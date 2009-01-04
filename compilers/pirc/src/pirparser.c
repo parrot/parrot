@@ -379,6 +379,7 @@ condition evaluates to I<true> during compile time) or it may become a C<noop>
 #include "pirmacro.h"
 #include "pirpcc.h"
 #include "pirerr.h"
+#include "pirop.h"
 
 /* #defines to prevent declarations of malloc() and free() in pirparser.h */
 #define YYMALLOC
@@ -510,7 +511,7 @@ static int check_value(constant * const c, int val);
 static void check_first_arg_direction(lexer_state * const lexer, char const * const opname);
 
 static int check_op_args_for_symbols(lexer_state * const lexer);
-static int get_opinfo(lexer_state * const lexer);
+
 
 static void undeclared_symbol(lexer_state * const lexer, char const * const symbol);
 
@@ -566,7 +567,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 235 "pir.y"
+#line 236 "pir.y"
 {
     double              dval;
     int                 ival;
@@ -586,7 +587,7 @@ typedef union YYSTYPE
     struct macro_param *pval;
 }
 /* Line 187 of yacc.c.  */
-#line 590 "pirparser.c"
+#line 591 "pirparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -599,7 +600,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 603 "pirparser.c"
+#line 604 "pirparser.c"
 
 #ifdef short
 # undef short
@@ -1055,49 +1056,49 @@ static const yytype_int16 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   557,   557,   558,   563,   569,   570,   573,   574,   577,
-     578,   579,   580,   581,   582,   583,   584,   585,   592,   593,
-     596,   600,   606,   613,   614,   617,   618,   621,   625,   626,
-     629,   630,   633,   636,   637,   640,   644,   655,   659,   661,
-     665,   671,   675,   679,   684,   685,   689,   691,   695,   699,
-     705,   709,   713,   714,   717,   718,   721,   723,   725,   727,
-     729,   731,   733,   735,   737,   739,   741,   743,   745,   747,
-     751,   756,   760,   764,   773,   784,   786,   788,   792,   801,
-     802,   815,   819,   824,   825,   829,   830,   831,   834,   841,
-     847,   848,   858,   860,   863,   864,   865,   866,   867,   868,
-     869,   870,   871,   872,   873,   874,   875,   876,   877,   883,
-     886,   891,   892,   897,   898,   901,   903,   911,   919,   920,
-     922,   925,   931,   932,   941,   942,   943,   944,   952,   956,
-     960,   969,   976,   983,   986,   987,   990,   999,  1006,  1009,
-    1010,  1013,  1014,  1017,  1053,  1055,  1059,  1061,  1066,  1068,
-    1072,  1095,  1099,  1101,  1110,  1121,  1133,  1143,  1146,  1147,
-    1150,  1159,  1168,  1173,  1178,  1199,  1204,  1245,  1263,  1270,
-    1275,  1286,  1297,  1308,  1319,  1324,  1329,  1334,  1344,  1363,
-    1397,  1399,  1401,  1403,  1405,  1407,  1409,  1411,  1416,  1425,
-    1427,  1429,  1431,  1433,  1435,  1437,  1439,  1441,  1443,  1455,
-    1460,  1462,  1464,  1466,  1468,  1470,  1472,  1474,  1476,  1478,
-    1480,  1482,  1484,  1515,  1541,  1549,  1558,  1567,  1569,  1571,
-    1573,  1575,  1579,  1584,  1586,  1591,  1592,  1595,  1596,  1599,
-    1600,  1603,  1611,  1615,  1617,  1621,  1625,  1626,  1629,  1644,
-    1648,  1649,  1652,  1664,  1665,  1669,  1671,  1675,  1679,  1681,
-    1683,  1689,  1690,  1695,  1696,  1700,  1702,  1711,  1713,  1717,
-    1721,  1723,  1725,  1729,  1730,  1733,  1753,  1760,  1762,  1772,
-    1789,  1791,  1793,  1797,  1806,  1811,  1818,  1819,  1823,  1825,
-    1829,  1831,  1836,  1837,  1841,  1843,  1845,  1847,  1857,  1861,
-    1862,  1863,  1864,  1867,  1872,  1883,  1890,  1895,  1896,  1900,
-    1902,  1906,  1907,  1910,  1914,  1918,  1922,  1931,  1941,  1942,
-    1947,  1949,  1954,  1959,  1960,  1964,  1966,  1970,  1976,  1977,
-    1981,  1983,  1991,  1992,  1996,  2000,  2004,  2005,  2008,  2012,
-    2016,  2018,  2020,  2022,  2030,  2031,  2035,  2036,  2037,  2040,
-    2041,  2044,  2045,  2046,  2047,  2048,  2049,  2052,  2053,  2054,
-    2055,  2063,  2066,  2067,  2078,  2079,  2080,  2081,  2085,  2086,
-    2089,  2090,  2091,  2092,  2093,  2094,  2095,  2096,  2099,  2100,
-    2101,  2104,  2105,  2106,  2107,  2108,  2109,  2110,  2111,  2112,
-    2113,  2114,  2115,  2116,  2117,  2118,  2119,  2120,  2121,  2122,
-    2123,  2124,  2125,  2126,  2132,  2133,  2134,  2135,  2136,  2137,
-    2138,  2139,  2140,  2141,  2142,  2143,  2155,  2163,  2167,  2168,
-    2171,  2172,  2173,  2174,  2175,  2176,  2179,  2181,  2182,  2185,
-    2186,  2189,  2193,  2198
+       0,   558,   558,   559,   564,   570,   571,   574,   575,   578,
+     579,   580,   581,   582,   583,   584,   585,   586,   593,   594,
+     597,   601,   607,   614,   615,   618,   619,   622,   626,   627,
+     630,   631,   634,   637,   638,   641,   645,   656,   660,   662,
+     666,   672,   676,   680,   685,   686,   690,   692,   696,   700,
+     706,   710,   714,   715,   718,   719,   722,   724,   726,   728,
+     730,   732,   734,   736,   738,   740,   742,   744,   746,   748,
+     752,   757,   761,   765,   774,   785,   787,   789,   793,   802,
+     803,   816,   820,   825,   826,   830,   831,   832,   835,   842,
+     848,   849,   859,   861,   864,   865,   866,   867,   868,   869,
+     870,   871,   872,   873,   874,   875,   876,   877,   878,   884,
+     887,   892,   893,   898,   899,   902,   904,   912,   920,   921,
+     923,   926,   932,   933,   942,   943,   944,   945,   953,   957,
+     961,   970,   977,   984,   987,   988,   991,  1000,  1007,  1010,
+    1011,  1014,  1015,  1018,  1054,  1056,  1060,  1062,  1067,  1069,
+    1073,  1096,  1100,  1102,  1111,  1122,  1134,  1144,  1147,  1148,
+    1151,  1160,  1169,  1174,  1179,  1200,  1205,  1246,  1264,  1271,
+    1276,  1287,  1298,  1309,  1320,  1325,  1330,  1335,  1345,  1364,
+    1398,  1400,  1402,  1404,  1406,  1408,  1410,  1412,  1417,  1426,
+    1428,  1430,  1432,  1434,  1436,  1438,  1440,  1442,  1444,  1456,
+    1461,  1463,  1465,  1467,  1469,  1471,  1473,  1475,  1477,  1479,
+    1481,  1483,  1485,  1516,  1542,  1550,  1559,  1568,  1570,  1572,
+    1574,  1576,  1580,  1585,  1587,  1592,  1593,  1596,  1597,  1600,
+    1601,  1604,  1612,  1616,  1618,  1622,  1626,  1627,  1630,  1645,
+    1649,  1650,  1653,  1665,  1666,  1670,  1672,  1676,  1680,  1682,
+    1684,  1690,  1691,  1696,  1697,  1701,  1703,  1712,  1714,  1718,
+    1722,  1724,  1726,  1730,  1731,  1734,  1754,  1761,  1763,  1773,
+    1790,  1792,  1794,  1798,  1807,  1812,  1819,  1820,  1824,  1826,
+    1830,  1832,  1837,  1838,  1842,  1844,  1846,  1848,  1858,  1862,
+    1863,  1864,  1865,  1868,  1873,  1884,  1891,  1896,  1897,  1901,
+    1903,  1907,  1908,  1911,  1915,  1919,  1923,  1932,  1942,  1943,
+    1948,  1950,  1955,  1960,  1961,  1965,  1967,  1971,  1977,  1978,
+    1982,  1984,  1992,  1993,  1997,  2001,  2005,  2006,  2009,  2013,
+    2017,  2019,  2021,  2023,  2031,  2032,  2036,  2037,  2038,  2041,
+    2042,  2045,  2046,  2047,  2048,  2049,  2050,  2053,  2054,  2055,
+    2056,  2064,  2067,  2068,  2079,  2080,  2081,  2082,  2086,  2087,
+    2090,  2091,  2092,  2093,  2094,  2095,  2096,  2097,  2100,  2101,
+    2102,  2105,  2106,  2107,  2108,  2109,  2110,  2111,  2112,  2113,
+    2114,  2115,  2116,  2117,  2118,  2119,  2120,  2121,  2122,  2123,
+    2124,  2125,  2126,  2127,  2133,  2134,  2135,  2136,  2137,  2138,
+    2139,  2140,  2141,  2142,  2143,  2144,  2156,  2164,  2168,  2169,
+    2172,  2173,  2174,  2175,  2176,  2177,  2180,  2182,  2183,  2186,
+    2187,  2190,  2194,  2199
 };
 #endif
 
@@ -2611,22 +2612,22 @@ yyreduce:
   switch (yyn)
     {
         case 4:
-#line 566 "pir.y"
+#line 567 "pir.y"
     { fixup_global_labels(lexer); ;}
     break;
 
   case 20:
-#line 597 "pir.y"
+#line 598 "pir.y"
     { new_macro_const(lexer->macros, (yyvsp[(2) - (3)].sval), (yyvsp[(3) - (3)].sval), yypirget_lineno(yyscanner)); ;}
     break;
 
   case 21:
-#line 603 "pir.y"
+#line 604 "pir.y"
     { /* fprintf(stderr, "macro body: [%s]\n", CURRENT_MACRO(lexer)->body);*/ ;}
     break;
 
   case 22:
-#line 607 "pir.y"
+#line 608 "pir.y"
     {
                           new_macro(lexer->macros, (yyvsp[(2) - (2)].sval), yypirget_lineno(yyscanner), TRUE,
                                     lexer->macro_size);
@@ -2634,17 +2635,17 @@ yyreduce:
     break;
 
   case 27:
-#line 622 "pir.y"
+#line 623 "pir.y"
     { add_macro_param(CURRENT_MACRO(lexer), (yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 35:
-#line 641 "pir.y"
+#line 642 "pir.y"
     { store_macro_string(CURRENT_MACRO(lexer), "%s\n", (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 36:
-#line 645 "pir.y"
+#line 646 "pir.y"
     {
                           store_macro_string(CURRENT_MACRO(lexer), ".local %s %s\n",
                                              pir_type_names[(yyvsp[(2) - (3)].ival)], (yyvsp[(3) - (3)].sval));
@@ -2652,152 +2653,152 @@ yyreduce:
     break;
 
   case 37:
-#line 656 "pir.y"
+#line 657 "pir.y"
     { load_library(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 38:
-#line 660 "pir.y"
+#line 661 "pir.y"
     { yypirset_lineno ((yyvsp[(2) - (2)].ival), yyscanner); ;}
     break;
 
   case 39:
-#line 662 "pir.y"
+#line 663 "pir.y"
     { lexer->filename = (yyvsp[(2) - (2)].sval); ;}
     break;
 
   case 40:
-#line 666 "pir.y"
+#line 667 "pir.y"
     { annotate(lexer, (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 41:
-#line 672 "pir.y"
+#line 673 "pir.y"
     { set_hll(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 42:
-#line 676 "pir.y"
+#line 677 "pir.y"
     { set_hll_map(lexer, (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 43:
-#line 680 "pir.y"
+#line 681 "pir.y"
     { set_namespace(lexer, (yyvsp[(3) - (4)].key)); ;}
     break;
 
   case 44:
-#line 684 "pir.y"
+#line 685 "pir.y"
     { (yyval.key) = NULL; ;}
     break;
 
   case 45:
-#line 686 "pir.y"
+#line 687 "pir.y"
     { (yyval.key) = (yyvsp[(1) - (1)].key); ;}
     break;
 
   case 46:
-#line 690 "pir.y"
+#line 691 "pir.y"
     { (yyval.key) = new_key(lexer, (yyvsp[(1) - (1)].expr)); ;}
     break;
 
   case 47:
-#line 692 "pir.y"
+#line 693 "pir.y"
     { (yyval.key) = add_key(lexer, (yyvsp[(1) - (3)].key), (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 48:
-#line 696 "pir.y"
+#line 697 "pir.y"
     { (yyval.expr) = expr_from_string(lexer, (yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 50:
-#line 706 "pir.y"
+#line 707 "pir.y"
     { close_sub(lexer); ;}
     break;
 
   case 51:
-#line 710 "pir.y"
+#line 711 "pir.y"
     { new_subr(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 56:
-#line 722 "pir.y"
+#line 723 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_ANON);;}
     break;
 
   case 57:
-#line 724 "pir.y"
+#line 725 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_INIT); ;}
     break;
 
   case 58:
-#line 726 "pir.y"
+#line 727 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_LOAD); ;}
     break;
 
   case 59:
-#line 728 "pir.y"
+#line 729 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_MAIN); ;}
     break;
 
   case 60:
-#line 730 "pir.y"
+#line 731 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_LEX); ;}
     break;
 
   case 61:
-#line 732 "pir.y"
+#line 733 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_POSTCOMP); ;}
     break;
 
   case 62:
-#line 734 "pir.y"
+#line 735 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_IMMEDIATE); ;}
     break;
 
   case 63:
-#line 736 "pir.y"
+#line 737 "pir.y"
     { set_sub_flag(lexer, PIRC_SUB_FLAG_MULTI); ;}
     break;
 
   case 64:
-#line 738 "pir.y"
+#line 739 "pir.y"
     { set_sub_outer(lexer, (yyvsp[(3) - (4)].sval)); ;}
     break;
 
   case 65:
-#line 740 "pir.y"
+#line 741 "pir.y"
     { set_sub_methodname(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 66:
-#line 742 "pir.y"
+#line 743 "pir.y"
     { set_sub_vtable(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 67:
-#line 744 "pir.y"
+#line 745 "pir.y"
     { set_sub_subid(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 68:
-#line 746 "pir.y"
+#line 747 "pir.y"
     { set_sub_instanceof(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 69:
-#line 748 "pir.y"
+#line 749 "pir.y"
     { set_sub_nsentry(lexer, (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 70:
-#line 752 "pir.y"
+#line 753 "pir.y"
     { set_sub_multi_types(lexer, (yyvsp[(2) - (3)].expr)); ;}
     break;
 
   case 71:
-#line 756 "pir.y"
+#line 757 "pir.y"
     {
                           CURRENT_SUB(lexer)->info.num_multi_types = 1;
                           /* n=1 means :multi() -- without any types. */
@@ -2805,12 +2806,12 @@ yyreduce:
     break;
 
   case 72:
-#line 761 "pir.y"
+#line 762 "pir.y"
     { (yyval.expr) = (yyvsp[(1) - (1)].expr); ;}
     break;
 
   case 73:
-#line 765 "pir.y"
+#line 766 "pir.y"
     {
                           CURRENT_SUB(lexer)->info.num_multi_types = 2;
                           /* start counting multi types; always 1 higher than actual number
@@ -2822,7 +2823,7 @@ yyreduce:
     break;
 
   case 74:
-#line 774 "pir.y"
+#line 775 "pir.y"
     {
                           ++CURRENT_SUB(lexer)->info.num_multi_types;
                           /* link the multi types in reverse other. That's fine,
@@ -2834,22 +2835,22 @@ yyreduce:
     break;
 
   case 75:
-#line 785 "pir.y"
+#line 786 "pir.y"
     { (yyval.expr) = expr_from_ident(lexer, (yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 76:
-#line 787 "pir.y"
+#line 788 "pir.y"
     { (yyval.expr) = expr_from_string(lexer, (yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 77:
-#line 789 "pir.y"
+#line 790 "pir.y"
     { (yyval.expr) = expr_from_key(lexer, (yyvsp[(1) - (1)].key)); ;}
     break;
 
   case 78:
-#line 793 "pir.y"
+#line 794 "pir.y"
     {
                            /* if there are parameters, then emit a get_params instruction. */
                            if ((yyvsp[(1) - (1)].uval) > 0)
@@ -2858,12 +2859,12 @@ yyreduce:
     break;
 
   case 79:
-#line 801 "pir.y"
+#line 802 "pir.y"
     { (yyval.uval) = 0; ;}
     break;
 
   case 80:
-#line 803 "pir.y"
+#line 804 "pir.y"
     {
                           /* if the :named flag was set, there's an extra
                            * constant string argument for the name. count that too.
@@ -2877,27 +2878,27 @@ yyreduce:
     break;
 
   case 81:
-#line 816 "pir.y"
+#line 817 "pir.y"
     { (yyval.targ) = set_param_flag(lexer, (yyvsp[(2) - (4)].targ), (yyvsp[(3) - (4)].ival)); ;}
     break;
 
   case 82:
-#line 820 "pir.y"
+#line 821 "pir.y"
     { (yyval.targ) = add_param(lexer, (yyvsp[(1) - (2)].ival), (yyvsp[(2) - (2)].sval)); ;}
     break;
 
   case 83:
-#line 824 "pir.y"
+#line 825 "pir.y"
     { (yyval.ival) = 0; ;}
     break;
 
   case 84:
-#line 826 "pir.y"
+#line 827 "pir.y"
     { SET_FLAG((yyval.ival), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 88:
-#line 835 "pir.y"
+#line 836 "pir.y"
     { (yyval.ival) = TARGET_FLAG_INVOCANT;
                            /* XXX handle multi_type */
 
@@ -2905,12 +2906,12 @@ yyreduce:
     break;
 
   case 89:
-#line 842 "pir.y"
+#line 843 "pir.y"
     { (yyval.ival) = TARGET_FLAG_UNIQUE_REG; ;}
     break;
 
   case 91:
-#line 849 "pir.y"
+#line 850 "pir.y"
     {
                          ++lexer->stmt_counter;
                          /* increment the logical statement counter; a statement can be
@@ -2921,37 +2922,37 @@ yyreduce:
     break;
 
   case 92:
-#line 859 "pir.y"
+#line 860 "pir.y"
     { set_label(lexer, (yyvsp[(1) - (2)].sval)); ;}
     break;
 
   case 110:
-#line 887 "pir.y"
+#line 888 "pir.y"
     { (yyval.sval) = expand_macro(yyscanner, (yyvsp[(1) - (3)].mval), (yyvsp[(2) - (3)].pval)); ;}
     break;
 
   case 111:
-#line 891 "pir.y"
+#line 892 "pir.y"
     { (yyval.pval) = NULL; ;}
     break;
 
   case 112:
-#line 893 "pir.y"
+#line 894 "pir.y"
     { (yyval.pval) = (yyvsp[(2) - (3)].pval); ;}
     break;
 
   case 113:
-#line 897 "pir.y"
+#line 898 "pir.y"
     { (yyval.pval) = NULL; ;}
     break;
 
   case 115:
-#line 902 "pir.y"
+#line 903 "pir.y"
     { (yyval.pval) = new_macro_param((yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 116:
-#line 904 "pir.y"
+#line 905 "pir.y"
     {
                           macro_param *param = new_macro_param((yyvsp[(3) - (3)].sval));
                           param->next = (yyvsp[(1) - (3)].pval);
@@ -2960,7 +2961,7 @@ yyreduce:
     break;
 
   case 117:
-#line 912 "pir.y"
+#line 913 "pir.y"
     {
                           symbol *sym = find_symbol(lexer, (yyvsp[(1) - (1)].sval));
                           if (sym == NULL) {
@@ -2971,22 +2972,22 @@ yyreduce:
     break;
 
   case 119:
-#line 921 "pir.y"
+#line 922 "pir.y"
     { (yyval.sval) = expand_macro(yyscanner, (yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].pval)); ;}
     break;
 
   case 121:
-#line 926 "pir.y"
+#line 927 "pir.y"
     { (yyval.sval) = (yyvsp[(2) - (3)].sval); ;}
     break;
 
   case 122:
-#line 931 "pir.y"
+#line 932 "pir.y"
     { (yyval.sval) = ""; ;}
     break;
 
   case 123:
-#line 933 "pir.y"
+#line 934 "pir.y"
     { /* XXX cleanup memory stuff */
                           char *newbuff = (char *)mem_sys_allocate((strlen((yyvsp[(1) - (2)].sval)) + strlen((yyvsp[(2) - (2)].sval)) + 2)
                                                                    * sizeof (char));
@@ -2996,17 +2997,17 @@ yyreduce:
     break;
 
   case 127:
-#line 945 "pir.y"
+#line 946 "pir.y"
     { (yyval.sval) = expand_macro(yyscanner, (yyvsp[(1) - (2)].mval), (yyvsp[(2) - (2)].pval)); ;}
     break;
 
   case 128:
-#line 953 "pir.y"
+#line 954 "pir.y"
     { set_instr(lexer, NULL); ;}
     break;
 
   case 130:
-#line 961 "pir.y"
+#line 962 "pir.y"
     {
                            if (lexer->parse_errors > MAX_NUM_ERRORS)
                                panic(lexer, "Too many errors. Compilation aborted.\n");
@@ -3016,7 +3017,7 @@ yyreduce:
     break;
 
   case 131:
-#line 970 "pir.y"
+#line 971 "pir.y"
     {
                            set_instrf(lexer, "null", "%T", (yyvsp[(2) - (3)].targ));
                            get_opinfo(lexer);
@@ -3024,7 +3025,7 @@ yyreduce:
     break;
 
   case 132:
-#line 977 "pir.y"
+#line 978 "pir.y"
     {
                            set_instrf(lexer, "get_results", "%T", (yyvsp[(2) - (3)].targ));
                            get_opinfo(lexer);
@@ -3032,7 +3033,7 @@ yyreduce:
     break;
 
   case 136:
-#line 991 "pir.y"
+#line 992 "pir.y"
     { /* at this point, TK_IDENT may in fact be a symbol identifier,
                             * not an op, so don't do any checks like is_parrot_op() just yet.
                             */
@@ -3042,7 +3043,7 @@ yyreduce:
     break;
 
   case 137:
-#line 1000 "pir.y"
+#line 1001 "pir.y"
     { /* when this rule is activated, the initial identifier must
                            * be a parrot op.
                            */
@@ -3052,7 +3053,7 @@ yyreduce:
     break;
 
   case 143:
-#line 1018 "pir.y"
+#line 1019 "pir.y"
     {
                          /* the "instruction" that was set now appears to be
                           * an identifier; get the name, and check its type.
@@ -3089,22 +3090,22 @@ yyreduce:
     break;
 
   case 144:
-#line 1054 "pir.y"
+#line 1055 "pir.y"
     { push_operand(lexer, (yyvsp[(1) - (1)].expr)); ;}
     break;
 
   case 145:
-#line 1056 "pir.y"
+#line 1057 "pir.y"
     { push_operand(lexer, expr_from_key(lexer, (yyvsp[(1) - (1)].key))); ;}
     break;
 
   case 146:
-#line 1060 "pir.y"
+#line 1061 "pir.y"
     { (yyval.expr) = expr_from_const(lexer, (yyvsp[(1) - (1)].cval)); ;}
     break;
 
   case 147:
-#line 1062 "pir.y"
+#line 1063 "pir.y"
     { /* this is either a LABEL or a symbol; in the latter case, the type
                             * will be filled in later. */
                            (yyval.expr) = expr_from_ident(lexer, (yyvsp[(1) - (1)].sval));
@@ -3112,17 +3113,17 @@ yyreduce:
     break;
 
   case 148:
-#line 1067 "pir.y"
+#line 1068 "pir.y"
     { (yyval.expr) = expr_from_target(lexer, (yyvsp[(1) - (1)].targ)); ;}
     break;
 
   case 149:
-#line 1069 "pir.y"
+#line 1070 "pir.y"
     { (yyval.expr) = expr_from_target(lexer, (yyvsp[(1) - (1)].targ)); ;}
     break;
 
   case 150:
-#line 1073 "pir.y"
+#line 1074 "pir.y"
     {
                            /* if $1 is a register, just return that */
                            if (TEST_FLAG((yyvsp[(1) - (2)].targ)->flags, TARGET_FLAG_IS_REG))
@@ -3146,22 +3147,22 @@ yyreduce:
     break;
 
   case 151:
-#line 1096 "pir.y"
+#line 1097 "pir.y"
     { (yyval.key) = (yyvsp[(2) - (3)].key); ;}
     break;
 
   case 152:
-#line 1100 "pir.y"
+#line 1101 "pir.y"
     { (yyval.key) = new_key(lexer, (yyvsp[(1) - (1)].expr)); ;}
     break;
 
   case 153:
-#line 1102 "pir.y"
+#line 1103 "pir.y"
     { (yyval.key) = add_key(lexer, (yyvsp[(1) - (3)].key), (yyvsp[(3) - (3)].expr)); ;}
     break;
 
   case 154:
-#line 1111 "pir.y"
+#line 1112 "pir.y"
     {
                           /* the instruction is already set in parrot_op rule */
                           unshift_operand(lexer, (yyvsp[(4) - (6)].expr));
@@ -3175,7 +3176,7 @@ yyreduce:
     break;
 
   case 155:
-#line 1122 "pir.y"
+#line 1123 "pir.y"
     {
                           /* the instruction is already set in parrot_op rule */
                           unshift_operand(lexer, (yyvsp[(4) - (4)].expr));
@@ -3190,7 +3191,7 @@ yyreduce:
     break;
 
   case 156:
-#line 1134 "pir.y"
+#line 1135 "pir.y"
     { /* XXX create a PMC const for $4 */
                           unshift_operand(lexer, expr_from_key(lexer, (yyvsp[(4) - (6)].key)));
                           unshift_operand(lexer, expr_from_target(lexer, (yyvsp[(1) - (6)].targ)));
@@ -3201,7 +3202,7 @@ yyreduce:
     break;
 
   case 160:
-#line 1151 "pir.y"
+#line 1152 "pir.y"
     {
                           if ((yyvsp[(3) - (3)].ival) == 0)
                               set_instrf(lexer, "null", "%T", (yyvsp[(1) - (3)].targ));
@@ -3213,7 +3214,7 @@ yyreduce:
     break;
 
   case 161:
-#line 1160 "pir.y"
+#line 1161 "pir.y"
     {
                           if ((yyvsp[(3) - (3)].dval) == 0.0)
                               set_instrf(lexer, "null", "%T", (yyvsp[(1) - (3)].targ));
@@ -3225,7 +3226,7 @@ yyreduce:
     break;
 
   case 162:
-#line 1169 "pir.y"
+#line 1170 "pir.y"
     {
                           set_instrf(lexer, "set", "%T%C", (yyvsp[(1) - (3)].targ), (yyvsp[(3) - (3)].cval));
                           get_opinfo(lexer);
@@ -3233,7 +3234,7 @@ yyreduce:
     break;
 
   case 163:
-#line 1174 "pir.y"
+#line 1175 "pir.y"
     {
                           set_instrf(lexer, "set", "%T%T", (yyvsp[(1) - (3)].targ), (yyvsp[(3) - (3)].targ));
                           get_opinfo(lexer);
@@ -3241,7 +3242,7 @@ yyreduce:
     break;
 
   case 164:
-#line 1179 "pir.y"
+#line 1180 "pir.y"
     {
                           symbol *sym = find_symbol(lexer, (yyvsp[(3) - (3)].sval));
                           if (sym) {
@@ -3265,7 +3266,7 @@ yyreduce:
     break;
 
   case 165:
-#line 1200 "pir.y"
+#line 1201 "pir.y"
     {
                           unshift_operand(lexer, expr_from_target(lexer, (yyvsp[(1) - (3)].targ)));
                           get_opinfo(lexer);
@@ -3273,7 +3274,7 @@ yyreduce:
     break;
 
   case 166:
-#line 1205 "pir.y"
+#line 1206 "pir.y"
     {
                           /*   $P0 = foo ["bar"]
                            *
@@ -3317,7 +3318,7 @@ yyreduce:
     break;
 
   case 167:
-#line 1246 "pir.y"
+#line 1247 "pir.y"
     {
                           symbol *sym = find_symbol(lexer, (yyvsp[(3) - (4)].sval));
                           target *t;
@@ -3338,7 +3339,7 @@ yyreduce:
     break;
 
   case 168:
-#line 1264 "pir.y"
+#line 1265 "pir.y"
     {
                           target *preg = new_reg(lexer, PMC_TYPE, (yyvsp[(3) - (4)].ival));
                           set_target_key(preg, (yyvsp[(4) - (4)].key));
@@ -3348,7 +3349,7 @@ yyreduce:
     break;
 
   case 169:
-#line 1271 "pir.y"
+#line 1272 "pir.y"
     {
                           set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival)], "%T%E", (yyvsp[(1) - (3)].targ), (yyvsp[(3) - (3)].expr));
                           get_opinfo(lexer);
@@ -3356,7 +3357,7 @@ yyreduce:
     break;
 
   case 170:
-#line 1276 "pir.y"
+#line 1277 "pir.y"
     {
                           if ((yyvsp[(3) - (3)].ival) == 1)
                               set_instrf(lexer, "inc", "%T", (yyvsp[(1) - (3)].targ));
@@ -3370,7 +3371,7 @@ yyreduce:
     break;
 
   case 171:
-#line 1287 "pir.y"
+#line 1288 "pir.y"
     {
                           if ((yyvsp[(3) - (3)].dval) == 1.0)
                               set_instrf(lexer, "inc", "%T", (yyvsp[(1) - (3)].targ));
@@ -3384,7 +3385,7 @@ yyreduce:
     break;
 
   case 172:
-#line 1298 "pir.y"
+#line 1299 "pir.y"
     {
                           if ((yyvsp[(3) - (3)].ival) == 1)
                               set_instrf(lexer, "dec", "%T", (yyvsp[(1) - (3)].targ));
@@ -3398,7 +3399,7 @@ yyreduce:
     break;
 
   case 173:
-#line 1309 "pir.y"
+#line 1310 "pir.y"
     {
                           if ((yyvsp[(3) - (3)].dval) == 1.0)
                               set_instrf(lexer, "dec", "%T", (yyvsp[(1) - (3)].targ));
@@ -3412,7 +3413,7 @@ yyreduce:
     break;
 
   case 174:
-#line 1320 "pir.y"
+#line 1321 "pir.y"
     {
                           set_instrf(lexer, "add", "%T%T", (yyvsp[(1) - (3)].targ), (yyvsp[(3) - (3)].targ));
                           get_opinfo(lexer);
@@ -3420,7 +3421,7 @@ yyreduce:
     break;
 
   case 175:
-#line 1325 "pir.y"
+#line 1326 "pir.y"
     {
                           set_instrf(lexer, "sub", "%T%T", (yyvsp[(1) - (3)].targ), (yyvsp[(3) - (3)].targ));
                           get_opinfo(lexer);
@@ -3428,7 +3429,7 @@ yyreduce:
     break;
 
   case 176:
-#line 1330 "pir.y"
+#line 1331 "pir.y"
     {
                           set_instrf(lexer, (yyvsp[(3) - (4)].sval), "%T%E", (yyvsp[(1) - (4)].targ), (yyvsp[(4) - (4)].expr));
                           get_opinfo(lexer);
@@ -3436,7 +3437,7 @@ yyreduce:
     break;
 
   case 177:
-#line 1335 "pir.y"
+#line 1336 "pir.y"
     {
                           if (targets_equal((yyvsp[(1) - (5)].targ), (yyvsp[(3) - (5)].targ))) /* $P0 = $P0 + $P1 ==> $P0 += $P1 */
                               set_instrf(lexer, opnames[(yyvsp[(4) - (5)].ival)], "%T%E", (yyvsp[(1) - (5)].targ), (yyvsp[(5) - (5)].expr));
@@ -3449,7 +3450,7 @@ yyreduce:
     break;
 
   case 178:
-#line 1345 "pir.y"
+#line 1346 "pir.y"
     {
                           symbol *sym = find_symbol(lexer, (yyvsp[(1) - (4)].sval));
                           target *t;
@@ -3471,7 +3472,7 @@ yyreduce:
     break;
 
   case 179:
-#line 1364 "pir.y"
+#line 1365 "pir.y"
     {
                           target *preg = new_reg(lexer, PMC_TYPE, (yyvsp[(1) - (4)].ival));
                           set_target_key(preg, (yyvsp[(2) - (4)].key));
@@ -3481,97 +3482,97 @@ yyreduce:
     break;
 
   case 180:
-#line 1398 "pir.y"
+#line 1399 "pir.y"
     { set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival)], "%i%T", (yyvsp[(1) - (3)].ival), (yyvsp[(3) - (3)].targ)); ;}
     break;
 
   case 181:
-#line 1400 "pir.y"
+#line 1401 "pir.y"
     { set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival)], "%n%T", (yyvsp[(1) - (3)].dval), (yyvsp[(3) - (3)].targ)); ;}
     break;
 
   case 182:
-#line 1402 "pir.y"
+#line 1403 "pir.y"
     { set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival)], "%s%T", (yyvsp[(1) - (3)].sval), (yyvsp[(3) - (3)].targ)); ;}
     break;
 
   case 183:
-#line 1404 "pir.y"
+#line 1405 "pir.y"
     { set_instrf(lexer, "set", "%C", fold_s_s(yyscanner, (yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].sval))); ;}
     break;
 
   case 184:
-#line 1406 "pir.y"
+#line 1407 "pir.y"
     { set_instrf(lexer, "set", "%C", fold_i_i(yyscanner, (yyvsp[(1) - (3)].ival), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].ival))); ;}
     break;
 
   case 185:
-#line 1408 "pir.y"
+#line 1409 "pir.y"
     { set_instrf(lexer, "set", "%C", fold_n_n(yyscanner, (yyvsp[(1) - (3)].dval), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].dval))); ;}
     break;
 
   case 186:
-#line 1410 "pir.y"
+#line 1411 "pir.y"
     { set_instrf(lexer, "set", "%C", fold_i_n(yyscanner, (yyvsp[(1) - (3)].ival), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].dval))); ;}
     break;
 
   case 187:
-#line 1412 "pir.y"
+#line 1413 "pir.y"
     { set_instrf(lexer, "set", "%C", fold_n_i(yyscanner, (yyvsp[(1) - (3)].dval), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].ival))); ;}
     break;
 
   case 188:
-#line 1417 "pir.y"
+#line 1418 "pir.y"
     { get_opinfo(lexer); ;}
     break;
 
   case 189:
-#line 1426 "pir.y"
+#line 1427 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, (yyvsp[(3) - (5)].sval), (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 190:
-#line 1428 "pir.y"
+#line 1429 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "int", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 191:
-#line 1430 "pir.y"
+#line 1431 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "num", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 192:
-#line 1432 "pir.y"
+#line 1433 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "pmc", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 193:
-#line 1434 "pir.y"
+#line 1435 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "string", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 194:
-#line 1436 "pir.y"
+#line 1437 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "if", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 195:
-#line 1438 "pir.y"
+#line 1439 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "unless", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 196:
-#line 1440 "pir.y"
+#line 1441 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "goto", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 197:
-#line 1442 "pir.y"
+#line 1443 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (5)].ival), 1, "null", (yyvsp[(5) - (5)].sval)); ;}
     break;
 
   case 198:
-#line 1444 "pir.y"
+#line 1445 "pir.y"
     {
                           int istrue = evaluate_c(lexer, (yyvsp[(2) - (4)].cval));
                           /* if "unless", invert the true-ness */
@@ -3586,7 +3587,7 @@ yyreduce:
     break;
 
   case 199:
-#line 1456 "pir.y"
+#line 1457 "pir.y"
     {
                           set_instrf(lexer, (yyvsp[(1) - (5)].ival) ? "unless_null" : "if_null", "%T%I",
                                      new_reg(lexer, PMC_TYPE, (yyvsp[(3) - (5)].ival)), (yyvsp[(5) - (5)].sval));
@@ -3594,67 +3595,67 @@ yyreduce:
     break;
 
   case 200:
-#line 1461 "pir.y"
+#line 1462 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 201:
-#line 1463 "pir.y"
+#line 1464 "pir.y"
     { set_instrf(lexer, (yyvsp[(1) - (4)].ival) ? "unless" : "if", "%T%I", (yyvsp[(2) - (4)].targ), (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 202:
-#line 1465 "pir.y"
+#line 1466 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "int", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 203:
-#line 1467 "pir.y"
+#line 1468 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "num", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 204:
-#line 1469 "pir.y"
+#line 1470 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "pmc", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 205:
-#line 1471 "pir.y"
+#line 1472 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "string", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 206:
-#line 1473 "pir.y"
+#line 1474 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "if", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 207:
-#line 1475 "pir.y"
+#line 1476 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "unless", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 208:
-#line 1477 "pir.y"
+#line 1478 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "goto", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 209:
-#line 1479 "pir.y"
+#line 1480 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "goto", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 210:
-#line 1481 "pir.y"
+#line 1482 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "null", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 211:
-#line 1483 "pir.y"
+#line 1484 "pir.y"
     { create_if_instr(lexer, (yyvsp[(1) - (4)].ival), 0, "null", (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 212:
-#line 1485 "pir.y"
+#line 1486 "pir.y"
     {
                           if ((yyvsp[(2) - (4)].ival) == COMPUTE_DURING_RUNTIME) {
                              if ((yyvsp[(1) - (4)].ival) == NEED_INVERT_OPNAME) /* "unless" */
@@ -3682,7 +3683,7 @@ yyreduce:
     break;
 
   case 213:
-#line 1516 "pir.y"
+#line 1517 "pir.y"
     {
                           /* the instructions "gt" and "ge" are converted to "lt" and "le".
                            * if so, then the arguments must be reversed as well. "lt" and
@@ -3711,7 +3712,7 @@ yyreduce:
     break;
 
   case 214:
-#line 1542 "pir.y"
+#line 1543 "pir.y"
     {
                           if (((yyvsp[(0) - (3)].ival) != NEED_INVERT_OPNAME) && ((yyvsp[(2) - (3)].ival) == OP_GE || (yyvsp[(2) - (3)].ival) == OP_GT))
                               set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival) + 1], "%T%i", (yyvsp[(3) - (3)].targ), (yyvsp[(1) - (3)].ival));
@@ -3722,7 +3723,7 @@ yyreduce:
     break;
 
   case 215:
-#line 1550 "pir.y"
+#line 1551 "pir.y"
     {
                           if (((yyvsp[(0) - (3)].ival) != NEED_INVERT_OPNAME) && ((yyvsp[(2) - (3)].ival) == OP_GE || (yyvsp[(2) - (3)].ival) == OP_GT))
                               set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival) + 1], "%T%n", (yyvsp[(3) - (3)].targ), (yyvsp[(1) - (3)].dval));
@@ -3734,7 +3735,7 @@ yyreduce:
     break;
 
   case 216:
-#line 1559 "pir.y"
+#line 1560 "pir.y"
     {
                           if (((yyvsp[(0) - (3)].ival) != NEED_INVERT_OPNAME) && ((yyvsp[(2) - (3)].ival) == OP_GE || (yyvsp[(2) - (3)].ival) == OP_GT))
                               set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival)], "%T%s", (yyvsp[(3) - (3)].targ), (yyvsp[(1) - (3)].sval));
@@ -3746,32 +3747,32 @@ yyreduce:
     break;
 
   case 217:
-#line 1568 "pir.y"
+#line 1569 "pir.y"
     { (yyval.ival) = evaluate_i_i((yyvsp[(1) - (3)].ival), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].ival)); ;}
     break;
 
   case 218:
-#line 1570 "pir.y"
+#line 1571 "pir.y"
     { (yyval.ival) = evaluate_i_n((yyvsp[(1) - (3)].ival), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].dval)); ;}
     break;
 
   case 219:
-#line 1572 "pir.y"
+#line 1573 "pir.y"
     { (yyval.ival) = evaluate_n_i((yyvsp[(1) - (3)].dval), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].ival)); ;}
     break;
 
   case 220:
-#line 1574 "pir.y"
+#line 1575 "pir.y"
     { (yyval.ival) = evaluate_n_n((yyvsp[(1) - (3)].dval), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].dval)); ;}
     break;
 
   case 221:
-#line 1576 "pir.y"
+#line 1577 "pir.y"
     { (yyval.ival) = evaluate_s_s((yyvsp[(1) - (3)].sval), (yyvsp[(2) - (3)].ival), (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 222:
-#line 1580 "pir.y"
+#line 1581 "pir.y"
     {
                           yypirerror(yyscanner, lexer, "cannot compare string to %s",
                                      (yyvsp[(3) - (3)].ival) == INT_TYPE ? "integer" : "number");
@@ -3779,37 +3780,37 @@ yyreduce:
     break;
 
   case 223:
-#line 1585 "pir.y"
+#line 1586 "pir.y"
     { yypirerror(yyscanner, lexer, "cannot compare integer to string"); ;}
     break;
 
   case 224:
-#line 1587 "pir.y"
+#line 1588 "pir.y"
     { yypirerror(yyscanner, lexer, "cannot compare number to string"); ;}
     break;
 
   case 225:
-#line 1591 "pir.y"
+#line 1592 "pir.y"
     { (yyval.ival) = INT_TYPE; ;}
     break;
 
   case 226:
-#line 1592 "pir.y"
+#line 1593 "pir.y"
     { (yyval.ival) = NUM_TYPE; ;}
     break;
 
   case 227:
-#line 1595 "pir.y"
+#line 1596 "pir.y"
     { (yyval.ival) = DONT_INVERT_OPNAME; /* no need to invert */ ;}
     break;
 
   case 228:
-#line 1596 "pir.y"
+#line 1597 "pir.y"
     { (yyval.ival) = NEED_INVERT_OPNAME; /* yes, invert opname */ ;}
     break;
 
   case 231:
-#line 1604 "pir.y"
+#line 1605 "pir.y"
     {
                           set_instrf(lexer, "branch", "%I", (yyvsp[(2) - (3)].sval));
                           set_op_labelflag(lexer, BIT(0)); /* bit 0 means: "1 << 0" */
@@ -3818,37 +3819,37 @@ yyreduce:
     break;
 
   case 232:
-#line 1612 "pir.y"
+#line 1613 "pir.y"
     { declare_local(lexer, (yyvsp[(2) - (4)].ival), (yyvsp[(3) - (4)].symb)); ;}
     break;
 
   case 233:
-#line 1616 "pir.y"
+#line 1617 "pir.y"
     { (yyval.symb) = (yyvsp[(1) - (1)].symb); ;}
     break;
 
   case 234:
-#line 1618 "pir.y"
+#line 1619 "pir.y"
     { (yyval.symb) = add_local((yyvsp[(1) - (3)].symb), (yyvsp[(3) - (3)].symb)); ;}
     break;
 
   case 235:
-#line 1622 "pir.y"
+#line 1623 "pir.y"
     { (yyval.symb) = new_local(lexer, (yyvsp[(1) - (2)].sval), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 236:
-#line 1625 "pir.y"
+#line 1626 "pir.y"
     { (yyval.ival) = 0; ;}
     break;
 
   case 237:
-#line 1626 "pir.y"
+#line 1627 "pir.y"
     { (yyval.ival) = 1; ;}
     break;
 
   case 238:
-#line 1630 "pir.y"
+#line 1631 "pir.y"
     { /* if $4 is not a register, it must be a declared symbol */
                           if (!TEST_FLAG((yyvsp[(4) - (5)].targ)->flags, TARGET_FLAG_IS_REG)) {
 
@@ -3861,12 +3862,12 @@ yyreduce:
     break;
 
   case 239:
-#line 1645 "pir.y"
+#line 1646 "pir.y"
     { convert_inv_to_instr(lexer, (yyvsp[(1) - (1)].invo)); ;}
     break;
 
   case 242:
-#line 1657 "pir.y"
+#line 1658 "pir.y"
     { /* $4 contains an invocation object */
                               set_invocation_args(lexer, (yyvsp[(4) - (8)].invo), (yyvsp[(3) - (8)].argm));
                               (yyval.invo) = set_invocation_results(lexer, (yyvsp[(4) - (8)].invo), (yyvsp[(6) - (8)].targ));
@@ -3874,72 +3875,72 @@ yyreduce:
     break;
 
   case 243:
-#line 1664 "pir.y"
+#line 1665 "pir.y"
     { (yyval.argm) = NULL; ;}
     break;
 
   case 244:
-#line 1666 "pir.y"
+#line 1667 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 245:
-#line 1670 "pir.y"
+#line 1671 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 246:
-#line 1672 "pir.y"
+#line 1673 "pir.y"
     { (yyval.argm) = add_arg((yyvsp[(1) - (2)].argm), (yyvsp[(2) - (2)].argm)); ;}
     break;
 
   case 247:
-#line 1676 "pir.y"
+#line 1677 "pir.y"
     { (yyval.argm) = (yyvsp[(2) - (3)].argm); ;}
     break;
 
   case 248:
-#line 1680 "pir.y"
+#line 1681 "pir.y"
     { (yyval.invo) = invoke(lexer, CALL_PCC, (yyvsp[(2) - (3)].targ), (yyvsp[(3) - (3)].targ)); ;}
     break;
 
   case 249:
-#line 1682 "pir.y"
+#line 1683 "pir.y"
     { (yyval.invo) = invoke(lexer, CALL_NCI, (yyvsp[(2) - (2)].targ)); ;}
     break;
 
   case 250:
-#line 1685 "pir.y"
+#line 1686 "pir.y"
     { (yyval.invo) = invoke(lexer, CALL_METHOD, (yyvsp[(2) - (5)].targ), (yyvsp[(5) - (5)].expr)); ;}
     break;
 
   case 251:
-#line 1689 "pir.y"
+#line 1690 "pir.y"
     { (yyval.targ) = NULL; ;}
     break;
 
   case 252:
-#line 1691 "pir.y"
+#line 1692 "pir.y"
     { (yyval.targ) = (yyvsp[(2) - (2)].targ); ;}
     break;
 
   case 253:
-#line 1695 "pir.y"
+#line 1696 "pir.y"
     { (yyval.targ) = NULL; ;}
     break;
 
   case 254:
-#line 1697 "pir.y"
+#line 1698 "pir.y"
     { (yyval.targ) = (yyvsp[(1) - (1)].targ); ;}
     break;
 
   case 255:
-#line 1701 "pir.y"
+#line 1702 "pir.y"
     { (yyval.targ) = (yyvsp[(1) - (1)].targ); ;}
     break;
 
   case 256:
-#line 1703 "pir.y"
+#line 1704 "pir.y"
     {
                              if ((yyvsp[(2) - (2)].targ))
                                  (yyval.targ) = add_target(lexer, (yyvsp[(1) - (2)].targ), (yyvsp[(2) - (2)].targ));
@@ -3949,32 +3950,32 @@ yyreduce:
     break;
 
   case 257:
-#line 1712 "pir.y"
+#line 1713 "pir.y"
     { (yyval.targ) = (yyvsp[(2) - (3)].targ); ;}
     break;
 
   case 258:
-#line 1714 "pir.y"
+#line 1715 "pir.y"
     { (yyval.targ) = NULL; ;}
     break;
 
   case 260:
-#line 1722 "pir.y"
+#line 1723 "pir.y"
     { (yyval.invo) = set_invocation_results(lexer, (yyvsp[(3) - (3)].invo), (yyvsp[(1) - (3)].targ)); ;}
     break;
 
   case 261:
-#line 1724 "pir.y"
+#line 1725 "pir.y"
     { (yyval.invo) = set_invocation_results(lexer, (yyvsp[(3) - (3)].invo), (yyvsp[(1) - (3)].targ)); ;}
     break;
 
   case 262:
-#line 1726 "pir.y"
+#line 1727 "pir.y"
     {  (yyval.invo) = set_invocation_results(lexer, (yyvsp[(1) - (1)].invo), NULL); ;}
     break;
 
   case 265:
-#line 1734 "pir.y"
+#line 1735 "pir.y"
     {
                              /* if $1 is not a register, check whether the symbol was declared */
                              if (!TEST_FLAG((yyvsp[(1) - (4)].targ)->flags, TARGET_FLAG_IS_REG)) {
@@ -3995,7 +3996,7 @@ yyreduce:
     break;
 
   case 266:
-#line 1754 "pir.y"
+#line 1755 "pir.y"
     {
                              (yyval.invo) = invoke(lexer, CALL_PCC, (yyvsp[(1) - (2)].targ), NULL);
                              set_invocation_args(lexer, (yyval.invo), (yyvsp[(2) - (2)].argm));
@@ -4003,12 +4004,12 @@ yyreduce:
     break;
 
   case 267:
-#line 1761 "pir.y"
+#line 1762 "pir.y"
     { (yyval.targ) = (yyvsp[(1) - (1)].targ); ;}
     break;
 
   case 268:
-#line 1763 "pir.y"
+#line 1764 "pir.y"
     {
                              symbol *sym = find_symbol(lexer, (yyvsp[(1) - (1)].sval));
                              if (sym == NULL)
@@ -4019,7 +4020,7 @@ yyreduce:
     break;
 
   case 269:
-#line 1773 "pir.y"
+#line 1774 "pir.y"
     { /* check that this identifier was declared */
                              symbol *sym = find_symbol(lexer, (yyvsp[(1) - (1)].sval));
 
@@ -4039,22 +4040,22 @@ yyreduce:
     break;
 
   case 270:
-#line 1790 "pir.y"
+#line 1791 "pir.y"
     { (yyval.expr) = expr_from_target(lexer, new_reg(lexer, PMC_TYPE, (yyvsp[(1) - (1)].ival))); ;}
     break;
 
   case 271:
-#line 1792 "pir.y"
+#line 1793 "pir.y"
     { (yyval.expr) = expr_from_target(lexer, new_reg(lexer, STRING_TYPE, (yyvsp[(1) - (1)].ival))); ;}
     break;
 
   case 272:
-#line 1794 "pir.y"
+#line 1795 "pir.y"
     { (yyval.expr) = expr_from_const(lexer, new_const(lexer, STRING_TYPE, (yyvsp[(1) - (1)].sval))); ;}
     break;
 
   case 273:
-#line 1798 "pir.y"
+#line 1799 "pir.y"
     {
                              symbol *sym = find_symbol(lexer, (yyvsp[(1) - (1)].sval));
                              if (sym == NULL)
@@ -4066,74 +4067,74 @@ yyreduce:
     break;
 
   case 274:
-#line 1807 "pir.y"
+#line 1808 "pir.y"
     { (yyval.targ) = new_reg(lexer, PMC_TYPE, (yyvsp[(1) - (1)].ival)); ;}
     break;
 
   case 275:
-#line 1812 "pir.y"
+#line 1813 "pir.y"
     {
                              (yyval.targ) = (yyvsp[(2) - (3)].targ);
                            ;}
     break;
 
   case 276:
-#line 1818 "pir.y"
+#line 1819 "pir.y"
     { (yyval.targ) = NULL; ;}
     break;
 
   case 277:
-#line 1820 "pir.y"
+#line 1821 "pir.y"
     { (yyval.targ) = (yyvsp[(1) - (1)].targ); ;}
     break;
 
   case 278:
-#line 1824 "pir.y"
+#line 1825 "pir.y"
     { (yyval.targ) = (yyvsp[(1) - (1)].targ); ;}
     break;
 
   case 279:
-#line 1826 "pir.y"
+#line 1827 "pir.y"
     { (yyval.targ) = add_target(lexer, (yyvsp[(1) - (3)].targ), (yyvsp[(3) - (3)].targ)); ;}
     break;
 
   case 280:
-#line 1830 "pir.y"
+#line 1831 "pir.y"
     { (yyval.targ) = set_param_flag(lexer, (yyvsp[(1) - (2)].targ), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 281:
-#line 1832 "pir.y"
+#line 1833 "pir.y"
     { (yyval.targ) = set_param_alias(lexer, (yyvsp[(1) - (3)].sval)); ;}
     break;
 
   case 282:
-#line 1836 "pir.y"
+#line 1837 "pir.y"
     { (yyval.ival) = 0; ;}
     break;
 
   case 283:
-#line 1838 "pir.y"
+#line 1839 "pir.y"
     { SET_FLAG((yyval.ival), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 284:
-#line 1842 "pir.y"
+#line 1843 "pir.y"
     { (yyval.ival) = TARGET_FLAG_OPTIONAL; ;}
     break;
 
   case 285:
-#line 1844 "pir.y"
+#line 1845 "pir.y"
     { (yyval.ival) = TARGET_FLAG_OPT_FLAG; ;}
     break;
 
   case 286:
-#line 1846 "pir.y"
+#line 1847 "pir.y"
     { (yyval.ival) = TARGET_FLAG_SLURPY; ;}
     break;
 
   case 287:
-#line 1848 "pir.y"
+#line 1849 "pir.y"
     {
                              (yyval.ival) = TARGET_FLAG_NAMED;
                              set_param_alias(lexer, (yyvsp[(2) - (2)].sval));
@@ -4141,12 +4142,12 @@ yyreduce:
     break;
 
   case 288:
-#line 1858 "pir.y"
+#line 1859 "pir.y"
     { convert_inv_to_instr(lexer, (yyvsp[(1) - (1)].invo)); ;}
     break;
 
   case 293:
-#line 1868 "pir.y"
+#line 1869 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_RETURN);
                               set_invocation_args(lexer, (yyval.invo), (yyvsp[(2) - (3)].argm));
@@ -4154,7 +4155,7 @@ yyreduce:
     break;
 
   case 294:
-#line 1873 "pir.y"
+#line 1874 "pir.y"
     { /* was the invocation a method call? then it becomes a method tail
                                * call, otherwise it's just a normal (sub) tail call.
                                */
@@ -4166,7 +4167,7 @@ yyreduce:
     break;
 
   case 295:
-#line 1884 "pir.y"
+#line 1885 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_YIELD);
                               set_invocation_args(lexer, (yyval.invo), (yyvsp[(2) - (3)].argm));
@@ -4174,47 +4175,47 @@ yyreduce:
     break;
 
   case 296:
-#line 1891 "pir.y"
+#line 1892 "pir.y"
     { (yyval.argm) = (yyvsp[(2) - (3)].argm); ;}
     break;
 
   case 297:
-#line 1895 "pir.y"
+#line 1896 "pir.y"
     { (yyval.argm) = NULL; ;}
     break;
 
   case 298:
-#line 1897 "pir.y"
+#line 1898 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 299:
-#line 1901 "pir.y"
+#line 1902 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 300:
-#line 1903 "pir.y"
+#line 1904 "pir.y"
     { (yyval.argm) = add_arg((yyvsp[(1) - (3)].argm), (yyvsp[(3) - (3)].argm)); ;}
     break;
 
   case 303:
-#line 1911 "pir.y"
+#line 1912 "pir.y"
     { (yyval.argm) = set_arg_alias(lexer, (yyvsp[(1) - (3)].sval)); ;}
     break;
 
   case 304:
-#line 1915 "pir.y"
+#line 1916 "pir.y"
     { (yyval.argm) = set_arg_flag((yyval.argm), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 305:
-#line 1919 "pir.y"
+#line 1920 "pir.y"
     { (yyval.argm) = set_curarg(lexer, new_argument(lexer, (yyvsp[(1) - (1)].expr)));  ;}
     break;
 
   case 306:
-#line 1925 "pir.y"
+#line 1926 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_RETURN);
                               set_invocation_args(lexer, (yyval.invo), (yyvsp[(3) - (5)].argm));
@@ -4222,7 +4223,7 @@ yyreduce:
     break;
 
   case 307:
-#line 1934 "pir.y"
+#line 1935 "pir.y"
     {
                               (yyval.invo) = invoke(lexer, CALL_YIELD);
                               set_invocation_args(lexer, (yyval.invo), (yyvsp[(3) - (5)].argm));
@@ -4230,72 +4231,72 @@ yyreduce:
     break;
 
   case 308:
-#line 1941 "pir.y"
+#line 1942 "pir.y"
     { (yyval.argm) = NULL; ;}
     break;
 
   case 309:
-#line 1943 "pir.y"
+#line 1944 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 310:
-#line 1948 "pir.y"
+#line 1949 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 311:
-#line 1950 "pir.y"
+#line 1951 "pir.y"
     { (yyval.argm) = add_arg((yyvsp[(1) - (2)].argm), (yyvsp[(2) - (2)].argm)); ;}
     break;
 
   case 312:
-#line 1955 "pir.y"
+#line 1956 "pir.y"
     { (yyval.argm) = (yyvsp[(2) - (3)].argm); ;}
     break;
 
   case 313:
-#line 1959 "pir.y"
+#line 1960 "pir.y"
     { (yyval.argm) = NULL; ;}
     break;
 
   case 314:
-#line 1961 "pir.y"
+#line 1962 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 315:
-#line 1965 "pir.y"
+#line 1966 "pir.y"
     { (yyval.argm) = (yyvsp[(1) - (1)].argm); ;}
     break;
 
   case 316:
-#line 1967 "pir.y"
+#line 1968 "pir.y"
     { (yyval.argm) = add_arg((yyvsp[(1) - (2)].argm), (yyvsp[(2) - (2)].argm)); ;}
     break;
 
   case 317:
-#line 1971 "pir.y"
+#line 1972 "pir.y"
     { (yyval.argm) = (yyvsp[(2) - (3)].argm); ;}
     break;
 
   case 318:
-#line 1976 "pir.y"
+#line 1977 "pir.y"
     { (yyval.ival) = 0; ;}
     break;
 
   case 319:
-#line 1978 "pir.y"
+#line 1979 "pir.y"
     { SET_FLAG((yyval.ival), (yyvsp[(2) - (2)].ival)); ;}
     break;
 
   case 320:
-#line 1982 "pir.y"
+#line 1983 "pir.y"
     { (yyval.ival) = ARG_FLAG_FLAT; ;}
     break;
 
   case 321:
-#line 1984 "pir.y"
+#line 1985 "pir.y"
     {
                                (yyval.ival) = ARG_FLAG_NAMED;
                                set_arg_alias(lexer, (yyvsp[(2) - (2)].sval));
@@ -4303,137 +4304,137 @@ yyreduce:
     break;
 
   case 322:
-#line 1991 "pir.y"
+#line 1992 "pir.y"
     { (yyval.sval) = NULL; ;}
     break;
 
   case 323:
-#line 1993 "pir.y"
+#line 1994 "pir.y"
     { (yyval.sval) = (yyvsp[(1) - (1)].sval); ;}
     break;
 
   case 324:
-#line 1997 "pir.y"
+#line 1998 "pir.y"
     { (yyval.sval) = (yyvsp[(2) - (3)].sval); ;}
     break;
 
   case 328:
-#line 2009 "pir.y"
+#line 2010 "pir.y"
     { /*store_global_constant(lexer, $2); */;}
     break;
 
   case 329:
-#line 2013 "pir.y"
+#line 2014 "pir.y"
     { store_global_constant(lexer, (yyvsp[(2) - (2)].cdec)); ;}
     break;
 
   case 330:
-#line 2017 "pir.y"
+#line 2018 "pir.y"
     { (yyval.cdec) = new_named_const(lexer, INT_VAL, (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].ival)); ;}
     break;
 
   case 331:
-#line 2019 "pir.y"
+#line 2020 "pir.y"
     { (yyval.cdec) = new_named_const(lexer, NUM_VAL, (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].dval)); ;}
     break;
 
   case 332:
-#line 2021 "pir.y"
+#line 2022 "pir.y"
     { (yyval.cdec) = new_named_const(lexer, STRING_VAL, (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].sval)); ;}
     break;
 
   case 333:
-#line 2023 "pir.y"
+#line 2024 "pir.y"
     { (yyval.cdec) = new_pmc_const(lexer, (yyvsp[(1) - (4)].sval), (yyvsp[(2) - (4)].sval), (yyvsp[(4) - (4)].cval)); ;}
     break;
 
   case 334:
-#line 2030 "pir.y"
+#line 2031 "pir.y"
     { (yyval.expr) = expr_from_target(lexer, (yyvsp[(1) - (1)].targ)); ;}
     break;
 
   case 335:
-#line 2031 "pir.y"
+#line 2032 "pir.y"
     { (yyval.expr) = expr_from_const(lexer, (yyvsp[(1) - (1)].cval)); ;}
     break;
 
   case 336:
-#line 2035 "pir.y"
+#line 2036 "pir.y"
     { (yyval.cval) = new_const(lexer, INT_VAL, (yyvsp[(1) - (1)].ival)); ;}
     break;
 
   case 337:
-#line 2036 "pir.y"
+#line 2037 "pir.y"
     { (yyval.cval) = new_const(lexer, NUM_VAL, (yyvsp[(1) - (1)].dval)); ;}
     break;
 
   case 339:
-#line 2040 "pir.y"
+#line 2041 "pir.y"
     { (yyval.cval) = new_const(lexer, STRING_VAL, (yyvsp[(1) - (1)].sval)); ;}
     break;
 
   case 340:
-#line 2041 "pir.y"
+#line 2042 "pir.y"
     { (yyval.cval) = new_const(lexer, USTRING_VAL, (yyvsp[(1) - (1)].ustr)); ;}
     break;
 
   case 341:
-#line 2044 "pir.y"
+#line 2045 "pir.y"
     { (yyval.ival) = OP_NE; ;}
     break;
 
   case 342:
-#line 2045 "pir.y"
+#line 2046 "pir.y"
     { (yyval.ival) = OP_EQ; ;}
     break;
 
   case 343:
-#line 2046 "pir.y"
+#line 2047 "pir.y"
     { (yyval.ival) = OP_LT; ;}
     break;
 
   case 344:
-#line 2047 "pir.y"
+#line 2048 "pir.y"
     { (yyval.ival) = OP_LE; ;}
     break;
 
   case 345:
-#line 2048 "pir.y"
+#line 2049 "pir.y"
     { (yyval.ival) = OP_GE; ;}
     break;
 
   case 346:
-#line 2049 "pir.y"
+#line 2050 "pir.y"
     { (yyval.ival) = OP_GT; ;}
     break;
 
   case 347:
-#line 2052 "pir.y"
+#line 2053 "pir.y"
     { (yyval.ival) = INT_TYPE; ;}
     break;
 
   case 348:
-#line 2053 "pir.y"
+#line 2054 "pir.y"
     { (yyval.ival) = NUM_TYPE; ;}
     break;
 
   case 349:
-#line 2054 "pir.y"
+#line 2055 "pir.y"
     { (yyval.ival) = PMC_TYPE; ;}
     break;
 
   case 350:
-#line 2055 "pir.y"
+#line 2056 "pir.y"
     { (yyval.ival) = STRING_TYPE; ;}
     break;
 
   case 351:
-#line 2063 "pir.y"
+#line 2064 "pir.y"
     { set_curtarget(lexer, (yyvsp[(1) - (1)].targ));  ;}
     break;
 
   case 353:
-#line 2067 "pir.y"
+#line 2068 "pir.y"
     { /* a symbol must have been declared; check that at this point. */
                            symbol * sym = find_symbol(lexer, (yyvsp[(1) - (1)].sval));
                            if (sym == NULL) {
@@ -4446,277 +4447,277 @@ yyreduce:
     break;
 
   case 354:
-#line 2078 "pir.y"
+#line 2079 "pir.y"
     { (yyval.targ) = new_reg(lexer, PMC_TYPE, (yyvsp[(1) - (1)].ival));    ;}
     break;
 
   case 355:
-#line 2079 "pir.y"
+#line 2080 "pir.y"
     { (yyval.targ) = new_reg(lexer, NUM_TYPE, (yyvsp[(1) - (1)].ival));    ;}
     break;
 
   case 356:
-#line 2080 "pir.y"
+#line 2081 "pir.y"
     { (yyval.targ) = new_reg(lexer, INT_TYPE, (yyvsp[(1) - (1)].ival));    ;}
     break;
 
   case 357:
-#line 2081 "pir.y"
+#line 2082 "pir.y"
     { (yyval.targ) = new_reg(lexer, STRING_TYPE, (yyvsp[(1) - (1)].ival)); ;}
     break;
 
   case 360:
-#line 2089 "pir.y"
+#line 2090 "pir.y"
     { (yyval.sval) = "if"; ;}
     break;
 
   case 361:
-#line 2090 "pir.y"
+#line 2091 "pir.y"
     { (yyval.sval) = "unless"; ;}
     break;
 
   case 362:
-#line 2091 "pir.y"
+#line 2092 "pir.y"
     { (yyval.sval) = "goto"; ;}
     break;
 
   case 363:
-#line 2092 "pir.y"
+#line 2093 "pir.y"
     { (yyval.sval) = "int"; ;}
     break;
 
   case 364:
-#line 2093 "pir.y"
+#line 2094 "pir.y"
     { (yyval.sval) = "num"; ;}
     break;
 
   case 365:
-#line 2094 "pir.y"
+#line 2095 "pir.y"
     { (yyval.sval) = "string"; ;}
     break;
 
   case 366:
-#line 2095 "pir.y"
+#line 2096 "pir.y"
     { (yyval.sval) = "pmc"; ;}
     break;
 
   case 367:
-#line 2096 "pir.y"
+#line 2097 "pir.y"
     { (yyval.sval) = "null"; ;}
     break;
 
   case 368:
-#line 2099 "pir.y"
+#line 2100 "pir.y"
     { (yyval.sval) = "neg"; ;}
     break;
 
   case 369:
-#line 2100 "pir.y"
+#line 2101 "pir.y"
     { (yyval.sval) = "not"; ;}
     break;
 
   case 370:
-#line 2101 "pir.y"
+#line 2102 "pir.y"
     { (yyval.sval) = "bnot"; ;}
     break;
 
   case 371:
-#line 2104 "pir.y"
+#line 2105 "pir.y"
     { (yyval.ival) = OP_ADD; ;}
     break;
 
   case 372:
-#line 2105 "pir.y"
+#line 2106 "pir.y"
     { (yyval.ival) = OP_SUB; ;}
     break;
 
   case 373:
-#line 2106 "pir.y"
+#line 2107 "pir.y"
     { (yyval.ival) = OP_DIV; ;}
     break;
 
   case 374:
-#line 2107 "pir.y"
+#line 2108 "pir.y"
     { (yyval.ival) = OP_MUL; ;}
     break;
 
   case 375:
-#line 2108 "pir.y"
+#line 2109 "pir.y"
     { (yyval.ival) = OP_MOD; ;}
     break;
 
   case 376:
-#line 2109 "pir.y"
+#line 2110 "pir.y"
     { (yyval.ival) = OP_BOR; ;}
     break;
 
   case 377:
-#line 2110 "pir.y"
+#line 2111 "pir.y"
     { (yyval.ival) = OP_BAND; ;}
     break;
 
   case 378:
-#line 2111 "pir.y"
+#line 2112 "pir.y"
     { (yyval.ival) = OP_BXOR; ;}
     break;
 
   case 379:
-#line 2112 "pir.y"
+#line 2113 "pir.y"
     { (yyval.ival) = OP_POW; ;}
     break;
 
   case 380:
-#line 2113 "pir.y"
+#line 2114 "pir.y"
     { (yyval.ival) = OP_CONCAT; ;}
     break;
 
   case 381:
-#line 2114 "pir.y"
+#line 2115 "pir.y"
     { (yyval.ival) = OP_LSR; ;}
     break;
 
   case 382:
-#line 2115 "pir.y"
+#line 2116 "pir.y"
     { (yyval.ival) = OP_SHR; ;}
     break;
 
   case 383:
-#line 2116 "pir.y"
+#line 2117 "pir.y"
     { (yyval.ival) = OP_SHL; ;}
     break;
 
   case 384:
-#line 2117 "pir.y"
+#line 2118 "pir.y"
     { (yyval.ival) = OP_OR; ;}
     break;
 
   case 385:
-#line 2118 "pir.y"
+#line 2119 "pir.y"
     { (yyval.ival) = OP_AND; ;}
     break;
 
   case 386:
-#line 2119 "pir.y"
+#line 2120 "pir.y"
     { (yyval.ival) = OP_FDIV; ;}
     break;
 
   case 387:
-#line 2120 "pir.y"
+#line 2121 "pir.y"
     { (yyval.ival) = OP_XOR; ;}
     break;
 
   case 388:
-#line 2121 "pir.y"
+#line 2122 "pir.y"
     { (yyval.ival) = OP_ISEQ; ;}
     break;
 
   case 389:
-#line 2122 "pir.y"
+#line 2123 "pir.y"
     { (yyval.ival) = OP_ISLE; ;}
     break;
 
   case 390:
-#line 2123 "pir.y"
+#line 2124 "pir.y"
     { (yyval.ival) = OP_ISLT; ;}
     break;
 
   case 391:
-#line 2124 "pir.y"
+#line 2125 "pir.y"
     { (yyval.ival) = OP_ISGE; ;}
     break;
 
   case 392:
-#line 2125 "pir.y"
+#line 2126 "pir.y"
     { (yyval.ival) = OP_ISGT; ;}
     break;
 
   case 393:
-#line 2126 "pir.y"
+#line 2127 "pir.y"
     { (yyval.ival) = OP_ISNE; ;}
     break;
 
   case 394:
-#line 2132 "pir.y"
+#line 2133 "pir.y"
     { (yyval.ival) = OP_MUL; ;}
     break;
 
   case 395:
-#line 2133 "pir.y"
+#line 2134 "pir.y"
     { (yyval.ival) = OP_MOD; ;}
     break;
 
   case 396:
-#line 2134 "pir.y"
+#line 2135 "pir.y"
     { (yyval.ival) = OP_POW; ;}
     break;
 
   case 397:
-#line 2135 "pir.y"
+#line 2136 "pir.y"
     { (yyval.ival) = OP_DIV; ;}
     break;
 
   case 398:
-#line 2136 "pir.y"
+#line 2137 "pir.y"
     { (yyval.ival) = OP_FDIV; ;}
     break;
 
   case 399:
-#line 2137 "pir.y"
+#line 2138 "pir.y"
     { (yyval.ival) = OP_BOR; ;}
     break;
 
   case 400:
-#line 2138 "pir.y"
+#line 2139 "pir.y"
     { (yyval.ival) = OP_BAND; ;}
     break;
 
   case 401:
-#line 2139 "pir.y"
+#line 2140 "pir.y"
     { (yyval.ival) = OP_BXOR; ;}
     break;
 
   case 402:
-#line 2140 "pir.y"
+#line 2141 "pir.y"
     { (yyval.ival) = OP_CONCAT; ;}
     break;
 
   case 403:
-#line 2141 "pir.y"
+#line 2142 "pir.y"
     { (yyval.ival) = OP_SHR; ;}
     break;
 
   case 404:
-#line 2142 "pir.y"
+#line 2143 "pir.y"
     { (yyval.ival) = OP_SHL; ;}
     break;
 
   case 405:
-#line 2143 "pir.y"
+#line 2144 "pir.y"
     { (yyval.ival) = OP_LSR; ;}
     break;
 
   case 407:
-#line 2164 "pir.y"
+#line 2165 "pir.y"
     { new_subr(lexer, "@start"); ;}
     break;
 
   case 416:
-#line 2180 "pir.y"
+#line 2181 "pir.y"
     { set_label(lexer, (yyvsp[(1) - (2)].sval)); ;}
     break;
 
   case 421:
-#line 2190 "pir.y"
+#line 2191 "pir.y"
     { set_sub_name(lexer, (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 422:
-#line 2194 "pir.y"
+#line 2195 "pir.y"
     { new_subr(lexer, NULL); ;}
     break;
 
   case 423:
-#line 2199 "pir.y"
+#line 2200 "pir.y"
     {
                                   if (is_parrot_op(lexer, (yyvsp[(1) - (3)].sval)))
                                       get_opinfo(lexer);
@@ -4728,7 +4729,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 4732 "pirparser.c"
+#line 4733 "pirparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -4942,19 +4943,11 @@ yyreturn:
 }
 
 
-#line 2210 "pir.y"
+#line 2211 "pir.y"
 
 
 
 
-/* the order of these letters match with the pir_type enumeration.
- * These are used for generating the full opname (set I0, 10 -> set_i_ic).
- * The first 5 correspond to the values in the pir_type enumeration,
- * the last 5 correspond to the values in the value_type enumeration.
- * Note that the last 's' corresponds to USTRING_VAL, which is a unicode
- * string, but when used it's still a string.
- */
-static char const type_codes[10] = {'i', 's', 'p', 'n', '?', 'i', 's', 'p', 'n', 's'};
 
 
 /*
@@ -6020,261 +6013,7 @@ check_first_arg_direction(lexer_state * const lexer, NOTNULL(char const * const 
 
 
 
-/*
 
-=item C<static int
-get_signature_length(expression * const e)>
-
-Calculate the length of the signature for one operand; an operand is separated
-from the instruction name or another operand through '_', which must also
-be counted.
-
- set $I0, 42  --> set_i_ic
-
-therefore, for $I0 (a target), return 1 for the type, 1 for the '_', and whatever
-is needed for a key, if any, as in this example:
-
- set $P0[1] = "hi"  --> set_p_kic_sc
-
-$P0 is a target, resulting in "_p", the key [1] is a key ('k') of type int ('i'),
-and it's a constant ('c'). Add 1 for the '_'.
-
-=cut
-
-*/
-PARROT_WARN_UNUSED_RESULT
-static int
-get_signature_length(NOTNULL(expression * const e)) {
-    switch (e->type) {
-        case EXPR_TARGET:
-            return 2 + ((e->expr.t->key != NULL) /* if there's a key on this target ... */
-                       ? get_signature_length(e->expr.t->key->head->expr) + 1 /* ... get its length. */
-                       : 0);
-        case EXPR_CONSTANT:
-            return 3;    /* for _, 'k', 'c' */
-        case EXPR_IDENT:
-            return 3; /* 1 for '_', 1 for 'i', 1 for 'c' */
-        case EXPR_KEY: { /* for '_', 'k' */
-            int n;
-            /* if the key is an integer constant, then signature becomes '_kic', otherwise _kc. */
-            if (e->expr.k->head->expr->type         == EXPR_CONSTANT
-            &&  e->expr.k->head->expr->expr.c->type == INT_VAL)
-                n = 3;
-            else
-                n = 2;
-
-            return n + get_signature_length(e->expr.k->head->expr);
-        }
-        default:
-            fprintf(stderr, "wrong expression typein get_signature_length()\n");
-            break;
-    }
-    return 0;
-}
-
-
-
-
-/*
-
-=item C<static char *
-write_signature(expression * const iter, char *instr_writer)>
-
-Write the signature for the operand C<iter>, using the character
-pointer C<instr_writer>. When the operand is an indexed target node
-(in other words, it has a key node), this function is invoked recursively
-passing the key as an argument.
-
-This function returns the updated character pointer (due to pass-by-value
-semantics of the C calling conventions).
-
-=cut
-
-*/
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static char *
-write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
-    switch (iter->type) {
-        case EXPR_TARGET:
-            *instr_writer++ = type_codes[iter->expr.t->info->type];
-
-            if (iter->expr.t->key) {
-                *instr_writer++ = '_';
-                *instr_writer++ = 'k';
-
-                /* XXX this switch replaces the messy code below. double-check before delete. */
-                switch (iter->expr.t->key->head->expr->type) {
-                    case EXPR_TARGET:
-                        switch (iter->expr.t->key->head->expr->expr.t->info->type) {
-                            case PMC_TYPE:
-                                /* the key is a target, and its type is a PMC. In that
-                                 * case, do not print the signature; 'kp' is not valid.
-                                 */
-                                break;
-                            case INT_TYPE:
-                                *instr_writer++ = 'i';
-                                break;
-                            default:
-                                break;
-                        }
-                        break;
-                    case EXPR_CONSTANT:
-                        /* integer constant key results in '_kic' signature */
-                        if (iter->expr.c->type == INT_VAL)
-                            *instr_writer++ = 'i';
-
-                        *instr_writer++ = 'c';
-                        break;
-                    default:
-                        /* XXX does this ever happen? */
-                        fprintf(stderr, "write_signature: non-constant key\n");
-                        instr_writer = write_signature(iter->expr.t->key->head->expr, instr_writer);
-                        break;
-                }
-
-            }
-            break;
-        case EXPR_CONSTANT:
-            *instr_writer++ = type_codes[iter->expr.c->type];
-            *instr_writer++ = 'c';
-            break;
-        case EXPR_IDENT: /* used for labels; these will be converted to (i)nteger (c)onstants*/
-            *instr_writer++ = 'i';
-            *instr_writer++ = 'c';
-            break;
-        case EXPR_KEY:
-            *instr_writer++ = 'k';
-
-            instr_writer    = write_signature(iter->expr.k->head->expr, instr_writer);
-            /*
-
-            switch (iter->expr.k->expr->type) {
-                case EXPR_CONSTANT:
-                   *instr_writer++ = 'c';
-                   break;
-                default:
-                    fprintf(stderr, "write_signature: non-constant key\n");
-                    instr_writer = write_signature(iter->expr.k->expr, instr_writer);
-                    break;
-            }
-            */
-
-            break;
-        default:
-            fprintf(stderr, "wrong expression type in write_signature()\n");
-            break;
-    }
-    return instr_writer;
-}
-
-
-/*
-
-=item C<static char *
-get_signatured_opname(instruction * const instr)>
-
-Returns the full opname of the instruction C<name>; the signature
-of the opname is based on the operands, some examples are shown
-below:
-
- set I0, 10        --> set_i_ic
- print "hi"        --> print_sc
- set P0[1], 3.14   --> set_p_kic_nc
-
-For each operand, an underscore is added; then for the types
-int, num, string or pmc, an 'i', 'n', 's' or 'p' is added
-respectively. If the operand is a constant, a 'c' suffic is added.
-
-If the operand is a key of something, a 'k' prefix is added.
-
-=cut
-
-*/
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-static char *
-get_signatured_opname(NOTNULL(lexer_state * const lexer), NOTNULL(instruction * const instr)) {
-    size_t      fullname_length;
-    char       *fullname;
-    char       *instr_writer;
-    expression *iter         = instr->operands;
-    unsigned    num_operands = 0;
-
-    /* get length of short opname (and add 1 for the NULL character) */
-    fullname_length = strlen(instr->opname) + 1;
-
-    /* for each operand, calculate the length of the signature (for that op.)
-     * and add it to the full length.
-     */
-    if (iter) {
-        iter = iter->next;
-        do {
-            int keylength    = get_signature_length(iter);
-            fullname_length += keylength;
-            iter             = iter->next;
-            ++num_operands;
-        }
-        while (iter != instr->operands->next);
-    }
-
-    /* now we know how long the fullname will be, allocate enough memory. */
-    fullname = (char *)pir_mem_allocate_zeroed(lexer, fullname_length * sizeof (char));
-
-    /* copy the short name into fullname buffer, and set instr_writer to
-     * the character after that.
-     */
-    strcpy(fullname, instr->opname);
-    instr_writer = fullname + strlen(instr->opname);
-
-    /* now iterate again over all operands, and codify them into the fullname.
-     * As we counted the number of operands, this loop can be written a bit simpler.
-     */
-    iter = instr->operands;
-    while (num_operands-- > 0) {
-        iter            = iter->next;
-        *instr_writer++ = '_'; /* separate each operand code by a '_' */
-        instr_writer    = write_signature(iter, instr_writer);
-    }
-
-    return fullname;
-}
-
-
-/*
-
-=item C<static int
-get_opinfo(lexer_state * const lexer)>
-
-Compute the signatured opname from the instruction name and its arguments.
-Based on this signature, the opcode is retrieved. If the opcode cannot
-be found (i.e., it's -1), then a check is done for some special math ops;
-C<add_i_ic_ic> and the like do not exist, but instead should be replaced
-by C<set_i_ic> (and the like). If it's not one of these special cases,
-then that means the op is not valid, and an error message will be reported.
-
-=cut
-
-*/
-PARROT_IGNORABLE_RESULT
-static int
-get_opinfo(lexer_state * const lexer) {
-    instruction * const instr = CURRENT_INSTRUCTION(lexer);
-
-    char * const fullopname   = get_signatured_opname(lexer, instr);
-    /* find the numeric opcode for the signatured op. */
-    int          opcode       = lexer->interp->op_lib->op_code(fullopname, 1);
-
-    if (opcode < 0) {
-        yypirerror(lexer->yyscanner, lexer, "'%s' is not a parrot op", fullopname);
-        return FALSE;
-    }
-    else {
-        update_op(lexer, instr, opcode);
-        return TRUE;
-    }
-
-}
 
 /*
 
