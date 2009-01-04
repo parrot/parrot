@@ -347,24 +347,9 @@ Uncovered implicit 'else':
 
     $self->{max_op_num} ||= 0;
 
-Real question:  can C<$self->{max_op_num}> ever be C<undef>, C<0>
-or empty string?
-
-=item *
-
-Can these C<die> statements be provoked?
-
-        if ( exists $self->{optable}->{$name} ) {
-            die "duplicate opcode $name and $number";
-        }
-
-=item *
-
-Can this C<die> statement be provoked?
-
-        if ( exists $self->{optable}->{$name} ) {
-            die "skipped opcode is also in $num_file";
-        }
+Real questions:  Can C<$self->{max_op_num}> ever be C<undef>, C<0>
+or empty string?  Is there any place prior to this where
+C<$self->{max_op_num}> can be assigned to?
 
 =back
 
