@@ -294,7 +294,8 @@ print_statement(lexer_state * const lexer, subroutine * const sub) {
 =item C<void
 print_subs(struct lexer_state * const lexer)>
 
-XXX
+Top-level function to print all generated code. This function
+iterates over all subs and prints their instructions.
 
 =cut
 
@@ -671,6 +672,10 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
 
 =item C<static void
 emit_pbc_expr(lexer_state * const lexer, expression * const operand)>
+
+Emit bytecode for the expression C<operand>. This is a dispatch
+function, invoking the appropriate function depending on C<operand>'s
+type.
 
 =cut
 

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2007-2008, The Perl Foundation.
+ * Copyright (C) 2007-2009, The Perl Foundation.
  */
 
 /*
@@ -1331,6 +1331,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
 
         /* declare it as a local, so that it will get a register assigned. */
         declare_local(lexer, PMC_TYPE, constsym);
+        assign_vanilla_register(lexer, constsym);
 
         value->name     = name;    /* set name of constant node */
         value->type     = PMC_VAL; /* set type of constant node */
@@ -1345,19 +1346,6 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         push_operand(lexer, expr_from_target(lexer, consttarg));
         push_operand(lexer, expr_from_const(lexer, value));
 
-        /* XXXX
-
-        Don't generate that instruction if the constant is never referenced.
-        This is true for all variants (pmc, int, string, num) in this function.
-
-        As the constant is declared as a .local (see above), it will only
-        be assigned a color (register) iff the symbol is referenced (looked up
-        for the first time).
-
-        XXX fix this.
-
-
-        */
     }
 
     else if (value->type == INT_VAL) {
@@ -1375,6 +1363,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             VTABLE_set_integer_native(lexer->interp, intconst, value->val.ival);
 
             declare_local(lexer, PMC_TYPE, constsym);
+            assign_vanilla_register(lexer, constsym);
 
             value->name = name;
 
@@ -1403,6 +1392,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             VTABLE_set_number_native(lexer->interp, numconst, value->val.nval);
 
             declare_local(lexer, PMC_TYPE, constsym);
+            assign_vanilla_register(lexer, constsym);
 
             value->name = name;
 
@@ -1432,6 +1422,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
                                                          strlen(value->val.sval)));
 
             declare_local(lexer, PMC_TYPE, constsym);
+            assign_vanilla_register(lexer, constsym);
 
             value->name = name;
 
