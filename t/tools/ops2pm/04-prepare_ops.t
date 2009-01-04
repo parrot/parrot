@@ -256,7 +256,7 @@ into the methods of F<Utils.pm>.
 F<04-prepare_ops.t> tests whether C<Parrot::Ops2pm::Base::prepare_ops()>
 works properly.
 
-=head1 TODO
+=head1 COMMENT
 
 The following statements and branches in C<prepare_ops()> are as yet uncovered:
 
@@ -270,6 +270,10 @@ Can C<$ops> be undefined as a result of a call to C<Parrot::OpsFile->new()>?
     die "$self->{script}: Could not read ops file '$self->{file}'!\n"
         unless defined $ops;
 
+Probably not, because the existence of C<$self->{file} has already been
+checked.  But it never hurts to check whether a constructor has returned a
+defined value.
+
 =item *
 
 Can I provoke this C<die> message?
@@ -277,6 +281,8 @@ Can I provoke this C<die> message?
         my $temp_ops = Parrot::OpsFile->new( [$f], $self->{nolines} );
         die "$self->{script}: Could not read ops file '$f'!\n"
             unless defined $temp_ops;
+
+Probably not, for same reason as above.
 
 =back
 
