@@ -100,9 +100,7 @@ sub runstep {
 
         # If we are building shared, need to include dynamic libparrot.lib, otherwise
         # the static libparrot.lib.
-        if ( $conf->data->get('parrot_is_shared') ) {
-            $conf->data->set( libparrot_ldflags   => $conf->data->get('build_dir') . '/libparrot.lib' );
-        }
+        $conf->data->set( libparrot_ldflags   => 'libparrot.lib' );
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
@@ -232,7 +230,7 @@ sub runstep {
             has_dynamic_linking => 1,
             ld_load_flags       => '-shared ',
             ld_share_flags      => '-shared ',
-            libparrot_ldflags   => $conf->data->get('build_dir') . '/libparrot.dll',
+            libparrot_ldflags   => 'libparrot.dll',
             ncilib_link_extra   => 'src/libnci_test.def',
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',

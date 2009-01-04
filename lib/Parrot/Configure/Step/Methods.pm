@@ -119,6 +119,7 @@ sub _handle_darwin_for_macports {
         cc              => $cc,
         win32_gcc       => '-lalpha32 -lalpha32 -lopenalpha32',
         win32_nongcc    => 'alpha.lib',
+        cygwin          => '-lalpha32 -lXalpha32', # optional
         darwin          => 'alphadarwin.lib',
         default         => '-lalpha',
     } );
@@ -137,6 +138,8 @@ combinations.  We currently support settings for:
 =item * MSWin32 with F<gcc> as the C-compiler.
 
 =item * MSWin32 with any C-compiler other than F<gcc>.
+
+=item * Cygwin to override Mingw.
 
 =item * Darwin.
 
@@ -173,12 +176,18 @@ supersede the value in C<default>.
 
 =item * C<win32_gcc>
 
-Libraries to be added where OS is mswin32 and C-compiler is F<gcc>.
+Libraries to be added where OS is mswin32 or cygwin and C-compiler is F<gcc>.
 Single whitespace-delimited string.
 
 =item * C<win32_nongcc>
 
 Libraries to be added where OS is mswin32 and C-compiler is not F<gcc>.
+Single whitespace-delimited string.
+
+=item * C<cygwin>
+
+Optional libraries to be added where OS is cygwin. This overrides C<win32_gcc>
+if defined.
 Single whitespace-delimited string.
 
 =item * C<darwin>
@@ -197,7 +206,8 @@ sub _add_to_libs {
     my $args = shift;
     croak "_add_to_libs() takes hashref: $!" unless ref($args) eq 'HASH';
     my $platform =
-          (($args->{osname} =~ /mswin32/i ||
+           $args->{osname} =~ /cygwin/i      ? 'cygwin'
+        :(($args->{osname} =~ /mswin32/i ||
            $args->{osname} =~ /cygwin/i) &&
            $args->{cc} =~ /^gcc/i)          ? 'win32_gcc'
         :  $args->{osname} =~ /mswin32/i    ? 'win32_nongcc'

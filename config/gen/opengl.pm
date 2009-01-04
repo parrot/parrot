@@ -448,6 +448,9 @@ sub runstep {
 #         "$ENV{HOME}/src/osx-insane/usr/X11R6 1/include/GL/*.h",
     );
 
+    # X freeglut only if DISPLAY is set, otherwise use native w32api GLUT
+    shift @header_globs if $^O eq 'cygwin' and !$ENV{DISPLAY};
+
     print "\nChecking for OpenGL headers using the following globs:\n\t",
         join("\n\t", @header_globs), "\n"
         if $verbose;
