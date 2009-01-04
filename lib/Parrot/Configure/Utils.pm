@@ -33,6 +33,7 @@ use File::Copy ();
 use File::Spec;
 use File::Which;
 use lib ("lib");
+use Parrot::BuildUtil ();
 our @EXPORT    = ();
 our @EXPORT_OK = qw(
     prompt copy_if_diff move_if_diff integrate
@@ -295,19 +296,12 @@ sub check_progs {
 
 =item C<_slurp($filename)>
 
-Slurps C<$filename> into memory and returns it as a string.
+Slurps C<$filename> into memory and returns it as a string.  This is just an
+alias for C<Parrot::BuildUtil::slurp_file>.
 
 =cut
 
-sub _slurp {
-    my $filename = shift;
-
-    open( my $fh, '<', $filename ) or die "Can't open $filename: $!";
-    my $text = do { local $/; <$fh> };
-    close($fh) or die "Can't close $filename: $!";
-
-    return $text;
-}
+*_slurp = \&Parrot::BuildUtil::slurp_file;
 
 =back
 
