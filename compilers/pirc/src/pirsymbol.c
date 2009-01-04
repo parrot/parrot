@@ -327,10 +327,11 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
                 }
 
 
+            /*
             if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC))
                 fprintf(stderr, "live range of variable %s: (%d, %d)\n", sym->info.id.name,
                         sym->info.interval->startpoint, sym->info.interval->endpoint);
-
+            */
             return sym;
         }
 
@@ -344,6 +345,8 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         /*
         fprintf(stderr, "symbol type: %d ==> %d\n", c->type, convert_valuetype_to_pirtype[c->type]);
         */
+        if (sym->info.color == NO_REG_ALLOCATED)
+            assign_vanilla_register(lexer, sym);
         return sym;
     }
 

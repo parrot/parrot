@@ -4320,12 +4320,12 @@ yyreduce:
 
   case 328:
 #line 2010 "pir.y"
-    { store_global_constant(lexer, (yyvsp[(2) - (2)].cdec)); ;}
+    { /*store_global_constant(lexer, $2); */;}
     break;
 
   case 329:
 #line 2014 "pir.y"
-    { /* XXX is .globalconst to be kept? */ ;}
+    { store_global_constant(lexer, (yyvsp[(2) - (2)].cdec)); ;}
     break;
 
   case 330:

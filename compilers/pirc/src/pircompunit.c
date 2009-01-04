@@ -1295,11 +1295,10 @@ new_const(lexer_state * const lexer, value_type type, ...) {
 
 /*
 
-=item C<constant *
+=item C<constdecl *
 new_named_const(lexer_state * const lexer, value_type type, char * const name, ...)>
 
-Creates a new constant node of the given type, by the given name.
-Wrapper function for C<create_const>.
+Creates a new constdecl node of the given type, by the given name.
 
 =cut
 
@@ -1331,19 +1330,19 @@ new_named_const(lexer_state * const lexer, value_type type, char const * const n
             panic(lexer, "unknown data type in create_const() (%d)", type);
             break;
     }
-
+    va_end(arg_ptr);
     c->name = name;
     c->type = type;
-    va_end(arg_ptr);
+
     return c;
 }
 
 /*
 
-=item C<constant *
+=item C<constdecl *
 new_pmc_const(char const * const type, char const * const name, constant * const value)>
 
-Create a new PMC constant of type C<type>, name C<name> and having a value C<value>.
+Create a new PMC constant declaration of type C<type>, name C<name> and having a value C<value>.
 The type must be a string indicating a valid type name (e.g. "Sub"). C<name> is the name
 of the constant, and the value of the constant is passed as C<value>.
 
@@ -1389,7 +1388,9 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
         push_operand(lexer, expr_from_target(lexer, consttarg));
         push_operand(lexer, expr_from_const(lexer, value));
-
+        /*set_instrf(lexer, "set", "%T%C", consttarg, value);
+        get_opinfo(lexer->yyscanner);
+        */
         decl->name     = name;
         decl->type     = PMC_VAL;
         decl->val.pval = value->val.sval;
@@ -1416,6 +1417,11 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
             push_operand(lexer, expr_from_target(lexer, consttarg));
             push_operand(lexer, expr_from_int(lexer, index));
+
+            /* declaration of an Integer means it's a PMC, not an INT_TYPE */
+            decl->name     = name;
+            decl->type     = PMC_VAL;
+            decl->val.pval = value->val.sval;
 
         }
         else {
@@ -1444,6 +1450,10 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             push_operand(lexer, expr_from_target(lexer, consttarg));
             push_operand(lexer, expr_from_int(lexer, index));
 
+            decl->name     = name;
+            decl->type     = PMC_VAL;
+            decl->val.pval = value->val.sval;
+
         }
         else {
             yypirerror(lexer->yyscanner, lexer,
@@ -1458,9 +1468,11 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             symbol *constsym  = new_symbol(lexer, name, PMC_TYPE);
             target *consttarg = target_from_symbol(lexer, constsym);
 
-            PMC *strconst = pmc_new(lexer->interp,
+            PMC    *strconst  = pmc_new(lexer->interp,
                                     Parrot_get_ctx_HLL_type(lexer->interp, enum_class_String));
-            int index     = add_pmc_const(lexer->bc, strconst);
+
+            int     index     = add_pmc_const(lexer->bc, strconst);
+
             VTABLE_set_string_native(lexer->interp, strconst,
                                      string_from_cstring(lexer->interp, value->val.sval,
                                                          strlen(value->val.sval)));
@@ -1471,6 +1483,10 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
             push_operand(lexer, expr_from_target(lexer, consttarg));
             push_operand(lexer, expr_from_int(lexer, index));
+
+            decl->name     = name;
+            decl->type     = PMC_VAL;
+            decl->val.pval = value->val.sval;
 
         }
         else {

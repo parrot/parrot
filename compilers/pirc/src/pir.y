@@ -2007,11 +2007,11 @@ const_stat            : const_decl
                       ;
 
 const_decl            : ".const" const_tail
-                            { store_global_constant(lexer, $2); }
+                            { /*store_global_constant(lexer, $2); */}
                       ;
 
 globalconst_decl      : ".globalconst" const_tail
-                            { /* XXX is .globalconst to be kept? */ }
+                            { store_global_constant(lexer, $2); }
                       ;
 
 const_tail            : "int" identifier '=' TK_INTC
