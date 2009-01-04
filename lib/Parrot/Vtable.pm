@@ -130,9 +130,8 @@ sub vtbl_defs {
     my $vtable = shift;
 
     my $defs = q{};
-    my $entry;
 
-    for $entry ( @{$vtable} ) {
+    for my $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
         my $args = join( ", ", 'PARROT_INTERP', 'PMC* pmc', split( /\s*,\s*/, $entry->[2] ) );
         $defs .= "typedef $entry->[0] (*$entry->[1]_method_t)($args);\n";
@@ -152,9 +151,8 @@ sub vtbl_struct {
     my $vtable = shift;
 
     my $struct = q{};
-    my $entry;
 
-    $struct = <<"EOF";
+    $struct = <<'EOF';
 typedef enum {
     VTABLE_IS_CONST_FLAG     = 0x001,
     VTABLE_HAS_CONST_TOO     = 0x002,
@@ -182,7 +180,7 @@ typedef struct _vtable {
     /* Vtable Functions */
 
 EOF
-    for $entry ( @{$vtable} ) {
+    for my $entry ( @{$vtable} ) {
         next if ( $entry->[4] =~ /MMD_/ );
         $struct .= "    $entry->[1]_method_t $entry->[1];\n";
     }

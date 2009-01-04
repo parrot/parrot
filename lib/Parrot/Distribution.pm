@@ -234,10 +234,11 @@ BEGIN {
 
                 # Filter out ignored directories
                 # and return the results
-                return sort
+                my @dirs = sort
                     map  { $self->directory_with_name($_) }
                     grep { !m|(?:$filter_dir)| }
                     keys %dirs;
+                return @dirs;
             };
 
             *{ $method . '_file_with_name' } = sub {
@@ -272,9 +273,11 @@ BEGIN {
                 # Look through the list of distribution files
                 # for files ending in the proper extension(s)
                 # and return a sorted list of filenames
-                return sort
+                my @files = sort
                     map  { $self->file_with_name($_) }
-                    grep { m|(?i)(?:$filter_ext)| } $self->_dist_files;
+                    grep { m|(?i)(?:$filter_ext)| }
+                    $self->_dist_files;
+                return @files;
             };
         }
     }
