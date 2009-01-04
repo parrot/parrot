@@ -1374,6 +1374,8 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         /* create a target from the symbol */
         target *consttarg = target_from_symbol(lexer, constsym);
 
+        SET_FLAG(constsym->flags, TARGET_FLAG_IS_CONST);
+
         /* declare it as a local, so that it will get a register assigned. */
         declare_local(lexer, PMC_TYPE, constsym);
         assign_vanilla_register(lexer, constsym);
@@ -1410,6 +1412,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
                                     Parrot_get_ctx_HLL_type(lexer->interp, enum_class_Integer));
             int index     = add_pmc_const(lexer->bc, intconst);
             VTABLE_set_integer_native(lexer->interp, intconst, value->val.ival);
+
 
             declare_local(lexer, PMC_TYPE, constsym);
             assign_vanilla_register(lexer, constsym);

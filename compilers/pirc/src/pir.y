@@ -180,7 +180,7 @@ static int evaluate_i_n(int a, pir_rel_operator op, double b);
 static int evaluate_n_i(double a, pir_rel_operator op, int b);
 static int evaluate_s_s(char const * const a, pir_rel_operator op, char const * const b);
 
-static int evaluate_s(char * const s);
+static int evaluate_s(char const * const s);
 static int evaluate_c(lexer_state * const lexer, constant * const c);
 
 static char *concat_strings(lexer_state * const lexer, char const * a, char const * b);
@@ -2075,6 +2075,8 @@ symbol      : reg
                                /* make sure sym is not NULL */
                                sym = new_symbol(lexer, $1, UNKNOWN_TYPE);
                            }
+
+
                            $$ = target_from_symbol(lexer, sym);
                          }
             ;
@@ -2760,7 +2762,7 @@ evaluate_s_s(NOTNULL(char const * const a), pir_rel_operator op, NOTNULL(char co
 /*
 
 =item C<static int
-evaluate_s(char * const s)>
+evaluate_s(char const * const s)>
 
 Evaluate a string in boolean context; if the string's length is 0, it's false.
 If the string equals "0", ".0", "0." or "0.0", it's false.
@@ -2771,7 +2773,7 @@ Otherwise, it's true.
 */
 PARROT_WARN_UNUSED_RESULT
 static int
-evaluate_s(NOTNULL(char * const s)) {
+evaluate_s(NOTNULL(char const * const s)) {
     int strlen_s = strlen(s);
 
     if (strlen_s > 0) {
@@ -3327,15 +3329,40 @@ check_op_args_for_symbols(lexer_state * const lexer) {
             symbol *sym = find_symbol(lexer, operand->expr.id);
 
             if (sym) {
-                operand->expr.t        = target_from_symbol(lexer, sym);
+
                 /*
                 operand->expr.t = new_target(lexer);
                 operand->expr.t->info  = &sym->info;
                 */
-                operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
+                operand->expr.t = target_from_symbol(lexer, sym);
+                operand->type   = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
-            else { /* it must be a label */
-                SET_BIT(label_bitmask, BIT(i));
+            else { /* it may be a constant, otherwise it's a label */
+
+/* XXX */
+#if 0
+/* experimental code to integrate constants. Doesn't work properly, this is only
+ * 1 spot in which symbol lookups are done; needs to be done everywhere.
+ * XXX possibly integrate constdecl and symbol, or represent constdecl's as symbols.
+ */
+                constdecl *c = find_global_constant(lexer, operand->expr.id);
+
+                if (c) { /* it's a constant */
+
+                    /* convert the operand to a constant, copy the const value into this. */
+                    operand->type         = EXPR_CONSTANT;
+                    /* allocate a new const; doesn't matter which type/value, overwritten later */
+                    operand->expr.c       = new_const(lexer, INT_VAL, 0); /* dummy value */
+                    operand->expr.c->val  = c->val; /* copy value union */
+                    operand->expr.c->type = c->type; /* copy value type */
+                }
+                else
+#endif
+/* XXX */
+                {
+                    /* it must be a label */
+                    SET_BIT(label_bitmask, BIT(i));
+                }
             }
         }
     }

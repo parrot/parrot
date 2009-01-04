@@ -353,21 +353,6 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
         buck = buck->next;
     }
 
-    /* it's not a symbol; try the constants */
-    c = find_global_constant(lexer, name);
-    if (c) {
-        /* convert the constdecl->type (value_type) to a pir_type value */
-        symbol *sym = new_symbol(lexer, name, valuetype_pirtype_clut[c->type]);
-        /*
-        fprintf(stderr, "symbol type: %d ==> %d\n", c->type, convert_valuetype_to_pirtype[c->type]);
-        */
-        /*
-        if (sym->info.color == NO_REG_ALLOCATED)
-            assign_vanilla_register(lexer, sym);
-        */
-        return sym;
-    }
-
     return NULL;
 }
 

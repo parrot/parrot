@@ -497,7 +497,7 @@ static int evaluate_i_n(int a, pir_rel_operator op, double b);
 static int evaluate_n_i(double a, pir_rel_operator op, int b);
 static int evaluate_s_s(char const * const a, pir_rel_operator op, char const * const b);
 
-static int evaluate_s(char * const s);
+static int evaluate_s(char const * const s);
 static int evaluate_c(lexer_state * const lexer, constant * const c);
 
 static char *concat_strings(lexer_state * const lexer, char const * a, char const * b);
@@ -1091,14 +1091,14 @@ static const yytype_uint16 yyrline[] =
     1982,  1984,  1992,  1993,  1997,  2001,  2004,  2008,  2009,  2012,
     2016,  2020,  2022,  2024,  2026,  2034,  2035,  2039,  2040,  2041,
     2044,  2045,  2048,  2049,  2050,  2051,  2052,  2053,  2056,  2057,
-    2058,  2059,  2067,  2070,  2071,  2082,  2083,  2084,  2085,  2089,
-    2090,  2093,  2094,  2095,  2096,  2097,  2098,  2099,  2100,  2103,
-    2104,  2105,  2108,  2109,  2110,  2111,  2112,  2113,  2114,  2115,
-    2116,  2117,  2118,  2119,  2120,  2121,  2122,  2123,  2124,  2125,
-    2126,  2127,  2128,  2129,  2130,  2136,  2137,  2138,  2139,  2140,
-    2141,  2142,  2143,  2144,  2145,  2146,  2147,  2159,  2167,  2171,
-    2172,  2175,  2176,  2177,  2178,  2179,  2180,  2183,  2185,  2186,
-    2189,  2190,  2193,  2197,  2202
+    2058,  2059,  2067,  2070,  2071,  2084,  2085,  2086,  2087,  2091,
+    2092,  2095,  2096,  2097,  2098,  2099,  2100,  2101,  2102,  2105,
+    2106,  2107,  2110,  2111,  2112,  2113,  2114,  2115,  2116,  2117,
+    2118,  2119,  2120,  2121,  2122,  2123,  2124,  2125,  2126,  2127,
+    2128,  2129,  2130,  2131,  2132,  2138,  2139,  2140,  2141,  2142,
+    2143,  2144,  2145,  2146,  2147,  2148,  2149,  2161,  2169,  2173,
+    2174,  2177,  2178,  2179,  2180,  2181,  2182,  2185,  2187,  2188,
+    2191,  2192,  2195,  2199,  2204
 };
 #endif
 
@@ -4451,282 +4451,284 @@ yyreduce:
                                /* make sure sym is not NULL */
                                sym = new_symbol(lexer, (yyvsp[(1) - (1)].sval), UNKNOWN_TYPE);
                            }
+
+
                            (yyval.targ) = target_from_symbol(lexer, sym);
                          ;}
     break;
 
   case 355:
-#line 2082 "pir.y"
+#line 2084 "pir.y"
     { (yyval.targ) = new_reg(lexer, PMC_TYPE, (yyvsp[(1) - (1)].ival));    ;}
     break;
 
   case 356:
-#line 2083 "pir.y"
+#line 2085 "pir.y"
     { (yyval.targ) = new_reg(lexer, NUM_TYPE, (yyvsp[(1) - (1)].ival));    ;}
     break;
 
   case 357:
-#line 2084 "pir.y"
+#line 2086 "pir.y"
     { (yyval.targ) = new_reg(lexer, INT_TYPE, (yyvsp[(1) - (1)].ival));    ;}
     break;
 
   case 358:
-#line 2085 "pir.y"
+#line 2087 "pir.y"
     { (yyval.targ) = new_reg(lexer, STRING_TYPE, (yyvsp[(1) - (1)].ival)); ;}
     break;
 
   case 361:
-#line 2093 "pir.y"
+#line 2095 "pir.y"
     { (yyval.sval) = "if"; ;}
     break;
 
   case 362:
-#line 2094 "pir.y"
+#line 2096 "pir.y"
     { (yyval.sval) = "unless"; ;}
     break;
 
   case 363:
-#line 2095 "pir.y"
+#line 2097 "pir.y"
     { (yyval.sval) = "goto"; ;}
     break;
 
   case 364:
-#line 2096 "pir.y"
+#line 2098 "pir.y"
     { (yyval.sval) = "int"; ;}
     break;
 
   case 365:
-#line 2097 "pir.y"
+#line 2099 "pir.y"
     { (yyval.sval) = "num"; ;}
     break;
 
   case 366:
-#line 2098 "pir.y"
+#line 2100 "pir.y"
     { (yyval.sval) = "string"; ;}
     break;
 
   case 367:
-#line 2099 "pir.y"
+#line 2101 "pir.y"
     { (yyval.sval) = "pmc"; ;}
     break;
 
   case 368:
-#line 2100 "pir.y"
+#line 2102 "pir.y"
     { (yyval.sval) = "null"; ;}
     break;
 
   case 369:
-#line 2103 "pir.y"
+#line 2105 "pir.y"
     { (yyval.sval) = "neg"; ;}
     break;
 
   case 370:
-#line 2104 "pir.y"
+#line 2106 "pir.y"
     { (yyval.sval) = "not"; ;}
     break;
 
   case 371:
-#line 2105 "pir.y"
+#line 2107 "pir.y"
     { (yyval.sval) = "bnot"; ;}
     break;
 
   case 372:
-#line 2108 "pir.y"
+#line 2110 "pir.y"
     { (yyval.ival) = OP_ADD; ;}
     break;
 
   case 373:
-#line 2109 "pir.y"
+#line 2111 "pir.y"
     { (yyval.ival) = OP_SUB; ;}
     break;
 
   case 374:
-#line 2110 "pir.y"
+#line 2112 "pir.y"
     { (yyval.ival) = OP_DIV; ;}
     break;
 
   case 375:
-#line 2111 "pir.y"
+#line 2113 "pir.y"
     { (yyval.ival) = OP_MUL; ;}
     break;
 
   case 376:
-#line 2112 "pir.y"
+#line 2114 "pir.y"
     { (yyval.ival) = OP_MOD; ;}
     break;
 
   case 377:
-#line 2113 "pir.y"
+#line 2115 "pir.y"
     { (yyval.ival) = OP_BOR; ;}
     break;
 
   case 378:
-#line 2114 "pir.y"
+#line 2116 "pir.y"
     { (yyval.ival) = OP_BAND; ;}
     break;
 
   case 379:
-#line 2115 "pir.y"
+#line 2117 "pir.y"
     { (yyval.ival) = OP_BXOR; ;}
     break;
 
   case 380:
-#line 2116 "pir.y"
+#line 2118 "pir.y"
     { (yyval.ival) = OP_POW; ;}
     break;
 
   case 381:
-#line 2117 "pir.y"
+#line 2119 "pir.y"
     { (yyval.ival) = OP_CONCAT; ;}
     break;
 
   case 382:
-#line 2118 "pir.y"
+#line 2120 "pir.y"
     { (yyval.ival) = OP_LSR; ;}
     break;
 
   case 383:
-#line 2119 "pir.y"
+#line 2121 "pir.y"
     { (yyval.ival) = OP_SHR; ;}
     break;
 
   case 384:
-#line 2120 "pir.y"
+#line 2122 "pir.y"
     { (yyval.ival) = OP_SHL; ;}
     break;
 
   case 385:
-#line 2121 "pir.y"
+#line 2123 "pir.y"
     { (yyval.ival) = OP_OR; ;}
     break;
 
   case 386:
-#line 2122 "pir.y"
+#line 2124 "pir.y"
     { (yyval.ival) = OP_AND; ;}
     break;
 
   case 387:
-#line 2123 "pir.y"
+#line 2125 "pir.y"
     { (yyval.ival) = OP_FDIV; ;}
     break;
 
   case 388:
-#line 2124 "pir.y"
+#line 2126 "pir.y"
     { (yyval.ival) = OP_XOR; ;}
     break;
 
   case 389:
-#line 2125 "pir.y"
+#line 2127 "pir.y"
     { (yyval.ival) = OP_ISEQ; ;}
     break;
 
   case 390:
-#line 2126 "pir.y"
+#line 2128 "pir.y"
     { (yyval.ival) = OP_ISLE; ;}
     break;
 
   case 391:
-#line 2127 "pir.y"
+#line 2129 "pir.y"
     { (yyval.ival) = OP_ISLT; ;}
     break;
 
   case 392:
-#line 2128 "pir.y"
+#line 2130 "pir.y"
     { (yyval.ival) = OP_ISGE; ;}
     break;
 
   case 393:
-#line 2129 "pir.y"
+#line 2131 "pir.y"
     { (yyval.ival) = OP_ISGT; ;}
     break;
 
   case 394:
-#line 2130 "pir.y"
+#line 2132 "pir.y"
     { (yyval.ival) = OP_ISNE; ;}
     break;
 
   case 395:
-#line 2136 "pir.y"
+#line 2138 "pir.y"
     { (yyval.ival) = OP_MUL; ;}
     break;
 
   case 396:
-#line 2137 "pir.y"
+#line 2139 "pir.y"
     { (yyval.ival) = OP_MOD; ;}
     break;
 
   case 397:
-#line 2138 "pir.y"
+#line 2140 "pir.y"
     { (yyval.ival) = OP_POW; ;}
     break;
 
   case 398:
-#line 2139 "pir.y"
+#line 2141 "pir.y"
     { (yyval.ival) = OP_DIV; ;}
     break;
 
   case 399:
-#line 2140 "pir.y"
+#line 2142 "pir.y"
     { (yyval.ival) = OP_FDIV; ;}
     break;
 
   case 400:
-#line 2141 "pir.y"
+#line 2143 "pir.y"
     { (yyval.ival) = OP_BOR; ;}
     break;
 
   case 401:
-#line 2142 "pir.y"
+#line 2144 "pir.y"
     { (yyval.ival) = OP_BAND; ;}
     break;
 
   case 402:
-#line 2143 "pir.y"
+#line 2145 "pir.y"
     { (yyval.ival) = OP_BXOR; ;}
     break;
 
   case 403:
-#line 2144 "pir.y"
+#line 2146 "pir.y"
     { (yyval.ival) = OP_CONCAT; ;}
     break;
 
   case 404:
-#line 2145 "pir.y"
+#line 2147 "pir.y"
     { (yyval.ival) = OP_SHR; ;}
     break;
 
   case 405:
-#line 2146 "pir.y"
+#line 2148 "pir.y"
     { (yyval.ival) = OP_SHL; ;}
     break;
 
   case 406:
-#line 2147 "pir.y"
+#line 2149 "pir.y"
     { (yyval.ival) = OP_LSR; ;}
     break;
 
   case 408:
-#line 2168 "pir.y"
+#line 2170 "pir.y"
     { new_subr(lexer, "@start"); ;}
     break;
 
   case 417:
-#line 2184 "pir.y"
+#line 2186 "pir.y"
     { set_label(lexer, (yyvsp[(1) - (2)].sval)); ;}
     break;
 
   case 422:
-#line 2194 "pir.y"
+#line 2196 "pir.y"
     { set_sub_name(lexer, (yyvsp[(3) - (3)].sval)); ;}
     break;
 
   case 423:
-#line 2198 "pir.y"
+#line 2200 "pir.y"
     { new_subr(lexer, NULL); ;}
     break;
 
   case 424:
-#line 2203 "pir.y"
+#line 2205 "pir.y"
     {
                                   if (is_parrot_op(lexer, (yyvsp[(1) - (3)].sval)))
                                       get_opinfo(lexer);
@@ -4738,7 +4740,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 4742 "pirparser.c"
+#line 4744 "pirparser.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -4952,7 +4954,7 @@ yyreturn:
 }
 
 
-#line 2214 "pir.y"
+#line 2216 "pir.y"
 
 
 
@@ -5502,7 +5504,7 @@ evaluate_s_s(NOTNULL(char const * const a), pir_rel_operator op, NOTNULL(char co
 /*
 
 =item C<static int
-evaluate_s(char * const s)>
+evaluate_s(char const * const s)>
 
 Evaluate a string in boolean context; if the string's length is 0, it's false.
 If the string equals "0", ".0", "0." or "0.0", it's false.
@@ -5513,7 +5515,7 @@ Otherwise, it's true.
 */
 PARROT_WARN_UNUSED_RESULT
 static int
-evaluate_s(NOTNULL(char * const s)) {
+evaluate_s(NOTNULL(char const * const s)) {
     int strlen_s = strlen(s);
 
     if (strlen_s > 0) {
@@ -6069,15 +6071,40 @@ check_op_args_for_symbols(lexer_state * const lexer) {
             symbol *sym = find_symbol(lexer, operand->expr.id);
 
             if (sym) {
-                operand->expr.t        = target_from_symbol(lexer, sym);
+
                 /*
                 operand->expr.t = new_target(lexer);
                 operand->expr.t->info  = &sym->info;
                 */
-                operand->type          = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
+                operand->expr.t = target_from_symbol(lexer, sym);
+                operand->type   = EXPR_TARGET; /* convert operand node into EXPR_TARGET */
             }
-            else { /* it must be a label */
-                SET_BIT(label_bitmask, BIT(i));
+            else { /* it may be a constant, otherwise it's a label */
+
+/* XXX */
+#if 0
+/* experimental code to integrate constants. Doesn't work properly, this is only
+ * 1 spot in which symbol lookups are done; needs to be done everywhere.
+ * XXX possibly integrate constdecl and symbol, or represent constdecl's as symbols.
+ */
+                constdecl *c = find_global_constant(lexer, operand->expr.id);
+
+                if (c) { /* it's a constant */
+
+                    /* convert the operand to a constant, copy the const value into this. */
+                    operand->type         = EXPR_CONSTANT;
+                    /* allocate a new const; doesn't matter which type/value, overwritten later */
+                    operand->expr.c       = new_const(lexer, INT_VAL, 0); /* dummy value */
+                    operand->expr.c->val  = c->val; /* copy value union */
+                    operand->expr.c->type = c->type; /* copy value type */
+                }
+                else
+#endif
+/* XXX */
+                {
+                    /* it must be a label */
+                    SET_BIT(label_bitmask, BIT(i));
+                }
             }
         }
     }
