@@ -30,6 +30,7 @@ O(c) (constant) time.
 #include "pirdefines.h"
 #include "pirpcc.h"
 #include "pirerr.h"
+#include "pirop.h"
 #include "bcgen.h"
 
 #include <stdio.h>
@@ -1385,17 +1386,17 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
          * as second; its type is PMC_VAL, which is processed further in
          * piremit::emit_pbc_const_arg(), case PMC_VAL.
          */
+
+         /* XXX always emit this? I prefer load-on-demand */
+
         new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
         push_operand(lexer, expr_from_target(lexer, consttarg));
         push_operand(lexer, expr_from_const(lexer, value));
-        /*set_instrf(lexer, "set", "%T%C", consttarg, value);
-        get_opinfo(lexer->yyscanner);
-        */
+
         decl->name     = name;
         decl->type     = PMC_VAL;
         decl->val.pval = value->val.sval;
     }
-
     else if (value->type == INT_VAL) {
 
         STRING *intclassname = string_from_cstring(lexer->interp, "Integer", 7);
@@ -1417,6 +1418,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
             push_operand(lexer, expr_from_target(lexer, consttarg));
             push_operand(lexer, expr_from_int(lexer, index));
+
 
             /* declaration of an Integer means it's a PMC, not an INT_TYPE */
             decl->name     = name;

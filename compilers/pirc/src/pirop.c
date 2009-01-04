@@ -58,7 +58,8 @@ get_signature_length(NOTNULL(expression * const e)) {
     switch (e->type) {
         case EXPR_TARGET:
             return 2 + ((e->expr.t->key != NULL) /* if there's a key on this target ... */
-                       ? get_signature_length(e->expr.t->key->head->expr) + 1 /* ... get its length. */
+                                                 /* ... get its length. */
+                       ? get_signature_length(e->expr.t->key->head->expr) + 1
                        : 0);
         case EXPR_CONSTANT:
             return 3;    /* for _, 'k', 'c' */

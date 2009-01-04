@@ -51,6 +51,36 @@ Globally defined constants are stored in yet another separate list.
 
 #define NO_REG_ALLOCATED    -1
 
+/* Conversion Look-Up Table (CLUT) for pir_type and value_type enums.
+ *
+ * Lookup table to convert value_type values into pir_type values.
+ * when indexing with a pir_type value, the value_type is returned;
+ * when looking up with a value_type, the corresponding
+ * pir_type value is returned. For both STRING_VAL and
+ * USTRING_VAL, STRING_TYPE is returned.
+ *
+ * Example input:  INT_TYPE (value "0")
+ *         output: INT_VAL  (value "5")
+ *
+ * Example input:  INT_VAL  (value "5")
+ *         output: INT_TYPE (value "0")
+ *
+ * When input is STRING_TYPE you'll only get STRING_VAL,
+ * never USTRING_VAL (indicating unicode string).
+ */
+static const int valuetype_pirtype_clut[10] = {
+    INT_VAL,      /* INT_TYPE -> INT_VAL */
+    STRING_VAL,   /* STRING_TYPE -> STRING_VAL */
+    PMC_VAL,      /* PMC_TYPE -> PMC_VAL */
+    NUM_VAL,      /* NUM_TYPE -> NUM_VAL */
+    UNKNOWN_TYPE, /* UNKNOWN_TYPE -> UNKNOWN_TYPE */
+    INT_TYPE,     /* INT_VAL -> INT_TYPE */
+    STRING_TYPE,  /* STRING_VAL -> STRING_TYPE */
+    PMC_TYPE,     /* PMC_VAL -> PMC_TYPE */
+    NUM_TYPE,     /* NUM_VAL -> NUM_TYPE */
+    STRING_TYPE   /* USTRING_VAL -> STRING_TYPE */
+};
+
 /*
 
 =item C<static int
@@ -222,17 +252,19 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
         }
 
 
-        if (b == NULL) { /* loop was broken because b == NULL, so it wasnt found; */
+        if (b == NULL) { /* loop was broken because b == NULL, so it wasn't found; */
             b = new_bucket(lexer);
             bucket_symbol(b) = iter;
             store_bucket(table, b, hash);
             iter->info.type  = type;
+            fprintf(stderr, "declare_local(): [%s]\n", iter->info.id.name);
         }
 
         iter = iter->next;
     }
-
 }
+
+
 
 /*
 
@@ -271,24 +303,7 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
     while (subiter != lexer->subs->next); /* iterate over all subs */
 }
 
-/* Lookup table to convert value_type values into pir_type values.
- * when indexing with a pir_type value, the pir_type value itself
- * is returned; when looking up with a value_type, the corresponding
- * pir_type value is returned. For instance, for both STRING_VAL and
- * USTRING_VAL, STRING_TYPE is returned.
- */
-static const int convert_valuetype_to_pirtype[10] = {
-    INT_TYPE,
-    STRING_TYPE,
-    PMC_TYPE,
-    NUM_TYPE,
-    UNKNOWN_TYPE,
-    INT_TYPE,     /* INT_VAL -> INT_TYPE */
-    STRING_TYPE,  /* STRING_VAL -> STRING_TYPE */
-    PMC_TYPE,     /* PMC_VAL -> PMC_TYPE */
-    NUM_TYPE,     /* NUM_VAL -> NUM_TYPE */
-    STRING_TYPE   /* USTRING_VAL -> STRING_TYPE */
-};
+
 
 /*
 
@@ -341,12 +356,15 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
     /* it's not a symbol; try the constants */
     c = find_global_constant(lexer, name);
     if (c) {
-        symbol *sym = new_symbol(lexer, name, convert_valuetype_to_pirtype[c->type]);
+        /* convert the constdecl->type (value_type) to a pir_type value */
+        symbol *sym = new_symbol(lexer, name, valuetype_pirtype_clut[c->type]);
         /*
         fprintf(stderr, "symbol type: %d ==> %d\n", c->type, convert_valuetype_to_pirtype[c->type]);
         */
+        /*
         if (sym->info.color == NO_REG_ALLOCATED)
             assign_vanilla_register(lexer, sym);
+        */
         return sym;
     }
 
@@ -622,7 +640,7 @@ store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constdecl * co
     bucket *b            = new_bucket(lexer);
     bucket_constant(b)   = c;
     store_bucket(table, b, hash);
-    fprintf(stderr, "store global constant\n");
+    fprintf(stderr, "store global constant (%s)\n", c->name);
 }
 
 /*

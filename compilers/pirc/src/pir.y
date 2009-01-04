@@ -576,7 +576,7 @@ pir_chunks        : pir_chunk
                   ;
 
 pir_chunk         : sub_def
-                  | const_decl
+                  | const_decl_chunk
                   | namespace_decl
                   | hll_specifier
                   | hll_mapping
@@ -1132,7 +1132,7 @@ parrot_op_assign  : target '=' parrot_op op_arg_expr ',' parrot_op_args
                           }
                         }
                   | target '=' parrot_op keylist ',' parrot_op_args
-                        { /* XXX create a PMC const for $4 */
+                        {
                           unshift_operand(lexer, expr_from_key(lexer, $4));
                           unshift_operand(lexer, expr_from_target(lexer, $1));
                           if (check_op_args_for_symbols(lexer))
@@ -1204,11 +1204,11 @@ assignment        : target '=' TK_INTC
                         }
                   | target '=' parrot_op keylist
                         {
-                          /*   $P0 = foo ["bar"]
+                          /*   $P0 = foo ["bar"]    # PIR style
                            *
                            * could be PIR sugar for this PASM code:
                            *
-                           *    foo $P0, ["bar"]
+                           *    foo $P0, ["bar"]    # PASM style
                            *
                            * but as this sugar is already used for keyed access, the parser
                            * will not allow the former syntax; if there is an op C<foo>,
@@ -1999,7 +1999,10 @@ paren_string          : '(' TK_STRINGC ')'
                       ;
 
 const_decl_stat       : const_stat "\n"
+                      ;
 
+const_decl_chunk      : const_decl
+                            { store_global_constant(lexer, $1); }
                       ;
 
 const_stat            : const_decl
@@ -2007,7 +2010,7 @@ const_stat            : const_decl
                       ;
 
 const_decl            : ".const" const_tail
-                            { /*store_global_constant(lexer, $2); */}
+                            { $$ = $2; }
                       ;
 
 globalconst_decl      : ".globalconst" const_tail
