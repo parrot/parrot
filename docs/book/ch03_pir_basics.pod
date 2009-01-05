@@ -496,6 +496,34 @@ Fortunately, libraries of macros have been developed that can implement
 more familiar syntax for many of these control structures. We will discuss
 these libraries in more detail in A<CHP-6> "PIR Standard Library".
 
+=head1 Classes and Objects
+
+It may seem more appropriate for a discussion of PIR's support for classes
+and objects to reside in it's own chapter, instead of appearing in a generic
+chapter about PIR programming "basics". However, part of PIR's core
+functionality is it's support for object-oriented programming. PIR does't
+use all the fancy syntax as other OO languages, and it doesn't even support
+all the features that most modern OO languages have. What PIR does have is
+support for some of the basic structures and abilities, the necessary subset
+to construct richer and higher-level object systems.
+
+=head2 PMCs as Classes
+
+PMCs aren't exactly "classes" in the way that this term is normally used.
+They are polymorphic data items that can be one of a large variety of
+predefined types. As we have seen briefly, and as we will see in more depth
+later, PMCs have a standard interface called the VTABLE interface. VTABLEs
+are a standard list of functions that all PMCs implement N<or, PMCs can
+choose not to implement each interface explicitly and instead let Parrot
+call the default implementations>. 
+
+VTABLES are very strict: There are a fixed number with fixed names and
+fixed argument lists. You can't just create any random VTABLE interface that
+you want to create, you can only make use of the ones that Parrot supplies
+and expects. To circumvent this limitation, PMCs may have METHODS in
+addition to VTABLES. METHODS are arbitrary code functions that can be
+written in C, may have any name, and may implement any behavior.
+
 =cut
 
 ##########################################################################
