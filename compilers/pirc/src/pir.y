@@ -2223,8 +2223,11 @@ pasm_sub_head             : ".pcc_sub"
 
 pasm_instruction          : parrot_op op_args "\n"
                                 {
-                                  if (is_parrot_op(lexer, $1))
-                                      get_opinfo(lexer);
+
+                                  if (is_parrot_op(lexer, $1)) {
+                                      check_op_args_for_symbols(lexer);
+                                      /* get_opinfo(lexer); */
+                                  }
                                   else /* not a parrot op */
                                       yypirerror(yyscanner, lexer, "'%s' is not a parrot op", $1);
 
@@ -3459,6 +3462,12 @@ mistakenly tried to use a PASM register in PIR mode.
 */
 static void
 undeclared_symbol(lexer_state * const lexer, char const * const symbol) {
+    if (TEST_FLAG(lexer->flags, LEXER_FLAG_PASMFILE)) {
+        yypirerror(lexer->yyscanner, lexer,
+                   "cannot use symbols in PASM mode ('%s')", symbol);
+        return;
+    }
+
     yypirerror(lexer->yyscanner, lexer, "symbol '%s' not declared", symbol);
 
     /* maybe user tried to use PASM register? */

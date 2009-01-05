@@ -1090,13 +1090,13 @@ REGISTER       "$"[SNIP]{DIGITS}
                           return TK_LABEL;
                         }
 
-<PASM>"$"[SNIP]{DIGIT}+ { yypirerror(yyscanner, yypirget_extra(yyscanner),
+<PASM>{REGISTER}        { yypirerror(yyscanner, yypirget_extra(yyscanner),
                                      "symbolic registers are not allowed in PASM mode");
                         }
-<PASM>"P"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_PREG; }
-<PASM>"N"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_NREG; }
-<PASM>"I"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_IREG; }
-<PASM>"S"{DIGIT}+       { yylval->ival = atoi(yytext + 1); return TK_SREG; }
+<PASM>"P"{DIGITS}       { yylval->ival = atoi(yytext + 1); return TK_PREG; }
+<PASM>"N"{DIGITS}       { yylval->ival = atoi(yytext + 1); return TK_NREG; }
+<PASM>"I"{DIGITS}       { yylval->ival = atoi(yytext + 1); return TK_IREG; }
+<PASM>"S"{DIGITS}       { yylval->ival = atoi(yytext + 1); return TK_SREG; }
 
 <PASM>{IDENT}           { /* can be a parrot op or a label; the check is done in the parser. */
                           yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
