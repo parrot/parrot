@@ -1664,228 +1664,114 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 PARROT_INTERP, int n, int *args)
 ;
 
-static void
+void
 Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    op_info_t *op_info = &interp->op_info_table[*jit_info->cur_op];
-    int p1 = *(jit_info->cur_op + 1);
-
-    /* return result is in EAX or ST(0) */
-    switch (op_info->types[0]) {
-        case PARROT_ARG_I:
-            emitm_movl_r_m(interp, jit_info->native_ptr,
-                    emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_INT(p1));
-            break;
-        case PARROT_ARG_S:
-            emitm_movl_r_m(interp, jit_info->native_ptr,
-                    emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_STR(p1));
-            break;
-        case PARROT_ARG_P:
-            emitm_movl_r_m(interp, jit_info->native_ptr,
-                    emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(p1));
-            break;
-        case PARROT_ARG_N:
-            jit_emit_fstore_mb_n(interp, jit_info->native_ptr, emit_EBX,
-                    REG_OFFS_NUM(p1));
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1, "jit_vtable1r: ill LHS");
-            break;
-    }
-}
+;
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1)
  */
-static void
+void
 Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 1 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 1, a);
-}
+;
 
 /* emit a call to a vtable func
  * $1 = $2->vtable(interp, $2)
  */
-static void
+void
 Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 2 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 1, a);
-    Parrot_jit_store_retval(jit_info, interp);
-}
+;
 
 
 /* emit a call to a vtable func
  * $1 = $2->vtable(interp, $2, $3)
  */
-static void
+void
 Parrot_jit_vtable_1r223_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 2 , 3};
-    Parrot_jit_vtable_n_op(jit_info, interp, 2, a);
-    Parrot_jit_store_retval(jit_info, interp);
-}
+;
 
 /* emit a call to a vtable func
  * $1 = $3->vtable(interp, $3, $2)
  */
-static void
+void
 Parrot_jit_vtable_1r332_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 3 , 2};
-    Parrot_jit_vtable_n_op(jit_info, interp, 2, a);
-    Parrot_jit_store_retval(jit_info, interp);
-}
+;
+
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2)
  */
-static void
+void
 Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 1, 2 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 2, a);
-}
+;
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $1)
  */
-static void
+void
 Parrot_jit_vtable_111_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 1, 1 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 2, a);
-}
+;
+
 /* emit a call to a vtable func
  * $2->vtable(interp, $2, $1)
  */
-static void
+void
 Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 2, 1 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 2, a);
-}
+;
 
 /* emit a call to a vtable func
  * $2->vtable(interp, $2, $3, $1)
  */
-static void
+void
 Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 2, 3, 1 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 3, a);
-}
+;
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2, $3)
  */
-static void
+void
 Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int a[] = { 1, 2, 3 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 3, a);
-}
+;
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2, $1)
  */
-static void
+void
 Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-{
-    int a[] = { 1, 2, 1 };
-    Parrot_jit_vtable_n_op(jit_info, interp, 3, a);
-}
-
+                     PARROT_INTERP);
 
 /* if_p_ic, unless_p_ic */
-static void
+void
 Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP, int unless)
-{
-    int ic = *(jit_info->cur_op + 2);   /* branch offset */
-
-    /* emit call  vtable function i.e. get_bool, result eax */
-    Parrot_jit_vtable1_op(jit_info, interp);
-    /* test result */
-    jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
-    jit_emit_jcc(jit_info, unless ? emitm_jz : emitm_jnz, ic);
-}
+;
 
 /* unless_p_ic */
-static void
+ void
 Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    Parrot_jit_vtable_if_unless_op(jit_info, interp, 1);
-}
+;
 
 /* if_p_ic */
-static void
+void
 Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    Parrot_jit_vtable_if_unless_op(jit_info, interp, 0);
-}
+;
 
 /* new_p_ic */
-static void
+void
 Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP)
-{
-    int p1, i2;
-    op_info_t *op_info = &interp->op_info_table[*jit_info->cur_op];
-    size_t offset = offsetof(VTABLE, init);
-
-    PARROT_ASSERT(op_info->types[0] == PARROT_ARG_P);
-    p1 = *(jit_info->cur_op + 1);
-    i2 = *(jit_info->cur_op + 2);
-
-    if (i2 <= 0 || i2 >= interp->n_vtable_max)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "Illegal PMC enum (%d) in new", i2);
-
-    /* get interpreter */
-    Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-
-    /* push pmc enum and interpreter */
-    emitm_pushl_i(jit_info->native_ptr, i2);
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#  if EXEC_CAPABLE
-    if (jit_info->objfile) {
-        CALL("pmc_new_noinit");
-    }
-    else
-#  endif
-    {
-        call_func(jit_info, (void (*) (void))pmc_new_noinit);
-    }
-    /* result = eax push pmc */
-    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
-    /* store in PMC too */
-    emitm_movl_r_m(interp, jit_info->native_ptr,
-            emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(p1));
-    /* push interpreter */
-    Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-    /* mov (offs)%eax, %eax i.e. $1->vtable */
-    emitm_movl_m_r(interp, jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
-            offsetof(struct PMC, vtable));
-    /* call *(offset)eax */
-    emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
-    /* adjust 4 args pushed */
-    emitm_addb_i_r(jit_info->native_ptr, 16, emit_ESP);
-}
+;
 
 #  undef IREG
 #  undef NREG
