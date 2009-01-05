@@ -1239,3 +1239,232 @@ jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
 #undef NATIVECODE
 #undef ROFFS_PMC
 #undef ROFFS_INT
+
+#if EXEC_CAPABLE
+#  define emitm_callm(pc, b, i, s, d) { \
+       *((pc)++) = (char) 0xff; \
+       (pc) = emit_r_X((interp), (pc), emit_reg(emit_b010), (b), (i), (s), (d));\
+       }
+#else /* EXEC_CAPABLE */
+#  define emitm_callm(pc, b, i, s, d) { \
+       *((pc)++) = (char) 0xff; \
+       (pc) = emit_r_X((interp), (pc), emit_reg(emit_b010), (b), (i), (s), (d)); }
+#endif /* EXEC_CAPABLE */
+
+#  define jit_emit_fload_mb_n(interp, pc, base, offs) \
+      emitm_fldl((interp), (pc), (base), emit_None, 1, (offs))
+	  
+#  define CONST(i) (int *)(jit_info->cur_op[i] * \
+       sizeof (PackFile_Constant) + \
+       offsetof(PackFile_Constant, u))
+	   
+#  define jit_emit_fload_mb_n(interp, pc, base, offs) \
+      emitm_fldl((interp), (pc), (base), emit_None, 1, (offs))
+
+#  define emitm_callr(pc, reg) { \
+    *((pc)++) = (char) 0xff; \
+    *((pc)++) = (char) 0xd0 | ((reg) - 1); }
+	
+#  define emitm_fld(pc, sti) do { \
+     if ((unsigned char *)(pc) == (lastpc + 2) && \
+       (int)(*lastpc) == (int)0xDD && \
+       (int)lastpc[1] == (int)(0xD8+(sti)+1)) \
+       lastpc[1] = 0xD0+(sti)+1; \
+     else \
+       emitm_fl_3((pc), emit_b001, emit_b000, (sti)); \
+  } while (0)
+
+#  define jit_emit_fload_m_n(interp, pc, address) \
+      emitm_fldl((interp), (pc), emit_None, emit_None, emit_None, (address))
+
+#  define emitm_fldl(interp, pc, b, i, s, d) \
+    emitm_fl_2((interp), (pc), emit_b10, 1, emit_b000, (b), (i), (s), (d))
+#if EXEC_CAPABLE
+#  define emitm_pushl_m(pc, mem) { \
+       *((pc)++) = (char) 0xff; \
+       *((pc)++) = (char) 0x35; \
+       *(long *)(pc) = (long)(mem); \
+       (pc) += 4; }
+#else /* EXEC_CAPABLE */
+#  define emitm_pushl_m(pc, mem) { \
+       *((pc)++) = (char) 0xff; \
+       *((pc)++) = (char) 0x35; \
+       *(long *)(pc) = (long)(mem); \
+       (pc) += 4; }
+#endif /* EXEC_CAPABLE */
+
+#  define emitm_fl_2(interp, pc, mf, opa, opb, b, i, s, d) { \
+    *((pc)++) = (char)(emitm_floatop | ((mf) << 1) | (opa)); \
+    (pc) = emit_r_X((interp), (pc), emit_reg(opb), (b), (i), (s), (long)(d)); }
+	
+#  define emitm_alub_i_r(pc, op1, op2, imm, reg) { \
+    *((pc)++) = (char) (op1); *((pc)++) = (char) emit_alu_X_r((op2), (reg)); *((pc)++) = (char)(imm); }
+
+
+#  define emitm_fstpl(interp, pc, b, i, s, d) \
+    emitm_fl_2((interp), (pc), emit_b10, 1, emit_b011, (b), (i), (s), (d))
+	
+#  define emitm_addb_i_r(pc, imm, reg) \
+    emitm_alub_i_r((pc), 0x83, emit_b000, (imm), (reg))
+	
+/*
+ * for vtable calls registers are already saved back
+ */
+void
+Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
+                PARROT_INTERP, int n, int *args)
+{
+    int        nvtable = op_jit[*jit_info->cur_op].extcall;
+    size_t     offset;
+    op_info_t *op_info = &interp->op_info_table[*jit_info->cur_op];
+    int        pi;
+    int        idx, i, op;
+    int        st      = 0;         /* stack pop correction */
+    char      *L4      = NULL;
+
+    /* get the offset of the first vtable func */
+    offset  = offsetof(VTABLE, absolute);
+    offset += nvtable * sizeof (void *);
+    op      = *jit_info->cur_op;
+
+    if (op == PARROT_OP_set_i_p_ki) {
+        L4 = jit_set_i_p_ki(jit_info, interp, offset);
+    }
+    else if (op == PARROT_OP_set_p_ki_i) {
+        L4 = jit_set_p_ki_i(jit_info, interp, offset);
+    }
+
+    /* get params $i, 0 is opcode */
+    for (idx = n; idx > 0; idx--) {
+        i  = args[idx-1];
+        pi = *(jit_info->cur_op + i);
+
+        switch (op_info->types[i - 1]) {
+            case PARROT_ARG_S:
+                emitm_movl_m_r(interp, jit_info->native_ptr,
+                        emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_STR(pi));
+                emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+                break;
+            case PARROT_ARG_K:
+            case PARROT_ARG_P:
+                emitm_movl_m_r(interp, jit_info->native_ptr,
+                        emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_PMC(pi));
+                /* push $i, the left most Pi stays in eax, which is used
+                 * below, to call the vtable method
+                 */
+                emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+                break;
+            case PARROT_ARG_KI:
+            case PARROT_ARG_I:
+                if (MAP(i))
+                    emitm_pushl_r(jit_info->native_ptr, MAP(i));
+                else {
+                    emitm_movl_m_r(interp, jit_info->native_ptr,
+                            emit_EAX, emit_EBX, emit_None, 1, REG_OFFS_INT(pi));
+                    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+                }
+                break;
+                break;
+            case PARROT_ARG_KIC:
+            case PARROT_ARG_IC:
+                /* XXX INTVAL_SIZE */
+                /* push value */
+                emitm_pushl_i(jit_info->native_ptr, pi);
+                break;
+            case PARROT_ARG_N:
+                /* push num on st(0) */
+                if (MAP(i))
+                    emitm_fld(jit_info->native_ptr, MAP(i));
+                else
+                    jit_emit_fload_mb_n(interp, jit_info->native_ptr,
+                            emit_EBX, REG_OFFS_NUM(pi));
+                goto store;
+            case PARROT_ARG_NC:
+                /*
+                 * TODO not all constants are shared between interpreters
+                 */
+#  if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    jit_emit_fload_m_n(interp, jit_info->native_ptr, CONST(i));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                            jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
+                }
+                else
+#  endif
+                    jit_emit_fload_m_n(interp, jit_info->native_ptr,
+                            &interp->code->const_table->
+                            constants[pi]->u.number);
+store:
+#  if NUMVAL_SIZE == 8
+                /* make room for double */
+                emitm_addb_i_r(jit_info->native_ptr, -8, emit_ESP);
+                emitm_fstpl(interp, jit_info->native_ptr, emit_ESP, emit_None, 1, 0);
+                /* additional stack adjustment */
+                st += 4;
+#  else
+                emitm_addb_i_r(jit_info->native_ptr, -12, emit_ESP);
+                emitm_fstpt(jit_info->native_ptr, emit_ESP, emit_None, 1, 0);
+                st += 8;
+#  endif
+                break;
+
+            case PARROT_ARG_SC:
+#  if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    emitm_pushl_m(jit_info->native_ptr, CONST(i));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                            jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
+                }
+                else
+#  endif
+                    emitm_pushl_i(jit_info->native_ptr,
+                            interp->code->const_table->
+                            constants[pi]->u.string);
+                break;
+
+            case PARROT_ARG_KC:
+            case PARROT_ARG_PC:
+#  if EXEC_CAPABLE
+                if (jit_info->objfile) {
+                    emitm_pushl_m(jit_info->native_ptr, CONST(i));
+                    Parrot_exec_add_text_rellocation(jit_info->objfile,
+                            jit_info->native_ptr, RTYPE_DATA,
+                            "const_table", -4);
+                }
+                else
+#  endif
+                    emitm_pushl_i(jit_info->native_ptr,
+                            interp->code->const_table->
+                            constants[pi]->u.key);
+                break;
+
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "jit_vtable_n_op: unimp type %d, arg %d vtable %d",
+                    op_info->types[i - 1], i, nvtable);
+                break;
+        }
+    }
+
+    /* push interpreter */
+    Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
+
+    if (L4) {
+        emitm_callr(jit_info->native_ptr, emit_ESI);
+    }
+    else {
+        /* mov (offs)%eax, %eax i.e. $1->vtable */
+        emitm_movl_m_r(interp, jit_info->native_ptr, emit_EAX, emit_EAX, emit_None, 1,
+                offsetof(struct PMC, vtable));
+        /* call *(offset)eax */
+        emitm_callm(jit_info->native_ptr, emit_EAX, emit_None, emit_None, offset);
+    }
+
+    emitm_addb_i_r(jit_info->native_ptr,
+            st + sizeof (void *) * (n + 1), emit_ESP);
+
+    /* L4: */
+    if (L4)
+        L4[1] = (char)(jit_info->native_ptr - L4 - 2);
+}
