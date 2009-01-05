@@ -409,7 +409,7 @@ we can use lexical subroutines to simulate this behavior that HLLs require:
       #x, y, and z are all visible here
   .end
 
-=head3 Declaring and Using Nested Subroutines
+=head3 Lexical Variables
 
 As we have seen above, we can declare a new subroutine to be a nested inner
 subroutine of an existing outer subroutine using the C<:outer> flag. The
@@ -421,10 +421,7 @@ subroutines can reference in their C<:outer> declarations. Within lexical
 subroutines, the C<.lex> command defines a local variable that follows these
 scoping rules.
 
-Sound confusing? It's not so bad. The basics are that we use C<:outer> to
-define a lexically-scoped subroutine, and we use C<.lex> to define lexically
-scoped variables in those subroutines. It's only when things start getting
-crazy with multisubs that we need to worry about any more details then that.
+=head3 Lexpad PMCs
 
 =head2 Compilation Units Revisited
 
