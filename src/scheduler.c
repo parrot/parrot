@@ -72,7 +72,7 @@ Initalize the concurrency scheduler for the interpreter.
 void
 Parrot_cx_init_scheduler(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_cx_init_scheduler);
+    ASSERT_ARGS(Parrot_cx_init_scheduler)
     if (!interp->parent_interpreter) {
         PMC *scheduler;
 
@@ -99,7 +99,7 @@ If a wake request has been received, handle tasks.
 void
 Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(Parrot_cx_check_tasks);
+    ASSERT_ARGS(Parrot_cx_check_tasks)
     if (SCHEDULER_wake_requested_TEST(scheduler))
         Parrot_cx_handle_tasks(interp, interp->scheduler);
 }
@@ -120,7 +120,7 @@ PARROT_EXPORT
 void
 Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(Parrot_cx_handle_tasks);
+    ASSERT_ARGS(Parrot_cx_handle_tasks)
     SCHEDULER_wake_requested_CLEAR(scheduler);
     Parrot_cx_refresh_task_list(interp, scheduler);
 
@@ -175,7 +175,7 @@ messages, etc.
 void
 Parrot_cx_refresh_task_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(Parrot_cx_refresh_task_list);
+    ASSERT_ARGS(Parrot_cx_refresh_task_list)
     scheduler_process_wait_list(interp, scheduler);
     scheduler_process_messages(interp, scheduler);
 
@@ -199,7 +199,7 @@ the scheduler's task list).
 void
 Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(Parrot_cx_runloop_wake);
+    ASSERT_ARGS(Parrot_cx_runloop_wake)
     enable_event_checking(interp);
     SCHEDULER_wake_requested_SET(scheduler);
 }
@@ -219,7 +219,7 @@ PARROT_EXPORT
 void
 Parrot_cx_runloop_end(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_cx_runloop_end);
+    ASSERT_ARGS(Parrot_cx_runloop_end)
     SCHEDULER_terminate_requested_SET(interp->scheduler);
     Parrot_cx_handle_tasks(interp, interp->scheduler);
 }
@@ -239,7 +239,7 @@ PARROT_EXPORT
 void
 Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 {
-    ASSERT_ARGS(Parrot_cx_schedule_task);
+    ASSERT_ARGS(Parrot_cx_schedule_task)
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
@@ -263,7 +263,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_peek_task(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_cx_peek_task);
+    ASSERT_ARGS(Parrot_cx_peek_task)
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
@@ -288,7 +288,7 @@ Parrot_cx_schedule_timer(PARROT_INTERP,
         ARGIN_NULLOK(STRING *type), FLOATVAL duration, FLOATVAL interval,
         INTVAL repeat, ARGIN_NULLOK(PMC *sub))
 {
-    ASSERT_ARGS(Parrot_cx_schedule_timer);
+    ASSERT_ARGS(Parrot_cx_schedule_timer)
     PMC * const timer = pmc_new(interp, enum_class_Timer);
 
     VTABLE_set_number_keyed_int(interp, timer, PARROT_TIMER_NSEC, duration);
@@ -321,7 +321,7 @@ PARROT_EXPORT
 void
 Parrot_cx_schedule_repeat(PARROT_INTERP, ARGIN(PMC *task))
 {
-    ASSERT_ARGS(Parrot_cx_schedule_repeat);
+    ASSERT_ARGS(Parrot_cx_schedule_repeat)
     INTVAL repeat = VTABLE_get_integer_keyed_int(interp, task,
             PARROT_TIMER_REPEAT);
     FLOATVAL duration = VTABLE_get_number_keyed_int(interp, task,
@@ -353,7 +353,7 @@ void
 Parrot_cx_schedule_callback(PARROT_INTERP,
         ARGIN(PMC *user_data), ARGIN(char *ext_data))
 {
-    ASSERT_ARGS(Parrot_cx_schedule_callback);
+    ASSERT_ARGS(Parrot_cx_schedule_callback)
     PMC *callback = pmc_new(interp, enum_class_Task);
     Parrot_Task_attributes * const task_struct = PARROT_TASK(callback);
 
@@ -378,7 +378,7 @@ PARROT_EXPORT
 void
 Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_cx_request_suspend_for_gc);
+    ASSERT_ARGS(Parrot_cx_request_suspend_for_gc)
 #if CX_DEBUG
     fprintf(stderr, "requesting gc suspend [interp=%p]\n", interp);
 #endif
@@ -399,7 +399,7 @@ PARROT_EXPORT
 void
 Parrot_cx_delete_task(PARROT_INTERP, ARGIN(PMC *task))
 {
-    ASSERT_ARGS(Parrot_cx_delete_task);
+    ASSERT_ARGS(Parrot_cx_delete_task)
     if (interp->scheduler) {
         const INTVAL tid = VTABLE_get_integer(interp, task);
         VTABLE_delete_keyed_int(interp, interp->scheduler, tid);
@@ -426,7 +426,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_cx_delete_suspend_for_gc);
+    ASSERT_ARGS(Parrot_cx_delete_suspend_for_gc)
     if (interp->scheduler) {
         STRING *suspend_str = CONST_STRING(interp, "suspend_for_gc");
         Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
@@ -479,7 +479,7 @@ PARROT_EXPORT
 void
 Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 {
-    ASSERT_ARGS(Parrot_cx_add_handler_local);
+    ASSERT_ARGS(Parrot_cx_add_handler_local)
     if (PMC_IS_NULL(CONTEXT(interp)->handlers))
         CONTEXT(interp)->handlers = pmc_new(interp, enum_class_ResizablePMCArray);
 
@@ -502,7 +502,7 @@ PARROT_EXPORT
 void
 Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
-    ASSERT_ARGS(Parrot_cx_delete_handler_local);
+    ASSERT_ARGS(Parrot_cx_delete_handler_local)
     PMC *handlers  = CONTEXT(interp)->handlers;
 
     if (PMC_IS_NULL(handlers))
@@ -571,7 +571,7 @@ PARROT_EXPORT
 void
 Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
 {
-    ASSERT_ARGS(Parrot_cx_add_handler);
+    ASSERT_ARGS(Parrot_cx_add_handler)
     STRING *add_handler = CONST_STRING(interp, "add_handler");
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -595,7 +595,7 @@ PARROT_EXPORT
 void
 Parrot_cx_delete_handler_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
-    ASSERT_ARGS(Parrot_cx_delete_handler_typed);
+    ASSERT_ARGS(Parrot_cx_delete_handler_typed)
     if (!interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
@@ -618,7 +618,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_cx_count_handlers_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
-    ASSERT_ARGS(Parrot_cx_count_handlers_typed);
+    ASSERT_ARGS(Parrot_cx_count_handlers_typed)
     INTVAL count = 0;
 
     if (!interp->scheduler)
@@ -653,7 +653,7 @@ PARROT_EXPORT
 void
 Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(PMC *payload))
 {
-    ASSERT_ARGS(Parrot_cx_send_message);
+    ASSERT_ARGS(Parrot_cx_send_message)
     if (interp->scheduler) {
         Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(interp->scheduler);
         PMC *message = pmc_new(interp, enum_class_SchedulerMessage);
@@ -694,7 +694,7 @@ PARROT_EXPORT
 void
 Parrot_cx_broadcast_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(PMC *data))
 {
-    ASSERT_ARGS(Parrot_cx_broadcast_message);
+    ASSERT_ARGS(Parrot_cx_broadcast_message)
     UINTVAL i;
     LOCK(interpreter_array_mutex);
     for (i = 0; i < n_interpreters; ++i) {
@@ -731,7 +731,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
 {
-    ASSERT_ARGS(Parrot_cx_find_handler_for_task);
+    ASSERT_ARGS(Parrot_cx_find_handler_for_task)
     PMC *handler = PMCNULL;
 #if CX_DEBUG
     fprintf(stderr, "searching for handler\n");
@@ -766,7 +766,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 {
-    ASSERT_ARGS(Parrot_cx_find_handler_local);
+    ASSERT_ARGS(Parrot_cx_find_handler_local)
     Parrot_Context *context;
     PMC            *iter        = PMCNULL;
     STRING * const  handled_str = CONST_STRING(interp, "handled");
@@ -832,7 +832,7 @@ Run the associated code block for a timer event, when the timer fires.
 void
 Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
 {
-    ASSERT_ARGS(Parrot_cx_timer_invoke);
+    ASSERT_ARGS(Parrot_cx_timer_invoke)
     Parrot_Timer_attributes * const timer_struct = PARROT_TIMER(timer);
 #if CX_DEBUG
     fprintf(stderr, "current timer time: %f, %f\n",
@@ -858,7 +858,7 @@ Run the associated code block for a callback event.
 void
 Parrot_cx_invoke_callback(PARROT_INTERP, ARGIN(PMC *callback))
 {
-    ASSERT_ARGS(Parrot_cx_invoke_callback);
+    ASSERT_ARGS(Parrot_cx_invoke_callback)
     Parrot_Task_attributes * const task_struct = PARROT_TASK(callback);
     if (!PMC_IS_NULL(task_struct->data)) {
         Parrot_run_callback(interp, task_struct->data,
@@ -893,7 +893,7 @@ PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *next))
 {
-    ASSERT_ARGS(Parrot_cx_schedule_sleep);
+    ASSERT_ARGS(Parrot_cx_schedule_sleep)
 #if PARROT_HAS_THREADS
     Parrot_cond condition;
     Parrot_mutex lock;
@@ -950,7 +950,7 @@ to become active tasks.
 static void
 scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(scheduler_process_wait_list);
+    ASSERT_ARGS(scheduler_process_wait_list)
     Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
     INTVAL num_tasks, index;
 
@@ -996,7 +996,7 @@ take appropriate action on any received.
 static void
 scheduler_process_messages(PARROT_INTERP, ARGMOD(PMC *scheduler))
 {
-    ASSERT_ARGS(scheduler_process_messages);
+    ASSERT_ARGS(scheduler_process_messages)
     Parrot_Scheduler_attributes * sched_struct = PARROT_SCHEDULER(scheduler);
 
     PMC    *message;

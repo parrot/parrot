@@ -145,7 +145,7 @@ static void
 set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
         ARGIN(STRING *name))
 {
-    ASSERT_ARGS(set_cstring_prop);
+    ASSERT_ARGS(set_cstring_prop)
     STRING * const key  = const_string(interp, what);
     PMC    * const prop = constant_pmc_new(interp, enum_class_String);
 
@@ -167,7 +167,7 @@ static void
 store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
         ARGIN(STRING *type), ARGIN(STRING *lib_name))
 {
-    ASSERT_ARGS(store_lib_pmc);
+    ASSERT_ARGS(store_lib_pmc)
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_DYN_LIBS);
@@ -198,7 +198,7 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 is_loaded(PARROT_INTERP, ARGIN(STRING *path))
 {
-    ASSERT_ARGS(is_loaded);
+    ASSERT_ARGS(is_loaded)
     PMC * const iglobals = interp->iglobals;
     PMC * const dyn_libs = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_DYN_LIBS);
@@ -224,7 +224,7 @@ static STRING *
 get_path(PARROT_INTERP, ARGMOD(STRING *lib), ARGOUT(void **handle),
         ARGIN(STRING *wo_ext), ARGIN_NULLOK(STRING *ext))
 {
-    ASSERT_ARGS(get_path);
+    ASSERT_ARGS(get_path)
     STRING *path, *full_name;
     const char *err = NULL;    /* buffer returned from Parrot_dlerror */
 
@@ -346,7 +346,7 @@ Parrot_init_lib(PARROT_INTERP,
                 ARGIN_NULLOK(PMC *(*load_func)(PARROT_INTERP)),
                 ARGIN_NULLOK(void (*init_func)(PARROT_INTERP, ARGIN_NULLOK(PMC *))))
 {
-    ASSERT_ARGS(Parrot_init_lib);
+    ASSERT_ARGS(Parrot_init_lib)
     PMC *lib_pmc = NULL;
 
     if (load_func)
@@ -380,7 +380,7 @@ static PMC *
 run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         ARGIN(STRING *lib_name), ARGIN(STRING *wo_ext))
 {
-    ASSERT_ARGS(run_init_lib);
+    ASSERT_ARGS(run_init_lib)
     STRING *type;
     PMC *(*load_func)(PARROT_INTERP);
     void (*init_func)(PARROT_INTERP, PMC *);
@@ -459,7 +459,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
-    ASSERT_ARGS(clone_string_into);
+    ASSERT_ARGS(clone_string_into)
     STRING * const orig = VTABLE_get_string(s, value);
     char * const raw_str = string_to_cstring(s, orig);
     STRING * const ret =
@@ -485,7 +485,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC *
 make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 {
-    ASSERT_ARGS(make_string_pmc);
+    ASSERT_ARGS(make_string_pmc)
     PMC * const ret = VTABLE_new_from_string(interp,
         interp->vtables[enum_class_String]->pmc_class,
         string, PObj_constant_FLAG);
@@ -509,7 +509,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
 {
-    ASSERT_ARGS(Parrot_clone_lib_into);
+    ASSERT_ARGS(Parrot_clone_lib_into)
     STRING * const filename = CONST_STRING(s, "_filename");
     STRING * const libname  = CONST_STRING(s, "_lib_name");
     STRING * const type_str = CONST_STRING(s, "_type");
@@ -589,7 +589,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_load_lib(PARROT_INTERP, ARGIN_NULLOK(STRING *lib), SHIM(PMC *initializer))
 {
-    ASSERT_ARGS(Parrot_load_lib);
+    ASSERT_ARGS(Parrot_load_lib)
     void   *handle;
     PMC    *lib_pmc;
     STRING *path;

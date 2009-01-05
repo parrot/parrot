@@ -359,7 +359,7 @@ void
 Parrot_init_arg_nci(PARROT_INTERP, ARGOUT(call_state *st),
     ARGIN(const char *sig))
 {
-    ASSERT_ARGS(Parrot_init_arg_nci);
+    ASSERT_ARGS(Parrot_init_arg_nci)
     init_call_stats(st);
 
     if (PMC_IS_NULL(interp->args_signature))
@@ -388,7 +388,7 @@ PARROT_EXPORT
 void
 Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig))
 {
-    ASSERT_ARGS(Parrot_init_ret_nci);
+    ASSERT_ARGS(Parrot_init_ret_nci)
     Parrot_Context *ctx                 = CONTEXT(interp);
     PMC            * const current_cont = ctx->current_cont;
 
@@ -433,7 +433,7 @@ Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
         ARGIN_NULLOK(opcode_t *indexes), ARGIN_NULLOK(PMC *sig_pmc),
         ARGMOD(call_state_item *sti))
 {
-    ASSERT_ARGS(Parrot_init_arg_indexes_and_sig_pmc);
+    ASSERT_ARGS(Parrot_init_arg_indexes_and_sig_pmc)
     if (!sig_pmc && indexes) {
         ++indexes;
         sig_pmc = ctx->constants[*indexes]->u.key;
@@ -480,7 +480,7 @@ int
 Parrot_init_arg_op(PARROT_INTERP, ARGIN(Parrot_Context *ctx),
     ARGIN_NULLOK(opcode_t *pc), ARGIN(call_state_item *sti))
 {
-    ASSERT_ARGS(Parrot_init_arg_op);
+    ASSERT_ARGS(Parrot_init_arg_op)
     PMC *sig_pmc = PMCNULL;
 
     if (pc) {
@@ -511,7 +511,7 @@ Parrot_init_arg_sig(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
     ARGIN(const char *sig), ARGIN_NULLOK(void *ap),
     ARGMOD(call_state_item *sti))
 {
-    ASSERT_ARGS(Parrot_init_arg_sig);
+    ASSERT_ARGS(Parrot_init_arg_sig)
     sti->used = 1;
     sti->i    = 0;
     sti->n    = 0;
@@ -547,7 +547,7 @@ fetches the first arg from the flattened set.
 static void
 start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
 {
-    ASSERT_ARGS(start_flatten);
+    ASSERT_ARGS(start_flatten)
     if (PARROT_ARG_NAME_ISSET(st->src.sig)) {
 
         /* src ought to be an hash */
@@ -593,7 +593,7 @@ type of argument/parameter to get next.  The index gets increased elsewhere.
 static void
 next_arg_sig(ARGMOD(call_state_item *sti))
 {
-    ASSERT_ARGS(next_arg_sig);
+    ASSERT_ARGS(next_arg_sig)
     switch (sti->mode & CALL_S_D_MASK) {
         case CALL_STATE_OP:
             sti->sig = SIG_ITEM(sti->u.op.signature, sti->i);
@@ -636,7 +636,7 @@ Fetches the next argument from the signature in the given call state.
 static int
 fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(fetch_arg_sig);
+    ASSERT_ARGS(fetch_arg_sig)
     va_list * const ap = (va_list *)(st->src.u.sig.ap);
 
     switch (st->src.sig & PARROT_ARG_TYPE_MASK) {
@@ -698,7 +698,7 @@ Fetches an argument from the appropriate context.
 static int
 fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(fetch_arg_op);
+    ASSERT_ARGS(fetch_arg_op)
     const int    constant = PARROT_ARG_CONSTANT_ISSET(st->src.sig);
     const INTVAL idx      = st->src.u.op.pc[st->src.i];
 
@@ -770,7 +770,7 @@ PARROT_EXPORT
 int
 Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(Parrot_fetch_arg);
+    ASSERT_ARGS(Parrot_fetch_arg)
     if (!st->src.used)
         return 1;
 
@@ -850,7 +850,7 @@ PARROT_EXPORT
 int
 Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(Parrot_fetch_arg_nci);
+    ASSERT_ARGS(Parrot_fetch_arg_nci)
     next_arg_sig(&st->dest);
 
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
@@ -891,7 +891,7 @@ Autoboxes an int into the expected container type.
 static void
 convert_arg_from_int(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(convert_arg_from_int);
+    ASSERT_ARGS(convert_arg_from_int)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_FLOATVAL:
             UVal_num(st->val) = (FLOATVAL)UVal_int(st->val);
@@ -927,7 +927,7 @@ Autoboxes a num into the expected container type.
 static void
 convert_arg_from_num(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(convert_arg_from_num);
+    ASSERT_ARGS(convert_arg_from_num)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             UVal_int(st->val) = (INTVAL)UVal_num(st->val);
@@ -964,7 +964,7 @@ Autoboxes a string primitive to the expected container type.
 static void
 convert_arg_from_str(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(convert_arg_from_str);
+    ASSERT_ARGS(convert_arg_from_str)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             UVal_int(st->val) = string_to_int(interp, UVal_str(st->val));
@@ -1000,7 +1000,7 @@ Unboxes a PMC to the expected primitive type.
 static void
 convert_arg_from_pmc(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(convert_arg_from_pmc);
+    ASSERT_ARGS(convert_arg_from_pmc)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             UVal_int(st->val) = VTABLE_get_integer(interp, UVal_pmc(st->val));
@@ -1031,7 +1031,7 @@ Otherwise moves on.
 static void
 check_for_opt_flag(ARGMOD(call_state *st), int has_arg)
 {
-    ASSERT_ARGS(check_for_opt_flag);
+    ASSERT_ARGS(check_for_opt_flag)
     INTVAL idx;
     call_state_item * const dest = &st->dest;
 
@@ -1075,7 +1075,7 @@ tailcalled function or method.
 static void
 clone_key_arg(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(clone_key_arg);
+    ASSERT_ARGS(clone_key_arg)
     PMC *key = UVal_pmc(st->val);
 
     if (!key)
@@ -1112,7 +1112,7 @@ Initializes dest calling state for the first named arg.
 static void
 init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(init_first_dest_named);
+    ASSERT_ARGS(init_first_dest_named)
     int i, n_named;
 
     if (st->dest.mode & CALL_STATE_SIG)
@@ -1177,7 +1177,7 @@ Locates a destination argument name, returning 0 if not found.
 static int
 locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(locate_named_named);
+    ASSERT_ARGS(locate_named_named)
     int i;
     int n_named = -1;
 
@@ -1231,7 +1231,7 @@ Stores the next argument in the destination register appropriately.
 static void
 store_arg(ARGIN(const call_state *st), INTVAL idx)
 {
-    ASSERT_ARGS(store_arg);
+    ASSERT_ARGS(store_arg)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
             CTX_REG_INT(st->dest.ctx, idx) = UVal_int(st->val);
@@ -1267,7 +1267,7 @@ PARROT_EXPORT
 int
 Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
 {
-    ASSERT_ARGS(Parrot_store_arg);
+    ASSERT_ARGS(Parrot_store_arg)
     INTVAL idx;
     if (st->dest.i >= st->dest.n)
         return 0;
@@ -1294,7 +1294,7 @@ Throws an exception if there are too few arguments passed.
 static void
 too_few(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 {
-    ASSERT_ARGS(too_few);
+    ASSERT_ARGS(too_few)
     const int max_expected_args = st->params;
     const int min_expected_args = max_expected_args - st->optionals;
 
@@ -1321,7 +1321,7 @@ Throws an exception if there are too many arguments passed.
 static void
 too_many(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 {
-    ASSERT_ARGS(too_many);
+    ASSERT_ARGS(too_many)
     const int max_expected_args = st->params;
     const int min_expected_args = max_expected_args - st->optionals;
 
@@ -1348,7 +1348,7 @@ Adds a null value to the appropriate register.
 static void
 null_val(int sig, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(null_val);
+    ASSERT_ARGS(null_val)
     switch (sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:   UVal_int(st->val) = 0;       break;
         case PARROT_ARG_FLOATVAL: UVal_num(st->val) = 0.0;     break;
@@ -1382,7 +1382,7 @@ or
 static void
 check_named(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(check_named);
+    ASSERT_ARGS(check_named)
     int i;
     int n_named = -1;
 
@@ -1466,7 +1466,7 @@ Sets the default values of the passed C<call_state>.
 static void
 init_call_stats(ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(init_call_stats);
+    ASSERT_ARGS(init_call_stats)
     /* initial guess, adjusted for :flat args */
     st->n_actual_args = st->src.n;
 
@@ -1494,7 +1494,7 @@ PARROT_EXPORT
 void
 Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_result)
 {
-    ASSERT_ARGS(Parrot_process_args);
+    ASSERT_ARGS(Parrot_process_args)
     int n_named;
     int err_check = 1;
     call_state_item *src, *dest;
@@ -1702,7 +1702,7 @@ PARROT_EXPORT
 void
 Parrot_convert_arg(PARROT_INTERP, ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(Parrot_convert_arg);
+    ASSERT_ARGS(Parrot_convert_arg)
     /* register key args have to be cloned */
     if ((st->src.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC)
         clone_key_arg(interp, st);
@@ -1749,7 +1749,7 @@ parrot_pass_args(PARROT_INTERP,
         ARGMOD_NULLOK(opcode_t *src_indexes), ARGMOD_NULLOK(opcode_t *dest_indexes),
         arg_pass_t param_or_result)
 {
-    ASSERT_ARGS(parrot_pass_args);
+    ASSERT_ARGS(parrot_pass_args)
     call_state st;
     PMC *src_signature, *dest_signature;
 
@@ -1798,7 +1798,7 @@ opcode_t *
 parrot_pass_args_fromc(PARROT_INTERP, ARGIN(const char *sig),
         ARGMOD(opcode_t *dest), ARGIN(Parrot_Context *old_ctxp), va_list ap)
 {
-    ASSERT_ARGS(parrot_pass_args_fromc);
+    ASSERT_ARGS(parrot_pass_args_fromc)
     call_state st;
 
     Parrot_init_arg_op(interp, CONTEXT(interp), dest, &st.dest);
@@ -1823,7 +1823,7 @@ static int
 set_retval_util(PARROT_INTERP, ARGIN(const char *sig),
     ARGIN(Parrot_Context *ctx), ARGMOD(call_state *st))
 {
-    ASSERT_ARGS(set_retval_util);
+    ASSERT_ARGS(set_retval_util)
     opcode_t * const src_pc = interp->current_returns;
     int              todo   = Parrot_init_arg_op(interp, ctx, src_pc, &st->src);
 
@@ -1860,7 +1860,7 @@ PARROT_CAN_RETURN_NULL
 void *
 set_retval(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 {
-    ASSERT_ARGS(set_retval);
+    ASSERT_ARGS(set_retval)
     call_state st;
 
     if (!sig_ret || sig_ret == 'v')
@@ -1895,7 +1895,7 @@ Handles an INTVAL return value, returning its value if present and 0 otherwise.
 INTVAL
 set_retval_i(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 {
-    ASSERT_ARGS(set_retval_i);
+    ASSERT_ARGS(set_retval_i)
     call_state st;
 
     if (sig_ret != 'I')
@@ -1923,7 +1923,7 @@ otherwise.
 FLOATVAL
 set_retval_f(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 {
-    ASSERT_ARGS(set_retval_f);
+    ASSERT_ARGS(set_retval_f)
     call_state st;
 
     if (sig_ret != 'N')
@@ -1953,7 +1953,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING*
 set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 {
-    ASSERT_ARGS(set_retval_s);
+    ASSERT_ARGS(set_retval_s)
     call_state st;
 
     if (sig_ret != 'S')
@@ -1983,7 +1983,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC*
 set_retval_p(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 {
-    ASSERT_ARGS(set_retval_p);
+    ASSERT_ARGS(set_retval_p)
     call_state st;
 
     if (sig_ret != 'P')
@@ -2014,7 +2014,7 @@ commit_last_arg(PARROT_INTERP, int index, int cur,
     ARGMOD(opcode_t **indexes), ARGMOD(Parrot_Context *ctx),
     ARGIN_NULLOK(PMC *pmc), ARGIN(va_list *list))
 {
-    ASSERT_ARGS(commit_last_arg);
+    ASSERT_ARGS(commit_last_arg)
     int reg_offset = 0;
 
     /* invocant already commited, just return */
@@ -2080,7 +2080,7 @@ static Parrot_Context *
 count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
     ARGMOD(PMC *args_sig), ARGMOD(PMC *results_sig), int flag)
 {
-    ASSERT_ARGS(count_signature_elements);
+    ASSERT_ARGS(count_signature_elements)
     const char  *x;
     unsigned int seen_arrow  = 0;
 
@@ -2179,7 +2179,7 @@ commit_last_arg_sig_object(PARROT_INTERP, int index, int cur,
     ARGMOD(opcode_t **indexes), ARGMOD(Parrot_Context *ctx),
     ARGIN(PMC *sig_obj))
 {
-    ASSERT_ARGS(commit_last_arg_sig_object);
+    ASSERT_ARGS(commit_last_arg_sig_object)
     int reg_offset = 0;
 
     /* calculate arg's register offset */
@@ -2243,7 +2243,7 @@ set_context_sig_returns(PARROT_INTERP,
     ARGMOD(Parrot_Context *ctx), ARGMOD(opcode_t **indexes),
     ARGIN_NULLOK(const char *ret_x), ARGMOD(PMC *result_list))
 {
-    ASSERT_ARGS(set_context_sig_returns);
+    ASSERT_ARGS(set_context_sig_returns)
     const char   *x;
     STRING       *empty_string = CONST_STRING(interp, "");
     unsigned int  index        = 0;
@@ -2315,7 +2315,7 @@ static void
 set_context_sig_returns_varargs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
     ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(va_list returns))
 {
-    ASSERT_ARGS(set_context_sig_returns_varargs);
+    ASSERT_ARGS(set_context_sig_returns_varargs)
     unsigned int index = 0;
     unsigned int seen_arrow = 1;
     const char *x;
@@ -2381,7 +2381,7 @@ set_context_sig_params(PARROT_INTERP, ARGIN(const char *signature),
     ARGMOD(opcode_t **indexes), ARGMOD(Parrot_Context *ctx),
     ARGMOD(PMC *sig_obj))
 {
-    ASSERT_ARGS(set_context_sig_params);
+    ASSERT_ARGS(set_context_sig_params)
     /* second loop through signature to build all index and arg_flag
      * loop also assigns args(up to the ->) to registers */
     int index      = -1;
@@ -2482,7 +2482,7 @@ void
 Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(const char *sig), ...)
 {
-    ASSERT_ARGS(Parrot_pcc_invoke_sub_from_c_args);
+    ASSERT_ARGS(Parrot_pcc_invoke_sub_from_c_args)
     PMC *sig_obj;
     va_list args;
     va_start(args, sig);
@@ -2553,7 +2553,7 @@ void
 Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
         ARGIN(const char *signature), ...)
 {
-    ASSERT_ARGS(Parrot_PCCINVOKE);
+    ASSERT_ARGS(Parrot_PCCINVOKE)
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
     /* args INSP, returns INSP */
@@ -2734,7 +2734,7 @@ void
 Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(PMC *sig_obj))
 {
-    ASSERT_ARGS(Parrot_pcc_invoke_sub_from_sig_object);
+    ASSERT_ARGS(Parrot_pcc_invoke_sub_from_sig_object)
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
     /* args INSP, returns INSP */

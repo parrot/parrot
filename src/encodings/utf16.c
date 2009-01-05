@@ -243,7 +243,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 {
-    ASSERT_ARGS(to_encoding);
+    ASSERT_ARGS(to_encoding)
 #if PARROT_HAS_ICU
     UErrorCode err;
     int dest_len;
@@ -349,7 +349,7 @@ Returns the codepoint in string C<src> at position C<offset>.
 static UINTVAL
 get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
-    ASSERT_ARGS(get_codepoint);
+    ASSERT_ARGS(get_codepoint)
 #if PARROT_HAS_ICU
     UChar * const s = (UChar*) src->strstart;
     UINTVAL c, pos;
@@ -380,7 +380,7 @@ Sets, in string C<src> at position C<offset>, the codepoint C<codepoint>.
 static void
 set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoint)
 {
-    ASSERT_ARGS(set_codepoint);
+    ASSERT_ARGS(set_codepoint)
     UNUSED(interp);
     UNUSED(src);
     UNUSED(offset);
@@ -401,7 +401,7 @@ Returns the byte in string C<src> at position C<offset>.
 static UINTVAL
 get_byte(SHIM_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 {
-    ASSERT_ARGS(get_byte);
+    ASSERT_ARGS(get_byte)
     const unsigned char * const contents = (unsigned char *)src->strstart;
     if (offset >= src->bufused) {
 /*        Parrot_ex_throw_from_c_args(interp, NULL, 0,
@@ -425,7 +425,7 @@ Sets, in string C<src> at position C<offset>, the byte C<byte>.
 static void
 set_byte(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL byte)
 {
-    ASSERT_ARGS(set_byte);
+    ASSERT_ARGS(set_byte)
     unsigned char *contents;
 
     if (offset >= src->bufused)
@@ -452,7 +452,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
-    ASSERT_ARGS(get_codepoints);
+    ASSERT_ARGS(get_codepoints)
     String_iter iter;
     UINTVAL start;
     STRING * const return_string = Parrot_make_COW_reference(interp, src);
@@ -486,7 +486,7 @@ static STRING *
 get_codepoints_inplace(PARROT_INTERP, ARGIN(STRING *src),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *return_string))
 {
-    ASSERT_ARGS(get_codepoints_inplace);
+    ASSERT_ARGS(get_codepoints_inplace)
     String_iter iter;
     UINTVAL start;
     Parrot_reuse_COW_reference(interp, src, return_string);
@@ -516,7 +516,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
-    ASSERT_ARGS(get_bytes);
+    ASSERT_ARGS(get_bytes)
     UNUSED(interp);
     UNUSED(src);
     UNUSED(offset)
@@ -541,7 +541,7 @@ static STRING *
 get_bytes_inplace(PARROT_INTERP, ARGIN(STRING *src),
         UINTVAL offset, UINTVAL count, ARGIN(STRING *return_string))
 {
-    ASSERT_ARGS(get_bytes_inplace);
+    ASSERT_ARGS(get_bytes_inplace)
     UNUSED(interp);
     UNUSED(src);
     UNUSED(offset)
@@ -565,7 +565,7 @@ static void
 set_codepoints(PARROT_INTERP, ARGIN(STRING *src),
         UINTVAL offset, UINTVAL count, ARGIN(STRING *new_codepoints))
 {
-    ASSERT_ARGS(set_codepoints);
+    ASSERT_ARGS(set_codepoints)
     UNUSED(interp);
     UNUSED(src);
     UNUSED(offset)
@@ -589,7 +589,7 @@ static void
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
         UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))
 {
-    ASSERT_ARGS(set_bytes);
+    ASSERT_ARGS(set_bytes)
     UNUSED(interp);
     UNUSED(offset)
     UNUSED(count);
@@ -609,7 +609,7 @@ Unconditionally makes the string be in this encoding, if that's valid
 static void
 become_encoding(PARROT_INTERP, SHIM(STRING *src))
 {
-    ASSERT_ARGS(become_encoding);
+    ASSERT_ARGS(become_encoding)
     UNIMPL;
 }
 
@@ -628,7 +628,7 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 codepoints(PARROT_INTERP, ARGIN(STRING *src))
 {
-    ASSERT_ARGS(codepoints);
+    ASSERT_ARGS(codepoints)
     String_iter iter;
     /*
      * this is used to initially calculate src->strlen,
@@ -654,7 +654,7 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 bytes(SHIM_INTERP, ARGIN(STRING *src))
 {
-    ASSERT_ARGS(bytes);
+    ASSERT_ARGS(bytes)
     return src->bufused;
 }
 
@@ -673,7 +673,7 @@ PARROT_WARN_UNUSED_RESULT
 static UINTVAL
 utf16_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
-    ASSERT_ARGS(utf16_decode_and_advance);
+    ASSERT_ARGS(utf16_decode_and_advance)
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL c, pos;
     pos = i->bytepos / sizeof (UChar);
@@ -700,7 +700,7 @@ next position in the string.
 static void
 utf16_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
-    ASSERT_ARGS(utf16_encode_and_advance);
+    ASSERT_ARGS(utf16_encode_and_advance)
     UChar *s = (UChar*) i->str->strstart;
     UINTVAL pos;
     pos = i->bytepos / sizeof (UChar);
@@ -722,7 +722,7 @@ Moves the string iterator C<i> to the position C<n> in the string.
 static void
 utf16_set_position(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 {
-    ASSERT_ARGS(utf16_set_position);
+    ASSERT_ARGS(utf16_set_position)
     UChar * const s = (UChar*) i->str->strstart;
     UINTVAL pos;
     pos = 0;
@@ -746,7 +746,7 @@ Initializes for string C<src> the string iterator C<iter>.
 static void
 iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 {
-    ASSERT_ARGS(iter_init);
+    ASSERT_ARGS(iter_init)
     iter->str = src;
     iter->bytepos = iter->charpos = 0;
 #if PARROT_HAS_ICU
@@ -773,7 +773,7 @@ PARROT_CANNOT_RETURN_NULL
 ENCODING *
 Parrot_encoding_utf16_init(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_encoding_utf16_init);
+    ASSERT_ARGS(Parrot_encoding_utf16_init)
     ENCODING * const return_encoding = Parrot_new_encoding(interp);
 
     static const ENCODING base_encoding = {

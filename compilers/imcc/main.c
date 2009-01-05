@@ -144,7 +144,7 @@ Outputs usage error message.
 static void
 usage(ARGMOD(FILE *fp))
 {
-    ASSERT_ARGS(usage);
+    ASSERT_ARGS(usage)
     fprintf(fp,
             "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-o FILE] <file>\n");
@@ -163,7 +163,7 @@ Print out list of debugging flag values.
 static void
 help_debug(void)
 {
-    ASSERT_ARGS(help_debug);
+    ASSERT_ARGS(help_debug)
     /* split printf for C89 compliance on string length */
     printf(
     "--imcc-debug -d [Flags] ...\n"
@@ -208,7 +208,7 @@ Print out "help" list of options.
 static void
 help(void)
 {
-    ASSERT_ARGS(help);
+    ASSERT_ARGS(help)
     /* split printf for C89 compliance on string length */
     printf(
     "parrot [Options] <file>\n"
@@ -266,7 +266,7 @@ Print out parrot version number.
 static void
 Parrot_version(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_version);
+    ASSERT_ARGS(Parrot_version)
     printf("This is parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
     printf("Copyright (C) 2001-2008, The Perl Foundation.\n\
@@ -343,7 +343,7 @@ PARROT_PURE_FUNCTION
 static int
 is_all_hex_digits(ARGIN(const char *s))
 {
-    ASSERT_ARGS(is_all_hex_digits);
+    ASSERT_ARGS(is_all_hex_digits)
     for (; *s; s++)
         if (!isxdigit(*s))
             return 0;
@@ -605,7 +605,7 @@ Pre-processor step.  Turn parser's output codes into Parrot instructions.
 static void
 do_pre_process(PARROT_INTERP)
 {
-    ASSERT_ARGS(do_pre_process);
+    ASSERT_ARGS(do_pre_process)
     int       c;
     YYSTYPE   val;
 
@@ -727,7 +727,7 @@ Create list (opt_desc[]) describing optimisation flags.
 static void
 imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(char *opt_desc))
 {
-    ASSERT_ARGS(imcc_get_optimization_description);
+    ASSERT_ARGS(imcc_get_optimization_description)
     int i = 0;
 
     if (opt_level & (OPT_PRE | OPT_CFG))
@@ -801,7 +801,7 @@ static void
 imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
         int argc, ARGIN(char **argv))
 {
-    ASSERT_ARGS(imcc_run_pbc);
+    ASSERT_ARGS(imcc_run_pbc)
     if (IMCC_INFO(interp)->imcc_warn)
         PARROT_WARNINGS_on(interp, PARROT_WARNINGS_ALL_FLAG);
     else
@@ -837,7 +837,7 @@ Output packed bytecode file.
 static void
 imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
 {
-    ASSERT_ARGS(imcc_write_pbc);
+    ASSERT_ARGS(imcc_write_pbc)
     size_t    size;
     opcode_t *packed;
     FILE     *fp;
@@ -876,7 +876,7 @@ Read in the source and determine whether it's Parrot bytecode or PASM
 static void
 determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 {
-    ASSERT_ARGS(determine_input_file_type);
+    ASSERT_ARGS(determine_input_file_type)
     yyscan_t yyscanner = IMCC_INFO(interp)->yyscanner;
 
     /* Read in the source and check the file extension for the input type;
@@ -921,7 +921,7 @@ static void
 determine_output_file_type(PARROT_INTERP,
     ARGMOD(int *obj_file), ARGIN(const char *output_file))
 {
-    ASSERT_ARGS(determine_output_file_type);
+    ASSERT_ARGS(determine_output_file_type)
     const char * const ext = strrchr(output_file, '.');
 
     if (ext) {
@@ -957,7 +957,7 @@ compile_to_bytecode(PARROT_INTERP,
                     ARGIN(const char * const sourcefile),
                     ARGIN_NULLOK(const char * const output_file))
 {
-    ASSERT_ARGS(compile_to_bytecode);
+    ASSERT_ARGS(compile_to_bytecode)
     PackFile *pf;
     yyscan_t  yyscanner = IMCC_INFO(interp)->yyscanner;
     const int per_pbc   = (STATE_WRITE_PBC(interp) | STATE_RUN_PBC(interp)) !=0;

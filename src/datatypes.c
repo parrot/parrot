@@ -40,7 +40,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_get_datatype_enum(PARROT_INTERP, ARGIN(const STRING *type_name))
 {
-    ASSERT_ARGS(Parrot_get_datatype_enum);
+    ASSERT_ARGS(Parrot_get_datatype_enum)
     char * const type = string_to_cstring(interp, type_name);
     int i;
 
@@ -72,7 +72,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
 {
-    ASSERT_ARGS(Parrot_get_datatype_name);
+    ASSERT_ARGS(Parrot_get_datatype_name)
     const char * const s =
         (type < enum_first_type || type >= enum_last_type)
             ? "illegal"

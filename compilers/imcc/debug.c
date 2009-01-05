@@ -44,7 +44,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 {
-    ASSERT_ARGS(IMCC_fatal);
+    ASSERT_ARGS(IMCC_fatal)
     va_list ap;
 
     va_start(ap, fmt);
@@ -68,7 +68,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 {
-    ASSERT_ARGS(IMCC_fataly);
+    ASSERT_ARGS(IMCC_fataly)
     va_list ap;
 
     va_start(ap, fmt);
@@ -93,7 +93,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 {
-    ASSERT_ARGS(IMCC_fatal_standalone);
+    ASSERT_ARGS(IMCC_fatal_standalone)
     va_list ap;
 
     va_start(ap, fmt);
@@ -118,7 +118,7 @@ PARROT_DOES_NOT_RETURN
 void
 IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 {
-    ASSERT_ARGS(IMCC_fataly_standalone);
+    ASSERT_ARGS(IMCC_fataly_standalone)
 
     va_list ap;
 
@@ -145,7 +145,7 @@ PARROT_EXPORT
 void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 {
-    ASSERT_ARGS(IMCC_warning);
+    ASSERT_ARGS(IMCC_warning)
     va_list ap;
     if (IMCC_INFO(interp)->imcc_warn)
         return;
@@ -170,7 +170,7 @@ PARROT_EXPORT
 void
 IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
-    ASSERT_ARGS(IMCC_info);
+    ASSERT_ARGS(IMCC_info)
     va_list ap;
 
     if (level > IMCC_INFO(interp)->verbose)
@@ -195,7 +195,7 @@ PARROT_EXPORT
 void
 IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 {
-    ASSERT_ARGS(IMCC_debug);
+    ASSERT_ARGS(IMCC_debug)
     va_list ap;
 
     if (!(level & IMCC_INFO(interp)->debug))
@@ -218,7 +218,7 @@ Dumps the current instruction status of IMCC
 void
 dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_instructions);
+    ASSERT_ARGS(dump_instructions)
     const Instruction *ins;
     int                pc;
 
@@ -263,7 +263,7 @@ Dumps the current IMCC config data.
 void
 dump_cfg(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_cfg);
+    ASSERT_ARGS(dump_cfg)
     unsigned int i;
     Edge *e;
 
@@ -303,7 +303,7 @@ Dumps the current loops in the IMC_Unit C<unit>.
 void
 dump_loops(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_loops);
+    ASSERT_ARGS(dump_loops)
     int i;
     Loop_info ** loop_info = unit->loop_info;
 
@@ -350,7 +350,7 @@ Dumps the list of labels in IMC_Unit C<unit>.
 void
 dump_labels(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_labels);
+    ASSERT_ARGS(dump_labels)
     const SymHash * const hsh = &unit->hash;
     unsigned int          i;
 
@@ -384,7 +384,7 @@ Dumps a list of the symbolic registers in IMC_Unit C<unit>
 void
 dump_symreg(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_symreg);
+    ASSERT_ARGS(dump_symreg)
     unsigned int i;
     SymReg ** const reglist = unit->reglist;
 
@@ -433,7 +433,7 @@ allocated.
 void
 dump_liveness_status(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_liveness_status);
+    ASSERT_ARGS(dump_liveness_status)
     unsigned int i;
     SymReg ** const reglist = unit->reglist;
 
@@ -462,7 +462,7 @@ Dumps the state of SymReg C<r> in IMC_Unit C<unit>.
 void
 dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
 {
-    ASSERT_ARGS(dump_liveness_status_var);
+    ASSERT_ARGS(dump_liveness_status_var)
     fprintf(stderr, "\nSymbol %s:", r->name);
     if (r->life_info) {
         unsigned int i;
@@ -511,7 +511,7 @@ Dumps the interference graph for the current IMC_Unit C<unit>
 void
 dump_interference_graph(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_interference_graph);
+    ASSERT_ARGS(dump_interference_graph)
     int x;
     SymReg** const reglist = unit->reglist;
     const int n_symbols = unit->n_symbols;
@@ -551,7 +551,7 @@ Dumps the current list of dominators for the current IMC_Unit C<unit>.
 void
 dump_dominators(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_dominators);
+    ASSERT_ARGS(dump_dominators)
     unsigned int i;
 
     fprintf(stderr, "\nDumping the Dominators Tree:"
@@ -586,7 +586,7 @@ Dumps the list of dominance frontiers for the current IMC_Unit C<unit>.
 void
 dump_dominance_frontiers(ARGIN(const IMC_Unit *unit))
 {
-    ASSERT_ARGS(dump_dominance_frontiers);
+    ASSERT_ARGS(dump_dominance_frontiers)
     unsigned int i;
 
     fprintf(stderr, "\nDumping the Dominance Frontiers:"

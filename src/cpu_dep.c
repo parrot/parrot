@@ -64,7 +64,7 @@ tracing the stack is very straightforward.
 void
 trace_system_areas(PARROT_INTERP)
 {
-    ASSERT_ARGS(trace_system_areas);
+    ASSERT_ARGS(trace_system_areas)
     {
 #if defined(__sparc)
         /* Flush the register windows. For sparc systems, we use hand-coded
@@ -152,7 +152,7 @@ variable in this function, which should be at the "top" of the stack.
 static void
 trace_system_stack(PARROT_INTERP)
 {
-    ASSERT_ARGS(trace_system_stack);
+    ASSERT_ARGS(trace_system_stack)
     /* Create a local variable on the system stack. This represents the
        "top" of the stack. A value stored in interp->lo_var_ptr represents
        the "bottom" of the stack. We must trace the entire area between the

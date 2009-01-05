@@ -128,7 +128,7 @@ static STRING *
 handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
         INTVAL is_int_type, ARGIN_NULLOK(STRING* prefix))
 {
-    ASSERT_ARGS(handle_flags);
+    ASSERT_ARGS(handle_flags)
     UINTVAL len = string_length(interp, str);
 
     if (is_int_type) {
@@ -235,7 +235,7 @@ static STRING*
 str_append_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *info),
         ARGMOD(STRING *src), ARGIN_NULLOK(STRING *prefix))
 {
-    ASSERT_ARGS(str_append_w_flags);
+    ASSERT_ARGS(str_append_w_flags)
     src = handle_flags(interp, info, src, 1, prefix);
     dest = string_append(interp, dest, src);
     return dest;
@@ -256,7 +256,7 @@ a float.
 static void
 gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 {
-    ASSERT_ARGS(gen_sprintf_call);
+    ASSERT_ARGS(gen_sprintf_call)
     int i    = 0;
     out[i++] = '%';
 
@@ -321,7 +321,7 @@ STRING *
 Parrot_sprintf_format(PARROT_INTERP,
         ARGIN(STRING *pat), ARGIN(SPRINTF_OBJ *obj))
 {
-    ASSERT_ARGS(Parrot_sprintf_format);
+    ASSERT_ARGS(Parrot_sprintf_format)
     INTVAL i;
     INTVAL len     = 0;
     INTVAL old     = 0;

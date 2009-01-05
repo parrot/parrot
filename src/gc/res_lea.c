@@ -45,7 +45,7 @@ count.
 void
 Parrot_go_collect(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_go_collect);
+    ASSERT_ARGS(parrot_go_collect)
     if (interp->arena_base->GC_block_level) {
         return;
     }
@@ -66,7 +66,7 @@ no memory available.
 static PARROT_INLINE void*
 xmalloc(size_t size)
 {
-    ASSERT_ARGS(xmalloc);
+    ASSERT_ARGS(xmalloc)
     void *p = malloc(size);
     if (!p)
         do_panic(NULL, "malloc: out of mem", __FILE__, __LINE__);
@@ -87,7 +87,7 @@ no memory available.
 static PARROT_INLINE void*
 xcalloc(size_t n, size_t size)
 {
-    ASSERT_ARGS(xcalloc);
+    ASSERT_ARGS(xcalloc)
     void * const p = calloc(n, size);
     if (!p)
         do_panic(NULL, "calloc: out of mem", __FILE__, __LINE__);
@@ -108,7 +108,7 @@ is no memory available.
 static PARROT_INLINE void*
 xrealloc(void *p, size_t size)
 {
-    ASSERT_ARGS(xrealloc);
+    ASSERT_ARGS(xrealloc)
     void * const n = realloc(p, size);
     if (!n)
         do_panic(NULL, "realloc: out of mem", __FILE__, __LINE__);
@@ -129,7 +129,7 @@ refcounting in DOD.
 void
 Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)
 {
-    ASSERT_ARGS(parrot_reallocate);
+    ASSERT_ARGS(parrot_reallocate)
     const size_t oldlen = PObj_buflen(buffer);
     Buffer_alloc_unit *p;
 
@@ -177,7 +177,7 @@ suitably aligned for holding anything contained in UnionVal
 void
 Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 {
-    ASSERT_ARGS(parrot_allocate_aligned);
+    ASSERT_ARGS(parrot_allocate_aligned)
     Buffer_alloc_unit *p;
     p = (Buffer_alloc_unit *) xmalloc(Buffer_alloc_offset + size);
     p->ref_count = 0;
@@ -199,7 +199,7 @@ number of bytes memory required.
 void
 Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)
 {
-    ASSERT_ARGS(parrot_reallocate_string);
+    ASSERT_ARGS(parrot_reallocate_string)
     Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(str)) {
@@ -227,7 +227,7 @@ number bytes of memory required.
 void
 Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)
 {
-    ASSERT_ARGS(parrot_allocate_string);
+    ASSERT_ARGS(parrot_allocate_string)
     Buffer_alloc_unit *p;
     p = (Buffer_alloc_unit *) xcalloc(Buffer_alloc_offset + size, 1);
     p->ref_count = 0;
@@ -248,7 +248,7 @@ Does nothing.
 void
 Parrot_initialize_memory_pools(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_initialize_memory_pools);
+    ASSERT_ARGS(parrot_initialize_memory_pools)
 }
 
 /*
@@ -263,7 +263,7 @@ Does nothing.
 void
 Parrot_merge_memory_pools(Interp *dest, Interp *source)
 {
-    ASSERT_ARGS(parrot_merge_memory_pools);
+    ASSERT_ARGS(parrot_merge_memory_pools)
 }
 
 /*
@@ -279,7 +279,7 @@ Does nothing.
 void
 Parrot_destroy_memory_pools(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_destroy_memory_pools);
+    ASSERT_ARGS(parrot_destroy_memory_pools)
 }
 
 /*

@@ -73,7 +73,7 @@ PMC*
 Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
         ARGIN(STRING *cb_signature))
 {
-    ASSERT_ARGS(Parrot_make_cb);
+    ASSERT_ARGS(Parrot_make_cb)
     PMC *cb, *cb_sig;
     int type;
     char * sig_str;
@@ -160,7 +160,7 @@ Verify user_data PMC then continue with callback_CD
 static void
 verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
-    ASSERT_ARGS(verify_CD);
+    ASSERT_ARGS(verify_CD)
     PARROT_INTERP = NULL;
     size_t i;
 
@@ -223,7 +223,7 @@ Common callback function handler. See pdd16.
 static void
 callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
-    ASSERT_ARGS(callback_CD);
+    ASSERT_ARGS(callback_CD)
 
     PMC *passed_interp;       /* the interp that originated the CB */
     PMC *passed_synchronous;  /* flagging synchronous execution */
@@ -286,7 +286,7 @@ void
 Parrot_run_callback(PARROT_INTERP,
         ARGMOD(PMC* user_data), ARGIN(char* external_data))
 {
-    ASSERT_ARGS(Parrot_run_callback);
+    ASSERT_ARGS(Parrot_run_callback)
     PMC     *signature;
     PMC     *sub;
     STRING  *sig_str;
@@ -382,7 +382,7 @@ PARROT_EXPORT
 void
 Parrot_callback_C(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 {
-    ASSERT_ARGS(Parrot_callback_C);
+    ASSERT_ARGS(Parrot_callback_C)
     verify_CD(external_data, user_data);
 }
 
@@ -390,7 +390,7 @@ PARROT_EXPORT
 void
 Parrot_callback_D(ARGMOD(PMC *user_data), ARGIN(char *external_data))
 {
-    ASSERT_ARGS(Parrot_callback_D);
+    ASSERT_ARGS(Parrot_callback_D)
     verify_CD(external_data, user_data);
 }
 

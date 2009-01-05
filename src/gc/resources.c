@@ -143,7 +143,7 @@ static void
 alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
         ARGIN(const char *why))
 {
-    ASSERT_ARGS(alloc_new_block);
+    ASSERT_ARGS(alloc_new_block)
     Memory_Block *new_block;
 
     const size_t alloc_size = (size > pool->minimum_block_size)
@@ -228,7 +228,7 @@ PARROT_CANNOT_RETURN_NULL
 static void *
 mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
 {
-    ASSERT_ARGS(mem_allocate);
+    ASSERT_ARGS(mem_allocate)
     void *return_val;
 
     /* we always should have one block at least */
@@ -305,7 +305,7 @@ PARROT_WARN_UNUSED_RESULT
 static const char*
 buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
 {
-    ASSERT_ARGS(buffer_location);
+    ASSERT_ARGS(buffer_location)
     int i;
     static char reg[10];
 
@@ -334,7 +334,7 @@ Prints a debug statement with information about the given PObj C<b>.
 static void
 debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
 {
-    ASSERT_ARGS(debug_print_buf);
+    ASSERT_ARGS(debug_print_buf)
     fprintf(stderr, "found %p, len %d, flags 0x%08x at %s\n",
             b, (int)PObj_buflen(b), (uint)PObj_get_FLAGS(b),
             buffer_location(interp, b));
@@ -361,7 +361,7 @@ as being alive in any way.
 static void
 compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 {
-    ASSERT_ARGS(compact_pool);
+    ASSERT_ARGS(compact_pool)
     INTVAL        j;
     UINTVAL       total_size;
 
@@ -599,7 +599,7 @@ Redirects to C<compact_pool>.
 void
 Parrot_go_collect(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_go_collect);
+    ASSERT_ARGS(Parrot_go_collect)
     compact_pool(interp, interp->arena_base->memory_pool);
 }
 
@@ -620,7 +620,7 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 aligned_size(ARGIN(const Buffer *buffer), size_t len)
 {
-    ASSERT_ARGS(aligned_size);
+    ASSERT_ARGS(aligned_size)
     if (PObj_is_COWable_TEST(buffer))
         len += sizeof (void*);
     if (PObj_aligned_TEST(buffer))
@@ -647,7 +647,7 @@ PARROT_WARN_UNUSED_RESULT
 static char *
 aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
 {
-    ASSERT_ARGS(aligned_mem);
+    ASSERT_ARGS(aligned_mem)
     if (PObj_is_COWable_TEST(buffer))
         mem += sizeof (void*);
     if (PObj_aligned_TEST(buffer))
@@ -676,7 +676,7 @@ PARROT_WARN_UNUSED_RESULT
 static size_t
 aligned_string_size(size_t len)
 {
-    ASSERT_ARGS(aligned_string_size);
+    ASSERT_ARGS(aligned_string_size)
     len += sizeof (void*);
     len = (len + WORD_ALIGN_1) & WORD_ALIGN_MASK;
     return len;
@@ -697,7 +697,7 @@ PARROT_WARN_UNUSED_RESULT
 int
 Parrot_in_memory_pool(PARROT_INTERP, ARGIN(void *bufstart))
 {
-    ASSERT_ARGS(Parrot_in_memory_pool);
+    ASSERT_ARGS(Parrot_in_memory_pool)
     Memory_Pool * const pool = interp->arena_base->memory_pool;
     Memory_Block * cur_block = pool->top_block;
 
@@ -735,7 +735,7 @@ memory is not cleared.
 void
 Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
 {
-    ASSERT_ARGS(Parrot_reallocate);
+    ASSERT_ARGS(Parrot_reallocate)
     size_t copysize;
     char  *mem;
     Memory_Pool * const pool = interp->arena_base->memory_pool;
@@ -805,7 +805,7 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 void
 Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
 {
-    ASSERT_ARGS(Parrot_reallocate_string);
+    ASSERT_ARGS(Parrot_reallocate_string)
     size_t copysize;
     char *mem, *oldmem;
     size_t new_size, needed, old_size;
@@ -876,7 +876,7 @@ C<PObj_buflen> will be set to exactly the given C<size>.
 void
 Parrot_allocate(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
 {
-    ASSERT_ARGS(Parrot_allocate);
+    ASSERT_ARGS(Parrot_allocate)
     PObj_buflen(buffer) = 0;
     PObj_bufstart(buffer) = NULL;
     PARROT_ASSERT((size & WORD_ALIGN_1) == 0);
@@ -901,7 +901,7 @@ malloc(3) suitable to hold e.g. a C<FLOATVAL> array.
 void
 Parrot_allocate_aligned(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
 {
-    ASSERT_ARGS(Parrot_allocate_aligned);
+    ASSERT_ARGS(Parrot_allocate_aligned)
     size_t new_size;
     char *mem;
 
@@ -933,7 +933,7 @@ is B<not> changed.
 void
 Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
 {
-    ASSERT_ARGS(Parrot_allocate_string);
+    ASSERT_ARGS(Parrot_allocate_string)
     size_t       new_size;
     Memory_Pool *pool;
     char        *mem;
@@ -976,7 +976,7 @@ PARROT_CANNOT_RETURN_NULL
 static Memory_Pool *
 new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 {
-    ASSERT_ARGS(new_memory_pool);
+    ASSERT_ARGS(new_memory_pool)
     Memory_Pool * const pool = mem_internal_allocate_typed(Memory_Pool);
 
     pool->top_block              = NULL;
@@ -1006,7 +1006,7 @@ for both.
 void
 Parrot_initialize_memory_pools(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_initialize_memory_pools);
+    ASSERT_ARGS(Parrot_initialize_memory_pools)
     Arenas * const arena_base = interp->arena_base;
 
     arena_base->memory_pool   = new_memory_pool(POOL_SIZE, &compact_pool);
@@ -1033,7 +1033,7 @@ blocks are freed, free the pools themselves.
 void
 Parrot_destroy_memory_pools(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_destroy_memory_pools);
+    ASSERT_ARGS(Parrot_destroy_memory_pools)
     int i;
 
     for (i = 0; i < 2; i++) {
@@ -1069,7 +1069,7 @@ is emptied, but is not destroyed here.
 static void
 merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 {
-    ASSERT_ARGS(merge_pools);
+    ASSERT_ARGS(merge_pools)
     Memory_Block *cur_block;
 
     cur_block = source->top_block;
@@ -1114,7 +1114,7 @@ C<dest_interp>.
 void
 Parrot_merge_memory_pools(ARGIN(Interp *dest_interp), ARGIN(Interp *source_interp))
 {
-    ASSERT_ARGS(Parrot_merge_memory_pools);
+    ASSERT_ARGS(Parrot_merge_memory_pools)
     merge_pools(dest_interp->arena_base->constant_string_pool,
                 source_interp->arena_base->constant_string_pool);
 

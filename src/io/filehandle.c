@@ -41,7 +41,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(STRING *mode_str))
 {
-    ASSERT_ARGS(Parrot_io_parse_open_flags);
+    ASSERT_ARGS(Parrot_io_parse_open_flags)
     INTVAL i, mode_len;
     INTVAL flags = 0;
 
@@ -115,7 +115,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
 {
-    ASSERT_ARGS(Parrot_io_make_string);
+    ASSERT_ARGS(Parrot_io_make_string)
     /*
      * when we get a NULL string, we read a default len
      */
@@ -155,7 +155,7 @@ PARROT_EXPORT
 void
 Parrot_io_set_os_handle(SHIM_INTERP, ARGIN(PMC *filehandle), PIOHANDLE file_descriptor)
 {
-    ASSERT_ARGS(Parrot_io_set_os_handle);
+    ASSERT_ARGS(Parrot_io_set_os_handle)
     PARROT_FILEHANDLE(filehandle)->os_handle = file_descriptor;
 }
 
@@ -179,7 +179,7 @@ PARROT_EXPORT
 PIOHANDLE
 Parrot_io_get_os_handle(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_os_handle);
+    ASSERT_ARGS(Parrot_io_get_os_handle)
     return PARROT_FILEHANDLE(filehandle)->os_handle;
 }
 
@@ -203,7 +203,7 @@ PARROT_EXPORT
 void
 Parrot_io_set_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL flags)
 {
-    ASSERT_ARGS(Parrot_io_set_flags);
+    ASSERT_ARGS(Parrot_io_set_flags)
     Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
     handle_struct->flags = flags;
 }
@@ -228,7 +228,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_flags);
+    ASSERT_ARGS(Parrot_io_get_flags)
     Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
     INTVAL flags = handle_struct->flags;
     return flags;
@@ -254,7 +254,7 @@ PARROT_EXPORT
 void
 Parrot_io_set_file_size(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_size)
 {
-    ASSERT_ARGS(Parrot_io_set_file_size);
+    ASSERT_ARGS(Parrot_io_set_file_size)
     PARROT_FILEHANDLE(filehandle)->file_size = file_size;
 }
 
@@ -280,7 +280,7 @@ PARROT_EXPORT
 PIOOFF_T
 Parrot_io_get_file_size(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_file_size);
+    ASSERT_ARGS(Parrot_io_get_file_size)
     return PARROT_FILEHANDLE(filehandle)->file_size;
 }
 
@@ -304,7 +304,7 @@ void
 Parrot_io_set_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_start))
 {
-    ASSERT_ARGS(Parrot_io_set_buffer_start);
+    ASSERT_ARGS(Parrot_io_set_buffer_start)
     PARROT_FILEHANDLE(filehandle)->buffer_start = new_start;
 }
 
@@ -329,7 +329,7 @@ PARROT_CAN_RETURN_NULL
 unsigned char *
 Parrot_io_get_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_buffer_start);
+    ASSERT_ARGS(Parrot_io_get_buffer_start)
     return PARROT_FILEHANDLE(filehandle)->buffer_start;
 }
 
@@ -354,7 +354,7 @@ PARROT_CAN_RETURN_NULL
 unsigned char *
 Parrot_io_get_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_buffer_next);
+    ASSERT_ARGS(Parrot_io_get_buffer_next)
     return PARROT_FILEHANDLE(filehandle)->buffer_next;
 }
 
@@ -378,7 +378,7 @@ void
 Parrot_io_set_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_next))
 {
-    ASSERT_ARGS(Parrot_io_set_buffer_next);
+    ASSERT_ARGS(Parrot_io_set_buffer_next)
     PARROT_FILEHANDLE(filehandle)->buffer_next = new_next;
 }
 
@@ -403,7 +403,7 @@ PARROT_CAN_RETURN_NULL
 unsigned char *
 Parrot_io_get_buffer_end(SHIM_INTERP, ARGIN_NULLOK(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_buffer_end);
+    ASSERT_ARGS(Parrot_io_get_buffer_end)
     return PARROT_FILEHANDLE(filehandle)->buffer_end;
 }
 
@@ -427,7 +427,7 @@ void
 Parrot_io_set_buffer_end(SHIM_INTERP, ARGIN(PMC *filehandle),
         ARGIN_NULLOK(unsigned char *new_end))
 {
-    ASSERT_ARGS(Parrot_io_set_buffer_end);
+    ASSERT_ARGS(Parrot_io_set_buffer_end)
     PARROT_FILEHANDLE(filehandle)->buffer_end = new_end;
 }
 
@@ -451,7 +451,7 @@ PARROT_CAN_RETURN_NULL
 INTVAL
 Parrot_io_get_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_buffer_flags);
+    ASSERT_ARGS(Parrot_io_get_buffer_flags)
     return PARROT_FILEHANDLE(filehandle)->buffer_flags;
 }
 
@@ -474,7 +474,7 @@ it can be cleanly changed later.
 void
 Parrot_io_set_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL new_flags)
 {
-    ASSERT_ARGS(Parrot_io_set_buffer_flags);
+    ASSERT_ARGS(Parrot_io_set_buffer_flags)
     PARROT_FILEHANDLE(filehandle)->buffer_flags = new_flags;
 }
 
@@ -498,7 +498,7 @@ PARROT_CAN_RETURN_NULL
 size_t
 Parrot_io_get_buffer_size(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_buffer_size);
+    ASSERT_ARGS(Parrot_io_get_buffer_size)
     return PARROT_FILEHANDLE(filehandle)->buffer_size;
 }
 
@@ -521,7 +521,7 @@ it can be cleanly changed later.
 void
 Parrot_io_set_buffer_size(SHIM_INTERP, ARGIN(PMC *filehandle), size_t new_size)
 {
-    ASSERT_ARGS(Parrot_io_set_buffer_size);
+    ASSERT_ARGS(Parrot_io_set_buffer_size)
     PARROT_FILEHANDLE(filehandle)->buffer_size = new_size;
 }
 
@@ -544,7 +544,7 @@ PARROT_CAN_RETURN_NULL
 void
 Parrot_io_clear_buffer(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_clear_buffer);
+    ASSERT_ARGS(Parrot_io_clear_buffer)
     Parrot_FileHandle_attributes *io = PARROT_FILEHANDLE(filehandle);
     if (io->buffer_start && (io->flags & PIO_BF_MALLOC)) {
         mem_sys_free(io->buffer_start);
@@ -572,7 +572,7 @@ PARROT_EXPORT
 PIOOFF_T
 Parrot_io_get_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_file_position);
+    ASSERT_ARGS(Parrot_io_get_file_position)
     return PARROT_FILEHANDLE(filehandle)->file_pos;
 }
 
@@ -596,7 +596,7 @@ PARROT_EXPORT
 PIOOFF_T
 Parrot_io_get_last_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_get_last_file_position);
+    ASSERT_ARGS(Parrot_io_get_last_file_position)
     return PARROT_FILEHANDLE(filehandle)->last_pos;
 }
 
@@ -621,7 +621,7 @@ PARROT_EXPORT
 void
 Parrot_io_set_file_position(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_pos)
 {
-    ASSERT_ARGS(Parrot_io_set_file_position);
+    ASSERT_ARGS(Parrot_io_set_file_position)
     Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
     handle_struct->last_pos = handle_struct->file_pos;
     handle_struct->file_pos = file_pos;
@@ -648,7 +648,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_is_encoding(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(STRING *value))
 {
-    ASSERT_ARGS(Parrot_io_is_encoding);
+    ASSERT_ARGS(Parrot_io_is_encoding)
     Parrot_FileHandle_attributes *handle_struct = PARROT_FILEHANDLE(filehandle);
     if (STRING_IS_NULL(handle_struct->encoding))
         return 0;
@@ -674,7 +674,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_close_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_close_filehandle);
+    ASSERT_ARGS(Parrot_io_close_filehandle)
     INTVAL result;
 
     if (Parrot_io_is_closed_filehandle(interp, pmc))
@@ -703,7 +703,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_is_closed_filehandle);
+    ASSERT_ARGS(Parrot_io_is_closed_filehandle)
     return PIO_IS_CLOSED(interp, pmc);
 }
 
@@ -721,7 +721,7 @@ PARROT_EXPORT
 void
 Parrot_io_flush_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_flush_filehandle);
+    ASSERT_ARGS(Parrot_io_flush_filehandle)
     if (Parrot_io_is_closed(interp, pmc))
         return;
 

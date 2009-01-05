@@ -40,7 +40,7 @@ static int context_gc_mark = 0;
 void
 mark_context_start(void)
 {
-    ASSERT_ARGS(mark_context_start);
+    ASSERT_ARGS(mark_context_start)
     if (++context_gc_mark == 0) context_gc_mark = 1;
 }
 
@@ -58,7 +58,7 @@ Marks the context C<*ctx>.
 void
 mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 {
-    ASSERT_ARGS(mark_context);
+    ASSERT_ARGS(mark_context)
     PObj *obj;
     int   i;
 
@@ -137,7 +137,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_sub *
 new_sub(PARROT_INTERP)
 {
-    ASSERT_ARGS(new_sub);
+    ASSERT_ARGS(new_sub)
     /* Using system memory until I figure out GC issues */
     Parrot_sub * const newsub = mem_allocate_zeroed_typed(Parrot_sub);
     newsub->seg               = interp->code;
@@ -161,7 +161,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_sub *
 new_closure(PARROT_INTERP)
 {
-    ASSERT_ARGS(new_closure);
+    ASSERT_ARGS(new_closure)
     Parrot_sub * const newsub = new_sub(interp);
     return newsub;
 }
@@ -183,7 +183,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_cont *
 new_continuation(PARROT_INTERP, ARGIN_NULLOK(const Parrot_cont *to))
 {
-    ASSERT_ARGS(new_continuation);
+    ASSERT_ARGS(new_continuation)
     Parrot_cont    * const cc     = mem_allocate_typed(Parrot_cont);
     Parrot_Context * const to_ctx = to ? to->to_ctx : CONTEXT(interp);
 
@@ -219,7 +219,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_cont *
 new_ret_continuation(PARROT_INTERP)
 {
-    ASSERT_ARGS(new_ret_continuation);
+    ASSERT_ARGS(new_ret_continuation)
     Parrot_cont * const cc = mem_allocate_typed(Parrot_cont);
 
     cc->to_ctx          = CONTEXT(interp);
@@ -249,7 +249,7 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_coro *
 new_coroutine(PARROT_INTERP)
 {
-    ASSERT_ARGS(new_coroutine);
+    ASSERT_ARGS(new_coroutine)
     Parrot_coro * const co = mem_allocate_zeroed_typed(Parrot_coro);
 
     co->seg                = interp->code;
@@ -276,7 +276,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
 {
-    ASSERT_ARGS(new_ret_continuation_pmc);
+    ASSERT_ARGS(new_ret_continuation_pmc)
     PMC* const continuation = pmc_new(interp, enum_class_RetContinuation);
     VTABLE_set_pointer(interp, continuation, address);
     return continuation;
@@ -295,7 +295,7 @@ Make true Continuations from all RetContinuations up the call chain.
 void
 invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
 {
-    ASSERT_ARGS(invalidate_retc_context);
+    ASSERT_ARGS(invalidate_retc_context)
     Parrot_Context *ctx = PMC_cont(cont)->from_ctx;
     cont = ctx->current_cont;
 
@@ -332,7 +332,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
 {
-    ASSERT_ARGS(Parrot_full_sub_name);
+    ASSERT_ARGS(Parrot_full_sub_name)
     if (sub && VTABLE_defined(interp, sub)) {
         Parrot_sub * const s = PMC_sub(sub);
 
@@ -399,7 +399,7 @@ int
 Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
                     ARGOUT(Parrot_Context_info *info))
 {
-    ASSERT_ARGS(Parrot_Context_get_info);
+    ASSERT_ARGS(Parrot_Context_get_info)
     Parrot_sub *sub;
     DECL_CONST_CAST;
 
@@ -491,7 +491,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING*
 Parrot_Context_infostr(PARROT_INTERP, ARGIN(const Parrot_Context *ctx))
 {
-    ASSERT_ARGS(Parrot_Context_infostr);
+    ASSERT_ARGS(Parrot_Context_infostr)
     Parrot_Context_info info;
     STRING             *res = NULL;
     const char * const  msg = (CONTEXT(interp) == ctx)
@@ -526,7 +526,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC*
 Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(const Parrot_Context *ctx))
 {
-    ASSERT_ARGS(Parrot_find_pad);
+    ASSERT_ARGS(Parrot_find_pad)
     while (1) {
         PMC                    * const lex_pad = ctx->lex_pad;
         const Parrot_Context   * const outer   = ctx->outer_ctx;
@@ -567,7 +567,7 @@ Capture the current lexical environment of a sub.
 void
 Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 {
-    ASSERT_ARGS(Parrot_capture_lex);
+    ASSERT_ARGS(Parrot_capture_lex)
     Parrot_Context * const ctx      = CONTEXT(interp);
     Parrot_sub * const current_sub  = PMC_sub(ctx->current_sub);
     Parrot_sub * const sub          = PMC_sub(sub_pmc);
@@ -635,7 +635,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC*
 parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
-    ASSERT_ARGS(parrot_new_closure);
+    ASSERT_ARGS(parrot_new_closure)
     PMC        * const clos_pmc = VTABLE_clone(interp, sub_pmc);
     Parrot_capture_lex(interp, clos_pmc);
     return clos_pmc;
@@ -656,7 +656,7 @@ void
 Parrot_continuation_check(PARROT_INTERP, ARGIN(PMC *pmc),
     ARGIN(Parrot_cont *cc))
 {
-    ASSERT_ARGS(Parrot_continuation_check);
+    ASSERT_ARGS(Parrot_continuation_check)
     Parrot_Context *to_ctx       = cc->to_ctx;
     Parrot_Context *from_ctx     = CONTEXT(interp);
 
@@ -686,7 +686,7 @@ void
 Parrot_continuation_rewind_environment(PARROT_INTERP, SHIM(PMC *pmc),
         ARGIN(Parrot_cont *cc))
 {
-    ASSERT_ARGS(Parrot_continuation_rewind_environment);
+    ASSERT_ARGS(Parrot_continuation_rewind_environment)
     Parrot_Context * const to_ctx = cc->to_ctx;
 
     /* debug print before context is switched */

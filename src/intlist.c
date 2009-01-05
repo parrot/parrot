@@ -151,7 +151,7 @@ Marks the list as live.
 void
 intlist_mark(PARROT_INTERP, ARGMOD(IntList *l))
 {
-    ASSERT_ARGS(intlist_mark);
+    ASSERT_ARGS(intlist_mark)
     list_mark(interp, (List *)l);
 }
 
@@ -170,7 +170,7 @@ PARROT_CANNOT_RETURN_NULL
 IntList *
 intlist_clone(PARROT_INTERP, ARGIN(const IntList *list))
 {
-    ASSERT_ARGS(intlist_clone);
+    ASSERT_ARGS(intlist_clone)
     return (IntList *)list_clone(interp, (const List *)list);
 }
 
@@ -189,7 +189,7 @@ PARROT_CANNOT_RETURN_NULL
 IntList *
 intlist_new(PARROT_INTERP)
 {
-    ASSERT_ARGS(intlist_new);
+    ASSERT_ARGS(intlist_new)
     return (IntList *)list_new(interp, enum_type_INTVAL);
 }
 
@@ -208,7 +208,7 @@ PARROT_PURE_FUNCTION
 INTVAL
 intlist_length(SHIM_INTERP, ARGIN(const IntList *list))
 {
-    ASSERT_ARGS(intlist_length);
+    ASSERT_ARGS(intlist_length)
     return ((const List *)list)->length;
 }
 
@@ -225,7 +225,7 @@ Assigns <val> to the item at C<idx>.
 void
 intlist_assign(PARROT_INTERP, ARGMOD(IntList *l), INTVAL idx, INTVAL val)
 {
-    ASSERT_ARGS(intlist_assign);
+    ASSERT_ARGS(intlist_assign)
     list_assign(interp, (List *)l, idx, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
@@ -242,7 +242,7 @@ Pushes C<val> on the end of the list.
 void
 intlist_push(PARROT_INTERP, ARGMOD(IntList *l), INTVAL val)
 {
-    ASSERT_ARGS(intlist_push);
+    ASSERT_ARGS(intlist_push)
     list_push(interp, (List *)l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
@@ -259,7 +259,7 @@ Pushes C<val> on the front of the list.
 void
 intlist_unshift(PARROT_INTERP, ARGMOD(IntList **l), INTVAL val)
 {
-    ASSERT_ARGS(intlist_unshift);
+    ASSERT_ARGS(intlist_unshift)
     list_unshift(interp, (List *)*l, INTVAL2PTR(void *, val), enum_type_INTVAL);
 }
 
@@ -276,7 +276,7 @@ Popping/shifting into a sparse hole returns 0.
 INTVAL
 intlist_pop(PARROT_INTERP, ARGMOD(IntList *l))
 {
-    ASSERT_ARGS(intlist_pop);
+    ASSERT_ARGS(intlist_pop)
     void * const ret = list_pop(interp, (List *)l, enum_type_INTVAL);
     const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
@@ -295,7 +295,7 @@ Removes and returns the first item on the list.
 INTVAL
 intlist_shift(PARROT_INTERP, ARGMOD(IntList **l))
 {
-    ASSERT_ARGS(intlist_shift);
+    ASSERT_ARGS(intlist_shift)
     void * const ret = list_shift(interp, (List *)*l, enum_type_INTVAL);
     const INTVAL retval = ret == (void *)-1 ? 0 : *(INTVAL *)ret;
     return retval;
@@ -315,7 +315,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 intlist_get(PARROT_INTERP, ARGMOD(IntList *list), INTVAL idx)
 {
-    ASSERT_ARGS(intlist_get);
+    ASSERT_ARGS(intlist_get)
     void * const ret = list_get(interp, (List *)list, idx, enum_type_INTVAL);
     if (ret)
         return *(INTVAL *)ret;

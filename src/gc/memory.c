@@ -43,7 +43,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_allocate(size_t size)
 {
-    ASSERT_ARGS(mem_sys_allocate);
+    ASSERT_ARGS(mem_sys_allocate)
     void * const ptr = malloc(size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
@@ -70,7 +70,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_allocate(size_t size, ARGIN(const char *file), int line)
 {
-    ASSERT_ARGS(mem__internal_allocate);
+    ASSERT_ARGS(mem__internal_allocate)
     void * const ptr = malloc((size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
@@ -101,7 +101,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_allocate_zeroed(size_t size)
 {
-    ASSERT_ARGS(mem_sys_allocate_zeroed);
+    ASSERT_ARGS(mem_sys_allocate_zeroed)
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
@@ -128,7 +128,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)
 {
-    ASSERT_ARGS(mem__internal_allocate_zeroed);
+    ASSERT_ARGS(mem__internal_allocate_zeroed)
     void * const ptr = calloc(1, (size_t)size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal malloc %i at %p (%s/%d)\n",
@@ -160,7 +160,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_realloc(ARGFREE(void *from), size_t size)
 {
-    ASSERT_ARGS(mem_sys_realloc);
+    ASSERT_ARGS(mem_sys_realloc)
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
@@ -196,7 +196,7 @@ PARROT_CANNOT_RETURN_NULL
 void *
 mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 {
-    ASSERT_ARGS(mem_sys_realloc_zeroed);
+    ASSERT_ARGS(mem_sys_realloc_zeroed)
     void *ptr;
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
@@ -233,7 +233,7 @@ void *
 mem__internal_realloc(ARGFREE(void *from), size_t size,
         ARGIN(const char *file), int line)
 {
-    ASSERT_ARGS(mem__internal_realloc);
+    ASSERT_ARGS(mem__internal_realloc)
     void * const ptr = realloc(from, size);
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n",
@@ -270,7 +270,7 @@ void *
 mem__internal_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size,
     ARGIN(const char *file), int line)
 {
-    ASSERT_ARGS(mem__internal_realloc_zeroed);
+    ASSERT_ARGS(mem__internal_realloc_zeroed)
     void * const ptr = realloc(from, size);
 #  ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "internal free of %p (realloc -- %i bytes) (%s/%d)\n",
@@ -305,7 +305,7 @@ PARROT_EXPORT
 void
 mem_sys_free(ARGFREE(void *from))
 {
-    ASSERT_ARGS(mem_sys_free);
+    ASSERT_ARGS(mem_sys_free)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Freed %p\n", from);
 #endif
@@ -328,7 +328,7 @@ C<STDERR>.
 void
 mem__internal_free(ARGFREE(void *from), ARGIN(const char *file), int line)
 {
-    ASSERT_ARGS(mem__internal_free);
+    ASSERT_ARGS(mem__internal_free)
 #ifdef DETAIL_MEMORY_DEBUG
     fprintf(stderr, "Internal free of %p (%s/%d)\n", from, file, line);
 #else
@@ -353,7 +353,7 @@ is determined at compile time.
 void
 mem_setup_allocator(PARROT_INTERP)
 {
-    ASSERT_ARGS(mem_setup_allocator);
+    ASSERT_ARGS(mem_setup_allocator)
     interp->arena_base = mem_allocate_zeroed_typed(Arenas);
     interp->arena_base->sized_header_pools = NULL;
 

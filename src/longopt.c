@@ -88,7 +88,7 @@ longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
             ARGMOD(struct longopt_opt_info* info_buf))
 {
-    ASSERT_ARGS(longopt_get);
+    ASSERT_ARGS(longopt_get)
     const int dex = info_buf->opt_index;
 
     info_buf->opt_id = 0;
@@ -137,7 +137,7 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                     ARGIN(const struct longopt_opt_decl options[]),
                     ARGMOD(struct longopt_opt_info* info_buf))
 {
-    ASSERT_ARGS(longopt_get_longopt);
+    ASSERT_ARGS(longopt_get_longopt)
     const int dex = info_buf->opt_index;
     int optlen = 0;
     const struct longopt_opt_decl* dptr;
@@ -232,7 +232,7 @@ longopt_get_shortopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
                      ARGIN(const struct longopt_opt_decl options[]),
                      ARGMOD(struct longopt_opt_info* info_buf))
 {
-    ASSERT_ARGS(longopt_get_shortopt);
+    ASSERT_ARGS(longopt_get_shortopt)
     const int dex = info_buf->opt_index;
     const struct longopt_opt_decl* dptr;
     const char* pos;

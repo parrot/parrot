@@ -240,7 +240,7 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile*
 pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
 {
-    ASSERT_ARGS(pbc_merge_loadpbc);
+    ASSERT_ARGS(pbc_merge_loadpbc)
     INTVAL program_size, wanted;
     char *program_code;
     PackFile *pf;
@@ -332,7 +332,7 @@ static PackFile_ByteCode*
 pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                    int num_inputs, ARGMOD(PackFile *pf))
 {
-    ASSERT_ARGS(pbc_merge_bytecode);
+    ASSERT_ARGS(pbc_merge_bytecode)
     int i;
     opcode_t *bc = mem_allocate_typed(opcode_t);
     opcode_t cursor = 0;
@@ -397,7 +397,7 @@ static PackFile_ConstTable*
 pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
-    ASSERT_ARGS(pbc_merge_constants);
+    ASSERT_ARGS(pbc_merge_constants)
     int i, j;
     PackFile_Constant   **constants = mem_allocate_typed(PackFile_Constant *);
     opcode_t cursor = 0;
@@ -493,7 +493,7 @@ static void
 pbc_merge_fixups(PARROT_INTERP, ARGIN(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
-    ASSERT_ARGS(pbc_merge_fixups);
+    ASSERT_ARGS(pbc_merge_fixups)
     int i, j;
     PackFile_FixupTable *fixup_seg;
     PackFile_FixupEntry **fixups = mem_allocate_typed(PackFile_FixupEntry *);
@@ -589,7 +589,7 @@ static void
 pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
-    ASSERT_ARGS(pbc_merge_debugs);
+    ASSERT_ARGS(pbc_merge_debugs)
     int i, j;
     PackFile_Debug *debug_seg;
     opcode_t *lines                  = mem_allocate_typed(opcode_t);
@@ -660,7 +660,7 @@ static void
 pbc_merge_pic_index(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                  int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
-    ASSERT_ARGS(pbc_merge_pic_index);
+    ASSERT_ARGS(pbc_merge_pic_index)
     int i;
     PackFile_Segment *pic_index;
     size_t size;
@@ -713,7 +713,7 @@ static void
 pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                      int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
-    ASSERT_ARGS(pbc_merge_ctpointers);
+    ASSERT_ARGS(pbc_merge_ctpointers)
     int        cur_arg;
     opcode_t  *op_ptr;
     opcode_t  *ops       = bc->base.data;
@@ -796,7 +796,7 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile*
 pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 {
-    ASSERT_ARGS(pbc_merge_begin);
+    ASSERT_ARGS(pbc_merge_begin)
     PackFile_ByteCode   *bc;
     PackFile_ConstTable *ct;
 
@@ -837,7 +837,7 @@ This functions writes out the merged packfile.
 static void
 pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename))
 {
-    ASSERT_ARGS(pbc_merge_write);
+    ASSERT_ARGS(pbc_merge_write)
     FILE     *fp;
 
     /* Get size of packfile we'll write. */

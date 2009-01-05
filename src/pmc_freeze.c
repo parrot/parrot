@@ -480,7 +480,7 @@ No encoding of strings, no transcoding.
 static void
 str_append(PARROT_INTERP, ARGMOD(STRING *s), ARGIN(const void *b), size_t len)
 {
-    ASSERT_ARGS(str_append);
+    ASSERT_ARGS(str_append)
     const size_t used = s->bufused;
     const int need_free = (int)PObj_buflen(s) - used - len;
     /*
@@ -512,7 +512,7 @@ Pushes an ASCII version of the integer C<v> onto the end of the C<*io>
 static void
 push_ascii_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 {
-    ASSERT_ARGS(push_ascii_integer);
+    ASSERT_ARGS(push_ascii_integer)
     char buffer[20];
     const size_t len = snprintf(buffer, sizeof (buffer), "%d ", (int) v);
     str_append(interp, io->image, buffer, len);
@@ -532,7 +532,7 @@ Pushes an ASCII version of the number C<v> onto the end of the C<*io>
 static void
 push_ascii_number(PARROT_INTERP, ARGIN(const IMAGE_IO *io), FLOATVAL v)
 {
-    ASSERT_ARGS(push_ascii_number);
+    ASSERT_ARGS(push_ascii_number)
     char buffer[40];
     const size_t len = snprintf(buffer, sizeof (buffer), "%g ", (double) v);
     str_append(interp, io->image, buffer, len);
@@ -556,7 +556,7 @@ XXX no string delimiters - so no space allowed.
 static void
 push_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const STRING *s))
 {
-    ASSERT_ARGS(push_ascii_string);
+    ASSERT_ARGS(push_ascii_string)
     const UINTVAL length = string_length(interp, s);
     char * const buffer = (char *)malloc(4*length); /* XXX Why 4?  What does that mean? */
     char *cursor = buffer;
@@ -587,7 +587,7 @@ Pushes an ASCII version of the PMC C<*v> onto the end of the C<*io>
 static void
 push_ascii_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(const PMC* v))
 {
-    ASSERT_ARGS(push_ascii_pmc);
+    ASSERT_ARGS(push_ascii_pmc)
     char buffer[20];
     const size_t len = snprintf(buffer, sizeof (buffer), "%p ", (const void *)v);
     str_append(interp, io->image, buffer, len);
@@ -606,7 +606,7 @@ Removes and returns an integer from the start of the C<*io> "stream".
 static INTVAL
 shift_ascii_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_ascii_integer);
+    ASSERT_ARGS(shift_ascii_integer)
     char * const start = (char*)io->image->strstart;
     char *p = start;
     const INTVAL i = strtoul(p, &p, 10);
@@ -632,7 +632,7 @@ Removes and returns an number from the start of the C<*io> "stream".
 static FLOATVAL
 shift_ascii_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_ascii_number);
+    ASSERT_ARGS(shift_ascii_number)
     char * const start = (char*)io->image->strstart;
     char *p = start;
     const FLOATVAL f = (FLOATVAL) strtod(p, &p);
@@ -660,7 +660,7 @@ PARROT_CAN_RETURN_NULL
 static STRING*
 shift_ascii_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_ascii_string);
+    ASSERT_ARGS(shift_ascii_string)
     STRING *s;
 
     char * const start = (char*)io->image->strstart;
@@ -693,7 +693,7 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 shift_ascii_pmc(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_ascii_pmc);
+    ASSERT_ARGS(shift_ascii_pmc)
     char * const start = (char*)io->image->strstart;
     char *p = start;
     const unsigned long i = strtoul(p, &p, 16);
@@ -726,7 +726,7 @@ PARROT_INLINE
 static void
 op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
 {
-    ASSERT_ARGS(op_check_size);
+    ASSERT_ARGS(op_check_size)
     const size_t used = s->bufused;
     const int need_free = (int)PObj_buflen(s) - used - len;
     /*
@@ -757,7 +757,7 @@ Appends the opcode C<b> to the string C<*s>.
 static void
 op_append(PARROT_INTERP, ARGIN(STRING *s), opcode_t b, size_t len)
 {
-    ASSERT_ARGS(op_append);
+    ASSERT_ARGS(op_append)
     op_check_size(interp, s, len);
     *((opcode_t *)((ptrcast_t)s->strstart + s->bufused)) = b;
     s->bufused += len;
@@ -779,7 +779,7 @@ XXX assumes sizeof (opcode_t) == sizeof (INTVAL).
 static void
 push_opcode_integer(PARROT_INTERP, ARGIN(IMAGE_IO *io), INTVAL v)
 {
-    ASSERT_ARGS(push_opcode_integer);
+    ASSERT_ARGS(push_opcode_integer)
     PARROT_ASSERT(sizeof (opcode_t) == sizeof (INTVAL));
     op_append(interp, io->image, (opcode_t)v, sizeof (opcode_t));
 }
@@ -797,7 +797,7 @@ Pushes the number C<v> onto the end of the C<*io> "stream".
 static void
 push_opcode_number(PARROT_INTERP, ARGIN(IMAGE_IO *io), FLOATVAL v)
 {
-    ASSERT_ARGS(push_opcode_number);
+    ASSERT_ARGS(push_opcode_number)
     const size_t   len  = PF_size_number() * sizeof (opcode_t);
     STRING * const s    = io->image;
     const size_t   used = s->bufused;
@@ -824,7 +824,7 @@ Pushes the string C<*v> onto the end of the C<*io> "stream".
 static void
 push_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(STRING *v))
 {
-    ASSERT_ARGS(push_opcode_string);
+    ASSERT_ARGS(push_opcode_string)
     const size_t len = PF_size_string(v) * sizeof (opcode_t);
     STRING * const s = io->image;
     const size_t used = s->bufused;
@@ -851,7 +851,7 @@ Pushes the PMC C<*v> onto the end of the C<*io> "stream".
 static void
 push_opcode_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(PMC* v))
 {
-    ASSERT_ARGS(push_opcode_pmc);
+    ASSERT_ARGS(push_opcode_pmc)
     op_append(interp, io->image, (opcode_t)v, sizeof (opcode_t));
 }
 
@@ -871,7 +871,7 @@ packfile header for wordsize and endianess.
 static INTVAL
 shift_opcode_integer(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_opcode_integer);
+    ASSERT_ARGS(shift_opcode_integer)
     const char * const   start  = (char *)io->image->strstart;
     char               **opcode = &io->image->strstart;
     const INTVAL i              = PF_fetch_integer(io->pf,
@@ -900,7 +900,7 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 shift_opcode_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_opcode_pmc);
+    ASSERT_ARGS(shift_opcode_pmc)
     INTVAL i = shift_opcode_integer(interp, io);
     return (PMC *)i;
 }
@@ -918,7 +918,7 @@ Removes and returns an number from the start of the C<*io> "stream".
 static FLOATVAL
 shift_opcode_number(SHIM_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_opcode_number);
+    ASSERT_ARGS(shift_opcode_number)
     const char * const   start  = (const char *)io->image->strstart;
     char               **opcode = &io->image->strstart;
     const FLOATVAL       f      = PF_fetch_number(io->pf,
@@ -945,7 +945,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 shift_opcode_string(PARROT_INTERP, ARGIN(IMAGE_IO *io))
 {
-    ASSERT_ARGS(shift_opcode_string);
+    ASSERT_ARGS(shift_opcode_string)
     char * const   start  = (char*)io->image->strstart;
     char         **opcode = &io->image->strstart;
     STRING * const s      = PF_fetch_string(interp, io->pf,
@@ -976,7 +976,7 @@ Adds a C<PMC_EXT> to C<*pmc>.
 static void
 pmc_add_ext(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    ASSERT_ARGS(pmc_add_ext);
+    ASSERT_ARGS(pmc_add_ext)
     if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
         add_pmc_ext(interp, pmc);
 }
@@ -994,7 +994,7 @@ Sets all the C<next_for_GC> pointers to C<NULL>.
 static void
 cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
 {
-    ASSERT_ARGS(cleanup_next_for_GC_pool);
+    ASSERT_ARGS(cleanup_next_for_GC_pool)
     Small_Object_Arena *arena;
 
     for (arena = pool->last_Arena; arena; arena = arena->prev) {
@@ -1024,7 +1024,7 @@ Cleans up the C<next_for_GC> pointers.
 static void
 cleanup_next_for_GC(PARROT_INTERP)
 {
-    ASSERT_ARGS(cleanup_next_for_GC);
+    ASSERT_ARGS(cleanup_next_for_GC)
     cleanup_next_for_GC_pool(interp->arena_base->pmc_pool);
     cleanup_next_for_GC_pool(interp->arena_base->constant_pmc_pool);
 }
@@ -1072,7 +1072,7 @@ Initializes the freeze/thaw subsystem.
 static void
 ft_init(PARROT_INTERP, ARGIN(visit_info *info))
 {
-    ASSERT_ARGS(ft_init);
+    ASSERT_ARGS(ft_init)
     STRING *s = info->image;
     PackFile *pf;
 
@@ -1130,7 +1130,7 @@ Initializes the C<*info> lists.
 static void
 todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
 {
-    ASSERT_ARGS(todo_list_init);
+    ASSERT_ARGS(todo_list_init)
     info->visit_pmc_now = visit_todo_list;
     info->visit_pmc_later = add_pmc_todo_list;
     /* we must use PMCs here, so that they get marked properly */
@@ -1157,7 +1157,7 @@ static void
 freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
         int seen, UINTVAL id)
 {
-    ASSERT_ARGS(freeze_pmc);
+    ASSERT_ARGS(freeze_pmc)
     IMAGE_IO * const io = info->image_io;
     INTVAL type;
 
@@ -1216,7 +1216,7 @@ static int
 thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
         ARGOUT(UINTVAL *id), ARGOUT(INTVAL *type))
 {
-    ASSERT_ARGS(thaw_pmc);
+    ASSERT_ARGS(thaw_pmc)
     PMC *n;
     IMAGE_IO * const io = info->image_io;
     int seen = 0;
@@ -1268,7 +1268,7 @@ static void
 do_action(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
         int seen, UINTVAL id)
 {
-    ASSERT_ARGS(do_action);
+    ASSERT_ARGS(do_action)
     switch (info->what) {
         case VISIT_FREEZE_AT_DESTRUCT:
         case VISIT_FREEZE_NORMAL:
@@ -1298,7 +1298,7 @@ static PMC*
 thaw_create_pmc(PARROT_INTERP, ARGIN(const visit_info *info),
         INTVAL type)
 {
-    ASSERT_ARGS(thaw_create_pmc);
+    ASSERT_ARGS(thaw_create_pmc)
     PMC *pmc;
     switch (info->what) {
         case VISIT_THAW_NORMAL:
@@ -1329,7 +1329,7 @@ PARROT_INLINE
 static void
 do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info *info))
 {
-    ASSERT_ARGS(do_thaw);
+    ASSERT_ARGS(do_thaw)
     UINTVAL id;
     INTVAL type;
     PMC ** pos;
@@ -1427,7 +1427,7 @@ If not found, throw an exception.
 static UINTVAL
 id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    ASSERT_ARGS(id_from_pmc);
+    ASSERT_ARGS(id_from_pmc)
     UINTVAL id = 1;     /* first PMC in first arena */
     Small_Object_Arena *arena;
     Small_Object_Pool *pool;
@@ -1473,7 +1473,7 @@ Remembers the PMC for later processing.
 static void
 add_pmc_next_for_GC(SHIM_INTERP, ARGIN(PMC *pmc), ARGOUT(visit_info *info))
 {
-    ASSERT_ARGS(add_pmc_next_for_GC);
+    ASSERT_ARGS(add_pmc_next_for_GC)
     if (pmc->pmc_ext) {
         PMC_next_for_GC(info->mark_ptr) = pmc;
         info->mark_ptr = PMC_next_for_GC(pmc) = pmc;
@@ -1498,7 +1498,7 @@ static int
 next_for_GC_seen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         ARGIN(visit_info *info), ARGOUT(UINTVAL *id))
 {
-    ASSERT_ARGS(next_for_GC_seen);
+    ASSERT_ARGS(next_for_GC_seen)
     int seen = 0;
 
     if (PMC_IS_NULL(pmc)) {
@@ -1539,7 +1539,7 @@ Remembers the PMC to be processed later.
 static void
 add_pmc_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info))
 {
-    ASSERT_ARGS(add_pmc_todo_list);
+    ASSERT_ARGS(add_pmc_todo_list)
     list_push(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);
 }
 
@@ -1560,7 +1560,7 @@ static int
 todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
         ARGOUT(UINTVAL *id))
 {
-    ASSERT_ARGS(todo_list_seen);
+    ASSERT_ARGS(todo_list_seen)
     HashBucket * const b =
         parrot_hash_get_bucket(interp, (Hash *)PMC_struct_val(info->seen), pmc);
 
@@ -1594,7 +1594,7 @@ appropriate action.
 static void
 visit_next_for_GC(PARROT_INTERP, ARGIN(PMC* pmc), ARGIN(visit_info* info))
 {
-    ASSERT_ARGS(visit_next_for_GC);
+    ASSERT_ARGS(visit_next_for_GC)
     UINTVAL id;
     const int seen = next_for_GC_seen(interp, pmc, info, &id);
     UNUSED(seen);
@@ -1626,7 +1626,7 @@ Checks the seen PMC via the todo list.
 static void
 visit_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* info))
 {
-    ASSERT_ARGS(visit_todo_list);
+    ASSERT_ARGS(visit_todo_list)
     UINTVAL id;
     int seen;
 
@@ -1656,7 +1656,7 @@ Todo-list and seen handling is all in C<do_thaw()>.
 static void
 visit_todo_list_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* old), ARGIN(visit_info* info))
 {
-    ASSERT_ARGS(visit_todo_list_thaw);
+    ASSERT_ARGS(visit_todo_list_thaw)
     do_thaw(interp, old, info);
 }
 
@@ -1675,7 +1675,7 @@ static void
 visit_loop_next_for_GC(PARROT_INTERP, ARGIN(PMC *current),
         ARGIN(visit_info *info))
 {
-    ASSERT_ARGS(visit_loop_next_for_GC);
+    ASSERT_ARGS(visit_loop_next_for_GC)
     visit_next_for_GC(interp, current, info);
     if (current->pmc_ext) {
         PMC *prev = NULL;
@@ -1703,7 +1703,7 @@ static void
 visit_loop_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC *current),
         ARGIN(visit_info *info))
 {
-    ASSERT_ARGS(visit_loop_todo_list);
+    ASSERT_ARGS(visit_loop_todo_list)
     PMC        **list_item;
     List        *finish_list    = NULL;
     List * const todo           = (List *)PMC_data(info->todo);
@@ -1779,7 +1779,7 @@ Allocate image to some estimated size.
 static void
 create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 {
-    ASSERT_ARGS(create_image);
+    ASSERT_ARGS(create_image)
     STRING *array = CONST_STRING(interp, "array");
     STRING *hash  = CONST_STRING(interp, "hash");
     INTVAL  len;
@@ -1821,7 +1821,7 @@ PARROT_CAN_RETURN_NULL
 static PMC*
 run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
 {
-    ASSERT_ARGS(run_thaw);
+    ASSERT_ARGS(run_thaw)
     visit_info info;
     int dod_block = 0;
     const UINTVAL bufused = image->bufused;
@@ -1897,7 +1897,7 @@ PARROT_CAN_RETURN_NULL
 STRING*
 Parrot_freeze_at_destruct(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    ASSERT_ARGS(Parrot_freeze_at_destruct);
+    ASSERT_ARGS(Parrot_freeze_at_destruct)
     visit_info info;
 
     Parrot_block_GC_mark(interp);
@@ -1934,9 +1934,9 @@ PARROT_CAN_RETURN_NULL
 STRING*
 Parrot_freeze(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    ASSERT_ARGS(Parrot_freeze);
+    ASSERT_ARGS(Parrot_freeze)
 #if FREEZE_USE_NEXT_FOR_GC
-    ASSERT_ARGS(Parrot_freeze);
+    ASSERT_ARGS(Parrot_freeze)
     /*
      * we could do a DOD run here before, to free resources
      */
@@ -1977,7 +1977,7 @@ PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_thaw(PARROT_INTERP, ARGIN(STRING* image))
 {
-    ASSERT_ARGS(Parrot_thaw);
+    ASSERT_ARGS(Parrot_thaw)
     return run_thaw(interp, image, VISIT_THAW_NORMAL);
 }
 
@@ -1998,7 +1998,7 @@ PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_thaw_constants(PARROT_INTERP, ARGIN(STRING* image))
 {
-    ASSERT_ARGS(Parrot_thaw_constants);
+    ASSERT_ARGS(Parrot_thaw_constants)
     return run_thaw(interp, image, VISIT_THAW_CONSTANTS);
 }
 
@@ -2020,7 +2020,7 @@ PARROT_CAN_RETURN_NULL
 PMC*
 Parrot_clone(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    ASSERT_ARGS(Parrot_clone);
+    ASSERT_ARGS(Parrot_clone)
     return VTABLE_clone(interp, pmc);
 }
 

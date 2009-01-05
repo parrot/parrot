@@ -40,7 +40,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new(PARROT_INTERP)
 {
-    ASSERT_ARGS(key_new);
+    ASSERT_ARGS(key_new)
     return pmc_new(interp, enum_class_Key);
 }
 
@@ -61,7 +61,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_integer(PARROT_INTERP, INTVAL value)
 {
-    ASSERT_ARGS(key_new_integer);
+    ASSERT_ARGS(key_new_integer)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
@@ -87,7 +87,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_number(PARROT_INTERP, FLOATVAL value)
 {
-    ASSERT_ARGS(key_new_number);
+    ASSERT_ARGS(key_new_number)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
@@ -113,7 +113,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_string(PARROT_INTERP, ARGIN(STRING *value))
 {
-    ASSERT_ARGS(key_new_string);
+    ASSERT_ARGS(key_new_string)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
@@ -140,7 +140,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
 {
-    ASSERT_ARGS(key_new_cstring);
+    ASSERT_ARGS(key_new_cstring)
     return key_new_string(interp, string_from_cstring(interp, value, 0));
 }
 
@@ -161,7 +161,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
 {
-    ASSERT_ARGS(key_new_pmc);
+    ASSERT_ARGS(key_new_pmc)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_pmc_FLAG;
@@ -183,7 +183,7 @@ PARROT_EXPORT
 void
 key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
 {
-    ASSERT_ARGS(key_set_integer);
+    ASSERT_ARGS(key_set_integer)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_integer_FLAG;
     PMC_int_val(key)     = value;
@@ -206,7 +206,7 @@ PARROT_EXPORT
 void
 key_set_register(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
 {
-    ASSERT_ARGS(key_set_register);
+    ASSERT_ARGS(key_set_register)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_register_FLAG | flag;
     PMC_int_val(key)     = value;
@@ -229,7 +229,7 @@ PARROT_EXPORT
 void
 key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
 {
-    ASSERT_ARGS(key_set_number);
+    ASSERT_ARGS(key_set_number)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_number_FLAG;
     PMC_num_val(key)     = value;
@@ -252,7 +252,7 @@ PARROT_EXPORT
 void
 key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 {
-    ASSERT_ARGS(key_set_string);
+    ASSERT_ARGS(key_set_string)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_string_FLAG;
     PMC_str_val(key)     = value;
@@ -275,7 +275,7 @@ PARROT_EXPORT
 void
 key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
 {
-    ASSERT_ARGS(key_set_pmc);
+    ASSERT_ARGS(key_set_pmc)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_pmc_FLAG;
 
@@ -302,7 +302,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_type(SHIM_INTERP, ARGIN(const PMC *key))
 {
-    ASSERT_ARGS(key_type);
+    ASSERT_ARGS(key_type)
     return (PObj_get_FLAGS(key) & KEY_type_FLAGS) & ~KEY_register_FLAG;
 }
 
@@ -324,7 +324,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 key_integer(PARROT_INTERP, ARGIN(PMC *key))
 {
-    ASSERT_ARGS(key_integer);
+    ASSERT_ARGS(key_integer)
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         case KEY_hash_iterator_FLAGS:
@@ -379,7 +379,7 @@ PARROT_WARN_UNUSED_RESULT
 FLOATVAL
 key_number(PARROT_INTERP, ARGIN(PMC *key))
 {
-    ASSERT_ARGS(key_number);
+    ASSERT_ARGS(key_number)
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
         return PMC_num_val(key);
@@ -416,7 +416,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
-    ASSERT_ARGS(key_string);
+    ASSERT_ARGS(key_string)
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         /* remember to COW strings instead of returning them directly */
         case KEY_string_FLAG:
@@ -467,7 +467,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_pmc(PARROT_INTERP, ARGIN(PMC *key))
 {
-    ASSERT_ARGS(key_pmc);
+    ASSERT_ARGS(key_pmc)
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG | KEY_register_FLAG:
         return REG_PMC(interp, PMC_int_val(key));
@@ -493,7 +493,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
-    ASSERT_ARGS(key_next);
+    ASSERT_ARGS(key_next)
     return VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext
         ? (PMC *)PMC_data(key)
         : NULL;
@@ -521,7 +521,7 @@ PARROT_IGNORABLE_RESULT
 PMC *
 key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
 {
-    ASSERT_ARGS(key_append);
+    ASSERT_ARGS(key_append)
     PMC *tail = key1;
 
     while (PMC_data(tail)) {
@@ -548,7 +548,7 @@ PARROT_EXPORT
 void
 key_mark(PARROT_INTERP, ARGIN(PMC *key))
 {
-    ASSERT_ARGS(key_mark);
+    ASSERT_ARGS(key_mark)
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
 
     if (flags == KEY_string_FLAG)
@@ -586,7 +586,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 {
-    ASSERT_ARGS(key_set_to_string);
+    ASSERT_ARGS(key_set_to_string)
     STRING * const semicolon = CONST_STRING(interp, " ; ");
     STRING * const quote     = CONST_STRING(interp, "'");
     STRING        *value     = string_from_cstring(interp, "[ ", 2);

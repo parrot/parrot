@@ -46,7 +46,7 @@ PARROT_EXPORT
 void
 string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
 {
-    ASSERT_ARGS(string_set_data_directory);
+    ASSERT_ARGS(string_set_data_directory)
 #if PARROT_HAS_ICU
     u_setDataDirectory(dir);
 
@@ -84,7 +84,7 @@ Parrot_UInt4
 string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         ARGMOD(STRING *string))
 {
-    ASSERT_ARGS(string_unescape_one);
+    ASSERT_ARGS(string_unescape_one)
     UINTVAL workchar = 0;
     UINTVAL charcount = 0;
     const UINTVAL len = string_length(interp, string);
@@ -322,7 +322,7 @@ PARROT_CONST_FUNCTION
 INTVAL
 Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 {
-    ASSERT_ARGS(Parrot_char_digit_value);
+    ASSERT_ARGS(Parrot_char_digit_value)
 #if PARROT_HAS_ICU
     return u_charDigitValue(character);
 #else
@@ -349,7 +349,7 @@ PARROT_CANNOT_RETURN_NULL
 char *
 str_dup(ARGIN(const char *old))
 {
-    ASSERT_ARGS(str_dup);
+    ASSERT_ARGS(str_dup)
     const size_t bytes = strlen(old) + 1;
     char * const copy = (char *)mem_sys_allocate(bytes);
     memcpy(copy, old, bytes);
@@ -376,7 +376,7 @@ PARROT_CANNOT_RETURN_NULL
 char *
 str_dup_remove_quotes(ARGIN(const char *old))
 {
-    ASSERT_ARGS(str_dup_remove_quotes);
+    ASSERT_ARGS(str_dup_remove_quotes)
     const size_t oldlen = strlen(old) + 1;
 
     /* 2 for the beginning and ending quote chars */

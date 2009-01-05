@@ -48,11 +48,11 @@ sub check_asserts {
             if($line =~ /^#define ASSERT_ARGS_([_a-zA-Z0-9]+)\s/s) {
                 push(@defines, $1);
             }
-            if($line =~ /^\s+ASSERT_ARGS\(([_a-zA-Z0-9]+)\);/) {
+            if($line =~ /^\s+ASSERT_ARGS\(([_a-zA-Z0-9]+)\)$/) {
                 my $func = $1;
                 $usages{$func} = 1;
                 my $fulltext = join('',@lines);
-                if($fulltext !~ /\n\{\s*ASSERT_ARGS\($func\);/s) {
+                if($fulltext !~ /\n\{\s*ASSERT_ARGS\($func\)\n/s) {
                     push(@offsets, $func);
                 }
             }

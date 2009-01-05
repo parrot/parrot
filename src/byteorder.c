@@ -47,7 +47,7 @@ PARROT_CONST_FUNCTION
 INTVAL
 fetch_iv_le(INTVAL w)
 {
-    ASSERT_ARGS(fetch_iv_le);
+    ASSERT_ARGS(fetch_iv_le)
 #if !PARROT_BIGENDIAN
     return w;
 #else
@@ -85,7 +85,7 @@ PARROT_CONST_FUNCTION
 INTVAL
 fetch_iv_be(INTVAL w)
 {
-    ASSERT_ARGS(fetch_iv_be);
+    ASSERT_ARGS(fetch_iv_be)
 #if PARROT_BIGENDIAN
     return w;
 #else
@@ -121,7 +121,7 @@ PARROT_CONST_FUNCTION
 opcode_t
 fetch_op_be(opcode_t w)
 {
-    ASSERT_ARGS(fetch_op_be);
+    ASSERT_ARGS(fetch_op_be)
 #if PARROT_BIGENDIAN
     return w;
 #else
@@ -159,7 +159,7 @@ PARROT_CONST_FUNCTION
 opcode_t
 fetch_op_le(opcode_t w)
 {
-    ASSERT_ARGS(fetch_op_le);
+    ASSERT_ARGS(fetch_op_le)
 #if !PARROT_BIGENDIAN
     return w;
 #else
@@ -207,7 +207,7 @@ Converts a 4-byte big-endian buffer C<b> into a little-endian C<rb>.
 void
 fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_4);
+    ASSERT_ARGS(fetch_buf_be_4)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
@@ -231,7 +231,7 @@ Converts a 4-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 void
 fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_4);
+    ASSERT_ARGS(fetch_buf_le_4)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
@@ -255,7 +255,7 @@ Converts an 8-byte big-endian buffer C<b> into a little-endian buffer C<rb>
 void
 fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_8);
+    ASSERT_ARGS(fetch_buf_be_8)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
@@ -283,7 +283,7 @@ Converts an 8-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
 void
 fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_8);
+    ASSERT_ARGS(fetch_buf_le_8)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
@@ -311,7 +311,7 @@ Converts a 12-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 void
 fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_12);
+    ASSERT_ARGS(fetch_buf_le_12)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
@@ -343,7 +343,7 @@ Converts a 12-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 void
 fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_12);
+    ASSERT_ARGS(fetch_buf_be_12)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
@@ -375,7 +375,7 @@ Converts a 16-byte little-endian buffer C<b> into a big-endian buffer C<b>.
 void
 fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_le_16);
+    ASSERT_ARGS(fetch_buf_le_16)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
@@ -411,7 +411,7 @@ Converts a 16-byte big-endian buffer C<b> into a little-endian buffer C<b>.
 void
 fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
-    ASSERT_ARGS(fetch_buf_be_16);
+    ASSERT_ARGS(fetch_buf_be_16)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else

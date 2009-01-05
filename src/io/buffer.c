@@ -47,7 +47,7 @@ Initialize buffering on STDOUT and STDIN.
 INTVAL
 Parrot_io_init_buffer(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_io_init_buffer);
+    ASSERT_ARGS(Parrot_io_init_buffer)
     if (Parrot_io_STDOUT(interp))
         Parrot_io_setlinebuf(interp, Parrot_io_STDOUT(interp));
 
@@ -70,7 +70,7 @@ Set the buffering mode for the filehandle.
 void
 Parrot_io_setbuf(PARROT_INTERP, ARGMOD(PMC *filehandle), size_t bufsize)
 {
-    ASSERT_ARGS(Parrot_io_setbuf);
+    ASSERT_ARGS(Parrot_io_setbuf)
     INTVAL filehandle_flags = Parrot_io_get_flags(interp, filehandle);
     INTVAL         buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
     unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
@@ -140,7 +140,7 @@ Set the file handle to line buffering mode.
 INTVAL
 Parrot_io_setlinebuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_setlinebuf);
+    ASSERT_ARGS(Parrot_io_setlinebuf)
     INTVAL filehandle_flags = Parrot_io_get_flags(interp, filehandle);
 
     /* already linebuffering */
@@ -172,7 +172,7 @@ Flush the I/O buffer for a given filehandle object.
 INTVAL
 Parrot_io_flush_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_flush_buffer);
+    ASSERT_ARGS(Parrot_io_flush_buffer)
     long wrote;
     size_t to_write;
     STRING fake;
@@ -232,7 +232,7 @@ The buffer layer's C<Fill> function.
 size_t
 Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
-    ASSERT_ARGS(Parrot_io_fill_readbuf);
+    ASSERT_ARGS(Parrot_io_fill_readbuf)
     size_t   got;
     STRING   fake;
     STRING  *s    = &fake;
@@ -276,7 +276,7 @@ size_t
 Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
               ARGIN(STRING **buf))
 {
-    ASSERT_ARGS(Parrot_io_read_buffer);
+    ASSERT_ARGS(Parrot_io_read_buffer)
     unsigned char *out_buf, *buffer_start, *buffer_next, *buffer_end;
     STRING        *s;
     size_t         len;
@@ -406,7 +406,7 @@ size_t
 Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         ARGOUT(STRING **buf))
 {
-    ASSERT_ARGS(Parrot_io_peek_buffer);
+    ASSERT_ARGS(Parrot_io_peek_buffer)
     unsigned char *buffer_next;
     STRING * const s            = Parrot_io_make_string(interp, buf, 1);
     UINTVAL        len          = 1;
@@ -464,7 +464,7 @@ that is what is required.
 size_t
 Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING **buf))
 {
-    ASSERT_ARGS(Parrot_io_readline_buffer);
+    ASSERT_ARGS(Parrot_io_readline_buffer)
     size_t l;
     unsigned char *out_buf;
     unsigned char *buf_start;
@@ -566,7 +566,7 @@ The buffer layer's C<Write> function.
 size_t
 Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
 {
-    ASSERT_ARGS(Parrot_io_write_buffer);
+    ASSERT_ARGS(Parrot_io_write_buffer)
     size_t avail;
     void * const buffer = s->strstart;
     const size_t len = s->bufused;
@@ -674,7 +674,7 @@ PIOOFF_T
 Parrot_io_seek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         PIOOFF_T offset, INTVAL whence)
 {
-    ASSERT_ARGS(Parrot_io_seek_buffer);
+    ASSERT_ARGS(Parrot_io_seek_buffer)
     PIOOFF_T newpos;
     PIOOFF_T file_pos = Parrot_io_get_file_position(interp, filehandle);
     unsigned char *buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
@@ -733,7 +733,7 @@ the new architecture.
 static INTVAL
 io_is_end_of_line(ARGIN(const char *c))
 {
-    ASSERT_ARGS(io_is_end_of_line);
+    ASSERT_ARGS(io_is_end_of_line)
     if ((*(c)) == '\n')
         return 1;
 

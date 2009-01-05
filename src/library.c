@@ -155,7 +155,7 @@ also F<include/parrot/library.h> for C<enum_lib_paths>.
 void
 parrot_init_library_paths(PARROT_INTERP)
 {
-    ASSERT_ARGS(parrot_init_library_paths);
+    ASSERT_ARGS(parrot_init_library_paths)
     PMC *paths;
     STRING *entry;
 
@@ -250,7 +250,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 get_search_paths(PARROT_INTERP, enum_lib_paths which)
 {
-    ASSERT_ARGS(get_search_paths);
+    ASSERT_ARGS(get_search_paths)
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
             IGLOBALS_LIB_PATHS);
@@ -273,7 +273,7 @@ PARROT_PURE_FUNCTION
 static int
 is_abs_path(ARGIN(const STRING *file))
 {
-    ASSERT_ARGS(is_abs_path);
+    ASSERT_ARGS(is_abs_path)
     const char * const file_name = file->strstart;
     if (file->strlen <= 1)
         return 0;
@@ -312,7 +312,7 @@ Converts a path with forward slashes to one with backward slashes.
 static void
 cnv_to_win32_filesep(ARGMOD(STRING *path))
 {
-    ASSERT_ARGS(cnv_to_win32_filesep);
+    ASSERT_ARGS(cnv_to_win32_filesep)
     char* cnv;
 
     PARROT_ASSERT(path->encoding == Parrot_fixed_8_encoding_ptr ||
@@ -343,7 +343,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
 {
-    ASSERT_ARGS(path_finalize);
+    ASSERT_ARGS(path_finalize)
 
     /* TODO create a string API that just does that
      *      a lot of ICU lib functions also need 0-terminated strings
@@ -380,7 +380,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 {
-    ASSERT_ARGS(path_guarantee_trailing_separator);
+    ASSERT_ARGS(path_guarantee_trailing_separator)
     STRING * const path_separator_string = string_chr(interp, path_separator);
 
     /* make sure the path has a trailing slash before appending the file */
@@ -408,7 +408,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_append(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 {
-    ASSERT_ARGS(path_append);
+    ASSERT_ARGS(path_append)
     l_path = path_guarantee_trailing_separator(interp, l_path);
     l_path = string_append(interp, l_path, r_path);
 
@@ -432,7 +432,7 @@ PARROT_CANNOT_RETURN_NULL
 static STRING*
 path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 {
-    ASSERT_ARGS(path_concat);
+    ASSERT_ARGS(path_concat)
     STRING* join;
 
     join = string_copy(interp, l_path);
@@ -470,7 +470,7 @@ PARROT_CAN_RETURN_NULL
 static STRING*
 try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 {
-    ASSERT_ARGS(try_load_path);
+    ASSERT_ARGS(try_load_path)
     STRING *final;
 
     final = string_copy(interp, path);
@@ -501,7 +501,7 @@ PARROT_CAN_RETURN_NULL
 static STRING*
 try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 {
-    ASSERT_ARGS(try_bytecode_extensions);
+    ASSERT_ARGS(try_bytecode_extensions)
     STRING *with_ext, *result;
 
     int guess;
@@ -555,7 +555,7 @@ Parrot_add_library_path(PARROT_INTERP,
         ARGIN(const char *path),
         enum_lib_paths which)
 {
-    ASSERT_ARGS(Parrot_add_library_path);
+    ASSERT_ARGS(Parrot_add_library_path)
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
         IGLOBALS_LIB_PATHS);
@@ -593,7 +593,7 @@ STRING*
 Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
         enum_runtime_ft type)
 {
-    ASSERT_ARGS(Parrot_locate_runtime_file_str);
+    ASSERT_ARGS(Parrot_locate_runtime_file_str)
     STRING *prefix;
     STRING *full_name;
     PMC    *paths;
@@ -648,7 +648,7 @@ char*
 Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
         enum_runtime_ft type)
 {
-    ASSERT_ARGS(Parrot_locate_runtime_file);
+    ASSERT_ARGS(Parrot_locate_runtime_file)
     STRING * const file   = string_from_cstring(interp, file_name, 0);
     STRING * const result = Parrot_locate_runtime_file_str(interp, file, type);
     /*
@@ -682,7 +682,7 @@ PARROT_CANNOT_RETURN_NULL
 char*
 Parrot_get_runtime_prefix(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_get_runtime_prefix);
+    ASSERT_ARGS(Parrot_get_runtime_prefix)
     int     free_it;
     char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
 
@@ -717,7 +717,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_get_runtime_path(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_get_runtime_path);
+    ASSERT_ARGS(Parrot_get_runtime_path)
     int     free_it;
     char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
     STRING *result;
@@ -760,7 +760,7 @@ STRING *
 parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
         ARGOUT(STRING **wo_ext), ARGOUT(STRING **ext))
 {
-    ASSERT_ARGS(parrot_split_path_ext);
+    ASSERT_ARGS(parrot_split_path_ext)
     STRING * const slash1 = CONST_STRING(interp, "/");
     STRING * const slash2 = CONST_STRING(interp, "\\");
     STRING * const dot    = CONST_STRING(interp, ".");

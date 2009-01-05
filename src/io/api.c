@@ -52,7 +52,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)
 {
-    ASSERT_ARGS(Parrot_io_new_pmc);
+    ASSERT_ARGS(Parrot_io_new_pmc)
     PMC * const new_io = pmc_new(interp, enum_class_FileHandle);
 
     Parrot_io_set_flags(interp, new_io, flags);
@@ -82,7 +82,7 @@ PMC *
 Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         ARGIN(STRING *path), ARGIN_NULLOK(STRING *mode))
 {
-    ASSERT_ARGS(Parrot_io_open);
+    ASSERT_ARGS(Parrot_io_open)
     PMC *new_filehandle;
 
     if (PMC_IS_NULL(pmc))
@@ -117,7 +117,7 @@ PMC *
 Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
         ARGIN(STRING *sflags))
 {
-    ASSERT_ARGS(Parrot_io_fdopen);
+    ASSERT_ARGS(Parrot_io_fdopen)
     PMC *new_filehandle;
     INTVAL flags;
 
@@ -153,7 +153,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_close);
+    ASSERT_ARGS(Parrot_io_close)
     INTVAL result;
 
     if (PMC_IS_NULL(pmc))
@@ -178,7 +178,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_is_closed);
+    ASSERT_ARGS(Parrot_io_is_closed)
     INTVAL result;
 
     if (PMC_IS_NULL(pmc))
@@ -202,7 +202,7 @@ PARROT_EXPORT
 void
 Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_flush);
+    ASSERT_ARGS(Parrot_io_flush)
     if (PMC_IS_NULL(pmc))
         return;
 
@@ -226,7 +226,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 {
-    ASSERT_ARGS(Parrot_io_reads);
+    ASSERT_ARGS(Parrot_io_reads)
     STRING *result;
     Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "read"), "I->S",
             length, &result);
@@ -250,7 +250,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_readline);
+    ASSERT_ARGS(Parrot_io_readline)
     STRING *result;
     Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "readline"), "->S",
             &result);
@@ -272,7 +272,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size_t length)
 {
-    ASSERT_ARGS(Parrot_io_write);
+    ASSERT_ARGS(Parrot_io_write)
     DECL_CONST_CAST;
     INTVAL result;
     STRING fake;
@@ -306,7 +306,7 @@ PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
 {
-    ASSERT_ARGS(Parrot_io_seek);
+    ASSERT_ARGS(Parrot_io_seek)
     if (Parrot_io_is_closed(interp, pmc))
         return -1;
 
@@ -328,7 +328,7 @@ PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_tell);
+    ASSERT_ARGS(Parrot_io_tell)
     if (Parrot_io_is_closed(interp, pmc))
         return -1;
 
@@ -351,7 +351,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 {
-    ASSERT_ARGS(Parrot_io_peek);
+    ASSERT_ARGS(Parrot_io_peek)
     if (Parrot_io_is_closed(interp, pmc))
         return -1;
 
@@ -374,7 +374,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_eof);
+    ASSERT_ARGS(Parrot_io_eof)
     INTVAL result;
 
     /* io could be null here, but rather than return a negative error
@@ -404,7 +404,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 {
-    ASSERT_ARGS(Parrot_io_puts);
+    ASSERT_ARGS(Parrot_io_puts)
     return Parrot_io_write(interp, pmc, s, strlen(s));
 }
 
@@ -422,7 +422,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
 {
-    ASSERT_ARGS(Parrot_io_putps);
+    ASSERT_ARGS(Parrot_io_putps)
     INTVAL result;
 
     if (PMC_IS_NULL(pmc))
@@ -449,7 +449,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 {
-    ASSERT_ARGS(Parrot_io_fprintf);
+    ASSERT_ARGS(Parrot_io_fprintf)
     va_list args;
     INTVAL ret;
 
@@ -476,7 +476,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_printf(PARROT_INTERP, ARGIN(const char *s), ...)
 {
-    ASSERT_ARGS(Parrot_io_printf);
+    ASSERT_ARGS(Parrot_io_printf)
     va_list args;
     INTVAL ret;
 
@@ -513,7 +513,7 @@ PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 {
-    ASSERT_ARGS(Parrot_io_eprintf);
+    ASSERT_ARGS(Parrot_io_eprintf)
     va_list args;
     INTVAL ret;
 
@@ -551,7 +551,7 @@ PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
 Parrot_io_getfd(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_getfd);
+    ASSERT_ARGS(Parrot_io_getfd)
     return Parrot_io_get_os_handle(interp, pmc);
 }
 
@@ -570,7 +570,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_is_tty(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_is_tty);
+    ASSERT_ARGS(Parrot_io_is_tty)
     if (Parrot_io_is_closed(interp, pmc))
         return 0;
 
@@ -599,7 +599,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_STDIN(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_io_STDIN);
+    ASSERT_ARGS(Parrot_io_STDIN)
     return _PIO_STDIN(interp);
 }
 
@@ -619,7 +619,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_STDOUT(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_io_STDOUT);
+    ASSERT_ARGS(Parrot_io_STDOUT)
     return _PIO_STDOUT(interp);
 }
 
@@ -639,7 +639,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_STDERR(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_io_STDERR);
+    ASSERT_ARGS(Parrot_io_STDERR)
     return _PIO_STDERR(interp);
 }
 
@@ -665,7 +665,7 @@ PARROT_EXPORT
 PIOOFF_T
 Parrot_io_make_offset(INTVAL offset)
 {
-    ASSERT_ARGS(Parrot_io_make_offset);
+    ASSERT_ARGS(Parrot_io_make_offset)
     return offset;
 }
 
@@ -683,7 +683,7 @@ This allows 64-bit seeks with only 32-bit C<INTVALS>.
 PIOOFF_T
 Parrot_io_make_offset32(INTVAL hi, INTVAL lo)
 {
-    ASSERT_ARGS(Parrot_io_make_offset32);
+    ASSERT_ARGS(Parrot_io_make_offset32)
     return ((PIOOFF_T)hi << 31) | lo;
 }
 
@@ -700,7 +700,7 @@ Returns the return value of the C<get_integer> vtable method on C<*pmc>.
 PIOOFF_T
 Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(Parrot_io_make_offset_pmc);
+    ASSERT_ARGS(Parrot_io_make_offset_pmc)
     return VTABLE_get_integer(interp, pmc);
 }
 

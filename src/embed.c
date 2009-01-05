@@ -591,7 +591,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
-    ASSERT_ARGS(setup_argv);
+    ASSERT_ARGS(setup_argv)
     INTVAL i;
     PMC   *userargv;
 
@@ -639,7 +639,7 @@ Sort function for profile data. Sorts by time.
 static int
 prof_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 {
-    ASSERT_ARGS(prof_sort_f);
+    ASSERT_ARGS(prof_sort_f)
     const FLOATVAL timea = ((const ProfData *)a)->time;
     const FLOATVAL timeb = ((const ProfData *)b)->time;
 
@@ -667,7 +667,7 @@ PARROT_CANNOT_RETURN_NULL
 static const char *
 op_name(PARROT_INTERP, int k)
 {
-    ASSERT_ARGS(op_name);
+    ASSERT_ARGS(op_name)
     switch (k) {
         case PARROT_PROF_DOD_p1:
             return "DOD_mark_root";
@@ -703,7 +703,7 @@ measured with time C<parrot -b>.
 static FLOATVAL
 calibrate(PARROT_INTERP)
 {
-    ASSERT_ARGS(calibrate);
+    ASSERT_ARGS(calibrate)
     size_t   count  = 1000000;
     size_t   n      = count;
     opcode_t code[] = { 1 };      /* noop */
@@ -734,7 +734,7 @@ Prints out a profile listing.
 static void
 print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 {
-    ASSERT_ARGS(print_profile);
+    ASSERT_ARGS(print_profile)
     RunProfile * const profile = interp->profile;
 
     if (profile) {
@@ -818,7 +818,7 @@ Prints GC info.
 static void
 print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 {
-    ASSERT_ARGS(print_debug);
+    ASSERT_ARGS(print_debug)
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         /* Give souls brave enough to activate debugging an earful about GC. */
 
@@ -846,7 +846,7 @@ PARROT_CANNOT_RETURN_NULL
 static PMC*
 set_current_sub(PARROT_INTERP)
 {
-    ASSERT_ARGS(set_current_sub);
+    ASSERT_ARGS(set_current_sub)
     opcode_t i;
     PMC *sub_pmc;
 
