@@ -217,7 +217,7 @@ $(PHP_GROUP): $(PMC_SOURCES)
 test:     all
 	- $(PERL) t/harness
 
-test-all: all test-php test
+test-all: all test-php test test-pmc
 
 test-php:
 	- $(PERL) t/harness --with-php
@@ -231,7 +231,7 @@ smoke : build
 # make sure debugging output is disabled while running the tests
 export PMCDEBUG=
 
-test-pmc: pmc
+test-pmc: build-pmc
 	@ prove -I../../lib t/pmc
 
 # this does not work yet
