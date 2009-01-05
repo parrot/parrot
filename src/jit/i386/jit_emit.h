@@ -1836,72 +1836,24 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 #  define NATIVECODE jit_info->native_ptr
 #  define CUR_OPCODE jit_info->cur_op
 #  define CONST(i) PCONST(jit_info->cur_op[(i)])
-static void
+void
 jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-{
-    PMC *sig_pmc;
-    INTVAL *sig_bits, i, n;
-
-    sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
-    sig_bits = SIG_ARRAY(sig_pmc);
-    n = SIG_ELEMS(sig_pmc);
-    jit_info->n_args = n;
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-    for (i = 0; i < n; ++i) {
-        switch (sig_bits[i] & PARROT_ARG_TYPE_MASK) {
-            case PARROT_ARG_INTVAL:
-                emitm_movl_m_r(interp, NATIVECODE, MAP(2+i), emit_EAX, emit_None,
-                        1, 4 + i*4);
-                break;
-            case PARROT_ARG_FLOATVAL:
-                emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EAX, emit_None,
-                        1, 4+ i*4);
-                jit_emit_fload_mb_n(interp, NATIVECODE, emit_EAX, 0);
-                emitm_fstp(NATIVECODE, (MAP(2+i) + 1));
-                if (i < n - 1)
-                    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EBP,
-                            emit_None, 1, 16);
-                break;
-            default:
-                break;
-        }
-    }
-}
+;
 
 /*
  * preserve registers
  * a) all callee saved on function entry
  */
-static void
-jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-{
-    int i, used_i, save_i;
-    const jit_arch_regs *reg_info;
 
-    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type];
-    save_i = reg_info->n_preserved_I;
-    for (i = save_i; i < used_i; ++i) {
-        emitm_pushl_r(jit_info->native_ptr, reg_info->map_I[i]);
-    }
-}
+ void
+jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
+;
 
 /* restore saved regs, see above */
-static void
+
+void
 jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-{
-
-    int i, used_i, save_i;
-    const jit_arch_regs *reg_info;
-
-    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type];
-    save_i = reg_info->n_preserved_I;
-    /* note - reversed order of jit_save_regs  */
-    for (i = used_i - 1; i >= save_i; --i) {
-        emitm_popl_r(jit_info->native_ptr, reg_info->map_I[i]);
-    }
-}
+;
 
 /*
  * preserve registers around a functioncall
@@ -1912,235 +1864,24 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
  *      use jit_emit_mov_RM_{in} functions (load/store base indexed)
  *      and a macro to retrive sp
  */
-static int
+
+int
 jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
-{
-    int i, used_i, used_n;
-    const jit_arch_regs *reg_info;
+;
 
-    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
-    used_n = CONTEXT(interp)->n_regs_used[REGNO_NUM];
-    jit_emit_sub_ri_i(interp, jit_info->native_ptr, emit_ESP,
-            (used_i * sizeof (INTVAL) + used_n * sizeof (FLOATVAL)));
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type];
-    for (i = 0; i < used_i; ++i) {
-        /* XXX need 2 skip vars */
-        if (reg_info->map_I[i] == skip)
-            continue;
-        emitm_movl_r_m(interp, NATIVECODE, reg_info->map_I[i], emit_ESP,
-                            emit_None, 1,
-                            (used_n * sizeof (FLOATVAL) +
-                             i      * sizeof (INTVAL)));
-    }
-    for (i = 0; i < used_n; ++i) {
-        if (reg_info->map_F[i] == skip)
-            continue;
-        emitm_fld(NATIVECODE, reg_info->map_F[i]);
-        jit_emit_fstore_mb_n(interp, NATIVECODE, emit_ESP, (i * sizeof (FLOATVAL)));
-    }
-    return used_n;
-}
-
-static void
+void
 jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int skip)
-{
+;
 
-    int i, used_i, used_n;
-    const jit_arch_regs *reg_info;
-
-    used_i = CONTEXT(interp)->n_regs_used[REGNO_INT];
-    used_n = CONTEXT(interp)->n_regs_used[REGNO_NUM];
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type];
-
-    for (i = 0; i < used_i; ++i) {
-        if (reg_info->map_I[i] == skip)
-            continue;
-        emitm_movl_m_r(interp, NATIVECODE, reg_info->map_I[i], emit_ESP,
-                            emit_None, 1,
-                            (used_n * sizeof (FLOATVAL) +
-                             i      * sizeof (INTVAL)));
-    }
-    for (i = 0; i < used_n; ++i) {
-        if (reg_info->map_F[i] == skip)
-            continue;
-        jit_emit_fload_mb_n(interp, NATIVECODE, emit_ESP, (i * sizeof (FLOATVAL)));
-        emitm_fstp(NATIVECODE, (1+reg_info->map_F[i]));
-    }
-
-    jit_emit_add_ri_i(interp, jit_info->native_ptr, emit_ESP,
-            (used_i * sizeof (INTVAL) + used_n * sizeof (FLOATVAL)));
-}
-
-static void
+void
 jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-        int recursive)
-{
-    PMC *sig_pmc;
-    INTVAL *sig_bits, sig;
+        int recursive);
 
-    sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
-    if (!SIG_ELEMS(sig_pmc))
-        return;
-    sig_bits = SIG_ARRAY(sig_pmc);
-    sig = sig_bits[0];
-    if (!recursive) {
-        /* mov 16(%ebp), %eax - fetch args ptr */
-        emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
-        emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EAX, emit_None, 1, 0);
-    }
-    /*
-     * recursive returns according to ABI */
-    switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
-        case PARROT_ARG_INTVAL:
-            if (recursive) {
-                jit_emit_mov_rr_i(NATIVECODE, emit_EAX, MAP(2));
-            }
-            else {
-                emitm_movl_r_m(interp, NATIVECODE, MAP(2), emit_EAX, 0, 1, 0);
-            }
-            break;
-        case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
-            if (recursive) {
-                jit_emit_mov_ri_i(interp, NATIVECODE, emit_EAX, CUR_OPCODE[2]);
-            }
-            else {
-                emitm_movl_i_m(NATIVECODE, CUR_OPCODE[2], emit_EAX, 0, 1, 0);
-            }
-            break;
-        case PARROT_ARG_FLOATVAL:
-            if (recursive) {
-                jit_emit_mov_rr_n(NATIVECODE, FSR1, MAP(2));
-            }
-            else {
-                emitm_fld(NATIVECODE, MAP(2));
-                jit_emit_fstore_mb_n(interp, NATIVECODE, emit_EAX, 0);
-            }
-            break;
-        case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
-            if (recursive) {
-                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &CONST(2)->u.number);
-            }
-            else {
-                jit_emit_mov_ri_n(interp, NATIVECODE, FSR1, &CONST(2)->u.number);
-                jit_emit_fstore_mb_n(interp, NATIVECODE, emit_EAX, 0);
-            }
-            break;
-        default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "set_returns_jit - unknown typ");
-            break;
-    }
-}
-
-static void
+void
 jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive)
-{
-    PMC *sig_args, *sig_params, *sig_result;
-    INTVAL *sig_bits, sig, i, n;
-    PackFile_Constant ** constants;
-    opcode_t *params, *result;
-    char params_map;
-    int skip, used_n;
-    char collision[16];
-    const jit_arch_regs *reg_info;
-
-    reg_info = &jit_info->arch_info->regs[jit_info->code_type];
-
-    /* create args array */
-    if (!recursive)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "set_args_jit - can't do that yet ");
-
-    constants = CONTEXT(interp)->constants;
-    sig_args  = constants[CUR_OPCODE[1]]->u.key;
-
-    if (!SIG_ELEMS(sig_args))
-        return;
-    params = jit_info->optimizer->sections->begin;
-    sig_params = constants[params[1]]->u.key;
-    ASSERT_SIG_PMC(sig_params);
-    sig_bits = SIG_ARRAY(sig_args);
-    n = SIG_ELEMS(sig_args);
-    /*
-     * preserve registers - need get_results, because we skip the
-     * return value
-     */
-    result = CUR_OPCODE + 2 + n + 3; /* set_args, set_p_pc */
-    PARROT_ASSERT(*result == PARROT_OP_get_results_pc);
-    sig_result = constants[result[1]]->u.key;
-    ASSERT_SIG_PMC(sig_result);
-
-    if (!SIG_ELEMS(sig_result))
-        skip = -1;
-    else
-        skip = MAP(2 + n + 3 + 2);
-    used_n = jit_save_regs_call(jit_info, interp, skip);
-    memset(collision, 0, 16);
-    for (i = 0; i < n; ++i) {
-        sig = sig_bits[i];
-        /* move args to params regs */
-        params_map = jit_info->optimizer->map_branch[2 + i];
-        switch (sig & (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT)) {
-            case PARROT_ARG_INTVAL:
-                /* if the arg was already set,
-                 * we can't use the src again - fetch from stack
-                 *
-                 * XXX skip
-                 *
-                 * TODO write a general reg_move
-                 */
-                if (collision[(int)MAP(2+i)]) {
-                    int j;
-                    for (j = 0; j < reg_info->n_mapped_I; ++j) {
-                        if (reg_info->map_I[j] == MAP(2+i)) {
-                            emitm_movl_m_r(interp, NATIVECODE, params_map, emit_ESP,
-                                    emit_None, 1,
-                                    (used_n * sizeof (FLOATVAL) +
-                                     j  * sizeof (INTVAL)));
-                            break;
-                        }
-                    }
-                }
-                else {
-                    if (params_map != MAP(2+i)) {
-                        jit_emit_mov_rr_i(NATIVECODE, params_map, MAP(2 + i));
-                    }
-                }
-                collision[(int)params_map] = 1;
-                break;
-            case PARROT_ARG_INTVAL|PARROT_ARG_CONSTANT:
-                /* TODO move constants last */
-                jit_emit_mov_ri_i(interp, NATIVECODE, params_map, CUR_OPCODE[2 + i]);
-                break;
-            case PARROT_ARG_FLOATVAL:
-                if (collision[(int)MAP(2+i)]) {
-                    int j;
-                    for (j = 0; j < reg_info->n_mapped_F; ++j) {
-                        if (reg_info->map_F[j] == MAP(2+i)) {
-                            jit_emit_fload_mb_n(interp, NATIVECODE, emit_ESP, (j * sizeof (FLOATVAL)));
-                            emitm_fstp(NATIVECODE, (1+params_map));
-                            break;
-                        }
-                    }
-                }
-                else {
-                    jit_emit_mov_rr_n(NATIVECODE, params_map, MAP(2 + i));
-                }
-                collision[(int)params_map] = 1;
-                break;
-            case PARROT_ARG_FLOATVAL|PARROT_ARG_CONSTANT:
-                jit_emit_mov_ri_n(interp, NATIVECODE, params_map,
-                        &CONST(2 + i)->u.number);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                    "set_args_jit - unknown type");
-                break;
-        }
-    }
-}
+;
 
 #  undef CONST
 /*
