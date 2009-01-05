@@ -217,6 +217,12 @@ sub runstep {
                 optimize  => '',
             );
         }
+        elsif ( $make =~ /mingw32-make/i ) {
+            ; # Vanilla Perl
+            $conf->data->set(
+                blib_dir  => 'blib\\lib'
+            );
+        }
         else {
             warn "unknown configuration";
         }
