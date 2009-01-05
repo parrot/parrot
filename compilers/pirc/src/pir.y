@@ -587,6 +587,7 @@ pir_chunk         : sub_def
                   | location_directive
                   | annotation
                   | macro_definition
+                  | error_stat
                   ;
 
 

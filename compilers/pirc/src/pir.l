@@ -380,6 +380,10 @@ REGISTER       "$"[SNIP]{DIGITS}
 ":flat"           { return TK_FLAG_FLAT; }
 ":invocant"       { return TK_FLAG_INVOCANT; }
 
+":"{IDENT}        { yypirerror(yyscanner, yyget_extra(yyscanner),
+                               "unrecognized sub flag: '%s'", yytext);
+                  }
+
 
 {Q_STRING}        { /* copy the string, remove the quotes. */
                     yylval->sval = dupstrn(yyget_extra(yyscanner), yytext + 1, yyleng - 2);
