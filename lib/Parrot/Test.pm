@@ -962,7 +962,7 @@ sub _generate_test_functions {
                 my $libparrot =
                     $PConfig{parrot_is_shared}
                     ? ("$PConfig{rpath_blib} " .
-                      ($^O =~ m/MSWin32/ and $PConfig{cc} eq 'cl'
+                      (($^O =~ m/MSWin32/ and $PConfig{cc} eq 'cl')
                          ? "" : "-L$PConfig{blib_dir} "))
                     . (
                       $^O =~ m/MSWin32/
