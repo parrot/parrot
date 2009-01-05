@@ -960,7 +960,9 @@ sub _generate_test_functions {
                 my $iculibs = $PConfig{has_icu} ? $PConfig{icu_shared} : q{};
                 my $libparrot =
                     $PConfig{parrot_is_shared}
-                    ? "$PConfig{rpath_blib} -L$PConfig{blib_dir} "
+                    ? ("$PConfig{rpath_blib} " .
+                      ($^O =~ m/MSWin32/ and $PConfig{cc} eq 'cl'
+                         ? "" : "-L$PConfig{blib_dir} "))
                     . (
                       $^O =~ m/MSWin32/
                     ? $PConfig{libparrot_ldflags}
