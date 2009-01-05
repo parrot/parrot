@@ -1796,7 +1796,7 @@ method               : identifier
                      | TK_SREG
                            { $$ = expr_from_target(lexer, new_reg(lexer, STRING_TYPE, $1)); }
                      | TK_STRINGC
-                           { $$ = expr_from_const(lexer, new_const(lexer, STRING_TYPE, $1)); }
+                           { $$ = expr_from_const(lexer, new_const(lexer, STRING_VAL, $1)); }
                      ;
 
 pmc_object           : identifier

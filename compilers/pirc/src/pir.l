@@ -381,7 +381,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 ":invocant"       { return TK_FLAG_INVOCANT; }
 
 ":"{IDENT}        { yypirerror(yyscanner, yyget_extra(yyscanner),
-                               "unrecognized sub flag: '%s'", yytext);
+                               "unrecognized flag: '%s'", yytext);
                   }
 
 
@@ -501,12 +501,19 @@ REGISTER       "$"[SNIP]{DIGITS}
 {BIN}             { yylval->ival = atoi(yytext); return TK_INTC; }
 {OCT}             { yylval->ival = atoi(yytext); return TK_INTC; }
 
-"."               { /* XXX some work to be done to disallow $P0 . foo()
-                     * spaces should not be allowed.
+"."/[\'\"$a-zA-Z] { /* Make sure the dot is followed by a character that
+                     * starts a method object. $ for registers,
+                     * quotes for quoted strings, and letters for identifiers.
+                     *
                      */
                      return '.';
                   }
 
+{WS}"."[^{WS}]    { yypirerror(yyscanner, yyget_extra(yyscanner),
+                    "no space allowed before a methodcall dot, "
+                    "or space expected after the '.' operator");
+                    return '.';
+                  }
 
 %{
 
