@@ -238,13 +238,8 @@ sub runsteps {
     # We make certain that argument to --fatal-step is a comma-delimited
     # string of configuration steps, each of which is a string delimited by
     # two colons, the first half of which is one of init|inter|auto|gen
-#<<<<<<< .working
     elsif ( defined ( $fatal_step_str ) ) {
         %steps_to_die_for = _handle_fatal_step_option( $fatal_step_str );
-#=======
-#    elsif ( defined ( $fatal_step ) ) {
-#        %steps_to_die_for = $conf->_handle_fatal_step_option( $fatal_step );
-#>>>>>>> .merge-right.r30499
     }
     else {
         # No action needed; this is the default case where no step is fatal
