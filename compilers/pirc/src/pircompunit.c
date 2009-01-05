@@ -2477,6 +2477,7 @@ update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARR
         CURRENT_SUB(lexer)->info.regs_used[i] = reg_usage[i];
 }
 
+
 /*
 
 =item C<void
@@ -2496,8 +2497,16 @@ annotate(lexer_state * const lexer, char const * const key, constant * const val
     ann->bytecode_index = lexer->stmt_counter;
     ++lexer->num_annotations; /* keep track of number of annotations */
 
-    /* store the annotation in a list, managed by the lexer */
-    ann->next = lexer->annotations;
+    /* store the annotation in a list, managed by the lexer
+     * the list is circular linked, so that the order of annotations is preserved.
+     */
+    if (lexer->annotations) {
+        ann->next = lexer->annotations->next; /* new node's next becomes the first one. */
+        lexer->annotations->next = ann;
+    }
+    else {
+        ann->next = ann; /* link to itself */
+    }
     lexer->annotations = ann;
 }
 

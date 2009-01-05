@@ -355,6 +355,28 @@ create_codesegment(bytecode * const bc, int codesize) {
     bc->opcursor = (opcode_t *)bc->interp->code->base.data;
 }
 
+#if 0
+/*
+
+=item C<void
+create_annotations_segment(bytecode * const bc, opcode_t bytecode_offset)>
+
+Create an annotations segment, and an initial annotations group.
+
+=cut
+
+*/
+void
+create_annotations_segment(bytecode * const bc, opcode_t bytecode_offset) {
+    bc->interp->code->annotations = PackFile_Segment_new_seg(bc->interp,
+                                        bc->interp->code->base.dir,
+                                        PF_ANNOTATIONS_SEG, "ANNOTATIONS", 1);
+
+    /* Create initial group. */
+    PackFile_Annotations_add_group(bc->interp, bc->interp->code->annotations, bytecode_offset);
+}
+#endif
+
 /*
 
 =item C<void
