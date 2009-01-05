@@ -824,3 +824,255 @@ opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is
     return pc;
 }
 
+char *
+opt_div_ri(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, INTVAL imm, int is_div)
+{
+    char *pc = jit_info->native_ptr;
+
+    UINTVAL ld2 = ld((UINTVAL) imm);
+    if (is_div && imm > 1 && !(imm & (imm - 1))) {
+        /* positive power of 2 - do a shift */
+        pc = emit_shift_i_r(interp, pc, emit_b101, ld2, dest);
+    }
+    else {
+        if (dest != emit_EBX) {
+            emitm_pushl_r(pc, emit_EBX);
+            jit_emit_mov_ri_i(interp, pc, emit_EBX, imm);
+            jit_info->native_ptr = pc;
+            pc = opt_div_rr(interp, jit_info, dest, emit_EBX, is_div);
+            pc = emit_popl_r(pc, emit_EBX);
+        }
+        else {
+            emitm_pushl_r(pc, emit_EDI);
+            jit_emit_mov_ri_i(interp, pc, emit_EDI, imm);
+            jit_info->native_ptr = pc;
+            pc = opt_div_rr(interp, jit_info, dest, emit_EDI, is_div);
+            pc = emit_popl_r(pc, emit_EDI);
+        }
+    }
+    return pc;
+}
+
+#  define emitm_alu_imp_m(pc, op, b, i, s, d) { \
+    *((pc)++) = (char) 0xf7; \
+    (pc) = emit_r_X((interp), (pc), emit_reg(op), (b), (i), (s), (d)); }
+#  define emitm_sdivl_m(pc, b, i, s, d) \
+    emitm_alu_imp_m((pc), emit_b111, (b), (i), (s), (d))
+
+char *
+opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int is_div)
+{
+    char *pc = jit_info->native_ptr;
+    int saved = 0;
+
+    if (dest != emit_EAX) {
+        jit_emit_mov_rr_i(pc, emit_EAX, dest);
+    }
+    if (dest == emit_EDX) {
+        /* all ok, we can globber it */
+    }
+    else {
+        /* if ECX is mapped, push EDX on stack */
+        if (intreg_is_used(jit_info, emit_ECX)) {
+            emitm_pushl_r(pc, emit_EDX);
+            saved = 2;
+        }
+        /* if EDX is mapped, save it in ECX */
+        else if (intreg_is_used(jit_info, emit_EDX)) {
+            saved = 1;
+            jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+        }
+	}
+    /* this sequence allows 2 other instructions to run parallel */
+    jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
+    pc = emit_shift_i_r(interp, pc, emit_b111, 31, emit_EDX); /* SAR 31 */
+
+    emitm_sdivl_m(pc, emit_EBX, 0, 1, offs);
+
+    if (is_div) {
+        /* result = quotient in EAX */
+        if (saved == 1) {
+            jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+        }
+        if (dest != emit_EAX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EAX);
+        }
+        if (saved == 2) {
+            emitm_popl_r(pc, emit_EDX);
+        }
+    }
+    else {
+        /* result = remainder in EDX */
+        if (dest != emit_EDX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EDX);
+            if (saved == 1) {
+                jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+            }
+            else if (saved == 2)
+                emitm_popl_r(pc, emit_EDX);
+        }
+    }
+    return pc;
+}
+
+/* Long jump - 32 bit disp */
+#  define emitm_jxl(pc, code, disp) { \
+    *((pc)++) = (char) 0x0f; \
+    *((pc)++) = (char)(0x80 | (code));  \
+    *(long *)(pc) = (disp); (pc) += 4; }
+
+void
+jit_emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
+{
+    long offset;
+    opcode_t opcode;
+
+    opcode = jit_info->op_i + disp;
+
+    if (opcode <= jit_info->op_i) {
+        offset = jit_info->arena.op_map[opcode].offset -
+                (jit_info->native_ptr - jit_info->arena.start);
+
+        /* If we are here, the current section must have a branch_target
+           section, I think. */
+        if (jit_info->optimizer->cur_section->branch_target ==
+            jit_info->optimizer->cur_section)
+                offset +=
+                    jit_info->optimizer->cur_section->branch_target->load_size;
+
+        if (emit_is8bit(offset - 2)) {
+            emitm_jxs(jit_info->native_ptr, code, offset - 2);
+        }
+        else {
+            emitm_jxl(jit_info->native_ptr, code, offset - 6);
+        }
+
+        return;
+    }
+
+    Parrot_jit_newfixup(jit_info);
+    jit_info->arena.fixups->type = JIT_X86BRANCH;
+    jit_info->arena.fixups->param.opcode = opcode;
+    /* If the branch is to the current section, skip the load instructions. */
+    if (jit_info->optimizer->cur_section->branch_target ==
+        jit_info->optimizer->cur_section)
+            jit_info->arena.fixups->skip =
+                (char)jit_info->optimizer->cur_section->branch_target->load_size;
+
+    emitm_jxl(jit_info->native_ptr, code, 0xc0def00d);
+}
+
+#  define emitm_jumpl(pc, disp) { \
+    *((pc)++) = (char) 0xe9; \
+    *(long *)(pc) = (disp); (pc) += 4; }
+
+void
+emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
+{
+    long offset;
+    opcode_t opcode;
+
+    opcode = jit_info->op_i + disp;
+
+    if (opcode <= jit_info->op_i) {
+        offset = jit_info->arena.op_map[opcode].offset -
+                                (jit_info->native_ptr - jit_info->arena.start);
+        if (emit_is8bit(offset - 2)) {
+            emitm_jumps(jit_info->native_ptr, (char)(offset - 2));
+        }
+        else {
+            emitm_jumpl(jit_info->native_ptr, offset - 5);
+        }
+        return;
+    }
+
+    Parrot_jit_newfixup(jit_info);
+    jit_info->arena.fixups->type = JIT_X86JUMP;
+    jit_info->arena.fixups->param.opcode = opcode;
+    /* If the branch is to the current section, skip the load instructions. */
+    if (jit_info->optimizer->cur_section->branch_target ==
+        jit_info->optimizer->cur_section)
+            jit_info->arena.fixups->skip =
+                (char)jit_info->optimizer->cur_section->branch_target->load_size;
+    emitm_jumpl(jit_info->native_ptr, 0xc0def00d);
+}
+
+#if EXEC_CAPABLE
+#  define emitm_jumpm(pc, b, i, s, d) { \
+       *((pc)++) = (char) 0xff; \
+       (pc) = emit_r_X((interp), (pc), emit_reg(emit_b100), (b), (i), (s), (d)); \
+       }
+#else /* EXEC_CAPABLE */
+#  define emitm_jumpm(pc, b, i, s, d) { \
+       *((pc)++) = (char) 0xff; \
+       (pc) = emit_r_X((interp), (pc), emit_reg(emit_b100), (b), (i), (s), (d)); }
+#endif /* EXEC_CAPABLE */
+
+#  define emitm_alul_i_r(pc, op1, op2, imm, reg) { \
+    *((pc)++) = (char) (op1); \
+    *((pc)++) = (char) emit_alu_X_r((op2), (reg)); \
+    *(long *)((pc)) = (long)(imm); (pc) += 4; }
+
+#  define emitm_subl_i_r(pc, imm, reg) \
+    emitm_alul_i_r((pc), 0x81, emit_b101, (imm), (reg))
+	
+#  define jit_emit_sub_rr_i(interp, pc, reg1, reg2) \
+    emitm_alul_r_r((pc), 0x29, (reg2), (reg1))
+
+void
+Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
+                   PARROT_INTERP)
+{
+    /* we have to get the code pointer, which might change
+     * due too intersegment branches
+     */
+
+    /* get interpreter
+     */
+    emitm_movl_m_r(interp, jit_info->native_ptr,
+            emit_EBX, emit_EBP, emit_None, 1, INTERP_BP_OFFS);
+    if (!jit_info->objfile) {
+        /*
+         * emit interp->code->base.data
+         */
+        emitm_movl_m_r(interp, jit_info->native_ptr, emit_ECX, emit_EBX, 0, 1,
+                offsetof(Interp, code));
+        emitm_movl_m_r(interp, jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
+                offsetof(PackFile_Segment, data));
+        /* calc code offset */
+        jit_emit_sub_rr_i(interp, jit_info->native_ptr, emit_EAX, emit_EDX);
+        /*
+         * now we have the offset of the ins in EAX
+         *
+         * interp->code->jit_info->arena->op_map
+         *
+         * TODO interleave these 2 calculations
+         */
+        emitm_movl_m_r(interp, jit_info->native_ptr, emit_EDX, emit_ECX, 0, 1,
+                offsetof(PackFile_ByteCode, jit_info));
+        emitm_lea_m_r(interp, jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(Parrot_jit_info_t, arena));
+        emitm_movl_m_r(interp, jit_info->native_ptr, emit_EDX, emit_EDX, 0, 1,
+                offsetof(Parrot_jit_arena_t, op_map));
+
+    }
+#if EXEC_CAPABLE
+    else {
+        int *reg;
+        emitm_subl_i_r(jit_info->native_ptr,
+            jit_info->objfile->bytecode_header_size, emit_EAX);
+        Parrot_exec_add_text_rellocation(jit_info->objfile,
+            jit_info->native_ptr, RTYPE_DATA, "program_code", -4);
+        reg = Parrot_exec_add_text_rellocation_reg(jit_info->objfile,
+                jit_info->native_ptr, "opcode_map", 0, 0);
+        jit_emit_mov_ri_i(interp, jit_info->native_ptr, emit_EDX, (long) reg);
+    }
+#endif
+    /* get base pointer */
+    emitm_movl_m_r(interp, jit_info->native_ptr, emit_EBX, emit_EBX, 0, 1,
+            offsetof(Interp, ctx.bp));
+
+    /* This jumps to the address in op_map[EDX + sizeof (void *) * INDEX] */
+    emitm_jumpm(jit_info->native_ptr, emit_EDX, emit_EAX,
+            sizeof (*jit_info->arena.op_map) / 4, 0);
+}
