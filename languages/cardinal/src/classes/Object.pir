@@ -29,7 +29,7 @@ Perform initializations and create the base classes.
 .sub 'onload' :anon :init :load
     .local pmc cardinalmeta
     load_bytecode 'P6object.pbc'
-    $P0 = get_hll_global 'P6metaclass'
+    $P0 = get_root_global ['parrot'], 'P6metaclass'
     $P0.'new_class'('CardinalObject', 'attr'=>'%!properties')
     cardinalmeta = $P0.'HOW'()
     set_hll_global ['CardinalObject'], '!CARDINALMETA', cardinalmeta

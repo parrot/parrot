@@ -15,7 +15,7 @@ src/classes/CardinalHash.pir - Cardinal hash class and related functions
 .sub 'onload' :anon :load :init
     .local pmc cardinalmeta, mappingproto
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    mappingproto = cardinalmeta.'new_class'('CardinalHash', 'parent'=>'Hash CardinalObject')
+    mappingproto = cardinalmeta.'new_class'('CardinalHash', 'parent'=>'parrot;Hash CardinalObject')
     cardinalmeta.'register'('Hash', 'parent'=>'CardinalObject', 'protoobject'=>mappingproto)
     $P0 = get_class 'CardinalHash'
     addattribute $P0, 'default'
@@ -76,7 +76,7 @@ Returns elements of hash as array of C<Pair(key, value)>
     .local pmc iter
     .local pmc rv
     iter = new 'Iterator', self
-    rv   = new 'List'
+    rv   = new 'CardinalArray'
   loop:
     unless iter goto end
     $S1 = shift iter
@@ -94,7 +94,7 @@ Returns elements of hash as array of C<Pair(key, value)>
     .local pmc iter
     .local pmc rv
     iter = new 'Iterator', self
-    rv   = new 'List'
+    rv   = new 'CardinalArray'
   loop:
     unless iter goto end
     $S1 = shift iter
@@ -109,7 +109,7 @@ Returns elements of hash as array of C<Pair(key, value)>
     .local pmc iter
     .local pmc rv
     iter = new 'Iterator', self
-    rv   = new 'List'
+    rv   = new 'CardinalArray'
   loop:
     unless iter goto end
     $S1 = shift iter

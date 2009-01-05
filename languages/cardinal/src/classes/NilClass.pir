@@ -5,7 +5,7 @@
 .sub 'onload' :anon :load :init
     .local pmc cardinalmeta, nilproto
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    nilproto = cardinalmeta.'new_class'('NilClass', 'parent'=>'Undef CardinalObject')
+    nilproto = cardinalmeta.'new_class'('NilClass', 'parent'=>'parrot;Undef CardinalObject')
     cardinalmeta.'register'('Undef', 'parent'=>nilproto, 'protoobject'=>nilproto)
 .end
 

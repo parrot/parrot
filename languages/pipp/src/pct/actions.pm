@@ -48,6 +48,8 @@ method TOP($/, $key) {
             $block.push( $($_) );
         }
 
+        $block.hll('pipp');
+
         make $block;
     }
 }

@@ -17,7 +17,7 @@ symbols for C<Bool::True> and C<Bool::False>.
 .sub 'onload' :anon :init :load
     .local pmc cardinalmeta, boolproto
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    boolproto = cardinalmeta.'new_class'('Bool', 'parent'=>'Boolean')
+    boolproto = cardinalmeta.'new_class'('Bool', 'parent'=>'parrot;Boolean')
     cardinalmeta.'register'('Boolean', 'parent'=>boolproto, 'protoobject'=>boolproto)
 
     $P0 = boolproto.'new'()

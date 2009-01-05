@@ -280,6 +280,7 @@ END_PIR
 
     $S0 = aplformat(arg)
     say $S0
+    .return (arg)
 .end
 
 .sub 'aplvector'

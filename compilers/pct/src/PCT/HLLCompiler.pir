@@ -128,7 +128,7 @@ Accessor for the C<parsegrammar> attribute.
 
 Accessor for the C<parseactions> attribute.
 
-=item astgrammar([string grammar])
+=item astgrammar([grammar])
 
 Accessor for the C<astgrammar> attribute.
 
@@ -152,7 +152,7 @@ the compiler is ready for code to be compiled and executed.
 .end
 
 .sub 'parsegrammar' :method
-    .param string value        :optional
+    .param pmc value        :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('$parsegrammar', value, has_value)
 .end
@@ -164,7 +164,7 @@ the compiler is ready for code to be compiled and executed.
 .end
 
 .sub 'astgrammar' :method
-    .param string value        :optional
+    .param pmc value        :optional
     .param int has_value       :opt_flag
     .tailcall self.'attr'('$astgrammar', value, has_value)
 .end
@@ -342,16 +342,22 @@ to any options and return the resulting parse tree.
     top = find_method parsegrammar, 'TOP'
     goto have_top
   parsegrammar_string:
+    $S0 = typeof parsegrammar
+    eq $S0, 'NameSpace', parsegrammar_ns
     $P0 = self.'parse_name'(parsegrammar)
     $S0 = pop $P0
     $P1 = get_hll_global $P0, $S0
     $I0 = can $P1, 'TOP'
-    unless $I0 goto parsegrammar_ns
+    unless $I0 goto parsegrammar_ns_string
     top = find_method $P1, 'TOP'
     goto have_top
-  parsegrammar_ns:
+  parsegrammar_ns_string:
     $P0 = self.'parse_name'(parsegrammar)
     top = get_hll_global $P0, 'TOP'
+    unless null top goto have_top
+    goto err_notop
+  parsegrammar_ns:
+    top = parsegrammar['TOP']
     unless null top goto have_top
   err_notop:
     self.'panic'('Cannot find TOP regex in ', parsegrammar)
@@ -364,12 +370,18 @@ to any options and return the resulting parse tree.
     ##  if parseactions is a Class or array, make action directly from that
     $I0 = isa parseactions, 'Class'
     if $I0 goto action_make
+    $I0 = isa parseactions, 'NameSpace'
+    if $I0 goto action_namespace
     $I0 = does parseactions, 'array'
     if $I0 goto action_make
     ##  if parseactions is not a String, use it directly.
     $I0 = isa parseactions, 'String'
     if $I0 goto action_string
     action = parseactions
+    goto have_action
+  action_namespace:
+    $P0 = get_class parseactions
+    action = new $P0
     goto have_action
   action_string:
     ##  Try the string itself, if that fails try splitting on '::'
@@ -416,8 +428,10 @@ resulting ast.
     .param pmc adverbs         :slurpy :named
 
   compile_astgrammar:
-    .local string astgrammar_name
+    .local pmc astgrammar_name
     astgrammar_name = self.'astgrammar'()
+    $S0 = typeof astgrammar_name
+    eq $S0, 'NameSpace', astgrammar_ns
     unless astgrammar_name goto compile_match
 
     .local pmc astgrammar_namelist
@@ -427,12 +441,17 @@ resulting ast.
     astgrammar = new astgrammar_namelist
     astbuilder = astgrammar.'apply'(source)
     .tailcall astbuilder.'get'('past')
+  astgrammar_ns:
+    $P0 = get_class astgrammar_name
+    astgrammar = new $P0
+    astbuilder = astgrammar.'apply'(source)
+    .tailcall astbuilder.'get'('past')
 
   compile_match:
-    push_eh err_past
+    #push_eh err_past
     .local pmc ast
     ast = source.'item'()
-    pop_eh
+    #pop_eh
     $I0 = isa ast, ['PAST';'Node']
     unless $I0 goto err_past
     .return (ast)

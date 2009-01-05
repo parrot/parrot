@@ -111,12 +111,15 @@ is set or implied.
     grammar = adverbs['grammar']
     $S0 = typeof grammar
     eq $S0, 'NameSpace', grammar_namespace
+    ne $S0, 'String', have_grammar
     $S0 = grammar
     $P0 = split '::', $S0
     grammar_class = get_class $P0
     goto with_grammar
-  grammar_namespace:
+  have_grammar:
     grammar_class = grammar
+  grammar_namespace:
+    grammar_class = get_class grammar
   with_grammar:
   with_adverbs:
 

@@ -184,7 +184,7 @@ the output to the correct output file.
     initpir.'emit'(<<'        CODE', namespace, inherit, $S0)
           ## namespace %0
           .local pmc p6meta
-          p6meta = get_hll_global 'P6metaclass'
+          p6meta = get_root_global ['parrot'], 'P6metaclass'
           $P0 = p6meta.'get_proto'('%0')
           unless null $P0 goto %2
           p6meta.'new_class'('%0', 'parent'=>'%1')

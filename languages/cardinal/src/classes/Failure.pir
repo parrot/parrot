@@ -3,7 +3,7 @@
 .sub 'onload' :anon :init :load
     .local pmc meta, failureproto, exceptionproto
     meta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    failureproto = meta.'new_class'('CardinalFailure', 'parent'=>'Undef CardinalAny', 'attr'=>'$!exception')
+    failureproto = meta.'new_class'('CardinalFailure', 'parent'=>'parrot;Undef CardinalAny', 'attr'=>'$!exception')
     meta.'register'('Undef', 'parent'=>failureproto, 'protoobject'=>failureproto)
     exceptionproto = meta.'new_class'('CardinalException', 'parent'=>'CardinalAny', 'attr'=>'$!exception')
     meta.'register'('Exception', 'protoobject'=>exceptionproto)

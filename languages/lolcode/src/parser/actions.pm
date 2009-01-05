@@ -22,6 +22,7 @@ method TOP($/) {
     $block.symbol('IT', :scope('lexical'));
     my $it := PAST::Var.new( :name( 'IT' ), :scope('lexical'), :viviself('Undef'), :isdecl(1));
     $block.unshift($it);
+    $block.hll('lolcode');
     make $block;
 }
 

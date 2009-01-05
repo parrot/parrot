@@ -287,6 +287,8 @@ or 'Object').
 
 =cut
 
+.include 'library/dumper.pir'
+
 .sub 'register' :method
     .param pmc parrotclass
     .param pmc options         :slurpy :named
@@ -300,7 +302,7 @@ or 'Object').
     ## get the hll, either from options or the caller's namespace
     .local pmc hll
     hll = options['hll']
-    $I0 = defined $P0
+    $I0 = defined hll
     if $I0, have_hll
     $P0 = getinterp
     $P0 = $P0['namespace';1]
@@ -326,13 +328,27 @@ or 'Object').
     $S0 = parentclass
     parentclass = split ' ', $S0
   parent_array:
-    .local pmc iter
+    .local pmc iter, item
     iter = new 'Iterator', parentclass
   parent_loop:
     unless iter goto parent_done
-    $P0 = shift iter
-    unless $P0 goto parent_loop
-    self.'add_parent'($P0, 'to'=>parrotclass)
+    item = shift iter
+    $S0 = item
+    $P0 = split ';', $S0
+    $I0 = elements $P0
+    eq $I0, 1, no_parent_hll
+    $S0 = shift $P0
+    goto have_parent_hll
+  no_parent_hll:
+    $S0 = hll
+  have_parent_hll:
+    $P0 = shift $P0
+    $S1 = $P0
+    $P0 = split '::', $S1
+    unshift $P0, $S0
+    $S0 = pop $P0
+    item = get_root_global $P0, $S0
+    self.'add_parent'(item, 'to'=>parrotclass)
     goto parent_loop
   parent_done:
     self.'add_parent'('P6object', 'to'=>parrotclass)
@@ -463,27 +479,29 @@ of names separated by spaces.
     options['hll'] = hll
   have_hll:
 
+    .local pmc class_ns, ns
+    $S0 = typeof name
     $I0 = isa name, 'String'
     if $I0, parrotclass_string
+    $I0 = isa name, 'ResizableStringArray'
+    if $I0, parrotclass_array
     parrotclass = newclass name
     goto have_parrotclass
   parrotclass_string:
     $S0 = name
-    .local pmc class_ns, lookup
     class_ns = split '::', $S0
     unshift class_ns, hll
-    lookup = get_root_namespace class_ns
-    $I0 = defined lookup
-    unless $I0, parrotclass_no_namespace
-    parrotclass = newclass lookup
-    goto have_parrotclass
-  parrotclass_no_namespace:
-    # The namespace doesn't exist, so we need to create it
-    .local pmc ns
-    ns = new 'NameSpace'
-    set_root_global class_ns, '', ns
-    ns = get_root_namespace class_ns
+    $P0 = get_root_namespace
+    ns = $P0.'make_namespace'(class_ns)
     parrotclass = newclass ns
+    goto have_parrotclass
+  parrotclass_array:
+    class_ns = name
+    unshift class_ns, hll
+    $P0 = get_root_namespace
+    ns = $P0.'make_namespace'(class_ns)
+    parrotclass = newclass ns
+    goto have_parrotclass
   have_parrotclass:
 
     .local pmc attrlist, iter
@@ -537,6 +555,9 @@ Multimethod helper to return the parrotclass for C<x>.
 
 .sub 'get_parrotclass' :method
     .param pmc x
+    .param pmc hll :named('hll') :optional
+    .param int has_hll :opt_flag
+    if null x goto done
     .local pmc parrotclass
     parrotclass = x
     $S0 = typeof x
@@ -544,6 +565,8 @@ Multimethod helper to return the parrotclass for C<x>.
     if $S0 == 'PMCProxy' goto done
     $I0 = isa x, 'String'
     if $I0 goto x_string
+    $I0 = isa x, 'NameSpace'
+    if $I0 goto x_ns
     $I0 = isa x, 'P6object'
     if $I0 goto x_p6object
     $P0 = typeof x
@@ -559,6 +582,12 @@ Multimethod helper to return the parrotclass for C<x>.
     unless null parrotclass goto done
     $S0 = x
     $P0 = split '::', $S0
+    unless has_hll goto no_hll
+    unshift $P0, hll
+    x = get_root_namespace $P0
+    unless null x goto x_ns
+    $S0 = shift $P0
+  no_hll:
     x = get_hll_namespace $P0
   x_ns:
     if null x goto done

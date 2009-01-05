@@ -22,21 +22,29 @@ object.
 =cut
 
 
+.HLL 'cardinal'
 .namespace []
 
 .include 'src/gen_builtins.pir'
 
 .sub 'onload' :anon :load :init
-    $P0 = subclass 'ResizablePMCArray', 'List'
+    load_bytecode 'PCT.pbc'
+    .local pmc parrotns, cardinalns, exports
+    parrotns = get_root_namespace ['parrot']
+    cardinalns = get_hll_namespace
+    exports = split ' ', 'PAST PCT PGE P6metaclass'
+    parrotns.'export_to'(cardinalns, exports)
 .end
 
+.include 'src/gen_grammar.pir'
+.include 'src/parser/quote_expression.pir'
+.include 'src/gen_actions.pir'
 .namespace [ 'cardinal';'Compiler' ]
 
 #no caridinal_group found on my machine
 #.loadlib 'cardinal_group'
 
 .sub 'onload' :anon :load :init
-    load_bytecode 'PCT.pbc'
     .local pmc cardinalmeta
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
     cardinalmeta.'new_class'('cardinal::Compiler', 'parent'=>'PCT::HLLCompiler')
@@ -44,17 +52,19 @@ object.
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
     $P1.'language'('cardinal')
-    $P1.'parsegrammar'('cardinal::Grammar')
-    $P1.'parseactions'('cardinal::Grammar::Actions')
+    $P0 = get_hll_namespace ['cardinal';'Grammar']
+    $P1.'parsegrammar'($P0)
+    $P0 = get_hll_namespace ['cardinal';'Grammar';'Actions']
+    $P1.'parseactions'($P0)
 
     $P1.'commandline_banner'("Cardinal - Ruby for the Parrot VM\n\n")
     $P1.'commandline_prompt'('crb(main):001:0>')
 
      ##  create a list of END blocks to be run
-    $P0 = new 'List'
+    $P0 = new 'CardinalArray'
     set_hll_global ['cardinal'], '@?END_BLOCKS', $P0
 
-    $P0 = new 'List'
+    $P0 = new 'CardinalArray'
     set_hll_global ['cardinal';'Grammar';'Actions'], '@?BLOCK', $P0
 
     $P1 = get_hll_global ['PAST';'Compiler'], '%valflags'
@@ -98,13 +108,6 @@ to the cardinal compiler.
     goto iter_loop
   iter_end:
 .end
-
-
-.include 'src/gen_grammar.pir'
-.include 'src/parser/quote_expression.pir'
-.include 'src/gen_actions.pir'
-
-
 
 =back
 

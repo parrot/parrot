@@ -18,14 +18,36 @@ object.
 
 =cut
 
-.sub '__onload' :load :init
+.HLL 'pynie'
+
+.sub '' :anon :load :init
     load_bytecode 'PCT.pbc'
 
+    .local pmc parrotns, pyns, exports
+    parrotns = get_root_namespace ['parrot']
+    pyns = get_hll_namespace
+    exports = split ' ', 'PAST PCT PGE'
+    parrotns.'export_to'(pyns, exports)
+.end
+
+.include 'src/gen_grammar.pir'
+.include 'src/gen_actions.pir'
+.include 'src/parser/indent.pir'
+
+.include 'src/builtins/funcs.pir'
+.include 'src/builtins/io.pir'
+.include 'src/builtins/lists.pir'
+.include 'src/builtins/oper.pir'
+
+
+.sub '__onload' :load :init
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P0 = $P0.'new'()
     $P0.'language'('Pynie')
-    $P0.'parsegrammar'('Pynie::Grammar')
-    $P0.'parseactions'('Pynie::Grammar::Actions')
+    $P1 = get_hll_namespace ['Pynie';'Grammar']
+    $P0.'parsegrammar'($P1)
+    $P1 = get_hll_namespace ['Pynie';'Grammar';'Actions']
+    $P0.'parseactions'($P1)
 
     $P0.'commandline_banner'("Pynie: a Python compiler for Parrot.\n")
     $P0.'commandline_prompt'('>>> ')
@@ -47,15 +69,6 @@ to the Pynie compiler.
     .tailcall $P0.'command_line'(args)
 .end
 
-
-.include 'src/gen_grammar.pir'
-.include 'src/gen_actions.pir'
-.include 'src/parser/indent.pir'
-
-.include 'src/builtins/funcs.pir'
-.include 'src/builtins/io.pir'
-.include 'src/builtins/lists.pir'
-.include 'src/builtins/oper.pir'
 
 =back
 

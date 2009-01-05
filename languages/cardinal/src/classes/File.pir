@@ -22,7 +22,7 @@ Perform initializations and create the File class
 .sub 'onload' :anon :init :load
     .local pmc cardinalmeta
     $P0 = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    cardinalmeta = $P0.'new_class'('CardinalFile', 'parent'=>'File IO CardinalObject', 'attr'=>'!path')
+    cardinalmeta = $P0.'new_class'('CardinalFile', 'parent'=>'parrot;File IO CardinalObject', 'attr'=>'!path')
     $P0.'register'('File', 'parent'=>'CardinalObject', 'protoobject'=>cardinalmeta)
 .end
 

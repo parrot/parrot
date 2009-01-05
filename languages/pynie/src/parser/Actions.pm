@@ -4,7 +4,9 @@
 class Pynie::Grammar::Actions;
 
 method TOP($/) {
-    make $( $<file_input> );
+    my $block := PAST::Block.new( $( $<file_input> ) );
+    $block.hll('pynie');
+    make $block;
 }
 
 method file_input($/) {

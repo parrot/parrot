@@ -16,8 +16,8 @@ Stolen from Rakudo
 .sub 'onload' :anon :load :init
     .local pmc cardinalmeta, arrayproto, interp, core_type, hll_type
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    arrayproto = cardinalmeta.'new_class'('CardinalArray', 'parent'=>'ResizablePMCArray CardinalObject')
-    cardinalmeta.'register'('ResizablePMCArray', 'parent'=>'CardinalObject', 'protoobject'=>arrayproto)
+    arrayproto = cardinalmeta.'new_class'('CardinalArray', 'parent'=>'parrot;ResizablePMCArray CardinalObject')
+    #cardinalmeta.'register'('ResizablePMCArray', 'parent'=>'CardinalObject', 'protoobject'=>arrayproto)
     core_type = get_class 'ResizablePMCArray'
     hll_type = get_class 'CardinalArray'
 

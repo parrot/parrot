@@ -28,14 +28,30 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
 =cut
 
+.HLL 'pipp'
+
+.sub '' :anon :load :init
+
+    # Pipp uses the Parrot Compiler Toolkit
+    load_bytecode 'PCT.pbc'
+
+    # Export namespaces to the appropriate HLL ns
+    .local pmc parrotns, phpns, exports
+    parrotns = get_root_namespace ['parrot']
+    phpns = get_hll_namespace
+    exports = split ' ', 'PAST PCT PGE'
+    parrotns.'export_to'(phpns, exports)
+.end
+
+.include 'src/pct/gen_grammar.pir'
+.include 'src/pct/gen_actions.pir'
+.include 'src/pct/quote_expression.pir'
+
 .HLL '_pipp'
 
 .const string VERSION = "0.0.1"
 
 .sub '__onload' :anon :load :init
-
-    # Pipp uses the Parrot Compiler Toolkit
-    load_bytecode 'PCT.pbc'
 
     # %valflags specifies when PAST::Val nodes are allowed to
     # be used as a constant.  The 'e' flag indicates that the
@@ -77,13 +93,15 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
     # Initialize the stack @?BLOCK
     $P0 = new 'ResizablePMCArray'
-    set_root_global ['parrot';'Pipp';'Grammar';'Actions'], '@?BLOCK', $P0
+    set_root_global ['pipp';'Pipp';'Grammar';'Actions'], '@?BLOCK', $P0
 
     # register and set up the the HLLCompiler
     $P1 = new ['PCT';'HLLCompiler']
     $P1.'language'('Pipp')
-    $P1.'parsegrammar'('Pipp::Grammar')
-    $P1.'parseactions'('Pipp::Grammar::Actions')
+    $P0 = get_root_namespace ['pipp';'Pipp';'Grammar']
+    $P1.'parsegrammar'($P0)
+    $P0 = get_root_namespace ['pipp';'Pipp';'Grammar';'Actions']
+    $P1.'parseactions'($P0)
 
 .end
 
@@ -341,12 +359,6 @@ NO_REST:
     set_root_global ['pipp'], '$_ENV', $P0
 
 .end
-
-.HLL 'parrot'
-
-.include 'src/pct/gen_grammar.pir'
-.include 'src/pct/gen_actions.pir'
-.include 'src/pct/quote_expression.pir'
 
 # Local Variables:
 #   mode: pir

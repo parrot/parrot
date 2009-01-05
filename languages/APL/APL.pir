@@ -21,18 +21,34 @@ object.
 
 =cut
 
-.namespace [ 'APL::Compiler' ]
+.HLL 'apl'
+
+.namespace [ 'APL';'Compiler' ]
 
 .loadlib 'apl_group'
 
-.sub 'onload' :anon :load :init
+.sub '' :anon :load :init
     load_bytecode 'PCT.pbc'
 
+    .local pmc parrotns, aplns, exports
+    parrotns = get_root_namespace ['parrot']
+    aplns = get_hll_namespace
+    exports = split ' ', 'PAST PCT PGE'
+    parrotns.'export_to'(aplns, exports)
+.end
+
+.include 'src/gen_builtins.pir'
+.include 'src/gen_grammar.pir'
+.include 'src/gen_actions.pir'
+
+.sub 'onload' :anon :load :init
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
     $P1.'language'('APL')
-    $P1.'parsegrammar'('APL::Grammar')
-    $P1.'parseactions'('APL::Grammar::Actions')
+    $P0 = get_hll_namespace ['APL';'Grammar']
+    $P1.'parsegrammar'($P0)
+    $P0 = get_hll_namespace ['APL';'Grammar';'Actions']
+    $P1.'parseactions'($P0)
 
     ##  tell PCT to always generate pmcs for Float constants
     $P0 = get_hll_global ['PAST';'Compiler'], '%valflags'
@@ -53,10 +69,6 @@ to the APL compiler.
     $P1 = $P0.'command_line'(args, 'encoding'=>'utf8')
 .end
 
-
-.include 'src/gen_builtins.pir'
-.include 'src/gen_grammar.pir'
-.include 'src/gen_actions.pir'
 
 =back
 

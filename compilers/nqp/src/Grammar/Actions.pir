@@ -788,7 +788,7 @@
     if $S0 != 'class' goto class_done
     .local string inline
     inline = <<'        INLINE'
-        $P0 = get_hll_global 'P6metaclass'
+        $P0 = get_root_global ['parrot'], 'P6metaclass'
         $P1 = split '::', '%s'
         push_eh subclass_done
         $P2 = $P0.'new_class'($P1)

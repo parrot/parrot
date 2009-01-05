@@ -23,7 +23,7 @@ Stolen from Rakudo
 .sub 'onload' :anon :init :load
     .local pmc cardinalmeta, strproto
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    strproto = cardinalmeta.'new_class'('CardinalString', 'parent'=>'String CardinalObject')
+    strproto = cardinalmeta.'new_class'('CardinalString', 'parent'=>'parrot;String CardinalObject')
     cardinalmeta.'register'('String', 'parent'=>'CardinalObject', 'protoobject'=>strproto)
 .end
 

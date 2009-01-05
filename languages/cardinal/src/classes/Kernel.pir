@@ -21,7 +21,7 @@ Perform initializations and create the kernel class
 .sub 'onload' :anon :init :load
     .local pmc cardinalmeta, kernelprototype
     load_bytecode 'P6object.pbc'
-    $P0 = get_hll_global 'P6metaclass'
+    $P0 = get_hll_global ['CardinalObject'], '!CARDINALMETA'
     kernelprototype = $P0.'new_class'('Kernel', 'attr'=>'%!properties')
     #cardinalmeta = $P0.'HOW'()
     cardinalmeta = kernelprototype.'new'()

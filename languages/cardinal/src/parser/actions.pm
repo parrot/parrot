@@ -21,6 +21,7 @@ method TOP($/) {
     my $past := $( $<comp_stmt> );
     $past.blocktype('declaration');
     $past.pirflags(':load');
+    $past.hll('cardinal');
 
     our $?INIT;
         if defined( $?INIT ) {

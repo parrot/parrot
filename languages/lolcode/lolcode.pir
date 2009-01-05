@@ -21,12 +21,27 @@ object.
 
 =cut
 
+.HLL 'lolcode'
+
 .namespace [ 'lolcode';'Compiler' ]
 
 .loadlib 'lolcode_group'
 
-.sub 'onload' :anon :load :init
+.sub '' :anon :load :init
     load_bytecode 'PCT.pbc'
+    .local pmc parrotns, lolns, exports
+    parrotns = get_root_namespace ['parrot']
+    lolns = get_hll_namespace
+    exports = split ' ', 'PAST PCT PGE P6metaclass'
+    parrotns.'export_to'(lolns, exports)
+.end
+
+.include 'src/gen_builtins.pir'
+.include 'src/gen_grammar.pir'
+.include 'src/parser/yarn_literal.pir'
+.include 'src/gen_actions.pir'
+
+.sub 'onload' :anon :load :init
 
     $P0 = new 'ResizablePMCArray'
     set_hll_global ['lolcode';'Grammar';'Actions'], '@?BLOCK', $P0
@@ -37,8 +52,10 @@ object.
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
     $P1.'language'('lolcode')
-    $P1.'parsegrammar'('lolcode::Grammar')
-    $P1.'parseactions'('lolcode::Grammar::Actions')
+    $P0 = get_hll_namespace ['lolcode';'Grammar']
+    $P1.'parsegrammar'($P0)
+    $P0 = get_hll_namespace ['lolcode';'Grammar';'Actions']
+    $P1.'parseactions'($P0)
 .end
 
 =item main(args :slurpy)  :main
@@ -55,11 +72,6 @@ to the lolcode compiler.
     $P1 = $P0.'command_line'(args)
 .end
 
-
-.include 'src/gen_builtins.pir'
-.include 'src/gen_grammar.pir'
-.include 'src/parser/yarn_literal.pir'
-.include 'src/gen_actions.pir'
 
 =back
 

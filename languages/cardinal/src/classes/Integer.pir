@@ -20,7 +20,7 @@ CardinalInteger - Cardinal integers
 .sub 'onload' :anon :init :load
     .local pmc cardinalmeta, intproto
     cardinalmeta = get_hll_global ['CardinalObject'], '!CARDINALMETA'
-    intproto = cardinalmeta.'new_class'('CardinalInteger', 'parent'=>'Integer CardinalObject')
+    intproto = cardinalmeta.'new_class'('CardinalInteger', 'parent'=>'parrot;Integer CardinalObject')
     cardinalmeta.'register'('Float', 'parent'=>'CardinalObject', 'protoobject'=>intproto)
 .end
 
