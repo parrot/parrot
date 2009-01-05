@@ -2021,7 +2021,7 @@ const_tail            : basic_const_tail
                       | pmc_const_tail
                       ;
 
-globalconst_decl      : ".globalconst" const_tail
+globalconst_decl      : ".globalconst" basic_const_tail
                             { store_global_constant(lexer, $2); }
                       ;
 
@@ -2029,8 +2029,10 @@ basic_const_tail      : "int" identifier '=' TK_INTC
                             { $$ = new_named_const(lexer, INT_VAL, $2, $4); }
                       | "num" identifier '=' TK_NUMC
                             { $$ = new_named_const(lexer, NUM_VAL, $2, $4); }
-                      | "string" identifier '=' stringconst
+                      | "string" identifier '=' TK_STRINGC
                             { $$ = new_named_const(lexer, STRING_VAL, $2, $4); }
+                      //| "string" identifier '=' TK_USTRINGC
+                      //      { $$ = new_named_const(lexer, USTRING_VAL, $2, $4); }
                       ;
 
 pmc_const_tail        : TK_STRINGC identifier '=' pmc_const

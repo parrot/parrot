@@ -491,6 +491,28 @@ REGISTER       "$"[SNIP]{DIGITS}
 
 {IDENT}           { /* identifier; can be a global (sub or const), local or parrot op */
                     lexer_state * const lexer = yyget_extra(yyscanner);
+                    constdecl   * const c = find_global_constant(lexer, yytext);
+
+                    if (c) {
+                        switch (c->type) {
+                            case INT_VAL:
+                                yylval->ival = c->val.ival;
+                                return TK_INTC;
+                            case STRING_VAL:
+                                yylval->sval = c->val.sval;
+                                return TK_STRINGC;
+                            case NUM_VAL:
+                                yylval->dval = c->val.nval;
+                                return TK_NUMC;
+                            case USTRING_VAL:
+                                yylval->sval = c->val.ustr->contents;
+                                return TK_USTRINGC;
+                            default:
+                                panic(lexer, "unsupported constant type");
+                                break;
+                        }
+                    }
+
                     yylval->sval = dupstr(lexer, yytext);
                     return TK_IDENT;
                   }

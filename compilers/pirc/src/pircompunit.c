@@ -1321,6 +1321,8 @@ new_named_const(lexer_state * const lexer, value_type type, char const * const n
             c->val.nval = va_arg(arg_ptr, double);
             break;
         case PMC_VAL:  /* value of a PMC_VAL constant is also a string */
+            c->val.pval = va_arg(arg_ptr, char *);
+            break;
         case STRING_VAL:
             c->val.sval = va_arg(arg_ptr, char *);
             break;

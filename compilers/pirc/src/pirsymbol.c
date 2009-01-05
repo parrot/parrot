@@ -625,7 +625,6 @@ store_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(constdecl * co
     bucket *b            = new_bucket(lexer);
     bucket_constant(b)   = c;
     store_bucket(table, b, hash);
-    fprintf(stderr, "store global constant (%s)\n", c->name);
 }
 
 /*
@@ -652,9 +651,6 @@ find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char const * co
 
     while (b) {
         if (STREQ(bucket_constant(b)->name, name)) {
-            /*
-            fprintf(stderr, "found!\n");
-            */
             return bucket_constant(b);
         }
 
