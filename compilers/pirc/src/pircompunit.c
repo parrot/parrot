@@ -2480,7 +2480,7 @@ update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARR
 /*
 
 =item C<void
-annotate(lexer_state * const lexer, char const * const key, char const * const value)>
+annotate(lexer_state * const lexer, char const * const key, constant * const value)>
 
 Add a new annotation with key C<key> and value C<value>.
 
@@ -2488,8 +2488,17 @@ Add a new annotation with key C<key> and value C<value>.
 
 */
 void
-annotate(lexer_state * const lexer, char const * const key, char const * const value) {
-    /* XXX todo */
+annotate(lexer_state * const lexer, char const * const key, constant * const value) {
+    annotation *ann     = (annotation *)pir_mem_allocate(lexer, sizeof (annotation));
+    ann->key            = key;
+    ann->value          = value;
+    /* store the current statement counter value */
+    ann->bytecode_index = lexer->stmt_counter;
+    ++lexer->num_annotations; /* keep track of number of annotations */
+
+    /* store the annotation in a list, managed by the lexer */
+    ann->next = lexer->annotations;
+    lexer->annotations = ann;
 }
 
 

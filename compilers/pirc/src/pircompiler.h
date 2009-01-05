@@ -143,6 +143,9 @@ typedef struct lexer_state {
     struct bytecode          *bc;
     unsigned                  codesize;
 
+    annotation               *annotations;
+    unsigned                  num_annotations;
+
 } lexer_state;
 
 /* accessor for current macro; always first on the list. */

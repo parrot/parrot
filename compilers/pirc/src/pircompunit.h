@@ -331,6 +331,16 @@ typedef struct hashtable {
 } hashtable;
 
 
+/* struct to represent bytecode annotation */
+typedef struct annotation {
+    int bytecode_index;    /* index in bytecode stream from where this annotation is active */
+    char const *key;       /* key of annotation */
+    constant   *value;     /* value of annotation */
+
+    struct annotation *next; /* next annotation; annotations are stored in a list */
+
+} annotation;
+
 /* forward declaration of structs */
 struct symbol;
 struct label;
@@ -492,7 +502,7 @@ void update_sub_register_usage(struct lexer_state * const lexer,
 void new_sub_instr(struct lexer_state * const lexer, int opcode, char const * const opname,
               unsigned num_var_args);
 
-void annotate(struct lexer_state * const lexer, char const * const key, char const * const value);
+void annotate(struct lexer_state * const lexer, char const * const key, constant * const value);
 
 #endif /* PARROT_PIR_PIRCOMPUNIT_H_GUARD */
 

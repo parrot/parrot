@@ -667,7 +667,7 @@ location_directive: ".line" TK_INTC
                         { lexer->filename = $2; }
                   ;
 
-annotation        : ".annotate" TK_STRINGC ',' TK_STRINGC
+annotation        : ".annotate" TK_STRINGC ',' constant
                         { annotate(lexer, $2, $4); }
                   ;
 
