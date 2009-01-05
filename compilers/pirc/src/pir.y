@@ -494,11 +494,14 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
 
 %type <cval> constant
              stringconst
+             pmc_const
 
 %type <cdec> const_tail
              const_decl
              globalconst_decl
              const_stat
+             basic_const_tail
+             pmc_const_tail
 
 
 /* all exported functions start with "yypir", instead of default "yy". */
@@ -2001,8 +2004,8 @@ paren_string          : '(' TK_STRINGC ')'
 const_decl_stat       : const_stat "\n"
                       ;
 
-const_decl_chunk      : const_decl
-                            { store_global_constant(lexer, $1); }
+const_decl_chunk      : ".const" basic_const_tail
+                            { store_global_constant(lexer, $2); }
                       ;
 
 const_stat            : const_decl
@@ -2013,20 +2016,36 @@ const_decl            : ".const" const_tail
                             { $$ = $2; }
                       ;
 
+const_tail            : basic_const_tail
+                      | pmc_const_tail
+                      ;
+
 globalconst_decl      : ".globalconst" const_tail
                             { store_global_constant(lexer, $2); }
                       ;
 
-const_tail            : "int" identifier '=' TK_INTC
+basic_const_tail      : "int" identifier '=' TK_INTC
                             { $$ = new_named_const(lexer, INT_VAL, $2, $4); }
                       | "num" identifier '=' TK_NUMC
                             { $$ = new_named_const(lexer, NUM_VAL, $2, $4); }
-                      | "string" identifier '=' TK_STRINGC
+                      | "string" identifier '=' stringconst
                             { $$ = new_named_const(lexer, STRING_VAL, $2, $4); }
-                      | TK_STRINGC identifier '=' constant
+                      ;
+
+pmc_const_tail        : TK_STRINGC identifier '=' pmc_const
                             { $$ = new_pmc_const(lexer, $1, $2, $4); }
                       ;
 
+pmc_const             : constant
+                      | identifier
+                            { /* this alternative is necessary, otherwise the parser
+                               * just stops when assigning an identifier to a pmc
+                               * const, without an error message. That may be
+                               * a bug in bison.
+                               */
+                              yypirerror(yyscanner, lexer, "unexpected identifier");
+                            }
+                      ;
 
 
 /* Expressions, variables and operators */
@@ -2038,7 +2057,7 @@ expression  : target         { $$ = expr_from_target(lexer, $1); }
 
 constant    : TK_INTC        { $$ = new_const(lexer, INT_VAL, $1); }
             | TK_NUMC        { $$ = new_const(lexer, NUM_VAL, $1); }
-            | stringconst
+            | stringconst    { $$ = $1; }
             ;
 
 stringconst : TK_STRINGC     { $$ = new_const(lexer, STRING_VAL, $1); }
