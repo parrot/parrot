@@ -273,8 +273,8 @@ optimizations and lexical subroutines.
 
 In many cases, a subroutine will set up and call another subroutine,
 and then return the result of the second call directly. This is called
-a X<tailcall> tailcall, and is important in PIR. Here's a contrived
-example in pseudocode:
+a X<tailcall> tailcall, and is an important opportunity for optimization.
+Here's a contrived example in pseudocode:
 
  call add_two(5)
 
@@ -285,9 +285,11 @@ example in pseudocode:
 In this example, the subroutine C<add_two> makes two calls to
 c<add_one>. The second call to C<add_one> is used as the return
 value. C<add_one> is called and its result is immediately returned
-to the caller of C<add_two>, it is never stored anywhere. We can
-optimize this situation is we realize that the second call to
-C<add_one> is returning to the same place that C<add_two> is. The
+to the caller of C<add_two>, it is never stored in a local register or
+variable in C<add_two>, it's immediately returned. We can
+optimize this situation if we realize that the second call to
+C<add_one> is returning to the same place that C<add_two> is, and therefore
+can utilize the same return continuation as C<add_two> uses. The
 two subroutine calls can share a return continution, instead of
 having to create a new continuation for each call.
 
