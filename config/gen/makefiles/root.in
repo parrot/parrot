@@ -879,7 +879,7 @@ $(LIBPARROT_STATIC) : $(O_FILES)
 $(LIBPARROT_SHARED) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
-#IF(cygchkdll):		-Wl,--out-implib=blib/lib/libparrot.dll.a \
+#IF(cygwin):		-Wl,--out-implib=libparrot.dll.a \
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
