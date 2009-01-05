@@ -195,7 +195,6 @@ sub runstep {
             $conf->data->set(
                 a       => '.a',
                 ar      => 'ar',
-                cc      => 'gcc',
                 ccflags => '-DWIN32 ',
                 ld      => 'g++',
                 ldflags => '',
@@ -204,7 +203,6 @@ sub runstep {
                 link      => 'gcc',
                 linkflags => '',
                 o         => '.o',
-                blib_dir  => 'blib\\lib',
             );
         }
         elsif ( $make =~ /dmake/i ) {
@@ -220,7 +218,8 @@ sub runstep {
         elsif ( $make =~ /mingw32-make/i ) {
             ; # Vanilla Perl
             $conf->data->set(
-                blib_dir  => 'blib\\lib'
+                make      => 'mingw32-make',
+                make_c    => 'mingw32-make -C',
             );
         }
         else {
@@ -232,17 +231,17 @@ sub runstep {
         }
 
         $conf->data->set(
+            cc                  => 'gcc',
             parrot_is_shared    => 1,
             has_dynamic_linking => 1,
             ld_load_flags       => '-shared ',
             ld_share_flags      => '-shared ',
-            libparrot_ldflags   => 'libparrot.dll',
+            libparrot_ldflags   => "\"$build_dir\\libparrot.dll\"",
             ncilib_link_extra   => 'src/libnci_test.def',
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',
-            make                => 'mingw32-make',
-            make_c              => 'mingw32-make -C',
             slash               => '\\',
+            blib_dir            => 'blib\\lib',
         );
     }
 }
