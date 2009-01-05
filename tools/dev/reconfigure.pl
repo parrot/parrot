@@ -24,15 +24,15 @@ my $conf = Parrot::Configure->new;
 $conf->add_step( $args->{step} );
 $conf->options->set( %{$args} );
 
-# The result of slurp() is that the parameters in %Parrot::Config::PConfig
+# The result of get_PConfig() is that the parameters in %Parrot::Config::PConfig
 # are assigned to the {c} attribute in $conf.
-$conf->data()->slurp();
+$conf->data()->get_PConfig();
 
-# The result of slurp_temp() is that the parameters in
+# The result of get_PConfig_Temp() is that the parameters in
 # %Parrot::Config::PConfig_Temp
 # are assigned to the {c}{$_} attribute in $conf.
 if ( $args->{step} =~ /gen::makefiles/ ) {
-    $conf->data()->slurp_temp();
+    $conf->data()->get_PConfig_Temp();
 }
 $conf->run_single_step( $args->{step} );
 print "\n";

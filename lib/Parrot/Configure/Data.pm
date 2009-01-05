@@ -236,7 +236,7 @@ sub keys {
     return keys %{ $self->{c} };
 }
 
-=item * C<slurp()>
+=item * C<get_PConfig()>
 
 =over 4
 
@@ -256,7 +256,7 @@ Reference to hash holding main Parrot::Configure data structure.
 
 =cut
 
-sub slurp {
+sub get_PConfig {
     my $self = shift;
     my $res  = eval <<EVAL_CONFIG;
 no strict;
@@ -270,7 +270,7 @@ EVAL_CONFIG
     $self->{c} = $res;
 }
 
-=item * C<slurp_temp()>
+=item * C<get_PConfig_Temp()>
 
 =over 4
 
@@ -292,7 +292,7 @@ structure holding temporary data.
 
 =cut
 
-sub slurp_temp {
+sub get_PConfig_Temp {
     my $self = shift;
     my $res  = eval <<EVAL_CONFIG_TEMP;
 no strict;

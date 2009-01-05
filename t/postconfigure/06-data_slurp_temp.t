@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 06-data_slurp_temp.t
+# 06-data_get_PConfig_Temp.t
 
 use strict;
 use warnings;
@@ -83,18 +83,18 @@ my $res = eval "no strict; use Parrot::Config::Generated; \\%PConfig";
 SKIP: {
     my $reason = <<REASON;
 If you have already completed configuration,
-you can call Parrot::Configure::Data::slurp().
+you can call Parrot::Configure::Data::get_PConfig().
 You appear not to have completed configuration;
 hence, three tests are skipped.
 REASON
 
     skip $reason, 3 unless defined $res;
 
-    eval { $conf->data()->slurp(); };
-    ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::slurp() succeeded" );
+    eval { $conf->data()->get_PConfig(); };
+    ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::get_PConfig() succeeded" );
 
-    eval { $conf->data()->slurp_temp(); };
-    ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::slurp_temp() succeeded" );
+    eval { $conf->data()->get_PConfig_Temp(); };
+    ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::get_PConfig_Temp() succeeded" );
    my $rv;
    my $stdout;
    capture ( sub {$rv = $conf->run_single_step( $args->{step}) }, \$stdout);
@@ -107,11 +107,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-06-data_slurp_temp.t - test Parrot::Configure::Data::slurp() once configuration has been completed
+06-data_get_PConfig_Temp.t - test Parrot::Configure::Data::get_PConfig_Temp() once configuration has been completed
 
 =head1 SYNOPSIS
 
-    % prove t/postconfigure/06-data_slurp_temp.t
+    % prove t/postconfigure/06-data_get_PConfig_Temp.t
 
 =head1 DESCRIPTION
 
@@ -122,8 +122,8 @@ Parrot::Config::Generated has been created.  So certain tests need to be run
 when your Parrot filesystem is in a "pre-F<make>, post-F<Configure.pl>" state.
 
 The tests in this file mimic the functionality of F<tools/dev/reconfigure.pl>
-and test C<Parrot::Configure::Data::slurp()>.  What is 'slurped' here is an
-already created C<%Parrot::Config::PConfig>.
+and test C<Parrot::Configure::Data::get_PConfig()>.  What is 'slurped' here is
+an already created C<%Parrot::Config::PConfig>.
 
 =head1 AUTHOR
 

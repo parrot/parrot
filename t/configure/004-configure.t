@@ -77,17 +77,17 @@ my $res = eval "no strict; use Parrot::Config::Generated; \\%PConfig";
 SKIP: {
     my $reason = <<REASON;
 If you have already completed configuration,
-you can call Parrot::Configure::Data::slurp().
+you can call Parrot::Configure::Data::get_PConfig().
 But here you are testing for that method's failure.
 REASON
 
     skip $reason, 1 if defined $res;
 
-    eval { $conf->data()->slurp(); };
+    eval { $conf->data()->get_PConfig(); };
     like(
         $@,
         qr/You cannot use --step until you have completed the full configure process/,
-"Got expected error message for --step option and slurp() without prior configuration"
+"Got expected error message for --step option and get_PConfig() without prior configuration"
     );
 }
 
@@ -95,17 +95,17 @@ $res = eval "no strict; use Parrot::Config::Generated; \\%PConfig_Temp";
 SKIP: {
     my $reason = <<REASON;
 If you have already completed configuration,
-you can call Parrot::Configure::Data::slurp_temp().
+you can call Parrot::Configure::Data::get_PConfig_Temp().
 But here you are testing for that method's failure.
 REASON
 
     skip $reason, 1 if defined $res;
 
-    eval { $conf->data()->slurp_temp(); };
+    eval { $conf->data()->get_PConfig_Temp(); };
     like(
         $@,
         qr/You cannot use --step until you have completed the full configure process/,
-"Got expected error message for --step option and slurp_temp() without prior configuration"
+"Got expected error message for --step option and get_PConfig_Temp() without prior configuration"
     );
 }
 

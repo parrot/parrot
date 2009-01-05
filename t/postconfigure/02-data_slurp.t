@@ -1,7 +1,7 @@
 #! perl
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-# 02-data_slurp.t
+# 02-data_get_PConfig.t
 
 use strict;
 use warnings;
@@ -81,15 +81,15 @@ my $res = eval "no strict; use Parrot::Config; \\%PConfig";
 SKIP: {
     my $reason = <<REASON;
 If you have already completed configuration,
-you can call Parrot::Configure::Data::slurp().
+you can call Parrot::Configure::Data::get_PConfig().
 You appear not to have completed configuration;
 hence, two tests are skipped.
 REASON
 
     skip $reason, 2 unless defined $res;
 
-    eval { $conf->data()->slurp(); };
-    ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::slurp() succeeded" );
+    eval { $conf->data()->get_PConfig(); };
+    ok( ( defined $@ ) && ( !$@ ), "Parrot::Configure::get_PConfig() succeeded" );
     my $rv;
     my $stdout;
     capture ( sub {$rv = $conf->run_single_step( $args->{step})}, \$stdout  );
@@ -102,11 +102,11 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-02-data_slurp.t - test Parrot::Configure::Data::slurp() once configuration has been completed
+02-data_get_PConfig.t - test Parrot::Configure::Data::get_PConfig() once configuration has been completed
 
 =head1 SYNOPSIS
 
-    % prove t/postconfigure/02-data_slurp.t
+    % prove t/postconfigure/02-data_get_PConfig.t
 
 =head1 DESCRIPTION
 
@@ -117,7 +117,7 @@ Parrot::Config::Generated has been created.  So certain tests need to be run
 when your Parrot filesystem is in a "pre-F<make>, post-F<Configure.pl>" state.
 
 The tests in this file mimic the functionality of F<tools/dev/reconfigure.pl>
-and test C<Parrot::Configure::Data::slurp()>.  What is 'slurped' here is an
+and test C<Parrot::Configure::Data::get_PConfig()>.  What is 'slurped' here is an
 already created C<%Parrot::Config::PConfig>.
 
 =head1 AUTHOR
