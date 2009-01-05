@@ -701,5 +701,126 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
     return pc;
 }
 
+#  define jit_emit_test_r_i(pc, reg1) emitm_alul_r_r((pc), 0x85, (reg1), (reg1))
+#  define emitm_jz   4
+#  define emitm_sdivl_r(pc, reg2) emitm_alu_imp_r((pc), emit_b111, (reg2))
+#  define emitm_jumps(pc, disp) { \
+    *((pc)++) = (char) 0xeb; \
+    *((pc)++) = (disp); }
+/* These are used by both signed and unsigned EDIV, but only unsigned MUL */
+#  define emitm_alu_imp_r(pc, op, reg) { \
+    *((pc)++) = (char) 0xf7; \
+    *((pc)++) = (char) emit_alu_X_r((op), (reg)); }
 
+/* dest /= src
+ * edx:eax /= src, quotient => eax, rem => edx
+ */
+char *
+opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
+{
+    char *pc = jit_info->native_ptr;
+    int saved = 0;
+    int div_ecx = 0;
+    char *L1, *L2, *L3;
+    static const char div_by_zero[] = "Divide by zero";
+
+    PARROT_ASSERT(src != emit_EAX);
+
+    if (dest != emit_EAX) {
+        jit_emit_mov_rr_i(pc, emit_EAX, dest);
+    }
+    if (dest == emit_EDX) {
+        /* all ok, we can globber it */
+    }
+    else {
+        /* if ECX is not mapped use it */
+        if (!intreg_is_used(jit_info, emit_ECX) && src == emit_EDX) {
+            jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+            div_ecx = 1;
+        }
+        else
+            /* if EDX is mapped, preserve EDX on stack */
+            if (intreg_is_used(jit_info, emit_EDX)) {
+                emitm_pushl_r(pc, emit_EDX);
+                saved = 1;
+                /* if EDX is the src, we need another temp register: ECX */
+                if (src == emit_EDX) {
+                    /* if ECX is mapped save it, but not if it's dest */
+                    if (intreg_is_used(jit_info, emit_ECX) &&
+                            dest != emit_ECX) {
+                        emitm_pushl_r(pc, emit_ECX);
+                        saved = 2;
+                    }
+                    /* else just use it */
+                    jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
+                    div_ecx = 1;
+                }
+            }
+    }
+    /* this sequence allows 2 other instructions to run parallel */
+    if (dest != emit_EDX) {
+        jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
+    }
+    pc = emit_shift_i_r(interp, pc, emit_b111, 31, emit_EDX); /* SAR 31 */
+    if (div_ecx) {
+        jit_emit_test_r_i(pc, emit_ECX);
+        L1 = pc;
+        emitm_jxs(pc, emitm_jz, 0);
+        emitm_sdivl_r(pc, emit_ECX);
+        L3 = pc;
+        emitm_jumps(pc, 0);
+        /* L1: */
+        L1[1] = (char)(pc - L1 - 2);
+    }
+    else {
+        jit_emit_test_r_i(pc, src);
+        L2 = pc;
+        emitm_jxs(pc, emitm_jz, 0);
+        emitm_sdivl_r(pc, src);
+        L3 = pc;
+        emitm_jumps(pc, 0);
+        /* L2: */
+        L2[1] = (char)(pc - L2 - 2);
+    }
+    /* TODO Parrot_ex_throw_from_c_args */
+    emitm_pushl_i(pc, div_by_zero);
+    emitm_pushl_i(pc, EXCEPTION_DIV_BY_ZERO);
+    emitm_pushl_i(pc, 0);    /* NULL */
+    Parrot_jit_emit_get_INTERP(interp, pc, emit_ECX);
+    emitm_pushl_r(pc, emit_ECX);
+    jit_info->native_ptr = pc;
+    jit_emit_real_exception(jit_info);
+    pc = jit_info->native_ptr;
+    /* L3: */
+    L3[1] = (char)(pc - L3 - 2);
+    if (saved == 2) {
+        emitm_popl_r(pc, emit_ECX);
+    }
+    if (is_div) {
+        /* result = quotient in EAX */
+        if (saved) {
+            emitm_popl_r(pc, emit_EDX);
+        }
+        if (dest != emit_EAX) {
+            jit_emit_mov_rr_i(pc, dest, emit_EAX);
+        }
+    }
+    else {
+        /* result = remainder in EDX */
+        if (saved) {
+            emitm_popl_r(pc, emit_EAX);
+            jit_emit_mov_rr_i(pc, dest, emit_EDX);
+            jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
+        }
+        else {
+            if (dest != emit_EDX)
+                jit_emit_mov_rr_i(pc, dest, emit_EDX);
+        }
+    }
+    if (!saved && div_ecx) {
+        /* restore EDX */
+        jit_emit_mov_rr_i(pc, emit_EDX, emit_ECX);
+    }
+    return pc;
+}
 
