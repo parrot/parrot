@@ -738,6 +738,7 @@ help :
 	@echo "  cover:             Run test suite coverage analysis."
 	@echo "  tags-vi:           Create tags for the vi editor."
 	@echo "  tags-emacs:        Create tags for the EMACS editor."
+	@echo "  perlcritic:        Check Perl code with Perl::Critic."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
@@ -2235,6 +2236,13 @@ tags-vi: tags.vi.dummy
 	$(PERL) $(BUILD_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.vi.dummy:
+
+perlcritic:
+	perlcritic --profile tools/util/perlcritic.conf
+
+# Andy's extra-cranky Perl::Critic checking for cage cleaners
+cagecritic:
+	perlcritic -1 --profile tools/util/perlcritic-cage.conf lib/Parrot
 
 # This target will eventually create all the headers automatically.  If you are
 # having problems with linkage in Win32 (or elsewhere), because something is
