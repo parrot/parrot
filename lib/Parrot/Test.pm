@@ -935,6 +935,7 @@ sub _generate_test_functions {
 
                 my $cmd =
                       "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} "
+                    . ($^O =~ m/MSWin32/ and $PConfig{cc} eq 'cl' ? "-DPARROT_IN_EXTENSION" : "")
                     . " -I./include -c "
                     . "$PConfig{cc_o_out}$obj_f $source_f";
                 my $exit_code = run_command(
