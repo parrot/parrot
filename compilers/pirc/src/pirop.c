@@ -28,7 +28,18 @@
  * Note that the last 's' corresponds to USTRING_VAL, which is a unicode
  * string, but when used it's still a string.
  */
-static char const type_codes[10] = {'i', 's', 'p', 'n', '?', 'i', 's', 'p', 'n', 's'};
+static char const type_codes[10] = {
+    'i',   /* INT_TYPE     */
+    's',   /* STRING_TYPE  */
+    'p',   /* PMC_TYPE     */
+    'n',   /* NUM_TYPE     */
+    '?',   /* UNKNOWN_TYPE */
+    'i',   /* INT_VAL      */
+    's',   /* STRING_VAL   */
+    'p',   /* PMC_VAL      */
+    'n',   /* NUM_VAL      */
+    's'    /* USTRING_VAL  */
+};
 
 /*
 

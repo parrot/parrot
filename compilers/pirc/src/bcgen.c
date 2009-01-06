@@ -359,7 +359,7 @@ create_codesegment(bytecode * const bc, int codesize) {
 /*
 
 =item C<void
-create_annotations_segment(bytecode * const bc)>
+create_annotations_segment(bytecode * const bc, char const * const name)>
 
 Create an annotations segment, and an initial annotations group.
 

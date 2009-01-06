@@ -541,7 +541,7 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
          * store the register as "used".
          */
         int nextreg = next_register(lexer, type);
-        fprintf(stderr, "mapping reg %d to %d\n", regno, nextreg);
+        /* fprintf(stderr, "mapping reg %d to %d\n", regno, nextreg); */
         return use_register(lexer, type, regno, nextreg);
     }
 }

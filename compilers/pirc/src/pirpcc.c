@@ -125,7 +125,6 @@ mapped to a PASM register, so using negative PIR register is safe.
 */
 static target *
 generate_unique_pir_reg(lexer_state * const lexer, pir_type type) {
-    fprintf(stderr, "unique reg of type %d: %d\n", type, lexer->pir_reg_generator - 1);
     return new_reg(lexer, type, --lexer->pir_reg_generator);
 }
 
@@ -316,8 +315,6 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     array_index = generate_signature_pmc(lexer, num_arguments);
     /* add the index (of the signature PMC) in the PBC constant table as operand */
     push_operand(lexer, expr_from_int(lexer, array_index));
-
-    fprintf(stderr, "args2ops: %d arguments\n", num_arguments);
 
     /* no need to continue if there's no arguments */
     if (num_arguments == 0)
@@ -565,8 +562,8 @@ convert_nci_call(lexer_state * const lexer, invocation * const inv)>
 Generate instructions for a function invocation using the Native Call
 Interface (NCI). The sequence of instructions is:
 
-XXX complete this.
-
+ set_args_pc
+ get_results_pc
  invokecc_p
 
 =cut
@@ -574,7 +571,18 @@ XXX complete this.
 */
 static void
 convert_nci_call(lexer_state * const lexer, invocation * const inv) {
-    set_instr(lexer, "invokecc_p");
+    target *sub;
+
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
+    arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
+
+    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
+    targets_to_operands(lexer, inv->results, inv->num_results);
+
+    sub = get_invoked_sub(lexer, inv->sub);
+
+    new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p", 0);
+    add_operands(lexer, "%T", sub);
 }
 
 /*
@@ -588,8 +596,6 @@ The sequence of instructions is:
  set_returns_pc
  yield
 
-XXX This does not work; why?
-
 =cut
 
 */
@@ -599,7 +605,6 @@ convert_pcc_yield(lexer_state * const lexer, invocation * const inv) {
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
     new_sub_instr(lexer, PARROT_OP_yield, "yield", 0);
 }
-
 
 
 /*
@@ -658,7 +663,7 @@ convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
     switch (inv->method->type) {
         case EXPR_TARGET:
             new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
-            add_operands(lexer, "%T%E", inv->sub, inv->method);
+            add_operands(lexer, "%T%E", inv->sub, inv->method); /* XXX test this */
             break;
         case EXPR_CONSTANT:
             new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_sc, "tailcallmethod_p_sc", 0);
@@ -712,6 +717,7 @@ convert_inv_to_instr(lexer_state * const lexer, invocation * const inv) {
             panic(lexer, "Unknown invocation type in convert_inv_to_instr()");
             break;
     }
+
 
 }
 
