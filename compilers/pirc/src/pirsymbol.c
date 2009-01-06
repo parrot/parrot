@@ -68,7 +68,7 @@ Globally defined constants are stored in yet another separate list.
  * When input is STRING_TYPE you'll only get STRING_VAL,
  * never USTRING_VAL (indicating unicode string).
  */
-static const int valuetype_pirtype_clut[10] = {
+const int valuetype_pirtype_clut[10] = {
     INT_VAL,      /* INT_TYPE -> INT_VAL */
     STRING_VAL,   /* STRING_TYPE -> STRING_VAL */
     PMC_VAL,      /* PMC_TYPE -> PMC_VAL */

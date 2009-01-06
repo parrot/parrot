@@ -161,6 +161,7 @@ print_constant(lexer_state * const lexer, constant * const c) {
             panic(lexer, "Unknown type detected in print_constant()");
             break;
     }
+
 }
 
 /*

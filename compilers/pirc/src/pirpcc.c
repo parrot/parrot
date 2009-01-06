@@ -85,8 +85,10 @@ calculate_pcc_argument_flags(argument * const arg) {
             SET_FLAG(flag, arg->value->expr.t->info->type);
             break;
         case EXPR_CONSTANT:
-            /* copy the type of the constant */
-            SET_FLAG(flag, arg->value->expr.c->type);
+            /* copy the type of the constant; note that constants store a value_type,
+             * not a pir_type, so convert here.
+             */
+            SET_FLAG(flag, valuetype_pirtype_clut[arg->value->expr.c->type]);
             /* set the flag indicating the argument is a constant literal, not a register. */
             SET_FLAG(flag, PARROT_ARG_CONSTANT);
             break;
@@ -477,7 +479,7 @@ convert_pcc_call(lexer_state * const lexer, invocation * const inv) {
 
     if (inv->retcc) { /* return continuation present? */
         new_sub_instr(lexer, PARROT_OP_invoke_p_p, "invoke_p_p", 0);
-        add_operands(lexer, "%T%T", inv->sub, inv->retcc);
+        add_operands(lexer, "%T%T", sub, inv->retcc);
     }
     else {
         new_sub_instr(lexer, PARROT_OP_invokecc_p, "invokecc_p", 0);

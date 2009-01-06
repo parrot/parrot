@@ -72,6 +72,9 @@ typedef struct local_label {
 } local_label;
 
 
+/* lookup table to convert value_type and pir_type values into one another. */
+extern const int valuetype_pirtype_clut[10];
+
 
 /* symbol constructor */
 symbol *new_symbol(struct lexer_state * const lexer, char const * const name, pir_type type);
