@@ -906,8 +906,8 @@ emit_pbc_annotations(lexer_state * const lexer) {
     if (lexer->annotations == NULL)
         return;
 
-#if 0
 
+#if 0
     /* create an annotations segment, which is not created by default. */
     create_annotations_segment(lexer->bc, lexer->filename);
 
@@ -917,13 +917,30 @@ emit_pbc_annotations(lexer_state * const lexer) {
     /* iterate over annotations and store them */
     do {
 
-        /* add the key */
-        opcode_t key  = ....
+        opcode_t key, value;
 
-        opcode_t type = ...
-        opcode_t offset = iter->offset;
 
-        add_annotation(lexer->bc, offset, key, type, value);
+        switch (iter->value->type) {
+            case INT_VAL:
+                value = iter->value->val.ival;
+                break;
+            case NUM_VAL:
+                value = add_num_const(lexer->bc, iter->value->val.nval);
+                break;
+            case STRING_VAL:
+                value = add_string_const(lexer->bc, iter->value->val.sval, "ascii");
+                break;
+            case USTRING_VAL:
+                value = add_string_const(lexer->bc, iter->value->val.ustr->contents,
+                                                    iter->value->val.ustr->charset);
+                break;
+            default:
+                panic(lexer, "unknown annotation constant type");
+                break;
+        }
+
+
+        add_annotation(lexer->bc, iter->offset, key, iter->value->type, value);
 
         iter = iter->next;
     }
@@ -931,6 +948,8 @@ emit_pbc_annotations(lexer_state * const lexer) {
 
 #endif
 }
+
+
 
 /*
 

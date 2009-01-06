@@ -49,8 +49,8 @@ typedef struct multi_type {
  * sub.
  */
 typedef struct lexical {
-    char const     *name;
-    int            *color;
+    char const     *name;     /* name of this lexical */
+    int            *color;    /* register assigned to the lexical */
     struct lexical *next;
 
 } lexical;
@@ -81,6 +81,11 @@ bytecode *new_bytecode(Interp *interp, char const * const filename);
 
 
 void create_codesegment(bytecode * const bc, int codesize);
+
+void create_annotations_segment(bytecode * const bc, char const * const name);
+
+void add_annotation(bytecode * const bc, opcode_t offset, opcode_t key,
+                                         opcode_t type, opcode_t value);
 
 /* call this to write the PBC file */
 void write_pbc_file(bytecode * const bc, char const * const filename) ;

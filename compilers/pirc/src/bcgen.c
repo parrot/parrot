@@ -401,6 +401,7 @@ add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type
 
 #endif
 
+
 /*
 
 =item C<void
