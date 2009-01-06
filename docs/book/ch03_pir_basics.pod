@@ -524,6 +524,67 @@ and expects. To circumvent this limitation, PMCs may have METHODS in
 addition to VTABLES. METHODS are arbitrary code functions that can be
 written in C, may have any name, and may implement any behavior.
 
+=head2 Subclassing PMCs
+
+Existing built-in PMC types can be subclassed to associate additional data
+and methods with that PMC type. Subclassed PMC types act like their PMC
+base types, by sharing the same VTABLE methods and underlying data types.
+However, the subclass can define additional methods and attribute data
+storage. If necessary new VTABLE interfaces can be defined in PIR and old
+VTABLE methods can be overriden using PIR. We'll talk about defining
+methods and VTABLE interface overrides in the next chapter.
+
+Creating a new subclass of an existing PMC class is done using the
+C<subclass> keyword:
+
+  # create an anonymous subclass
+  $P0 = subclass 'ResizablePMCArray'
+
+  # create a subclass named "MyArray"
+  $P0 = subclass 'ResizablePMCArray', 'MyArray'
+
+This returns a C<Class> PMC which can be used to create and modify the
+class by adding attributes or creating objects of that class. You can also
+use the new class PMC to create additional subclasses:
+
+  $P0 = subclass 'ResizablePMCArray', 'MyArray'
+  $P1 = subclass $P0, 'MyOtherArray'
+
+Once you have created these classes, you can create them like normal with
+the C<new> keyword:
+
+  $P0 = new 'MyArray'
+  $P1 = new 'MyOtherArray'
+
+=head2 Creating Classes
+
+In addition to subclassing existing PMC types, new classes can be created
+in PIR from scratch. This is done with the C<newclass> opcode:
+
+  $P0 = newclass 'MyClass'
+
+=head2 Attributes
+
+Classes and subclasses can be given attributes N<in addition to methods,
+which we will talk about in the next chapter> which are named data fields.
+Attributes are created with the C<addattribute> opcode, and can be set
+and retrieved with the C<setattribute> and C<getattribute> opcodes
+respectively:
+
+  $P0 = newclass 'MyClass'
+  addattribute $P0, 'First'
+  addattribute $P0, 'Second'
+
+  $P1 = new 'MyClass'
+  setattribute $P1, 'First', 'First Value'
+  setattribute $P1, 'Second', 'Second Value'
+  $S0 = getattribute $P1, 'First'
+  $S1 = getattribute $P1, 'Second'
+
+Those values added as attributes don't need to be strings, even though
+both of the ones in the example are. They can be integers, numbers
+or PMCs too.
+
 =cut
 
 ##########################################################################
