@@ -2417,6 +2417,7 @@ close_sub(lexer_state * const lexer) {
      */
     if (CURRENT_INSTRUCTION(lexer)) {
         switch (CURRENT_INSTRUCTION(lexer)->opcode) {
+            case PARROT_OP_tailcall_p:
             case PARROT_OP_end:
             case PARROT_OP_returncc:
             case PARROT_OP_yield:
