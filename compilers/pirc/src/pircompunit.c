@@ -2495,12 +2495,11 @@ annotate(lexer_state * const lexer, char const * const key, constant * const val
     annotation *ann     = (annotation *)pir_mem_allocate(lexer, sizeof (annotation));
     ann->key            = key;
     ann->value          = value;
-    /* store the current statement counter value */
-    ann->bytecode_index = lexer->stmt_counter;
+
     ++lexer->num_annotations; /* keep track of number of annotations */
 
-    /* store a pointer to the current instruction */
-    ann->instr = CURRENT_INSTRUCTION(lexer);
+
+    ann->offset = CURRENT_INSTRUCTION(lexer)->offset;
 
     /* store the annotation in a list, managed by the lexer
      * the list is circular linked, so that the order of annotations is preserved.

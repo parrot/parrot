@@ -333,10 +333,9 @@ typedef struct hashtable {
 
 /* struct to represent bytecode annotation */
 typedef struct annotation {
-    int bytecode_index;    /* index in bytecode stream from where this annotation is active */
+    opcode_t     offset;
     char const  *key;      /* key of annotation */
     constant    *value;    /* value of annotation */
-    instruction *instr;    /* pointer to the instruction from where the annotation is active */
 
     struct annotation *next; /* next annotation; annotations are stored in a list */
 

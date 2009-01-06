@@ -909,7 +909,7 @@ emit_pbc_annotations(lexer_state * const lexer) {
 #if 0
 
     /* create an annotations segment, which is not created by default. */
-    create_annotations_segment(lexer->bc, lexer->interp->code->base.data);
+    create_annotations_segment(lexer->bc, lexer->filename);
 
     /* initialize to the first annotation */
     iter = lexer->annotations->next;
@@ -921,7 +921,7 @@ emit_pbc_annotations(lexer_state * const lexer) {
         opcode_t key  = ....
 
         opcode_t type = ...
-        opcode_t offset = (opcode_t)iter->instr->offset;
+        opcode_t offset = iter->offset;
 
         add_annotation(lexer->bc, offset, key, type, value);
 

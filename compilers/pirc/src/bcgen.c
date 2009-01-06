@@ -359,7 +359,7 @@ create_codesegment(bytecode * const bc, int codesize) {
 /*
 
 =item C<void
-create_annotations_segment(bytecode * const bc, opcode_t bytecode_offset)>
+create_annotations_segment(bytecode * const bc)>
 
 Create an annotations segment, and an initial annotations group.
 
@@ -367,13 +367,18 @@ Create an annotations segment, and an initial annotations group.
 
 */
 void
-create_annotations_segment(bytecode * const bc, opcode_t bytecode_offset) {
+create_annotations_segment(bytecode * const bc, char const * const name) {
+    char *segment_name = (char *)mem_sys_allocate((strlen(name) + 5) * sizeof (char));
+    sprintf(segment_name, "%s_ANN", name);
+
     bc->interp->code->annotations = PackFile_Segment_new_seg(bc->interp,
                                         bc->interp->code->base.dir,
-                                        PF_ANNOTATIONS_SEG, "ANNOTATIONS", 1);
+                                        PF_ANNOTATIONS_SEG, segment_name, 1);
 
     /* Create initial group. */
-    PackFile_Annotations_add_group(bc->interp, bc->interp->code->annotations, bytecode_offset);
+    PackFile_Annotations_add_group(bc->interp,
+                                   bc->interp->code->annotations,
+                                   bc->interp->code->base.data);
 }
 
 
