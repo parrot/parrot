@@ -5,7 +5,7 @@
     load_bytecode "library/Stream/Replay.pir"
 
     stream = new "Stream::Writer"
-    $P0 = global "_reader"
+    $P0 = get_global "_reader"
     assign stream, $P0
 
     stream."write"( "1" )
