@@ -310,7 +310,7 @@ main(int argc, char *argv[]) {
         return 0;
     }
     else {
-        hdocoutfile = tmpnam("hdoc");
+        hdocoutfile = "hdoctemp";
         file = open_file(hdocoutfile, "w");
         process_heredocs(interp, argv[0], file);
         fclose(file);
