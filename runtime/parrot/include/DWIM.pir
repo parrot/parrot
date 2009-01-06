@@ -40,8 +40,8 @@ dwim2:
 iter_end:
 
     .begin_return
-    .return dwim
-    .return pos
+    .set_return dwim
+    .set_return pos
     .end_return
 .end
 
