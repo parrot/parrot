@@ -848,6 +848,7 @@ set_label(lexer_state * const lexer, char const * const labelname) {
      *
      * jumping to L1 is equivalent to jumping to L2 or L3; so when calculating
      * branch offsets, all three labels must yield the same offset.
+     */
 
     /* store the labelname and its offset */
     store_local_label(lexer, labelname, instr->offset);
