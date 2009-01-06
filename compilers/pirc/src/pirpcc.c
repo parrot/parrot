@@ -618,9 +618,10 @@ The sequence of instructions is:
 static void
 convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
-    arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
+
     /* in a methodcall, the invocant object is passed as the first argument */
-    unshift_operand(lexer, expr_from_target(lexer, inv->sub));
+    unshift_arg(inv->arguments, new_argument(lexer, expr_from_target(lexer, inv->sub)));
+    arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
     new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
     targets_to_operands(lexer, inv->results, inv->num_results);

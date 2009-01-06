@@ -417,6 +417,7 @@ expression *expr_from_num(struct lexer_state * const lexer, double nval);
 /* functions for argument node creation and storing */
 argument *new_argument(struct lexer_state * const lexer, expression * const expr);
 argument *add_arg(argument *arg1, argument * const arg2);
+void unshift_arg(argument *last, argument * const newarg);
 
 target *add_param(struct lexer_state * const lexer, pir_type type, char const * const name);
 target *set_param_alias(struct lexer_state * const lexer, char const * const alias);

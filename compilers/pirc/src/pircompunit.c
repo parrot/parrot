@@ -748,11 +748,41 @@ add_arg(argument *last, argument * const newarg) {
     PARROT_ASSERT(last);
     PARROT_ASSERT(newarg);
 
-    newarg->next = last->next; /* arg2->next is last one, must point to first item */
+    newarg->next = last->next;
     last->next   = newarg;
     last         = newarg;
 
     return last;
+}
+
+/*
+
+=item C<void
+unshift_arg(argument *last, argument * const newarg)>
+
+Unshift argument C<newarg> in front of the list, pointed to by C<last>.
+Given this list:
+
+ A->B->C->D
+ ^
+
+A is the last one, B the first one. D points to A.
+After the unshift_arg() call, the list should look like:
+
+ A->X->B->C->D
+ ^
+
+Where X is the new argument. Basically, it's inserted in between
+A (last) and B (first), but the pointer to the "last" is not updated,
+so that A stays the last.
+
+=cut
+
+*/
+void
+unshift_arg(argument *last, argument * const newarg) {
+    newarg->next = last->next;
+    last->next   = newarg;
 }
 
 /*
