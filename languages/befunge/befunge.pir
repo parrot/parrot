@@ -1,10 +1,10 @@
 # $Id$
 
+.include "debug.pir"
 .include "load.pir"
 
 =pod
 
-.include "debug.pasm"
 .include "flow.pasm"
 .include "io.pasm"
 .include "maths.pasm"
@@ -35,12 +35,11 @@ ARGV_NEXT:
     char = substr arg, 0, 1
     ne char, "-",  ARGV_DONE
     eq arg,  "-d", ARGV_DEBUG
-    branch ARGV_NEXT
+    goto ARGV_NEXT
 
 ARGV_DEBUG:
-    inc i
-    #TODO bsr DEBUG_INITIALIZE    # initialize P3
-    branch ARGV_NEXT
+    debug_initialize()
+    goto ARGV_NEXT
 
 ARGV_DONE:
     file      = argv[i]

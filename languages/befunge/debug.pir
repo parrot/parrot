@@ -1,19 +1,37 @@
 # $Id$
 
-# Initialize the debug structure.
-# P3 = [ 1, { "<" => 1, "10,10" => 1, "r:6" => 1, "c:3" => 1, ... } ]
-# P3[0] = stop at each step
-# P3[1] = a Hash which keys are either the char to break upon
-#         when reaching it, or a location "y,x", or a column "c:nn"
-#         or a row "r:nn"
-DEBUG_INITIALIZE:
-        new P3, 'ResizablePMCArray'
-        set P3[0], 1          # Stop at first step.
-        repeat S10, "0", 128  # No char to break on.
-        new P4, 'Hash'
-        set P3[1], P4         # The breakpoints.
-        ret
+#
+# ** globals used for debug purposes:
+#
+# step: boolean telling whether to stop at each step
+#
+# breakpoints: hash listing the existing breakpoints. the keys are
+# either the char to break upon when reaching it, or a location "y,x",
+# or a column "c:nn", or a row "r:nn"
+# eg: { "<" => 1, "10,10" => 1, "r:6" => 1, "c:3" => 1, ... }
+#
 
+#
+# debug_initialize()
+#
+# declare & initialize global debug variables
+#
+.sub "debug_initialize"
+    .local pmc step, breakpoints
+    
+    step = new 'Integer'
+    step = 1
+    breakpoints = new 'Hash'
+
+    set_global "step", step
+    set_global "breakpoints", breakpoints
+    #repeat S10, "0", 128  # No char to break on.
+    
+    .return()
+.end
+
+
+=pod
 
 # Check whether we should stop the interpreter at the current
 # moment, allowing user to play with the debugger.
@@ -213,3 +231,4 @@ DEBUG_DUMP_PLAYFIELD_END:
         print S10
         ret
 
+=cut
