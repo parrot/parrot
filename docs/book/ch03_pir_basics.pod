@@ -124,7 +124,7 @@ in the code with numeric constants.
   $I0 = 42       # Integers are regular numeric constants
   $I1 = -1       # They can be negative or positive
   $I2 = 0xA5     # They can also be hexadecimal
-  $I3 = 046      # ...or octal
+  $I4 = 0b01010  # ...or binary
 
   $N0 = 3.14     # Numbers can have a decimal point
   $N1 = 4        # ...or they don't
