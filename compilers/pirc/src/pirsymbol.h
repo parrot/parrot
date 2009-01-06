@@ -18,6 +18,8 @@
 #include "pircompunit.h"
 #include "pirregalloc.h"
 
+#define NO_REG_ALLOCATED    -1
+
 /* core info of all symbols and PIR registers ($I42, etc.). */
 typedef struct syminfo {
     int            color;

@@ -23,7 +23,7 @@ Conventions.
 #include "pircompunit.h"
 #include "pircompiler.h"
 #include "pirerr.h"
-#include "pirdefines.h"
+#include "pirsymbol.h"
 
 #include "parrot/oplib/ops.h"
 

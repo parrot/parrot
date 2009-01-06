@@ -49,7 +49,7 @@ Globally defined constants are stored in yet another separate list.
 */
 
 
-#define NO_REG_ALLOCATED    -1
+
 
 /* Conversion Look-Up Table (CLUT) for pir_type and value_type enums.
  *
