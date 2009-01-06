@@ -709,7 +709,8 @@ set_param_flag(lexer_state * const lexer, target * const param, target_flag flag
 =item C<argument *
 new_argument(lexer_state * const lexer, expression * const expr)>
 
-Create a new argument node which wraps C<expr>.
+Create a new argument node which wraps C<expr>. The new argument node
+is circular linked, meaning its C<next> pointer points to itself.
 
 =cut
 
@@ -776,13 +777,19 @@ Where X is the new argument. Basically, it's inserted in between
 A (last) and B (first), but the pointer to the "last" is not updated,
 so that A stays the last.
 
+The function returns a pointer to the last node in the list.
+
 =cut
 
 */
-void
+argument *
 unshift_arg(argument *last, argument * const newarg) {
-    newarg->next = last->next;
-    last->next   = newarg;
+    if (last) {
+        newarg->next = last->next;
+        last->next   = newarg;
+        return last;
+    }
+    return newarg;
 }
 
 /*

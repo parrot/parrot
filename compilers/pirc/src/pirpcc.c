@@ -617,10 +617,13 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
+    fprintf(stderr, "convert pcc method call\n");
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
 
     /* in a methodcall, the invocant object is passed as the first argument */
-    unshift_arg(inv->arguments, new_argument(lexer, expr_from_target(lexer, inv->sub)));
+    inv->arguments = unshift_arg(inv->arguments,
+                                 new_argument(lexer, expr_from_target(lexer, inv->sub)));
+
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
     new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", inv->num_results);
@@ -628,6 +631,7 @@ convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
 
     new_sub_instr(lexer, PARROT_OP_callmethodcc_p_sc, "callmethodcc_p_sc", 0);
     add_operands(lexer, "%T%E", inv->sub, inv->method);
+    fprintf(stderr, "convert pcc method call done\n");
 }
 
 /*
