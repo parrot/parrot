@@ -24,7 +24,7 @@
     # parsing argv
     .local int debug
     .local pmc playfield
-    (debug, playfield) = _parse_argv(argv)
+    (playfield,debug) = _parse_argv(argv)
 
     # various inits
     .local int x, y, dir, flag
@@ -53,15 +53,20 @@
         # I4 = flag (1=string-mode,2=bridge,3=end)
         # N0 = random seed
         # S2 = user input
+        # S0 = current instruction
+
+    .local int    val
+    .local string char
+  TICK:
+    val  = playfield[y;x]
+    char = chr val
+    if debug == 0 goto TICK_NODEBUG
+    #bsr DEBUG_CHECK_BREAKPOINT
+  TICK_NODEBUG:
 
 =pod
 
-TICK:
-        set I20, P1[I1;I0]
-        chr S0, I20             # S0 = current instruction
-        eq I5, 0, TICK_NODEBUG
-        bsr DEBUG_CHECK_BREAKPOINT
-TICK_NODEBUG:
+
         eq S0, "\"", FLOW_TOGGLE_STRING_MODE
         eq I4, 1, IO_PUSH_CHAR
         eq I4, 2, MAIN_TRAMPOLINE
