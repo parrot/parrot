@@ -1,6 +1,6 @@
 # $Id$
-        get_params "(0)", P5    # get @ARGV as a ResizableStringArray
-        branch MAIN
+
+=pod
 
 .include "debug.pasm"
 .include "flow.pasm"
@@ -8,6 +8,16 @@
 .include "load.pasm"
 .include "maths.pasm"
 .include "stack.pasm"
+
+=cut
+
+.sub "befunge" :main
+
+    print "befunge being ported to a working state...\n"
+
+=pod
+
+        get_params "(0)", P5    # get @ARGV as a ResizableStringArray
 
 MAIN:
         getstdout P10
@@ -117,6 +127,9 @@ MOVE_WEST:
         mod I0, I0, 80
         branch TICK
 
+=cut
+
 MAIN_END:
         end
 
+.end
