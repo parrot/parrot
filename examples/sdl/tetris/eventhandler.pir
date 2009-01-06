@@ -40,8 +40,7 @@ END:
     app = self."app"()
     app."setTimer"( 0 )
     $P0 = find_global "SDL::Event", "disptach_event"
-    invokecc $P0
-    ret = I5
+    ret = $P0()
     app."setTimer"( 1 )
     .return (ret)
 .end
