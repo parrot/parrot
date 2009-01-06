@@ -24,7 +24,7 @@ List the content of the directory 'docs'.
      store_global 'libc::readdir', readdir
      store_global 'libc::closedir', closedir
      .local pmc curdir
-     curdir = libc::opendir("docs")
+     curdir = opendir("docs")
      .local pmc entry
 
      .include "datatypes.pasm"
@@ -42,7 +42,7 @@ List the content of the directory 'docs'.
      push $P2, 256
      push $P2, 0           # 11
 lp_dir:
-     entry = libc::readdir(curdir)
+     entry = readdir(curdir)
      $I0 = get_addr entry
      unless $I0 goto done
      assign entry, $P2
@@ -59,7 +59,7 @@ loop:
      print "\n"
      goto lp_dir
 done:
-     libc::closedir(curdir)
+     closedir(curdir)
 .end
 
 # Local Variables:
