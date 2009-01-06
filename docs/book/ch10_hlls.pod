@@ -56,6 +56,78 @@ executable file, but instead is left in original PBC format.
 
 =head3 Compiler Objects
 
+The C<compreg> opcode has two forms that are used with HLL compilers. The
+first form stores an object as a compiler object to be retrieved later, and
+the second form retrieves a stored compiler object for a given language.
+The exact type of compiler object stored with C<compreg> can vary for each
+different language implementation, although most of the languages using PCT
+will have a common form. If a compiler object is in register C<$P0>, it can
+be stored using the following C<compreg> syntax:
+
+  compreg 'MyCompiler', $P0
+
+There are two built-in compiler objects: One for PIR and one for PASM. These
+two don't need to be stored first, they can simply be retrieved and used.
+The PIR and PASM compiler objects are Sub PMCs that take a single string
+argument and return an array PMC containing a list of all the compiled
+subroutines from the string. Other compiler objects might be different
+entirely, and may need to be used in different ways. A common convention is
+for a compiler to be an object with a C<compile> method. This is done with
+PCT-based compilers and for languages who use a stateful compiler.
+
+Compiler objects allow programs in Parrot to compile arbitrary code strings
+at runtime and execute them. This ability, to dynamically compile
+code that is represented in a string variable at runtime, is of fundamental
+importance to many modern dynamic languages.  Here's an example using
+the PIR compiler:
+
+  $P0 = compreg 'PIR'      # Get the compiler object
+  $P1 = $P0(code)          # Compile the string variable "code"
+
+The returned value from invoking the compiler object is an array of PMCs
+that contains the various executable subroutines from the compiled source.
+Here's a more verbose example of this:
+
+  $P0 = compreg 'PIR'
+  $S0 = << "END_OF_CODE"
+
+    .sub 'hello'
+       say 'hello world!'
+    .end
+  
+    .sub 'goodbye'
+       say 'goodbye world!'
+    .end
+
+  END_OF_CODE
+
+  $P1 = $P0($S0)
+  $P2 = $P1[0]      # The sub "hello"
+  $P3 = $P1[0]      # The sub "goodbye"
+
+  $P2()             # "hello world!"
+  $P3()             # "goodbye world!"
+
+Here's an example of a Read-Eval-Print-Loop (REPL) in PIR:
+
+  $P0 = getstdin
+  $P1 = compreg 'PIR'
+  
+  loop_top:
+    $S0 = readline $P0
+    $S0 = ".sub '' :anon\n" . $S0
+    $S0 = $S0 . "\n.end\n"
+    $P2 = $P1($S0)
+    $P2()
+  
+    goto loop_top
+
+The exact list of HLL packages installed on your system may vary. Some
+language compiler packages will exist as part of the Parrot source code
+repository, but many will be developed and maintained separately. In any
+case, these compilers will typically need to be loaded into your program
+first, before a compiler object for them can be retrieved and used.
+
 =head2 HLL Namespaces
 
 Let's take a closer look at namespaces then we have in previous chapters.
