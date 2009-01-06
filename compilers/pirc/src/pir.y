@@ -585,7 +585,6 @@ pir_chunk         : sub_def
                   | hll_mapping
                   | loadlib
                   | location_directive
-                  | annotation
                   | macro_definition
                   | error_stat
                   ;
@@ -665,10 +664,6 @@ location_directive: ".line" TK_INTC
                         { yypirset_lineno ($2, yyscanner); }
                   | ".file" TK_STRINGC
                         { lexer->filename = $2; }
-                  ;
-
-annotation        : ".annotate" TK_STRINGC ',' constant
-                        { annotate(lexer, $2, $4); }
                   ;
 
 /* HLL stuff      */
@@ -879,7 +874,12 @@ statement         : parrot_stat
                   | empty_stat
                   | location_stat
                   | expansion_stat
+                  | annotation
                   | error_stat
+                  ;
+
+annotation        : ".annotate" TK_STRINGC ',' constant "\n"
+                        { annotate(lexer, $2, $4); }
                   ;
 
 
@@ -2031,8 +2031,8 @@ basic_const_tail      : "int" identifier '=' TK_INTC
                             { $$ = new_named_const(lexer, NUM_VAL, $2, $4); }
                       | "string" identifier '=' TK_STRINGC
                             { $$ = new_named_const(lexer, STRING_VAL, $2, $4); }
-                      //| "string" identifier '=' TK_USTRINGC
-                      //      { $$ = new_named_const(lexer, USTRING_VAL, $2, $4); }
+                      | "string" identifier '=' TK_USTRINGC
+                            { $$ = new_named_const(lexer, USTRING_VAL, $2, $4); }
                       ;
 
 pmc_const_tail        : TK_STRINGC identifier '=' pmc_const

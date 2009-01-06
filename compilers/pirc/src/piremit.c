@@ -562,7 +562,7 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
      * representation of the key. Initialize the cursor (pc)
      * to write into this buffer.
      */
-    pc = key = (opcode_t *)pir_mem_allocate(lexer, k->keylength * sizeof (opcode_t));
+    pc = key = (opcode_t *)pir_mem_allocate(lexer, k->keylength * sizeof (opcode_t) * 2);
 
     /* store key length in slot 0 */
     *pc++ = k->keylength;
@@ -632,6 +632,10 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
      */
     keysize = pc - key;
 
+    fprintf(stderr, "key=[");
+    for (index = 0; index < keysize; index++) {
+        fprintf(stderr, "%d|", key[index]);
+    }
     index = store_key_bytecode(lexer->bc, key);
 
     fprintf(stderr, "store_key_bytecode index=%d\n", index);

@@ -375,6 +375,25 @@ create_annotations_segment(bytecode * const bc, opcode_t bytecode_offset) {
     /* Create initial group. */
     PackFile_Annotations_add_group(bc->interp, bc->interp->code->annotations, bytecode_offset);
 }
+
+
+/*
+
+void
+add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type, opcode_t value)>
+
+Add an annotation for the bytecode at C<offset>, having a key C<key>,
+of type C<type> and a value passed in C<value>.
+
+=cut
+
+*/
+void
+add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type, opcode_t value) {
+    PackFile_Annotations_add_entry(bc->interp, bc->interp->code->annotations,
+                                   offset, key, type, value);
+}
+
 #endif
 
 /*
