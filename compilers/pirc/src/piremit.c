@@ -806,6 +806,7 @@ static void
 emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
     int         i;
     expression *operand;
+    opcode_t offset;
 
     /* emit the opcode */
 
@@ -819,7 +820,19 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
     optimize_instr(lexer, instr);
 
 
-    emit_opcode(lexer->bc, instr->opcode);
+    offset = emit_opcode(lexer->bc, instr->opcode);
+
+    /* the offset at which the instruction is written must be equal
+     * to the offset that we calculated ourselves. Sanity check!
+     */
+
+    /*
+    if (offset != instr->offset)
+        fprintf(stderr, "unexpected offset: %d / %d\n",  offset, instr->offset);
+    else
+        fprintf(stderr, "offset ok\n");
+
+    */
 
     /* emit the arguments */
 
@@ -875,6 +888,50 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
     }
 }
 
+
+/*
+
+=item C<static void
+emit_pbc_annotations(lexer_state * const lexer)>
+
+Emit all annotations into the PackFile.
+
+=cut
+
+*/
+static void
+emit_pbc_annotations(lexer_state * const lexer) {
+    annotation *iter;
+
+    if (lexer->annotations == NULL)
+        return;
+
+#if 0
+
+    /* create an annotations segment, which is not created by default. */
+    create_annotations_segment(lexer->bc, lexer->interp->code->base.data);
+
+    /* initialize to the first annotation */
+    iter = lexer->annotations->next;
+
+    /* iterate over annotations and store them */
+    do {
+
+        /* add the key */
+        opcode_t key  = ....
+
+        opcode_t type = ...
+        opcode_t offset = (opcode_t)iter->instr->offset;
+
+        add_annotation(lexer->bc, offset, key, type, value);
+
+        iter = iter->next;
+    }
+    while (iter != lexer->annotations->next);
+
+#endif
+}
+
 /*
 
 =item C<void
@@ -920,6 +977,9 @@ emit_pbc(lexer_state * const lexer) {
         subiter = subiter->next;
     }
     while (subiter != lexer->subs->next);
+
+    /* emit annotations */
+    emit_pbc_annotations(lexer);
 
     /* write the output to a file. */
     write_pbc_file(lexer->bc, "a.pbc");  /* XXX fix output file specified by user */

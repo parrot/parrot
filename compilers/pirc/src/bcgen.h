@@ -87,16 +87,11 @@ void write_pbc_file(bytecode * const bc, char const * const filename) ;
 
 
 /* emitting ops */
-void emit_opcode(bytecode * const bc, opcode_t op);
-
-
-/* does a look-up of the op by name, then emit that bytecode */
-void emit_op_by_name(bytecode * const bc, char const * const name);
-
+opcode_t emit_opcode(bytecode * const bc, opcode_t op);
 
 /* emitting operands */
+opcode_t emit_int_arg(bytecode * const bc, int argvalue);
 
-void emit_int_arg(bytecode * const bc, int argvalue);
 
 /* storing constants in constant table */
 

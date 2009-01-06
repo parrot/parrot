@@ -416,38 +416,41 @@ destroy_bytecode(bytecode * bc) {
 
 /*
 
-=item C<void
+=item C<opcode_t
 emit_opcode(bytecode * const bc, opcode_t op)>
 
-Write the opcode C<op> into the bytecode stream.
+Write the opcode C<op> into the bytecode stream. The bytecode
+offset where the instruction is written is returned.
 
 =cut
 
 */
-void
+PARROT_IGNORABLE_RESULT
+opcode_t
 emit_opcode(bytecode * const bc, opcode_t op) {
-    *bc->opcursor++ = op;
+    *bc->opcursor = op;
     fprintf(stderr, "[%d]", op);
+    return (bc->opcursor++ - bc->interp->code->base.data);
 
 }
 
 /*
 
-=item C<void
+=item C<opcode_t
 emit_int_arg(bytecode * const bc, int intval)>
 
-Write an integer argument into the bytecode stream.
-XXX Possibly use 1 function for emitting opcodes and ints; they're
-the same anyway?
+Write an integer argument into the bytecode stream. The offset
+in bytecode where the instruction is written is returned.
 
 =cut
 
 */
-void
+PARROT_IGNORABLE_RESULT
+opcode_t
 emit_int_arg(bytecode * const bc, int intval) {
-    *bc->opcursor++ = intval;
+    *bc->opcursor = intval;
     fprintf(stderr, "{%d}", intval);
-
+    return (bc->opcursor++ - bc->interp->code->base.data);
 }
 
 

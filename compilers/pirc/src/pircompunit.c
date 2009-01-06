@@ -2483,7 +2483,9 @@ update_sub_register_usage(lexer_state * const lexer, unsigned reg_usage[NUM_PARR
 =item C<void
 annotate(lexer_state * const lexer, char const * const key, constant * const value)>
 
-Add a new annotation with key C<key> and value C<value>.
+Add a new annotation with key C<key> and value C<value>. This function assumes
+that there's an instruction in place, as it will store a pointer to the current
+instruction.
 
 =cut
 
@@ -2496,6 +2498,9 @@ annotate(lexer_state * const lexer, char const * const key, constant * const val
     /* store the current statement counter value */
     ann->bytecode_index = lexer->stmt_counter;
     ++lexer->num_annotations; /* keep track of number of annotations */
+
+    /* store a pointer to the current instruction */
+    ann->instr = CURRENT_INSTRUCTION(lexer);
 
     /* store the annotation in a list, managed by the lexer
      * the list is circular linked, so that the order of annotations is preserved.
