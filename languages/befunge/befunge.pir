@@ -2,12 +2,12 @@
 
 .include "debug.pir"
 .include "load.pir"
+.include "maths.pir"
 
 =pod
 
 .include "flow.pasm"
 .include "io.pasm"
-.include "maths.pasm"
 .include "stack.pasm"
 
 =cut
@@ -21,25 +21,38 @@
     #getstdout stdout
     #pioctl I10, P10, 3, 0
 
+    # parsing argv
     .local int debug
     .local pmc playfield
     (debug, playfield) = _parse_argv(argv)
 
+    # various inits
+    .local int x, y, dir, flag
+    x = 0       # x coord of the pc
+    y = 0       # y coord of the pc
+    dir  = 1    # direction of the pc
+    flag = 0    # 1=string-mode, 2=bridge, 3=end
+    
+    .local pmc stack
+    stack = new 'ResizablePMCArray'
+    
+    .local num seed
+    seed = time
+    seed = mod seed, .RANDMAX
 
-=pod
-
-        set S10, P5[I0]
-        save S10
-        bsr LOAD
-        restore P1              # P1 = the playfield
-        new P2, .ResizablePMCArray      # P2 = the stack
-        set I0, 0               # I0 = x coord of the PC
-        set I1, 0               # I1 = y coord of the PC
-        set I2, 1               # I2 = direction of the PC
-        set I4, 0               # I4 = flag (1=string-mode,2=bridge,3=end)
-        time N0                 # N0 = random seed
-        mod N0, N0, .RANDMAX
-        set S2, ""              # S2 = user input
+    .local string user_input
+    user_input = ""
+    
+        # I5 is debug
+        #set S10, P5[I0] ??
+        # P1 = the playfield
+        # P2 = the stack
+        # I0 = x coord of the PC
+        # I1 = y coord of the PC
+        # I2 = direction of the PC
+        # I4 = flag (1=string-mode,2=bridge,3=end)
+        # N0 = random seed
+        # S2 = user input
 
 =pod
 
