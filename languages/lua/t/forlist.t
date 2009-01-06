@@ -60,15 +60,14 @@ CODE
 3
 OUT
 
-language_output_is( 'lua', <<'CODE', <<'OUT', 'for pairs (hash)' );
+language_output_like( 'lua', <<'CODE', <<'OUT', 'for pairs (hash)' );
 t = {a=10, b=100}
 
 for k in pairs(t) do
     print(k)
 end
 CODE
-a
-b
+/^(a\nb|b\na)$/
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', 'for break' );
