@@ -38,18 +38,18 @@ The main function.
 
     .local pmc screen
     screen = app.'surface'()
-    set_global 'screen' = screen
+    set_global 'screen', screen
 
     # create the LCD
     .local pmc lcd
     lcd = new 'SDL::LCD'
-    set_global 'LCD' = lcd
+    set_global 'LCD', lcd
 
     # draw the watch
     drawWatch()
 
     # create the timer
-    $P1 = global "drawWatch"
+    $P1 = get_global "drawWatch"
     $P0 = new 'Timer'
     $P0[.PARROT_TIMER_NSEC] = 0.5
     $P0[.PARROT_TIMER_HANDLER] = $P1
@@ -57,7 +57,7 @@ The main function.
     $P0[.PARROT_TIMER_RUNNING] = 1
     # store the timer somewhere, it will be
     # collected and destroyed otherwise
-    set_global "timer" = $P0
+    set_global "timer", $P0
 
     #
     # event loop
