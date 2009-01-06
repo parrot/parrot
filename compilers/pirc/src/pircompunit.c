@@ -793,8 +793,9 @@ unshift_arg(invocation * const inv, argument * const newarg) {
         newarg->next = inv->arguments->next;
         inv->arguments->next = newarg;
     }
+    else
+        inv->arguments = newarg;
 
-    inv->arguments = newarg;
     return inv->arguments;
 }
 
