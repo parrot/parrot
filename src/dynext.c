@@ -39,12 +39,11 @@ static STRING * clone_string_into(
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
-    ARGMOD(STRING *lib),
+    ARGMOD_NULLOK(STRING *lib),
     ARGOUT(void **handle),
     ARGIN(STRING *wo_ext),
     ARGIN_NULLOK(STRING *ext))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*lib)
@@ -65,11 +64,10 @@ static PMC * make_string_pmc(PARROT_INTERP, ARGIN(STRING *string))
 PARROT_CANNOT_RETURN_NULL
 static PMC * run_init_lib(PARROT_INTERP,
     ARGIN(void *handle),
-    ARGIN(STRING *lib_name),
+    ARGIN_NULLOK(STRING *lib_name),
     ARGIN(STRING *wo_ext))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void set_cstring_prop(PARROT_INTERP,
@@ -86,12 +84,11 @@ static void store_lib_pmc(PARROT_INTERP,
     ARGIN(PMC *lib_pmc),
     ARGIN(STRING *path),
     ARGIN(STRING *type),
-    ARGIN(STRING *lib_name))
+    ARGIN_NULLOK(STRING *lib_name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
+        __attribute__nonnull__(4);
 
 #define ASSERT_ARGS_clone_string_into __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(d) \
@@ -99,7 +96,6 @@ static void store_lib_pmc(PARROT_INTERP,
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_get_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(lib) \
     || PARROT_ASSERT_ARG(handle) \
     || PARROT_ASSERT_ARG(wo_ext)
 #define ASSERT_ARGS_is_loaded __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -111,7 +107,6 @@ static void store_lib_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_run_init_lib __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(handle) \
-    || PARROT_ASSERT_ARG(lib_name) \
     || PARROT_ASSERT_ARG(wo_ext)
 #define ASSERT_ARGS_set_cstring_prop __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -122,8 +117,7 @@ static void store_lib_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(lib_pmc) \
     || PARROT_ASSERT_ARG(path) \
-    || PARROT_ASSERT_ARG(type) \
-    || PARROT_ASSERT_ARG(lib_name)
+    || PARROT_ASSERT_ARG(type)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -165,7 +159,7 @@ Store a C<ParrotLibrary> PMC in the interpreter's C<iglobals>.
 
 static void
 store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
-        ARGIN(STRING *type), ARGIN(STRING *lib_name))
+        ARGIN(STRING *type), ARGIN_NULLOK(STRING *lib_name))
 {
     ASSERT_ARGS(store_lib_pmc)
     PMC * const iglobals = interp->iglobals;
@@ -221,7 +215,7 @@ Return path and handle of a dynamic lib, setting lib_name to just the filestem
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static STRING *
-get_path(PARROT_INTERP, ARGMOD(STRING *lib), ARGOUT(void **handle),
+get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
         ARGIN(STRING *wo_ext), ARGIN_NULLOK(STRING *ext))
 {
     ASSERT_ARGS(get_path)
@@ -378,7 +372,7 @@ Calls the necessary initialization routines, if any.
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 run_init_lib(PARROT_INTERP, ARGIN(void *handle),
-        ARGIN(STRING *lib_name), ARGIN(STRING *wo_ext))
+        ARGIN_NULLOK(STRING *lib_name), ARGIN(STRING *wo_ext))
 {
     ASSERT_ARGS(run_init_lib)
     STRING *type;
