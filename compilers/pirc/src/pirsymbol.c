@@ -95,6 +95,7 @@ This is the vanilla register allocator.
 static int
 next_register(NOTNULL(lexer_state * const lexer), pir_type type) {
     CURRENT_SUB(lexer)->info.regs_used[type]++; /* count number of registers used */
+    /* fprintf(stderr, "vanilla reg: %d of type %d\n", lexer->curregister[type], type); */
     return lexer->curregister[type]++;
 }
 
@@ -112,6 +113,9 @@ Assign a new register to symbol C<sym>, and create a new live interval for C<sym
 void
 assign_vanilla_register(NOTNULL(lexer_state * const lexer), symbol * const sym) {
     sym->info.color    = next_register(lexer, sym->info.type);
+    /* fprintf(stderr, "assigning vanilla reg %d to symbol %s\n", sym->info.color,
+                    sym->info.id.name);
+    */
 
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
         sym->info.interval = new_live_interval(lexer->lsr, lexer->stmt_counter, sym->info.type);
@@ -257,7 +261,7 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
             bucket_symbol(b) = iter;
             store_bucket(table, b, hash);
             iter->info.type  = type;
-            fprintf(stderr, "declare_local(): [%s]\n", iter->info.id.name);
+            /* fprintf(stderr, "declare_local(): [%s]\n", iter->info.id.name); */
         }
 
         iter = iter->next;
@@ -333,9 +337,10 @@ find_symbol(NOTNULL(lexer_state * const lexer), NOTNULL(char const * const name)
 
         if (STREQ(sym->info.id.name, name)) {
 
-            if (sym->info.color == NO_REG_ALLOCATED)  /* no PASM register assigned yet */
+            if (sym->info.color == NO_REG_ALLOCATED) { /* no PASM register assigned yet */
                 /* get a new reg from vanilla reg. allocator */
                 assign_vanilla_register(lexer, sym);
+            }
             else  /* update end point of interval */
                 if (TEST_FLAG(lexer->flags, LEXER_FLAG_REGALLOC)) {
                     sym->info.interval->endpoint = lexer->stmt_counter;
@@ -535,7 +540,9 @@ color_reg(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
          * a new PASM register through the vanilla reg. allocator and
          * store the register as "used".
          */
-        return use_register(lexer, type, regno, next_register(lexer, type));
+        int nextreg = next_register(lexer, type);
+        fprintf(stderr, "mapping reg %d to %d\n", regno, nextreg);
+        return use_register(lexer, type, regno, nextreg);
     }
 }
 

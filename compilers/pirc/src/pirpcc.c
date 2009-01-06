@@ -125,6 +125,7 @@ mapped to a PASM register, so using negative PIR register is safe.
 */
 static target *
 generate_unique_pir_reg(lexer_state * const lexer, pir_type type) {
+    fprintf(stderr, "unique reg of type %d: %d\n", type, lexer->pir_reg_generator - 1);
     return new_reg(lexer, type, --lexer->pir_reg_generator);
 }
 
@@ -395,48 +396,66 @@ save_global_reference(lexer_state * const lexer, instruction * const instr,
 =item C<static target *
 get_invoked_sub(lexer_state * const lexer, target * const sub)>
 
+Return a C<target> node that represents the sub to invoke.
+If C<sub> is a register, that is returned. If it's a declared C<.local>,
+then a target node representing that symbol is returned. If it's
+just the name of a .sub, then there's 2 possibilities: either the
+sub was already parsed, in which case it's stored as a global_label,
+or the sub was not parsed yet, in which case a runtime resolving
+instruction is emitted.
+
 =cut
 
 */
 static target *
 get_invoked_sub(lexer_state * const lexer, target * const sub) {
-    target *subreg = NULL;
+    target       *subreg = NULL;
+    symbol       *sym    = NULL;
+    global_label *glob   = NULL;
 
     /* if the target is a register, invoke that. */
-    if (TEST_FLAG(sub->flags, TARGET_FLAG_IS_REG)) {
-        subreg = new_reg(lexer, PMC_TYPE, sub->info->color);
+    if (TEST_FLAG(sub->flags, TARGET_FLAG_IS_REG))
+        return sub;
+
+
+    /* find the global label in the current file, or find it during runtime */
+    sym  = find_symbol(lexer, sub->info->id.name);
+
+    /* if the invoked object was declared as a .local, return that */
+    if (sym)
+        return target_from_symbol(lexer, sym);
+
+    /* it was not a .local, so check whether it's a declared .sub */
+    glob   = find_global_label(lexer, sub->info->id.name);
+    subreg = generate_unique_pir_reg(lexer, PMC_TYPE);
+
+    if (glob) {
+        new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
+        add_operands(lexer, "%T%i", subreg, glob->const_table_index);
+        return subreg;
     }
-    else { /* find the global label in the current file, or find it during runtime */
-        global_label *glob = find_global_label(lexer, sub->info->id.name);
-        subreg             = generate_unique_pir_reg(lexer, PMC_TYPE);
 
-        if (glob) {
-            new_sub_instr(lexer, PARROT_OP_set_p_pc, "set_p_pc", 0);
-            add_operands(lexer, "%T%i", subreg, glob->const_table_index);
-        }
-        else { /* find it during runtime (hopefully, otherwise exception) */
-            new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc, "find_sub_not_null_p_sc", 0);
+    /* find it during runtime (hopefully, otherwise exception) */
+    new_sub_instr(lexer, PARROT_OP_find_sub_not_null_p_sc, "find_sub_not_null_p_sc", 0);
 
-            add_operands(lexer, "%T%s", subreg, sub->info->id.name);
+    add_operands(lexer, "%T%s", subreg, sub->info->id.name);
 
-            /* save the current instruction in a list; entries in this list will be
-             * fixed up, if possible, after the parsing phase.
-             *
-             * Instead of the instruction
-             *
-             *   set_p_pc
-             *
-             * that is generated when the global label C<glob> was found (see above),
-             * another instructions is generated. After the parse, we'll re-try
-             * to find the global label that is referenced. For now, just generate
-             * this instruction to do the resolving of the label during runtime:
-             *
-             *   find_sub_not_null_p_sc
-             */
-            save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), sub->info->id.name);
-        }
+    /* save the current instruction in a list; entries in this list will be
+     * fixed up, if possible, after the parsing phase.
+     *
+     * Instead of the instruction
+     *
+     *   set_p_pc
+     *
+     * that is generated when the global label C<glob> was found (see above),
+     * another instructions is generated. After the parse, we'll re-try
+     * to find the global label that is referenced. For now, just generate
+     * this instruction to do the resolving of the label during runtime:
+     *
+     *   find_sub_not_null_p_sc
+     */
+    save_global_reference(lexer, CURRENT_INSTRUCTION(lexer), sub->info->id.name);
 
-    }
     return subreg;
 
 }
