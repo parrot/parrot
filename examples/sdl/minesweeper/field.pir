@@ -294,7 +294,7 @@ Draws the field, then the LCDs and the smiley button.
     field   = .ITERATE_FROM_START
 
     cache   = getattribute self, 'cache'
-    cacheit = new Iterator, cache
+    cacheit = new "Iterator", cache
     cacheit = .ITERATE_FROM_START
 
     screen  = getattribute self, 'screen'
@@ -697,7 +697,7 @@ The horizontal mouse position.
 
     $P1 = getattribute self, 'screen'
 
-    $P0.draw( $P1 )
+    $P0."draw"( $P1 )
 END:
 
 .end
@@ -980,7 +980,7 @@ This method is called automatically when this module is loaded.
 
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines_debug.png"
-    image = new $I0, $P0
+    image = new "SDL::Image", $P0
     store_global "Mines::Field", "field_debug", image
 
     newclass $P0, "Mines::Field"
