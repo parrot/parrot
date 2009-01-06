@@ -153,6 +153,47 @@ Or, if you need more flexibility, you can use a heredoc:
 
   End_Token
 
+=head3 Strings: Encodings and Charsets
+
+Strings are complicated. It used to be that all that was needed was to
+support the ASCII charset, which only contained a handful of common
+symbols and English characters. Now we need to worry about character
+encodings and charsets in order to make sense out of all the string data
+in the world.
+
+Parrot has a very flexible system for handling and manipulating strings.
+Every string is associated with an encoding and a character set (charset).
+The default for Parrot is 8-bit ASCII, which is simple to use and is almost
+universally supported. However, support is built in to have other formats as
+well.
+
+String constants, like the ones we've seen above, can have an optional
+prefix specifying the encoding and the charset to be used by the string.
+Parrot will maintain these values internally, and will automatically convert
+strings when necessary to preserve the information. String prefixes are
+specified as C<encoding:charset:> at the front of the string. Here are some
+examples:
+
+  $S0 = utf8:unicode:"Hello UTF8 Unicode World!"
+  $S1 = utf16:unicode:"Hello UTF16 Unicode World!"
+  $S2 = ascii:"This is 8-bit ASCII"
+  $S3 = binary:"This is treated as raw unformatted binary"
+
+The C<binary:> encoding treats the string as a buffer of raw unformatted
+binary data. It isn't really a "string" per se because binary data isn't
+treated as if it contains any readable characters. These kinds of strings
+are useful for library routines that return large amounts of binary data
+that doesn't easily fit into any other primitive data type.
+
+When two types of strings are combined together in some way, such as through
+concatenation, they must both use the same character set an encoding.
+Parrot will automatically upgrade one or both of the strings to use the next
+highest compatible format, if they aren't equal. ASCII strings will
+automatically upgrade to UTF-8 strings if needed, and UTF-8 will upgrade
+to UTF-16. Handling and maintaining these data and conversions all happens
+automatically inside Parrot, and you the programmer don't need to worry
+about the details.
+
 =head2 Named Variables
 
 Z<CHP-3-SECT-2.3>
