@@ -48,7 +48,7 @@ F<docs/pdds/pdd26_ast.pod>
     # wrap the content in a block
     .local pmc var_block
     var_block = new ['PAST';'Block']
-    var_block.init( val_x, 'blocktype' => 'immediate' )
+    var_block."init"( val_x, 'blocktype' => 'immediate' )
 
     # set up compiler
     .local pmc astcompiler
