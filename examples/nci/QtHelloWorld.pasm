@@ -31,35 +31,35 @@ F<src/call_list.txt> and rebuilding Parrot.
 
 # get and invoke the QApplication_new function
     dlfunc P0, P1, "QApplication_new", "pv"
-    invoke
-    set P2, P5	# remember pApp
+    invokecc P0
+    set P2, P5  # remember pApp
 
 # get and invoke QLabel_new
     set S5, "Hello, world!"
     dlfunc P0, P1, "QLabel_new", "pt"
     # if you need more labels, save P0 = QLabel_new() function
-    invoke
-    set P6, P5	# save pLabel
+    invokecc P0
+    set P6, P5  # save pLabel
 
 # size the QLabel
-    set I5, 30	# y
-    set I6, 120	# x
+    set I5, 30  # y
+    set I6, 120 # x
     dlfunc P0, P1, "QLabel_resize", "vpii"
-    invoke
+    invokecc P0
 
 # register the label
     dlfunc P0, P1, "QApplication_setMainWidget", "vpp"
-    set P5, P6	# pLabel
-    set P6, P2	# pApp
-    invoke
+    set P5, P6  # pLabel
+    set P6, P2  # pApp
+    invokecc P0
     # P5  = label
     dlfunc P0, P1, "QLabel_show", "vp"
-    invoke
+    invokecc P0
 
 # and go
     dlfunc P0, P1,"QApplication_exec", "vp"
-    set P5, P2	# app
-    invoke
+    set P5, P2  # app
+    invokecc P0
     end
 
 =head1 SEE ALSO
