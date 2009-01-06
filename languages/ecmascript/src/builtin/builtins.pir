@@ -48,11 +48,11 @@
 .end
 
 
-.sub 'Array'
-    .param pmc args :slurpy
-    $P0 = new 'Array'
-    .return ($P0)
-.end
+#.sub 'Array'
+#    .param pmc args :slurpy
+#    $P0 = new 'Array'
+#    .return ($P0)
+#.end
 
 .sub __load :init :anon
     newclass $P0, ['ECMAScript';'Object']

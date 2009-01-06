@@ -679,9 +679,13 @@ method null($/) {
 }
 
 method object_literal($/) {
-    my $past := PAST::Op.new( :pasttype('call'), :node($/) );
-    $past.name('Object');
+    my $past := PAST::Stmts.new( :node($/) );
+    
+    my $type := PAST::Var.new( :name('JSObject'), :scope('package'), :node($/) );
+    my $obj := PAST::Op.new( :pasttype('callmethod'), :name("new"), :node($/), $type);
+
     for $<property> {
+        $($_).unshift($obj);
         $past.push( $($_) );
     }
     make $past;
@@ -702,17 +706,19 @@ method property($/) {
     ## XXX my $key  := PAST::Val.new( $prop, :returns('String'), :node($/) );
     my $val  := $( $<assignment_expression> );
 
-    $val.named($key);
-    make $val;
+    my $past := PAST::Op.new( :pasttype('callmethod'), :name('Set'), $key, $val, :node($/) );
+
+    make $past;
 }
 
 
 method property_name($/, $key) {
     ## XXX
     my $propname := $( $/{$key} );
-    my $past := PAST::Op.new( :inline('    $S0 = %0'), :node($/) );
-    $past.push($propname);
-    make $past;
+    #my $past := PAST::Op.new( :inline('    $S0 = %0'), :node($/) );
+    #$past.push($propname);
+    #make $past;
+    make $propname;
 }
 
 method array_literal($/) {

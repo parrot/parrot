@@ -137,6 +137,9 @@ test: all
 
 testclean:
 	$(RM_F) "t/*.js" "t/*.out"
+	$(RM_F) "t/sanity_pt/*.js" "t/sanity_pt/*.out"
+	$(RM_F) "t/js_pt/*.js" "t/js_pt/*.out"
+
 
 CLEANUPS = \
   js.pbc \

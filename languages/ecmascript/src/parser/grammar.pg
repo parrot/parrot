@@ -345,7 +345,7 @@ token false { 'false' {*} }
 token null { 'null' {*} }
 
 rule object_literal {
-    '{' [ <property> [',' <property> ]* ]? '}'
+    '{' [ <property> [',' <property> ]* [',']? ]?  '}'
     {*}
 }
 
