@@ -317,6 +317,8 @@ arguments_to_operands(lexer_state * const lexer, argument * const args, unsigned
     /* add the index (of the signature PMC) in the PBC constant table as operand */
     push_operand(lexer, expr_from_int(lexer, array_index));
 
+    fprintf(stderr, "args2ops: %d arguments\n", num_arguments);
+
     /* no need to continue if there's no arguments */
     if (num_arguments == 0)
         return;
@@ -617,12 +619,9 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
-    fprintf(stderr, "convert pcc method call\n");
-    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
-
     /* in a methodcall, the invocant object is passed as the first argument */
-    inv->arguments = unshift_arg(inv->arguments,
-                                 new_argument(lexer, expr_from_target(lexer, inv->sub)));
+    unshift_arg(inv, new_argument(lexer, expr_from_target(lexer, inv->sub)));
+    new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
 
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
@@ -631,7 +630,7 @@ convert_pcc_methodcall(lexer_state * const lexer, invocation * const inv) {
 
     new_sub_instr(lexer, PARROT_OP_callmethodcc_p_sc, "callmethodcc_p_sc", 0);
     add_operands(lexer, "%T%E", inv->sub, inv->method);
-    fprintf(stderr, "convert pcc method call done\n");
+
 }
 
 /*

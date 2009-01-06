@@ -759,9 +759,12 @@ add_arg(argument *last, argument * const newarg) {
 /*
 
 =item C<void
-unshift_arg(argument *last, argument * const newarg)>
+unshift_arg(invocation * const inv, argument * const newarg)>
 
-Unshift argument C<newarg> in front of the list, pointed to by C<last>.
+Unshift argument C<newarg> on an invocation object. The number
+of arguments in the list of C<inv> is incremented to reflect
+the extra argument on the list.
+
 Given this list:
 
  A->B->C->D
@@ -783,13 +786,16 @@ The function returns a pointer to the last node in the list.
 
 */
 argument *
-unshift_arg(argument *last, argument * const newarg) {
-    if (last) {
-        newarg->next = last->next;
-        last->next   = newarg;
-        return last;
+unshift_arg(invocation * const inv, argument * const newarg) {
+    ++inv->num_arguments;
+
+    if (inv->arguments) {
+        newarg->next = inv->arguments->next;
+        inv->arguments->next = newarg;
     }
-    return newarg;
+
+    inv->arguments = newarg;
+    return inv->arguments;
 }
 
 /*
