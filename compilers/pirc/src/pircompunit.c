@@ -785,6 +785,8 @@ The function returns a pointer to the last node in the list.
 =cut
 
 */
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
 argument *
 unshift_arg(invocation * const inv, argument * const newarg) {
     ++inv->num_arguments;

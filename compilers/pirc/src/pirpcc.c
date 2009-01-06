@@ -649,16 +649,20 @@ The sequence of instructions is:
 */
 static void
 convert_pcc_methodtailcall(lexer_state * const lexer, invocation * const inv) {
+    unshift_arg(inv, new_argument(lexer, expr_from_target(lexer, inv->sub)));
     new_sub_instr(lexer, PARROT_OP_set_args_pc, "set_args_pc", inv->num_arguments);
+
     arguments_to_operands(lexer, inv->arguments, inv->num_arguments);
 
     /* check out the type of the method expression; it may be a PMC or a STRING. */
     switch (inv->method->type) {
         case EXPR_TARGET:
             new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_p, "tailcallmethod_p_p", 0);
+            add_operands(lexer, "%T%E", inv->sub, inv->method);
             break;
         case EXPR_CONSTANT:
             new_sub_instr(lexer, PARROT_OP_tailcallmethod_p_sc, "tailcallmethod_p_sc", 0);
+            add_operands(lexer, "%T%E", inv->sub, inv->method);
             break;
         default:
             panic(lexer, "unknown expression type in tailcallmethod instruction");
