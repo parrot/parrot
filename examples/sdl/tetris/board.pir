@@ -191,8 +191,8 @@ This method returns nothing.
     .local int width
     .local int size
 
-    $I0 = typeof block
-    if $I0 == .Undef goto END
+    $S0 = typeof block
+    if $S0 == "Undef" goto END
 
     # assign the board to the block
     block."setBoard"( self )

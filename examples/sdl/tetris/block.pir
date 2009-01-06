@@ -406,8 +406,8 @@ This method returns nothing.
     add $I0, 9 # +1 = make first block id blue; +8 = make it bright
     # lookup the color value
     color = app."color"( $I0 )
-    $I0 = typeof color
-    if $I0 == .Undef goto END
+    $S0 = typeof color
+    if $S0 == "Undef" goto END
 
     # get the x/y position in board coordinates
     (xp, yp) = self."position"()

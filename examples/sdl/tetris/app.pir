@@ -188,7 +188,7 @@ An exeption is thrown if an error occurs.
 =cut
 
 .sub initTimer :method
-    $P0 = new SArray
+    $P0 = new "Array"
     $P1 = find_global "Tetris::App", "_app_timer"
     $P0 = 8
     $P0[0] = .PARROT_TIMER_NSEC
