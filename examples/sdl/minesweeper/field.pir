@@ -290,7 +290,7 @@ Draws the field, then the LCDs and the smiley button.
     .local pmc status
 
     getattribute field, self, 'field'
-    field   = new Iterator, field
+    field   = new "Iterator", field
     field   = .ITERATE_FROM_START
 
     cache   = getattribute self, 'cache'
