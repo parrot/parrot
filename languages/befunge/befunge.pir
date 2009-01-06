@@ -31,17 +31,13 @@ ARGV_NEXT:
     arg  = argv[i]
     char = substr arg, 0, 1
     ne char, "-",  ARGV_DONE
-    #eq arg,  "-d", ARGV_DEBUG
+    eq arg,  "-d", ARGV_DEBUG
     branch ARGV_NEXT
 
-=pod
-
 ARGV_DEBUG:
-        inc I5
-        bsr DEBUG_INITIALIZE    # initialize P3
-        branch ARGV_NEXT
-
-=cut
+    inc i
+    #TODO bsr DEBUG_INITIALIZE    # initialize P3
+    branch ARGV_NEXT
 
 ARGV_DONE:
 
