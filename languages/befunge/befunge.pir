@@ -15,35 +15,16 @@
 .sub "befunge" :main
     .param pmc argv
 
-    .local int    i, debug
-    .local string arg, char, file
-    .local pmc    playfield
-
     print "befunge being ported to a working state...\n"
 
     # disable buffering on stdout
     #getstdout stdout
     #pioctl I10, P10, 3, 0
 
+    .local int debug
+    .local pmc playfield
+    (debug, playfield) = _parse_argv(argv)
 
-    i     = 0
-    debug = 0
-
-ARGV_NEXT:
-    inc i
-    arg  = argv[i]
-    char = substr arg, 0, 1
-    ne char, "-",  ARGV_DONE
-    eq arg,  "-d", ARGV_DEBUG
-    goto ARGV_NEXT
-
-ARGV_DEBUG:
-    debug_initialize()
-    goto ARGV_NEXT
-
-ARGV_DONE:
-    file      = argv[i]
-    playfield = load(file)
 
 =pod
 
@@ -145,4 +126,41 @@ MOVE_WEST:
 MAIN_END:
         end
 .end
+
+
+#
+# (playfield, debug) = _parse_argv(argv)
+#
+# parse argv and return the playfield loaded from the file passed as argument,
+# and a boolean telling whether we're in debug mode or not.
+#
+.sub "_parse_argv"
+    .param pmc argv
+    
+    .local int    i, debug
+    .local string arg, char, file
+    .local pmc    playfield
+    
+    i     = 0
+    debug = 0
+  _PARSE_ARGS__ARGV_NEXT:
+    inc i
+    arg  = argv[i]
+    char = substr arg, 0, 1
+    if char != "-"   goto _PARSE_ARGV__DONE
+    if arg  ==  "-d" goto _PARSE_ARGV__DEBUG
+    goto _PARSE_ARGS__ARGV_NEXT
+
+  _PARSE_ARGV__DEBUG:
+    debug_initialize()
+    debug = 1
+    goto _PARSE_ARGS__ARGV_NEXT
+
+  _PARSE_ARGV__DONE:
+    file      = argv[i]
+    playfield = load(file)
+    
+    .return(playfield, debug)
+.end
+
 
