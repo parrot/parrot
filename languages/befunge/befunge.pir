@@ -1,11 +1,12 @@
 # $Id$
 
+.include "load.pir"
+
 =pod
 
 .include "debug.pasm"
 .include "flow.pasm"
 .include "io.pasm"
-.include "load.pasm"
 .include "maths.pasm"
 .include "stack.pasm"
 
@@ -15,13 +16,15 @@
     .param pmc argv
 
     .local int    i, debug
-    .local string arg, char
+    .local string arg, char, file
+    .local pmc    playfield
 
     print "befunge being ported to a working state...\n"
 
     # disable buffering on stdout
     #getstdout stdout
     #pioctl I10, P10, 3, 0
+
 
     i     = 0
     debug = 0
@@ -40,6 +43,8 @@ ARGV_DEBUG:
     branch ARGV_NEXT
 
 ARGV_DONE:
+    file      = argv[i]
+    playfield = load(file)
 
 =pod
 
