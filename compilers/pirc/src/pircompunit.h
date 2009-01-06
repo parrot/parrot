@@ -412,6 +412,7 @@ expression *expr_from_ident(struct lexer_state * const lexer, char const * const
 expression *expr_from_key(struct lexer_state * const lexer, key * const k);
 expression *expr_from_string(struct lexer_state * const lexer, char const * const sval);
 expression *expr_from_int(struct lexer_state * const lexer, int ival);
+expression *expr_from_num(struct lexer_state * const lexer, double nval);
 
 /* functions for argument node creation and storing */
 argument *new_argument(struct lexer_state * const lexer, expression * const expr);

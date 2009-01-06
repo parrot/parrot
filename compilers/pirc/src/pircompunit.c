@@ -1308,7 +1308,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 constdecl *
 new_named_const(lexer_state * const lexer, value_type type, char const * const name, ...) {
-    constdecl *c = pir_mem_allocate(lexer, sizeof (constdecl));
+    constdecl *c = (constdecl *)pir_mem_allocate(lexer, sizeof (constdecl));
     va_list arg_ptr;
     va_start(arg_ptr, name);
 
