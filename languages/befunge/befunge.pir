@@ -12,30 +12,41 @@
 =cut
 
 .sub "befunge" :main
+    .param pmc argv
+
+    .local int    i, debug
+    .local string arg, char
 
     print "befunge being ported to a working state...\n"
 
+    # disable buffering on stdout
+    #getstdout stdout
+    #pioctl I10, P10, 3, 0
+
+    i     = 0
+    debug = 0
+
+ARGV_NEXT:
+    inc i
+    arg  = argv[i]
+    char = substr arg, 0, 1
+    ne char, "-",  ARGV_DONE
+    #eq arg,  "-d", ARGV_DEBUG
+    branch ARGV_NEXT
+
 =pod
 
-        get_params "(0)", P5    # get @ARGV as a ResizableStringArray
-
-MAIN:
-        getstdout P10
-        pioctl I10, P10, 3, 0   # disable buffering on stdout
-        set I0, 0
-        set I5, 0               # debug mode
-ARGV_NEXT:
-        inc I0
-        set S10, P5[I0]
-        substr S11, S10, 0, 1
-        ne S11, "-", ARGV_DONE
-        eq S10, "-d", ARGV_DEBUG
-        branch ARGV_NEXT
 ARGV_DEBUG:
         inc I5
         bsr DEBUG_INITIALIZE    # initialize P3
         branch ARGV_NEXT
+
+=cut
+
 ARGV_DONE:
+
+=pod
+
         set S10, P5[I0]
         save S10
         bsr LOAD
@@ -48,6 +59,8 @@ ARGV_DONE:
         time N0                 # N0 = random seed
         mod N0, N0, .RANDMAX
         set S2, ""              # S2 = user input
+
+=pod
 
 TICK:
         set I20, P1[I1;I0]
@@ -131,5 +144,5 @@ MOVE_WEST:
 
 MAIN_END:
         end
-
 .end
+
