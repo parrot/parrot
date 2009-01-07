@@ -137,39 +137,52 @@ NOT_NUM:
   FLOW_TOGGLE_STRING_MODE:
     flow__toggle_string_mode()
     goto MOVE_PC
-    
-  MOVE_PC:
 
 =pod
 
 MAIN_TRAMPOLINE:
         set I4, 0               # no more trampoline
-MOVE_PC:
-        eq I2, 1, MOVE_EAST
-        eq I2, 2, MOVE_SOUTH
-        eq I2, 3, MOVE_WEST
-        # fallback MOVE_NORTH
-MOVE_NORTH:
-        dec I1
-        mod I1, I1, 25
-        branch TICK
-MOVE_EAST:
-        inc I0
-        mod I0, I0, 80
-        branch TICK
-MOVE_SOUTH:
-        inc I1
-        mod I1, I1, 25
-        branch TICK
-MOVE_WEST:
-        dec I0
-        mod I0, I0, 80
-        branch TICK
 
 =cut
 
-MAIN_END:
-        end
+  MOVE_PC:
+    # reload status & associated vars, that may have
+    # changed in the subs
+    .local int dir
+    status = get_global "status"
+    dir    = status["dir"]
+    x      = status["x"]
+    y      = status["y"]
+    
+    if dir == 1 goto MOVE_EAST
+    if dir == 2 goto MOVE_SOUTH
+    if dir == 3 goto MOVE_WEST
+    # fallback MOVE_NORTH
+  MOVE_NORTH:
+    dec y
+    mod y, y, 25
+    goto MOVE_DONE
+  MOVE_EAST:
+    inc x
+    mod x, x, 80
+    goto MOVE_DONE
+  MOVE_SOUTH:
+    inc y
+    mod y, y, 25
+    goto MOVE_DONE
+  MOVE_WEST:
+    dec x
+    mod x, x, 80
+    # fallback MOVE_DONE
+    #goto MOVE_DONE
+  MOVE_DONE:
+    status["x"] = x
+    status["y"] = y
+    set_global "status", status
+    goto TICK
+
+  MAIN_END:
+    end
 .end
 
 
