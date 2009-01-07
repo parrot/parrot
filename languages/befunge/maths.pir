@@ -2,6 +2,24 @@
 
 .macro_const RANDMAX 65536.0
 
+
+#
+# push number on befunge's stack.
+# befunge stack:
+#   before:     ...
+#   after:      ... <number>
+.sub maths__push_number
+    $P0 = get_global "status"
+    $P1 = get_global "stack"
+
+    $S0 = $P0["char"]
+    $I0 = $S0
+    push $P1, $I0
+
+    set_global "stack", $P1
+.end
+
+
 =pod
 
 # Create a pseudo-random number.
@@ -23,14 +41,6 @@ MATHS_RAND:
     save I10
     ret
 
-# Push number on Befunge's stack.
-# Befunge Stack:
-#   before:     ...
-#   after:      ... <number>
-MATHS_PUSH_NUMBER:
-    set I10, S0
-    push P2, I10
-    branch MOVE_PC
 
 # Addition.
 # Befunge Stack:
