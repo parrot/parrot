@@ -88,19 +88,19 @@ or the resulting PIR code (target='PIR').
     optable = new ['PGE';'OPTable']
     store_global '$optable', optable
 
-    $P0 = find_global 'glob_literal'
+    $P0 = get_global 'glob_literal'
     optable.'newtok'('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_quest'
+    $P0 = get_global 'glob_quest'
     optable.'newtok'('term:?', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_star'
+    $P0 = get_global 'glob_star'
     optable.'newtok'('term:*', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_enum'
+    $P0 = get_global 'glob_enum'
     optable.'newtok'('term:[', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
-    $P0 = find_global 'glob_alt'
+    $P0 = get_global 'glob_alt'
     optable.'newtok'('term:{', 'equiv'=>'term:', 'nows'=>1, 'parsed'=>$P0)
 
     optable.'newtok'('infix:', 'looser'=>'term:', 'assoc'=>'list', 'nows'=>1, 'match'=>'PGE::Exp::Concat')

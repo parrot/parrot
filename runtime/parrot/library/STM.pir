@@ -38,7 +38,7 @@
 
 restart_tx:
     .local pmc statuses
-    statuses = find_global 'statuses'
+    statuses = get_global 'statuses'
     tx_flags = bor tx_flags, STATUS_COMMIT
     push statuses, tx_flags
 
@@ -47,7 +47,7 @@ restart_tx:
     the_result = new 'Undef'
 
     .local pmc _thelper
-    _thelper = find_global '_transaction_helper'
+    _thelper = get_global '_transaction_helper'
 
     $P0 = newclosure _thelper
     stm_start
@@ -61,10 +61,10 @@ done_tx:
     #print $I0
     #print "\n"
     .local pmc ends
-    ends = find_global 'ends'
+    ends = get_global 'ends'
     $P0 = pop ends
     .local int status
-    statuses = find_global 'statuses'
+    statuses = get_global 'statuses'
     status = pop statuses
     status = band status, STATUS_MASK
     if status == STATUS_COMMIT goto do_commit
@@ -124,14 +124,14 @@ do_return:
     closure = find_lex 'closure'
     args = find_lex 'args'
     the_cont = interpinfo .INTERPINFO_CURRENT_CONT
-    ends = find_global 'ends'
+    ends = get_global 'ends'
     push ends, the_cont
     .tailcall closure(args :flat)
 .end
 
 .sub _end_tx
     .local pmc ends
-    ends = find_global 'ends'
+    ends = get_global 'ends'
     .local pmc end
     end = ends[-1]
     $P0 = end() # workaround?
@@ -140,7 +140,7 @@ do_return:
 
 .sub _cur_status
     .local pmc statuses
-    statuses = find_global 'statuses'
+    statuses = get_global 'statuses'
     $I0 = statuses
     if $I0 == 0 goto none_such
     $I0 = $I0 - 1
@@ -154,7 +154,7 @@ none_such:
 .sub _set_status
     .param int new_status
     .local pmc statuses
-    statuses = find_global 'statuses'
+    statuses = get_global 'statuses'
     $I0 = pop statuses
     push statuses, new_status
 .end
@@ -176,7 +176,7 @@ inner_choice_part:
     .local int this_status
     .local pmc this_end
     .local int i
-    statuses = find_global 'statuses'
+    statuses = get_global 'statuses'
 
     i = statuses
     dec i
@@ -278,7 +278,7 @@ is_invalid:
     .param pmc args :slurpy
     .local int status
 
-    $P0 = find_global '_transaction'
+    $P0 = get_global '_transaction'
     # print "STM::transaction("
     # print closure
     # print ", ...)\n"

@@ -97,7 +97,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PIR compiler sub" );
     code .= "returncc\n"
     the_sub = my_compiler("_foo", code)
     the_sub()
-    the_sub = find_global "_foo"
+    the_sub = get_global "_foo"
     the_sub()
 .end
 

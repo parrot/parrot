@@ -1011,7 +1011,7 @@ l1:
     o = Foo34()
     is( o, 'Foo34', 'found global Foo34' )
 
-    f = find_global "Foo34"
+    f = get_global "Foo34"
     o = f()
     is( o, 'Foo34', 'found global Foo34 explicitly' )
 

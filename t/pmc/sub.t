@@ -930,11 +930,11 @@ pir_output_like( <<'CODE', <<'OUTPUT', ':anon' );
 .sub main :main
     "foo"()
     print "ok\n"
-    $P0 = find_global "new"
+    $P0 = get_global "new"
     $I0 = defined $P0
     print $I0
     print "\n"
-    $P0 = find_global "foo"
+    $P0 = get_global "foo"
     unless null $P0 goto foo
     print "nofoo\n"
   foo:

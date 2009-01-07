@@ -727,7 +727,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "method cache invalidation" );
     subclass cl, cl, "Bar"
     o = new "Bar"
     print o
-    $P0 = find_global "ok2"
+    $P0 = get_global "ok2"
     cl.'add_method'('get_string', $P0, 'vtable' => 1)
     print o
 .end

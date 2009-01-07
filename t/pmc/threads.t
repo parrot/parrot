@@ -82,7 +82,7 @@ SKIP: {
     .local pmc threadfunc
     .local pmc thread
     $I5 = 10
-    threadfunc = find_global "foo"
+    threadfunc = get_global "foo"
     thread = new 'ParrotThread'
     thread.'run_clone'(threadfunc)
 
@@ -125,7 +125,7 @@ loop:
     .local pmc threadfunc
     .local pmc thread
     $I5 = 10
-    threadfunc = find_global "foo"
+    threadfunc = get_global "foo"
     thread = new 'ParrotThread'
     thread.'run_clone'(threadfunc)
 
@@ -171,7 +171,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
     $P6 = 'from '
 
     print "ok 1\n"
-    threadsub = find_global "foo"
+    threadsub = get_global "foo"
     thread = new 'ParrotThread'
     thread.'run_clone'(threadsub, $P6)
     sleep 1 # to let the thread run
@@ -214,7 +214,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'thread - kill' );
     .local pmc threadsub
     .local pmc thread
     bounds 1    # assert slow core -S and -g are fine too
-    threadsub = find_global "foo"
+    threadsub = get_global "foo"
     thread = new 'ParrotThread'
     $I0 = thread
     print 'start '
@@ -249,7 +249,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
     .const int MAX = 1000
     .local pmc kid
     .local pmc Adder
-    Adder = find_global '_add'
+    Adder = get_global '_add'
     kid = new 'ParrotThread'
     .local pmc from
     from = new 'Integer'
@@ -302,7 +302,7 @@ SKIP: {
     .local pmc foo
     .local pmc queue
     .local pmc thread
-    foo = find_global '_foo'
+    foo = get_global '_foo'
     queue = new 'TQueue' # flag for when the thread is done
     thread = new 'ParrotThread'
     thread.'run_clone'(foo, queue)
@@ -329,7 +329,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "share a PMC" );
 .sub main :main
     .local pmc foo
-    foo = find_global "_foo"
+    foo = get_global "_foo"
     .local pmc to_share
     to_share = new 'Integer'
     .local pmc shared_ref
@@ -380,7 +380,7 @@ pir_output_is( <<'CODE', <<'OUT', "multi-threaded" );
     .local pmc thread
     thread = new 'ParrotThread'
     .local pmc foo
-    foo = find_global '_foo'
+    foo = get_global '_foo'
     thread.'run_clone'(foo, queue)
     thread.'join'()
     print "done main\n"
@@ -467,7 +467,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "CLONE_CODE only" );
     test3()
     .local pmc test4
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
-    test4 = find_global 'test4'
+    test4 = get_global 'test4'
     if null test4 goto okay
     print "not "
 okay:
@@ -488,7 +488,7 @@ okay:
     .local pmc thread
     thread = new 'ParrotThread'
     .local pmc thread_func
-    thread_func = find_global 'thread_func'
+    thread_func = get_global 'thread_func'
     $I0 = .PARROT_CLONE_CODE
     thread.'run'($I0, thread_func, test2)
     thread.'join'()
@@ -831,7 +831,7 @@ pir_output_unlike( <<'CODE', qr/not/, "globals + constant table subs issue", @to
     .param pmc what
     .param pmc expect
     .local pmc number
-    number = find_global 'test_num'
+    number = get_global 'test_num'
     if what == expect goto okay
     print "# got:      "
     print what
@@ -866,7 +866,7 @@ okay:
 .end
 
 .sub _check_sanity
-    $P0 = find_global 'foo'
+    $P0 = get_global 'foo'
     $P1 = get_hll_global [ 'Foo' ], 'foo'
     is($P0, $P1)
 .end
@@ -879,7 +879,7 @@ okay:
 
 .sub check_sanity
     _check_sanity()
-    $P0 = find_global '_check_sanity'
+    $P0 = get_global '_check_sanity'
     $P0()
     $P0 = get_hll_global [ 'Foo' ], '_check_sanity'
     $P0()
@@ -887,14 +887,14 @@ okay:
 
 .sub _check_value
     .param int value
-    $P0 = find_global 'foo'
+    $P0 = get_global 'foo'
     is($P0, value)
 .end
 
 .sub check_value
     .param int value
     _check_value(value)
-    $P0 = find_global '_check_value'
+    $P0 = get_global '_check_value'
     $P0(value)
     $P0 = get_hll_global [ 'Foo' ], '_check_value'
     $P0(value)
@@ -1006,7 +1006,7 @@ okay:
     passed = 15
 
     .local pmc thread_func
-    thread_func = find_global 'test'
+    thread_func = get_global 'test'
     print "in thread:\n"
     thread.'run'(flags, thread_func, passed)
     thread.'join'()
@@ -1048,7 +1048,7 @@ pir_output_is( <<'CODE', <<'OUT', 'multi-threaded strings via SharedRef' );
     .local pmc foo
 
     thread = new 'ParrotThread'
-    foo = find_global '_foo'
+    foo = get_global '_foo'
     thread.'run_clone'(foo, queue)
     thread.'join'()
     print "done main\n"

@@ -29,7 +29,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'Integer_divide_Integer  10 / 3 = 1003' );
 
 .sub 'test' :main
     .local pmc divide
-    divide = find_global "Integer_divide_Integer"
+    divide = get_global "Integer_divide_Integer"
     add_multi "divide", "Integer,Integer,Integer", divide
 
     $P0 = new 'Integer'
@@ -61,7 +61,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "1+1=3" );
 
 .sub _main
     .local pmc add
-    add = find_global "add"
+    add = get_global "add"
     add_multi "add", "Integer,Integer,Integer", add
 
     $P0 = new 'Integer'
@@ -93,7 +93,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "PASM divide - override builtin 10 / 3 = 42
 
 .sub _main
     .local pmc divide
-    divide = find_global "Integer_divide_Integer"
+    divide = get_global "Integer_divide_Integer"
     add_multi "divide", "Integer,Integer,Integer", divide
 
     $P0 = new 'Integer'
@@ -121,7 +121,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "INTVAL return numeq" );
 
 .sub _main
     .local pmc comp
-    comp = find_global "Float_cmp_Integer"
+    comp = get_global "Float_cmp_Integer"
     add_multi "cmp", "Float,Integer", comp
 
     $P1 = new 'Float'
@@ -148,7 +148,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "find_multi" );
 
 .sub _main
     .local pmc comp
-    comp = find_global "Float_cmp_Integer"
+    comp = get_global "Float_cmp_Integer"
     add_multi "cmp_num", "Float,Integer", comp
     $P0 = find_multi "cmp_num", "Float,Integer"
     if_null $P0, nok
@@ -176,7 +176,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "find_multi - invoke it" );
 
 .sub _main
     .local pmc comp
-    comp = find_global "Float_cmp_Integer"
+    comp = get_global "Float_cmp_Integer"
     add_multi "cmp_num", "Float,Integer", comp
     $P0 = find_multi "cmp_num", "Float,Integer"
     if_null $P0, nok
@@ -224,7 +224,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', "PASM MMD divide - loaded sub" );
 .sub _main
     .local pmc divide
     load_bytecode "$temp_pir"
-    divide = find_global "Integer_divide_Integer"
+    divide = get_global "Integer_divide_Integer"
     add_multi "divide", "Integer,Integer,Integer", divide
 
     \$P0 = new 'Integer'
