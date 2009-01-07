@@ -205,8 +205,6 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
     || PARROT_ASSERT_ARG(_namespace)
 #define ASSERT_ARGS_Parrot_set_global __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_store_global_cur __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_store_global_k __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc_key)
