@@ -68,8 +68,13 @@
 
     if debug == 0 goto TICK_NODEBUG
     debug__check_breakpoint()
+    
   TICK_NODEBUG:
-
+    if char == '"' goto FLOW_TOGGLE_STRING_MODE
+    
+    # unknown instruction
+    goto MOVE_PC
+    
 =pod
 
 
@@ -118,8 +123,15 @@ NOT_NUM:
         eq S0, "g", IO_GET_VALUE
         eq S0, "p", IO_PUT_VALUE
 
-        # Unknow instruction.
-        branch MOVE_PC
+=cut
+
+  FLOW_TOGGLE_STRING_MODE:
+    flow__toggle_string_mode()
+    goto MOVE_PC
+    
+  MOVE_PC:
+
+=pod
 
 MAIN_TRAMPOLINE:
         set I4, 0               # no more trampoline
