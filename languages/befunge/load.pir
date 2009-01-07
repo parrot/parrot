@@ -28,6 +28,7 @@
     len  = length line
     if len <= 0 goto LOAD__EOF
 
+    chopn line, 1
     line     = _load__fit_str_to_80(line)
     playline = _load__str_to_array(line)
     push playfield, playline
