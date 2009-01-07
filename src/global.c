@@ -652,47 +652,6 @@ Parrot_store_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
 /*
 
-=item C<void Parrot_store_global_k>
-
-Store the PMC C<val> into the namespace designated by C<pmc_key>,
-which may be a key PMC, an array of namespace name strings, or a
-string PMC, with name C<globalname>.
-
-RT #46161 - For now this function prefers non-namespaces, it will eventually
-entirely use the untyped interface.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_store_global_k(PARROT_INTERP, ARGIN(PMC *pmc_key),
-        ARGIN_NULLOK(STRING *globalname), ARGIN_NULLOK(PMC *val))
-{
-    ASSERT_ARGS(Parrot_store_global_k)
-    PMC *ns;
-
-    /*
-     * RT #46167 - temporary hack to notice when key is actually a string, so that
-     * the legacy logic for invalidating method cache will be called; this is
-     * not good enough but it avoids regressesions for now
-     */
-    if (pmc_key->vtable->base_type == enum_class_String) {
-        Parrot_store_global_s(interp, PMC_str_val(pmc_key),
-                              globalname, val);
-        return;
-    }
-
-    ns = Parrot_make_namespace_keyed(interp,
-                                     Parrot_get_ctx_HLL_namespace(interp),
-                                     pmc_key);
-
-    Parrot_store_global_n(interp, ns, globalname, val);
-}
-
-/*
-
 =item C<void Parrot_store_global_s>
 
 Store the PMC C<val> into the namespace designated by C<str_key>, or

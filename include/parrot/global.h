@@ -138,14 +138,6 @@ void Parrot_set_global(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_store_global_k(PARROT_INTERP,
-    ARGIN(PMC *pmc_key),
-    ARGIN_NULLOK(STRING *globalname),
-    ARGIN_NULLOK(PMC *val))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_store_global_n(PARROT_INTERP,
     ARGIN_NULLOK(PMC *ns),
     ARGIN_NULLOK(STRING *globalname),
@@ -205,9 +197,6 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
     || PARROT_ASSERT_ARG(_namespace)
 #define ASSERT_ARGS_Parrot_set_global __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_store_global_k __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc_key)
 #define ASSERT_ARGS_Parrot_store_global_n __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_store_global_s __attribute__unused__ int _ASSERT_ARGS_CHECK = \

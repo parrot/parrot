@@ -357,11 +357,6 @@ nothing if the global is not found.
 Find and return a global called C<name> in the keyed namespace C<namespace>.
 Returns C<PMCNULL> if not found.
 
-=item C<void Parrot_store_global_k(PARROT_INTERP, Parrot_PMC namespace_key, Parrot_String name, Parrot_PMC val)>
-
-Sets the value of a global called C<name> in the keyed namespace C<namespace>.
-Does nothing if the global is not found.
-
 =back
 
 =head3 Lexicals
