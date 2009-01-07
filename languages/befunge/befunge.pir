@@ -23,14 +23,17 @@
     set_global "playfield", playfield
 
     # various inits
-    .local int x, y, dir, flag
-    x = 0       # x coord of the pc
-    y = 0       # y coord of the pc
-    dir  = 1    # direction of the pc
-    flag = 0    # 1=string-mode, 2=bridge, 3=end
+    .local pmc status
+    status = new 'Hash'
+    status["x"] = 0       # x coord of the pc
+    status["y"] = 0       # y coord of the pc
+    status["dir"]  = 1    # direction of the pc
+    status["flag"] = 0    # 1=string-mode, 2=bridge, 3=end
+    set_global "status", status
 
     .local pmc stack
     stack = new 'ResizablePMCArray'
+    set_global "stack", stack
 
     .local num seed
     seed = time
@@ -51,13 +54,20 @@
         # S2 = user input
         # S0 = current instruction
 
-    .local int    val
+    .local int    x, y, val
     .local string char
   TICK:
+    status = get_global "status"
+    x    = status["x"]
+    y    = status["y"]
     val  = playfield[y;x]
     char = chr val
+    status["char"] = char
+    status["val"]  = val
+    set_global "status", status
+
     if debug == 0 goto TICK_NODEBUG
-    debug__check_breakpoint(x,y,char,val)
+    debug__check_breakpoint()
   TICK_NODEBUG:
 
 =pod

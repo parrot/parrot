@@ -32,8 +32,13 @@
 
 
 .sub "_debug__print_status_coordinates"
-    .param int x
-    .param int y
+    .local pmc status
+    .local int x
+    .local int y
+
+    status = get_global "status"
+    x = status["x"]
+    y = status["y"]
 
     print "("
     print x
@@ -43,8 +48,13 @@
 .end
 
 .sub "_debug__print_status_current_char"
-    .param string char 
-    .param int    val
+    .local pmc    status
+    .local string char 
+    .local int    val
+
+    status = get_global "status"
+    char = status["char"]
+    val  = status["val"]
 
     print "'"
     print char
@@ -57,14 +67,9 @@
 # Print the status of the instruction pointer:
 # coordinates, current char, direction, flags and stack.
 .sub "_debug__print_status"
-    .param int    x
-    .param int    y
-    .param string char 
-    .param int    val
-
-    _debug__print_status_coordinates(x,y)
+    _debug__print_status_coordinates()
     print " - "
-    _debug__print_status_current_char(char,val)
+    _debug__print_status_current_char()
     print " "
     print "\n"
 
@@ -107,28 +112,18 @@ DEBUG_PRINT_STATUS_STACK_END:
 .end
 
 .sub "_debug__interact"
-    .param int    x
-    .param int    y
-    .param string char 
-    .param int    val
-
-    _debug__print_status(x,y,char,val)
+    _debug__print_status()
 .end
 
 
 # Check whether we should stop the interpreter at the current
 # moment, allowing user to play with the debugger.
 .sub "debug__check_breakpoint"
-    .param int    x
-    .param int    y
-    .param string char 
-    .param int    val
-
     .local pmc step
 
     step = get_global "step"
     if step == 0 goto DEBUG__CHECK_BREAKPOINT__CHAR
-    _debug__interact(x,y,char,val)
+    _debug__interact()
     goto DEBUG__CHECK_BREAKPOINT__END
 
   DEBUG__CHECK_BREAKPOINT__CHAR:
