@@ -626,6 +626,111 @@ Those values added as attributes don't need to be strings, even though
 both of the ones in the example are. They can be integers, numbers
 or PMCs too.
 
+=head1 Exceptions
+
+Parrot includes a robust exception mechanism that is not only used internally
+to implement a variety of control flow constructs, but is also available for
+use directly from PIR code. Exceptions, in as few words as possible, are
+error conditions in the program. Exceptions are I<thrown> when an error
+occurs, and they can be I<caught> by special routines called I<handlers>. This
+enables Parrot to recover from errors in a controlled way, instead of crashing
+and terminating the process entirely.
+
+Exceptions, like most other data objects in Parrot, are PMCs. They contain
+and provide access to a number of different bits of data about the error,
+such as the location where the error was thrown (including complete
+backtraces), any annotation information from the file, and other data.
+
+=head2 Throwing Exceptions
+
+Many exceptions are used internally in Parrot to indicate error conditions.
+Opcodes such as C<die> and C<warn> throw exceptions internally to do what they
+are supposed to do. Other opcodes such as C<div> throw exceptions only when
+an error occurs, such as an attempted division by zero.
+
+Exceptions can also be thrown manually using the C<throw> opcode. Here's an
+example:
+
+  $P0 = new 'Exception'
+  throw $P0
+
+This throws the exception object as an error. If there are any available
+handlers in scope, the interpreter will pass the exception object to the
+handler and continue execution there. If there are no handlers available,
+Parrot will exit.
+
+=head2 Exception Handlers
+
+Exception handlers are labels in PIR code that can be jumped to when an
+exception is thrown. To list a label as an exception handler, the C<push_eh>
+opcode is used. All handlers exist on a stack. Pushing a new handler adds it
+to the top of the stack, and using the C<pop_eh> opcode pops the handler off
+the top of the stack.
+
+  push_eh my_handler
+    # something that might cause an error
+
+  my_handler:
+    # handle the error here
+
+=head2 Rethrowing and Exception Propagation
+
+Exception handlers are nested and are stored in a stack. This is because not
+all handlers are intended to handle all exceptions. If a handler cannot deal
+with a particular exception, it can C<rethrow> the exception to the next
+handler in the stack. Exceptions propagate through the handler stack until it
+reaches the default handler which causes Parrot to exit.
+
+=head2 Annotations
+
+Annotations are pieces of metadata that can be stored in a bytecode file to
+give some information about what the original source code looked like. This
+is especially important when dealing with high-level languages. We'll go into
+detail about annotations and their use in A<CHP-10>Chapter 10.
+
+Annotations are created using the c<.annotation> keyword. Annotations consist
+of a key/value pair, where the key is a string and the value is an integer,
+a number, or a string. Since annotations are stored compactly as constants in
+the compiled bytecode, PMCs cannot be used.
+
+  .annotation 'file', 'mysource.lang'
+  .annotation 'line', 42
+  .annotation 'compiletime', 0.3456
+
+Annotations exist, or are "in force" throughout the entire compilation unit,
+or until they are redefined. Creating a new annotation with the same name as
+an old one overwrites it with the new value. The current hash of annotations
+can be retrieved with the C<annotations> opcode:
+
+  .annotation 'line', 1
+  $P0 = annotations # {'line' => 1}
+  .annotation 'line', 2
+  $P0 = annotations # {'line' => 2}
+
+Or, to retrieve a single annotation by name, you can write:
+
+  $I0 = annotations 'line'
+
+=head3 Annotations in Exceptions
+
+Exception objects contain information about the annotations that were in force
+when the exception was thrown. These can be retrieved with the
+C<'annotation'()>  method of the exception PMC object:
+
+  $I0 = $P0.'annotations'('line')  # only the 'line' annotation
+  $P1 = $P0.'annotations'()        # hash of all annotations
+
+Exceptions can also give out a backtrace to try and follow where the program
+was exactly when the exception was thrown:
+
+  $P1 = $P0.'backtrace'()
+
+The backtrace PMC is an array of hashes. Each element in the array corresponds
+to a function in the current call stack. Each hash has two elements:
+C<'annotation'> which is the hash of annotations that were in effect at that
+point, and C<'sub'> which is the Sub PMC of that function.
+  
+
 =cut
 
 ##########################################################################
