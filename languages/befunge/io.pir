@@ -132,3 +132,11 @@ IO_PUT_VALUE_POP_3:
         branch MOVE_PC
 
 =cut
+
+########################################################################
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
+
