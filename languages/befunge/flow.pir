@@ -11,6 +11,16 @@
 .end
 
 #
+# go north.
+# befunge stack unchanged.
+# delta <- (1,0)
+.sub "flow__go_north"
+    $P0 = get_global "status"
+    $P0["dir"] = 0
+    set_global "status", $P0
+.end
+
+#
 # go south.
 # befunge stack unchanged.
 # delta <- (-1,0)
@@ -34,14 +44,6 @@
 
 
 =pod
-
-# Go north.
-# Befunge stack unchanged.
-# delta <- (0,-1)
-FLOW_GO_NORTH:
-    set I2, 0
-    branch MOVE_PC
-
 
 FLOW_GO_AWAY:
     save 4
