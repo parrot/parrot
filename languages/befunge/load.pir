@@ -94,7 +94,6 @@
 
     i     = 0
     len   = length str
-    dec len
     array = new 'ResizablePMCArray'
   _LOAD__STR_TO_ARRAY__NEXT_CHAR:
     if i == len goto _LOAD__STR_TO_ARRAY__DONE
