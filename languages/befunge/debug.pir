@@ -111,6 +111,27 @@
     print "\n"
 .end
 
+.sub "_debug__help"
+    print "Available commands are:\n"
+    print " status        - print state of current IP\n"
+    print " dump          - dump playfield\n"
+    print " break c       - set a breakpoint on character c\n"
+    print " break x,y     - set a breakpoint at coords (x,y)\n"
+    print " break c:x     - set a breakpoint on column x\n"
+    print " break r:y     - set a breakpoint on row y\n"
+    print " delete c      - delete breakpoint on character c\n"
+    print " delete x,y    - delete breakpoint at coords (x,y)\n"
+    print " delete c:x    - delete breakpoint on column x\n"
+    print " delete r:y    - delete breakpoint on row y\n"
+    print " list          - list breakpoints\n"
+    print " next          - step one befunge instruction\n"
+    print " continue      - resume execution\n"
+    print " restart       - restart execution\n"
+    print " quit          - abort execution\n"
+    print " help          - display this message\n"
+    print "\n"
+.end
+
 # The interpreter has reached a breakpoint. Let's
 # stop and interact with user.
 .sub "_debug__interact"
@@ -133,9 +154,13 @@
 
   DEBUG__INTERACT__DUMP:
   DEBUG__INTERACT__HELP:
+    _debug__help()
+    goto DEBUG__INTERACT__LOOP
+
   DEBUG__INTERACT__LIST:
     print "Not yet implemented...\n"
     goto DEBUG__INTERACT__LOOP
+
   DEBUG__INTERACT__NEXT:
   DEBUG__INTERACT__QUIT:
 
@@ -170,23 +195,6 @@ DEBUG_INTERACT_DUMP:
         bsr DEBUG_DUMP_PLAYFIELD
         branch DEBUG_INTERACT
 DEBUG_INTERACT_HELP:
-        print "Available commands are:\n"
-        print " status        - print state of current IP\n"
-        print " dump          - dump playfield\n"
-        print " break c       - set a breakpoint on character c\n"
-        print " break x,y     - set a breakpoint at coords (x,y)\n"
-        print " break c:x     - set a breakpoint on column x\n"
-        print " break r:y     - set a breakpoint on row y\n"
-        print " delete c      - delete breakpoint on character c\n"
-        print " delete x,y    - delete breakpoint at coords (x,y)\n"
-        print " delete c:x    - delete breakpoint on column x\n"
-        print " delete r:y    - delete breakpoint on row y\n"
-        print " list          - list breakpoints\n"
-        print " next          - step one befunge instruction\n"
-        print " continue      - resume execution\n"
-        print " restart       - restart execution\n"
-        print " quit          - abort execution\n"
-        print " help          - display this message\n"
         print "\n"
         branch DEBUG_INTERACT
 DEBUG_INTERACT_NEXT:
