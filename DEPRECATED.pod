@@ -85,7 +85,7 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
-=item * named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc
+=item * named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc [post 0.9.0]
 
 Class PMC name resolution will be the following.
 
