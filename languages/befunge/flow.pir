@@ -45,7 +45,7 @@
 .end
 
 
-# ** string mode
+# ** flag handling
 
 #
 # toggle string mode.
@@ -66,6 +66,16 @@
     set_global "status", $P0
 .end
 
+
+#
+# remove trampoline flag.
+# befunge stack unchanged.
+#
+.sub "flow__trampoline"
+    $P0 = get_global "status"
+    $P0["flag"] = 0
+    set_global "status", $P0
+.end
 
 =pod
 

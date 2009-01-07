@@ -151,19 +151,17 @@ NOT_NUM:
   FLOW_TOGGLE_STRING_MODE:
     flow__toggle_string_mode()
     goto MOVE_PC
+  FLOW_TRAMPOLINE:
+    flow__trampoline()
+    goto MOVE_PC
 
     # io instructions
   IO_PUSH_CHAR:
     io__push_char()
     goto MOVE_PC
-  
-=pod
 
-MAIN_TRAMPOLINE:
-        set I4, 0               # no more trampoline
-
-=cut
-
+    # instruction executed, now move the pc
+    
   MOVE_PC:
     # reload status & associated vars, that may have
     # changed in the subs
