@@ -680,7 +680,7 @@ method null($/) {
 
 method object_literal($/) {
     my $past := PAST::Stmts.new( :node($/) );
-    
+
     my $type := PAST::Var.new( :name('JSObject'), :scope('package'), :node($/) );
     my $obj := PAST::Op.new( :pasttype('callmethod'), :name("new"), :node($/), $type);
 

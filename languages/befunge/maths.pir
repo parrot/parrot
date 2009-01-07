@@ -131,3 +131,10 @@ MATHS_NOT_POP_1:
         branch MOVE_PC
 
 =cut
+
+########################################################################
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

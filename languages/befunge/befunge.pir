@@ -32,17 +32,17 @@
     y = 0       # y coord of the pc
     dir  = 1    # direction of the pc
     flag = 0    # 1=string-mode, 2=bridge, 3=end
-    
+
     .local pmc stack
     stack = new 'ResizablePMCArray'
-    
+
     .local num seed
     seed = time
     seed = mod seed, .RANDMAX
 
     .local string user_input
     user_input = ""
-    
+
         # I5 is debug
         #set S10, P5[I0] ??
         # P1 = the playfield
@@ -154,11 +154,11 @@ MAIN_END:
 #
 .sub "_parse_argv"
     .param pmc argv
-    
+
     .local int    i, debug
     .local string arg, char, file
     .local pmc    playfield
-    
+
     i     = 0
     debug = 0
   _PARSE_ARGS__ARGV_NEXT:
@@ -177,8 +177,14 @@ MAIN_END:
   _PARSE_ARGV__DONE:
     file      = argv[i]
     playfield = load(file)
-    
+
     .return(playfield, debug)
 .end
 
 
+########################################################################
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

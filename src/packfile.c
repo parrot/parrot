@@ -4121,11 +4121,13 @@ PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(struct PackFile_Annotations
 
     /* Allocate extra space for the group in the groups array. */
     if (self->groups)
-        self->groups = (PackFile_Annotations_Group **)mem_sys_realloc(self->groups, (1 + self->num_groups) *
-                sizeof(PackFile_Annotations_Group *));
+        self->groups =
+            (PackFile_Annotations_Group **)mem_sys_realloc(self->groups,
+                (1 + self->num_groups) *
+                    sizeof (PackFile_Annotations_Group *));
     else
         self->groups = mem_allocate_n_typed(self->num_groups + 1, PackFile_Annotations_Group *);
-    
+
     /* Store details. */
     self->groups[self->num_groups] = mem_allocate_typed(PackFile_Annotations_Group);
     self->groups[self->num_groups]->bytecode_offset = offset;
@@ -4172,8 +4174,10 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(struct PackFile_Annotations
     if (key_id == -1) {
         /* We do nee have it. Add key entry. */
         if (self->keys)
-            self->keys = (PackFile_Annotations_Key **)mem_sys_realloc(self->keys, (1 + self->num_keys) *
-                    sizeof(PackFile_Annotations_Key *));
+            self->keys =
+                (PackFile_Annotations_Key **)mem_sys_realloc(self->keys,
+                    (1 + self->num_keys) *
+                        sizeof (PackFile_Annotations_Key *));
         else
             self->keys = mem_allocate_n_typed(self->num_keys + 1, PackFile_Annotations_Key *);
         key_id = self->num_keys;
@@ -4194,10 +4198,14 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(struct PackFile_Annotations
 
     /* Add annotations entry. */
     if (self->entries)
-            self->entries = (PackFile_Annotations_Entry **)mem_sys_realloc(self->entries, (1 + self->num_entries) *
-                    sizeof(PackFile_Annotations_Entry *));
+            self->entries =
+                (PackFile_Annotations_Entry **)mem_sys_realloc(self->entries,
+                    (1 + self->num_entries) *
+                        sizeof (PackFile_Annotations_Entry *));
         else
-            self->entries = mem_allocate_n_typed(self->num_entries + 1, PackFile_Annotations_Entry *);
+            self->entries =
+                mem_allocate_n_typed(self->num_entries + 1,
+                    PackFile_Annotations_Entry *);
     self->entries[self->num_entries] = mem_allocate_typed(PackFile_Annotations_Entry);
     self->entries[self->num_entries]->bytecode_offset = offset;
     self->entries[self->num_entries]->key = key_id;
@@ -4287,7 +4295,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(struct PackFile_Annotations *se
             break;
         else
             start_entry = self->groups[i]->entries_offset;
-    
+
     if (key_id == -1) {
         /* Look through entries, storing what we find by key and tracking those
          * that we have values for. */

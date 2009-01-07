@@ -18,7 +18,7 @@
 #
 .sub "debug_initialize"
     .local pmc step, breakpoints
-    
+
     step = new 'Integer'
     step = 1
     breakpoints = new 'Hash'
@@ -26,7 +26,7 @@
     set_global "step", step
     set_global "breakpoints", breakpoints
     #repeat S10, "0", 128  # No char to break on.
-    
+
     .return()
 .end
 
@@ -232,3 +232,10 @@ DEBUG_DUMP_PLAYFIELD_END:
         ret
 
 =cut
+
+########################################################################
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

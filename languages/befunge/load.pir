@@ -36,14 +36,14 @@
     # end of file, but not enough lines
   LOAD__EOF:
     missing = 24 - noline
-        
+
   LOAD__FILL_EMPTY_LINE:
     line     = _load__fit_str_to_80('')
     playline = _load__str_to_array(line)
     push playfield, playline
     dec missing
     if missing > 0 goto LOAD__FILL_EMPTY_LINE
-    
+
     # file loaded, return the playfield
   LOAD__COMPLETE:
     close fh
@@ -71,10 +71,10 @@
     concat str, ' '
     goto _LOAD__FIT_STR_TO_80__PADDING
   _LOAD__FIT_STR_TO_80__PADDED:
-  
+
     # truncate to 80 chars
     substr str, 80, -1, ''
-  
+
     .return(str)
 .end
 
@@ -87,11 +87,11 @@
 #
 .sub "_load__str_to_array"
     .param string str
-    
+
     .local int i, len, val
     .local string char
     .local pmc array
-   
+
     i     = 0
     len   = length str
     dec len
@@ -103,11 +103,15 @@
     push array, val
     inc i
     goto _LOAD__STR_TO_ARRAY__NEXT_CHAR
-    
+
   _LOAD__STR_TO_ARRAY__DONE:
     .return(array)
 .end
 
 
-
-
+########################################################################
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
