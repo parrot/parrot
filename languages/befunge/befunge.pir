@@ -72,6 +72,11 @@
   TICK_NODEBUG:
     if char == '"' goto FLOW_TOGGLE_STRING_MODE
     
+    # sole number
+    
+    # direction changing
+    if char == '<' goto FLOW_GO_WEST
+    
     # unknown instruction
     goto MOVE_PC
     
@@ -125,6 +130,10 @@ NOT_NUM:
 
 =cut
 
+  FLOW_GO_WEST:
+    flow__go_west()
+    goto MOVE_PC
+    
   FLOW_TOGGLE_STRING_MODE:
     flow__toggle_string_mode()
     goto MOVE_PC
