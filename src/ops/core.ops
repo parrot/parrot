@@ -133,7 +133,7 @@ inline op wrapper__() :internal :flow {
 }
 
 inline op prederef__() :internal :flow {
-    const opcode_t * const _this = CUR_OPCODE;
+    opcode_t * const _this = CUR_OPCODE;
     if (interp->run_core & PARROT_CGOTO_CORE) {
         /* must be CGP then - check for events in not yet prederefed code */
         Parrot_cx_runloop_wake(interp, interp->scheduler);
