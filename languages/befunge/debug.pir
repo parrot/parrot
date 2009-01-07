@@ -220,6 +220,11 @@
     goto DEBUG__INTERACT__LOOP
 
   DEBUG__INTERACT__NEXT:
+    .local pmc step
+    step = get_global "step"
+    step = 1
+    set_global "step", step
+    goto DEBUG__INTERACT__END
 
   DEBUG__INTERACT__QUIT:
     end
@@ -240,10 +245,6 @@ DEBUG_INTERACT_DELETE:
         set P4, P3[1]
         delete P4[S10]
         branch DEBUG_INTERACT
-DEBUG_INTERACT_DUMP:
-        bsr DEBUG_DUMP_PLAYFIELD
-        branch DEBUG_INTERACT
-        branch DEBUG_INTERACT
 DEBUG_INTERACT_NEXT:
         set P3[0], 1        # stop at next instruction
         branch DEBUG_INTERACT_END
@@ -254,11 +255,11 @@ DEBUG_INTERACT_RESTART:
 DEBUG_INTERACT_STATUS:
         bsr DEBUG_PRINT_STATUS
         branch DEBUG_INTERACT
-DEBUG_INTERACT_END:
-        ret
-
+        
 =cut
 
+  DEBUG__INTERACT__END:
+    .return()
 .end
 
 
