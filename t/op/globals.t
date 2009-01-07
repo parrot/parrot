@@ -131,7 +131,7 @@ pir_output_is( <<'CODE', <<OUT, "find/store global with key" );
 .sub set_it
         $P0 = new 'String'
         $P0 = "Ook...BANG!\n"
-        store_global [ "Monkey" ; "Toaster" ], "Explosion", $P0
+        set_hll_global [ "Monkey" ; "Toaster" ], "Explosion", $P0
 .end
 CODE
 Ook...BANG!

@@ -60,7 +60,7 @@ This class defines the following methods:
     .local pmc single
     single = new 'Undef'
 
-    store_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', single
+    set_hll_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', single
 .end
 
 =item C<new( args_hash )>
@@ -212,7 +212,7 @@ This probably doesn't work correctly yet, but you will probably never use it.
     results    = new 'ResizablePMCArray'
 
     # store this as the singleton
-    store_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', self
+    set_hll_global [ 'Test'; 'Builder'; '_singleton' ], 'singleton', self
 
   RESULTS_DEFINED:
     .return( output, testplan, results )

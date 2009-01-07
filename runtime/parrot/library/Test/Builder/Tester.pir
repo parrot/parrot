@@ -190,11 +190,11 @@ This module defines the following public functions:
     expect_out  = new 'ResizablePMCArray'
     expect_diag = new 'ResizablePMCArray'
 
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_test',         test
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test', default_test
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output',  test_output
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out',   expect_out
-    store_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag',  expect_diag
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_test',         test
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_default_test', default_test
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_test_output',  test_output
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_out',   expect_out
+    set_hll_global [ 'Test'; 'Builder'; 'Tester' ], '_expect_diag',  expect_diag
 .end
 
 =item C<plan( num_tests )>

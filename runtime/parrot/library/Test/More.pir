@@ -69,7 +69,7 @@ This class defines the following functions:
     .local pmc test
     test = new [ 'Test'; 'Builder' ]
 
-    store_global [ 'Test'; 'More' ], '_test', test
+    set_hll_global [ 'Test'; 'More' ], '_test', test
 .end
 
 =item C<plan( number_or_no_plan )>
