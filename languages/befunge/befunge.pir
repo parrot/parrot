@@ -75,6 +75,7 @@
     # sole number
     
     # direction changing
+    if char == '>' goto FLOW_GO_EAST
     if char == '<' goto FLOW_GO_WEST
     
     # unknown instruction
@@ -130,6 +131,9 @@ NOT_NUM:
 
 =cut
 
+  FLOW_GO_EAST:
+    flow__go_east()
+    goto MOVE_PC
   FLOW_GO_WEST:
     flow__go_west()
     goto MOVE_PC

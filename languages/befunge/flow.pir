@@ -1,6 +1,16 @@
 # $Id$
 
 #
+# go east.
+# befunge stack unchanged.
+# delta <- (1,0)
+.sub "flow__go_east"
+    $P0 = get_global "status"
+    $P0["dir"] = 1
+    set_global "status", $P0
+.end
+
+#
 # go west.
 # befunge stack unchanged.
 # delta <- (-1,0)
@@ -19,13 +29,6 @@
 # delta <- (0,-1)
 FLOW_GO_NORTH:
     set I2, 0
-    branch MOVE_PC
-
-# Go east.
-# Befunge stack unchanged.
-# delta <- (1,0)
-FLOW_GO_EAST:
-    set I2, 1
     branch MOVE_PC
 
 # Go south.
