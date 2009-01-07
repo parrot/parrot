@@ -542,7 +542,7 @@ these libraries in more detail in A<CHP-6> "PIR Standard Library".
 It may seem more appropriate for a discussion of PIR's support for classes
 and objects to reside in it's own chapter, instead of appearing in a generic
 chapter about PIR programming "basics". However, part of PIR's core
-functionality is it's support for object-oriented programming. PIR does't
+functionality is it's support for object-oriented programming. PIR doesn't
 use all the fancy syntax as other OO languages, and it doesn't even support
 all the features that most modern OO languages have. What PIR does have is
 support for some of the basic structures and abilities, the necessary subset
