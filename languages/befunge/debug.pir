@@ -31,18 +31,104 @@
 .end
 
 
+.sub "_debug__print_status_coordinates"
+    .param int x
+    .param int y
+
+    print "("
+    print x
+    print ","
+    print y
+    print ")"
+.end
+
+.sub "_debug__print_status_current_char"
+    .param string char 
+    .param int    val
+
+    print "'"
+    print char
+    print "' (ord="
+    print val
+    print ")"
+.end
+
+
+# Print the status of the instruction pointer:
+# coordinates, current char, direction, flags and stack.
+.sub "_debug__print_status"
+    .param int    x
+    .param int    y
+    .param string char 
+    .param int    val
+
+    _debug__print_status_coordinates(x,y)
+    print " - "
+    _debug__print_status_current_char(char,val)
+    print " "
+    print "\n"
+
+=pod
+
+DEBUG_PRINT_STATUS:
+        # Coordinates.
+        # Current char.
+        # Direction.
+        print " dir="
+        print I2
+        # Flags:
+        set S10, " \""
+        eq I4, 1, DEBUG_PRINT_STATUS_FLAG
+        set S10, " #"
+        eq I4, 2, DEBUG_PRINT_STATUS_FLAG
+        set S10, " @"
+        eq I4, 3, DEBUG_PRINT_STATUS_FLAG
+        set S10, "  "
+DEBUG_PRINT_STATUS_FLAG:
+        print S10
+        # Stack.
+        print " stack="
+        set I11, P2
+        set I10, 0
+        ge  I10, I11, DEBUG_PRINT_STATUS_STACK_END
+DEBUG_PRINT_STATUS_STACK_LOOP:
+        set I12, P2[I10]
+        print I12
+        inc I10
+        ge I10, I11, DEBUG_PRINT_STATUS_STACK_END
+        print ","
+        branch DEBUG_PRINT_STATUS_STACK_LOOP
+DEBUG_PRINT_STATUS_STACK_END:
+        print "\n"
+        ret
+
+=cut
+
+.end
+
 .sub "_debug__interact"
+    .param int    x
+    .param int    y
+    .param string char 
+    .param int    val
+
+    _debug__print_status(x,y,char,val)
 .end
 
 
 # Check whether we should stop the interpreter at the current
 # moment, allowing user to play with the debugger.
 .sub "debug__check_breakpoint"
+    .param int    x
+    .param int    y
+    .param string char 
+    .param int    val
+
     .local pmc step
 
     step = get_global "step"
     if step == 0 goto DEBUG__CHECK_BREAKPOINT__CHAR
-    _debug__interact()
+    _debug__interact(x,y,char,val)
     goto DEBUG__CHECK_BREAKPOINT__END
 
   DEBUG__CHECK_BREAKPOINT__CHAR:
@@ -181,50 +267,6 @@ DEBUG_INTERACT_END:
 
 
 
-# Print the status of the instruction pointer:
-# coordinates, current char, direction, flags and stack.
-DEBUG_PRINT_STATUS:
-        # Coordinates.
-        print "("
-        print I0
-        print ","
-        print I1
-        print ")"
-        # Current char.
-        print " - '"
-        print S0
-        print "' (ord="
-        ord I10, S0
-        print I10
-        print ")"
-        # Direction.
-        print " dir="
-        print I2
-        # Flags:
-        set S10, " \""
-        eq I4, 1, DEBUG_PRINT_STATUS_FLAG
-        set S10, " #"
-        eq I4, 2, DEBUG_PRINT_STATUS_FLAG
-        set S10, " @"
-        eq I4, 3, DEBUG_PRINT_STATUS_FLAG
-        set S10, "  "
-DEBUG_PRINT_STATUS_FLAG:
-        print S10
-        # Stack.
-        print " stack="
-        set I11, P2
-        set I10, 0
-        ge  I10, I11, DEBUG_PRINT_STATUS_STACK_END
-DEBUG_PRINT_STATUS_STACK_LOOP:
-        set I12, P2[I10]
-        print I12
-        inc I10
-        ge I10, I11, DEBUG_PRINT_STATUS_STACK_END
-        print ","
-        branch DEBUG_PRINT_STATUS_STACK_LOOP
-DEBUG_PRINT_STATUS_STACK_END:
-        print "\n"
-        ret
 
 
 # Dump the playfield on stdout.

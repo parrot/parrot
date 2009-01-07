@@ -20,6 +20,7 @@
     .local int debug
     .local pmc playfield
     (playfield,debug) = _parse_argv(argv)
+    set_global "playfield", playfield
 
     # various inits
     .local int x, y, dir, flag
@@ -56,7 +57,7 @@
     val  = playfield[y;x]
     char = chr val
     if debug == 0 goto TICK_NODEBUG
-    debug__check_breakpoint()
+    debug__check_breakpoint(x,y,char,val)
   TICK_NODEBUG:
 
 =pod
