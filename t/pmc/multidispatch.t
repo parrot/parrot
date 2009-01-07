@@ -335,7 +335,7 @@ pir_output_is( <<'CODE', <<'OUT', "first dynamic MMD call" );
     ## push m, s
     ## s = get_global "Bar", "foo"
     ## push m, s
-    ## store_global "foo", m
+    ## set_global "foo", m
     print "calling foo(f, b)\n"
     foo(f, b)
     print "calling foo(b, f)\n"

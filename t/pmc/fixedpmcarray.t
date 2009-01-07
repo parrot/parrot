@@ -304,7 +304,7 @@ pir_output_like(
      bounds 1
      compares = new 'Integer'
      compares = 0
-     store_global "compares", compares
+     set_global "compares", compares
     cmp_fun = get_global "cmp_fun"
      sort_ar()
      sort_ar(cmp_fun)

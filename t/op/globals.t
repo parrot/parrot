@@ -20,8 +20,6 @@ t/op/globals.t - Global Variables
 
 Tests the C<get_global> and C<set_global> operations.
 
-LEGACY: Tests the C<store_global> and C<find_global> operations.
-
 =cut
 
 pasm_output_is( <<'CODE', '12', "set/get" );
@@ -97,7 +95,7 @@ pasm_output_is( <<'CODE', '12', "Fetch and store" );
         new P1, 'Integer'
         set P0, 12
         set P1, 7
-        store_global "Integer", P0
+        set_global "Integer", P0
         get_hll_global P1, "Integer"
         print P1
         end

@@ -370,10 +370,6 @@ Operations to modify global variables
 
 ########################################
 
-=item B<store_global>(in STR, invar PMC)
-
-Store value $2 as global symbol $1 in the current namespace.
-
 =item B<store_global>(in STR, in STR, invar PMC)
 
 =item B<store_global>(in PMC, in STR, invar PMC)
@@ -383,10 +379,6 @@ namespace does not exist, create it.  $1 may be a key, a string, or an array
 of strings.
 
 =cut
-
-op store_global(in STR, invar PMC) :deprecated {
-    Parrot_store_global_cur(interp, $1, $2);
-}
 
 op store_global(in STR, in STR, invar PMC) :deprecated {
     Parrot_store_global_s(interp, $1, $2, $3);

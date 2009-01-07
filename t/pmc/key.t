@@ -157,7 +157,7 @@ code
   $P0 = get_class 'Sub'
   $P1 = subclass $P0, 'TclProc'
   $P1 = new 'ResizablePMCArray'
-  store_global 'call_chain', $P1
+  set_global 'call_chain', $P1
 .end
 
 # Local Variables:

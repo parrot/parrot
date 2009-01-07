@@ -86,7 +86,7 @@ or the resulting PIR code (target='PIR').
     load_bytecode 'PGE.pbc'
 
     optable = new ['PGE';'OPTable']
-    store_global '$optable', optable
+    set_global '$optable', optable
 
     $P0 = get_global 'glob_literal'
     optable.'newtok'('term:', 'precedence'=>'=', 'nows'=>1, 'parsed'=>$P0)

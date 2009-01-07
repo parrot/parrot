@@ -862,7 +862,7 @@ okay:
 .sub setup
     $P0 = new 'Integer'
     $P0 = 1
-    store_global 'foo', $P0
+    set_global 'foo', $P0
 .end
 
 .sub _check_sanity
@@ -874,7 +874,7 @@ okay:
 .sub mutate
     $P0 = new 'Integer'
     $P0 = 2
-    store_global 'foo', $P0
+    set_global 'foo', $P0
 .end
 
 .sub check_sanity
@@ -943,7 +943,7 @@ okay:
 .sub main :main
     $P0 = new 'Integer'
     $P0 = 1
-    store_global 'test_num', $P0
+    set_global 'test_num', $P0
 
     .const 'Sub' _check = 'full_check'
     _check()
