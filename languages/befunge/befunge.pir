@@ -133,6 +133,7 @@ NOT_NUM:
 
 =cut
 
+    # flow instructions
   FLOW_GO_EAST:
     flow__go_east()
     goto MOVE_PC
@@ -145,7 +146,6 @@ NOT_NUM:
   FLOW_GO_WEST:
     flow__go_west()
     goto MOVE_PC
-    
   FLOW_TOGGLE_STRING_MODE:
     flow__toggle_string_mode()
     goto MOVE_PC

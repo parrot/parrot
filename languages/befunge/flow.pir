@@ -1,5 +1,7 @@
 # $Id$
 
+# ** direction changing
+
 #
 # go east.
 # befunge stack unchanged.
@@ -39,6 +41,28 @@
 .sub "flow__go_west"
     $P0 = get_global "status"
     $P0["dir"] = 3
+    set_global "status", $P0
+.end
+
+
+# ** string mode
+
+#
+# toggle string mode.
+# befunge stack unchanged.
+#
+.sub "flow__toggle_string_mode"
+    $P0 = get_global "status"
+    $I0 = $P0["flag"]
+  
+    if $I0 == 1 goto FLOW__TOGGLE_STRING_MODE__OFF
+    $P0["flag"] = 1
+    goto FLOW__TOGGLE_STRING_MODE__DONE
+    
+  FLOW__TOGGLE_STRING_MODE__OFF:
+    $P0["flag"] = 0
+  
+  FLOW__TOGGLE_STRING_MODE__DONE:
     set_global "status", $P0
 .end
 
@@ -102,15 +126,6 @@ FLOW_COMPARE_TRUE:
     push P2, I12
     branch MOVE_PC
 
-# Toggle string mode.
-# Befunge stack unchanged.
-FLOW_TOGGLE_STRING_MODE:
-    eq I4, 1, FLOW_TOGGLE_STRING_MODE_OFF
-    set I4, 1
-    branch MOVE_PC
-FLOW_TOGGLE_STRING_MODE_OFF:
-    set I4, 0
-    branch MOVE_PC
 
 # Trampoline.
 # Befunge stack unchanged.
