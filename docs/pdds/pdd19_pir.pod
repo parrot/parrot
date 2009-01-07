@@ -359,14 +359,14 @@ Set the current PIR file name to the value specified. This is useful in case
 the PIR code is generated from some source PIR files, and error messages
 should print the source file's name, not the name of the generated file.
 
-=item .annotate <key> <value>
+=item .annotate <key>, <value>
 
 Makes an entry in the bytecode annotations table. This is used to store high
 level language debug information. Examples:
 
-  .annotate "file" "aardvark.p6"
-  .annotate "line" 5
-  .annotate "column" 24
+  .annotate "file", "aardvark.p6"
+  .annotate "line", 5
+  .annotate "column", 24
 
 An annotation stays in effect until the next annotation with the same key or
 the end of the current compilation unit (that is, if you use a tool such as
@@ -377,13 +377,13 @@ One annotation covers many PIR instructions. If the result of compiling one
 line of HLL code is 15 lines of PIR, you only need to emit one annotation
 before the first of those 15 lines to set the line number.
 
-  .annotate "line" 42
+  .annotate "line", 42
 
 The key must always be a quoted string. The value may be an integer, a number
 or a quoted string. Note that integer values are stored most compactly; should
 you instead of the above annotate directive emit:
 
-  .annotate "line" "42"
+  .annotate "line", "42"
 
 Then you're asking for a bigger bytecode file as a result.
 

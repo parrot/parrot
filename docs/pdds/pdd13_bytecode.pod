@@ -307,9 +307,10 @@ an individual entry.
   |        |        |    0x02 - Fixup Segment                                |
   |        |        |    0x03 - Constant Table Segment                       |
   |        |        |    0x04 - Bytecode Segment                             |
-  |        |        |    0x05 - Annotations Segment                          |
-  |        |        |    0x06 - PIC Data Segment                             |
-  |        |        |    0x07 - Dependencies Segment                         |
+  |        |        |    0x05 - PIR Debug Segment                            |
+  |        |        |    0x06 - Annotations Segment                          |
+  |        |        |    0x07 - PIC Data Segment                             |
+  |        |        |    0x08 - Dependencies Segment                         |
   +--------+--------+--------------------------------------------------------+
   | 1      | n      | The name of the segment, as a (NULL terminated) ASCII  |
   |        |        | C string. This must be padded with trailing NULL       |
@@ -511,6 +512,46 @@ following form.
   +--------+--------+--------------------------------------------------------+
 
 
+=head3 PIR Debug Segment
+
+This segment stores the filenames and line numbers of PIR code that was
+compiled to bytecode. The segment comes in two parts.
+
+=over 4
+
+=item A list of mappings between offsets in the bytecode and filenames,
+indicating that the bytecode from that point on until the next entry was
+generated from the PIR found in the given filename
+
+=item A list of mappings between instructions in the bytecode and line
+numbers, with one entry per instruction
+
+=back
+
+The segment starts with:
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of filename mappings that follow.               |
+  |        |        |    n                                                   |
+  +--------+--------+--------------------------------------------------------+
+
+Then come n mappings.
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 0      | 1      | Offset in the bytecode.                                |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | A string constant holding the filename, stored as an   |
+  |        |        | index into the constants table.                        |
+  +--------+--------+--------------------------------------------------------+
+
+This is followed by the line number for each instruction in the bytecode
+segment.
+
+
 =head3 Annotations Segment
 
 Annotations allow any instruction in the bytecode stream to have zero or more
@@ -589,8 +630,17 @@ order.
   |        |        | annotations for the given instruction start.           |
   +--------+--------+--------------------------------------------------------+
 
-The rest of the segment is made up of a sequence of instructions to key and
-value mappings, taking the following format:
+The rest of the segment is made up of a sequence of bytecode offset to key and
+value mappings. First comes the number of them that follow:
+
+  +--------+--------+--------------------------------------------------------+
+  | Offset | Length | Description                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Number of bytecode to keypair mappings that follow.    |
+  |        |        |    n                                                   |
+  +--------+--------+--------------------------------------------------------+
+
+Then there are n entries of the following format:
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |

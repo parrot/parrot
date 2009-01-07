@@ -378,6 +378,14 @@ INS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     op_info_t   *op_info;
     char fullname[64], format[128];
 
+    if (STREQ(name, ".annotate")) {
+        ins = _mk_instruction(name, "", n, r, 0);
+        if (emit)
+            return emitb(interp, unit, ins);
+        else
+            return ins;
+    }
+
     if ((STREQ(name, "set_args"))
     ||  (STREQ(name, "get_results"))
     ||  (STREQ(name, "get_params"))

@@ -593,8 +593,8 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     int i, j;
     PackFile_Debug *debug_seg;
     opcode_t *lines                  = mem_allocate_typed(opcode_t);
-    PackFile_DebugMapping **mappings =
-        mem_allocate_typed(PackFile_DebugMapping *);
+    PackFile_DebugFilenameMapping **mappings =
+        mem_allocate_typed(PackFile_DebugFilenameMapping *);
     opcode_t num_mappings = 0;
     opcode_t num_lines    = 0;
 
@@ -615,16 +615,15 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             in_seg->base.size * sizeof (opcode_t));
 
         /* Concatenate mappings. */
-        mappings = (PackFile_DebugMapping **)mem_sys_realloc(mappings,
+        mappings = (PackFile_DebugFilenameMapping **)mem_sys_realloc(mappings,
                    (num_mappings + in_seg->num_mappings) *
                    sizeof (Parrot_Pointer));
         for (j = 0; j < in_seg->num_mappings; j++) {
-            PackFile_DebugMapping *mapping = mem_allocate_typed(
-                PackFile_DebugMapping);
+            PackFile_DebugFilenameMapping *mapping = mem_allocate_typed(
+                PackFile_DebugFilenameMapping);
             STRUCT_COPY(mapping, in_seg->mappings[j]);
             mapping->offset += num_lines;
-            if (mapping->mapping_type == PF_DEBUGMAPPINGTYPE_FILENAME)
-                mapping->u.filename += inputs[i]->const_start;
+            mapping->filename += inputs[i]->const_start;
             mappings[num_mappings + j] = mapping;
         }
 

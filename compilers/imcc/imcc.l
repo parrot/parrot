@@ -302,6 +302,7 @@ SP              [ ]
 
 <*>".line"               return TK_LINE;
 <*>".file"               return TK_FILE;
+<INITIAL,emit>".annotate" return ANNOTATE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".set_arg"               return ARG;
 ".sub"                   return SUB;

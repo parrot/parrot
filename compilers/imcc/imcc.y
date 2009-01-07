@@ -800,7 +800,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT
 %token <t> NAMESPACE DOT_METHOD
-%token <t> SUB SYM LOCAL LEXICAL CONST
+%token <t> SUB SYM LOCAL LEXICAL CONST ANNOTATE
 %token <t> INC DEC GLOBAL_CONST
 %token <t> PLUS_ASSIGN MINUS_ASSIGN MUL_ASSIGN DIV_ASSIGN CONCAT_ASSIGN
 %token <t> BAND_ASSIGN BOR_ASSIGN BXOR_ASSIGN FDIV FDIV_ASSIGN MOD_ASSIGN
@@ -840,6 +840,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %type <i> if_statement unless_statement
 %type <i> func_assign get_results
 %type <i> opt_invocant
+%type <i> annotate_directive
 %type <sr> target targetlist reg const var result pcc_set_yield
 %type <sr> keylist keylist_force _keylist key maybe_ns
 %type <sr> vars _vars var_or_i _var_or_i label_op sub_label_op sub_label_op_c
@@ -926,6 +927,17 @@ location_directive:
            set_filename(interp, $2);
          }
    ;
+
+annotate_directive:
+    ANNOTATE STRINGC COMMA const
+        {
+          /* We'll want to store an entry while emitting instructions, so just
+           * store annotation like it's an instruction. */
+          SymReg * const key = mk_const(interp, $2, 'S');
+          $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, ".annotate", 2, key, $4);
+          mem_sys_free($2);
+        }
+    ;
 
 hll_def:
 
@@ -1558,6 +1570,7 @@ statement:
    | FILECOMMENT               { $$ = 0; }
    | LINECOMMENT               { $$ = 0; }
    | location_directive        { $$ = 0; }
+   | annotate_directive        { $$ = $1; }
    ;
 
 labels:

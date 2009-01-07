@@ -695,6 +695,40 @@ Set this PMC as shared.
         return shared_self;
     }
 
+
+/*
+
+=item C<PMC *annotations>
+
+Gets any bytecode annotations in force at the point where the exception was
+thrown. If the optional name of an annotation is specified, gets just that
+annotation. If not, returns a Hash of all of them.
+
+=cut
+
+*/
+
+    METHOD PMC *annotations(STRING *name :optional, INTVAL have_name :opt_flag) {
+        PMC *resume;
+        PMC *result = PMCNULL;
+
+        /* Get resume continuation, to find location we failed at. */
+        GET_ATTR_resume(interp, SELF, resume);
+        if (!PMC_IS_NULL(resume)) {
+            Parrot_cont *cont = PMC_cont(resume);
+            if (cont->seg != NULL && cont->seg->annotations != NULL)
+                result = PackFile_Annotations_lookup(interp, cont->seg->annotations,
+                        cont->address - cont->seg->base.data, name);
+        }
+
+        /* If we didn't have a key specified and we found no annotations to
+         * return, should return an empty hash. */
+        if (!have_name && PMC_IS_NULL(result))
+            result = pmc_new(interp, enum_class_Hash);
+
+        RETURN(PMC *result);
+    }
+
 /*
 
 =back

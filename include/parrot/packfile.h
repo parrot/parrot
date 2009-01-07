@@ -75,15 +75,6 @@ typedef struct PackFile_Constant {
     } u;
 } PackFile_Constant;
 
-typedef struct PackFile_DebugMapping {
-    opcode_t offset;
-    opcode_t mapping_type;
-    union {
-        opcode_t filename;
-        opcode_t source_seg; /* XXX Source segments currently unimplemented. */
-    } u;
-} PackFile_DebugMapping;
-
 /*
 ** PackFile Segment:
 *    The base type of every section
@@ -124,6 +115,7 @@ typedef enum {
     PF_CONST_SEG,
     PF_BYTEC_SEG,
     PF_DEBUG_SEG,
+    PF_ANNOTATIONS_SEG,
 
     PF_MAX_SEG
 } pack_file_types;
@@ -204,20 +196,53 @@ struct PackFile_ByteCode {
     struct PackFile_Debug *debugs;
     PackFile_ConstTable   *const_table;
     PackFile_FixupTable   *fixups;
+    struct PackFile_Annotations *annotations;
 };
 
-enum PF_DEBUGMAPPINGTYPE {
-    PF_DEBUGMAPPINGTYPE_NONE = 0,
-    PF_DEBUGMAPPINGTYPE_FILENAME,
-    PF_DEBUGMAPPINGTYPE_SOURCESEG
-};
+typedef struct PackFile_DebugFilenameMapping {
+    opcode_t offset;
+    opcode_t filename;
+} PackFile_DebugFilenameMapping;
 
 typedef struct PackFile_Debug {
     PackFile_Segment        base;
     opcode_t                num_mappings;
-    PackFile_DebugMapping **mappings;
+    PackFile_DebugFilenameMapping **mappings;
     PackFile_ByteCode      *code;   /* where this segment belongs to */
 } PackFile_Debug;
+
+
+/* Key types for annotation segment. */
+#define PF_ANNOTATION_KEY_TYPE_INT 0
+#define PF_ANNOTATION_KEY_TYPE_STR 1
+#define PF_ANNOTATION_KEY_TYPE_NUM 2
+
+typedef struct PackFile_Annotations_Key {
+    opcode_t name;
+    opcode_t type;
+} PackFile_Annotations_Key;
+
+typedef struct PackFile_Annotations_Group {
+    opcode_t bytecode_offset;
+    opcode_t entries_offset;
+} PackFile_Annotations_Group;
+
+typedef struct PackFile_Annotations_Entry {
+    opcode_t bytecode_offset;
+    opcode_t key;
+    opcode_t value;
+} PackFile_Annotations_Entry;
+
+typedef struct PackFile_Annotations {
+    PackFile_Segment            base;
+    opcode_t                    num_keys;
+    PackFile_Annotations_Key    **keys;
+    opcode_t                    num_groups;
+    PackFile_Annotations_Group  **groups;
+    opcode_t                    num_entries;
+    PackFile_Annotations_Entry  **entries;
+    PackFile_ByteCode           *code;
+} PackFile_Annotations;
 
 typedef struct PackFile_Directory {
     PackFile_Segment   base;
@@ -599,12 +624,10 @@ PARROT_EXPORT
 void Parrot_debug_add_mapping(PARROT_INTERP,
     ARGMOD(PackFile_Debug *debug),
     opcode_t offset,
-    int mapping_type,
-    ARGIN(const char *filename),
-    int source_seg)
+    ARGIN(const char *filename))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*debug);
 
 PARROT_EXPORT
@@ -662,6 +685,72 @@ void default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
 void mark_const_subs(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+void PackFile_Annotations_add_entry(PARROT_INTERP,
+    ARGMOD(struct PackFile_Annotations *self),
+    opcode_t offset,
+    opcode_t key,
+    opcode_t type,
+    opcode_t value)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+void PackFile_Annotations_add_group(PARROT_INTERP,
+    ARGMOD(struct PackFile_Annotations *self),
+    opcode_t offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+void PackFile_Annotations_destroy(SHIM_INTERP,
+    ARGMOD(struct PackFile_Segment *seg))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*seg);
+
+void PackFile_Annotations_dump(PARROT_INTERP,
+    ARGIN(struct PackFile_Segment *seg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+PMC * PackFile_Annotations_lookup(PARROT_INTERP,
+    ARGIN(struct PackFile_Annotations *self),
+    opcode_t offset,
+    ARGIN_NULLOK(STRING *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
+    ARGIN(struct PackFile *pf),
+    SHIM(const char *name),
+    NULLOK(int add))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+opcode_t * PackFile_Annotations_pack(PARROT_INTERP,
+    ARGIN(struct PackFile_Segment *seg),
+    ARGMOD(opcode_t *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*cursor);
+
+size_t PackFile_Annotations_packed_size(PARROT_INTERP,
+    ARGIN(struct PackFile_Segment *seg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *seg),
+    ARGIN(const opcode_t *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*seg);
 
 #define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -779,6 +868,37 @@ void mark_const_subs(PARROT_INTERP)
     || PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_mark_const_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_PackFile_Annotations_add_entry \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(self)
+#define ASSERT_ARGS_PackFile_Annotations_add_group \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(self)
+#define ASSERT_ARGS_PackFile_Annotations_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(seg)
+#define ASSERT_ARGS_PackFile_Annotations_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(seg)
+#define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(self)
+#define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pf)
+#define ASSERT_ARGS_PackFile_Annotations_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(seg) \
+    || PARROT_ASSERT_ARG(cursor)
+#define ASSERT_ARGS_PackFile_Annotations_packed_size \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(seg)
+#define ASSERT_ARGS_PackFile_Annotations_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(seg) \
+    || PARROT_ASSERT_ARG(cursor)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile.c */
 
