@@ -317,7 +317,7 @@ hello from foo_2
 OUTPUT
 
 TODO: {
-    local $TODO = "cannot 'rm' an open file on windows" if $^O eq 'MSWin32';
+    local $TODO = "cannot 'rm' an open file on windows. TT#121" if $^O =~ /(MSWin32|cygwin)/;
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
 .sub main :main
 
