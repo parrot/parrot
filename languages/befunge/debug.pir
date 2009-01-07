@@ -274,53 +274,49 @@ DEBUG_INTERACT_STATUS:
     goto DEBUG__CHECK_BREAKPOINT__END
 
   DEBUG__CHECK_BREAKPOINT__CHAR:
-  DEBUG__CHECK_BREAKPOINT__END:
+    .local pmc breakpoints, status
+    breakpoints = get_global "breakpoints"
+    status      = get_global "status"
+    $S0 = status["char"]
+    $I0 = exists breakpoints[$S0]
+    if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__COORD
+    _debug__interact()
+    goto DEBUG__CHECK_BREAKPOINT__END
 
-=pod
+  DEBUG__CHECK_BREAKPOINT__COORD:
+    .local int x, y
+    x = status["x"]
+    y = status["y"]
+    $S0 = x
+    $S1 = y
+    concat $S0, ","
+    concat $S0, $S1
+    $I0 = exists breakpoints[$S0]
+    if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__ROW
+    _debug__interact()
+    goto DEBUG__CHECK_BREAKPOINT__END
 
-        set I10, P3[0]
-        eq 0, I10, DEBUG_CHECK_BREAKPOINT_CHAR
-        bsr DEBUG_INTERACT
-        branch DEBUG_CHECK_BREAKPOINT_END
-DEBUG_CHECK_BREAKPOINT_CHAR:
-        set P4, P3[1]
-        exists I10, P4[S0]
-        eq 0, I10, DEBUG_CHECK_BREAKPOINT_COORD
-        bsr DEBUG_INTERACT
-        branch DEBUG_CHECK_BREAKPOINT_END
-DEBUG_CHECK_BREAKPOINT_COORD:
-        set S10, I0
-        concat S10, ","
-        set S11, I1
-        concat S10, S11
-        exists I10, P4[S10]
-        eq 0, I10, DEBUG_CHECK_BREAKPOINT_ROW
-        bsr DEBUG_INTERACT
-        branch DEBUG_CHECK_BREAKPOINT_END
-DEBUG_CHECK_BREAKPOINT_ROW:
-        set S10, "r:"
-        set S11, I1
-        concat S10, S11
-        exists I10, P4[S10]
-        eq 0, I10, DEBUG_CHECK_BREAKPOINT_COL
-        bsr DEBUG_INTERACT
-        branch DEBUG_CHECK_BREAKPOINT_END
-DEBUG_CHECK_BREAKPOINT_COL:
-        set S10, "c:"
-        set S11, I0
-        concat S10, S11
-        exists I10, P4[S10]
-        eq 0, I10, DEBUG_CHECK_BREAKPOINT_END
-        bsr DEBUG_INTERACT
-        # Fallback
-        # branch DEBUG_CHECK_BREAKPOINT_END
+  DEBUG__CHECK_BREAKPOINT__ROW:
+    $S0 = "r:"
+    $S1 = y
+    concat $S0, $S1
+    $I0 = exists breakpoints[$S0]
+    if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__COL
+    _debug__interact()
+    goto DEBUG__CHECK_BREAKPOINT__END
 
+  DEBUG__CHECK_BREAKPOINT__COL:
+    $S0 = "c:"
+    $S1 = x
+    concat $S0, $S1
+    $I0 = exists breakpoints[$S0]
+    if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__COL
+    _debug__interact()
+    # fallback
+    #goto DEBUG__CHECK_BREAKPOINT__END
 
   DEBUG__CHECK_BREAKPOINT__END:
     .return()
-
-=cut
-
 .end
 
 
