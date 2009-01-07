@@ -62,15 +62,8 @@
     .param string str
 
     # padding with spaces to 80 chars if needed
-    .local int i, len
-    len = length str
-    i   = 80 - len
-  _LOAD__FIT_STR_TO_80__PADDING:
-    if i <= 0 goto _LOAD__FIT_STR_TO_80__PADDED
-    dec i
-    concat str, ' '
-    goto _LOAD__FIT_STR_TO_80__PADDING
-  _LOAD__FIT_STR_TO_80__PADDED:
+    $S0 = repeat ' ', 80
+    concat str, $S0
 
     # truncate to 80 chars
     substr str, 80, -1, ''
