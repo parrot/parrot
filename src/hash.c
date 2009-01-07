@@ -574,35 +574,32 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info* in
     size_t i;
     IMAGE_IO * const io = info->image_io;
 
-    for (i = 0; i <= hash->mask; i++) {
-        HashBucket *b = hash->bi[i];
+    for (i = 0; i < hash->entries; i++) {
+        HashBucket *b = hash->bs+i;
 
-        while (b) {
-            switch (hash->key_type) {
-                case Hash_key_type_STRING:
-                    VTABLE_push_string(interp, io, (STRING *)b->key);
-                    break;
-                case Hash_key_type_int:
-                    VTABLE_push_integer(interp, io, (INTVAL)b->key);
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "unimplemented key type");
-                    break;
-            }
-            switch (hash->entry_type) {
-                case enum_hash_pmc:
-                    (info->visit_pmc_now)(interp, (PMC *)b->value, info);
-                    break;
-                case enum_hash_int:
-                    VTABLE_push_integer(interp, io, (INTVAL)b->value);
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                        "unimplemented value type");
-                    break;
-            }
-            b = b->next;
+        switch (hash->key_type) {
+            case Hash_key_type_STRING:
+                VTABLE_push_string(interp, io, (STRING *)b->key);
+                break;
+            case Hash_key_type_int:
+                VTABLE_push_integer(interp, io, (INTVAL)b->key);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "unimplemented key type");
+                break;
+        }
+        switch (hash->entry_type) {
+            case enum_hash_pmc:
+                (info->visit_pmc_now)(interp, (PMC *)b->value, info);
+                break;
+            case enum_hash_int:
+                VTABLE_push_integer(interp, io, (INTVAL)b->value);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "unimplemented value type");
+                break;
         }
     }
 }
@@ -1362,40 +1359,38 @@ void
 parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
 {
     ASSERT_ARGS(parrot_hash_clone)
-    UINTVAL i;
+    UINTVAL i, entries;
+    entries = hash->entries;
 
-    for (i = 0; i <= hash->mask; i++) {
-        HashBucket *b = hash->bi[i];
-        while (b) {
-            void * const  key = b->key;
-            void         *valtmp;
+    for (i = 0; i < entries; i++) {
+        HashBucket *b = hash->bs+i;
+        void * const  key = b->key;
+        void         *valtmp;
 
-            switch (hash->entry_type) {
-            case enum_type_undef:
-            case enum_type_ptr:
-            case enum_type_INTVAL:
-                valtmp = (void *)b->value;
-                break;
+        switch (hash->entry_type) {
+        case enum_type_undef:
+        case enum_type_ptr:
+        case enum_type_INTVAL:
+            valtmp = (void *)b->value;
+            break;
 
-            case enum_type_STRING:
-                valtmp = (void *)string_copy(interp, (STRING *)b->value);
-                break;
+        case enum_type_STRING:
+            valtmp = (void *)string_copy(interp, (STRING *)b->value);
+            break;
 
-            case enum_type_PMC:
-                if (PMC_IS_NULL((PMC *)b->value))
-                    valtmp = (void *)PMCNULL;
-                else
-                    valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
-                break;
+        case enum_type_PMC:
+            if (PMC_IS_NULL((PMC *)b->value))
+                valtmp = (void *)PMCNULL;
+            else
+                valtmp = (void *)VTABLE_clone(interp, (PMC*)b->value);
+            break;
 
-            default:
-                valtmp = NULL; /* avoid warning */
-                Parrot_ex_throw_from_c_args(interp, NULL, -1,
-                    "hash corruption: type = %d\n", hash->entry_type);
-            };
-            parrot_hash_put(interp, dest, key, valtmp);
-            b = b->next;
-        }
+        default:
+            valtmp = NULL; /* avoid warning */
+            Parrot_ex_throw_from_c_args(interp, NULL, -1,
+                "hash corruption: type = %d\n", hash->entry_type);
+        };
+        parrot_hash_put(interp, dest, key, valtmp);
     }
 }
 

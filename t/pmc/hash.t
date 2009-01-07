@@ -22,7 +22,7 @@ well.
     .include 'test_more.pir'
     .include 'except_types.pasm'
 
-    plan(143)
+    plan(145)
 
     initial_hash_tests()
     more_than_one_hash()
@@ -43,6 +43,8 @@ well.
     getting_values_from_undefined_keys()
     setting_and_getting_non_scalar_pmcs()
     testing_clone()
+    clone_preserves_order()
+    freeze_thaw_preserves_order()
     compound_keys()
     getting_pmcs_from_compound_keys()
     getting_pmcs_from_string_int_compound_keys()
@@ -582,6 +584,163 @@ DONE:
 #     print "not "
 # ok6:
 #     print "ok 6\n"
+.end
+
+# TT #116
+# This test failure depends on the value if the hash seed, which is randomized.
+# To try to ensure that the test fails reliably if there's a regression, it's
+# run 3 times with different hash keys.
+.sub clone_preserves_order
+    .local pmc h, cloned
+    .local string s1, s2
+    .local int all_ok
+
+    all_ok = 1
+    h      = new 'Hash'
+
+    h['a'] = 1
+    h['b'] = 2
+    h['c'] = 3
+    h['d'] = 4
+    h['e'] = 5
+    h['f'] = 6
+    h['g'] = 7
+    h['h'] = 8
+    h['i'] = 9
+    h['j'] = 10
+    h['k'] = 11
+    h['l'] = 12
+
+    cloned = clone h
+    #If the bug is present, the order of elements in the get_repr string will
+    #be different.
+    s1 = get_repr h
+    s2 = get_repr cloned
+
+    if s1 != s2 goto fail
+
+    h = new 'Hash'
+
+    h['aa'] = 1
+    h['bb'] = 2
+    h['cc'] = 3
+    h['dd'] = 4
+    h['ee'] = 5
+    h['ff'] = 6
+    h['gg'] = 7
+    h['hh'] = 8
+    h['ii'] = 9
+    h['jj'] = 10
+    h['kk'] = 11
+    h['ll'] = 12
+
+    cloned = clone h
+    s1 = get_repr h
+    s2 = get_repr cloned
+    if s1 != s2 goto fail
+
+    h = new 'Hash'
+
+    h['one']    = 1
+    h['two']    = 2
+    h['three']  = 3
+    h['four']   = 4
+    h['five']   = 5
+    h['six']    = 6
+    h['seven']  = 7
+    h['eight']  = 8
+    h['nine']   = 9
+    h['ten']    = 10
+    h['eleven'] = 11
+    h['twelve'] = 12
+
+    cloned = clone h
+    s1 = get_repr h
+    s2 = get_repr cloned
+    if s1 != s2 goto fail
+    
+    goto end
+fail:
+    all_ok = 0
+end:
+    ok(all_ok, "clone preserves hash internal order")
+.end
+
+.sub freeze_thaw_preserves_order
+    .local pmc h, cloned
+    .local string s1, s2
+    .local int all_ok
+
+    all_ok = 1
+    h      = new 'Hash'
+
+    h['a'] = 1
+    h['b'] = 2
+    h['c'] = 3
+    h['d'] = 4
+    h['e'] = 5
+    h['f'] = 6
+    h['g'] = 7
+    h['h'] = 8
+    h['i'] = 9
+    h['j'] = 10
+    h['k'] = 11
+    h['l'] = 12
+
+    $S0 = freeze h
+    cloned = thaw $S0
+    s1 = get_repr h
+    s2 = get_repr cloned
+
+    if s1 != s2 goto fail
+
+    h = new 'Hash'
+
+    h['aa'] = 1
+    h['bb'] = 2
+    h['cc'] = 3
+    h['dd'] = 4
+    h['ee'] = 5
+    h['ff'] = 6
+    h['gg'] = 7
+    h['hh'] = 8
+    h['ii'] = 9
+    h['jj'] = 10
+    h['kk'] = 11
+    h['ll'] = 12
+
+    $S0 = freeze h
+    cloned = thaw $S0
+    s1 = get_repr h
+    s2 = get_repr cloned
+    if s1 != s2 goto fail
+
+    h = new 'Hash'
+
+    h['one']    = 1
+    h['two']    = 2
+    h['three']  = 3
+    h['four']   = 4
+    h['five']   = 5
+    h['six']    = 6
+    h['seven']  = 7
+    h['eight']  = 8
+    h['nine']   = 9
+    h['ten']    = 10
+    h['eleven'] = 11
+    h['twelve'] = 12
+
+    $S0 = freeze h
+    cloned = thaw $S0
+    s1 = get_repr h
+    s2 = get_repr cloned
+    if s1 != s2 goto fail
+    
+    goto end
+fail:
+    all_ok = 0
+end:
+    ok(all_ok, "freeze/thaw preserves hash internal order")
 .end
 
 .sub compound_keys
