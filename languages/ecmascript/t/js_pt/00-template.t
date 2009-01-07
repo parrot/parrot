@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 # Copyright (C) 2008, The Perl Foundation.
-# $Id: 10-version.t 34398 2008-12-26 19:40:48Z bernhard $
+# $Id$
 
 use strict;
 use warnings;
