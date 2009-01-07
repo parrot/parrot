@@ -1,5 +1,7 @@
 # $Id$
 
+=pod
+
 # Go north.
 # Befunge stack unchanged.
 # delta <- (0,-1)
@@ -108,4 +110,6 @@ FLOW_BRIDGE:
 FLOW_END:
         set I4, 3
         branch MOVE_PC
+
+=cut
 

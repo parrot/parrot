@@ -1,5 +1,7 @@
 # $Id$
 
+=pod
+
 # String mode.
 # Befunge stack:
 #   before:     ...
@@ -128,3 +130,5 @@ IO_PUT_VALUE_POP_2:
 IO_PUT_VALUE_POP_3:
         set P1[I11;I10], I20
         branch MOVE_PC
+
+=cut

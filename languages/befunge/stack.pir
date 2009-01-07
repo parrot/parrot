@@ -1,5 +1,7 @@
 # $Id$
 
+=pod
+
 # Duplicate.
 # Befunge stack:
 #   before:     ... v
@@ -41,4 +43,6 @@ STACK_SWAP_POP_2:
         push P2, I10
         push P2, I11
         branch MOVE_PC
+
+=cut
 

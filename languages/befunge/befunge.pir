@@ -1,16 +1,11 @@
 # $Id$
 
 .include "debug.pir"
+.include "flow.pir"
+.include "io.pir"
 .include "load.pir"
 .include "maths.pir"
-
-=pod
-
-.include "flow.pasm"
-.include "io.pasm"
-.include "stack.pasm"
-
-=cut
+.include "stack.pir"
 
 .sub "befunge" :main
     .param pmc argv
