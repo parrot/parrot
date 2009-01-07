@@ -729,6 +729,64 @@ annotation. If not, returns a Hash of all of them.
         RETURN(PMC *result);
     }
 
+
+/*
+
+=item C<PMC *backtrace>
+
+Gets a representation of the backtrace at the point that this exception was
+thrown. Returns an array of hashes. Each array element represents a caller in
+the backtrace, the most recent caller first. The hash has two keys: C<sub>,
+which holds the PMC representing the sub, and C<annotations> which is a hash
+of the annotations at the point where the exception was thrown for the current
+sub, or for the point of the call a level deeper for the rest.
+
+=cut
+
+*/
+
+    METHOD PMC *backtrace() {
+        PMC *result = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC *resume;
+
+        /* Get starting context, then loop over them. */
+        GET_ATTR_resume(interp, SELF, resume);
+        if (!PMC_IS_NULL(resume)) {
+            Parrot_cont *cont = PMC_cont(resume);
+            Parrot_Context *cur_ctx = cont->to_ctx;
+            while (cur_ctx) {
+                PMC *frame = pmc_new(interp, enum_class_Hash);
+                PMC *annotations;
+
+                /* Get sub and put it in the hash. */
+                PMC *sub = cur_ctx->current_sub;
+                if (sub == NULL)
+                    sub = PMCNULL;
+                VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "sub"), sub);
+
+                /* Look up any annotations and put them in the hash. */
+                if (!PMC_IS_NULL(sub) && sub->vtable->base_type == enum_class_Sub &&
+                        PMC_sub(sub)->seg->annotations) {
+                    PackFile_ByteCode *seg = PMC_sub(sub)->seg;
+                    opcode_t *pc = cur_ctx == cont->to_ctx ? cont->address : cur_ctx->current_pc;
+                    annotations = PackFile_Annotations_lookup(interp,  seg->annotations,
+                        pc - seg->base.data, NULL);
+                }
+                else {
+                    annotations = pmc_new(interp, enum_class_Hash);
+                }
+                VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "annotations"), annotations);
+
+                /* Push frame and go to next caller. */
+                VTABLE_push_pmc(interp, result, frame);
+                cur_ctx = cur_ctx->caller_ctx;
+            }
+        }
+
+        RETURN(PMC *result);
+    }
+
+
 /*
 
 =back

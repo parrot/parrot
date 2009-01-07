@@ -19,11 +19,12 @@ Test various use cases of the annotate directive.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(15)
+    plan(25)
 
     'no_annotations'()
     'annotations_exception'()
     'annotations_ops'()
+    'backtrace_annotations'()
 .end
 
 
@@ -94,6 +95,70 @@ Test various use cases of the annotate directive.
     is ($S0, 'loo.py', 'annotations_p op gave back correct hash')
     $I1 = $P0['line']
     is ($I1, 2, 'annotations_p op gave back correct hash')
+.end
+
+
+.sub 'backtrace_annotations'
+    push_eh failed
+    'foo'()
+
+  failed:
+    .local pmc exception, bt, frame, ann
+    .get_results (exception)
+    bt = exception.'backtrace'()
+    $I0 = elements bt
+    $I0 = $I0 > 3
+    ok ($I0, 'backtrace has enough elements')
+
+    frame = bt[0]
+    $S0 = frame["sub"]
+    is ($S0, 'baz', 'frame 0 has right sub name')
+    ann = frame["annotations"]
+    $S0 = ann["file"]
+    is ($S0, 'baz.pm', 'frame 0 has right file annotation')
+    $I0 = ann["line"]
+    is ($I0, 2, 'frame 0 has right line annotation')
+
+    frame = bt[1]
+    $S0 = frame["sub"]
+    is ($S0, 'bar', 'frame 1 has right sub name')
+    ann = frame["annotations"]
+    $S0 = ann["file"]
+    is ($S0, 'foo.p6', 'frame 1 has right file annotation')
+    $I0 = ann["line"]
+    is ($I0, 5, 'frame 1 has right line annotation')
+
+    frame = bt[2]
+    $S0 = frame["sub"]
+    is ($S0, 'foo', 'frame 2 has right sub name')
+    ann = frame["annotations"]
+    $S0 = ann["file"]
+    is ($S0, 'foo.p6', 'frame 2 has right file annotation')
+    $I0 = ann["line"]
+    is ($I0, 2, 'frame 2 has right line annotation')
+.end
+
+# Test subs for backtrace_annotations
+.sub 'foo'
+    .annotate 'file', 'foo.p6'
+    .annotate 'line', 1
+    noop
+    .annotate 'line', 2
+    'bar'()
+    .annotate 'line', 3
+.end
+.sub 'bar'
+    .annotate 'line', 4
+    noop
+    .annotate 'line', 5
+    'baz'()
+.end
+.sub 'baz'
+    .annotate 'file', 'baz.pm'
+    .annotate 'line', 1
+    noop
+   .annotate 'line', 2
+   die "LOL HALP I HAZ A FAIL"
 .end
 
 
