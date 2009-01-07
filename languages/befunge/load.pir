@@ -35,7 +35,7 @@
 
     # end of file, but not enough lines
   LOAD__EOF:
-    missing = 24 - noline
+    missing = 26 - noline
 
   LOAD__FILL_EMPTY_LINE:
     line     = _load__fit_str_to_80('')
