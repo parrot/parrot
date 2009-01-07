@@ -56,7 +56,7 @@
     val  = playfield[y;x]
     char = chr val
     if debug == 0 goto TICK_NODEBUG
-    #bsr DEBUG_CHECK_BREAKPOINT
+    debug__check_breakpoint()
   TICK_NODEBUG:
 
 =pod

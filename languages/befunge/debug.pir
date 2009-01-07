@@ -31,11 +31,27 @@
 .end
 
 
-=pod
+.sub "_debug__interact"
+.end
+
 
 # Check whether we should stop the interpreter at the current
 # moment, allowing user to play with the debugger.
-DEBUG_CHECK_BREAKPOINT:
+.sub "debug__check_breakpoint"
+    .local pmc step
+
+    step = get_global "step"
+    if step == 0 goto DEBUG__CHECK_BREAKPOINT__CHAR
+    _debug__interact()
+    goto DEBUG__CHECK_BREAKPOINT__END
+
+  DEBUG__CHECK_BREAKPOINT__CHAR:
+  DEBUG__CHECK_BREAKPOINT__END:
+
+.end
+
+=pod
+
         set I10, P3[0]
         eq 0, I10, DEBUG_CHECK_BREAKPOINT_CHAR
         bsr DEBUG_INTERACT
@@ -72,8 +88,14 @@ DEBUG_CHECK_BREAKPOINT_COL:
         bsr DEBUG_INTERACT
         # Fallback
         # branch DEBUG_CHECK_BREAKPOINT_END
-DEBUG_CHECK_BREAKPOINT_END:
-        ret
+
+
+  DEBUG__CHECK_BREAKPOINT__END:
+    .return()
+
+.end
+
+=pod
 
 
 # The interpreter has reached a breakpoint. Let's
