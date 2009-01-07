@@ -19,14 +19,6 @@ int cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-Basic_block * find_outer(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Basic_block *blk))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
 const char * get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -63,17 +55,6 @@ Instruction * IMCC_subst_constants_umix(PARROT_INTERP,
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*r);
 
-int move_ins_out(PARROT_INTERP,
-    ARGMOD(IMC_Unit *unit),
-    ARGMOD(Instruction **ins),
-    ARGIN(const Basic_block *bb))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*unit)
-        FUNC_MODIFIES(*ins);
-
 int optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -87,9 +68,6 @@ int pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 #define ASSERT_ARGS_cfg_optimize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(unit)
-#define ASSERT_ARGS_find_outer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(blk)
 #define ASSERT_ARGS_get_neg_op __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(op) \
     || PARROT_ASSERT_ARG(n)
@@ -104,11 +82,6 @@ int pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     || PARROT_ASSERT_ARG(unit) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(r)
-#define ASSERT_ARGS_move_ins_out __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins) \
-    || PARROT_ASSERT_ARG(bb)
 #define ASSERT_ARGS_optimize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(unit)

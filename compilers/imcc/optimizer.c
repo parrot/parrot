@@ -51,7 +51,6 @@ optimizer
 runs with CFG and life info
 
 used_once ... deletes assignments, when LHS is unused
-loop_optimization ... pulls invariants out of loops
 RT #46279 e.g. constant_propagation
 
 post_optimizer: currently pcc_optimize in pcc.c
@@ -76,22 +75,8 @@ e.g. eliminate new Px .PerlUndef because Px where different before
 
 /* HEADERIZER HFILE: compilers/imcc/optimizer.h */
 
-
-/* buggy - turned off */
-#define  DO_LOOP_OPTIMIZATION 0
-
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_WARN_UNUSED_RESULT
-static int _is_ins_save(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *check_ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
 
 static int branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
@@ -149,40 +134,6 @@ static int if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-PARROT_WARN_UNUSED_RESULT
-static int is_ins_save(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
-static int is_invariant(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-static int loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*unit);
-
-PARROT_WARN_UNUSED_RESULT
-static int loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*unit);
-
-PARROT_WARN_UNUSED_RESULT
-static int max_loop_depth(ARGIN(const IMC_Unit *unit))
-        __attribute__nonnull__(1);
-
 static int strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -199,10 +150,6 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*unit);
 
-#define ASSERT_ARGS__is_ins_save __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(check_ins) \
-    || PARROT_ASSERT_ARG(r)
 #define ASSERT_ARGS_branch_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(unit)
@@ -231,23 +178,6 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 #define ASSERT_ARGS_if_branch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(unit)
-#define ASSERT_ARGS_is_ins_save __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins) \
-    || PARROT_ASSERT_ARG(r)
-#define ASSERT_ARGS_is_invariant __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(ins)
-#define ASSERT_ARGS_loop_one __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
-#define ASSERT_ARGS_loop_optimization __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(unit)
-#define ASSERT_ARGS_max_loop_depth __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(unit)
 #define ASSERT_ARGS_strength_reduce __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(unit)
@@ -259,50 +189,6 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     || PARROT_ASSERT_ARG(unit)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#if DO_LOOP_OPTIMIZATION
-PARROT_WARN_UNUSED_RESULT
-int _is_ins_save(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *check_ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-int is_ins_save(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins),
-    ARGIN(const SymReg *r),
-    int what)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
-PARROT_WARN_UNUSED_RESULT
-int max_loop_depth(ARGIN(const IMC_Unit *unit))
-        __attribute__nonnull__(1);
-
-int is_invariant(PARROT_INTERP,
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Instruction *ins))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-Basic_block * find_outer(
-    ARGIN(const IMC_Unit *unit),
-    ARGIN(const Basic_block *blk))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-
-#endif
 
 /*
 
@@ -386,10 +272,6 @@ optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         any = constant_propagation(interp, unit);
         if (used_once(interp, unit))
             return 1;
-#if DO_LOOP_OPTIMIZATION
-        if (loop_optimization(interp, unit))
-            return 1;
-#endif
     }
     return any;
 }
@@ -1681,371 +1563,6 @@ used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
     }
     return opt;
 }
-
-#if DO_LOOP_OPTIMIZATION
-
-static int reason;
-enum check_t { CHK_INV_NEW, CHK_INV_SET, CHK_CLONE };
-
-/*
-
-=item C<static int _is_ins_save>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-_is_ins_save(ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *check_ins),
-        ARGIN(const SymReg *r), int what)
-{
-    ASSERT_ARGS(_is_ins_save)
-    Instruction *ins;
-    int bb;
-    int use_count, lhs_use_count;
-    int i, in_use;
-    int new_bl=-1, set_bl=-1;
-
-    /* now check all instructions where r is used */
-
-    /* we give up fast ;-) */
-    switch (what) {
-        case CHK_INV_NEW:
-        case CHK_INV_SET:
-            if (r->set == 'P' && r->lhs_use_count != 2)
-                return reason=1, 0;
-            if (r->set != 'P' && r->lhs_use_count != 1)
-                return reason=2, 0;
-            break;
-        case CHK_CLONE:
-            if (r->set == 'P' && r->lhs_use_count != 2)
-                return reason=1, 0;
-            break;
-        default:
-            break;
-    }
-
-    use_count = r->use_count;
-    lhs_use_count = r->lhs_use_count;
-    for (bb = 0; bb < unit->n_basic_blocks; bb++) {
-        const Life_range * const lr = r->life_info[bb];
-
-        for (ins = lr->first_ins; ins; ins = ins->next) {
-            int nregs;
-            /* finished with this range */
-            if (!lr->last_ins->next || ins == lr->last_ins->next)
-                break;
-            for (i = in_use = 0; ins->symregs[i]; i++)
-                if (ins->symregs[i] == r) {
-                    in_use++;
-                }
-            nregs = i;
-            if (!in_use)
-                continue;
-
-            /* var is in use in this ins */
-            use_count--;
-            if (instruction_writes(ins, r)) {
-                lhs_use_count--;
-                if (STREQ(ins->opname, "new"))
-                    new_bl=bb;
-                if (STREQ(ins->opname, ""))
-                    set_bl=bb;
-            }
-            /* this is the instruction, to check, it's safe */
-            if (check_ins == ins)
-                continue;
-
-            /* now look for dangerous ops */
-            if (STREQ(ins->opname, "find_global"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "store_global"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "push"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "pop"))
-                return reason=4, 0;
-            if (STREQ(ins->opname, "clone"))
-                return reason=4, 0;
-            /* indexed set/get ??? RT #46289, as index is ok */
-            if (0 && STREQ(ins->opname, "set") && nregs != 2)
-                return reason=5, 0;
-            /*
-             * set P, P  - dangerous?
-             */
-            if (ins->type & ITALIAS)
-                return reason=6, 0;
-            /* we saw all occurencies of reg, so fine */
-            if (lhs_use_count == 0 && use_count == 0) {
-                if (what == CHK_INV_SET && new_bl != set_bl)
-                    return 0;
-                return 1;
-            }
-        }
-        /* we have finished this life range */
-    } /* for bb */
-    return what == CHK_CLONE ? 1 : (reason=10, 0);
-}
-
-/*
-
-=item C<static int is_ins_save>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-is_ins_save(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *ins),
-        ARGIN(const SymReg *r), int what)
-{
-    ASSERT_ARGS(is_ins_save)
-    int save;
-
-    reason = 0;
-    save = _is_ins_save(unit, ins, r, what);
-    if (!save && reason)
-        IMCC_debug(interp, DEBUG_OPT2,
-                   "ins not save var %s reason %d %I\n",
-                r->name, reason, ins);
-    return save;
-}
-
-/*
-
-=item C<static int max_loop_depth>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-max_loop_depth(ARGIN(const IMC_Unit *unit))
-{
-    ASSERT_ARGS(max_loop_depth)
-    int i;
-    int d = 0;
-
-    for (i = 0; i < unit->n_basic_blocks; i++)
-        if (unit->bb_list[i]->loop_depth > d)
-            d = unit->bb_list[i]->loop_depth;
-    return d;
-}
-
-/*
-
-=item C<static int is_invariant>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-static int
-is_invariant(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGIN(const Instruction *ins))
-{
-    ASSERT_ARGS(is_invariant)
-    int what;
-
-    if (STREQ(ins->opname, "new")) {
-        what = CHK_INV_NEW;
-    }
-    /* only, if once assigned and not changed */
-    else if (STREQ(ins->opname, "set") &&
-            !(ins->symregs[0]->usage & U_KEYED) &&
-            ins->symregs[1]->type & VTCONST) {
-        what = CHK_INV_SET;
-    }
-    else {
-        return 0;
-    }
-    return is_ins_save(interp, unit, ins, ins->symregs[0], what);
-}
-
-#  define MOVE_INS_1_BL
-#  ifdef MOVE_INS_1_BL
-/*
-
-=item C<Basic_block * find_outer>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-Basic_block *
-find_outer(ARGIN(const IMC_Unit *unit), ARGIN(const Basic_block *blk))
-{
-    ASSERT_ARGS(find_outer)
-    int i;
-    Loop_info ** const loop_info = unit->loop_info;
-    const int          bb        = blk->index;
-    int                i         = unit->n_loops - 1;
-
-    /* loops are sorted depth last */
-    for (; i >= 0; i--) {
-        Loop_info * const info = loop_info[i];
-        if (set_contains(info->loop, bb)) {
-            const int preheader = info->preheader;
-            if (preheader >= 0)
-                return unit->bb_list[preheader];
-        }
-    }
-    return NULL;
-}
-#  endif
-
-/*
-
-=item C<int move_ins_out>
-
-move the instruction ins before loop in bb
-
-=cut
-
-*/
-
-int
-move_ins_out(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
-        ARGMOD(Instruction **ins), ARGIN(const Basic_block *bb))
-{
-    ASSERT_ARGS(move_ins_out)
-    Basic_block *pred;
-    Instruction * next, *out;
-
-    /* check loop_info, where this loop started
-     * actually, this moves instruction to block 0 */
-#  ifdef MOVE_INS_1_BL
-    pred = find_outer(unit, bb);
-#  else
-    UNUSED(bb);
-    pred = unit->bb_list[0];
-#  endif
-    if (!pred) {
-        IMCC_debug(interp, DEBUG_OPT2, "outer loop not found (CFG?)\n");
-        return 0;
-    }
-    out = pred->end;
-    next = (*ins)->next;
-    (*ins)->bbindex = pred->index;
-    IMCC_debug(interp, DEBUG_OPT2, "inserting it in blk %d after %I\n",
-            pred->index, out);
-    *ins = move_ins(unit, *ins, out);
-    if (0 && (DEBUG_OPT2 & IMCC_INFO(interp)->debug)) {
-        char buf[256];
-        SymReg * regs[IMCC_MAX_REGS];
-        Instruction * tmp;
-
-        regs[0] = 0;
-        snprintf(buf, sizeof (buf), "# Invar moved: %s", out->next->op);
-        tmp = INS(interp, unit, "", buf, regs, 0, 0, 0);
-        insert_ins(unit, (*ins)->prev, tmp);
-    }
-    ostat.invariants_moved++;
-    /* RT #46291 CFG is changed here, which also means
-     * that the life_info is wrong now
-     * so, currently we calc CFG and life again */
-    return 1;
-}
-
-/*
-
-=item C<static int loop_one>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-loop_one(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int bnr)
-{
-    ASSERT_ARGS(loop_one)
-    Basic_block * const bb = unit->bb_list[bnr];
-    Instruction *ins;
-    int changed = 0;
-
-    if (bnr == 0) {
-        IMCC_warning(interp, "loop_one", "wrong loop depth in block 0\n");
-        return 0;
-    }
-    IMCC_debug(interp, DEBUG_OPT2, "loop_one blk %d\n", bnr);
-    for (ins = bb->start ; ins ; ins = ins->next) {
-        reason = 0;
-        if (is_invariant(interp, unit, ins)) {
-            IMCC_debug(interp, DEBUG_OPT2, "found invariant %I\n", ins);
-            if (move_ins_out(interp, unit, &ins, bb)) {
-                changed++;
-                ins = ins->prev;
-            }
-        }
-        if (ins == bb->end)
-            break;
-    }
-    return changed;
-
-}
-
-/*
-
-=item C<static int loop_optimization>
-
-RT #48260: Not yet documented!!!
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static int
-loop_optimization(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
-{
-    ASSERT_ARGS(loop_optimization)
-    int l;
-    int changed = 0;
-    static int prev_depth;
-
-    const int loop_depth = prev_depth ? prev_depth : max_loop_depth(unit);
-
-    /* work from inside out */
-    IMCC_debug(interp, DEBUG_OPT2, "loop_optimization\n");
-    for (l = loop_depth; l > 0; l--) {
-        int bb;
-
-        IMCC_debug(interp, DEBUG_OPT2, "loop_depth %d\n", l);
-        for (bb = 0; bb < unit->n_basic_blocks; bb++)
-            if (unit->bb_list[bb]->loop_depth == l) {
-                changed |= loop_one(interp, unit, bb);
-            }
-        /* currently e.g. mandel.p6 breaks, if not only the most
-         * inner loop is changed, but outer loops too */
-        if (changed) {
-            prev_depth = l-1;
-            IMCC_debug(interp, DEBUG_OPT2, "after loop_opt\n");
-            if (IMCC_INFO(interp)->debug>1)
-                dump_instructions(interp, unit);
-            return changed;
-        }
-    }
-    prev_depth = 0;
-    return 0;
-}
-#endif
 
 /*
 
