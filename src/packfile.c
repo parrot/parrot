@@ -4047,13 +4047,13 @@ Produces a dump of the annotations segment.
 */
 
 void
-PackFile_Annotations_dump(PARROT_INTERP, ARGIN(struct PackFile_Segment *seg))
+PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const struct PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_dump)
-    PackFile_Annotations *self = (PackFile_Annotations *)seg;
+    const PackFile_Annotations *self = (const PackFile_Annotations *)seg;
     INTVAL i;
 
-    default_dump_header(interp, (PackFile_Segment *)self);
+    default_dump_header(interp, (const PackFile_Segment *)self);
 
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");

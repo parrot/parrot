@@ -709,7 +709,7 @@ void PackFile_Annotations_destroy(SHIM_INTERP,
         FUNC_MODIFIES(*seg);
 
 void PackFile_Annotations_dump(PARROT_INTERP,
-    ARGIN(struct PackFile_Segment *seg))
+    ARGIN(const struct PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
