@@ -63,6 +63,28 @@
     print ")"
 .end
 
+.sub "_debug__print_direction"
+    $P0 = get_global "status"
+    $I0 = $P0["dir"]
+    print "dir="
+    print $I0
+.end
+
+.sub "_debug__print_flags"
+    $P0 = get_global "status"
+    $I0 = $P0["flag"]
+
+    $S0 = '"'
+    if $I0 == 1 goto DEBUG__PRINT_FLAGS__PRINT
+    $S0 = '#'
+    if $I0 == 2 goto DEBUG__PRINT_FLAGS__PRINT
+    $S0 = '@'
+    if $I0 == 3 goto DEBUG__PRINT_FLAGS__PRINT
+    $S0 = '-'
+  DEBUG__PRINT_FLAGS__PRINT:
+    print $S0
+.end
+
 
 # Print the status of the instruction pointer:
 # coordinates, current char, direction, flags and stack.
@@ -71,26 +93,13 @@
     print " - "
     _debug__print_status_current_char()
     print " "
+    _debug__print_direction()
+    print " "
+    _debug__print_flags()
     print "\n"
 
 =pod
 
-DEBUG_PRINT_STATUS:
-        # Coordinates.
-        # Current char.
-        # Direction.
-        print " dir="
-        print I2
-        # Flags:
-        set S10, " \""
-        eq I4, 1, DEBUG_PRINT_STATUS_FLAG
-        set S10, " #"
-        eq I4, 2, DEBUG_PRINT_STATUS_FLAG
-        set S10, " @"
-        eq I4, 3, DEBUG_PRINT_STATUS_FLAG
-        set S10, "  "
-DEBUG_PRINT_STATUS_FLAG:
-        print S10
         # Stack.
         print " stack="
         set I11, P2
