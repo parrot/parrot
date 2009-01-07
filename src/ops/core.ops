@@ -1394,6 +1394,60 @@ op new_callback(out PMC, invar PMC, invar PMC, in STR) {
 
 ###############################################################################
 
+=head2 Annotations operations
+
+These operations relate to bytecode annotations.
+
+=over 4
+
+=cut
+
+########################################
+
+=item B<annotations>(out PMC)
+
+Gets all bytecode annotations in effect at the current point, in a Hash.
+If there are none, returns an empty Hash.
+
+=cut
+
+inline op annotations(out PMC) {
+    if (interp->code->annotations) {
+        opcode_t const cur_pos = (expr NEXT()) - interp->code->base.data;
+        $1 = PackFile_Annotations_lookup(interp, interp->code->annotations,
+                cur_pos, NULL);
+    }
+    else {
+        $1 = pmc_new(interp, enum_class_Hash);
+    }
+    goto NEXT();
+}
+
+=item B<annotations>(out PMC, in STR)
+
+Gets the bytecode annotation with the given name that is in effect at the
+current point. Returns PMCNULL if there is none.
+
+=cut
+
+inline op annotations(out PMC, in STR) {
+    if (interp->code->annotations) {
+        opcode_t const cur_pos = (expr NEXT()) - interp->code->base.data;
+        $1 = PackFile_Annotations_lookup(interp, interp->code->annotations,
+                cur_pos, $2);
+    }
+    else {
+        $1 = PMCNULL;
+    }
+    goto NEXT();
+}
+
+=back
+
+=cut
+
+###############################################################################
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2008, The Perl Foundation.

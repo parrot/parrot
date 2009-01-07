@@ -19,10 +19,11 @@ Test various use cases of the annotate directive.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(9)
+    plan(15)
 
     'no_annotations'()
     'annotations_exception'()
+    'annotations_ops'()
 .end
 
 
@@ -69,6 +70,30 @@ Test various use cases of the annotate directive.
     is ($P1, 'foo.p6', "file annotation got OK from hash")
     $P1 = $P0["line"]
     is ($P1, 2, "line annotation got OK from hash")
+.end
+
+
+.sub 'annotations_ops'
+    .annotate 'file', 'loo.py'
+    .annotate 'line', 1
+
+    $P1 = annotations 'file'
+    is ($P1, 'loo.py', 'annotations_p_sc op returned correct thing')
+    $S0 = 'line'
+    $P1 = annotations $S0
+    is ($P1, 1,        'annotations_p_s op returned correct thing')
+
+    .annotate 'line', 2
+    $P0 = annotations
+    .annotate 'line', 3
+
+    isa_ok ($P0, 'Hash', 'annotations_p op gives back hash')
+    $I0 = elements $P0
+    is ($I0, 2, 'annoations op gave hash with right number of elements')
+    $S0 = $P0['file']
+    is ($S0, 'loo.py', 'annotations_p op gave back correct hash')
+    $I1 = $P0['line']
+    is ($I1, 2, 'annotations_p op gave back correct hash')
 .end
 
 

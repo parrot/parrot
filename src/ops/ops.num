@@ -1279,3 +1279,6 @@ find_global_p_s_sc             1248
 find_global_p_sc_sc            1249
 find_name_p_s                  1250
 find_name_p_sc                 1251
+annotations_p                  1252
+annotations_p_s                1253
+annotations_p_sc               1254
