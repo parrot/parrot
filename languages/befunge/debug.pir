@@ -32,34 +32,26 @@
 
 
 .sub "_debug__print_status_coordinates"
-    .local pmc status
-    .local int x
-    .local int y
-
-    status = get_global "status"
-    x = status["x"]
-    y = status["y"]
+    $P0 = get_global "status"
+    $I0 = $P0["x"]
+    $I1 = $P0["y"]
 
     print "("
-    print x
+    print $I0
     print ","
-    print y
+    print $I1
     print ")"
 .end
 
 .sub "_debug__print_status_current_char"
-    .local pmc    status
-    .local string char 
-    .local int    val
-
-    status = get_global "status"
-    char = status["char"]
-    val  = status["val"]
+    $P0 = get_global "status"
+    $S0 = $P0["char"]
+    $I0 = $P0["val"]
 
     print "'"
-    print char
+    print $S0
     print "' (ord="
-    print val
+    print $I0
     print ")"
 .end
 
