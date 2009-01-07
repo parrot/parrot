@@ -77,6 +77,24 @@
     print $S0
 .end
 
+.sub "_debug__print_stack"
+    .local int i, len
+
+    print "stack="
+
+    $P0 = get_global "stack"
+    len = $P0
+    i   = 0
+    if i >= len goto DEBUG_PRINT_STACK__END
+  DEBUG_PRINT_STACK__LOOP:
+    $I0 = $P0[i]
+    print $I0
+    inc i
+    if i >= len goto DEBUG_PRINT_STACK__END
+    print ","
+    goto DEBUG_PRINT_STACK__LOOP
+  DEBUG_PRINT_STACK__END:
+.end
 
 # Print the status of the instruction pointer:
 # coordinates, current char, direction, flags and stack.
@@ -88,28 +106,9 @@
     _debug__print_direction()
     print " "
     _debug__print_flags()
+    print " "
+    _debug__print_stack()
     print "\n"
-
-=pod
-
-        # Stack.
-        print " stack="
-        set I11, P2
-        set I10, 0
-        ge  I10, I11, DEBUG_PRINT_STATUS_STACK_END
-DEBUG_PRINT_STATUS_STACK_LOOP:
-        set I12, P2[I10]
-        print I12
-        inc I10
-        ge I10, I11, DEBUG_PRINT_STATUS_STACK_END
-        print ","
-        branch DEBUG_PRINT_STATUS_STACK_LOOP
-DEBUG_PRINT_STATUS_STACK_END:
-        print "\n"
-        ret
-
-=cut
-
 .end
 
 .sub "_debug__interact"
