@@ -219,15 +219,20 @@ Gets a Hash containing any bytecode annotations in effect at the point where
 the exception was thrown. If none were in effect, returns an empty Hash. See
 the PIR PDD for syntax for declaring and semantics of bytecode annotations.
 
-{{NOTE: Not yet implemented}}
-
 =item B<PMC *annotations(STRING *name)>
 
 Returns a PMC representing the bytecode annotation with the key specified in
 C<name> at the point where the exception was thrown. If there was no such
 annotation in effect, a NULL PMC will be returned.
 
-{{NOTE: Not yet implemented}}
+=item B<PMC *backtrace()>
+
+Gets a representation of the backtrace at the point that this exception was
+thrown. Returns an array of hashes. Each array element represents a caller in
+the backtrace, the most recent caller first. The hash has two keys: C<sub>,
+which holds the PMC representing the sub, and C<annotations> which is a hash
+of the annotations at the point where the exception was thrown for the current
+sub, or for the point of the call a level deeper for the rest.
 
 =back
 
