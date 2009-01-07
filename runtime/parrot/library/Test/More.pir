@@ -84,7 +84,7 @@ already declared a plan or if you pass an invalid argument.
     .param string tests
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
     test.'plan'( tests )
 .end
 
@@ -100,7 +100,7 @@ recording it with the optional test description in C<description>.
     .param string description     :optional
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     test.'ok'( passed, description )
 .end
@@ -117,7 +117,7 @@ C<passed>, recording it with the optional test description in C<description>.
     .param string description :optional
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int reverse_passed
     reverse_passed = not passed
@@ -154,7 +154,7 @@ add more.
     .param int have_desc   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int l, r, pass
     l    = left
@@ -185,7 +185,7 @@ add more.
     .param int have_prec   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local num l, r
     .local int pass
@@ -225,7 +225,7 @@ add more.
     .param int have_desc   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local string l, r
     .local int pass
@@ -255,7 +255,7 @@ add more.
     .param int have_desc   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
     .local int does_type
@@ -316,7 +316,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param int have_desc   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
     pass       = 0
@@ -351,7 +351,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param int have_desc   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
     pass = 0
@@ -386,7 +386,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param int have_desc   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int pass
     pass = 0
@@ -421,7 +421,7 @@ Like C<is>, but succeeds if the arguments I<don't> match.
     .param int have_desc   :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     # this comparison may not work in general, but it's worth trying
     .local int pass
@@ -454,7 +454,7 @@ Prints C<diagnostic> to the screen, without affecting test comparisons.
     .param string diagnostic
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
     test.'diag'( diagnostic )
 .end
 
@@ -484,7 +484,7 @@ hard to extend it for hash-like structures, too.
     position = new 'ResizablePMCArray'
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int does_flag
     does_flag = does left, 'array'
@@ -547,7 +547,7 @@ hard to extend it for hash-like structures, too.
     .param pmc position
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int l_count
     .local int r_count
@@ -612,7 +612,7 @@ hard to extend it for hash-like structures, too.
     .param pmc position
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local int l_count
     .local int r_count
@@ -833,7 +833,7 @@ optional test description in C<description>.
     .param string description :optional
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local pmc p6rule_compile
     load_bytecode "PGE.pbc"
@@ -887,7 +887,7 @@ actually skipped.  Arguments are optional.
     .param string description
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
     test.'skip'(how_many, description)
 .end
 
@@ -895,7 +895,7 @@ actually skipped.  Arguments are optional.
     .param int how_many
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
     test.'skip'(how_many)
 .end
 
@@ -903,13 +903,13 @@ actually skipped.  Arguments are optional.
     .param string description
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
     test.'skip'(1, description)
 .end
 
 .sub skip :multi()
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
     test.'skip'()
 .end
 
@@ -925,7 +925,7 @@ and the C<reason> you have marked it as TODO.
     .param pmc args :slurpy
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     test.'todo'( args :flat )
 .end
@@ -950,7 +950,7 @@ Bad input: "C<test that the return from Foo is correct type>"
     .param int got_name :opt_flag
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    get_hll_global test, [ 'Test'; 'More' ], '_test'
 
     .local string description, diagnostic
     description = "The object"
