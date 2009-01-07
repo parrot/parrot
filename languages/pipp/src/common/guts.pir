@@ -57,7 +57,7 @@ Dump a PMC
 .include 'except_types.pasm'
 .include 'except_severity.pasm'
 
-=head2 return
+=item return
 
 For returning a value from a function.
 

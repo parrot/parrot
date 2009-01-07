@@ -29,13 +29,11 @@ A listing of things that Pipp does differently from the standard PHP.
 
 =item No old style constructors, where the constructor is named after the class.
 
-=cut
+=back
 
 =head1 Implementation
 
 Pipp is based on the Parrot Compiler Toolkit.
-
-=back
 
 =head1 Status
 

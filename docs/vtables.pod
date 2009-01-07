@@ -82,7 +82,7 @@ the beautifully non-existent Fooby language:
 
 This will produce a skeleton PMC file (to be preprocessed into ordinary C
 code by the F<tools/build/pmc2c.pl> program) with stubs for all the methods
-you need to fill in. N<Actually, there are more stubs here then you probably
+you need to fill in. Actually, there are more stubs here then you probably
 I<need> to fill in. Your PMC isn't going to want to support all these
 methods, and in many cases you may want to fall back to default behavior
 instead of implementing a dummy method.> The function C<init> allows you to
@@ -310,3 +310,5 @@ src/pmc/YOURCLASS.pmc, add the C<extends SUPERCLASS> phrase. For example:
 
 See the POD documentation in F<tools/build/pmc2c.pl> for a list of useful
 keywords that you may use in the .pmc file.
+
+=cut

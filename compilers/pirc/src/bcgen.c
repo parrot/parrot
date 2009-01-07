@@ -227,7 +227,7 @@ add_key_const(bytecode * const bc, PMC *key) {
 
 /*
 
-static void
+=item C<static void
 check_requested_constant(bytecode * const bc, unsigned index, int expectedtype)>
 
 Perform a sanity check on a requested constant. The constant at index C<index>
@@ -384,7 +384,7 @@ create_annotations_segment(bytecode * const bc, char const * const name) {
 
 /*
 
-void
+=item C<void
 add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type, opcode_t value)>
 
 Add an annotation for the bytecode at C<offset>, having a key C<key>,

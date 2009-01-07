@@ -404,9 +404,6 @@ Dumps a Null PMC.
     .return ( 1 )
 .end
 
-
-=cut
-
 =item Capture dumpe
 
 Dump a capture object.

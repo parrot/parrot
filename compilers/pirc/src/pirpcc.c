@@ -15,8 +15,6 @@ Conventions.
 
 =head1 FUNCTIONS
 
-=over 4
-
 */
 
 #include "pirpcc.h"
@@ -30,6 +28,8 @@ Conventions.
 
 
 /*
+
+=over 4
 
 =item C<static int
 calculate_pcc_target_flags(target * const result)>
