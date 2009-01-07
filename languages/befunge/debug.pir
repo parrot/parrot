@@ -132,6 +132,45 @@
     print "\n"
 .end
 
+
+#
+# _debug__dump_playfield()
+#
+# dump the playfield on stdout.
+#
+.sub "_debug__dump_playfield"
+    .local string divider, line
+    .local pmc    playfield
+    
+    playfield = get_global "playfield"
+    divider = repeat '-', 82
+    concat divider, "\n"
+    print divider
+
+    $I0 = 0
+  DEBUG__DUMP_PLAYFIELD__NEXT_LINE:
+    if $I0 >= 25 goto DEBUG__DUMP_PLAYFIELD__END
+    $I1 = 0
+    line = "|"
+  DEBUG__DUMP_PLAYFIELD__NEXT_CHAR:
+    if $I1 >= 80 goto DEBUG__DUMP_PLAYFIELD__EOL
+    $I2 = playfield[$I0;$I1]
+    $S0 = chr $I2
+    concat line, $S0
+    inc $I1
+    goto DEBUG__DUMP_PLAYFIELD__NEXT_CHAR 
+  DEBUG__DUMP_PLAYFIELD__EOL:
+    concat line, "|\n"
+    print line
+    inc $I0
+    goto DEBUG__DUMP_PLAYFIELD__NEXT_LINE
+
+  DEBUG__DUMP_PLAYFIELD__END:
+    print divider
+    print "\n"
+    .return()
+.end
+
 # The interpreter has reached a breakpoint. Let's
 # stop and interact with user.
 .sub "_debug__interact"
@@ -151,22 +190,9 @@
     if $S1 == "list" goto DEBUG__INTERACT__LIST
     if $S1 == "next" goto DEBUG__INTERACT__NEXT
     if $S1 == "quit" goto DEBUG__INTERACT__QUIT
-
-  DEBUG__INTERACT__DUMP:
-  DEBUG__INTERACT__HELP:
-    _debug__help()
-    goto DEBUG__INTERACT__LOOP
-
-  DEBUG__INTERACT__LIST:
-    print "Not yet implemented...\n"
-    goto DEBUG__INTERACT__LOOP
-
-  DEBUG__INTERACT__NEXT:
-  DEBUG__INTERACT__QUIT:
-
+    
 =pod
 
-DEBUG_INTERACT:
         substr S11, S10, 0, 5
         eq S11, "break", DEBUG_INTERACT_BREAK
         substr S11, S10, 0, 6
@@ -178,6 +204,29 @@ DEBUG_INTERACT:
         eq S11, "continue", DEBUG_INTERACT_CONTINUE
         print "Unknown instruction. Type help for help.\n"
         branch DEBUG_INTERACT
+
+=cut
+
+  DEBUG__INTERACT__DUMP:
+    _debug__dump_playfield()
+    goto DEBUG__INTERACT__LOOP
+    
+  DEBUG__INTERACT__HELP:
+    _debug__help()
+    goto DEBUG__INTERACT__LOOP
+
+  DEBUG__INTERACT__LIST:
+    print "Not yet implemented...\n"
+    goto DEBUG__INTERACT__LOOP
+
+  DEBUG__INTERACT__NEXT:
+
+  DEBUG__INTERACT__QUIT:
+    end
+
+=pod
+
+DEBUG_INTERACT:
 DEBUG_INTERACT_BREAK:
         substr S11, S10, 0, 6, ""
         set P4, P3[1]
@@ -194,14 +243,10 @@ DEBUG_INTERACT_DELETE:
 DEBUG_INTERACT_DUMP:
         bsr DEBUG_DUMP_PLAYFIELD
         branch DEBUG_INTERACT
-DEBUG_INTERACT_HELP:
-        print "\n"
         branch DEBUG_INTERACT
 DEBUG_INTERACT_NEXT:
         set P3[0], 1        # stop at next instruction
         branch DEBUG_INTERACT_END
-DEBUG_INTERACT_QUIT:
-        end
 DEBUG_INTERACT_RESTART:
         #branch MAIN
         print "Not yet implemented...\n"
@@ -229,8 +274,6 @@ DEBUG_INTERACT_END:
 
   DEBUG__CHECK_BREAKPOINT__CHAR:
   DEBUG__CHECK_BREAKPOINT__END:
-
-.end
 
 =pod
 
@@ -275,43 +318,10 @@ DEBUG_CHECK_BREAKPOINT_COL:
   DEBUG__CHECK_BREAKPOINT__END:
     .return()
 
+=cut
+
 .end
 
-=pod
-
-
-
-
-
-
-
-# Dump the playfield on stdout.
-DEBUG_DUMP_PLAYFIELD:
-        repeat S10, "-", 82
-        concat S10, "\n"
-        print S10
-        set I10, 0
-DEBUG_DUMP_PLAYFIELD_NEXT_LINE:
-        ge I10, 25, DEBUG_DUMP_PLAYFIELD_END
-        set I11, 0
-        set S11, "|"
-DEBUG_DUMP_PLAYFIELD_NEXT_CHAR:
-        ge I11, 80, DEBUG_DUMP_PLAYFIELD_EOL
-        set I12, P1[I10;I11]
-        chr S12, I12
-        concat S11, S12
-        inc I11
-        branch DEBUG_DUMP_PLAYFIELD_NEXT_CHAR
-DEBUG_DUMP_PLAYFIELD_EOL:
-        concat S11, "|\n"
-        print S11
-        inc I10
-        branch DEBUG_DUMP_PLAYFIELD_NEXT_LINE
-DEBUG_DUMP_PLAYFIELD_END:
-        print S10
-        ret
-
-=cut
 
 ########################################################################
 # Local Variables:
