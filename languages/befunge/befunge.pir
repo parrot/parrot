@@ -76,6 +76,7 @@
     
     # direction changing
     if char == '>' goto FLOW_GO_EAST
+    if char == 'v' goto FLOW_GO_SOUTH
     if char == '<' goto FLOW_GO_WEST
     
     # unknown instruction
@@ -136,6 +137,9 @@ NOT_NUM:
     goto MOVE_PC
   FLOW_GO_WEST:
     flow__go_west()
+    goto MOVE_PC
+  FLOW_GO_SOUTH:
+    flow__go_south()
     goto MOVE_PC
     
   FLOW_TOGGLE_STRING_MODE:
