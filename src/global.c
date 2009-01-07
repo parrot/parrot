@@ -652,29 +652,6 @@ Parrot_store_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
 /*
 
-=item C<void Parrot_store_global_cur>
-
-Store the value C<val> with name C<globalname> in the current namespace.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_store_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname),
-        ARGIN_NULLOK(PMC *val))
-{
-    ASSERT_ARGS(Parrot_store_global_cur)
-    Parrot_store_global_n(interp,
-                          CONTEXT(interp)->current_namespace,
-                          globalname, val);
-
-    /* RT #46165 - method cache invalidation should occur */
-}
-
-/*
-
 =item C<void Parrot_store_global_k>
 
 Store the PMC C<val> into the namespace designated by C<pmc_key>,
@@ -712,8 +689,6 @@ Parrot_store_global_k(PARROT_INTERP, ARGIN(PMC *pmc_key),
                                      pmc_key);
 
     Parrot_store_global_n(interp, ns, globalname, val);
-
-    /* RT #46165 - method cache invalidation should occur */
 }
 
 /*

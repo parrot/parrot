@@ -343,11 +343,6 @@ Not documented yet.
 Find and return a global called C<name> in the namespace C<namespace>.  Returns
 C<PMCNULL> if not found.
 
-=item C<void Parrot_store_global_cur(PARROT_INTERP, Parrot_String name, Parrot_PMC val)>
-
-Sets the value of a global called C<name> in the current namespace.  Does
-nothing if the global is not found.
-
 =item C<void Parrot_store_global_n(PARROT_INTERP, Parrot_String namespace, Parrot_String name, Parrot_PMC val)>
 
 Not documented yet.

@@ -138,12 +138,6 @@ void Parrot_set_global(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_store_global_cur(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *globalname),
-    ARGIN_NULLOK(PMC *val))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void Parrot_store_global_k(PARROT_INTERP,
     ARGIN(PMC *pmc_key),
     ARGIN_NULLOK(STRING *globalname),
