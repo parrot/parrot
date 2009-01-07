@@ -111,8 +111,101 @@
     print "\n"
 .end
 
+# The interpreter has reached a breakpoint. Let's
+# stop and interact with user.
 .sub "_debug__interact"
+  DEBUG__INTERACT__LOOP:
     _debug__print_status()
+
+    print "bef> "
+    $P0 = getstdin
+    $S0 = readline $P0
+    chopn $S0, 1
+    $I0 = length $S0
+
+    if $I0 == 0 goto DEBUG__INTERACT__NEXT
+    $S1 = substr $S0, 0, 4
+    if $S1 == "dump" goto DEBUG__INTERACT__DUMP
+    if $S1 == "help" goto DEBUG__INTERACT__HELP
+    if $S1 == "list" goto DEBUG__INTERACT__LIST
+    if $S1 == "next" goto DEBUG__INTERACT__NEXT
+    if $S1 == "quit" goto DEBUG__INTERACT__QUIT
+
+  DEBUG__INTERACT__DUMP:
+  DEBUG__INTERACT__HELP:
+  DEBUG__INTERACT__LIST:
+    print "Not yet implemented...\n"
+    goto DEBUG__INTERACT__LOOP
+  DEBUG__INTERACT__NEXT:
+  DEBUG__INTERACT__QUIT:
+
+=pod
+
+DEBUG_INTERACT:
+        substr S11, S10, 0, 5
+        eq S11, "break", DEBUG_INTERACT_BREAK
+        substr S11, S10, 0, 6
+        eq S11, "delete", DEBUG_INTERACT_DELETE
+        eq S11, "status", DEBUG_INTERACT_STATUS
+        substr S11, S10, 0, 7
+        eq S11, "restart", DEBUG_INTERACT_RESTART
+        substr S11, S10, 0, 8
+        eq S11, "continue", DEBUG_INTERACT_CONTINUE
+        print "Unknown instruction. Type help for help.\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_BREAK:
+        substr S11, S10, 0, 6, ""
+        set P4, P3[1]
+        set P4[S10], 1      # stop at specified breakpoint
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_CONTINUE:
+        set P3[0], 0        # do not stop at next instruction
+        branch DEBUG_INTERACT_END
+DEBUG_INTERACT_DELETE:
+        substr S11, S10, 0, 7, ""
+        set P4, P3[1]
+        delete P4[S10]
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_DUMP:
+        bsr DEBUG_DUMP_PLAYFIELD
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_HELP:
+        print "Available commands are:\n"
+        print " status        - print state of current IP\n"
+        print " dump          - dump playfield\n"
+        print " break c       - set a breakpoint on character c\n"
+        print " break x,y     - set a breakpoint at coords (x,y)\n"
+        print " break c:x     - set a breakpoint on column x\n"
+        print " break r:y     - set a breakpoint on row y\n"
+        print " delete c      - delete breakpoint on character c\n"
+        print " delete x,y    - delete breakpoint at coords (x,y)\n"
+        print " delete c:x    - delete breakpoint on column x\n"
+        print " delete r:y    - delete breakpoint on row y\n"
+        print " list          - list breakpoints\n"
+        print " next          - step one befunge instruction\n"
+        print " continue      - resume execution\n"
+        print " restart       - restart execution\n"
+        print " quit          - abort execution\n"
+        print " help          - display this message\n"
+        print "\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_NEXT:
+        set P3[0], 1        # stop at next instruction
+        branch DEBUG_INTERACT_END
+DEBUG_INTERACT_QUIT:
+        end
+DEBUG_INTERACT_RESTART:
+        #branch MAIN
+        print "Not yet implemented...\n"
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_STATUS:
+        bsr DEBUG_PRINT_STATUS
+        branch DEBUG_INTERACT
+DEBUG_INTERACT_END:
+        ret
+
+=cut
+
 .end
 
 
@@ -179,86 +272,6 @@ DEBUG_CHECK_BREAKPOINT_COL:
 =pod
 
 
-# The interpreter has reached a breakpoint. Let's
-# stop and interact with user.
-DEBUG_INTERACT:
-        bsr DEBUG_PRINT_STATUS
-        print "bef> "
-        getstdin P5
-        readline S10, P5
-        chopn S10, 1
-        length I10, S10
-        eq I10, 0, DEBUG_INTERACT_NEXT
-        substr S11, S10, 0, 4
-        eq S11, "dump", DEBUG_INTERACT_DUMP
-        eq S11, "help", DEBUG_INTERACT_HELP
-        eq S11, "list", DEBUG_INTERACT_LIST
-        eq S11, "next", DEBUG_INTERACT_NEXT
-        eq S11, "quit", DEBUG_INTERACT_QUIT
-        substr S11, S10, 0, 5
-        eq S11, "break", DEBUG_INTERACT_BREAK
-        substr S11, S10, 0, 6
-        eq S11, "delete", DEBUG_INTERACT_DELETE
-        eq S11, "status", DEBUG_INTERACT_STATUS
-        substr S11, S10, 0, 7
-        eq S11, "restart", DEBUG_INTERACT_RESTART
-        substr S11, S10, 0, 8
-        eq S11, "continue", DEBUG_INTERACT_CONTINUE
-        print "Unknown instruction. Type help for help.\n"
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_BREAK:
-        substr S11, S10, 0, 6, ""
-        set P4, P3[1]
-        set P4[S10], 1      # stop at specified breakpoint
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_CONTINUE:
-        set P3[0], 0        # do not stop at next instruction
-        branch DEBUG_INTERACT_END
-DEBUG_INTERACT_DELETE:
-        substr S11, S10, 0, 7, ""
-        set P4, P3[1]
-        delete P4[S10]
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_DUMP:
-        bsr DEBUG_DUMP_PLAYFIELD
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_HELP:
-        print "Available commands are:\n"
-        print " status        - print state of current IP\n"
-        print " dump          - dump playfield\n"
-        print " break c       - set a breakpoint on character c\n"
-        print " break x,y     - set a breakpoint at coords (x,y)\n"
-        print " break c:x     - set a breakpoint on column x\n"
-        print " break r:y     - set a breakpoint on row y\n"
-        print " delete c      - delete breakpoint on character c\n"
-        print " delete x,y    - delete breakpoint at coords (x,y)\n"
-        print " delete c:x    - delete breakpoint on column x\n"
-        print " delete r:y    - delete breakpoint on row y\n"
-        print " list          - list breakpoints\n"
-        print " next          - step one befunge instruction\n"
-        print " continue      - resume execution\n"
-        print " restart       - restart execution\n"
-        print " quit          - abort execution\n"
-        print " help          - display this message\n"
-        print "\n"
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_LIST:
-        print "Not yet implemented...\n"
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_NEXT:
-        set P3[0], 1        # stop at next instruction
-        branch DEBUG_INTERACT_END
-DEBUG_INTERACT_QUIT:
-        end
-DEBUG_INTERACT_RESTART:
-        #branch MAIN
-        print "Not yet implemented...\n"
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_STATUS:
-        bsr DEBUG_PRINT_STATUS
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_END:
-        ret
 
 
 
