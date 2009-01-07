@@ -1281,9 +1281,5 @@ find_global_p_s_s              1250
 find_global_p_sc_s             1251
 find_global_p_s_sc             1252
 find_global_p_sc_sc            1253
-find_global_p_p_s              1254
-find_global_p_pc_s             1255
-find_global_p_p_sc             1256
-find_global_p_pc_sc            1257
-find_name_p_s                  1258
-find_name_p_sc                 1259
+find_name_p_s                  1254
+find_name_p_sc                 1255

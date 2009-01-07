@@ -26,7 +26,8 @@
 # Also, if you're removing an opcode, be sure to run "make opsrenumber"
 
 # please insert tab separated entries at the top of the list
- 
+
+3.27	2008.01.07	coke	removed find_global_p_p_s
 3.26	2008.12.30	chromatic	removed deprecated infix, n_infix, get_mro opcodes
 3.25	2008.11.15	tewk	changed size of Parrot_sub structure which effects frozen sub pmc size
 3.24	2008.11.24	pmichaud	added capture_lex opcode

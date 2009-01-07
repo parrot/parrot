@@ -9,7 +9,7 @@ PGE::Hs - Match and display PGE rules as Haskell expressions
     .sub _main
         load_bytecode "PGE.pbc"
         load_bytecode "PGE/Hs.pir"
-        $P0 = find_global ["PGE";"Hs"], "match"
+        $P0 = get_hll_global ["PGE";"Hs"], "match"
         $S0 = $P0("Hello", "(...)*$")
         print $S0   # PGE_Match 2 5 [PGE_Array [PGE_Match 2 5 [] []]] []
     .end

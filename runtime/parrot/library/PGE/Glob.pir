@@ -130,7 +130,7 @@ parse C<PGE::Match> object.
     .param pmc adverbs         :slurpy :named
 
     .local pmc optable, match
-    optable = find_global ['PGE';'Glob'], '$optable'
+    optable = get_hll_global ['PGE';'Glob'], '$optable'
     match = optable.'parse'(mob)
     .return (match)
 .end
