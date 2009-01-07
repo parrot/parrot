@@ -1,16 +1,26 @@
 # $Id$
 
-=pod
+# ** string mode
 
-# String mode.
-# Befunge stack:
+#
+# string mode.
+# befunge stack:
 #   before:     ...
 #   after:      ... c
-# i = ord(current char)
+# c = ord(current char)
+.sub io__push_char
+    $P0 = get_global "status"
+    $P1 = get_global "stack"
+
+    $I0 = $P0["val"]
+    push $P1, $I0
+
+    set_global "stack", $P1
+.end
+
+=pod
+
 IO_PUSH_CHAR:
-    ord I10, S0
-    push P2, I10
-    branch MOVE_PC
 
 # Input integer.
 # Befunge stack:

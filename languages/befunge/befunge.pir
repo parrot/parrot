@@ -54,7 +54,7 @@
         # S2 = user input
         # S0 = current instruction
 
-    .local int    x, y, val
+    .local int    x, y, flag, val
     .local string char
   TICK:
     status = get_global "status"
@@ -62,6 +62,7 @@
     y    = status["y"]
     val  = playfield[y;x]
     char = chr val
+    flag = status["flag"]
     status["char"] = char
     status["val"]  = val
     set_global "status", status
@@ -71,6 +72,7 @@
     
   TICK_NODEBUG:
     if char == '"' goto FLOW_TOGGLE_STRING_MODE
+    if flag == 1   goto IO_PUSH_CHAR
     
     # sole number
     
@@ -150,6 +152,11 @@ NOT_NUM:
     flow__toggle_string_mode()
     goto MOVE_PC
 
+    # io instructions
+  IO_PUSH_CHAR:
+    io__push_char()
+    goto MOVE_PC
+  
 =pod
 
 MAIN_TRAMPOLINE:
