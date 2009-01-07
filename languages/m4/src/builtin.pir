@@ -814,7 +814,7 @@ Execute a shell command and don't return the return code.
   .local pmc exit_status_as_pmc
   exit_status_as_pmc = new 'Integer'
   exit_status_as_pmc  = exit_status
-  store_global 'exit_status', exit_status_as_pmc
+  set_global 'exit_status', exit_status_as_pmc
 
   .return ( '' )
 .end
@@ -832,7 +832,7 @@ Return the exit status of the last syscmd.
 
   # Retrieve it as a global set by m4_sysval
   .local pmc exit_status_as_pmc
-  find_global exit_status_as_pmc, 'exit_status'
+  exit_status_as_pmc = get_global 'exit_status'
 
   .local string ret
   ret = exit_status_as_pmc
