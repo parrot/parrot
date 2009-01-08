@@ -57,13 +57,9 @@ Serialize the segment.
         opcode_t *newptr, *ptr = (opcode_t*)mem_sys_allocate(length);
         STRING *str;
         newptr = PackFile_Segment_pack(interp, pfseg, ptr);
-        /* FIXME: PARROT_BINARY_CHARSET seems like a better choice, but the
-         * comparison function for the binary charset plugin always returns
-         * "equal", which means tests fail.
-         */
         str = string_make_direct(interp, (const char*)ptr,
                 (newptr - ptr) * sizeof (opcode_t),
-                PARROT_FIXED_8_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+                PARROT_FIXED_8_ENCODING, PARROT_BINARY_CHARSET, 0);
         mem_sys_free(ptr);
         RETURN(STRING *str);
     }

@@ -69,6 +69,8 @@ PackfileDirectory
 OUT
 
 
+# common setup code for later tests
+
 my $get_uuid_pbc = <<'EOF';
 
 .sub _pbc
@@ -231,7 +233,7 @@ CODE
 
 # PackfileDirectory.get_pmc_keyed_str
 
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.get_pmc_keyed_str', todo => 'implement this' );
+pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.get_pmc_keyed_str' );
 .sub 'test' :main
     .local pmc pf, pfdir
     pf    = _pbc()
@@ -239,11 +241,11 @@ pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.get_pmc_key
     $I0   = elements pfdir
     $I1   = 0
     LOOP:
-    $P0   = pfdir[$I1]
-    $S1   = pfdir[$I1]
-    $P1   = pfdir[$S1]
-    $S0 = $P0
-    $S1 = $P1
+    $P0 = pfdir[$I1]
+    $S1 = pfdir[$I1]
+    $P1 = pfdir[$S1]
+    $S0 = typeof $P0
+    $S1 = typeof $P1
     eq $S0, $S1, GOOD
     goto ERROR
     GOOD:

@@ -68,12 +68,8 @@ Return raw serialized PBC file data.
         opcode_t *ptr = (opcode_t*)mem_sys_allocate(length);
         STRING *str;
         PackFile_pack(interp, pf, ptr);
-        /* FIXME: PARROT_BINARY_CHARSET seems like a better choice, but the
-         * comparison function for the binary charset plugin always returns
-         * "equal", which means tests fail.
-         */
         str = string_make_direct(interp, (const char*)ptr, length,
-                PARROT_FIXED_8_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+                PARROT_FIXED_8_ENCODING, PARROT_BINARY_CHARSET, 0);
         mem_sys_free(ptr);
         return str;
     }

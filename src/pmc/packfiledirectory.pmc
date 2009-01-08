@@ -116,7 +116,16 @@ Search the array for a segment with the given name, and return it if it exists.
 
 */
     VTABLE PMC *get_pmc_keyed_str(STRING *name)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        int i, total = pfd->num_segments;
+        for (i = 0; i < total; i++) {
+            PackFile_Segment *pfseg;
+            pfseg = pfd->segments[i];
+            if (!string_compare(interp, name, const_string(interp, pfseg->name)))
+                return VTABLE_get_pmc_keyed_int(interp, SELF, i);
+        }
+        /* the specified segment name wasn't found. */
+        return PMCNULL;
     }
 
 
