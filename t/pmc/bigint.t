@@ -36,7 +36,7 @@ my $vers_check = <<'EOP';
     .local pmc b, ar
     .local string v
     .local int ma, mi, pa
-    b = new 'BigInt'
+    b = new ['BigInt']
     v = b.'version'()
     ar = split '.', v
     ma = ar[0]
@@ -73,7 +73,7 @@ if ( $PConfig{gmp} ) {
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "create" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    print "ok\n"
    end
 CODE
@@ -81,7 +81,7 @@ ok
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set/get int" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 999999
    set I1, P0
    print I1
@@ -97,7 +97,7 @@ OUT
 
 pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
      .include 'include/fp_equality.pasm'
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, 999999
      set N1, P0
      .fp_eq_pasm(N1, 999999.0, OK1)
@@ -130,7 +130,7 @@ ok 4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set double, get str" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 1.23e12
    print P0
    print "\n"
@@ -140,7 +140,7 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "set str, get str" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, "1230000000000"
    print P0
    print "\n"
@@ -150,11 +150,11 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 999999
-   new P1, 'BigInt'
+   new P1, ['BigInt']
    set P1, 1000000
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    add P2, P0, P1
    set S0, P2
    print S0
@@ -172,9 +172,9 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add_int" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 999999
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    add P2, P0, 1000000
    set S0, P2
    print S0
@@ -191,11 +191,11 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub bigint" );
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, 12345678
-     new P1, 'BigInt'
+     new P1, ['BigInt']
      set P1, 5678
-     new P2, 'BigInt'
+     new P2, ['BigInt']
      sub P2, P0, P1
      set I0, P2
      eq I0, 12340000, OK1
@@ -203,7 +203,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub bigint" );
 OK1: print "ok 1\n"
      set P0, "123456789012345678"
      sub P2, P0, P1
-     new P3, 'BigInt'
+     new P3, ['BigInt']
      set P3, "123456789012340000"
      eq P2, P3, OK2
      print "not "
@@ -222,9 +222,9 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub native int" );
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, 12345678
-     new P2, 'BigInt'
+     new P2, ['BigInt']
      sub P2, P0, 5678
      set I0, P2
      eq I0, 12340000, OK1
@@ -232,7 +232,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub native int" );
 OK1: print "ok 1\n"
      set P0, "123456789012345678"
      sub P2, P0, 5678
-     new P3, 'BigInt'
+     new P3, ['BigInt']
      set P3, "123456789012340000"
      eq P2, P3, OK2
      print "not "
@@ -244,11 +244,11 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub other int" );
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, 12345678
-     new P1, 'Integer'
+     new P1, ['Integer']
      set P1, 5678
-     new P2, 'BigInt'
+     new P2, ['BigInt']
      sub P2, P0, P1
      set I0, P2
      eq I0, 12340000, OK1
@@ -256,13 +256,13 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "sub other int" );
 OK1: print "ok 1\n"
      set P0, "123456789012345678"
      sub P2, P0, P1
-     new P3, 'BigInt'
+     new P3, ['BigInt']
      set P3, "123456789012340000"
      eq P2, P3, OK2
      print "not "
 OK2: print "ok 2\n"
      set P0, 9876543
-     new P4, 'Integer'
+     new P4, ['Integer']
      set P4, 44
      sub P2, P0, P4
      set I0, P2
@@ -284,11 +284,11 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 999999
-   new P1, 'BigInt'
+   new P1, ['BigInt']
    set P1, 1000000
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    mul P2, P0, P1
    set S0, P2
    print S0
@@ -299,9 +299,9 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "mul_int" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 999999
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    mul P2, P0, 1000000
    print P2
    print "\n"
@@ -311,18 +311,18 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div bigint" );
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, "100000000000000000000"
-     new P1, 'BigInt'
+     new P1, ['BigInt']
      set P1, "100000000000000000000"
-     new P2, 'BigInt'
+     new P2, ['BigInt']
      div P2, P0, P1
      set I0, P2
      eq I0, 1, OK1
      print "not "
 OK1: print "ok 1\n"
 
-     new P3, 'BigInt'
+     new P3, ['BigInt']
      set P3, "10000000000000"
      set P1, 10000000
      div P2, P0, P1
@@ -352,11 +352,11 @@ ok 4
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div native int" );
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, "100000000000000000000"
-     new P1, 'BigInt'
+     new P1, ['BigInt']
      div P1, P0, 10
-     new P2, 'BigInt'
+     new P2, ['BigInt']
      set P2, "10000000000000000000"
      eq P1, P2, OK1
      print "not "
@@ -375,20 +375,20 @@ ok 2
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "div other int" );
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, "100000000000000000000"
-     new P1, 'BigInt'
-     new P3, 'Integer'
+     new P1, ['BigInt']
+     new P3, ['Integer']
      set P3, 10
      div P1, P0, P3
-     new P2, 'BigInt'
+     new P2, ['BigInt']
      set P2, "10000000000000000000"
      eq P1, P2, OK1
      print "not "
 OK1: print "ok 1\n"
 
      set P0, "100000000000000"
-     new P4, 'Integer'
+     new P4, ['Integer']
      set P4, 10000000
      div P1, P0, P4
      set P2, 10000000
@@ -405,11 +405,11 @@ for my $op ( "/", "%" ) {
     for my $type ( "BigInt", "Integer" ) {
         pir_output_is( <<"CODE", <<OUTPUT, "bigint $op by zero $type" );
 .sub _main :main
-    \$P0 = new 'BigInt'
+    \$P0 = new ['BigInt']
     set \$P0, "1000000000000000000000"
-    \$P1 = new 'BigInt'
+    \$P1 = new ['BigInt']
     ## divide by a zero $type
-    \$P2 = new '$type'
+    \$P2 = new ['$type']
     set \$P2, 0
     push_eh OK
     \$P1 = \$P0 $op \$P2
@@ -450,12 +450,12 @@ OUTPUT
     }
 
     pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
-   new P0, 'Integer'
+   new P0, ['Integer']
    set P0, $a
-   new P1, 'Integer'
+   new P1, ['Integer']
    set P1, $b
-   new P2, 'Integer'
-   new P3, 'BigInt'
+   new P2, ['Integer']
+   new P3, ['BigInt']
    set I3, 3
 lp:
    add P2, P0, P1
@@ -479,12 +479,12 @@ ok
 OUT
 
     pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
-   new P0, 'Integer'
+   new P0, ['Integer']
    set P0, $a
-   new P1, 'Integer'
+   new P1, ['Integer']
    set P1, $b
-   new P2, 'Integer'
-   new P3, 'BigInt'
+   new P2, ['Integer']
+   new P3, ['BigInt']
    set I3, 3
 lp:
    add P2, P0, P1
@@ -509,9 +509,9 @@ OUT
 }
 
 pasm_output_is( <<'CODE', <<'OUT', "abs" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, "-1230000000000"
-   new P1, 'Undef'
+   new P1, ['Undef']
    abs P1, P0
    print P1
    print "\n"
@@ -531,7 +531,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'BigInt'
+    pmc1 = new ['BigInt']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -547,7 +547,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Truth" );
-     new P0, 'BigInt'
+     new P0, ['BigInt']
      set P0, "123456789123456789"
      if P0, OK1
      print "not "
@@ -563,8 +563,8 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "neg" );
-     new P0, 'BigInt'
-     new P1, 'BigInt'
+     new P0, ['BigInt']
+     new P1, ['BigInt']
      set P0, "123456789123456789"
      neg P0
      set P1, "-123456789123456789"
@@ -579,15 +579,15 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "pi() generator" );
 .sub PI
     .local pmc k, a, b, a1, b1
-    k = new 'Integer'
+    k = new ['Integer']
     k = 2
-    a = new 'Integer'
+    a = new ['Integer']
     a = 4
-    b = new 'Integer'
+    b = new ['Integer']
     b = 1
-    a1 = new 'Integer'
+    a1 = new ['Integer']
     a1 = 12
-    b1 = new 'Integer'
+    b1 = new ['Integer']
     b1 = 4
 forever:
     .local pmc p, q
@@ -696,11 +696,11 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "shl_bigint" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, "2"
-   new P1, 'BigInt'
+   new P1, ['BigInt']
    set P1, 2
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    shl P2, P0, P1
    set S0, P2
    print S0
@@ -720,11 +720,11 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "shl_bigint with a negative shift" );
 ## cf the shr_bigint case.
 .sub main :main
-   new $P0, 'BigInt'
+   $P0 = new ['BigInt']
    set $P0, 8
-   new $P1, 'BigInt'
+   $P1 = new ['BigInt']
    set $P1, -2
-   new $P2, 'BigInt'
+   $P2 = new ['BigInt']
    shl $P2, $P0, $P1
    say $P2
    set $P0, "102400000000000"
@@ -738,11 +738,11 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "shl_int" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 2
-   new P1, 'Integer'
+   new P1, ['Integer']
    set P1, 1
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    shl P2, P0, P1
    set S0, P2
    print S0
@@ -769,11 +769,11 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "shl_int with a negative shift" );
 ## cf the shr_int case.
 .sub main :main
-   new $P0, 'BigInt'
+   $P0 = new ['BigInt']
    set $P0, 4
-   new $P1, 'Integer'
+   $P1 =  new ['Integer']
    set $P1, -1
-   new $P2, 'BigInt'
+   $P2 = new ['BigInt']
    shl $P2, $P0, $P1
    say $P2
    set $P0, "200000000000"
@@ -795,11 +795,11 @@ pir_output_like( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bi
 ## The result on the second line is a BigInt on 32-bit systems and still an
 ## Integer on 64-bit systems.
 .sub main :main
-   new $P0, 'Integer'
+   $P0 = new ['Integer']
    set $P0, 1000001
-   new $P1, 'Integer'
+   $P1 = new ['Integer']
    set $P1, 10
-   new $P2, 'Integer'
+   $P2 = new ['Integer']
    ## shift by 10 bits . . .
    shl $P2, $P0, $P1
    $S2 = typeof $P2
@@ -808,7 +808,7 @@ pir_output_like( <<'CODE', <<'OUT', "shl_int and i_shl_int promote Integer to Bi
    say $P2
    ## then by 20 bits . . .
    $P1 = 20
-   new $P3, 'Integer'
+   $P3 = new ['Integer']
    $P3 = 1000001
    shl $P3, $P0, $P1
    $S2 = typeof $P3
@@ -834,11 +834,11 @@ pir_error_output_like( <<'CODE', <<'OUT', "shl_int throws an error when promotio
 .include "errors.pasm"
 .sub main :main
    errorson .PARROT_ERRORS_OVERFLOW_FLAG
-   new $P0, 'Integer'
+   $P0 = new ['Integer']
    set $P0, 1000001
-   new $P1, 'Integer'
+   $P1 = new ['Integer']
    set $P1, 10
-   new $P2, 'Integer'
+   $P2 = new ['Integer']
    ## shift by 10 bits . . .
    shl $P2, $P0, $P1
    $S2 = typeof $P2
@@ -865,9 +865,9 @@ pir_output_is( <<'CODE', <<'OUT', "shl_int by 64 bits also promotes to Bigint" )
 ## on all the systems I have available), so both 32- and 64-bit systems treat
 ## shifting by 64 bits as shifting by zero.
 .sub main :main
-   new $P0, 'Integer'
+   $P0 = new ['Integer']
    set $P0, 1000001
-   new $P1, 'Integer'
+   $P1 = new ['Integer']
    set $P1, 64
    shl $P2, $P0, $P1
    $S2 = typeof $P2
@@ -882,11 +882,11 @@ OUT
 pir_output_is(
     <<'CODE', <<'OUT', "shr_int and i_shr_int with a neg shift promote Integer to Bigint" );
 .sub main :main
-   new $P0, 'Integer'
+   $P0 = new ['Integer']
    set $P0, 1000001
-   new $P1, 'Integer'
+   $P1 = new ['Integer']
    set $P1, -10
-   new $P2, 'Integer'
+   $P2 = new ['Integer']
    ## shift by 10 bits . . .
    shr $P2, $P0, $P1
    $S2 = typeof $P2
@@ -907,11 +907,11 @@ BigInt 1152922657528351582846976
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "shr_bigint" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 8
-   new P1, 'BigInt'
+   new P1, ['BigInt']
    set P1, 2
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    shr P2, P0, P1
    set S0, P2
    print S0
@@ -931,11 +931,11 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "shr_bigint with a negative shift" );
 ## cf the shl_bigint case.
 .sub main :main
-   new $P0, 'BigInt'
+   $P0 = new ['BigInt']
    set $P0, 2
-   new $P1, 'BigInt'
+   $P1 = new['BigInt']
    set $P1, -2
-   new $P2, 'BigInt'
+   $P2 = new ['BigInt']
    shr $P2, $P0, $P1
    say $P2
    set $P0, "100000000000"
@@ -949,11 +949,11 @@ CODE
 OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "shr_int" );
-   new P0, 'BigInt'
+   new P0, ['BigInt']
    set P0, 4
-   new P1, 'Integer'
+   new P1, ['Integer']
    set P1, 1
-   new P2, 'BigInt'
+   new P2, ['BigInt']
    shr P2, P0, P1
    set S0, P2
    print S0
@@ -980,11 +980,11 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "shr_int with a negative shift" );
 ## cf the shl_int case.
 .sub main :main
-   new $P0, 'BigInt'
+   $P0 = new ['BigInt']
    set $P0, 2
-   new $P1, 'Integer'
+   $P1 = new ['Integer']
    set $P1, -1
-   new $P2, 'BigInt'
+   $P2 = new ['BigInt']
    shr $P2, $P0, $P1
    say $P2
    set $P0, "100000000000"
@@ -1004,7 +1004,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "BUG #34949 gt" );
 .sub main :main
     .local pmc b
-    b = new 'BigInt'
+    b = new ['BigInt']
     b = 1e10
     if b > 4 goto ok
     print "never\n"
@@ -1019,7 +1019,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "BUG #34949 ge" );
 .sub main :main
     .local pmc b
-    b = new 'BigInt'
+    b = new ['BigInt']
     b = 1e10
     if b >= 4 goto ok
     print "never\n"
@@ -1034,7 +1034,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "BUG #34949 ne" );
 .sub main :main
     .local pmc b
-    b = new 'BigInt'
+    b = new ['BigInt']
     b = 1e10
     if b != 4 goto ok
     print "never\n"
@@ -1049,7 +1049,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "BUG #34949 eq" );
 .sub main :main
     .local pmc b
-    b = new 'BigInt'
+    b = new ['BigInt']
     b = 1e10
     if b == 4 goto nok
     print "ok\n"
@@ -1064,7 +1064,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "BUG #34949 le" );
 .sub main :main
     .local pmc b
-    b = new 'BigInt'
+    b = new ['BigInt']
     b = 1e10
     if b <= 4 goto nok
     print "ok\n"
@@ -1079,7 +1079,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "BUG #34949 lt" );
 .sub main :main
     .local pmc b
-    b = new 'BigInt'
+    b = new ['BigInt']
     b = 1e10
     if b < 4 goto nok
     print "ok\n"

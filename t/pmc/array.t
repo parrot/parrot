@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, 'Array'
+    new P0, ['Array']
 
     set I0,P0
     eq I0,0,OK_1
@@ -43,7 +43,7 @@ OK_2:    print "ok 2\n"
     print "not "
 OK_3:    print "ok 3\n"
 
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 3
     set P0,P1
     set I0,P0
@@ -61,7 +61,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 1
 
     set P0[0],-7
@@ -90,7 +90,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 2
 
     set P0[1], -7
@@ -119,7 +119,7 @@ ok 3
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 1
 
     set P0[1], -7
@@ -131,7 +131,7 @@ current instr/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 1
 
     set I0, P0[1]
@@ -142,7 +142,7 @@ current instr/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "defined" );
-    new P0, 'Array'
+    new P0, ['Array']
     defined I0, P0
     print I0
     print "\n"
@@ -160,12 +160,12 @@ pasm_output_is( <<'CODE', <<OUTPUT, "defined" );
     defined I0, P0[100]
     print I0
     print "\n"
-    new P1, 'Undef'
+    new P1, ['Undef']
     set P0[2], P1
     defined I0, P0[2]
     print I0
     print "\n"
-    new P2, 'Key'
+    new P2, ['Key']
     set P2, 3
     set P0[3], 4
     defined I0, P0[P2]
@@ -188,7 +188,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "exists" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 5
     set P0[0], 1
     exists I0, P0[0]
@@ -200,12 +200,12 @@ pasm_output_is( <<'CODE', <<OUTPUT, "exists" );
     exists I0, P0[100]
     print I0
     print "\n"
-    new P1, 'Undef'
+    new P1, ['Undef']
     set P0[2], P1
     exists I0, P0[2]
     print I0
     print "\n"
-    new P2, 'Key'
+    new P2, ['Key']
     set P2, 3
     set P0[3], 4
     exists I0, P0[P2]
@@ -227,9 +227,9 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
      .include 'include/fp_equality.pasm'
-     new P0, 'Array'
+     new P0, ['Array']
      set P0, 4
-     new P1, 'Key'
+     new P1, ['Key']
 
      set P1, 0
      set P0[P1], 25
@@ -241,7 +241,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
      set P0[P1], "Squeek"
 
      set P1, 3
-     new P2, 'Hash'
+     new P2, ['Hash']
      set P2["a"], "apple"
      set P0[P1], P2
 
@@ -276,17 +276,17 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
      .include 'include/fp_equality.pasm'
-     new P0, 'Array'
+     new P0, ['Array']
      set P0, 1024
 
      set P0[25], 125
      set P0[128], -9.9
      set P0[513], "qwertyuiopasdfghjklzxcvbnm"
-     new P1, 'Integer'
+     new P1, ['Integer']
      set P1, 123456
      set P0[1023], P1
 
-     new P2, 'Key'
+     new P2, ['Key']
      set P2, 25
      set I0, P0[P2]
      eq I0, 125, OK1
@@ -321,9 +321,9 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUT, "multikeyed access I arg" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 1
-    new P1, 'Array'
+    new P1, ['Array']
     set P1, 1
     set P0[0], P1
     set P0[0;0], 20
@@ -348,11 +348,11 @@ Array
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "multikeyed access P arg" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 1
-    new P1, 'Array'
+    new P1, ['Array']
     set P1, 1
-    new P3, 'Integer'
+    new P3, ['Integer']
     set P3, 20
     set P0[0], P1
     set P0[0;0], P3
@@ -377,7 +377,7 @@ Array
 OUT
 
 pasm_output_is( <<'CODE', <<OUT, "delete" );
-    new P0, 'Array'
+    new P0, ['Array']
     set P0, 3
     set P0[0], 10
     set P0[1], 20
@@ -401,7 +401,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Array'
+    pmc1 = new ['Array']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -426,7 +426,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "get_bool" );
 .sub _main
     .local pmc p
     .local int i
-    p = new 'Array'
+    p = new ['Array']
 
     if p goto L1
     print "not "
@@ -444,7 +444,7 @@ L2: say "true"
     print "not "
 L3: say "true"
 
-    p = new 'Array'
+    p = new ['Array']
     p = 0
     if p goto L4
     print "not "
@@ -465,7 +465,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "freeze/thaw" );
     .local pmc p, it, val
     .local string s
 
-    p = new 'Array'
+    p = new ['Array']
 
     unshift p, 2
     unshift p, "foo"
@@ -502,8 +502,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "array comparison" );
     .local pmc a1, a2
     .local int i
 
-    a1 = new 'Array'
-    a2 = new 'Array'
+    a1 = new ['Array']
+    a2 = new ['Array']
 
     if a1 == a2 goto L1
     print "not "
