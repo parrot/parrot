@@ -731,12 +731,8 @@ A packfile will be represented in memory by Parrot as a tree of PMCs. These
 will provide a programatic way to construct and walk packfiles, both for the
 Parrot internals and from programs running on the Parrot VM.
 
-{{ TODO... QUESTION: Will the CStruct PMC make it into Parrot? If so, we
-may want to change the interface of these PMCs to take advantage of it.
-ANSWER: Yes it will (most likely with a different name), but it needs to
-be prototyped first. Do you want to hold off on implementing the
-bytecode changes until it's available? I say go ahead and implement now,
-then revise when the new PMC is available. }}
+{{ TODO... ManagedStruct and UnmanagedStruct may be helpful for these;
+consider switching these PMCs over to use them at some point. }}
 
 
 =head3 Packfile.pmc
