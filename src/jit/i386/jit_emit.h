@@ -24,6 +24,25 @@
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
 
+/* Scale factor values */
+#define emit_Scale(scale) ((scale) << 6)
+#define emit_Scale_1 emit_Scale(0)
+#define emit_Scale_2 emit_Scale(1)
+#define emit_Scale_4 emit_Scale(2)
+#define emit_Scale_8 emit_Scale(3)
+
+/* Scale factor values */
+#define emit_Scale(scale) ((scale) << 6)
+#define emit_Scale_1 emit_Scale(0)
+#define emit_Scale_2 emit_Scale(1)
+#define emit_Scale_4 emit_Scale(2)
+#define emit_Scale_8 emit_Scale(3)
+
+/* ESIB byte */
+#define emit_reg_Index(x) (((x)-1) << 3)
+#define emit_reg_Base(x) ((x)-1)
+#define emit_Index_None ((emit_b100) << 3)
+
 /*
  * helper funcs - get argument n
  */
@@ -1625,13 +1644,6 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 #  undef Parrot_jit_vtable_unlessp_op
 #  undef Parrot_jit_vtable_newp_ic_op
 
-#  define CONST(i) (int *)(jit_info->cur_op[i] * \
-       sizeof (PackFile_Constant) + \
-       offsetof(PackFile_Constant, u))
-
-#  define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, \
-       jit_info->native_ptr, (f)); \
-       emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 /* emit a call to a vtable func
  * $X->vtable(interp, $X [, $Y...])
  */
@@ -1640,9 +1652,6 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 #  include "parrot/oplib/ops.h"
 EXTERN INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
 EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
-#  define ROFFS_PMC(x) REG_OFFS_PMC(jit_info->cur_op[(x)])
-#  define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[(x)])
-#  define NATIVECODE jit_info->native_ptr
 
 char*
 jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
@@ -1652,9 +1661,6 @@ char*
 jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
 ;
 
-#  undef ROFFS_PMC
-#  undef ROFFS_INT
-#  undef NATIVECODE
 
 /*
  * for vtable calls registers are already saved back
@@ -1833,9 +1839,6 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 
 #endif /* JIT_CGP */
 
-#  define NATIVECODE jit_info->native_ptr
-#  define CUR_OPCODE jit_info->cur_op
-#  define CONST(i) PCONST(jit_info->cur_op[(i)])
 void
 jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 ;
@@ -1883,7 +1886,6 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive)
 ;
 
-#  undef CONST
 /*
  * if jit_emit_noop is defined, it does align a jump target
  * to 1 << JUMP_ALIGN
@@ -1918,15 +1920,44 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
 
 #if JIT_EMIT == 0
 
-void
-Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-;
-
 extern int control_word;
 
 #  ifdef JIT_CGP
 #    include <parrot/oplib/core_ops_cgp.h>
 #  endif
+
+#  define REQUIRES_CONSTANT_POOL 0
+/*
+ * examples/pir/mandel.pir and t/op/jitn_14 show rounding problems
+ * due to keeping intermediate results in FP registers
+ * When intermediates are written back to parrot regs, rounding to
+ * 64 bit is performed, which changes results slightly
+ *
+ * One method is to just turn off mapped floats. The other one is
+ * setting a different control word (with precision control = double)
+ * see emitm_fldcw above
+ */
+#  define FLOAT_REGISTERS_TO_MAP 4
+
+/* registers are either allocate per section or per basic block
+ * set this to 1 or 0 to change allocation scheme
+ */
+#  define ALLOCATE_REGISTERS_PER_SECTION 1
+
+/*
+ * new style move function using offsets relative to the base_reg
+ */
+#  ifdef JIT_CGP
+#    define INTERP_BP_OFFS todo
+#  else
+#    define INTERP_BP_OFFS -16
+#  endif
+
+#endif /* JIT_EMIT = 0 */
+
+void
+Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
+;
 
 void
 Parrot_jit_begin(Parrot_jit_info_t *jit_info,
@@ -1971,11 +2002,6 @@ void
 jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs);
 
-#endif /* JIT_EMIT = 0 */
-
-#if JIT_EMIT == 2
-/* generate code just once */
-
 void
 Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info);
 
@@ -1987,12 +2013,15 @@ void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP);
 
+#if JIT_EMIT == 2
+/* generate code just once */
 
 /* autogened inside core.ops */
 static void
 Parrot_end_jit(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 #  undef Parrot_jit_restart_op
+#endif /* JIT_EMIT == 2 */
 
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
@@ -2007,40 +2036,6 @@ calc_signature_needs(const char *sig, int *strings);
  
 void *
 Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature);
-
-#endif
-
-#if JIT_EMIT == 0
-
-#  define REQUIRES_CONSTANT_POOL 0
-/*
- * examples/pir/mandel.pir and t/op/jitn_14 show rounding problems
- * due to keeping intermediate results in FP registers
- * When intermediates are written back to parrot regs, rounding to
- * 64 bit is performed, which changes results slightly
- *
- * One method is to just turn off mapped floats. The other one is
- * setting a different control word (with precision control = double)
- * see emitm_fldcw above
- */
-#  define FLOAT_REGISTERS_TO_MAP 4
-
-/* registers are either allocate per section or per basic block
- * set this to 1 or 0 to change allocation scheme
- */
-#  define ALLOCATE_REGISTERS_PER_SECTION 1
-
-/*
- * new style move function using offsets relative to the base_reg
- */
-#  ifdef JIT_CGP
-#    define INTERP_BP_OFFS todo
-#  else
-#    define INTERP_BP_OFFS -16
-#  endif
-
-
-#endif /* JIT_EMIT == 0 */
 
 /*
  * register usage
@@ -2063,7 +2058,6 @@ Parrot_jit_init(PARROT_INTERP);
 
 #undef INT_REGISTERS_TO_MAP
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
-
 
 /*
  * Local variables:
