@@ -37,7 +37,7 @@ LINK             = @link@
 LINKFLAGS        = @linkflags@ @link_debug@ @ld_debug@
 LD               = @ld@
 LDFLAGS          = @ldflags@ @ld_debug@
-#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
+#IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 O                = @o@
 EXE              = @exe@
 SHARE_EXT        = @share_ext@
@@ -45,10 +45,7 @@ LOAD_EXT         = @load_ext@
 A                = @a@
 LD_SHARE_FLAGS   = @ld_share_flags@
 LD_LOAD_FLAGS    = @ld_load_flags@
-GEN_MAKEFILES = Makefile 
 DYNEXT_DIR          = runtime/parrot/dynext
-LIBNCI_TEST_SO      = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
-LIBGLUTCB_SO        = $(DYNEXT_DIR)/libglutcb$(LOAD_EXT)
 
 @make_set_make@
 MAKE = @make_c@
@@ -74,15 +71,17 @@ all :
 test:
 	$(RM_F) test.db t/test.db
 	PERL6LIB=../../languages/perl6 $(PERL6) t/test.p6
-	
 
 $(SHARED_LIB) : $(C_FILES)
 	$(MKPATH) @blib_dir@
 	$(CC) $(CC_INC) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ \
-#CONDITIONED_LINE(cygchkdll):		-Wl,--out-implib=blib/lib/libparrot.dll.a \
+#IF(cygwin):		-Wl,--out-implib=lib$(TARGET_NAME).dll.a \
+#IF(win32 and cc==gcc):		-Wl,--out-implib=lib$(TARGET_NAME).lib \
 		$(C_FILES) $(C_LIBS) $(ICU_SHARED)
-#CONDITIONED_LINE(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 
 
 clean : 
 	$(RM_F) $(SHARED_LIB) @blib_dir@ $(O_FILES) Makefile
+#IF(cygwin):	$(RM_F) lib$(TARGET_NAME).dll.a
+#IF(win32 and cc==gcc):	$(RM_F) lib$(TARGET_NAME).lib
