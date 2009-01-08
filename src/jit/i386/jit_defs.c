@@ -10,6 +10,11 @@
 #  define EXTERN
 #endif
 
+#if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && PARROT_I386_JIT_CGP
+#  define JIT_CGP
+#  include <parrot/oplib/core_ops_cgp.h>
+#endif
+
 INTVAL
 get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
@@ -2048,3 +2053,177 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
 }
 
 #  undef CONST
+
+void
+Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
+{
+    Parrot_jit_fixup_t *fixup, *next;
+    char *fixup_ptr;
+
+    fixup = jit_info->arena.fixups;
+
+    while (fixup) {
+        switch (fixup->type) {
+        /* This fixes-up a branch to a known opcode offset -
+           32-bit displacement only */
+            case JIT_X86BRANCH:
+                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 2;
+                *(long *)(fixup_ptr) =
+                    jit_info->arena.op_map[fixup->param.opcode].offset
+                        - (fixup->native_offset + 6) + fixup->skip;
+                break;
+            case JIT_X86JUMP:
+                fixup_ptr = Parrot_jit_fixup_target(jit_info, fixup) + 1;
+                *(long *)(fixup_ptr) =
+                    jit_info->arena.op_map[fixup->param.opcode].offset
+                        - (fixup->native_offset + 5) + fixup->skip;
+                break;
+            case JIT_X86CALL:
+                fixup_ptr = jit_info->arena.start + fixup->native_offset + 1;
+                *(long *)(fixup_ptr) = (long)fixup->param.fptr -
+                    (long)fixup_ptr - 4;
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                    "Unknown fixup type:%d\n", fixup->type);
+            break;
+        }
+        next = fixup->next;
+        free(fixup);
+        fixup = next;
+    }
+    jit_info->arena.fixups = NULL;
+}
+
+int control_word = 0x27f;
+
+#  define emitm_fldcw(interp, pc, mem) \
+    emitm_fl_2((interp), (pc), emit_b00, 1, emit_b101, 0, 0, 0, (mem))
+#  define jit_emit_stack_frame_enter(pc) do { \
+    emitm_pushl_r((pc), emit_EBP); \
+    jit_emit_mov_rr_i((pc), emit_EBP, emit_ESP); \
+} while (0)
+
+#ifdef JIT_CGP
+
+/*
+ * This is the somewhat complicated program flow
+ *
+ * JIT code                     prederef code
+ * 1) jit_begin
+ *    stack_enter
+ *    call cgp_core  -->        set stack frame
+ *                              jump to retaddr
+ *    test EAX, 0    <--        also from HALT
+ *    jnz code_start
+ *    stack_leave
+ *    ret
+ * code_start: of JIT code
+ *    jit code
+ *    ....
+ *
+ * 2) normal_op
+ *    mov prederef_code_ptr, esi
+ *    call *(esi)    ---->      prederefed (non JITted code)
+ *                              ....
+ *    ....           <----      ret
+ *    jit_code
+ *    ....
+ * 3) HALT == jit_end
+ *    mov prederefed_op_func[0], esi
+ *    jump *esi      ----->     cleanup prederef stack frame
+ *                              xor eax,eax ; return 0
+ *                              ret (--> after call cgp_core in 1)
+ *
+ */
+
+void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+                 PARROT_INTERP)
+{
+    jit_emit_stack_frame_enter(jit_info->native_ptr);
+    emitm_fldcw(interp, jit_info->native_ptr, &control_word);
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    /* get the pc from stack:  mov 12(%ebp), %ebx */
+    emitm_movl_m_r(interp, jit_info->native_ptr, emit_EBX, emit_EBP, emit_None, 1, 12);
+    /* emit cgp_core(1, interp) */
+    /* get the interpreter from stack:  mov 8(%ebp), %eax */
+    emitm_movl_m_r(interp, jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 8);
+    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+    /*
+     * TODO define the offset of the interpreter on the stack
+     *      relative to %ebp
+     */
+    emitm_pushl_i(jit_info->native_ptr, 1);
+    /* use EAX as flag, when jumping back on init, EAX==1 */
+    jit_emit_mov_ri_i(interp, jit_info->native_ptr, emit_EAX, 1);
+    if (!jit_info->objfile)
+        call_func(jit_info, (void (*)(void))cgp_core);
+#    if EXEC_CAPABLE
+    else {
+        Parrot_exec_add_text_rellocation_func(jit_info->objfile,
+            jit_info->native_ptr, "cgp_core");
+        emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
+    }
+#    endif
+    /* when cur_opcode == 1, cgp_core jumps back here
+     * when EAX == 0, the official return from HALT was called */
+    jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
+    emitm_jxs(jit_info->native_ptr, emitm_jnz, 5);
+    emitm_popl_r(jit_info->native_ptr, emit_EBX);
+    jit_emit_stack_frame_leave(jit_info->native_ptr);
+    emitm_ret(jit_info->native_ptr);
+    /* get PC = ebx to eax, jump there */
+    jit_emit_mov_rr_i(jit_info->native_ptr, emit_EAX, emit_EBX);
+    Parrot_emit_jump_to_eax(jit_info, interp);
+
+/* code_start: */
+}
+
+#else /* JIT_CGP */
+
+void
+Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+                 PARROT_INTERP)
+{
+    /* the generated code gets called as:
+     * (jit_code)(interp, pc)
+     * jumping to pc is the same code as used in Parrot_jit_cpcf_op()
+     */
+
+    /* Maintain the stack frame pointer for the sake of gdb */
+    jit_emit_stack_frame_enter(jit_info->native_ptr);
+    emitm_fldcw(interp, jit_info->native_ptr, &control_word);
+    /* stack:
+     *  12   pc
+     *   8   interpreter
+     *   4   retaddr
+     *   0   ebp <----- ebp
+     *  -4   ebx .. preserved regs
+     *  -8   esi ..
+     * -12   edi ..
+     * -16   interpreter
+     */
+
+    /* Save all callee-saved registers (cdecl)
+     */
+    emitm_pushl_r(jit_info->native_ptr, emit_EBX);
+    emitm_pushl_r(jit_info->native_ptr, emit_ESI);
+    emitm_pushl_r(jit_info->native_ptr, emit_EDI);
+
+    /* Cheat on op function calls by writing the interpreter arg on the stack
+     * just once. If an op function ever modifies the interpreter argument on
+     * the stack this will stop working !!! */
+
+    /* get the interpreter from stack:  mov 8(%ebp), %eax */
+    emitm_movl_m_r(interp, jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 8);
+    emitm_pushl_r(jit_info->native_ptr, emit_EAX);
+
+    /* get the pc from stack:  mov 12(%ebp), %eax */
+    emitm_movl_m_r(interp, jit_info->native_ptr, emit_EAX, emit_EBP, emit_None, 1, 12);
+
+    /* jump to restart pos or first op */
+    Parrot_emit_jump_to_eax(jit_info, interp);
+}
+
+#endif /* JIT_CGP */
