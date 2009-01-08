@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, 'FixedBooleanArray'
+    new P0, ['FixedBooleanArray']
 
     set I0,P0
     eq I0,0,OK_1
@@ -44,7 +44,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
-    new P0, 'FixedBooleanArray'
+    new P0, ['FixedBooleanArray']
 
     set I0,P0
     set P0,1
@@ -61,7 +61,7 @@ OUTPUT
 #VIM's syntax highlighter needs this line
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, 'FixedBooleanArray'
+    new P0, ['FixedBooleanArray']
     set P0, 1
 
     set P0[0],-7
@@ -90,7 +90,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, 'FixedBooleanArray'
+    new P0, ['FixedBooleanArray']
     set P0, 2
 
     set P0[1], -7
@@ -119,7 +119,7 @@ ok 3
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, 'FixedBooleanArray'
+    new P0, ['FixedBooleanArray']
     set P0, 1
 
     set P0[1], -7
@@ -131,7 +131,7 @@ current instr\.:/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, 'FixedBooleanArray'
+    new P0, ['FixedBooleanArray']
     set P0, 1
 
     set I0, P0[1]
@@ -143,9 +143,9 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
      .include 'include/fp_equality.pasm'
-     new P0, 'FixedBooleanArray'
+     new P0, ['FixedBooleanArray']
      set P0, 3
-     new P1, 'Key'
+     new P1, ['Key']
 
      set P1, 0
      set P0[P1], 25
@@ -180,17 +180,17 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
      .include 'include/fp_equality.pasm'
-     new P0, 'FixedBooleanArray'
+     new P0, ['FixedBooleanArray']
      set P0, 1024
 
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "17"
-     new P1, 'Integer'
+     new P1, ['Integer']
      set P1, 123456
      set P0[1023], P1
 
-     new P2, 'Key'
+     new P2, ['Key']
      set P2, 25
      set I0, P0[P2]
      eq I0, 1, OK1
@@ -228,7 +228,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'FixedBooleanArray'
+    pmc1 = new ['FixedBooleanArray']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -248,7 +248,7 @@ CODE
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "Truth" );
-     new P0, 'FixedBooleanArray'
+     new P0, ['FixedBooleanArray']
      unless P0, OK1
      print "not "
 OK1: print "ok 1\n"
@@ -268,11 +268,11 @@ ok 3
 OUTPUT
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "PMC keys & values" );
-     new P0, 'FixedBooleanArray'
+     new P0, ['FixedBooleanArray']
      set P0, 2
-     new P1, 'Key'
+     new P1, ['Key']
      set P1, 1
-     new P2, 'Integer'
+     new P2, ['Integer']
      set P2, 1
      set P0[P1], P2
      set I0, P0[P1]
@@ -289,7 +289,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
     .local int i
     .local string s
 
-    fba = new 'FixedBooleanArray'
+    fba = new ['FixedBooleanArray']
     fba = 17
 
     fba[1]  = 1
@@ -317,7 +317,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
     .local int i
     .local string s
 
-    fba1 = new 'FixedBooleanArray'
+    fba1 = new ['FixedBooleanArray']
     fba1 = 17
 
     fba1[1]  = 1

@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0,'FixedPMCArray'
+    new P0, ['FixedPMCArray']
 
     set I0,P0
     eq I0,0,OK_1
@@ -44,7 +44,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
-    new P0, 'FixedPMCArray'
+    new P0, ['FixedPMCArray']
 
     set I0,P0
     set P0,1
@@ -61,7 +61,7 @@ OUTPUT
 #VIM's syntax highlighter needs this line
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Truth and falsehood" );
-        new P0, 'FixedPMCArray'
+        new P0, ['FixedPMCArray']
 
         set P0, 0
         if P0, NOK_1
@@ -90,7 +90,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-        new P0, 'FixedPMCArray'
+        new P0, ['FixedPMCArray']
         set P0, 1
 
     set P0[0],-7
@@ -119,7 +119,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-        new P0, 'FixedPMCArray'
+        new P0, ['FixedPMCArray']
         set P0, 2
 
     set P0[1], -7
@@ -148,7 +148,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
-    new P0, 'FixedPMCArray'
+    new P0, ['FixedPMCArray']
     set P0, 1
 
     push_eh caught
@@ -164,7 +164,7 @@ caught an exception
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
-    new P0, 'FixedPMCArray'
+    new P0, ['FixedPMCArray']
     set P0, 1
 
     push_eh caught
@@ -181,7 +181,7 @@ OUTPUT
 
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, 'FixedPMCArray'
+    new P0, ['FixedPMCArray']
     set P0, 1
 
     push_eh caught
@@ -197,7 +197,7 @@ caught an exception
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, 'FixedPMCArray'
+    new P0, ['FixedPMCArray']
     set P0, 1
 
     push_eh caught
@@ -214,9 +214,9 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
      .include 'include/fp_equality.pasm'
-     new P0, 'FixedPMCArray'
+     new P0, ['FixedPMCArray']
      set P0, 3
-     new P1, 'Key'
+     new P1, ['Key']
 
      set P1, 0
      set P0[P1], 25
@@ -251,17 +251,17 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
      .include 'include/fp_equality.pasm'
-     new P0, 'FixedPMCArray'
+     new P0, ['FixedPMCArray']
      set P0, 1024
 
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "cow"
-     new P1, 'Integer'
+     new P1, ['Integer']
      set P1, 123456
      set P0[1023], P1
 
-     new P2, 'Key'
+     new P2, ['Key']
      set P2, 25
      set I0, P0[P2]
      eq I0, 125, OK1
@@ -302,7 +302,7 @@ pir_output_like(
      .local pmc compares, cmp_fun
      # RT #46855 doesnt work wit prederef of JIT
      bounds 1
-     compares = new 'Integer'
+     compares = new ['Integer']
      compares = 0
      set_global "compares", compares
     cmp_fun = get_global "cmp_fun"
@@ -315,7 +315,7 @@ pir_output_like(
     compares = get_global "compares"
     compares = 0
     .local pmc ar
-    new ar, 'FixedPMCArray'
+    ar = new ['FixedPMCArray']
     ar = 5
     ar[0] = 10
     ar[1] = 2
@@ -365,7 +365,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'FixedPMCArray'
+    pmc1 = new ['FixedPMCArray']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -388,7 +388,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "Getting unitialized elements" );
 
 .sub main :main
     .local pmc arr1
-    arr1 = new 'FixedPMCArray'
+    arr1 = new ['FixedPMCArray']
     arr1 = 2005
     .local pmc elem_1956
     elem_1956 = arr1[1956]
@@ -410,14 +410,14 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Multi keys" );
     .local num    elem_out_num
     .local string elem_out_string
 
-    matrix = new 'FixedPMCArray'
+    matrix = new ['FixedPMCArray']
     matrix = 1
-    row = new 'FixedPMCArray'
+    row = new ['FixedPMCArray']
     row = 4           # assing with an integer, number, pmc, string
     matrix[0] = row
     matrix[0;0] = 128
     matrix[0;1] = 128.128
-    elem_in_pmc = new 'Integer'
+    elem_in_pmc = new ['Integer']
     elem_in_pmc = 256
     matrix[0;2] = elem_in_pmc
     matrix[0;3] = "asdf"
@@ -520,8 +520,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "equality" );
 .sub main :main
     .local pmc fpa1, fpa2, p1, p2
     .local int i
-    fpa1 = new 'FixedPMCArray'
-    fpa2 = new 'FixedPMCArray'
+    fpa1 = new ['FixedPMCArray']
+    fpa2 = new ['FixedPMCArray']
 
     print "1:"
     if fpa1 == fpa2 goto L1
@@ -536,9 +536,9 @@ L2: say "equal"
 
     fpa2 = 3
 
-    p1 = new 'String'
+    p1 = new ['String']
     p1 = "foobarx"
-    p2 = new 'String'
+    p2 = new ['String']
     p2 = "foobarx"
 
     fpa1[0] = p1
@@ -549,8 +549,8 @@ L2: say "equal"
     print "not "
 L3: say "equal"
 
-    p1 = new 'String'
-    p2 = new 'String'
+    p1 = new ['String']
+    p2 = new ['String']
     p1 = ''
     p2 = ''
 
@@ -580,7 +580,7 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "defined" );
 .sub main :main
     .local pmc arr1
-    arr1 = new 'FixedPMCArray'
+    arr1 = new ['FixedPMCArray']
     arr1 = 2005
     .local int defined_elem_1956
     defined_elem_1956 = defined arr1[1956]
@@ -604,7 +604,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "elements, get_integer, get_number" );
     .local pmc arr1
     .local int elems_i
     .local num elems_f
-    arr1 = new 'FixedPMCArray'
+    arr1 = new ['FixedPMCArray']
     arr1 = 0
     elems_i = elements arr1
     if elems_i == 0 goto ok_1
@@ -624,7 +624,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "elements, get_integer, get_number" );
   ok_3:
     say 'ok 3'
 
-    arr1 = new 'FixedPMCArray'
+    arr1 = new ['FixedPMCArray']
     arr1 = 2048
     elems_i = elements arr1
     if elems_i == 2048 goto ok_4
@@ -656,25 +656,25 @@ OUTPUT
 pir_output_is(<<'CODE', <<'OUTPUT', 'basic splice');
 .sub 'main'
     .local pmc one
-    one = new 'Integer'
+    one = new ['Integer']
     one = 1
 
     .local pmc fpa
-    fpa = new 'FixedPMCArray'
+    fpa = new ['FixedPMCArray']
     fpa = 5
 
     splice fpa, one, 0, 5
     print_array( fpa )
 
     .local pmc two
-    two = new 'Integer'
+    two = new ['Integer']
     two = 2
 
     splice fpa, two, 1, 3
     print_array( fpa )
 
     .local pmc three
-    three = new 'Integer'
+    three = new ['Integer']
     three = 3
 
     splice fpa, three, 2, 3
@@ -704,11 +704,11 @@ OUTPUT
 pir_error_output_like(<<'CODE', <<'OUTPUT', 'splice out of bounds, offset 0');
 .sub 'main'
     .local pmc fpa
-    fpa = new 'FixedPMCArray'
+    fpa = new ['FixedPMCArray']
     fpa = 5
 
     .local pmc nil
-    nil = new 'Undef'
+    nil = new ['Undef']
 
     splice fpa, nil, 0, 6
 .end
@@ -719,11 +719,11 @@ OUTPUT
 pir_error_output_like(<<'CODE', <<'OUTPUT', 'splice out of bounds, big offset');
 .sub 'main'
     .local pmc fpa
-    fpa = new 'FixedPMCArray'
+    fpa = new ['FixedPMCArray']
     fpa = 5
 
     .local pmc nil
-    nil = new 'Undef'
+    nil = new ['Undef']
 
     splice fpa, nil, 6, 0
 .end

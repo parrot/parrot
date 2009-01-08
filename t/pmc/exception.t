@@ -37,7 +37,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "push_eh - pop_eh, PMC exception handler" );
 .sub main :main
-    $P0 = new "ExceptionHandler"
+    $P0 = new ['ExceptionHandler']
     set_addr $P0, _handler
     push_eh $P0
     print "ok 1\n"
@@ -56,7 +56,7 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
     print "main\n"
     push_eh _handler
-    new P30, 'Exception'
+    new P30, ['Exception']
     throw P30
     print "not reached\n"
     end
@@ -70,10 +70,10 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw, PMC exception handler" );
     print "main\n"
-    new P20, "ExceptionHandler"
+    new P20, ['ExceptionHandler']
     set_addr P20, _handler
     push_eh P20
-    new P30, 'Exception'
+    new P30, ['Exception']
     throw P30
     print "not reached\n"
     end
@@ -88,8 +88,8 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
     print "main\n"
     push_eh handler
-    new P1, 'Exception'
-    new P2, 'String'
+    new P1, ['Exception']
+    new P2, ['String']
     set P2, "just pining"
     setattribute P1, 'message', P2
     throw P1
@@ -117,17 +117,17 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "exception attributes" );
     print "main\n"
     push_eh handler
-    new P1, 'Exception'
-    new P2, 'String'
+    new P1, ['Exception']
+    new P2, ['String']
     set P2, "just pining"
     setattribute P1, 'message', P2
-    new P3, 'Integer'
+    new P3, ['Integer']
     set P3, 5
     setattribute P1, 'severity', P3
-    new P4, 'String'
+    new P4, ['String']
     set P4, "additional payload"
     setattribute P1, 'payload', P4
-    new P5, 'Array'
+    new P5, ['Array']
     set P5, 2
     set P5[0], 'backtrace line 1'
     set P5[1], 'backtrace line 2'
@@ -172,10 +172,10 @@ OUTPUT
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results - be sure registers are ok" );
 # see also #38459
     print "main\n"
-    new P0, 'Integer'
+    new P0, ['Integer']
     push_eh handler
-    new P1, 'Exception'
-    new P2, 'String'
+    new P1, ['Exception']
+    new P2, ['String']
     set P2, "just pining"
     setattribute P1, 'message', P2
     throw P1
@@ -196,8 +196,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".get_results() - PIR" );
 .sub main :main
     print "main\n"
     push_eh _handler
-    new $P1, 'Exception'
-    new $P2, 'String'
+    $P1 = new ['Exception']
+    $P2 = new ['String']
     set $P2, "just pining"
     setattribute $P1, 'message', $P2
     throw $P1
@@ -227,8 +227,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw - message" );
     print "main\n"
     push_eh _handler
 
-    new P30, 'Exception'
-    new P20, 'String'
+    new P30, ['Exception']
+    new P20, ['String']
     set P20, "something happened"
     setattribute P30, "message", P20
     throw P30
@@ -248,8 +248,8 @@ something happened
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
-    new P0, 'Exception'
-    new P20, 'String'
+    new P0, ['Exception']
+    new P20, ['String']
     set P20, "something happened"
     setattribute P0, "message", P20
     throw P0
@@ -261,7 +261,7 @@ OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
     push_eh _handler
-    new P0, 'Exception'
+    new P0, ['Exception']
     pop_eh
     throw P0
     print "not reached\n"
@@ -273,7 +273,7 @@ CODE
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
-    new P0, 'Exception'
+    new P0, ['Exception']
     throw P0
     print "not reached\n"
     end
@@ -286,8 +286,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
     push_eh _handler1
     push_eh _handler2
 
-    new P30, 'Exception'
-    new P20, 'String'
+    new P30, ['Exception']
+    new P20, ['String']
     set P20, "something happened"
     setattribute P30, "message", P20
     throw P30
@@ -318,8 +318,8 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers, throw next" );
     push_eh _handler1
     push_eh _handler2
 
-    new P30, 'Exception'
-    new P20, 'String'
+    new P30, ['Exception']
+    new P20, ['String']
     set P20, "something happened"
     setattribute P30, "message", P20
     throw P30
@@ -401,7 +401,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "push_eh - throw" );
     print "main\n"
     push_eh handler
     print "ok\n"
-    new P30, 'Exception'
+    new P30, ['Exception']
     throw P30
     print "not reached\n"
     end
@@ -456,7 +456,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'pop_eh out of context (2)', todo => 'runlo
 .sub main :main
         $P0 = get_hll_global ['Foo'], 'load'
         $P0()
-        $P0 = new 'Foo'
+        $P0 = new ['Foo']
         push_eh catch
         $S0 = $P0
         pop_eh
@@ -475,7 +475,7 @@ catch:
 .end
 
 .sub get_string :vtable :method
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     throw $P0
 .end
 CODE
@@ -487,7 +487,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
     print "main\n"
     .const 'Sub' at_exit = "exit_handler"
     pushaction at_exit
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     throw $P0
     .return()
 .end
@@ -511,7 +511,7 @@ pir_output_like(
     print "main\n"
     .const 'Sub' at_exit = "exit_handler"
     pushaction at_exit
-    $P1 = new 'Exception'
+    $P1 = new ['Exception']
     throw $P1
     print "never 1\n"
 h:
@@ -524,7 +524,7 @@ h:
     .param int flag
     print "at_exit, flag = "
     say flag
-    $P2 = new 'Exception'
+    $P2 = new ['Exception']
     throw $P2
     print "never 2\n"
 .end
@@ -542,7 +542,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "exit_handler via exit exception", @todo );
 .sub main :main
     .local pmc a
     .lex 'a', a
-    a = new 'Integer'
+    a = new ['Integer']
     a = 42
     push_eh handler
     exit 0
@@ -582,8 +582,8 @@ handler:
 .end
 
 .sub broken
-    $P0 = new 'Exception'
-    new $P2, 'String'
+    $P0 = new ['Exception']
+    new $P2, ['String']
     set $P2, "something broke"
     setattribute $P0, "message", $P2
     throw $P0
@@ -634,14 +634,14 @@ handle_errs:
 .sub foo
     ## Take a continuation.
     .local pmc cont
-    cont = new 'Continuation'
+    cont = new ['Continuation']
     set_addr cont, over_there
     print "    returning from foo\n"
     .return (cont)
 over_there:
     print "    got over there.\n"
     .local pmc ex
-    ex = new 'Exception'
+    ex = new ['Exception']
     throw ex
 .end
 CODE
@@ -684,7 +684,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "catch ex from C-level MULTI function", tod
 
 .local pmc p, q
 
-    p = new 'Integer'
+    p = new ['Integer']
     set p, "0"
 
     push_eh handler

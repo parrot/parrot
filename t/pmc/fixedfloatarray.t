@@ -18,8 +18,8 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 .sub main :main
-    .include 'include/fp_equality.pasm'
-    .include 'include/test_more.pir'
+    .include 'fp_equality.pasm'
+    .include 'test_more.pir'
     plan(24)
 
     array_size_tests()
@@ -32,7 +32,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub array_size_tests
-    new $P0, 'FixedFloatArray'
+    $P0 = new ['FixedFloatArray']
 
     set $I0,$P0
     is($I0, 0, "initial size is 0")
@@ -53,7 +53,7 @@ end:
 
 
 .sub element_set_tests
-    new $P0, 'FixedFloatArray'
+    $P0 = new ['FixedFloatArray']
     set $P0, 1
 
     set $P0[0],-7
@@ -68,7 +68,7 @@ end:
     set $S0,$P0[0]
     is($S0, "17.2", "ok")
 
-    new $P0, 'FixedFloatArray'
+    $P0 = new ['FixedFloatArray']
     set $P0, 2
 
     set $P0[1], -7
@@ -86,7 +86,7 @@ end:
 .end
 
 .sub oob_tests
-    new $P0, 'FixedFloatArray'
+    $P0 = new ['FixedFloatArray']
     set $P0, 1
 
     push_eh eh1
@@ -110,9 +110,9 @@ after_eh2:
 
 
 .sub set_and_get_tests
-     new $P0, 'FixedFloatArray'
+     $P0 = new ['FixedFloatArray']
      set $P0, 3
-     new $P1, 'Key'
+     $P1 = new ['Key']
 
      set $P1, 0
      set $P0[$P1], 25
@@ -136,17 +136,17 @@ after_ok1:
      is($S0, "17.32", "set string via PMC Key, get via int")
 
 
-     new $P0, 'FixedFloatArray'
+     $P0 = new ['FixedFloatArray']
      set $P0, 1024
 
      set $P0[25], 125
      set $P0[128], 10.2
      set $P0[513], "17.3"
-     new $P1, 'Integer'
+     $P1 = new ['Integer']
      set $P1, 123456
      set $P0[1023], $P1
 
-     new $P2, 'Key'
+     $P2 = new ['Key']
      set $P2, 25
      set $I0, $P0[$P2]
      is($I0, 125, "set int via int, get via PMC Key")
@@ -173,7 +173,7 @@ after_ok2:
 
 .sub clone_tests
      set $I30, 2000
-     new $P0, 'FixedFloatArray'
+     $P0 = new ['FixedFloatArray']
      set $P0, $I30
      set $I0, 0
 L1:  set $N0, $I0
@@ -200,7 +200,7 @@ end:
 
 
 .sub what_is_truth
-    new $P0, 'FixedFloatArray'
+    $P0 = new ['FixedFloatArray']
     $I0 = $P0
     is($I0, 0, "an empty FixedFloatArray is false")
     set $P0, 1
@@ -211,7 +211,7 @@ end:
 
 .sub interface_check
     .local pmc p
-    p = new 'FixedFloatArray'
+    p = new ['FixedFloatArray']
     .local int b
     does b, p, "scalar"
     is(b, 0, "FFA does not do scalar")

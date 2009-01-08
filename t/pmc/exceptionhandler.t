@@ -25,7 +25,7 @@ Tests the ExceptionHandler PMC.
     plan(8)
 
     .local pmc eh
-    new eh, 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     ok(1, 'Instantiated ExceptionHandler')
 
     set_addr eh, nonfatal_handler_one
@@ -33,17 +33,17 @@ Tests the ExceptionHandler PMC.
     eh.'max_severity'(.EXCEPT_WARNING)
     push_eh eh
 
-    new eh, 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     set_addr eh, error_handler_one
     eh.'min_severity'(.EXCEPT_ERROR)
     eh.'max_severity'(.EXCEPT_FATAL)
     push_eh eh
 
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     $P0['severity'] = .EXCEPT_NORMAL
     throw $P0
 
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     $P0['severity'] = .EXCEPT_SEVERE
     throw $P0
 
@@ -69,21 +69,21 @@ Tests the ExceptionHandler PMC.
 
   more_tests:
 
-    new eh, 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     set_addr eh, typed_handler_one
     eh.'handle_types'(.CONTROL_OK, .CONTROL_BREAK)
     push_eh eh
 
-    new eh, 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     set_addr eh, typed_handler_two
     eh.'handle_types'(.EXCEPTION_SYNTAX_ERROR, .EXCEPTION_UNEXPECTED_NULL)
     push_eh eh
 
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     $P0['type'] = .CONTROL_OK
     throw $P0
 
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     $P0['type'] = .CONTROL_BREAK
     throw $P0
 
@@ -135,7 +135,7 @@ Tests the ExceptionHandler PMC.
 .sub subclass_handler_pop
     .param pmc myhandler
     .local pmc eh
-    new eh, 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     set_addr eh, subclassed_popped
     push_eh eh
 
@@ -146,7 +146,7 @@ Tests the ExceptionHandler PMC.
 
     pop_eh
 
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     throw $P0
 
   subclassed_popped:
@@ -159,7 +159,7 @@ Tests the ExceptionHandler PMC.
 .sub subclass_handler_catches_can
     .param pmc myhandler
     .local pmc eh
-    new eh, 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     set_addr eh, subclassed_failed
     push_eh eh
 
@@ -168,7 +168,7 @@ Tests the ExceptionHandler PMC.
     set_addr myeh, subclassed_handler
     push_eh myeh
 
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     throw $P0
 
   subclassed_failed:
@@ -181,7 +181,7 @@ Tests the ExceptionHandler PMC.
 .sub subclass_handler_catches
     .param pmc myhandler
     .local pmc eh
-    new eh, 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     set_addr eh, subclassed_failed
     push_eh eh
 
@@ -190,7 +190,7 @@ Tests the ExceptionHandler PMC.
     set_addr myeh, subclassed_handler
     push_eh myeh
 
-    $P0 = new 'Exception'
+    $P0 = new ['Exception']
     throw $P0
 
   subclassed_failed:

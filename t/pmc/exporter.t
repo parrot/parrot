@@ -25,8 +25,8 @@ Tests the Exporter PMC.
 # L<PDD17/Exporter PMC>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    $P0 = new 'Exporter'
-    say "ok 1 - $P0 = new 'Exporter'"
+    $P0 = new ['Exporter']
+    say "ok 1 - $P0 = new ['Exporter']"
 
     $I0 = isa $P0, 'Exporter'
     if $I0 goto ok_2
@@ -35,13 +35,13 @@ pir_output_is( <<'CODE', <<'OUT', 'new' );
     say "ok 2 - isa $P0, 'Exporter'"
 .end
 CODE
-ok 1 - $P0 = new 'Exporter'
+ok 1 - $P0 = new ['Exporter']
 ok 2 - isa $P0, 'Exporter'
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'source' );
 .sub 'test' :main
-    new $P0, 'Exporter'
+    $P0 = new ['Exporter']
     $P1 = $P0.'source'()
     if null $P1 goto ok_1
     print 'not '
@@ -93,7 +93,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'destination' );
 .sub 'test' :main
-    new $P0, 'Exporter'
+    $P0 = new ['Exporter']
     $P1 = $P0.'destination'()
     unless null $P1 goto ok_1
     print 'not '
@@ -152,7 +152,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'globals' );
 .sub 'test' :main
-    $P0 = new 'Exporter'
+    $P0 = new ['Exporter']
 
     $P1 = $P0.'globals'()
     $I0 = isnull $P1
@@ -162,7 +162,7 @@ pir_output_is( <<'CODE', <<'OUT', 'globals' );
     say 'ok 1 - globals() returns PMCNULL upon Exporter init'
 
     # create an array to store globals in
-    $P99 = new 'ResizableStringArray'
+    $P99 = new ['ResizableStringArray']
 
     $P0.'globals'($P99)
     $P1 = $P0.'globals'()
@@ -193,7 +193,7 @@ pir_output_is( <<'CODE', <<'OUT', 'globals' );
     say 'ok 3 - globals() with array arg sets globals hash (hash with two keys)'
 
     # create a hash to store globals in
-    $P99 = new 'Hash'
+    $P99 = new ['Hash']
 
     $P0.'globals'($P99)
     $P1 = $P0.'globals'()
@@ -245,7 +245,7 @@ OUT
 
 pir_error_output_like( <<'CODE', <<'OUT', 'import - no args' );
 .sub 'test' :main
-    $P0 = new 'Exporter'
+    $P0 = new ['Exporter']
 
     $P0.'import'()
     say 'ok 1 - import() with no args throws an exception'
@@ -261,7 +261,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - same source and destination namespac
 
     src      = get_namespace
 
-    exporter = new 'Exporter'
+    exporter = new ['Exporter']
     exporter.'import'( src :named('source'), src :named('destination'), 'plan ok' :named('globals') )
     plan(1)
     ok(1)
@@ -288,7 +288,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as string' );
 
     src      = get_namespace [ 'Test'; 'More' ]
 
-    exporter = new 'Exporter'
+    exporter = new ['Exporter']
     exporter.'import'( src :named('source'), 'plan ok' :named('globals') )
     plan(1)
     ok(1)
@@ -305,7 +305,7 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals with source passed separatel
 
     src      = get_namespace [ 'Test'; 'More' ]
 
-    exporter = new 'Exporter'
+    exporter = new ['Exporter']
     exporter.'source'( src )
     exporter.'import'( 'plan ok' :named('globals') )
     plan(1)
@@ -322,11 +322,11 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as array' );
     .local pmc exporter, src, globals
 
     src     = get_namespace [ 'Test'; 'More' ]
-    globals = new 'ResizableStringArray'
+    globals = new ['ResizableStringArray']
     globals = push 'ok'
     globals = push 'plan'
 
-    exporter = new 'Exporter'
+    exporter = new ['Exporter']
     exporter.'import'( src :named('source'), globals :named('globals') )
     plan(1)
     ok(1)
@@ -341,13 +341,13 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - null + empty strin
     load_bytecode 'Test/More.pir'
     .local pmc exporter, src, globals, nul
 
-    nul     = new 'Null'
+    nul     = new ['Null']
     src     = get_namespace [ 'Test'; 'More' ]
-    globals = new 'Hash'
+    globals = new ['Hash']
     globals['ok'] = nul
     globals['plan'] = ''
 
-    exporter = new 'Exporter'
+    exporter = new ['Exporter']
     exporter.'import'( src :named('source'), globals :named('globals') )
     plan(1)
     ok(1)
@@ -363,11 +363,11 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals as hash - with dest names (l
     .local pmc exporter, src, globals
 
     src     = get_namespace [ 'Test'; 'More' ]
-    globals = new 'Hash'
+    globals = new ['Hash']
     globals['plan'] = 'consilium'
     globals['ok'] = 'rectus'
 
-    exporter = new 'Exporter'
+    exporter = new ['Exporter']
     exporter.'import'( src :named('source'), globals :named('globals') )
     consilium(1)
     rectus(1)
@@ -384,11 +384,11 @@ pir_output_is( <<'CODE', <<'OUT', 'import - globals with destination' );
 
     src     = get_namespace [ 'Test'; 'More' ]
     dest    = get_namespace ['foo']
-    globals = new 'ResizableStringArray'
+    globals = new ['ResizableStringArray']
     globals = push 'ok'
     globals = push 'plan'
 
-    exporter = new 'Exporter'
+    exporter = new ['Exporter']
     exporter.'import'( src :named('source'), dest :named('destination'), globals :named('globals') )
 
     $P0 = get_global ['foo'], 'bar'
