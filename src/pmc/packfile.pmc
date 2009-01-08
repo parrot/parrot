@@ -158,7 +158,7 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
             return pf->header->uuid_size;
 
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
-                       "PackFile: No such integer key \"%s\"",
+                       "Packfile: No such integer key \"%s\"",
                        Parrot_string_cstring(interp, key));
     }
 
@@ -183,7 +183,7 @@ Fetch a string keyed value from the packfile object.  Valid keys are:
             return string_from_cstring(interp, (char*)pf->header->uuid_data, pf->header->uuid_size);
 
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
-                       "PackFile: No such string key \"%s\"",
+                       "Packfile: No such string key \"%s\"",
                        Parrot_string_cstring(interp, key));
     }
 
@@ -259,7 +259,7 @@ Set an integer keyed value to the specified value.  Valid keys are:
             return;
         }
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
-                       "PackFile: No such integer key \"%s\"",
+                       "Packfile: No such integer key \"%s\"",
                        Parrot_string_cstring(interp, key));
     }
 

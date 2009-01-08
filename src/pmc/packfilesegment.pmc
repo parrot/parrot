@@ -80,7 +80,7 @@ Unpack a serialized segment string.
 */
     METHOD unpack(STRING *data) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                                    "unpack() not implemented.");
+                                    "PackfileSegment.unpack() not implemented yet.");
     }
 
 }
