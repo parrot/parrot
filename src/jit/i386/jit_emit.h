@@ -46,44 +46,31 @@
 /*
  * helper funcs - get argument n
  */
-INTVAL
-get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
-;
+INTVAL get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n);
 
-FLOATVAL
-get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n)
+FLOATVAL get_nci_N(PARROT_INTERP, ARGMOD(call_state *st), int n);
 ;
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
-get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n)
-;
+get_nci_S(PARROT_INTERP, ARGMOD(call_state *st), int n);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
-;
+get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n);
 
 /*
  * set return value
  */
-void
-set_nci_I(PARROT_INTERP, ARGOUT(call_state *st), INTVAL val)
-;
+void set_nci_I(PARROT_INTERP, ARGOUT(call_state *st), INTVAL val);
 
-void
-set_nci_N(PARROT_INTERP, ARGOUT(call_state *st), FLOATVAL val)
-;
+void set_nci_N(PARROT_INTERP, ARGOUT(call_state *st), FLOATVAL val);
 
-void
-set_nci_S(PARROT_INTERP, ARGOUT(call_state *st), STRING *val)
-;
+void set_nci_S(PARROT_INTERP, ARGOUT(call_state *st), STRING *val);
 
-void
-set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val)
-;
+void set_nci_P(PARROT_INTERP, ARGOUT(call_state *st), PMC* val);
 
 
 #if defined HAVE_COMPUTED_GOTO && defined __GNUC__ && PARROT_I386_JIT_CGP
@@ -194,39 +181,23 @@ extern UINTVAL ld(UINTVAL);
 
 #define emit_alu_r_r(reg1, reg2) emit_alu_X_r(((reg1) - 1), (reg2))
 
-int
-emit_is8bit(long disp)
-;
+int emit_is8bit(long disp);
 
-char *
-emit_disp8_32(char *pc, int disp)
-;
+char * emit_disp8_32(char *pc, int disp);
 
-void
-emit_sib(PARROT_INTERP, char *pc, int scale, int i, int base)
-;
+void emit_sib(PARROT_INTERP, char *pc, int scale, int i, int base);
 
-char *
-emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, long disp)
-;
+char * emit_r_X(PARROT_INTERP, char *pc, int reg_opcode, int base, int i, int scale, long disp);
 
-char *
-emit_shift_i_r(PARROT_INTERP, char *pc, int opcode, int imm, int reg)
-;
+char * emit_shift_i_r(PARROT_INTERP, char *pc, int opcode, int imm, int reg);
 
-char *
-emit_shift_i_m(PARROT_INTERP, char *pc, int opcode, int imm,
-               int base, int i, int scale, long disp)
-;
+char * emit_shift_i_m(PARROT_INTERP, char *pc, int opcode, int imm,
+               int base, int i, int scale, long disp);
 
-char *
-emit_shift_r_r(PARROT_INTERP, char *pc, int opcode, int reg1, int reg2)
-;
+char * emit_shift_r_r(PARROT_INTERP, char *pc, int opcode, int reg1, int reg2);
 
-char *
-emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
-               int base, int i, int scale, long disp)
-;
+char * emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
+               int base, int i, int scale, long disp);
 
 
 /* CDQ - need this to do multiply */
@@ -263,36 +234,26 @@ emit_shift_r_m(PARROT_INTERP, char *pc, int opcode, int reg,
 #endif /* EXEC_CAPABLE */
 
 
-char *
-emit_pushl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
-;
+char * emit_pushl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp);
 
 /* POPs */
 
-char *
-emit_popl_r(char *pc, int reg)
-;
+char * emit_popl_r(char *pc, int reg);
 
 #  define emitm_popl_r(pc, reg) \
     (pc) = emit_popl_r((pc), (reg))
 
-char *
-emit_popl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp)
-;
+char * emit_popl_m(PARROT_INTERP, char *pc, int base, int i, int scale, long disp);
 
 /* MOVes */
 
-static char *
-emit_movb_r_r(char *pc, int reg1, int reg2)
-;
+char * emit_movb_r_r(char *pc, int reg1, int reg2);
 
 #  define jit_emit_mov_rr_i(pc, reg2, reg1) if ((reg1) != (reg2)) { \
     *((pc)++) = (char) 0x89; \
     *((pc)++) = (char) emit_alu_r_r((reg1), (reg2)); }
 
-static char *
-emit_movb_i_r(char *pc, char imm, int reg)
-;
+char * emit_movb_i_r(char *pc, char imm, int reg);
 
 #  define jit_emit_mov_ri_i(interp, pc, reg, imm) { \
     *((pc)++) = (char)(0xb8 | ((reg) - 1)); \
@@ -340,9 +301,7 @@ emit_movb_i_r(char *pc, char imm, int reg)
 #  define emitm_lea_m_r(interp, pc, reg1, b, i, s, d) \
     emitm_movX_Y_Z((interp), 0x8d, (pc), (reg1), (b), (i), (s), (d))
 
-static char *
-emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, long disp)
-;
+char * emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, long disp);
 
 #  define emitm_movl_i_m(pc, imm, b, i, s, d) { \
     *((pc)++) = (char) 0xc7; \
@@ -461,9 +420,7 @@ emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, lon
     *(pc)++ = 0xf; \
     emitm_alul_r_m((pc), 0xaf, (reg1), (b), (i), (s), (d)); }
 
-char *
-opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
-;
+char * opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src);
 
 #  define jit_emit_mul_rir_i(pc, dest, imm, src) \
        (pc) = opt_mul(interp, (pc), (dest), (imm), (src))
@@ -632,17 +589,11 @@ opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
 #  define jit_emit_ror_ri_i(interp, pc, reg, imm) \
     { (pc) = emit_shift_i_r((interp), (pc), emit_b001, (imm), (reg)); }
 
-int
-intreg_is_used(Parrot_jit_info_t *jit_info, char reg)
-;
+int intreg_is_used(Parrot_jit_info_t *jit_info, char reg);
 
-char *
-opt_shift_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int count, int op)
-;
+char * opt_shift_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int count, int op);
 
-char *
-opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int op)
-;
+char * opt_shift_rm(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int op);
 
 /* interface, shift r1 by r2 bits */
 
@@ -1455,9 +1406,7 @@ extern unsigned char *lastpc;
 }
 
 /* ST(r1) /= ST(r2) */
-char *
-div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
-;
+char * div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1);
 
 #  define jit_emit_div_rr_n(interp, pc, r1, r2) \
     emitm_fld((pc), (r2)); \
@@ -1474,9 +1423,7 @@ div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1)
     jit_info->native_ptr = (pc); \
     (pc) = div_rr_n((interp), jit_info, (r))
 
-char *
-mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
-;
+char * mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r);
 
 /* ST(i) %= MEM
  * please note the hardccded jumps */
@@ -1516,7 +1463,6 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
     emitm_sahf(pc); \
 }
 
-
 /* compare mem <-> ST(r) */
 #  define jit_emit_cmp_mi_n(interp, pc, mem, r) { \
     jit_emit_fload_m_n((interp), (pc), (mem)); \
@@ -1545,7 +1491,6 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
       } \
     } \
 }
-
 
 #  define jit_emit_neg_M_i(interp, pc, offs) \
     emitm_negl_m((pc), emit_EBX, emit_None, 1, (long)(offs))
@@ -1580,40 +1525,32 @@ mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r)
 /* dest /= src
  * edx:eax /= src, quotient => eax, rem => edx
  */
-char *
-opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src, int is_div)
-;
+char * opt_div_rr(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int src,
+	int is_div);
 
 #  define jit_emit_div_rr_i(interp, pc, r1, r2) (pc) = opt_div_rr((interp), jit_info, (r1), (r2), 1)
 #  define jit_emit_cmod_rr_i(interp, pc, r1, r2) (pc) = opt_div_rr((interp), jit_info, (r1), (r2), 0)
 
-char *
-opt_div_ri(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, INTVAL imm, int is_div)
-;
+char * opt_div_ri(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, INTVAL imm,
+	int is_div);
 
 #  define jit_emit_div_ri_i(pc, r1, imm) (pc) = opt_div_ri(interp, jit_info, (r1), (imm), 1)
 #  define jit_emit_cmod_ri_i(pc, r1, imm) (pc) = opt_div_ri(interp, jit_info, (r1), (imm), 0)
 
-char *
-opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int is_div)
-;
+char * opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs,
+	int is_div);
 
 #  define jit_emit_div_RM_i(interp, pc, r, m)  (pc) = opt_div_RM((interp), jit_info, (r), (m), 1)
 #  define jit_emit_cmod_RM_i(interp, pc, r, m) (pc) = opt_div_RM((interp), jit_info, (r), (m), 0)
 
 enum { JIT_X86BRANCH, JIT_X86JUMP, JIT_X86CALL };
 
-void
-jit_emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp)
-;
+void jit_emit_jcc(Parrot_jit_info_t *jit_info, int code, opcode_t disp);
 
-void
-emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp)
-;
+void emit_jump(Parrot_jit_info_t *jit_info, opcode_t disp);
 
-void
-Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-;
+void Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP);
+
 
 #  define jit_emit_stack_frame_enter(pc) do { \
     emitm_pushl_r((pc), emit_EBP); \
@@ -1653,138 +1590,91 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 EXTERN INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
 EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
 
-char*
-jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
-;
+char * jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset);
 
-char*
-jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
-;
-
+char * jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset);
 
 /*
  * for vtable calls registers are already saved back
  */
-void
-Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
-                PARROT_INTERP, int n, int *args)
-;
+void Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
+                PARROT_INTERP, int n, int *args);
 
-void
-Parrot_jit_store_retval(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_store_retval(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1)
  */
-void
-Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable1_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1 = $2->vtable(interp, $2)
  */
-void
-Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
-
+void Parrot_jit_vtable1r_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1 = $2->vtable(interp, $2, $3)
  */
-void
-Parrot_jit_vtable_1r223_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_1r223_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1 = $3->vtable(interp, $3, $2)
  */
-void
-Parrot_jit_vtable_1r332_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_1r332_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2)
  */
-void
-Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_112_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $1)
  */
-void
-Parrot_jit_vtable_111_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_111_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $2->vtable(interp, $2, $1)
  */
-void
-Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_221_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $2->vtable(interp, $2, $3, $1)
  */
-void
-Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_2231_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2, $3)
  */
-void
-Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_1123_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* emit a call to a vtable func
  * $1->vtable(interp, $1, $2, $1)
  */
-void
-Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
+void Parrot_jit_vtable_1121_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP);
 
 /* if_p_ic, unless_p_ic */
-void
-Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP, int unless)
-;
+void Parrot_jit_vtable_if_unless_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP, int unless);
 
 /* unless_p_ic */
- void
-Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_unlessp_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* if_p_ic */
-void
-Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
+void Parrot_jit_vtable_ifp_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 /* new_p_ic */
-void
-Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-;
-
-#  undef IREG
-#  undef NREG
-#  undef SREG
-#  undef PREG
-#  undef CONST
-#  undef CALL
+void Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
+                     PARROT_INTERP);
 
 #endif /* JIT_VTABLE_OPS */
 
@@ -1839,24 +1729,18 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
 
 #endif /* JIT_CGP */
 
-void
-jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-;
+void jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 /*
  * preserve registers
  * a) all callee saved on function entry
  */
 
- void
-jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-;
+void jit_save_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 /* restore saved regs, see above */
 
-void
-jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-;
+void jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 /*
  * preserve registers around a functioncall
@@ -1868,23 +1752,16 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
  *      and a macro to retrive sp
  */
 
-int
-jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
-;
+int jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip);
 
-void
-jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-        int skip)
-;
+void jit_restore_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP,
+        int skip);
 
-void
-jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
+void jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
         int recursive);
 
-void
-jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
-        int recursive)
-;
+void jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
+        int recursive);
 
 /*
  * if jit_emit_noop is defined, it does align a jump target
@@ -1955,12 +1832,9 @@ extern int control_word;
 
 #endif /* JIT_EMIT = 0 */
 
-void
-Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
-;
+void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
-void
-Parrot_jit_begin(Parrot_jit_info_t *jit_info,
+void Parrot_jit_begin(Parrot_jit_info_t *jit_info,
                  PARROT_INTERP);
 
 
@@ -1977,40 +1851,31 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
  *   args[n + 1] .. opcode_t* next - ususally just returned
  */
 
-void
-Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
+void Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
                  PARROT_INTERP);
 
 
-void
-Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
+void Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
                  PARROT_INTERP);
 
-void
-jit_mov_mr_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+void jit_mov_mr_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int base_reg, INTVAL offs, int src_reg);
 
-void
-jit_mov_mr_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+void jit_mov_mr_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int base_reg, INTVAL offs, int src_reg);
 
-void
-jit_mov_rm_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+void jit_mov_rm_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs);
 
-void
-jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+void jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs);
 
-void
-Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info);
+void Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info);
 
-void
-Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
+void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                      PARROT_INTERP);
 
-void
-Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
+void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP);
 
 #if JIT_EMIT == 2
@@ -2023,19 +1888,15 @@ Parrot_end_jit(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 #  undef Parrot_jit_restart_op
 #endif /* JIT_EMIT == 2 */
 
-void
-Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
+void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP);
 				   
 
-int
-count_regs(PARROT_INTERP, char *sig, char *sig_start);
+int count_regs(PARROT_INTERP, char *sig, char *sig_start);
 
-size_t
-calc_signature_needs(const char *sig, int *strings);
+size_t calc_signature_needs(const char *sig, int *strings);
  
-void *
-Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature);
+void * Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature);
 
 /*
  * register usage
@@ -2053,8 +1914,7 @@ extern const char i_map_sub[];
 
 static const jit_arch_info arch_info;
 
-const jit_arch_info *
-Parrot_jit_init(PARROT_INTERP);
+const jit_arch_info * Parrot_jit_init(PARROT_INTERP);
 
 #undef INT_REGISTERS_TO_MAP
 #endif /* PARROT_I386_JIT_EMIT_H_GUARD */
