@@ -1783,15 +1783,16 @@ void jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
 #  define JUMP_ALIGN 0
 #  define SUB_ALIGN 0
 
-#if JIT_EMIT == 0
+#ifdef JIT_EMIT
+#  if JIT_EMIT == 0
 
 extern int control_word;
 
-#  ifdef JIT_CGP
-#    include <parrot/oplib/core_ops_cgp.h>
-#  endif
+#    ifdef JIT_CGP
+#      include <parrot/oplib/core_ops_cgp.h>
+#    endif
 
-#  define REQUIRES_CONSTANT_POOL 0
+#    define REQUIRES_CONSTANT_POOL 0
 /*
  * examples/pir/mandel.pir and t/op/jitn_14 show rounding problems
  * due to keeping intermediate results in FP registers
@@ -1802,23 +1803,24 @@ extern int control_word;
  * setting a different control word (with precision control = double)
  * see emitm_fldcw above
  */
-#  define FLOAT_REGISTERS_TO_MAP 4
+#    define FLOAT_REGISTERS_TO_MAP 4
 
 /* registers are either allocate per section or per basic block
  * set this to 1 or 0 to change allocation scheme
  */
-#  define ALLOCATE_REGISTERS_PER_SECTION 1
+#    define ALLOCATE_REGISTERS_PER_SECTION 1
 
 /*
  * new style move function using offsets relative to the base_reg
  */
-#  ifdef JIT_CGP
-#    define INTERP_BP_OFFS todo
-#  else
-#    define INTERP_BP_OFFS -16
-#  endif
+#    ifdef JIT_CGP
+#      define INTERP_BP_OFFS todo
+#    else
+#      define INTERP_BP_OFFS -16
+#    endif
 
-#endif /* JIT_EMIT = 0 */
+#  endif /* JIT_EMIT = 0 */
+#endif /* JIT_EMIT */
 
 void Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
@@ -1859,14 +1861,16 @@ void Parrot_jit_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 void Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
-#if JIT_EMIT == 2
+#ifdef JIT_EMIT
+#  if JIT_EMIT == 2
 /* generate code just once */
 
 /* autogened inside core.ops */
 static void Parrot_end_jit(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
-#  undef Parrot_jit_restart_op
-#endif /* JIT_EMIT == 2 */
+#    undef Parrot_jit_restart_op
+#  endif /* JIT_EMIT == 2 */
+#endif /* JIT_EMIT */
 
 void Parrot_jit_restart_op(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
