@@ -2227,3 +2227,137 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
 }
 
 #endif /* JIT_CGP */
+
+/* RET */
+#define emitm_ret(pc) *((pc)++) = (char) 0xc3
+
+#  define jit_emit_stack_frame_leave(pc) do { \
+    jit_emit_mov_rr_i((pc), emit_ESP, emit_EBP); \
+    emitm_popl_r((pc), emit_EBP); \
+} while (0)
+
+#  define jit_emit_bxor_rr_i(interp, pc, reg1, reg2) \
+    emitm_alul_r_r((pc), 0x31, (reg2), (reg1))
+	
+#  define jit_emit_fst_mb_n(interp, pc, base, offs) \
+      emitm_fstl((interp), (pc), (base), emit_None, 1, (offs))
+	  
+#  define emitm_fstl(interp, pc, b, i, s, d) \
+    emitm_fl_2((interp), (pc), emit_b10, 1, emit_b010, (b), (i), (s), (d))
+
+/*
+ * create a JITted version of a PIR sub, where everything
+ * resided in registers
+ *
+ * The sub is called as
+ *
+ *   opcode_t * func(Interp *i, INTVAL *sig_bits, void **args);
+ *
+ *   args[0] ...    NULL / return value address
+ *   args[1..n] ... addresses of n arguments
+ *   args[n + 1] .. opcode_t* next - ususally just returned
+ */
+
+void
+Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
+                 PARROT_INTERP)
+{
+    jit_emit_stack_frame_enter(jit_info->native_ptr);
+    /* stack:
+     *  16   args
+     *  12   sig_bits
+     *   8   interpreter
+     *   4   retaddr
+     *   0   ebp <----- ebp
+     * [ -4   ebx .. preserved regs ]
+     * [ -8   edi .. preserved regs ]
+     */
+    /*
+     * check register usage of the subroutine
+     * how many we have to preserve
+     */
+    jit_save_regs(jit_info, interp);
+    /* when it's a recursive sub, we fetch params to registers
+     * and all a inner helper sub, which run with registers only
+     */
+    if (jit_info->flags & JIT_CODE_RECURSIVE) {
+        char * L1;
+        PackFile_Constant ** constants;
+        PMC *sig_result;
+        opcode_t *result;
+
+        jit_get_params_pc(jit_info, interp);
+        /* remember fixup position - call sub */
+        L1 = NATIVECODE;
+        emitm_calll(NATIVECODE, 0);
+        /* check type of return value */
+        constants = CONTEXT(interp)->constants;
+        result = CONTEXT(interp)->current_results;
+        sig_result = constants[result[1]]->u.key;
+        if (!SIG_ELEMS(sig_result))
+            goto no_result;
+        /* fetch args to %edx */
+        emitm_movl_m_r(interp, NATIVECODE, emit_EDX, emit_EBP, emit_None, 1, 16);
+        emitm_movl_m_r(interp, NATIVECODE, emit_ECX, emit_EDX, emit_None, 1, 0);
+        if (SIG_ITEM(sig_result, 0) == PARROT_ARG_FLOATVAL) {
+            jit_emit_fst_mb_n(interp, jit_info->native_ptr, emit_ECX, 0);
+        }
+        else {
+            emitm_movl_r_m(interp, NATIVECODE, emit_EAX, emit_ECX, 0, 1, 0);
+        }
+no_result:
+        /* return 0 - no branch */
+        jit_emit_bxor_rr_i(interp, NATIVECODE, emit_EAX, emit_EAX);
+        /* restore pushed callee saved */
+        jit_restore_regs(jit_info, interp);
+        jit_emit_stack_frame_leave(NATIVECODE);
+        emitm_ret(NATIVECODE);
+        /* align the inner sub */
+#  if SUB_ALIGN
+        while ((long)jit_info->native_ptr & ((1<<SUB_ALIGN) - 1)) {
+            jit_emit_noop(jit_info->native_ptr);
+        }
+#  endif
+        /* fixup call statement */
+        L1[1] = NATIVECODE - L1 - 5;
+    }
+    /* TODO be sure we got a label here in map_branch */
+}
+
+void
+Parrot_jit_begin_sub(Parrot_jit_info_t *jit_info,
+                 PARROT_INTERP)
+{
+}
+
+void
+jit_mov_mr_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+        int base_reg, INTVAL offs, int src_reg)
+{
+    emitm_fld(jit_info->native_ptr, src_reg);
+    jit_emit_fstore_mb_n(interp, jit_info->native_ptr, base_reg, offs);
+}
+
+void
+jit_mov_mr_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+        int base_reg, INTVAL offs, int src_reg)
+{
+    emitm_movl_r_m(interp, jit_info->native_ptr,
+            src_reg, base_reg, emit_None, 1, offs);
+}
+
+void
+jit_mov_rm_n_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+        int dst_reg, int base_reg, INTVAL offs)
+{
+    jit_emit_fload_mb_n(interp, jit_info->native_ptr, base_reg,  offs);
+    emitm_fstp(jit_info->native_ptr, (dst_reg+1));
+}
+
+void
+jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
+        int dst_reg, int base_reg, INTVAL offs)
+{
+    emitm_movl_m_r(interp, jit_info->native_ptr,
+            dst_reg, base_reg, emit_None, 1, offs);
+}
