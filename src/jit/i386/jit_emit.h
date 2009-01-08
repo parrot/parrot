@@ -1976,162 +1976,16 @@ jit_mov_rm_offs(PARROT_INTERP, Parrot_jit_info_t *jit_info,
 #if JIT_EMIT == 2
 /* generate code just once */
 
-static void
-Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
-{
-    jit_emit_finit(jit_info->native_ptr);
-}
-
-
-
-#  ifdef JIT_CGP
-/*
- * XXX needs some fixing
- * s. t/sub/pmc_{8,9}.t: the 2 print in tail call without that 'end'
- *    are recogniced as one non JIIted block
- */
 void
-Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-{
-    Parrot_jit_optimizer_section_ptr cur_section =
-        jit_info->optimizer->cur_section;
-    int last_is_branch = 0;
-    void ** offset;
-
-    PARROT_ASSERT(op_jit[*jit_info->cur_op].extcall == 1);
-    if (cur_section->done == 1)
-        return;
-    else if (cur_section->done == -1 && --cur_section->ins_count > 0)
-        return;
-    /* check, where section ends
-     */
-    if (interp->op_info_table[*cur_section->end].jump)
-        last_is_branch = 1;
-    else if (cur_section->next && !cur_section->next->isjit)
-        last_is_branch = 1;
-    /* if more then 1 op, then jump to CGP, branches are never
-     * executed in CGP, they are handled below */
-    if (cur_section->done >= 0 &&
-            (INTVAL)cur_section->op_count >= 2 + last_is_branch) {
-        int saved = 0;
-        offset = (jit_info->cur_op - interp->code->base.data) +
-            interp->code->prederef.code;
-
-        jit_emit_mov_ri_i(interp, jit_info->native_ptr, emit_ESI, offset);
-        emitm_callm(jit_info->native_ptr, emit_ESI, 0, 0, 0);
-        /* now patch a B<cpu_ret> opcode after the end of the
-         * prederefed (non JIT) section
-         */
-        if (last_is_branch) {
-            offset = (cur_section->end - interp->code->base.data) +
-                interp->code->prederef.code;
-            cur_section->done = -1;
-            /* ins to skip */
-            cur_section->ins_count = cur_section->op_count - 1;
-        }
-        else {
-            /* There must be a next section: either we have a B<end>
-             * or a JITed branch,
-             * when the branch is non JIT, we are in the above case
-             */
-            offset = (cur_section->next->begin - interp->code->base.data)
-                + interp->code->prederef.code;
-            cur_section->done = 1;
-        }
-        *offset = ((op_func_t*)interp->op_lib->op_func_table)[2];
-    }
-    else {
-        /* else call normal funtion */
-        emitm_pushl_i(jit_info->native_ptr, interp);
-        emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
-        call_func(jit_info,
-            (void (*)(void))interp->op_func_table[*(jit_info->cur_op)]);
-        emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
-        /* when this was a branch, then EAX is now the offset
-         * in the byte_code
-         */
-    }
-}
-
-#  else /* JIT_CGP */
-extern int jit_op_count(void);
+Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info);
 
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
-                     PARROT_INTERP)
-{
-    int cur_op = *jit_info->cur_op;
-    static int check;
-
-    if (cur_op >= jit_op_count()) {
-        cur_op = CORE_OPS_wrapper__;
-    }
-
-    if ((++check & 0x7) == 0) {
-        /*
-         * every 8 ??? normal ops, we emit a check for event processing
-         */
-
-/*
- * There is an optimization to reuse arguments on the stack.  Compilers may
- * decide to reuse the argument space though.  If you are *absolutely sure*
- * this does not happen define PARROT_JIT_STACK_REUSE_INTERP.
- */
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-        /*
-        * op functions have the signature (cur_op, interp)
-        * we use the interpreter already on stack and only push the
-        * cur_op
-        */
-#    else
-        /* push interpreter */
-        Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-        emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#    endif
-
-        emitm_pushl_i(jit_info->native_ptr, CORE_OPS_check_events);
-
-        call_func(jit_info,
-            (void (*) (void)) (interp->op_func_table[CORE_OPS_check_events]));
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-        emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
-#    else
-        emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
-#    endif
-    }
-
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-    /*
-    * op functions have the signature (cur_op, interp)
-    * we use the interpreter already on stack and only push the
-    * cur_op
-    */
-#    else
-    Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
-    emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#    endif
-
-    emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
-
-    call_func(jit_info,
-            (void (*) (void))(interp->op_func_table[cur_op]));
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
-    emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
-#    else
-    emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
-#    endif
-}
-
-#  endif /* JIT_CGP */
+                     PARROT_INTERP);
 
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
-                   PARROT_INTERP)
-{
-    Parrot_jit_normal_op(jit_info, interp);
-    Parrot_emit_jump_to_eax(jit_info, interp);
-}
+                   PARROT_INTERP);
 
 
 /* autogened inside core.ops */
@@ -2139,30 +1993,11 @@ static void
 Parrot_end_jit(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 #  undef Parrot_jit_restart_op
+
 void
 Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
-                   PARROT_INTERP)
-{
-    char *jmp_ptr, *sav_ptr;
-
-    Parrot_jit_normal_op(jit_info, interp);
-    /* test eax, if zero (e.g after trace), return from JIT */
-    jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
-    /* remember PC */
-    jmp_ptr = jit_info->native_ptr;
-    /* emit jump past exit code, dummy offset
-     * this assumes exit code is not longer then a short jump (126 bytes) */
-    emitm_jxs(jit_info->native_ptr, emitm_jnz, 0);
-    Parrot_end_jit(jit_info, interp);
-    /* fixup above jump */
-    sav_ptr = jit_info->native_ptr;
-    jit_info->native_ptr = jmp_ptr;
-    emitm_jxs(jit_info->native_ptr, emitm_jnz, (long)(sav_ptr - jmp_ptr) - 2);
-    /* restore PC */
-    jit_info->native_ptr = sav_ptr;
-    Parrot_emit_jump_to_eax(jit_info, interp);
-}
-
+                   PARROT_INTERP);
+				   
 /*
  * params are put rigth to left on the stack
  * parrot registers are counted left to right
