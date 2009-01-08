@@ -345,17 +345,22 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 =item C<static INTVAL compare>
 
-Returns 0. We can't directly compare two binary buffers (yet).
+Compare the two buffers, first by size, then with memcmp.
 
 =cut
 
 */
 
 static INTVAL
-compare(SHIM_INTERP, SHIM(const STRING *lhs), SHIM(const STRING *rhs))
+compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     ASSERT_ARGS(compare)
-    return 0;
+    const UINTVAL l_len = lhs->strlen;
+    const UINTVAL r_len = rhs->strlen;
+    if (l_len != r_len)
+        return l_len - r_len;
+
+    return memcmp(lhs->strstart, rhs->strstart, l_len);
 }
 
 /*
