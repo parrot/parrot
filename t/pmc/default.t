@@ -25,7 +25,7 @@ Tests the default PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not implemeted' );
 .sub 'test' :main
-    new P0, 'default'
+    new P0, ['default']
     print "ok 1\n"
 .end
 CODE
@@ -34,7 +34,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'inspect vtable function');
 .sub 'test' :main
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P1 = inspect $P0, 'flags'
     $I9 = 1 << 9   # PObj_is_PMC_FLAG
     $I29 = 1 << 29 # PObj_is_class_FLAG

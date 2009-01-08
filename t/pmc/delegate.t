@@ -25,7 +25,7 @@ Tests method delegation.
 # basic functionality - setting and getting types
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate set_integer_native" );
-    new P0, 'delegate'
+    new P0, ['delegate']
     set P0, 42
     end
 .namespace ["delegate"]
@@ -42,7 +42,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_integer" );
-    new P0, 'delegate'
+    new P0, ['delegate']
     set I0, P0
     print I0
     print "\n"
@@ -58,7 +58,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate set_string_native" );
-    new P0, 'delegate'
+    new P0, ['delegate']
     set P0, "fortytwo"
     end
 .namespace ["delegate"]
@@ -72,7 +72,7 @@ fortytwo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_string" );
-    new P0, 'delegate'
+    new P0, ['delegate']
     set S0, P0
     print S0
     print "\n"
@@ -88,7 +88,7 @@ fortytwo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate set_number_native" );
-    new P0, 'delegate'
+    new P0, ['delegate']
     set P0, 47.11
     end
 .namespace ["delegate"]
@@ -102,7 +102,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate get_number" );
-    new P0, 'delegate'
+    new P0, ['delegate']
     set N0, P0
     print N0
     print "\n"
@@ -118,8 +118,8 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "delegate assign_pmc" );
-    new P0, 'delegate'
-    new P1, 'Integer'
+    new P0, ['delegate']
+    new P1, ['Integer']
     set P1, 42
     assign P0, P1
     end
@@ -137,9 +137,9 @@ OUTPUT
 # math
 pir_output_is( <<'CODE', <<'OUTPUT', "delegate add_p_p_i" );
 .sub main
-    new $P0, 'delegate'
+    $P0 = new ['delegate']
     set $P0, 1
-    new $P2, 'Integer'
+    $P2 = new ['Integer']
     add $P2, $P0, 1
     print $P2   # yeah 1+1 = 3
     print "\n"
@@ -159,7 +159,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "delegate add_p_p_i" );
     .param pmc d
     print r
     print "\n"
-    d = new 'Integer'
+    d = new ['Integer']
     d =  3
     .return(d)
 .end
@@ -172,11 +172,11 @@ OUTPUT
 # math
 pir_output_is( <<'CODE', <<'OUTPUT', "delegate add_p_p_p" );
 .sub main
-    new $P0, 'delegate'
+    $P0 = new ['delegate']
     set $P0, 1
-    new $P1, 'Integer'
+    $P1 = new ['Integer']
     set $P1, 1
-    new $P2, 'Integer'
+    $P2 = new ['Integer']
     set $P2, 777
     add $P2, $P0, $P1
     print $P2   # yeah 1+1 = 3

@@ -17,12 +17,12 @@ Tests the Enumerate PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new $P1, 'Array'
-    new $P0, 'Enumerate', $P1
+    $P1 = new ['Array']
+    $P2 = new ['Enumerate'], $P1
 
     ok(1, "Instantiated 'Enumerate'")
 .end

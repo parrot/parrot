@@ -21,7 +21,7 @@ Tests the deleg_pmc PMC.
 
     plan(1)
 
-    new $P0, 'deleg_pmc'
+    $P0 = new ['deleg_pmc']
     ok(1, 'Instantiated .deleg_pmc')
 .end
 

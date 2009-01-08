@@ -26,7 +26,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
 .include "interpinfo.pasm"
 .pcc_sub _main:
     .const 'Sub' P0 = "_coro"
-    new P10, 'Integer'
+    new P10, ['Integer']
     set P10, 2
     set_global "i", P10
 lp:
@@ -57,10 +57,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
     .const 'Sub' itr = "_iterator"
 
     .local pmc zero
-    zero = new 'Integer'
+    zero = new ['Integer']
     zero = 0
 
-    new return, 'Continuation'
+    return = new ['Continuation']
     set_addr return, return_here
     loop:
         .begin_call
@@ -82,7 +82,7 @@ return_here:
 
 .sub _iterator
     .local pmc x
-    x = new 'Integer'
+    x = new ['Integer']
     x = 0
     iloop:
         .begin_yield
@@ -111,7 +111,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
 _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
-    new P16, 'Integer'
+    new P16, ['Integer']
     set P16, 2
     set_global "i", P16
 lp:
@@ -150,7 +150,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro" );
 _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
-    new P16, 'Integer'
+    new P16, ['Integer']
     set P16, 2
     set_global "i", P16
 lp:
@@ -189,7 +189,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro no handler"
 _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
-    new P16, 'Integer'
+    new P16, ['Integer']
     set P16, 2
     set_global "i", P16
 lp:
@@ -225,7 +225,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in coro rethrow" );
 _main:
     .const 'Sub' P0 = "_coro"
     push_eh _catchm
-    new P16, 'Integer'
+    new P16, ['Integer']
     set P16, 2
     set_global "i", P16
 lp:
@@ -271,7 +271,7 @@ pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
 .end
 .sub coro
     .local pmc x
-    x = new 'Integer'
+    x = new ['Integer']
     x = 0
     iloop:
         .yield (x)
@@ -298,7 +298,7 @@ ex:
 .end
 .sub coro
     .local pmc x
-    x = new 'Integer'
+    x = new ['Integer']
     x = 0
     iloop:
         .yield (x)
@@ -319,7 +319,7 @@ loop:
 .end
 .sub coro
     .local pmc x
-    x = new 'Integer'
+    x = new ['Integer']
     x = 0
     iloop:
         .yield (x)
@@ -334,7 +334,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Coroutine'
+    pmc1 = new ['Coroutine']
     .local int bool1
     does bool1, pmc1, "scalar"      # XXX WTF
     print bool1

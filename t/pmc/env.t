@@ -17,7 +17,7 @@ Tests the C<Env> PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     plan(16)
 
     all_envs_are_identical()
@@ -32,8 +32,8 @@ Tests the C<Env> PMC.
 .end
 
 .sub all_envs_are_identical
-    new $P0, 'Env'
-    new $P1, 'Env'
+    $P0 = new ['Env']
+    $P1 = new ['Env']
     eq_addr $P0, $P1, ok
     ok(0, "all Envs aren't identical")
     goto end
@@ -43,17 +43,17 @@ end:
 .end
 
 .sub setenv_getenv
-    new $P0, 'Env'
+    $P0 = new ['Env']
     set $P0['PARROT_TMP'], 'hello polly'
     set $S0, $P0['PARROT_TMP']
     is($S0, 'hello polly', 'getenv and setenv work with string keys')
     delete $P0['PARROT_TMP']
 
-    new $P1, 'Key'
+    $P1 = new ['Key']
     set $P1, "PARROT_TMP"
-    new $P2, 'String'
+    $P2 = new ['String']
     set $P2, "Foobar"
-    new $P3, 'String'
+    $P3 = new ['String']
     set $P0[$P1], $P2
     set $P3, $P0[$P1]
     is($P3, "Foobar", "getenv and setenv work with PMC keys")
@@ -64,17 +64,17 @@ end:
 .end
 
 .sub all_envs_are_the_same
-    new $P0, 'Env'
+    $P0 = new ['Env']
     set $P0['PARROT_TMP'], 'hello polly'
     set $S0, $P0['PARROT_TMP']
-    new $P1, 'Env'
+    $P1 = new ['Env']
     set $S1, $P1['PARROT_TMP']
     is($S0, $S1, 'all envs are the same')
     delete $P0['PARROT_TMP']
 .end
 
 .sub gone_delete
-    new $P0, 'Env'
+    $P0 = new ['Env']
     set $P0['PARROT_TMP'], 'hello polly'
     exists $I0, $P0['PARROT_TMP']
     if $I0, ok1
@@ -90,7 +90,7 @@ ok2:
 .end
 
 .sub iterate
-    new $P0, 'Env'
+    $P0 = new ['Env']
     set $P0["PARROT_1"], "hello"
     set $P0["PARROT_2"], "polly"
     iter $P1, $P0
@@ -121,7 +121,7 @@ loopend:
 
     unless $I0 goto no_unsetenv
 
-    new $P0, 'Env'
+    $P0 = new ['Env']
     set $P0['PARROT_TMP'], 'hello polly'
     exists $I0, $P0['PARROT_TMP']
     ok( $I0, "set env var stays set")
@@ -138,7 +138,7 @@ end:
 
 .sub is_interface_done
     .local pmc pmc1
-    pmc1 = new 'Env'
+    pmc1 = new ['Env']
     .local int bool1
 
     does bool1, pmc1, 'hash'
@@ -157,7 +157,7 @@ end:
     .local num num_before, num_after, num_diff
 
     # add three more keys in env
-    env = new 'Env'
+    env = new ['Env']
     num_before = env
     int_before = env
     env["PARROT_TMP_ADD_1"] = "tmp_add_1"
@@ -178,7 +178,7 @@ end:
 
 ## RT #50186 - shouldn't segfault
 .sub oob_query
-    new $P0, 'Env'
+    $P0 = new ['Env']
     set $S0, $P0[999]
     is($S0, '', 'no segfault')
 .end

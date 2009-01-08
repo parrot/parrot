@@ -25,12 +25,12 @@ Tests the Continuation PMC.
 .end
 
 .sub test_new
-    new $P0, 'Continuation'
+    $P0 = new ['Continuation']
     ok(1, "new Continuation didn't explode")
 .end
 
 .sub invoke_with_init
-    new $P0, 'Continuation'
+    $P0 = new ['Continuation']
     set_addr $P0, L1
     $P0()
     ok(0, "didn't call continuation")
