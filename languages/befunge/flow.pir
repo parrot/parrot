@@ -54,14 +54,14 @@
 .sub "flow__toggle_string_mode"
     $P0 = get_global "status"
     $I0 = $P0["flag"]
-  
+
     if $I0 == 1 goto FLOW__TOGGLE_STRING_MODE__OFF
     $P0["flag"] = 1
     goto FLOW__TOGGLE_STRING_MODE__DONE
-    
+
   FLOW__TOGGLE_STRING_MODE__OFF:
     $P0["flag"] = 0
-  
+
   FLOW__TOGGLE_STRING_MODE__DONE:
     set_global "status", $P0
 .end

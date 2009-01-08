@@ -69,28 +69,28 @@
 
     if debug == 0 goto TICK_NODEBUG
     debug__check_breakpoint()
-    
+
   TICK_NODEBUG:
     # flags handling
     if char == '"' goto FLOW_TOGGLE_STRING_MODE
     if flag == 1   goto IO_PUSH_CHAR
     if flag == 2   goto FLOW_TRAMPOLINE
     if flag == 3   goto END
-    
+
     # sole number
     if char <  '0' goto NOT_NUM
     if char <= '9' goto MATHS_PUSH_NUMBER
   NOT_NUM:
-    
+
     # direction changing
     if char == '>' goto FLOW_GO_EAST
     if char == '^' goto FLOW_GO_NORTH
     if char == 'v' goto FLOW_GO_SOUTH
     if char == '<' goto FLOW_GO_WEST
-    
+
     # unknown instruction
     goto MOVE_PC
-    
+
 =pod
 
 
@@ -160,10 +160,10 @@
   MATHS_PUSH_NUMBER:
     maths__push_number()
     goto MOVE_PC
-    
-    
+
+
     # instruction executed, now move the pc
-    
+
   MOVE_PC:
     # reload status & associated vars, that may have
     # changed in the subs
@@ -172,7 +172,7 @@
     dir    = status["dir"]
     x      = status["x"]
     y      = status["y"]
-    
+
     if dir == 1 goto MOVE_EAST
     if dir == 2 goto MOVE_SOUTH
     if dir == 3 goto MOVE_WEST

@@ -141,7 +141,7 @@
 .sub "_debug__dump_playfield"
     .local string divider, line
     .local pmc    playfield
-    
+
     playfield = get_global "playfield"
     divider = repeat '-', 82
     concat divider, "\n"
@@ -158,7 +158,7 @@
     $S0 = chr $I2
     concat line, $S0
     inc $I1
-    goto DEBUG__DUMP_PLAYFIELD__NEXT_CHAR 
+    goto DEBUG__DUMP_PLAYFIELD__NEXT_CHAR
   DEBUG__DUMP_PLAYFIELD__EOL:
     concat line, "|\n"
     print line
@@ -190,7 +190,7 @@
     if $S1 == "list" goto DEBUG__INTERACT__LIST
     if $S1 == "next" goto DEBUG__INTERACT__NEXT
     if $S1 == "quit" goto DEBUG__INTERACT__QUIT
-    
+
 =pod
 
         substr S11, S10, 0, 5
@@ -210,7 +210,7 @@
   DEBUG__INTERACT__DUMP:
     _debug__dump_playfield()
     goto DEBUG__INTERACT__LOOP
-    
+
   DEBUG__INTERACT__HELP:
     _debug__help()
     goto DEBUG__INTERACT__LOOP
@@ -255,7 +255,7 @@ DEBUG_INTERACT_RESTART:
 DEBUG_INTERACT_STATUS:
         bsr DEBUG_PRINT_STATUS
         branch DEBUG_INTERACT
-        
+
 =cut
 
   DEBUG__INTERACT__END:
