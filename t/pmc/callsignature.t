@@ -27,7 +27,7 @@ Tests the CallSignature PMC.
 
 .sub instantiate
 
-    new $P0, 'CallSignature'
+    $P0 = new ['CallSignature']
     ok(1, 'Instantiated CallSignature')
 
 .end

@@ -31,7 +31,7 @@ type combinations.
 .end
 
 .sub init_int_tests
-    new $P0, 'Boolean'
+    $P0 = new ['Boolean']
 
     set $I0, $P0
     is($I0, 0,  "Boolean defaults to false")
@@ -48,7 +48,7 @@ type combinations.
 
 .sub num_tests
 
-    new $P0, 'Boolean'
+    $P0 = new ['Boolean']
     set $N0, 0
     set $P0, $N0
     set $I0, $P0
@@ -61,7 +61,7 @@ type combinations.
 .end
 
 .sub string_tests
-    new $P0, 'Boolean'
+    $P0 = new ['Boolean']
 
     set $S0, "0"
     set $P0, $S0
@@ -80,8 +80,8 @@ type combinations.
 .end
 
 .sub pmc_to_pmc_tests
-    new $P0, 'Boolean'
-    new $P1, 'Boolean'
+    $P0 = new ['Boolean']
+    $P1 = new ['Boolean']
 
     set $P0, 1
     clone $P1, $P0
@@ -98,7 +98,7 @@ type combinations.
 .end
 
 .sub boolean_as_conditional
-    new $P0, 'Boolean'
+    $P0 = new ['Boolean']
 
     set $P0, 1
     if $P0, OK_1
@@ -110,9 +110,9 @@ end:
 .end
 
 .sub logic_operations
-    new $P0, 'Boolean'
-    new $P1, 'Boolean'
-    new $P2, 'Boolean'
+    $P0 = new ['Boolean']
+    $P1 = new ['Boolean']
+    $P2 = new ['Boolean']
 
     set $P0, 1
     set $P1, 0
@@ -158,8 +158,8 @@ end:
 .end
 
 .sub negation_tests
-    new $P0, 'Boolean'
-    new $P1, 'Boolean'
+    $P0 = new ['Boolean']
+    $P1 = new ['Boolean']
 
     set $P0, 1
     neg $P1, $P0
@@ -182,7 +182,7 @@ end:
     .local pmc p
     .local int b
 
-    p = new 'Boolean'
+    p = new ['Boolean']
     does b, p, "scalar"
     is(b, 1, "Boolean does scalar")
     does b, p, "boolean"

@@ -24,7 +24,7 @@ Tests the Class PMC.
      load_bytecode 'Test/More.pir'
      .local pmc exporter, test_ns
      test_ns = get_namespace [ 'Test'; 'More' ]
-     exporter = new 'Exporter'
+     exporter = new ['Exporter']
      exporter.'import'( test_ns :named('source'), 'plan ok is isa_ok todo' :named('globals') )
 
      plan(TESTS)
@@ -52,9 +52,9 @@ Tests the Class PMC.
 .sub 'new op'
     .local pmc class
     .local int isa_class
-    new class, 'Class'
+    class = new ['Class']
 
-    ok(1, "$P0 = new 'Class'")
+    ok(1, "$P0 = new ['Class']")
     isa_ok(class, 'Class')
 .end
 
@@ -65,7 +65,7 @@ Tests the Class PMC.
     .local int class_flags, class_flag_set
     .const int POBJ_IS_CLASS_FLAG = 536870912  # 1 << 29
 
-    new class, 'Class'
+    class = new ['Class']
     class_flags_pmc = inspect class, 'flags'
     class_flags = class_flags_pmc
     class_flag_set = class_flags & POBJ_IS_CLASS_FLAG
@@ -77,7 +77,7 @@ Tests the Class PMC.
 # L<PDD15/Class PMC API/=item name>
 .sub 'name'
     .local pmc class, result
-    new class, 'Class'
+    class = new ['Class']
 
     result = class.'name'()
     is(result, '', 'name() with no args returns class name, which is empty at first')
@@ -104,7 +104,7 @@ Tests the Class PMC.
 .sub 'new method'
     .local pmc class, result, attrib
     .local int isa_object
-    new class, 'Class'
+    class = new ['Class']
     result = class.'new'()
 
     isa_ok(result, 'Object')
@@ -119,7 +119,7 @@ Tests the Class PMC.
     ok($I0, 'new() with non-attribute key fails')
 
     $I0 = 1
-    class = new 'Class'
+    class = new ['Class']
     class.'add_attribute'('foo')
     class.'add_attribute'('bar')
     result = class.'new'('foo' => 1, 'bar' => 2)
@@ -139,7 +139,7 @@ Tests the Class PMC.
 .sub 'attributes'
     .local pmc class, attribs
     .local int test_val
-    new class, 'Class'
+    class = new ['Class']
     attribs = class.'attributes'()
     test_val = isa attribs, 'Hash'
 
@@ -163,7 +163,7 @@ Tests the Class PMC.
 .sub 'add_attribute'
     .local pmc class, attribs
     .local int test_val
-    new class, 'Class'
+    class = new ['Class']
 
     $I0 = 1
     push_eh t_no_args
@@ -198,7 +198,7 @@ Tests the Class PMC.
 # L<PDD15/Class PMC API>
 .sub 'set_attr/get_attr'
     .local pmc class, class_instance, attrib_in, attrib_out
-    new class, 'Class'
+    class = new ['Class']
     class.'name'("Test")
     class.'add_attribute'("foo")
     ok(1, 'created a class with one attribute')
@@ -206,7 +206,7 @@ Tests the Class PMC.
     class_instance = class.'new'()
     ok(1, 'instantiated the class')
 
-    attrib_in = new 'Integer'
+    attrib_in = new ['Integer']
     attrib_in = 42
     setattribute class_instance, "foo", attrib_in
     ok(1, 'set an attribute')
@@ -220,7 +220,7 @@ Tests the Class PMC.
 .sub 'add_method' # todo => 'not yet implemented'
     .local pmc class, attribs, meth_to_add, test_attr_val
     .local int test_val
-    new class, 'Class'
+    class = new ['Class']
 
     $I0 = 1
     push_eh t_no_args
@@ -285,7 +285,7 @@ Tests the Class PMC.
 .sub 'parents'
     .local pmc class, parents
     .local int isa_parent
-    new class, 'Class'
+    class = new ['Class']
     parents = class.'parents'()
 
     ## XXX is this really what's expected?
@@ -305,7 +305,7 @@ Tests the Class PMC.
 .sub 'roles'
     .local pmc class, array
     .local int is_array
-    new class, 'Class'
+    class = new ['Class']
     array = class.'roles'()
 
     ## XXX is this really what's expected?
@@ -324,7 +324,7 @@ Tests the Class PMC.
     .local pmc class, result
     .local int test_val
 
-    class = new 'Class'
+    class = new ['Class']
     class.'name'('foo')
     class.'add_attribute'('a')
 
@@ -349,9 +349,9 @@ Tests the Class PMC.
     .local string test_name
     .local int test_val
 
-    attrs = new 'Hash'
+    attrs = new ['Hash']
     attrs['name'] = 'Monkey'
-    class = new 'Class', attrs
+    class = new ['Class'], attrs
     class.'add_attribute'('banana')
     class_instance = class.'new'()
     ok(1, 'clone() created class Monkey and instantiated it')
@@ -380,14 +380,14 @@ Tests the Class PMC.
     .local string test_string_val
     .local int num_elems
 
-    class = new 'Hash'
+    class = new ['Hash']
     class['name'] = 'Monkey2'
-    class_instance = new 'Class', class
+    class_instance = new ['Class'], class
     class_instance.'add_attribute'('banana')
     monkey = class_instance.'new'()
     ok(1, 'clone_pmc() created class Monkey and instantiated it')
 
-    class = new 'Hash'
+    class = new ['Hash']
     class['name'] = 'Mandrill'
     mandrill = clone class_instance, class
     ok(1, 'clone_pmc() cloned class Monkey with Hash argument')
@@ -411,31 +411,31 @@ Tests the Class PMC.
 .sub 'new with init hash'
     .local pmc class, init_hash, attrs, methods, meth_to_add, class_instance
     .local pmc attr_val, result
-    init_hash = new 'Hash'
+    init_hash = new ['Hash']
 
     # We'll have some attributes...
-    attrs = new 'ResizablePMCArray'
+    attrs = new ['ResizablePMCArray']
     attrs[0] = 'x'
     attrs[1] = 'y'
     init_hash['attributes'] = attrs
 
     # And a method.
-    methods = new 'Hash'
+    methods = new ['Hash']
     meth_to_add = get_global 'add'
     methods['add'] = meth_to_add
     init_hash['methods'] = methods
 
-    class = new 'Class', init_hash
+    class = new ['Class'], init_hash
     ok(1, 'new() created new class with attributes and methods supplied')
 
     # Instantiate and try setting each attribute.
     class_instance = class.'new'()
-    attr_val = new 'Integer'
+    attr_val = new ['Integer']
     attr_val = 37
     setattribute class_instance, 'x', attr_val
     ok(1, 'new() set first attribute')
 
-    attr_val = new 'Integer'
+    attr_val = new ['Integer']
     attr_val = 5
     setattribute class_instance, 'y', attr_val
     ok(1, 'new() set second attribute')
@@ -448,7 +448,7 @@ Tests the Class PMC.
 .sub add :method
     $P0 = getattribute self, "x"
     $P1 = getattribute self, "y"
-    $P2 = new 'Integer'
+    $P2 = new ['Integer']
     $P2 = $P0 + $P1
     .return($P2)
 .end
@@ -457,7 +457,7 @@ Tests the Class PMC.
 # L<PDD15/Class PMC API/=item isa>
 .sub 'isa'
     .local pmc class
-    new class, 'Class'
+    class = new ['Class']
 
     test_isa( class, 'Class', 1 )
     test_isa( class, 'Hash',  0 )
@@ -495,22 +495,22 @@ Tests the Class PMC.
 .sub 'does'
     .local pmc class
     .local pmc attrs
-    attrs = new 'Hash'
+    attrs = new ['Hash']
 
     .local pmc red, green, blue
     attrs['name'] = 'Red'
-    red           = new 'Role', attrs
+    red           = new ['Role'], attrs
 
     attrs['name'] = 'Green'
-    green         = new 'Role', attrs
+    green         = new ['Role'], attrs
 
     attrs['name'] = 'Blue'
-    blue          = new 'Role', attrs
+    blue          = new ['Role'], attrs
 
     green.'add_role'( blue )
 
     .local pmc color
-    color = new 'Class'
+    color = new ['Class']
 
     test_does( color, 'Red', 0 )
 
@@ -554,22 +554,22 @@ Tests the Class PMC.
 # L<PDD15/Class PMC API/=item does>
 .sub 'more does' # RT #42974
     .local pmc attrs
-    attrs = new 'Hash'
+    attrs = new ['Hash']
 
     .local pmc red, green, blue
     attrs['name'] = 'Red'
-    red           = new 'Role', attrs
+    red           = new ['Role'], attrs
 
     attrs['name'] = 'Green'
-    green         = new 'Role', attrs
+    green         = new ['Role'], attrs
 
     attrs['name'] = 'Blue'
-    blue          = new 'Role', attrs
+    blue          = new ['Role'], attrs
 
     green.'add_role'( blue )
 
     .local pmc color
-    color = new 'Class'
+    color = new ['Class']
 
     $S0 = 'Red'
     $I0 = color.'does'($S0)

@@ -18,7 +18,7 @@ Tests the Closure PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(3)
 
@@ -27,7 +27,7 @@ Tests the Closure PMC.
 .end
 
 .sub new_closure
-    new $P0, 'Closure'
+    $P0 = new ['Closure']
     ok( 1, 'Created new Closure' )
     isa_ok( $P0, 'Closure' )
 .end
@@ -37,7 +37,7 @@ Tests the Closure PMC.
 ## sub->outer_ctx to be initialized, regardless of whether the closure
 ## had ever been called.
     .lex "X", $P40
-    $P40 = new 'Integer'
+    $P40 = new ['Integer']
     $P40 = 22
     .const 'Sub' $P43 = "___internal_test_1_0_"
     newclosure $P44, $P43

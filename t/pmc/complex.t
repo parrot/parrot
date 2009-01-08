@@ -105,8 +105,8 @@ Tests the Complex PMC.
 .endm
 
 .sub string_parsing
-    new $P0, 'Complex'
-    new $P1, 'String'
+    $P0 = new ['Complex']
+    $P1 = new ['String']
 
     set $P0, "4"
     is( $P0, "4+0i", '"4" parsed as 4+0i' )
@@ -161,7 +161,7 @@ Tests the Complex PMC.
 .end
 
 .sub exception_malformed_string__real_part
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
     push_eh handler
         set $P0, "q + 3i"
     pop_eh
@@ -170,7 +170,7 @@ handler:
 .end
 
 .sub exception_malformed_string__imaginary_part
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
     push_eh handler
         set $P0, "1 + ij"
     pop_eh
@@ -179,7 +179,7 @@ handler:
 .end
 
 .sub exception_malformed_string__missing_plus_or_minus
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
     push_eh handler
         set $P0, "1 * i"
     pop_eh
@@ -188,10 +188,10 @@ handler:
 .end
 
 .sub test_complex_add
-    new $P0, 'Complex'
-    new $P1, 'Complex'
-    new $P2, 'Float'
-    new $P3, 'Integer'
+    $P0 = new ['Complex']
+    $P1 = new ['Complex']
+    $P2 = new ['Float']
+    $P3 = new ['Integer']
 
     set $P0, "1 + i"
     add $P0, $P0, $P0
@@ -231,10 +231,10 @@ handler:
 .end
 
 .sub test_complex_subtract
-    new $P0, 'Complex'
-    new $P1, 'Complex'
-    new $P2, 'Float'
-    new $P3, 'Integer'
+    $P0 = new ['Complex']
+    $P1 = new ['Complex']
+    $P2 = new ['Float']
+    $P3 = new ['Integer']
 
     set $P0, "1 + i"
     sub $P0, $P0, $P0
@@ -274,10 +274,10 @@ handler:
 .end
 
 .sub test_complex_multiply
-    new $P0, 'Complex'
-    new $P1, 'Complex'
-    new $P2, 'Float'
-    new $P3, 'Integer'
+    $P0 = new ['Complex']
+    $P1 = new ['Complex']
+    $P2 = new ['Float']
+    $P3 = new ['Integer']
 
     set $P0, "2 + 3i"
     mul $P0, $P0, $P0
@@ -318,9 +318,9 @@ handler:
  .end
 
 .sub test_complex_divide
-    new $P0, 'Complex'
-    new $P1, 'Complex'
-    new $P2, 'Float'
+    $P0 = new ['Complex']
+    $P1 = new ['Complex']
+    $P2 = new ['Float']
 
     set $P0, "2 + 3i"
     div $P0, $P0, $P0
@@ -356,11 +356,11 @@ handler:
     skip( 1, 'div by zero not caught' )
     .return()
 
-    $P0 = new 'Complex'
+    $P0 = new ['Complex']
     set $P0, "4+3.5i"
-    $P1 = new 'Complex'
+    $P1 = new ['Complex']
     ## divide by a zero Complex
-    $P2 = new 'Complex'
+    $P2 = new ['Complex']
     set $P2, 0
     push_eh handler
         $P1 = $P0 / $P2
@@ -373,11 +373,11 @@ handler:
     skip( 1, 'div by zero not caught' )
     .return()
 
-    $P0 = new 'Complex'
+    $P0 = new ['Complex']
     set $P0, "4+3.5i"
-    $P1 = new 'Complex'
+    $P1 = new ['Complex']
     ## divide by a zero Float
-    $P2 = new 'Float'
+    $P2 = new ['Float']
     set $P2, 0
     push_eh handler
         $P1 = $P0 / $P2
@@ -389,11 +389,11 @@ handler:
     skip( 1, 'div by zero not caught' )
     .return()
 
-    $P0 = new 'Complex'
+    $P0 = new ['Complex']
     set $P0, "4+3.5i"
-    $P1 = new 'Complex'
+    $P1 = new ['Complex']
     ## divide by a zero Integer
-    $P2 = new 'Integer'
+    $P2 = new ['Integer']
     set $P2, 0
     push_eh handler
         $P1 = $P0 / $P2
@@ -402,7 +402,7 @@ handler:
 .end
 
 .sub get_int_or_num_or_bool
-        new $P0, 'Complex'
+        $P0 = new ['Complex']
         set $P0, "2 - 1.5i"
         is( $P0, "2-1.5i", 'Complex "2 - 1.5i" returned ok' )
 
@@ -419,8 +419,8 @@ handler:
 .end
 
 .sub test_get_keyed
-        new $P0, 'Complex'
-        new $P1, 'String'
+        $P0 = new ['Complex']
+        $P1 = new ['String']
         set $P0, "- 3.3 + 1.2i"
         set $P1, "imag"
 
@@ -443,7 +443,7 @@ handler:
 .end
 
 .sub exception_get_keyed__invalid_string_key
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
     set $P0, "5 + 3.5i"
     push_eh handler
         set $N0, $P0["Foo55"]
@@ -452,7 +452,7 @@ handler:
 .end
 
 .sub exception_get_keyed__invalid_numeric_key
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
     set $P0, "5 + 3.5i"
     push_eh handler
         set $N0, $P0[2]
@@ -461,7 +461,7 @@ handler:
 .end
 
 .sub set_int_or_num
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
 
     set $P0, "3 + 4i"
     set $P0, -2
@@ -473,9 +473,9 @@ handler:
 .end
 
 .sub set_keyed
-    new $P0, 'Complex'
-    new $P1, 'String'
-    new $P2, 'String'
+    $P0 = new ['Complex']
+    $P1 = new ['String']
+    $P2 = new ['String']
     set $P1, "real"
 
     set $P0[$P1], 1
@@ -494,7 +494,7 @@ handler:
 .end
 
 .sub exception_set_keyed__invalid_key
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
     push_eh handler
         set $P0[2], 12.5
 handler:
@@ -502,8 +502,8 @@ handler:
 .end
 
 .sub test_is_equal
-    new $P0, 'Complex'
-    new $P1, 'Complex'
+    $P0 = new ['Complex']
+    $P1 = new ['Complex']
 
     set $P0, "2 + 3j"
     set $P1["real"], 2
@@ -515,16 +515,16 @@ handler:
 .end
 
 .sub test_complex_abs
-    new $P0, 'Complex'
+    $P0 = new ['Complex']
     set $P0, "4 + 3i"
-    new $P1, 'Undef'
+    $P1 = new ['Undef']
     abs $P1, $P0
     is( $P1, "5", 'abs 4+3j -> 5' )
 .end
 
 .sub check_whether_interface_is_done
     .local pmc pmc1
-    pmc1 = new 'Complex'
+    pmc1 = new ['Complex']
     .local int bool1
 
     does bool1, pmc1, "scalar"
@@ -564,9 +564,9 @@ handler:
     .return()
 
     $P0 = get_class "Complex"
-    $P1 = new 'Float'
+    $P1 = new ['Float']
     $P1 = 2.0
-    $P2 = new 'Float'
+    $P2 = new ['Float']
     $P2 = 3.0
     # $P1 = $P0."instantiate"($P1, $P2)
     is( $P1, "2+3i", 'instantiate pir p' )
@@ -582,9 +582,9 @@ handler:
 .end
 
 .sub test_complex_neg
-     new $P0, 'Complex'
+     $P0 = new ['Complex']
      set $P0, "1.3 + 1.7i"
-     new $P1, 'Integer'
+     $P1 = new ['Integer']
      neg $P1, $P0
      set $N0, $P1[0]
      set $N1, $P1[1]
@@ -593,7 +593,7 @@ handler:
 .end
 
 .sub test_clone
-     new $P0, 'Complex'
+     $P0 = new ['Complex']
      set $P0, "1 - 3i"
      clone $P1, $P0
      is( $P0, $P1, 'clone Complex PMC')
@@ -607,9 +607,9 @@ handler:
 
 .sub test_sub
     .local pmc d, f, c
-    d = new 'Undef'
-    f = new 'Float'
-    c = new 'Complex'
+    d = new ['Undef']
+    f = new ['Float']
+    c = new ['Complex']
     f = 2.2
     c = "5+2j"
     d = c - f
@@ -627,13 +627,13 @@ handler:
 
 .sub test_i_sub
     .local pmc f, c
-    f = new 'Float'
+    f = new ['Float']
     f = 2.2
-    c = new 'Complex'
+    c = new ['Complex']
     c = "5+2j"
     c -= f
     is( c, '2.8+2i', 'Complex -= test' )
-    c = new 'Complex'
+    c = new ['Complex']
     c = "5+2j"
     f -= c
     is( f, '-2.8-2i', '... and reverse it' )
@@ -648,7 +648,7 @@ handler:
 
 .sub sprintf_with_a_complex
     .local pmc c, c2
-    c = new 'Complex'
+    c = new ['Complex']
     .sprintf_is( "%d%+di", "1.35+35.1i", "1+35i" )
     .sprintf_is( "%.3f%+.3fi", "0+3.141592653589793i", "0.000+3.142i" )
     .sprintf_is( "%.3f%+.3fi", "0+i", "0.000+1.000i" )
@@ -665,27 +665,27 @@ handler:
 
 .sub pow_with_complex_numbers
     .local pmc c, c2, c3
-    c  = new 'Complex'
-    c2 = new 'Complex'
-    c3 = new 'Complex'
+    c  = new ['Complex']
+    c2 = new ['Complex']
+    c3 = new ['Complex']
     .pow_test_is( "i", "i", "0.207880+0.000000i" )
     .pow_test_is( "i", "2", "-1.000000+0.000000i" )
     .pow_test_is( "2i", "2", "-4.000000+0.000000i" )
     .pow_test_is( "2+2i", "2+2i", "-1.452505-0.809890i" )
     .pow_test_is( "i", "0.5i", "0.455938+0.000000i" )
     .pow_test_is( 2, "2i", "0.183457+0.983028i" )
-    c2 = new 'Integer'
+    c2 = new ['Integer']
     .pow_test_is( "2i", 2, "-4.000000+0.000000i" )
     .pow_test_is( "2", 4, "16.000000+0.000000i" )
-    c2 = new 'Float'
+    c2 = new ['Float']
     .pow_test_is( "2i", 0.5, "1.000000+1.000000i" )
 .end
 
 .sub e_raised_pi_time_i__plus_1_equal_0
     .local pmc c, c2, c3
-    c  = new 'Complex'
-    c2 = new 'Complex'
-    c3 = new 'Complex'
+    c  = new ['Complex']
+    c2 = new ['Complex']
+    c3 = new ['Complex']
     # e^(pi * i) + 1 = 0
     $N0 = atan 1
     $N0 *= 4
@@ -700,8 +700,8 @@ handler:
 # # Need to find some formal spec for when to return -0.0.
 
 .macro complex_op_is( val, res, op )
-    new $P1, 'Complex'
-    new $P2, 'Complex'
+    $P1 = new ['Complex']
+    $P2 = new ['Complex']
     set $P1, .val
 
     set $S0, .val
@@ -1167,13 +1167,13 @@ win32fail:
 
     .local pmc a, b, c
     ##   a = 1 + 2i
-    a = new 'MyComplex'
+    a = new ['MyComplex']
     a['real'] = 1
     a['imag'] = 2
     is( a, "1+2i", '' )
 
     ##   b = 3 + 4i
-    b = new 'MyComplex'
+    b = new ['MyComplex']
     b['real'] = 3
     b['imag'] = 4
     is( b, "3+4i" , '' )
@@ -1186,9 +1186,9 @@ win32fail:
 .namespace ['MyComplex']
 
 .sub 'init' :vtable
-    $P1 = new 'Float'
+    $P1 = new ['Float']
     setattribute self, "re", $P1
-    $P2 = new 'Float'
+    $P2 = new ['Float']
     setattribute self, "im", $P2
 .end
 

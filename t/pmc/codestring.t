@@ -36,7 +36,7 @@ Tests the CodeString class directly.
 .sub create_codestring
     .local pmc code
     .local string s
-    code = new 'CodeString'
+    code = new ['CodeString']
     code = 'ok'
     s = code
     is(s, "ok", "code string creation succeeded")
@@ -45,7 +45,7 @@ Tests the CodeString class directly.
 .sub calls_to_unique
     .local pmc code
     .local string s
-    code = new 'CodeString'
+    code = new ['CodeString']
     $P1 = code.'unique'('ok ')
     s = $P1
     is(s, "ok 10", "call to unique with name")
@@ -59,7 +59,7 @@ Tests the CodeString class directly.
 
 .sub basic_emit
     .local pmc code
-    code = new 'CodeString'
+    code = new ['CodeString']
     code.'emit'('label:')
     code.'emit'('    say "Hello, World"')
     code.'emit'('    $I0 = 1')
@@ -74,7 +74,7 @@ CODE
 
 .sub emit_with_pos_args
     .local pmc code
-    code = new 'CodeString'
+    code = new ['CodeString']
     code.'emit'('label_%0:', 1234)
     code.'emit'('    say "%0, %1"', 'Hello', 'World')
     code.'emit'('    %0 = %2', '$I0', 24, 48)
@@ -87,7 +87,7 @@ CODE
 
 .sub emit_with_percent_args
     .local pmc code
-    code = new 'CodeString'
+    code = new ['CodeString']
     code.'emit'('label_%0:', 1234)
     code.'emit'('    say "%,"', 'Hello')
     code.'emit'('    say "%,"', 'Hello', 'World', 'of', 'Parrot')
@@ -100,7 +100,7 @@ CODE
 
 .sub emit_with_named_args
     .local pmc code
-    code = new 'CodeString'
+    code = new ['CodeString']
     code.'emit'('label_%a:', 'a'=>1234)
     code.'emit'('    say "%b, %c"', 'b'=>'Hello', 'c'=>'World')
     code.'emit'('    say "%d"', 'b'=>'Hello', 'c'=>'World')
@@ -113,7 +113,7 @@ CODE
 
 .sub emit_with_pos_and_named_args
     .local pmc code
-    code = new 'CodeString'
+    code = new ['CodeString']
     code.'emit'('label_%a:', 'a'=>1234)
     code.'emit'('    %0 "%b, %c"', 'say', 'print', 'b'=>'H', 'c'=>'W')
     code.'emit'('    say "%,, %c"', 'alpha', 'beta', 'b'=>'H', 'c'=>'W')
@@ -126,8 +126,8 @@ CODE
 
 .sub output_global_unique_num
     .local pmc code1, code2
-    code1 = new 'CodeString'
-    code2 = new 'CodeString'
+    code1 = new ['CodeString']
+    code2 = new ['CodeString']
     .local string unique1, unique2
     unique1 = code1.'unique'()
     unique2 = code2.'unique'('$P')
@@ -137,7 +137,7 @@ CODE
 
 .sub namespace_keys
     .local pmc code
-    code = new 'CodeString'
+    code = new ['CodeString']
     $S0 = code.'key'('abc')
     is($S0, '["abc"]', "unnested namespace key ok")
     $S0 = code.'key'('abc', 'def')
@@ -154,7 +154,7 @@ CODE
 .sub first_char_repl_regression
     .local pmc code
     null $P0
-    code = new 'CodeString'
+    code = new ['CodeString']
     code.'emit'('new', 'n'=>$P0)
     is(code, "new\n", "regression on first char repl bug looks fine")
 .end
