@@ -1895,7 +1895,7 @@ extern const char floatval_map[];
 
 extern const char i_map_sub[];
 
-static const jit_arch_info arch_info;
+extern const jit_arch_info arch_info;
 
 const jit_arch_info * Parrot_jit_init(PARROT_INTERP);
 
