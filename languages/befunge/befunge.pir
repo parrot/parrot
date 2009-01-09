@@ -40,18 +40,6 @@
     .local string user_input
     user_input = ""
 
-        # I5 is debug
-        #set S10, P5[I0] ??
-        # P1 = the playfield
-        # P2 = the stack
-        # I0 = x coord of the PC
-        # I1 = y coord of the PC
-        # I2 = direction of the PC
-        # I4 = flag (1=string-mode,2=bridge,3=end)
-        # N0 = random seed
-        # S2 = user input
-        # S0 = current instruction
-
     .local int    x, y, flag, val
     .local string char
   TICK:
@@ -73,6 +61,8 @@
     if char == '"' goto FLOW_TOGGLE_STRING_MODE
     if flag == 1   goto IO_PUSH_CHAR
     if flag == 2   goto FLOW_TRAMPOLINE
+
+    if char == ' ' goto MOVE_PC
 
     # sole number
     if char <  '0' goto NOT_NUM
@@ -112,7 +102,6 @@
     if char == 'p' goto IO_VALUE_PUT
     
     # unknown instruction
-    if char == ' ' goto MOVE_PC
     print "unknown instruction: "
     print char
     print "\n"
