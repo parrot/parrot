@@ -95,6 +95,7 @@
     # math functions
     if char == '+' goto MATHS_ADD
     if char == '-' goto MATHS_SUB
+    if char == '*' goto MATHS_MUL
     if char == '/' goto MATHS_DIV
     if char == '%' goto MATHS_MOD
     if char == '!' goto MATHS_NOT
@@ -125,12 +126,12 @@
         #eq S0, "_", FLOW_EW_IF
         #eq S0, "|", FLOW_NS_IF
         #eq S0, "#", FLOW_BRIDGE
-        eq S0, "@", FLOW_END
+        #eq S0, "@", FLOW_END
 
         # Math functions.
         #eq S0, "+", MATHS_ADD
         #eq S0, "-", MATHS_SUB
-        eq S0, "*", MATHS_MUL
+        #eq S0, "*", MATHS_MUL
         #eq S0, "/", MATHS_DIV
         #eq S0, "%", MATHS_MOD
         #eq S0, "!", MATHS_NOT
@@ -211,6 +212,9 @@
     goto MOVE_PC
   MATHS_MOD:
     maths__mod()
+    goto MOVE_PC
+  MATHS_MUL:
+    maths__mul()
     goto MOVE_PC
   MATHS_NOT:
     maths__not()
