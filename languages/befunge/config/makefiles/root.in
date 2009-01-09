@@ -32,8 +32,8 @@ all: build
 
 build: befunge.pbc
 
-befunge.pbc: befunge.pasm debug.pasm flow.pasm io.pasm load.pasm maths.pasm stack.pasm
-	$(PARROT) -o befunge.pbc befunge.pasm
+befunge.pbc: befunge.pir debug.pir flow.pir io.pir load.pir maths.pir stack.pir
+	$(PARROT) -o befunge.pbc befunge.pir
 
 test: befunge.pbc
 	cd .. && $(PERL) t/harness --languages=befunge
