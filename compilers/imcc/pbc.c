@@ -2169,9 +2169,9 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         /* Add annotations seg if we're missing one. */
         if (!interp->code->annotations) {
             /* Create segment. */
-            char *name = mem_sys_allocate(strlen(interp->code->base.name) + 5);
+            char * const name = mem_sys_allocate(strlen(interp->code->base.name) + 5);
             strcpy(name, interp->code->base.name);
-            strcpy(name + strlen(name), "_ANN");
+            strcat(name, "_ANN");
             interp->code->annotations = PackFile_Segment_new_seg(interp, interp->code->base.dir,
                     PF_ANNOTATIONS_SEG, name, 1);
             interp->code->annotations->code = interp->code;
