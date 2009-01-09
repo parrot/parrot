@@ -67,21 +67,14 @@ C<target> adverbs.
 
     .local pmc ns
     ns = adverbs['namespace']
-    if null ns goto ns_grammar
-    unless ns goto ns_grammar
-    $P0 = code.'key'(ns)
-    code.'emit'('.namespace %0', $P0)
-    goto ns_done
+    unless null ns goto ns_emit
   ns_grammar:
     .local string grammar
     grammar = adverbs['grammar']
-    if grammar == '' goto ns_root
-    $P0 = split '::', grammar
-    $P0 = code.'key'($P0 :flat)
-    code.'emit'(".namespace %0", $P0)
-    goto ns_done
-  ns_root:
-    code.'emit'('.namespace []')
+    ns = split '::', grammar
+  ns_emit:
+    $P0 = code.'key'(ns)
+    code.'emit'('.namespace %0', $P0)
   ns_done:
 
     $P0 = self.'root_pir'(adverbs :flat :named)
