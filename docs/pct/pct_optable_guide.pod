@@ -52,7 +52,7 @@ An expresson such as C<1 + 2> will result in a parse tree like this:
             2
 
 This may not seem very big, but remember it's only for C<1 + 2>!
-Also note that you have to add at least one rule per precendence level,
+Also note that you have to add at least one rule per precedence level,
 so the rules for parsing simple statements can increase the size of
 your grammar dramatically.
 
