@@ -2,6 +2,19 @@
 
 .macro_const RANDMAX 65536.0
 
+#
+# maths__not()
+#
+# logical not.
+# befunge stack:
+#   before:     ... a
+#   after:      ... not(a)
+#
+.sub "maths__not"
+    $I0 = stack__pop()
+    $I0 = not $I0
+    stack_push($I0)
+.end
 
 #
 # push number on befunge's stack.
@@ -127,18 +140,6 @@ MATHS_MOD_POP_2:
     push P2, I12
     branch MOVE_PC
 
-# Logical not.
-# Befunge Stack:
-#   before:     ... a
-#   after:      ... not(a)
-MATHS_NOT:
-    set I10, P2
-    unless I10, MATHS_NOT_POP_1
-    pop I10, P2
-MATHS_NOT_POP_1:
-    not I10, I10
-    push P2, I10
-    branch MOVE_PC
 
 =cut
 

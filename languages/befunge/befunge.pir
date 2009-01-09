@@ -89,7 +89,10 @@
     if char == '<' goto FLOW_GO_WEST
 
     # flow control
+    
     # math functions
+    if char == '!' goto MATHS_NOT
+    
     # stack operations
     if char == ':' goto STACK_DUP
 
@@ -97,6 +100,11 @@
     if char == 'p' goto IO_PUT_VALUE
     
     # unknown instruction
+    if char == ' ' goto MOVE_PC
+    print "unknown instruction: "
+    print char
+    print "\n"
+    end
     goto MOVE_PC
 
 =pod
@@ -114,7 +122,7 @@
         eq S0, "*", MATHS_MUL
         eq S0, "/", MATHS_DIV
         eq S0, "%", MATHS_MOD
-        eq S0, "!", MATHS_NOT
+        #eq S0, "!", MATHS_NOT
 
         # Stack operations.
         #eq S0, ":", STACK_DUP
@@ -160,6 +168,10 @@
     goto MOVE_PC
 
     # maths instructions
+  MATHS_NOT:
+    maths__not()
+    goto MOVE_PC
+    
   MATHS_PUSH_NUMBER:
     maths__push_number()
     goto MOVE_PC
