@@ -234,7 +234,7 @@ struct Parrot_Context {
     struct PackFile_Constant ** constants;
 
     /* code->prederefed.code - code->base.data in opcodes
-     * to simplify conversio between code ptrs in e.g. invoke */
+     * to simplify conversion between code ptrs in e.g. invoke */
     size_t pred_offset;
 };
 
