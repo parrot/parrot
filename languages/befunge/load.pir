@@ -10,7 +10,7 @@
 .sub "load"
     .param string file
 
-    .local int    len, missing, noline
+    .local int    len, missing, noline, newline
     .local string line
     .local pmc    fh, playline, playfield
 
@@ -28,7 +28,10 @@
     len  = length line
     if len <= 0 goto LOAD__EOF
 
+    newline = index line, "\n"
+    if newline < 0 goto LOAD__SKIP_CHOP
     chopn line, 1
+    LOAD__SKIP_CHOP:
     line     = _load__fit_str_to_80(line)
     playline = _load__str_to_array(line)
     push playfield, playline
