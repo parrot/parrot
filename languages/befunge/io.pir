@@ -20,7 +20,7 @@
 
 
 #
-# io__get_value()
+# io__value_get()
 #
 # get a value from the playfield.
 # befunge stack:
@@ -28,7 +28,7 @@
 #   after:      ... i
 # i = value_at(x,y)
 #
-.sub "io__get_value"
+.sub "io__value_get"
     .local int x, y
     y = stack__pop()
     x = stack__pop()
@@ -40,7 +40,7 @@
 
 
 #
-# io__put_value()
+# io__value_put()
 #
 # put a value in the playfield.
 # befunge stack:
@@ -48,7 +48,7 @@
 #   after:      ...
 # value_at(x,y) = i
 #
-.sub "io__put_value"
+.sub "io__value_put"
     .local int x, y, v
     y = stack__pop()
     x = stack__pop()

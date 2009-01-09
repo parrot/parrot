@@ -99,8 +99,8 @@
     if char == ':' goto STACK_DUP
 
     # i/o operations
-    if char == 'p' goto IO_GET_VALUE
-    if char == 'p' goto IO_PUT_VALUE
+    if char == 'p' goto IO_VALUE_GET
+    if char == 'p' goto IO_VALUE_PUT
     
     # unknown instruction
     if char == ' ' goto MOVE_PC
@@ -172,11 +172,11 @@
   IO_PUSH_CHAR:
     io__push_char()
     goto MOVE_PC
-  IO_GET_VALUE:
-    io__get_value()
+  IO_VALUE_GET:
+    io__value_get()
     goto MOVE_PC
-  IO_PUT_VALUE:
-    io__put_value()
+  IO_VALUE_PUT:
+    io__value_put()
     goto MOVE_PC
 
     # maths instructions
