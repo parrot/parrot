@@ -20,6 +20,26 @@
 
 
 #
+# io__get_value()
+#
+# get a value from the playfield.
+# befunge stack:
+#   before:     ... x y
+#   after:      ... i
+# i = value_at(x,y)
+#
+.sub "io__get_value"
+    .local int x, y
+    y = stack__pop()
+    x = stack__pop()
+    
+    $P0 = get_global "playfield"
+    $I0 = $P0[y;x]
+    stack__push($I0)
+.end
+
+
+#
 # io__put_value()
 #
 # put a value in the playfield.
@@ -38,6 +58,8 @@
     $P0[y;x] = v
     set_global"playfield", $P0
 .end
+
+
 
 =pod
 
@@ -121,24 +143,6 @@ IO_OUTPUT_CHAR:
 IO_OUTPUT_CHAR_POP_1:
     chr S10, I10
     print S10
-    branch MOVE_PC
-
-# Get a value from playfield.
-# Befunge stack:
-#   before:     ... x y
-#   after:      ... i
-# i = value_at(x,y)
-IO_GET_VALUE:
-    set I11, P2
-    unless I11, IO_GET_VALUE_POP_1
-    pop I11, P2
-IO_GET_VALUE_POP_1:
-    set I10, P2
-    unless I10, IO_GET_VALUE_POP_2
-    pop I10, P2
-IO_GET_VALUE_POP_2:
-    set I12, P1[I11;I10]
-    push P2, I12
     branch MOVE_PC
 
 

@@ -99,6 +99,7 @@
     if char == ':' goto STACK_DUP
 
     # i/o operations
+    if char == 'p' goto IO_GET_VALUE
     if char == 'p' goto IO_PUT_VALUE
     
     # unknown instruction
@@ -136,7 +137,7 @@
         eq S0, "~", IO_INPUT_CHAR
         eq S0, ".", IO_OUTPUT_INT
         eq S0, ",", IO_OUTPUT_CHAR
-        eq S0, "g", IO_GET_VALUE
+        #eq S0, "g", IO_GET_VALUE
         #eq S0, "p", IO_PUT_VALUE
 
 =cut
@@ -170,6 +171,9 @@
     # io instructions
   IO_PUSH_CHAR:
     io__push_char()
+    goto MOVE_PC
+  IO_GET_VALUE:
+    io__get_value()
     goto MOVE_PC
   IO_PUT_VALUE:
     io__put_value()
