@@ -1,9 +1,9 @@
 # $Id$
 
 #
-# stack_duplicate()
+# stack__duplicate()
 #
-# duplicate element at top of stck
+# duplicate element at top of stack
 # befunge stack:
 #   before:     ... v
 #   after:      ... v v
@@ -49,6 +49,7 @@
 # befunge stack:
 #    before:    ...
 #    after:     ... v
+# no return value
 #
 .sub "stack__push"
     .param int v
@@ -65,6 +66,8 @@
 # befunge stack:
 #   before:     ... a b
 #   after:      ... b a
+# no return value
+#
 .sub "stack__swap"
     $I0 = stack__pop()
     $I1 = stack__pop()
@@ -72,29 +75,6 @@
     stack__push($I1)
 .end
 
-=pod
-
-STACK_POP:
-    set I10, P2
-    unless I10, STACK_POP_POP_1
-    pop I10, P2
-STACK_POP_POP_1:
-    branch MOVE_PC
-
-STACK_SWAP:
-    set I10, P2
-    unless I10, STACK_SWAP_POP_1
-    pop I10, P2
-STACK_SWAP_POP_1:
-    set I11, P2
-    unless I11, STACK_SWAP_POP_2
-    pop I11, P2
-STACK_SWAP_POP_2:
-    push P2, I10
-    push P2, I11
-    branch MOVE_PC
-
-=cut
 
 ########################################################################
 # Local Variables:
