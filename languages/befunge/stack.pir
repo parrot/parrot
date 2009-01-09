@@ -41,6 +41,23 @@
     .return($I1)
 .end
 
+
+#
+# stack__push(v)
+#
+# push a value on the stack.
+# befunge stack:
+#    before:    ...
+#    after:     ... v
+#
+.sub "stack__push"
+    .param int v
+    $P0 = get_global "stack"
+    push $P0, v
+    set_global "stack", $P0
+.end
+
+
 =pod
 
 STACK_POP:
