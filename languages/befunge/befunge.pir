@@ -103,10 +103,6 @@
     if char == 'p' goto IO_VALUE_PUT
     
     # unknown instruction
-    print "unknown instruction: "
-    print char
-    print "\n"
-    end
     goto MOVE_PC
 
     # flow instructions
