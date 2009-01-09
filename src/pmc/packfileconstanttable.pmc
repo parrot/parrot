@@ -30,11 +30,11 @@ static PackFile_Constant *
 getconst(PARROT_INTERP, PackFile_ConstTable *table, int index, int type)
 {
     PackFile_Constant *rv;
-    if(index < 0 || index >= table->const_count)
+    if (index < 0 || index >= table->const_count)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "Requested data out of range.");
     rv = table->constants[index];
-    if(rv->type != type)
+    if (rv->type != type)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Requested constant of the wrong type.");
     return rv;
@@ -178,7 +178,7 @@ Get the type of the specified constant.  Possible type IDs:
         PackFile_ConstTable *pftable = PMC_data_typed(SELF, PackFile_ConstTable *);
         PackFile_Constant *constant;
         INTVAL rv;
-        if(index < 0 || index >= pftable->const_count)
+        if (index < 0 || index >= pftable->const_count)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "Requested data out of range.");
         constant = pftable->constants[index];

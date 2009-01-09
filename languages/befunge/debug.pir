@@ -209,20 +209,20 @@
     $P0[$S0] = 1
     set_global "breakpoints", $P0
     goto DEBUG__INTERACT__LOOP
-    
+
   DEBUG__INTERACT__CONTINUE:
     $P0 = get_global "step"
     $P0 = 0
     set_global "step", $P0
     goto DEBUG__INTERACT__END
-    
+
   DEBUG__INTERACT__DELETE:
     substr $S0, 0, 7, ""
     $P0 = get_global "breakpoints"
     delete $P0[$S0]
     set_global "breakpoints", $P0
     goto DEBUG__INTERACT__LOOP
-    
+
   DEBUG__INTERACT__DUMP:
     _debug__dump_playfield()
     goto DEBUG__INTERACT__LOOP
@@ -244,11 +244,11 @@
 
   DEBUG__INTERACT__QUIT:
     end
-    
+
   DEBUG__INTERACT__RESTART:
     print "Not yet implemented...\n"
     goto DEBUG__INTERACT__LOOP
-    
+
   DEBUG__INTERACT__STATUS:
     _debug__print_status()
     goto DEBUG__INTERACT__LOOP

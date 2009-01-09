@@ -94,11 +94,11 @@
     .local int a, b
     b = stack__pop()
     a = stack__pop()
-    
+
     if a < b goto FLOW__COMPARE__FALSE
     stack__push(1)
     .return()
-    
+
   FLOW__COMPARE__FALSE:
     stack__push(0)
 .end

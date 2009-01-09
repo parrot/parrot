@@ -4,13 +4,6 @@ $Id$
 */
 /* HEADERIZER HFILE: none */
 
-/*
- * Local variables:
- *   c-file-style: "parrot"
- * End:
- * vim: expandtab shiftwidth=4:
- */
-
 #include <assert.h>
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
@@ -347,7 +340,7 @@ emit_movb_i_m(PARROT_INTERP, char *pc, char imm, int base, int i, int scale, lon
     *(pc++) = imm;
     return pc;
 }
-	
+
 char *
 opt_mul(PARROT_INTERP, char *pc, int dest, INTVAL imm, int src)
 {
@@ -719,7 +712,7 @@ opt_div_RM(PARROT_INTERP, Parrot_jit_info_t *jit_info, int dest, int offs, int i
             saved = 1;
             jit_emit_mov_rr_i(pc, emit_ECX, emit_EDX);
         }
-	}
+    }
     /* this sequence allows 2 other instructions to run parallel */
     jit_emit_mov_rr_i(pc, emit_EDX, emit_EAX);
     pc = emit_shift_i_r(interp, pc, emit_b111, 31, emit_EDX); /* SAR 31 */
@@ -1106,40 +1099,40 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 /*
                  * TODO not all constants are shared between interpreters
                  */
-#  if EXEC_CAPABLE
+#if EXEC_CAPABLE
                 if (jit_info->objfile) {
                     jit_emit_fload_m_n(interp, jit_info->native_ptr, CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
                             jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
                 }
                 else
-#  endif
+#endif
                     jit_emit_fload_m_n(interp, jit_info->native_ptr,
                             &interp->code->const_table->
                             constants[pi]->u.number);
 store:
-#  if NUMVAL_SIZE == 8
+#if NUMVAL_SIZE == 8
                 /* make room for double */
                 emitm_addb_i_r(jit_info->native_ptr, -8, emit_ESP);
                 emitm_fstpl(interp, jit_info->native_ptr, emit_ESP, emit_None, 1, 0);
                 /* additional stack adjustment */
                 st += 4;
-#  else
+#else
                 emitm_addb_i_r(jit_info->native_ptr, -12, emit_ESP);
                 emitm_fstpt(jit_info->native_ptr, emit_ESP, emit_None, 1, 0);
                 st += 8;
-#  endif
+#endif
                 break;
 
             case PARROT_ARG_SC:
-#  if EXEC_CAPABLE
+#if EXEC_CAPABLE
                 if (jit_info->objfile) {
                     emitm_pushl_m(jit_info->native_ptr, CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
                             jit_info->native_ptr, RTYPE_DATA, "const_table", -4);
                 }
                 else
-#  endif
+#endif
                     emitm_pushl_i(jit_info->native_ptr,
                             interp->code->const_table->
                             constants[pi]->u.string);
@@ -1147,7 +1140,7 @@ store:
 
             case PARROT_ARG_KC:
             case PARROT_ARG_PC:
-#  if EXEC_CAPABLE
+#if EXEC_CAPABLE
                 if (jit_info->objfile) {
                     emitm_pushl_m(jit_info->native_ptr, CONST(i));
                     Parrot_exec_add_text_rellocation(jit_info->objfile,
@@ -1155,7 +1148,7 @@ store:
                             "const_table", -4);
                 }
                 else
-#  endif
+#endif
                     emitm_pushl_i(jit_info->native_ptr,
                             interp->code->const_table->
                             constants[pi]->u.key);
@@ -1393,12 +1386,12 @@ Parrot_jit_vtable_newp_ic_op(Parrot_jit_info_t *jit_info,
     /* push pmc enum and interpreter */
     emitm_pushl_i(jit_info->native_ptr, i2);
     emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#  if EXEC_CAPABLE
+#if EXEC_CAPABLE
     if (jit_info->objfile) {
         CALL("pmc_new_noinit");
     }
     else
-#  endif
+#endif
     {
         call_func(jit_info, (void (*) (void))pmc_new_noinit);
     }
@@ -1713,7 +1706,8 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
                     int j;
                     for (j = 0; j < reg_info->n_mapped_F; ++j) {
                         if (reg_info->map_F[j] == MAP(2+i)) {
-                            jit_emit_fload_mb_n(interp, NATIVECODE, emit_ESP, (j * sizeof (FLOATVAL)));
+                            jit_emit_fload_mb_n(interp, NATIVECODE, emit_ESP,
+                                                (j * sizeof (FLOATVAL)));
                             emitm_fstp(NATIVECODE, (1+params_map));
                             break;
                         }
@@ -1836,13 +1830,13 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
     jit_emit_mov_ri_i(interp, jit_info->native_ptr, emit_EAX, 1);
     if (!jit_info->objfile)
         call_func(jit_info, (void (*)(void))cgp_core);
-#    if EXEC_CAPABLE
+#  if EXEC_CAPABLE
     else {
         Parrot_exec_add_text_rellocation_func(jit_info->objfile,
             jit_info->native_ptr, "cgp_core");
         emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
     }
-#    endif
+#  endif
     /* when cur_opcode == 1, cgp_core jumps back here
      * when EAX == 0, the official return from HALT was called */
     jit_emit_test_r_i(jit_info->native_ptr, emit_EAX);
@@ -1973,11 +1967,11 @@ no_result:
         jit_emit_stack_frame_leave(NATIVECODE);
         emitm_ret(NATIVECODE);
         /* align the inner sub */
-#  if SUB_ALIGN
+#if SUB_ALIGN
         while ((long)jit_info->native_ptr & ((1<<SUB_ALIGN) - 1)) {
             jit_emit_noop(jit_info->native_ptr);
         }
-#  endif
+#endif
         /* fixup call statement */
         L1[1] = NATIVECODE - L1 - 5;
     }
@@ -2028,7 +2022,7 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
     jit_emit_finit(jit_info->native_ptr);
 }
 
-#  ifdef JIT_CGP
+#ifdef JIT_CGP
 /*
  * XXX needs some fixing
  * s. t/sub/pmc_{8,9}.t: the 2 print in tail call without that 'end'
@@ -2098,7 +2092,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
     }
 }
 
-#  else /* JIT_CGP */
+#else /* JIT_CGP */
 extern int jit_op_count(void);
 
 void
@@ -2122,52 +2116,52 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
  * decide to reuse the argument space though.  If you are *absolutely sure*
  * this does not happen define PARROT_JIT_STACK_REUSE_INTERP.
  */
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
+#  ifdef PARROT_JIT_STACK_REUSE_INTERP
         /*
         * op functions have the signature (cur_op, interp)
         * we use the interpreter already on stack and only push the
         * cur_op
         */
-#    else
+#  else
         /* push interpreter */
         Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
         emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#    endif
+#  endif
 
         emitm_pushl_i(jit_info->native_ptr, CORE_OPS_check_events);
 
         call_func(jit_info,
             (void (*) (void)) (interp->op_func_table[CORE_OPS_check_events]));
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
+#  ifdef PARROT_JIT_STACK_REUSE_INTERP
         emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
-#    else
+#  else
         emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
-#    endif
+#  endif
     }
 
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
+#  ifdef PARROT_JIT_STACK_REUSE_INTERP
     /*
     * op functions have the signature (cur_op, interp)
     * we use the interpreter already on stack and only push the
     * cur_op
     */
-#    else
+#  else
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
     emitm_pushl_r(jit_info->native_ptr, emit_ECX);
-#    endif
+#  endif
 
     emitm_pushl_i(jit_info->native_ptr, jit_info->cur_op);
 
     call_func(jit_info,
             (void (*) (void))(interp->op_func_table[cur_op]));
-#    ifdef PARROT_JIT_STACK_REUSE_INTERP
+#  ifdef PARROT_JIT_STACK_REUSE_INTERP
     emitm_addb_i_r(jit_info->native_ptr, 4, emit_ESP);
-#    else
+#  else
     emitm_addb_i_r(jit_info->native_ptr, 8, emit_ESP);
-#    endif
+#  endif
 }
 
-#  endif /* JIT_CGP */
+#endif /* JIT_CGP */
 
 void
 Parrot_jit_cpcf_op(Parrot_jit_info_t *jit_info,
@@ -2208,7 +2202,7 @@ Parrot_jit_restart_op(Parrot_jit_info_t *jit_info,
  * the needed register number
  * TODO handel overflow params
  */
- 
+
 int
 count_regs(PARROT_INTERP, char *sig, char *sig_start)
 {
@@ -2263,7 +2257,7 @@ calc_signature_needs(const char *sig, int *strings)
     return stack_size;
 
 }
-	
+
 /*
  * The function generated here is called as func(interp, nci_info)
  * interp   ...  8(%ebp)
@@ -2273,7 +2267,7 @@ calc_signature_needs(const char *sig, int *strings)
  * an optimized compile of src/nci.c:pcf_x_yy(). In case of any troubles
  * just compare the disassembly.
  */
- 
+
 void *
 Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
 {
@@ -2391,34 +2385,36 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 break;
             case 'p':   /* push pmc->data */
                 emitm_call_cfunc(pc, get_nci_P);
-#  if ! PMC_DATA_IN_EXT
+#if ! PMC_DATA_IN_EXT
                 /* mov pmc, %edx
                  * mov 8(%edx), %eax
                  * push %eax
                  */
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC, data));
-#  else
+#else
                 /* push pmc->pmc_ext->data
                  * mov pmc, %edx
                  * mov pmc_ext(%edx), %eax
                  * mov data(%eax), %eax
                  * push %eax
                  */
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC, pmc_ext));
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC_EXT, data));
-#  endif
+                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
+                               offsetof(struct PMC, pmc_ext));
+                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
+                               offsetof(struct PMC_EXT, data));
+#endif
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'O':   /* push PMC * object in P2 */
             case 'P':   /* push PMC * */
             case '@':
                 emitm_call_cfunc(pc, get_nci_P);
-#  if PARROT_CATCH_NULL
+#if PARROT_CATCH_NULL
                 /* PMCNULL is a global */
                 jit_emit_cmp_rm_i(pc, emit_EAX, &PMCNULL);
                 emitm_jxs(pc, emitm_jne, 2); /* skip the xor */
                 jit_emit_bxor_rr_i(interp, pc, emit_EAX, emit_EAX);
-#  endif
+#endif
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'v':
@@ -2431,12 +2427,14 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 break;
             case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
                 emitm_call_cfunc(pc, get_nci_S);
-                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, (size_t) &PObj_bufstart((STRING *) 0));
+                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
+                               (size_t) &PObj_bufstart((STRING *) 0));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
                 emitm_call_cfunc(pc, get_nci_S);
-                emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, (size_t) &PObj_bufstart((STRING *) 0));
+                emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
+                              (size_t) &PObj_bufstart((STRING *) 0));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'S':
@@ -2455,7 +2453,8 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 /* This might be right. Or not... */
                 /* we need the offset of PMC_int_val */
                 emitm_call_cfunc(pc, get_nci_P);
-                emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, (size_t) &PMC_int_val((PMC *) 0));
+                emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
+                              (size_t) &PMC_int_val((PMC *) 0));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             default:
@@ -2556,15 +2555,15 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             /* eax = PMC, get return value into edx */
             /* stuff return value into pmc->data */
 
-#  if ! PMC_DATA_IN_EXT
+#if ! PMC_DATA_IN_EXT
             /* mov %edx, (data) %eax */
             emitm_movl_r_m(interp, pc, emit_EDX, emit_EAX, 0, 1, offsetof(struct PMC, data));
-#  else
+#else
             /* mov pmc_ext(%eax), %eax
                mov %edx, data(%eax) */
             emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC, pmc_ext));
             emitm_movl_r_m(interp, pc, emit_EDX, emit_EAX, 0, 1, offsetof(struct PMC_EXT, data));
-#  endif
+#endif
 
             /* reset EBP(4) */
             emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
@@ -2683,3 +2682,9 @@ Parrot_jit_init(PARROT_INTERP)
     return &arch_info;
 }
 
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

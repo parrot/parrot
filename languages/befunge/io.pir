@@ -41,15 +41,15 @@
     $P1 = getstdin
     $S0 = readline $P1
     chopn $S0, 1
-    
+
   _IO__INPUT_CHAR__SUBSTR:
     $S1 = substr $S0, 0, 1, ""
     $P0 = $S0
     set_global "user_input", $P0
-    
+
     $I0 = ord $S1
     stack__push($I0)
-    
+
 .end
 
 #
@@ -74,7 +74,7 @@
     $S0 = readline $P1
     chopn $S0, 1
     len = length $S0
-    
+
   _IO__INPUT_INT__PARSE_INPUT:
     .local int    i
     .local string buf
@@ -87,12 +87,12 @@
     concat buf, $S1
     inc i
     if i < len goto _IO__INPUT_INT__NEXT_CHAR
-    
+
   _IO__INPUT_INT__NAN:
     substr $S0, 0, i, ""
     $P0 = $S0
     set_global "user_input", $P0
-  
+
     $I0 = buf
     stack__push($I0)
 .end
@@ -146,7 +146,7 @@
     .local int x, y
     y = stack__pop()
     x = stack__pop()
-    
+
     $P0 = get_global "playfield"
     $I0 = $P0[y;x]
     stack__push($I0)

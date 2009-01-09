@@ -80,7 +80,7 @@
     if char == '|' goto FLOW_IF_VERTICAL
     if char == '#' goto FLOW_BRIDGE
     if char == '@' goto FLOW_END
-    
+
     # math functions
     if char == '+' goto MATHS_ADD
     if char == '-' goto MATHS_SUB
@@ -88,7 +88,7 @@
     if char == '/' goto MATHS_DIV
     if char == '%' goto MATHS_MOD
     if char == '!' goto MATHS_NOT
-    
+
     # stack operations
     if char == ':' goto STACK_DUP
     if char == '$' goto STACK_POP
@@ -101,7 +101,7 @@
     if char == '.' goto IO_OUTPUT_INT
     if char == 'g' goto IO_VALUE_GET
     if char == 'p' goto IO_VALUE_PUT
-    
+
     # unknown instruction
     goto MOVE_PC
 
@@ -188,7 +188,7 @@
   MATHS_SUB:
     maths__sub()
     goto MOVE_PC
-    
+
     # stack operations
   STACK_DUP:
     stack__duplicate()
@@ -199,7 +199,7 @@
   STACK_SWAP:
     $I0 = stack__swap()
     goto MOVE_PC
-    
+
 
     # instruction executed, now move the pc
 

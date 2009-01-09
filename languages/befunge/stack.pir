@@ -11,7 +11,7 @@
 #
 .sub "stack__duplicate"
     $I0 = stack__pop()
-    
+
     $P0 = get_global "stack"
     push $P0, $I0
     push $P0, $I0
