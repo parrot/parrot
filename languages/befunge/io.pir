@@ -18,7 +18,38 @@
     set_global "stack", $P1
 .end
 
+
 # ** input
+
+#
+# io__input_char()
+#
+# input character.
+# befunge stack:
+#   before:     ...
+#   after:      ... c
+# c = getchar()
+# no return value.
+#
+.sub "io__input_char"
+    $P0 = get_global "user_input"
+    $S0 = $P0
+
+    $I0 = length $S0
+    if $I0 > 0 goto _IO__INPUT_CHAR__SUBSTR
+
+    $P1 = getstdin
+    $S0 = readline $P1
+    
+  _IO__INPUT_CHAR__SUBSTR:
+    $S1 = substr $S0, 0, 1, ""
+    $P0 = $S0
+    set_global "user_input", $P0
+    
+    $I0 = ord $S1
+    stack__push($I0)
+    
+.end
 
 #
 # io__input_int()
@@ -140,35 +171,6 @@
     set_global"playfield", $P0
 .end
 
-
-
-=pod
-
-
-# Input character.
-# Befunge stack:
-#   before:     ...
-#   after:      ... c
-# c = getchar()
-IO_INPUT_CHAR:
-    save S2
-    restore S2
-    length I10, S2
-    gt I10, 0, IO_INPUT_CHAR_SUBSTR
-    getstdin P15
-    readline S2, P15
-IO_INPUT_CHAR_SUBSTR:
-    substr S10, S2, 0, 1
-    length I10, S2
-    substr S2, S2, 1, I10
-    ord I10, S10
-    push P2, I10
-    save S2
-    restore S2
-    branch MOVE_PC
-
-
-=cut
 
 ########################################################################
 # Local Variables:

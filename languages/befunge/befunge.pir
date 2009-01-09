@@ -95,6 +95,7 @@
     if char == '\' goto STACK_SWAP
 
     # i/o operations
+    if char == '~' goto IO_INPUT_CHAR
     if char == '&' goto IO_INPUT_INT
     if char == ',' goto IO_OUTPUT_CHAR
     if char == '.' goto IO_OUTPUT_INT
@@ -179,6 +180,9 @@
     goto MOVE_PC
 
     # io instructions
+  IO_INPUT_CHAR:
+    io__input_char()
+    goto MOVE_PC
   IO_INPUT_INT:
     io__input_int()
     goto MOVE_PC
