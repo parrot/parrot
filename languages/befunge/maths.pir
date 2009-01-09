@@ -13,7 +13,7 @@
 .sub "maths__not"
     $I0 = stack__pop()
     $I0 = not $I0
-    stack_push($I0)
+    stack__push($I0)
 .end
 
 #
@@ -23,13 +23,9 @@
 #   after:      ... <number>
 .sub maths__push_number
     $P0 = get_global "status"
-    $P1 = get_global "stack"
-
     $S0 = $P0["char"]
     $I0 = $S0
-    push $P1, $I0
-
-    set_global "stack", $P1
+    stack__push($I0)
 .end
 
 
