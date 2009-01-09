@@ -39,7 +39,8 @@ Get the number of elements in the array.
 
 */
     VTABLE INTVAL elements() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_Segment *pfseg = PMC_data_typed(SELF, PackFile_Segment *);
+        return pfseg->size;
     }
 
 
@@ -53,7 +54,11 @@ Fetch an integer's worth of data from the segment.
 
 */
     VTABLE INTVAL get_integer_keyed_int(INTVAL key)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_Segment *pfseg = PMC_data_typed(SELF, PackFile_Segment *);
+        if(key < 0 || (UINTVAL)key >= pfseg->size)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "Requested data out of range.");
+        return pfseg->data[key];
     }
 
 
