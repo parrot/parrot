@@ -33,10 +33,6 @@
     stack = new 'ResizablePMCArray'
     set_global "stack", stack
 
-    .local num seed
-    seed = time
-    seed = mod seed, .RANDMAX
-
     .local string user_input
     user_input = ""
 
