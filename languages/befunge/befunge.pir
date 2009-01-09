@@ -88,18 +88,18 @@
     if char == 'v' goto FLOW_GO_SOUTH
     if char == '<' goto FLOW_GO_WEST
 
+    # flow control
+    # math functions
+    # stack operations
+    if char == ':' goto STACK_DUP
+
+    # i/o operations
+    if char == 'p' goto IO_PUT_VALUE
+    
     # unknown instruction
     goto MOVE_PC
 
 =pod
-
-
-        # Direction changing.
-        eq S0, "^", FLOW_GO_NORTH
-        eq S0, ">", FLOW_GO_EAST
-        eq S0, "v", FLOW_GO_SOUTH
-        eq S0, "<", FLOW_GO_WEST
-        eq S0, "?", FLOW_GO_AWAY
 
         # Flow control.
         eq S0, "`", FLOW_COMPARE
@@ -117,7 +117,7 @@
         eq S0, "!", MATHS_NOT
 
         # Stack operations.
-        eq S0, ":", STACK_DUP
+        #eq S0, ":", STACK_DUP
         eq S0, "$", STACK_POP
         eq S0, "\\", STACK_SWAP
 
@@ -127,7 +127,7 @@
         eq S0, ".", IO_OUTPUT_INT
         eq S0, ",", IO_OUTPUT_CHAR
         eq S0, "g", IO_GET_VALUE
-        eq S0, "p", IO_PUT_VALUE
+        #eq S0, "p", IO_PUT_VALUE
 
 =cut
 
@@ -155,12 +155,20 @@
   IO_PUSH_CHAR:
     io__push_char()
     goto MOVE_PC
+  IO_PUT_VALUE:
+    io__put_value()
+    goto MOVE_PC
 
     # maths instructions
   MATHS_PUSH_NUMBER:
     maths__push_number()
     goto MOVE_PC
-
+    
+    # stack operations
+  STACK_DUP:
+    stack__duplicate()
+    goto MOVE_PC
+    
 
     # instruction executed, now move the pc
 
