@@ -18,6 +18,12 @@
     set_global "stack", $P1
 .end
 
+# ** input
+
+# ** output
+
+
+# ** playfield tinkering
 
 #
 # io__value_get()
@@ -62,8 +68,6 @@
 
 
 =pod
-
-IO_PUSH_CHAR:
 
 # Input integer.
 # Befunge stack:
