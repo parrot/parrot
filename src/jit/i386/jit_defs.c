@@ -2,7 +2,9 @@
 Copyright (C) 2008, The Perl Foundation.
 $Id$
 */
+
 /* HEADERIZER HFILE: none */
+/* HEADERIZER STOP */
 
 #include <assert.h>
 #include "parrot/parrot.h"
