@@ -78,6 +78,23 @@
     stack__push($I2)
 .end
 
+
+#
+# maths__mod()
+#
+# modulus.
+# befunge stack:
+#   before:     ... a b
+#   after:      ... a%b
+#
+.sub "maths__mod"
+    $I1 = stack__pop()
+    $I0 = stack__pop()
+    $I2 = mod $I0, $I1
+    stack__push($I2)
+.end
+
+
 =pod
 
 # Create a pseudo-random number.
@@ -113,23 +130,6 @@ MATHS_MUL_POP_1:
     pop I10, P2
 MATHS_MUL_POP_2:
     mul I12, I10, I11
-    push P2, I12
-    branch MOVE_PC
-
-# Remainder.
-# Befunge Stack:
-#   before:     ... a b
-#   after:      ... a mod b
-MATHS_MOD:
-    set I11, P2
-    unless I11, MATHS_MOD_POP_1
-    pop I11, P2
-MATHS_MOD_POP_1:
-    set I10, P2
-    unless I10, MATHS_MOD_POP_2
-    pop I10, P2
-MATHS_MOD_POP_2:
-    mod I12, I10, I11
     push P2, I12
     branch MOVE_PC
 

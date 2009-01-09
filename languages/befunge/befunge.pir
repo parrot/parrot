@@ -98,6 +98,7 @@
     if char == '+' goto MATHS_ADD
     if char == '-' goto MATHS_SUB
     if char == '/' goto MATHS_DIV
+    if char == '%' goto MATHS_MOD
     if char == '!' goto MATHS_NOT
     
     # stack operations
@@ -131,7 +132,7 @@
         #eq S0, "-", MATHS_SUB
         eq S0, "*", MATHS_MUL
         #eq S0, "/", MATHS_DIV
-        eq S0, "%", MATHS_MOD
+        #eq S0, "%", MATHS_MOD
         #eq S0, "!", MATHS_NOT
 
         # Stack operations.
@@ -201,6 +202,9 @@
     goto MOVE_PC
   MATHS_DIV:
     maths__div()
+    goto MOVE_PC
+  MATHS_MOD:
+    maths__mod()
     goto MOVE_PC
   MATHS_NOT:
     maths__not()
