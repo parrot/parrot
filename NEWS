@@ -11,6 +11,9 @@ New in January 2009 release
     - various bug fixes and updates
     - basic bytecode generation for calling conventions
 - Languages
+  + Befunge
+    - back to working state
+    - ported to pir
   + Pipp
     - added support for 'elsif'
     - added support for 'do-while'
