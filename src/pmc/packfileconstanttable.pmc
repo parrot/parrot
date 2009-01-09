@@ -26,6 +26,21 @@ PDD13 for the design spec.
 
 #include "parrot/parrot.h"
 
+static PackFile_Constant *
+getconst(PARROT_INTERP, PackFile_ConstTable *table, int index, int type)
+{
+    PackFile_Constant *rv;
+    if(index < 0 || index >= table->const_count)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "Requested data out of range.");
+    rv = table->constants[index];
+    if(rv->type != type)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Requested constant of the wrong type.");
+    return rv;
+}
+
+
 pmclass PackfileConstantTable extends PackfileSegment {
 
 
@@ -39,7 +54,8 @@ Get the number of elements in the array.
 
 */
     VTABLE INTVAL elements() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_ConstTable *pftable = PMC_data_typed(SELF, PackFile_ConstTable *);
+        return pftable->const_count;
     }
 
 
@@ -54,7 +70,9 @@ numeric.
 
 */
     VTABLE FLOATVAL get_number_keyed_int(INTVAL index)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_ConstTable *pftable = PMC_data_typed(SELF, PackFile_ConstTable *);
+        PackFile_Constant *constant = getconst(interp, pftable, index, PFC_NUMBER);
+        return constant->u.number;
     }
 
 
@@ -69,7 +87,9 @@ a string.
 
 */
     VTABLE STRING *get_string_keyed_int(INTVAL index)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_ConstTable *pftable = PMC_data_typed(SELF, PackFile_ConstTable *);
+        PackFile_Constant *constant = getconst(interp, pftable, index, PFC_STRING);
+        return constant->u.string;
     }
 
 
@@ -83,7 +103,9 @@ Fetch a PMC constant.  An exception is thrown if the given constant isn't a PMC.
 
 */
     VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_ConstTable *pftable = PMC_data_typed(SELF, PackFile_ConstTable *);
+        PackFile_Constant *constant = getconst(interp, pftable, index, PFC_PMC);
+        return constant->u.key;
     }
 
 
@@ -152,8 +174,16 @@ Get the type of the specified constant.  Possible type IDs:
 =cut
 
 */
-    INTVAL get_type(INTVAL index) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    METHOD get_type(INTVAL index) {
+        PackFile_ConstTable *pftable = PMC_data_typed(SELF, PackFile_ConstTable *);
+        PackFile_Constant *constant;
+        INTVAL rv;
+        if(index < 0 || index >= pftable->const_count)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "Requested data out of range.");
+        constant = pftable->constants[index];
+        rv = constant->type;
+        RETURN(INTVAL rv);
     }
 
 
