@@ -204,9 +204,9 @@
     goto DEBUG__INTERACT__LOOP
 
   DEBUG__INTERACT__BREAK:
-    $S1 = substr $S0, 6, -1
+    substr $S0, 0, 6, ""
     $P0 = get_global "breakpoints"
-    $P0[$S1] = 1
+    $P0[$S0] = 1
     set_global "breakpoints", $P0
     goto DEBUG__INTERACT__LOOP
     
