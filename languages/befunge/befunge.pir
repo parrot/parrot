@@ -74,6 +74,7 @@
     if char == '^' goto FLOW_GO_NORTH
     if char == 'v' goto FLOW_GO_SOUTH
     if char == '<' goto FLOW_GO_WEST
+    if char == '?' goto FLOW_GO_AWAY
 
     # flow control
     if char == '`' goto FLOW_COMPARE
@@ -149,6 +150,9 @@
     goto MOVE_PC
   FLOW_END:
     flow__end()
+    goto MOVE_PC
+  FLOW_GO_AWAY:
+    flow__go_away()
     goto MOVE_PC
   FLOW_GO_EAST:
     flow__go_east()

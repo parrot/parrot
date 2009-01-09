@@ -45,6 +45,23 @@
 .end
 
 
+#
+# go away.
+# befunge stack unchanged.
+# delta <- one of N,S,E,W
+# no return value
+#
+.sub "flow__go_away"
+    $P0 = new 'Random'
+    $N0 = $P0
+    $N0 = $N0 * 4
+    $I0 = $N0
+    $P0 = get_global "status"
+    $P0["dir"] = $I0
+    set_global "status", $P0
+.end
+
+
 # ** ifs & comparisons
 
 #
@@ -154,18 +171,6 @@
     _flow__flag_set(0)
 .end
 
-=pod
-
-FLOW_GO_AWAY:
-    save 4
-    bsr MATHS_RAND
-    restore I10
-    set I2, I10
-    save I2
-    restore I2
-    branch MOVE_PC
-
-=cut
 
 
 # ** end
