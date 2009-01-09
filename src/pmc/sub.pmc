@@ -385,7 +385,8 @@ Creates and returns a clone of the subroutine.
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret)    = NULL;
         memcpy(sub, PMC_sub(SELF), sizeof (Parrot_sub));
-        sub->name           = string_copy(INTERP, sub->name);
+        if (sub->name != NULL)
+            sub->name = string_copy(INTERP, sub->name);
 
         if (sub->ctx)
             Parrot_context_ref(INTERP, sub->ctx);

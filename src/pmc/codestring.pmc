@@ -214,31 +214,32 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
     STRING *semi          = CONST_STRING(INTERP, ";");
     STRING *close_bracket = CONST_STRING(INTERP, "]");
     STRING *s_array       = CONST_STRING(INTERP, "array");
-    STRING *prefix        = open_bracket;
-    STRING *out           = CONST_STRING(INTERP, "");
+    STRING *prefix        = NULL;
+    STRING *out           = open_bracket;
     INTVAL elements, index;
 
     elements     = VTABLE_elements(INTERP, args);
 
     for (index = 0; index < elements; index++) {
         PMC *P0      = VTABLE_get_pmc_keyed_int(INTERP, args, index);
-        if (VTABLE_does(interp, P0, s_array)) {
+        if (PMC_IS_NULL(P0)) continue;
+        else if (VTABLE_does(interp, P0, s_array)) {
             INTVAL elements2, index2;
             elements2 = VTABLE_elements(INTERP, P0);
             for (index2 = 0; index2 < elements2; index2++) {
                 STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
-                out          = string_append(INTERP, out, prefix);
                 (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-                out          = string_append(INTERP, out, S0);
-                prefix       = semi;
+                if (prefix) out = string_append(INTERP, out, prefix);
+                out    = string_append(INTERP, out, S0);
+                prefix = semi;
             }
         }
         else {
             STRING *S0   = VTABLE_get_string_keyed_int(INTERP, args, index);
-            out          = string_append(INTERP, out, prefix);
             (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-            out          = string_append(INTERP, out, S0);
-            prefix       = semi;
+            if (prefix) out = string_append(INTERP, out, prefix);
+            out    = string_append(INTERP, out, S0);
+            prefix = semi;
         }
     }
 

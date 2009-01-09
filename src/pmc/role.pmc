@@ -431,7 +431,20 @@ composed into this role.
         }
 
         /* Clone and return. */
-        return PMC_IS_NULL(found) ? PMCNULL : VTABLE_clone(interp, found);
+        if (PMC_IS_NULL(found)) { return PMCNULL; }
+        if (found->vtable->base_type == enum_class_Hash) {
+            /* for Hash return values, create and return a shallow 
+             * clone because the VTABLE_clone does a deep clone */
+            PMC * const hash = pmc_new(interp, enum_class_Hash);
+            PMC * const iter = VTABLE_get_iter(interp, found);
+            while (VTABLE_get_bool(interp, iter)) {
+                STRING * key = VTABLE_shift_string(interp, iter);
+                PMC * value  = VTABLE_get_pmc_keyed_str(interp, found, key);
+                VTABLE_set_pmc_keyed_str(interp, hash, key, value);
+            }
+            return hash;
+        }
+        return VTABLE_clone(interp, found);
     }
 
 

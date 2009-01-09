@@ -19,7 +19,7 @@ Tests the CodeString class directly.
 
 .sub main :main
     .include 'include/test_more.pir'
-    plan(17)
+    plan(20)
 
     create_codestring()
     calls_to_unique()
@@ -139,16 +139,24 @@ CODE
     .local pmc code
     code = new ['CodeString']
     $S0 = code.'key'('abc')
-    is($S0, '["abc"]', "unnested namespace key ok")
+    is($S0, '["abc"]', "unnested namespace key")
     $S0 = code.'key'('abc', 'def')
-    is($S0, '["abc";"def"]', "nested namespace key ok")
+    is($S0, '["abc";"def"]', "nested namespace key")
     $P0 = split ' ', unicode:"abc def T\xe9st"
     $S0 = code.'key'($P0 :flat)
-    is($S0, '["abc";"def";unicode:"T\x{e9}st"]', "flattened nested unicode ns key ok")
+    is($S0, '["abc";"def";unicode:"T\x{e9}st"]', "flattened nested unicode ns key")
     $S0 = code.'key'($P0)
-    is($S0, '["abc";"def";unicode:"T\x{e9}st"]', "nested unicode ns key ok")
+    is($S0, '["abc";"def";unicode:"T\x{e9}st"]', "nested unicode ns key")
     $S0 = code.'key'('_perl6', $P0)
-    is($S0, '["_perl6";"abc";"def";unicode:"T\x{e9}st"]', "big ns key ok")
+    is($S0, '["_perl6";"abc";"def";unicode:"T\x{e9}st"]', "big ns key")
+    $S0 = code.'key'('')
+    is($S0, '[""]', "empty string namespace")
+    $P0 = new 'ResizablePMCArray'
+    $S0 = code.'key'($P0)
+    is($S0, '[]', "empty array namespace")
+    null $P0
+    $S0 = code.'key'($P0)
+    is($S0, '[]', "null PMC namespace")
 .end
 
 .sub first_char_repl_regression
