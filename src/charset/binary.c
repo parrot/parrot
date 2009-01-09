@@ -28,8 +28,10 @@ This file implements the charset functions for binary data
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static INTVAL compare(SHIM_INTERP,
-    SHIM(const STRING *lhs),
-    SHIM(const STRING *rhs));
+    ARGIN(const STRING *lhs),
+    ARGIN(const STRING *rhs))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 static STRING* compose(PARROT_INTERP, SHIM(STRING *source_string))
@@ -106,7 +108,9 @@ static void upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
         __attribute__nonnull__(1);
 
 static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
-#define ASSERT_ARGS_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(lhs) \
+    || PARROT_ASSERT_ARG(rhs)
 #define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_cs_index __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
