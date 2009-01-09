@@ -58,7 +58,7 @@ print a list of files that do match PATTERN
 
 treat binary files as text.
 
-This uses a basic hueristic to discover if a file is binary or not.  Files are
+This uses a basic heuristic to discover if a file is binary or not.  Files are
 read line by line, and it keeps processing "normally" until a control character
 is found, and then stops and goes onto the next file is that line matches.
 
