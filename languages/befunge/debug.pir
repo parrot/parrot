@@ -252,23 +252,11 @@
 
 =pod
 
-DEBUG_INTERACT:
-DEBUG_INTERACT_BREAK:
-        substr S11, S10, 0, 6, ""
-        set P4, P3[1]
-        set P4[S10], 1      # stop at specified breakpoint
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_CONTINUE:
-        set P3[0], 0        # do not stop at next instruction
-        branch DEBUG_INTERACT_END
 DEBUG_INTERACT_DELETE:
         substr S11, S10, 0, 7, ""
         set P4, P3[1]
         delete P4[S10]
         branch DEBUG_INTERACT
-DEBUG_INTERACT_NEXT:
-        set P3[0], 1        # stop at next instruction
-        branch DEBUG_INTERACT_END
 
 =cut
 
