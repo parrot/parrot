@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -375,25 +375,23 @@ show version information.
     .local pmc env
     env = get_hll_global '_G'
     .const 'LuaString' k_print = 'print'
-    .local int has_readline
     .local pmc stdin
     stdin = getstdin
-    has_readline = stdin.'set_readline_interactive'(1)
+    .local string code
   L1:
-    .local pmc code
-    code = get_line (stdin, has_readline, 1)
-    if null code goto L2    # no input
-    unless code goto L2     # empty
+    code = get_line(stdin, 1)
+    if code == '' goto L1   # no input
+    if code == '\04' goto L2
     ($P0, $S0) = lua_loadbuffer(code, '=stdin')
     unless null $P0 goto L3
   L4:
     $I0 = index $S0, "'eof' expected"
     if $I0 < 0 goto L5
-    .local pmc code2
-    code2 = get_line (stdin, has_readline, 0)
-    if null code2 goto L5   # no input
-    unless code2 goto L5    # empty
-    code = concat code2
+    .local string code2
+    code2 = get_line(stdin, 0)
+    if code2 == '' goto L5  # no input
+    if code2 == '\04' goto L2
+    code .= code2
     ($P0, $S0) = lua_loadbuffer(code, '=stdin')
     if null $P0 goto L4
   L3:
@@ -415,31 +413,24 @@ show version information.
 
 .sub 'get_line' :anon
     .param pmc stdin
-    .param int has_readline
     .param int firstline
     .local string prmt
     prmt = get_prompt(firstline)
-    printerr prmt
-    .local pmc code
-    if has_readline < 0 goto L1
-    code = stdin.'readline'('')
-    if null code goto L2        # no input
+    .local string code
+    push_eh _handler
+    code = stdin.'readline_interactive'(prmt)
+    pop_eh
+    if code == '' goto L2        # no input
     code .= "\n"
-    goto L3
-  L1:
-    $S0 = readline stdin
-    new code, 'String'
-    code = $S0
-  L3:
     unless firstline goto L2
-    $S0 = code
-    $S1 = substr $S0, 0, 1
+    $S1 = substr code, 0, 1
     unless $S1 == '=' goto L2
-    $S0 = substr $S0, 1         # first line starts with `='
-    $S0 = 'return ' . $S0
-    set code, $S0               # change it to `return'
+    $S0 = substr code, 1         # first line starts with `='
+    code = 'return ' . $S0       # change it to `return'
   L2:
     .return (code)
+  _handler:
+    .return ('\04')              # Ctrl-D
 .end
 
 
@@ -475,7 +466,7 @@ show version information.
 
 
 .sub 'print_version' :anon
-    l_message('', "Lua 5.1 on Parrot  Copyright (C) 2005-2008, The Perl Foundation.")
+    l_message('', "Lua 5.1 on Parrot  Copyright (C) 2005-2009, The Perl Foundation.")
 .end
 
 
