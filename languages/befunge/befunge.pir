@@ -89,6 +89,8 @@
     if char == '<' goto FLOW_GO_WEST
 
     # flow control
+    if char == '_' goto FLOW_IF_HORIZONTAL
+    if char == '!' goto FLOW_IF_VERTICAL
     
     # math functions
     if char == '!' goto MATHS_NOT
@@ -111,8 +113,8 @@
 
         # Flow control.
         eq S0, "`", FLOW_COMPARE
-        eq S0, "_", FLOW_EW_IF
-        eq S0, "|", FLOW_NS_IF
+        #eq S0, "_", FLOW_EW_IF
+        #eq S0, "|", FLOW_NS_IF
         eq S0, "#", FLOW_BRIDGE
         eq S0, "@", FLOW_END
 
@@ -151,6 +153,12 @@
     goto MOVE_PC
   FLOW_GO_WEST:
     flow__go_west()
+    goto MOVE_PC
+  FLOW_IF_HORIZONTAL:
+    flow__if_horizontal()
+    goto MOVE_PC
+  FLOW_IF_VERTICAL:
+    flow__if_vertical()
     goto MOVE_PC
   FLOW_TOGGLE_STRING_MODE:
     flow__toggle_string_mode()

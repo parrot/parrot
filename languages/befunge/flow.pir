@@ -45,6 +45,43 @@
 .end
 
 
+# ** ifs & comparisons
+
+#
+# flow__if_horizontal()
+#
+# east/west if.
+# befunge stack:
+#   before:     ... b
+#   after:      ...
+# delta <- if (b) (-1,0) else (1,0)
+.sub "flow__if_horizontal"
+    $I0 = stack__pop()
+    if $I0 == 0 goto FLOW__IF_HORIZONTAL__FALSE
+    flow__go_west()
+    .return()
+  FLOW__IF_HORIZONTAL__FALSE:
+    flow__go_east()
+.end
+
+#
+# flow__if_vertical()
+#
+# north/south if.
+# befunge stack:
+#   before:     ... b
+#   after:      ...
+# delta <- if (b) (0,-1) else (0,1)
+.sub "flow__if_vertical"
+    $I0 = stack__pop()
+    if $I0 == 0 goto FLOW__IF_HORIZONTAL__FALSE
+    flow__go_south()
+    .return()
+  FLOW__IF_HORIZONTAL__FALSE:
+    flow__go_north()
+.end
+
+
 # ** flag handling
 
 #
@@ -88,31 +125,6 @@ FLOW_GO_AWAY:
     restore I2
     branch MOVE_PC
 
-# East/West if.
-# Befunge stack:
-#   before:     ... b
-#   after:      ...
-# delta <- if (b) (-1,0) else (1,0)
-FLOW_EW_IF:
-    set I10, P2
-    unless I10, FLOW_EW_IF_POP_1
-    pop I10, P2
-FLOW_EW_IF_POP_1:
-    eq I10, 0, FLOW_GO_EAST
-    branch FLOW_GO_WEST
-
-# North/South if.
-# Befunge stack:
-#   before:     ... b
-#   after:      ...
-# delta <- if (b) (0,-1) else (0,1)
-FLOW_NS_IF:
-    set I10, P2
-    unless I10, FLOW_NS_IF_POP_1
-    pop I10, P2
-FLOW_NS_IF_POP_1:
-    eq I10, 0, FLOW_GO_SOUTH
-    branch FLOW_GO_NORTH
 
 
 # Greater than.
