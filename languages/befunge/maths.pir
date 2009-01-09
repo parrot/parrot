@@ -5,6 +5,8 @@
 # befunge stack:
 #   before:     ...
 #   after:      ... <number>
+# no return value.
+#
 .sub maths__push_number
     $P0 = get_global "status"
     $S0 = $P0["char"]
@@ -22,6 +24,7 @@
 # befunge stack:
 #   before:     ... a b
 #   after:      ... a+b
+# no return value.
 #
 .sub "maths__add"
     $I1 = stack__pop()
@@ -38,6 +41,7 @@
 # befunge stack:
 #   before:     ... a b
 #   after:      ... a/b
+# no return value.
 #
 .sub "maths__div"
     $I1 = stack__pop()
@@ -54,6 +58,7 @@
 # befunge stack:
 #   before:     ... a b
 #   after:      ... a%b
+# no return value.
 #
 .sub "maths__mod"
     $I1 = stack__pop()
@@ -71,6 +76,7 @@
 #   before:     ... a b
 #   after:      ... a*b
 # no return value.
+# no return value.
 #
 .sub "maths__mul"
     $I1 = stack__pop()
@@ -87,6 +93,7 @@
 # befunge stack:
 #   before:     ... a
 #   after:      ... not(a)
+# no return value.
 #
 .sub "maths__not"
     $I0 = stack__pop()
@@ -102,6 +109,7 @@
 # befunge stack:
 #   before:     ... a b
 #   after:      ... a-b
+# no return value.
 #
 .sub "maths__sub"
     $I1 = stack__pop()
