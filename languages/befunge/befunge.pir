@@ -26,7 +26,7 @@
     status["x"] = 0       # x coord of the pc
     status["y"] = 0       # y coord of the pc
     status["dir"]  = 1    # direction of the pc
-    status["flag"] = 0    # 1=string-mode, 2=bridge, 3=end
+    status["flag"] = 0    # 1=string-mode, 2=bridge
     set_global "status", status
 
     .local pmc stack
