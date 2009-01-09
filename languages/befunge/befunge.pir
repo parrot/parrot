@@ -90,7 +90,7 @@
 
     # flow control
     if char == '_' goto FLOW_IF_HORIZONTAL
-    if char == '!' goto FLOW_IF_VERTICAL
+    if char == '|' goto FLOW_IF_VERTICAL
     
     # math functions
     if char == '!' goto MATHS_NOT
