@@ -52,7 +52,7 @@
 .end
 
 #
-# io__input_int()
+# io__input_integer()
 #
 # input integer.
 # befunge stack:

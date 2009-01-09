@@ -148,7 +148,7 @@
     io__input_char()
     goto MOVE_PC
   IO_INPUT_INT:
-    io__input_int()
+    io__input_integer()
     goto MOVE_PC
   IO_OUTPUT_CHAR:
     io__output_char()
