@@ -211,7 +211,10 @@
     goto DEBUG__INTERACT__LOOP
     
   DEBUG__INTERACT__CONTINUE:
-    goto DEBUG__INTERACT__LOOP
+    $P0 = get_global "step"
+    $P0 = 0
+    set_global "step", $P0
+    goto DEBUG__INTERACT__END
     
   DEBUG__INTERACT__DELETE:
     _debug__breakpoint_del()
@@ -321,7 +324,7 @@ DEBUG_INTERACT_NEXT:
     $S1 = x
     concat $S0, $S1
     $I0 = exists breakpoints[$S0]
-    if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__COL
+    if $I0 == 0 goto DEBUG__CHECK_BREAKPOINT__END
     _debug__interact()
     # fallback
     #goto DEBUG__CHECK_BREAKPOINT__END

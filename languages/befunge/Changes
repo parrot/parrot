@@ -2,6 +2,9 @@
 
 Revision history for a Befunge interpreter written for Parrot.
 
+0.3.0 
+        Ported to latest parrot.
+
 0.2.2 Tue May 30 20:59:09 CEST 2005
         Use standard PMCs instead of Perl* PMCs
 
