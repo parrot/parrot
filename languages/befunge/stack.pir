@@ -58,6 +58,20 @@
 .end
 
 
+#
+# stack__swap()
+#
+# swap.
+# befunge stack:
+#   before:     ... a b
+#   after:      ... b a
+.sub "stack__swap"
+    $I0 = stack__pop()
+    $I1 = stack__pop()
+    stack__push($I0)
+    stack__push($I1)
+.end
+
 =pod
 
 STACK_POP:
@@ -67,10 +81,6 @@ STACK_POP:
 STACK_POP_POP_1:
     branch MOVE_PC
 
-# Swap.
-# Befunge stack:
-#   before:     ... a b
-#   after:      ... b a
 STACK_SWAP:
     set I10, P2
     unless I10, STACK_SWAP_POP_1
