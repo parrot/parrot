@@ -40,6 +40,7 @@
 
     $P1 = getstdin
     $S0 = readline $P1
+    chopn $S0, 1
     
   _IO__INPUT_CHAR__SUBSTR:
     $S1 = substr $S0, 0, 1, ""
@@ -71,6 +72,7 @@
 
     $P1 = getstdin
     $S0 = readline $P1
+    chopn $S0, 1
     len = length $S0
     
   _IO__INPUT_INT__PARSE_INPUT:
