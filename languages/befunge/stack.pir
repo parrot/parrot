@@ -1,25 +1,53 @@
 # $Id$
 
-=pod
-
-# Duplicate.
-# Befunge stack:
+#
+# stack_duplicate()
+#
+# duplicate element at top of stck
+# befunge stack:
 #   before:     ... v
-#   after:      ... v
-STACK_DUP:
-    set I10, P2
-    unless I10, STACK_DUP_POP_1
-    pop I10, P2
-STACK_DUP_POP_1:
-    push P2, I10
-    push P2, I10
-    branch MOVE_PC
+#   after:      ... v v
+# no return value
+#
+.sub "stack__duplicate"
+    $P0 = get_global "stack"
 
-# Pop.
-# Befunge stack:
+    $I0 = $P0
+    if $I0 == 0 goto STACK__DUPLICATE_END
+    
+    $I1 = pop $P0
+    push $P0, $I1
+    push $P0, $I1
+    set_global "stack", $P0
+
+  STACK__DUPLICATE_END:
+    .return()
+.end
+
+
+#
+# val = stack__pop()
+#
+# pop and return a value from the stack, or 0 if stack is empty.
+# befunge stack:
 #    before:    ... v
 #    after:     ...
-# Element is just discarded.
+#
+.sub "stack__pop"
+    $P0 = get_global "stack"
+
+    $I0 = $P0
+    if $I0 > 0 goto STACK__POP__POP
+    .return(0)
+
+  STACK__POP__POP:
+    $I1 = pop $P0
+    set_global "stack", $P0
+    .return($I1)
+.end
+
+=pod
+
 STACK_POP:
     set I10, P2
     unless I10, STACK_POP_POP_1
