@@ -659,6 +659,25 @@ handlers in scope, the interpreter will pass the exception object to the
 handler and continue execution there. If there are no handlers available,
 Parrot will exit.
 
+=head2 Exception Attributes
+
+Since Exceptions are PMC objects, they can contain a number of useful data
+items. One such data item is the message:
+
+  $P0 = new 'Exception'
+  $P1 = new 'String'
+  $P1 = "this is an error message for the exception"
+  $P0["message"] = $P1
+
+Another is the severity and the type:
+
+  $P0["severity"] = 1   # An integer value
+  $P0["type"] = 2       # Also an Integer
+  
+Finally, there is a spot for additional data to be included:
+
+  $P0["payload"] = $P2  # Any arbitrary PMC
+
 =head2 Exception Handlers
 
 Exception handlers are labels in PIR code that can be jumped to when an
@@ -672,6 +691,34 @@ the top of the stack.
 
   my_handler:
     # handle the error here
+
+=head3 Catching Exceptions
+
+The exception PMC that was thrown can be caught using the C<.get_results()>
+directive. This returns the Exception PMC object that was thrown from inside
+the handler:
+
+  my_handler:
+    .local pmc err
+    .get_results(err)
+
+With the exception PMC available, the various attributes of that PMC can be
+accessed and analyzed for additional information about the error.
+
+=head3 Exception Handler PMCs
+
+Like all other interesting data types in Parrot, exception handlers are a PMC
+type. When using the syntax above with C<push_eh LABEL>, the handler PMC
+is created internally by Parrot. However, you can create it explicitly too
+if you want:
+
+  $P0 = new 'ExceptionHandler'
+  set_addr $P0, my_handler
+  push_eh $P0
+  ...
+  
+  my_handler:
+    ...
 
 =head2 Rethrowing and Exception Propagation
 
@@ -730,7 +777,6 @@ to a function in the current call stack. Each hash has two elements:
 C<'annotation'> which is the hash of annotations that were in effect at that
 point, and C<'sub'> which is the Sub PMC of that function.
   
-
 =cut
 
 ##########################################################################
