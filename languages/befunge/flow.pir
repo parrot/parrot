@@ -85,6 +85,21 @@
 # ** flag handling
 
 #
+# _flow__flag_set(val)
+#
+# set flag to val.
+#
+.sub "_flow__flag_set"
+    .param int val
+    $P0 = get_global "status"
+    $P0["flag"] = val
+    set_global "status", $P0
+.end
+
+
+#
+# flow__toggle_string_mode()
+#
 # toggle string mode.
 # befunge stack unchanged.
 #
@@ -93,14 +108,11 @@
     $I0 = $P0["flag"]
 
     if $I0 == 1 goto FLOW__TOGGLE_STRING_MODE__OFF
-    $P0["flag"] = 1
-    goto FLOW__TOGGLE_STRING_MODE__DONE
+    _flow__flag_set(1)
+    .return()
 
   FLOW__TOGGLE_STRING_MODE__OFF:
-    $P0["flag"] = 0
-
-  FLOW__TOGGLE_STRING_MODE__DONE:
-    set_global "status", $P0
+    _flow__flag_set(0)
 .end
 
 
@@ -112,9 +124,11 @@
 #
 .sub "flow__trampoline"
     .param int val
-    $P0 = get_global "status"
-    $P0["flag"] = val
-    set_global "status", $P0
+    if val == 0 goto FLOW__TRAMPOLINE_OFF
+    _flow__flag_set(2)
+    .return()
+  FLOW__TRAMPOLINE_OFF:
+    _flow__flag_set(0)
 .end
 
 =pod
