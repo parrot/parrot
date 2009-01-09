@@ -204,7 +204,10 @@
     goto DEBUG__INTERACT__LOOP
 
   DEBUG__INTERACT__BREAK:
-    _debug__breakpoint_add()
+    $S1 = substr $S0, 6, -1
+    $P0 = get_global "breakpoints"
+    $P0[$S1] = 1
+    set_global "breakpoints", $P0
     goto DEBUG__INTERACT__LOOP
     
   DEBUG__INTERACT__CONTINUE:
