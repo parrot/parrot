@@ -10,8 +10,6 @@
 .sub "befunge" :main
     .param pmc argv
 
-    print "befunge being ported to a working state...\n"
-
     # disable buffering on stdout
     #getstdout stdout
     #pioctl I10, P10, 3, 0
