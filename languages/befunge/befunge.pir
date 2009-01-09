@@ -33,8 +33,10 @@
     stack = new 'ResizablePMCArray'
     set_global "stack", stack
 
-    .local string user_input
+    .local pmc user_input
+    user_input = new 'String'
     user_input = ""
+    set_global "user_input", user_input
 
     .local int    x, y, flag, val
     .local string char
@@ -93,6 +95,7 @@
     if char == '\' goto STACK_SWAP
 
     # i/o operations
+    if char == '&' goto IO_INPUT_INT
     if char == ',' goto IO_OUTPUT_CHAR
     if char == '.' goto IO_OUTPUT_INT
     if char == 'g' goto IO_VALUE_GET
@@ -176,6 +179,9 @@
     goto MOVE_PC
 
     # io instructions
+  IO_INPUT_INT:
+    io__input_int()
+    goto MOVE_PC
   IO_OUTPUT_CHAR:
     io__output_char()
     goto MOVE_PC

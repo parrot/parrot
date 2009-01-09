@@ -20,6 +20,51 @@
 
 # ** input
 
+#
+# io__input_int()
+#
+# input integer.
+# befunge stack:
+#   before:     ...
+#   after:      ... i
+# i = readint()
+# no return value.
+#
+.sub "io__input_integer"
+    $P0 = get_global "user_input"
+    $S0 = $P0
+
+    .local int len
+    len = length $S0
+    if len > 0 goto _IO__INPUT_INT__PARSE_INPUT
+
+    $P1 = getstdin
+    $S0 = readline $P1
+    len = length $S0
+    
+  _IO__INPUT_INT__PARSE_INPUT:
+    .local int    i
+    .local string buf
+    i   = 0
+    buf = ""
+  _IO__INPUT_INT__NEXT_CHAR:
+    $S1 = substr $S0, i, 1
+    if $S1 < '0' goto _IO__INPUT_INT__NAN
+    if $S1 > '9' goto _IO__INPUT_INT__NAN
+    concat buf, $S1
+    inc i
+    if i < len goto _IO__INPUT_INT__NEXT_CHAR
+    
+  _IO__INPUT_INT__NAN:
+    substr $S0, 0, i, ""
+    $P0 = $S0
+    set_global "user_input", $P0
+  
+    $I0 = buf
+    stack__push($I0)
+.end
+
+
 # ** output
 
 #
@@ -99,35 +144,6 @@
 
 =pod
 
-# Input integer.
-# Befunge stack:
-#   before:     ...
-#   after:      ... i
-# i = readint()
-IO_INPUT_INT:
-    save S2
-    restore S2
-    length I10, S2
-    gt I10, 0, IO_INPUT_INT_PARSE_INPUT
-    getstdin P15
-    readline S2, P15
-    length I10, S2
-IO_INPUT_INT_PARSE_INPUT:
-    set I11, 0
-    set S10, ""
-IO_INPUT_INT_NEXT_CHAR:
-    substr S11, S2, I11, 1
-    lt S11, "0", IO_INPUT_INT_NAN
-    gt S11, "9", IO_INPUT_INT_NAN
-    concat S10, S10, S11
-    inc I11
-    lt I11, I10, IO_INPUT_INT_NEXT_CHAR
-    set I10, 0
-    set I11, 0
-IO_INPUT_INT_NAN:
-    substr S2, S2, I11, I10
-    push P2, S10
-    branch MOVE_PC
 
 # Input character.
 # Befunge stack:
