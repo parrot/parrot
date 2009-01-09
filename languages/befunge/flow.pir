@@ -3,9 +3,13 @@
 # ** direction changing
 
 #
+# flow__go_east()
+#
 # go east.
 # befunge stack unchanged.
 # delta <- (1,0)
+# no return value.
+#
 .sub "flow__go_east"
     $P0 = get_global "status"
     $P0["dir"] = 1
@@ -13,9 +17,13 @@
 .end
 
 #
+# flow__go_north()
+#
 # go north.
 # befunge stack unchanged.
 # delta <- (1,0)
+# no return value.
+#
 .sub "flow__go_north"
     $P0 = get_global "status"
     $P0["dir"] = 0
@@ -23,9 +31,12 @@
 .end
 
 #
+# flow__go_south()
+#
 # go south.
 # befunge stack unchanged.
 # delta <- (-1,0)
+# no return value.
 #
 .sub "flow__go_south"
     $P0 = get_global "status"
@@ -34,9 +45,12 @@
 .end
 
 #
+# flow__go_west()
+#
 # go west.
 # befunge stack unchanged.
 # delta <- (-1,0)
+# no return value.
 #
 .sub "flow__go_west"
     $P0 = get_global "status"
@@ -45,6 +59,8 @@
 .end
 
 
+#
+# flow__go_away()
 #
 # go away.
 # befunge stack unchanged.
@@ -72,6 +88,7 @@
 #   before:     ... a b
 #   after:      ... a>b
 # result is either 1 or 0.
+# no return value.
 #
 .sub "flow__compare"
     .local int a, b
@@ -95,6 +112,8 @@
 #   before:     ... b
 #   after:      ...
 # delta <- if (b) (-1,0) else (1,0)
+# no return value.
+#
 .sub "flow__if_horizontal"
     $I0 = stack__pop()
     if $I0 == 0 goto FLOW__IF_HORIZONTAL__FALSE
@@ -112,6 +131,8 @@
 #   before:     ... b
 #   after:      ...
 # delta <- if (b) (0,-1) else (0,1)
+# no return value.
+#
 .sub "flow__if_vertical"
     $I0 = stack__pop()
     if $I0 == 0 goto FLOW__IF_HORIZONTAL__FALSE
@@ -128,6 +149,7 @@
 # _flow__flag_set(val)
 #
 # set flag to val.
+# no return value.
 #
 .sub "_flow__flag_set"
     .param int val
@@ -142,6 +164,7 @@
 #
 # toggle string mode.
 # befunge stack unchanged.
+# no return value.
 #
 .sub "flow__toggle_string_mode"
     $P0 = get_global "status"
@@ -161,6 +184,7 @@
 #
 # set/remove trampoline flag.
 # befunge stack unchanged.
+# no return value.
 #
 .sub "flow__trampoline"
     .param int val
