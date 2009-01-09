@@ -433,7 +433,7 @@ composed into this role.
         /* Clone and return. */
         if (PMC_IS_NULL(found)) { return PMCNULL; }
         if (found->vtable->base_type == enum_class_Hash) {
-            /* for Hash return values, create and return a shallow 
+            /* for Hash return values, create and return a shallow
              * clone because the VTABLE_clone does a deep clone */
             PMC * const hash = pmc_new(interp, enum_class_Hash);
             PMC * const iter = VTABLE_get_iter(interp, found);
