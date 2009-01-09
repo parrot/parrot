@@ -46,8 +46,13 @@
 .sub "maths__div"
     $I1 = stack__pop()
     $I0 = stack__pop()
+    if $I1 == 0 goto MATHS__DIV__BY_ZERO
     $I2 = $I0 / $I1
     stack__push($I2)
+    .return()
+    
+  MATHS__DIV__BY_ZERO:
+    stack__push(0)
 .end
 
 
