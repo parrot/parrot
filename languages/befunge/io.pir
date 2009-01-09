@@ -22,6 +22,21 @@
 
 # ** output
 
+#
+# io__output_char()
+#
+# output character.
+# befunge stack:
+#   before:     ... i
+#   after:      ...
+# writechar( chr(i) )
+#
+.sub "io__output_char"
+    $I0 = stack__pop()
+    $S0 = chr $I0
+    print $S0
+.end
+
 
 # ** playfield tinkering
 
@@ -133,20 +148,6 @@ IO_OUTPUT_INT:
 IO_OUTPUT_INT_POP_1:
     print I10
     print " "
-    branch MOVE_PC
-
-# Output character.
-# Befunge stack:
-#   before:     ... i
-#   after:      ...
-# writechar( chr(i) )
-IO_OUTPUT_CHAR:
-    set I10, P2
-    unless I10, IO_OUTPUT_CHAR_POP_1
-    pop I10, P2
-IO_OUTPUT_CHAR_POP_1:
-    chr S10, I10
-    print S10
     branch MOVE_PC
 
 
