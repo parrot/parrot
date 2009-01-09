@@ -73,7 +73,6 @@
     if char == '"' goto FLOW_TOGGLE_STRING_MODE
     if flag == 1   goto IO_PUSH_CHAR
     if flag == 2   goto FLOW_TRAMPOLINE
-    if flag == 3   goto END
 
     # sole number
     if char <  '0' goto NOT_NUM
@@ -91,6 +90,7 @@
     if char == '_' goto FLOW_IF_HORIZONTAL
     if char == '|' goto FLOW_IF_VERTICAL
     if char == '#' goto FLOW_BRIDGE
+    if char == '@' goto FLOW_END
     
     # math functions
     if char == '+' goto MATHS_ADD
@@ -156,6 +156,9 @@
     goto MOVE_PC
   FLOW_COMPARE:
     flow__compare()
+    goto MOVE_PC
+  FLOW_END:
+    flow__end()
     goto MOVE_PC
   FLOW_GO_EAST:
     flow__go_east()
@@ -269,8 +272,6 @@
     set_global "status", status
     goto TICK
 
-  END:
-    end
 .end
 
 

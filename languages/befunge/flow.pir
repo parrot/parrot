@@ -165,18 +165,23 @@ FLOW_GO_AWAY:
     restore I2
     branch MOVE_PC
 
-
-
-
-
-# Stop.
-# Befunge stack unchanged.
-# End program.
-FLOW_END:
-    set I4, 3
-    branch MOVE_PC
-
 =cut
+
+
+# ** end
+
+#
+# flow__end()
+#
+# stop.
+# befunge stack unchanged.
+# end program.
+# no return value.
+#
+.sub "flow__end"
+    end
+.end
+
 
 ########################################################################
 # Local Variables:
