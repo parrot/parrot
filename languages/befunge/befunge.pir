@@ -108,6 +108,7 @@
 
     # i/o operations
     if char == ',' goto IO_OUTPUT_CHAR
+    if char == '.' goto IO_OUTPUT_INT
     if char == 'g' goto IO_VALUE_GET
     if char == 'p' goto IO_VALUE_PUT
     
@@ -144,7 +145,7 @@
         # I/O operations.
         eq S0, "&", IO_INPUT_INT
         eq S0, "~", IO_INPUT_CHAR
-        eq S0, ".", IO_OUTPUT_INT
+        #eq S0, ".", IO_OUTPUT_INT
         #eq S0, ",", IO_OUTPUT_CHAR
         #eq S0, "g", IO_GET_VALUE
         #eq S0, "p", IO_PUT_VALUE
@@ -186,6 +187,9 @@
     # io instructions
   IO_OUTPUT_CHAR:
     io__output_char()
+    goto MOVE_PC
+  IO_OUTPUT_INT:
+    io__output_int()
     goto MOVE_PC
   IO_PUSH_CHAR:
     io__push_char()

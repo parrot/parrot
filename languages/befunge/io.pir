@@ -37,6 +37,21 @@
     print $S0
 .end
 
+#
+# io__output_int()
+#
+# output integer.
+# befunge stack:
+#   before:     ... i
+#   after:      ...
+# writeint(i)
+#
+.sub "io__output_int"
+    $I0 = stack__pop()
+    print $I0
+    print " "
+.end
+
 
 # ** playfield tinkering
 
@@ -134,20 +149,6 @@ IO_INPUT_CHAR_SUBSTR:
     push P2, I10
     save S2
     restore S2
-    branch MOVE_PC
-
-# Output integer.
-# Befunge stack:
-#   before:     ... i
-#   after:      ...
-# writeint(i)
-IO_OUTPUT_INT:
-    set I10, P2
-    unless I10, IO_OUTPUT_INT_POP_1
-    pop I10, P2
-IO_OUTPUT_INT_POP_1:
-    print I10
-    print " "
     branch MOVE_PC
 
 
