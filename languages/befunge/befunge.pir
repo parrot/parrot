@@ -99,7 +99,7 @@
     if char == ':' goto STACK_DUP
 
     # i/o operations
-    if char == 'p' goto IO_VALUE_GET
+    if char == 'g' goto IO_VALUE_GET
     if char == 'p' goto IO_VALUE_PUT
     
     # unknown instruction
