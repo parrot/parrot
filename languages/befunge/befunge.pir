@@ -109,38 +109,6 @@
     end
     goto MOVE_PC
 
-=pod
-
-        # Flow control.
-        #eq S0, "`", FLOW_COMPARE
-        #eq S0, "_", FLOW_EW_IF
-        #eq S0, "|", FLOW_NS_IF
-        #eq S0, "#", FLOW_BRIDGE
-        #eq S0, "@", FLOW_END
-
-        # Math functions.
-        #eq S0, "+", MATHS_ADD
-        #eq S0, "-", MATHS_SUB
-        #eq S0, "*", MATHS_MUL
-        #eq S0, "/", MATHS_DIV
-        #eq S0, "%", MATHS_MOD
-        #eq S0, "!", MATHS_NOT
-
-        # Stack operations.
-        #eq S0, ":", STACK_DUP
-        #eq S0, "$", STACK_POP
-        #eq S0, "\\", STACK_SWAP
-
-        # I/O operations.
-        eq S0, "&", IO_INPUT_INT
-        eq S0, "~", IO_INPUT_CHAR
-        #eq S0, ".", IO_OUTPUT_INT
-        #eq S0, ",", IO_OUTPUT_CHAR
-        #eq S0, "g", IO_GET_VALUE
-        #eq S0, "p", IO_PUT_VALUE
-
-=cut
-
     # flow instructions
   FLOW_BRIDGE:
     flow__trampoline(1)
