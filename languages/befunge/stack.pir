@@ -10,17 +10,12 @@
 # no return value
 #
 .sub "stack__duplicate"
-    $P0 = get_global "stack"
-
-    $I0 = $P0
-    if $I0 == 0 goto STACK__DUPLICATE_END
+    $I0 = stack__pop()
     
-    $I1 = pop $P0
-    push $P0, $I1
-    push $P0, $I1
+    $P0 = get_global "stack"
+    push $P0, $I0
+    push $P0, $I0
     set_global "stack", $P0
-
-  STACK__DUPLICATE_END:
     .return()
 .end
 
