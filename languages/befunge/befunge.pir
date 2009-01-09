@@ -99,6 +99,7 @@
     
     # stack operations
     if char == ':' goto STACK_DUP
+    if char == '$' goto STACK_POP
 
     # i/o operations
     if char == ',' goto IO_OUTPUT_CHAR
@@ -132,7 +133,7 @@
 
         # Stack operations.
         #eq S0, ":", STACK_DUP
-        eq S0, "$", STACK_POP
+        #eq S0, "$", STACK_POP
         eq S0, "\\", STACK_SWAP
 
         # I/O operations.
@@ -202,6 +203,9 @@
     # stack operations
   STACK_DUP:
     stack__duplicate()
+    goto MOVE_PC
+  STACK_POP:
+    $I0 = stack__pop()
     goto MOVE_PC
     
 
