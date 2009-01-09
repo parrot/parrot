@@ -265,7 +265,6 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
             PARROT_ASSERT(pmc);
 
             pmc->vtable    = vtable;
-            pmc->real_self = pmc;
             VTABLE_set_pointer(interp, pmc, pmc);
         }
 
@@ -302,7 +301,6 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 
     pmc            = new_pmc_header(interp, flags);
     pmc->vtable    = vtable;
-    pmc->real_self = pmc;
 
 #ifdef GC_VERBOSE
     if (Interp_flags_TEST(interp, PARROT_TRACE_FLAG)) {

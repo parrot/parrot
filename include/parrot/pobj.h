@@ -141,7 +141,6 @@ struct PMC {
     VTABLE         *vtable;
     DPOINTER       *data;
     struct PMC_EXT *pmc_ext;
-    PMC            *real_self;
 };
 
 struct _Sync;   /* forward decl */

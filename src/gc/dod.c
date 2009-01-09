@@ -219,16 +219,11 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
     /* mark it live */
     PObj_live_SET(obj);
 
-    /* if object is a PMC and its real_self pointer points to another
-     * PMC, we must mark that. */
+    /* if object is a PMC and contains buffers or PMCs, then attach the PMC
+     * to the chained mark list. */
     if (PObj_is_PMC_TEST(obj)) {
         PMC * const p = (PMC *)obj;
 
-        if (p->real_self != p)
-            pobject_lives(interp, (PObj *)p->real_self);
-
-        /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-         * to the chained mark list. */
         if (PObj_is_special_PMC_TEST(obj))
             mark_special(interp, p);
 
