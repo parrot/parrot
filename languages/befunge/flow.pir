@@ -48,6 +48,29 @@
 # ** ifs & comparisons
 
 #
+# flow__compare()
+#
+# greater than.
+# befunge stack:
+#   before:     ... a b
+#   after:      ... a>b
+# result is either 1 or 0.
+#
+.sub "flow__compare"
+    .local int a, b
+    b = stack__pop()
+    a = stack__pop()
+    
+    if a < b goto FLOW__COMPARE__FALSE
+    stack__push(1)
+    .return()
+    
+  FLOW__COMPARE__FALSE:
+    stack__push(0)
+.end
+
+
+#
 # flow__if_horizontal()
 #
 # east/west if.
@@ -143,27 +166,6 @@ FLOW_GO_AWAY:
     branch MOVE_PC
 
 
-
-# Greater than.
-# Befunge stack:
-#   before:     ... a b
-#   after:      ... a>b
-# Result is either 1 or 0.
-FLOW_COMPARE:
-    set I10, P2
-    unless I10, FLOW_COMPARE_POP_1
-    pop I10, P2
-FLOW_COMPARE_POP_1:
-    set I11, P2
-    unless I11, FLOW_COMPARE_POP_2
-    pop I11, P2
-FLOW_COMPARE_POP_2:
-    set I12, 1
-    gt I11, I10, FLOW_COMPARE_TRUE
-    set I12, 0
-FLOW_COMPARE_TRUE:
-    push P2, I12
-    branch MOVE_PC
 
 
 

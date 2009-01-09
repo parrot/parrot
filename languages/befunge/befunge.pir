@@ -89,6 +89,7 @@
     if char == '<' goto FLOW_GO_WEST
 
     # flow control
+    if char == '`' goto FLOW_COMPARE
     if char == '_' goto FLOW_IF_HORIZONTAL
     if char == '|' goto FLOW_IF_VERTICAL
     if char == '#' goto FLOW_BRIDGE
@@ -117,7 +118,7 @@
 =pod
 
         # Flow control.
-        eq S0, "`", FLOW_COMPARE
+        #eq S0, "`", FLOW_COMPARE
         #eq S0, "_", FLOW_EW_IF
         #eq S0, "|", FLOW_NS_IF
         #eq S0, "#", FLOW_BRIDGE
@@ -149,6 +150,9 @@
     # flow instructions
   FLOW_BRIDGE:
     flow__trampoline(1)
+    goto MOVE_PC
+  FLOW_COMPARE:
+    flow__compare()
     goto MOVE_PC
   FLOW_GO_EAST:
     flow__go_east()
