@@ -29,6 +29,22 @@
 .end
 
 
+#
+# maths__sub()
+#
+# substraction.
+# befunge stack:
+#   before:     ... a b
+#   after:      ... a-b
+#
+.sub "maths__sub"
+    $I1 = stack__pop()
+    $I0 = stack__pop()
+    $I2 = $I0 - $I1
+    stack__push($I2)
+.end
+
+
 =pod
 
 # Create a pseudo-random number.
@@ -65,23 +81,6 @@ MATHS_ADD_POP_1:
     pop I10, P2
 MATHS_ADD_POP_2:
     add I12, I10, I11
-    push P2, I12
-    branch MOVE_PC
-
-# Substraction.
-# Befunge Stack:
-#   before:     ... a b
-#   after:      ... a-b
-MATHS_SUB:
-    set I11, P2
-    unless I11, MATHS_SUB_POP_1
-    pop I11, P2
-MATHS_SUB_POP_1:
-    set I10, P2
-    unless I10, MATHS_SUB_POP_2
-    pop I10, P2
-MATHS_SUB_POP_2:
-    sub I12, I10, I11
     push P2, I12
     branch MOVE_PC
 

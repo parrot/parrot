@@ -93,6 +93,7 @@
     if char == '|' goto FLOW_IF_VERTICAL
     
     # math functions
+    if char == '-' goto MATHS_SUB
     if char == '!' goto MATHS_NOT
     
     # stack operations
@@ -121,7 +122,7 @@
 
         # Math functions.
         eq S0, "+", MATHS_ADD
-        eq S0, "-", MATHS_SUB
+        #eq S0, "-", MATHS_SUB
         eq S0, "*", MATHS_MUL
         eq S0, "/", MATHS_DIV
         eq S0, "%", MATHS_MOD
@@ -183,9 +184,11 @@
   MATHS_NOT:
     maths__not()
     goto MOVE_PC
-    
   MATHS_PUSH_NUMBER:
     maths__push_number()
+    goto MOVE_PC
+  MATHS_SUB:
+    maths__sub()
     goto MOVE_PC
     
     # stack operations
