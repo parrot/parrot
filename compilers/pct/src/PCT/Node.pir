@@ -97,6 +97,18 @@ children and attributes.  Returns the newly created node.
 .end
 
 
+=item clone()
+
+Clone the node.
+
+=cut
+
+.sub 'clone' :method
+    $P0 = clone self
+    .return ($P0)
+.end
+
+
 =item unshift(child)
 
 Add C<child> to the beginning of the invocant's list of children.

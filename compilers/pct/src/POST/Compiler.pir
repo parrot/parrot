@@ -28,7 +28,7 @@ PIR or an Eval PMC (bytecode).
 
     $P0 = new 'String'
     set_global '$?HLL', $P0
-    $P0 = box '[]'
+    null $P0
     set_global '$?NAMESPACE', $P0
     .return ()
 .end
@@ -249,12 +249,13 @@ the sub.
 
     .local pmc outerns, ns, nskey
     outerns = get_global '$?NAMESPACE'
-    nskey = outerns
-    ns = node.'namespace'()
-    unless ns goto have_ns
-    nskey = code.'key'(ns)
-    set_global '$?NAMESPACE', nskey
+    ns = outerns
+    $P0 = node.'namespace'()
+    unless $P0 goto have_ns
+    ns = $P0
   have_ns:
+    set_global '$?NAMESPACE', ns
+    nskey = code.'key'(ns)
 
   subpir_start:
     $P0 = node.'compiler'()
@@ -312,7 +313,6 @@ the sub.
     .param pmc options         :slurpy :named
 
     options['target'] = 'pir'
-    options['grammar'] = ''
     $P0 = node.'subid'()
     options['subid'] = $P0
     .local pmc source, compiler, pir

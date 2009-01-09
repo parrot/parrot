@@ -207,7 +207,7 @@ Get/set the opcode type for this node.
     if has_value goto getset_value
     $I0 = exists self['subid']
     if $I0 goto getset_value
-    value = self.'unique'()
+    value = self.'unique'('post')
     has_value = 1
   getset_value:
     .tailcall self.'attr'('subid', value, has_value)

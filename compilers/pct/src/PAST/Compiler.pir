@@ -80,7 +80,7 @@ any value type.
     piropsig['pow']        = 'NN+'
     piropsig['print']      = 'v*'
     piropsig['set']        = 'PP'
-    piropsig['setprop']    = 'vP~P'
+    piropsig['setprop']    = '0P~P'
     set_global '%piropsig', piropsig
 
     ##  %valflags specifies when PAST::Val nodes are allowed to
@@ -584,7 +584,7 @@ nodes of type C<PAST::Stmts>.
 
 =cut
 
-.sub 'as_post' :method :multi(_, ['PAST';'Node'])
+.sub 'as_post' :method :multi(_, ['PAST';'Node']) :subid('Node.as_post')
     .param pmc node
     .param pmc options         :slurpy :named
 
@@ -743,10 +743,11 @@ Return the POST representation of a C<PAST::Block>.
     unshift blockpast, node
 
     .local string name, pirflags, blocktype
-    .local pmc ns, hll
+    .local pmc subid, ns, hll
     name = node.'name'()
     pirflags = node.'pirflags'()
     blocktype = node.'blocktype'()
+    subid = node.'subid'()
     ns = node.'namespace'()
     hll = node.'hll'()
 
@@ -760,7 +761,7 @@ Return the POST representation of a C<PAST::Block>.
     ##  create a POST::Sub node for this block
     .local pmc bpost
     $P0 = get_hll_global ['POST'], 'Sub'
-    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll)
+    bpost = $P0.'new'('node'=>node, 'name'=>name, 'blocktype'=>blocktype, 'namespace'=>ns, 'hll'=>hll, 'subid'=>subid)
     unless pirflags goto pirflags_done
     bpost.'pirflags'(pirflags)
   pirflags_done:
@@ -798,8 +799,6 @@ Return the POST representation of a C<PAST::Block>.
 
     ##  add block setup code (cpost) to outer block if needed
     if null outerpost goto outer_done
-    $I0 = index pirflags, ':anon'
-    if $I0 >= 0 goto outer_done
     .local pmc cpost
     $P0 = get_hll_global ['POST'], 'Ops'
     cpost = $P0.'new'( 'result'=>blockreg )
@@ -1045,6 +1044,11 @@ a 'pasttype' of 'pirop'.
 
     $S0 = substr signature, 0, 1
     if $S0 == 'v' goto pirop_void
+    $I0 = index '0123456789', $S0
+    if $I0 < 0 goto pirop_reg
+    $S0 = arglist[$I0]
+    ops.'result'($S0)
+    goto pirop_void
   pirop_reg:
     .local string result
     result = self.'uniquereg'($S0)
@@ -1505,6 +1509,37 @@ to C<ResizablePMCArray> if not set.
 .end
 
 
+=item stmts(PAST::Op node)
+
+Treat the node like a PAST::Stmts node -- i.e., invoke all the
+children and return the value of the last one.
+
+=cut
+
+.sub 'stmts' :method :multi(_, ['PAST';'Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+
+    .const 'Sub' $P0 = 'Node.as_post'
+    .tailcall self.$P0(node, options :flat :named)
+.end
+
+
+=item null(PAST::Op node)
+
+A "no-op" node -- none of the children are processed, and
+no statements are generated.
+
+=cut
+
+.sub 'null' :method :multi(_, ['PAST';'Op'])
+    .param pmc node
+    .param pmc options         :slurpy :named
+    $P0 = get_hll_global ['POST'], 'Ops'
+    .tailcall $P0.'new'('node'=>node)
+.end
+
+
 =item return(PAST::Op node)
 
 Generate a return exception, using the first child (if any) as
@@ -1916,7 +1951,17 @@ attribute.
     scope = concat " '", scope
     scope = concat scope, "'"
   scope_error_1:
-    .tailcall self.'panic'("Scope", scope, " not found for PAST::Var '", name, "'")
+    # Find the nearest named block
+    .local pmc it
+    $P0 = get_global '@?BLOCK'
+    it = iter $P0
+  scope_error_block_loop:
+    unless it goto scope_error_2
+    $P0 = shift it
+    $S0 = $P0.'name'()
+    unless $S0 goto scope_error_block_loop
+  scope_error_2:
+    .tailcall self.'panic'("Scope", scope, " not found for PAST::Var '", name, "' in ", $S0)
 .end
 
 
@@ -2156,9 +2201,6 @@ attribute.
     name = node.'name'()
     name = self.'escape'(name)
 
-    .local int isdecl
-    isdecl = node.'isdecl'()
-
     .local pmc call_on, ops
     call_on = node[0]
     if null call_on goto use_self
@@ -2173,21 +2215,14 @@ attribute.
     if bindpost goto attribute_bind
 
   attribute_post:
-    if isdecl goto attribute_decl
     .local pmc fetchop, storeop
     $P0 = get_hll_global ['POST'], 'Op'
     fetchop = $P0.'new'(ops, call_on, name, 'pirop'=>'getattribute')
     storeop = $P0.'new'(call_on, name, ops, 'pirop'=>'setattribute')
     .tailcall self.'vivify'(node, ops, fetchop, storeop)
 
-  attribute_decl:
-    .tailcall $P0.'new'('node'=>node)
-
   attribute_bind:
     $P0 = get_hll_global ['POST'], 'Op'
-    if isdecl goto attribute_bind_decl
-    .tailcall $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
-  attribute_bind_decl:
     .tailcall $P0.'new'(call_on, name, bindpost, 'pirop'=>'setattribute', 'result'=>bindpost)
 .end
 
@@ -2198,6 +2233,10 @@ attribute.
 
     .local string name
     name = node.'name'()
+    if name goto have_name
+    name = self.'uniquereg'('P')
+    node.'name'(name)
+  have_name:
 
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -2253,6 +2292,8 @@ to have a PMC generated containing the constant value.
     .local pmc value, returns
     value = node['value']
     if null value goto err_novalue
+    $I0 = isa value, ['PAST';'Block']
+    if $I0 goto value_block
     returns = node.'returns'()
     if returns goto have_returns
     $S0 = typeof value
@@ -2277,11 +2318,23 @@ to have a PMC generated containing the constant value.
 
   result_pmc:
     .local string result
-    result = self.'unique'('$P')
+    result = self.'uniquereg'('P')
     returns = self.'escape'(returns)
     ops.'push_pirop'('new', result, returns)
     ops.'push_pirop'('assign', result, value)
     ops.'result'(result)
+    .return (ops)
+
+  value_block:
+    .local string blockreg, blockref
+    blockreg = self.'uniquereg'('P')
+    blockref = concat ".const 'Sub' ", blockreg
+    concat blockref, ' = '
+    $P0 = value.'subid'()
+    $S0 = self.'escape'($P0)
+    concat blockref, $S0
+    ops.'push_pirop'(blockref)
+    ops.'result'(blockreg)
     .return (ops)
 
   err_novalue:
