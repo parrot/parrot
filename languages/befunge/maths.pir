@@ -29,6 +29,24 @@
 .end
 
 
+# ** math operations
+
+#
+# maths__add()
+#
+# addition.
+# befunge stack:
+#   before:     ... a b
+#   after:      ... a+b
+#
+.sub "maths__add"
+    $I1 = stack__pop()
+    $I0 = stack__pop()
+    $I2 = $I0 + $I1
+    stack__push($I2)
+.end
+
+
 #
 # maths__sub()
 #
@@ -65,24 +83,6 @@ MATHS_RAND:
     set I10, N10
     save I10
     ret
-
-
-# Addition.
-# Befunge Stack:
-#   before:     ... a b
-#   after:      ... a+b
-MATHS_ADD:
-    set I11, P2
-    unless I11, MATHS_ADD_POP_1
-    pop I11, P2
-MATHS_ADD_POP_1:
-    set I10, P2
-    unless I10, MATHS_ADD_POP_2
-    pop I10, P2
-MATHS_ADD_POP_2:
-    add I12, I10, I11
-    push P2, I12
-    branch MOVE_PC
 
 # Multiplication.
 # Befunge Stack:
