@@ -115,10 +115,10 @@
 .sub "flow__if_vertical"
     $I0 = stack__pop()
     if $I0 == 0 goto FLOW__IF_HORIZONTAL__FALSE
-    flow__go_south()
+    flow__go_north()
     .return()
   FLOW__IF_HORIZONTAL__FALSE:
-    flow__go_north()
+    flow__go_south()
 .end
 
 
