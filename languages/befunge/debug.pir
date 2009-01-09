@@ -191,22 +191,29 @@
     if $S1 == "next" goto DEBUG__INTERACT__NEXT
     if $S1 == "quit" goto DEBUG__INTERACT__QUIT
 
-=pod
+    $S1 = substr $S0, 0, 5
+    if $S1 == "break" goto DEBUG__INTERACT__BREAK
+    $S1 = substr $S0, 0, 6
+    if $S1 == "delete" goto DEBUG__INTERACT__DELETE
+    if $S1 == "status" goto DEBUG__INTERACT__STATUS
+    $S1 = substr $S0, 0, 7
+    if $S1 == "restart" goto DEBUG__INTERACT__RESTART
+    $S1 = substr $S0, 0, 8
+    if $S1 == "continue" goto DEBUG__INTERACT__CONTINUE
+    print "Unknown instruction. Type help for help.\n"
+    goto DEBUG__INTERACT__LOOP
 
-        substr S11, S10, 0, 5
-        eq S11, "break", DEBUG_INTERACT_BREAK
-        substr S11, S10, 0, 6
-        eq S11, "delete", DEBUG_INTERACT_DELETE
-        eq S11, "status", DEBUG_INTERACT_STATUS
-        substr S11, S10, 0, 7
-        eq S11, "restart", DEBUG_INTERACT_RESTART
-        substr S11, S10, 0, 8
-        eq S11, "continue", DEBUG_INTERACT_CONTINUE
-        print "Unknown instruction. Type help for help.\n"
-        branch DEBUG_INTERACT
-
-=cut
-
+  DEBUG__INTERACT__BREAK:
+    _debug__breakpoint_add()
+    goto DEBUG__INTERACT__LOOP
+    
+  DEBUG__INTERACT__CONTINUE:
+    goto DEBUG__INTERACT__LOOP
+    
+  DEBUG__INTERACT__DELETE:
+    _debug__breakpoint_del()
+    goto DEBUG__INTERACT__LOOP
+    
   DEBUG__INTERACT__DUMP:
     _debug__dump_playfield()
     goto DEBUG__INTERACT__LOOP
@@ -228,6 +235,14 @@
 
   DEBUG__INTERACT__QUIT:
     end
+    
+  DEBUG__INTERACT__RESTART:
+    print "Not yet implemented...\n"
+    goto DEBUG__INTERACT__LOOP
+    
+  DEBUG__INTERACT__STATUS:
+    _debug__print_status()
+    goto DEBUG__INTERACT__LOOP
 
 =pod
 
@@ -248,13 +263,6 @@ DEBUG_INTERACT_DELETE:
 DEBUG_INTERACT_NEXT:
         set P3[0], 1        # stop at next instruction
         branch DEBUG_INTERACT_END
-DEBUG_INTERACT_RESTART:
-        #branch MAIN
-        print "Not yet implemented...\n"
-        branch DEBUG_INTERACT
-DEBUG_INTERACT_STATUS:
-        bsr DEBUG_PRINT_STATUS
-        branch DEBUG_INTERACT
 
 =cut
 
