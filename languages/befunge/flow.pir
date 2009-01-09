@@ -105,12 +105,15 @@
 
 
 #
-# remove trampoline flag.
+# flow__trampoline(bool)
+#
+# set/remove trampoline flag.
 # befunge stack unchanged.
 #
 .sub "flow__trampoline"
+    .param int val
     $P0 = get_global "status"
-    $P0["flag"] = 0
+    $P0["flag"] = val
     set_global "status", $P0
 .end
 
@@ -149,12 +152,6 @@ FLOW_COMPARE_TRUE:
     branch MOVE_PC
 
 
-# Trampoline.
-# Befunge stack unchanged.
-# Skip next instruction (pos < pos + delta)
-FLOW_BRIDGE:
-    set I4, 2
-    branch MOVE_PC
 
 # Stop.
 # Befunge stack unchanged.

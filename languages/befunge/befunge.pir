@@ -91,6 +91,7 @@
     # flow control
     if char == '_' goto FLOW_IF_HORIZONTAL
     if char == '|' goto FLOW_IF_VERTICAL
+    if char == '#' goto FLOW_BRIDGE
     
     # math functions
     if char == '-' goto MATHS_SUB
@@ -117,7 +118,7 @@
         eq S0, "`", FLOW_COMPARE
         #eq S0, "_", FLOW_EW_IF
         #eq S0, "|", FLOW_NS_IF
-        eq S0, "#", FLOW_BRIDGE
+        #eq S0, "#", FLOW_BRIDGE
         eq S0, "@", FLOW_END
 
         # Math functions.
@@ -144,6 +145,9 @@
 =cut
 
     # flow instructions
+  FLOW_BRIDGE:
+    flow__trampoline(1)
+    goto MOVE_PC
   FLOW_GO_EAST:
     flow__go_east()
     goto MOVE_PC
@@ -166,7 +170,7 @@
     flow__toggle_string_mode()
     goto MOVE_PC
   FLOW_TRAMPOLINE:
-    flow__trampoline()
+    flow__trampoline(0)
     goto MOVE_PC
 
     # io instructions
