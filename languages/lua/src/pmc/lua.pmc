@@ -101,50 +101,6 @@ information see F<src/pmc.c>.
 
 /*
 
-=item C<STRING* caller()>
-
-=cut
-
-*/
-    METHOD STRING* caller() {
-        Parrot_Context   *sub_ctx = CONTEXT(interp)->caller_ctx;
-        STRING           *retval;
-
-        /* backtrace: follow the continuation chain */
-        while (1) {
-            PMC *cont;
-            if (sub_ctx->current_sub && PMC_metadata(sub_ctx->current_sub)) {
-                Parrot_Context_info info;
-                Parrot_block_GC_mark(INTERP);
-
-                if (Parrot_Context_get_info(INTERP, sub_ctx, &info)) {
-                    STRING *retval = info.subname;
-
-                    Parrot_unblock_GC_mark(INTERP);
-                    RETURN(STRING *retval);
-                }
-                Parrot_unblock_GC_mark(INTERP);
-                break;
-            }
-
-            cont = sub_ctx->current_cont;
-
-
-            if (!cont)
-                break;
-
-            sub_ctx = PMC_cont(cont)->to_ctx;
-
-            if (!sub_ctx)
-                break;
-        }
-
-        retval = const_string(INTERP, "?");
-        RETURN(STRING *retval);
-    }
-
-/*
-
 =item C<PMC* clock()>
 
 =cut

@@ -42,11 +42,25 @@ CAUTION: don't used it in an exception handler, but lua_x_argerror & rethrow.
     .param int narg
     .param pmc extramsg :slurpy
     $S1 = narg
-    new $P0, 'Lua'
-    $S0 = $P0.'caller'()
+    $S0 = caller()
     .tailcall lua_x_error("bad argument #", $S1, " to '", $S0, "' (", extramsg :flat, ")")
 .end
 
+.sub 'caller' :anon
+    $P0 = getinterp
+    $I0 = 0
+  L1:
+    inc $I0
+    push_eh _handler
+    $P1 = $P0['sub'; $I0]
+    pop_eh
+    $P2 = $P1.'getfenv'()
+    unless $P2 goto L1
+    $S0 = $P1.'get_name'()
+    .return ($S0)
+  _handler:
+    .return ("?")
+.end
 
 =item C<lua_checkany (narg, arg)>
 
