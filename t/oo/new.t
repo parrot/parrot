@@ -1,12 +1,6 @@
-#!perl
-# Copyright (C) 2007-2008, The Perl Foundation.
+#! parrot
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -22,621 +16,472 @@ Tests OO features related to instantiating new objects.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object' );
 .sub main :main
-    $P1 = newclass "Foo"
-    $S1 = typeof $P1
-    say $S1
+    .include 'except_types.pasm'
+    .include 'test_more.pir'
+    plan(111)
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    instantiate_from_class_object()
+    manually_create_anonymous_class_object()
+    manually_create_named_class_object()
+    instantiate_from_class_object_method()
+    instantiate_from_string_name()
+    instantiate_from_string_register_name()
+    instantiate_from_string_PMC_name()
+    instantiate_from_key_name()
+    instantiate_from_key_PMC_name()
+    create_and_instantiate_from_array_of_names()
+    only_string_arrays_work_for_creating_classes()
+    instantiate_from_class_object_with_init()
+    instantiate_from_string_name_with_init()
+    instantiate_from_string_register_name_with_init()
+    instantiate_from_string_PMC_name_with_init()
+    instantiate_from_array_of_names_with_init()
+    instantiate_from_key_name_with_init()
+    create_class_namespace_initializer()
+    regression_test_instantiate_class_within_different_namespace()
+    get_class_retrieves_a_high_level_class_object()
+    get_class_retrieves_a_proxy_class_object()
+    get_class_retrieves_a_class_object_that_doesnt_exist()
+    instantiate_class_from_invalid_key()
+.end
+
+
+#
+# Utility sub
+#
+.sub _test_instance
+    .param pmc obj
+    .param string in_str 
+
+    # Set up local variables
+    .local pmc key_pmc
+    .local string class_name
+
+    key_pmc = new 'Key'
+    $P0 = split ' ', in_str
+    $S0 = shift $P0
+    $I1 = 1
+    key_pmc    = $S0
+    class_name = $S0
+
+  LOOP:
+    $I0 = elements $P0
+    if $I0 == 0 goto BEGIN_TEST
+    $S1 = shift $P0
+    $P1 = new 'Key'
+    $P1 = $S1
+    push key_pmc, $P1
+    concat class_name, ';'
+    concat class_name, $S1
+    $I1 += 1
+    goto LOOP
+
+    # Start testing
+  BEGIN_TEST:
+    .local string typeof_message
+    typeof_message = concat 'New instance is of type: ', class_name
+    $S1 = typeof obj
+    is($S1, class_name, typeof_message)
+
+    isa_ok(obj, 'Object')
+
+    .local string keypmc_message
+    $S2 = get_repr key_pmc
+    keypmc_message = concat 'The object isa ', $S2
+    $I2 = isa obj, key_pmc
+    ok($I2, keypmc_message)
+
+    unless $I1 == 1 goto END_TEST
+    isa_ok(obj, class_name)
+
+  END_TEST:
+    .return()
+.end
+
+
+#############################################################################
+
+
+.sub instantiate_from_class_object
+    ok(1, "Instantiate from class object")
+    $P1 = newclass 'Foo1'
+    $S1 = typeof $P1
+    is($S1, 'Class', '`newclass "Foo"` creates a Class PMC')
+    isa_ok($P1, 'Class')
 
     $P2 = new $P1
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo1')
 .end
-CODE
-Class
-1
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create anonymous class object' );
-.sub main :main
-    $P1 = new "Class"
+
+.sub manually_create_anonymous_class_object
+    ok(2, "Manually create anonymous class object")
+    $P1 = new 'Class'
     $S1 = typeof $P1
-    say $S1
-
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    is($S1, 'Class', 'New anonymous class creates a Class PMC')
+    isa_ok($P1, 'Class')
 
     $P2 = new $P1
-
     $S1 = typeof $P2
-    print "'"
-    print $S1
-    print "'\n"
+    is($S1, '', 'New instance is of type ""')
+    isa_ok($P2, 'Object')
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $I3 = isa $P2, ''
+    is($I3, 0, '"isa" will not match an empty type')
+    $I3 = isa $P2, 'Foo'
+    is($I3, 0, '"isa" will not match a random type')
 .end
-CODE
-Class
-1
-''
-0
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'manually create named class object' );
-.sub main :main
-    $P1 = new "Class"
-    $P1.'name'("Foo")
+
+.sub manually_create_named_class_object
+    ok(3, "Manually create named class object")
+    $P1 = new 'Class'
+    $P1.'name'('Foo2')
     $S1 = typeof $P1
-    say $S1
-
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    is($S1, 'Class', 'new named class creates a "Class" PMC')
+    isa_ok($P1, 'Class')
 
     $P2 = new $P1
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo2')
 .end
-CODE
-Class
-1
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object method' );
-.sub main :main
-    $P1 = newclass "Foo"
+
+.sub instantiate_from_class_object_method
+    ok(4, "Instantiate from class object 'new' method")
+    $P1 = newclass 'Foo3'
+
     $P2 = $P1.'new'()
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo3')
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name' );
-.sub main :main
-    $P1 = newclass "Foo"
-    $P2 = new 'Foo'
 
-    $S1 = typeof $P2
-    say $S1
+.sub instantiate_from_string_name
+    ok(5, "Instantiate from string name")
+    $P1 = newclass 'Foo4'
 
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $P2 = new 'Foo4'
+    _test_instance($P2, 'Foo4')
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name' );
-.sub main :main
-    $P1 = newclass "Foo"
-    $S1 = 'Foo'
+
+.sub instantiate_from_string_register_name
+    ok(6, "Instantiate from string register name")
+    $P1 = newclass 'Foo5'
+
+    $S1 = 'Foo5'
     $P2 = new $S1
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo5')
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name' );
-.sub main :main
-    $P1 = newclass "Foo"
+
+.sub instantiate_from_string_PMC_name
+    ok(7, "Instantiate from string PMC name")
+    $P1 = newclass 'Foo6'
+
     $P3 = new 'String'
-    $P3 = 'Foo'
+    $P3 = 'Foo6'
     $P2 = new $P3
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo6')
 .end
-CODE
-Foo
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name' );
-.sub main :main
-    $P1 = newclass ['Foo';'Bar']
+
+.sub instantiate_from_key_name
+    ok(8, "Instantiate from Key name")
+    $P1 = newclass ['Foo';'Bar1']
     $S1 = typeof $P1
-    say $S1
+    is($S1, 'Class', "`newclass ['Foo';'Bar1']` creates a Class PMC")
+    isa_ok($P1, 'Class')
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
-
-    $P2 = new ['Foo';'Bar']
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, ['Foo';'Bar']
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $P2 = new $P1
+    _test_instance($P2, 'Foo Bar1')
 .end
-CODE
-Class
-1
-Foo;Bar
-1
-1
-OUT
 
-pir_output_is(
-    <<'CODE', <<'OUT', 'instantiate from key PMC name', todo => 'create non-constant key' );
-.sub main :main
-    $P1 = newclass ['Foo';'Bar']
-    $S1 = typeof $P1
-    say $S1
 
-    $I3 = isa $P1, "Class"
-    say $I3
+.sub instantiate_from_key_PMC_name
+    ok(9, "Instantiate from Key PMC name")
+    $P1 = newclass ['Foo';'Bar2']
 
-    # How do you set the value of a non-constant key PMC?
     $P3 = new 'Key'
+    $P3 = 'Foo'
+    $P4 = new 'Key'
+    $P4 = 'Bar2'
+    push $P3, $P4
 
     $P2 = new $P3
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, 'Bar'
-    say $I3
-
-    $I3 = isa $P2, "Object"
-    say $I3
+    _test_instance($P2, 'Foo Bar2')
 .end
-CODE
-Class
-1
-Foo;Bar
-1
-1
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'create and instantiate from array of names' );
-.sub main :main
-    $P0 = split " ", "Foo Bar"
+
+.sub create_and_instantiate_from_array_of_names
+    ok(10, "Create and instantiate from ResizableStringArray")
+    $P0 = split ' ', 'Foo Bar3'
     $P1 = newclass $P0
     $S1 = typeof $P1
-    say $S1
-
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+    is($S1, 'Class', "`newclass some_string_array` creates a Class PMC")
+    isa_ok($P1, 'Class')
 
     $P2 = new $P0
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, ['Foo';'Bar']
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo Bar3')
 .end
-CODE
-Class
-1
-Foo;Bar
-1
-1
-OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', 'only string arrays work for creating classes' );
-.sub main :main
-    $P0 = new 'ResizablePMCArray'
+
+.sub only_string_arrays_work_for_creating_classes
+    ok(11, 'Create a class via a ResizablePMCArray')
+    .local pmc eh
+    .local string message
+    $P0  = new 'ResizablePMCArray'
     $P10 = new 'String'
     $P10 = 'Foo'
     $P11 = new 'String'
-    $P11 = 'Bar'
+    $P11 = 'Bar4'
+    $P0.'push'($P10)
+    $P0.'push'($P11)
 
+  try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_INVALID_OPERATION)
+    set_addr eh, catch
+
+    push_eh eh
     $P1 = newclass $P0
-    $S1 = typeof $P1
-    say $S1
+    $I0 = 1
+    goto finally
 
-    $I3 = isa $P1, "Class"
-    print $I3
-    print "\n"
+  catch:
+    .local pmc exception
+    .get_results(exception)
+    message = exception['message']
+    $I0 = 0
 
-    $P2 = new $P0
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, ['Foo';'Bar']
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+  finally:
+    pop_eh
+    nok($I0, "Exception caught for ...")
+    is(message, 'Invalid class name key in init_pmc for Class', 'Invalid class name key')
 .end
-CODE
-/Invalid class name key/
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from class object with init' );
-.sub main :main
-    $P1 = newclass "Foo"
+
+.sub instantiate_from_class_object_with_init
+    ok(12, 'Instantiate from Class object, with init')
+    $P1 = newclass 'Foo7'
     addattribute $P1, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = 'data for Foo7'
     $P3['data'] = $P4
 
     $P2 = new $P1, $P3
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo7')
 
     $P5 = getattribute $P2, 'data'
-    print $P5
+    is($P5, 'data for Foo7', 'class attribute retrieved via the instance')
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string name with init' );
-.sub main :main
-    $P1 = newclass "Foo"
+
+.sub instantiate_from_string_name_with_init
+    ok(13, 'Instantiate from string name, with init')
+    $P1 = newclass 'Foo8'
     addattribute $P1, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = 'data for Foo8'
     $P3['data'] = $P4
 
-    $P2 = new 'Foo', $P3
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $P2 = new 'Foo8', $P3
+    _test_instance($P2, 'Foo8')
 
     $P5 = getattribute $P2, 'data'
-    print $P5
+    is($P5, 'data for Foo8', 'class attribute retrieved via the instance')
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string register name with init' );
-.sub main :main
-    $P1 = newclass "Foo"
+
+.sub instantiate_from_string_register_name_with_init
+    ok(14, 'Instantiate from string register name, with init')
+    $P1 = newclass 'Foo9'
     addattribute $P1, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = 'data for Foo9'
     $P3['data'] = $P4
 
-    $S1 = 'Foo'
+    $S1 = 'Foo9'
     $P2 = new $S1, $P3
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo9')
 
     $P5 = getattribute $P2, 'data'
-    print $P5
+    is($P5, 'data for Foo9', 'class attribute retrieved via the instance')
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from string PMC name with init' );
-.sub main :main
-    $P1 = newclass "Foo"
+
+.sub instantiate_from_string_PMC_name_with_init
+    ok(15, 'Instantiate from string PMC name, with init')
+    $P1 = newclass 'Foo10'
     addattribute $P1, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo\n"
+    $P4 = 'data for Foo10'
     $P3['data'] = $P4
 
     $P6 = new 'String'
-    $P6 = 'Foo'
+    $P6 = 'Foo10'
     $P2 = new $P6, $P3
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, "Foo"
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo10')
 
     $P5 = getattribute $P2, 'data'
-    print $P5
+    is($P5, 'data for Foo10', 'class attribute retrieved via the instance')
 .end
-CODE
-Foo
-1
-1
-data for Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from array of names with init' );
-.sub main :main
-    $P0 = split " ", "Foo Bar"
+
+.sub instantiate_from_array_of_names_with_init
+    ok(16, 'Instantiate from string array, with init')
+    $P0 = split ' ', 'Foo Bar5'
     $P1 = newclass $P0
     addattribute $P1, 'data'
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo;Bar\n"
+    $P4 = 'data for Foo;Bar5'
     $P3['data'] = $P4
 
     $P2 = new $P0, $P3
 
     $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, ["Foo";"Bar"]
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    _test_instance($P2, 'Foo Bar5')
 
     $P5 = getattribute $P2, 'data'
-    print $P5
+    is($P5, 'data for Foo;Bar5', 'class attribute retrieved via the instance')
 .end
-CODE
-Foo;Bar
-1
-1
-data for Foo;Bar
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'instantiate from key name with init' );
-.sub main :main
-    $P1 = newclass ['Foo';'Bar']
+
+.sub instantiate_from_key_name_with_init
+    ok(17, 'Instantiate from Key name, with init')
+    $P1 = newclass ['Foo';'Bar6']
     addattribute $P1, 'data'
 
     $P3 = new 'Hash'
     $P4 = new 'String'
-    $P4 = "data for Foo;Bar\n"
+    $P4 = 'data for Foo;Bar6'
     $P3['data'] = $P4
 
-    $P2 = new ['Foo';'Bar'], $P3
-
-    $S1 = typeof $P2
-    say $S1
-
-    $I3 = isa $P2, 'Bar'
-    print $I3
-    print "\n"
-
-    $I3 = isa $P2, "Object"
-    print $I3
-    print "\n"
+    $P2 = new ['Foo';'Bar6'], $P3
+    _test_instance($P2, 'Foo Bar6')
 
     $P5 = getattribute $P2, 'data'
-    print $P5
+    is($P5, 'data for Foo;Bar6', 'class attribute retrieved via the instance')
 .end
-CODE
-Foo;Bar
-0
-1
-data for Foo;Bar
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'create class namespace initializer' );
-.sub main :main
+
+.sub create_class_namespace_initializer
     .local pmc ns
-    ns = get_namespace ['Foo';'Bar']
+    ns = get_namespace ['Foo';'Bar7']
     $P0 = new 'Class', ns
 
-    $P1 = new ['Foo';'Bar']
-    $P1.'blue'()
+    $P1 = new ['Foo';'Bar7']
+    $S0 = $P1.'blue'()
+    is($S0, 'foo_bar7 blue', 'Create class namespace initializer')
 .end
 
-.namespace [ 'Foo';'Bar' ]
-.sub 'blue' :method
-    say 'foo blue'
+.namespace [ 'Foo';'Bar7' ]
+.sub blue :method
+    .return('foo_bar7 blue')
 .end
 
-CODE
-foo blue
-OUT
+.namespace []
 
-pir_output_is( <<'CODE', <<'OUT', 'regression test, instantiate class within different namespace' );
-.sub main :main
-    $P0 = newclass 'Foo'
-    $P0 = newclass 'Bar'
 
-    $P1 = new 'Foo'
-    $P1.'blue'()
+.sub regression_test_instantiate_class_within_different_namespace
+    $P0 = newclass 'Foo11'
+    $P0 = newclass 'Bar11'
+
+    $P1 = new 'Foo11'
+    $S0 = $P1.'blue'()
+    is($S0, 'foo11 blue bar11 blue', 'Regression test: instantiate class within different namespace')
 .end
 
-.namespace [ 'Foo' ]
-.sub 'blue' :method
-    say 'foo blue'
-    $P1 = new 'Bar'
-    $P1.'blue'()
+.namespace [ 'Foo11' ]
+.sub blue :method
+    $P0 = new 'Bar11'
+    $S0 = $P0.'blue'()
+    $S0 = concat 'foo11 blue ', $S0
+    .return($S0)
 .end
 
-.namespace [ 'Bar' ]
-.sub 'blue' :method
-    say 'bar blue'
+.namespace [ 'Bar11' ]
+.sub blue :method
+    .return('bar11 blue')
 .end
-CODE
-foo blue
-bar blue
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'get_class retrieves a high-level class object' );
-.sub main :main
-    $P0 = newclass 'Foo'
+.namespace []
+
+
+.sub get_class_retrieves_a_high_level_class_object
+    ok(20, 'get_class retrieves a high level class object')
+    $P0 = newclass 'Foo12'
     $S1 = typeof $P0
-    say $S1
+    is($S1, 'Class',"`newclass 'Foo12' returns a Class PMC`")
 
-    $P1 = get_class 'Foo'
+    $P1 = get_class 'Foo12'
     $S1 = typeof $P1
-    say $S1
+    is($S1, 'Class',"`get_class 'Foo12' returns a Class PMC`")
 
     $P2 = new $P1
-    $S1 = typeof $P2
-    say $S1
+    _test_instance($P2, 'Foo12')
 .end
-CODE
-Class
-Class
-Foo
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'get_class retrieves a proxy class object' );
-.sub main :main
+
+.sub get_class_retrieves_a_proxy_class_object
+    ok(21, 'get_class retrieves a proxy class object')
     $P1 = get_class 'String'
     $S1 = typeof $P1
-    say $S1
+    is($S1, 'PMCProxy', "`get_class 'String'` returns a PMCProxy PMC")
 
     $P2 = new $P1
     $S1 = typeof $P2
-    say $S1
+    is($S1, 'String', 'Instantiating the proxy returns a String PMC')
 .end
-CODE
-PMCProxy
-String
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', "get_class retrieves a class object that doesn't exist" );
-.sub main :main
+
+.sub get_class_retrieves_a_class_object_that_doesnt_exist
+    ok(22, 'get_class retrieves a class object that does not exist')
+    .local int murple_not_defined
+    murple_not_defined = 1
     $P1 = get_class 'Murple'
     if null $P1 goto not_defined
-    say "Class is defined. Shouldn't be."
-    end
-  not_defined:
-    say "Class isn't defined."
-.end
-CODE
-Class isn't defined.
-OUT
+    murple_not_defined = 0
 
-pir_error_output_like(<<'CODE', <<'OUT', 'Instantiate class from invalid key');
-.sub 'main' :main
-    $P0 = new [ 'Foo'; 'Bar'; 'Baz' ]
+  not_defined:
+    ok(murple_not_defined, '"Murple" class is not defined')
 .end
-CODE
-/Class '\[ 'Foo' ; 'Bar' ; 'Baz' \]' not found/
-OUT
+
+
+.sub instantiate_class_from_invalid_key
+    ok(23, 'Instantiate a class from invalid Key PMC')
+    .local pmc eh
+    .local string message
+
+  try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_NO_CLASS)
+    set_addr eh, catch
+
+    push_eh eh
+    $P0 = new [ 'Foo'; 'Bar'; 'Baz' ]
+    $I0 = 1
+    goto finally
+    
+  catch:
+    .local pmc exception
+    .get_results(exception)
+    message = exception['message']
+    $I0 = 0
+
+  finally:    pop_eh
+    nok($I0, 'Exception caught for ...')
+    is(message, "Class '[ 'Foo' ; 'Bar' ; 'Baz' ]' not found", 'Class not found')
+.end
+
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

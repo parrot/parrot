@@ -1,12 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 10;
 
 =head1 NAME
 
@@ -22,125 +16,116 @@ Tests role composition in the OO implementation.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'role with no methods' );
-.sub 'test' :main
+.sub main :main
+    .include 'except_types.pasm'
+    .include 'test_more.pir'
+    plan(41)
+
+    role_with_no_methods()
+    role_with_one_method_no_methods_in_class()
+    two_roles_and_a_class_a_method_each_no_conflict()
+    two_roles_that_conflict()
+    role_that_conflicts_with_a_class_method()
+    conflict_resolution_by_exclusion()
+    conflict_resolution_by_aliasing_and_exclude()
+    conflict_resolution_by_resolve()
+    role_that_does_a_role()
+    conflict_from_indirect_role()
+.end
+
+.sub badger :method
+    .return('Badger!')
+.end
+.sub badger2 :method
+    .return('Second Badger!')
+.end
+.sub mushroom :method
+    .return('Mushroom!')
+.end
+.sub snake :method
+    .return('Snake!')
+.end
+.sub fire
+    .return("You're FIRED!")
+.end
+.sub fire2
+    .return('BURNINATION!')
+.end
+.sub give_payrise
+    .return('You all get a pay rise of 0.0005%.')
+.end
+
+.sub role_with_no_methods
     $P0 = new 'Role'
     $P1 = new 'Class'
 
     $P1.'add_role'($P0)
-    print "ok 1 - added role\n"
+    ok(1, 'added role')
 
     $P2 = $P1.'roles'()
     $I0 = elements $P2
-    if $I0 == 1 goto OK_2
-    print "not "
-OK_2:
-    print "ok 2 - roles list has the role\n"
+    is($I0, 1, 'roles list has the role')
 
     $P2 = $P1.'new'()
-    print "ok 3 - instantiated class with composed role\n"
+    ok(1, 'instantiated class with composed role')
 .end
-CODE
-ok 1 - added role
-ok 2 - roles list has the role
-ok 3 - instantiated class with composed role
-OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'role with one method, no methods in class' );
-.sub 'test' :main
+.sub role_with_one_method_no_methods_in_class
     $P0 = new 'Role'
     $P1 = new 'Class'
 
     $P2 = get_global "badger"
     $P0.'add_method'("badger", $P2)
-    print "ok 1 - added method to a role\n"
+    ok(1, 'added method to a role')
 
     $P1.'add_role'($P0)
-    print "ok 2 - composed role into the class\n"
+    ok(1, 'composed role into the class')
 
     $P2 = $P1.'roles'()
     $I0 = elements $P2
-    if $I0 == 1 goto OK_3
-    print "not "
-OK_3:
-    print "ok 3 - roles list has the role\n"
+    is($I0, 1, 'roles list has the role')
 
     $P2 = $P1.'new'()
-    print "ok 4 - instantiated class with composed role\n"
+    ok(1, 'instantiated class with composed role')
 
-    $P2.'badger'()
-    print "ok 5 - called method composed from role\n"
+    $S0 = $P2.'badger'()
+    is($S0, 'Badger!', 'called method composed from role')
 .end
 
-.sub badger :method
-    print "Badger!\n"
-.end
-CODE
-ok 1 - added method to a role
-ok 2 - composed role into the class
-ok 3 - roles list has the role
-ok 4 - instantiated class with composed role
-Badger!
-ok 5 - called method composed from role
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'two roles and a class, a method each, no conflict' );
-.sub 'test' :main
+.sub two_roles_and_a_class_a_method_each_no_conflict
     $P0 = new 'Role'
     $P1 = new 'Role'
     $P2 = new 'Class'
 
     $P3 = get_global "snake"
     $P2.'add_method'("snake", $P3)
-    print "ok 1 - class has a method\n"
+    ok(1, 'class has a method')
 
     $P3 = get_global "badger"
     $P0.'add_method'("badger", $P3)
     $P2.'add_role'($P0)
-    print "ok 2 - composed first role into the class\n"
+    ok(1, 'composed first role into the class')
 
     $P3 = get_global "mushroom"
     $P1.'add_method'("mushroom", $P3)
     $P2.'add_role'($P1)
-    print "ok 3 - composed second role into the class\n"
+    ok(1, 'composed second role into the class')
 
     $P3 = $P2.'new'()
-    print "ok 4 - instantiated class\n"
+    ok(1, 'instantiated class')
 
-    $P3.'badger'()
-    print "ok 5 - called method from first role\n"
+    $S0 = $P3.'badger'()
+    is($S0, 'Badger!', 'called method from first role')
 
-    $P3.'mushroom'()
-    print "ok 6 - called method from second role\n"
+    $S1 = $P3.'mushroom'()
+    is($S1, 'Mushroom!', 'called method from second role')
 
-    $P3.'snake'()
-    print "ok 7 - called method from class\n"
+    $S2 = $P3.'snake'()
+    is($S2, 'Snake!', 'called method from class')
 .end
 
-.sub badger :method
-    print "Badger!\n"
-.end
-.sub mushroom :method
-    print "Mushroom!\n"
-.end
-.sub snake :method
-    print "Snake!\n"
-.end
-CODE
-ok 1 - class has a method
-ok 2 - composed first role into the class
-ok 3 - composed second role into the class
-ok 4 - instantiated class
-Badger!
-ok 5 - called method from first role
-Mushroom!
-ok 6 - called method from second role
-Snake!
-ok 7 - called method from class
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'two roles that conflict' );
-.sub 'test' :main
+.sub two_roles_that_conflict
+    .local pmc eh
     $P0 = new 'Role'
     $P1 = new 'Role'
     $P2 = new 'Class'
@@ -148,67 +133,66 @@ pir_output_is( <<'CODE', <<'OUT', 'two roles that conflict' );
     $P3 = get_global "badger"
     $P0.'add_method'("badger", $P3)
     $P2.'add_role'($P0)
-    print "ok 1 - composed first role into the class\n"
+    ok(1, 'composed first role into the class')
 
     $P3 = get_global "badger2"
     $P1.'add_method'("badger", $P3)
-    push_eh OK_2
+
+  try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT)
+    set_addr eh, catch
+
+    push_eh eh
     $P2.'add_role'($P1)
-    print "not "
+    $I0 = 1
+    goto finally
+
+  catch:
+    $I0 = 0
+
+  finally:
     pop_eh
-OK_2:
-    print "ok 2 - composition failed due to conflict\n"
+    nok($I0, 'composition failed due to conflict')
 .end
 
-.sub badger :method
-    print "Badger!\n"
-.end
-.sub badger2 :method
-    print "Badger!\n"
-.end
-CODE
-ok 1 - composed first role into the class
-ok 2 - composition failed due to conflict
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'role that conflicts with a class method' );
-.sub 'test' :main
+.sub role_that_conflicts_with_a_class_method
+    .local pmc eh
     $P0 = new 'Role'
     $P1 = new 'Class'
 
     $P2 = get_global "badger"
     $P1.'add_method'("badger", $P2)
-    print "ok 1 - class has a method\n"
+    ok(1, 'class has a method')
 
     $P2 = get_global "badger2"
     $P0.'add_method'("badger", $P2)
-    push_eh OK_2
+
+  try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT)
+    set_addr eh, catch
+    
+    push_eh eh
     $P1.'add_role'($P0)
-    print "not "
+    $I0 = 1
+    goto finally
+
+  catch:
+    $I0 = 0
+
+  finally:
     pop_eh
-OK_2:
-    print "ok 2 - composition failed due to conflict\n"
+    nok($I0, 'composition failed due to conflict')
 .end
 
-.sub badger :method
-    print "Badger!\n"
-.end
-.sub badger2 :method
-    print "Badger!\n"
-.end
-CODE
-ok 1 - class has a method
-ok 2 - composition failed due to conflict
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by exclusion' );
-.sub 'test' :main
+.sub conflict_resolution_by_exclusion
     $P0 = new 'Role'
     $P1 = new 'Class'
 
     $P2 = get_global "badger"
     $P1.'add_method'("badger", $P2)
-    print "ok 1 - class has a method\n"
+    ok(1, 'class has a method')
 
     $P2 = get_global "badger2"
     $P0.'add_method'("badger", $P2)
@@ -217,143 +201,79 @@ pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by exclusion' );
     $P3 = new 'ResizableStringArray'
     push $P3, "badger"
     $P1.'add_role'($P0, 'exclude_method' => $P3)
-    print "ok 2 - composition worked due to exclusion\n"
+    ok(1, 'composition worked due to exclusion')
 
     $P2 = $P1.'new'()
-    $P2.'badger'()
-    print "ok 3 - called method from class\n"
+    $S0 = $P2.'badger'()
+    is($S0, 'Badger!', 'called method from class')
 
-    $P2.'snake'()
-    print "ok 4 - called method from role that wasn't excluded\n"
+    $S1 = $P2.'snake'()
+    is($S1, 'Snake!', "called method from role that wasn't excluded")
 .end
 
-.sub badger :method
-    print "Badger!\n"
-.end
-.sub badger2 :method
-    print "Oops, wrong badger.\n"
-.end
-.sub snake :method
-    print "Snake!\n"
-.end
-CODE
-ok 1 - class has a method
-ok 2 - composition worked due to exclusion
-Badger!
-ok 3 - called method from class
-Snake!
-ok 4 - called method from role that wasn't excluded
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by aliasing and exclude' );
-.sub 'test' :main
+.sub conflict_resolution_by_aliasing_and_exclude
     $P0 = new 'Role'
     $P1 = new 'Class'
 
-    $P2 = get_global "badger"
-    $P1.'add_method'("badger", $P2)
-    print "ok 1 - class has a method\n"
+    $P2 = get_global 'badger'
+    $P1.'add_method'('badger', $P2)
+    ok(1, 'class has a method')
 
-    $P2 = get_global "badger2"
-    $P0.'add_method'("badger", $P2)
-    $P2 = get_global "snake"
-    $P0.'add_method'("snake", $P2)
+    $P2 = get_global 'badger2'
+    $P0.'add_method'('badger', $P2)
+    $P2 = get_global 'snake'
+    $P0.'add_method'('snake', $P2)
     $P3 = new 'Hash'
-    $P3["badger"] = "role_badger"
+    $P3['badger'] = 'role_badger'
     $P4 = new 'ResizableStringArray'
-    $P4[0] = "badger"
+    $P4[0] = 'badger'
     $P1.'add_role'($P0, 'alias_method' => $P3, 'exclude_method' => $P4)
-    print "ok 2 - composition worked due to aliasing and exclude\n"
+    ok(1, 'composition worked due to aliasing and exclude')
 
     $P2 = $P1.'new'()
-    $P2.'badger'()
-    print "ok 3 - called method from class\n"
+    $S0 = $P2.'badger'()
+    is($S0, 'Badger!', 'called method from class')
 
-    $P2.'snake'()
-    print "ok 4 - called method from role that wasn't aliased\n"
+    $S1 = $P2.'snake'()
+    is($S1, 'Snake!', "called method from role that wasn't aliased")
 
-    $P2.'role_badger'()
-    print "ok 5 - called method from role that was aliased\n"
+    $S2 = $P2.'role_badger'()
+    is($S2, 'Second Badger!', 'called method from role that was aliased')
 .end
 
-.sub badger :method
-    print "Badger!\n"
-.end
-.sub badger2 :method
-    print "Aliased badger!\n"
-.end
-.sub snake :method
-    print "Snake!\n"
-.end
-CODE
-ok 1 - class has a method
-ok 2 - composition worked due to aliasing and exclude
-Badger!
-ok 3 - called method from class
-Snake!
-ok 4 - called method from role that wasn't aliased
-Aliased badger!
-ok 5 - called method from role that was aliased
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'conflict resolution by resolve' );
-.sub 'test' :main
+.sub conflict_resolution_by_resolve
     $P0 = new 'Role'
     $P1 = new 'Class'
 
     $P3 = new 'ResizableStringArray'
-    push $P3, "badger"
+    push $P3, 'badger'
     $P1.'resolve_method'($P3)
-    print "ok 1 - set resolve list\n"
+    ok(1, 'set resolve list')
 
     $P4 = $P1.'resolve_method'()
     $S0 = $P4[0]
-    if $S0 == "badger" goto ok_2
-    print "not "
-ok_2:
-    print "ok 2 - got resolve list and it matched\n"
+    is($S0, 'badger', 'got resolve list and it matched')
 
-    $P2 = get_global "badger"
-    $P1.'add_method'("badger", $P2)
-    print "ok 3 - class has a method\n"
+    $P2 = get_global 'badger'
+    $P1.'add_method'('badger', $P2)
+    ok(1, 'class has a method')
 
-    $P2 = get_global "badger2"
-    $P0.'add_method'("badger", $P2)
-    $P2 = get_global "snake"
-    $P0.'add_method'("snake", $P2)
+    $P2 = get_global 'badger2'
+    $P0.'add_method'('badger', $P2)
+    $P2 = get_global 'snake'
+    $P0.'add_method'('snake', $P2)
     $P1.'add_role'($P0)
-    print "ok 4 - composition worked due to resolve\n"
+    ok(1, 'composition worked due to resolve')
 
     $P2 = $P1.'new'()
-    $P2.'badger'()
-    print "ok 5 - called method from class\n"
+    $S1 = $P2.'badger'()
+    is($S1, 'Badger!', 'called method from class')
 
-    $P2.'snake'()
-    print "ok 6 - called method from role that wasn't resolved\n"
+    $S2 = $P2.'snake'()
+    is($S2, 'Snake!', "called method from role that wasn't resolved")
 .end
 
-.sub badger :method
-    print "Badger!\n"
-.end
-.sub badger2 :method
-    print "Oops, wrong badger.\n"
-.end
-.sub snake :method
-    print "Snake!\n"
-.end
-CODE
-ok 1 - set resolve list
-ok 2 - got resolve list and it matched
-ok 3 - class has a method
-ok 4 - composition worked due to resolve
-Badger!
-ok 5 - called method from class
-Snake!
-ok 6 - called method from role that wasn't resolved
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'role that does a role' );
-.sub 'test' :main
+.sub role_that_does_a_role
     .local pmc PHB, Manage, FirePeople
 
     FirePeople = new 'Role'
@@ -362,85 +282,63 @@ pir_output_is( <<'CODE', <<'OUT', 'role that does a role' );
 
     Manage = new 'Role'
     $P0 = get_global 'give_payrise'
-    FirePeople.'add_method'("give_payrise", $P0)
+    Manage.'add_method'("give_payrise", $P0)
     Manage.'add_role'(FirePeople)
-    print "ok 1 - adding one role to another happens\n"
+    ok(1, 'adding one role to another happens')
 
     PHB = new 'Class'
     PHB.'add_role'(Manage)
-    print "ok 2 - added one rule that does another role to the class\n"
+    ok(1, 'added one rule that does another role to the class')
 
     $P0 = PHB.'new'()
-    $P0.'give_payrise'()
-    print "ok 3 - called method from direct role\n"
+    $S0 = $P0.'give_payrise'()
+    is($S0, 'You all get a pay rise of 0.0005%.', 'called method from direct role')
 
-    $P0.'fire'()
-    print "ok 4 - called method from indirect role\n"
+    $S1 = $P0.'fire'()
+    is($S1, "You're FIRED!", 'called method from indirect role')
 .end
 
-.sub fire
-    print "You're FIRED!\n"
-.end
-.sub give_payrise
-    print "You all get a pay rise of 0.0005%.\n"
-.end
-CODE
-ok 1 - adding one role to another happens
-ok 2 - added one rule that does another role to the class
-You all get a pay rise of 0.0005%.
-ok 3 - called method from direct role
-You're FIRED!
-ok 4 - called method from indirect role
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'conflict from indirect role' );
-.sub 'test' :main
-    .local pmc BurninatorBoss, Manage, FirePeople, Burninator
+.sub conflict_from_indirect_role
+    .local pmc eh, BurninatorBoss, Manage, FirePeople, Burninator
 
     FirePeople = new 'Role'
     $P0 = get_global 'fire'
-    FirePeople.'add_method'("fire", $P0)
+    FirePeople.'add_method'('fire', $P0)
 
     Manage = new 'Role'
     $P0 = get_global 'give_payrise'
-    FirePeople.'add_method'("give_payrise", $P0)
+    FirePeople.'add_method'('give_payrise', $P0)
     Manage.'add_role'(FirePeople)
 
     Burninator = new 'Role'
     $P0 = get_global 'fire2'
-    Burninator.'add_method'("fire", $P0)
-    print "ok 1 - all roles created\n"
+    Burninator.'add_method'('fire', $P0)
+    ok(1, 'all roles created')
 
     BurninatorBoss = new 'Class'
     BurninatorBoss.'add_role'(Manage)
-    print "ok 2 - added first role with indirect role\n"
+    ok(1, 'added first role with indirect role')
 
-    push_eh OK_3
+  try:
+    eh = new 'ExceptionHandler'
+    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT)
+    set_addr eh, catch
+
+    push_eh eh
     BurninatorBoss.'add_role'(Burninator)
-    print "not "
-    pop_eh
-OK_3:
-    print "ok 3 - second role conflicts with method from indirect role\n"
-.end
+    $I0 = 1
+    goto finally
 
-.sub fire
-    print "You're FIRED!\n"
+  catch:
+    $I0 = 0
+
+  finally:
+    pop_eh
+    nok($I0, 'second role conflicts with method from indirect role')
 .end
-.sub fire2
-    print "BURNINATION!\n"
-.end
-.sub give_payrise
-    print "You all get a pay rise of 0.0005%.\n"
-.end
-CODE
-ok 1 - all roles created
-ok 2 - added first role with indirect role
-ok 3 - second role conflicts with method from indirect role
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

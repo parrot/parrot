@@ -1,12 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -22,179 +16,153 @@ Tests the C3 Method Resolution order for the OO implementation.
 
 =cut
 
-pir_output_is( <<'CODE', <<'OUT', 'single parent' );
-.sub 'test' :main
+.sub main :main
+    .include 'test_more.pir'
+
+    plan(12)
+
+    single_parent()
+    grandparent()
+    multiple_inheritance()
+    diamond_inheritance()
+.end
+
+.sub method_A :method
+    .return('Method from A')
+.end
+
+.sub method_B :method
+    .return('Method from B')
+.end
+
+.sub method_C :method
+    .return('Method from C')
+.end
+
+.sub method_D :method
+    .return('Method from D')
+.end
+
+.sub single_parent
     .local pmc A, B
 
     A = new 'Class'
-    $P0 = get_global 'testA'
-    A.'add_method'("foo", $P0)
-    A.'add_method'("bar", $P0)
+    $P0 = get_global 'method_A'
+    A.'add_method'('foo', $P0)
+    A.'add_method'('bar', $P0)
 
     B = new 'Class'
     B.'add_parent'(A)
-    $P0 = get_global 'testB'
-    B.'add_method'("foo", $P0)
+    $P0 = get_global 'method_B'
+    B.'add_method'('foo', $P0)
 
     $P0 = B.'new'()
-    $P0.'foo'()
-    $P0.'bar'()
+    $S0 = $P0.'foo'()
+    $S1 = $P0.'bar'()
+    is($S0, 'Method from B', 'Single Parent - Method foo overloaded in B')
+    is($S1, 'Method from A', 'Single Parent - Method bar inherited from A')
 .end
 
-.sub testA :method
-    print "Method from A called\n"
-.end
-.sub testB :method
-    print "Method from B called\n"
-.end
-CODE
-Method from B called
-Method from A called
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'grandparent' );
-.sub 'test' :main
+.sub grandparent
     .local pmc A, B, C
 
     A = new 'Class'
-    $P0 = get_global 'testA'
-    A.'add_method'("foo", $P0)
-    A.'add_method'("bar", $P0)
-    A.'add_method'("baz", $P0)
+    $P0 = get_global 'method_A'
+    A.'add_method'('foo', $P0)
+    A.'add_method'('bar', $P0)
+    A.'add_method'('baz', $P0)
 
     B = new 'Class'
     B.'add_parent'(A)
-    $P0 = get_global 'testB'
-    B.'add_method'("foo", $P0)
-    B.'add_method'("bar", $P0)
+    $P0 = get_global 'method_B'
+    B.'add_method'('foo', $P0)
+    B.'add_method'('bar', $P0)
 
     C = new 'Class'
     C.'add_parent'(B)
-    $P0 = get_global 'testC'
-    C.'add_method'("foo", $P0)
+    $P0 = get_global 'method_C'
+    C.'add_method'('foo', $P0)
 
     $P0 = C.'new'()
-    $P0.'foo'()
-    $P0.'bar'()
-    $P0.'baz'()
+    $S0 = $P0.'foo'()
+    $S1 = $P0.'bar'()
+    $S2 = $P0.'baz'()
+    is($S0, 'Method from C', 'Grandparent - Method foo overloaded in C')
+    is($S1, 'Method from B', 'Grandparent - Method bar inherited from B')
+    is($S2, 'Method from A', 'Grandparent - Method baz inherited from A')
 .end
 
-.sub testA :method
-    print "Method from A called\n"
-.end
-.sub testB :method
-    print "Method from B called\n"
-.end
-.sub testC :method
-    print "Method from C called\n"
-.end
-CODE
-Method from C called
-Method from B called
-Method from A called
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'multiple inheritance' );
-.sub 'test' :main
+.sub multiple_inheritance
     .local pmc A, B, C
-
-    A = newclass 'A'
-    $P0 = get_global 'testA'
-    A.'add_method'("foo", $P0)
-    A.'add_method'("bar", $P0)
-    A.'add_method'("baz", $P0)
-
-    B = newclass 'B'
-    $P0 = get_global 'testB'
-    B.'add_method'("foo", $P0)
-    B.'add_method'("bar", $P0)
-
-    C = newclass 'C'
+ 
+    A = newclass 'MIA'
+    $P0 = get_global 'method_A'
+    A.'add_method'('foo', $P0)
+    A.'add_method'('bar', $P0)
+    A.'add_method'('baz', $P0)
+ 
+    B = newclass 'MIB'
+    $P0 = get_global 'method_B'
+    B.'add_method'('foo', $P0)
+    B.'add_method'('bar', $P0)
+ 
+    C = newclass 'MIC'
     C.'add_parent'(B)
     C.'add_parent'(A)
-    $P0 = get_global 'testC'
-    C.'add_method'("foo", $P0)
-
+    $P0 = get_global 'method_C'
+    C.'add_method'('foo', $P0)
+ 
     $P0 = C.'new'()
-    $P0.'foo'()
-    $P0.'bar'()
-    $P0.'baz'()
+    $S0 = $P0.'foo'()
+    $S1 = $P0.'bar'()
+    $S2 = $P0.'baz'()
+    is($S0, 'Method from C', 'Multiple Inheritance - Method foo overloaded in C')
+    is($S1, 'Method from B', 'Multiple Inheritance - Method bar inherited from B')
+    is($S2, 'Method from A', 'Multiple Inheritance - Method baz inherited from A')
 .end
 
-.sub testA :method
-    print "Method from A called\n"
-.end
-.sub testB :method
-    print "Method from B called\n"
-.end
-.sub testC :method
-    print "Method from C called\n"
-.end
-CODE
-Method from C called
-Method from B called
-Method from A called
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'diamond inheritance' );
-.sub 'test' :main
+.sub diamond_inheritance
     .local pmc A, B, C, D
 
-    A = newclass 'A'
-    $P0 = get_global 'testA'
-    A.'add_method'("foo", $P0)
-    A.'add_method'("bar", $P0)
-    A.'add_method'("baz", $P0)
-    A.'add_method'("wag", $P0)
+    A = newclass 'DIA'
+    $P0 = get_global 'method_A'
+    A.'add_method'('foo', $P0)
+    A.'add_method'('bar', $P0)
+    A.'add_method'('baz', $P0)
+    A.'add_method'('wag', $P0)
 
-    B = newclass 'B'
+    B = newclass 'DIB'
     B.'add_parent'(A)
-    $P0 = get_global 'testB'
-    B.'add_method'("foo", $P0)
-    B.'add_method'("bar", $P0)
-    B.'add_method'("baz", $P0)
+    $P0 = get_global 'method_B'
+    B.'add_method'('foo', $P0)
+    B.'add_method'('bar', $P0)
+    B.'add_method'('baz', $P0)
 
-    C = newclass 'C'
+    C = newclass 'DIC'
     C.'add_parent'(A)
-    $P0 = get_global 'testC'
-    C.'add_method'("foo", $P0)
-    C.'add_method'("bar", $P0)
+    $P0 = get_global 'method_C'
+    C.'add_method'('foo', $P0)
+    C.'add_method'('bar', $P0)
 
-    D = newclass 'D'
+    D = newclass 'DID'
     D.'add_parent'(C)
     D.'add_parent'(B)
-    $P0 = get_global 'testD'
-    D.'add_method'("foo", $P0)
+    $P0 = get_global 'method_D'
+    D.'add_method'('foo', $P0)
 
     $P0 = D.'new'()
-    $P0.'foo'()
-    $P0.'bar'()
-    $P0.'baz'()
-    $P0.'wag'()
+    $S0 = $P0.'foo'()
+    $S1 = $P0.'bar'()
+    $S2 = $P0.'baz'()
+    $S3 = $P0.'wag'()
+    is($S0, 'Method from D', 'Diamond Inheritance - Method foo overloaded in D')
+    is($S1, 'Method from C', 'Diamond Inheritance - Method bar inherited from C')
+    is($S2, 'Method from B', 'Diamond Inheritance - Method baz inherited from B')
+    is($S3, 'Method from A', 'Diamond Inheritance - Method wag inherited from A')
 .end
-
-.sub testA :method
-    print "Method from A called\n"
-.end
-.sub testB :method
-    print "Method from B called\n"
-.end
-.sub testC :method
-    print "Method from C called\n"
-.end
-.sub testD :method
-    print "Method from D called\n"
-.end
-CODE
-Method from D called
-Method from C called
-Method from B called
-Method from A called
-OUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
