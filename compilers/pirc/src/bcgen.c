@@ -355,7 +355,7 @@ create_codesegment(bytecode * const bc, int codesize) {
     bc->opcursor = (opcode_t *)bc->interp->code->base.data;
 }
 
-#if 0
+
 /*
 
 =item C<void
@@ -375,12 +375,27 @@ create_annotations_segment(bytecode * const bc, char const * const name) {
                                         bc->interp->code->base.dir,
                                         PF_ANNOTATIONS_SEG, segment_name, 1);
 
+    bc->interp->code->annotations->code = bc->interp->code;
+
     /* Create initial group. */
     PackFile_Annotations_add_group(bc->interp,
                                    bc->interp->code->annotations,
-                                   bc->interp->code->base.data);
+                                   bc->opcursor - bc->interp->code->base.data);
 }
 
+/* Look up table for PackFile Annotation types */
+static int packfile_annotation_types[10] = {
+    PF_ANNOTATION_KEY_TYPE_INT,     /* INT_TYPE */
+    PF_ANNOTATION_KEY_TYPE_STR,     /* STRING_TYPE */
+    -1,                             /* PMC_TYPE */
+    PF_ANNOTATION_KEY_TYPE_NUM,     /* NUM_TYPE */
+    -1,                             /* UNKNOWN_TYPE */
+    PF_ANNOTATION_KEY_TYPE_INT,     /* INT_VAL */
+    PF_ANNOTATION_KEY_TYPE_STR,     /* STRING_VAL */
+    -1,                             /* PMC_VAL */
+    PF_ANNOTATION_KEY_TYPE_NUM,     /* NUM_VAL */
+    PF_ANNOTATION_KEY_TYPE_STR      /* USTRING_VAL */
+};
 
 /*
 
@@ -395,11 +410,18 @@ of type C<type> and a value passed in C<value>.
 */
 void
 add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type, opcode_t value) {
+    /* look up the type */
+    int annotation_type = packfile_annotation_types[type];
+    if (annotation_type == -1) {/* this is no good */
+        fprintf(stderr, "wrong annotation type!");
+        return;
+    }
+
     PackFile_Annotations_add_entry(bc->interp, bc->interp->code->annotations,
-                                   offset, key, type, value);
+                                   offset, key, annotation_type, value);
 }
 
-#endif
+
 
 
 /*

@@ -907,8 +907,6 @@ emit_pbc_annotations(lexer_state * const lexer) {
     if (lexer->annotations == NULL)
         return;
 
-
-#if 0
     /* create an annotations segment, which is not created by default. */
     create_annotations_segment(lexer->bc, lexer->filename);
 
@@ -937,7 +935,7 @@ emit_pbc_annotations(lexer_state * const lexer) {
                 break;
             default:
                 panic(lexer, "unknown annotation constant type");
-                break;
+                return; /* panic() exits, so this never happens */
         }
 
 
@@ -947,7 +945,7 @@ emit_pbc_annotations(lexer_state * const lexer) {
     }
     while (iter != lexer->annotations->next);
 
-#endif
+
 }
 
 
