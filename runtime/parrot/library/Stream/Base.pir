@@ -40,7 +40,7 @@ END:
     .local pmc close
 
     # call our own close
-    close = find_global "Stream::Base", "close"
+    close = get_hll_global ['Stream::Base'], 'close'
     close(self)
 .end
 
@@ -91,7 +91,7 @@ Returns nothing.
     .local int i
     .local pmc escape
 
-    escape = find_global "Data::Escape", "String"
+    escape = get_hll_global ['Data::Escape'], 'String'
 LOOP:
     i = self."connected"()
     unless i goto END

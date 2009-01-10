@@ -48,7 +48,7 @@ OKAY:
     store_global "_parrotlib", "include_paths", includes
 
     # get the directory handler
-    $P0 = find_global "_parrotlib", "handle_directory"
+    $P0 = get_hll_global ['_parrotlib'], 'handle_directory'
 
     # fill the includes array
 LOOP:
@@ -73,7 +73,7 @@ LOOP:
 
     $P1 = new 'String'
     $P1 = sig
-    find_global $P0, "_parrotlib", name
+    $P0 = get_hll_global ['_parrotlib'], name
     setprop $P0, "signature", $P1
     store_global "_parrotlib", name, $P0
 .end
@@ -90,7 +90,7 @@ This function returns the absolute filename of the requested file.
 .sub include_file_location
     .param string name
 
-    find_global $P0, "_parrotlib", "include_paths"
+    $P0 = get_hll_global ['_parrotlib'], 'include_paths'
     $S0 = find_file_path( name, $P0 )
 
     .begin_return
@@ -110,7 +110,8 @@ This function returns the absolute filename of the requested file.
 .sub imcc_compile_file_location
     .param string name
 
-    find_global $P0, "_parrotlib", "include_paths"
+    $P0 = get_hll_global ['_parrotlib'], 'include_paths'
+
     $S0 = find_file_path( name, $P0 )
 
     .begin_return

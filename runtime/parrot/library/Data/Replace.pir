@@ -12,7 +12,7 @@ Data::Replace - data replacing implemented in PIR
 
     .local pmc replace
 
-    replace = find_global "Data::Replace", "replace"
+    replace = get_hll_global ['Data::Replace'], 'replace'
 
     replace( array, old, new )
 
@@ -95,7 +95,7 @@ CANT_REPLACE:
     typeof name, where
     .include 'errors.pasm'
     errorsoff .PARROT_ERRORS_GLOBALS_FLAG
-    find_global temp, "Data::Replace", name
+    temp = get_hll_global ['"Data::Replace'], name
     errorson .PARROT_ERRORS_GLOBALS_FLAG
     # invoke it if found
     $I0 = defined temp
@@ -111,7 +111,7 @@ END:
 .end
 
 .sub __onload :load
-    $P0 = find_global "Data::Replace", "ResizablePMCArray"
+    $P0 = get_hll_global ['Data::Replace'], 'ResizablePMCArray'
     store_global "Data::Replace", "PMCArray", $P0
     store_global "Data::Replace", "StringArray", $P0
 .end

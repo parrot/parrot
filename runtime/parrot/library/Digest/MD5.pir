@@ -54,11 +54,11 @@ consumption which should be resolved soon.
 .sub onload :load
 
     .local pmc f
-    f = find_global "Digest", "_md5sum"
+    f = get_hll_global ['Digest'], '_md5sum'
     set_global "_md5sum", f
-    f = find_global "Digest", "_md5_hex"
+    f = get_hll_global ['Digest'], '_md5_hex'
     set_global "_md5_hex", f
-    f = find_global "Digest", "_md5_print"
+    f = get_hll_global ['Digest'], '_md5_print'
     set_global "_md5_print", f
 .end
 

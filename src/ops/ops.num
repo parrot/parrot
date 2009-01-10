@@ -1272,9 +1272,5 @@ store_global_s_s_p             1241
 store_global_sc_s_p            1242
 store_global_s_sc_p            1243
 store_global_sc_sc_p           1244
-find_global_p_s_s              1245
-find_global_p_sc_s             1246
-find_global_p_s_sc             1247
-find_global_p_sc_sc            1248
-find_name_p_s                  1249
-find_name_p_sc                 1250
+find_name_p_s                  1245
+find_name_p_sc                 1246

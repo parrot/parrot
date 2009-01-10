@@ -280,7 +280,7 @@ Returns the TAP-compatible string representation of this test.
     .local pmc status
     .local pmc parent_status
 
-    parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
+    parent_status = get_hll_global ['Test::Builder::Test::WithReason'], 'status'
     status        = parent_status()
     reason        = self.'reason'()
 
@@ -315,7 +315,7 @@ Returns the TAP-compatible string representation of this test.
     .local pmc status
     .local pmc parent_status
 
-    parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
+    parent_status = get_hll_global ['Test::Builder::Test::WithReason'], 'status'
     status        = parent_status()
 
     set status['skip'], 1
@@ -360,7 +360,7 @@ Returns the TAP-compatible string representation of this test.
     .local pmc status
     .local pmc parent_status
 
-    parent_status = find_global 'Test::Builder::Test::WithReason', 'status'
+    parent_status = get_hll_global ['Test::Builder::Test::WithReason'], 'status'
     status        = parent_status()
     passed        = self.'passed'()
 

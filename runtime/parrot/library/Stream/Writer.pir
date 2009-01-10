@@ -64,7 +64,7 @@ END:
     source()
 
     # close the source
-    source = find_global "Stream::Base", "close"
+    source = get_hll_global ['Stream::Base'], 'close'
     self."setSource"()
 
     # mark it as closed
