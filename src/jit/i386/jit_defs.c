@@ -12,7 +12,6 @@ $Id$
 #include "parrot/oplib/ops.h"
 #include "jit.h"
 #include "jit_emit.h"
-#include "parrot/oplib/ops.h"
 
 INTVAL
 get_nci_I(PARROT_INTERP, ARGMOD(call_state *st), int n)
