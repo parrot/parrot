@@ -686,6 +686,7 @@ void default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 void mark_const_subs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_EXPORT
 void PackFile_Annotations_add_entry(PARROT_INTERP,
     ARGMOD(struct PackFile_Annotations *self),
     opcode_t offset,
@@ -696,6 +697,7 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
+PARROT_EXPORT
 void PackFile_Annotations_add_group(PARROT_INTERP,
     ARGMOD(struct PackFile_Annotations *self),
     opcode_t offset)
@@ -721,6 +723,7 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
     ARGIN(struct PackFile *pf),

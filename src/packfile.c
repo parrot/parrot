@@ -3845,7 +3845,7 @@ and C<add>.
 =cut
 
 */
-
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
 PackFile_Annotations_new(PARROT_INTERP, ARGIN(struct PackFile *pf),
@@ -4112,7 +4112,7 @@ the new annotations group starts.
 =cut
 
 */
-
+PARROT_EXPORT
 void
 PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(struct PackFile_Annotations *self),
         opcode_t offset)
@@ -4153,7 +4153,7 @@ an index into the constants table otherwise.
 =cut
 
 */
-
+PARROT_EXPORT
 void
 PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(struct PackFile_Annotations *self),
         opcode_t offset, opcode_t key, opcode_t type, opcode_t value)
