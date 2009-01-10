@@ -38,7 +38,7 @@ pir_to_pbc:
 #  $P1 = $P0(pirfile)
 #  $P1 = compile $P0, pirfile
 
-  $P1 = find_global "_regex"
+  $P1 = get_global "_regex"
   .return($P1)
 .end
 
