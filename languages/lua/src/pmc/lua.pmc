@@ -31,24 +31,6 @@ INTVAL dynpmc_LuaUserdata;
 
 static PMC * Lua_PMC;
 
-static STRING*
-context_infostr(PARROT_INTERP, Parrot_Context *ctx)
-{
-    Parrot_Context_info info;
-    STRING *res = NULL;
-
-    Parrot_block_GC_mark(interp);
-
-    if (Parrot_Context_get_info(interp, ctx, &info)) {
-        res = Parrot_sprintf_c(interp, "\t%Ss:%d in function '%Ss'\n",
-                                       info.file, info.line, info.subname);
-    }
-
-    Parrot_unblock_GC_mark(interp);
-
-    return res;
-}
-
 
 pmclass Lua
     singleton
@@ -235,100 +217,7 @@ information see F<src/pmc.c>.
         RETURN(STRING *retval);
     }
 
-/*
-
-=item C<STRING* traceback(INTVAL level)>
-
-=cut
-
-*/
-    METHOD STRING* traceback(INTVAL level) {
-        STRING *bt = string_from_literal(INTERP, "stack traceback:\n");
-        STRING *str;
-
-        /* information about the current sub */
-        Parrot_Context *sub_ctx = CONTEXT(interp)->caller_ctx;
-
-        if (level == 0) {
-            str = context_infostr(INTERP, sub_ctx);
-            bt  = string_append(INTERP, bt, str);
-        }
-
-        /* backtrace: follow the continuation chain */
-        while (1) {
-            PMC *cont = sub_ctx->current_cont;
-
-
-            if (!cont)
-                break;
-
-            sub_ctx = PMC_cont(cont)->to_ctx;
-
-            if (!sub_ctx)
-                break;
-
-            str = context_infostr(INTERP, sub_ctx);
-
-
-            if (!str)
-                break;
-
-            bt = string_append(INTERP, bt, str);
-        }
-
-        RETURN(STRING *bt);
-    }
-
-/*
-
-=item C<STRING* where()>
-
-=cut
-
-*/
-    METHOD STRING* where() {
-        Parrot_Context   *sub_ctx = CONTEXT(interp)->caller_ctx;
-        STRING           *retval;
-
-        /* backtrace: follow the continuation chain */
-        while (1) {
-            PMC *cont;
-            PMC *sub = sub_ctx->current_sub;
-            if (sub
-            &&  PMC_metadata(sub)
-            &&  VTABLE_isa(INTERP, sub, const_string(INTERP, "LuaFunction"))) {
-                Parrot_Context_info info;
-                Parrot_block_GC_mark(INTERP);
-
-                if (Parrot_Context_get_info(INTERP, sub_ctx, &info)) {
-                    STRING *res = Parrot_sprintf_c(INTERP, "%Ss:%d:",
-                                                   info.file, info.line);
-
-                    Parrot_unblock_GC_mark(INTERP);
-                    RETURN(STRING *res);
-                }
-                Parrot_unblock_GC_mark(INTERP);
-                break;
-            }
-
-            cont = sub_ctx->current_cont;
-
-
-            if (!cont)
-                break;
-
-            sub_ctx = PMC_cont(cont)->to_ctx;
-
-            if (!sub_ctx)
-                break;
-        }
-
-        retval = const_string(INTERP, "_._:0:");
-        RETURN(STRING *retval);
-    }
-
 }
-
 /*
 
 =back

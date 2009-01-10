@@ -363,7 +363,7 @@ Returns a string with a traceback of the call stack. An optional C<message>
 string is appended at the beginning of the traceback. This function is
 typically used with C<xpcall> to produce better error messages.
 
-STILL INCOMPLETE (see traceback in lua.pmc).
+STILL INCOMPLETE.
 
 =cut
 
@@ -377,12 +377,39 @@ STILL INCOMPLETE (see traceback in lua.pmc).
     unless $S1 goto L1
     $S1 .= "\n"
   L1:
-    new $P0, 'Lua'
-    $S0 = $P0.'traceback'($I2)
+    $S0 = _traceback($I2)
     $S1 .= $S0
     new res, 'LuaString'
     set res, $S1
     .return (res)
+.end
+
+.sub '_traceback' :anon
+    .param int level
+    $P0 = getinterp
+    $I0 = 0
+    $S0 = "stack traceback:"
+    .local pmc sub, outer
+  L1:
+    inc $I0
+    push_eh _handler
+    sub = $P0['sub'; $I0]
+    pop_eh
+    outer = sub.'get_outer'()
+    $S0 .= "\n\t"
+    unless null outer goto L3
+    $S0 .= "[PIR]:"
+    goto L4
+  L3:
+    $S0 .= "_._:0:"
+  L4:
+    $S0 .= " in function '"
+    $S1 = sub.'get_name'()
+    $S0 .= $S1
+    $S0 .= "'"
+    goto L1
+  _handler:
+    .return ($S0)
 .end
 
 

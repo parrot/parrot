@@ -1024,11 +1024,6 @@ This function never returns.
 .sub 'where' :anon
     # dummy implementation
     .return ("_._:0:")
-    # previous one that segfaults (see RT #60206)
-    .local pmc obj
-    new obj, 'Lua'
-    $S0 = obj.'where'()
-    .return ($S0)
 .end
 
 .sub 'traceback' :anon
