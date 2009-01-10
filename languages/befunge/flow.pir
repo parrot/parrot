@@ -95,12 +95,12 @@
     b = stack__pop()
     a = stack__pop()
 
-    if a < b goto FLOW__COMPARE__FALSE
-    stack__push(1)
+    if a > b goto FLOW__COMPARE__TRUE
+    stack__push(0)
     .return()
 
-  FLOW__COMPARE__FALSE:
-    stack__push(0)
+  FLOW__COMPARE__TRUE:
+    stack__push(1)
 .end
 
 
