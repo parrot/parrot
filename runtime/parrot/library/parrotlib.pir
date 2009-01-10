@@ -45,7 +45,7 @@ OKAY:
 
     # create includes array
     includes = new 'ResizablePMCArray'
-    store_global "_parrotlib", "include_paths", includes
+    set_hll_global ['_parrotlib'], 'include_paths', includes
 
     # get the directory handler
     $P0 = get_hll_global ['_parrotlib'], 'handle_directory'
@@ -75,7 +75,7 @@ LOOP:
     $P1 = sig
     $P0 = get_hll_global ['_parrotlib'], name
     setprop $P0, "signature", $P1
-    store_global "_parrotlib", name, $P0
+    set_hll_global ['_parrotlib'], name, $P0
 .end
 
 =item STRING = include_file_location( STRING )

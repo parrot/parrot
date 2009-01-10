@@ -112,8 +112,8 @@ END:
 
 .sub __onload :load
     $P0 = get_hll_global ['Data::Replace'], 'ResizablePMCArray'
-    store_global "Data::Replace", "PMCArray", $P0
-    store_global "Data::Replace", "StringArray", $P0
+    set_hll_global ['Data::Replace'], 'PMCArray', $P0
+    set_hll_global ['Data::Replace'], 'StringArray', $P0
 .end
 
 .sub ResizablePMCArray

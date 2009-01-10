@@ -4,9 +4,9 @@
     # print "loaded STM runtime library\n"
     # Create globals
     $P0 = new 'ResizablePMCArray'
-    store_global 'STM', 'ends', $P0
+    set_hll_global ['STM'], 'ends', $P0
     $P0 = new 'ResizableIntegerArray'
-    store_global 'STM', 'statuses', $P0
+    set_hll_global ['STM'], 'statuses', $P0
 .end
 
 .const int STATUS_COMMIT = 0

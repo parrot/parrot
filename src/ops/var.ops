@@ -370,20 +370,6 @@ Operations to modify global variables
 
 ########################################
 
-=item B<store_global>(in STR, in STR, invar PMC)
-
-Store global $3 as global symbol $2 in namespace designated by $1.  If
-namespace does not exist, create it.  $1 may be a key, a string, or an array
-of strings.
-
-=cut
-
-op store_global(in STR, in STR, invar PMC) :deprecated {
-    Parrot_store_global_s(interp, $1, $2, $3);
-}
-
-########################################
-
 =item B<find_name>(out PMC, in STR)
 
 Find the name $2 in lexical, current, global, or builtin namespace and
@@ -408,7 +394,7 @@ op find_name(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 
 =head1 LICENSE
 

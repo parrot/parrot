@@ -167,7 +167,7 @@ TYPE_OK:
 
 create_type:
     new self, "Data::Dumper"
-    store_global "Data::Dumper", "global", self
+    set_hll_global ['Data::Dumper'], 'global', self
 
 END:
     .return( self )

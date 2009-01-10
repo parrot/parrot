@@ -35,10 +35,6 @@ See RT #47011.
 
 =over 4
 
-=item * C<store_global> [post 0.5.0]
-
-See RT #48016. Replace usage with set_[hll,root]_global variants.
-
 =item * C<n_*> math opcode variants [post 0.7.1]
 
 See RT #58410.

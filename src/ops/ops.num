@@ -1268,9 +1268,5 @@ set_root_global_p_s_p          1237
 set_root_global_pc_s_p         1238
 set_root_global_p_sc_p         1239
 set_root_global_pc_sc_p        1240
-store_global_s_s_p             1241
-store_global_sc_s_p            1242
-store_global_s_sc_p            1243
-store_global_sc_sc_p           1244
-find_name_p_s                  1245
-find_name_p_sc                 1246
+find_name_p_s                  1241
+find_name_p_sc                 1242
