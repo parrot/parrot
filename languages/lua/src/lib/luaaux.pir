@@ -993,32 +993,57 @@ This function never returns.
     $I0 = $P0
     if $I0 == .EXCEPT_EXIT goto L2
   L1:
-    .local string msg
-    msg = ex
-    .local int lineno
-    .local string traceback, where
-    (traceback, where) = 'traceback'()
-    $S0 = where
+    .local pmc bt
+    bt = ex.'backtrace'()
+    $S0 = where()
     $S0 .= ' '
-    $S0 .= msg
+    $S1 = ex
+    $S0 .= $S1
     $S0 .= "\n"
-    $S0 .= traceback
+    $S1 = traceback(bt)
+    $S0 .= $S1
     .return (1, $S0)
   L2:
     rethrow ex
 .end
 
-.sub 'traceback'
+.sub 'where' :anon
     # dummy implementation
-    .return ("stack traceback:\n\tdummy\n", "_._:0:")
+    .return ("_._:0:")
     # previous one that segfaults (see RT #60206)
     .local pmc obj
-    .local string traceback, where
     new obj, 'Lua'
-    traceback = obj.'traceback'(1)
-    where = obj.'where'()
+    $S0 = obj.'where'()
+    .return ($S0)
+.end
 
-    .return (traceback, where)
+.sub 'traceback' :anon
+    .param pmc bt
+    .local pmc iter, sub, outer, annos
+    new iter, 'Iterator', bt
+    .local string ret
+    ret = "stack traceback:"
+  L1:
+    unless iter goto L2
+    $P0 = shift iter
+    sub = $P0['sub']
+    if null sub goto L2
+    $S0 = sub.'get_name'()
+    outer = sub.'get_outer'()
+    ret .= "\n\t"
+    unless null outer goto L3
+    ret .= "[PIR]:"
+    goto L4
+  L3:
+    ret .= "_._:0:"
+  L4:
+    ret .= " in function '"
+    ret .= $S0
+    ret .= "'"
+    annos = $P0['annotations']
+    goto L1
+  L2:
+    .return (ret)
 .end
 
 

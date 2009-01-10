@@ -148,6 +148,15 @@ Return the string "function".
 
 =over 4
 
+*/
+    METHOD STRING *get_name() {
+        const Parrot_sub * const sub = PMC_sub(SELF);
+        STRING *retval = string_copy(INTERP, sub->name);
+        RETURN(STRING *retval);
+    }
+
+/*
+
 =item C<PMC *getfenv()>
 
 =cut
