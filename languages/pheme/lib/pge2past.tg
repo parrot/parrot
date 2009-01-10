@@ -144,7 +144,7 @@ transform application (PAST;Op) :language('PIR') {
     func_name    = substr func_name, 1, name_length
 
     .local pmc func_func
-    func_func = find_global 'Pheme', func_name
+    func_func = get_hll_global ['Pheme'], func_name
 
     .local int have_func
     have_func = defined func_func
@@ -370,14 +370,14 @@ transform lambda (PAST;Op) :language('PIR') {
     goto args_iter_loop
   args_iter_end:
     .local pmc arg_names_stack
-    arg_names_stack = find_global 'arg_names_stack'
+    arg_names_stack = get_global 'arg_names_stack'
 
     .local int have_stack
     have_stack = defined arg_names_stack
     if have_stack goto add_names_to_stack
 
     arg_names_stack = new 'ResizablePMCArray'
-    store_global 'arg_names_stack', arg_names_stack
+    set_global 'arg_names_stack', arg_names_stack
 
   add_names_to_stack:
     push arg_names_stack, rewrite_args
@@ -420,7 +420,7 @@ transform rewrite_var_name (PAST;Op) :language('PIR') {
 
 transform rewrite_var_name (PAST;Val) :language('PIR') {
     .local pmc arg_names_stack
-    arg_names_stack = find_global 'arg_names_stack'
+    arg_names_stack = get_global 'arg_names_stack'
 
     .local pmc arg_names
     arg_names = arg_names_stack[-1]

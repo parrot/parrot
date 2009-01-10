@@ -16,7 +16,7 @@
 	symbols["'*'"]                 = 1
 	symbols["'/'"]                 = 1
 
-	store_global 'PhemeCompiler', 'symbols', symbols
+	set_hll_global ['PhemeCompiler'], 'symbols', symbols
 	.return()
 .end
 
@@ -34,7 +34,7 @@
 
 	.local pmc function
 	push_eh return_list
-	function = find_global symbol_name
+	function = get_global symbol_name
 	unless function goto return_list
 	pop_eh
 

@@ -6,13 +6,13 @@
     .param string description :optional
 
     .local pmc eqlist
-    eqlist = find_global 'Pheme', 'eqlist?'
+    eqlist = get_hll_global ['Pheme'], 'eqlist?'
 
     .local int equal
     equal = eqlist( l_cons, r_cons )
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    test = get_hll_global [ 'Test'; 'More' ], '_test'
 
     test.'ok'( equal, description )
     .return( equal )
@@ -24,13 +24,13 @@
     .param string description :optional
 
     .local pmc eqlist
-    eqlist = find_global 'Pheme', 'eqlist?'
+    eqlist = get_hll_global ['Pheme'], 'eqlist?'
 
     .local int equal
     equal = eqlist( l_cons, r_cons )
 
     .local pmc test
-    find_global test, [ 'Test'; 'More' ], '_test'
+    test = get_hll_global [ 'Test'; 'More' ], '_test'
 
     test.'ok'( equal, description )
     .return( equal )
@@ -54,8 +54,8 @@
   iter_loop:
     unless iter goto iter_end
     name = shift iter
-    sub  = find_global [ 'Test'; 'More' ], name
-    store_global name, sub
+    sub  = get_hll_global [ 'Test'; 'More' ], name
+    set_global name, sub
     goto iter_loop
   iter_end:
 

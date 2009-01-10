@@ -80,7 +80,7 @@
     .local pmc start_rule
     .local pmc match
 
-    start_rule = find_global ['Pheme';'Grammar'], 'prog'
+    start_rule = get_root_global ['Pheme';'Grammar'], 'prog'
     match      = get_root_global ['parrot';'PGE'], 'Match'
     source     = match.'new'(source, 'grammar'=>'Pheme::Grammar')
 
@@ -151,7 +151,7 @@
 	load_bytecode 'PGE/Dumper.pbc'
 
 	.local pmc dumper
-	dumper = find_global '_dumper'
+	dumper = get_global '_dumper'
 	dumper( match, '$/' )
 	.return()
 .end
