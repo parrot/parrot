@@ -140,7 +140,7 @@ Tests role composition in the OO implementation.
 
   try:
     eh = new 'ExceptionHandler'
-    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT)
+    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
     set_addr eh, catch
 
     push_eh eh
@@ -170,7 +170,7 @@ Tests role composition in the OO implementation.
 
   try:
     eh = new 'ExceptionHandler'
-    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT)
+    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
     set_addr eh, catch
     
     push_eh eh
@@ -321,7 +321,7 @@ Tests role composition in the OO implementation.
 
   try:
     eh = new 'ExceptionHandler'
-    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT)
+    eh.'handle_types'(.EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT)
     set_addr eh, catch
 
     push_eh eh

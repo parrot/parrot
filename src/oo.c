@@ -1161,7 +1161,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
         "->P", &immediate_parents);
 
     if (!immediate_parents)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METH_NOT_FOUND,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
             "Failed to get parents list from class!");
 
     parent_count = VTABLE_elements(interp, immediate_parents);
@@ -1284,7 +1284,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             if (VTABLE_exists_keyed_str(interp, methods_hash, method_name))
                 /* Conflicts with something already in the class. */
                 Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT,
+                    EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                     "A conflict occurred during role composition "
                     "due to method '%S'.", method_name);
 
@@ -1293,7 +1293,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                 method_name))
                 /* Something very weird is going on. */
                 Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT,
+                    EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                     "A conflict occurred during role composition;"
                     " the method '%S' from the role managed to conflict "
                     "with itself somehow.", method_name);
@@ -1315,7 +1315,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name))
                 /* Conflicts with something already in the class. */
                 Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT,
+                    EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                     "A conflict occurred during role composition"
                     " due to the aliasing of '%S' to '%S'.",
                     method_name, alias_name);
@@ -1324,7 +1324,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             if (VTABLE_exists_keyed_str(interp, proposed_add_methods,
                     alias_name))
                 Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_ROLE_COMPOSITION_METH_CONFLICT,
+                    EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                     "A conflict occurred during role composition"
                     " due to the aliasing of '%S' to '%S' (role already has"
                     " a method '%S').", method_name, alias_name, alias_name);

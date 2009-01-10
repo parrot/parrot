@@ -732,7 +732,7 @@ Adds the given sub PMC as a vtable override with the given name.
 
         /* Check that the name is actually valid as a vtable override */
         if (Parrot_get_vtable_index(interp, name) == -1)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METH_NOT_FOUND,
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
                 "'%S' is not a valid vtable function name.", name);
 
         /* Add it to vtable methods list. */
@@ -1083,7 +1083,7 @@ Creates a new PMC object of the type of the class and calls init().
                     VTABLE_get_string_keyed_int(interp, _class->resolve_method, i);
                 if (!VTABLE_exists_keyed_str(interp, _class->methods, check_meth))
                     Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_METH_NOT_FOUND, "The method '%S' was named "
+                        EXCEPTION_METHOD_NOT_FOUND, "The method '%S' was named "
                         "in the resolve list, but not supplied", check_meth);
             }
 

@@ -65,12 +65,12 @@ op callmethodcc(invar PMC, in STR) :object_base :flow {
     PMC * const _class = VTABLE_get_class(interp, object);
     if (PMC_IS_NULL(_class)) {
       dest = Parrot_ex_throw_from_op_args(interp, next,
-          EXCEPTION_METH_NOT_FOUND,
+          EXCEPTION_METHOD_NOT_FOUND,
           "Method '%Ss' not found for non-object", meth);
     }
     else {
       dest = Parrot_ex_throw_from_op_args(interp, next,
-          EXCEPTION_METH_NOT_FOUND,
+          EXCEPTION_METHOD_NOT_FOUND,
           "Method '%Ss' not found for invocant of class '%Ss'", meth,
           VTABLE_get_string(interp, _class));
     }
@@ -107,7 +107,7 @@ op callmethod(invar PMC, in STR, invar PMC) :object_base :flow {
 
 
   if (PMC_IS_NULL(method_pmc)) {
-    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METH_NOT_FOUND,
+    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
         VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
   }
@@ -141,7 +141,7 @@ op tailcallmethod(invar PMC, in STR) :object_base :flow {
   opcode_t *dest;
 
   if (PMC_IS_NULL(method_pmc)) {
-    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METH_NOT_FOUND,
+    dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND,
         "Method '%Ss' not found for invocant of class '%Ss'", meth,
         VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
   }

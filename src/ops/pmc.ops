@@ -182,7 +182,7 @@ op find_method(out PMC, invar PMC, in STR) :flow {
     $1 = VTABLE_find_method(interp, $2, $3);
     if (PMC_IS_NULL($1) || !VTABLE_defined(interp, $1)) {
         opcode_t *dest = Parrot_ex_throw_from_op_args(interp, resume,
-            EXCEPTION_METH_NOT_FOUND,
+            EXCEPTION_METHOD_NOT_FOUND,
             "Method '%Ss' not found for invocant of class '%Ss'", $3,
             VTABLE_get_string(interp, VTABLE_get_class(interp, $2)));
         goto ADDRESS(dest);

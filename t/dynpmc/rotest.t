@@ -65,7 +65,7 @@ CODE
     .local pmc value, eh
     value = new 'ROTest'
     eh = new 'ExceptionHandler'
-    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS, .EXCEPTION_METH_NOT_FOUND)
+    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS, .EXCEPTION_METHOD_NOT_FOUND)
     set_addr eh, eh_label
 
     #READONLYTEST

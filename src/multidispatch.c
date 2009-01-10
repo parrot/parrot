@@ -431,7 +431,7 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
     }
 
     if (PMC_IS_NULL(sub))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METH_NOT_FOUND,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
                 "Multiple Dispatch: No suitable candidate found for '%s',"
                 " with signature '%s'", name, sig);
 
