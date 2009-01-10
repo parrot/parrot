@@ -12,26 +12,27 @@ access to PMCs in Parrot.
 
 =head1 DESCRIPTION
 
-First, let's define some terminology. An B<aggregate PMC> is one which allows
-indexed access to sub-element that it stores or references, by supporting and
-implementing the C<_keyed> variants of vtable methods. These variants are
-B<indexing> operations, as they act on a specific indexed element of an
-aggregate PMC.
+First, let's define some terminology. An C<aggregate PMC> is one which stores
+or references other values as elements.  The aggregate PMC allows indexed
+access to element by implementing some of the C<_keyed> variants of VTABLE
+functions.  These variants are called C<indexing> operations, as they act on a
+specific indexed element of an aggregate PMC.  Examples of a aggregate PMCs
+include C<Hash>, C<FixedIntegerArray> and C<ResizablePMCArray>.
 
-Non-aggregates also support C<_keyed> variants of the vtable methods, but they
-may not do anything particularly clever - for instance, PMC types implementing
+Non-aggregates may also support C<_keyed> variants of the VTABLE functions, but
+they not do anything particularly clever.  For instance, PMC types implementing
 Perl references will merely pass the index on to the referent. These aren't
-aggregates because they don't directly store or reference sub-elements.
+aggregates because they don't directly store or reference elements.
 
-Indexing operations take one or more aggregate-B<key> atoms. At runtime, these
-operations will index the key into the aggregate returning a B<value>. Here is
-a well-known indexing operation in Perl 6:
+Indexing operations take one or more aggregate B<keys>.  At runtime these
+operations will index into the B<aggregate> using the C<key> and return a
+B<value>.  Here is a well-known indexing operation in Perl 6:
 
     @a[12] = $b;
 
-The key here is the constant integer C<12>, and the aggregate is the
-C<PerlArray> C<@a>. In the process of this assignment, Parrot will have to
-extract the PMC in element 12 of the array, producing a value. C<$b> is then
+The B<key> here is the constant integer C<12>  The aggregate is the
+C<Perl6Array> C<@a>.  In the process of this assignment, Parrot will have to
+extract the PMC in element 12 of the array, producing a C<value>. C<$b> is then
 assigned to this value.
 
 Now, how does this all get implemented?
@@ -40,21 +41,22 @@ Now, how does this all get implemented?
 
 =head2 The key structure
 
-The key structure has to have the following features: it must bundle up
-multiple keys so that multidimensional aggregates can be indexed; keys may be
-specified as integer, string, number or PMC.
+The key structure must bundle multiple keys.  This is to allow indexing into
+multidimensional aggregate PMCs.  These keys may be specified as integer,
+string, number or PMC.
 
-Hence, the following structure was produced. First, the individual keys as we
-think of them from a language level are each stored in a Key PMC with the key
-type encoded in the private flags of the PMC and the value stored in the PMCs
-cache.
+For this reason the following structure was produced.  Individual keys (e.g. a
+single C<Integer> or C<String>) are stored in a C<Key> PMC.  The type of the
+key is encoded in the private flags of the PMC as speficied below.   The value
+of the C<Key> PMC is stored in the PMC's cache (i.e. C<PMC_pmc_val(key)>,
+C<PMC_int_val(key)>).
 
-So, for instance, indexing the multidimensional array C<@foo[$a;12;"hi"]>
-produces three PMCs, one with a PMC type, one with an integer type and one
-with a string type.
+For example, indexing the multidimensional array C<@foo[$a,12;"hi"]>
+produces three PMCs; one with a PMC type, one with an integer type and one with
+a string type.
 
-As stated, the key type is encoded in the PMC flags using 8 bits based on the
-following scheme:
+The key type is encoded in the PMC flags using 8 bits based on the following
+scheme (from includes/parrot/key.h):
 
     typedef enum {
         KEY_integer_FLAG        = PObj_private0_FLAG,
@@ -77,14 +79,16 @@ following scheme:
     } KEY_flags
 
 
-The C<KEY_register_FLAG> is used to indicate that the C<int_val> component of
-the PMC's cache contains the number of a register of the appropriate type that
-itself contains the value of the key component.
+The C<KEY_register_FLAG> is used to indicate that value if the key is in a
+register.  In this case, C<PMC_int_val(key)> contains the number of a register
+of the appropriate type that contains the value.
 
-The next issue is to combine these things into a single key. This is done by
-using the C<data> member of the PMC to form a linked list so that each key
-points to the next key. A linked list is used so that partial keys can be
-easily generated as a multidimensional data structure is traversed.
+Parrot must also have a way to combine multiple keys into a key that can be
+treated as a single unit.  This is done by forming a singly linked list such
+that each key points at the next.  Within a single Key PMC, the pointer to the
+next key is stored in C<PMC_data(key)>.  The linked list structure allows the
+use of partial keys in multidimentional lookups, since the next key can be
+generated while the aggregate PMC is being traversed.
 
 These definitions, along with declarations of support routines used to
 manipulate keys, can be found in F<include/parrot/key.h>
