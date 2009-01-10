@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -605,6 +605,50 @@ everything via the VTABLE api.
             VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
                 VTABLE_get_pmc_keyed_int(INTERP, value, i));
     }
+
+/*
+
+=item METHOD PMC* shift()
+
+=item METHOD PMC* pop()
+
+Method forms to remove and return a PMC from the beginning or
+end of the array.
+
+=cut
+
+*/
+
+    METHOD PMC* shift() {
+        PMC *value = VTABLE_shift_pmc(INTERP, SELF);
+        RETURN(PMC *value);
+    }
+
+    METHOD PMC* pop() {
+        PMC *value = VTABLE_pop_pmc(INTERP, SELF);
+        RETURN(PMC *value);
+    }
+
+/*
+
+=item METHOD unshift(PMC* value)
+
+=item METHOD push(PMC* value)
+
+Method forms to add a PMC to the beginning or end of the array.
+
+=cut
+
+*/
+
+    METHOD unshift(PMC* value) {
+        VTABLE_unshift_pmc(INTERP, SELF, value);
+    }
+
+    METHOD push(PMC* value) {
+        VTABLE_push_pmc(INTERP, SELF, value);
+    }
+
 }
 
 /*

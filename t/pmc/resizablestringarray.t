@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,10 +20,10 @@ out-of-bounds test. Checks INT and PMC keys.
 
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     # set a test plan
-    plan(184)
+    plan(258)
 
     'size/resize'()
     'clone'()
@@ -63,6 +63,26 @@ out-of-bounds test. Checks INT and PMC keys.
     'sparse'()
 
     'splice'()
+
+    method_push_pmc()
+    method_push_string()
+    method_push_integer()
+    method_push_float()
+
+    method_pop_pmc()
+    method_pop_string()
+    method_pop_integer()
+    method_pop_float()
+
+    method_shift_pmc()
+    method_shift_string()
+    method_shift_integer()
+    method_shift_float()
+
+    method_unshift_pmc()
+    method_unshift_string()
+    method_unshift_integer()
+    method_unshift_float()
 .end
 
 #
@@ -1285,6 +1305,427 @@ still_ok:
     like(message, 'illegal\ type\ for\ splice', "splice with a different type")
 .end
 
+#
+# test pushing PMCs onto the array
+#
+.sub method_push_pmc
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    $P0 = new 'String'
+    $P0 = "one"
+    array.'push'($P0)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,     "method_push_pmc - elements")
+    is($S0, "one", "method_push_pmc - value")
+
+    $P0 = new 'String'
+    $P0 = "two"
+    array.'push'($P0)
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,     "method_push_pmc (grow) - elements")
+    is($S0, "two", "method_push_pmc (grow) - value")
+
+    array = 1
+    array.'push'('three')
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,       "method_push_pmc (shrink, grow) - elements")
+    is($S0, "three", "method_push_pmc (shrink, grow) - value")
+.end
+
+
+#
+# test pushing STRINGs onto the array
+#
+.sub method_push_string
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    array.'push'("one")
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,     "method_push_string - elements")
+    is($S0, "one", "method_push_string - value")
+
+    array.'push'("two")
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,     "method_push_string (grow) - elements")
+    is($S0, "two", "method_push_string (grow) - value")
+
+    array = 1
+    array.'push'("three")
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,       "method_push_string (shrink, grow) - elements")
+    is($S0, "three", "method_push_string (shrink, grow) - value")
+.end
+
+
+#
+# test pushing INTVALs onto the array
+#
+.sub method_push_integer
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    array.'push'(1)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,   "method_push_integer - elements")
+    is($S0, "1", "method_push_integer - value")
+
+    array.'push'(2)
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,   "method_push_integer (grow) - elements")
+    is($S0, "2", "method_push_integer (grow) - value")
+
+    array = 1
+    array.'push'(3)
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,   "method_push_integer (shrink, grow) - elements")
+    is($S0, "3", "method_push_integer (shrink, grow) - value")
+.end
+
+
+#
+# test pushing FLOATs onto the array
+#
+.sub method_push_float
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    array.'push'(1.1)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,     "method_push_float - elements")
+    is($S0, "1.1", "method_push_float - value")
+
+    array.'push'(2.2)
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,     "method_push_float (grow) - elements")
+    is($S0, "2.2", "method_push_float (grow) - value")
+
+    array = 1
+    array.'push'(3.3)
+    $I0 = elements array
+    $S0 = array[1]
+    is($I0, 2,     "method_push_float (shrink, grow) - elements")
+    is($S0, "3.3", "method_push_float (shrink, grow) - value")
+.end
+
+
+.sub method_pop_pmc
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[1] = "foo"
+    $P0 = array.'pop'()
+    $I0 = elements array
+    $S0 = typeof $P0
+    $S1 = $P0
+    is($I0, 1,        "method_pop_pmc - elements")
+    is($S0, 'String', "method_pop_pmc - type")
+    is($S1, 'foo',    "method_pop_pmc - value")
+
+    array = 0
+    push_eh exception
+      $P0 = array.'pop'()
+    pop_eh
+    ok(0, "method_pop_pmc - exception")
+    .return()
+
+exception:
+    ok(1, "method_pop_pmc - exception")
+    .return()
+.end
+
+.sub method_pop_string
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[1] = "foo"
+    $S0 = array.'pop'()
+    $I0 = elements array
+    is($I0, 1,     "method_pop_string - elements")
+    is($S0, 'foo', "method_pop_string - value")
+
+    array = 0
+    push_eh exception
+      $S0 = array.'pop'()
+    pop_eh
+    ok(0, "method_pop_string - exception")
+    .return()
+
+exception:
+    ok(1, "method_pop_string - exception")
+    .return()
+.end
+
+.sub method_pop_integer
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[1] = "2"
+    $I1 = array.'pop'()
+    $I0 = elements array
+    is($I0, 1, "method_pop_integer - elements")
+    is($I1, 2, "method_pop_integer - value")
+
+    array = 0
+    push_eh exception
+      $I0 = array.'pop'()
+    pop_eh
+    ok(0, "method_pop_integer - exception")
+    .return()
+
+exception:
+    ok(1, "method_pop_integer - exception")
+    .return()
+.end
+
+.sub method_pop_float
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[1] = "2.2"
+    $N0 = array.'pop'()
+    $I0 = elements array
+    is($I0, 1,   "method_pop_float - elements")
+    is($N0, 2.2, "method_pop_float - value")
+
+    array = 0
+    push_eh exception
+      $N0 = array.'pop'()
+    pop_eh
+    ok(0, "method_pop_float - exception")
+    .return()
+
+exception:
+    ok(1, "method_pop_float - exception")
+    .return()
+.end
+
+.sub method_shift_pmc
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[0] = "foo"
+    array[1] = "bar"
+    $P0 = array.'shift'()
+    $I0 = elements array
+    $S0 = typeof $P0
+    $S1 = $P0
+    is($I0, 1,        "method_shift_pmc - elements")
+    is($S0, 'String', "method_shift_pmc - type")
+    is($S1, 'foo',    "method_shift_pmc - value")
+
+    array = 0
+    push_eh exception
+      $P0 = array.'shift'()
+    pop_eh
+    ok(0, "method_shift_pmc - exception")
+    .return()
+
+exception:
+    ok(1, "method_shift_pmc - exception")
+    .return()
+.end
+
+.sub method_shift_string
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[0] = "foo"
+    array[1] = "bar"
+    $S0 = array.'shift'()
+    $I0 = elements array
+    is($I0, 1,        "method_shift_string - elements")
+    is($S0, 'foo',    "method_shift_string - value")
+
+    array = 0
+    push_eh exception
+      $S0 = array.'shift'()
+    pop_eh
+    ok(0, "method_shift_string - exception")
+    .return()
+
+exception:
+    ok(1, "method_shift_string - exception")
+    .return()
+.end
+
+.sub method_shift_integer
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[0] = "2"
+    array[1] = "3"
+    $I1 = array.'shift'()
+    $I0 = elements array
+    is($I0, 1, "method_shift_integer - elements")
+    is($I1, 2, "method_shift_integer - value")
+
+    array = 0
+    push_eh exception
+      $I0 = array.'shift'()
+    pop_eh
+    ok(0, "method_shift_integer - exception")
+    .return()
+
+exception:
+    ok(1, "method_shift_integer - exception")
+    .return()
+.end
+
+.sub method_shift_float
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array[0] = "2.2"
+    array[1] = "3.3"
+    $N0 = array.'shift'()
+    $I0 = elements array
+    is($I0, 1,   "method_shift_float - elements")
+    is($N0, 2.2, "method_shift_float - value")
+
+    array = 0
+    push_eh exception
+      $N0 = array.'shift'()
+    pop_eh
+    ok(0, "method_shift_float - exception")
+    .return()
+
+exception:
+    ok(1, "method_shift_float - exception")
+    .return()
+.end
+
+.sub method_unshift_pmc
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    $P0 = new 'String'
+    $P0 = "one"
+    array.'unshift'($P0)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,     "method_unshift_pmc - elements")
+    is($S0, "one", "method_unshift_pmc - value")
+
+    $P0 = new 'String'
+    $P0 = "two"
+    array.'unshift'($P0)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,     "method_unshift_pmc (grow) - elements")
+    is($S0, "two", "method_unshift_pmc (grow) - value")
+
+    array = 1
+    array.'unshift'("three")
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,       "method_unshift_pmc (shrink, grow) - elements")
+    is($S0, "three", "method_unshift_pmc (shrink, grow) - value")
+.end
+
+
+#
+# test unshifting STRINGs onto the array
+#
+.sub method_unshift_string
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    array.'unshift'("one")
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,     "method_unshift_string - elements")
+    is($S0, "one", "method_unshift_string - value")
+
+    array.'unshift'("two")
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,     "method_unshift_string (grow) - elements")
+    is($S0, "two", "method_unshift_string (grow) - value")
+
+    array = 1
+    array.'unshift'("three")
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,       "method_unshift_string (shrink, grow) - elements")
+    is($S0, "three", "method_unshift_string (shrink, grow) - value")
+.end
+
+
+#
+# test unshifting INTVALs onto the array
+#
+.sub method_unshift_integer
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    array.'unshift'(1)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,   "method_unshift_integer - elements")
+    is($S0, "1", "method_unshift_integer - value")
+
+    array.'unshift'(2)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,   "method_unshift_integer (grow) - elements")
+    is($S0, "2", "method_unshift_integer (grow) - value")
+
+    array = 1
+    array.'unshift'(3)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,   "method_unshift_integer (shrink, grow) - elements")
+    is($S0, "3", "method_unshift_integer (shrink, grow) - value")
+.end
+
+
+#
+# test unshifting FLOATs onto the array
+#
+.sub method_unshift_float
+    .local pmc array
+    array = new 'ResizableStringArray'
+
+    array = 0
+    array.'unshift'(1.1)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 1,     "method_unshift_float - elements")
+    is($S0, "1.1", "method_unshift_float - value")
+
+    array.'unshift'(2.2)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,     "method_unshift_float (grow) - elements")
+    is($S0, "2.2", "method_unshift_float (grow) - value")
+
+    array = 1
+    array.'unshift'(3.3)
+    $I0 = elements array
+    $S0 = array[0]
+    is($I0, 2,     "method_unshift_float (shrink, grow) - elements")
+    is($S0, "3.3", "method_unshift_float (shrink, grow) - value")
+.end
 
 # Local Variables:
 #   mode: pir
