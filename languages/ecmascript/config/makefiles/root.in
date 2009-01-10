@@ -42,6 +42,7 @@ SOURCES = \
   src/gen_actions.pir \
   src/builtin/builtins.pir \
   src/classes/Object.pir \
+  src/classes/Array.pir \
   src/classes/Null.pir \
   src/classes/Boolean.pir \
   src/classes/Number.pir \

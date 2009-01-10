@@ -19,7 +19,7 @@ care of much of that.
     .local pmc jsmeta
     load_bytecode 'PCT.pbc'
     $P0 = get_root_global ['parrot'], 'P6metaclass'
-    $P0.'new_class'('JSObject')
+    $P0.'new_class'('JSObject', 'parent'=>'Hash')
     jsmeta = $P0.'HOW'()
     set_hll_global ['JSObject'], '$!JSMETA', jsmeta
 .end
@@ -38,6 +38,22 @@ we can't current get at the Object PMC's clone method, so for now we do it
 like this.
 
 =cut
+
+.namespace ['JSObject']
+.sub 'Set' :method
+    .param pmc key
+    .param pmc val
+    self[key] = val
+    .return(self)
+.end
+
+.namespace ['JSObject']
+.sub 'Get' :method
+    .param pmc key
+    .local pmc val
+    val = self[key]
+    .return(val)
+.end
 
 .namespace ['JSObject']
 .sub 'clone' :method
@@ -255,7 +271,8 @@ the object's type and address.
     push $P0, $P1
     $I0 = get_addr self
     push $P0, $I0
-    $S0 = sprintf "%s<0x%x>", $P0
+    #$S0 = sprintf "[object Object %s 0x%x]", $P0
+    $S0 = sprintf "[object Object]", $P0
     .return ($S0)
 .end
 
@@ -281,6 +298,20 @@ Create a new object having the same class as the invocant.
     jsmeta = get_hll_global ['JSObject'], '$!JSMETA'
     $P0 = jsmeta.'get_parrotclass'(self)
     $P1 = new $P0
+    .return ($P1)
+.end
+
+.sub 'old_new' :method
+    .param pmc init_parents :slurpy
+    .param pmc init_this    :named :slurpy
+
+    # Instantiate.
+    .local pmc jsmeta
+    jsmeta = get_hll_global ['JSObject'], '$!JSMETA'
+    $P0 = jsmeta.'get_parrotclass'(self)
+    $P1 = new $P0
+    goto no_whence
+    #.return ($P1)
 
     # If this proto object has a WHENCE auto-vivification, we should use
     # put any values it contains but that init_this does not into init_this.
@@ -408,7 +439,7 @@ Create a new object having the same class as the invocant.
 
     # Is it a Hash? If so, initialize to JSHash.
     if sigil != '%' goto no_hash
-    $P3 = new 'JSHash'
+    $P3 = new 'Hash'
     $I0 = defined $P2
     if $I0 goto have_hash_value
     set $P2, $P3

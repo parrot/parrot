@@ -682,32 +682,25 @@ method object_literal($/) {
     my $past := PAST::Stmts.new( :node($/) );
 
     my $type := PAST::Var.new( :name('JSObject'), :scope('package'), :node($/) );
-    my $obj := PAST::Op.new( :pasttype('callmethod'), :name("new"), :node($/), $type);
+    my $objvar := PAST::Var.new(:scope('register'), :name('obj'));
+    $past.push( 
+        PAST::Op.new(:pasttype('bind'), 
+          PAST::Var.new(:scope('register'), :name('obj'), :isdecl(1)),
+          PAST::Op.new( :pasttype('callmethod'), :name("new"), :node($/), $type),
+          :node($/)));
 
     for $<property> {
-        $($_).unshift($obj);
-        $past.push( $($_) );
+      $($_).unshift($objvar);
+      $past.push( $($_) );
     }
+    $past.push($objvar);
     make $past;
 }
 
 method property($/) {
-    ## TODO: a property is a key/value pair. The value must be passed as a parameter
-    ## and passed as a :named parameter using the key as a name.
-    ##
-    ## XXX figure out whether this is the way to go, or to use "setattribute", so use
-    ## parrot's actual object system instead of hashtables.
-    ##
-    ## How to solve this, as property_name can be a value and a variable (but I think this is
-    ## is supposed to be an auto-quoted identifier). Check manual.
-    ## For now: this is broken, but it's a start.
     my $key  := $( $<property_name> );
-
-    ## XXX my $key  := PAST::Val.new( $prop, :returns('String'), :node($/) );
     my $val  := $( $<assignment_expression> );
-
     my $past := PAST::Op.new( :pasttype('callmethod'), :name('Set'), $key, $val, :node($/) );
-
     make $past;
 }
 
@@ -722,20 +715,51 @@ method property_name($/, $key) {
 }
 
 method array_literal($/) {
-    ## XXX todo
-    my $past := PAST::Op.new( :pasttype('call'), :name('Array'), :node($/) );
+    my $past := PAST::Stmts.new( :node($/) );
 
+    my $type := PAST::Var.new( :name('JSArray'), :scope('package'), :node($/) );
+    my $objvar := PAST::Var.new(:scope('register'), :name('obj'));
+    $past.push( 
+        PAST::Op.new(:pasttype('bind'), 
+          PAST::Var.new(:scope('register'), :name('obj'), :isdecl(1)),
+          PAST::Op.new( :pasttype('callmethod'), :name("new"), :node($/), $type),
+          :node($/)));
+    my $i := 0;
+    for $<assignment_expression> {
+      $past.push( 
+          PAST::Op.new( :pasttype('callmethod'), :name('Set'), $objvar, $i, $($_), :node($/) ));
+      $i := $i + 1;
+    }
+    $past.push($objvar);
     make $past;
 }
 
 method element_list($/) {
-    ## XXX todo
+    print("el\n");
+    my $past := PAST::Stmts.new( :node($/) );
+    for $<assignment_expression> {
+      _dumper($_);
+    }
+    for $<elision> {
+      _dumper($_);
+    }
+    #for $/.list() {
+    #  _dumper($_);
+      #for $_.list() {
+      #  $past.push( $($_) );
+      #}
+    #}
+    make $past;
 }
 
 method elision($/) {
-    ## return number of commas.
-    my $value := +$<comma>;
-    make PAST::Val.new( :value($value), :returns('Integer'), :node($/) );
+    my $past := PAST::Stmts.new( :node($/) );
+    my $undef := PAST::Var.new( :name('undef'), :namespace('JSUndefined'), :scope('package'), :node($/) );
+    
+    for $<comma> {
+      $past.push(PAST::Op.new( :pasttype('callmethod'), :name('append'), $undef, :node($/) ));
+    }
+    make $past;
 }
 
 method str_literal($/) {

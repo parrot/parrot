@@ -81,6 +81,7 @@ js is a compiler for ECMAScript-262 (3rd edition) running on Parrot.
 
 .include 'src/builtin/builtins.pir'
 .include 'src/classes/Object.pir'
+.include 'src/classes/Array.pir'
 .include 'src/classes/Boolean.pir'
 .include 'src/classes/Null.pir'
 #.include 'src/classes/Number.pir'
