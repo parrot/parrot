@@ -366,7 +366,7 @@ SP              [ ]
 "null"                        return PNULL;
 "int"                         return INTV;
 "num"                         return FLOATV;
-"new"                         return NEW;
+
 "pmc"                         return PMCV;
 "string"                      return STRINGV;
 "<<"                          return SHIFT_LEFT;

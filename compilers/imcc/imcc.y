@@ -1731,30 +1731,11 @@ assignment:
             { $$ = iINDEXFETCH(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $5); }
    | target '[' keylist ']' '=' var
             { $$ = iINDEXSET(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $6); }
-   | target '=' NEW classname COMMA var
+     /* Removing this line causes test failures in t/compilers/tge/* for
+        some reason. Eventualy it should be removed and the normal handling
+        of ops should be used for all forms of "new". */
+   | target '=' 'new' classname '[' keylist ']'
             { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, $6, 1); }
-   | target '=' NEW classname '[' keylist ']'
-            { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, $6, 1); }
-   | target '=' NEW classname
-            { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, NULL, 1); }
-   | target '=' NEW var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $1, $4); }
-   | target '=' NEW maybe_ns
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $1, $4); }
-   | target '=' NEW maybe_ns COMMA var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
-   | target '=' NEW var COMMA var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
-   | target '=' NEW var '[' keylist ']'
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $1, $4, $6); }
-       /* NEW is here because it is both PIR and PASM keywords so we
-        * have to handle the token here (or badly hack the lexer). */
-   | NEW target COMMA var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 2, $2, $4); }
-   | NEW target COMMA var COMMA var
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $2, $4, $6); }
-   | NEW target COMMA var '[' keylist ']'
-            { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "new", 3, $2, $4, $6); }
      /* Subroutine call the short way */
    | target  '=' sub_call
          {
