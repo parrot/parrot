@@ -1,9 +1,9 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
 
-Parrot::Distribution - Parrot Distribution Directory
+Parrot::Distribution - Info on the Parrot Distribution
 
 =head1 SYNOPSIS
 
@@ -34,6 +34,7 @@ use warnings;
 
 use ExtUtils::Manifest;
 use File::Spec;
+
 use lib qw( lib );
 use Parrot::BuildUtil ();
 
@@ -136,45 +137,59 @@ BEGIN {
 
 =item C<is_git_co()>
 
-=item C<c_source_file_directories()>
+Check the type of checkout.
 
 =item C<c_header_file_directories()>
 
-=item C<pmc_source_file_directories()>
-
-=item C<yacc_source_file_directories()>
+=item C<c_source_file_directories()>
 
 =item C<lex_source_file_directories()>
 
 =item C<ops_source_file_directories()>
 
+=item C<perl_source_file_directories()>
+
+=item C<pir_source_file_directories()>
+
+=item C<pmc_source_file_directories()>
+
+=item C<yacc_source_file_directories()>
+
 Returns the directories which contain source files of the appropriate filetype.
 
-=item C<c_source_file_with_name($name)>
+=item C<c_header_file_with_name()>
 
-=item C<c_header_file_with_name($name)>
+=item C<c_source_file_with_name()>
 
-=item C<pmc_source_file_with_name($name)>
+=item C<lex_source_file_with_name()>
 
-=item C<yacc_source_file_with_name($name)>
+=item C<ops_source_file_with_name()>
 
-=item C<lex_source_file_with_name($name)>
+=item C<perl_source_file_with_name()>
 
-=item C<ops_source_file_with_name($name)>
+=item C<pir_source_file_with_name()>
+
+=item C<pmc_source_file_with_name()>
+
+=item C<yacc_source_file_with_name()>
 
 Returns the source file with the specified name and of the appropriate filetype.
 
-=item C<c_source_files()>
-
 =item C<c_header_files()>
 
-=item C<pmc_source_files()>
-
-=item C<yacc_source_files()>
+=item C<c_source_files()>
 
 =item C<lex_source_files()>
 
 =item C<ops_source_files()>
+
+=item C<perl_source_files()>
+
+=item C<pir_source_files()>
+
+=item C<pmc_source_files()>
+
+=item C<yacc_source_files()>
 
 Returns a sorted list of the source files listed within the MANIFEST of
 Parrot.  Returns a list of Parrot::IO::File objects of the appropriate filetype.
