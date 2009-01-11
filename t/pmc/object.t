@@ -20,12 +20,12 @@ Tests the Object PMC.
 ## TODO add more tests as this is documented and implemented
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
     push_eh cant_instantiate
-      new $P0, 'Object'
+      new $P0, ['Object']
     pop_eh
     ok(0, 'Able to instantiate Object')
     goto done_1

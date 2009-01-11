@@ -21,8 +21,8 @@ Tests the Null PMC.
 
     plan(1)
 
-    new $P0, 'Null'
-    ok(1, 'Instantiated .Null')
+    new $P0, ['Null']
+    ok(1, 'Instantiated a Null PMC')
 .end
 
 # Local Variables:

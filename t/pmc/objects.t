@@ -129,7 +129,7 @@ Tests the object/class subsystem.
 .end
 
 .sub test_isa
-    new $P1, 'Boolean'
+    new $P1, ['Boolean']
 
     isa $I0, $P1, "Boolean"
     is( $I0, 1, 'Boolean isa Boolean' )
@@ -168,7 +168,7 @@ Tests the object/class subsystem.
 .end
 
 .sub does_scalar
-    new $P1, 'Boolean'
+    new $P1, ['Boolean']
 
     does $I0, $P1, "Boolean"
     is( $I0, 0, 'Boolean !does Boolean' )
@@ -181,7 +181,7 @@ Tests the object/class subsystem.
 .end
 
 .sub does_array
-    new $P1, 'OrderedHash'
+    new $P1, ['OrderedHash']
 
     does $I0, $P1, "Boolean"
     is( $I0, 0, 'OrderedHash !does Boolean' )
@@ -347,16 +347,16 @@ l1:
 .namespace ['Bar32']
 
 .sub init :vtable :method
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = 'Foo32.i'
     setattribute self, ['Foo32'], "i", $P0
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = 'Foo32.j'
     setattribute self, ["Foo32"], "j", $P0
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = 'Bar32.j'
     setattribute self, ["Bar32"], "j", $P0
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = 'Bar32.k'
     setattribute self, ["Bar32"], "k", $P0
 .end
@@ -368,11 +368,11 @@ l1:
     addattribute $P1, "i"
     new $P2, $P1
 
-    new $P3, 'Integer'
+    new $P3, ['Integer']
     set $P3, 1024
     setattribute $P2, "i", $P3
 
-    new $P4, 'Integer'
+    new $P4, ['Integer']
     getattribute $P4, $P2, "i"
 
     is( $P4, 1024, 'set/get Integer attribute' )
@@ -384,9 +384,9 @@ l1:
     addattribute $P1, "j"
     new $P2, "Foo14"
 
-    new $P3, 'Integer'
+    new $P3, ['Integer']
     set $P3, 4201
-    new $P4, 'Hash'
+    new $P4, ['Hash']
     set $P4["Key"], "Value"
 
     setattribute $P2, "i", $P3
@@ -406,10 +406,10 @@ l1:
     new $P2, $P1
     new $P3, $P1
 
-    new $P4, 'Integer'
+    new $P4, ['Integer']
     set $P4, 100
     setattribute $P2, "i", $P4
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "One hundred"
     setattribute $P3, "i", $P5
 
@@ -434,13 +434,13 @@ l1:
     # Note that setattribute holds the actual PMC, not a copy, so
     # in this test both attributes get the PMC from $P4, and should
     # both have the same value, despite the C<inc>.
-    new $P4, 'Integer'
+    new $P4, ['Integer']
     set $P4, 10
     setattribute $P2, "i", $P4
     inc $P4
     setattribute $P2, "j", $P4
 
-    new $P5, 'Integer'
+    new $P5, ['Integer']
     set $P5, 100
     setattribute $P3, "i", $P5
     inc $P5
@@ -479,19 +479,19 @@ l1:
     new $P3, "Bar17"
 
     # Set the attribute values
-    new $P10, 'String'           # set attribute values
+    new $P10, ['String']           # set attribute values
     set $P10, "i"                # attribute slots have reference semantics
     setattribute $P3, ".i", $P10  # so always put new PMCs in
                                 # if you have unique values
-    new $P10, 'String'
+    new $P10, ['String']
     set $P10, "j"
     setattribute $P3, ".j", $P10
 
-    new $P10, 'String'
+    new $P10, ['String']
     set $P10, "k"
     setattribute $P3, ".k", $P10
 
-    new $P10, 'String'
+    new $P10, ['String']
     set $P10, "l"
     setattribute $P3, ".l", $P10
 
@@ -524,7 +524,7 @@ l1:
 
     is( k, 13, 'added two MyInt1' )
 
-    j = new 'Integer'
+    j = new ['Integer']
     j = 100
     k = i + j
 
@@ -558,8 +558,8 @@ l1:
     newclass $P0, "A"
     newclass $P1, "B"
 
-    new $P0, "A"
-    new $P1, "B"
+    new $P0, ['A']
+    new $P1, ['B']
 
     typeof $S0, $P0
     typeof $S1, $P1
@@ -578,13 +578,13 @@ l1:
     subclass $P3, $P1, "Sun"
     addparent $P3, $P2
 
-    new $P4, "Sun"
+    new $P4, ['Sun']
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "G"
     setattribute $P4, "Spectral Type", $P5
 
-    new $P6, 'String'
+    new $P6, ['String']
     set $P6, "$100,000,000"
     setattribute $P4, "Annual Profit", $P6
 
@@ -608,7 +608,7 @@ l1:
 
     new $P4, "Sun2"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "Taurus"
     setattribute $P4, "Location", $P5
     getattribute $P6, $P4, "Location"
@@ -635,7 +635,7 @@ l1:
     newclass $P1, "Foo18"
     addattribute $P1, "i"
     new $P2, "Foo18"
-    new $P3, 'String'
+    new $P3, ['String']
     set $P3, "ok"
     setattribute $P2, "i", $P3
 
@@ -652,11 +652,11 @@ l1:
 
     new $P2, "Foo19"
 
-    new $P3, 'String'
+    new $P3, ['String']
     set $P3, "foo i"
     setattribute $P2, "i", $P3
 
-    new $P3, 'String'
+    new $P3, ['String']
     set $P3, "bar j"
     setattribute $P2, "j", $P3
 
@@ -676,11 +676,11 @@ l1:
 
     new $P2, "Foo20"
 
-    new $P3, 'String'
+    new $P3, ['String']
     set $P3, "foo i"
     setattribute $P2, ["Foo20"], "i", $P3
 
-    new $P3, 'String'
+    new $P3, ['String']
     set $P3, "bar j"
     setattribute $P2, ["Bar20"], "j", $P3
 
@@ -743,7 +743,7 @@ l1:
 
     .local pmc i, i2
     i = new "MyInt5"
-    i2 = new "Integer"
+    i2 = new ['Integer']
     i2 = 43
 
     i = 42    # set_integer is inherited from Integer
@@ -760,7 +760,7 @@ l1:
 
 .sub set_integer_native :vtable :method
    .param int new_value
-   $P1 = new 'Integer'
+   $P1 = new ['Integer']
    $P1 = new_value
    setattribute self, "intval", $P1
 .end
@@ -848,7 +848,7 @@ l1:
 .namespace ["MyInt8"]
 .sub 'set_integer_native' :vtable :method
     .param int val
-    $P1 = new 'Integer'
+    $P1 = new ['Integer']
     $P1 = val
     setattribute self, "intval", $P1
     .return ()
@@ -910,7 +910,7 @@ l1:
 .namespace ["MyInt9"]
 .sub 'set_integer_native' :vtable :method
     .param int val
-    $P1 = new 'Integer'
+    $P1 = new ['Integer']
     $P1 = val
     setattribute self, "intval", $P1
     .return ()
@@ -979,7 +979,7 @@ l1:
 .namespace ['MyInt10']
 .sub 'set_integer_native' :vtable :method
     .param int val
-    $P1 = new 'Integer'
+    $P1 = new ['Integer']
     $P1 = val
     setattribute self, "intval", $P1
     .return ()
@@ -1097,19 +1097,19 @@ l1:
     new $P2, "Bar22"
 
     # set a bunch of attribs
-    new $P4, 'Integer'
+    new $P4, ['Integer']
     set $P4, 10
     setattribute $P2, "i", $P4
 
-    new $P4, 'Integer'
+    new $P4, ['Integer']
     set $P4, 11
     setattribute $P2, "j", $P4
 
-    new $P4, 'Integer'
+    new $P4, ['Integer']
     set $P4, 20
     setattribute $P2, "k", $P4
 
-    new $P4, 'Integer'
+    new $P4, ['Integer']
     set $P4, 21
     setattribute $P2, "l", $P4
 
@@ -1137,8 +1137,8 @@ l1:
     a = getattribute o, "a"
     is( a, 'ok 1', 'init without an arg' )
 
-    h = new 'Hash'
-    $P0 = new 'String'
+    h = new ['Hash']
+    $P0 = new ['String']
     $P0 = "ok 2"
     h['a'] = $P0
     o  = new cl, h
@@ -1154,7 +1154,7 @@ l1:
     .return()
 .end
 .sub init :vtable :method
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "ok 1"
     setattribute self, 'a', $P0
 .end
@@ -1206,7 +1206,7 @@ l1:
 
 .sub init :vtable :method
     .local pmc p
-    p = new 'Integer'
+    p = new ['Integer']
     p = 999
     setattribute self, "init_check", p
 .end
@@ -1418,7 +1418,7 @@ l1:
     isnull $I1, $P0
     ok( $I1, 'should be null' )
 
-    $P1 = new "Integer"
+    $P1 = new ['Integer']
     setattribute self, "i", $P1  # i won't be null if init called again
     .return ()
 .end
@@ -1458,7 +1458,7 @@ l1:
     newclass $P1, "Foo45"
     new $P2, $P1
 
-    new $P3, 'Integer'
+    new $P3, ['Integer']
     push_eh handler
         setattribute $P2, "bar", $P3
     pop_eh
@@ -1473,7 +1473,7 @@ end:
     newclass $P1, "Foo47"
     new $P2, $P1
 
-    new $P3, 'Integer'
+    new $P3, ['Integer']
     push_eh handler
         setattribute $P2, ["Foo47"], "no_such", $P3
     pop_eh
@@ -1511,7 +1511,7 @@ end:
 
 .sub addparent_exceptions_1
     newclass $P0, "Astronomical Object 2"
-    new $P1, 'String'
+    new $P1, ['String']
     set $P1, "Not a class"
     push_eh handler
         addparent $P0, $P1
@@ -1524,7 +1524,7 @@ end:
 .end
 
 .sub addparent_exceptions_2
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     newclass $P1, "Trashcan"
     push_eh handler
         addparent $P0, $P1
@@ -1574,7 +1574,7 @@ end:
 
 .sub wrong_way_to_create_new_objects
     push_eh handler
-        new $P0, 'Object'
+        new $P0, ['Object']
     pop_eh
     ok(0, "object instantiation exception not thrown")
     goto end
@@ -1606,25 +1606,25 @@ end:
     new $P13, "Bar54"
 
     # Foo54 and Bar54 have attribute accessor methods
-    new $P5, 'String'        # set attribute values
+    new $P5, ['String']        # set attribute values
     set $P5, "i"       # attribute slots have reference semantics
     set_args "0,0", $P5, "i"
     get_results ""
     callmethodcc $P13, "Foo54__set"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "j"
     set_args "0,0", $P5, "j"
     get_results ""
     callmethodcc  $P13,"Foo54__set"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "k"
     set_args "0,0", $P5, "k"
     get_results ""
     callmethodcc  $P13,"Bar54__set"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "l"
     set_args "0,0", $P5, "l"
     get_results ""
@@ -1716,31 +1716,31 @@ end:
     new $P2, "Bar56"
 
     # Foo56 and Bar56 have attribute accessor methods
-    new $P5, 'String'        # set attribute values
+    new $P5, ['String']        # set attribute values
     set $P5, "i"       # attribute slots have reference semantics
     set_args "0,0,0", $P5, "Foo56", "i"
     get_results ""
     callmethodcc $P2, "set"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "j"
     set_args "0,0,0", $P5, "Foo56", "j"
     get_results ""
     callmethodcc $P2, "set"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "k"
     set_args "0,0,0", $P5, "Bar56", "k"
     get_results ""
     callmethodcc $P2, "set"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "l"
     set_args "0,0,0", $P5, "Bar56", "l"
     get_results ""
     callmethodcc $P2, "set"
 
-    new $P5, 'String'
+    new $P5, ['String']
     set $P5, "m"
     set_args "0,0,0", $P5, "Bar56", "m"
     get_results ""
