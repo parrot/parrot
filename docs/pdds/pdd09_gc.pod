@@ -567,14 +567,14 @@ Always use these provided macros when you need to test or set these flags.
 
 The PMC has some sort of active destructor, and will have that destructor
 called when the PMC is destroyed. The destructor is typically called from
-within C<src/gc/dod.c:Parrot_dod_free_pmc>.
+within C<src/gc/api.c:Parrot_gc_free_pmc>.
 
 =item PObj_custom_mark_FLAG
 
 The C<mark> vtable slot will be called during the GC mark phase. The mark
 function must call C<pobject_lives> for all non-NULL objects (Buffers and
 PMCs) that PMC refers to. This flag is typically tested and the custom mark
-VTABLE method called from C<src/gc/dod.c:mark_special>.
+VTABLE method called from C<src/gc/api.c:mark_special>.
 
 =item PObj_data_is_PMC_array_FLAG
 

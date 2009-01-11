@@ -103,7 +103,7 @@ Stack_Chunk_t *
 new_stack(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(new_stack)
-    Small_Object_Pool * const pool = make_bufferlike_pool(interp, sizeof (Stack_Chunk_t));
+    Small_Object_Pool * const pool = get_bufferlike_pool(interp, sizeof (Stack_Chunk_t));
     Stack_Chunk_t     * const chunk = (Stack_Chunk_t *)(pool->get_free_object)(interp, pool);
 
     chunk->prev = chunk;        /* mark the top of the stack */

@@ -258,9 +258,9 @@ filled in.
 
 =head1 FILES
 
-smallobject.[ch], headers.c, resources.[ch], res_lea.c, dod.c, string.[ch],
-pobj.h. Other garbage collector implementations may use separate files as
-well.
+mark_sweep.[ch], src/gc/pools.c, resources.[ch], res_lea.c, src/gc/api.c,
+string.[ch], pobj.h. Other garbage collector implementations may use separate
+files as well.
 
 =head1 BUGS
 

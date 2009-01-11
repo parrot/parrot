@@ -45,7 +45,7 @@ pmclass deleg_pmc no_ro {
         /* don't pass that on
          *
          * NB objects have the flag PObj_data_is_PMC_array_FLAG set,
-         * marking is done internally in src/dod.c
+         * marking is done internally in src/gc/api.c
          */
     }
 

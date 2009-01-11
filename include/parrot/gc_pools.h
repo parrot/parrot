@@ -1,18 +1,17 @@
-/* headers.h
- *  Copyright (C) 2001-2003, The Perl Foundation.
+/* gc_pools.h
+ *  Copyright (C) 2001-2009, The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
- *     Header management functions. Handles getting of various headers,
- *     and pool creation
+ *     Handles pool management for GC.
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
  *  References:
  */
 
-#ifndef PARROT_HEADERS_H_GUARD
-#define PARROT_HEADERS_H_GUARD
+#ifndef PARROT_GC_POOLS_H_GUARD
+#define PARROT_GC_POOLS_H_GUARD
 
 #include "parrot/parrot.h"
 
@@ -45,23 +44,19 @@ typedef enum {
 typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
 
 
-/* HEADERIZER BEGIN: src/headers.c */
+/* HEADERIZER BEGIN: src/gc/pools.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-void add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
-
-void add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
         __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+void * get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 size_t get_max_buffer_address(PARROT_INTERP)
@@ -91,22 +86,7 @@ int is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool * make_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-Buffer * new_buffer_header(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * new_buffer_pool(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-void * new_bufferlike_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -117,17 +97,7 @@ Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * new_pmc_header(PARROT_INTERP, UINTVAL flags)
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * new_pmc_pool(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING * new_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
@@ -146,9 +116,6 @@ int Parrot_forall_header_pools(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(4);
 
-void Parrot_initialize_header_pool_names(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 void Parrot_initialize_header_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -159,14 +126,11 @@ void Parrot_merge_header_pools(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest_interp);
 
-#define ASSERT_ARGS_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
-#define ASSERT_ARGS_add_pmc_sync __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_get_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_get_max_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_get_max_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -181,21 +145,11 @@ void Parrot_merge_header_pools(
 #define ASSERT_ARGS_is_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(ptr)
-#define ASSERT_ARGS_make_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_buffer_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -204,9 +158,6 @@ void Parrot_merge_header_pools(
 #define ASSERT_ARGS_Parrot_forall_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(func)
-#define ASSERT_ARGS_Parrot_initialize_header_pool_names \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_initialize_header_pools \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -214,10 +165,10 @@ void Parrot_merge_header_pools(
        PARROT_ASSERT_ARG(dest_interp) \
     || PARROT_ASSERT_ARG(source_interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/headers.c */
+/* HEADERIZER END: src/gc/pools.c */
 
 
-#endif /* PARROT_HEADERS_H_GUARD */
+#endif /* PARROT_GC_POOLS_H_GUARD */
 
 /*
  * Local variables:

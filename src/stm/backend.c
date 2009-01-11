@@ -298,7 +298,7 @@ Parrot_STM_alloc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
     Small_Object_Pool *ignored;
     STM_TRACE("Parrot_STM_alloc");
 
-    ignored = make_bufferlike_pool(interp, sizeof (Parrot_STM_PMC_handle_data));
+    ignored = get_bufferlike_pool(interp, sizeof (Parrot_STM_PMC_handle_data));
     UNUSED(ignored);
     handle = (Parrot_STM_PMC_handle_data *)new_bufferlike_header(interp,
                 sizeof (Parrot_STM_PMC_handle_data));

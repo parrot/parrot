@@ -14,7 +14,7 @@ function gets the current processor context and either traces it
 directly or stores it on the system stack. C<trace_system_stack>
 sets up a trace of the system stack using two marker addresses as
 boundaries. The code to actually perform the trace of a memory block
-between two boundaries is located in C<src/gc/dod.c:trace_mem_block>.
+between two boundaries is located in C<src/gc/api.c:trace_mem_block>.
 
 =head2 Functions
 
@@ -26,7 +26,7 @@ between two boundaries is located in C<src/gc/dod.c:trace_mem_block>.
 
 #include "parrot/parrot.h"
 
-/* HEADERIZER HFILE: include/parrot/dod.h */
+/* HEADERIZER HFILE: include/parrot/gc_api.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -169,7 +169,7 @@ trace_system_stack(PARROT_INTERP)
 
 =head1 SEE ALSO
 
-F<src/gc/dod.c> and F<include/parrot/dod.h>.
+F<src/gc/api.c> and F<include/parrot/gc_api.h>.
 
 =cut
 

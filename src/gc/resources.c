@@ -378,7 +378,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     ++arena_base->GC_block_level;
 
     if (interp->profile)
-        Parrot_dod_profile_start(interp);
+        Parrot_gc_profile_start(interp);
 
     /* We're collecting */
     arena_base->mem_allocs_since_last_collect    = 0;
@@ -579,7 +579,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     pool->possibly_reclaimable   = 0;
 
     if (interp->profile)
-        Parrot_dod_profile_end(interp, PARROT_PROF_GC);
+        Parrot_gc_profile_end(interp, PARROT_PROF_GC);
 
     --arena_base->GC_block_level;
 }

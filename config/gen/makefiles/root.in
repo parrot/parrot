@@ -383,16 +383,16 @@ INTERP_O_FILES = \
     $(SRC_DIR)/exit$(O) \
     $(SRC_DIR)/extend$(O) \
     $(SRC_DIR)/extend_vtable$(O) \
-    $(SRC_DIR)/gc/dod$(O) \
-    $(SRC_DIR)/gc/gc_gms$(O) \
-    $(SRC_DIR)/gc/gc_ims$(O) \
+    $(SRC_DIR)/gc/api$(O) \
+    $(SRC_DIR)/gc/generational_ms$(O) \
+    $(SRC_DIR)/gc/incremental_ms$(O) \
     $(SRC_DIR)/gc/memory$(O) \
+    $(SRC_DIR)/gc/pools$(O) \
     $(SRC_DIR)/gc/register$(O) \
-    $(SRC_DIR)/gc/smallobject$(O) \
+    $(SRC_DIR)/gc/mark_sweep$(O) \
     $(SRC_DIR)/global$(O) \
     $(SRC_DIR)/global_setup$(O) \
     $(SRC_DIR)/hash$(O) \
-    $(SRC_DIR)/headers$(O) \
     $(SRC_DIR)/hll$(O) \
     $(SRC_DIR)/inter_call$(O)  \
     $(SRC_DIR)/inter_cb$(O)  \
@@ -1069,19 +1069,19 @@ $(SRC_DIR)/exec_save$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
 $(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str
 
-$(SRC_DIR)/gc/smallobject$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/mark_sweep$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/dod$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/api$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/gc_ims$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/generational_ms$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/gc_gms$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/incremental_ms$(O) : $(GENERAL_H_FILES)
+
+$(SRC_DIR)/gc/pools$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/resources$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/res_lea$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/headers$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/hll$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/hll.str
 

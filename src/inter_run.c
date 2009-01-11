@@ -146,7 +146,7 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
     PMC * const ret_c    = new_ret_continuation_pmc(interp, NULL);
     interp->current_cont = ret_c;
 #if defined GC_VERBOSE && GC_VERBOSE
-    PObj_report_SET(ret_c);     /* s. also dod.c */
+    PObj_report_SET(ret_c);     /* s. also src/gc/api.c */
 #endif
     /* invoke the sub, which places the context of the sub in the
      * interpreter, and switches code segments if needed

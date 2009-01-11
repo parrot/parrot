@@ -3,8 +3,8 @@
  * Copyright (C) 2002-2008, The Perl Foundation
  */
 
-#ifndef PARROT_SMALLOBJECT_H_GUARD
-#define PARROT_SMALLOBJECT_H_GUARD
+#ifndef PARROT_GC_MARK_SWEEP_H_GUARD
+#define PARROT_GC_MARK_SWEEP_H_GUARD
 
 #  include "parrot/parrot.h"
 
@@ -17,6 +17,12 @@ typedef struct Small_Object_Arena {
 } Small_Object_Arena;
 
 struct Small_Object_Pool;
+
+typedef enum {
+    GC_TRACE_FULL,
+    GC_TRACE_ROOT_ONLY,
+    GC_TRACE_SYSTEM_ONLY
+} Parrot_gc_trace_type;
 
 typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, void *);
 typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
@@ -134,8 +140,14 @@ typedef struct Small_Object_Pool {
 #endif
 
 
-/* HEADERIZER BEGIN: src/gc/smallobject.c */
+/* HEADERIZER BEGIN: src/gc/mark_sweep.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+void pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*obj);
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL contained_in_pool(
@@ -173,7 +185,28 @@ void Parrot_append_arena_in_pool(PARROT_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*new_arena);
 
+void Parrot_gc_clear_live_bits(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_ms_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
+        __attribute__nonnull__(1);
+
+void Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+int Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
+        __attribute__nonnull__(1);
+
+void Parrot_gc_trace_pmc_data(PARROT_INTERP, ARGIN(PMC *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
         __attribute__nonnull__(1);
 
 int Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
@@ -189,6 +222,9 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
         FUNC_MODIFIES(*dest)
         FUNC_MODIFIES(*source);
 
+#define ASSERT_ARGS_pobject_lives __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(obj)
 #define ASSERT_ARGS_contained_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(ptr)
@@ -203,7 +239,21 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(new_arena)
+#define ASSERT_ARGS_Parrot_gc_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_ms_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_Parrot_gc_trace_children __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_trace_pmc_data __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(p)
+#define ASSERT_ARGS_Parrot_gc_trace_root __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_is_const_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -214,9 +264,9 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
     || PARROT_ASSERT_ARG(dest) \
     || PARROT_ASSERT_ARG(source)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/gc/smallobject.c */
+/* HEADERIZER END: src/gc/mark_sweep.c */
 
-#endif /* PARROT_SMALLOBJECT_H_GUARD */
+#endif /* PARROT_GC_MARK_SWEEP_H_GUARD */
 
 /*
  * Local variables:

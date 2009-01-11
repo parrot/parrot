@@ -1263,7 +1263,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
     /* mark and sweep our world -- later callbacks will keep
      * it sync'd
      */
-    Parrot_dod_ms_run(interp, GC_trace_stack_FLAG);
+    Parrot_gc_ms_run(interp, GC_trace_stack_FLAG);
 
     PARROT_ASSERT(!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC));
 }

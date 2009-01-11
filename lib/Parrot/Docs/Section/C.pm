@@ -235,7 +235,7 @@ sub new {
                 'pairs'   => ['resources'],
                 'sources' => ['res_lea']
             ),
-            $self->c_pair_item( '', 'smallobject' ),
+            $self->c_pair_item( '', 'mark_sweep' ),
             $self->c_pair_item( '', 'headers' ),
         ),
         $self->new_group(

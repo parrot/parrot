@@ -94,7 +94,7 @@ handle at the end of a block scope, if the PMC isn't alive any more.
 
 =head1 SEE ALSO
 
-F<include/parrot/pobj.h>, F<src/dod.c>, F<docs/pdds/pdd02_vtables.pod>
+F<include/parrot/pobj.h>, F<src/gc/api.c>, F<docs/pdds/pdd02_vtables.pod>
 
 =head1 AUTHOR
 

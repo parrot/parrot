@@ -58,17 +58,17 @@ maximizes the probability that any newborn objects will run afoul of the
 garbage collector.
 
 Within the C<--gc-debug> mode, there is another tool to help narrow down the
-problem. You can edit F<src/gc/dod.c> and C<#define> the C<GC_VERBOSE> flag to 1.
-After recompiling C<parrot>, the garbage collector will perform additional
+problem. You can edit F<src/gc/api.c> and C<#define> the C<GC_VERBOSE> flag to
+1.  After recompiling C<parrot>, the garbage collector will perform additional
 checks. After the garbage collector has traced all objects to find which ones
 are still alive, it will scan through all of the dead objects to see if any of
 them believe they are alive (which will happen for infants, since they come
-into existence marked live.) If it finds any, it will print them out. You can
-then re-run the program with a breakpoint set on the routine that allocated the
-object (e.g. C<get_free_object> in F<src/gc/smallobject.c>).  You'll probably want
-to make the breakpoint conditional on the object having the version number that
-was reported, because the same memory location will probably hold many
-different objects over the lifetime of the program.
+into existence marked live.) If it finds any, it will print them out.
+You can then re-run the program with a breakpoint set on the routine that
+allocated the object (e.g. C<get_free_object> in F<src/gc/mark_sweep.c>).
+You'll probably want to make the breakpoint conditional on the object having
+the version number that was reported, because the same memory location will
+probably hold many different objects over the lifetime of the program.
 
 =head1 PIR AND PASM CODE
 

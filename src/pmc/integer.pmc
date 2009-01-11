@@ -67,11 +67,9 @@ Initializes the integer with a default value of C<0>.
 */
 
 VTABLE PMC *instantiate(PMC *sig) {
-    PMC * const ret    = new_pmc_header(INTERP, 0);
+    PMC * const ret    = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
     opcode_t   *arg_op = interp->current_args;
     INTVAL      init   = 0;
-
-    ret->vtable        = interp->vtables[SELF->vtable->base_type];
 
     if (SIG_ELEMS(sig) == 2) {
         switch (SIG_ITEM(sig, 1)) {
@@ -89,7 +87,7 @@ VTABLE PMC *instantiate(PMC *sig) {
         }
     }
 
-    PMC_int_val(ret) = init;
+    VTABLE_set_integer_native(INTERP, ret, init);
     return ret;
 }
 
