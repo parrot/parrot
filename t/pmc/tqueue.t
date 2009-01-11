@@ -26,17 +26,17 @@ Tests the thread queue.
     .local int i, is_ok
     .local pmc tq, pInt
 
-    new tq, 'TQueue'
+    new tq, ['TQueue']
     ok(1, "didn't crash")
 
     i = tq
     is_ok = i == 0
     ok(is_ok, "int assignment gets # of elements in empty queue")
 
-    pInt = new 'Integer'
+    pInt = new ['Integer']
     pInt = 2
     push tq, pInt
-    pInt = new 'Integer'
+    pInt = new ['Integer']
     pInt = 3
     push tq, pInt
     i = tq

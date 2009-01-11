@@ -17,12 +17,12 @@ Tests the UnManagedStruct PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new $P0, 'UnManagedStruct'
-    ok(1, 'Instantiated .UnManagedStruct')
+    new $P0, ['UnManagedStruct']
+    ok(1, 'Instantiated an UnManagedStruct PMC')
 .end
 
 # Local Variables:

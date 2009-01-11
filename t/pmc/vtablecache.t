@@ -17,12 +17,12 @@ Tests the VtableCache PMC.
 =cut
 
 .sub main :main
-   .include 'include/test_more.pir'
+   .include 'test_more.pir'
 
     plan(1)
 
-    new $P0, 'VtableCache'
-    ok(1, 'Instantiated .VtableCache')
+    new $P0, ['VtableCache']
+    ok(1, 'Instantiated a VtableCache PMC')
 .end
 
 # Local Variables:

@@ -18,7 +18,7 @@ Tests the C<String> PMC.
 
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(164)
 
@@ -76,7 +76,7 @@ Tests the C<String> PMC.
 .end
 
 .sub set_or_get_strings
-        new $P0, 'String'
+        new $P0, ['String']
 
         set $P0, "foo"
         set $S0, $P0
@@ -104,27 +104,27 @@ Tests the C<String> PMC.
 .end
 
 .sub setting_integers
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "1"
         set $I0, $P0
         is( $I0, 1, 'string "1" -> int' )
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "2.0"
         set $I0, $P0
         is( $I0, 2, 'string "2.0" -> int' )
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, ""
         set $I0, $P0
         is( $I0, 0, 'string "" -> int' )
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "\0"
         set $I0, $P0
         is( $I0, 0, 'string "\0" -> int' )
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "foo"
         set $I0, $P0
         is( $I0, 0, 'string "foo" -> int' )
@@ -147,41 +147,41 @@ Tests the C<String> PMC.
 
 .sub setting_numbers
         .include 'include/fp_equality.pasm'
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "1"
         set $N0, $P0
         .fp_eq_ok($N0, 1.0, 'String 1 -> $N0 == 1.0')
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "2.0"
         set $N0, $P0
         .fp_eq_ok($N0, 2.0, 'String "2.0" -> $N0 == 2.0')
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, ""
         set $N0, $P0
         .fp_eq_ok($N0, 0.0, 'String "" -> $N0 == 0.0')
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "\0"
         set $N0, $P0
         .fp_eq_ok($N0, 0.0, 'String "\0" -> $N0 == 0.0')
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "foo"
         set $N0, $P0
         .fp_eq_ok($N0, 0.0, 'String "foo" -> $N0 == 0.0')
 
-        new $P0, 'String'
+        new $P0, ['String']
         set $P0, "1.3e5"
         set $N0, $P0
         .fp_eq_ok($N0, 130000.0, 'String "1.3e5" -> $N0 == 130000.0')
 .end
 
 .sub ensure_that_concat_ppp_copies_strings
-    new $P0, 'String'
-    new $P1, 'String'
-    new $P2, 'String'
+    new $P0, ['String']
+    new $P1, ['String']
+    new $P2, ['String']
 
     set $P0, "foo"
     concat  $P1, $P0, $P0
@@ -199,8 +199,8 @@ Tests the C<String> PMC.
 .end
 
 .sub ensure_that_concat_pps_copies_strings
-    new $P0, 'String'
-    new $P1, 'String'
+    new $P0, ['String']
+    new $P1, ['String']
 
     set $S0, "Grunties"
     set $P1, "fnargh"
@@ -212,7 +212,7 @@ Tests the C<String> PMC.
 .end
 
 .sub setting_string_references
-    new $P0, 'String'
+    new $P0, ['String']
     set $S0, "C2H5OH + 10H20"
     set $P0, $S0
     chopn $S0, 8
@@ -222,7 +222,7 @@ Tests the C<String> PMC.
 .end
 
 .sub assigning_string_copies
-    new $P0, 'String'
+    new $P0, ['String']
     set $S0, "C2H5OH + 10H20"
     assign $P0, $S0
     chopn $S0, 8
@@ -232,63 +232,63 @@ Tests the C<String> PMC.
 .end
 
 .sub test_repeat
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "x"
-    new $P1, 'Integer'
+    new $P1, ['Integer']
     set $P1, 12
-    new $P2, 'String'
+    new $P2, ['String']
     repeat $P2, $P0, $P1
     is( $P2, 'xxxxxxxxxxxx', 'Integer arg to repeat' )
 
     set $P0, "y"
-    new $P1, 'Float'
+    new $P1, ['Float']
     set $P1, 6.5
     repeat $P2, $P0, $P1
     is( $P2, 'yyyyyy', 'Float arg to repeat' ) 
 
     set $P0, "z"
-    new $P1, 'String'
+    new $P1, ['String']
     set $P1, "3"
     repeat $P2, $P0, $P1
     is( $P2, 'zzz', 'String "3" arg to repeat' )
 
     set $P0, "a"
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     repeat $P2, $P0, $P1
     is( $P2, '', 'undef PMC arg to repeat' )
 .end
 
 .sub test_repeat_without_creating_dest_pmc
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "x"
-    new $P1, 'Integer'
+    new $P1, ['Integer']
     set $P1, 12
     repeat $P2, $P0, $P1
     is( $P2, 'xxxxxxxxxxxx', 'Integer argument to repeat' )
 
     set $P0, "y"
-    new $P1, 'Float'
+    new $P1, ['Float']
     set $P1, 6.5
     repeat $P3, $P0, $P1
     is( $P3, 'yyyyyy', 'Float arg to repeat' ) 
 
     set $P0, "z"
-    new $P1, 'String'
+    new $P1, ['String']
     set $P1, "3"
     repeat $P4, $P0, $P1
     is( $P4, 'zzz', 'String "3" arg to repeat' )
 
     set $P0, "a"
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     repeat $P5, $P0, $P1
     is( $P5, '', 'Undef PMC arg to repeat' )
 .end
 
 .sub test_repeat_int
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "x"
     set $I1, 12
-    new $P2, 'String'
+    new $P2, ['String']
     repeat $P2, $P0, $I1
     is( $P2, 'xxxxxxxxxxxx', 'repeat with int arg' )
 
@@ -299,7 +299,7 @@ Tests the C<String> PMC.
 .end
 
 .sub test_repeat_int_without_declaring_dest
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "x"
     set $I1, 12
     repeat $P2, $P0, $I1
@@ -312,7 +312,7 @@ Tests the C<String> PMC.
 
 
 .sub test_if_string
-    new $P0, 'String'
+    new $P0, ['String']
     set $S0, "True"
     set $P0, $S0
 
@@ -321,7 +321,7 @@ Tests the C<String> PMC.
         set $I0, 0
 TRUE:   ok( $I0, 'String "String" is true' )
 
-        new $P1, 'String'
+        new $P1, ['String']
         set $S1, ""
         set $P1, $S1
         set $I0, 1
@@ -329,7 +329,7 @@ TRUE:   ok( $I0, 'String "String" is true' )
         set $I0, 0
 TRUE2:  nok( $I0, 'String "" is false' )
 
-        new $P2, 'String'
+        new $P2, ['String']
         set $S2, "0"
         set $P2, $S2
         set $I0, 1
@@ -337,7 +337,7 @@ TRUE2:  nok( $I0, 'String "" is false' )
         set $I0, 0
 TRUE3:  nok( $I0, 'String "0" is false' )
 
-        new $P3, 'String'
+        new $P3, ['String']
         set $S3, "0123"
         set $P3, $S3
         set $I0, 1
@@ -345,7 +345,7 @@ TRUE3:  nok( $I0, 'String "0" is false' )
         set $I0, 0
 TRUE4:  ok( $I0, 'String "0123" is true' )
 
-        new $P4, 'String'
+        new $P4, ['String']
         set $I0, 1
         if $P4, TRUE5
         set $I0, 0
@@ -353,22 +353,22 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_concat
-    new $P0, 'String'
-    new $P1, 'Undef'
+    new $P0, ['String']
+    new $P1, ['Undef']
     set $P0, "foo"
     concat  $P1, $P0, $P0
     is( $P0, "foo", 'original String is untouched' )
     is( $P1, "foofoo", '...and concat worked' )
 
-    new $P0, 'String'
-    new $P1, 'Undef'
+    new $P0, ['String']
+    new $P1, ['Undef']
     set $P0, "bar"
     concat  $P0, $P0, $P1
     is( $P0, "bar", '"bar" + Undef = "bar"' )
     is( $P1, "", '... Undef is ""' )
 
-    new $P0, 'String'
-    new $P1, 'Undef'
+    new $P0, ['String']
+    new $P1, ['Undef']
     set $P1, "str"
     concat  $P1, $P0, $P1
     is( $P0, "", 'original Undef is ""' )
@@ -376,13 +376,13 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_concat_without_defining_dest
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "foo"
     concat    $P1, $P0, $P0
     is( $P0, "foo", 'original String is unchanged' )
     is( $P1, "foofoo", '... concat String x2' )
 
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "foo"
     concat $P2, $P0, "bar"
     is( $P0, "foo", 'original String is unchanged' )
@@ -390,8 +390,8 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_cmp
-    new $P1, 'String'
-    new $P2, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
 
     set $P1, "abc"
     set $P2, "abc"
@@ -410,8 +410,8 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub cmp_with_integer
-    new $P1, 'Integer'
-    new $P2, 'String'
+    new $P1, ['Integer']
+    new $P2, ['String']
     set $P2, "10"
 
     # Int. vs Str.
@@ -442,7 +442,7 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_substr
-    new $P0, 'String'
+    new $P0, ['String']
 
     set $P0, "This is a test\n"
     substr $S0, $P0, 0, 5
@@ -457,9 +457,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub bands_null_string
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P3, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P3, ['String']
 
     null $S1
     set $P1, $S1
@@ -496,8 +496,8 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_bands_2
-    new $P1, 'String'
-    new $P2, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
     set $P1, "abc"
     set $P2, "EE"
     bands $P1, $P2
@@ -506,9 +506,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_bands_3
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P0, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P0, ['String']
     set $P1, "abc"
     set $P2, "EE"
     bands $P0, $P1, $P2
@@ -518,9 +518,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub bors_null_string
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P3, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P3, ['String']
 
     null $S1
     null $S2
@@ -577,8 +577,8 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_bors_2
-    new $P1, 'String'
-    new $P2, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
     set $P1, "abc"
     set $P2, "EE"
 
@@ -588,9 +588,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_bors_3
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P0, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P0, ['String']
     set $P1, "abc"
     set $P2, "EE"
 
@@ -601,9 +601,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub bxors_null_string
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P3, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P3, ['String']
     null $S1
     null $S2
     set $P1, $S1
@@ -657,9 +657,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub bxors_2
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P3, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P3, ['String']
 
     set $P1, "a2c"
     set $P2, "Dw"
@@ -675,9 +675,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub bxors_3
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P0, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P0, ['String']
 
     set $P1, "a2c"
     set $P2, "Dw"
@@ -695,9 +695,9 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub bnots_null_string
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P3, 'String'
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P3, ['String']
 
     null $S1
     null $S2
@@ -719,8 +719,8 @@ TRUE5:  nok( $I0, 'uninitizalized String is false' )
 .end
 
 .sub test_eq_str
-        new $P1, 'String'
-        new $P2, 'String'
+        new $P1, ['String']
+        new $P2, ['String']
         set $P1, "ABC"
         set $P2, "ABC"
 
@@ -735,7 +735,7 @@ OK1:    ok( $I0, 'eq_str "ABC"(String), "ABC"(String) -> true' )
         set $I0, 0
 OK2:    nok( $I0, 'eq_str "abc"(String), 1(Int) -> false' )
 
-        new $P3, 'Integer'
+        new $P3, ['Integer']
         set $P3, 0
         set $I0, 1
         eq_str $P2, $P3, OK3
@@ -749,8 +749,8 @@ OK4:    nok( $I0, 'eq_str 0(Integer), "abc"(String) -> false' )
 .end
 
 .sub test_ne_str
-        new $P1, 'String'
-        new $P2, 'String'
+        new $P1, ['String']
+        new $P2, ['String']
         set $P1, "ABC"
         set $P2, "abc"
         set $I0, 1
@@ -764,7 +764,7 @@ OK1:    ok( $I0, 'ne_str "abc", "ABC" -> true' )
         set $I0, 0
 OK2:    nok( $I0, 'ne_str "ABC", "ABC" -> false' )
 
-        new $P3, 'Integer'
+        new $P3, ['Integer']
         set $P3, 0
         set $I0, 1
         ne_str $P2, $P3, OK3
@@ -778,7 +778,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 .end
 
 .sub set_const_and_chop
-   new $P0, 'String'
+   new $P0, ['String']
    set $P0, "str"
    set $S0, $P0
    chopn $S0, 2
@@ -788,7 +788,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 
 .sub check_whether_interface_is_done
     .local pmc pmc1
-    pmc1 = new 'String'
+    pmc1 = new ['String']
     .local int bool1
 
     does bool1, pmc1, "scalar"
@@ -802,7 +802,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 .end
 
 .sub test_clone
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "Tacitus\n"
     clone $P1, $P0
     set $P0, ""
@@ -810,21 +810,21 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 .end
 
 .sub test_set_px_i
-  new $P0, 'String'
+  new $P0, ['String']
   set $P0, "abcdef\n"
   set $P0[2], 65
   is( $P0, "abAdef\n", 'set p[x] = int' )
 .end
 
 .sub test_set_px_s
-  new $P0, 'String'
+  new $P0, ['String']
   set $P0, "abcdef\n"
   set $P0[2], "AB"
   is( $P0, "abABef\n", 'set p[x] = string' )
 .end
 
 .sub test_string_replace
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "hello world"
 
     is( $P0, "hello world", 'original' )
@@ -837,7 +837,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 .end
 
 .sub set_i0__p0__string_to_int
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "12.3E5\n"
     set $I0, $P0
     is( $I0, 12, '"12.3E4\n" -> $I0 = 12' )
@@ -854,7 +854,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
     el = elements tr_00
     is( el, 256, 'elements' )
 
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0.'trans'(s, tr_00)
 
     is( s, 'TAACGSTAACGS', 'trans' )
@@ -863,7 +863,7 @@ OK4:    ok( $I0, 'ne_str "0(Integer), "ABC" -> true' )
 # create tr table at compile-time
 .sub tr_00_init :immediate
     .local pmc tr_array
-    tr_array = new 'FixedIntegerArray'   # Todo char array
+    tr_array = new ['FixedIntegerArray']   # Todo char array
     tr_array = 256                      # Python compat ;)
     .local string from, to
     from = 'wsatugcyrkmbdhvnATUGCYRKMBDHVN'
@@ -882,13 +882,13 @@ loop:
 
 .sub reverse_p0__reverse_string
     $S0 = 'torrap'
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0.'reverse'($S0)
     is( $S0, "parrot", 'reverse string' )
 .end
 
 .sub is_integer__check_integer
-  $P0 = new 'String'
+  $P0 = new ['String']
 
   $I0 = $P0.'is_integer'('543')
   ok( $I0, 'String."is_integer("543")' )
@@ -915,7 +915,7 @@ loop:
 .end
 
 .sub get_string_returns_cow_string
-  $P0 = new 'String'
+  $P0 = new ['String']
   $P0 = "Foo44"
 
   $S0 = $P0
@@ -926,7 +926,7 @@ loop:
 
 .sub to_int_1
     .local pmc s
-    s = new 'String'
+    s = new ['String']
     s = "123"
     $I0 = s.'to_int'(10)
     is( $I0, "123", 'String.to_int(10)' )
@@ -940,14 +940,14 @@ loop:
 
 .sub elements_gives_length_of_string
     .local pmc s
-    s = new 'String'
+    s = new ['String']
     s = "123456789"
     $I0 = elements s
     is( $I0, "9", 'elements gives length of string' )
 .end
 
 .sub test_string_reverse_index
-  $P0 = new 'String'
+  $P0 = new ['String']
   $I0 = $P0.'reverse_index'('hello', 0)
   is( $I0, -1, "main empty -1" )
 
@@ -978,7 +978,7 @@ loop:
 .endm
 
 .sub out_of_bounds_substr_positive_offset
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "Woburn"
 
     set $I0, 0
@@ -989,7 +989,7 @@ handler:
 .end
 
 .sub out_of_bounds_substr_negative_offset
-    new $P0, 'String'
+    new $P0, ['String']
     set $P0, "Woburn"
     push_eh handler
         substr $S0, $P0, -123, 22
@@ -999,7 +999,7 @@ handler:
 
 .sub excpetion_to_int_2
     .local pmc s
-    s = new 'String'
+    s = new ['String']
     s = "123"
     push_eh handler
         $I0 = s.'to_int'(3)
@@ -1009,7 +1009,7 @@ handler:
 
 .sub exception_to_int_3
     .local pmc s
-    s = new 'String'
+    s = new ['String']
     s = "123"
     push_eh handler
         $I0 = s.'to_int'(37)

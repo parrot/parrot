@@ -17,12 +17,12 @@ Tests the STMLog PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new $P0, 'STMLog'
-    ok(1, 'Instantiated .STMLog')
+    new $P0, ['STMLog']
+    ok(1, 'Instantiated an STMLog PMC')
 .end
 
 # Local Variables:

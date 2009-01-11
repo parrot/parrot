@@ -17,7 +17,7 @@ Tests mainly morphing undef to other types.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(19)
 
@@ -36,8 +36,8 @@ Tests mainly morphing undef to other types.
 .end
 
 .sub morph_to_string
-        new $P0, 'String'
-        new $P1, 'Undef'
+        new $P0, ['String']
+        new $P1, ['Undef']
         set $P0, "foo"
         concat  $P1, $P0, $P0
         is( $P1, 'foofoo', 'morphed to string' )
@@ -45,7 +45,7 @@ Tests mainly morphing undef to other types.
 
 .sub undef_pmc_is_false
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     if pmc1 goto PMC1_IS
       ok( 1, 'PMC Undef created by new is false' )
       .return()
@@ -55,7 +55,7 @@ Tests mainly morphing undef to other types.
 
 .sub undef_pmc_is_not_defined
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     .local int is_defined
     is_defined = defined pmc1
     if is_defined goto PMC1_IS_DEFINED
@@ -67,14 +67,14 @@ Tests mainly morphing undef to other types.
 
 .sub undef_pmc_morph_to_string
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     $S1 = pmc1
     is( $S1, '', 'PMC Undef is empty string' )
 .end
 
 .sub undef_pmc_morph_to_integer
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     .local int int1
     int1 = pmc1
     is( int1, 0, 'PMC Undef as integer is zero' )
@@ -87,7 +87,7 @@ Tests mainly morphing undef to other types.
 
 .sub undef_pmc_morph_to_float
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     .local int int1
     int1 = pmc1
     .local num float1
@@ -98,7 +98,7 @@ Tests mainly morphing undef to other types.
 
 .sub string_pmc_morph_to_undef
     .local pmc pmc1
-    pmc1 = new 'String'
+    pmc1 = new ['String']
     morph pmc1, 'Undef'
     $S1 = typeof pmc1
     is( $S1, 'Undef', 'PMC String morph to undef' )
@@ -106,7 +106,7 @@ Tests mainly morphing undef to other types.
 
 .sub undef_pmc_set_to_integer_native
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     pmc1 = -88888888
     is( pmc1, -88888888, 'PMC Undef set to int gives int' )
 
@@ -117,7 +117,7 @@ Tests mainly morphing undef to other types.
 
 .sub undef_pmc_isa_after_assignment
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     .local int pmc1_is_a
 
     pmc1_is_a = isa pmc1, "Undef"
@@ -138,7 +138,7 @@ Tests mainly morphing undef to other types.
 
 .sub check_whether_interface_is_done
     .local pmc pmc1
-    pmc1 = new 'Undef'
+    pmc1 = new ['Undef']
     .local int bool1
 
     does bool1, pmc1, "scalar"
@@ -149,15 +149,15 @@ Tests mainly morphing undef to other types.
 .end
 
 .sub verify_clone_works
-    $P1 = new 'Undef'
+    $P1 = new ['Undef']
     $P2 = clone $P1
     $S0 = typeof $P2
     is( $S0, 'Undef', 'PMC Undef clone is an Undef' )
 .end
 
 .sub undef_equals_undef
-    $P1 = new 'Undef'
-    $P2 = new 'Undef'
+    $P1 = new ['Undef']
+    $P2 = new ['Undef']
     if $P1 == $P2 goto ok
         ok( 0, 'Undef == Undef (RT #33603)' )
         .return()

@@ -17,12 +17,12 @@ Tests the STMRef PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new $P0, 'STMRef'
-    ok(1, 'Instantiated .STMRef')
+    new $P0, ['STMRef']
+    ok(1, 'Instantiated an STMRef PMC')
 .end
 
 # Local Variables:
