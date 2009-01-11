@@ -53,51 +53,52 @@ Raises an exception if the distribution root is not found.
 
 =cut
 
-## i'm a singleton
-my $dist;
+{
+    my $dist; ## i'm a singleton
 
-sub new {
-    my ($class) = @_;
+    sub new {
+        my ($class) = @_;
 
-    return $dist if defined $dist;
+        return $dist if defined $dist;
 
-    my $self = bless {}, $class;
+        my $self = bless {}, $class;
 
-    return $self->_initialize;
-}
+        return $self->_initialize;
+    }
 
-sub _initialize {
-    my ($self) = @_;
+    sub _initialize {
+        my ($self) = @_;
 
-    my $file = 'README';
-    my $path = '.';
+        my $file = 'README';
+        my $path = '.';
 
-    while ( $self = $self->SUPER::new($path) ) {
-        if (    $self->file_exists_with_name($file)
-            and $self->file_with_name($file)->read =~ m/^This is Parrot/os )
-        {
-            $dist = $self;
-            last;
+        while ( $self = $self->SUPER::new($path) ) {
+            if (    $self->file_exists_with_name($file)
+                and $self->file_with_name($file)->read =~ m/^This is Parrot/os )
+            {
+                $dist = $self;
+                last;
+            }
+
+            $path = $self->parent_path();
         }
 
-        $path = $self->parent_path();
+        # non-object call syntax since $self is undefined
+        _croak( undef, "Failed to find Parrot distribution root\n" )
+            unless $self;
+
+        if ( defined $dist ) {
+            $self->_dist_files(
+                [
+                    sort keys %{
+                        ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) )
+                        },
+                ]
+            );
+        }
+
+        return $self;
     }
-
-    # non-object call syntax since $self is undefined
-    _croak( undef, "Failed to find Parrot distribution root\n" )
-        unless $self;
-
-    if ( defined $dist ) {
-        $self->_dist_files(
-            [
-                sort keys %{
-                    ExtUtils::Manifest::maniread( File::Spec->catfile( $self->path, "MANIFEST" ) )
-                    },
-            ]
-        );
-    }
-
-    return $self;
 }
 
 sub _croak {
@@ -791,7 +792,7 @@ sub generated_files {
     my $self = shift;
 
     my $generated = ExtUtils::Manifest::maniread('MANIFEST.generated');
-    my $path      = $dist->path();
+    my $path      = $self->path();
 
     return {
         map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }
