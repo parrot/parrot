@@ -57,7 +57,7 @@ my $template = <<'END_OF_TEMPLATE';
 
 .sub "__load_inlinetable" :load :init
     $P0 = new 'Hash'
-    store_global "APL", "%pirtable", $P0
+    set_hll_global ['APL'], "%pirtable", $P0
     .local pmc itable
     itable = new 'Hash'
     set_hll_global ['APL';'Grammar';'Actions'], '%inlinetable', itable
