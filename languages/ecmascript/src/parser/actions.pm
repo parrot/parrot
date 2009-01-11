@@ -683,8 +683,8 @@ method object_literal($/) {
 
     my $type := PAST::Var.new( :name('JSObject'), :scope('package'), :node($/) );
     my $objvar := PAST::Var.new(:scope('register'), :name('obj'));
-    $past.push( 
-        PAST::Op.new(:pasttype('bind'), 
+    $past.push(
+        PAST::Op.new(:pasttype('bind'),
           PAST::Var.new(:scope('register'), :name('obj'), :isdecl(1)),
           PAST::Op.new( :pasttype('callmethod'), :name("new"), :node($/), $type),
           :node($/)));
@@ -719,14 +719,14 @@ method array_literal($/) {
 
     my $type := PAST::Var.new( :name('JSArray'), :scope('package'), :node($/) );
     my $objvar := PAST::Var.new(:scope('register'), :name('obj'));
-    $past.push( 
-        PAST::Op.new(:pasttype('bind'), 
+    $past.push(
+        PAST::Op.new(:pasttype('bind'),
           PAST::Var.new(:scope('register'), :name('obj'), :isdecl(1)),
           PAST::Op.new( :pasttype('callmethod'), :name("new"), :node($/), $type),
           :node($/)));
     my $i := 0;
     for $<assignment_expression> {
-      $past.push( 
+      $past.push(
           PAST::Op.new( :pasttype('callmethod'), :name('Set'), $objvar, $i, $($_), :node($/) ));
       $i := $i + 1;
     }
@@ -755,7 +755,7 @@ method element_list($/) {
 method elision($/) {
     my $past := PAST::Stmts.new( :node($/) );
     my $undef := PAST::Var.new( :name('undef'), :namespace('JSUndefined'), :scope('package'), :node($/) );
-    
+
     for $<comma> {
       $past.push(PAST::Op.new( :pasttype('callmethod'), :name('append'), $undef, :node($/) ));
     }
