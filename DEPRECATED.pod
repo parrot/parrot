@@ -55,6 +55,8 @@ If you want to override a vtable method/function when building a Class, then
 use the method C<add_vtable_override> instead of calling C<add_method> with
 one or both of these flags.
 
+See TT #158
+
 =back
 
 =head1 PIR syntax
@@ -89,6 +91,8 @@ if the arg is a ResizableStringArray
 
 if the arg is a Namespace or Class PMC
   The passed in class or the class attatched to the passed in namespace.
+
+See TT #159
 
 =back
 
