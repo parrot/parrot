@@ -56,12 +56,10 @@ test: all
 	$(PERL) -Ilib t/harness
 
 testclean:
-	$(RM_F) "t/*.out"
 
 clean: testclean
 	$(RM_F) pheme.pbc
 	$(RM_F) lib/pheme_grammar_gen.pir
-	$(RM_F) lib/*.pbc
 	$(RM_F) lib/ASTGrammar.pir
 
 realclean: clean
