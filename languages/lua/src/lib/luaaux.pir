@@ -1037,7 +1037,13 @@ This function never returns.
     $P0 = shift iter
     sub = $P0['sub']
     if null sub goto L2
+    $I0 = isa sub, 'LuaFunction'
+    unless $I0 goto L5
     $S0 = sub.'get_name'()
+    goto L6
+  L5:
+    $S0 = sub
+  L6:
     outer = sub.'get_outer'()
     ret .= "\n\t"
     unless null outer goto L3
