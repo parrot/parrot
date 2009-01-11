@@ -276,15 +276,21 @@ declare_local(NOTNULL(lexer_state * const lexer), pir_type type,
 check_unused_symbols(lexer_state * const lexer)>
 
 Check all subroutines for unused symbols. If a symbol is declared but
-never used, a warning message is printed to C<stderr>.
+never used, a warning message is printed to C<stderr>. If there's
+no subroutines, the function will do nothing and return.
 
 =cut
 
 */
 void
 check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
-    subroutine *subiter = lexer->subs->next; /* start at first sub. */
+    subroutine *subiter;
 
+    /* if there's no subs, just return. */
+    if (lexer->subs == NULL)
+        return;
+
+    lexer->subs->next; /* start at first sub. */
     puts("");
 
     do {
