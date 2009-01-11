@@ -355,30 +355,6 @@ XCASE_DONE:
 FINISHED:
 	.return($N0)
 .end
-.sub _BUILTIN_STRING_STRING	# string string(num repeat, num ascii)
-	.param int argc
-	.param num repeatf
-
-	.local int repeat
-	set repeat, repeatf
-	.local string repeater
-	.local string target
-	set $I1, 0
-	set target, ""
-	entrytype $I0, 0
-	eq $I0, FLOAT, FLOATB
-	.local string thing
-	set repeater, thing
-	branch REP
-FLOATB:	.local num ascii
-	set $I0, ascii
-	chr repeater, $I0
-REP: 	ge $I1, repeat, BAIL
-	concat target, repeater
-	inc $I1
-	branch REP
-BAIL:	.return(target)
-.end
 .sub _BUILTIN_LOG		# num log(num op)
 	.param int argc
 	.param num op
