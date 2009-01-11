@@ -34,9 +34,9 @@
 NEXT:
 	if argc==0 goto END_DISPLAY
 	dec argc
-	$I0 = typeof printme
-	if $I0 == .String goto DISPSTRING
-	if $I0 != .Float  goto DISPERR
+	$S0 = typeof printme
+	if $S0 == 'String' goto DISPSTRING
+	if $S0 != 'Float'  goto DISPERR
 
 	# Now, do num
 	intver = printme

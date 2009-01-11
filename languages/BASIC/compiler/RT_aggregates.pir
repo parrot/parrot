@@ -50,9 +50,9 @@ ARR_END:
         .param pmc things     :slurpy
 
 	# Assign a number
-	.local int rhs_type
+	.local string rhs_type
 	rhs_type = typeof rhs
-	if rhs_type == .String goto ASSIGN_STRING
+	if rhs_type == 'String' goto ASSIGN_STRING
 	.local string key
 	.local pmc BASICARR
 	BASICARR = get_global "BASICARR"
@@ -66,7 +66,7 @@ ARR_END:
 
 	# Assign a string
 ASSIGN_STRING:
-	if rhs_type != .String goto ASSIGN_UNK
+	if rhs_type != 'String' goto ASSIGN_UNK
 
 	.local string key
 	.local pmc BASICARR
@@ -197,15 +197,15 @@ ENDLOOP:noop
 	key = ""
 
 	.local pmc thing
-	.local int key_type
+	.local string key_type
 KEYLOOP:
 	if keycount ==0 goto KEYDONE
 	thing = shift things
 	key_type = typeof thing
 
 	key .= "|"
-	if key_type == .Float goto ADDFLOAT
-	if key_type == .String goto ADDSTRING
+	if key_type == 'Float' goto ADDFLOAT
+	if key_type == 'String' goto ADDSTRING
 
 	print "Wrong type on stack, key creation\n"
 	end
