@@ -784,7 +784,7 @@ Generic method for compilers invoked from a shell command line.
     self.'interactive'(args :flat, adverbs :flat :named)
     goto save_output
   eval_line:
-    result = self.'eval'($S0, adverbs :flat :named)
+    result = self.'eval'($S0, '-e', args :flat, adverbs :flat :named)
 
   save_output:
     if null result goto end
