@@ -1,11 +1,11 @@
 # $Id$
 
 Pipp is Parrot's PHP.
-Pipp is an implementation of the language PHP that runs on Parrot
-and uses the Parrot Compiler Toolkit.
+Pipp is an implementation of the language PHP that runs on Parrot.
+Pipp is implemtented with the Parrot Compiler Toolkit.
 
-Run 'make test' for building and running the tests in F<t>.
-Run 'make smolder_test' for testing and submitting the test result to
+Run 'make test' for building and running the tests in the directory F<t>.
+Run 'make smoke' for testing and submitting the test result to
 http://smolder.plusthree.com/app/public_projects/smoke_reports/10
 
 For more information see F<docs/pipp.pod> or visit L<http://pipp.org>.

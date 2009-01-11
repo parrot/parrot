@@ -33,7 +33,7 @@ A listing of things that Pipp does differently from the standard PHP.
 
 =head1 Implementation
 
-Pipp is based on the Parrot Compiler Toolkit.
+Pipp is based on the Parrot Compiler Toolkit. See L<internals.pod> for details.
 
 =head1 Status
 

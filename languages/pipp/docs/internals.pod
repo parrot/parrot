@@ -2,9 +2,51 @@
 
 =head1 TITLE
 
-namespaces - Notes on namespaces in PHP
+internals - Design and Implementation of Pipp
 
-=head1 Namespaces in Pipp
+=head1 Source code
+
+See L<pipp.pod>.
+
+=head1 Issue tracking
+
+See F<../ROADMAP> and L<pipp.pod>.
+
+=head1 Testing
+
+See L<testing.pod>.
+
+=head1 Parsing
+
+Parsing is done with PCT.
+
+=head1 Variables
+
+=over 4
+
+=item globals in top file
+
+=item globals in included files
+
+=item class scope
+
+=item function and method scope
+
+=item constants
+
+=back
+
+=head1 Functions and closures
+
+=head2 Builtin functions
+
+=head2 Closures
+
+=head2 Internal functions
+
+=head1 Object orientation
+
+=head1 Namespaces
 
 A namespace is introduced with the keyword B<namespace>.
 There can be multiple namespaces per file. They are not nested.
@@ -18,7 +60,7 @@ Namespaces are case insensitive.
 No global code can precede the first B<namespace> directive.
 Free code is disallowed within namespaces.
 
-=head1 Implementation in Pipp
+=head2 Implementation in Pipp
 
 Currently the namespace directive is only parsed.
 
@@ -29,13 +71,7 @@ Free code within namespace is allowed.
 There will be namespaced variables as well.
 'namespace \;' indicates the return to the root namespace.
 
-
-
-=head1 AUTHOR
-
-Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
-
-=head1 SEE ALSO
+=head2 SEE ALSO
 
   L<http://docs.php.net/manual/en/language.namespaces.php>
   L<http://wiki.php.net/rfc/namespaces>
@@ -47,5 +83,36 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
   L<http://marc.info/?l=php-internals&m=121527668606247>
   L<http://bugs.php.net/bug.php?id=46304>
   L<http://loveandtheft.org/2008/10/26/set-sail-for-fail-php-namespaces/>
+
+=head1 Including and requiring
+
+C<require_once()> is supported, but might have issues with variables. 
+
+=head1 Extensions
+
+=head2 Implementation in Pipp
+
+Currently, Pipp has no support at all for extensions.
+
+=head2 SEE ALSO
+
+  TODO: Embedding and Extending PHP, by Sahrah ...
+  L<http://www.php.net/manual/en/internals2.php>
+
+=head1 Interaction with the Parrot world
+
+Using Modules from other HLLs. Inlining PIR and other languages.
+
+=head1 Compatability
+
+See L<pipp.pod> for a list of divergences.
+
+=head1 Related projects.
+
+See the Wiki. Roadsend, Zend, PHC.
+
+=head1 AUTHOR
+
+Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut

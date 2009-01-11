@@ -8,10 +8,10 @@ Pipp - Testing
 
 For testing the test-suite from PHP 5.3 is used.
 For sanity checking there are also few tests in
-the subdirs of F<languages/pipp/t>.
-These tests are used by 'make test'.
+below the directory subdirs of F<pipp/t>.
+These tests are executed by 'make test'.
 
-Run individual tests like:
+Run individual tests e.g.:
   
   perl t/harness --verbose t/in_php/01_sea_only.t
 
