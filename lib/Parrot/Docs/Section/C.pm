@@ -235,8 +235,7 @@ sub new {
                 'pairs'   => ['resources'],
                 'sources' => ['res_lea']
             ),
-            $self->c_pair_item( '', 'mark_sweep' ),
-            $self->c_pair_item( '', 'headers' ),
+            $self->c_source_item( '', 'mark_sweep' ),
         ),
         $self->new_group(
             'Garbage Collection',
