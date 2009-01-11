@@ -1,31 +1,17 @@
 # $Id$
+# Copyright (C) 2009, The Perl Foundation.
 
-# Copyright (C) 2006-2007, The Perl Foundation.
-
-# Configuration script for Pipp.
-
-# RT#31633: need to steal from gen::languages and tools/dev/reconfigure.pl
-#           in order to make this work
-
-package main;
-
-# pragmata
 use strict;
 use warnings;
 use 5.008;
-use FindBin;
-use lib "$FindBin::Bin/../../lib";
 
-# Parrot specific Perl modules
-use Parrot::Configure::Step  ();
+my $build_dir = '../..';
+my $cmd = qq{$^X -Ilib tools/dev/reconfigure.pl --step=gen::languages --languages=pipp};
 
-# RT#31633: This is too simplistic
-# Parrot::Configure::Step::genfile( 'config/makefiles/root.in' => 'Makefile' );
+print "Running '$cmd' in $build_dir\n";
 
-print <<'END_TEXT';
-Hi,
-I'm Configure.pl. Eventually I'll generate Makefile.
-END_TEXT
+chdir $build_dir;
+`$cmd`
 
 # Local Variables:
 #   mode: cperl

@@ -16,7 +16,6 @@ PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 PARROT        = $(BUILD_DIR)/parrot@exe@
 PERL          = @perl@
 RM_F          = @rm_f@
-RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 PMCBUILD      = $(PERL) @build_dir@/tools/build/dynpmc.pl
 NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
 PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
@@ -148,7 +147,7 @@ help:
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=pipp
+	$(PERL) Configure.pl
 
 build:           build-common
 
