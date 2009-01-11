@@ -19,10 +19,11 @@ functions.  These variants are called C<indexing> operations, as they act on a
 specific indexed element of an aggregate PMC.  Examples of a aggregate PMCs
 include C<Hash>, C<FixedIntegerArray> and C<ResizablePMCArray>.
 
-Non-aggregates may also support C<_keyed> variants of the VTABLE functions, but
-they not do anything particularly clever.  For instance, PMC types implementing
-Perl references will merely pass the index on to the referent. These aren't
-aggregates because they don't directly store or reference elements.
+Non-aggregates may also support C<_keyed> variants of the VTABLE functions,
+but they not do anything particularly clever.  For instance, PMC types
+implementing Perl references will merely pass the index on to the referent.
+These aren't aggregates because they don't directly store or reference
+elements.
 
 Indexing operations take one or more aggregate B<keys>.  At runtime these
 operations will index into the B<aggregate> using the C<key> and return a
@@ -32,8 +33,8 @@ B<value>.  Here is a well-known indexing operation in Perl 6:
 
 The B<key> here is the constant integer C<12>  The aggregate is the
 C<Perl6Array> C<@a>.  In the process of this assignment, Parrot will have to
-extract the PMC in element 12 of the array, producing a C<value>. C<$b> is then
-assigned to this value.
+extract the PMC in element 12 of the array, producing a C<value>.
+C<$b> is then assigned to this value.
 
 Now, how does this all get implemented?
 
@@ -52,8 +53,8 @@ of the C<Key> PMC is stored in the PMC's cache (i.e. C<PMC_pmc_val(key)>,
 C<PMC_int_val(key)>).
 
 For example, indexing the multidimensional array C<@foo[$a,12;"hi"]>
-produces three PMCs; one with a PMC type, one with an integer type and one with
-a string type.
+produces three PMCs; one with a PMC type, one with an integer type
+and one with a string type.
 
 The key type is encoded in the PMC flags using 8 bits based on the following
 scheme (from includes/parrot/key.h):
