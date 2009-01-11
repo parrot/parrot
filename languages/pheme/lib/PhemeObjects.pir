@@ -1,6 +1,6 @@
 .namespace [ 'Pheme'; 'Cons' ]
 
-.sub _initialize :anon :load :init
+.sub '_initialize' :anon :load :init
     .local pmc cons_class
     cons_class = get_class [ 'Pheme'; 'Cons' ]
     $I0 = defined cons_class
@@ -15,31 +15,31 @@
 .end
 
 .sub 'get_bool' :vtable
-	.return( 1 )
+    .return( 1 )
 .end
 
 .sub 'get_string' :vtable :method
-	.local pmc    head
-	.local string output
-	head    = self.'head'()
+    .local pmc    head
+    .local string output
+    head    = self.'head'()
 
-	.local int head_defined
-	head_defined = defined head
-	unless head_defined goto return_it
-	output  = head
+    .local int head_defined
+    head_defined = defined head
+    unless head_defined goto return_it
+    output  = head
 
-	.local pmc tail
-	tail = self.'tail'()
+    .local pmc tail
+    tail = self.'tail'()
 
-	.local string tail_output
-	tail_output = tail
-	unless tail_output goto return_it
+    .local string tail_output
+    tail_output = tail
+    unless tail_output goto return_it
 
-	output .= ':'
-	output .= tail_output
+    output .= ':'
+    output .= tail_output
 
   return_it:
-	.return( output )
+    .return( output )
 .end
 
 .sub 'head' :method
@@ -56,29 +56,29 @@
     .return( head )
 .end
 
-.sub get_integer :vtable :method
-	.local pmc elem
-	elem  = self.'head'()
+.sub 'get_integer' :vtable :method
+    .local pmc elem
+    elem  = self.'head'()
 
-	.local int elem_defined
-	elem_defined = defined elem
+    .local int elem_defined
+    elem_defined = defined elem
 
-	if elem_defined goto count_tail
-	.return( 0 )
+    if elem_defined goto count_tail
+    .return( 0 )
 
   count_tail:
-	.local int count
-	count = 0
-	elem  = self
+    .local int count
+    count = 0
+    elem  = self
 
   loop_start:
-	inc count
-	elem         = elem.'tail'()
-	elem_defined = defined elem
-	if elem_defined goto loop_start
+    inc count
+    elem         = elem.'tail'()
+    elem_defined = defined elem
+    if elem_defined goto loop_start
 
   loop_end:
-	.return( count )
+    .return( count )
 .end
 
 .sub 'tail' :method
@@ -97,18 +97,18 @@
 
 .namespace [ 'Pheme'; 'Atom' ]
 
-.sub _initialize :anon :load :init
-	.local pmc atom_class
-	newclass atom_class, [ 'Pheme'; 'Atom' ]
+.sub '_initialize' :anon :load :init
+    .local pmc atom_class
+    newclass atom_class, [ 'Pheme'; 'Atom' ]
 
-	addattribute atom_class, 'value'
+    addattribute atom_class, 'value'
 .end
 
 .namespace [ 'Pheme'; 'Atom'; 'Symbol' ]
 
-.sub _initialize :anon :load :init
-	.local pmc symbol_class
-	subclass symbol_class, [ 'Pheme'; 'Atom' ], [ 'Pheme'; 'Atom'; 'Symbol' ]
+.sub '_initialize' :anon :load :init
+    .local pmc symbol_class
+    subclass symbol_class, [ 'Pheme'; 'Atom' ], [ 'Pheme'; 'Atom'; 'Symbol' ]
 .end
 
 # Local Variables:
