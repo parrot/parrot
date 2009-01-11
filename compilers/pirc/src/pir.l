@@ -379,6 +379,7 @@ REGISTER       "$"[SNIP]{DIGITS}
 ":named"          { return TK_FLAG_NAMED; }
 ":flat"           { return TK_FLAG_FLAT; }
 ":invocant"       { return TK_FLAG_INVOCANT; }
+":lookahead"      { return TK_FLAG_LOOKAHEAD; }
 
 ":"{IDENT}        { yypirerror(yyscanner, yyget_extra(yyscanner),
                                "unrecognized flag: '%s'", yytext);

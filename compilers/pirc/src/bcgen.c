@@ -230,7 +230,8 @@ add_num_const(bytecode * const bc, double f) {
 =item C<int
 add_key_const(bytecode * const bc, PMC *key)>
 
-Add a key constant to the constants list.
+Add a key constant to the constants list. The index where C<key> is
+stored in the constants table is returned.
 
 =cut
 
@@ -331,23 +332,23 @@ PMC in the bytecode's constant table.
 bytecode *
 new_bytecode(Interp *interp, char const * const filename) {
     PMC      *self;
-    bytecode *bc      = (bytecode *)mem_sys_allocate(sizeof (bytecode));
+    bytecode *bc = (bytecode *)mem_sys_allocate(sizeof (bytecode));
 
     /* Create a new packfile and load it into the parrot interpreter */
-    bc->packfile      = PackFile_new(interp, 0);
+    bc->packfile = PackFile_new(interp, 0);
     Parrot_loadbc(interp, bc->packfile);
 
     /* store a pointer to the parrot interpreter, which saves passing around
      * the interp as an extra argument.
      */
-    bc->interp        = interp;
+    bc->interp   = interp;
 
     /* create segments */
     PARROT_ASSERT(filename != NULL);
-    interp->code      = PF_create_default_segs(interp, filename, 1);
+    interp->code = PF_create_default_segs(interp, filename, 1);
 
     /* add interpreter globals to bytecode. XXX Why is this? */
-    self              = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
+    self         = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     add_pmc_const(bc, self);
 
     return bc;
@@ -358,7 +359,9 @@ new_bytecode(Interp *interp, char const * const filename) {
 =item C<void
 create_codesegment(bytecode * const bc, int codesize)>
 
-Create a code segment of size C<codesize>.
+Create a code segment of size C<codesize>. C<bc>'s C<opcursor> attribute
+is initialized; this is the pointer used to write opcodes and operands
+into the code segment.
 
 =cut
 

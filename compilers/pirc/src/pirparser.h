@@ -140,21 +140,22 @@
      TK_FLAG_OPTIONAL = 356,
      TK_FLAG_OPT_FLAG = 357,
      TK_FLAG_INVOCANT = 358,
-     TK_MACRO = 359,
-     TK_ENDM = 360,
-     TK_MACRO_LOCAL = 361,
-     TK_MACRO_LABEL = 362,
-     TK_MACRO_CONST = 363,
-     TK_MACRO_LABEL_ID = 364,
-     TK_MACRO_LOCAL_ID = 365,
-     TK_MACRO_IDENT = 366,
-     TK_MACRO_ARG_IDENT = 367,
-     TK_MACRO_ARG_OTHER = 368,
-     TK_MACRO_CONST_VAL = 369,
-     TK_PASM_MARKER_START = 370,
-     TK_PIR_MARKER_START = 371,
-     TK_PCC_SUB = 372,
-     TK_PARROT_OP = 373
+     TK_FLAG_LOOKAHEAD = 359,
+     TK_MACRO = 360,
+     TK_ENDM = 361,
+     TK_MACRO_LOCAL = 362,
+     TK_MACRO_LABEL = 363,
+     TK_MACRO_CONST = 364,
+     TK_MACRO_LABEL_ID = 365,
+     TK_MACRO_LOCAL_ID = 366,
+     TK_MACRO_IDENT = 367,
+     TK_MACRO_ARG_IDENT = 368,
+     TK_MACRO_ARG_OTHER = 369,
+     TK_MACRO_CONST_VAL = 370,
+     TK_PASM_MARKER_START = 371,
+     TK_PIR_MARKER_START = 372,
+     TK_PCC_SUB = 373,
+     TK_PARROT_OP = 374
    };
 #endif
 /* Tokens.  */
@@ -259,21 +260,22 @@
 #define TK_FLAG_OPTIONAL 356
 #define TK_FLAG_OPT_FLAG 357
 #define TK_FLAG_INVOCANT 358
-#define TK_MACRO 359
-#define TK_ENDM 360
-#define TK_MACRO_LOCAL 361
-#define TK_MACRO_LABEL 362
-#define TK_MACRO_CONST 363
-#define TK_MACRO_LABEL_ID 364
-#define TK_MACRO_LOCAL_ID 365
-#define TK_MACRO_IDENT 366
-#define TK_MACRO_ARG_IDENT 367
-#define TK_MACRO_ARG_OTHER 368
-#define TK_MACRO_CONST_VAL 369
-#define TK_PASM_MARKER_START 370
-#define TK_PIR_MARKER_START 371
-#define TK_PCC_SUB 372
-#define TK_PARROT_OP 373
+#define TK_FLAG_LOOKAHEAD 359
+#define TK_MACRO 360
+#define TK_ENDM 361
+#define TK_MACRO_LOCAL 362
+#define TK_MACRO_LABEL 363
+#define TK_MACRO_CONST 364
+#define TK_MACRO_LABEL_ID 365
+#define TK_MACRO_LOCAL_ID 366
+#define TK_MACRO_IDENT 367
+#define TK_MACRO_ARG_IDENT 368
+#define TK_MACRO_ARG_OTHER 369
+#define TK_MACRO_CONST_VAL 370
+#define TK_PASM_MARKER_START 371
+#define TK_PIR_MARKER_START 372
+#define TK_PCC_SUB 373
+#define TK_PARROT_OP 374
 
 
 
@@ -300,7 +302,7 @@ typedef union YYSTYPE
     struct macro_param *pval;
 }
 /* Line 1489 of yacc.c.  */
-#line 304 "pirparser.h"
+#line 306 "pirparser.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

@@ -548,23 +548,25 @@ in the actual PackFile. See C<store_key_bytecode()>.
 */
 static int
 emit_pbc_key(lexer_state * const lexer, key * const k) {
-    key_entry  *iter      = k->head;
-    int         keylength = 0;
-
+    key_entry  *iter;
     opcode_t   *key;
     opcode_t    keysize;    /* total size of key in bytecode */
     opcode_t   *pc;         /* cursor to write into key array */
     expression *operand;
     int         index;
 
-    /* create an array of opcode_t for storing the bytecode
-     * representation of the key. Initialize the cursor (pc)
-     * to write into this buffer.
+    /* create an array of opcode_t for storing the bytecode representation
+     * of the key. Initialize the cursor (pc) to write into this buffer.
+     * The size is 2 opcode_t's for each key plus 1 opcode_t for storing the size.
      */
-    pc = key = (opcode_t *)pir_mem_allocate(lexer, k->keylength * sizeof (opcode_t) * 4);
+    pc  =
+    key = (opcode_t *)pir_mem_allocate(lexer, (k->keylength * 2 + 1) * sizeof (opcode_t));
 
     /* store key length in slot 0 */
     *pc++ = k->keylength;
+
+    /* initialize iterator */
+    iter  = k->head;
 
     while (iter) {
         switch (iter->expr->type) {
@@ -619,8 +621,6 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
 
         }
 
-        /* count the number of keys XXX  no longer necessary. keep for now. sanity check? */
-        ++keylength;
         iter = iter->next;
     }
 

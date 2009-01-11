@@ -50,6 +50,7 @@ typedef enum target_flags {
     TARGET_FLAG_UNIQUE_REG  = 1 << 4, /* flag to tell register allocator to leave this poor target
                                          alone! */
     TARGET_FLAG_INVOCANT    = 1 << 5, /* XXX for MDD; to be implemented according to PDD27 */
+    TARGET_FLAG_LOOKAHEAD   = 1 << 6, /* for :lookahead */
 
     /* abuse this enum for these pir compiler internal flags; by adding them here, they can
      * be encoded in the same flag member variable of the target struct, preventing the need

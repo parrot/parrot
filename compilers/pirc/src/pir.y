@@ -364,6 +364,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
        TK_FLAG_OPTIONAL     ":optional"
        TK_FLAG_OPT_FLAG     ":opt_flag"
        TK_FLAG_INVOCANT     ":invocant"
+       TK_FLAG_LOOKAHEAD    ":lookahead"
 
 /* tokens and types for macro layer */
 
@@ -465,7 +466,8 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
              target_flag
              param_flags
              param_flag
-             invocant_param
+             invocant_flag
+             lookahead_flag
              arg_flags
              arg_flag
              if_unless
@@ -827,11 +829,16 @@ param_flags       : /* empty */
                   ;
 
 param_flag        : target_flag
-                  | invocant_param
+                  | invocant_flag
+                  | lookahead_flag
                   | unique_reg_flag
                   ;
 
-invocant_param    : ":invocant" '(' multi_type ')'
+lookahead_flag    : ":lookahead" '(' ')'
+                         { $$ = TARGET_FLAG_LOOKAHEAD; }
+                  ;
+
+invocant_flag     : ":invocant" '(' multi_type ')'
                          { $$ = TARGET_FLAG_INVOCANT;
                            /* XXX handle multi_type */
 
