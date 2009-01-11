@@ -26,16 +26,16 @@ Tests the Status PMC described in PDD22.
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 .sub 'test' :main
     new P0, 'Status'
-    say "ok 1 - $P0 = new 'Status'"
+    say "ok 1 - $P0 = new ['Status']"
 .end
 CODE
-ok 1 - $P0 = new 'Status'
+ok 1 - $P0 = new ['Status']
 OUT
 
 # L<PDD22/Status Object PMC API/=item get_integer (vtable)>
 pir_output_is( <<'CODE', <<'OUT', 'get_integer (vtable)', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'Status'
+    $P0 = new ['Status']
 
     # TODO test more return values
     # TODO figure out how to set the values to make testing possible
@@ -65,7 +65,7 @@ OUT
 # L<PDD22/Status Object PMC API/=item get_bool (vtable)>
 pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'Status'
+    $P0 = new ['Status']
 
     # TODO figure out how to set the values to make testing possible
 
@@ -93,7 +93,7 @@ OUT
 # L<PDD22/Status Object PMC API/=item return>
 pir_output_is( <<'CODE', <<'OUT', 'return', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'Status'
+    $P0 = new ['Status']
 
     # TODO test all return values
     # TODO figure out how to set the values to make testing possible
@@ -126,7 +126,7 @@ OUT
 # L<PDD22/Status Object PMC API/=item error>
 pir_output_is( <<'CODE', <<'OUT', 'error', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'Status'
+    $P0 = new ['Status']
 
     # TODO test all error values
     # TODO figure out how to set the values to make testing possible
@@ -178,7 +178,7 @@ OUT
 # L<PDD22/Status Object PMC API/=item throw>
 pir_output_is( <<'CODE', <<'OUT', 'throw', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'Status'
+    $P0 = new ['Status']
 
     # TODO figure out how to set the values to make testing possible
 
@@ -189,7 +189,7 @@ pir_output_is( <<'CODE', <<'OUT', 'throw', todo => 'not yet implemented' );
     say 'ok 1 - $P0.throw() # no error'
 
   test_2:
-    $P0 = new 'Status' # need error here
+    $P0 = new ['Status'] # need error here
 
     push_eh eh_error
     $P0.throw()

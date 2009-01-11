@@ -26,7 +26,7 @@ Tests the LexPad PMC.
 
 .sub new_test
     push_eh eh
-    $P0 = new 'LexPad'
+    $P0 = new ['LexPad']
     pop_eh
     ok(0, "shouldn't be able to create a LexPad without an initializer")
     goto end

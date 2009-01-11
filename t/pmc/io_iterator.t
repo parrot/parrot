@@ -26,18 +26,18 @@ Tests the I/O Iterator PMC described in PDD22.
 pir_output_is( <<'CODE', <<'OUT', 'new', todo => 'not yet implemented' );
 .sub 'test' :main
     $P99 = 1 # RT #46847 replace with io object
-    $P0 = new 'Iterator', $P99
-    say "ok 1 - $P0 = new 'Iterator', $P1"
+    $P0 = new ['Iterator'], $P99
+    say "ok 1 - $P0 = new ['Iterator'], $P1"
 .end
 CODE
-ok 1 - $P0 = new 'Iterator', $P1
+ok 1 - $P0 = new ['Iterator'], $P1
 OUT
 
 # L<PDD22/I\/O Iterator PMC API/=item shift>
 pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented' );
 .sub 'test' :main
     $P99 = 1 # RT #46847 replace with io object
-    $P0 = new 'Iterator', $P99
+    $P0 = new ['Iterator'], $P99
 
     $S0 = shift $P0
 
@@ -56,7 +56,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'get_bool (vtable)', todo => 'not yet implemented' );
 .sub 'test' :main
     $P99 = 1 # RT #46847 replace with io object
-    $P0 = new 'Iterator', $P99
+    $P0 = new ['Iterator'], $P99
 
     # empty i/o object
     unless $P0 goto ok_1

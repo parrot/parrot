@@ -32,12 +32,12 @@ Tests the C<Key> PMC.
     .local string result
     result = ''
 
-    new $P0, 'Key'
+    new $P0, ['Key']
     set $P0, "1"
-    new $P1, 'Key'
+    new $P1, ['Key']
     set $P1, "2"
     push $P0, $P1
-    new $P2, 'Key'
+    new $P2, ['Key']
     set $P2, "3"
     push $P1, $P2
 
@@ -66,7 +66,7 @@ e2:
 .end
 
 .sub extract_int_from_string_keys
-    new $P0, 'ResizableStringArray'
+    new $P0, ['ResizableStringArray']
     push $P0, 'ok1'
     push $P0, 'ok2'
     set $S0, 0
@@ -77,7 +77,7 @@ e2:
 .end
 
 .sub extract_string_from_int_keys
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $P0['1'], 'ok1'
     set $P0['2'], 'ok2'
     set $I0, 1
@@ -126,10 +126,10 @@ end:
 .sub 'xxx' :anon
   .local pmc call_chain, lexpad
   call_chain = get_root_global ['_tcl'], 'call_chain'
-  lexpad = new 'Hash'
+  lexpad = new ['Hash']
   push call_chain, lexpad
   .local pmc arg_list
-  arg_list = new 'ResizablePMCArray'
+  arg_list = new ['ResizablePMCArray']
   lexpad['args'] = arg_list
     $P14 = find_name "&info"
     $P14()
@@ -142,7 +142,7 @@ code
   pir_compiler = compreg 'PIR'
   $P0 = pir_compiler($S0)
   $P0 = $P0[0]
-  $P1 = new 'TclProc'
+  $P1 = new ['TclProc']
   assign $P1, $P0
   .local pmc ns_target
   ns_target = get_hll_namespace
@@ -156,7 +156,7 @@ code
   load_bytecode 'PGE.pbc'
   $P0 = get_class 'Sub'
   $P1 = subclass $P0, 'TclProc'
-  $P1 = new 'ResizablePMCArray'
+  $P1 = new ['ResizablePMCArray']
   set_global 'call_chain', $P1
 .end
 

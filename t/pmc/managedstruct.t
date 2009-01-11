@@ -28,7 +28,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 .end
 
 .sub set_managedstruct_size
-    new $P0, 'ManagedStruct'
+    new $P0, ['ManagedStruct']
     set $I0,$P0
     is($I0, 0, "empty ManagedStruct has size 0")
     set $P0,1
@@ -43,7 +43,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 .sub element_access
 
     #element access - float, double
-    new $P2, 'ResizablePMCArray'
+    new $P2, ['ResizablePMCArray']
     .include "datatypes.pasm"
     push $P2, .DATATYPE_FLOAT
     push $P2, 2	# 2 elem array
@@ -51,7 +51,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     push $P2, .DATATYPE_DOUBLE
     push $P2, 0
     push $P2, 0
-    new $P0, 'ManagedStruct', $P2
+    new $P0, ['ManagedStruct'], $P2
     # must have set size automatically
     # this is hopefully 2*4+8 everywhere
     set $I0, $P0
@@ -75,11 +75,11 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 
     #element access - char, short
-    new $P2, 'ResizablePMCArray'
+    new $P2, ['ResizablePMCArray']
     push $P2, .DATATYPE_CHAR
     push $P2, 2	# 2 elem char array
     push $P2, 0
-    new $P0, 'ManagedStruct', $P2
+    new $P0, ['ManagedStruct'], $P2
     set $I0, $P0
     $I1 = ge $I0, 2
     ok($I1, "ManagedStruct size is at least 2")
@@ -91,7 +91,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     set $I0, $P0[0;1]
     is($I0, 2, "char val of 258 retrieved as 2")
     # now acces that as a short
-    new $P2, 'ResizablePMCArray'
+    new $P2, ['ResizablePMCArray']
     push $P2, .DATATYPE_SHORT
     push $P2, 1
     push $P2, 0
@@ -109,7 +109,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 #.include "datatypes.pasm"
 #
 .sub named_element_access_int16
-    new $P1, 'OrderedHash'
+    new $P1, ['OrderedHash']
     set  $P1['x'], .DATATYPE_INT16
     push $P1, 0
     push $P1, 0
@@ -119,7 +119,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     push $P1, 0
 
     # need a ManagedStruct to allocate data memory
-    new $P2, 'ManagedStruct', $P1
+    new $P2, ['ManagedStruct'], $P1
 
     # calc allocation size
     set $I0, 0
@@ -156,16 +156,16 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 .sub nested_struct_offsets
 
     # the nested structure
-    new $P3, 'ResizablePMCArray'
+    new $P3, ['ResizablePMCArray']
     push $P3, .DATATYPE_INT
     push $P3, 0
     push $P3, 0
     push $P3, .DATATYPE_INT
     push $P3, 0
     push $P3, 0
-    new $P4, 'UnManagedStruct', $P3
+    new $P4, ['UnManagedStruct'], $P3
     # outer structure
-    new $P2, 'ResizablePMCArray'
+    new $P2, ['ResizablePMCArray']
     push $P2, .DATATYPE_INT
     push $P2, 0
     push $P2, 0
@@ -179,7 +179,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     push $P2, 0
     push $P2, 0
     # attach struct initializer
-    new $P5, 'UnManagedStruct', $P2
+    new $P5, ['UnManagedStruct'], $P2
 
     # now check offsets
     set $I0, $P2[2]
@@ -204,7 +204,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 .sub interface_check
     .local pmc pmc1
-    pmc1 = new 'ManagedStruct'
+    pmc1 = new ['ManagedStruct']
     .local int bool1
     does bool1, pmc1, "scalar"
     is(bool1, 1, "ManagedStruct does scalar")

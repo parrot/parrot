@@ -26,7 +26,7 @@ Tests the LexInfo PMC.
 
 .sub new_test
     push_eh eh
-    $P0 = new 'LexInfo'
+    $P0 = new ['LexInfo']
     pop_eh
     ok(0, "shouldn't be able to create a LexInfo without an initializer")
     goto end

@@ -46,11 +46,11 @@ TODO: {
 .sub main
     $P0 = null
     test($P0, "Undef")
-    new $P0, 'Integer'
+    new $P0, ['Integer']
     test($P0, "null")
-    new $P0, 'Undef'
+    new $P0, ['Undef']
     test($P0, "Integer")
-    new $P0, 'String'
+    new $P0, ['String']
     test($P0, "String")
 .end
 .sub test
@@ -205,7 +205,7 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "read on invalid fh should throw exception" );
-    new P0, 'FileHandle'
+    new P0, ['FileHandle']
 
     push_eh _readline_handler
     readline S0, P0
@@ -295,7 +295,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "open & print" );
    set I0, -12
    set N0, 2.2
    set S0, "Foo"
-   new P0, 'String'
+   new P0, ['String']
    set P0, "Bar\\n"
 
    open P1, "$temp_file", "w"
@@ -516,7 +516,7 @@ ok 3
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'printerr' );
-   new P0, 'String'
+   new P0, ['String']
    set P0, "This is a test\n"
    printerr 10
    printerr "\n"
@@ -829,7 +829,7 @@ pir_output_is( <<'CODE', <<"OUTPUT", "string read/write handle", todo => "no str
     .local string greeting
     .local string layer
 
-    pio = new 'StringHandle'
+    pio = new ['StringHandle']
     print pio, "Hello"
     print pio, ", "
     print pio, "world!"
@@ -855,7 +855,7 @@ EOS
     pio = open    "$temp_file", 'w'
     print pio, \$S0
     close pio
-    cl = new 'FileHandle'
+    cl = new ['FileHandle']
     \$S1 = cl.'readall'('$temp_file')
     if \$S0 == \$S1 goto ok
     print "not "

@@ -24,20 +24,20 @@ and cloning.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "multiarray creation" );
-    new P1, 'ResizablePMCArray'
+    new P1, ['ResizablePMCArray']
     # intial size
     set P1[0], 0
     set P1[1], 50
     # dimensions 10x5 2D array
     # XXX can this be done w/o push/append a key?
-    new P2, 'Key'
+    new P2, ['Key']
     set P2, 10
-    new P3, 'Key'
+    new P3, ['Key']
     set P3, 5
     push P2, P3
     set P1[2], 1
     set P1[3], P2
-    new P0, 'MultiArray', P1
+    new P0, ['MultiArray'], P1
     print "ok\n"
     end
 CODE
@@ -45,19 +45,19 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "multiarray access 2d" );
-    new P1, 'ResizablePMCArray'
+    new P1, ['ResizablePMCArray']
     # intial size
     set P1[0], 0
     set P1[1], 100
     # dimensions
-    new P2, 'Key'
+    new P2, ['Key']
     set P2, 10
-    new P3, 'Key'
+    new P3, ['Key']
     set P3, 5
     push P2, P3
     set P1[2], 1
     set P1[3], P2
-    new P0, 'MultiArray', P1
+    new P0, ['MultiArray'], P1
     # array size, multiarray doesnt autogrow
     set P0, 200
 
@@ -102,22 +102,22 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "multiarray access 3d" );
-    new P1, 'ResizablePMCArray'
+    new P1, ['ResizablePMCArray']
     # initial size
     set P1[0], 0
     set P1[1], 200
     # dimensions 10x5x4
-    new P2, 'Key'
+    new P2, ['Key']
     set P2, 10
-    new P3, 'Key'
+    new P3, ['Key']
     set P3, 5
     push P2, P3
-    new P3, 'Key'
+    new P3, ['Key']
     set P3, 4
     push P2, P3
     set P1[2], 1
     set P1[3], P2
-    new P0, 'MultiArray', P1
+    new P0, ['MultiArray'], P1
     set P0, 200
 
     set I10, 10
@@ -200,7 +200,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'MultiArray'
+    pmc1 = new ['MultiArray']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -221,28 +221,28 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'Verify Basic Iterator support' );
   .sub test :main
-     $P1 = new 'ResizablePMCArray'
+     $P1 = new ['ResizablePMCArray']
 
      $P1[0] = 0
      $P1[1] = 4
 
-     $P2 = new 'Key'
+     $P2 = new ['Key']
      $P2 = 2
-     $P3 = new 'Key'
+     $P3 = new ['Key']
      $P3 = 2
      push $P2, $P3
 
      $P1[2] = 1
      $P1[3] = $P2
 
-     $P0 = new 'MultiArray', $P1
+     $P0 = new ['MultiArray'], $P1
 
      $P0[0;0] = 1
      $P0[1;0] = 2
      $P0[0;1] = 3
      $P0[1;1] = 4
 
-     $P9 = new 'Iterator', $P0
+     $P9 = new ['Iterator'], $P0
 loop:
     unless $P9 goto end_loop
     $P10 = shift $P9
