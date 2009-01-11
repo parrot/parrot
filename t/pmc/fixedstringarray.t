@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, 'FixedStringArray'
+    new P0, ['FixedStringArray']
 
     set I0,P0
     eq I0,0,OK_1
@@ -44,7 +44,7 @@ ok 2
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Resetting array size (and getting an exception)" );
-    new P0, 'FixedStringArray'
+    new P0, ['FixedStringArray']
 
     set I0,P0
     set P0,1
@@ -61,7 +61,7 @@ OUTPUT
 #VIM's syntax highlighter needs this line
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, 'FixedStringArray'
+    new P0, ['FixedStringArray']
     set P0, 1
 
     set P0[0],-7
@@ -90,7 +90,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, 'FixedStringArray'
+    new P0, ['FixedStringArray']
     set P0, 2
 
     set P0[1], -7
@@ -119,7 +119,7 @@ ok 3
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, 'FixedStringArray'
+    new P0, ['FixedStringArray']
     set P0, 1
 
     set P0[1], -7
@@ -131,7 +131,7 @@ current instr\.:/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, 'FixedStringArray'
+    new P0, ['FixedStringArray']
     set P0, 1
 
     set I0, P0[1]
@@ -143,9 +143,9 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
      .include 'include/fp_equality.pasm'
-     new P0, 'FixedStringArray'
+     new P0, ['FixedStringArray']
      set P0, 3
-     new P1, 'Key'
+     new P1, ['Key']
 
      set P1, 0
      set P0[P1], 25
@@ -180,17 +180,17 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
      .include 'include/fp_equality.pasm'
-     new P0, 'FixedStringArray'
+     new P0, ['FixedStringArray']
      set P0, 1024
 
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "cow"
-     new P1, 'Integer'
+     new P1, ['Integer']
      set P1, 123456
      set P0[1023], P1
 
-     new P2, 'Key'
+     new P2, ['Key']
      set P2, 25
      set I0, P0[P2]
      eq I0, 125, OK1
@@ -228,7 +228,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'FixedStringArray'
+    pmc1 = new ['FixedStringArray']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -248,7 +248,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Clone" );
-     new P0, 'FixedStringArray'
+     new P0, ['FixedStringArray']
      set P0, 3
      set P0[0], "abcde"
      set P0[1], "fghi"
@@ -270,7 +270,7 @@ abcdefghijkl
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "Cloning before size is set" );
-     new P0, 'FixedStringArray'
+     new P0, ['FixedStringArray']
      clone P1, P0
      set P0, 10
      set P1, 20
@@ -287,7 +287,7 @@ OUTPUT
 #VIM's syntax highlighter needs this line
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Truth" );
-     new P0, 'FixedStringArray'
+     new P0, ['FixedStringArray']
      unless P0, OK1
      print "not "
 OK1: print "ok 1\n"
@@ -302,7 +302,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Garbage collection" );
-     new P0, 'FixedStringArray'
+     new P0, ['FixedStringArray']
      set P0, 8192
      set I0, 0
 L1:  set P0[I0], I0
@@ -331,7 +331,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
 .sub 'main' :main
-    new $P0, 'FixedStringArray'
+    new $P0, ['FixedStringArray']
     set $P0, 3
     $P0[0] = 42
     $P0[1] = 43
@@ -355,7 +355,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw" );
     .local pmc fsa, it
     .local string s
 
-    new fsa, 'FixedStringArray'
+    new fsa, ['FixedStringArray']
     fsa = 5
     fsa[0] = 42
     fsa[1] = 43

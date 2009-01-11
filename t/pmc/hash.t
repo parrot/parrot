@@ -102,11 +102,11 @@ well.
 .end
 
 .sub more_than_one_hash
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $S0, "key"
     set $P0[$S0], 1
 
-    new $P1, 'Hash'
+    new $P1, ['Hash']
     set $S1, "another_key"
     set $P1[$S1], 2
 
@@ -119,12 +119,12 @@ well.
 
 .sub null_key
     # See RT #59542
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     $P0['yum'] = 5
     null $S0
     $I0 = 0
 
-    $P2 = new 'ExceptionHandler'
+    $P2 = new ['ExceptionHandler']
     $P2.'handle_types'(.EXCEPTION_UNEXPECTED_NULL)
     set_addr $P2, null_ex_eh
     push_eh $P2
@@ -142,7 +142,7 @@ check:
 .end
 
 .sub hash_keys_with_nulls_in_them
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $S0, "parp\0me"
     set $S1, "parp\0you"
 
@@ -157,7 +157,7 @@ check:
 .end
 
 .sub nearly_the_same_hash_keys
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $S0, "a\0"
     set $S1, "\0a"
 
@@ -172,7 +172,7 @@ check:
 .end
 
 .sub the_same_hash_keys
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $S0, "Happy"
     set $S1, "Happy"
 
@@ -191,7 +191,7 @@ check:
 # XXX - really?
 
 .sub key_that_hashes_to_zero
-        new $P0, 'Hash'
+        new $P0, ['Hash']
         set $S0, "key2"
         set $P0[$S0], 1
         set $I0, $P0[$S0]
@@ -200,7 +200,7 @@ check:
 .end
 
 .sub size_of_the_hash
-    new $P0, 'Hash'
+    new $P0, ['Hash']
 
     set $P0["0"], 1
     set $I0, $P0
@@ -388,7 +388,7 @@ DONE:
 .end
 
 .sub testing_two_hash_indices_with_integers_at_a_time
-      new $P0, 'Hash'
+      new $P0, ['Hash']
 
       set $P0["foo"],37
       set $P0["bar"],-15
@@ -409,7 +409,7 @@ DONE:
 .end
 
 .sub testing_two_hash_indices_with_numbers_at_a_time
-      new $P0, 'Hash'
+      new $P0, ['Hash']
 
       set $P0["foo"],37.100000
       set $P0["bar"],-15.100000
@@ -431,7 +431,7 @@ DONE:
 .end
 
 .sub testing_two_hash_indices_with_strings_at_a_time
-      new $P0, 'Hash'
+      new $P0, ['Hash']
 
       set $P0["foo"],"baz"
       set $P0["bar"],"qux"
@@ -456,9 +456,9 @@ DONE:
 # and/or keys. Now we try PMCs.
 
 .sub setting_and_getting_scalar_pmcs
-      new $P0, 'Hash'
-      new $P1, 'Integer'
-      new $P2, 'Integer'
+      new $P0, ['Hash']
+      new $P1, ['Integer']
+      new $P2, ['Integer']
 
       set $S0, "non-PMC key"
 
@@ -477,7 +477,7 @@ DONE:
       set $P2, $P0[$S0]
       is( $P2, $P1, 'lookup string' )
 
-      new $P1, 'Undef'
+      new $P1, ['Undef']
       set $P0[$S0], $P1
       set $P2, $P0[$S0]
       typeof $S1, $P2
@@ -486,8 +486,8 @@ DONE:
 .end
 
 .sub setting_scalar_pmcs_and_getting_scalar_values
-      new $P0, 'Hash'
-      new $P1, 'Integer'
+      new $P0, ['Hash']
+      new $P1, ['Integer']
 
       set $S0, "A rather large key"
 
@@ -512,7 +512,7 @@ DONE:
 .end
 
 .sub getting_values_from_undefined_keys
-      new $P2, 'Hash'
+      new $P2, ['Hash']
 
       set $I0, $P2["qwerty"]
       set $N0, $P2["asdfgh"]
@@ -531,9 +531,9 @@ DONE:
 .end
 
 .sub setting_and_getting_non_scalar_pmcs
-        new $P0,'Hash'
-        new $P1,'ResizablePMCArray'
-        new $P2,'ResizablePMCArray'
+        new $P0, ['Hash']
+        new $P1, ['ResizablePMCArray']
+        new $P2, ['ResizablePMCArray']
         set $P1[4],"string"
         set $P0["one"],$P1
         set $P2,$P0["one"]
@@ -542,10 +542,10 @@ DONE:
 .end
 
 .sub testing_clone
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $S0, "a"
     set $P0[$S0], $S0
-    new $P2, 'ResizablePMCArray'
+    new $P2, ['ResizablePMCArray']
     set $P2, 2
     set $P0["b"], $P2
 
@@ -596,7 +596,7 @@ DONE:
     .local int all_ok
 
     all_ok = 1
-    h      = new 'Hash'
+    h      = new ['Hash']
 
     h['a'] = 1
     h['b'] = 2
@@ -619,7 +619,7 @@ DONE:
 
     if s1 != s2 goto fail
 
-    h = new 'Hash'
+    h = new ['Hash']
 
     h['aa'] = 1
     h['bb'] = 2
@@ -639,7 +639,7 @@ DONE:
     s2 = get_repr cloned
     if s1 != s2 goto fail
 
-    h = new 'Hash'
+    h = new ['Hash']
 
     h['one']    = 1
     h['two']    = 2
@@ -672,7 +672,7 @@ end:
     .local int all_ok
 
     all_ok = 1
-    h      = new 'Hash'
+    h      = new ['Hash']
 
     h['a'] = 1
     h['b'] = 2
@@ -694,7 +694,7 @@ end:
 
     if s1 != s2 goto fail
 
-    h = new 'Hash'
+    h = new ['Hash']
 
     h['aa'] = 1
     h['bb'] = 2
@@ -715,7 +715,7 @@ end:
     s2 = get_repr cloned
     if s1 != s2 goto fail
 
-    h = new 'Hash'
+    h = new ['Hash']
 
     h['one']    = 1
     h['two']    = 2
@@ -744,9 +744,9 @@ end:
 .end
 
 .sub compound_keys
-    new $P0, 'Hash'
-    new $P1, 'Hash'
-    new $P2, 'ResizablePMCArray'
+    new $P0, ['Hash']
+    new $P1, ['Hash']
+    new $P2, ['ResizablePMCArray']
     set $P1["b"], "ab"
     set $P0["a"], $P1
     set $S0, $P0["a";"b"]
@@ -780,9 +780,9 @@ end:
 .end
 
 .sub getting_pmcs_from_compound_keys
-    new $P0, 'Hash'
-    new $P1, 'Hash'
-    new $P2, 'Integer'
+    new $P0, ['Hash']
+    new $P1, ['Hash']
+    new $P2, ['Integer']
     set $P2, 12
     set $P1["b"], $P2
     set $P0["a"], $P1
@@ -793,9 +793,9 @@ end:
 # 12
 
 .sub getting_pmcs_from_string_int_compound_keys
-    new $P0, 'Hash'
-    new $P1, 'Hash'
-    new $P2, 'Integer'
+    new $P0, ['Hash']
+    new $P1, ['Hash']
+    new $P2, ['Integer']
     set $P2, 4
     set $P1[9], $P2
     set $I0, $P1[9]
@@ -809,7 +809,7 @@ end:
 # A hash is only false if it has size 0
 
 .sub if_hash
-    new $P0, 'Hash'
+    new $P0, ['Hash']
 
     ## Could just use Test::More tests directly, but then we are really
     ## checking casting to Int then testing value (I think)
@@ -835,7 +835,7 @@ end:
   L3:
     ok( $I1, 'Hash with one value ("") is true' )
 
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     set $P0["key"], $P1
     $I1 = 1
     if $P0, L4
@@ -846,7 +846,7 @@ end:
 .end
 
 .sub unless_hash
-    new $P0, 'Hash'
+    new $P0, ['Hash']
 
     $I0 = 1
     unless $P0, L1
@@ -869,7 +869,7 @@ end:
     ok( $I0, 'Hash with one value ("\0") is true' )
 
     $I0 = 0
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     set $P0["key"], $P1
     unless $P0, L4
       $I0 = 1
@@ -879,7 +879,7 @@ end:
 .end
 
 .sub defined_hash
-    new $P0, 'Hash'
+    new $P0, ['Hash']
 
     defined $I0, $P0
     ok( $I0, 'Empty has is defined' )
@@ -898,7 +898,7 @@ end:
     $I0 = not $I0
     ok( $I0, 'Unassigned hash slot is undefined' )
 
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     set $P0["c"], $P1
     defined $I0, $P0["c"]
     $I0 = not $I0
@@ -906,7 +906,7 @@ end:
 .end
 
 .sub exists_hash_key
-    new $P0, 'Hash'
+    new $P0, ['Hash']
 
     set $P0["a"], 1
     exists $I0, $P0["a"]
@@ -916,14 +916,14 @@ end:
     $I0 = not $I0
     ok( $I0, 'unassigned hash key does not exist' )
 
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     set $P0["c"], $P1
     exists $I0, $P0["c"]
     ok( $I0, 'hash key assigned Undef PMC exists' )
 .end
 
 .sub delete_hash_key
-    new $P0, 'Hash'
+    new $P0, ['Hash']
 
     set $P0["a"], 1
     exists $I0, $P0["a"]
@@ -936,8 +936,8 @@ end:
 .end
 
 .sub cloning_keys
-    new $P10, 'Hash'
-    new $P1, 'Key'
+    new $P10, ['Hash']
+    new $P1, ['Key']
 
     set $P1, "Bar"
     set $P10[$P1], "Food"
@@ -953,13 +953,13 @@ end:
 .end
 
 .sub cloning_pmc_vals
-    new $P10, 'Hash'
+    new $P10, ['Hash']
 
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     set $P1, "value"
     set $P10["str"], $P1
 
-    new $P1, 'Undef'
+    new $P1, ['Undef']
     set $P1, 42
     set $P10["int"], $P1
 
@@ -973,9 +973,9 @@ end:
 .sub delete_and_free_list
     set $I2, 10
     set $I1, 1
-    new $P0, 'SArray'
+    new $P0, ['SArray']
     set $P0, 1
-    new $P1, 'Hash'
+    new $P1, ['Hash']
 outer:
     set $P0[0], $I1
     sprintf $S0, "ok %vd\n", $P0
@@ -1000,7 +1000,7 @@ lp:
 
 ## XXX already tested?
 .sub exists_with_constant_string_key
-    new $P16, 'Hash'
+    new $P16, ['Hash']
 
     set $P16["key1"], "value for key1"
     set $S16, $P16["key1"]
@@ -1016,7 +1016,7 @@ lp:
 
 .sub hash_in_pir
     .local pmc hash1
-    hash1 = new 'Hash'
+    hash1 = new ['Hash']
     hash1['X'] = 'U'
     .local string val1
     val1 = hash1['X']
@@ -1025,11 +1025,11 @@ lp:
 
 .sub setting_with_compound_keys
     .local pmc outer_hash
-    outer_hash = new 'Hash'
+    outer_hash = new ['Hash']
     .local pmc inner_hash
-    inner_hash = new 'Hash'
+    inner_hash = new ['Hash']
     .local pmc inner_array
-    inner_array = new 'ResizablePMCArray'
+    inner_array = new ['ResizablePMCArray']
     .local string elem_string
     .local int    elem_int
     .local pmc    elem_pmc
@@ -1073,7 +1073,7 @@ lp:
 
     # setting and retrieving a PMC in an inner ResizablePMCArray
     .local pmc in_pmc
-    in_pmc = new 'String'
+    in_pmc = new ['String']
     in_pmc = 'inner_array:132'
     inner_array[132] = in_pmc
     outer_hash['inner_array'] = inner_array
@@ -1116,7 +1116,7 @@ lp:
 .end
 
 .sub mutating_the_lookup_string
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $P0["a"], "one"
     set $P0["ab"], "two"
     set $P0["abc"], "three"
@@ -1136,7 +1136,7 @@ lp:
 
 .sub check_whether_interface_is_done
     .local pmc pmc1
-    pmc1 = new 'Hash'
+    pmc1 = new ['Hash']
     .local int bool1
 
     does bool1, pmc1, "scalar"
@@ -1152,7 +1152,7 @@ lp:
 .end
 
 .sub iter_over_hash
-    new $P0, 'Hash'
+    new $P0, ['Hash']
     set $P0['a'], 'x'
 
     iter $P1, $P0
@@ -1181,13 +1181,13 @@ lp:
   .local pmc thash
 
   # just put in some dummy data...
-  thash = new 'Hash'
+  thash = new ['Hash']
   thash["a"] = "b"
   thash["c"] = "d"
   thash["e"] = "f"
 
   .local pmc iter
-  iter = new 'Iterator', thash
+  iter = new ['Iterator'], thash
   iter = .ITERATE_FROM_START
 
   .local string key
@@ -1210,7 +1210,7 @@ preit_end:
   # what do we have after deletion?
   result = ""
 
-  iter = new 'Iterator', thash
+  iter = new ['Iterator'], thash
   iter = .ITERATE_FROM_START
 
   # go through the hash, print out all the keys... I believe it should be a and e?
@@ -1228,7 +1228,7 @@ postit_end:
 .end
 
 .sub unicode_keys_register_rt_39249
-  $P1 = new 'Hash'
+  $P1 = new ['Hash']
 
   $S99 = unicode:"\u7777"
   $P1[$S99] = "ok"
@@ -1237,7 +1237,7 @@ postit_end:
 .end
 
 .sub unicode_keys_literal_rt_39249
-  $P1 = new 'Hash'
+  $P1 = new ['Hash']
 
   $P1[unicode:"\u7777"] = "ok"
   $S1 = $P1[unicode:"\u7777"]

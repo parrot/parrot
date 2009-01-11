@@ -26,7 +26,7 @@ Tests the freeze/thaw archiving subsystem.
 END { unlink "temp.fpmc"; }
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer" );
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 777
     freeze S0, P1
 
@@ -42,7 +42,7 @@ Integer 777
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a String" );
-    new P1, 'String'
+    new P1, ['String']
     set P1, "foo"
     freeze S0, P1
 
@@ -58,7 +58,7 @@ String foo
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Float" );
-    new P1, 'Float'
+    new P1, ['Float']
     set P1, 3.14159
     freeze S0, P1
 
@@ -74,11 +74,11 @@ Float 3.14159
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 666
-    new P0, 'Hash'
+    new P0, ['Hash']
     set P0["k1"], P1
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 777
     set P0["k2"], P1
     freeze S0, P0
@@ -104,11 +104,11 @@ Hash 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Hash" );
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 666
-    new P0, 'Hash'
+    new P0, ['Hash']
     set P0["k1"], P1
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 777
     set P0["k2"], P1
     freeze S0, P0
@@ -134,9 +134,9 @@ Hash 2
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Integer with prop" );
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 666
-    new P2, 'Integer'
+    new P2, ['Integer']
     set P2, 42
     setprop P1, "answer", P2
     freeze S0, P1
@@ -158,14 +158,14 @@ Integer 666
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw Array w Integer with prop" );
-    new P0, 'ResizablePMCArray'
-    new P1, 'Integer'
+    new P0, ['ResizablePMCArray']
+    new P1, ['Integer']
     set P1, 666
     push P0, P1
-    new P2, 'Integer'
+    new P2, ['Integer']
     set P2, 777
     push P0, P2
-    new P3, 'Integer'
+    new P3, ['Integer']
     set P3, 42
     setprop P1, "answer", P3
 
@@ -209,10 +209,10 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw array w NULL pmc" );
-    new P0, 'ResizablePMCArray'
+    new P0, ['ResizablePMCArray']
     null P1
     push P0, P1
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 10
     push P0, P1
 
@@ -261,15 +261,15 @@ back
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
-    new P0, 'FixedPMCArray'
+    new P0, ['FixedPMCArray']
     set P0, 3
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 666
     set P0[0], P1
-    new P2, 'Integer'
+    new P2, ['Integer']
     set P2, 777
     set P0[1], P2
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 666
     set P0[2], P1
     freeze S0, P0
@@ -303,12 +303,12 @@ ok diff
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a FixedPMCArray" );
-    new P0, 'FixedPMCArray'
+    new P0, ['FixedPMCArray']
     set P0, 3
-    new P1, 'Integer'
+    new P1, ['Integer']
     set P1, 666
     set P0[0], P1
-    new P2, 'Integer'
+    new P2, ['Integer']
     set P2, 777
     set P0[1], P2
     set P0[2], P1
@@ -444,7 +444,7 @@ ok1:
 
     new P5, S10
     print "ok 3\n"
-    new P6, 'String'
+    new P6, ['String']
     set P6, "ok 5\n"
     setattribute P5, '.aa', P6
     print "ok 4\n"
@@ -483,10 +483,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
 
     new P5, S10
     print "ok 3\n"
-    new P6, 'String'
+    new P6, ['String']
     set P6, "ok 5\n"
     setattribute P5, ["Foo"], ".aa", P6
-    new P6, 'String'
+    new P6, ['String']
     set P6, "ok 6\n"
     setattribute P5, ["Foo"], ".bb", P6
     print "ok 4\n"
@@ -512,7 +512,7 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     newclass P10, "Foo"
     addattribute P10, ".aa"
     addattribute P10, ".bb"
-    new P10, "Foo"
+    new P10, ['Foo']
     print S10
     freeze S3, P10
     open P3, "temp.fpmc", 'w'
@@ -527,10 +527,10 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "thaw object w attr into same interpreter"
     print "\n"
 
     print "ok 3\n"
-    new P6, 'String'
+    new P6, ['String']
     set P6, "ok 5\n"
     setattribute P5, ["Foo"], ".aa", P6
-    new P6, 'String'
+    new P6, ['String']
     set P6, "ok 6\n"
     setattribute P5, ["Foo"], ".bb", P6
     print "ok 4\n"
@@ -568,10 +568,10 @@ ok1:
     print "\n"
 
     print "ok 3\n"
-    new P6, 'String'
+    new P6, ['String']
     set P6, "ok 5\n"
     setattribute P5, ["Foo"], ".aa", P6
-    new P6, 'String'
+    new P6, ['String']
     set P6, "ok 6\n"
     setattribute P5, ["Foo"], ".bb", P6
     print "ok 4\n"
@@ -590,17 +590,17 @@ ok 6
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "freeze Key" );
-    new P0, 'Hash'
-    new P1, 'FixedPMCArray'
+    new P0, ['Hash']
+    new P1, ['FixedPMCArray']
     set P1, 2
     set P1[1], P0
     set P0["foo"], "ok\n"
     set S0, P1[1; "foo"]
     print S0
 
-    new P3, 'Key'
+    new P3, ['Key']
     set P3, 1
-    new P4, 'Key'
+    new P4, ['Key']
     set P4, "foo"
     push P3, P4
 
@@ -627,7 +627,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a ResizableBooleanArray" );
 .sub test :main
     .local pmc original_arr, thawed_arr
     .local string frozen_arr
-    original_arr = new 'ResizableBooleanArray'
+    original_arr = new ['ResizableBooleanArray']
     set original_arr, 666
     original_arr[555] = 777
 
@@ -691,7 +691,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a ResizablePMCArray" );
 .sub test :main
     .local pmc original_arr, thawed_arr
     .local string frozen_arr
-    original_arr = new 'ResizablePMCArray'
+    original_arr = new ['ResizablePMCArray']
     original_arr[0] = 1
     original_arr[1] = 2.72
     original_arr[2] = "three.14"
@@ -757,7 +757,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Conure" );
     .local pmc cl, o
     cl = newclass 'Conure'
     addattribute cl, 'temperature'
-    o = new 'Conure'
+    o = new ['Conure']
     $S0 = freeze o
     $P1 = thaw $S0
     $P2 = getattribute $P1, 'temperature'
@@ -766,7 +766,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Conure" );
 
 .namespace ['Conure']
 .sub __init :method
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 37
     setattribute self, 'temperature', $P0
 .end
@@ -782,7 +782,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
     addattribute cl, '%!key'
     addattribute cl, '%!klen'
     addattribute cl, '&!ws'
-    o = new 'OPTable'
+    o = new ['OPTable']
     o."init"()
     o."test"()
     $S0 = freeze o
@@ -794,8 +794,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw obj of class w Hash attrs" );
 
 .sub "init" :method :vtable
     .local pmc keytable, klentable
-    keytable = new 'Hash'
-    klentable = new 'Hash'
+    keytable = new ['Hash']
+    klentable = new ['Hash']
     setattribute self, '%!key', keytable
     setattribute self, '%!klen', klentable
 .end

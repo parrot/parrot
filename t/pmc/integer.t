@@ -27,7 +27,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "basic math" );
 
 .sub _main
     .local pmc int_1
-    int_1 = new 'Integer'
+    int_1 = new ['Integer']
     print int_1
     print "\n"
     int_1 = 1
@@ -66,7 +66,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "truth and definedness" );
 
 .sub _main
     .local pmc int_1
-    int_1 = new 'Integer'
+    int_1 = new ['Integer']
 
     print "A newly created Integer is "
     if int_1 goto LABEL_1
@@ -113,7 +113,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "set_string_native" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Integer'
+    pmc1 = new ['Integer']
     pmc1 = "-123456789"
     print pmc1
     print "\n"
@@ -127,7 +127,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "isa" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Integer'
+    pmc1 = new ['Integer']
 
     .local int pmc1_is_a
     pmc1_is_a = isa pmc1, "Integer"
@@ -147,7 +147,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Integer'
+    pmc1 = new ['Integer']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -170,7 +170,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Comparison ops: ne" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Integer'
+    pmc1 = new ['Integer']
     .local int int1
     pmc1 = 10
     int1 = 20
@@ -196,7 +196,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Comparison ops: gt" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Integer'
+    pmc1 = new ['Integer']
     .local int int1
     pmc1 = 10
     int1 = 5
@@ -230,7 +230,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Comparison ops: ge" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Integer'
+    pmc1 = new ['Integer']
     .local int int1
     pmc1 = 10
     int1 = 5
@@ -262,7 +262,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Logical ops: istrue & isfalse" );
 
 .sub _main
     .local pmc pmc1
-    pmc1 = new 'Integer'
+    pmc1 = new ['Integer']
     .local int int1
     pmc1 = 10
     istrue int1, pmc1
@@ -289,7 +289,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "if/unless with Integer PMC" );
-      new P0, 'Integer'
+      new P0, ['Integer']
       set P0, 10
       if P0, OK1
       print "not "
@@ -315,11 +315,11 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUT', "add" );
-   new P0, 'Integer'
+   new P0, ['Integer']
    set P0, 5
-   new P1, 'Integer'
+   new P1, ['Integer']
    set P1, 10
-   new P2, 'Integer'
+   new P2, ['Integer']
    add P2, P0, P1
    set S0, P2
    print S0
@@ -338,8 +338,8 @@ OUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "<oper>" );
 .sub main :main
-    $P0 = new 'Integer'
-    $P1 = new 'Integer'
+    $P0 = new ['Integer']
+    $P1 = new ['Integer']
     set $P0, 6
     set $P1, 2
 
@@ -377,7 +377,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "can get_as_base()" );
 .sub main :main
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
     $I0 = can $P0, 'get_as_base'
     if $I0, OK
@@ -390,7 +390,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
 .sub main :main
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
 
     $S0 = $P0.'get_as_base'(1)
@@ -405,7 +405,7 @@ OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "get_as_base() bounds check" );
 .sub main :main
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
 
     $S0 = $P0.'get_as_base'(37)
@@ -420,7 +420,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_as_base(10)" );
 .sub main :main
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
 
     $S0 = $P0.'get_as_base'(10)
@@ -434,7 +434,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "get_as_base(various)" );
 .sub main :main
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
 
     $S0 = $P0.'get_as_base'(2)
@@ -495,9 +495,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'cmp functions for subclasses' );
 .sub main :main
     $P0 = subclass 'Integer', 'Int'
 
-    $P1 = new 'Int'
+    $P1 = new ['Int']
     $P1 = 1
-    $P2 = new 'Int'
+    $P2 = new ['Int']
     $P2 = 2
 
     $I0 = cmp $P1, $P2
@@ -515,7 +515,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'cmp for Integers more than 2^31 apart, RT #59336' );
 .sub 'main' :main
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 2147483600
 
   test_10:
