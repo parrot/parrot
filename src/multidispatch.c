@@ -297,7 +297,8 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_list args)
+Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC* obj),
+        ARGIN(const char *sig), va_list args)
 {
     ASSERT_ARGS(Parrot_build_sig_object_from_varargs)
     PMC         *type_tuple    = PMCNULL;
@@ -313,6 +314,7 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
 
     VTABLE_set_string_native(interp, call_object, string_sig);
 
+    /* Process the varargs list */
     for (i = 0; i < sig_len; ++i) {
         const INTVAL type = string_index(interp, string_sig, i);
 
@@ -382,8 +384,17 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN(const char *sig), va_l
         }
     }
 
+    /* Check if we have an invocant, and add it to the front of the arguments */
+    if (!PMC_IS_NULL(obj)) {
+        string_sig = string_concat(interp, CONST_STRING(interp, "Pi"), string_sig, 0);
+        VTABLE_set_string_native(interp, call_object, string_sig);
+        VTABLE_unshift_pmc(interp, call_object, obj);
+    }
+
+    /* Build a type_tuple for multiple dispatch */
     type_tuple = Parrot_mmd_build_type_tuple_from_sig_obj(interp, call_object);
     VTABLE_set_pmc(interp, call_object, type_tuple);
+
     return call_object;
 }
 
@@ -414,7 +425,7 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 
     va_list args;
     va_start(args, sig);
-    sig_object = Parrot_build_sig_object_from_varargs(interp, sig, args);
+    sig_object = Parrot_build_sig_object_from_varargs(interp, PMCNULL, sig, args);
     va_end(args);
 
     /* Check the cache. */
@@ -442,7 +453,7 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
             VTABLE_name(interp, sub));
 #endif
 
-    Parrot_pcc_invoke_sub_from_sig_object(interp, sub, sig_object);
+    Parrot_pcc_invoke_from_sig_object(interp, sub, sig_object);
 }
 
 
@@ -862,13 +873,22 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
                 break;
             case 'P':
             {
-                PMC *pmc_arg = VTABLE_get_pmc_keyed_int(interp, sig_obj, i);
-                if (PMC_IS_NULL(pmc_arg))
-                    VTABLE_set_integer_keyed_int(interp, type_tuple,
-                            i, enum_type_PMC);
-                else
-                    VTABLE_set_integer_keyed_int(interp, type_tuple, i,
-                            VTABLE_type(interp, pmc_arg));
+                INTVAL type_lookahead = string_index(interp, string_sig, (i + 1));
+                if (type_lookahead == 'i') {
+                    if (i != 0)
+                        Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_INVALID_OPERATION,
+                            "Multiple Dispatch: only the first argument can be an invocant");
+                }
+                else {
+                    PMC *pmc_arg = VTABLE_get_pmc_keyed_int(interp, sig_obj, i);
+                    if (PMC_IS_NULL(pmc_arg))
+                        VTABLE_set_integer_keyed_int(interp, type_tuple,
+                                i, enum_type_PMC);
+                    else
+                        VTABLE_set_integer_keyed_int(interp, type_tuple, i,
+                                VTABLE_type(interp, pmc_arg));
+                }
 
                 break;
             }

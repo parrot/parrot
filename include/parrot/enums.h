@@ -58,7 +58,8 @@ typedef enum {
     /* unused - 0x040 */
     PARROT_ARG_OPTIONAL         = 0x080, /* 128 */
     PARROT_ARG_OPT_FLAG         = 0x100, /* 256 prev optional was set */
-    PARROT_ARG_NAME             = 0x200 /* 512 this String is an arg name */
+    PARROT_ARG_NAME             = 0x200, /* 512 this String is an arg name */
+    PARROT_ARG_INVOCANT         = 0x400  /* 1024 this PMC is an invocant */
     /* more to come soon */
 
 } Call_bits_enum_t;
@@ -77,6 +78,7 @@ typedef enum {
 #define PARROT_ARG_OPTIONAL_ISSET(o)      ((o) & PARROT_ARG_OPTIONAL)
 #define PARROT_ARG_OPT_FLAG_ISSET(o)      ((o) & PARROT_ARG_OPT_FLAG)
 #define PARROT_ARG_NAME_ISSET(o)          ((o) & PARROT_ARG_NAME)
+#define PARROT_ARG_INVOCANT_ISSET(o)      ((o) & PARROT_ARG_INVOCANT)
 
 
 #endif /* PARROT_ENUMS_H_GUARD */

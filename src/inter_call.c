@@ -2130,13 +2130,23 @@ count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
                 break;
             case 'P':
                 arg_ret_cnt[seen_arrow]++;
-                max_regs[seen_arrow * 4 + REGNO_PMC]++;
+                {
+                    /* Lookahead to see if PMC is marked as invocant */
+                    if (*(++x) == 'i') {
+                        max_regs[REGNO_PMC]++;
+                    }
+                    else {
+                        x--; /* Undo lookahead */
+                        max_regs[seen_arrow * 4 + REGNO_PMC]++;
+                    }
+                }
                 break;
             case 'f':
             case 'n':
             case 's':
             case 'o':
             case 'p':
+            case 'i':
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
@@ -2165,8 +2175,8 @@ count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
 
 =item C<static void commit_last_arg_sig_object>
 
-Called by Parrot_pcc_invoke_sub_from_sig_object when it reaches the end of each
-arg in the arg signature.  See C<Parrot_pcc_invoke_sub_from_sig_object> for
+Called by Parrot_pcc_invoke_from_sig_object when it reaches the end of each
+arg in the arg signature.  See C<Parrot_pcc_invoke_from_sig_object> for
 signature syntax.
 
 =cut
@@ -2191,7 +2201,22 @@ commit_last_arg_sig_object(PARROT_INTERP, int index, int cur,
         case PARROT_ARG_STRING:
             reg_offset = n_regs_used[seen_arrow * 4 + REGNO_STR]++; break;
         case PARROT_ARG_PMC :
-            reg_offset = n_regs_used[seen_arrow * 4 + REGNO_PMC]++; break;
+            if (cur & PARROT_ARG_INVOCANT) {
+                if (seen_arrow == 0 && index == 0) {
+                    n_regs_used[REGNO_PMC]++;
+                    reg_offset = 0;
+                }
+                else {
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                            EXCEPTION_INVALID_OPERATION,
+                            "Parrot_pcc_invoke: Only the first parameter can be an invocant %d, %d",
+                            seen_arrow, index);
+                }
+            }
+            else {
+                reg_offset = n_regs_used[seen_arrow * 4 + REGNO_PMC]++;
+            }
+            break;
         default:
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Parrot_PCCINVOKE: invalid reg type");
@@ -2218,11 +2243,14 @@ commit_last_arg_sig_object(PARROT_INTERP, int index, int cur,
                 break;
             case PARROT_ARG_PMC:
                 CTX_REG_PMC(ctx, reg_offset) = VTABLE_get_pmc_keyed_int(interp, sig_obj, index);
+                if (cur & PARROT_ARG_INVOCANT) {
+                    interp->current_object = CTX_REG_PMC(ctx, reg_offset);
+                }
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
-                    "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type");
+                    "Parrot_pcc_invoke_from_sig_object: invalid reg type");
         }
     }
 }
@@ -2282,7 +2310,7 @@ set_context_sig_returns(PARROT_INTERP,
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type %c!", *x);
+                        "Parrot_pcc_invoke_from_sig_object: invalid reg type %c!", *x);
             }
 
             /* invalidate the CPointer's pointers so that GC doesn't try to
@@ -2365,7 +2393,7 @@ set_context_sig_returns_varargs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
 
 Sets the subroutine arguments in the C<ctx> context, according to the
 signature string C<signature>. Currently this function is only called
-from C<Parrot_pcc_invoke_sub_from_sig_object>, but eventually when
+from C<Parrot_pcc_invoke_from_sig_object>, but eventually when
 things are unified enough it should be called from C<Parrot_PCCINVOKE>
 as well. The only difference currently between the two implementations
 are the calls to C<commit_last_arg_sig_object> and C<commit_last_arg>.
@@ -2434,7 +2462,7 @@ set_context_sig_params(PARROT_INTERP, ARGIN(const char *signature),
                 default:
                   Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
-                    "Parrot_pcc_invoke_sub_from_sig_object: invalid reg type %c!", *x);
+                    "Parrot_pcc_invoke_from_sig_object: invalid reg type %c!", *x);
             }
 
         }
@@ -2446,10 +2474,11 @@ set_context_sig_params(PARROT_INTERP, ARGIN(const char *signature),
                 case 's': cur |= PARROT_ARG_SLURPY_ARRAY; break;
                 case 'o': cur |= PARROT_ARG_OPTIONAL;     break;
                 case 'p': cur |= PARROT_ARG_OPT_FLAG;     break;
+                case 'i': cur |= PARROT_ARG_INVOCANT;     break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "Parrot_pcc_invoke_sub_from_sig_object: invalid adverb type %c!", *x);
+                        "Parrot_pcc_invoke_from_sig_object: invalid adverb type %c!", *x);
             }
         }
     }
@@ -2486,10 +2515,10 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
     PMC *sig_obj;
     va_list args;
     va_start(args, sig);
-    sig_obj = Parrot_build_sig_object_from_varargs(interp, sig, args);
+    sig_obj = Parrot_build_sig_object_from_varargs(interp, PMCNULL, sig, args);
     va_end(args);
 
-    Parrot_pcc_invoke_sub_from_sig_object(interp, sub_obj, sig_obj);
+    Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
     dod_unregister_pmc(interp, sig_obj);
 }
 
@@ -2719,7 +2748,48 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
 
 /*
 
-=item C<void Parrot_pcc_invoke_sub_from_sig_object>
+=item C<void Parrot_pcc_invoke_method_from_c_args>
+
+Makes a method call given the name of the method and the arguments as a
+C variadic argument list. C<pmc> is the invocant, C<method_name> is the
+string name of the method, C<signature> is a C string describing the
+signature of the invocation, according to the Parrot calling
+conventions.  The variadic argument list contains the input arguments
+followed by the output results in the same order that they appear in the
+function signature.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
+        ARGMOD(STRING *method_name),
+        ARGIN(const char *signature), ...)
+{
+    PMC *sig_obj;
+    PMC *sub_obj;
+    va_list args;
+    va_start(args, signature);
+    sig_obj = Parrot_build_sig_object_from_varargs(interp, pmc, signature, args);
+    va_end(args);
+
+    /* Find the subroutine object as a named method on pmc */
+    sub_obj = VTABLE_find_method(interp, pmc, method_name);
+    if (PMC_IS_NULL(sub_obj))
+         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
+             "Method '%Ss' not found", method_name);
+
+    /* Invoke the subroutine object with the given CallSignature object */
+    Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
+    dod_unregister_pmc(interp, sig_obj);
+
+}
+
+/*
+
+=item C<void Parrot_pcc_invoke_from_sig_object>
 
 Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
 to invoke is passed as an argument rather than looked up by name, and the
@@ -2731,7 +2801,7 @@ signature string and call arguments are passed in a CallSignature PMC.
 
 PARROT_EXPORT
 void
-Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
+Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(PMC *sig_obj))
 {
     ASSERT_ARGS(Parrot_pcc_invoke_sub_from_sig_object)
@@ -2798,8 +2868,10 @@ Parrot_pcc_invoke_sub_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     /* Invoke the function */
     dest = VTABLE_invoke(interp, sub_obj, NULL);
 
-    /* PIR Subs need runops to run their opcodes. */
-    if (sub_obj->vtable->base_type == enum_class_Sub) {
+    /* PIR Subs need runops to run their opcodes. Methods and NCI subs
+     * don't. */
+    if (sub_obj->vtable->base_type == enum_class_Sub
+            && PMC_IS_NULL(interp->current_object)) {
         INTVAL old_core  = interp->run_core;
         opcode_t offset  = dest - interp->code->base.data;
 
