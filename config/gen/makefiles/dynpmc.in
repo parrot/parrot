@@ -24,7 +24,7 @@ PMCS = \
 #IF(has_crypto):  sha1 \
 #IF(has_crypto):  sha256 \
 #IF(has_crypto):  sha512 \
-  subproxy 
+  subproxy
 
 BUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 
@@ -46,7 +46,7 @@ all :
 	@$(BUILD) copy --destination=$(RUNTIME_DIR) $(PMCS)
 
 test : all
-	cd ../.. ; perl -Ilib t/harness t/dynpmc/*.t
+	cd ../.. && $(PERL) -Ilib t/harness t/dynpmc/*.t
 
 testclean :
 	$(RM_F) "../../t/dynpmc/*.pir" "../../t/dynpmc/*.pbc"

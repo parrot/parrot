@@ -1,10 +1,10 @@
 # $Id$
 
-PERL = @perl@
-RM_F = @rm_f@
-LOAD_EXT = @load_ext@
+PERL        = @perl@
+RM_F        = @rm_f@
+LOAD_EXT    = @load_ext@
 RUNTIME_DIR = @build_dir@/runtime/parrot/dynext
-O = @o@
+O           = @o@
 
 # add your dynamic op libraries here
 #
@@ -21,7 +21,7 @@ all :
 	@$(BUILD) copy --destination=$(RUNTIME_DIR) $(OPLIBS)
 
 test : all
-	 cd ../.. ; perl -Ilib t/harness t/dynoplibs/*.t
+	 cd ../.. && $(PERL) -Ilib t/harness t/dynoplibs/*.t
 
 testclean :
 	 $(RM_F) "../../t/dynoplibs/*.pir" "../../t/dynoplibs/*.pbc"

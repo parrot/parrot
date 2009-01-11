@@ -1,12 +1,12 @@
 # $Id$
 
 # Setup some commands
-LN_S     = @lns@
 PERL     = @perl@
 RM_F     = @rm_f@
-PARROT   = ../../parrot@exe@
-TOOL_DIR = ../..
 CP       = @cp@
+PARROT   = ../../parrot@exe@
+
+TOOL_DIR = ../..
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
@@ -14,7 +14,8 @@ PARROT_LIBRARY    = ../../runtime/parrot/library
 # the default target
 all: $(PARROT_LIBRARY)/PGE.pbc
 
-SOURCES = PGE.pir \
+SOURCES = \
+  PGE.pir \
   PGE/Exp.pir \
   PGE/Match.pir \
   PGE/Regex.pir \
@@ -55,21 +56,21 @@ help:
 	@echo ""
 
 test: all
-	cd $(TOOL_DIR); prove -r t/compilers/pge
+	cd $(TOOL_DIR) && prove -r t/compilers/pge
 
 testclean:
 	$(RM_F) "../../t/compilers/pge/*.pir" \
 	    "../../t/compilers/pge/p5regex/*.pir" \
-	    "../../t/compilers/pge/perl6regex/*.pir"
-	$(RM_F) "../../t/compilers/pge/*.pbc" \
+	    "../../t/compilers/pge/perl6regex/*.pir" \
+	    "../../t/compilers/pge/*.pbc" \
 	    "../../t/compilers/pge/p5regex/*.pbc" \
 	    "../../t/compilers/pge/perl6regex/*.pbc"
 
 clean: testclean
 	$(RM_F) \
-    PGE.pbc \
-    $(PARROT_LIBRARY)/PGE.pbc \
-    PGE/builtins_gen.pir
+	    PGE.pbc \
+	    $(PARROT_LIBRARY)/PGE.pbc \
+	    PGE/builtins_gen.pir
 
 realclean: clean
 	$(RM_F) Makefile
