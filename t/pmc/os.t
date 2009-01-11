@@ -39,7 +39,7 @@ END {
 my $cwd = File::Spec->canonpath(getcwd);
 pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
         $S1 = $P1."cwd"()
         print $S1
         print "\n"
@@ -56,7 +56,7 @@ chdir '..';
 
 pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
 
         $S1 = "src"
         $P1."chdir"($S1)
@@ -86,7 +86,7 @@ $xpto =~ s/src([\/\\]?)$/xpto$1/;
 
 pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
 
         $S1 = "xpto"
         $I1 = 0o555
@@ -116,7 +116,7 @@ mkdir "xpto" unless -d "xpto";
 
 pir_output_is( <<'CODE', <<'OUT', 'Test rm call in a directory' );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
 
         $S1 = "xpto"
         $P1."rm"($S1)
@@ -151,7 +151,7 @@ if ( $MSWin32 ) {
     $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
 
@@ -166,7 +166,7 @@ CODE
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
 
@@ -189,7 +189,7 @@ SKIP: {
     my $entries = join( ' ', @entries ) . "\n";
     pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
-    $P1 = new 'OS'
+    $P1 = new ['OS']
     $P2 = $P1.'readdir'('docs')
 
     $S0 = join ' ', $P2
@@ -205,7 +205,7 @@ SKIP: {
     close $FILE;
     pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
-    $P1 = new 'OS'
+    $P1 = new ['OS']
     $P1.'rename'('____some_test_file', '___some_other_file')
     $I0 = stat '___some_other_file', 0
     print $I0
@@ -232,7 +232,7 @@ SKIP: {
     $lstat = sprintf( "0x%08x\n" x 13, @s );
     pir_output_is( <<'CODE', $lstat, "Test OS.lstat" );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."lstat"($S1)
 
@@ -248,7 +248,7 @@ CODE
 # Test remove on a file
 pir_output_is( <<'CODE', <<"OUT", "Test rm call in a file" );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
 
         $S1 = "xpto"
         $P1."rm"($S1)
@@ -270,7 +270,7 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
 
         $S1 = "xpto"
         $S2 = "MANIFEST"
@@ -294,7 +294,7 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
-        $P1 = new 'OS'
+        $P1 = new ['OS']
 
         $S1 = "xpto"
         $S2 = "MANIFEST"

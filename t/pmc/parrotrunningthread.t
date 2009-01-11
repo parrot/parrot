@@ -21,7 +21,7 @@ Tests the ParrotRunningThread PMC.
 
     plan(2)
 
-    new $P0, 'ParrotRunningThread'
+    new $P0, ['ParrotRunningThread']
     ok(1, 'Instantiated .ParrotRunningThread')
 
     test_set_integer_native($P0)

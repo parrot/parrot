@@ -33,7 +33,7 @@ Tests the PMCProxy PMC.
 .end
 
 .sub new_tests
-    new $P0, 'PMCProxy'
+    new $P0, ['PMCProxy']
     ok(1, "new PMCProxy didn't explode")
     isa_ok($P0, "PMCProxy")
 .end
@@ -84,7 +84,7 @@ Tests the PMCProxy PMC.
 
 
 .sub add_pmcproxy_as_parent
-    $P0 = new 'Class'
+    $P0 = new ['Class']
     ok(1, 'created a PDD15 class')
 
     $P1 = get_class 'Hash'
@@ -99,7 +99,7 @@ Tests the PMCProxy PMC.
 
 
 .sub non_vtable_method_override
-    $P0 = new 'Class'
+    $P0 = new ['Class']
     ok(1, 'ok 1 - created a PDD15 class')
 
     $P1 = get_class 'Class'
@@ -118,7 +118,7 @@ Tests the PMCProxy PMC.
     $P2.'add_attribute'('foo')
     ok(1, 'called the add_attribute method of the PMC parent')
 
-    $P3 = new 'Role'
+    $P3 = new ['Role']
     $P2.'add_role'($P3)
     ok(1, 'done with method call overridding')
 .end
@@ -132,7 +132,7 @@ Tests the PMCProxy PMC.
 
 
 .sub vtable_method_override
-    $P0 = new 'Class'
+    $P0 = new ['Class']
     ok(1, 'created a PDD15 class')
 
     $P1 = get_class 'Class'
@@ -156,7 +156,7 @@ Tests the PMCProxy PMC.
     $I0 = elements $P3
     is($I0, 1, "the attribute was actually added")
 
-    $P3 = new 'Role'
+    $P3 = new ['Role']
     addrole $P2, $P3
     ok(1, 'done with vtable override test')
 .end
@@ -166,7 +166,7 @@ Tests the PMCProxy PMC.
 
 
 .sub self_calls_overridden_methods
-    $P0 = new 'Class'
+    $P0 = new ['Class']
     ok(1, 'created a PDD15 class')
 
     $P1 = get_class 'Class'
@@ -189,7 +189,7 @@ Tests the PMCProxy PMC.
 .end
 .sub always42 :method
     .param string what
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
     .return($P0)
 .end

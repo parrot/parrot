@@ -25,17 +25,17 @@ Tests the FileHandle PMC.
 # L<PDD22/I\/O PMC API/=item new>
 pir_output_is( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, 'FileHandle'
-    say "ok 1 - $P0 = new 'FileHandle'"
+    new $P0, ['FileHandle']
+    say "ok 1 - $P0 = new ['FileHandle']"
 .end
 CODE
-ok 1 - $P0 = new 'FileHandle'
+ok 1 - $P0 = new ['FileHandle']
 OUT
 
 # L<PDD22/I\/O PMC API/=item open.*=item close>
 pir_output_is( <<'CODE', <<'OUT', 'open and close - synchronous', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    $P0 = new ['FileHandle']
     $P0.open('README')
     say 'ok 1 - $P0.open($S1)'
 
@@ -89,7 +89,7 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
     $P1 = # RT #46831 create a callback here
-    $P0 = new 'FileHandle'
+    $P0 = new ['FileHandle']
 
     $P0.open('README')
     say 'ok 1 - $P0.open($S1)'
@@ -123,7 +123,7 @@ pir_output_is(
     .local pmc chomp
                chomp = get_global ['String';'Utils'], 'chomp'
 
-    $P0 = new 'FileHandle'
+    $P0 = new ['FileHandle']
     $P0.open('README')
 
     $S0 = $P0.read(14) # bytes
@@ -141,7 +141,7 @@ pir_output_is(
     $P0.print(123)
     $P0.print(456.789)
     $P0.print("squawk\n")
-    $P1 = new 'Integer'
+    $P1 = new ['Integer']
     $P1 = 42
     $P0.print($P1)
     say 'ok 3 - $P0.print(${I,N,S,P}1)'
@@ -177,7 +177,7 @@ OUT
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
 .sub 'test' :main
-    $P0 = new 'FileHandle'
+    $P0 = new ['FileHandle']
 
     $S0 = $P0.record_separator()
     if $S0 == "\n" goto ok_1
@@ -215,7 +215,7 @@ pir_output_is( <<'CODE', <<'OUT', 'buffer_type', todo => 'not yet implemented' )
 .sub 'test' :main
     .include 'io_buffer_types.pasm'
 
-    $P0 = new 'FileHandle'
+    $P0 = new ['FileHandle']
 
     $P0.buffer_type('unbuffered')
     $I0 = $P0.buffer_type()

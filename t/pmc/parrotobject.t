@@ -25,7 +25,7 @@ Tests the Object PMC.
 
 pir_error_output_like( <<'CODE', <<'OUT', 'new' );
 .sub 'test' :main
-    new $P0, 'Object'
+    new $P0, ['Object']
     print "ok 1\n"
 .end
 CODE
@@ -138,11 +138,11 @@ pir_output_is( <<'CODE', <<'OUT', ':vtable inheritance from core classes' );
     $P0 = subclass 'Hash', 'Foo'
     $P0 = subclass 'Hash', 'Bar'
 
-    $P1 = new 'Foo'
+    $P1 = new ['Foo']
     $S1 = $P1
     say $S1
 
-    $P1 = new 'Bar'
+    $P1 = new ['Bar']
     $S1 = $P1
     say $S1
 .end
@@ -169,9 +169,9 @@ OUT
 pir_output_is(
     <<'CODE', <<'OUT', 'assign opcode in inherited classes' );
 .sub main :main
-    $P1 = new 'ResizablePMCArray'
+    $P1 = new ['ResizablePMCArray']
     push $P1, 3
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new ['ResizablePMCArray']
     assign $P2, $P1
     $I0 = elements $P2
     print $I0
@@ -201,7 +201,7 @@ say "you invoked me!"
 
 .sub main :main
 $P0 = newclass "Foo"
-$P1 = new "Foo"
+$P1 = new ['Foo']
 $P1()
 say "got here"
 .end
@@ -223,7 +223,7 @@ pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 
 .sub main :main
   $P0 = newclass "Foo"
-  $P1 = new "Foo"
+  $P1 = new ['Foo']
   $I0 = $P1(2)
   print $I0
   print "\n"
@@ -243,7 +243,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'RT #41732' );
 
 .sub main :main
     $P0 = newclass "Foo"
-    $P1 = new "Foo"
+    $P1 = new ['Foo']
     $P1()
 .end
 CODE

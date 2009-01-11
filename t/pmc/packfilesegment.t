@@ -33,7 +33,7 @@ my $get_uuid_pbc = <<'EOF';
     .include "stat.pasm"
     .include "interpinfo.pasm"
     .local pmc pf, pio
-    pf   = new 'Packfile'
+    pf   = new ['Packfile']
     $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
     $S0 .= "/runtime/parrot/library/uuid.pbc"
     $I0  = stat $S0, .STAT_FILESIZE

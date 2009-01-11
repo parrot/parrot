@@ -15,9 +15,9 @@
     # set a test plan
     plan(NUM_OF_TESTS)
 
-    new $P0, 'Pair'
+    new $P0, ['Pair']
     ok(1, "still alive")
-    new $P1, 'Integer'
+    new $P1, ['Integer']
     set $P1, 42
     set $P0["key"], $P1
     ok(1, "still alive")
@@ -25,8 +25,8 @@
     is($P2, 42, "fetching value")
 
     .local pmc p, kv
-    new p, 'Pair'
-    new $P1, 'Integer'
+    new p, ['Pair']
+    new $P1, ['Integer']
     set $P1, 42
     set p["key"], $P1
 
@@ -50,9 +50,9 @@ SKIP: {
     pir_output_is( <<'CODE', <<'OUT', 'instantiate, assign' );
 .sub main :main
     .local pmc cl, p, kv, k, v
-    k = new 'String'
+    k = new ['String']
     k = "key"
-    v = new 'String'
+    v = new ['String']
     v = "value"
     cl = get_class "Pair"
     p = cl."instantiate"(k, v)
@@ -64,7 +64,7 @@ SKIP: {
     print $P0
     print ' '
 
-    v = new 'Integer'
+    v = new ['Integer']
     v = 77
     assign p, v
     $P0 = p."value"()

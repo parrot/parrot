@@ -25,7 +25,7 @@ Tests the ParrotInterpreter PMC.
 
 pir_output_is( <<'CODE', <<'OUT', 'create new interpreter' );
 .sub 'test' :main
-    new $P0, 'ParrotInterpreter'
+    new $P0, ['ParrotInterpreter']
     print "ok 1\n"
 .end
 CODE
@@ -43,7 +43,7 @@ PIR
     $P0 = compreg "PIR"
     $P1 = $P0($S0)
     # Invoke in different interpreter.
-    $P2 = new 'ParrotInterpreter'
+    $P2 = new ['ParrotInterpreter']
     runinterp $P2, $P1
     print "survived\n"
 .end
@@ -59,7 +59,7 @@ pir_output_is( <<'CODE', <<'OUT', 'running passed code pmc in another interprete
      say "help, i'm stuck inside an interpreter!"
  .end
 PIR
-     $P0 = new 'ParrotInterpreter'
+     $P0 = new ['ParrotInterpreter']
      $P1 = compreg 'PIR'
      $P2 = $P1($S0)
      runinterp $P0, $P2
@@ -79,10 +79,10 @@ pir_output_is( <<'CODE', <<'OUT', 'accessing PMCs from nested interp' );
     $P0 = 'Accessing globals from other interpreters.'
  .end
 PIR
-     $P3 = new 'String'
+     $P3 = new ['String']
      set_global 'some_string', $P3
 
-     $P0 = new 'ParrotInterpreter'
+     $P0 = new ['ParrotInterpreter']
      $P1 = compreg 'PIR'
      $P2 = $P1($S0)
      runinterp $P0, $P2

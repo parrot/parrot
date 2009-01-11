@@ -30,7 +30,7 @@ Tests the PackfileDirectory PMC.
 pir_output_is( <<'CODE', <<'OUT', 'get_directory' );
 .sub 'test' :main
     .local pmc pf
-    pf = new 'Packfile'
+    pf = new ['Packfile']
     $P1 = pf.'get_directory'()
     $S0 = typeof $P1
     say $S0
@@ -48,7 +48,7 @@ my $get_uuid_pbc = <<'EOF';
     .include "stat.pasm"
     .include "interpinfo.pasm"
     .local pmc pf, pio
-    pf   = new 'Packfile'
+    pf   = new ['Packfile']
     $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
     $S0 .= "/runtime/parrot/library/uuid.pbc"
     $I0  = stat $S0, .STAT_FILESIZE
