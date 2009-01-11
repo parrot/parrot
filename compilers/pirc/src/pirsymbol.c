@@ -290,7 +290,7 @@ check_unused_symbols(NOTNULL(lexer_state * const lexer)) {
     if (lexer->subs == NULL)
         return;
 
-    lexer->subs->next; /* start at first sub. */
+    subiter = lexer->subs->next; /* start at first sub. */
     puts("");
 
     do {

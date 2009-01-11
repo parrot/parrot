@@ -557,20 +557,16 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
     expression *operand;
     int         index;
 
-    fprintf(stderr, "emit pbc key\n");
-
     /* create an array of opcode_t for storing the bytecode
      * representation of the key. Initialize the cursor (pc)
      * to write into this buffer.
      */
-    pc = key = (opcode_t *)pir_mem_allocate(lexer, k->keylength * sizeof (opcode_t) * 2);
+    pc = key = (opcode_t *)pir_mem_allocate(lexer, k->keylength * sizeof (opcode_t) * 4);
 
     /* store key length in slot 0 */
     *pc++ = k->keylength;
 
-
     while (iter) {
-
         switch (iter->expr->type) {
             case EXPR_CONSTANT: {
                 constant *c = iter->expr->expr.c;
@@ -582,6 +578,11 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
                     case STRING_VAL:
                         *pc++ = PARROT_ARG_SC;
                         *pc++ = add_string_const(lexer->bc, c->val.sval, "ascii");
+                        break;
+                    case USTRING_VAL:
+                        *pc++ = PARROT_ARG_SC;
+                        *pc++ = add_string_const(lexer->bc, c->val.ustr->contents,
+                                                            c->val.ustr->charset);
                         break;
                     default:
                         panic(lexer, "wrong type of key");
@@ -618,28 +619,20 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
 
         }
 
-        /* count the number of keys*/
+        /* count the number of keys XXX  no longer necessary. keep for now. sanity check? */
         ++keylength;
         iter = iter->next;
     }
-
-/*
-    fprintf(stderr, "keylength is: %d, found keylength is: %d\n", k->keylength, keylength);
-    assert(keylength == k->keylength);
-*/
 
     /* calculate size of key in bytecode; each field has 2 INTVALs:
      * flags/types and the register/constant index.
      */
     keysize = pc - key;
 
-    fprintf(stderr, "key=[");
-    for (index = 0; index < keysize; index++) {
-        fprintf(stderr, "%d|", key[index]);
-    }
     index = store_key_bytecode(lexer->bc, key);
 
-    fprintf(stderr, "store_key_bytecode index=%d\n", index);
+    emit_int_arg(lexer->bc, index);
+
     return index;
 
 }
@@ -653,7 +646,7 @@ emit_pbc_target_arg(lexer_state * const lexer, target * const t)>
 Emit the assigned register of target C<t>. The assigned register is
 stored in the C<color> field, of either the C<pir_reg> or C<symbol>
 structure, depending on whether C<t> is a register or a symbol,
-respectively.
+respectively. If C<t> has a key, the key is emitted as well.
 
 =cut
 
@@ -662,14 +655,9 @@ static void
 emit_pbc_target_arg(lexer_state * const lexer, target * const t) {
     emit_int_arg(lexer->bc, t->info->color);
 
+    /* if t has a key, emit that as well */
     if (t->key) {
-
-        /* XXX should do emit_pbc_key... always? */
-        /*emit_pbc_key(lexer, t->key);
-        */
-        /* this works for integers: */
-        emit_pbc_expr(lexer, t->key->head->expr);
-
+        emit_pbc_key(lexer, t->key);
     }
 }
 
@@ -693,10 +681,6 @@ emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
             break;
         case EXPR_TARGET:
             emit_pbc_target_arg(lexer, operand->expr.t);
-
-            if (operand->expr.t->key)
-                emit_pbc_key(lexer, operand->expr.t->key);
-
             break;
         case EXPR_LABEL:
             emit_pbc_label_arg(lexer, operand->expr.l);
@@ -798,7 +782,8 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
 =item C<static void
 emit_pbc_instr(lexer_state * const lexer, instruction * const instr)>
 
-Emit PBC for one instruction.
+Emit PBC for one instruction. If the C<opinfo> attribute of C<instr>
+is NULL, the function does nothing and returns.
 
 =cut
 
@@ -809,8 +794,6 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
     expression *operand;
     opcode_t offset;
 
-    /* emit the opcode */
-
     if (instr->opinfo == NULL)
         return;
 
@@ -820,7 +803,7 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
      */
     optimize_instr(lexer, instr);
 
-
+    /* emit the opcode */
     offset = emit_opcode(lexer->bc, instr->opcode);
 
     /* the offset at which the instruction is written must be equal
@@ -883,7 +866,7 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
     }
     while (iter != sub->statements->next);
 
-
+    /* run :immediate subs */
     if (TEST_FLAG(sub->flags, PIRC_SUB_FLAG_IMMEDIATE)) {
         PackFile_fixup_subs(lexer->interp, PBC_IMMEDIATE, NULL);
     }
@@ -895,7 +878,9 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
 =item C<static void
 emit_pbc_annotations(lexer_state * const lexer)>
 
-Emit all annotations into the PackFile.
+Emit all annotations into the PackFile. First a new annotations
+segment is created. Then, for each annotation, its value is stored
+in the constants table.
 
 =cut
 

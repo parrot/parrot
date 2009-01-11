@@ -172,12 +172,32 @@ XXX what to do with "encoding"?
 */
 int
 add_string_const(bytecode * const bc, char const * const str, char const * charset) {
-    int                index    = new_pbc_const(bc);
-    PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
+    STRING *parrotstr = string_make(bc->interp, str, strlen(str), charset, PObj_constant_FLAG);
+    int index         = 0;
+    int count         = bc->interp->code->const_table->const_count;
+    PackFile_Constant *constant;
+
+    /* check whether the string is already stored; if so, return that index */
+    while (index < count) {
+        constant = bc->interp->code->const_table->constants[index];
+        if (constant->type == PFC_STRING) {
+            if (string_compare(bc->interp, constant->u.string, parrotstr) == 0)
+                return index;
+        }
+        index++;
+    }
+
+    /* it wasn't stored yet, store it now, and return the index */
+    index    = new_pbc_const(bc);
+    constant = bc->interp->code->const_table->constants[index];
 
     constant->type     = PFC_STRING;
-    constant->u.string = string_make(bc->interp, str, strlen(str), charset, PObj_constant_FLAG);
+    constant->u.string = parrotstr;
+    /*
+    fprintf(stderr, "add_string_const (%s) at index: %d\n", str, index);
+    */
     return index;
+
 }
 
 
@@ -457,7 +477,7 @@ PARROT_IGNORABLE_RESULT
 opcode_t
 emit_opcode(bytecode * const bc, opcode_t op) {
     *bc->opcursor = op;
-    fprintf(stderr, "[%d]", op);
+    fprintf(stderr, "\n[%d]", op);
     return (bc->opcursor++ - bc->interp->code->base.data);
 
 }
