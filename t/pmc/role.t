@@ -19,12 +19,12 @@ Tests the Role PMC.
 # L<PDD15/Role PMC API>
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(5)
 
 
-    $P0 = new 'Role'
+    $P0 = new ['Role']
     ok(1, 'Role type exists') # or we've already died.
 
 
@@ -32,9 +32,9 @@ Tests the Role PMC.
     is($I0, 1, 'isa Role')
 
 
-    $P0 = new 'Hash'
+    $P0 = new ['Hash']
     $P0['name'] = 'Wob'
-    $P1 = new 'Role', $P0
+    $P1 = new ['Role'], $P0
     ok(1, 'Created a Role initialized with a Hash')
 
     $P2 = $P1.'inspect'('name')

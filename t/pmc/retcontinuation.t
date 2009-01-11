@@ -17,12 +17,12 @@ Tests the RetContinuation PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new $P0, 'RetContinuation'
-    ok(1, 'Instantiated .RetContinuation')
+    new $P0, ['RetContinuation']
+    ok(1, 'Instantiated a RetContinuation PMC')
 .end
 
 # Local Variables:

@@ -95,7 +95,7 @@ out-of-bounds test. Checks INT and PMC keys.
 #
 .sub 'size/resize'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     $I0 = array
     $I1 = elements array
@@ -147,8 +147,8 @@ still_ok:
 #
 .sub 'set_pmc_keyed'
     .local pmc array, elem
-    array = new 'ResizableStringArray'
-    elem  = new 'Integer'
+    array = new ['ResizableStringArray']
+    elem  = new ['Integer']
 
     array = 1
 
@@ -218,7 +218,7 @@ done:
 #
 .sub 'get_pmc_keyed'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
     array = 1
     array[0] = "first"
     array[1] = "second"
@@ -289,7 +289,7 @@ done:
 .sub 'set_string_keyed'
     .local pmc    array
     .local string elem
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 1
 
@@ -359,7 +359,7 @@ done:
 #
 .sub 'get_string_keyed'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
     array = 1
     array[0] = "first"
     array[1] = "second"
@@ -415,7 +415,7 @@ done:
 .sub 'set_integer_keyed'
     .local pmc array
     .local int elem
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 1
 
@@ -485,7 +485,7 @@ done:
 #
 .sub 'get_integer_keyed'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
     array = 1
     array[0] = "1"
     array[1] = "2"
@@ -541,7 +541,7 @@ done:
 .sub 'set_number_keyed'
     .local pmc   array
     .local num elem
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 1
 
@@ -611,7 +611,7 @@ done:
 #
 .sub 'get_number_keyed'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
     array = 1
     array[0] = "1.1"
     array[1] = "2.2"
@@ -666,10 +666,10 @@ done:
 #
 .sub 'push_pmc'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "one"
     push array, $P0
     $I0 = elements array
@@ -677,7 +677,7 @@ done:
     is($I0, 1,     "push_pmc - elements")
     is($S0, "one", "push_pmc - value")
 
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "two"
     push array, $P0
     $I0 = elements array
@@ -699,7 +699,7 @@ done:
 #
 .sub 'push_string'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     push array, "one"
@@ -728,7 +728,7 @@ done:
 #
 .sub 'push_integer'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     push array, 1
@@ -757,7 +757,7 @@ done:
 #
 .sub 'push_float'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     push array, 1.1
@@ -782,7 +782,7 @@ done:
 
 .sub 'pop_pmc'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "foo"
     $P0 = pop array
@@ -807,7 +807,7 @@ exception:
 
 .sub 'pop_string'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "foo"
     $S0 = pop array
@@ -829,7 +829,7 @@ exception:
 
 .sub 'pop_integer'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "2"
     $I1 = pop array
@@ -851,7 +851,7 @@ exception:
 
 .sub 'pop_float'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "2.2"
     $N0 = pop array
@@ -873,7 +873,7 @@ exception:
 
 .sub 'shift_pmc'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "foo"
     array[1] = "bar"
@@ -899,7 +899,7 @@ exception:
 
 .sub 'shift_string'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "foo"
     array[1] = "bar"
@@ -922,7 +922,7 @@ exception:
 
 .sub 'shift_integer'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "2"
     array[1] = "3"
@@ -945,7 +945,7 @@ exception:
 
 .sub 'shift_float'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "2.2"
     array[1] = "3.3"
@@ -971,10 +971,10 @@ exception:
 #
 .sub 'unshift_pmc'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "one"
     unshift array, $P0
     $I0 = elements array
@@ -982,7 +982,7 @@ exception:
     is($I0, 1,     "unshift_pmc - elements")
     is($S0, "one", "unshift_pmc - value")
 
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "two"
     unshift array, $P0
     $I0 = elements array
@@ -1004,7 +1004,7 @@ exception:
 #
 .sub 'unshift_string'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     unshift array, "one"
@@ -1033,7 +1033,7 @@ exception:
 #
 .sub 'unshift_integer'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     # unshift_string
     array = 0
@@ -1063,7 +1063,7 @@ exception:
 #
 .sub 'unshift_float'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     unshift array, 1.1
@@ -1091,7 +1091,7 @@ exception:
 #
 .sub 'clone'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
     array = 3
     array[0] = 1
     array[1] = 3.2
@@ -1111,7 +1111,7 @@ exception:
 
 .sub 'get_string'
     .local pmc array
-    array = new 'ResizablePMCArray'
+    array = new ['ResizablePMCArray']
     array[0] = "foo"
     array[1] = "bar"
     array[2] = "baz"
@@ -1122,7 +1122,7 @@ exception:
 
 .sub 'does'
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     $I0 = does array, 'array'
     is($I0, 1, "does array")
@@ -1137,7 +1137,7 @@ exception:
 #
 .sub sparse
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     $I10 = 110000
     $I0  = 1
@@ -1219,24 +1219,24 @@ err_2:
 
 
 .sub 'splice'
-    $P1 = new 'ResizableStringArray'
+    $P1 = new ['ResizableStringArray']
     $P1 = 3
     $P1[0] = '1'
     $P1[1] = '2'
     $P1[2] = '3'
-    $P2 = new 'ResizableStringArray'
+    $P2 = new ['ResizableStringArray']
     $P2 = 1
     $P2[0] = 'A'
     splice $P1, $P2, 0, 2
     $S0 = join "", $P1
     is($S0, "A3", "splice replace")
 
-    $P1 = new 'ResizableStringArray'
+    $P1 = new ['ResizableStringArray']
     $P1 = 3
     $P1[0] = '1'
     $P1[1] = '2'
     $P1[2] = '3'
-    $P2 = new 'ResizableStringArray'
+    $P2 = new ['ResizableStringArray']
     $P2 = 1
     $P2[0] = 'A'
     splice $P1, $P2, 1, 2
@@ -1244,13 +1244,13 @@ err_2:
     is($S0, "1A", "splice replace")
 
 .macro SpliceMadeEasy(code, out, testing)
-    $P1 = new 'ResizableStringArray'
+    $P1 = new ['ResizableStringArray']
     $P1[0] = "1"
     $P1[1] = "2"
     $P1[2] = "3"
     $P1[3] = "4"
     $P1[4] = "5"
-    $P2 = new 'ResizableStringArray'
+    $P2 = new ['ResizableStringArray']
     $P2[0] = 'A'
     $P2[1] = 'B'
     $P2[2] = 'C'
@@ -1269,22 +1269,22 @@ err_2:
     .SpliceMadeEasy({ splice $P1, $P2, 2, 2 }, "12ABCDE5", "splice, replace in middle")
     .SpliceMadeEasy({ splice $P1, $P2, 3, 2 }, "123ABCDE", "splice, replace at end")
     .SpliceMadeEasy({
-        $P2 = new 'ResizableStringArray'
+        $P2 = new ['ResizableStringArray']
         splice $P1, $P2, 2, 2
     }, "125", "splice, empty replacement")
     .SpliceMadeEasy({
-        $P2 = new 'ResizableStringArray'
+        $P2 = new ['ResizableStringArray']
         $P2[0] = "A"
         splice $P1, $P2, 2, 1
     }, "12A45", "splice, equal size replacement")
 
-    $P1 = new 'ResizableStringArray'
+    $P1 = new ['ResizableStringArray']
     $P1[0] = "1"
     $P1[1] = "2"
     $P1[2] = "3"
     $P1[3] = "4"
     $P1[4] = "5"
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new ['ResizablePMCArray']
     $P2[0] = 'A'
     $P2[1] = 'B'
     $P2[2] = 'C'
@@ -1310,10 +1310,10 @@ still_ok:
 #
 .sub method_push_pmc
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "one"
     array.'push'($P0)
     $I0 = elements array
@@ -1321,7 +1321,7 @@ still_ok:
     is($I0, 1,     "method_push_pmc - elements")
     is($S0, "one", "method_push_pmc - value")
 
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "two"
     array.'push'($P0)
     $I0 = elements array
@@ -1343,7 +1343,7 @@ still_ok:
 #
 .sub method_push_string
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     array.'push'("one")
@@ -1372,7 +1372,7 @@ still_ok:
 #
 .sub method_push_integer
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     array.'push'(1)
@@ -1401,7 +1401,7 @@ still_ok:
 #
 .sub method_push_float
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     array.'push'(1.1)
@@ -1427,7 +1427,7 @@ still_ok:
 
 .sub method_pop_pmc
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "foo"
     $P0 = array.'pop'()
@@ -1452,7 +1452,7 @@ exception:
 
 .sub method_pop_string
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "foo"
     $S0 = array.'pop'()
@@ -1474,7 +1474,7 @@ exception:
 
 .sub method_pop_integer
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "2"
     $I1 = array.'pop'()
@@ -1496,7 +1496,7 @@ exception:
 
 .sub method_pop_float
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[1] = "2.2"
     $N0 = array.'pop'()
@@ -1518,7 +1518,7 @@ exception:
 
 .sub method_shift_pmc
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "foo"
     array[1] = "bar"
@@ -1544,7 +1544,7 @@ exception:
 
 .sub method_shift_string
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "foo"
     array[1] = "bar"
@@ -1567,7 +1567,7 @@ exception:
 
 .sub method_shift_integer
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "2"
     array[1] = "3"
@@ -1590,7 +1590,7 @@ exception:
 
 .sub method_shift_float
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array[0] = "2.2"
     array[1] = "3.3"
@@ -1613,10 +1613,10 @@ exception:
 
 .sub method_unshift_pmc
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "one"
     array.'unshift'($P0)
     $I0 = elements array
@@ -1624,7 +1624,7 @@ exception:
     is($I0, 1,     "method_unshift_pmc - elements")
     is($S0, "one", "method_unshift_pmc - value")
 
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "two"
     array.'unshift'($P0)
     $I0 = elements array
@@ -1646,7 +1646,7 @@ exception:
 #
 .sub method_unshift_string
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     array.'unshift'("one")
@@ -1675,7 +1675,7 @@ exception:
 #
 .sub method_unshift_integer
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     array.'unshift'(1)
@@ -1704,7 +1704,7 @@ exception:
 #
 .sub method_unshift_float
     .local pmc array
-    array = new 'ResizableStringArray'
+    array = new ['ResizableStringArray']
 
     array = 0
     array.'unshift'(1.1)

@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, 'ResizableIntegerArray'
+    new P0, ['ResizableIntegerArray']
 
     set I0,P0
     eq I0,0,OK_1
@@ -65,7 +65,7 @@ ok 5
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, 'ResizableIntegerArray'
+    new P0, ['ResizableIntegerArray']
     set P0, 1
 
     set P0[0],-7
@@ -94,7 +94,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, 'ResizableIntegerArray'
+    new P0, ['ResizableIntegerArray']
 
     set P0[1], -7
     set I0, P0[1]
@@ -122,7 +122,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
-    new P0, 'ResizableIntegerArray'
+    new P0, ['ResizableIntegerArray']
     set P0, 1
 
     push_eh eh
@@ -138,7 +138,7 @@ got an ex
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
-    new P0, 'ResizableIntegerArray'
+    new P0, ['ResizableIntegerArray']
     set P0, 1
 
     push_eh eh
@@ -154,7 +154,7 @@ got an ex
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, 'ResizableIntegerArray'
+    new P0, ['ResizableIntegerArray']
     set P0, 1
 
     set P0[1], -7
@@ -166,7 +166,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, 'ResizableIntegerArray'
+    new P0, ['ResizableIntegerArray']
     set P0, 1
 
     set I0, P0[1]
@@ -178,8 +178,8 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
      .include 'include/fp_equality.pasm'
-     new P0, 'ResizableIntegerArray'
-     new P1, 'Key'
+     new P0, ['ResizableIntegerArray']
+     new P1, ['Key']
 
      set P1, 0
      set P0[P1], 25
@@ -214,17 +214,17 @@ OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
      .include 'include/fp_equality.pasm'
-     new P0, 'ResizableIntegerArray'
+     new P0, ['ResizableIntegerArray']
      set P0, 1
 
      set P0[25], 125
      set P0[128], 10.2
      set P0[513], "17"
-     new P1, 'Integer'
+     new P1, ['Integer']
      set P1, 123456
      set P0[1023], P1
 
-     new P2, 'Key'
+     new P2, ['Key']
      set P2, 25
      set I0, P0[P2]
      eq I0, 125, OK1
@@ -262,7 +262,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
 
 .sub test :main
     .local pmc pmc1
-    pmc1 = new 'ResizableIntegerArray'
+    pmc1 = new ['ResizableIntegerArray']
     .local int bool1
     does bool1, pmc1, "scalar"
     print bool1
@@ -285,7 +285,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "push integer" );
 
 .sub test :main
     .local pmc pmc1
-    pmc1 = new 'ResizableIntegerArray'
+    pmc1 = new ['ResizableIntegerArray']
     pmc1[9999] = 0
     push pmc1, 10001
     .local int elements
@@ -304,7 +304,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'basic pop' );
-     new P0, 'ResizableIntegerArray'
+     new P0, ['ResizableIntegerArray']
      set P0[0], 4
      set P0[1], 8
      set P0[2], 16
@@ -333,7 +333,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'pop many values' );
-     new P0, 'ResizableIntegerArray'
+     new P0, ['ResizableIntegerArray']
      set I0, 0
 L1:  set P0[I0], I0
      inc I0
@@ -358,7 +358,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'push/pop' );
-     new P0, 'ResizableIntegerArray'
+     new P0, ['ResizableIntegerArray']
      push P0, 2
      push P0, 4
      push P0, 6
@@ -372,7 +372,7 @@ ok 1
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', 'pop from empty array' );
-     new P0, 'ResizableIntegerArray'
+     new P0, ['ResizableIntegerArray']
      pop I0, P0
      end
 CODE
@@ -383,7 +383,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "shift integer" );
 .sub test :main
     .local pmc ar
-    ar = new 'ResizableIntegerArray'
+    ar = new ['ResizableIntegerArray']
     ar[0] = 10
     ar[1] = 20
     $I0 = elements ar
@@ -408,7 +408,7 @@ OUTPUT
 pir_output_is( << 'CODE', << 'OUTPUT', "unshift integer" );
 .sub test :main
     .local pmc ar
-    ar = new 'ResizableIntegerArray'
+    ar = new ['ResizableIntegerArray']
     unshift ar, 10
     unshift ar, 20
     $I0 = elements ar

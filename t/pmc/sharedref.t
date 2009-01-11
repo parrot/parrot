@@ -17,12 +17,12 @@ Tests the SharedRef PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(1)
 
-    new $P0, 'SharedRef'
-    ok(1, 'Instantiated SharedRef PMC')
+    new $P0, ['SharedRef']
+    ok(1, 'Instantiated a SharedRef PMC')
 .end
 
 # Local Variables:

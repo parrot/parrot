@@ -17,12 +17,12 @@ Tests random number generation
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(2)
 
-    new $P0, 'Random'
-    ok(1, 'Instantiated .Random')
+    new $P0, ['Random']
+    ok(1, 'Instantiated Random PMC')
     set $I0, $P0
     ok(1, 'Got (unknown) random int')
 .end

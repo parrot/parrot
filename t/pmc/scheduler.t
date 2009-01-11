@@ -18,7 +18,7 @@ Tests the concurrency scheduler PMC.
 
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     plan(6)
 
     create_and_set_attributes()
@@ -27,8 +27,8 @@ Tests the concurrency scheduler PMC.
 .end
 
 .sub create_and_set_attributes
-    $P0 = new "Scheduler"
-    $P1 = new "Task"
+    $P0 = new ['Scheduler']
+    $P1 = new ['Task']
 
     push $P0, $P1
 
@@ -50,15 +50,15 @@ got_task:
 
 .sub create_concurrent_scheduler_with_init
     .local pmc data
-    data       = new 'Hash'
+    data       = new ['Hash']
 
     .local pmc id
-    id         = new 'Integer'
+    id         = new ['Integer']
     id         = 128
     data['id'] = id
 
-    $P0 = new 'Scheduler', data
-    $P1 = new 'Task'
+    $P0 = new ['Scheduler'], data
+    $P1 = new ['Task']
 
     push $P0, $P1
 
@@ -77,7 +77,7 @@ got_task:
     ok(1, "got a task")
 
     push_eh bad_initializer
-      $P0 = new 'Scheduler', id
+      $P0 = new ['Scheduler'], id
     pop_eh
 
     ok(0, "No exception on invalid initializer?  Uh oh!")
@@ -91,18 +91,18 @@ bad_initializer:
 .sub add_event_and_handler_to_scheduler
     .local pmc handler, handler_init, handler_sub
     .local pmc event, event_init
-    handler_init = new 'Hash'
+    handler_init = new ['Hash']
     handler_init['type'] = 'myevent'
     handler_sub = get_global 'my_event_handler'
     handler_init['code'] = handler_sub
-    handler = new 'EventHandler', handler_init
+    handler = new ['EventHandler'], handler_init
 
     addhandler handler
 
-    event_init = new 'Hash'
+    event_init = new ['Hash']
     event_init['type'] = 'event'
     event_init['subtype'] = 'myevent'
-    event = new 'Task', event_init
+    event = new ['Task'], event_init
 
     schedule event
 

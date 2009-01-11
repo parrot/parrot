@@ -17,7 +17,7 @@ Tests the SchedulerMessage PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(7)
 
@@ -28,12 +28,12 @@ Tests the SchedulerMessage PMC.
 .end
 
 .sub init_check
-    new $P0, 'SchedulerMessage'
+    new $P0, ['SchedulerMessage']
     ok(1, 'Instantiated SchedulerMessage PMC')
 .end
 
 .sub type_and_id_tests
-    $P0 = new 'SchedulerMessage'
+    $P0 = new ['SchedulerMessage']
     $P0 = 2345
     $P0 = "some kinda message"
 
@@ -46,7 +46,7 @@ Tests the SchedulerMessage PMC.
 .end
 
 .sub freeze_thaw_tests
-    $P0 = new 'SchedulerMessage'
+    $P0 = new ['SchedulerMessage']
     $P0 = 86
     $P0 = "Smart message"
 
@@ -63,11 +63,11 @@ Tests the SchedulerMessage PMC.
 
 
 .sub hash_tests
-    $P0 = new 'Hash'
+    $P0 = new ['Hash']
     $P0['id'] = 9
     $P0['type'] = 'nine'
 
-    $P1 = new 'SchedulerMessage', $P0
+    $P1 = new ['SchedulerMessage'], $P0
 
     $S0 = $P1
     is($S0, "nine", "hash-initialized message has correct type")

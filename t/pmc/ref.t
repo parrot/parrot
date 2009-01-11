@@ -17,7 +17,7 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     plan(41)
 
     basic_ref_tests()
@@ -32,8 +32,8 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 
 
 .sub basic_ref_tests
-    new $P2, 'Integer'
-    new $P1, 'Ref', $P2
+    new $P2, ['Integer']
+    new $P1, ['Ref'], $P2
     ok(1, "Ref creation didn't explode")
 
     inc $P1
@@ -52,10 +52,10 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 .end
 
 .sub setref_tests
-    new $P2, 'Integer'
-    new $P3, 'Float'
+    new $P2, ['Integer']
+    new $P3, ['Float']
     set $P3, 0.5
-    new $P1, 'Ref', $P2
+    new $P1, ['Ref'], $P2
     inc $P1
     is($P1, 1, "Integer Ref is incremented correctly")
     setref $P1, $P3
@@ -66,11 +66,11 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 .end
 
 .sub assign_ref_tests
-    new $P2, 'Integer'
-    new $P3, 'Float'
+    new $P2, ['Integer']
+    new $P3, ['Float']
     set $P2, 0
     set $P3, 0.5
-    new $P1, 'Ref', $P2
+    new $P1, ['Ref'], $P2
     assign $P1, 1
     $S0 = $P1
     #XXX: not sure why the string conversion is needed
@@ -90,8 +90,8 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 .end
 
 .sub sharedref_tests
-    new $P2, 'Integer'
-    new $P1, 'SharedRef', $P2
+    new $P2, ['Integer']
+    new $P1, ['SharedRef'], $P2
     ok(1, "SharedRef created without explosion")
     set $P1, 4711
     is($P1, 4711, "SharedRef assignment looks good")
@@ -102,8 +102,8 @@ Tests that vtable method delegation works on a C<Ref> PMC.
     is($S0, "String", "SharedRef type looks good after type change")
     is($P1, "hello", "SharedRef value looks good after type change")
 
-    new $P2, 'Integer'
-    new $P1, 'SharedRef', $P2
+    new $P2, ['Integer']
+    new $P1, ['SharedRef'], $P2
     ok(1, "SharedRef creation didn't explode")
     push_eh eh
     deref $P3, $P1
@@ -117,11 +117,11 @@ end:
 
 .sub interface_tests
     .local pmc pmc1
-    pmc1 = new 'Array'
+    pmc1 = new ['Array']
     .local pmc pmc2
-    pmc2 = new 'Ref', pmc1
+    pmc2 = new ['Ref'], pmc1
     .local pmc pmc3
-    pmc3 = new 'SharedRef', pmc1
+    pmc3 = new ['SharedRef'], pmc1
     .local int bool1
     does bool1, pmc2, "scalar"
     is(bool1, 0, "Ref doesn't do scalar")
@@ -140,15 +140,15 @@ end:
 
 
 .sub set_get_tests
-    new $P2, 'Integer'
-    new $P1, 'Ref', $P2
+    new $P2, ['Integer']
+    new $P1, ['Ref'], $P2
     set $P1, 10
     is($P1, 10, "set works on Integer Ref")
     set $I0, $P1
     is($I0, 10, "get works on Integer Ref")
 
-    new $P2, 'Float'
-    new $P1, 'Ref', $P2
+    new $P2, ['Float']
+    new $P1, ['Ref'], $P2
     set $P1, 12.5
     set $N0, $P2
     set $N1, 12.5
@@ -158,8 +158,8 @@ end:
 .end
 
 .sub push_pop_tests
-    new $P2, 'ResizableIntegerArray'
-    new $P1, 'Ref', $P2
+    new $P2, ['ResizableIntegerArray']
+    new $P1, ['Ref'], $P2
     push $P1, 200
     push $P1, -3
     set $I0, $P1
@@ -175,31 +175,31 @@ end:
 .end
 
 .sub add_tests
-    new $P2, 'Integer'
-    new $P1, 'Ref', $P2
+    new $P2, ['Integer']
+    new $P1, ['Ref'], $P2
     set $P1, 10
     add $P1, $P1
     is($P2, 20, "add ref,ref is ok")
 
-    new $P3, 'Integer'
-    new $P2, 'Integer'
-    new $P1, 'Ref', $P2
+    new $P3, ['Integer']
+    new $P2, ['Integer']
+    new $P1, ['Ref'], $P2
     set $P3, 12
     set $P1, 10
     add $P1, $P3
     is($P2, 22, "add ref,int is ok")
 
-    new $P3, 'Integer'
-    new $P2, 'Integer'
-    new $P1, 'Ref', $P2
+    new $P3, ['Integer']
+    new $P2, ['Integer']
+    new $P1, ['Ref'], $P2
     set $P3, 12
     set $P1, 10
     add $P4, $P3, $P1
     is($P4, 22, "add dest,int,ref is ok")
 
-    new $P3, 'Integer'
-    new $P2, 'Integer'
-    new $P1, 'Ref', $P2
+    new $P3, ['Integer']
+    new $P2, ['Integer']
+    new $P1, ['Ref'], $P2
     set $P3, 12
     set $P1, 10
     add $P4, $P1, $P3

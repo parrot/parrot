@@ -18,8 +18,8 @@ out-of-bounds test. Checks INT and PMC keys.
 =cut
 
 .sub main :main
-    .include 'include/fp_equality.pasm'
-    .include 'include/test_more.pir'
+    .include 'fp_equality.pasm'
+    .include 'test_more.pir'
 
     plan(118)
 
@@ -53,7 +53,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub resize_tests
     .local pmc p
     .local int is_ok, i
-    p = new 'ResizablePMCArray'
+    p = new ['ResizablePMCArray']
 
     i = p
     is_ok = i == 0
@@ -84,7 +84,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub negative_array_size
     .local pmc p
     .local int is_ok, i
-    p = new 'ResizablePMCArray'
+    p = new ['ResizablePMCArray']
     push_eh eh
     p = -1
     pop_eh
@@ -102,7 +102,7 @@ end:
     .local num n
     .local string s
 
-    p = new 'ResizablePMCArray'
+    p = new ['ResizablePMCArray']
     p = 1
 
     p[0] = -7
@@ -155,9 +155,9 @@ end:
 .sub exception_tests
     .local pmc rpa, i
 
-    rpa = new 'ResizablePMCArray'
+    rpa = new ['ResizablePMCArray']
     rpa = 1
-    i = new 'Integer'
+    i = new ['Integer']
     i = 12345
 
     push_eh eh1
@@ -211,8 +211,8 @@ end:
 
 .sub set_keyed_get_keyed_tests
 
-     new $P0, 'ResizablePMCArray'
-     new $P1, 'Key'
+     new $P0, ['ResizablePMCArray']
+     new $P1, ['Key']
 
      set $P1, 0
      set $P0[$P1], 25
@@ -223,7 +223,7 @@ end:
      set $P1, 2
      set $P0[$P1], "bleep"
 
-     new $P2, 'String'
+     new $P2, ['String']
      set $P2, "Bloop"
      set $P1, 3
      set $P0[$P1], $P2
@@ -242,23 +242,23 @@ NOK1:
      set $S0, $P0[2]
      is($S0, "bleep", "set string via Key PMC, get string via int")
 
-     new $P3, 'Undef'
+     new $P3, ['Undef']
      set $P3, $P0[3]
      set $S0, $P3
      is($S0, "Bloop", "set PMC via Key PMC, get PMC via PMC")
 
 
-     new $P0, 'ResizablePMCArray'
+     new $P0, ['ResizablePMCArray']
      set $P0, 1
 
      set $P0[25], 125
      set $P0[128], 10.2
      set $P0[513], "cow"
-     new $P1, 'Integer'
+     new $P1, ['Integer']
      set $P1, 123456
      set $P0[1023], $P1
 
-     new $P2, 'Key'
+     new $P2, ['Key']
      set $P2, 25
      set $I0, $P0[$P2]
      is($I0, 125, "set int via int, get int via Key PMC")
@@ -286,7 +286,7 @@ NOK2:
 
 .sub interface_check
     .local pmc p
-    p = new 'ResizablePMCArray'
+    p = new ['ResizablePMCArray']
     .local int b
     does b, p, "scalar"
     is(b, 0 ,"ResizablePMCArray doesn't do scalar")
@@ -299,7 +299,7 @@ NOK2:
 
 .sub inherited_sort_method
     .local pmc ar
-    ar = new 'ResizablePMCArray'
+    ar = new ['ResizablePMCArray']
 
     ar[0] = 10
     ar[1] = 2
@@ -329,10 +329,10 @@ done:
 
 .sub push_pmc
     .local pmc pmc_arr, pmc_9999, pmc_10000
-    pmc_arr = new 'ResizablePMCArray'
-    pmc_9999  = new 'Float'
+    pmc_arr = new ['ResizablePMCArray']
+    pmc_9999  = new ['Float']
     pmc_9999  = 10000.10000
-    pmc_10000 = new 'Float'
+    pmc_10000 = new ['Float']
     pmc_10000 = 123.123
     pmc_arr[9999] = pmc_9999
     push pmc_arr, pmc_10000
@@ -348,8 +348,8 @@ done:
 .sub push_int
     .local pmc pmc_arr, pmc_9999
     .local int int_10000
-    pmc_arr = new 'ResizablePMCArray'
-    pmc_9999  = new 'Float'
+    pmc_arr = new ['ResizablePMCArray']
+    pmc_9999  = new ['Float']
     pmc_9999  = 10000.10000
     int_10000 = 123
     pmc_arr[9999] = pmc_9999
@@ -366,8 +366,8 @@ done:
 .sub push_string
     .local pmc pmc_arr, pmc_9999
     .local string string_10000
-    pmc_arr = new 'ResizablePMCArray'
-    pmc_9999  = new 'Float'
+    pmc_arr = new ['ResizablePMCArray']
+    pmc_9999  = new ['Float']
     pmc_9999  = 10000.10000
     string_10000 = '123asdf'
     pmc_arr[9999] = pmc_9999
@@ -383,7 +383,7 @@ done:
 
 .sub shift_int
     .local pmc pmc_arr, elem
-    pmc_arr = new 'ResizablePMCArray'
+    pmc_arr = new ['ResizablePMCArray']
     push pmc_arr, 4
     push pmc_arr, 3
     push pmc_arr, 2
@@ -423,12 +423,12 @@ done:
 .end
 
 .sub unshift_pmc
-    new $P0, 'ResizablePMCArray'
-    new $P1, 'Integer'
+    new $P0, ['ResizablePMCArray']
+    new $P1, ['Integer']
     set $P1, 1
-    new $P2, 'Integer'
+    new $P2, ['Integer']
     set $P2, 2
-    new $P3, 'Integer'
+    new $P3, ['Integer']
     set $P3, 3
     unshift $P0, $P1
     unshift $P0, $P2
@@ -445,7 +445,7 @@ done:
 
 
 .sub get_mro_tests
-    new $P0, 'ResizablePMCArray'
+    new $P0, ['ResizablePMCArray']
     $P1 = inspect $P0, 'mro'
     ok(1, "get_mro didn't explode")
     elements $I1, $P1
@@ -471,11 +471,11 @@ loop:
 
     f = 123.123
     i = 123
-    p = new 'Float'
+    p = new ['Float']
     p = 456.456
     s = "abc"
 
-    pmc_arr = new 'ResizablePMCArray'
+    pmc_arr = new ['ResizablePMCArray']
 
     elements = pmc_arr
     is(elements, 0, "element count of empty ResizablePMCArray is 0")
@@ -513,11 +513,11 @@ loop:
 
     f = 123.123
     i = 123
-    p = new 'Float'
+    p = new ['Float']
     p = 456.456
     s = "abc"
 
-    pmc_arr = new 'ResizablePMCArray'
+    pmc_arr = new ['ResizablePMCArray']
 
     elements = pmc_arr
     is(elements, 0, "empty RPA has 0 elements")
@@ -548,8 +548,8 @@ loop:
 ## an Integer Matrix, as used by befunge as a playing field
 .sub multikey_access
     .local pmc matrix, row_in, row_out
-    matrix = new 'ResizablePMCArray'
-    row_in = new 'ResizableIntegerArray'
+    matrix = new ['ResizablePMCArray']
+    row_in = new ['ResizableIntegerArray']
     push row_in, 42
     push matrix, row_in
 
@@ -565,14 +565,14 @@ loop:
 
 .sub exists_and_defined
     .local pmc array
-    array = new 'ResizablePMCArray'
+    array = new ['ResizablePMCArray']
     push array, 'a'
     push array, 'b'
     push array, 'c'
-    $P0 = new 'Null'
+    $P0 = new ['Null']
     push array, $P0
     push array, 'e'
-    $P0 = new 'Undef'
+    $P0 = new ['Undef']
     push array, $P0
     push array, '7'
     push array, '-8.8'
@@ -631,27 +631,27 @@ loop:
 
 .sub append_tests
 
-    $P1 = new 'ResizablePMCArray'
+    $P1 = new ['ResizablePMCArray']
     push $P1, 'a'
     push $P1, 'b'
     push $P1, 'c'
 
-    $P2 = new 'FixedPMCArray'
+    $P2 = new ['FixedPMCArray']
     $P2 = 2
-    $P0 = new 'Null'
+    $P0 = new ['Null']
     $P2[0] = $P0
     $P2[1] = 'e'
-    $P0 = new 'Undef'
+    $P0 = new ['Undef']
 
-    $P3 = new 'ResizablePMCArray'
+    $P3 = new ['ResizablePMCArray']
     push $P3, $P0
     push $P3, '7'
     push $P3, '-8.8'
 
-    $P4 = new 'ResizablePMCArray'
+    $P4 = new ['ResizablePMCArray']
 
-    $P5 = new 'MultiSub'    # extends ResizablePMCArray
-    $P99 = new 'Sub'
+    $P5 = new ['MultiSub']    # extends ResizablePMCArray
+    $P99 = new ['Sub']
     push $P5, $P99
 
     $P4.'append'( $P4 )
@@ -702,7 +702,7 @@ loop:
 .sub get_array_string
     .param pmc p
     $S0 = ''
-    $P3 = new 'Iterator', p
+    $P3 = new ['Iterator'], p
 loop:
     unless $P3 goto loop_end
     $P4 = shift $P3
@@ -716,14 +716,14 @@ loop_end:
 
 .sub splice_tests
     .local pmc ar1, ar2
-    ar1 = new 'ResizablePMCArray'
+    ar1 = new ['ResizablePMCArray']
     ar1[0] = 1
     ar1[1] = 2
     ar1[2] = 3
     ar1[3] = 4
     ar1[4] = 5
 
-    ar2 = new 'ResizablePMCArray'
+    ar2 = new ['ResizablePMCArray']
     ar2[0] = 'A'
     ar2[1] = 'B'
     ar2[2] = 'C'
@@ -773,7 +773,7 @@ loop_end:
     is($S0, "123ABCDE", "splice, replace at end")
 
     $P1 = clone ar1
-    $P2 = new 'Array'
+    $P2 = new ['Array']
     $P2 = 5
     $P2[0] = 'A'
     $P2[1] = 'B'
@@ -785,13 +785,13 @@ loop_end:
     is($S0, "123ABCDE", "splice, replace with another type")
 
     $P1 = clone ar1
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new ['ResizablePMCArray']
     splice $P1, $P2, 2, 2
     $S0 = get_array_string($P1)
     is($S0, "125", "splice with empty replacement")
 
     $P1 = clone ar1
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new ['ResizablePMCArray']
     $P2[0] = 'A'
     splice $P1, $P2, 2, 1
     $S0 = get_array_string($P1)
@@ -801,12 +801,12 @@ loop_end:
 
 
 .sub splice_replace1
-    $P1 = new 'ResizablePMCArray'
+    $P1 = new ['ResizablePMCArray']
     $P1 = 3
     $P1[0] = '1'
     $P1[1] = '2'
     $P1[2] = '3'
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new ['ResizablePMCArray']
     $P2 = 1
     $P2[0] = 'A'
     splice $P1, $P2, 1, 2
@@ -816,12 +816,12 @@ loop_end:
 
 
 .sub splice_replace2
-    $P1 = new 'ResizablePMCArray'
+    $P1 = new ['ResizablePMCArray']
     $P1 = 3
     $P1[0] = '1'
     $P1[1] = '2'
     $P1[2] = '3'
-    $P2 = new 'ResizablePMCArray'
+    $P2 = new ['ResizablePMCArray']
     $P2 = 1
     $P2[0] = 'A'
     splice $P1, $P2, 0, 2
@@ -835,7 +835,7 @@ loop_end:
     .local pmc arr, iter
     $P0 = subclass 'ResizablePMCArray', 'MyArray'
 
-    arr = new 'MyArray'
+    arr = new ['MyArray']
     push arr, 11
     push arr, 13
     push arr, 15
@@ -843,7 +843,7 @@ loop_end:
     is($I0, 3, "RPA subclass has correct element count")
 
     $S1 = ''
-    iter = new 'Iterator', arr
+    iter = new ['Iterator'], arr
 loop:
     unless iter goto end
     $P2 = shift iter
@@ -857,7 +857,7 @@ end:
 
 
 .sub method_forms_of_unshift_etc
-    $P0 = new 'ResizablePMCArray'
+    $P0 = new ['ResizablePMCArray']
     $P0.'unshift'(1)
     $P0.'push'('two')
     $I0 = $P0
@@ -872,7 +872,7 @@ end:
 #RT #56636 - segfault from sort if comparison is always 1
 .sub sort_with_broken_cmp
     .local pmc array
-    array = new 'ResizablePMCArray'
+    array = new ['ResizablePMCArray']
     push array, 4
     push array, 5
     push array, 3

@@ -27,7 +27,7 @@ my $library = <<'CODE';
 .sub make_readonly
     .param pmc arg
     .local pmc one
-    one = new 'Integer'
+    one = new ['Integer']
     one = 1
     setprop arg, '_ro', one
 .end
@@ -35,7 +35,7 @@ my $library = <<'CODE';
 .sub make_writable
     .param pmc arg
     .local pmc zero
-    zero = new 'Integer'
+    zero = new ['Integer']
     zero = 0
     setprop arg, '_ro', zero
 .end
@@ -45,10 +45,10 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only is not wr
 .sub main :main
     .local pmc foo, eh
 
-    foo = new 'Integer'
+    foo = new ['Integer']
     foo = 42
 
-    eh = new 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
     set_addr eh, eh_label
 
@@ -73,7 +73,7 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only can be re
     .local pmc foo
     .local pmc tmp
 
-    foo = new 'Integer'
+    foo = new ['Integer']
     foo = 42
 
     make_readonly(foo)
@@ -86,7 +86,7 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only can be re
     print $S0
     print "\n"
 
-    tmp = new 'Integer'
+    tmp = new ['Integer']
     add tmp, foo, foo
     print tmp
     print "\n"
@@ -112,7 +112,7 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer stays Integer" );
 .sub main :main
     .local pmc foo
 
-    foo = new 'Integer'
+    foo = new ['Integer']
     foo = 42
 
     make_readonly(foo)
@@ -127,10 +127,10 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer add" );
 .sub main :main
     .local pmc foo, eh
 
-    foo = new 'Integer'
+    foo = new ['Integer']
     foo = 42
 
-    eh = new 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
     set_addr eh, eh_label
 
@@ -155,11 +155,11 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
 .sub main :main
     .local pmc foo, eh
 
-    foo = new 'Complex'
+    foo = new ['Complex']
     foo[0] = 1.0
     foo[1] = 1.0
 
-    eh = new 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
     set_addr eh, eh_label
 
@@ -183,13 +183,13 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursiv
 .sub main :main
     .local pmc foo, three, four, eh
 
-    foo = new 'ResizablePMCArray'
-    three = new 'Integer'
+    foo = new ['ResizablePMCArray']
+    three = new ['Integer']
     three = 3
-    four = new 'Integer'
+    four = new ['Integer']
     four = 4
 
-    eh = new 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
     set_addr eh, eh_label
 
@@ -218,17 +218,17 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Objects" );
 .sub main :main
     .local pmc fooclass, foo, eh, i
 
-    i = new 'Integer'
+    i = new ['Integer']
     i = 1
 
-    eh = new 'ExceptionHandler'
+    eh = new ['ExceptionHandler']
     eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
     set_addr eh, eh_label
 
 
     fooclass = newclass 'Foo'
     addattribute fooclass, 'bar'
-    foo = new 'Foo'
+    foo = new ['Foo']
     setattribute foo, 'bar', i
     make_readonly(foo)
     inc i
@@ -258,8 +258,8 @@ OUTPUT
     .local pmc three
     .local pmc tmp
 
-    foo = new 'ResizablePMCArray'
-    three = new 'Integer'
+    foo = new ['ResizablePMCArray']
+    three = new ['Integer']
     three = 3
 
     foo = 1
