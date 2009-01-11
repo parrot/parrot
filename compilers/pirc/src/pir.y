@@ -834,8 +834,11 @@ param_flag        : target_flag
                   | unique_reg_flag
                   ;
 
-lookahead_flag    : ":lookahead" '(' ')'
-                         { $$ = TARGET_FLAG_LOOKAHEAD; }
+lookahead_flag    : ":lookahead" paren_string
+                         {
+                           $$ = TARGET_FLAG_LOOKAHEAD;
+                           set_param_alias(lexer, $2);
+                         }
                   ;
 
 invocant_flag     : ":invocant" '(' multi_type ')'
