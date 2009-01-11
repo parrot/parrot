@@ -136,7 +136,6 @@ src/PASTGrammar_gen.pir: src/PASTGrammar.tg
 
 src/POSTGrammar_gen.pir: src/POSTGrammar.tg
 	$(TGE) --output=src/POSTGrammar_gen.pir src/POSTGrammar.tg
-	$(PERL) -i.bak -pe "s|'PAST::|'PAST;|" src/POSTGrammar_gen.pir
 
 lua.pbc: lua.pir src/lua51.pir src/grammar51.pir src/lua51_gen.pir src/PASTGrammar_gen.pir src/POSTGrammar_gen.pir $(LIB_SRCS)
 	$(PARROT) -o lua.pbc --output-pbc lua.pir

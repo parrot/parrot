@@ -14,7 +14,7 @@ into an opcode syntax tree (POST).
 grammar Lua::POST::Grammar is TGE::Grammar;
 
 
-transform post (PAST::Block) :language('PIR') {
+transform post (PAST;Block) :language('PIR') {
     null $P0
     set_hll_global ['Lua';'POST'], '$?environ', $P0
     .local pmc endlabels
@@ -117,7 +117,7 @@ PIRCODE
 }
 
 
-transform post (PAST::Stmts) :language('PIR') {
+transform post (PAST;Stmts) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -136,18 +136,18 @@ transform post (PAST::Stmts) :language('PIR') {
 }
 
 
-transform void (PAST::Stmts) :language('PIR') {
+transform void (PAST;Stmts) :language('PIR') {
     .tailcall tree.'get'('post', node)
 }
 
 
-transform void (PAST::Op) :language('PIR') {
+transform void (PAST;Op) :language('PIR') {
     $S0 = node.'pasttype'()
     .tailcall tree.'get'($S0, node)
 }
 
 
-transform cond (PAST::Op) :language('PIR') {
+transform cond (PAST;Op) :language('PIR') {
     $S0 = node.'pirop'()
     $I0 = index $S0, 'is'
     unless $I0 >= 0 goto L1
@@ -157,7 +157,7 @@ transform cond (PAST::Op) :language('PIR') {
 }
 
 
-transform post (PAST::Op) :language('PIR') {
+transform post (PAST;Op) :language('PIR') {
     $S0 = node.'pasttype'()
     unless $S0 == 'call' goto L1
     .local pmc post
@@ -175,7 +175,7 @@ transform post (PAST::Op) :language('PIR') {
 }
 
 
-transform pirop (PAST::Op) :language('PIR') {
+transform pirop (PAST;Op) :language('PIR') {
     .local string result
     $S0 = node.'pirop'()
     $I0 = index $S0, 'is'
@@ -212,7 +212,7 @@ transform pirop (PAST::Op) :language('PIR') {
 }
 
 
-transform cmp (PAST::Op) :language('PIR') {
+transform cmp (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -233,7 +233,7 @@ transform cmp (PAST::Op) :language('PIR') {
 }
 
 
-transform call (PAST::Op) :language('PIR') {
+transform call (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -268,7 +268,7 @@ transform call (PAST::Op) :language('PIR') {
 }
 
 
-transform len (PAST::Op) :language('PIR') {
+transform len (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -285,7 +285,7 @@ transform len (PAST::Op) :language('PIR') {
 }
 
 
-transform and (PAST::Op) :language('PIR') {
+transform and (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -325,12 +325,12 @@ transform and (PAST::Op) :language('PIR') {
 }
 
 
-transform or (PAST::Op) :language('PIR') {
+transform or (PAST;Op) :language('PIR') {
     .tailcall tree.'get'('and', node)
 }
 
 
-transform vararg (PAST::Op) :language('PIR') {
+transform vararg (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -343,7 +343,7 @@ transform vararg (PAST::Op) :language('PIR') {
 }
 
 
-transform if (PAST::Op) :language('PIR') {
+transform if (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -379,7 +379,7 @@ transform if (PAST::Op) :language('PIR') {
 }
 
 
-transform while (PAST::Op) :language('PIR') {
+transform while (PAST;Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
@@ -409,7 +409,7 @@ transform while (PAST::Op) :language('PIR') {
 }
 
 
-transform repeat (PAST::Op) :language('PIR') {
+transform repeat (PAST;Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
@@ -439,7 +439,7 @@ transform repeat (PAST::Op) :language('PIR') {
 }
 
 
-transform fornum (PAST::Op) :language('PIR') {
+transform fornum (PAST;Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
@@ -505,7 +505,7 @@ transform fornum (PAST::Op) :language('PIR') {
 }
 
 
-transform forlist (PAST::Op) :language('PIR') {
+transform forlist (PAST;Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     .local pmc ops
@@ -629,7 +629,7 @@ transform forlist (PAST::Op) :language('PIR') {
 }
 
 
-transform return (PAST::Op) :language('PIR') {
+transform return (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -667,7 +667,7 @@ transform return (PAST::Op) :language('PIR') {
 }
 
 
-transform break (PAST::Op) :language('PIR') {
+transform break (PAST;Op) :language('PIR') {
     .local pmc endlabels
     endlabels = get_hll_global ['Lua';'POST'], '@endlabels'
     $S0 = endlabels[0]
@@ -676,7 +676,7 @@ transform break (PAST::Op) :language('PIR') {
 }
 
 
-transform assign (PAST::Op) :language('PIR') {
+transform assign (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -698,7 +698,7 @@ transform assign (PAST::Op) :language('PIR') {
 }
 
 
-transform assignlist (PAST::Op) :language('PIR') {
+transform assignlist (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -766,7 +766,7 @@ transform assignlist (PAST::Op) :language('PIR') {
 }
 
 
-transform parenthese (PAST::Op) :language('PIR') {
+transform parenthese (PAST;Op) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -779,12 +779,12 @@ transform parenthese (PAST::Op) :language('PIR') {
 }
 
 
-transform cond (PAST::Val) :language('PIR') {
+transform cond (PAST;Val) :language('PIR') {
     .tailcall tree.'get'('post', node)
 }
 
 
-transform post (PAST::Val) :language('PIR') {
+transform post (PAST;Val) :language('PIR') {
     .local string type
     type = node.'name'()
     $I0 = index type, 'Lua'
@@ -811,7 +811,7 @@ transform post (PAST::Val) :language('PIR') {
 }
 
 
-transform key (PAST::Val) :language('PIR') {
+transform key (PAST;Val) :language('PIR') {
     .local pmc subpost
     subpost = get_hll_global ['Lua';'POST'], '$?SUB'
     .local pmc storage_const
@@ -836,7 +836,7 @@ transform key (PAST::Val) :language('PIR') {
 }
 
 
-transform constructor (PAST::Val) :language('PIR') {
+transform constructor (PAST;Val) :language('PIR') {
     .local pmc ops
     $P0 = get_hll_global ['POST'], 'Ops'
     ops = $P0.'new'('node'=>node)
@@ -898,18 +898,18 @@ transform constructor (PAST::Val) :language('PIR') {
 }
 
 
-transform cond (PAST::Var) :language('PIR') {
+transform cond (PAST;Var) :language('PIR') {
     .tailcall tree.'get'('post', node)
 }
 
 
-transform post (PAST::Var) :language('PIR') {
+transform post (PAST;Var) :language('PIR') {
     $S0 = node.'scope'()
     .tailcall tree.'get'($S0, node)
 }
 
 
-transform parameter (PAST::Var) :language('PIR') {
+transform parameter (PAST;Var) :language('PIR') {
     .local pmc subpost
     subpost = get_hll_global ['Lua';'POST'], '$?SUB'
     .local pmc ops
@@ -943,7 +943,7 @@ transform parameter (PAST::Var) :language('PIR') {
 }
 
 
-transform lexical (PAST::Var) :language('PIR') {
+transform lexical (PAST;Var) :language('PIR') {
     .local pmc subpost
     subpost = get_hll_global ['Lua';'POST'], '$?SUB'
     .local pmc storage_lex
@@ -987,7 +987,7 @@ transform lexical (PAST::Var) :language('PIR') {
 }
 
 
-transform package (PAST::Var) :language('PIR') {
+transform package (PAST;Var) :language('PIR') {
     .local pmc ops
     .local string result
     $P0 = get_hll_global ['POST'], 'Ops'
@@ -1060,7 +1060,7 @@ PIRCODE
 }
 
 
-transform keyed (PAST::Var) :language('PIR') {
+transform keyed (PAST;Var) :language('PIR') {
     .tailcall tree.'get'('package', node)
 }
 
