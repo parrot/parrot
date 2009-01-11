@@ -17,7 +17,7 @@ Tests property access on PMCs.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     plan(15)
 
     setprop_getprop_tests()
@@ -30,12 +30,12 @@ Tests property access on PMCs.
 
 
 .sub setprop_getprop_tests
-    new $P0, 'Integer'
+    new $P0, ['Integer']
     set $P0, 10
-    new $P1, 'String'
+    new $P1, ['String']
     set $P1, "ten"
     setprop $P0, "en", $P1
-    new $P2, 'String'
+    new $P2, ['String']
     set $P2, "zehn"
     setprop $P0, "de", $P2
     is($P0, "10", "setprop is ok")
@@ -46,8 +46,8 @@ Tests property access on PMCs.
 .end
 
 .sub prop_vals_are_refs
-    new $P0, 'String'
-    new $P1, 'String'
+    new $P0, ['String']
+    new $P1, ['String']
     set $P0, "Dog"
 
     set $S0, "Brown"
@@ -57,7 +57,7 @@ Tests property access on PMCs.
     set $S0, "Black"
     set $P1, "No"
     setprop $P0, $S0, $P1
-    new $P2, 'String'
+    new $P2, ['String']
     getprop $P2, "Black", $P0
     is($P2, "No", "'Black' property refers to right string")
     getprop $P2, "Brown", $P0
@@ -65,10 +65,10 @@ Tests property access on PMCs.
 .end
 
 .sub prop_reset
-    new $P0, 'ResizablePMCArray'
-    new $P1, 'String'
-    new $P2, 'String'
-    new $P3, 'String'
+    new $P0, ['ResizablePMCArray']
+    new $P1, ['String']
+    new $P2, ['String']
+    new $P3, ['String']
 
     set $S0, "Type"
     set $P1, "Integer"
@@ -82,8 +82,8 @@ Tests property access on PMCs.
 .end
 
 .sub get_unset_prop
-    new $P1, 'Float'
-    new $P2, 'Integer'
+    new $P1, ['Float']
+    new $P2, ['Integer']
 
     getprop $P2, "Wibble", $P1
     defined $I2, $P2
@@ -91,12 +91,12 @@ Tests property access on PMCs.
 .end
 
 .sub delprop_tests
-    new $P0, 'Integer'
+    new $P0, ['Integer']
     set $P0, 10
-    new $P1, 'String'
+    new $P1, ['String']
     set $P1, "ten"
     setprop $P0, "en", $P1
-    new $P2, 'String'
+    new $P2, ['String']
     set $P2, "zehn"
     setprop $P0, "de", $P2
     is($P0, "10", "ok")
@@ -115,12 +115,12 @@ end:
 .end
 
 .sub prophash_tests
-    new $P0, 'Integer'
+    new $P0, ['Integer']
     set $P0, 10
-    new $P1, 'String'
+    new $P1, ['String']
     set $P1, "ten"
     setprop $P0, "en", $P1
-    new $P2, 'String'
+    new $P2, ['String']
     set $P2, "zehn"
     setprop $P0, "de", $P2
     prophash $P3, $P0
