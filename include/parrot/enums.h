@@ -59,7 +59,8 @@ typedef enum {
     PARROT_ARG_OPTIONAL         = 0x080, /* 128 */
     PARROT_ARG_OPT_FLAG         = 0x100, /* 256 prev optional was set */
     PARROT_ARG_NAME             = 0x200, /* 512 this String is an arg name */
-    PARROT_ARG_INVOCANT         = 0x400  /* 1024 this PMC is an invocant */
+    PARROT_ARG_LOOKAHEAD        = 0x400, /* 1024 this is a lookahead argument */
+    PARROT_ARG_INVOCANT         = 0x800  /* 2048 this PMC is an invocant */
     /* more to come soon */
 
 } Call_bits_enum_t;

@@ -2146,6 +2146,7 @@ count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
             case 's':
             case 'o':
             case 'p':
+            /* case 'l': */ /* lookahead parameter */
             case 'i':
                 break;
             default:
@@ -2474,6 +2475,7 @@ set_context_sig_params(PARROT_INTERP, ARGIN(const char *signature),
                 case 's': cur |= PARROT_ARG_SLURPY_ARRAY; break;
                 case 'o': cur |= PARROT_ARG_OPTIONAL;     break;
                 case 'p': cur |= PARROT_ARG_OPT_FLAG;     break;
+                case 'l': cur |= PARROT_ARG_LOOKAHEAD;    break;
                 case 'i': cur |= PARROT_ARG_INVOCANT;     break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
@@ -2552,6 +2554,8 @@ Signatures:
   s slurpy
   o optional
   p opt flag
+  l lookahead parameter (next positional, or next named if no positionals)
+  i invocant
 
   -> is the separator between args and results, similar to type theory
   notation.
@@ -2701,6 +2705,7 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
                 case 's': cur |= PARROT_ARG_SLURPY_ARRAY; break;
                 case 'o': cur |= PARROT_ARG_OPTIONAL;     break;
                 case 'p': cur |= PARROT_ARG_OPT_FLAG;     break;
+                /* case 'l': cur |= PARROT_ARG_LOOKAHEAD;    break; */
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
