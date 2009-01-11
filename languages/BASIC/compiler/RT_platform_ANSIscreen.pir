@@ -75,22 +75,22 @@
 
 ## These don't work exactly right.  ANSI would require that I send
 ## \e[6n and read the input stream for a \e[row;colR reply from the
-## terminal.  I *really* can't do that until IO is fixed, because STDIN
+## terminal.  I *really* can't do that until $IO is fixed, because STDIN
 ## is line-buffered and asking the user to press return after each cursor
 ## positioning is lame.
 #ANSI_SCREEN_SETXCUR:
 #	print "\e[;"
-#	print I1
+#	print $I1
 #	print "H"
 #	ret
 #
 #ANSI_SCREEN_SETYCUR:
 #	print "\e["
-#	print I1
+#	print $I1
 #	print ";H"
 #	ret
 #
-#	# I0,I1
+#	# $I0,$I1
 #	# QB origin is 1,1
 
 ## QB.exe
@@ -103,8 +103,8 @@
 	.param int fore
 	.param int back
 	print "\e"
-#	# foreground in I0
-#	# background in I1
+#	# foreground in $I0
+#	# background in $I1
 	print "[0;"
 	get_global $P0, "ANSI_fgcolors"
 	lt fore, 8, ANSI_FG
@@ -168,7 +168,7 @@ ANSI_BG:
 .end
 
 .sub _set_nonblock	# void _set_nonblock
-	I11= 0
+	$I11= 0
 	$P1 = loadlib ""
 	.local pmc fcntl
 	fcntl = dlfunc $P1, "fcntl", "iiii"
@@ -178,7 +178,7 @@ ANSI_BG:
 
 	fcntl = dlfunc $P1, "fcntl", "iiil"
 
-	$I7 = bor I5, 2048  # O_NONBLOCK 04000
+	$I7 = bor $I5, 2048  # O_NONBLOCK 04000
 	#invoke		# nmode=fcntl(0, F_SETFL, mode | O_NONBLOCK)
 	fcntl(STDIN, F_SETFL, $I7)
 
@@ -199,8 +199,8 @@ ANSI_BG:
 
 .sub _TERMIO_scankey
 	get_global $P0, "scankey"
-	I0= $P0["value"]
-	eq I0, 1, END
+	$I0= $P0["value"]
+	eq $I0, 1, END
 	_set_noecho_cbreak()
 END:
 	$P0["value"]= 1
@@ -209,8 +209,8 @@ END:
 
 .sub _TERMIO_normal
 	get_global $P0, "scankey"
-	I0= $P0["value"]
-	eq I0, 0, END
+	$I0= $P0["value"]
+	eq $I0, 0, END
 	_set_echo_nocbreak()
 END:
 	$P0["value"]= 0

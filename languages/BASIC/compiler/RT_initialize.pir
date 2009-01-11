@@ -28,7 +28,7 @@
 	$P0[0]=$P1
         $P1 = getstdout
 	#Don't buffer stdout...
-        $I0 = pioctl $P1, 3, 0
+        $P1.'buffer_type'('unbuffered')
 	$P0[1]=$P1
         $P1 = getstderr
 	$P0[2]=$P1

@@ -3,16 +3,16 @@
 .include "sysinfo.pasm"
 
 .sub _platform_setup		# void platform_setup(void)
-	sysinfo S0, .SYSINFO_PARROT_OS
-	ne S0, "MSWin32", NOTWIN
+	sysinfo $S0, .SYSINFO_PARROT_OS
+	ne $S0, "MSWin32", NOTWIN
 	_win32_setup()
 	branch END
 NOTWIN: _ansi_setup()
 END:	noop
 .end
 .sub _platform_shutdown
-	sysinfo S0, .SYSINFO_PARROT_OS
-	ne S0, "MSWin32", NOTWIN
+	sysinfo $S0, .SYSINFO_PARROT_OS
+	ne $S0, "MSWin32", NOTWIN
 	_win32_shutdown()
 	branch END
 NOTWIN: _ansi_shutdown()
@@ -22,8 +22,8 @@ END:	noop
 	get_global $P0, "PRINTCOL"
 	set $P0["value"], 0
 	set_global "PRINTCOL", $P0
-	sysinfo S0, .SYSINFO_PARROT_OS
-	ne S0, "MSWin32", NOTWIN
+	sysinfo $S0, .SYSINFO_PARROT_OS
+	ne $S0, "MSWin32", NOTWIN
 	_win32_screen_clear()
 	branch END
 NOTWIN: _ansi_screen_clear()
@@ -31,18 +31,18 @@ END:	noop
 .end
 
 #SCREEN_SETXCUR:
-#	set I1, P6[.VALUE]
-#	sysinfo S0, .SYSINFO_PARROT_OS
-#	eq S0, "MSWin32", WIN32_SCREEN_SETXCUR
+#	set $I1, $P6[.VALUE]
+#	sysinfo $S0, .SYSINFO_PARROT_OS
+#	eq $S0, "MSWin32", WIN32_SCREEN_SETXCUR
 #	branch ANSI_SCREEN_SETXCUR
 #
 #SCREEN_SETYCUR:
-#	set I1, P6[.VALUE]
-#	sysinfo S0, .SYSINFO_PARROT_OS
-#	eq S0, "MSWin32", WIN32_SCREEN_SETYCUR
+#	set $I1, $P6[.VALUE]
+#	sysinfo $S0, .SYSINFO_PARROT_OS
+#	eq $S0, "MSWin32", WIN32_SCREEN_SETYCUR
 #	branch ANSI_SCREEN_SETYCUR
 #
-#	# X in P7, Y in P6
+#	# X in $P7, Y in $P6
 .sub _screen_locate		# void screen_locate(float x, float y)
 	.param num xf
 	.param num yf

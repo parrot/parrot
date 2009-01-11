@@ -298,7 +298,7 @@ ENDINSTR:
 	.param string full
 	.param string substring
 
-	.return _BUILTIN_INSTR(argc,1.0,full,substring)
+	.tailcall _BUILTIN_INSTR(argc,1.0,full,substring)
 .end
 
 .sub _BUILTIN_UCASE_STRING	# string ucase$(string targ)
