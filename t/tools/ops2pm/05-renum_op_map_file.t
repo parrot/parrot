@@ -41,13 +41,13 @@ ok(-d $samplesdir, "Able to locate samples directory");
     ##### Stage 1:  Generate ops.num de novo #####
 
     my @stage1 = qw(
-        core_ops.orig
-        bit_ops.orig
-        ops_num.orig
+        core_ops.original
+        bit_ops.original
+        ops_num.original
     );
-    copy_into_position($samplesdir, \@stage1, q{orig}, $opsdir);
+    copy_into_position($samplesdir, \@stage1, q{original}, $opsdir);
     foreach my $f ( qw| core bit | ) {
-        copy qq{$samplesdir/${f}_ops.orig}, qq{src/ops/$f.ops.post}
+        copy qq{$samplesdir/${f}_ops.original}, qq{src/ops/$f.ops.post}
             or croak "Unable to store $f for later testing: $!";
     }
     ($lastcode, $lastnumber) = run_test_stage(
@@ -85,8 +85,8 @@ ok(-d $samplesdir, "Able to locate samples directory");
 
   TODO: {
         local $TODO = 'Post 1.0 regeneration problematic';
-    my @stage3 = qw( pic_ops.orig );
-    copy_into_position($samplesdir, \@stage3, q{orig}, $opsdir);
+    my @stage3 = qw( pic_ops.original );
+    copy_into_position($samplesdir, \@stage3, q{original}, $opsdir);
     ($lastcode, $lastnumber) = run_test_stage(
         [ qw(
             src/ops/core.ops
@@ -106,13 +106,13 @@ ok(-d $samplesdir, "Able to locate samples directory");
     ##### Stage 4:  Again generate ops.num de novo #####
 
     my @stage4 = qw(
-        core_ops.orig
-        bit_ops.orig
-        ops_num.orig
+        core_ops.original
+        bit_ops.original
+        ops_num.original
     );
-    copy_into_position($samplesdir, \@stage4, q{orig}, $opsdir);
+    copy_into_position($samplesdir, \@stage4, q{original}, $opsdir);
     foreach my $f ( qw| core bit | ) {
-        copy qq{$samplesdir/${f}_ops.orig}, qq{src/ops/$f.ops.post}
+        copy qq{$samplesdir/${f}_ops.original}, qq{src/ops/$f.ops.post}
             or croak "Unable to store $f for later testing: $!";
     }
     ($lastcode, $lastnumber) = run_test_stage(
@@ -150,8 +150,8 @@ ok(-d $samplesdir, "Able to locate samples directory");
 
     ##### Stage 6:  Add some opcodes and regenerate ops.num #####
 
-    my @stage6 = qw( pic_ops.orig );
-    copy_into_position($samplesdir, \@stage6, q{orig}, $opsdir);
+    my @stage6 = qw( pic_ops.original );
+    copy_into_position($samplesdir, \@stage6, q{original}, $opsdir);
     ($lastcode, $lastnumber) = run_test_stage(
         [ qw(
             src/ops/core.ops
