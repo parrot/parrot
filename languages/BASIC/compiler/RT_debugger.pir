@@ -104,7 +104,7 @@ DEBUGGER_DELWATCH:
 	branch DEBUGGER_COMMAND
 
 DEBUGGER_DELALLWATCH:
-	$P0=new .ResizablePMCArray
+	$P0=new 'ResizablePMCArray'
 	set $P25["watch"], $P0
 	print "All watches cleared.\n"
 	branch DEBUGGER_COMMAND

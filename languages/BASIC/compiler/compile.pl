@@ -173,7 +173,7 @@ END_PIR
                 exists \$I0, \$P1[\$S0]
                 eq \$I0, 0, DEBUGGER_DONE        # This breakpoint doesn't exist
         DEBUGGER_STOP:
-                \$P1=new .Hash
+                \$P1=new 'Hash'
 @debdecl                .set_arg \$P1
                 .set_arg debline
                 _DEBUGGER_STOP_FOR_REAL()
@@ -186,7 +186,7 @@ if ($debug) {
     print CODE<<FOO;
 .sub _DEBUG_INIT
         saveall
-        \$P0=new .ResizablePMCArray
+        \$P0=new 'ResizablePMCArray'
         find_global \$P1, "DEBUGGER"
 FOO
     foreach ( 0 .. @main::basic - 1 ) {
@@ -197,9 +197,9 @@ FOO
     print CODE<<FOO;
         \$P1["code"]= \$P0
         \$P1["step"]= 1   # Turn on stepping mode
-        \$P0=new .Hash
+        \$P0=new 'Hash'
         \$P1["break"]= \$P0  # Breakpoints
-        \$P0=new .ResizablePMCArray
+        \$P0=new 'ResizablePMCArray'
         \$P1["watch"]= \$P0  # Watch
         store_global "DEBUGGER", \$P1
 .end

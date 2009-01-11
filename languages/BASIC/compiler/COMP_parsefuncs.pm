@@ -1182,9 +1182,9 @@ DIMTYPE
         #print STDERR "Marking ${var}${seg}\n";
         push @{ $code{$seg}->{code} }, <<DIMARR;
         # Set aside storage for Array $var
-        \$P0 = new .Hash
-        \$P2 = new .ResizablePMCArray
-        \$P3 = new .Hash
+        \$P0 = new 'Hash'
+        \$P2 = new 'ResizablePMCArray'
+        \$P3 = new 'Hash'
         \$P3["index"]=\$P2
         \$P3["hash"]=\$P0
         find_global \$P1, "BASICARR"

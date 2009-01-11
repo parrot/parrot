@@ -90,7 +90,7 @@ CLOSE_OK:
 	.local string token
 	line  = _CHOMP(line)
 
-	$P1=new .ResizablePMCArray
+	$P1=new 'ResizablePMCArray'
 	eq splitflag, 0, SPLITSINGLE
 
 SPLITAGAIN:
