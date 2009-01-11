@@ -19,9 +19,9 @@ NOTWIN: _ansi_shutdown()
 END:	noop
 .end
 .sub _screen_clear
-	find_global $P0, "PRINTCOL"
+	get_global $P0, "PRINTCOL"
 	set $P0["value"], 0
-	store_global "PRINTCOL", $P0
+	set_global "PRINTCOL", $P0
 	sysinfo S0, .SYSINFO_PARROT_OS
 	ne S0, "MSWin32", NOTWIN
 	_win32_screen_clear()

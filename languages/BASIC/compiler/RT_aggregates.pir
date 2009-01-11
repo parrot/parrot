@@ -10,7 +10,7 @@
 
 	.local string key
 	.local pmc BASICARR
-	find_global BASICARR, "BASICARR"
+	get_global BASICARR, "BASICARR"
 	key = _ARRAY_BUILDKEY(keycount,things)
 	$P0 = BASICARR[array]
 	if key != "" goto ARR_NORMAL
@@ -28,7 +28,7 @@ ARR_NORMAL:
 
 	.local string key
 	.local pmc BASICARR
-	find_global BASICARR, "BASICARR"
+	get_global BASICARR, "BASICARR"
 	key = _ARRAY_BUILDKEY(keycount, things)
 	$P0 = BASICARR[array]
 	if key != "" goto ARR_NORMAL
@@ -55,13 +55,13 @@ ARR_END:
 	if rhs_type == .String goto ASSIGN_STRING
 	.local string key
 	.local pmc BASICARR
-	BASICARR = find_global "BASICARR"
+	BASICARR = get_global "BASICARR"
 
 	key = _ARRAY_BUILDKEY(keycount,things)
 	$P1 = BASICARR[array]
 	$P0 =  $P1["hash"]
 	$P0[key] = rhs
-	store_global "BASICARR", BASICARR
+	set_global "BASICARR", BASICARR
 	goto END_ASSIGN
 
 	# Assign a string
@@ -70,13 +70,13 @@ ASSIGN_STRING:
 
 	.local string key
 	.local pmc BASICARR
-	find_global BASICARR, "BASICARR"
+	get_global BASICARR, "BASICARR"
 
 	key = _ARRAY_BUILDKEY(keycount, things)
 	$P1 =  BASICARR[array]
 	$P0 = $P1["hash"]
 	$P0[key] = rhs
-	store_global "BASICARR", BASICARR
+	set_global "BASICARR", BASICARR
 	goto END_ASSIGN
 
 	# Assign a... well, we dunno WTF this is.
@@ -84,7 +84,7 @@ ASSIGN_UNK:
 	#ne I3, 1, ASSIGN_ERR (handled by calling conventions now)
 	.local string key
 	.local pmc BASICARR
-	find_global BASICARR, "BASICARR"
+	get_global BASICARR, "BASICARR"
 	key = _ARRAY_BUILDKEY(keycount,things)
 	$P1 = BASICARR[array]
 	$P0 = $P1["hash"]
@@ -109,7 +109,7 @@ NOTINT:
 	#goto END_UNK
 
 END_UNK:
-	store_global "BASICARR", BASICARR
+	set_global "BASICARR", BASICARR
 	goto END_ASSIGN
 
 ASSIGN_ERR:
@@ -119,7 +119,7 @@ ASSIGN_ERR:
 
 END_ASSIGN:
 	# Temporary, needed only until Hash->keys() gets implemented
-	find_global BASICARR, "BASICARR"
+	get_global BASICARR, "BASICARR"
 	$P1 = BASICARR[array]
 	$P0 = $P1["index"]
 	.local int i
@@ -134,7 +134,7 @@ E_A2:
 	$P0[i]=key
 	$P1["index"]=$P0
 	BASICARR[array]=$P1
-	store_global "BASICARR", BASICARR
+	set_global "BASICARR", BASICARR
 REALEND:
 	noop
 .end
@@ -148,7 +148,7 @@ REALEND:
 	.local pmc TARGARR
 	.local pmc TARGINDEX
 	.local int i
-	find_global BASICARR, "BASICARR"
+	get_global BASICARR, "BASICARR"
 	$P0=BASICARR[source]
 	SRCINDEX=$P0["index"]
 	$P0=BASICARR[target]
@@ -176,13 +176,13 @@ ENDLOOP:noop
 #	.param string rhs
 #	.local string key
 #	.local pmc BASICARR
-#	find_global BASICARR, "BASICARR"
+#	get_global BASICARR, "BASICARR"
 
 #	key = _ARRAY_BUILDKEY()   # Will absorb rest of arguments.
 #	set $P0, BASICARR[array]
 #	set $P0[key], rhs
 #
-#	store_global "BASICARR", BASICARR
+#	set_global "BASICARR", BASICARR
 #.end
 # These are probably defined somewhere, I can't find them.
 

@@ -10,28 +10,28 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	set I0, 1
 	set I5, -11
 	invoke
-	store_global "kernel32", P1
-	store_global "Win32handle", P5
+	set_global "kernel32", P1
+	set_global "Win32handle", P5
 	set I0, 1
 	set I5, -10
 	invoke
-	store_global "Win32Inputhandle", P5
+	set_global "Win32Inputhandle", P5
 	$P0= new 'Hash'
-	store_global "Win32console", $P0
+	set_global "Win32console", $P0
 	_WIN32_CONSOLE_INFO()
 .end
 .sub _win32_shutdown			# void win32_shutdown(void)
 .end
 .sub _WIN32_CONSOLE_INFO		# void WIN32_CONSOLE_INFO(void)
-	find_global P1, "kernel32"
+	get_global P1, "kernel32"
 	dlfunc P0, P1, "GetConsoleScreenBufferInfo", "ipp"
-	find_global P5, "Win32handle"
+	get_global P5, "Win32handle"
 	P6=new 'ManagedStruct'
 	set P6, SIZEOF_CONSOLE_SCREEN_BUFFER_INFO
 	set I0, 1
 	invoke
 	set P5, P6
-	find_global P0, "Win32console"
+	get_global P0, "Win32console"
 
 	$I1 = _UMS_GET_SHORT(0,P5) # 0==dwSize.X
 	set P0["xbuf"], $I1
@@ -65,20 +65,20 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	_WIN32_CONSOLE_HOME()
 .end
 .sub _WIN32_CONSOLE_HOME	# void Win32_console_home(void)
-	find_global P2, "kernel32"
+	get_global P2, "kernel32"
 	dlfunc P0, P2, "SetConsoleCursorPosition", "ipi"
 	set I0, 1
-	find_global P5, "Win32handle"
+	get_global P5, "Win32handle"
 	set I5, 0
 	invoke
 .end
 
 .sub _WIN32_CONSOLE_CLEAR	# void Win32_console_clear(void)
-	find_global P1, "Win32console"
-	find_global P2, "kernel32"
+	get_global P1, "Win32console"
+	get_global P2, "kernel32"
 	dlfunc P0, P2, "FillConsoleOutputCharacterA", "ipcilp"
 	set I0, 1
-	find_global P5, "Win32handle"
+	get_global P5, "Win32handle"
 	P6=new 'ManagedStruct'
 	set P6, SIZEOF_DWORD
 	set I5, 32			# Char (space)
@@ -91,7 +91,7 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	# in effect.
 	dlfunc P0, P2, "FillConsoleOutputAttribute", "ipiilp"
 	set I0, 1
-	find_global P5, "Win32handle"
+	get_global P5, "Win32handle"
 	P6= new 'ManagedStruct'
 	set P6, SIZEOF_DWORD
 	set I5, P1["attr"]		# Attrib
@@ -105,12 +105,12 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	_WIN32_CONSOLE_INFO()
 .end
 .sub _WIN32_SCREEN_GETXCUR		# int win32_screen_getxcur(void)
-	find_global P1, "Win32console"
+	get_global P1, "Win32console"
 	set $I0, P1["curx"]
 	.return($I0)
 .end
 .sub _WIN32_SCREEN_GETYCUR		# int win32_screen_getycur(void)
-	find_global P1, "Win32console"
+	get_global P1, "Win32console"
 	set $I0, P1["cury"]
 	.return($I0)
 .end
@@ -136,11 +136,11 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	set I5, x
 	shl I5, I5, 16
 	add I5, I5, y
-	find_global P1, "Win32console"
-	find_global P2, "kernel32"
+	get_global P1, "Win32console"
+	get_global P2, "kernel32"
 	dlfunc P0, P2, "SetConsoleCursorPosition", "ipi"
 	set I0, 1
-	find_global P5, "Win32handle"
+	get_global P5, "Win32handle"
 	invoke
 .end
 
@@ -178,9 +178,9 @@ I can't test this on windows, and it's currently broken. Please fix it.
 	.param int back
 	shl I5, back, 4
 	add I5, I5, fore
-	find_global P2, "kernel32"
+	get_global P2, "kernel32"
 	dlfunc P0, P2, "SetConsoleTextAttribute", "ipi"
-	find_global P5, "Win32handle"
+	get_global P5, "Win32handle"
 	set I0, 1
 	invoke
 	_WIN32_CONSOLE_INFO()  # refresh this.
@@ -192,16 +192,16 @@ I can't test this on windows, and it's currently broken. Please fix it.
 .sub _WIN32_INKEY	# string Win32_inkey(void)
 	set S0, ""
 	set I9, 0
-	find_global P1, "kernel32"
+	get_global P1, "kernel32"
 	dlfunc P0, P1, "SetConsoleMode", "ipi"
 	set I0, 1
-	find_global P5, "Win32Inputhandle"
+	get_global P5, "Win32Inputhandle"
 	set I5, 0
 	invoke
 INKEY:
 	dlfunc P9, P1,  "PeekConsoleInputA",  "ippip"
         dlfunc P10, P1, "ReadConsoleInputA", "ippip"
-	find_global P5, "Win32Inputhandle"
+	get_global P5, "Win32Inputhandle"
 	P6=new 'ManagedStruct'
 	P7=new 'ManagedStruct'
 	set P6, INPUT_BUFFER
@@ -245,7 +245,7 @@ NEXT_EVENT:
 	inc I5
 	set P0, P10	# ReadConsoleInput
         set I0, 1
-	find_global P5, "Win32Inputhandle"
+	get_global P5, "Win32Inputhandle"
 	invoke
 	branch END
 

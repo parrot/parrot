@@ -27,7 +27,7 @@
         # XXX Used to use entrytype.  our naive fix here will eventually
 	#   fail, because of the two variable type arguments.
 
-	$P0 = find_global "PRINTCOL"
+	$P0 = get_global "PRINTCOL"
 	PRINTCOL = $P0["value"]
 
 	buf = ""
@@ -85,7 +85,7 @@ DISPNL:
 	goto NEXT
 END_DISPLAY:
 	$P0["value"] = PRINTCOL
-	store_global "PRINTCOL", $P0
+	set_global "PRINTCOL", $P0
 	print buf
 	.return(buf)
 DISPERR:
@@ -245,7 +245,7 @@ MIDDONE:
 .sub _BUILTIN_RND	# num rnd([num seed])
 	.param int argc
 	.local int RANDSEED
-	find_global $P0, "RANDSEED"
+	get_global $P0, "RANDSEED"
 	set RANDSEED, $P0["value"]
 	eq argc, 0, RND_GEN
 	.local num repeat
@@ -264,7 +264,7 @@ RND_REPEAT:
 RND_BAIL:
 
 	set $P0["value"], RANDSEED
-	store_global "RANDSEED", $P0
+	set_global "RANDSEED", $P0
 
 	.return($N0)
 .end
@@ -430,7 +430,7 @@ ERR_RANGE:
 	.param int argc
 	.param num cols
 	.local int PRINTCOL
-	find_global $P0, "PRINTCOL"
+	get_global $P0, "PRINTCOL"
 	set PRINTCOL, $P0["value"]
 
 	set $I0, cols

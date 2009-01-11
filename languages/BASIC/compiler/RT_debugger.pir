@@ -1,7 +1,7 @@
 .sub _DEBUGGER_STOP_FOR_REAL	# void Debugger_stop(int line, Hash local_values)
 	.param int line
 	.param pmc locals
-	find_global $P25, "DEBUGGER"
+	get_global $P25, "DEBUGGER"
 
 	set $P0, $P25["code"]
 	set $S0, $P0[line]
@@ -199,7 +199,7 @@ DEBUG_PRINTEND:
 	ret
 
 DEBUGGER_DONE:
-	store_global "DEBUGGER", $P25
+	set_global "DEBUGGER", $P25
 	ret
 .end
 

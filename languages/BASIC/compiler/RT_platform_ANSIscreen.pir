@@ -28,7 +28,7 @@
 	$P0[5]= MAGENTA
 	$P0[6]= YELLOW
 	$P0[7]= WHITE
-	store_global "ANSI_fgcolors", $P0
+	set_global "ANSI_fgcolors", $P0
 
 	$P0=new 'ResizablePMCArray'
 	$P0[0]= BLACK
@@ -47,11 +47,11 @@
 	$P0[13]= MAGENTA
 	$P0[14]= YELLOW
 	$P0[15]= 8
-	store_global "ANSI_bgcolors", $P0
+	set_global "ANSI_bgcolors", $P0
 
 	$P0=new 'Hash'
 	$P0["value"]=0
-	store_global "scankey", $P0
+	set_global "scankey", $P0
 .end
 
 .sub _ansi_screen_clear
@@ -106,7 +106,7 @@
 #	# foreground in I0
 #	# background in I1
 	print "[0;"
-	find_global $P0, "ANSI_fgcolors"
+	get_global $P0, "ANSI_fgcolors"
 	lt fore, 8, ANSI_FG
 	sub fore, fore, 8
 	print "1;"	# Turn on high intensity
@@ -118,7 +118,7 @@ ANSI_FG:
 
 	# Background
 ANSI_BG:
-	$P0 = find_global "ANSI_bgcolors"
+	$P0 = get_global "ANSI_bgcolors"
 	$I3 = $P0[back]
 	print "4"
 	print $I3
@@ -155,14 +155,14 @@ ANSI_BG:
 
 	ioctl(0, TCSETAF, $P10)
 
-	store_global "ioctl_mode", $P9
+	set_global "ioctl_mode", $P9
 .end
 
 .sub _set_echo_nocbreak
 	$P1 = loadlib ""
 	.local pmc ioctl
 	ioctl = dlfunc $P1, "ioctl", "iiip"
-	$P9 = find_global "ioctl_mode"
+	$P9 = get_global "ioctl_mode"
 
 	ioctl(0, TCSETAF, $P9)
 .end
@@ -184,11 +184,11 @@ ANSI_BG:
 
 	$P0=new 'Hash'
 	$P0["value"]= old_value
-	store_global "fcntl_mode", $P0
+	set_global "fcntl_mode", $P0
 .end
 
 .sub _unset_nonblock	# void _unset_nonblock
-	$P0 = find_global "fcntl_mode"
+	$P0 = get_global "fcntl_mode"
 	$I11= $P0["value"]
 	$P1 = loadlib ""
 	.local pmc fcntl
@@ -198,23 +198,23 @@ ANSI_BG:
 .end
 
 .sub _TERMIO_scankey
-	find_global $P0, "scankey"
+	get_global $P0, "scankey"
 	I0= $P0["value"]
 	eq I0, 1, END
 	_set_noecho_cbreak()
 END:
 	$P0["value"]= 1
-	store_global "scankey", $P0
+	set_global "scankey", $P0
 .end
 
 .sub _TERMIO_normal
-	find_global $P0, "scankey"
+	get_global $P0, "scankey"
 	I0= $P0["value"]
 	eq I0, 0, END
 	_set_echo_nocbreak()
 END:
 	$P0["value"]= 0
-	store_global "scankey", $P0
+	set_global "scankey", $P0
 .end
 
 # For now, uses TERMIO calls directly and assumes you're on a

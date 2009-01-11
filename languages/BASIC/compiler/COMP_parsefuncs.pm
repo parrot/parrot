@@ -299,10 +299,10 @@ PROMPTRND
     else {
         ( $result, $type, @code ) = EXPRESSION();
         push @{ $code{$seg}->{code} }, <<EOR;
-@code   find_global \$P0, "RANDSEED"
+@code   get_global \$P0, "RANDSEED"
         \$I0= $result
         \$P0["value"]= \$I0
-        store_global "RANDSEED", \$P0
+        set_global "RANDSEED", \$P0
 EOR
         feedme();
     }
@@ -450,9 +450,9 @@ PRINT
         }
         else {
             push @{ $code{$seg}->{code} }, <<PRINT;
-        find_global \$P0, "PRINTCOL"
+        get_global \$P0, "PRINTCOL"
         \$P0["value"]=0
-        store_global "PRINTCOL", \$P0
+        set_global "PRINTCOL", \$P0
         print "\\n"
 PRINT
         }
@@ -1187,9 +1187,9 @@ DIMTYPE
         \$P3 = new 'Hash'
         \$P3["index"]=\$P2
         \$P3["hash"]=\$P0
-        find_global \$P1, "BASICARR"
+        get_global \$P1, "BASICARR"
         \$P1["$var$seg"]= \$P3
-        store_global "BASICARR", \$P1
+        set_global "BASICARR", \$P1
         #
 DIMARR
         if ( $syms[NEXT] eq "," ) {
@@ -1395,9 +1395,9 @@ EOH
             $arrays{"${_}${seg}"} = 1;
             push @{ $code{$seg}->{code} }, <<PUSHARR;
         .param pmc array_$englishname
-        find_global \$P1, "BASICARR"
+        get_global \$P1, "BASICARR"
         \$P1["${_}$seg"]= array_$englishname
-        store_global "BASICARR", \$P1
+        set_global "BASICARR", \$P1
 PUSHARR
 
             # push @{$code{$seg}->{args}}, $_;
@@ -1532,8 +1532,8 @@ RTBE
 sub parse_data_setup {
     push @{ $code{_data}->{code} }, <<DATAPREP;
         # Prepare the Read/Data stuff
-        find_global \$P1, "RESTOREINFO"
-        find_global \$P2, "READDATA"
+        get_global \$P1, "RESTOREINFO"
+        get_global \$P2, "READDATA"
 DATAPREP
     my $counter = 0;
     foreach my $ld (@data) {
@@ -1551,8 +1551,8 @@ ADDDATA
     }
 
     push @{ $code{_data}->{code} }, <<DATADONE;
-        store_global "RESTOREINFO", \$P1
-        store_global "READDATA", \$P2
+        set_global "RESTOREINFO", \$P1
+        set_global "READDATA", \$P2
 DATADONE
 }
 

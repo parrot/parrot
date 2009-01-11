@@ -93,7 +93,7 @@ END_PIR
     }
     if (@saves) {
         print CODE qq{\t\t# Grab "COMMON" variables from global stash\n};
-        print CODE qq{\t\tfind_global _GLOBALS, "COMMON"\n};
+        print CODE qq{\t\tget_global _GLOBALS, "COMMON"\n};
         foreach (@saves) {
             print CODE qq{\t\t$_=_GLOBALS["$_"]\n};
         }
@@ -111,11 +111,11 @@ END_PIR
                 }
             }
             if (@saves) {
-                $edit .= qq{\tfind_global _GLOBALS, "COMMON"\n};
+                $edit .= qq{\tget_global _GLOBALS, "COMMON"\n};
                 foreach (@saves) {
                     $edit .= qq{\t_GLOBALS["$_"]=$_\n};
                 }
-                $edit .= qq{\tstore_global "COMMON", _GLOBALS\n};
+                $edit .= qq{\tset_global "COMMON", _GLOBALS\n};
             }
             s/#SAVECOMMON/$edit/;
         }
@@ -128,7 +128,7 @@ END_PIR
                 }
             }
             if (@saves) {
-                $edit .= qq{\tfind_global _GLOBALS, "COMMON"\n};
+                $edit .= qq{\tget_global _GLOBALS, "COMMON"\n};
                 foreach (@saves) {
                     $edit .= qq{\t$_=_GLOBALS["$_"]\n};
                 }
@@ -147,11 +147,11 @@ END_PIR
         }
     }
     if (@saves) {
-        print CODE qq{\t\tfind_global _GLOBALS, "COMMON"\n};
+        print CODE qq{\t\tget_global _GLOBALS, "COMMON"\n};
         foreach (@saves) {
             print CODE qq{\t_GLOBALS["$_"]=$_\n};
         }
-        print CODE qq{\t\tstore_global "COMMON", _GLOBALS\n\t};
+        print CODE qq{\t\tset_global "COMMON", _GLOBALS\n\t};
     }
     delete $code{$seg};
     if ( !$debug ) {
@@ -163,7 +163,7 @@ END_PIR
     print CODE<<EOD;
         .sub ${seg}_debug
                 .param int debline
-                find_global \$P0, "DEBUGGER"
+                get_global \$P0, "DEBUGGER"
                 \$I0= \$P0["step"]
                 ne \$I0, 0, DEBUGGER_STOP
                 \$P1= \$P0["break"]
@@ -187,7 +187,7 @@ if ($debug) {
 .sub _DEBUG_INIT
         saveall
         \$P0=new 'ResizablePMCArray'
-        find_global \$P1, "DEBUGGER"
+        get_global \$P1, "DEBUGGER"
 FOO
     foreach ( 0 .. @main::basic - 1 ) {
         my $line = $main::basic[$_];
@@ -201,7 +201,7 @@ FOO
         \$P1["break"]= \$P0  # Breakpoints
         \$P0=new 'ResizablePMCArray'
         \$P1["watch"]= \$P0  # Watch
-        store_global "DEBUGGER", \$P1
+        set_global "DEBUGGER", \$P1
 .end
 FOO
 }

@@ -27,8 +27,8 @@
 .sub _READ		# ResizablePMCArray READ(void)
 	.local pmc READDATA
 	.local int READPOINTER
-	find_global READDATA, "READDATA"
-	find_global $P0, "READPOINTER"
+	get_global READDATA, "READDATA"
+	get_global $P0, "READPOINTER"
 	set READPOINTER, $P0["value"]
 
 	set $I0, READDATA
@@ -39,7 +39,7 @@
 	inc READPOINTER
 
 	set $P0["value"], READPOINTER
-	store_global "READPOINTER", $P0
+	set_global "READPOINTER", $P0
 
 	.return($S1)
 ERR_READ:
@@ -50,14 +50,14 @@ ERR_READ:
 	.param string where
 	.local int READPOINTER
 	.local pmc RESTOREINFO
-	find_global RESTOREINFO, "RESTOREINFO"
-	find_global $P0, "READPOINTER"
+	get_global RESTOREINFO, "RESTOREINFO"
+	get_global $P0, "READPOINTER"
 	set READPOINTER, $P0["value"]
 
 	set READPOINTER, RESTOREINFO[where]
 
 	set $P0["value"], READPOINTER
-	store_global "READPOINTER", $P0
+	set_global "READPOINTER", $P0
 .end
 
 .sub _get_little_endian # int get_little_endian(struct, offset, bytes)

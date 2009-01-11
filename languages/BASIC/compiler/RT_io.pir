@@ -8,7 +8,7 @@
 	.param int fd
 	ne fd, 0, NORESET
 	_line_read()
-NORESET:find_global $P0, "FDS"
+NORESET:get_global $P0, "FDS"
 	$P1=$P0[fd]
 	set $S0, ""
 	read $S0, $P1, numchar
@@ -27,14 +27,14 @@ NORESET:find_global $P0, "FDS"
 	print " in open\n"
 	end
 OPEN_OK:
-	find_global $P0, "FDS"
+	get_global $P0, "FDS"
 	$P0[fd]=$P1
-	store_global "FDS", $P0
+	set_global "FDS", $P0
 .end
 .sub _CLOSE		# void close(int fd)
 	.param int fd
 	.local int error
-	find_global $P0, "FDS"
+	get_global $P0, "FDS"
 	set $P1, $P0[fd]
 	close $P1
 	err error
@@ -44,21 +44,21 @@ OPEN_OK:
 	print " in close\n"
 	end
 CLOSE_OK:
-	store_global "FDS", $P0
+	set_global "FDS", $P0
 .end
 .sub _WRITE		# void writestring(int fd, 1, string stuff)
 	.param int fd
 	.local string buffer
 	.local int oldprintcol
 
-	find_global $P1, "PRINTCOL"
+	get_global $P1, "PRINTCOL"
 	oldprintcol=$P1["value"]
 	buffer = _BUILTIN_DISPLAY(fd, buffer) #_WORK()
-	find_global $P1, "PRINTCOL"
+	get_global $P1, "PRINTCOL"
 	$P1["value"]=oldprintcol
-	store_global "PRINTCOL", $P1
+	set_global "PRINTCOL", $P1
 
-	find_global $P0, "FDS"
+	get_global $P0, "FDS"
 	set $P1, $P0[fd]
 	print $P1, buffer
 .end
@@ -74,7 +74,7 @@ CLOSE_OK:
 #        #       I0   Error?
 .sub _READLINE		# string readline(int fd)
 	.param int fd
-	$P0 = find_global "FDS"
+	$P0 = get_global "FDS"
 	$P1 = $P0[fd]
 	$S0 = readline $P1
 	.return($S0)

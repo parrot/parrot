@@ -4,24 +4,24 @@
 .const int VALUE = 1
 .sub _main :main
 	$P0 = new 'Hash'
-	store_global "BASICARR", $P0
+	set_global "BASICARR", $P0
 	$P0 = new 'ResizablePMCArray'
-	store_global "READDATA", $P0
+	set_global "READDATA", $P0
 	$P0 = new 'Hash'
-	store_global "RESTOREINFO", $P0
+	set_global "RESTOREINFO", $P0
 	$P0=new 'Hash'
 	$P0["value"]=0
-	store_global "READPOINTER", $P0
+	set_global "READPOINTER", $P0
 	$P0=new 'Hash'
 	$P0["value"]=20021107
-	store_global "RANDSEED", $P0
+	set_global "RANDSEED", $P0
 	$P0=new 'Hash'
 	$P0["value"]=0
-	store_global "PRINTCOL", $P0
+	set_global "PRINTCOL", $P0
 	$P0=new 'Hash'
-	store_global "DEBUGGER", $P0
+	set_global "DEBUGGER", $P0
 	$P0=new 'Hash'
-	store_global "COMMON", $P0
+	set_global "COMMON", $P0
 	$P0=new 'ResizablePMCArray'
 	fdopen $P1, 0, "r"	# STDIN and friends...
         $P1 = getstdin
@@ -32,7 +32,7 @@
 	$P0[1]=$P1
         $P1 = getstderr
 	$P0[2]=$P1
-	store_global "FDS", $P0
+	set_global "FDS", $P0
 
 	_data()
 	_platform_setup()
