@@ -1,14 +1,14 @@
 # $Id$
 
 # Setup some commands
-LN_S     = @lns@
 PERL     = @perl@
 RM_F     = @rm_f@
+CP       = @cp@
 PARROT   = ../../parrot@exe@
+
 TOOL_DIR = ../..
 PGE_DIR  = ../../compilers/pge
 TEST_DIR = ../../t/compilers/pct
-CP       = @cp@
 
 # Where to put things
 PARROT_LIBRARY    = ../../runtime/parrot/library
@@ -58,7 +58,7 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-test: all 
+test: all
 	cd $(TOOL_DIR) && prove -r t/compilers/pct
 
 testclean:

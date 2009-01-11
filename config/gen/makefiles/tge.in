@@ -51,12 +51,12 @@ testclean:
 
 clean: testclean
 	$(RM_F) TGE/Rule.pbc \
-	TGE/Parser.pir \
-	TGE/Parser.pbc \
-	TGE/Tree.pbc \
-	TGE/Grammar.pbc \
-	TGE/Compiler.pbc \
-	$(PARROT_LIBRARY)/TGE.pbc
+	    TGE/Parser.pir \
+	    TGE/Parser.pbc \
+	    TGE/Tree.pbc \
+	    TGE/Grammar.pbc \
+	    TGE/Compiler.pbc \
+	    $(PARROT_LIBRARY)/TGE.pbc
 
 realclean: clean
 	$(RM_F) Makefile

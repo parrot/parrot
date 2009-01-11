@@ -33,7 +33,7 @@ test: all
 	cd $(TOOL_DIR) && prove -r t/compilers/json
 
 testclean:
-	$(RM_F) "../../t/compilers/json/*.pir" \
+	$(RM_F) "../../t/compilers/json/*.pir"
 
 JSON.pbc : JSON/grammar.pbc JSON/pge2pir.pbc JSON.pir
 	$(PARROT) --output=JSON.pbc JSON.pir
@@ -51,4 +51,4 @@ JSON/pge2pir.pir : JSON/pge2pir.tg
 	$(PARROT) $(TGE_DIR)/tgc.pir --output=JSON/pge2pir.pir JSON/pge2pir.tg
 
 clean : testclean
-	@rm_f@ "JSON/*.pbc" "JSON/*.pir" JSON.pbc
+	$(RM_F) "JSON/*.pbc" "JSON/*.pir" JSON.pbc

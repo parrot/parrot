@@ -10,13 +10,15 @@ PGE_LIBRARY  = @build_dir@/runtime/parrot/library/PGE
 
 all: nqp.pbc
 
-SOURCES = nqp.pir \
+SOURCES = \
+  nqp.pir \
   src/Grammar.pg \
   src/Grammar/Actions.pir \
   src/builtins.pir
 
-BOOTSRC = bootstrap/nqp.pir \
-	bootstrap/actions.pm
+BOOTSRC = \
+  bootstrap/nqp.pir \
+  bootstrap/actions.pm
 
 # the default target
 nqp.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
@@ -26,9 +28,9 @@ nqp.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
 
 boot: $(BOOTSRC)
 	$(PARROT) nqp.pbc \
-	--output=bootstrap/gen_actions.pir \
-	--target=pir \
-	bootstrap/actions.pm
+	    --output=bootstrap/gen_actions.pir \
+	    --target=pir \
+	    bootstrap/actions.pm
 	$(PARROT) --output-pbc -o bootstrap/nqp.pbc bootstrap/nqp.pir
 
 # This is a listing of all targets, that are meant to be called by users

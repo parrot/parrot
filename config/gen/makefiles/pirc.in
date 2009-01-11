@@ -1,7 +1,8 @@
 # $Id$
 
+.SUFFIXES : .c @o@
+
 # Setup some commands
-LN_S          = @lns@
 PERL          = @perl@
 RM_F          = @rm_f@
 PARROT        = ../../parrot@exe@
@@ -26,37 +27,38 @@ LINKFLAGS     = @linkflags@ @link_debug@ @ld_debug@
 LD            = @ld@
 LDFLAGS       = @ldflags@ @ld_debug@
 
-SOURCES       = src/main.c \
-src/pirparser.c \
-src/pirlexer.c \
-src/pircompunit.c \
-src/pircompiler.c \
-src/pirsymbol.c \
-src/piremit.c \
-src/hdocprep.c \
-src/pirmacro.c \
-src/pirregalloc.c \
-src/bcgen.c \
-src/pirerr.c \
-src/pircapi.c \
-src/pirop.c
+SOURCES       = \
+  src/main.c \
+  src/pirparser.c \
+  src/pirlexer.c \
+  src/pircompunit.c \
+  src/pircompiler.c \
+  src/pirsymbol.c \
+  src/piremit.c \
+  src/hdocprep.c \
+  src/pirmacro.c \
+  src/pirregalloc.c \
+  src/bcgen.c \
+  src/pirerr.c \
+  src/pircapi.c \
+  src/pirop.c
 
 OBJS          = \
-src/main$(O) \
-src/pirparser$(O) \
-src/pirlexer$(O) \
-src/pircompunit$(O) \
-src/pircompiler$(O) \
-src/pirsymbol$(O) \
-src/piremit$(O) \
-src/hdocprep$(O) \
-src/pirmacro$(O) \
-src/pirregalloc$(O) \
-src/bcgen$(O) \
-src/pirpcc$(O) \
-src/pirerr$(O) \
-src/pircapi$(O) \
-src/pirop$(O)
+  src/main$(O) \
+  src/pirparser$(O) \
+  src/pirlexer$(O) \
+  src/pircompunit$(O) \
+  src/pircompiler$(O) \
+  src/pirsymbol$(O) \
+  src/piremit$(O) \
+  src/hdocprep$(O) \
+  src/pirmacro$(O) \
+  src/pirregalloc$(O) \
+  src/bcgen$(O) \
+  src/pirpcc$(O) \
+  src/pirerr$(O) \
+  src/pircapi$(O) \
+  src/pirop$(O)
 
 .c$(O) :
 	@$(PERL) ../../tools/dev/cc_flags.pl -v ../../CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
@@ -68,8 +70,8 @@ all: pirc$(EXE)
 
 pirc$(EXE): $(OBJS)
 	$(LINK) @ld_out@$@ \
-  $(OBJS) \
-	@rpath_blib@ @libparrot_ldflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+	    $(OBJS) \
+	    @rpath_blib@ @libparrot_ldflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 
 src/pirparser$(O): src/pirparser.c src/pirparser.h
 src/pirlexer$(O): src/pirlexer.c src/pirlexer.h
@@ -98,12 +100,11 @@ Makefile: $(BUILD_DIR)/config/gen/makefiles/pirc.in
 clean:
 	$(RM_F) *$(O)
 	$(RM_F) $(OBJS)
-	$(RM_F) pirc
+	$(RM_F) pirc$(EXE)
 
 realclean: clean
 	$(RM_F) \
-Makefile \
-pirc$(EXE) \
-doc/*.html
+	    Makefile \
+	    doc/*.html
 
 distclean: realclean
