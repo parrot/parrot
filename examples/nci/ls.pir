@@ -16,7 +16,7 @@ List the content of the directory 'docs'.
      .local pmc opendir
      .local pmc readdir
      .local pmc closedir
-     null libc
+     libc = loadlib 'libc'
      dlfunc opendir, libc, 'opendir', 'pt'
      dlfunc readdir, libc, 'readdir', 'pp'
      dlfunc closedir, libc, 'closedir', 'ip'
