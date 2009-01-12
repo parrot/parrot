@@ -719,13 +719,6 @@ handler:
 .endm
 
 .sub ln_of_complex_numbers
-    .local pmc config_hash, interp
-    .local string osname
-    interp = getinterp
-    config_hash = interp[.IGLOBALS_CONFIG_HASH]
-    osname = config_hash["os_name"]
-    eq osname, "MSWin32", win32fail
-
     .complex_op_is("-2+0i", "0.693147+3.141593i", 'ln' )
     .complex_op_is("-1+0i", "0.000000+3.141593i", 'ln' )
     .complex_op_is("-0.5+0i", "-0.693147+3.141593i", 'ln' )
@@ -747,10 +740,6 @@ handler:
     .complex_op_is("2-3i", "1.282475-0.982794i", 'ln' )
     .complex_op_is("-2+3i", "1.282475+2.158799i", 'ln' )
     .complex_op_is("-2-3i", "1.282475-2.158799i", 'ln' )
-    .return()
-
-win32fail:
-    skip( 17, 'inf is not platform-independent' )
 .end
 
 .sub exp_of_complex_numbers
@@ -1031,10 +1020,10 @@ win32fail:
 
 .sub sinh_of_complex_numbers
     .local pmc config_hash, interp
+    .local string osname
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
-    $S0 = config_hash["os_name"]
-    eq $S0, "MSWin32", win32fail
+    osname = config_hash["osname"]
 
     .complex_op_is("-2+0i", "-3.626860+0.000000i", 'sinh' )
     .complex_op_is("-1+0i", "-1.175201+0.000000i", 'sinh' )
@@ -1042,21 +1031,23 @@ win32fail:
     .complex_op_is("0.5+0i", "0.521095+0.000000i", 'sinh' )
     .complex_op_is("1+0i", "1.175201+0.000000i", 'sinh' )
     .complex_op_is("2+0i", "3.626860+0.000000i", 'sinh' )
-    .complex_op_is("0-2i", "-0.000000-0.909297i", 'sinh' )
     .complex_op_is("0-1i", "0.000000-0.841471i", 'sinh' )
     .complex_op_is("0-0.5i", "0.000000-0.479426i", 'sinh' )
     .complex_op_is("0+0.5i", "0.000000+0.479426i", 'sinh' )
     .complex_op_is("0+1i", "0.000000+0.841471i", 'sinh' )
-    .complex_op_is("0+2i", "-0.000000+0.909297i", 'sinh' )
     .complex_op_is("0+0i", "0.000000+0.000000i", 'sinh' )
     .complex_op_is("2+3i", "-3.590565+0.530921i", 'sinh' )
     .complex_op_is("2-3i", "-3.590565-0.530921i", 'sinh' )
     .complex_op_is("-2+3i", "3.590565+0.530921i", 'sinh' )
     .complex_op_is("-2-3i", "3.590565-0.530921i", 'sinh' )
+
+    eq osname, "MSWin32", win32fail
+    .complex_op_is("0-2i", "-0.000000-0.909297i", 'sinh' )
+    .complex_op_is("0+2i", "-0.000000+0.909297i", 'sinh' )
     .return()
 
 win32fail:
-    skip( 17, 'failing on win32' )
+    skip( 2, 'failing on win32' )
 .end
 
 .sub cosh_of_complex_numbers
