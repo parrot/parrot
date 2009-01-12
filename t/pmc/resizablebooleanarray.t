@@ -1,12 +1,6 @@
-#! perl
+#! parrot
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 23;
 
 =head1 NAME
 
@@ -23,334 +17,258 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, ['ResizableBooleanArray']
+.include 'except_types.pasm'
+.include 'fp_equality.pasm'
 
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:   print "ok 1\n"
+.sub main :main
 
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:   print "ok 2\n"
+    .include 'test_more.pir'
 
-    set P0,5
-    set I0,P0
-    eq I0,5,OK_3
-    print "not "
-OK_3:   print "ok 3\n"
+    plan(64)
 
-    set P0,50
-    set I0,P0
-    eq I0,50,OK_4
-    print "not "
-OK_4:   print "ok 4\n"
+    setting_array_size()
+    setting_first_element()
+    setting_second_element()
+    setting_negatively_indexed_element()
+    getting_negatively_indexed_element()
+    setting_oob_element()
+    getting_oob_element()
+    set_via_pmc_keys_access_via_ints()
+    set_via_int_access_via_key_pmc()
+    interface_check()
+    push_integer()
+    push_and_pop()
+    pop_bounds_check()
+    shift_and_unshift()
+    shift_bounds_check()
+    aerobics()
+    direct_access()
+    sparse_access()
+    check_for_zeroedness()
+    pop_into_sparse()
+    clone_tests()
+    alternate_clone_tests()
 
-    set P0,7
-    set I0,P0
-    eq I0,7,OK_5
-    print "not "
-OK_5:   print "ok 5\n"
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-ok 5
-OUTPUT
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-        new P0, ['ResizableBooleanArray']
-        set P0, 1
 
-    set P0[0],-7
-    set I0,P0[0]
-    eq I0,1,OK_1
-    print "not "
-OK_1:   print "ok 1\n"
+.sub setting_array_size
 
-    set P0[0],3.7
-    set N0,P0[0]
-    eq N0,1.0,OK_2
-    print "not "
-OK_2:   print "ok 2\n"
+    new $P0, ['ResizableBooleanArray']
 
-    set P0[0],"17"
-    set S0,P0[0]
-    eq S0,"1",OK_3
-    print "not "
-OK_3:   print "ok 3\n"
+    is($P0, 0, "new ResizableBooleanArray is empty")
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+    $P0 = 1
+    is($P0, 1, "int assignment to RBA works")
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-        new P0, ['ResizableBooleanArray']
-        set P0, 2
+    $P0 = 5
+    is($P0, 5, "another int assignment to RBA works")
 
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,1,OK_1
-    print "not "
-OK_1:   print "ok 1\n"
+    $P0 = 50
+    is($P0, 50, "yet another int assignment to RBA works")
 
-    set P0[1], 3.7
-    set N0, P0[1]
-    eq N0,1.0,OK_2
-    print "not "
-OK_2:   print "ok 2\n"
+    $P0 = 7
+    is($P0, 7, "shrinking via int assignment to RBA works")
+.end
 
-    set P0[1],"17"
-    set S0, P0[1]
-    eq S0,"1",OK_3
-    print "not "
-OK_3:   print "ok 3\n"
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub setting_first_element
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
-    new P0, ['ResizableBooleanArray']
+    new $P0, ['ResizableBooleanArray']
+    $P0 = 1
 
-    push_eh caught
-    set P0[-1], 1
+    $P0[0] = -7
+    $I0 = $P0[0]
+    is($I0, 1, "negative int -> boolean conversion is ok")
+
+    $P0[0] = 3.7
+    $N0 = $P0[0]
+    is($N0, 1.0, "float -> boolean conversion is ok")
+
+    $P0[0] = 17
+    $I0 = $P0[0]
+    is($I0, 1, "positive int -> boolean conversion is ok")
+
+.end
+
+.sub setting_second_element
+
+    new $P0, ['ResizableBooleanArray']
+    $P0 = 2
+
+    $P0[1] = -7
+    $I0 = $P0[1]
+    is($I0, 1, "negative int -> boolean conversion is ok")
+
+    $P0[1] = 3.7
+    $N0 = $P0[1]
+    is($N0, 1.0, "float -> boolean conversion is ok")
+
+    $P0[1] = 17
+    $I0 = $P0[1]
+    is($I0, 1, "positive int -> boolean conversion is ok")
+
+.end
+
+
+.sub setting_negatively_indexed_element
+    new $P0, ['ResizableBooleanArray']
+    new $P1, ['ExceptionHandler']
+
+    set_addr $P1, caught
+    $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh $P1
+
+    set $P0[-1], 1
     pop_eh
-    print "no exception"
-    end
+
+    ok(0, "no exception caught for negative index access")
+    goto end
+
 caught:
-    say "caught an exception"
-    end
-CODE
-caught an exception
-OUTPUT
+    ok(1, "caught exception on negative index access")
+end:
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
-    new P0, ['ResizableBooleanArray']
-    set P0, 1
 
-    set I0, P0[-1]
-    print "got "
-    say I0
-    end
-CODE
-got 0
-OUTPUT
+.sub getting_negatively_indexed_element
+    new $P0, ['ResizableBooleanArray']
+    set $P0, 1
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, ['ResizableBooleanArray']
+    set $I0, $P0[-1]
+    is($I0, 0, "negative index retrieval is 0")
+.end
 
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,1,OK_1
-    print "not "
-OK_1:   print "ok 1\n"
 
-    set P0[0], 3.7
-    set N0, P0[0]
-    eq N0,1.0,OK_2
-    print "not "
-OK_2:   print "ok 2\n"
+.sub setting_oob_element
+    new $P0, ['ResizableBooleanArray']
 
-    set P0[5],"17"
-    set S0, P0[5]
-    eq S0,"1",OK_3
-    print "not "
-OK_3:   print "ok 3\n"
+    set $P0[1], -7
+    set $I0, $P0[1]
+    is($I0, 1, "negative oob assignment is fine")
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+    $P0[2] = 3.7
+    $N0 = $P0[2]
+    is($N0, 1.0, "float -> boolean conversion w/ oob assignment is ok")
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-        new P0, ['ResizableBooleanArray']
-        set P0, 1
+    $P0[3] = 17
+    $I0 = $P0[3]
+    is($I0, 1, "positive int -> boolean conversion w/ oob assignment is ok")
 
-    set I0, P0[1]
-    print "ok 1\n"
-    end
-CODE
-ok 1
-OUTPUT
+.end
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'include/fp_equality.pasm'
-     new P0, ['ResizableBooleanArray']
-     new P1, ['Key']
 
-     set P1, 0
-     set P0[P1], 25
+.sub getting_oob_element
+    new $P0, ['ResizableBooleanArray']
+    set $P0, 1
 
-     set P1, 1
-     set P0[P1], 2.5
+    set $I0, $P0[1]
+    ok(1, "setting/getting an oob element worked")
+.end
 
-     set P1, 2
-     set P0[P1], "17"
 
-     set I0, P0[0]
-     eq I0, 1, OK1
-     print "not "
-OK1: print "ok 1\\n"
+.sub set_via_pmc_keys_access_via_ints
+     new $P0, ['ResizableBooleanArray']
+     new $P1, ['Key']
 
-     set N0, P0[1]
-     .fp_eq_pasm(N0, 1.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
+     set $P1, 0
+     set $P0[$P1], 25
 
-     set S0, P0[2]
-     eq S0, "1", OK3
-     print "not "
-OK3: print "ok 3\\n"
+     set $P1, 1
+     set $P0[$P1], 2.5
 
-     end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+     set $P1, 2
+     set $P0[$P1], "17"
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'include/fp_equality.pasm'
-     new P0, ['ResizableBooleanArray']
-     set P0, 1
+     set $I0, $P0[0]
+     is($I0, 1, "key set, int get worked")
 
-     set P0[25], 125
-     set P0[128], 10.2
-     set P0[513], "17"
-     new P1, ['Integer']
-     set P1, 123456
-     set P0[1023], P1
+     set $N0, $P0[1]
+     is($N0, 1.0, "key set, num get worked")
 
-     new P2, ['Key']
-     set P2, 25
-     set I0, P0[P2]
-     eq I0, 1, OK1
-     print "not "
-OK1: print "ok 1\\n"
+     set $S0, $P0[2]
+     is($S0, "1", "key set, string get worked")
+.end
 
-     set P2, 128
-     set N0, P0[P2]
-     .fp_eq_pasm(N0, 1.0, OK2)
-     print "not "
-OK2: print "ok 2\\n"
+.sub set_via_int_access_via_key_pmc
+     new $P0, ['ResizableBooleanArray']
+     set $P0, 1
 
-     set P2, 513
-     set S0, P0[P2]
-     eq S0, "1", OK3
-     print "not "
-OK3: print "ok 3\\n"
+     set $P0[25], 125
+     set $P0[128], 10.2
+     set $P0[513], "17"
+     new $P1, ['Integer']
+     set $P1, 123456
+     set $P0[1023], $P1
 
-     set P2, 1023
-     set P3, P0[P2]
-     set I1, P3
-     eq I1, 1, OK4
-     print "not "
-OK4: print "ok 4\\n"
+     new $P2, ['Key']
+     set $P2, 25
+     set $I0, $P0[$P2]
+     is($I0, 1, "int set, key get worked")
 
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
+     set $P2, 128
+     set $N0, $P0[$P2]
+     is($N0, 1.0, "int set, key get worked")
 
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
-.sub _main
+     set $P2, 513
+     set $S0, $P0[$P2]
+     is($S0, "1", "int set key get worked")
+
+     set $P2, 1023
+     set $P3, $P0[$P2]
+     is($P3, 1, "int set, key get worked")
+.end
+
+.sub interface_check
     .local pmc pmc1
     pmc1 = new ['ResizableBooleanArray']
     .local int bool1
     does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
+    is(bool1, 0, "RBA doesn't do 'scalar'")
     does bool1, pmc1, "array"
-    print bool1
-    print "\n"
+    is(bool1, 1, "RBA does 'array'")
     does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    is(bool1, 0, "RBA doesn't do 'no_interface'")
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "push integer" );
-.sub _main
+.sub push_integer
     .local pmc pmc1
+    .local string last
+    .local int elements
+
     pmc1 = new ['ResizableBooleanArray']
     pmc1[9999] = 0
     push pmc1, 10001
-    .local int elements
     elements = pmc1
-    print elements
-    print "\n"
-    .local string last
+    is(elements, 10001, "element count looks good")
+
     last = pmc1[10000]
-    print last
-    print "\n"
-    end
+    is(last, 1, "last element has the right value")
 .end
-CODE
-10001
-1
-OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "creation" );
-        new P0, ['ResizableBooleanArray']
-        set I0, P0
-        print "Created ResizableBooleanArray with "
-        print I0
-        print " elements to start with.\n"
-        end
-CODE
-Created ResizableBooleanArray with 0 elements to start with.
-OUTPUT
+.sub push_and_pop
+    .local int i, i_elem
+    .local pmc pmc_arr
+    .local int elements
 
-pir_output_is( << 'CODE', << 'OUTPUT', "push and pop" );
-.sub test :main
-       .local int i, i_elem
-       .local pmc pmc_arr
-       .local int elements
+    i = 1
+    pmc_arr = new ['ResizableBooleanArray']
 
-       i = 1
-       pmc_arr = new ['ResizableBooleanArray']
+    is(pmc_arr, 0, "new RBA doesn't have any elements")
 
-       print_num_elements( pmc_arr )
+    push pmc_arr, i
+    is(pmc_arr, 1, "RBA with 1 element says it has 1 element")
 
-       push pmc_arr, i
-       print i
-       print_num_elements( pmc_arr )
+    push pmc_arr, 0
+    is(pmc_arr, 2, "RBA with 2 elements says it has 2 elements")
 
-       push pmc_arr, 0
-       print 0
-       print_num_elements( pmc_arr )
+    i_elem = pop pmc_arr
+    is(i_elem, 0, "pop popped the right value")
+    is(pmc_arr, 1, "RBA has 1 element, as expected")
 
-       print_num_elements( pmc_arr )
-
-       i_elem= pop pmc_arr
-       print i_elem
-       print_num_elements( pmc_arr )
-
-       i_elem= pop pmc_arr
-       print i_elem
-       print_num_elements( pmc_arr )
+    i_elem = pop pmc_arr
+    is(i_elem, 1, "pop popped the right value again")
+    is(pmc_arr, 0, "RBA is now empty, expectedly")
 
     pmc_arr = 62
     push pmc_arr, 0
@@ -360,523 +278,458 @@ pir_output_is( << 'CODE', << 'OUTPUT', "push and pop" );
     i_elem = pop pmc_arr
     i_elem = pop pmc_arr
     i_elem = pop pmc_arr
-    print i_elem
-    print_num_elements(pmc_arr)
+    is(i_elem, 1, "pop popped the right thing again")
+    is(pmc_arr, 63, "RBA has expected size")
 .end
 
-.sub print_num_elements
-       .param pmc pmc_arr
-       .local int elements
-       elements= pmc_arr
-       print '['
-       print elements
-       print "]\n"
-       .return()
+
+.sub pop_bounds_check
+    $P0 = new ['ResizableBooleanArray']
+    $P1 = new ['ExceptionHandler']
+
+    set_addr $P1, caught
+    $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh $P1
+    pop $I0, $P0
+    pop_eh
+    ok(0, "failed to catch an oob exception")
+    goto end
+caught:
+    ok(1, "caught an oob exception")
+end:
 .end
 
-CODE
-[0]
-1[1]
-0[2]
-[2]
-0[1]
-1[0]
-1[63]
-OUTPUT
 
-pir_error_output_like( << 'CODE', << 'OUTPUT', "pop bounds checking" );
-.sub 'test' :main
-       $P0 = new ['ResizableBooleanArray']
-       pop $I0, $P0
-.end
-CODE
-/ResizableBooleanArray: Can't pop from an empty array!.*/
-OUTPUT
+.sub shift_and_unshift
+    .local int i, i_elem
+    .local pmc pmc_arr
+    .local int elements
 
-#'
+    i = 1
+    pmc_arr = new ['ResizableBooleanArray']
 
-pir_output_is( << 'CODE', << 'OUTPUT', "unshift and shift" );
-.sub test :main
-       .local int i, i_elem
-       .local pmc pmc_arr
-       .local int elements
+    # No elements are set
+    is(pmc_arr, "", "stringification looks ok")
 
-       i= 1
-       pmc_arr = new ['ResizableBooleanArray']
+    # Set two of the first three elements
+    pmc_arr[0] = 1
+    pmc_arr[2] = 1
+    is(pmc_arr, "101", "stringification w/ 3 elems is good")
 
-       # No elements are set
-       print_num_elements( pmc_arr )
+    # Unshift a "1"  element on
+    unshift pmc_arr, i
+    is(pmc_arr, "1101", "still ok")
 
-       # Set two of the first three elements
-       pmc_arr[0] = 1
-       pmc_arr[2] = 1
-       print_num_elements( pmc_arr )
+    # Unshift a "0"  element on
+    unshift pmc_arr, 0
+    is(pmc_arr, "01101", "still ok")
 
-       # Unshift a "1"  element on
-       unshift pmc_arr, i
-       print i
-       print_num_elements( pmc_arr )
+    # Shift an element off
+    i_elem = shift pmc_arr
+    is(i_elem, 0, "shift shifted a 0")
+    is(pmc_arr, "1101", "stringification ok")
 
-       # Unshift a "0"  element on
-       unshift pmc_arr, 0
-       print 0
-       print_num_elements( pmc_arr )
+    # Shift an element off
+    i_elem = shift pmc_arr
+    is(i_elem, 1, "shift shifted a 1")
+    is(pmc_arr, "101", "stringification ok")
 
-       # Shift an element off
-       i_elem= shift pmc_arr
-       print i_elem
-       print_num_elements( pmc_arr )
+    # Resize the array
+    pmc_arr = 25
+    is(pmc_arr, "1010000000000000000000000", "long stringification is correct")
 
-       # Shift an element off
-       i_elem= shift pmc_arr
-       print i_elem
-       print_num_elements( pmc_arr )
+    # Unshift 4 elements on
+    unshift pmc_arr, 1
+    unshift pmc_arr, 1
+    unshift pmc_arr, 0
+    unshift pmc_arr, 1
+    is(pmc_arr, "10111010000000000000000000000", "longer stringification is ok")
 
-       # Resize the array
-       pmc_arr = 62
-       print_num_elements(pmc_arr)
+    # Shift 3 elements off
+    i_elem = shift pmc_arr
+    i_elem = shift pmc_arr
+    i_elem = shift pmc_arr
+    is(i_elem, 1, "shift shifted the right thing")
+    is(pmc_arr, "11010000000000000000000000", "stringification is still ok")
 
-       # Unshift 4 elements on
-       unshift pmc_arr, 1
-       unshift pmc_arr, 1
-       unshift pmc_arr, 0
-       unshift pmc_arr, 1
-       print_num_elements(pmc_arr)
+    # Set same size array is currently
+    pmc_arr = 26
+    is(pmc_arr, "11010000000000000000000000", "noop size change did nothing")
 
-       # Shift 3 elements off
-       i_elem = shift pmc_arr
-       i_elem = shift pmc_arr
-       i_elem = shift pmc_arr
-       print i_elem
-       print_num_elements(pmc_arr)
+    # Set 101th element
+    pmc_arr[100] = 1
+    is(pmc_arr, 101, "setting pmc_arr[100] changed size to 101")
 
-       # Set same size array is currently
-       pmc_arr = 63
-       print_num_elements(pmc_arr)
-
-       # Set 101th element
-       pmc_arr[100] = 1
-       print_num_elements(pmc_arr)
-
-       # Shift off 99 elements
-      .local int counter
-      counter = 98
+    # Shift off 99 elements
+    .local int counter
+    counter = 98
 shift_loop:
-       i_elem = shift pmc_arr
-       dec counter
-       if counter > 0 goto shift_loop
+    i_elem = shift pmc_arr
+    dec counter
+    if counter > 0 goto shift_loop
 
-       print i_elem
-       print_num_elements(pmc_arr)
+    is(i_elem, 0, "all peachy")
+    is(pmc_arr, "001", "all's well that ends well")
 .end
 
-.sub print_num_elements
-       .param pmc pmc_arr
-       .local int elements
-       elements= pmc_arr
-       print '['
-       print elements
-       print "]\n"
-       $I0 = pmc_arr[0]
-       print $I0
-       print ', '
-       $I0 = pmc_arr[1]
-       print $I0
-       print ', '
-       $I0 = pmc_arr[2]
-       print $I0
-       print "\n"
-       .return()
+
+.sub shift_bounds_check
+    $P0 = new ['ResizableBooleanArray']
+    $P1 = new ['ExceptionHandler']
+
+    set_addr $P1, caught
+    $P1.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    push_eh $P1
+
+    shift $I0, $P0
+    ok(0, "no OOB exception thrown")
+    goto end
+
+caught:
+    ok(1, "OOB exception thrown and caught")
+
+end:
 .end
 
-CODE
-[0]
-0, 0, 0
-[3]
-1, 0, 1
-1[4]
-1, 1, 0
-0[5]
-0, 1, 1
-0[4]
-1, 1, 0
-1[3]
-1, 0, 1
-[62]
-1, 0, 1
-[66]
-1, 0, 1
-1[63]
-1, 1, 0
-[63]
-1, 1, 0
-[101]
-1, 1, 0
-0[3]
-0, 0, 1
-OUTPUT
+.sub aerobics
+    new $P0, ['ResizableBooleanArray']
+    set $I10, 10000
 
-pir_error_output_like( << 'CODE', << 'OUTPUT', "shift bounds checking" );
-.sub 'test' :main
-       $P0 = new ['ResizableBooleanArray']
-       shift $I0, $P0
+    set $I1, 0
+    set $I0, 0
+  buildup:
+    ge $I0, $I10, postBuildUp
+
+    mod $I4, $I1, 2
+    push $P0, $I4
+    add $I1, 1    # Push $P0, mod $I1++, 2
+    mod $I4, $I1, 2
+    push $P0, $I4
+    add $I1, 1    # Push $P0, mod $I1++, 2
+    mod $I4, $I1, 2
+    push $P0, $I4
+    add $I1, 1    # Push $P0, mod $I1++, 2
+
+    pop $I2, $P0
+    mul $I3, $I0, 3
+    add $I3, 2
+    mod $I3, 2
+    ne $I2, $I3, errFirstPop  # fail if pop != mod $I0 * 3 + 2, 2
+
+    pop $I2, $P0
+    mul $I3, $I0, 3
+    add $I3, 1
+    mod $I3, 2
+    ne $I2, $I3, errSecondPop  # fail if pop != mod $I0 * 3 + 1, 2
+
+    set $I2, $P0
+    add $I3, $I0, 1
+    ne $I2, $I3, errBuildLen   # fail if length != $I0 + 1
+
+    add $I0, 1
+    branch buildup
+  postBuildUp:
+
+    set $I0, 0
+  checkBuildUpLeft:
+    ge $I0, $I10, postCheckBuildUpLeft
+    set $I2, $P0[$I0]
+    mul $I3, $I0, 3
+    mod $I3, 2
+    ne $I2, $I3, errLeftGet
+    add $I0, 1
+    branch checkBuildUpLeft
+  postCheckBuildUpLeft:
+
+    mul $I0, $I10, -1
+  checkBuildUpRight:
+    ge $I0, 0, postCheckBuildUpRight
+    set $I2, $P0[$I0]
+    add $I3, $I0, $I10
+    mul $I3, 3
+    mod $I3, 2
+    ne $I2, $I3, errRightGet
+    add $I0, 1
+    branch checkBuildUpRight
+  postCheckBuildUpRight:
+
+    set $I0, $I10
+  tearDown:
+    le $I0, 0, postTearDown
+    pop $I2, $P0
+    sub $I3, $I0, 1
+    mod $I3, 2
+    ne $I2, $I3, errTearDown
+
+    sub $I0, 1
+    branch tearDown
+  postTearDown:
+
+    ok(1, "aerobics completed successfully")
+    .return()
+  errFirstPop:
+    print "FAILED: first pop\n"
+    bsr info
+    .return()
+  errSecondPop:
+    print "FAILED: second pop\n"
+    bsr info
+    .return()
+  errBuildLen:
+    print "FAILED: buildup length\n"
+    bsr info
+    .return()
+  errLeftGet:
+    print "FAILED: left get\n"
+    bsr info
+    .return()
+  errRightGet:
+    print "FAILED: right get\n"
+    bsr info
+    .return()
+  errTearDown:
+    print "FAILED: tear down cap\n"
+    bsr info
+    .return()
+  info:
+    ok(0, "aerobics goof:")
+    print "#Found: "
+    print $I2
+    print "\n#Wanted: "
+    print $I3
+    print "\n"
+    ret
 .end
-CODE
-/ResizableBooleanArray: Can't shift from an empty array!.*/
-OUTPUT
 
-#'
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "aerobics" );
-        new P0, ['ResizableBooleanArray']
-        set I10, 10000
-
-        set I1, 0
-        set I0, 0
-buildup:
-        ge I0, I10, postBuildUp
-
-        mod I4, I1, 2
-        push P0, I4
-        add I1, 1    # Push P0, mod I1++, 2
-        mod I4, I1, 2
-        push P0, I4
-        add I1, 1    # Push P0, mod I1++, 2
-        mod I4, I1, 2
-        push P0, I4
-        add I1, 1    # Push P0, mod I1++, 2
-
-        pop I2, P0
-        mul I3, I0, 3
-        add I3, 2
-        mod I3, 2
-        ne I2, I3, errFirstPop  # fail if pop != mod I0 * 3 + 2, 2
-
-        pop I2, P0
-        mul I3, I0, 3
-        add I3, 1
-        mod I3, 2
-        ne I2, I3, errSecondPop  # fail if pop != mod I0 * 3 + 1, 2
-
-        set I2, P0
-        add I3, I0, 1
-        ne I2, I3, errBuildLen   # fail if length != I0 + 1
-
-        add I0, 1
-        branch buildup
-postBuildUp:
-
-        set I0, 0
-checkBuildUpLeft:
-        ge I0, I10, postCheckBuildUpLeft
-        set I2, P0[I0]
-        mul I3, I0, 3
-        mod I3, 2
-        ne I2, I3, errLeftGet
-        add I0, 1
-        branch checkBuildUpLeft
-postCheckBuildUpLeft:
-
-        mul I0, I10, -1
-checkBuildUpRight:
-        ge I0, 0, postCheckBuildUpRight
-        set I2, P0[I0]
-        add I3, I0, I10
-        mul I3, 3
-        mod I3, 2
-        ne I2, I3, errRightGet
-        add I0, 1
-        branch checkBuildUpRight
-postCheckBuildUpRight:
-
-        set I0, I10
-tearDown:
-        le I0, 0, postTearDown
-        pop I2, P0
-        sub I3, I0, 1
-        mod I3, 2
-        ne I2, I3, errTearDown
-
-        sub I0, 1
-        branch tearDown
-postTearDown:
-
-        print "I need a shower.\n"
-        end
-errFirstPop:
-        print "FAILED: first pop\n"
-        bsr info
-        end
-errSecondPop:
-        print "FAILED: second pop\n"
-        bsr info
-        end
-errBuildLen:
-        print "FAILED: buildup length\n"
-        bsr info
-        end
-errLeftGet:
-        print "FAILED: left get\n"
-        bsr info
-        end
-errRightGet:
-        print "FAILED: right get\n"
-        bsr info
-        end
-errTearDown:
-        print "FAILED: tear down cap\n"
-        bsr info
-        end
-info:
-        print "Found: "
-        print I2
-        print "\nWanted: "
-        print I3
-        print "\n"
-        ret
-CODE
-I need a shower.
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "direct access 2" );
-    #new P0, ['IntList']
-    new P0, ['ResizableBooleanArray']
-    set I10, 550000
-    set I0, 1
+.sub direct_access
+    new $P0, ['ResizableBooleanArray']
+    set $I10, 550000
+    set $I0, 1
 lp1:
-    add I1, I0, 5
-    mod I2, I1, 2
-    set P0[I0], I2
-    add I3, I1, I0
-    mod I2, I3, 2
-    push P0, I2
-    shl I0, I0, 1
-    inc I0
-    le I0, I10, lp1
+    add $I1, $I0, 5
+    mod $I2, $I1, 2
+    set $P0[$I0], $I2
+    add $I3, $I1, $I0
+    mod $I2, $I3, 2
+    push $P0, $I2
+    shl $I0, $I0, 1
+    inc $I0
+    le $I0, $I10, lp1
 
-    set I0, 1
+    set $I0, 1
 lp2:
-    add I1, I0, 5
-    mod I5, I1, 2
-    # check at I0
-    set I2, P0[I0]
-    ne I2, I5, err
-    add I4, I0, 1
-    # and pushed value at I0+1
-    set I4, P0[I4]
-    add I3, I1, I0
-    mod I5, I3, 2
-    ne I5, I4, err
+    add $I1, $I0, 5
+    mod $I5, $I1, 2
+    # check at $I0
+    set $I2, $P0[$I0]
+    ne $I2, $I5, err
+    add $I4, $I0, 1
+    # and pushed value at $I0+1
+    set $I4, $P0[$I4]
+    add $I3, $I1, $I0
+    mod $I5, $I3, 2
+    ne $I5, $I4, err
 
-    shl I0, I0, 1
-    inc I0
-    le I0, I10, lp2
-    print "ok\n"
-    end
+    shl $I0, $I0, 1
+    inc $I0
+    le $I0, $I10, lp2
+    ok(1, "direct access check passed")
+    .return()
 err:
     print "not ok "
-    print I0
+    print $I0
     print " "
-    print I1
+    print $I1
     print " "
-    print I2
+    print $I2
     print " "
-    print I3
+    print $I3
     print " "
-    print I4
+    print $I4
     print " "
-    print I5
+    print $I5
     print " "
-    print I6
+    print $I6
     print " "
-    print I7
+    print $I7
     print "\n"
 
-    end
-CODE
-ok
-OUTPUT
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "sparse access" );
-    new P0, ['ResizableBooleanArray']
-       set I10, 110000
-       set I0, 1
+
+.sub sparse_access
+    new $P0, ['ResizableBooleanArray']
+    set $I10, 110000
+    set $I0, 1
+  lp1:
+    add $I1, $I0, 5
+    mod $I9, $I1, 2
+    set $P0[$I0], $I9
+    add $I3, $I1, $I0
+    mod $I9, $I3, 2
+    push $P0, $I9
+    shl $I0, $I0, 1
+    inc $I0
+    le $I0, $I10, lp1
+
+    set $I0, 1
+  lp2:
+    add $I1, $I0, 5
+    mod $I9, $I1, 2
+    # check at $I0
+    set $I2, $P0[$I0]
+    ne $I2, $I9, err
+    add $I4, $I0, 1
+    # and pushed value at $I0+1
+    set $I4, $P0[$I4]
+    add $I3, $I1, $I0
+    mod $I9, $I3, 2
+    ne $I9, $I4, err
+
+    shl $I0, $I0, 1
+    inc $I0
+    le $I0, $I10, lp2
+    ok(1, "sparse access tests ok")
+
+    # now repeat and fill some holes
+
+    set $I0, 777
+  lp3:
+    add $I1, $I0, 5
+    mod $I9, $I1, 2
+    set $P0[$I0], $I9
+    add $I0, $I0, 666
+    le $I0, $I10, lp3
+
+    set $I0, 777
+  lp4:
+    add $I1, $I0, 5
+    mod $I9, $I1, 2
+    # check at $I0
+    set $I2, $P0[$I0]
+    ne $I2, $I9, err
+
+    add $I0, $I0, 666
+    le $I0, $I10, lp4
+    ok(1, "sparse access tests still ok")
+    .return()
+  err:
+    print "not ok "
+    print $I0
+    print " "
+    print $I1
+    print " "
+    print $I2
+    print " "
+    print $I3
+    print " "
+    print $I4
+    print "\n"
+
+.end
+
+
+.sub check_for_zeroedness
+    new $P0, ['ResizableBooleanArray']
+    set $I0, 0
 lp1:
-       add I1, I0, 5
-    mod I9, I1, 2
-       set P0[I0], I9
-       add I3, I1, I0
-    mod I9, I3, 2
-       push P0, I9
-       shl I0, I0, 1
-       inc I0
-       le I0, I10, lp1
+    push $P0, 0
+    inc $I0
+    lt $I0, 100, lp1
 
-       set I0, 1
+    set $I2, 10000
+    set $P0, $I2
 lp2:
-       add I1, I0, 5
-    mod I9, I1, 2
-       # check at I0
-       set I2, P0[I0]
-       ne I2, I9, err
-       add I4, I0, 1
-       # and pushed value at I0+1
-       set I4, P0[I4]
-       add I3, I1, I0
-    mod I9, I3, 2
-       ne I9, I4, err
-
-       shl I0, I0, 1
-       inc I0
-       le I0, I10, lp2
-       print "ok 1\n"
-
-       # now repeat and fill some holes
-
-       set I0, 777
-lp3:
-       add I1, I0, 5
-    mod I9, I1, 2
-       set P0[I0], I9
-       add I0, I0, 666
-       le I0, I10, lp3
-
-       set I0, 777
-lp4:
-       add I1, I0, 5
-    mod I9, I1, 2
-       # check at I0
-       set I2, P0[I0]
-       ne I2, I9, err
-
-       add I0, I0, 666
-       le I0, I10, lp4
-       print "ok 2\n"
-       end
+    set $I1, $P0[$I0]
+    ne $I1, 0, err
+    inc $I0
+    lt $I0, $I2, lp2
+    ok(1, "zeoredness tests passed")
+    .return()
 err:
-       print "not ok "
-       print I0
-       print " "
-       print I1
-       print " "
-       print I2
-       print " "
-       print I3
-       print " "
-       print I4
-       print "\n"
-
-       end
-CODE
-ok 1
-ok 2
-OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "check for zeroedness" );
-    new P0, ['ResizableBooleanArray']
-    set I0, 0
-lp1:
-    push P0, 0
-    inc I0
-    lt I0, 100, lp1
-
-    set I2, 10000
-    #set I0, 100
-    set P0, I2
-lp2:
-    set I1, P0[I0]
-    ne I1, 0, err
-    inc I0
-    lt I0, I2, lp2
-    print "ok\n"
-    end
-err:
-    print "Found non-zero value "
-    print I1
+    ok(0, "zeoredness tests failed")
+    print "#Found non-zero value "
+    print $I1
     print " at "
-    print I0
-    print "\n"
-    end
-CODE
-ok
-OUTPUT
+    say $I0
+.end
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "pop into sparse" );
-    new P0, ['ResizableBooleanArray']
-       set I10, 100
-       set I0, 0
-       # push some values at start
+
+.sub pop_into_sparse
+    new $P0, ['ResizableBooleanArray']
+    set $I10, 100
+    set $I0, 0
+    # push some values at start
 loop1:
-    mod I5, I0, 2
-       push P0, I5
-       inc I0
-       lt I0, I10, loop1
+    mod $I5, $I0, 2
+    push $P0, $I5
+    inc $I0
+    lt $I0, $I10, loop1
 
-       # create sparse
-       set I0, 100000
-       set I1, 1000
-    mod I5, I1, 2
-       #set P0[I0], I1
-       set P0[I0], I5
-       inc I1
+    # create sparse
+    set $I0, 100000
+    set $I1, 1000
+    mod $I5, $I1, 2
+    #set $P0[$I0], $I1
+    set $P0[$I0], $I5
+    inc $I1
 loop2:
-       # push some values after hole
-    mod I5, I1, 2
-       push P0, I5
-       inc I1
-       le I1, 1100, loop2
-       dec I1
+    # push some values after hole
+    mod $I5, $I1, 2
+    push $P0, $I5
+    inc $I1
+    le $I1, 1100, loop2
+    dec $I1
 
-       set I3, P0
+    set $I3, $P0
 lp3:
-       set I4, P0
-       ne I3, I4, err1
-       pop I2, P0
-       dec I3
-    mod I5, I1, 2
-       ne I2, I5, err2
-       gt I3, I0, cont1
-       lt I3, I10, cont1
-       set I1, 0
+    set $I4, $P0
+    ne $I3, $I4, err1
+    pop $I2, $P0
+    dec $I3
+    mod $I5, $I1, 2
+    ne $I2, $I5, err2
+    gt $I3, $I0, cont1
+    lt $I3, $I10, cont1
+    set $I1, 0
 
-       gt I3, I10, lp3
-       set I1, I10
+    gt $I3, $I10, lp3
+    set $I1, $I10
 
 cont1:
-       dec I1
-       eq I1, 0, ok
-       branch lp3
+    dec $I1
+    eq $I1, 0, ok
+    branch lp3
 ok:
-       print "ok\n"
-       end
-err1:   set S0, "len"
-       branch err
+    ok(1, "pop into sparse tests passed")
+    .return()
+    err1:   set $S0, "len"
+    branch err
 err2:
-       set S0, "val"
+    set $S0, "val"
 err:
-       print "nok "
-       print S0
-       print " "
-       print I0
-       print " "
-       print I1
-       print " "
-       print I2
-       print " "
-       print I3
-       print " "
-       print I4
-       print " "
-       print I5
-       end
-CODE
-ok
-OUTPUT
+    ok(0, "pop into sparse tests failed")
+    print "#nok "
+    print $S0
+    print " "
+    print $I0
+    print " "
+    print $I1
+    print " "
+    print $I2
+    print " "
+    print $I3
+    print " "
+    print $I4
+    print " "
+    print $I5
+.end
 
-pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
-.sub _main
+.sub clone_tests
     .local pmc rba1, rba2
-    .local int i
+    .local int i, failed
+    failed = 0
     rba1 = new ['ResizableBooleanArray']
 
     rba1[0]    = 1
@@ -886,53 +739,48 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone" );
 
     i = rba1[5000]
     if i == 1 goto ok_0
-    print "nok 0 "
+    failed = 1
 
 ok_0:
     i = pop rba1
     if i == 1 goto ok_1
-    print "nok 1 "
+    failed = 2
 
 ok_1:
     i = rba1
     if i == 5000 goto ok_2
-    print "nok 2 "
-    print i
+    failed = 3
 
 ok_2:
     i = pop rba2
     if i == 1 goto ok_3
-    print "nok 3 "
+    failed = 4
 
 ok_3:
     i = rba2
     if i == 5000 goto ok_4
-    print "nok 4 "
+    failed = 5
 
 ok_4:
     i = rba2[5000] #should be undefined, i.e. 0
     if i == 0 goto ok_5
-    print "nok 5 "
+    failed = 6
 
 ok_5:
     i = pop rba2 #same as previous
     if i == 0 goto ok_6
-    print "nok 6 "
+    failed = 7
     $S0 = rba2
     say $S0
-    end
 
 ok_6:
-    print "ok\n"
+    is(failed, 0, "all clone tests passed")
 .end
-CODE
-ok
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "clone (alternate)" );
-.sub _main
+.sub alternate_clone_tests
     .local pmc rba1, rba2
-    .local int i
+    .local int i, failed
+    failed = 0
     rba1 = new ['ResizableBooleanArray']
 
     rba1[0]    = 1
@@ -947,50 +795,44 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone (alternate)" );
 
     i = rba1[5000]
     if i == 1 goto ok_0
-    print "nok 0 "
+    failed = 1
 
 ok_0:
     i = pop rba1
     if i == 1 goto ok_1
-    print "nok 1 "
+    failed = 2
 
 ok_1:
     i = rba1
     if i == 5000 goto ok_2
-    print "nok 2 "
-    print i
+    failed = 3
 
 ok_2:
     i = pop rba2
     if i == 1 goto ok_3
-    print "nok 3 "
+    failed = 4
 
 ok_3:
     i = rba2
     if i == 5000 goto ok_4
-    print "nok 4 "
+    failed = 5
 
 ok_4:
     i = rba2[5000] #should be undefined, i.e. 0
     if i == 0 goto ok_5
-    print "nok 5 "
+    failed = 6
 
 ok_5:
     i = pop rba2 #same as previous
     if i == 0 goto ok_6
-    print "nok 6 "
-    end
+    failed = 7
 
 ok_6:
-    print "ok\n"
+    is(failed, 0, "all alternate clone tests passed")
 .end
-CODE
-ok
-OUTPUT
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
