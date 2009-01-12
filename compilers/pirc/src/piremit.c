@@ -134,7 +134,8 @@ print_target(lexer_state * const lexer, target * const t) {
 =item C<void
 print_constant(lexer_state * const lexer, constant * const c)>
 
-Print the value of constant C<c>.
+Print the value of constant C<c>. Based on C<c>'s type, the appropriate
+value is printed.
 
 =cut
 
@@ -155,13 +156,12 @@ print_constant(lexer_state * const lexer, constant * const c) {
             fprintf(out, "\"%s\"", c->val.pval);
             break;
         case USTRING_VAL:
-            fprintf(out, "\"%s\"", c->val.ustr->contents); /* XXX also encoding? */
+            fprintf(out, "%c:\"%s\"", c->val.ustr->charset, c->val.ustr->contents);
             break;
         default:
             panic(lexer, "Unknown type detected in print_constant()");
             break;
     }
-
 }
 
 /*
@@ -169,7 +169,8 @@ print_constant(lexer_state * const lexer, constant * const c) {
 =item C<void
 print_expr(lexer_state * const lexer, expression * const expr)>
 
-Print the expression C<expr>.
+Print the expression C<expr>. This is a dispatch function, calling
+a specialized function based on C<expr>'s type.
 
 =cut
 
@@ -203,7 +204,9 @@ print_expr(lexer_state * const lexer, expression * const expr) {
 print_expressions(expression * const expr)>
 
 Print the list of expressions pointed to by C<expr>,
-if C<expr> is not NULL. Expressions are separated by commas.
+if C<expr> is not NULL. If C<expr> is NULL, the
+function does nothing and returns. Expressions are
+separated by commas.
 
 =cut
 
@@ -211,6 +214,7 @@ if C<expr> is not NULL. Expressions are separated by commas.
 void
 print_expressions(lexer_state * const lexer, expression * const expr) {
     expression *iter;
+
     if (expr == NULL)
         return;
 
@@ -230,6 +234,8 @@ print_expressions(lexer_state * const lexer, expression * const expr) {
 =item C<void
 print_instruction(lexer_state * const lexer, instruction * const ins)>
 
+Print the instruction C<ins>.
+
 =cut
 
 */
@@ -247,18 +253,13 @@ print_instruction(lexer_state * const lexer, instruction * const ins) {
     if (ins->opname) {
 
         if (TEST_FLAG(lexer->flags, LEXER_FLAG_EMIT_PASM)) {
-
             fprintf(out, "    %s ", ins->opinfo->name);
             print_expressions(lexer, ins->operands);
         }
         else {
             fprintf(out, "%04u   %s ", ins->offset, ins->opname);
-
             print_expressions(lexer, ins->operands);
-
             fprintf(out, "\t# op %d", ins->opcode);
-
-
         }
         fprintf(out, "\n");
     }
@@ -329,15 +330,13 @@ print_subs(struct lexer_state * const lexer) {
         fprintf(out, "\n");
 
         if (subiter->flags) {
-
-
+            int i;
             fprintf(out, ".pcc_sub ");
-
-            if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_MAIN))
-                fprintf(out, ":main ");
-            if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_METHOD))
-                fprintf(out, ":method ");
-                /* XXX and so on; check which ones are available in PASM mode. */
+            for (i = 0; i < BIT(i); i++) {
+                if (TEST_FLAG(subiter->flags, BIT(i))) {
+                    fprintf(out, " :%s", subflag_names[i]);
+                }
+            }
 
         }
 
@@ -354,7 +353,8 @@ print_subs(struct lexer_state * const lexer) {
 =item C<static void
 emit_pir_instruction(lexer_state * const lexer, instruction * const instr)>
 
-Print the PIR representation of C<instr>.
+Print the PIR representation of C<instr>. If C<instr> has a label, that
+is printed first.
 
 =cut
 
@@ -376,6 +376,10 @@ emit_pir_instruction(lexer_state * const lexer, instruction * const instr) {
 
 =item C<static void
 emit_pir_statement(lexer_state * const lexer, subroutine * const sub)>
+
+Emit all statements of the subroutine C<sub>. The statements
+are emitted in PIR format. If there are no statements in C<sub>,
+this function returns.
 
 =cut
 
@@ -403,7 +407,8 @@ emit_pir_statement(lexer_state * const lexer, subroutine * const sub) {
 emit_pir_subs(lexer_state * const lexer)>
 
 Print the PIR representation of all subroutines stored
-in the C<lexer>.
+in the C<lexer>. If there are no subroutines, thre function
+does nothing and returns.
 
 =cut
 
@@ -425,12 +430,10 @@ emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
         lexer->outfile = stdout;
     }
 
-
     do {
         int i;
         fprintf(out, "\n.namespace ");
         print_key(lexer, subiter->name_space);
-
 
         fprintf(out, "\n.sub %s", subiter->info.subname);
 
@@ -629,8 +632,8 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
      */
     keysize = pc - key;
 
+    /* store the key, and emit the index at which it's stored into the code segment */
     index = store_key_bytecode(lexer->bc, key);
-
     emit_int_arg(lexer->bc, index);
 
     return index;
@@ -685,11 +688,9 @@ emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
         case EXPR_LABEL:
             emit_pbc_label_arg(lexer, operand->expr.l);
             break;
-
         case EXPR_KEY:
             emit_pbc_key(lexer, operand->expr.k);
             break;
-
         default:
             break;
     }

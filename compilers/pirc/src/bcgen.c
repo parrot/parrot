@@ -615,10 +615,11 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
                 VTABLE_set_string_native(bc->interp, sig_pmc, typestring);
                 break;
             }
-            case MULTI_TYPE_KEYED:
+            case MULTI_TYPE_KEYED: {
                 /* XXX implement this */
 
                 break;
+            }
             default:
                 fprintf(stderr, "invalid multi entry type");
                 break; /* XXX fatal; throw excpetion? */
@@ -742,27 +743,21 @@ is passed in C<ns>.
 */
 static PMC *
 get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
-    PMC *namespace_pmc;
-
     if (ns == NULL)
         return NULL;
 
     switch (ns->entry_type) {
-        case MULTI_TYPE_IDENT:
-            namespace_pmc = constant_pmc_new(bc->interp, enum_class_String);
+        case MULTI_TYPE_IDENT: {
+            PMC *namespace_pmc         = constant_pmc_new(bc->interp, enum_class_String);
             PMC_str_val(namespace_pmc) = add_string_const_from_cstring(bc, ns->entry.ident);
             break;
+        }
         case MULTI_TYPE_KEYED:
-            namespace_pmc = NULL;
-            /* XXX implement this */
-
-            break;
         default:
-            fprintf(stderr, "unknown key type"); /* XXX exception? */
-            namespace_pmc = NULL;
+            fprintf(stderr, "keys are not supported for namespaces"); /* XXX exception? */
             break;
     }
-    return namespace_pmc;
+    return NULL;
 }
 
 
