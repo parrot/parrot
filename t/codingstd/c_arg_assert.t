@@ -46,7 +46,7 @@ sub check_asserts {
         my @lines = ($file->read());
         foreach my $line (@lines) {
             if($line =~ /^#define ASSERT_ARGS_([_a-zA-Z0-9]+)\s/s) {
-                push(@defines, $1);
+                push(@defines, [$1, $path] );
             }
             if($line =~ /^\s+ASSERT_ARGS\(([_a-zA-Z0-9]+)\)$/) {
                 my $func = $1;
@@ -60,12 +60,12 @@ sub check_asserts {
     }
 
     # next, cross reference them.
-    my @missing = grep { !exists($usages{$_}) } @defines;
+    my @missing = grep { !exists($usages{$_->[0]}) } @defines;
     ok(!scalar @missing);
     if(scalar @missing) {
         diag("unused assert macros found:");
         foreach my $missing (sort @missing) {
-            diag($missing);
+            diag($missing->[1] . ": " . $missing->[0]);
         }
         diag(scalar(@missing) . " unused assert macros found in total.");
     }
