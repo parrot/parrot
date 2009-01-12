@@ -1,20 +1,14 @@
-#! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+#! parrot
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( t . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 20;
 
 =head1 NAME
 
-t/library/File-Spec.t - test File::Spec module
+t/library/File_Spec.t - test File::Spec module
 
 =head1 SYNOPSIS
 
-    % prove t/library/File-Spec.t
+    % prove t/library/File_Spec.t
 
 =head1 DESCRIPTION
 
@@ -25,93 +19,87 @@ Tests file specifications.
 ##############################
 # File::Spec
 
-my $PRE = <<'PRE';
-.sub 'main' :main
-        load_bytecode 'library/File/Spec.pir'
+.sub main :main
+    .include 'test_more.pir'
+    plan(22)
 
-        .local int classtype
-        .local pmc spec
-
-        spec = new 'File::Spec'
-
-PRE
-my $POST = <<'POST';
-        goto OK
-NOK:
-        print "not "
-OK:
-        print "ok"
-END:
-        print "\n"
+    FS_load_bytecode()
+    FS_new()
+    FS_can()
+    FS_isa()
+    FS_version()
+    FS_private_subs()
 .end
-POST
 
-## 1
-pir_output_is( <<'CODE'. $POST, <<'OUT', "load_bytecode" );
-.sub 'main' :main
-        load_bytecode 'File/Spec.pir'
-CODE
-ok
-OUT
+.sub FS_load_bytecode
+    load_bytecode 'File/Spec.pir'
+    ok(1, 'load_bytecode')
+.end
 
-pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "new" );
-CODE
-ok
-OUT
+.sub FS_new
+    .local pmc spec
 
-my @meths = (
-    qw/
-        __isa VERSION devnull tmpdir case_tolerant file_name_is_absolute catfile
-        catdir path canonpath splitpath splitdir catpath abs2rel rel2abs
-        /
-);
-pir_output_is( $PRE . <<"CODE". $POST, <<'OUT', "can ($_)" ) for @meths;
-        .local pmc meth
-        \$I0 = can spec, "$_"
-        unless \$I0, NOK
-CODE
-ok
-OUT
+    spec = new 'File::Spec'
+    ok(1, 'new')
+.end
 
-pir_output_like( $PRE . <<'CODE'. $POST, <<'OUT', "isa" );
-        .local pmc class
-        class= new 'String'
+.sub FS_can
+    .local pmc spec
+    .local pmc method_list
 
-        class= spec.'__isa'()
-        print class
-        print "\n"
-CODE
-/^File::Spec::.+/
-OUT
+    $S0 = '__isa VERSION devnull tmpdir case_tolerant file_name_is_absolute '
+    $S0 = concat $S0, 'catfile catdir path canonpath splitpath splitdir '
+    $S0 = concat $S0, 'catpath abs2rel rel2abs'
+    method_list = split ' ', $S0
 
-pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "version" );
-        .local pmc version
-        version= spec.'VERSION'()
-        print version
-        goto END
-CODE
-0.1
-OUT
+    spec = new 'File::Spec'
 
-## testing private subs
-pir_output_is( $PRE . <<'CODE'. $POST, <<'OUT', "_get_module" );
-        .local string module
-        .local pmc get_module
-        get_module = get_hll_global [ 'File::Spec' ], '_get_module'
-        module= get_module( 'MSWin32' )
-        print module
-        print "\n"
-        module= get_module( 'foobar' )
-        print module
-        goto END
-CODE
-Win32
-Unix
-OUT
+  LOOP:
+    $I0 = elements method_list
+    if $I0 == 0 goto END_TEST
+    $S0 = method_list.'shift'()
+    $I0 = can spec, $S0
+    $S1 = concat 'File::Spec can ', $S0
+    ok($I0, $S1)
+    goto LOOP
+
+  END_TEST:
+.end
+
+.sub FS_isa
+    .local pmc spec
+
+    spec = new 'File::Spec'
+    isa_ok(spec, 'File::Spec')
+    $S0 = spec.'__isa'()
+    like($S0, "File '::' Spec '::' .+", 'The object isa File::Spec::.+')
+.end
+
+.sub FS_version
+    .local pmc spec
+
+    spec = new 'File::Spec'
+    $S0 = spec.'VERSION'()
+    is($S0, '0.1', 'VERSION 0.1')
+.end
+
+.sub FS_private_subs
+    .local pmc spec
+
+    spec = new 'File::Spec'
+    .local string module
+    .local pmc get_module
+    get_module = get_hll_global [ 'File::Spec' ], '_get_module'
+
+    module = get_module( 'MSWin32' )
+    is(module, 'Win32', 'File::Spec module for MSWin32 is Win32')
+
+    module = get_module( 'foobar' )
+    is(module, 'Unix',  'File::Spec module for foobar is Unix')
+.end
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
