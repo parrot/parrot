@@ -559,8 +559,6 @@ start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
         st->key              = pmc_new(interp, enum_class_Key);
         PMC_int_val(st->key) = 0;
         PMC_data(st->key)    = (void *)INITBucketIndex;
-
-        dod_register_pmc(interp, st->key);
     }
     else {
         /* src ought to be an array */
@@ -654,7 +652,6 @@ fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
                 UVal_pmc(st->val) = CONTEXT(interp)->current_object;
             else {
                 UVal_pmc(st->val) = va_arg(*ap, PMC *);
-                dod_register_pmc(interp, UVal_pmc(st->val));
             }
 
             if (st->src.sig & PARROT_ARG_FLATTEN) {
@@ -669,9 +666,6 @@ fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
 
                 st->src.used = 1;
                 retval       = Parrot_fetch_arg(interp, st);
-
-                if (!PMC_IS_NULL(st->key))
-                    dod_unregister_pmc(interp, st->key);
 
                 return retval;
             }
@@ -738,9 +732,6 @@ fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
                 st->src.used = 1;
                 retval       = Parrot_fetch_arg(interp, st);
 
-                if (!PMC_IS_NULL(st->key))
-                    dod_unregister_pmc(interp, st->key);
-
                 return retval;
             }
             break;
@@ -803,9 +794,6 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
         if (st->src.slurp_i == st->src.slurp_n) {
             st->src.mode &= ~CALL_STATE_FLATTEN;
 
-            if (!PMC_IS_NULL(st->key))
-                dod_unregister_pmc(interp, st->key);
-
             st->key = PMCNULL;
             st->src.i++;
         }
@@ -866,7 +854,6 @@ Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
         }
 
         UVal_pmc(st->val) = slurped;
-        dod_register_pmc(interp, slurped);
     }
     else {
         Parrot_fetch_arg(interp, st);
@@ -906,7 +893,6 @@ convert_arg_from_int(PARROT_INTERP, ARGMOD(call_state *st))
 
             VTABLE_set_integer_native(interp, d, UVal_int(st->val));
             UVal_pmc(st->val) = d;
-            dod_register_pmc(interp, d);
             }
             break;
         default:
@@ -942,7 +928,6 @@ convert_arg_from_num(PARROT_INTERP, ARGMOD(call_state *st))
 
             VTABLE_set_number_native(interp, d, UVal_num(st->val));
             UVal_pmc(st->val) = d;
-            dod_register_pmc(interp, d);
             }
             break;
         default:
@@ -979,7 +964,6 @@ convert_arg_from_str(PARROT_INTERP, ARGMOD(call_state *st))
 
             VTABLE_set_string_native(interp, d, UVal_str(st->val));
             UVal_pmc(st->val) = d;
-            dod_register_pmc(interp, d);
             }
             break;
         default:
@@ -1143,7 +1127,6 @@ init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
              * otherwise it may get collected. */
             st->dest.slurp = pmc_new(interp,
                 Parrot_get_ctx_HLL_type(interp, enum_class_Hash));
-            dod_register_pmc(interp, st->dest.slurp);
 
             /* pass the slurpy hash */
             idx = st->dest.u.op.pc[i];
@@ -1611,7 +1594,6 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
         /* Must register this PMC or it may get collected when only the struct
          * references it. */
-        dod_register_pmc(interp, array);
         CTX_REG_PMC(st->dest.ctx, idx) = array;
 
         while (Parrot_fetch_arg(interp, st)) {
@@ -1629,7 +1611,6 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
         }
 
         dest->i++;
-        dod_unregister_pmc(interp, array);
     }
 
     /* is there another argument? if we're throwing errors, that's an error */
@@ -1681,10 +1662,6 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
     }
 
     check_named(interp, st);
-
-    /* we may or may not have registered this pmc */
-    if (dest->slurp)
-        dod_unregister_pmc(interp, dest->slurp);
 }
 
 
@@ -1776,8 +1753,6 @@ parrot_pass_args(PARROT_INTERP,
 
     /* If we created a slurpy, we had to DOD register it so it did not get
      * collected during arg processing; we'll now unregister it. */
-    if (st.dest.slurp)
-        dod_unregister_pmc(interp, st.dest.slurp);
 }
 
 
@@ -1873,7 +1848,6 @@ set_retval(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
         case 'P':
             if (set_retval_util(interp, "P", ctx, &st)) {
                 PMC *retval = UVal_pmc(st.val);
-                dod_unregister_pmc(interp, retval);
                 return (void *)retval;
             }
         default:
@@ -2521,7 +2495,6 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
     va_end(args);
 
     Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
-    dod_unregister_pmc(interp, sig_obj);
 }
 
 /*
