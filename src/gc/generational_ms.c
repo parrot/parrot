@@ -562,6 +562,7 @@ PARROT_EXPORT
 void
 Parrot_gc_gms_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_gms_init)
     Arenas * const arena_base = interp->arena_base;
 
     arena_base->gc_private = mem_sys_allocate_zeroed(sizeof (Gc_gms_private));
@@ -1066,6 +1067,7 @@ void
 parrot_gc_gms_wb(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
     ARGIN(void *_new))
 {
+    ASSERT_ARGS(parrot_gc_gms_wb)
     Gc_gms_hdr * const nh = PObj_to_GMSH(_new);
     Gc_gms_hdr * const ah = PObj_to_GMSH(agg);
 
@@ -1099,6 +1101,7 @@ void
 parrot_gc_gms_wb_key(PARROT_INTERP, ARGIN(PMC *agg), ARGIN(void *old),
     ARGIN(void *old_key), ARGIN(void *_new), ARGIN(void *new_key))
 {
+    ASSERT_ARGS(parrot_gc_gms_wb_key)
     Gc_gms_hdr *nh, *ah;
 
     /* handle hash values */
@@ -1469,6 +1472,7 @@ PARROT_EXPORT
 void
 parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 {
+    ASSERT_ARGS(parrot_gc_gms_pobject_lives)
     Gc_gms_hdr *h;
     int priority;
 

@@ -285,6 +285,7 @@ void
 Parrot_gc_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *p))
 {
+    ASSERT_ARGS(Parrot_gc_free_pmc)
     PMC    * const pmc        = (PMC *)p;
     Arenas * const arena_base = interp->arena_base;
 
@@ -321,6 +322,7 @@ Frees the C<PMC_EXT> structure attached to a PMC, if it exists.
 void
 Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
 {
+    ASSERT_ARGS(Parrot_gc_free_pmc_ext)
     /* if the PMC has a PMC_EXT structure, return it to the pool/arena */
     Arenas            * const arena_base = interp->arena_base;
     Small_Object_Pool * const ext_pool   = arena_base->pmc_ext_pool;
@@ -354,6 +356,7 @@ void
 Parrot_gc_free_sysmem(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
+    ASSERT_ARGS(Parrot_gc_free_sysmem)
     /* has sysmem allocated, e.g. string_pin */
     if (PObj_sysmem_TEST(b) && PObj_bufstart(b))
         mem_sys_free(PObj_bufstart(b));
@@ -378,6 +381,7 @@ void
 Parrot_gc_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
+    ASSERT_ARGS(Parrot_gc_free_buffer_malloc)
     /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
      * external */
     PObj_buflen(b) = 0;
@@ -410,6 +414,7 @@ reuse later.
 void
 Parrot_gc_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
 {
+    ASSERT_ARGS(Parrot_gc_free_buffer)
     Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
 
     /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
@@ -441,6 +446,7 @@ PARROT_CONST_FUNCTION
 static size_t
 find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 {
+    ASSERT_ARGS(find_common_mask)
     int       i;
     const int bound = sizeof (size_t) * 8;
 
@@ -480,6 +486,7 @@ areas.
 void
 trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
 {
+    ASSERT_ARGS(trace_mem_block)
     size_t    prefix;
     ptrdiff_t cur_var_ptr;
 
@@ -549,6 +556,7 @@ Records the start time of a DOD run when profiling is enabled.
 void
 Parrot_gc_profile_start(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_profile_start)
     if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
         interp->profile->dod_time = Parrot_floatval_time();
 }
@@ -567,6 +575,7 @@ enabled. Also record start time of next part.
 void
 Parrot_gc_profile_end(PARROT_INTERP, int what)
 {
+    ASSERT_ARGS(Parrot_gc_profile_end)
     if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
         RunProfile * const profile = interp->profile;
         const FLOATVAL     now     = Parrot_floatval_time();
@@ -601,6 +610,7 @@ initializer function for the MS garbage collector.
 void
 Parrot_gc_ms_run_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_ms_run_init)
     Arenas * const arena_base       = interp->arena_base;
 
     arena_base->dod_trace_ptr       = NULL;
@@ -624,6 +634,7 @@ headers.
 void
 Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(Parrot_do_dod_run)
     interp->arena_base->do_gc_mark(interp, flags);
     parrot_gc_context(interp);
 }

@@ -521,6 +521,7 @@ C<pool->num_free_objects> has to be updated by the caller.
 static void
 gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(void *to_add))
 {
+    ASSERT_ARGS(gc_ims_add_free_object)
     *(void **)to_add = pool->free_list;
     pool->free_list  = to_add;
 #if DISABLE_GC_DEBUG
@@ -550,6 +551,7 @@ PARROT_WARN_UNUSED_RESULT
 static void *
 gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_ims_get_free_object)
     PObj *ptr;
     Arenas * const arena_base    = interp->arena_base;
     Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
@@ -590,6 +592,7 @@ Allocate new objects for the given pool.
 static void
 gc_ims_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_ims_alloc_objects)
     Small_Object_Arena *new_arena;
     size_t size;
 
@@ -620,6 +623,7 @@ and allocate objects.
 static void
 gc_ims_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
+    ASSERT_ARGS(gc_ims_pool_init)
     pool->add_free_object = gc_ims_add_free_object;
     pool->get_free_object = gc_ims_get_free_object;
     pool->alloc_objects   = gc_ims_alloc_objects;
@@ -640,6 +644,7 @@ Shuts down this GC system.
 static void
 parrot_gc_ims_deinit(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_gc_ims_deinit)
     Arenas * const arena_base = interp->arena_base;
 
     mem_sys_free(arena_base->gc_private);
@@ -663,6 +668,7 @@ C<more_objects_fn>.
 void
 Parrot_gc_ims_init(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_ims_init)
     Arenas * const arena_base = interp->arena_base;
     arena_base->gc_private    = mem_allocate_zeroed_typed(Gc_ims_private);
 
@@ -690,6 +696,7 @@ Reinitialize the collector for the next collection cycle.
 static void
 parrot_gc_ims_reinit(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_gc_ims_reinit)
     Gc_ims_private *g_ims;
     Arenas * const  arena_base = interp->arena_base;
 
@@ -724,6 +731,7 @@ The former are marked immediately, only the latter need real work here.
 static void
 parrot_gc_ims_mark(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_gc_ims_mark)
     size_t todo;
     double work_factor;
     PMC   *next;
@@ -763,6 +771,7 @@ Callback to sweep a header pool (see Parrot_forall_header_pools).
 static int
 sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *arg))
 {
+    ASSERT_ARGS(sweep_cb)
     int * const n_obj = (int *)arg;
 
     Parrot_gc_sweep(interp, pool);
@@ -791,6 +800,7 @@ TODO split work per pool.
 static void
 parrot_gc_ims_sweep(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_gc_ims_sweep)
     Arenas * const  arena_base = interp->arena_base;
     Gc_ims_private *g_ims      = (Gc_ims_private *)arena_base->gc_private;
     size_t          n_objects;
@@ -841,6 +851,7 @@ Callback to collect a header pool (see Parrot_forall_header_pools).
 static int
 collect_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag), ARGIN(void *arg))
 {
+    ASSERT_ARGS(collect_cb)
     const int           check_only = (int)(INTVAL)arg;
     Memory_Pool * const mem_pool   = pool->mem_pool;
 
@@ -888,6 +899,7 @@ Run the copying collector in memory pools, if it could yield some free memory.
 static int
 parrot_gc_ims_collect(PARROT_INTERP, int check_only)
 {
+    ASSERT_ARGS(parrot_gc_ims_collect)
 #if defined(GC_IS_MALLOC) && GC_IS_MALLOC
     UNUSED(interp);
     UNUSED(check_only);
@@ -933,6 +945,7 @@ allocation.
 static void
 parrot_gc_ims_run_increment(PARROT_INTERP)
 {
+    ASSERT_ARGS(parrot_gc_ims_run_increment)
     Arenas * const arena_base    = interp->arena_base;
     Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
 
@@ -1012,6 +1025,7 @@ Interface to C<Parrot_do_dod_run>. C<flags> is one of:
 static void
 parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
 {
+    ASSERT_ARGS(parrot_gc_ims_run)
     int                    lazy;
     Arenas * const         arena_base = interp->arena_base;
     Gc_ims_private * const g_ims      = (Gc_ims_private *)arena_base->gc_private;
@@ -1115,6 +1129,7 @@ be greyed or the aggregate must be rescanned -- so grey it.
 void
 Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 {
+    ASSERT_ARGS(Parrot_gc_ims_wb)
 #if DOD_IMS_GREY_NEW
     IMS_DEBUG((stderr, "%d agg %p mark %p\n",
                 ((Gc_ims_private *)interp->arena_base->
