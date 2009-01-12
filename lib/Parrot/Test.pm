@@ -740,7 +740,7 @@ sub _generate_test_functions {
                 $args    =~ s/--run-exec//;
                 $cmd       = qq{$parrot $args "$code_f"};
             } elsif ($func =~ /^pirc_/) {
-                $cmd       = qq{$pirc -p "$code_f"};
+                $cmd       = qq{$pirc -b -x "$code_f"};
             }
 
             write_code_to_file( $code, $code_f );

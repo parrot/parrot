@@ -1,20 +1,17 @@
 #!perl
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
-
 
 use lib "../../lib";
 use Parrot::Test tests => 1;
 
-pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "test for :main");
-.sub main :main
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "a single const declaration");
+.sub main
+    say "ok"
 .end
 CODE
-.namespace []
-.pcc_sub :main main:
-    end
+ok
 OUTPUT
-
 
 # Local Variables:
 #   mode: cperl

@@ -13,6 +13,8 @@
 
 =head1 DESCRIPTION
 
+This file contains functions related to opcodes.
+
 =head1 FUNCTIONS
 
 =over 4

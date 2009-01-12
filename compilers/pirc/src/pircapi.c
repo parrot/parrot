@@ -16,6 +16,8 @@
 
 =head1 DESCRIPTION
 
+This file implements the API for PIRC. A program that wants to use
+PIRC's services should use only these functions.
 
 =head1 FUNCTIONS
 

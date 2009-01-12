@@ -1,45 +1,16 @@
 #!perl
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 use lib "../../lib";
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 1;
 
-
-pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "simple macro without parameters");
-.macro Hi()
-    print "hello"
-.endm
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "a single const declaration");
 .sub main
-    .Hi()
+    say "ok"
 .end
 CODE
-.namespace []
-main:
-    print "hello"
-    set_returns 1
-    returncc
-OUTPUT
-
-pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "expansion w/ parameters and nested macro_const expansion");
-.macro_const ANSWER 42
-
-.macro foo(a,b)
-    say .a
-    say .b
-.endm
-
-.sub main
-    .foo(.ANSWER, "hi")
-.end
-
-CODE
-.namespace []
-main:
-    say 42
-    say "hi"
-    set_returns 1
-    returncc
+ok
 OUTPUT
 
 # Local Variables:
@@ -48,4 +19,3 @@ OUTPUT
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
-
