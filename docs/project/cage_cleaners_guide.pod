@@ -5,10 +5,11 @@
 
 From F<docs/project/roles_responsibilities.pod>:
 
- Fixes failing tests, makes sure coding standards are implemented, reviews
- documentation and examples. A class of tickets in the tracking system (RT)
- has been created for use by this group. This is an entry level position, and
- viewed as a good way to get familiar with parrot internals.
+ Fixes failing tests, makes sure coding standards are implemented,
+ reviews documentation and examples. A class of tickets in the
+ tracking system (RT or Trac) has been created for use by this
+ group. This is an entry level position, and viewed as a good way
+ to get familiar with parrot internals.
 
 =head1 Testing Parrot after making a code cleaning change
 
