@@ -16,15 +16,16 @@ as a command line (without interactive mode) :
 
 or as a library :
 
-     load_bytecode 'Markdown.pbc'
-     $P0 = compreg 'Markdown'
+     load_bytecode 'markdown.pbc'
+     $P0 = compreg 'markdown'
      $S0 = <<'MARKDOWN'
  Title
  =====
  Some text.
  MARKDOWN
      $P1 = $P0.'compile'($S0)
-     print $P1
+     $S0 = $P1()
+     print $S0
 
 =head1 DESCRIPTION
 
@@ -54,13 +55,11 @@ object.
     p6meta = new 'P6metaclass'
     $P0 = p6meta.'new_class'('Markdown::Compiler', 'parent'=>'PCT::HLLCompiler')
     $P1 = $P0.'new'()
-    $P1.'language'('Markdown')
+    $P1.'language'('markdown')
     $P1.'parsegrammar'('Markdown::Grammar')
     $P1.'parseactions'('Markdown::Grammar::Actions')
     $P1.'removestage'('post')
-    $P1.'removestage'('pir')
-    $P1.'removestage'('evalpmc')
-    $P1.'addstage'('html')
+    $P1.'addstage'('html', 'before' => 'pir')
 .end
 
 =item html(source [, adverbs :slurpy :named])
@@ -78,6 +77,25 @@ Transform MAST C<source> into a String containing HTML.
 .end
 
 
+.sub 'pir' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    new $P0, 'CodeString'
+    $P0 = <<'PIRCODE'
+.sub 'main' :anon
+    $S0 = <<'PIR'
+PIRCODE
+    $P0 .= source
+    $P0 .= <<'PIRCODE'
+PIR
+    .return ($S0)
+.end
+PIRCODE
+    .return ($P0)
+.end
+
+
 =item main(args :slurpy)  :main
 
 Start compilation by passing any command line C<args>
@@ -91,7 +109,7 @@ to the Markdown compiler.
     load_bytecode 'dumper.pbc'
     load_bytecode 'PGE/Dumper.pbc'
 
-    $P0 = compreg 'Markdown'
+    $P0 = compreg 'markdown'
 
     .local pmc opts
     opts = $P0.'process_args'(args)
