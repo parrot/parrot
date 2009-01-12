@@ -18,13 +18,16 @@
 
 
     # read the befunge program
-    fh        = open file, 'r'
+    fh = new 'FileHandle'
+    push_eh catch
+    fh.'open'(file, 'r')
+    pop_eh
     noline    = 0
   LOAD__READ_NEXT_LINE:
     inc noline
     if noline > 25 goto LOAD__COMPLETE
 
-    line = readline fh
+    line = fh.'readline'()
     len  = length line
     if len <= 0 goto LOAD__EOF
 
@@ -50,8 +53,20 @@
 
     # file loaded, return the playfield
   LOAD__COMPLETE:
-    close fh
+    fh.'close'()
     .return(playfield)
+
+  catch:
+    .local pmc ex
+    .get_results (ex)
+    $S0 = "Can't open '"
+    $S0 .= file
+    $S0 .= "' ("
+    $S1 = err
+    $S0 .= $S1
+    $S0 .= ")\n"
+    printerr $S0
+    rethrow ex
 
 .end
 

@@ -11,8 +11,9 @@
     .param pmc argv
 
     # disable buffering on stdout
-    #getstdout stdout
-    #pioctl I10, P10, 3, 0
+    .local pmc stdout
+    getstdout stdout
+    stdout.'buffer_type'("unbuffered")
 
     # parsing argv
     .local int debug
