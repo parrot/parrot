@@ -64,7 +64,7 @@ sub check_asserts {
     ok(!scalar @missing);
     if(scalar @missing) {
         diag("unused assert macros found:");
-        foreach my $missing (sort @missing) {
+        foreach my $missing (sort { $a->[1] . $a->[0] cmp $b->[1] . $b->[0]} @missing) {
             diag($missing->[1] . ": " . $missing->[0]);
         }
         diag(scalar(@missing) . " unused assert macros found in total.");
