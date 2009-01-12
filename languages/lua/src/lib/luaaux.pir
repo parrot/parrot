@@ -605,7 +605,7 @@ messages and in debug information.
     .param string data
     .param string chunkname
     .local pmc lua_comp
-    lua_comp = compreg 'Lua'
+    lua_comp = compreg 'lua'
     push_eh _handler
     $P0 = lua_comp.'compile'(data)
     $P0 = $P0[1]

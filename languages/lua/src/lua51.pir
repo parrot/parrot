@@ -36,7 +36,7 @@ Used by F<languages/lua/lua.pir>.
     $P0.'new_class'('Lua::Compiler', 'parent'=>'PCT::HLLCompiler', 'attr'=>'$ostgrammar')
 
     $P0 = new ['Lua';'Compiler']
-    $P0.'language'('Lua')
+    $P0.'language'('lua')
     $P0.'parsegrammar'('Lua::Grammar')
     $P0.'astgrammar'('Lua::PAST::Grammar')
     $P0.'ostgrammar'('Lua::POST::Grammar')
