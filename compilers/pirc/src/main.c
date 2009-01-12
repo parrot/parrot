@@ -81,6 +81,7 @@ print_help(char const * const program_name)
     "  -S        do not perform strength reduction\n"
     "  -v        verbose mode\n"
     "  -W        show warning messages\n"
+    "  -x        execute code after compilation\n"
 #ifdef YYDEBUG
     "  -y        debug bison-generated parser\n"
 #endif
@@ -136,6 +137,17 @@ process_file(void *a) {
 
 
 
+static void
+runcode(PARROT_INTERP, int argc, char *argv[]) {
+
+    /* runs :init functions */
+    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+
+    /* RT#46149 no return value :-( */
+    Parrot_runcode(interp, argc, argv);
+}
+
+
 
 /*
 
@@ -152,6 +164,7 @@ main(int argc, char *argv[]) {
     char const * const program_name = argv[0];
     int                flexdebug    = 0;
     int                flags        = 0;
+    int                execute      = 0;
     char              *filename     = NULL;
     char              *outputfile   = NULL;
     char              *hdocoutfile  = NULL;
@@ -230,6 +243,9 @@ main(int argc, char *argv[]) {
                 break;
             case 'W':
                 SET_FLAG(flags, LEXER_FLAG_WARNINGS);
+                break;
+            case 'x':
+                execute = 1;
                 break;
 /* Only allow for debug flag if the generated parser supports it */
 #ifdef YYDEBUG
@@ -327,7 +343,13 @@ main(int argc, char *argv[]) {
     }
 
     parse_file(interp, flexdebug, file, filename, flags, 0, macrosize, outputfile);
+/*
     fprintf(stderr, "done\n");
+*/
+
+    if (execute)
+        runcode(interp, argc, argv);
+
 }
 #endif
 

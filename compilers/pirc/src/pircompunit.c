@@ -2134,6 +2134,9 @@ add_key(NOTNULL(lexer_state * const lexer), NOTNULL(key * const keylist),
     key_entry *iter   = keylist->head;
 
     /* goto end of list */
+    /* XXX this could be optimized by having key_entries stored in
+     * a circular linked list. Fix later.
+     */
     while (iter->next != NULL)
         iter = iter->next;
 

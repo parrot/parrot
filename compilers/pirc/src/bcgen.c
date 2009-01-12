@@ -480,7 +480,9 @@ PARROT_IGNORABLE_RESULT
 opcode_t
 emit_opcode(bytecode * const bc, opcode_t op) {
     *bc->opcursor = op;
+/*
     fprintf(stderr, "\n[%d]", op);
+*/
     return (bc->opcursor++ - bc->interp->code->base.data);
 
 }
@@ -500,7 +502,9 @@ PARROT_IGNORABLE_RESULT
 opcode_t
 emit_int_arg(bytecode * const bc, int intval) {
     *bc->opcursor = intval;
+/*
     fprintf(stderr, "{%d}", intval);
+*/
     return (bc->opcursor++ - bc->interp->code->base.data);
 }
 

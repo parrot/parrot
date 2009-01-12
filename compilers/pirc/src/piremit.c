@@ -989,7 +989,9 @@ emit_pbc(lexer_state * const lexer) {
     write_pbc_file(lexer->bc, "a.pbc");  /* XXX fix output file specified by user */
 
     /* XXX just make sure no seg. faults  happened */
+/*
     fprintf(stderr, "done writing pbc\n");
+*/
 }
 
 /*
