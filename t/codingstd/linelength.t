@@ -44,7 +44,6 @@ my %lang_is_checked = map { $_ => 1 } qw{
     cardinal
     dotnet
     eclectus
-    hq9plus
     lazy-k
     lua
     m4

@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -41,7 +41,6 @@ sub _init {
         cardinal chitchat cola c99
         eclectus ecmascript
         forth
-        hq9plus
         jako json
         lazy-k lisp lolcode lua
         m4 markdown

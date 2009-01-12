@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -165,15 +165,6 @@ print $FH "print(\"Hello World from JS\\n\");";
 close $FH;
 $out = `$parrot languages/ecmascript/js.pbc $filename`;
 ok($out eq "Hello World from JS\n", "check ecmascript");
-unlink($filename);
-
-$filename = 'test.HQ9Plus';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH "H";
-close $FH;
-$out = `$parrot languages/hq9plus/hq9plus.pbc $filename`;
-ok($out eq "Hello, world!\n", "check HQ9Plus");
 unlink($filename);
 
 $filename = 'test.l';

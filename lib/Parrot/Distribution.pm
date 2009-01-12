@@ -493,7 +493,6 @@ sub get_perl_exemption_regexp {
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
         languages/regex/lib/Regex/Grammar.pm
         languages/pipp/src/pct/actions.pm
-        languages/hq9plus/src/parser/actions.pm
         compilers/nqp/
         compilers/ncigen/src/parser/actions.pm
         lib/Digest/Perl/
@@ -691,7 +690,6 @@ sub perl_module_file_directories {
         map( "languages/$_" => qw<
             APL/t
             BASIC/compiler
-            HQ9plus/lib/Parrot/Test
             WMLScript/build/SRM WMLScript/t/Parrot/Test
             bc/lib/Parrot/Test bc/lib/Parrot/Test/Bc
             dotnet/build/SRM dotnet/t
