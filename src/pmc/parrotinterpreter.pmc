@@ -360,6 +360,7 @@ Introspection interface. C<key> can be:
   "namespace"               ... return namespace PMC for this sub
   "outer"                   ... return outer sub of this closure
   "<item>"; level           ... same for caller <level>
+  "annotations"; level > 0  ... annotations at point of call <level>s down
   "outer"; "<item>"         ... same for outer level 1
   "outer"; "<item>"; level  ... same for outer <level>
   "globals"                 ... return global stash
@@ -451,6 +452,29 @@ Introspection interface. C<key> can be:
 
         if (string_equal(interp, item, s) == 0)
             return VTABLE_clone(interp, ctx->current_cont);
+
+        s = CONST_STRING(interp, "annotations");
+
+        if (string_equal(interp, item, s) == 0) {
+            PMC *sub = ctx->current_sub;
+            if (ctx == CONTEXT(interp)) {
+                /* We can't know the current program counter for the currently
+                 * executing sub, so can't return annotations for that. */
+                if (ctx == CONTEXT(interp))
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                            "Cannot get annotations at depth 0; use annotations op instead.");
+            }
+            if (!PMC_IS_NULL(sub) && sub->vtable->base_type == enum_class_Sub &&
+                    PMC_sub(sub)->seg->annotations) {
+                PackFile_ByteCode *seg = PMC_sub(sub)->seg;
+                opcode_t *pc = ctx->current_pc;
+                return PackFile_Annotations_lookup(interp,  seg->annotations,
+                        pc - seg->base.data, NULL);
+            }
+            else {
+                return pmc_new(interp, enum_class_Hash);
+            }
+        }
 
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
                 "No such item %Ss", item);

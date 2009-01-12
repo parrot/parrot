@@ -19,12 +19,13 @@ Test various use cases of the annotate directive.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(25)
+    plan(29)
 
     'no_annotations'()
     'annotations_exception'()
     'annotations_ops'()
     'backtrace_annotations'()
+    'parrotinterpreter_annotations'()
 .end
 
 
@@ -161,6 +162,36 @@ Test various use cases of the annotate directive.
    die "LOL HALP I HAZ A FAIL"
 .end
 
+
+.sub 'parrotinterpreter_annotations'
+    .annotate 'file', 'answer.p6'
+    .annotate 'line', 42
+    $P0 = new 'ParrotInterpreter'
+
+    .annotate 'line', 43
+    'test_callee'()
+.end
+
+.sub 'test_callee'
+    .annotate 'line', 100
+    $P0 = new 'ParrotInterpreter'
+    $P1 = $P0['annotations'; 1]
+    $S0 = $P1['file']
+    'is'($S0, 'answer.p6', 'annotations for caller sub returend with level 1')
+    $I0 = $P1['line']
+    'is'($I0, 43, 'annotations from caller sub returned at point of call with level 1')
+    'test_outer'()
+.end
+
+.sub 'test_outer' :outer('parrotinterpreter_annotations')
+    .annotate 'line', 101
+    $P0 = new 'ParrotInterpreter'
+    $P1 = $P0['outer'; 'annotations'; 1]
+    $S0 = $P1['file']
+    'is'($S0, 'answer.p6', 'annotations for outer sub returend with level 1')
+    $I0 = $P1['line']
+    'is'($I0, 43, 'annotations from outer sub returned at point of call with level 1')
+.end
 
 # Local Variables:
 #   mode: pir 
