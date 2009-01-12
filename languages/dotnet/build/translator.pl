@@ -455,7 +455,7 @@ NO_IN_TRACE:
         stypes = new "ResizablePMCArray"
 
     # Instantiate a bytecode escaper.
-    escaper = find_global "Data::Escape", "String"
+    escaper = get_global ["Data::Escape"], "String"
 
     # Source of generated label numbers set to zero.
     label_num = 0
