@@ -520,7 +520,7 @@ entry labels inside C<.emit> blocks have to be global labels:
       ret
   .eom
 
-=head2 Namespaces, Classes, and Methods
+=head2 Namespaces, Methods, and VTABLES
 
 Z<CHP-4-SECT-2>
 
@@ -676,7 +676,7 @@ return values just like a single line subroutine call:
 
   (res1, res2) = obj."method"(arg1, arg2)
 
-=head2 VTABLEs
+=head3 VTABLEs
 
 PMCs all subscribe to a common interface of functions called X<VTABLE>
 VTABLEs. Every PMC implements the same set of these interfaces, which
