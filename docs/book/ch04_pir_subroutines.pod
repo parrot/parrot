@@ -520,7 +520,7 @@ entry labels inside C<.emit> blocks have to be global labels:
       ret
   .eom
 
-=head2 Methods
+=head2 Namespaces, Classes, and Methods
 
 Z<CHP-4-SECT-2>
 
@@ -582,7 +582,7 @@ can invoke it like a normal subroutine:
     $P1 = get_global ["Foo"], "MySubroutine"
     $P1()                           # invoke it
 
-=head3 Method Syntax
+=head3 Calling Methods
 
 Z<CHP-4-SECT-2>
 
@@ -604,9 +604,37 @@ variable that does. Here's an example:
 
   .local string methname = "Foo"
   object.methname()               # Same as object."Foo"()
+  object."Foo"()                  # Same 
 
 The invocant can be a variable or register, and the method name can be
 a literal string, string variable, or method object PMC.
+
+=head3 Defining Methods
+
+Methods are defined like any other subroutine except with two major
+differences: They must be inside a namespace named after the class
+they are a part of, and they must use the C<:method> flag.
+
+  .namespace [ "MyClass"]
+
+  .sub "MyMethod" :method
+    ...
+
+Inside the method, the invocant object can be accessed using the C<self>
+keyword. C<self> isn't the only name you can call this value, however.
+You can also use the C<:invocant> flag to define a new name for the invocant
+object:
+
+  .sub "MyMethod" :method
+    $S0 = self                    # Already defined as "self"
+    say $S0
+  .end
+  
+  .sub "MyMethod2" :method
+    .param pmc item :invocant     # "self" is now called "item"
+    $S0 = item
+    say $S0
+  .end
 
 This example defines two methods in the C<Foo> class. It calls one
 from the main body of the subroutine and the other from within the
