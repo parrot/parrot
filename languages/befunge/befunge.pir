@@ -10,6 +10,8 @@
 .sub "befunge" :main
     .param pmc argv
 
+    push_eh catch
+
     # disable buffering on stdout
     .local pmc stdout
     getstdout stdout
@@ -239,6 +241,11 @@
     status["y"] = y
     set_global "status", status
     goto TICK
+
+  catch:
+    .local pmc ex
+    .get_results (ex)
+    printerr ex
 
 .end
 

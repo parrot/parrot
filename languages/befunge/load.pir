@@ -64,8 +64,8 @@
     $S0 .= "' ("
     $S1 = err
     $S0 .= $S1
-    $S0 .= ")\n"
-    printerr $S0
+    $S0 .= ")"
+    ex = $S0
     rethrow ex
 
 .end
