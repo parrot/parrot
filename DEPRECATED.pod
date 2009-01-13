@@ -41,6 +41,16 @@ See RT #58410.
 
 =back
 
+=head1 PMCS
+
+=over 4
+
+=item * Remove VtableCache PMC [post 0.9.0]
+
+See TT #6
+
+=back
+
 =head1 Class Features
 
 =over 4
