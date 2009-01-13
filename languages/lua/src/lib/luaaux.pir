@@ -35,7 +35,7 @@ CAUTION: don't used it in an exception handler, but lua_x_argerror & rethrow.
     .param int narg
     .param pmc extramsg :slurpy
     $S0 = lua_x_argerror(narg, extramsg :flat)
-    lua_error($S0)
+    die $S0
 .end
 
 .sub 'lua_x_argerror'
@@ -1010,11 +1010,10 @@ This function never returns.
     .local pmc bt
     bt = ex.'backtrace'()
     $S0 = where()
-    $S0 .= ' '
     $S1 = ex
     $S0 .= $S1
     $S0 .= "\n"
-    $S1 = traceback(bt)
+    $S1 = str_traceback(bt)
     $S0 .= $S1
     .return (1, $S0)
   L2:
@@ -1023,10 +1022,10 @@ This function never returns.
 
 .sub 'where' :anon
     # dummy implementation
-    .return ("_._:0:")
+    .return ("_._:0: ")
 .end
 
-.sub 'traceback' :anon
+.sub 'str_traceback'
     .param pmc bt
     .local pmc iter, sub, outer, annos
     new iter, 'Iterator', bt

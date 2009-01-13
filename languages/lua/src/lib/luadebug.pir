@@ -377,7 +377,8 @@ STILL INCOMPLETE.
     unless $S1 goto L1
     $S1 .= "\n"
   L1:
-    $S0 = _traceback($I2)
+    $P0 = _traceback($I2)
+    $S0 = str_traceback($P0)
     $S1 .= $S0
     new res, 'LuaString'
     set res, $S1
@@ -387,29 +388,22 @@ STILL INCOMPLETE.
 .sub '_traceback' :anon
     .param int level
     $P0 = getinterp
+    .local pmc res, hash, sub, annos
+    new res, 'ResizablePMCArray'
     $I0 = 0
-    $S0 = "stack traceback:"
-    .local pmc sub, outer
   L1:
     inc $I0
     push_eh _handler
     sub = $P0['sub'; $I0]
+    annos = $P0['annotations'; $I0]
     pop_eh
-    outer = sub.'get_outer'()
-    $S0 .= "\n\t"
-    unless null outer goto L3
-    $S0 .= "[PIR]:"
-    goto L4
-  L3:
-    $S0 .= "_._:0:"
-  L4:
-    $S0 .= " in function '"
-    $S1 = sub.'get_name'()
-    $S0 .= $S1
-    $S0 .= "'"
+    new hash, 'Hash'
+    hash['sub'] = sub
+    hash['annotations'] = annos
+    push res, hash
     goto L1
   _handler:
-    .return ($S0)
+    .return (res)
 .end
 
 
