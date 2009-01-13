@@ -24,14 +24,14 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 3;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'parsing of namespace directive' );
 <?php
 
 namespace A\B {}
 
-namespace \A\B\C {}
+namespace A\B\C {}
 
 ?>
 CODE
@@ -49,7 +49,7 @@ namespace A\B {
 const FOO  = "FOO in A::B\n";
 
 echo FOO;
-echo A\B\FOO;
+echo \A\B\FOO;
 echo \FOO;
 
 }
@@ -57,42 +57,8 @@ echo \FOO;
 namespace {
 
 echo FOO;
-echo A\B\FOO;
+echo \A\B\FOO;
 echo \FOO;
-
-}
-
-?>
-CODE
-FOO in A::B
-FOO in A::B
-FOO in root
-FOO in root
-FOO in A::B
-FOO in root
-OUT
-
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with variable', todo => 'not implemented yet' );
-<?php
-
-namespace {
-$FOO = "FOO in root.\n";
-}
-
-namespace A\B {
-
-$FOO  = "FOO in A::B\n";
-
-echo $FOO;
-echo $A\B\FOO;
-echo $\FOO;
-}
-
-namespace {
-
-echo $FOO;
-echo $A\B\FOO;
-echo $\FOO;
 
 }
 
@@ -118,7 +84,7 @@ class Dings {
     }
 }
 
-$dings = new A\Dings;
+$dings = new \A\B\Dings;
 $dings->bums();
 
 }
