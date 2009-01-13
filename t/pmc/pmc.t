@@ -49,7 +49,7 @@ OUTPUT
 my $checkTypes;
 my %types_we_cant_test
     = map { $_ => 1; } (    # These require initializers.
-    qw(Null Iterator Enumerate Ref STMRef SharedRef
+    qw(Null Iterator Enumerate Ref SharedRef
         ParrotObject ParrotThread
         deleg_pmc BigInt LexInfo LexPad Slice Object),
 

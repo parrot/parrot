@@ -17,7 +17,6 @@ use Parrot::Pmc2c::PMC::deleg_pmc ();
 use Parrot::Pmc2c::PMC::Null ();
 use Parrot::Pmc2c::PMC::Ref ();
 use Parrot::Pmc2c::PMC::SharedRef ();
-use Parrot::Pmc2c::PMC::STMRef ();
 use Parrot::Pmc2c::PMC::Object ();
 use File::Spec ();
 use Carp;

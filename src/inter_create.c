@@ -349,13 +349,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     Parrot_do_dod_run(interp, GC_finish_FLAG);
 
-#if STM_PROFILE
-    if (interp->thread_data && interp->thread_data->stm_log
-    && !interp->parent_interpreter
-    &&  Interp_debug_TEST(interp, PARROT_THREAD_DEBUG_FLAG))
-        Parrot_STM_dump_profile(interp);
-#endif
-
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
      * so if such a PMC needs destroying, we get a memory leak, like for
@@ -386,22 +379,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (! (interp->parent_interpreter ||
                 Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
         return;
-
-    if (interp->thread_data && interp->thread_data->stm_log) {
-        while (Parrot_STM_transaction_depth(interp) > 0) {
-            /* XXX */
-            fprintf(stderr, "interpreter %p had pending transaction on exit\n",
-                    (void *) interp);
-            Parrot_STM_abort(interp);
-        }
-#if STM_PROFILE
-        if (interp->parent_interpreter
-            && interp->thread_data->state & THREAD_STATE_JOINED)
-            Parrot_STM_merge_profile(interp->parent_interpreter,
-                                     interp);
-#endif
-        Parrot_STM_destroy(interp);
-    }
 
     if (interp->parent_interpreter
     &&  interp->thread_data

@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+3.31    2009.01.12      whiteknight     remove stm.ops and all opcodes therein
 3.30	2009.01.10	coke	removed find_global_p_s_s and store_global_s_s_p 
 3.29	2009.01.07	coke	removed store_global_p_s_p
 3.28	2009.01.07	jonathan	changes for bytecode annoations (packfile and ops)
@@ -39,7 +40,6 @@
 3.21	2008.11.06	coke	remove new_p_i, new_p_i_p, find_type_i_p, find_type_i_s, valid_type_i_i, typeof_i_p, typeof_i_p_k, typeof_i_p_ik, typeof_s_i
 3.20	2008.10.23	pmichaud	make opsrenumber fix
 3.19	2008.08.04	coke	remove getclass opcodes
-3.18	2008.07.16	bernhard	remove opcode getfd
 3.18	2008.07.16	bernhard	remove opcode getfd
 3.17    2008.06.26	jonathan	sub PMC freeze format changed
 3.16    2008.04.23	pmichaud	remove other user stack opcodes

@@ -527,11 +527,6 @@ docs/resources/perl.css                                     [main]doc
 docs/resources/up.gif                                       [main]doc
 docs/running.pod                                            [main]doc
 docs/stability.pod                                          [main]doc
-docs/stm/atomic.pod                                         [main]doc
-docs/stm/howto.pod                                          [main]doc
-docs/stm/internals.pod                                      [main]doc
-docs/stm/stm_frontend.pod                                   [main]doc
-docs/stm/thread-issues.pod                                  [main]doc
 docs/submissions.pod                                        [main]doc
 docs/tests.pod                                              [main]doc
 docs/user/pir/pp001-intro.pod                               [main]doc
@@ -953,7 +948,6 @@ include/parrot/settings.h                                   [main]include
 include/parrot/slice.h                                      [main]include
 include/parrot/stacks.h                                     [main]include
 include/parrot/stat.h                                       [main]include
-include/parrot/stm/backend.h                                [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/string_primitives.h                          [main]include
@@ -2749,7 +2743,6 @@ lib/Parrot/Pmc2c/PMC/ParrotClass.pm                         [devel]
 lib/Parrot/Pmc2c/PMC/PrintTree.pm                           [devel]
 lib/Parrot/Pmc2c/PMC/RO.pm                                  [devel]
 lib/Parrot/Pmc2c/PMC/Ref.pm                                 [devel]
-lib/Parrot/Pmc2c/PMC/STMRef.pm                              [devel]
 lib/Parrot/Pmc2c/PMC/SharedRef.pm                           [devel]
 lib/Parrot/Pmc2c/PMC/default.pm                             [devel]
 lib/Parrot/Pmc2c/PMC/deleg_pmc.pm                           [devel]
@@ -2865,7 +2858,6 @@ runtime/parrot/library/SDL/Rect.pir                         [library]
 runtime/parrot/library/SDL/Sprite.pir                       [library]
 runtime/parrot/library/SDL/StopWatch.pir                    [library]
 runtime/parrot/library/SDL/Surface.pir                      [library]
-runtime/parrot/library/STM.pir                              [library]
 runtime/parrot/library/Stream/Base.pir                      [library]
 runtime/parrot/library/Stream/Combiner.pir                  [library]
 runtime/parrot/library/Stream/Coroutine.pir                 [library]
@@ -3056,7 +3048,6 @@ src/ops/ops.skip                                            []
 src/ops/pic.ops                                             []
 src/ops/pmc.ops                                             []
 src/ops/set.ops                                             []
-src/ops/stm.ops                                             []
 src/ops/string.ops                                          []
 src/ops/sys.ops                                             []
 src/ops/var.ops                                             []
@@ -3154,9 +3145,6 @@ src/pmc/scheduler.pmc                                       []
 src/pmc/schedulermessage.pmc                                []
 src/pmc/sharedref.pmc                                       []
 src/pmc/slice.pmc                                           []
-src/pmc/stmlog.pmc                                          []
-src/pmc/stmref.pmc                                          []
-src/pmc/stmvar.pmc                                          []
 src/pmc/string.pmc                                          []
 src/pmc/stringhandle.pmc                                    []
 src/pmc/sub.pmc                                             []
@@ -3173,10 +3161,6 @@ src/scheduler.c                                             []
 src/spf_render.c                                            []
 src/spf_vtable.c                                            []
 src/stacks.c                                                []
-src/stm/backend.c                                           []
-src/stm/stm_internal.h                                      []
-src/stm/stm_waitlist.h                                      []
-src/stm/waitlist.c                                          []
 src/string.c                                                []
 src/string_primitives.c                                     []
 src/sub.c                                                   []
@@ -3592,9 +3576,6 @@ t/pmc/schedulermessage.t                                    []
 t/pmc/sharedref.t                                           []
 t/pmc/signal.t                                              []
 t/pmc/slice.t                                               []
-t/pmc/stmlog.t                                              []
-t/pmc/stmref.t                                              []
-t/pmc/stmvar.t                                              []
 t/pmc/string.t                                              []
 t/pmc/stringhandle.t                                        []
 t/pmc/sub.t                                                 []
@@ -3695,11 +3676,6 @@ t/steps/inter_shlibs-01.t                                   []
 t/steps/inter_types-01.t                                    []
 t/steps/inter_yacc-01.t                                     []
 t/steps/inter_yacc-02.t                                     []
-t/stm/basic.t                                               []
-t/stm/basic_mt.t                                            []
-t/stm/llqueue.t                                             []
-t/stm/queue.t                                               []
-t/stm/runtime.t                                             []
 t/stress/gc.t                                               []
 t/tools/dev/pmctree.t                                       []
 t/tools/dev/searchops.t                                     []

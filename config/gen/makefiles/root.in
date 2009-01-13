@@ -421,8 +421,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/spf_render$(O) \
     $(SRC_DIR)/spf_vtable$(O) \
     $(SRC_DIR)/stacks$(O) \
-    $(SRC_DIR)/stm/backend$(O) \
-    $(SRC_DIR)/stm/waitlist$(O) \
     $(SRC_DIR)/string_primitives$(O) \
     $(SRC_DIR)/sub$(O) \
     $(SRC_DIR)/thread$(O) \
@@ -2053,7 +2051,6 @@ COVER_DIRS = \
     $(SRC_DIR)/ops \
     $(SRC_DIR)/packfile \
     $(SRC_DIR)/pmc \
-    $(SRC_DIR)/stm \
     $(IO_DIR) \
     $(IMCC_DIR)
 

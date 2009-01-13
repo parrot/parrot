@@ -320,7 +320,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/stat.h"
 #include "parrot/slice.h"
 #include "parrot/hll.h"
-#include "parrot/stm/backend.h"
 #include "parrot/pbcversion.h"
 
 #endif /* PARROT_PARROT_H_GUARD */

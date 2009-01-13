@@ -105,9 +105,6 @@ typedef struct _Thread_data {
      */
     Parrot_cond  interp_cond;
 
-    /* STM transaction log */
-    struct STM_tx_log   *stm_log;
-
     /* COW'd constant tables */
     Hash             *const_tables;
 } Thread_data;

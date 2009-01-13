@@ -343,11 +343,6 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     PARROT_ASSERT(interp->DOD_registry);
     pobject_lives(interp, (PObj *)interp->DOD_registry);
 
-    /* Mark the transaction log */
-    /* XXX do this more generically? */
-    if (interp->thread_data && interp->thread_data->stm_log)
-        Parrot_STM_mark_transaction(interp);
-
     /* Mark the MMD cache. */
     if (interp->op_mmd_cache)
         Parrot_mmd_cache_mark(interp, interp->op_mmd_cache);
