@@ -3,7 +3,7 @@
 # $Id$
 
 use lib "../../lib";
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 5;
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "a local, a reg and an if-stat");
 .sub main
@@ -65,6 +65,41 @@ ok
 ok
 ok
 OUTPUT
+
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "indexing an array");
+.sub main
+    .local pmc p
+    p = new "ResizableIntegerArray"
+    p[0] = 42
+    p[1] = 43
+    $I0 = p[0]
+    say $I0
+    $I1 = p[1]
+    say $I1
+.end
+CODE
+42
+43
+OUTPUT
+
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "indexing a hash");
+.sub main
+    .local pmc p
+    p = new "Hash"
+    p["hello"] = 42
+    $I0 = p["hello"]
+    say $I0
+    p["bye"] = 3.3
+    $N1 = p["bye"]
+    say $N1
+.end
+CODE
+42
+3.3
+OUTPUT
+
 
 
 
