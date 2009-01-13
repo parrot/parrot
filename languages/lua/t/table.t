@@ -78,12 +78,11 @@ CODE
 3	c
 OUTPUT
 
-language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreach (hash)' );
+language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function foreach (hash)' );
 t = {a=10, b=100}
 table.foreach(t, print)
 CODE
-a	10
-b	100
+/^(a\t10\nb\t100|b\t100\na\t10)$/
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function foreachi' );
