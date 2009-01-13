@@ -11,9 +11,10 @@ src/classes/Nil.pir - Nil objects
 .namespace []
 
 .sub '' :anon :load :init
-    .local pmc jsmeta, nilproto
+    .local pmc jsmeta, nilproto, nullclass
+    nullclass = get_hll_global ['parrot'], 'Null'
     jsmeta = get_hll_global ['JSObject'], '$!JSMETA'
-    nilproto = jsmeta.'new_class'('JSNull', 'parent'=>'Null')
+    nilproto = jsmeta.'new_class'('JSNull', 'parent'=>nullclass)
     jsmeta.'register'('Null', 'parent'=>nilproto, 'protoobject'=>nilproto)
 
     $P0 = nilproto.'new'()

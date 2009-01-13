@@ -10,6 +10,8 @@ method TOP($/, $key) {
     if $key eq 'open' {
         ## create a 'global' current block and stuff it into the scope stack.
         $?BLOCK := PAST::Block.new( :blocktype('declaration'), :node($/) );
+        $?BLOCK.hll('js');
+
         @?BLOCK.unshift($?BLOCK);
     }
     elsif $key eq 'close' {
@@ -631,7 +633,7 @@ method new_expression($/) {
     ## past as argument. This is done 'inside out', so the last 'new' is invoked
     ## first, so to say.
     for $<sym> {
-        $past := PAST::Op.new( $past, :name('new'), :pasttype('call'), :node($/) );
+        $past := PAST::Op.new( $past, :name('new'), :pasttype('callmethod'), :node($/) );
     }
     make $past;
 }
@@ -700,7 +702,7 @@ method object_literal($/) {
 method property($/) {
     my $key  := $( $<property_name> );
     my $val  := $( $<assignment_expression> );
-    my $past := PAST::Op.new( :pasttype('callmethod'), :name('Set'), $key, $val, :node($/) );
+    my $past := PAST::Op.new( :inline('    %0[%1] = %2'), $key, $val, :node($/) );
     make $past;
 }
 
@@ -717,7 +719,7 @@ method property_name($/, $key) {
 method array_literal($/) {
     my $past := PAST::Stmts.new( :node($/) );
 
-    my $type := PAST::Var.new( :name('JSArray'), :scope('package'), :node($/) );
+    my $type := PAST::Var.new( :name('Array'), :scope('package'), :node($/) );
     my $objvar := PAST::Var.new(:scope('register'), :name('obj'));
     $past.push(
         PAST::Op.new(:pasttype('bind'),
@@ -727,7 +729,7 @@ method array_literal($/) {
     my $i := 0;
     for $<assignment_expression> {
       $past.push(
-          PAST::Op.new( :pasttype('callmethod'), :name('Set'), $objvar, $i, $($_), :node($/) ));
+          PAST::Op.new( :inline('    %0[%1] = %2'), $objvar, $i, $($_), :node($/) )); 
       $i := $i + 1;
     }
     $past.push($objvar);

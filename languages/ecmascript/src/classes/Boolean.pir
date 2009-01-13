@@ -18,9 +18,10 @@ symbols for C<Boolean::True> and C<Boolean::False>.
 .namespace ['JSBoolean']
 
 .sub 'onload' :anon :init :load
-    .local pmc jsmeta, boolproto
+    .local pmc jsmeta, boolproto, booleanclass
+    booleanclass = get_root_global ['parrot'], 'Boolean'
     jsmeta = get_hll_global ['JSObject'], '$!JSMETA'
-    boolproto = jsmeta.'new_class'('JSBoolean', 'parent'=>'Boolean')
+    boolproto = jsmeta.'new_class'('JSBoolean', 'parent'=>booleanclass)
     #boolproto = jsmeta.'new_class'('Boolean')
     #boolproto.'!IMMUTABLE'()
     jsmeta.'register'('Boolean', 'parent'=>boolproto, 'protoobject'=>boolproto)

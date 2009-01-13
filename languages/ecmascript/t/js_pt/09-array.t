@@ -11,7 +11,7 @@ use Parrot::Test tests => 1;
 
 language_output_is( 'JS', <<'CODE', <<'OUT', 'new array into var', todo => 'NOTIMPLEMENTED');
 var a = new Array();
-print a.length
+print(a.length);
 CODE
 0
 OUT

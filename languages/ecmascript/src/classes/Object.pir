@@ -18,8 +18,9 @@ care of much of that.
 .sub '' :anon :init :load
     .local pmc jsmeta
     load_bytecode 'PCT.pbc'
+    $P1 = get_root_global ['parrot'], 'Hash'
     $P0 = get_root_global ['parrot'], 'P6metaclass'
-    $P0.'new_class'('JSObject', 'parent'=>'Hash')
+    $P0.'new_class'('JSObject', 'parent'=>$P1)
     jsmeta = $P0.'HOW'()
     set_hll_global ['JSObject'], '$!JSMETA', jsmeta
 .end

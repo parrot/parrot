@@ -19,9 +19,11 @@ care of much of that.
     .local pmc jsmeta
     load_bytecode 'PCT.pbc'
     $P0 = get_root_global ['parrot'], 'P6metaclass'
-    $P0.'new_class'('JSArray', 'parent'=>'JSObject')
+    $P0.'new_class'('Array', 'parent'=>'JSObject')
     jsmeta = $P0.'HOW'()
-    set_hll_global ['JSArray'], '$!JSMETA', jsmeta
+    set_hll_global ['Array'], '$!JSMETA', jsmeta
+    get_class $P0, 'Array'
+    addattribute $P0, '__array'
 .end
 
 =head2 Methods
@@ -39,23 +41,7 @@ like this.
 
 =cut
 
-.namespace ['JSArray']
-.sub 'Set' :method
-    .param pmc key
-    .param pmc val
-    self[key] = val
-    .return(self)
-.end
-
-.namespace ['JSArray']
-.sub 'Get' :method
-    .param pmc key
-    .local pmc val
-    val = self[key]
-    .return(val)
-.end
-
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'clone' :method
     .param pmc new_attrs :slurpy :named
 
@@ -90,7 +76,7 @@ Return true if the object is defined.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'defined' :method
     $P0 = get_hll_global ['Bool'], 'True'
     .return ($P0)
@@ -103,7 +89,7 @@ Return invocant in hash context.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'hash' :method
     .tailcall self.'Hash'()
 .end
@@ -120,7 +106,7 @@ Return invocant in item context.  Default is to return self.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'item' :method
     .return (self)
 .end
@@ -146,7 +132,7 @@ Return invocant in list context.  Default is to return a List containing self.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'list' :method
     $P0 = new 'List'
     push $P0, self
@@ -159,7 +145,7 @@ Print the object.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'print' :method
     $P0 = get_hll_global 'print'
     .tailcall $P0(self)
@@ -171,7 +157,7 @@ Print the object, followed by a newline.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'say' :method
     $P0 = get_hll_global 'say'
     .tailcall $P0(self)
@@ -183,7 +169,7 @@ Boolean value of object -- defaults to C<.defined> (S02).
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'true' :method
     .tailcall self.'defined'()
 .end
@@ -198,9 +184,9 @@ Boolean value of object -- defaults to C<.defined> (S02).
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'Array' :method
-    $P0 = new 'JSArray'
+    $P0 = new 'Array'
     $P0.'!STORE'(self)
     .return ($P0)
 .end
@@ -209,7 +195,7 @@ Boolean value of object -- defaults to C<.defined> (S02).
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'Hash' :method
     $P0 = new 'JSHash'
     $P0.'!STORE'(self)
@@ -232,7 +218,7 @@ an object reference (unless the invocant already is one).
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub '' :method('Scalar') :anon
     $I0 = isa self, 'ObjectRef'
     unless $I0 goto not_ref
@@ -264,7 +250,7 @@ the object's type and address.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'Str' :method
     $P0 = new 'ResizableStringArray'
     $P1 = self.'WHAT'()
@@ -288,14 +274,14 @@ Create a new object having the same class as the invocant.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub 'new' :method
     .param pmc init_parents :slurpy
     .param pmc init_this    :named :slurpy
 
     # Instantiate.
     .local pmc jsmeta
-    jsmeta = get_hll_global ['JSArray'], '$!JSMETA'
+    jsmeta = get_hll_global ['Array'], '$!JSMETA'
     $P0 = jsmeta.'get_parrotclass'(self)
     $P1 = new $P0
     .return ($P1)
@@ -307,7 +293,7 @@ Create a new object having the same class as the invocant.
 
 =cut
 
-.namespace ['JSArray']
+.namespace ['Array']
 .sub '' :vtable('decrement') :method
     $P0 = self.'pred'()
     'infix:='(self, $P0)
@@ -328,10 +314,29 @@ Create a new object having the same class as the invocant.
     .tailcall self.'Iterator'()
 .end
 
+#.sub '' :vtable('get_string') :method
+#    $S0 = self.'Str'()
+#    .return ($S0)
+#.end
+
 .sub '' :vtable('get_string') :method
-    $S0 = self.'Str'()
-    .return ($S0)
+    $S0 = ''
+    .local pmc iter
+    iter = new 'Iterator', self
+    goto loop_start
+    loop:
+    unless iter goto end
+    $S0 = concat $S0, ','
+    loop_start:
+    $S1 = shift iter
+    $S2 = iter[$S1]
+    concat $S0, $S2
+    goto loop
+    end:
+.return ($S0)
 .end
+
+
 
 .sub '' :vtable('increment') :method
     $P0 = self.'succ'()
