@@ -63,21 +63,11 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =item L<http://phpcompiler.org/>
 
-=item L<http://en.wikipedia.org/wiki/Document_Object_Model>
-
 =item L<http://en.wikipedia.org/wiki/Abstract_syntax_tree>
-
-=item L<http://en.wikipedia.org/wiki/XSLT>
-
-=item L<http://search.cpan.org/dist/parrot/docs/glossary.pod>
-
-=item L<http://perl.overmeer.net/xml-compile/>
 
 =item L<http://en.wikipedia.org/wiki/Plum-headed_parakeet>
 
 =item L<http://www.parrotcode.org/docs/compiler_tools.html>
-
-=item L<http://www.antlr.org/v3/index.html>
 
 =back
 
