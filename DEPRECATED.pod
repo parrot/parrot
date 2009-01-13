@@ -3,7 +3,7 @@
 =head1 Deprecation in Parrot
 
 This is a list of currently deprecated features of Parrot.  Every deprecation
-has an associated RT ticket.  Each item indicates the last release it's
+has an associated RT or TT ticket.  Each item indicates the last release it's
 guaranteed to appear in.
 
 When deprecated items are removed, all usage of the feature in the
@@ -128,7 +128,7 @@ to happen.  See RT #60586 and RT #53302.
 =item P6protoobject stringification [post 0.9.0]
 
 Stringification of protoobjects will return the full name of the type
-and parentheses, per Synopsis 12.
+and parentheses, per Synopsis 12.  See TT #168
 
 =back
 
