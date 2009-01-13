@@ -126,7 +126,9 @@ int add_num_const(bytecode * const bc, FLOATVAL f);
 */
 
 
-int add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas);
+
+int add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas,
+                struct lexer_state * const lexer);
 
 
 #endif /* PARROT_BCGEN_H_GUARD */

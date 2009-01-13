@@ -4,7 +4,7 @@
  */
 #include <stdio.h>
 #include <assert.h>
-
+#include "pirsymbol.h"
 
 #include "parrot/parrot.h"
 
@@ -695,26 +695,47 @@ find_outer_sub(bytecode * const bc, char const * const outername)>
 
 Find the outer sub that has name C<outername>. If not found, NULL is returned.
 
+XXX this function needs access to C<lexer>, which adds a dependency.
+XXX This should be fixed, to make bcgen.c a complete independent module.
+
 =cut
 
 */
 static PMC *
-find_outer_sub(bytecode * const bc, char const * const outername) {
-    PMC    *current;
-    STRING *cur_name;
-    size_t  len;
+find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_state * const lexer)
+{
+    PMC          *current;
+    STRING       *cur_name;
+    size_t        len;
+    global_label *outersub;
+
 
     /* if sub has no :outer, leave */
     if (outername == NULL)
         return NULL;
 
-
+    /* if outername is an empty string, leave */
     len = strlen(outername);
     if (len == 0)
         return NULL;
 
+    /* find the outer sub */
+    outersub = find_global_label(lexer, outername);
 
-    /* XXX go here through the global labels, and check whether it can be found */
+    if (outersub) {
+        int const num_constants = bc->interp->code->const_table->const_count;
+
+        /* sanity check for const_table_index */
+        if (outersub->const_table_index >= 0 && outersub->const_table_index < num_constants)
+        {
+            PackFile_Constant *subconst
+                       = bc->interp->code->const_table->constants[outersub->const_table_index];
+            /* set a flag on that outer sub that it's an outer sub */
+            PObj_get_FLAGS(subconst->u.key) |= SUB_FLAG_IS_OUTER;
+            return subconst->u.key;
+        }
+
+    }
 
     /* could be eval too; check if :outer is the current sub */
     current = CONTEXT(bc->interp)->current_sub;
@@ -726,6 +747,7 @@ find_outer_sub(bytecode * const bc, char const * const outername) {
 
     cur_name = PMC_sub(current)->name;
 
+    /* XXX can't this be a call to string_compare() ? */
     if (cur_name->strlen == len && (memcmp((char *)cur_name->strstart, outername, len) == 0))
         return current;
 
@@ -833,7 +855,9 @@ The C<subpragmas> parameter encode flags such as C<:immediate> etc.
 
 */
 int
-add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas) {
+add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas,
+            struct lexer_state * const lexer)
+{
     PMC                   *sub_pmc;        /* the "Sub" pmc, or a variant, such as "Coroutine" */
     Parrot_sub            *sub;
     int                    subconst_index; /* index in const table for the sub pmc */
@@ -854,7 +878,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     sub->namespace_name   = get_namespace_pmc(bc, info->name_space);
     sub->HLL_id           = CONTEXT(bc->interp)->current_HLL;
     sub->lex_info         = create_lexinfo(bc, sub_pmc, info->lexicals, needlex);
-    sub->outer_sub        = find_outer_sub(bc, info->outersub);
+    sub->outer_sub        = find_outer_sub(bc, info->outersub, lexer);
 
     /* Set the vtable index; if this .sub was declared as :vtable, its vtable
      * index was found during the parse; otherwise it's -1.
