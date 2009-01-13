@@ -729,7 +729,7 @@ method array_literal($/) {
     my $i := 0;
     for $<assignment_expression> {
       $past.push(
-          PAST::Op.new( :inline('    %0[%1] = %2'), $objvar, $i, $($_), :node($/) )); 
+          PAST::Op.new( :inline('    %0[%1] = %2'), $objvar, $i, $($_), :node($/) ));
       $i := $i + 1;
     }
     $past.push($objvar);
