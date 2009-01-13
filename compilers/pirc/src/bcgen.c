@@ -640,7 +640,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
 /*
 
 =item C<static PMC *
-create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lexflag)>
+create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int needlex)>
 
 Create a lexinfo PMC for the sub C<sub>. If there are no lexicals,
 but the C<:lex> flag was specified, or the sub has an C<:outer> flag,
@@ -650,12 +650,10 @@ then a lexinfo is created after all. The created lexinfo is returned.
 
 */
 static PMC *
-create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lexflag) {
+create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int needlex) {
     lexical      * lexiter     = lexicals;
     INTVAL   const lex_info_id = Parrot_get_ctx_HLL_type(bc->interp, enum_class_LexInfo);
     STRING * const method      = string_from_literal(bc->interp, "declare_lex_preg");
-
-    int      outer = 0; /* change type of this */
 
     /* create a lexinfo PMC */
     PMC * lex_info             = pmc_new_noinit(bc->interp, lex_info_id);
@@ -680,7 +678,7 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int lex
      * and doesn't need a lex_info. If, however, the sub has an :outer or a
      * :lex flag, then create the lex_info anyway.
      */
-    if (lex_info == NULL && (outer || lexflag)) {
+    if (lex_info == NULL && needlex) {
         lex_info = pmc_new_noinit(bc->interp, lex_info_id);
         VTABLE_init_pmc(bc->interp, lex_info, sub);
     }
@@ -877,7 +875,10 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     sub->end_offs         = info->endoffset;
     sub->namespace_name   = get_namespace_pmc(bc, info->name_space);
     sub->HLL_id           = CONTEXT(bc->interp)->current_HLL;
-    sub->lex_info         = create_lexinfo(bc, sub_pmc, info->lexicals, needlex);
+    /* create a lexinfo object, if needlex is true, or this sub has an :outer */
+    sub->lex_info         = create_lexinfo(bc, sub_pmc, info->lexicals,
+                                           needlex | (info->outersub != NULL));
+
     sub->outer_sub        = find_outer_sub(bc, info->outersub, lexer);
 
     /* Set the vtable index; if this .sub was declared as :vtable, its vtable
