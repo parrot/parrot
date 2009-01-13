@@ -60,8 +60,9 @@ LIST
     .param pmc extra :slurpy
     .local pmc res
     $S1 = lua_checkstring(1, str)
-    $P0 = compreg 'Markdown'
-    $S0 = $P0.'compile'($S1)
+    $P0 = compreg 'markdown'
+    $P1 = $P0.'compile'($S1)
+    $S0 = $P1()
     new res, 'LuaString'
     set res, $S0
     .return (res)
