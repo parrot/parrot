@@ -68,6 +68,8 @@ are processed by a different preprocessor; see F<hdocprep.l>.
 #include "pirmacro.h"
 #include "pirerr.h"
 
+#include "parrot/parrot.h"
+
 /* define the type of the extra field in the yyscan_t object that is passed around;
  * this is the lexer_state structure, defined in "pircompiler.h"
  */
@@ -385,13 +387,29 @@ REGISTER       "$"[SNIP]{DIGITS}
                                "unrecognized flag: '%s'", yytext);
                   }
 
+{DQ_STRING}       { /* XXX this is a bit hacky. First the string is unescaped, but that
+                     * returns a STRING * object; that's not what we want at this point.
+                     * So, convert it back to a C string, and return that. Later, that
+                     * string is converted into a STRING again, so this must be fixed.
+                     * Preferably there would be an unescape function returning a C-string.
+                     */
+                    lexer_state * const lexer = yyget_extra(yyscanner);
 
-{Q_STRING}        { /* copy the string, remove the quotes. */
+                    STRING *pstr = string_unescape_cstring(lexer->interp,
+                                                           yytext + 1, '"', "ascii");
+
+                    char *str = string_to_cstring(lexer->interp, pstr);
+
+                    yylval->sval = str;
+                    return TK_STRINGC;
+                  }
+
+{SQ_STRING}       { /* copy the string, remove the quotes. */
                     yylval->sval = dupstrn(yyget_extra(yyscanner), yytext + 1, yyleng - 2);
                     return TK_STRINGC;
                   }
 
-{CHARSET}{DQ_STRING}  {
+{CHARSET}{DQ_STRING}  { /* XXX these double-quoted strings are not unescaped (yet) */
                     /* parse yytext, which contains the charset, a ':', and the quoted string */
                     char        *colon = strchr(yytext, ':');
                     lexer_state *lexer = yyget_extra(yyscanner);
@@ -420,7 +438,7 @@ REGISTER       "$"[SNIP]{DIGITS}
                     return TK_USTRINGC;
                   }
 
-{ENCODING}{CHARSET}{DQ_STRING} {
+{ENCODING}{CHARSET}{DQ_STRING} { /* XXX these double-quoted strings are not unescaped (yet) */
                     /* parse yytext, which contains the encoding, a ':', a charset,
                      * a ':', and the quoted string
                      */
