@@ -29,6 +29,8 @@ A listing of things that Pipp does differently from the standard PHP.
 
 =item No old style constructors, where the constructor is named after the class.
 
+=item Only bracketed version of namespaces. No check for unnamespaced code.
+
 =back
 
 =head1 Implementation

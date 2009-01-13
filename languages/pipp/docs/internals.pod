@@ -18,7 +18,11 @@ See L<testing.pod>.
 
 =head1 Parsing
 
-Parsing is done with PCT.
+Parsing is done with Parrot Compiler Toolkit, PCT.
+
+=head1 Bytecode generation
+
+The parse tree is transformed to a Parrot Abstrace Syntax Tree, from which PIR und then Bytecode is generated.
 
 =head1 Variables
 
@@ -48,8 +52,10 @@ Parsing is done with PCT.
 
 =head1 Namespaces
 
-A namespace is introduced with the keyword B<namespace>.
-There can be multiple namespaces per file. They are not nested.
+A namespace is introduced with the keyword B<namespace>. 
+The namespaced code can be enclosed in brackets.
+The namespace declaration needs to be the first statement in the file.
+With brackets, there can be multiple namespaces per file. Nesting is not possible.
 Namespaces don't carry over to included files.
 B<define()> doesn't define in the current namespace.
 The backslash character serves as the namespace separator.
@@ -67,9 +73,9 @@ Currently the namespace directive is only parsed.
 In order to ease implementation and testing, there will be
 some divergences in Pipp. 
 Code before the first namespace directive is allowed.
+Only the bracketed syntax is supported.
 Free code within namespace is allowed.
-There will be namespaced variables as well.
-'namespace \;' indicates the return to the root namespace.
+Unnamespaced code is allowed.
 
 =head2 SEE ALSO
 
