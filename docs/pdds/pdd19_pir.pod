@@ -398,7 +398,8 @@ Then you're asking for a bigger bytecode file as a result.
 Define "main" entry point to start execution.  If multiple subroutines are
 marked as B<:main>, the B<last> marked subroutine is used.  Only the first
 file loaded or compiled counts; subs marked as B<:main> are ignored by the
-B<load_bytecode> op.
+B<load_bytecode> op. If no B<:main> flag is specified at all, execution
+starts at the first subroutine in the file.
 
 =item :load
 
