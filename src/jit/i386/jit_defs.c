@@ -2060,8 +2060,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
         jit_emit_mov_ri_i(interp, jit_info->native_ptr, emit_ESI, offset);
         emitm_callm(jit_info->native_ptr, emit_ESI, 0, 0, 0);
         /* now patch a B<cpu_ret> opcode after the end of the
-         * prederefed (non JIT) section
-         */
+         * prederefed (non JIT) section */
         if (last_is_branch) {
             offset = (cur_section->end - interp->code->base.data) +
                 interp->code->prederef.code;
@@ -2078,7 +2077,7 @@ Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
                 + interp->code->prederef.code;
             cur_section->done = 1;
         }
-        *offset = ((op_func_t*)interp->op_lib->op_func_table)[2];
+        *offset = ((op_func_t*)interp->op_lib->op_func_table)[PARROT_OP_cpu_ret];
     }
     else {
         /* else call normal funtion */

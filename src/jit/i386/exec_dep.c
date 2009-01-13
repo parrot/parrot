@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2008, The Perl Foundation.
+ * Copyright (C) 2003-2009, The Perl Foundation.
  */
 
 /*
@@ -80,7 +80,7 @@ Parrot_exec_normal_op(Parrot_jit_info_t *jit_info, PARROT_INTERP)
             cur_section->done = 1;
         }
 
-        i = (int)(((op_func_t*)interp->op_lib->op_func_table)[2]);
+        i = (int)(((op_func_t*)interp->op_lib->op_func_table)[PARROT_OP_cpu_ret]);
         j = (int)cgp_core;
 
         *offset = (void *)(i - j);
