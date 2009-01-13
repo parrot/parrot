@@ -146,7 +146,7 @@ rule statement_delimiter {
 }
 
 rule namespace_statement {
-    'namespace' <NAMESPACE_NAME> ';'
+    'namespace' <NAMESPACE_NAME>? '{' <statement_list> '}'
     {*}
 }
 

@@ -114,17 +114,18 @@ method inline_sea_short_tag($/) {
 }
 
 method namespace_statement($/) {
-    our $?NS := ~$<NAMESPACE_NAME>;
-    my $past := PAST::Op.new(
-                    :pasttype('call'),
-                    :name('echo'),
-                    :node($/),
-                    PAST::Val.new(
-                        :value('Encountered namespace: ' ~ $?NS ~ "\n"),
-                        :returns('PhpString'),
-                    ),
-                );
-    make $past;
+    my $ns_name := +$<NAMESPACE_NAME> ?? ~$<NAMESPACE_NAME>[0] !! '';
+    my $block :=
+        PAST::Block.new(
+            :namespace($ns_name),
+            $( $<statement_list> )
+        );
+
+    # set up scope 'package' for the superglobals
+    our @?SUPER_GLOBALS;
+    for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
+    make $block;
 }
 
 method return_statement($/) {
@@ -814,11 +815,9 @@ method quote($/) {
 method quote_expression($/, $key) {
     my $past;
     if $key eq 'quote_regex' {
-        our $?NS;
         $past := PAST::Block.new(
             $<quote_regex>,
             :compiler('PGE::Perl6Regex'),
-            :namespace($?NS),
             :blocktype('declaration'),
             :node( $/ )
         );

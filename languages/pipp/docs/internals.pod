@@ -68,14 +68,10 @@ Free code is disallowed within namespaces.
 
 =head2 Implementation in Pipp
 
-Currently the namespace directive is only parsed.
-
 In order to ease implementation and testing, there will be
 some divergences in Pipp. 
-Code before the first namespace directive is allowed.
 Only the bracketed syntax is supported.
-Free code within namespace is allowed.
-Unnamespaced code is allowed.
+Code outside the scope of namespaces directives is allowed.
 
 =head2 SEE ALSO
 
