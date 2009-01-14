@@ -52,7 +52,7 @@ This program should be used when adding or removing PMCs.
 
 =head1 AUTHOR
 
-Christoph Otto 
+Christoph Otto
 
 =cut
 
