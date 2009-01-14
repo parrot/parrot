@@ -52,7 +52,6 @@ sub new {
         $self->new_group( 'Ops Tests',                           '', 't/op',  't/dynoplibs' ),
         $self->new_group( 'PMC Tests',                           '', 't/pmc', 't/dynpmc' ),
         $self->new_group( 'C Source Code Tests',                 '', 't/src' ),
-        $self->new_group( 'Software Transactional Memory Tests', '', 't/stm' ),
         $self->new_group( 'Stress Tests',                        '', 't/stress' ),
     );
 }
