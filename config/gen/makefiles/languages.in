@@ -15,9 +15,8 @@ LANGUAGES = \
     BASIC befunge bf \
     c99 cardinal chitchat cola \
     dotnet \
-    eclectus ecmascript \
+    ecmascript \
     forth \
-    hq9plus \
     jako json \
     lazy-k lisp lolcode lua \
     m4 markdown \
@@ -76,9 +75,8 @@ test-separate: all \
     befunge.test bf.test \
     c99.test cardinal.test chitchat.test cola.test \
     dotnet.test \
-    eclectus.test ecmascript.test \
+    ecmascript.test \
     forth.test \
-    hq9plus.test \
     jako.test json.test \
     lazy-k.test lisp.test lolcode.test lua.test \
     m4.test \
@@ -97,7 +95,6 @@ clean: \
     dotnet.clean \
     ecmascript.clean \
     forth.clean \
-    hq9plus.clean \
     jako.clean json.clean \
     lisp.clean \
     lolcode.clean lua.clean \
@@ -115,9 +112,8 @@ realclean: \
     befunge.realclean bf.realclean \
     c99.realclean cardinal.realclean chitchat.realclean cola.realclean \
     dotnet.realclean \
-    eclectus.realclean ecmascript.realclean \
+    ecmascript.realclean \
     forth.realclean \
-    hq9plus.realclean \
     jako.realclean json.realclean \
     lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
     m4.realclean markdown.realclean \
@@ -235,16 +231,6 @@ dotnet.clean:
 dotnet.realclean:
 	- $(MAKE) dotnet realclean
 
-eclectus: eclectus.dummy
-eclectus.dummy:
-	- $(MAKE) eclectus
-eclectus.test :
-	- $(MAKE) eclectus test
-eclectus.clean :
-	- $(MAKE) eclectus clean
-eclectus.realclean :
-	- $(MAKE) eclectus realclean
-
 ecmascript : ecmascript.dummy
 ecmascript.dummy:
 	- $(MAKE) ecmascript
@@ -264,16 +250,6 @@ forth.clean:
 	- $(MAKE) forth clean
 forth.realclean:
 	- $(MAKE) forth realclean
-
-hq9plus: hq9plus.dummy
-hq9plus.dummy:
-	- $(MAKE) hq9plus
-hq9plus.test:
-	- $(MAKE) hq9plus test
-hq9plus.clean:
-	- $(MAKE) hq9plus clean
-hq9plus.realclean:
-	- $(MAKE) hq9plus realclean
 
 jako: jako.dummy
 jako.dummy:
