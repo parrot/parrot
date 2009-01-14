@@ -118,7 +118,6 @@ sub _init {
         -Wunreachable-code
         -Wunused-function
         -Wunused-label
-        -Wunused-parameter
         -Wunused-value
         -Wunused-variable
     );
@@ -137,6 +136,7 @@ sub _init {
         -Wmissing-noreturn
         -Wshadow
         -Wunused-macros
+        -Wunused-parameter
     );
 
     $data{potential_warnings}        = \@potential_warnings;
