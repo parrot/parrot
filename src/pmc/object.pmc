@@ -791,7 +791,6 @@ Used to mark a PMC as read-only shared.
         PMC *classobj;
         Parrot_Interp  master;
         INTVAL         type_num;
-        PMC           *vtable_cache = PMCNULL;
 
         if (PObj_is_PMC_shared_TEST(SELF))
             return SELF;
@@ -799,17 +798,6 @@ Used to mark a PMC as read-only shared.
         master = interpreter_array[0];
         classobj = VTABLE_get_class(INTERP, SELF);
         type_num = SELF->vtable->base_type;
-
-        /* keep the original vtable from going away... */
-        vtable_cache = PARROT_CLASS(classobj)->vtable_cache;
-        if (PMC_IS_NULL(vtable_cache)) {
-            vtable_cache = pmc_new(INTERP, enum_class_VtableCache);
-            PMC_struct_val(vtable_cache) = INTERP->vtables[type_num];
-            PARROT_CLASS(classobj)->vtable_cache = vtable_cache;
-        }
-
-        add_pmc_sync(INTERP, vtable_cache);
-        PObj_is_PMC_shared_SET(vtable_cache);
 
         /* make sure metadata doesn't go away unexpectedly */
         if (PMC_metadata(pmc))

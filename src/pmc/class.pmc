@@ -80,10 +80,6 @@ A Null PMC is allocated during initialization.
 A cache of visible attribute names to attribute indexes.
 A Null PMC is allocated during initialization.
 
-=item C<vtable_cache>
-
-Cache of the vtable used for objects (only STM).
-
 =item C<resolve_method>
 
 A list of method names the class provides used for name conflict resolution.
@@ -429,7 +425,6 @@ pmclass Class
     ATTR PMC *attrib_metadata;  /* Hash of attributes in this class to hashes of metadata. */
     ATTR PMC *attrib_index;     /* Lookup table for attributes in this and parents. */
     ATTR PMC *attrib_cache;     /* Cache of visible attrib names to indexes. */
-    ATTR PMC *vtable_cache;     /* Cache of the vtable used for objects (only STM). */
     ATTR PMC *resolve_method;   /* List of method names the class provides to resolve
                                  * conflicts with methods from roles. */
     ATTR PMC *parent_overrides;
@@ -468,7 +463,6 @@ arguments. The class is attached to the current HLL namespace.
         _class->attrib_metadata = pmc_new(interp, enum_class_Hash);
         _class->attrib_index    = PMCNULL;
         _class->attrib_cache    = PMCNULL;
-        _class->vtable_cache    = PMCNULL; /* only used for STM */
         _class->resolve_method  = pmc_new(interp, enum_class_ResizablePMCArray);
 
         _class->vtable_overrides = pmc_new(interp, enum_class_Hash);
