@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, The Perl Foundation.
+# Copyright (C) 2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -10,9 +10,9 @@ my $pmc_num_file = $ARGV[0];
 my $pmc_order = 0;
 my $pmc_num_contents;
 
-open (PMC_NUM, "<$pmc_num_file");
+open my $pmc_num_fh, '<', $pmc_num_file;
 
-for (<PMC_NUM>) {
+for (<$pmc_num_fh>) {
     if (/^([\w]+)\.pmc\s+\d+$/) {
         $pmc_num_contents .= "$1.pmc    $pmc_order\n";
         $pmc_order++;
@@ -22,10 +22,10 @@ for (<PMC_NUM>) {
     }
 }
 
-close PMC_NUM;
-open (PMC_NUM, ">$pmc_num_file");
-print PMC_NUM $pmc_num_contents;
-close PMC_NUM;
+close $pmc_num_fh;
+open  $pmc_num_fh, '>', $pmc_num_file;
+print $pmc_num_fh $pmc_num_contents;
+close $pmc_num_fh;
 
 
 ################### DOCUMENTATION ####################
