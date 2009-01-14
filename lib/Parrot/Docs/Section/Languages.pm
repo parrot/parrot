@@ -39,7 +39,6 @@ sub new {
         'Language Implementations',
         'languages.html',
         '',
-        $self->new_item( '', 'languages/LANGUAGES_STATUS.pod' ),
         $self->new_item( '', 'languages/t/harness' ),
         $self->new_section( 'abc',         'abc.html',        '', 'languages/abc' ),
         $self->new_section( 'APL',         'apl.html',        '', 'languages/APL' ),

@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
 
 =head1 Release Instructions
@@ -21,7 +21,7 @@ A couple of weeks in advance: Ask people to run C<make fulltest> and report
 A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot.  Ask whether there
 are any showstopping bugs.  It's also good to ask for updates to F<NEWS>,
-F<CREDITS>, F<PLATFORMS>, F<RESPONSIBLE_PARTIES> and F<LANGUAGES_STATUS>.
+F<CREDITS>, F<PLATFORMS>, F<RESPONSIBLE_PARTIES> and L<https://trac.parrot.org/parrot/wiki/Languages>.
 
 You might also select a name for your release. For example, you could
 select a name from L<http://en.wikipedia.org/wiki/List_of_parrots>.
