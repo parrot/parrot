@@ -248,6 +248,37 @@ names in some situations. Of course, making huge identifier names could
 cause all sorts of memory allocation problems or inefficiencies in
 parsing. Push the limits at your own risk.
 
+=head2 Register Allocator
+
+Now's a decent time to talk about Parrot's register allocator. When you use
+a register like C<$P5>, you aren't necessarily talking about the fifth
+register in memory. This is important since you can use a $P10000000 without
+forcing Parrot to allocate an array of ten million registers. Instead Parrot's
+compiler front-end uses an allocation algorithm which turns each register in
+the PIR source code into a reference to an actual memory storage location.
+
+The allocator is a type of optimization. It performs a lifetime analysis on
+the registers to determine when they are being used and when they are not.
+When a register stops being used for one thing, it can be reused later for a
+different purpose. Register reuse helps to keep Parrot's memory requirements
+lower, because fewer unique registers need to be allocated. However, the
+downside of the register allocator is that it takes more time to execute during
+the compilation phase.
+
+In some situations it can be helpful to turn the allocator off and avoid
+expensive optimizations. Such situations are subroutines where there are a
+small fixed number of registers used, when variables are used throughout the
+subroutine and should never be reused, or when some kind of pointer reference
+needs to be made to the register N<this happens in some NCI calls that take
+pointers and return values>. To turn off the register allocator for certain
+variables, you can use the C<:unique_reg> modifier:
+
+  .local pmc MyUniquePMC :unique_reg
+
+Notice that C<:unique_reg> shouldn't affect the behavior of Parrot, but
+instead only changes the way registers are allocated. It's a trade off between
+using more memory in exchange for less time spent optimizing the subroutine.
+
 =head2 PMC variables
 
 Z<CHP-3-SECT-2.4>
