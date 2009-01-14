@@ -141,6 +141,17 @@ quotes:
 
   $S0 = "This string is \n on two lines"
   $S0 = 'This is a \n one-line string with a slash in it'
+  
+Here's a quick listing of the escape sequences supported by double-quoted
+strings:
+
+  \xhh        1..2 hex digits
+  \ooo        1..3 oct digits
+  \cX         control char X
+  \x{h..h}    1..8 hex digits
+  \uhhhh      4 hex digits
+  \Uhhhhhhhh  8 hex digits
+  \a, \b, \t, \n, \v, \f, \r, \e, \\, \"
 
 Or, if you need more flexibility, you can use a heredoc:
 
@@ -149,7 +160,9 @@ Or, if you need more flexibility, you can use a heredoc:
   This is a multi-line string literal. Notice that
   it doesn't use quotation marks. The string continues
   until the ending token (the thing in quotes next to
-  the << above) is found.
+  the << above) is found. The terminator must appear on
+  it's own line, must appear at the beginning of the
+  line, and may not have any trailing whitespace.
 
   End_Token
 
@@ -157,7 +170,7 @@ Or, if you need more flexibility, you can use a heredoc:
 
 Strings are complicated. It used to be that all that was needed was to
 support the ASCII charset, which only contained a handful of common
-symbols and English characters. Now we need to worry about character
+symbols and English characters. Now we need to worry about several character
 encodings and charsets in order to make sense out of all the string data
 in the world.
 
@@ -167,11 +180,11 @@ The default for Parrot is 8-bit ASCII, which is simple to use and is almost
 universally supported. However, support is built in to have other formats as
 well.
 
-String constants, like the ones we've seen above, can have an optional
-prefix specifying the encoding and the charset to be used by the string.
-Parrot will maintain these values internally, and will automatically convert
-strings when necessary to preserve the information. String prefixes are
-specified as C<encoding:charset:> at the front of the string. Here are some
+Double-quoted string constants, like the ones we've seen above, can have an
+optional prefix specifying the charset or both the encoding and charset of the
+string. Parrot will maintain these values internally, and will automatically
+convert strings when necessary to preserve the information. String prefixes
+are specified as C<encoding:charset:> at the front of the string. Here are some
 examples:
 
   $S0 = utf8:unicode:"Hello UTF8 Unicode World!"
@@ -179,11 +192,14 @@ examples:
   $S2 = ascii:"This is 8-bit ASCII"
   $S3 = binary:"This is treated as raw unformatted binary"
 
-The C<binary:> encoding treats the string as a buffer of raw unformatted
+The C<binary:> charset treats the string as a buffer of raw unformatted
 binary data. It isn't really a "string" per se because binary data isn't
 treated as if it contains any readable characters. These kinds of strings
 are useful for library routines that return large amounts of binary data
 that doesn't easily fit into any other primitive data type.
+
+Notice that only double-quoted strings can have encoding and charset prefixes
+like this. Single-quoted strings do not support them.
 
 When two types of strings are combined together in some way, such as through
 concatenation, they must both use the same character set an encoding.
