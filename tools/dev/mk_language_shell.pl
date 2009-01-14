@@ -287,18 +287,32 @@ object.
 
 =cut
 
+.HLL '@lclang@'
+
 .namespace [ '@lang@';'Compiler' ]
 
 .loadlib '@lclang@_group'
 
-.sub 'onload' :anon :load :init
+.sub '' :anon :load :init
     load_bytecode 'PCT.pbc'
+    .local pmc parrotns, hllns, exports
+    parrotns = get_root_namespace ['parrot']
+    hllns = get_hll_namespace
+    exports = split ' ', 'PAST PCT PGE'
+    parrotns.'export_to'(hllns, exports)
+.end
 
+.include 'src/gen_grammar.pir'
+.include 'src/gen_actions.pir'
+
+.sub 'onload' :anon :load :init
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
     $P1 = $P0.'new'()
-    $P1.'language'('@lang@')
-    $P1.'parsegrammar'('@lang@::Grammar')
-    $P1.'parseactions'('@lang@::Grammar::Actions')
+    $P1.'language'('@lclang@')
+    $P0 = get_hll_namespace ['@lang@';'Grammar']
+    $P1.'parsegrammar'($P0)
+    $P0 = get_hll_namespace ['@lang@';'Grammar';'Actions']
+    $P1.'parseactions'($P0)
 .end
 
 =item main(args :slurpy)  :main
@@ -311,14 +325,11 @@ to the @lang@ compiler.
 .sub 'main' :main
     .param pmc args
 
-    $P0 = compreg '@lang@'
+    $P0 = compreg '@lclang@'
     $P1 = $P0.'command_line'(args)
 .end
 
-
 .include 'src/gen_builtins.pir'
-.include 'src/gen_grammar.pir'
-.include 'src/gen_actions.pir'
 
 =back
 
@@ -412,7 +423,7 @@ value of the comment is passed as the second argument to the method.
 class @lang@::Grammar::Actions;
 
 method TOP($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ) );
+    my $past := PAST::Block.new( :blocktype('declaration'), :node( $/ ), :hll('@lclang@') );
     for $<statement> {
         $past.push( $( $_ ) );
     }
