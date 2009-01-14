@@ -2850,8 +2850,8 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
      * don't. */
     if (sub_obj->vtable->base_type == enum_class_Sub
             && PMC_IS_NULL(interp->current_object)) {
-        INTVAL old_core  = interp->run_core;
-        opcode_t offset  = dest - interp->code->base.data;
+        const INTVAL old_core = interp->run_core;
+        const opcode_t offset = dest - interp->code->base.data;
 
         /* can't re-enter the runloop from here with PIC cores: RT #60048 */
         if (interp->run_core == PARROT_CGP_CORE
