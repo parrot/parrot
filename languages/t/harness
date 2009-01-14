@@ -66,7 +66,6 @@ my $result = GetOptions( 'languages=s'   => \$languages_list );
 #
 # BASIC                No t/harness, two implementations
 # ecmascript           No t/harness
-# eclectus
 # forth                No t/harness
 # perl6                test scripts are written in Perl 6, not Perl 5
 # pheme                test scripts are written in Scheme, not Perl 5
