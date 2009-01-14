@@ -440,7 +440,7 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
             return VTABLE_get_string(interp, reg);
         }
         case KEY_integer_FLAG:
-            return string_from_int(interp, PMC_int_val(key));
+            return string_from_int(interp, key_integer(interp, key));
         case KEY_integer_FLAG | KEY_register_FLAG:
             return string_from_int(interp, REG_INT(interp, PMC_int_val(key)));
         default:
@@ -595,7 +595,7 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 value = string_append(interp, value,
-                    string_from_int(interp, PMC_int_val(key)));
+                    string_from_int(interp, key_integer(interp, key)));
                 break;
             case KEY_string_FLAG:
                 value = string_append(interp, value, quote);
