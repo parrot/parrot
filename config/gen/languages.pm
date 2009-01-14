@@ -39,7 +39,7 @@ sub _init {
         APL abc
         befunge bf
         cardinal chitchat cola c99
-        eclectus ecmascript
+        ecmascript
         forth
         jako json
         lazy-k lisp lolcode lua

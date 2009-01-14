@@ -20,7 +20,9 @@ New in January 2009 release
     - added support for 'elsif'
     - added support for 'do-while'
   + HQ9+
-    - left the nest and is now at https://github.com/bschmalhofer/hq9plus
+    - left the nest and is now at https://github.com/bschmalhofer/hq9plus/
+  + Eclectus
+    - left the nest and is now at http://github.com/bschmalhofer/eclectus/
 - Miscellaneous
   + Infrastructure
     - 'make smoke' now generates Smolder reports sent to

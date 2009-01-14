@@ -44,7 +44,7 @@ For almost all languages you can do something like:
 =head1 TODO
 
 It should be possible to use non-Perl5 test files,
-like for languages/perl6, languages/pheme or languages/eclectus.
+like for languages/perl6 or languages/pheme.
 
 =cut
 
