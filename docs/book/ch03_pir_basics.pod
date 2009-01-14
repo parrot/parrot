@@ -337,6 +337,11 @@ but have to be declared beforehand:
   .const string mouse = "Mouse"     # string constant
   .const num pi = 3.14159           # floating point constant
 
+In addition to normal local constants, you can also specify a global constant
+which is accessible from everywhere in the current code file:
+
+  .globalconst int days = 365
+
 =head1 Symbol Operators
 
 Z<CHP-3-SECT-3>
