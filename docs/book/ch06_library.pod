@@ -23,6 +23,14 @@ that can be used by Parrot hackers and HLL-implementers alike, if needed.
 This chapter is going to give a brief overview of some of these libraries
 and how they are used.
 
+=head1 Loading and Using Libraries
+
+Libraries are precompiled code files that can be loaded into Parrot. There
+are ways to load a library into Parrot, each with a slightly different
+mechanism. The C<.loadlib> PIR directive causes the library file to be loaded
+at compile-time. The C<load_lib> obcode causes the library to be loaded
+dynamically at runtime.
+
 =head1 General Parrot Libraries
 
 =head2 F<Config.fpmc>
