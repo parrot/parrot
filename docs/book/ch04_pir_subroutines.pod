@@ -105,12 +105,10 @@ X<.return directive>
 The C<.return> directive allows the subroutine to return control flow
 to the calling subroutine, and optionally returns result output values.
 
-
-Here's a complete code example that reimplements the factorial code
-from the previous section as an independent subroutine. The subroutine
-C<_fact> is a separate compilation unit, assembled and processed after
-the C<_main> function.  Parrot resolves global symbols like the
-C<_fact> label between different units.
+Here's a complete code example that implements the factorial algorithm.
+The subroutine C<fact> is a separate compilation unit, assembled and
+processed after the C<main> function.  Parrot resolves global symbols
+like the C<fact> label between different units.
 
   # factorial.pir
   .sub main
@@ -458,8 +456,14 @@ find the proper environment information about variables.
 
 Z<CHP-4-SECT-1.2>
 
-The example above could have been written using simple labels instead
-of separate compilation units:
+The term "compilation unit" is one that's been bandied about throughout the
+chapter and it's worth some amount of explanation here. A compilation unit
+is a section of code that forms a single unit. In some instances the term
+can be used to describe an entire file. In most other cases, it's used to
+describe a single subroutine. Our earlier example which created a C<'fact'>
+subroutine for calculating factorials could be considered to have used two
+separate compilation units: The C<main> subroutine and the C<fact> subroutine.
+Here is a way to rewrite that algorithm using only a single subroutine instead:
 
   .sub main
       $I1 = 5         # counter
@@ -483,49 +487,15 @@ of separate compilation units:
 
 The unit of code from the C<fact> label definition to C<ret> is a
 reusable routine. There are several problems with this simple
-approach. First, the caller has to know to pass the argument to
-C<fact> in C<$I1> and to get the result from C<$I0>. Second, neither
-the caller nor the function itself preserves any registers. This is
-fine for the example above, because very few registers are used. But
-if this same bit of code were buried deeply in a math routine package,
-you would have a high risk of clobbering the caller's register values.
+approach. In terms of the interface, the caller has to know to pass the
+argument to C<fact> in C<$I1> and to get the result from C<$I0>. This is
+different from how subroutines are normally invoked in PIR.
 
-X<PIR (Parrot intermediate representation);register allocation>
-X<data flow graph (DFG)>
-Another disadvantage of this approach is that C<_main> and C<fact>
+Another disadvantage of this approach is that C<main> and C<fact>
 share the same compilation unit, so they're parsed and processed as
-one piece of code. When Parrot does register allocation, it calculates
-the data flow graph (DFG) of all symbols,N<The operation to calculate
-the DFG has a quadratic cost or better. It depends on I<n_lines *
-n_symbols>.> looks at their usage, calculates the interference between
-all possible combinations of symbols, and then assigns a Parrot
-register to each symbol. This process is less efficient for large
-compilation units than it is for several small ones, so it's better to
-keep the code modular. The optimizer will decide whether register
-usage is light enough to merit combining two compilation units, or
-even inlining the entire function.
-
-=begin sidebar A Short Note on the Optimizer
-
-Z<CHP-4-SIDEBAR-1>
-
-X<optimizer>
-The optimizer isn't powerful enough to inline small subroutines yet.
-But it already does other simpler optimizations. You may recall that
-the PASM opcode C<mul> (multiply) has a two-argument version that uses
-the same register for the destination and the first operand. When
-Parrot
-comes across a PIR statement like C<$I0 = $I0 * $I1>, it can optimize
-it to the two-argument C<mul $I0>, C<$I1> instead of C<mul $I0, $I0,
-$I1>. This kind of optimization is enabled by the C<-O1> command-line
-option.
-
-So you don't need to worry about finding the shortest PASM
-instruction, calculating constant terms, or avoiding branches to speed
-up your code. Parrot does it already.
-
-=end sidebar
-
+one piece of code. They share registers, and they would also share LexInfo
+and LexPad PMCs, if any were needed by C<main>. This is a problem when trying
+to follow normal encapsulation guidelines.
 
 =head3 PASM Subroutines
 
