@@ -423,7 +423,36 @@ subroutines can reference in their C<:outer> declarations. Within lexical
 subroutines, the C<.lex> command defines a local variable that follows these
 scoping rules.
 
-=head3 Lexpad PMCs
+=head3 LexPad and LexInfo PMCs
+
+Information about lexical variables in a subroutine is stored in two different
+types of PMCs: The LexPad and LexInfo PMCs. Neither of these PMC types are
+really usable from PIR code, but are instead used by Parrot internally to
+store information about lexical variables.
+
+C<LexInfo> PMCs are used to store information about lexical variables at
+compile time. This is read-only information that is generated during
+compilation to represent what is known about lexical variables. Not all
+subroutines get a LexInfo PMC by default, you need to indicate to Parrot
+somehow that you require a LexInfo PMC to be created. One way to do this is
+with the C<.lex> directive that we looked at above. Of course, the C<.lex>
+directive only works for languages where the names of lexical variables are
+all known at compile time. For languages where this information isn't known,
+the subroutine can be flagged with C<:lex> instead.
+
+C<LexPad> PMCs are used to store run-time information about lexical variables.
+This includes their current values and their type information. LexPad PMCs are
+created at runtime for subs that have a C<LexInfo> PMC already. These are
+created each time the subroutine is invoked, which allows for recursive
+subroutine calls without overwriting variable names.
+
+There is no easy way to get a reference to the current LexPad or LexInfo PMCs
+in a given subroutine, but that doesn't matter because they aren't useful by
+themselves anyway. Remember that subroutines themselves can be lexical and
+that therefore the lexical environment of a given variable can extend to
+multiple subroutines and therefore multiple LexPads. The opcodes C<find_lex>
+and C<store_lex> automatically search through nested LexPads recursively to
+find the proper environment information about variables.
 
 =head2 Compilation Units Revisited
 
