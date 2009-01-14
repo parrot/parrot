@@ -16,9 +16,9 @@ TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 PBC_TO_EXE = ../../pbc_to_exe@exe@
 RECONFIGURE = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
-#CONDITIONED_LINE(darwin):
-#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
-#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
+#IF(darwin):
+#IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 ## places to look for things
 LIBPATH  = src/lib
@@ -88,7 +88,7 @@ GEN_PIR = \
  src/PASTGrammar_gen.pir \
  src/POSTGrammar_gen.pir \
  $(LIBPATH)/luabytecode_gen.pir \
- $(LIBPATH)/gl.pir \
+#IF(has_opengl): $(LIBPATH)/gl.pir \
  $(LIBPATH)/sha1.pir
 
 GEN_PBC = \
@@ -105,16 +105,16 @@ all: \
  bit.pbc \
  bitlib.pbc \
  complex.pbc \
- $(LIBPATH)/gl.pbc \
- gl_binding.pbc \
- glut.pbc \
+#IF(has_opengl): $(LIBPATH)/gl.pbc \
+#IF(has_opengl): gl_binding.pbc \
+#IF(has_opengl): glut.pbc \
  lfs.pbc \
  lpeg.pbc \
  markdown.pbc \
  mathx.pbc \
- md5.pbc \
+#IF(has_crypto): md5.pbc \
  random.pbc \
- sha1.pbc \
+#IF(has_crypto): sha1.pbc \
  struct.pbc \
  uuid.pbc \
  $(GEN_PIR) \
@@ -215,17 +215,17 @@ bitlib.pbc: $(LIBPATH)/bitlib.pir
 complex.pbc: $(LIBPATH)/complex.pir
 	-$(PARROT) --output=complex.pbc $(LIBPATH)/complex.pir
 
-$(LIBPATH)/gl.pir: $(LIBPATH)/gl.lua lua.pbc
-	-$(PARROT) luap.pir --target=pir $(LIBPATH)/gl.lua > $(LIBPATH)/gl.pir
-
-$(LIBPATH)/gl.pbc: $(LIBPATH)/gl.pir
-	-$(PARROT) --output=$(LIBPATH)/gl.pbc $(LIBPATH)/gl.pir
-
-gl_binding.pbc: $(LIBPATH)/gl_binding.pir
-	-$(PARROT) --output=gl_binding.pbc $(LIBPATH)/gl_binding.pir
-
-glut.pbc: $(LIBPATH)/glut.pir
-	-$(PARROT) --output=glut.pbc $(LIBPATH)/glut.pir
+#IF(has_opengl):$(LIBPATH)/gl.pir: $(LIBPATH)/gl.lua lua.pbc
+#IF(has_opengl):	-$(PARROT) luap.pir --target=pir $(LIBPATH)/gl.lua > $(LIBPATH)/gl.pir
+#IF(has_opengl):
+#IF(has_opengl):$(LIBPATH)/gl.pbc: $(LIBPATH)/gl.pir
+#IF(has_opengl):	-$(PARROT) --output=$(LIBPATH)/gl.pbc $(LIBPATH)/gl.pir
+#IF(has_opengl):
+#IF(has_opengl):gl_binding.pbc: $(LIBPATH)/gl_binding.pir
+#IF(has_opengl):	-$(PARROT) --output=gl_binding.pbc $(LIBPATH)/gl_binding.pir
+#IF(has_opengl):
+#IF(has_opengl):glut.pbc: $(LIBPATH)/glut.pir
+#IF(has_opengl):	-$(PARROT) --output=glut.pbc $(LIBPATH)/glut.pir
 
 lfs.pbc: $(LIBPATH)/lfs.pir
 	-$(PARROT) --output=lfs.pbc $(LIBPATH)/lfs.pir
@@ -239,15 +239,15 @@ markdown.pbc: $(LIBPATH)/markdown.pir
 mathx.pbc: $(LIBPATH)/mathx.pir
 	-$(PARROT) --output=mathx.pbc $(LIBPATH)/mathx.pir
 
-md5.pbc: $(LIBPATH)/md5.pir
-	-$(PARROT) --output=md5.pbc $(LIBPATH)/md5.pir
+#IF(has_crypto):md5.pbc: $(LIBPATH)/md5.pir
+#IF(has_crypto):	-$(PARROT) --output=md5.pbc $(LIBPATH)/md5.pir
 
 random.pbc: $(LIBPATH)/random.pir
 	-$(PARROT) --output=random.pbc $(LIBPATH)/random.pir
 
-sha1.pbc: $(LIBPATH)/md5.pir
-	$(PERL) -pe "s|md5|sha1|g; s|MD5|SHA1|g" $(LIBPATH)/md5.pir > $(LIBPATH)/sha1.pir
-	-$(PARROT) --output=sha1.pbc $(LIBPATH)/sha1.pir
+#IF(has_crypto):sha1.pbc: $(LIBPATH)/md5.pir
+#IF(has_crypto):	$(PERL) -pe "s|md5|sha1|g; s|MD5|SHA1|g" $(LIBPATH)/md5.pir > $(LIBPATH)/sha1.pir
+#IF(has_crypto):	-$(PARROT) --output=sha1.pbc $(LIBPATH)/sha1.pir
 
 struct.pbc: $(LIBPATH)/struct.pir
 	-$(PARROT) --output=struct.pbc $(LIBPATH)/struct.pir
