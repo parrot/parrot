@@ -6,7 +6,7 @@ use warnings;
 use 5.008;
 
 my $build_dir = '../..';
-my $hll       = 'pipp';
+my $hll       = 'eclectus';
 my $cmd       = qq{$^X -Ilib tools/dev/reconfigure.pl --step=gen::languages --languages=$hll};
 
 print "Running '$cmd' in $build_dir\n";

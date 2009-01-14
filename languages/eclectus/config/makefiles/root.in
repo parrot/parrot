@@ -61,7 +61,7 @@ help :
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=eclectus
+	$(PERL) Configure.pl
 
 # Compilation:
 build: $(ECLECTUS_GROUP) driver_nqp.pbc
