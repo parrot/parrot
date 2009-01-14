@@ -14,7 +14,6 @@ PBC_MERGE = ../../pbc_merge@exe@
 PGE      = $(PARROT) ../../runtime/parrot/library/PGE/Perl6Grammar.pir
 TGE      = $(PARROT) ../../compilers/tge/tgc.pir
 PBC_TO_EXE = ../../pbc_to_exe@exe@
-RECONFIGURE = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 PMCBUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
 #IF(darwin):
 #IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
@@ -263,7 +262,7 @@ src/yapp/Lua/parser.pm: src/yapp/Lua/lua51.yp
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd ../.. && $(RECONFIGURE) --step=gen::languages --languages=lua
+	$(PERL) Configure.pl
 
 help:
 	@echo ""
