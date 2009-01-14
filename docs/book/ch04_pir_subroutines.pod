@@ -506,9 +506,12 @@ X<PASM (Parrot assembly language);subroutines>
 PIR code can include pure PASM compilation units. These are wrapped in
 the C<.emit> and C<.eom> directives instead of C<.sub> and C<.end>.
 The C<.emit> directive doesn't take a name, it only acts as a
-container for the PASM code. These primitive compilation units can be
-useful for grouping PASM functions or function wrappers. Subroutine
-entry labels inside C<.emit> blocks have to be global labels:
+container for the PASM code N<in terms of parser terminology, the C<.emit>
+directive causes the parser to transition into PASM mode. The C<.eom> directive
+causes the parser to transition back into PIR mode>. These primitive
+compilation units can be useful for grouping PASM functions or function
+wrappers. Subroutine entry labels inside C<.emit> blocks have to be global
+labels:
 
   .emit
   _substr:
