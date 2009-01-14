@@ -20,73 +20,72 @@ csub.pmc		9
 compiler.pmc		10
 exception.pmc		11
 version.pmc		12
-vtablecache.pmc		13
-parrotio.pmc		14
-parrotlibrary.pmc	15
-constparrotlibrary.pmc  16
-parrotinterpreter.pmc	17
-parrotthread.pmc	18
-lexpad.pmc		19
-timer.pmc		20
-pointer.pmc		21
+parrotio.pmc		13
+parrotlibrary.pmc	14
+constparrotlibrary.pmc  15
+parrotinterpreter.pmc	16
+parrotthread.pmc	17
+lexpad.pmc		18
+timer.pmc		19
+pointer.pmc		20
 
 # sub and subroutine like pmcs
 
-sub.pmc			22
-closure.pmc		23
-continuation.pmc	24
-retcontinuation.pmc	25
-exception_handler.pmc	26
-coroutine.pmc		27
-eval.pmc		28
-nci.pmc			29
+sub.pmc			21
+closure.pmc		22
+continuation.pmc	23
+retcontinuation.pmc	24
+exception_handler.pmc	25
+coroutine.pmc		26
+eval.pmc		27
+nci.pmc			28
 
 # scalars
 
-# abstract scalar.pmc		29
+# abstract scalar.pmc		28
 
 # base types
-float.pmc		30
-integer.pmc		31
-bigint.pmc              32
-complex.pmc             33
-string.pmc		34
+float.pmc		29
+integer.pmc		30
+bigint.pmc              31
+complex.pmc             32
+string.pmc		33
 
 # abstract perlscalar.pmc
-perlint.pmc		35
-perlnum.pmc		36
-perlstring.pmc		37
-perlundef.pmc		38
-boolean.pmc		39
+perlint.pmc		34
+perlnum.pmc		35
+perlstring.pmc		36
+perlundef.pmc		37
+boolean.pmc		38
 
-ref.pmc			40
-sharedref.pmc		41
+ref.pmc			39
+sharedref.pmc		40
 
 # arrays XXX this list isn't complete
 
-array.pmc		42
-fixedintegerarray.pmc	43
-intlist.pmc		44
-iterator.pmc		45
-perlarray.pmc		46
-pmcarray.pmc		47
-sarray.pmc		48
-constsarray.pmc 	49
-fixedstringarray.pmc		50
-multiarray.pmc		51
+array.pmc		41
+fixedintegerarray.pmc	42
+intlist.pmc		43
+iterator.pmc		44
+perlarray.pmc		45
+pmcarray.pmc		46
+sarray.pmc		47
+constsarray.pmc 	48
+fixedstringarray.pmc	49
+multiarray.pmc		50
 
 
 # hashes
-hash.pmc		52
-perlhash.pmc		53
-orderedhash.pmc		54
+hash.pmc		51
+perlhash.pmc		52
+orderedhash.pmc		53
 
 # other
 
-tqueue.pmc		55
+tqueue.pmc		54
 
-parrotclass.pmc		56
-parrotobject.pmc	57
+parrotclass.pmc		55
+parrotobject.pmc	56
 
-os.pmc                  58
-file.pmc                59
+os.pmc                  57
+file.pmc                58
