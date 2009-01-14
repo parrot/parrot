@@ -119,20 +119,21 @@ token close_short_tag {
 # statements
 
 rule statement {
-    | <namespace_statement>     {*}  #= namespace_statement
-    | <return_statement>        {*}  #= return_statement
-    | <require_once_statement>  {*}  #= require_once_statement
-    | <echo_statement>          {*}  #= echo_statement
-    | <expression_statement>    {*}  #= expression_statement
-    | <if_statement>            {*}  #= if_statement
-    | <while_statement>         {*}  #= while_statement
-    | <do_while_statement>      {*}  #= do_while_statement
-    | <for_statement>           {*}  #= for_statement
-    | <inline_sea_short_tag>    {*}  #= inline_sea_short_tag
-    | <inline_sea_script_tag>   {*}  #= inline_sea_script_tag
-    | [ <var_assign> ';' ]      {*}  #= var_assign
-    | <function_definition>     {*}  #= function_definition
-    | <class_definition>        {*}  #= class_definition
+    | <namespace_statement>            {*}  #= namespace_statement
+    | <return_statement>               {*}  #= return_statement
+    | <require_once_statement>         {*}  #= require_once_statement
+    | <echo_statement>                 {*}  #= echo_statement
+    | <expression_statement>           {*}  #= expression_statement
+    | <namespace_constant_definition>  {*}  #= namespace_constant_definition
+    | <if_statement>                   {*}  #= if_statement
+    | <while_statement>                {*}  #= while_statement
+    | <do_while_statement>             {*}  #= do_while_statement
+    | <for_statement>                  {*}  #= for_statement
+    | <inline_sea_short_tag>           {*}  #= inline_sea_short_tag
+    | <inline_sea_script_tag>          {*}  #= inline_sea_script_tag
+    | [ <var_assign> ';' ]             {*}  #= var_assign
+    | <function_definition>            {*}  #= function_definition
+    | <class_definition>               {*}  #= class_definition
 }
 
 rule statement_list {
@@ -146,8 +147,8 @@ rule statement_delimiter {
 }
 
 rule namespace_statement {
-    'namespace' <NAMESPACE_NAME>? '{' <statement_list> '}'
-    {*}
+    'namespace' <NAMESPACE_NAME>?  {*}       #= open
+    '{' <statement_list> '}'       {*}       #= close
 }
 
 # return can appear inside and outside functions
@@ -395,10 +396,8 @@ rule term {
 
 # declarations
 rule closure {
-    'function' <param_list> <bind_list>?
-    {*}                                     #= open
-    '{' <statement_list> '}'
-    {*}                                     #= close
+    'function' <param_list> <bind_list>?  {*}   #= open
+    '{' <statement_list> '}'              {*}   #= close
 }
 
 rule bind_list {
@@ -406,10 +405,8 @@ rule bind_list {
 }
 
 rule function_definition {
-    'function' <FUNCTION_NAME> <param_list>
-    {*}                                     #= open
-    '{' <statement_list> '}'
-    {*}                                     #= close
+    'function' <FUNCTION_NAME> <param_list> {*}  #= open
+    '{' <statement_list> '}'                {*}  #= close
 }
 
 rule param_list {
@@ -432,16 +429,22 @@ rule method_declaration {
 }
 
 rule class_definition {
-    'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
-    {*}                                     #= open
+    'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]?  {*}  #= open
+    '{'
         <class_constant_definition>*
         <class_member_definition>*
         <class_method_definition>*
-    '}'
-    {*}                                     #= close
+    '}'                                                      {*}  #= close
 }
 
 rule class_constant_definition {
+    'const' <CONSTANT_NAME> '=' <literal> <.statement_delimiter>
+    {*}
+}
+
+# In PHP 5.3 a constand definition outside a declared namespace is forbidden
+# In Pipp this is not checked
+rule namespace_constant_definition {
     'const' <CONSTANT_NAME> '=' <literal> <.statement_delimiter>
     {*}
 }
@@ -451,10 +454,8 @@ rule class_member_definition {
 }
 
 rule class_method_definition {
-    'function' <METHOD_NAME> <param_list>
-    {*}                                     #= open
-    '{' <statement_list> '}'
-    {*}                                     #= close
+    'function' <METHOD_NAME> <param_list> {*}  #= open
+    '{' <statement_list> '}'              {*}  #= close
 }
 
 token curly_interpolation {

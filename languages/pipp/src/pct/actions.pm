@@ -20,6 +20,7 @@ value of the comment is passed as the second argument to the method.
 class Pipp::Grammar::Actions;
 
 method TOP($/, $key) {
+    our $?NS := '';
     our @?BLOCK; # A stack of PAST::Block
     our @?SUPER_GLOBALS :=
           ( '$_GET', '$_POST', '$_SERVER', '$_GLOBALS',
@@ -113,19 +114,22 @@ method inline_sea_short_tag($/) {
         );
 }
 
-method namespace_statement($/) {
-    my $ns_name := +$<NAMESPACE_NAME> ?? ~$<NAMESPACE_NAME>[0] !! '';
-    my $block :=
-        PAST::Block.new(
-            :namespace($ns_name),
-            $( $<statement_list> )
-        );
+method namespace_statement($/, $key) {
+    our $?NS;
 
-    # set up scope 'package' for the superglobals
-    our @?SUPER_GLOBALS;
-    for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+    if $key eq 'open' {
+        $?NS := +$<NAMESPACE_NAME> ?? ~$<NAMESPACE_NAME>[0] !! '';
+    }
+    else {
+        my $block :=
+            PAST::Block.new(
+                :namespace($?NS),
+                $( $<statement_list> )
+            );
+        $?NS := '';
 
-    make $block;
+        make $block;
+    }
 }
 
 method return_statement($/) {
@@ -288,6 +292,26 @@ method class_constant_definition($/) {
             :node( $/ ),
             PAST::Val.new(
                 :value( 'Foo::' ~ ~$<CONSTANT_NAME> ),
+                :returns('PhpString'),
+            ),
+            $( $<literal> ),
+        )
+    );
+
+    make $past;
+}
+
+method namespace_constant_definition($/) {
+    our $?NS;
+    my $past := PAST::Block.new( :name('namespace_constant_definition') );
+    my $loadinit := $past.loadinit();
+    $loadinit.unshift(
+        PAST::Op.new(
+            :pasttype('call'),
+            :name('define'),
+            :node( $/ ),
+            PAST::Val.new(
+                :value( $?NS ~ '\\' ~ ~$<CONSTANT_NAME> ),
                 :returns('PhpString'),
             ),
             $( $<literal> ),

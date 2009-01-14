@@ -65,7 +65,6 @@ Only classes, functions and constants are namespaced.
 The current namespace can be queried with B<__NAMESPACE__>.
 Namespaces are case insensitive.
 No global code can precede the first B<namespace> directive.
-Free code is disallowed within namespaces.
 
 =head2 Implementation in Pipp
 
@@ -73,6 +72,7 @@ In order to ease implementation and testing, there will be
 some divergences in Pipp. 
 Only the bracketed syntax is supported.
 Code outside the scope of namespaces directives is allowed.
+'const' outside a declared namespace is allowed.
 
 =head2 SEE ALSO
 
