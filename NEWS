@@ -15,8 +15,12 @@ New in January 2009 release
     - back to working state
     - ported to pir
   + Pipp
+    - added incomplete support for closures
+    - removed support for the alternative parsing strategies
     - added support for 'elsif'
     - added support for 'do-while'
+  + HQ9+
+    - left the nest and is now at https://github.com/bschmalhofer/hq9plus
 - Miscellaneous
   + Infrastructure
     - 'make smoke' now generates Smolder reports sent to
