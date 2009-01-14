@@ -557,7 +557,7 @@ start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
 
         /* create key needed to iterate the hash */
         st->key              = pmc_new(interp, enum_class_Key);
-        PMC_int_val(st->key) = 0;
+        key_set_integer(interp, st->key, 0);
         PMC_data(st->key)    = (void *)INITBucketIndex;
     }
     else {
