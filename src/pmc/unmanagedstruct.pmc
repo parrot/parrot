@@ -643,7 +643,7 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
     return toff;
 }
 
-pmclass UnManagedStruct extends default need_ext no_ro {
+pmclass UnManagedStruct need_ext no_ro {
 
 /*
 
