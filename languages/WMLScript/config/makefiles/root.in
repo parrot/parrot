@@ -13,9 +13,9 @@ OPSDIR   = ops
 O        = @o@
 LOAD_EXT = @load_ext@
 PARROT_DYNEXT = @build_dir@/runtime/parrot/dynext
-#CONDITIONED_LINE(darwin):
-#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
-#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
+#IF(darwin):
+#IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 SRM=Stack
 
@@ -90,6 +90,10 @@ $(LIBPATH)/wmlsstring.pbc: $(LIBPATH)/wmlsstring.pir
 
 $(LIBPATH)/wmlsconsole.pbc: $(LIBPATH)/wmlsconsole.pir
 	$(PARROT) --output=$(LIBPATH)/wmlsconsole.pbc $(LIBPATH)/wmlsconsole.pir
+
+# regenerate the Makefile
+Makefile: config/makefiles/root.in
+	$(PERL) Configure.pl
 
 help:
 	@echo ""
