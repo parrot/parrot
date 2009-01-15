@@ -2746,6 +2746,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
         ARGMOD(STRING *method_name),
         ARGIN(const char *signature), ...)
 {
+    ASSERT_ARGS(Parrot_pcc_invoke_method_from_c_args)
     PMC *sig_obj;
     PMC *sub_obj;
     va_list args;
