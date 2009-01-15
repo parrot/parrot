@@ -23,7 +23,7 @@ Parsing is done with Parrot Compiler Toolkit, PCT.
 =head1 Bytecode generation
 
 The parse tree is transformed to a Parrot Abstrace Syntax Tree.
-PIR und Bytecode is theb generated from the PAST.
+PIR und Bytecode is then generated from the PAST.
 
 =head1 Variables
 
@@ -31,13 +31,36 @@ PIR und Bytecode is theb generated from the PAST.
 
 =item globals in top file
 
+Lexical. Might need extra treatment.
+
 =item globals in included files
 
-=item class scope
+Lexical in scope of the included file.
+
+=item Class constants
+
+=item Class members
 
 =item function and method scope
 
+Lexical is scope of the function or method.
+
+=item $this
+
+Bound to register C<self>.
+
 =item constants
+
+Currently constants are stored in the hash ['pipp'; 'php_constants'].
+The functions C<define> and C<defined> access this package scoped hash.
+This approach works good enough for constants in the global namespace.
+For namespaced constants the above approach could be extended to
+consider the namespace part of the constant, the current namespace and
+the active namespace aliases.
+
+Another approach is to treat constants as namespaced variables and
+work with standard PAST techniques.
+Experiments using that approach are underway.
 
 =back
 
@@ -46,6 +69,8 @@ PIR und Bytecode is theb generated from the PAST.
 =head2 Builtin functions
 
 =head2 Closures
+
+TODO: see C<t/php/closures.t>
 
 =head2 Internal functions
 
