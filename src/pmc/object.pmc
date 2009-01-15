@@ -854,8 +854,10 @@ Changes the PMC to a PMC of a new type
         PMC * const method = Parrot_oo_find_vtable_override(interp,
                 classobj, meth_name);
 
-        if (!PMC_IS_NULL(method))
-            Parrot_run_meth_fromc_args(interp, method, SELF, meth_name, "vI", type);
+        if (!PMC_IS_NULL(method)) {
+            STRING *typename = string_copy(interp, interp->vtables[type]->whoami);
+            Parrot_run_meth_fromc_args(interp, method, SELF, meth_name, "vS", typename);
+        }
         else
             SUPER(type);
     }
