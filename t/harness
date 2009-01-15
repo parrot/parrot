@@ -22,6 +22,7 @@ use Parrot::Harness::Options qw(
     Usage
 );
 use Parrot::Harness::Smoke qw(
+    generate_html_smoke_report
     send_archive_to_smolder
     collect_test_environment_data
 );
@@ -91,6 +92,15 @@ if ($longopts->{archive}) {
     $harness->runtests(@tests);
     send_archive_to_smolder(%env_data) if $longopts->{send_to_smolder};
 
+}
+elsif ($longopts->{html}) {
+    generate_html_smoke_report(
+        {
+            tests => \@tests,
+            args  => $args,
+            file  => 'smoke.html',
+        }
+    );
 }
 else {
     eval { require TAP::Harness };
@@ -185,6 +195,10 @@ Some test scripts run more quickly when this is set.
 =item C<--gc-debug>
 
 Invoke parrot with '--gc-debug'.
+
+=item C<--html>
+
+Emit a C<smoke.html> file instead of displaying results.
 
 =item C<--code-tests>
 
