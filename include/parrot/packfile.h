@@ -393,6 +393,34 @@ INTVAL PackFile_add_segment(SHIM_INTERP,
         FUNC_MODIFIES(*dir);
 
 PARROT_EXPORT
+void PackFile_Annotations_add_entry(PARROT_INTERP,
+    ARGMOD(struct PackFile_Annotations *self),
+    opcode_t offset,
+    opcode_t key,
+    opcode_t type,
+    opcode_t value)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
+void PackFile_Annotations_add_group(PARROT_INTERP,
+    ARGMOD(struct PackFile_Annotations *self),
+    opcode_t offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
+    ARGIN(struct PackFile *pf),
+    SHIM(const char *name),
+    NULLOK(int add))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 void PackFile_Constant_destroy(SHIM_INTERP,
     ARGMOD_NULLOK(PackFile_Constant *self))
         FUNC_MODIFIES(*self);
@@ -686,25 +714,6 @@ void default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 void mark_const_subs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_EXPORT
-void PackFile_Annotations_add_entry(PARROT_INTERP,
-    ARGMOD(struct PackFile_Annotations *self),
-    opcode_t offset,
-    opcode_t key,
-    opcode_t type,
-    opcode_t value)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
-
-PARROT_EXPORT
-void PackFile_Annotations_add_group(PARROT_INTERP,
-    ARGMOD(struct PackFile_Annotations *self),
-    opcode_t offset)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
-
 void PackFile_Annotations_destroy(SHIM_INTERP,
     ARGMOD(struct PackFile_Segment *seg))
         __attribute__nonnull__(2)
@@ -720,15 +729,6 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
     ARGIN(struct PackFile_Annotations *self),
     opcode_t offset,
     ARGIN_NULLOK(STRING *key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PackFile_Segment * PackFile_Annotations_new(PARROT_INTERP,
-    ARGIN(struct PackFile *pf),
-    SHIM(const char *name),
-    NULLOK(int add))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -761,6 +761,17 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
 #define ASSERT_ARGS_PackFile_add_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dir) \
     || PARROT_ASSERT_ARG(seg)
+#define ASSERT_ARGS_PackFile_Annotations_add_entry \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(self)
+#define ASSERT_ARGS_PackFile_Annotations_add_group \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(self)
+#define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pf)
 #define ASSERT_ARGS_PackFile_Constant_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_PackFile_Constant_new __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_PackFile_Constant_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -871,14 +882,6 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
     || PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_mark_const_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_PackFile_Annotations_add_entry \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(self)
-#define ASSERT_ARGS_PackFile_Annotations_add_group \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_PackFile_Annotations_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(seg)
 #define ASSERT_ARGS_PackFile_Annotations_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -887,9 +890,6 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
 #define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(self)
-#define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pf)
 #define ASSERT_ARGS_PackFile_Annotations_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(seg) \

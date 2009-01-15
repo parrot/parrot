@@ -202,10 +202,6 @@ void Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 int Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
         __attribute__nonnull__(1);
 
-void Parrot_gc_trace_pmc_data(PARROT_INTERP, ARGIN(PMC *p))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
         __attribute__nonnull__(1);
 
@@ -250,9 +246,6 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_Parrot_gc_trace_children __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_gc_trace_pmc_data __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(p)
 #define ASSERT_ARGS_Parrot_gc_trace_root __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_is_const_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
