@@ -54,7 +54,7 @@ Free structures.
         capture->hash           = NULL;
         PMC_int_val(SELF)       = CAPTURE_DATA_SIZE;
         PObj_active_destroy_SET(SELF);
-        PObj_data_is_PMC_array_SET(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
     VTABLE void destroy() {
@@ -505,6 +505,28 @@ and memory address.
     VTABLE STRING *get_string() {
         STRING *classname = VTABLE_name(INTERP, SELF);
         return Parrot_sprintf_c(INTERP, "%S[0x%x]", classname, SELF);
+    }
+
+/*
+
+=item C<void mark(void)>
+
+Mark the array.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC ** const data = PMC_data_typed(SELF, PMC **);
+        INTVAL i;
+
+        if (!data)
+            return;
+
+        for (i = PMC_int_val(SELF) - 1; i >= 0; --i)
+            if (data[i])
+                pobject_lives(interp, (PObj *)data[i]);
     }
 
 /*

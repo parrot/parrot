@@ -57,7 +57,6 @@ Initializes a newly created CallSignature object.
         sig_struct->hash       = NULL;
         PMC_int_val(SELF)      = CAPTURE_DATA_SIZE;
         PObj_active_destroy_SET(SELF);
-        PObj_data_is_PMC_array_SET(SELF);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -187,6 +186,9 @@ Mark any referenced strings and PMCs.
 
 */
     VTABLE void mark() {
+        PMC ** const data = PMC_data_typed(SELF, PMC **);
+        INTVAL i;
+
         if (PARROT_CALLSIGNATURE(SELF)) {
             Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
 
@@ -201,6 +203,13 @@ Mark any referenced strings and PMCs.
             if (attrs->short_sig)
                 pobject_lives(interp, (PObj*)attrs->short_sig);
         }
+
+        if (!data)
+            return;
+
+        for (i = PMC_int_val(SELF) - 1; i >= 0; --i)
+            if (data[i])
+                pobject_lives(interp, (PObj *)data[i]);
     }
 
 

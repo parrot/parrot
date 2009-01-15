@@ -39,7 +39,6 @@ typedef enum {
         ((PMC **)(x))[(y)] = (z); \
     } while (0)
 #define set_attrib_flags(x) do { \
-        PObj_data_is_PMC_array_SET(x); \
         PObj_active_destroy_SET(x); \
     } while (0)
 #define set_attrib_array_size(o, y) do { \

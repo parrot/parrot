@@ -65,7 +65,7 @@ Initializes the array.
         PMC_int_val(SELF) = 0;
         PMC_data(SELF)    = NULL;
         PObj_active_destroy_SET(SELF);
-        PObj_data_is_PMC_array_SET(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
@@ -104,7 +104,7 @@ Creates and returns a copy of the array.
             PMC_int_val(dest) = size;
             PMC_data(dest)    = mem_allocate_n_typed(size, PMC *);
             mem_copy_n_typed(PMC_data(dest), PMC_data(SELF), size, PMC *);
-            PObj_data_is_PMC_array_SET(dest);
+            PObj_custom_mark_SET(dest);
         }
 
         return dest;
@@ -412,7 +412,7 @@ array.
         }
 
         PMC_int_val2(SELF) = size;
-        PObj_data_is_PMC_array_SET(SELF);
+        PObj_custom_mark_SET(SELF);
     }
 /*
 
@@ -789,7 +789,31 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
         return VTABLE_defined(INTERP, val);
     }
 
+/*
+
+=item C<void mark(void)>
+
+Mark the array.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        PMC ** const data = PMC_data_typed(SELF, PMC **);
+        INTVAL i;
+
+        if (!data)
+            return;
+
+        for (i = PMC_int_val(SELF) - 1; i >= 0; --i)
+            if (data[i])
+                pobject_lives(interp, (PObj *)data[i]);
+    }
+
+
 }
+
 
 /*
 
