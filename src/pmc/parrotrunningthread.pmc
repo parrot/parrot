@@ -82,6 +82,8 @@ Return the thread ID of this thread.
 
 Change the thread ID we refer to to C<new_tid>.
 
+=cut
+
 */
 
     VTABLE void set_integer_native(INTVAL new_tid) {
