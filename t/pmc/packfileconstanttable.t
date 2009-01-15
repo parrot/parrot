@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 use Parrot::Config;
 
 =head1 NAME
@@ -50,6 +50,23 @@ my $get_uuid_pbc = <<'EOF';
 EOF
 
 
+# sanity check we have a PackfileConstantTable
+
+pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'sanity' );
+.sub 'test' :main
+    .local pmc pf, pfdir, pftable
+    .local string name
+    pf      = _pbc()
+    pfdir   = pf.'get_directory'()
+    pftable = pfdir[2]
+    name    = typeof pftable
+    say name
+.end
+CODE
+PackfileConstantTable
+OUT
+
+
 # PackfileConstantTable.elements
 
 pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'elements' );
@@ -70,9 +87,9 @@ greater
 OUT
 
 
-# PackfileRawSegment.get_integer_keyed_int
+# PackfileConstantTable.get_type and PackfileConstantTable.get_*_keyed_int
 
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'get_integer_keyed_int' );
+pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'get_type, get_*_keyed_int' );
 .sub 'test' :main
     .local pmc pf, pfdir, pftable
     .local int size, this, type
