@@ -259,10 +259,6 @@ typedef enum PObj_enum {
     PObj_report_FLAG            = POBJ_FLAG(23),
 
 /* PMC specific FLAGs */
-    /* Set to true if the PMC data pointer points to a malloced
-     * array of PObjs
-     */
-    PObj_data_is_PMC_array_FLAG = POBJ_FLAG(24),
     /* call object finalizer */
     PObj_need_finalize_FLAG     = POBJ_FLAG(25),
     /* a PMC that needs special handling in DOD, i.e one that has either:
@@ -358,7 +354,6 @@ typedef enum PObj_enum {
     if ((PObj_get_FLAGS(o) & \
                 (PObj_active_destroy_FLAG | \
                  PObj_custom_mark_FLAG | \
-                 PObj_data_is_PMC_array_FLAG  | \
                  PObj_is_PMC_EXT_FLAG | \
                  PObj_needs_early_DOD_FLAG))) \
         DOD_flag_SET(is_special_PMC, o); \
@@ -368,19 +363,6 @@ typedef enum PObj_enum {
 
 #define PObj_is_special_PMC_TEST(o) DOD_flag_TEST(is_special_PMC, o)
 #define PObj_is_special_PMC_SET(o) DOD_flag_SET(is_special_PMC, o)
-
-#define PObj_data_is_PMC_array_SET(o) do { \
-    PObj_special_SET(data_is_PMC_array, o); \
-    PObj_flag_SET(active_destroy, o); \
-    } while (0)
-
-#define PObj_data_is_PMC_array_CLEAR(o) do {\
-    PObj_special_CLEAR(data_is_PMC_array, o); \
-    PObj_flag_CLEAR(active_destroy, o); \
-    } while (0)
-
-#define PObj_data_is_PMC_array_TEST(o) \
-    PObj_flag_TEST(data_is_PMC_array, o)
 
 #define PObj_needs_early_DOD_TEST(o) PObj_flag_TEST(needs_early_DOD, o)
 #define PObj_needs_early_DOD_SET(o) PObj_special_SET(needs_early_DOD, o)

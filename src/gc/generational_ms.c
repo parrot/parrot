@@ -1599,7 +1599,6 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
     ASSERT_ARGS(trace_children_cb)
     Arenas * const arena_base = interp->arena_base;
     const int lazy_dod = arena_base->lazy_dod;
-    const UINTVAL mask = PObj_data_is_PMC_array_FLAG | PObj_custom_mark_FLAG;
     Gc_gms_hdr *h;
 
     for (h = pool->gray; h != pool->white;) {
@@ -1614,26 +1613,10 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
         arena_base->dod_trace_ptr = current;
         if (!PObj_needs_early_DOD_TEST(current))
             PObj_high_priority_DOD_CLEAR(current);
-        /* mark children */
-        bits = PObj_get_FLAGS(current) & mask;
-        if (bits) {
-            if (bits == PObj_data_is_PMC_array_FLAG) {
-                /* malloced array of PMCs */
-                PMC ** const data = PMC_data(current);
 
-                if (data) {
-                    INTVAL i;
-                    for (i = 0; i < PMC_int_val(current); i++) {
-                        if (data[i]) {
-                            pobject_lives(interp, (PObj *)data[i]);
-                        }
-                    }
-                }
-            }
-            else {
-                /* All that's left is the custom */
-                VTABLE_mark(interp, current);
-            }
+        /* mark children */
+        if (PObj_custom_mark_TEST(current)) {
+            VTABLE_mark(interp, current);
         }
         if (h != pool->gray) {
             /* if a gray was inserted DFS, it is next */

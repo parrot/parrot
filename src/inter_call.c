@@ -2782,7 +2782,7 @@ void
 Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
         ARGIN(PMC *sig_obj))
 {
-    ASSERT_ARGS(Parrot_pcc_invoke_sub_from_sig_object)
+    ASSERT_ARGS(Parrot_pcc_invoke_from_sig_object)
 #define PCC_ARG_MAX 1024
     /* variables from PCCINVOKE impl in PCCMETHOD.pm */
     /* args INSP, returns INSP */

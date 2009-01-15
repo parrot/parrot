@@ -576,11 +576,6 @@ function must call C<pobject_lives> for all non-NULL objects (Buffers and
 PMCs) that PMC refers to. This flag is typically tested and the custom mark
 VTABLE method called from C<src/gc/api.c:mark_special>.
 
-=item PObj_data_is_PMC_array_FLAG
-
-Set if the data pointer points to an array of objects. The length of the
-array is C<PMC_int_val(SELF)>.
-
 =item PObj_external_FLAG
 
 Set if the buffer points to memory that came from outside Parrot's memory

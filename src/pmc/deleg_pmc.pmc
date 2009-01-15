@@ -42,11 +42,7 @@ pmclass deleg_pmc no_ro {
     }
 
     VTABLE void mark() {
-        /* don't pass that on
-         *
-         * NB objects have the flag PObj_data_is_PMC_array_FLAG set,
-         * marking is done internally in src/gc/api.c
-         */
+        /* don't pass that on */
     }
 
     VTABLE void destroy() {
