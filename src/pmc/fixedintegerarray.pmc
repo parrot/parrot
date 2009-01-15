@@ -59,7 +59,7 @@ in the constant PMC pool.
     VTABLE PMC *new_from_string(STRING *rep, INTVAL flags) {
         const INTVAL type = SELF->vtable->base_type;
         INTVAL  n, elem, i, l;
-        char   *p, *start;
+        char   *source, *p, *start;
         int     base;
 
         if (flags & PObj_constant_FLAG)
@@ -76,22 +76,28 @@ in the constant PMC pool.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                     "unhandled string encoding in constructor");
 
+        source = string_to_cstring(interp, rep);
+
         /* "()" - no args */
-        if (l <= 2 && ((char *)rep->strstart)[0] == '(')
+        if (l <= 2 && *source == '(') {
+            string_cstring_free(source);
             return SELF;
+        }
 
         /* count commas */
-        p = rep->strstart;
-        for (i = l, n = 0; i; --i, ++p) {
+        p = source;
+        n = 0;
+        while (*p) {
             if (*p == ',')
                 ++n;
+            p++;
         }
 
         /* presize the array */
         SELF.set_integer_native(n + 1);
 
         /* parse string */
-        p = rep->strstart;
+        p = source;
 
         for (i = l, n = 0; i; --i, ++p) {
             switch (*p) {
@@ -127,6 +133,7 @@ in the constant PMC pool.
             }
         }
 
+        string_cstring_free(source);
         return SELF;
     }
 
