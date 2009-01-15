@@ -691,6 +691,11 @@ emit_pbc_expr(lexer_state * const lexer, expression * const operand) {
         case EXPR_KEY:
             emit_pbc_key(lexer, operand->expr.k);
             break;
+        /*
+        case EXPR_IDENT:
+            fprintf(stderr, "expr ident\n");
+            break;
+        */
         default:
             break;
     }

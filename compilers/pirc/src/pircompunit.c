@@ -1082,10 +1082,10 @@ add_operands(lexer_state * const lexer, char const * const format, ...) {
 /*
 
 =item C<void
-set_instr_flag(lexer_state * const lexer, instr_flag flag)>
+set_op_labelflag(lexer_state * const lexer, int flag)>
 
-Set the flag C<flag> on the current instruction. Note that C<flag> may
-encode different flags.
+Set a flag on the current instruction that it contains labels as operands.
+The bit indicates which operand, count starting from bit 1.
 
 =cut
 
@@ -2380,6 +2380,7 @@ fixup_local_labels(lexer_state * const lexer) {
             while (operand != iter->operands);
 
         }
+
 
     }
     while (iter != lexer->subs->statements); /* iterate over all instructions */

@@ -1471,11 +1471,17 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                         {
                           set_instrf(lexer, $1 ? "unless_null" : "if_null", "%T%I",
                                      new_reg(lexer, PMC_TYPE, $3), $5);
+                          /* set a flag indicating that the 2nd operand is a label */
+                          set_op_labelflag(lexer, BIT(1));
                         }
                   | if_unless TK_IDENT then identifier
                         { create_if_instr(lexer, $1, 0, $2, $4); }
                   | if_unless reg then identifier
-                        { set_instrf(lexer, $1 ? "unless" : "if", "%T%I", $2, $4); }
+                        {
+                          set_instrf(lexer, $1 ? "unless" : "if", "%T%I", $2, $4);
+                          /* set a flag indicating that the 2nd operand is a label */
+                          set_op_labelflag(lexer, BIT(1));
+                        }
                   | if_unless "int" then identifier
                         { create_if_instr(lexer, $1, 0, "int", $4); }
                   | if_unless "num" then identifier
@@ -1503,7 +1509,7 @@ conditional_instr : if_unless "null" TK_IDENT "goto" identifier
                                  invert_instr(lexer);
 
                              push_operand(lexer, expr_from_ident(lexer, $4));
-
+                             /* set a flag indicating that the 3rd operand is a label */
                              set_op_labelflag(lexer, BIT(2));
                           }
                           else { /* evaluation during compile time */
@@ -2918,8 +2924,10 @@ create_if_instr(NOTNULL(lexer_state * const lexer), int invert, int hasnull,
     else
         set_instrf(lexer, invert ? "unless" : "if", "%T%I", target_from_symbol(lexer, sym), label);
 
-    /* set a flag on this instruction */
-    set_op_labelflag(lexer, BIT(2));
+    /* set a flag on this instruction that the second operand is a label. */
+    /*set_op_labelflag(lexer, BIT(2));
+    */
+    set_op_labelflag(lexer, BIT(1));
 }
 
 /*
