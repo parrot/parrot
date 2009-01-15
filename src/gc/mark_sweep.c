@@ -667,7 +667,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
             arena_base->dod_mark_ptr = PMC_next_for_GC(obj) = obj;
         }
     }
-    else if (PObj_custom_mark_TEST(obj)) {
+    if (PObj_custom_mark_TEST(obj)) {
         PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
         VTABLE_mark(interp, obj);
     }
