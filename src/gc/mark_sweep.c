@@ -991,7 +991,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
         if (PMC_metadata(current))
             pobject_lives(interp, (PObj *)PMC_metadata(current));
 
-         if(PObj_custom_mark_TEST(current)) {
+         if (PObj_custom_mark_TEST(current)) {
             PARROT_ASSERT(!PObj_on_free_list_TEST(current));
             VTABLE_mark(interp, current);
         }
