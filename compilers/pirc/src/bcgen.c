@@ -181,21 +181,26 @@ add_string_const(bytecode * const bc, char const * const str, char const * chars
     while (index < count) {
         constant = bc->interp->code->const_table->constants[index];
         if (constant->type == PFC_STRING) {
-            if (string_compare(bc->interp, constant->u.string, parrotstr) == 0)
+            if (string_equal(bc->interp, constant->u.string, parrotstr) == 0) {
+                fprintf(stderr, "found string %s at index %d\n", str, index);
                 return index;
+            }
         }
-        index++;
+        ++index;
     }
 
+    /* fprintf(stderr, "string '%s' not found, storing...\n", str);
+    */
     /* it wasn't stored yet, store it now, and return the index */
     index    = new_pbc_const(bc);
     constant = bc->interp->code->const_table->constants[index];
 
     constant->type     = PFC_STRING;
     constant->u.string = parrotstr;
-    /*
-    fprintf(stderr, "add_string_const (%s) at index: %d\n", str, index);
+
+    /*fprintf(stderr, "add_string_const (%s) at index: %d\n", str, index);
     */
+
     return index;
 
 }
@@ -224,7 +229,6 @@ add_num_const(bytecode * const bc, double f) {
 }
 
 
-
 /*
 
 =item C<int
@@ -238,10 +242,31 @@ stored in the constants table is returned.
 */
 int
 add_key_const(bytecode * const bc, PMC *key) {
-    int index                   = new_pbc_const(bc);
-    PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
-    constant->type              = PFC_KEY;
-    constant->u.key             = key;
+    PackFile_Constant *constant;
+    int count  = bc->interp->code->const_table->const_count;
+    int index  = 0;
+    STRING *s1 = key_set_to_string(bc->interp, key);
+
+    /* iterate over all constants; if a constant is a key, compare the string representations */
+    while (index < count) {
+        constant = bc->interp->code->const_table->constants[index];
+
+        if (constant->type == PFC_KEY) {
+            STRING *s2 = key_set_to_string(bc->interp, constant->u.key);
+            if (string_equal(bc->interp, s1, s2) == 0) {
+                fprintf(stderr, "found equal key (%d)\n", index);
+                return index;
+            }
+        }
+        ++index;
+    }
+
+    /* key wasn't found, so add it now */
+    index            = new_pbc_const(bc);
+    constant         = bc->interp->code->const_table->constants[index];
+    constant->type   = PFC_KEY;
+    constant->u.key  = key;
+    fprintf(stderr, "new key const (%d)\n", index);
     return index;
 }
 
@@ -480,9 +505,8 @@ PARROT_IGNORABLE_RESULT
 opcode_t
 emit_opcode(bytecode * const bc, opcode_t op) {
     *bc->opcursor = op;
-/*
+
     fprintf(stderr, "\n[%d]", op);
-*/
     return (bc->opcursor++ - bc->interp->code->base.data);
 
 }
@@ -503,8 +527,8 @@ opcode_t
 emit_int_arg(bytecode * const bc, int intval) {
     *bc->opcursor = intval;
 
-/*    fprintf(stderr, "{%d}", intval);
-*/
+    fprintf(stderr, "{%d}", intval);
+
 
     return (bc->opcursor++ - bc->interp->code->base.data);
 }

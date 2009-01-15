@@ -154,6 +154,7 @@ typedef union value {
     int       ival;
     char     *pval;
     ucstring *ustr;
+    STRING   *pstr; /* pstr stands for Parrot STRING */
 
 } value;
 
