@@ -594,8 +594,8 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *namespace))
         if (!typeid_exists) {
             PMC    *classname_hash = interp->class_hash;
             /* set entry in name->type hash */
-            PMC    *item      = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, item, type);
+            PMC    *item     = pmc_new(interp, enum_class_Integer);
+            PMC_int_val(item) = type;
 
             VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
         }
@@ -969,9 +969,9 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
         return;
 
     if (PObj_is_class_TEST(_class)) {
-        SLOTTYPE * const class_array = PMC_data_typed(_class, SLOTTYPE *);
-        PMC *const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
-        class_name = VTABLE_get_string(interp, class_name_pmc);
+        SLOTTYPE * const class_array    = PMC_data_typed(_class, SLOTTYPE *);
+        PMC *const       class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+                         class_name     = PMC_str_val(class_name_pmc);
     }
     else
         class_name = _class->vtable->whoami;
