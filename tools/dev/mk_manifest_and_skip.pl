@@ -1,10 +1,11 @@
 ##! perl
 # $Id$
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 
 use strict;
 use warnings;
-use lib (qw| lib |);
+use lib qw| lib |;
+
 use Parrot::Manifest;
 
 my $script = $0;
@@ -31,9 +32,12 @@ tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
 
 =head1 DESCRIPTION
 
-Recreates MANIFEST and MANIFEST.SKIP from the svn directories.
+Recreates MANIFEST and MANIFEST.SKIP from the subversion properties
+and the output of C<svn status>. .
 So far tested with svn 1.2.0 and svn 1.4.2.  This also worked with svk 1.08,
 but to keep our tasks manageable, we only guarantee support for Subversion.
+
+This won't work for git-svn.
 
 =head1 SEE ALSO
 

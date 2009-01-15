@@ -24,8 +24,8 @@ sub new {
     my $status_output_ref = [qx($data{cmd} status -v)];
 
     # grab the versioned resources:
-    my @versioned_files  = ();
-    my @dirs             = ();
+    my @versioned_files;
+    my @dirs;
     my @versioned_output = grep !/^[?D]/, @{$status_output_ref};
     for my $line (@versioned_output) {
         my @line_info = split( /\s+/, $line );
@@ -50,36 +50,37 @@ sub new {
 
     # initialize the object from the prepared values (Damian, p. 98)
     %$self = %data;
+
     return $self;
 }
 
 sub prepare_manifest {
     my $self = shift;
-    my %manifest_lines;
 
+    my %manifest_lines;
     for my $file ( @{ $self->{versioned_files} } ) {
         $manifest_lines{$file} = _get_manifest_entry($file);
     }
+
     return \%manifest_lines;
 }
 
 sub determine_need_for_manifest {
     my $self               = shift;
     my $proposed_files_ref = shift;
-    if ( !-f $self->{file} ) {
-        return 1;
+
+    return 1 unless -f $self->{file};
+
+    my $current_files_ref        = $self->_get_current_files();
+    my $different_patterns_count = 0;
+    foreach my $cur ( keys %{$current_files_ref} ) {
+        $different_patterns_count++ unless $proposed_files_ref->{$cur};
     }
-    else {
-        my $current_files_ref        = $self->_get_current_files();
-        my $different_patterns_count = 0;
-        foreach my $cur ( keys %{$current_files_ref} ) {
-            $different_patterns_count++ unless $proposed_files_ref->{$cur};
-        }
-        foreach my $pro ( keys %{$proposed_files_ref} ) {
-            $different_patterns_count++ unless $current_files_ref->{$pro};
-        }
-        $different_patterns_count ? return 1 : return;
+    foreach my $pro ( keys %{$proposed_files_ref} ) {
+        $different_patterns_count++ unless $current_files_ref->{$pro};
     }
+
+    $different_patterns_count ? return 1 : return;
 }
 
 my $text_file_coda = <<'CODA';
@@ -92,6 +93,7 @@ CODA
 sub print_manifest {
     my $self               = shift;
     my $manifest_lines_ref = shift;
+
     my $print_str          = <<"END_HEADER";
 # ex: set ro:
 # $self->{id}
@@ -112,11 +114,13 @@ END_HEADER
         or croak "Unable to open $self->{file} for writing";
     print $MANIFEST $print_str;
     close $MANIFEST or croak "Unable to close $self->{file} after writing";
+
     return 1;
 }
 
 sub _get_manifest_entry {
     my $file    = shift;
+
     my $special = _get_special();
     my $loc     = '[]';
     for ($file) {
@@ -136,6 +140,7 @@ sub _get_manifest_entry {
             : m[^(apps/\w+)/] ? "[$1]"
             :                   '[]';
     }
+
     return $loc;
 }
 
@@ -180,27 +185,34 @@ sub _get_special {
         tools/build/revision_c.pl                       [devel]
         src/vtable.tbl                                  [devel]
     );
+
     return \%special;
 }
 
 sub _get_current_files {
     my $self          = shift;
-    my %current_files = ();
+
+    my %current_files;
     open my $FILE, "<", $self->{file}
         or die "Unable to open $self->{file} for reading";
     while ( my $line = <$FILE> ) {
         chomp $line;
+
         next if $line =~ /^\s*$/o;
+
         next if $line =~ /^#/o;
-        my @els = split /\s+/, $line;
-        $current_files{ $els[0] }++;
+
+        my ($file) = split /\s+/, $line;
+        $current_files{ $file }++;
     }
     close $FILE or die "Unable to close $self->{file} after reading";
+
     return \%current_files;
 }
 
 sub prepare_manifest_skip {
     my $self      = shift;
+
     my $svnignore = `$self->{cmd} propget svn:ignore @{ $self->{dirs} }`;
 
     # cope with trailing newlines in svn:ignore output
@@ -221,12 +233,14 @@ sub prepare_manifest_skip {
             $ignore{$1} = $2 if $2;
         }
     }
+
     return $self->_compose_print_str( \%ignore );
 }
 
 sub determine_need_for_manifest_skip {
     my $self      = shift;
     my $print_str = shift;
+
     if ( !-f $self->{skip} ) {
         return 1;
     }
@@ -240,6 +254,7 @@ sub determine_need_for_manifest_skip {
         foreach my $pro ( keys %{$proposed_skips_ref} ) {
             $different_patterns_count++ unless $current_skips_ref->{$pro};
         }
+
         $different_patterns_count ? return 1 : return;
     }
 }
@@ -247,18 +262,21 @@ sub determine_need_for_manifest_skip {
 sub print_manifest_skip {
     my $self      = shift;
     my $print_str = shift;
+
     open my $MANIFEST_SKIP, '>', $self->{skip}
         or die "Unable to open $self->{skip} for writing";
     $print_str .= $text_file_coda;
     print $MANIFEST_SKIP $print_str;
     close $MANIFEST_SKIP
         or die "Unable to close $self->{skip} after writing";
+
     return 1;
 }
 
 sub _compose_print_str {
     my $self       = shift;
     my $ignore_ref = shift;
+
     my %ignore     = %{$ignore_ref};
     my $print_str  = <<"END_HEADER";
 # ex: set ro:
@@ -292,12 +310,14 @@ END_HEADER
                 : "^$_\$\n^$_/\n";
         }
     }
+
     return $print_str;
 }
 
 sub _get_current_skips {
     my $self          = shift;
-    my %current_skips = ();
+
+    my %current_skips;
     open my $SKIP, "<", $self->{skip}
         or die "Unable to open $self->{skip} for reading";
     while ( my $line = <$SKIP> ) {
@@ -307,11 +327,13 @@ sub _get_current_skips {
         $current_skips{$line}++;
     }
     close $SKIP or die "Unable to close $self->{skip} after reading";
+
     return \%current_skips;
 }
 
 sub _get_proposed_skips {
     my $print_str      = shift;
+
     my @proposed_lines = split /\n/, $print_str;
     my %proposed_skips = ();
     for my $line (@proposed_lines) {
@@ -319,6 +341,7 @@ sub _get_proposed_skips {
         next if $line =~ /^#/o;
         $proposed_skips{$line}++;
     }
+
     return \%proposed_skips;
 }
 
