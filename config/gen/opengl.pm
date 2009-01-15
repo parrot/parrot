@@ -125,6 +125,7 @@ my %C_TYPE = (
     COLORREF                => 'void',
 
     wchar_t                 => 'void',
+    GLCchar                 => 'void',
 
     GLMfunctions            => 'void*',
     GLXContext              => 'void*',
@@ -170,6 +171,7 @@ my %C_TYPE = (
     int32_t                 => 'int',
 
     GLenum                  => 'unsigned int',
+    GLCenum                 => 'unsigned int',
     CGLPixelFormatAttribute => 'unsigned int',
     CGLRendererProperty     => 'unsigned int',
     CGLContextEnable        => 'unsigned int',
@@ -270,8 +272,10 @@ my @IGNORE = (
     # Don't handle this odd create/callback register function yet
     'glutCreateMenu',
 
-    # Don't handle Mesa, GLU, or MUI callbacks yet
+    # Don't handle Mesa, GLC, GLU, or MUI callbacks yet
     'glProgramCallbackMESA',
+    'glcCallbackFunc',
+    'glcGetCallbackFunc',
     'gluNurbsCallback',
     'gluQuadricCallback',
     'gluTessCallback',
