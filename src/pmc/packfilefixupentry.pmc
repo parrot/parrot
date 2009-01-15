@@ -33,7 +33,8 @@ Fetch the label field of the fixup entry.
 
 */
     VTABLE STRING *get_string() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_FixupEntry *pfentry = PMC_data_typed(SELF, PackFile_FixupEntry *);
+        return string_from_cstring(interp, pfentry->name, strlen(pfentry->name));
     }
 
 /*
@@ -60,7 +61,8 @@ Fetch the offset field of the fixup entry.
 
 */
     VTABLE INTVAL get_integer() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_FixupEntry *pfentry = PMC_data_typed(SELF, PackFile_FixupEntry *);
+        return pfentry->offset;
     }
 
 
@@ -87,8 +89,10 @@ Fetch the type field of the fixup entry.
 =cut
 
 */
-    INTVAL get_type() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    METHOD get_type() {
+        PackFile_FixupEntry *pfentry = PMC_data_typed(SELF, PackFile_FixupEntry *);
+        int rv = pfentry->type;
+        RETURN(INTVAL rv);
     }
 
 
