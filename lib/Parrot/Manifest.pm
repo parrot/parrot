@@ -315,7 +315,9 @@ sub _compose_gitignore {
 #
 # This file should contain a transcript of the svn:ignore properties
 # of the directories in the Parrot subversion repository.
-# (Needed for convenience whne working with git-svn.
+# The .gitignore file is a convenience for developers  working with git-svn.
+# See http://www.kernel.org/pub/software/scm/git/docs/gitignore.html for the
+# format of this file.
 #
 END_HEADER
 
@@ -326,8 +328,8 @@ END_HEADER
         foreach ( sort split /\n/, $ignores_ref->{$directory} ) {
             $print_str .=
                 ( $dir ne '.' )
-                ? "$dir/$_\n"
-                : "$_\n";
+                ? "/$dir/$_\n"
+                : "/$_\n";
         }
     }
 
