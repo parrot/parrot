@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 13;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -39,7 +39,7 @@ CODE
 After class definition.
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant in Foo' );
 <?php
 
 class Foo {
@@ -48,6 +48,21 @@ class Foo {
 }
 
 echo Foo::bar;
+
+?>
+CODE
+constant bar in class Foo
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant in Bar', todo => 'Foo is hardwired' );
+<?php
+
+class Bar {
+
+    const bar = "constant bar in class Bar\n";
+}
+
+echo Bar::bar;
 
 ?>
 CODE
