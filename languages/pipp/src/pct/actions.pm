@@ -63,13 +63,13 @@ method sea_or_code($/, $key) {
 # The sea, text, surrounding the island, code, is printed out
 method SEA($/) {
     make PAST::Op.new(
-             :name('echo'),
-             :node($/),
-             PAST::Val.new(
-                 :value(~$/),
-                 :returns('PhpString')
-             )
-         );
+        :name('echo'),
+        :node($/),
+        PAST::Val.new(
+            :value(~$/),
+            :returns('PhpString')
+        )
+    );
 }
 
 method code_short_tag($/) {
@@ -106,13 +106,13 @@ method statement_list($/) {
 
 method inline_sea_short_tag($/) {
    make PAST::Op.new(
-            PAST::Val.new(
-                :value(~$<SEA_empty_allowed>),
-                :returns('PhpString')
-            ),
-            :name('echo'),
-            :node($/)
-        );
+       PAST::Val.new(
+           :value(~$<SEA_empty_allowed>),
+           :returns('PhpString')
+       ),
+       :name('echo'),
+       :node($/)
+   );
 }
 
 method namespace_definition($/, $key) {
@@ -135,25 +135,21 @@ method namespace_definition($/, $key) {
 }
 
 method return_statement($/) {
-    my $past := PAST::Op.new(
-                   :name('return'),
-                   :pasttype('call'),
-                   :node( $/ ),
-                   $( $/<expression> )
-               );
-
-    make $past;
+    make PAST::Op.new(
+        :name('return'),
+        :pasttype('call'),
+        :node( $/ ),
+        $( $/<expression> )
+    );
 }
 
 method require_once_statement($/) {
-    my $past := PAST::Op.new(
-                   :name('require'),
-                   :pasttype('call'),
-                   :node( $/ ),
-                   $( $/<quote> )
-               );
-
-    make $past;
+    make PAST::Op.new(
+        :name('require'),
+        :pasttype('call'),
+        :node( $/ ),
+        $( $/<quote> )
+    );
 }
 
 method echo_statement($/) {
@@ -200,15 +196,14 @@ method array_argument($/, $key) {
 }
 
 method key_value_pair($/) {
-   make
-       PAST::Op.new(
-           :node( $/ ),
-           :pasttype( 'call' ),
-           :name( 'infix:=>' ),
-           :returns( 'Array' ),
-           $( $<key> ),
-           $( $<value> )
-       );
+   make PAST::Op.new(
+       :node( $/ ),
+       :pasttype( 'call' ),
+       :name( 'infix:=>' ),
+       :returns( 'Array' ),
+       $( $<key> ),
+       $( $<value> )
+   );
 }
 
 method method_call($/) {
@@ -241,23 +236,22 @@ method constructor_call($/) {
         PAST::Var.new(:name('cons'), :scope('register'))
     );
 
-    make
-        PAST::Stmts.new(
-            PAST::Var.new( :name('obj'),  :scope('register'), :isdecl(1) ),
-            PAST::Var.new( :name('cons'), :scope('register'), :isdecl(1) ),
-            # use default constructor when there is no explicit constructor
+    make PAST::Stmts.new(
+        PAST::Var.new( :name('obj'),  :scope('register'), :isdecl(1) ),
+        PAST::Var.new( :name('cons'), :scope('register'), :isdecl(1) ),
+        # use default constructor when there is no explicit constructor
+        PAST::Op.new(
+            :pasttype('if'),
             PAST::Op.new(
-                :pasttype('if'),
-                PAST::Op.new(
-                    :pirop('isnull'),
-                    PAST::Op.new( :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'") )  # condition
-                ),
-                PAST::Op.new( :inline("cons = get_global ['PippObject'], '__construct'") ),
-                PAST::Op.new( :inline("cons = get_global ['" ~ $class_name ~ "'], '__construct'") )
+                :pirop('isnull'),
+                PAST::Op.new( :inline("%r = get_global ['" ~ $class_name ~ "'], '__construct'") )  # condition
             ),
-            $cons_call,                                       # call the constructor
-            PAST::Var.new( :name('obj'), :scope('register') ) # return the created object
-        );
+            PAST::Op.new( :inline("cons = get_global ['PippObject'], '__construct'") ),
+            PAST::Op.new( :inline("cons = get_global ['" ~ $class_name ~ "'], '__construct'") )
+        ),
+        $cons_call,                                       # call the constructor
+        PAST::Var.new( :name('obj'), :scope('register') ) # return the created object
+    );
 }
 
 method constant($/) {
@@ -333,22 +327,20 @@ method argument_list($/) {
 }
 
 method conditional_expression($/) {
-    make
-        PAST::Op.new(
-            :node($/),
-            $( $<expression> ),
-            $( $<statement_list> )
-        );
+    make PAST::Op.new(
+        :node($/),
+        $( $<expression> ),
+        $( $<statement_list> )
+    );
 }
 
 method do_while_statement($/) {
-    make
-        PAST::Op.new(
-            :pasttype('repeat_while'),
-            :node($/),
-            $( $<expression> ),
-            $( $<statement_list> )
-        );
+    make PAST::Op.new(
+        :pasttype('repeat_while'),
+        :node($/),
+        $( $<expression> ),
+        $( $<statement_list> )
+    );
 }
 
 method if_statement($/) {
@@ -395,12 +387,11 @@ method elseif_clause($/) {
 }
 
 method var_assign($/) {
-    make
-        PAST::Op.new(
-            :pasttype('bind'),
-            $( $<var> ),
-            $( $<expression> ),
-        );
+    make PAST::Op.new(
+        :pasttype('bind'),
+        $( $<var> ),
+        $( $<expression> ),
+    );
 }
 
 method array_elem($/) {
@@ -416,18 +407,17 @@ method array_elem($/) {
         );
     }
 
-    make
+    make PAST::Var.new(
+        :scope('keyed'),
+        :viviself('PhpNull'),
+        :lvalue(1),
         PAST::Var.new(
-            :scope('keyed'),
-            :viviself('PhpNull'),
+            :name(~$<var_name>),
+            :viviself('PhpArray'),
             :lvalue(1),
-            PAST::Var.new(
-                :name(~$<var_name>),
-                :viviself('PhpArray'),
-                :lvalue(1),
-            ),
-            $( $<expression> )
-        );
+        ),
+        $( $<expression> )
+    );
 }
 
 method simple_var($/) {
@@ -443,12 +433,11 @@ method simple_var($/) {
         );
     }
 
-    make
-        PAST::Var.new(
-            :name(~$<var_name>),
-            :viviself('PhpNull'),
-            :lvalue(1),
-        );
+    make PAST::Var.new(
+        :name(~$<var_name>),
+        :viviself('PhpNull'),
+        :lvalue(1),
+    );
 }
 
 method var($/, $key) {
@@ -460,15 +449,14 @@ method this($/) {
 }
 
 method member($/) {
-    make
-        PAST::Op.new(
-            :pasttype('callmethod'),
-            :name('member'),
-            PAST::Var.new(
-                :name('$this'),
-                :scope('lexical')
-            )
-        );
+    make PAST::Op.new(
+        :pasttype('callmethod'),
+        :name('member'),
+        PAST::Var.new(
+            :name('$this'),
+            :scope('lexical')
+        )
+    );
 }
 
 method while_statement($/) {
@@ -524,42 +512,42 @@ method literal($/, $key) {
 
 method true($/) {
     make PAST::Val.new(
-             :value( 1 ),
-             :returns('PhpBoolean'),
-             :node($/)
-         );
+        :value( 1 ),
+        :returns('PhpBoolean'),
+        :node($/)
+    );
 }
 
 method false($/) {
     make PAST::Val.new(
-             :value( 0 ),
-             :returns('PhpBoolean'),
-             :node($/)
-         );
+        :value( 0 ),
+        :returns('PhpBoolean'),
+        :node($/)
+    );
 }
 
 method null($/) {
     make PAST::Val.new(
-             :value( 0 ),
-             :returns('PhpNull'),
-             :node($/)
-         );
+        :value( 0 ),
+        :returns('PhpNull'),
+        :node($/)
+    );
 }
 
 method integer($/) {
     make PAST::Val.new(
-             :value( ~$/ ),
-             :returns('PhpInteger'),
-             :node($/)
-         );
+        :value( ~$/ ),
+        :returns('PhpInteger'),
+        :node($/)
+    );
 }
 
 method number($/) {
     make PAST::Val.new(
-             :value( +$/ ),
-             :returns('PhpFloat'),
-             :node($/)
-         );
+        :value( +$/ ),
+        :returns('PhpFloat'),
+        :node($/)
+    );
 }
 
 method closure($/, $key) {
@@ -894,7 +882,6 @@ method quote_term($/, $key) {
     else {
         $past := $( $/{ $key } );
     }
-
     make $past;
 }
 
