@@ -100,15 +100,14 @@ Given the name of a constant this function will return the constants associated 
     .RETURN_NULL()
   L1:
     $P1 = shift args
-    $S1 = $P1
-    .local pmc cst
-    cst = get_hll_global 'php_constants'
-    $I0 = exists cst[$S1]
-    unless $I0 goto L2
-    $P0 = cst[$S1]
-    .return ($P0)
+    .local string name
+    name = $P1
+    .local pmc val
+    val = get_hll_global name
+    if_null val, L2
+    .return (val)
   L2:
-    error(E_WARNING, "Couldn't find constant ", $S1)
+    error(E_WARNING, "Couldn't find constant ", name)
     .RETURN_NULL()
 .end
 

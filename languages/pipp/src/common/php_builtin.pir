@@ -112,12 +112,12 @@ STILL INCOMPLETE.
     error(E_WARNING,"Constants may only evaluate to scalar values")
     .RETURN_FALSE()
   L4:
-    $S1 = $P1
-    .local pmc cst
-    cst = get_hll_global 'php_constants'
-    $I0 = exists cst[$S1]
-    if $I0 goto L6
-    cst[$S1] = $P2
+    .local string name
+    name = $P1
+    .local pmc val
+    val = get_hll_global name
+    unless null val goto L6        # don't overwrite an existing value
+    set_hll_global name, $P2
     .RETURN_TRUE()
   L6:
     .RETURN_FALSE()
@@ -139,10 +139,13 @@ Check whether a constant exists
     .RETURN_NULL()
   L1:
     $P1 = shift args
-    $S1 = $P1
-    .local pmc cst
-    cst = get_hll_global 'php_constants'
-    $I0 = exists cst[$S1]
+    .local string name
+    name = $P1
+    .local pmc val
+    val = get_hll_global name
+    $I0 = isnull val    # check the nullness and invert it
+    $I0 = $I0 - 1
+    $I0 = neg $I0
 
     .RETURN_BOOL($I0)
 .end

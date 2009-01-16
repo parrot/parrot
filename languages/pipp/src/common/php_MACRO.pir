@@ -33,15 +33,13 @@ php_MACRO.pir - PHP API macros
 .macro REGISTER_LONG_CONSTANT(symb, val)
     new $P0, 'PhpInteger'
     set $P0, .val
-    $P44 = get_hll_global 'php_constants'
-    $P44[.symb] = $P0
+    set_hll_global .symb, $P0
 .endm
 
 .macro REGISTER_STRING_CONSTANT(symb, val)
     new $P0, 'PhpString'
     set $P0, .val
-    $P44 = get_hll_global 'php_constants'
-    $P44[.symb] = $P0
+    set_hll_global .symb, $P0
 .endm
 
 =item C<.RETURN_BOOL( val )>

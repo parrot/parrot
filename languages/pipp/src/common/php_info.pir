@@ -35,10 +35,8 @@ php_info.pir - PHP info Standard Library
     .REGISTER_STRING_CONSTANT('DEFAULT_INCLUDE_PATH', '.')
 
     # register NULL
-    .local pmc cst
-    cst = get_hll_global 'php_constants'
     new $P0, 'PhpNull'
-    cst['NULL'] = $P0
+    set_hll_global 'NULL', $P0
 
 .end
 
