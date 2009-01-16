@@ -33,6 +33,8 @@ Note: The TQueue must always be emptied before program exit.
 #include "parrot/parrot.h"
 
 pmclass TQueue need_ext is_shared {
+    ATTR struct QUEUE *queue;
+    ATTR INTVAL        thread_count;
 
 /*
 
@@ -45,8 +47,13 @@ Initializes the queue.
 */
 
     VTABLE void init() {
-        PMC_int_val(SELF) = 0;
-        PMC_data(SELF)    = queue_init(0);
+        Parrot_TQueue_attributes* attrs =
+            mem_allocate_zeroed_typed(Parrot_TQueue_attributes);
+
+        attrs->thread_count = 0;
+        attrs->queue        = queue_init(0);
+        PMC_data(SELF)      = attrs;
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -76,8 +83,10 @@ Marks all the threads in the queue as live.
 */
 
     VTABLE void mark() {
-        QUEUE       *queue = PMC_data_typed(SELF, QUEUE *);
+        QUEUE       *queue;
         QUEUE_ENTRY *entry;
+
+        GET_ATTR_queue(INTERP, SELF, queue);
 
         queue_lock(queue);
         entry = queue->head;
@@ -105,8 +114,10 @@ Destroys the queue.
 */
 
     VTABLE void destroy() {
-        if (PMC_data(SELF)) {
-            QUEUE * const queue = PMC_data_typed(SELF, QUEUE *);
+        QUEUE *queue;
+        GET_ATTR_queue(INTERP, SELF, queue);
+
+        if (queue) {
 #if 0
             /*
              * wait til queue is empty
@@ -120,8 +131,8 @@ Destroys the queue.
             }
 #endif
             mem_sys_free(queue);
-            PMC_data(SELF) = NULL;
         }
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -147,7 +158,10 @@ Returns whether there are any threads in the queue.
 */
 
     VTABLE INTVAL get_integer() {
-        return PMC_int_val(SELF);
+
+        INTVAL thread_count;
+        GET_ATTR_thread_count(INTERP, SELF, thread_count);
+        return thread_count;
     }
 
 /*
@@ -176,7 +190,10 @@ Adds the thread C<*item> to the end of the queue.
 
     void push_pmc(PMC *item) {
         QUEUE_ENTRY * const entry = mem_allocate_typed(QUEUE_ENTRY);
-        QUEUE       * const queue = PMC_data_typed(SELF, QUEUE *);
+        QUEUE       *       queue;
+        INTVAL       thread_count;
+
+        GET_ATTR_queue(INTERP, SELF, queue);
 
         /*
          * if item isn't shared nor const, then make
@@ -193,7 +210,10 @@ Adds the thread C<*item> to the end of the queue.
 
         /* s. tsq.c:queue_push */
         queue_lock(queue);
-        ++PMC_int_val(SELF);
+        
+        GET_ATTR_thread_count(INTERP, SELF, thread_count);
+        ++thread_count;
+        SET_ATTR_thread_count(INTERP, SELF, thread_count);
 
         /* Is there something in the queue? */
         if (queue->tail) {
@@ -221,10 +241,12 @@ Removes the first thread from the start of the queue.
 */
 
     VTABLE PMC *shift_pmc() {
-        QUEUE       * const queue = PMC_data_typed(SELF, QUEUE *);
+        QUEUE       *queue;
         QUEUE_ENTRY *entry;
         PMC         *ret;
+        INTVAL       thread_count;
 
+        GET_ATTR_queue(INTERP, SELF, queue);
         queue_lock(queue);
 
         while (queue->head == NULL) {
@@ -232,7 +254,9 @@ Removes the first thread from the start of the queue.
         }
 
         entry = nosync_pop_entry(queue);
-        --PMC_int_val(SELF);
+        GET_ATTR_thread_count(INTERP, SELF, thread_count);
+        --thread_count;
+        SET_ATTR_thread_count(INTERP, SELF, thread_count);
 
         queue_unlock(queue);
 
