@@ -68,7 +68,7 @@ static void pt_gc_wait_for_stage(PARROT_INTERP,
 static void pt_gc_wakeup_check(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void pt_ns_clone(
+static void pt_ns_clone(PARROT_INTERP,
     ARGOUT(Parrot_Interp d),
     ARGOUT(PMC *dest_ns),
     ARGIN(Parrot_Interp s),
@@ -77,6 +77,7 @@ static void pt_ns_clone(
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(d)
         FUNC_MODIFIES(*dest_ns);
 
@@ -123,7 +124,8 @@ static void* thread_func(ARGIN_NULLOK(void *arg));
 #define ASSERT_ARGS_pt_gc_wakeup_check __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_ns_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(d) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(d) \
     || PARROT_ASSERT_ARG(dest_ns) \
     || PARROT_ASSERT_ARG(s) \
     || PARROT_ASSERT_ARG(source_ns)
@@ -593,7 +595,7 @@ Clones all globals from C<s> to C<d>.
 */
 
 static void
-pt_ns_clone(ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
+pt_ns_clone(PARROT_INTERP, ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
             ARGIN(Parrot_Interp s), ARGIN(PMC *source_ns))
 {
     ASSERT_ARGS(pt_ns_clone)
@@ -613,7 +615,7 @@ pt_ns_clone(ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
                 sub_ns = pmc_new(d, enum_class_NameSpace);
                 VTABLE_set_pmc_keyed_str(d, dest_ns, key, sub_ns);
             }
-            pt_ns_clone(d, sub_ns, s, val);
+            pt_ns_clone(s, d, sub_ns, s, val);
         }
         else {
             PMC * const dval = VTABLE_get_pmc_keyed_str(d, dest_ns, key);
@@ -647,7 +649,7 @@ pt_clone_globals(Parrot_Interp d, Parrot_Interp s)
 {
     ASSERT_ARGS(pt_clone_globals)
     Parrot_block_GC_mark(d);
-    pt_ns_clone(d, d->root_namespace, s, s->root_namespace);
+    pt_ns_clone(s, d, d->root_namespace, s, s->root_namespace);
     Parrot_unblock_GC_mark(d);
 }
 

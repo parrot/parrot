@@ -49,9 +49,12 @@ static int args_match_params(
         __attribute__nonnull__(3);
 
 PARROT_WARN_UNUSED_RESULT
-static int call_is_safe(ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
+static int call_is_safe(PARROT_INTERP,
+    ARGIN(const PMC *sub),
+    ARGMOD(opcode_t **set_args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*set_args);
 
 PARROT_WARN_UNUSED_RESULT
@@ -97,7 +100,8 @@ static int returns_match_results(
     || PARROT_ASSERT_ARG(seg) \
     || PARROT_ASSERT_ARG(start)
 #define ASSERT_ARGS_call_is_safe __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sub) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
     || PARROT_ASSERT_ARG(set_args)
 #define ASSERT_ARGS_jit_can_compile_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -328,7 +332,7 @@ Returns C<0> otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-call_is_safe(ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
+call_is_safe(PARROT_INTERP, ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
 {
     ASSERT_ARGS(call_is_safe)
     PMC *called, *sig_results;
@@ -407,7 +411,7 @@ ops_jittable(PARROT_INTERP, ARGIN(const PMC *sub), ARGIN(const PMC *sig_results)
                 break;
             case PARROT_OP_set_args_pc:
                 /* verify call, return address after the call */
-                if (!call_is_safe(sub, &pc))
+                if (!call_is_safe(interp, sub, &pc))
                     return 0;
                 *flags |= JIT_CODE_RECURSIVE;
                 continue;

@@ -570,7 +570,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
     ASSERT_ARGS(Parrot_capture_lex)
     Parrot_Context * const ctx      = CONTEXT(interp);
     Parrot_sub * const current_sub  = PMC_sub(ctx->current_sub);
-    Parrot_sub * const sub          = PMC_sub(sub_pmc);
+    Parrot_sub *sub;
     Parrot_Context *old;
 
     /* MultiSub gets special treatment */
@@ -592,6 +592,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
     }
 
     /* the sub_pmc has to have an outer_sub that is the caller */
+    sub = PMC_sub(sub_pmc);
     if (PMC_IS_NULL(sub->outer_sub))
         return;
 
@@ -702,6 +703,43 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, SHIM(PMC *pmc),
     CONTEXT(interp)      = to_ctx;
     interp->ctx.bp       = to_ctx->bp;
     interp->ctx.bp_ps    = to_ctx->bp_ps;
+}
+
+
+/*
+
+=item C<Parrot_sub * Parrot_get_sub_pmc_from_subclass>
+
+Gets a Parrot_sub structure from something that isn't a Sub PMC, but rather a
+subclass. 
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Parrot_sub *
+Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
+    ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
+    PMC *key, *sub_pmc;
+
+    /* Ensure we really do have a subclass of sub. */
+    if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
+        /* If it's actually a PMC still, probably does the same structure
+         * underneath. */
+        if (!PObj_is_object_TEST(subclass))
+            return (Parrot_sub *)PMC_struct_val(subclass);
+
+        /* Get the Sub PMC itself. */
+        key = pmc_new(interp, enum_class_String);
+        VTABLE_set_string_native(interp, key, CONST_STRING(interp, "Sub"));
+        sub_pmc = VTABLE_get_attr_keyed(interp, subclass, key, CONST_STRING(interp, "proxy"));
+        if (sub_pmc->vtable->base_type == enum_class_Sub)
+            return (Parrot_sub *)PMC_struct_val(sub_pmc);
+    }
+    Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Attempting to do sub operation on non-Sub.");
 }
 
 /*

@@ -171,7 +171,12 @@ typedef struct Parrot_sub {
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
 } Parrot_sub;
 
-#define PMC_sub(pmc) ((Parrot_sub *)PMC_struct_val(pmc))
+#define PMC_sub(pmc) (pmc->vtable->base_type == enum_class_Sub || \
+                      pmc->vtable->base_type == enum_class_Coroutine || \
+                      pmc->vtable->base_type == enum_class_Eval || \
+                      pmc->vtable->base_type == enum_class_Closure ? \
+    (Parrot_sub *)PMC_struct_val(pmc) : \
+    Parrot_get_sub_pmc_from_subclass(interp, pmc))
 
 /* the first entries must match Parrot_sub, so we can cast
  * these two to the other type
@@ -272,6 +277,11 @@ STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC *subclass)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC* parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
@@ -351,6 +361,9 @@ PMC* Parrot_find_pad(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(ctx)
 #define ASSERT_ARGS_Parrot_full_sub_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_sub_pmc_from_subclass \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parrot_new_closure __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
