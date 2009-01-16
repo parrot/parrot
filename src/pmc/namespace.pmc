@@ -463,47 +463,50 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
         if (PMC_IS_NULL(key))
             return PMCNULL;
 
-        if (key->vtable->base_type == enum_class_String)
-            return SELF.get_pointer_keyed_str(VTABLE_get_string(INTERP, key));
+        switch (key->vtable->base_type) {
+            case enum_class_String:
+                return SELF.get_pointer_keyed_str(VTABLE_get_string(INTERP, key));
+            case enum_class_Key: {
+                /* this loop (and function) could use a rewrite for clarity */
+                while (1) {
+                    STRING * const part = VTABLE_get_string(INTERP, key);
+                    key  = key_next(INTERP, key);
 
-        if (key->vtable->base_type == enum_class_Key) {
-            /* this loop (and function) could use a rewrite for clarity */
-            while (1) {
-                STRING * const part = VTABLE_get_string(INTERP, key);
-                key  = key_next(INTERP, key);
+                    if (!key)
+                        return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
 
-                if (!key)
-                    return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
+                    ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
 
-                ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
+                    if (PMC_IS_NULL(ns))
+                        return PMCNULL;
+                }
 
-                if (PMC_IS_NULL(ns))
-                    return PMCNULL;
+                return ns;
             }
+            case enum_class_ResizableStringArray: {
+                INTVAL elements = VTABLE_elements(interp, key);
+                INTVAL i;
+                for (i = 0; i < elements; ++i)  {
+                    STRING * const part = VTABLE_get_string_keyed_int(interp, key, i);
 
-            return ns;
-        }
+                    /* Last entry in the array */
+                    if ((i + 1) >= elements)
+                        return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
 
-        if (key->vtable->base_type == enum_class_ResizableStringArray) {
-            INTVAL elements = VTABLE_elements(interp, key);
-            INTVAL i;
-            for (i = 0; i < elements; ++i)  {
-                STRING * const part = VTABLE_get_string_keyed_int(interp, key, i);
+                    ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
 
-                /* Last entry in the array */
-                if ((i + 1) >= elements)
-                    return VTABLE_get_pointer_keyed_str(INTERP, ns, part);
-
-                ns = Parrot_get_namespace_keyed_str(INTERP, ns, part);
-
-                if (PMC_IS_NULL(ns))
-                    return PMCNULL;
+                    if (PMC_IS_NULL(ns))
+                        return PMCNULL;
+                }
+                return ns;
             }
-            return ns;
+            case enum_class_NameSpace:
+                /* XXX TT#182: Implement this! */
+                return PMCNULL;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+                    "Invalid namespace key in get_pointer_keyed");
         }
-
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
-            "Invalid namespace key in get_pointer_keyed");
     }
 
 /*
