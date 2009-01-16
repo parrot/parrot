@@ -1,6 +1,6 @@
 #! parrot
 # Copyright (C) 2007, The Perl Foundation.
-# $Id: vtableoverride.t 35599 2009-01-10 02:01:58Z whiteknight $
+# $Id$
 
 =head1 NAME
 
