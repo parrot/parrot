@@ -274,7 +274,7 @@ method class_constant($/) {
     our $?NS;
     make PAST::Var.new(
         :scope('package'),
-        :namespace( $?NS ~ '\\' ~ $<class_name> ~ '::'), 
+        :namespace( $?NS ~ '\\' ~ $<class_name> ~ '::'),
         :name(~$<constant_name>)
     );
 }
@@ -290,7 +290,7 @@ method class_constant_definition($/) {
             :pasttype('bind'),
             PAST::Var.new(
                 :name(~$<constant_name>),
-                :isdecl(1),                                                           
+                :isdecl(1),
                 :scope('package'),
                 :viviself('PhpNull'),
                 :namespace( $?NS ~ '\\' ~ $?CLASS ~ '::')
@@ -309,7 +309,7 @@ method namespace_constant_definition($/) {
             :pasttype('bind'),
             PAST::Var.new(
                 :name(~$<constant_name>),
-                :isdecl(1),                                                           
+                :isdecl(1),
                 :scope('package'),
                 :viviself('PhpNull'),
                 :namespace($?NS)

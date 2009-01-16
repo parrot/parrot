@@ -41,7 +41,7 @@ token sea_or_code {
 }
 
 # text, in most cases broken HTML,
-# when an '<' is encountered check whether this is the start of PHP-code 
+# when an '<' is encountered check whether this is the start of PHP-code
 regex SEA {
     '<'? .+? ( <before '<'> | $ )
     {*}
@@ -76,7 +76,7 @@ regex open_script_tag {
     }}
 }
 
-regex close_script_tag { 
+regex close_script_tag {
     '</script' <ws_char>*: '>'
     {{  $S0 = "script"
         $P0 = get_global "tag_type"
@@ -89,24 +89,24 @@ regex close_script_tag {
 
 token quoted_lang_name { '"php"' | '\'php\'' }
 
-token code_start_echo_tag {     
-    '<?=' 
+token code_start_echo_tag {
+    '<?='
     {{ $P0 = new 'String'
        $P0 = "short"
        set_global "tag_type", $P0
     }}
 }
 
-token open_short_tag { 
-    '<?' 'php'?  
+token open_short_tag {
+    '<?' 'php'?
     {{ $P0 = new 'String'
        $P0 = "short"
        set_global "tag_type", $P0
     }}
 }
 
-token close_short_tag { 
-    '?>' \n?  
+token close_short_tag {
+    '?>' \n?
     {{  $S0 = "short"
         $P0 = get_global "tag_type"
         $S1 = $P0
@@ -137,7 +137,7 @@ rule statement {
 }
 
 rule statement_list {
-    <statement>* {*}            
+    <statement>* {*}
 }
 
 rule statement_delimiter {
