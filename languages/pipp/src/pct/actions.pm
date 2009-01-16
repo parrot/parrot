@@ -262,24 +262,11 @@ method constructor_call($/) {
 
 method constant($/) {
     our $?NS;
-    if $?NS eq '' {
-        make
-            PAST::Op.new(
-                :name('constant'),
-                PAST::Val.new(
-                    :returns('PhpString'),
-                    :value( ~$<CONSTANT_NAME> ),
-                )
-            );
-    }
-    else {
-        make
-            PAST::Var.new(
-                :name(~$<CONSTANT_NAME>),
-                :scope('package'),
-                :namespace($?NS)
-            );
-    }
+    make PAST::Var.new(
+        :name(~$<CONSTANT_NAME>),
+        :scope('package'),
+        :namespace($?NS)
+    );
 }
 
 # TODO: merge with rule 'constant'
