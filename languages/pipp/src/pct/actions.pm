@@ -20,7 +20,8 @@ value of the comment is passed as the second argument to the method.
 class Pipp::Grammar::Actions;
 
 method TOP($/, $key) {
-    our $?NS := '';
+    our $?NS    := '';
+    our $?CLASS := '';
     our @?BLOCK; # A stack of PAST::Block
     our @?SUPER_GLOBALS :=
           ( '$_GET', '$_POST', '$_SERVER', '$_GLOBALS',
@@ -295,6 +296,7 @@ method class_constant($/) {
 
 # class constants could probably also be set in a class init block
 method class_constant_definition($/) {
+    our $?CLASS;
     my $past := PAST::Block.new( :name('class_constant_definition') );
     my $loadinit := $past.loadinit();
     $loadinit.unshift(
@@ -303,7 +305,7 @@ method class_constant_definition($/) {
             :name('define'),
             :node( $/ ),
             PAST::Val.new(
-                :value( 'Foo::' ~ ~$<CONSTANT_NAME> ),
+                :value( $?CLASS ~ '::' ~ ~$<CONSTANT_NAME> ),
                 :returns('PhpString'),
             ),
             $( $<literal> ),
@@ -707,12 +709,15 @@ method param_list($/) {
 
 method class_definition($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
+    our $?CLASS; # for namespacing of constants
 
     if $key eq 'open' {
+        $?CLASS := ~$<CLASS_NAME>;
         my $block := PAST::Block.new(
                 :node($/),
                 :blocktype('declaration'),
-                :pirflags( ':init :load' )
+                :pirflags( ':init :load' ),
+                :namespace( $?CLASS )
             );
 
         # set up scope 'package' for the superglobals
@@ -723,8 +728,6 @@ method class_definition($/, $key) {
     }
     else {
         my $block := @?BLOCK.shift();
-        my $class_name := ~$<CLASS_NAME><ident>;
-        $block.namespace( $class_name );
         $block.push(
             # Start of class definition; make PAST to create class object if
             # we're creating a new class.
@@ -738,7 +741,7 @@ method class_definition($/, $key) {
                 PAST::Op.new(
                     :pasttype('call'),
                     :name('pipp_create_class'),
-                    PAST::Val.new( :value($class_name) )
+                    PAST::Val.new( :value($?CLASS) )
                 )
             )
         );
@@ -836,6 +839,8 @@ method class_definition($/, $key) {
         }
 
         $block.push( $methods_block );
+
+        $?CLASS := '';
 
         make $block;
     }

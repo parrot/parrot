@@ -54,7 +54,7 @@ CODE
 constant bar in class Foo
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant in Bar', todo => 'Foo is hardwired' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'class constant in Bar' );
 <?php
 
 class Bar {
@@ -66,7 +66,7 @@ echo Bar::bar;
 
 ?>
 CODE
-constant bar in class Foo
+constant bar in class Bar
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'calling an instance method' );
