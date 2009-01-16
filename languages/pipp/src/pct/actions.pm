@@ -114,7 +114,7 @@ method inline_sea_short_tag($/) {
         );
 }
 
-method namespace_statement($/, $key) {
+method namespace_definition($/, $key) {
     our $?NS;
 
     if $key eq 'open' {
@@ -327,20 +327,6 @@ method namespace_constant_definition($/) {
             ),
             $( $<literal> )
         );
-
-#   my $loadinit := $past.loadinit();
-#   $loadinit.unshift(
-#       PAST::Op.new(
-#           :pasttype('call'),
-#           :name('define'),
-#           :node( $/ ),
-#           PAST::Val.new(
-#               :value( $?NS ~ '\\' ~ ~$<CONSTANT_NAME> ),
-#               :returns('PhpString'),
-#           ),
-#           $( $<literal> ),
-#       )
-#   );
 
     make $past;
 }

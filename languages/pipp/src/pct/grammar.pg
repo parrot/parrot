@@ -119,7 +119,7 @@ token close_short_tag {
 # statements
 
 rule statement {
-    | <namespace_statement>            {*}  #= namespace_statement
+    | <namespace_definition>           {*}  #= namespace_definition
     | <return_statement>               {*}  #= return_statement
     | <require_once_statement>         {*}  #= require_once_statement
     | <echo_statement>                 {*}  #= echo_statement
@@ -146,7 +146,7 @@ rule statement_delimiter {
     | $
 }
 
-rule namespace_statement {
+rule namespace_definition {
     'namespace' <NAMESPACE_NAME>?  {*}       #= open
     '{' <statement_list> '}'       {*}       #= close
 }
