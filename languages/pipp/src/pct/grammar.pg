@@ -241,7 +241,7 @@ rule var_assign {
 #
 token CLASS_NAME               { <ident> }
 
-token CONSTANT_NAME            { <NAMESPACED_IDENT> }
+token CONSTANT_NAME            { <name> }
 
 token CLASS_CONSTANT_ACCESSOR  { '::' }
 
@@ -259,9 +259,14 @@ token METHOD_NAME              { <ident> }
 
 token NAMESPACE_SEPARATOR      { '\\' }
 
-token NAMESPACE_NAME           { <.NAMESPACE_SEPARATOR>? <ident> [ <.NAMESPACE_SEPARATOR> <ident> ]* }
+token NAMESPACE_NAME           { <.name> }
 
-token NAMESPACED_IDENT         { <.NAMESPACE_SEPARATOR>? <ident> [ <.NAMESPACE_SEPARATOR> <ident> ]* }
+token name {
+    | <ident> <morename>*    # no leading backslash
+    | <morename>+            # leading backslash
+}
+
+token morename { <.NAMESPACE_SEPARATOR> <ident> }
 
 token VAR_NAME                 { '$' <ident> }
 
