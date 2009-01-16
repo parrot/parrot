@@ -48,7 +48,7 @@ regex SEA {
 }
 
 rule code_echo_tag {
-    <.CODE_START_ECHO_TAG> <argument_list> <.statement_delimiter>
+    <.code_start_echo_tag> <argument_list> <.statement_delimiter>
         <statement_list>
     <.close_short_tag>?
     {*}
@@ -89,7 +89,7 @@ regex close_script_tag {
 
 token quoted_lang_name { '"php"' | '\'php\'' }
 
-token CODE_START_ECHO_TAG {     
+token code_start_echo_tag {     
     '<?=' 
     {{ $P0 = new 'String'
        $P0 = "short"
@@ -147,7 +147,7 @@ rule statement_delimiter {
 }
 
 rule namespace_definition {
-    'namespace' <NAMESPACE_NAME>?  {*}       #= open
+    'namespace' <namespace_name>?  {*}       #= open
     '{' <statement_list> '}'       {*}       #= close
 }
 
@@ -239,40 +239,40 @@ rule var_assign {
 
 # identifiers
 #
-token CLASS_NAME               { <ident> }
+token class_name               { <ident> }
 
-token CONSTANT_NAME            { <name> }
+token constant_name            { <name> }
 
-token CLASS_CONSTANT_ACCESSOR  { '::' }
+token class_constant_accessor  { '::' }
 
-token STATIC_METHOD_ACCESSOR   { '::' }
+token static_method_accessor   { '::' }
 
-token FUNCTION_NAME            { <ident> }
+token function_name            { <ident> }
 
-token INTERFACE_NAME           { <ident> }
+token interface_name           { <ident> }
 
-token MEMBER_NAME              { <ident> }
+token member_name              { <ident> }
 
-token METHOD_NAME              { <ident> }
+token method_name              { <ident> }
 
 # namespace support
 
-token NAMESPACE_SEPARATOR      { '\\' }
+token namespace_separator      { '\\' }
 
-token NAMESPACE_NAME           { <.name> }
+token namespace_name           { <.name> }
 
 token name {
     | <ident> <morename>*    # no leading backslash
     | <morename>+            # leading backslash
 }
 
-token morename { <.NAMESPACE_SEPARATOR> <ident> }
+token morename { <.namespace_separator> <ident> }
 
-token VAR_NAME                 { '$' <ident> }
+token var_name                 { '$' <ident> }
 
 # terms
 rule method_call {
-    <var> '->' <METHOD_NAME> '(' <argument_list> ')'
+    <var> '->' <method_name> '(' <argument_list> ')'
     {*}
 }
 
@@ -282,7 +282,7 @@ rule closure_call {
 }
 
 rule function_call {
-    <FUNCTION_NAME> '(' <argument_list> ')'
+    <function_name> '(' <argument_list> ')'
     {*}
 }
 
@@ -303,31 +303,31 @@ rule key_value_pair {
 }
 
 rule constructor_call {
-    'new' <CLASS_NAME> [ '(' <argument_list> ')' ]?
+    'new' <class_name> [ '(' <argument_list> ')' ]?
     {*}
 }
 
-token TRUE {
+token true {
     [:i 'TRUE' ]
     {*}
 }
 
-token FALSE {
+token false {
     [:i 'FALSE']
     {*}
 }
 
-token NULL {
+token null {
     'NULL'
     {*}
 }
 
-token NUMBER {
+token number {
     ( \d+ )? '.' \d+
     {*}
 }
 
-token INTEGER {
+token integer {
     \d+
     {*}
 }
@@ -340,12 +340,12 @@ token quote {
 }
 
 token constant {
-    <CONSTANT_NAME>
+    <constant_name>
     {*}
 }
 
 token class_constant {
-    <CLASS_NAME> <.CLASS_CONSTANT_ACCESSOR> <CONSTANT_NAME>
+    <class_name> <.class_constant_accessor> <constant_name>
     {*}
 }
 
@@ -355,17 +355,17 @@ rule this {
 }
 
 rule member {
-    <this> '->' <MEMBER_NAME>
+    <this> '->' <member_name>
     {*}
 }
 
 rule array_elem {
-    <VAR_NAME> '[' <expression> ']'
+    <var_name> '[' <expression> ']'
     {*}
 }
 
 token simple_var {
-    <VAR_NAME>
+    <var_name>
     {*}
 }
 
@@ -376,11 +376,11 @@ token var {
 }
 
 rule literal {
-    | <TRUE>    {*}    #= TRUE
-    | <FALSE>   {*}    #= FALSE
-    | <NULL>    {*}    #= NULL
-    | <NUMBER>  {*}    #= NUMBER
-    | <INTEGER> {*}    #= INTEGER
+    | <true>    {*}    #= true
+    | <false>   {*}    #= false
+    | <null>    {*}    #= null
+    | <number>  {*}    #= number
+    | <integer> {*}    #= integer
     | <quote>   {*}    #= quote
 }
 
@@ -408,35 +408,35 @@ rule closure {
 }
 
 rule bind_list {
-    'use' '(' [ '&'? <VAR_NAME> [',' '&'? <VAR_NAME>]* ]? ')'
+    'use' '(' [ '&'? <var_name> [',' '&'? <var_name>]* ]? ')'
 }
 
 rule function_definition {
-    'function' <FUNCTION_NAME> <param_list> {*}  #= open
+    'function' <function_name> <param_list> {*}  #= open
     '{' <statement_list> '}'                {*}  #= close
 }
 
 rule param_list {
-    '(' [ '&'? <VAR_NAME> [',' '&'? <VAR_NAME>]* ]? ')'
+    '(' [ '&'? <var_name> [',' '&'? <var_name>]* ]? ')'
     {*}
 }
 
 # OO
 
 rule interface_definition {
-    'interface' <INTERFACE_NAME> [ 'implements' <INTERFACE_NAME> ]? '{'
+    'interface' <interface_name> [ 'implements' <interface_name> ]? '{'
         <method_declaration>*
     '}'
     {*}
 }
 
 rule method_declaration {
-    'function' <METHOD_NAME> <param_list> ';'
+    'function' <method_name> <param_list> ';'
     {*}
 }
 
 rule class_definition {
-    'class' <CLASS_NAME> [ 'implements' <INTERFACE_NAME> ]?  {*}  #= open
+    'class' <class_name> [ 'implements' <interface_name> ]?  {*}  #= open
     '{'
         <class_constant_definition>*
         <class_member_definition>*
@@ -445,23 +445,23 @@ rule class_definition {
 }
 
 rule class_constant_definition {
-    'const' <CONSTANT_NAME> '=' <literal> <.statement_delimiter>
+    'const' <constant_name> '=' <literal> <.statement_delimiter>
     {*}
 }
 
 # In PHP 5.3 a constand definition outside a declared namespace is forbidden
 # In Pipp this is not checked
 rule namespace_constant_definition {
-    'const' <CONSTANT_NAME> '=' <literal> <.statement_delimiter>
+    'const' <constant_name> '=' <literal> <.statement_delimiter>
     {*}
 }
 
 rule class_member_definition {
-    'public' <VAR_NAME> '=' <literal> <.statement_delimiter>
+    'public' <var_name> '=' <literal> <.statement_delimiter>
 }
 
 rule class_method_definition {
-    'function' <METHOD_NAME> <param_list> {*}  #= open
+    'function' <method_name> <param_list> {*}  #= open
     '{' <statement_list> '}'              {*}  #= close
 }
 

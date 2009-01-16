@@ -119,7 +119,7 @@ method namespace_definition($/, $key) {
     our $?NS;
 
     if $key eq 'open' {
-        $?NS := +$<NAMESPACE_NAME> ?? ~$<NAMESPACE_NAME>[0] !! '';
+        $?NS := +$<namespace_name> ?? ~$<namespace_name>[0] !! '';
     }
     else {
         my $block :=
@@ -176,7 +176,7 @@ method closure_call($/) {
 
 method function_call($/) {
     my $past := $( $<argument_list> );
-    $past.name( ~$<FUNCTION_NAME> );
+    $past.name( ~$<function_name> );
 
     make $past;
 }
@@ -213,7 +213,7 @@ method key_value_pair($/) {
 
 method method_call($/) {
     my $past := $( $<argument_list> );
-    $past.name( ~$<METHOD_NAME> );
+    $past.name( ~$<method_name> );
     $past.pasttype( 'callmethod' );
     $past.unshift( $( $<var> ) );
 
@@ -222,7 +222,7 @@ method method_call($/) {
 
 # TODO: Call the default constructor without explicit check, inherit from PippObject instead
 method constructor_call($/) {
-    my $class_name := ~$<CLASS_NAME>;
+    my $class_name := ~$<class_name>;
     # The constructor needs a list of it's arguments, or an empty list
     my $cons_call  := +$<argument_list> ??
                         $( $<argument_list>[0] )
@@ -263,7 +263,7 @@ method constructor_call($/) {
 method constant($/) {
     our $?NS;
     make PAST::Var.new(
-        :name(~$<CONSTANT_NAME>),
+        :name(~$<constant_name>),
         :scope('package'),
         :namespace($?NS)
     );
@@ -274,8 +274,8 @@ method class_constant($/) {
     our $?NS;
     make PAST::Var.new(
         :scope('package'),
-        :namespace( $?NS ~ '\\' ~ $<CLASS_NAME> ~ '::'), 
-        :name(~$<CONSTANT_NAME>)
+        :namespace( $?NS ~ '\\' ~ $<class_name> ~ '::'), 
+        :name(~$<constant_name>)
     );
 }
 
@@ -289,7 +289,7 @@ method class_constant_definition($/) {
         PAST::Op.new(
             :pasttype('bind'),
             PAST::Var.new(
-                :name(~$<CONSTANT_NAME>),
+                :name(~$<constant_name>),
                 :isdecl(1),                                                           
                 :scope('package'),
                 :viviself('PhpNull'),
@@ -308,7 +308,7 @@ method namespace_constant_definition($/) {
         PAST::Op.new(
             :pasttype('bind'),
             PAST::Var.new(
-                :name(~$<CONSTANT_NAME>),
+                :name(~$<constant_name>),
                 :isdecl(1),                                                           
                 :scope('package'),
                 :viviself('PhpNull'),
@@ -405,11 +405,11 @@ method var_assign($/) {
 
 method array_elem($/) {
     our @?BLOCK;
-    unless @?BLOCK[0].symbol( ~$<VAR_NAME> ) {
-        @?BLOCK[0].symbol( ~$<VAR_NAME>, :scope('lexical') );
+    unless @?BLOCK[0].symbol( ~$<var_name> ) {
+        @?BLOCK[0].symbol( ~$<var_name>, :scope('lexical') );
         @?BLOCK[0].push(
             PAST::Var.new(
-                :name(~$<VAR_NAME>),
+                :name(~$<var_name>),
                 :viviself('PhpArray'),
                 :isdecl(1)
             )
@@ -422,7 +422,7 @@ method array_elem($/) {
             :viviself('PhpNull'),
             :lvalue(1),
             PAST::Var.new(
-                :name(~$<VAR_NAME>),
+                :name(~$<var_name>),
                 :viviself('PhpArray'),
                 :lvalue(1),
             ),
@@ -432,11 +432,11 @@ method array_elem($/) {
 
 method simple_var($/) {
     our @?BLOCK;
-    unless ( @?BLOCK[0].symbol( ~$<VAR_NAME> ) || @?BLOCK[0].symbol( ~$<VAR_NAME> ~ '_hidden' ) ) {
-        @?BLOCK[0].symbol( ~$<VAR_NAME>, :scope('lexical') );
+    unless ( @?BLOCK[0].symbol( ~$<var_name> ) || @?BLOCK[0].symbol( ~$<var_name> ~ '_hidden' ) ) {
+        @?BLOCK[0].symbol( ~$<var_name>, :scope('lexical') );
         @?BLOCK[0].push(
             PAST::Var.new(
-                :name(~$<VAR_NAME>),
+                :name(~$<var_name>),
                 :viviself('PhpNull'),
                 :isdecl(1)
             )
@@ -445,7 +445,7 @@ method simple_var($/) {
 
     make
         PAST::Var.new(
-            :name(~$<VAR_NAME>),
+            :name(~$<var_name>),
             :viviself('PhpNull'),
             :lvalue(1),
         );
@@ -522,7 +522,7 @@ method literal($/, $key) {
     make $( $/{$key} );
 }
 
-method TRUE($/) {
+method true($/) {
     make PAST::Val.new(
              :value( 1 ),
              :returns('PhpBoolean'),
@@ -530,7 +530,7 @@ method TRUE($/) {
          );
 }
 
-method FALSE($/) {
+method false($/) {
     make PAST::Val.new(
              :value( 0 ),
              :returns('PhpBoolean'),
@@ -538,7 +538,7 @@ method FALSE($/) {
          );
 }
 
-method NULL($/) {
+method null($/) {
     make PAST::Val.new(
              :value( 0 ),
              :returns('PhpNull'),
@@ -546,7 +546,7 @@ method NULL($/) {
          );
 }
 
-method INTEGER($/) {
+method integer($/) {
     make PAST::Val.new(
              :value( ~$/ ),
              :returns('PhpInteger'),
@@ -554,7 +554,7 @@ method INTEGER($/) {
          );
 }
 
-method NUMBER($/) {
+method number($/) {
     make PAST::Val.new(
              :value( +$/ ),
              :returns('PhpFloat'),
@@ -575,7 +575,7 @@ method closure($/, $key) {
 
         # declare the bound vars a lexical
         if +$<bind_list> == 1 {
-            for $<bind_list>[0]<VAR_NAME> {
+            for $<bind_list>[0]<var_name> {
                 $block.symbol( ~$_ ~ '_hidden', :comment('bound with use') );
             }
         }
@@ -607,7 +607,7 @@ method function_definition($/, $key) {
     else {
         my $block := @?BLOCK.shift();
 
-        $block.name( ~$<FUNCTION_NAME> );
+        $block.name( ~$<function_name> );
         $block.control('return_pir');
         $block.push( $( $<statement_list> ) );
 
@@ -646,7 +646,7 @@ method class_method_definition($/, $key) {
     else {
         my $block := @?BLOCK.shift();
 
-        $block.name( ~$<METHOD_NAME> );
+        $block.name( ~$<method_name> );
         $block.blocktype( 'method' );
         $block.control('return_pir');
         $block.push( $( $<statement_list> ) );
@@ -658,7 +658,7 @@ method class_method_definition($/, $key) {
 method param_list($/) {
     my $block := PAST::Block.new( :blocktype('declaration'), :node($/) );
     my $arity := 0;
-    for $<VAR_NAME> {
+    for $<var_name> {
         $block.push(
             PAST::Var.new(
                 :name(~$_),
@@ -699,7 +699,7 @@ method class_definition($/, $key) {
     our $?CLASS; # for namespacing of constants
 
     if $key eq 'open' {
-        $?CLASS := ~$<CLASS_NAME>;
+        $?CLASS := ~$<class_name>;
         my $block := PAST::Block.new(
                 :node($/),
                 :blocktype('declaration'),
@@ -743,7 +743,7 @@ method class_definition($/, $key) {
 
         # declare the attributes
         for $<class_member_definition> {
-            my $member_name := ~$_<VAR_NAME><ident>;
+            my $member_name := ~$_<var_name><ident>;
             $methods_block.symbol(
                 $member_name,
                 :scope('attribute'),
@@ -812,12 +812,12 @@ method class_definition($/, $key) {
             $methods_block.push(
                 PAST::Block.new(
                     :blocktype('declaration'),
-                    :name(~$_<VAR_NAME><ident>),
+                    :name(~$_<var_name><ident>),
                     :pirflags(':method'),
                     :node( $/ ),
                     PAST::Stmts.new(
                         PAST::Var.new(
-                            :name(~$_<VAR_NAME><ident>),
+                            :name(~$_<var_name><ident>),
                             :scope('attribute')
                         )
                     )
