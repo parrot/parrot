@@ -39,6 +39,9 @@ Lexical in scope of the included file.
 
 =item Class constants
 
+Class constants are stored a package variables in the namespace $?NS ~ '\\' ~ $?CLASS ~ '::'.
+The trailing '::' guarantees that there is no conflict with namespace constants.
+
 =item Class members
 
 =item function and method scope

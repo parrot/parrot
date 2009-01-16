@@ -345,7 +345,7 @@ token constant {
 }
 
 token class_constant {
-    <.CLASS_NAME> <.CLASS_CONSTANT_ACCESSOR> <.CONSTANT_NAME>
+    <CLASS_NAME> <.CLASS_CONSTANT_ACCESSOR> <CONSTANT_NAME>
     {*}
 }
 

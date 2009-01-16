@@ -284,31 +284,31 @@ method constant($/) {
 
 # TODO: merge with rule 'constant'
 method class_constant($/) {
-    make
-        PAST::Op.new(
-            :name('constant'),
-            PAST::Val.new(
-                :returns('PhpString'),
-                :value( ~$/ ),
-            )
-        );
+    our $?NS;
+    make PAST::Var.new(
+        :scope('package'),
+        :namespace( $?NS ~ '\\' ~ $<CLASS_NAME> ~ '::'), 
+        :name(~$<CONSTANT_NAME>)
+    );
 }
 
 # class constants could probably also be set in a class init block
 method class_constant_definition($/) {
     our $?CLASS;
+    our $?NS;
     my $past := PAST::Block.new( :name('class_constant_definition') );
     my $loadinit := $past.loadinit();
     $loadinit.unshift(
         PAST::Op.new(
-            :pasttype('call'),
-            :name('define'),
-            :node( $/ ),
-            PAST::Val.new(
-                :value( $?CLASS ~ '::' ~ ~$<CONSTANT_NAME> ),
-                :returns('PhpString'),
+            :pasttype('bind'),
+            PAST::Var.new(
+                :name(~$<CONSTANT_NAME>),
+                :isdecl(1),                                                           
+                :scope('package'),
+                :viviself('PhpNull'),
+                :namespace( $?NS ~ '\\' ~ $?CLASS ~ '::')
             ),
-            $( $<literal> ),
+            $( $<literal> )
         )
     );
 
