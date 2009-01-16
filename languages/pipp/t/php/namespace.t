@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 6;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'parsing of namespace directive' );
 <?php
@@ -35,6 +35,96 @@ namespace A\B\C {}
 
 ?>
 CODE
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace A', todo => 'not implemented yet' );
+<?php
+
+namespace A {
+    const FOO = "FOO in A\n";
+    echo FOO;
+}
+
+?>
+CODE
+FOO in A
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace A\B', todo => 'not implemented yet' );
+<?php
+
+namespace A\B {
+    const FOO = "FOO in A\\B\n";
+    echo FOO;
+}
+
+?>
+CODE
+FOO in A\B
+OUT
+
+=for perl6
+
+package A {
+    our $FOO = "FOO in A\n";
+}
+
+package A::B {
+    our $FOO  = "FOO in A::B\n";
+}
+
+package A {
+    our $FOO;
+    print $FOO;
+    print $A::FOO;
+    print $A::B::FOO;
+    say('');
+}
+
+package A::B {
+    our $FOO;
+    print $FOO;
+    print $A::FOO;
+    print $A::B::FOO;
+    say('');
+}
+
+=cut
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'not implemented yet' );
+<?php
+
+namespace A {
+    const FOO = "FOO in A\n";
+}
+
+namespace A\B {
+    const FOO  = "FOO in A:B\n";
+}
+
+namespace A {
+    echo FOO;
+    echo \A\B\FOO;
+    echo \A\FOO;
+    echo "\n";
+}
+
+namespace A\B {
+    echo FOO;
+    echo \A\B\FOO;
+    echo \A\FOO;
+    echo "\n";
+}
+
+?>
+CODE
+FOO in A
+FOO in A::B
+FOO in A
+
+FOO in A::B
+FOO in A::B
+FOO in A
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'not implemented yet' );
