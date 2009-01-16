@@ -20,11 +20,9 @@ php_file.pir - PHP file Standard Library
 .const int SEEK_END = 2
 
 .sub '__init' :anon :load :init
-    .local pmc cst
-    .GET_CONSTANTS(cst)
-    .REGISTER_LONG_CONSTANT(cst, 'SEEK_SET', SEEK_SET)
-    .REGISTER_LONG_CONSTANT(cst, 'SEEK_CUR', SEEK_CUR)
-    .REGISTER_LONG_CONSTANT(cst, 'SEEK_END', SEEK_END)
+    .REGISTER_LONG_CONSTANT('SEEK_SET', SEEK_SET)
+    .REGISTER_LONG_CONSTANT('SEEK_CUR', SEEK_CUR)
+    .REGISTER_LONG_CONSTANT('SEEK_END', SEEK_END)
 .end
 
 =item C<string basename(string path [, string suffix])>

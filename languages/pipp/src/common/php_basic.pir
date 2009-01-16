@@ -102,7 +102,7 @@ Given the name of a constant this function will return the constants associated 
     $P1 = shift args
     $S1 = $P1
     .local pmc cst
-    .GET_CONSTANTS(cst)
+    cst = get_hll_global 'php_constants'
     $I0 = exists cst[$S1]
     unless $I0 goto L2
     $P0 = cst[$S1]

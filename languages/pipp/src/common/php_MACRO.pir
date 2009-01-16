@@ -30,20 +30,18 @@ php_MACRO.pir - PHP API macros
 .const int E_ALL = 0x1fff
 .const int E_CORE = 0x0030
 
-.macro GET_CONSTANTS(reg)
-    get_hll_global .reg, 'php_constants'
-.endm
-
-.macro REGISTER_LONG_CONSTANT(reg, symb, val)
+.macro REGISTER_LONG_CONSTANT(symb, val)
     new $P0, 'PhpInteger'
     set $P0, .val
-    .reg[.symb] = $P0
+    $P44 = get_hll_global 'php_constants'
+    $P44[.symb] = $P0
 .endm
 
-.macro REGISTER_STRING_CONSTANT(reg, symb, val)
+.macro REGISTER_STRING_CONSTANT(symb, val)
     new $P0, 'PhpString'
     set $P0, .val
-    .reg[.symb] = $P0
+    $P44 = get_hll_global 'php_constants'
+    $P44[.symb] = $P0
 .endm
 
 =item C<.RETURN_BOOL( val )>

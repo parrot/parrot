@@ -114,7 +114,7 @@ STILL INCOMPLETE.
   L4:
     $S1 = $P1
     .local pmc cst
-    .GET_CONSTANTS(cst)
+    cst = get_hll_global 'php_constants'
     $I0 = exists cst[$S1]
     if $I0 goto L6
     cst[$S1] = $P2
@@ -141,8 +141,9 @@ Check whether a constant exists
     $P1 = shift args
     $S1 = $P1
     .local pmc cst
-    .GET_CONSTANTS(cst)
+    cst = get_hll_global 'php_constants'
     $I0 = exists cst[$S1]
+
     .RETURN_BOOL($I0)
 .end
 

@@ -22,11 +22,9 @@ php_API.pir - PHP API Library
     set_hll_global 'php_constants', $P0
 
     # set up error codes
-    .local pmc cst
-    .GET_CONSTANTS(cst)
-    .REGISTER_LONG_CONSTANT(cst, 'E_ERROR', E_ERROR)
-    .REGISTER_LONG_CONSTANT(cst, 'E_WARNING', E_WARNING)
-    .REGISTER_LONG_CONSTANT(cst, 'E_CORE', E_CORE)
+    .REGISTER_LONG_CONSTANT('E_ERROR', E_ERROR)
+    .REGISTER_LONG_CONSTANT('E_WARNING', E_WARNING)
+    .REGISTER_LONG_CONSTANT('E_CORE', E_CORE)
 
     # set up default error_reporting
     $P1 = new 'PhpInteger'
