@@ -31,6 +31,8 @@ A listing of things that Pipp does differently from the standard PHP.
 
 =item Only bracketed version of namespaces. No check for unnamespaced code.
 
+=item A leading backslash is allowed in namespace declarations.
+
 =item 'const' outside a declared namespace is allowed.
 
 =back
