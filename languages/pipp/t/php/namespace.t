@@ -37,7 +37,7 @@ namespace A\B\C {}
 CODE
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace A', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace A' );
 <?php
 
 namespace A {
@@ -50,7 +50,7 @@ CODE
 FOO in A
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace A\B', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace A\B' );
 <?php
 
 namespace A\B {

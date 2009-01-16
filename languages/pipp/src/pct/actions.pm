@@ -124,6 +124,7 @@ method namespace_statement($/, $key) {
         my $block :=
             PAST::Block.new(
                 :namespace($?NS),
+                :blocktype('immediate'),
                 $( $<statement_list> )
             );
         $?NS := '';
@@ -259,14 +260,25 @@ method constructor_call($/) {
 }
 
 method constant($/) {
-    make
-        PAST::Op.new(
-            :name('constant'),
-            PAST::Val.new(
-                :returns('PhpString'),
-                :value( ~$<CONSTANT_NAME> ),
-            )
-        );
+    our $?NS;
+    if $?NS eq '' {
+        make
+            PAST::Op.new(
+                :name('constant'),
+                PAST::Val.new(
+                    :returns('PhpString'),
+                    :value( ~$<CONSTANT_NAME> ),
+                )
+            );
+    }
+    else {
+        make
+            PAST::Var.new(
+                :name(~$<CONSTANT_NAME>),
+                :scope('package'),
+                :namespace($?NS)
+            );
+    }
 }
 
 # TODO: merge with rule 'constant'
@@ -303,20 +315,32 @@ method class_constant_definition($/) {
 
 method namespace_constant_definition($/) {
     our $?NS;
-    my $past := PAST::Block.new( :name('namespace_constant_definition') );
-    my $loadinit := $past.loadinit();
-    $loadinit.unshift(
+    my $past :=
         PAST::Op.new(
-            :pasttype('call'),
-            :name('define'),
-            :node( $/ ),
-            PAST::Val.new(
-                :value( $?NS ~ '\\' ~ ~$<CONSTANT_NAME> ),
-                :returns('PhpString'),
+            :pasttype('bind'),
+            PAST::Var.new(
+                :name(~$<CONSTANT_NAME>),
+                :isdecl(1),                                                           
+                :scope('package'),
+                :viviself('PhpNull'),
+                :namespace($?NS)
             ),
-            $( $<literal> ),
-        )
-    );
+            $( $<literal> )
+        );
+
+#   my $loadinit := $past.loadinit();
+#   $loadinit.unshift(
+#       PAST::Op.new(
+#           :pasttype('call'),
+#           :name('define'),
+#           :node( $/ ),
+#           PAST::Val.new(
+#               :value( $?NS ~ '\\' ~ ~$<CONSTANT_NAME> ),
+#               :returns('PhpString'),
+#           ),
+#           $( $<literal> ),
+#       )
+#   );
 
     make $past;
 }
@@ -496,7 +520,7 @@ method for_statement($/) {
 
 # Handle the operator precedence table.
 method expression($/, $key) {
-    if ($key eq 'end') {
+    if $key eq 'end' {
         make $( $<expr> );
     }
     else {
@@ -739,7 +763,7 @@ method class_definition($/, $key) {
            $block.push( $($_) );
         }
 
-        my $methods_block := PAST::Block.new( :blocktype('immediate') );
+        my $methods_block := PAST::Block.new(:blocktype('immediate'));
 
         # declare the attributes
         for $<class_member_definition> {
@@ -882,7 +906,7 @@ method quote_concat($/) {
 
 method quote_term($/, $key) {
     my $past;
-    if ($key eq 'literal') {
+    if $key eq 'literal' {
         $past := PAST::Val.new(
             :value( ~$<quote_literal> ),
             :returns('PhpString'),
