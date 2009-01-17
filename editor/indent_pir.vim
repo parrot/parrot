@@ -56,7 +56,7 @@ fun! PIRIndent()
     let SUB = '^\s*\.pcc_sub\s\+\|^\s*\.sub\s\+\|^\s*\.macro\s\+'
     let RETURNBLOCK = '\s*\.begin_return\s*$'
     let END = '^\s*\.end\s*$\|^\s*\.end_return\s*\|^\s*\.endm$'
-    let LABEL = '^\s*\k\+:\s*$'
+    let LABEL = '^\s*\k\+:'
 
     if prevline =~? SUB
         let ind = ind + &sw
