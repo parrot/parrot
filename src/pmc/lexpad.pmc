@@ -29,6 +29,7 @@ These are the vtable functions for the lexpad PMC.
  */
 
 pmclass LexPad provides hash no_ro {
+    ATTR PMC * lexinfo;
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -78,7 +79,14 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 */
     VTABLE void init_pmc(PMC *lexinfo) {
-        PMC_pmc_val(SELF) = lexinfo;
+        Parrot_LexPad_attributes *attrs = 
+            mem_allocate_zeroed_typed(Parrot_LexPad_attributes);
+        attrs->lexinfo = lexinfo;
+        PMC_data(SELF) = attrs;
+    }
+
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
     }
 
     VTABLE void set_pointer(void *ctx) {
@@ -86,12 +94,14 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE INTVAL elements() {
-        PMC *info = PMC_pmc_val(SELF);
+        PMC *info;
+        GET_ATTR_lexinfo(INTERP, SELF, info);
         return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(info));
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *name) {
-        PMC * const info = PMC_pmc_val(SELF);
+        PMC *info;
+        GET_ATTR_lexinfo(INTERP, SELF, info);
         return parrot_hash_get_bucket(INTERP,
             (Hash *)PMC_struct_val(info), name) != 0;
     }
@@ -102,11 +112,16 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE PMC *get_pmc_keyed_str(STRING *name) {
-        PMC              * const info = PMC_pmc_val(SELF);
-        Hash             * const hash = (Hash *)PMC_struct_val(info);
-        Parrot_Context   * const ctx  = (Parrot_Context *)PMC_struct_val(SELF);
-        HashBucket       * const b    = parrot_hash_get_bucket(INTERP, hash, name);
+        PMC              * info;
+        Hash             * hash;
+        Parrot_Context   * ctx;
+        HashBucket       * b;
         INTVAL            regno;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        hash = (Hash *)PMC_struct_val(info);
+        ctx  = (Parrot_Context *)PMC_struct_val(SELF);
+        b    = parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
             return NULL;
@@ -122,11 +137,16 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *value) {
-        PMC              * const info  = PMC_pmc_val(SELF);
-        Hash             * const hash  = (Hash *)PMC_struct_val(info);
-        Parrot_Context   * const ctx   = (Parrot_Context *)PMC_struct_val(SELF);
-        HashBucket       * const b     = parrot_hash_get_bucket(INTERP, hash, name);
-        INTVAL            regno;
+        PMC              * info;
+        Hash             * hash;
+        Parrot_Context   * ctx;
+        HashBucket       * b;
+        INTVAL             regno;
+
+        GET_ATTR_lexinfo(INTERP, SELF, info);
+        hash = (Hash *)PMC_struct_val(info);
+        ctx  = (Parrot_Context *)PMC_struct_val(SELF);
+        b    = parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND,
@@ -142,7 +162,8 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     METHOD get_lexinfo() {
-        PMC *lexinfo = PMC_pmc_val(SELF);
+        PMC *lexinfo;
+        GET_ATTR_lexinfo(INTERP, SELF, lexinfo);
         RETURN(PMC *lexinfo);
     }
 }
