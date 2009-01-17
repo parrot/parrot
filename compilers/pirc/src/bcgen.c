@@ -112,11 +112,12 @@ is resized each time a constant is added.
 */
 static int
 new_pbc_const(bytecode * const bc) {
-    Interp *interp = bc->interp;
-    size_t oldcount;
-    size_t newcount;
+    Interp            *interp;
+    size_t             oldcount;
+    size_t             newcount;
     PackFile_Constant *new_pbc_constant;
 
+    interp   = bc->interp;
     oldcount = interp->code->const_table->const_count;
     newcount = oldcount + 1;
 
@@ -744,7 +745,8 @@ find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_s
     STRING       *cur_name;
     size_t        len;
     global_label *outersub;
-    /* we need a Interp called "interp", because of some macros.
+
+    /* we need a Interp called "interp", because of some macros expansions.
      * needed on Linux. 17-Jan-2009, kjs.
      */
     Interp       *interp = bc->interp;
@@ -763,13 +765,13 @@ find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_s
     outersub = find_global_label(lexer, outername);
 
     if (outersub) {
-        int const num_constants = bc->interp->code->const_table->const_count;
+        int const num_constants = interp->code->const_table->const_count;
 
         /* sanity check for const_table_index */
         if (outersub->const_table_index >= 0 && outersub->const_table_index < num_constants)
         {
             PackFile_Constant *subconst
-                       = bc->interp->code->const_table->constants[outersub->const_table_index];
+                       = interp->code->const_table->constants[outersub->const_table_index];
             /* set a flag on that outer sub that it's an outer sub */
             PObj_get_FLAGS(subconst->u.key) |= SUB_FLAG_IS_OUTER;
             return subconst->u.key;
@@ -778,7 +780,7 @@ find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_s
     }
 
     /* could be eval too; check if :outer is the current sub */
-    current = CONTEXT(bc->interp)->current_sub;
+    current = CONTEXT(interp)->current_sub;
 
     if (current == NULL) {
         fprintf(stderr, "cannot find :outer sub '%s'\n", outername); /* XXX exception ? */
@@ -905,8 +907,10 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     int                    i;              /* for loop iterator */
     PackFile_Constant     *subname_const;
     /* need a Interp object called "interp", because of some macro expansions. */
-    Interp                *interp = bc->interp;
+    Interp                *interp;
 
+
+    interp                = bc->interp;
     sub_pmc               = create_sub_pmc(bc, info->iscoroutine, info->instanceof);
     sub                   = PMC_sub(sub_pmc);
     subname_index         = add_string_const(bc, info->subname, "ascii");

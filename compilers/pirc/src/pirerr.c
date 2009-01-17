@@ -9,6 +9,7 @@
 #include "pirparser.h"
 #include "piryy.h"
 #include "pirlexer.h"
+#include "pirerr.h"
 
 /*
 
