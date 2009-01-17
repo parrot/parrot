@@ -360,6 +360,10 @@ bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC *self,
 
 #else /* ifdef PARROT_HAS_GMP */
 
+typedef struct BIGINT {
+    INTVAL b; /* bogus definition for users without libgmp*/
+} BIGINT;
+
 static void
 bigint_init(PARROT_INTERP, PMC *self) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
