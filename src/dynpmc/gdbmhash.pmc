@@ -1,5 +1,5 @@
 /* gdbmhash.pmc
- *  Copyright (C) 2005-2008, The Perl Foundation.
+ *  Copyright (C) 2005-2009 The Perl Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
@@ -117,8 +117,7 @@ Open a or create a new dbm file.
 
     void set_string_native(STRING* value) {
         char * const c_db_name = string_to_cstring(interp, value);
-        GDBM_FILE dbf          = 
-	    gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
+        GDBM_FILE dbf          = gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
 
         string_cstring_free(c_db_name);
 
