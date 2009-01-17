@@ -285,9 +285,10 @@ method class_constant($/) {
 method class_constant_definition($/) {
     our $?CLASS;
     our $?NS;
-    my $past := PAST::Block.new( :name('class_constant_definition') );
-    my $loadinit := $past.loadinit();
-    $loadinit.unshift(
+    my $past := PAST::Block.new(:blocktype('immediate'));
+    my $ns   := $?CLASS eq '' ?? $?NS
+                              !! $?NS ~ '\\' ~ $?CLASS ~ '::';
+    $past.loadinit().push(
         PAST::Op.new(
             :pasttype('bind'),
             PAST::Var.new(
@@ -295,7 +296,7 @@ method class_constant_definition($/) {
                 :isdecl(1),
                 :scope('package'),
                 :viviself('PhpNull'),
-                :namespace( $?NS ~ '\\' ~ $?CLASS ~ '::')
+                :namespace($ns)
             ),
             $( $<literal> )
         )
@@ -305,8 +306,12 @@ method class_constant_definition($/) {
 }
 
 method namespace_constant_definition($/) {
+    our $?CLASS;
     our $?NS;
-    my $past :=
+    my $past := PAST::Block.new(:blocktype('immediate'));
+    my $ns   := $?CLASS eq '' ?? $?NS
+                              !! $?NS ~ '\\' ~ $?CLASS ~ '::';
+    $past.loadinit().push(
         PAST::Op.new(
             :pasttype('bind'),
             PAST::Var.new(
@@ -314,10 +319,11 @@ method namespace_constant_definition($/) {
                 :isdecl(1),
                 :scope('package'),
                 :viviself('PhpNull'),
-                :namespace($?NS)
+                :namespace($ns)
             ),
             $( $<literal> )
-        );
+        )
+    );
 
     make $past;
 }
