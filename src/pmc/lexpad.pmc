@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2008, The Perl Foundation.
+Copyright (C) 2007-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -79,7 +79,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
 */
     VTABLE void init_pmc(PMC *lexinfo) {
-        Parrot_LexPad_attributes *attrs = 
+        Parrot_LexPad_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_LexPad_attributes);
         attrs->lexinfo = lexinfo;
         PMC_data(SELF) = attrs;
