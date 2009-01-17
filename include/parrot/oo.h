@@ -57,13 +57,6 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_class_lookup(PARROT_INTERP, ARGIN(STRING *class_name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_ComposeRole(PARROT_INTERP,
     ARGIN(PMC *role),
     ARGIN(PMC *exclude),
@@ -154,12 +147,6 @@ void init_object_cache(PARROT_INTERP)
 void mark_object_cache(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC * Parrot_class_lookup_p(PARROT_INTERP, ARGIN(PMC *class_name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 void Parrot_oo_extract_methods_from_namespace(PARROT_INTERP,
     ARGIN(PMC *self),
     ARGIN(PMC *ns))
@@ -204,9 +191,6 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_Parrot_class_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(class_name)
 #define ASSERT_ARGS_Parrot_ComposeRole __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(role) \
@@ -248,9 +232,6 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_mark_object_cache __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_class_lookup_p __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(class_name)
 #define ASSERT_ARGS_Parrot_oo_extract_methods_from_namespace \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

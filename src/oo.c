@@ -460,66 +460,6 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
     return Parrot_mmd_func_names[idx];
 }
 
-
-/*
-
-=item C<PMC * Parrot_class_lookup>
-
-Looks for the class named C<class_name> and returns it if it exists.
-Otherwise it returns C<PMCNULL>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_class_lookup(PARROT_INTERP, ARGIN(STRING *class_name))
-{
-    ASSERT_ARGS(Parrot_class_lookup)
-    const INTVAL type = pmc_type(interp, class_name);
-    PMC         *pmc;
-
-    if (type <= 0)
-        return PMCNULL;
-
-    pmc = interp->vtables[type]->pmc_class;
-    PARROT_ASSERT(pmc);
-    return pmc;
-}
-
-
-/*
-
-=item C<PMC * Parrot_class_lookup_p>
-
-Looks for the class named C<class_name> and returns it if it exists.
-Otherwise it returns C<PMCNULL>.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_class_lookup_p(PARROT_INTERP, ARGIN(PMC *class_name))
-{
-    ASSERT_ARGS(Parrot_class_lookup_p)
-    const INTVAL type = pmc_type_p(interp, class_name);
-    PMC         *pmc;
-
-    if (type <= 0)
-        return PMCNULL;
-
-    pmc = interp->vtables[type]->pmc_class;
-    PARROT_ASSERT(pmc);
-    return pmc;
-}
-
-
 /*
 
 =item C<static INTVAL fail_if_type_exists>
