@@ -517,7 +517,7 @@ co-hq9plus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
 
 co-pjs:
-	- $(SVN) checkout http://parrotjs.googlecode.com/svn/trunk/ parrotjs-read-only
+	- $(SVN) checkout 'http:////parrotjs.googlecode.com/svn/trunk/' parrotjs-read-only
 
 co-primitivearc:
 	- $(GIT) clone 'git:////github.com/stefano/primitivearc.git'
