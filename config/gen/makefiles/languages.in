@@ -7,9 +7,10 @@ MAKE          = @make_c@
 RM_F          = @rm_f@
 BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+GIT           = git
 
 # List of languages that are currently managed in the Parrot svn repository
-# When adding or removing languages, please update the list 
+# When adding or removing languages, please update the list
 LANGUAGES = \
     abc APL \
     BASIC befunge bf \
@@ -62,6 +63,11 @@ help:
 	@echo "https://trac.parrot.org/parrot/wiki/Languages."
 	@echo ""
 	@echo "Some languages are managed in other repositories."
+	@echo "Here are some helpers for checking these languages out."
+	@echo ""
+	@echo "  co-all:        Try to fetch externally managed languages"
+	@echo ""
+	@echo "  co-hq9plus:    Try to fetch HQ9+"
 
 # regenerate the Makefile
 Makefile: ../config/gen/makefiles/languages.in
@@ -482,3 +488,15 @@ Zcode.clean:
 	- $(MAKE) Zcode clean
 Zcode.realclean:
 	- $(MAKE) Zcode realclean
+
+# helpers for checking out externally managed languages
+
+# check out all known externally managed languages
+co-all: co-eclectus co-hq9plus
+
+co-eclectus:
+	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
+
+co-hq9plus:
+	- $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
+
