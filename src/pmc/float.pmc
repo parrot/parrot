@@ -479,103 +479,103 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD cos() {
         PMC * const d  = pmc_new(INTERP,
                 Parrot_get_ctx_HLL_type(INTERP, enum_class_Float));
-        SET_ATTR_fv(INTERP, SELF, cos(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, cos(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD asec() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, acos(1.0 / SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, acos(1.0 / SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD asin() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, asin(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, asin(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD atan() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, atan(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, atan(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD atan2(PMC *val) {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, atan2(SELF.get_number(), VTABLE_get_number(INTERP, val)));
+        SET_ATTR_fv(INTERP, d, atan2(SELF.get_number(), VTABLE_get_number(INTERP, val)));
         RETURN(PMC *d);
     }
 
     METHOD cosh() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, cosh(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, cosh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD exp() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, exp(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, exp(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD ln() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, log(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, log(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD log10() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, log10(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, log10(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD log2() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, log(SELF.get_number()) / log(2.0));
+        SET_ATTR_fv(INTERP, d, log(SELF.get_number()) / log(2.0));
         RETURN(PMC *d);
     }
 
     METHOD sec() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, 1.0 / cos(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, 1.0 / cos(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD sech() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, 1.0 / cosh(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, 1.0 / cosh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD sin() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, sin(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, sin(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD sinh() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, sinh(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, sinh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD tan() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, tan(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, tan(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD tanh() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, tanh(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, tanh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
     METHOD sqrt() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        SET_ATTR_fv(INTERP, SELF, sqrt(SELF.get_number()));
+        SET_ATTR_fv(INTERP, d, sqrt(SELF.get_number()));
         RETURN(PMC *d);
     }
 }

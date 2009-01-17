@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 44;
+use Parrot::Test tests => 61;
 
 =head1 NAME
 
@@ -1135,29 +1135,481 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method' );
 .include 'fp_equality.pasm'
 .sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
     $P0 = new ['Float']
     $P0 = 0.0
     $P1 = $P0.'acos'()
-    .fp_eq($P1, 1.57079632, OK1)
-    print 'got '
-    print $P1
-    print ' but '
-  OK1:
-    say 'result should be 1.57079632'
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "acos(%.1f) is %.9f", array
+    say $S0
 
     $P2 = new ['Float']
     $P2 = 0.5
     $P3 = $P2.'acos'()
-    .fp_eq($P3, 1.04719755, OK2)
-    print 'got '
-    print $P3
-    print ' but '
-  OK2:
-    say 'result should be 1.04719755'
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "acos(%.1f) is %.9f", array
+    say $S0
 .end
 CODE
-result should be 1.57079632
-result should be 1.04719755
+acos(0.0) is 1.570796327
+acos(0.5) is 1.047197551
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'cos as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'cos'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "cos(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'cos'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "cos(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+cos(0.0) is 1.000000000
+cos(0.5) is 0.877582562
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'asec as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 1.0
+    $P1 = $P0.'asec'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "asec(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 3.0
+    $P3 = $P2.'asec'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "asec(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+asec(1.0) is 0.000000000
+asec(3.0) is 1.230959417
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'asin as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'asin'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "asin(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'asin'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "asin(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+asin(0.0) is 0.000000000
+asin(0.5) is 0.523598776
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'atan as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'atan'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "atan(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'atan'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "atan(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+atan(0.0) is 0.000000000
+atan(0.5) is 0.463647609
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'atan2 as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 3
+    $P0 = new ['Float']
+    $P1 = new ['Float']
+    $P0 = 0.7
+    $P1 = 0.5
+    $P2 = $P0.'atan2'($P1)
+    array[0] = $P0
+    array[1] = $P1
+    array[2] = $P2
+    $S0 = sprintf "atan2(%.1f, %.1f) is %.9f", array
+    say $S0
+.end
+CODE
+atan2(0.7, 0.5) is 0.950546841
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'cosh as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'cosh'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "cosh(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'cosh'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "cosh(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+cosh(0.0) is 1.000000000
+cosh(0.5) is 1.127625965
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'exp as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'exp'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "exp(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'exp'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "exp(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+exp(0.0) is 1.000000000
+exp(0.5) is 1.648721271
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'ln as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 45.0
+    $P1 = $P0.'ln'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "ln(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'ln'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "ln(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+ln(45.0) is 3.806662490
+ln(0.5) is -0.693147181
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'log10 as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 1000.0
+    $P1 = $P0.'log10'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "log10(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'log10'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "log10(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+log10(1000.0) is 3.000000000
+log10(0.5) is -0.301029996
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'log2 as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 32.0
+    $P1 = $P0.'log2'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "log2(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'log2'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "log2(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+log2(32.0) is 5.000000000
+log2(0.5) is -1.000000000
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'sec as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'sec'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "sec(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'sec'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "sec(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+sec(0.0) is 1.000000000
+sec(0.5) is 1.139493927
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'sech as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'sech'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "sech(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'sech'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "sech(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+sech(0.0) is 1.000000000
+sech(0.5) is 0.886818884
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'sin as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'sin'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "sin(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'sin'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "sin(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+sin(0.0) is 0.000000000
+sin(0.5) is 0.479425539
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'sinh as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'sinh'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "sinh(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'sinh'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "sinh(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+sinh(0.0) is 0.000000000
+sinh(0.5) is 0.521095305
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'tan as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'tan'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "tan(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'tan'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "tan(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+tan(0.0) is 0.000000000
+tan(0.5) is 0.546302490
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'tanh as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'tanh'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "tanh(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'tanh'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "tanh(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+tanh(0.0) is 0.000000000
+tanh(0.5) is 0.462117157
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'sqrt as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    .local pmc array
+    array = new 'FixedFloatArray'
+    array = 2
+    $P0 = new ['Float']
+    $P0 = 16.0
+    $P1 = $P0.'sqrt'()
+    array[0] = $P0
+    array[1] = $P1
+    $S0 = sprintf "sqrt(%.1f) is %.9f", array
+    say $S0
+
+    $P2 = new ['Float']
+    $P2 = 2.0
+    $P3 = $P2.'sqrt'()
+    array[0] = $P2
+    array[1] = $P3
+    $S0 = sprintf "sqrt(%.1f) is %.9f", array
+    say $S0
+.end
+CODE
+sqrt(16.0) is 4.000000000
+sqrt(2.0) is 1.414213562
 OUTPUT
 
 
