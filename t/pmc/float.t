@@ -1132,7 +1132,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method', todo => 'TT #184' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method' );
 .include 'fp_equality.pasm'
 .sub main :main
     $P0 = new ['Float']
@@ -1148,16 +1148,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method', todo => 'TT #184' );
     $P2 = new ['Float']
     $P2 = 0.5
     $P3 = $P2.'acos'()
-    .fp_eq($P3, 1.0471975511966, OK2)
+    .fp_eq($P3, 1.04719755, OK2)
     print 'got '
     print $P3
     print ' but '
   OK2:
-    say 'result should be 1.0471975511966'
+    say 'result should be 1.04719755'
 .end
 CODE
-result should be 0.0
-result should be 1.0471975511966
+result should be 1.57079632
+result should be 1.04719755
 OUTPUT
 
 
