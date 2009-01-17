@@ -253,10 +253,6 @@ token member_name              { <ident> }
 
 token method_name              { <ident> }
 
-# namespace support
-
-token namespace_separator      { '\\' }
-
 token namespace_name           { <.name> }
 
 token name {
@@ -264,7 +260,7 @@ token name {
     | <morename>+            # leading backslash
 }
 
-token morename                 { <.namespace_separator> <ident> }
+token morename                 { '\\' <ident> }
 
 token var_name                 { '$' <ident> }
 
