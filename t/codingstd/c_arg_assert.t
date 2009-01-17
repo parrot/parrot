@@ -56,7 +56,7 @@ sub check_asserts {
                 $usages{$func} = 1;
 
                 # The ASSERT_ARGS macro needs to follow an opening curly bracket
-                if ($fulltext !~ m/\n\{\s*ASSERT_ARGS\($func\)\n/s) {
+                if ($fulltext !~ m/\)(?:\n| )\{\s*ASSERT_ARGS\($func\)\n/s) {
                     push @misplaced, [$func, $path];
                 }
             }

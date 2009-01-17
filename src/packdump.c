@@ -119,11 +119,11 @@ static const char *flag_bit_names[] =
     "is_object"
 };
 
-static void
-pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
 /* Given a word of flags, generate a dump line of the whole word in hex,
  * followed by individual bits.
  */
+static void
+pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
 {
     ASSERT_ARGS(pobj_flag_dump)
     INTVAL idx = 0;
