@@ -2590,7 +2590,7 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     Parrot_io_printf(interp, "\n  mappings => [\n");
     for (i = 0; i < debug->num_mappings; i++) {
-        char *filename = string_to_cstring(interp, PF_CONST(debug->code,
+        char * const filename = string_to_cstring(interp, PF_CONST(debug->code,
                    debug->mappings[i]->filename)->u.string);;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
@@ -4058,7 +4058,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const struct PackFile_Segment *se
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");
     for (i = 0; i < self->num_keys; i++) {
-        char *key_name = string_to_cstring(interp, PF_CONST(self->code,
+        char * const key_name = string_to_cstring(interp, PF_CONST(self->code,
                self->keys[i]->name)->u.string);
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %s\n", key_name);

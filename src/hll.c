@@ -95,9 +95,9 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
     PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
 
     if (entry_name && !STRING_IS_EMPTY(entry_name)) {
-        char   *cstring    = string_to_cstring(interp, entry_name);
-        UINTVAL len        = string_length(interp, entry_name);
-        STRING *const_name = string_make_direct(interp, cstring,
+        char   * const cstring    = string_to_cstring(interp, entry_name);
+        const  UINTVAL len        = string_length(interp, entry_name);
+        STRING *const_name        = string_make_direct(interp, cstring,
             len, PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
             PObj_constant_FLAG);
 

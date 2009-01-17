@@ -167,12 +167,12 @@ Sets the specified function pointer and signature (C<*key>).
 
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
-        int                           jitted   = 0;
-        char                         *key_c;
+        int                             jitted = 0;
+        char                     * const key_c = 
+	    string_to_cstring(INTERP, key);
 
         /* Store the original function and signature. */
         PMC_struct_val(SELF) = func;
-        key_c                = string_to_cstring(INTERP, key);
         nci_info->signature  = string_make(interp, key_c, strlen(key_c),
                                     NULL, PObj_constant_FLAG);
         string_cstring_free(key_c);

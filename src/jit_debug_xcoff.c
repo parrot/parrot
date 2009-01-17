@@ -254,7 +254,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
 
     if (interp->code->debugs) {
         char *ext;
-        char *src = string_to_cstring(interp,
+        char * const src = string_to_cstring(interp,
             Parrot_debug_pc_to_filename(interp,
             interp->code->debugs, 0));
         pasmfile = string_make(interp, src, strlen(src), NULL,
@@ -280,7 +280,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
     stabsfile = debug_file(interp, file, "stabs.s");
     ofile = debug_file(interp, file, "o");
     {
-        char *temp = string_to_cstring(interp, stabsfile);
+        char * const temp = string_to_cstring(interp, stabsfile);
         stabs      = fopen(temp, "w");
         string_cstring_free(temp);
     }
@@ -288,7 +288,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
         return;
 
     {
-        char *temp = string_to_cstring(interp, pasmfile);
+        char * const temp = string_to_cstring(interp, pasmfile);
         /* filename info */
         fprintf(stabs, ".file \"%s\"\n", temp);
         string_cstring_free(temp);
@@ -334,7 +334,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
     cmd = Parrot_sprintf_c(interp, "as %Ss -o %Ss", stabsfile, ofile);
 
     {
-        char *temp = string_to_cstring(interp, cmd);
+        char * const temp = string_to_cstring(interp, cmd);
         system(temp);
         string_cstring_free(temp);
     }

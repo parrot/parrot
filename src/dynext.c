@@ -378,7 +378,6 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     STRING *type;
     PMC *(*load_func)(PARROT_INTERP);
     void (*init_func)(PARROT_INTERP, PMC *);
-    char *cinit_func_name;
     PMC *lib_pmc;
 
     /*
@@ -387,22 +386,20 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
      */
     Parrot_block_GC_mark(interp);
 
-    /* get load_func */
     if (lib_name) {
-        STRING * const load_name  = Parrot_sprintf_c(interp,
+        STRING * const load_name       = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_load", lib_name);
+        STRING * const init_func_name  = Parrot_sprintf_c(interp,
+                                        "Parrot_lib_%Ss_init", lib_name);
         char   * const cload_func_name = string_to_cstring(interp, load_name);
-        STRING *init_func_name;
+        char   * const cinit_func_name = string_to_cstring(interp, init_func_name);
 
-        load_func    = (PMC * (*)(PARROT_INTERP))
+        /* get load_func */
+        load_func       = (PMC * (*)(PARROT_INTERP))
             D2FPTR(Parrot_dlsym(handle, cload_func_name));
-
         string_cstring_free(cload_func_name);
 
         /* get init_func */
-        init_func_name  = Parrot_sprintf_c(interp, "Parrot_lib_%Ss_init",
-                                          lib_name);
-        cinit_func_name = string_to_cstring(interp, init_func_name);
         init_func       = (void (*)(PARROT_INTERP, PMC *))
             D2FPTR(Parrot_dlsym(handle, cinit_func_name));
         string_cstring_free(cinit_func_name);
@@ -454,9 +451,9 @@ static STRING *
 clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
     ASSERT_ARGS(clone_string_into)
-    STRING * const orig = VTABLE_get_string(s, value);
-    char * const raw_str = string_to_cstring(s, orig);
-    STRING * const ret =
+    STRING * const  orig   = VTABLE_get_string(s, value);
+    char   * const raw_str = string_to_cstring(s, orig);
+    STRING * const   ret   =
         string_make_direct(d, raw_str, strlen(raw_str),
             PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
             PObj_constant_FLAG);

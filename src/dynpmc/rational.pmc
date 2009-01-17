@@ -54,9 +54,8 @@ Returns a string representation of a Rational-PMC to a certain base.
 */
 static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
   #ifdef PARROT_HAS_GMP
-    STRING *pstr;
-    char *cstr = mpq_get_str(NULL, (int) base, RT(self));
-    pstr = string_from_cstring(interp, cstr, 0);
+    char * const cstr = mpq_get_str(NULL, (int) base, RT(self));
+    STRING * pstr     = string_from_cstring(interp, cstr, 0);
     string_cstring_free(cstr);
     return pstr;
   #else
@@ -391,7 +390,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_string_native(STRING *value) {
       #ifdef PARROT_HAS_GMP
-        char *cstr = string_to_cstring(INTERP, value);
+        char * const cstr = string_to_cstring(INTERP, value);
         mpq_set_str(RT(SELF), cstr, 0);
         mpq_canonicalize(RT(SELF));
         string_cstring_free(cstr);
@@ -409,7 +408,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
       #ifdef PARROT_HAS_GMP
-        char *cstr = string_to_cstring(INTERP, value);
+        char * const cstr = string_to_cstring(INTERP, value);
         mpq_set_str(RT(SELF), cstr, (int) base);
         mpq_canonicalize(RT(SELF));
         string_cstring_free(cstr);

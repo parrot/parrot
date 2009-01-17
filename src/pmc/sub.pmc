@@ -832,7 +832,7 @@ slurpy arguments).
 
     METHOD __get_regs_used(STRING *reg) {
         Parrot_sub * const sub  = PMC_sub(SELF);
-        char              *kind = string_to_cstring(interp, reg);
+        char       * const kind = string_to_cstring(interp, reg);
         INTVAL             regs_used;
 
         /* TODO switch to canonical NiSP order

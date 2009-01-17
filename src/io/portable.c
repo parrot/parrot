@@ -144,7 +144,7 @@ Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
     flags |= PIO_F_FILE;
 
     { /* scope for temporary C string */
-        const char *spath = string_to_cstring(interp, path);
+        char * const spath = string_to_cstring(interp, path);
         /* Try opening the file
          * note that this can't really handle O_EXCL, etc. */
         fptr = fopen(spath, oflags);

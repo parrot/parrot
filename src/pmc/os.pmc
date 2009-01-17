@@ -137,8 +137,8 @@ C<path>.
 
     METHOD rm(STRING *path) {
         struct stat info;
-        char *cpath = string_to_cstring(interp, path);
-        int   error = stat(cpath, &info);
+        char * const cpath = string_to_cstring(interp, path);
+        int          error = stat(cpath, &info);
 
         if (error) {
             const char * const errmsg = strerror(errno);

@@ -283,7 +283,7 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
 
     if (interp->code->debugs) {
         char *ext;
-        char *src = string_to_cstring(interp,
+        char * const src = string_to_cstring(interp,
             Parrot_debug_pc_to_filename(interp,
             interp->code->debugs, 0));
         pasmfile = string_make(interp, src, strlen(src), NULL,
@@ -364,8 +364,8 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
     cmd = Parrot_sprintf_c(interp, "as %Ss -o %Ss", stabsfile, ofile);
 
     {
-        char *temp   = string_to_cstring(interp, cmd);
-        int   status = system(temp);
+        char * const temp   = string_to_cstring(interp, cmd);
+        int          status = system(temp);
         if (status)
             fprintf(stderr, "Assembly failed: %d\n%s\n", status, temp);
         string_cstring_free(temp);

@@ -688,13 +688,13 @@ Same assume number base C<base>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        char *s = string_to_cstring(INTERP, value);
+        char * const s = string_to_cstring(INTERP, value);
         bigint_set_str(INTERP, SELF, s, 10);
         string_cstring_free(s);
     }
 
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
-        char *s = string_to_cstring(INTERP, value);
+        char * const s = string_to_cstring(INTERP, value);
         bigint_set_str(INTERP, SELF, s, base);
         string_cstring_free(s);
     }
