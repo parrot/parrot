@@ -171,12 +171,12 @@ typedef struct Parrot_sub {
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
 } Parrot_sub;
 
-#define PMC_sub(pmc) (pmc->vtable->base_type == enum_class_Sub || \
-                      pmc->vtable->base_type == enum_class_Coroutine || \
-                      pmc->vtable->base_type == enum_class_Eval || \
-                      pmc->vtable->base_type == enum_class_Closure ? \
+#define PMC_sub(pmc) ((pmc)->vtable->base_type == enum_class_Sub || \
+                      (pmc)->vtable->base_type == enum_class_Coroutine || \
+                      (pmc)->vtable->base_type == enum_class_Eval || \
+                      (pmc)->vtable->base_type == enum_class_Closure ? \
     (Parrot_sub *)PMC_struct_val(pmc) : \
-    Parrot_get_sub_pmc_from_subclass(interp, pmc))
+    Parrot_get_sub_pmc_from_subclass(interp, (pmc)))
 
 /* the first entries must match Parrot_sub, so we can cast
  * these two to the other type
