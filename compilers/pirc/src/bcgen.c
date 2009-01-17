@@ -21,6 +21,12 @@
 #  define PMCNULL         ((PMC *)NULL)
 #endif
 
+/* turn this on when debugging */
+#define DEBUGBC     0
+
+
+
+
 /*
 
 =head1 DESCRIPTION
@@ -182,7 +188,9 @@ add_string_const(bytecode * const bc, char const * const str, char const * chars
         constant = bc->interp->code->const_table->constants[index];
         if (constant->type == PFC_STRING) {
             if (string_equal(bc->interp, constant->u.string, parrotstr) == 0) {
+#if DEBUGBC
                 fprintf(stderr, "found string %s at index %d\n", str, index);
+#endif
                 return index;
             }
         }
@@ -198,8 +206,9 @@ add_string_const(bytecode * const bc, char const * const str, char const * chars
     constant->type     = PFC_STRING;
     constant->u.string = parrotstr;
 
-    /*fprintf(stderr, "add_string_const (%s) at index: %d\n", str, index);
-    */
+#if DEBUGBC
+    fprintf(stderr, "add_string_const (%s) at index: %d\n", str, index);
+#endif
 
     return index;
 
@@ -254,7 +263,9 @@ add_key_const(bytecode * const bc, PMC *key) {
         if (constant->type == PFC_KEY) {
             STRING *s2 = key_set_to_string(bc->interp, constant->u.key);
             if (string_equal(bc->interp, s1, s2) == 0) {
+#if DEBUGBC
                 fprintf(stderr, "found equal key (%d)\n", index);
+#endif
                 return index;
             }
         }
@@ -266,7 +277,9 @@ add_key_const(bytecode * const bc, PMC *key) {
     constant         = bc->interp->code->const_table->constants[index];
     constant->type   = PFC_KEY;
     constant->u.key  = key;
+#if DEBUGBC
     fprintf(stderr, "new key const (%d)\n", index);
+#endif
     return index;
 }
 
@@ -505,8 +518,9 @@ PARROT_IGNORABLE_RESULT
 opcode_t
 emit_opcode(bytecode * const bc, opcode_t op) {
     *bc->opcursor = op;
-
+#if DEBUGBC
     fprintf(stderr, "\n[%d]", op);
+#endif
     return (bc->opcursor++ - bc->interp->code->base.data);
 
 }
@@ -526,10 +540,9 @@ PARROT_IGNORABLE_RESULT
 opcode_t
 emit_int_arg(bytecode * const bc, int intval) {
     *bc->opcursor = intval;
-
+#if DEBUGBC
     fprintf(stderr, "{%d}", intval);
-
-
+#endif
     return (bc->opcursor++ - bc->interp->code->base.data);
 }
 
