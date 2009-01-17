@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -7,11 +7,12 @@ fp_equality.pasm - floating point equivalency macros
 
 =head1 DESCRIPTION
 
-This file provides two macros to determine if a pair of PIR nums are equivalent.
+This file provides two PIR macros to determine if a pair of floating point numbers are equivalent.
+The same macros are also provided for PASM. 
 
 =cut
 
-.macro fp_eq (  J, K, L )
+.macro fp_eq ( J, K, L )
     set $N10, .J
     set $N11, .K
     sub $N12, $N11, $N10
@@ -23,7 +24,7 @@ This file provides two macros to determine if a pair of PIR nums are equivalent.
 .endm
 
 
-.macro fp_ne(   J,K,L)
+.macro fp_ne ( J, K, L )
     set $N10, .J
     set $N11, .K
     sub $N12, $N11, $N10
@@ -34,7 +35,7 @@ This file provides two macros to determine if a pair of PIR nums are equivalent.
 .label $FPNENOK:
 .endm
 
-.macro fp_eq_pasm (  J, K, L )
+.macro fp_eq_pasm ( J, K, L )
     set N10, .J
     set N11, .K
     sub N12, N11, N10
@@ -46,7 +47,7 @@ This file provides two macros to determine if a pair of PIR nums are equivalent.
 .endm
 
 
-.macro fp_ne_pasm(   J,K,L)
+.macro fp_ne_pasm ( J, K, L )
     set N10, .J
     set N11, .K
     sub N12, N11, N10
