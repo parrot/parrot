@@ -291,7 +291,7 @@ method class_constant_definition($/) {
         PAST::Op.new(
             :pasttype('bind'),
             PAST::Var.new(
-                :name(~$<constant_name>),
+                :name(~$<ident>),
                 :isdecl(1),
                 :scope('package'),
                 :viviself('PhpNull'),
@@ -310,7 +310,7 @@ method namespace_constant_definition($/) {
         PAST::Op.new(
             :pasttype('bind'),
             PAST::Var.new(
-                :name(~$<constant_name>),
+                :name(~$<ident>),
                 :isdecl(1),
                 :scope('package'),
                 :viviself('PhpNull'),

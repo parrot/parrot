@@ -266,7 +266,7 @@ token name {
     | <morename>+            # leading backslash
 }
 
-token morename { <.namespace_separator> <ident> }
+token morename                 { <.namespace_separator> <ident> }
 
 token var_name                 { '$' <ident> }
 
@@ -445,14 +445,14 @@ rule class_definition {
 }
 
 rule class_constant_definition {
-    'const' <constant_name> '=' <literal> <.statement_delimiter>
+    'const' <ident> '=' <literal> <.statement_delimiter>
     {*}
 }
 
 # In PHP 5.3 a constand definition outside a declared namespace is forbidden
 # In Pipp this is not checked
 rule namespace_constant_definition {
-    'const' <constant_name> '=' <literal> <.statement_delimiter>
+    'const' <ident> '=' <literal> <.statement_delimiter>
     {*}
 }
 
