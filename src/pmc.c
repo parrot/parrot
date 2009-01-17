@@ -633,12 +633,6 @@ pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
         else
             return 0;
     }
-    else if (name->vtable->base_type == enum_class_Role)
-        /* This is a bit of a hack for now. Stringification is imprecise, and
-           we sholdn't be relying on that to find unique class IDs in all
-           cases. */
-        return pmc_type(interp, VTABLE_get_string(interp, name));
-
     item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
 
     if (!PMC_IS_NULL(item))
