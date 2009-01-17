@@ -8,8 +8,8 @@ RM_F          = @rm_f@
 BUILD_DIR     = @build_dir@
 RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
-# add new languages here
-# remove obsolete languages here
+# List of languages that are currently managed in the Parrot svn repository
+# When adding or removing languages, please update the list 
 LANGUAGES = \
     abc APL \
     BASIC befunge bf \
@@ -49,7 +49,7 @@ help:
 	@echo ""
 	@echo "  help:          Print this help message."
 	@echo ""
-	@echo "Following languages are available:"
+	@echo "Following languages are available in Parrot's svn repository:"
 	@echo "  $(LANGUAGES)"
 	@echo ""
 	@echo "A particular language <lang> can be built, tested and cleand up"
@@ -58,8 +58,10 @@ help:
 	@echo "  make <lang>.clean"
 	@echo "  make <lang>.realclean"
 	@echo ""
-	@echo "For the status of individual languages see LANGUAGES.STATUS.pod"
+	@echo "For the status of individual languages see"
+	@echo "https://trac.parrot.org/parrot/wiki/Languages."
 	@echo ""
+	@echo "Some languages are managed in other repositories."
 
 # regenerate the Makefile
 Makefile: ../config/gen/makefiles/languages.in
