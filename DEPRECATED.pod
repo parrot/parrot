@@ -7,7 +7,7 @@ has an associated RT or TT ticket.  Each item indicates the last release it's
 guaranteed to appear in.
 
 When deprecated items are removed, all usage of the feature in the
-repository should be updated or removed; including documentation.
+repository should be updated or removed, including documentation.
 
 When deprecating opcodes, in addition to the ticket, be sure to mark the
 opcode with the :deprecated flag; this will allow users to enable deprecation
