@@ -2642,7 +2642,7 @@ YY_RULE_SETUP
                      *   (colon1) (colon2)
                      *
                      * colon1 points to the first colon, colon2 points to the second.
-                     *
+                     */
 
                     /* copy the encoding part */
                     ustr->encoding = dupstrn(lexer, yytext, colon1 - yytext);
