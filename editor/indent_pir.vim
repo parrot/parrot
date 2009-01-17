@@ -1,7 +1,7 @@
 " Description:  PIR indenter
 " Author:   Andrew Rodland <arodland@entermail.net>
 " Maintainer: Jimmy Zhuo <zhuomingliang@yahoo.com.cn>
-" Last Change: 2008 Dec 3
+" Last Change: 2009 Jan 16
 
 " As usual, we want to be alone
 if exists("b:did_indent")
