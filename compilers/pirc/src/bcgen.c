@@ -8,7 +8,7 @@
 
 #include "parrot/parrot.h"
 
-/* #include "parrot/interpreter.h" */
+#include "parrot/interpreter.h"
 
 /* #include "parrot/embed.h" */
 
@@ -731,6 +731,10 @@ find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_s
     STRING       *cur_name;
     size_t        len;
     global_label *outersub;
+    /* we need a Interp called "interp", because of some macros.
+     * needed on Linux. 17-Jan-2009, kjs.
+     */
+    Interp       *interp = bc->interp;
 
 
     /* if sub has no :outer, leave */
@@ -887,6 +891,8 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     int                    subname_index;
     int                    i;              /* for loop iterator */
     PackFile_Constant     *subname_const;
+    /* need a Interp object called "interp", because of some macro expansions. */
+    Interp                *interp = bc->interp;
 
     sub_pmc               = create_sub_pmc(bc, info->iscoroutine, info->instanceof);
     sub                   = PMC_sub(sub_pmc);
