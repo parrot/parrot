@@ -1138,12 +1138,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method', todo => 'TT #184' );
     $P0 = new ['Float']
     $P0 = 0.0
     $P1 = $P0.'acos'()
-    .fp_eq($P1, 0.0, OK1)
+    .fp_eq($P1, 1.57079632, OK1)
     print 'got '
     print $P1
     print ' but '
   OK1:
-    say 'result should be 0.0'
+    say 'result should be 1.57079632'
 
     $P2 = new ['Float']
     $P2 = 0.5
