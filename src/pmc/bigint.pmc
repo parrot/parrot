@@ -36,116 +36,170 @@ typedef struct BIGINT {
     mpz_t b;
 } BIGINT;
 
-#  define BN(x) ((BIGINT *)PMC_struct_val(x))->b
 
 static void
 bigint_init(PARROT_INTERP, PMC *self) {
-    PMC_struct_val(self) = malloc(sizeof (BIGINT));
-    mpz_init(BN(self));
+    Parrot_BigInt_attributes *attrs =
+        mem_allocate_zeroed_typed(Parrot_BigInt_attributes);
+    attrs->bi = mem_allocate_zeroed_typed(BIGINT);
+    mpz_init(attrs->bi->b);
+    PMC_data(self) = attrs;
 }
+
 static void
 bigint_clear(PARROT_INTERP, PMC *self) {
-    mpz_clear(BN(self));
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    mpz_clear(bi->b);
 }
 
 static void
 bigint_set(PARROT_INTERP, PMC *dest, PMC *src) {
-    mpz_clear(BN(dest));
-    mpz_init(BN(dest));
-    mpz_set(BN(dest), BN(src));
+    BIGINT *bi_dest, *bi_src;
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    GETATTR_BigInt_bi(interp, src,  bi_src);
+    mpz_clear(bi_dest->b);
+    mpz_init(bi_dest->b);
+    mpz_set(bi_dest->b, bi_src->b);
 }
 
 static void
 bigint_set_long(PARROT_INTERP, PMC *self, long value) {
-    mpz_set_si(BN(self), value);
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    mpz_set_si(bi->b, value);
 }
 
 static void
 bigint_set_double(PARROT_INTERP, PMC *self, double value) {
-    mpz_set_d(BN(self), value);
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    mpz_set_d(bi->b, value);
 }
 
 static void
 bigint_set_str(PARROT_INTERP, PMC *self, char *value, int base) {
-    mpz_set_str(BN(self), value, base);
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    mpz_set_str(bi->b, value, base);
 }
 
 static BIGNUM*
 bigint_get_self(PARROT_INTERP, PMC *self) {
-    return PMC_struct_val(self);
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    return bi;
 }
 
 static void
 bigint_set_self(PARROT_INTERP, PMC *self, BIGNUM *value) {
-    mpz_set(BN(self), (mpz_srcptr)value);
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    mpz_set(bi->b, (mpz_srcptr)((BIGINT*)value)->b);
 }
 
 static long
 bigint_get_long(PARROT_INTERP, PMC *self) {
-    if (mpz_fits_slong_p(BN(self)))
-        return mpz_get_si(BN(self));
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    if (mpz_fits_slong_p(bi->b))
+        return mpz_get_si(bi->b);
 
     Parrot_ex_throw_from_c_args(interp, NULL, 1, "bigint_get_long: number too big");
 }
 
 static int
 bigint_get_bool(PARROT_INTERP, PMC *self) {
-    if (mpz_sgn(BN(self)) != 0)
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    if (mpz_sgn(bi->b) != 0)
         return 1;
     else
         return 0;
 }
+
 static char *
 bigint_get_string(PARROT_INTERP, PMC *self, int base) {
-    size_t n = mpz_sizeinbase(BN(self), base) + 2;
-    char  *s = (char *)mem_sys_allocate(n);
-    return mpz_get_str(s, base, BN(self));
+    BIGINT *bi;
+    size_t  n;
+    char   *s;
+
+    GETATTR_BigInt_bi(interp, self, bi);
+    n = mpz_sizeinbase(bi->b, base) + 2;
+    s = (char *)mem_sys_allocate(n);
+    return mpz_get_str(s, base, bi->b);
 }
 
 static double
 bigint_get_double(PARROT_INTERP, PMC *self) {
-    return mpz_get_d(BN(self));
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    return mpz_get_d(bi->b);
 }
 
 static void
 bigint_add_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
-    mpz_add(BN(dest), BN(self), BN(value));
+    BIGINT *bi_self, *bi_value, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, value, bi_value);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    mpz_add(bi_dest->b, bi_self->b, bi_value->b);
 }
 
 static void
 bigint_add_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     if (value < 0)
-        mpz_sub_ui(BN(dest), BN(self), (unsigned long int)-value);
+        mpz_sub_ui(bi_dest->b, bi_self->b, (unsigned long int)-value);
     else
-        mpz_add_ui(BN(dest), BN(self), (unsigned long int)value);
+        mpz_add_ui(bi_dest->b, bi_self->b, (unsigned long int)value);
 }
 
 static void
 bigint_sub_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
-    mpz_sub(BN(dest), BN(self), BN(value));
+    BIGINT *bi_self, *bi_value, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, value, bi_value);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    mpz_sub(bi_dest->b, bi_self->b, bi_value->b);
 }
 
 static void
 bigint_sub_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     if (value < 0)
-        mpz_add_ui(BN(dest), BN(self), (unsigned long int)-value);
+        mpz_add_ui(bi_dest->b, bi_self->b, (unsigned long int)-value);
     else
-        mpz_sub_ui(BN(dest), BN(self), (unsigned long int)value);
+        mpz_sub_ui(bi_dest->b, bi_self->b, (unsigned long int)value);
 }
 
 static void
 bigint_mul_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
-    mpz_mul(BN(dest), BN(self), BN(value));
+    BIGINT *bi_self, *bi_value, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, value, bi_value);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    mpz_mul(bi_dest->b, bi_self->b, bi_value->b);
 }
 
 static void
 bigint_mul_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
-    mpz_mul_si(BN(dest), BN(self), value);
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    mpz_mul_si(bi_dest->b, bi_self->b, value);
 }
 
 static void
 bigint_pow_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
-    mpz_pow_ui(BN(dest), BN(self), (unsigned long int)value);
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    mpz_pow_ui(bi_dest->b, bi_self->b, (unsigned long int)value);
 }
 
 static void
@@ -158,110 +212,150 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value) {
 static void
 bigint_check_divide_zero(PARROT_INTERP, PMC *value) {
     /* Throw an exception if we are dividing by zero. */
-    if (mpz_cmp_si(BN(value), 0) == 0)
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, value, bi);
+    if (mpz_cmp_si(bi->b, 0) == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
 static void
 bigint_div_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
+    BIGINT *bi_self, *bi_value, *bi_dest;
     bigint_check_divide_zero(interp, value);
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, value, bi_value);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     /* this is mpz_fdiv_q */
-    mpz_div(BN(dest), BN(self), BN(value));
+    mpz_div(bi_dest->b, bi_self->b, bi_value->b);
 }
 
 static void
 bigint_div_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     int_check_divide_zero(interp, value);
 
     /* this is mpz_fdiv_q */
     if (value < 0) {
-        mpz_div_ui(BN(dest), BN(self), (unsigned long int)-value);
-        mpz_neg(BN(dest), BN(dest));
+        mpz_div_ui(bi_dest->b, bi_self->b, (unsigned long int)-value);
+        mpz_neg(bi_dest->b, bi_dest->b);
     }
     else
-        mpz_div_ui(BN(dest), BN(self), (unsigned long int)value);
+        mpz_div_ui(bi_dest->b, bi_self->b, (unsigned long int)value);
 }
 
 static void
 bigint_fdiv_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
+    BIGINT *bi_self, *bi_value, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, value, bi_value);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     bigint_check_divide_zero(interp, value);
-    mpz_fdiv_q(BN(dest), BN(self), BN(value));
+    mpz_fdiv_q(bi_dest->b, bi_self->b, bi_value->b);
 }
 
 static void
 bigint_fdiv_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     int_check_divide_zero(interp, value);
 
     if (value < 0) {
-        mpz_fdiv_q_ui(BN(dest), BN(self), (unsigned long int)-value);
-        mpz_neg(BN(dest), BN(dest));
+        mpz_fdiv_q_ui(bi_dest->b, bi_self->b, (unsigned long int)-value);
+        mpz_neg(bi_dest->b, bi_dest->b);
     }
     else
-        mpz_fdiv_q_ui(BN(dest), BN(self), (unsigned long int)value);
+        mpz_fdiv_q_ui(bi_dest->b, bi_self->b, (unsigned long int)value);
 }
 
 static void
 bigint_mod_bigint(PARROT_INTERP, PMC *self, PMC *value, PMC *dest) {
+    BIGINT *bi_self, *bi_value, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, value, bi_value);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     bigint_check_divide_zero(interp, value);
-    mpz_mod(BN(dest), BN(self), BN(value));
+    mpz_mod(bi_dest->b, bi_self->b, bi_value->b);
 }
 
 static void
 bigint_mod_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     int_check_divide_zero(interp, value);
 
     if (value < 0) {
-        mpz_mod_ui(BN(dest), BN(self), (unsigned long int)-value);
+        mpz_mod_ui(bi_dest->b, bi_self->b, (unsigned long int)-value);
     }
     else
-        mpz_mod_ui(BN(dest), BN(self), (unsigned long int)value);
+        mpz_mod_ui(bi_dest->b, bi_self->b, (unsigned long int)value);
 }
 
 static INTVAL
 bigint_cmp(PARROT_INTERP, PMC *self, PMC *value) {
-    return mpz_cmp(BN(self), BN(value));
+    BIGINT *bi_self, *bi_value;
+    GETATTR_BigInt_bi(interp, self,  bi_self);
+    GETATTR_BigInt_bi(interp, value, bi_value);
+    return mpz_cmp(bi_self->b, bi_value->b);
 }
 
 static INTVAL
 bigint_cmp_int(PARROT_INTERP, PMC *self, INTVAL value) {
-    return mpz_cmp_si(BN(self), value);
+    BIGINT *bi;
+    GETATTR_BigInt_bi(interp, self, bi);
+    return mpz_cmp_si(bi->b, value);
 }
 
 static void
 bigint_abs(PARROT_INTERP, PMC *self, PMC *dest) {
+    BIGINT *bi_self, *bi_dest;
     VTABLE_morph(interp, dest, enum_class_BigInt);
-    mpz_abs(BN(dest), BN(self));
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    mpz_abs(bi_dest->b, bi_self->b);
 }
 
 static void
 bigint_neg(PARROT_INTERP, PMC *self, PMC *dest) {
+    BIGINT *bi_self, *bi_dest;
     VTABLE_morph(interp, dest, enum_class_BigInt);
-    mpz_neg(BN(dest), BN(self));
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
+    mpz_neg(bi_dest->b, bi_self->b);
 }
 
 static void
 bigint_bitwise_shl_bigint_int(PARROT_INTERP, PMC *self,
                               INTVAL value, PMC *dest)
 {
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
        need to do something sensible with negative values. */
     if (value >= 0)
-        mpz_mul_2exp(BN(dest), BN(self), (unsigned long int)value);
+        mpz_mul_2exp(bi_dest->b, bi_self->b, (unsigned long int)value);
     else
-        mpz_tdiv_q_2exp(BN(dest), BN(self), (unsigned long int)-value);
+        mpz_tdiv_q_2exp(bi_dest->b, bi_self->b, (unsigned long int)-value);
 }
 
 static void
 bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC *self,
                               INTVAL value, PMC *dest)
 {
+    BIGINT *bi_self, *bi_dest;
+    GETATTR_BigInt_bi(interp, self, bi_self);
+    GETATTR_BigInt_bi(interp, dest, bi_dest);
     /* The third args to mpz_mul_2exp and mpz_tdiv_q_2exp are unsigned, so we
        need to do something sensible with negative values. */
     if (value >= 0)
-        mpz_tdiv_q_2exp(BN(dest), BN(self), (unsigned long int)value);
+        mpz_tdiv_q_2exp(bi_dest->b, bi_self->b, (unsigned long int)value);
     else
-        mpz_mul_2exp(BN(dest), BN(self), (unsigned long int)-value);
+        mpz_mul_2exp(bi_dest->b, bi_self->b, (unsigned long int)-value);
 }
 
 #else /* ifdef PARROT_HAS_GMP */
@@ -469,6 +563,7 @@ bigint_bitwise_shr_bigint_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest)
 #endif /* ifdef PARROT_HAS_GMP */
 
 pmclass BigInt {
+    ATTR struct BIGINT * bi; /*bigint val*/
 
 /*
 
@@ -541,8 +636,14 @@ BigInt object.
     }
 
     VTABLE void destroy() {
+        BIGINT                   *bi;
+        Parrot_BigInt_attributes *attrs;
+
         bigint_clear(INTERP, SELF);
-        mem_sys_free(PMC_struct_val(SELF));
+
+        attrs = (Parrot_BigInt_attributes*)PMC_data(SELF);
+        mem_sys_free(attrs->bi);
+        mem_sys_free(attrs);
     }
 
 /*
@@ -920,6 +1021,7 @@ Decrements the integer.
     }
 
     MULTI PMC *divide(BigInt value, PMC *dest) {
+        BIGINT *bi;
         if (dest)
             VTABLE_morph(interp, dest, SELF->vtable->base_type);
         else
@@ -928,8 +1030,9 @@ Decrements the integer.
         bigint_div_bigint(INTERP, SELF, value, dest);
 #if 0
         /* to downgrade or not that's the question */
-        if (mpz_fits_slong_p(BN(dest))) {
-            long iresult = mpz_get_si(BN(dest));
+        GETATTR_BigInt_bi(interp, dest, bi);
+        if (mpz_fits_slong_p(bi->b)) {
+            long iresult = mpz_get_si(bi->b);
             VTABLE_morph(interp, dest, enum_class_Integer);
             VTABLE_set_integer_native(interp, dest, iresult);
         }
