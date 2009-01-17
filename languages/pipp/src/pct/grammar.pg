@@ -238,14 +238,12 @@ rule var_assign {
 
 
 # identifiers
-#
-token class_name               { <ident> }
+
+token class_name {
+    <ident>
+}
 
 token constant_name            { <name> }
-
-token class_constant_accessor  { '::' }
-
-token static_method_accessor   { '::' }
 
 token function_name            { <ident> }
 
@@ -345,7 +343,7 @@ token constant {
 }
 
 token class_constant {
-    <class_name> <.class_constant_accessor> <constant_name>
+    <class_name> '::' <constant_name>
     {*}
 }
 
