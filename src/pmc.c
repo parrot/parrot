@@ -620,17 +620,25 @@ pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
     PMC * item;
 
     if (name->vtable->base_type == enum_class_NameSpace) {
+        /* We need to convert the NameSpace to a ResizableStringArray. The
+           get_name method does this for now, but eventually we should be
+           able to do a morph VTABLE call instead */
         Parrot_PCCINVOKE(interp, name, CONST_STRING(interp, "get_name"), "->P",  &name);
-        /* lop off the HLL namespace */
-        PARROT_ASSERT(name->vtable->base_type == enum_class_ResizableStringArray);
 
-        /* if it's the root namespace, the array will be empty so don't
-           try to do a shift here */
+        /* We need to chop off the HLL namespace. If it is the root
+           namespace, the array will be empty so don't try to do a shift
+           here */
         if (VTABLE_get_integer(interp, name) > 0)
             VTABLE_shift_pmc(interp, name);
         else
             return 0;
     }
+    else if (name->vtable->base_type == enum_class_Role)
+        /* This is a bit of a hack for now. Stringification is imprecise, and
+           we sholdn't be relying on that to find unique class IDs in all
+           cases. */
+        return pmc_type(interp, VTABLE_get_string(interp, name));
+
     item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
 
     if (!PMC_IS_NULL(item))

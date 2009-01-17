@@ -200,7 +200,6 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
             case enum_class_NameSpace:
                 classobj = VTABLE_get_class(interp, key);
                 break;
-
             case enum_class_String:
             case enum_class_Key:
             case enum_class_ResizableStringArray:
@@ -219,28 +218,19 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         }
     }
 
+    /* If the PMCProxy doesn't exist yet for the given key, we look up the
+       type ID here and create a new one */
     if (PMC_IS_NULL(classobj)) {
         /* Look up a low-level class and create a proxy */
-        INTVAL type;
-        const INTVAL base_type = key->vtable->base_type;
-
-        /* XXX TT#182: This is a hack! We should be able to treat all
-           PMC types the same through pmc_type_p or some interface to it */
-        if (base_type == enum_class_Key
-         || base_type == enum_class_ResizableStringArray
-         || base_type == enum_class_String
-         || base_type == enum_class_NameSpace)
-            type = pmc_type_p(interp, key);
-        else
-            type = pmc_type(interp, VTABLE_get_string(interp, key));
+        const INTVAL type = pmc_type_p(interp, key);
 
         /* Reject invalid type numbers */
         if (type > interp->n_vtable_max || type <= 0)
-            return PMCNULL;
+            classobj = PMCNULL;
         else {
-             PMC * const type_num = pmc_new(interp, enum_class_Integer);
-             VTABLE_set_integer_native(interp, type_num, type);
-             classobj = pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            PMC * const type_num = pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, type_num, type);
+            classobj = pmc_new_init(interp, enum_class_PMCProxy, type_num);
         }
     }
 

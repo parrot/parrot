@@ -502,7 +502,8 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
             }
             default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
-                    "Invalid namespace key in get_pointer_keyed");
+                    "Invalid namespace key of type '%S' in get_pointer_keyed",
+                    key->vtable->whoami);
         }
     }
 
