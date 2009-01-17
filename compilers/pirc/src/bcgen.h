@@ -125,7 +125,10 @@ int add_num_const(bytecode * const bc, FLOATVAL f);
 
 */
 
-
+/* forward declaration of lexer_state struct. In the future, this parameter should
+ * go, so that this forward declaration can go too.
+ */
+struct lexer_state;
 
 int add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas,
                 struct lexer_state * const lexer);
