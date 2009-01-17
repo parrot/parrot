@@ -1132,7 +1132,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method' );
+pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method', todo => 'TT #184' );
 .include 'fp_equality.pasm'
 .sub main :main
     $P0 = new ['Float']
