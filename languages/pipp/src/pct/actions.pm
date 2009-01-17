@@ -28,18 +28,26 @@ method TOP($/, $key) {
             '$_FILES', '$_COOKIE', '$_SESSION', '$_REQUEST', '$_ENV' );
 
     if $key eq 'open' {
-        my $block := PAST::Block.new(
-                         :node($/),
-                         :hll('pipp')
-                     );
+        my $main := PAST::Block.new(:node($/), :hll('pipp'));
+
+        # Create the main startup block.
+        # This makes sure that needed libs are loaded
+        $main.loadinit().push(
+            PAST::Op.new( :inline('$P0 = compreg "Pipp"',
+                                  'unless null $P0 goto have_pipp',
+                                  'load_bytecode "pipp.pbc"',
+                                  'have_pipp:')
+            )
+        );
+
 
         # by default all symbols are lexical
-        $block.symbol_defaults( :scope('lexical') );
+        $main.symbol_defaults( :scope('lexical') );
 
         # set up scope 'package' for the superglobals
-        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+        for ( @?SUPER_GLOBALS ) { $main.symbol( :scope('package'), $_ ); }
 
-        @?BLOCK.unshift($block);
+        @?BLOCK.unshift($main);
     }
     else {
         # retrieve the block created in the "if" section in this method.
