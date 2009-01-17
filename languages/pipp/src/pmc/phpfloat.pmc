@@ -26,6 +26,7 @@ pmclass PhpFloat
     group    php_group
     hll      PHP
     maps     Float {
+    ATTR FLOATVAL fv;
 
 /*
 
@@ -87,7 +88,7 @@ Return a representation of this float in the same format as PHP's serialize func
 */
     METHOD acosh() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC_num_val(d) = acosh(PMC_num_val(SELF));
+        SET_ATTR_fv(INTERP, d, acosh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
@@ -100,7 +101,7 @@ Return a representation of this float in the same format as PHP's serialize func
 */
     METHOD asinh() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC_num_val(d) = asinh(PMC_num_val(SELF));
+        SET_ATTR_fv(INTERP, d, asinh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
@@ -113,7 +114,7 @@ Return a representation of this float in the same format as PHP's serialize func
 */
     METHOD atanh() {
         PMC * const d  = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        PMC_num_val(d) = atanh(PMC_num_val(SELF));
+        SET_ATTR_fv(INTERP, d, atanh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
