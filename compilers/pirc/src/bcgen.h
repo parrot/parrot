@@ -79,6 +79,7 @@ typedef struct sub_info {
 
 bytecode *new_bytecode(Interp *interp, char const * const filename);
 
+void destroy_bytecode(bytecode * bc);
 
 void create_codesegment(bytecode * const bc, int codesize);
 
