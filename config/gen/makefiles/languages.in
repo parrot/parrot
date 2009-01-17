@@ -69,7 +69,18 @@ help:
 	@echo ""
 	@echo "  co-all:        Try to fetch externally managed languages"
 	@echo ""
+	@echo "  co-eclectus:   Try to fetch eclectus"
+	@echo ""
+	@echo "  co-gil:        Try to fetch gil"
+	@echo ""
 	@echo "  co-hq9plus:    Try to fetch HQ9+"
+	@echo ""
+	@echo "  co-pjs:        Try to fetch PJS"
+	@echo ""
+	@echo "  co-primitivearc: Try to fetch primitivearc"
+	@echo ""
+	@echo "  co-tcl:        Try to fetch Partcl"
+	@echo ""
 
 # regenerate the Makefile
 Makefile: ../config/gen/makefiles/languages.in
