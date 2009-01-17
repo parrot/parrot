@@ -494,10 +494,13 @@ Zcode.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-hq9plus co-tcl
+co-all: co-eclectus co-gil co-hq9plus co-tcl
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
+
+co-gil:
+	- $(GIT) clone 'git:////github.com/tene/gil.git'
 
 co-hq9plus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
