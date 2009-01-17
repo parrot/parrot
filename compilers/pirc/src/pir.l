@@ -64,7 +64,6 @@ are processed by a different preprocessor; see F<hdocprep.l>.
 #include <ctype.h>
 #include "pirparser.h"
 #include "pircompiler.h"
-#include "piryy.h"
 #include "pirmacro.h"
 #include "pirerr.h"
 

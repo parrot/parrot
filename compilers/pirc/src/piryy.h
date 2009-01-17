@@ -23,6 +23,7 @@ typedef void * yyscan_t;
 
 int yypirparse(yyscan_t yyscanner, struct lexer_state * const lexer);
 
+void init_scanner_state(yyscan_t yyscanner);
 
 int yypirget_lineno(yyscan_t yyscanner);
 

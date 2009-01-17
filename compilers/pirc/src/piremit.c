@@ -156,7 +156,7 @@ print_constant(lexer_state * const lexer, constant * const c) {
             fprintf(out, "\"%s\"", c->val.pval);
             break;
         case USTRING_VAL:
-            fprintf(out, "%c:\"%s\"", c->val.ustr->charset, c->val.ustr->contents);
+            fprintf(out, "%s:\"%s\"", c->val.ustr->charset, c->val.ustr->contents);
             break;
         default:
             panic(lexer, "Unknown type detected in print_constant()");

@@ -1401,29 +1401,29 @@ static yyconst flex_int32_t yy_rule_can_match_eol[211] =
 
 static yyconst flex_int16_t yy_rule_linenum[210] =
     {   0,
-      227,  249,  251,  253,  258,  259,  260,  261,  262,  263,
-      264,  265,  266,  267,  268,  269,  271,  272,  273,  274,
-      276,  277,  278,  279,  280,  281,  282,  283,  284,  285,
-      286,  287,  289,  294,  295,  297,  298,  299,  300,  301,
-      302,  303,  304,  305,  306,  307,  309,  310,  311,  312,
-      314,  315,  316,  317,  319,  320,  321,  322,  323,  325,
-      326,  327,  328,  329,  330,  331,  332,  333,  335,  336,
-      337,  338,  339,  340,  341,  342,  343,  344,  345,  346,
-      347,  348,  349,  350,  351,  352,  355,  362,  363,  364,
-      365,  366,  367,  368,  369,  370,  371,  372,  373,  374,
+      226,  248,  250,  252,  257,  258,  259,  260,  261,  262,
+      263,  264,  265,  266,  267,  268,  270,  271,  272,  273,
+      275,  276,  277,  278,  279,  280,  281,  282,  283,  284,
+      285,  286,  288,  293,  294,  296,  297,  298,  299,  300,
+      301,  302,  303,  304,  305,  306,  308,  309,  310,  311,
+      313,  314,  315,  316,  318,  319,  320,  321,  322,  324,
+      325,  326,  327,  328,  329,  330,  331,  332,  334,  335,
+      336,  337,  338,  339,  340,  341,  342,  343,  344,  345,
+      346,  347,  348,  349,  350,  351,  354,  361,  362,  363,
+      364,  365,  366,  367,  368,  369,  370,  371,  372,  373,
 
-      375,  377,  378,  379,  380,  381,  382,  383,  384,  386,
-      390,  407,  412,  441,  489,  490,  491,  492,  494,  499,
-      511,  539,  540,  541,  542,  543,  545,  553,  604,  617,
-      639,  644,  649,  656,  657,  672,  677,  678,  683,  684,
-      685,  687,  703,  757,  785,  790,  795,  796,  797,  798,
-      803,  814,  815,  817,  819,  830,  844,  849,  850,  851,
-      852,  854,  869,  883,  912,  937,  939,  944,  954,  959,
-      977,  983,  990, 1023, 1025, 1030, 1066, 1067, 1068, 1070,
-     1071, 1072, 1073, 1074, 1075, 1077, 1078, 1079, 1081, 1086,
-     1091, 1092, 1095, 1129, 1134, 1137, 1138, 1139, 1140, 1142,
+      374,  376,  377,  378,  379,  380,  381,  382,  383,  385,
+      389,  406,  411,  440,  488,  489,  490,  491,  493,  498,
+      510,  538,  539,  540,  541,  542,  544,  552,  603,  616,
+      638,  643,  648,  655,  656,  671,  676,  677,  682,  683,
+      684,  686,  702,  756,  784,  789,  794,  795,  796,  797,
+      802,  813,  814,  816,  818,  829,  843,  848,  849,  850,
+      851,  853,  868,  882,  911,  936,  938,  943,  953,  958,
+      976,  982,  989, 1022, 1024, 1029, 1065, 1066, 1067, 1069,
+     1070, 1071, 1072, 1073, 1074, 1076, 1077, 1078, 1080, 1085,
+     1090, 1091, 1094, 1128, 1133, 1136, 1137, 1138, 1139, 1141,
 
-     1147, 1148, 1149, 1150, 1151, 1153, 1158, 1160, 1162
+     1146, 1147, 1148, 1149, 1150, 1152, 1157, 1159, 1161
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -1463,7 +1463,6 @@ are processed by a different preprocessor; see F<hdocprep.l>.
 #include <ctype.h>
 #include "pirparser.h"
 #include "pircompiler.h"
-#include "piryy.h"
 #include "pirmacro.h"
 #include "pirerr.h"
 
@@ -1544,7 +1543,7 @@ static int restore_filestate(yyscan_t yyscanner);
 
 /* The PASM state is an exclusive state, recognizing ONLY PASM tokens. */
 
-#line 1548 "pirlexer.c"
+#line 1547 "pirlexer.c"
 
 #define INITIAL 0
 #define MACROHEAD 1
@@ -1850,11 +1849,11 @@ YY_DECL
     struct yyguts_t * yyg = (struct yyguts_t*)yyscanner;
 
 /* %% [7.0] user's declarations go here */
-#line 224 "pir.l"
+#line 223 "pir.l"
 
 
 
-#line 1858 "pirlexer.c"
+#line 1857 "pirlexer.c"
 
     yylval = yylval_param;
 
@@ -1981,7 +1980,7 @@ do_action:  /* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 227 "pir.l"
+#line 226 "pir.l"
 { /* only when the scanning starts, is this state used. Only a single
                          * character is read, pushed back, and then, depending on the
                          * lexer flags, either PASM or PIR mode (INITIAL state) is activated.
@@ -2006,19 +2005,19 @@ YY_RULE_SETUP
     YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 249 "pir.l"
+#line 248 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 251 "pir.l"
+#line 250 "pir.l"
 { /* ignore line comments */ }
     YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
-#line 253 "pir.l"
+#line 252 "pir.l"
 { /* a set of continuous newlines yields a single newline token. */
                     yylval->sval = "\n";
                     return TK_NL;
@@ -2026,419 +2025,419 @@ YY_RULE_SETUP
     YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 258 "pir.l"
+#line 257 "pir.l"
 { return TK_ASSIGN_USHIFT; }
     YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 259 "pir.l"
+#line 258 "pir.l"
 { return TK_USHIFT; }
     YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 260 "pir.l"
+#line 259 "pir.l"
 { return TK_ASSIGN_RSHIFT; }
     YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 261 "pir.l"
+#line 260 "pir.l"
 { return TK_RSHIFT; }
     YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 262 "pir.l"
+#line 261 "pir.l"
 { return TK_LSHIFT; }
     YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 263 "pir.l"
+#line 262 "pir.l"
 { return TK_ARROW; }
     YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 264 "pir.l"
+#line 263 "pir.l"
 { return TK_EQ; }
     YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 265 "pir.l"
+#line 264 "pir.l"
 { return TK_NE; }
     YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 266 "pir.l"
+#line 265 "pir.l"
 { return TK_LE; }
     YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 267 "pir.l"
+#line 266 "pir.l"
 { return TK_GE; }
     YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 268 "pir.l"
+#line 267 "pir.l"
 { return TK_LT; }
     YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 269 "pir.l"
+#line 268 "pir.l"
 { return TK_GT; }
     YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 271 "pir.l"
+#line 270 "pir.l"
 { return TK_FDIV; }
     YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 272 "pir.l"
+#line 271 "pir.l"
 { return TK_AND; }
     YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 273 "pir.l"
+#line 272 "pir.l"
 { return TK_OR; }
     YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 274 "pir.l"
+#line 273 "pir.l"
 { return TK_XOR; }
     YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 276 "pir.l"
+#line 275 "pir.l"
 { return '+'; }
     YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 277 "pir.l"
+#line 276 "pir.l"
 { return '%'; }
     YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 278 "pir.l"
+#line 277 "pir.l"
 { return '*'; }
     YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 279 "pir.l"
+#line 278 "pir.l"
 { return '/'; }
     YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 280 "pir.l"
+#line 279 "pir.l"
 { return '!'; }
     YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 281 "pir.l"
+#line 280 "pir.l"
 { return '~'; }
     YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 282 "pir.l"
+#line 281 "pir.l"
 { return '-'; }
     YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 283 "pir.l"
+#line 282 "pir.l"
 { return '('; }
     YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 284 "pir.l"
+#line 283 "pir.l"
 { return ')'; }
     YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 285 "pir.l"
+#line 284 "pir.l"
 { return ','; }
     YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 286 "pir.l"
+#line 285 "pir.l"
 { return '['; }
     YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 287 "pir.l"
+#line 286 "pir.l"
 { return ']'; }
     YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 289 "pir.l"
+#line 288 "pir.l"
 { /* if the dot is surrounded by whitespace, it's a concatenation operator */
                     return TK_CONC;
                   }
     YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 294 "pir.l"
+#line 293 "pir.l"
 { return '='; }
     YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 295 "pir.l"
+#line 294 "pir.l"
 { return ';'; }
     YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 297 "pir.l"
+#line 296 "pir.l"
 { return TK_ASSIGN_INC; }
     YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 298 "pir.l"
+#line 297 "pir.l"
 { return TK_ASSIGN_DEC; }
     YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 299 "pir.l"
+#line 298 "pir.l"
 { return TK_ASSIGN_DIV; }
     YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 300 "pir.l"
+#line 299 "pir.l"
 { return TK_ASSIGN_MUL; }
     YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 301 "pir.l"
+#line 300 "pir.l"
 { return TK_ASSIGN_MOD; }
     YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 302 "pir.l"
+#line 301 "pir.l"
 { return TK_ASSIGN_POW; }
     YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 303 "pir.l"
+#line 302 "pir.l"
 { return TK_ASSIGN_BOR; }
     YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 304 "pir.l"
+#line 303 "pir.l"
 { return TK_ASSIGN_BAND; }
     YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 305 "pir.l"
+#line 304 "pir.l"
 { return TK_ASSIGN_FDIV; }
     YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 306 "pir.l"
+#line 305 "pir.l"
 { return TK_ASSIGN_BNOT; }
     YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 307 "pir.l"
+#line 306 "pir.l"
 { return TK_ASSIGN_CONC; }
     YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 309 "pir.l"
+#line 308 "pir.l"
 { return TK_IF; }
     YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 310 "pir.l"
+#line 309 "pir.l"
 { return TK_GOTO; }
     YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 311 "pir.l"
+#line 310 "pir.l"
 { return TK_UNLESS; }
     YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 312 "pir.l"
+#line 311 "pir.l"
 { return TK_NULL; }
     YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 314 "pir.l"
+#line 313 "pir.l"
 { return TK_INT; }
     YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 315 "pir.l"
+#line 314 "pir.l"
 { return TK_NUM; }
     YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 316 "pir.l"
+#line 315 "pir.l"
 { return TK_PMC; }
     YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 317 "pir.l"
+#line 316 "pir.l"
 { return TK_STRING; }
     YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 319 "pir.l"
+#line 318 "pir.l"
 { return TK_ANNOTATE; }
     YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 320 "pir.l"
+#line 319 "pir.l"
 { return TK_SET_ARG; }
     YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 321 "pir.l"
+#line 320 "pir.l"
 { return TK_CONST; }
     YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 322 "pir.l"
+#line 321 "pir.l"
 { return TK_END; }
     YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 323 "pir.l"
+#line 322 "pir.l"
 { return TK_FILE; }
     YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 325 "pir.l"
+#line 324 "pir.l"
 { return TK_GET_RESULTS; }
     YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 326 "pir.l"
+#line 325 "pir.l"
 { return TK_GLOBALCONST; }
     YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 327 "pir.l"
+#line 326 "pir.l"
 { return TK_HLL; }
     YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 328 "pir.l"
+#line 327 "pir.l"
 { return TK_HLL_MAP; }
     YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 329 "pir.l"
+#line 328 "pir.l"
 { return TK_INVOCANT; }
     YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 330 "pir.l"
+#line 329 "pir.l"
 { return TK_LEX; }
     YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 331 "pir.l"
+#line 330 "pir.l"
 { return TK_LINE; }
     YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 332 "pir.l"
+#line 331 "pir.l"
 { return TK_LOADLIB; }
     YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 333 "pir.l"
+#line 332 "pir.l"
 { return TK_LOCAL; }
     YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 335 "pir.l"
+#line 334 "pir.l"
 { return TK_METH_CALL; }
     YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 336 "pir.l"
+#line 335 "pir.l"
 { return TK_NAMESPACE; }
     YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 337 "pir.l"
+#line 336 "pir.l"
 { return TK_NCI_CALL; }
     YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 338 "pir.l"
+#line 337 "pir.l"
 { return TK_PARAM; }
     YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 339 "pir.l"
+#line 338 "pir.l"
 { return TK_BEGIN_CALL; }
     YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 340 "pir.l"
+#line 339 "pir.l"
 { return TK_BEGIN_RETURN; }
     YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 341 "pir.l"
+#line 340 "pir.l"
 { return TK_BEGIN_YIELD; }
     YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 342 "pir.l"
+#line 341 "pir.l"
 { return TK_CALL; }
     YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 343 "pir.l"
+#line 342 "pir.l"
 { return TK_END_CALL; }
     YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 344 "pir.l"
+#line 343 "pir.l"
 { return TK_END_RETURN; }
     YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 345 "pir.l"
+#line 344 "pir.l"
 { return TK_END_YIELD; }
     YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 346 "pir.l"
+#line 345 "pir.l"
 { return TK_GET_RESULT; }
     YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 347 "pir.l"
+#line 346 "pir.l"
 { return TK_RETURN; }
     YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 348 "pir.l"
+#line 347 "pir.l"
 { return TK_SUB; }
     YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 349 "pir.l"
+#line 348 "pir.l"
 { return TK_YIELD; }
     YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 350 "pir.l"
+#line 349 "pir.l"
 { return TK_SET_RETURN; }
     YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 351 "pir.l"
+#line 350 "pir.l"
 { return TK_SET_YIELD; }
     YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 352 "pir.l"
+#line 351 "pir.l"
 { return TK_TAILCALL; }
     YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 355 "pir.l"
+#line 354 "pir.l"
 { /* make sure these are not used outside macro defs */
                     yypirerror(yyscanner, yypirget_extra(yyscanner),
                                "cannot use '%s' outside of macro definitions", yytext);
@@ -2446,124 +2445,124 @@ YY_RULE_SETUP
     YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 362 "pir.l"
+#line 361 "pir.l"
 { return TK_FLAG_ANON; }
     YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 363 "pir.l"
+#line 362 "pir.l"
 { return TK_FLAG_INIT; }
     YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 364 "pir.l"
+#line 363 "pir.l"
 { return TK_FLAG_LOAD; }
     YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 365 "pir.l"
+#line 364 "pir.l"
 { return TK_FLAG_POSTCOMP; }
     YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 366 "pir.l"
+#line 365 "pir.l"
 { return TK_FLAG_IMMEDIATE; }
     YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 367 "pir.l"
+#line 366 "pir.l"
 { return TK_FLAG_MAIN; }
     YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 368 "pir.l"
+#line 367 "pir.l"
 { return TK_FLAG_METHOD; }
     YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 369 "pir.l"
+#line 368 "pir.l"
 { return TK_FLAG_LEX; }
     YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 370 "pir.l"
+#line 369 "pir.l"
 { return TK_FLAG_OUTER; }
     YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 371 "pir.l"
+#line 370 "pir.l"
 { return TK_FLAG_VTABLE; }
     YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 372 "pir.l"
+#line 371 "pir.l"
 { return TK_FLAG_MULTI; }
     YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 373 "pir.l"
+#line 372 "pir.l"
 { return TK_FLAG_SUBID; }
     YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 374 "pir.l"
+#line 373 "pir.l"
 { return TK_FLAG_INSTANCEOF; }
     YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 375 "pir.l"
+#line 374 "pir.l"
 { return TK_FLAG_NSENTRY; }
     YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 377 "pir.l"
+#line 376 "pir.l"
 { return TK_FLAG_UNIQUE_REG; }
     YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 378 "pir.l"
+#line 377 "pir.l"
 { return TK_FLAG_OPTIONAL; }
     YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 379 "pir.l"
+#line 378 "pir.l"
 { return TK_FLAG_OPT_FLAG; }
     YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 380 "pir.l"
+#line 379 "pir.l"
 { return TK_FLAG_SLURPY; }
     YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 381 "pir.l"
+#line 380 "pir.l"
 { return TK_FLAG_NAMED; }
     YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 382 "pir.l"
+#line 381 "pir.l"
 { return TK_FLAG_FLAT; }
     YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 383 "pir.l"
+#line 382 "pir.l"
 { return TK_FLAG_INVOCANT; }
     YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 384 "pir.l"
+#line 383 "pir.l"
 { return TK_FLAG_LOOKAHEAD; }
     YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 386 "pir.l"
+#line 385 "pir.l"
 { yypirerror(yyscanner, yypirget_extra(yyscanner),
                                "unrecognized flag: '%s'", yytext);
                   }
     YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 390 "pir.l"
+#line 389 "pir.l"
 { /* XXX this is a bit hacky. First the string is unescaped, but that
                      * returns a STRING * object; that's not what we want at this point.
                      * So, convert it back to a C string, and return that. Later, that
@@ -2583,7 +2582,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 407 "pir.l"
+#line 406 "pir.l"
 { /* copy the string, remove the quotes. */
                     yylval->sval = dupstrn(yypirget_extra(yyscanner), yytext + 1, yyleng - 2);
                     return TK_STRINGC;
@@ -2591,7 +2590,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 412 "pir.l"
+#line 411 "pir.l"
 { /* XXX these double-quoted strings are not unescaped (yet) */
                     /* parse yytext, which contains the charset, a ':', and the quoted string */
                     char        *colon = strchr(yytext, ':');
@@ -2623,7 +2622,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 441 "pir.l"
+#line 440 "pir.l"
 { /* XXX these double-quoted strings are not unescaped (yet) */
                     /* parse yytext, which contains the encoding, a ':', a charset,
                      * a ':', and the quoted string
@@ -2673,27 +2672,27 @@ YY_RULE_SETUP
     YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 489 "pir.l"
+#line 488 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_PREG; }
     YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 490 "pir.l"
+#line 489 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_SREG; }
     YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 491 "pir.l"
+#line 490 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_NREG; }
     YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 492 "pir.l"
+#line 491 "pir.l"
 { yylval->ival = atoi(yytext + 2); return TK_IREG; }
     YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 494 "pir.l"
+#line 493 "pir.l"
 { /* make the label Id available in the parser. remove the ":" first. */
                     yylval->sval = dupstrn(yypirget_extra(yyscanner), yytext, yyleng - 1);
                     return TK_LABEL;
@@ -2701,7 +2700,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 499 "pir.l"
+#line 498 "pir.l"
 { /* give a warning when using PASM registers as PIR identifiers */
                     lexer_state * const lexer = yypirget_extra(yyscanner);
 
@@ -2716,7 +2715,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 511 "pir.l"
+#line 510 "pir.l"
 { /* identifier; can be a global (sub or const), local or parrot op */
                     lexer_state * const lexer = yypirget_extra(yyscanner);
                     constdecl   * const c = find_global_constant(lexer, yytext);
@@ -2747,27 +2746,27 @@ YY_RULE_SETUP
     YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 539 "pir.l"
+#line 538 "pir.l"
 { yylval->dval = atof(yytext); return TK_NUMC; }
     YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 540 "pir.l"
+#line 539 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 541 "pir.l"
+#line 540 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 542 "pir.l"
+#line 541 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 543 "pir.l"
+#line 542 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 127:
@@ -2775,7 +2774,7 @@ case 127:
 yyg->yy_c_buf_p = yy_cp = yy_bp + 1;
 YY_DO_BEFORE_ACTION; /* set up yytext again */
 YY_RULE_SETUP
-#line 545 "pir.l"
+#line 544 "pir.l"
 { /* Make sure the dot is followed by a character that
                      * starts a method object. $ for registers,
                      * quotes for quoted strings, and letters for identifiers.
@@ -2787,7 +2786,7 @@ YY_RULE_SETUP
 case 128:
 /* rule 128 can match eol */
 YY_RULE_SETUP
-#line 553 "pir.l"
+#line 552 "pir.l"
 { yypirerror(yyscanner, yypirget_extra(yyscanner),
                     "no space allowed before a methodcall dot, "
                     "or space expected after the '.' operator");
@@ -2810,7 +2809,7 @@ YY_RULE_SETUP
 
 
 case YY_STATE_EOF(SCANSTR):
-#line 575 "pir.l"
+#line 574 "pir.l"
 { /* switch back from .macro_const buffer to file. */
                      lexer_state * const lexer = yypirget_extra(yyscanner);
                      yy_pop_state(yyscanner);
@@ -2818,7 +2817,7 @@ case YY_STATE_EOF(SCANSTR):
                    }
     YY_BREAK
 case YY_STATE_EOF(SCANMACRO):
-#line 581 "pir.l"
+#line 580 "pir.l"
 { /* override the default <<EOF>> action; go back to normal state and
                       * switch back to the saved file.
                       */
@@ -2844,7 +2843,7 @@ case YY_STATE_EOF(SCANMACRO):
     YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 604 "pir.l"
+#line 603 "pir.l"
 { /* when scanning a macro body, the @ marker indicates the {IDENT} must
                           * be munged.
                           */
@@ -2855,14 +2854,14 @@ YY_RULE_SETUP
                        }
     YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 613 "pir.l"
+#line 612 "pir.l"
 { /* end of file, stop scanning. */
                     yyterminate();
                   }
     YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 617 "pir.l"
+#line 616 "pir.l"
 { /* any character not covered in the rules above is an error. */
                     yypirerror(yyscanner, yypirget_extra(yyscanner),
                                "unexpected character: '%c'", yytext[0]);
@@ -2883,7 +2882,7 @@ YY_RULE_SETUP
 
 case 131:
 YY_RULE_SETUP
-#line 639 "pir.l"
+#line 638 "pir.l"
 {
                                yy_push_state(MACROCONST, yyscanner);
                                return TK_MACRO_CONST;
@@ -2891,7 +2890,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 644 "pir.l"
+#line 643 "pir.l"
 {
                                yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
                                return TK_IDENT;
@@ -2899,7 +2898,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 649 "pir.l"
+#line 648 "pir.l"
 {
                                /* only these tokens can be macro constant values */
                                yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
@@ -2909,19 +2908,19 @@ YY_RULE_SETUP
     YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 656 "pir.l"
+#line 655 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 657 "pir.l"
+#line 656 "pir.l"
 {
                                yypirerror(yyscanner, yypirget_extra(yyscanner),
                                           "unknown character: '%c'", yytext[0]);
                              }
     YY_BREAK
 case YY_STATE_EOF(MACROCONST):
-#line 661 "pir.l"
+#line 660 "pir.l"
 {
                                yypirerror(yyscanner, yypirget_extra(yyscanner),
                                           "read end of file during .macro_const definition");
@@ -2934,7 +2933,7 @@ case YY_STATE_EOF(MACROCONST):
 
 case 136:
 YY_RULE_SETUP
-#line 672 "pir.l"
+#line 671 "pir.l"
 { /* start a macro definition */
                                yy_push_state(MACROHEAD, yyscanner);
                                return TK_MACRO;
@@ -2942,12 +2941,12 @@ YY_RULE_SETUP
     YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 677 "pir.l"
+#line 676 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 678 "pir.l"
+#line 677 "pir.l"
 {
                                yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
                                return TK_IDENT;
@@ -2955,23 +2954,23 @@ YY_RULE_SETUP
     YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 683 "pir.l"
+#line 682 "pir.l"
 { return '('; }
     YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 684 "pir.l"
+#line 683 "pir.l"
 { return ')'; }
     YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 685 "pir.l"
+#line 684 "pir.l"
 { return ','; }
     YY_BREAK
 case 142:
 /* rule 142 can match eol */
 YY_RULE_SETUP
-#line 687 "pir.l"
+#line 686 "pir.l"
 { /* a set of continuous newlines yields a single newline token. */
                                yy_pop_state(yyscanner); /* remove MACROHEAD state */
                                yy_push_state(MACROBODY, yyscanner); /* enter MACROBODY state */
@@ -2989,7 +2988,7 @@ YY_RULE_SETUP
 
 case 143:
 YY_RULE_SETUP
-#line 703 "pir.l"
+#line 702 "pir.l"
 { /* .foo; it can be a macro, macro_local, or just $P0.foo(),
                                 * but we need to check that.
                                 */
@@ -3046,7 +3045,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 144:
 YY_RULE_SETUP
-#line 757 "pir.l"
+#line 756 "pir.l"
 { /* expand a .macro_const or parameter in argument list */
                                lexer_state * const lexer = yypirget_extra(yyscanner);
                                macro_def   * const macro = find_macro(lexer->macros, yytext + 1);
@@ -3077,7 +3076,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 145:
 YY_RULE_SETUP
-#line 785 "pir.l"
+#line 784 "pir.l"
 {
                                yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
                                return TK_MACRO_ARG_IDENT;
@@ -3085,7 +3084,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 146:
 YY_RULE_SETUP
-#line 790 "pir.l"
+#line 789 "pir.l"
 {
                                yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
                                return TK_MACRO_ARG_OTHER;
@@ -3093,22 +3092,22 @@ YY_RULE_SETUP
     YY_BREAK
 case 147:
 YY_RULE_SETUP
-#line 795 "pir.l"
+#line 794 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 148:
 YY_RULE_SETUP
-#line 796 "pir.l"
+#line 795 "pir.l"
 { return ','; }
     YY_BREAK
 case 149:
 YY_RULE_SETUP
-#line 797 "pir.l"
+#line 796 "pir.l"
 { return '('; }
     YY_BREAK
 case 150:
 YY_RULE_SETUP
-#line 798 "pir.l"
+#line 797 "pir.l"
 {
                                yy_pop_state(yyscanner); /* leave MACROEXPAND state */
                                return ')';
@@ -3116,14 +3115,14 @@ YY_RULE_SETUP
     YY_BREAK
 case 151:
 YY_RULE_SETUP
-#line 803 "pir.l"
+#line 802 "pir.l"
 {
                                yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
                                return TK_MACRO_ARG_OTHER;
                              }
     YY_BREAK
 case YY_STATE_EOF(STRINGEXPAND):
-#line 808 "pir.l"
+#line 807 "pir.l"
 {
                                lexer_state * const lexer = yypirget_extra(yyscanner);
                                yy_pop_state(yyscanner);
@@ -3132,23 +3131,23 @@ case YY_STATE_EOF(STRINGEXPAND):
     YY_BREAK
 case 152:
 YY_RULE_SETUP
-#line 814 "pir.l"
+#line 813 "pir.l"
 { return '{'; }
     YY_BREAK
 case 153:
 YY_RULE_SETUP
-#line 815 "pir.l"
+#line 814 "pir.l"
 { return '}'; }
     YY_BREAK
 case 154:
 /* rule 154 can match eol */
 YY_RULE_SETUP
-#line 817 "pir.l"
+#line 816 "pir.l"
 { yylval->sval = "\n"; return TK_NL; }
     YY_BREAK
 case 155:
 YY_RULE_SETUP
-#line 819 "pir.l"
+#line 818 "pir.l"
 { yypirerror(yyscanner, yypirget_extra(yyscanner),
                                           "unknown character in macro expansion: %c", yytext[0]);
                              }
@@ -3160,7 +3159,7 @@ YY_RULE_SETUP
 
 case 156:
 YY_RULE_SETUP
-#line 830 "pir.l"
+#line 829 "pir.l"
 { /* give a warning if the right flag is set */
                               /*
                               lexer_state * const lexer = yypirget_extra(yyscanner);
@@ -3176,7 +3175,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 157:
 YY_RULE_SETUP
-#line 844 "pir.l"
+#line 843 "pir.l"
 {
                               yy_push_state(MACROLOCAL, yyscanner);
                               return TK_MACRO_LOCAL;
@@ -3184,27 +3183,27 @@ YY_RULE_SETUP
     YY_BREAK
 case 158:
 YY_RULE_SETUP
-#line 849 "pir.l"
+#line 848 "pir.l"
 { return TK_INT; }
     YY_BREAK
 case 159:
 YY_RULE_SETUP
-#line 850 "pir.l"
+#line 849 "pir.l"
 { return TK_PMC; }
     YY_BREAK
 case 160:
 YY_RULE_SETUP
-#line 851 "pir.l"
+#line 850 "pir.l"
 { return TK_NUM; }
     YY_BREAK
 case 161:
 YY_RULE_SETUP
-#line 852 "pir.l"
+#line 851 "pir.l"
 { return TK_STRING; }
     YY_BREAK
 case 162:
 YY_RULE_SETUP
-#line 854 "pir.l"
+#line 853 "pir.l"
 { /* normal .macro_local */
                               lexer_state * const lexer = yypirget_extra(yyscanner);
                               /* reserve space for {IDENT}, the @ marker and the NULL char. */
@@ -3222,7 +3221,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 163:
 YY_RULE_SETUP
-#line 869 "pir.l"
+#line 868 "pir.l"
 { /* declare a .macro_local based on a parameter */
                               lexer_state * const lexer = yypirget_extra(yyscanner);
 
@@ -3239,7 +3238,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 164:
 YY_RULE_SETUP
-#line 883 "pir.l"
+#line 882 "pir.l"
 { /* .$foo */
                               lexer_state * const lexer = yypirget_extra(yyscanner);
                               macro_table * const table = peek_macro_table(lexer);
@@ -3271,7 +3270,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 165:
 YY_RULE_SETUP
-#line 912 "pir.l"
+#line 911 "pir.l"
 { /* expanding a .macro_local using a macro parameter value */
                              lexer_state * const lexer     = yypirget_extra(yyscanner);
                              char  const * const paramname = dupstrn(lexer, yytext + 1, yyleng - 2);
@@ -3299,13 +3298,13 @@ YY_RULE_SETUP
     YY_BREAK
 case 166:
 YY_RULE_SETUP
-#line 937 "pir.l"
+#line 936 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 167:
 /* rule 167 can match eol */
 YY_RULE_SETUP
-#line 939 "pir.l"
+#line 938 "pir.l"
 { /* newline after .macro_local <type> <ident> line */
                               yy_pop_state(yyscanner);
                               return TK_NL;
@@ -3313,7 +3312,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 168:
 YY_RULE_SETUP
-#line 944 "pir.l"
+#line 943 "pir.l"
 { /* this state is only used for declaring .macro_locals */
                               yypirerror(yyscanner, yypirget_extra(yyscanner),
                                  "unknown character '%c' when declaring .macro_local", yytext[0]);
@@ -3326,7 +3325,7 @@ YY_RULE_SETUP
 
 case 169:
 YY_RULE_SETUP
-#line 954 "pir.l"
+#line 953 "pir.l"
 {
                               yy_push_state(MACROLABEL, yyscanner);
                               return TK_MACRO_LABEL;
@@ -3334,7 +3333,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 170:
 YY_RULE_SETUP
-#line 959 "pir.l"
+#line 958 "pir.l"
 { /* if the "$" is there, it's a macro label using a macro
                                * parameter's value; otherwise it's a normal macro label
                                */
@@ -3355,7 +3354,7 @@ YY_RULE_SETUP
 case 171:
 /* rule 171 can match eol */
 YY_RULE_SETUP
-#line 977 "pir.l"
+#line 976 "pir.l"
 { /* the newline character after a ".macro_label $foo:" declaration */
                               yy_pop_state(yyscanner); /* leave MACROLABEL state */
                               return TK_NL;
@@ -3363,7 +3362,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 172:
 YY_RULE_SETUP
-#line 983 "pir.l"
+#line 982 "pir.l"
 { /* scan a label when expanding a buffer; declared as .macro_label */
                               lexer_state * const lexer = yypirget_extra(yyscanner);
                               char const  * const label = dupstrn(lexer, yytext, yyleng - 2);
@@ -3373,7 +3372,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 173:
 YY_RULE_SETUP
-#line 990 "pir.l"
+#line 989 "pir.l"
 { /* scan a label when expanding macro; was a macro parameter */
                              lexer_state * const lexer     = yypirget_extra(yyscanner);
                              char const  * const paramname = dupstrn(lexer, yytext + 1, yyleng - 3);
@@ -3408,12 +3407,12 @@ YY_RULE_SETUP
 case 174:
 /* rule 174 can match eol */
 YY_RULE_SETUP
-#line 1023 "pir.l"
+#line 1022 "pir.l"
 { store_macro_char(CURRENT_MACRO(yypirget_extra(yyscanner)), '\n'); }
     YY_BREAK
 case 175:
 YY_RULE_SETUP
-#line 1025 "pir.l"
+#line 1024 "pir.l"
 {
                                yy_pop_state(yyscanner); /* leave MACROBODY state */
                                return TK_ENDM;
@@ -3421,13 +3420,13 @@ YY_RULE_SETUP
     YY_BREAK
 case 176:
 YY_RULE_SETUP
-#line 1030 "pir.l"
+#line 1029 "pir.l"
 { /* store everything else */
                                store_macro_char(CURRENT_MACRO(yypirget_extra(yyscanner)), yytext[0]);
                              }
     YY_BREAK
 case YY_STATE_EOF(MACROBODY):
-#line 1034 "pir.l"
+#line 1033 "pir.l"
 { /* catch run-away macro bodys */
                                yypirerror(yyscanner, yypirget_extra(yyscanner),
                                           "read end of file while reading macro body");
@@ -3459,67 +3458,67 @@ case YY_STATE_EOF(MACROBODY):
 
 case 177:
 YY_RULE_SETUP
-#line 1066 "pir.l"
+#line 1065 "pir.l"
 { return ','; }
     YY_BREAK
 case 178:
 YY_RULE_SETUP
-#line 1067 "pir.l"
+#line 1066 "pir.l"
 { return '['; }
     YY_BREAK
 case 179:
 YY_RULE_SETUP
-#line 1068 "pir.l"
+#line 1067 "pir.l"
 { return ']'; }
     YY_BREAK
 case 180:
 YY_RULE_SETUP
-#line 1070 "pir.l"
+#line 1069 "pir.l"
 { return TK_FLAG_MAIN; }
     YY_BREAK
 case 181:
 YY_RULE_SETUP
-#line 1071 "pir.l"
+#line 1070 "pir.l"
 { return TK_FLAG_LOAD; }
     YY_BREAK
 case 182:
 YY_RULE_SETUP
-#line 1072 "pir.l"
+#line 1071 "pir.l"
 { return TK_FLAG_INIT; }
     YY_BREAK
 case 183:
 YY_RULE_SETUP
-#line 1073 "pir.l"
+#line 1072 "pir.l"
 { return TK_FLAG_ANON; }
     YY_BREAK
 case 184:
 YY_RULE_SETUP
-#line 1074 "pir.l"
+#line 1073 "pir.l"
 { return TK_FLAG_POSTCOMP; }
     YY_BREAK
 case 185:
 YY_RULE_SETUP
-#line 1075 "pir.l"
+#line 1074 "pir.l"
 { return TK_FLAG_IMMEDIATE; }
     YY_BREAK
 case 186:
 YY_RULE_SETUP
-#line 1077 "pir.l"
+#line 1076 "pir.l"
 { return TK_PCC_SUB; }
     YY_BREAK
 case 187:
 YY_RULE_SETUP
-#line 1078 "pir.l"
+#line 1077 "pir.l"
 { return TK_LEX; }
     YY_BREAK
 case 188:
 YY_RULE_SETUP
-#line 1079 "pir.l"
+#line 1078 "pir.l"
 { return TK_NAMESPACE; }
     YY_BREAK
 case 189:
 YY_RULE_SETUP
-#line 1081 "pir.l"
+#line 1080 "pir.l"
 {
                           yy_push_state(MACROHEAD, yyscanner);
                           return TK_MACRO;
@@ -3527,7 +3526,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 190:
 YY_RULE_SETUP
-#line 1086 "pir.l"
+#line 1085 "pir.l"
 {
                           yy_push_state(MACROCONST, yyscanner);
                           return TK_MACRO_CONST;
@@ -3535,17 +3534,17 @@ YY_RULE_SETUP
     YY_BREAK
 case 191:
 YY_RULE_SETUP
-#line 1091 "pir.l"
+#line 1090 "pir.l"
 { return TK_LINE; }
     YY_BREAK
 case 192:
 YY_RULE_SETUP
-#line 1092 "pir.l"
+#line 1091 "pir.l"
 { return TK_FILE; }
     YY_BREAK
 case 193:
 YY_RULE_SETUP
-#line 1095 "pir.l"
+#line 1094 "pir.l"
 { /* macro expansion in PASM mode. */
                           lexer_state * const lexer = yypirget_extra(yyscanner);
                           macro_def   * const macro = find_macro(lexer->macros, yytext + 1);
@@ -3582,7 +3581,7 @@ YY_RULE_SETUP
     YY_BREAK
 case 194:
 YY_RULE_SETUP
-#line 1129 "pir.l"
+#line 1128 "pir.l"
 { /* a label in PASM */
                           yylval->sval = dupstrn(yypirget_extra(yyscanner), yytext, yyleng - 1);
                           return TK_LABEL;
@@ -3590,34 +3589,34 @@ YY_RULE_SETUP
     YY_BREAK
 case 195:
 YY_RULE_SETUP
-#line 1134 "pir.l"
+#line 1133 "pir.l"
 { yypirerror(yyscanner, yypirget_extra(yyscanner),
                                      "symbolic registers are not allowed in PASM mode");
                         }
     YY_BREAK
 case 196:
 YY_RULE_SETUP
-#line 1137 "pir.l"
+#line 1136 "pir.l"
 { yylval->ival = atoi(yytext + 1); return TK_PREG; }
     YY_BREAK
 case 197:
 YY_RULE_SETUP
-#line 1138 "pir.l"
+#line 1137 "pir.l"
 { yylval->ival = atoi(yytext + 1); return TK_NREG; }
     YY_BREAK
 case 198:
 YY_RULE_SETUP
-#line 1139 "pir.l"
+#line 1138 "pir.l"
 { yylval->ival = atoi(yytext + 1); return TK_IREG; }
     YY_BREAK
 case 199:
 YY_RULE_SETUP
-#line 1140 "pir.l"
+#line 1139 "pir.l"
 { yylval->ival = atoi(yytext + 1); return TK_SREG; }
     YY_BREAK
 case 200:
 YY_RULE_SETUP
-#line 1142 "pir.l"
+#line 1141 "pir.l"
 { /* can be a parrot op or a label; the check is done in the parser. */
                           yylval->sval = dupstr(yypirget_extra(yyscanner), yytext);
                           return TK_IDENT;
@@ -3625,32 +3624,32 @@ YY_RULE_SETUP
     YY_BREAK
 case 201:
 YY_RULE_SETUP
-#line 1147 "pir.l"
+#line 1146 "pir.l"
 { yylval->dval = atof(yytext); return TK_NUMC; }
     YY_BREAK
 case 202:
 YY_RULE_SETUP
-#line 1148 "pir.l"
+#line 1147 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 203:
 YY_RULE_SETUP
-#line 1149 "pir.l"
+#line 1148 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 204:
 YY_RULE_SETUP
-#line 1150 "pir.l"
+#line 1149 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 205:
 YY_RULE_SETUP
-#line 1151 "pir.l"
+#line 1150 "pir.l"
 { yylval->ival = atoi(yytext); return TK_INTC; }
     YY_BREAK
 case 206:
 YY_RULE_SETUP
-#line 1153 "pir.l"
+#line 1152 "pir.l"
 { /* copy the string, remove the quotes. */
                           yylval->sval = dupstrn(yypirget_extra(yyscanner), yytext + 1, yyleng - 2);
                           return TK_STRINGC;
@@ -3658,32 +3657,32 @@ YY_RULE_SETUP
     YY_BREAK
 case 207:
 YY_RULE_SETUP
-#line 1158 "pir.l"
+#line 1157 "pir.l"
 { /* ignore whitespace */ }
     YY_BREAK
 case 208:
 /* rule 208 can match eol */
 YY_RULE_SETUP
-#line 1160 "pir.l"
+#line 1159 "pir.l"
 { return TK_NL; }
     YY_BREAK
 case 209:
 YY_RULE_SETUP
-#line 1162 "pir.l"
+#line 1161 "pir.l"
 { yypirerror(yyscanner, yypirget_extra(yyscanner),
                                      "unrecognized character: %c", yytext[0]);
                         }
     YY_BREAK
 case YY_STATE_EOF(PASM):
-#line 1165 "pir.l"
+#line 1164 "pir.l"
 { yyterminate(); }
     YY_BREAK
 case 210:
 YY_RULE_SETUP
-#line 1167 "pir.l"
+#line 1166 "pir.l"
 ECHO;
     YY_BREAK
-#line 3687 "pirlexer.c"
+#line 3686 "pirlexer.c"
 case YY_STATE_EOF(MACROHEAD):
 case YY_STATE_EOF(MACROLOCAL):
 case YY_STATE_EOF(MACROLABEL):
@@ -4937,7 +4936,7 @@ static int yy_flex_strlen (yyconst char * s , yyscan_t yyscanner)
 
 /* %ok-for-header */
 
-#line 1167 "pir.l"
+#line 1166 "pir.l"
 
 
 
