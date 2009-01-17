@@ -2753,7 +2753,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                     break;
                 case KEY_number_FLAG:
                     Parrot_snprintf(interp, buf, sizeof (buf),
-                                    FLOATVAL_FMT, PMC_num_val(k));
+                                    FLOATVAL_FMT, VTABLE_get_number(interp, k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;

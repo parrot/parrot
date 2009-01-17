@@ -431,7 +431,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 PMC_int_val(SELF) = VTABLE_shift_integer(INTERP, io);
                 break;
             case KEY_number_FLAG:
-                PMC_num_val(SELF) = VTABLE_shift_float(INTERP, io);
+                VTABLE_set_number_native(INTERP, SELF, VTABLE_shift_float(INTERP, io));
                 break;
             case KEY_string_FLAG:
                 PMC_str_val(SELF) = VTABLE_shift_string(INTERP, io);

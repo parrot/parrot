@@ -557,7 +557,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI PMC *add(Float value, PMC* dest) {
-        rat_add_float(INTERP, SELF, PMC_num_val(value), dest);
+        rat_add_float(INTERP, SELF, VTABLE_get_number(INTERP, value), dest);
         return dest;
     }
 
@@ -592,7 +592,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI void i_add(Float value) {
-        rat_add_float(INTERP, SELF, (double) PMC_num_val(value), SELF);
+        rat_add_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value), SELF);
     }
 
     MULTI void i_add(Rational value) {
@@ -667,7 +667,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI PMC *subtract(Float value, PMC* dest) {
-        rat_add_float(INTERP, SELF, - ((double) PMC_num_val(value)), dest);
+        rat_add_float(INTERP, SELF, - ((double) VTABLE_get_number(INTERP, value)), dest);
         return dest;
     }
 
@@ -702,7 +702,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI void i_subtract(Float value) {
-        rat_add_float(INTERP, SELF, - ((double) PMC_num_val(value)), SELF);
+        rat_add_float(INTERP, SELF, - ((double) VTABLE_get_number(INTERP, value)), SELF);
     }
 
     MULTI void i_subtract(Rational value) {
@@ -777,7 +777,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI PMC *multiply(Float value, PMC* dest) {
-        rat_multiply_float(INTERP, SELF, (double) PMC_num_val(value), dest);
+        rat_multiply_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value), dest);
         return dest;
     }
 
@@ -812,7 +812,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI void i_multiply(Float value) {
-        rat_multiply_float(INTERP, SELF, (double) PMC_num_val(value), SELF);
+        rat_multiply_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value), SELF);
     }
 
     MULTI void i_multiply(Rational value) {
@@ -887,7 +887,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI PMC *divide(Float value, PMC* dest) {
-        rat_divide_float(INTERP, SELF, (double) PMC_num_val(value), dest);
+        rat_divide_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value), dest);
         return dest;
     }
 
@@ -922,7 +922,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     }
 
     MULTI void i_divide(Float value) {
-        rat_divide_float(INTERP, SELF, (double) PMC_num_val(value), SELF);
+        rat_divide_float(INTERP, SELF, (double) VTABLE_get_number(INTERP, value), SELF);
     }
 
     MULTI void i_divide(Rational value) {

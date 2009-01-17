@@ -691,7 +691,7 @@ Returns whether the hash is the same as C<*other>.
 
         if (!nextkey) {
             PMC *val         = get_number_pmc(INTERP, SELF->vtable->base_type);
-            PMC_num_val(val) = value;
+            VTABLE_set_number_native(INTERP, val, value);
             parrot_hash_put(INTERP, (Hash *)PMC_struct_val(SELF), keystr, val);
             return;
         }
@@ -717,7 +717,7 @@ Sets C<value> as the value for C<*key>.
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
         PMC * const val  = get_number_pmc(INTERP, SELF->vtable->base_type);
-        PMC_num_val(val) = value;
+        VTABLE_set_number_native(INTERP, val, value);
 
         parrot_hash_put(INTERP, (Hash *)PMC_struct_val(SELF), key, val);
     }

@@ -91,7 +91,7 @@ key_new_number(PARROT_INTERP, FLOATVAL value)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
-    PMC_num_val(key)     = value;
+    VTABLE_set_number_native(interp, key, value);
 
     return key;
 }
@@ -227,12 +227,12 @@ Set the number C<value> in C<key>.
 
 PARROT_EXPORT
 void
-key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
+key_set_number(PARROT_INTERP, ARGMOD(PMC *key), FLOATVAL value)
 {
     ASSERT_ARGS(key_set_number)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_number_FLAG;
-    PMC_num_val(key)     = value;
+    VTABLE_set_number_native(interp, key, value);
 
     return;
 }
@@ -382,7 +382,7 @@ key_number(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(key_number)
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
-        return PMC_num_val(key);
+        return VTABLE_get_number(interp, key);
     case KEY_number_FLAG | KEY_register_FLAG:
         return REG_NUM(interp, PMC_int_val(key));
     case KEY_pmc_FLAG:

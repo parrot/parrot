@@ -221,7 +221,7 @@ PackFile_find_in_const(PARROT_INTERP,
             PMC_str_val(key))
             return i;
         else if (type == PFC_NUMBER && ct->constants[i]->u.number ==
-                 PMC_num_val(key))
+                 VTABLE_get_integer(interp, key))
             return i;
     Parrot_io_eprintf(NULL, "find_in_const: couldn't find const for key\n");
     Parrot_exit(interp, 1);

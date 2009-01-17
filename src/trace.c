@@ -183,7 +183,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
             len += Parrot_io_eprintf(debugger, "%vi", PMC_int_val(key));
             break;
         case KEY_number_FLAG:
-            len += Parrot_io_eprintf(debugger, "%vg", PMC_num_val(key));
+            len += Parrot_io_eprintf(debugger, "%vg", VTABLE_get_number(interp, key));
             break;
         case KEY_string_FLAG:
             {
