@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 44;
 
 =head1 NAME
 
@@ -1130,6 +1130,34 @@ CODE
 -1
 0
 1
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'acos as a method' );
+.include 'fp_equality.pasm'
+.sub main :main
+    $P0 = new ['Float']
+    $P0 = 0.0
+    $P1 = $P0.'acos'()
+    .fp_eq($P1, 0.0, OK1)
+    print 'got '
+    print $P1
+    print ' but '
+  OK1:
+    say 'result should be 0.0'
+
+    $P2 = new ['Float']
+    $P2 = 0.5
+    $P3 = $P2.'acos'()
+    .fp_eq($P3, 1.0471975511966, OK2)
+    print 'got '
+    print $P3
+    print ' but '
+  OK2:
+    say 'result should be 1.0471975511966'
+.end
+CODE
+result should be 0.0
+result should be 1.0471975511966
 OUTPUT
 
 
