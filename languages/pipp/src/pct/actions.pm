@@ -281,31 +281,7 @@ method class_constant($/) {
     );
 }
 
-# class constants could probably also be set in a class init block
-method class_constant_definition($/) {
-    our $?CLASS;
-    our $?NS;
-    my $past := PAST::Block.new(:blocktype('immediate'));
-    my $ns   := $?CLASS eq '' ?? $?NS
-                              !! $?NS ~ '\\' ~ $?CLASS ~ '::';
-    $past.loadinit().push(
-        PAST::Op.new(
-            :pasttype('bind'),
-            PAST::Var.new(
-                :name(~$<ident>),
-                :isdecl(1),
-                :scope('package'),
-                :viviself('PhpNull'),
-                :namespace($ns)
-            ),
-            $( $<literal> )
-        )
-    );
-
-    make $past;
-}
-
-method namespace_constant_definition($/) {
+method constant_definition($/) {
     our $?CLASS;
     our $?NS;
     my $past := PAST::Block.new(:blocktype('immediate'));
@@ -737,8 +713,8 @@ method class_definition($/, $key) {
 
         # nothing to do for $<const_definition,
         # setup of class constants is done in the 'loadinit' node
-        for $<class_constant_definition> {
-           $block.push( $($_) );
+        for $<constant_definition> {
+            $block.push( $($_) );
         }
 
         my $methods_block := PAST::Block.new(:blocktype('immediate'));

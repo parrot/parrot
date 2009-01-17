@@ -124,7 +124,7 @@ rule statement {
     | <require_once_statement>         {*}  #= require_once_statement
     | <echo_statement>                 {*}  #= echo_statement
     | <expression_statement>           {*}  #= expression_statement
-    | <namespace_constant_definition>  {*}  #= namespace_constant_definition
+    | <constant_definition>            {*}  #= constant_definition
     | <if_statement>                   {*}  #= if_statement
     | <while_statement>                {*}  #= while_statement
     | <do_while_statement>             {*}  #= do_while_statement
@@ -438,20 +438,15 @@ rule method_declaration {
 rule class_definition {
     'class' <class_name> [ 'implements' <interface_name> ]?  {*}  #= open
     '{'
-        <class_constant_definition>*
+        <constant_definition>*
         <class_member_definition>*
         <class_method_definition>*
     '}'                                                      {*}  #= close
 }
 
-rule class_constant_definition {
-    'const' <ident> '=' <literal> <.statement_delimiter>
-    {*}
-}
-
-# In PHP 5.3 a constand definition outside a declared namespace is forbidden
+# In PHP 5.3 a constant definition outside a declared namespace or class is forbidden
 # In Pipp this is not checked
-rule namespace_constant_definition {
+rule constant_definition {
     'const' <ident> '=' <literal> <.statement_delimiter>
     {*}
 }
