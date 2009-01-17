@@ -617,8 +617,21 @@ pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
 {
     ASSERT_ARGS(pmc_type_p)
     PMC * const classname_hash = interp->class_hash;
-    PMC * const item           =
-        (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
+    PMC * item;
+
+    if (name->vtable->base_type == enum_class_NameSpace) {
+        Parrot_PCCINVOKE(interp, name, CONST_STRING(interp, "get_name"), "->P",  &name);
+        /* lop off the HLL namespace */
+        PARROT_ASSERT(name->vtable->base_type == enum_class_ResizableStringArray);
+
+        /* if it's the root namespace, the array will be empty so don't
+           try to do a shift here */
+        if (VTABLE_get_integer(interp, name) > 0)
+            VTABLE_shift_pmc(interp, name);
+        else
+            return 0;
+    }
+    item = (PMC *)VTABLE_get_pointer_keyed(interp, classname_hash, name);
 
     if (!PMC_IS_NULL(item))
         return VTABLE_get_integer(interp, item);

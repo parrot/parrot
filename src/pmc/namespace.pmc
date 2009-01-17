@@ -500,9 +500,6 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                 }
                 return ns;
             }
-            case enum_class_NameSpace:
-                /* XXX TT#182: Implement this! */
-                return PMCNULL;
             default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                     "Invalid namespace key in get_pointer_keyed");
@@ -633,16 +630,19 @@ Returns the name of the namespace as an array of strings.
 
     METHOD get_name() {
         PMC * const ar = pmc_new(INTERP, enum_class_ResizableStringArray);
+        INTVAL elements = 0;
         PMC *ns        = SELF;
 
         while (ns) {
             Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(ns);
             VTABLE_unshift_string(INTERP, ar, nsinfo->name);
             ns = PMC_pmc_val(ns);
+            elements++;
         }
 
         /* remove the NULL string of the namespace root */
-        VTABLE_shift_string(INTERP, ar);
+        if (elements > 0)
+            VTABLE_shift_string(INTERP, ar);
 
         RETURN(PMC *ar);
     }

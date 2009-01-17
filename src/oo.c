@@ -228,7 +228,8 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
            PMC types the same through pmc_type_p or some interface to it */
         if (base_type == enum_class_Key
          || base_type == enum_class_ResizableStringArray
-         || base_type == enum_class_String)
+         || base_type == enum_class_String
+         || base_type == enum_class_NameSpace)
             type = pmc_type_p(interp, key);
         else
             type = pmc_type(interp, VTABLE_get_string(interp, key));
