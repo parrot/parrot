@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -211,75 +211,75 @@ end:
 
 .sub set_keyed_get_keyed_tests
 
-     new $P0, ['ResizablePMCArray']
-     new $P1, ['Key']
+    new $P0, ['ResizablePMCArray']
+    new $P1, ['Key']
 
-     set $P1, 0
-     set $P0[$P1], 25
+    set $P1, 0
+    set $P0[$P1], 25
 
-     set $P1, 1
-     set $P0[$P1], 2.5
+    set $P1, 1
+    set $P0[$P1], 2.5
 
-     set $P1, 2
-     set $P0[$P1], "bleep"
+    set $P1, 2
+    set $P0[$P1], "bleep"
 
-     new $P2, ['String']
-     set $P2, "Bloop"
-     set $P1, 3
-     set $P0[$P1], $P2
+    new $P2, ['String']
+    set $P2, "Bloop"
+    set $P1, 3
+    set $P0[$P1], $P2
 
-     set $I0, $P0[0]
-     is($I0, 25, "set int via Key PMC, get int via int")
+    set $I0, $P0[0]
+    is($I0, 25, "set int via Key PMC, get int via int")
 
-     set $N0, $P0[1]
-     .fp_eq($N0, 2.5, OK1)
-     ok(0, "set num via Key PMC, get num via int fails")
-     goto NOK1
+    set $N0, $P0[1]
+    .fp_eq($N0, 2.5, OK1)
+    ok(0, "set num via Key PMC, get num via int fails")
+    goto NOK1
 OK1:
-     ok(1, "set num via Key PMC, get num via int fails")
+    ok(1, "set num via Key PMC, get num via int fails")
 NOK1:
 
-     set $S0, $P0[2]
-     is($S0, "bleep", "set string via Key PMC, get string via int")
+    set $S0, $P0[2]
+    is($S0, "bleep", "set string via Key PMC, get string via int")
 
-     new $P3, ['Undef']
-     set $P3, $P0[3]
-     set $S0, $P3
-     is($S0, "Bloop", "set PMC via Key PMC, get PMC via PMC")
+    new $P3, ['Undef']
+    set $P3, $P0[3]
+    set $S0, $P3
+    is($S0, "Bloop", "set PMC via Key PMC, get PMC via PMC")
 
 
-     new $P0, ['ResizablePMCArray']
-     set $P0, 1
+    new $P0, ['ResizablePMCArray']
+    set $P0, 1
 
-     set $P0[25], 125
-     set $P0[128], 10.2
-     set $P0[513], "cow"
-     new $P1, ['Integer']
-     set $P1, 123456
-     set $P0[1023], $P1
+    set $P0[25], 125
+    set $P0[128], 10.2
+    set $P0[513], "cow"
+    new $P1, ['Integer']
+    set $P1, 123456
+    set $P0[1023], $P1
 
-     new $P2, ['Key']
-     set $P2, 25
-     set $I0, $P0[$P2]
-     is($I0, 125, "set int via int, get int via Key PMC")
+    new $P2, ['Key']
+    set $P2, 25
+    set $I0, $P0[$P2]
+    is($I0, 125, "set int via int, get int via Key PMC")
 
-     set $P2, 128
-     set $N0, $P0[$P2]
-     .fp_eq($N0, 10.2, OK2)
-     ok(0, "set num via int, get num via Key PMC")
-     goto NOK2
+    set $P2, 128
+    set $N0, $P0[$P2]
+    .fp_eq($N0, 10.2, OK2)
+    ok(0, "set num via int, get num via Key PMC")
+    goto NOK2
 OK2:
-     ok(1, "set num via int, get num via Key PMC")
+    ok(1, "set num via int, get num via Key PMC")
 NOK2:
 
-     set $P2, 513
-     set $S0, $P0[$P2]
-     is($S0, "cow", "set string via int, get string via Key PMC")
+    set $P2, 513
+    set $S0, $P0[$P2]
+    is($S0, "cow", "set string via int, get string via Key PMC")
 
-     set $P2, 1023
-     set $P3, $P0[$P2]
-     set $I1, $P3
-     is($I1, 123456, "set int via int, get int via Key PMC")
+    set $P2, 1023
+    set $P3, $P0[$P2]
+    set $I1, $P3
+    is($I1, 123456, "set int via int, get int via Key PMC")
 
 .end
 
