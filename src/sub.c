@@ -711,7 +711,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, SHIM(PMC *pmc),
 =item C<Parrot_sub * Parrot_get_sub_pmc_from_subclass>
 
 Gets a Parrot_sub structure from something that isn't a Sub PMC, but rather a
-subclass. 
+subclass.
 
 =cut
 

@@ -210,7 +210,7 @@ Adds the thread C<*item> to the end of the queue.
 
         /* s. tsq.c:queue_push */
         queue_lock(queue);
-        
+
         GET_ATTR_thread_count(INTERP, SELF, thread_count);
         ++thread_count;
         SET_ATTR_thread_count(INTERP, SELF, thread_count);

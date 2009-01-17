@@ -226,7 +226,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
         /* XXX TT#182: This is a hack! We should be able to treat all
            PMC types the same through pmc_type_p or some interface to it */
-        if (base_type == enum_class_Key 
+        if (base_type == enum_class_Key
          || base_type == enum_class_ResizableStringArray
          || base_type == enum_class_String)
             type = pmc_type_p(interp, key);
