@@ -135,7 +135,7 @@ Caching that only ever applied to 4 opcodes, one of which has now been removed.
 The files (and all functions in them) are deprecated, and will be removed. See
 RT #60048.
 
-=item * Subs marked with C<:vtable>/C<:method> aren't in namespace [post 0.8.2]
+=item Subs marked with C<:vtable>/C<:method> aren't in namespace [post 0.8.2]
 
 Subs marked with C<:vtable> or C<:method> flags are no longer given a
 namespace entry by default.  Use the C<:nsentry> flag to cause this
@@ -151,6 +151,26 @@ to happen.  See RT #60586 and RT #53302.
 
 Stringification of protoobjects will return the full name of the type
 and parentheses, per Synopsis 12.  See TT #168
+
+=back
+
+=head1 standard library
+
+=over 4
+
+=item Data::Sort [post 0.9.0]
+
+Sorting is already available as a method on various array-style PMCs.
+See TT #106
+
+=item Data::Escape [post 0.9.0]
+
+Replace usage with the escape opcode.  See TT #107
+
+=item DWIM [post 0.9.0]
+
+Hasn't been kept up to date; might move to the examples/ folder, but
+doesn't need to be in stdlib.  See TT #120
 
 =back
 
