@@ -224,12 +224,12 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         INTVAL type;
         const INTVAL base_type = key->vtable->base_type;
 
-        /* XXX TT#182: This is a hack! We should be able to treat all
-           PMC types the same through pmc_type_p or some interface to it */
+        /* This is a hack! All PMCs should be able to be handled through
+           a single codepath, and all of them should be able to avoid
+           stringification because it's so imprecise. */
         if (base_type == enum_class_Key
          || base_type == enum_class_ResizableStringArray
-         || base_type == enum_class_String
-         || base_type == enum_class_NameSpace)
+         || base_type == enum_class_String)
             type = pmc_type_p(interp, key);
         else
             type = pmc_type(interp, VTABLE_get_string(interp, key));
