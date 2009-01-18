@@ -192,9 +192,6 @@ unlink($filename);
 $out = `$parrot languages/lua/lua.pbc -e "print(nil)"`;
 ok($out eq "nil\n", "check lua");
 
-$out = `$parrot languages/m4/m4.pbc`;
-ok($out =~ /^Usage/, "check m4");
-
 $filename = 'test.text';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";

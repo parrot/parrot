@@ -45,7 +45,6 @@ my %lang_is_checked = map { $_ => 1 } qw{
     dotnet
     lazy-k
     lua
-    m4
     ook
     perl6
     pipp

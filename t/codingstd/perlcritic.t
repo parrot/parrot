@@ -45,7 +45,7 @@ if ( !@ARGV ) {
     # they wish to be tested. Language developers: don't break the build!
 
     my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages');
-    my $filter_languages = qr/^\Q$languages_dir$PConfig{slash}\E(?!m4|pipp)/x;
+    my $filter_languages = qr/^\Q$languages_dir$PConfig{slash}\E(?!pipp)/x;
 
     @files = grep {! m/$filter_languages/}
              map  { $_->path }

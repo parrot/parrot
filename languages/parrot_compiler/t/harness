@@ -61,7 +61,7 @@ if ( grep { m/^--files$/ } @ARGV ) {
 
 =head1 SEE ALSO
 
-F<languages/scheme/t/harness>, F<languages/m4/t/harness>, F<languages/python/t/harness>
+F<languages/scheme/t/harness>, F<languages/python/t/harness>
 
 =head1 AUTHOR
 

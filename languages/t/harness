@@ -27,7 +27,7 @@ or
 
 =item Selected languages
 
-    cd languages && perl t/harness --languages=m4,punie
+    cd languages && perl t/harness --languages=pynie,punie
 
 =item Per Language Harness
 
@@ -87,7 +87,7 @@ my @unified_testable_languages
               dotnet
               jako
               lazy-k lisp lua
-              m4 markdown
+              markdown
               ook
               parrot_compiler pipp punie
               regex

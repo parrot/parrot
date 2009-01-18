@@ -640,7 +640,6 @@ sub perl_script_file_directories {
             WMLScript/build
             dotnet dotnet/build dotnet/tools
             lua
-            m4/tools
             pipp
             python
             regex
@@ -696,7 +695,6 @@ sub perl_module_file_directories {
             jako/lib/Jako
             jako/lib/Jako/Construct
             lua/Lua lua/t/Parrot/Test
-            m4/lib/Parrot/Test m4/lib/Parrot/Test/M4
             parrot_compiler/lib/Parrot/Test
             perl6/t/01-sanity
             pipp/lib/Parrot/Test pipp/lib/Parrot/Test/Pipp

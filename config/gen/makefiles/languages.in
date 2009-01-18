@@ -21,7 +21,7 @@ LANGUAGES = \
     forth \
     jako json \
     lazy-k lisp lolcode lua \
-    m4 markdown \
+    markdown \
     ook \
     parrot_compiler perl6 pheme PIR pipp punie pynie \
     regex \
@@ -100,7 +100,6 @@ test-separate: all \
     forth.test \
     jako.test json.test \
     lazy-k.test lisp.test lolcode.test lua.test \
-    m4.test \
     ook.test \
     parrot_compiler.test perl6.test pheme.test PIR.test pipp.test punie.test pynie.test \
     regex.test \
@@ -119,7 +118,7 @@ clean: \
     jako.clean json.clean \
     lisp.clean \
     lolcode.clean lua.clean \
-    m4.clean markdown.clean \
+    markdown.clean \
     ook.clean \
     parrot_compiler.clean perl6.clean pheme.clean PIR.clean pipp.clean punie.clean pynie.clean \
     regex.clean \
@@ -137,7 +136,7 @@ realclean: \
     forth.realclean \
     jako.realclean json.realclean \
     lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
-    m4.realclean markdown.realclean \
+    markdown.realclean \
     ook.realclean \
     parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
     regex.realclean \
@@ -331,16 +330,6 @@ lua.clean:
 	- $(MAKE) lua clean
 lua.realclean:
 	- $(MAKE) lua realclean
-
-m4: m4.dummy
-m4.dummy:
-	- $(MAKE) m4
-m4.test:
-	- $(MAKE) m4 test
-m4.clean:
-	- $(MAKE) m4 clean
-m4.realclean:
-	- $(MAKE) m4 realclean
 
 markdown: markdown.dummy
 markdown.dummy:

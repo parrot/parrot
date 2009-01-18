@@ -1,4 +1,0 @@
-# $Id$
-
-frozen2yaml    - Dumps the contents of a frozen state file as YAML.
-scrutinize.pl  - Test with Perl::Critic
