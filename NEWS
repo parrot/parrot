@@ -11,6 +11,22 @@ New in January 2009 release
     - various bug fixes and updates
     - basic bytecode generation for calling conventions
 - Languages
+  + Rakudo
+    - improved error mesages in multi dispatch
+    - implemented clone method for all objects
+    - implemented MAIN sub
+    - Unicode versions of hyper operators
+    - refactored IO.readline
+    - basic support for Inf and NaN
+    - list and array slices with whatever star
+    - implemented last and redo
+    - pointy blocks as terms
+    - refactored variable and parameter passing
+    - improved assignment semantics
+    - improved parsing of type names and subs
+    - implemented parametric roles
+    - separate types for blocks, subs and methods
+    - basic support for submethods
   + Befunge
     - back to working state
     - ported to pir
