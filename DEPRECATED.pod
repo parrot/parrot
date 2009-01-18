@@ -57,9 +57,31 @@ See RT #58410.
 
 =over 4
 
-=item * Remove VtableCache PMC [post 0.9.0]
+=item * vtablecache [post 0.9.0] (TT #6)
 
-See TT #6
+=item * delegeate [post 0.9.0] (TT #187)
+
+=item * deleg_pmc [post 0.9.0] (TT #187)
+
+=item * enumerate [post 0.9.0] (TT #187)
+
+=item * intlist [post 0.9.0] (TT #187)
+
+=item * multiarray [post 0.9.0] (TT #187)
+
+=item * pair [post 0.9.0] (TT #187)
+
+=item * pointer [post 0.9.0] (TT #187)
+
+=item * closure [post 0.9.0] (TT #188)
+
+=item * random [post 0.9.0] (TT #189)
+
+=item * ref [post 0.9.0] (TT #190)
+
+=item * sarray [post 0.9.0] (TT #191)
+
+=item * tqueue [post 0.9.0] (TT #192)
 
 =back
 
