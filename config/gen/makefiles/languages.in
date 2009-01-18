@@ -75,6 +75,8 @@ help:
 	@echo ""
 	@echo "  co-hq9plus:    Try to fetch HQ9+"
 	@echo ""
+	@echo "  co-m4:         Try to fetch Parrot m4"
+	@echo ""
 	@echo "  co-pjs:        Try to fetch PJS"
 	@echo ""
 	@echo "  co-primitivearc: Try to fetch primitivearc"
@@ -494,7 +496,7 @@ Zcode.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-gil co-hq9plus co-pjs co-primitivearc co-tcl
+co-all: co-eclectus co-gil co-hq9plus co-m4 co-pjs co-primitivearc co-tcl
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
@@ -504,6 +506,9 @@ co-gil:
 
 co-hq9plus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
+
+co-m4:
+	- $(GIT) clone 'git:////github.com/bschmalhofer/m4.git'
 
 co-pjs:
 	- $(SVN) checkout 'http:////parrotjs.googlecode.com/svn/trunk/' parrotjs-read-only
