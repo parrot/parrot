@@ -50,6 +50,8 @@ pmclass WmlsFloat
     group wmls_group
     hll wmlscript maps Float {
 
+    ATTR FLOATVAL fv;
+
 /* Class initialization. Caches constant strings that will be used later.
 */
     void class_init() {
@@ -103,7 +105,7 @@ Returns a Parrot string representation of the number.
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        PMC_num_val(SELF) = (FLOATVAL)value;
+        SET_ATTR_fv(INTERP, SELF, (FLOATVAL)value);
     }
 
 /*
@@ -116,8 +118,9 @@ Returns a Parrot string representation of the number.
 
 */
     VTABLE PMC* neg(PMC* dest) {
+        FLOATVAL result = - SELF.get_number();
         dest = pmc_new(INTERP, dynpmc_WmlsFloat);
-        PMC_num_val(dest) = - SELF.get_number();
+        VTABLE_set_number_native(INTERP, dest, result);
         return dest;
     }
 
