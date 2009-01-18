@@ -738,7 +738,7 @@ Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
         if (sub_pmc->vtable->base_type == enum_class_Sub)
             return (Parrot_sub *)PMC_struct_val(sub_pmc);
     }
-    Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Attempting to do sub operation on non-Sub.");
 }
 
