@@ -602,16 +602,16 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
                 switch (t->info->type) {
                     case INT_TYPE:
                         *pc++ = PARROT_ARG_I;
+                        *pc++ = t->info->color;
                         break;
                     case STRING_TYPE:
                         *pc++ = PARROT_ARG_S;
+                        *pc++ = t->info->color;
                         break;
                     default:
                         panic(lexer, "wrong type of key");
                         break;
                 }
-
-                *pc++ = t->info->color;
                 break;
             }
             case EXPR_KEY:
@@ -632,6 +632,10 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
      */
     keysize = pc - key;
 
+    fprintf(stderr, "key: ");
+    for (index = 0; index < keysize; ++index) {
+        fprintf(stderr, "%d|", key[index]);
+    }
     /* store the key, and emit the index at which it's stored into the code segment */
     index = store_key_bytecode(lexer->bc, key);
     emit_int_arg(lexer->bc, index);

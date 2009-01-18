@@ -579,6 +579,7 @@ store_key_bytecode(bytecode * const bc, opcode_t * key) {
 
     index = add_key_const(bc, pfc->u.key);
 
+    fprintf(stderr, "store key at index %d\n", index);
     mem_sys_free(pfc);
 
     return index;

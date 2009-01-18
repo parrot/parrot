@@ -127,7 +127,6 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                 *instr_writer++ = '_';
                 *instr_writer++ = 'k';
 
-                /* XXX this switch replaces the messy code below. double-check before delete. */
                 switch (iter->expr.t->key->head->expr->type) {
                     case EXPR_TARGET:
                         switch (iter->expr.t->key->head->expr->expr.t->info->type) {
@@ -135,6 +134,9 @@ write_signature(NOTNULL(expression * const iter), NOTNULL(char *instr_writer)) {
                                 /* the key is a target, and its type is a PMC. In that
                                  * case, do not print the signature; 'kp' is not valid.
                                  */
+                                break;
+                            case STRING_TYPE: /* strings become key-constant */
+                                *instr_writer++ = 'c';
                                 break;
                             case INT_TYPE:
                                 *instr_writer++ = 'i';
