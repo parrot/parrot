@@ -174,7 +174,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
             if (key_next(interp, next))
                 next = key_next(interp, next);
 
-            offs = PMC_int_val(init);
+            offs = VTABLE_get_integer(interp, init);
 
 #ifdef STRUCT_DEBUG
             Parrot_io_eprintf(interp, "offs = %d\n", (int)offs);
@@ -628,7 +628,7 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
 
         if (type == enum_type_struct) {
             PMC *nested = VTABLE_getprop(interp, type_pmc, CONST_STRING(interp, "_struct"));
-            size        = PMC_int_val(nested);
+            size        = VTABLE_get_integer(interp, nested);
         }
         else
             size = data_types[type - enum_first_type].size;
