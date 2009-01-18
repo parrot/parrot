@@ -72,7 +72,6 @@ Clone the couroutine.
 
     VTABLE void init() {
         PMC_struct_val(SELF) = new_coroutine(INTERP);
-        PMC_pmc_val(SELF)    = PMCNULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -102,7 +101,6 @@ Destroys the coroutine.
         PObj_custom_mark_destroy_SETALL(ret);
 
         PMC_struct_val(ret) = sub;
-        PMC_pmc_val(ret)    = PMCNULL;
 
         memcpy(sub, PMC_sub(SELF), sizeof (Parrot_coro));
 
