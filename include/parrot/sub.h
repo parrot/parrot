@@ -100,7 +100,9 @@ typedef enum {
 #undef SUB_FLAG
 
 #define Sub_comp_get_FLAGS(o) ((PMC_sub(o))->comp_flags)
-#define Sub_comp_flag_TEST(flag, o) (Sub_comp_get_FLAGS(o) & SUB_COMP_FLAG_ ## flag)
+
+#define Sub_comp_flag_TEST(flag, o) (Sub_comp_get_FLAGS((PMC *)o) & SUB_COMP_FLAG_ ## flag)
+
 #define Sub_comp_flag_SET(flag, o) (Sub_comp_get_FLAGS(o) |= SUB_COMP_FLAG_ ## flag)
 #define Sub_comp_flag_CLEAR(flag, o) (Sub_comp_get_FLAGS(o) &= ~(UINTVAL)(SUB_COMP_FLAG_ ## flag))
 

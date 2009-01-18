@@ -186,7 +186,7 @@ PMC * Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_oo_register_type(PARROT_INTERP,
     ARGIN(PMC *name),
-    ARGIN(PMC *namespace))
+    ARGIN(PMC *_namespace))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
@@ -255,7 +255,7 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_oo_register_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name) \
-    || PARROT_ASSERT_ARG(namespace)
+    || PARROT_ASSERT_ARG(_namespace)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/oo.c */
 

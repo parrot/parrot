@@ -521,15 +521,15 @@ allows the new object metamodel to interact with the old one until it does.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *namespace))
+Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
 {
     ASSERT_ARGS(Parrot_oo_register_type)
     INTVAL type;
     const INTVAL typeid_exists = fail_if_type_exists(interp, name);
 
-    PMC *classobj = VTABLE_get_class(interp, namespace);
+    PMC *classobj = VTABLE_get_class(interp, _namespace);
     if (!PMC_IS_NULL(classobj)) {
-        STRING *classname = VTABLE_get_string(interp, namespace);
+        STRING *classname = VTABLE_get_string(interp, _namespace);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Class %Ss already registered!\n",
                 string_escape_string(interp, classname));

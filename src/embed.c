@@ -863,7 +863,7 @@ set_current_sub(PARROT_INTERP)
         if (ft->fixups[i]->type == enum_fixup_sub) {
             const opcode_t ci      = ft->fixups[i]->offset;
             PMC           *sub_pmc = ct->constants[ci]->u.key;
-            Parrot_sub    *sub     = PMC_sub(sub_pmc);
+            Parrot_sub *sub        = PMC_sub(sub_pmc);
 
             if (sub->seg == cur_cs) {
                 const size_t offs = sub->start_offs;
