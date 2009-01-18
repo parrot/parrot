@@ -59,7 +59,6 @@ Initializes the continuation.
 
     VTABLE void init() {
         PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
-        PMC_pmc_val(SELF)    = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
         /* PANIC("don't do that"); */
         /*
@@ -136,7 +135,6 @@ Creates and returns a clone of the continuation.
         PObj_custom_mark_destroy_SETALL(ret);
         cc->runloop_id       = cc_self->runloop_id;
         PMC_struct_val(ret)  = cc;
-        PMC_pmc_val(ret)     = PMC_pmc_val(SELF);
 
         return ret;
     }
@@ -155,7 +153,6 @@ Assign context.
         Parrot_cont * const cc_src  = PMC_cont(src);
 
         STRUCT_COPY(cc_self, cc_src);
-        PMC_pmc_val(SELF) = PMC_pmc_val(src);
     }
 /*
 
