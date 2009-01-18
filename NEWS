@@ -9,7 +9,8 @@ New in January 2009 release
   + PIRC
     - refactoring of various data structures
     - various bug fixes and updates
-    - basic bytecode generation for calling conventions
+    - complete bytecode generation
+    - add '-x' commandline option to run compiled code
 - Languages
   + Rakudo
     - improved error mesages in multi dispatch
