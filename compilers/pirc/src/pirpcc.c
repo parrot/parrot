@@ -362,6 +362,33 @@ generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters) {
     /* convert the parameter list into operands. Parameters are stored as target nodes. */
     targets_to_operands(lexer, CURRENT_SUB(lexer)->parameters, num_parameters);
 }
+
+
+/*
+
+=item C<void
+generate_getresults_instr(lexer_state * const lexer, target * const targetlist)>
+
+Generate instruction for the C<.get_results> statement.
+
+=cut
+
+*/
+void
+generate_getresults_instr(lexer_state * const lexer, target * const targetlist) {
+    /* add this point we know that there's only 1 target, as that's the convention for
+     * exception handlers:
+     *
+     * .get_results($P0)
+     *
+     * If exception handlers can take any number of targets, this should be updated
+     * here as well.
+     */
+    new_sub_instr(lexer, PARROT_OP_get_results_pc, "get_results_pc", 1);
+    targets_to_operands(lexer, targetlist, 1);
+}
+
+
 /*
 
 =item C<static void

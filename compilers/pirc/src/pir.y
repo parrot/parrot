@@ -990,8 +990,7 @@ null_stat         : "null" target "\n"
 
 getresults_stat   : ".get_results" opt_target_list "\n"
                          {
-                           set_instrf(lexer, "get_results", "%T", $2);
-                           get_opinfo(lexer);
+                           generate_getresults_instr(lexer, $2);
                          }
                   ;
 

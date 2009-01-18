@@ -11,7 +11,7 @@
 
 void convert_inv_to_instr(struct lexer_state * const lexer, invocation * const inv);
 void generate_parameters_instr(struct lexer_state * const lexer, unsigned num_parameters);
-
+void generate_getresults_instr(struct lexer_state * const lexer, target * const targetlist);
 void emit_sub_epilogue(struct lexer_state * const lexer);
 
 #endif /* PARROT_PIR_PIRPCC_H_GUARD */

@@ -909,6 +909,7 @@ emit_pbc_annotations(lexer_state * const lexer) {
 
         opcode_t key, value;
 
+        key = add_string_const(lexer->bc, iter->key, "ascii");
 
         switch (iter->value->type) {
             case INT_VAL:
