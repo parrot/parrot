@@ -28,6 +28,7 @@ New in January 2009 release
     - implemented parametric roles
     - separate types for blocks, subs and methods
     - basic support for submethods
+    - implemented Junction autothreading
   + Befunge
     - back to working state
     - ported to pir
