@@ -197,7 +197,7 @@ while (<>) {
     elsif ( $meta{pkgconfig} ) {
 
         # For the time being this is hardcoded as being installed under libdir
-        # as it is typically donw with automake installed packages.  If there
+        # as it is typically done with automake installed packages.  If there
         # is a use case to make this configurable we'll add a seperate
         # --pkgconfigdir option.
         $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $dest );
