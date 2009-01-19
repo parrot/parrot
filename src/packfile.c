@@ -559,12 +559,20 @@ Check B<sub_pmc>'s pragmas (e.g. flags like C<:load>, C<:main>, etc.) returning
 static int
 sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
 {
+    /* Note: the const casting is only needed because of the
+     * internal details of the Sub_comp macros.
+     * The assumption is that the TEST versions are in fact const,
+     * so the casts are safe.
+     * These casts are a quick fix to allow parrot build with c++,
+     * a refactor of the macros will be a cleaner solution.
+     */
+    DECL_CONST_CAST;
     ASSERT_ARGS(sub_pragma)
     int todo    = 0;
     int pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
                                           & ~SUB_FLAG_IS_OUTER;
 
-    if (!pragmas && !Sub_comp_INIT_TEST(sub_pmc))
+    if (!pragmas && !Sub_comp_INIT_TEST(PARROT_const_cast(PMC *, sub_pmc)))
         return 0;
 
     switch (action) {
@@ -575,7 +583,7 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
                 todo = 1;
 
             /* :init functions need to be called at MAIN time, so return 1 */
-            if (Sub_comp_INIT_TEST(sub_pmc)) /* symreg.h:P_INIT */
+            if (Sub_comp_INIT_TEST(PARROT_const_cast(PMC *, sub_pmc))) /* symreg.h:P_INIT */
                 todo = 1;
 
             break;
