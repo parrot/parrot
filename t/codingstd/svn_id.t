@@ -43,7 +43,7 @@ my @all_files  = ( @c_files, @perl_files );
 my @files = @ARGV ? @ARGV : @all_files;
 my @no_id_files;
 
-my $id_line = '\$Id.*\$';
+my $id_line = '\$Id:.*\$';
 
 foreach my $file (@files) {
 
