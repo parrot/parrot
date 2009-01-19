@@ -1041,11 +1041,6 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     yyscan_t           yyscanner   = IMCC_INFO(interp)->yyscanner;
     const char * const output_file = interp->output_file;
 
-    /* set the top of the stack so GC can trace it for GC-able pointers
-     * see trace_system_areas() in src/cpu_dep.c */
-    if (!interp->lo_var_ptr)
-        interp->lo_var_ptr = (void *)&obj_file;
-
     /* Figure out what kind of source file we have -- if we have one */
     if (!sourcefile || !*sourcefile)
         IMCC_fatal_standalone(interp, 1, "main: No source file specified.\n");

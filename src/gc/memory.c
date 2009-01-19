@@ -346,16 +346,21 @@ Initializes the memory allocator and the garbage collection subsystem.
 Calls the initialization function associated with each collector, which
 is determined at compile time.
 
+The "stacktop" parameter is required; it provides an upper bound for
+stack scanning during a garbage collection run.
+
 =cut
 
 */
 
 void
-mem_setup_allocator(PARROT_INTERP)
+mem_setup_allocator(PARROT_INTERP, ARGIN(void *stacktop))
 {
     ASSERT_ARGS(mem_setup_allocator)
     interp->arena_base = mem_allocate_zeroed_typed(Arenas);
     interp->arena_base->sized_header_pools = NULL;
+
+    interp->lo_var_ptr = stacktop;
 
 #if PARROT_GC_MS
     Parrot_gc_ms_init(interp);

@@ -117,6 +117,7 @@ Parrot_Interp
 make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
 {
     ASSERT_ARGS(make_interpreter)
+    int stacktop;
     Interp *interp;
 
     /* Get an empty interpreter from system memory */
@@ -167,7 +168,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     }
 
     /* Set up the memory allocation system */
-    mem_setup_allocator(interp);
+    mem_setup_allocator(interp, (void*)&stacktop);
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 

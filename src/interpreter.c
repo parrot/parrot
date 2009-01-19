@@ -889,13 +889,7 @@ evaluation of opcode continues.
 void
 runops_int(PARROT_INTERP, size_t offset)
 {
-    int lo_var_ptr;
     opcode_t *(*core) (PARROT_INTERP, opcode_t *) = NULL;
-
-    /* if we are entering the run loop the first time, set the stack pointer so
-     * that we can scan the stack for GCable pointers */
-    if (!interp->lo_var_ptr)
-        interp->lo_var_ptr = (void *)&lo_var_ptr;
 
     /* setup event function ptrs */
     if (!interp->save_func_table)
