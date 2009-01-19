@@ -89,7 +89,7 @@ Fetch the type field of the fixup entry.
 =cut
 
 */
-    INTVAL get_type() {
+    METHOD get_type() {
         PackFile_FixupEntry *pfentry = PMC_data_typed(SELF, PackFile_FixupEntry *);
         int rv = pfentry->type;
         RETURN(INTVAL rv);
