@@ -11,11 +11,11 @@ Fairly randomly sorted, the tasks are:
 
 [DONE] 2.a Create a PMC constant for strings, numbers and
              subroutines.
-[TODO] 2.b Create a PMC constant for keys
+[DONE] 2.b Create a PMC constant for keys
 
 [TODO] 3.  Complete PASM output, so it can actually be parsed and run.
 
-[TODO] 4.  Handle :multi flag properly.
+[DONE] 4.  Handle :multi flag properly.
 
 [TODO] 5.  Handle nested macro expansions.
 
@@ -31,8 +31,8 @@ Fairly randomly sorted, the tasks are:
 
 [DONE] 9.a Handle :slurpy
 
-[TODO] 9.b Handle :flat
+[DONE] 9.b Handle :flat
 
-[TODO] 10. Handle indexed assignments in bytecode.
+[DONE] 10. Handle indexed assignments in bytecode.
 
 More tasks will be added as I think of them. --kjs

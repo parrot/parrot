@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -310,19 +310,8 @@ register (assuming they're of the same type).
 
 =head2 Status
 
-Bytecode generation is mostly done, except for:
-
-=over 4
-
-=item * :multi types
-
-=item * keys and indexed assignments
-
-=item * auto-boxing of return values doesn't work
-
-=item * :flat flag doesn't work
-
-=back
+Bytecode generation is done, but there is the occasional bug. These
+are reported in trac.parrot.org.
 
 
 =head1 IMPLEMENTATION
@@ -334,15 +323,17 @@ The directory compilers/pirc has a number of subdirectories:
 =item doc - contains documentation.
 
 =item heredoc - contains the implementation of the heredoc preprocessor. This is now
-integrated with pirc/new. It now only has a driver program to build a stand-alone
+integrated with pirc/src. It now only has a driver program to build a stand-alone
 heredoc preprocessor.
 
-=item new - contains the Bison/Flex implementation of PIRC
+=item src - contains the Bison/Flex implementation of PIRC
 
-=item t - for tests. No tests yet at this point.
+=item t - for tests. Tests input is fed into Parrot after compilation,
+which will run the code.
 
 =item macro - contains the old implementation of the macro preprocessor. This is now
-integrated with pirc/new.
+integrated with pirc/src. These files are kept as a reference until the macro
+preprocessor in pirc/src is completed.
 
 =back
 
@@ -393,15 +384,7 @@ Then make sure to overwrite the supplied flex binary.
 =head1 BUGS
 
 Having a look at this implementation would be greatly appreciated, and any resulting
-feedback even more :-)
-
-=over 4
-
-=item * Memory management of the macro processor needs to be fixed. (heredoc and PIR parser are ok).
-
-=item * Braced macro argument handling needs a lot of testing.
-
-=back
+feedback even more :-). Please post bug reports in trac.parrot.org.
 
 
 =head1 SEE ALSO
