@@ -1500,8 +1500,8 @@ string_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const S
     else if (!s1->strlen) {   /* s2->strlen is the same here */
         return 0;
     }
-    else if (s1->strstart == s2->strstart &&
-            s1->bufused == s2->bufused) { /* COWed strings */
+    /* COWed strings */
+    else if (s1->strstart == s2->strstart && s1->bufused == s2->bufused) {
         return 0;
     }
 

@@ -85,12 +85,14 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
         ARGMOD(STRING *string))
 {
     ASSERT_ARGS(string_unescape_one)
-    UINTVAL workchar = 0;
+    UINTVAL workchar  = 0;
     UINTVAL charcount = 0;
     const UINTVAL len = string_length(interp, string);
+
     /* Well, not right now */
     UINTVAL codepoint = CHARSET_GET_BYTE(interp, string, *offset);
     ++*offset;
+
     switch (codepoint) {
         case 'x':
             codepoint = CHARSET_GET_BYTE(interp, string, *offset);
