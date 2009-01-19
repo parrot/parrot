@@ -32,6 +32,7 @@ New in January 2009 release
     - back to working state
     - ported to pir
   + Pipp
+    - constants are now handled as package vars
     - added incomplete support for closures
     - removed support for the alternative parsing strategies
     - added support for 'elsif'
