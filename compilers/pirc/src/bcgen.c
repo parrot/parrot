@@ -395,7 +395,7 @@ new_bytecode(Interp *interp, char const * const filename) {
     self         = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     add_pmc_const(bc, self);
 
-
+    /* initialize debug-segment fields */
     bc->instr_counter = 0;
     bc->debug_seg     = NULL;
 
@@ -419,7 +419,7 @@ create_codesegment(bytecode * const bc, int codesize) {
     /* allocate enough space. XXX I *think* bytes is /always/ codesize * 4. */
     bc->interp->code->base.data = (opcode_t *)mem_sys_realloc(bc->interp->code->base.data,
                                                               codesize * 4);
-
+    /* store the size of the code-segment */
     bc->interp->code->base.size = codesize;
 
     /* initialize the cursor to write opcodes into the code segment */
@@ -429,20 +429,19 @@ create_codesegment(bytecode * const bc, int codesize) {
 /*
 
 =item C<void
-create_debugsegment(bytecode * const bc, size_t size)>
+create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const file)>
 
-Create a debug segment of size C<size>
+Create a debug segment of size C<size>.
 
 =cut
 
 */
 void
-create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const sourcefile)
-{
+create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const file) {
     bc->debug_seg = Parrot_new_debug_seg(bc->interp, bc->interp->code, size);
 
     /* XXX why is the +1 needed? FIX! */
-    Parrot_debug_add_mapping(bc->interp, bc->debug_seg, sourceline + 1, sourcefile);
+    Parrot_debug_add_mapping(bc->interp, bc->debug_seg, sourceline + 1, file);
 }
 
 /*
@@ -450,19 +449,13 @@ create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const
 =item C<void
 emit_debug_info(bytecode * const bc, int sourceline)>
 
-Emit debug information.
-XXX
+Emit the C<sourceline> number in the debug segment.
 
 =cut
 
 */
 void
 emit_debug_info(bytecode * const bc, int sourceline) {
-    /*
-if (IMCC_INFO(interp)->debug_seg)
-            IMCC_INFO(interp)->debug_seg->base.data[IMCC_INFO(interp)->ins_line++] =
-                (opcode_t)ins->line;
-                */
     bc->debug_seg->base.data[bc->instr_counter++] = sourceline;
 }
 

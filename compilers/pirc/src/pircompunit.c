@@ -401,7 +401,9 @@ new_statement(lexer_state * const lexer, char const * const opname) {
     instr->offset = lexer->codesize;
 
     /* set the PIR source line number */
+    /* XXX yypirget_lineno returns the wrong line no :-( FIX! */
     instr->sourceline = yypirget_lineno(lexer->yyscanner);
+
 /*
     fprintf(stderr, "[%4d][%s]\n", instr->sourceline, opname);
 */
