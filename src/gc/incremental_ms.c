@@ -527,11 +527,9 @@ gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(vo
 #if DISABLE_GC_DEBUG
     UNUSED(interp);
 #else
-    if (GC_DEBUG(interp)) {
-        if (pool == interp->arena_base->pmc_pool) {
-            PMC * const p = (PMC *)to_add;
-            p->vtable     = interp->vtables[enum_class_Null];
-        }
+    if (GC_DEBUG(interp)  && pool == interp->arena_base->pmc_pool) {
+        PMC * const p = (PMC *)to_add;
+        p->vtable     = interp->vtables[enum_class_Null];
     }
 #endif
 }
