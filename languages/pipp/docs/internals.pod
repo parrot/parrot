@@ -69,6 +69,8 @@ Experiments using that approach are underway.
 
 =head1 Functions and closures
 
+TODO: type hints in function declarations
+
 =head2 Builtin functions
 
 =head2 Closures
