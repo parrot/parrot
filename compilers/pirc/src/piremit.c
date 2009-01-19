@@ -814,6 +814,9 @@ emit_pbc_instr(lexer_state * const lexer, instruction * const instr) {
      */
     optimize_instr(lexer, instr);
 
+    /* XXX check whether there's a debug segment, or that debug info must be emitted */
+    emit_debug_info(lexer->bc, instr->sourceline);
+
     /* emit the opcode */
     offset = emit_opcode(lexer->bc, instr->opcode);
 
@@ -870,6 +873,10 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
 
     /* initialize iter to first instruction */
     iter = sub->statements->next;
+
+    /* create debug segment */
+    /* XXX is this the right size? */
+    create_debugsegment(lexer->bc, lexer->codesize, iter->sourceline, lexer->filename);
 
     do {
         emit_pbc_instr(lexer, iter);

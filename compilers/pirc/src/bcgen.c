@@ -75,9 +75,10 @@ accessor functions.
 
 
 struct bytecode {
-    PackFile    *packfile;       /* the actual packfile */
-    opcode_t    *opcursor;       /* for writing ops into the code segment */
-    Interp      *interp;         /* parrot interpreter */
+    PackFile        *packfile;       /* the actual packfile */
+    opcode_t        *opcursor;       /* for writing ops into the code segment */
+    Interp          *interp;         /* parrot interpreter */
+    PackFile_Debug  *debug_seg;      /* debug segment */
 };
 
 
@@ -418,6 +419,46 @@ create_codesegment(bytecode * const bc, int codesize) {
 
     /* initialize the cursor to write opcodes into the code segment */
     bc->opcursor = (opcode_t *)bc->interp->code->base.data;
+}
+
+/*
+
+=item C<void
+create_debugsegment(bytecode * const bc, size_t size)>
+
+Create a debug segment of size C<size>
+
+=cut
+
+*/
+void
+create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const sourcefile)
+{
+    bc->debug_seg = Parrot_new_debug_seg(bc->interp, bc->interp->code, size);
+
+    /* XXX why is the +1 needed? FIX! */
+    Parrot_debug_add_mapping(bc->interp, bc->debug_seg, sourceline + 1, sourcefile);
+}
+
+/*
+
+=item C<void
+emit_debug_info(bytecode * const bc, int sourceline)>
+
+Emit debug information.
+XXX
+
+=cut
+
+*/
+void
+emit_debug_info(bytecode * const bc, int sourceline) {
+    /*
+if (IMCC_INFO(interp)->debug_seg)
+            IMCC_INFO(interp)->debug_seg->base.data[IMCC_INFO(interp)->ins_line++] =
+                (opcode_t)ins->line;
+                */
+    bc->debug_seg->base.data[sourceline] = sourceline;
 }
 
 
@@ -984,6 +1025,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     /* return the index in the constant table where this sub PMC is stored */
     return subconst_index;
 }
+
 
 
 /*

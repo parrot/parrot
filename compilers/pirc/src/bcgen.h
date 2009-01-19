@@ -82,6 +82,8 @@ bytecode *new_bytecode(Interp *interp, char const * const filename);
 void destroy_bytecode(bytecode * bc);
 
 void create_codesegment(bytecode * const bc, int codesize);
+void create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const file);
+void emit_debug_info(bytecode * const bc, int sourceline);
 
 void create_annotations_segment(bytecode * const bc, char const * const name);
 
