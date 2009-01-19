@@ -105,6 +105,7 @@ Code outside the scope of namespaces directives is allowed.
 =head2 SEE ALSO
 
   L<http://docs.php.net/manual/en/language.namespaces.php>
+  L<http://docs.php.net/manual/en/language.namespaces.faq.php>
   L<http://wiki.php.net/rfc/namespaces>
   L<http://wiki.php.net/rfc/namespaceseparator>
   L<http://wiki.php.net/rfc/backslashnamespaces>
