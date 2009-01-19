@@ -1,13 +1,13 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
-
 use lib qw( . lib ../lib ../../lib );
+
 use Parrot::Distribution;
-use Test::More tests => 1;
+use Test::More            tests => 1;
 
 =head1 NAME
 
@@ -43,8 +43,6 @@ my @all_files  = ( @c_files, @perl_files );
 my @files = @ARGV ? @ARGV : @all_files;
 my @no_id_files;
 
-my $id_line = '\$Id:.*\$';
-
 foreach my $file (@files) {
 
     # if we have command line arguments, the file is the full path
@@ -55,7 +53,13 @@ foreach my $file (@files) {
 
     my $buf = $DIST->slurp($path);
 
-    if ( $buf !~ m{$id_line}m ) {
+    if ( $buf !~ m/\$Id
+                   (?:
+                    \$       # unexpanded tag, for git-svn users or for new files
+                    |
+                    :.*\$    # expanded tag, colon required
+                   )
+                  /xm ) {
         push @no_id_files, $path;
         next;
     }
