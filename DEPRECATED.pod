@@ -59,7 +59,7 @@ See RT #58410.
 
 =item * vtablecache [post 0.9.0] (TT #6)
 
-=item * delegeate [post 0.9.0] (TT #187)
+=item * delegate [post 0.9.0] (TT #187)
 
 =item * deleg_pmc [post 0.9.0] (TT #187)
 
