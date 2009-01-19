@@ -79,6 +79,7 @@ struct bytecode {
     opcode_t        *opcursor;       /* for writing ops into the code segment */
     Interp          *interp;         /* parrot interpreter */
     PackFile_Debug  *debug_seg;      /* debug segment */
+    int              instr_counter;
 };
 
 
@@ -394,6 +395,10 @@ new_bytecode(Interp *interp, char const * const filename) {
     self         = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_INTERPRETER);
     add_pmc_const(bc, self);
 
+
+    bc->instr_counter = 0;
+    bc->debug_seg     = NULL;
+
     return bc;
 }
 
@@ -458,7 +463,7 @@ if (IMCC_INFO(interp)->debug_seg)
             IMCC_INFO(interp)->debug_seg->base.data[IMCC_INFO(interp)->ins_line++] =
                 (opcode_t)ins->line;
                 */
-    bc->debug_seg->base.data[sourceline] = sourceline;
+    bc->debug_seg->base.data[bc->instr_counter++] = sourceline;
 }
 
 

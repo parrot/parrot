@@ -402,7 +402,9 @@ new_statement(lexer_state * const lexer, char const * const opname) {
 
     /* set the PIR source line number */
     instr->sourceline = yypirget_lineno(lexer->yyscanner);
-
+/*
+    fprintf(stderr, "[%4d][%s]\n", instr->sourceline, opname);
+*/
     /*
     fprintf(stderr, "offset of %s is: %d\n", opname, instr->offset);
     */
