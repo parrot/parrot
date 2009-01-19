@@ -277,8 +277,10 @@ STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC *subclass)
-        __attribute__nonnull__(1);
+Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP,
+    ARGIN(PMC *subclass))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -364,7 +366,8 @@ PMC* Parrot_find_pad(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_sub_pmc_from_subclass \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(subclass)
 #define ASSERT_ARGS_parrot_new_closure __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub_pmc)

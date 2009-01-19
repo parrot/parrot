@@ -125,7 +125,8 @@ void key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
         FUNC_MODIFIES(*key);
 
 PARROT_EXPORT
-void key_set_number(SHIM_INTERP, ARGMOD(PMC *key), FLOATVAL value)
+void key_set_number(PARROT_INTERP, ARGMOD(PMC *key), FLOATVAL value)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*key);
 
@@ -202,7 +203,8 @@ STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
 #define ASSERT_ARGS_key_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_key_set_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(key)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_key_set_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(key) \
