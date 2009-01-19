@@ -37,7 +37,9 @@ package gen::opengl;
 
 use strict;
 use warnings;
+use File::Basename;
 use File::Glob;
+use File::Which;
 
 use base qw(Parrot::Configure::Step);
 
@@ -403,6 +405,13 @@ sub runstep {
     my $verbose = $conf->options->get('verbose') || 0;
 
     my @include_paths_win32 = grep /\S/ => split /;/ => ($ENV{INCLUDE} || '');
+
+    my $osname = $conf->data->get_p5('OSNAME');
+    if (scalar @include_paths_win32 == 0 && $osname =~ /mswin32/i) {
+        my $cc = $conf->data->get('cc');
+        my $path = dirname(dirname(which($cc))) . '\include';
+        @include_paths_win32 = ( $path );
+    }
 
     s{\\}{/}g foreach @include_paths_win32;
 
