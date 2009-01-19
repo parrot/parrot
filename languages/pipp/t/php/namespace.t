@@ -88,6 +88,30 @@ FOO in A
 FOO in A\B
 OUT
 
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'constant with fully qualified names' );
+<?php
+
+namespace A {
+    const FOO = "FOO in A\n";
+}
+
+namespace A\B {
+    const FOO = "FOO in A\\B\n";
+    echo \A\FOO;
+}
+
+namespace A\B {
+    echo \A\FOO;
+    echo \A\B\FOO;
+}
+
+?>
+CODE
+FOO in A
+FOO in A\B
+OUT
+
 =for perl6
 
 package A {

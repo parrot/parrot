@@ -127,7 +127,7 @@ method namespace_definition($/, $key) {
     our $?NS;
 
     if $key eq 'open' {
-        $?NS := +$<namespace_name> ?? ~$<namespace_name>[0] !! '';
+        $?NS := +$<namespace_name> ?? ~$<namespace_name>[0] ~ '\\' !! '';
     }
     else {
         my $block :=
@@ -264,11 +264,22 @@ method constructor_call($/) {
 
 method constant($/) {
     our $?NS;
-    make PAST::Var.new(
-        :name(~$<name>),
-        :scope('package'),
-        :namespace($?NS)
-    );
+    if $<name><leading_backslash> {
+        # fully qualified name
+        make PAST::Var.new(
+            :name(~$<name><ident>),
+            :scope('package'),
+            :namespace(~$<name><ns_path>)
+        );
+    }
+    else {
+        # access relative to current namespace
+        make PAST::Var.new(
+            :name(~$<name><ident>),
+            :scope('package'),
+            :namespace($?NS ~ $<name><ns_path>)
+        );
+    }
 }
 
 # TODO: merge with rule 'constant'

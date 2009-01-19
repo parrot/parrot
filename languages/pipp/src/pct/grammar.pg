@@ -251,17 +251,20 @@ token member_name              { <ident> }
 
 token method_name              { <ident> }
 
-token namespace_name           { <ns_component>* <ident> }
+token namespace_name           { <ns_path> <ident> }
 
 token name {
     <leading_backslash=ns_sep>?           # a leading backslash is optional, but significant
-    <ns_component>*                       # namespace
+    <ns_path>                             # namespace
     <ident>                               # identifier is required
 }
 
 token ns_sep                   { '\\' }   # yes, PHP 5.3 uses backslash as the namespace separator
 
-token ns_component             { <ident> <.ns_sep> }
+
+token ns_path                  {
+    [ <ident> <.ns_sep> ]*
+} 
 
 token var_name                 { '$' <ident> }
 
