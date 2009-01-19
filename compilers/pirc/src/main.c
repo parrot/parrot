@@ -136,7 +136,17 @@ process_file(void *a) {
 }
 
 
+/*
 
+=item C<static void
+runcode(PARROT_INTERP, int argc, char *argv[])>
+
+This function runs the code in the interpreter's (in C<PARROT_INTERP>)
+code segment.
+
+=cut
+
+*/
 static void
 runcode(PARROT_INTERP, int argc, char *argv[]) {
 
