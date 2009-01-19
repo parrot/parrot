@@ -35,7 +35,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
     .local pmc func
     .local pmc lib
 
-    func= find_global 'PCRE', 'init'
+    func= get_hll_global ['PCRE'], 'init'
     lib= func()
 
     .local string s
@@ -52,7 +52,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
     .local string error
     .local int errptr
 
-    func= find_global 'PCRE', 'compile'
+    func= get_hll_global ['PCRE'], 'compile'
     ( regex, error, errptr )= func( pat, 0 )
 
     .local int is_regex_defined
@@ -62,7 +62,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
     .local int ok
     .local pmc result
 
-    func= find_global 'PCRE', 'match'
+    func= get_hll_global ['PCRE'], 'match'
     ( ok, result )= func( regex, s, 0, 0 )
 
     if ok < 0 goto NOMATCH
@@ -73,7 +73,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
     .local string match
 
 LP:
-    func= find_global 'PCRE', 'dollar'
+    func= get_hll_global ['PCRE'], 'dollar'
     match= func( s, ok, result, i )
     print match
     print "\n"
