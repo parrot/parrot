@@ -6,11 +6,12 @@ internals - Design and Implementation of Pipp
 
 =head1 Source code
 
-See L<pipp.pod>.
+See L<pipp.pod> on where to get the code.
 
 =head1 Issue tracking
 
-See F<../ROADMAP> and L<pipp.pod>.
+Not decided yet. Will be documented in L<pipp.pod>.
+See also F<../ROADMAP>.
 
 =head1 Testing
 
@@ -75,6 +76,7 @@ TODO: type hints in function declarations
 
 =head2 Closures
 
+There is a major bug in the implementation.
 TODO: see C<t/php/closures.t>
 
 =head2 Internal functions
@@ -98,25 +100,46 @@ No global code can precede the first B<namespace> directive.
 
 =head2 Implementation in Pipp
 
-In order to ease implementation and testing, there will be
+In order to ease implementation and testing, there are
 some divergences in Pipp. 
-Only the bracketed syntax is supported.
-Code outside the scope of namespaces directives is allowed.
-'const' outside a declared namespace is allowed.
+
+=over 4
+
+=item Only the bracketed syntax is supported.
+
+=item Code outside the scope of namespaces directives is allowed.
+
+=item 'const' outside a declared namespace is allowed.
+
+=back
 
 =head2 SEE ALSO
 
-  L<http://docs.php.net/manual/en/language.namespaces.php>
-  L<http://docs.php.net/manual/en/language.namespaces.faq.php>
-  L<http://wiki.php.net/rfc/namespaces>
-  L<http://wiki.php.net/rfc/namespaceseparator>
-  L<http://wiki.php.net/rfc/backslashnamespaces>
-  L<http://wiki.php.net/rfc/namespacecurlies>
-  L<http://wiki.php.net/rfc/namespaceref>
-  L<http://inside.webfactory.de/en/blog/php-namespaces-explained.html>
-  L<http://marc.info/?l=php-internals&m=121527668606247>
-  L<http://bugs.php.net/bug.php?id=46304>
-  L<http://loveandtheft.org/2008/10/26/set-sail-for-fail-php-namespaces/>
+=over 4
+
+=item L<http://docs.php.net/manual/en/language.namespaces.php>
+
+=item L<http://docs.php.net/manual/en/language.namespaces.faq.php>
+
+=item L<http://wiki.php.net/rfc/namespaces>
+
+=item L<http://wiki.php.net/rfc/namespaceseparator>
+
+=item L<http://wiki.php.net/rfc/backslashnamespaces>
+
+=item L<http://wiki.php.net/rfc/namespacecurlies>
+
+=item L<http://wiki.php.net/rfc/namespaceref>
+
+=item L<http://inside.webfactory.de/en/blog/php-namespaces-explained.html>
+
+=item L<http://marc.info/?l=php-internals&m=121527668606247>
+
+=item L<http://bugs.php.net/bug.php?id=46304>
+
+=item L<http://loveandtheft.org/2008/10/26/set-sail-for-fail-php-namespaces/>
+
+=back
 
 =head1 Including and requiring
 
