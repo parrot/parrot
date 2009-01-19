@@ -251,6 +251,10 @@ mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_symreg)
     IMC_Unit * const unit = IMCC_INFO(interp)->last_unit;
+
+    /* Check for the condition that fires up a segfault in TT #162 */
+    PARROT_ASSERT(unit != NULL);
+
     return _mk_symreg(&unit->hash, name, t);
 }
 
