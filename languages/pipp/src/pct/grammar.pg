@@ -243,8 +243,6 @@ token class_name {
     <ident>
 }
 
-token constant_name            { <name> }
-
 token function_name            { <ident> }
 
 token interface_name           { <ident> }
@@ -337,12 +335,12 @@ token quote {
 }
 
 token constant {
-    <constant_name>
+    <name>
     {*}
 }
 
 token class_constant {
-    <class_name> '::' <constant_name>
+    <class_name> '::' <name>
     {*}
 }
 

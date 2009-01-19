@@ -265,7 +265,7 @@ method constructor_call($/) {
 method constant($/) {
     our $?NS;
     make PAST::Var.new(
-        :name(~$<constant_name>),
+        :name(~$<name>),
         :scope('package'),
         :namespace($?NS)
     );
@@ -277,7 +277,7 @@ method class_constant($/) {
     make PAST::Var.new(
         :scope('package'),
         :namespace( $?NS ~ '\\' ~ $<class_name> ~ '::'),
-        :name(~$<constant_name>)
+        :name(~$<name>)
     );
 }
 
