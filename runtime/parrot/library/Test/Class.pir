@@ -6,7 +6,7 @@ Test::Class - Parrot extension for objecty testing of modules
 
     .sub 'main'
         # load this library
-        load_bytecode 'library/Test/Class.pbc'
+        load_bytecode 'Test/Class.pbc'
 
         # load other testing libraries
         .include 'include/test_more.pir'
@@ -63,7 +63,7 @@ everything.
 .namespace [ 'Test'; 'Class' ]
 
 .sub '__init__' :load
-    load_bytecode 'runtime/parrot/library/Test/More.pbc'
+    load_bytecode 'Test/More.pbc'
 
     .local pmc class
     class = newclass [ 'Test'; 'Class' ]
