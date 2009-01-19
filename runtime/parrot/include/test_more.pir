@@ -14,7 +14,7 @@ simple test file written in parrot.
 
 =cut
 
-    load_bytecode 'runtime/parrot/library/Test/More.pbc'
+    load_bytecode 'Test/More.pbc'
 
     # get the testing functions
     .local pmc exports, curr_namespace, test_namespace
