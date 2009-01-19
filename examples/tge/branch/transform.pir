@@ -18,7 +18,7 @@ specified type.
 .sub _main :main
     .param pmc argv
 
-    load_bytecode '../../../runtime/parrot/library/TGE.pbc'
+    load_bytecode 'TGE.pbc'
     load_bytecode 'lib/Leaf.pir'
     load_bytecode 'lib/Branch.pir'
 
@@ -28,8 +28,8 @@ specified type.
 
     # Compile a grammar from the source grammar file
     .local pmc grammar
-    grammar = new 'TGE'
-    grammar.'agcompile'(source)
+    $P1 = new ['TGE';'Compiler']
+    grammar = $P1.'compile'(source)
 
     # Build up the tree for testing
     .local pmc tree
