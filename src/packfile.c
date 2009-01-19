@@ -559,6 +559,8 @@ Check B<sub_pmc>'s pragmas (e.g. flags like C<:load>, C<:main>, etc.) returning
 static int
 sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
 {
+    ASSERT_ARGS(sub_pragma)
+
     /* Note: the const casting is only needed because of the
      * internal details of the Sub_comp macros.
      * The assumption is that the TEST versions are in fact const,
@@ -567,7 +569,6 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
      * a refactor of the macros will be a cleaner solution.
      */
     DECL_CONST_CAST;
-    ASSERT_ARGS(sub_pragma)
     int todo    = 0;
     int pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
                                           & ~SUB_FLAG_IS_OUTER;
