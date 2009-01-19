@@ -45,8 +45,8 @@ An SDL::LCD object has the following methods:
     .return()
 
   create_class:
-    load_bytecode 'library/SDL/Image.pir'
-    load_bytecode 'library/SDL/Rect.pir'
+    load_bytecode 'SDL/Image.pir'
+    load_bytecode 'SDL/Rect.pir'
 
     .local pmc digits
     digits = new 'SDL::Image'
