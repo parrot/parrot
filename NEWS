@@ -32,7 +32,11 @@ New in January 2009 release
     - back to working state
     - ported to pir
   + Pipp
+    - add support for namespaced constants
     - constants are now handled as package vars
+    - variables are now lexical variables
+    - add support for superglobals in functions
+    - Call the class __constructor when there is one
     - added incomplete support for closures
     - removed support for the alternative parsing strategies
     - added support for 'elsif'
@@ -41,6 +45,8 @@ New in January 2009 release
     - left the nest and is now at https://github.com/bschmalhofer/hq9plus/
   + Eclectus
     - left the nest and is now at http://github.com/bschmalhofer/eclectus/
+  + m4
+    - left the nest and is now at http://github.com/bschmalhofer/m4/
 - Miscellaneous
   + Infrastructure
     - 'make smoke' now generates Smolder reports sent to
