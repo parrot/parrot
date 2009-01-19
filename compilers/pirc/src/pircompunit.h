@@ -293,6 +293,7 @@ typedef struct instruction {
     int                 oplabelbits;  /* bits indicating which operands are labels */
     struct op_info_t   *opinfo;       /* pointer to the op_info containing this op's meta data */
     int                 opcode;       /* the opcode of this instruction */
+    int                 sourceline;   /* PIR source line */
 
     struct instruction *next;
 } instruction;

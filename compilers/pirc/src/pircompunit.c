@@ -400,6 +400,9 @@ new_statement(lexer_state * const lexer, char const * const opname) {
     /* the codesize so far will be the offset of this instruction. */
     instr->offset = lexer->codesize;
 
+    /* set the PIR source line number */
+    instr->sourceline = yypirget_lineno(lexer->yyscanner);
+
     /*
     fprintf(stderr, "offset of %s is: %d\n", opname, instr->offset);
     */
