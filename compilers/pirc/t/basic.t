@@ -3,7 +3,7 @@
 # $Id$
 
 use lib "../../lib";
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 6;
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "a local, a reg and an if-stat");
 .sub main
@@ -84,7 +84,7 @@ CODE
 OUTPUT
 
 
-pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "indexing a hash");
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "indexing a hash with a string constant");
 .sub main
     .local pmc p
     p = new "Hash"
@@ -100,6 +100,24 @@ CODE
 3.3
 OUTPUT
 
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "indexing a hash with a string register");
+.sub main
+    .local pmc p
+    p = new "Hash"
+    $S0 = "hello"
+    p[$S0] = 42
+    $I0 = p[$S0]
+    say $I0
+    # and combine indexing with string constant and register
+    $S1 = "bye"
+    p["bye"] = 3.3
+    $N1 = p["bye"]
+    say $N1
+.end
+CODE
+42
+3.3
+OUTPUT
 
 
 

@@ -235,6 +235,9 @@ add_num_const(bytecode * const bc, double f) {
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
     constant->type              = PFC_NUMBER;
     constant->u.number          = f;
+#if DEBUGBC
+    fprintf(stderr, "add_num_const (%f) at index: %d\n", f, index);
+#endif
     return index;
 }
 
@@ -579,7 +582,10 @@ store_key_bytecode(bytecode * const bc, opcode_t * key) {
 
     index = add_key_const(bc, pfc->u.key);
 
+#if DEBUGBC
     fprintf(stderr, "store key at index %d\n", index);
+#endif
+
     mem_sys_free(pfc);
 
     return index;

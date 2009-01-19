@@ -631,11 +631,12 @@ emit_pbc_key(lexer_state * const lexer, key * const k) {
      * flags/types and the register/constant index.
      */
     keysize = pc - key;
-
+/*
     fprintf(stderr, "key: ");
     for (index = 0; index < keysize; ++index) {
         fprintf(stderr, "%d|", key[index]);
     }
+*/
     /* store the key, and emit the index at which it's stored into the code segment */
     index = store_key_bytecode(lexer->bc, key);
     emit_int_arg(lexer->bc, index);
