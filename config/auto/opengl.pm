@@ -107,7 +107,8 @@ F<GLUT for Win32> (L<http://www.xmission.com/~nate/glut.html>)
 
 =head3 MinGW
 
- XXXX: No details yet
+GLUT 3.7.6,
+see L<http://www.transmissionzero.co.uk/computing/using-glut-with-mingw/>.
 
 
 =head3 Cygwin/w32api
