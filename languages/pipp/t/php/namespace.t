@@ -1,9 +1,9 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
 
-t/php/namespace.t - testing packages, aka namespaces
+t/php/namespace.t - testing namespaces
 
 =head1 SYNOPSIS
 
@@ -15,7 +15,7 @@ Working with namespaces.
 
 =head1 SEE ALSO
 
-L<../../docs/namespaces.pod>
+L<../../docs/internals.pod>
 
 =cut
 
@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 7;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'parsing of namespace directive' );
 <?php
@@ -63,6 +63,31 @@ CODE
 FOO in A\B
 OUT
 
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'FOO in different namespace block' );
+<?php
+
+namespace A {
+    const FOO = "FOO in A\n";
+}
+
+namespace A\B {
+    const FOO  = "FOO in A\\B\n";
+}
+
+namespace A {
+    echo FOO;
+}
+
+namespace A\B {
+    echo FOO;
+}
+
+?>
+CODE
+FOO in A
+FOO in A\B
+OUT
+
 =for perl6
 
 package A {
@@ -91,7 +116,7 @@ package A::B {
 
 =cut
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'not yet' );
 <?php
 
 namespace A {
@@ -99,7 +124,7 @@ namespace A {
 }
 
 namespace A\B {
-    const FOO  = "FOO in A:B\n";
+    const FOO  = "FOO in A\\B\n";
 }
 
 namespace A {
