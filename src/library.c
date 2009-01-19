@@ -160,12 +160,15 @@ parrot_init_library_paths(PARROT_INTERP)
     STRING *entry;
 
     PMC * const iglobals = interp->iglobals;
+    PMC * const config_hash =
+            VTABLE_get_pmc_keyed_int(interp, iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
+
     /* create the lib_paths array */
     PMC * const lib_paths = pmc_new(interp, enum_class_FixedPMCArray);
-
     VTABLE_set_integer_native(interp, lib_paths, PARROT_LIB_PATH_SIZE);
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             IGLOBALS_LIB_PATHS, lib_paths);
+    
     /* each is an array of strings */
     /* define include paths */
     paths = pmc_new(interp, enum_class_ResizableStringArray);
@@ -177,6 +180,11 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
+    if (VTABLE_elements(interp, config_hash)) {
+        STRING * const key = CONST_STRING(interp, "includedir");
+        entry = VTABLE_get_string_keyed_str(interp, config_hash, key);
+        VTABLE_push_string(interp, paths, entry);
+    }
     entry = CONST_STRING(interp, "lib/parrot/include/");
     VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "lib/parrot/");
@@ -192,6 +200,11 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
+    if (VTABLE_elements(interp, config_hash)) {
+        STRING * const key = CONST_STRING(interp, "libdir");
+        entry = VTABLE_get_string_keyed_str(interp, config_hash, key);
+        VTABLE_push_string(interp, paths, entry);
+    }
     entry = CONST_STRING(interp, "lib/parrot/library/");
     VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "lib/parrot/");
