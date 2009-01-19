@@ -24,7 +24,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 8;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'parsing of namespace directive' );
 <?php
@@ -109,6 +109,7 @@ namespace A\B {
 ?>
 CODE
 FOO in A
+FOO in A
 FOO in A\B
 OUT
 
@@ -140,7 +141,7 @@ package A::B {
 
 =cut
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'not yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant' );
 <?php
 
 namespace A {
@@ -168,24 +169,25 @@ namespace A\B {
 ?>
 CODE
 FOO in A
-FOO in A::B
+FOO in A\B
 FOO in A
 
-FOO in A::B
-FOO in A::B
+FOO in A\B
+FOO in A\B
 FOO in A
+
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant', todo => 'not implemented yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'namespace with constant' );
 <?php
 
 namespace {
-const FOO = "FOO in root.\n";
+const FOO = "FOO in root\n";
 }
 
 namespace A\B {
 
-const FOO  = "FOO in A::B\n";
+const FOO  = "FOO in A\\B\n";
 
 echo FOO;
 echo \A\B\FOO;
@@ -203,11 +205,11 @@ echo \FOO;
 
 ?>
 CODE
-FOO in A::B
-FOO in A::B
+FOO in A\B
+FOO in A\B
 FOO in root
 FOO in root
-FOO in A::B
+FOO in A\B
 FOO in root
 OUT
 
