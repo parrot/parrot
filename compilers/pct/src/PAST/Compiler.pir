@@ -70,6 +70,7 @@ any value type.
     piropsig['getprop']    = 'P~P'
     piropsig['mod']        = 'PP+'
     piropsig['mul']        = 'PP+'
+    piropsig['neg']        = 'PP'
     piropsig['n_neg']      = 'PP'
     piropsig['newclosure'] = 'PP'
     piropsig['not']        = 'PP'
