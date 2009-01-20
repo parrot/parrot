@@ -16,9 +16,6 @@ math.ops - Mathematical Operations
 Operations that perform some sort of mathematics, including both basic
 math and transcendental functions.
 
-The variants with a prepended B<n_> like <n_abs> generate a new target PMC.
-If possible, they use the appropriate language type, specified with C<.HLL>.
-
 =head2 Arithmetic operations
 
 These operations store the results of arithmetic on other registers and
@@ -45,10 +42,6 @@ Set $1 to its absolute value.
 =item B<abs>(out PMC, invar PMC)
 
 Set $1 to absolute value of $2.
-
-=item B<n_abs>(out PMC, invar PMC)
-
-Create new $1 as the absolute of $2.
 
 =cut
 
@@ -80,10 +73,6 @@ inline op abs(invar PMC) :base_core {
 
 inline op abs(out PMC, invar PMC) :base_core {
   $1 = VTABLE_absolute(interp, $2, $1);
-}
-
-inline op n_abs(out PMC, invar PMC) :base_core {
-  $1 = VTABLE_absolute(interp, $2, NULL);
 }
 
 ########################################

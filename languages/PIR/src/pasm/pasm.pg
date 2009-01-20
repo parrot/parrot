@@ -44,9 +44,7 @@ rule bitwise_op {
     band                <target> \, <simple_expr> [ \, <simple_expr> ]?
   | bands               <target> \, <simple_expr> [ \, <simple_expr> ]?
   | bnot                <target> [ \, <simple_expr> ]?
-  | n_bnot              <target> \, <simple_expr>
   | bnots               <target> [ \, <simple_expr> ]?
-  | n_bnots             <target> \, <simple_expr>
   | bor                 <target> \, <simple_expr> [ \, <simple_expr> ]?
   | bors                <target> \, <simple_expr> [ \, <simple_expr> ]?
   | shl                 <target> \, <simple_expr> [ \, <simple_expr> ]?
@@ -100,7 +98,6 @@ rule comparison_op {
   | isne                <isXX_args>
   | and                 [ <int_reg> | <id> ] \, <simple_expr> \, <simple_expr>
   | not                 <target> [ \, <target> ]?
-  | n_not               <target> \, <target>
   | or                  [ <int_reg> | <id> ] \,<simple_expr> \, <simple_expr>
   | xor                 [ <int_reg> | <id> ] \, <simple_expr> \, <simple_expr>
 }

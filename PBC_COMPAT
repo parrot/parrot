@@ -27,8 +27,9 @@
 
 # please insert tab separated entries at the top of the list
 
-3.31    2009.01.12      whiteknight     remove stm.ops and all opcodes therein
-3.30	2009.01.10	coke	removed find_global_p_s_s and store_global_s_s_p 
+3.32    2009.01.19	chromatic	removed remaning n_* math/bitwise ops
+3.31    2009.01.12	whiteknight	remove stm.ops and all opcodes therein
+3.30	2009.01.10	coke	removed find_global_p_s_s and store_global_s_s_p
 3.29	2009.01.07	coke	removed store_global_p_s_p
 3.28	2009.01.07	jonathan	changes for bytecode annoations (packfile and ops)
 3.27	2008.01.07	coke	removed find_global_p_p_s, find_global_p_s, store_global_p_s

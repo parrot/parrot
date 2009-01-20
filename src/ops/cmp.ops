@@ -17,9 +17,6 @@ Operations that compare two registers against each other.
 Some of these operations affect control flow directly; others
 do not.
 
-The variants with a prepended B<n_> like <n_not> generate a new target PMC.
-If possible, they use the appropriate language type, specified with C<.HLL>.
-
 =cut
 
 ###############################################################################
@@ -931,10 +928,6 @@ Set the boolean state of $1 to the opposite of the boolean state from $1.
 
 =item B<not>(out PMC, invar PMC)
 
-=item B<n_not>(out PMC, invar PMC)
-
-Set the boolean state of $1 to the opposite of the boolean state from $2.
-
 =cut
 
 inline op not(inout INT) :base_core {
@@ -951,10 +944,6 @@ inline op not(invar PMC) :base_core {
 
 inline op not(out PMC, invar PMC) :base_core {
   $1 = VTABLE_logical_not(interp, $2, $1);
-}
-
-inline op n_not(out PMC, invar PMC) :base_core {
-  $1 = VTABLE_logical_not(interp, $2, NULL);
 }
 
 ########################################

@@ -442,9 +442,9 @@ operator declarations as I wrote them for Squaak:
                        is pirop('n_div')       { ... }
 
     proto 'prefix:not' is tighter('infix:*')
-                       is pirop('n_not')       { ... }
+                       is pirop('not')       { ... }
     proto 'prefix:-'   is tighter('prefix:not')
-                       is pirop('n_neg')       { ... }
+                       is pirop('neg')       { ... }
 
     proto 'term:'      is tighter('prefix:-')
                        is parsed(&term)        { ... }

@@ -31,9 +31,6 @@ or in groups.
 
 The variant with an appended B<s> like B<bands> work on strings.
 
-The variants with a prepended B<n_> like <n_bnot> generate a new target PMC.
-If possible, they use the appropriate language type, specified with C<.HLL>.
-
 =over 4
 
 =cut
@@ -140,10 +137,6 @@ Sets $1 to C<bitwise not> $1 inplace.
 
 =item B<bnot>(out PMC, invar PMC)
 
-=item B<n_bnot>(out PMC, invar PMC)
-
-Set the bits of $1 to the B<not> of the corresponding bits from $2.
-
 =cut
 
 inline op bnot(inout INT) :base_core {
@@ -162,10 +155,6 @@ inline op bnot(out PMC, invar PMC) :base_core {
   $1 = VTABLE_bitwise_not(interp, $2, $1);
 }
 
-inline op n_bnot(out PMC, invar PMC) :base_core {
-  $1 = VTABLE_bitwise_not(interp, $2, NULL);
-}
-
 =item B<bnots>(inout STR)
 
 =item B<bnots>(invar PMC)
@@ -173,10 +162,6 @@ inline op n_bnot(out PMC, invar PMC) :base_core {
 =item B<bnots>(out STR, in STR)
 
 =item B<bnots>(out PMC, invar PMC)
-
-=item B<n_bnots>(out PMC, invar PMC)
-
-Set the bits of $1 to the B<not> of the corresponding bits from $2.
 
 =cut
 
@@ -194,10 +179,6 @@ inline op bnots(invar PMC) :base_core {
 
 inline op bnots(out PMC, invar PMC) :base_core {
   $1 = VTABLE_bitwise_nots(interp, $2, $1);
-}
-
-inline op n_bnots(out PMC, invar PMC) :base_core {
-  $1 = VTABLE_bitwise_nots(interp, $2, NULL);
 }
 
 ########################################
