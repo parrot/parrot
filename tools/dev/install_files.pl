@@ -124,9 +124,9 @@ my %options = (
     destdir     => '',
     exec_prefix => '/usr',
     bindir      => '/usr/bin',
-    libdir      => '/usr/lib',
-    includedir  => '/usr/include',
-    docdir      => '/usr/share/doc',
+    libdir      => '/usr/lib/parrot',
+    includedir  => '/usr/include/parrot',
+    docdir      => '/usr/share/doc/parrot',
     'dry-run'   => 0,
 );
 
