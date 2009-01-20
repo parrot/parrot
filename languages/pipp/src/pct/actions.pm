@@ -765,6 +765,22 @@ method class_definition($/, $key) {
                         $( $_<literal> )
                     )
                 );
+
+                # add accessors for the attribute
+                $methods_block.push(
+                    PAST::Block.new(
+                        :blocktype('declaration'),
+                        :name(~$_<var_name><ident>),
+                        :pirflags(':method'),
+                        :node( $/ ),
+                        PAST::Stmts.new(
+                            PAST::Var.new(
+                                :name(~$_<var_name><ident>),
+                                :scope('attribute')
+                            )
+                        )
+                    )
+                );
             }
         }
 
@@ -796,26 +812,6 @@ method class_definition($/, $key) {
         # add the methods
         for $<class_method_definition> {
             $methods_block.push( $($_) );
-        }
-
-        # add accessors for the attributes
-        for $<class_member_definition> {
-            if $_<static> {
-                $methods_block.push(
-                    PAST::Block.new(
-                        :blocktype('declaration'),
-                        :name(~$_<var_name><ident>),
-                        :pirflags(':method'),
-                        :node( $/ ),
-                        PAST::Stmts.new(
-                            PAST::Var.new(
-                                :name(~$_<var_name><ident>),
-                                :scope('attribute')
-                            )
-                        )
-                    )
-                );
-            }
         }
 
         $block.push( $methods_block );
