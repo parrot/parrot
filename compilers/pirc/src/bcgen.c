@@ -429,7 +429,7 @@ create_codesegment(bytecode * const bc, int codesize) {
 /*
 
 =item C<void
-create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const file)>
+create_debugsegment(bytecode * const bc, size_t size, char const * const file)>
 
 Create a debug segment of size C<size>.
 
@@ -437,11 +437,11 @@ Create a debug segment of size C<size>.
 
 */
 void
-create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const file) {
+create_debugsegment(bytecode * const bc, size_t size, char const * const file) {
     bc->debug_seg = Parrot_new_debug_seg(bc->interp, bc->interp->code, size);
 
 
-    Parrot_debug_add_mapping(bc->interp, bc->debug_seg, sourceline, file);
+    Parrot_debug_add_mapping(bc->interp, bc->debug_seg, bc->instr_counter, file);
 }
 
 /*
@@ -926,6 +926,48 @@ create_sub_pmc(bytecode * const bc, int iscoroutine, char const * const instance
      */
     return pmc_new(bc->interp, type);
 }
+
+
+#if 0
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t *
+make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
+{
+    const size_t old  = old_blocks(interp);
+    const size_t size = unit->n_basic_blocks + old;
+
+    if (!IMCC_INFO(interp)->globals->cs->jit_info) {
+        const size_t len  =
+            strlen(IMCC_INFO(interp)->globals->cs->seg->base.name) + 5;
+        char * const name = mem_allocate_n_typed(len, char);
+
+        snprintf(name, len, "%s_JIT",
+            IMCC_INFO(interp)->globals->cs->seg->base.name);
+
+        IMCC_INFO(interp)->globals->cs->jit_info =
+                PackFile_Segment_new_seg(interp,
+                    interp->code->base.dir, PF_UNKNOWN_SEG, name, 1);
+
+        mem_sys_free(name);
+    }
+
+    /* store current size */
+    IMCC_INFO(interp)->globals->cs->subs->n_basic_blocks = unit->n_basic_blocks;
+
+    /* offset of block start and end, 4 * registers_used */
+    IMCC_INFO(interp)->globals->cs->jit_info->data =
+        mem_realloc_n_typed(IMCC_INFO(interp)->globals->cs->jit_info->data,
+            size * 4, opcode_t);
+
+    IMCC_INFO(interp)->globals->cs->jit_info->size = size * 4;
+
+    return IMCC_INFO(interp)->globals->cs->jit_info->data + old * 4;
+}
+
+#endif /* HAS_JIT */
+
 
 
 /*
