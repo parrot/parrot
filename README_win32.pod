@@ -111,11 +111,8 @@ or by some test.
 B<antlr> - ANother Tool for Language Recognition
 L<http://www.antlr.org/>
 
-B<m4> - macro language processor
-L<http://gnuwin32.sourceforge.net/>
-
-B<SVN::Client> - Perl wrapper of Subversion client functions
-L<http://subversion.tigris.org/> (svn-win32-1.4.x_pl.zip)
+B<ctags> - Exuberant Ctags
+L<http://ctags.sourceforge.net/>
 
 =item Inno Setup
 
@@ -246,6 +243,6 @@ This document borrows heavily from Perl's README.win32.
 
 GCC/mingw32 support was added in 0.1.2 (François Perrad).
 
-Last updated: 22 July 2008
+Last updated: 20 Jan 2009
 
 =cut
