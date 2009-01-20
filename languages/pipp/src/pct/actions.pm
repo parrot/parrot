@@ -264,6 +264,9 @@ method constructor_call($/) {
 
 method constant($/) {
     our $?NS;
+    our $?CLASS;
+    my $ns   := $?CLASS eq '' ?? $?NS
+                              !! $?NS ~ '\\' ~ $?CLASS ~ '::';
     if $<name><leading_backslash> {
         # fully qualified name
         make PAST::Var.new(
@@ -277,7 +280,7 @@ method constant($/) {
         make PAST::Var.new(
             :name(~$<name><ident>),
             :scope('package'),
-            :namespace($?NS ~ $<name><ns_path>)
+            :namespace($ns ~ $<name><ns_path>)
         );
     }
 }
@@ -741,15 +744,19 @@ method param_list($/) {
 method class_definition($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
     our $?CLASS; # for namespacing of constants
-
     if $key eq 'open' {
-        # Start of class definition; make PAST to create class object
         $?CLASS := ~$<class_name>;
+        our $?NS;
+
         my $block := PAST::Block.new(
             :node($/),
             :blocktype('declaration'),
             :pirflags( ':init :load' ),
-            :namespace($?CLASS),
+            :namespace($?CLASS)
+        );
+
+        # Start of class definition; make PAST to create class object
+        $block.push(
             PAST::Op.new(
                 :pasttype('bind'),
                 PAST::Var.new(
@@ -761,6 +768,25 @@ method class_definition($/, $key) {
                     :pasttype('call'),
                     :name('pipp_create_class'),
                     PAST::Val.new( :value($?CLASS) )
+                )
+            )
+        );
+
+        # assign predeclared constant __CLASS__
+        my $ns :=  $?NS ~ '\\' ~ $?CLASS ~ '::';
+        $block.push(
+            PAST::Op.new(
+                :pasttype('bind'),
+                PAST::Var.new(
+                    :name('__CLASS__'),
+                    :isdecl(1),
+                    :scope('package'),
+                    :viviself('PhpNull'),
+                    :namespace($ns)
+                ),
+                PAST::Val.new(
+                    :value($?CLASS),
+                    :returns('PhpString'),
                 )
             )
         );
