@@ -267,12 +267,6 @@ token ns_path                  {
 
 token var_name                 { '$' <ident> }
 
-# keywords
-
-token static {
-    'static'
-}
-
 # terms
 rule method_call {
     <var> '->' <method_name> '(' <argument_list> ')'
@@ -443,6 +437,7 @@ rule class_definition {
     '{'
         [ | <constant_definition>
           | <class_member_definition>
+          | <class_static_member_definition>
           | <class_method_definition>
         ]*
     '}'                                                      {*}  #= close
@@ -455,9 +450,12 @@ rule constant_definition {
     {*}
 }
 
-# TODO: use a named literal match
 rule class_member_definition {
-    'public' <static>? <var_name> '=' <literal> <.statement_delimiter>
+    'public' <var_name> '=' <literal> <.statement_delimiter> {*}
+}
+
+rule class_static_member_definition {
+    'public' 'static' <var_name> '=' <literal> <.statement_delimiter> {*}
 }
 
 rule class_method_definition {
