@@ -822,8 +822,8 @@ implementing a non-aggregate type.  If the I<self> key is non-null and the PMC
 class is a non-aggregate type, the _keyed_* methods should throw an exception.
 
 If you do not implement the *_keyed_int and *_keyed_str functions, the default
-will convert the INTVAL or STRING * into a key PMC * and call the corresponding
-*_keyed functions.
+will convert the INTVAL or STRING * into a key PMC * and call the
+corresponding *_keyed functions.
 
 =over 4
 

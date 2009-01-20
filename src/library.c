@@ -170,7 +170,7 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_set_integer_native(interp, lib_paths, PARROT_LIB_PATH_SIZE);
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             IGLOBALS_LIB_PATHS, lib_paths);
-    
+
     /* each is an array of strings */
     /* define include paths */
     paths = pmc_new(interp, enum_class_ResizableStringArray);
