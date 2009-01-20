@@ -8,7 +8,9 @@ src/library.c - Interface to Parrot's bytecode library
 
 =head1 DESCRIPTION
 
-This file contains C functions to access Parrot's bytecode library functions.
+This file contains C functions to access Parrot's bytecode library functions,
+for include files (via C<.include>), library files (via C<load_bytecode>), and
+dynext files (via C<loadlib>).
 
 =head2 Functions
 
