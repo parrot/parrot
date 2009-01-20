@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -130,6 +130,24 @@ sub goto_pop {
               cur_opcode = opcode_to_prederef(interp, dest);
               goto SWITCH_AGAIN; }";
 }
+
+=item C<init_func_init1($base)>
+
+Returns the C code for the init function.
+
+=cut
+
+sub init_func_init1 {
+    my ( $self, $base ) = @_;
+    my $cg_func = $self->core_prefix . $base;
+    my $bs      = $base . $self->suffix . '_';
+
+    return <<END_C;
+        if (!${bs}op_lib.op_func_table)
+            ${bs}op_lib.op_func_table = (op_func_t *)&core_switch_op_lib;
+END_C
+}
+
 
 =item C<run_core_func_start()>
 
