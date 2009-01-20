@@ -22,6 +22,7 @@ New in January 2009 release
     - refactored IO.readline
     - basic support for Inf and NaN
     - list and array slices with whatever star
+    - hash slices
     - implemented last and redo
     - pointy blocks as terms
     - refactored variable and parameter passing
@@ -31,6 +32,7 @@ New in January 2009 release
     - separate types for blocks, subs and methods
     - basic support for submethods
     - implemented Junction autothreading of user code (not builtins yet)
+    - eval supports :lang attribute
   + Befunge
     - back to working state
     - ported to pir
