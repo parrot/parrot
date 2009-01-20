@@ -19,7 +19,7 @@ Tests role composition in the OO implementation.
 .sub main :main
     .include 'except_types.pasm'
     .include 'test_more.pir'
-    plan(41)
+    plan(45)
 
     role_with_no_methods()
     role_with_one_method_no_methods_in_class()
@@ -31,6 +31,7 @@ Tests role composition in the OO implementation.
     conflict_resolution_by_resolve()
     role_that_does_a_role()
     conflict_from_indirect_role()
+    multi_composition()
 .end
 
 .sub badger :method
@@ -335,6 +336,31 @@ Tests role composition in the OO implementation.
   finally:
     pop_eh
     nok($I0, 'second role conflicts with method from indirect role')
+.end
+
+.sub 'multi_composition'
+    .local pmc R, C
+    R = new 'Role'
+    $P0 = get_global 'mctest_2'
+    R.'add_method'("mctest", $P0)
+    C = new 'Class'
+    $P0 = get_global 'mctest_1'
+    C.'add_method'("mctest", $P0)
+    C.'add_role'(R)
+    ok(1, 'a multi in the class prevents a role conflict')
+
+    $P0 = inspect C, 'methods'
+    $I0 = elements $P0
+    is($I0, 1, 'class had still one method after composition')
+    $P0 = $P0['mctest']
+    $I0 = isa $P0, 'MultiSub'
+    is($I0, 1, 'method was a multi sub')
+    $I0 = elements $P0
+    is($I0, 2, 'multi holds both candidates')
+.end
+.sub 'mctest_1' :multi()
+.end
+.sub 'mctest_2'
 .end
 
 # Local Variables:
