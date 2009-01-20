@@ -13,6 +13,12 @@ New in January 2009 release
     - various bug fixes and updates
     - complete bytecode generation
     - add '-x' commandline option to run compiled code
+  + PCT
+    - add 'hll' and 'subid' attributes to PAST::Block
+    - refactor loop handling code to handle last/redo/next
+    - add :pasttype('stmts') and :pasttype('null')
+    - improve "scope not found" error message
+    - allow PAST::Val nodes to contain block references
   + PGE
     - add "skipkey" option to PGE::OPTable
     - allow spaces before modifiers in regexes
