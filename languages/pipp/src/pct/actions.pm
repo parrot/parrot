@@ -282,6 +282,16 @@ method constant($/) {
     }
 }
 
+method static_member($/) {
+    our $?NS;
+    our $?CLASS;
+    make PAST::Var.new(
+        :scope('package'),
+        :namespace( $?NS ~'\\' ~ $?CLASS ~ '::'),
+        :name(~$<ident>)
+    );
+}
+
 # TODO: merge with rule 'constant'
 method class_constant($/) {
     our $?NS;
@@ -646,7 +656,27 @@ method class_member_definition($/) {
 }
 
 method class_static_member_definition($/) {
-    make PAST::Block.new();
+    our $?CLASS;
+    our $?NS;
+    my $past := PAST::Block.new(:blocktype('immediate'));
+    my $ns   := $?CLASS eq '' ?? $?NS
+                              !! $?NS ~ '\\' ~ $?CLASS ~ '::';
+    my $member_name := ~$<var_name><ident>;
+    $past.loadinit().push(
+        PAST::Op.new(
+            :pasttype('bind'),
+            PAST::Var.new(
+                :name($member_name),
+                :isdecl(1),
+                :scope('package'),
+                :viviself('PhpNull'),
+                :namespace($ns)
+            ),
+            $( $<literal> )
+        )
+    );
+
+    make $past;
 }
 
 method class_method_definition($/, $key) {
@@ -751,6 +781,9 @@ method class_definition($/, $key) {
 
         # declare the attributes
         for $<class_member_definition> {
+            $block.push( $($_) );
+        }
+        for $<class_static_member_definition> {
             $block.push( $($_) );
         }
 

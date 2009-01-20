@@ -301,7 +301,7 @@ CODE
 Foo
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'static member', todo => 'not yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'static member' );
 <?php
 
 class A {
@@ -320,7 +320,7 @@ CODE
 static member $a
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'static member after function', todo => 'not yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'static member after function' );
 <?php
 
 class A {

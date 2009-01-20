@@ -346,6 +346,11 @@ token class_constant {
     {*}
 }
 
+token static_member {
+    'self' '::' '$' <ident>
+    {*}
+}
+
 rule this {
     '$this'
     {*}
@@ -391,6 +396,7 @@ rule term {
     | '(' <var_assign> ')'     {*}   #= var_assign
     | '(' <expression> ')'     {*}   #= expression
     | <literal>                {*}   #= literal
+    | <static_member>          {*}   #= static_member
     | <class_constant>         {*}   #= class_constant
     | <constant>               {*}   #= constant
     | <member>                 {*}   #= member
