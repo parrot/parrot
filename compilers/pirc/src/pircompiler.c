@@ -175,6 +175,12 @@ new_lexer(PARROT_INTERP, NULLOK(char * const filename), int flags) {
      */
     lexer->pir_reg_generator = -1;
 
+    /* Flex' built-in line counting mechanism doesn't work properly,
+     * because PIRC handles newlines as 'logical' newlines, which is
+     * one or more newlines. Therefore, PIRC keeps track of lines itself.
+     */
+    lexer->linenr = 1;
+
 
     /* create a hashtable to store all strings */
     init_hashtable(lexer, &lexer->strings, HASHTABLE_SIZE_INIT);

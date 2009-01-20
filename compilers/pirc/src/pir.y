@@ -573,11 +573,15 @@ pir_contents      : opt_nl
                   ;
 
 opt_nl            : /* empty */
-                  | "\n"
+                  | newline
+                  ;
+
+newline           : "\n"
+                        { lexer->linenr += $1; }
                   ;
 
 pir_chunks        : pir_chunk
-                  | pir_chunks "\n" pir_chunk
+                  | pir_chunks newline pir_chunk
                   ;
 
 pir_chunk         : sub_def
@@ -698,7 +702,7 @@ namespace_slice   : TK_STRINGC
                         { $$ = expr_from_string(lexer, $1); }
                   ;
 
-sub_def           : sub_head sub_flags "\n"
+sub_def           : sub_head sub_flags newline
                     parameter_list
                     instructions
                     sub_end
@@ -814,7 +818,7 @@ parameters        : /* empty */
                         }
                   ;
 
-parameter         : ".param" param param_flags "\n"
+parameter         : ".param" param param_flags newline
                          { $$ = set_param_flag(lexer, $2, $3); }
                   ;
 
@@ -888,7 +892,7 @@ statement         : parrot_stat
                   | error_stat
                   ;
 
-annotation        : ".annotate" TK_STRINGC ',' constant "\n"
+annotation        : ".annotate" TK_STRINGC ',' constant newline
                         { annotate(lexer, $2, $4); }
                   ;
 
@@ -898,7 +902,7 @@ annotation        : ".annotate" TK_STRINGC ',' constant "\n"
 expansion_stat    : macro_expansion
                   ;
 
-macro_expansion   : TK_MACRO_IDENT opt_macro_args "\n"
+macro_expansion   : TK_MACRO_IDENT opt_macro_args newline
                         { $$ = expand_macro(yyscanner, $1, $2); }
                   ;
 
@@ -965,15 +969,15 @@ braced_item       : "\n"
 
 
 /* make sure a new instruction node is created; call set_instr() for that. */
-empty_stat        : "\n"
+empty_stat        : newline
                         { set_instr(lexer, NULL); }
                   ;
 
-location_stat     : location_directive "\n"
+location_stat     : location_directive newline
                   ;
 
 /* "error" is a built-in rule; used for trying to recover. */
-error_stat        : error "\n"
+error_stat        : error newline
                          {
                            if (lexer->parse_errors > MAX_NUM_ERRORS)
                                panic(lexer, "Too many errors. Compilation aborted.\n");
@@ -982,20 +986,20 @@ error_stat        : error "\n"
                          }
                   ;
 
-null_stat         : "null" target "\n"
+null_stat         : "null" target newline
                          {
                            set_instrf(lexer, "null", "%T", $2);
                            get_opinfo(lexer);
                          }
                   ;
 
-getresults_stat   : ".get_results" opt_target_list "\n"
+getresults_stat   : ".get_results" opt_target_list newline
                          {
                            generate_getresults_instr(lexer, $2);
                          }
                   ;
 
-parrot_stat       : parrot_instruction "\n"
+parrot_stat       : parrot_instruction newline
                   ;
 
 parrot_instruction: parrot_op opt_op_args
@@ -1155,7 +1159,7 @@ parrot_op_assign  : target '=' parrot_op op_arg_expr ',' parrot_op_args
                         }
                   ;
 
-assignment_stat   : assignment "\n"
+assignment_stat   : assignment newline
                   ;
 
 rhs_ident         : TK_IDENT
@@ -1168,7 +1172,7 @@ assignment        : target '=' TK_INTC
                               set_instrf(lexer, "null", "%T", $1);
                           else
                               set_instrf(lexer, "set", "%T%i", $1, $3);
-
+                          CURRENT_INSTRUCTION(lexer)->sourceline = lexer->linenr;
                           get_opinfo(lexer);
                         }
                   | target '=' TK_NUMC
@@ -1428,7 +1432,7 @@ binary_expr       : TK_INTC binop target
                   ;
 
 
-conditional_stat  : conditional_instr "\n"
+conditional_stat  : conditional_instr newline
                         { get_opinfo(lexer); }
                   ;
 
@@ -1621,7 +1625,7 @@ then              : "goto" /* PIR mode */
                   | ','    /* PASM mode*/
                   ;
 
-goto_stat         : "goto" identifier "\n"
+goto_stat         : "goto" identifier newline
                         {
                           set_instrf(lexer, "branch", "%I", $2);
                           set_op_labelflag(lexer, BIT(0)); /* bit 0 means: "1 << 0" */
@@ -1629,7 +1633,7 @@ goto_stat         : "goto" identifier "\n"
                         }
                   ;
 
-local_decl        : ".local" type local_id_list "\n"
+local_decl        : ".local" type local_id_list newline
                         { declare_local(lexer, $2, $3); }
                   ;
 
@@ -1647,7 +1651,7 @@ has_unique_reg    : /* empty */     { $$ = 0; }
                   | ":unique_reg"   { $$ = 1; }
                   ;
 
-lex_decl          : ".lex" TK_STRINGC ',' pmc_object "\n"
+lex_decl          : ".lex" TK_STRINGC ',' pmc_object newline
                         { /* if $4 is not a register, it must be a declared symbol */
                           if (!TEST_FLAG($4->flags, TARGET_FLAG_IS_REG)) {
 
@@ -1670,11 +1674,11 @@ invocation           : long_invocation_stat
                      | short_invocation_stat
                      ;
 
-long_invocation_stat : ".begin_call" "\n"
+long_invocation_stat : ".begin_call" newline
                        opt_long_arguments
-                       long_invocation "\n"
+                       long_invocation newline
                        opt_long_results
-                       ".end_call" "\n"
+                       ".end_call" newline
                             { /* $4 contains an invocation object */
                               set_invocation_args(lexer, $4, $3);
                               $$ = set_invocation_results(lexer, $4, $6);
@@ -1693,7 +1697,7 @@ long_arguments       : long_argument
                             { $$ = add_arg($1, $2); }
                      ;
 
-long_argument        : ".set_arg" short_arg "\n"
+long_argument        : ".set_arg" short_arg newline
                             { $$ = $2; }
                      ;
 
@@ -1729,13 +1733,13 @@ long_results         : long_result
                            }
                      ;
 
-long_result          : ".get_result" result_target "\n"
+long_result          : ".get_result" result_target newline
                            { $$ = $2; }
                      | local_decl
                            { $$ = NULL; }
                      ;
 
-short_invocation_stat: short_invocation "\n"
+short_invocation_stat: short_invocation newline
                      ;
 
 
@@ -1885,12 +1889,12 @@ return_instr         : short_return_stat
                      | long_yield_stat
                      ;
 
-short_return_stat    : ".return" arguments "\n"
+short_return_stat    : ".return" arguments newline
                             {
                               $$ = invoke(lexer, CALL_RETURN);
                               set_invocation_args(lexer, $$, $2);
                             }
-                     | ".tailcall" simple_invocation "\n"
+                     | ".tailcall" simple_invocation newline
                             { /* was the invocation a method call? then it becomes a method tail
                                * call, otherwise it's just a normal (sub) tail call.
                                */
@@ -1901,7 +1905,7 @@ short_return_stat    : ".return" arguments "\n"
                             }
                      ;
 
-short_yield_stat     : ".yield" arguments "\n"
+short_yield_stat     : ".yield" arguments newline
                             {
                               $$ = invoke(lexer, CALL_YIELD);
                               set_invocation_args(lexer, $$, $2);
@@ -1940,18 +1944,18 @@ arg                  : expression
                             { $$ = set_curarg(lexer, new_argument(lexer, $1));  }
                      ;
 
-long_return_stat     : ".begin_return" "\n"
+long_return_stat     : ".begin_return" newline
                        opt_return_expressions
-                       ".end_return" "\n"
+                       ".end_return" newline
                             {
                               $$ = invoke(lexer, CALL_RETURN);
                               set_invocation_args(lexer, $$, $3);
                             }
                      ;
 
-long_yield_stat      : ".begin_yield" "\n"
+long_yield_stat      : ".begin_yield" newline
                        opt_yield_expressions
-                       ".end_yield" "\n"
+                       ".end_yield" newline
                             {
                               $$ = invoke(lexer, CALL_YIELD);
                               set_invocation_args(lexer, $$, $3);
@@ -1972,7 +1976,7 @@ yield_expressions     : yield_expression
                       ;
 
 
-yield_expression      : ".set_yield" short_arg "\n"
+yield_expression      : ".set_yield" short_arg newline
                             { $$ = $2; }
                       ;
 
@@ -1988,7 +1992,7 @@ return_expressions    : return_expression
                             { $$ = add_arg($1, $2); }
                       ;
 
-return_expression     : ".set_return" short_arg "\n"
+return_expression     : ".set_return" short_arg newline
                             { $$ = $2; }
                       ;
 
@@ -2018,7 +2022,7 @@ paren_string          : '(' TK_STRINGC ')'
                              { $$ = $2; }
                       ;
 
-const_decl_stat       : const_stat "\n"
+const_decl_stat       : const_stat newline
                       ;
 
 const_decl_chunk      : ".const" basic_const_tail

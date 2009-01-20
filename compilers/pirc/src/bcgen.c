@@ -440,8 +440,8 @@ void
 create_debugsegment(bytecode * const bc, size_t size, int sourceline, char const * const file) {
     bc->debug_seg = Parrot_new_debug_seg(bc->interp, bc->interp->code, size);
 
-    /* XXX why is the +1 needed? FIX! */
-    Parrot_debug_add_mapping(bc->interp, bc->debug_seg, sourceline + 1, file);
+
+    Parrot_debug_add_mapping(bc->interp, bc->debug_seg, sourceline, file);
 }
 
 /*
