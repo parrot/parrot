@@ -35,6 +35,7 @@ New in January 2009 release
     - back to working state
     - ported to pir
   + Pipp
+    - add support for predefined constant __CLASS__
     - add initial support for static members
     - add support for namespaced constants
     - constants are now handled as package vars
