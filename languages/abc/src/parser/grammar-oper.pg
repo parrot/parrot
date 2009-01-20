@@ -15,7 +15,7 @@ proto prefix:<-->   is equiv(postfix:<++>) is lvalue(1) { ... }
 
 ## negation
 proto prefix:<->    is looser(postfix:<++>)
-    is pirop('n_neg')
+    is pirop('neg')
     { ... }
 
 ## exponentiation
