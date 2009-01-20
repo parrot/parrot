@@ -3,7 +3,7 @@
 # $Id$
 
 use lib "../../lib";
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "a simple sub call - no params");
 .sub main
@@ -70,6 +70,26 @@ pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "a simple sub call - slurpy param");
 .end
 CODE
 3
+OUTPUT
+
+
+
+pirc_2_pasm_is(<<'CODE', <<'OUTPUT', "method call");
+.sub main
+    .local pmc cl, obj, meth
+    cl  = newclass "Foo"
+    obj = new "Foo"
+    obj.'hi'()
+.end
+
+.namespace ["Foo"]
+.sub hi :method
+    say "ok"
+.end
+
+
+CODE
+ok
 OUTPUT
 
 

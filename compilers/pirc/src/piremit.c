@@ -876,8 +876,7 @@ emit_pbc_sub(lexer_state * const lexer, subroutine * const sub) {
 
     /* create debug segment */
     /* XXX is this the right size? */
-    create_debugsegment(lexer->bc, lexer->codesize, iter->sourceline, lexer->filename);
-
+    create_debugsegment(lexer->bc, lexer->codesize, lexer->filename);
 
     do {
         emit_pbc_instr(lexer, iter);

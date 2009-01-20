@@ -438,8 +438,10 @@ Create a debug segment of size C<size>.
 */
 void
 create_debugsegment(bytecode * const bc, size_t size, char const * const file) {
+    /* create a new debug segment; Parrot_new_debug_seg() automatically stores
+     * away any currently existing debug segment.
+     */
     bc->debug_seg = Parrot_new_debug_seg(bc->interp, bc->interp->code, size);
-
 
     Parrot_debug_add_mapping(bc->interp, bc->debug_seg, bc->instr_counter, file);
 }

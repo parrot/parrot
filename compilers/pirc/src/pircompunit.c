@@ -188,6 +188,9 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
     else {
         CURRENT_SUB(lexer)->info.vtable_index = vtable_index;
         SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_VTABLE);
+
+        /* :vtable methods have an automatic "self" parameter */
+        add_param(lexer, PMC_TYPE, "self");
     }
 }
 
@@ -226,6 +229,9 @@ set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
         CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->info.subname;
 
     SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_METHOD);
+
+    /* :methods have an automatic "self" parameter */
+    add_param(lexer, PMC_TYPE, "self");
 }
 
 /*
@@ -266,8 +272,7 @@ set_sub_nsentry(lexer_state * const lexer, char const * const nsentry) {
 set_sub_flag(lexer_state * const lexer, sub_flag flag)>
 
 Set a subroutine flag on the current sub. The C<flag> parameter may encode
-multiple flags. If it encodes the C<:vtable> or C<:method> flag, an extra
-parameter named C<self> is added to the current subroutine.
+multiple flags.
 
 =cut
 
@@ -277,9 +282,6 @@ set_sub_flag(lexer_state * const lexer, sub_flag flag) {
     /* set the specified flag in the current subroutine */
     SET_FLAG(CURRENT_SUB(lexer)->flags, flag);
 
-    /* if the sub is a method or a :vtable method, then also add a "self" parameter */
-    if (TEST_FLAG(flag, (PIRC_SUB_FLAG_VTABLE | PIRC_SUB_FLAG_METHOD)))
-        add_param(lexer, PMC_TYPE, "self");
 }
 
 /*
