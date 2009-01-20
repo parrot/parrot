@@ -97,6 +97,10 @@ L<http://gnuwin32.sourceforge.net/>
 B<GMP> - GNU multiple precision arithmetic library
 L<http://developer.berlios.de/projects/win32gmp/>
 
+B<OpenGL> / B<GLUT> - Open Graphics Library
+L<http://www.xmission.com/~nate/glut.html> or
+L<http://www.transmissionzero.co.uk/computing/using-glut-with-mingw/>
+
 B<pcre> - Perl-Compatible Regular Expression library
 L<http://gnuwin32.sourceforge.net/>
 
