@@ -91,6 +91,7 @@ typedef struct lexer_state {
     unsigned       parse_errors;
     char const    *filename;       /* name of input file */
     FILE          *outfile;        /* output file */
+    int            linenr;         /* Flex' line counting su^W^W doesn't work well. */
 
     subroutine    *subs;           /* list of subs; always points to the current sub. */
 

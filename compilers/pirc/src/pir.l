@@ -250,7 +250,24 @@ REGISTER       "$"[SNIP]{DIGITS}
 [#].*{EOL}{WS}*   { /* ignore line comments */ }
 
 {EOL}[\t\r\n ]*   { /* a set of continuous newlines yields a single newline token. */
-                    yylval->sval = "\n";
+                    int index        = 0;
+                    int num_newlines = 0;
+
+                    /* count number of newlines in the matched text;
+                     * iterate explicitly using an index is somewhat safer
+                     * than with a character pointer, as you'd have to
+                     * check for (*iter != '\0'), not (iter != NULL) for
+                     * some reason. Just do it safely, and hope the compiler
+                     * optimizes this a bit.
+                     */
+                    while (index < yyleng) {
+                        if (yytext[index] == '\n')
+                            ++num_newlines;
+
+                        ++index;
+                    }
+                    /* pass the number of matched newlines */
+                    yylval->ival = num_newlines;
                     return TK_NL;
                   }
 

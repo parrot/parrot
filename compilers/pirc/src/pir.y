@@ -287,7 +287,7 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
        TK_TAILCALL          ".tailcall"
        TK_ANNOTATE          ".annotate"
 
-%token <sval> TK_NL         "\n"
+%token <ival> TK_NL         "\n"
 
 %token <sval> TK_LABEL      "label"
        <sval> TK_IDENT      "identifier"
@@ -954,6 +954,7 @@ braced_contents   : /* empty */
                   ;
 
 braced_item       : "\n"
+                        { $$ = "\n"; }
                   | TK_MACRO_ARG_OTHER
                   | TK_MACRO_ARG_IDENT
                   | TK_MACRO_IDENT opt_macro_args
