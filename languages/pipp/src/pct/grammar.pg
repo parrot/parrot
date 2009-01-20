@@ -441,9 +441,10 @@ rule method_declaration {
 rule class_definition {
     'class' <class_name> [ 'implements' <interface_name> ]?  {*}  #= open
     '{'
-        <constant_definition>*
-        <class_member_definition>*
-        <class_method_definition>*
+        [ | <constant_definition>
+          | <class_member_definition>
+          | <class_method_definition>
+        ]*
     '}'                                                      {*}  #= close
 }
 
