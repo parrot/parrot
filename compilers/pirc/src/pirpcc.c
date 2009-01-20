@@ -358,9 +358,15 @@ this is the number of parameters of this function.
 */
 void
 generate_parameters_instr(lexer_state * const lexer, unsigned num_parameters) {
-    new_sub_instr(lexer, PARROT_OP_get_params_pc, "get_params_pc", num_parameters);
-    /* convert the parameter list into operands. Parameters are stored as target nodes. */
-    targets_to_operands(lexer, CURRENT_SUB(lexer)->parameters, num_parameters);
+    if (TEST_FLAG(CURRENT_SUB(lexer)->flags , (PIRC_SUB_FLAG_METHOD | PIRC_SUB_FLAG_VTABLE))) {
+        ++num_parameters; /* didn't count implicit "self" parameter yet. */
+    }
+
+    if (num_parameters > 0) {
+        new_sub_instr(lexer, PARROT_OP_get_params_pc, "get_params_pc", num_parameters);
+        /* convert the parameter list into operands. Parameters are stored as target nodes. */
+        targets_to_operands(lexer, CURRENT_SUB(lexer)->parameters, num_parameters);
+    }
 }
 
 

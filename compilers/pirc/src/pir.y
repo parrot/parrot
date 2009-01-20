@@ -796,11 +796,7 @@ multi_type        : identifier
                   ;
 
 parameter_list    : parameters
-                         {
-                           /* if there are parameters, then emit a get_params instruction. */
-                           if ($1 > 0)
-                               generate_parameters_instr(lexer, $1);
-                         }
+                         { generate_parameters_instr(lexer, $1); }
                   ;
 
 parameters        : /* empty */
