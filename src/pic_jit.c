@@ -50,7 +50,7 @@ static int args_match_params(
 
 PARROT_WARN_UNUSED_RESULT
 static int call_is_safe(PARROT_INTERP,
-    ARGIN(const PMC *sub),
+    ARGIN(PMC *sub),
     ARGMOD(opcode_t **set_args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -58,13 +58,13 @@ static int call_is_safe(PARROT_INTERP,
         FUNC_MODIFIES(*set_args);
 
 PARROT_WARN_UNUSED_RESULT
-static int jit_can_compile_sub(PARROT_INTERP, ARGIN(const PMC *sub))
+static int jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 static int ops_jittable(PARROT_INTERP,
-    ARGIN(const PMC *sub),
+    ARGIN(PMC *sub),
     ARGIN(const PMC *sig_results),
     ARGIN(const PackFile_ByteCode *seg),
     ARGIN(opcode_t *pc),
@@ -200,7 +200,7 @@ are used then JIT supports. Returns 1 if it does not use too many registers.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-jit_can_compile_sub(PARROT_INTERP, ARGIN(const PMC *sub))
+jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub))
 {
     ASSERT_ARGS(jit_can_compile_sub)
     const jit_arch_info * const info = Parrot_jit_init(interp);
@@ -332,7 +332,7 @@ Returns C<0> otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-call_is_safe(PARROT_INTERP, ARGIN(const PMC *sub), ARGMOD(opcode_t **set_args))
+call_is_safe(PARROT_INTERP, ARGIN(PMC *sub), ARGMOD(opcode_t **set_args))
 {
     ASSERT_ARGS(call_is_safe)
     PMC *called, *sig_results;
@@ -383,7 +383,7 @@ otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-ops_jittable(PARROT_INTERP, ARGIN(const PMC *sub), ARGIN(const PMC *sig_results),
+ops_jittable(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const PMC *sig_results),
         ARGIN(const PackFile_ByteCode *seg), ARGIN(opcode_t *pc),
         ARGIN(const opcode_t *end), ARGOUT(int *flags))
 {
@@ -459,7 +459,7 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 int
-parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(const PMC *sub), ARGIN(const PMC *sig_args),
+parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const PMC *sig_args),
         ARGIN(const PMC *sig_results), ARGOUT(int *flags))
 {
     ASSERT_ARGS(parrot_pic_is_safe_to_jit)
@@ -523,7 +523,7 @@ RT#48260: Not yet documented!!!
 */
 
 funcptr_t
-parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(const PMC *sub), int flags)
+parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(PMC *sub), int flags)
 {
     ASSERT_ARGS(parrot_pic_JIT_sub)
 #ifdef HAS_JIT

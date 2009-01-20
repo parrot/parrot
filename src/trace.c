@@ -170,7 +170,7 @@ Prints a key to C<stderr>, returns the length of the output.
 */
 
 int
-trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
+trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(trace_key_dump)
     Interp * const debugger = interp->debugger;

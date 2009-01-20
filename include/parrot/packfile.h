@@ -325,7 +325,7 @@ size_t PackFile_ConstTable_pack_size(PARROT_INTERP,
 PARROT_EXPORT
 int PackFile_find_in_const(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
-    ARGIN(const PMC *key),
+    ARGIN(PMC *key),
     int type)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

@@ -161,7 +161,7 @@ void parrot_PIC_prederef(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 int parrot_pic_is_safe_to_jit(PARROT_INTERP,
-    ARGIN(const PMC *sub),
+    ARGIN(PMC *sub),
     ARGIN(const PMC *sig_args),
     ARGIN(const PMC *sig_results),
     ARGOUT(int *flags))
@@ -172,9 +172,7 @@ int parrot_pic_is_safe_to_jit(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*flags);
 
-funcptr_t parrot_pic_JIT_sub(PARROT_INTERP,
-    ARGIN(const PMC *sub),
-    int flags)
+funcptr_t parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(PMC *sub), int flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -212,7 +212,7 @@ constant is in constant table, so we have to search for it.
 PARROT_EXPORT
 int
 PackFile_find_in_const(PARROT_INTERP,
-        ARGIN(const PackFile_ConstTable *ct), ARGIN(const PMC *key), int type)
+        ARGIN(const PackFile_ConstTable *ct), ARGIN(PMC *key), int type)
 {
     ASSERT_ARGS(PackFile_find_in_const)
     int i;

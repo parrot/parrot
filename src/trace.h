@@ -18,7 +18,7 @@
 /* HEADERIZER BEGIN: src/trace.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-int trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
+int trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
