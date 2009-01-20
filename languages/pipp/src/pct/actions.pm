@@ -654,26 +654,6 @@ method param_list($/) {
                 :scope('parameter'),
             )
         );
-#####        $block.push(
-#####            PAST::Op.new(
-#####                :pasttype('bind'),
-#####                PAST::Var.new(
-#####                    :name(~$_),
-#####                    :scope('lexical')
-#####                ),
-#####                PAST::Op.new(
-#####                    :inline(
-#####                        '#   %r = new "Perl6Scalar", %0',
-#####                        '#   $P0 = get_hll_global ["Bool"], "True"',
-#####                        '#   setprop %r, "readonly", $P0'
-#####                    ),
-#####                    PAST::Var.new(
-#####                        :name(~$_),
-#####                        :scope('lexical')
-#####                    )
-#####                )
-#####            )
-#####        );
 
         $arity++;
         $block.symbol( ~$_, :scope('lexical') );
