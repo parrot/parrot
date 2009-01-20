@@ -13,6 +13,11 @@ New in January 2009 release
     - various bug fixes and updates
     - complete bytecode generation
     - add '-x' commandline option to run compiled code
+  + PGE
+    - add "skipkey" option to PGE::OPTable
+    - allow spaces before modifiers in regexes
+    - add '(' ~ ')' goal matching syntax
+    - skip creating a class/grammar if it already exists
 - Languages
   + Rakudo
     - improved error mesages in multi dispatch
