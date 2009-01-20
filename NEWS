@@ -61,6 +61,8 @@ New in January 2009 release
     - left the nest and is now at http://github.com/bschmalhofer/m4/
   + Lua:
     - add a minimalist user back trace
+  + PIR
+    - "does" and "morph" VTABLE interfaces are now overridable from PIR
 - Miscellaneous
   + Infrastructure
     - 'make smoke' now generates Smolder reports sent to
