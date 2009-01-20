@@ -640,7 +640,7 @@ proto 'term:'      is precedence('=')    is parsed(&primary) { ... }
 proto infix:<**>   is looser('term:')        { ... }
 proto prefix:<~>   is looser(infix:<**>)     { ... }
 proto prefix:<+>   is looser(prefix:<~>)     { ... }
-proto prefix:<->   is equiv(prefix:<+>)  is pirop('n_neg')     { ... }
+proto prefix:<->   is equiv(prefix:<+>)  is pirop('neg')     { ... }
 proto infix:<*>    is looser(prefix:<+>) is pirop('mul')     { ... }
 proto infix:</>    is equiv(infix:<*>)   is pirop('div')     { ... }
 proto infix:<//>   is equiv(infix:<*>)   is pirop('fdiv')    { ... }
