@@ -1,6 +1,8 @@
 # $Id$
 
 New in January 2009 release
+- Implementation
+  + Implemented bytecode annotations
 - Compilers
   + IMCC
     - removed keyed string indexing, e.g. $S0[1].
@@ -16,7 +18,7 @@ New in January 2009 release
     - improved error mesages in multi dispatch
     - implemented clone method for all objects
     - implemented MAIN sub
-    - Unicode versions of hyper operators
+    - Unicode versions of infix hyper operators
     - refactored IO.readline
     - basic support for Inf and NaN
     - list and array slices with whatever star
@@ -25,10 +27,10 @@ New in January 2009 release
     - refactored variable and parameter passing
     - improved assignment semantics
     - improved parsing of type names and subs
-    - implemented parametric roles
+    - mostly implemented parametric roles
     - separate types for blocks, subs and methods
     - basic support for submethods
-    - implemented Junction autothreading
+    - implemented Junction autothreading of user code (not builtins yet)
   + Befunge
     - back to working state
     - ported to pir
