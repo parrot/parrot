@@ -148,6 +148,8 @@ Return the string "function".
 
 =over 4
 
+=cut
+
 */
     METHOD STRING *get_name() {
         const Parrot_sub * const sub = PMC_sub(SELF);
