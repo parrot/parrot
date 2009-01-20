@@ -138,6 +138,18 @@ if the arg is a Namespace or Class PMC
 
 See TT #159
 
+=item * load_bytecode without a file extension [post 0.9.0]
+
+The load_bytecode opcode will require an extension on all .pir, .pasm, and .pbc files.
+It will perform limited checks for alternate extenstions:
+
+  a .pir file that isn't found will check for a .pbc file
+
+  a .pasm file that isn't found will check for a .pbc file
+  
+  a .pbc file that isn't found will check for a .pir file, then a .pasm file
+
+
 =back
 
 =head1 Functions
