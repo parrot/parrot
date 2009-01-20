@@ -775,15 +775,7 @@ method class_definition($/, $key) {
         my $block := @?BLOCK.shift();
 
         # setup of class constants is done in the 'loadinit' node
-        for $<constant_definition> {
-            $block.push( $($_) );
-        }
-
-        # declare the attributes
-        for $<class_member_definition> {
-            $block.push( $($_) );
-        }
-        for $<class_static_member_definition> {
+        for $<class_member_or_method_definition> {
             $block.push( $($_) );
         }
 
@@ -812,17 +804,15 @@ method class_definition($/, $key) {
             )
         );
 
-        # add the methods
-        for $<class_method_definition> {
-            $block.push( $($_) );
-        }
-
         $?CLASS := '';
 
         make $block;
     }
 }
 
+method class_member_or_method_definition($/, $key) {
+    make $( $/{$key} );
+}
 
 method quote($/) {
     make $( $<quote_expression> );

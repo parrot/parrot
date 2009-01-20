@@ -440,13 +440,14 @@ rule method_declaration {
 
 rule class_definition {
     'class' <class_name> [ 'implements' <interface_name> ]?  {*}  #= open
-    '{'
-        [ | <constant_definition>
-          | <class_member_definition>
-          | <class_static_member_definition>
-          | <class_method_definition>
-        ]*
-    '}'                                                      {*}  #= close
+    '{' <class_member_or_method_definition>* '}'             {*}  #= close
+}
+
+rule class_member_or_method_definition {
+    | <constant_definition> {*}                  #= constant_definition
+    | <class_member_definition> {*}              #= class_member_definition
+    | <class_static_member_definition> {*}       #= class_static_member_definition
+    | <class_method_definition> {*}              #= class_method_definition
 }
 
 # In PHP 5.3 a constant definition outside a declared namespace or class is forbidden
