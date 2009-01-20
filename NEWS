@@ -3,6 +3,7 @@
 New in January 2009 release
 - Implementation
   + Implemented bytecode annotations
+  + Role composition is now aware of multi-subs
 - Compilers
   + IMCC
     - removed keyed string indexing, e.g. $S0[1].
@@ -45,6 +46,7 @@ New in January 2009 release
     - basic support for submethods
     - implemented Junction autothreading of user code (not builtins yet)
     - eval supports :lang attribute
+    - proto makes other subs in scope multis, including in role composition
   + Befunge
     - back to working state
     - ported to pir
