@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -300,3 +300,23 @@ echo "\n";
 CODE
 Foo
 OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'static member', todo => 'not yet' );
+<?php
+
+class A {
+    public static $a = "static member \$a\n";
+
+    function echo_static () {
+        echo self::$a;
+    }
+}
+
+$a = new A;
+$a->echo_static();
+
+?>
+CODE
+static member $a
+OUT
+

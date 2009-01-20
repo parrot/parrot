@@ -28,6 +28,8 @@ PIR und Bytecode is then generated from the PAST.
 
 =head1 Variables
 
+List of scopes and types of variables.
+
 =over 4
 
 =item globals in top file
@@ -42,6 +44,12 @@ Lexical in scope of the included file.
 
 Class constants are stored a package variables in the namespace $?NS ~ '\\' ~ $?CLASS ~ '::'.
 The trailing '::' guarantees that there is no conflict with namespace constants.
+
+TODO: make them readonly
+
+=item Static class members
+
+Like class constants, but writable.
 
 =item Class members
 

@@ -732,38 +732,40 @@ method class_definition($/, $key) {
 
         # declare the attributes
         for $<class_member_definition> {
-            my $member_name := ~$_<var_name><ident>;
-            $methods_block.symbol(
-                $member_name,
-                :scope('attribute'),
-                :default( $( $_<literal> ) )
-            );
+            if $_<static> {
+                my $member_name := ~$_<var_name><ident>;
+                $methods_block.symbol(
+                    $member_name,
+                    :scope('attribute'),
+                    :default( $( $_<literal> ) )
+                );
 
-            $block.push(
-                PAST::Op.new(
-                    :pasttype('call'),
-                    :name('pipp_add_attribute'),
-                    PAST::Var.new(
-                        :name('def'),
-                        :scope('register')
-                    ),
-                    PAST::Val.new( :value($member_name) )
-                )
-            );
-            $block.push(
-                PAST::Op.new(
-                    :pasttype('call'),
-                    :name('!ADD_TO_WHENCE'),
-                    PAST::Var.new(
-                        :name('def'),
-                        :scope('register'),
-                    ),
-                    PAST::Val.new(
-                        :value($member_name)
-                    ),
-                    $( $_<literal> )
-                )
-            );
+                $block.push(
+                    PAST::Op.new(
+                        :pasttype('call'),
+                        :name('pipp_add_attribute'),
+                        PAST::Var.new(
+                            :name('def'),
+                            :scope('register')
+                        ),
+                        PAST::Val.new( :value($member_name) )
+                    )
+                );
+                $block.push(
+                    PAST::Op.new(
+                        :pasttype('call'),
+                        :name('!ADD_TO_WHENCE'),
+                        PAST::Var.new(
+                            :name('def'),
+                            :scope('register'),
+                        ),
+                        PAST::Val.new(
+                            :value($member_name)
+                        ),
+                        $( $_<literal> )
+                    )
+                );
+            }
         }
 
         # It's a new class definition. Make proto-object.
@@ -798,20 +800,22 @@ method class_definition($/, $key) {
 
         # add accessors for the attributes
         for $<class_member_definition> {
-            $methods_block.push(
-                PAST::Block.new(
-                    :blocktype('declaration'),
-                    :name(~$_<var_name><ident>),
-                    :pirflags(':method'),
-                    :node( $/ ),
-                    PAST::Stmts.new(
-                        PAST::Var.new(
-                            :name(~$_<var_name><ident>),
-                            :scope('attribute')
+            if $_<static> {
+                $methods_block.push(
+                    PAST::Block.new(
+                        :blocktype('declaration'),
+                        :name(~$_<var_name><ident>),
+                        :pirflags(':method'),
+                        :node( $/ ),
+                        PAST::Stmts.new(
+                            PAST::Var.new(
+                                :name(~$_<var_name><ident>),
+                                :scope('attribute')
+                            )
                         )
                     )
-                )
-            );
+                );
+            }
         }
 
         $block.push( $methods_block );

@@ -94,7 +94,7 @@ See C<!keyword_class> in Rakudo.
 .end
 
 
-=item tipp_add_attribute(class, attr_name, attr_value)
+=item pipp_add_attribute(class, attr_name, attr_value)
 
 Adds an attribute with the given name to the class or role.
 See C<!keyword_has> in Rakudo.

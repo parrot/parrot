@@ -261,12 +261,17 @@ token name {
 
 token ns_sep                   { '\\' }   # yes, PHP 5.3 uses backslash as the namespace separator
 
-
 token ns_path                  {
     [ <ident> <.ns_sep> ]*
 } 
 
 token var_name                 { '$' <ident> }
+
+# keywords
+
+token static {
+    'static'
+}
 
 # terms
 rule method_call {
@@ -449,8 +454,9 @@ rule constant_definition {
     {*}
 }
 
+# TODO: use a named literal match
 rule class_member_definition {
-    'public' <var_name> '=' <literal> <.statement_delimiter>
+    'public' <static>? <var_name> '=' <literal> <.statement_delimiter>
 }
 
 rule class_method_definition {
