@@ -33,16 +33,6 @@ determined.
 
 =back
 
-=head1 vtable entries
-
-=over 4
-
-=item * C<new_from_string> [post 0.5.0]
-
-See RT #47011.
-
-=back
-
 =head1 Opcodes
 
 =over 4

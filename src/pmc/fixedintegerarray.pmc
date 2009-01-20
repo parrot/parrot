@@ -46,7 +46,7 @@ Initializes the array.
 
 /*
 
-=item C<PMC new_from_string(STRING *rep, INTVAL flags)>
+=item C<PMC instantiate_str(STRING *rep, INTVAL flags)>
 
 Class method to construct an array from the string representation C<rep>,
 which is a string I<"(el0, el1, ...)">. C<flags> may have the
@@ -56,7 +56,7 @@ in the constant PMC pool.
 =cut
 
 */
-    VTABLE PMC *new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC *instantiate_str(STRING *rep, INTVAL flags) {
         const INTVAL type = SELF->vtable->base_type;
         INTVAL  n, elem, i, l;
         char   *source, *p, *start;

@@ -48,7 +48,7 @@ Initializes the string.
 
 /*
 
-=item C<PMC* new_from_string(STRING *rep, INTVAL flags)>
+=item C<PMC* instantiate_str(STRING *rep, INTVAL flags)>
 
 Allow :
 
@@ -57,7 +57,7 @@ Allow :
 =cut
 
 */
-    VTABLE PMC* new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC* instantiate_str(STRING *rep, INTVAL flags) {
         PMC *res;
         INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)
@@ -94,7 +94,7 @@ Creates a copy of the string.
 
 */
     VTABLE PMC* clone() {
-        return VTABLE_new_from_string(INTERP, SELF, PMC_str_val(SELF), 0);
+        return VTABLE_instantiate_str(INTERP, SELF, PMC_str_val(SELF), 0);
     }
 
 /*

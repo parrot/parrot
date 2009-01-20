@@ -71,14 +71,14 @@ Make an exact copy of this PMC.
 
 /*
 
-=item C<PMC *new_from_string(STRING *rep, INTVAL flags)>
+=item C<PMC *instantiate_str(STRING *rep, INTVAL flags)>
 
 Class method to construct an Integer from the string representation C<rep>.
 
 =cut
 
 */
-    VTABLE PMC *new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC *instantiate_str(STRING *rep, INTVAL flags) {
         const INTVAL type = SELF->vtable->base_type;
         PMC * const res =
             (flags & PObj_constant_FLAG)

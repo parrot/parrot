@@ -1100,7 +1100,7 @@ CODE
 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "new_from_string" );
+pir_output_is( <<'CODE', <<OUTPUT, "instantiate_str" );
 .sub main :main
     .const 'Float' pi = "3.1"
     print pi

@@ -50,10 +50,10 @@ Initializes the number to zero.
 
 /*
 
-=item C<PMC *new_from_string(STRING *rep, INTVAL flags)>
+=item C<PMC *instantiate_str(STRING *rep, INTVAL flags)>
 
 Return a LuaNumber PMC created from a string (Implementation
-is based on new_from_string() from Integer PMC).
+is based on instantiate_str() from Integer PMC).
 
 Allow :
 
@@ -62,7 +62,7 @@ Allow :
 =cut
 
 */
-    VTABLE PMC *new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC *instantiate_str(STRING *rep, INTVAL flags) {
         PMC *res;
         INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)

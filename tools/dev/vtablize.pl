@@ -1,6 +1,6 @@
 #! perl -pi.bak
 # $Id$
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ use warnings;
 s/^(\s*)(void\s+init\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+init_pmc\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(PMC\s+\*instantiate\(PMC\s+\*\w*\)\s+{)/$1VTABLE $2/;
-s/^(\s*)(PMC\s+\*new_from_string\(STRING\s+\*\w*,\s+INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
+s/^(\s*)(PMC\s+\*instantiate_str\(STRING\s+\*\w*,\s+INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+morph\(INTVAL\s+\w*\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+mark\(\)\s+{)/$1VTABLE $2/;
 s/^(\s*)(void\s+destroy\(\)\s+{)/$1VTABLE $2/;

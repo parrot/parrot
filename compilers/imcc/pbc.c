@@ -1782,7 +1782,7 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     else
         s = string_unescape_cstring(interp, r->name, 0, NULL);
 
-    p       = VTABLE_new_from_string(interp, _class, s, PObj_constant_FLAG);
+    p = VTABLE_instantiate_str(interp, _class, s, PObj_constant_FLAG);
 
     /* append PMC constant */
     r->color = add_const_table_pmc(interp, p);

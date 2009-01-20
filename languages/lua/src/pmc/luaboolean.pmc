@@ -49,14 +49,14 @@ Initializes the Boolean with a default value of C<false>.
 
 /*
 
-=item C<PMC new_from_string(STRING *rep)>
+=item C<PMC instantiate_str(STRING *rep)>
 
 Class method to construct an Boolean from the string representation C<rep>.
 
 =cut
 
 */
-    VTABLE PMC* new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC* instantiate_str(STRING *rep, INTVAL flags) {
         PMC *res;
         INTVAL type = PMC_type(SELF);
         if (flags & PObj_constant_FLAG)

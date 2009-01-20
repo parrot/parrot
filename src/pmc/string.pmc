@@ -41,14 +41,14 @@ Initializes the string.
 
 /*
 
-=item C<PMC new_from_string(STRING *rep)>
+=item C<PMC instantiate_str(STRING *rep)>
 
 Class method to construct a String from the string representation C<rep>.
 
 =cut
 
 */
-    VTABLE PMC *new_from_string(STRING *rep, INTVAL flags) {
+    VTABLE PMC *instantiate_str(STRING *rep, INTVAL flags) {
         PMC *res;
         const INTVAL type = SELF->vtable->base_type;
 

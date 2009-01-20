@@ -10,7 +10,7 @@ void init()
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer)
 PMC* instantiate(PMC* sig)
-PMC* new_from_string(STRING* rep, INTVAL flags)
+PMC* instantiate_str(STRING* rep, INTVAL flags)
 void morph(INTVAL type) :write
 void mark()
 void destroy()

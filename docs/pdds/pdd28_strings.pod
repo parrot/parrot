@@ -611,7 +611,7 @@ The String PMC implements the following vtable functions.
 
 Initialize a new String PMC.
 
-=item new_from_string
+=item instantiate_str
 
 Create a new String PMC from a Parrot string argument.
 

@@ -61,7 +61,7 @@ Tests the C<String> PMC.
     test_string_trans()
     reverse_p0__reverse_string()
     is_integer__check_integer()
-    new_from_string()
+    instantiate_str()
     get_string_returns_cow_string()
     to_int_1()
     elements_gives_length_of_string()
@@ -909,7 +909,7 @@ loop:
   ok( $I0, '... +1' )
 .end
 
-.sub new_from_string
+.sub instantiate_str
     .const 'String' ok = "ok"
     is( ok, "ok", ".const 'String'" )
 .end
