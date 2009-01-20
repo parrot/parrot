@@ -8,6 +8,7 @@ New in January 2009 release
     - removed keyed string indexing, e.g. $S0[1].
     - removed slice syntax, e.g. $P0[1..2]
     - removed .namespace <ident>/.endnamespace <ident> pair
+    - fixed 'new $P0, [classname]' syntax
   + PIRC
     - refactoring of various data structures
     - various bug fixes and updates
@@ -73,6 +74,11 @@ New in January 2009 release
   + Infrastructure
     - 'make smoke' now generates Smolder reports sent to
       http://smolder.plusthree.com/app/public_projects/smoke_reports/8
+  + BOOK
+    - Added sections about Classes, OO programming, and methods.
+    - Added information about Annotations, Exceptions, and Handlers
+  + STM
+    - Removed non-functional STM subsystem
 
 
 New in 0.8.2
