@@ -41,6 +41,7 @@ U: cotto
 D: remove the seed arg from string_hash()
 
 U: chromatic
+D: Changed new_from_string VTABLE entry name to instantiate_str, per RT#47011.
 D: Use typedefs for Parrot-defined structs outside of headers
 D: Updated copyrights in all files modified in 2007
 D: Changed string_from_cstring() calls to string_from_literal()
