@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'definition of a class' );
 <?php
@@ -356,5 +356,36 @@ $a->echo_class();
 ?>
 CODE
 A
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', '__METHOD__' );
+<?php
+
+class A {
+    function ecHO_class () {
+        echo __CLASS__;
+        echo "\n";
+        echo __METHOD__;
+        echo "\n";
+    }
+
+    function prinT_Class () {
+        echo __CLASS__;
+        echo "\n";
+        echo __METHOD__;
+        echo "\n";
+    }
+}
+
+$a = new A;
+$a->ecHO_class();
+$a->prinT_Class();
+
+?>
+CODE
+A
+ecHO_class
+A
+prinT_Class
 OUT
 

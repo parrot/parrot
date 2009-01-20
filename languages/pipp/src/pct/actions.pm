@@ -688,12 +688,11 @@ method class_method_definition($/, $key) {
     if $key eq 'open' {
         # note that $<param_list> creates a new PAST::Block.
         my $block := $( $<param_list> );
+        $block.name( ~$<method_name> );
+        $block.blocktype( 'method' );
+        $block.control('return_pir');
 
-        # set up scope 'package' for the superglobals
-        our @?SUPER_GLOBALS;
-        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
-
-        $block.unshift(
+        $block.push(
             PAST::Op.new(
                 :pasttype('bind'),
                 PAST::Var.new(
@@ -708,14 +707,36 @@ method class_method_definition($/, $key) {
             )
         );
 
+        # set up scope 'package' for the superglobals
+        our @?SUPER_GLOBALS;
+        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
         @?BLOCK.unshift( $block );
     }
     else {
+        our $?NS;
+        our $?CLASS;
+        my $ns :=  $?NS ~ '\\' ~ $?CLASS ~ '::';
+
         my $block := @?BLOCK.shift();
 
-        $block.name( ~$<method_name> );
-        $block.blocktype( 'method' );
-        $block.control('return_pir');
+        $block.push(
+            PAST::Op.new(
+                :pasttype('bind'),
+                PAST::Var.new(
+                    :name('__METHOD__'),
+                    :isdecl(1),
+                    :scope('package'),
+                    :viviself('PhpNull'),
+                    :namespace($ns)
+                ),
+                PAST::Val.new(
+                    :value($block.name()),
+                    :returns('PhpString'),
+                )
+            )
+        );
+
         $block.push( $( $<statement_list> ) );
 
         make $block;
