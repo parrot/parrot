@@ -1317,7 +1317,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                             cur_method, i));
             }
             else {
-                /* It's not, and we didn't conflict so much be no entry. Just stick it in. */
+                /* It's not, and we didn't conflict so must be no entry. Just stick it in. */
                 VTABLE_set_pmc_keyed_str(interp, methods_hash, method_name, cur_method);
             }
         }
