@@ -144,7 +144,7 @@ sub init_func_init1 {
 
     return <<END_C;
         if (!${bs}op_lib.op_func_table)
-            ${bs}op_lib.op_func_table = (op_func_t *)&core_switch_op_lib;
+            ${bs}op_lib.op_func_table = (op_func_t *)&${bs}op_lib;
 END_C
 }
 
