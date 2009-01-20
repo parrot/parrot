@@ -139,6 +139,10 @@ and .pbc files.  It will perform limited checks for alternate extensions:
   
   a .pbc file that isn't found will check for a .pir file, then a .pasm file
 
+=item * all socket-related opcodes [post 0.9.0]
+
+The socket-related opcodes will all be replaced with method calls.
+
 =back
 
 =head1 Functions
