@@ -391,7 +391,7 @@ proto prefix:<~> is equiv(prefix:<+>)
     is pirop('set S*')
     { ... }
 proto prefix:<-> is equiv(prefix:<+>)
-    is pirop('n_neg')
+    is pirop('neg')
     { ... }
 proto prefix:<!> is equiv(prefix:<+>)
     is pirop('isfalse')
