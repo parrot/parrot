@@ -708,13 +708,11 @@ method class_definition($/, $key) {
             $block.push( $($_) );
         }
 
-        my $methods_block := PAST::Block.new(:blocktype('immediate'));
-
         # declare the attributes
         for $<class_member_definition> {
             if $_<static> {
                 my $member_name := ~$_<var_name><ident>;
-                $methods_block.symbol(
+                $block.symbol(
                     $member_name,
                     :scope('attribute'),
                     :default( $( $_<literal> ) )
@@ -747,7 +745,7 @@ method class_definition($/, $key) {
                 );
 
                 # add accessors for the attribute
-                $methods_block.push(
+                $block.push(
                     PAST::Block.new(
                         :blocktype('declaration'),
                         :name(~$_<var_name><ident>),
@@ -791,10 +789,8 @@ method class_definition($/, $key) {
 
         # add the methods
         for $<class_method_definition> {
-            $methods_block.push( $($_) );
+            $block.push( $($_) );
         }
-
-        $block.push( $methods_block );
 
         $?CLASS := '';
 
