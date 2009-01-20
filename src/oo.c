@@ -1229,15 +1229,18 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
 
         /* If we weren't excluded... */
         if (!excluded) {
-            /* Is there a method with this name already in the class?
-             * RT #45999 multi-method handling. */
+            /* Is there a method with this name already in the class? */
 
-            if (VTABLE_exists_keyed_str(interp, methods_hash, method_name))
-                /* Conflicts with something already in the class. */
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
-                    "A conflict occurred during role composition "
-                    "due to method '%S'.", method_name);
+            if (VTABLE_exists_keyed_str(interp, methods_hash, method_name)) {
+                /* Conflicts with something already in the class, unless it's a
+                 * multi-method. */
+                PMC *cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, method_name);
+                if (PMC_IS_NULL(cur_entry) || !VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub")))
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
+                        "A conflict occurred during role composition "
+                        "due to method '%S'.", method_name);
+            }
 
             /* What about a conflict with ourslef? */
             if (VTABLE_exists_keyed_str(interp, proposed_add_methods,
@@ -1261,15 +1264,18 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             STRING * const alias_name = VTABLE_get_string_keyed_str(interp,
                 alias, method_name);
 
-            /* Is there a method with this name already in the class?
-             * RT #45999: multi-method handling. */
-            if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name))
-                /* Conflicts with something already in the class. */
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
-                    "A conflict occurred during role composition"
-                    " due to the aliasing of '%S' to '%S'.",
-                    method_name, alias_name);
+            /* Is there a method with this name already in the class? If it's
+             * not a multi-method, error. */
+            if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name)) {
+                PMC *cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, alias_name);
+                if (PMC_IS_NULL(cur_entry) || !VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub")))
+                    /* Conflicts with something already in the class. */
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
+                        "A conflict occurred during role composition"
+                        " due to the aliasing of '%S' to '%S'.",
+                        method_name, alias_name);
+            }
 
             /* What about a conflict with ourslef? */
             if (VTABLE_exists_keyed_str(interp, proposed_add_methods,
@@ -1298,7 +1304,30 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                                         proposed_add_methods, method_name);
 
         /* Add it to the methods of the class. */
-        VTABLE_set_pmc_keyed_str(interp, methods_hash, method_name, cur_method);
+        PMC *cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, method_name);
+        if (VTABLE_isa(interp, cur_method, CONST_STRING(interp, "MultiSub"))) {
+            /* The thing we're adding is a multi-sub, but is the thing in the
+             * class already a multi-sub? */
+            if (!PMC_IS_NULL(cur_entry) && VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub"))) {
+                /* Class already has a multi-sub; need to merge our methods into it. */
+                INTVAL num_subs = VTABLE_elements(interp, cur_method);
+                INTVAL i;
+                for (i = 0; i < num_subs; i++)
+                    VTABLE_push_pmc(interp, cur_entry, VTABLE_get_pmc_keyed_int(interp,
+                            cur_method, i));
+            }
+            else {
+                /* It's not, and we didn't conflict so much be no entry. Just stick it in. */
+                VTABLE_set_pmc_keyed_str(interp, methods_hash, method_name, cur_method);
+            }
+        }
+        else {
+            /* Are we adding into a multi-sub? */
+            if (!PMC_IS_NULL(cur_entry) && VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub")))
+                VTABLE_push_pmc(interp, cur_entry, cur_method);
+            else
+                VTABLE_set_pmc_keyed_str(interp, methods_hash, method_name, cur_method);
+        }
     }
 
     /* Add this role to the roles list. */
