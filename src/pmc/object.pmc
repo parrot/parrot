@@ -548,8 +548,23 @@ Returns whether the object's class does the role with name C<*role_name>.
 */
 
     VTABLE INTVAL does(STRING *role_name) {
+        /* If it's a null string, return false */
         if (!role_name)
             return 0;
+        else {
+            PMC    * const classobj = VTABLE_get_class(interp, SELF);
+            STRING * meth_name      = CONST_STRING(interp, "does");
+
+            PMC * const method = Parrot_oo_find_vtable_override(interp,
+                classobj, meth_name);
+
+            if (!PMC_IS_NULL(method)
+             && Parrot_run_meth_fromc_args_reti(interp, method, SELF, meth_name, "IS", role_name))
+                return 1;
+        }
+        /* Check the superclass's vtable interface, if any. */
+        if (SUPER(role_name))
+            return 1;
 
         /* Dispatch to the object's class */
         return VTABLE_does(interp, VTABLE_get_class(interp, SELF), role_name);
