@@ -668,25 +668,13 @@ method class_definition($/, $key) {
     our $?CLASS; # for namespacing of constants
 
     if $key eq 'open' {
+        # Start of class definition; make PAST to create class object
         $?CLASS := ~$<class_name>;
         my $block := PAST::Block.new(
-                :node($/),
-                :blocktype('declaration'),
-                :pirflags( ':init :load' ),
-                :namespace( $?CLASS )
-            );
-
-        # set up scope 'package' for the superglobals
-        our @?SUPER_GLOBALS;
-        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
-
-        @?BLOCK.unshift( $block );
-    }
-    else {
-        my $block := @?BLOCK.shift();
-        $block.push(
-            # Start of class definition; make PAST to create class object if
-            # we're creating a new class.
+            :node($/),
+            :blocktype('declaration'),
+            :pirflags( ':init :load' ),
+            :namespace($?CLASS),
             PAST::Op.new(
                 :pasttype('bind'),
                 PAST::Var.new(
@@ -702,7 +690,15 @@ method class_definition($/, $key) {
             )
         );
 
-        # nothing to do for $<const_definition,
+        # set up scope 'package' for the superglobals
+        our @?SUPER_GLOBALS;
+        for ( @?SUPER_GLOBALS ) { $block.symbol( :scope('package'), $_ ); }
+
+        @?BLOCK.unshift( $block );
+    }
+    else {
+        my $block := @?BLOCK.shift();
+
         # setup of class constants is done in the 'loadinit' node
         for $<constant_definition> {
             $block.push( $($_) );
