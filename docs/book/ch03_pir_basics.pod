@@ -6,32 +6,31 @@ Z<CHP-3>
 
 X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR (Parrot intermediate representation)>
-The Parrot intermediate representation (PIR) is an overlay on top of the
-Parrot assembly language (PASM). PIR provides some simplifications and
-high-level constructs to simplify programming tasks above what an
-assembly language like PASM typically would have. It has many
-high-level features that will be familiar to programmers, but
-it still isn't considered to be a high-level language by itself. In fact,
+The Parrot intermediate representation (PIR) is the primary way to program
+Parrot directly. It used to be an overlay on top of the far more primitive
+Parrot assembly language (PASM). However, PIR and PASM have since diverged
+semantically in a number of places and no longer are directly related to
+one another. PIR has many high-level features that will be familiar to
+programmers, such as basic operator syntax. However, it's still very
+low-level, and is closely tied to the underlying virtual machine. In fact,
 the Parrot developers specifically want to keep in that way for a
-number of reasons. PASM, the Parrot assembly language on which PIR is
-based, is discussed in more detail in A<CHP-5>Chapter 5.
+number of reasons. PASM, the Parrot assembly language, is discussed in more
+detail in A<CHP-5>Chapter 5.
 
-X<.pir files> As a convention, files containing pure PIR code generally
-have a F<.pir> extension. Parrot will treat a file with any other
-extension, besides F<.pasm> as a PIR file in mixed mode. This means that
-the file can contain PIR and PASM code interchangably, with a few caveats
-that will be discussed later.
+X<.pir files>
+As a convention, files containing pure PIR code generally
+have a F<.pir> extension. PASM files typically end with F<.pasm>. Compiled
+Parrot Bytecode (PBC) files have a F<.pbc> extension. We'll talk more
+about PBC and PASM in later chapters.
 
 X<PIR (Parrot intermediate representation);documentation>
 PIR is well documented, both in traditional documentation and in
-instructional code examples. The documentation for the PIR compiler IMCC
-in F<docs/imcc/> or the project documentation in F<docs/> are good
+instructional code examples. The project documentation in F<docs/> are good
 sources for information about the current syntax, semantics, and
-implementation. The other PIR compiler, PIRC, has its own documentation
-that is slowly maturing. This is a useful source of information too. The
-test suite in F<t/compilers/imcc/> shows examples of proper working code. In fact,
-the test suite is the definitive PIR resource, because it shows how PIR
-I<actually works>, even when the documentation may be out of date.
+implementation.  The test suite in F<t/compilers/imcc/> shows examples
+of proper working code. In fact, the test suite is the definitive PIR
+resource, because it shows how PIR I<actually works>, even when the
+documentation may be out of date.
 
 =head1 Statements
 
@@ -42,16 +41,18 @@ X<PIR (Parrot intermediate representation);statements>
 The syntax of statements in PIR is much more flexible then is commonly
 found in assembly languages, but is more rigid and "close to the machine"
 then some higher-level languages like C are. PIR has a very close
-relationship with the Parrot assembly language, PASM. All PASM instructions
-are valid PIR instructions. PIR does add some extra syntactic options to
-help improve readability and programmability, however. The statement
-delimiter for both PIR and PASM is a newline C<\n>. Each statement has to
-be on its own line N<This isn't entirely true when you consider things like
-macros and heredocs, but we'll tackle those issues when we come to them.>,
-but empty whitespace lines between statements are okay. Statements may also
-start with a label, for use with jumps and branches. Comments are marked by
-a hash sign (C<#>), and continue until the end of the line. POD blocks may
-be used for multi-line documentation.
+relationship with the Parrot assembly language, PASM. PASM instructions,
+with some small changes and caveats, are valid PIR instructions. PIR does
+add some extra syntactic options to help improve readability and
+programmability, however. The statement delimiter for both PIR and PASM is
+a newline C<\n>. Each statement has to be on its own line N<This isn't
+entirely true when you consider things like macros and heredocs, but we'll
+tackle those issues when we come to them.>, but empty whitespace lines
+between statements are okay. Statements may also start with a label, for
+use with jumps and branches. Comments are marked by a hash sign (C<#>),
+and continue until the end of the line. POD blocks may be used for
+multi-line documentation. We'll talk about all these issues in more detail
+as we go.
 
 To help with readability, PIR has some high-level constructs, including
 symbol operators:
