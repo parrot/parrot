@@ -118,6 +118,9 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         obj = (PObj *)CTX_REG_STR(ctx, i);
         if (obj) {
+            /* work around a mysterious segfault-inducing problem we haven't
+             * yet tracked down */
+            PObj_flag_CLEAR(is_PMC, obj);
             PObj_is_string_SET(obj);
             pobject_lives(interp, obj);
         }
