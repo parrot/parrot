@@ -75,12 +75,23 @@ sub runstep {
         : '$(LIBPARROT_STATIC)',
     );
 
+    # Set -rpath (or equivalent) for executables to find the
+    # shared libparrot in the build directory.
     $conf->data->set(
         rpath_blib => ( $parrot_is_shared && $conf->data->get('rpath') )
         ? $conf->data->get('rpath')
             . $conf->data->get('build_dir')
             . $conf->data->get('slash')
             . $conf->data->get('blib_dir')
+        : ''
+    );
+    
+    # Set -rpath (or equivalent) for the installed executables to find the
+    # installed shared libparrot.
+    $conf->data->set(
+        rpath_lib => ( $parrot_is_shared && $conf->data->get('rpath') )
+        ? $conf->data->get('rpath')
+            . $conf->data->get('libdir')
         : ''
     );
 

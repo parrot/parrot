@@ -798,7 +798,7 @@ $(INSTALLABLEPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     $(PARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/main$(O) \
-    $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
+    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(SRC_DIR)/install_config$(O)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(INC_DIR)/parrot.h : $(INC_DIR)/pbcversion.h $(INC_DIR)/vtable.h
@@ -897,7 +897,7 @@ $(INSTALLABLEPDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT) $(SRC_DIR)/parro
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/parrot_debugger$(O) \
     $(SRC_DIR)/parrot_config$(O) \
-    $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
@@ -915,7 +915,7 @@ $(DIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_disassemble$(O) \
-    $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
@@ -933,7 +933,8 @@ $(SRC_DIR)/pdump$(O) : $(GEN_HEADERS)
 $(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pdump$(O) \
-    $(SRC_DIR)/packdump$(O) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    $(SRC_DIR)/packdump$(O) \
+    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 
@@ -949,7 +950,7 @@ $(SRC_DIR)/pbc_info$(O) : $(GEN_HEADERS)
 $(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_info$(O) \
-    $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
@@ -967,7 +968,7 @@ $(INSTALLABLEPBCMERGE) : $(SRC_DIR)/pbc_merge$(O) $(LIBPARROT) $(INSTALLABLECONF
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/pbc_merge$(O) \
     $(SRC_DIR)/install_config$(O) \
-    $(ALL_PARROT_LIBS) $(LINKFLAGS)
+    @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 
