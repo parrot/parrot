@@ -284,6 +284,8 @@ LINECOMMENT    [#].*{EOL}?
 
 <*>{LINECOMMENT}        { /* ignore line comments */ }
 
+<INITIAL>^"=cut"{EOL}   { /* ignore a "=cut" if it's not in a POD comment */ }
+
 <INITIAL>^"=".*{EOL}    { yy_push_state(POD, yyscanner); }
 
 
