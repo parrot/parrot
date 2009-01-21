@@ -36,21 +36,6 @@ their operands are emitted through the C<bcgen> module.
 
 */
 
-static char const * const subflag_names[] = {
-    "method",
-    "init",
-    "load",
-    "outer",
-    "main",
-    "anon",
-    "postcomp",
-    "immediate",
-    "vtable",
-    "lex",
-    "multi",
-    "lexid"
-};
-
 #define out lexer->outfile
 
 /* the order of these letters match with the pir_type enumeration.
@@ -62,6 +47,7 @@ static void emit_pir_statement(lexer_state * const lexer, subroutine * const sub
 static void emit_pir_instruction(lexer_state * const lexer, instruction * const instr);
 static void emit_pbc_expr(lexer_state * const lexer, expression * const operand);
 
+static void print_sub_flags(lexer_state * const lexer, subroutine * const subiter);
 
 /* prototype declaration */
 void print_expr(lexer_state * const lexer, expression * const expr);
@@ -293,6 +279,46 @@ print_statement(lexer_state * const lexer, subroutine * const sub) {
 
 /*
 
+=item C<static void
+print_sub_flags(lexer_state * const lexer, subroutine * const subiter)>
+
+Print the appropriate subflags.
+
+=cut
+
+*/
+static void
+print_sub_flags(lexer_state * const lexer, subroutine * const subiter) {
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_INIT))
+        fprintf(out, ":init ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_LOAD))
+        fprintf(out, ":load ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_MAIN))
+        fprintf(out, ":main ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_ANON))
+        fprintf(out, ":anon ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_POSTCOMP))
+        fprintf(out, ":postcomp ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_IMMEDIATE))
+        fprintf(out, ":immediate ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_METHOD))
+        fprintf(out, ":method ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_HAS_OUTER))
+        fprintf(out, ":outer ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_VTABLE))
+        fprintf(out, ":vtable ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_LEX))
+        fprintf(out, ":lex ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_MULTI))
+        fprintf(out, ":multi ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_SUBID))
+        fprintf(out, ":subid ");
+    if (TEST_FLAG(subiter->flags, PIRC_SUB_FLAG_INSTANCEOF))
+        fprintf(out, ":instanceof ");
+}
+
+/*
+
 =item C<void
 print_subs(struct lexer_state * const lexer)>
 
@@ -330,14 +356,8 @@ print_subs(struct lexer_state * const lexer) {
         fprintf(out, "\n");
 
         if (subiter->flags) {
-            int i;
             fprintf(out, ".pcc_sub ");
-            for (i = 0; i < BIT(i); i++) {
-                if (TEST_FLAG(subiter->flags, BIT(i))) {
-                    fprintf(out, " :%s", subflag_names[i]);
-                }
-            }
-
+            print_sub_flags(lexer, subiter);
         }
 
         fprintf(out, "%s:\n", subiter->info.subname);
@@ -437,11 +457,7 @@ emit_pir_subs(lexer_state * const lexer, char const * const outfile) {
 
         fprintf(out, "\n.sub %s", subiter->info.subname);
 
-        for (i = 0; i < BIT(i); i++) {
-            if (TEST_FLAG(subiter->flags, BIT(i))) {
-                fprintf(out, " :%s", subflag_names[i]);
-            }
-        }
+        print_sub_flags(lexer, subiter);
 
         fprintf(out, "\n");
         emit_pir_statement(lexer, subiter);
