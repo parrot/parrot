@@ -125,8 +125,8 @@ Marks the current idx/key and the aggregate as live.
              pobject_lives(INTERP, (PObj *)PMC_struct_val(SELF));
 
         /* the aggregate */
-        if (PMC_pmc_val(SELF))
-             pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+        if (SELF.get_pmc() != PMCNULL)
+             pobject_lives(INTERP, (PObj *)SELF.get_pmc());
     }
 
 /*
@@ -143,7 +143,7 @@ Make a clone of the iterator.
         STRING     *name    = CONST_STRING(interp, "set_key");
         PMC * const key     = (PMC *)PMC_struct_val(SELF);
         PMC * const res     = pmc_new_init(INTERP, SELF->vtable->base_type,
-                                           PMC_pmc_val(SELF));
+                                           SELF.get_pmc());
         Parrot_PCCINVOKE(interp, res, name, "P->", VTABLE_clone(interp, key));
         return res;
     }
@@ -187,7 +187,7 @@ Returns a textual representation of the iterator.
 */
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        return VTABLE_get_integer_keyed(INTERP, PMC_pmc_val(SELF), key);
+        return VTABLE_get_integer_keyed(INTERP, SELF.get_pmc(), key);
     }
 
 /*
@@ -202,7 +202,7 @@ Get integer value of current position plus idx.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const agg = SELF.get_pmc();
         return VTABLE_get_integer_keyed_int(INTERP, agg, PMC_int_val(key) +idx);
     }
 
@@ -215,7 +215,7 @@ Get integer value of current position plus idx.
 */
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        return VTABLE_get_number_keyed(INTERP, PMC_pmc_val(SELF), key);
+        return VTABLE_get_number_keyed(INTERP, SELF.get_pmc(), key);
     }
 
 /*
@@ -230,7 +230,7 @@ Get number value of current position plus idx.
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const agg = SELF.get_pmc();
         return VTABLE_get_number_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
     }
 
@@ -245,7 +245,7 @@ Get number value of current position plus idx.
 */
 
     VTABLE STRING *get_string_keyed(PMC *key) {
-        return VTABLE_get_string_keyed(INTERP, PMC_pmc_val(SELF), key);
+        return VTABLE_get_string_keyed(INTERP, SELF.get_pmc(), key);
     }
 
 /*
@@ -260,7 +260,7 @@ Get string value of current position plus idx.
 
     VTABLE STRING *get_string_keyed_int(INTVAL idx) {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const agg = SELF.get_pmc();
         return VTABLE_get_string_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
     }
 
@@ -290,11 +290,24 @@ Returns the number of remaining elements in the aggregate. TODO.
 */
 
     VTABLE INTVAL elements() {
-        return VTABLE_elements(INTERP, PMC_pmc_val(SELF));
+        return VTABLE_elements(INTERP, SELF.get_pmc());
     }
 
 /*
 
+=item C<PMC *get_pmc()>
+
+Returns this Interator's aggregate.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc() {
+        return PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+    }
+
+/*
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 Returns the element for C<*key>.
@@ -304,7 +317,7 @@ Returns the element for C<*key>.
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        return VTABLE_get_pmc_keyed(INTERP, PMC_pmc_val(SELF), key);
+        return VTABLE_get_pmc_keyed(INTERP, SELF.get_pmc(), key);
     }
 
 /*
@@ -319,7 +332,7 @@ Returns the element for C<key>.
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL idx) {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const agg = SELF.get_pmc();
         return VTABLE_get_pmc_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
     }
 
@@ -344,7 +357,7 @@ Reset the Iterator. C<value> must be one of
                     "Illegal set_integer on iterator");
 
         /* reset iterator on aggregate */
-        agg = PMC_pmc_val(SELF);
+        agg = SELF.get_pmc();
 
         if (agg->vtable->base_type == enum_class_Slice) {
             /* it's an xrange serving as its own aggregate */
@@ -372,7 +385,7 @@ Reset the Iterator. C<value> must be one of
 
     VTABLE INTVAL pop_integer() {
         PMC * const key      = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg      = PMC_pmc_val(SELF);
+        PMC * const agg      = SELF.get_pmc();
         const INTVAL ret     = VTABLE_get_integer_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
@@ -390,7 +403,7 @@ Reset the Iterator. C<value> must be one of
 
     VTABLE FLOATVAL pop_float() {
         PMC * const key      = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg      = PMC_pmc_val(SELF);
+        PMC * const agg      = SELF.get_pmc();
         const FLOATVAL ret   = VTABLE_get_number_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
@@ -408,7 +421,7 @@ Reset the Iterator. C<value> must be one of
 
     VTABLE STRING *pop_string() {
         PMC * const key      = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg      = PMC_pmc_val(SELF);
+        PMC * const agg      = SELF.get_pmc();
         STRING * const ret   = VTABLE_get_string_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
@@ -428,7 +441,7 @@ the previous one.
 
     VTABLE PMC *pop_pmc() {
         PMC * const key      = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg      = PMC_pmc_val(SELF);
+        PMC * const agg      = SELF.get_pmc();
         PMC * const ret      = VTABLE_get_pmc_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_PREV);
@@ -449,7 +462,7 @@ the next one.
 
     VTABLE INTVAL shift_integer() {
         PMC * const key      = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg      = PMC_pmc_val(SELF);
+        PMC * const agg      = SELF.get_pmc();
         const INTVAL ret     = VTABLE_get_integer_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
@@ -497,7 +510,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
             REG_INT(interp, 3) =
             REG_INT(interp, 4) = 0;
 
-        agg        = PMC_pmc_val(SELF);
+        agg = SELF.get_pmc();
 
         if (agg->vtable->base_type == enum_class_IntList) {
             const INTVAL ires  = SELF.shift_integer();
@@ -523,7 +536,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
 
     VTABLE FLOATVAL shift_float() {
         PMC * const key      = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg      = PMC_pmc_val(SELF);
+        PMC * const agg      = SELF.get_pmc();
         const FLOATVAL ret   = VTABLE_get_number_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
@@ -541,7 +554,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
 
     VTABLE STRING *shift_string() {
         PMC * const key      = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg      = PMC_pmc_val(SELF);
+        PMC * const agg      = SELF.get_pmc();
         STRING * const ret   = VTABLE_get_string_keyed(INTERP, agg, key);
         PMC_struct_val(SELF) =
             VTABLE_nextkey_keyed(INTERP, key, agg, ITERATE_GET_NEXT);
@@ -561,7 +574,7 @@ the next one.
 
     VTABLE PMC *shift_pmc() {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const agg = SELF.get_pmc();
         PMC        *ret;
 
         if (PMC_int_val(key) == -1)
@@ -587,7 +600,7 @@ Returns whether an element for C<*key> exists in the aggregate.
 */
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        return VTABLE_exists_keyed(INTERP, PMC_pmc_val(SELF), key);
+        return VTABLE_exists_keyed(INTERP, SELF.get_pmc(), key);
     }
 
 /*
@@ -602,7 +615,7 @@ Returns whether an element for C<idx> exists in the aggregate.
 
     VTABLE INTVAL exists_keyed_int(INTVAL idx) {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const agg = SELF.get_pmc();
         return VTABLE_exists_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
     }
 
@@ -617,7 +630,7 @@ Returns whether the iterator contains an aggregate.
 */
 
     VTABLE INTVAL defined() {
-        return (INTVAL)(PMC_pmc_val(SELF) != 0);
+        return (INTVAL)(SELF.get_pmc() != PMCNULL);
     }
 
 /*
@@ -629,7 +642,7 @@ Returns whether the iterator contains an aggregate.
 */
 
     VTABLE INTVAL defined_keyed(PMC *key) {
-        return VTABLE_defined_keyed(INTERP, PMC_pmc_val(SELF), key);
+        return VTABLE_defined_keyed(INTERP, SELF.get_pmc(), key);
     }
 
 /*
@@ -644,7 +657,7 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
 
     VTABLE INTVAL defined_keyed_int(INTVAL idx) {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        PMC * const agg = PMC_pmc_val(SELF);
+        PMC * const agg = SELF.get_pmc();
         return VTABLE_defined_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
     }
 

@@ -89,7 +89,7 @@ Creates a copy of the string.
     VTABLE PMC *clone() {
         PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
-        PMC_str_val(dest) = string_copy(INTERP, SELF.get_string());
+        VTABLE_set_string_native(INTERP, dest, string_copy(INTERP, SELF.get_string()));
         return dest;
     }
 
@@ -235,7 +235,7 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        PMC_str_val(SELF) = string_set(INTERP, PMC_str_val(SELF), value);
+        PMC_str_val(SELF) = string_set(INTERP, SELF.get_string(), value);
     }
 
 /*

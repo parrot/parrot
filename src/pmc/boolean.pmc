@@ -41,7 +41,7 @@ C<bool> object according to the passed PMC value.
         PMC * const res = pmc_new(interp, enum_class_Boolean);
 
         if (argcP)
-            PMC_int_val(res) = VTABLE_get_bool(interp, REG_PMC(interp, 5));
+            SELF.set_bool(VTABLE_get_bool(interp, REG_PMC(interp, 5)));
 
         return PMCNULL; /* TODO */
     }
@@ -90,7 +90,7 @@ Sets the value to C<value> evaluated in a boolean context.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        PMC_int_val(SELF) = !FLOAT_IS_ZERO(value);
+        SELF.set_bool(!FLOAT_IS_ZERO(value));
     }
 
 /*
@@ -104,7 +104,7 @@ Sets the value to C<*value> evaluated in a boolean context.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        PMC_int_val(SELF) = string_bool(INTERP, value);
+        SELF.set_bool(string_bool(INTERP, value));
     }
 }
 
