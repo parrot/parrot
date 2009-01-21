@@ -12,8 +12,6 @@ BuildRequires:  ncurses-devel
 BuildRequires:  gmp-devel
 BuildRequires:  gdbm-devel
 BuildRequires:  /usr/bin/perldoc
-BuildRequires:  bc
-BuildRequires:  m4
 BuildRequires:  libicu-devel
 
 %package languages
