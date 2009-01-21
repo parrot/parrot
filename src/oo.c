@@ -546,7 +546,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
             PMC    *classname_hash = interp->class_hash;
             /* set entry in name->type hash */
             PMC    *item     = pmc_new(interp, enum_class_Integer);
-            PMC_int_val(item) = type;
+            VTABLE_set_integer_native(interp, item, type);
 
             VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
         }
