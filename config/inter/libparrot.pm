@@ -85,7 +85,7 @@ sub runstep {
             . $conf->data->get('blib_dir')
         : ''
     );
-    
+
     # Set -rpath (or equivalent) for the installed executables to find the
     # installed shared libparrot.
     $conf->data->set(
