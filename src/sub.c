@@ -117,8 +117,10 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         obj = (PObj *)CTX_REG_STR(ctx, i);
-        if (obj)
+        if (obj) {
+            PObj_is_string_SET(obj);
             pobject_lives(interp, obj);
+        }
     }
 }
 
