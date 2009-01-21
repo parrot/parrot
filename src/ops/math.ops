@@ -767,10 +767,6 @@ Set $1 to its negative.
 
 Set $1 to the negative of $2.
 
-=item B<n_neg>(out PMC, invar PMC)
-
-Create $1 as the negative of $2.
-
 =cut
 
 inline op neg(inout INT) :base_core {
@@ -795,10 +791,6 @@ inline op neg(out NUM, in NUM) :base_core {
 
 inline op neg(out PMC, invar PMC) :base_core {
   $1 = VTABLE_neg(interp, $2, $1);
-}
-
-inline op n_neg(out PMC, invar PMC) :base_core {
-  $1 = VTABLE_neg(interp, $2, NULL);
 }
 
 ########################################

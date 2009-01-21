@@ -129,7 +129,6 @@ token pasm_instruction {
 | ne
 | n_repeat
 | n_concat
-| n_neg
 | mul
 | mod
 | add_multi

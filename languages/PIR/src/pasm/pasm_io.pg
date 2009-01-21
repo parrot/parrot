@@ -49,7 +49,6 @@ rule math_op {
 | mod                 <arg_hack> #
 | mul                 <arg_hack> #
 | neg                 <arg_hack> #
-| n_neg               <arg_hack> #
 | pow                 <arg_hack> #
 | sub                 <arg_hack> #
 | sqrt                <arg_hack> #
