@@ -4,6 +4,9 @@ New in January 2009 release
 - Implementation
   + Implemented bytecode annotations
   + Role composition is now aware of multi-subs
+  + Unbuffered IO PMCs now autopromote when buffering is necessary
+  + Installation parrot binary and libparrot shared library now supported
+  + Class registry now respects HLLs
 - Compilers
   + IMCC
     - removed keyed string indexing, e.g. $S0[1].
@@ -76,6 +79,8 @@ New in January 2009 release
   + Infrastructure
     - 'make smoke' now generates Smolder reports sent to
       http://smolder.plusthree.com/app/public_projects/smoke_reports/8
+  + Improved const and null correctness for C function parameters
+  + Sped up STRING manipulation (append, chop), improving PGE about 30%
   + BOOK
     - Added sections about Classes, OO programming, and methods.
     - Added information about Annotations, Exceptions, and Handlers
