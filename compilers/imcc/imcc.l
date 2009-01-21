@@ -283,7 +283,11 @@ SP              [ ]
     }
 
 
-
+<INITIAL,emit,macro>^"=cut"{EOL} {
+    /* this is a stand-alone =cut, but we're
+     * not in POD mode, so just ignore.
+     */
+}
 
 <INITIAL,emit,macro>^"=" {
         IMCC_INFO(interp)->in_pod = 1;
