@@ -567,21 +567,21 @@ size_t
 Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
 {
     ASSERT_ARGS(Parrot_io_write_buffer)
-    size_t avail;
-    void * const buffer = s->strstart;
-    const size_t len = s->bufused;
-    int need_flush;
-
-    INTVAL                buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    void          * const buffer       = s->strstart;
     unsigned char * const buffer_start = Parrot_io_get_buffer_start(interp, filehandle);
     unsigned char *       buffer_next  = Parrot_io_get_buffer_next(interp, filehandle);
     const size_t          buffer_size  = Parrot_io_get_buffer_size(interp, filehandle);
+    INTVAL                buffer_flags = Parrot_io_get_buffer_flags(interp, filehandle);
+    const size_t          len          = s->bufused;
+    int                   need_flush;
+    size_t                avail;
 
     if (len <= 0)
         return 0;
-    if (buffer_flags & PIO_BF_WRITEBUF) {
+
+    if (buffer_flags & PIO_BF_WRITEBUF)
         avail = buffer_size - (buffer_next - buffer_start);
-    }
+
     else if (buffer_flags & PIO_BF_READBUF) {
         buffer_flags &= ~PIO_BF_READBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
@@ -589,22 +589,24 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
         avail = buffer_size;
     }
-    else {
+    else
         avail = buffer_size;
-    }
+
     /* If we are line buffered, check for newlines.
-     * If any, we should flush
-     */
+     * If any, we should flush */
     need_flush = 0;
+
     if (Parrot_io_get_flags(interp, filehandle) & PIO_F_LINEBUF) {
         /* scan from end, it's likely that EOL is at end of string */
         const char *p = (char*)buffer + len - 1;
-        size_t i;
-        for (i = 0; i < len; ++i, --p)
+        size_t      i;
+
+        for (i = 0; i < len; ++i, --p) {
             if (io_is_end_of_line(p)) {
                 need_flush = 1;
                 break;
             }
+        }
     }
 
     /*
@@ -615,22 +617,24 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
      */
     if (need_flush || len >= buffer_size) {
         long wrote;
+
         /* Write through, skip buffer. */
         Parrot_io_flush(interp, filehandle);
         wrote = PIO_WRITE(interp, filehandle, s);
+
         if (wrote == (long)len) {
             Parrot_io_set_file_position(interp, filehandle, (wrote +
                         Parrot_io_get_file_position(interp, filehandle)));
             return wrote;
         }
-        else {
-            return (size_t)-1; /* Write error */
-        }
+        /* Write error */
+        else
+            return (size_t)-1;
     }
     else if (avail > len) {
         buffer_flags |= PIO_BF_WRITEBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
-        memcpy(buffer_next, buffer, len);
+        memmove(buffer_next, buffer, len);
         buffer_next += len;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
         Parrot_io_set_file_position(interp, filehandle, (len +
@@ -642,15 +646,16 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
 
         buffer_flags |= PIO_BF_WRITEBUF;
         Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
+
         /* Fill remainder, flush, then try to buffer more */
-        memcpy(buffer_next, buffer, avail);
+        memmove(buffer_next, buffer, avail);
         buffer_next += avail;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
         Parrot_io_set_file_position(interp, filehandle, (avail +
                     Parrot_io_get_file_position(interp, filehandle)));
         Parrot_io_flush(interp, filehandle);
         buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
-        memcpy(buffer_start, ((const char *)buffer + avail), diff);
+        memmove(buffer_start, ((const char *)buffer + avail), diff);
         Parrot_io_set_buffer_start(interp, filehandle, buffer_start);
         buffer_next += diff;
         Parrot_io_set_buffer_next(interp, filehandle, buffer_next);
@@ -659,6 +664,7 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
         return len;
     }
 }
+
 
 /*
 
