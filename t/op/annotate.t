@@ -19,13 +19,14 @@ Test various use cases of the annotate directive.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(29)
+    plan(33)
 
     'no_annotations'()
     'annotations_exception'()
     'annotations_ops'()
     'backtrace_annotations'()
     'parrotinterpreter_annotations'()
+    'eval_test'()
 .end
 
 
@@ -192,6 +193,44 @@ Test various use cases of the annotate directive.
     $I0 = $P1['line']
     'is'($I0, 43, 'annotations from outer sub returned at point of call with level 1')
 .end
+
+
+.sub 'eval_test'
+    .annotate 'file', 'a.tcl'
+    .annotate 'line', 3
+    $P1 = compreg 'PIR'
+    $S0 = <<"END_PIR"
+.sub 'joe'
+    .annotate 'file', 'b.tcl'
+    die "what?"
+.end
+END_PIR
+    $P2 = $P1($S0)
+    push_eh eek
+    joe()
+    pop_eh
+    die "Should not get here!"
+
+  eek:
+    .get_results($P3)
+    pop_eh
+    $P3 = $P3.'backtrace'()
+    
+    $P4 = $P3[0]
+    $P4 = $P4['annotations']
+    $S0 = $P4['file']
+    'is'($S0, 'b.tcl', 'annotation from eval code OK')
+    $I0 = exists $P4['line']
+    'is'($I0, 0, 'no line annotation (since it was not set)')
+
+    $P4 = $P3[1]
+    $P4 = $P4['annotations']
+    $S0 = $P4['file']
+    'is'($S0, 'a.tcl', 'annotation from caller of eval code OK')
+    $I0 = $P4['line']
+    'is'($I0, 3, 'annotation from caller of eval code OK')
+.end
+
 
 # Local Variables:
 #   mode: pir 
