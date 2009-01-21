@@ -413,7 +413,8 @@ the 3rd Tuesday of each month. Version numbers for each release will be
 determined each month, and will depend on the features actually present in
 that release.
 
- - January 20th, 2009   - chromatic
+ - February 17, 2009 - 0.9.1
+ - March 17, 2009  - 1.0.0
 
 =cut
 

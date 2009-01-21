@@ -1,5 +1,5 @@
 Name:           parrot
-Version:        0.8.2
+Version:        0.9.0
 Release:        1%{?dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
@@ -132,6 +132,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Tue Jan 20 2009 chromatic <chromatic@wgz.org> 0.9.0
+- updated to 0.9.0
+
 * Tue Dec 16 2008 Whiteknight <wknight8111@gmail.com> 0.8.2
 - updated to 0.8.2
 

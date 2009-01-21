@@ -1,6 +1,6 @@
 # $Id$
 
-New in January 2009 release
+New in January 2009 release (0.9.0)
 - Implementation
   + Implemented bytecode annotations
   + Role composition is now aware of multi-subs

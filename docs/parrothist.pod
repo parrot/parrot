@@ -132,4 +132,6 @@ the strings?).
 
  Whiteknight 0.8.2          2008-Dec-16     "Feliz Loro"
 
+ chromatic   0.9.0          2009-Jan-20     "From Outer Space"
+
 =cut

@@ -33,16 +33,6 @@ determined.
 
 =back
 
-=head1 Opcodes
-
-=over 4
-
-=item * C<n_*> math opcode variants [post 0.7.1]
-
-See RT #58410.
-
-=back
-
 =head1 PMCS
 
 =over 4
