@@ -37,11 +37,9 @@ Something like this worked for me under Linux.
   make
 
   # configure run-tests.php
-  export PARROT_HOME=/home/bernhard/devel/Parrot/trunk
+  export PARROT_HOME=/home/bernhard/devel/Parrot/git/parrot
   export TEST_PHP_EXECUTABLE=$PARROT_HOME/languages/pipp/pipp
   export TEST_PHP_CGI_EXECUTABLE=$PARROT_HOME/languages/pipp/pipp
-  # export PIPP_VARIANT=pct
-  # export PIPP_VARIANT=phc
   export NO_INTERACTION=1
 
   # run the test-suite
