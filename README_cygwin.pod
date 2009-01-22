@@ -12,10 +12,12 @@ C<export PATH=`pwd`/blib/lib:$PATH>
 There are official cygwin parrot packages available via
 L<http://cygwin.com/setup.exe>.
 
-  parrot libparrot0 libparrot-devel parrot-perl6 parrot-languages
+  parrot libparrot0 libparrot-devel parrot-perl6
 
 Some tweaks are needed for different names for the ffi to some dll's.
-See L</loadlib DLL versioning>
+See L</loadlib DLL versioning>.
+
+parrot-languages was dropped with 0.9.0.
 
 
 =head1 Packages
@@ -46,12 +48,10 @@ Optional build requirements:
 
 Optional perl packages for testing: 
 
-  L<Test::TAP::HTMLMatrix> if you want to run the language smoke tests
-  with C<make languages-smoke>.
+  L<Test::TAP::HTMLMatrix> if you want to run the smoke tests
+  with C<make smoke>.
 
   L<Test::Base> for some APL language tests.
-
-  perl L<Moose> for smartlink
 
   perl L<Test::Perl::Critic> and L<Perl::Critic>
 
@@ -108,24 +108,60 @@ for cygwin, and as the name says it will never be :)
   make test # see PLATFORMS for known issues.
   make reallyinstall
 
-=head1 TODO
+=head1 PROBLEMS
 
 =over
 
-=item Makefile tuning
+=item perl fatal error - unable to remap Glob.dll
 
-Rename libparrot.dll to cygparrot0_8_2.dll and create an interim
-libparrot.dll.a
+Something like:
+  F<perl.exe>: *** fatal error - unable to remap 
+  F<C:\cygwin\lib\perl5\5.10\i686-cygwin\auto\File\Glob\Glob.dll>
+  to same address as parent(C<0x860000>) != C<0x14D0000>
 
-  [perl #56998] [TODO]  rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
-  [perl #56562] [PATCH] root.in: add cygwin importlib
+This is a known cygwin problem with dll's, esp. perl on non-XP 32bit platforms.
+You need to install the C<rebase> package and run C<rebaseall> from an C<ash>
+shell.
+
+=item Crash at miniparrot.exe config_lib.pasm
+
+Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your
+fingers
+
+  F<./miniparrot.exe config_lib.pasm > runtime/parrot/include/config.fpmc>
+crashes
+
+See below.
+
+=item Spurious stackdumps while building
+
+Building with an already installed library fails. See RT#39742
+
+Be sure that there's no other libparrot.dll.a or libparrot.a 
+in the linker libpath. 
+
+F</usr/lib/libparrot.dll.a>, F</usr/local/lib/libparrot.dll.a>
+
+=item os hardlink test fail
+
+  t/pmc/os....................................
+  #   Failed test 'hard link was really created'
+  #   at t/pmc/os.t line 312.
+
+This is a known Windows limitation with NTFS junctions on files.
+
+=back
+
+=head1 TODO
+
+=over
 
 =item loadlib DLL versioning
 
 Use cyg*-1.1.dll naming conventions instead of lib*.so.1.1 names for
 loadlib, the FFI.
 
-Thanks to the L<Windows DLL Hell> and the impossibility of
+Thanks to the C<Windows DLL Hell> and the impossibility of
 file hardlinks, windows dll names are versioned, so the loadlib
 function or the various pir's needs more logic.
 
@@ -154,6 +190,6 @@ Threads, Events, and Signals are missing.
 
 =head1 HISTORY
 
-Last updated: 20 July 2008
+Last updated: 22 January 2009
 
 =cut
