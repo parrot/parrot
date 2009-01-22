@@ -44,6 +44,15 @@
 
 #-----------------------------------------------------------------------
 
+.sub pirric_aux_loadbytecode
+    .param string bcname
+    load_bytecode bcname
+.end
+
+.HLL 'parrot'
+
+#-----------------------------------------------------------------------
+
 .const int PIRRIC_ERROR_NORMAL = 0
 .const int PIRRIC_ERROR_EXIT = 1
 .const int PIRRIC_ERROR_GOTO = 2
@@ -119,6 +128,7 @@
     setpredef(predefs, 'RIGHT$', 'right')
     setpredef(predefs, 'MID$', 'mid')
     setpredef(predefs, 'COMPLEX', 'complex')
+    setpredef(predefs, 'COMPREG', 'compreg')
     setpredef(predefs, 'EXP', 'exp')
     setpredef(predefs, 'LN', 'ln')
     setpredef(predefs, 'SIN', 'sin')
@@ -705,6 +715,20 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub predef_compreg :method
+    .param pmc tokenizer
+
+    $P1 = tokenizer.'get'()
+    ne $P1, '(', fail
+    $P2 = self.'get_1_arg'(tokenizer)
+    $S1 = $P2
+    $P3 = compreg $S1
+    .return($P3)
+fail:
+    SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
 .sub predef_exp :method
     .param pmc tokenizer
 
@@ -960,8 +984,15 @@ emptyargs:
 getvar:
     $P2 = tokenizer.'get'()
     eq $P2, '.', dotted
+    eq $P2, '(', isfunctor
     tokenizer.'back'()
     .return(var)
+
+isfunctor:
+    #say 'Functor'
+    args = self.'get_args'(tokenizer)
+    $P3 = var()
+    .return($P3)
 
 dotted:
     $P3 = tokenizer.'get'()
@@ -1799,7 +1830,7 @@ fail:
     upcase $S1
     ne $S1, 'B', fail
     $S1 = arg
-    load_bytecode $S1
+    pirric_aux_loadbytecode($S1)
     .return()
 notype:
     .local pmc program, newprogram
