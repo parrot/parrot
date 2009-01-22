@@ -161,8 +161,9 @@ Currently, Pipp has no support at all for extensions.
 
 =head2 SEE ALSO
 
-  TODO: Embedding and Extending PHP, by Sahrah ...
+  L<http://www.amazon.com/Extending-Embedding-PHP-Developers-Library/dp/067232704X/>
   L<http://www.php.net/manual/en/internals2.php>
+  L<http://www.projectzero.org/zero/sebring/latest/docs/zero.devguide.doc/zero.php/ExtendingPHP.html>
 
 =head1 Interaction with the Parrot world
 
