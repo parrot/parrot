@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 17;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -288,9 +288,9 @@ OUT
     unlink "xpto" if -f "xpto";
 }
 
-# Test link
+# Test link to file. May require root permissions
 SKIP: {
-    skip "Parrot link not implemented for Windows, yet", 2 if $MSWin32;
+    skip "Hardlinks to files not possible on Windows", 2 if $MSWin32 or $cygwin;
 
     pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
@@ -309,8 +309,33 @@ ok
 OUT
 
     my $nl = [ stat("MANIFEST") ]->[3];
-    ok( $nl > 1, "hard link was really created" );
+    ok( $nl > 1, "hard link to file was really created" );
     unlink "xpto" if -f "xpto";
+}
+
+# Test link to dir.
+TODO: {
+    local $TODO = "Hardlinks to a directory may require root permissions";
+
+    pir_output_is( <<'CODE', <<"OUT", "Test dirlink" );
+.sub main :main
+        $P1 = new ['OS']
+
+        $S1 = "xpto"
+        $S2 = "tools"
+        $P1."link"($S2, $S1)
+
+        print "ok\n"
+
+        end
+.end
+CODE
+ok
+OUT
+
+    my $nl = [ stat("tools") ]->[3];
+    ok( $nl > 1, "hard link to dir was really created" );
+    unlink "xpto" if -d "xpto";
 }
 
 # Local Variables:
