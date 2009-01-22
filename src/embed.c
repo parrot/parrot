@@ -1025,6 +1025,57 @@ Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
     return NULL;
 }
 
+/*
+
+=item C<static void print_constant_table>
+
+Print the contents of the constants table.
+
+=cut
+
+*/
+static void
+print_constant_table(PARROT_INTERP) {
+    INTVAL numconstants = interp->code->const_table->const_count;
+    INTVAL i;
+
+    /* TODO: would be nice to print the name of the file as well */
+    Parrot_io_printf(interp, "Constant-table\n");
+
+    for (i = 0; i < numconstants; ++i) {
+        PackFile_Constant *c = interp->code->const_table->constants[i];
+
+        switch (c->type) {
+            case PFC_NUMBER:
+                Parrot_io_printf(interp, "PMC_CONST(%d): %f\n", i, c->u.number);
+                break;
+            case PFC_STRING:
+                Parrot_io_printf(interp, "PMC_CONST(%d): %S\n", i, c->u.string);
+                break;
+            case PFC_KEY:
+                Parrot_io_printf(interp, "PMC_CONST(%d): ", i);
+                /* XXX */
+                /* Parrot_print_p(interp, c->u.key); */
+                Parrot_io_printf(interp, "(PMC constant)");
+                Parrot_io_printf(interp, "\n");
+                break;
+            case PFC_PMC:
+                Parrot_io_printf(interp, "PMC_CONST(%d): ", i);
+                /* XXX */
+                /* Parrot_print_p(interp, c->u.key); */
+                Parrot_io_printf(interp, "(PMC constant)");
+                Parrot_io_printf(interp, "\n");
+                break;
+            default:
+                Parrot_io_printf(interp, "wrong constant type in constant table!\n");
+                /* XXX throw an exception? Is it worth the trouble? */
+                break;
+        }
+    }
+
+    Parrot_io_printf(interp, "\n");
+}
+
 
 /*
 
@@ -1056,6 +1107,8 @@ Parrot_disassemble(PARROT_INTERP)
 
     line   = pdb->file->line;
     debugs = (interp->code->debugs != NULL);
+
+    print_constant_table(interp);
 
     Parrot_io_printf(interp, "%12s-%12s", "Seq_Op_Num", "Relative-PC");
 
