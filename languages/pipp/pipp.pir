@@ -108,26 +108,16 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 .sub 'pipp' :main
     .param pmc argv
 
-    .local string prog, rest
+    .local string prog, php_source_fn
     .local pmc    opt
-    (prog, opt, rest) = parse_options(argv)
+    (prog, opt, php_source_fn) = parse_arguments(argv)
 
-    # Find the name of the input file
-    .local string source_fn
-    $I0 = defined opt['f']
-    unless $I0 goto GOT_NO_F_OPTION
-        source_fn = opt['f']
-        goto GOT_PHP_SOURCE_FN
-GOT_NO_F_OPTION:
-    unless rest goto GOT_NO_FILE_ON_COMMAND_LINE
-        source_fn = rest
-        goto GOT_PHP_SOURCE_FN
-GOT_NO_FILE_ON_COMMAND_LINE:
-        #XXX: should do REPL or read from stdin
+    if php_source_fn goto GOT_PHP_SOURCE_FN
+        # XXX: should do REPL or read from stdin
         printerr "No input file specified.\n"
-    exit -1
+        exit -1
 
-GOT_PHP_SOURCE_FN:
+  GOT_PHP_SOURCE_FN:
 
     # config stuff
     .local pmc cfg
@@ -233,9 +223,10 @@ ERROR:
 .end
 
 # get commandline options
-.sub parse_options
+.sub parse_arguments
     .param pmc argv
 
+    # name of the called program
     .local string prog
     prog = shift argv
 
@@ -266,29 +257,36 @@ ERROR:
         print VERSION
         print "\n"
         end
-n_ver:
+  n_ver:
+
     $I0 = defined opt['help']
     unless $I0 goto n_help
-help:
-    print "usage: "
-    print prog
-    print " [options...] [file]\n"
-    print "see\n\tperldoc -F "
-    print prog
-    print "\nfor more\n"
-    end
+        print "usage: "
+        print prog
+        print " [options...] [file]\n"
+        print "see\n\tperldoc -F "
+        print prog
+        print "\nfor more\n"
+        end
+  n_help:
 
-n_help:
-
+    # Find the name of the input file
     .local int argc
-    .local string rest
+    .local string php_source_fn
     argc = elements argv
-    if argc < 1 goto NO_REST
-    dec argc
-    rest = argv[argc]
-NO_REST:
+    if argc < 1 goto NO_PHP_SCRIPT_NAME
+        dec argc
+        php_source_fn = argv[argc]
+        goto GOT_PHP_SOURCE_FN
+  NO_PHP_SCRIPT_NAME:
 
-    .return (prog, opt, rest)
+    $I0 = defined opt['f']
+    unless $I0 goto GOT_NO_F_OPTION
+        php_source_fn = opt['f']
+  GOT_NO_F_OPTION:
+
+  GOT_PHP_SOURCE_FN:
+    .return (prog, opt, php_source_fn)
 .end
 
 # keep arguments from the command line and from ini-file
