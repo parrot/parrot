@@ -309,10 +309,16 @@ good:
 #-----------------------------------------------------------------------
 .sub readlinebas
     .param pmc file
+    .param int interactive :optional
 
     .local string line
 
+    if interactive goto read_inter
     line = readline file
+    goto read_done
+read_inter:
+    line = file.'readline_interactive'()
+read_done:
 
     $I1 = length line
 checkline:
@@ -1457,7 +1463,7 @@ finish:
 
     say 'Ready'
 reinit:
-    line = readlinebas(stdin)
+    line = readlinebas(stdin, 1)
 
     .local pmc tokenizer
     .local pmc token
