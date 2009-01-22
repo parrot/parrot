@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * Copyright (C) 2002-2009, The Perl Foundation.
  * $Id$
  */
 
@@ -528,8 +528,7 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
     const size_t size = unit->n_basic_blocks + old;
 
     if (!IMCC_INFO(interp)->globals->cs->jit_info) {
-        const size_t len  =
-            strlen(IMCC_INFO(interp)->globals->cs->seg->base.name) + 5;
+        const size_t len  = strlen(IMCC_INFO(interp)->globals->cs->seg->base.name) + 5;
         char * const name = mem_allocate_n_typed(len, char);
 
         snprintf(name, len, "%s_JIT",
@@ -2168,8 +2167,9 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         /* Add annotations seg if we're missing one. */
         if (!interp->code->annotations) {
-            /* Create segment. */
-            char               * const name = (char *) mem_sys_allocate(strlen(interp->code->base.name) + 5);
+            /* Create segment. "_ANN" is added to the name */
+            const               size_t len  = strlen(interp->code->base.name) + 5;
+            char               * const name = (char *) mem_sys_allocate(len);
             int                        add  = interp->code && interp->code->base.dir;
             PackFile_Directory * const dir  = add ? interp->code->base.dir :
                     &interp->initial_pf->directory;
