@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 72;
+use Test::More tests => 69;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -21,7 +21,7 @@ use Parrot::Configure::Test qw(
 );
 use IO::CaptureOutput qw | capture |;
 
-########## _add_to_libs() ##########
+########## _select_lib() ##########
 
 my ($args, $step_list_ref) = process_options(
     {
@@ -44,47 +44,44 @@ my $step = test_step_constructor_and_description($conf);
 my ($osname, $cc);
 $osname = 'mswin32';
 $cc = 'gcc';
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'readline.lib',
     default         => '-lreadline',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/-lreadline/,
-    "'libs' modified as expected");
+   '-lreadline',
+   "_select_lib() returned expected value");
 
 $osname = 'mswin32';
 $cc = 'cc';
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'readline.lib',
     default         => '-lreadline',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/readline\.lib/,
-    "'libs' modified as expected");
+   'readline.lib',
+   "_select_lib() returned expected value");
 
 $osname = 'foobar';
 $cc = undef;
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'readline.lib',
     default         => '-lreadline',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/-lreadline/,
-    "'libs' modified as expected");
+   '-lreadline',
+   "_select_lib() returned true value");
 
 $osname = 'foobar';
 $cc = undef;
 eval {
-    $step->_add_to_libs( [
+    $step->_select_lib( [
         conf            => $conf,
         osname          => $osname,
         cc              => $cc,
@@ -92,8 +89,8 @@ eval {
         default         => '-lreadline',
     ] );
 };
-like($@, qr/_add_to_libs\(\) takes hashref/,
-    "Bad argument to _add_to_libs correctly detected");
+like($@, qr/_select_lib\(\) takes hashref/,
+    "Bad argument to _select_lib correctly detected");
 
 ########## _handle_darwin_for_fink() ##########
 

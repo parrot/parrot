@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  34;
+use Test::More tests =>  30;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::gettext');
@@ -45,7 +45,7 @@ is($step->result(), q{no}, "Expected result was set");
 
 $conf->replenish($serialized);
 
-########## _add_to_libs() ##########
+########## _select_lib() ##########
 
 ($args, $step_list_ref) = process_options( {
     argv => [ ],
@@ -59,7 +59,7 @@ my ($osname, $cc, $initial_value);
 $osname = 'mswin32';
 $cc = 'gcc';
 $initial_value = $conf->data->get( 'libs' );
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
@@ -67,15 +67,12 @@ ok($step->_add_to_libs( {
     win32_nongcc    => 'intl.lib',
     default         => defined $conf->data->get('glibc') ? '' : '-lintl',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/-lintl/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   '-lintl',
+   "_select_lib() returned expected value");
 
 $osname = 'mswin32';
 $cc = 'cc';
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
@@ -83,16 +80,13 @@ ok($step->_add_to_libs( {
     win32_nongcc    => 'intl.lib',
     default         => defined $conf->data->get('glibc') ? '' : '-lintl',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/intl.lib/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   'intl.lib',
+   "_select_lib() returned expected value");
 
 $osname = 'foobar';
 $cc = 'cc';
 $conf->data->set( glibc => 1 );
-ok($step->_add_to_libs( {
+isnt($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
@@ -100,16 +94,13 @@ ok($step->_add_to_libs( {
     win32_nongcc    => 'intl.lib',
     default         => defined $conf->data->get('glibc') ? '' : '-lintl',
 } ),
-    "_add_to_libs() returned true value");
-unlike($conf->data->get( 'libs' ), qr/-lintl/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   '-lintl',
+   "_select_lib() returned expected value");
 
 $osname = 'foobar';
 $cc = 'cc';
 $conf->data->set( glibc => undef );
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
@@ -117,9 +108,8 @@ ok($step->_add_to_libs( {
     win32_nongcc    => 'intl.lib',
     default         => defined $conf->data->get('glibc') ? '' : '-lintl',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/-lintl/,
-    "'libs' modified as expected");
+   '-lintl',
+   "_select_lib() returned expected value");
 
 ########## _evaluate_cc_run() ##########
 

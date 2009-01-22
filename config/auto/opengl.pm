@@ -18,7 +18,6 @@ the base development tools for your platform.  The following sections detail
 the steps needed to add OpenGL support for each platform for which we have
 received this information -- details for additional platforms are welcome!
 
-
 =head2 Mac OS X
 
 You will need to install the F<OpenGL Framework> and the F<GLUT Framework>.
@@ -163,18 +162,12 @@ sub runstep {
         return 1;
     }
 
-    my $cc        = $conf->data->get('cc');
-    my $libs      = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags   = $conf->data->get('ccflags');
-
     my $osname = $conf->data->get_p5('OSNAME');
 
-    # Prefer Cygwin/w32api over Cygwin/X, but use X when DISPLAY is set
-    $self->_add_to_libs( {
+    my $extra_libs = $self->_select_lib( {
             conf            => $conf,
             osname          => $osname,
-            cc              => $cc,
+            cc              => $conf->data->get('cc'),
             # Prefer Cygwin/w32api over Cygwin/X, but use X when DISPLAY is set
             ($^O eq 'cygwin') ?
              ($ENV{DISPLAY} ? (cygwin => '-lglut -L/usr/X11R6/lib -lGLU -lGL')
@@ -194,14 +187,10 @@ sub runstep {
 
     $conf->cc_gen('config/auto/opengl/opengl.in');
     my $has_glut = 0;
-    eval { $conf->cc_build() };
+    eval { $conf->cc_build( q{}, $extra_libs ) };
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_glut = _handle_glut($conf, $self->_evaluate_cc_run($test, $verbose));
-    }
-    unless ($has_glut) {
-        # The Parrot::Configure settings might have changed while class ran
-        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
+        $has_glut = _handle_glut($conf, $extra_libs, $self->_evaluate_cc_run($test, $verbose));
     }
 
     return 1;
@@ -218,13 +207,14 @@ sub _evaluate_cc_run {
 }
 
 sub _handle_glut {
-    my ($conf, $glut_api_version, $glut_brand) = @_;
+    my ($conf, $libs, $glut_api_version, $glut_brand) = @_;
 
     $conf->data->set(
         # Completely cargo culted
         opengl     => 'define',
         has_opengl => 1,
         HAS_OPENGL => 1,
+        opengl_lib => $libs,
 
         glut       => 'define',
         glut_brand => $glut_brand,

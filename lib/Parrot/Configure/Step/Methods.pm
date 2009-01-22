@@ -27,24 +27,6 @@ begin with an underscore 'C<_>'.
 
 =head1 METHODS
 
-=head2 C<_recheck_settings()>
-
-    $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
-
-Currently used in configuration step classes auto::gmp, auto::readline,
-auto::gdbm, and auto::opengl.
-
-=cut
-
-sub _recheck_settings {
-    my ($self, $conf, $libs, $ccflags, $linkflags, $verbose) = @_;
-    $conf->data->set( 'libs',      $libs );
-    $conf->data->set( 'ccflags',   $ccflags );
-    $conf->data->set( 'linkflags', $linkflags );
-    print " (no) " if $verbose;
-    $self->set_result('no');
-}
-
 =head2 C<_handle_darwin_for_fink()>
 
     $self->_handle_darwin_for_fink($conf, $libs, $osname, $file);
@@ -111,9 +93,9 @@ sub _handle_darwin_for_macports {
     return 1;
 }
 
-=head2 C<_add_to_libs()>
+=head2 C<_select_lib()>
 
-    $self->_add_to_libs( {
+    $self->_select_lib( {
         conf            => $conf,
         osname          => $osname,
         cc              => $cc,
@@ -201,10 +183,10 @@ B<Return Value>:  Returns true value upon success.
 
 =cut
 
-sub _add_to_libs {
+sub _select_lib {
     my $self = shift;
     my $args = shift;
-    croak "_add_to_libs() takes hashref: $!" unless ref($args) eq 'HASH';
+    croak "_select_lib() takes hashref: $!" unless ref($args) eq 'HASH';
     my $platform =
            $args->{osname} =~ /cygwin/i      ? 'cygwin'
         :(($args->{osname} =~ /mswin32/i ||
@@ -216,8 +198,7 @@ sub _add_to_libs {
     my $libs = defined($args->{$platform})
         ? $args->{$platform}
         : $args->{default};
-    $args->{conf}->data->add(' ', libs => $libs);
-    return 1;
+    return $libs;
 }
 
 sub _add_flags_not_yet_seen {

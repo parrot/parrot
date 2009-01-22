@@ -23,7 +23,8 @@ See L<www.openssl.org>
 pmclass @md_name@
     dynpmc
     need_ext
-    group digest_group {
+    group digest_group
+    lib crypto {
 
 /*
 

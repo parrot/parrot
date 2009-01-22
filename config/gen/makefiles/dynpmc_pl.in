@@ -82,9 +82,12 @@ sub partial_link_cmd {
     my $liblist;
     if ($^O =~ /mswin32/i) {
         # Need to put various libraries in the link line.
-        $liblist = join( ' ', map { "$_.lib" } keys %$libs );
         if ($CC =~ /gcc/i) {
-            $liblist =~ s/libgdbm\.lib/-llibgdbm/i;
+            $liblist = join( ' ', map { "-l$_" } keys %$libs );
+            $liblist =~ s/-lgdbm/-llibgdbm/i;
+        }
+        else {
+            $liblist = join( ' ', map { "$_.lib" } keys %$libs );
         }
         my $extraLibs = '@libs@ @icu_shared@';
         $extraLibs =~ s/blib/..\\blib/g;
@@ -212,11 +215,6 @@ sub gather_groups_and_libs {
 
         # there can be many libs
         my %libs = %{ $class->{flags}{lib} || {} };
-        if ($^O eq 'MSWin32' && $CC =~ /^gcc/i) {
-            my %newlibs = ();
-            $newlibs{"lib$_"} = $libs{$_} for keys %libs;
-            %libs = %newlibs;
-        }
         $pmc_libs{$pmc} = \%libs;
 
         # There should be at most a single group

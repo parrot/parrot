@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 44;
+use Test::More tests => 34;
 use Carp;
 use lib qw( lib );
 use_ok('config::init::defaults');
@@ -46,7 +46,7 @@ is( $conf->data->get( 'HAS_PCRE' ), 0,
 
 $conf->replenish($serialized);
 
-########## _add_to_libs() ##########
+########## _select_lib() ##########
 
 ($args, $step_list_ref) = process_options( {
     argv => [ ],
@@ -63,50 +63,41 @@ my ($osname, $cc, $initial_value);
 $osname = 'mswin32';
 $cc = 'gcc';
 $initial_value = $conf->data->get( 'libs' );
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'pcre.lib',
     default         => '-lpcre',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/-lpcre/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   '-lpcre',
+   "_select_lib() returned expected value");
 
 $osname = 'mswin32';
 $cc = 'cc';
 $initial_value = $conf->data->get( 'libs' );
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'pcre.lib',
     default         => '-lpcre',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/pcre\.lib/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   'pcre.lib',
+   "_select_lib() returned expected value");
 
 $osname = 'foobar';
 $cc = 'gcc';
 $initial_value = $conf->data->get( 'libs' );
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'pcre.lib',
     default         => '-lpcre',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/-lpcre/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   '-lpcre',
+   "_select_lib() returned expected value");
 
 ########## _evaluate_cc_run() ##########
 
@@ -122,21 +113,6 @@ $test = q{pcre 4.1};
 ok($step->_evaluate_cc_run($test, $verbose),
     "_evaluate_cc_run returned true value as expected");
 is($step->result(), q{yes, 4.1}, "Got expected PCRE version");
-
-# Mock different outcomes of _recheck_settings()
-my ($libs, $ccflags, $linkflags);
-
-$libs = q{-lalpha};
-$ccflags = q{-Ibeta};
-$linkflags = q{-Lgamma};
-$verbose = undef;
-$step->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
-like($conf->data->get('libs'), qr/$libs/,
-    "Got expected value for 'libs'");
-like($conf->data->get('ccflags'), qr/$ccflags/,
-    "Got expected value for 'ccflags'");
-like($conf->data->get('linkflags'), qr/$linkflags/,
-    "Got expected value for 'linkflags'");
 
 $conf->replenish($serialized);
 
@@ -166,26 +142,6 @@ $test = q{pcre 4.0};
     ok($has_pcre, "_evaluate_cc_run returned true value as expected");
     is($step->result(), q{yes, 4.0}, "Got expected PCRE version");
     like($stdout, qr/\(yes, 4\.0\)/, "Got expected verbose output");
-}
-
-# Mock different outcomes of _recheck_settings()
-$libs = q{-ldelta};
-$ccflags = q{-Iepsilon};
-$linkflags = q{-Lzeta};
-{
-    my ($stdout, $stderr);
-    capture(
-        sub { $step->_recheck_settings(
-            $conf, $libs, $ccflags, $linkflags, $verbose); },
-        \$stdout,
-    );
-    like($conf->data->get('libs'), qr/$libs/,
-        "Got expected value for 'libs'");
-    like($conf->data->get('ccflags'), qr/$ccflags/,
-        "Got expected value for 'ccflags'");
-    like($conf->data->get('linkflags'), qr/$linkflags/,
-        "Got expected value for 'linkflags'");
-    like($stdout, qr/\(no\)/, "Got expected verbose output");
 }
 
 pass("Completed all tests in $0");

@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  62;
+use Test::More tests =>  47;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -164,53 +164,6 @@ ok(! defined $step->result(), "Result is undefined, as expected");
 }
 
 $conf->replenish($serialized);
-
-########## --without-gdbm; _recheck_settings() ##########
-
-($args, $step_list_ref) = process_options( {
-    argv => [ q{--without-gdbm} ],
-    mode => q{configure},
-} );
-rerun_defaults_for_testing($conf, $args );
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-
-my ($libs, $ccflags, $linkflags);
-
-$libs = q{-lalpha};
-$ccflags = q{-Ibeta};
-$linkflags = q{-Lgamma};
-$verbose = undef;
-$step->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
-like($conf->data->get('libs'), qr/$libs/,
-    "Got expected value for 'libs'");
-like($conf->data->get('ccflags'), qr/$ccflags/,
-    "Got expected value for 'ccflags'");
-like($conf->data->get('linkflags'), qr/$linkflags/,
-    "Got expected value for 'linkflags'");
-is($step->result, 'no', "Expected result was set");
-
-{
-    my $stdout;
-    $libs = q{-lalpha};
-    $ccflags = q{-Ibeta};
-    $linkflags = q{-Lgamma};
-    $verbose = 1;
-    capture(
-        sub { $step->_recheck_settings(
-            $conf, $libs, $ccflags, $linkflags, $verbose); },
-        \$stdout,
-    );
-    like($conf->data->get('libs'), qr/$libs/,
-        "Got expected value for 'libs'");
-    like($conf->data->get('ccflags'), qr/$ccflags/,
-        "Got expected value for 'ccflags'");
-    like($conf->data->get('linkflags'), qr/$linkflags/,
-        "Got expected value for 'linkflags'");
-    is($step->result, 'no', "Expected result was set");
-    like($stdout, qr/\(no\)/, "Got expected verbose output");
-}
 
 pass("Completed all tests in $0");
 

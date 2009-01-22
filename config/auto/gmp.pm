@@ -56,17 +56,12 @@ sub runstep {
         return 1;
     }
 
-    my $cc        = $conf->data->get('cc');
-    my $libs      = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags   = $conf->data->get('ccflags');
+    my $osname = $conf->data->get_p5('OSNAME');
 
-    my $osname    = $conf->data->get_p5('OSNAME');
-
-    $self->_add_to_libs( {
+    my $extra_libs = $self->_select_lib( {
         conf            => $conf,
         osname          => $osname,
-        cc              => $cc,
+        cc              => $conf->data->get('cc'),
         win32_nongcc    => 'gmp.lib',
         default         => '-lgmp',
     } );
@@ -77,15 +72,14 @@ sub runstep {
     $self->_handle_darwin_for_macports($conf, $osname, 'gmp.h');
 
     $conf->cc_gen('config/auto/gmp/gmp.in');
-    eval { $conf->cc_build(); };
+    eval { $conf->cc_build( q{}, $extra_libs); };
     my $has_gmp = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
         $has_gmp = $self->_evaluate_cc_run( $conf, $test, $has_gmp, $verbose );
     }
-    unless ($has_gmp) {
-        # The Parrot::Configure settings might have changed while class ran
-        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
+    if ($has_gmp) {
+        $conf->data->add( ' ', libs => $extra_libs );
     }
 
     return 1;

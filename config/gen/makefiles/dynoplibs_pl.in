@@ -78,9 +78,6 @@ sub partial_link_cmd {
     if ($^O =~ /mswin32/i) {
         # Need to put various libraries in the link line.
         $liblist = join( ' ', map { "$_.lib" } keys %$libs );
-        if ($CC =~ /gcc/i) {
-            $liblist =~ s/gdbm\.lib/-llibgdbm/i;
-        }
         my $extraLibs = '@libs@ @icu_shared@';
         $extraLibs =~ s/blib/..\\blib/g;
         $extraLibs =~ s/\Q$(A)\E/.lib/g;
@@ -122,7 +119,7 @@ elsif ($mode eq 'linklibs') {
     my $core_suffix;
     foreach $core_suffix (values %cores) {
         partial_link({}, $_ . "_ops$core_suffix", @objs) foreach (@oplibs);
-     }
+    }
 }
 elsif ($mode eq 'copy') {
     # Copy *.so -> destination, where destination is the first

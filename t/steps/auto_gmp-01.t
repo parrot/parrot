@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  73;
+use Test::More tests =>  61;
 use Carp;
 use Cwd;
 use File::Spec;
@@ -55,7 +55,7 @@ is($step->result(), q{no}, "Expected result was set");
 
 $conf->replenish($serialized);
 
-########### _add_to_libs() ###########
+########### _select_lib() ###########
 
 ($args, $step_list_ref) = process_options( {
     argv => [ ],
@@ -68,48 +68,39 @@ my ($osname, $cc, $initial_value);
 $osname = 'mswin32';
 $cc = 'gcc';
 $initial_value = $conf->data->get( 'libs' );
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'gmp.lib',
     default         => '-lgmp',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/-lgmp/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   '-lgmp',
+   "_select_lib() returned expected value");
 
 $osname = 'mswin32';
 $cc = 'cc';
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'gmp.lib',
     default         => '-lgmp',
 } ),
-    "_add_to_libs() returned true value");
-like($conf->data->get( 'libs' ), qr/gmp\.lib/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   'gmp.lib',
+   "_select_lib() returned expected value");
 
 $osname = 'foobar';
 $cc = undef;
-ok($step->_add_to_libs( {
+is($step->_select_lib( {
     conf            => $conf,
     osname          => $osname,
     cc              => $cc,
     win32_nongcc    => 'gmp.lib',
     default         => '-lgmp',
 } ),
-    "_handle_mswin32() returned true value");
-like($conf->data->get( 'libs' ), qr/-lgmp/,
-    "'libs' modified as expected");
-# Restore value for next test.
-$conf->data->set( 'libs' => $initial_value );
+   '-lgmp',
+   "_select_lib() returned expected value");
 
 ########### _handle_darwin_for_fink() ###########
 
@@ -218,46 +209,6 @@ is($has_gmp, 0, "gmp status unchanged");
     $conf->data->set('HAS_GMP' => undef);
     $step->set_result(undef);
 }
-
-########### _recheck_settings() ###########
-
-my ($libs, $ccflags, $linkflags);
-
-$libs = q{-lalpha};
-$ccflags = q{-Ibeta};
-$linkflags = q{-Lgamma};
-$verbose = undef;
-$step->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
-like($conf->data->get('libs'), qr/$libs/,
-    "Got expected value for 'libs'");
-like($conf->data->get('ccflags'), qr/$ccflags/,
-    "Got expected value for 'ccflags'");
-like($conf->data->get('linkflags'), qr/$linkflags/,
-    "Got expected value for 'linkflags'");
-is($step->result, 'no', "Expected result was set");
-
-{
-    my $stdout;
-    $libs = q{-lalpha};
-    $ccflags = q{-Ibeta};
-    $linkflags = q{-Lgamma};
-    $verbose = 1;
-    capture(
-        sub { $step->_recheck_settings(
-            $conf, $libs, $ccflags, $linkflags, $verbose); },
-        \$stdout,
-    );
-    like($conf->data->get('libs'), qr/$libs/,
-        "Got expected value for 'libs'");
-    like($conf->data->get('ccflags'), qr/$ccflags/,
-        "Got expected value for 'ccflags'");
-    like($conf->data->get('linkflags'), qr/$linkflags/,
-        "Got expected value for 'linkflags'");
-    is($step->result, 'no', "Expected result was set");
-    like($stdout, qr/\(no\)/, "Got expected verbose output");
-}
-
-$conf->replenish($serialized);
 
 ########### _handle_darwin_for_fink() ###########
 

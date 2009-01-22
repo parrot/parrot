@@ -50,17 +50,12 @@ sub runstep {
         return 1;
     }
 
-    my $cc        = $conf->data->get('cc');
-    my $libs      = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags   = $conf->data->get('ccflags');
-
     my $osname = $conf->data->get_p5('OSNAME');
 
-    $self->_add_to_libs( {
+    my $extra_libs = $self->_select_lib( {
         conf            => $conf,
         osname          => $osname,
-        cc              => $cc,
+        cc              => $conf->data->get('cc'),
         win32_gcc       => '-lintl',
         win32_nongcc    => 'intl.lib',
         default         => defined $conf->data->get('glibc') ? '' : '-lintl',
@@ -71,18 +66,14 @@ sub runstep {
     $self->_handle_darwin_for_fink($conf, $osname, 'libintl.h');
 
     $conf->cc_gen('config/auto/gettext/gettext.in');
-    eval { $conf->cc_build(); };
-    my $has_gettext;
+    eval { $conf->cc_build( q{}, $extra_libs ); };
+    my $has_gettext = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
         $has_gettext = $self->_evaluate_cc_run($test, $verbose);
     }
     if ($has_gettext) {
-        _handle_gettext($conf, $verbose);
-    }
-    else {
-        # The Parrot::Configure settings might have changed while class ran
-        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
+        _handle_gettext($conf, $verbose, $extra_libs);
     }
     $conf->data->set( HAS_GETTEXT => $has_gettext );
 
@@ -102,8 +93,9 @@ sub _evaluate_cc_run {
 }
 
 sub _handle_gettext {
-    my ($conf, $verbose) = @_;
+    my ($conf, $verbose, $libs) = @_;
     $conf->data->add( ' ', ccflags => "-DHAS_GETTEXT" );
+    $conf->data->add( ' ', libs => $libs );
     $verbose and print "\n  ccflags: ", $conf->data->get("ccflags"), "\n";
     return 1;
 }

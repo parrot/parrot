@@ -38,14 +38,10 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose');
 
-    my $cc        = $conf->data->get('cc');
-    my $libs      = $conf->data->get('libs');
-    my $linkflags = $conf->data->get('linkflags');
-    my $ccflags   = $conf->data->get('ccflags');
-
+    my $cc     = $conf->data->get('cc');
     my $osname = $conf->data->get_p5('OSNAME');
 
-    $self->_add_to_libs( {
+    my $extra_libs = $self->_select_lib( {
         conf            => $conf,
         osname          => $osname,
         cc              => $cc,
@@ -60,44 +56,33 @@ sub runstep {
 
     $conf->cc_gen('config/auto/readline/readline.in');
     my $has_readline = 0;
-    eval { $conf->cc_build() };
+    eval { $conf->cc_build( q{}, $extra_libs ) };
     if ( !$@ ) {
         if ( $conf->cc_run() ) {
             $has_readline = $self->_evaluate_cc_run($verbose);
         }
-        _handle_readline($conf, $has_readline);
+        _handle_readline($conf, $extra_libs);
     }
     else {
-        _handle_ncurses_need($conf, $osname, $cc);
-        eval { $conf->cc_build() };
+        # a second chance with ncurses
+        $extra_libs .= ' ';
+        $extra_libs .= $self->_select_lib( {
+            conf            => $conf,
+            osname          => $osname,
+            cc              => $cc,
+            win32_nongcc    => 'ncurses.lib',
+            default         => '-lncurses',
+        } );
+        eval { $conf->cc_build( q{}, $extra_libs) };
         if ( !$@ ) {
             if ( $conf->cc_run() ) {
                 $has_readline = $self->_evaluate_cc_run($verbose);
             }
-            _handle_readline($conf, $has_readline);
+            _handle_readline($conf, $extra_libs);
         }
     }
-    unless ($has_readline) {
-        # The Parrot::Configure settings might have changed while class ran
-        $self->_recheck_settings($conf, $libs, $ccflags, $linkflags, $verbose);
-    }
+    $conf->data->set( HAS_READLINE => $has_readline );
 
-    return 1;
-}
-
-sub _handle_ncurses_need {
-    my ($conf, $osname, $cc) = @_;
-    if ( $osname =~ /mswin32/i ) {
-        if ( $cc =~ /^gcc/i ) {
-            $conf->data->add( ' ', libs => '-lncurses' );
-        }
-        else {
-            $conf->data->add( ' ', libs => 'ncurses.lib' );
-        }
-    }
-    else {
-        $conf->data->add( ' ', libs => '-lncurses' );
-    }
     return 1;
 }
 
@@ -110,11 +95,9 @@ sub _evaluate_cc_run {
 }
 
 sub _handle_readline {
-    my ($conf, $has_readline) = @_;
-    $conf->data->set(
-        readline     => 'define',
-        HAS_READLINE => $has_readline,
-    );
+    my ($conf, $libs) = @_;
+    $conf->data->set( readline => 'define' );
+    $conf->data->add( ' ', libs => $libs );
     return 1;
 }
 
