@@ -781,7 +781,7 @@ get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub))
     /* If we have a String, do a string lookup */
     else if (nsname->vtable->base_type == enum_class_String)
         return Parrot_make_namespace_keyed_str(interp, nsroot,
-                VTABLE_get_string(interp,nsname));
+                VTABLE_get_string(interp, nsname));
     /* Otherwise, do a PMC lookup */
     else
         return Parrot_make_namespace_keyed(interp, nsroot, nsname);
