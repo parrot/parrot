@@ -166,14 +166,14 @@ GOT_PHP_SOURCE_FN:
     .local pmc args
     args = new 'ResizableStringArray'
     push args, prog
-    push args, rest
+    push args, php_source_fn
 
-    $P0 = get_root_global ['parrot'], '_dumper'
-    $P0( args )
+    # $P0 = get_root_global ['parrot'], '_dumper'
+    # $P0( args )
     .tailcall pipp_compiler.'command_line'( args, 'target' => target, 'output' => output )
 
 RUN_NQP:
-    .tailcall run_nqp( source_fn, target )
+    .tailcall run_nqp( php_source_fn, target )
 
 ERROR:
     printerr err_msg
