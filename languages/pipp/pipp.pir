@@ -168,6 +168,8 @@ GOT_PHP_SOURCE_FN:
     push args, prog
     push args, rest
 
+    $P0 = get_root_global ['parrot'], '_dumper'
+    $P0( args )
     .tailcall pipp_compiler.'command_line'( args, 'target' => target, 'output' => output )
 
 RUN_NQP:
@@ -215,7 +217,8 @@ ERROR:
     .local pmc stmts
     ( stmts ) = php_entry()     # stmts contains the PAST
     if target != 'past' goto NO_PAST_DUMP
-        _dumper( stmts )
+        $P0 = get_root_global ['parrot'], '_dumper'
+        $P0( stmts )
         .return ()
     NO_PAST_DUMP:
 
