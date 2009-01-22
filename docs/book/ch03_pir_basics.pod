@@ -86,8 +86,8 @@ Z<CHP-3-SECT-2.1>
 
 PIR code has a variety of ways to store values while you work with
 them. Actually, the only place to store values is in a Parrot register,
-but there are multiple ways to work with these registers. Parrot's
-register names always start with a dollar sign, followed by a single
+but there are multiple ways to work with these registers. Register names
+in PIR always start with a dollar sign, followed by a single
 character that shows whether it is an integer (I), numeric (N), string
 (S), or PMC (P) register, and then the number of the register:
 
@@ -96,20 +96,21 @@ character that shows whether it is an integer (I), numeric (N), string
 
 You can have as many registers of each type as you need, Parrot will
 automatically allocate new ones for you. The process is transparent, and
-programmers should never have to worry about it.
-
-Parrot registers are allocated in a linear array, and register numbers
-are indices into this array. Having more registers means Parrot must
-allocate more storage space for them, which can decrease memory efficiency
-and register allocation/fetch performance. In general, it's better to
-keep the number of registers small. However, the number of the register
-does not necessarily correspond to the actual storage location where the
-register data is held. A memory allocator unit translates register names
-in the form "$S0" into an actual fixed memory location. This allocator
+programmers should never have to worry about it. It's worth noting that
+the number of the register does not correspond to the actual memory address
+of the register, and using C<$S1000000> doesn't actually allocate one
+million registers. The PIR register allocator will turn the numbers you've
+provided into actual memory addresses during compilation, and will attempt
+to make very efficient use of memory if it is able. This allocator
 can also help to optimize register usage so that existing registers are
-reused instead of allocating new ones in memory. The short version is that
-the programmer should never have to worry about register allocation, and
-should feel free to use as many as she wants. As with any system, it's
+reused instead of allocating new ones in memory.
+
+Parrot registers are allocated in a linear array. Having more registers
+means Parrot must allocate more storage space for them. Too many allocations
+can decrease memory efficiency and register allocation/fetch performance.
+In general, it's better to keep the number of registers used as small as
+possible. The programmer should never have to worry about register allocation,
+and should feel free to use as many as she wants. As with any system, it's
 a good idea to be mindful of the things that might impact performance
 anyway.
 
