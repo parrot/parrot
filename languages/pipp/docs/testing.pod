@@ -24,11 +24,11 @@ Something like this worked for me under Linux.
   cd ~/devel/Parrot/trunk
   perl Configure.pl && make
 
-  # build Pipp
+  # build the fakecutable pipp
   cd languages/pipp
   make pipp
 
-  # build PHP 5.3
+  # build the devel version of PHP 5.3
   cd ~/devel/PHP/
   wget http://snaps.php.net/php5.3-200807221230.tar.gz
   tar xvzf php5.3-200807221230.tar.gz
