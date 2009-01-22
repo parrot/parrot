@@ -1059,13 +1059,47 @@ print_constant_table(PARROT_INTERP) {
                 Parrot_io_printf(interp, "(PMC constant)");
                 Parrot_io_printf(interp, "\n");
                 break;
-            case PFC_PMC:
+            case PFC_PMC: {
                 Parrot_io_printf(interp, "PMC_CONST(%d): ", i);
-                /* XXX */
-                /* Parrot_print_p(interp, c->u.key); */
-                Parrot_io_printf(interp, "(PMC constant)");
+                switch (c->u.key->vtable->base_type) {
+                    /* each PBC file has a ParrotInterpreter, but it can't stringify by itself */
+                    case enum_class_ParrotInterpreter:
+                        Parrot_io_printf(interp, "'ParrotInterpreter'");
+                        break;
+
+                    /* FixedIntegerArrays are used for signatures, handy to print */
+                    case enum_class_FixedIntegerArray: {
+                        INTVAL n = VTABLE_elements(interp, c->u.key);
+                        INTVAL i;
+                        Parrot_io_printf(interp, "[");
+                        for (i = 0; i < n; ++i) {
+                            INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, i);
+                            Parrot_io_printf(interp, "%d", val);
+                            if (i < n - 1)
+                                Parrot_io_printf(interp, ",");
+                        }
+                        Parrot_io_printf(interp, "]");
+                        break;
+                    }
+                    case enum_class_NameSpace:
+                    case enum_class_String:
+                    case enum_class_Key:
+                    case enum_class_ResizableStringArray:
+                        {
+                            Parrot_print_p(interp, c->u.key);
+                            break;
+                        }
+                    case enum_class_Sub:
+                        Parrot_io_printf(interp, "%S", VTABLE_get_string(interp, c->u.key));
+                        break;
+                    default:
+                        Parrot_io_printf(interp, "(PMC constant)");
+                        break;
+                }
+
                 Parrot_io_printf(interp, "\n");
                 break;
+            }
             default:
                 Parrot_io_printf(interp, "wrong constant type in constant table!\n");
                 /* XXX throw an exception? Is it worth the trouble? */
