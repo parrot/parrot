@@ -1390,7 +1390,8 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
             Parrot_ex_throw_from_c_args(interp, NULL, -1,
                 "hash corruption: type = %d\n", hash->entry_type);
         };
-        parrot_hash_put(interp, dest, key, valtmp);
+        if(key)
+            parrot_hash_put(interp, dest, key, valtmp);
     }
 }
 

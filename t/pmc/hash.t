@@ -22,7 +22,7 @@ well.
     .include 'test_more.pir'
     .include 'except_types.pasm'
 
-    plan(145)
+    plan(146)
 
     initial_hash_tests()
     more_than_one_hash()
@@ -43,6 +43,7 @@ well.
     getting_values_from_undefined_keys()
     setting_and_getting_non_scalar_pmcs()
     testing_clone()
+    clone_doesnt_crash_on_deleted_keys()
     clone_preserves_order()
     freeze_thaw_preserves_order()
     compound_keys()
@@ -584,6 +585,19 @@ DONE:
 #     print "not "
 # ok6:
 #     print "ok 6\n"
+.end
+
+.sub clone_doesnt_crash_on_deleted_keys
+    .local pmc hash1, hash2
+    .local string key1, key2
+    hash1 = new 'Hash'
+    key1 = 'foo'
+    key2 = 'bar'
+    hash1[key1] = 1
+    hash1[key2] = 2
+    delete hash1[key1]
+    hash2 = clone hash1
+    ok( 1, "clone doesn't crash on deleted keys" )
 .end
 
 # TT #116
