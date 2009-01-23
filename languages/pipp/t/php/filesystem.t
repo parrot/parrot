@@ -3,18 +3,18 @@
 
 =head1 NAME
 
-t/php/dir.t - Standard Library dir
+t/php/filesystem.t - Standard Library filesystem
 
 =head1 SYNOPSIS
 
-    perl t/harness t/php/dir.t
+    perl t/harness t/php/filesystem.t
 
 =head1 DESCRIPTION
 
-Tests PHP Standard Library dir
-(implemented in F<languages/pipp/src/common/php_dir.pir>).
+Tests PHP Standard Library filesystem
+(implemented in F<languages/pipp/src/common/php_filesystem.pir>).
 
-See L<http://docs.php.net/manual/en/book.dir.php>.
+See L<http://docs.php.net/manual/en/book.filesystem.php>.
 
 =cut
 
