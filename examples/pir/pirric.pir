@@ -885,6 +885,24 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
+.sub get_args_and_call :method
+    .param pmc tokenizer
+    .param pmc fun
+
+    .local pmc args, result
+
+    args = self.'get_args'(tokenizer)
+    $I0 = defined args
+    unless $I0 goto emptyargs
+    result = fun(args :flat)
+    goto done
+emptyargs:
+    result = fun()
+done:
+    .return(result)    
+.end
+
+#-----------------------------------------------------------------------
 .sub eval_base :method
     .param pmc tokenizer
     .param pmc token :optional
@@ -990,9 +1008,10 @@ getvar:
 
 isfunctor:
     #say 'Functor'
-    args = self.'get_args'(tokenizer)
-    $P3 = var()
+
+    $P3 = self.'get_args_and_call'(tokenizer, var)
     .return($P3)
+
 
 dotted:
     $P3 = tokenizer.'get'()
