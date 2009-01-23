@@ -1086,7 +1086,10 @@ print_constant_table(PARROT_INTERP) {
                     case enum_class_Key:
                     case enum_class_ResizableStringArray:
                         {
-                            Parrot_print_p(interp, c->u.key);
+                            /*Parrot_print_p(interp, c->u.key);*/
+                            STRING * const s = VTABLE_get_string(interp, c->u.key);
+                            if (s)
+                                Parrot_io_printf(interp, "%Ss",s);
                             break;
                         }
                     case enum_class_Sub:
