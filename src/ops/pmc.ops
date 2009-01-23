@@ -48,7 +48,7 @@ back to the type ID if no class object is stored in the namespace.
   new P0, 'ResizableBooleanArray'
 
 Optionally a PMC may be passed to the constructor. It's up to the class what
-to do with the intializer.  See PDD02 for more.
+to do with the initializer.  See PDD17 and the init_pmc function for more.
 
 =cut
 

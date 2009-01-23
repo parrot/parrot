@@ -17,7 +17,7 @@ Tests the Class PMC.
 =cut
 
 
-.const int TESTS = 49
+.const int TESTS = 53
 
 
 .sub 'main' :main
@@ -38,7 +38,7 @@ Tests the Class PMC.
 #     'add_method'() # TODO not yet implemented
      'parents'()
      'roles'()
-#     'inspect'() # XXX must fix 'attributes' test
+     'inspect'()
      'clone'()
      'clone_pmc'()
      'new with init hash'()
@@ -332,7 +332,7 @@ Tests the Class PMC.
     ok(1, 'inspect() with no args called returns successfully')
 
     test_val = elements result
-    is(test_val, 6, 'inspect() returns correctly sized value')
+    is(test_val, 7, 'inspect() returns correctly sized value')
 
     result = class.'inspect'('name')
     is(result, 'foo', 'inspect() "name" param returns expected value')
