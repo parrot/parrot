@@ -326,8 +326,8 @@ Initializes the complex number with the value 0+0i.
 
 =item C<void init_pmc(PMC *initializer)>
 
-Initializes the complex number with the specified values.
-(not implemented)
+Initializes the complex number with the specified initializer.
+The initializer can be a string PMC or a numeric array with (real, imag)
 
 =item C<void destroy()>
 
@@ -351,8 +351,29 @@ Creates an identical copy of the complex number.
     }
 
     VTABLE void init_pmc(PMC *initializer) {
-        /* XXX not implemented */
+        const INTVAL arg_type = VTABLE_type(interp, initializer);
         SELF.init();
+        switch (arg_type) {
+            case enum_class_String:
+                SELF.set_string_native(VTABLE_get_string(interp, initializer));
+                break;
+            case enum_class_FixedFloatArray:
+            case enum_class_ResizableFloatArray:
+            case enum_class_FixedIntegerArray:
+            case enum_class_ResizableIntegerArray:
+                if (VTABLE_get_integer(interp, initializer) == 2) {
+                    FLOATVAL re = VTABLE_get_number_keyed_int(interp, initializer, 0);
+                    FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
+                    SET_ATTR_re(INTERP, SELF, re);
+                    SET_ATTR_im(INTERP, SELF, im);
+		    break;
+                }
+                /* else let it fall to default */
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_OPERATION,
+                    "Invalid Complex initializer");
+        }
     }
 
     VTABLE void destroy() {
