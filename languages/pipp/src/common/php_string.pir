@@ -443,15 +443,29 @@ Returns the input string repeat mult times
 
 =item C<mixed str_replace(mixed search, mixed replace, mixed subject [, int &replace_count])>
 
-Replaces all occurrences of search in haystack with replace
+Replaces all occurrences of search in subject with replace.
 
-NOT IMPLEMENTED.
+TODO: search and replace may be arrays.
+TODO: Passing back the number of replacements in replace_count.
+TODO: error and parameter checking
 
 =cut
 
 .sub 'str_replace'
-    not_implemented()
+    .param pmc search
+    .param pmc replace
+    .param pmc subject
+
+    $S1 = subject
+    $S2 = search
+    $I2 = length $S2
+    $S3 = replace
+    $P0 = split $S2, $S1
+    $S0 = join $S3, $P0
+
+    .RETURN_STRING($S0)
 .end
+
 
 =item C<string str_rot13(string str)>
 

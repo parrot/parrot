@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,11 +20,10 @@ See L<http://www.php.net/manual/en/ref.strings.php>.
 
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'bin2hex' );
@@ -469,6 +468,16 @@ echo "A1B2C3 \1011\1022\1033", "\n";
 ?>
 CODE
 A1B2C3 A1B2C3
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'str_replace' );
+<?php
+
+echo str_replace( "one", "1", "one + one = 2\n" );
+
+?>
+CODE
+1 + 1 = 2
 OUT
 
 # Local Variables:
