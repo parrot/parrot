@@ -1176,11 +1176,7 @@ parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_size)
 
-    if (hash)
-        return hash->entries;
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1,
-        "parrot_hash_size asked to check a NULL hash\n");
+    return hash->entries;
 }
 
 
