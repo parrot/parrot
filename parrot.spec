@@ -5,7 +5,7 @@ Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
-Source0:        http://www.cpan.org/authors/id/P/PA/PARTICLE/parrot-%{version}.tar.gz
+Source0:        ftp://ftp.parrot.org/pub/parrot/releases/devel/parrot/parrot-$%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
@@ -65,12 +65,15 @@ export LD_LIBRARY_PATH=$( pwd )/blib/lib
 make
 make languages
 make perl6
+make parrot_utils
+make installable
+make html
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
-make reallyinstall DESTDIR=$RPM_BUILD_ROOT
+make install DESTDIR=$RPM_BUILD_ROOT
 
 # Drop the docs so rpm can pick them up itself.
 rm -rf $RPM_BUILD_ROOT/%{_docdir}/parrot
@@ -110,6 +113,9 @@ rm -rf $RPM_BUILD_ROOT
 %doc docs examples
 %exclude %{_bindir}/parrot_config
 %exclude %{_bindir}/perl6
+%exclude %{_bindir}/parrot_debugger
+%exclude %{_bindir}/pbc_*
+%exclude %{_bindir}/pdump
 %{_bindir}/*
 %{_libdir}/parrot
 %{_libdir}/libparrot.so.*
@@ -124,12 +130,27 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(-,root,root,-)
 %{_bindir}/parrot_config
+%{_bindir}/parrot_debugger
+%{_bindir}/pbc_disassemble
+%{_bindir}/pbc_info
+%{_bindir}/pbc_merge
+%{_bindir}/pbc_to_exe
+%{_bindir}/pdump
 %{_includedir}/parrot
 %{_libdir}/libparrot.so
 %{_libdir}/libparrot.a
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Tue Jan 23 2009 Reini Urban <rurban@x-ray.at> 0.9.0
+- added make installable, perl6 is still not installable
+- added parrot_utils to devel
+- fixed Source0 url
+
+* Tue Jan 23 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 0.9.0
+- added make html, new parrot-doc package
+- make reallyinstall => make install
+
 * Tue Jan 20 2009 chromatic <chromatic@wgz.org> 0.9.0
 - updated to 0.9.0
 
