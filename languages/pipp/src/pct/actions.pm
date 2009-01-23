@@ -329,10 +329,19 @@ method constant_definition($/) {
 }
 
 method global_declaration($/) {
-    # for now just a placeholder
-    my $past := PAST::Stmts.new( :name('global_definition') );
 
-    make $past;
+    # variables are 'lexical' in the current block,
+    # unless they are found in the symbol table of the current block
+    our @?BLOCK;
+    unless ( @?BLOCK[0].symbol( ~$<var_name> ) ) {
+        @?BLOCK[0].symbol(
+            ~$<var_name>, :comment('global_declaration')
+        );
+    }
+
+    make PAST::Stmts.new(
+        :name("global_definition of $<var_name>")
+    );
 }
 
 method argument_list($/) {
@@ -446,7 +455,8 @@ method simple_var($/) {
     # variables are 'lexical' in the current block,
     # unless they are found in the symbol table of the current block
     our @?BLOCK;
-    unless ( @?BLOCK[0].symbol( ~$<var_name> ) ) {
+    unless (   @?BLOCK[0].symbol( ~$<var_name> ) 
+            || @?BLOCK[0].symbol( ~$<var_name> ~ '_hidden' )) {
         @?BLOCK[0].symbol(
             :scope('lexical'),
             ~$<var_name>
