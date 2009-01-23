@@ -63,11 +63,11 @@ static void expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
 static void hash_freeze(PARROT_INTERP,
     ARGIN(const Hash * const hash),
-    ARGMOD(visit_info* info))
+    ARGMOD(visit_info *info))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(* info);
+        FUNC_MODIFIES(*info);
 
 static void hash_thaw(PARROT_INTERP,
     ARGMOD(Hash *hash),
@@ -422,7 +422,7 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<void parrot_mark_hash_keys>
+=item C<static void parrot_mark_hash_keys>
 
 Marks the hash and only its keys as live.
 
@@ -458,7 +458,7 @@ parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<void parrot_mark_hash_values>
+=item C<static void parrot_mark_hash_values>
 
 Marks the hash and only its values as live.
 
@@ -494,7 +494,7 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<void parrot_mark_hash_both>
+=item C<static void parrot_mark_hash_both>
 
 Marks the hash and both its keys and values as live.
 
