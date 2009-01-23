@@ -14,11 +14,17 @@ token TOP {
 
 # Whitespace and comments
 
-token ws_char           { \h | \v }
+token ws_char {
+    \h | \v             # horizontal or vertical whitespace
+}
 
-token singlelinecomment { [ '#' || '//' ] \N* }    # end of line comment like Unix shell and C++
+token singlelinecomment {
+    [ '#' || '//' ] \N*    # end of line comment like Unix shell and C++
+}
 
-token multilinecomment  { '/*' .*?  '*/' }         # C-like multiline comment
+token multilinecomment {
+    '/*' .*?  '*/'         # C-like multiline comment
+}
 
 token ws_all {
     | <.ws_char>
@@ -243,15 +249,25 @@ token class_name {
     <ident>
 }
 
-token function_name            { <ident> }
+token function_name {
+    <ident>
+}
 
-token interface_name           { <ident> }
+token interface_name {
+    <ident>
+}
 
-token member_name              { <ident> }
+token member_name {
+    <ident>
+}
 
-token method_name              { <ident> }
+token method_name {
+    <ident>
+}
 
-token namespace_name           { <ns_path> <ident> }
+token namespace_name {
+    <ns_path> <ident>
+}
 
 token name {
     <leading_backslash=ns_sep>?           # a leading backslash is optional, but significant
@@ -259,13 +275,17 @@ token name {
     <ident>                               # identifier is required
 }
 
-token ns_sep                   { '\\' }   # yes, PHP 5.3 uses backslash as the namespace separator
+token ns_sep {
+    '\\'                                  # yes, PHP 5.3 uses backslash as the namespace separator
+}
 
-token ns_path                  {
+token ns_path {
     [ <ident> <.ns_sep> ]*
-} 
+}
 
-token var_name                 { '$' <ident> }
+token var_name {
+    '$' <ident>
+}
 
 # terms
 rule method_call {
