@@ -19,24 +19,24 @@ __END__
 
 =head1 NAME
 
-tools/dev/mk_manifest_and_skip.pl - Recreate MANIFEST and MANIFEST.SKIP
+tools/dev/mk_gitignore.pl - Create the file F<.gitignore>.
 
 =head1 SYNOPSIS
 
-    % perl tools/dev/mk_manifest_and_skip.pl
+    % perl tools/dev/mk_gitignore.pl
 
 =head1 DESCRIPTION
 
-Recreates MANIFEST and MANIFEST.SKIP from the subversion properties
-and the output of C<svn status>. .
-So far tested with svn 1.2.0 and svn 1.4.2.  This also worked with svk 1.08,
-but to keep our tasks manageable, we only guarantee support for Subversion.
+This is a helper for users of git-svn. In an svn-checkout it creates
+a file called F<.gitignore> containing the files detailed in the subversion property
+C<svn:ignore>. This file can then be copied to a git-svn working directory.
 
-This won't work for git-svn.
+So beware, this works only for a svn checkout and the result is only useful
+for a git-svn checkout.
 
 =head1 SEE ALSO
 
-Parrot::Manifest.
+Parrot::Manifest. F<tools/dev/mk_manifest_and_skip.pl>.
 
 =cut
 
