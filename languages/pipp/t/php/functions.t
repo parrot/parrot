@@ -285,7 +285,7 @@ CODE
 returned:''
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return a variable', todo => 'not working yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'return a variable' );
 <?php
 
 function func_with_return ( )  {
@@ -298,7 +298,7 @@ echo "$a\n";
 
 ?>
 CODE
-I was a variable.
+I was a variable
 OUT
 
 
