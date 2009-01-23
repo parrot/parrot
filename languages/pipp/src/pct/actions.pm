@@ -442,9 +442,15 @@ method array_elem($/) {
 }
 
 method simple_var($/) {
+
+    # variables are 'lexical' in the current block,
+    # unless they are found in the symbol table of the current block
     our @?BLOCK;
-    unless ( @?BLOCK[0].symbol( ~$<var_name> ) || @?BLOCK[0].symbol( ~$<var_name> ~ '_hidden' ) ) {
-        @?BLOCK[0].symbol( ~$<var_name>, :scope('lexical') );
+    unless ( @?BLOCK[0].symbol( ~$<var_name> ) ) {
+        @?BLOCK[0].symbol(
+            :scope('lexical'),
+            ~$<var_name>
+        );
         @?BLOCK[0].push(
             PAST::Var.new(
                 :name(~$<var_name>),
