@@ -366,13 +366,19 @@ Creates an identical copy of the complex number.
                     FLOATVAL im = VTABLE_get_number_keyed_int(interp, initializer, 1);
                     SET_ATTR_re(INTERP, SELF, re);
                     SET_ATTR_im(INTERP, SELF, im);
-		    break;
+                    break;
                 }
                 /* else let it fall to default */
             default:
-                Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_OPERATION,
-                    "Invalid Complex initializer");
+                if (VTABLE_isa(interp, initializer, CONST_STRING(interp, "String"))) {
+                    STRING * s = VTABLE_get_string(interp, initializer);
+                    SELF.set_string_native(s);
+                }
+                else {
+                    Parrot_ex_throw_from_c_args(interp, NULL,
+                        EXCEPTION_INVALID_OPERATION,
+                        "Invalid Complex initializer");
+                }
         }
     }
 
