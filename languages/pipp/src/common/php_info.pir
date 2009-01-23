@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -37,7 +37,6 @@ php_info.pir - PHP info Standard Library
     # register NULL
     new $P0, 'PhpNull'
     set_hll_global 'NULL', $P0
-
 .end
 
 .sub 'logo_guid' :anon

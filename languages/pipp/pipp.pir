@@ -88,7 +88,7 @@ Bernhard Schmalhofer - L<Bernhard.Schmalhofer@gmx.de>
 
     # import PGE::Util::die into Pipp::Grammar
     $P0 = get_root_global ['parrot';'PGE';'Util'], 'die'
-    set_hll_global ['Pipp';'Grammar'], 'die', $P0
+    set_hll_global ['Pipp'; 'Grammar'], 'die', $P0
     set_hll_global ['Pipp'], 'die', $P0
 
     # Initialize the stack @?BLOCK

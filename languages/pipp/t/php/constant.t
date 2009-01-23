@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -22,7 +22,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test   tests => 23;
+use Parrot::Test   tests => 25;
 use Parrot::Config qw( %PConfig );
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'define() and constant(), string' );
@@ -137,7 +137,7 @@ CODE
 /Couldn't find constant UNDEF_CST/
 OUT
 
-# predefined constants
+# predefined constants of the info extension
 
 language_output_is( 'Pipp', <<'CODE', $PConfig{osname}, 'PHP_OS' );
 <?php
@@ -194,6 +194,18 @@ CODE
 language_output_is( 'Pipp', <<'CODE', '.', 'DEFAULT_INCLUDE_PATH' );
 <?php
 echo DEFAULT_INCLUDE_PATH;
+CODE
+
+# predefined constants of the dir extension
+
+language_output_is( 'Pipp', <<'CODE', $PConfig{slash}, 'DIRECTORY_SEPARATOR' );
+<?php
+echo constant("DIRECTORY_SEPARATOR");
+CODE
+
+language_output_is( 'Pipp', <<'CODE', $PConfig{slash}, 'PATH_SEPARATOR' );
+<?php
+echo constant("PATH_SEPARATOR");
 CODE
 
 # Local Variables:

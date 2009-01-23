@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -12,6 +12,18 @@ php_dir.pir - PHP dir Standard Library
 =over 4
 
 =cut
+
+.sub '__init' :anon :load :init
+    # get some config info
+    .local pmc cfg
+    $P0 = get_root_global ['parrot'], '_config'
+    cfg  = $P0()
+    .local string slash
+    slash = cfg['slash']
+
+    .REGISTER_STRING_CONSTANT('DIRECTORY_SEPARATOR', slash)
+    .REGISTER_STRING_CONSTANT('PATH_SEPARATOR', slash)
+.end
 
 =item C<bool chdir(string directory)>
 
