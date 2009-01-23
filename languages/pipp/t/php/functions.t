@@ -302,7 +302,7 @@ I was a variable
 OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'global', todo => 'not working yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'global' );
 <?php
 
 $outer = "outer variable\n";
