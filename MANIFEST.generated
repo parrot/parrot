@@ -58,14 +58,14 @@ include/parrot/oplib/ops.h                        [main]include
 include/parrot/platform.h                         [main]include
 include/parrot/platform_interface.h               [main]include
 include/parrot/vtable.h                           [main]include
-installable_disassemble                           [main]bin
-installable_disassemble.exe                       [main]bin
 installable_parrot                                [main]bin
 installable_parrot.exe                            [main]bin
 installable_parrot_config                         [main]bin
 installable_parrot_config.exe                     [main]bin
 installable_parrot_debugger                       [main]bin
 installable_parrot_debugger.exe                   [main]bin
+installable_pbc_disassemble                       [main]bin
+installable_pbc_disassemble.exe                   [main]bin
 installable_pbc_info                              [main]bin
 installable_pbc_info.exe                          [main]bin
 installable_pbc_merge                             [main]bin
