@@ -29,7 +29,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $prefix = $conf->options->get('prefix') || "/usr/local";
+    my $prefix = $conf->options->get('prefix') || ($^O eq 'MSWin32' ? "C:/Parrot" : "/usr/local");
     $prefix =~ s{/\z}{};
     my $ep = $conf->options->get('exec-prefix');
     $ep =~ s{/\z}{} if defined $ep;
