@@ -457,17 +457,6 @@ path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
     return join;
 }
 
-#define LOAD_EXT_CODE_LAST 2
-
-static const char* load_ext_code[ LOAD_EXT_CODE_LAST + 1 ] = {
-    ".pbc",
-
-    /* source level files */
-
-    ".pasm",
-    ".pir",
-};
-
 /*
 
 =item C<static STRING* try_load_path>
@@ -517,35 +506,64 @@ static STRING*
 try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 {
     ASSERT_ARGS(try_bytecode_extensions)
-    STRING *with_ext, *result;
-
+    STRING *test_path, *result;
+    STRING * const bytecode_extension = CONST_STRING(interp, ".pbc");
+    STRING * const pir_extension      = CONST_STRING(interp, ".pir");
+    STRING * const pasm_extension     = CONST_STRING(interp, ".pasm");
     int guess;
 
-    /*
-      First try the path without guessing the extension to ensure compatibility
-      with existing code.
-     */
+    test_path = string_copy(interp, path);
 
-    with_ext = string_copy(interp, path);
-
-    result = try_load_path(interp, with_ext);
+    /* First try the path as given. */
+    result = try_load_path(interp, test_path);
     if (result)
         return result;
 
     /*
-      Start guessing now. This version tries to find the lowest form of the
-      code, starting with bytecode and working up to PIR. Note the atypical
-      loop control. This is so the array can easily be processed in reverse.
-     */
+      If the original requested file doesn't exist, try it with a
+      different extension. A requested PIR or PASM file will check for a
+      corresponding bytecode file. A requested bytecode file will check
+      first for a corresponding PIR file, then for a PASM file.
+    */
 
-    for (guess = 0 ; guess <= LOAD_EXT_CODE_LAST ; guess++) {
-        with_ext = string_copy(interp, path);
-        with_ext = string_append(interp,
-                                 with_ext, const_string(interp, load_ext_code[guess]));
+    if (!STRING_IS_NULL(test_path)) {
+        if (string_length(interp, test_path) > 4) {
+            STRING *orig_ext = string_substr(interp, test_path, -4, 4, NULL, 0);
+            /* First try substituting .pbc for the .pir extension */
+            if (string_equal(interp, orig_ext, pir_extension) == 0) {
+                STRING *without_ext = string_chopn(interp, test_path, 4);
+                test_path = string_append(interp, without_ext, bytecode_extension);
+                result = try_load_path(interp, test_path);
+                if (result)
+                    return result;
+            }
+            /* Next try substituting .pir, then .pasm for the .pbc extension */
+            else if (string_equal(interp, orig_ext, bytecode_extension) == 0) {
+                STRING *without_ext = string_chopn(interp, test_path, 4);
+                test_path = string_append(interp, without_ext, pir_extension);
+                result = try_load_path(interp, test_path);
+                if (result)
+                    return result;
 
-        result = try_load_path(interp, with_ext);
-        if (result)
-            return result;
+                test_path = string_append(interp, without_ext, pasm_extension);
+                result = try_load_path(interp, test_path);
+                if (result)
+                    return result;
+            }
+
+        }
+
+        /* Finally, try substituting .pbc for the .pasm extension. */
+        if (string_length(interp, test_path) > 5) {
+            STRING *orig_ext = string_substr(interp, test_path, -5, 5, NULL, 0);
+            if (string_equal(interp, orig_ext, pasm_extension) == 0) {
+                STRING *without_ext = string_chopn(interp, test_path, 5);
+                test_path = string_append(interp, without_ext, bytecode_extension);
+                result = try_load_path(interp, test_path);
+                if (result)
+                    return result;
+            }
+        }
     }
 
     return NULL;
