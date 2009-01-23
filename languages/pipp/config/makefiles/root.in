@@ -72,6 +72,7 @@ PHP_SRC_STD_EXT = \
   src/common/php_exec.pir \
   src/common/php_file.pir \
   src/common/php_filestat.pir \
+  src/common/php_filesystem.pir \
   src/common/php_formatted_print.pir \
   src/common/php_fsock.pir \
   src/common/php_ftok.pir \

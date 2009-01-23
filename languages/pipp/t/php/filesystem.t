@@ -23,15 +23,29 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 1;
+use Parrot::Test   tests => 5;
 use Parrot::Config qw( %PConfig );
 
+# test dirname
+{
+    my @test_cases = (
+        ['a/b'                    => 'a' ],
+        ['a/b/c'                  => 'a/b' ],
+        ['axxxx/bxxxx/cxxxx'      => 'axxxx/bxxxx' ],
+        ['axxxx'                  => 'axxxx/bxxxx', todo => 'not yet' ],
+        ['/not_there'             => $PConfig{slash} ],
+    );
 
-language_output_is( 'Pipp', <<'CODE', $PConfig{slash}, 'dirname("/not_there")', todo => 'not yet' );
+    foreach ( @test_cases ) {
+        my ( $path, $dirname, @extra ) = @{$_};
+
+        language_output_is( 'Pipp', <<"CODE", $dirname, qq{dirname('$path')}, @extra );
 <?php
-  echo dirname("/not_there");
+  echo dirname('$path');
 ?>
 CODE
+    }
+}
 
 # Local Variables:
 #   mode: cperl

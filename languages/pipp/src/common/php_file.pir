@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -91,18 +91,6 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'copy'
-    not_implemented()
-.end
-
-=item C<string dirname(string path)>
-
-Returns the directory name component of the path
-
-NOT IMPLEMENTED.
-
-=cut
-
-.sub 'dirname'
     not_implemented()
 .end
 

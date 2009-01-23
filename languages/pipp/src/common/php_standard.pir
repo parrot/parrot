@@ -19,6 +19,7 @@
 .include 'languages/pipp/src/common/php_exec.pir'
 .include 'languages/pipp/src/common/php_file.pir'
 .include 'languages/pipp/src/common/php_filestat.pir'
+.include 'languages/pipp/src/common/php_filesystem.pir'
 .include 'languages/pipp/src/common/php_formatted_print.pir'
 .include 'languages/pipp/src/common/php_fsock.pir'
 .include 'languages/pipp/src/common/php_ftok.pir'
