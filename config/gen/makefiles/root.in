@@ -1439,11 +1439,15 @@ CONFIGURE_TEST_FILES = \
 # We probably need a complete build before running the tests.
 test_prep : all
 
+# We always want to test annotations are persisted in PBC during make test.
+test_pbc_annotation_persistence :
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r t/op/annotate.t
+
 # Run test cases with a single call of t/harness. Users have to look at only
 # one report. The default set of tests to run is contained in t/harness,
 # make any edits there.
 # Normal test package
-test : test_prep
+test : test_prep test_pbc_annotation_persistence
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
 # run the test suite, create a TAP archive and send it off to smolder
