@@ -32,13 +32,21 @@ List of scopes and types of variables.
 
 =over 4
 
-=item globals in top file
+=item variables outside a function in top file
 
 Lexical. Might need extra treatment.
 
-=item globals in included files
+=item variables outside a function in included files
 
 Lexical in scope of the included file.
+
+=item variables declared as 'global' in functions
+
+Lexical in outer scope. TODO: not sure of that
+
+=item variables declared as 'static' in functions
+
+????
 
 =item Class constants
 

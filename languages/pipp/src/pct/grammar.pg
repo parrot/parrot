@@ -131,6 +131,7 @@ rule statement {
     | <echo_statement>                 {*}  #= echo_statement
     | <expression_statement>           {*}  #= expression_statement
     | <constant_definition>            {*}  #= constant_definition
+    | <global_declaration>             {*}  #= global_declaration
     | <if_statement>                   {*}  #= if_statement
     | <while_statement>                {*}  #= while_statement
     | <do_while_statement>             {*}  #= do_while_statement
@@ -243,7 +244,7 @@ rule var_assign {
 }
 
 
-# identifiers
+# identifiers and declarations
 
 token class_name {
     <ident>
@@ -285,6 +286,13 @@ token ns_path {
 
 token var_name {
     '$' <ident>
+}
+
+# TODO: is global only allowed in functions and methods ?
+# TODO: multiple globals can be declared
+rule global_declaration {
+    'global' <var_name> <.statement_delimiter>
+     {*}
 }
 
 # terms

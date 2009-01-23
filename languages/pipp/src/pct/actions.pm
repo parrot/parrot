@@ -328,6 +328,13 @@ method constant_definition($/) {
     make $past;
 }
 
+method global_declaration($/) {
+    # for now just a placeholder
+    my $past := PAST::Stmts.new( :name('global_definition') );
+
+    make $past;
+}
+
 method argument_list($/) {
     my $past := PAST::Op.new(
                     :pasttype('call'),

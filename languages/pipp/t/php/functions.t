@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'function with no args' );
 <?php
@@ -299,4 +299,22 @@ echo "$a\n";
 ?>
 CODE
 I was a variable.
+OUT
+
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'global', todo => 'not working yet' );
+<?php
+
+$outer = "outer variable\n";
+
+function echo_outer( )  {
+  global $outer;
+  echo $outer;
+}
+
+echo_outer();
+
+?>
+CODE
+outer variable
 OUT
