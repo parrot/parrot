@@ -6,18 +6,16 @@ README.cygwin - Parrot under Cygwin
 
 =head1 SYNOPSIS
 
-Parrot builds out of the box under Cygwin after 
-C<export PATH=`pwd`/blib/lib:$PATH>
+Parrot builds out of the box under Cygwin,
+when no other parrot is installed. See below at PROBLEMS.
 
 There are official cygwin parrot packages available via
 L<http://cygwin.com/setup.exe>.
 
-  parrot libparrot0 libparrot-devel parrot-perl6
+  parrot libparrot0 libparrot-devel parrot-perl6 parrot-languages
 
 Some tweaks are needed for different names for the ffi to some dll's.
 See L</loadlib DLL versioning>.
-
-parrot-languages was dropped with 0.9.0.
 
 
 =head1 Packages
@@ -102,11 +100,10 @@ for cygwin, and as the name says it will never be :)
 
 =head1 BUILD
 
-  export PATH=`pwd`/blib/lib:$PATH
   perl Configure.pl
   make
-  make test # see PLATFORMS for known issues.
-  make reallyinstall
+  make test
+  make install
 
 =head1 PROBLEMS
 
@@ -190,6 +187,6 @@ Threads, Events, and Signals are missing.
 
 =head1 HISTORY
 
-Last updated: 22 January 2009
+Last updated: 23 January 2009
 
 =cut
