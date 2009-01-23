@@ -544,15 +544,33 @@ fail:
 .sub predef_new :method
     .param pmc tokenizer
 
+    .local pmc args
+    .local int nargs
+    .local string name
+    .local pmc obj
+
     $P1 = tokenizer.'get'()
     ne $P1, '(', fail
-    $P1 = self.'get_1_arg'(tokenizer)
-    $S1 = $P1
+    args = self.'get_args'(tokenizer)
+    $I0 = defined args
+    unless $I0 goto fail
+    nargs = args
+    name = args [0]
     #print 'NEW: '
-    #say $S1
+    #say name
+    eq nargs, 1, noarg
 
-    $P2 = new $S1
-    .return($P2)
+    .local pmc arg1
+    arg1 = args [1]
+    #say arg1
+
+    obj = new name, arg1
+
+    goto done
+noarg:
+    obj = new name
+done:
+    .return(obj)
 fail:
     SyntaxError()
 .end
