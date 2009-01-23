@@ -954,6 +954,9 @@ no_predef:
     $P0 = get_namespace token
     $I0 = defined $P0
     if $I0 goto spaced
+    $P0 = get_root_namespace token
+    $I0 = defined $P0
+    if $I0 goto spaced
 
     $P1 = tokenizer.'get'()
     $S1 = $P1
@@ -966,7 +969,10 @@ no_predef:
     args = self.'get_args'(tokenizer)
     $P9 = var(args)
     .return($P9)
+
 spaced:
+    # say "namespace"
+
     $P1 = tokenizer.'get'()
     ne $P1, '.', fail
     $P1 = tokenizer.'get'()
