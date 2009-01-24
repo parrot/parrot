@@ -43,8 +43,6 @@ determined.
 
 =item * enumerate [post 0.9.0] (TT #187)
 
-=item * intlist [post 0.9.0] (TT #187)
-
 =item * multiarray [post 0.9.0] (TT #187)
 
 =item * pair [post 0.9.0] (TT #187)

@@ -296,7 +296,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/op.h"
 #include "parrot/pmc.h"
 #include "parrot/events.h"
-#include "parrot/intlist.h"
 #include "parrot/gc_api.h"
 #include "parrot/gc_mark_sweep.h"
 #include "parrot/gc_pools.h"

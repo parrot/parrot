@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 22;
+use Parrot::Test tests => 21;
 
 =head1 NAME
 
@@ -636,43 +636,6 @@ CODE
 parrot
 parrot
 OUTPUT
-
-pasm_output_is( <<'CODE', <<'OUTPUT', "intlist iter vtable" );
-   .include "iterator.pasm"
-   new P0, ['IntList']
-   push P0, 100
-   push P0, 200
-   push P0, 300
-   push P0, 400
-   push P0, 500
-   push P0, 600
-   push P0, 700
-   push P0, 800
-   iter P2, P0
-   print "ok 1\n"
-lp:
-   unless P2, ex
-   shift I0, P2
-   print I0
-   print "\n"
-   branch lp
-ex:
-   print "ok 2\n"
-   end
-CODE
-ok 1
-100
-200
-300
-400
-500
-600
-700
-800
-ok 2
-OUTPUT
-
-
 
 TODO: {
     local $TODO = "adding keys during iteration";

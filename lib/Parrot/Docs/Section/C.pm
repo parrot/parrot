@@ -159,7 +159,6 @@ sub new {
             '',
             $self->c_pair_item( '', 'datatypes' ),
             $self->c_pair_item( '', 'hash' ),
-            $self->c_pair_item( '', 'intlist' ),
             $self->c_pair_item( '', 'list' ),
         ),
         $self->new_group(

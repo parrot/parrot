@@ -65,27 +65,26 @@ sharedref.pmc    40
 
 array.pmc    41
 fixedintegerarray.pmc    42
-intlist.pmc    43
-iterator.pmc    44
-perlarray.pmc    45
-pmcarray.pmc    46
-sarray.pmc    47
-constsarray.pmc    48
-fixedstringarray.pmc    49
-multiarray.pmc    50
+iterator.pmc    43
+perlarray.pmc    44
+pmcarray.pmc    45
+sarray.pmc    46
+constsarray.pmc    47
+fixedstringarray.pmc    48
+multiarray.pmc    49
 
 
 # hashes
-hash.pmc    51
-perlhash.pmc    52
-orderedhash.pmc    53
+hash.pmc    50
+perlhash.pmc    51
+orderedhash.pmc    52
 
 # other
 
-tqueue.pmc    54
+tqueue.pmc    53
 
-parrotclass.pmc    55
-parrotobject.pmc    56
+parrotclass.pmc    54
+parrotobject.pmc    55
 
-os.pmc    57
-file.pmc    58
+os.pmc    56
+file.pmc    57

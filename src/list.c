@@ -1580,7 +1580,7 @@ list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
 
     const UINTVAL n = list_length(interp, list);
     PARROT_ASSERT(list->item_type == enum_type_PMC);
-    /* TODO intlist ... */
+
     for (idx = 0, chunk = list->first; chunk; chunk = chunk->next) {
         /* TODO deleted elements */
         if (!(chunk->flags & sparse)) {

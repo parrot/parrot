@@ -512,13 +512,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
 
         agg = SELF.get_pmc();
 
-        if (agg->vtable->base_type == enum_class_IntList) {
-            const INTVAL ires  = SELF.shift_integer();
-            REG_INT(interp, 1) = 1;
-            REG_INT(interp, 5) = ires;
-            return (opcode_t *)next;
-        }
-        else {
+        {
             PMC * const res    = SELF.shift_pmc();
             REG_INT(interp, 3) = 1;
             REG_PMC(interp, 5) = res;

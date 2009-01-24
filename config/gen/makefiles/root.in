@@ -400,7 +400,6 @@ INTERP_O_FILES = \
     $(SRC_DIR)/inter_misc$(O)  \
     $(SRC_DIR)/interpreter$(O)  \
     $(SRC_DIR)/inter_run$(O)  \
-    $(SRC_DIR)/intlist$(O) \
     $(SRC_DIR)/key$(O) \
     $(SRC_DIR)/library$(O) \
     $(SRC_DIR)/list$(O) \
@@ -1028,8 +1027,6 @@ $(SRC_DIR)/pmc$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/pmc_freeze$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc_freeze.str
 
 $(SRC_DIR)/hash$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/intlist$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
