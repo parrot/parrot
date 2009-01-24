@@ -60,7 +60,7 @@ ok( $f->contains_pod, 'contains_pod yes, no errors' );
 is( $f->num_pod_errors, 0, 'num_pod_errors none' );
 
 # Not the best of tests, but at least something.
-like( $f->pod_as_html, qr|<html>.*?</html>|si, 'pod_as_html' );
+like( $f->pod_as_html, qr|<html.*?</html>|si, 'pod_as_html' );
 $f->write("=haed1 FOO\n\nFoo\n\n=cut\n\nbar\n");
 ok( $f->contains_pod, 'contains_pod yes, errors' );
 is( $f->num_pod_errors, 1, 'num_pod_errors one' );
