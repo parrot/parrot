@@ -37,7 +37,7 @@ my $parrot    = File::Spec->catfile( $FindBin::Bin,
                                      $PConfig{test_prog} );
 my $unlamba   = $parrot . q{ } . File::Spec->catfile( $FindBin::Bin,
                                                       File::Spec->updir(), 
-                                                      'unl.pir' );
+                                                      'unl.pbc' );
 my @test_cases = (
     [ 'newline.unl'  => "\n" ],
     [ 'h.unl'        => "h\n" ],

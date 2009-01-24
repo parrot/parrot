@@ -4,12 +4,12 @@
 # Makefile for languages/unlambda
 
 # configuration settings
-BUILD_DIR       = @build_dir@
+BUILD_DIR     = @build_dir@
 
 # Set up commands
-PERL            = @perl@
-RM_F            = @rm_f@
-RECONFIGURE     = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+PERL          = @perl@
+RM_F          = @rm_f@
+PARROT        = $(BUILD_DIR)/parrot@exe@
 #CONDITIONED_LINE(darwin):
 #CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
@@ -26,9 +26,9 @@ help :
 	@echo ""
 	@echo "  test:              Run the test suite."
 	@echo ""
-	@echo "  clean:             Clean up temporary files."
+	@echo "  clean:             Clean up."
 	@echo ""
-	@echo "  realclean:         Clean up generated files."
+	@echo "  realclean:         Clean and remove Makefile."
 	@echo ""
 	@echo "  help:              Print this help message."
 
@@ -37,13 +37,14 @@ Makefile: config/makefiles/root.in
 	 $(PERL) Configure.pl
 
 # Compilation:
-build:
-	@echo "nothing to do"
+build: unl.pbc
+
+unl.pbc:
+	$(PARROT) -o unl.pbc unl.pir
 
 # cleaning up
-
 clean: 
-	@echo "nothing to do"
+	$(RM_F) unl.pbc
 
 realclean: clean
 	$(RM_F) Makefile
