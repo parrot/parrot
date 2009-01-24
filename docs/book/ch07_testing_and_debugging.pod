@@ -2,7 +2,7 @@
 
 =head0 Testing and Debugging
 
-Z<CHP-6>
+Z<CHP-7>
 
 Programming languages and the virtual machines on which they run are just
 one small part of the total programming ecosystem. Programmers require not
@@ -15,7 +15,7 @@ written in any of the HLLs that Parrot supports.
 
 =head1 Writing Tests
 
-Z<CHP-6-SECT-1>
+Z<CHP-7-SECT-1>
 
 X<testing Parrot>
 Parrot is volunteer-driven, and contributions from new users are always
@@ -118,7 +118,7 @@ failing.
 
 =head1 The Parrot Debugger
 
-Z<CHP-6-SECT-2>
+Z<CHP-7-SECT-2>
 
 =cut
 

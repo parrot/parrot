@@ -2,7 +2,7 @@
 
 =head0 Parrot Internals
 
-Z<CHP-7>
+Z<CHP-8>
 
 This chapter details the architecture and internal workings of Parrot,
 and attempts to explain how Parrot has been designed and how it operates.
@@ -13,7 +13,7 @@ look at it, but the design fits together remarkably well.
 
 =head1 Core Design Principles
 
-Z<CHP-7-SECT-1>
+Z<CHP-8-SECT-1>
 
 X<Parrot;internals>
 Three main principles drive the design of
@@ -72,7 +72,7 @@ have sometimes been made to Perl itself.
 
 =head1 Parrot's Architecture
 
-Z<CHP-7-SECT-2>
+Z<CHP-8-SECT-2>
 
 The X<architecture;Parrot>
 X<Parrot;architecture>
@@ -85,7 +85,7 @@ afterward.
 
 =begin figure Parrot's flow
 
-Z<CHP-7-FIG-1>
+Z<CHP-8-FIG-1>
 F<figs/p6e_0801.png>
 
 =end figure
@@ -113,7 +113,7 @@ small section.
 
 =head2 Parser
 
-Z<CHP-7-SECT-2.1>
+Z<CHP-8-SECT-2.1>
 
 X<parser, Parrot>
 X<Parrot;parser module>
@@ -171,7 +171,7 @@ is to recreate all the quirks in a new parser.
 
 =head2 Compiler
 
-Z<CHP-7-SECT-2.2>
+Z<CHP-8-SECT-2.2>
 
 
 X<Parrot;compiler module>
@@ -194,7 +194,7 @@ Parrot into bytecode.
 
 =head2 Optimizer
 
-Z<CHP-7-SECT-2.3>
+Z<CHP-8-SECT-2.3>
 
 X<Parrot;optimizer module>
 X<optimizer>
@@ -316,7 +316,7 @@ execute Z-machine bytecode, but happy accidents are the best kind.
 
 =head1 The Interpreter
 
-Z<CHP-7-SECT-3>
+Z<CHP-8-SECT-3>
 
 The X<interpreter, Parrot>
 interpreter is the engine that actually runs the code emitted by the
@@ -360,7 +360,7 @@ correct design decision.
 
 =head2 Registers
 
-Z<CHP-7-SECT-3.1>
+Z<CHP-8-SECT-3.1>
 
 X<interpreter, Parrot;registers>
 As we've seen in previous chapers, Parrot has four basic types of
@@ -375,7 +375,7 @@ in sequential arrays to save space and increase access speed.
 
 =head2 Strings
 
-Z<CHP-7-SECT-3.3>
+Z<CHP-8-SECT-3.3>
 
 X<strings;Parrot>
 X<interpreter, Parrot;strings>
@@ -455,7 +455,7 @@ does to try and reimplement Unicode again.
 
 =head2 Variables
 
-Z<CHP-7-SECT-3.4>
+Z<CHP-8-SECT-3.4>
 
 X<variables;Parrot interpreter and>
 X<interpreter, Parrot;variables>
@@ -506,7 +506,7 @@ overloaded for a PMC, have VTABLE entries.
 
 =head2 Bytecode
 
-Z<CHP-7-SECT-3.5>
+Z<CHP-8-SECT-3.5>
 
 Like any CPU, software, or hardware, Parrot needs a set of
 instructions to tell it what to do. For hardware, this is a stream of
@@ -560,7 +560,7 @@ X<Parrot;interpreter;;(see interpreter, Parrot)>
 
 =head1 I/O, Events, and Threads
 
-Z<CHP-7-SECT-4>
+Z<CHP-8-SECT-4>
 
 Parrot has comprehensive support for I/O, threads, and events. These
 three systems are interrelated, so we'll treat them together. The
@@ -570,7 +570,7 @@ design and implementation.
 
 =head2 I/O
 
-Z<CHP-7-SECT-4.1>
+Z<CHP-8-SECT-4.1>
 
 Parrot's base X<I/O;Parrot> I/O system is fully X<asynchronous I/O>
 asynchronous with callbacks and per-request private data. Since this
@@ -637,7 +637,7 @@ are plenty of systems around that demonstrate what a bad idea that is.
 
 =head2 Events
 
-Z<CHP-7-SECT-4.2>
+Z<CHP-8-SECT-4.2>
 
 An X<events, Parrot> event is a notification that something has
 happened: the user has manipulated a GUI element, an I/O request has
@@ -710,7 +710,7 @@ where it's the correct thing to do.
 
 =head2 Signals
 
-Z<CHP-7-SECT-4.3>
+Z<CHP-8-SECT-4.3>
 
 X<signals, Parrot>
 Signals are a special form of event, based on the standard Unix signal
@@ -771,7 +771,7 @@ and private data, to be outstanding.
 
 =head2 Threads
 
-Z<CHP-7-SECT-4.4>
+Z<CHP-8-SECT-4.4>
 
 X<threads, Parrot>
 Threads are a means of splitting a process into multiple pieces that
@@ -884,7 +884,7 @@ VTABLE operation is in progress.
 
 =head1 Objects
 
-Z<CHP-7-SECT-5>
+Z<CHP-8-SECT-5>
 
 X<objects;Parrot>
 Perl 5, Perl 6, Python, and Ruby are all object-oriented languages in
@@ -899,7 +899,7 @@ override.
 
 =head2 Generic Object Interfacing
 
-Z<CHP-7-SECT-5.1>
+Z<CHP-8-SECT-5.1>
 
 X<PMCs (Parrot Magic Cookies);handling method calls>
 Parrot's object system is very simple--in fact, a PMC only has to handle
@@ -924,7 +924,7 @@ same name.
 
 =head2 Parrot Objects
 
-Z<CHP-7-SECT-5.2>
+Z<CHP-8-SECT-5.2>
 
 X<objects;Parrot>
 X<Parrot;objects>
@@ -986,7 +986,7 @@ part to implement Perl 6's roles.
 
 =head2 Mixed Class-Type Support
 
-Z<CHP-7-SECT-5.3>
+Z<CHP-8-SECT-5.3>
 
 X<mixed class-type support in Parrot>
 X<classes;Parrot;mixed class support>
@@ -1015,7 +1015,7 @@ from each other without difficulty.
 
 =head1 Advanced Features
 
-Z<CHP-7-SECT-6>
+Z<CHP-8-SECT-6>
 
 Since the languages Parrot targets (like Perl and Ruby) have
 sophisticated concepts as core features, it's in Parrot's best
@@ -1024,7 +1024,7 @@ not all) of these features.
 
 =head2 Garbage Collection
 
-Z<CHP-7-SECT-6.1>
+Z<CHP-8-SECT-6.1>
 
 X<garbage collection;Parrot>
 It's expected that modern languages have garbage collection built in.
@@ -1099,7 +1099,7 @@ which it would have to do if PMC or string structures could move.
 
 =head2 Multimethod Dispatching
 
-Z<CHP-7-SECT-6.2>
+Z<CHP-8-SECT-6.2>
 
 X<multimethod;dispatching>
 Multimethod dispatching (also known as signature-based dispatching) is
@@ -1162,7 +1162,7 @@ general version for normal subroutine and method dispatch.
 
 =head2 Continuations
 
-Z<CHP-7-SECT-6.3>
+Z<CHP-8-SECT-6.3>
 
 X<continuations>
 Continuations are possibly the most powerful high-level flow control
@@ -1234,7 +1234,7 @@ for languages that want them.
 
 =head2 Coroutines
 
-Z<CHP-7-SECT-6.4>
+Z<CHP-8-SECT-6.4>
 
 X<coroutines>
 A coroutine is a subroutine or method that can suspend itself partway
@@ -1256,7 +1256,7 @@ for them.
 
 =head1 Conclusion
 
-Z<CHP-7-SECT-7>
+Z<CHP-8-SECT-7>
 
 We've touched on much of Parrot's core functionality, but certainly
 not all. Hopefully we've given you enough of a feel for how Parrot

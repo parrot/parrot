@@ -2,7 +2,7 @@
 
 =head1 Opcodes and Runcores
 
-Z<CHP-11>
+Z<CHP-12>
 
 The smallest executable component is not the compilation unit or even
 the subroutine, but is actually the opcode. Opcodes in PASM, like opcodes
@@ -50,7 +50,7 @@ their uses, and their benefits.
 
 =over 4
 
-=item* Slow Core
+=item * Slow Core
 
 The slow core is a basic runcore design that treats each opcode as a
 separate function at the C level. Each function is called, and returns
@@ -71,7 +71,7 @@ how the slow core works:
 	  UPDATE_INTERPRETER();
   }
 
-=item* Fast Core
+=item * Fast Core
 
 The fast core is a bare-bones core that doesn't do any of the
 bounds-checking or context updating that the slow core does. The fast
@@ -86,7 +86,7 @@ current context for each dispatch.
 	  DISPATCH_OPCODE(pc);
   }
 
-=item* Switch Core
+=item * Switch Core
 
 As its name implies, the switch core uses a gigantic C C<switch / case>
 structure to execute opcodes. Here's a brief example of how this
@@ -109,7 +109,7 @@ opcodes is a jump back to the top of the loop, incrementing the opcode
 pointer, dereferencing the opcode pointer, and then a jump to the C<case>
 statement for the next opcode.
 
-=item* Computed Goto Core
+=item * Computed Goto Core
 
 I<Computed Goto> is a feature of some C compilers where a label is
 treated as a piece of data that can be stored as a C<void *> pointer. Each
@@ -167,7 +167,7 @@ the actual code has been optimized quite a bit from what has been
 presented here. However, as we shall see with the precomputed goto core,
 it isn't optimized as aggressively as is possible.
 
-=item* Precomputed Goto Core
+=item * Precomputed Goto Core
 
 The precomputed goto core is an amazingly fast optimized core that uses
 the same computed goto feature, but performs the array dereferencing
@@ -208,9 +208,9 @@ The caveat of course is that the predereferenced computed goto core is only
 available with compilers that support computed goto, such as GCC. Parrot
 will not have access to this core if it is built with a different compiler.
 
-=item* Tracing Core
+=item * Tracing Core
 
-=item* Profiling Core
+=item * Profiling Core
 
 The profiling core analyzes the performance of Parrot, and helps to
 determine where bottlenecks and trouble spots are in the programs that
@@ -227,7 +227,7 @@ run while in the subroutine, the number of each opcode called and the
 number of calls to each subroutine made. All this information is helpfully
 printed to the STDERR output for later analysis.
 
-=item* GC Debug Core
+=item * GC Debug Core
 
 Parrot's garbage collector has been known as a weakness in the system
 for several years. In fact, the garbage collector and memory management
@@ -243,7 +243,7 @@ collection iteration between every single opcode. The throughput
 performance is terrible, but that's not the point: it's almost guaranteed
 to find problems in the memory system if they exist.
 
-=item* Debug Core
+=item * Debug Core
 
 The debug core works like a normal software debugger, such as GDB. The
 debug core executes each opcode, and then prompts the user to enter a
@@ -361,6 +361,7 @@ the subroutine returns.
 
 =head2 Dynops
 
+=cut
 
 ##########################################################################
 #                              PSEUDOPOD LEGEND

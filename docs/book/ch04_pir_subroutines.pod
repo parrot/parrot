@@ -1,7 +1,5 @@
 =pod
 
-Z<CHP-4>
-
 =head1 Subroutines
 
 Z<CHP-4>
@@ -454,7 +452,7 @@ find the proper environment information about variables.
 
 =head2 Compilation Units Revisited
 
-Z<CHP-4-SECT-1.2>
+Z<CHP-4-SECT-1.1>
 
 The term "compilation unit" is one that's been bandied about throughout the
 chapter and it's worth some amount of explanation here. A compilation unit
@@ -499,7 +497,7 @@ to follow normal encapsulation guidelines.
 
 =head3 PASM Subroutines
 
-Z<CHP-4-SECT-1.1>
+Z<CHP-4-SECT-1.2>
 
 X<subroutines;PASM>
 X<PASM (Parrot assembly language);subroutines>
@@ -537,7 +535,7 @@ in Parrot.
 
 =head3 Namespaces
 
-Z<CHP-4-SECT-2>
+Z<CHP-4-SECT-2.1>
 
 X<Namespaces>
 X<.namespace>
@@ -586,7 +584,7 @@ can invoke it like a normal subroutine:
 
 =head3 Calling Methods
 
-Z<CHP-4-SECT-2>
+Z<CHP-4-SECT-2.2>
 
 Now that we've discussed namespaces, we can start to discuss all the
 interesting things that namespaces enable, like object-oriented
@@ -793,12 +791,12 @@ directive. C<.yield> plays several roles:
 
 =over 4
 
-=item* Identifies coroutines
+=item * Identifies coroutines
 
 When Parrot sees a yield, it knows to create a coroutine PMC object
 instead of a Subroutine one.
 
-=item* Creates a continuation
+=item * Creates a continuation
 
 Continuations, as we have already seen, allow us to continue
 execution at the point of the continuation later. It's like a snapshot of
@@ -806,7 +804,7 @@ the current execution environment. C<.yield> creates a continuation in
 the coroutine and stores the continuation object in the coroutine object
 or later resuming from the point of the C<.yield>.
 
-=item* Returns a value
+=item * Returns a value
 
 C<.yield> can return a value N<or many values, or no values> to the caller.
 It is basically the same as a C<.return> in this regard.

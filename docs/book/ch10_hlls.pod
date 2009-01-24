@@ -165,14 +165,14 @@ at the data level? There are two ways:
 
 =over 4
 
-=item* VTable methods
+=item * VTable methods
 
 VTable methods are the standard interface for PMC data types, and all PMCs
 have them. If the PMCs were written properly to satisfy this interface
 all the necessary information from those PMCs. Operate on the PMCs at the
 VTable level, and we can safely ignore the implementation details of them.
 
-=item* Class Methods
+=item * Class Methods
 
 If a library returns data in a particular format, the library reuser should
 know, understand, and make use of that format. Classes written in other

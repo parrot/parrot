@@ -2,7 +2,7 @@
 
 =head1 Parrot Reference
 
-Z<CHP-10>
+Z<CHP-13>
 
 This chapter contains a condensed list of PASM opcodes, PIR directives
 and instructions, and Parrot command-line options, sorted alphabetically
@@ -13,7 +13,7 @@ Instructions".
 
 =head2 PASM Opcodes
 
-Z<CHP-10-SECT-1>
+Z<CHP-13-SECT-1>
 
 X<PASM (Parrot assembly language);opcodes, quick reference>
 For complete details on each opcode and the latest changes, read the
@@ -1245,7 +1245,7 @@ A<CHP-10-TABLE-1>Table 11-1.
 
 =begin table picture Interpinfo flags
 
-Z<CHP-10-TABLE-1>
+Z<CHP-13-TABLE-1>
 
 =headrow
 
@@ -2415,7 +2415,7 @@ information to return, as listed in A<CHP-10-TABLE-2>Table 11-2.
 
 =begin table picture Stringinfo arguments
 
-Z<CHP-10-TABLE-2>
+Z<CHP-13-TABLE-2>
 
 =headrow
 
@@ -2812,7 +2812,7 @@ I<Arguments: IR, I, I or P, P, P>
 
 =head2 PIR Directives
 
-Z<CHP-10-SECT-2>
+Z<CHP-13-SECT-2>
 
 X<PIR (Parrot intermediate representation);quick reference;directives>
 This is a summary of PIR directives. Directives are preprocessed by the
@@ -3031,7 +3031,7 @@ Same as C<.local>.
 
 =head2 PIR Instructions
 
-Z<CHP-10-SECT-3>
+Z<CHP-13-SECT-3>
 
 X<PIR (Parrot intermediate representation);quick reference;instructions>
 This section is a quick reference to PIR instructions. For more details
@@ -3323,7 +3323,7 @@ Unless the value evaluates as true, jump to the named identifier.
 
 =head2 Parrot Command-Line Options
 
-Z<CHP-10-SECT-4>
+Z<CHP-13-SECT-4>
 
 X<command-line options (Parrot)>
 X<Parrot;command-line options>
@@ -3336,7 +3336,7 @@ have the latest details. Or just run F<parrot --help>.
 
 =head3 General Usage
 
-Z<CHP-10-SECT-4.1>
+Z<CHP-13-SECT-4.1>
 
   parrot [options] file [arguments]
 
@@ -3346,7 +3346,7 @@ command-line R<arguments> and stores it in C<P5> on program start.
 
 =head3 Assembler Options
 
-Z<CHP-10-SECT-4.2>
+Z<CHP-13-SECT-4.2>
 
 =over 4
 
@@ -3374,7 +3374,7 @@ from the C<-d> switch by whitespace, it has to start with a number.
 
 =begin table picture Debug bits
 
-Z<CHP-10-TABLE-3>
+Z<CHP-13-TABLE-3>
 
 =headrow
 
@@ -3513,7 +3513,7 @@ X<optimizations (Parrot)>
 
 =begin table picture Optimizations
 
-Z<CHP-10-TABLE-4>
+Z<CHP-13-TABLE-4>
 
 =headrow
 
@@ -3561,7 +3561,7 @@ Z<CHP-10-TABLE-4>
 
 =head3 Bytecode Interpreter Options
 
-Z<CHP-10-SECT-4.3>
+Z<CHP-13-SECT-4.3>
 
 X<Parrot;bytecode interpreter options>
 X<bytecode interpreter options (Parrot)>

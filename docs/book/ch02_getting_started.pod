@@ -142,7 +142,7 @@ respectively.
 
 =head1 Building Parrot
 
-Z<CHP-9-SECT-1>
+Z<CHP-2-SECT-2.2.2>
 
 X<Parrot;source code>
 The first step before you start playing with Parrot's PASM and PIR
@@ -192,7 +192,7 @@ programming platform.
 
 =head3 Patch submission
 
-Z<CHP-2-SECT-2.2.2>
+Z<CHP-2-SECT-2.2.3>
 
 X<Parrot;patch submission>
 Parrot development proceeds through a continuous stream of patches.
@@ -324,7 +324,7 @@ With the attached file F<list_chunk_initialize.patch>:
 
 =head3 Bug tracking
 
-Z<CHP-2-SECT-2.2.3>
+Z<CHP-2-SECT-2.2.4>
 
 X<Parrot;bug tracking>
 Bug reports go to the same address as patch submissions

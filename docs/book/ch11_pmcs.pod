@@ -2,7 +2,7 @@
 
 =head1 PMCs
 
-Z<CHP-10>
+Z<CHP-11>
 
 PMCs are one of the four fundamental data types in Parrot, and definitely one
 of the most useful. A PMC can contain a single scalar value (integer, floating
@@ -229,7 +229,7 @@ cannot define.
 =head3 Loading dynpmcs
 
 
-
+=cut
 
 ##########################################################################
 #                              PSEUDOPOD LEGEND
