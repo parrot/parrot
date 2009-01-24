@@ -20,9 +20,6 @@ List the content of the directory 'docs'.
      dlfunc opendir, libc, 'opendir', 'pt'
      dlfunc readdir, libc, 'readdir', 'pp'
      dlfunc closedir, libc, 'closedir', 'ip'
-     store_global 'libc::opendir', opendir
-     store_global 'libc::readdir', readdir
-     store_global 'libc::closedir', closedir
      .local pmc curdir
      curdir = opendir("docs")
      .local pmc entry
