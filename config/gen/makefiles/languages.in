@@ -83,6 +83,23 @@ help:
 	@echo ""
 	@echo "  co-tcl:        Try to fetch Partcl"
 	@echo ""
+    @echo "NOTE: These make targets assume that you have run the corresponding co target."
+	@echo "  up-all:        Try to update externally managed languages"
+	@echo ""
+	@echo "  up-eclectus:   Try to update eclectus"
+	@echo ""
+	@echo "  up-gil:        Try to update gil"
+	@echo ""
+	@echo "  up-hq9plus:    Try to update HQ9+"
+	@echo ""
+	@echo "  up-m4:         Try to update Parrot m4"
+	@echo ""
+	@echo "  up-pjs:        Try to update PJS"
+	@echo ""
+	@echo "  up-primitivearc: Try to update primitivearc"
+	@echo ""
+	@echo "  up-tcl:        Try to update Partcl"
+	@echo ""
 
 # regenerate the Makefile
 Makefile: ../config/gen/makefiles/languages.in
@@ -497,25 +514,47 @@ Zcode.realclean:
 
 # check out all known externally managed languages
 co-all: co-eclectus co-gil co-hq9plus co-m4 co-pjs co-primitivearc co-tcl
+up-all: up-eclectus up-gil up-hq9plus up-m4 up-pjs up-primitivearc up-tcl
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
 
+up-eclectus:
+	cd eclectus &&  $(GIT) pull
+
 co-gil:
 	- $(GIT) clone 'git:////github.com/tene/gil.git'
 
+up-gil:
+	cd gil && $(GIT) pull
+
 co-hq9plus:
-	- $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
+    - $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
+
+up-hq9plus:
+	cd hq9plus && $(GIT) pull
 
 co-m4:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/m4.git'
 
+up-m4:
+	cd m4 && $(GIT) pull
+
 co-pjs:
 	- $(SVN) checkout 'http:////parrotjs.googlecode.com/svn/trunk/' parrotjs-read-only
+
+up-pjs:
+	cd parrotjs-read-only && $(SVN) up
 
 co-primitivearc:
 	- $(GIT) clone 'git:////github.com/stefano/primitivearc.git'
 
+up-primitivearc:
+	cd primitivearc && $(GIT) pull
+
 co-tcl:
 	- $(SVN) checkout 'http:////partcl.googlecode.com/svn/trunk' tcl
+
+up-tcl:
+	cd tcl && $(SVN) up
 
