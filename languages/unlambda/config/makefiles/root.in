@@ -34,7 +34,7 @@ help :
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=unlambda
+	 $(PERL) Configure.pl
 
 # Compilation:
 build:
