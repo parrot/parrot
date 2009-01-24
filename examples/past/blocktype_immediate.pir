@@ -43,7 +43,7 @@ F<docs/pdds/pdd26_ast.pod>
     # content of the block
     .local pmc val_x
     val_x = new ['PAST';'Val']
-    val_x.init( 'value' => '-536870912', 'returns' => 'Integer' )
+    val_x.'init'( 'value' => '-536870912', 'returns' => 'Integer' )
 
     # wrap the content in a block
     .local pmc var_block
