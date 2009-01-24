@@ -40,30 +40,33 @@ sub header {
     my $title      = shift || 'Untitled';
     my $navigation = shift || '';
     my $resources  = shift || '';
+    my $breadcrumb = $navigation;
+    $breadcrumb .= " &raquo; " if $navigation;
+    $breadcrumb .= $title;
 
     <<"HEADER";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
-    "http://www.w3.org/TR/REC-html40/loose.dtd">
-<HTML>
-    <HEAD>
-        <TITLE>$title</TITLE>
-        <LINK REL="stylesheet" TYPE="text/css"
-            HREF="$resources/perl.css"
-            TITLE="Default CSS2" media="screen">
-    </HEAD>
-    <BODY>
-        <A NAME="_top"></A>
-        <TABLE CELLSPACING="0" WIDTH="730">
-            <TR>
-                <TD WIDTH="100%" COLSPAN="2" CLASS="BANNER">parrotcode: <SPAN CLASS="title">$title</SPAN></TD>
-            </TR>
-            <TR>
-                <TD WIDTH="100%" COLSPAN="2"  ID="NAV" STYLE="border-bottom: 1px solid #191970;">
-                    $navigation
-                </TD>
-            </TR>
-        </TABLE>
-        <DIV CLASS="pod">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <title>$title</title>
+        <link rel="stylesheet" type="text/css"
+            href="$resources/parrot.css"
+            media="all">
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="header">
+
+                <img border=0 src="$resources/parrot_logo.png" id="logo" alt="parrot">
+            </div> <!-- "header" -->
+            <div id="divider"></div>
+            <div id="mainbody">
+                <div id="breadcrumb">
+                    $breadcrumb
+                </div>
 HEADER
 }
 
@@ -84,26 +87,14 @@ sub footer {
     my $resources  = shift || '';
 
     <<"FOOTER";
-        </DIV>
-        <P>
-        <TABLE BORDER="0" WIDTH="730" CELLSPACING="0" CELLPADDING="0">
-            <TR ALIGN="RIGHT">
-                <TD WIDTH="590" VALIGN="MIDDLE">
-                    <BR>
-                    <DIV CLASS="FOOTER">
-                        <DIV ALIGN="LEFT">
-                        </DIV>
-                    </DIV>
-                </TD>
-                <TD VALIGN="middle" ALIGN="center">
-                    <IMG BORDER=0
-                        SRC="$resources/parrot_small.png"
-                        ALT="parrot">
-                </TD>
-            </TR>
-        </TABLE>
-    </BODY>
-</HTML>
+            </div> <!-- "mainbody" -->
+            <div id="divider"></div>
+            <div id="footer">
+	        Copyright &copy; 2002-2009, Parrot Foundation.
+            </div>
+        </div> <!-- "wrapper" -->
+    </body>
+</html>
 FOOTER
 }
 

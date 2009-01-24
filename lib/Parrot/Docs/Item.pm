@@ -116,7 +116,7 @@ sub html_navigation {
     my $path   = shift;
     my $parent = $self->parent || return '';
 
-    return join ' | ', grep { length } $parent->html_navigation($path), $parent->html_link($path);
+    return join ' &raquo; ', grep { length } $parent->html_navigation($path), $parent->html_link($path);
 }
 
 =item C<write_html($source, $target, $silent)>
