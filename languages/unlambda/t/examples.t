@@ -38,14 +38,15 @@ my $parrot    = File::Spec->catfile( $FindBin::Bin,
 my $unlamba   = $parrot . q{ } . File::Spec->catfile( $FindBin::Bin,
                                                       File::Spec->updir(), 
                                                       'unl.pir' );
-my %expected = (
-    'newline.unl'  => "\n",
-    'h.unl'        => "h\n",
-    'hello.unl'    => "Hello world\n",
-    'k.unl'        => 'H',
+my @test_cases = (
+    [ 'newline.unl'  => "\n" ],
+    [ 'h.unl'        => "h\n" ],
+    [ 'k.unl'        => 'H' ],
+    [ 'hello.unl'    => "Hello world\n" ],
 );
 
-while ( my ($code_fn, $out) = each %expected ) {
+foreach (@test_cases) {
+    my ($code_fn, $out) = @{$_};
     my $prog = File::Spec->catfile( $FindBin::Bin,
                                     File::Spec->updir(),
                                     'examples',
