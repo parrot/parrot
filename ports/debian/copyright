@@ -1,14 +1,13 @@
 This package was debianized by Florian Ragwitz <rafl@debianforum.de> on
 Fri, 28 Oct 2005 10:02:44 +0200.
-This package was debianized by the Debian Parrot Maintainers
-<pkg-parrot-devel@lists.alioth.debian.org> on
-Mon, 31 Dec 2007 15:53:34 +0000.
+This package was debianized by the Parrot Developers
+<parrot-dev@lists.parrot.org> on Mon, 31 Dec 2007 15:53:34 +0000.
 
-It was downloaded from http://parrotcode.org/
+It was downloaded from http://parrot.org/
 
 Copyright for most of the code is held by:
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 
 Some files have a different copyright:
 

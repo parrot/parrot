@@ -16,7 +16,7 @@ debian/control: debian/control.in VERSION
 configure: debian/control configure-stamp
 configure-stamp:
 	dh_testdir
-	perl Configure.pl --prefix=/usr --optimize
+	perl Configure.pl --prefix=/usr
 	touch configure-stamp
 
 build: build-stamp
@@ -47,7 +47,7 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_testdir
 	dh_testroot
 	dh_clean -k 
-	$(MAKE) reallyinstall DESTDIR=$(CURDIR)/debian/tmp
+	$(MAKE) install DESTDIR=$(CURDIR)/debian/tmp
 	dh_installdirs
 	find $(CURDIR)/debian/tmp -type f
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing

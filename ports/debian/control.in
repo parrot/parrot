@@ -1,9 +1,9 @@
 Source: parrot
 Section: interpreters
 Priority: optional
-Maintainer: Debian Parrot Maintainers <pkg-parrot-devel@lists.alioth.debian.org>
-Uploaders: Allison Randal <allison@perl.org>, Nuno Carvalho <mestre.smash@gmail.com>, Patrick Michaud <pmichaud@pobox.com>
-Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libgmp3-dev, libgdbm-dev, libicu-dev, libreadline-dev
+Maintainer: Parrot Developers <parrot-dev@lists.parrot.org>
+Uploaders: Allison Randal <allison@parrot.org>, Nuno Carvalho <mestre.smash@gmail.com>, Patrick Michaud <pmichaud@pobox.com>
+Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libgdbm-dev, libreadline-dev
 Standards-Version: 3.7.2
 
 Package: parrot
@@ -34,7 +34,7 @@ Description: Virtual machine for dynamic languages
 Package: libparrot-dev
 Architecture: any
 Section: libdevel
-Depends: libparrot%SOVERSION% (= ${binary:Version}), parrot, libicu-dev
+Depends: libparrot%SOVERSION% (= ${binary:Version}), parrot
 Description: Virtual machine for dynamic languages
  Parrot is a virtual machine designed to efficiently compile and execute
  bytecode for dynamic languages. Parrot currently hosts a variety of language

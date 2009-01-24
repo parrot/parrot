@@ -1,35 +1,22 @@
-parrot (0.7.0-1) unstable; urgency=low
-
-  * New upstream release
-
- -- Nuno Carvalho <mestre.smash@gmail.com>  Tue, 02 Sep 2008 13:05:31 +0100
-
-parrot (0.6.4-1) unstable; urgency=low
-
-  * New upstream release
-  * debian/copyright:
-    - Added license link.
-    - Updated copyright years.
-    - Removed copyright info for files no longer in distribution.
-
- -- Nuno Carvalho <mestre.smash@gmail.com>  Sat, 16 Aug 2008 14:15:14 +0200
-
-parrot (0.5.1-1) unstable; urgency=low
+parrot (0.9.0-1) unstable; urgency=low
 
   * New upstream release (Closes: #444707).
   * debian/control.in:
-    - Build-Depends updated to libicu-dev from libicu36-dev
-      (Closes: #456835).
-    - Depends for libparrot-dev updated to libicu-dev from
+    - Build-Depends removed optional library libicu36-dev
+      (Closes: #456835). Removed optional library libgmp3-dev.
+    - Depends for libparrot-dev removed optional library
       libicu34-dev (Closes: #431289).
-    - New maintainer: Parrot Debian Maintainers
-      (Closes: #444708)
+    - New maintainer: Parrot Developers (Closes: #444708)
     - New uploaders: Allison Randal, Nuno Carvalho,
       Patrick Michaud
     - Updated long and short package descriptions.
   * debian/rules
     - Removed install of install_config.o file, no longer in
       distribution.
+    - Removed --optimize flag from configure, known problems
+      on 64-bit architectures.
+    - Changed 'reallyinstall' target to 'install', matching
+      change in source makefile.
   * debian/libparrot0.4.12.install
     - Deleted, replaced by debian/libparrot.install.
   * debian/parrot-doc.docs
@@ -40,7 +27,7 @@ parrot (0.5.1-1) unstable; urgency=low
     - Updated copyright years.
     - Removed copyright info for files no longer in distribution.
 
- -- Allison Randal <allison@perl.org>  Sun, 30 Dec 2007 17:21:45 +0000
+ -- Allison Randal <allison@parrot.org>  Fri, 23 Jan 2009 15:16:25 -0800
 
 parrot (0.4.13-1) unstable; urgency=low
 
