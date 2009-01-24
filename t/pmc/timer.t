@@ -66,7 +66,7 @@ OUT
 
 pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer" );
 .include "timer.pasm"
-    new P1, ['SArray']
+    new P1, ['FixedPMCArray']
     set P1, 4
     set P1[0], .PARROT_TIMER_SEC
     set P1[1], 8
@@ -105,7 +105,7 @@ SKIP: {
 
     pasm_output_like( <<'CODE', <<'OUT', "Timer setup - initializer/start" );
 .include "timer.pasm"
-    new P1, ['SArray']
+    new P1, ['FixedPMCArray']
     set P1, 6
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.5
@@ -129,7 +129,7 @@ OUT
 
     pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/stop" );
 .include "timer.pasm"
-    new P1, ['SArray']
+    new P1, ['FixedPMCArray']
     set P1, 6
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.5
@@ -158,7 +158,7 @@ OUT
        ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
     pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/repeat" , @todo );
 .include "timer.pasm"
-    new P1, ['SArray']
+    new P1, ['FixedPMCArray']
     set P1, 8
     set P1[0], .PARROT_TIMER_NSEC
     set P1[1], 0.2

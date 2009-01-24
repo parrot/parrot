@@ -72,7 +72,7 @@ ResizableStringArray:\s\d+\.\d+s\n
 \n
 1\s\*\s1000\s=\s1000\n
 100\s\*\s1000\s=\s100000\n
-SArray:\s\d+\.\d+s\n
+FixedPMCArray:\s\d+\.\d+s\n
 \s+$/x,
     q{arriter.pir}     => qq(100000\n100000\n100000\n111111\n),
     q{arriter_o1.pir}  => qq(100000\n100000\n100000\n111111\n),

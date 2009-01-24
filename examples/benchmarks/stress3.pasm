@@ -27,7 +27,7 @@ Note that a command-line argument of 1 is supposed to cause the PMCs to
 be destroyed before a 2nd loop is run. However, this seems to be broken
 at the moment:
 
-    SArray: Entry not an integer!
+    FixedPMCArray: Entry not an integer!
 
 =cut
 

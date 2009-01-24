@@ -256,7 +256,7 @@ It is drawn onto the screen consigned to the constructor.
     $P0 = new 'ResizablePMCArray'
     store_global "SDL::StopWatch::Timer", "array", $P0
 
-    $P0 = new 'SArray'
+    $P0 = new 'FixedPMCArray'
     $P1 = find_global "SDL::StopWatch::Timer", "tick"
     $P0 = 8
     $P0[0] = .PARROT_TIMER_NSEC

@@ -156,8 +156,8 @@ newline or semicolon after an end keyword."
     "ParrotRunningThread" "ParrotThread" "Pointer" "Random" "Ref"
     "ResizableBooleanArray" "ResizableFloatArray" "ResizableIntegerArray"
     "ResizablePMCArray" "ResizableStringArray" "RetContinuation"
-    "Role" "SArray" "Scalar" "SharedRef" "Slice" "String" "Sub"
-    "Super" "TQueue" "Timer" "UnManagedStruct" "Undef" "VtableCache"))
+    "Role" "Scalar" "SharedRef" "Slice" "String" "Sub" "Super" "TQueue"
+    "Timer" "UnManagedStruct" "Undef" "VtableCache"))
 
 (defvar pir-ops
   '("abs" "accept" "acos" "add" "addattribute" "addmethod" "addparent"

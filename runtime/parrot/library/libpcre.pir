@@ -105,8 +105,8 @@ RETURN:
     .local int ovece
 
     .local pmc struct
-    struct= new 'SArray'
-    struct= 3
+    struct = new 'FixedPMCArray'
+    struct = 3
 
     .include "datatypes.pasm"
 

@@ -45,8 +45,6 @@ determined.
 
 =item * ref [post 0.9.0] (TT #190)
 
-=item * sarray [post 0.9.0] (TT #191)
-
 =item * tqueue [post 0.9.0] (TT #192)
 
 =back

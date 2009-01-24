@@ -45,7 +45,7 @@ For example, C<8> corresponds to C<backspace>.
 .sub _load_key_names
 	.local pmc key_names
 
-	key_names = new 'SArray'
+	key_names = new 'FixedPMCArray'
 	key_names = 323
 	store_global 'SDL::Constants', 'key_names', key_names
 

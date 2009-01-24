@@ -987,7 +987,7 @@ end:
 .sub delete_and_free_list
     set $I2, 10
     set $I1, 1
-    new $P0, ['SArray']
+    new $P0, ['FixedPMCArray']
     set $P0, 1
     new $P1, ['Hash']
 outer:
