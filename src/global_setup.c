@@ -215,7 +215,7 @@ parrot_global_setup_2(PARROT_INTERP)
     Parrot_register_core_pmcs(interp, classname_hash);
 
     /* init the interpreter globals array */
-    iglobals         = pmc_new(interp, enum_class_SArray);
+    iglobals         = pmc_new(interp, enum_class_FixedPMCArray);
     interp->iglobals = iglobals;
     VTABLE_set_integer_native(interp, iglobals, (INTVAL)IGLOBALS_SIZE);
 
