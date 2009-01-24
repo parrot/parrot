@@ -1,0 +1,8 @@
+# This program demonstrates the "k" function
+#
+# The character 'H' is printed.
+#
+# ".Hi" prints 'H' as a sideeffect, "i" is a dummy argument.
+# "k" is the identity function, which returns it's first argument, ".hi".
+# The last "i" is the second argument to "k".
+```k.Hii
