@@ -41,8 +41,6 @@ determined.
 
 =item * deleg_pmc [post 0.9.0] (TT #187)
 
-=item * multiarray [post 0.9.0] (TT #187)
-
 =item * pair [post 0.9.0] (TT #187)
 
 =item * pointer [post 0.9.0] (TT #187)

@@ -71,20 +71,18 @@ pmcarray.pmc    45
 sarray.pmc    46
 constsarray.pmc    47
 fixedstringarray.pmc    48
-multiarray.pmc    49
-
 
 # hashes
-hash.pmc    50
-perlhash.pmc    51
-orderedhash.pmc    52
+hash.pmc    49
+perlhash.pmc    50
+orderedhash.pmc    51
 
 # other
 
-tqueue.pmc    53
+tqueue.pmc    52
 
-parrotclass.pmc    54
-parrotobject.pmc    55
+parrotclass.pmc    53
+parrotobject.pmc    54
 
-os.pmc    56
-file.pmc    57
+os.pmc    55
+file.pmc    56
