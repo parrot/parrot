@@ -455,8 +455,7 @@ method simple_var($/) {
     # variables are 'lexical' in the current block,
     # unless they are found in the symbol table of the current block
     our @?BLOCK;
-    unless (   @?BLOCK[0].symbol( ~$<var_name> ) 
-            || @?BLOCK[0].symbol( ~$<var_name> ~ '_hidden' )) {
+    unless @?BLOCK[0].symbol( ~$<var_name> ) {
         @?BLOCK[0].symbol(
             :scope('lexical'),
             ~$<var_name>
@@ -601,7 +600,7 @@ method closure($/, $key) {
         # declare the bound vars a lexical
         if +$<bind_list> == 1 {
             for $<bind_list>[0]<var_name> {
-                $block.symbol( ~$_ ~ '_hidden', :comment('bound with use') );
+                $block.symbol( ~$_, :comment('bound with use') );
             }
         }
         @?BLOCK.unshift( $block );
