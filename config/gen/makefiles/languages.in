@@ -534,10 +534,10 @@ up-markdown:
 	cd markdown && $(GIT) pull
 
 co-pjs:
-	- $(SVN) checkout 'http:////parrotjs.googlecode.com/svn/trunk/' parrotjs-read-only
+	- $(SVN) checkout 'http:////parrotjs.googlecode.com/svn/trunk/' pjs
 
 up-pjs:
-	cd parrotjs-read-only && $(SVN) up
+	cd pjs && $(SVN) up
 
 co-primitivearc:
 	- $(GIT) clone 'git:////github.com/stefano/primitivearc.git'
