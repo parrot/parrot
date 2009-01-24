@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 28;
+use Test::More tests => 25;
 
 =head1 NAME
 
@@ -164,7 +164,7 @@ open $FH, '>', $filename
 print $FH "print(\"Hello World from JS\\n\");";
 close $FH;
 $out = `$parrot languages/ecmascript/js.pbc $filename`;
-ok($out eq "Hello World from JS\n", "check ecmascript");
+ok($out eq "Hello World from JS\n\n", "check ecmascript");
 unlink($filename);
 
 $filename = 'test.l';
@@ -191,15 +191,6 @@ unlink($filename);
 
 $out = `$parrot languages/lua/lua.pbc -e "print(nil)"`;
 ok($out eq "nil\n", "check lua");
-
-$filename = 'test.text';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH "Hello, World!\n\n";
-close $FH;
-$out = `$parrot languages/markdown/markdown.pbc $filename`;
-ok($out eq "<p>Hello, World!</p>\n\n", "check markdown");
-unlink($filename);
 
 $out = `$parrot languages/ook/ook.pbc`;
 ok($out eq q{}, "check ook");

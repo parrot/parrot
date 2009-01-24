@@ -43,7 +43,6 @@ sub _init {
         forth
         jako json
         lazy-k lisp lolcode lua
-        markdown
         ook
         parrot_compiler perl6 pheme PIR pipp punie pynie
         regex

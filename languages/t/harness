@@ -87,7 +87,6 @@ my @unified_testable_languages
               dotnet
               jako
               lazy-k lisp lua
-              markdown
               ook
               parrot_compiler pipp punie
               regex

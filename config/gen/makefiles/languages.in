@@ -21,7 +21,6 @@ LANGUAGES = \
     forth \
     jako json \
     lazy-k lisp lolcode lua \
-    markdown \
     ook \
     parrot_compiler perl6 pheme PIR pipp punie pynie \
     regex \
@@ -137,7 +136,6 @@ clean: \
     jako.clean json.clean \
     lisp.clean \
     lolcode.clean lua.clean \
-    markdown.clean \
     ook.clean \
     parrot_compiler.clean perl6.clean pheme.clean PIR.clean pipp.clean punie.clean pynie.clean \
     regex.clean \
@@ -155,7 +153,6 @@ realclean: \
     forth.realclean \
     jako.realclean json.realclean \
     lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
-    markdown.realclean \
     ook.realclean \
     parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
     regex.realclean \
@@ -350,16 +347,6 @@ lua.clean:
 lua.realclean:
 	- $(MAKE) lua realclean
 
-markdown: markdown.dummy
-markdown.dummy:
-	- $(MAKE) markdown
-markdown.test:
-	- $(MAKE) markdown test
-markdown.clean:
-	- $(MAKE) markdown clean
-markdown.realclean:
-	- $(MAKE) markdown realclean
-
 ook : ook.dummy
 ook.dummy:
 	- $(MAKE) ook
@@ -513,8 +500,8 @@ Zcode.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-gil co-hq9plus co-m4 co-pjs co-primitivearc co-tcl
-up-all: up-eclectus up-gil up-hq9plus up-m4 up-pjs up-primitivearc up-tcl
+co-all: co-eclectus co-gil co-hq9plus co-m4 co-markdown co-pjs co-primitivearc co-tcl
+up-all: up-eclectus up-gil up-hq9plus up-m4 up-markdown up-pjs up-primitivearc up-tcl
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
@@ -539,6 +526,12 @@ co-m4:
 
 up-m4:
 	cd m4 && $(GIT) pull
+
+co-markdown:
+	- $(GIT) clone 'git:////github.com/fperrad/markdown.git'
+
+up-markdown:
+	cd markdown && $(GIT) pull
 
 co-pjs:
 	- $(SVN) checkout 'http:////parrotjs.googlecode.com/svn/trunk/' parrotjs-read-only
