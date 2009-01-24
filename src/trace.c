@@ -150,9 +150,6 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         Parrot_io_eprintf(debugger, "Object(%Ss)=PMC(%#p)",
                 VTABLE_get_string(interp, VTABLE_get_class(interp, pmc)), pmc);
     }
-    else if (pmc->vtable->base_type == enum_class_delegate) {
-        Parrot_io_eprintf(debugger, "delegate=PMC(%#p)", pmc);
-    }
     else {
         Parrot_io_eprintf(debugger, "%S=PMC(%#p)",
                 VTABLE_name(interp, pmc), pmc);

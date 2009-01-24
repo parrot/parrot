@@ -540,7 +540,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "verify deleg_pmc object marking" );
+pir_output_is( <<'CODE', <<'OUTPUT', "verify pmc proxy object marking" );
 .sub main :main
     .local pmc cl, s, t
     cl = subclass "String", "X"

@@ -12,8 +12,6 @@ use Parrot::Pmc2c::Library ();
 use Parrot::Pmc2c::UtilFunctions qw( filename );
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::PMC::default ();
-use Parrot::Pmc2c::PMC::delegate ();
-use Parrot::Pmc2c::PMC::deleg_pmc ();
 use Parrot::Pmc2c::PMC::Null ();
 use Parrot::Pmc2c::PMC::Ref ();
 use Parrot::Pmc2c::PMC::SharedRef ();

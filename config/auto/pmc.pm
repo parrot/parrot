@@ -168,8 +168,6 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/Library.pm \\
     lib/Parrot/Pmc2c/UtilFunctions.pm \\
     lib/Parrot/Pmc2c/PMC/default.pm \\
-    lib/Parrot/Pmc2c/PMC/delegate.pm \\
-    lib/Parrot/Pmc2c/PMC/deleg_pmc.pm \\
     lib/Parrot/Pmc2c/PMC/Null.pm \\
     lib/Parrot/Pmc2c/PMC/Ref.pm \\
     lib/Parrot/Pmc2c/PMC/SharedRef.pm \\
