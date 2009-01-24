@@ -1,24 +1,31 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2009, The Perl Foundation.
 # $Id$
-package Parrot::Pmc2c::Pmc2cMain;
+package Parrot::Pmc2c::Dumper;
+
 use strict;
 use warnings;
+
 use Parrot::Pmc2c::UtilFunctions qw(slurp spew filename);
 use Parrot::Pmc2c::Parser qw(parse_pmc);
 use Carp;
+
+use base 'Exporter';
+@Parrot::Pmc2c::Dumper::EXPORT_OK = 'dump_pmc';
 
 =head3 C<dump_pmc()>
 
     $return_value = dump_pmc($pmc2cMain);
 
-B<Purpose:>  Create a F<.dump> file for each file listed in pmc2cMain's
-C<arg> key (which can be found in the directories listed in pmc2cMain's C<include> key).
+B<Purpose:>  Creates a F<.dump> file for each file listed in pmc2cMain's C<arg>
+key (which can be found in the directories listed in pmc2cMain's C<include>
+key).
 
 B<Arguments:>
 
 B<Return Values:>  Returns 1 upon success.
 
-B<Comments:>  Called when C<--dump> is specified as the command-line option to F<pmc2c.pl>.
+B<Comments:>  Called when C<--dump> is specified as the command-line option to
+F<pmc2c.pl>.
 
 =cut
 

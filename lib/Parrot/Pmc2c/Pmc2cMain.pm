@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2009, The Perl Foundation.
 # $Id$
 package Parrot::Pmc2c::Pmc2cMain;
 use strict;
@@ -7,9 +7,9 @@ use warnings;
 use Storable;
 use Parrot::PMC ();
 use Parrot::Pmc2c::VTable ();
-use Parrot::Pmc2c::Dumper;
+use Parrot::Pmc2c::Dumper 'dump_pmc';
 use Parrot::Pmc2c::Library ();
-use Parrot::Pmc2c::UtilFunctions qw( filename );
+use Parrot::Pmc2c::UtilFunctions 'filename';
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::Null ();
