@@ -794,9 +794,16 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
         ARGOUT(STRING **wo_ext), ARGOUT(STRING **ext))
 {
     ASSERT_ARGS(parrot_split_path_ext)
-    STRING * const slash1 = CONST_STRING(interp, "/");
-    STRING * const slash2 = CONST_STRING(interp, "\\");
-    STRING * const dot    = CONST_STRING(interp, ".");
+
+    /* This is a quick fix for TT #65
+     * TODO: redo it with the string reimplementation
+     */
+    const char * charset = Parrot_charset_c_name(interp,
+        Parrot_charset_number_of_str(interp, in) );
+    STRING * const slash1 = string_make(interp, "/", 1, charset, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash2 = string_make(interp, "\\", 1, charset, PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const dot    = string_make(interp, ".", 1, charset, PObj_external_FLAG|PObj_constant_FLAG);
+
     const INTVAL len = string_length(interp, in);
     STRING *stem;
     INTVAL pos_sl, pos_dot;
