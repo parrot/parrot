@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  36;
+use Test::More tests =>  34;
 use Carp;
 use Cwd;
 use File::Path qw| mkpath |;
@@ -178,7 +178,6 @@ my @dummy_options = qw(
     array.pmc
     fixedintegerarray.pmc
     iterator.pmc
-    sarray.pmc
     fixedstringarray.pmc
     hash.pmc
     orderedhash.pmc
