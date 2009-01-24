@@ -1785,11 +1785,6 @@ A dynamically sized array which holds only String values.
 
 =over 4
 
-=item Pair
-
-A Pair PMC represents one key => value mapping.
-Thus it is like a one element hash or a two element array.
-
 =item Hash
 
 A container with key-value semantics. The values are PMCs.
