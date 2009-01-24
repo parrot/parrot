@@ -917,7 +917,7 @@ fail:
 emptyargs:
     result = fun()
 done:
-    .return(result)    
+    .return(result)
 .end
 
 #-----------------------------------------------------------------------

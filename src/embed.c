@@ -1089,7 +1089,7 @@ print_constant_table(PARROT_INTERP) {
                             /*Parrot_print_p(interp, c->u.key);*/
                             STRING * const s = VTABLE_get_string(interp, c->u.key);
                             if (s)
-                                Parrot_io_printf(interp, "%Ss",s);
+                                Parrot_io_printf(interp, "%Ss", s);
                             break;
                         }
                     case enum_class_Sub:
