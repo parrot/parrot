@@ -710,6 +710,7 @@ examples/pir/genprog.bas                                    [main]doc
 examples/pir/hanoi.pir                                      [main]doc
 examples/pir/hello-dwim.pir                                 [main]doc
 examples/pir/io.pir                                         [main]doc
+examples/pir/interlangs.bas                                 [main]doc
 examples/pir/levenshtein.pir                                [main]doc
 examples/pir/life.pir                                       [main]doc
 examples/pir/local_label.pir                                [main]doc
