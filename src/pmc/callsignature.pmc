@@ -30,8 +30,6 @@ information for a multiple dispatch call.
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
 pmclass CallSignature extends Capture need_ext provides array provides hash {
-    ATTR PMC    *array;      /* Positional arguments */
-    ATTR PMC    *hash;       /* Named arguments */
     ATTR PMC    *returns;    /* Result PMCs, if they were passed with the call */
     ATTR PMC    *type_tuple; /* Cached argument types for multiple dispatch */
     ATTR STRING *short_sig;  /* Simple string signature args & returns */

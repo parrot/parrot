@@ -26,7 +26,6 @@ pmclass PhpFloat
     group    php_group
     hll      PHP
     maps     Float {
-    ATTR FLOATVAL fv;
 
 /*
 

@@ -76,7 +76,7 @@ sub parse_pmc {
     my $lineno = count_newlines($preamble) + $chewed_lines + 1;
     my $class_init;
 
-    ($lineno, $pmcbody)    = find_attrs(  $pmc, $pmcbody, $lineno, $filename);
+    ($lineno, $pmcbody)    = find_attrs(  $pmc, $pmcbody, $lineno, $filename, $pmc2cMain);
     ($lineno, $class_init) = find_methods($pmc, $pmcbody, $lineno, $filename);
 
     $pmc->postamble( Parrot::Pmc2c::Emitter->text( $post, $filename, $lineno ) );
@@ -90,7 +90,26 @@ sub parse_pmc {
 }
 
 sub find_attrs {
-    my ($pmc, $pmcbody, $lineno, $filename) = @_;
+    my ($pmc, $pmcbody, $lineno, $filename, $pmc2cMain) = @_;
+
+    #prepend parent ATTRs to this PMC's ATTR list, if possible
+    my $got_attrs_from = '';
+    foreach my $parent ( @{ $pmc->{parents} } ) {
+
+        my $parent_dump = $pmc2cMain->read_dump( lc($parent) . '.dump' );
+
+        if ( $got_attrs_from ne '' && $parent_dump->{has_attribute} ) {
+            die "$filename is trying to extend $got_attrs_from and $parent, ".
+                "but both these PMCs have ATTRs.";
+        }
+
+        if ( $parent_dump->{has_attribute} ) {
+            $got_attrs_from = $parent;
+            foreach my $parent_attrs ( @{ $parent_dump->{attributes} } ) {
+                $pmc->add_attribute($parent_attrs);
+            }
+        }
+    }
 
     # backreferences here are all +1 because below the qr is wrapped in quotes
     my $attr_re = qr{
