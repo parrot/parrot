@@ -15,35 +15,34 @@
 #define PARROT_LIST_H_GUARD
 
 typedef struct List_chunk {
-    Buffer data;                /* item store */
-    UINTVAL flags;              /* chunk flags */
-    UINTVAL items;              /* items in this chunk */
-    UINTVAL n_chunks;           /* # of chunks with grow policy in flags */
-    UINTVAL n_items;            /* # of items with grow policy in flags */
+    Buffer             data;        /* item store */
     struct List_chunk *next;
     struct List_chunk *prev;
+    UINTVAL            flags;       /* chunk flags */
+    UINTVAL            items;       /* items in this chunk */
+    UINTVAL            n_chunks;    /* # of chunks with grow policy in flags */
+    UINTVAL            n_items;     /* # of items  with grow policy in flags */
 } List_chunk;
 
-#define sparse PObj_private0_FLAG
+#define sparse      PObj_private0_FLAG
 #define no_power_2  PObj_private1_FLAG
 #define fixed_items PObj_private2_FLAG
-#define grow_items PObj_private3_FLAG
+#define grow_items  PObj_private3_FLAG
 
 typedef struct List {
-    Buffer chunk_list;          /* pointers to chunks */
-    UINTVAL length;             /* number of items in list */
-    UINTVAL start;              /* offset, where array[0] is */
-    PMC * container;            /* the Array PMC */
-    PARROT_DATA_TYPE item_type; /* item type */
-    int item_size;              /* item size */
-    int items_per_chunk;        /* override defaults */
-    UINTVAL cap;                /* list capacity in items */
-    int grow_policy;            /* fixed / variable len */
-    UINTVAL collect_runs;       /* counter, when chunklist was built */
-    UINTVAL n_chunks;           /* number of chunks */
-    PMC * user_data;            /* e.g. multiarray dimensions */
-    List_chunk *first;          /* first chunk holding data */
-    List_chunk *last;           /* last chunk */
+    Buffer           chunk_list;      /* pointers to chunks */
+    PMC             *container;       /* the Array PMC */
+    List_chunk      *first;           /* first chunk holding data */
+    List_chunk      *last;            /* last chunk */
+    UINTVAL          length;          /* number of items in list */
+    UINTVAL          start;           /* offset, where array[0] is */
+    PARROT_DATA_TYPE item_type;       /* item type */
+    UINTVAL          cap;             /* list capacity in items */
+    UINTVAL          collect_runs;    /* counter, when chunklist was built */
+    UINTVAL          n_chunks;        /* number of chunks */
+    int              grow_policy;     /* fixed / variable len */
+    int              items_per_chunk; /* override defaults */
+    int              item_size;       /* item size */
 } List;
 
 typedef enum {

@@ -368,12 +368,14 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     chunk->prev     = NULL;
     Parrot_allocate_aligned(interp, (Buffer *)chunk, size);
     memset(PObj_bufstart((Buffer*)chunk), 0, size);
+
     /* see also src/hash.c */
-    if (list->container) {
+    if (list->container)
         GC_WRITE_BARRIER(interp, list->container, 0, chunk);
-    }
+
     Parrot_unblock_GC_mark(interp);
-    /*Parrot_unblock_GC_sweep(interp); */
+
+    /* Parrot_unblock_GC_sweep(interp); */
     return chunk;
 }
 
@@ -524,6 +526,7 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
         }
         prev = chunk;
     }
+
     if (changes)
         rebuild_chunk_ptrs(list, 0);
 }
@@ -1268,32 +1271,33 @@ list_new(PARROT_INTERP, PARROT_DATA_TYPE type)
 
     list->item_type = type;
     switch (type) {
-    case enum_type_sized:       /* gets overridden below */
-    case enum_type_char:
-        list->item_size = sizeof (char);
-        break;
-    case enum_type_short:
-        list->item_size = sizeof (short);
-        break;
-    case enum_type_int:
-        list->item_size = sizeof (int);
-        break;
-    case enum_type_INTVAL:
-        list->item_size = sizeof (INTVAL);
-        break;
-    case enum_type_FLOATVAL:
-        list->item_size = sizeof (FLOATVAL);
-        break;
-    case enum_type_PMC:
-        list->item_size = sizeof (PMC *);
-        break;
-    case enum_type_STRING:
-        list->item_size = sizeof (STRING *);
-        break;
-    default:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list type\n");
-        break;
+        case enum_type_sized:       /* gets overridden below */
+        case enum_type_char:
+            list->item_size = sizeof (char);
+            break;
+        case enum_type_short:
+            list->item_size = sizeof (short);
+            break;
+        case enum_type_int:
+            list->item_size = sizeof (int);
+            break;
+        case enum_type_INTVAL:
+            list->item_size = sizeof (INTVAL);
+            break;
+        case enum_type_FLOATVAL:
+            list->item_size = sizeof (FLOATVAL);
+            break;
+        case enum_type_PMC:
+            list->item_size = sizeof (PMC *);
+            break;
+        case enum_type_STRING:
+            list->item_size = sizeof (STRING *);
+            break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown list type\n");
+            break;
     }
+
     return list;
 }
 
@@ -1312,10 +1316,12 @@ void
 list_pmc_new(PARROT_INTERP, ARGMOD(PMC *container))
 {
     ASSERT_ARGS(list_pmc_new)
-    List * const l = list_new(interp, enum_type_PMC);
-    l->container = container;
+
+    List * const l      = list_new(interp, enum_type_PMC);
+    l->container        = container;
     PMC_data(container) = l;
 }
+
 
 /*
 
@@ -1328,9 +1334,6 @@ C<list_new_init()> uses these initializers:
     2 ... type (overriding type parameter)
     3 ... item_size for enum_type_sized
     4 ... items_per_chunk
-
-After getting these values out of the key/value pairs, a new array with
-these values is stored in user_data, where the keys are explicit.
 
 =cut
 
@@ -1391,7 +1394,9 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init))
                     "Invalid initializer for list\n");
         }
     }
+
     list = list_new(interp, type);
+
     if (list->item_type == enum_type_sized) { /* override item_size */
 
         if (!item_size)
@@ -1404,12 +1409,13 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init))
                 ? (1 << (ld(items_per_chunk) + 1)) /* make power of 2 */
                 : MAX_ITEMS;
     }
+
     if (size)
         list_set_length(interp, list, size);
-    /* make a private copy of init data */
-    list->user_data = user_array = pmc_new(interp, enum_class_SArray);
+
     /* set length */
     VTABLE_set_integer_native(interp, user_array, 2);
+
     /* store values */
     VTABLE_set_integer_keyed_int(interp, user_array, 0,  size);
     VTABLE_set_pmc_keyed_int(interp, user_array, 1, multi_key);
@@ -1431,14 +1437,12 @@ void
 list_pmc_new_init(PARROT_INTERP, ARGMOD(PMC *container), ARGIN(PMC *init))
 {
     ASSERT_ARGS(list_pmc_new_init)
-    List * const l = list_new_init(interp, enum_type_PMC, init);
-    l->container = container;
+
+    List * const l      = list_new_init(interp, enum_type_PMC, init);
+    l->container        = container;
     PMC_data(container) = l;
-    /*
-     * this is a new PMC, so no old value
-     */
-    GC_WRITE_BARRIER(interp, container, NULL, l->user_data);
 }
+
 
 /*
 
@@ -1510,9 +1514,7 @@ list_clone(PARROT_INTERP, ARGIN(const List *other))
             }
         }
     }
-    if (other->user_data) {
-        l->user_data = VTABLE_clone(interp, other->user_data);
-    }
+
     rebuild_chunk_list(interp, l);
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
@@ -1552,9 +1554,8 @@ list_mark(PARROT_INTERP, ARGMOD(List *list))
 
         }
     }
+
     pobject_lives(interp, (PObj *)list);
-    if (list->user_data)
-        pobject_lives(interp, (PObj *) list->user_data);
 }
 
 /*
