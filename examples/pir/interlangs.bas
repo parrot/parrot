@@ -13,9 +13,9 @@
 200 REM +--------------------------------------------------------------------+
 210 REM
 1000 REM Load languages
-1010 gosub 2000
+1010 GOSUB 2000
 1020 REM Compile code
-1030 gosub 3000
+1030 GOSUB 3000
 1200 REM Execute compiled code
 1210 REM Forget the return value from ecmascript
 1220 unused= jsblock()
@@ -27,8 +27,8 @@
 1319 REM *** This syntax is subject to change ***
 1320 myfunc= js.myecmascriptfunc
 1330 REM Call the perl6 sub passing the ecmascript function as second argument
-1340 print perl6sub("pirric", myfunc)
-1600 REM First the ecmascript function print his message,
+1340 PRINT perl6sub("pirric", myfunc)
+1600 REM First the ecmascript function PRINT his message,
 1610 REM then the parrot sub returns a string,
 1620 REM that is printed by pirric.
 1630 REM The output must be:
@@ -37,27 +37,34 @@
 1660 REM Hello from a perl6 sub, pirric
 1670 REM
 1900 REM That's all folks!
-1910 exit
+1910 EXIT
 3000 REM
 3010 REM Compile code
 3020 REM
 3100 REM Perl6 code that return an anonymous sub
-3110 perl6block=perl6compiler.compile("sub ($a, $b){$b(); 'Hello from a perl6 sub, ' ~ $a; };")
+3110 ON ERROR GOTO 3900
+3120 perl6block=perl6compiler.compile("sub ($a, $b){$b(); 'Hello from a perl6 sub, ' ~ $a; };")
 3200 REM ecmascript code that defines a function
-3210 jsblock=ecmascriptcompiler.compile("function myecmascriptfunc() { print ('Hello from ecmascript'); }")
-3800 return
+3210 ON ERROR GOTO 3920
+3220 jsblock=ecmascriptcompiler.compile("function myecmascriptfunc() { print ('Hello from ecmascript'); }")
+3800 ON ERROR GOTO 0
+3810 RETURN
+3900 PRINT "Error compiling perl6"
+3910 EXIT 1
+3920 PRINT "Error compiling ecmascript"
+3930 EXIT 1
 2000 REM
 2010 REM Load languages
 2020 REM
-2100 on error goto 2900
-2110 load "perl6.pbc", b
-2120 perl6compiler = compreg("Perl6")
-2200 on error goto 2920
-2210 load "js.pbc", b
-2220 ecmascriptcompiler= compreg("JS")
-2800 on error goto 0
-2810 return
-2900 print "Can't load perl6"
-2910 exit
-2920 print "Can't load ecmascript"
-2930 exit
+2100 ON ERROR GOTO 2900
+2110 LOAD "perl6.pbc", b
+2120 perl6compiler = COMPREG("Perl6")
+2200 ON ERROR GOTO 2920
+2210 LOAD "js.pbc", b
+2220 ecmascriptcompiler= COMPREG("JS")
+2800 ON ERROR GOTO 0
+2810 RETURN
+2900 PRINT "Can't load perl6"
+2910 EXIT 1
+2920 PRINT "Can't load ecmascript"
+2930 EXIT 1

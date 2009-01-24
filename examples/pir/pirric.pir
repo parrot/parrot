@@ -407,8 +407,14 @@ done:
 .sub set_error_goto :method
     .param int code
 
+    .local int newmode
+    newmode = PIRRIC_ERROR_GOTO
+    ne code, 0, setmode
+    # ON ERROR GOTO 0 means use default error handling
+    newmode = PIRRIC_ERROR_NORMAL
+setmode:
     $P0 = getattribute self, 'errormode'
-    $P0 = PIRRIC_ERROR_GOTO
+    $P0 = newmode
     $P1 = getattribute self, 'errorvalue'
     $P1 = code
 .end
