@@ -516,7 +516,7 @@ up-gil:
 	cd gil && $(GIT) pull
 
 co-hq9plus:
-    - $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
+	- $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
 
 up-hq9plus:
 	cd hq9plus && $(GIT) pull
