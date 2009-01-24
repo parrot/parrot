@@ -42,6 +42,8 @@
 .include 'except_types.pasm'
 .include 'cclass.pasm'
 
+.include 'warnings.pasm'
+
 #-----------------------------------------------------------------------
 
 .sub pirric_aux_loadbytecode
@@ -59,6 +61,8 @@
 
 #-----------------------------------------------------------------------
 .sub init :load :init
+
+    warningson .PARROT_WARNINGS_DEPRECATED_FLAG
 
     .local pmc func
     func = get_global ['Tokenizer'], 'newTokenizer'
