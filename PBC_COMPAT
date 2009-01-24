@@ -27,7 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
-3.34	2009.01.23	coke	removed intlist PMC
+3.34	2009.01.23	coke	removed intlist, enumerate PMCs
 3.33    2009.01.20	chromatic	removed n_neg opcode
 3.32    2009.01.19	chromatic	removed remaining n_* math/bitwise ops
 3.31    2009.01.12	whiteknight	remove stm.ops and all opcodes therein
