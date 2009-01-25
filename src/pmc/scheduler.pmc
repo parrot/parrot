@@ -513,11 +513,12 @@ If no type argument is passed, counts all handlers.
     METHOD count_handlers(STRING *type :optional, INTVAL have_type :opt_flag) {
         /* avoid uninitialized value warning */
         PMC   *handlers = NULL;
-        INTVAL elements = VTABLE_elements(INTERP, handlers);
+        INTVAL elements;
         INTVAL count    = 0;
         INTVAL index;
 
         GET_ATTR_handlers(INTERP, SELF, handlers);
+        elements = VTABLE_elements(INTERP, handlers);
 
         if (!have_type)
             RETURN(INTVAL elements);

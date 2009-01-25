@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 31;
 
 =head1 NAME
 
@@ -713,6 +713,45 @@ end:
 .end
 CODE
 no segfault
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "count_eh" );
+.sub main :main
+    $I0 = count_eh
+    if $I0 == 0 goto right_number1
+        print "not "
+    right_number1:
+    print "ok 1\n"
+    push_eh _handler1
+    push_eh _handler2
+    print "ok 2\n"
+    $I1 = count_eh
+    if $I1 == 2 goto right_number2
+        print "not "
+    right_number2:
+    print "ok 3\n"
+    pop_eh
+    pop_eh
+    print "ok 4\n"
+    $I2 = count_eh
+    if $I2 == 0 goto right_number3
+        print "not "
+    right_number3:
+    print "ok 5\n"
+    end
+_handler1:
+    print "first handler\n"
+    end
+_handler2:
+    print "second handler\n"
+    end
+.end
+CODE
+ok 1
+ok 2
+ok 3
+ok 4
+ok 5
 OUTPUT
 
 # Local Variables:

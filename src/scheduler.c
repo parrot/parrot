@@ -559,6 +559,73 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 
 /*
 
+=item C<INTVAL Parrot_cx_count_handlers_local>
+
+Count the number of active handlers of a particular type from the
+context's list of handlers.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_cx_count_handlers_local(PARROT_INTERP, ARGIN(STRING *handler_type))
+{
+    ASSERT_ARGS(Parrot_cx_count_handlers_local)
+    PMC *handlers = CONTEXT(interp)->handlers;
+    INTVAL elements;
+
+    if (PMC_IS_NULL(handlers))
+        return 0;
+
+    elements = VTABLE_elements(interp, handlers);
+
+    if (STRING_IS_NULL(handler_type) || STRING_IS_EMPTY(handler_type))
+        return elements;
+
+    /* Loop from newest handler to oldest handler. */
+    {
+        STRING      *exception_str = CONST_STRING(interp, "exception");
+        STRING      *event_str     = CONST_STRING(interp, "event");
+        STRING      *handler_str   = CONST_STRING(interp, "ExceptionHandler");
+        INTVAL       count = 0;
+        INTVAL       index;
+        typedef enum { Hunknown,  Hexception, Hevent } Htype;
+
+        const Htype htype =
+            (string_equal(interp, handler_type, exception_str) == 0) ?
+            Hexception :
+            (string_equal(interp, handler_type, event_str) == 0) ?
+                Hevent :
+                Hunknown;
+        STRING * const handler_name = (htype == Hexception) ?
+            handler_str : (STRING *) NULL;
+
+        for (index = 0; index < elements; ++index) {
+            PMC *handler = VTABLE_get_pmc_keyed_int(interp, handlers, index);
+            if (!PMC_IS_NULL(handler)) {
+                switch (htype) {
+                case Hexception:
+                        if (VTABLE_isa(interp, handler, handler_name))
+                            count++;
+                        break;
+                    case Hevent:
+                        if (handler->vtable->base_type == enum_class_EventHandler)
+                            count++;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return count;
+    }
+}
+
+
+/*
+
 =item C<void Parrot_cx_add_handler>
 
 Add a task handler to scheduler's list of handlers.
@@ -625,7 +692,7 @@ Parrot_cx_count_handlers_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 
-    Parrot_PCCINVOKE(interp, interp->scheduler, CONST_STRING(interp, "count_handlers"), "S->I", handler_type, count);
+    Parrot_PCCINVOKE(interp, interp->scheduler, CONST_STRING(interp, "count_handlers"), "S->I", handler_type, &count);
 
     return count;
 }

@@ -866,7 +866,7 @@ inline op rethrow(invar PMC) :flow {
 }
 
 inline op count_eh(out INT) {
-    $1 = Parrot_cx_count_handlers_typed(interp,
+    $1 = Parrot_cx_count_handlers_local(interp,
             string_from_cstring(interp, "exception", 9));
 }
 
