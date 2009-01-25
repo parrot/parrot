@@ -317,6 +317,7 @@ OUT
 TODO: {
     local $TODO = "Hardlinks to a directory may require root permissions";
 
+    my $prevnl = [ stat("tools") ]->[3];
     pir_output_is( <<'CODE', <<"OUT", "Test dirlink" );
 .sub main :main
         $P1 = new ['OS']
@@ -334,7 +335,7 @@ ok
 OUT
 
     my $nl = [ stat("tools") ]->[3];
-    ok( $nl > 1, "hard link to dir was really created" );
+    ok( $nl > $prevnl, "hard link to dir was really created" );
     unlink "xpto" if -d "xpto";
 }
 
