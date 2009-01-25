@@ -75,7 +75,6 @@ END
 
     for my $pmc ( split( /\s+/, $pmc_list ) ) {
         $pmc =~ s/\.pmc$//;
-        next if $pmc =~ /^const/;
 
         # make each pmc depend upon its parent.
         my $parent_dumps = '';
@@ -124,7 +123,6 @@ END
     my %parents;
 
 PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
-        next if $pmc_file =~ /^const/;
 
         open my $PMC, "<", "src/pmc/$pmc_file"
             or die "open src/pmc/$pmc_file: $!";

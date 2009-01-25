@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  36;
+use Test::More tests =>  32;
 use Carp;
 use Cwd;
 use File::Path qw| mkpath |;
@@ -213,91 +213,6 @@ my @dummy_options = qw(
     undef.pmc
 );
 my $dummy_options = join q{ } => @dummy_options;
-
-($args, $step_list_ref) = process_options(
-    {
-        argv => [ qq{--pmc=$dummy_options} ],
-        mode => q{configure},
-    }
-);
-
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-$ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-
-$conf->replenish($serialized);
-
-########## --pmc ##########
-
-@dummy_options = qw(
-    default.pmc
-    null.pmc
-    env.pmc
-    key.pmc
-    random.pmc
-    unmanagedstruct.pmc
-    managedstruct.pmc
-    constexception.pmc
-    parrotlibrary.pmc
-    parrotinterpreter.pmc
-    parrotthread.pmc
-    lexpad.pmc
-    timer.pmc
-    pointer.pmc
-    sub.pmc
-    continuation.pmc
-    retcontinuation.pmc
-    exceptionhandler.pmc
-    coroutine.pmc
-    eval.pmc
-    nci.pmc
-    float.pmc
-    integer.pmc
-    bigint.pmc
-    complex.pmc
-    string.pmc
-    boolean.pmc
-    ref.pmc
-    sharedref.pmc
-    array.pmc
-    fixedintegerarray.pmc
-    iterator.pmc
-    fixedstringarray.pmc
-    hash.pmc
-    orderedhash.pmc
-    tqueue.pmc
-    os.pmc
-    file.pmc
-    addrregistry.pmc
-    bound_nci.pmc
-    capture.pmc
-    class.pmc
-    codestring.pmc
-    exporter.pmc
-    fixedbooleanarray.pmc
-    fixedfloatarray.pmc
-    fixedpmcarray.pmc
-    lexinfo.pmc
-    multisub.pmc
-    namespace.pmc
-    object.pmc
-    parrotrunningthread.pmc
-    pccmethod_test.pmc
-    pmcproxy.pmc
-    resizablebooleanarray.pmc
-    resizablefloatarray.pmc
-    resizableintegerarray.pmc
-    resizablepmcarray.pmc
-    resizablestringarray.pmc
-    role.pmc
-    scalar.pmc
-    scheduler.pmc
-    slice.pmc
-    task.pmc
-    undef.pmc
-);
-$dummy_options = join q{ } => @dummy_options;
 
 ($args, $step_list_ref) = process_options(
     {
