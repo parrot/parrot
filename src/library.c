@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2007, The Perl Foundation.
+Copyright (C) 2004-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -798,11 +798,14 @@ parrot_split_path_ext(PARROT_INTERP, ARGMOD(STRING *in),
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
      */
-    const char * charset = Parrot_charset_c_name(interp,
-        Parrot_charset_number_of_str(interp, in) );
-    STRING * const slash1 = string_make(interp, "/", 1, charset, PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const slash2 = string_make(interp, "\\", 1, charset, PObj_external_FLAG|PObj_constant_FLAG);
-    STRING * const dot    = string_make(interp, ".", 1, charset, PObj_external_FLAG|PObj_constant_FLAG);
+    const char *   charset = Parrot_charset_c_name(interp,
+            Parrot_charset_number_of_str(interp, in));
+    STRING * const slash1  = string_make(interp, "/", 1, charset,
+            PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const slash2  = string_make(interp, "\\", 1, charset,
+            PObj_external_FLAG|PObj_constant_FLAG);
+    STRING * const dot     = string_make(interp, ".", 1, charset,
+            PObj_external_FLAG|PObj_constant_FLAG);
 
     const INTVAL len = string_length(interp, in);
     STRING *stem;
