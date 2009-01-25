@@ -231,7 +231,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
 # @args hold default.pmc and 3 other .pmc files in dependency order
 {
-    my $tdir = tempdir( CLEANUP => 0 );
+    my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
@@ -292,7 +292,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 # how should a missing dependency be handled?
 # scalar requires integer
 {
-    my $tdir = tempdir( CLEANUP => 0 );
+    my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
