@@ -22,6 +22,8 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 #include "parrot/parrot.h"
 
 pmclass FixedFloatArray need_ext provides array {
+    ATTR INTVAL    size;
+    ATTR FLOATVAL *float_array;
 
 /*
 
@@ -40,8 +42,9 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        PMC_int_val(SELF) = 0;
-        PMC_data(SELF)    = NULL;
+        Parrot_FixedFloatArray_attributes* attrs =
+            mem_allocate_zeroed_typed(Parrot_FixedFloatArray_attributes);
+        PMC_data(SELF) = attrs;
     }
 
 /*
@@ -55,11 +58,12 @@ Destroys the array.
 */
 
     VTABLE void destroy() {
-        if (PMC_data(SELF))
-            mem_sys_free(PMC_data(SELF));
+        FLOATVAL *float_array;
+        GET_ATTR_float_array(INTERP, SELF, float_array);
+        if (float_array)
+            mem_sys_free(float_array);
 
-        PMC_data(SELF)    = NULL;
-        PMC_int_val(SELF) = 0;
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -73,19 +77,22 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        INTVAL size;
+        INTVAL    size;
+        FLOATVAL *self_float_array, *dest_float_array;
         size_t mem_size;
         PMC   * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        GET_ATTR_float_array(INTERP, SELF, self_float_array);
 
-        if (!PMC_data(SELF))
+        if (!self_float_array)
             return dest;
 
-        size              = PMC_int_val(SELF);
-        PMC_int_val(dest) = size;
+        GET_ATTR_size(INTERP, SELF, size);
+        SET_ATTR_size(INTERP, dest, size);
         mem_size          = size * sizeof (FLOATVAL);
 
-        PMC_data(dest)    = mem_sys_allocate(mem_size);
-        mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), mem_size);
+        dest_float_array  = (FLOATVAL*)mem_sys_allocate(mem_size);
+        mem_sys_memcopy(dest_float_array, self_float_array, mem_size);
+        SET_ATTR_float_array(INTERP, dest, dest_float_array);
         PObj_active_destroy_SET(dest);
 
         return dest;
@@ -115,7 +122,9 @@ fixed sized array).
 */
 
     VTABLE INTVAL elements() {
-        return PMC_int_val(SELF);
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
     }
 
 /*
@@ -176,14 +185,16 @@ Returns the floating-point value of the element at index C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        FLOATVAL *data;
+        FLOATVAL *float_array;
+        INTVAL    size;
 
-        if (key < 0 || key >= PMC_int_val(SELF))
+        GET_ATTR_size(INTERP, SELF, size);
+        if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedFloatArray: index out of bounds!");
 
-        data = (FLOATVAL *)PMC_data(SELF);
-        return data[key];
+        GET_ATTR_float_array(INTERP, SELF, float_array);
+        return float_array[key];
     }
 
 /*
@@ -275,13 +286,16 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL size) {
-        if (PMC_int_val(SELF) || size < 1)
+    VTABLE void set_integer_native(INTVAL new_size) {
+        INTVAL old_size;
+        GET_ATTR_size(INTERP, SELF, old_size);
+        if (old_size || new_size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "FixedFloatArray: Can't resize!");
 
-        PMC_int_val(SELF) = size;
-        PMC_data(SELF)    = mem_sys_allocate(size * sizeof (FLOATVAL));
+        SET_ATTR_size(INTERP, SELF, new_size);
+        SET_ATTR_float_array(INTERP, SELF, 
+                mem_allocate_n_typed(new_size, FLOATVAL));
         PObj_active_destroy_SET(SELF);
     }
 
@@ -326,13 +340,16 @@ C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        FLOATVAL *data;
-        if (key < 0 || key >= PMC_int_val(SELF))
+        FLOATVAL *float_array;
+        INTVAL size;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedFloatArray: index out of bounds!");
 
-        data      = (FLOATVAL *)PMC_data(SELF);
-        data[key] = value;
+        GET_ATTR_float_array(INTERP, SELF, float_array);
+        float_array[key] = value;
     }
 
 /*
