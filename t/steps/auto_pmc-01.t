@@ -144,6 +144,9 @@ my $cwd = cwd();
 $conf->replenish($serialized);
 
 ########## --pmc ##########
+# What happens when user tells Configure.pl to use only 
+# specified PMCs to build Parrot?
+###########################
 
 my @dummy_options = qw(
     default.pmc
