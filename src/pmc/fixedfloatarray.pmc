@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -294,7 +294,7 @@ Resizes the array to C<size> elements.
                     "FixedFloatArray: Can't resize!");
 
         SET_ATTR_size(INTERP, SELF, new_size);
-        SET_ATTR_float_array(INTERP, SELF, 
+        SET_ATTR_float_array(INTERP, SELF,
                 mem_allocate_n_typed(new_size, FLOATVAL));
         PObj_active_destroy_SET(SELF);
     }
