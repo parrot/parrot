@@ -3,11 +3,11 @@
 
 =head1 NAME
 
-lazy-k/t/calc.t - testing calc.lazy
+t/calc.t - testing calc.lazy
 
 =head1 SYNOPSIS
 
-    % cd languages && perl lazy-k/t/calc.t
+    % cd languages/lazy-k && perl lazy-k/t/calc.t
 
 =head1 DESCRIPTION
 
@@ -32,7 +32,7 @@ my $is_win32  = $^O eq 'MSWin32';
 
 my $parrot    = File::Spec->catfile( File::Spec->updir(), File::Spec->updir(), $PConfig{test_prog} );
 my $lazy_k    = "$parrot lazy.pbc";
-my $source_fn = 'calc.lazy'; 
+my $source_fn = 'examples/calc.lazy'; 
 
 # XXX This does not look portable.
 my $cmd;

@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -7,7 +7,7 @@ lazy-k/t/cat.t - testing cat.lazy
 
 =head1 SYNOPSIS
 
-    % cd languages && perl lazy-k/t/cat.t
+    % cd languages/lazy-k && perl t/cat.t
 
 =head1 DESCRIPTION
 
@@ -24,7 +24,6 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Data::Dumper;
 use Test::More       tests => 1;
 use Parrot::Config   qw(%PConfig);
 use File::Spec       ();
@@ -33,7 +32,7 @@ my $is_win32  = $^O eq 'MSWin32';
 
 my $parrot    = File::Spec->catfile( File::Spec->updir(), File::Spec->updir(), $PConfig{test_prog} );
 my $lazy_k    = "$parrot lazy.pbc";
-my $source_fn = 'cat.lazy'; 
+my $source_fn = 'examples/cat.lazy'; 
 
 # XXX This does not look portable.
 my $cmd;
@@ -45,5 +44,4 @@ else {
     $cmd = qq{echo '1+2*3' | $lazy_k $source_fn};
 }
 
-# die Dumper( $cmd );
 is( `$cmd`, "1+2*3\n", 'cat.lazy' );
