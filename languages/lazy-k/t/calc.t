@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -24,16 +24,15 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
-use Data::Dumper;
-use Test::More tests => 1;
-use Parrot::Config;
-use File::Spec();
+use Test::More       tests => 1;
+use Parrot::Config   qw(%PConfig);
+use File::Spec       ();
 
 my $is_win32  = $^O eq 'MSWin32';
 
-my $parrot    = File::Spec->catfile( File::Spec->updir(), $PConfig{test_prog} );
-my $lazy_k    = $parrot . q{ } . File::Spec->catfile( 'lazy-k', 'lazy.pbc' );
-my $source_fn = File::Spec->catfile( 'lazy-k', 'calc.lazy' ); 
+my $parrot    = File::Spec->catfile( File::Spec->updir(), File::Spec->updir(), $PConfig{test_prog} );
+my $lazy_k    = "$parrot lazy.pbc";
+my $source_fn = 'calc.lazy'; 
 
 # XXX This does not look portable.
 my $cmd;
@@ -45,5 +44,4 @@ else {
     $cmd = qq{echo '1+2*3' | $lazy_k $source_fn};
 }
 
-# die Dumper( $cmd );
 is( `$cmd`, "7\n", 'calc.lazy' );

@@ -50,4 +50,4 @@ realclean: clean
 
 # testing
 test: build
-	cd .. && $(PERL) t/harness --languages=lazy-k
+	$(PERL) t/harness

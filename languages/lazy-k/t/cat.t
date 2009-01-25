@@ -25,15 +25,15 @@ use FindBin;
 use lib "$FindBin::Bin/../../../lib";
 
 use Data::Dumper;
-use Test::More tests => 1;
-use Parrot::Config;
-use File::Spec();
+use Test::More       tests => 1;
+use Parrot::Config   qw(%PConfig);
+use File::Spec       ();
 
 my $is_win32  = $^O eq 'MSWin32';
 
-my $parrot    = File::Spec->catfile( File::Spec->updir(), $PConfig{test_prog} );
-my $lazy_k    = $parrot . q{ } . File::Spec->catfile( 'lazy-k', 'lazy.pbc' );
-my $source_fn = File::Spec->catfile( 'lazy-k', 'cat.lazy' ); 
+my $parrot    = File::Spec->catfile( File::Spec->updir(), File::Spec->updir(), $PConfig{test_prog} );
+my $lazy_k    = "$parrot lazy.pbc";
+my $source_fn = 'cat.lazy'; 
 
 # XXX This does not look portable.
 my $cmd;
