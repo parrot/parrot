@@ -1,51 +1,22 @@
 =head1 NAME
 
-parrothist - the parrot history records
+parrothist - Parrot Release History
 
 =head1 DESCRIPTION
 
-This document aims to record the parrot source code releases.
+This document records Parrot source code releases, and their release managers.
 
-=head1 INTRODUCTION
-
-Parrot history in brief...
-
-... ok, done!
-
-=head1 THE KEEPERS OF THE PUMPKIN
+=head1 RELEASE MANAGERS
 
 Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
 Patrick Michaud, Will Coleda, Matt Diephouse, chromatic, Allison Randal,
-Jonathan Worthington.
+Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth.
 
-=head2 PUMPKIN?
-
-[from Porting/pumpkin.pod in the Perl source code distribution]
-
-Chip Salzenberg gets credit for that, with a nod to his coworker,
-David Croy.  We had passed around various names (baton, token, hot
-potato) but none caught on.  Then, Chip asked:
-
-[begin quote]
-
-   Who has the patch pumpkin?
-
-To explain:  David Croy once told me once that at a previous job,
-there was one tape drive and multiple systems that used it for backups.
-But instead of some high-tech exclusion software, they used a low-tech
-method to prevent multiple simultaneous backups: a stuffed pumpkin.
-No one was allowed to make backups unless they had the "backup pumpkin".
-
-[end quote]
-
-The name has stuck.  The holder of the pumpkin is sometimes called
-the pumpking (keeping the source afloat?) or the pumpkineer (pulling
-the strings?).
 
 =head1 THE RECORDS
 
- Pump-       Release        Date            Release name
- king
+ Release     Release        Date            Release name
+ Manager
  ===========================================================================
 
  Simon       0.0.1          2001-Sep-10     n/a
