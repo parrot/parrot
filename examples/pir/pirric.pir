@@ -31,10 +31,13 @@
 # - Predefined string functions: CHR$, ASC, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
 # - Indexing with [ ]
-# - Special functions: NEW, ISA, COMPREG
+# - Special functions: NEW, ISA, COMPREG, GETPARROTINTERP
 # - Calls to methods in foreign objects
 # - Calls to functions in foreign namespaces
-
+#
+# Command line options:
+# -t Trace on. Same as the TRON instruction
+# -p all remaining arguments are executed as PRINT instructions
 #-----------------------------------------------------------------------
 
 .include 'iterator.pasm'
@@ -126,6 +129,7 @@
     predefs = new 'Hash'
     setpredef(predefs, 'NEW')
     setpredef(predefs, 'ISA')
+    setpredef(predefs, 'GETPARROTINTERP')
     setpredef(predefs, 'CHR$', 'CHR_S')
     setpredef(predefs, 'ASC')
     setpredef(predefs, 'LEN')
@@ -204,6 +208,7 @@ read_args:
     .local string arg
     arg = args[$I1]
     if arg == '-t' goto opt_tron
+    if arg == '-p' goto print_items
 
     #say arg
     program.'load'(arg)
@@ -215,6 +220,18 @@ opt_tron:
     runner.'trace'(1)
     inc $I1
     goto read_args
+
+print_items:
+    .local pmc tokenizer
+    inc $I1
+    le $I0, $I1, print_end
+    $S9 = args [$I1]
+    tokenizer = newTokenizer($S9)
+    runner.'func_PRINT'(tokenizer)
+    null tokenizer
+    goto print_items
+print_end:
+    exit 0
 
 no_prog:
     $I0 = 0
@@ -603,6 +620,15 @@ fail:
     .return($P0)
 fail:
     SyntaxError()
+.end
+
+#-----------------------------------------------------------------------
+
+.sub predef_GETPARROTINTERP :method
+    .param pmc tokenizer
+
+    $P0 = getinterp
+    .return($P0)
 .end
 
 #-----------------------------------------------------------------------
