@@ -477,6 +477,7 @@ INSTALLABLEPINFO    = $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPDB      = $(CUR_DIR)/installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG   = $(CUR_DIR)/installable_parrot_config$(EXE)
+INSTALLABLEPERL6    = $(CUR_DIR)/installable_perl6$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -742,7 +743,7 @@ world : all parrot_utils
 
 parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLECONFIG)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLECONFIG) $(INSTALLABLEPERL6)
 
 
 flags_dummy :
@@ -785,6 +786,11 @@ $(PERL6) : compilers $(PBC_TO_EXE)
 	$(CP) languages/perl6/perl6$(EXE) $(PERL6)
 	$(CHMOD) 0755 $(PERL6)
 	$(PERL6) -e"say 'Hello, world.'"
+
+$(INSTALLABLEPERL6) : $(PERL6)
+	$(MAKE) languages/perl6 installable_perl6$(EXE)
+	$(CP) languages/perl6/installable_perl6$(EXE) $(INSTALLABLEPERL6)
+	$(CHMOD) 0755 $(INSTALLABLEPERL6)
 
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
