@@ -31,7 +31,7 @@
 # - Predefined string functions: CHR$, ASC, LEN, LEFT$, RIGHT$, MID$
 # - Parenthesis
 # - Indexing with [ ]
-# - Special functions: NEW, ISA
+# - Special functions: NEW, ISA, COMPREG
 # - Calls to methods in foreign objects
 # - Calls to functions in foreign namespaces
 
@@ -110,6 +110,7 @@
     setkeyword(keywords, 'LIST')
     setkeyword(keywords, 'LOAD')
     setkeyword(keywords, 'NEXT')
+    setkeyword(keywords, 'NEW')
     setkeyword(keywords, 'ON')
     setkeyword(keywords, 'PRINT')
     setkeyword(keywords, 'REM')
@@ -123,28 +124,28 @@
 
     .local pmc predefs
     predefs = new 'Hash'
-    setpredef(predefs, 'NEW', 'new')
-    setpredef(predefs, 'ISA', 'isa')
-    setpredef(predefs, 'CHR$', 'chr')
-    setpredef(predefs, 'ASC', 'asc')
-    setpredef(predefs, 'LEN', 'len')
-    setpredef(predefs, 'LEFT$', 'left')
-    setpredef(predefs, 'RIGHT$', 'right')
-    setpredef(predefs, 'MID$', 'mid')
-    setpredef(predefs, 'COMPLEX', 'complex')
-    setpredef(predefs, 'COMPREG', 'compreg')
-    setpredef(predefs, 'EXP', 'exp')
-    setpredef(predefs, 'LN', 'ln')
-    setpredef(predefs, 'SIN', 'sin')
-    setpredef(predefs, 'SINH', 'sinh')
-    setpredef(predefs, 'COS', 'cos')
-    setpredef(predefs, 'COSH', 'cosh')
-    setpredef(predefs, 'TAN', 'tan')
-    setpredef(predefs, 'TANH', 'tanh')
-    setpredef(predefs, 'ASIN', 'asin')
-    setpredef(predefs, 'ACOS', 'acos')
-    setpredef(predefs, 'ATAN', 'atan')
-    setpredef(predefs, 'SQR', 'sqr')
+    setpredef(predefs, 'NEW')
+    setpredef(predefs, 'ISA')
+    setpredef(predefs, 'CHR$', 'CHR_S')
+    setpredef(predefs, 'ASC')
+    setpredef(predefs, 'LEN')
+    setpredef(predefs, 'LEFT$', 'LEFT_S')
+    setpredef(predefs, 'RIGHT$', 'RIGHT_S')
+    setpredef(predefs, 'MID$', 'MID_S')
+    setpredef(predefs, 'COMPLEX')
+    setpredef(predefs, 'COMPREG')
+    setpredef(predefs, 'EXP')
+    setpredef(predefs, 'LN')
+    setpredef(predefs, 'SIN')
+    setpredef(predefs, 'SINH')
+    setpredef(predefs, 'COS')
+    setpredef(predefs, 'COSH')
+    setpredef(predefs, 'TAN')
+    setpredef(predefs, 'TANH')
+    setpredef(predefs, 'ASIN')
+    setpredef(predefs, 'ACOS')
+    setpredef(predefs, 'ATAN')
+    setpredef(predefs, 'SQR')
     set_global 'predefs', predefs
 
 # Create classes for control flow exceptions
@@ -244,8 +245,12 @@ good:
 .sub setpredef
     .param pmc predefs
     .param string key
-    .param string name
+    .param string name :optional
+    .param int has_name :opt_flag
 
+    if has_name goto setfuncname
+    name = key
+setfuncname:
     .local string funcname
     funcname = concat 'predef_', name
 
@@ -551,7 +556,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_new :method
+.sub predef_NEW :method
     .param pmc tokenizer
 
     .local pmc args
@@ -586,7 +591,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_isa :method
+.sub predef_ISA :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -601,7 +606,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_chr :method
+.sub predef_CHR_S :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -620,7 +625,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_asc :method
+.sub predef_ASC :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -637,7 +642,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_len :method
+.sub predef_LEN :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -655,7 +660,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_left :method
+.sub predef_LEFT_S :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -675,7 +680,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_right :method
+.sub predef_RIGHT_S :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -697,7 +702,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_mid :method
+.sub predef_MID_S :method
     .param pmc tokenizer
 
     $P0 = tokenizer.'get'()
@@ -724,7 +729,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_complex :method
+.sub predef_COMPLEX :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -743,7 +748,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_compreg :method
+.sub predef_COMPREG :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -757,7 +762,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_exp :method
+.sub predef_EXP :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -770,7 +775,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_ln :method
+.sub predef_LN :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -783,7 +788,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_sin :method
+.sub predef_SIN :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -796,7 +801,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_sinh :method
+.sub predef_SINH :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -809,7 +814,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_cos :method
+.sub predef_COS :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -822,7 +827,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_cosh :method
+.sub predef_COSH :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -835,7 +840,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_tan :method
+.sub predef_TAN :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -848,7 +853,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_tanh :method
+.sub predef_TANH :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -861,7 +866,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_asin :method
+.sub predef_ASIN :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -874,7 +879,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_acos :method
+.sub predef_ACOS :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -887,7 +892,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_atan :method
+.sub predef_ATAN :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -900,7 +905,7 @@ fail:
 .end
 
 #-----------------------------------------------------------------------
-.sub predef_sqr :method
+.sub predef_SQR :method
     .param pmc tokenizer
 
     $P1 = tokenizer.'get'()
@@ -1936,6 +1941,20 @@ jump:
     .return()
 endloop:
     $P0 = pop stack
+.end
+
+.sub func_NEW :method
+    .param pmc tokenizer
+
+    .local pmc newprogram
+    newprogram = new ['Program']
+    setattribute self, 'program', newprogram
+
+    self.'clear_all'()
+
+    .local pmc end
+    end = new 'End'
+    throw_typed(end)
 .end
 
 .sub func_ON :method
