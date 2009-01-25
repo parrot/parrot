@@ -141,7 +141,8 @@ sub runstep {
     my @pmc = sort_pmcs( @{ $self->{srcpmc} } );
 
     my $pmc_list = $conf->options->get('pmc')
-        || join( ' ', grep { defined $_ } @pmc );
+        ? $conf->options->get('pmc')
+        : join( ' ', grep { defined $_ } @pmc );
 
     # names of class files for src/pmc/Makefile
     ( my $TEMP_pmc_o   = $pmc_list ) =~ s/\.pmc/\$(O)/g;
