@@ -114,6 +114,15 @@ my ( $tie, $msg, @lines );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
+    #create a dump for default.pmc
+    Parrot::Pmc2c::Pmc2cMain->new(
+        {
+            include => \@include, 
+            opt=>\%opt,
+            args=>[qq{$temppmcdir/default.pmc}],
+            bin=>$Bin
+        }
+    )->dump_pmc();
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/array.dump},   "array.dump created as expected" );
@@ -207,6 +216,19 @@ my ( $tie, $msg, @lines );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
+
+
+    #create dumps for dependencies of boolean
+    for my $pmc ( qq{$temppmcdir/default.pmc},  qq{$temppmcdir/class.pmc} ) {
+        Parrot::Pmc2c::Pmc2cMain->new(
+            {
+                include => \@include, 
+                opt=>\%opt,
+                args=>[$pmc],
+                bin=>$Bin
+            }
+        )->dump_pmc();
+    }
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
