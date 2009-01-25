@@ -69,7 +69,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # BASIC                No t/harness, two implementations
 # ecmascript           No t/harness
 # forth                No t/harness
-# lazy-k               path dependencies in test scripts
 # perl6                test scripts are written in Perl 6, not Perl 5
 # pheme                test scripts are written in Scheme, not Perl 5
 # PIR                  many test failures
@@ -87,7 +86,7 @@ my @unified_testable_languages
               cola
               dotnet
               jako
-              lisp lua
+              lazy-k lisp lua
               ook
               parrot_compiler pipp punie
               regex
