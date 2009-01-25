@@ -7,10 +7,6 @@ body {
     padding: 0;
 }
 
-p {
-    margin-top: 5px;
-     margin-bottom: 5px;
-}
 
 h1, h2, h3, h4, h4 {
     padding-bottom: 5px;
@@ -18,7 +14,6 @@ h1, h2, h3, h4, h4 {
 }
 
 body {
-    line-height: 135%;
     font-family: 'Trebuchet MS', Trebuchet, Arial, Verdana, sans-serif;
     color: #1D2D45;
     font-size: 13px;
