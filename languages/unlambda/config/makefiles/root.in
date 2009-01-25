@@ -21,7 +21,7 @@ help :
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  build:             does nothing."
+	@echo "  build:             Build unl.pbc."
 	@echo "                     This is the default target."
 	@echo ""
 	@echo "  test:              Run the test suite."
@@ -34,7 +34,7 @@ help :
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	 $(PERL) Configure.pl
+	$(PERL) Configure.pl
 
 # Compilation:
 build: unl.pbc
@@ -43,7 +43,7 @@ unl.pbc:
 	$(PARROT) -o unl.pbc unl.pir
 
 # cleaning up
-clean: 
+clean:
 	$(RM_F) unl.pbc
 
 realclean: clean
