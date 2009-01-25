@@ -1,6 +1,7 @@
 # Copyright (C) 2005-2008, The Perl Foundation.
 # $Id$
 
+.include 'except_severity.pasm'
 
 ## Not sure what standard built-in library is for ECMAScript, but
 ## we need some output function for testing. For now this'll do.
@@ -19,6 +20,19 @@
     goto print_loop
   end_print_loop:
     print "\n"
+.end
+
+.sub 'quit'
+    .param pmc args :slurpy
+    .local int nargs, retcode
+    retcode = 0
+    nargs = args
+    unless nargs goto done
+    retcode = args [0]
+done:
+    # Severity doomed used to bypass the catching done
+    # by the default HLL compiler.
+    die .EXCEPT_DOOMED, retcode
 .end
 
 .sub 'version'
