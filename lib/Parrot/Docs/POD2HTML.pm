@@ -360,13 +360,6 @@ sub process_end_token {
         $tagname = 'Para_item'
             if @{ $self->{STACK} } and $self->{STACK}->[-1] eq 'text';
     }
-    elsif ( $tagname =~ /head[12]/o ) {
-
-        # Put the up arrow on the end of a heading.
-        # The space is needed on the front.
-        print { $self->{'output_fh'} }
-            " <a href='#_top'><img alt='^' border=0 src='$self->{RESOURCES_URL}/up.gif'></a>";
-    }
     elsif ( $tagname eq 'C' ) {
 
         # See the note in process_code_start_token() above.
