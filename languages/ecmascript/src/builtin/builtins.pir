@@ -4,15 +4,18 @@
 
 ## Not sure what standard built-in library is for ECMAScript, but
 ## we need some output function for testing. For now this'll do.
+## Separate items with an space, as the js shell in SpiderMonkey do.
 
 .sub 'print'
     .param pmc args :slurpy
     .local pmc iter
     new iter, 'Iterator', args
-  print_loop:
     unless iter goto end_print_loop
+  print_loop:
     $P1 = shift iter
     print $P1
+    unless iter goto end_print_loop
+    print ' '
     goto print_loop
   end_print_loop:
     print "\n"
