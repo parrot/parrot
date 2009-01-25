@@ -35,6 +35,15 @@ done:
     die .EXCEPT_DOOMED, retcode
 .end
 
+.sub 'readline'
+    .param pmc unused :slurpy
+    .local pmc stdin
+    stdin = getstdin
+    .local string line
+    line = readline stdin
+    .return(line)
+.end
+
 .sub 'version'
     .param pmc version :optional
     .param int has_version :opt_flag
