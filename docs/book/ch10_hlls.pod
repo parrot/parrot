@@ -110,17 +110,19 @@ Here's a more verbose example of this:
 
 Here's an example of a Read-Eval-Print-Loop (REPL) in PIR:
 
-  $P0 = getstdin
-  $P1 = compreg 'PIR'
-  
-  loop_top:
-    $S0 = readline $P0
-    $S0 = ".sub '' :anon\n" . $S0
-    $S0 = $S0 . "\n.end\n"
-    $P2 = $P1($S0)
-    $P2()
-  
-    goto loop_top
+  .sub main
+    $P0 = getstdin
+    $P1 = compreg 'PIR'
+    
+    loop_top:
+      $S0 = readline $P0
+      $S0 = ".sub '' :anon\n" . $S0
+      $S0 = $S0 . "\n.end\n"
+      $P2 = $P1($S0)
+      $P2()
+      
+      goto loop_top
+  .end
 
 The exact list of HLL packages installed on your system may vary. Some
 language compiler packages will exist as part of the Parrot source code
@@ -142,6 +144,24 @@ operate on Parrot simultaneously while staying completely oblivious to
 each other.
 
 =head2 HLL Mapping
+
+HLL mapping enables Parrot to use a custom data type for internal operations
+instead of using the normal built-in types. Mappings can be created with the
+C<"hll_map"> method of the interpreter PMC.
+
+  $P0 = newclass "MyNewClass"         # New type
+  $P1 = getclass "ResizablePMCArray"  # Built-in type
+  $P2 = getinterp
+  $P2.'hll_map'($P1, $P0)
+
+With the mapping in place, anywhere that Parrot would have used a
+ResizablePMCArray it now uses a MyNewClass object instead. Here's one example
+of this:
+
+  .sub 'MyTestSub'
+      .param pmc arglist :slurpy   # A MyNewClass array of args
+      .return(arglist)
+  .end
 
 =head2 Interoperability Guidelines
 
