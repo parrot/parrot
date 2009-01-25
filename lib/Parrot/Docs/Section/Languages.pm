@@ -54,7 +54,6 @@ sub new {
         $self->new_section( 'ecmascript',  'ecmascript.html', '', 'languages/ecmascript' ),
         $self->new_section( 'forth',       'forth.html',      '', 'languages/forth' ),
         $self->new_section( 'Jako',        'jako.html',       '', 'languages/jako' ),
-        $self->new_section( 'lazy-k',      'lazy-k.html',     '', 'languages/lazy-k' ),
         $self->new_section( 'lolcode',     'lolcode.html',    '', 'languages/lolcode' ),
         $self->new_section( 'Lua',         'lua.html',        '', 'languages/lua' ),
         $self->new_section( 'Ook!',        'ook.html',        '', 'languages/ook' ),

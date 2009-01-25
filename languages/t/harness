@@ -86,7 +86,7 @@ my @unified_testable_languages
               cola
               dotnet
               jako
-              lazy-k lisp lua
+              lisp lua
               ook
               parrot_compiler pipp punie
               regex

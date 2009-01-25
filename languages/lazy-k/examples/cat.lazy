@@ -1,7 +1,0 @@
-# usage
-# $ ../../parrot lazy.pir cat.lazy < cat.lazy
-
-i
-
-# yep that's the whole progam
-# yes, there are faster programs that do the job :-)

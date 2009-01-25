@@ -20,7 +20,7 @@ LANGUAGES = \
     ecmascript \
     forth \
     jako json \
-    lazy-k lisp lolcode lua \
+    lisp lolcode lua \
     ook \
     parrot_compiler perl6 pheme PIR pipp punie pynie \
     regex \
@@ -74,6 +74,8 @@ help:
 	@echo ""
 	@echo "  co-hq9plus:    Try to fetch HQ9+"
 	@echo ""
+	@echo "  co-lazy-k:     Try to fetch lazy-k"
+	@echo ""
 	@echo "  co-m4:         Try to fetch Parrot m4"
 	@echo ""
 	@echo "  co-pjs:        Try to fetch PJS"
@@ -81,6 +83,8 @@ help:
 	@echo "  co-primitivearc: Try to fetch primitivearc"
 	@echo ""
 	@echo "  co-tcl:        Try to fetch Partcl"
+	@echo ""
+	@echo "  co-unlambda:   Try to fetch unlambda"
 	@echo ""
     @echo "NOTE: These make targets assume that you have run the corresponding co target."
 	@echo "  up-all:        Try to update externally managed languages"
@@ -91,6 +95,8 @@ help:
 	@echo ""
 	@echo "  up-hq9plus:    Try to update HQ9+"
 	@echo ""
+	@echo "  up-lazy-k:     Try to update lazy-k"
+	@echo ""
 	@echo "  up-m4:         Try to update Parrot m4"
 	@echo ""
 	@echo "  up-pjs:        Try to update PJS"
@@ -98,6 +104,8 @@ help:
 	@echo "  up-primitivearc: Try to update primitivearc"
 	@echo ""
 	@echo "  up-tcl:        Try to update Partcl"
+	@echo ""
+	@echo "  up-unlambda:   Try to update unlambda"
 	@echo ""
 
 # regenerate the Makefile
@@ -117,7 +125,7 @@ test-separate: all \
     ecmascript.test \
     forth.test \
     jako.test json.test \
-    lazy-k.test lisp.test lolcode.test lua.test \
+    lisp.test lolcode.test lua.test \
     ook.test \
     parrot_compiler.test perl6.test pheme.test PIR.test pipp.test punie.test pynie.test \
     regex.test \
@@ -152,7 +160,7 @@ realclean: \
     ecmascript.realclean \
     forth.realclean \
     jako.realclean json.realclean \
-    lazy-k.realclean lisp.realclean lolcode.realclean lua.realclean \
+    lisp.realclean lolcode.realclean lua.realclean \
     ook.realclean \
     parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
     regex.realclean \
@@ -306,16 +314,6 @@ json.clean:
 	- $(MAKE) json clean
 json.realclean:
 	- $(MAKE) json realclean
-
-lazy-k: lazy-k.dummy
-lazy-k.dummy:
-	- $(MAKE) lazy-k
-lazy-k.test:
-	- $(MAKE) lazy-k test
-lazy-k.clean:
-	- $(MAKE) lazy-k clean
-lazy-k.realclean:
-	- $(MAKE) lazy-k realclean
 
 lisp: lisp.dummy
 lisp.dummy:
@@ -490,8 +488,8 @@ Zcode.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-gil co-hq9plus co-m4 co-markdown co-pjs co-primitivearc co-tcl co-unlambda
-up-all: up-eclectus up-gil up-hq9plus up-m4 up-markdown up-pjs up-primitivearc up-tcl up-unlambda
+co-all: co-eclectus co-gil co-hq9plus co-lazy-k co-m4 co-markdown co-pjs co-primitivearc co-tcl co-unlambda
+up-all: up-eclectus up-gil up-hq9plus up-lazy-k up-m4 up-markdown up-pjs up-primitivearc up-tcl up-unlambda
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
@@ -510,6 +508,12 @@ co-hq9plus:
 
 up-hq9plus:
 	cd hq9plus && $(GIT) pull
+
+co-lazy-k:
+	- $(GIT) clone 'git:////github.com/bschmalhofer/lazy-k.git'
+
+up-lazy-k:
+	cd lazy-k && $(GIT) pull
 
 co-m4:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/m4.git'

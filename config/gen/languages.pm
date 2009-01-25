@@ -42,7 +42,7 @@ sub _init {
         ecmascript
         forth
         jako json
-        lazy-k lisp lolcode lua
+        lisp lolcode lua
         ook
         parrot_compiler perl6 pheme PIR pipp punie pynie
         regex
