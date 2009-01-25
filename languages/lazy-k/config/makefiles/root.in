@@ -26,15 +26,15 @@ help :
 	@echo ""
 	@echo "  test:              run the test suite,"
 	@echo ""
-	@echo "  clean:             clean up temporary files"
+	@echo "  clean:             clean up"
 	@echo ""
-	@echo "  realclean:         clean up generated files"
+	@echo "  realclean:         clean up and remove Makefile"
 	@echo ""
 	@echo "  help:              print this help message"
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=lazy-k
+	$(PERL) Configure.pl
 
 build:
 
