@@ -32,7 +32,7 @@ use File::Spec();
 my $is_win32  = $^O eq 'MSWin32';
 
 my $parrot    = File::Spec->catfile( File::Spec->updir(), $PConfig{test_prog} );
-my $lazy_k    = $parrot . q{ } . File::Spec->catfile( 'lazy-k', 'lazy.pir' );
+my $lazy_k    = $parrot . q{ } . File::Spec->catfile( 'lazy-k', 'lazy.pbc' );
 my $source_fn = File::Spec->catfile( 'lazy-k', 'cat.lazy' ); 
 
 # XXX This does not look portable.

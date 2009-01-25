@@ -2,46 +2,52 @@
 
 # Makefile for languages/lazy-k
 
-# Setup of some commands
-PARROT        = @build_dir@/parrot@exe@
+# configuration settings
+BUILD_DIR     = @build_dir@
+
+# Set up commands
 PERL          = @perl@
 RM_F          = @rm_f@
-RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+PARROT        = $(BUILD_DIR)/parrot@exe@
 #CONDITIONED_LINE(darwin):
 #CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
-# set up location
-BUILD_DIR     = @build_dir@
-
-default: all
-all: build
+# The default target
+default: build
 
 help :
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  build:             Nothing to do"
-	@echo "                     This is the default."
+	@echo "  build:             Build lazy.pbc."
+	@echo "                     This is the default target."
 	@echo ""
-	@echo "  test:              run the test suite,"
+	@echo "  test:              Run the test suite."
 	@echo ""
-	@echo "  clean:             clean up"
+	@echo "  clean:             Clean up."
 	@echo ""
-	@echo "  realclean:         clean up and remove Makefile"
+	@echo "  realclean:         Clean and remove Makefile."
 	@echo ""
-	@echo "  help:              print this help message"
+	@echo "  help:              Print this help message."
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
 	$(PERL) Configure.pl
 
-build:
+# Compilation:
+build: lazy.pbc
 
-test: build
-	cd .. && $(PERL) t/harness --languages=lazy-k
+lazy.pbc:
+	$(PARROT) -o lazy.pbc lazy.pir
 
+# cleaning up
 clean:
+	$(RM_F) lazy.pbc
 
 realclean: clean
 	$(RM_F) Makefile
+
+# testing
+test: build
+	cd .. && $(PERL) t/harness --languages=lazy-k
