@@ -108,6 +108,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
+    #create a dump for default.pmc
+    Parrot::Pmc2c::Pmc2cMain->new(
+        {
+            include => \@include, 
+            opt=>\%opt,
+            args=>[qq{$temppmcdir/default.pmc}],
+            bin=>$Bin
+        }
+    )->dump_pmc();
+
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/array.dump},   "array.dump created as expected" );
@@ -202,6 +212,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
+    #create a dump for default.pmc
+    Parrot::Pmc2c::Pmc2cMain->new(
+        {
+            include => \@include, 
+            opt=>\%opt,
+            args=>[qq{$temppmcdir/default.pmc}],
+            bin=>$Bin
+        }
+    )->dump_pmc();
+
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/null.dump},    "null.dump created as expected" );
@@ -211,7 +231,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 
 # @args hold default.pmc and 3 other .pmc files in dependency order
 {
-    my $tdir = tempdir( CLEANUP => 1 );
+    my $tdir = tempdir( CLEANUP => 0 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
@@ -248,6 +268,18 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
+    #create dumps for dependencies of boolean
+    for my $pmc ( qq{$temppmcdir/default.pmc},  qq{$temppmcdir/scalar.pmc}, qq{$temppmcdir/integer.pmc} ) {
+        Parrot::Pmc2c::Pmc2cMain->new(
+            {
+                include => \@include, 
+                opt=>\%opt,
+                args=>[$pmc],
+                bin=>$Bin
+            }
+        )->dump_pmc();
+    }
+
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/scalar.dump},  "scalar.dump created as expected" );
@@ -260,7 +292,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
 # how should a missing dependency be handled?
 # scalar requires integer
 {
-    my $tdir = tempdir( CLEANUP => 1 );
+    my $tdir = tempdir( CLEANUP => 0 );
     ok( chdir $tdir, 'changed to temp directory for testing' );
     my $pmcdir = q{src/pmc};
     ok( ( mkdir qq{$tdir/src} ), "created src/ under tempdir" );
@@ -304,7 +336,7 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     like(
         $@,
         qr/^cannot find file 'scalar\.dump' in path/,
-        "dump_pmc failed on integer because prerequisite scalar wasn't supplied to 'args' key"
+        "ERROR WAS '$@', path is $temppmcdir"
     );
 
     ok( chdir $cwd, "changed back to original directory" );
@@ -342,6 +374,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
+
+    #create a dump for default.pmc
+    Parrot::Pmc2c::Pmc2cMain->new(
+        {
+            include => \@include, 
+            opt=>\%opt,
+            args=>[qq{$temppmcdir/default.pmc}],
+            bin=>$Bin
+        }
+    )->dump_pmc();
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
@@ -427,6 +469,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
 
+    #create a dump for default.pmc
+    Parrot::Pmc2c::Pmc2cMain->new(
+        {
+            include => \@include, 
+            opt=>\%opt,
+            args=>[qq{$temppmcdir/default.pmc}],
+            bin=>$Bin
+        }
+    )->dump_pmc();
+
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/default.dump}, "default.dump created as expected" );
     ok( -f qq{$temppmcdir/array.dump},   "array.dump created as expected" );
@@ -484,6 +536,16 @@ my @include_orig = ( qq{$main::topdir}, qq{$main::topdir/src/pmc}, );
     isa_ok( $self, q{Parrot::Pmc2c::Pmc2cMain} );
     $dump_file = $self->dump_vtable("$main::topdir/src/vtable.tbl");
     ok( -e $dump_file, "dump_vtable created vtable.dump" );
+
+    #create a dump for default.pmc
+    Parrot::Pmc2c::Pmc2cMain->new(
+        {
+            include => \@include, 
+            opt=>\%opt,
+            args=>[qq{$temppmcdir/default.pmc}],
+            bin=>$Bin
+        }
+    )->dump_pmc();
 
     ok( $self->dump_pmc(),               "dump_pmc succeeded" );
     ok( -f qq{$temppmcdir/array.dump},   "array.dump created as expected" );
