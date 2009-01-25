@@ -47,7 +47,7 @@ sub _init {
         parrot_compiler perl6 pheme PIR pipp punie pynie
         regex
         scheme squaak
-        unlambda urm
+        urm
         WMLScript
         Zcode
     };

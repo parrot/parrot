@@ -25,7 +25,7 @@ LANGUAGES = \
     parrot_compiler perl6 pheme PIR pipp punie pynie \
     regex \
     scheme squaak \
-    unlambda urm \
+    urm \
     WMLScript \
     Zcode
 
@@ -122,7 +122,7 @@ test-separate: all \
     parrot_compiler.test perl6.test pheme.test PIR.test pipp.test punie.test pynie.test \
     regex.test \
     scheme.test squaak.test \
-    urm.test unlambda.test \
+    urm.test \
     WMLScript.test \
     Zcode.test
 
@@ -157,7 +157,7 @@ realclean: \
     parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
     regex.realclean \
     scheme.realclean squaak.realclean \
-    urm.realclean unlambda.realclean \
+    urm.realclean \
     WMLScript.realclean \
     Zcode.realclean
 
@@ -457,16 +457,6 @@ squaak.clean:
 squaak.realclean:
 	- $(MAKE) squaak realclean
 
-unlambda: unlambda.dummy
-unlambda.dummy:
-	- $(MAKE) unlambda
-unlambda.test :
-	- $(MAKE) unlambda test
-unlambda.clean :
-	- $(MAKE) unlambda clean
-unlambda.realclean :
-	- $(MAKE) unlambda realclean
-
 urm: urm.dummy
 urm.dummy:
 	- $(MAKE) urm
@@ -500,8 +490,8 @@ Zcode.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-gil co-hq9plus co-m4 co-markdown co-pjs co-primitivearc co-tcl
-up-all: up-eclectus up-gil up-hq9plus up-m4 up-markdown up-pjs up-primitivearc up-tcl
+co-all: co-eclectus co-gil co-hq9plus co-m4 co-markdown co-pjs co-primitivearc co-tcl co-unlambda
+up-all: up-eclectus up-gil up-hq9plus up-m4 up-markdown up-pjs up-primitivearc up-tcl up-unlambda
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
@@ -550,4 +540,10 @@ co-tcl:
 
 up-tcl:
 	cd tcl && $(SVN) up
+
+co-unlambda:
+	- $(GIT) clone 'git:////github.com/fperrad/unlambda.git'
+
+up-unlambda:
+	cd unlambda && $(GIT) pull
 

@@ -90,7 +90,6 @@ my @unified_testable_languages
               ook
               parrot_compiler pipp punie
               regex
-              unlambda
               WMLScript
             );
 my @harnesses

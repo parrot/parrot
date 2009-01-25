@@ -48,7 +48,6 @@ my %lang_is_checked = map { $_ => 1 } qw{
     ook
     perl6
     pipp
-    unlambda
     WMLScript
 };
 
