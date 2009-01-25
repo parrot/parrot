@@ -33,108 +33,6 @@ sub _init {
     };
 }
 
-# Return the (lowercased) name of the immediate parent of the given
-# (lowercased) pmc name.
-sub pmc_parent {
-    my ($self, $pmc) = @_;
-
-    return $self->{PMC_PARENTS}{$pmc} if defined $self->{PMC_PARENTS}{$pmc};
-
-    local $/;
-    open( my $PMC, '<', "src/pmc/$pmc.pmc" )
-        or die "open src/pmc/$pmc.pmc failed: $!";
-    local $_ = <$PMC>;
-    close $PMC;
-
-    # Throw out everything but the pmclass declaration
-    s/^.*?pmclass//s;
-    s/\{.*$//s;
-
-    return $self->{PMC_PARENTS}{$pmc} = lc($1) if m/extends\s+(\w+)/;
-    return $self->{PMC_PARENTS}{$pmc} = 'default';
-}
-
-# Return an array of all
-sub pmc_parents {
-    my ($self, $pmc) = @_;
-
-    my @parents = ($pmc);
-    push @parents, $self->pmc_parent( $parents[-1] )
-        until $parents[-1] eq 'default';
-
-    shift @parents;
-    return @parents;
-}
-
-sub get_pmc_order {
-    open my $IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
-    my %order;
-    while (<$IN>) {
-        next if /^#/;
-
-        if (/(\w+\.\w+)\s+(\d+)/) {
-            $order{$1} = $2;
-        }
-    }
-
-    close $IN;
-
-    return \%order;
-}
-
-sub sort_pmcs {
-    my @pmcs      = @_;
-    my $pmc_order = get_pmc_order();
-    my $n         = keys %$pmc_order;
-    my @sorted_pmcs;
-
-    for my $pmc (@pmcs) {
-        if ( exists $pmc_order->{$pmc} ) {
-            $sorted_pmcs[ $pmc_order->{$pmc} ] = $pmc;
-        }
-        else {
-            $sorted_pmcs[ $n++ ] = $pmc;
-        }
-    }
-
-    return @sorted_pmcs;
-}
-
-sub contains_pccmethod {
-    my $file = shift;
-    open( my $fh, '<', $file ) or die "Can't read '$file': $!\n";
-
-    local $_;
-    while (<$fh>) {
-        next unless /METHOD/;
-        return 1;
-    }
-
-    return;
-}
-
-# Given a PMC file name, get a list of all the includes it specifies
-sub get_includes {
-    my $file = shift;
-    open( my $fh, '<', $file ) or die "Can't read '$file': $!\n";
-
-    my @retval;
-    local $_;
-    while (<$fh>) {
-        next unless /^\s*#include\s+["<](.*)[">]\s+$/;
-        my $include = $1;
-        if ($include =~ m{^(\.|parrot/)}) { # main parrot include dir
-          $include = "include/" . $include;
-        } elsif ($include =~ m/^pmc_|\.str$/) { # local pmc header
-          $include = "src/pmc/" . $include;
-        } # else it's probably a system header, don't depend on it.
-        push @retval, $include;
-    }
-
-    return join(' ', @retval);
-}
-
-
 sub runstep {
     my ( $self, $conf ) = @_;
 
@@ -283,6 +181,107 @@ PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
     );
 
     return 1;
+}
+
+# Return the (lowercased) name of the immediate parent of the given
+# (lowercased) pmc name.
+sub pmc_parent {
+    my ($self, $pmc) = @_;
+
+    return $self->{PMC_PARENTS}{$pmc} if defined $self->{PMC_PARENTS}{$pmc};
+
+    local $/;
+    open( my $PMC, '<', "src/pmc/$pmc.pmc" )
+        or die "open src/pmc/$pmc.pmc failed: $!";
+    local $_ = <$PMC>;
+    close $PMC;
+
+    # Throw out everything but the pmclass declaration
+    s/^.*?pmclass//s;
+    s/\{.*$//s;
+
+    return $self->{PMC_PARENTS}{$pmc} = lc($1) if m/extends\s+(\w+)/;
+    return $self->{PMC_PARENTS}{$pmc} = 'default';
+}
+
+# Return an array of all
+sub pmc_parents {
+    my ($self, $pmc) = @_;
+
+    my @parents = ($pmc);
+    push @parents, $self->pmc_parent( $parents[-1] )
+        until $parents[-1] eq 'default';
+
+    shift @parents;
+    return @parents;
+}
+
+sub get_pmc_order {
+    open my $IN, '<', 'src/pmc/pmc.num' or die "Can't read src/pmc/pmc.num";
+    my %order;
+    while (<$IN>) {
+        next if /^#/;
+
+        if (/(\w+\.\w+)\s+(\d+)/) {
+            $order{$1} = $2;
+        }
+    }
+
+    close $IN;
+
+    return \%order;
+}
+
+sub sort_pmcs {
+    my @pmcs      = @_;
+    my $pmc_order = get_pmc_order();
+    my $n         = keys %$pmc_order;
+    my @sorted_pmcs;
+
+    for my $pmc (@pmcs) {
+        if ( exists $pmc_order->{$pmc} ) {
+            $sorted_pmcs[ $pmc_order->{$pmc} ] = $pmc;
+        }
+        else {
+            $sorted_pmcs[ $n++ ] = $pmc;
+        }
+    }
+
+    return @sorted_pmcs;
+}
+
+sub contains_pccmethod {
+    my $file = shift;
+    open( my $fh, '<', $file ) or die "Can't read '$file': $!\n";
+
+    local $_;
+    while (<$fh>) {
+        next unless /METHOD/;
+        return 1;
+    }
+
+    return;
+}
+
+# Given a PMC file name, get a list of all the includes it specifies
+sub get_includes {
+    my $file = shift;
+    open( my $fh, '<', $file ) or die "Can't read '$file': $!\n";
+
+    my @retval;
+    local $_;
+    while (<$fh>) {
+        next unless /^\s*#include\s+["<](.*)[">]\s+$/;
+        my $include = $1;
+        if ($include =~ m{^(\.|parrot/)}) { # main parrot include dir
+          $include = "include/" . $include;
+        } elsif ($include =~ m/^pmc_|\.str$/) { # local pmc header
+          $include = "src/pmc/" . $include;
+        } # else it's probably a system header, don't depend on it.
+        push @retval, $include;
+    }
+
+    return join(' ', @retval);
 }
 
 sub order_pmcs_by_hierarchy {
