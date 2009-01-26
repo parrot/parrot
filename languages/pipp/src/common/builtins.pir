@@ -39,7 +39,7 @@
     goto iter_loop
 
   iter_end:
-    .return (1)
+    .RETURN_NULL()
 .end
 
 ## autoincrement

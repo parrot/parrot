@@ -26,6 +26,16 @@ Parsing is done with Parrot Compiler Toolkit, PCT.
 The parse tree is transformed to a Parrot Abstrace Syntax Tree.
 PIR und Bytecode is then generated from the PAST.
 
+=head1 language constructs
+
+=head2 echo
+
+No return value.
+
+=head2 print
+
+Always returns 1.
+
 =head1 Variables
 
 List of scopes and types of variables.
