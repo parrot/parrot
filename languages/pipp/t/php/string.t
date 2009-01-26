@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 36;
+use Parrot::Test tests => 37;
 
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'bin2hex' );
@@ -66,6 +66,14 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'rtrim' );
 ?>
 CODE
   abc
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'chop' );
+<?php
+  echo chop('  abcde  ef '), "\n";
+?>
+CODE
+  abcde  ef
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'str_repeat' );

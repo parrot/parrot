@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -6,6 +6,13 @@
 php_string.pir - PHP string Standard Library
 
 =head1 DESCRIPTION
+
+See L<http://www.php.net/manual/en/book.strings.php>.
+
+=head1 TODO
+
+Implement functions.
+Rename file to extensions/strings.pir.
 
 =head2 Functions
 
@@ -134,6 +141,18 @@ Converts the binary representation of data to hex
     .RETURN_STRING($S0)
 .end
 
+=item C<string chop(string str [, string character_mask])>
+
+Alias of C<rtrim>.
+
+=cut
+
+.sub 'chop'
+    .param pmc args :slurpy
+
+    .tailcall rtrim(args :flat)
+.end
+
 =item C<string chr(int ascii)>
 
 Converts ASCII code to a character
@@ -234,6 +253,7 @@ An alias for implode
 
 .sub 'join'
     .param pmc args :slurpy
+
     .tailcall implode(args :flat)
 .end
 
