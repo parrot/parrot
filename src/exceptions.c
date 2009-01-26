@@ -598,10 +598,14 @@ Parrot_print_backtrace(void)
 #  else
     { /* Scope for strings */
         char ** strings = backtrace_symbols(array, size);
-        for (i = 0; i < size; i++)
-            fprintf(stderr, "%s\n", strings[i]);
-
-        mem_sys_free(strings);
+        if (strings) {
+            for (i = 0; i < size; i++)
+                fprintf(stderr, "%s\n", strings[i]);
+            /* backtrace_symbols gets memory using malloc */
+            free(strings);
+        }
+        else
+            fputs("Not enough memory for backtrace_symbols\n", stderr);
     }
 #  endif
 
