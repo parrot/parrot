@@ -28,27 +28,27 @@ rule pod_section {
     {*}
 }
 
-rule pod_sequence {
-     <back_directive> {*}
-    | <item_directive> {*}
-    | <over_directive> {*}
-    | <heading>
+regex pod_sequence {
+      <heading>
     | <begin_directive>
     | <end_directive>
     | <for_directive>
+    | <back_directive>
+    | <item_directive>
+    | <over_directive>
     | <encoding_directive>
-#    | <literal_paragraph>
+    | <literal_paragraph>
     | <paragraph>
 }
 
 token pod_directive {
-    ^^ '=pod'
+    ^^ '=pod' \n
     <.blank_line>
     {*}
 }
 
 token cut_directive {
-    ^^ '=cut'
+    ^^ '=cut' \n
     <.blank_line>?
     {*}
 }
@@ -58,6 +58,7 @@ token heading {
     '=head'
     <digit>
     <block_title>?
+    \n
     <.blank_line>
     {*}
 }
@@ -67,6 +68,7 @@ token begin_directive {
     '=begin'
     <block_name>
     <block_title>?
+    \n
     <.blank_line>
     {*}
 }
@@ -74,6 +76,7 @@ token begin_directive {
 token end_directive {
     ^^ '=end'
     <block_name>
+    \n
     <.blank_line>
     {*}
 }
@@ -83,7 +86,8 @@ token for_directive {
     '=for'
     <block_name>
     <block_title>?
-    <.blank_line>
+    \n
+    <paragraph>
     {*}
 }
 
@@ -94,12 +98,13 @@ token over_directive {
         <digit>*
         [ '.' <digit>+ ]?
     ]?
+    \n
     <.blank_line>
     {*}
 }
 
 token back_directive {
-    ^^ '=back'
+    ^^ '=back' \n
     <.blank_line>
     {*}
 }
@@ -112,6 +117,7 @@ token item_directive {
         | <digit>* '.'?
         ]
     ]?
+    \n
     <.blank_line>
     {*}
 }
@@ -120,6 +126,7 @@ token encoding_directive {
     ^^
     '=encoding'
     <block_name>
+    \n
     <.blank_line>
     {*}
 }
@@ -127,13 +134,13 @@ token encoding_directive {
 regex paragraph {
     ^^
     <!before '='>           # Not a directive
-    <formatted_text>
-    [ \n <formatted_text> ]*
+    [ <formatted_text> \n ]+
     <.blank_line>
     {*}
 }
 
-token literal_paragraph {
+regex literal_paragraph {
+    ^^
     [ <.pod_ws> <formatted_text> \n ]+
     <.blank_line>
     {*}
@@ -170,11 +177,9 @@ regex format_code {
     {*}
 }
 
-#token ws { <!ww> \s+ }
-
 token pod_ws {
     [ ' ' | \t ]+ # Literal spaces or tabs, no newlines or other whitespace
     {*}
 }
 
-token blank_line { \n <.pod_ws>? \n }
+token blank_line { ^^ <.pod_ws>? \n }

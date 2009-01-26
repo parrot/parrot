@@ -58,6 +58,7 @@ More text.
 =cut
 
 =for baz
+Body of =for block.
 
 =cut
 
@@ -78,7 +79,14 @@ Including a newline.
 
 Text containing E<formatting B<codes>>.
 
-A multi-bracket formating code containing C<<special -> characters>>.
+A multi-bracket formatting code containing C<<special -> characters>>.
+
+=cut
+
+=head4 literal paragraph
+
+  Some literal text.
+  And some more literal text.
 
 =cut
 
