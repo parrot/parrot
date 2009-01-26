@@ -22,18 +22,18 @@ use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
 use Parrot::Test tests => 19;
 
+my $h = "Hello, World!\n";
+
 language_output_is( 'Pipp', <<'CODE', 'Hello, World!', 'sea without newline' );
 Hello, World!<?php
 ?>
 CODE
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sea with one newline' );
+language_output_is( 'Pipp', <<'CODE', $h, 'sea with one newline' );
 Hello, World!
 <?php
 ?>
 CODE
-Hello, World!
-OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sea with two newlines' );
 Hello,
@@ -53,47 +53,39 @@ Hello,
 World!
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'sea without following PHP code' );
+language_output_is( 'Pipp', <<'CODE', $h, 'sea without following PHP code' );
 Hello,<?php
   ?> World!
 <?php
 ?>
 CODE
-Hello, World!
-OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'echo one double quoted string' );
+language_output_is( 'Pipp', <<'CODE', $h, 'echo one double quoted string' );
 <?php
 echo "Hello, World!\n";
 ?>
 CODE
-Hello, World!
-OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'echo with single quoted string' );
+language_output_is( 'Pipp', <<'CODE', $h, 'echo with single quoted string' );
 <?php
 echo 'Hello, World!';
 echo "\n";
 ?>
 CODE
-Hello, World!
-OUT
 
 
 language_output_is( 'Pipp', <<'CODE', 'Hello World', 'only alphanumic' );
 <?php echo "Hello World"; ?>
 CODE
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'two echo statements' );
+language_output_is( 'Pipp', <<'CODE', $h, 'two echo statements' );
 <?php
 echo "Hello, ";
 echo "World!\n";
 ?>
 CODE
-Hello, World!
-OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'two echo statements' );
+language_output_is( 'Pipp', <<'CODE', $h, 'two echo statements' );
 <?php
 echo "Hello, ";
 ?>Wo<?php
@@ -102,8 +94,6 @@ echo "rl";
 <?php
 ?>
 CODE
-Hello, World!
-OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'hello with some HTML' );
 <html>
@@ -132,75 +122,59 @@ Hello, World!
 OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'hello in a scalar' );
+language_output_is( 'Pipp', <<'CODE', $h, 'hello in a scalar' );
 <?php
 $h = "Hello, World!\n";
 echo $h;
 ?>
 CODE
-Hello, World!
-OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'hello in a hash' );
+language_output_is( 'Pipp', <<'CODE', $h, 'hello in a hash' );
 <?php
 $h["e"] = "Hello, World!\n";
 echo $h["e"];
 ?>
 CODE
-Hello, World!
-OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'no semicolon befor CODE_END' );
+language_output_is( 'Pipp', <<'CODE', $h, 'no semicolon befor CODE_END' );
 <?php
 echo 'Hello, ';
 echo "World!\n"
 ?>
 CODE
-Hello, World!
-OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'concatenation of two strings' );
+language_output_is( 'Pipp', <<'CODE', $h, 'concatenation of two strings' );
 <?php
 echo 'Hello, ' . "World!\n"
 ?>
 CODE
-Hello, World!
-OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'script tags' );
+language_output_is( 'Pipp', <<'CODE', $h, 'script tags' );
 <script language="php">
 echo "Hello, World!\n";
 </script>
 CODE
-Hello, World!
-OUT
 
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'script tags' );
+language_output_is( 'Pipp', <<'CODE', $h, 'script tags' );
 <script language="php">
 echo "Hello, World!\n";
 </script>
 CODE
-Hello, World!
-OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'echo with three args' );
+language_output_is( 'Pipp', <<'CODE', $h, 'echo with three args' );
 <?php
 echo 'Hello', ', World!', "\n";
 ?>
 CODE
-Hello, World!
-OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'print with one arg' );
+language_output_is( 'Pipp', <<'CODE', $h, 'print with one arg' );
 <?php
 print "Hello, World!\n";
 ?>
 CODE
-Hello, World!
-OUT
 
