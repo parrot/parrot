@@ -59,7 +59,7 @@ For the root dir a slash is appended.
     ne $S0, '', abs_path
         is_abs_path = 1
   abs_path:
-  
+
   pop_empty:
     # pop empty path components
     $I0 = elements $P0
@@ -71,7 +71,7 @@ For the root dir a slash is appended.
 
   check_already_popped:
     if last_nonempty_has_been_popped goto return_join
-        $S0 = pop $P0   
+        $S0 = pop $P0
         last_nonempty_has_been_popped = 1
         goto pop_empty
 
@@ -87,7 +87,7 @@ For the root dir a slash is appended.
 
   return_join:
     $S0 = join slash_str, $P0
-    eq $S0, '', return_root_or_pwd 
+    eq $S0, '', return_root_or_pwd
     .RETURN_STRING($S0)
 .end
 
