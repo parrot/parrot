@@ -1,0 +1,87 @@
+Foo
+Bar
+Baz
+
+=pod
+
+=over
+
+=item
+
+=back
+
+=cut
+
+Some blob of text.
+
+=over 4.5
+
+=item *
+
+=back
+
+=cut
+
+Another blob of text.
+
+=over 4
+
+=item 45
+
+=back
+
+=cut
+
+More text.
+
+=head1 Foo
+
+=cut
+
+
+
+
+=head2
+
+=cut
+
+=begin foo
+
+=end foo
+
+=cut
+
+=begin bar Some Text
+
+=end bar
+
+=cut
+
+=for baz
+
+=cut
+
+=head1 a paragraph
+
+Random paragraph.
+
+=cut
+
+=head2 more paragraphs
+
+Another random paragraph.
+Including a newline.
+
+=cut
+
+=head3 formatting codes
+
+Text containing E<formatting B<codes>>.
+
+A multi-bracket formating code containing C<<special -> characters>>.
+
+=cut
+
+=encoding utf8
+
+=cut

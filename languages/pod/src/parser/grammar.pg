@@ -1,0 +1,180 @@
+# $Id$
+
+=begin overview
+
+This is the grammar for Pod written as a sequence of Perl 6 rules.
+
+=end overview
+
+grammar Pod::Grammar is PCT::Grammar;
+
+rule TOP {
+    [ <skipped>
+    | <pod_section>
+    ]*
+    [ $ || <panic: 'Pod syntax error'> ]
+    {*}
+}
+
+rule skipped {
+    ^^ <![=]> \N*
+    {*}
+}
+
+rule pod_section {
+    [ <pod_directive> | <?before '='> ]
+    <pod_sequence>*
+    <cut_directive>
+    {*}
+}
+
+rule pod_sequence {
+     <back_directive> {*}
+    | <item_directive> {*}
+    | <over_directive> {*}
+    | <heading>
+    | <begin_directive>
+    | <end_directive>
+    | <for_directive>
+    | <encoding_directive>
+#    | <literal_paragraph>
+    | <paragraph>
+}
+
+token pod_directive {
+    ^^ '=pod'
+    <.blank_line>
+    {*}
+}
+
+token cut_directive {
+    ^^ '=cut'
+    <.blank_line>?
+    {*}
+}
+
+token heading {
+    ^^
+    '=head'
+    <digit>
+    <block_title>?
+    <.blank_line>
+    {*}
+}
+
+token begin_directive {
+    ^^
+    '=begin'
+    <block_name>
+    <block_title>?
+    <.blank_line>
+    {*}
+}
+
+token end_directive {
+    ^^ '=end'
+    <block_name>
+    <.blank_line>
+    {*}
+}
+
+token for_directive {
+    ^^
+    '=for'
+    <block_name>
+    <block_title>?
+    <.blank_line>
+    {*}
+}
+
+token over_directive {
+    ^^
+    '=over'
+    [   <.pod_ws>
+        <digit>*
+        [ '.' <digit>+ ]?
+    ]?
+    <.blank_line>
+    {*}
+}
+
+token back_directive {
+    ^^ '=back'
+    <.blank_line>
+    {*}
+}
+
+token item_directive {
+    ^^
+    '=item'
+    [ <.pod_ws>
+        [ '*'
+        | <digit>* '.'?
+        ]
+    ]?
+    <.blank_line>
+    {*}
+}
+
+token encoding_directive {
+    ^^
+    '=encoding'
+    <block_name>
+    <.blank_line>
+    {*}
+}
+
+regex paragraph {
+    ^^
+    <!before '='>           # Not a directive
+    <formatted_text>
+    [ \n <formatted_text> ]*
+    <.blank_line>
+    {*}
+}
+
+token literal_paragraph {
+    [ <.pod_ws> <formatted_text> \n ]+
+    <.blank_line>
+    {*}
+}
+
+token block_name {
+    <.pod_ws>
+    <[_]+alpha+digit>+
+    {*}
+}
+
+token block_title {
+    <.pod_ws>
+    <formatted_text>
+    {*}
+}
+
+regex formatted_text {
+    [ <format_code>
+    | <alpha>
+    | <digit>
+    | <punct>
+    | <pod_ws>
+    ]+ 
+    {*}
+}
+
+regex format_code {
+    <[BCEFILSXZ]>
+    [ '<<<' <formatted_text> '>>>'
+    | '<<'  <formatted_text> '>>'
+    | '<'   <formatted_text> '>'
+    ]
+    {*}
+}
+
+#token ws { <!ww> \s+ }
+
+token pod_ws {
+    [ ' ' | \t ]+ # Literal spaces or tabs, no newlines or other whitespace
+    {*}
+}
+
+token blank_line { \n <.pod_ws>? \n }
