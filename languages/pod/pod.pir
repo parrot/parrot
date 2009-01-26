@@ -63,8 +63,6 @@ to the Pod compiler.
     $P1 = $P0.'command_line'(args)
 .end
 
-.include 'src/gen_builtins.pir'
-
 =back
 
 =cut
