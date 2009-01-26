@@ -1301,24 +1301,19 @@ more:
     .return($P0)
 doequal:
     $P2 = self.'eval_add'(tokenizer)
-    clone $P3, $P0
+    set $P3, $P0
     $I0 = iseq $P3, $P2
-    null $P0
-    $P0 = new 'Integer'
-    set $P0, $I0
-    goto more
+    goto next
 doless:
     $P2 = self.'eval_add'(tokenizer)
-    clone $P3, $P0
+    set $P3, $P0
     $I0 = islt $P3, $P2
-    null $P0
-    $P0 = new 'Integer'
-    set $P0, $I0
-    goto more
+    goto next
 dogreat:
     $P2 = self.'eval_add'(tokenizer)
-    clone $P3, $P0
+    set $P3, $P0
     $I0 = isgt $P3, $P2
+next:
     null $P0
     $P0 = new 'Integer'
     set $P0, $I0
