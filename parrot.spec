@@ -5,7 +5,7 @@ Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
-Source0:        ftp://ftp.parrot.org/pub/parrot/releases/devel/parrot/parrot-$%{version}.tar.gz
+Source0:        ftp://ftp.parrot.org/pub/parrot/releases/devel/parrot/parrot-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
@@ -148,7 +148,7 @@ rm -rf $RPM_BUILD_ROOT
 - fixed Source0 url
 
 * Tue Jan 23 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 0.9.0
-- added make html, new parrot-doc package
+- added make html
 - make reallyinstall => make install
 
 * Tue Jan 20 2009 chromatic <chromatic@wgz.org> 0.9.0
