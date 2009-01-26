@@ -824,6 +824,7 @@ examples/subs/multi_retvals.pir                             [main]doc
 examples/subs/no_retval.pir                                 [main]doc
 examples/subs/pasm_sub1.pasm                                [main]doc
 examples/subs/single_retval.pir                             [main]doc
+examples/tcl/tcltkdemo.pir                                  [main]doc
 examples/tge/README                                         [main]doc
 examples/tge/branch/branch.g                                [main]doc
 examples/tge/branch/lib/Branch.pir                          [main]doc
@@ -2703,6 +2704,8 @@ runtime/parrot/library/Stream/Sub.pir                       [library]
 runtime/parrot/library/Stream/Writer.pir                    [library]
 runtime/parrot/library/String/Utils.pir                     [library]
 runtime/parrot/library/Tcl/Glob.pir                         [library]
+runtime/parrot/library/TclLibrary.pir                       [library]
+runtime/parrot/library/TclLibrary.2.pir                     [library]
 runtime/parrot/library/Test/Builder.pir                     [library]
 runtime/parrot/library/Test/Builder/Output.pir              [library]
 runtime/parrot/library/Test/Builder/Test.pir                [library]
@@ -3213,6 +3216,7 @@ t/library/sort.t                                            []
 t/library/streams.t                                         []
 t/library/string_utils.t                                    []
 t/library/tcl_glob.t                                        []
+t/library/tcl_lib.t                                         []
 t/library/test_builder_tester.t                             []
 t/library/test_class.t                                      []
 t/library/test_more.t                                       []
