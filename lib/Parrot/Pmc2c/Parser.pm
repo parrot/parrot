@@ -124,7 +124,7 @@ sub find_attrs {
 
         # type
         \s+
-        (   (?:U)?INTVAL
+        (   U?INTVAL
           | FLOATVAL
           | STRING\s+\*
           | PMC\s+\*
