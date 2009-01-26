@@ -167,6 +167,15 @@ method echo_statement($/) {
     make $past;
 }
 
+method print_statement($/) {
+    make PAST::Op.new(
+        :pasttype('call'),
+        :name('print'),
+        :node($/),
+        $( $<expression> )
+    );
+}
+
 method expression_statement($/) {
     make $( $<expression> );
 }

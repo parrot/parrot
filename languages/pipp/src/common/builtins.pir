@@ -25,8 +25,6 @@
     .return (1)
 .end
 
-# steal builtins from Perl6
-# TODO: put that into php_builtins.pir
 .sub 'echo'
     .param pmc list            :slurpy
 
@@ -40,6 +38,14 @@
 
   iter_end:
     .RETURN_NULL()
+.end
+
+.sub 'print'
+    .param pmc arg
+
+    print arg
+
+    .RETURN_LONG(1)
 .end
 
 ## autoincrement

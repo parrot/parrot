@@ -129,6 +129,7 @@ rule statement {
     | <return_statement>               {*}  #= return_statement
     | <require_once_statement>         {*}  #= require_once_statement
     | <echo_statement>                 {*}  #= echo_statement
+    | <print_statement>                {*}  #= print_statement
     | <expression_statement>           {*}  #= expression_statement
     | <constant_definition>            {*}  #= constant_definition
     | <global_declaration>             {*}  #= global_declaration
@@ -171,6 +172,11 @@ token require_once_statement {
 
 token echo_statement {
     'echo' <.ws_char> <argument_list> <ws> <.statement_delimiter>
+    {*}
+}
+
+token print_statement {
+    'print' <.ws_char> <expression> <.statement_delimiter>
     {*}
 }
 

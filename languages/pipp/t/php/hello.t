@@ -196,7 +196,7 @@ CODE
 Hello, World!
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'print with one arg', todo => 'no print yet' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'print with one arg' );
 <?php
 print "Hello, World!\n";
 ?>
