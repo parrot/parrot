@@ -24,7 +24,9 @@ Define the the core subsystem for exceptions.
 
 #ifdef PARROT_HAS_BACKTRACE
 #  include <execinfo.h>
-#  include <dlfcn.h>
+#  ifdef PARROT_HAS_DLINFO
+#    include <dlfcn.h>
+#  endif
 #endif
 
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
@@ -565,6 +567,9 @@ Parrot_print_backtrace(void)
 #ifdef PARROT_HAS_BACKTRACE
 #  define BACKTRACE_DEPTH 32
 /*#  define BACKTRACE_VERBOSE */
+#  ifndef PARROT_HAS_DLINFO
+#    define BACKTRACE_VERBOSE
+#  endif
     /* stolen from http://www.delorie.com/gnu/docs/glibc/libc_665.html */
     void *array[BACKTRACE_DEPTH];
     int i;

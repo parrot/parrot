@@ -1,0 +1,24 @@
+/*
+ * test_dlinfo_c.c - check that Dl_info is avaible
+ */
+
+#include <execinfo.h>
+#include <dlfcn.h>
+#include <stdlib.h>
+
+int
+main(int argc, char **argv)
+{
+    Dl_info frameInfo;
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ * c-indentation-style: bsd
+ * c-basic-offset: 4
+ * indent-tabs-mode: nil
+ * End:
+ *
+ * vim: expandtab shiftwidth=4:
+ */
