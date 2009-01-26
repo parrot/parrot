@@ -70,7 +70,7 @@ CODE
 Hello, World!
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'hello' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'echo with single quoted string' );
 <?php
 echo 'Hello, World!';
 echo "\n";
