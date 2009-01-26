@@ -1347,7 +1347,6 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init))
 {
     ASSERT_ARGS(list_new_init)
     List  *list;
-    PMC   *user_array;
     PMC   *multi_key       = NULL;
     INTVAL size            = 0;
     INTVAL item_size       = 0;
@@ -1413,14 +1412,9 @@ list_new_init(PARROT_INTERP, PARROT_DATA_TYPE type, ARGIN(PMC *init))
     if (size)
         list_set_length(interp, list, size);
 
-    /* set length */
-    VTABLE_set_integer_native(interp, user_array, 2);
-
-    /* store values */
-    VTABLE_set_integer_keyed_int(interp, user_array, 0,  size);
-    VTABLE_set_pmc_keyed_int(interp, user_array, 1, multi_key);
     return list;
 }
+
 
 /*
 

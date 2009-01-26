@@ -149,10 +149,8 @@ Initializes the PMC by calling the underlying C<list_new()> function.
 
 =item C<void init_pmc(PMC *init)>
 
-Calls C<list_new_init()> to initialize the underlying list.
-
-C<*init> contains the initialization information specifying initial
-size, number of dimensions, etc.
+C<*init> contains the initialization information specifying initial size,
+number of dimensions, etc.
 
 =cut
 
