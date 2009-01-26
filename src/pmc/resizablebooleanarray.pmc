@@ -34,6 +34,9 @@ C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 #define BITS_TO_BYTES(size) ((size) / BITS_PER_CHAR)
 
 pmclass ResizableBooleanArray extends FixedBooleanArray need_ext provides array {
+    /* RBA uses the same attributes as FBA, but in RBA they're used as follows:
+       size:             position of the last element (a.k.a tail_pos)
+       resize_threshold: position of the first element (a.k.a. head_pos) */
 
 
 /*
@@ -53,7 +56,7 @@ Returns the integer value of the element at index C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        INTVAL offsetkey;
+        UINTVAL offsetkey, tail_pos, head_pos;
 
         /* Try to make negative index into a real index */
         if (key < 0) {
@@ -66,9 +69,11 @@ Returns the integer value of the element at index C<key>.
         }
 
         /* Check if key is greater than allocated size */
-        offsetkey = key + PMC_int_val2(SELF);
+        GET_ATTR_size(INTERP, SELF, tail_pos);
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+        offsetkey = key + head_pos;
 
-        if (offsetkey >= PMC_int_val(SELF))
+        if (offsetkey >= tail_pos)
             return 0;
 
         return SUPER(offsetkey);
@@ -85,7 +90,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        INTVAL offsetkey;
+        UINTVAL offsetkey, tail_pos, head_pos;
 
         /* Try to make negative index into a real index */
         if (key < 0) {
@@ -98,9 +103,11 @@ Sets the integer value of the element at index C<key> to C<value>.
         }
 
         /* Check if key is greater than allocated size */
-        offsetkey = key + PMC_int_val2(SELF);
+        GET_ATTR_size(INTERP, SELF, tail_pos);
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+        offsetkey = key + head_pos;
 
-        if (offsetkey >= PMC_int_val(SELF))
+        if (offsetkey >= tail_pos)
             SELF.set_integer_native(key+1);
 
         SUPER(offsetkey, value);
@@ -117,14 +124,17 @@ Resizes the array to C<size> elements.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
-        /* Size respects any existing head position offset from unshift */
-        size_t newsize = size + PMC_int_val2(SELF);
-        size_t oldsize = PMC_int_val(SELF);
 
-        size_t new_bytesize, old_bytesize;
+        unsigned char * bit_array;
+        size_t          old_tail_pos, new_tail_pos, new_size_in_bytes, old_size_in_bytes;
+
+        /* Size respects any existing head position offset from unshift */
+        GET_ATTR_resize_threshold(INTERP, SELF, new_tail_pos);
+        GET_ATTR_size(INTERP, SELF, old_tail_pos);
+        new_tail_pos += size;
 
         /* We are already at the requested size. Yay */
-        if (newsize == oldsize)
+        if (new_tail_pos == old_tail_pos)
             return;
 
         if (size < 0)
@@ -132,34 +142,39 @@ Resizes the array to C<size> elements.
                 "ResizableBooleanArray: Can't resize!");
 
         /* now set the new size, in bits */
-        PMC_int_val(SELF) = newsize;
+        SET_ATTR_size(INTERP, SELF, new_tail_pos);
 
         /* convert sizes to bytes */
-        new_bytesize  = ROUND_BYTES(newsize);
-        old_bytesize  = ROUND_BYTES(oldsize);
+        new_size_in_bytes = ROUND_BYTES(new_tail_pos);
+        old_size_in_bytes = ROUND_BYTES(old_tail_pos);
 
         /* Nothing allocated yet */
-        if (!PMC_data(SELF))
-            PMC_data(SELF) = mem_sys_allocate_zeroed(new_bytesize);
+        GET_ATTR_bit_array(INTERP, SELF, bit_array);
+        if (!bit_array) {
+            SET_ATTR_bit_array(INTERP, SELF, 
+                    (unsigned char *)mem_sys_allocate_zeroed(new_size_in_bytes));
 
         /* The size is different, and doesn't fit within the current
          * allocation */
-        else if (new_bytesize != old_bytesize) {
-            Parrot_UInt1 * old_store = PMC_data_typed(SELF, Parrot_UInt1 *);
-            Parrot_UInt1 * new_store =
-                (Parrot_UInt1 *)mem_sys_allocate_zeroed(newsize);
-            size_t         copy_size =
-                new_bytesize < old_bytesize ? new_bytesize : old_bytesize;
+        }
+        else if (new_size_in_bytes != old_size_in_bytes) {
+            unsigned char * old_store = bit_array;
+            unsigned char * new_store =
+                (unsigned char *)mem_sys_allocate_zeroed(new_tail_pos);
+            size_t          copy_size =
+                new_size_in_bytes < old_size_in_bytes ? new_size_in_bytes : old_size_in_bytes;
 
             /* Replace old array with new array, and free old array */
-            PMC_data(SELF) = mem_sys_memmove(new_store, old_store, copy_size);
+            SET_ATTR_bit_array(INTERP, SELF, 
+                    (unsigned char *)mem_sys_memmove(
+                        new_store, old_store, copy_size));
             mem_sys_free(old_store);
         }
     }
 
 /*
 
-=item C<void push_integer(INTVAL size)>
+=item C<void push_integer(INTVAL value)>
 
 Extends the array by adding an element of value C<value> to the end.
 
@@ -168,14 +183,20 @@ Extends the array by adding an element of value C<value> to the end.
 */
 
     VTABLE void push_integer(INTVAL value) {
-        const INTVAL size = PMC_int_val(SELF) - PMC_int_val2(SELF);
-        SELF.set_integer_native(size + 1);
-        SELF.set_integer_keyed_int(size, value);
+        UINTVAL tail_pos, head_pos;
+        INTVAL  new_size;
+
+        GET_ATTR_size(INTERP, SELF, tail_pos);
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+
+        new_size = tail_pos - head_pos;
+        SELF.set_integer_native(new_size + 1);
+        SELF.set_integer_keyed_int(new_size, value);
     }
 
 /*
 
-=item C<void pop_integer(INTVAL size)>
+=item C<void pop_integer(INTVAL value)>
 
 Removes and returns the last element.
 
@@ -184,22 +205,26 @@ Removes and returns the last element.
 */
 
     VTABLE INTVAL pop_integer() {
-        INTVAL size, value;
+        UINTVAL new_size, tail_pos, head_pos;
+        INTVAL  value;
 
         if (SELF.elements() < 1)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "ResizableBooleanArray: Can't pop from an empty array!");
 
-        size  = PMC_int_val(SELF) - PMC_int_val2(SELF);
-        value = SELF.get_integer_keyed_int(size - 1);
-        SELF.set_integer_native(size - 1);
+        GET_ATTR_size(INTERP, SELF, tail_pos);
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+
+        new_size  = tail_pos - head_pos;
+        value = SELF.get_integer_keyed_int(new_size - 1);
+        SELF.set_integer_native(new_size - 1);
 
         return value;
     }
 
 /*
 
-=item C<void unshift_integer(INTVAL size)>
+=item C<void unshift_integer(INTVAL value)>
 
 Extends the array by adding an element of value C<value> to the
 beginning.
@@ -209,35 +234,44 @@ beginning.
 */
 
     VTABLE void unshift_integer(INTVAL value) {
+        UINTVAL head_pos;
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+
         /* If the current head position offset is 0, size this thing up by one
          * allocation unit */
-        if (PMC_int_val2(SELF) <= 0) {
-            Parrot_UInt1 * const sdOld = PMC_data_typed(SELF, Parrot_UInt1 *);
+        if (head_pos<= 0) {
+
+            UINTVAL         tail_pos, new_size;
+            unsigned char * old_bit_array;
+            size_t          old_mem_size, new_mem_size;
+            unsigned char * new_bit_array;
+
+            GET_ATTR_size(INTERP, SELF, tail_pos);
+            GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+            GET_ATTR_bit_array(INTERP, SELF, old_bit_array);
 
             /* Allocate an extra allocation unit of space in new array */
-            size_t oldmemsize, newmemsize;
-            Parrot_UInt1 *sdNew = NULL;
-            newmemsize          = ROUND_BYTES(PMC_int_val(SELF) + MIN_ALLOC);
-            sdNew               =
-                (Parrot_UInt1 *)mem_sys_allocate_zeroed(newmemsize);
+            new_mem_size  = ROUND_BYTES(tail_pos+ MIN_ALLOC);
+            new_bit_array = (unsigned char *)mem_sys_allocate_zeroed(new_mem_size);
 
             /* Copy contents of old array to new array, moving the head
              * position forward by one allocation unit (in bytes). */
-            oldmemsize = ROUND_BYTES(PMC_int_val(SELF));
-            mem_sys_memmove(sdNew + (BITS_TO_BYTES(MIN_ALLOC)), sdOld, oldmemsize);
+            old_mem_size = ROUND_BYTES(tail_pos);
+            mem_sys_memmove(new_bit_array + (BITS_TO_BYTES(MIN_ALLOC)), old_bit_array, old_mem_size);
 
             /* Replace old array with new array, and free old array */
-            PMC_data(SELF) = sdNew;
-            mem_sys_free(sdOld);
+            SET_ATTR_bit_array(INTERP, SELF, new_bit_array);
+            mem_sys_free(old_bit_array);
 
             /* Added one allocation unit to the head position offset */
-            PMC_int_val2(SELF) += MIN_ALLOC;
-            PMC_int_val(SELF)  += MIN_ALLOC;
+            SET_ATTR_size(            INTERP, SELF, tail_pos + MIN_ALLOC);
+            SET_ATTR_resize_threshold(INTERP, SELF, head_pos + MIN_ALLOC);
 
         }
 
         /* Move the head position */
-        PMC_int_val2(SELF)--;
+        GET_ATTR_resize_threshold(INTERP, SELF,   head_pos);
+        SET_ATTR_resize_threshold(INTERP, SELF, --head_pos);
 
         /* Assign the new value as the first item */
         SELF.set_integer_keyed_int(0, value);
@@ -245,7 +279,7 @@ beginning.
 
 /*
 
-=item C<void shift_integer(INTVAL size)>
+=item C<void shift_integer(INTVAL value)>
 
 Removes and returns the first element.
 
@@ -255,6 +289,7 @@ Removes and returns the first element.
 
     VTABLE INTVAL shift_integer() {
         INTVAL value;
+        UINTVAL tail_pos, head_pos;
 
         if (SELF.elements() < 1)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -264,32 +299,33 @@ Removes and returns the first element.
         value = SELF.get_integer_keyed_int(0);
 
         /* Move the head position */
-        PMC_int_val2(SELF)++;
+        GET_ATTR_resize_threshold(INTERP, SELF,   head_pos);
+        SET_ATTR_resize_threshold(INTERP, SELF, ++head_pos);
 
         /* If the head position offset is greater than our allocation unit
          * size, size this thing down */
-        if (PMC_int_val2(SELF) >= MIN_ALLOC) {
+        if (head_pos >= MIN_ALLOC) {
             /* Allocate one allocation unit less of space in new array */
-            Parrot_UInt1 *sdNew      = NULL;
-            Parrot_UInt1 *sdOld      = NULL;
-            size_t        newmemsize = ROUND_BYTES(PMC_int_val(SELF)
-                                            - MIN_ALLOC);
-            sdNew                    =
-                (Parrot_UInt1 *)mem_sys_allocate_zeroed(newmemsize);
+            unsigned char *new_bit_array, *old_bit_array;
+            size_t         new_mem_size;
+            GET_ATTR_size(INTERP, SELF, tail_pos);
+            new_mem_size  = ROUND_BYTES(tail_pos - MIN_ALLOC);
+            new_bit_array = 
+                (unsigned char *)mem_sys_allocate_zeroed(new_mem_size);
 
             /* Copy contents of old array to new array, move the head position
              * offset back by one allocation unit (in bytes) */
-            sdOld = PMC_data_typed(SELF, Parrot_UInt1 *);
-            mem_sys_memmove(sdNew, sdOld + (BITS_TO_BYTES(MIN_ALLOC)), newmemsize);
+            GET_ATTR_bit_array(INTERP, SELF, old_bit_array);
+            mem_sys_memmove(new_bit_array, old_bit_array + (BITS_TO_BYTES(MIN_ALLOC)), new_mem_size);
 
             /* Replace old array with new array, and free old array */
-            PMC_data(SELF) = sdNew;
-            mem_sys_free(sdOld);
+            SET_ATTR_bit_array(INTERP, SELF, new_bit_array);
+            mem_sys_free(old_bit_array);
 
             /* Removed one allocation unit from the head position offset */
-            PMC_int_val2(SELF) -= MIN_ALLOC;
-            PMC_int_val(SELF)  -= MIN_ALLOC;
-
+            SET_ATTR_size(INTERP, SELF, tail_pos - MIN_ALLOC);
+            GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+            SET_ATTR_resize_threshold(INTERP, SELF, head_pos- MIN_ALLOC);
         }
 
         return value;
@@ -304,7 +340,10 @@ Removes and returns the first element.
 */
 
     VTABLE INTVAL elements() {
-        return PMC_int_val(SELF) - PMC_int_val2(SELF);
+        UINTVAL tail_pos, head_pos;
+        GET_ATTR_size(INTERP, SELF, tail_pos);
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+        return tail_pos - head_pos;
     }
 
 /*
@@ -332,19 +371,27 @@ Returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest      = pmc_new(INTERP, SELF->vtable->base_type);
-        size_t      dest_size = PMC_int_val(SELF);
+        UINTVAL         tail_pos, head_pos;
+        unsigned char * my_bit_array, * dest_bit_array;
 
-        PMC_int_val(dest)     = dest_size;
-        PMC_int_val2(dest)    = PMC_int_val2(SELF);
+        PMC * const     dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-        if (PMC_data(SELF)) {
-            size_t dest_size_in_bits = dest_size / BITS_PER_CHAR + 1;
-            PMC_data(dest) = mem_sys_allocate(dest_size_in_bits);
-            mem_sys_memcopy(PMC_data(dest), PMC_data(SELF), dest_size_in_bits);
+        GET_ATTR_bit_array(INTERP, SELF, my_bit_array);
+        GET_ATTR_size(INTERP, SELF, tail_pos);
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+
+        SET_ATTR_size(INTERP, dest, tail_pos);
+        SET_ATTR_resize_threshold(INTERP, dest, head_pos);
+
+        if (my_bit_array) {
+            size_t size_in_bits = tail_pos / BITS_PER_CHAR + 1;
+            dest_bit_array = (unsigned char *)mem_sys_allocate(size_in_bits);
+            mem_sys_memcopy(dest_bit_array, my_bit_array, size_in_bits);
         }
         else
-            PMC_data(dest) = NULL;
+            dest_bit_array = NULL;
+
+        SET_ATTR_bit_array(INTERP, dest, dest_bit_array);
 
         PObj_active_destroy_SET(dest);
         return dest;
@@ -374,13 +421,19 @@ Used to archive the string.
         */
 
         STRING           *s;
-        IMAGE_IO * const  io   = info->image_io;
-        const size_t      size = ROUND_BYTES(PMC_int_val(SELF));
+        UINTVAL           tail_pos, rounded_size, head_pos;
+        unsigned char    *bit_array;
+        IMAGE_IO * const  io = info->image_io;
 
-        VTABLE_push_integer(INTERP, io, PMC_int_val2(SELF));
-        VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
+        GET_ATTR_size(INTERP, SELF, tail_pos);
+        GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+        GET_ATTR_bit_array(INTERP, SELF, bit_array);
+        rounded_size = ROUND_BYTES(tail_pos);
 
-        s = string_from_cstring(INTERP, PMC_data_typed(SELF, char *), size);
+        VTABLE_push_integer(INTERP, io, head_pos);
+        VTABLE_push_integer(INTERP, io, tail_pos);
+
+        s = string_from_cstring(INTERP, (char*)bit_array, tail_pos);
 
         VTABLE_push_string(INTERP, io, s);
     }
@@ -395,15 +448,20 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO * const io      = info->image_io;
-        const INTVAL     headPos = VTABLE_shift_integer(INTERP, io);
-        const INTVAL     tailPos = VTABLE_shift_integer(INTERP, io);
-        STRING * const   s       = VTABLE_shift_string(INTERP, io);
+        unsigned char   *bit_array;
+        IMAGE_IO * const io       = info->image_io;
+        const UINTVAL    head_pos = VTABLE_shift_integer(INTERP, io);
+        const UINTVAL    tail_pos = VTABLE_shift_integer(INTERP, io);
+        STRING * const   s        = VTABLE_shift_string(INTERP, io);
 
-        PMC_data(SELF)           = mem_sys_allocate_zeroed(s->bufused);
-        mem_sys_memcopy(PMC_data(SELF), s->strstart, s->bufused);
-        PMC_int_val2(SELF)       = headPos;
-        PMC_int_val(SELF)        = tailPos;
+        bit_array      = (unsigned char *)mem_sys_allocate_zeroed(s->bufused);
+        mem_sys_memcopy(bit_array, (unsigned char *)s->strstart, s->bufused);
+        PMC_data(SELF) = 
+            mem_allocate_zeroed_typed(Parrot_ResizableBooleanArray_attributes);
+
+        SET_ATTR_size(INTERP, SELF, tail_pos);
+        SET_ATTR_resize_threshold(INTERP, SELF, head_pos);
+        SET_ATTR_bit_array(INTERP, SELF, bit_array);
     }
 
 }  /* pmclass */
