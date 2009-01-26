@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 19;
 
 language_output_is( 'Pipp', <<'CODE', 'Hello, World!', 'sea without newline' );
 Hello, World!<?php
@@ -62,7 +62,7 @@ CODE
 Hello, World!
 OUT
 
-language_output_is( 'Pipp', <<'CODE', <<'OUT', 'hello' );
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'echo one double quoted string' );
 <?php
 echo "Hello, World!\n";
 ?>
@@ -187,3 +187,20 @@ echo "Hello, World!\n";
 CODE
 Hello, World!
 OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'echo with three args' );
+<?php
+echo 'Hello', ', World!', "\n";
+?>
+CODE
+Hello, World!
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'print with one arg', todo => 'no print yet' );
+<?php
+print "Hello, World!\n";
+?>
+CODE
+Hello, World!
+OUT
+
