@@ -366,7 +366,7 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
     do {
         int first = 1;
         do {
-            while (pre_optimize(interp, unit));
+            while (pre_optimize(interp, unit)) { };
 
             find_basic_blocks(interp, unit, first);
             build_cfg(interp, unit);

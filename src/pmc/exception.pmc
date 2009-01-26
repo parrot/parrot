@@ -127,7 +127,7 @@ Initializes the exception with supplied values.
         PMC_data(SELF)            = core_struct;
         core_struct->severity     = ishash
             ? VTABLE_get_integer_keyed_str(interp, values, severity)
-            : EXCEPT_error;
+            : (INTVAL) EXCEPT_error;
         core_struct->handled      = 0;
         core_struct->message      = ishash
             ? VTABLE_get_string_keyed_str(interp, values, message)

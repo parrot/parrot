@@ -286,8 +286,8 @@ void Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 #endif
 
 #if PARROT_GC_MS
-#  define GC_WRITE_BARRIER(interp, agg, old, _new)
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key)
+#  define GC_WRITE_BARRIER(interp, agg, old, _new) do { } while (0)
+#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { } while (0)
 #endif
 
 #if PARROT_GC_GMS
