@@ -22,7 +22,7 @@ This file implements the charset functions for binary data
 #include "ascii.h"
 #include "binary.h"
 
-/* HEADERIZER HFILE: src/charset/binary.h */
+/* HEADERIZER HFILE: src/string/charset/binary.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

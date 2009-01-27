@@ -20,7 +20,7 @@ This file implements the charset functions for iso-8859-1 data
 #include "iso-8859-1.h"
 #include "ascii.h"
 
-/* HEADERIZER HFILE: src/charset/iso-8859-1.h */
+/* HEADERIZER HFILE: src/string/charset/iso-8859-1.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

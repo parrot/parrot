@@ -21,7 +21,7 @@ This file implements the charset functions for unicode data
 #include "ascii.h"
 #include "tables.h"
 
-/* HEADERIZER HFILE: src/charset/unicode.h */
+/* HEADERIZER HFILE: src/string/charset/unicode.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

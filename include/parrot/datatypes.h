@@ -138,6 +138,10 @@ const struct _data_types data_types[] = {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+FLOATVAL floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_get_datatype_enum(PARROT_INTERP,
     ARGIN(const STRING *type_name))
@@ -150,10 +154,8 @@ PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
 
-PARROT_EXPORT
-FLOATVAL
-floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num);
-
+#define ASSERT_ARGS_floatval_divide_by_zero __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_datatype_enum __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(type_name)

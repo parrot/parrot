@@ -13,7 +13,7 @@
 #ifndef PARROT_ENCODING_UCS2_H_GUARD
 #define PARROT_ENCODING_UCS2_H_GUARD
 
-/* HEADERIZER BEGIN: src/encodings/ucs2.c */
+/* HEADERIZER BEGIN: src/string/encoding/ucs2.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
@@ -23,7 +23,7 @@ ENCODING * Parrot_encoding_ucs2_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_encoding_ucs2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/encodings/ucs2.c */
+/* HEADERIZER END: src/string/encoding/ucs2.c */
 
 #endif /* PARROT_ENCODING_UCS2_H_GUARD */
 

@@ -13,7 +13,7 @@
 #ifndef PARROT_CHARSET_BINARY_H_GUARD
 #define PARROT_CHARSET_BINARY_H_GUARD
 
-/* HEADERIZER BEGIN: src/charset/binary.c */
+/* HEADERIZER BEGIN: src/string/charset/binary.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
@@ -23,7 +23,7 @@ const CHARSET * Parrot_charset_binary_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_charset_binary_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/charset/binary.c */
+/* HEADERIZER END: src/string/charset/binary.c */
 
 #endif /* PARROT_CHARSET_BINARY_H_GUARD */
 

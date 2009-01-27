@@ -21,7 +21,7 @@ UCS-2 encoding with the help of the ICU library.
 #include "parrot/parrot.h"
 #include "../unicode.h"
 
-/* HEADERIZER HFILE: src/encodings/ucs2.h */
+/* HEADERIZER HFILE: src/string/encoding/ucs2.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

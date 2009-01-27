@@ -17,7 +17,7 @@
  * common functions for ascii-ish charsets
  */
 
-/* HEADERIZER BEGIN: src/charset/ascii.c */
+/* HEADERIZER BEGIN: src/string/charset/ascii.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
@@ -135,7 +135,7 @@ const CHARSET * Parrot_charset_ascii_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_charset_ascii_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/charset/ascii.c */
+/* HEADERIZER END: src/string/charset/ascii.c */
 
 #endif /* PARROT_CHARSET_ASCII_H_GUARD */
 

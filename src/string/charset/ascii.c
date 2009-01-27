@@ -26,7 +26,7 @@ charset functionality for similar charsets like iso-8859-1.
 
 #include "tables.h"
 
-/* HEADERIZER HFILE: src/charset/ascii.h */
+/* HEADERIZER HFILE: src/string/charset/ascii.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

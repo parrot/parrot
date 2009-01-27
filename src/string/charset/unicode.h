@@ -18,7 +18,7 @@
  */
 
 
-/* HEADERIZER BEGIN: src/charset/unicode.c */
+/* HEADERIZER BEGIN: src/string/charset/unicode.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
@@ -28,7 +28,7 @@ const CHARSET * Parrot_charset_unicode_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_charset_unicode_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/charset/unicode.c */
+/* HEADERIZER END: src/string/charset/unicode.c */
 
 
 #endif /* PARROT_CHARSET_UNICODE_H_GUARD */

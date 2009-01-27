@@ -29,8 +29,11 @@ subroutines.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void check_for_opt_flag(PARROT_INTERP, ARGMOD(call_state *st), int has_arg)
+static void check_for_opt_flag(PARROT_INTERP,
+    ARGMOD(call_state *st),
+    int has_arg)
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
 static void check_named(PARROT_INTERP, ARGMOD(call_state *st))
@@ -141,6 +144,7 @@ static int locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
 
 static void next_arg_sig(PARROT_INTERP, ARGMOD(call_state_item *sti))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*sti);
 
 static void null_val(int sig, ARGMOD(call_state *st))
@@ -231,7 +235,8 @@ static void too_many(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_check_for_opt_flag __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(st)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(st)
 #define ASSERT_ARGS_check_named __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(st)
@@ -284,7 +289,8 @@ static void too_many(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(st)
 #define ASSERT_ARGS_next_arg_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sti)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sti)
 #define ASSERT_ARGS_null_val __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(st)
 #define ASSERT_ARGS_set_context_sig_params __attribute__unused__ int _ASSERT_ARGS_CHECK = \

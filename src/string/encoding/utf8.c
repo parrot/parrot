@@ -22,7 +22,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 #include "../unicode.h"
 #include "utf8.h"
 
-/* HEADERIZER HFILE: src/encodings/utf8.h */
+/* HEADERIZER HFILE: src/string/encoding/utf8.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

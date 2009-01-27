@@ -13,7 +13,7 @@
 #ifndef PARROT_ENCODING_UTF16_H_GUARD
 #define PARROT_ENCODING_UTF16_H_GUARD
 
-/* HEADERIZER BEGIN: src/encodings/utf16.c */
+/* HEADERIZER BEGIN: src/string/encoding/utf16.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
@@ -23,7 +23,7 @@ ENCODING * Parrot_encoding_utf16_init(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_encoding_utf16_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/encodings/utf16.c */
+/* HEADERIZER END: src/string/encoding/utf16.c */
 
 #endif /* PARROT_ENCODING_UTF16_H_GUARD */
 
