@@ -1111,7 +1111,7 @@ $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h
 $(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/inter_call$(O) : $(SRC_DIR)/inter_call.c $(GENERAL_H_FILES) \
-    $(SRC_DIR)/inter_call.str
+    $(SRC_DIR)/inter_call.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
 
 $(SRC_DIR)/inter_cb$(O) : $(SRC_DIR)/inter_cb.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_cb.str
