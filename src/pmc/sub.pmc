@@ -715,8 +715,8 @@ The number of optional named arguments
 
             /* If the first instruction is a get_params... */
             if (*pc == PARROT_OP_get_params_pc) {
-                int i, sig_length;
-                PMC *sig;
+                int     i, sig_length;
+                PMC    *sig;
 
                 /* Get the signature (the next thing in the bytecode). */
                 pc++;
@@ -724,10 +724,10 @@ The number of optional named arguments
                 ASSERT_SIG_PMC(sig);
 
                 /* Iterate over the signature and compute argument counts. */
-                sig_length = SIG_ELEMS(sig);
+                sig_length = VTABLE_elements(INTERP, sig);
                 for (i = 0; i < sig_length; i++)
                 {
-                    int sig_item = SIG_ITEM(sig, i);
+                    int sig_item = VTABLE_get_integer_keyed_int(INTERP, sig, i);;
                     if (PARROT_ARG_SLURPY_ARRAY_ISSET(sig_item)){
                         if (PARROT_ARG_NAME_ISSET(sig_item))
                             sub->arg_info->named_slurpy = 1;
@@ -736,7 +736,7 @@ The number of optional named arguments
                     }
                     else if (PARROT_ARG_NAME_ISSET(sig_item)) {
                         i++;
-                        sig_item = SIG_ITEM(sig, i);
+                        sig_item = VTABLE_get_integer_keyed_int(INTERP, sig, i);;
                         if (PARROT_ARG_OPTIONAL_ISSET(sig_item))
                             sub->arg_info->named_optional++;
                         else

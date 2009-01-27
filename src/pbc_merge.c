@@ -762,9 +762,9 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
             const PMC * const sig = bc->const_table->constants[op_ptr[1]]->u.key;
 
             /* Loop over the arguments to locate any that need a fixup. */
-            const int sig_items = SIG_ELEMS(sig);
+            const int sig_items = VTABLE_elements(interp, sig);
             for (cur_arg = 0; cur_arg < sig_items; cur_arg++) {
-                switch (SIG_ITEM(sig, cur_arg)) {
+                switch (VTABLE_get_integer_keyed_int(interp, sig, cur_arg)) {
                     case PARROT_ARG_NC:
                     case PARROT_ARG_PC:
                     case PARROT_ARG_SC:

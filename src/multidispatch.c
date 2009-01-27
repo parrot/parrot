@@ -593,14 +593,14 @@ Parrot_mmd_arg_tuple_func(PARROT_INTERP)
 
     ASSERT_SIG_PMC(args_array);
 
-    sig_len = SIG_ELEMS(args_array);
+    sig_len = VTABLE_elements(interp, args_array);
     if (!sig_len)
         return arg_tuple;
 
     ++args_op;
 
     for (i = 0; i < sig_len; ++i, ++args_op) {
-        type = SIG_ITEM(args_array, i);
+        type = VTABLE_get_integer_keyed_int(interp, args_array, i);
 
         /* named don't MMD */
         if (type & PARROT_ARG_NAME)

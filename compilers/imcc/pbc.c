@@ -1388,7 +1388,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
                 break;
             case PFC_STRING:
                 ns_pmc = constant_pmc_new(interp, enum_class_String);
-                PMC_str_val(ns_pmc) = ct->constants[ns_const]->u.string;
+                VTABLE_set_string_native(interp, ns_pmc, ct->constants[ns_const]->u.string);
                 break;
             default:
                 break;

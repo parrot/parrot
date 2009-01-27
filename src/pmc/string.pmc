@@ -890,7 +890,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
         p = (unsigned char *)src->strstart;
         /* TODO verify trans table */
 
-        tr_data = PMC_data_typed(table, INTVAL *);    /* XXX */
+        GETATTR_FixedIntegerArray_int_array(INTERP, table, tr_data);
 
         for (i = 0; i < len; ++i, ++p) {
             const unsigned char ch = (unsigned char)tr_data[*p];

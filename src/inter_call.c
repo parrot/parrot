@@ -22,13 +22,14 @@ subroutines.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
+#include "pmc/pmc_fixedintegerarray.h"
 
 /* HEADERIZER HFILE: include/parrot/inter_call.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void check_for_opt_flag(ARGMOD(call_state *st), int has_arg)
+static void check_for_opt_flag(PARROT_INTERP, ARGMOD(call_state *st), int has_arg)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*st);
 
@@ -138,7 +139,7 @@ static int locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*st);
 
-static void next_arg_sig(ARGMOD(call_state_item *sti))
+static void next_arg_sig(PARROT_INTERP, ARGMOD(call_state_item *sti))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*sti);
 
@@ -429,7 +430,7 @@ These functions return 0 if no arguments are present, or 1 on success.
 
 PARROT_EXPORT
 int
-Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
+Parrot_init_arg_indexes_and_sig_pmc(PARROT_INTERP, ARGIN(Parrot_Context *ctx),
         ARGIN_NULLOK(opcode_t *indexes), ARGIN_NULLOK(PMC *sig_pmc),
         ARGMOD(call_state_item *sti))
 {
@@ -453,11 +454,11 @@ Parrot_init_arg_indexes_and_sig_pmc(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
         ASSERT_SIG_PMC(sig_pmc);
         sti->u.op.signature = sig_pmc;
         sti->u.op.pc        = indexes;
-        sti->n              = SIG_ELEMS(sig_pmc);
+        sti->n              = VTABLE_elements(interp, sig_pmc);
 
         /* initialize sti->sig */
         if (sti->n)
-            next_arg_sig(sti);
+            next_arg_sig(interp, sti);
     }
 
     return sti->n > 0;
@@ -507,7 +508,7 @@ const_table), registers, function signature, and arguments.
 
 PARROT_EXPORT
 int
-Parrot_init_arg_sig(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
+Parrot_init_arg_sig(PARROT_INTERP, ARGIN(Parrot_Context *ctx),
     ARGIN(const char *sig), ARGIN_NULLOK(void *ap),
     ARGMOD(call_state_item *sti))
 {
@@ -526,7 +527,7 @@ Parrot_init_arg_sig(SHIM_INTERP, ARGIN(Parrot_Context *ctx),
 
         /* initialize st->sig */
         if (sti->n)
-            next_arg_sig(sti);
+            next_arg_sig(interp, sti);
     }
 
     return sti->n > 0;
@@ -589,12 +590,13 @@ type of argument/parameter to get next.  The index gets increased elsewhere.
 */
 
 static void
-next_arg_sig(ARGMOD(call_state_item *sti))
+next_arg_sig(PARROT_INTERP, ARGMOD(call_state_item *sti))
 {
     ASSERT_ARGS(next_arg_sig)
     switch (sti->mode & CALL_S_D_MASK) {
         case CALL_STATE_OP:
-            sti->sig = SIG_ITEM(sti->u.op.signature, sti->i);
+            sti->sig = VTABLE_get_integer_keyed_int(interp,
+                    sti->u.op.signature, sti->i);
             break;
         case CALL_STATE_SIG:
             switch (sti->u.sig.sig[sti->i]) {
@@ -770,7 +772,7 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
 
     st->src.used = 0;
 
-    next_arg_sig(&st->src);
+    next_arg_sig(interp, &st->src);
 
     /* check if we're supposed to continue a :flat argument */
     if (st->src.mode & CALL_STATE_FLATTEN) {
@@ -807,7 +809,7 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
     && !(st->src.sig & PARROT_ARG_FLATTEN)) {
         fetch_arg_op(interp, st);
         st->name = UVal_str(st->val);
-        next_arg_sig(&st->src);
+        next_arg_sig(interp, &st->src);
     }
 
     switch (st->src.mode & CALL_S_D_MASK) {
@@ -839,7 +841,7 @@ int
 Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
 {
     ASSERT_ARGS(Parrot_fetch_arg_nci)
-    next_arg_sig(&st->dest);
+    next_arg_sig(interp, &st->dest);
 
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
         PMC *slurped = pmc_new(interp,
@@ -1013,7 +1015,7 @@ Otherwise moves on.
 */
 
 static void
-check_for_opt_flag(ARGMOD(call_state *st), int has_arg)
+check_for_opt_flag(PARROT_INTERP, ARGMOD(call_state *st), int has_arg)
 {
     ASSERT_ARGS(check_for_opt_flag)
     INTVAL idx;
@@ -1026,7 +1028,7 @@ check_for_opt_flag(ARGMOD(call_state *st), int has_arg)
     if (dest->i >= dest->n)
         return;
 
-    next_arg_sig(dest);
+    next_arg_sig(interp, dest);
 
     /* if this isn't an :opt_flag argument, we need to reset things
      * and go to the next argument */
@@ -1113,7 +1115,8 @@ init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
     /* 1) count named args, make sure there is less than 32/64
      * 2) create slurpy hash if needed */
     for (i = st->dest.i; i < st->dest.n; ++i) {
-        const INTVAL sig = SIG_ITEM(st->dest.u.op.signature, i);
+        const INTVAL sig = VTABLE_get_integer_keyed_int(interp,
+                st->dest.u.op.signature, i);
 
         /* skip the arg name, only count the actual args of the named args */
         if (!(sig & PARROT_ARG_NAME))
@@ -1168,7 +1171,8 @@ locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
         int idx;
         STRING *param;
 
-        st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
+        st->dest.sig = VTABLE_get_integer_keyed_int(interp,
+                st->dest.u.op.signature, i);
         if (!(st->dest.sig & PARROT_ARG_NAME))
             continue;
 
@@ -1183,7 +1187,8 @@ locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
 
         if (st->name == param || string_equal(interp, st->name, param) == 0) {
             ++i;
-            st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
+            st->dest.sig = VTABLE_get_integer_keyed_int(interp,
+                    st->dest.u.op.signature, i);
             st->dest.i   = i;
 
             /* if bit is set we have a duplicate */
@@ -1371,7 +1376,8 @@ check_named(PARROT_INTERP, ARGMOD(call_state *st))
 
     for (i = st->first_named; i < st->dest.n; ++i) {
         /* verify that a name exists */
-        const INTVAL sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
+        const INTVAL sig = st->dest.sig =
+            VTABLE_get_integer_keyed_int(interp, st->dest.u.op.signature, i);
         if (sig & PARROT_ARG_NAME) {
             INTVAL arg_sig;
             int last_name_pos;
@@ -1387,12 +1393,17 @@ check_named(PARROT_INTERP, ARGMOD(call_state *st))
             i++;
 
             /* verify that an actual arg exists */
-            arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i);
+            arg_sig = st->dest.sig = VTABLE_get_integer_keyed_int(interp,
+                    st->dest.u.op.signature, i);
             PARROT_ASSERT(!(arg_sig & PARROT_ARG_NAME));
 
             /* if this named arg is already filled, continue */
             if (st->named_done & (1 << n_named)) {
-                arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i+1);
+                /* XXX: This reads past the end of the array. TT #233*/
+                INTVAL* int_array;
+                GETATTR_FixedIntegerArray_int_array(interp,
+                        st->dest.u.op.signature, int_array);
+                arg_sig = st->dest.sig = int_array[i+1];
 
                 /* skip associated opt flag arg as well */
                 if (arg_sig & PARROT_ARG_OPT_FLAG)
@@ -1409,7 +1420,8 @@ check_named(PARROT_INTERP, ARGMOD(call_state *st))
                 /* Don't walk off the end of the array */
                 if (i+1 >= st->dest.n)
                     continue;
-                arg_sig = st->dest.sig = SIG_ITEM(st->dest.u.op.signature, i+1);
+                arg_sig = st->dest.sig = VTABLE_get_integer_keyed_int(interp,
+                        st->dest.u.op.signature, i+1);
                 if (arg_sig & PARROT_ARG_OPT_FLAG) {
                     i++;
                     idx = st->dest.u.op.pc[i];
@@ -1505,7 +1517,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
         int has_arg;
 
         /* check if the next dest arg is :slurpy */
-        next_arg_sig(dest);
+        next_arg_sig(interp, dest);
         if (dest->sig & PARROT_ARG_SLURPY_ARRAY)
             break;
 
@@ -1534,11 +1546,11 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
                 PARROT_ASSERT(idx >= 0);
                 store_arg(st, idx);
 
-                check_for_opt_flag(st, 0);
+                check_for_opt_flag(interp, st, 0);
 
                 /* next dest arg */
                 dest->i++;
-                next_arg_sig(dest);
+                next_arg_sig(interp, dest);
             }
 
             /* Restore value */
@@ -1553,7 +1565,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
             if (!has_arg)
                 break;
             dest->i++;
-            next_arg_sig(dest);
+            next_arg_sig(interp, dest);
         }
 
         /* if there *is* an arg, convert it */
@@ -1581,7 +1593,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
         /* if we're at an :optional argument, check for an :opt_flag */
         if (dest->sig & PARROT_ARG_OPTIONAL)
-            check_for_opt_flag(st, has_arg);
+            check_for_opt_flag(interp, st, has_arg);
     }
 
     /* 2nd: Positional :slurpy */
@@ -1653,7 +1665,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
             /* if we're at an :optional argument, check for an :opt_flag */
             if (dest->sig & PARROT_ARG_OPTIONAL)
-                check_for_opt_flag(st, 1);
+                check_for_opt_flag(interp, st, 1);
         }
 
         /* otherwise this doesn't get reset and we can't catch positional args
