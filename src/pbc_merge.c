@@ -759,7 +759,7 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                 op_num == PARROT_OP_get_params_pc  ||
                 op_num == PARROT_OP_set_returns_pc) {
             /* Get the signature. */
-            const PMC * const sig = bc->const_table->constants[op_ptr[1]]->u.key;
+            PMC * const sig = bc->const_table->constants[op_ptr[1]]->u.key;
 
             /* Loop over the arguments to locate any that need a fixup. */
             const int sig_items = VTABLE_elements(interp, sig);
