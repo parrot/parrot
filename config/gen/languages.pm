@@ -45,6 +45,7 @@ sub _init {
         lisp lolcode lua
         ook
         parrot_compiler perl6 pheme PIR pipp punie pynie
+        pod
         regex
         scheme squaak
         urm
