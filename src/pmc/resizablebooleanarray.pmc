@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -151,7 +151,7 @@ Resizes the array to C<size> elements.
         /* Nothing allocated yet */
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         if (!bit_array) {
-            SET_ATTR_bit_array(INTERP, SELF, 
+            SET_ATTR_bit_array(INTERP, SELF,
                     (unsigned char *)mem_sys_allocate_zeroed(new_size_in_bytes));
 
         /* The size is different, and doesn't fit within the current
@@ -165,7 +165,7 @@ Resizes the array to C<size> elements.
                 new_size_in_bytes < old_size_in_bytes ? new_size_in_bytes : old_size_in_bytes;
 
             /* Replace old array with new array, and free old array */
-            SET_ATTR_bit_array(INTERP, SELF, 
+            SET_ATTR_bit_array(INTERP, SELF,
                     (unsigned char *)mem_sys_memmove(
                         new_store, old_store, copy_size));
             mem_sys_free(old_store);
@@ -257,14 +257,15 @@ beginning.
             /* Copy contents of old array to new array, moving the head
              * position forward by one allocation unit (in bytes). */
             old_mem_size = ROUND_BYTES(tail_pos);
-            mem_sys_memmove(new_bit_array + (BITS_TO_BYTES(MIN_ALLOC)), old_bit_array, old_mem_size);
+            mem_sys_memmove(new_bit_array + (BITS_TO_BYTES(MIN_ALLOC)),
+                    old_bit_array, old_mem_size);
 
             /* Replace old array with new array, and free old array */
             SET_ATTR_bit_array(INTERP, SELF, new_bit_array);
             mem_sys_free(old_bit_array);
 
             /* Added one allocation unit to the head position offset */
-            SET_ATTR_size(            INTERP, SELF, tail_pos + MIN_ALLOC);
+            SET_ATTR_size(INTERP, SELF, tail_pos + MIN_ALLOC);
             SET_ATTR_resize_threshold(INTERP, SELF, head_pos + MIN_ALLOC);
 
         }
@@ -310,13 +311,14 @@ Removes and returns the first element.
             size_t         new_mem_size;
             GET_ATTR_size(INTERP, SELF, tail_pos);
             new_mem_size  = ROUND_BYTES(tail_pos - MIN_ALLOC);
-            new_bit_array = 
+            new_bit_array =
                 (unsigned char *)mem_sys_allocate_zeroed(new_mem_size);
 
             /* Copy contents of old array to new array, move the head position
              * offset back by one allocation unit (in bytes) */
             GET_ATTR_bit_array(INTERP, SELF, old_bit_array);
-            mem_sys_memmove(new_bit_array, old_bit_array + (BITS_TO_BYTES(MIN_ALLOC)), new_mem_size);
+            mem_sys_memmove(new_bit_array, old_bit_array + (BITS_TO_BYTES(MIN_ALLOC)),
+                new_mem_size);
 
             /* Replace old array with new array, and free old array */
             SET_ATTR_bit_array(INTERP, SELF, new_bit_array);
@@ -456,7 +458,7 @@ Used to unarchive the string.
 
         bit_array      = (unsigned char *)mem_sys_allocate_zeroed(s->bufused);
         mem_sys_memcopy(bit_array, (unsigned char *)s->strstart, s->bufused);
-        PMC_data(SELF) = 
+        PMC_data(SELF) =
             mem_allocate_zeroed_typed(Parrot_ResizableBooleanArray_attributes);
 
         SET_ATTR_size(INTERP, SELF, tail_pos);

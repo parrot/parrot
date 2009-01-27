@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -519,7 +519,7 @@ Used to archive the string.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
 
-        s = string_from_cstring(INTERP, (char*)bit_array, 
+        s = string_from_cstring(INTERP, (char*)bit_array,
                 (resize_threshold / BITS_PER_CHAR));
 
         VTABLE_push_integer(INTERP, io, size);
