@@ -748,11 +748,6 @@ Parrot_sprintf_format(PARROT_INTERP,
                             else if (thefloat == PARROT_FLOATVAL_INF_NEGATIVE) {
                                 ts = cstr2pstr(PARROT_CSTRING_INF_NEGATIVE);
                             }
-                            /* XXX for some reason, this comparison isn't working
-                            else if (thefloat == PARROT_FLOATVAL_NAN_QUIET) {
-                                ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
-                            }
-                            */
                             else if (thefloat != thefloat) {
                                 ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
                             }
