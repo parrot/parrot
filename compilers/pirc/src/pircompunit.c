@@ -158,6 +158,27 @@ set_sub_multi_types(lexer_state * const lexer, expression * const multitype) {
 
 /*
 
+=item C<static void
+add_self_parameter(lexer_state * const lexer)>
+
+Add a parameter named C<"self"> to the current subroutine, but only
+if both :vtable and :method flags have I<not> been set yet. If either
+of these flags has been set, then that means "self" was already added.
+
+=cut
+
+*/
+static void
+add_self_parameter(lexer_state * const lexer) {
+    /* only add "self" parameter if :vtable and :method flags have not been set yet */
+    if (!TEST_FLAG(CURRENT_SUB(lexer)->flags, (PIRC_SUB_FLAG_VTABLE | PIRC_SUB_FLAG_METHOD))) {
+
+        add_param(lexer, PMC_TYPE, "self");
+    }
+}
+
+/*
+
 =item C<void
 set_sub_vtable(lexer_state * const lexer, char const * vtablename)>
 
@@ -185,12 +206,20 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
     if (vtable_index == -1)
         yypirerror(lexer->yyscanner, lexer,
                    "'%s' is not a vtable method but was used with :vtable flag", vtablename);
-    else {
-        CURRENT_SUB(lexer)->info.vtable_index = vtable_index;
-        SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_VTABLE);
 
-        /* :vtable methods have an automatic "self" parameter */
-        add_param(lexer, PMC_TYPE, "self");
+    else {
+        /* test for duplicate :vtable on a sub */
+        if (CURRENT_SUB(lexer)->info.vtable_index != -1)
+            yypirerror(lexer->yyscanner, lexer, ":vtable flag was already set on sub");
+        else
+            CURRENT_SUB(lexer)->info.vtable_index = vtable_index;
+
+        add_self_parameter(lexer);
+
+        /* always set the :vtable flag, even if :method was already set.
+         * XXX emit a warning or somethign? Is :vtable + :method still useful?
+         */
+        SET_FLAG(CURRENT_SUB(lexer)->flags, PIRC_SUB_FLAG_VTABLE);
     }
 }
 
@@ -228,10 +257,10 @@ set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
     else /* :method without a value defaults to the subname. */
         CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->info.subname;
 
-    SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_METHOD);
-
     /* :methods have an automatic "self" parameter */
-    add_param(lexer, PMC_TYPE, "self");
+    add_self_parameter(lexer);
+
+    SET_FLAG(lexer->subs->flags, PIRC_SUB_FLAG_METHOD);
 }
 
 /*
