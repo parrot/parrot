@@ -24,6 +24,7 @@ files and directories (relative to C<path>, which defaults
 to F<languages/xyz> if an explicit C<path> isn't given):
 
     README
+    Configure.pl
     xyz.pir
     config/makefiles/root.in
     src/parser/grammar.pg
@@ -37,7 +38,7 @@ Any files that already exist are skipped, so this script can
 be used to repopulate a language directory with omitted files.
 
 After populating the language directory, the script attempts to
-run tools/dev/reconfigure.pl to automatically generate the Makefile
+run Configure.pl to automatically generate the Makefile
 from config/makefiles/root.in . This step is only executed if the
 optional C<path> argument is not specified.
 
@@ -97,9 +98,8 @@ close($fh) if $fh;
 
 ##  build the initial makefile if no path was specified on command line
 unless ($ARGV[1]) {
-  my $reconfigure = "$PConfig{perl} $PConfig{build_dir}/tools/dev/reconfigure.pl";
-  $reconfigure =~ s!/!$PConfig{slash}!g;
-  system("$reconfigure --step=gen::languages --languages=$lclang");
+  my $reconfigure = "$PConfig{perl} Configure.pl";
+  system("cd languages && cd $lclang && $reconfigure");
 }
 
 ##  we're done
@@ -134,6 +134,28 @@ sub start_new_file {
 __DATA__
 __README__
 Language '@lang@' was created with @script@, @rev@.
+
+__Configure.pl__
+# @Id@
+
+use strict;
+use warnings;
+use 5.008;
+
+my $build_dir = '../..';
+my $hll       = '@lclang@';
+my $cmd       = qq{$^X -Ilib tools/dev/reconfigure.pl --step=gen::languages --languages=$hll};
+
+print "Running '$cmd' in $build_dir\n";
+chdir $build_dir;
+`$cmd`
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
 
 __config/makefiles/root.in__
 ## @Id@
@@ -209,7 +231,7 @@ $(@UCLANG@_GROUP): $(PARROT) $(PMC_SOURCES)
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=@lclang@
+	$(PERL) Configure.pl
 
 # This is a listing of all targets, that are meant to be called by users
 help:
