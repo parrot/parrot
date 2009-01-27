@@ -92,6 +92,10 @@ sub runstep {
         $ccflags .= ' -Wunused-function';
         $ccflags .= ' -Wunused-variable';
 
+        # enable correct floating point behavior
+        # which is *not* the default behavior. ahem.
+        $ccflags .= ' -we147';
+
         $ld_share_flags = ' -shared -g -pipe -fexceptions -fPIC';
         $cc_shared .= ' -fPIC';
 
