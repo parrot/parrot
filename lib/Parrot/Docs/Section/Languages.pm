@@ -61,6 +61,7 @@ sub new {
         $self->new_section( 'pheme',       'pheme.html',      '', 'languages/pheme' ),
         $self->new_section( 'Pipp',        'pipp.html',       '', 'languages/pipp' ),
         $self->new_section( 'PIR',         'pir.html',        '', 'languages/PIR' ),
+        $self->new_section( 'POD',         'pod.html',        '', 'languages/pod' ),
         $self->new_section( 'Punie',       'punie.html',      '', 'languages/punie' ),
         $self->new_section( 'Pynie',       'pynie.html',      '', 'languages/pynie' ),
         $self->new_section( 'Regex',       'regex.html',      '', 'languages/regex' ),
