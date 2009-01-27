@@ -75,7 +75,7 @@ typedef size_t (*charset_compute_hash_t)(PARROT_INTERP, const STRING *, size_t s
 
 typedef STRING* (*charset_converter_t)(PARROT_INTERP, STRING *src, STRING *dst);
 
-/* HEADERIZER BEGIN: src/charset.c */
+/* HEADERIZER BEGIN: src/string/charset.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -203,7 +203,7 @@ void Parrot_register_charset_converter(SHIM_INTERP,
     || PARROT_ASSERT_ARG(rhs) \
     || PARROT_ASSERT_ARG(func)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/charset.c */
+/* HEADERIZER END: src/string/charset.c */
 
 struct _charset {
     const char *name;

@@ -20,7 +20,7 @@ use Getopt::Long ();
 use IO::File ();
 
 my $outfile          = 'all_cstring.str';
-my $string_private_h = 'src/string_private_cstring.h';
+my $string_private_h = 'src/string/private_cstring.h';
 
 # add read/write permissions even if we don't read/write the file
 # for example, Solaris requires write permissions for exclusive locks

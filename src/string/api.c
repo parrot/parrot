@@ -26,7 +26,7 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "parrot/parrot.h"
 #include "parrot/compiler.h"
 #include "parrot/string_funcs.h"
-#include "string_private_cstring.h"
+#include "private_cstring.h"
 #include "parrot/resources.h"
 
 /*

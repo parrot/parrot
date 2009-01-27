@@ -23,7 +23,7 @@
 #define Parrot_unCOW_string(i, s) PObj_COW_TEST((s)) ? \
     Parrot_unmake_COW((i), (s)), (s) : (s)
 
-/* HEADERIZER BEGIN: src/string.c */
+/* HEADERIZER BEGIN: src/string/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -727,7 +727,7 @@ STRING* uint_to_str(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(tc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/string.c */
+/* HEADERIZER END: src/string/api.c */
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_STRING_FUNCS_H_GUARD */

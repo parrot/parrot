@@ -34,7 +34,7 @@ sub _init {
 my @encodings_defaults =
     defined( $ENV{TEST_ENCODING} )
     ? $ENV{TEST_ENCODING}
-    : sort map { basename($_) } glob "./src/encodings/*.c";
+    : sort map { basename($_) } glob "./src/string/encoding/*.c";
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -68,7 +68,7 @@ E_NOTE
     foreach my $encoding ( split( /\s+/, $encoding_list ) ) {
         $encoding =~ s/\.c$//;
         $TEMP_encoding_build .= <<END
-src/encodings/$encoding\$(O): src/encodings/$encoding.h src/encodings/$encoding.c \$(NONGEN_HEADERS)
+src/string/encoding/$encoding\$(O): src/string/encoding/$encoding.h src/string/encoding/$encoding.c \$(NONGEN_HEADERS)
 
 
 END
@@ -76,7 +76,7 @@ END
 
     # build list of libraries for link line in Makefile
     my $slash = $conf->data->get('slash');
-    $TEMP_encoding_o =~ s/^| / src${slash}encodings${slash}/g;
+    $TEMP_encoding_o =~ s/^| / src${slash}string${slash}encoding${slash}/g;
 
     $conf->data->set(
         encoding            => $encoding_list,

@@ -21,7 +21,7 @@ representation.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
-#include "../unicode.h"
+#include "../string/unicode.h"
 
 /* HEADERIZER HFILE: include/parrot/io.h */
 
