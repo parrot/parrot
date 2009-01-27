@@ -17,7 +17,7 @@ Tests the Class PMC.
 =cut
 
 
-.const int TESTS = 53
+.const int TESTS = 62 
 
 
 .sub 'main' :main
@@ -35,7 +35,7 @@ Tests the Class PMC.
      'attributes'()
      'add_attribute'()
      'set_attr/get_attr'()
-#     'add_method'() # TODO not yet implemented
+     'add_method'()
      'parents'()
      'roles'()
      'inspect'()
@@ -217,8 +217,8 @@ Tests the Class PMC.
 
 
 # L<PDD15/Class PMC API/=item add_method>
-.sub 'add_method' # todo => 'not yet implemented'
-    .local pmc class, attribs, meth_to_add, test_attr_val
+.sub 'add_method'
+    .local pmc class, attribs, meth_to_add, test_attr_val, obj_inst
     .local int test_val
     class = new ['Class']
 
@@ -263,8 +263,20 @@ Tests the Class PMC.
 
     .local string test_string_val
 
+    $I0 = 1
+    push_eh t_class_meth
     test_string_val = class.'foo'()
+    $I0 = 0
+    pop_eh
+
     is(test_string_val, 'bar', 'add_method() invoking method added to class works')
+t_class_meth:
+    todo(0, 'add_method() invoking method added to class works', "classes don't seem to call methods yet")
+
+    obj_inst = class.'new'()
+    test_string_val = obj_inst.'foo'()
+    is(test_string_val, 'bar', 'add_method() invoking method added to class through instance works')
+
 
     $I0 = 1
     push_eh t_existing_method
@@ -277,7 +289,7 @@ Tests the Class PMC.
 .end
 
 .sub 'foo' :method
-    .return ('foo')
+    .return ('bar')
 .end
 
 
