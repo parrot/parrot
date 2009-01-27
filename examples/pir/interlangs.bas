@@ -8,7 +8,7 @@
 150 REM + First build perl6, ecmascript and pipp                             +
 160 REM + Then do:                                                           +
 170 REM + ../../parrot -L /yourparrotdir/languages/perl6                     +
-180 REM +              -L /yourparrotdir/languages/ecamscript                +
+180 REM +              -L /yourparrotdir/languages/ecmascript                +
 190 REM +              -L /yourparrotdir/languages/pipp                      +
 200 REM +               pirric.pir perl6-js.bas                              +
 210 REM +--------------------------------------------------------------------+
