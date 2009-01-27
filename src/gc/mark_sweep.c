@@ -723,7 +723,7 @@ static void
 gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_ms_add_free_pmc_ext)
-    PMC_EXT *object        = (PMC_EXT *)to_add;
+    PMC_EXT * const object = (PMC_EXT *)to_add;
     object->_metadata      = NULL;
 
     /* yes, this cast is a hack for now, but a pointer is a pointer */
