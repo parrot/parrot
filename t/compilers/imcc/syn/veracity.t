@@ -107,12 +107,11 @@ OUT
 
 #}
 
-SKIP: {
-    skip 'failing on win32' => 1 if $^O =~ m/win32/i;
 
 pir_output_is( <<'CODE', <<'OUT', "Float NaN" );
 .sub test :main
     $N0 = 'NaN'
+    say $N0
     unless $N0 goto not_nan
     say "NaN is true"
 
@@ -120,10 +119,10 @@ pir_output_is( <<'CODE', <<'OUT', "Float NaN" );
     end
 .end
 CODE
+NaN
 NaN is true
 OUT
 
-}
 
 # Local Variables:
 #   mode: cperl

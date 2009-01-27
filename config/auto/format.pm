@@ -38,6 +38,8 @@ sub runstep {
 
     _set_floatvalfmt_nvsize($conf);
 
+    _set_floatvalmaxmin($conf);
+
     return 1;
 }
 
@@ -89,7 +91,7 @@ sub _set_intvalmaxmin {
     $conf->data->set( intvalmin   => $ivmin );
     $conf->data->set( intvalmax   => $ivmax );
 
-    $conf->cc_gen('config/auto/format/maxmin.in');
+    $conf->cc_gen('config/auto/format/intval_maxmin.in');
     eval { $conf->cc_build(); };
     if ( $@ ) {
         $ivmin = '0';
@@ -123,6 +125,40 @@ sub _set_floatvalfmt_nvsize {
         floatvalfmt => $nvformat,
         nvsize      => $nvsize
     );
+}
+
+# This is unrelated to format, may be moved to other place later
+sub _set_floatvalmaxmin {
+    my $conf = shift;
+    my $nvmin;
+    my $nvmax;
+    my $nv = $conf->data->get(qw(nv));
+
+    if ( $nv eq "double" ) {
+        $nvmin = 'DBL_MIN';
+        $nvmax = 'DBL_MAX';
+    }
+    elsif ( $nv eq "long double" ) {
+
+        # Stay way from long double for now (it may be 64 or 80 bits)
+        # die "long double not supported at this time, use double.";
+        $nvmin = 'LDBL_MIN';
+        $nvmax = 'LDBL_MAX';
+    }
+    else {
+        die qq{Configure.pl:  Can't find limits for type '$nv'\n};
+    }
+
+    $conf->data->set( floatvalmin => $nvmin );
+    $conf->data->set( floatvalmax => $nvmax );
+
+    $conf->cc_gen('config/auto/format/floatval_maxmin.in');
+    eval { $conf->cc_build(); };
+    if ( $@ ) {
+        $nvmin = '0';
+        $nvmax = '0';
+    }
+
 }
 
 1;

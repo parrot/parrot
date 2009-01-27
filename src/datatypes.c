@@ -81,6 +81,16 @@ Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
     return string_make(interp, s, strlen(s), NULL, PObj_external_FLAG);
 }
 
+
+PARROT_EXPORT
+FLOATVAL
+floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num)
+{
+    FLOATVAL zero = 0.0;
+    return num / zero;
+}
+
+
 /*
 
 =back

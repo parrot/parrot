@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 
 # test for GMP
 use Parrot::Config;
@@ -866,7 +866,7 @@ next:
 # In the meantime, make sure it overflows nicely
 # on 32 bit.
     unless i2 > 40 goto next
-.end
+`.end
 CODE
 2
 4
@@ -910,6 +910,20 @@ CODE
 1099511627776
 OUTPUT
 }
+
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith" );
+.sub 'test' :main
+    $N0 = 'Inf'
+    say $N0
+    $N0 -= $N0
+    say $N0
+.end
+CODE
+Inf
+NaN
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

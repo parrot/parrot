@@ -125,6 +125,15 @@ const struct _data_types data_types[] = {
 };
 #endif /* INSIDE_GLOBAL_SETUP */
 
+#define PARROT_FLOATVAL_INF_POSITIVE  floatval_divide_by_zero(interp, 1.0)
+#define PARROT_FLOATVAL_INF_NEGATIVE  floatval_divide_by_zero(interp, -1.0)
+#define PARROT_FLOATVAL_NAN_QUIET     floatval_divide_by_zero(interp, 0.0)
+
+#define PARROT_CSTRING_INF_POSITIVE    "Inf"
+#define PARROT_CSTRING_INF_NEGATIVE    "-Inf"
+#define PARROT_CSTRING_NAN_QUIET       "NaN"
+
+
 /* HEADERIZER BEGIN: src/datatypes.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -140,6 +149,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
         __attribute__nonnull__(1);
+
+PARROT_EXPORT
+FLOATVAL
+floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num);
 
 #define ASSERT_ARGS_Parrot_get_datatype_enum __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

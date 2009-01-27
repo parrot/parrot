@@ -741,9 +741,26 @@ Parrot_sprintf_format(PARROT_INTERP,
                             const HUGEFLOATVAL thefloat =
                                 obj->getfloat(interp, info.type, obj);
 
-                            /* turn -0.0 into 0.0 */
-                            gen_sprintf_call(tc, &info, ch);
-                            ts = cstr2pstr(tc);
+                            /* check for Inf and NaN values */
+                            if (thefloat == PARROT_FLOATVAL_INF_POSITIVE) {
+                                ts = cstr2pstr(PARROT_CSTRING_INF_POSITIVE);
+                            }
+                            else if (thefloat == PARROT_FLOATVAL_INF_NEGATIVE) {
+                                ts = cstr2pstr(PARROT_CSTRING_INF_NEGATIVE);
+                            }
+                            /* XXX for some reason, this comparison isn't working
+                            else if (thefloat == PARROT_FLOATVAL_NAN_QUIET) {
+                                ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
+                            }
+                            */
+                            else if (thefloat != thefloat) {
+                                ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
+                            }
+                            else {
+                                /* turn -0.0 into 0.0 */
+                                gen_sprintf_call(tc, &info, ch);
+                                ts = cstr2pstr(tc);
+                            }
 
                             /* XXX lost precision if %Hg or whatever */
                             {
