@@ -399,6 +399,7 @@ END_BODY
     goto config_cont
  config_install:
     config    .= 'install_config'
+    rpath     = $P0['rpath_lib']
  config_cont:
     config    .= o
     pathquote  = ''
