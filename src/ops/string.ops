@@ -142,7 +142,7 @@ inline op repeat(out STR, in STR, in INT) :base_mem {
                 "Cannot repeat with negative arg");
         goto ADDRESS(handler);
     }
-    $1 = string_repeat(interp, $2, (UINTVAL)$3, NULL);
+    $1 = Parrot_str_repeat(interp, $2, (UINTVAL)$3);
 }
 
 inline op repeat(invar PMC, invar PMC, in INT) :base_core {

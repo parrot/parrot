@@ -1153,7 +1153,7 @@ Repeat the string C<SELF> in place C<value> times.
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_string_native(INTERP, dest,
-            string_repeat(INTERP, s, n, NULL));
+            Parrot_str_repeat(INTERP, s, n));
         return dest;
     }
 
@@ -1164,7 +1164,7 @@ Repeat the string C<SELF> in place C<value> times.
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_string_native(INTERP, dest,
-            string_repeat(INTERP, s, n, NULL));
+            Parrot_str_repeat(INTERP, s, n));
         return dest;
     }
 
@@ -1172,13 +1172,13 @@ Repeat the string C<SELF> in place C<value> times.
     VTABLE void i_repeat(PMC *value) {
         STRING * const s = SELF.get_string();
         const UINTVAL  n = (UINTVAL)VTABLE_get_integer(INTERP, value);
-        SELF.set_string_native(string_repeat(INTERP, s, n, NULL));
+        SELF.set_string_native(Parrot_str_repeat(INTERP, s, n));
     }
 
     VTABLE void i_repeat_int(INTVAL value) {
         STRING * const s = SELF.get_string();
         const UINTVAL  n = value;
-        SELF.set_string_native(string_repeat(INTERP, s, n, NULL));
+        SELF.set_string_native(Parrot_str_repeat(INTERP, s, n));
     }
 
 

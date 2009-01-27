@@ -52,6 +52,14 @@ STRING * Parrot_reuse_COW_reference(SHIM_INTERP,
         FUNC_MODIFIES(*d);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_str_repeat(PARROT_INTERP,
+    ARGIN(const STRING *s),
+    UINTVAL num)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 const char * Parrot_string_cstring(SHIM_INTERP, ARGIN(const STRING *str))
@@ -558,6 +566,9 @@ STRING* uint_to_str(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_reuse_COW_reference __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(s) \
     || PARROT_ASSERT_ARG(d)
+#define ASSERT_ARGS_Parrot_str_repeat __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_Parrot_string_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(str)
 #define ASSERT_ARGS_Parrot_string_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \

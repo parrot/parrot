@@ -191,7 +191,7 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
             ((info->flags & FLAG_ZERO) && !(info->flags & FLAG_MINUS))
                 ? CONST_STRING(interp, "0")
                 : CONST_STRING(interp, " ");
-        STRING * const fill = string_repeat(interp, filler, info->width - len, NULL);
+        STRING * const fill = Parrot_str_repeat(interp, filler, info->width - len);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
             str = string_concat(interp, str, fill, 0);

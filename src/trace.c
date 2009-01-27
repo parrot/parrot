@@ -388,9 +388,9 @@ trace_op_dump(PARROT_INTERP,
         if (!more)
             goto done;
         if (len < ARGS_COLUMN)  {
-            STRING * const fill = string_repeat(debugger,
+            STRING * const fill = Parrot_str_repeat(debugger,
                     const_string(debugger, " "),
-                    ARGS_COLUMN - len, NULL);
+                    ARGS_COLUMN);
             Parrot_io_putps(debugger, Parrot_io_STDERR(debugger), fill);
         }
         else {

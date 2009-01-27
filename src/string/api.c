@@ -1122,6 +1122,43 @@ string_repeat(PARROT_INTERP, ARGIN(const STRING *s),
 
 /*
 
+=item C<STRING * Parrot_str_repeat>
+
+Repeats the specified Parrot string I<num> times and returns the result.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
+{
+    ASSERT_ARGS(string_repeat)
+    STRING * const dest = string_make_direct(interp, NULL,
+                        s->bufused * num,
+                        s->encoding, s->charset, 0);
+    if (num > 0) {
+        /* copy s into dest num times */
+        UINTVAL length = s->bufused;
+        UINTVAL i;
+        char * destpos = dest->strstart;
+	const char * const srcpos = s->strstart;
+        for (i = 0; i < num; i++) {
+            mem_sys_memcopy(destpos, srcpos, length);
+	    destpos+= length;
+        }
+
+        dest->bufused = s->bufused * num;
+        dest->strlen  = s->strlen * num;
+    }
+
+    return dest;
+}
+
+/*
+
 =item C<STRING * string_substr>
 
 Copies the substring of length C<length> from C<offset> from the specified
