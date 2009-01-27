@@ -29,16 +29,16 @@ rule pod_section {
 }
 
 regex pod_sequence {
-      <heading>
-    | <begin_directive>
-    | <end_directive>
-    | <for_directive>
-    | <back_directive>
-    | <item_directive>
-    | <over_directive>
-    | <encoding_directive>
-    | <literal_paragraph>
-    | <paragraph>
+    | <heading>              #= heading
+    | <begin_directive>      #= begin_directive
+    | <end_directive>        #= end_directive
+    | <for_directive>        #= for_directive
+    | <back_directive>       #= back_directive
+    | <item_directive>       #= item_directive
+    | <over_directive>       #= over_directive
+    | <encoding_directive>   #= encoding_directive
+    | <literal_paragraph>    #= literal_paragraph
+    | <paragraph>            #= paragraph
 }
 
 token pod_directive {
@@ -164,8 +164,7 @@ regex formatted_text {
     | <digit>
     | <punct>
     | <pod_ws>
-    ]+ 
-    {*}
+    ]+
 }
 
 regex format_code {
@@ -183,3 +182,10 @@ token pod_ws {
 }
 
 token blank_line { ^^ <.pod_ws>? \n }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
