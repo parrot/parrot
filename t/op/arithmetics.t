@@ -866,7 +866,7 @@ next:
 # In the meantime, make sure it overflows nicely
 # on 32 bit.
     unless i2 > 40 goto next
-`.end
+.end
 CODE
 2
 4
