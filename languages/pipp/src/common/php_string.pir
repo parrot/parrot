@@ -296,7 +296,34 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'implode'
-    not_implemented()
+    .param string glue
+    .param pmc    pieces
+
+    .local int num_elems
+    num_elems = elements pieces
+
+    unless num_elems == 0 goto L1
+    .RETURN_STRING('')
+  L1:
+
+    .local string res
+    .local pmc iter
+    iter = new ['Iterator'], pieces
+
+    $P0 = shift iter
+    $S0 = $P0
+    concat res, $S0 
+    $I1 = 0
+    args_loop:
+        unless iter goto args_end
+        concat res, glue
+        $P0 = shift iter
+        $S0 = $P0
+        concat res, $S0
+        goto args_loop
+    args_end:
+
+    .RETURN_STRING(res)
 .end
 
 =item C<string join(array src, string glue)>
@@ -378,6 +405,7 @@ Returns ASCII value of character
 
 .sub 'ord'
     .param pmc args :slurpy
+
     .local int argc
     argc = args
     unless argc != 1 goto L1

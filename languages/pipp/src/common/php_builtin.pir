@@ -371,7 +371,15 @@ NOT IMPLEMENTED.
 =cut
 
 .sub 'get_loaded_extensions'
-    not_implemented()
+    .local pmc array
+    array = new ['PhpArray']
+
+    .local pmc extension
+    extension = new ['PhpString']
+    extension = 'standard'
+    push array, extension
+
+    .return(array)
 .end
 
 =item C<array get_object_vars(object obj)>

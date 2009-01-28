@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'php_egg_logo_guid()' );
@@ -95,6 +95,15 @@ language_output_is( 'Pipp', <<'CODE', '.', 'get_include_path()' );
   echo get_include_path();
 ?>
 CODE
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'get_loaded_extensions()' );
+<?php
+  print join( ';', get_loaded_extensions());
+  echo "\n";
+?>
+CODE
+standard
+OUT
 
 
 # Local Variables:

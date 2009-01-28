@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -67,6 +67,7 @@ Creates an array
 
 .sub 'array'
     .param pmc args :slurpy
+
     .local pmc array, iter
     array = new 'PhpArray'
     iter = new 'Iterator', args
