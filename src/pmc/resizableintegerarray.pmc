@@ -141,7 +141,7 @@ Resizes the array to C<size> elements.
             }
 
             GET_ATTR_int_array(INTERP, SELF, int_array);
-            int_array = (INTVAL*)mem_sys_realloc( (void*)int_array, cur * sizeof (INTVAL));
+            int_array = (INTVAL*) mem_sys_realloc((void*) int_array, cur * sizeof (INTVAL));
             SET_ATTR_int_array(INTERP, SELF, int_array);
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, cur);
