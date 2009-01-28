@@ -1262,7 +1262,7 @@ Parrot_pic_callr___pc {
     PMC                *sig_result = constants[CUR_OPCODE[1]]->u.key;
     opcode_t           *params     = jit_info->optimizer->sections->begin;
     PMC                *sig_params = constants[params[1]]->u.key;
-    int                 op_i       = SIG_ELEMS(sig_params) + 2;
+    int                 op_i       = VTABLE_elements(interp, sig_params) + 2;
     int                 offset     = jit_info->arena.op_map[op_i].offset;
     int                 here       = NATIVECODE - jit_info->arena.start;
     int                 skip;
@@ -1270,7 +1270,7 @@ Parrot_pic_callr___pc {
     /* TODO preserve necessary regs */
     assert(*CUR_OPCODE == PARROT_OP_get_results_pc);
 
-    if (!SIG_ELEMS(sig_result))
+    if (!VTABLE_elements(interp, sig_result))
         skip = -1;
     /* skip result - save rest */
     else
@@ -1303,7 +1303,7 @@ Parrot_get_results_pc {
     PackFile_Constant **constants  = CONTEXT(interp)->constants;
     PMC                *sig_result = constants[CUR_OPCODE[1]]->u.key;
 
-    if (!SIG_ELEMS(sig_result))
+    if (!VTABLE_elements(interp, sig_result))
         return;
 
     /* result is r3 TODO Nums */

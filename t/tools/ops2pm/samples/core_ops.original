@@ -494,7 +494,7 @@ op set_args(inconst PMC) :flow {
 
     /* for now just point to the opcode */
     interp->current_args = _this;
-    argc = SIG_ELEMS(signature);
+    argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
@@ -504,7 +504,7 @@ op get_results(inconst PMC) :flow {
     INTVAL argc;
 
     CONTEXT(interp)->current_results = _this;
-    argc = SIG_ELEMS(signature);
+    argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
@@ -538,7 +538,7 @@ op get_params(inconst PMC) :flow {
         Parrot_free_context(interp, caller_ctx, 0);
         interp->current_args = NULL;
     }
-    argc = SIG_ELEMS(signature);
+    argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 
@@ -571,7 +571,7 @@ op set_returns(inconst PMC) :flow {
 
         parrot_pass_args(interp, ctx, caller_ctx, src_indexes, dest_indexes, PARROT_PASS_RESULTS);
     }
-    argc = SIG_ELEMS(signature);
+    argc = VTABLE_elements(interp, signature);
     goto OFFSET(argc + 2);
 }
 

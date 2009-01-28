@@ -417,8 +417,8 @@ Resizes the array to C<size> elements.
 
         SET_ATTR_size(INTERP, SELF, size);
         GET_ATTR_int_array(INTERP, SELF, int_array);
-        int_array = mem_realloc_n_typed(int_array, size, INTVAL);
-        SET_ATTR_int_array(INTERP, SELF, int_array);
+        SET_ATTR_int_array(INTERP, SELF, 
+                mem_realloc_n_typed(int_array, size, INTVAL));
         PObj_active_destroy_SET(SELF);
     }
 

@@ -71,8 +71,8 @@ Initializes the integer with a default value of C<0>.
         opcode_t   *arg_op = interp->current_args;
         INTVAL      init   = 0;
 
-        if (SIG_ELEMS(sig) == 2) {
-            switch (SIG_ITEM(sig, 1)) {
+        if (VTABLE_elements(interp, sig) == 2) {
+            switch (VTABLE_get_integer_keyed_int(INTERP, sig, 1)) {
                 case PARROT_ARG_I:
                     init = REG_INT(interp, arg_op[3]);
                     break;

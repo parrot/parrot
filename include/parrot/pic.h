@@ -87,13 +87,14 @@ void parrot_PIC_alloc_store(ARGOUT(PackFile_ByteCode *cs), size_t n)
         FUNC_MODIFIES(*cs);
 
 PARROT_WARN_UNUSED_RESULT
-int parrot_pic_check_sig(
-    ARGIN(const PMC *sig1),
-    ARGIN(const PMC *sig2),
+int parrot_pic_check_sig(PARROT_INTERP,
+    ARGIN(PMC *sig1),
+    ARGIN(PMC *sig2),
     ARGOUT(int *type))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
         FUNC_MODIFIES(*type);
 
 void parrot_PIC_destroy(ARGMOD(PackFile_ByteCode *cs))
@@ -135,7 +136,8 @@ void parrot_PIC_prederef(PARROT_INTERP,
 #define ASSERT_ARGS_parrot_PIC_alloc_store __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(cs)
 #define ASSERT_ARGS_parrot_pic_check_sig __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sig1) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig1) \
     || PARROT_ASSERT_ARG(sig2) \
     || PARROT_ASSERT_ARG(type)
 #define ASSERT_ARGS_parrot_PIC_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -162,8 +164,8 @@ void parrot_PIC_prederef(PARROT_INTERP,
 PARROT_WARN_UNUSED_RESULT
 int parrot_pic_is_safe_to_jit(PARROT_INTERP,
     ARGIN(PMC *sub),
-    ARGIN(const PMC *sig_args),
-    ARGIN(const PMC *sig_results),
+    ARGIN(PMC *sig_args),
+    ARGIN(PMC *sig_results),
     ARGOUT(int *flags))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

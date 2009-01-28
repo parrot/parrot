@@ -78,6 +78,7 @@ lookup of the cache has to be done in the opcode itself.
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_fixedintegerarray.h"
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
@@ -127,12 +128,13 @@ static void parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*mic);
 
-static int pass_int(SHIM_INTERP,
-    ARGIN(const PMC *sig),
+static int pass_int(PARROT_INTERP,
+    ARGIN(PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -141,7 +143,7 @@ static int pass_int(SHIM_INTERP,
         FUNC_MODIFIES(*dest_base);
 
 static int pass_mixed(PARROT_INTERP,
-    ARGIN(const PMC *sig),
+    ARGIN(PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(void * const *src),
     ARGOUT(char *dest_base),
@@ -154,12 +156,13 @@ static int pass_mixed(PARROT_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
-static int pass_num(SHIM_INTERP,
-    ARGIN(const PMC *sig),
+static int pass_num(PARROT_INTERP,
+    ARGIN(PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -167,12 +170,13 @@ static int pass_num(SHIM_INTERP,
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*dest_base);
 
-static int pass_pmc(SHIM_INTERP,
-    ARGIN(const PMC *sig),
+static int pass_pmc(PARROT_INTERP,
+    ARGIN(PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
     ARGIN(void * const *dest))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -181,7 +185,7 @@ static int pass_pmc(SHIM_INTERP,
         FUNC_MODIFIES(*dest_base);
 
 static int pass_str(PARROT_INTERP,
-    ARGIN(const PMC *sig),
+    ARGIN(PMC *sig),
     ARGIN(const char *src_base),
     ARGIN(const void **src),
     ARGOUT(char *dest_base),
@@ -206,7 +210,8 @@ static int pass_str(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(mic)
 #define ASSERT_ARGS_pass_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sig) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig) \
     || PARROT_ASSERT_ARG(src_base) \
     || PARROT_ASSERT_ARG(src) \
     || PARROT_ASSERT_ARG(dest_base) \
@@ -219,13 +224,15 @@ static int pass_str(PARROT_INTERP,
     || PARROT_ASSERT_ARG(dest_base) \
     || PARROT_ASSERT_ARG(dest)
 #define ASSERT_ARGS_pass_num __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sig) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig) \
     || PARROT_ASSERT_ARG(src_base) \
     || PARROT_ASSERT_ARG(src) \
     || PARROT_ASSERT_ARG(dest_base) \
     || PARROT_ASSERT_ARG(dest)
 #define ASSERT_ARGS_pass_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sig) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig) \
     || PARROT_ASSERT_ARG(src_base) \
     || PARROT_ASSERT_ARG(src) \
     || PARROT_ASSERT_ARG(dest_base) \
@@ -442,12 +449,12 @@ RT #48260: Not yet documented!!!
 */
 
 static int
-pass_int(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_int(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     ASSERT_ARGS(pass_int)
     int i;
-    int n = SIG_ELEMS(sig);
+    int n = VTABLE_elements(interp, sig);
 
     for (i = 2; n; ++i, --n) {
         const INTVAL arg = *(const INTVAL *)(src_base + ((const opcode_t*)src)[i]);
@@ -467,12 +474,12 @@ RT #48260: Not yet documented!!!
 */
 
 static int
-pass_num(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_num(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     ASSERT_ARGS(pass_num)
     int i;
-    int n = SIG_ELEMS(sig);
+    int n = VTABLE_elements(interp, sig);
 
     for (i = 2; n; ++i, --n) {
         const FLOATVAL arg = *(const FLOATVAL *)(src_base + ((const opcode_t*)src)[i]);
@@ -492,12 +499,12 @@ RT #48260: Not yet documented!!!
 */
 
 static int
-pass_str(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_str(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     ASSERT_ARGS(pass_str)
     int i;
-    int n = SIG_ELEMS(sig);
+    int n = VTABLE_elements(interp, sig);
 
     for (i = 2; n; ++i, --n) {
         STRING * const arg = *(STRING* const *)(src_base + ((const opcode_t*)src)[i]);
@@ -518,12 +525,12 @@ RT #48260: Not yet documented!!!
 */
 
 static int
-pass_pmc(SHIM_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_pmc(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
         ARGIN(const void **src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     ASSERT_ARGS(pass_pmc)
     int i;
-    int n = SIG_ELEMS(sig);
+    int n = VTABLE_elements(interp, sig);
 
     for (i = 2; n; ++i, --n) {
         PMC * const arg = *(PMC* const *)(src_base + ((const opcode_t*)src)[i]);
@@ -543,16 +550,16 @@ RT #48260: Not yet documented!!!
 */
 
 static int
-pass_mixed(PARROT_INTERP, ARGIN(const PMC *sig), ARGIN(const char *src_base),
+pass_mixed(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
         ARGIN(void * const *src), ARGOUT(char *dest_base), ARGIN(void * const *dest))
 {
     ASSERT_ARGS(pass_mixed)
     int i;
     INTVAL *bitp;
-    int n = SIG_ELEMS(sig);
+    int n = VTABLE_elements(interp, sig);
 
     ASSERT_SIG_PMC(sig);
-    bitp = SIG_ARRAY(sig);
+    GETATTR_FixedIntegerArray_int_array(interp, sig, bitp);
 
     for (i = 2; n; ++i, --n) {
         const INTVAL bits = *bitp++;
@@ -630,7 +637,7 @@ the type PARROT_ARG_CONSTANT stands for mixed types or constants
 
 PARROT_WARN_UNUSED_RESULT
 int
-parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
+parrot_pic_check_sig(PARROT_INTERP, ARGIN(PMC *sig1), ARGIN(PMC *sig2),
         ARGOUT(int *type))
 {
     ASSERT_ARGS(parrot_pic_check_sig)
@@ -639,9 +646,9 @@ parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
     ASSERT_SIG_PMC(sig1);
     ASSERT_SIG_PMC(sig2);
 
-    n = SIG_ELEMS(sig1);
+    n = VTABLE_elements(interp, sig1);
 
-    if (n != SIG_ELEMS(sig2))
+    if (n != VTABLE_elements(interp, sig2))
         return -1;
 
     if (!n) {
@@ -650,8 +657,8 @@ parrot_pic_check_sig(ARGIN(const PMC *sig1), ARGIN(const PMC *sig2),
     }
 
     for (i = 0; i < n; ++i) {
-        int t1 = SIG_ITEM(sig1, i);
-        int t2 = SIG_ITEM(sig2, i);
+        int t1 = VTABLE_get_integer_keyed_int(interp, sig1, i);
+        int t2 = VTABLE_get_integer_keyed_int(interp, sig2, i);
 
         if (i) {
             t0 = 0;
@@ -728,13 +735,13 @@ is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t 
 
         /* check current_args signature */
         sig2 = caller_ctx->constants[const_nr]->u.key;
-        n    = parrot_pic_check_sig(sig1, sig2, &type);
+        n    = parrot_pic_check_sig(interp, sig1, sig2, &type);
 
         if (n == -1)
             return 0;
     }
     else {
-        if (SIG_ELEMS(sig1) == 0) {
+        if (VTABLE_elements(interp, sig1) == 0) {
             sig2 = NULL;
             type = 0;
         }
@@ -811,7 +818,7 @@ is_pic_func(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), int core_t
     PMC            * const sig_args = (PMC *)(pc[1]);
 
     ASSERT_SIG_PMC(sig_args);
-    n                    = SIG_ELEMS(sig_args);
+    n                    = VTABLE_elements(interp, sig_args);
     interp->current_args = (opcode_t*)pc + ctx->pred_offset;
     pc                  += 2 + n;
     op                   = (opcode_t*)pc + ctx->pred_offset;

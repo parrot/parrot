@@ -203,7 +203,7 @@ prederef_args(ARGMOD(void **pc_prederef), PARROT_INTERP,
         int type;
         if (i >= m) {
             PMC * const sig = (PMC*) pc_prederef[1];
-            type = SIG_ITEM(sig, i - m);
+            type = VTABLE_get_integer_keyed_int(interp, sig, i - m);
             type &= (PARROT_ARG_TYPE_MASK | PARROT_ARG_CONSTANT);
         }
         else

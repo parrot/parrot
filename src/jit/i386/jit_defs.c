@@ -10,6 +10,7 @@ $Id$
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_fixedintegerarray.h"
 #include "jit.h"
 #include "jit_emit.h"
 
@@ -1431,8 +1432,8 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
     INTVAL *sig_bits, i, n;
 
     sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
-    sig_bits = SIG_ARRAY(sig_pmc);
-    n = SIG_ELEMS(sig_pmc);
+    GETATTR_FixedIntegerArray_int_array(interp, sig_pmc, sig_bits);
+    n = VTABLE_elements(interp, sig_pmc);
     jit_info->n_args = n;
     emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EBP, emit_None, 1, 16);
     for (i = 0; i < n; ++i) {
@@ -1568,9 +1569,9 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     INTVAL *sig_bits, sig;
 
     sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
-    if (!SIG_ELEMS(sig_pmc))
+    if (!VTABLE_elements(interp, sig_pmc))
         return;
-    sig_bits = SIG_ARRAY(sig_pmc);
+    GETATTR_FixedIntegerArray_int_array(interp, sig_pmc, sig_bits);
     sig = sig_bits[0];
     if (!recursive) {
         /* mov 16(%ebp), %eax - fetch args ptr */
@@ -1644,13 +1645,13 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     constants = CONTEXT(interp)->constants;
     sig_args  = constants[CUR_OPCODE[1]]->u.key;
 
-    if (!SIG_ELEMS(sig_args))
+    if (!VTABLE_elements(interp, sig_args))
         return;
     params = jit_info->optimizer->sections->begin;
     sig_params = constants[params[1]]->u.key;
     ASSERT_SIG_PMC(sig_params);
-    sig_bits = SIG_ARRAY(sig_args);
-    n = SIG_ELEMS(sig_args);
+    GETATTR_FixedIntegerArray_int_array(interp, sig_args, sig_bits);
+    n = VTABLE_elements(interp, sig_args);
     /*
      * preserve registers - need get_results, because we skip the
      * return value
@@ -1660,7 +1661,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     sig_result = constants[result[1]]->u.key;
     ASSERT_SIG_PMC(sig_result);
 
-    if (!SIG_ELEMS(sig_result))
+    if (!VTABLE_elements(interp, sig_result))
         skip = -1;
     else
         skip = MAP(2 + n + 3 + 2);
@@ -1949,12 +1950,13 @@ Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info,
         constants = CONTEXT(interp)->constants;
         result = CONTEXT(interp)->current_results;
         sig_result = constants[result[1]]->u.key;
-        if (!SIG_ELEMS(sig_result))
+        if (!VTABLE_elements(interp, sig_result))
             goto no_result;
         /* fetch args to %edx */
         emitm_movl_m_r(interp, NATIVECODE, emit_EDX, emit_EBP, emit_None, 1, 16);
         emitm_movl_m_r(interp, NATIVECODE, emit_ECX, emit_EDX, emit_None, 1, 0);
-        if (SIG_ITEM(sig_result, 0) == PARROT_ARG_FLOATVAL) {
+        if (VTABLE_get_integer_keyed_int(interp, sig_result, 0) ==
+                PARROT_ARG_FLOATVAL) {
             jit_emit_fst_mb_n(interp, jit_info->native_ptr, emit_ECX, 0);
         }
         else {

@@ -17,6 +17,7 @@
 #  include <sys/mman.h>
 #  include <limits.h>
 #  include "parrot/oplib/ops.h"
+#  include "pmc/pmc_fixedintegerarray.h"
 
 #ifndef CACHELINESIZE
    /* TODO this should be determined by configure */
@@ -908,9 +909,9 @@ jit_set_returns_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     INTVAL *sig_bits, sig;
 
     sig_pmc = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
-    if (!SIG_ELEMS(sig_pmc))
+    if (!VTABLE_elements(interp, sig_pmc))
         return;
-    sig_bits = SIG_ARRAY(sig_pmc);
+    GETATTR_FixedIntegerArray_int_array(interp, sig_pmc, sig_bits);
     sig = sig_bits[0];
     if (!recursive) {
         /* ISR2 <- args[0] */
@@ -979,13 +980,13 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP, int recursive)
 
     constants = CONTEXT(interp)->constants;
     sig_args = constants[CUR_OPCODE[1]]->u.key;
-    if (!SIG_ELEMS(sig_args))
+    if (!VTABLE_elements(interp, sig_args))
         return;
     params = jit_info->optimizer->sections->begin;
     sig_params = constants[params[1]]->u.key;
     ASSERT_SIG_PMC(sig_params);
-    sig_bits = SIG_ARRAY(sig_args);
-    n = SIG_ELEMS(sig_args);
+    GETATTR_FixedIntegerArray_int_array(interp, sig_args, sig_bits);
+    n = VTABLE_elements(interp, sig_args);
     /*
      * preserve registers - need get_results, because we skip the
      * return value
@@ -995,7 +996,7 @@ jit_set_args_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP, int recursive)
     sig_result = constants[result[1]]->u.key;
     ASSERT_SIG_PMC(sig_result);
 
-    if (!SIG_ELEMS(sig_result))
+    if (!VTABLE_elements(interp, sig_result))
         skip = -1;
     else
         skip = MAP(2 + n + 3 + 2);

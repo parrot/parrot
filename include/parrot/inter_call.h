@@ -356,10 +356,6 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
     PARROT_ASSERT(PObj_is_PMC_TEST(sig)); \
     PARROT_ASSERT((sig)->vtable->base_type == enum_class_FixedIntegerArray)
 
-#define SIG_ELEMS(sig) PMC_int_val(sig)
-#define SIG_ARRAY(sig) (INTVAL*)PMC_data(sig)
-#define SIG_ITEM(sig, idx) (SIG_ARRAY(sig))[(idx)]
-
 /* XXX Remove interp from this */
 #define ADD_OP_VAR_PART(interp, seg, pc, n) do { \
     if (*(pc) == PARROT_OP_set_args_pc || \

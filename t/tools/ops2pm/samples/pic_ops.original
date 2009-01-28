@@ -4,6 +4,7 @@
 */
 
 #include "parrot/oplib/ops.h"
+#include "../src/pmc/pmc_fixedintegerarray.h"
 
 typedef opcode_t* (*interface_f)(Interp*, INTVAL*, void **);
 
@@ -255,8 +256,8 @@ inline op pic_callr__(inconst PMC) :pic :flow {
         pred_pc = (void**) pc - ctx->pred_offset;
         sig = (PMC*)(pred_pc[1]);
         ASSERT_SIG_PMC(sig);
-        PARROT_ASSERT(SIG_ELEMS(sig) <= 1);
-        args[0] = SIG_ELEMS(sig) ?
+        PARROT_ASSERT(VTABLE_elements(interp, sig) <= 1);
+        args[0] = VTABLE_elements(interp, sig) ?
             (_reg_base + ((opcode_t*)pred_pc)[2]) : NULL;
     }
     else
@@ -265,8 +266,8 @@ inline op pic_callr__(inconst PMC) :pic :flow {
     n_args = 0;
     sig = mic->m.sig;
     ASSERT_SIG_PMC(sig);
-    n_args = SIG_ELEMS(sig);
-    sig_bits = SIG_ARRAY(sig);
+    n_args = VTABLE_elements(interp, sig);
+    GETATTR_FixedIntegerArray_int_array(interp, sig, sig_bits);
     for (i = 0; i < n_args; ++i) {
         switch (sig_bits[i]) {
             case PARROT_ARG_INTVAL:

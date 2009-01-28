@@ -314,7 +314,7 @@ trace_op_dump(PARROT_INTERP,
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "NULL sig PMC detected in trace_op_dump");
 
-                type = SIG_ITEM(sig, i - 2) &
+                type = VTABLE_get_integer_keyed_int(interp, sig, i - 2) &
                     (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             }
             if (i > s &&
@@ -403,7 +403,7 @@ trace_op_dump(PARROT_INTERP,
             if (i < info->op_count)
                 type = info->types[i - 1];
             else
-                type = SIG_ITEM(sig, i - 2) &
+                type = VTABLE_get_integer_keyed_int(interp, sig, i - 2) &
                     (PARROT_ARG_TYPE_MASK|PARROT_ARG_CONSTANT);
             if (i > s) {
                 Parrot_io_eprintf(debugger, " ");

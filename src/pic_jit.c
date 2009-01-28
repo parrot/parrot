@@ -40,13 +40,14 @@ TODO:
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-static int args_match_params(
-    ARGIN(const PMC *sig_args),
+static int args_match_params(PARROT_INTERP,
+    ARGIN(PMC *sig_args),
     ARGIN(const PackFile_ByteCode *seg),
     ARGIN(const opcode_t *start))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4);
 
 PARROT_WARN_UNUSED_RESULT
 static int call_is_safe(PARROT_INTERP,
@@ -65,7 +66,7 @@ static int jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub))
 PARROT_WARN_UNUSED_RESULT
 static int ops_jittable(PARROT_INTERP,
     ARGIN(PMC *sub),
-    ARGIN(const PMC *sig_results),
+    ARGIN(PMC *sig_results),
     ARGIN(const PackFile_ByteCode *seg),
     ARGIN(opcode_t *pc),
     ARGIN(const opcode_t *end),
@@ -89,14 +90,16 @@ static opcode_t * pic_test_func(PARROT_INTERP,
         FUNC_MODIFIES(*args);
 
 PARROT_WARN_UNUSED_RESULT
-static int returns_match_results(
-    ARGIN(const PMC *sig_ret),
-    ARGIN(const PMC *sig_result))
+static int returns_match_results(PARROT_INTERP,
+    ARGIN(PMC *sig_ret),
+    ARGIN(PMC *sig_result))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_args_match_params __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sig_args) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig_args) \
     || PARROT_ASSERT_ARG(seg) \
     || PARROT_ASSERT_ARG(start)
 #define ASSERT_ARGS_call_is_safe __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -118,7 +121,8 @@ static int returns_match_results(
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(args)
 #define ASSERT_ARGS_returns_match_results __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(sig_ret) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig_ret) \
     || PARROT_ASSERT_ARG(sig_result)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -243,12 +247,12 @@ Returns C<0> otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-args_match_params(ARGIN(const PMC *sig_args), ARGIN(const PackFile_ByteCode *seg),
+args_match_params(PARROT_INTERP, ARGIN(PMC *sig_args), ARGIN(const PackFile_ByteCode *seg),
     ARGIN(const opcode_t *start))
 {
     ASSERT_ARGS(args_match_params)
-    const PMC *sig_params;
-    int n, type;
+    PMC *sig_params;
+    int  n, type;
 
     if (*start != PARROT_OP_get_params_pc)
         return 0;
@@ -258,7 +262,7 @@ args_match_params(ARGIN(const PMC *sig_args), ARGIN(const PackFile_ByteCode *seg
     /* verify that we actually can pass arguments */
     ASSERT_SIG_PMC(sig_params);
 
-    n = parrot_pic_check_sig(sig_args, sig_params, &type);
+    n = parrot_pic_check_sig(interp, sig_args, sig_params, &type);
 
     /* arg count mismatch */
     if (n == -1)
@@ -293,11 +297,11 @@ otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-returns_match_results(ARGIN(const PMC *sig_ret), ARGIN(const PMC *sig_result))
+returns_match_results(PARROT_INTERP, ARGIN(PMC *sig_ret), ARGIN(PMC *sig_result))
 {
     ASSERT_ARGS(returns_match_results)
     int type;
-    const int n = parrot_pic_check_sig(sig_ret, sig_result, &type);
+    const int n = parrot_pic_check_sig(interp, sig_ret, sig_result, &type);
 
     /* arg count mismatch */
     if (n == -1)
@@ -342,7 +346,7 @@ call_is_safe(PARROT_INTERP, ARGIN(PMC *sub), ARGMOD(opcode_t **set_args))
         PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
 
     /* ignore the signature for now */
-    pc += 2 + SIG_ELEMS(sig_args);
+    pc += 2 + VTABLE_elements(interp, sig_args);
 
     if (*pc != PARROT_OP_set_p_pc)
        return 0;
@@ -359,7 +363,7 @@ call_is_safe(PARROT_INTERP, ARGIN(PMC *sub), ARGMOD(opcode_t **set_args))
         return 0;
 
     sig_results  = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
-    pc          += 2 + SIG_ELEMS(sig_results);
+    pc          += 2 + VTABLE_elements(interp, sig_results);
 
     if (*pc != PARROT_OP_invokecc_p)
         return 0;
@@ -383,7 +387,7 @@ otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-ops_jittable(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const PMC *sig_results),
+ops_jittable(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *sig_results),
         ARGIN(const PackFile_ByteCode *seg), ARGIN(opcode_t *pc),
         ARGIN(const opcode_t *end), ARGOUT(int *flags))
 {
@@ -403,8 +407,8 @@ ops_jittable(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const PMC *sig_results),
                 break;
             case PARROT_OP_set_returns_pc:
                 {
-                const PMC * const sig_ret = seg->const_table->constants[pc[1]]->u.key;
-                if (!returns_match_results(sig_ret, sig_results))
+                PMC * const sig_ret = seg->const_table->constants[pc[1]]->u.key;
+                if (!returns_match_results(interp, sig_ret, sig_results))
                     return 0;
                 }
                 goto op_is_ok;
@@ -459,8 +463,8 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 int
-parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const PMC *sig_args),
-        ARGIN(const PMC *sig_results), ARGOUT(int *flags))
+parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *sig_args),
+        ARGIN(PMC *sig_results), ARGOUT(int *flags))
 {
     ASSERT_ARGS(parrot_pic_is_safe_to_jit)
 #ifdef HAS_JIT
@@ -489,7 +493,7 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const PMC *sig_a
     start = base + PMC_sub(sub)->start_offs;
     end   = base + PMC_sub(sub)->end_offs;
 
-    if (!args_match_params(sig_args, PMC_sub(sub)->seg, start))
+    if (!args_match_params(interp, sig_args, PMC_sub(sub)->seg, start))
         return 0;
 
     /*

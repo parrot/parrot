@@ -2840,7 +2840,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
     if (specialop > 0) {
         char buf[1000];
         PMC * const sig = interp->code->const_table->constants[op[1]]->u.key;
-        int n_values = SIG_ELEMS(sig);
+        int n_values = VTABLE_elements(interp, sig);
         /* The flag_names strings come from Call_bits_enum_t (with which it
            should probably be colocated); they name the bits from LSB to MSB.
            The two least significant bits are not flags; they are the register
