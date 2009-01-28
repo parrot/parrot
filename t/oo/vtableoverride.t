@@ -53,6 +53,15 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
     $P0 = getattribute $P1, "message"
     $S0 = $P0
     is($S0, "Morphing [MyObject] to type Integer", "Morph VTABLE override 1")
+    
+    # Test invoke. Doesn't currently work so we need to fix that.
+    #$P0 = $P1("invoked!")
+    #$S0 = $P0
+    #is($S0, "invoked!", "Invoke VTABLE override return value")
+    
+    #$P0 = getattribute $P1, "message"
+    #$S0 = $P0
+    #is($S0, "invoked!", "Invoke VTABLE override sideeffects")
 .end
 
 .sub 'subclass_tests'
@@ -114,6 +123,13 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
     .return(0)
 yes:
     .return (1)
+.end
+
+.sub 'invoke' :vtable
+    .param string msg
+    $P0 = box msg
+    setattribute self, "message", $P0
+    .return($P0)
 .end
 
 .namespace [ 'MySubObject' ]
