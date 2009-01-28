@@ -167,7 +167,7 @@ sub runstep {
             # Prefer Cygwin/w32api over Cygwin/X, but use X when DISPLAY is set
             ($^O eq 'cygwin') ?
              ($ENV{DISPLAY} ? (cygwin => '-lglut -L/usr/X11R6/lib -lGLU -lGL')
-                            : (cygwin => '-lglut32 -lglu32 -lopengl32'))
+                            : (cygwin => '/usr/bin/glut32.dll -lglu32 -lopengl32'))
              : (),
             win32_gcc       => '-lglut32 -lglu32 -lopengl32',
             win32_nongcc    => 'opengl32.lib glu32.lib glut32.lib',
