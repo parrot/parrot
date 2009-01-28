@@ -443,7 +443,7 @@ char * symreg_to_str(ARGIN(const SymReg *s))
 typedef enum {
     P_NONE           = 0x00,                  /* 0<<0 */
     P_NEED_LEX       = 0x01,                  /* 1<<0 */
-    /* P_XXXX        = 0x02, */               /* 1<<1 */
+    P_VTABLE         = 0x02,                  /* 1<<1 */
     P_METHOD         = 0x04,                  /* 1<<2 */
     P_ANON           = SUB_FLAG_PF_ANON,      /* 1<<3 0x8    - private3 */
     P_MAIN           = SUB_FLAG_PF_MAIN,      /* 1<<4 0x10   - private4 */

@@ -1169,13 +1169,13 @@ outer:
 vtable:
      VTABLE_METHOD
          {
-           $$ = 0;
+           $$ = P_VTABLE;
            IMCC_INFO(interp)->cur_unit->vtable_name = NULL;
            IMCC_INFO(interp)->cur_unit->is_vtable_method = 1;
          }
    | VTABLE_METHOD '(' STRINGC ')'
          {
-           $$ = 0;
+           $$ = P_VTABLE;
            IMCC_INFO(interp)->cur_unit->vtable_name = $3;
            IMCC_INFO(interp)->cur_unit->is_vtable_method = 1;
          }

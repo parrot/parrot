@@ -202,7 +202,7 @@ say "you invoked me!"
 .sub main :main
 $P0 = newclass "Foo"
 $P1 = new ['Foo']
-$P1()
+$P1($P1)   # pass the object it"self"
 say "got here"
 .end
 CODE
@@ -224,7 +224,7 @@ pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 .sub main :main
   $P0 = newclass "Foo"
   $P1 = new ['Foo']
-  $I0 = $P1(2)
+  $I0 = $P1($P1, 2) # pass the object it"self"
   print $I0
   print "\n"
 .end
@@ -247,7 +247,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'RT #41732' );
     $P1()
 .end
 CODE
-/1 params expected/
+/2 params expected/
 OUT
 
 # '

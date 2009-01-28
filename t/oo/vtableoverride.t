@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -18,10 +18,11 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(11)
+    plan(12)
 
     newclass_tests()
     subclass_tests()
+    vtable_implies_self_tests()
 .end
 
 .sub 'newclass_tests'
@@ -69,6 +70,12 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
     is ($I0, 1, "inherited does")
 .end
 
+.sub 'vtable_implies_self_tests'
+  $P1 = get_class 'MyVtableObject'
+  $P2 = $P1.'new'()
+  $I0 = does $P2, 'frobulate'
+  ok( $I0, ':vtable should imply the self parameter' )
+.end
 
 .namespace [ 'MyObject' ]
 
@@ -130,8 +137,21 @@ yes:
     .return (1)
 .end
 
+.namespace [ 'MyVtableObject' ]
 
+.sub '__onload' :anon :init
+  $P1 = get_class 'String'
+  $P2 = subclass $P1, 'MyVtableObject'
+.end
 
+.sub 'does' :vtable
+    .param string what
+    eq what, 'frobulate', true
+    .return( 0 )
+
+  true:
+    .return( 1 )
+.end
 
 # Local Variables:
 #   mode: pir

@@ -3340,7 +3340,7 @@ yyreduce:
   case 65:
 #line 1171 "compilers/imcc/imcc.y"
     {
-           (yyval.t) = 0;
+           (yyval.t) = P_VTABLE;
            IMCC_INFO(interp)->cur_unit->vtable_name = NULL;
            IMCC_INFO(interp)->cur_unit->is_vtable_method = 1;
          }
@@ -3349,7 +3349,7 @@ yyreduce:
   case 66:
 #line 1177 "compilers/imcc/imcc.y"
     {
-           (yyval.t) = 0;
+           (yyval.t) = P_VTABLE;
            IMCC_INFO(interp)->cur_unit->vtable_name = (yyvsp[(3) - (4)].s);
            IMCC_INFO(interp)->cur_unit->is_vtable_method = 1;
          }
