@@ -44,5 +44,3 @@ realclean: clean
 	$(RM_F) Makefile
 
 distclean: realclean
-
-svnclean: realclean

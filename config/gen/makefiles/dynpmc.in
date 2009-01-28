@@ -70,5 +70,3 @@ realclean: clean
 	$(RM_F) Makefile $(GEN_PMC_DEFINITIONS)
 
 distclean: realclean
-
-svnclean: realclean
