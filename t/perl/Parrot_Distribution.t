@@ -1,11 +1,12 @@
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 31;
+
+use Test::More tests => 30;
 use File::Spec;
 
 =head1 NAME
