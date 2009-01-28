@@ -9,7 +9,7 @@ CHMOD  = @chmod@
 PERLDOC = @perldoc@
 
 # long list of .pod files
-POD = @pod@
+POD = @TEMP_pod@
 
 #
 # Targets
@@ -35,7 +35,7 @@ doc-prep:
 	$(MKPATH) ops
 
 packfile-c.pod: ../src/packfile.c
-#IF(new_perldoc):	$(PERLDOC) -ud packfile-c.pod ../src/packfile.c 
+#IF(new_perldoc):	$(PERLDOC) -ud packfile-c.pod ../src/packfile.c
 #ELSE:	$(PERLDOC) -u ../src/packfile.c > packfile-c.pod
 
 clean:
@@ -47,3 +47,4 @@ html:
 html-clean:
 	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new()->delete_html_docs()"
 
+@TEMP_pod_build@

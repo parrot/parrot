@@ -78,7 +78,6 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $self->makefiles($conf);
-    $conf->append_configure_log('docs/Makefile');
     $self->cflags($conf);
 
     return 1;
@@ -123,55 +122,7 @@ sub makefiles {
         my $args   = $self->{makefiles}->{$target};
         my $source = delete $args->{SOURCE};
 
-        if ( $target ne 'docs/Makefile' ) {
-            $conf->genfile($source => $target, %$args );
-        }
-        else {
-
-            if ( $conf->data->get('has_perldoc') ) {
-
-                # set up docs/Makefile, partly based on the .ops in the root dir
-
-                opendir OPS, "src/ops" or die "opendir ops: $!";
-                my @ops = sort grep { !/^\./ && /\.ops$/ } readdir OPS;
-                closedir OPS;
-
-                my $pod = join " " =>
-                    map { my $t = $_; $t =~ s/\.ops$/.pod/; "ops/$t" } @ops;
-
-                $conf->data->set( pod => $pod );
-
-                $conf->genfile($source => $target, %$args );
-
-                $conf->data->set( pod => undef );
-
-                open my $MAKEFILE, ">>", "docs/Makefile"
-                    or die "open >> docs/Makefile: $!";
-
-                my $slash       = $conf->data->get('slash');
-                my $new_perldoc = $conf->data->get('new_perldoc');
-
-                foreach my $ops (@ops) {
-                    my $pod = $ops;
-                    $pod =~ s/\.ops$/.pod/;
-                    print {$MAKEFILE} "ops$slash$pod: ..${slash}src${slash}ops${slash}$ops\n";
-                    if ( $new_perldoc == 1 ) {
-                        print {$MAKEFILE} "\t\$(PERLDOC) -ud ops${slash}$pod"
-                            . " ..${slash}src${slash}ops${slash}$ops\n";
-                        print {$MAKEFILE} "\t\$(CHMOD) 0644 ops${slash}$pod\n\n";
-                    }
-                    else {
-                        print {$MAKEFILE} "\t\$(PERLDOC) -u ..${slash}ops${slash}$ops"
-                            . " > ops${slash}$pod\n";
-                        print {$MAKEFILE} "\t\$(CHMOD) 0644 ..${slash}ops${slash}$pod\n\n";
-                    }
-                }
-
-            }
-            else {
-                print "\nNo Perldoc, not generating a docs makefile.\n";
-            }
-        }
+        $conf->genfile($source => $target, %$args );
     }
     return;
 }
