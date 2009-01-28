@@ -485,34 +485,6 @@ Compares the string with C<value>; returns FALSE if they match.
 
 /*
 
-=item C<INTVAL is_same(PMC *value)>
-
-Compares the string in this PMC with the one in the C<value> PMC.
-Returns true if this PMC and the one in C<value> are of the same PMC
-class and their strings are aliases of the same internal string.
-
-(this can only happen if you use the set_string_native method)
-
-=cut
-
-*/
-    VTABLE INTVAL is_same(PMC *value) {
-        if (PMC_IS_NULL(value)) {
-            return 0;
-        }
-        else {
-            if (value->vtable == SELF->vtable) {
-                const STRING * const s = VTABLE_get_string(INTERP, SELF);
-                const STRING * const v = VTABLE_get_string(INTERP, value);
-                return (INTVAL)(s == v);
-            }
-            else
-                return 0;
-        }
-    }
-
-/*
-
 =item C<INTVAL cmp(PMC *value)>
 
 Compares the string with C<value>; returns -1 if the
