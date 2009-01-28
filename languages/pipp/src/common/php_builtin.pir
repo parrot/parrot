@@ -375,8 +375,13 @@ NOT IMPLEMENTED.
     array = new ['PhpArray']
 
     .local pmc extension
+
     extension = new ['PhpString']
     extension = 'standard'
+    push array, extension
+
+    extension = new ['PhpString']
+    extension = 'Reflection'
     push array, extension
 
     .return(array)

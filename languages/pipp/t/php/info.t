@@ -102,7 +102,7 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'get_loaded_extensions()' );
   echo "\n";
 ?>
 CODE
-standard
+standard;Reflection
 OUT
 
 
