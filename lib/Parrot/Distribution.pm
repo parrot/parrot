@@ -637,7 +637,6 @@ sub perl_script_file_directories {
         map( "languages/$_" => qw<
             APL/tools
             BASIC/compiler BASIC/interpreter
-            WMLScript/build
             dotnet dotnet/build dotnet/tools
             lua
             pipp
@@ -689,7 +688,6 @@ sub perl_module_file_directories {
         map( "languages/$_" => qw<
             APL/t
             BASIC/compiler
-            WMLScript/build/SRM WMLScript/t/Parrot/Test
             bc/lib/Parrot/Test bc/lib/Parrot/Test/Bc
             dotnet/build/SRM dotnet/t
             jako/lib/Jako

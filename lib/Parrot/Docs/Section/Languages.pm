@@ -68,7 +68,6 @@ sub new {
         $self->new_section( 'Scheme',      'scheme.html',     '', 'languages/scheme' ),
         $self->new_section( 'Squaak',      'squaak.html',     '', 'languages/squaak' ),
         $self->new_section( 'URM',         'urm.html',        '', 'languages/urm' ),
-        $self->new_section( 'WMLScript',   'wmlscript.html',  '', 'languages/WMLScript' ),
         $self->new_section( 'Zcode',       'zcode.html',      '', 'languages/Zcode' ),
     );
 }

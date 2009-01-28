@@ -49,7 +49,6 @@ sub _init {
         regex
         scheme squaak
         urm
-        WMLScript
         Zcode
     };
     $data{languages_source} = q{config/gen/makefiles/languages.in};

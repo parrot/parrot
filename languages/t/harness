@@ -90,7 +90,6 @@ my @unified_testable_languages
               ook
               parrot_compiler pipp punie
               regex
-              WMLScript
             );
 my @harnesses
     = grep {-f $_}

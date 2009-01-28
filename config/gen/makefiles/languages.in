@@ -26,7 +26,6 @@ LANGUAGES = \
     regex \
     scheme squaak \
     urm \
-    WMLScript \
     Zcode
 
 # the default target
@@ -131,7 +130,6 @@ test-separate: all \
     regex.test \
     scheme.test squaak.test \
     urm.test \
-    WMLScript.test \
     Zcode.test
 
 clean: \
@@ -149,7 +147,6 @@ clean: \
     regex.clean \
     scheme.clean squaak.clean \
     urm.clean \
-    WMLScript.clean \
     Zcode.clean
 
 realclean: \
@@ -166,7 +163,6 @@ realclean: \
     regex.realclean \
     scheme.realclean squaak.realclean \
     urm.realclean \
-    WMLScript.realclean \
     Zcode.realclean
 
 
@@ -465,16 +461,6 @@ urm.clean:
 urm.realclean:
 	- $(MAKE) urm realclean
 
-WMLScript: WMLScript.dummy
-WMLScript.dummy:
-	- $(MAKE) WMLScript
-WMLScript.test:
-	- $(MAKE) WMLScript test
-WMLScript.clean:
-	- $(MAKE) WMLScript clean
-WMLScript.realclean:
-	- $(MAKE) WMLScript realclean
-
 Zcode : Zcode.dummy
 Zcode.dummy:
 # Do nothing. make Zcode requires an Inform compiler
@@ -488,8 +474,8 @@ Zcode.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-gil co-hq9plus co-lazy-k co-m4 co-markdown co-pjs co-primitivearc co-tcl co-unlambda
-up-all: up-eclectus up-gil up-hq9plus up-lazy-k up-m4 up-markdown up-pjs up-primitivearc up-tcl up-unlambda
+co-all: co-eclectus co-gil co-hq9plus co-lazy-k co-m4 co-markdown co-pjs co-primitivearc co-tcl co-unlambda co-wmlscript
+up-all: up-eclectus up-gil up-hq9plus up-lazy-k up-m4 up-markdown up-pjs up-primitivearc up-tcl up-unlambda up-wmlscript
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
@@ -546,8 +532,14 @@ up-tcl:
 	cd tcl && $(SVN) up
 
 co-unlambda:
-	- $(GIT) clone 'git:////github.com/fperrad/unlambda.git'
+	- $(GIT) clone 'git:////github.com/bschmalhofer/unlambda.git'
 
 up-unlambda:
 	cd unlambda && $(GIT) pull
+
+co-wmlscript:
+	- $(GIT) clone 'git:////github.com/fperrad/wmlscript.git'
+
+up-wmlscript:
+	cd wmlscript && $(GIT) pull
 

@@ -47,7 +47,6 @@ my %lang_is_checked = map { $_ => 1 } qw{
     ook
     perl6
     pipp
-    WMLScript
 };
 
 my $build_dir = $PConfig{build_dir};
