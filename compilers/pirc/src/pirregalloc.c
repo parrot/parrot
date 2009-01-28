@@ -95,6 +95,7 @@ new_linear_scan_register_allocator(struct lexer_state *lexer) {
 XXX debug function only
 
 */
+void print_list(char *msg, live_interval *i);
 void
 print_list(char *msg, live_interval *i) {
     fprintf(stderr, "%s: ", msg);

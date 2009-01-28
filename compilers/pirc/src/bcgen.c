@@ -477,7 +477,8 @@ create_annotations_segment(bytecode * const bc, char const * const name) {
     char *segment_name = (char *)mem_sys_allocate((strlen(name) + 5) * sizeof (char));
     sprintf(segment_name, "%s_ANN", name);
 
-    bc->interp->code->annotations = PackFile_Segment_new_seg(bc->interp,
+    bc->interp->code->annotations = (PackFile_Annotations*)
+                                    PackFile_Segment_new_seg(bc->interp,
                                         bc->interp->code->base.dir,
                                         PF_ANNOTATIONS_SEG, segment_name, 1);
 

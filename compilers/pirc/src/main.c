@@ -177,7 +177,7 @@ main(int argc, char *argv[]) {
     int                execute      = 0;
     char              *filename     = NULL;
     char              *outputfile   = NULL;
-    char              *hdocoutfile  = NULL;
+    const char        *hdocoutfile  = NULL;
     unsigned           macrosize    = INIT_MACRO_SIZE;
     PARROT_INTERP                   = Parrot_new(NULL);
 
