@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -508,15 +508,97 @@ NOT IMPLEMENTED.
 
 =item C<mixed print_r(mixed var [, bool return])>
 
-Prints out or returns information about the specified variable
+Prints out or returns information about the specified variable.
+
+Currently this a c&b from C<var_dump()>.
+Not sure what the differences are.
 
 NOT IMPLEMENTED.
 
 =cut
 
+.include "library/dumper.pir"
+.include "cclass.pasm"
+
 .sub 'print_r'
-    not_implemented()
+    .param pmc a
+    .param pmc return_flag           :optional  # TODO implement
+    .param int has_return_flag       :opt_flag
+
+    if null a goto set_null_type
+
+    .local string type_of_pmc
+    type_of_pmc = typeof a
+    unless type_of_pmc == 'string' goto L1
+    print a
+    .return()
+
+  L1:
+    unless type_of_pmc == 'array' goto L2
+    print "Array\n(\n"
+
+    .local pmc    it, val, key
+    .local string indent, key_str
+    .local int    key_starts_with_digit
+    indent = '    '
+    it = iter a
+  iter_loop:
+    unless it goto iter_end
+    shift key, it
+    key_str = key
+    key_starts_with_digit = is_cclass .CCLASS_NUMERIC, key_str, 0
+    print indent
+    print '['
+    if key_starts_with_digit goto key_is_an_integer_1
+  key_is_an_integer_1:
+    print key
+    if key_starts_with_digit goto key_is_an_integer_2
+  key_is_an_integer_2:
+    print '] => '
+    val = a[key]
+    print_r(val)
+
+    branch iter_loop
+  iter_end:
+    say "\n)"
+    .return()
+  L2:
+    unless type_of_pmc == 'integer' goto L3
+    print 'int('
+    print a
+    say ')'
+
+    .return()
+  L3:
+    unless type_of_pmc == 'boolean' goto L4
+    print 'bool('
+    if a goto a_is_true
+    print 'false'
+    say ')'
+
+    .return()
+  a_is_true:
+    print 'true'
+    say ')'
+
+    .return()
+  set_null_type:
+    type_of_pmc = 'NULL'
+  L4:
+    unless type_of_pmc == 'NULL' goto L5
+    say type_of_pmc
+
+    .return()
+  L5:
+    # this should never happen
+    print 'unexpectedly encountered a '
+    print type_of_pmc
+    print " PMC\n"
+    _dumper(a)
+
+    .return()
 .end
+
 
 =item C<bool putenv(string setting)>
 

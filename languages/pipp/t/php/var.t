@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test  tests => 12;
+use Parrot::Test  tests => 13;
 
 =for perl6
 
@@ -145,6 +145,17 @@ array(1) {
   ["bar"]=>
   string(4) "asdf"
 }
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<'OUT', 'print_r(), array with string key' );
+<?php
+$foo['bar'] = 'asdf';
+print_r( $foo );
+CODE
+Array
+(
+    [bar] => asdf
+)
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'var_dump() with int key' );
