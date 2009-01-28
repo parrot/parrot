@@ -340,7 +340,7 @@ operations, and offset math is messy with encodings that aren't byte-based.}}
 
 =head3 Conversions between normalization form, encoding, and charset
 
-Conversion will be done with a function called C<Parrot_string_grapheme_copy>:
+Conversion will be done with a function called C<Parrot_str_grapheme_copy>:
 
     INTVAL string_grapheme_copy(STRING *src, STRING *dst)
 
@@ -362,41 +362,41 @@ the addition of the NFG string format. Many string functions that are part of
 Parrot's external API will be renamed for the standard "Parrot_*" naming
 conventions.
 
-=head3 Parrot_string_set (was string_set)
+=head3 Parrot_str_set (was string_set)
 
 Set one string to a copy of the value of another string.
 
-=head3 Parrot_string_new_COW (was Parrot_make_COW_reference)
+=head3 Parrot_str_new_COW (was Parrot_make_COW_reference)
 
 Create a new copy-on-write string. Creating a new string header, clone the
 struct members of the original string, and point to the same string buffer as
 the original string.
 
-=head3 Parrot_string_reuse_COW (was Parrot_reuse_COW_reference)
+=head3 Parrot_str_reuse_COW (was Parrot_reuse_COW_reference)
 
 Create a new copy-on-write string. Clone the struct members of the original
 string into a passed in string header, and point the reused string header to
 the same string buffer as the original string.
 
-=head3 Parrot_string_write_COW (was Parrot_unmake_COW)
+=head3 Parrot_str_write_COW (was Parrot_unmake_COW)
 
 If the specified Parrot string is copy-on-write, copy the string's contents
 to a new string buffer and clear the copy-on-write flag.
 
-=head3 Parrot_string_concat (was string_concat)
+=head3 Parrot_str_concat (was string_concat)
 
 Concatenate two strings. Takes three arguments: two strings, and one integer
 value of flags. If both string arguments are null, return a new string created
 according to the integer flags.
 
-=head3 Parrot_string_append (was string_append)
+=head3 Parrot_str_append (was string_append)
 
 Append one string to another and return the result. In the default case, the
 return value is the same as the first string argument (modifying that argument
 in place). If the first argument is COW or read-only, then the return value is
 a new string.
 
-=head3 Parrot_string_from_cstring (was string_from_cstring)
+=head3 Parrot_str_from_cstring (was string_from_cstring)
 
 Create a Parrot string from a C string (a C<char *>). Takes two arguments, a C
 string, and an integer length of the string (number of characters). If the
@@ -405,16 +405,16 @@ integer length isn't passed, the function will calculate the length.
 {{NOTE: the integer length isn't really necessary, and is under consideration
 for deprecation.}}
 
-=head3 Parrot_string_new
+=head3 Parrot_str_new
 
 Return a new string with the default encoding and character set. Accepts one
 argument, a C string (C<char *>) to initialize the value of the string.
 
-=head3 Parrot_string_new_noinit (was string_make_empty)
+=head3 Parrot_str_new_noinit (was string_make_empty)
 
 Returns a new empty string with the default encoding and chararacter set.
 
-=head3 Parrot_string_new_init (was string_make_direct)
+=head3 Parrot_str_new_init (was string_make_direct)
 
 Returns a new string of the requested encoding, character set, and
 normalization form, initializing the string value to the value passed in.  The
@@ -429,49 +429,49 @@ a string name for the character set. This behavior is no longer supported, but
 C<Parrot_find_encoding> and C<Parrot_find_charset> can look up the encoding or
 character set structs. }}
 
-=head3 Parrot_constant_string_new (was const_string)
+=head3 Parrot_str_constant_new (was const_string)
 
 Creates and returns a new Parrot constant string. Takes one C string (a C<char
 *>) as an argument, the value of the constant string. The length of the C
 string is calculated internally.
 
-=head3 Parrot_string_resize (was string_grow)
+=head3 Parrot_str_resize (was string_grow)
 
 Resize the string buffer of the given string adding the number of bytes passed
 in the integer argument. If the argument is negative, remove the given number
 of bytes. Throws an exception if shrinking the string buffer size will
 truncate the string (if C<strlen> will be longer than C<buflen>).
 
-=head3 Parrot_string_length (was string_compute_strlen)
+=head3 Parrot_str_length (was string_compute_strlen)
 
 Returns the number of characters in the string. Combining characters are each
 counted separately. Variable-width encodings may lookahead.
 
-=head3 Parrot_string_grapheme_length
+=head3 Parrot_str_grapheme_length
 
 Returns the number of graphemes in the string. Groups of combining characters
 count as a single grapheme.
 
-=head3 Parrot_string_byte_length (was string_length)
+=head3 Parrot_str_byte_length (was string_length)
 
 Returns the number of bytes in the string. The character width of
 variable-width encodings is ignored. Combining characters are not treated any
 differently than other characters. This is equivalent to accessing the
 C<strlen> member of the C<STRING> struct directly.
 
-=head3 Parrot_string_index (was string_index)
+=head3 Parrot_str_index (was string_index)
 
 Returns the character at the specified index (the Nth character from the start
 of the string). Combining characters are counted separately. Variable-width
 encodings will lookahead to capture full character values.
 
-=head3 Parrot_string_grapheme_index
+=head3 Parrot_str_grapheme_index
 
 Returns the grapheme at the given index (the Nth grapheme from the string's
 start). Groups of combining characters count as a single grapheme, so this
 function may return multiple characters.
 
-=head3 Parrot_string_find_substr (was string_str_index)
+=head3 Parrot_str_find_index (was string_str_index)
 
 Search for a given substring within a string. If it's found, return an integer
 index to the substring's location (the Nth character from the start of the
@@ -479,59 +479,59 @@ string). Combining characters are counted separately. Variable-width encodings
 will lookahead to capture full character values. Returns -1 unless the
 substring is found.
 
-=head3 Parrot_string_copy (was string_copy)
+=head3 Parrot_str_copy (was string_copy)
 
 Make a COW copy a string (a new string header pointing to the same string
 buffer).
 
-=head3 Parrot_string_grapheme_copy (new)
+=head3 Parrot_str_grapheme_copy (new)
 
 Accepts two string arguments: a destination and a source. Iterates through the
 source string one grapheme at a time and appends it to the destination string.
 
 This function can be used to convert a string of one format to another format.
 
-=head3 Parrot_string_repeat (was string_repeat)
+=head3 Parrot_str_repeat (was string_repeat)
 
 Return a string containing the passed string argument, repeated the number of
 times in the integer argument.
 
-=head3 Parrot_string_substr (was string_substr)
+=head3 Parrot_str_substr (was string_substr)
 
 Return a substring starting at an integer offset with an integer length. The
 offset and length specify characters. Combining characters are counted
 separately. Variable-width encodings will lookahead to capture full character
 values.
 
-=head3 Parrot_string_grapheme_substr
+=head3 Parrot_str_grapheme_substr
 
 Return a substring starting at an integer offset with an integer length. The
 offset and length specify graphemes. Groups of combining characters count as a
 single grapheme.
 
-=head3 Parrot_string_replace (was string_replace)
+=head3 Parrot_str_replace (was string_replace)
 
 Replaces a substring within the first string argument with the second string
 argument. An integer offset and length, in characters, specify where the
 removed substring starts and how long it is.
 
-=head3 Parrot_string_grapheme_replace
+=head3 Parrot_str_grapheme_replace
 
 Replaces a substring within the first string argument with the second string
 argument. An integer offset and length in graphemes specify where the removed
 substring starts and how long it is.
 
-=head3 Parrot_string_chopn (was string_chopn)
+=head3 Parrot_str_chopn (was string_chopn)
 
 Chop the requested number of characters off the end of a string without
 modifying the original string.
 
-=head3 Parrot_string_chopn_inplace (was string_chopn_inplace).
+=head3 Parrot_str_chopn_inplace (was string_chopn_inplace).
 
 Chop the requested number of characters off the end of a string, modifying the
 original string.
 
-=head3 Parrot_string_grapheme_chopn
+=head3 Parrot_str_grapheme_chopn
 
 Chop the requested number of graphemes off the end of a string without
 modifying the original string.
