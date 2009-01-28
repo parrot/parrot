@@ -114,7 +114,7 @@ rule parameter_flags {
 }
 
 rule labeled_pir_instr {
-    [ <label> <instr>?
+    [ <normal_label> <instr>?
     | <instr>
     ]
     <.nl>
@@ -122,7 +122,7 @@ rule labeled_pir_instr {
 }
 
 rule labeled_pasm_instr {
-    [ <label> <pasm_instr>?
+    [ <normal_label> <pasm_instr>?
     | <pasm_instr>
     ]
     <.nl>
