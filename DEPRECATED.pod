@@ -157,11 +157,6 @@ See TT #106
 
 Replace usage with the escape opcode.  See TT #107
 
-=item DWIM [post 0.9.0]
-
-Hasn't been kept up to date; might move to the examples/ folder, but
-doesn't need to be in stdlib.  See TT #120
-
 =back
 
 =cut
