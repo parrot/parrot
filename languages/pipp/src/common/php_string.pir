@@ -175,14 +175,68 @@ Converts ASCII code to a character
 
 =item C<string chunk_split(string str [, int chunklen [, string ending]])>
 
-Returns split line
+Inserts the string C<ending> every C<chunklen> characters into the string C<str>.
+Default for C<chunklen> is 76. Default for C<ending> is '\r\n'.
 
 NOT IMPLEMENTED.
 
 =cut
 
 .sub 'chunk_split'
-    not_implemented()
+    .param pmc args :slurpy
+
+    .local int argc
+    argc = args
+    unless argc > 3 goto L1
+    wrong_param_count()
+    unless argc == 0 goto L1
+    wrong_param_count()
+  L1:
+    .local string ending
+    ending = "\r\n"   # TODO: the windows case
+    unless argc == 3 goto L2
+    ending = pop args
+    argc = args
+  L2:
+    .local int chunk_len
+    chunk_len = 76
+    unless argc == 2 goto L3
+       chunk_len = pop args
+  L3:
+    .local string str
+    str = pop args
+    argc = args
+
+    # compute number of complete chunks and length of the rest
+    .local int str_len
+    str_len = length str
+    .local int num_chunks
+    num_chunks = str_len / chunk_len
+    .local int rest_len
+    rest_len = mod str_len, chunk_len
+
+    # assemble the output
+    .local string res, chunk
+    .local int i, cursor
+    i = 0
+    cursor = 0
+  L4:
+    unless i < num_chunks goto L5
+    chunk = substr str, cursor, chunk_len
+    concat res, chunk
+    concat res, ending
+    inc i
+    cursor = cursor + chunk_len
+    goto L4
+  L5:
+
+    unless rest_len > 0 goto L6
+    chunk = substr str, cursor
+    concat res, chunk
+    concat res, ending
+  L6:
+
+    .RETURN_STRING(res)
 .end
 
 =item C<mixed count_chars(string input [, int mode])>

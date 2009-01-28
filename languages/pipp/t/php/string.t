@@ -23,7 +23,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 37;
+use Parrot::Test tests => 38;
 
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'bin2hex' );
@@ -486,6 +486,16 @@ echo str_replace( "one", "1", "one + one = 2\n" );
 ?>
 CODE
 1 + 1 = 2
+OUT
+
+language_output_is( 'Pipp', <<'CODE', <<"OUT", 'chunk_split' );
+<?php
+
+echo chunk_split( '12345678901234567890', 3, '? ?'), "\n";
+
+?>
+CODE
+123? ?456? ?789? ?012? ?345? ?678? ?90? ?
 OUT
 
 # Local Variables:
