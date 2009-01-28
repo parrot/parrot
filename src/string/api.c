@@ -1143,11 +1143,11 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
         /* copy s into dest num times */
         UINTVAL length = s->bufused;
         UINTVAL i;
-        char * destpos = dest->strstart;
-	const char * const srcpos = s->strstart;
+        char *             destpos = dest->strstart;
+        const char * const srcpos  = s->strstart;
         for (i = 0; i < num; i++) {
             mem_sys_memcopy(destpos, srcpos, length);
-	    destpos+= length;
+            destpos += length;
         }
 
         dest->bufused = s->bufused * num;
