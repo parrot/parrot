@@ -46,7 +46,6 @@ sub runstep {
         parrot_is_shared    => 1,
         sym_export          => '__declspec(dllexport)',
         sym_import          => '__declspec(dllimport)',
-        #cygchkdll           => 'tools/build/cygchkdll.sh $(MINIPARROT) $(LIBPARROT)',
         libparrot_shared    => $libparrot_shared,
         blib_dir            => '.',
         libparrot_ldflags   => '-L' . $build_dir . ' -lparrot',
