@@ -312,7 +312,7 @@ NOT IMPLEMENTED.
 
     $P0 = shift iter
     $S0 = $P0
-    concat res, $S0 
+    concat res, $S0
     $I1 = 0
     args_loop:
         unless iter goto args_end
