@@ -32,6 +32,13 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );
 
+    if ($conf->data->get('gccversion')) {
+        my $verbose = $conf->options->get('verbose');
+        print " (skipped) " if $verbose;
+        $self->set_result('skipped');
+        $conf->data->set( msvcversion => undef );
+        return 1;
+    }
     my $msvcref = _probe_for_msvc($conf);
 
     $self->_evaluate_msvc($conf, $msvcref);
