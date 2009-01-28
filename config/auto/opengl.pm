@@ -156,11 +156,7 @@ sub runstep {
         |
     );
 
-    if ($without) {
-        $conf->data->set( has_opengl => 0 );
-        $self->set_result('no');
-        return 1;
-    }
+    return $self->_handle_no_opengl($conf) if $without;
 
     my $osname = $conf->data->get_p5('OSNAME');
 
@@ -188,12 +184,13 @@ sub runstep {
     $conf->cc_gen('config/auto/opengl/opengl.in');
     my $has_glut = 0;
     eval { $conf->cc_build( q{}, $extra_libs ) };
-    if ( !$@ ) {
-        my $test = $conf->cc_run();
-        $has_glut = _handle_glut($conf, $extra_libs, $self->_evaluate_cc_run($test, $verbose));
+    if ( $@ ) {
+        return $self->_handle_no_opengl($conf);
     }
-
-    return 1;
+    else {
+        my $test = $conf->cc_run();
+        return _handle_glut($conf, $extra_libs, $self->_evaluate_cc_run($test, $verbose));
+    }
 }
 
 sub _evaluate_cc_run {
@@ -224,6 +221,24 @@ sub _handle_glut {
 
     return 1;
 }
+
+sub _handle_no_opengl {
+    my ($self, $conf) = @_;
+
+    $conf->data->set(
+        has_opengl => 0,
+        HAS_OPENGL => 0,
+        opengl_lib => '',
+
+        has_glut   => 0,
+        HAS_GLUT   => 0,
+    );
+
+    $self->set_result('no');
+
+    return 1;
+}
+
 
 1;
 
