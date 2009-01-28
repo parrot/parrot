@@ -83,8 +83,7 @@ sub _evaluate_gcc {
     }
     my $gccversion = $major;
     $gccversion .= ".$minor" if defined $minor;
-    print " (yep: $gccversion )" if $verbose;
-    $self->set_result('yes');
+    $self->set_result("yes, $gccversion");
 
     my $ccwarn = $conf->data->get('ccwarn');
 
