@@ -2124,7 +2124,14 @@ string_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     while (isspace((unsigned char)*p))
         p++;
 
-    f = atof(p);
+    if (STREQ(p, PARROT_CSTRING_INF_POSITIVE))
+        f = PARROT_FLOATVAL_INF_POSITIVE;
+    else if (STREQ(p, PARROT_CSTRING_INF_NEGATIVE))
+        f = PARROT_FLOATVAL_INF_NEGATIVE;
+    else if (STREQ(p, PARROT_CSTRING_NAN_QUIET))
+        f = PARROT_FLOATVAL_NAN_QUIET;
+    else
+        f = atof(p);
 
     /* Not all atof()s return -0 from "-0" */
     if (*p == '-' && FLOAT_IS_ZERO(f))
