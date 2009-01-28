@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -1135,7 +1135,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
 {
-    ASSERT_ARGS(string_repeat)
+    ASSERT_ARGS(Parrot_str_repeat)
     STRING * const dest = string_make_direct(interp, NULL,
                         s->bufused * num,
                         s->encoding, s->charset, 0);

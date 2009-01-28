@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2002-2008, The Perl Foundation.
+Copyright (C) 2002-2009, The Perl Foundation.
 License:  Artistic 2.0, see README and LICENSE for details
 $Id$
 
@@ -86,6 +86,7 @@ PARROT_EXPORT
 FLOATVAL
 floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num)
 {
+    ASSERT_ARGS(floatval_divide_by_zero)
     FLOATVAL zero = 0.0;
     return num / zero;
 }
