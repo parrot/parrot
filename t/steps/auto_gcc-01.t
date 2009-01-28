@@ -160,12 +160,12 @@ $step = test_step_constructor_and_description($conf);
     $gnucref->{__GNUC_MINOR__} = q{abc};
     capture ( sub {$rv = $step->_evaluate_gcc($conf, $gnucref) }, \$stdout);
     ok($rv, "_evaluate_gcc() returned true value");
-    ok( $stdout, "verbose output captured" );
+    ok( !$stdout, "verbose output captured" );
     ok(defined $conf->data->get( 'gccversion' ),
         "gccversion defined as expected");
     is($conf->data->get( 'gccversion' ), 123,
         "Got expected value for gccversion");
-    is($step->result(), q{yes}, "Got expected result");
+    like($step->result(), qr/^yes/, "Got expected result");
 }
 
 $conf->replenish($serialized);
@@ -192,7 +192,7 @@ $step = test_step_constructor_and_description($conf);
         "gccversion defined as expected");
     is($conf->data->get( 'gccversion' ), q{123.456},
         "Got expected value for gccversion");
-    is($step->result(), q{yes}, "Got expected result");
+    like($step->result(), qr/^yes/, "Got expected result");
 }
 
 $conf->replenish($serialized);
@@ -215,12 +215,12 @@ $step = test_step_constructor_and_description($conf);
     $gnucref->{__GNUC_MINOR__} = q{456};
     capture ( sub {$rv = $step->_evaluate_gcc($conf, $gnucref) }, \$stdout);
     ok($rv, "_evaluate_gcc() returned true value");
-    ok( $stdout, "verbose output captured" );
+    ok( !$stdout, "verbose output captured" );
     ok(defined $conf->data->get( 'gccversion' ),
         "gccversion defined as expected");
     is($conf->data->get( 'gccversion' ), q{123.456},
         "Got expected value for gccversion");
-    is($step->result(), q{yes}, "Got expected result");
+    like($step->result(), qr/^yes/, "Got expected result");
 }
 
 $conf->replenish($serialized);
@@ -263,7 +263,7 @@ ok($step->_evaluate_gcc($conf, $gnucref),
     "_evaluate_gcc() returned true value");
 ok(defined $conf->data->get( 'gccversion' ),
     "gccversion defined as expected");
-is($step->result(), q{yes}, "Got expected result");
+like($step->result(), qr/^yes/, "Got expected result");
 
 $conf->replenish($serialized);
 
@@ -290,7 +290,7 @@ $gnucref->{__GNUC_MINOR__} = q{1};
         "Got expected value for gccversion");
     is($conf->data->get( 'HAS_aligned_funcptr' ), 0,
         "Got expected value for HAS_aligned_funcptr");
-    is($step->result(), q{yes}, "Got expected result");
+    like($step->result(), qr/^yes/, "Got expected result");
 }
 
 pass("Completed all tests in $0");
