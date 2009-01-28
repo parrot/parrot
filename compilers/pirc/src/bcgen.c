@@ -416,9 +416,9 @@ into the code segment.
 */
 void
 create_codesegment(bytecode * const bc, int codesize) {
-    /* allocate enough space. XXX I *think* bytes is /always/ codesize * 4. */
+    /* allocate enough space. */
     bc->interp->code->base.data = (opcode_t *)mem_sys_realloc(bc->interp->code->base.data,
-                                                              codesize * 4);
+                                                              codesize * sizeof (opcode_t));
     /* store the size of the code-segment */
     bc->interp->code->base.size = codesize;
 
