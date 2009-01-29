@@ -164,7 +164,7 @@ Tag the release as "RELEASE_a_b_c", where a.b.c is the version number. If
 you're working in trunk, be sure to specify the revision number generated
 in step 3, above.
 
- $ export SVNPARROT=https://svn.perl.org/parrot
+ $ export SVNPARROT=https://svn.parrot.org/parrot
  $ svn copy -m "tagged release a.b.c" \
    $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
 
@@ -359,7 +359,7 @@ F<README>, F<RESPONSIBLE_PARTIES>.
 
 Instead of step 1, create a new branch, and get a working copy of it:
 
-   $ export SVNPARROT=https://svn.perl.org/parrot
+   $ export SVNPARROT=https://svn.parrot.org/parrot
    $ svn copy -m"Starting release a.b.c" \
               $SVNPARROT/trunk $SVNPARROT/branches/RELEASE_a_b_c
    $ svn checkout $SVNPARROT/branches/RELEASE_a_b_c parrot-release

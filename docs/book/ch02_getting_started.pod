@@ -91,10 +91,10 @@ Metacommiter. To download the most recent version from SVN, type this
 command into your terminal N<This is for Linux users, on Mac or
 Windows systems, follow the instructions from your SVN client>:
 
-  svn co https://svn.perl.org/parrot/trunk parrot
+  svn co https://svn.parrot.org/parrot/trunk parrot
 
 There's also a web interface for viewing files in the repository at
-U<http://svn.perl.org/parrot/>.
+U<http://svn.parrot.org/parrot/>.
 
 The repository is large and complex, so it's worth taking a little bit
 of time to explore. The code changes constantly, but most files and

@@ -161,7 +161,7 @@ See:
 
 =item * L<http://dev.perl.org/>
 
-=item * L<http://svn.perl.org/>
+=item * L<https://svn.parrot.org/>
 
 =back
 

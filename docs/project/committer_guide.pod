@@ -119,8 +119,8 @@ repository.
 
 To create a new branch from the parrot trunk you use the command:
 
-  % svn copy https://svn.perl.org/parrot/trunk \
-             https://svn.perl.org/parrot/branches/<branch_name> \
+  % svn copy https://svn.parrot.org/parrot/trunk \
+             https://svn.parrot.org/parrot/branches/<branch_name> \
 	           -m "Creating a private branch of parrot/trunk."
 
 where you might want to be a bit more informative in the commit message than
@@ -133,12 +133,12 @@ repository.
 You first need to work out when the branch occurred.  This is done with
 C<svn log>:
 
-  % svn log -v --stop-on-copy https://svn.perl.org/parrot/branches/<branch_name>
+  % svn log -v --stop-on-copy https://svn.parrot.org/parrot/branches/<branch_name>
 
 This will tell you the revision number when the branch happened.  You now
 need a clean working copy of C<trunk>, where you issue the command:
 
-  % svn merge -r<revision_number>:HEAD https://svn.perl.org/parrot/branches/<branch_name>
+  % svn merge -r<revision_number>:HEAD https://svn.parrot.org/parrot/branches/<branch_name>
 
 Run C<svn status>, check the output of C<svn diff> to make sure things look
 sane, build parrot and run the test suite with C<make test> and if
@@ -152,7 +152,7 @@ branched from trunk (again with the help of C<svn log> and its
 C<--stop-on-copy> argument), having a clean working copy of your branch, and
 then running the command:
 
-  % svn merge -r<revision_number>:HEAD https://svn.perl.org/parrot/trunk
+  % svn merge -r<revision_number>:HEAD https://svn.parrot.org/parrot/trunk
 
 Again, build and run the test suite to make sure everything worked (you
 might also have to resolve any conflicts) and then you can check in your
@@ -163,13 +163,13 @@ change to the branch.
 It is sometimes necessary to undo a commit.  The best way to do this is with
 a working copy without local modifications, and then issue the command:
 
-  % svn merge -c <revision_number> https://svn.perl.org/parrot/trunk
+  % svn merge -c <revision_number> https://svn.parrot.org/parrot/trunk
 
 This merges I<out> the change which occurred in the C<trunk> branch at the
 revision C<revision_number>.  This command works with Subversion versions
 1.4 and above.  Below this version number, you'll need to use
 
-  % svn merge -r <revision_number>:<revision_number-1> https://svn.perl.org/parrot/trunk
+  % svn merge -r <revision_number>:<revision_number-1> https://svn.parrot.org/parrot/trunk
 
 This merges the change in C<revision_number> I<backwards> so undoes it.
 

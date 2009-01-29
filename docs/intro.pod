@@ -120,7 +120,7 @@ Periodically, numbered releases will appear on CPAN.  At this stage of the
 project, an awful lot is changing between releases. You can get a copy of the
 latest Parrot from the SVN repository. This is done as follows:
 
-  svn co https://svn.perl.org/parrot/trunk parrot
+  svn co https://svn.parrot.org/parrot/trunk parrot
 
 You can find more instructions at: L<http://www.parrotcode.org/source.html>
 
