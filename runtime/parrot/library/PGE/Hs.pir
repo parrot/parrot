@@ -54,7 +54,6 @@ whole thing may be taken out or refactored away at any moment.
 
 .sub "__onload" :load
     .local pmc load
-    load_bytecode "Data/Escape.pir"
     $P0 = get_class ['PGE';'Match']
 .end
 
@@ -162,10 +161,9 @@ END:
     .local int ari, arc
     .local int tmpi, cond
     .local string tmps, key
-    .local pmc capt, iter, subelm, elm, escape
+    .local pmc capt, iter, subelm, elm
 
     out = ""
-    escape = get_hll_global ["Data::Escape"], "String"
 
   start:
     out .= "PGE_Match "
@@ -212,7 +210,7 @@ END:
     unless cond goto subrules_fail
     elm = capt[key]
     out .= '("'
-    tmps = escape(key)
+    tmps = escape key
     out .= tmps
     out .= '", '
     bsr dumper
@@ -235,7 +233,8 @@ END:
     out .= tmps
     ret
   dumper_string:
-    tmps = escape(elm)
+    $S0 = elm
+    tmps = escape $S0
     out .= 'PGE_String "'
     out .= tmps
     out .= '"'
