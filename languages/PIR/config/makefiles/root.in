@@ -1,3 +1,4 @@
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
 
 ## arguments we want to run parrot with
@@ -30,7 +31,7 @@ PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 
 PMC_DIR       = src/pmc
 
-all: pir.pbc 
+all: pir.pbc
 
 #PERL6_GROUP = $(PMC_DIR)/perl6_group$(LOAD_EXT)
 
@@ -42,7 +43,7 @@ SOURCES = pir.pir \
   src/pasm/gen_pasm_instr.pir \
   src/pasm/gen_pasm_core.pir \
   src/pasm/gen_pasm_io.pir \
-  src/pasm/gen_pasm_pmc.pir  
+  src/pasm/gen_pasm_pmc.pir
 
 PASMGRAMMAR = src/pasm/gen_pasm.pbc \
   src/pasm/gen_pasm_instr.pbc \
@@ -102,7 +103,7 @@ src/pasm/gen_pasm_instr.pbc: src/pasm/gen_pasm_instr.pir
 
 src/pasm/gen_pasm_args.pbc: src/pasm/gen_pasm_args.pir
 	$(PARROT) --output-pbc -o src/pasm/gen_pasm_args.pbc src/pasm/gen_pasm_args.pir
-	
+
 src/pasm/gen_pasm_io.pbc: src/pasm/gen_pasm_io.pir
 	$(PARROT) --output-pbc -o src/pasm/gen_pasm_io.pbc src/pasm/gen_pasm_io.pir
 
@@ -111,7 +112,7 @@ src/pasm/gen_pasm_pmc.pbc: src/pasm/gen_pasm_pmc.pir
 
 src/pasm/gen_pasm_core.pbc: src/pasm/gen_pasm_core.pir
 	$(PARROT) --output-pbc -o src/pasm/gen_pasm_core.pbc src/pasm/gen_pasm_core.pir
-	
+
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=PIR

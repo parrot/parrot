@@ -1,3 +1,4 @@
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
 # Makefile for languages/Zcode
@@ -57,7 +58,7 @@ examples: $(EXAMPLES)
 clean:
 	@echo "No temp files to clean"
 
-# Deletes z files. 
+# Deletes z files.
 # Don't do this unless you have an Inform compiler!
 realclean: clean
 	$(RM_F) Makefile

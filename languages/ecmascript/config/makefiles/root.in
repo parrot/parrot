@@ -1,3 +1,4 @@
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 ## arguments we want to run parrot with
@@ -95,10 +96,10 @@ js@exe@: js.pbc
 js.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o js.pbc js.pir
 
-src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg 
+src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
 	    --output=src/gen_grammar.pir \
-	    src/parser/grammar.pg 
+	    src/parser/grammar.pg
 
 src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
@@ -162,7 +163,7 @@ CLEANUPS = \
   t/*.out \
   t/*.rb
 
-clean: 
+clean:
 	$(RM_RF) $(CLEANUPS)
 
 realclean: clean

@@ -1,3 +1,4 @@
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 # Set up extensions
@@ -294,7 +295,7 @@ clean-test:
   t/php/*.out \
   t/pmc/*.pir \
   pipp_test_run.tar.gz
-  
+
 clean-hash:
 	$(RM_F) "$(HASH_OBJS)"
 

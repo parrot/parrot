@@ -1,3 +1,4 @@
+# Copyright (C) 2003-2009, The Perl Foundation.
 # $Id$
 
 # Makefile for languages/urm
@@ -34,17 +35,17 @@ Makefile: config/makefiles/root.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=urm
 
 test: build
-	cd .. && $(PERL) -I../lib urm/t/harness 
+	cd .. && $(PERL) -I../lib urm/t/harness
 
 examples: build
 	$(PERL) urmc -c examples/biggerzero.urm
 	$(PERL) urmc -c examples/sub.urm
 	$(PERL) urmc -c examples/sim.urm
-	$(PERL) urmc -c examples/mult.urm    
+	$(PERL) urmc -c examples/mult.urm
 	$(PERL) urmc -c examples/div.urm
 	$(PERL) urmc -c examples/distance.urm
 
-build: 
+build:
 	$(PERL) -c urmc
 
 clean:
@@ -60,4 +61,4 @@ clean:
 
 realclean: clean
 	$(RM_F) Makefile
-	
+
