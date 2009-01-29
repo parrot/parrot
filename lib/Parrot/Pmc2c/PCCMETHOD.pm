@@ -277,10 +277,17 @@ sub parse_p_args_string {
     my $linear_args  = [];
 
     for my $x ( split /,/, $parameters ) {
+
+        #change 'PMC * foo' to 'PMC *foo'
+        $x =~ s/\*\s+/\*/ if ($x =~ /\s\*+\s/);
+
+        #change 'PMC* foo' to 'PMC *foo'
+        $x =~ s/(\*+)\s+/ $1/ if ($x =~ /^\w+\*/);
+
         my ( $type, $name, $rest ) = split /\s+/, trim($x), 3;
 
         die "invalid PCC arg '$x': did you forget to specify a type?\n"
-             unless defined $name;
+            unless defined $name;
 
         if ($name =~ /\**([a-zA-Z_]\w*)/) {
             $name = $1;
