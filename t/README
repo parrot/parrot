@@ -3,53 +3,58 @@
 
 This directory contains the Parrot test suite.
 
-For details on how tests are written see the documentation in '../docs/tests.pod'.
+For details on how tests are written see the documentation
+in '../docs/tests.pod'.
 For status of the testing effort, see 'TESTS.STATUS.pod' in this directory.
 The script 'harness' actually runs the test suite.
 
 Below is a list of subdirs along with a short description
 of what is tested in there.
 
-benchmark:      Run benchmarks
+benchmark:      Run benchmarks.
 
-codingstd:      Conventions and Guidelines for Parrot Source Code
+codingstd:      Conventions and guidelines for Parrot source code.
 
-compilers:      Mini languages distributed with Parrot
+compilers:      Mini languages distributed with Parrot.
 
-configure:      Perl modules of configuration subsystem
+configure:      Perl modules of configuration subsystem.
 
-distro:         Tests run before a distribution is released
+distro:         Tests run before a distribution is released.
 
-doc:            Completeness and sanity of the documentation
+doc:            Completeness and sanity of the documentation.
 
-dynoplibs:      Dynamic opcode libraries
+dynoplibs:      Dynamic opcode libraries.
 
-dynpmc:         Dynamic PMCs
+dynpmc:         Dynamic PMCs.
 
-examples:       Check whether the examples are still working
+examples:       Check whether the examples are still working.
 
-library:        Parrot modules
+library:        Parrot modules.
 
-native_pbc:     Parrot Byte Code
+manifest:       Functionality supporting the creation of MANIFEST
+                and related files.
 
-oo:             Object oriented features of Parrot
+native_pbc:     Parrot Byte Code.
 
-op:             Try to cover all core operators
+oo:             Object oriented features of Parrot.
 
-pdd15oo:        New version of the object support as specified in PDD15
+op:             Try to cover all core operators.
 
-perl:           Test Perl 5 modules used for configuration, building and testing of Parrot.
+perl:           Test Perl 5 modules used for configuration, building
+                and testing of Parrot.
 
-pmc:            Try to cover all builtin PMCs
+pharness:       Functionality supporting Parrot's test harnesses.
+
+pmc:            Try to cover all builtin PMCs.
 
 postconfigure:  Tests of configuration system which cannot be run until
                 configuration has completed.
 
-run:            Mostly command line options of the 'parrot' executable
+run:            Mostly command line options of the 'parrot' executable.
 
 src:            Tests written in C.
 
-stm:            Storage transactional memory
+steps:          Steps in the Parrot configuration process.
 
 stress:         Stress testing. Make Parrot sweat.
 
