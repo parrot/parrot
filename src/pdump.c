@@ -141,15 +141,18 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
 {
     Parrot_io_printf(interp, "HEADER => [\n");
     Parrot_io_printf(interp, "\twordsize  = %d", pf->header->wordsize);
-    Parrot_io_printf(interp, "\t(interpreter's wordsize    = %d)\n",
-            sizeof (opcode_t));
-    Parrot_io_printf(interp, "\t(interpreter's INTVAL size = %d)\n",
-            sizeof (INTVAL));
+    Parrot_io_printf(interp, "\t(interpreter's wordsize/INTVAL = %d/%d)\n",
+                     sizeof (opcode_t),sizeof (INTVAL));
     Parrot_io_printf(interp, "\tbyteorder = %d", pf->header->byteorder);
-    Parrot_io_printf(interp, "\t(interpreter's byteorder   = %d)\n",
+    Parrot_io_printf(interp, "\t(interpreter's byteorder       = %d)\n",
             PARROT_BIGENDIAN);
     Parrot_io_printf(interp, "\tfloattype = %d", pf->header->floattype);
-    Parrot_io_printf(interp, "\t(interpreter's NUMVAL_SIZE = %d)\n", NUMVAL_SIZE);
+    Parrot_io_printf(interp, "\t(interpreter's NUMVAL_SIZE     = %d)\n", NUMVAL_SIZE);
+    Parrot_io_printf(interp, "\tparrot-version %d.%d.%d, bytecode-version %d.%d\n",
+                     pf->header->major, pf->header->minor, pf->header->patch,
+                     pf->header->bc_major, pf->header->bc_minor);
+    Parrot_io_printf(interp, "\tUUID type = %d, UUID size = %d\n",
+                     pf->header->uuid_type, pf->header->uuid_size);
     Parrot_io_printf(interp, "\t%s endianize, %s opcode, %s numval transform\n",
             pf->need_endianize ? "**need**" : "no",
             pf->need_wordsize ? "**need**" : "no",
