@@ -107,7 +107,7 @@ test: all
 	$(INTERP) examples/queens.pir
 	$(INTERP) examples/sub.pir
 
-
-#
-# End of file.
-#
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

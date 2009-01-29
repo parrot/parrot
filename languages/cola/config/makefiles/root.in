@@ -130,3 +130,7 @@ colacc$(EXE) : parser$(O) lexer$(O) gen$(O) semant$(O) sym$(O) type$(O)
 test: default
 	cd .. && $(PERL) t/harness --languages=cola
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

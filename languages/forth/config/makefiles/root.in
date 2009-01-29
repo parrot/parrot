@@ -48,3 +48,8 @@ virtualstack.pbc: virtualstack.pir
 
 test: all
 	$(PERL) t/harness
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

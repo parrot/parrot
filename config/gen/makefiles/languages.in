@@ -544,3 +544,7 @@ co-wmlscript:
 up-wmlscript:
 	cd wmlscript && $(GIT) pull
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

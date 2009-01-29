@@ -109,3 +109,8 @@ realclean: clean
 	    doc/*.html
 
 distclean: realclean
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

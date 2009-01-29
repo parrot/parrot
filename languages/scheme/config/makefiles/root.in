@@ -60,3 +60,8 @@ over:
 # testing
 test:
 	cd .. && $(PERL) scheme/t/harness
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

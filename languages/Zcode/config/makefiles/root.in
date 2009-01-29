@@ -65,3 +65,8 @@ realclean: clean
 
 maintclean: realclean
 	$(RM_F) $(EXAMPLES) $(TEST_ZFILES)
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

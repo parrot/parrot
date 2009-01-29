@@ -2259,8 +2259,7 @@ apilist: $(SRC_DIR)/core_pmcs.c
 malloclist: $(SRC_DIR)/core_pmcs.c
 	$(PERL) $(BUILD_TOOLS_DIR)/headerizer.pl --macro=PARROT_MALLOC $(HEADERIZER_O_FILES)
 
-#
 # Local variables:
-# mode: makefile
-# ex: ft=make
+#   mode: makefile
 # End:
+# vim: ft=make:

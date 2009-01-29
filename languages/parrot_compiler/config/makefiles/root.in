@@ -55,3 +55,7 @@ parrot_compiler.pbc : parrot_compiler.pir
 parrot_compiler.pasm : parrot_compiler.pir
 	$(PARROT) -o parrot_compiler.pasm parrot_compiler.pir
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

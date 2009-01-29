@@ -48,3 +48,8 @@ html-clean:
 	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new()->delete_html_docs()"
 
 @TEMP_pod_build@
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

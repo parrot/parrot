@@ -61,3 +61,7 @@ Parrot-Embed.clean:
 #IF(win32):	- cd Parrot-Embed && nmake clean
 #UNLESS(win32):	- cd Parrot-Embed && $(MAKE) clean
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

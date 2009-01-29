@@ -98,3 +98,8 @@ realclean: clean
 	$(RM_RF) Makefile
 
 distclean: realclean
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

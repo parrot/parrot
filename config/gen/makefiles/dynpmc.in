@@ -71,3 +71,8 @@ realclean: clean
 	$(RM_F) Makefile $(GEN_PMC_DEFINITIONS)
 
 distclean: realclean
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

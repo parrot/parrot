@@ -283,6 +283,10 @@ realclean: clean
 
 distclean: realclean
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
 
 __@lclang@.pir__
 =head1 TITLE

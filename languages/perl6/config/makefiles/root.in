@@ -305,3 +305,7 @@ help:
 Makefile: config/makefiles/root.in config/makefiles/utils.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=perl6
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

@@ -143,4 +143,7 @@ realclean: clean
 
 distclean: realclean
 
-
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

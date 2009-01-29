@@ -53,3 +53,8 @@ JSON/pge2pir.pir : JSON/pge2pir.tg
 
 clean : testclean
 	$(RM_F) "JSON/*.pbc" "JSON/*.pir" JSON.pbc
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
