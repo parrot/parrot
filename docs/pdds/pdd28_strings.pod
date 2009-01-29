@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -346,8 +346,8 @@ Conversion will be done with a function called C<Parrot_str_grapheme_copy>:
 
 Converting a string from one format to another involves creating a new empty
 string with the required attributes, and passing the source string and the new
-string to C<Parrot_str_grapheme_copy>. This function iterates through the source
-string one grapheme at a time, using the character set function pointer
+string to C<Parrot_str_grapheme_copy>. This function iterates through the
+source string one grapheme at a time, using the character set function pointer
 C<get_grapheme> (which may read ahead multiple characters with strings that
 aren't in NFG). For each source grapheme, the function will call
 C<set_grapheme> on the destination string (which may append multiple
