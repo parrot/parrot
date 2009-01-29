@@ -7,47 +7,59 @@ docs/parrotbyte.pod - The Parrot Bytecode (PBC) Format
 
 =head1 Format of the Parrot bytecode
 
-  0          1          2          3
+The 18-byte header consists of:
+
+  0                                           7
   +----------+----------+----------+----------+
-  | Wordsize | Byteorder|  Major   |  Minor   |
+  |         Parrot Magic = 0x 13155a1         |
   +----------+----------+----------+----------+
 
-The wordsize (or C<opcode_t> size) must be 4 (32-bit) or 8 (64 bit). The
+B<Magic> is stored in native byteorder. The loader uses the byteorder header to
+convert the Magic to verify. More specifically, ALL words (non-bytes) in the
+bytecode file are stored in native order, unless otherwise specified.
+
+  8          9         10         11
+  +----------+----------+----------+
+  | Wordsize | Byteorder| FloatType|
+  +----------+----------+----------+
+
+The B<Wordsize> (or C<opcode_t> size) must be 4 (32-bit) or 8 (64 bit). The
 bytecode loader is responsible for transforming the file into the VM native
 wordsize on the fly. For performance, a utility F<pdump> is provided to convert
 PBCs on disk if they cannot be recompiled. See F<src/pdump.c> for more
 information.
 
-Byteorder currently supports two values: (0-Little Endian, 1-Big Endian)
+B<Byteorder> currently supports two values: (0-Little Endian, 1-Big Endian)
 
-  4          5
+B<FloatType> 0 is IEEE 754 8 byte double, FloatType 1 is
+i386 little endian 12 byte long double.
+
+  11        12         13         14         15         16
+  +----------+----------+----------+----------+----------+
+  |  Major   |  Minor   |  Patch   | BC Major | BC Minor |
+  +----------+----------+----------+----------+----------+
+
+B<Major>, B<Minor>, B<Patch> for the version of Parrot that wrote
+the bytecode file.
+
+B<BC Major> and B<BC Minor> are for the internal bytecode version.
+
+  16        17         18         19         20         21         22
+  +----------+----------+----------+----------+----------+----------+
+  | UUID type| UUID size|  *UUID data                               |
+  +----------+----------+----------+----------+----------+----------+
+
+After the UUID type and size comes the UUID data pointer.
+
+  22*
   +----------+----------+----------+----------+
-  | INT size | FloatType|  10 Byte  ...       |
+  |         dir_format      (1)               |
   +----------+----------+----------+----------+
-  |           fingerprint for ...             |
-  +----------+----------+----------+----------+
-  |           core.ops is here                |
+  |         padding         (0)               |
   +----------+----------+----------+----------+
 
-INT size (sizeof(INTVAL)) must be 4 or 8.  FloatType 0 is IEEE 754 8 byte
-double, FloatType 1 is i386 little endian 12 byte long double.
-
-  16
-  +----------+----------+----------+----------+
-  |         Parrot Magic = 0x 13155a1         |
-  +----------+----------+----------+----------+
-
-Magic is stored in native byteorder. The loader uses the byteorder header to
-convert the Magic to verify. More specifically, ALL words (non-bytes) in the
-bytecode file are stored in native order, unless otherwise specified.
-
-  20*
-  +----------+----------+----------+----------+
-  |         Opcode Type (Perl = 0x5045524c)   |
-  +----------+----------+----------+----------+
-
-The asterisk for the offset states, from here we have opcodes. The given
-offsets are for 32 bit opcode types only.
+B<dir_format> has length opcode_t and value 1 for PBC FORMAT 1,
+defined in F<packfile.h>
 
 =head1 PBC FORMAT 1
 
@@ -55,17 +67,8 @@ All segments are aligned at a 16 byte boundary. All segments share a common
 header and are kept in directories, which itself is a PBC segment. All offsets
 and sizes are in native opcodes of the machine that produced the PBC.
 
-=head2 Format 1 Header
-
-  24*
-  +----------+----------+----------+----------+
-  |         dir_format      (1)               |
-  +----------+----------+----------+----------+
-  |         padding         (0)               |
-  +----------+----------+----------+----------+
-
-After this header, the first PBC directory follows at offset 32* starting with
-a:
+After the PBC header, the first PBC directory follows at offset 24*
+starting with a:
 
 =head2 Format 1 Segment Header
 
@@ -172,7 +175,7 @@ or Coroutine PMC.
 
 =head2 Debug Segment
 
-The opcode stream will contain one line number per bytecode instruction. No 
+The opcode stream will contain one line number per bytecode instruction. No
 information as to what file that line is from will be stored in this stream.
 
 The header will start with a count of the number of source file to bytecode
@@ -183,12 +186,12 @@ position mappings that are in the header.
   |   number of source => bytecode mappings   |
   +----------+----------+----------+----------+
 
-A source to bytecode position mapping simply states that the bytecode that 
-starts from the specified offset up until the offset in the next mapping, or 
-if there is none up until the end of the bytecode, has it's source in 
+A source to bytecode position mapping simply states that the bytecode that
+starts from the specified offset up until the offset in the next mapping, or
+if there is none up until the end of the bytecode, has it's source in
 location X.
 
-A mapping always starts with the offset in the bytecode, followed by the 
+A mapping always starts with the offset in the bytecode, followed by the
 type of the mapping.
 
   0 (relative)
@@ -203,18 +206,18 @@ type of the mapping.
 
 There are 3 mapping types.
 
-Type B<0> means there is no source available for the bytecode starting at the 
-given offset. No further data is stored with this type of mapping; the next 
+Type B<0> means there is no source available for the bytecode starting at the
+given offset. No further data is stored with this type of mapping; the next
 mapping continues immediately after it.
 
 Type B<1> means the source is available in a file. An index into the constants
 table follows, which will point to a string containing the filename.
 
-Type B<2> means the source is available in a source segment. Another integer 
+Type B<2> means the source is available in a source segment. Another integer
 follows, which will specify which source file in the source segment to use.
 
-Note that the ordering of the offsets into the bytecode must be sequential; 
-a mapping for offset 100 cannot follow a mapping for offset 200, for 
+Note that the ordering of the offsets into the bytecode must be sequential;
+a mapping for offset 100 cannot follow a mapping for offset 200, for
 example.
 
 =head2 CONSTANT TABLE SEGMENT
@@ -342,7 +345,8 @@ Variable argument opcodes update by Jonathan Worthington C<jonathan@jwcs.net>
 
 New debug segment format by Jonathan Worthington C<jonathan@jwcs.net>
 
+PBC Header updates by Reini Urban C<rurban@x-ray.at>
+
 =head1 VERSION
 
-2005.10.04
-
+2009-01-29
