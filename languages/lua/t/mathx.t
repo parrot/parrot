@@ -34,17 +34,13 @@ CODE
 /^3\.14/
 OUTPUT
 
-SKIP:
-{
-    skip "skipped on win32" => 2 if ( $^O eq 'MSWin32' );
-
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'infinity' );
 require 'mathx'
 print(type(math.infinity))
 print(math.infinity)
 CODE
 number
-inf
+Inf
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'nan' );
@@ -53,9 +49,8 @@ print(type(math.nan))
 print(math.nan)
 CODE
 number
-nan
+NaN
 OUTPUT
-}
 
 language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'function acosh' );
 require 'mathx'
