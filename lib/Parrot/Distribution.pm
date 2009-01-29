@@ -321,6 +321,24 @@ sub is_git_co {
     return shift->directory_exists_with_name('.git');
 }
 
+=item C<get_make_language_files()>
+
+Returns the Make language source files within Parrot.
+
+=cut
+
+sub get_make_language_files {
+    my ($self) = @_;
+
+    # Look through the list of distribution files
+    # and return a sorted list of filenames
+    my @files = sort
+        map  { $self->file_with_name($_) }
+        grep { m|[/\\]makefiles[/\\][a-z]+\.in$| }
+        $self->_dist_files;
+    return @files;
+}
+
 =item C<get_c_language_files()>
 
 Returns the C language source files within Parrot.  Namely:

@@ -38,7 +38,8 @@ my $DIST = Parrot::Distribution->new;
 my $skip_files = $DIST->generated_files();
 my @c_files    = $DIST->get_c_language_files();
 my @perl_files = $DIST->get_perl_language_files();
-my @all_files  = ( @c_files, @perl_files );
+my @make_files = $DIST->get_make_language_files();
+my @all_files  = ( @c_files, @perl_files, @make_files );
 
 my @files = @ARGV ? @ARGV : @all_files;
 my ( @no_copyright_files, @outdated_copyright_files );
