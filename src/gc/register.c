@@ -310,14 +310,14 @@ init_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
         ARGIN_NULLOK(const Parrot_Context *old))
 {
     ASSERT_ARGS(init_context)
-    ctx->ref_count         = 0;    /* RT #46191 1 - Exceptions !!! */
+    ctx->ref_count         = 0;
     ctx->gc_mark           = 0;
     ctx->current_results   = NULL;
     ctx->results_signature = NULL;
     ctx->lex_pad           = PMCNULL;
     ctx->outer_ctx         = NULL;
     ctx->current_cont      = NULL;
-    ctx->current_object    = NULL; /* RT #46181 who clears it?  */
+    ctx->current_object    = NULL;
     ctx->current_HLL       = 0;
     ctx->handlers          = PMCNULL;
 
