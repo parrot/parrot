@@ -342,11 +342,11 @@ operations, and offset math is messy with encodings that aren't byte-based.}}
 
 Conversion will be done with a function called C<Parrot_str_grapheme_copy>:
 
-    INTVAL string_grapheme_copy(STRING *src, STRING *dst)
+    INTVAL Parrot_str_grapheme_copy(STRING *src, STRING *dst)
 
 Converting a string from one format to another involves creating a new empty
 string with the required attributes, and passing the source string and the new
-string to C<string_grapheme_copy>. This function iterates through the source
+string to C<Parrot_str_grapheme_copy>. This function iterates through the source
 string one grapheme at a time, using the character set function pointer
 C<get_grapheme> (which may read ahead multiple characters with strings that
 aren't in NFG). For each source grapheme, the function will call
@@ -536,6 +536,29 @@ original string.
 Chop the requested number of graphemes off the end of a string without
 modifying the original string.
 
+=head3 Parrot_str_compare (was string_compare)
+
+Compare two strings to each other. Return 0 if they are equal, 1 if the first
+is greater and -1 if the second is greater. Uses character set collation order
+for the comparison. (Two strings that are logically equivalent in terms of
+display, but stored in different normalizations are not equal.)
+
+=head3 Parrot_str_grapheme_compare
+
+Compare two strings to each other. Return 0 if they are equal, 1 if the first
+is greater and -1 if the second is greater. Uses NFG normalization to compare
+the two strings.
+
+=head3 Parrot_str_equal (was string_equal)
+
+Compare two strings, return 1 if they are equal, 0 if they are not equal.
+
+{{DEPRECATION NOTE: The return value is reversed from the current logic.}}
+
+=head3 Parrot_str_grapheme_equal
+
+Compare two strings using NFG normalization, return 1 if they are equal, 0 if
+they are not equal.
 
 =head2 Internal String Functions
 
