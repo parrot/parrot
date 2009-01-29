@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 
-use Parrot::Test skip_all => 'ongoing PBC format changes';
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -45,41 +45,42 @@ $ mv n.pbc t/native_pbc/number_$(N).pbc
 =cut
 
 my $output = << 'END_OUTPUT';
-1.000000
-4.000000
-16.000000
-64.000000
-256.000000
-1024.000000
-4096.000000
-16384.000000
-65536.000000
-262144.000000
-1048576.000000
-4194304.000000
-16777216.000000
-67108864.000000
-268435456.000000
-1073741824.000000
-4294967296.000000
-17179869184.000000
-68719476736.000000
-274877906944.000000
-1099511627776.000000
-4398046511104.000000
-17592186044416.000000
-70368744177664.000000
-281474976710656.000000
-1125899906842620.000000
+1
+4
+16
+64
+256
+1024
+4096
+16384
+65536
+262144
+1048576
+4194304
+16777216
+67108864
+268435456
+1073741824
+4294967296
+17179869184
+68719476736
+274877906944
+1099511627776
+4398046511104
+17592186044416
+70368744177664
+281474976710656
+1.12589990684262e+15
 END_OUTPUT
 
 # execute t/native_pbc/number_1.pbc
 #
 # HEADER => [
-#         wordsize  = 4   (interpreter's wordsize    = 4)
-#         int_size  = 4   (interpreter's INTVAL size = 4)
-#         byteorder = 0   (interpreter's byteorder   = 0)
-#         floattype = 0   (interpreter's NUMVAL_SIZE = 8)
+#         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
+#         byteorder = 0   (interpreter's byteorder       = 0)
+#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]

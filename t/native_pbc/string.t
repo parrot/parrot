@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test skip_all => 'ongoing PBC format changes';
+use Parrot::Test skip_all => 'ongoing PBC format changes'; # tests => 1;
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ Tests word-size/string/endian-ness for different architectures.
 
 =begin comment
 
-The PBC is generated from t/op/strings_133.pasm for different architectures.
+The PBC is generated from t/op/string_133.pasm for different architectures.
 Actually, there is a single architecture right now.
 
 For adding tests, see the comments in t/native_pbc/number.t
@@ -41,10 +41,11 @@ END_OUTPUT
 # execute t/native_pbc/string_1.pbc
 #
 # HEADER => [
-#         wordsize  = 4   (interpreter's wordsize    = 4)
-#         int_size  = 4   (interpreter's INTVAL size = 4)
-#         byteorder = 0   (interpreter's byteorder   = 0)
-#         floattype = 0   (interpreter's NUMVAL_SIZE = 8)
+#         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
+#         byteorder = 0   (interpreter's byteorder       = 0)
+#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
