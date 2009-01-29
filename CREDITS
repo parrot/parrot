@@ -57,9 +57,8 @@ U: heimdall
 E: Nattfodd@gmail.com
 
 N: Allison Randal
-D: Lead Designer
-D: TGE, Punie (Perl 1), P6C
-E: allison@perl.org
+D: Architect & Lead Developer
+E: allison@parrot.org
 U: allison
 
 N: Amir Karger
