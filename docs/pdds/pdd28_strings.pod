@@ -396,19 +396,15 @@ return value is the same as the first string argument (modifying that argument
 in place). If the first argument is COW or read-only, then the return value is
 a new string.
 
-=head3 Parrot_str_from_cstring (was string_from_cstring)
+=head3 Parrot_str_new (was string_from_cstring)
 
-Create a Parrot string from a C string (a C<char *>). Takes two arguments, a C
-string, and an integer length of the string (number of characters). If the
-integer length isn't passed, the function will calculate the length.
+Return a new string with the default encoding and character set. Accepts two
+arguments, a C string (C<char *>) to initialize the value of the string, and an
+integer length of the string (number of characters). If the integer length
+isn't passed, the function will calculate the length.
 
 {{NOTE: the integer length isn't really necessary, and is under consideration
 for deprecation.}}
-
-=head3 Parrot_str_new
-
-Return a new string with the default encoding and character set. Accepts one
-argument, a C string (C<char *>) to initialize the value of the string.
 
 =head3 Parrot_str_new_noinit (was string_make_empty)
 
@@ -565,12 +561,12 @@ they are not equal.
 The following functions are used internally and are not part of the public
 interface.
 
-=head3 string_system_init (was string_init)
+=head3 Parrot_str_init (was string_init)
 
 Initialize Parrot's string subsystem, including string allocation and garbage
 collection.
 
-=head3 string_system_end (was string_deinit)
+=head3 Parrot_str_finish (was string_deinit)
 
 Terminate and clean up Parrot's string subsystem, including string allocation
 and garbage collection.
