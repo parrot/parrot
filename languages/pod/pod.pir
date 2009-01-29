@@ -21,6 +21,11 @@ object.
 
 =cut
 
+.sub 'print'
+    .param string arg
+    print arg
+.end
+
 .HLL 'pod'
 
 .namespace [ 'Pod';'Compiler' ]
@@ -40,13 +45,20 @@ object.
 .include 'src/gen_actions.pir'
 
 .sub 'onload' :anon :load :init
+    load_bytecode 'PCT.pbc'
     $P0 = get_hll_global ['PCT'], 'HLLCompiler'
-    $P1 = $P0.'new'()
+    $P2 = subclass $P0, 'PODCompiler'
+    $P1 = $P2.'new'()
     $P1.'language'('pod')
     $P0 = get_hll_namespace ['Pod';'Grammar']
     $P1.'parsegrammar'($P0)
     $P0 = get_hll_namespace ['Pod';'Grammar';'Actions']
     $P1.'parseactions'($P0)
+
+
+    ##  set the compilation stages in the @stages attribute
+    $P0 = split ' ', 'parse doctree'
+    setattribute $P1, '@stages', $P0
 .end
 
 =item main(args :slurpy)  :main
@@ -62,6 +74,8 @@ to the Pod compiler.
     $P0 = compreg 'pod'
     $P1 = $P0.'command_line'(args)
 .end
+
+.include 'src/Pod/DocTree/Node.pir'
 
 =back
 

@@ -19,6 +19,7 @@ representation of a Pod document.
     parent = get_class ['PCT';'Node']
     base = p6meta.'new_class'('Pod;DocTree;Node', 'parent'=>parent)
 
+    p6meta.'new_class'('Pod;DocTree;File',        'parent'=>base)
     p6meta.'new_class'('Pod;DocTree;Heading',     'parent'=>base)
     p6meta.'new_class'('Pod;DocTree;Block',       'parent'=>base)
     p6meta.'new_class'('Pod;DocTree;List',        'parent'=>base)
@@ -49,6 +50,13 @@ values are generally set by the C<node> method inherited from
 C<PCT::Node>.
 
 Other node attributes are generally defined by subclasses of C<Pod;DocTree;Node>.
+
+=head2 Pod;DocTree;File
+
+A C<Pod;DocTree;File> node represents a file containing Pod. As such, it's
+the C<root> node of the Pod parse tree. The C<name> attribute contains the
+name of the file.
+
 
 =head2 Pod;DocTree;Heading
 

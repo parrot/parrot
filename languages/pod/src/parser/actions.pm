@@ -17,26 +17,25 @@ value of the comment is passed as the second argument to the method.
 
 class Pod::Grammar::Actions;
 
+
+
 method TOP($/) {
-    my $rootblock;
+    my $file := Pod::DocTree::File.new();
 
     for $<pod_section> {
-        $rootblock.push( $( $_  ) );
+        $file.push( $( $_ ) );
     }
-
-    make $rootblock;
+    make $file;
 }
 
-method skipped($/) {
-
-}
 
 method pod_section($/) {
-    for $<pod_sequence> {
-        ## XXX store it where? A block?
-        $( $_ );
-    }
-    make $( $<pod_sequence>[0] );
+    #for $<pod_sequence> {
+    #    ## XXX store it where? A block?
+    #    $( $_ );
+    #}
+    #make $( $<pod_sequence>[0] );
+    make Pod::DocTree::Text.new( :name("pod-section"));
 }
 
 method pod_sequence($/, $key) {
@@ -44,11 +43,11 @@ method pod_sequence($/, $key) {
 }
 
 method pod_directive($/) {
-
+    make Pod::DocTree::Text.new( :name("pod-directive") );
 }
 
 method cut_directive($/) {
-
+    make Pod::DocTree::Text.new( :name("cut-directive") );
 }
 
 
@@ -61,6 +60,7 @@ sub title($/, $block) {
 }
 
 method heading($/) {
+    say("heading");
     my $heading := Pod::DocTree::Heading.new();
     ## set the level of the heading
     $heading.level($<digit>);
@@ -83,18 +83,20 @@ method begin_directive($/) {
 
 
 method end_directive($/) {
-
+    make Pod::DocTree::Text.new( :name("end-directive") );
 }
+
 method for_directive($/) {
     # use same code as in begin-directive.
+    make Pod::DocTree::Text.new( :name("for-directive") );
 }
 
 method over_directive($/) {
-
+    make Pod::DocTree::Text.new( :name("over-directive") );
 }
 
 method back_directive($/) {
-
+    make Pod::DocTree::Text.new( :name("back-directive") );
 }
 
 method item_directive($/) {
@@ -104,15 +106,15 @@ method item_directive($/) {
 }
 
 method encoding_directive($/) {
-
+    make Pod::DocTree::Text.new( :name("encoding-directive") );
 }
 
 method paragraph($/) {
-
+    make Pod::DocTree::Text.new( :name("paragraph") );
 }
 
 method literal_paragraph($/) {
-
+    make Pod::DocTree::Text.new( :name("literal-paragraph") );
 }
 
 method block_name($/) {
@@ -125,13 +127,10 @@ method block_title($/) {
 }
 
 method format_code($/) {
-
+    make Pod::DocTree::Text.new( :name("format-code") );
 }
 
-## XXX not sure if this needs action method is needed.
-method pod_ws($/) {
 
-}
 
 # Local Variables:
 #   mode: cperl

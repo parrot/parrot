@@ -18,7 +18,7 @@ rule TOP {
 
 rule skipped {
     ^^ <![=]> \N*
-    {*}
+
 }
 
 rule pod_section {
@@ -168,7 +168,7 @@ regex formatted_text {
 }
 
 regex format_code {
-    <[BCEFILSXZ]>
+    $<code>=<[BCEFILSXZ]>
     [ '<<<' <formatted_text> '>>>'
     | '<<'  <formatted_text> '>>'
     | '<'   <formatted_text> '>'
@@ -178,7 +178,6 @@ regex format_code {
 
 token pod_ws {
     [ ' ' | \t ]+ # Literal spaces or tabs, no newlines or other whitespace
-    {*}
 }
 
 token blank_line { ^^ <.pod_ws>? \n }
