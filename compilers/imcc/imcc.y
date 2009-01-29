@@ -52,6 +52,16 @@ static void add_pcc_named_arg(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*cur_call);
 
+static void add_pcc_named_arg_var(PARROT_INTERP,
+    ARGMOD(SymReg *cur_call),
+    ARGIN(SymReg *name),
+    ARGIN(SymReg *value))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*cur_call);
+
 static void add_pcc_named_param(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
     ARGIN(const char *name),
@@ -233,6 +243,11 @@ static void set_lexical(PARROT_INTERP,
     || PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_add_pcc_named_param_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(cur_call) \
+    || PARROT_ASSERT_ARG(name) \
+    || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_add_pcc_named_result __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(cur_call) \
@@ -397,7 +412,7 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
     if (ascii) {
         /* strip delimiters */
         name                   = str_dup(constant + 1);
-        name[strlen(name) - 1] = '\0';
+        name[strlen(name) - 1] = 0;
     }
     else {
         name = str_dup(constant);
@@ -440,7 +455,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     char   *unquoted_name = str_dup(name + 1);
     size_t  name_length   = strlen(unquoted_name) - 1;
 
-    unquoted_name[name_length] = '\0';
+    unquoted_name[name_length] = 0;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (IMCC_INFO(interp)->state->pasm_file) {
@@ -455,7 +470,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     if (ascii) {
         /* strip delimiters */
         const_name                         = str_dup(constant + 1);
-        const_name[strlen(const_name) - 1] = '\0';
+        const_name[strlen(const_name) - 1] = 0;
     }
     else {
         const_name = str_dup(constant);
@@ -632,7 +647,7 @@ mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
     /* name is a quoted sub name */
     SymReg *r;
     char *name_copy                  = str_dup(name + 1);
-    name_copy[strlen(name_copy) - 1] = '\0';
+    name_copy[strlen(name_copy) - 1] = 0;
 
     r = mk_sub_address(interp, name_copy);
     mem_sys_free(name_copy);
@@ -717,6 +732,16 @@ add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *nam
     r->type  |= VT_NAMED;
 
     add_pcc_arg(cur_call, r);
+    add_pcc_arg(cur_call, value);
+}
+
+static void
+add_pcc_named_arg_var(PARROT_INTERP, ARGMOD(SymReg *cur_call),
+    ARGIN(SymReg *name), ARGIN(SymReg *value))
+{
+    ASSERT_ARGS(add_pcc_named_param_var)
+    name->type |= VT_NAMED;
+    add_pcc_arg(cur_call, name);
     add_pcc_arg(cur_call, value);
 }
 
@@ -1679,7 +1704,10 @@ labeled_inst:
            IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isTAIL_CALL;
            IMCC_INFO(interp)->cur_call = NULL;
          }
-   | GOTO label_op { $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch", 1, $2); }
+   | GOTO label_op
+         {
+            $$ = MK_I(interp, IMCC_INFO(interp)->cur_unit, "branch", 1, $2);
+         }
    | PARROT_OP vars
          {
            $$ = INS(interp,
@@ -1912,6 +1940,11 @@ arglist:
            $$ = 0;
            add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $3, $5);
            mem_sys_free($3);
+         }
+   | var ADV_ARROW var
+         {
+           $$ = 0;
+           add_pcc_named_arg_var(interp, IMCC_INFO(interp)->cur_call, $1, $3);
          }
    | STRINGC ADV_ARROW var
          {

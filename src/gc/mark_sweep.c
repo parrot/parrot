@@ -669,7 +669,9 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
     }
     if (PObj_custom_mark_TEST(obj)) {
         PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
-        VTABLE_mark(interp, obj);
+
+        if (!PObj_constant_TEST(obj))
+            VTABLE_mark(interp, obj);
     }
 }
 

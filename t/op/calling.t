@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 93;
+use Parrot::Test tests => 94;
 
 =head1 NAME
 
@@ -2404,6 +2404,34 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "arg mismatch with no params", todo
 CODE
 /too many arguments passed\(1\) - 0 params expected/
 OUTPUT
+
+# See Rakudo RT #62730
+pir_output_is( <<'CODE', <<'OUTPUT', "named from register, not constant" );
+.sub 'main'
+    $S0 = 'foo'
+    example('foo' => 42)              # normal named parameter
+    example( $S0  => 42)              # parameter named by non-const register
+    just_a_string( $S0, 'foo' => 42 ) # nameyness should not stick on register
+.end
+
+.sub 'example'
+    .param pmc foo :named('foo')
+    say foo
+.end
+
+.sub 'just_a_string'
+    .param pmc bar
+    .param int baz :named( 'foo' )
+    say bar
+    say baz
+.end
+CODE
+42
+42
+foo
+42
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
