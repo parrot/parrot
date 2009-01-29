@@ -38,6 +38,7 @@ sub runstep {
     }
 
     if ($is_msvc) {
+        my $msvcversion = $conf->data->get('msvcversion');
 
         # Check the output of cl.exe to see if it contains the
         # string 'Standard' and remove the -O1 option if it does.
@@ -46,21 +47,23 @@ sub runstep {
         # The logo gets printed to STDERR; hence the redirection.
         my $cc_output = `$cc /? 2>&1` || '';
         $ccflags =~ s/-O1 // if $cc_output =~ m/Standard/ || $cc_output =~ m{/ZI};
-        $ccflags =~ s/-Gf/-GF/ if $cc_output =~ m/Version (\d+)/ && $1 >= 13;
+        unless ($msvcversion) { $cc_output =~ m/Version (\d+)/; $msvcversion = $1; }
+        $ccflags =~ s/-Gf/-GF/ if $msvcversion >= 13;
 
         # override perl's warnings level
         $ccflags =~ s/-W\d/-W4/;
 
         # if we want pbc_to_exe to work, need to let some versions of the
         # compiler use more memory than they normally would
-        $ccflags .= " -Zm400 " if $cc_output =~ m/Version (\d+)/ && $1 == 12;
+        $ccflags .= " -Zm400 " if $msvcversion < 13;
 
         my $ccwarn = '';
-
         # disable certain very noisy warnings
-        $ccwarn .= "-wd4127 ";    # conditional expression is constant
-        $ccwarn .= "-wd4054 ";    # type cast from function ptr to data ptr
-        $ccwarn .= "-wd4310 ";    # cast truncates constant value
+        if ($msvcversion >= 13) {
+            $ccwarn .= "-wd4127 ";    # conditional expression is constant
+            $ccwarn .= "-wd4054 ";    # type cast from function ptr to data ptr
+            $ccwarn .= "-wd4310 ";    # cast truncates constant value
+        }
 
         $conf->data->set(
             share_ext  => '.dll',
