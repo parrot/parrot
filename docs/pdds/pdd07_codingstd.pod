@@ -361,6 +361,15 @@ opcode source files), must end with this coda:
 
 =item *
 
+Make source files must end with this coda:
+
+    # Local Variables:
+    #   mode: makefile
+    # End:
+    # vim: ft=make:
+
+=item *
+
 Perl source files must end with this coda:
 
     # Local Variables:
