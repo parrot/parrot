@@ -18,10 +18,13 @@ value of the comment is passed as the second argument to the method.
 class Pod::Grammar::Actions;
 
 method TOP($/) {
-    make $( $/ );
-    # for $<pod_section> {
-    #     $( $_  );
-    # }
+    my $rootblock;
+
+    for $<pod_section> {
+        $rootblock.push( $( $_  ) );
+    }
+
+    make $rootblock;
 }
 
 method skipped($/) {
@@ -33,6 +36,7 @@ method pod_section($/) {
         ## XXX store it where? A block?
         $( $_ );
     }
+    make $( $<pod_sequence>[0] );
 }
 
 method pod_sequence($/, $key) {
@@ -47,17 +51,22 @@ method cut_directive($/) {
 
 }
 
-## XXX refactor the block_title stuff for heading and begin_directive.
+
+
+sub title($/, $block) {
+    if $<block_title> {
+        my $title := $( $<block_title>[0] );
+        $block.title( $title.name() );
+    }
+}
 
 method heading($/) {
     my $heading := Pod::DocTree::Heading.new();
     ## set the level of the heading
     $heading.level($<digit>);
 
-    if $<block_title> {
-        my $title := $( $<block_title>[0] );
-        $heading.title( $title.name() );
-    }
+    title($/, $heading);
+
     make $heading;
 }
 
@@ -67,12 +76,11 @@ method begin_directive($/) {
     my $name  := $( $<block_name> );
     $block.name( $name.name() );
 
-    if $<block_title> {
-        my $title := $( $<block_title>[0] );
-        $heading.title( $title.name() );
-    }
+    title($/, $block);
+
     make $block;
 }
+
 
 method end_directive($/) {
 

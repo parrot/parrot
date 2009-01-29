@@ -29,16 +29,16 @@ rule pod_section {
 }
 
 regex pod_sequence {
-    | <heading>              #= heading
-    | <begin_directive>      #= begin_directive
-    | <end_directive>        #= end_directive
-    | <for_directive>        #= for_directive
-    | <back_directive>       #= back_directive
-    | <item_directive>       #= item_directive
-    | <over_directive>       #= over_directive
-    | <encoding_directive>   #= encoding_directive
-    | <literal_paragraph>    #= literal_paragraph
-    | <paragraph>            #= paragraph
+    | <heading>              {*} #= heading
+    | <begin_directive>      {*} #= begin_directive
+    | <end_directive>        {*} #= end_directive
+    | <for_directive>        {*} #= for_directive
+    | <back_directive>       {*} #= back_directive
+    | <item_directive>       {*} #= item_directive
+    | <over_directive>       {*} #= over_directive
+    | <encoding_directive>   {*} #= encoding_directive
+    | <literal_paragraph>    {*} #= literal_paragraph
+    | <paragraph>            {*} #= paragraph
 }
 
 token pod_directive {
