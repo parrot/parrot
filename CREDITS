@@ -57,7 +57,7 @@ U: heimdall
 E: Nattfodd@gmail.com
 
 N: Allison Randal
-D: Architect & Lead Developer
+D: Architect (0.4.6...) & Lead Developer
 E: allison@parrot.org
 U: allison
 
@@ -200,7 +200,8 @@ U: creiss
 E: creiss@cc.gatech.edu
 
 N: Chip Salzenberg
-D: Pumpking (0.4.6 - ... ) and demagogue
+D: Release manager emeritus (0.4.6-0.4.7)
+D: Architect emeritus (0.1.2-0.4.5)
 U: chip
 E: chip@pobox.com
 
@@ -268,7 +269,7 @@ E: dmknopp@loyola.edu
 
 N: Dan Sugalski
 U: dan
-D: The big cheese emeritus
+D: Architect emeritus (0.0.1-0.1.1)
 E: dan@sidhe.org
 W: http://www.sidhe.org/~dan/blog/
 
@@ -412,7 +413,7 @@ N: Jeff Clites
 D: PPC JIT patches, ICU support, string handling
 
 N: Jeff Goff
-D: Release pumpking for 0.0.5-0.0.8
+D: Release manager for 0.0.5-0.0.8
 U: jgoff
 E: jgoff@speakeasy.net
 
@@ -560,7 +561,7 @@ E: acme@astray.com
 
 N: Leopold Toetsch
 U: leo
-D: Patchmonster & pumpking emeritus (0.0.13 - 0.4.5)
+D: Patchmonster & release manager emeritus (0.0.13 - 0.4.5)
 E: lt@toetsch.at
 S: Herrnbaumgarten, Austria
 
@@ -805,7 +806,7 @@ E: sartak@gmail.com
 N: Simon Cozens
 U: simon
 E: simon@simon-cozens.org
-D: Release pumpking for 0.0.1-0.0.4
+D: Release manager for 0.0.1-0.0.4
 
 N: Simon Glover
 U: scog
@@ -842,7 +843,7 @@ D: Bugfixes
 
 N: Steve Fink
 U: sfink
-D: Release pumpking for 0.0.9-0.0.11
+D: Release manager for 0.0.9-0.0.11
 E: steve@fink.com
 S: San Carlos, CA, USA
 
