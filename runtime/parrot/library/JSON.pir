@@ -356,7 +356,6 @@ done:
 .end
 
 .include  'library/Data/Escape.pir'
-.include  'library/Data/Sort.pir'
 
 =back
 
