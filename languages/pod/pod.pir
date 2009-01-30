@@ -30,6 +30,13 @@ object.
 
 .namespace [ 'Pod';'Compiler' ]
 
+
+.sub 'doctree' :method
+    .param pmc match
+    .param pmc namedargs :named :slurpy
+    print "doctree"
+.end
+
 .loadlib 'pod_group'
 
 .sub '' :anon :load :init
