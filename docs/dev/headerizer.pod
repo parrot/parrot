@@ -28,8 +28,14 @@ Yesterday there was a problem where I forgot to put PARROT_EXPORT on the
 function in source, so linking on Windows broke.  If that happens again,
 here's what you do:
 
-* Run Configure.pl
-* Update the source with PARROT_EXPORT above the return type
-* Run "make headerizer"
+=over 4
+
+=item * Run Configure.pl
+
+=item * Update the source with PARROT_EXPORT above the return type
+
+=item * Run "make headerizer"
+
+=back
 
 The .h file should now have PARROT_EXPORT for the function in question.
