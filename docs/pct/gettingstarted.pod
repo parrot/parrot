@@ -89,7 +89,7 @@ Now we discussed the most important acronyms, it's time to get up and running.
 
 =head2 Download and Build Parrot
 
-Get Parrot from C<http://www.parrotcode.org/source.html> and build it. If
+Get Parrot from L<http://www.parrot.org/download> and build it. If
 you're lucky and you have a fast computer, it should be done within 5 minutes.
 It's always useful to run the test suite by typing:
 
@@ -225,6 +225,6 @@ irc.perl.org. You're welcome to ask questions.
 =head1 SUGGESTIONS
 
 If you have suggestions, improvements, tips or complaints about this document,
-please send an email to C<parrot-porters@perl.org>.
+please send an email to C<parrot-dev@parrot.org>.
 
 =cut
