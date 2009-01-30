@@ -14,10 +14,6 @@ converted to String PMCs and then to native Parrot strings.  PMCs assigned to
 to elements of the array will be stringified by having their C<get_string>
 method called.
 
-=head2 Functions
-
-=over 4
-
 =cut
 
 */
@@ -25,6 +21,33 @@ method called.
 #include "parrot/parrot.h"
 
 pmclass ResizableStringArray extends FixedStringArray need_ext provides array {
+    ATTR UINTVAL resize_threshold; /*max capacity before resizing */
+
+/*
+
+=head2 Functions
+
+=over 4
+
+=over 4
+
+=item C<void init()>
+
+Initializes the array.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+
+        Parrot_ResizableStringArray_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_ResizableStringArray_attributes);
+
+        PMC_data(SELF)   = attrs;
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
 
 /*
 
@@ -37,10 +60,11 @@ Returns the Parrot string value of the element at index C<key>.
 */
 
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
-        STRING **data;
+
+        STRING **str_array;
+        INTVAL size = SELF.elements();
 
         if (key < 0) {
-            INTVAL size = SELF.elements();
             if (key < -size)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: index out of bounds!");
@@ -48,15 +72,15 @@ Returns the Parrot string value of the element at index C<key>.
                 key += size;
         }
 
-        if (key >= PMC_int_val(SELF))
+        if (key >= size)
             return string_from_literal(INTERP, "");
 
-        data = (STRING**)PMC_data(SELF);
+        GET_ATTR_str_array(INTERP, SELF, str_array);
 
-        if (!data[key])
-            data[key] = string_from_cstring(interp, NULL, 0);
+        if (!str_array[key])
+            str_array[key] = string_from_cstring(interp, NULL, 0);
 
-        return data[key];
+        return str_array[key];
     }
 
 /*
@@ -70,10 +94,11 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        STRING **data;
+        
+        STRING **str_array;
+        INTVAL size = SELF.elements();
 
         if (key < 0) {
-            INTVAL size = SELF.elements();
             if (key < -size)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: index out of bounds!");
@@ -81,12 +106,12 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
                 key += size;
         }
 
-        if (key >= PMC_int_val(SELF))
+        if (key >= size)
             SELF.set_integer_native(key+1);
 
-        data      = (STRING **)PMC_data(SELF);
-        GC_WRITE_BARRIER(INTERP, SELF, data[key], value);
-        data[key] = value;
+        GET_ATTR_str_array(INTERP, SELF, str_array);
+        GC_WRITE_BARRIER(INTERP, SELF, str_array[key], value);
+        str_array[key] = value;
     }
 
 /*
@@ -101,8 +126,8 @@ the array.
 */
 
     VTABLE void push_string(STRING *value) {
-        INTVAL nextix = SELF.elements();
-        SELF.set_string_keyed_int(nextix, value);
+        INTVAL next_idx = SELF.elements();
+        SELF.set_string_keyed_int(next_idx, value);
     }
 
 /*
@@ -116,13 +141,12 @@ Removes and returns the last element in the array.
 */
 
     VTABLE STRING *pop_string() {
-        INTVAL  size = PMC_int_val(SELF);
+        INTVAL  size = SELF.elements();
         STRING *value;
 
-        if (size == 0) {
+        if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't pop from an empty array!");
-        }
 
         value = SELF.get_string_keyed_int(size - 1);
         SELF.set_integer_native(size - 1);
@@ -188,57 +212,64 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL size) {
-        if (size < 0)
+    VTABLE void set_integer_native(INTVAL new_size) {
+
+        STRING **str_array;
+        INTVAL   resize_threshold;
+
+        if (new_size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizableStringArray: Can't resize!");
 
-        if (!PMC_data(SELF)) {
+        GET_ATTR_str_array(INTERP, SELF, str_array);
+        GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
+        if (!str_array) {
             /* empty - used fixed routine */
-            if (size < 8) {
+            if (new_size < 8) {
                 SUPER(8);
-                PMC_int_val(SELF)  = size;
-                PMC_int_val2(SELF) = 8;
+                SET_ATTR_size(INTERP, SELF, new_size);
+                SET_ATTR_resize_threshold(INTERP, SELF, 8);
             }
             else {
-                SUPER(size);
-                PMC_int_val2(SELF) = size;
+                SUPER(new_size);
+                SET_ATTR_resize_threshold(INTERP, SELF, new_size);
             }
         }
-        else if (size <= PMC_int_val2(SELF)) {
+        else if (new_size <= resize_threshold) {
             /* zero out anything that was previously allocated
              * if we're growing the array */
-            INTVAL oldsize = PMC_int_val(SELF);
-            if (size > oldsize) {
-                STRING **data   = (STRING**)PMC_data(SELF);
+            INTVAL old_size = SELF.elements();
+            if (new_size > old_size) {
                 INTVAL i;
-                for (i=oldsize; i<size; i++)
-                    data[i] = NULL;
+                for (i = old_size; i < new_size; i++)
+                    str_array[i] = NULL;
             }
 
-            PMC_int_val(SELF) = size;
+            SET_ATTR_size(INTERP, SELF, new_size);
             /* we could shrink here if necessary */
             return;
         }
         else {
-            INTVAL i   = PMC_int_val2(SELF);
+            INTVAL i   = resize_threshold;
             INTVAL cur = i;
 
             if (cur < 8192)
-                cur = size < 2 * cur ? 2 * cur : size;
+                cur = new_size < 2 * cur ? 2 * cur : new_size;
             else {
-                cur = size + 4096;
+                cur = new_size + 4096;
                 cur &= ~0xfff;
             }
 
-            PMC_data(SELF) = mem_sys_realloc(PMC_data(SELF),
-                    cur * sizeof (STRING*));
+            SET_ATTR_str_array(INTERP, SELF, 
+                    (STRING **)mem_sys_realloc(
+                        str_array, cur * sizeof (STRING*)));
+            GET_ATTR_str_array(INTERP, SELF, str_array);
 
             for (; i < cur; i++)
-                ((STRING **)PMC_data(SELF))[i] = NULL;
+                str_array[i] = NULL;
 
-            PMC_int_val2(SELF) = cur;
-            PMC_int_val(SELF)  = size;
+            SET_ATTR_size(INTERP, SELF, new_size);
+            SET_ATTR_resize_threshold(INTERP, SELF, cur);
         }
     }
 
@@ -255,7 +286,7 @@ Creates and returns a copy of the array.
     VTABLE PMC *clone() {
         PMC *copy = SUPER();
         /* copy trimmed extra space */
-        PMC_int_val2(copy) = PMC_int_val(SELF);
+        SET_ATTR_resize_threshold(INTERP, copy, SELF.elements());
         return copy;
     }
 
@@ -270,7 +301,7 @@ Removes and returns an item from the start of the array.
 */
 
     VTABLE STRING *shift_string() {
-        INTVAL  size = PMC_int_val(SELF);
+        INTVAL  size = SELF.elements();
         STRING *value;
 
         if (size == 0)
@@ -399,9 +430,11 @@ Removes and returns a String PMC from the start of the array.
 */
 
     VTABLE PMC *shift_pmc() {
-        INTVAL  size = PMC_int_val(SELF);
-        PMC    *ret;
-        STRING *value;
+        UINTVAL  size;
+        PMC     *ret;
+        STRING  *value;
+
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -428,17 +461,15 @@ of the array.
 */
 
     VTABLE void unshift_string(STRING *value) {
-        STRING **data = PMC_data_typed(SELF, STRING **);
-        INTVAL   size = PMC_int_val(SELF);
-        INTVAL   i;
+        STRING  **str_array;
+        UINTVAL   size, i;
 
-
+        GET_ATTR_str_array(INTERP, SELF, str_array);
+        GET_ATTR_size(INTERP, SELF, size);
         SELF.set_integer_native(size + 1);
 
-        data = PMC_data_typed(SELF, STRING **);
-
         for (i = size; i; --i)
-            data[i] = data[i - 1];
+            str_array[i] = str_array[i - 1];
 
         SELF.set_string_keyed_int(0, value);
     }
@@ -511,12 +542,14 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 */
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        STRING **data = PMC_data_typed(SELF, STRING **);
-        INTVAL   size = PMC_int_val(SELF);
-        INTVAL   i;
+        STRING  **str_array;
+        UINTVAL   size, i;
+
+        GET_ATTR_str_array(INTERP, SELF, str_array);
+        GET_ATTR_size(INTERP, SELF, size);
 
         for (i = key; i < size - 1; ++i)
-            data[i] = data[i + 1];
+            str_array[i] = str_array[i + 1];
 
         SELF.set_integer_native(size - 1);
     }
@@ -532,13 +565,15 @@ Removes the element at C<*key>.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        INTVAL   idx  = key_integer(INTERP, key);
-        STRING **data = PMC_data_typed(SELF, STRING **);
-        INTVAL   size = PMC_int_val(SELF);
-        INTVAL   i;
+        INTVAL    idx  = key_integer(INTERP, key);
+        STRING  **str_array;
+        UINTVAL   size, i;
+
+        GET_ATTR_str_array(INTERP, SELF, str_array);
+        GET_ATTR_size(INTERP, SELF, size);
 
         for (i = idx; i < size - 1; ++i)
-            data[i] = data[i + 1];
+            str_array[i] = str_array[i + 1];
 
         SELF.set_integer_native(size - 1);
     }
@@ -560,6 +595,7 @@ everything via the VTABLE api.
 */
 
     void splice(PMC *value, INTVAL offset, INTVAL count) {
+
         INTVAL length, elems, shift, i;
 
         if (value->vtable->base_type != SELF->vtable->base_type &&
@@ -588,7 +624,6 @@ everything via the VTABLE api.
 
             SELF.set_integer_native(length + shift);
         }
-
         /* grow the array */
         else if (shift > 0) {
             SELF.set_integer_native(length + shift);
@@ -620,12 +655,12 @@ end of the array.
 */
 
     METHOD PMC* shift() {
-        PMC *value = VTABLE_shift_pmc(INTERP, SELF);
+        PMC *value = SELF.shift_pmc();
         RETURN(PMC *value);
     }
 
     METHOD PMC* pop() {
-        PMC *value = VTABLE_pop_pmc(INTERP, SELF);
+        PMC *value = SELF.pop_pmc();
         RETURN(PMC *value);
     }
 
@@ -642,11 +677,11 @@ Method forms to add a PMC to the beginning or end of the array.
 */
 
     METHOD unshift(PMC* value) {
-        VTABLE_unshift_pmc(INTERP, SELF, value);
+        SELF.unshift_pmc(value);
     }
 
     METHOD push(PMC* value) {
-        VTABLE_push_pmc(INTERP, SELF, value);
+        SELF.push_pmc(value);
     }
 
 }
