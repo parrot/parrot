@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2008, The Perl Foundation. */
+/* Copyright (C) 2001-2009, The Perl Foundation. */
 /* $Id$ */
 
 #include <stdio.h>
@@ -20,15 +20,23 @@ void * rl_get_keymap(void);
 }
 #endif
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     /* Cannot use readline() since we will actually run this
      * and readline() would hang waiting for input.
      * Instead, we use rl_get_keymap(). */
 #if 0
-    char * r = readline ("hello polly>");
+    char * r = readline("hello polly>");
 #endif
     void* keymap = rl_get_keymap();
     puts("1");
     return EXIT_SUCCESS;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

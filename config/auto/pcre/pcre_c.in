@@ -1,0 +1,26 @@
+/* Copyright (C) 2008-2009, The Perl Foundation. */
+/* $Id$ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pcre.h>
+
+int
+main(int argc, char *argv[])
+{
+
+    if (pcre_exec == NULL) {
+        printf("pcre_exec is NULL\n");
+        return EXIT_FAILURE;
+    }
+    printf("pcre %s\n", pcre_version());
+
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

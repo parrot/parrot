@@ -54,7 +54,7 @@ sub runstep {
     $self->_handle_darwin_for_fink($conf, $osname, 'readline/readline.h');
     $self->_handle_darwin_for_macports($conf, $osname, q{readline/readline.h});
 
-    $conf->cc_gen('config/auto/readline/readline.in');
+    $conf->cc_gen('config/auto/readline/readline_c.in');
     my $has_readline = 0;
     eval { $conf->cc_build( q{}, $extra_libs ) };
     if ( !$@ ) {

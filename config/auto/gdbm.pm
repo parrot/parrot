@@ -65,7 +65,7 @@ sub runstep {
     # Fink location.
     $self->_handle_darwin_for_fink($conf, $osname, 'gdbm.h');
 
-    $conf->cc_gen('config/auto/gdbm/gdbm.in');
+    $conf->cc_gen('config/auto/gdbm/gdbm_c.in');
     eval { $conf->cc_build( q{}, $extra_libs ); };
     my $has_gdbm = 0;
     if ( !$@ ) {

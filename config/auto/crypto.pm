@@ -57,7 +57,7 @@ sub runstep {
         default         => '-lcrypto',
     } );
 
-    $conf->cc_gen('config/auto/crypto/crypto.in');
+    $conf->cc_gen('config/auto/crypto/crypto_c.in');
     eval { $conf->cc_build( q{}, $extra_libs); };
     my $has_crypto = 0;
     if ( !$@ ) {

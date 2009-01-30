@@ -1,0 +1,29 @@
+/* Copyright (C) 2008-2009, The Perl Foundation. */
+/* $Id$ */
+
+#define PACKAGE   "hello"
+#define LOCALEDIR "."
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <libintl.h>
+#include <locale.h>
+
+int
+main(int argc, char *argv[])
+{
+    setlocale(LC_ALL, "");
+    bindtextdomain(PACKAGE, LOCALEDIR);
+    textdomain(PACKAGE);
+
+    printf(gettext("Hello, world!\n"));
+
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

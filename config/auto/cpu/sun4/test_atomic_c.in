@@ -1,3 +1,9 @@
+/*
+Copyright (C) 2007-2009, The Perl Foundation.
+$Id$
+
+*/
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,7 +12,7 @@ extern int parrot_sparc_cas32(uint32_t *address, uint32_t oldval, uint32_t newva
 extern int parrot_sparc_cas64(uint64_t *address, uint64_t oldval, uint64_t newval);
 
 #define DIAGNOSE() fprintf(stderr, "error at line %d: successp=%d/old=%llx/value=%llx\n", __LINE__, \
-			    successp, (unsigned long long) oldval, (unsigned long long) value)
+                           successp, (unsigned long long) oldval, (unsigned long long) value)
 
 int main(void) {
     {
@@ -17,13 +23,13 @@ int main(void) {
 
         successp = parrot_sparc_cas32(&value, 41, 0xFFFFFFFFu);
         if (successp || value == 0xFFFFFFFFu) {
-	    DIAGNOSE();
+            DIAGNOSE();
             return EXIT_FAILURE;
         }
 
         successp = parrot_sparc_cas32(&value, oldval, 0xFFFFFFFFu);
         if (!successp || value != 0xFFFFFFFFu) {
-	    DIAGNOSE();
+            DIAGNOSE();
             return EXIT_FAILURE;
         }
 
@@ -31,7 +37,7 @@ int main(void) {
 
         successp = parrot_sparc_cas32(&value, oldval, 0);
         if (!successp || value != 0) {
-	    DIAGNOSE();
+            DIAGNOSE();
             return EXIT_FAILURE;
         }
     }
@@ -39,8 +45,7 @@ int main(void) {
     /* we'll only use the below functions if pointers are wide enough;
      * and they don't work when pointers aren't wide enough
      */
-    if (sizeof(void *) == sizeof(uint64_t))
-    {
+    if (sizeof (void *) == sizeof (uint64_t)) {
         int successp;
         uint64_t value;
         uint64_t oldval;
@@ -48,13 +53,13 @@ int main(void) {
 
         successp = parrot_sparc_cas64(&value, 41, 0x123456789abcdef0u);
         if (successp || value == 0x123456789abcdef0u) {
-	    DIAGNOSE();
+            DIAGNOSE();
             return EXIT_FAILURE;
         }
 
         successp = parrot_sparc_cas64(&value, oldval, 0x123456789abcdef0u);
         if (!successp || value != 0x123456789abcdef0u) {
-	    DIAGNOSE();
+            DIAGNOSE();
             return EXIT_FAILURE;
         }
 
@@ -62,7 +67,7 @@ int main(void) {
 
         successp = parrot_sparc_cas64(&value, oldval, 0);
         if (!successp || value != 0) {
-	    DIAGNOSE();
+            DIAGNOSE();
             return EXIT_FAILURE;
         }
     }
@@ -71,3 +76,10 @@ int main(void) {
 
     return EXIT_SUCCESS;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

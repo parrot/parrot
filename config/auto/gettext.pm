@@ -65,7 +65,7 @@ sub runstep {
     # Fink location.
     $self->_handle_darwin_for_fink($conf, $osname, 'libintl.h');
 
-    $conf->cc_gen('config/auto/gettext/gettext.in');
+    $conf->cc_gen('config/auto/gettext/gettext_c.in');
     eval { $conf->cc_build( q{}, $extra_libs ); };
     my $has_gettext = 0;
     if ( !$@ ) {

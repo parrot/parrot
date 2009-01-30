@@ -1,19 +1,19 @@
-/* Copyright (C) 2008, The Perl Foundation. */
+/* Copyright (C) 2008-2009, The Perl Foundation. */
 /* $Id$ */
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef __APPLE_CC__
-#include <GLUT/glut.h>
+#  include <GLUT/glut.h>
 #else
-#include <GL/glut.h>
+#  include <GL/glut.h>
 #endif
 
-
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
-    if(glutInit == NULL) {
+    if (glutInit == NULL) {
         printf("glutInit is NULL\n");
         return EXIT_FAILURE;
     }
@@ -30,3 +30,10 @@ int main(int argc, char *argv[])
 
     return EXIT_SUCCESS;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

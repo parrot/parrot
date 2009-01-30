@@ -71,7 +71,7 @@ sub runstep {
     $self->_handle_darwin_for_fink($conf, $osname, 'gmp.h');
     $self->_handle_darwin_for_macports($conf, $osname, 'gmp.h');
 
-    $conf->cc_gen('config/auto/gmp/gmp.in');
+    $conf->cc_gen('config/auto/gmp/gmp_c.in');
     eval { $conf->cc_build( q{}, $extra_libs); };
     my $has_gmp = 0;
     if ( !$@ ) {

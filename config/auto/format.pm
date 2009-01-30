@@ -91,7 +91,7 @@ sub _set_intvalmaxmin {
     $conf->data->set( intvalmin   => $ivmin );
     $conf->data->set( intvalmax   => $ivmax );
 
-    $conf->cc_gen('config/auto/format/intval_maxmin.in');
+    $conf->cc_gen('config/auto/format/intval_maxmin_c.in');
     eval { $conf->cc_build(); };
     if ( $@ ) {
         $ivmin = '0';
@@ -152,7 +152,7 @@ sub _set_floatvalmaxmin {
     $conf->data->set( floatvalmin => $nvmin );
     $conf->data->set( floatvalmax => $nvmax );
 
-    $conf->cc_gen('config/auto/format/floatval_maxmin.in');
+    $conf->cc_gen('config/auto/format/floatval_maxmin_c.in');
     eval { $conf->cc_build(); };
     if ( $@ ) {
         $nvmin = '0';

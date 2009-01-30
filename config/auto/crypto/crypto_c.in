@@ -6,11 +6,19 @@
 #include <openssl/opensslv.h>
 #include <openssl/err.h>
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     unsigned long dummy = ERR_get_error();
 
-    printf ("%s\n", OPENSSL_VERSION_TEXT);
+    printf("%s\n", OPENSSL_VERSION_TEXT);
 
     return EXIT_SUCCESS;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

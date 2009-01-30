@@ -42,7 +42,7 @@ sub runstep {
         $conf->cc_clean();
     }
 
-    @files = qw( test_gcc_cmpxchg.in );
+    @files = qw( test_gcc_cmpxchg_c.in );
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;

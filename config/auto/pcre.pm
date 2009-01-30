@@ -61,7 +61,7 @@ sub runstep {
     $self->_handle_darwin_for_fink    ($conf, $osname, 'pcre.h');
     $self->_handle_darwin_for_macports($conf, $osname, 'pcre.h');
 
-    $conf->cc_gen('config/auto/pcre/pcre.in');
+    $conf->cc_gen('config/auto/pcre/pcre_c.in');
     eval { $conf->cc_build( q{}, $extra_libs ) };
     my $has_pcre = 0;
     if ( !$@ ) {

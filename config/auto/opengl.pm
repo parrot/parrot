@@ -181,7 +181,7 @@ sub runstep {
     $self->_handle_darwin_for_fink    ($conf, $osname, 'GL/glut.h');
     $self->_handle_darwin_for_macports($conf, $osname, 'GL/glut.h');
 
-    $conf->cc_gen('config/auto/opengl/opengl.in');
+    $conf->cc_gen('config/auto/opengl/opengl_c.in');
     my $has_glut = 0;
     eval { $conf->cc_build( q{}, $extra_libs ) };
     if ( $@ ) {

@@ -21,7 +21,7 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose');
 
-    my @files = qw( test_gcc_cmpset.in );
+    my @files = qw( test_gcc_cmpset_c.in );
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;

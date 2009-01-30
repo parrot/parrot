@@ -1,19 +1,25 @@
 /*
- * test for cmpxchg support with gcc-style inline ASM
- */
-#include <assert.h> 
+Copyright (C) 2007-2009, The Perl Foundation.
+$Id$
+
+test for cmpxchg support with gcc-style inline ASM
+*/
+
+#include <assert.h>
 #include <stdlib.h>
 
 #include <stdio.h>
 
 inline static void *docmpxchg(void **ptr, void *oldval, void *newval) {
     __asm__ __volatile__("lock\n"
-                         "cmpxchgl %1,%2" : "=a"(oldval) : "q"(newval), "m"(*ptr), "0" (oldval) 
+                         "cmpxchgl %1,%2" : "=a"(oldval) : "q"(newval), "m"(*ptr), "0" (oldval)
                         : "memory");
     return oldval;
 }
 
-int main(void) {
+int
+main(void)
+{
     char dummy[] = "some string";
     char *oldval;
     char *newval;
@@ -23,7 +29,7 @@ int main(void) {
     oldval = dummy;
 
     oldval = docmpxchg((void **)&atomic, oldval, newval);
-    
+
 
 #ifdef DEBUG_CMPXCHG_TEST
     printf("atomic=[%s], old=[%s], new=[%s]\n", atomic, oldval, newval);
@@ -44,3 +50,10 @@ int main(void) {
 
     return EXIT_SUCCESS;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

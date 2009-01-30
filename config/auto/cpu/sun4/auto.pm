@@ -44,7 +44,7 @@ sub runstep {
 
     build_asm( $self, $conf );
 
-    my @files = qw( test_atomic.in );
+    my @files = qw( test_atomic_c.in );
     for my $f (@files) {
         print " $f " if $verbose;
         my ($suffix) = $f =~ /test_(\w+)/;
