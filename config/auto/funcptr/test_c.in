@@ -1,7 +1,9 @@
 /*
- * testparrotfuncptr.c - figure out if the compiler will let us do
- *                       non-ansi function pointer casts.
- */
+Copyright (C) 2002-2009, The Perl Foundation.
+$Id$
+
+figure out if the compiler will let us do non-ansi function pointer casts.
+*/
 
 #include <stdio.h>
 
@@ -35,10 +37,7 @@ main(int argc, char *argv[])
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

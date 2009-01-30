@@ -1,30 +1,42 @@
 /*
- * test for S_ISREG macro
- *
- */
+Copyright (C) 2003-2009, The Perl Foundation.
+$Id$
+
+test for S_ISREG macro
+*/
 
 #include <stdio.h>
 #include <sys/stat.h>
 
-int main(int argc, char **argv) {
+int
+main(int argc, char **argv)
+{
     struct stat file_stat;
     struct stat dir_stat;
-    
+
     if (0 != stat("config/auto/isreg/test_c.in", &file_stat)) {
         puts("file stat failed");
-	return 0;
+        return 0;
     }
-    
+
     if (0 != stat("config/auto/isreg", &dir_stat)) {
         puts("dir stat failed");
-	return 0;    
+        return 0;
     }
 
     if (S_ISREG(file_stat.st_mode) && ! S_ISREG(dir_stat.st_mode)) {
         puts("ok");
-    } else {
+    }
+    else {
         puts("borken");
     }
-    
+
     return 0;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

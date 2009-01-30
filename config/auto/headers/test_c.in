@@ -1,10 +1,25 @@
+/*
+Copyright (C) 2002-2009, The Perl Foundation.
+$Id$
+
+*/
+
 @testheaders@
 
 /* Don't want stdio influencing our ability to include headers. Some day soon
    we won't be using stdio  */
 #include <stdio.h>
 
-int main (int argc, char* argv[]) {
+int
+main(int argc, char* argv[])
+{
     printf("@testheader@ OK\n");
     return 0;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

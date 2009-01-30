@@ -1,25 +1,39 @@
+/*
+Copyright (C) 2002-2009, The Perl Foundation.
+$Id$
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 
-int main() {
-	int i;
-	union W {
-		unsigned char b[sizeof(@iv@)/sizeof(unsigned char)];
-		@iv@ w;
-	} w;
-	if(sizeof(w) == 4) {
-		w.w = 0x04030201;
-	}
-	else {
-                w.w = 0x08070605; 
-                w.w <<= 32; 
-                w.w |= 0x04030201;
-	}
+int
+main()
+{
+    int i;
+    union W {
+        unsigned char b[sizeof (@iv@)/sizeof (unsigned char)];
+        @iv@ w;
+    } w;
+    if (sizeof (w) == 4) {
+        w.w = 0x04030201;
+    }
+    else {
+        w.w = 0x08070605;
+        w.w <<= 32;
+        w.w |= 0x04030201;
+    }
 
-	for(i = 0; i < sizeof(w.b); i++) {
-		printf("%1u", w.b[i]);
-	}
-	printf("\n");
-	exit(0);
-	return 0;
+    for (i = 0; i < sizeof (w.b); i++) {
+        printf("%1u", w.b[i]);
+    }
+    printf("\n");
+    return 0;
 }
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

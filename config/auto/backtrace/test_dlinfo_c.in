@@ -1,6 +1,9 @@
 /*
- * test_dlinfo_c.c - check that Dl_info is avaible
- */
+Copyright (C) 2009, The Perl Foundation.
+$Id$
+
+check that Dl_info is avaible
+*/
 
 #include <execinfo.h>
 #include <dlfcn.h>
@@ -15,10 +18,7 @@ main(int argc, char **argv)
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

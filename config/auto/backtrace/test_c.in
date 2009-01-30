@@ -1,6 +1,9 @@
 /*
- * test_c.c - figure out if libc has backtrace() & backtrace_symbols()
- */
+Copyright (C) 2007-2009, The Perl Foundation.
+$Id$
+
+figure out if libc has backtrace() & backtrace_symbols()
+*/
 
 #include <execinfo.h>
 #include <stdlib.h>
@@ -19,10 +22,7 @@ main(int argc, char **argv)
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

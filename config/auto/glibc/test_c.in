@@ -1,6 +1,9 @@
 /*
- * test_c.c - seeing if GNU libc is installed
- */
+Copyright (C) 2008-2009, The Perl Foundation.
+$Id$
+
+seeing if GNU libc is installed
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,10 +24,7 @@ main()
 
 /*
  * Local variables:
- * c-indentation-style: bsd
- * c-basic-offset: 4
- * indent-tabs-mode: nil
+ *   c-file-style: "parrot"
  * End:
- *
  * vim: expandtab shiftwidth=4:
  */

@@ -1,3 +1,9 @@
+/*
+Copyright (C) 2005-2009, The Perl Foundation.
+$Id$
+
+*/
+
 #include <stdio.h>
 #include <stdarg.h>
 
@@ -24,9 +30,9 @@ test2(arg *a) {
     d = va_arg(*ap, double);
     s = va_arg(*ap, char *);
     if (i == 42 && d == 2.0)
-	printf("%s\n",s);
+        printf("%s\n", s);
     else
-	printf("nok\n");
+        printf("nok\n");
 }
 
 static void
@@ -46,10 +52,16 @@ test0(int n, ...)
     va_end(ap);
 }
 
-int main(int argc, char *argv[])
+int
+main(int argc, char *argv[])
 {
     test0(3, 42, 2.0, "ok");
     return 0;
 }
 
-
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
