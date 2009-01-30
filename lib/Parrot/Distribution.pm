@@ -232,7 +232,7 @@ BEGIN {
                 ? @{ $file_class{$class}{$type}{except_dirs} }
                 : ();
             my $method = join '_' => $type, $class;
-            my $filter_ext = join '|' => map { "\\.${_}\$" } @exts;
+            my $filter_ext = join '|' => map { "\\.${_}\$|_${_}\\.in\$" } @exts;
             my $filter_dir = join
                 '|' => map { qr{\b$_\b} }
                 map { quotemeta($_) } @ignore_dirs,
@@ -407,6 +407,8 @@ This is to exclude automatically generated C-language files Parrot might have.
             config/auto/cpu/i386/memcpy_mmx_in.c
             config/auto/cpu/i386/memcpy_sse.c
             config/auto/cpu/i386/memcpy_sse_in.c
+            config/gen/config_h/config_h.in
+            config/gen/config_h/feature_h.in
             compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
             compilers/imcc/imcparser.h
