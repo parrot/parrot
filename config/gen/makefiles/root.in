@@ -2193,8 +2193,7 @@ $(LIBNCI_TEST_SO): $(SRC_DIR)/nci_test$(O)
 $(LIBGLUTCB_SO): $(LIBPARROT) $(SRC_DIR)/glut_callbacks$(O)
 	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
     @ld_out@$@ $(SRC_DIR)/glut_callbacks$(O) \
-    $(ALL_PARROT_LIBS) \
-#IF(has_opengl):    @opengl_lib@
+    $(ALL_PARROT_LIBS) @opengl_lib@
 
 # emacs etags
 # this needs exuberant-ctags
