@@ -504,7 +504,7 @@ ok 2
 OUTPUT
 
 SKIP: {
-    skip 'failing on win32' => 1 if $^O =~ m/win32/i;
+    skip 'failing on your platform' => 1 if $^O =~ m/win32|openbsd/i;
 
 pasm_output_like( << 'CODE', << 'OUTPUT', "neg 0" );
     new P0, ['Float']
