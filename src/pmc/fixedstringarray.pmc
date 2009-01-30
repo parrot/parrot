@@ -62,9 +62,9 @@ Destroys the array.
 */
 
     VTABLE void destroy() {
-        
+
         STRING **str_array;
-        
+
         GET_ATTR_str_array(INTERP, SELF, str_array);
 
         if (str_array)
@@ -84,7 +84,7 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        
+
         STRING    **my_str_array, **dest_str_array;
         PMC        *const dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -122,7 +122,7 @@ Marks the array as live.
 
         STRING **str_array;
         GET_ATTR_str_array(INTERP, SELF, str_array);
-        
+
         if (str_array) {
             UINTVAL size, i;
             GET_ATTR_size(INTERP, SELF, size);
@@ -352,7 +352,7 @@ cause an exception to be thrown.
 */
 
     VTABLE void set_integer_native(INTVAL new_size) {
-        
+
         UINTVAL  old_size;
         GET_ATTR_size(INTERP, SELF, old_size);
 
@@ -361,7 +361,7 @@ cause an exception to be thrown.
                 "FixedStringArray: Can't resize!");
 
         SET_ATTR_size(INTERP, SELF, new_size);
-        SET_ATTR_str_array(INTERP, SELF, 
+        SET_ATTR_str_array(INTERP, SELF,
                 (STRING**)mem_sys_allocate_zeroed(new_size * sizeof (STRING*)));
 
         PObj_custom_mark_destroy_SETALL(SELF);

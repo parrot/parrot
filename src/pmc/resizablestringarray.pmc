@@ -94,7 +94,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
-        
+
         STRING **str_array;
         INTVAL size = SELF.elements();
 
@@ -260,7 +260,7 @@ Resizes the array to C<size> elements.
                 cur &= ~0xfff;
             }
 
-            SET_ATTR_str_array(INTERP, SELF, 
+            SET_ATTR_str_array(INTERP, SELF,
                     (STRING **)mem_sys_realloc(
                         str_array, cur * sizeof (STRING*)));
             GET_ATTR_str_array(INTERP, SELF, str_array);
