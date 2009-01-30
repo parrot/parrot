@@ -1,0 +1,27 @@
+/*
+Copyright (C) 2003-2009, The Perl Foundation.
+$Id$
+
+test for sigaction function
+*/
+
+#include <stdio.h>
+#include <signal.h>
+
+int
+main(int argc, char **argv)
+{
+    struct sigaction old_sa, new_sa;
+
+    sigemptyset(&new_sa.sa_mask);
+    sigaction(SIGFPE, NULL, &old_sa);
+    puts("ok");
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

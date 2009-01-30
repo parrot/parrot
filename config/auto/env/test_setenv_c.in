@@ -1,0 +1,28 @@
+/*
+Copyright (C) 2003-2009, The Perl Foundation.
+$Id$
+
+test for setenv
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char **argv)
+{
+    if (setenv("PARROT_TEST", "flaf", 1)) {
+        puts("borken");
+    }
+    else {
+        puts("ok");
+    }
+
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

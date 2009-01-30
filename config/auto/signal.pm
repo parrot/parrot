@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -41,21 +41,21 @@ sub runstep {
 
     my $verbose = $conf->options->get('verbose');
 
-    $conf->cc_gen('config/auto/signal/test_1.in');
+    $conf->cc_gen('config/auto/signal/test1_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         _handle__sighandler_t($conf, $verbose);
     }
     $conf->cc_clean();
 
-    $conf->cc_gen('config/auto/signal/test_2.in');
+    $conf->cc_gen('config/auto/signal/test2_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         _handle_sigaction($conf, $verbose);
     }
     $conf->cc_clean();
 
-    $conf->cc_gen('config/auto/signal/test_itimer.in');
+    $conf->cc_gen('config/auto/signal/test_itimer_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         _handle_setitimer($conf, $verbose);

@@ -1,0 +1,25 @@
+/*
+Copyright (C) 2003-2009, The Perl Foundation.
+$Id$
+
+test to check if compiler supports inline
+*/
+
+#include <stdio.h>
+
+inline f(void) {
+    puts("inline");
+}
+
+int
+main() {
+    f();
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -38,7 +38,7 @@ sub runstep {
 
 sub _probe_for_snprintf {
     my $conf = shift;
-    $conf->cc_gen('config/auto/snprintf/test.in');
+    $conf->cc_gen('config/auto/snprintf/test_c.in');
     $conf->cc_build();
     my $res = $conf->cc_run() or die "Can't run the snprintf testing program: $!";
     $conf->cc_clean();

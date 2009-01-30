@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -37,13 +37,13 @@ sub runstep {
 
     my ( $setenv, $unsetenv ) = ( 0, 0 );
 
-    $conf->cc_gen('config/auto/env/test_setenv.in');
+    $conf->cc_gen('config/auto/env/test_setenv_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         $setenv = 1;
     }
     $conf->cc_clean();
-    $conf->cc_gen('config/auto/env/test_unsetenv.in');
+    $conf->cc_gen('config/auto/env/test_unsetenv_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run() !~ /ok/ ) {
         $unsetenv = 1;

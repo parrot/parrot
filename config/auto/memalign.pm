@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -53,7 +53,7 @@ sub runstep {
 
     my $test2 = 0;
 
-    $conf->cc_gen('config/auto/memalign/test_c2.in');
+    $conf->cc_gen('config/auto/memalign/test2_c.in');
     eval { $conf->cc_build(); };
     unless ( $@ || $conf->cc_run_capture() !~ /ok/ ) {
         $test2 = 1;

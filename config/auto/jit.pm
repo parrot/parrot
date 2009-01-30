@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -115,7 +115,7 @@ sub runstep {
     # test for executable malloced memory
     if ( -e "config/auto/jit/test_exec_$osname.in" ) {
         print " (has_exec_protect " if $verbose;
-        $conf->cc_gen("config/auto/jit/test_exec_$osname.in");
+        $conf->cc_gen("config/auto/jit/test_exec_${osname}_c.in");
         eval { $conf->cc_build(); };
         if ($@) {
             print " $@) " if $verbose;

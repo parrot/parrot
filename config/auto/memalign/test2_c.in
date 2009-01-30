@@ -1,0 +1,34 @@
+/*
+Copyright (C) 2003-2009, The Perl Foundation.
+$Id$
+
+test for posix_memalign function
+*/
+
+#include <@malloc_header@>
+#include <stdlib.h>
+#include <stdio.h>
+
+int
+main(int argc, char *argv[])
+{
+    void * p;
+    size_t s = 256;
+    /*
+     * at least glibc 2.2.4's posix_memalign is broken
+     * (it checks size for being a power of 2 instead of alignment)
+     *
+     * TODO only disable memalign_if_possible (which may have
+     *      arbitrary allocation size)
+     */
+    int i = posix_memalign(&p, s, 177);
+    puts(((@ptrcast@)p & 0xff) == 0 && i == 0 ? "ok" : "nix");
+    return i;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

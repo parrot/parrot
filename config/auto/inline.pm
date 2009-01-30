@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -51,7 +51,7 @@ sub _first_probe_for_inline {
     my $self = shift;
     my $conf = shift;
     my $test;
-    $conf->cc_gen('config/auto/inline/test_1.in');
+    $conf->cc_gen('config/auto/inline/test1_c.in');
     eval { $conf->cc_build(); };
     if ( !$@ ) {
         $test = $conf->cc_run();
@@ -66,7 +66,7 @@ sub _second_probe_for_inline {
     my $conf = shift;
     my $test = shift;
     if ( !$test ) {
-        $conf->cc_gen('config/auto/inline/test_2.in');
+        $conf->cc_gen('config/auto/inline/test2_c.in');
         eval { $conf->cc_build(); };
         if ( !$@ ) {
             $test = $conf->cc_run();
