@@ -142,7 +142,7 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
     Parrot_io_printf(interp, "HEADER => [\n");
     Parrot_io_printf(interp, "\twordsize  = %d", pf->header->wordsize);
     Parrot_io_printf(interp, "\t(interpreter's wordsize/INTVAL = %d/%d)\n",
-                     sizeof (opcode_t),sizeof (INTVAL));
+                     sizeof (opcode_t), sizeof (INTVAL));
     Parrot_io_printf(interp, "\tbyteorder = %d", pf->header->byteorder);
     Parrot_io_printf(interp, "\t(interpreter's byteorder       = %d)\n",
             PARROT_BIGENDIAN);

@@ -399,8 +399,8 @@ a new string.
 =head3 Parrot_str_new (was string_from_cstring)
 
 Return a new string with the default encoding and character set. Accepts two
-arguments, a C string (C<char *>) to initialize the value of the string, and an
-integer length of the string (number of characters). If the integer length
+arguments, a C string (C<char *>) to initialize the value of the string, and
+an integer length of the string (number of characters). If the integer length
 isn't passed, the function will calculate the length.
 
 {{NOTE: the integer length isn't really necessary, and is under consideration
