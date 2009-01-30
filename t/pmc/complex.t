@@ -1041,7 +1041,6 @@ handler:
     .complex_op_is("-2+3i", "3.590565+0.530921i", 'sinh' )
     .complex_op_is("-2-3i", "3.590565-0.530921i", 'sinh' )
 
-    eq osname, "MSWin32", fail
     eq osname, "openbsd", fail
     .complex_op_is("0-2i", "-0.000000-0.909297i", 'sinh' )
     .complex_op_is("0+2i", "-0.000000+0.909297i", 'sinh' )

@@ -170,7 +170,7 @@ OUTPUT
 #
 
 SKIP: {
-    skip 'failing on your platform' => 1 if $^O =~ m/win32|openbsd/i;
+    skip 'failing on your platform' => 1 if $^O =~ m/openbsd/i;
 
 pasm_output_is( <<'CODE', <<OUTPUT, "turn a native number into its negative" );
         set N0, 0
