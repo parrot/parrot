@@ -46,8 +46,8 @@ object.
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
-    $P0 = get_hll_global ['PCT'], 'HLLCompiler'
-    $P2 = subclass $P0, 'PODCompiler'
+    $P0 = get_class ['PCT';'HLLCompiler']
+    $P2 = subclass $P0, ['Pod';'Compiler']
     $P1 = $P2.'new'()
     $P1.'language'('pod')
     $P0 = get_hll_namespace ['Pod';'Grammar']
