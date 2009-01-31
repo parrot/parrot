@@ -142,6 +142,7 @@ rule statement {
     | [ <var_assign> ';' ]             {*}  #= var_assign
     | <function_definition>            {*}  #= function_definition
     | <class_definition>               {*}  #= class_definition
+    | <empty_statement>                {*}  #= empty_statement
 }
 
 rule statement_list {
@@ -152,6 +153,10 @@ rule statement_delimiter {
     | ';'
     | <before '?'>
     | $
+}
+
+rule empty_statement {
+    ';' {*}
 }
 
 rule namespace_definition {

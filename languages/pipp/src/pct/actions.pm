@@ -793,6 +793,10 @@ method param_list($/) {
     make $block;
 }
 
+method empty_statement($/) {
+    make PAST::Stmts.new( :name('empty statement') );
+}
+
 method class_definition($/, $key) {
     our @?BLOCK; # A stack of PAST::Block
     our $?CLASS; # for namespacing of constants

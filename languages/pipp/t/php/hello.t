@@ -20,7 +20,7 @@ use warnings;
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Test tests => 19;
+use Parrot::Test tests => 20;
 
 my $h = "Hello, World!\n";
 
@@ -175,6 +175,18 @@ CODE
 language_output_is( 'Pipp', <<'CODE', $h, 'print with one arg' );
 <?php
 print "Hello, World!\n";
+?>
+CODE
+
+language_output_is( 'Pipp', <<'CODE', $h, 'empty statements' );
+<?php
+;
+;;
+;;;;;;
+print "Hello, World!\n";
+;
+;;
+;;;;;;
 ?>
 CODE
 
