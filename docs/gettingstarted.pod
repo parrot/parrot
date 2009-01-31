@@ -37,7 +37,7 @@ L<http://svn.perl.org/snapshots/parrot/parrot-latest.tar.gz>
 Even better is the option to use SVN, which gets you the very latest copy of
 the Parrot distribution. The procedure for this is:
 
-    svn checkout https://svn.perl.org/parrot/trunk parrot
+    svn checkout https://svn.parrot.org/parrot/trunk parrot
 
 =item *
 
@@ -49,7 +49,7 @@ C<rsync -av --delete svn.perl.org::parrot-HEAD parrot>
 
 If you're using git-svn, you should check out just the latest version. First:
 
-C<< git svn clone -s -r HEAD https://svn.perl.org/parrot >>
+C<< git svn clone -s -r HEAD https://svn.parrot.org/parrot >>
 
 =back
 
