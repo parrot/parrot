@@ -1,3 +1,6 @@
+# Copyright (C) 2002-2009, The Perl Foundation.
+# $Id$
+
 =head1 NAME
 
 Parrot::Config::Generated - Parrot Generated Configuration Data
@@ -13,12 +16,20 @@ is used by F<lib/Parrot/Config.pm>.
 package Parrot::Config::Generated;
 
 use strict;
+use warnings;
 use vars qw(%PConfig %PConfig_Temp);
 
 
-<<PCONFIG>>
+@PCONFIG@
 
-<<PCONFIGTEMP>>
+@PCONFIGTEMP@
 
 
 1;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

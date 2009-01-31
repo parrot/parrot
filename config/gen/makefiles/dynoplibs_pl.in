@@ -82,7 +82,8 @@ sub partial_link_cmd {
         $extraLibs =~ s/blib/..\\blib/g;
         $extraLibs =~ s/\Q$(A)\E/.lib/g;
         $liblist .= ' ' . $extraLibs;
-    } else {
+    }
+    else {
         $liblist = join( ' ', map { "-l$_" } keys %$libs );
     }
 
@@ -158,7 +159,8 @@ sub modtime {
 
     if (defined $ago) {
         return $NOW - $ago;
-    } else {
+    }
+    else {
         return;
     }
 }
