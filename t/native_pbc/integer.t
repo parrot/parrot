@@ -56,10 +56,28 @@ should be included for reference.
 # ]
 pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval" )
     or diag "May need to regenerate t/native_pbc/integer_1.pbc; read test file";
-TODO: {
-local $TODO = "darwin/PPC integer_2.pbc missing";
-pbc_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval");
-}
+
+# HEADER => [
+#         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
+#         byteorder = 1   (interpreter's byteorder       = 1)
+#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
+#         no endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
+pbc_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval")
+    or diag "May need to regenerate t/native_pbc/integer_2.pbc; read test file";
+
+# HEADER => [
+#         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
+#         byteorder = 0   (interpreter's byteorder       = 0)
+#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
+#         no endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
 pbc_output_is( undef, '270544960', "x86_64 double float 64 bit opcode_t" )
     or diag "May need to regenerate t/native_pbc/integer_3.pbc; read test file";
 

@@ -88,12 +88,27 @@ END_OUTPUT
 pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
     or diag "May need to regenerate t/native_pbc/number_1.pbc; see test file";
 
-TODO: {
-local $TODO = "wrong number_2.pbc based on number_2.pasm. needs to be regenerated";
+# HEADER => [
+#         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
+#         byteorder = 1   (interpreter's byteorder       = 1)
+#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
+#         no endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
 pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
     or diag "May need to regenerate t/native_pbc/number_2.pbc; see test file";
-}
 
+# HEADER => [
+#         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
+#         byteorder = 0   (interpreter's byteorder       = 0)
+#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
+#         no endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
 pbc_output_is(undef, $output, "x86_64 double float 64 bit opcode_t")
     or diag "May need to regenerate t/native_pbc/number_3.pbc; see test file";
 
