@@ -306,7 +306,7 @@ Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd, INTV
     flags |= PIO_F_SHARED;
 
     if (PMC_IS_NULL(filehandle)) {
-        PMC *io = Parrot_io_new_pmc(interp, flags);
+        PMC * const io = Parrot_io_new_pmc(interp, flags);
         Parrot_io_set_os_handle(interp, io, fd);
         return io;
     }
@@ -315,8 +315,6 @@ Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd, INTV
         Parrot_io_set_os_handle(interp, filehandle, fd);
         return filehandle;
     }
-
-    return PMCNULL;
 }
 
 /*
