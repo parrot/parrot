@@ -138,7 +138,7 @@ NONGEN_HEADERS   = @TEMP_nongen_headers@
 
 GEN_MAKEFILES = \
     Makefile \
-#IF(has_perldoc):    docs/Makefile \
+    docs/Makefile \
     compilers/json/Makefile \
     compilers/ncigen/Makefile \
     compilers/nqp/Makefile \

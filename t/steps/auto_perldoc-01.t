@@ -68,7 +68,7 @@ is($conf->data->get('has_perldoc'), 0,
     "Got expected value for 'has_perldoc'");
 is($conf->data->get('new_perldoc'), 0,
     "Got expected value for 'new_perldoc'");
-is($conf->data->get('perldoc'), undef,
+is($conf->data->get('perldoc'), 'echo',
     "... and expected 'perldoc' path");
 
 $version = 1;

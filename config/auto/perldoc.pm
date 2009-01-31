@@ -98,6 +98,9 @@ sub _initial_content_check {
         $conf->data->set(
             has_perldoc => 0,
             new_perldoc => 0,
+            perldoc     => 'echo',
+            TEMP_pod        => '',
+            TEMP_pod_build  => '',
         );
         $self->set_result('no');
         return;
