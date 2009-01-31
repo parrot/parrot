@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -55,7 +55,7 @@ Fetch a segment PMC from the array.
 
 */
     VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
-        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        const PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
         PackFile_Segment *pfseg;
         PMC *rv;
         int pmc_type;
@@ -78,6 +78,7 @@ Fetch a segment PMC from the array.
             case PF_DEBUG_SEG:
             default:
                 pmc_type = enum_class_PackfileRawSegment;
+                break;
         }
         rv = pmc_new(interp, pmc_type);
         PMC_data(rv) = pfseg;
@@ -95,9 +96,8 @@ Fetch a string containing the name of the specified segment PMC.
 
 */
     VTABLE STRING *get_string_keyed_int(INTVAL index)  {
-        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
-        PackFile_Segment *pfseg;
-        PMC *rv;
+        const PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        const PackFile_Segment *pfseg;
         if (index < 0 || index >= (INTVAL)pfd->num_segments)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                                         "PackfileDirectory: index out of bounds!");
@@ -116,11 +116,11 @@ Search the array for a segment with the given name, and return it if it exists.
 
 */
     VTABLE PMC *get_pmc_keyed_str(STRING *name)  {
-        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
-        int i, total = pfd->num_segments;
+        const PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        const int total = pfd->num_segments;
+        int i;
         for (i = 0; i < total; i++) {
-            PackFile_Segment *pfseg;
-            pfseg = pfd->segments[i];
+            const PackFile_Segment * const pfseg = pfd->segments[i];
             if (!string_compare(interp, name, const_string(interp, pfseg->name)))
                 return VTABLE_get_pmc_keyed_int(interp, SELF, i);
         }
