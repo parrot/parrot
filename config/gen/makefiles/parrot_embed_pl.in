@@ -1,6 +1,10 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 #
+
+use strict;
+use warnings;
+
 use Cwd;
 use Config;
 use File::Copy;
@@ -64,3 +68,10 @@ sub dynamic_lib
     $inherited     =~ s{($sub_target)}{$1 t/greet.pbc};
     $inherited;
 }
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

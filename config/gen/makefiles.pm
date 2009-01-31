@@ -31,7 +31,7 @@ sub _init {
         'ext/Makefile' => { SOURCE => 'config/gen/makefiles/ext.in', },
 
         'ext/Parrot-Embed/Makefile.PL' => {
-            SOURCE            => 'config/gen/makefiles/parrot_embed.in',
+            SOURCE            => 'config/gen/makefiles/parrot_embed_pl.in',
             replace_slashes   => 0,
             conditioned_lines => 1,
         },
