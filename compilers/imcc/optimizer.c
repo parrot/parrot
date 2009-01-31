@@ -51,7 +51,8 @@ optimizer
 runs with CFG and life info
 
 used_once ... deletes assignments, when LHS is unused
-RT #46279 e.g. constant_propagation
+
+constant_propagation
 
 post_optimizer: currently pcc_optimize in pcc.c
 ---------------
