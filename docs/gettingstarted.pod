@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -12,6 +12,9 @@ docs/gettingstarted.pod - Parrot Developer FAQ
 You're already on the right track. This FAQ should help you find everything you
 need to become an active member of the Parrot community. Just look through the
 questions below and read the ones that apply to you.
+
+More current information is also available at
+L<https://trac.parrot.org/parrot/wiki/NewParrotDeveloperGuide>.
 
 =head2 Where can I get Parrot?
 
