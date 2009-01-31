@@ -241,7 +241,7 @@ beginning.
          * allocation unit */
         if (head_pos<= 0) {
 
-            UINTVAL         tail_pos, new_size;
+            UINTVAL         tail_pos;
             unsigned char * old_bit_array;
             size_t          old_mem_size, new_mem_size;
             unsigned char * new_bit_array;
