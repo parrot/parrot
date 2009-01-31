@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
+use Parrot::Config;
 
 use Parrot::Test tests => 1;
 
@@ -84,8 +85,13 @@ END_OUTPUT
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
+TODO: {
+    local $TODO = "numval transform fails on big endian (PPC). See TT #254"
+      if $PConfig{byteorder} eq '4321';
+
 pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
     or diag "May need to regenerate t/native_pbc/number_1.pbc; see test file";
+}
 
 # Formerly there were tests for:
 # pbc_output_is(undef, <<OUTPUT, "i386 long double float 32 bit opcode_t");
