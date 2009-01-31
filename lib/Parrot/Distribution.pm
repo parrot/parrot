@@ -210,7 +210,7 @@ BEGIN {
             },
             yacc => { file_exts => ['y'] },
             perl => {
-                file_exts   => [ 'pl', 'pm', 'in', 't' ],
+                file_exts   => [ 'pl', 'pm', 't' ],
                 shebang     => qr/^#!\s*perl/,
                 shebang_ext => qr/.t$/,
             },
@@ -456,8 +456,6 @@ Returns the Perl language source files within Parrot.  Namely:
 
 =item Perl module files C<*.pm>
 
-=item .in files C<*.in>
-
 =item test files C<*.t>
 
 =back
@@ -511,6 +509,7 @@ sub get_perl_exemption_regexp {
 
     my $parrot_dir = $self->path();
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
+        languages/dotnet/config/N2PConfig_pm.in
         languages/regex/lib/Regex/Grammar.pm
         languages/pipp/src/pct/actions.pm
         compilers/nqp/
@@ -543,10 +542,11 @@ sub is_perl {
 
     # modules and perl scripts should always be tested..
     return 1 if $filename =~ /\.(?:pm|pl)$/;
+    return 1 if $filename =~ /_(?:pm|pl)\.in$/;
 
-    # test files (.t) and configure (.in) files might need testing.
+    # test files (.t) might need testing.
     # ignore everything else.
-    return 0 unless $filename !~ /\.(?:t|in)$/;
+    return 0 unless $filename !~ /\.t$/;
 
     # Now let's check to see if there's a perl shebang.
 
