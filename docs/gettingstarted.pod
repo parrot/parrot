@@ -58,7 +58,7 @@ C<< git svn clone -s -r HEAD https://svn.parrot.org/parrot >>
 
 The above instructions are also on the Parrot website:
 
-L<http://www.parrotcode.org/source.html>
+L<http://www.parrot.org/download>
 
 =head2 Now that I've got Parrot, what do I do?
 
@@ -247,7 +247,7 @@ management system, see the previous question.
 
 There are several other useful resources that can be found via:
 
-L<http://www.parrotcode.org/resources>
+L<http://www.parrot.org/parrot/wiki/WhereIsIt>
 
 =over 4
 

@@ -69,8 +69,6 @@ Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =item L<http://en.wikipedia.org/wiki/Plum-headed_parakeet>
 
-=item L<http://www.parrotcode.org/docs/compiler_tools.html>
-
 =back
 
 =cut

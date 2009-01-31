@@ -16,7 +16,7 @@ UTF-16 strings used by .NET. Parrot must be built with ICU support.
 
 =item * A built Parrot source tree. The Parrot source, available from SVN as
 well as a number of release builds, can be located at the Parrot webstie
-(L<http://www.parrotcode.org/>.
+(L<http://www.parrot.org/>.
 
 =item * For running the regression tests and translating any vaguely real
 world programs (as in, ones that use the .NET class library), Mono

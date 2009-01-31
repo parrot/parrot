@@ -157,7 +157,7 @@ See:
 
 =over 4
 
-=item * L<http://www.parrotcode.org/>
+=item * L<http://www.parrot.org/>
 
 =item * L<http://dev.perl.org/>
 

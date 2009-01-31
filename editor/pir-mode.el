@@ -390,7 +390,7 @@ programming parrot than raw PASM (Parrot Assembly). In general,
 compilers (and certainly humans) should code in PIR and let Parrot
 handle register allocation and all that good stuff.
 
-To find out more, hie thee to `http://www.parrotcode.org/'.
+To find out more, hie thee to `http://www.parrot.org/'.
 
 Type \\[list-abbrevs] to display the built in abbrevs for PIR
 keywords. (When I've set them up.)
