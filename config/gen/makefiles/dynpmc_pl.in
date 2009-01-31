@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -109,7 +109,7 @@ sub partial_link_cmd {
     }
 
     if (defined $ENV{DYNPMC_LINK}) {
-        push @$sources, split ",", $ENV{DYNPMC_LINK};
+        push @{$sources}, split /,/, $ENV{DYNPMC_LINK};
     }
 
     return
