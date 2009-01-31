@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
 
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -86,18 +86,26 @@ END_OUTPUT
 #         dirformat = 1
 # ]
 TODO: {
-    local $TODO = "numval transform fails on big endian (PPC). See TT #254"
+    local $TODO = "endianized numval transform fails. See TT #254"
       if $PConfig{byteorder} eq '4321';
 
 pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
     or diag "May need to regenerate t/native_pbc/number_1.pbc; see test file";
+
+}
+TODO: {
+    local $TODO = "endianized numval transform fails. See TT #254"
+      if $PConfig{byteorder} eq '1234';
+
+pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
+    or diag "Requires endianized numval transform fixes. See TT #254.";
+
 }
 
 # Formerly there were tests for:
-# pbc_output_is(undef, <<OUTPUT, "i386 long double float 32 bit opcode_t");
-# pbc_output_is(undef, <<OUTPUT, "PPC double float 32 bit BE opcode_t");
-# pbc_output_is(undef, <<OUTPUT, "little-endian 64-bit tru64");
-# pbc_output_is(undef, <<OUTPUT, "big-endian 64-bit irix");
+# pbc_output_is(undef, <<OUTPUT, "i386 long double float 32 bit opcode_t"); #_2
+# pbc_output_is(undef, <<OUTPUT, "little-endian 64-bit tru64");             #_4
+# pbc_output_is(undef, <<OUTPUT, "big-endian 64-bit irix");                 #_5
 
 # Local Variables:
 #   mode: cperl
