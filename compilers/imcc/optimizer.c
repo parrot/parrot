@@ -1369,7 +1369,7 @@ branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int unused_label>
 
-Removes unused labels. A label is unused if ... [RT #46287: finish this].
+Removes unused labels.
 
 Returns TRUE if any optimizations were performed. Otherwise, returns
 FALSE.
