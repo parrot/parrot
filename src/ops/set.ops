@@ -491,7 +491,6 @@ Morphs the PMC in $1 to the type of the PMC in $2, then assigns $2 to $1.
 
 inline op copy(inout PMC, invar PMC) :base_mem {
   PMC   * const clone = VTABLE_clone(interp, $2);
-  INTVAL type         = VTABLE_type(interp, $2);
 
   /* Preserve the metadata on the destination. */
   PMC   * const meta  = VTABLE_getprops(interp, $1);
@@ -610,7 +609,7 @@ inline op clearp() :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 
 =head1 LICENSE
 
