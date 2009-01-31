@@ -209,39 +209,11 @@ L<irc.rhizomatic.net> and L<irc.pobox.com>.
 
 =head2 I've developed a patch. What should I do with it?
 
-There's a lot of traffic that goes through the mailing list, and it's quite
-possible that if you send patches directly to the mailing list, they will get
-lost in the mailboxes of those with commit access.
-
-As such, a better solution would be to submit your patch to RT, the request
-tracker system that maintains bugs and patches for the Parrot project. To
-visit RT, go here:
-
-L<https://rt.perl.org/rt3/>
-
-Or if you want to submit a patch, send an email to
-C<parrotbug@parrotcode.org> with the moniker [PATCH] (including the brackets)
-at the start of the subject so that it can be appropriately tagged in the RT
-system. Please note that you do B<not> have to CC C<parrot-dev@parrot.org>
-when reporting a bug. The RT system will correctly handle that on its own.
-
-A listing of the pending patches can be found here:
-
-L<http://www.parrotcode.org/openpatches>
-
-
+See L<submissions.pod> for details.
 
 =head2 I've found a bug, what now?
 
-Well, if you know enough about the bug that you can fix the problem, please do
-so. Then you can create a patch and submit it to the list, with a better chance
-of your bug getting attention. If you're not able to solve it on your own,
-we're still interested in seeing what the problem is, and hopefully helping to
-resolve it. To report a bug, email C<parrotbug@parrotcode.org> with a brief
-description of your bug in the subject. For more information about the bug
-management system, see the previous question.
-
-
+See L<submissions.pod> for details.
 
 =head2 What other useful resources are there for developers?
 
