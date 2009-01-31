@@ -156,6 +156,10 @@ and parentheses, per Synopsis 12.  See TT #168
 
 Replace usage with the escape opcode.  See TT #107
 
+=item File::Spec [post 0.9.1]
+
+See TT #109
+
 =back
 
 =cut
