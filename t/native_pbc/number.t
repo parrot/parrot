@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
 
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 3;
 
 =head1 NAME
 
@@ -85,22 +85,17 @@ END_OUTPUT
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-TODO: {
-    local $TODO = "endianized numval transform fails. See TT #254"
-      if $PConfig{byteorder} eq '4321';
-
 pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
     or diag "May need to regenerate t/native_pbc/number_1.pbc; see test file";
 
-}
 TODO: {
-    local $TODO = "endianized numval transform fails. See TT #254"
-      if $PConfig{byteorder} eq '1234';
-
+local $TODO = "wrong number_2.pbc based on number_2.pasm. needs to be regenerated";
 pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
-    or diag "Requires endianized numval transform fixes. See TT #254.";
-
+    or diag "May need to regenerate t/native_pbc/number_2.pbc; see test file";
 }
+
+pbc_output_is(undef, $output, "x86_64 double float 64 bit opcode_t")
+    or diag "May need to regenerate t/native_pbc/number_3.pbc; see test file";
 
 # Formerly there were tests for:
 # pbc_output_is(undef, <<OUTPUT, "i386 long double float 32 bit opcode_t"); #_2
