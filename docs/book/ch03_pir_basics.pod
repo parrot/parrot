@@ -505,13 +505,13 @@ for you automatically:
   $S0 = $I0   # Stringify. "5"
   $N0 = $S0   # Numify. 5.0
   $I0 = $N0   # Intify. 5
-  
+
 Notice that conversions between the numeric formats and strings only makes
 sense when the value to convert is a number.
 
   $S0 = "parrot"
   $I0 = $S0        # 0
-  
+
 We've also seen an example earlier where a string literal was set into a
 PMC register that had a type C<String>. This works for all the primitive
 types and their autoboxed PMC equivalents:
@@ -769,6 +769,35 @@ and expects. To circumvent this limitation, PMCs may have METHODS in
 addition to VTABLES. METHODS are arbitrary code functions that can be
 written in C, may have any name, and may implement any behavior.
 
+=head2 VTABLE Interfaces
+
+Internally, all operations on PMCs are performed by calling various VTABLE
+interfaces.
+
+=head2 Class and Object PMCs
+
+The details about various PMC classes are managed by the Class PMC. Class PMCs
+contain information about the class, available methods, the inheritance
+hierarchy of the class, and various other details. Classes can be created
+with the C<newclass> opcode:
+
+  $P0 = newclass "MyClass"
+
+Once we have created the class PMC, we can instantiate objects of that class
+using the C<new> opcode. The C<new> opcode takes either the class name or the
+Class PMC as an argument:
+
+  $P1 = new $P0        # $P0 is the Class PMC
+  $P2 = new "MyClass"  # Same
+
+The C<new> opcode can create two different types of PMC. The first type are
+the built-in core PMC classes. The built-in PMCs are written in C and cannot
+be extended from PIR without subclassing. However, you can also create
+user-defined PMC types in PIR. User-defined PMCs use the Object PMC type for
+instantiation. Object PMCs are used for all user-defined type and keep track
+of the methods and VTABLE override definitions. We're going to talk about
+methods and VTABLE overrides in the next chapter.
+
 =head2 Subclassing PMCs
 
 Existing built-in PMC types can be subclassed to associate additional data
@@ -801,13 +830,6 @@ the C<new> keyword:
   $P0 = new 'MyArray'
   $P1 = new 'MyOtherArray'
 
-=head2 Creating Classes
-
-In addition to subclassing existing PMC types, new classes can be created
-in PIR from scratch. This is done with the C<newclass> opcode:
-
-  $P0 = newclass 'MyClass'
-
 =head2 Attributes
 
 Classes and subclasses can be given attributes N<in addition to methods,
@@ -816,13 +838,19 @@ Attributes are created with the C<addattribute> opcode, and can be set
 and retrieved with the C<setattribute> and C<getattribute> opcodes
 respectively:
 
+  # Create the new class with two attributes
   $P0 = newclass 'MyClass'
   addattribute $P0, 'First'
   addattribute $P0, 'Second'
 
+  # Create a new item of type MyClass
   $P1 = new 'MyClass'
+
+  # Set values to the attributes
   setattribute $P1, 'First', 'First Value'
   setattribute $P1, 'Second', 'Second Value'
+
+  # Get the attribute values
   $S0 = getattribute $P1, 'First'
   $S1 = getattribute $P1, 'Second'
 
@@ -980,7 +1008,7 @@ The backtrace PMC is an array of hashes. Each element in the array corresponds
 to a function in the current call stack. Each hash has two elements:
 C<'annotation'> which is the hash of annotations that were in effect at that
 point, and C<'sub'> which is the Sub PMC of that function.
-  
+
 =cut
 
 ##########################################################################
