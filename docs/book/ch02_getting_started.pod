@@ -94,7 +94,7 @@ Windows systems, follow the instructions from your SVN client>:
   svn co https://svn.parrot.org/parrot/trunk parrot
 
 There's also a web interface for viewing files in the repository at
-U<http://svn.parrot.org/parrot/>.
+U<http://svn.parrot.org/parrot/>. 
 
 The repository is large and complex, so it's worth taking a little bit
 of time to explore. The code changes constantly, but most files and
@@ -191,7 +191,105 @@ both PASM and PIR, and we will discuss some of the more advanced
 features of Parrot that make it an interesting and attractive
 programming platform.
 
-=head3 Patch submission
+=head2 Build Requirements
+
+There are a number of requirements for building Parrot from source, and a
+number of optional libraries and components that can be used to extend it's
+capabilities. None of these requirements or optional components are necessary
+unless you are building Parrot from the source code.
+
+=over 4
+
+=item* C Compiler
+
+Parrot can be built with a number of C compilers. Parrot is written using the
+C89 standard, and the Parrot project officially supports the most recent
+C89 compiler on major systems, including the most recent versions of Microsoft
+C Compiler and the GNU Compiler Collection (GCC).
+
+=item* make
+
+Make is a program to manage and automate the build process. Unix-based systems
+will typically have access to the C<make> command as part of the normal
+development tools. Windows systems can get the C<nmake> utility to perform the
+same task.
+
+=item* Subversion
+
+Subversion is the source control system that is used by the Parrot project.
+You need subversion to checkout the latest version of the source code. You can
+get subversion at L<http://subversion.tigris.org>, or on Linux systems you
+can use the command
+
+  sudo apt-get install subversion
+
+=item* bison and flex
+
+Bison and Flex are used to create the lexical analyzer and parser components
+for the PIR compilers IMCC and PIRC. These are not necessary most of the time
+unless you are planning to hack on IMCC and PIRC directly. On Linux systems you
+can use the command
+
+  sudo apt-get install bison flex
+
+=item* ICU
+
+ICU is a library for handling and manipulating Unicode text strings. Without
+ICU libraries installed, you wont be able to use Unicode with your built
+Parrot. On Linux systems you can get ICU with this command:
+
+  sudo apt-get install libicu-dev
+
+=item* GMP
+
+GMP is a mathematics library for manipulating arbitrary precision and arbitrary
+size numbers. GMP is used by the BigInt and BigNum PMCs, so without GMP you
+won't have access to these data types. To get GMP on Linux systems, use the
+command:
+
+  sudo apt-get install libgmp3-dev
+
+=item* Readline
+
+The readline library allows some advanced behaviors on the command line such
+as command history. You can get the readline library on Linux by using the
+command:
+
+  sudo apt-get install libreadline5-dev
+
+=item* PCRE
+
+PCRE is a library that provides access to the Perl 5 regular expression syntax.
+In order to use these regular expressions, you will want to install PCRE. To
+do that on Linux you use the command:
+
+  sudo apt-get install libpcre3-dev
+
+=item* GDBM
+
+=item* PQ
+
+=item* GLUT
+
+GLUT is an interface to the OpenGL API. It enables programs running on Parrot
+to have access to 3D graphics. To get GLUT on Linux systems you can use the
+command:
+
+  sudo apt-get install libglut3-dev
+
+=back
+
+In addition to these build requirements listed above, there are a number of
+Perl libraries needed to enable all tests and testing facilities, and to
+generate all the necessary documentation.
+
+To get the Perl packages for Parrot, you can use the commands:
+
+  sudo cpan Test::Base Test::Pod Test::Pod::Coverage Pod::Spell
+  sudo cpan File::HomeDir File::Which Readonly Regexp::Parser
+  sudo cpan Perl::Critic Perl::Critic::Bangs Test::Perl::Critic
+
+=head2 Patch submission
 
 Z<CHP-2-SECT-2.2.3>
 
