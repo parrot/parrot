@@ -123,6 +123,8 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 /*
  * low level FLOATVAL fetch and convert functions
  *
+ * Floattype 0 = IEEE-754 8 byte double
+ * Floattype 1 = x86 little endian 12 byte long double
  *
  */
 
@@ -130,7 +132,7 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 
 =item C<static void cvt_num12_num8>
 
-Converts i386 LE 12-byte long double to IEEE 754 8 byte double
+Converts i386 LE 12-byte long double to IEEE 754 8 byte double.
 
 =cut
 
@@ -618,15 +620,22 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 #if TRACE_PACKFILE
     Parrot_io_eprintf(NULL, "PF_fetch_number: Byteordering..\n");
 #endif
-    /* Here is where the size transforms get messy */
-    if (NUMVAL_SIZE == 8 && ! pf->header->floattype) {
+    /* Here is where the size transforms get messy.
+       Floattype 0 = IEEE-754 8 byte double
+       Floattype 1 = x86 little endian 12 byte long double
+    */
+    if (NUMVAL_SIZE == 8 && pf->header->floattype) {
+        (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
+        f = d;
+    }
+    else {
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
+    }
+    if (pf->header->floattype) {
         *((const unsigned char **) (stream)) += 12;
     }
     else {
-        (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
         *((const unsigned char **) (stream)) += 8;
-        f = d;
     }
     return f;
 }
