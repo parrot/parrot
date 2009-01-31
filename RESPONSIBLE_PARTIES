@@ -7,7 +7,8 @@ SVN commit access, just those who have a role they've taken responsibility
 for.
 
 See docs/project/roles_responsibilities.pod for role definitions, and
-languages/LANGUAGES.STATUS.pod for more language authors/maintainers.
+https://trac.parrot.org/parrot/wiki/Languages for more language
+authors/maintainers.
 
 
 Project Team

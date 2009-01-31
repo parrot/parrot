@@ -50,7 +50,6 @@ my %type_for_suffix = (
     'Log'          => 'SVN Entries file',                  # probably obsolete
     'PL'           => 'Perl script',
     'SKIP'         => 'MANIFEST skip file',
-    'STATUS'       => 'Languages status file',
     'TXT'          => 'Text file',
     'txt'          => 'Text file',
     'a'            => 'Library file',

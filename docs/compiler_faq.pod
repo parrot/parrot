@@ -631,7 +631,6 @@ Aside from the files in your new language directory, you must modify
     MANIFEST
     config/gen/languages.pm
     config/gen/makefiles/languages.in
-    languages/LANGUAGES.STATUS.pod
 
 Inside your language dir, you may consider adding the following:
 

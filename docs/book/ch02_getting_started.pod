@@ -117,7 +117,8 @@ probably be nice enough to leave a note telling you where it went>:
 Perl 6, Python ("Pynie"), Ruby ("Cardinal"), PHP ("Pipp"), Lisp, Lua,
 Tcl ("partcl"), WMLScript, Forth, Scheme, Befunge, BASIC, and many
 others. These language compilers are in various stages of partial
-completion. The file F<LANGUAGES.STATUS> provides meta information on
+completion. The page L<https://trac.parrot.org/parrot/wiki/Languages>
+provides meta information on
 the included languages and on the many language projects that are
 being developed and maintained outside the Parrot repository. If you
 have a language you're particularly interested to see implemented on
