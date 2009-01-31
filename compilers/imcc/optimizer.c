@@ -43,7 +43,7 @@ unused labels and dead_code_remove() to remove unreachable code
 cfg_optimize may be called multiple times during the construction of the
 CFG depending on whether or not it finds anything to optimize.
 
-RT #46277: subst_constants ... rewrite e.g. add_i_ic_ic -- where does this happen?
+subst_constants ... rewrite e.g. add_i_ic_ic
 
 optimizer
 ---------
