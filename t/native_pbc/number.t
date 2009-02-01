@@ -31,10 +31,10 @@ Tests word-size/float-type/endian-ness for different architectures.
 # if your wordsize/floattype/endianess is not covered here
 # please add it:
 
-$ ./parrot -o n.pbc t/op/number_1.pasm
-$ make pdump
-$ ./pdump -h n.pbc
-$ mv n.pbc t/native_pbc/number_$(N).pbc
+  $ ./parrot -o n.pbc t/op/number_1.pasm
+  $ make pdump
+  $ ./pdump -h n.pbc
+  $ mv n.pbc t/native_pbc/number_$(N).pbc
 
 # then
 # - increase number of tests
@@ -42,6 +42,12 @@ $ mv n.pbc t/native_pbc/number_$(N).pbc
 # - put the file into MANIFEST
 # - add the file as binary (svn add) and commit it
 # thanks -leo
+
+On test failures please add the output of
+
+  $ ./pdump -h t/native_pbc/number_${N}.pbc
+
+into your report. We need your wordsize/floattype/endianess.
 
 =cut
 
@@ -85,8 +91,12 @@ END_OUTPUT
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
+TODO: {
+local $TODO = "Known problem on 64bit with reading 32bit dirs. See TT #254"
+  if $PConfig{ptrsize} == 8;
+
 pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
-    or diag "May need to regenerate t/native_pbc/number_1.pbc; see test file";
+    or diag "May need to regenerate t/native_pbc/number_1.pbc; read test file";
 
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
@@ -98,7 +108,8 @@ pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
 #         dirformat = 1
 # ]
 pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
-    or diag "May need to regenerate t/native_pbc/number_2.pbc; see test file";
+    or diag "May need to regenerate t/native_pbc/number_2.pbc; read test file";
+}
 
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
@@ -110,7 +121,7 @@ pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
 #         dirformat = 1
 # ]
 pbc_output_is(undef, $output, "x86_64 double float 64 bit opcode_t")
-    or diag "May need to regenerate t/native_pbc/number_3.pbc; see test file";
+    or diag "May need to regenerate t/native_pbc/number_3.pbc; read test file";
 
 # Formerly there were tests for:
 # pbc_output_is(undef, <<OUTPUT, "i386 long double float 32 bit opcode_t"); #_2

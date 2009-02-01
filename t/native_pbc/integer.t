@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
+use Parrot::Config;
 
 use Parrot::Test tests => 3;
 
@@ -41,6 +42,12 @@ The output of
 
 should be included for reference.
 
+On test failures please add the output of
+
+  $ ./pdump -h t/native_pbc/number_${N}.pbc
+
+into your report. We need your wordsize/floattype/endianess.
+
 =cut
 
 # execute the file t/native_pbc/integer_1.pbc
@@ -54,6 +61,10 @@ should be included for reference.
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
+TODO: {
+local $TODO = "Known problem on 64bit with reading 32bit dirs. See TT #254"
+  if $PConfig{ptrsize} == 8;
+
 pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval" )
     or diag "May need to regenerate t/native_pbc/integer_1.pbc; read test file";
 
@@ -68,6 +79,7 @@ pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval" )
 # ]
 pbc_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval")
     or diag "May need to regenerate t/native_pbc/integer_2.pbc; read test file";
+}
 
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
