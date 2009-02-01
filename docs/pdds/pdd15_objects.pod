@@ -986,7 +986,7 @@ continuation.
 
 Throws a Method_Not_Found_Exception for a non-existent method.
 
-=item callmethodsupercc
+=item callmethodsupercc [hypothetical, 2.0 or later]
 
   callmethodsupercc $P1, $S1
   callmethodsupercc $P1, $P2
@@ -997,7 +997,7 @@ continuation.  This is a variant of C<callmethodcc> that skips over the
 current class when searching for the method, and only looks in the parent
 classes.  PIR may provide some syntactical sugar for this.
 
-=item callmethodnextcc
+=item callmethodnextcc [hypothetical, 2.0 or later]
 
   callmethodnextcc $P1, $S1
   callmethodnextcc $P1, $P2
