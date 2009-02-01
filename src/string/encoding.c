@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/encoding.c - global encoding functions
+src/string/encoding.c - global encoding functions
 
 =head1 DESCRIPTION
 
