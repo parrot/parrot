@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -177,11 +177,11 @@ sub new {
             '',
             $self->c_item(
                 '',
-                'pairs'   => [ 'string_primitives', 'string' ],
-                'headers' => ['string_funcs']
+                'sources' => [ 'string/primitives', 'string/api' ],
+                'headers' => [ 'string', 'string_funcs', 'string_primitives' ]
             ),
-            $self->c_item( 'String encodings', 'contents' => ['src/encodings'] ),
-            $self->c_item( 'String charset',   'contents' => ['src/charset'] ),
+            $self->c_item( 'String encodings', 'contents' => ['src/string/encoding'] ),
+            $self->c_item( 'String charset',   'contents' => ['src/string/charset'] ),
             $self->c_item(
                 'Miscellaneous, <code>sprintf</code> and utility functions.',
                 'pairs'   => ['misc'],
