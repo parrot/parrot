@@ -96,8 +96,8 @@ values produce an error.
 sub generated_file_header {
     my ( $filename, $style ) = @_;
 
-    die "unknown style '$style'"
-        if $style !~ m/\A(perl|c)\z/;
+    die qq{unknown style "$style"}
+        if $style !~ m/\A(?:perl|c)\z/;
 
     require File::Spec;
     my $script = File::Spec->abs2rel($0);

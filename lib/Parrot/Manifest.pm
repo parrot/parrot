@@ -113,7 +113,7 @@ END_HEADER
     $print_str .= $text_file_coda;
     open my $MANIFEST, '>', $self->{file}
         or croak "Unable to open $self->{file} for writing";
-    print $MANIFEST $print_str;
+    print {$MANIFEST} $print_str;
     close $MANIFEST or croak "Unable to close $self->{file} after writing";
 
     return 1;

@@ -238,6 +238,8 @@ sub squawk {
     my $error = shift;
 
     push( @{ $warnings{$file}->{$func} }, $error );
+
+    return;
 }
 
 1;
