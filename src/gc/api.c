@@ -8,9 +8,12 @@ src/gc/api.c - general Parrot API for GC functions
 
 =head1 DESCRIPTION
 
-This file implements I<dead object destruction>. This is documented in
-PDD 9 with supplementary notes in F<docs/dev/dod.pod> and
-F<docs/memory_internals.pod>.
+This file implements the external-facing API for Parrot's garbage collector.
+The collector itself is composed of various interchangable cores that each
+may operate very differently internally. The functions in this file can be used
+throughtout Parrot without having to be concerned about the internal operations
+of the GC. This is documented in PDD 9 with supplementary notes in
+F<docs/dev/dod.pod> and F<docs/memory_internals.pod>.
 
 It's possible to turn on/off the checking of the system stack and
 processor registers. The actual checking is set up in F<src/cpu_dep.c>
