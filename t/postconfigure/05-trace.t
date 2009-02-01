@@ -46,10 +46,10 @@ my $steps_number = scalar( @{$steps} );
 is( ref($steps), q{ARRAY}, "list_steps() correctly returned array ref" );
 
 # Sanity check!
+my @PConfig_steps = split /\s+/, $PConfig{configuration_steps};
 is_deeply(
     $steps,
-#    [ get_steps_list() ],
-    $PConfig{configuration_steps},
+    [ @PConfig_steps ],
     "list_steps() returned same as \$Parrot::Config::PConfig{configuration_steps}"
 );
 
