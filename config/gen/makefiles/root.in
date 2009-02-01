@@ -2232,12 +2232,14 @@ tags-vi: tags.vi.dummy
 
 tags.vi.dummy:
 
+CRITIC_FILES='lib/Parrot'
+
 perlcritic:
-	perlcritic --profile tools/util/perlcritic.conf
+	perlcritic --profile tools/util/perlcritic.conf $(CRITIC_FILES)
 
 # Andy's extra-cranky Perl::Critic checking for cage cleaners
 cagecritic:
-	perlcritic -1 --profile tools/util/perlcritic-cage.conf lib/Parrot
+	perlcritic -1 --profile tools/util/perlcritic-cage.conf $(CRITIC_FILES)
 
 # This target will eventually create all the headers automatically.  If you are
 # having problems with linkage in Win32 (or elsewhere), because something is

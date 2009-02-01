@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -364,6 +364,8 @@ sub run_single_step {
     else {
         die "Mangled task in run_single_step";
     }
+
+    return;
 }
 
 sub _run_this_step {
@@ -452,6 +454,8 @@ sub _failure_message {
     my ( $step, $step_name ) = @_;
     my $result = $step->result || 'no result returned';
     carp "\nstep $step_name failed: " . $result;
+
+    return;
 }
 
 
@@ -537,7 +541,7 @@ sub pcfreeze {
 sub replenish {
     my $conf = shift;
     my $serialized = shift;
-    foreach my $k (keys %$conf) {
+    foreach my $k (keys %{$conf}) {
         delete $conf->{$k};
     }
     local $Storable::Deparse = 1;
@@ -546,6 +550,8 @@ sub replenish {
     while ( my ($k, $v) = each %gut ) {
         $conf->{$k} = $v;
     }
+
+    return;
 }
 
 =back
