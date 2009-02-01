@@ -425,7 +425,7 @@ a string name for the character set. This behavior is no longer supported, but
 C<Parrot_find_encoding> and C<Parrot_find_charset> can look up the encoding or
 character set structs. }}
 
-=head3 Parrot_str_constant_new (was const_string)
+=head3 Parrot_str_new_constant (was const_string)
 
 Creates and returns a new Parrot constant string. Takes one C string (a C<char
 *>) as an argument, the value of the constant string. The length of the C
@@ -455,13 +455,13 @@ variable-width encodings is ignored. Combining characters are not treated any
 differently than other characters. This is equivalent to accessing the
 C<strlen> member of the C<STRING> struct directly.
 
-=head3 Parrot_str_index (was string_index)
+=head3 Parrot_str_indexed (was string_index)
 
 Returns the character at the specified index (the Nth character from the start
 of the string). Combining characters are counted separately. Variable-width
 encodings will lookahead to capture full character values.
 
-=head3 Parrot_str_grapheme_index
+=head3 Parrot_str_grapheme_indexed
 
 Returns the grapheme at the given index (the Nth grapheme from the string's
 start). Groups of combining characters count as a single grapheme, so this
