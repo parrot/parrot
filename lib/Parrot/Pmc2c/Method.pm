@@ -27,6 +27,8 @@ sub new {
 
     # this is usually wrong, but *something* calls new on an object somewhere
     bless $self, ref $class || $class;
+
+    return $self;
 }
 
 sub clone {
@@ -37,6 +39,8 @@ sub clone {
 sub add_mmd_rights {
     my ( $self, $value ) = @_;
     push @{ $self->{mmd_rights} }, $value;
+
+    return;
 }
 
 sub mmd_rights {

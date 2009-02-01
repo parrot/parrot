@@ -1,6 +1,11 @@
 # Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
+package Parrot::Configure;
+
+use strict;
+use warnings;
+
 =head1 NAME
 
 Parrot::Configure - Conducts the execution of Configuration Steps
@@ -32,11 +37,6 @@ This module accepts no arguments to its C<import> method and exports no
 I<symbols>.
 
 =cut
-
-package Parrot::Configure;
-
-use strict;
-use warnings;
 
 use lib qw(config);
 use Carp qw(carp);
@@ -75,7 +75,7 @@ BEGIN {
         data    => Parrot::Configure::Data->new,
         options => Parrot::Configure::Data->new,
     };
-    bless $singleton, "Parrot::Configure";
+    bless $singleton, 'Parrot::Configure';
 }
 
 sub new {
@@ -156,7 +156,7 @@ used C<add_step()> or C<add_steps()> to add any configuration steps.
 
 sub get_list_of_steps {
     my $conf = shift;
-    die "list_of_steps not available until steps have been added"
+    die 'list_of_steps not available until steps have been added'
         unless defined $conf->{list_of_steps};
     return wantarray ? @{ $conf->{list_of_steps} } : $conf->{list_of_steps};
 }
@@ -233,7 +233,7 @@ sub runsteps {
     # If the --fatal option is true, then all config steps are mapped into
     # %steps_to_die_for and there is no consideration of --fatal-step.
     if ($fatal) {
-        %steps_to_die_for = map {$_, 1} @{ $conf->{list_of_steps} };
+        %steps_to_die_for = map { ($_,1) } @{ $conf->{list_of_steps} };
     }
     # We make certain that argument to --fatal-step is a comma-delimited
     # string of configuration steps, each of which is a string delimited by
@@ -292,10 +292,10 @@ sub _handle_fatal_step_option {
     my $fatal_step_str = shift;
     my %steps_to_die_for = ();
     my $named_step_pattern = qr/(?:init|inter|auto|gen)::\w+/;
-    if ( $fatal_step_str =~ /^
+    if ( $fatal_step_str =~ m{^
         $named_step_pattern
         (, $named_step_pattern)*
-        $/x
+        $}x
     ) {
         my @fatal_steps = split /,/, $fatal_step_str;
         for my $s (@fatal_steps) {
@@ -303,7 +303,7 @@ sub _handle_fatal_step_option {
         }
     }
     else {
-        die "Argument to 'fatal-step' option must be comma-delimited string of valid configuration steps";
+        die 'Argument to "fatal-step" option must be comma-delimited string of valid configuration steps';
     }
     return %steps_to_die_for;
 }
@@ -312,10 +312,10 @@ sub _handle_verbose_step_option {
     my $verbose_step_str = shift;
     my %verbose_steps = ();
     my $named_step_pattern = qr/(?:init|inter|auto|gen)::\w+/;
-    if ( $verbose_step_str =~ /^
+    if ( $verbose_step_str =~ m{^
         $named_step_pattern
         (, $named_step_pattern)*
-        $/x
+        $}x
     ) {
         my @verbose_steps = split /,/, $verbose_step_str;
         for my $s (@verbose_steps) {
@@ -323,7 +323,7 @@ sub _handle_verbose_step_option {
         }
     }
     else {
-        die "Argument to 'verbose-step' option must be comma-delimited string of valid configuration steps";
+        die 'Argument to "verbose-step" option must be comma-delimited string of valid configuration steps';
     }
     return %verbose_steps;
 }
@@ -350,7 +350,7 @@ sub run_single_step {
         $conf->options->get(qw( verbose verbose-step ask ));
 
     my $task = ( $conf->steps() )[0];
-    if ( $task->{"Parrot::Configure::Task::step"} eq $taskname ) {
+    if ( $task->{'Parrot::Configure::Task::step'} eq $taskname ) {
         $conf->_run_this_step(
             {
                 task            => $task,
@@ -362,7 +362,7 @@ sub run_single_step {
         );
     }
     else {
-        die "Mangled task in run_single_step";
+        die 'Mangled task in run_single_step';
     }
 
     return;

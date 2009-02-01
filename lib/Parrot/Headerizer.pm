@@ -201,11 +201,11 @@ sub function_components_from_declaration {
     if ( $return_type =~ /\*/ ) {
         if ( !$macros{PARROT_CAN_RETURN_NULL} && !$macros{PARROT_CANNOT_RETURN_NULL} ) {
             $self->squawk( $file, $name,
-                "Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found." );
+                'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );
         }
         elsif ( $macros{PARROT_CAN_RETURN_NULL} && $macros{PARROT_CANNOT_RETURN_NULL} ) {
             $self->squawk( $file, $name,
-                "Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together." );
+                q{Can't have both PARROT_CAN_RETURN_NULL and PARROT_CANNOT_RETURN_NULL together.} );
         }
     }
 

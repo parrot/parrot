@@ -60,14 +60,14 @@ sub _print_to_cache {
     my ($cache, $revision) = @_;
     open my $FH, ">", $cache
         or die "Unable to open handle to $cache for writing: $!";
-    print $FH "$revision\n";
+    print {$FH} "$revision\n";
     close $FH or die "Unable to close handle to $cache after writing: $!";
 }
 
 sub _get_revision {
     my $revision;
     if (-f $cache) {
-        open my $FH, "<", $cache
+        open my $FH, '<', $cache
             or die "Unable to open $cache for reading: $!";
         chomp($revision = <$FH>);
         close $FH or die "Unable to close $cache after reading: $!";
