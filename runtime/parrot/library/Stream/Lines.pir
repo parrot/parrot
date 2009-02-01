@@ -22,8 +22,6 @@ TBD
 
 =cut
 
-.include "library/Data/Escape.pir"
-
 .sub onload :load :anon
     .local int i
     .local pmc base
