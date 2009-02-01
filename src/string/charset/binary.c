@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/charset/binary.c
+src/string/charset/binary.c
 
 =head1 DESCRIPTION
 
