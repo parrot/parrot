@@ -1061,9 +1061,9 @@ $(SRC_DIR)/exec_save$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
 $(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str
 
-$(SRC_DIR)/gc/mark_sweep$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc_private.h
+$(SRC_DIR)/gc/mark_sweep$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 
-$(SRC_DIR)/gc/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc_private.h
+$(SRC_DIR)/gc/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 
 $(SRC_DIR)/gc/generational_ms$(O) : $(GENERAL_H_FILES)
 
@@ -1170,7 +1170,7 @@ $(SRC_DIR)/nci$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/nci.c $(SRC_DIR)/nci.str
 
 $(SRC_DIR)/vtables$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/vtables.c
 
-$(SRC_DIR)/gc/system$(O) : $(GENERAL_H_FILES)  $(SRC_DIR)/gc_private.h
+$(SRC_DIR)/gc/system$(O) : $(GENERAL_H_FILES)  $(SRC_DIR)/gc/gc_private.h
 
 $(SRC_DIR)/nci.c : $(SRC_DIR)/call_list.txt $(BUILD_TOOLS_DIR)/nativecall.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/nativecall.pl $(SRC_DIR)/call_list.txt
