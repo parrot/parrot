@@ -115,6 +115,8 @@ sub testloop {
         my $total_files = @{$args{files}};
         diag("That's $failures failed files out of $total_files files total.");
     }
+
+    return;
 }
 
 1;

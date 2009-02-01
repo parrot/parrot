@@ -15,7 +15,7 @@ sub new {
     my $self = {};
     bless $self, $class;
     $self->build($filename) if $filename;
-    $self;
+    return $self;
 }
 
 sub build {
@@ -47,6 +47,8 @@ sub build {
     $self->{'has_method'} = \%method_lookup;
     $self->{'methods'}    = \@methods;
     $self->{'names'}      = \@method_names;
+
+    return;
 }
 
 sub right_type {

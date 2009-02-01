@@ -37,7 +37,7 @@ sub pre_method_gen {
         );
 
         # don't return anything, ever
-        my $output = <<EOC;
+        my $output = <<"EOC";
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
         "Null PMC access in $vt_method_name()");
 EOC
