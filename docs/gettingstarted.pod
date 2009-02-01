@@ -25,7 +25,7 @@ L<https://trac.parrot.org/parrot/wiki/NewParrotDeveloperGuide>.
 There is a web interface to the subversion repository, in case you just want to
 browse the source.
 
-L<http://svn.perl.org/viewcvs/parrot/>
+L<https://trac.parrot.org/parrot/browser>
 
 =item *
 
