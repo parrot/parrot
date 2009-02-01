@@ -44,7 +44,7 @@ op store_lex(in STR, invar PMC) {
     PMC              * const lex_pad  = Parrot_find_pad(interp, lex_name, ctx);
 
     if (PMC_IS_NULL(lex_pad)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_LEX_NOT_FOUND,
                 "Lexical '%Ss' not found", lex_name);
         goto ADDRESS(handler);
@@ -73,7 +73,7 @@ op find_lex(out PMC, in STR) {
             ? NULL
             : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
     if (!result) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, NULL,
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
                 EXCEPTION_LEX_NOT_FOUND,
                 "Lexical '%Ss' not found", lex_name);
         goto ADDRESS(handler);

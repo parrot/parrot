@@ -89,7 +89,7 @@ op eq(invar PMC, invar PMC, inconst LABEL) :base_core {
 }
 
 op eq(invar PMC, in INT, inconst LABEL) :base_core {
-  PMC *temp = temporary_pmc_new(interp, enum_class_Integer);
+  PMC * const temp = temporary_pmc_new(interp, enum_class_Integer);
   VTABLE_set_integer_native(interp, temp, $2);
 
   if (VTABLE_is_equal(interp, $1, temp)) {
@@ -196,7 +196,7 @@ op ne(invar PMC, invar PMC, inconst LABEL) :base_core {
 }
 
 op ne(invar PMC, in INT, inconst LABEL) :base_core {
-  PMC *temp = temporary_pmc_new(interp, enum_class_Integer);
+  PMC * const temp = temporary_pmc_new(interp, enum_class_Integer);
   VTABLE_set_integer_native(interp, temp, $2);
 
   if (!VTABLE_is_equal(interp, $1, temp)) {
@@ -293,7 +293,7 @@ op lt(invar PMC, invar PMC, inconst LABEL) :base_core {
 }
 
 op lt(invar PMC, in INT, inconst LABEL) :base_core {
-  PMC *temp         = temporary_pmc_new(interp, enum_class_Integer);
+  PMC * const temp  = temporary_pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
 
   if (VTABLE_cmp(interp, $1, temp) < 0) {
@@ -378,7 +378,7 @@ op le(invar PMC, invar PMC, inconst LABEL) :base_core {
 }
 
 op le(invar PMC, in INT, inconst LABEL) :base_core {
-  PMC *temp         = temporary_pmc_new(interp, enum_class_Integer);
+  PMC * const temp  = temporary_pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
 
   if (VTABLE_cmp(interp, $1, temp) <= 0) {
@@ -439,7 +439,7 @@ op gt(invar PMC, invar PMC, inconst LABEL) :base_core {
 }
 
 op gt(invar PMC, in INT, inconst LABEL) :base_core {
-  PMC *temp         = temporary_pmc_new(interp, enum_class_Integer);
+  PMC * const temp  = temporary_pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
 
   if (VTABLE_cmp(interp, $1, temp) > 0) {
@@ -500,7 +500,7 @@ op ge(invar PMC, invar PMC, inconst LABEL) :base_core {
 }
 
 op ge(invar PMC, in INT, inconst LABEL) :base_core {
-  PMC *temp         = temporary_pmc_new(interp, enum_class_Integer);
+  PMC * const temp  = temporary_pmc_new(interp, enum_class_Integer);
   PMC_int_val(temp) = $2;
 
   if (VTABLE_cmp(interp, $1, temp) >= 0) {
@@ -640,21 +640,21 @@ inline op cmp(out INT, invar PMC, invar PMC) :base_core {
 }
 
 inline op cmp(out INT, invar PMC, in INT) :base_core {
-  INTVAL l = VTABLE_get_integer(interp, $2);
+  const INTVAL l = VTABLE_get_integer(interp, $2);
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
        0;
 }
 
 inline op cmp(out INT, invar PMC, in NUM) :base_core {
-  FLOATVAL l = VTABLE_get_number(interp, $2);
+  const FLOATVAL l = VTABLE_get_number(interp, $2);
   $1 = l < $3 ? -1 :
        l > $3 ? +1 :
        0;
 }
 
 inline op cmp(out INT, invar PMC, in STR) :base_core {
-  STRING* l = VTABLE_get_string(interp, $2);
+  STRING* const l = VTABLE_get_string(interp, $2);
   $1 = string_compare(interp, l, $3);
 }
 
@@ -992,7 +992,7 @@ inline op xor(invar PMC, invar PMC, invar PMC) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 
 =head1 LICENSE
 

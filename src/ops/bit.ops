@@ -336,7 +336,7 @@ Set $1 to the value of $2 shifted right by $3 bits.
 =cut
 
 inline op shr(inout INT, in INT) :base_core {
-  INTVAL signed_shift = -$2;
+  const INTVAL signed_shift = -$2;
   $1 = bit_shift_left($1, signed_shift);
 }
 
@@ -349,7 +349,7 @@ inline op shr(invar PMC, invar PMC) :base_core {
 }
 
 inline op shr(out INT, in INT, in INT) :base_core {
-  INTVAL signed_shift = -$3;
+  const INTVAL signed_shift = -$3;
   $1 = bit_shift_left($2, signed_shift);
 }
 
@@ -533,7 +533,7 @@ inline op bxors(invar PMC, invar PMC, invar PMC) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 
 =head1 LICENSE
 
