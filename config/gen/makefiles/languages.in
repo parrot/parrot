@@ -86,7 +86,7 @@ help:
 	@echo ""
 	@echo "  co-unlambda:   Try to fetch unlambda"
 	@echo ""
-    @echo "NOTE: These make targets assume that you have run the corresponding co target."
+	@echo "NOTE: These make targets assume that you have run the corresponding co target."
 	@echo "  up-all:        Try to update externally managed languages"
 	@echo ""
 	@echo "  up-eclectus:   Try to update eclectus"
@@ -479,67 +479,67 @@ co-all: co-eclectus co-gil co-hq9plus co-lazy-k co-m4 co-markdown co-pjs co-prim
 up-all: up-eclectus up-gil up-hq9plus up-lazy-k up-m4 up-markdown up-pjs up-primitivearc up-tcl up-unlambda up-wmlscript
 
 co-eclectus:
-	- $(GIT) clone 'git:////github.com/bschmalhofer/eclectus.git'
+	- $(GIT) clone 'git:////github.com//bschmalhofer//eclectus.git'
 
 up-eclectus:
 	cd eclectus &&  $(GIT) pull
 
 co-gil:
-	- $(GIT) clone 'git:////github.com/tene/gil.git'
+	- $(GIT) clone 'git:////github.com//tene//gil.git'
 
 up-gil:
 	cd gil && $(GIT) pull
 
 co-hq9plus:
-	- $(GIT) clone 'git:////github.com/bschmalhofer/hq9plus.git'
+	- $(GIT) clone 'git:////github.com//bschmalhofer//hq9plus.git'
 
 up-hq9plus:
 	cd hq9plus && $(GIT) pull
 
 co-lazy-k:
-	- $(GIT) clone 'git:////github.com/bschmalhofer/lazy-k.git'
+	- $(GIT) clone 'git:////github.com//bschmalhofer//lazy-k.git'
 
 up-lazy-k:
 	cd lazy-k && $(GIT) pull
 
 co-m4:
-	- $(GIT) clone 'git:////github.com/bschmalhofer/m4.git'
+	- $(GIT) clone 'git:////github.com//bschmalhofer//m4.git'
 
 up-m4:
 	cd m4 && $(GIT) pull
 
 co-markdown:
-	- $(GIT) clone 'git:////github.com/fperrad/markdown.git'
+	- $(GIT) clone 'git:////github.com//fperrad//markdown.git'
 
 up-markdown:
 	cd markdown && $(GIT) pull
 
 co-pjs:
-	- $(SVN) checkout 'http:////parrotjs.googlecode.com/svn/trunk/' pjs
+	- $(SVN) checkout 'http:////parrotjs.googlecode.com//svn//trunk' pjs
 
 up-pjs:
 	cd pjs && $(SVN) up
 
 co-primitivearc:
-	- $(GIT) clone 'git:////github.com/stefano/primitivearc.git'
+	- $(GIT) clone 'git:////github.com//stefano//primitivearc.git'
 
 up-primitivearc:
 	cd primitivearc && $(GIT) pull
 
 co-tcl:
-	- $(SVN) checkout 'http:////partcl.googlecode.com/svn/trunk' tcl
+	- $(SVN) checkout 'http:////partcl.googlecode.com//svn//trunk' tcl
 
 up-tcl:
 	cd tcl && $(SVN) up
 
 co-unlambda:
-	- $(GIT) clone 'git:////github.com/bschmalhofer/unlambda.git'
+	- $(GIT) clone 'git:////github.com//bschmalhofer//unlambda.git'
 
 up-unlambda:
 	cd unlambda && $(GIT) pull
 
 co-wmlscript:
-	- $(GIT) clone 'git:////github.com/fperrad/wmlscript.git'
+	- $(GIT) clone 'git:////github.com//fperrad//wmlscript.git'
 
 up-wmlscript:
 	cd wmlscript && $(GIT) pull
