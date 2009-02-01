@@ -1538,7 +1538,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
             /*
              * Workaround for several argument passing problems
-             * RT #54860 y otros
+             * RT #54860 and others
              * Save current value while setting the optional
              */
             UnionVal old_value;
