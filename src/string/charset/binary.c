@@ -18,7 +18,7 @@ This file implements the charset functions for binary data
 
 #include "parrot/parrot.h"
 
-/* In local src/charset/ directory */
+/* In local src/string/charset/ directory */
 #include "ascii.h"
 #include "binary.h"
 
