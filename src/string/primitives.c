@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/string_primitives.c - String Primitives
+src/string/string_primitives.c - String Primitives
 
 =head1 DESCRIPTION
 
