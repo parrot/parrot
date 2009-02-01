@@ -36,6 +36,8 @@ static void trace_system_stack(PARROT_INTERP)
 
 #define ASSERT_ARGS_trace_system_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_find_common_mask __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -162,6 +164,121 @@ trace_system_stack(PARROT_INTERP)
     trace_mem_block(interp, (size_t)lo_var_ptr,
             (size_t)&lo_var_ptr);
 }
+
+#ifndef PLATFORM_STACK_WALK
+
+/*
+
+=item C<static size_t find_common_mask>
+
+Finds a mask covering the longest common bit-prefix of C<val1>
+and C<val2>.
+
+=cut
+
+*/
+
+PARROT_CONST_FUNCTION
+static size_t
+find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
+{
+    ASSERT_ARGS(find_common_mask)
+    int       i;
+    const int bound = sizeof (size_t) * 8;
+
+    /* Shifting a value by its size (in bits) or larger is undefined behaviour.
+       So need an explicit check to return 0 if there is no prefix, rather than
+       attempting to rely on (say) 0xFFFFFFFF << 32 being 0.  */
+    for (i = 0; i < bound; i++) {
+        if (val1 == val2)
+            return ~(size_t)0 << i;
+
+        val1 >>= 1;
+        val2 >>= 1;
+    }
+
+    if (val1 == val2) {
+        PARROT_ASSERT(i == bound);
+        return 0;
+    }
+
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERP_ERROR,
+            "Unexpected condition in find_common_mask()!\n");
+}
+
+/*
+
+=item C<void trace_mem_block>
+
+Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
+Attempt to find pointers to PObjs or buffers, and mark them as "alive"
+if found. See src/cpu_dep.c for more information about tracing memory
+areas.
+
+=cut
+
+*/
+
+void
+trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
+{
+    ASSERT_ARGS(trace_mem_block)
+    size_t    prefix;
+    ptrdiff_t cur_var_ptr;
+
+    const size_t buffer_min = get_min_buffer_address(interp);
+    const size_t buffer_max = get_max_buffer_address(interp);
+    const size_t pmc_min    = get_min_pmc_address(interp);
+    const size_t pmc_max    = get_max_pmc_address(interp);
+
+    const size_t mask       =
+        find_common_mask(interp,
+                         buffer_min < pmc_min ? buffer_min : pmc_min,
+                         buffer_max > pmc_max ? buffer_max : pmc_max);
+
+    if (!lo_var_ptr || !hi_var_ptr)
+        return;
+
+    if (lo_var_ptr < hi_var_ptr) {
+        const size_t tmp_ptr = hi_var_ptr;
+        hi_var_ptr           = lo_var_ptr;
+        lo_var_ptr           = tmp_ptr;
+    }
+
+    /* Get the expected prefix */
+    prefix = mask & buffer_min;
+
+    for (cur_var_ptr = hi_var_ptr;
+            (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
+            cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof (void *))) {
+        const size_t ptr = *(size_t *)cur_var_ptr;
+
+        /* Do a quick approximate range check by bit-masking */
+        if ((ptr & mask) == prefix || !prefix) {
+            /* Note that what we find via the stack or registers are not
+             * guaranteed to be live pmcs/buffers, and could very well have
+             * had their bufstart/vtable destroyed due to the linked list of
+             * free headers... */
+            if (pmc_min <= ptr && ptr < pmc_max &&
+                    is_pmc_ptr(interp, (void *)ptr)) {
+                /* ...so ensure that pobject_lives checks PObj_on_free_list_FLAG
+                 * before adding it to the next_for_GC list, to have
+                 * vtable->mark() called. */
+                pobject_lives(interp, (PObj *)ptr);
+            }
+            else if (buffer_min <= ptr && ptr < buffer_max &&
+                    is_buffer_ptr(interp, (void *)ptr)) {
+                /* ...and since pobject_lives doesn't care about bufstart, it
+                 * doesn't really matter if it sets a flag */
+                pobject_lives(interp, (PObj *)ptr);
+            }
+        }
+    }
+
+    return;
+}
+#endif
+
 
 /*
 
