@@ -63,8 +63,6 @@ sub new {
         }
     }
 
-    # RT#44435 support getting implementations from central superclass instead
-    # (e.g. some ro_fail pseudoclass that generates an exception)
     foreach my $vt_method ( @{ $self->vtable->methods } ) {
         my $vt_method_name = $vt_method->name;
         if ( $vt_method_name eq 'find_method' ) {
