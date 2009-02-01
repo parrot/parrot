@@ -181,11 +181,17 @@ sub runstep {
         perl      => $^X,
         perl_inc  => $self->find_perl_headers(),
         test_prog => 'parrot',
+
+        # some utilities in Makefile
+        cat       => '$(PERL) -MExtUtils::Command -e cat',
+        chmod     => '$(PERL) -MExtUtils::Command -e ExtUtils::Command::chmod',
+        cp        => '$(PERL) -MExtUtils::Command -e cp',
+        mkpath    => '$(PERL) -MExtUtils::Command -e mkpath',
+        mv        => '$(PERL) -MExtUtils::Command -e mv',
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
-        mkpath    => '$(PERL) -MExtUtils::Command -e mkpath',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
-        chmod     => '$(PERL) -MExtUtils::Command -e ExtUtils::Command::chmod',
+
         ar        => $Config{ar},
         ar_flags  => 'cr',
 
@@ -211,8 +217,6 @@ sub runstep {
         platform_asm => 0,
         as           => 'as',    # assembler
 
-        cp    => '$(PERL) -MExtUtils::Command -e cp',
-        mv    => '$(PERL) -MExtUtils::Command -e mv',
         lns   => $Config{lns},                          # soft link
         slash => '/',
 

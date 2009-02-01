@@ -172,7 +172,7 @@ O             = @o@
 PERL          = @perl@
 RM_F          = @rm_f@
 CP            = @cp@
-CAT           = $(PERL) -MExtUtils::Command -e cat
+CAT           = @cat@
 PARROT        = ../../parrot@exe@
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 #IF(darwin):

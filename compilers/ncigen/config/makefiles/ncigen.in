@@ -15,7 +15,7 @@ PERL          = @perl@
 RM_RF         = @rm_rf@
 CP            = @cp@
 PARROT        = ../../parrot@exe@
-CAT           = $(PERL) -MExtUtils::Command -e cat
+CAT           = @cat@
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 
