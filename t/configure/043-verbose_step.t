@@ -77,7 +77,7 @@ $conf->add_steps( @{ $step_list_ref } );
 $conf->options->set(%args);
 eval { $conf->runsteps(); };
 like($@,
-    qr/Argument to ['"]verbose-step['"] option must be comma-delimited.*?steps/,
+    qr/Argument to 'verbose-step' option must be comma-delimited.*?steps/,
     "Got expected error message for bad value to --verbose-step"
 );
 
