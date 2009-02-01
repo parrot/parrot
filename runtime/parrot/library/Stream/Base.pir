@@ -27,7 +27,6 @@ TBD
 .sub onload :load :anon
     $P0 = get_class 'Stream::Base'
     unless null $P0 goto END
-    load_bytecode "library/Data/Escape.pir"
 
     newclass $P0, "Stream::Base"
     addattribute $P0, 'source'
@@ -89,16 +88,14 @@ Returns nothing.
 .sub dump :method
     .local string str
     .local int i
-    .local pmc escape
 
-    escape = get_hll_global ['Data::Escape'], 'String'
 LOOP:
     i = self."connected"()
     unless i goto END
     str = self."read"()
     if_null str, END
     print "read:["
-    str = escape( str )
+    str = escape str
     print str
     print "]\n"
     branch LOOP
