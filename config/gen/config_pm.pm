@@ -93,15 +93,20 @@ END
 
     while (<$IN>) {
         if (/\@PCONFIG\@/) {
-            my $k;
-            for $k ( sort { lc $a cmp lc $b || $a cmp $b } $conf->data->keys ) {
+            for my $k ( sort { lc $a cmp lc $b || $a cmp $b } $conf->data->keys ) {
                 my $v = $conf->data->get($k);
                 if ( defined $v ) {
+                    my $type = ref $v;
+                    if ( $type ) {
+                        die "type of '$k' is not supported : $type\n";
+                    }
+                    # Scalar
                     $v =~ s/(["\\])/\\$1/g;
                     $v =~ s/\n/\\n/g;
                     print {$OUT} qq(    set P0["$k"], "$v"\n);
                 }
                 else {
+                    # Undef
                     print {$OUT} qq(    set P0["$k"], P1\n);
                 }
             }
