@@ -662,6 +662,12 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
     METHOD set_key(PMC *key) {
         PMC_struct_val(SELF) = key;
     }
+
+    METHOD get_key() {
+        PMC *key = PMC_struct_val(SELF);
+        RETURN(PMC *key);
+    }
+
 }
 
 /*

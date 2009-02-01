@@ -1438,17 +1438,20 @@ failures.
 
         PippHashTable *ht;
         PippBucket    *bkt;
+        STRING        *get_key = CONST_STRING(INTERP, "get_key");
         PMC           *iter  = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-        PMC           *key   = (PMC *)PMC_struct_val(iter);
+        PMC           *key;
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
 
-        ht->iter             = iter;
-        PMC_int_val(key)     = ht->elementCount ? 0 : -1;
+        /* yup, only one iterator per PhpArray */
+        ht->iter = iter;
+
+        Parrot_PCCINVOKE(INTERP, iter, get_key, "->P", &key);
 
         /* set the key's flags so get_x_keyed() knows when it's being called
          * from an Iterator. */
-        PObj_get_FLAGS(key) |= KEY_pipp_iterator_FLAG;
+        PObj_get_FLAGS(key) = KEY_pipp_iterator_FLAG;
 
         /* Get the Iterator and ht->internalPointer in sync. */
         bkt = ht->tableHead;
@@ -1869,7 +1872,10 @@ behavior of PHP's C<next()> function.
 
         if (ht->internalPointer != NULL) {
             if (ht->iter) {
-                PMC *key = (PMC *)PMC_struct_val(ht->iter);
+                STRING *get_key = CONST_STRING(INTERP, "get_key");
+                PMC    *key;
+
+                Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
                 VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_NEXT);
             }
             ht->internalPointer = ht->internalPointer->tableNext;
@@ -1895,7 +1901,10 @@ behavior of PHP's C<prev()> function.
 
         if (ht->internalPointer != NULL) {
             if (ht->iter) {
-                PMC           *key = (PMC *)PMC_struct_val(ht->iter);
+                PMC    *key;
+                STRING *get_key = CONST_STRING(INTERP, "get_key");
+
+                Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
                 VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_PREV);
             }
             ht->internalPointer = ht->internalPointer->tablePrev;
@@ -1922,7 +1931,10 @@ function.
 
         ht->internalPointer = ht->tableHead;
         if (ht->iter) {
-            PMC *key = (PMC *)PMC_struct_val(ht->iter);
+            PMC    *key;
+            STRING *get_key = CONST_STRING(INTERP, "get_key");
+
+			Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
             VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_FROM_START);
         }
         RETURN(void);
@@ -1946,7 +1958,10 @@ insertion order.  This method emulates the behavior of PHP's C<end()> function.
 
         ht->internalPointer = ht->tableTail;
         if (ht->iter) {
-            PMC *key = (PMC *)PMC_struct_val(ht->iter);
+			PMC    *key;
+			STRING *get_key = CONST_STRING(INTERP, "get_key");
+
+			Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
             VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_FROM_END);
         }
         RETURN(void);
@@ -2058,7 +2073,10 @@ be returned.
 
             ht->internalPointer = ht->internalPointer->tableNext;
             if (ht->iter) {
-                PMC *key = (PMC *)PMC_struct_val(ht->iter);
+				PMC    *key;
+				STRING *get_key = CONST_STRING(INTERP, "get_key");
+
+				Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
                 VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_NEXT);
             }
 
