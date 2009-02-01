@@ -664,7 +664,7 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
     }
 
     METHOD get_key() {
-        PMC *key = PMC_struct_val(SELF);
+        PMC *key = (PMC*)PMC_struct_val(SELF);
         RETURN(PMC *key);
     }
 
