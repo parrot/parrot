@@ -109,7 +109,7 @@ $conf->add_steps($step);
 $conf->options->set( %{$args} );
 my $rv;
 eval { $rv = $conf->runsteps; };
-like($@, qr/^Argument to 'fatal-step' option/,
+like($@, qr/^Argument to ["']fatal-step['"] option/,
     "Got expected error message when value to --fatal-step option was misspecified");
 
 $conf->replenish($serialized);
