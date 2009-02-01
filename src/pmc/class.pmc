@@ -628,7 +628,7 @@ Marks any referenced strings and PMCs in the structure as live.
 =item C<void add_attribute(STRING *name, PMC *type)>
 
 Adds the given attribute (C<name>) with an optional C<type>.
-Creates a new class if the current class has been instantiated.
+Throws an exception if the current class has been instantiated.
 Enters the attribute in the C<attrib_metadata> table.
 Returns an error if an attribute of C<name> already exists.
 
@@ -660,6 +660,38 @@ Returns an error if an attribute of C<name> already exists.
         /* Enter the attribute in the attrib_metadata table. */
         VTABLE_set_pmc_keyed_str(interp, _class->attrib_metadata, name,
             new_attribute);
+    }
+
+/*
+
+=item C<void remove_attribute(STRING *name)>
+
+Removes the given attribute (C<name>) from the class. Throws an exception if
+the current class has been instantiated, or if the class has no attribute
+C<name>.
+
+=cut
+
+*/
+
+    VTABLE void remove_attribute(STRING *name, PMC *type) {
+        Parrot_Class_attributes * const _class        = PARROT_CLASS(SELF);
+
+        /* If we've been instantiated already, not allowed. */
+        if (_class->instantiated)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Modifications to classes are not allowed after instantiation.");
+
+        /* If we don't have an attribute of this name, it's an error. */
+        if (!VTABLE_exists_keyed_str(interp, _class->attrib_metadata, name))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Attribute '%Ss' cannot be removed, does not exist in '%Ss'.", name,
+                VTABLE_get_string(INTERP, SELF));
+
+        /* Remove the attribute from the attrib_metadata table. */
+        VTABLE_delete_keyed_str(interp, _class->attrib_metadata, name);
+
+        build_attrib_index(interp, SELF);
     }
 
 /*
@@ -803,6 +835,67 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* Add to the lists of our immediate parents and all parents. */
         VTABLE_push_pmc(interp, _class->parents, parent);
+        _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+
+        /* Anonymous classes have no entry in the vtable array */
+        if (!CLASS_is_anon_TEST(SELF))
+            interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
+    }
+
+/*
+
+=item C<void remove_parent(PMC *parent)>
+
+Remove the supplied class object from the list of parents for the class.
+Throws an exception if parent is null, is not a class, or is not a parent, or
+if the class has been instantiated.
+
+=cut
+
+*/
+    VTABLE void remove_parent(PMC *parent) {
+        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+
+        /* get number of direct parents */
+        const int parent_count      = VTABLE_elements(interp, _class->parents);
+
+        int index; /* loop iterator */
+
+        /* If we've been instantiated already, not allowed. */
+        if (_class->instantiated) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Modifications to classes are not allowed after instantiation.");
+        }
+
+        /* Ensure it really is a class. */
+        if (!PObj_is_class_TEST(parent)) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Parent isn't a Class.");
+        }
+
+        /* iterate over all direct parents, looking for
+         * the parent to be removed.
+         */
+        for (index = 0; index < parent_count; index++) {
+            /* get the next parent */
+            PMC * const current_parent = VTABLE_get_pmc_keyed_int(interp,
+                                      _class->parents, index);
+            if (current_parent == parent)
+                break;
+        }
+        if (index >= parent_count)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Can't remove_parent: is not a parent.");
+
+        /* Move up the remaining parents on the list and pops it */
+        for (; index < parent_count - 1; index++) {
+            PMC * const current_parent = VTABLE_get_pmc_keyed_int(interp,
+                _class->parents, index + 1);
+            VTABLE_set_pmc_keyed_int(interp, _class->parents,
+                index, current_parent);
+        }
+        VTABLE_pop_pmc(interp, _class->parents);
+
         _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
 
         /* Anonymous classes have no entry in the vtable array */

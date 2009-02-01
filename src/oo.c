@@ -558,33 +558,6 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
 
 /*
 
-=item C<PMC * Parrot_remove_parent>
-
-This currently does nothing but return C<PMCNULL>.
-RT #50646
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_IGNORABLE_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_remove_parent(PARROT_INTERP, ARGIN(PMC *removed_class),
-        ARGIN(PMC *existing_class))
-{
-    ASSERT_ARGS(Parrot_remove_parent)
-    UNUSED(interp);
-    UNUSED(removed_class);
-    UNUSED(existing_class);
-
-    return PMCNULL;
-}
-
-
-/*
-
 =item C<void mark_object_cache>
 
 Marks all PMCs in the object method cache as live.  This shouldn't strictly be

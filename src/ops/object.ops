@@ -422,7 +422,7 @@ Remove class $2 from class $1's list of parents.
 =cut
 
 inline op removeparent(invar PMC, invar PMC) :object_classes {
-    Parrot_remove_parent(interp, $2, $1);
+    VTABLE_remove_parent(interp, $1, $2);
 }
 
 =item B<addrole>(invar PMC, invar PMC)
@@ -457,20 +457,12 @@ inline op addattribute(invar PMC, in STR) :object_classes {
 
 =item B<removeattribute>(invar PMC, in STR) B<(unimplemented)>
 
-=item B<removeattribute>(invar PMC, in INT) B<(unimplemented)>
-
-Remove attribute $2 from class $1, specified either by name or offset.
+Remove attribute $2 from class $1, specified by name.
 
 =cut
 
-op removeattribute(invar PMC, in STR) :flow {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "removeattribute is not implemented");
-}
-
-op removeattribute(invar PMC, in INT) :flow {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "removeattribute is not implemented");
+op removeattribute(invar PMC, in STR) :object_classes {
+    VTABLE_remove_attribute(interp, $1, $2);
 }
 
 =item B<getattribute>(out PMC, invar PMC, in STR)
