@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/charset.c - global charset functions
+src/string/charset.c - global charset functions
 
 =head1 DESCRIPTION
 

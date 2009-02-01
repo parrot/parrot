@@ -3296,7 +3296,7 @@ int_to_str(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, unsigned int base)
 
 =over
 
-=item F<src/string_primitives.c>
+=item F<src/string/primitives.c>
 
 =item F<include/parrot/string.h>
 
