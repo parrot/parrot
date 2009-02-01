@@ -21,23 +21,69 @@ object.
 
 =cut
 
-.sub 'print'
-    .param string arg
-    print arg
-.end
+
 
 .HLL 'pod'
 
-.namespace [ 'Pod';'Compiler' ]
+.loadlib 'pod_group'
 
+.include 'src/Pod/DocTree/Node.pir'
 
-.sub 'doctree' :method
-    .param pmc match
-    .param pmc namedargs :named :slurpy
-    print "doctree"
+.namespace [ 'Pod';'DocTree';'Compiler' ]
+
+.sub 'to_html' :method
+    .param pmc node
+    .param pmc adverbs :slurpy :named
 .end
 
-.loadlib 'pod_group'
+.sub 'as_html' :method :multi(_,['Pod';'DocTree';'File'])
+    .param pmc node
+    .local string html
+    html = "<html>"
+
+
+    html .= "</html>"
+
+    .return (html)
+.end
+
+
+.sub 'as_html' :method :multi(_,['Pod';'DocTree';'Heading'])
+    .param pmc node
+    .local string html
+    .local string level
+    # create opening heading tag, e.g. <h1>
+    html = "<h"
+    $I0  = node."level"()
+    level = $I0
+    html .= level
+    html .= ">"
+
+    # create closin heading tag, e.g. </h1>
+    html .= "</h"
+    html .= level
+    html .= ">"
+
+.end
+
+
+
+.namespace [ 'Pod';'Compiler' ]
+
+.sub 'doctree' :method
+    .param pmc node
+    .param pmc adverbs :slurpy :named
+.end
+
+.sub 'html' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
+
+    $P0 = new ['Pod';'HTML';'Compiler']
+    .tailcall $P0.'to_html'(source, adverbs :flat :named)
+.end
+
+
 
 .sub '' :anon :load :init
     load_bytecode 'PCT.pbc'
@@ -64,9 +110,11 @@ object.
 
 
     ##  set the compilation stages in the @stages attribute
-    $P0 = split ' ', 'parse doctree'
+    $P0 = split ' ', 'parse doctree html'
     setattribute $P1, '@stages', $P0
 .end
+
+
 
 =item main(args :slurpy)  :main
 
@@ -82,7 +130,7 @@ to the Pod compiler.
     $P1 = $P0.'command_line'(args)
 .end
 
-.include 'src/Pod/DocTree/Node.pir'
+
 
 =back
 

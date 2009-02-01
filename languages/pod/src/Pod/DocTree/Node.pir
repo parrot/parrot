@@ -17,20 +17,20 @@ representation of a Pod document.
     .local pmc p6meta, parent, base
     p6meta = new 'P6metaclass'
     parent = get_class ['PCT';'Node']
-    base = p6meta.'new_class'('Pod;DocTree;Node', 'parent'=>parent)
+    base = p6meta.'new_class'('Pod::DocTree::Node', 'parent'=>parent)
 
-    p6meta.'new_class'('Pod;DocTree;File',        'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;Heading',     'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;Block',       'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;List',        'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;Item',        'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;Text',        'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;Format',      'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;Paragraph',   'parent'=>base)
-    p6meta.'new_class'('Pod;DocTree;Literal',     'parent'=>base)
-
-    .return ()
+    p6meta.'new_class'('Pod::DocTree::File',        'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Heading',     'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Block',       'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::List',        'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Item',        'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Text',        'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Format',      'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Paragraph',   'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Literal',     'parent'=>base)
 .end
+
+
 
 =head1 Pod;DocTree Node Types
 
@@ -72,6 +72,8 @@ The C<title> attribute is the heading title text.
 Get/set the heading level for this node.
 
 =cut
+
+
 
 .namespace [ 'Pod';'DocTree';'Heading' ]
 
@@ -198,7 +200,6 @@ original Pod). Literals have multiple children, which may be text sections
 or format nodes.
 
 =cut
-
 
 # Local Variables:
 #   mode: pir

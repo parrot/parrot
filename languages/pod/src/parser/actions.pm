@@ -20,7 +20,7 @@ class Pod::Grammar::Actions;
 
 
 method TOP($/) {
-    my $file := Pod::DocTree::File.new();
+    my $file := PAST::Block.new();
 
     for $<pod_section> {
         $file.push( $( $_ ) );
@@ -60,7 +60,6 @@ sub title($/, $block) {
 }
 
 method heading($/) {
-    say("heading");
     my $heading := Pod::DocTree::Heading.new();
     ## set the level of the heading
     $heading.level($<digit>);
