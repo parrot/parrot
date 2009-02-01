@@ -49,7 +49,6 @@ sub _init {
         regex
         scheme squaak
         urm
-        Zcode
     };
     $data{languages_source} = q{config/gen/makefiles/languages.in};
     return \%data;

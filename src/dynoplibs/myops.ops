@@ -97,12 +97,12 @@ op alarm(in NUM, in NUM, in PMC) {
 =item B<conv_u2>(inout INT)
 
 Conversion of a two byte unsigned int to an INT.
-Formerly in dotgnu.ops. Used only in ./languages/Zcode/z3main.pir.
+Formerly in dotgnu.ops.
 
 =item B<conv_i2>(inout INT)
 
 Conversion of a two byte signed int to an INT.
-Formerly in dotgnu.ops. Used only in ./languages/Zcode/z3main.pir.
+Formerly in dotgnu.ops.
 
 =cut
 

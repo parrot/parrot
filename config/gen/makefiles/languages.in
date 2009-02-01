@@ -26,8 +26,7 @@ LANGUAGES = \
     parrot_compiler perl6 pheme PIR pipp punie pynie \
     regex \
     scheme squaak \
-    urm \
-    Zcode
+    urm
 
 # the default target
 all: $(LANGUAGES)
@@ -130,8 +129,7 @@ test-separate: all \
     parrot_compiler.test perl6.test pheme.test PIR.test pipp.test punie.test pynie.test \
     regex.test \
     scheme.test squaak.test \
-    urm.test \
-    Zcode.test
+    urm.test
 
 clean: \
     abc.clean APL.clean \
@@ -147,8 +145,7 @@ clean: \
     parrot_compiler.clean perl6.clean pheme.clean PIR.clean pipp.clean punie.clean pynie.clean \
     regex.clean \
     scheme.clean squaak.clean \
-    urm.clean \
-    Zcode.clean
+    urm.clean
 
 realclean: \
     abc.realclean APL.realclean \
@@ -163,8 +160,7 @@ realclean: \
     parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
     regex.realclean \
     scheme.realclean squaak.realclean \
-    urm.realclean \
-    Zcode.realclean
+    urm.realclean
 
 
 #
@@ -461,16 +457,6 @@ urm.clean:
 	- $(MAKE) urm clean
 urm.realclean:
 	- $(MAKE) urm realclean
-
-Zcode : Zcode.dummy
-Zcode.dummy:
-# Do nothing. make Zcode requires an Inform compiler
-Zcode.test:
-	- $(MAKE) Zcode test
-Zcode.clean:
-	- $(MAKE) Zcode clean
-Zcode.realclean:
-	- $(MAKE) Zcode realclean
 
 # helpers for checking out externally managed languages
 

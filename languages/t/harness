@@ -75,7 +75,6 @@ my $result = GetOptions( 'html'          => \$do_gen_html,
 # pynie                test scripts are written in PIR, not Perl 5
 # scheme               many test failures
 # urm                  uses deprecated parrot features
-# Zcode                Method 'instantiate' not found for 'Zmachine'
 
 my @unified_testable_languages
     = defined $languages_list ?
