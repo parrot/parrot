@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/string.c - Parrot Strings
+src/string/api.c - Parrot Strings
 
 =head1 DESCRIPTION
 
