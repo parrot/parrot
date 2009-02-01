@@ -25,8 +25,9 @@ between two boundaries is located in C<src/gc/api.c:trace_mem_block>.
 */
 
 #include "parrot/parrot.h"
+#include "gc_private.h"
 
-/* HEADERIZER HFILE: include/parrot/gc_api.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -40,14 +41,6 @@ static void trace_system_stack(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#ifdef __ia64__
-
-#  include <ucontext.h>
-extern void *flush_reg_store(void);
-#  define BACKING_STORE_BASE 0x80000fff80000000
-
-#endif
 
 /*
 
@@ -278,7 +271,6 @@ trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
     return;
 }
 #endif
-
 
 /*
 

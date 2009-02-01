@@ -21,6 +21,7 @@ mark/sweep garbage collectors use this code.
 
 #include "parrot/parrot.h"
 #include "parrot/gc_mark_sweep.h"
+#include "gc_private.h"
 
 /* HEADERIZER HFILE: include/parrot/gc_mark_sweep.h */
 

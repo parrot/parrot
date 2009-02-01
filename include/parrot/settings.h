@@ -40,7 +40,7 @@
  * 1 ... IMS incremental mark & sweep
  * 2 ... GMS generational mark & sweep
  *
- * Please note that only '0' is tested.
+ * Please note that only 0 currently works.
  */
 
 #define PARROT_GC_SUBSYSTEM 0
@@ -60,11 +60,6 @@
 #  define PARROT_GC_IMS     0
 #  define PARROT_GC_GMS     1
 #endif
-
-
-/*
- * misc settings
- */
 
 /*
  * JIT/i386 can use the CGP run core for external functions instead
