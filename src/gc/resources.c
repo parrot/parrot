@@ -8,6 +8,8 @@ src/gc/resources.c - Allocate and deallocate tracked resources
 
 =head1 DESCRIPTION
 
+Functions to manage non-PObj memory, including strings and buffers.
+
 =head2 Parrot Memory Management Code
 
 =over 4
