@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
 
-use Parrot::Test tests => 3;
+use Parrot::Test skip_all => "Ongoing work in TT #254";
 
 =head1 NAME
 
