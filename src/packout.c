@@ -10,6 +10,8 @@ src/packout.c - Functions for writing out packfiles
 
 =head1 DESCRIPTION
 
+This file implements various functions for creating and writing packfiles.
+
 =head2 Functions
 
 =over 4
