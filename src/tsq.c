@@ -8,6 +8,8 @@ src/tsq.c - Thread-safe queues
 
 =head1 DESCRIPTION
 
+This file implements thread-safe queues for Parrot.
+
 =head2 Functions
 
 =over 4
