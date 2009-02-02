@@ -567,7 +567,7 @@ Returns the PMC value for the element at C<*key>.
                 void *idx           = parrot_hash_get_idx(INTERP, hash, key);
                 const INTVAL i      = (INTVAL)idx;
                 result              = pmc_new(INTERP, enum_class_Integer);
-                PMC_int_val(result) = i;
+                VTABLE_set_integer_native(INTERP, result, i);
             }
             else {
                 STRING *s = (STRING *)parrot_hash_get_idx(INTERP, hash, key);
@@ -665,7 +665,7 @@ Returns whether the hash is the same as C<*other>.
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
         PMC * const val  = get_integer_pmc(INTERP, SELF->vtable->base_type);
-        PMC_int_val(val) = value;
+        VTABLE_set_integer_native(INTERP, val, value);
 
         parrot_hash_put(INTERP, (Hash *)PMC_struct_val(SELF), key, val);
     }

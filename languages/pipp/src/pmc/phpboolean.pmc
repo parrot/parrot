@@ -51,7 +51,7 @@ Return the string '1' or ''.
 
 */
     STRING* get_string() {
-        if (PMC_int_val(SELF))
+        if (SELF.get_integer())
             return const_string(INTERP, "1");
         else
             return const_string(INTERP, "");

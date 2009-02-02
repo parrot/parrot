@@ -71,12 +71,12 @@ Return "1" or "0".
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        PMC_int_val(SELF) = (value != 0);
+        SUPER((value != 0));
     }
 
 
     VTABLE void set_bool(INTVAL value) {
-        PMC_int_val(SELF) = (value != 0);
+        SELF.set_integer_native(value);
     }
 
 /*
