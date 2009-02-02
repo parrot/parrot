@@ -13,6 +13,9 @@ that are only for use in the GC and don't need to be included in the rest of
 Parrot.
 */
 
+#ifndef PARROT_GC_PRIVATE_H_GUARD
+#define PARROT_GC_PRIVATE_H_GUARD
+
 #include "parrot/settings.h"
 
 #if ! DISABLE_GC_DEBUG
@@ -38,3 +41,12 @@ void trace_system_areas(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/system.c */
+
+#endif /* PARROT_GC_PRIVATE_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */

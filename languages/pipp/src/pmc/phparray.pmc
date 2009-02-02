@@ -1934,7 +1934,7 @@ function.
             PMC    *key;
             STRING *get_key = CONST_STRING(INTERP, "get_key");
 
-			Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
+            Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
             VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_FROM_START);
         }
         RETURN(void);
@@ -1958,10 +1958,10 @@ insertion order.  This method emulates the behavior of PHP's C<end()> function.
 
         ht->internalPointer = ht->tableTail;
         if (ht->iter) {
-			PMC    *key;
-			STRING *get_key = CONST_STRING(INTERP, "get_key");
+            PMC    *key;
+            STRING *get_key = CONST_STRING(INTERP, "get_key");
 
-			Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
+            Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
             VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_FROM_END);
         }
         RETURN(void);
@@ -2073,10 +2073,10 @@ be returned.
 
             ht->internalPointer = ht->internalPointer->tableNext;
             if (ht->iter) {
-				PMC    *key;
-				STRING *get_key = CONST_STRING(INTERP, "get_key");
+                PMC    *key;
+                STRING *get_key = CONST_STRING(INTERP, "get_key");
 
-				Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
+                Parrot_PCCINVOKE(INTERP, ht->iter, get_key, "->P", &key);
                 VTABLE_nextkey_keyed(INTERP, key, SELF, ITERATE_GET_NEXT);
             }
 
