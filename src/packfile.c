@@ -1420,7 +1420,7 @@ default_unpack(ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
         for (i = 0; i < (int)self->size; i++) {
             self->data[i] = PF_fetch_opcode(self->pf, &cursor);
 #if TRACE_PACKFILE
-            Parrot_io_eprintf(NULL, "default_unpack: transformed op[#%d]/%d %u\n", 
+            Parrot_io_eprintf(NULL, "default_unpack: transformed op[#%d]/%d %u\n",
                 i, self->size, self->data[i]);
 #endif
         }
@@ -1980,7 +1980,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
                 return 0;
             }
 #if TRACE_PACKFILE == 2
-        Parrot_io_eprintf(NULL, "Segment offset: new pos 0x%x (src=0x%x cursor=0x%x).\n", 
+        Parrot_io_eprintf(NULL, "Segment offset: new pos 0x%x (src=0x%x cursor=0x%x).\n",
             pos - pf->src, pf->src, cursor);
 #endif
         }
@@ -2059,7 +2059,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         else
             delta = pos - cursor;
 #if TRACE_PACKFILE == 2
-        Parrot_io_eprintf(NULL, "  delta=%d pos=0x%x cursor=0x%x\n", 
+        Parrot_io_eprintf(NULL, "  delta=%d pos=0x%x cursor=0x%x\n",
             delta, pos, cursor);
 #endif
 
@@ -3280,7 +3280,7 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
                 entry->offset = PF_fetch_opcode(pf, &cursor);
 #if TRACE_PACKFILE == 2
         Parrot_io_eprintf(interp,
-                "PackFile_FixupTable_unpack(): type %d, name %s, offset %ld\n", 
+                "PackFile_FixupTable_unpack(): type %d, name %s, offset %ld\n",
                 entry->type, entry->name, entry->offset);
 #endif
                 break;
@@ -3523,7 +3523,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
     for (i = 0; i < self->const_count; i++) {
 #if TRACE_PACKFILE
         Parrot_io_eprintf(interp,
-                "PackFile_ConstTable_unpack(): Unpacking constant %ld/%ld\n", 
+                "PackFile_ConstTable_unpack(): Unpacking constant %ld/%ld\n",
                 i, self->const_count);
 #endif
 
