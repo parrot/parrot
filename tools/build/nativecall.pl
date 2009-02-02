@@ -70,11 +70,11 @@ my %sig_table = (
     b => { as_proto => "void *", as_return => "", sig_char => "S" },
     B => { as_proto => "void **", as_return => "", sig_char => "S" },
     # These should be replaced by modifiers in the future
-    2 => { as_proto => "short *",  sig_char => "P",
+    2 => { as_proto => "short *",  sig_char => "P", return_type => "short",
            ret_assign => "set_nci_I(interp, &st, *return_data);" },
-    3 => { as_proto => "int *",  sig_char => "P",
+    3 => { as_proto => "int *",  sig_char => "P", return_type => "int",
            ret_assign => "set_nci_I(interp, &st, *return_data);" },
-    4 => { as_proto => "long *",  sig_char => "P",
+    4 => { as_proto => "long *",  sig_char => "P", return_type => "long",
            ret_assign => "set_nci_I(interp, &st, *return_data);" },
     L => { as_proto => "long *", as_return => "" },
     T => { as_proto => "char **", as_return => "" },
@@ -361,8 +361,11 @@ sub make_arg {
     /[234]/ && do {
         my $ret_type = $sig_table{$_}{return_type};
         push @{$temps_ref},          "PMC *t_$temp_num;";
+        push @{$temps_ref},          "$ret_type i_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "($ret_type)&PMC_int_val(t_$temp_num)";
+        push @{$extra_preamble_ref}, "i_$temp_num = ($ret_type) VTABLE_get_integer(interp, t_$temp_num);";
+        push @{$extra_postamble_ref}, "VTABLE_set_integer_native(interp, t_$temp_num, i_$temp_num);";
+        return "&i_$temp_num";
     };
     /t/ && do {
         push @{$temps_ref}, "char *t_$temp_num;";
@@ -417,26 +420,7 @@ sub print_function {
     if ( length $params ) {
         my $proto = join ', ', map { $sig_table{$_}{as_proto} } split( m//, $params );
 
-        # This is an after-the-fact hack: real fix would be in make_arg
-        # or somewhere at that level.  The main point being that one cannot
-        # just cast pointers and expect things to magically align.  Instead
-        # of trying to: (int*)&something_not_int, one HAS to use temporary
-        # variables.  We detect and collect those to "temp".
-        my @temp;
-        for my $i ( 0 .. $#$args ) {
-            if ( $args->[$i] =~ /^\((.+)\*\)&(.+)$/ ) {
-                $temp[$i] = [ $1, $2 ];
-                $args->[$i] = "&arg$i";
-            }
-        }
         my $call_params = join( ",", @$args );
-        my @tempi = grep { defined $temp[$_] } 0 .. $#$args;
-        my $temp_decl = join( "\n    ", map { "$temp[$_]->[0] arg$_;" } @tempi );
-        ## shorts need to be properly cast
-        my $temp_in = join( "\n    ",
-            map { "arg$_ = " . ( 'short' eq $temp[$_]->[0] ? '(short)' : '' ) . "$temp[$_]->[1];" }
-                @tempi );
-        my $temp_out = join( "\n    ", map { "$temp[$_]->[1] = arg$_;" } @tempi );
 
         print $NCI <<"HEADER";
 static void
@@ -446,15 +430,12 @@ pcf_${return}_$fix_params(PARROT_INTERP, PMC *self)
     func_t pointer;
     $call_state
     $return_data
-    $temp_decl
     $other_decl
     Parrot_init_arg_nci(interp, &st, \"$sig\");
     $extra_preamble
 
     pointer =  (func_t)D2FPTR(PMC_struct_val(self));
-    $temp_in
     $return_assign ($ret_type)(*pointer)($call_params);
-    $temp_out
     $final_assign
     $extra_postamble
 }
