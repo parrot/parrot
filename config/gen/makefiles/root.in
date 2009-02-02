@@ -1443,7 +1443,7 @@ CONFIGURE_TEST_FILES = \
 test_prep : all
 
 # We always want to test annotations are persisted in PBC during make test.
-test_pbc_annotation_persistence :
+test_pbc_annotation_persistence : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r t/op/annotate.t
 
 # Run test cases with a single call of t/harness. Users have to look at only
