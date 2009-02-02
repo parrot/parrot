@@ -810,7 +810,7 @@ sub generated_files {
 
     return {
         map { File::Spec->catfile( $path, $_ ) => $generated->{$_} }
-            keys %$generated
+            keys %{$generated};
     };
 }
 

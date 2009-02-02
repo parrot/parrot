@@ -328,16 +328,17 @@ use vars qw(\$VERSION \$ops \$preamble);
 
 END_C
 
-    print $MODULE $preamble;
-    print $MODULE Data::Dumper->Dump( [ $self->{real_ops}->preamble, [ $self->{real_ops}->ops ] ],
+    print {$MODULE} $preamble;
+    print {$MODULE} Data::Dumper->Dump( [ $self->{real_ops}->preamble, [ $self->{real_ops}->ops ] ],
         [qw($preamble $ops)] );
 
-    print $MODULE <<END_C;
+    print {$MODULE} <<END_C;
 
 1;
 END_C
 
-    close $MODULE;
+    close $MODULE or die;
+
     return 1;
 }
 

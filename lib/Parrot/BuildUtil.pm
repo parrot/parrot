@@ -2,12 +2,13 @@
 # $Id$
 
 package Parrot::BuildUtil;
+
 use strict;
 use warnings;
 
 =head1 NAME
 
-Parrot:BuildUtil - Utilities for building Parrot
+Parrot::BuildUtil - Utilities for building Parrot
 
 =head1 DESCRIPTION
 
@@ -41,9 +42,9 @@ sub parrot_version {
     }
 
     # Obtain the official version number from the VERSION file.
-    open my $VERSION, '<', 'VERSION' or die "Could not open VERSION file!";
+    open my $VERSION, '<', 'VERSION' or die 'Could not open VERSION file!';
     chomp( $parrot_version = <$VERSION> );
-    close $VERSION;
+    close $VERSION or die $!;
 
     $parrot_version =~ s/\s+//g;
     @parrot_version = split( /\./, $parrot_version );
@@ -79,7 +80,7 @@ sub slurp_file {
     local $/ = undef;
     my $file = <$SLURP> . '';
     $file =~ s/\cM\cJ/\n/g;
-    close $SLURP;
+    close $SLURP or die $!;
 
     return $file;
 }

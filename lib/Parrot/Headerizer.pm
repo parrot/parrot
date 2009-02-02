@@ -75,49 +75,49 @@ sub extract_function_declarations {
     my $self = shift;
     my $text = shift;
 
-    $text =~ s[/\*\s*HEADERIZER STOP.+][]s;
+    $text =~ s{/\*\s*HEADERIZER STOP.+}{}s;
 
     # Strip blocks of comments
-    $text =~ s[^/\*.*?\*/][]mxsg;
+    $text =~ s{^/\*.*?\*/}{}mxsg;
 
     # Strip # compiler directives (Thanks, Audrey!)
-    $text =~ s[^#(\\\n|.)*][]mg;
+    $text =~ s{^#(\\\n|.)*}{}mg;
 
     # Strip code blocks
-    $text =~ s[^{.+?^}][]msg;
+    $text =~ s/^{.+?^}//msg;
 
     # Split on paragraphs
     my @funcs = split /\n{2,}/, $text;
 
     # If it doesn't start in the left column, it's not a func
-    @funcs = grep /^\S/, @funcs;
+    @funcs = grep { /^\S/ } @funcs;
 
     # Typedefs, enums and externs are no good
-    @funcs = grep !/^(typedef|enum|extern)\b/, @funcs;
+    @funcs = grep { !/^(?:typedef|enum|extern)\b/ } @funcs;
 
     # Structs are OK if they're not alone on the line
     @funcs = grep { !/^struct.+;\n/ } @funcs;
 
     # Structs are OK if they're not being defined
-    @funcs = grep { !/^(static\s+)?struct.+{\n/ } @funcs;
+    @funcs = grep { !/^(?:static\s+)?struct.+{\n/ } @funcs;
 
     # Ignore magic function name YY_DECL
-    @funcs = grep !/YY_DECL/, @funcs;
+    @funcs = grep { !/YY_DECL/ } @funcs;
 
     # Ignore anything with magic words HEADERIZER SKIP
-    @funcs = grep !m{/\*\s*HEADERIZER SKIP\s*\*/}, @funcs;
+    @funcs = grep { !m{/\*\s*HEADERIZER SKIP\s*\*/} } @funcs;
 
     # Variables are of no use to us
-    @funcs = grep !/=/, @funcs;
+    @funcs = grep { !/=/ } @funcs;
 
     # Get rid of any blocks at the end
     s/\s*{.*//s for @funcs;
 
     # Toast anything non-whitespace
-    @funcs = grep /\S/, @funcs;
+    @funcs = grep { /\S/ } @funcs;
 
     # If it's got a semicolon, it's not a function header
-    @funcs = grep !/;/, @funcs;
+    @funcs = grep { !/;/ } @funcs;
 
     chomp @funcs;
 
@@ -166,7 +166,7 @@ sub function_components_from_declaration {
     }
 
     my $return_type = shift @lines;
-    my $args = join( " ", @lines );
+    my $args = join( ' ', @lines );
 
     $args =~ s/\s+/ /g;
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
