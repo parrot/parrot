@@ -357,28 +357,6 @@ sub gen_attributes {
 
 }
 
-# RT #43737 quick hack - to get MMD variants
-sub get_super_mmds {
-    my ( $self, $vt_method_name, $right, $mmd_prefix ) = @_;
-    my @mmds;
-
-    my $super_mmd_rights = $self->{super_mmd_rights}{$vt_method_name};
-    if ($super_mmd_rights) {
-        while ( my ( $super_pmc_name, $mmd_rights ) = each %$super_mmd_rights )
-        {
-            for my $x ( @{$mmd_rights} ) {
-                next if $x eq "DEFAULT";
-                my $right      = "enum_class_$x";
-                my $super_name =
-                    "Parrot_${super_pmc_name}_${vt_method_name}_$x";
-                push @mmds, [ $mmd_prefix, 0, $right, $super_name ];
-            }
-        }
-    }
-
-    return @mmds;
-}
-
 =item C<find_multi_functions()>
 
 Returns an arrayref of MULTI function names declared in the PMC. Used to
@@ -400,80 +378,6 @@ sub find_multi_functions {
         push @multi_names, [ $method->symbol, $short_sig, $full_sig, $functionname ];
     }
     return ( \@multi_names );
-}
-
-=item C<find_mmd_methods()>
-
-Returns three values:
-
-The first is an arrayref of <[ mmd_number, left, right, implementation_func]>
-suitable for initializing the MMD list.
-
-The second is a arrayref listing dynamic PMCs which will need to be looked up.
-
-The third is a list of C<[index, dynamic PMC]> pairs of right entries
-in the MMD table that will need to be resolved at runtime.
-
-=cut
-
-sub find_mmd_methods {
-    my ($self)  = @_;
-    my $pmcname = $self->name;
-
-    my ( @mmds, @init_mmds, %init_mmds );
-
-    foreach my $vt_method ( @{ $self->vtable->methods } ) {
-        my $vt_method_name = $vt_method->name;
-        next unless $vt_method->is_mmd;
-
-        my $implementor;
-        if ( $self->implements_vtable($vt_method_name) ) {
-            $implementor = $pmcname;
-        }
-        else {
-            my $class = $self->{super}{$vt_method_name};
-            next
-                if $class =~ /^[A-Z]/
-                or $class eq 'default'
-                or $class eq 'delegate';
-            $implementor = $class;
-        }
-
-        my ( $mmd_method_name, $func, $left, $right );
-        $mmd_method_name = "Parrot_${implementor}_$vt_method_name";
-        $func            = $vt_method->mmd_prefix;
-
-        # dynamic PMCs need the runtime type which is passed in entry to
-        # class_init
-
-        # set to 'entry' below in initialization loop.
-        $left  = 0;
-        $right = $vt_method->right;
-
-        if ( exists $self->{super}{$vt_method_name} ) {
-            push @mmds, $self->get_super_mmds( $vt_method_name, $right, $func );
-        }
-
-        push @mmds, [ $func, $left, $right, $mmd_method_name ];
-
-        my $pmc_method = $self->get_method($vt_method_name);
-        if ($pmc_method) {
-            foreach my $mmd ( @{ $pmc_method->mmds } ) {
-                my $right = $mmd->right;
-                if ( $self->is_dynamic($right) ) {
-                    $right = 0;
-                    push @init_mmds, [ scalar @mmds, $mmd->right ];
-                    $init_mmds{ $mmd->right } = 1;
-                }
-                else {
-                    $right = "enum_class_$right";
-                }
-                $mmd_method_name = "Parrot_" . $self->name . "_" . $mmd->name;
-                push @mmds, [ $func, $left, $right, $mmd_method_name ];
-            }
-        }
-    }
-    return ( \@mmds, \@init_mmds, [ keys %init_mmds ] );
 }
 
 sub build_full_c_vt_method_name {
@@ -551,8 +455,6 @@ sub init_func {
 
     my $cout      = "";
     my $classname = $self->name;
-
-    my ( $mmds, $init_mmds, $dyn_mmds ) = $self->find_mmd_methods();
 
     my $enum_name   = $self->is_dynamic ? -1 : "enum_class_$classname";
     my $vtable_decl = $self->vtable_decl( 'temp_base_vtable', $enum_name );
@@ -762,36 +664,6 @@ EOC
     $cout .= <<"EOC";
         {
 EOC
-
-    # declare auxiliary variables for dyncpmc IDs
-    foreach my $dynpmc (@$dyn_mmds) {
-        next if $dynpmc eq $classname;
-        $cout .= <<"EOC";
-            const int my_enum_class_$dynpmc = pmc_type(interp, string_from_literal(interp, "$dynpmc"));
-EOC
-    }
-
-    # init MMD "right" slots with the dynpmc types
-    foreach my $entry (@$init_mmds) {
-        if ( $entry->[1] eq $classname ) {
-            $cout .= <<"EOC";
-            _temp_mmd_init[$entry->[0]].right = entry;
-EOC
-        }
-        else {
-            $cout .= <<"EOC";
-            _temp_mmd_init[$entry->[0]].right = my_enum_class_$entry->[1];
-EOC
-        }
-    }
-
-    # just to be safe
-    foreach my $dynpmc (@$dyn_mmds) {
-        next if $dynpmc eq $classname;
-        $cout .= <<"EOC";
-            PARROT_ASSERT(my_enum_class_$dynpmc != enum_class_default);
-EOC
-    }
 
 
     if ( @$multi_funcs ) {
