@@ -30,6 +30,8 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/dynext.h"
 #include "pmc_class.h"
 
+#include "../io/io_private.h"
+
 /*
 
 =item C<void
@@ -701,11 +703,12 @@ Finish thawing.
     METHOD run_gc() {
         Parrot_do_dod_run(PMC_data_typed(SELF, Parrot_Interp), 0);
     }
+
 /*
 
 =item METHOD hll_map(PMC core_type,PMC hll_type)
 
-Finish thawing.
+Map core_type to hll_type.
 
 =cut
 
@@ -716,6 +719,32 @@ Finish thawing.
         INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
         INTVAL hll_id       = CONTEXT(interp)->current_HLL;
         Parrot_register_HLL_type(INTERP, hll_id, core_type_id, hll_type_id);
+    }
+
+/*
+
+=item METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional)
+
+Returns the standard parrot handler asscoiated with the interpreter.
+The valid values for fileno are listed in include/stdio.pasm
+
+Optionally sets the parrot handler passed as second argument
+as the specified standard handler.
+
+This method is experimental.
+
+=cut
+
+*/
+
+    METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
+        PMC * handle = PMCNULL;
+        if (fileno >= PIO_STDIN_FILENO && fileno <= PIO_STDERR_FILENO) {
+            handle = interp->piodata->table[fileno];
+            if (!PMC_IS_NULL(newhandle))
+                interp->piodata->table[fileno] = newhandle;
+        }
+        RETURN(PMC *handle);
     }
 
 
