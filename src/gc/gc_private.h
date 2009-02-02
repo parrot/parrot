@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001-2009, The Perl Foundation.
-$Id: api.c 36259 2009-02-01 20:58:23Z whiteknight $
+$Id$
 
 =head1 NAME
 
