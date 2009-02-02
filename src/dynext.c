@@ -8,6 +8,8 @@ src/dynext.c - Dynamic extensions to Parrot
 
 =head1 DESCRIPTION
 
+Functions for loading and initializing dynamic link libraries.
+
 =head2 Functions
 
 =over 4
