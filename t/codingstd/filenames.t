@@ -59,11 +59,12 @@ Paul Cochrane <paultcochrane at gmail dot com>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my $manifest = maniread('MANIFEST');
 my @files;
 if (@ARGV){
     @files = @ARGV;
-} else {
+}
+else {
+    my $manifest = maniread('MANIFEST');
     # Give ports a little more leeway
     @files = grep {! /^ports/} sort keys %$manifest;
 }
