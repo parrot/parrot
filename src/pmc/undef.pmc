@@ -148,6 +148,9 @@ Returns an empty string.
 */
 
     VTABLE STRING *get_string() {
+        Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
+            "Stringifying an Undef PMC");
+
         return string_make_empty(INTERP, enum_stringrep_one, 0);
     }
 

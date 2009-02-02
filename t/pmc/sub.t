@@ -732,9 +732,7 @@ main
 back
 OUTPUT
 
-# This is the behavior of Parrot 0.4.3
-# RT #46817 Should there be a warning ?
-pir_output_is( <<'CODE', '', 'warn on in main' );
+pir_output_like( <<'CODE', '/Stringifying an Undef PMC/', 'warn on in main' );
 .sub _main :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -761,10 +759,7 @@ CODE
 ok
 OUTPUT
 
-# RT #46819 This is the behavior of Parrot 0.4.3
-# It looks like core PMCs never emit warning.
-# Look in perlundef.t for a more sane test of 'warningson' in subs
-pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
+pir_output_like( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
 .sub _main :main
 .include "warnings.pasm"
     _f1()
@@ -783,8 +778,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', "warn on in sub, turn off in f2" );
     warningsoff .PARROT_WARNINGS_UNDEF_FLAG
 .end
 CODE
+/Stringifying an Undef PMC
+.*
 back
-ok
+ok/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub names" );
