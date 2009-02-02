@@ -674,7 +674,7 @@ C<name>.
 
 */
 
-    VTABLE void remove_attribute(STRING *name, PMC *type) {
+    VTABLE void remove_attribute(STRING *name) {
         Parrot_Class_attributes * const _class        = PARROT_CLASS(SELF);
 
         /* If we've been instantiated already, not allowed. */
