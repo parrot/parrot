@@ -52,6 +52,7 @@ into your report. We need your wordsize/floattype/endianess.
 
 # execute the file t/native_pbc/integer_1.pbc
 #
+# any ordinary intel 386 linux, cygwin, mingw, MSWin32, ...
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 0   (interpreter's byteorder       = 0)
@@ -68,6 +69,7 @@ local $TODO = "Known problem on 64bit with reading 32bit dirs. See TT #254"
 pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval" )
     or diag "May need to regenerate t/native_pbc/integer_1.pbc; read test file";
 
+# darwin/ppc:
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 1   (interpreter's byteorder       = 1)
@@ -81,6 +83,7 @@ pbc_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval")
     or diag "May need to regenerate t/native_pbc/integer_2.pbc; read test file";
 }
 
+# any ordinary 64-bit intel unix:
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)

@@ -82,6 +82,7 @@ END_OUTPUT
 
 # execute t/native_pbc/number_1.pbc
 #
+# any ordinary intel 386 linux, cygwin, mingw, MSWin32, ...
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 0   (interpreter's byteorder       = 0)
@@ -98,6 +99,7 @@ local $TODO = "Known problem on 64bit with reading 32bit dirs. See TT #254"
 pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
     or diag "May need to regenerate t/native_pbc/number_1.pbc; read test file";
 
+# darwin/ppc:
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 1   (interpreter's byteorder       = 1)
@@ -111,6 +113,7 @@ pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
     or diag "May need to regenerate t/native_pbc/number_2.pbc; read test file";
 }
 
+# any ordinary 64-bit intel unix:
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)
@@ -120,8 +123,13 @@ pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
+TODO: {
+local $TODO = "Known problem on 64bit double-float gentoo-amd64, but not solaris-64int. See TT #254"
+  if $PConfig{ptrsize} == 8;
+
 pbc_output_is(undef, $output, "x86_64 double float 64 bit opcode_t")
     or diag "May need to regenerate t/native_pbc/number_3.pbc; read test file";
+}
 
 # Formerly there were tests for:
 # pbc_output_is(undef, <<OUTPUT, "i386 long double float 32 bit opcode_t"); #_2
