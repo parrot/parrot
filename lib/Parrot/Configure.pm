@@ -303,7 +303,7 @@ sub _handle_fatal_step_option {
         }
     }
     else {
-        die q{Argument to "fatal-step" option must be comma-delimited string of valid configuration steps};
+        die q{Argument to fatal-step option must be comma-delimited string of valid configuration steps};
     }
     return %steps_to_die_for;
 }
@@ -323,7 +323,7 @@ sub _handle_verbose_step_option {
         }
     }
     else {
-        die q{Argument to "verbose-step" option must be comma-delimited string of valid configuration steps};
+        die q{Argument to verbose-step option must be comma-delimited string of valid configuration steps};
     }
     return %verbose_steps;
 }
