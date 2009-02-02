@@ -5,7 +5,7 @@
 
 /*
  * Sample Foo class used to verify dynamic loading and
- * proper inheritance - used for testing only
+ * proper inheritance - for testing only
  */
 
 pmclass Foo dynpmc provides scalar extends Integer {

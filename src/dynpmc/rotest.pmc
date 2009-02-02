@@ -5,7 +5,7 @@
 
 /*
  * Sample class used to verify read-only variant
- * generation. For testing only.
+ * generation.  For testing only.
  */
 
 pmclass ROTest dynpmc provides scalar extends Integer {
