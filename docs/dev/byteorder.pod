@@ -7,27 +7,51 @@ docs/dev/byteorder.pod - Byteorder Conversion Functions
 
 =head1 Overview
 
+The platform byteorder is stored for C code in F<include/parrot/config.h>
+
+  #define PARROT_BYTEORDER        0x1234
+
+for parrot code in
+
+  $P0 = _config()
+  $P0["byteorder"]
+
+or for perl code via
+
+  use Parrot::Config;
+  $PConfig{byteorder};
+
+The byteorder values are analog to perl, see L<perlfunc/pack>:
+
+  1234  little-endian 32-bit, 12345678  little-endian 64-bit
+  4321  big-endian 32-bit,    87654321  big-endian 64-bit
+
+When reading a pbc stored in a different architecture, the pbc header defines
+the pbc byteorder for the architecture which stored the pbc, and the
+F<src/packfile/pf_items.c> functions are used to convert the values to the
+native endianness, wordsize and ptrsize.
+
 The byteorder code will check the endianness of an C<INTVAL> or an C<opcode_t>
 value and swap from little to big, or big to little when appropriate. Functions
 also exist to convert a 4, 8, 12, or 16 byte character buffer to big or little
-endian.  The functions will be placed in the PackFile vtable and will be called
-when necessary. The Parrot interpreter should be smart enough to avoid calling
+endian. The functions are be placed in the PackFile vtable and are be called
+when necessary. The Parrot interpreter is be smart enough to avoid calling
 these functions when converting from and to the same byteorder.
 
 =head1 Data Structures and Algorithms
 
 The algorithm to change from one endianness to another is identical and simple
 to understand.  Basically, the size of an C<INTVAL> or C<opcode_t> is used to
-determine at compile time how many bits should be shifted around.  Then the
+determine at compile time how many bits should be shifted around. Then the
 correct bits are shifted by the correct amounts (please look at source code for
-exact amounts).  The buffer change functions are implemented by a straight
+exact amounts). The buffer change functions are implemented by a straight
 forward algorithm that assigns swaps all of the bytes.
 
 =head1 Important Functions
 
 =over 4
 
-=item C<fetch_iv_le> 
+=item C<fetch_iv_le>
 
 This function will convert an C<INTVAL> into little endian format.  It is a
 no-op if the native format is already little endian.
@@ -59,6 +83,29 @@ This set of functions will convert an unsigned character buffer into big endian
 format.  Only a C<memcpy> is performed if the native format is already big
 endian.
 
+=head1 Low level FLOATVAL fetch and convert functions
+
+We support two different floattypes, stored in the pbc header as 0 or 1.
+
+  Floattype 0 = IEEE-754 8 byte double
+  Floattype 1 = x86 little endian 12 byte long double
+
+=over 4
+
+=item C<cvt_num12_num8>
+
+Converts i386 LE 12-byte long double to IEEE 754 8 byte double.
+
+=item C<cvt_num12_num8_be>
+
+Converts a 12-byte i386 long double into a big-endian IEEE 754 8-byte double.
+Converting to BE is not yet implemented (throws internal_exception).
+
+=item C<cvt_num12_num8_le>
+
+Converts a 12-byte i386 long double into a little-endian IEEE 754
+8-byte double.
+
 =back
 
 =head1 Unimplemented Functions
@@ -77,7 +124,8 @@ Put an C<INTVAL> directly on a bytestream
 
 =head1 History
 
-Initial version by Melvin on 2002/05/01
+Initial version by Melvin on 2002-01-05,
+more byteorder explanations by Reini Urban 2009-02-02
 
 =head1 Notes
 
@@ -86,3 +134,13 @@ middle endian) are not supported.  Also, an assumption of 4 or 8 byte
 C<INTVAL>'s and C<opcode_t>'s is made.
 
 =head1 References
+
+The fetch and transformer functions are implemented in F<src/packfile/pf_items.c>
+
+=cut
+
+__END__
+Local Variables:
+  fill-column:78
+End:
+vim: expandtab shiftwidth=2 textwidth=70:
