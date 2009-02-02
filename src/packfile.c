@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -2011,14 +2011,14 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         seg->dir         = dir;
     }
 
-#  if TRACE_PACKFILE == 2
+#if TRACE_PACKFILE == 2
     Parrot_io_eprintf(NULL, "pre-ALIGN_16: cursor=0x%x\n", cursor);
     /* FIXME on 64bit reading 32bit */
-#  endif
+#endif
     ALIGN_16(pf->src, cursor);
-#  if TRACE_PACKFILE == 2
+#if TRACE_PACKFILE == 2
     Parrot_io_eprintf(NULL, "ALIGN_16: src=0x%x cursor=0x%x\n", pf->src, cursor);
-#  endif
+#endif
 
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
