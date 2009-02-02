@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -153,7 +153,7 @@ else {
 
         if ( $send_to_smolder_flag ) {
             $env_data{report_file} = $report_file;
-            $env_data{project_id}  = 999;
+            $env_data{project_id}  = 12;
             $env_data{test_prog}   = $ENV{PARROT_LUA_TEST_PROG};
             Parrot::Harness::Smoke::send_archive_to_smolder(%env_data);
         }
