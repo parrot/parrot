@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/cpu_dep.c - CPU-dependent functions
+src/gc/system.c - CPU-dependent mark/sweep functions
 
 =head1 DESCRIPTION
 
