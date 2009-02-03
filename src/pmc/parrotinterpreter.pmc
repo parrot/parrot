@@ -31,10 +31,8 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "pmc_class.h"
 
 /* Cancelling this until better solution */
-#if 0
 /* This is a quick hack to test the stdhandle feature */
-#include "../../src/io/io_private.h"
-#endif
+/* include "../../src/io/io_private.h" */
 
 /*
 
