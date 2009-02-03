@@ -19,7 +19,7 @@ $config{PARROTDIR}       = '../..';
 $config{PARROT}          = '..@slash@..@slash@parrot@exe@';
 $config{C_LIBS}          = '@libs@';
 $config{INCLUDE}         = "$config{PARROTDIR}/include";
-#UNLESS(win32):$config{ALL_PARROT_LIBS} = "@libparrot_ldflags@ $config{C_LIBS}";
+#UNLESS(win32):$config{ALL_PARROT_LIBS} = "@libparrot_ldflags@ $config{C_LIBS} @linkflags@";
 $config{ABS_PARROTDIR}   = Cwd::realpath(
                                File::Spec->rel2abs( $config{PARROTDIR} ) );
 $config{LDDLFLAGS}       = $Config{lddlflags};
