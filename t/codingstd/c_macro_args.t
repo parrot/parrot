@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id $
 
 use strict;
@@ -32,7 +32,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new();
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my @files = @ARGV ? <@ARGV> : $DIST->get_c_language_files();
 
 check_macro_args(@files);
 

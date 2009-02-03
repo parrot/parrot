@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -66,7 +66,7 @@ my $manifest_gen = maniread("$build_dir/MANIFEST.generated");
 # if we have files passed in at the command line, use them
 my @files;
 if (@ARGV) {
-    @files = @ARGV;
+    @files = <@ARGV>;
 }
 else {
     diag "finding files with pod, this might take a while.";

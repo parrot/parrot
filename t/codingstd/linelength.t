@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -62,7 +62,7 @@ while (<DATA>) {
 }
 
 # find the files that we need to check
-my @files = @ARGV ? @ARGV : source_files();
+my @files = @ARGV ? <@ARGV> : source_files();
 
 # check all the files and keep a list of those failing
 my @lines_too_long;

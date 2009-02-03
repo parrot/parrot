@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -34,7 +34,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 
 my @files =
       @ARGV
-    ? @ARGV
+    ? <@ARGV>
     : map { $_->path() } Parrot::Distribution->new()->get_c_language_files();
 
 check_indent(@files);

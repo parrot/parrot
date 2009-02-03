@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -44,7 +44,7 @@ my $keywords = join '|' => sort { length $a cmp length $b } qw/
     do        if        static    while     size_t
     /;
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
+my @files = @ARGV ? <@ARGV> : $DIST->get_c_language_files();
 check_parens(@files);
 
 exit;

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -42,7 +42,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 my $DIST = Parrot::Distribution->new();
 my @files;
 if (@ARGV) {
-    @files = @ARGV;
+    @files = <@ARGV>;
 }
 else {
     my %files = map { $_->path() => 1 } $DIST->c_header_files();

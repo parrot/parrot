@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -37,7 +37,7 @@ L<docs/pdds/pdd07_codingstd.pod>
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : source_files();
+my @files = @ARGV ? <@ARGV> : source_files();
 my @failures;
 
 foreach my $file (@files) {

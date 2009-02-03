@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -43,7 +43,7 @@ my $coda = <<'CODA';
 CODA
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_pir_language_files();
+my @files = @ARGV ? <@ARGV> : $DIST->get_pir_language_files();
 my @no_coda;
 my @extra_coda;
 

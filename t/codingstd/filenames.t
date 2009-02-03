@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -61,7 +61,7 @@ Paul Cochrane <paultcochrane at gmail dot com>
 my $DIST = Parrot::Distribution->new;
 my @files;
 if (@ARGV){
-    @files = @ARGV;
+    @files = <@ARGV>;
 }
 else {
     my $manifest = maniread('MANIFEST');

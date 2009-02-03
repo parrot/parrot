@@ -41,7 +41,7 @@ my $coda = <<'CODA';
 CODA
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_make_language_files();
+my @files = @ARGV ? <@ARGV> : $DIST->get_make_language_files();
 
 Parrot::Test::Util::Runloop->testloop(
     name        => 'every file has a coda',

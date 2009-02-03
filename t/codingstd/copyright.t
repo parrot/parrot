@@ -11,7 +11,7 @@ use Test::More tests => 2;
 
 =head1 NAME
 
-t/codingstd/check_copyright.t - checks for an appropriate copyright
+t/codingstd/copyright.t - checks for an appropriate copyright
 statement in parrot source files
 
 =head1 SYNOPSIS
@@ -40,7 +40,7 @@ my @perl_files = $DIST->get_perl_language_files();
 my @make_files = $DIST->get_make_language_files();
 my @all_files  = ( @c_files, @perl_files, @make_files );
 
-my @files = @ARGV ? @ARGV : @all_files;
+my @files = @ARGV ? <@ARGV> : @all_files;
 my ( @no_copyright_files, @outdated_copyright_files );
 
 my @gmtime       = gmtime(time);
