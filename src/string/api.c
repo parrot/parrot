@@ -1459,10 +1459,7 @@ Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(c
 =item C<INTVAL Parrot_str_not_equal>
 
 Compares two Parrot strings, performing type and encoding conversions if
-necessary.
-
-Note that this function returns 0 if the strings are equal, and non-zero
-otherwise.
+necessary. Returns 1 if the strings are not equal, and 0 otherwise.
 
 =cut
 
@@ -1474,27 +1471,49 @@ INTVAL
 Parrot_str_not_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
     ASSERT_ARGS(Parrot_str_not_equal)
+    return !Parrot_str_equal(interp, s1, s2);
+}
+
+/*
+
+=item C<INTVAL Parrot_str_equal>
+
+Compares two Parrot strings, performing type and encoding conversions if
+necessary.
+
+Returns 1 if the strings are equal, and 0 otherwise.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
+{
+    ASSERT_ARGS(Parrot_str_equal)
     if ((s1 == s2) || (!s1 && !s2)) {
-        return 0;
-    }
-    else if (!s2) {
-        return s1->strlen != 0;
-    }
-    else if (!s1) {
-        return s2->strlen != 0;
-    }
-    else if (s1->strlen != s2->strlen) {
-        return 1;       /* we don't care which is bigger */
-    }
-    else if (s1->hashval != s2->hashval && s1->hashval && s2->hashval) {
         return 1;
     }
-    else if (!s1->strlen) {   /* s2->strlen is the same here */
+    else if (!s2) {
+        return s1->strlen == 0;
+    }
+    else if (!s1) {
+        return s2->strlen == 0;
+    }
+    else if (s1->strlen != s2->strlen) {
+        return 0;       /* we don't care which is bigger */
+    }
+    else if (s1->hashval != s2->hashval && s1->hashval && s2->hashval) {
         return 0;
+    }
+    else if (!s1->strlen) {   /* s2->strlen is the same here */
+        return 1;
     }
     /* COWed strings */
     else if (s1->strstart == s2->strstart && s1->bufused == s2->bufused) {
-        return 0;
+        return 1;
     }
 
     /*
@@ -1502,7 +1521,7 @@ Parrot_str_not_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK
      * both strings are non-null
      * both strings have same length
      */
-    return CHARSET_COMPARE(interp, s1, s2);
+    return !CHARSET_COMPARE(interp, s1, s2);
 }
 
 
