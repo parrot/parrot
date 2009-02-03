@@ -571,6 +571,10 @@ collection.
 Terminate and clean up Parrot's string subsystem, including string allocation
 and garbage collection.
 
+=head3 Parrot_str_free (was string_free)
+
+Free the string's header.
+
 =head3 string_max_bytes
 
 Calculate the number of bytes needed to hold a given number of characters in a
@@ -603,17 +607,36 @@ pointer. Deprecated with C<strstart>.
 
 =head3 string_ord
 
-Replaced by C<Parrot_string_index>.
+Replaced by C<Parrot_str_indexed>.
 
 =head3 string_chr
 
-This is handled just fine by C<Parrot_string_new>, we don't need a special
+This is handled just fine by C<Parrot_str_new>, we don't need a special
 version for a single character.
 
 =head3 make_writable
 
 An archaic function that uses a method of describing strings that hasn't been
 allowed for years.
+
+=head3 string_to_cstring_nullable
+
+Just the implementation of string_to_cstring, no need for a separate function
+that specially allows returning a NULL string.
+
+=head3 string_increment
+
+Old Perl 5-style behavior where "aa" goes to "bb". Only useful for ASCII
+strings, and not terribly useful even there.
+
+=head3 Parrot_string_cstring
+
+Unsafe, and behavior handled by Parrot_str_to_cstring.
+
+
+=head3 Parrot_string_split
+
+Is the same as Parrot_str_split.
 
 =head2 String PMC API
 
