@@ -18,9 +18,9 @@ $Id$
     char *dbg = getenv("PMCDEBUG"); \
     if (dbg && strlen(dbg)) { \
         STRING *pstr = Parrot_sprintf_c(interp, __VA_ARGS__);  \
-        char *str = string_to_cstring(interp, pstr);           \
+        char *str = Parrot_str_to_cstring(interp, pstr);           \
         fprintf(stderr, "%s", str);        \
-        string_cstring_free(str);   \
+        Parrot_str_free_cstring(str);   \
     } \
 }
 #else

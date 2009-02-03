@@ -240,7 +240,7 @@ void pipp_hash_sanity_check(PARROT_INTERP, PippHashTable *ht) {
             curr_key = curr_bkt->key;
             cmp_bkt = curr_bkt->tableNext;
             while (cmp_bkt != NULL) {
-                if (!string_compare(interp, curr_key, cmp_bkt->key))
+                if (!Parrot_str_compare(interp, curr_key, cmp_bkt->key))
                     Parrot_ex_throw_from_c_args(interp, NULL, -1,
                             "PHPArray corruption: PHPArray contains duplicate keys.");
                 cmp_bkt = cmp_bkt->tableNext;
@@ -294,7 +294,7 @@ void pipp_hash_renumber(PARROT_INTERP, PippHashTable *ht) {
     for (bkt = ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
         if (bkt->keyIsInt) {
             dprintf("renumbering from %d to %d\n", bkt->keyInt, curr_idx);
-            bkt->key    = string_from_int(interp, curr_idx);
+            bkt->key    = Parrot_str_from_int(interp, curr_idx);
             bkt->keyInt = curr_idx;
             curr_idx++;
         }
@@ -374,12 +374,12 @@ PippBucket* pipp_hash_get_bucket(PARROT_INTERP, PippHashTable *ht, STRING *key){
     INTVAL key_hash, bucket_idx;
     PippBucket *bucket;
 
-    key_hash = string_hash(interp, key);
+    key_hash = Parrot_str_to_hashval(interp, key);
     bucket   = ht->buckets[key_hash & ht->hashMask];
     dprintf("pipp_hash_get_bucket called with key '%Ss', has hash 0x%X\n",
             key, key_hash);
 
-    while (bucket != NULL && string_compare(interp, bucket->key, key))
+    while (bucket != NULL && Parrot_str_compare(interp, bucket->key, key))
         bucket = bucket->bucketNext;
     if (bucket) {
         dprintf("found bucket with key '%Ss'\n", bucket->key);
@@ -427,7 +427,7 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
     PippBucket *first_bucket, *curr_bucket;
     INTVAL      key_hash, bucket_idx;
 
-    key_hash     = string_hash(interp, key);
+    key_hash     = Parrot_str_to_hashval(interp, key);
     bucket_idx   = key_hash & ht->hashMask;
     curr_bucket  = ht->buckets[bucket_idx];
     first_bucket = curr_bucket;
@@ -445,7 +445,7 @@ PippBucket* pipp_hash_put(PARROT_INTERP, PippHashTable *ht, STRING *key, PMC *p_
 
     /* Find the right bucket for the key. */
     while (curr_bucket != NULL &&
-           string_compare(interp, curr_bucket->key, key)) {
+           Parrot_str_compare(interp, curr_bucket->key, key)) {
         dprintf("looking for the right bucket: '%Ss' != '%Ss'\n", curr_bucket->key, key);
         curr_bucket = curr_bucket->bucketNext;
     }
@@ -562,8 +562,8 @@ PippBucket* pipp_hash_push(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
         pipp_hash_resize(interp, ht, ht->capacity * 2);
     }
 
-    s_key    = string_from_int(interp, ht->nextIndex);
-    key_hash = string_hash(interp, s_key);
+    s_key    = Parrot_str_from_int(interp, ht->nextIndex);
+    key_hash = Parrot_str_to_hashval(interp, s_key);
     bkt      = mem_allocate_zeroed_typed(PippBucket);
 
     bkt->key       = s_key;
@@ -639,8 +639,8 @@ PippBucket* pipp_hash_unshift(PARROT_INTERP, PippHashTable *ht, PMC *p_val){
         pipp_hash_resize(interp, ht, ht->capacity * 2);
     }
 
-    s_key    = string_from_int(interp, 0);
-    key_hash = string_hash(interp, s_key);
+    s_key    = Parrot_str_from_int(interp, 0);
+    key_hash = Parrot_str_to_hashval(interp, s_key);
     bkt      = mem_allocate_zeroed_typed(PippBucket);
 
     bkt->key       = s_key;
@@ -807,7 +807,7 @@ PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
     PippIntParserState  state;
 
     isInt    = mem_allocate_zeroed_typed(PippIsInt);
-    key_len  = string_length(interp, key);
+    key_len  = Parrot_str_length(interp, key);
     negate       = 0;
     curr_idx     = 0;
     isInt->isInt = 1;
@@ -815,7 +815,7 @@ PippIsInt* pipp_hash_get_intval(PARROT_INTERP, STRING *key) {
     state = PIPS_START;
     /* This is basically equivalient to matching against /^([-]?[1-9][0-9]*|0)$/ */
     while (curr_idx < key_len) {
-        curr_char = string_index(interp, key, curr_idx);
+        curr_char = Parrot_str_indexed(interp, key, curr_idx);
         switch (state) {
             case PIPS_START:
                 if (curr_char == '-') {
