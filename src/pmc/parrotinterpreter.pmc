@@ -30,7 +30,8 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/dynext.h"
 #include "pmc_class.h"
 
-#include "../io/io_private.h"
+/* This is a quick hack to test the stdhandle feature */
+#include "../../src/io/io_private.h"
 
 /*
 
