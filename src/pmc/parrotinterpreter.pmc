@@ -30,8 +30,11 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/dynext.h"
 #include "pmc_class.h"
 
+/* Cancelling this until better solution */
+#if 0
 /* This is a quick hack to test the stdhandle feature */
 #include "../../src/io/io_private.h"
+#endif
 
 /*
 
@@ -740,11 +743,14 @@ This method is experimental.
 
     METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional) {
         PMC * handle = PMCNULL;
+/* Temporarily disabled */
+#if 0
         if (fileno >= PIO_STDIN_FILENO && fileno <= PIO_STDERR_FILENO) {
             handle = interp->piodata->table[fileno];
             if (!PMC_IS_NULL(newhandle))
                 interp->piodata->table[fileno] = newhandle;
         }
+#endif
         RETURN(PMC *handle);
     }
 
