@@ -29,24 +29,17 @@ L<https://trac.parrot.org/parrot/browser>
 
 =item *
 
-The easiest solution is to grab the most recent snapshot of the Parrot SVN
-repository. It's a tar-gzipped download of a recent checkout of Parrot, updated
-every six hours. You can find it here:
+The easiest solution is to grab the latest monthly development release. You can
+find it here:
 
-L<http://svn.perl.org/snapshots/parrot/parrot-latest.tar.gz>
+L<http://www.parrot.org/release/current>
 
 =item *
 
-Even better is the option to use SVN, which gets you the very latest copy of
-the Parrot distribution. The procedure for this is:
+An even better option is to use SVN, which gets you the very latest copy of the
+Parrot distribution. The procedure for this is:
 
     svn checkout https://svn.parrot.org/parrot/trunk parrot
-
-=item *
-
-If you're one of those rsync folks, you can access the repository with:
-
-C<rsync -av --delete svn.perl.org::parrot-HEAD parrot>
 
 =item *
 
