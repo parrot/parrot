@@ -390,7 +390,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_string_native(STRING *value) {
       #ifdef PARROT_HAS_GMP
-        char * const cstr = string_to_cstring(INTERP, value);
+        char * const cstr = Parrot_str_to_cstring(INTERP, value);
         mpq_set_str(RT(SELF), cstr, 0);
         mpq_canonicalize(RT(SELF));
         Parrot_str_free_cstring(cstr);
@@ -408,7 +408,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
       #ifdef PARROT_HAS_GMP
-        char * const cstr = string_to_cstring(INTERP, value);
+        char * const cstr = Parrot_str_to_cstring(INTERP, value);
         mpq_set_str(RT(SELF), cstr, (int) base);
         mpq_canonicalize(RT(SELF));
         Parrot_str_free_cstring(cstr);

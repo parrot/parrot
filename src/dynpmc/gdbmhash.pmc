@@ -116,7 +116,7 @@ Open a or create a new dbm file.
 */
 
     void set_string_native(STRING* value) {
-        char * const c_db_name = string_to_cstring(interp, value);
+        char * const c_db_name = Parrot_str_to_cstring(interp, value);
         GDBM_FILE dbf          = gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
 
         Parrot_str_free_cstring(c_db_name);
