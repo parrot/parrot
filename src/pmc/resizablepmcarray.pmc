@@ -664,13 +664,13 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
         for (j = 0; j < n; ++j) {
             PMC *val = SELF.get_pmc_keyed_int(j);
-            res      = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res      = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
 
             if (j < n - 1)
-                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        return string_append(INTERP, res, CONST_STRING(INTERP, " ]"));
+        return Parrot_str_append(INTERP, res, CONST_STRING(INTERP, " ]"));
     }
 
 /*

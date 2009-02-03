@@ -61,9 +61,9 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
 
     /* Handle vtable methods with two underscores at the start. */
     if (sub->vtable_index == -1) {
-        if (string_str_index(interp, key, CONST_STRING(interp, "__"), 0) == 0) {
-            STRING * const meth_name = string_substr(interp, key, 2,
-                (INTVAL)(string_length(interp, key) - 2), NULL, 0);
+        if (Parrot_str_find_index(interp, key, CONST_STRING(interp, "__"), 0) == 0) {
+            STRING * const meth_name = Parrot_str_substr(interp, key, 2,
+                (INTVAL)(Parrot_str_byte_length(interp, key) - 2), NULL, 0);
             sub->vtable_index        =
                 Parrot_get_vtable_index(interp, meth_name);
         }
@@ -89,7 +89,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
     if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
         STRING *method_name = key;
 
-        if (0 != string_equal(interp, sub->method_name, CONST_STRING(interp, "")))
+        if (0 != Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, "")))
             method_name = sub->method_name;
         add_to_class(interp, nsinfo, classobj, method_name, value);
     }
@@ -279,7 +279,7 @@ really a public API.
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
                     STRING *method_name = key;
 
-                    if (0 != string_equal(interp, sub->method_name, CONST_STRING(interp, "")))
+                    if (0 != Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, "")))
                         method_name = sub->method_name;
 
                     add_to_class(INTERP, nsinfo, classobj, method_name, value);

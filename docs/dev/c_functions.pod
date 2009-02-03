@@ -195,14 +195,14 @@ For functions that are important API functions.
     PARROT_EXPORT
     PARROT_WARN_UNUSED_RESULT
     INTVAL
-    string_str_index(PARROT_INTERP, NOTNULL(const STRING *s),
+    Parrot_str_find_index(PARROT_INTERP, NOTNULL(const STRING *s),
             NOTNULL(const STRING *s2), INTVAL start)
 
 
-C<string_str_index> is part of the Parrot API, and returns an INTVAL. The
+C<Parrot_str_find_index> is part of the Parrot API, and returns an INTVAL. The
 interpreter is used somewhere in the function. String C<s> and C<s2>
 cannot be NULL. If the calling function ignores the return value,
-it's an error, because you'd never want to call C<string_str_index()>
+it's an error, because you'd never want to call C<Parrot_str_find_index()>
 without wanting to know its value.
 
     PARROT_EXPORT

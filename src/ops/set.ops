@@ -27,7 +27,7 @@ $1. Removes the constant flag on the copy, if there was one.
 =cut
 
 inline op clone(out STR, in STR) :base_mem {
-  $1 = string_copy(interp, $2);
+  $1 = Parrot_str_copy(interp, $2);
 }
 
 
@@ -125,7 +125,7 @@ inline op set(out INT, in NUM) :base_core {
 }
 
 inline op set(out INT, in STR) :base_core {
-  $1 = string_to_int(interp, $2);
+  $1 = Parrot_str_to_int(interp, $2);
 }
 
 inline op set(out NUM, in NUM) :base_core {
@@ -137,7 +137,7 @@ inline op set(out NUM, in INT) :base_core {
 }
 
 inline op set(out NUM, in STR) :base_core {
-  $1 = string_to_num(interp, $2);
+  $1 = Parrot_str_to_num(interp, $2);
 }
 
 inline op set(out NUM, invar PMC) :base_core {
@@ -153,15 +153,15 @@ inline op set(out STR, invar STR) :base_core {
 }
 
 inline op set(out STR, inconst STR) :base_core {
-  $1 = string_copy(interp, $2);
+  $1 = Parrot_str_copy(interp, $2);
 }
 
 inline op set(out STR, in INT) :base_core {
-  $1 = string_from_int(interp, $2);
+  $1 = Parrot_str_from_int(interp, $2);
 }
 
 inline op set(out STR, in NUM) :base_core {
-  $1 = string_from_num(interp, $2);
+  $1 = Parrot_str_from_num(interp, $2);
 }
 
 inline op set(out PMC, inconst PMC) :base_core {
@@ -186,7 +186,7 @@ inline op set(invar PMC, invar STR) :base_core {
 
 inline op set(invar PMC, inconst STR) :base_core {
   VTABLE_set_string_native(interp, $1,
-    string_copy(interp, $2));
+    Parrot_str_copy(interp, $2));
 }
 inline op set(out INT, invar PMC) :base_core {
   $1 = VTABLE_get_integer(interp, $2);
@@ -246,7 +246,7 @@ inline op assign(invar PMC, in STR) :base_core {
 }
 
 inline op assign(out STR, in STR) :base_core {
-  $1 = string_set(interp, $1, $2);
+  $1 = Parrot_str_set(interp, $1, $2);
 }
 
 inline op setref(invar PMC, invar PMC) :base_core {

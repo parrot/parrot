@@ -63,7 +63,7 @@ Class method to construct an Boolean from the string representation C<rep>.
             res = constant_pmc_new(INTERP, type);
         else
             res = pmc_new(INTERP, type);
-        PMC_int_val(res) = (string_to_int(INTERP, rep) != 0);
+        PMC_int_val(res) = (Parrot_str_to_int(INTERP, rep) != 0);
         return res;
     }
 
@@ -77,7 +77,7 @@ Return the string "boolean".
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "boolean");
+        return Parrot_str_new_constant(INTERP, "boolean");
     }
 
 /*
@@ -119,9 +119,9 @@ Return the string "true" or "false".
 */
     VTABLE STRING* get_string() {
         if (PMC_int_val(SELF))
-            return const_string(INTERP, "true");
+            return Parrot_str_new_constant(INTERP, "true");
         else
-            return const_string(INTERP, "false");
+            return Parrot_str_new_constant(INTERP, "false");
     }
 
 

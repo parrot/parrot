@@ -66,7 +66,7 @@ static const char *fp;
 static void _init(Interp *interp, STRING *str)
 {
     bytecode = Parrot_string_cstring(interp, str);
-    maxi     = string_length(interp, str);
+    maxi     = Parrot_str_byte_length(interp, str);
     fp       = (const char *)bytecode;
 }
 
@@ -112,11 +112,11 @@ static STRING* _get_string(Interp *interp)
     memcpy(&s, fp, sizeof s);
     fp += sizeof s;
     if (s != 0) {
-        str = string_from_cstring(interp, fp, s-1);
+        str = Parrot_str_new(interp, fp, s-1);
         fp += s;
     }
     else
-        str = string_from_cstring(interp, "", 0);
+        str = Parrot_str_new(interp, "", 0);
     return str;
 }
 
@@ -137,7 +137,7 @@ static PMC* _load_function(Interp *interp);
 static PMC* _load_bool(Interp *interp)
 {
     PMC* ret = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Boolean")));
+          Parrot_str_new_constant(interp, "Boolean")));
     VTABLE_set_integer_native(interp, ret, _get_byte());
     return ret;
 }
@@ -145,7 +145,7 @@ static PMC* _load_bool(Interp *interp)
 static PMC* _load_byte(Interp *interp)
 {
     PMC* ret = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Integer")));
+          Parrot_str_new_constant(interp, "Integer")));
     VTABLE_set_integer_native(interp, ret, _get_byte());
     return ret;
 }
@@ -153,7 +153,7 @@ static PMC* _load_byte(Interp *interp)
 static PMC* _load_integer(Interp *interp)
 {
     PMC* ret = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "Integer")));
+          Parrot_str_new_constant(interp, "Integer")));
     VTABLE_set_integer_native(interp, ret, _get_integer());
     return ret;
 }
@@ -161,7 +161,7 @@ static PMC* _load_integer(Interp *interp)
 static PMC* _load_string(Interp *interp)
 {
     PMC* ret = pmc_new(interp, pmc_type(interp,
-          const_string(interp, "String")));
+          Parrot_str_new_constant(interp, "String")));
     VTABLE_set_string_native(interp, ret, _get_string(interp));
     return ret;
 }
@@ -178,21 +178,21 @@ static void _load_header(Interp *interp, PMC *script)
 #if 1
     fp -= 8;
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "version"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "version"), _load_byte(interp));
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "format"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "format"), _load_byte(interp));
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "endian"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "endian"), _load_byte(interp));
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "sizeof_int"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "sizeof_int"), _load_byte(interp));
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "sizeof_size_t"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "sizeof_size_t"), _load_byte(interp));
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "sizeof_opcode"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "sizeof_opcode"), _load_byte(interp));
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "sizeof_number"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "sizeof_number"), _load_byte(interp));
     VTABLE_set_attr_str(interp, script,
-        const_string(interp, "integral"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "integral"), _load_byte(interp));
 #endif
 }
 
@@ -284,9 +284,9 @@ static PMC* _load_local_list(Interp *interp)
         PMC* local = _new_lua(interp, "Local");
         VTABLE_set_string_native(interp, local, _get_string(interp));
         VTABLE_set_attr_str(interp, local,
-            const_string(interp, "startpc"), _load_integer(interp));
+            Parrot_str_new_constant(interp, "startpc"), _load_integer(interp));
         VTABLE_set_attr_str(interp, local,
-            const_string(interp, "endpc"), _load_integer(interp));
+            Parrot_str_new_constant(interp, "endpc"), _load_integer(interp));
         VTABLE_set_pmc_keyed_int(interp, ret, i, local);
     }
 
@@ -314,31 +314,31 @@ static PMC* _load_function(Interp *interp)
     PMC * ret = _new_lua(interp, "Function");
 
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "source"), _load_string(interp));
+        Parrot_str_new_constant(interp, "source"), _load_string(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "linedefined"), _load_integer(interp));
+        Parrot_str_new_constant(interp, "linedefined"), _load_integer(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "lastlinedefined"), _load_integer(interp));
+        Parrot_str_new_constant(interp, "lastlinedefined"), _load_integer(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "nups"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "nups"), _load_byte(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "numparams"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "numparams"), _load_byte(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "is_vararg"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "is_vararg"), _load_byte(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "maxstacksize"), _load_byte(interp));
+        Parrot_str_new_constant(interp, "maxstacksize"), _load_byte(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "code"), _load_instruction_list(interp));
+        Parrot_str_new_constant(interp, "code"), _load_instruction_list(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "k"), _load_constant_list(interp));
+        Parrot_str_new_constant(interp, "k"), _load_constant_list(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "p"), _load_prototype_list(interp));
+        Parrot_str_new_constant(interp, "p"), _load_prototype_list(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "lineinfo"), _load_line_list(interp));
+        Parrot_str_new_constant(interp, "lineinfo"), _load_line_list(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "locvars"), _load_local_list(interp));
+        Parrot_str_new_constant(interp, "locvars"), _load_local_list(interp));
     VTABLE_set_attr_str(interp, ret,
-        const_string(interp, "upvalues"), _load_upvalue_list(interp));
+        Parrot_str_new_constant(interp, "upvalues"), _load_upvalue_list(interp));
 
     return ret;
 }
@@ -384,7 +384,7 @@ Loads Lua 5.1 VM bytecode.
         _init(INTERP, luabytecode);
         _load_header(INTERP, script);
         VTABLE_set_attr_str(INTERP, script,
-          const_string(INTERP, "top"), _load_function(INTERP));
+          Parrot_str_new_constant(INTERP, "top"), _load_function(INTERP));
 
         RETURN(PMC *script);
     }

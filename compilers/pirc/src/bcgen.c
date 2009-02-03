@@ -190,7 +190,7 @@ add_string_const(bytecode * const bc, char const * const str, char const * chars
     while (index < count) {
         constant = bc->interp->code->const_table->constants[index];
         if (constant->type == PFC_STRING) {
-            if (string_equal(bc->interp, constant->u.string, parrotstr) == 0) {
+            if (Parrot_str_equal(bc->interp, constant->u.string, parrotstr) == 0) {
 #if DEBUGBC
                 fprintf(stderr, "found string %s at index %d\n", str, index);
 #endif
@@ -268,7 +268,7 @@ add_key_const(bytecode * const bc, PMC *key) {
 
         if (constant->type == PFC_KEY) {
             STRING *s2 = key_set_to_string(bc->interp, constant->u.key);
-            if (string_equal(bc->interp, s1, s2) == 0) {
+            if (Parrot_str_equal(bc->interp, s1, s2) == 0) {
 #if DEBUGBC
                 fprintf(stderr, "found equal key (%d)\n", index);
 #endif
@@ -749,7 +749,7 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int nee
 
     /* walk through the list of lexicals and register them */
     while (lexiter) {
-        STRING *lexname = string_from_cstring(bc->interp, lexiter->name, strlen(lexiter->name));
+        STRING *lexname = Parrot_str_new(bc->interp, lexiter->name, strlen(lexiter->name));
 
         /* declare the .lex as such */
 
@@ -838,7 +838,7 @@ find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_s
 
     cur_name = PMC_sub(current)->name;
 
-    /* XXX can't this be a call to string_compare() ? */
+    /* XXX can't this be a call to Parrot_str_compare() ? */
     if (cur_name->strlen == len && (memcmp((char *)cur_name->strstart, outername, len) == 0))
         return current;
 
@@ -900,7 +900,7 @@ create_sub_pmc(bytecode * const bc, int iscoroutine, char const * const instance
     if (instanceof) {
         /* Look it up as a class and as a PMC type. */
         STRING * const classname
-                 = string_from_cstring(bc->interp, instanceof + 1, strlen(instanceof) - 2);
+                 = Parrot_str_new(bc->interp, instanceof + 1, strlen(instanceof) - 2);
 
         PMC * const classobj = Parrot_oo_get_class_str(bc->interp, classname);
 

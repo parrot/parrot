@@ -156,7 +156,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
                                 "Invalid mode for file open");
 
     oflags = convert_flags_to_unix(flags);
-    spath = string_to_cstring(interp, path);
+    spath = Parrot_str_to_cstring(interp, path);
 
     /* Only files for now */
     flags |= PIO_F_FILE;
@@ -175,7 +175,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
          */
         if ((oflags & (O_CREAT | O_EXCL)) == (O_CREAT | O_EXCL)) {
             close(fd);
-            string_cstring_free(spath); /* returning before C string freed */
+            Parrot_str_free_cstring(spath); /* returning before C string freed */
             return PMCNULL;
         }
         /*
@@ -206,7 +206,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
         /* File doesn't exist and O_CREAT not specified */
     }
 
-    string_cstring_free(spath); /* done with C string */
+    Parrot_str_free_cstring(spath); /* done with C string */
 
     if (fd >= 0) {
         struct stat buf;
@@ -690,7 +690,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         /* XXX ugly hack to be able to pass some arguments
          *     split cmd at blanks */
-        orig_cmd = cmd = string_to_cstring(interp, command);
+        orig_cmd = cmd = Parrot_str_to_cstring(interp, command);
         c        = strdup(cmd);
 
         for (n = 0, p = strtok(c, " "); n < 9 && p; p = strtok(NULL, " ")) {
@@ -701,11 +701,11 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         argv[n] = NULL;
 
-        string_cstring_free(c); /* done with C string */
+        Parrot_str_free_cstring(c); /* done with C string */
         execv(cmd, argv);       /* XXX use execvp ? */
 
         /* Will never reach this unless exec fails. */
-        string_cstring_free(orig_cmd);
+        Parrot_str_free_cstring(orig_cmd);
         perror("execvp");
         exit(EXIT_FAILURE);
     }

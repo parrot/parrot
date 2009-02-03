@@ -139,7 +139,7 @@ Return the string "userdata".
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "userdata");
+        return Parrot_str_new_constant(INTERP, "userdata");
     }
 
 /*

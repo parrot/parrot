@@ -110,7 +110,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
             Parrot_io_eprintf(debugger, "%S=PMC(%#p Str:(NULL))",
                     VTABLE_name(interp, pmc), pmc);
         else {
-            STRING* const escaped = string_escape_string_delimited(
+            STRING* const escaped = Parrot_str_escape_truncate(
                             interp, s, 20);
             if (escaped)
                 Parrot_io_eprintf(debugger, "%S=PMC(%#p Str:\"%Ss\")",
@@ -185,7 +185,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
         case KEY_string_FLAG:
             {
             const STRING * const s = PMC_str_val(key);
-            STRING* const escaped = string_escape_string_delimited(
+            STRING* const escaped = Parrot_str_escape_truncate(
                             interp, s, 20);
             if (escaped)
                 len += Parrot_io_eprintf(debugger, "\"%Ss\"", escaped);
@@ -204,7 +204,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
         case KEY_string_FLAG|KEY_register_FLAG:
             {
             const STRING * const s = REG_STR(interp, PMC_int_val(key));
-            STRING* const escaped = string_escape_string_delimited(
+            STRING* const escaped = Parrot_str_escape_truncate(
                             interp, s, 20);
             if (escaped)
                 len += Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"", PMC_int_val(key),
@@ -340,7 +340,7 @@ trace_op_dump(PARROT_INTERP,
                     break;
                 case PARROT_ARG_SC:
                     {
-                    STRING* const escaped = string_escape_string_delimited(
+                    STRING* const escaped = Parrot_str_escape_truncate(
                             interp,
                             PCONST(o)->u.string, 20);
                     if (escaped)
@@ -389,7 +389,7 @@ trace_op_dump(PARROT_INTERP,
             goto done;
         if (len < ARGS_COLUMN)  {
             STRING * const fill = Parrot_str_repeat(debugger,
-                    const_string(debugger, " "),
+                    Parrot_str_new_constant(debugger, " "),
                     ARGS_COLUMN);
             Parrot_io_putps(debugger, Parrot_io_STDERR(debugger), fill);
         }
@@ -425,7 +425,7 @@ trace_op_dump(PARROT_INTERP,
                     break;
                 case PARROT_ARG_S:
                     if (REG_STR(interp, o)) {
-                        STRING* const escaped = string_escape_string_delimited(
+                        STRING* const escaped = Parrot_str_escape_truncate(
                                 interp, REG_STR(interp, o), 20);
                         Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"", o,
                                 escaped);

@@ -68,7 +68,7 @@ Raises an exception. Use C<init_pmc()>.
 */
     VTABLE void init_pmc(PMC *sub) {
         PMC *classobj = Parrot_oo_get_class_str(INTERP,
-                          const_string(INTERP, "Parrot::Coroutine"));
+                          Parrot_str_new_constant(INTERP, "Parrot::Coroutine"));
         PMC *init_args;
 
         if (PMC_IS_NULL(classobj))
@@ -77,7 +77,7 @@ Raises an exception. Use C<init_pmc()>.
 
         init_args = pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pmc_keyed_str(INTERP, init_args,
-                                 const_string(INTERP, "initial_sub"), sub);
+                                 Parrot_str_new_constant(INTERP, "initial_sub"), sub);
         PMC_pmc_val(SELF) = VTABLE_instantiate(INTERP, classobj, init_args);
         PMC_metadata(SELF) = getcurrenv(INTERP);
         PObj_custom_mark_SET(SELF);
@@ -109,7 +109,7 @@ Return the string "thread".
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "thread");
+        return Parrot_str_new_constant(INTERP, "thread");
     }
 
 /*

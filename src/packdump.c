@@ -167,7 +167,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                    (long)i);
 
         Parrot_io_printf(interp, "        DATA     => \"%Ss\"\n",
-                       string_escape_string(interp, self->u.string));
+                       Parrot_str_escape(interp, self->u.string));
         Parrot_io_printf(interp, "    } ],\n");
         break;
 
@@ -261,7 +261,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         {
             PMC * const pmc = self->u.key;
             Parrot_sub *sub;
-            STRING * const null = const_string(interp, "(null)");
+            STRING * const null = Parrot_str_new_constant(interp, "(null)");
             STRING *namespace_description;
 
             pobj_flag_dump(interp, (long)PObj_get_FLAGS(pmc));
@@ -294,13 +294,13 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     if (sub->namespace_name) {
                         switch (sub->namespace_name->vtable->base_type) {
                             case enum_class_String:
-                                namespace_description = string_from_cstring(interp, "'", 1);
-                                namespace_description = string_append(interp,
+                                namespace_description = Parrot_str_new(interp, "'", 1);
+                                namespace_description = Parrot_str_append(interp,
                                         namespace_description,
                                         PMC_str_val(sub->namespace_name));
-                                namespace_description = string_append(interp,
+                                namespace_description = Parrot_str_append(interp,
                                         namespace_description,
-                                        string_from_cstring(interp, "'", 1));
+                                        Parrot_str_new(interp, "'", 1));
                                 break;
                             case enum_class_Key:
                                 namespace_description =

@@ -41,7 +41,7 @@ pmclass LuaFunction
 
 */
     VTABLE void init_pmc(PMC *sub) {
-        if (VTABLE_isa(INTERP, sub, const_string(INTERP, "Sub"))) {
+        if (VTABLE_isa(INTERP, sub, Parrot_str_new_constant(INTERP, "Sub"))) {
             PMC_struct_val(SELF) = mem_allocate_zeroed_typed(Parrot_sub);
             PMC_pmc_val(SELF)    = NULL;
             PMC_metadata(SELF)   = NULL;
@@ -79,7 +79,7 @@ Return the string "function".
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "function");
+        return Parrot_str_new_constant(INTERP, "function");
     }
 
 /*
@@ -153,7 +153,7 @@ Return the string "function".
 */
     METHOD STRING *get_name() {
         const Parrot_sub * const sub = PMC_sub(SELF);
-        STRING *retval = string_copy(INTERP, sub->name);
+        STRING *retval = Parrot_str_copy(INTERP, sub->name);
         RETURN(STRING *retval);
     }
 

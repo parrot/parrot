@@ -335,7 +335,7 @@ static STRING *
 get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_codepoints)
-    STRING * const return_string = Parrot_make_COW_reference(interp, src);
+    STRING * const return_string = Parrot_str_new_COW(interp, src);
 #if PARROT_HAS_ICU
     return_string->strstart = (char*)src->strstart + offset * sizeof (UChar);
     return_string->bufused = count * sizeof (UChar);

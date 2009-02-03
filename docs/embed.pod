@@ -285,12 +285,12 @@ is unclear.
 Returns the internal type number corresponding to C<type>.  Useful for
 instantiating various Parrot data types.
 
-=item C<char *string_to_cstring(PARROT_INTERP)>
+=item C<char *Parrot_str_to_cstring(PARROT_INTERP)>
 
 XXX needs to be a formal Parrot_* API.
 Returns the C string representation of a Parrot string.
 
-=item C<STRING *string_from_cstring(PARROT_INTERP, const char *string, int len)>
+=item C<STRING *Parrot_str_new(PARROT_INTERP, const char *string, int len)>
 
 XXX needs to be a formal Parrot_* API.
 Returns the Parrot string representation of a C string.
@@ -298,7 +298,7 @@ Returns the Parrot string representation of a C string.
 =item C<string_from_literal(PARROT_INTERP, const char *string)>
 
 XXX needs to be a formal Parrot_* API.
-A macro for simplifying calls to C<string_from_cstring>.
+A macro for simplifying calls to C<Parrot_str_new>.
 
 =back
 

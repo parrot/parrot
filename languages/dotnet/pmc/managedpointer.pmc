@@ -445,7 +445,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
     PMC* get_attr(INTVAL idx)
     {
         PMC *ref;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "load_pmc"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "load_pmc"),
                     "->P", &ref);
         if (ref)
             return VTABLE_get_attr(INTERP, ref, idx);
@@ -456,7 +456,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
     PMC* get_attr_str(STRING* idx)
     {
         PMC *ref;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "load_pmc"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "load_pmc"),
                     "->P", &ref);
         if (ref)
             return VTABLE_get_attr_str(INTERP, ref, idx);
@@ -467,7 +467,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
     void set_attr(INTVAL idx, PMC *value)
     {
         PMC *ref;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "load_pmc"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "load_pmc"),
                     "->P", &ref);
         if (ref)
             VTABLE_set_attr(INTERP, ref, idx, value);
@@ -476,7 +476,7 @@ pmclass ManagedPointer dynpmc group dotnet_runtime {
     void set_attr_str(STRING *idx, PMC *value)
     {
         PMC *ref;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "load_pmc"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "load_pmc"),
                     "->P", &ref);
         if (ref)
             VTABLE_set_attr_str(INTERP, ref, idx, value);

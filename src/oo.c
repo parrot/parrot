@@ -131,14 +131,14 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
                 vtable_overrides, vtable_index_str);
 
             /* Look up the name of the vtable function from the index. */
-            const INTVAL vtable_index = string_to_int(interp, vtable_index_str);
+            const INTVAL vtable_index = Parrot_str_to_int(interp, vtable_index_str);
             const char * const meth_c = Parrot_vtable_slot_names[vtable_index];
-            STRING     *vtable_name   = string_from_cstring(interp, meth_c, 0);
+            STRING     *vtable_name   = Parrot_str_new(interp, meth_c, 0);
 
             /* Strip leading underscores in the vtable name */
-            if (string_str_index(interp, vtable_name, CONST_STRING(interp, "__"), 0) == 0) {
-                vtable_name = string_substr(interp, vtable_name, 2,
-                    string_length(interp, vtable_name) - 2, NULL, 0);
+            if (Parrot_str_find_index(interp, vtable_name, CONST_STRING(interp, "__"), 0) == 0) {
+                vtable_name = Parrot_str_substr(interp, vtable_name, 2,
+                    Parrot_str_byte_length(interp, vtable_name) - 2, NULL, 0);
             }
 
             VTABLE_add_vtable_override(interp, self, vtable_name, vtable_sub);
@@ -406,7 +406,7 @@ INTVAL
 Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 {
     ASSERT_ARGS(Parrot_get_vtable_index)
-    char * const name_c      = string_to_cstring(interp, name);
+    char * const name_c      = Parrot_str_to_cstring(interp, name);
 
     /* some of the first "slots" don't have names. skip 'em. */
     INTVAL low               = PARROT_VTABLE_LOW;
@@ -419,7 +419,7 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
         const INTVAL cmp = strcmp(name_c, meth_c);
 
         if (cmp == 0) {
-            string_cstring_free(name_c);
+            Parrot_str_free_cstring(name_c);
             return mid;
         }
         else if (cmp > 0)
@@ -428,7 +428,7 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
             high = mid;
     }
 
-    string_cstring_free(name_c);
+    Parrot_str_free_cstring(name_c);
 
     return -1;
 }
@@ -532,7 +532,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
         STRING *classname = VTABLE_get_string(interp, _namespace);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Class %Ss already registered!\n",
-                string_escape_string(interp, classname));
+                Parrot_str_escape(interp, classname));
     }
 
     /* Type doesn't exist, so go ahead and register it. Lock interpreter so
@@ -772,7 +772,7 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
         return found;
 
 
-    if (!string_equal(interp, method_name, CONST_STRING(interp, "__get_string")))
+    if (!Parrot_str_equal(interp, method_name, CONST_STRING(interp, "__get_string")))
         return find_method_direct_1(interp, _class, CONST_STRING(interp, "__get_repr"));
 
     return PMCNULL;
@@ -1193,7 +1193,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                 const STRING * const check =
                     VTABLE_get_string_keyed_int(interp, exclude, i);
 
-                if (string_equal(interp, check, method_name) == 0) {
+                if (Parrot_str_equal(interp, check, method_name) == 0) {
                     excluded = 1;
                     break;
                 }

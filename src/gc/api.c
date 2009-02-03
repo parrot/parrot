@@ -353,7 +353,7 @@ Parrot_gc_free_sysmem(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
     ASSERT_ARGS(Parrot_gc_free_sysmem)
-    /* has sysmem allocated, e.g. string_pin */
+    /* has sysmem allocated, e.g. Parrot_str_pin */
     if (PObj_sysmem_TEST(b) && PObj_bufstart(b))
         mem_sys_free(PObj_bufstart(b));
 

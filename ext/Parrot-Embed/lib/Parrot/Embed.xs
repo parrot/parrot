@@ -125,7 +125,7 @@ CODE:
 	}
 
 	real_interp     = interp->interp;
-	p_global        = const_string( real_interp, global );
+	p_global        = Parrot_str_new_constant( real_interp, global );
 
 	if ( items == 3 )
 		namespace   = ST(2);
@@ -134,7 +134,7 @@ CODE:
 
 	if (namespace  != &PL_sv_undef )
 	{
-		p_namespace = const_string( real_interp, SvPVX( namespace ) );
+		p_namespace = Parrot_str_new_constant( real_interp, SvPVX( namespace ) );
 		pmc         = Parrot_find_global_s(real_interp, p_namespace, p_global);
 	}
 	else
@@ -155,7 +155,7 @@ PREINIT:
 	Parrot_PMC     out_pmc;
 CODE:
 	real_interp = interp->interp;  
-	code_type   = const_string( real_interp, "PIR" );
+	code_type   = Parrot_str_new_constant( real_interp, "PIR" );
 	out_pmc     = Parrot_compile_string( real_interp, code_type, code, &error );
 	RETVAL      = make_pmc( aTHX_ ST(0), out_pmc );
 OUTPUT:
@@ -185,7 +185,7 @@ PREINIT:
 CODE:
 	pmc_actual = pmc->pmc;
 	interp     = get_interp( pmc->interp );
-	arg_string = const_string( interp, argument );
+	arg_string = Parrot_str_new_constant( interp, argument );
 	out_pmc    = Parrot_call_sub( interp, pmc_actual, signature, arg_string );
 	RETVAL     = make_pmc( aTHX_ pmc->interp, out_pmc );
 OUTPUT:

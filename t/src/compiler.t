@@ -44,7 +44,7 @@ run(PARROT_INTERP, int argc, char *argv[])
     PMC   *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    STRING *pir    = const_string(interp, "PIR");
+    STRING *pir    = Parrot_str_new_constant(interp, "PIR");
     PMC    *comp   = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
@@ -64,7 +64,7 @@ run(PARROT_INTERP, int argc, char *argv[])
     dod_register_pmc(interp, prog);
 
     /* locate function to run */
-    smain = const_string(interp, "main");
+    smain = Parrot_str_new_constant(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
 
     /* location of the entry */
@@ -131,7 +131,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     dod_register_pmc(interp, prog);
 
     /* locate function to run */
-    smain = const_string(interp, "main");
+    smain = Parrot_str_new_constant(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
 
     /* location of the entry */
@@ -159,7 +159,7 @@ run(PARROT_INTERP, int argc, char *argv[])
     PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    STRING *pir     = const_string(interp, "PIR");
+    STRING *pir     = Parrot_str_new_constant(interp, "PIR");
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
@@ -224,7 +224,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     dod_register_pmc(interp, prog);
 
     /* locate function to run */
-    smain = const_string(interp, "main");
+    smain = Parrot_str_new_constant(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
 
     /* location of the entry */
@@ -252,7 +252,7 @@ run(PARROT_INTERP, int argc, char *argv[])
     PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    STRING *pir     = const_string(interp, "PIR");
+    STRING *pir     = Parrot_str_new_constant(interp, "PIR");
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
@@ -317,7 +317,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     dod_register_pmc(interp, prog);
 
     /* locate function to run */
-    smain = const_string(interp, "main");
+    smain = Parrot_str_new_constant(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
 
     /* location of the entry */
@@ -344,7 +344,7 @@ run(PARROT_INTERP, int argc, char *argv[])
     PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    STRING *pir     = const_string(interp, "PIR");
+    STRING *pir     = Parrot_str_new_constant(interp, "PIR");
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {
@@ -409,7 +409,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     dod_register_pmc(interp, prog);
 
     /* locate function to run */
-    smain = const_string(interp, "main");
+    smain = Parrot_str_new_constant(interp, "main");
     entry = Parrot_find_global_cur(interp, smain);
 
     /* location of the entry */
@@ -435,7 +435,7 @@ run(PARROT_INTERP, int argc, char *argv[])
     PMC    *compreg = Parrot_PMC_get_pmc_keyed_int(interp,
                                        interp->iglobals,
                                        IGLOBALS_COMPREG_HASH);
-    STRING *pir     = const_string(interp, "PIR");
+    STRING *pir     = Parrot_str_new_constant(interp, "PIR");
     PMC    *comp    = Parrot_PMC_get_pmc_keyed_str(interp, compreg, pir);
 
     if (PMC_IS_NULL(comp) || !Parrot_PMC_defined(interp, comp)) {

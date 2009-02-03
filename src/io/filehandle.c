@@ -48,10 +48,10 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN_NULLOK(STRING *mode_str))
     if (STRING_IS_NULL(mode_str))
         return PIO_F_READ;
 
-    mode_len = string_length(interp, mode_str);
+    mode_len = Parrot_str_byte_length(interp, mode_str);
 
     for (i = 0; i < mode_len; ++i) {
-        INTVAL s = string_index(interp, mode_str, i);
+        INTVAL s = Parrot_str_indexed(interp, mode_str, i);
         switch (s) {
             case 'r':
                 flags |= PIO_F_READ;
@@ -120,7 +120,7 @@ Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
      * when we get a NULL string, we read a default len
      */
     if (*buf == NULL) {
-        *buf = string_make_empty(interp, enum_stringrep_one, len);
+        *buf = Parrot_str_new_noinit(interp, enum_stringrep_one, len);
         return *buf;
     }
     else {
@@ -653,7 +653,7 @@ Parrot_io_is_encoding(PARROT_INTERP, ARGIN(PMC *filehandle), ARGIN(STRING *value
     if (STRING_IS_NULL(handle_struct->encoding))
         return 0;
 
-    if (string_equal(interp, value, handle_struct->encoding) == 0)
+    if (Parrot_str_equal(interp, value, handle_struct->encoding) == 0)
         return 1;
 
     return 0;

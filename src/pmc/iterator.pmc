@@ -175,7 +175,7 @@ Returns a textual representation of the iterator.
 
     VTABLE STRING *get_string() {
         PMC * const key = (PMC *)PMC_struct_val(SELF);
-        return string_from_int(INTERP, key_integer(INTERP, key));
+        return Parrot_str_from_int(INTERP, key_integer(INTERP, key));
     }
 
 /*

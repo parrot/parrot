@@ -38,7 +38,7 @@ static STRING* make_hash_key(Interp* interp, PMC * key)
 
 static STRING* match_range(Interp* interp, PMC* self, PMC* range)
 {
-    STRING* input_key = const_string(interp, "!INPUT");
+    STRING* input_key = Parrot_str_new_constant(interp, "!INPUT");
     Hash* hash = (Hash*) PMC_struct_val(self);
     HashBucket *b;
     STRING* input;
@@ -58,7 +58,7 @@ static STRING* match_range(Interp* interp, PMC* self, PMC* range)
     if (start == -2 || end == -2 || end < start - 1)
         return NULL;
     else
-        return string_substr(interp, input, start, end - start + 1, NULL, 0);
+        return Parrot_str_substr(interp, input, start, end - start + 1, NULL, 0);
 }
 
 static STRING* fetch_string(Interp* interp, PMC* matchobj, PMC* val)
@@ -75,7 +75,7 @@ static INTVAL fetch_integer(Interp* interp, PMC* matchobj, PMC* val)
 {
     if (val->vtable->base_type == MatchRange_type_id) {
         STRING* valstr = match_range(interp, matchobj, val);
-        return string_to_int(interp, valstr);
+        return Parrot_str_to_int(interp, valstr);
     }
     else {
         return VTABLE_get_integer(interp, val);
@@ -145,7 +145,7 @@ Returns the string value for the element at C<*key>.
                 result = parrot_hash_get_idx(interp, hash, key);
 
                 if (hash->key_type == Hash_key_type_int)
-                    return string_from_int(interp, (INTVAL)result);
+                    return Parrot_str_from_int(interp, (INTVAL)result);
 
                 return (STRING *)result;
             default:
@@ -181,7 +181,7 @@ Returns the string value for the element at C<*key>.
                 if (hash->key_type == Hash_key_type_int)
                     return (INTVAL)result;
                 else
-                    return string_to_int(interp, (STRING *)result);
+                    return Parrot_str_to_int(interp, (STRING *)result);
             default:
                 keystr = make_hash_key(interp, key);
         }
@@ -210,7 +210,7 @@ has not completed yet.
 
 */
     INTVAL get_bool() {
-        STRING* input_key = const_string(interp, "!RESULT");
+        STRING* input_key = Parrot_str_new_constant(interp, "!RESULT");
         Hash* hash = (Hash*) PMC_struct_val(SELF);
         HashBucket *b;
 

@@ -73,11 +73,11 @@ from $2 and $3.
 =cut
 
 inline op bands(inout STR, in STR) :base_core {
-  string_bitwise_and(interp, $1, $2, &$1);
+  Parrot_str_bitwise_and(interp, $1, $2, &$1);
 }
 
 inline op bands(out STR, in STR, in STR) :base_core {
-  $1 = string_bitwise_and(interp, $2, $3, NULL);
+  $1 = Parrot_str_bitwise_and(interp, $2, $3, NULL);
 }
 
 ########################################
@@ -133,11 +133,11 @@ Set the bits of $1 to the B<not> of the corresponding bits from $2.
 =cut
 
 inline op bnots(inout STR) :base_core {
-  string_bitwise_not(interp, $1, &$1);
+  Parrot_str_bitwise_not(interp, $1, &$1);
 }
 
 inline op bnots(out STR, in STR) :base_core {
-  string_bitwise_not(interp, $2, &$1);
+  Parrot_str_bitwise_not(interp, $2, &$1);
 }
 
 inline op bnots(invar PMC) :base_core {
@@ -187,11 +187,11 @@ from $2 and $3.
 =cut
 
 inline op bors(inout STR, in STR) :base_core {
-  string_bitwise_or(interp, $1, $2, &$1);
+  Parrot_str_bitwise_or(interp, $1, $2, &$1);
 }
 
 inline op bors(out STR, in STR, in STR) :base_core {
-  $1 = string_bitwise_or(interp, $2, $3, NULL);
+  $1 = Parrot_str_bitwise_or(interp, $2, $3, NULL);
 }
 
 ########################################

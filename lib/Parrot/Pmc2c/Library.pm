@@ -77,8 +77,8 @@ sub gen_c {
 
     $cout .= <<"EOC";
 #define PARROT_IN_EXTENSION
-#define CONST_STRING(i, s)     const_string(i, s)
-#define CONST_STRING_GEN(i, s) const_string(i, s)
+#define CONST_STRING(i, s)     Parrot_str_new_constant(i, s)
+#define CONST_STRING_GEN(i, s) Parrot_str_new_constant(i, s)
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/dynext.h"

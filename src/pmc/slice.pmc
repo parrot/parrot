@@ -206,7 +206,7 @@ next_range:
         STRING * const cur = RVal_str(r->cur);
         STRING * const end = RVal_str(r->end);
 
-        if (string_compare(interp, cur, end) < 0)
+        if (Parrot_str_compare(interp, cur, end) < 0)
             RVal_str(r->cur) = string_increment(interp, cur);
         else
             goto next_range;
@@ -348,7 +348,7 @@ This is used for implementing Pythons xrange()
 
     VTABLE STRING *get_string_keyed(PMC *key) {
         const INTVAL v = VTABLE_get_integer(INTERP, key);
-        return string_from_int(INTERP, v);
+        return Parrot_str_from_int(INTERP, v);
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {

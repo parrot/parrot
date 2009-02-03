@@ -190,7 +190,7 @@ inline op branch_cs(in STR) :base_loop :check_event :flow {
         PackFile_find_fixup_entry(interp, enum_fixup_label, label);
 
     if (!fe) {
-        string_cstring_free(label);
+        Parrot_str_free_cstring(label);
         real_exception(interp, NULL, 1, "branch_cs: fixup for '%Ss' not found",
             $1);
     }
@@ -199,7 +199,7 @@ inline op branch_cs(in STR) :base_loop :check_event :flow {
         Parrot_switch_to_cs(interp, fe->seg, 1);
     }
     mem_sys_free(fe);
-    string_cstring_free(label);
+    Parrot_str_free_cstring(label);
     interp->resume_flag = 2;
     goto ADDRESS(0);
 }
@@ -1264,13 +1264,13 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
         VTABLE_set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
         PObj_get_FLAGS($1) |= PObj_private1_FLAG;
     }
-    string_cstring_free(name);
+    Parrot_str_free_cstring(name);
 }
 
 op dlvar(out PMC, invar PMC, in STR) {
     char * const name = string_to_cstring(interp, ($3));
     void * const p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
-    string_cstring_free(name);
+    Parrot_str_free_cstring(name);
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,

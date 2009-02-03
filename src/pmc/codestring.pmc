@@ -69,37 +69,37 @@ A newline is automatically added to the end of the fmt.
     INTVAL replen       = 0;
     INTVAL I0, I1;
 
-    fmt = Parrot_make_COW_reference(INTERP, fmt);
+    fmt = Parrot_str_new_COW(INTERP, fmt);
 
     while (pos >= 0) {
         pos += replen;
-        pos = string_str_index(INTERP, fmt, percent, pos);
+        pos = Parrot_str_find_index(INTERP, fmt, percent, pos);
         if (pos < 0) break;
 
-        key = string_substr(INTERP, fmt, pos+1, 1, &key, 0);
+        key = Parrot_str_substr(INTERP, fmt, pos+1, 1, &key, 0);
 
         if (VTABLE_exists_keyed_str(INTERP, hash, key)) {
             repl = VTABLE_get_string_keyed_str(INTERP, hash, key);
         }
-        else if (Parrot_string_is_cclass(INTERP, enum_cclass_numeric, fmt,
+        else if (Parrot_str_is_cclass(INTERP, enum_cclass_numeric, fmt,
                 (UINTVAL)pos + 1)) {
-            I0   = string_to_int(INTERP, key);
+            I0   = Parrot_str_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
-        else if (0 == string_equal(INTERP, key, comma)) {
+        else if (0 == Parrot_str_equal(INTERP, key, comma)) {
             repl = VTABLE_get_string_keyed_int(INTERP, args, 0);
-            repl = Parrot_make_COW_reference(INTERP, repl);
+            repl = Parrot_str_new_COW(INTERP, repl);
             I1   = VTABLE_elements(INTERP, args);
             I0   = 1;
 
             while (I0 < I1) {
                 S0   = VTABLE_get_string_keyed_int(INTERP, args, I0);
-                repl = string_append(INTERP, repl, comma_space);
-                repl = string_append(INTERP, repl, S0);
+                repl = Parrot_str_append(INTERP, repl, comma_space);
+                repl = Parrot_str_append(INTERP, repl, S0);
                 I0++;
             }
         }
-        else if (0 == string_equal(INTERP, key, percent)) {
+        else if (0 == Parrot_str_equal(INTERP, key, percent)) {
             repl = percent;
         }
         else {
@@ -108,15 +108,15 @@ A newline is automatically added to the end of the fmt.
             continue;
         }
 
-        (void) string_replace(INTERP, fmt, pos, 2, repl, NULL);
-        replen = string_length(INTERP, repl);
+        (void) Parrot_str_replace(INTERP, fmt, pos, 2, repl, NULL);
+        replen = Parrot_str_byte_length(INTERP, repl);
     }
 
     /* Add a newline if necessary */
-    if ('\n' != string_index(INTERP, fmt, string_length(interp, fmt) - 1))
-        fmt = string_concat(INTERP, fmt, newline, 0);
+    if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_byte_length(interp, fmt) - 1))
+        fmt = Parrot_str_concat(INTERP, fmt, newline, 0);
 
-    S1 = string_concat(INTERP, SELF.get_string(), fmt, 0);
+    S1 = Parrot_str_concat(INTERP, SELF.get_string(), fmt, 0);
     VTABLE_set_string_native(INTERP, SELF, S1);
 
     RETURN(PMC *SELF);
@@ -140,7 +140,7 @@ counting at 10 (so that the values 0..9 can be considered "safe").
 
   METHOD unique(STRING *format :optional, int has_fmt :opt_flag) {
     static INTVAL counter = 10;
-    STRING *counter_as_string = string_from_int(INTERP, counter);
+    STRING *counter_as_string = Parrot_str_from_int(INTERP, counter);
     UNUSED(SELF);
 
     counter++;
@@ -149,8 +149,8 @@ counting at 10 (so that the values 0..9 can be considered "safe").
         RETURN(STRING *counter_as_string);
     }
     else {
-        STRING *result = string_copy(INTERP, format);
-        result         = string_concat(INTERP, result, counter_as_string, 1);
+        STRING *result = Parrot_str_copy(INTERP, format);
+        result         = Parrot_str_concat(INTERP, result, counter_as_string, 1);
         RETURN(STRING *result);
     }
   }
@@ -168,16 +168,16 @@ prefixed with 'unicode:'.
 */
 
   METHOD escape(STRING *str) {
-    STRING *escaped_str = string_escape_string(INTERP, str);
+    STRING *escaped_str = Parrot_str_escape(INTERP, str);
     STRING *quote       = CONST_STRING(INTERP, "\x22");
     STRING *x           = CONST_STRING(INTERP, "\\x");
     INTVAL x_pos;
     INTVAL is_unicode = 0;
     UNUSED(SELF);
 
-    escaped_str = string_concat(INTERP, quote, escaped_str, 1);
-    escaped_str = string_concat(INTERP, escaped_str, quote, 1);
-    x_pos       = string_str_index(INTERP, escaped_str, x, 0);
+    escaped_str = Parrot_str_concat(INTERP, quote, escaped_str, 1);
+    escaped_str = Parrot_str_concat(INTERP, escaped_str, quote, 1);
+    x_pos       = Parrot_str_find_index(INTERP, escaped_str, x, 0);
 
     if (x_pos != -1) {
         is_unicode = 1;
@@ -185,14 +185,14 @@ prefixed with 'unicode:'.
     else
     {
         STRING *u = CONST_STRING(INTERP, "\\u");
-        INTVAL u_pos = string_str_index(INTERP, escaped_str, u, 0);
+        INTVAL u_pos = Parrot_str_find_index(INTERP, escaped_str, u, 0);
         if (u_pos != -1)
             is_unicode = 1;
     }
 
     if (is_unicode) {
         STRING *unicode = CONST_STRING(INTERP, "unicode:");
-        escaped_str     = string_concat(INTERP, unicode, escaped_str, 1);
+        escaped_str     = Parrot_str_concat(INTERP, unicode, escaped_str, 1);
     }
 
     RETURN(STRING *escaped_str);
@@ -229,21 +229,21 @@ For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
             for (index2 = 0; index2 < elements2; index2++) {
                 STRING *S0   = VTABLE_get_string_keyed_int(INTERP, P0, index2);
                 (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-                if (prefix) out = string_append(INTERP, out, prefix);
-                out    = string_append(INTERP, out, S0);
+                if (prefix) out = Parrot_str_append(INTERP, out, prefix);
+                out    = Parrot_str_append(INTERP, out, S0);
                 prefix = semi;
             }
         }
         else {
             STRING *S0   = VTABLE_get_string_keyed_int(INTERP, args, index);
             (STRING *S0) = PCCINVOKE(INTERP, SELF, "escape", STRING *S0);
-            if (prefix) out = string_append(INTERP, out, prefix);
-            out    = string_append(INTERP, out, S0);
+            if (prefix) out = Parrot_str_append(INTERP, out, prefix);
+            out    = Parrot_str_append(INTERP, out, S0);
             prefix = semi;
         }
     }
 
-    out = string_append(INTERP, out, close_bracket);
+    out = Parrot_str_append(INTERP, out, close_bracket);
 
     RETURN(STRING *out);
 }

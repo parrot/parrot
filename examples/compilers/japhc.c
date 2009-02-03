@@ -60,7 +60,7 @@ Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)
     STRING *cmp;
 
     cdebug((stderr, "japhc_init\n"));
-    cmp = const_string(interp, "JaPH_Compiler");
+    cmp = Parrot_str_new_constant(interp, "JaPH_Compiler");
     Parrot_compreg(interp, cmp, japh_compiler);
 }
 

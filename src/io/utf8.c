@@ -84,7 +84,7 @@ Parrot_io_read_utf8(PARROT_INTERP, ARGMOD(PMC *filehandle),
                 UNUSED(read);
 
                 s->strlen    = iter.charpos;
-                s            = string_append(interp, s, s2);
+                s            = Parrot_str_append(interp, s, s2);
                 len         += len2 + 1;
 
                 /* check last char */

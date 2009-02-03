@@ -897,7 +897,7 @@ static PMC* make_param_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
     else
         pos_name = stream_word_u(ass->tables, row_addr + 4);
     if (pos_name)
-        param->str_name = string_from_cstring(INTERP, ass->strings + pos_name, 0);
+        param->str_name = Parrot_str_new(INTERP, ass->strings + pos_name, 0);
     else
         param->str_name = NULL;
 
@@ -947,7 +947,7 @@ static PMC* make_field_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
         cur_pos = 6;
     }
     if (pos_name)
-        field->str_name = string_from_cstring(INTERP, ass->strings + pos_name, 0);
+        field->str_name = Parrot_str_new(INTERP, ass->strings + pos_name, 0);
     else
         field->str_name = NULL;
 
@@ -1011,7 +1011,7 @@ static PMC* make_method_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
         cur_pos = 12;
     }
     if (pos_name)
-        method->str_name = string_from_cstring(INTERP, ass->strings + pos_name, 0);
+        method->str_name = Parrot_str_new(INTERP, ass->strings + pos_name, 0);
     else
         method->str_name = NULL;
 
@@ -1187,16 +1187,16 @@ static PMC* make_class_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
         cur_pos = 12;
     }
     if (pos_name)
-        type->str_name = string_from_cstring(INTERP, ass->strings + pos_name, 0);
+        type->str_name = Parrot_str_new(INTERP, ass->strings + pos_name, 0);
     else
         type->str_name = NULL;
     if (pos_namespace)
     {
-        type->str_namespace = string_from_cstring(INTERP,
+        type->str_namespace = Parrot_str_new(INTERP,
             ass->strings + pos_namespace, 0);
-        type->str_fullname = string_concat(INTERP, type->str_namespace,
+        type->str_fullname = Parrot_str_concat(INTERP, type->str_namespace,
             string_from_literal(INTERP, "."), 0);
-        type->str_fullname = string_concat(INTERP, type->str_fullname,
+        type->str_fullname = Parrot_str_concat(INTERP, type->str_fullname,
             type->str_name, 0);
     }
     else
@@ -1357,11 +1357,11 @@ static PMC* make_typeref_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
         pos_namespace = stream_word_u(ass->tables, row_addr + cur_pos + 4);
     }
     if (pos_name)
-        typeref->str_name = string_from_cstring(INTERP, ass->strings + pos_name, 0);
+        typeref->str_name = Parrot_str_new(INTERP, ass->strings + pos_name, 0);
     else
         typeref->str_name = NULL;
     if (pos_namespace)
-        typeref->str_namespace = string_from_cstring(INTERP,
+        typeref->str_namespace = Parrot_str_new(INTERP,
             ass->strings + pos_namespace, 0);
     else
         typeref->str_namespace = NULL;
@@ -1425,7 +1425,7 @@ static PMC* make_memberref_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass,
         pos_name = stream_word_u(ass->tables, row_addr + cur_pos);
         cur_pos += 4;
     }
-    memberref->str_name = string_from_cstring(INTERP, ass->strings + pos_name, 0);
+    memberref->str_name = Parrot_str_new(INTERP, ass->strings + pos_name, 0);
 
     /* Get signature. */
     if (ass->blobs_ptr_size == 2)
@@ -1493,7 +1493,7 @@ static PMC* make_assemblyref_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass
         pos_name = stream_word_u(ass->tables, row_addr + cur_pos);
         cur_pos += 4;
     }
-    assemblyref->str_name = string_from_cstring(INTERP, ass->strings + pos_name, 0);
+    assemblyref->str_name = Parrot_str_new(INTERP, ass->strings + pos_name, 0);
 
     /* Get culture. */
     if (ass->strings_ptr_size == 2)
@@ -1506,7 +1506,7 @@ static PMC* make_assemblyref_pmc(Interp *INTERP, PMC *self, dotnet_assembly *ass
         pos_culture = stream_word_u(ass->tables, row_addr + cur_pos);
         cur_pos += 4;
     }
-    assemblyref->str_culture = string_from_cstring(INTERP, ass->strings + pos_culture, 0);
+    assemblyref->str_culture = Parrot_str_new(INTERP, ass->strings + pos_culture, 0);
 
     /* Get hash value blob index. */
     if (ass->blobs_ptr_size == 2)
@@ -1843,7 +1843,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
             return;
 
         /* Otherwise, we need to load it. */
-        filename = string_to_cstring(INTERP, ass->filename);
+        filename = Parrot_str_to_cstring(INTERP, ass->filename);
         in = fopen(filename, "rb");
         free(filename);
 
@@ -1935,7 +1935,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
         /* Create and return a new string (pass 0 as length; end found
            automatically). */
 
-        result = string_from_cstring(INTERP, ass->strings + i, 0);
+        result = Parrot_str_new(INTERP, ass->strings + i, 0);
         RETURN(STRING *result);
     }
 
@@ -1989,7 +1989,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
                "Blob position and length out of range");
 
         /* Return string. */
-        result = string_make_direct(INTERP, ass->user_strings + start,
+        result = Parrot_str_new_init(INTERP, ass->user_strings + start,
                     length - 1, encoding, charset, 0);
         RETURN(STRING *result);
     }
@@ -2039,7 +2039,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
                "Blob position and length out of range");
 
         /* Return string containing blob. */
-        out = string_from_cstring(INTERP, ass->blobs + start, length);
+        out = Parrot_str_new(INTERP, ass->blobs + start, length);
         if (!out)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                "Unable to create blob string");

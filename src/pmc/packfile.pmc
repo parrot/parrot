@@ -68,7 +68,7 @@ Return raw serialized PBC file data.
         opcode_t *ptr = (opcode_t*)mem_sys_allocate(length);
         STRING *str;
         PackFile_pack(interp, pf, ptr);
-        str = string_make_direct(interp, (const char*)ptr, length,
+        str = Parrot_str_new_init(interp, (const char*)ptr, length,
                 PARROT_FIXED_8_ENCODING, PARROT_BINARY_CHARSET, 0);
         mem_sys_free(ptr);
         return str;
@@ -87,7 +87,7 @@ Implementation note: taken from the bottom end of Parrot_readbc().
     VTABLE void set_string_native(STRING *str) {
         PackFile *pf = PMC_data_typed(SELF, PackFile *);
         const opcode_t *ptr = (const opcode_t*)Parrot_string_cstring(interp, str);
-        int length = string_length(interp, str);
+        int length = Parrot_str_byte_length(interp, str);
         if (!PackFile_unpack(interp, pf, ptr, length))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                                         "Can't unpack packfile.");
@@ -132,25 +132,25 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
 */
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
         PackFile *pf = PMC_data_typed(SELF, PackFile *);
-        if (!string_compare(interp, key, CONST_STRING(interp, "wordsize")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "wordsize")))
             return pf->header->wordsize;
-        if (!string_compare(interp, key, CONST_STRING(interp, "byteorder")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "byteorder")))
             return pf->header->byteorder;
-        if (!string_compare(interp, key, CONST_STRING(interp, "fptype")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "fptype")))
             return pf->header->floattype;
-        if (!string_compare(interp, key, CONST_STRING(interp, "version_major")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "version_major")))
             return pf->header->major;
-        if (!string_compare(interp, key, CONST_STRING(interp, "version_minor")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "version_minor")))
             return pf->header->minor;
-        if (!string_compare(interp, key, CONST_STRING(interp, "version_patch")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "version_patch")))
             return pf->header->patch;
-        if (!string_compare(interp, key, CONST_STRING(interp, "bytecode_major")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "bytecode_major")))
             return pf->header->bc_major;
-        if (!string_compare(interp, key, CONST_STRING(interp, "bytecode_minor")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "bytecode_minor")))
             return pf->header->bc_minor;
-        if (!string_compare(interp, key, CONST_STRING(interp, "uuid_type")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "uuid_type")))
             return pf->header->uuid_type;
-        if (!string_compare(interp, key, CONST_STRING(interp, "uuid_length")))
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "uuid_length")))
             return pf->header->uuid_size;
 
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
@@ -175,8 +175,8 @@ Fetch a string keyed value from the packfile object.  Valid keys are:
 */
     VTABLE STRING *get_string_keyed_str(STRING *key) {
         PackFile *pf = PMC_data_typed(SELF, PackFile *);
-        if (!string_compare(interp, key, CONST_STRING(interp, "uuid")))
-            return string_from_cstring(interp, (char*)pf->header->uuid_data, pf->header->uuid_size);
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "uuid")))
+            return Parrot_str_new(interp, (char*)pf->header->uuid_data, pf->header->uuid_size);
 
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
                        "Packfile: No such string key \"%s\"",
@@ -238,19 +238,19 @@ Set an integer keyed value to the specified value.  Valid keys are:
 */
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
         PackFile *pf = PMC_data_typed(SELF, PackFile *);
-        if (!string_compare(interp, key, CONST_STRING(interp, "version_major"))) {
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "version_major"))) {
             pf->header->major = value;
             return;
         }
-        if (!string_compare(interp, key, CONST_STRING(interp, "version_minor"))) {
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "version_minor"))) {
             pf->header->minor = value;
             return;
         }
-        if (!string_compare(interp, key, CONST_STRING(interp, "version_patch"))) {
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "version_patch"))) {
             pf->header->patch = value;
             return;
         }
-        if (!string_compare(interp, key, CONST_STRING(interp, "uuid_type"))) {
+        if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "uuid_type"))) {
             pf->header->uuid_type = value;
             return;
         }

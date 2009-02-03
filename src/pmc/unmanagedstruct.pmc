@@ -506,7 +506,7 @@ set_string(PARROT_INTERP, char *p, int type, STRING *value)
 {
     if (type == enum_type_cstr) {
         /* assuming 0-terminated C-string here;
-         * we can't use string_to_cstring easily */
+         * we can't use Parrot_str_to_cstring easily */
         char *cstr  = value->strstart;
         *(char **)p = cstr;
     }

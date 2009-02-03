@@ -41,17 +41,17 @@ INTVAL
 Parrot_get_datatype_enum(PARROT_INTERP, ARGIN(const STRING *type_name))
 {
     ASSERT_ARGS(Parrot_get_datatype_enum)
-    char * const type = string_to_cstring(interp, type_name);
+    char * const type = Parrot_str_to_cstring(interp, type_name);
     int i;
 
     for (i = enum_first_type; i < enum_last_type; i++) {
         if (STREQ(data_types[i - enum_first_type].name, type)) {
-            string_cstring_free(type);
+            Parrot_str_free_cstring(type);
             return i;
         }
     }
 
-    string_cstring_free(type);
+    Parrot_str_free_cstring(type);
 
     return enum_type_undef;
 }

@@ -78,7 +78,7 @@ static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
         return PMC_int_val(t1) == PMC_int_val(t2);
 
     if (PMC_type(t1) == dynpmc_LuaString)
-        return 0 == string_compare(interp, PMC_str_val(t1), PMC_str_val(t2));
+        return 0 == Parrot_str_compare(interp, PMC_str_val(t1), PMC_str_val(t2));
 
     return PMC_struct_val(t1) == PMC_struct_val(t2);
 }
@@ -101,7 +101,7 @@ static Node *mainposition(PARROT_INTERP, const LuaHash *t, PMC *key)
         h = PMC_int_val(key);
     }
     else if (PMC_type(key) == dynpmc_LuaString) {
-        h = string_hash(interp, VTABLE_get_string(interp, key));
+        h = Parrot_str_to_hashval(interp, VTABLE_get_string(interp, key));
     }
     else {
         h = (unsigned long)PMC_struct_val(key);
@@ -117,12 +117,12 @@ static Node *mainposition(PARROT_INTERP, const LuaHash *t, PMC *key)
 /* specialized version for strings */
 static PMC** lua_getstr(PARROT_INTERP, const LuaHash *t, STRING *key)
 {
-    unsigned long h = string_hash(interp, key);
+    unsigned long h = Parrot_str_to_hashval(interp, key);
     Node         *n = &t->node[h&(t->size-1)];
 
     do {
         if (PMC_type(n->key) == dynpmc_LuaString
-         && 0 == string_compare(interp, PMC_str_val(n->key), key))
+         && 0 == Parrot_str_compare(interp, PMC_str_val(n->key), key))
             return &n->val;
 
         n = n->next;
@@ -342,11 +342,11 @@ static void lua_mark_table(PARROT_INTERP, LuaHash *t, STRING *mode)
     int   i;
 
     if (mode) {
-        mark_key = string_str_index(interp, mode,
-                    const_string(interp, "k"), 0) < 0;
+        mark_key = Parrot_str_find_index(interp, mode,
+                    Parrot_str_new_constant(interp, "k"), 0) < 0;
 
-        mark_val = string_str_index(interp, mode,
-                    const_string(interp, "v"), 0) < 0;
+        mark_val = Parrot_str_find_index(interp, mode,
+                    Parrot_str_new_constant(interp, "v"), 0) < 0;
     }
 
     for (i = 0; i < t->size; i++) {
@@ -402,11 +402,11 @@ Marks the hash as live.
 #if 0
             PMC *key = pmc_new(INTERP, dynpmc_LuaString);
             VTABLE_set_string_native(INTERP, key,
-                    const_string(INTERP, "__mode"));
+                    Parrot_str_new_constant(INTERP, "__mode"));
             m = lua_get(INTERP, PMC_hash(meta), key);
 #else
             m = lua_getstr(INTERP, PMC_hash(meta),
-                    const_string(INTERP, "__mode"));
+                    Parrot_str_new_constant(INTERP, "__mode"));
 #endif
             if (m && *m)
                 mode = PMC_str_val(*m);
@@ -445,7 +445,7 @@ Return the string "table".
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "table");
+        return Parrot_str_new_constant(INTERP, "table");
     }
 
 /*
@@ -570,7 +570,7 @@ Need by NameSpace.export_to().
 */
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
         PMC * pmc_key = pmc_new(INTERP, dynpmc_LuaString);
-        VTABLE_set_string_native(INTERP, pmc_key, string_copy(INTERP, key));
+        VTABLE_set_string_native(INTERP, pmc_key, Parrot_str_copy(INTERP, key));
         value = VTABLE_clone(interp, value);
         *lua_set(INTERP, PMC_hash(SELF), pmc_key) = value;
     }

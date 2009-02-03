@@ -129,33 +129,33 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
         INTVAL is_int_type, ARGIN_NULLOK(STRING* prefix))
 {
     ASSERT_ARGS(handle_flags)
-    UINTVAL len = string_length(interp, str);
+    UINTVAL len = Parrot_str_byte_length(interp, str);
 
     if (is_int_type) {
         if (info->flags & FLAG_PREC && info->prec == 0 &&
                 len == 1 &&
                 string_ord(interp, str, 0) == '0') {
-            string_chopn_inplace(interp, str, len);
+            Parrot_str_chopn_inplace(interp, str, len);
             len = 0;
         }
         /* +, space */
         if (!len || string_ord(interp, str, 0) != '-') {
             if (info->flags & FLAG_PLUS) {
                 STRING * const cs = CONST_STRING(interp, "+");
-                str = string_concat(interp, cs, str, 0);
+                str = Parrot_str_concat(interp, cs, str, 0);
                 len++;
             }
             else if (info->flags & FLAG_SPACE) {
                 STRING * const cs = CONST_STRING(interp, " ");
-                str = string_concat(interp, cs, str, 0);
+                str = Parrot_str_concat(interp, cs, str, 0);
                 len++;
             }
         }
 
         /* # 0x ... */
         if ((info->flags & FLAG_SHARP) && prefix) {
-            str = string_concat(interp, prefix, str, 0);
-            len += string_length(interp, prefix);
+            str = Parrot_str_concat(interp, prefix, str, 0);
+            len += Parrot_str_byte_length(interp, prefix);
         }
         /* XXX sharp + fill ??? */
 
@@ -176,12 +176,12 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
     else {
         /* string precision */
         if (info->flags & FLAG_PREC && info->prec == 0) {
-            string_chopn_inplace(interp, str, len);
+            Parrot_str_chopn_inplace(interp, str, len);
             len = 0;
         }
         else
             if (info->flags & FLAG_PREC && info->prec < len) {
-                string_chopn_inplace(interp, str, -(INTVAL)(info->prec));
+                Parrot_str_chopn_inplace(interp, str, -(INTVAL)(info->prec));
                 len = info->prec;
             }
     }
@@ -194,7 +194,7 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
         STRING * const fill = Parrot_str_repeat(interp, filler, info->width - len);
 
         if (info->flags & FLAG_MINUS) { /* left-align */
-            str = string_concat(interp, str, fill, 0);
+            str = Parrot_str_concat(interp, str, fill, 0);
         }
         else {                  /* right-align */
             /* signed and zero padded */
@@ -203,14 +203,14 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
                     string_ord(interp, str, 0) == '+')) {
                 STRING *temp = NULL;
                 STRING *ignored;
-                ignored = string_substr(interp, str, 1, len-1, &temp, 0);
+                ignored = Parrot_str_substr(interp, str, 1, len-1, &temp, 0);
                 UNUSED(ignored);
-                string_chopn_inplace(interp, str, -1);
-                str = string_append(interp, str, fill);
-                str = string_append(interp, str, temp);
+                Parrot_str_chopn_inplace(interp, str, -1);
+                str = Parrot_str_append(interp, str, fill);
+                str = Parrot_str_append(interp, str, temp);
             }
             else {
-                str = string_concat(interp, fill, str, 0);
+                str = Parrot_str_concat(interp, fill, str, 0);
             }
         }
     }
@@ -237,7 +237,7 @@ str_append_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *inf
 {
     ASSERT_ARGS(str_append_w_flags)
     src = handle_flags(interp, info, src, 1, prefix);
-    dest = string_append(interp, dest, src);
+    dest = Parrot_str_append(interp, dest, src);
     return dest;
 }
 
@@ -325,14 +325,14 @@ Parrot_sprintf_format(PARROT_INTERP,
     INTVAL i;
     INTVAL len     = 0;
     INTVAL old     = 0;
-    INTVAL pat_len = (INTVAL)string_length(interp, pat);
+    INTVAL pat_len = (INTVAL)Parrot_str_byte_length(interp, pat);
     HUGEINTVAL num;
 
     /* start with a buffer; double the pattern length to avoid realloc #1 */
-    STRING *targ = string_make_empty(interp, enum_stringrep_one, pat_len << 1);
+    STRING *targ = Parrot_str_new_noinit(interp, enum_stringrep_one, pat_len << 1);
 
     /* ts is used almost universally as an intermediate target;
-     * tc is used as a temporary buffer by uint_to_string and
+     * tc is used as a temporary buffer by Parrot_str_from_uint and
      * as a target by gen_sprintf_call.
      */
     STRING *substr = NULL;
@@ -342,10 +342,10 @@ Parrot_sprintf_format(PARROT_INTERP,
         if (string_ord(interp, pat, i) == '%') {        /* % */
             if (len) {
                 STRING *ignored
-                    = string_substr(interp, pat, old, len, &substr, 1);
+                    = Parrot_str_substr(interp, pat, old, len, &substr, 1);
                 UNUSED(ignored);
                 /* XXX This shouldn't modify targ the pointer */
-                targ = string_append(interp, targ, substr);
+                targ = Parrot_str_append(interp, targ, substr);
             }
             len = 0;
             old = i;
@@ -608,7 +608,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             STRING * const ts    =
-                                uint_to_str(interp, tc, theuint, 8, 0);
+                                Parrot_str_from_uint(interp, tc, theuint, 8, 0);
                             STRING * const prefix = CONST_STRING(interp, "0");
 
                             /* unsigned conversion - no plus */
@@ -623,7 +623,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             STRING * const ts         =
-                                uint_to_str(interp, tc, theuint, 16, 0);
+                                Parrot_str_from_uint(interp, tc, theuint, 16, 0);
                             STRING * const prefix = CONST_STRING(interp, "0x");
 
                             /* unsigned conversion - no plus */
@@ -639,8 +639,8 @@ Parrot_sprintf_format(PARROT_INTERP,
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             STRING * const ts =
-                                uint_to_str(interp, tc, theuint, 16, 0);
-                            string_upcase_inplace(interp, ts);
+                                Parrot_str_from_uint(interp, tc, theuint, 16, 0);
+                            Parrot_str_upcase_inplace(interp, ts);
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
@@ -655,7 +655,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             const UHUGEINTVAL theuint =
                                 obj->getuint(interp, info.type, obj);
                             STRING * const ts =
-                                uint_to_str(interp, tc, theuint, 2, 0);
+                                Parrot_str_from_uint(interp, tc, theuint, 2, 0);
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
@@ -670,7 +670,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             const HUGEINTVAL theint =
                                 obj->getint(interp, info.type, obj);
                             STRING * const ts =
-                                int_to_str(interp, tc, theint, 2);
+                                Parrot_str_from_int_base(interp, tc, theint, 2);
 
                             /* unsigned conversion - no plus */
                             info.flags &= ~FLAG_PLUS;
@@ -702,7 +702,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             ts = cstr2pstr(tc);
                             {
                                 char * const tempstr =
-                                    string_to_cstring(interp, ts);
+                                    Parrot_str_to_cstring(interp, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -711,9 +711,9 @@ Parrot_sprintf_format(PARROT_INTERP,
                                 /* the buffer is 4096, so no problem here */
                                 sprintf(tc, tempstr, sharedint);
 #endif
-                                string_cstring_free(tempstr);
+                                Parrot_str_free_cstring(tempstr);
                             }
-                            targ = string_append(interp, targ, cstr2pstr(tc));
+                            targ = Parrot_str_append(interp, targ, cstr2pstr(tc));
                             }
                             break;
 
@@ -722,7 +722,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             STRING * const prefix = CONST_STRING(interp, "0x");
                             const void * const ptr =
                                 obj->getptr(interp, info.type, obj);
-                            STRING * const ts = uint_to_str(interp, tc,
+                            STRING * const ts = Parrot_str_from_uint(interp, tc,
                                        (UHUGEINTVAL) (size_t) ptr, 16, 0);
 
                             targ = str_append_w_flags(interp, targ, &info,
@@ -760,7 +760,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             /* XXX lost precision if %Hg or whatever */
                             {
                                 char * const tempstr =
-                                    string_to_cstring(interp, ts);
+                                    Parrot_str_to_cstring(interp, ts);
 
 #ifdef PARROT_HAS_SNPRINTF
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
@@ -770,7 +770,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                                 /* the buffer is 4096, so no problem here */
                                 sprintf(tc, tempstr, (double)thefloat);
 #endif
-                                string_cstring_free(tempstr);
+                                Parrot_str_free_cstring(tempstr);
                             }
 
 #ifdef WIN32
@@ -813,7 +813,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                             }
 #endif /* WIN32 */
 
-                            targ = string_append(interp, targ, cstr2pstr(tc));
+                            targ = Parrot_str_append(interp, targ, cstr2pstr(tc));
                             }
                             break;
 
@@ -833,7 +833,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                                                     string, 0, NULL);
                                 obj->index++;
 
-                                targ = string_append(interp, targ, ts);
+                                targ = Parrot_str_append(interp, targ, ts);
                                 break;
                             }
 
@@ -844,7 +844,7 @@ Parrot_sprintf_format(PARROT_INTERP,
                                                         info.type, obj);
                             STRING * const ts     = handle_flags(interp, &info,
                                                         string, 0, NULL);
-                            targ = string_append(interp, targ, ts);
+                            targ = Parrot_str_append(interp, targ, ts);
                             }
                             break;
 
@@ -886,9 +886,9 @@ Parrot_sprintf_format(PARROT_INTERP,
         }
     }
     if (len) {
-        STRING *ignored = string_substr(interp, pat, old, len, &substr, 1);
+        STRING *ignored = Parrot_str_substr(interp, pat, old, len, &substr, 1);
         UNUSED(ignored);
-        targ = string_append(interp, targ, substr);
+        targ = Parrot_str_append(interp, targ, substr);
     }
 
     return targ;

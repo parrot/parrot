@@ -142,7 +142,7 @@ Class method to construct an Integer from the string representation C<rep>.
             : pmc_new(INTERP, type);
 
         /* RT #46623 bigint overflow */
-        VTABLE_set_integer_native(INTERP, res, string_to_int(INTERP, rep));
+        VTABLE_set_integer_native(INTERP, res, Parrot_str_to_int(INTERP, rep));
         return res;
     }
 
@@ -261,11 +261,11 @@ Returns the string value of the integer.
 
 */
     VTABLE STRING *get_string() {
-        return string_from_int(INTERP, SELF.get_integer());
+        return Parrot_str_from_int(INTERP, SELF.get_integer());
     }
 
     VTABLE STRING *get_repr() {
-        return string_from_int(INTERP, SELF.get_integer());
+        return Parrot_str_from_int(INTERP, SELF.get_integer());
     }
 
 
@@ -1352,7 +1352,7 @@ and 36, inclusive.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "get_as_base: base out of bounds");
 
-        result = int_to_str(interp, buf,
+        result = Parrot_str_from_int_base(interp, buf,
                 (HUGEINTVAL)VTABLE_get_integer(INTERP, SELF),
                 (unsigned int)base);
 

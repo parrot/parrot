@@ -34,7 +34,7 @@ Return the string 'NULL'.
 
 */
     STRING* name() {
-        return const_string(INTERP, "NULL");
+        return Parrot_str_new_constant(INTERP, "NULL");
     }
 
     VTABLE void set_integer_native(INTVAL value) {

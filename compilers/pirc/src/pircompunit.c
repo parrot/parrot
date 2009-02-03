@@ -199,7 +199,7 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
 
     /* get the index number of this vtable method */
     vtable_index = Parrot_get_vtable_index(lexer->interp,
-                                           string_from_cstring(lexer->interp, vtablename,
+                                           Parrot_str_new(lexer->interp, vtablename,
                                                                strlen(vtablename)));
 
     /* now check whether the method name actually a vtable method */
@@ -894,7 +894,7 @@ Load the library indicated by C<library>.
 void
 load_library(lexer_state * const lexer, char const * const library) {
     /* see imcc.y:600 */
-    STRING *libname       = string_from_cstring(lexer->interp, library, strlen(library));
+    STRING *libname       = Parrot_str_new(lexer->interp, library, strlen(library));
     PMC    *ignored_value = Parrot_load_lib(lexer->interp, libname, NULL);
     UNUSED(ignored_value);
     Parrot_register_HLL_lib(lexer->interp, libname);
@@ -1442,9 +1442,9 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
               char const * const name, constant * const value)
 {
     /* get a STRING representation of the c-string type */
-    STRING *classname    = string_from_cstring(lexer->interp, type, strlen(type));
+    STRING *classname    = Parrot_str_new(lexer->interp, type, strlen(type));
     /* get a STRING holding the c-string "Sub" */
-    STRING *subclassname = string_from_cstring(lexer->interp, "Sub", 3);
+    STRING *subclassname = Parrot_str_new(lexer->interp, "Sub", 3);
     /* get a PMC for the class passed in type */
     PMC    *constclass   = Parrot_oo_get_class_str(lexer->interp, classname);
     /* check whether that PMC isa "Sub" */
@@ -1488,7 +1488,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
     }
     else if (value->type == INT_VAL) {
 
-        STRING *intclassname = string_from_cstring(lexer->interp, "Integer", 7);
+        STRING *intclassname = Parrot_str_new(lexer->interp, "Integer", 7);
         INTVAL  is_an_int    = VTABLE_isa(lexer->interp, constclass, intclassname);
 
         if (is_an_int) {
@@ -1523,7 +1523,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
 
     }
     else if (value->type == NUM_VAL) {
-        STRING *numclassname  = string_from_cstring(lexer->interp, "Float", 5);
+        STRING *numclassname  = Parrot_str_new(lexer->interp, "Float", 5);
         INTVAL  is_a_num      = VTABLE_isa(lexer->interp, constclass, numclassname);
 
         if (is_a_num) {
@@ -1553,7 +1553,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
         }
     }
     else if (value->type == STRING_VAL) {
-        STRING *strclassname = string_from_cstring(lexer->interp, "String", 6);
+        STRING *strclassname = Parrot_str_new(lexer->interp, "String", 6);
         INTVAL  is_a_string  = VTABLE_isa(lexer->interp, constclass, strclassname);
 
         if (is_a_string) {
@@ -1566,7 +1566,7 @@ new_pmc_const(lexer_state * const lexer, char const * const type,
             int     index     = add_pmc_const(lexer->bc, strconst);
 
             VTABLE_set_string_native(lexer->interp, strconst,
-                                     string_from_cstring(lexer->interp, value->val.sval,
+                                     Parrot_str_new(lexer->interp, value->val.sval,
                                                          strlen(value->val.sval)));
 
             declare_local(lexer, PMC_TYPE, constsym);
@@ -1995,7 +1995,7 @@ Code taken from imcc.y; needs testing.
 */
 void
 set_hll(lexer_state * const lexer, char const * const hll) {
-    STRING * const hll_name             = string_from_cstring(lexer->interp, hll, strlen(hll));
+    STRING * const hll_name             = Parrot_str_new(lexer->interp, hll, strlen(hll));
     CONTEXT(lexer->interp)->current_HLL = Parrot_register_HLL(lexer->interp, hll_name);
 }
 
@@ -2021,8 +2021,8 @@ Code taken from imcc.y; needs testing.
 void
 set_hll_map(lexer_state * const lexer, char const * const stdtype, char const * const maptype) {
     Parrot_Context *ctx           = CONTEXT(lexer->interp);
-    STRING * const  built_in_name = string_from_cstring(lexer->interp, stdtype, strlen(stdtype));
-    STRING * const  language_name = string_from_cstring(lexer->interp, maptype, strlen(maptype));
+    STRING * const  built_in_name = Parrot_str_new(lexer->interp, stdtype, strlen(stdtype));
+    STRING * const  language_name = Parrot_str_new(lexer->interp, maptype, strlen(maptype));
     int             built_in_type = pmc_type(lexer->interp, built_in_name);
     int             language_type = pmc_type(lexer->interp, language_name);
 

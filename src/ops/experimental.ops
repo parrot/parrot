@@ -353,7 +353,7 @@ inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
   STRING *dest = $1;
   if (!dest)
     dest = new_string_header(interp, 0);
-  $1 = string_substr(interp, $2, $3, $4, &dest, 1);
+  $1 = Parrot_str_substr(interp, $2, $3, $4, &dest, 1);
 }
 
 =item C<find_sub_not_null>(out PMC, in STR)

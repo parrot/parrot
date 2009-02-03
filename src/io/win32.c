@@ -224,10 +224,10 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
     flags |= PIO_F_FILE;
 
     { /* enclosing scope for temporary C string */
-        char * const spath = string_to_cstring(interp, path);
+        char * const spath = Parrot_str_to_cstring(interp, path);
         fd = CreateFile(spath, fAcc, fShare, NULL, fCreat,
                     FILE_ATTRIBUTE_NORMAL, NULL);
-        string_cstring_free(spath);
+        Parrot_str_free_cstring(spath);
     }
     if (fd != INVALID_HANDLE_VALUE) {
         PMC *io;

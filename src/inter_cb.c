@@ -356,7 +356,7 @@ case_I:
 #endif
         case 't':
             pasm_sig[2] = 'S';
-            param = string_from_cstring(interp, external_data, 0);
+            param = Parrot_str_new(interp, external_data, 0);
             break;
         default:
             Parrot_ex_throw_from_c_args(interp, NULL, 1,

@@ -142,7 +142,7 @@ set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
         ARGIN(STRING *name))
 {
     ASSERT_ARGS(set_cstring_prop)
-    STRING * const key  = const_string(interp, what);
+    STRING * const key  = Parrot_str_new_constant(interp, what);
     PMC    * const prop = constant_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, prop, name);
@@ -251,7 +251,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
 
         for (i = 0; i < n; ++i) {
             ext = VTABLE_get_string_keyed_int(interp, share_ext, i);
-            full_name = string_concat(interp, wo_ext, ext, 0);
+            full_name = Parrot_str_concat(interp, wo_ext, ext, 0);
             path = Parrot_locate_runtime_file_str(interp, full_name,
                     PARROT_RUNTIME_FT_DYNEXT);
             if (path) {
@@ -298,7 +298,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
     if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
         *handle = Parrot_dlopen((char*)lib->strstart + 3);
         if (*handle) {
-            path = string_substr(interp, lib, 3, lib->strlen - 3, NULL, 0);
+            path = Parrot_str_substr(interp, lib, 3, lib->strlen - 3, NULL, 0);
             return path;
         }
     }
@@ -307,8 +307,8 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
     /* And on cygwin replace a leading "lib" by "cyg". */
 #ifdef __CYGWIN__
     if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
-        path = string_append(interp, CONST_STRING(interp, "cyg"),
-            string_substr(interp, lib, 3, lib->strlen - 3, NULL, 0));
+        path = Parrot_str_append(interp, CONST_STRING(interp, "cyg"),
+            Parrot_str_substr(interp, lib, 3, lib->strlen - 3, NULL, 0));
 
         *handle           = Parrot_dlopen(path->strstart);
 
@@ -393,18 +393,18 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
                                         "Parrot_lib_%Ss_load", lib_name);
         STRING * const init_func_name  = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_init", lib_name);
-        char   * const cload_func_name = string_to_cstring(interp, load_name);
-        char   * const cinit_func_name = string_to_cstring(interp, init_func_name);
+        char   * const cload_func_name = Parrot_str_to_cstring(interp, load_name);
+        char   * const cinit_func_name = Parrot_str_to_cstring(interp, init_func_name);
 
         /* get load_func */
         load_func       = (PMC * (*)(PARROT_INTERP))
             D2FPTR(Parrot_dlsym(handle, cload_func_name));
-        string_cstring_free(cload_func_name);
+        Parrot_str_free_cstring(cload_func_name);
 
         /* get init_func */
         init_func       = (void (*)(PARROT_INTERP, PMC *))
             D2FPTR(Parrot_dlsym(handle, cinit_func_name));
-        string_cstring_free(cinit_func_name);
+        Parrot_str_free_cstring(cinit_func_name);
     }
     else {
         load_func = NULL;
@@ -454,12 +454,12 @@ clone_string_into(ARGMOD(Interp *d), ARGIN(Interp *s), ARGIN(PMC *value))
 {
     ASSERT_ARGS(clone_string_into)
     STRING * const  orig   = VTABLE_get_string(s, value);
-    char   * const raw_str = string_to_cstring(s, orig);
+    char   * const raw_str = Parrot_str_to_cstring(s, orig);
     STRING * const   ret   =
-        string_make_direct(d, raw_str, strlen(raw_str),
+        Parrot_str_new_init(d, raw_str, strlen(raw_str),
             PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
             PObj_constant_FLAG);
-    string_cstring_free(raw_str);
+    Parrot_str_free_cstring(raw_str);
     return ret;
 }
 
@@ -516,7 +516,7 @@ Parrot_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_pmc))
     STRING * const type =
         VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, type_str));
 
-    if (!string_equal(s, type, ops)) {
+    if (!Parrot_str_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
          * shared between interpreters dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.

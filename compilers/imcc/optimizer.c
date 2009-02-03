@@ -827,8 +827,8 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
                             break;
                         case 'N':
                             {
-                            STRING * const s = string_from_cstring(interp, r[i]->name, 0);
-                            REG_NUM(interp, i) = string_to_num(interp, s);
+                            STRING * const s = Parrot_str_new(interp, r[i]->name, 0);
+                            REG_NUM(interp, i) = Parrot_str_to_num(interp, s);
                             }
                             break;
                         case 'S':
@@ -1031,12 +1031,12 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
                 break;
             case 'S':
             {
-                char * const name = string_to_cstring(interp, REG_STR(interp, 0));
+                char * const name = Parrot_str_to_cstring(interp, REG_STR(interp, 0));
 
                 r[1] = mk_const(interp, name, r[0]->set);
 
                 snprintf(b, sizeof (b), "%p", REG_STR(interp, 0));
-                string_cstring_free(name);
+                Parrot_str_free_cstring(name);
 
                 break;
             }

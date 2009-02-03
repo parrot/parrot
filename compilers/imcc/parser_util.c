@@ -152,7 +152,7 @@ iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
     SymReg *pmc;
     int nargs;
     const int pmc_num = pmc_type(interp,
-            string_from_cstring(interp, *type == '.' ? type + 1 : type, 0));
+            Parrot_str_new(interp, *type == '.' ? type + 1 : type, 0));
 
     snprintf(fmt, sizeof (fmt), "%d", pmc_num);
     pmc = mk_const(interp, fmt, 'I');
@@ -698,7 +698,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;
         sub_data->end_offs   = new_cs->base.size;
-        sub_data->name       = string_from_cstring(interp, name, 0);
+        sub_data->name       = Parrot_str_new(interp, name, 0);
 
         *error_message = NULL;
     }
@@ -934,7 +934,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     IMCC_INFO(interp)->line        = 1;
 
     /*
-     * the string_compare() called from pmc_type() triggers DOD
+     * the Parrot_str_compare() called from pmc_type() triggers DOD
      * which can destroy packfiles under construction
      */
     Parrot_block_GC_mark(interp);
@@ -1041,13 +1041,13 @@ void
 register_compilers(PARROT_INTERP)
 {
     ASSERT_ARGS(register_compilers)
-    Parrot_compreg(interp, const_string(interp, "PASM"), imcc_compile_pasm_ex);
-    Parrot_compreg(interp, const_string(interp, "PIR"),  imcc_compile_pir_ex);
+    Parrot_compreg(interp, Parrot_str_new_constant(interp, "PASM"), imcc_compile_pasm_ex);
+    Parrot_compreg(interp, Parrot_str_new_constant(interp, "PIR"),  imcc_compile_pir_ex);
 
     /* It looks like this isn't used anywhere yet */
     /* TODO: return a Eval PMC, instead of a packfile */
     /* Parrot_compreg(interp,
-                      const_string(interp, "FILE"),
+                      Parrot_str_new_constant(interp, "FILE"),
                       imcc_compile_file ); */
 }
 

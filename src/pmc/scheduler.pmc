@@ -126,7 +126,7 @@ current maximum, and a birthtime of the current time.
 
         new_tid     = ++(core_struct->max_tid);
         VTABLE_set_integer_native(INTERP, task, new_tid);
-        task_id_str = string_from_int(INTERP, new_tid);
+        task_id_str = Parrot_str_from_int(INTERP, new_tid);
 
         VTABLE_set_pmc_keyed_str(INTERP, core_struct->task_list,
                                          task_id_str, task);
@@ -201,7 +201,7 @@ Removes the task with the given task ID from the task list.
 
     VTABLE void delete_keyed_int(INTVAL key) {
         Parrot_Scheduler_attributes *core_struct = PARROT_SCHEDULER(SELF);
-        STRING           *task_id_str = string_from_int(INTERP, key);
+        STRING           *task_id_str = Parrot_str_from_int(INTERP, key);
         VTABLE_delete_keyed_str(INTERP, core_struct->task_list, task_id_str);
         SCHEDULER_cache_valid_CLEAR(SELF);
     }
@@ -429,12 +429,12 @@ Deletes a handler from the scheduler.
         for (index = 0; index < elements; ++index) {
             PMC *handler = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
             if (!PMC_IS_NULL(handler)) {
-                if (string_equal(INTERP, type, except_str) == 0
+                if (Parrot_str_equal(INTERP, type, except_str) == 0
                 &&  handler->vtable->base_type == enum_class_ExceptionHandler) {
                     VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
                     RETURN(void);
                 }
-                else if (string_equal(INTERP, type, event_str) == 0
+                else if (Parrot_str_equal(INTERP, type, event_str) == 0
                      && handler->vtable->base_type == enum_class_EventHandler) {
                     VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
                     RETURN(void);
@@ -529,9 +529,9 @@ If no type argument is passed, counts all handlers.
             STRING *event     = CONST_STRING(INTERP, "event");
 
             if (!PMC_IS_NULL(handler)) {
-                if (((string_equal(INTERP, type, exception) == 0)
+                if (((Parrot_str_equal(INTERP, type, exception) == 0)
                 &&   handler->vtable->base_type == enum_class_ExceptionHandler)
-                || ((string_equal(INTERP, type, event) == 0)
+                || ((Parrot_str_equal(INTERP, type, event) == 0)
                 &&  handler->vtable->base_type == enum_class_EventHandler))
                         count++;
             }

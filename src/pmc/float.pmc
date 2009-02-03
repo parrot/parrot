@@ -85,7 +85,7 @@ Class method to construct an Integer from the string representation C<rep>.
                 ? constant_pmc_new(INTERP, type)
                 : pmc_new(INTERP, type);
 
-        SET_ATTR_fv(INTERP, res, string_to_num(INTERP, rep));
+        SET_ATTR_fv(INTERP, res, Parrot_str_to_num(INTERP, rep));
         return res;
     }
 
@@ -149,7 +149,7 @@ Returns a Parrot string representation of the number.
 */
 
     VTABLE STRING *get_string() {
-        return string_from_num(INTERP, SELF.get_number());
+        return Parrot_str_from_num(INTERP, SELF.get_number());
     }
 
     VTABLE STRING *get_repr() {

@@ -148,7 +148,7 @@ main(int argc, char *argv[])
 
     interp = Parrot_new(NULL);
 
-    Parrot_set_executable_name(interp, string_from_cstring(interp, argv[0], 0));
+    Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
 
     Parrot_debugger_init(interp);
 

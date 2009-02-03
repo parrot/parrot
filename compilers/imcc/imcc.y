@@ -491,7 +491,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
 
     r[1]          = rhs;
     rhs->pmc_type = pmc_type(interp,
-        string_from_cstring(interp, unquoted_name, name_length));
+        Parrot_str_new(interp, unquoted_name, name_length));
 
     mem_sys_free(unquoted_name);
     mem_sys_free(const_name);
@@ -797,7 +797,7 @@ static void
 do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 {
     ASSERT_ARGS(do_loadlib)
-    STRING * const s = string_unescape_cstring(interp, lib + 1, '"', NULL);
+    STRING * const s = Parrot_str_unescape(interp, lib + 1, '"', NULL);
     PMC    *ignored  = Parrot_load_lib(interp, s, NULL);
     UNUSED(ignored);
     Parrot_register_HLL_lib(interp, s);
@@ -968,7 +968,7 @@ hll_def:
 
      HLL STRINGC
          {
-            STRING * const hll_name = string_unescape_cstring(interp, $2 + 1, '"', NULL);
+            STRING * const hll_name = Parrot_str_unescape(interp, $2 + 1, '"', NULL);
             CONTEXT(interp)->current_HLL =
                 Parrot_register_HLL(interp, hll_name);
 
@@ -979,9 +979,9 @@ hll_def:
          {
             Parrot_Context *ctx           = CONTEXT(interp);
             STRING * const  built_in_name =
-                string_unescape_cstring(interp, $2 + 1, '"', NULL);
+                Parrot_str_unescape(interp, $2 + 1, '"', NULL);
             STRING * const language_name  =
-                string_unescape_cstring(interp, $4 + 1, '"', NULL);
+                Parrot_str_unescape(interp, $4 + 1, '"', NULL);
 
             int             built_in_type = pmc_type(interp, built_in_name);
             int             language_type = pmc_type(interp, language_name);
@@ -1741,7 +1741,7 @@ classname:
            /* there'd normally be a str_dup() here, but the lexer already
             * copied the string, so it's safe to use directly */
            if ((IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
-               string_from_cstring(interp, $1, 0))) <= 0) {
+               Parrot_str_new(interp, $1, 0))) <= 0) {
                IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "Unknown PMC type '%s'\n", $1);
            }

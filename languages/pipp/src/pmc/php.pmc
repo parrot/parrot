@@ -43,17 +43,17 @@ pmclass Php
 
         if (pass) {
             dynpmc_PhpArray = pmc_type(INTERP,
-              const_string(INTERP, "PhpArray"));
+              Parrot_str_new_constant(INTERP, "PhpArray"));
             dynpmc_PhpBoolean = pmc_type(INTERP,
-              const_string(INTERP, "PhpBoolean"));
+              Parrot_str_new_constant(INTERP, "PhpBoolean"));
             dynpmc_PhpFloat = pmc_type(INTERP,
-              const_string(INTERP, "PhpFloat"));
+              Parrot_str_new_constant(INTERP, "PhpFloat"));
             dynpmc_PhpInteger = pmc_type(INTERP,
-              const_string(INTERP, "PhpInteger"));
+              Parrot_str_new_constant(INTERP, "PhpInteger"));
             dynpmc_PhpString = pmc_type(INTERP,
-              const_string(INTERP, "PhpString"));
+              Parrot_str_new_constant(INTERP, "PhpString"));
             dynpmc_PhpNull = pmc_type(INTERP,
-              const_string(INTERP, "PhpNull"));
+              Parrot_str_new_constant(INTERP, "PhpNull"));
         }
     }
 

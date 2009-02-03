@@ -52,7 +52,7 @@ get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
 
         /* Build a string representing the fully qualified attribute name. */
         STRING *fq_name = VTABLE_get_string(interp, cur_class);
-        fq_name         = string_append(interp, fq_name, name);
+        fq_name         = Parrot_str_append(interp, fq_name, name);
 
         /* Look up. */
         if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {
@@ -91,7 +91,7 @@ get_attrib_index_keyed(PARROT_INTERP, PMC *self, PMC *key, STRING *name)
     /* Build a string representing the fully qualified attribute name. */
     parent_class = Parrot_oo_get_class(interp, key);
     fq_name      = VTABLE_get_string(interp, parent_class);
-    fq_name      = string_append(interp, fq_name, name);
+    fq_name      = Parrot_str_append(interp, fq_name, name);
 
     /* Look up. */
     if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name)) {

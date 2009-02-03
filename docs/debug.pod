@@ -177,7 +177,7 @@ Here is an example of a what a backtrace might look like:
     Backtrace - Obtained 15 stack frames (max trace depth is 32).
       (unknown)
         Parrot_confess
-          Parrot_make_COW_reference
+          Parrot_str_new_COW
             Parrot_String_get_string
               Parrot_set_s_p
                 (unknown)
@@ -266,10 +266,10 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
     #0  Parrot_confess (cond=0xb7eeda65 "s", file=0xb7eeda58 "src/string.c", 
         line=129) at src/exceptions.c:767
     No locals.
-    #1  0xb7c433b1 in Parrot_make_COW_reference (interp=0x804e008, s=0x0)
+    #1  0xb7c433b1 in Parrot_str_new_COW (interp=0x804e008, s=0x0)
         at src/string.c:129
             d = (STRING *) 0x81c21b8
-            __PRETTY_FUNCTION__ = "Parrot_make_COW_reference"
+            __PRETTY_FUNCTION__ = "Parrot_str_new_COW"
     #2  0xb7e40db3 in Parrot_String_get_string (interp=0x804e008, pmc=0x81c8578)
         at src/pmc/string.c:310
     No locals.

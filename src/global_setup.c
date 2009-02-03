@@ -90,7 +90,7 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
 
     if (parrot_config_size_stored > 1) {
         STRING * const config_string =
-            string_make_direct(interp,
+            Parrot_str_new_init(interp,
                                (const char *)parrot_config_stored, parrot_config_size_stored,
                                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                                PObj_external_FLAG|PObj_constant_FLAG);

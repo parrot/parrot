@@ -104,7 +104,7 @@ Sets the value to C<*value> evaluated in a boolean context.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        SELF.set_bool(string_bool(INTERP, value));
+        SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
 }
 

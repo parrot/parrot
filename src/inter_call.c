@@ -712,7 +712,7 @@ fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
         {
             /* ensure that callees don't modify constant caller strings */
             if (constant)
-                UVal_str(st->val) = Parrot_make_COW_reference(interp,
+                UVal_str(st->val) = Parrot_str_new_COW(interp,
                                         st->src.ctx->constants[idx]->u.string);
             else
                 UVal_str(st->val) = CTX_REG_STR(st->src.ctx, idx);
@@ -892,7 +892,7 @@ convert_arg_from_int(PARROT_INTERP, ARGMOD(call_state *st))
             UVal_num(st->val) = (FLOATVAL)UVal_int(st->val);
             break;
         case PARROT_ARG_STRING:
-            UVal_str(st->val) = string_from_int(interp, UVal_int(st->val));
+            UVal_str(st->val) = Parrot_str_from_int(interp, UVal_int(st->val));
             break;
         case PARROT_ARG_PMC:
             {
@@ -927,7 +927,7 @@ convert_arg_from_num(PARROT_INTERP, ARGMOD(call_state *st))
             UVal_int(st->val) = (INTVAL)UVal_num(st->val);
             break;
         case PARROT_ARG_STRING:
-            UVal_str(st->val) = string_from_num(interp, UVal_num(st->val));
+            UVal_str(st->val) = Parrot_str_from_num(interp, UVal_num(st->val));
             break;
         case PARROT_ARG_PMC:
             {
@@ -960,10 +960,10 @@ convert_arg_from_str(PARROT_INTERP, ARGMOD(call_state *st))
     ASSERT_ARGS(convert_arg_from_str)
     switch (st->dest.sig & PARROT_ARG_TYPE_MASK) {
         case PARROT_ARG_INTVAL:
-            UVal_int(st->val) = string_to_int(interp, UVal_str(st->val));
+            UVal_int(st->val) = Parrot_str_to_int(interp, UVal_str(st->val));
             break;
         case PARROT_ARG_FLOATVAL:
-            UVal_num(st->val) = string_to_num(interp, UVal_str(st->val));
+            UVal_num(st->val) = Parrot_str_to_num(interp, UVal_str(st->val));
             break;
         case PARROT_ARG_PMC:
             {
@@ -1191,7 +1191,7 @@ locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
                 ? st->dest.ctx->constants[idx]->u.string
                 : CTX_REG_STR(st->dest.ctx, idx);
 
-        if (st->name == param || string_equal(interp, st->name, param) == 0) {
+        if (st->name == param || Parrot_str_equal(interp, st->name, param) == 0) {
             ++i;
             st->dest.sig = VTABLE_get_integer_keyed_int(interp,
                     st->dest.u.op.signature, i);
@@ -2813,7 +2813,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     /* create the signature string, and the various PMCs that are needed to
        store all the parameters and parameter counts. */
-    char * const signature  = string_to_cstring(interp, VTABLE_get_string(interp, sig_obj));
+    char * const signature  = Parrot_str_to_cstring(interp, VTABLE_get_string(interp, sig_obj));
     PMC * const args_sig    = temporary_pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const results_sig = temporary_pmc_new(interp, enum_class_FixedIntegerArray);
     PMC * const ret_cont    = new_ret_continuation_pmc(interp, NULL);
@@ -2891,7 +2891,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
     interp->current_args   = save_current_args;
     interp->args_signature = save_args_signature;
     interp->current_object = save_current_object;
-    string_cstring_free(signature);
+    Parrot_str_free_cstring(signature);
 }
 
 

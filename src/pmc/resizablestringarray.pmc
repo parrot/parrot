@@ -78,7 +78,7 @@ Returns the Parrot string value of the element at index C<key>.
         GET_ATTR_str_array(INTERP, SELF, str_array);
 
         if (!str_array[key])
-            str_array[key] = string_from_cstring(interp, NULL, 0);
+            str_array[key] = Parrot_str_new(interp, NULL, 0);
 
         return str_array[key];
     }

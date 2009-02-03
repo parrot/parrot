@@ -369,7 +369,7 @@ static STRING *
 get_bytes(PARROT_INTERP, ARGIN(STRING *source_string), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_bytes)
-    STRING * const return_string = Parrot_make_COW_reference(interp,
+    STRING * const return_string = Parrot_str_new_COW(interp,
             source_string);
     return_string->encoding = source_string->encoding;
     return_string->charset = source_string->charset;
@@ -424,7 +424,7 @@ get_bytes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *return_string))
 {
     ASSERT_ARGS(get_bytes_inplace)
-    Parrot_reuse_COW_reference(interp, source_string, return_string);
+    Parrot_str_reuse_COW(interp, source_string, return_string);
 
     return_string->strstart = (char *)return_string->strstart + offset ;
     return_string->bufused = count;
@@ -469,7 +469,7 @@ set_bytes(PARROT_INTERP, ARGIN(STRING *source_string),
         UINTVAL offset, UINTVAL count, ARGMOD(STRING *new_bytes))
 {
     ASSERT_ARGS(set_bytes)
-    string_replace(interp, source_string, offset, count, new_bytes, NULL);
+    Parrot_str_replace(interp, source_string, offset, count, new_bytes, NULL);
 }
 
 /*

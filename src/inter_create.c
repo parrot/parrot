@@ -176,7 +176,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
      * Set up the string subsystem
      * This also generates the constant string tables
      */
-    string_init(interp);
+    Parrot_str_init(interp);
 
     /* Set up the MMD struct */
     interp->binop_mmd_funcs = NULL;
@@ -435,7 +435,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     }
 
     /* strings, charsets, encodings - only once */
-    string_deinit(interp);
+    Parrot_str_finish(interp);
 
     if (!interp->parent_interpreter) {
         if (interp->thread_data)

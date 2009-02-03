@@ -37,7 +37,7 @@ Return the string 'string'.
 
 */
     STRING* name() {
-        return const_string(INTERP, "string");
+        return Parrot_str_new_constant(INTERP, "string");
     }
 
 /*
@@ -68,7 +68,7 @@ Return the string 'string'.
     METHOD INTVAL is_numeric(INTVAL allow_errors) {
         INTVAL       retval = 0;
         STRING       *rep = SELF.get_string();
-        char         *s   = string_to_cstring(INTERP, rep);
+        char         *s   = Parrot_str_to_cstring(INTERP, rep);
         char         *s1, *s2;
         INTVAL       i;
 
@@ -93,7 +93,7 @@ Return the string 'string'.
             }
         }
 
-        string_cstring_free(s);
+        Parrot_str_free_cstring(s);
         RETURN(INTVAL retval);
     }
 
@@ -107,13 +107,13 @@ Return the string 'string'.
     METHOD PMC* to_base(INTVAL base) {
         PMC          *retval;
         STRING       *rep = SELF.get_string();
-        char         *s1  = string_to_cstring(INTERP, rep);
+        char         *s1  = Parrot_str_to_cstring(INTERP, rep);
         char         *s2;
         unsigned long n   = strtoul(s1, &s2, base);
 
         retval = pmc_new(INTERP, dynpmc_PhpInteger);
         VTABLE_set_integer_native(INTERP, retval, n);
-        string_cstring_free(s1);
+        Parrot_str_free_cstring(s1);
         RETURN(PMC *retval);
     }
 
@@ -127,7 +127,7 @@ Return the string 'string'.
     METHOD PMC* to_number() {
         PMC          *retval;
         STRING       *rep = SELF.get_string();
-        char         *s   = string_to_cstring(INTERP, rep);
+        char         *s   = Parrot_str_to_cstring(INTERP, rep);
         char         *s1, *s2;
         INTVAL       i;
 
@@ -158,7 +158,7 @@ Return the string 'string'.
             }
         }
 
-        string_cstring_free(s);
+        Parrot_str_free_cstring(s);
         RETURN(PMC *retval);
     }
 
@@ -173,7 +173,7 @@ Return a representation of this string in the same format as PHP's serialize fun
 */
     METHOD STRING* serialize() {
         STRING *serialized;
-        serialized = string_printf(INTERP, "s:%d:\"%Ss\";", VTABLE_elements(INTERP, SELF),
+        serialized = Parrot_str_format_data(INTERP, "s:%d:\"%Ss\";", VTABLE_elements(INTERP, SELF),
                 VTABLE_get_string(INTERP, SELF));
         RETURN(STRING *serialized);
     }

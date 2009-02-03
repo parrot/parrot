@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
     if (!interp)
         return 1;
 
-    Parrot_set_executable_name(interp, string_from_cstring(interp, argv[0], 0));
+    Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
     Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
     pf = PackFile_new(interp, 0);

@@ -241,9 +241,9 @@ Returns the Parrot string representation of the array.
 
         for (i = 0; i < elems; i++) {
             if (SELF.get_integer_keyed_int((INTVAL)i))
-                str = string_concat(INTERP, str, one, 0);
+                str = Parrot_str_concat(INTERP, str, one, 0);
             else
-                str = string_concat(INTERP, str, zero, 0);
+                str = Parrot_str_concat(INTERP, str, zero, 0);
         }
 
         return str;
@@ -519,7 +519,7 @@ Used to archive the string.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
 
-        s = string_from_cstring(INTERP, (char*)bit_array,
+        s = Parrot_str_new(INTERP, (char*)bit_array,
                 (resize_threshold / BITS_PER_CHAR));
 
         VTABLE_push_integer(INTERP, io, size);

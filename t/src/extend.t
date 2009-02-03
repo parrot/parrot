@@ -441,7 +441,7 @@ static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile *pf = Parrot_readbc(interp, "$temp_pbc");
-    STRING   *name = const_string(interp, "_sub1");
+    STRING   *name = Parrot_str_new_constant(interp, "_sub1");
     PMC      *sub, *arg;
 
     Parrot_loadbc(interp, pf);
@@ -452,12 +452,12 @@ the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
     /* win32 seems to buffer stderr ? */
     Parrot_io_flush(interp, Parrot_io_STDERR(interp));
 
-    name = const_string(interp, "_sub2");
+    name = Parrot_str_new_constant(interp, "_sub2");
     sub  = Parrot_find_global_cur(interp, name);
     arg  = pmc_new(interp, enum_class_String);
 
     Parrot_PMC_set_string_native(interp, arg,
-                 string_from_cstring(interp, "hello ", 0));
+                 Parrot_str_new(interp, "hello ", 0));
 
     Parrot_call_sub(interp, sub, "vP", arg);
     Parrot_eprintf(interp, "back\\n");
@@ -515,7 +515,7 @@ static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
     PackFile         *pf   = Parrot_readbc(interp, "$temp_pbc");
-    STRING           *name = const_string(interp, "_sub1");
+    STRING           *name = Parrot_str_new_constant(interp, "_sub1");
     PMC              *sub;
     Parrot_runloop jump_point;
 
@@ -646,7 +646,7 @@ main(int argc, char* argv[])
 
     packfile = PackFile_new_dummy(interp, "dummy");
 
-    code_type = const_string( interp, "PIR" );
+    code_type = Parrot_str_new_constant( interp, "PIR" );
     retval    = Parrot_compile_string( interp, code_type, code, &error );
 
     if (!retval) {
@@ -654,7 +654,7 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    foo_name = const_string( interp, "foo" );
+    foo_name = Parrot_str_new_constant( interp, "foo" );
     sub      = Parrot_find_global_cur( interp, foo_name );
 
     retval   = (PMC *) Parrot_call_sub( interp, sub, "V", "" );
@@ -687,7 +687,7 @@ main(int argc, char* argv[])
     pf = Parrot_readbc( interp, "$temp_pbc" );
     Parrot_loadbc( interp, pf );
 
-    sub      = Parrot_find_global_cur( interp, const_string( interp, "add" ) );
+    sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
     result   = Parrot_call_sub( interp, sub, "III", 100, 200 );
     printf( "Result is %d.\\n", result );
 

@@ -357,7 +357,7 @@ Parrot_PMC_get_numval_intkey(PARROT_INTERP,
 
 Return a null-terminated string that represents the string value of the PMC.
 
-Note that you must free this string with C<string_cstring_free()>!
+Note that you must free this string with C<Parrot_str_free_cstring()>!
 
 =cut
 
@@ -376,7 +376,7 @@ Parrot_PMC_get_cstring_intkey(PARROT_INTERP,
 
     PARROT_CALLIN_START(interp);
     intermediate = VTABLE_get_string_keyed_int(interp, pmc, key);
-    retval       = string_to_cstring(interp, intermediate);
+    retval       = Parrot_str_to_cstring(interp, intermediate);
     PARROT_CALLIN_END(interp);
 
     return retval;
@@ -388,7 +388,7 @@ Parrot_PMC_get_cstring_intkey(PARROT_INTERP,
 
 Return a null-terminated string that represents the string value of the PMC.
 
-Note that you must free this string with C<string_cstring_free()>!
+Note that you must free this string with C<Parrot_str_free_cstring()>!
 
 =cut
 
@@ -406,7 +406,7 @@ Parrot_PMC_get_cstring(PARROT_INTERP, Parrot_PMC pmc)
 
     PARROT_CALLIN_START(interp);
     intermediate = VTABLE_get_string(interp, pmc);
-    retval       = string_to_cstring(interp, intermediate);
+    retval       = Parrot_str_to_cstring(interp, intermediate);
     PARROT_CALLIN_END(interp);
 
     return retval;
@@ -421,7 +421,7 @@ Return a null-terminated string for the PMC, along with the length.
 Yes, right now this is a bit of a cheat. It needs fixing, but without
 disturbing the interface.
 
-Note that you must free the string with C<string_cstring_free()>.
+Note that you must free the string with C<Parrot_str_free_cstring()>.
 
 =cut
 
@@ -438,7 +438,7 @@ Parrot_PMC_get_cstringn(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
     char *retval;
 
     PARROT_CALLIN_START(interp);
-    retval  = string_to_cstring(interp, VTABLE_get_string(interp, pmc));
+    retval  = Parrot_str_to_cstring(interp, VTABLE_get_string(interp, pmc));
     *length = strlen(retval);
     PARROT_CALLIN_END(interp);
 
@@ -454,7 +454,7 @@ Return a null-terminated string for the PMC, along with the length.
 Yes, right now this is a bit of a cheat. It needs fixing, but without
 disturbing the interface.
 
-Note that you must free this string with C<string_cstring_free()>.
+Note that you must free this string with C<Parrot_str_free_cstring()>.
 
 =cut
 
@@ -471,7 +471,7 @@ Parrot_PMC_get_cstringn_intkey(PARROT_INTERP, ARGIN(Parrot_PMC pmc),
     char *retval;
 
     PARROT_CALLIN_START(interp);
-    retval  = string_to_cstring(interp,
+    retval  = Parrot_str_to_cstring(interp,
                                VTABLE_get_string_keyed_int(interp, pmc, key));
     *length = strlen(retval);
     PARROT_CALLIN_END(interp);
@@ -683,7 +683,7 @@ Parrot_PMC_set_cstring(PARROT_INTERP, Parrot_PMC pmc, ARGIN_NULLOK(const char *v
     ASSERT_ARGS(Parrot_PMC_set_cstring)
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc,
-                             string_from_cstring(interp, value, 0));
+                             Parrot_str_new(interp, value, 0));
     PARROT_CALLIN_END(interp);
 }
 
@@ -705,7 +705,7 @@ Parrot_PMC_set_cstring_intkey(PARROT_INTERP,
     ASSERT_ARGS(Parrot_PMC_set_cstring_intkey)
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key,
-                                string_from_cstring(interp, value, 0));
+                                Parrot_str_new(interp, value, 0));
     PARROT_CALLIN_END(interp);
 }
 
@@ -727,7 +727,7 @@ Parrot_PMC_set_cstringn(PARROT_INTERP,
     ASSERT_ARGS(Parrot_PMC_set_cstringn)
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_native(interp, pmc,
-                             string_from_cstring(interp, value, length));
+                             Parrot_str_new(interp, value, length));
     PARROT_CALLIN_END(interp);
 }
 
@@ -811,7 +811,7 @@ Parrot_PMC_set_cstringn_intkey(PARROT_INTERP,
     ASSERT_ARGS(Parrot_PMC_set_cstringn_intkey)
     PARROT_CALLIN_START(interp);
     VTABLE_set_string_keyed_int(interp, pmc, key,
-                                string_from_cstring(interp, value, length));
+                                Parrot_str_new(interp, value, length));
     PARROT_CALLIN_END(interp);
 }
 
@@ -855,7 +855,7 @@ Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
     ASSERT_ARGS(Parrot_PMC_typenum)
     Parrot_Int retval;
     PARROT_CALLIN_START(interp);
-    retval = pmc_type(interp, string_from_cstring(interp, _class, 0));
+    retval = pmc_type(interp, Parrot_str_new(interp, _class, 0));
     PARROT_CALLIN_END(interp);
     return retval;
 }
@@ -893,7 +893,7 @@ void
 Parrot_free_cstring(ARGIN_NULLOK(char *string))
 {
     ASSERT_ARGS(Parrot_free_cstring)
-    string_cstring_free(string);
+    Parrot_str_free_cstring(string);
 }
 
 /*

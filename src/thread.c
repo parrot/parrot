@@ -514,7 +514,7 @@ thread_func(ARGIN_NULLOK(void *arg))
                     interp->thread_data->tid,
                     VTABLE_get_string(interp, exception),
                     VTABLE_get_integer_keyed_str(interp, exception,
-                        const_string(interp, "type"))); */
+                        Parrot_str_new_constant(interp, "type"))); */
 
         ret_val = PMCNULL;
     }

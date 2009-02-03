@@ -119,7 +119,7 @@ Open a or create a new dbm file.
         char * const c_db_name = string_to_cstring(interp, value);
         GDBM_FILE dbf          = gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
 
-        string_cstring_free(c_db_name);
+        Parrot_str_free_cstring(c_db_name);
 
         PMC_struct_val(SELF) = dbf;
     }
@@ -235,7 +235,7 @@ Returns the string value for the element at C<*key>.
         key_gdbm.dptr  = keystr->strstart;
         val_gdbm       = gdbm_fetch(dbf, key_gdbm);
 
-        val = string_from_cstring(interp, val_gdbm.dptr, val_gdbm.dsize);
+        val = Parrot_str_new(interp, val_gdbm.dptr, val_gdbm.dsize);
         free(val_gdbm.dptr);
 
         return val;

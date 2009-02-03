@@ -128,7 +128,7 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
                  PMC          *dest         = Parrot_clone(d, source);
                  Parrot_Class_attributes *source_class = PARROT_CLASS(source);
                  Parrot_Class_attributes *dest_class   = PARROT_CLASS(dest);
-                 dest_class->name           = string_copy(d, source_class->name);
+                 dest_class->name           = Parrot_str_copy(d, source_class->name);
                  dest_class->_namespace     = VTABLE_clone(d, source_class->_namespace);
             }
         }
@@ -382,12 +382,12 @@ Introspection interface. C<key> can be:
 
         Parrot_Context *ctx;
 
-        if (string_equal(interp, item, s) == 0)
+        if (Parrot_str_equal(interp, item, s) == 0)
             return interp->root_namespace;
 
         s     = CONST_STRING(interp, "outer");
 
-        if (string_equal(interp, item, s) == 0) {
+        if (Parrot_str_equal(interp, item, s) == 0) {
             outer   = item;
             nextkey = key_next(INTERP, key);
 
@@ -439,27 +439,27 @@ Introspection interface. C<key> can be:
 
         s = CONST_STRING(interp, "sub");
 
-        if (string_equal(interp, item, s) == 0)
+        if (Parrot_str_equal(interp, item, s) == 0)
             return ctx->current_sub;
 
         s = CONST_STRING(interp, "lexpad");
 
-        if (string_equal(interp, item, s) == 0)
+        if (Parrot_str_equal(interp, item, s) == 0)
             return ctx->lex_pad;
 
         s = CONST_STRING(interp, "namespace");
 
-        if (string_equal(interp, item, s) == 0)
+        if (Parrot_str_equal(interp, item, s) == 0)
             return ctx->current_namespace;
 
         s = CONST_STRING(interp, "continuation");
 
-        if (string_equal(interp, item, s) == 0)
+        if (Parrot_str_equal(interp, item, s) == 0)
             return VTABLE_clone(interp, ctx->current_cont);
 
         s = CONST_STRING(interp, "annotations");
 
-        if (string_equal(interp, item, s) == 0) {
+        if (Parrot_str_equal(interp, item, s) == 0) {
             PMC *sub = ctx->current_sub;
             if (ctx == CONTEXT(interp)) {
                 /* We can't know the current program counter for the currently

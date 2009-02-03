@@ -190,7 +190,7 @@ op debug_load(inconst STR) :base_debug {
     if (!(interp->pdb->state & PDB_BREAK)) {
         f = string_to_cstring(interp, ($1));
         PDB_load_source(interp, f);
-        string_cstring_free(f);
+        Parrot_str_free_cstring(f);
     }
 }
 
@@ -233,11 +233,11 @@ If $3 is negative, cut the string after -$3 characters.
 =cut
 
 inline op chopn(inout STR, in INT) :base_core {
-    string_chopn_inplace(interp, $1, $2);
+    Parrot_str_chopn_inplace(interp, $1, $2);
 }
 
 inline op chopn(out STR, in STR, in INT) :base_core {
-    $1 = string_chopn(interp, $2, $3);
+    $1 = Parrot_str_chopn(interp, $2, $3);
 }
 
 

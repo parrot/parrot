@@ -71,7 +71,7 @@ in the constant PMC pool.
         else
             SELF = pmc_new(INTERP, type);
 
-        l = string_length(INTERP, rep);
+        l = Parrot_str_byte_length(INTERP, rep);
 
         if (!l)
             return SELF;
@@ -80,11 +80,11 @@ in the constant PMC pool.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
                     "unhandled string encoding in constructor");
 
-        source = string_to_cstring(interp, rep);
+        source = Parrot_str_to_cstring(interp, rep);
 
         /* "()" - no args */
         if (l <= 2 && *source == '(') {
-            string_cstring_free(source);
+            Parrot_str_free_cstring(source);
             return SELF;
         }
 
@@ -137,7 +137,7 @@ in the constant PMC pool.
             }
         }
 
-        string_cstring_free(source);
+        Parrot_str_free_cstring(source);
         return SELF;
     }
 
@@ -340,13 +340,13 @@ Returns the Parrot string representation C<key>.
 
         for (j = 0; j < n; ++j) {
             PMC * const val = SELF.get_pmc_keyed_int(j);
-            res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
 
             if (j < n - 1)
-                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = string_append(INTERP, res, CONST_STRING(INTERP, " ]"));
+        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, " ]"));
         return res;
     }
 

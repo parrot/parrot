@@ -35,7 +35,7 @@ Return the string 'integer'.
 
 */
     STRING* name() {
-        return const_string(INTERP, "integer");
+        return Parrot_str_new_constant(INTERP, "integer");
     }
 
 /*
@@ -78,7 +78,7 @@ Return a representation of this integer in the same format as PHP's serialize fu
 */
     METHOD STRING* serialize() {
         STRING *serialized;
-        serialized = string_printf(INTERP, "i:%d;", VTABLE_get_integer(INTERP, SELF));
+        serialized = Parrot_str_format_data(INTERP, "i:%d;", VTABLE_get_integer(INTERP, SELF));
         RETURN(STRING *serialized);
     }
 

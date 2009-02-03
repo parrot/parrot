@@ -204,10 +204,10 @@ filehandle, rather than modifying the invocant).
                                 "Cannot reopen already open filehandle");
 
         if (got_mode && !STRING_IS_NULL(mode))
-            SET_ATTR_mode(INTERP, SELF, string_copy(INTERP, mode));
+            SET_ATTR_mode(INTERP, SELF, Parrot_str_copy(INTERP, mode));
 
         if (got_filename && !STRING_IS_NULL(filename))
-            SET_ATTR_filename(INTERP, SELF, string_copy(INTERP, filename));
+            SET_ATTR_filename(INTERP, SELF, Parrot_str_copy(INTERP, filename));
 
         /* Open the file. When no options are passed, reopen the same file as
          * before */
@@ -348,7 +348,7 @@ Read a line from the filehandle and return it in a string.
             if (*r)
                 add_history(r);
 
-            string_result = string_from_cstring(INTERP, r, 0);
+            string_result = Parrot_str_new(INTERP, r, 0);
             mem_sys_free(r);
             RETURN(STRING *string_result);
         }
@@ -366,7 +366,7 @@ Read a line from the filehandle and return it in a string.
         string_result = Parrot_io_reads(INTERP, SELF, 0);
         if (!string_result)
             RETURN(PMC *PMCNULL);
-        len = string_length(INTERP, string_result);
+        len = Parrot_str_byte_length(INTERP, string_result);
         if (len < 1)
             RETURN(PMC *PMCNULL);
         while (len > 0 &&
@@ -432,7 +432,7 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                                 "Cannot readall without a file name or open filehandle");
             }
-            result = string_make_empty(INTERP, enum_stringrep_one, 0);
+            result = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
 
             /* Do line buffering on the filehandle */
             if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
@@ -441,7 +441,7 @@ filehandle when finished.
             do {
                 STRING * const part = Parrot_io_reads(INTERP, SELF, 0);
 
-                result = string_append(INTERP, result, part);
+                result = Parrot_str_append(INTERP, result, part);
                 if (Parrot_io_eof(INTERP, SELF))
                     break;
             } while (1);
@@ -551,11 +551,11 @@ Full buffering, bytes are sent when the buffer is full.
         STRING *fullbuffer_string = CONST_STRING(INTERP, "full-buffered");
 
         if (got_type) {
-            if (string_equal(INTERP, new_type, nobuffer_string) == 0)
+            if (Parrot_str_equal(INTERP, new_type, nobuffer_string) == 0)
                 Parrot_io_setbuf(INTERP, SELF, PIOCTL_NONBUF);
-            else if (string_equal(INTERP, new_type, linebuffer_string) == 0)
+            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string) == 0)
                 Parrot_io_setlinebuf(INTERP, SELF);
-            else if (string_equal(INTERP, new_type, fullbuffer_string) == 0)
+            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string) == 0)
                 Parrot_io_setbuf(INTERP, SELF, PIO_UNBOUND);
         }
 
@@ -607,7 +607,7 @@ Retrieve the read mode string for the filehandle.
         STRING *mode, *mode_copy;
 
         GET_ATTR_mode(INTERP, SELF, mode);
-        mode_copy = string_copy(INTERP, mode);
+        mode_copy = Parrot_str_copy(INTERP, mode);
 
         RETURN(STRING *mode_copy);
 
@@ -630,14 +630,14 @@ scheme) for the filehandle.
 
         if (got_encoding) {
             if (!STRING_IS_NULL(new_encoding))
-                encoding_copy = string_copy(INTERP, new_encoding);
+                encoding_copy = Parrot_str_copy(INTERP, new_encoding);
             SET_ATTR_encoding(INTERP, SELF, encoding_copy);
             RETURN(STRING *new_encoding);
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
         if (!STRING_IS_NULL(encoding))
-            encoding_copy = string_copy(INTERP, encoding);
+            encoding_copy = Parrot_str_copy(INTERP, encoding);
 
         RETURN(STRING *encoding_copy);
 

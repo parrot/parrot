@@ -1713,7 +1713,7 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void
          * this is ugly, we still have to sweep all buffers
          */
         if (PObj_sysmem_TEST(obj) && PObj_bufstart(obj)) {
-            /* has sysmem allocated, e.g. string_pin */
+            /* has sysmem allocated, e.g. Parrot_str_pin */
             mem_sys_free(PObj_bufstart(obj));
             PObj_bufstart(obj) = NULL;
             PObj_buflen(obj) = 0;

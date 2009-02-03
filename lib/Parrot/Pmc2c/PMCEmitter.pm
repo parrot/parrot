@@ -69,8 +69,8 @@ sub generate_c_file {
     $c->emit( dont_edit( $self->filename ) );
     if ($self->is_dynamic) {
         $c->emit("#define PARROT_IN_EXTENSION\n");
-        $c->emit("#define CONST_STRING(i, s) const_string((i), s)\n");
-        $c->emit("#define CONST_STRING_GEN(i, s) const_string((i), s)\n");
+        $c->emit("#define CONST_STRING(i, s) Parrot_str_new_constant((i), s)\n");
+        $c->emit("#define CONST_STRING_GEN(i, s) Parrot_str_new_constant((i), s)\n");
     }
 
     $self->gen_includes;
@@ -526,7 +526,7 @@ EOC
         vt_clone->base_type    = entry;
         vt_clone->whoami       = string_make(interp, "$classname", @{[length($classname)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
-        vt_clone->provides_str = string_append(interp, vt_clone->provides_str,
+        vt_clone->provides_str = Parrot_str_append(interp, vt_clone->provides_str,
             string_make(interp, " $provides", @{[length($provides) + 1]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG));
 

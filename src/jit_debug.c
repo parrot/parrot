@@ -251,8 +251,8 @@ static STRING *
 debug_file(PARROT_INTERP, STRING *file, const char *ext)
 {
     STRING *ret;
-    ret = string_copy(interp, file);
-    ret = string_append(interp, ret,
+    ret = Parrot_str_copy(interp, file);
+    ret = Parrot_str_append(interp, ret,
             string_make(interp, ext, strlen(ext), NULL,
                 PObj_external_FLAG));
     return ret;
@@ -283,46 +283,46 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
 
     if (interp->code->debugs) {
         char *ext;
-        char * const src = string_to_cstring(interp,
+        char * const src = Parrot_str_to_cstring(interp,
             Parrot_debug_pc_to_filename(interp,
             interp->code->debugs, 0));
         pasmfile = string_make(interp, src, strlen(src), NULL,
                 PObj_external_FLAG);
-        file = string_copy(interp, pasmfile);
+        file = Parrot_str_copy(interp, pasmfile);
         /* chop pasm/pir */
 
         ext = strrchr(src, '.');
         if (ext && STREQ(ext, ".pasm"))
-            string_chopn_inplace(interp, file, 4);
+            Parrot_str_chopn_inplace(interp, file, 4);
         else if (ext && STREQ(ext, ".pir"))
-            string_chopn_inplace(interp, file, 3);
+            Parrot_str_chopn_inplace(interp, file, 3);
         else if (!ext) /* EVAL_n */
-            file = string_append(interp, file,
+            file = Parrot_str_append(interp, file,
                     string_make(interp, ".", 1, NULL, PObj_external_FLAG));
 
-        string_cstring_free(src);
+        Parrot_str_free_cstring(src);
     }
     else {
         /* chop pbc */
-        string_chopn_inplace(interp, file, 3);
+        Parrot_str_chopn_inplace(interp, file, 3);
         pasmfile = debug_file(interp, file, "pasm");
     }
     stabsfile = debug_file(interp, file, "stabs.s");
     ofile     = debug_file(interp, file, "o");
     {
-        char *const temp = string_to_cstring(interp, stabsfile);
+        char *const temp = Parrot_str_to_cstring(interp, stabsfile);
         stabs            = fopen(temp, "w");
-        string_cstring_free(temp);
+        Parrot_str_free_cstring(temp);
     }
     if (stabs == NULL)
         return;
 
     {
-        char * const temp = string_to_cstring(interp, pasmfile);
+        char * const temp = Parrot_str_to_cstring(interp, pasmfile);
         /* filename info */
         fprintf(stabs, ".data\n.text\n");       /* darwin wants it */
         fprintf(stabs, ".stabs \"%s\"," N_SO ",0,0,0\n", temp);
-        string_cstring_free(temp);
+        Parrot_str_free_cstring(temp);
     }
     /* jit_func start addr */
     fprintf(stabs, ".stabs \"jit_func:F(0,1)\"," N_FUN ",0,1,%p\n",
@@ -364,11 +364,11 @@ Parrot_jit_debug_stabs(PARROT_INTERP)
     cmd = Parrot_sprintf_c(interp, "as %Ss -o %Ss", stabsfile, ofile);
 
     {
-        char * const temp   = string_to_cstring(interp, cmd);
+        char * const temp   = Parrot_str_to_cstring(interp, cmd);
         int          status = system(temp);
         if (status)
             fprintf(stderr, "Assembly failed: %d\n%s\n", status, temp);
-        string_cstring_free(temp);
+        Parrot_str_free_cstring(temp);
     }
 }
 

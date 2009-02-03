@@ -69,7 +69,7 @@ static void make_writable(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_unmake_COW>
+=item C<void Parrot_str_write_COW>
 
 If the specified Parrot string is copy-on-write then the memory is
 copied over and the copy-on-write flag is cleared.
@@ -80,9 +80,9 @@ copied over and the copy-on-write flag is cleared.
 
 PARROT_EXPORT
 void
-Parrot_unmake_COW(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(Parrot_unmake_COW)
+    ASSERT_ARGS(Parrot_str_write_COW)
 
     /* COW_FLAG | constant_FLAG | external_FLAG) */
     if (PObj_is_cowed_TESTALL(s)) {
@@ -121,9 +121,9 @@ Parrot_unmake_COW(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<STRING * Parrot_make_COW_reference>
+=item C<STRING * Parrot_str_new_COW>
 
-Creates a copy-on-write string by cloning a string header without
+Creates a copy-on-write string, cloning a string header without
 allocating a new buffer.
 
 =cut
@@ -134,9 +134,9 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_make_COW_reference(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(Parrot_make_COW_reference)
+    ASSERT_ARGS(Parrot_str_new_COW)
     STRING *d;
 
     if (PObj_constant_TEST(s)) {
@@ -160,7 +160,7 @@ Parrot_make_COW_reference(PARROT_INTERP, ARGMOD(STRING *s))
          * is fixed correctly. */
         if (n_interpreters > 1 && PObj_is_movable_TESTALL(s) &&
                 !Parrot_in_memory_pool(interp, PObj_bufstart(s))) {
-            Parrot_unmake_COW(interp, d);
+            Parrot_str_write_COW(interp, d);
             Parrot_io_eprintf(interp, "cross-interpreter copy of "
                                      "relocatable string '%Ss' into tid %d\n",
                         d,
@@ -173,7 +173,7 @@ Parrot_make_COW_reference(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<STRING * Parrot_reuse_COW_reference>
+=item C<STRING * Parrot_str_reuse_COW>
 
 Creates a copy-on-write string by cloning a string header without
 allocating a new buffer. Doesn't allocate a new string header, instead
@@ -186,9 +186,9 @@ using the one passed in and returns it.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_reuse_COW_reference(SHIM_INTERP, ARGMOD(STRING *s), ARGOUT(STRING *d))
+Parrot_str_reuse_COW(SHIM_INTERP, ARGMOD(STRING *s), ARGOUT(STRING *d))
 {
-    ASSERT_ARGS(Parrot_reuse_COW_reference)
+    ASSERT_ARGS(Parrot_str_reuse_COW)
 
     if (PObj_constant_TEST(s)) {
         PObj_COW_SET(s);
@@ -206,7 +206,7 @@ Parrot_reuse_COW_reference(SHIM_INTERP, ARGMOD(STRING *s), ARGOUT(STRING *d))
 
 /*
 
-=item C<STRING * string_set>
+=item C<STRING * Parrot_str_set>
 
 Makes the contents of first Parrot string a copy of the contents of
 second.
@@ -218,9 +218,9 @@ second.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
+Parrot_str_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
 {
-    ASSERT_ARGS(string_set)
+    ASSERT_ARGS(Parrot_str_set)
     if (dest == src)
         return dest;
     if (dest) { /* && dest != src */
@@ -230,17 +230,17 @@ string_set(PARROT_INTERP, ARGIN_NULLOK(STRING *dest), ARGMOD(STRING *src))
             mem_sys_free(PObj_bufallocstart(dest));
         }
 #endif
-        dest = Parrot_reuse_COW_reference(interp, src, dest);
+        dest = Parrot_str_reuse_COW(interp, src, dest);
     }
     else
-        dest = Parrot_make_COW_reference(interp, src);
+        dest = Parrot_str_new_COW(interp, src);
     return dest;
 }
 
 
 /*
 
-=item C<void string_free>
+=item C<void Parrot_str_free>
 
 Frees the given STRING's header, accounting for reference counts for the
 STRING's buffer &c.  Use this only if you I<know> that nothing else has stored
@@ -251,9 +251,9 @@ the STRING elsewhere.
 */
 
 void
-string_free(PARROT_INTERP, ARGIN(STRING *s))
+Parrot_str_free(PARROT_INTERP, ARGIN(STRING *s))
 {
-    ASSERT_ARGS(string_free)
+    ASSERT_ARGS(Parrot_str_free)
     if (!PObj_constant_TEST(s)) {
         Small_Object_Pool * const pool = interp->arena_base->string_header_pool;
         pool->add_free_object(interp, pool, s);
@@ -270,7 +270,7 @@ Creation, enlargement, etc.
 
 =over 4
 
-=item C<void string_init>
+=item C<void Parrot_str_init>
 
 Initializes the Parrot string subsystem.
 
@@ -280,9 +280,9 @@ Initializes the Parrot string subsystem.
 
 PARROT_EXPORT
 void
-string_init(PARROT_INTERP)
+Parrot_str_init(PARROT_INTERP)
 {
-    ASSERT_ARGS(string_init)
+    ASSERT_ARGS(Parrot_str_init)
     Hash        *const_cstring_hash;
     size_t       i;
     const size_t n_parrot_cstrings =
@@ -318,7 +318,7 @@ string_init(PARROT_INTERP)
     for (i = 0; i < n_parrot_cstrings; ++i) {
         DECL_CONST_CAST;
         STRING * const s =
-            string_make_direct(interp,
+            Parrot_str_new_init(interp,
                 parrot_cstrings[i].string,
                 parrot_cstrings[i].len,
                 PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
@@ -331,7 +331,7 @@ string_init(PARROT_INTERP)
 
 /*
 
-=item C<void string_deinit>
+=item C<void Parrot_str_finish>
 
 De-Initializes the Parrot string subsystem.
 
@@ -341,9 +341,9 @@ De-Initializes the Parrot string subsystem.
 
 PARROT_EXPORT
 void
-string_deinit(PARROT_INTERP)
+Parrot_str_finish(PARROT_INTERP)
 {
-    ASSERT_ARGS(string_deinit)
+    ASSERT_ARGS(Parrot_str_finish)
     /* all are shared between interpreters */
     if (!interp->parent_interpreter) {
         mem_sys_free(interp->const_cstring_table);
@@ -378,7 +378,7 @@ string_capacity(SHIM_INTERP, ARGIN(const STRING *s))
 
 /*
 
-=item C<STRING * string_make_empty>
+=item C<STRING * Parrot_str_new_noinit>
 
 Creates and returns an empty Parrot string.
 
@@ -389,10 +389,10 @@ Creates and returns an empty Parrot string.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_make_empty(PARROT_INTERP,
+Parrot_str_new_noinit(PARROT_INTERP,
     parrot_string_representation_t representation, UINTVAL capacity)
 {
-    ASSERT_ARGS(string_make_empty)
+    ASSERT_ARGS(Parrot_str_new_noinit)
     STRING * const s = new_string_header(interp, 0);
 
     /* TODO adapt string creation functions */
@@ -478,7 +478,7 @@ string_rep_compatible(SHIM_INTERP,
 
 /*
 
-=item C<STRING * string_concat>
+=item C<STRING * Parrot_str_concat>
 
 Concatenates two Parrot strings. If necessary, converts the second
 string's encoding and/or type to match those of the first string. If
@@ -493,10 +493,10 @@ created and returned.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
+Parrot_str_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
             ARGIN_NULLOK(STRING *b), UINTVAL Uflags)
 {
-    ASSERT_ARGS(string_concat)
+    ASSERT_ARGS(Parrot_str_concat)
     if (a != NULL && a->strlen != 0) {
         if (b != NULL && b->strlen != 0) {
             const ENCODING *enc;
@@ -507,27 +507,27 @@ string_concat(PARROT_INTERP, ARGIN_NULLOK(STRING *a),
                 cs  = a->charset;
                 enc = a->encoding;
             }
-            result = string_make_direct(interp, NULL, a->bufused + b->bufused,
+            result = Parrot_str_new_init(interp, NULL, a->bufused + b->bufused,
                         enc, cs, 0);
 
-            result = string_append(interp, result, a);
-            result = string_append(interp, result, b);
+            result = Parrot_str_append(interp, result, a);
+            result = Parrot_str_append(interp, result, b);
 
             return result;
         }
 
-        return string_copy(interp, a);
+        return Parrot_str_copy(interp, a);
     }
 
     return b
-        ? string_copy(interp, b)
+        ? Parrot_str_copy(interp, b)
         : string_make(interp, NULL, 0, NULL, Uflags);
 }
 
 
 /*
 
-=item C<STRING * string_append>
+=item C<STRING * Parrot_str_append>
 
 Take in two Parrot strings and append the second to the first.  NOTE THAT
 RETURN VALUE MAY NOT BE THE FIRST STRING, if the first string is COW'd or
@@ -541,9 +541,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *b))
+Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *b))
 {
-    ASSERT_ARGS(string_append)
+    ASSERT_ARGS(Parrot_str_append)
     UINTVAL a_capacity;
     UINTVAL total_length;
     const CHARSET *cs;
@@ -552,21 +552,21 @@ string_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *b))
     /* XXX should this be a CHARSET method? */
 
     /* If B isn't real, we just bail */
-    const UINTVAL b_len = b ? string_length(interp, b) : 0;
+    const UINTVAL b_len = b ? Parrot_str_byte_length(interp, b) : 0;
     if (!b_len)
         return a;
 
     /* Is A real? */
     if (a == NULL || PObj_bufstart(a) == NULL)
-        return string_copy(interp, b);
+        return Parrot_str_copy(interp, b);
 
     saneify_string(a);
     saneify_string(b);
 
     /* If the destination's constant, or external then just fall back to
-       string_concat */
+       Parrot_str_concat */
     if (PObj_is_cowed_TESTALL(a))
-        return string_concat(interp, a, b, 0);
+        return Parrot_str_concat(interp, a, b, 0);
 
     cs = string_rep_compatible(interp, a, b, &enc);
     if (cs) {
@@ -607,7 +607,7 @@ string_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *b))
 
 /*
 
-=item C<STRING * string_from_cstring>
+=item C<STRING * Parrot_str_new>
 
 Make a Parrot string from a specified C string.
 
@@ -620,10 +620,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_from_cstring(PARROT_INTERP, ARGIN_NULLOK(const char * const buffer), const UINTVAL len)
+Parrot_str_new(PARROT_INTERP, ARGIN_NULLOK(const char * const buffer), const UINTVAL len)
 {
-    ASSERT_ARGS(string_from_cstring)
-    return string_make_direct(interp, buffer, len ? len :
+    ASSERT_ARGS(Parrot_str_new)
+    return Parrot_str_new_init(interp, buffer, len ? len :
             buffer ? strlen(buffer) : 0,
                               PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                               0); /* Force an 8-bit encoding at some
@@ -660,7 +660,7 @@ string_primary_encoding_for_representation(PARROT_INTERP,
 
 /*
 
-=item C<STRING * const_string>
+=item C<STRING * Parrot_str_new_constant>
 
 Creates and returns a constant Parrot string.
 
@@ -672,9 +672,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-const_string(PARROT_INTERP, ARGIN(const char *buffer))
+Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 {
-    ASSERT_ARGS(const_string)
+    ASSERT_ARGS(Parrot_str_new_constant)
     DECL_CONST_CAST;
     STRING *s;
     Hash   * const cstring_cache = (Hash *)interp->const_cstring_hash;
@@ -684,7 +684,7 @@ const_string(PARROT_INTERP, ARGIN(const char *buffer))
     if (s)
         return s;
 
-    s = string_make_direct(interp, buffer, strlen(buffer),
+    s = Parrot_str_new_init(interp, buffer, strlen(buffer),
                        PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
                        PObj_external_FLAG|PObj_constant_FLAG);
 
@@ -741,14 +741,14 @@ string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
             "Can't make '%s' charset strings", charset_name);
 
 
-    return string_make_direct(interp, buffer, len,
+    return Parrot_str_new_init(interp, buffer, len,
         charset->preferred_encoding, charset, flags);
 
 }
 
 /*
 
-=item C<STRING * string_make_direct>
+=item C<STRING * Parrot_str_new_init>
 
 Given a buffer, its length, an encoding, a character set, and STRING flags,
 creates and returns a new string.  Don't call this directly.
@@ -761,10 +761,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_make_direct(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
+Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
         ARGIN(const ENCODING *encoding), ARGIN_NULLOK(const CHARSET *charset), UINTVAL flags)
 {
-    ASSERT_ARGS(string_make_direct)
+    ASSERT_ARGS(Parrot_str_new_init)
     DECL_CONST_CAST;
     STRING * const s = new_string_header(interp, flags);
     s->encoding      = encoding;
@@ -786,7 +786,7 @@ string_make_direct(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
-            string_compute_strlen(interp, s);
+            Parrot_str_length(interp, s);
 
         return s;
     }
@@ -799,7 +799,7 @@ string_make_direct(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
         if (encoding == Parrot_fixed_8_encoding_ptr)
             s->strlen = len;
         else
-            string_compute_strlen(interp, s);
+            Parrot_str_length(interp, s);
     }
     else {
         s->strlen = s->bufused = 0;
@@ -811,7 +811,7 @@ string_make_direct(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
 
 /*
 
-=item C<STRING * string_grow>
+=item C<STRING * Parrot_str_resize>
 
 Grows the Parrot string's buffer by the specified number of characters.
 
@@ -822,10 +822,10 @@ Grows the Parrot string's buffer by the specified number of characters.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_grow(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
+Parrot_str_resize(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
 {
-    ASSERT_ARGS(string_grow)
-    Parrot_unmake_COW(interp, s);
+    ASSERT_ARGS(Parrot_str_resize)
+    Parrot_str_write_COW(interp, s);
 
     /* Don't check buflen, if we are here, we already checked. */
     Parrot_reallocate_string(interp,
@@ -842,7 +842,7 @@ string_grow(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
 
 =over 4
 
-=item C<UINTVAL string_length>
+=item C<UINTVAL Parrot_str_byte_length>
 
 Returns the number of characters in the specified Parrot string.
 
@@ -853,9 +853,9 @@ Returns the number of characters in the specified Parrot string.
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 UINTVAL
-string_length(SHIM_INTERP, ARGIN(const STRING *s))
+Parrot_str_byte_length(SHIM_INTERP, ARGIN(const STRING *s))
 {
-    ASSERT_ARGS(string_length)
+    ASSERT_ARGS(Parrot_str_byte_length)
 
     return s->strlen;
 }
@@ -863,7 +863,7 @@ string_length(SHIM_INTERP, ARGIN(const STRING *s))
 
 /*
 
-=item C<INTVAL string_index>
+=item C<INTVAL Parrot_str_indexed>
 
 Returns the character (or glyph, depending upon the string's encoding).  This
 abstracts the process of finding the Nth character in a (possibly Unicode or
@@ -879,9 +879,9 @@ Note that this is not range-checked.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_index(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
+Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
 {
-    ASSERT_ARGS(string_index)
+    ASSERT_ARGS(Parrot_str_indexed)
     saneify_string(s);
     return (INTVAL)CHARSET_GET_CODEPOINT(interp, s, idx);
 }
@@ -889,7 +889,7 @@ string_index(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL idx)
 
 /*
 
-=item C<INTVAL string_str_index>
+=item C<INTVAL Parrot_str_find_index>
 
 Returns the character position of the second Parrot string in the first at or
 after C<start>. The return value is a (0 based) offset in characters, not
@@ -902,10 +902,10 @@ bytes. If second string is not found in the first string, returns -1.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_str_index(PARROT_INTERP, ARGIN(const STRING *s),
+Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *s),
         ARGIN(const STRING *s2), INTVAL start)
 {
-    ASSERT_ARGS(string_str_index)
+    ASSERT_ARGS(Parrot_str_find_index)
     STRING *src, *search;
     UINTVAL len;
     DECL_CONST_CAST;
@@ -913,7 +913,7 @@ string_str_index(PARROT_INTERP, ARGIN(const STRING *s),
     if (start < 0)
         return -1;
 
-    len = string_length(interp, s);
+    len = Parrot_str_byte_length(interp, s);
 
     if (!len)
         return -1;
@@ -921,7 +921,7 @@ string_str_index(PARROT_INTERP, ARGIN(const STRING *s),
     if (start >= (INTVAL)len)
         return -1;
 
-    if (!string_length(interp, s2))
+    if (!Parrot_str_byte_length(interp, s2))
         return -1;
 
     src    = PARROT_const_cast(STRING *, s);
@@ -948,7 +948,7 @@ INTVAL
 string_ord(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), INTVAL idx)
 {
     ASSERT_ARGS(string_ord)
-    const UINTVAL len        = s ? string_length(interp, s) : 0;
+    const UINTVAL len        = s ? Parrot_str_byte_length(interp, s) : 0;
     UINTVAL       true_index = (UINTVAL)idx;
 
     if (len == 0)
@@ -968,7 +968,7 @@ string_ord(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), INTVAL idx)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
             "Cannot get character past end of string");
 
-    return string_index(interp, s, true_index);
+    return Parrot_str_indexed(interp, s, true_index);
 }
 
 
@@ -1007,7 +1007,7 @@ string_chr(PARROT_INTERP, UINTVAL character)
 
 /*
 
-=item C<STRING * string_copy>
+=item C<STRING * Parrot_str_copy>
 
 Creates and returns a copy of the specified Parrot string.
 
@@ -1019,10 +1019,10 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_copy(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_copy(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(string_copy)
-    return Parrot_make_COW_reference(interp, s);
+    ASSERT_ARGS(Parrot_str_copy)
+    return Parrot_str_new_COW(interp, s);
 }
 
 
@@ -1034,7 +1034,7 @@ string_copy(PARROT_INTERP, ARGMOD(STRING *s))
 
 =over 4
 
-=item C<INTVAL string_compute_strlen>
+=item C<INTVAL Parrot_str_length>
 
 Calculates and returns the number of characters in the specified Parrot string.
 
@@ -1045,9 +1045,9 @@ Calculates and returns the number of characters in the specified Parrot string.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
-string_compute_strlen(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_length(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(string_compute_strlen)
+    ASSERT_ARGS(Parrot_str_length)
 
     s->strlen = CHARSET_CODEPOINTS(interp, s);
     return s->strlen;
@@ -1075,51 +1075,6 @@ string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), UINTVAL nchars)
     return ENCODING_MAX_BYTES_PER_CODEPOINT(interp, s) * nchars;
 }
 
-
-/*
-
-=item C<STRING * string_repeat>
-
-Repeats the specified Parrot string I<num> times and stores the result in the
-second string, and returns it. The second string is created if necessary (that
-is, if you pass in a NULL value).
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-STRING *
-string_repeat(PARROT_INTERP, ARGIN(const STRING *s),
-    UINTVAL num, ARGOUT_NULLOK(STRING **d))
-{
-    ASSERT_ARGS(string_repeat)
-    UINTVAL i;
-
-    STRING * const dest = string_make_direct(interp, NULL,
-                        s->bufused * num,
-                        s->encoding, s->charset, 0);
-
-    if (num == 0)
-        return dest;
-
-    /* copy s into dest num times */
-    for (i = 0; i < num; i++) {
-        mem_sys_memcopy((void *)((ptrcast_t)dest->strstart + s->bufused * i),
-                        s->strstart, s->bufused);
-    }
-
-    dest->bufused = s->bufused * num;
-    dest->strlen  = s->strlen * num;
-
-    if (d != NULL)
-        *d = dest;
-
-    return dest;
-}
-
-
 /*
 
 =item C<STRING * Parrot_str_repeat>
@@ -1136,7 +1091,7 @@ STRING *
 Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
 {
     ASSERT_ARGS(Parrot_str_repeat)
-    STRING * const dest = string_make_direct(interp, NULL,
+    STRING * const dest = Parrot_str_new_init(interp, NULL,
                         s->bufused * num,
                         s->encoding, s->charset, 0);
     if (num > 0) {
@@ -1159,7 +1114,7 @@ Parrot_str_repeat(PARROT_INTERP, ARGIN(const STRING *s), UINTVAL num)
 
 /*
 
-=item C<STRING * string_substr>
+=item C<STRING * Parrot_str_substr>
 
 Copies the substring of length C<length> from C<offset> from the specified
 Parrot string and stores it in C<**d>, allocating memory if necessary. The
@@ -1173,11 +1128,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-string_substr(PARROT_INTERP,
+Parrot_str_substr(PARROT_INTERP,
         ARGIN_NULLOK(STRING *src), INTVAL offset, INTVAL length,
         ARGOUT_NULLOK(STRING **d), int replace_dest)
 {
-    ASSERT_ARGS(string_substr)
+    ASSERT_ARGS(Parrot_str_substr)
     if (src == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_SUBSTR_OUT_OF_STRING,
             "Cannot substr on a null string");
@@ -1189,8 +1144,8 @@ string_substr(PARROT_INTERP,
         saneify_string(src);
 
         /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
-        if (offset == (INTVAL)string_length(interp, src) || length < 1)
-            return string_make_empty(interp, enum_stringrep_one, 0);
+        if (offset == (INTVAL)Parrot_str_byte_length(interp, src) || length < 1)
+            return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
         if (offset < 0)
             true_offset = (UINTVAL)(src->strlen + offset);
@@ -1232,7 +1187,7 @@ string_substr(PARROT_INTERP,
 
 /*
 
-=item C<STRING * string_replace>
+=item C<STRING * Parrot_str_replace>
 
 Replaces a sequence of C<length> characters from C<offset> in the first
 Parrot string with the second Parrot string, returning what was
@@ -1257,10 +1212,10 @@ A negative offset is allowed to replace from the end.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_replace(PARROT_INTERP, ARGIN(STRING *src),
+Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
     INTVAL offset, INTVAL length, ARGIN(STRING *rep), ARGOUT_NULLOK(STRING **d))
 {
-    ASSERT_ARGS(string_replace)
+    ASSERT_ARGS(Parrot_str_replace)
     UINTVAL         start_byte, end_byte;
     INTVAL          diff;
     String_iter     iter;
@@ -1280,7 +1235,7 @@ string_replace(PARROT_INTERP, ARGIN(STRING *src),
     &&  length        == 1
     &&  rep->strlen   == 1) {
         if (PObj_is_cowed_TESTALL(src))
-            Parrot_unmake_COW(interp, src);
+            Parrot_str_write_COW(interp, src);
 
         ((char *)src->strstart)[offset] = ((char *)rep->strstart)[0];
 
@@ -1345,7 +1300,7 @@ string_replace(PARROT_INTERP, ARGIN(STRING *src),
 
     if (diff >= 0
     || ((INTVAL)src->bufused - (INTVAL)PObj_buflen(src)) <= diff) {
-        Parrot_unmake_COW(interp, src);
+        Parrot_str_write_COW(interp, src);
 
         if (diff != 0) {
             mem_sys_memmove((char *)src->strstart + start_byte + rep->bufused,
@@ -1358,14 +1313,14 @@ string_replace(PARROT_INTERP, ARGIN(STRING *src),
                 rep->strstart, rep->bufused);
 
         if (diff)
-            (void)string_compute_strlen(interp, src);
+            (void)Parrot_str_length(interp, src);
     }
 
     /* Replacement is larger than avail buffer, grow the string */
     else {
         /* diff is negative here, make it positive */
         diff = -(diff);
-        string_grow(interp, src, (UINTVAL)diff);
+        Parrot_str_resize(interp, src, (UINTVAL)diff);
 
         /* Move the end of old string that isn't replaced to new offset first */
         mem_sys_memmove((char *)src->strstart + end_byte + diff,
@@ -1376,7 +1331,7 @@ string_replace(PARROT_INTERP, ARGIN(STRING *src),
         mem_sys_memcopy((char *)src->strstart + start_byte, rep->strstart,
                 rep->bufused);
         src->bufused += diff;
-        (void)string_compute_strlen(interp, src);
+        (void)Parrot_str_length(interp, src);
     }
 
     /* src is modified, now return the original substring */
@@ -1386,7 +1341,7 @@ string_replace(PARROT_INTERP, ARGIN(STRING *src),
 
 /*
 
-=item C<STRING * string_chopn>
+=item C<STRING * Parrot_str_chopn>
 
 Removes the last C<n> characters of the specified Parrot string. If C<n> is
 negative, cuts the string after C<+n> characters. The returned string is a copy
@@ -1399,18 +1354,18 @@ of the one passed in.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_chopn(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
+Parrot_str_chopn(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
 {
-    ASSERT_ARGS(string_chopn)
-    STRING * const chopped = string_copy(interp, s);
-    string_chopn_inplace(interp, chopped, n);
+    ASSERT_ARGS(Parrot_str_chopn)
+    STRING * const chopped = Parrot_str_copy(interp, s);
+    Parrot_str_chopn_inplace(interp, chopped, n);
     return chopped;
 }
 
 
 /*
 
-=item C<void string_chopn_inplace>
+=item C<void Parrot_str_chopn_inplace>
 
 Removes the last C<n> characters of the specified Parrot string. If C<n> is
 negative, cuts the string after C<+n> characters. The string passed in is
@@ -1422,9 +1377,9 @@ modified and returned.
 
 PARROT_EXPORT
 void
-string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
+Parrot_str_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
 {
-    ASSERT_ARGS(string_chopn_inplace)
+    ASSERT_ARGS(Parrot_str_chopn_inplace)
     UINTVAL new_length, uchar_size;
 
     if (n < 0) {
@@ -1469,7 +1424,7 @@ string_chopn_inplace(PARROT_INTERP, ARGMOD(STRING *s), INTVAL n)
 
 /*
 
-=item C<INTVAL string_compare>
+=item C<INTVAL Parrot_str_compare>
 
 Compares two strings to each other.  If s1 is less than s2, returns -1.  If the
 strings are equal, returns 0.  If s1 is greater than s2, returns 2.  This
@@ -1483,9 +1438,9 @@ comparison.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
+Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
-    ASSERT_ARGS(string_compare)
+    ASSERT_ARGS(Parrot_str_compare)
     if (!s2)
         return s1 && (s1->strlen != 0);
 
@@ -1501,7 +1456,7 @@ string_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const
 
 /*
 
-=item C<INTVAL string_equal>
+=item C<INTVAL Parrot_str_equal>
 
 Compares two Parrot strings, performing type and encoding conversions if
 necessary.
@@ -1516,9 +1471,9 @@ otherwise.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
+Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
-    ASSERT_ARGS(string_equal)
+    ASSERT_ARGS(Parrot_str_equal)
     if ((s1 == s2) || (!s1 && !s2)) {
         return 0;
     }
@@ -1569,17 +1524,17 @@ make_writable(PARROT_INTERP, ARGMOD(STRING **s),
 {
     ASSERT_ARGS(make_writable)
     if (!*s)
-        *s = string_make_empty(interp, representation, len);
+        *s = Parrot_str_new_noinit(interp, representation, len);
     else if ((*s)->strlen < len)
-        string_grow(interp, *s, (UINTVAL)(len - (*s)->strlen));
+        Parrot_str_resize(interp, *s, (UINTVAL)(len - (*s)->strlen));
     else if (PObj_is_cowed_TESTALL(*s))
-        Parrot_unmake_COW(interp, *s);
+        Parrot_str_write_COW(interp, *s);
 }
 
 
 /*
 
-=item C<STRING * string_bitwise_and>
+=item C<STRING * Parrot_str_bitwise_and>
 
 Performs a bitwise C<AND> on two Parrot string, performing type and encoding
 conversions if necessary. If the second string is not C<NULL> then it is
@@ -1592,10 +1547,10 @@ reused.  Otherwise a new Parrot string is created.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
+Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         ARGIN_NULLOK(const STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
-    ASSERT_ARGS(string_bitwise_and)
+    ASSERT_ARGS(Parrot_str_bitwise_and)
     STRING *res;
     size_t  minlen;
 
@@ -1622,7 +1577,7 @@ string_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         res->charset  = Parrot_binary_charset_ptr;
     }
     else
-        res = string_make_direct(interp, NULL, minlen,
+        res = Parrot_str_new_init(interp, NULL, minlen,
                 Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
     if (!s1 || !s2) {
@@ -1730,7 +1685,7 @@ do { \
 
 /*
 
-=item C<STRING * string_bitwise_or>
+=item C<STRING * Parrot_str_bitwise_or>
 
 Performs a bitwise C<OR> on two Parrot strings, performing type and encoding
 conversions if necessary. If the third string is not C<NULL>, then it is
@@ -1743,10 +1698,10 @@ reused.  Otherwise a new Parrot string is created.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
+Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         ARGIN_NULLOK(const STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
-    ASSERT_ARGS(string_bitwise_or)
+    ASSERT_ARGS(Parrot_str_bitwise_or)
     STRING *res;
     size_t  maxlen = 0;
 
@@ -1775,7 +1730,7 @@ string_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         res->charset  = Parrot_binary_charset_ptr;
     }
     else
-        res = string_make_direct(interp, NULL, maxlen,
+        res = Parrot_str_new_init(interp, NULL, maxlen,
                 Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
     if (!maxlen) {
@@ -1805,7 +1760,7 @@ string_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
 /*
 
-=item C<STRING * string_bitwise_xor>
+=item C<STRING * Parrot_str_bitwise_xor>
 
 Performs a bitwise C<XOR> on two Parrot strings, performing type and encoding
 conversions if necessary. If the second string is not C<NULL>, then it is
@@ -1818,10 +1773,10 @@ reused.  Otherwise a new Parrot string is created.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
+Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         ARGIN_NULLOK(const STRING *s2), ARGOUT_NULLOK(STRING **dest))
 {
-    ASSERT_ARGS(string_bitwise_xor)
+    ASSERT_ARGS(Parrot_str_bitwise_xor)
     STRING *res;
     size_t  maxlen = 0;
 
@@ -1850,7 +1805,7 @@ string_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         res->charset  = Parrot_binary_charset_ptr;
     }
     else
-        res = string_make_direct(interp, NULL, maxlen,
+        res = Parrot_str_new_init(interp, NULL, maxlen,
                 Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
     if (!maxlen) {
@@ -1892,7 +1847,7 @@ do { \
 
 /*
 
-=item C<STRING * string_bitwise_not>
+=item C<STRING * Parrot_str_bitwise_not>
 
 Performs a bitwise C<NOT> on a Parrot string. If the second string is
 not C<NULL> then it is reused, otherwise a new Parrot string is created.
@@ -1904,10 +1859,10 @@ not C<NULL> then it is reused, otherwise a new Parrot string is created.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
+Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
     ARGOUT_NULLOK(STRING **dest))
 {
-    ASSERT_ARGS(string_bitwise_not)
+    ASSERT_ARGS(Parrot_str_bitwise_not)
     STRING *res;
     size_t  len;
 
@@ -1928,7 +1883,7 @@ string_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
         res->charset  = Parrot_binary_charset_ptr;
     }
     else
-        res = string_make_direct(interp, NULL, len,
+        res = Parrot_str_new_init(interp, NULL, len,
                 Parrot_fixed_8_encoding_ptr, Parrot_binary_charset_ptr, 0);
 
     if (!len) {
@@ -1957,7 +1912,7 @@ string_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
 
 /*
 
-=item C<INTVAL string_bool>
+=item C<INTVAL Parrot_str_boolean>
 
 Returns whether the specified Parrot string is true. A string is true if it is
 equal to anything other than C<0>, C<""> or C<"0">.
@@ -1969,16 +1924,16 @@ equal to anything other than C<0>, C<""> or C<"0">.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_bool(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    ASSERT_ARGS(string_bool)
-    const INTVAL len = s ? string_length(interp, s) : 0;
+    ASSERT_ARGS(Parrot_str_boolean)
+    const INTVAL len = s ? Parrot_str_byte_length(interp, s) : 0;
 
     if (len == 0)
         return 0;
 
     if (len == 1) {
-        const UINTVAL c = string_index(interp, s, 0);
+        const UINTVAL c = Parrot_str_indexed(interp, s, 0);
 
         /* relying on character literals being interpreted as ASCII--may
         not be correct on EBCDIC systems. use numeric value instead? */
@@ -1994,7 +1949,7 @@ string_bool(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<STRING * string_printf>
+=item C<STRING * Parrot_str_format_data>
 
 Writes and returns a Parrot string.
 
@@ -2005,9 +1960,9 @@ Writes and returns a Parrot string.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_printf(PARROT_INTERP, ARGIN(const char *format), ...)
+Parrot_str_format_data(PARROT_INTERP, ARGIN(const char *format), ...)
 {
-    ASSERT_ARGS(string_printf)
+    ASSERT_ARGS(Parrot_str_format_data)
     STRING *output;
     va_list args;
 
@@ -2021,7 +1976,7 @@ string_printf(PARROT_INTERP, ARGIN(const char *format), ...)
 
 /*
 
-=item C<INTVAL string_to_int>
+=item C<INTVAL Parrot_str_to_int>
 
 Converts a numeric Parrot string to an integer value.
 
@@ -2045,9 +2000,9 @@ rounding towards zero.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-string_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    ASSERT_ARGS(string_to_int)
+    ASSERT_ARGS(Parrot_str_to_int)
     if (s == NULL)
         return 0;
     {
@@ -2094,7 +2049,7 @@ string_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<FLOATVAL string_to_num>
+=item C<FLOATVAL Parrot_str_to_num>
 
 Converts a numeric Parrot STRING to a floating point number.
 
@@ -2105,9 +2060,9 @@ Converts a numeric Parrot STRING to a floating point number.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-string_to_num(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
 {
-    ASSERT_ARGS(string_to_num)
+    ASSERT_ARGS(Parrot_str_to_num)
     FLOATVAL    f = 0.0;
     char       *cstr;
     const char *p;
@@ -2118,7 +2073,7 @@ string_to_num(PARROT_INTERP, ARGIN(const STRING *s))
      * XXX C99 atof interprets 0x prefix
      * XXX would strtod() be better for detecting malformed input?
      */
-    cstr = string_to_cstring(interp, s);
+    cstr = Parrot_str_to_cstring(interp, s);
     p    = cstr;
 
     while (isspace((unsigned char)*p))
@@ -2142,7 +2097,7 @@ string_to_num(PARROT_INTERP, ARGIN(const STRING *s))
 #else
         f = -0.0;
 #endif
-    string_cstring_free(cstr);
+    Parrot_str_free_cstring(cstr);
 
     return f;
 }
@@ -2150,7 +2105,7 @@ string_to_num(PARROT_INTERP, ARGIN(const STRING *s))
 
 /*
 
-=item C<STRING * string_from_int>
+=item C<STRING * Parrot_str_from_int>
 
 Returns a Parrot string representation of the specified integer value.
 
@@ -2162,17 +2117,17 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_from_int(PARROT_INTERP, INTVAL i)
+Parrot_str_from_int(PARROT_INTERP, INTVAL i)
 {
-    ASSERT_ARGS(string_from_int)
+    ASSERT_ARGS(Parrot_str_from_int)
     char buf[128];
-    return int_to_str(interp, buf, (HUGEINTVAL)i, 10);
+    return Parrot_str_from_int_base(interp, buf, (HUGEINTVAL)i, 10);
 }
 
 
 /*
 
-=item C<STRING * string_from_num>
+=item C<STRING * Parrot_str_from_num>
 
 Returns a Parrot string representation of the specified floating-point value.
 
@@ -2184,9 +2139,9 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_from_num(PARROT_INTERP, FLOATVAL f)
+Parrot_str_from_num(PARROT_INTERP, FLOATVAL f)
 {
-    ASSERT_ARGS(string_from_num)
+    ASSERT_ARGS(Parrot_str_from_num)
     /* Too damn hard--hand it off to Parrot_sprintf, which'll probably
        use the system sprintf anyway, but has gigantic buffers that are
        awfully hard to overflow. */
@@ -2196,10 +2151,10 @@ string_from_num(PARROT_INTERP, FLOATVAL f)
 
 /*
 
-=item C<char * string_to_cstring>
+=item C<char * Parrot_str_to_cstring>
 
 Returns a C string for the specified Parrot string. Use
-C<string_cstring_free()> to free the string. Failure to do this will result in
+C<Parrot_str_free_cstring()> to free the string. Failure to do this will result in
 a memory leak.
 
 =cut
@@ -2210,9 +2165,9 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char *
-string_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    ASSERT_ARGS(string_to_cstring)
+    ASSERT_ARGS(Parrot_str_to_cstring)
     if (! s) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't convert NULL string");
@@ -2227,7 +2182,7 @@ string_to_cstring(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 =item C<char * string_to_cstring_nullable>
 
 Returns a C string for the specified Parrot string. Use
-C<string_cstring_free()> to free the string. Failure to do this will result in
+C<Parrot_str_free_cstring()> to free the string. Failure to do this will result in
 a memory leak.
 
 =cut
@@ -2254,9 +2209,9 @@ string_to_cstring_nullable(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<void string_cstring_free>
+=item C<void Parrot_str_free_cstring>
 
-Free a string created by C<string_to_cstring()>.
+Free a string created by C<Parrot_str_to_cstring()>.
 
 TODO - Hopefully this can go away at some point, as it's got all
 sorts of leak potential otherwise.
@@ -2267,16 +2222,16 @@ sorts of leak potential otherwise.
 
 PARROT_EXPORT
 void
-string_cstring_free(ARGIN_NULLOK(char *p))
+Parrot_str_free_cstring(ARGIN_NULLOK(char *p))
 {
-    ASSERT_ARGS(string_cstring_free)
+    ASSERT_ARGS(Parrot_str_free_cstring)
     mem_sys_free((void *)p);
 }
 
 
 /*
 
-=item C<void string_pin>
+=item C<void Parrot_str_pin>
 
 Replaces the specified Parrot string's managed buffer memory by system memory.
 
@@ -2286,9 +2241,9 @@ Replaces the specified Parrot string's managed buffer memory by system memory.
 
 PARROT_EXPORT
 void
-string_pin(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_pin(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(string_pin)
+    ASSERT_ARGS(Parrot_str_pin)
     char  *memory;
     size_t size;
 
@@ -2296,7 +2251,7 @@ string_pin(PARROT_INTERP, ARGMOD(STRING *s))
      *          not work for these
      *          so probably only sysmem should be tested
      */
-    Parrot_unmake_COW(interp, s);
+    Parrot_str_write_COW(interp, s);
 
     size   = PObj_buflen(s);
     memory = (char *)mem_sys_allocate(size);
@@ -2312,9 +2267,9 @@ string_pin(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<void string_unpin>
+=item C<void Parrot_str_unpin>
 
-Undoes a C<string_pin()> so that the string once again uses managed memory.
+Undoes a C<Parrot_str_pin()> so that the string once again uses managed memory.
 
 =cut
 
@@ -2322,9 +2277,9 @@ Undoes a C<string_pin()> so that the string once again uses managed memory.
 
 PARROT_EXPORT
 void
-string_unpin(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(string_unpin)
+    ASSERT_ARGS(Parrot_str_unpin)
     void  *memory;
     size_t size;
 
@@ -2334,7 +2289,7 @@ string_unpin(PARROT_INTERP, ARGMOD(STRING *s))
     if (!PObj_sysmem_TEST(s))
         return;
 
-    Parrot_unmake_COW(interp, s);
+    Parrot_str_write_COW(interp, s);
     size = PObj_buflen(s);
 
     /* We need a handle on the fixed memory so we can get rid of it later */
@@ -2361,7 +2316,7 @@ string_unpin(PARROT_INTERP, ARGMOD(STRING *s))
 
 /*
 
-=item C<size_t string_hash>
+=item C<size_t Parrot_str_to_hashval>
 
 Returns the hash value for the specified Parrot string, caching it in
 C<< s->hashval >>.
@@ -2373,9 +2328,9 @@ C<< s->hashval >>.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 size_t
-string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
+Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 {
-    ASSERT_ARGS(string_hash)
+    ASSERT_ARGS(Parrot_str_to_hashval)
     register size_t h;
     const UINTVAL seed = interp->hash_seed;
 
@@ -2394,10 +2349,10 @@ string_hash(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 
 /*
 
-=item C<STRING * string_escape_string>
+=item C<STRING * Parrot_str_escape>
 
 Escapes all non-ASCII chars to backslash sequences. Control chars that
-C<string_unescape_cstring> can handle are escaped as I<\x>, as well as a double
+C<Parrot_str_unescape> can handle are escaped as I<\x>, as well as a double
 quote character. Other control chars and codepoints < 0x100 are escaped as
 I<\xhh>, codepoints up to 0xffff, as I<\uhhhh>, and codepoints greater than
 this as I<\x{hh...hh}>.
@@ -2409,16 +2364,16 @@ this as I<\x{hh...hh}>.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_escape_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
+Parrot_str_escape(PARROT_INTERP, ARGIN_NULLOK(const STRING *src))
 {
-    ASSERT_ARGS(string_escape_string)
-    return string_escape_string_delimited(interp, src, (UINTVAL) ~0);
+    ASSERT_ARGS(Parrot_str_escape)
+    return Parrot_str_escape_truncate(interp, src, (UINTVAL) ~0);
 }
 
 
 /*
 
-=item C<STRING * string_escape_string_delimited>
+=item C<STRING * Parrot_str_escape_truncate>
 
 
 Escapes all non-ASCII characters in the given string with backslashed versions,
@@ -2431,10 +2386,10 @@ but limits the length of the output (used for trace output of strings).
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_escape_string_delimited(PARROT_INTERP,
+Parrot_str_escape_truncate(PARROT_INTERP,
         ARGIN_NULLOK(const STRING *src), UINTVAL limit)
 {
-    ASSERT_ARGS(string_escape_string_delimited)
+    ASSERT_ARGS(Parrot_str_escape_truncate)
     STRING *result, *hex;
     UINTVAL i, len, charlen;
     String_iter iter;
@@ -2455,7 +2410,7 @@ string_escape_string_delimited(PARROT_INTERP,
         charlen = 16;
 
     /* create ascii result */
-    result = string_make_direct(interp, NULL, charlen,
+    result = Parrot_str_new_init(interp, NULL, charlen,
             Parrot_fixed_8_encoding_ptr, Parrot_ascii_charset_ptr, 0);
 
     /* more work TODO */
@@ -2527,7 +2482,7 @@ string_escape_string_delimited(PARROT_INTERP,
         else
             hex = Parrot_sprintf_c(interp, "\\u%04x", c);
 
-        result = string_append(interp, result, hex);
+        result = Parrot_str_append(interp, result, hex);
 
         /* adjust our insert idx */
         i += hex->strlen;
@@ -2546,7 +2501,7 @@ string_escape_string_delimited(PARROT_INTERP,
 
 /*
 
-=item C<STRING * string_unescape_cstring>
+=item C<STRING * Parrot_str_unescape>
 
 Unescapes the specified C string. These sequences are covered:
 
@@ -2565,10 +2520,10 @@ Unescapes the specified C string. These sequences are covered:
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-string_unescape_cstring(PARROT_INTERP,
+Parrot_str_unescape(PARROT_INTERP,
     ARGIN(const char *cstring), char delimiter, ARGIN_NULLOK(const char *enc_char))
 {
-    ASSERT_ARGS(string_unescape_cstring)
+    ASSERT_ARGS(Parrot_str_unescape)
     size_t          clength = strlen(cstring);
     Parrot_UInt4    r;
     String_iter     iter;
@@ -2603,7 +2558,7 @@ string_unescape_cstring(PARROT_INTERP,
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Can't make '%s' charset strings", p + 1);
 
-        result   = string_make_direct(interp, cstring, clength,
+        result   = Parrot_str_new_init(interp, cstring, clength,
                         encoding, charset, flags);
         encoding = Parrot_fixed_8_encoding_ptr;
     }
@@ -2644,7 +2599,7 @@ string_unescape_cstring(PARROT_INTERP,
 
     /* this also validates the string */
     if (encoding != result->encoding)
-        string_compute_strlen(interp, result);
+        Parrot_str_length(interp, result);
 
     if (!CHARSET_VALIDATE(interp, result, 0))
         Parrot_ex_throw_from_c_args(interp, NULL,
@@ -2656,7 +2611,7 @@ string_unescape_cstring(PARROT_INTERP,
 
 /*
 
-=item C<STRING * string_upcase>
+=item C<STRING * Parrot_str_upcase>
 
 Returns a copy of the specified Parrot string converted to upper case.
 Non-caseable characters are left unchanged.
@@ -2669,17 +2624,17 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 STRING *
-string_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
-    ASSERT_ARGS(string_upcase)
+    ASSERT_ARGS(Parrot_str_upcase)
     if (STRING_IS_NULL(s)) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't upcase NULL string");
     }
     else {
         DECL_CONST_CAST;
-        STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
-        string_upcase_inplace(interp, dest);
+        STRING * const dest = Parrot_str_copy(interp, PARROT_const_cast(STRING *, s));
+        Parrot_str_upcase_inplace(interp, dest);
         return dest;
     }
 }
@@ -2687,7 +2642,7 @@ string_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<void string_upcase_inplace>
+=item C<void Parrot_str_upcase_inplace>
 
 Converts the specified Parrot string to upper case.
 
@@ -2697,15 +2652,15 @@ Converts the specified Parrot string to upper case.
 
 PARROT_EXPORT
 void
-string_upcase_inplace(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
+Parrot_str_upcase_inplace(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 {
-    ASSERT_ARGS(string_upcase_inplace)
+    ASSERT_ARGS(Parrot_str_upcase_inplace)
     if (STRING_IS_NULL(s)) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Can't upcase NULL string");
     }
     else {
-        Parrot_unmake_COW(interp, s);
+        Parrot_str_write_COW(interp, s);
         CHARSET_UPCASE(interp, s);
     }
 }
@@ -2713,7 +2668,7 @@ string_upcase_inplace(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 
 /*
 
-=item C<STRING * string_downcase>
+=item C<STRING * Parrot_str_downcase>
 
 Returns a copy of the specified Parrot string converted to lower case.
 Non-caseable characters are left unchanged.
@@ -2726,19 +2681,19 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 STRING *
-string_downcase(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_downcase(PARROT_INTERP, ARGIN(const STRING *s))
 {
-    ASSERT_ARGS(string_downcase)
+    ASSERT_ARGS(Parrot_str_downcase)
     DECL_CONST_CAST;
-    STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
-    string_downcase_inplace(interp, dest);
+    STRING * const dest = Parrot_str_copy(interp, PARROT_const_cast(STRING *, s));
+    Parrot_str_downcase_inplace(interp, dest);
     return dest;
 }
 
 
 /*
 
-=item C<void string_downcase_inplace>
+=item C<void Parrot_str_downcase_inplace>
 
 Converts the specified Parrot string to lower case.
 
@@ -2748,23 +2703,23 @@ Converts the specified Parrot string to lower case.
 
 PARROT_EXPORT
 void
-string_downcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_downcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(string_downcase_inplace)
+    ASSERT_ARGS(Parrot_str_downcase_inplace)
     /*
      * TODO get rid of all the inplace variants. We have for utf8:
-     * * 1 string_copy from the non-incase variant
+     * * 1 Parrot_str_copy from the non-incase variant
      * * conversion to utf16, with doubling the buffer
      * * possibly one more reallocation in downcase
      */
-    Parrot_unmake_COW(interp, s);
+    Parrot_str_write_COW(interp, s);
     CHARSET_DOWNCASE(interp, s);
 }
 
 
 /*
 
-=item C<STRING * string_titlecase>
+=item C<STRING * Parrot_str_titlecase>
 
 Returns a copy of the specified Parrot string converted to title case.
 Non-caseable characters are left unchanged.
@@ -2777,19 +2732,19 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 STRING *
-string_titlecase(PARROT_INTERP, ARGIN(const STRING *s))
+Parrot_str_titlecase(PARROT_INTERP, ARGIN(const STRING *s))
 {
-    ASSERT_ARGS(string_titlecase)
+    ASSERT_ARGS(Parrot_str_titlecase)
     DECL_CONST_CAST;
-    STRING * const dest = string_copy(interp, PARROT_const_cast(STRING *, s));
-    string_titlecase_inplace(interp, dest);
+    STRING * const dest = Parrot_str_copy(interp, PARROT_const_cast(STRING *, s));
+    Parrot_str_titlecase_inplace(interp, dest);
     return dest;
 }
 
 
 /*
 
-=item C<void string_titlecase_inplace>
+=item C<void Parrot_str_titlecase_inplace>
 
 Converts the specified Parrot string to title case.
 
@@ -2799,10 +2754,10 @@ Converts the specified Parrot string to title case.
 
 PARROT_EXPORT
 void
-string_titlecase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
+Parrot_str_titlecase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(string_titlecase_inplace)
-    Parrot_unmake_COW(interp, s);
+    ASSERT_ARGS(Parrot_str_titlecase_inplace)
+    Parrot_str_write_COW(interp, s);
     CHARSET_TITLECASE(interp, s);
 }
 
@@ -2827,7 +2782,7 @@ string_increment(PARROT_INTERP, ARGIN(const STRING *s))
     ASSERT_ARGS(string_increment)
     UINTVAL o;
 
-    if (string_length(interp, s) != 1)
+    if (Parrot_str_byte_length(interp, s) != 1)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "increment only for length = 1 done");
 
@@ -2869,7 +2824,7 @@ Parrot_string_cstring(SHIM_INTERP, ARGIN(const STRING *str))
 
 /*
 
-=item C<INTVAL Parrot_string_is_cclass>
+=item C<INTVAL Parrot_str_is_cclass>
 
 Returns 1 if the codepoint of string C<s> at given offset is in the given
 character class C<flags>. See also F<include/parrot/cclass.h> for possible
@@ -2882,11 +2837,11 @@ character classes. Returns 0 otherwise, or if the string is empty or NULL.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_string_is_cclass(PARROT_INTERP, INTVAL flags,
+Parrot_str_is_cclass(PARROT_INTERP, INTVAL flags,
         ARGIN(const STRING *s), UINTVAL offset)
 {
-    ASSERT_ARGS(Parrot_string_is_cclass)
-    if (!string_length(interp, s))
+    ASSERT_ARGS(Parrot_str_is_cclass)
+    if (!Parrot_str_byte_length(interp, s))
         return 0;
 
     return CHARSET_IS_CCLASS(interp, flags, s, offset);
@@ -2895,7 +2850,7 @@ Parrot_string_is_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<INTVAL Parrot_string_find_cclass>
+=item C<INTVAL Parrot_str_find_cclass>
 
 Finds the first occurrence of the given character class in C<flags> in the
 string, and returns its glyph-wise index.
@@ -2907,10 +2862,10 @@ string, and returns its glyph-wise index.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_string_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
+Parrot_str_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
                           UINTVAL offset, UINTVAL count)
 {
-    ASSERT_ARGS(Parrot_string_find_cclass)
+    ASSERT_ARGS(Parrot_str_find_cclass)
     if (!s)
         return -1;
 
@@ -2919,7 +2874,7 @@ Parrot_string_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN_NULLOK(STRING *s),
 
 /*
 
-=item C<INTVAL Parrot_string_find_not_cclass>
+=item C<INTVAL Parrot_str_find_not_cclass>
 
 Finds the first occurrence of the a character I<not> in the given character
 class in C<flags> in the string starting from C<offset> and looking at C<count>
@@ -2933,10 +2888,10 @@ found.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_string_find_not_cclass(PARROT_INTERP, INTVAL flags,
+Parrot_str_find_not_cclass(PARROT_INTERP, INTVAL flags,
     ARGIN_NULLOK(STRING *s), UINTVAL offset, UINTVAL count)
 {
-    ASSERT_ARGS(Parrot_string_find_not_cclass)
+    ASSERT_ARGS(Parrot_str_find_not_cclass)
     if (!s)
         return -1;
 
@@ -2946,7 +2901,7 @@ Parrot_string_find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<STRING* Parrot_string_trans_charset>
+=item C<STRING* Parrot_str_change_charset>
 
 If C<dest> == NULL, converts C<src> to the given charset or encoding inplace.
 Otherwise returns a copy of C<src> with the charset/encoding in C<dest>.
@@ -2959,10 +2914,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_string_trans_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
+Parrot_str_change_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
         INTVAL charset_nr, ARGOUT_NULLOK(STRING *dest))
 {
-    ASSERT_ARGS(Parrot_string_trans_charset)
+    ASSERT_ARGS(Parrot_str_change_charset)
     const CHARSET *new_charset;
 
     if (!src)
@@ -2980,7 +2935,7 @@ Parrot_string_trans_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
      */
     if (dest) {
         if (new_charset == src->charset) {
-            dest          = Parrot_reuse_COW_reference(interp, src, dest);
+            dest          = Parrot_str_reuse_COW(interp, src, dest);
             dest->charset = new_charset;
             /* keep encoding */
             return dest;
@@ -2995,7 +2950,7 @@ Parrot_string_trans_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
         if (new_charset == src->charset)
             return src;
 
-        Parrot_unmake_COW(interp, src);
+        Parrot_str_write_COW(interp, src);
     }
 
     return new_charset->to_charset(interp, src, dest);
@@ -3004,7 +2959,7 @@ Parrot_string_trans_charset(PARROT_INTERP, ARGMOD_NULLOK(STRING *src),
 
 /*
 
-=item C<STRING* Parrot_string_trans_encoding>
+=item C<STRING* Parrot_str_change_encoding>
 
 If C<dest> == NULL, converts C<src> to the given charset or encoding in place.
 Otherwise returns a copy of C<src> with the charset/encoding in C<dest>
@@ -3017,10 +2972,10 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING*
-Parrot_string_trans_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
+Parrot_str_change_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
         INTVAL encoding_nr, ARGOUT_NULLOK(STRING *dest))
 {
-    ASSERT_ARGS(Parrot_string_trans_encoding)
+    ASSERT_ARGS(Parrot_str_change_encoding)
     const ENCODING *new_encoding;
 
     if (!src)
@@ -3039,7 +2994,7 @@ Parrot_string_trans_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
     if (dest) {
         dest->encoding = new_encoding;
         if (new_encoding == src->encoding) {
-            dest = Parrot_reuse_COW_reference(interp, src, dest);
+            dest = Parrot_str_reuse_COW(interp, src, dest);
             return dest;
         }
     }
@@ -3047,7 +3002,7 @@ Parrot_string_trans_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
         if (new_encoding == src->encoding)
             return src;
 
-        Parrot_unmake_COW(interp, src);
+        Parrot_str_write_COW(interp, src);
     }
 
     return new_encoding->to_encoding(interp, src, dest);
@@ -3056,7 +3011,7 @@ Parrot_string_trans_encoding(PARROT_INTERP, ARGIN_NULLOK(STRING *src),
 
 /*
 
-=item C<STRING * string_compose>
+=item C<STRING * Parrot_str_compose>
 
 Normalizes the string.
 
@@ -3068,14 +3023,14 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 STRING *
-string_compose(PARROT_INTERP, ARGIN_NULLOK(STRING *src))
+Parrot_str_compose(PARROT_INTERP, ARGIN_NULLOK(STRING *src))
 {
-    ASSERT_ARGS(string_compose)
+    ASSERT_ARGS(Parrot_str_compose)
     if (!src)
         return NULL;
 
     if (!src->strlen)
-        return string_make_empty(interp, enum_stringrep_one, 0);
+        return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
     return CHARSET_COMPOSE(interp, src);
 }
@@ -3083,7 +3038,7 @@ string_compose(PARROT_INTERP, ARGIN_NULLOK(STRING *src))
 
 /*
 
-=item C<STRING* string_join>
+=item C<STRING* Parrot_str_join>
 
 Joins the elements of the array C<ar> as strings with the string C<j> between
 them, returning the result.
@@ -3096,25 +3051,25 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
-string_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
+Parrot_str_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 {
-    ASSERT_ARGS(string_join)
+    ASSERT_ARGS(Parrot_str_join)
     STRING *res;
     STRING *s;
     const int ar_len = VTABLE_elements(interp, ar);
     int i;
 
     if (ar_len == 0)
-        return string_make_empty(interp, enum_stringrep_one, 0);
+        return Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
 
     s   = VTABLE_get_string_keyed_int(interp, ar, 0);
-    res = s ? string_copy(interp, s) : NULL;
+    res = s ? Parrot_str_copy(interp, s) : NULL;
 
     for (i = 1; i < ar_len; ++i) {
         STRING * const next = VTABLE_get_string_keyed_int(interp, ar, i);
 
-        res  = string_append(interp, res, j);
-        res  = string_append(interp, res, next);
+        res  = Parrot_str_append(interp, res, j);
+        res  = Parrot_str_append(interp, res, next);
     }
 
     return res;
@@ -3123,10 +3078,11 @@ string_join(PARROT_INTERP, ARGIN_NULLOK(STRING *j), ARGIN(PMC *ar))
 
 /*
 
-=item C<PMC* string_split>
+=item C<PMC* Parrot_str_split>
 
 Splits the string C<str> at the delimiter C<delim>, returning a
-C<ResizableStringArray> of results.
+C<ResizableStringArray> of results. Returns PMCNULL if the string or the
+delimiter is NULL.
 
 =cut
 
@@ -3136,33 +3092,37 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
-string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
+Parrot_str_split(PARROT_INTERP,
+    ARGIN_NULLOK(STRING *delim), ARGIN_NULLOK(STRING *str))
 {
-    ASSERT_ARGS(string_split)
-    PMC * const res  = pmc_new(interp, enum_class_ResizableStringArray);
-    const int   slen = string_length(interp, str);
+    ASSERT_ARGS(Parrot_str_split)
+    PMC    *res;
+    INTVAL  slen, dlen, ps, pe;
 
-    int dlen;
-    int ps, pe;
+    if(STRING_IS_NULL(delim) || STRING_IS_NULL(str))
+        return PMCNULL;
+
+    res  = pmc_new(interp, enum_class_ResizableStringArray);
+    slen = Parrot_str_byte_length(interp, str);
 
     if (!slen)
         return res;
 
-    dlen = string_length(interp, delim);
+    dlen = Parrot_str_byte_length(interp, delim);
 
     if (dlen == 0) {
         int i;
         VTABLE_set_integer_native(interp, res, slen);
 
         for (i = 0; i < slen; ++i) {
-           STRING * const p = string_substr(interp, str, i, 1, NULL, 0);
+           STRING * const p = Parrot_str_substr(interp, str, i, 1, NULL, 0);
            VTABLE_set_string_keyed_int(interp, res, i, p);
         }
 
         return res;
     }
 
-    pe = string_str_index(interp, str, delim, 0);
+    pe = Parrot_str_find_index(interp, str, delim, 0);
 
     if (pe < 0) {
         VTABLE_push_string(interp, res, str);
@@ -3173,15 +3133,15 @@ string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
 
     while (ps <= slen) {
         const int      pl   = pe - ps;
-        STRING * const tstr = string_substr(interp, str, ps, pl, NULL, 0);
+        STRING * const tstr = Parrot_str_substr(interp, str, ps, pl, NULL, 0);
 
         VTABLE_push_string(interp, res, tstr);
-        ps = pe + string_length(interp, delim);
+        ps = pe + Parrot_str_byte_length(interp, delim);
 
         if (ps > slen)
             break;
 
-        pe = string_str_index(interp, str, delim, ps);
+        pe = Parrot_str_find_index(interp, str, delim, ps);
 
         if (pe < 0)
             pe = slen;
@@ -3193,30 +3153,7 @@ string_split(PARROT_INTERP, ARGIN(STRING *delim), ARGIN(STRING *str))
 
 /*
 
-=item C<PMC* Parrot_string_split>
-
-Split a string with a delimiter.
-Returns PMCNULL if the string or the delimiter is NULL,
-else is the same as string_split.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC*
-Parrot_string_split(PARROT_INTERP,
-    ARGIN_NULLOK(STRING *delim), ARGIN_NULLOK(STRING *str))
-{
-    ASSERT_ARGS(Parrot_string_split)
-    return (delim && str) ? string_split(interp, delim, str) : NULL;
-}
-
-/*
-
-=item C<STRING* uint_to_str>
+=item C<STRING* Parrot_str_from_uint>
 
 Returns C<num> converted to a Parrot C<STRING>.
 
@@ -3233,10 +3170,10 @@ If C<minus> is true, then C<-> is prepended to the string representation.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING*
-uint_to_str(PARROT_INTERP, ARGOUT(char *tc), UHUGEINTVAL num,
+Parrot_str_from_uint(PARROT_INTERP, ARGOUT(char *tc), UHUGEINTVAL num,
     unsigned int base, int minus)
 {
-    ASSERT_ARGS(uint_to_str)
+    ASSERT_ARGS(Parrot_str_from_uint)
     /* the buffer must be at least as long as this */
     char               *p    = tc + sizeof (UHUGEINTVAL)*8 + 1;
     const char * const  tail = p;
@@ -3262,7 +3199,7 @@ uint_to_str(PARROT_INTERP, ARGOUT(char *tc), UHUGEINTVAL num,
 
 /*
 
-=item C<STRING * int_to_str>
+=item C<STRING * Parrot_str_from_int_base>
 
 Returns C<num> converted to a Parrot C<STRING>.
 
@@ -3277,15 +3214,15 @@ If C<< num < 0 >>, then C<-> is prepended to the string representation.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-int_to_str(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, unsigned int base)
+Parrot_str_from_int_base(PARROT_INTERP, ARGOUT(char *tc), HUGEINTVAL num, unsigned int base)
 {
-    ASSERT_ARGS(int_to_str)
+    ASSERT_ARGS(Parrot_str_from_int_base)
     const int is_neg = (num < 0);
 
     if (is_neg)
         num = -num;
 
-    return uint_to_str(interp, tc, (UHUGEINTVAL)num, base, is_neg);
+    return Parrot_str_from_uint(interp, tc, (UHUGEINTVAL)num, base, is_neg);
 }
 
 /*

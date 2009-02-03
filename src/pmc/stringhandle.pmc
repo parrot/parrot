@@ -72,9 +72,9 @@ Create a copy of the stringhandle.
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
 
         data_struct->flags        = old_struct->flags;
-        data_struct->stringhandle = string_copy(INTERP, old_struct->stringhandle);
-        data_struct->mode         = string_copy(INTERP, old_struct->mode);
-        data_struct->encoding     = string_copy(INTERP, old_struct->encoding);
+        data_struct->stringhandle = Parrot_str_copy(INTERP, old_struct->stringhandle);
+        data_struct->mode         = Parrot_str_copy(INTERP, old_struct->mode);
+        data_struct->encoding     = Parrot_str_copy(INTERP, old_struct->encoding);
 
         return copy;
     }
@@ -161,10 +161,10 @@ stored for mocking.
         INTVAL flags;
 
         if (got_mode && !STRING_IS_NULL(mode))
-            SET_ATTR_mode(INTERP, SELF, string_copy(INTERP, mode));
+            SET_ATTR_mode(INTERP, SELF, Parrot_str_copy(INTERP, mode));
 
         if (got_filename && !STRING_IS_NULL(filename))
-            SET_ATTR_filename(INTERP, SELF, string_copy(INTERP, filename));
+            SET_ATTR_filename(INTERP, SELF, Parrot_str_copy(INTERP, filename));
 
 
         /* If StringHandle hasn't already been initialized, create a new string. */
@@ -172,10 +172,10 @@ stored for mocking.
         if (STRING_IS_NULL(old_string)) {
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (!STRING_IS_NULL(encoding)
-            &&  string_equal(INTERP, encoding, CONST_STRING(INTERP, "utf8")) == 0)
+            &&  Parrot_str_equal(INTERP, encoding, CONST_STRING(INTERP, "utf8")) == 0)
                 new_string = string_make(INTERP, "", 0, "unicode", 0);
             else
-                new_string = string_from_cstring(INTERP, "", 0);
+                new_string = Parrot_str_new(INTERP, "", 0);
 
             SET_ATTR_stringhandle(INTERP, SELF, new_string);
         }
@@ -183,7 +183,7 @@ stored for mocking.
         /* Set a default mode of read-only. */
         GET_ATTR_mode(INTERP, SELF, open_mode);
         if (STRING_IS_NULL(open_mode)) {
-            open_mode = const_string(INTERP, "r");
+            open_mode = Parrot_str_new_constant(INTERP, "r");
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
@@ -263,11 +263,11 @@ C<bytes> argument is currently ignored.
                 "Cannot read from a closed filehandle");
 
         if (length == 0)
-            string_result = string_copy(INTERP, string_orig);
+            string_result = Parrot_str_copy(INTERP, string_orig);
         else {
             INTVAL orig_length, read_length;
             read_length = length;
-            orig_length = string_length(INTERP, string_orig);
+            orig_length = Parrot_str_byte_length(INTERP, string_orig);
 
             GET_ATTR_read_offset(INTERP, SELF, offset);
 
@@ -275,7 +275,7 @@ C<bytes> argument is currently ignored.
             if (offset + read_length > orig_length)
                 read_length = orig_length - offset;
 
-            string_result = string_substr(INTERP, string_orig, offset,
+            string_result = Parrot_str_substr(INTERP, string_orig, offset,
                     read_length, NULL, 0);
             SET_ATTR_read_offset(INTERP, SELF, offset + read_length);
         }
@@ -303,9 +303,9 @@ responds to "\n" newlines.)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot read from a closed filehandle");
 
-        orig_length = string_length(INTERP, string_result);
+        orig_length = Parrot_str_byte_length(INTERP, string_result);
         GET_ATTR_read_offset(INTERP, SELF, offset);
-        newline_pos = string_str_index(INTERP, string_result, CONST_STRING(INTERP, "\n"), offset);
+        newline_pos = Parrot_str_find_index(INTERP, string_result, CONST_STRING(INTERP, "\n"), offset);
 
         /* No newline found, read the rest of the string. */
         if (newline_pos == -1)
@@ -313,7 +313,7 @@ responds to "\n" newlines.)
         else
             read_length = newline_pos - offset + 1; /* +1 to include the newline */
 
-        string_result = string_substr(INTERP, string_result, offset,
+        string_result = Parrot_str_substr(INTERP, string_result, offset,
                 read_length, NULL, 0);
         SET_ATTR_read_offset(INTERP, SELF, newline_pos + 1);
 
@@ -339,13 +339,13 @@ StringHandle object that isn't opened yet, returns an empty string.
             STRING *encoding;
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (!STRING_IS_NULL(encoding) &&
-                    string_equal(INTERP, encoding, const_string(INTERP, "utf8")) == 0)
+                    Parrot_str_equal(INTERP, encoding, Parrot_str_new_constant(INTERP, "utf8")) == 0)
                 string_result = string_make(INTERP, "", 0, "unicode", 0);
             else
-                string_result = const_string(INTERP, "");
+                string_result = Parrot_str_new_constant(INTERP, "");
         }
         else
-            string_result = string_copy(INTERP, string_result);
+            string_result = Parrot_str_copy(INTERP, string_result);
 
         RETURN(STRING *string_result);
     }
@@ -405,11 +405,11 @@ Print the string to the stringhandle.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot write to a filehandle not opened for write");
 
-        new_string = string_append(interp, old_string, to_print);
+        new_string = Parrot_str_append(interp, old_string, to_print);
 
         SET_ATTR_stringhandle(INTERP, SELF, new_string);
 
-        status = string_length(interp, new_string);
+        status = Parrot_str_byte_length(interp, new_string);
         RETURN(INTVAL status);
     }
 
@@ -426,22 +426,22 @@ ignored, but stored for mocking.
 
     METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
         INTVAL flags;
-        STRING *nobuffer_string   = const_string(INTERP, "unbuffered");
-        STRING *linebuffer_string = const_string(INTERP, "line-buffered");
-        STRING *fullbuffer_string = const_string(INTERP, "full-buffered");
+        STRING *nobuffer_string   = Parrot_str_new_constant(INTERP, "unbuffered");
+        STRING *linebuffer_string = Parrot_str_new_constant(INTERP, "line-buffered");
+        STRING *fullbuffer_string = Parrot_str_new_constant(INTERP, "full-buffered");
 
         GET_ATTR_flags(INTERP, SELF, flags);
 
         if (got_type) {
-            if (string_equal(INTERP, new_type, nobuffer_string) == 0) {
+            if (Parrot_str_equal(INTERP, new_type, nobuffer_string) == 0) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (string_equal(INTERP, new_type, linebuffer_string) == 0) {
+            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string) == 0) {
                 flags |=   PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (string_equal(INTERP, new_type, fullbuffer_string) == 0) {
+            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string) == 0) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags |=   PIO_F_BLKBUF;
             }
@@ -474,7 +474,7 @@ Returns the current size of the stringhandle.
 
         if (STRING_IS_NULL(stringhandle))
             RETURN(INTVAL 0);
-        buffer_size = string_length(interp, stringhandle);
+        buffer_size = Parrot_str_byte_length(interp, stringhandle);
 
         RETURN(INTVAL buffer_size);
 
@@ -494,7 +494,7 @@ Retrieve the read mode string for the stringhandle.
         STRING *mode, *mode_copy;
 
         GET_ATTR_mode(INTERP, SELF, mode);
-        mode_copy = string_copy(INTERP, mode);
+        mode_copy = Parrot_str_copy(INTERP, mode);
 
         RETURN(STRING *mode_copy);
 
@@ -517,14 +517,14 @@ scheme) for the stringhandle.
 
         if (got_encoding) {
             if (!STRING_IS_NULL(new_encoding))
-                encoding_copy = string_copy(INTERP, new_encoding);
+                encoding_copy = Parrot_str_copy(INTERP, new_encoding);
             SET_ATTR_encoding(INTERP, SELF, encoding_copy);
             RETURN(STRING *new_encoding);
         }
 
         GET_ATTR_encoding(INTERP, SELF, encoding);
         if (!STRING_IS_NULL(encoding))
-            encoding_copy = string_copy(INTERP, encoding);
+            encoding_copy = Parrot_str_copy(INTERP, encoding);
 
         RETURN(STRING *encoding_copy);
 
@@ -547,7 +547,7 @@ string data).
         GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
         GET_ATTR_read_offset(INTERP, SELF, offset);
 
-        if (offset >= string_length(INTERP, stringhandle))
+        if (offset >= Parrot_str_byte_length(INTERP, stringhandle))
             RETURN(INTVAL 1);
 
         RETURN(INTVAL 0);

@@ -304,8 +304,8 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC* obj),
     PMC         *type_tuple    = PMCNULL;
     PMC         *returns       = PMCNULL;
     PMC         *call_object   = pmc_new(interp, enum_class_CallSignature);
-    STRING      *string_sig    = const_string(interp, sig);
-    const INTVAL sig_len       = string_length(interp, string_sig);
+    STRING      *string_sig    = Parrot_str_new_constant(interp, sig);
+    const INTVAL sig_len       = Parrot_str_byte_length(interp, string_sig);
     INTVAL       in_return_sig = 0;
     INTVAL       i;
 
@@ -316,7 +316,7 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC* obj),
 
     /* Process the varargs list */
     for (i = 0; i < sig_len; ++i) {
-        const INTVAL type = string_index(interp, string_sig, i);
+        const INTVAL type = Parrot_str_indexed(interp, string_sig, i);
 
         /* Only create the returns array if it's needed */
         if (in_return_sig && PMC_IS_NULL(returns)) {
@@ -386,7 +386,7 @@ Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC* obj),
 
     /* Check if we have an invocant, and add it to the front of the arguments */
     if (!PMC_IS_NULL(obj)) {
-        string_sig = string_concat(interp, CONST_STRING(interp, "Pi"), string_sig, 0);
+        string_sig = Parrot_str_concat(interp, CONST_STRING(interp, "Pi"), string_sig, 0);
         VTABLE_set_string_native(interp, call_object, string_sig);
         VTABLE_unshift_pmc(interp, call_object, obj);
     }
@@ -434,7 +434,7 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 
     if (PMC_IS_NULL(sub)) {
         sub = Parrot_mmd_find_multi_from_sig_obj(interp,
-            const_string(interp, name), sig_object);
+            Parrot_str_new_constant(interp, name), sig_object);
 
         if (!PMC_IS_NULL(sub))
             Parrot_mmd_cache_store_by_types(interp, interp->op_mmd_cache, name,
@@ -775,13 +775,13 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
         STRING *type_name = VTABLE_get_string_keyed_int(interp, type_list, i);
         INTVAL  type;
 
-        if (string_equal(interp, type_name, CONST_STRING(interp, "DEFAULT"))==0)
+        if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "DEFAULT"))==0)
             type = enum_type_PMC;
-        else if (string_equal(interp, type_name, CONST_STRING(interp, "STRING"))==0)
+        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "STRING"))==0)
             type = enum_type_STRING;
-        else if (string_equal(interp, type_name, CONST_STRING(interp, "INTVAL"))==0)
+        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "INTVAL"))==0)
             type = enum_type_INTVAL;
-        else if (string_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL"))==0)
+        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL"))==0)
             type = enum_type_FLOATVAL;
         else
             type = pmc_type(interp, type_name);
@@ -810,7 +810,7 @@ static PMC*
 mmd_build_type_tuple_from_long_sig(PARROT_INTERP, ARGIN(STRING *long_sig))
 {
     ASSERT_ARGS(mmd_build_type_tuple_from_long_sig)
-    PMC *type_list = string_split(interp, CONST_STRING(interp, ","), long_sig);
+    PMC *type_list = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
 
     return mmd_build_type_tuple_from_type_list(interp, type_list);
 }
@@ -836,14 +836,14 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
     ASSERT_ARGS(Parrot_mmd_build_type_tuple_from_sig_obj)
     PMC * const  type_tuple = pmc_new(interp, enum_class_FixedIntegerArray);
     STRING      *string_sig = VTABLE_get_string(interp, sig_obj);
-    const INTVAL sig_len    = string_length(interp, string_sig);
+    const INTVAL sig_len    = Parrot_str_byte_length(interp, string_sig);
     INTVAL       tuple_size = 0;
     INTVAL       args_ended = 0;
     INTVAL       i;
 
     /* First calculate the number of arguments participating in MMD */
     for (i = 0; i < sig_len; ++i) {
-        INTVAL type = string_index(interp, string_sig, i);
+        INTVAL type = Parrot_str_indexed(interp, string_sig, i);
         if (type == '-')
             break;
 
@@ -853,7 +853,7 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
     VTABLE_set_integer_native(interp, type_tuple, tuple_size);
 
     for (i = 0; i < sig_len; ++i) {
-        INTVAL type = string_index(interp, string_sig, i);
+        INTVAL type = Parrot_str_indexed(interp, string_sig, i);
         if (args_ended)
             break;
 
@@ -873,7 +873,7 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
                 break;
             case 'P':
             {
-                INTVAL type_lookahead = string_index(interp, string_sig, (i + 1));
+                INTVAL type_lookahead = Parrot_str_indexed(interp, string_sig, (i + 1));
                 if (type_lookahead == 'i') {
                     if (i != 0)
                         Parrot_ex_throw_from_c_args(interp, NULL,
@@ -1401,7 +1401,7 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
         ARGIN(STRING *sub_name), ARGIN(STRING *long_sig), ARGIN(PMC *sub_obj))
 {
     ASSERT_ARGS(Parrot_mmd_add_multi_from_long_sig)
-    PMC    *type_list   = string_split(interp, CONST_STRING(interp, ","), long_sig);
+    PMC    *type_list   = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
     STRING *ns_name     = VTABLE_get_string_keyed_int(interp, type_list, 0);
     STRING *sub_str     = CONST_STRING(interp, "Sub");
     STRING *closure_str = CONST_STRING(interp, "Closure");
@@ -1441,10 +1441,10 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_mmd_add_multi_from_c_args)
     STRING *comma         = CONST_STRING(interp, ",");
-    STRING *sub_name_str  = const_string(interp, sub_name);
-    STRING *long_sig_str  = const_string(interp, long_sig);
-    STRING *short_sig_str = const_string(interp, short_sig);
-    PMC    *type_list     = string_split(interp, comma, long_sig_str);
+    STRING *sub_name_str  = Parrot_str_new_constant(interp, sub_name);
+    STRING *long_sig_str  = Parrot_str_new_constant(interp, long_sig);
+    STRING *short_sig_str = Parrot_str_new_constant(interp, short_sig);
+    PMC    *type_list     = Parrot_str_split(interp, comma, long_sig_str);
     STRING *ns_name       = VTABLE_get_string_keyed_int(interp, type_list, 0);
 
     /* Create an NCI sub for the C function */
@@ -1559,7 +1559,7 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
     if (name)
         strcpy((char *)(type_ids + num_values), name);
 
-    key = string_from_cstring(interp, (char *)type_ids, id_size);
+    key = Parrot_str_new(interp, (char *)type_ids, id_size);
     mem_sys_free(type_ids);
 
     return key;
@@ -1656,7 +1656,7 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
     if (name)
         strcpy((char *)(type_ids + num_types), name);
 
-    key = string_from_cstring(interp, (char *)type_ids, id_size);
+    key = Parrot_str_new(interp, (char *)type_ids, id_size);
 
     mem_sys_free(type_ids);
     return key;

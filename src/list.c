@@ -1497,7 +1497,7 @@ list_clone(PARROT_INTERP, ARGIN(const List *other))
                     s = ((STRING **) PObj_bufstart(&chunk->data))[i];
                     if (s) {
                         ((STRING **) PObj_bufstart(&new_chunk->data))[i] =
-                                string_copy(interp, s);
+                                Parrot_str_copy(interp, s);
                     }
                 }
                 break;

@@ -2598,10 +2598,10 @@ YY_RULE_SETUP
                      */
                     lexer_state * const lexer = yypirget_extra(yyscanner);
 
-                    STRING *pstr = string_unescape_cstring(lexer->interp,
+                    STRING *pstr = Parrot_str_unescape(lexer->interp,
                                                            yytext + 1, '"', "ascii");
 
-                    char *str = string_to_cstring(lexer->interp, pstr);
+                    char *str = Parrot_str_to_cstring(lexer->interp, pstr);
 
                     yylval->sval = str;
                     return TK_STRINGC;

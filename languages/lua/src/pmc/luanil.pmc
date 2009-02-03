@@ -69,7 +69,7 @@ Return the string "nil".
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "nil");
+        return Parrot_str_new_constant(INTERP, "nil");
     }
 
 /*
@@ -97,7 +97,7 @@ Return the string "nil".
 
 */
     VTABLE STRING* get_string() {
-        return const_string(INTERP, "nil");
+        return Parrot_str_new_constant(INTERP, "nil");
     }
 
 /*

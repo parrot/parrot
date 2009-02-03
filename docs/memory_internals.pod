@@ -175,7 +175,7 @@ a new block is added to the memory pool.
 This also implies that buffers are moved around during their life. Users of
 these buffers are therefore not allowed to hold pointers to buffers over pieces
 of code that might trigger a GC run, like C<Parrot_allocate()> or
-C<string_compare()>.
+C<Parrot_str_compare()>.
 
 =head2 Defragmenting allocator
 

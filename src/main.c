@@ -55,7 +55,7 @@ main(int argc, char * argv[])
     /* We parse the arguments, but first store away the name of the Parrot
        executable, since parsing destroys that and we want to make it
        available. */
-    Parrot_set_executable_name(interp, string_from_cstring(interp, argv[0], 0));
+    Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
 
     sourcefile = parseflags(interp, &argc, &argv);
     status     = imcc_run(interp, sourcefile, argc, argv);

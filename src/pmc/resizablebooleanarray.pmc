@@ -435,7 +435,7 @@ Used to archive the string.
         VTABLE_push_integer(INTERP, io, head_pos);
         VTABLE_push_integer(INTERP, io, tail_pos);
 
-        s = string_from_cstring(INTERP, (char*)bit_array, tail_pos);
+        s = Parrot_str_new(INTERP, (char*)bit_array, tail_pos);
 
         VTABLE_push_string(INTERP, io, s);
     }

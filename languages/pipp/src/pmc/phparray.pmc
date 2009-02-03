@@ -200,7 +200,7 @@ Store C<i_val> in this PHPArray, indexed by the INTVAL C<i_key>.
 
         PippHashTable *ht;
         PMC           *p_val = pmc_new(INTERP, enum_class_Integer);
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
         VTABLE_set_integer_native(INTERP, p_val, i_val);
@@ -274,7 +274,7 @@ Store C<val> in this PHPArray, indexed by the INTVAL C<i_key>.
     VTABLE void set_pmc_keyed_int(INTVAL i_key, PMC *p_val) {
 
         PippHashTable *ht;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
         pipp_hash_put(INTERP, ht, s_key, p_val);
@@ -349,7 +349,7 @@ Store C<s_val> in this PHPArray, indexed by the INTVAL C<i_key>.
     VTABLE void set_string_keyed_int(INTVAL i_key, STRING *s_val) {
 
         PippHashTable *ht;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
         PMC           *p_val = pmc_new(INTERP, enum_class_String);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
@@ -427,7 +427,7 @@ Store C<f_val> in this PHPArray, indexed by the INTVAL C<i_key>.
     VTABLE void set_number_keyed_int(INTVAL i_key, FLOATVAL f_val) {
 
         PippHashTable *ht;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
         PMC           *p_val = pmc_new(INTERP, enum_class_Float);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
@@ -509,7 +509,7 @@ C<i_key>.
 
         PippHashTable *ht;
         PMC           *p_val;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
         p_val = pipp_hash_get(INTERP, ht, s_key);
@@ -598,7 +598,7 @@ C<i_key>.
     VTABLE PMC *get_pmc_keyed_int(INTVAL i_key) {
 
         PippHashTable *ht;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
 
@@ -688,7 +688,7 @@ C<i_key>.
 
         PippHashTable *ht;
         PMC           *p_val;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
 
@@ -771,7 +771,7 @@ C<i_key>.
 
         PippHashTable *ht;
         PMC           *p_val;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
 
@@ -842,7 +842,7 @@ Return non-zero if an element keyed by C<i_key> exists.
     VTABLE INTVAL exists_keyed_int(INTVAL i_key) {
 
         PippHashTable *ht;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
 
@@ -917,7 +917,7 @@ nothing.
     VTABLE void delete_keyed_int(INTVAL i_key) {
 
         PippHashTable *ht;
-        STRING        *s_key = string_from_int(INTERP, i_key);
+        STRING        *s_key = Parrot_str_from_int(INTERP, i_key);
 
         GET_ATTR_hash_table(INTERP, SELF, ht);
 
@@ -1260,7 +1260,7 @@ Return the string 'array'.
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "array");
+        return Parrot_str_new_constant(INTERP, "array");
     }
 
 /*
@@ -1273,7 +1273,7 @@ Return the string 'Array'.
 
 */
     VTABLE STRING* get_string() {
-        return const_string(INTERP, "Array");
+        return Parrot_str_new_constant(INTERP, "Array");
     }
 
 /*
@@ -1486,7 +1486,7 @@ Return a deep clone of this PHPArray.
         pipp_hash_create(INTERP, orig_ht->capacity);
 
         for (bkt = orig_ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
-            cloned_key   = string_copy(INTERP, bkt->key);
+            cloned_key   = Parrot_str_copy(INTERP, bkt->key);
             cloned_value = VTABLE_clone(INTERP, bkt->value);
             pipp_hash_put(INTERP, cloned_ht, cloned_key, cloned_value);
         }
@@ -1522,7 +1522,7 @@ PHPArray, just make a clone.
             pipp_hash_resize(INTERP, my_ht, src_ht->elementCount);
 
             for (bkt = src_ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
-                STRING *key_copy   = string_copy(INTERP,  bkt->key);
+                STRING *key_copy   = Parrot_str_copy(INTERP,  bkt->key);
                 PMC    *value_copy = VTABLE_clone(INTERP, bkt->value);
                 pipp_hash_put(INTERP, my_ht, key_copy, value_copy);
             }
@@ -1592,7 +1592,7 @@ C<src> and C<SELF>, the value from C<SELF> will be used.
             GET_ATTR_hash_table(INTERP, src, src_ht);
 
             for (bkt = src_ht->tableHead; bkt != NULL; bkt = bkt->tableNext) {
-                key_copy   = string_copy(INTERP, bkt->key);
+                key_copy   = Parrot_str_copy(INTERP, bkt->key);
                 value_copy = VTABLE_clone(INTERP, bkt->value);
                 /* TODO: This isn't especially efficient. */
                 if (!pipp_hash_find(INTERP, my_ht, key_copy))
@@ -1835,16 +1835,16 @@ this string is the same as a Parrot Hash's C<get_repr()>:
             else
                 key_str = Parrot_sprintf_c(INTERP, "\"%Ss\": ", bkt->key);
 
-            repr    = string_append(INTERP, repr, key_str);
+            repr    = Parrot_str_append(INTERP, repr, key_str);
             val_str = VTABLE_get_string(INTERP, bkt->value);
-            repr    = string_append(INTERP, repr, val_str);
+            repr    = Parrot_str_append(INTERP, repr, val_str);
 
             if (bkt->tableNext != NULL)
-                repr = string_append(INTERP, repr, CONST_STRING(INTERP, ", "));
+                repr = Parrot_str_append(INTERP, repr, CONST_STRING(INTERP, ", "));
 
             bkt = bkt->tableNext;
         }
-        repr = string_append(INTERP, repr, CONST_STRING(INTERP, "}"));
+        repr = Parrot_str_append(INTERP, repr, CONST_STRING(INTERP, "}"));
         return repr;
     }
 
@@ -1987,7 +1987,7 @@ pointer.
         GET_ATTR_hash_table(INTERP, SELF, ht);
 
         if (ht->internalPointer)
-            s_key = string_copy(INTERP, ht->internalPointer->key);
+            s_key = Parrot_str_copy(INTERP, ht->internalPointer->key);
         else
             s_key = CONST_STRING(INTERP, "");
 

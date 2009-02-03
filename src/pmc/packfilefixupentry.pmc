@@ -34,7 +34,7 @@ Fetch the label field of the fixup entry.
 */
     VTABLE STRING *get_string() {
         PackFile_FixupEntry *pfentry = PMC_data_typed(SELF, PackFile_FixupEntry *);
-        return string_from_cstring(interp, pfentry->name, strlen(pfentry->name));
+        return Parrot_str_new(interp, pfentry->name, strlen(pfentry->name));
     }
 
 /*

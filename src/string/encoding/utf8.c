@@ -570,7 +570,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
     unsigned char *new_pos, *pos, *p;
 
     if (src->encoding == Parrot_utf8_encoding_ptr)
-        return in_place ? src : string_copy(interp, src);
+        return in_place ? src : Parrot_str_copy(interp, src);
     src_len = src->strlen;
     if (in_place) {
         result = src;
@@ -742,7 +742,7 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_codepoints)
 
-    STRING * const return_string = Parrot_make_COW_reference(interp, src);
+    STRING * const return_string = Parrot_str_new_COW(interp, src);
     String_iter    iter;
     UINTVAL        start;
 
@@ -779,7 +779,7 @@ static STRING *
 get_bytes(PARROT_INTERP, ARGMOD(STRING *src), UINTVAL offset, UINTVAL count)
 {
     ASSERT_ARGS(get_bytes)
-    STRING * const return_string = Parrot_make_COW_reference(interp, src);
+    STRING * const return_string = Parrot_str_new_COW(interp, src);
 
     return_string->encoding = src->encoding;    /* XXX */
     return_string->charset = src->charset;
@@ -813,7 +813,7 @@ get_codepoints_inplace(PARROT_INTERP, ARGMOD(STRING *src),
     String_iter iter;
     UINTVAL start;
 
-    Parrot_reuse_COW_reference(interp, src, return_string);
+    Parrot_str_reuse_COW(interp, src, return_string);
     iter_init(interp, src, &iter);
     iter.set_position(interp, &iter, offset);
 

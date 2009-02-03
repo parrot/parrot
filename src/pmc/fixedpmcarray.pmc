@@ -182,7 +182,7 @@ RT #46673 implement freeze/thaw and use that instead.
 */
 
     VTABLE STRING *get_string() {
-        return string_from_int(INTERP, SELF.elements());
+        return Parrot_str_from_int(INTERP, SELF.elements());
     }
 
     VTABLE STRING *get_repr() {
@@ -193,14 +193,14 @@ RT #46673 implement freeze/thaw and use that instead.
         for (i = 0; i < n; ++i) {
             PMC * const val = SELF.get_pmc_keyed_int(i);
 
-            res = string_append(INTERP, res, VTABLE_get_repr(INTERP, val));
+            res = Parrot_str_append(INTERP, res, VTABLE_get_repr(INTERP, val));
             if (n == 1)
-                res = string_append(INTERP, res, CONST_STRING(INTERP, ","));
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ","));
             else if (i < n - 1)
-                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = string_append(INTERP, res, CONST_STRING(INTERP, ")"));
+        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ")"));
 
         return res;
     }

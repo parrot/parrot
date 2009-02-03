@@ -2584,7 +2584,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             /* overrights address of st in EBP(4) */
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
-            emitm_call_cfunc(pc, string_from_cstring);
+            emitm_call_cfunc(pc, Parrot_str_new_from_cstring);
 
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
@@ -2610,7 +2610,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     for (i=0; i<string_buffer_count; i++) {
         emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, strings_offset);
         emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
-        emitm_call_cfunc(pc, string_cstring_free);
+        emitm_call_cfunc(pc, Parrot_str_free_cstring);
         strings_offset += 4;
     }
 

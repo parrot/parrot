@@ -2651,13 +2651,13 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     Parrot_io_printf(interp, "\n  mappings => [\n");
     for (i = 0; i < debug->num_mappings; i++) {
-        char * const filename = string_to_cstring(interp, PF_CONST(debug->code,
+        char * const filename = Parrot_str_to_cstring(interp, PF_CONST(debug->code,
                    debug->mappings[i]->filename)->u.string);;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
                    debug->mappings[i]->offset);
         Parrot_io_printf(interp, "        FILENAME => %s\n", filename);
-        string_cstring_free(filename);
+        Parrot_str_free_cstring(filename);
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -2772,7 +2772,7 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     mem_realloc_n_typed(ct->constants, ct->const_count, PackFile_Constant *);
     fnconst = PackFile_Constant_new(interp);
     fnconst->type = PFC_STRING;
-    fnconst->u.string = string_make_direct(interp, filename,
+    fnconst->u.string = Parrot_str_new_init(interp, filename,
         strlen(filename), PARROT_DEFAULT_ENCODING,
         PARROT_DEFAULT_CHARSET, PObj_constant_FLAG);
     ct->constants[ct->const_count - 1] = fnconst;
@@ -4143,7 +4143,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const struct PackFile_Segment *se
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");
     for (i = 0; i < self->num_keys; i++) {
-        char * const key_name = string_to_cstring(interp, PF_CONST(self->code,
+        char * const key_name = Parrot_str_to_cstring(interp, PF_CONST(self->code,
                self->keys[i]->name)->u.string);
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %s\n", key_name);
@@ -4153,7 +4153,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const struct PackFile_Segment *se
                 self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_NUM ? "number" :
                 "PMC");
         Parrot_io_printf(interp, "    ],\n");
-        string_cstring_free(key_name);
+        Parrot_str_free_cstring(key_name);
     }
     Parrot_io_printf(interp, "  ],\n");
 
@@ -4251,7 +4251,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(struct PackFile_Annotations
     STRING *key_name = PF_CONST(self->code, key)->u.string;
     for (i = 0; i < self->num_keys; i++) {
         STRING *test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
-        if (string_equal(interp, test_key, key_name) == 0) {
+        if (Parrot_str_equal(interp, test_key, key_name) == 0) {
             key_id = i;
             break;
         }
@@ -4365,7 +4365,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(struct PackFile_Annotations *se
     if (key != NULL) {
         for (i = 0; i < self->num_keys; i++) {
             STRING *test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
-            if (string_equal(interp, test_key, key) == 0) {
+            if (Parrot_str_equal(interp, test_key, key) == 0) {
                 key_id = i;
                 break;
             }
@@ -4496,7 +4496,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
     pbc = CONST_STRING(interp, "pbc");
-    if (string_equal(interp, ext, pbc) == 0)
+    if (Parrot_str_equal(interp, ext, pbc) == 0)
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;
@@ -4509,10 +4509,10 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
     /* remember wo_ext => full_path mapping */
     VTABLE_set_string_keyed_str(interp, is_loaded_hash,
             wo_ext, path);
-    filename = string_to_cstring(interp, path);
+    filename = Parrot_str_to_cstring(interp, path);
     if (file_type == PARROT_RUNTIME_FT_PBC) {
         PackFile *pf = PackFile_append_pbc(interp, filename);
-        string_cstring_free(filename);
+        Parrot_str_free_cstring(filename);
 
         if (!pf)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -4523,7 +4523,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
         PackFile_ByteCode * const cs =
             (PackFile_ByteCode *)IMCC_compile_file_s(interp,
                 filename, &err);
-        string_cstring_free(filename);
+        Parrot_str_free_cstring(filename);
 
         if (cs)
             do_sub_pragmas(interp, cs, PBC_LOADED, NULL);

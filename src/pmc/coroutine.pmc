@@ -104,7 +104,7 @@ Destroys the coroutine.
 
         memcpy(sub, PMC_sub(SELF), sizeof (Parrot_coro));
 
-        sub->name           = string_copy(INTERP, sub->name);
+        sub->name           = Parrot_str_copy(INTERP, sub->name);
 
         return ret;
     }

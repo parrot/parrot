@@ -255,7 +255,7 @@ to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
     if (src->encoding == Parrot_utf16_encoding_ptr ||
             src->encoding == Parrot_ucs2_encoding_ptr)
-        return in_place ? src : string_copy(interp, src);
+        return in_place ? src : Parrot_str_copy(interp, src);
     /*
      * TODO adapt string creation functions
      */
@@ -455,7 +455,7 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
     ASSERT_ARGS(get_codepoints)
     String_iter iter;
     UINTVAL start;
-    STRING * const return_string = Parrot_make_COW_reference(interp, src);
+    STRING * const return_string = Parrot_str_new_COW(interp, src);
 
     iter_init(interp, src, &iter);
     iter.set_position(interp, &iter, offset);
@@ -489,7 +489,7 @@ get_codepoints_inplace(PARROT_INTERP, ARGIN(STRING *src),
     ASSERT_ARGS(get_codepoints_inplace)
     String_iter iter;
     UINTVAL start;
-    Parrot_reuse_COW_reference(interp, src, return_string);
+    Parrot_str_reuse_COW(interp, src, return_string);
     iter_init(interp, src, &iter);
     iter.set_position(interp, &iter, offset);
     start = iter.bytepos;

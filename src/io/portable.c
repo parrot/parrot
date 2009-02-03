@@ -144,7 +144,7 @@ Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
     flags |= PIO_F_FILE;
 
     { /* scope for temporary C string */
-        char * const spath = string_to_cstring(interp, path);
+        char * const spath = Parrot_str_to_cstring(interp, path);
         /* Try opening the file
          * note that this can't really handle O_EXCL, etc. */
         fptr = fopen(spath, oflags);
@@ -152,7 +152,7 @@ Parrot_io_open_portable(PARROT_INTERP, ARGMOD(PMC *filehandle),
         if (fptr == NULL && errno == ENOENT && (flags & PIO_F_WRITE))
             fptr = fopen(spath, "w+b");
 
-        string_cstring_free(spath);
+        Parrot_str_free_cstring(spath);
     }
 
     /* File open */

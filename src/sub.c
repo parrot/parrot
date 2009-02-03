@@ -379,7 +379,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             if (s->name)
                 VTABLE_push_string(interp, ns_array, s->name);
 
-            res = string_join(interp, j, ns_array);
+            res = Parrot_str_join(interp, j, ns_array);
             Parrot_unblock_GC_mark(interp);
             return res;
         }
@@ -418,9 +418,9 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
 
     /* is the current sub of the specified context valid? */
     if (PMC_IS_NULL(ctx->current_sub)) {
-        info->subname  = string_from_cstring(interp, "???", 3);
+        info->subname  = Parrot_str_new(interp, "???", 3);
         info->nsname   = info->subname;
-        info->fullname = string_from_cstring(interp, "??? :: ???", 10);
+        info->fullname = Parrot_str_new(interp, "??? :: ???", 10);
         info->pc       = -1;
         return 0;
     }
@@ -585,7 +585,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
             PMC * const child_pmc        = VTABLE_shift_pmc(interp, iter);
             Parrot_sub * const child_sub = PMC_sub(child_pmc);
             if (!PMC_IS_NULL(child_sub->outer_sub))
-                if (0 == string_equal(interp, current_sub->subid,
+                if (0 == Parrot_str_equal(interp, current_sub->subid,
                                       PMC_sub(child_sub->outer_sub)->subid)) {
                 old = child_sub->outer_ctx;
                 child_sub->outer_ctx = Parrot_context_ref(interp, ctx);
@@ -603,7 +603,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 
 #if 0
     /* verify that the current sub is sub_pmc's :outer */
-    if (0 != string_equal(interp, current_sub->subid,
+    if (0 != Parrot_str_equal(interp, current_sub->subid,
                          PMC_sub(sub->outer_sub)->subid)) {
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_OPERATION, "'%Ss' isn't the :outer of '%Ss'",

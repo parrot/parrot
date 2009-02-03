@@ -1098,7 +1098,7 @@ Concatenate the string C<value> in place.
 */
 
     VTABLE PMC *concatenate(PMC *value, PMC *dest) {
-        STRING * const s = string_concat(INTERP, SELF.get_string(),
+        STRING * const s = Parrot_str_concat(INTERP, SELF.get_string(),
             VTABLE_get_string(INTERP, value), 0);
 
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1108,7 +1108,7 @@ Concatenate the string C<value> in place.
     }
 
     VTABLE PMC *concatenate_str(STRING *value, PMC *dest) {
-        STRING * const s = string_concat(INTERP,
+        STRING * const s = Parrot_str_concat(INTERP,
             SELF.get_string(), value, 0);
 
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1120,12 +1120,12 @@ Concatenate the string C<value> in place.
     VTABLE void i_concatenate(PMC *value) {
         STRING * const s = SELF.get_string();
         STRING * const v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(string_append(INTERP, s, v));
+        SELF.set_string_native(Parrot_str_append(INTERP, s, v));
     }
 
     VTABLE void i_concatenate_str(STRING *value) {
         STRING * const s = SELF.get_string();
-        SELF.set_string_native(string_append(INTERP, s, value));
+        SELF.set_string_native(Parrot_str_append(INTERP, s, value));
     }
 
 /*
@@ -1220,7 +1220,7 @@ C<*value>.
 */
 
     MULTI INTVAL cmp_string(PMC *value) {
-        return string_compare(INTERP, SELF.get_string(),
+        return Parrot_str_compare(INTERP, SELF.get_string(),
             VTABLE_get_string(INTERP, value));
     }
 
@@ -1266,7 +1266,7 @@ Returns whether the PMC has string equality with C<*value>.
 */
 
     MULTI INTVAL is_equal_string(PMC *value) {
-        return (0 == string_equal(INTERP, VTABLE_get_string(INTERP, SELF),
+        return (0 == Parrot_str_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                           VTABLE_get_string(INTERP, value)));
     }
 
@@ -1389,7 +1389,7 @@ C<offset>.
 */
 
     VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
-        return string_substr(INTERP, VTABLE_get_string(INTERP, SELF),
+        return Parrot_str_substr(INTERP, VTABLE_get_string(INTERP, SELF),
             offset, length, NULL, 0);
     }
 

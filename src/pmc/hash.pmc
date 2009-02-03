@@ -203,7 +203,7 @@ Returns the size of the hash.
         HashBucket *b;
 
         if (hash->key_type == Hash_key_type_STRING)
-            return SELF.get_integer_keyed_str(string_from_int(INTERP, key));
+            return SELF.get_integer_keyed_str(Parrot_str_from_int(INTERP, key));
 
         b = parrot_hash_get_bucket(INTERP, hash, (void *)key);
 
@@ -240,7 +240,7 @@ Returns the integer value for the element at C<*key>.
             else {
                 const STRING * const s =
                     (STRING *)parrot_hash_get_idx(INTERP, hash, key);
-                return string_to_int(INTERP, s);
+                return Parrot_str_to_int(INTERP, s);
             }
         }
 
@@ -296,7 +296,7 @@ Returns the size of the hash.
     }
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        STRING * const s = string_from_int(INTERP, key);
+        STRING * const s = Parrot_str_from_int(INTERP, key);
         return SELF.get_number_keyed_str(s);
     }
 /*
@@ -369,23 +369,23 @@ Return a representation of the hash contents.
             }
 
             if (all_digit) {
-                res = string_append(INTERP, res, key);
+                res = Parrot_str_append(INTERP, res, key);
             }
             else {
-                res = string_append(INTERP, res, CONST_STRING(INTERP, "'"));
-                res = string_append(INTERP, res, key);
-                res = string_append(INTERP, res, CONST_STRING(INTERP, "'"));
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "'"));
+                res = Parrot_str_append(INTERP, res, key);
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "'"));
             }
 
-            res = string_append(INTERP, res, CONST_STRING(INTERP, ": "));
+            res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ": "));
             val = SELF.get_pmc_keyed_str(key);
-            res = string_append(INTERP, res, VTABLE_get_string(INTERP, val));
+            res = Parrot_str_append(INTERP, res, VTABLE_get_string(INTERP, val));
 
             if (j < n - 1)
-                res = string_append(INTERP, res, CONST_STRING(INTERP, ", "));
+                res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = string_append(INTERP, res, CONST_STRING(INTERP, "}"));
+        res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, "}"));
 
         return res;
     }
@@ -410,13 +410,13 @@ Return a representation of the hash contents.
          *      (--leo)
          */
         if (!b)
-            return string_make_empty(INTERP, enum_stringrep_one, 0);
+            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
 
         return VTABLE_get_string(INTERP, (PMC*) b->value);
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL key) {
-        STRING * const s = string_from_int(INTERP, key);
+        STRING * const s = Parrot_str_from_int(INTERP, key);
         return SELF.get_string_keyed_str(s);
     }
 
@@ -441,7 +441,7 @@ Returns the string value for the element at C<*key>.
             /* called from iterator with an integer idx in key */
             if (hash->key_type == Hash_key_type_int) {
                 void  *idx = parrot_hash_get_idx(INTERP, hash, key);
-                return string_from_int(INTERP, (INTVAL)idx);
+                return Parrot_str_from_int(INTERP, (INTVAL)idx);
             }
 
             return (STRING *)parrot_hash_get_idx(INTERP, hash, key);
@@ -456,7 +456,7 @@ Returns the string value for the element at C<*key>.
          *      (--leo)
          */
         if (!b)
-            return string_make_empty(INTERP, enum_stringrep_one, 0);
+            return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
 
         nextkey = key_next(INTERP, key);
         valpmc  = (PMC *)b->value;
@@ -516,7 +516,7 @@ Returns the number of elements in the hash.
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        STRING * const s = string_from_int(INTERP, key);
+        STRING * const s = Parrot_str_from_int(INTERP, key);
         return SELF.get_pmc_keyed_str(s);
     }
 

@@ -202,7 +202,7 @@ Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
     int i;
 
     for (i = 0; i < n; ++i) {
-        if (!string_equal(interp, all_encodings->enc[i].name,
+        if (!Parrot_str_equal(interp, all_encodings->enc[i].name,
                           encodingname))
             return i;
     }
@@ -338,7 +338,7 @@ register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
                 (n + 1) * sizeof (One_encoding));
     all_encodings->n_encodings++;
     all_encodings->enc[n].encoding = encoding;
-    all_encodings->enc[n].name = const_string(interp, encodingname);
+    all_encodings->enc[n].name = Parrot_str_new_constant(interp, encodingname);
 
     return 1;
 }

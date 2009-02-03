@@ -54,13 +54,13 @@ matching range.
 static INTVAL*
 matchrange_locate_keyed_int(Interp* interp, PMC* self, STRING *key)
 {
-    STRING *start = string_from_cstring(interp, "start", 5);
+    STRING *start = Parrot_str_new(interp, "start", 5);
     STRING *end;
 
-    if (0 == string_equal(interp, key, start))
+    if (0 == Parrot_str_equal(interp, key, start))
         return &RANGE_START(self);
-    end = string_from_cstring(interp, "end", 3);
-    if (0 == string_equal(interp, key, end))
+    end = Parrot_str_new(interp, "end", 3);
+    if (0 == Parrot_str_equal(interp, key, end))
         return &RANGE_END(self);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
         "MatchRange: key is neither 'start' nor 'end'");

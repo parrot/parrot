@@ -41,7 +41,7 @@ use C<j> instead of C<i>.
 
 static void
 complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
-    char   *str               = string_to_cstring(interp, value);
+    char   *str               = Parrot_str_to_cstring(interp, value);
     char   *t                 = str;
     char   *first_num_offset  = str;
     char   *second_num_offset = NULL;
@@ -152,7 +152,7 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
         }
         else {
             /* "+" or "-" not found: error */
-            string_cstring_free(str);
+            Parrot_str_free_cstring(str);
 
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
@@ -164,8 +164,8 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
 
     if (first_num_length) {
         /* there is a real part, interpret it */
-        S   = string_from_cstring(interp, first_num_offset, first_num_length);
-        *re = string_to_num(interp, S);
+        S   = Parrot_str_new(interp, first_num_offset, first_num_length);
+        *re = Parrot_str_to_num(interp, S);
     }
     else {
         /* consider the real part 0.0 */
@@ -174,8 +174,8 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
 
     if (second_num_length) {
         /* there is an imaginary part, interpret it */
-        S   = string_from_cstring(interp, second_num_offset, second_num_length);
-        *im = string_to_num(interp, S);
+        S   = Parrot_str_new(interp, second_num_offset, second_num_length);
+        *im = Parrot_str_to_num(interp, S);
     }
     else {
         /* consider the imaginary part 0.0 */
@@ -191,7 +191,7 @@ complex_parse_string(PARROT_INTERP, FLOATVAL *re, FLOATVAL *im, STRING *value) {
     if (second_num_minus)
         *im = -*im;
 
-    string_cstring_free(str);
+    Parrot_str_free_cstring(str);
 }
 
 static void
@@ -483,10 +483,10 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
     VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
         FLOATVAL value;
-        if (string_equal(INTERP, key, CONST_STRING(INTERP, "real")) == 0) {
+        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real")) == 0) {
             GET_ATTR_re(INTERP, SELF, value);
         }
-        else if (string_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
             GET_ATTR_im(INTERP, SELF, value);
         }
         else
@@ -670,10 +670,10 @@ to C<value>.
     }
 
     VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
-        if (string_equal(INTERP, key, CONST_STRING(INTERP, "real")) == 0) {
+        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "real")) == 0) {
             SET_ATTR_re(INTERP, SELF, value);
         }
-        else if (string_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
+        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "imag")) == 0) {
             SET_ATTR_im(INTERP, SELF, value);
         }
         else

@@ -102,7 +102,7 @@ Fetch a string containing the name of the specified segment PMC.
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                                         "PackfileDirectory: index out of bounds!");
         pfseg = pfd->segments[index];
-        return const_string(interp, pfseg->name);
+        return Parrot_str_new_constant(interp, pfseg->name);
     }
 
 
@@ -121,7 +121,7 @@ Search the array for a segment with the given name, and return it if it exists.
         int i;
         for (i = 0; i < total; i++) {
             const PackFile_Segment * const pfseg = pfd->segments[i];
-            if (!string_compare(interp, name, const_string(interp, pfseg->name)))
+            if (!Parrot_str_compare(interp, name, Parrot_str_new_constant(interp, pfseg->name)))
                 return VTABLE_get_pmc_keyed_int(interp, SELF, i);
         }
         /* the specified segment name wasn't found. */

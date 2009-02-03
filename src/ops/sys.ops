@@ -178,7 +178,7 @@ op gmtime(out STR, in INT) {
   char resultbuffer[26];
   Parrot_gmtime_r(&t, &tm);
   Parrot_asctime_r(&tm, resultbuffer);
-  $1 = string_from_cstring(interp, resultbuffer, 25);
+  $1 = Parrot_str_new(interp, resultbuffer, 25);
 }
 
 op localtime(out STR, in INT) {
@@ -187,7 +187,7 @@ op localtime(out STR, in INT) {
   char resultbuffer[26];
   Parrot_localtime_r(&t, &tm);
   Parrot_asctime_r(&tm, resultbuffer);
-  $1 = string_from_cstring(interp, resultbuffer, 25);
+  $1 = Parrot_str_new(interp, resultbuffer, 25);
 }
 
 op decodetime(out PMC, in INT) {

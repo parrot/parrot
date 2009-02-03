@@ -787,7 +787,7 @@ optimize_instr(lexer_state * const lexer, instruction * const instr) {
             int index     = add_pmc_const(lexer->bc, strconst);
 
             VTABLE_set_string_native(lexer->interp, strconst,
-                                     string_from_cstring(lexer->interp,
+                                     Parrot_str_new(lexer->interp,
                                                          second_operand->expr.c->val.sval,
                                                          strlen(second_operand->expr.c->val.sval)));
 

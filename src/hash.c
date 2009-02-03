@@ -188,7 +188,7 @@ key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), SHIM(size_t seed))
     if (s->hashval)
         return s->hashval;
 
-   return string_hash(interp, s);
+   return Parrot_str_to_hashval(interp, s);
 }
 
 
@@ -1447,7 +1447,7 @@ parrot_hash_clone(PARROT_INTERP, ARGIN(const Hash *hash), ARGOUT(Hash *dest))
                 break;
 
             case enum_type_STRING:
-                valtmp = (void *)string_copy(interp, (STRING *)b->value);
+                valtmp = (void *)Parrot_str_copy(interp, (STRING *)b->value);
                 break;
 
             case enum_type_PMC:

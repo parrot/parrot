@@ -194,7 +194,7 @@ Retrieves the C<type> attribute of this event handler.
             PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
 
         if (e)
-            return string_copy(INTERP, e->type);
+            return Parrot_str_copy(INTERP, e->type);
 
         return string_from_literal(INTERP, "");
     }
@@ -246,7 +246,7 @@ handle the registered events.
             = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
         PMC *value = PMCNULL;
 
-        if (string_equal(interp, name, CONST_STRING(interp, "code")) == 0) {
+        if (Parrot_str_equal(interp, name, CONST_STRING(interp, "code")) == 0) {
             value = core_struct->code;
         }
 
@@ -306,11 +306,11 @@ Report whether the event handler can handle a particular type of event.
             PMC *type = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "type"));
             STRING *type_str = VTABLE_get_string(interp, type);
 
-            if (string_equal(interp, type_str, CONST_STRING(interp, "event")) == 0) {
+            if (Parrot_str_equal(interp, type_str, CONST_STRING(interp, "event")) == 0) {
                 PMC *subtype = VTABLE_get_attr_str(interp, event, CONST_STRING(interp, "subtype"));
                 STRING *subtype_str = VTABLE_get_string(interp, subtype);
 
-                if (string_equal(interp, subtype_str, handler_struct->type) == 0) {
+                if (Parrot_str_equal(interp, subtype_str, handler_struct->type) == 0) {
                     RETURN(INTVAL 1);
                 }
             }

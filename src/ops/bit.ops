@@ -102,7 +102,7 @@ from $2 and $3.
 =cut
 
 inline op bands(inout STR, in STR) :base_core {
-  string_bitwise_and(interp, $1, $2, &$1);
+  Parrot_str_bitwise_and(interp, $1, $2, &$1);
 }
 
 inline op bands(invar PMC, in STR) :base_core {
@@ -114,7 +114,7 @@ inline op bands(invar PMC, invar PMC) :base_core {
 }
 
 inline op bands(out STR, in STR, in STR) :base_core {
-  $1 = string_bitwise_and(interp, $2, $3, NULL);
+  $1 = Parrot_str_bitwise_and(interp, $2, $3, NULL);
 }
 
 inline op bands(invar PMC, invar PMC, in STR) :base_core {
@@ -166,11 +166,11 @@ inline op bnot(out PMC, invar PMC) :base_core {
 =cut
 
 inline op bnots(inout STR) :base_core {
-  string_bitwise_not(interp, $1, &$1);
+  Parrot_str_bitwise_not(interp, $1, &$1);
 }
 
 inline op bnots(out STR, in STR) :base_core {
-  string_bitwise_not(interp, $2, &$1);
+  Parrot_str_bitwise_not(interp, $2, &$1);
 }
 
 inline op bnots(invar PMC) :base_core {
@@ -248,7 +248,7 @@ from $2 and $3.
 =cut
 
 inline op bors(inout STR, in STR) :base_core {
-  string_bitwise_or(interp, $1, $2, &$1);
+  Parrot_str_bitwise_or(interp, $1, $2, &$1);
 }
 
 inline op bors(invar PMC, in STR) :base_core {
@@ -260,7 +260,7 @@ inline op bors(invar PMC, invar PMC) :base_core {
 }
 
 inline op bors(out STR, in STR, in STR) :base_core {
-  $1 = string_bitwise_or(interp, $2, $3, NULL);
+  $1 = Parrot_str_bitwise_or(interp, $2, $3, NULL);
 }
 
 inline op bors(invar PMC, invar PMC, in STR) :base_core {
@@ -502,7 +502,7 @@ from $2 and $3.
 =cut
 
 inline op bxors(inout STR, in STR) :base_core {
-  string_bitwise_xor(interp, $1, $2, &$1);
+  Parrot_str_bitwise_xor(interp, $1, $2, &$1);
 }
 
 inline op bxors(invar PMC, in STR) :base_core {
@@ -514,7 +514,7 @@ inline op bxors(invar PMC, invar PMC) :base_core {
 }
 
 inline op bxors(out STR, in STR, in STR) :base_core {
-  $1 = string_bitwise_xor(interp, $2, $3, NULL);
+  $1 = Parrot_str_bitwise_xor(interp, $2, $3, NULL);
 }
 
 inline op bxors(invar PMC, invar PMC, in STR) :base_core {

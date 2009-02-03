@@ -343,7 +343,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
        UErrorCode *status);
        */
     dest_len = src_len = src->strlen;
-    dest     = string_make_direct(interp, NULL, src_len * sizeof (UChar),
+    dest     = Parrot_str_new_init(interp, NULL, src_len * sizeof (UChar),
             src->encoding, src->charset, 0);
 
     err      = U_ZERO_ERROR;
@@ -767,7 +767,7 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
     String_iter iter;
 
     ENCODING_ITER_INIT(interp, src, &iter);
-    for (offset = 0; offset < string_length(interp, src); ++offset) {
+    for (offset = 0; offset < Parrot_str_byte_length(interp, src); ++offset) {
         const UINTVAL codepoint = iter.get_and_advance(interp, &iter);
         /* Check for Unicode non-characters */
         if (codepoint >= 0xfdd0

@@ -95,13 +95,13 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
     PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
 
     if (entry_name && !STRING_IS_EMPTY(entry_name)) {
-        char   * const cstring    = string_to_cstring(interp, entry_name);
-        const  UINTVAL len        = string_length(interp, entry_name);
-        STRING *const_name        = string_make_direct(interp, cstring,
+        char   * const cstring    = Parrot_str_to_cstring(interp, entry_name);
+        const  UINTVAL len        = Parrot_str_byte_length(interp, entry_name);
+        STRING *const_name        = Parrot_str_new_init(interp, cstring,
             len, PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
             PObj_constant_FLAG);
 
-        string_cstring_free(cstring);
+        Parrot_str_free_cstring(cstring);
         VTABLE_set_pmc_keyed_str(interp, hll_info, const_name, entry);
     }
     else
@@ -183,7 +183,7 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, name);
 
     /* create HLL namespace using the *constant* name */
-    hll_name = string_downcase(interp, VTABLE_get_string(interp, name));
+    hll_name = Parrot_str_downcase(interp, VTABLE_get_string(interp, name));
 
     /* HLL type mappings aren't yet created, we can't create
      * a namespace in HLL's flavor yet - maybe promote the
@@ -238,7 +238,7 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 
         if (!PMC_IS_NULL(lib_name)) {
             const STRING * const name = VTABLE_get_string(interp, lib_name);
-            if (string_equal(interp, name, hll_lib) == 0)
+            if (Parrot_str_equal(interp, name, hll_lib) == 0)
                 break;
         }
     }
@@ -530,7 +530,7 @@ Parrot_regenerate_HLL_namespaces(PARROT_INTERP)
             if (!hll_name)
                 continue;
 
-            string_downcase_inplace(interp, hll_name);
+            Parrot_str_downcase_inplace(interp, hll_name);
 
             /* XXX as in Parrot_register_HLL() this needs to be fixed to use
              * the correct type of namespace. It's relatively easy to do that

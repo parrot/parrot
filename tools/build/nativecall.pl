@@ -53,7 +53,7 @@ my %sig_table = (
     d => { as_proto => "double", sig_char => "N" },
     t => { as_proto => "char *",
            other_decl => "STRING *final_destination;",
-           ret_assign => "final_destination = string_from_cstring(interp, return_data, 0);\n    set_nci_S(interp, &st, final_destination);",
+           ret_assign => "final_destination = Parrot_str_new(interp, return_data, 0);\n    set_nci_S(interp, &st, final_destination);",
            sig_char => "S" },
     v => { as_proto => "void",
            return_type => "void *",
@@ -370,8 +370,8 @@ sub make_arg {
     /t/ && do {
         push @{$temps_ref}, "char *t_$temp_num;";
         push @{$extra_preamble_ref},
-            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? string_to_cstring(interp, s) : (char *) NULL;}";
-        push @{$extra_postamble_ref}, "do { if (t_$temp_num) string_cstring_free(t_$temp_num); } while (0);";
+            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? Parrot_str_to_cstring(interp, s) : (char *) NULL;}";
+        push @{$extra_postamble_ref}, "do { if (t_$temp_num) Parrot_str_free_cstring(t_$temp_num); } while (0);";
         return "t_$temp_num";
     };
     /b/ && do {
@@ -382,8 +382,8 @@ sub make_arg {
     /B/ && do {
         push @{$temps_ref}, "char *s_$temp_num;\n    char *t_$temp_num;\n    void** v_$temp_num = (void **) &t_$temp_num;";
         push @{$extra_preamble_ref},
-            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? string_to_cstring(interp, s) : (char *) NULL; s_$temp_num = t_$temp_num;}";
-        push @{$extra_postamble_ref}, "do { if (s_$temp_num) string_cstring_free(s_$temp_num); } while (0);";
+            "{STRING * s= GET_NCI_S($reg_num); t_$temp_num = s ? Parrot_str_to_cstring(interp, s) : (char *) NULL; s_$temp_num = t_$temp_num;}";
+        push @{$extra_postamble_ref}, "do { if (s_$temp_num) Parrot_str_free_cstring(s_$temp_num); } while (0);";
         return "v_$temp_num";
     };
     /J/ && do {
@@ -511,14 +511,14 @@ NOTNULL(STRING *signature), NOTNULL(int *jitted))
 
     /* And in here is the platform-independent way. Which is to say
        "here there be hacks" */
-    signature_len = string_length(interp, signature);
+    signature_len = Parrot_str_byte_length(interp, signature);
     if (0 == signature_len)
        return F2DPTR(pcf_v_);
     /* remove deprecated void argument 'v' character */
-    if (2 == signature_len && 'v' == string_index(interp, signature, 1)) {
+    if (2 == signature_len && 'v' == Parrot_str_indexed(interp, signature, 1)) {
        Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "function signature argument character 'v' ignored");
-       string_chopn_inplace(interp, signature, 1);
-       signature_len = string_length(interp, signature);
+       Parrot_str_chopn_inplace(interp, signature, 1);
+       signature_len = Parrot_str_byte_length(interp, signature);
     }
 
     iglobals = interp->iglobals;
@@ -541,7 +541,7 @@ $put_pointer
     /* Try if JIT code can build that signature. If yes, we are done */
 
     jit_key_name = CONST_STRING(interp, "_XJIT_");
-    jit_key_name = string_concat(interp, jit_key_name, signature, 0);
+    jit_key_name = Parrot_str_concat(interp, jit_key_name, signature, 0);
     b            = VTABLE_get_pmc_keyed_str(interp, HashPointer, jit_key_name);
 
     if (b && b->vtable->base_type == enum_class_ManagedStruct) {
@@ -572,20 +572,20 @@ $put_pointer
       with a neater way to do this.
      */
     ns = string_make(interp, " is an unknown signature type", 29, "ascii", 0);
-    message = string_concat(interp, signature, ns, 0);
+    message = Parrot_str_concat(interp, signature, ns, 0);
 
 #if defined(CAN_BUILD_CALL_FRAMES)
     ns = string_make(interp, ".\\nCAN_BUILD_CALL_FRAMES is enabled, this should not happen", 58, "ascii", 0);
 #else
     ns = string_make(interp, ".\\nCAN_BUILD_CALL_FRAMES is disabled, add the signature to src/call_list.txt", 75, "ascii", 0);
 #endif
-    message = string_concat(interp, message, ns, 0);
+    message = Parrot_str_concat(interp, message, ns, 0);
 
     /*
      * I think there may be memory issues with this but if we get to here we are
      * aborting.
      */
-    c = string_to_cstring(interp, message);
+    c = Parrot_str_to_cstring(interp, message);
     PANIC(interp, c);
 }
 

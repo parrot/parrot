@@ -45,11 +45,11 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     int free_it = 0;
     char* cmd = mem_sys_allocate(command->strlen + 4);
     char* shell = Parrot_getenv("ComSpec", &free_it);
-    char* cmdin = string_to_cstring(interp, command);
+    char* cmdin = Parrot_str_to_cstring(interp, command);
 
     strcpy(cmd, "/c ");
     strcat(cmd, cmdin);
-    string_cstring_free(cmdin);
+    Parrot_str_free_cstring(cmdin);
 
     memset(&si, 0, sizeof (si));
     si.cb = sizeof (si);
@@ -112,7 +112,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
     /* Now build command line. */
     for (i = 0; i < pmclen; i++) {
         STRING *s = VTABLE_get_string_keyed_int(interp, cmdargs, i);
-        char *cs  = string_to_cstring(interp, s);
+        char *cs  = Parrot_str_to_cstring(interp, s);
         if (cmdlinepos + (int)s->strlen + 3 > cmdlinelen) {
             cmdlinelen += s->strlen + 4;
             cmdline = mem_sys_realloc(cmdline, cmdlinelen);
@@ -165,7 +165,7 @@ void
 Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)
 {
     int status;
-    char *in = string_to_cstring(interp, command);
+    char *in = Parrot_str_to_cstring(interp, command);
     char *cmd = NULL;
     const char **argv = mem_sys_allocate_zeroed(2 * sizeof (int));
 

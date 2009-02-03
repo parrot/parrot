@@ -58,8 +58,8 @@ pmclass DotNetSignature dynpmc group dotnet {
         }
 
         /* Get blob data and its size and reset current position. */
-        sig->data      = string_to_cstring(INTERP, s);
-        sig->data_size = string_length(INTERP, s);
+        sig->data      = Parrot_str_to_cstring(INTERP, s);
+        sig->data_size = Parrot_str_byte_length(INTERP, s);
         sig->cur_pos   = 0;
     }
 

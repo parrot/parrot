@@ -116,12 +116,12 @@ Sets the name of the subroutine.
 
     VTABLE STRING *get_string() {
         const Parrot_sub * const sub = PMC_sub(SELF);
-        return string_copy(INTERP, sub->name);
+        return Parrot_str_copy(INTERP, sub->name);
     }
 
     VTABLE void set_string_native(STRING *subname) {
         Parrot_sub * const sub = PMC_sub(SELF);
-        sub->name              = string_copy(INTERP, subname);
+        sub->name              = Parrot_str_copy(INTERP, subname);
     }
 
 /*
@@ -381,12 +381,12 @@ Creates and returns a clone of the subroutine.
         /* we have to mark it ourselves */
         PObj_custom_mark_destroy_SETALL(ret);
 
-        /* first set the sub struct, string_copy may cause GC */
+        /* first set the sub struct, Parrot_str_copy may cause GC */
         PMC_struct_val(ret) = sub;
         PMC_pmc_val(ret)    = NULL;
         memcpy(sub, PMC_sub(SELF), sizeof (Parrot_sub));
         if (sub->name != NULL)
-            sub->name = string_copy(INTERP, sub->name);
+            sub->name = Parrot_str_copy(INTERP, sub->name);
 
         if (sub->ctx)
             Parrot_context_ref(INTERP, sub->ctx);
@@ -417,7 +417,7 @@ Set SELF to the data in other.
             memcpy(PMC_sub(SELF), PMC_sub(other), sizeof (struct Parrot_sub));
 
             /* copy the name so it's a different string in memory */
-            PMC_sub(SELF)->name = string_copy(INTERP, PMC_sub(SELF)->name);
+            PMC_sub(SELF)->name = Parrot_str_copy(INTERP, PMC_sub(SELF)->name);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -753,22 +753,22 @@ The number of optional named arguments
         }
 
         /* Return the argument information that was requested. */
-        if (string_equal(interp, what, CONST_STRING(interp, "pos_required")) == 0) {
+        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_required")) == 0) {
             count_found = (INTVAL)sub->arg_info->pos_required;
         }
-        else if (string_equal(interp, what, CONST_STRING(interp, "pos_optional")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_optional")) == 0) {
             count_found = (INTVAL)sub->arg_info->pos_optional;
         }
-        else if (string_equal(interp, what, CONST_STRING(interp, "pos_slurpy")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_slurpy")) == 0) {
             count_found = (INTVAL)sub->arg_info->pos_slurpy;
         }
-        else if (string_equal(interp, what, CONST_STRING(interp, "named_required")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_required")) == 0) {
             count_found = (INTVAL)sub->arg_info->named_required;
         }
-        else if (string_equal(interp, what, CONST_STRING(interp, "named_optional")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_optional")) == 0) {
             count_found = (INTVAL)sub->arg_info->named_optional;
         }
-        else if (string_equal(interp, what, CONST_STRING(interp, "named_slurpy")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_slurpy")) == 0) {
             count_found = (INTVAL)sub->arg_info->named_slurpy;
         }
         else {
@@ -832,7 +832,7 @@ slurpy arguments).
 
     METHOD __get_regs_used(STRING *reg) {
         Parrot_sub * const sub  = PMC_sub(SELF);
-        char       * const kind = string_to_cstring(interp, reg);
+        char       * const kind = Parrot_str_to_cstring(interp, reg);
         INTVAL             regs_used;
 
         /* TODO switch to canonical NiSP order
@@ -843,13 +843,13 @@ slurpy arguments).
         PARROT_ASSERT(sub->n_regs_used);
 
         if (!*kind || kind[1]) {
-            string_cstring_free(kind);
+            Parrot_str_free_cstring(kind);
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "illegal register kind '%Ss'", reg);
         }
 
         p = strchr(types, *kind);
-        string_cstring_free(kind);
+        Parrot_str_free_cstring(kind);
 
         if (!p)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,

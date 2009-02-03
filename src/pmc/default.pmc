@@ -96,13 +96,13 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
     if (!ro)
         ro = string_make(interp, "_ro", 3, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
-    if (!string_compare(interp, key, ro)) {
+    if (!Parrot_str_compare(interp, key, ro)) {
 #else
 
     /*
-     * s2 in string_compare is freed here
+     * s2 in Parrot_str_compare is freed here
      */
-    if (!string_compare(interp, key, CONST_STRING(interp, "_ro"))) {
+    if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "_ro"))) {
 #endif
         /* pmc should set/clear readonly */
         const INTVAL on = VTABLE_get_bool(interp, value);
@@ -181,7 +181,7 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 static PMC*
 check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-        &&!string_compare(interp, key, CONST_STRING(interp, "_ro"))) {
+        &&!Parrot_str_compare(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val  = pmc_new(interp, enum_class_Integer);
         PMC_int_val(ret_val) = 1;
         return ret_val;
@@ -233,11 +233,11 @@ static INTVAL
 does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
 {
     INTVAL  pos    = 0;
-    INTVAL  length = string_length(interp, what);
+    INTVAL  length = Parrot_str_byte_length(interp, what);
 
     do {
         INTVAL len;
-        INTVAL idx = string_str_index(interp, what, method, (INTVAL)pos);
+        INTVAL idx = Parrot_str_find_index(interp, what, method, (INTVAL)pos);
 
         if (idx < 0)
             return 0;
@@ -247,14 +247,14 @@ does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
         if (pos >= length)
             return 0;
 
-        len = string_length(interp, method);
+        len = Parrot_str_byte_length(interp, method);
 
-        if (pos && string_index(interp, what, pos - 1) != 32) {
+        if (pos && Parrot_str_indexed(interp, what, pos - 1) != 32) {
             pos += len;
             continue;
         }
 
-        if (pos + len < length && string_index(interp, what, pos + len) != 32) {
+        if (pos + len < length && Parrot_str_indexed(interp, what, pos + len) != 32) {
             pos += len;
             continue;
         }
@@ -944,13 +944,13 @@ Provides introspection of a specific piece of information about the PMC.
 */
 
     PMC *inspect_str(STRING *name) {
-        if (string_equal(interp, name, CONST_STRING(interp, "flags")) == 0) {
+        if (Parrot_str_equal(interp, name, CONST_STRING(interp, "flags")) == 0) {
             PMC *found = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found,
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
         }
-        else if (string_equal(interp, name, CONST_STRING(interp, "mro")) == 0) {
+        else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "mro")) == 0) {
             return VTABLE_clone(interp, SELF->vtable->mro);
         }
         else

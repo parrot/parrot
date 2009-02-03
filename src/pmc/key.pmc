@@ -67,7 +67,7 @@ Creates and returns a clone of the key.
                 case KEY_string_FLAG:
                 case KEY_string_FLAG | KEY_register_FLAG:
                     key_set_string(INTERP, dkey,
-                        string_copy(INTERP, VTABLE_get_string(INTERP, key)));
+                        Parrot_str_copy(INTERP, VTABLE_get_string(INTERP, key)));
                     break;
                 case KEY_pmc_FLAG:
                 case KEY_pmc_FLAG | KEY_register_FLAG:

@@ -187,9 +187,9 @@ Intersegment branch to location in fixup table named $1.
 inline op branch_cs(in STR) :base_loop :check_event :flow {
     PackFile_FixupEntry * fe;
     {
-        char * const label = string_to_cstring(interp, $1);
+        char * const label = Parrot_str_to_cstring(interp, $1);
         fe = PackFile_find_fixup_entry(interp, enum_fixup_label, label);
-        string_cstring_free(label);
+        Parrot_str_free_cstring(label);
     }
 
     if (!fe) {
@@ -377,7 +377,7 @@ inline op if(invar NUM, inconst LABEL) {
 }
 
 op if (invar STR, inconst LABEL) {
-    if (string_bool(interp, $1))
+    if (Parrot_str_boolean(interp, $1))
         goto OFFSET($2);
 }
 
@@ -411,7 +411,7 @@ inline op unless(invar NUM, inconst LABEL) {
 }
 
 op unless(invar STR, inconst LABEL) {
-    if (!string_bool(interp, $1))
+    if (!Parrot_str_boolean(interp, $1))
         goto OFFSET($2);
 }
 
@@ -837,7 +837,7 @@ inline op push_eh(invar PMC) {
 
 inline op pop_eh() {
     Parrot_cx_delete_handler_local(interp,
-            string_from_cstring(interp, "exception", 9));
+            Parrot_str_new(interp, "exception", 9));
 }
 
 inline op throw(invar PMC) :flow {
@@ -849,7 +849,7 @@ inline op throw(invar PMC) :flow {
      * current context appropriately.
      */
     Parrot_context_ref(interp, CONTEXT(interp));
-    VTABLE_set_attr_str(interp, $1, const_string(interp, "resume"), resume);
+    VTABLE_set_attr_str(interp, $1, Parrot_str_new_constant(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, $1, ret);
     goto ADDRESS(dest);
 }
@@ -867,7 +867,7 @@ inline op rethrow(invar PMC) :flow {
 
 inline op count_eh(out INT) {
     $1 = Parrot_cx_count_handlers_local(interp,
-            string_from_cstring(interp, "exception", 9));
+            Parrot_str_new(interp, "exception", 9));
 }
 
 inline op die(in STR) :flow {
@@ -878,7 +878,7 @@ inline op die(in STR) :flow {
                                     CONTROL_ERROR, $1);
 
     VTABLE_set_attr_str(interp, exception,
-                        const_string(interp, "resume"), resume);
+                        Parrot_str_new_constant(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
 }
@@ -893,7 +893,7 @@ inline op die(in PMC) :flow {
         Parrot_ex_build_exception(interp, EXCEPT_error, CONTROL_ERROR, msg);
 
     VTABLE_set_attr_str(interp, exception,
-                        const_string(interp, "resume"), resume);
+                        Parrot_str_new_constant(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
 }
@@ -919,7 +919,7 @@ inline op exit(in INT) :flow {
     PMC             *exception = Parrot_ex_build_exception(interp, EXCEPT_exit,
                                                       $1, NULL);
     VTABLE_set_attr_str(interp, exception,
-                        const_string(interp, "resume"), resume);
+                        Parrot_str_new_constant(interp, "resume"), resume);
     dest = Parrot_ex_throw_from_op(interp, exception, ret);
     goto ADDRESS(dest);
 }
@@ -1331,7 +1331,7 @@ inline op loadlib(out PMC, in STR) {
 }
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
-    char * const name = string_to_cstring(interp, ($3));
+    char * const name = Parrot_str_to_cstring(interp, ($3));
     void * const ptr  = Parrot_dlsym(
                             PMC_IS_NULL($2) ? NULL :
                             VTABLE_defined(interp, $2) ? PMC_data($2) :
@@ -1351,11 +1351,11 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
         VTABLE_set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
         PObj_get_FLAGS($1) |= PObj_private1_FLAG;
     }
-    string_cstring_free(name);
+    Parrot_str_free_cstring(name);
 }
 
 op dlvar(out PMC, invar PMC, in STR) {
-    char * const name = string_to_cstring(interp, ($3));
+    char * const name = Parrot_str_to_cstring(interp, ($3));
     void * const p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
@@ -1369,7 +1369,7 @@ op dlvar(out PMC, invar PMC, in STR) {
         $1 = pmc_new(interp, enum_class_UnManagedStruct);
         PMC_data($1) = p;
     }
-    string_cstring_free(name);
+    Parrot_str_free_cstring(name);
 }
 
 inline op compreg(in STR, invar PMC) {

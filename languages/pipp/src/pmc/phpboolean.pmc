@@ -38,7 +38,7 @@ Return the string 'boolean'.
 
 */
     STRING* name() {
-        return const_string(INTERP, "boolean");
+        return Parrot_str_new_constant(INTERP, "boolean");
     }
 
 /*
@@ -52,9 +52,9 @@ Return the string '1' or ''.
 */
     STRING* get_string() {
         if (SELF.get_integer())
-            return const_string(INTERP, "1");
+            return Parrot_str_new_constant(INTERP, "1");
         else
-            return const_string(INTERP, "");
+            return Parrot_str_new_constant(INTERP, "");
     }
 
 
@@ -76,7 +76,7 @@ Return a representation of this boolean in the same format as PHP's serialize fu
 
     METHOD STRING* serialize() {
         STRING *serialized;
-        serialized = string_printf(INTERP, "b:%d;", VTABLE_get_integer(INTERP, SELF));
+        serialized = Parrot_str_format_data(INTERP, "b:%d;", VTABLE_get_integer(INTERP, SELF));
         RETURN(STRING *serialized);
     }
 

@@ -204,7 +204,7 @@ Parrot_charset_number(PARROT_INTERP, ARGIN(const STRING *charsetname))
     const int n = all_charsets->n_charsets;
 
     for (i = 0; i < n; ++i) {
-        if (!string_equal(interp, all_charsets->set[i].name, charsetname))
+        if (!Parrot_str_equal(interp, all_charsets->set[i].name, charsetname))
             return i;
     }
     return -1;
@@ -340,7 +340,7 @@ register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
                 (n + 1) * sizeof (One_charset));
     all_charsets->n_charsets++;
     all_charsets->set[n].charset = charset;
-    all_charsets->set[n].name = const_string(interp, charsetname);
+    all_charsets->set[n].name = Parrot_str_new_constant(interp, charsetname);
     all_charsets->set[n].n_converters = 0;
 
     return 1;

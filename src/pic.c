@@ -590,7 +590,7 @@ pass_mixed(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
                 STRING *argS = *(STRING * const *)(src_base + ((const opcode_t *)src)[i]);
 
                 if (argS && PObj_constant_TEST(argS))
-                    argS = Parrot_make_COW_reference(interp, argS);
+                    argS = Parrot_str_new_COW(interp, argS);
 
                 *(STRING **)(dest_base + ((const opcode_t*)dest)[i]) = argS;
                 }
@@ -599,7 +599,7 @@ pass_mixed(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
                 {
                 STRING *argS = (STRING *)(src)[i];
                 if (argS && PObj_constant_TEST(argS))
-                    argS = Parrot_make_COW_reference(interp, argS);
+                    argS = Parrot_str_new_COW(interp, argS);
                 *(STRING **)(dest_base + ((const opcode_t *)dest)[i]) = argS;
                 }
                 break;

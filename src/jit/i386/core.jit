@@ -1114,7 +1114,7 @@ Parrot_set_s_sc {
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
     emitm_pushl_i(NATIVECODE, CONST(2)->u.string);
     emitm_pushl_r(NATIVECODE, emit_ECX);
-    CALL_FUNCTION(jit_info, string_copy);
+    CALL_FUNCTION(jit_info, Parrot_str_copy);
     emitm_addb_i_r(NATIVECODE, 8, emit_ESP);
     jit_emit_mov_MR_i(interp, NATIVECODE, ROFFS_STR(1), emit_EAX );
 }
@@ -1129,7 +1129,7 @@ TEMPLATE Parrot_cmp_sx_sx_ic {
     push_<typ1>(1);
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
     emitm_pushl_r(NATIVECODE, emit_ECX);
-    CALL_FUNCTION(jit_info, string_compare);
+    CALL_FUNCTION(jit_info, Parrot_str_compare);
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[3]);
@@ -1146,7 +1146,7 @@ TEMPLATE Parrot_eq_sx_sx_ic {
     push_<typ1>(1);
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
     emitm_pushl_r(NATIVECODE, emit_ECX);
-    CALL_FUNCTION(jit_info, string_equal);
+    CALL_FUNCTION(jit_info, Parrot_str_equal);
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[3]);
@@ -1212,7 +1212,7 @@ TEMPLATE Parrot_ifunless_sx_ic {
     push_<typ>(1);
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
     emitm_pushl_r(NATIVECODE, emit_ECX);
-    CALL_FUNCTION(jit_info, string_bool);
+    CALL_FUNCTION(jit_info, Parrot_str_boolean);
     emitm_addb_i_r(NATIVECODE, 8, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[2]);
@@ -1299,7 +1299,7 @@ Parrot_ord_i_s_i {
     /*
      * movl $2, %ecx         # %ecx := string
      * movl $3, %edx         # %edx := offset
-     * movl %ecx, %eax       # %eax := string_length
+     * movl %ecx, %eax       # %eax := Parrot_str_byte_length
      * cmpl #0, %ecx
      * je  L1
      */

@@ -42,7 +42,7 @@ Initializes the string.
 
 */
     VTABLE void init() {
-        PMC_str_val(SELF) = string_make_empty(INTERP, enum_stringrep_one, 0);
+        PMC_str_val(SELF) = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
         PObj_custom_mark_SET(SELF);
     }
 
@@ -65,7 +65,7 @@ Allow :
         else
             res = pmc_new(INTERP, type);
 
-        VTABLE_set_string_native(INTERP, res, string_copy(INTERP, rep));
+        VTABLE_set_string_native(INTERP, res, Parrot_str_copy(INTERP, rep));
         PObj_custom_mark_SET(res);
         return res;
     }
@@ -120,7 +120,7 @@ Return the string "string".
 
 */
     VTABLE STRING* name() {
-        return const_string(INTERP, "string");
+        return Parrot_str_new_constant(INTERP, "string");
     }
 
 /*
@@ -159,8 +159,8 @@ Sets the value of the string to that of the specified C<string>.
     VTABLE void set_string_native(STRING *value) {
         /* Only allow constant PMCs to embed constant strings */
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
-            const char *copy = string_to_cstring(INTERP, value);
-            value            = const_string(INTERP, copy);
+            const char *copy = Parrot_str_to_cstring(INTERP, value);
+            value            = Parrot_str_new_constant(INTERP, copy);
         }
 
         PMC_str_val(SELF) = value;
@@ -189,7 +189,7 @@ the specified C<PMC>.
 */
     VTABLE PMC* neg(PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -208,7 +208,7 @@ the specified C<PMC>.
 */
     VTABLE void i_neg() {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -228,7 +228,7 @@ Return length of the string.
 
 */
     VTABLE INTVAL elements() {
-        return string_length(INTERP, PMC_str_val(SELF));
+        return Parrot_str_byte_length(INTERP, PMC_str_val(SELF));
     }
 
 /*
@@ -277,7 +277,7 @@ Used to unarchive the string.
 */
     MULTI PMC* add(LuaNumber value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -289,7 +289,7 @@ Used to unarchive the string.
 
     MULTI PMC* add(LuaString value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -323,7 +323,7 @@ Used to unarchive the string.
 */
     MULTI void i_add(LuaNumber value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -336,7 +336,7 @@ Used to unarchive the string.
 
     MULTI void i_add(LuaString value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -371,7 +371,7 @@ Used to unarchive the string.
 */
     MULTI PMC* subtract(LuaNumber value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -383,7 +383,7 @@ Used to unarchive the string.
 
     MULTI PMC* subtract(LuaString value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -417,7 +417,7 @@ Used to unarchive the string.
 */
     MULTI void i_subtract(LuaNumber value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -430,7 +430,7 @@ Used to unarchive the string.
 
     MULTI void i_subtract(LuaString value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -466,7 +466,7 @@ Used to unarchive the string.
 */
     MULTI PMC* multiply(LuaNumber value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -478,7 +478,7 @@ Used to unarchive the string.
 
     MULTI PMC* multiply(LuaString value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -512,7 +512,7 @@ Used to unarchive the string.
 */
     MULTI void i_multiply(LuaNumber value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -525,7 +525,7 @@ Used to unarchive the string.
 
     MULTI void i_multiply(LuaString value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -560,7 +560,7 @@ Used to unarchive the string.
 */
     MULTI PMC* divide(LuaNumber value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -572,7 +572,7 @@ Used to unarchive the string.
 
     MULTI PMC* divide(LuaString value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -607,7 +607,7 @@ Used to unarchive the string.
 */
     MULTI void i_divide(LuaNumber value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -620,7 +620,7 @@ Used to unarchive the string.
 
     MULTI void i_divide(LuaString value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -655,7 +655,7 @@ Used to unarchive the string.
 */
     MULTI PMC* modulus(LuaNumber value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -667,7 +667,7 @@ Used to unarchive the string.
 
     MULTI PMC* modulus(LuaString value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -702,7 +702,7 @@ Used to unarchive the string.
 */
     MULTI void i_modulus(LuaNumber value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -715,7 +715,7 @@ Used to unarchive the string.
 
     MULTI void i_modulus(LuaString value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -750,7 +750,7 @@ Used to unarchive the string.
 */
     MULTI PMC* pow(LuaNumber value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -762,7 +762,7 @@ Used to unarchive the string.
 
     MULTI PMC* pow(LuaString value, PMC *dest) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -797,7 +797,7 @@ Used to unarchive the string.
 */
     MULTI void i_pow(LuaNumber value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -810,7 +810,7 @@ Used to unarchive the string.
 
     MULTI void i_pow(LuaString value) {
         PMC *n;
-        Parrot_PCCINVOKE(interp, SELF, const_string(interp, "tonumber"),
+        Parrot_PCCINVOKE(interp, SELF, Parrot_str_new_constant(interp, "tonumber"),
             "->P", &n);
 
         if (PMC_type(n) == dynpmc_LuaNumber)
@@ -850,7 +850,7 @@ they match.
     MULTI INTVAL is_equal(LuaString value) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(0 == string_equal(INTERP, s, v));
+        return (INTVAL)(0 == Parrot_str_equal(INTERP, s, v));
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
@@ -873,7 +873,7 @@ Throws an exception unless C<value> is a LuaString.
     MULTI INTVAL cmp(LuaString value) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        return string_compare(INTERP, s, v);
+        return Parrot_str_compare(INTERP, s, v);
     }
 
     MULTI INTVAL cmp(DEFAULT value) {
@@ -890,7 +890,7 @@ Throws an exception unless C<value> is a LuaString.
 
 */
     MULTI PMC* concatenate(LuaNumber value, PMC *dest) {
-        STRING *s = string_concat(INTERP,
+        STRING *s = Parrot_str_concat(INTERP,
             SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
 
         dest = pmc_new(INTERP, dynpmc_LuaString);
@@ -899,7 +899,7 @@ Throws an exception unless C<value> is a LuaString.
     }
 
     MULTI PMC* concatenate(LuaString value, PMC *dest) {
-        STRING *s = string_concat(INTERP,
+        STRING *s = Parrot_str_concat(INTERP,
             SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
 
         dest = pmc_new(INTERP, dynpmc_LuaString);
@@ -933,13 +933,13 @@ Throws an exception unless C<value> is a LuaString.
     MULTI void i_concatenate(LuaNumber value) {
         STRING *s = SELF.get_string();
         STRING *v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(string_append(INTERP, s, v));
+        SELF.set_string_native(Parrot_str_append(INTERP, s, v));
     }
 
     MULTI void i_concatenate(LuaString value) {
         STRING *s = SELF.get_string();
         STRING *v = VTABLE_get_string(INTERP, value);
-        SELF.set_string_native(string_append(INTERP, s, v));
+        SELF.set_string_native(Parrot_str_append(INTERP, s, v));
     }
 
     MULTI void i_concatenate(DEFAULT value) {
@@ -973,8 +973,8 @@ Throws an exception unless C<value> is a LuaString.
 */
     METHOD PMC* get_metatable() {
         PMC *retval = Parrot_find_global_s(INTERP,
-                             const_string(INTERP, "string"),
-                             const_string(INTERP, "mt_string"));
+                             Parrot_str_new_constant(INTERP, "string"),
+                             Parrot_str_new_constant(INTERP, "mt_string"));
         if (!retval)
             retval = pmc_new(INTERP, dynpmc_LuaNil);
 
@@ -1006,7 +1006,7 @@ Throws an exception unless C<value> is a LuaString.
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
 
         if (PMC_type(SELF) == PMC_type(value)
-        && 0               == string_equal(INTERP, PMC_str_val(SELF),
+        && 0               == Parrot_str_equal(INTERP, PMC_str_val(SELF),
                                   VTABLE_get_string(INTERP, value)))
             VTABLE_set_bool(INTERP, retval, 1);
         else
@@ -1025,7 +1025,7 @@ Throws an exception unless C<value> is a LuaString.
     METHOD PMC* tonumber() {
         PMC     *retval;
         STRING  *rep = SELF.get_string();
-        char    *s1  = string_to_cstring(INTERP, rep);
+        char    *s1  = Parrot_str_to_cstring(INTERP, rep);
         char    *s2;
         FLOATVAL d   = strtod(s1, &s2);
 
@@ -1039,12 +1039,12 @@ Throws an exception unless C<value> is a LuaString.
             if (*s2 == '\0') {
                 retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 VTABLE_set_number_native(INTERP, retval, d);
-                string_cstring_free(s1);
+                Parrot_str_free_cstring(s1);
                 RETURN(PMC *retval);
             }
         }
         retval = pmc_new(INTERP, dynpmc_LuaNil);
-        string_cstring_free(s1);
+        Parrot_str_free_cstring(s1);
         RETURN(PMC *retval);
     }
 
@@ -1058,7 +1058,7 @@ Throws an exception unless C<value> is a LuaString.
     METHOD PMC* tobase(INTVAL base) {
         PMC          *retval;
         STRING       *rep = SELF.get_string();
-        char         *s1  = string_to_cstring(INTERP, rep);
+        char         *s1  = Parrot_str_to_cstring(INTERP, rep);
         char         *s2;
         unsigned long n   = strtoul(s1, &s2, base);
 
@@ -1073,12 +1073,12 @@ Throws an exception unless C<value> is a LuaString.
             if (*s2 == '\0') {
                 retval = pmc_new(INTERP, dynpmc_LuaNumber);
                 VTABLE_set_number_native(INTERP, retval, n);
-                string_cstring_free(s1);
+                Parrot_str_free_cstring(s1);
                 RETURN(PMC *retval);
             }
         }
         retval = pmc_new(INTERP, dynpmc_LuaNil);
-        string_cstring_free(s1);
+        Parrot_str_free_cstring(s1);
         RETURN(PMC *retval);
     }
 

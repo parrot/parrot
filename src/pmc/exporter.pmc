@@ -262,7 +262,7 @@ Throws an exception if an unknown PMC type is passed.
                 INTVAL n, i;
 
                 if (VTABLE_isa(interp, glb, s_str))
-                    glb_array = string_split(interp, s_space,
+                    glb_array = Parrot_str_split(interp, s_space,
                         VTABLE_get_string(interp, glb));
                 else
                     glb_array = glb;

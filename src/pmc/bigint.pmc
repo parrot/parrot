@@ -588,7 +588,7 @@ Return GMP version string "x.y.z".
     METHOD version() {
         STRING *version;
 #ifdef PARROT_HAS_GMP
-        version = string_from_cstring(INTERP, gmp_version, 0);
+        version = Parrot_str_new(INTERP, gmp_version, 0);
 #else
         version = CONST_STRING(INTERP, "0.0.0");
 #endif
@@ -692,15 +692,15 @@ Same assume number base C<base>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        char * const s = string_to_cstring(INTERP, value);
+        char * const s = Parrot_str_to_cstring(INTERP, value);
         bigint_set_str(INTERP, SELF, s, 10);
-        string_cstring_free(s);
+        Parrot_str_free_cstring(s);
     }
 
     VTABLE void set_string_keyed_int(INTVAL base, STRING *value) {
-        char * const s = string_to_cstring(INTERP, value);
+        char * const s = Parrot_str_to_cstring(INTERP, value);
         bigint_set_str(INTERP, SELF, s, base);
-        string_cstring_free(s);
+        Parrot_str_free_cstring(s);
     }
 /*
 
@@ -793,21 +793,21 @@ appended.
 
     VTABLE STRING *get_string() {
         char   *s  = bigint_get_string(INTERP, SELF, 10);
-        STRING *ps = string_from_cstring(INTERP, s, 0);
+        STRING *ps = Parrot_str_new(INTERP, s, 0);
         mem_sys_free(s);
         return ps;
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL base) {
         char   *s  = bigint_get_string(INTERP, SELF, base);
-        STRING *ps = string_from_cstring(INTERP, s, 0);
+        STRING *ps = Parrot_str_new(INTERP, s, 0);
         mem_sys_free(s);
         return ps;
     }
 
     VTABLE STRING *get_repr() {
         STRING *s = SELF.get_string();
-        return string_append(INTERP, s, CONST_STRING(INTERP, "L"));
+        return Parrot_str_append(INTERP, s, CONST_STRING(INTERP, "L"));
     }
 /*
 

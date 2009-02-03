@@ -107,7 +107,7 @@ void
 Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 {
     ASSERT_ARGS(Parrot_mark_method_writes)
-    STRING *const str_name = const_string(interp, name);
+    STRING *const str_name = Parrot_str_new_constant(interp, name);
     PMC    *const pmc_true = pmc_new(interp, enum_class_Integer);
     PMC    *const method   = VTABLE_get_pmc_keyed_str(
         interp, interp->vtables[type]->_namespace, str_name);
@@ -168,10 +168,10 @@ Parrot_compile_string(PARROT_INTERP, ARGIN(STRING *type),
         ARGIN(const char *code), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_string)
-    if (string_compare(interp, CONST_STRING(interp, "PIR"), type) == 0)
+    if (Parrot_str_compare(interp, CONST_STRING(interp, "PIR"), type) == 0)
         return IMCC_compile_pir_s(interp, code, error);
 
-    if (string_compare(interp, CONST_STRING(interp, "PASM"), type) == 0)
+    if (Parrot_str_compare(interp, CONST_STRING(interp, "PASM"), type) == 0)
         return IMCC_compile_pasm_s(interp, code, error);
 
     *error = CONST_STRING(interp, "Invalid interpreter type");
@@ -387,7 +387,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
             else {
                 /* Need to strip back to what follows the final / or \. */
                 STRING *fullname   = VTABLE_get_string(interp, exe_name);
-                char   *fullname_c = string_to_cstring(interp, fullname);
+                char   *fullname_c = Parrot_str_to_cstring(interp, fullname);
                 int     pos        = strlen(fullname_c) - 1;
 
                 while (pos              >  0
@@ -398,7 +398,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
                 if (pos > 0)
                     pos++;
 
-                basename = string_from_cstring(interp, fullname_c + pos, 0);
+                basename = Parrot_str_new(interp, fullname_c + pos, 0);
                 mem_sys_free(fullname_c);
 
                 return basename;
@@ -481,7 +481,7 @@ sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
     ASSERT_ARGS(sysinfo_s)
     switch (info_wanted) {
         case PARROT_OS:
-            return const_string(interp, BUILD_OS_NAME);
+            return Parrot_str_new_constant(interp, BUILD_OS_NAME);
         case PARROT_OS_VERSION:
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
             {

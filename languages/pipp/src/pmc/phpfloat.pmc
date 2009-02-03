@@ -37,7 +37,7 @@ Return the string 'double'.
 
 */
     STRING* name() {
-        return const_string(INTERP, "double");
+        return Parrot_str_new_constant(INTERP, "double");
     }
 
 /*
@@ -62,12 +62,12 @@ Return a representation of this float in the same format as PHP's serialize func
 
         /* PHP's serialized floats stringify the exact value stored rather than
          * just the significant digits.  */
-        serialized = string_printf(INTERP, "%.*f", 100, VTABLE_get_number(INTERP, SELF));
+        serialized = Parrot_str_format_data(INTERP, "%.*f", 100, VTABLE_get_number(INTERP, SELF));
         while (string_ord(INTERP, serialized, zero_index - 1) == '0')
             zero_index--;
 
         serialized = string_chopn(INTERP, serialized, 0 - zero_index);
-        serialized = string_printf(INTERP, "f:%Ss;", serialized);
+        serialized = Parrot_str_format_data(INTERP, "f:%Ss;", serialized);
         RETURN(STRING *serialized);
     }
 
