@@ -66,7 +66,7 @@ Return a representation of this float in the same format as PHP's serialize func
         while (string_ord(INTERP, serialized, zero_index - 1) == '0')
             zero_index--;
 
-        serialized = string_chopn(INTERP, serialized, 0 - zero_index);
+        serialized = Parrot_str_chopn(INTERP, serialized, 0 - zero_index);
         serialized = Parrot_str_format_data(INTERP, "f:%Ss;", serialized);
         RETURN(STRING *serialized);
     }
