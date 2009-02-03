@@ -23,7 +23,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'test_more.pir'
 
     # set a test plan
-    plan(258)
+    plan(259)
 
     'size/resize'()
     'clone'()
@@ -57,6 +57,8 @@ out-of-bounds test. Checks INT and PMC keys.
     'unshift_string'()
     'unshift_integer'()
     'unshift_float'()
+
+    'unshift_string_resize_threshold'()
 
     'does'()
 #    'get_string'()
@@ -1025,6 +1027,56 @@ exception:
     $S0 = array[0]
     is($I0, 2,       "unshift_string (shrink, grow) - elements")
     is($S0, "three", "unshift_string (shrink, grow) - value")
+.end
+
+
+#
+# Test unshifting STRINGs onto an array
+# that is at the default resize_threshold(8).
+# Trac ticket# 256
+#
+.sub 'unshift_string_resize_threshold'
+    .local pmc rsarray
+    rsarray = new ['ResizableStringArray']
+
+    push rsarray, "1"
+    push rsarray, "2"
+    push rsarray, "3"
+    push rsarray, "4"
+    push rsarray, "5"
+    push rsarray, "6"
+    push rsarray, "7"
+    push rsarray, "8"
+# rsarray is now:  1  2  3  4  5  6  7  8
+
+# This unshift will cause a resize larger than the
+# initial resize_threshold (8), triggering the bug.
+    unshift rsarray, "0"
+
+# rsarray should now be   : 0  1  2  3  4  5  6  7  8
+# The bug causes it to be : 0  2  3  4  5  6  7  8  ""
+
+    $S0 = rsarray[0]
+    $S1 = rsarray[1]
+    $S2 = rsarray[2]
+    $S3 = rsarray[3]
+    $S4 = rsarray[4]
+    $S5 = rsarray[5]
+    $S6 = rsarray[6]
+    $S7 = rsarray[7]
+    $S8 = rsarray[8]
+
+    $S9  = $S0
+    $S9 .= $S1
+    $S9 .= $S2
+    $S9 .= $S3
+    $S9 .= $S4
+    $S9 .= $S5
+    $S9 .= $S6
+    $S9 .= $S7
+    $S9 .= $S8
+
+    is( $S9, "012345678", 'Unshift prepends at array instead of overlaying' )
 .end
 
 

@@ -464,10 +464,10 @@ of the array.
         STRING  **str_array;
         UINTVAL   size, i;
 
-        GET_ATTR_str_array(INTERP, SELF, str_array);
         GET_ATTR_size(INTERP, SELF, size);
         SELF.set_integer_native(size + 1);
 
+        GET_ATTR_str_array(INTERP, SELF, str_array);
         for (i = size; i; --i)
             str_array[i] = str_array[i - 1];
 
