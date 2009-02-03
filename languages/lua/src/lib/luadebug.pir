@@ -255,7 +255,8 @@ Sets the environment of the given C<object> to the given C<table>.
 =item C<debug.sethook (hook, mask [, count])>
 
 Sets the given function as a hook. The string C<mask> and the number C<count>
-describe when the hook will be called. The string mask may have the following characters, with the given meaning:
+describe when the hook will be called. The string mask may have the following
+characters, with the given meaning:
 
 =over 4
 

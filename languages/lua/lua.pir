@@ -61,7 +61,8 @@ default prompts are "> " and ">> ".
 
 =item B<->
 
-load and execute the standard input as a file, that is, not interactively, even when the standard input is a terminal.
+load and execute the standard input as a file, that is, not interactively,
+even when the standard input is a terminal.
 
 =item B<-e> I<stat>
 
