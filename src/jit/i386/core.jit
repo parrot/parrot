@@ -1146,7 +1146,7 @@ TEMPLATE Parrot_eq_sx_sx_ic {
     push_<typ1>(1);
     Parrot_jit_emit_get_INTERP(interp, jit_info->native_ptr, emit_ECX);
     emitm_pushl_r(NATIVECODE, emit_ECX);
-    CALL_FUNCTION(jit_info, Parrot_str_equal);
+    CALL_FUNCTION(jit_info, Parrot_str_not_equal);
     emitm_addb_i_r(NATIVECODE, 12, emit_ESP);
     jit_emit_test_r_i(NATIVECODE, emit_EAX);
     jit_emit_jcc(jit_info, <op>, *INT_CONST[3]);
