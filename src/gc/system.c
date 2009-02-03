@@ -16,6 +16,8 @@ sets up a trace of the system stack using two marker addresses as
 boundaries. The code to actually perform the trace of a memory block
 between two boundaries is located in C<src/gc/api.c:trace_mem_block>.
 
+TT #273: This file needs to be cleaned up significantly.
+
 =head2 Functions
 
 =over 4
@@ -66,6 +68,7 @@ trace_system_areas(PARROT_INTERP)
            assembly language to create a small function that flushes the
            register windows. Store the code in a union with a double to
            ensure proper memory alignment. */
+        /* TT #271: This needs to be fixed in a variety of ways */
         static union {
             unsigned int insns[4];
             double align_hack[2];
