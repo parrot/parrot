@@ -3099,7 +3099,7 @@ Parrot_str_split(PARROT_INTERP,
     PMC    *res;
     INTVAL  slen, dlen, ps, pe;
 
-    if(STRING_IS_NULL(delim) || STRING_IS_NULL(str))
+    if (STRING_IS_NULL(delim) || STRING_IS_NULL(str))
         return PMCNULL;
 
     res  = pmc_new(interp, enum_class_ResizableStringArray);
