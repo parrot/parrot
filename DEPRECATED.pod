@@ -102,10 +102,6 @@ if the arg is a Namespace or Class PMC
 
 See TT #159
 
-=item * all socket-related opcodes [post 0.9.0]
-
-The socket-related opcodes will all be replaced with method calls. See TT #221.
-
 =back
 
 =head1 Functions
