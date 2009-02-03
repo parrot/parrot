@@ -29,7 +29,7 @@ with this option.
 
 Rakudo Perl (languages/perl6) will be moving to its own repository
 shortly after the 0.9.0 release.  The new location is yet to be
-determined.
+determined. See TT #267.
 
 =back
 
