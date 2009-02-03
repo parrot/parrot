@@ -238,7 +238,7 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 
         if (!PMC_IS_NULL(lib_name)) {
             const STRING * const name = VTABLE_get_string(interp, lib_name);
-            if (Parrot_str_equal(interp, name, hll_lib) == 0)
+            if (Parrot_str_not_equal(interp, name, hll_lib) == 0)
                 break;
         }
     }

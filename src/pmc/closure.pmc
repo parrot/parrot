@@ -209,7 +209,7 @@ Invokes the closure.
                 if (PMC_IS_NULL(outer))
                     continue;
 
-                if (0 == Parrot_str_equal(INTERP, PMC_sub(outer)->subid,
+                if (0 == Parrot_str_not_equal(INTERP, PMC_sub(outer)->subid,
                             PMC_sub(sub->outer_sub)->subid)) {
                     sub->outer_sub = outer;
                     break;

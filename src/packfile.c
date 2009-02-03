@@ -4251,7 +4251,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(struct PackFile_Annotations
     STRING *key_name = PF_CONST(self->code, key)->u.string;
     for (i = 0; i < self->num_keys; i++) {
         STRING *test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
-        if (Parrot_str_equal(interp, test_key, key_name) == 0) {
+        if (Parrot_str_not_equal(interp, test_key, key_name) == 0) {
             key_id = i;
             break;
         }
@@ -4365,7 +4365,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(struct PackFile_Annotations *se
     if (key != NULL) {
         for (i = 0; i < self->num_keys; i++) {
             STRING *test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
-            if (Parrot_str_equal(interp, test_key, key) == 0) {
+            if (Parrot_str_not_equal(interp, test_key, key) == 0) {
                 key_id = i;
                 break;
             }
@@ -4496,7 +4496,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
     pbc = CONST_STRING(interp, "pbc");
-    if (Parrot_str_equal(interp, ext, pbc) == 0)
+    if (Parrot_str_not_equal(interp, ext, pbc) == 0)
         file_type = PARROT_RUNTIME_FT_PBC;
     else
         file_type = PARROT_RUNTIME_FT_SOURCE;

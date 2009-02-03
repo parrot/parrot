@@ -259,7 +259,7 @@ void Parrot_str_downcase_inplace(PARROT_INTERP, ARGMOD(STRING *s))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_str_equal(PARROT_INTERP,
+INTVAL Parrot_str_not_equal(PARROT_INTERP,
     ARGIN_NULLOK(const STRING *s1),
     ARGIN_NULLOK(const STRING *s2))
         __attribute__nonnull__(1);
@@ -612,7 +612,7 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_downcase_inplace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
-#define ASSERT_ARGS_Parrot_str_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_str_not_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_str_escape __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

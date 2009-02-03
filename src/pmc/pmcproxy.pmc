@@ -137,7 +137,7 @@ Initializes a PMCProxy PMC.
         for (i = 1; i < mro_length; i++) {
             PMC    *pclass = VTABLE_get_pmc_keyed_int(interp, interp->vtables[type_num]->mro, i);
             STRING *cname  = pclass->vtable->whoami;
-            if (Parrot_str_equal(interp, cname, CONST_STRING(interp, "scalar")) != 0) {
+            if (Parrot_str_not_equal(interp, cname, CONST_STRING(interp, "scalar")) != 0) {
                 PMC *pproxy = Parrot_oo_get_class_str(interp, cname);
                 VTABLE_push_pmc(interp, proxy_info->all_parents, pproxy);
             }
@@ -263,7 +263,7 @@ Returns whether the class is or inherits from C<*classname>.
         classname = VTABLE_get_string(interp, classobj);
 
         /* Check if the passed name is the same as the stored short name. */
-        if (Parrot_str_equal(interp, classname, _proxy->name) == 0)
+        if (Parrot_str_not_equal(interp, classname, _proxy->name) == 0)
             return 1;
 
         /* Check if the class object is the same as self's class object */
@@ -271,7 +271,7 @@ Returns whether the class is or inherits from C<*classname>.
             return 1;
 
         /* Check if the passed name is the same as the fully qualified name. */
-        if (Parrot_str_equal(interp, classname, VTABLE_get_string(interp, SELF)) == 0)
+        if (Parrot_str_not_equal(interp, classname, VTABLE_get_string(interp, SELF)) == 0)
             return 1;
 
         /* Look in the isa hash. */
@@ -306,7 +306,7 @@ Returns whether the class is or inherits from C<*classname>.
         Parrot_Class_attributes * const _proxy = PARROT_CLASS(SELF);
         const STRING * const pmc_proxy = CONST_STRING(interp, "PMCProxy");
 
-        if (Parrot_str_equal(INTERP, classname, pmc_proxy) == 0)
+        if (Parrot_str_not_equal(INTERP, classname, pmc_proxy) == 0)
             return 1;
 
         if (SUPER(classname))

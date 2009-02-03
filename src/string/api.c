@@ -1456,7 +1456,7 @@ Parrot_str_compare(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(c
 
 /*
 
-=item C<INTVAL Parrot_str_equal>
+=item C<INTVAL Parrot_str_not_equal>
 
 Compares two Parrot strings, performing type and encoding conversions if
 necessary.
@@ -1471,9 +1471,9 @@ otherwise.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
+Parrot_str_not_equal(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1), ARGIN_NULLOK(const STRING *s2))
 {
-    ASSERT_ARGS(Parrot_str_equal)
+    ASSERT_ARGS(Parrot_str_not_equal)
     if ((s1 == s2) || (!s1 && !s2)) {
         return 0;
     }

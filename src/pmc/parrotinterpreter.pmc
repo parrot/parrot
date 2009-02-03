@@ -382,12 +382,12 @@ Introspection interface. C<key> can be:
 
         Parrot_Context *ctx;
 
-        if (Parrot_str_equal(interp, item, s) == 0)
+        if (Parrot_str_not_equal(interp, item, s) == 0)
             return interp->root_namespace;
 
         s     = CONST_STRING(interp, "outer");
 
-        if (Parrot_str_equal(interp, item, s) == 0) {
+        if (Parrot_str_not_equal(interp, item, s) == 0) {
             outer   = item;
             nextkey = key_next(INTERP, key);
 
@@ -439,27 +439,27 @@ Introspection interface. C<key> can be:
 
         s = CONST_STRING(interp, "sub");
 
-        if (Parrot_str_equal(interp, item, s) == 0)
+        if (Parrot_str_not_equal(interp, item, s) == 0)
             return ctx->current_sub;
 
         s = CONST_STRING(interp, "lexpad");
 
-        if (Parrot_str_equal(interp, item, s) == 0)
+        if (Parrot_str_not_equal(interp, item, s) == 0)
             return ctx->lex_pad;
 
         s = CONST_STRING(interp, "namespace");
 
-        if (Parrot_str_equal(interp, item, s) == 0)
+        if (Parrot_str_not_equal(interp, item, s) == 0)
             return ctx->current_namespace;
 
         s = CONST_STRING(interp, "continuation");
 
-        if (Parrot_str_equal(interp, item, s) == 0)
+        if (Parrot_str_not_equal(interp, item, s) == 0)
             return VTABLE_clone(interp, ctx->current_cont);
 
         s = CONST_STRING(interp, "annotations");
 
-        if (Parrot_str_equal(interp, item, s) == 0) {
+        if (Parrot_str_not_equal(interp, item, s) == 0) {
             PMC *sub = ctx->current_sub;
             if (ctx == CONTEXT(interp)) {
                 /* We can't know the current program counter for the currently

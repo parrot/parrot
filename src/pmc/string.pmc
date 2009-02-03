@@ -447,7 +447,7 @@ they match.
     VTABLE INTVAL is_equal(PMC *value) {
         STRING * const s = VTABLE_get_string(INTERP, SELF);
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(0 == Parrot_str_equal(INTERP, s, v));
+        return (INTVAL)(0 == Parrot_str_not_equal(INTERP, s, v));
     }
 
 /*
@@ -480,7 +480,7 @@ Compares the string with C<value>; returns FALSE if they match.
     VTABLE INTVAL is_equal_string(PMC *value) {
         STRING * const s = VTABLE_get_string(INTERP, SELF);
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return Parrot_str_equal(INTERP, s, v) == 0;
+        return Parrot_str_not_equal(INTERP, s, v) == 0;
     }
 
 /*

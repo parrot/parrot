@@ -850,7 +850,7 @@ they match.
     MULTI INTVAL is_equal(LuaString value) {
         STRING *s = PMC_str_val(SELF);
         STRING *v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(0 == Parrot_str_equal(INTERP, s, v));
+        return (INTVAL)(0 == Parrot_str_not_equal(INTERP, s, v));
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
@@ -1006,7 +1006,7 @@ Throws an exception unless C<value> is a LuaString.
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
 
         if (PMC_type(SELF) == PMC_type(value)
-        && 0               == Parrot_str_equal(INTERP, PMC_str_val(SELF),
+        && 0               == Parrot_str_not_equal(INTERP, PMC_str_val(SELF),
                                   VTABLE_get_string(INTERP, value)))
             VTABLE_set_bool(INTERP, retval, 1);
         else

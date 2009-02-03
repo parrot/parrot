@@ -585,7 +585,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
             PMC * const child_pmc        = VTABLE_shift_pmc(interp, iter);
             Parrot_sub * const child_sub = PMC_sub(child_pmc);
             if (!PMC_IS_NULL(child_sub->outer_sub))
-                if (0 == Parrot_str_equal(interp, current_sub->subid,
+                if (0 == Parrot_str_not_equal(interp, current_sub->subid,
                                       PMC_sub(child_sub->outer_sub)->subid)) {
                 old = child_sub->outer_ctx;
                 child_sub->outer_ctx = Parrot_context_ref(interp, ctx);
@@ -603,7 +603,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 
 #if 0
     /* verify that the current sub is sub_pmc's :outer */
-    if (0 != Parrot_str_equal(interp, current_sub->subid,
+    if (0 != Parrot_str_not_equal(interp, current_sub->subid,
                          PMC_sub(sub->outer_sub)->subid)) {
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_OPERATION, "'%Ss' isn't the :outer of '%Ss'",

@@ -775,13 +775,13 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
         STRING *type_name = VTABLE_get_string_keyed_int(interp, type_list, i);
         INTVAL  type;
 
-        if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "DEFAULT"))==0)
+        if (Parrot_str_not_equal(interp, type_name, CONST_STRING(interp, "DEFAULT"))==0)
             type = enum_type_PMC;
-        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "STRING"))==0)
+        else if (Parrot_str_not_equal(interp, type_name, CONST_STRING(interp, "STRING"))==0)
             type = enum_type_STRING;
-        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "INTVAL"))==0)
+        else if (Parrot_str_not_equal(interp, type_name, CONST_STRING(interp, "INTVAL"))==0)
             type = enum_type_INTVAL;
-        else if (Parrot_str_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL"))==0)
+        else if (Parrot_str_not_equal(interp, type_name, CONST_STRING(interp, "FLOATVAL"))==0)
             type = enum_type_FLOATVAL;
         else
             type = pmc_type(interp, type_name);

@@ -545,11 +545,17 @@ Compare two strings to each other. Return 0 if they are equal, 1 if the first
 is greater and -1 if the second is greater. Uses NFG normalization to compare
 the two strings.
 
-=head3 Parrot_str_equal (was string_equal)
+=head3 Parrot_str_equal
 
 Compare two strings, return 1 if they are equal, 0 if they are not equal.
 
-{{DEPRECATION NOTE: The return value is reversed from the current logic.}}
+=head3 Parrot_str_not_equal (was string_equal)
+
+Compare two strings, return 0 if they are equal, 1 if they are not equal.
+
+{{DEPRECATION NOTE: The return value of 'Parrot_str_equal' is reversed from the
+old logic, but 'Parrot_str_not_equal' is provided as a drop-in replacement
+for the old function.}}
 
 =head3 Parrot_str_grapheme_equal
 

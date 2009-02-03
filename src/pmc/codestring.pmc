@@ -86,7 +86,7 @@ A newline is automatically added to the end of the fmt.
             I0   = Parrot_str_to_int(INTERP, key);
             repl = VTABLE_get_string_keyed_int(INTERP, args, I0);
         }
-        else if (0 == Parrot_str_equal(INTERP, key, comma)) {
+        else if (0 == Parrot_str_not_equal(INTERP, key, comma)) {
             repl = VTABLE_get_string_keyed_int(INTERP, args, 0);
             repl = Parrot_str_new_COW(INTERP, repl);
             I1   = VTABLE_elements(INTERP, args);
@@ -99,7 +99,7 @@ A newline is automatically added to the end of the fmt.
                 I0++;
             }
         }
-        else if (0 == Parrot_str_equal(INTERP, key, percent)) {
+        else if (0 == Parrot_str_not_equal(INTERP, key, percent)) {
             repl = percent;
         }
         else {

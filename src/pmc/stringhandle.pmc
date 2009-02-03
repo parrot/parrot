@@ -172,7 +172,7 @@ stored for mocking.
         if (STRING_IS_NULL(old_string)) {
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (!STRING_IS_NULL(encoding)
-            &&  Parrot_str_equal(INTERP, encoding, CONST_STRING(INTERP, "utf8")) == 0)
+            &&  Parrot_str_not_equal(INTERP, encoding, CONST_STRING(INTERP, "utf8")) == 0)
                 new_string = string_make(INTERP, "", 0, "unicode", 0);
             else
                 new_string = Parrot_str_new(INTERP, "", 0);
@@ -339,7 +339,7 @@ StringHandle object that isn't opened yet, returns an empty string.
             STRING *encoding;
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (!STRING_IS_NULL(encoding) &&
-                    Parrot_str_equal(INTERP, encoding, Parrot_str_new_constant(INTERP, "utf8")) == 0)
+                    Parrot_str_not_equal(INTERP, encoding, Parrot_str_new_constant(INTERP, "utf8")) == 0)
                 string_result = string_make(INTERP, "", 0, "unicode", 0);
             else
                 string_result = Parrot_str_new_constant(INTERP, "");
@@ -433,15 +433,15 @@ ignored, but stored for mocking.
         GET_ATTR_flags(INTERP, SELF, flags);
 
         if (got_type) {
-            if (Parrot_str_equal(INTERP, new_type, nobuffer_string) == 0) {
+            if (Parrot_str_not_equal(INTERP, new_type, nobuffer_string) == 0) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string) == 0) {
+            else if (Parrot_str_not_equal(INTERP, new_type, linebuffer_string) == 0) {
                 flags |=   PIO_F_LINEBUF;
                 flags &= ~ PIO_F_BLKBUF;
             }
-            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string) == 0) {
+            else if (Parrot_str_not_equal(INTERP, new_type, fullbuffer_string) == 0) {
                 flags &= ~ PIO_F_LINEBUF;
                 flags |=   PIO_F_BLKBUF;
             }

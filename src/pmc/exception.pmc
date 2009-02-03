@@ -239,7 +239,7 @@ C<key> is "message".
         STRING *name = VTABLE_get_string(INTERP, key);
         STRING *message;
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
+        if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
             GET_ATTR_message(interp, SELF, message);
         }
         else {
@@ -265,16 +265,16 @@ Returns the integer value for C<*key>.
         STRING *name   = VTABLE_get_string(INTERP, key);
         INTVAL  result = 0;
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
+        if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
             GET_ATTR_type(interp, SELF, result);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
             GET_ATTR_severity(interp, SELF, result);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
             GET_ATTR_exit_code(interp, SELF, result);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
             GET_ATTR_handled(interp, SELF, result);
         }
         else {
@@ -299,16 +299,16 @@ Returns the integer value for C<*key>.
     VTABLE INTVAL get_integer_keyed_str(STRING *key) {
         INTVAL result = 0;
 
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "type")) == 0) {
+        if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "type")) == 0) {
             GET_ATTR_type(interp, SELF, result);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "severity")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "severity")) == 0) {
             GET_ATTR_severity(interp, SELF, result);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "exit_code")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "exit_code")) == 0) {
             GET_ATTR_exit_code(interp, SELF, result);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "handled")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "handled")) == 0) {
             GET_ATTR_handled(interp, SELF, result);
         }
         else {
@@ -393,7 +393,7 @@ Sets the Parrot string value for C<*key>.
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
         STRING *name = VTABLE_get_string(INTERP, key);
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
+        if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
             SET_ATTR_message(interp, SELF, value);
         }
         else {
@@ -416,16 +416,16 @@ Sets the integer value for C<*key>.
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         STRING *name = VTABLE_get_string(INTERP, key);
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
+        if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
             SET_ATTR_type(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
             SET_ATTR_severity(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
             SET_ATTR_exit_code(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
             SET_ATTR_handled(interp, SELF, value);
         }
         else {
@@ -446,16 +446,16 @@ Sets the integer value for C<*key>.
 */
 
     VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
-        if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "type")) == 0) {
+        if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "type")) == 0) {
             SET_ATTR_type(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "severity")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "severity")) == 0) {
             SET_ATTR_severity(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "exit_code")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "exit_code")) == 0) {
             SET_ATTR_exit_code(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, key, CONST_STRING(INTERP, "handled")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, key, CONST_STRING(INTERP, "handled")) == 0) {
             SET_ATTR_handled(interp, SELF, value);
         }
         else {
@@ -561,46 +561,46 @@ Retrieve an attribute value for the exception object.
     VTABLE PMC *get_attr_str(STRING *name) {
         PMC *value = PMCNULL;
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
+        if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
                 INTVAL type;
                 GET_ATTR_type(interp, SELF, type);
                 value = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, type);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
                 INTVAL severity;
                 GET_ATTR_severity(interp, SELF, severity);
                 value = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, severity);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
                 INTVAL exit_code;
                 GET_ATTR_exit_code(interp, SELF, exit_code);
                 value = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, exit_code);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
                 INTVAL handled;
                 GET_ATTR_handled(interp, SELF, handled);
                 value = pmc_new(interp, enum_class_Integer);
                 VTABLE_set_integer_native(interp, value, handled);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
                 STRING *message;
                 GET_ATTR_message(interp, SELF, message);
                 value = pmc_new(interp, enum_class_String);
                 VTABLE_set_string_native(interp, value, message);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "payload")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "payload")) == 0) {
                 GET_ATTR_payload(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
                 GET_ATTR_resume(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "backtrace")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "backtrace")) == 0) {
                 GET_ATTR_backtrace(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handler_iter")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "handler_iter")) == 0) {
                 GET_ATTR_handler_iter(interp, SELF, value);
         }
         else {
@@ -623,36 +623,36 @@ Set an attribute value for the exception object.
 */
     VTABLE void set_attr_str(STRING *name, PMC *value) {
 
-        if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
+        if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "type")) == 0) {
             INTVAL type = VTABLE_get_integer(interp, value);
             SET_ATTR_type(interp, SELF, type);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "severity")) == 0) {
             INTVAL severity = VTABLE_get_integer(interp, value);
             SET_ATTR_severity(interp, SELF, severity);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "exit_code")) == 0) {
             INTVAL exit_code = VTABLE_get_integer(interp, value);
             SET_ATTR_exit_code(interp, SELF, exit_code);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "handled")) == 0) {
             INTVAL handled = VTABLE_get_integer(interp, value);
             SET_ATTR_handled(interp, SELF, handled);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "message")) == 0) {
             STRING *message = VTABLE_get_string(interp, value);
             SET_ATTR_message(interp, SELF, message);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "payload")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "payload")) == 0) {
             SET_ATTR_payload(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "resume")) == 0) {
             SET_ATTR_resume(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "backtrace")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "backtrace")) == 0) {
             SET_ATTR_backtrace(interp, SELF, value);
         }
-        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handler_iter")) == 0) {
+        else if (Parrot_str_not_equal(INTERP, name, CONST_STRING(INTERP, "handler_iter")) == 0) {
             SET_ATTR_handler_iter(interp, SELF, value);
         }
         else {
