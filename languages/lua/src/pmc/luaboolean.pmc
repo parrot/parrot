@@ -76,13 +76,13 @@ Class method to construct an Boolean from the string representation C<rep>.
 
 */
     VTABLE PMC* instantiate_str(STRING *rep, INTVAL flags) {
-        const INTVAL type = SELF->vtable->base_type;
+        const INTVAL type = PMC_type(SELF);
         PMC * const res =
             (flags & PObj_constant_FLAG)
                 ? constant_pmc_new(INTERP, type)
                 : pmc_new(INTERP, type);
-
-        SET_ATTR_iv(INTERP, res, Parrot_str_to_int(INTERP, rep) != 0);
+        const INTVAL iv = Parrot_str_to_int(INTERP, rep) != 0;
+        SET_ATTR_iv(INTERP, res, iv);
         return res;
     }
 
@@ -110,7 +110,7 @@ Creates and returns a clone of the scalar.
 */
     VTABLE PMC* clone() {
         INTVAL iv;
-        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC *dest = pmc_new(INTERP, PMC_type(SELF));
         GET_ATTR_iv(INTERP, SELF, iv);
         SET_ATTR_iv(INTERP, dest, iv);
         return dest;
@@ -264,8 +264,8 @@ Used to unarchive the boolean.
     METHOD PMC* rawequal(PMC *value) {
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
 
-        if (PMC_type(SELF)    == PMC_type(value)
-        &&  VTABLE_get_integer(INTERP, SELF) == VTABLE_get_integer(INTERP, value))
+        if (PMC_type(SELF) == PMC_type(value)
+         && VTABLE_get_integer(INTERP, SELF) == VTABLE_get_integer(INTERP, value))
             VTABLE_set_integer_native(INTERP, retval, 1);
         else
             VTABLE_set_integer_native(INTERP, retval, 0);

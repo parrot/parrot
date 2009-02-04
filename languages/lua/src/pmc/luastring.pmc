@@ -228,7 +228,7 @@ Return length of the string.
 
 */
     VTABLE INTVAL elements() {
-        return Parrot_str_byte_length(INTERP, PMC_str_val(SELF));
+        return Parrot_str_byte_length(INTERP, SELF.get_string());
     }
 
 /*
@@ -241,9 +241,9 @@ Used to archive the string.
 
 */
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        VTABLE_push_string(INTERP, io, PMC_str_val(SELF));
+        VTABLE_push_string(INTERP, io, SELF.get_string());
     }
 
 /*
@@ -256,10 +256,10 @@ Used to unarchive the string.
 
 */
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            PMC_str_val(SELF) = VTABLE_shift_string(INTERP, io);
+            SELF.set_string_native(VTABLE_shift_string(INTERP, io));
     }
 
 /*
@@ -300,7 +300,7 @@ Used to unarchive the string.
     }
 
     MULTI PMC* add(DEFAULT value, PMC *dest) {
-        PMC *meth = find_meth(INTERP, value, "__add");
+        PMC * const meth = find_meth(INTERP, value, "__add");
         if (meth) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (PMC_IS_NULL(dest))
@@ -348,7 +348,7 @@ Used to unarchive the string.
     }
 
     MULTI void i_add(DEFAULT value) {
-        PMC *meth = find_meth(INTERP, value, "__add");
+        PMC * const meth = find_meth(INTERP, value, "__add");
         if (meth) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (PMC_IS_NULL(SELF))
@@ -394,7 +394,7 @@ Used to unarchive the string.
     }
 
     MULTI PMC* subtract(DEFAULT value, PMC *dest) {
-        PMC *meth = find_meth(INTERP, value, "__sub");
+        PMC * const meth = find_meth(INTERP, value, "__sub");
         if (meth) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (PMC_IS_NULL(dest))
@@ -442,7 +442,7 @@ Used to unarchive the string.
     }
 
     MULTI void i_subtract(DEFAULT value) {
-        PMC *meth = find_meth(INTERP, value, "__sub");
+        PMC * const meth = find_meth(INTERP, value, "__sub");
 
         if (meth) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -489,7 +489,7 @@ Used to unarchive the string.
     }
 
     MULTI PMC* multiply(DEFAULT value, PMC *dest) {
-        PMC *meth = find_meth(INTERP, value, "__mul");
+        PMC * const meth = find_meth(INTERP, value, "__mul");
         if (meth) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (PMC_IS_NULL(dest))
@@ -537,7 +537,7 @@ Used to unarchive the string.
     }
 
     MULTI void i_multiply(DEFAULT value) {
-        PMC *meth = find_meth(INTERP, value, "__mul");
+        PMC * const meth = find_meth(INTERP, value, "__mul");
         if (meth) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (PMC_IS_NULL(SELF))
@@ -583,7 +583,7 @@ Used to unarchive the string.
     }
 
     MULTI PMC* divide(DEFAULT value, PMC *dest) {
-        PMC *meth = find_meth(INTERP, value, "__div");
+        PMC * const meth = find_meth(INTERP, value, "__div");
 
         if (meth) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -632,7 +632,7 @@ Used to unarchive the string.
     }
 
     MULTI void i_divide(DEFAULT value) {
-        PMC *meth = find_meth(INTERP, value, "__div");
+        PMC * const meth = find_meth(INTERP, value, "__div");
         if (meth) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (PMC_IS_NULL(SELF))
@@ -678,7 +678,7 @@ Used to unarchive the string.
     }
 
     MULTI PMC* modulus(DEFAULT value, PMC *dest) {
-        PMC *meth = find_meth(INTERP, value, "__mod");
+        PMC * const meth = find_meth(INTERP, value, "__mod");
 
         if (meth) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -727,7 +727,7 @@ Used to unarchive the string.
     }
 
     MULTI void i_modulus(DEFAULT value) {
-        PMC *meth = find_meth(INTERP, value, "__mod");
+        PMC * const meth = find_meth(INTERP, value, "__mod");
         if (meth) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
             if (PMC_IS_NULL(SELF))
@@ -773,7 +773,7 @@ Used to unarchive the string.
     }
 
     MULTI PMC* pow(DEFAULT value, PMC *dest) {
-        PMC *meth = find_meth(INTERP, value, "__pow");
+        PMC * const meth = find_meth(INTERP, value, "__pow");
 
         if (meth) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -822,7 +822,7 @@ Used to unarchive the string.
     }
 
     MULTI void i_pow(DEFAULT value) {
-        PMC *meth = find_meth(INTERP, value, "__pow");
+        PMC * const meth = find_meth(INTERP, value, "__pow");
 
         if (meth) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -848,8 +848,8 @@ they match.
 
 */
     MULTI INTVAL is_equal(LuaString value) {
-        STRING *s = PMC_str_val(SELF);
-        STRING *v = VTABLE_get_string(INTERP, value);
+        STRING * const s = SELF.get_string();
+        STRING * const v = VTABLE_get_string(INTERP, value);
         return (INTVAL)(0 == Parrot_str_not_equal(INTERP, s, v));
     }
 
@@ -871,8 +871,8 @@ Throws an exception unless C<value> is a LuaString.
 
 */
     MULTI INTVAL cmp(LuaString value) {
-        STRING *s = PMC_str_val(SELF);
-        STRING *v = VTABLE_get_string(INTERP, value);
+        STRING * const s = SELF.get_string();
+        STRING * const v = VTABLE_get_string(INTERP, value);
         return Parrot_str_compare(INTERP, s, v);
     }
 
@@ -890,7 +890,7 @@ Throws an exception unless C<value> is a LuaString.
 
 */
     MULTI PMC* concatenate(LuaNumber value, PMC *dest) {
-        STRING *s = Parrot_str_concat(INTERP,
+        STRING * const s = Parrot_str_concat(INTERP,
             SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
 
         dest = pmc_new(INTERP, dynpmc_LuaString);
@@ -899,7 +899,7 @@ Throws an exception unless C<value> is a LuaString.
     }
 
     MULTI PMC* concatenate(LuaString value, PMC *dest) {
-        STRING *s = Parrot_str_concat(INTERP,
+        STRING * const s = Parrot_str_concat(INTERP,
             SELF.get_string(), VTABLE_get_string(INTERP, value), 0);
 
         dest = pmc_new(INTERP, dynpmc_LuaString);
@@ -908,7 +908,7 @@ Throws an exception unless C<value> is a LuaString.
     }
 
     MULTI PMC* concatenate(DEFAULT value, PMC *dest) {
-        PMC *meth = find_meth(INTERP, value, "__concat");
+        PMC * const meth = find_meth(INTERP, value, "__concat");
 
         if (meth) {
             dest = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -931,19 +931,19 @@ Throws an exception unless C<value> is a LuaString.
 
 */
     MULTI void i_concatenate(LuaNumber value) {
-        STRING *s = SELF.get_string();
-        STRING *v = VTABLE_get_string(INTERP, value);
+        STRING * const s = SELF.get_string();
+        STRING * const v = VTABLE_get_string(INTERP, value);
         SELF.set_string_native(Parrot_str_append(INTERP, s, v));
     }
 
     MULTI void i_concatenate(LuaString value) {
-        STRING *s = SELF.get_string();
-        STRING *v = VTABLE_get_string(INTERP, value);
+        STRING * const s = SELF.get_string();
+        STRING * const v = VTABLE_get_string(INTERP, value);
         SELF.set_string_native(Parrot_str_append(INTERP, s, v));
     }
 
     MULTI void i_concatenate(DEFAULT value) {
-        PMC *meth = find_meth(INTERP, value, "__concat");
+        PMC * const meth = find_meth(INTERP, value, "__concat");
 
         if (meth) {
             SELF = Parrot_runops_fromc_args(INTERP, meth, "PPP", SELF, value);
@@ -1006,7 +1006,7 @@ Throws an exception unless C<value> is a LuaString.
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
 
         if (PMC_type(SELF) == PMC_type(value)
-        && 0               == Parrot_str_not_equal(INTERP, PMC_str_val(SELF),
+        && 0               == Parrot_str_not_equal(INTERP, SELF.get_string(),
                                   VTABLE_get_string(INTERP, value)))
             VTABLE_set_bool(INTERP, retval, 1);
         else
@@ -1023,11 +1023,10 @@ Throws an exception unless C<value> is a LuaString.
 
 */
     METHOD PMC* tonumber() {
-        PMC     *retval;
-        STRING  *rep = SELF.get_string();
-        char    *s1  = Parrot_str_to_cstring(INTERP, rep);
-        char    *s2;
-        FLOATVAL d   = strtod(s1, &s2);
+        PMC *retval;
+        char * const s1 = Parrot_str_to_cstring(INTERP, SELF.get_string());
+        char *s2;
+        const FLOATVAL d = strtod(s1, &s2);
 
         /* at least one valid digit? */
         if (s1 != s2) {
@@ -1056,11 +1055,10 @@ Throws an exception unless C<value> is a LuaString.
 
 */
     METHOD PMC* tobase(INTVAL base) {
-        PMC          *retval;
-        STRING       *rep = SELF.get_string();
-        char         *s1  = Parrot_str_to_cstring(INTERP, rep);
-        char         *s2;
-        unsigned long n   = strtoul(s1, &s2, base);
+        PMC *retval;
+        char * const s1 = Parrot_str_to_cstring(INTERP, SELF.get_string());
+        char *s2;
+        const unsigned long n = strtoul(s1, &s2, base);
 
         /* at least one valid digit? */
         if (s1 != s2) {

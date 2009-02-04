@@ -50,12 +50,11 @@ Allow :
 
 */
     VTABLE PMC* instantiate_str(STRING *rep, INTVAL flags) {
-        PMC *res;
-        INTVAL type = PMC_type(SELF);
-        if (flags & PObj_constant_FLAG)
-            res = constant_pmc_new(INTERP, type);
-        else
-            res = pmc_new(INTERP, type);
+        const INTVAL type = PMC_type(SELF);
+        PMC * const res =
+            (flags & PObj_constant_FLAG)
+                ? constant_pmc_new(INTERP, type)
+                : pmc_new(INTERP, type);
         return res;
     }
 

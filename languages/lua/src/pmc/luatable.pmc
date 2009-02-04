@@ -508,7 +508,7 @@ C<table> accessor.
         if (pvalue)
             value = *pvalue;
         else {
-            PMC *meth = find_meth(INTERP, SELF, "__index");
+            PMC * const meth = find_meth(INTERP, SELF, "__index");
             if (meth) {
                 if (dynpmc_LuaFunction == PMC_type(meth)) {
                     value = Parrot_runops_fromc_args(INTERP, meth, "PPP",
@@ -536,7 +536,7 @@ C<table> mutator.
 */
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         if (! lua_get(INTERP, PMC_hash(SELF), key)) {
-            PMC *meth = find_meth(INTERP, SELF, "__newindex");
+            PMC * const meth = find_meth(INTERP, SELF, "__newindex");
             if (meth) {
                 if (dynpmc_LuaFunction == PMC_type(meth)) {
                     Parrot_runops_fromc_args(INTERP, meth, "vPPP", SELF,
@@ -605,7 +605,7 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     MULTI INTVAL is_equal(LuaTable value) {
-        PMC *meth = find_meth(INTERP, SELF, "__eq");
+        PMC * const meth = find_meth(INTERP, SELF, "__eq");
         if (meth) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                    SELF, value);
@@ -635,7 +635,7 @@ The C<==> operation. Compares reference (not in depth).
 */
     MULTI INTVAL cmp(LuaTable value) {
 #if 0
-        PMC *meth = find_meth(INTERP, SELF, "__cmp");
+        PMC * const meth = find_meth(INTERP, SELF, "__cmp");
         if (meth) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                    SELF, value);
@@ -644,7 +644,7 @@ The C<==> operation. Compares reference (not in depth).
                 return (INTVAL)VTABLE_get_number(INTERP, retval);
         }
 #else
-        PMC *_lt = find_meth(INTERP, SELF, "__lt");
+        PMC * const _lt = find_meth(INTERP, SELF, "__lt");
 
         if (_lt) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
@@ -654,7 +654,7 @@ The C<==> operation. Compares reference (not in depth).
             if (r)
                 return (INTVAL)-1;
             else {
-                PMC *_le = find_meth(INTERP, SELF, "__le");
+                PMC * const _le = find_meth(INTERP, SELF, "__le");
                 if (_le) {
                     retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
                                                       SELF, value);
