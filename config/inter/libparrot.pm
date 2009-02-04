@@ -44,14 +44,38 @@ sub runstep {
 
     # Parrot can't necessarily handle a pre-existing installed shared
     # libparrot.so. At this point, we don't know the actual name
-    # of the shared parrot library. However, 'libparrot.so' will catch
-    # at least some of the problems.
-    # RT#52288: the check for old_versions should be improved
-    my $old_version
-        = File::Spec->catfile($conf->data->get('libdir'), 'libparrot.so');
-    if (-e $old_version) {
-        warn("\nWarning: Building a shared parrot library may conflict " .
-             "with your previously-installed $old_version\n");
+    # of the shared parrot library. So we try some candidates.
+    # See RT #52288: the check for old_versions should be improved
+    my @libs = ('libparrot.so');
+    my @libpaths = ('/usr/local/lib', '/usr/lib', $conf->data->get('libdir'));
+    if ($^O eq 'MSWin32') {
+        push @libpaths, (split /;/, $ENV{PATH});
+        @libs = ('libparrot.dll', 'libparrot.lib', 'libparrot.dll.a');
+    }
+    if ($^O eq 'cygwin') {
+        my @parrot_version = Parrot::BuildUtil::parrot_version();
+        my $dllsuffix = join("_",@parrot_version);
+        push @libpaths, ('/usr/bin/');
+        push @libpaths, (split /;/, $ENV{PATH});
+        @libs = ('libparrot.dll.a', 'cygparrot.dll', "cygparrot$dllsuffix.dll");
+    }
+    if (defined $ENV{LD_LIBRARY_PATH}) {
+        push @libpaths, (split /:/, $ENV{LD_LIBRARY_PATH});
+    }
+    if (defined $ENV{LD_RUN_PATH}) {
+        push @libpaths, (split /:/, $ENV{LD_RUN_PATH});
+    }
+    if (defined $ENV{DYLD_LIBRARY_PATH}) {
+        push @libpaths, (split /:/, $ENV{DYLD_LIBRARY_PATH});
+    }
+    foreach my $f (@libs) {
+        foreach my $d (@libpaths) {
+            my $oldversion = File::Spec->catfile($d, $f);
+            if (-e $oldversion) {
+                warn("\nWarning: Building a shared parrot library may conflict " .
+                     "with your previously-installed $oldversion\n");
+            }
+        }
     }
 
     if (
