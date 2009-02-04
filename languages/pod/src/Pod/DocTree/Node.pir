@@ -1,35 +1,42 @@
+# Copyright (C) 2009, The Perl Foundation.
+# $Id$
+
 =head1 NAME
 
-Pod;DocTree - Pod Document Tree
+Pod DocTree nodes.
 
 =head1 DESCRIPTION
 
-This file implements the various node types for Pod;DocTree, a tree
-representation of a Pod document.
+This file implements the various abstract syntax tree nodes
+for Pod.
 
 =cut
 
 .namespace [ 'Pod';'DocTree';'Node' ]
 
 .sub 'onload' :anon :load :init
-    ##   create the Pod;DocTree;Node base class
-    load_bytecode 'P6object.pbc'
-    .local pmc p6meta, parent, base
+    .local pmc p6meta, base
     p6meta = new 'P6metaclass'
-    parent = get_class ['PCT';'Node']
-    base = p6meta.'new_class'('Pod::DocTree::Node', 'parent'=>parent)
+    base = p6meta.'new_class'('Pod::DocTree::Node', 'parent'=>'PAST::Node')
 
-    p6meta.'new_class'('Pod::DocTree::File',        'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Heading',     'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Block',       'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::List',        'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Item',        'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Text',        'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Format',      'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Paragraph',   'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Literal',     'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::File', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Heading', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Text', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Block', 'parent'=>base)
+
+    p6meta.'new_class'('Markdown::Emphasis', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Entity', 'parent'=>base)
+    p6meta.'new_class'('Markdown::HorizontalRule', 'parent'=>base)
+    p6meta.'new_class'('Markdown::ItemizedList', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Line', 'parent'=>base)
+    p6meta.'new_class'('Markdown::ListItem', 'parent'=>base)
+    p6meta.'new_class'('Markdown::OrderedList', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Para', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Space', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Strong', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Title', 'parent'=>base)
+    p6meta.'new_class'('Markdown::Word', 'parent'=>base)
 .end
-
 
 
 =head1 Pod;DocTree Node Types
@@ -200,6 +207,132 @@ original Pod). Literals have multiple children, which may be text sections
 or format nodes.
 
 =cut
+
+
+
+=head1 NAME
+
+Pod::HTML::Compiler - Pod AST Compiler
+
+=head1 DESCRIPTION
+
+Pod::HTML::Compiler implements a compiler for Pod AST nodes.
+
+=head1 METHODS
+
+=over
+
+=cut
+
+.namespace [ 'Pod';'HTML';'Compiler' ]
+
+.sub '__onload' :anon :load :init
+    $P0 = get_hll_global 'P6metaclass'
+    $P0 = $P0.'new_class'('Pod::HTML::Compiler')
+.end
+
+.sub 'to_html' :method
+    .param pmc past
+    .param pmc adverbs         :slurpy :named
+
+    .tailcall self.'html'(past)
+.end
+
+.sub 'xml_escape' :anon
+    .param string str
+    $P0 = split '&', str
+    str = join '&amp;', $P0
+    $P0 = split '<', str
+    str = join '&lt;', $P0
+    $P0 = split '>', str
+    str = join '&gt;', $P0
+    .return (str)
+.end
+
+=item html_children(node)
+
+Return generated HTML for all of its children.
+
+=cut
+
+.sub 'html_children' :method
+    .param pmc node
+    .local pmc code, iter
+    code = new 'CodeString'
+    iter = node.'iterator'()
+  iter_loop:
+    unless iter goto iter_end
+    .local pmc cpast
+    cpast = shift iter
+    $P0 = self.'html'(cpast)
+    code .= $P0
+    goto iter_loop
+  iter_end:
+    .return (code)
+.end
+
+
+=item html(Any node)
+
+=cut
+
+.sub 'html' :method :multi(_,_)
+    .param pmc node
+    .tailcall self.'html_children'(node)
+.end
+
+
+=item html(Pod::DocTree::File node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Pod';'DocTree';'File'])
+    .param pmc node
+    .tailcall self.'html_children'(node)
+.end
+
+
+=item html(Pod::DocTree::Heading node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Pod';'DocTree';'Heading'])
+    .param pmc node
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<h"
+    $S1 = node.'level'()
+    $S0 .= $S1
+    $S0 .= ">"
+    set code, $S0
+
+    .return (code)
+.end
+
+
+=item html(Pod::DocTree::Text node)
+
+=cut
+
+.sub 'html' :method :multi(_,['Pod';'DocTree';'Text'])
+    .param pmc node
+    #$S1 = self.'html_children'(node)
+    #$S2 = node.'level'()
+    .local pmc code
+    new code, 'CodeString'
+    $S0 = "<text>"
+    set code, $S0
+    .return (code)
+.end
+
+
+
+=back
+
+=cut
+
+
+
 
 # Local Variables:
 #   mode: pir

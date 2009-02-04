@@ -1,14 +1,35 @@
+# Copyright (C) 2009, The Perl Foundation.
+# $Id$
+
 =head1 TITLE
 
 pod.pir - A Pod compiler.
 
-=head2 Description
+=head1 SYNOPSIS
+
+as a command line (without interactive mode) :
+
+    $ parrot markdown.pbc document.text
+    $ parrot markdown.pbc --target=parse document.text
+                                   PAST
+                                   HTML
+
+or as a library :
+
+     load_bytecode 'markdown.pbc'
+     $P0 = compreg 'markdown'
+     $S0 = <<'MARKDOWN'
+ Title
+ =====
+ Some text.
+ MARKDOWN
+     $P1 = $P0.'compile'($S0)
+     $S0 = $P1()
+     print $S0
+
+=head1 DESCRIPTION
 
 This is the base file for the Pod compiler.
-
-This file includes the parsing and grammar rules from
-the src/ directory, loads the relevant PGE libraries,
-and registers the compiler under the name 'Pod'.
 
 =head2 Functions
 
@@ -21,59 +42,27 @@ object.
 
 =cut
 
-
-
-.HLL 'pod'
-
-.loadlib 'pod_group'
-
-.include 'src/Pod/DocTree/Node.pir'
-
-.namespace [ 'Pod';'DocTree';'Compiler' ]
-
-.sub 'to_html' :method
-    .param pmc node
-    .param pmc adverbs :slurpy :named
-.end
-
-.sub 'as_html' :method :multi(_,['Pod';'DocTree';'File'])
-    .param pmc node
-    .local string html
-    html = "<html>"
-
-
-    html .= "</html>"
-
-    .return (html)
-.end
-
-
-.sub 'as_html' :method :multi(_,['Pod';'DocTree';'Heading'])
-    .param pmc node
-    .local string html
-    .local string level
-    # create opening heading tag, e.g. <h1>
-    html = "<h"
-    $I0  = node."level"()
-    level = $I0
-    html .= level
-    html .= ">"
-
-    # create closin heading tag, e.g. </h1>
-    html .= "</h"
-    html .= level
-    html .= ">"
-
-.end
-
-
-
 .namespace [ 'Pod';'Compiler' ]
 
-.sub 'doctree' :method
-    .param pmc node
-    .param pmc adverbs :slurpy :named
+.sub 'onload' :anon :load :init
+    load_bytecode 'PCT.pbc'
+
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+    $P0 = p6meta.'new_class'('Pod::Compiler', 'parent'=>'PCT::HLLCompiler')
+    $P1 = $P0.'new'()
+    $P1.'language'('pod')
+    $P1.'parsegrammar'('Pod::Grammar')
+    $P1.'parseactions'('Pod::Grammar::Actions')
+    $P1.'removestage'('post')
+    $P1.'addstage'('html', 'before' => 'pir')
 .end
+
+=item html(source [, adverbs :slurpy :named])
+
+Transform Pod AST C<source> into a String containing HTML.
+
+=cut
 
 .sub 'html' :method
     .param pmc source
@@ -84,36 +73,23 @@ object.
 .end
 
 
+.sub 'pir' :method
+    .param pmc source
+    .param pmc adverbs         :slurpy :named
 
-.sub '' :anon :load :init
-    load_bytecode 'PCT.pbc'
-    .local pmc parrotns, hllns, exports
-    parrotns = get_root_namespace ['parrot']
-    hllns = get_hll_namespace
-    exports = split ' ', 'PAST PCT PGE'
-    parrotns.'export_to'(hllns, exports)
+    new $P0, 'CodeString'
+    $P0 = <<'PIRCODE'
+.sub 'main' :anon
+    $S0 = <<'PIR'
+PIRCODE
+    $P0 .= source
+    $P0 .= <<'PIRCODE'
+PIR
+    .return ($S0)
 .end
-
-.include 'src/gen_grammar.pir'
-.include 'src/gen_actions.pir'
-
-.sub 'onload' :anon :load :init
-    load_bytecode 'PCT.pbc'
-    $P0 = get_class ['PCT';'HLLCompiler']
-    $P2 = subclass $P0, ['Pod';'Compiler']
-    $P1 = $P2.'new'()
-    $P1.'language'('pod')
-    $P0 = get_hll_namespace ['Pod';'Grammar']
-    $P1.'parsegrammar'($P0)
-    $P0 = get_hll_namespace ['Pod';'Grammar';'Actions']
-    $P1.'parseactions'($P0)
-
-
-    ##  set the compilation stages in the @stages attribute
-    $P0 = split ' ', 'parse doctree html'
-    setattribute $P1, '@stages', $P0
+PIRCODE
+    .return ($P0)
 .end
-
 
 
 =item main(args :slurpy)  :main
@@ -126,15 +102,27 @@ to the Pod compiler.
 .sub 'main' :main
     .param pmc args
 
+    load_bytecode 'dumper.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
+
     $P0 = compreg 'pod'
-    $P1 = $P0.'command_line'(args)
+
+    .local pmc opts
+    opts = $P0.'process_args'(args)
+
+    $P1 = $P0.'evalfiles'(args, opts :flat :named)
+    print $P1
 .end
 
+
+.include 'src/gen_grammar.pir'
+.include 'src/gen_actions.pir'
+#.include 'src/gen_builtins.pir'
+.include 'src/Pod/DocTree/node.pir'
 
 
 =back
 
-=cut
 
 # Local Variables:
 #   mode: pir

@@ -1,3 +1,4 @@
+# Copyright (C) 2009, The Perl Foundation.
 # $Id$
 
 =begin overview
@@ -5,6 +6,8 @@
 This is the grammar for Pod written as a sequence of Perl 6 rules.
 
 =end overview
+
+=cut
 
 grammar Pod::Grammar is PCT::Grammar;
 
@@ -44,13 +47,13 @@ regex pod_sequence {
 token pod_directive {
     ^^ '=pod' \n
     <.blank_line>
-    {*}
+
 }
 
 token cut_directive {
     ^^ '=cut' \n
     <.blank_line>?
-    {*}
+
 }
 
 token heading {
@@ -70,7 +73,7 @@ token begin_directive {
     <block_title>?
     \n
     <.blank_line>
-    {*}
+
 }
 
 token end_directive {
@@ -78,7 +81,7 @@ token end_directive {
     <block_name>
     \n
     <.blank_line>
-    {*}
+
 }
 
 token for_directive {
@@ -88,7 +91,7 @@ token for_directive {
     <block_title>?
     \n
     <paragraph>
-    {*}
+
 }
 
 token over_directive {
@@ -100,13 +103,13 @@ token over_directive {
     ]?
     \n
     <.blank_line>
-    {*}
+
 }
 
 token back_directive {
     ^^ '=back' \n
     <.blank_line>
-    {*}
+
 }
 
 token item_directive {
@@ -119,7 +122,7 @@ token item_directive {
     ]?
     \n
     <.blank_line>
-    {*}
+
 }
 
 token encoding_directive {
@@ -128,7 +131,7 @@ token encoding_directive {
     <block_name>
     \n
     <.blank_line>
-    {*}
+
 }
 
 regex paragraph {
@@ -136,26 +139,26 @@ regex paragraph {
     <!before '='>           # Not a directive
     [ <formatted_text> \n ]+
     <.blank_line>
-    {*}
+
 }
 
 regex literal_paragraph {
     ^^
     [ <.pod_ws> <formatted_text> \n ]+
     <.blank_line>
-    {*}
+
 }
 
 token block_name {
     <.pod_ws>
     <[_]+alpha+digit>+
-    {*}
+
 }
 
 token block_title {
     <.pod_ws>
     <formatted_text>
-    {*}
+
 }
 
 regex formatted_text {
@@ -173,7 +176,7 @@ regex format_code {
     | '<<'  <formatted_text> '>>'
     | '<'   <formatted_text> '>'
     ]
-    {*}
+
 }
 
 token pod_ws {
@@ -181,6 +184,7 @@ token pod_ws {
 }
 
 token blank_line { ^^ <.pod_ws>? \n }
+
 
 # Local Variables:
 #   mode: cperl
