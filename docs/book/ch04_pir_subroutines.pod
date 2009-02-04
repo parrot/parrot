@@ -240,6 +240,82 @@ This could be called in two ways:
   'MySub'("answer" => 42)  # with a value
   'MySub'()                # without
 
+=head3 Sub PMCs
+
+Subroutines are a PMC type in Parrot, and references to them can be stored
+in PMC registers and manipulated like other PMC types. You can get a subroutine
+in the current namespace with the C<get_global> opcode:
+
+  $P0 = get_global "MySubName"
+
+Or, if you want to find a subroutine from a different namespace, you need
+to first the the namespace PMC and then pass that to C<get_global>:
+
+  $P0 = get_namespace "MyNamespace"
+  $P1 = get_global $P0, "MySubName"
+
+With a Sub PMC, there are lots of things you can do. You can obviously invoke
+it:
+
+  $P0(1, 2, 3)
+
+You can get it's name or I<change> it's name:
+
+  $S0 = $P0               # Get the current name
+  $P0 = "MyNewSubName"    # Set a new name
+
+You can get a hash of the complete metadata for the subroutine:
+
+  $P1 = inspect $P0
+
+The metadata fields in this hash are
+
+=over 4
+
+=item * pos_required
+
+The number of required positional parameters to the Sub
+
+=item * pos_optional
+
+The number of optional positional parameters to the Sub
+
+=item * named_required
+
+The number of required named parameters to the Sub
+
+=item * named_optional
+
+The number of optional named parameters to the Sub
+
+=item * pos_slurpy
+
+Returns 1 if the sub has a slurpy parameter to eat up extra positional args
+
+=item * named_slurpy
+
+Returns 1 if the sub has a slurpy parameter to eat up extra named args
+
+=back
+
+Instead of getting the whole inspection hash, you can look for individual
+data items that you want:
+
+  $I0 = inspect $P0, "pos_required"
+
+If you want to get the total number of defined parameters to the Sub, you can
+call the C<arity> method:
+
+  $I0 = $P0.'arity'()
+
+To get the namespace PMC that the Sub was defined int, you can call the
+C<get_namespace> method:
+
+  $P1 = $P0.'get_namespace'()
+
+Subroutine PMCs are very useful things, and we will show more of their uses
+throughout this chapter.
+
 =head2 Continuation Passing Style
 
 Continuations are snapshots, a frozen image of the current execution
@@ -290,11 +366,33 @@ two subroutine calls can share a return continution, instead of
 having to create a new continuation for each call.
 
 X<.tailcall directive>
-In PIR code, we use the C<.tailcall> directive to make a tailcall
-like this, instead of the C<.return> directive. C<.tailcall>
-performs this optimization by reusing the return continution of
-the parent function to make the tailcall.
+In PIR code, we use the C<.tailcall> directive to make a tailcall like this,
+instead of the C<.return> directive. C<.tailcall> performs this optimization
+by reusing the return continution of the parent function to make the
+tailcall. In PIR, we can write this example:
 
+  .sub main :main
+      .local int value
+      value = add_two(5)
+      say value
+  .end
+  
+  .sub add_two
+      .param int value
+      .local int val2
+      val2 = add_one(value
+      .tailcall add_one(val2)
+  .end
+  
+  .sub add_one
+      .param int a
+      .local int b
+      b = a + 1
+      return b
+  .end
+
+This example above will print out the correct value "7".
+      
 =head3 Creating and Using Continuations
 
 Most often continuations are used implicitly in the other control-flow
@@ -345,6 +443,16 @@ own lexical variables that cannot be seen or modified by the outer subroutine.
 This is important because PIR doesn't have anything corresponding to blocks
 or nested scopes like some other languages have. Lexical subroutines play
 the role of nested scopes when they are needed.
+
+If the subroutine is lexical, you can get it's C<:outer> with the C<get_outer>
+method on the Sub PMC:
+
+  $P1 = $P0.'get_outer'()
+  
+If there is no C<:outer> PMC, this returns a NULL PMC. Conversely, you can
+set the outer sub:
+
+  $P0.'set_outer'($P1)
 
 =head3 Scope and HLLs
 
@@ -442,13 +550,28 @@ created at runtime for subs that have a C<LexInfo> PMC already. These are
 created each time the subroutine is invoked, which allows for recursive
 subroutine calls without overwriting variable names.
 
-There is no easy way to get a reference to the current LexPad or LexInfo PMCs
-in a given subroutine, but that doesn't matter because they aren't useful by
-themselves anyway. Remember that subroutines themselves can be lexical and
-that therefore the lexical environment of a given variable can extend to
+With a Subroutine PMC, you can get access to the associated LexInfo PMC by
+calling the C<'get_lexinfo'> method:
+
+  $P0 = find_global "MySubroutine"
+  $P1 = $P0.'get_lexinfo'()
+
+Once you have the LexInfo PMC, there are a limited number of operations that
+you can call with it:
+
+  $I0 = elements $P1    # Get the number of lexical variables from it
+  $P0 = $P1["name"]     # Get the entry for lexical variable "name"
+
+There really isn't much else useful to do with LexInfo PMCs, they're mostly
+used by Parrot internally and aren't helpful to the PIR programmer.
+
+There is no easy way to get a reference to the current LexPad PMC in a given
+subroutine, but like LexInfo PMCs that doesn't matter because they aren't
+useful from PIR anyway. Remember that subroutines themselves can be lexical
+and that therefore the lexical environment of a given variable can extend to
 multiple subroutines and therefore multiple LexPads. The opcodes C<find_lex>
 and C<store_lex> automatically search through nested LexPads recursively to
-find the proper environment information about variables.
+find the proper environment information about the given variables.
 
 =head2 Compilation Units Revisited
 
@@ -551,36 +674,81 @@ which we will also talk about a little later.
 Namespaces are specified with the C<.namespace []> directive. The brackets
 are not optional, but the keys inside them are. Here are some examples:
 
-    .namespace [ ]               # The root namespace
-    .namespace [ "Foo" ]         # The namespace "Foo"
-    .namespace [ "Foo" ; "Bar" ] # Namespace Foo::Bar
-    .namespace                   # WRONG! The [] are needed
+  .namespace [ ]               # The root namespace
+  .namespace [ "Foo" ]         # The namespace "Foo"
+  .namespace [ "Foo" ; "Bar" ] # Namespace Foo::Bar
+  .namespace                   # WRONG! The [] are needed
 
 Using semicolons, namespaces can be nested to any arbitrary depth.
 Namespaces are special types of PMC, so we can access them and manipulate
 them just like other data objects. We can get the PMC for the root
 namespace using the C<get_root_namespace> opcode:
 
-    $P0 = get_root_namespace
+  $P0 = get_root_namespace
 
 The current namespace, which might be different from the root namespace
 can be retrieved with the C<get_namespace> opcode:
 
-    $P0 = get_namespace             # get current namespace PMC
-    $P0 = get_namespace ["Foo"]     # get PMC for namespace "Foo"
+  $P0 = get_namespace             # get current namespace PMC
+  $P0 = get_namespace ["Foo"]     # get PMC for namespace "Foo"
+
+Namespaces are arranged into a large n-ary tree. There is the root namespace
+at the top of the tree. In the root namespace are various special HLL
+namespaces. Each HLL compiler gets it's own HLL namespace where it can store
+it's compiled data. Each HLL namespace may have a large hierarchy of other
+namespaces. The C<.namespace> directive that we've seen sets the current
+namespace. In PIR code, we have multiple ways to address a namespace:
+
+  # Get namespace "a/b/c" starting at the root namespace
+  $P0 = get_root_namespace ["a" ; "b" ; "c"]
+  
+  # Get namespace "a/b/c" starting in the current HLL namespace.
+  $P0 = get_hll_namespace ["a" ; "b" ; "c"]
+  # Same
+  $P0 = get_root_namespace ["hll" ; "a" ; "b" ; "c"]
+
+  # GEt namespace "a/b/c" starting in the current namespace
+  $P0 = get_namespace ["a" ; "b" ; "c"]
 
 Once we have a namespace PMC we can retrieve global variables and
 subroutine PMCs from it using the following functions:
 
-    $P1 = get_global $S0            # Get global in current namespace
-    $P1 = get_global ["Foo"], $S0   # Get global in namespace "Foo"
-    $P1 = get_global $P0, $S0       # Get global in $P0 namespace PMC
+  $P1 = get_global $S0            # Get global in current namespace
+  $P1 = get_global ["Foo"], $S0   # Get global in namespace "Foo"
+  $P1 = get_global $P0, $S0       # Get global in $P0 namespace PMC
 
-Of course, once we have found a subroutine PMC from a namespace, we
-can invoke it like a normal subroutine:
+=head3 Namespace PMCs
 
-    $P1 = get_global ["Foo"], "MySubroutine"
-    $P1()                           # invoke it
+We've seen above how to find a Namespace PMC. Once you have it, there are a
+few things you can do with it. You can find methods and variables that are
+stored in the namespace, or you can add new ones:
+
+  $P0 = get_namespace
+  $P0.'add_namespace'($P1)      # Add Namespace $P1 to $P0
+  $P1 = $P0.'find_namespace'("MyOtherNamespace")
+  
+  # Find namespace "MyNamespace" in $P0, create it if it
+  #    doesn't exist
+  $P1 = $P0.'make_namespace'("MyNamespace")
+
+  $P0.'add_sub'("MySub", $P2)   # Add Sub PMC $P2 to the namespace
+  $P1 = $P0.'find_sub'("MySub") # Find it
+  
+  $P0.'add_var'("MyVar", $P3)   # Add variable "MyVar" in $P3
+  $P1 = $P0.'find_var'("MyVar") # Find it
+  
+  # Return the name of Namespace $P0 as a ResizableStringArray
+  $P3 = $P0.'get_name'()
+  
+  # Find the parent namespace that contains this one:
+  $P5 = $P0.'get_parent'()
+  
+  # Get the Class PMC associated with this namespace:
+  $P6 = $P0.'get_class'()
+
+There are a few other operations that can be done on Namespaces, but none
+as interesting as these. We'll talk about Namespaces throughout the rest
+of this chapter.
 
 =head3 Calling Methods
 
