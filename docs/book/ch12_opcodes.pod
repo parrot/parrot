@@ -335,6 +335,41 @@ a numerical type first, and then dispatch to the C<add_p_p_n> opcode. This
 is just an example, and the exact mechanisms may change as more opcodes
 are added or old ones are deleted.
 
+Parameters can be one of the following types:
+
+=over 4
+
+=item * INT
+
+=item * NUM
+
+=item * STR
+
+=item * PMC
+
+=item * KEY
+
+=item * INTKEY
+
+=item * LABEL
+
+=back
+
+In addition to these types, you need to specify the direction that data is
+moving through that parameter:
+
+=over 4
+
+=item * in
+
+=item * out
+
+=item * inout
+
+=item * invar
+
+=back
+
 =head3 Opcode Control Flow
 
 Some opcodes have the ability to alter control flow of the program they
