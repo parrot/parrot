@@ -114,13 +114,13 @@ sub _get_programs {
     $linkflags = $conf->data->get('linkflags');
     $linkflags =~ s/-libpath:\S+//g;    # RT#43174 No idea why.
     $linkflags = integrate( $linkflags, $conf->options->get('linkflags') );
-    $linkflags = prompt( "And your linker?", $linkflags ) if $ask;
+    $linkflags = prompt( "And flags for your linker?", $linkflags ) if $ask;
     $conf->data->set( linkflags => $linkflags );
 
     $ldflags = $conf->data->get('ldflags');
     $ldflags =~ s/-libpath:\S+//g;      # RT#43174 No idea why.
     $ldflags = integrate( $ldflags, $conf->options->get('ldflags') );
-    $ldflags = prompt( "And your $ld for building shared libraries?", $ldflags )
+    $ldflags = prompt( "And your $ld flags for building shared libraries?", $ldflags )
         if $ask;
     $conf->data->set( ldflags => $ldflags );
 
