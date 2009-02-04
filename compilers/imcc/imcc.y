@@ -238,12 +238,12 @@ static void set_lexical(PARROT_INTERP,
     || PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_add_pcc_named_arg_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_param_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \

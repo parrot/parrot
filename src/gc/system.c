@@ -34,12 +34,16 @@ TT #273: This file needs to be cleaned up significantly.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CONST_FUNCTION
+static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
+        __attribute__nonnull__(1);
+
 static void trace_system_stack(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_trace_system_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_find_common_mask __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_trace_system_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */

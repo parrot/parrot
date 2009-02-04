@@ -33,10 +33,6 @@ F<docs/dev/dod.pod> and F<docs/memory_internals.pod>.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CONST_FUNCTION
-static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC_EXT * new_pmc_ext(PARROT_INTERP)
