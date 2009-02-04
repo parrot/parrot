@@ -20,60 +20,82 @@ $Revision$
 
 =head1 SYNOPSIS
 
-Short-term parrot core goal:
+Parrot installation process (from the parrot source directory):
 
-  make install DESTDIR=/tmp/inst
-  make test-installable -C language/lang
-  make installable -C language/lang
-  make install -C language/lang DESTDIR=/tmp/inst
+  perl Configure.pl --prefix=/usr/lib
+  make
+  make test
+  make install
 
-Long-term external goal:
 
-  cd module_name-1.00 && parrot Makefile.pir && make build test install
+Language installation process (from the language source directory):
 
-or:
-
-  cpan6 module_name ... --download --build --test --installable \
-                        --test-installable --install
+  make
+  make test
+  make install
 
 =head1 DESCRIPTION
 
-Parrot's F<MANIFEST> will contain the installation path of all files.  The
-installation script F<tools/dev/install_files.pl> is driven by this
-definition, which contains the filelist and the recommended package if being
-installed at all.
-The three runtime paths for "include", "library" for
-C<load_bytecode> and "dynext" for C<loadlib> should end up in the
-F<$prefix/lib/parrot/> paths.  {{NOTE: See #56996-fhs-runtime.patch }}
-Accessing F</usr/runtime> is forbidden by the FHS.
+Parrot uses Filesystem Hierarchy Standard (FHS) compliant install directories
+by default. Each install location is configurable with options passed to the
+configure script.
 
-The Parrot and language implementions on top of Parrot may be installed as
-self-hosting single-file executables, with the help of merged pbc's and
-pbc2exe --install.
-The destination path for the language libraries is not decided yet, two 
-conflicting layouts 1. "a language pbc is a simple library" vs 
-2. "a language is special" are discussed.
+=over
 
-Eg. ad 1. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
-replaced by C<load_bytecode 'WMLScript'> and F<WMLScript.pbc> should be
-installed to F<runtime/parrot/library/WMLScript.pbc> which ends up in
-F<$prefix/lib/parrot/library/WMLScript.pbc>.
+=item F</usr/bin/parrot>
 
-1a. C<load_bytecode 'languages/WMLScript'> =>
-  F<runtime/parrot/library/languages/WMLScript.pbc> =>
-  F<$prefix/lib/parrot/library/languages/WMLScript.pbc>.
+The main Parrot executable.
 
-1b. aka "existing practice":
-C<load_bytecode 'languages/WMLScript/WMLScript.pbc'> =>
-  F<languages/WMLScript/WMLScript.pbc>  or 
-    F<runtime/parrot/library/languages/WMLScript/WMLScript.pbc> =>
-  F<$prefix/lib/parrot/library/languages/WMLScript/WMLScript.pbc>.
+=item F</usr/lib/parrot/library/>
 
-ad 2. C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
-replaced by C<load_language 'WMLScript'> and F<WMLScript.pbc> should be
-installed to F<runtime/language/library/WMLScript.pbc> which ends up in
-F<$prefix/lib/parrot/language/library/WMLScript.pbc>. See below at 
-L</Layout 2 "Parallel - A language is special">. {{ ?? }}
+Parrot runtime libraries, corresponds to F<runtime/parrot/library/> in the
+repository.
+
+=item F</usr/lib/parrot/<version>/include/>
+
+Parrot runtime include files (not C include files), corresponds to
+F<runtime/parrot/include/> in the repository.
+
+=item F</usr/lib/parrot/<version>/dynext/>
+
+Parrot dynamic extension files (for C<loadlib>), corresponds to
+F<runtime/parrot/dynext/> in the repository.
+
+=item F</usr/lib/parrot/<version>/languages/>
+
+Parrot language modules, corresponds to F<languages/> in the repository.
+
+Languages are loaded with C<load_language 'abc'>, which loads either
+F<languages/abc/abc.pbc> in the build environment of a language in trunk, or
+F</usr/lib/parrot/languages/abc/abc.pbc> in an installed Parrot.
+
+On the commandline, a language is executed as:
+
+  $ abc hello.bc
+
+Where F<abc> is a symlink to the F<parrot> executable. On platforms that don't
+have symlinks, F<abc> may be a copy of the F<parrot> executable. On general
+principles, languages should not install themselves with the same name as their
+"real" counterpart, but should provide a build option to do so (so, the default
+installed executable for Python on Parrot should be F<pynie> or
+F<parrot-python> but not F<python>).
+
+=item F</usr/lib/parrot/<version>/languages/*>
+
+The languages directories may have subdirectories, including F<library> for
+their own set of libraries, and F<dynpmc> for dynamic pmcs.
+
+It is recommended that languages follow a standard pattern in installing their
+libraries so a bytecode compiled version of a module in the C<mylang> HLL named
+C<['Foo';'Bar']> is stored in
+F<usr/lib/parrot/<version>/languages/<mylang>/library/Foo/Bar.pbc>
+
+=item F</usr/lib/parrot/tools/>
+
+Parrot tools that don't belong in the bin/ directory and don't belong in the
+runtime, corresponds to F<tools/dev/> and/or F<tools/build> in the repository.
+
+=back
 
 Bootstrapping the configuration hash should not read a config file when the
 hash is already contained in the pmc or executable. {{ See #57418 [TODO]
@@ -99,12 +121,13 @@ invocations.
 
 =head1 DEPENDENCIES
 
-Before you can C<make installable -C language/lang> or a simple C<make>
-or C<make installable> in the directory F<languages>, you need to
-C<make parrot_utils> and C<make installable> in the parrot build directory.
+Building core Parrot depends on Perl (including perldoc, which may be a
+separate package), libgdm and libreadline.
 
-The languages have no extra dependencies to the required parrot_utils and
-F<src/install_config.o> and F<install_config.fpmc>
+Building a language depends on a series of Parrot build tools, installed in
+F</usr/lib/parrot/<version/tools>. These tools will generally not be included
+in the default C<parrot> package on most systems, but will require a
+C<parrot-dev> package to be installed before they can be built.
 
 =head1 DEFINITIONS
 
@@ -129,70 +152,6 @@ C<_config()>, generated in F<config_lib.pasm>, and either defined in
 F<library/config.pir>, or as frozen PMC embedded in the test executable
 (F<config.fpmc>), the installable executable (F<install_config.fpmc>) or empty
 for miniparrot (F<null_config.fpmc>).
-
-=head2 Layout 1 "A language pbc is simply a library"
-
-B<Rationale>: A language pbc is not much more than a normal library, so it
-should go to the normal parrot library path. The library searchpath needs no
-extension for languages.
-
-C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be
-replaced by C<load_bytecode 'WMLScript'> and F<WMLScript.pbc> should be
-installed to F<runtime/parrot/library/WMLScript.pbc> which ends up in
-F<$prefix/lib/parrot/library/WMLScript.pbc>.
-
-B<Usage>: C<load_bytecode 'WMLScript'> =C<gt>
-       F<runtime/parrot/library/WMLScript.pbc> =C<gt>
-       F<$prefix/lib/parrot/library/WMLScript.pbc>
-
-{{ rurban favors this one }}
-
-=head2 Layout 1, Variant a "Don't mix the libraries with the languages"
-
-B<Rationale>: A language pbc is a library under the C<languages> namespace. 
-The library searchpath needs no extension for languages.
-C<load_bytecode 'languages/bla'> makes it clear that C<bla> is a 
-language, not a library.
-
-B<Usage>: C<load_bytecode 'languages/WMLScript'> =C<gt>
-       F<runtime/parrot/library/languages/WMLScript.pbc> =C<gt>
-       F<$prefix/lib/parrot/library/languages/WMLScript.pbc>.
-
-=head2 Layout 1, Variant b "Below - Existing practice"
-
-B<Rationale>: A language pbc is a language pbc.
-Other languages assume the path from the build_dir
-as F<languages/WMLScript/WMLScript.pbc>, the installation root 
-begins at F<$prefix/lib/parrot/library>.
-
-B<Usage>: C<load_bytecode 'languages/WMLScript/WMLScript.pbc'> =C<gt>
-       F<languages/WMLScript/WMLScript.pbc> =C<gt>
-       F<$prefix/lib/parrot/library/languages/WMLScript/WMLScript.pbc>.
-
-=head2 Layout 2 "Parallel - A language is special"
-
-B<Rationale>: Languages are more than simple libraries because they could be
-invoked by link $0 magic on platforms which do support that. Languages should
-have their distinct libraries seperate from parrot with seperate dynext,
-library, include.  parrot is just another language, with perl6 sharing the
-same namespace.
-
-This requires either a new opcode or method to able to override the library 
-searchpath.
-
-C<load_bytecode 'languages/WMLScript/src/WMLScript.pbc'> should be replaced
-by C<load_language 'WMLScript'> and F<WMLScript.pbc> should be installed
-to F<runtime/languages/library/WMLScript.pbc> which ends up in 
-F<$prefix/lib/parrot/languages/library/WMLScript.pbc>.
-
-B<Usage>: C<load_language 'WMLScript'> =C<gt>
-       F<runtime/language/library/WMLScript.pbc> =C<gt>
-       F<$prefix/lib/parrot/WMLScript/library/WMLScript.pbc>
-     or Variant 2a:
-       F<$prefix/lib/parrot/languages/WMLScript/library/WMLScript.pbc>.
-
-I<Note>: We will not be able to get rid of F</usr/lib/parrot> here, so the 
-F<runtime/parrot> <=> F</usr/lib/parrot mapping> is not symetric anymore.
 
 =head2 make install
 
@@ -225,10 +184,6 @@ includes also need to be separate.
 C<make install> currently does not work with an already installed shared
 libparrot.so on most platforms. {{See a patch for this in RT #39742.}}
 
-The to-be-defined C<make install> actions for a language named "mylanguage":
-
-Different platforms will also support different layouts.
-
 =over 4
 
 =item * bin_dir: Copy installables to the destination directory's F<bin>
@@ -240,29 +195,6 @@ to the destination directory's F<script> directory. (F</usr/lib/parrot/bin/>
 
 =item * dynext: Copy shared libraries (groups and ops) to the destination
 directory's F<lib> directory under F</parrot/dynext/>.
-
-=item * lib_dir Variant 1: 
-  Copy the main language library F<mylanguage.pbc> to the destination
-  directory's F<lib> directory under F<parrot/library/> for HLL
-  interoperability. Also the other pbc's to a F<parrot/library/mylanguage> 
-  subdirectory.
-  C<load_bytecode "mylanguage"> should succeed.
-
-=item * lib_dir Variant 1a:
-  Copy the main language library F<mylanguage.pbc> to the destination
-  directory's F<lib> directory under F<parrot/library/languages/> for HLL
-  interoperability. Also the other pbc's to a
-  F<parrot/library/languages/mylanguage> subdirectory.
-  C<load_bytecode "languages/mylanguage"> should succeed.
-
-=item * lib_dir Variant 3 or 3a:
-  Copy the main language library F<mylanguage.pbc> to the destination
-  directory's F<lib> directory under F<parrot/language/library/> for HLL
-  interoperability. Also the other pbc's to a
-  F<parrot/language/library/mylanguage> subdirectory.
-  C<load_language "mylanguage"> should succeed.
-  The mylanguage.pbc is resonsible to load the other
-  "mylanguage/mylangspecial" pbc's.
 
 The subdirs are currently needed for C<forth> and C<WMLScript>, the other
 language pbc's are F<php_*.pbc>, F<pipplib.pbc> and F<tcllib.pbc>.
@@ -284,40 +216,6 @@ subdirectory. This should be selectable by a C<Configure> or C<make install>
 option.
 
 =back
-
-=head2 make installable -C languages/mylanguage
-
-This creates a bytecode or executable file linked to F<install_config.fpmc>,
-and this executable should not access the build directory's
-F<runtime/parrot> paths.
-
-A bytecode file may be optionally merged with F<install_config.fpmc>, an
-executable is just linked with C<pbc_to_exe --install>.
-
-=head2 make test-installable -C languages/mylanguage
-
-B<Goal>: Test if the generated installable does not access the build
-directory paths but does find older libraries, includes and dynext's in the
-F<$prefix> path. The destination directory is not known and may be
-optional. A simple test from C<make test> without any features from an
-external library is enough, because newer libraries are not installed yet at
-this stage.
-
-B<Implementation>: I<TODO>
-
-B<Problem>: C<make test-installable> should copy the make install files
-away, out of the build directory, should temporarily rename the build
-directory, run a simple test, and remake the build directory back. This will
-not be possible from a make run from within the build directory. So renaming
-the F<runtime> directory during the test might be the best idea.
-
-This is fragile and similar for every language target, so it should be
-simplified by a make framework, like include F<Makefile.common>, extending
-the current automake-like framework or using a Parrot/Install library.
-
-A core C<ExtUtils::MakeMaker> alike installation library for every external
-library and HLL, because the languages will be removed from trunk before the
-Parrot 1.0 release.
 
 =head2 Configuration bootstrapping
 
@@ -385,17 +283,8 @@ B<Fix 2>: Module system.
 
 Avoid already loaded pbc files.
 
-Source loading PIR statements like C<loadlib> and C<load_bytecode> should 
-
-a) cache the file name and skip the file if it has already been loaded (as
-  in perl5)
-
-b) add load*_once sisters as in php - C<load_bytecode_once> and
-  C<loadlib_once>.
-  This is not preferred. It might be added later on, but parrot core 
-  should not rely on it.
-
-{{NOTE: option (a) strongly preferred. -allison}}
+Source loading PIR statements like C<loadlib> and C<load_bytecode> should cache
+the file name and skip the file if it has already been loaded (as in perl5)
 
 B<Fix 3>: pbc_merge fixups
 
@@ -426,16 +315,6 @@ None.
 None.
 
 =head1 REFERENCES
-
-{{ Some of the mentioned single patches against SVN HEAD are at
-http://code.google.com/p/cygwin-rurban/source/browse/
-  trunk/release/parrot/patches
-
-The cygwin070patches branch contains all the mentioned fixes and language
-lib_dir installation variant 1, so it is really a "make_install" branch. }}
-
-#nnnnn references tickets in
-http://rt.perl.org/rt3/Ticket/Display.html?id=nnnnn
 
 =cut
 
