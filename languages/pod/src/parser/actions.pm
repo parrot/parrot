@@ -68,7 +68,13 @@ method over_directive($/) {
     make $list;
 }
 
-method item($/) {
+method back_directive($/) {
+    ## XXX thsi should probably be the List object
+    ## that's created in =over..
+    make Pod::DocTree::List.new();
+}
+
+method item_directive($/) {
     make Pod::DocTree::Item.new();
 }
 

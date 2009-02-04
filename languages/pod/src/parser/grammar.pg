@@ -15,13 +15,12 @@ rule TOP {
     [ <skipped>
     | <pod_section>
     ]*
-    [ $ || <panic: 'Pod syntax error'> ]
+    [ $ || <.panic: 'Pod syntax error'> ]
     {*}
 }
 
 rule skipped {
     ^^ <![=]> \N*
-
 }
 
 rule pod_section {
@@ -109,20 +108,23 @@ token over_directive {
 token back_directive {
     ^^ '=back' \n
     <.blank_line>
-
+   {*}
 }
 
 token item_directive {
     ^^
     '=item'
-    [ <.pod_ws>
-        [ '*'
-        | <digit>* '.'?
-        ]
-    ]?
+    [ <.pod_ws> <bullet> ]?
     \n
     <.blank_line>
     {*}
+}
+
+## it seems that "named" items is not possible.. forgotten?
+token bullet {
+    [ $<bullet>='*'
+    | $<ordered>=<digit>* '.'?
+    ]
 }
 
 token encoding_directive {
