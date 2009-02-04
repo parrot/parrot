@@ -37,10 +37,10 @@ CODE
 /^3\.14/
 OUTPUT
 
-language_output_like( 'lua', << 'CODE', << 'OUTPUT', 'variable huge' );
+language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'variable huge' );
 print(math.huge)
 CODE
-/^(inf|1.#INF)/
+Inf
 OUTPUT
 
 language_output_is( 'lua', << 'CODE', << 'OUTPUT', 'function abs' );

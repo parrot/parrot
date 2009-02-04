@@ -64,10 +64,10 @@ CODE
 -14
 OUT
 
-language_output_like( 'lua', <<'CODE', <<'OUT', '1 / 0' );
+language_output_is( 'lua', <<'CODE', <<'OUT', '1 / 0' );
 print(1 / 0)
 CODE
-/^(inf|1.#INF)/
+Inf
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '-25 % 3' );
@@ -76,10 +76,10 @@ CODE
 2
 OUT
 
-language_output_like( 'lua', <<'CODE', <<'OUT', '1 % 0' );
+language_output_is( 'lua', <<'CODE', <<'OUT', '1 % 0' );
 print(1 % 0)
 CODE
-/^(nan|-1.#IND)/
+NaN
 OUT
 
 language_output_is( 'lua', <<'CODE', <<'OUT', '3 ^ 3' );
