@@ -37,6 +37,31 @@ is used in Parrot ops.
 
 =over 4
 
+=item C<PMC * Parrot_io_stdhandle>
+
+Get the current standard IO object and optionally set a new one.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, ARGIN_NULLOK(PMC *newhandle))
+{
+    PMC * result = PMCNULL;
+    if (fileno == PIO_STDIN_FILENO || fileno == PIO_STDOUT_FILENO ||
+            fileno == PIO_STDERR_FILENO) {
+        result = interp->piodata->table[fileno];
+        if (! PMC_IS_NULL(newhandle))
+            interp->piodata->table[fileno] = newhandle;
+    }
+    return result;
+}
+
+/*
+
 =item C<PMC * Parrot_io_new_pmc>
 
 Creates a new I/O filehandle object. The value of C<flags> is set

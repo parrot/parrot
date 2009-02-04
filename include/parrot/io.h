@@ -292,6 +292,13 @@ PMC * Parrot_io_STDERR(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_io_stdhandle(PARROT_INTERP,
+    INTVAL fileno,
+    ARGIN_NULLOK(PMC *newhandle))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_io_STDIN(PARROT_INTERP)
@@ -384,6 +391,8 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_Parrot_io_STDERR __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_io_stdhandle __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_io_STDIN __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
