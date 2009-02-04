@@ -34,6 +34,8 @@ pmclass LuaBoolean
     hll      lua
     maps     Boolean {
 
+    ATTR INTVAL iv;
+
 /*
 
 =item C<void init()>
@@ -44,7 +46,24 @@ Initializes the Boolean with a default value of C<false>.
 
 */
     VTABLE void init() {
-        PMC_int_val(SELF) = 0;
+        Parrot_LuaBoolean_attributes* attrs =
+            mem_allocate_zeroed_typed(Parrot_LuaBoolean_attributes);
+        attrs->iv = 0;
+        PMC_data(SELF) = attrs;
+        PObj_active_destroy_SET(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroy this PMC.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -57,13 +76,13 @@ Class method to construct an Boolean from the string representation C<rep>.
 
 */
     VTABLE PMC* instantiate_str(STRING *rep, INTVAL flags) {
-        PMC *res;
-        INTVAL type = PMC_type(SELF);
-        if (flags & PObj_constant_FLAG)
-            res = constant_pmc_new(INTERP, type);
-        else
-            res = pmc_new(INTERP, type);
-        PMC_int_val(res) = (Parrot_str_to_int(INTERP, rep) != 0);
+        const INTVAL type = SELF->vtable->base_type;
+        PMC * const res =
+            (flags & PObj_constant_FLAG)
+                ? constant_pmc_new(INTERP, type)
+                : pmc_new(INTERP, type);
+
+        SET_ATTR_iv(INTERP, res, Parrot_str_to_int(INTERP, rep) != 0);
         return res;
     }
 
@@ -90,8 +109,10 @@ Creates and returns a clone of the scalar.
 
 */
     VTABLE PMC* clone() {
-        PMC *dest = pmc_new(INTERP, PMC_type(SELF));
-        STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
+        INTVAL iv;
+        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
+        GET_ATTR_iv(INTERP, SELF, iv);
+        SET_ATTR_iv(INTERP, dest, iv);
         return dest;
     }
 
@@ -105,7 +126,9 @@ Returns the integer value of the Boolean.
 
 */
     VTABLE INTVAL get_integer() {
-        return PMC_int_val(SELF);
+        INTVAL iv;
+        GET_ATTR_iv(INTERP, SELF, iv);
+        return iv;
     }
 
 /*
@@ -118,7 +141,9 @@ Return the string "true" or "false".
 
 */
     VTABLE STRING* get_string() {
-        if (PMC_int_val(SELF))
+        INTVAL iv;
+        GET_ATTR_iv(INTERP, SELF, iv);
+        if (iv)
             return Parrot_str_new_constant(INTERP, "true");
         else
             return Parrot_str_new_constant(INTERP, "false");
@@ -135,7 +160,9 @@ Returns the boolean value of the Boolean.
 
 */
     VTABLE INTVAL get_bool() {
-        return PMC_int_val(SELF) ? 1 : 0;
+        INTVAL iv;
+        GET_ATTR_iv(INTERP, SELF, iv);
+        return iv ? 1 : 0;
     }
 
 /*
@@ -148,11 +175,11 @@ Returns the boolean value of the Boolean.
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        PMC_int_val(SELF) = (value != 0);
+        SET_ATTR_iv(INTERP, SELF, value != 0);
     }
 
     VTABLE void set_bool(INTVAL value) {
-        PMC_int_val(SELF) = (value != 0);
+        SET_ATTR_iv(INTERP, SELF, value != 0);
     }
 
 /*
@@ -165,7 +192,7 @@ Sets the value of the boolean to the value in C<*value>.
 
 */
     VTABLE void set_pmc(PMC *value) {
-        PMC_int_val(SELF) = VTABLE_get_bool(INTERP, value);
+        SELF.set_integer_native(VTABLE_get_bool(INTERP, value));
     }
 
 /*
@@ -178,9 +205,9 @@ Used to archive the boolean.
 
 */
     VTABLE void freeze(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
         SUPER(info);
-        VTABLE_push_integer(INTERP, io, PMC_int_val(SELF));
+        VTABLE_push_integer(INTERP, io, SELF.get_integer());
     }
 
 /*
@@ -193,10 +220,10 @@ Used to unarchive the boolean.
 
 */
     VTABLE void thaw(visit_info *info) {
-        IMAGE_IO *io = info->image_io;
+        IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            PMC_int_val(SELF) = VTABLE_shift_integer(INTERP, io);
+            SELF.set_integer_native(VTABLE_shift_integer(INTERP, io));
     }
 
 /*
@@ -213,7 +240,8 @@ Used to unarchive the boolean.
 
 */
     MULTI INTVAL is_equal(LuaBoolean value) {
-        return (INTVAL)(PMC_int_val(SELF) == PMC_int_val(value));
+        return (VTABLE_get_integer(INTERP, SELF)
+            ==  VTABLE_get_integer(INTERP, value));
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
@@ -237,7 +265,7 @@ Used to unarchive the boolean.
         PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
 
         if (PMC_type(SELF)    == PMC_type(value)
-        &&  PMC_int_val(SELF) == VTABLE_get_integer(INTERP, value))
+        &&  VTABLE_get_integer(INTERP, SELF) == VTABLE_get_integer(INTERP, value))
             VTABLE_set_integer_native(INTERP, retval, 1);
         else
             VTABLE_set_integer_native(INTERP, retval, 0);

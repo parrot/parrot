@@ -63,7 +63,7 @@ typedef struct LuaHash {
 
 /******************************************************************************/
 
-static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
+static int lua_equalObj(PARROT_INTERP, PMC * const t1, PMC * const t2)
 {
     if (!t2)
         return 0;
@@ -72,13 +72,14 @@ static int lua_equalObj(PARROT_INTERP, const PMC *t1, const PMC *t2)
         return 0;
 
     if (PMC_type(t1) == dynpmc_LuaNumber)
-        return PMC_num_val(t1) == PMC_num_val(t2);
+        return VTABLE_get_number(interp, t1) == VTABLE_get_number(interp, t2);
 
     if (PMC_type(t1) == dynpmc_LuaBoolean)
-        return PMC_int_val(t1) == PMC_int_val(t2);
+        return VTABLE_get_integer(interp, t1) == VTABLE_get_integer(interp, t2);
 
     if (PMC_type(t1) == dynpmc_LuaString)
-        return 0 == Parrot_str_compare(interp, PMC_str_val(t1), PMC_str_val(t2));
+        return 0 == Parrot_str_compare(interp, VTABLE_get_string(interp, t1),
+                                               VTABLE_get_string(interp, t2));
 
     return PMC_struct_val(t1) == PMC_struct_val(t2);
 }
@@ -95,10 +96,10 @@ static Node *mainposition(PARROT_INTERP, const LuaHash *t, PMC *key)
         return NULL;
 
     if (PMC_type(key) == dynpmc_LuaNumber) {
-        h = (unsigned long)(long)PMC_num_val(key);
+        h = (unsigned long)(long)VTABLE_get_number(interp, key);
     }
     else if (PMC_type(key) == dynpmc_LuaBoolean) {
-        h = PMC_int_val(key);
+        h = VTABLE_get_integer(interp, key);
     }
     else if (PMC_type(key) == dynpmc_LuaString) {
         h = Parrot_str_to_hashval(interp, VTABLE_get_string(interp, key));
@@ -122,7 +123,7 @@ static PMC** lua_getstr(PARROT_INTERP, const LuaHash *t, STRING *key)
 
     do {
         if (PMC_type(n->key) == dynpmc_LuaString
-         && 0 == Parrot_str_compare(interp, PMC_str_val(n->key), key))
+         && 0 == Parrot_str_compare(interp, VTABLE_get_string(interp, n->key), key))
             return &n->val;
 
         n = n->next;
@@ -409,7 +410,7 @@ Marks the hash as live.
                     Parrot_str_new_constant(INTERP, "__mode"));
 #endif
             if (m && *m)
-                mode = PMC_str_val(*m);
+                mode = VTABLE_get_string(INTERP, *m);
         }
 
         if (PMC_struct_val(SELF))
