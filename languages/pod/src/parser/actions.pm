@@ -76,6 +76,18 @@ method block_title($/) {
     make Pod::DocTree::Text.new( :name("text") );
 }
 
+method paragraph($/) {
+    my $par := Pod::DocTree::Paragraph.new();
+    for $<formatted_text> {
+        $par.push( $( $_ ) );
+    }
+    make $par;
+}
+
+method formatted_text($/) {
+    make Pod::DocTree::Text.new( :name(~$/) );
+}
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

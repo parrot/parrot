@@ -139,7 +139,7 @@ regex paragraph {
     <!before '='>           # Not a directive
     [ <formatted_text> \n ]+
     <.blank_line>
-
+    {*}
 }
 
 regex literal_paragraph {
@@ -168,6 +168,7 @@ regex formatted_text {
     | <punct>
     | <pod_ws>
     ]+
+    {*}
 }
 
 regex format_code {
