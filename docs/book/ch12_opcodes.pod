@@ -208,6 +208,10 @@ The caveat of course is that the predereferenced computed goto core is only
 available with compilers that support computed goto, such as GCC. Parrot
 will not have access to this core if it is built with a different compiler.
 
+=item * JIT Core
+
+=item * Exec Core
+
 =item * Tracing Core
 
 =item * Profiling Core
@@ -258,7 +262,8 @@ Opcodes are the smallest logical execution element in Parrot. An
 individual opcode corresponds, in an abstract kind of way, with a single
 machine code instruction for a particular hardware processor
 architecture. The difference is that Parrot's opcodes can perform some
-very complex and high-level tasks. Also, Parrot's opcodes can be
+very complex and high-level tasks that each may take many execution cycles
+for the average hardware processor. Also, Parrot's opcodes can be
 dynamically loaded in from a special library file called a I<dynop
 library>. We'll talk about dynops a little bit later.
 
@@ -355,11 +360,73 @@ any>. The C<NEXT> keyword is frequently used in places like the C<invoke>
 opcode to create a continuation to the next opcode to return to after
 the subroutine returns.
 
+=item * ADDRESS()
+
+Jumps execution to the given address.
+
+  ADDRESS(x);
+  
+Here, C<x> should be an C<opcode_t *> value of the opcode to jump to.
+
+=item * OFFSET()
+
+Jumps to the address given as an offset from the current address.
+
+  OFFSET(x)
+
+Here, C<x> is an offset in C<size_t> units that represents how far forward
+(positive) or how far backwards (negative) to jump to.
+
+=item * POP()
+
+C<POP> pops the next opcode address off the control stack. To put an address
+onto the control stack, use the C<PUSH> keyword instead. C<PUSH> takes a single
+C<opcode_t *> argument to store, and C<POP> returns a single C<opcode_ *>
+value.
+
 =back
 
 =head2 The Opcode Compiler
 
+As we've seen in our discussions above, ops have a number of transformations
+to go through before they can be become C code and compiled into Parrot.
+The various special variables like C<$1>, C<INTERP> and C<ADDRESS> need to be
+converted to normal variable values. Also, each runcore requires the ops be
+compiled into various formats: The slow and fast cores need the ops to be
+compiled into individual subroutines. The switch core needs all the ops to be
+compiled into a single function using a large C<switch> statement. The
+computed goto cores require the ops be compiled into a large function with a
+large array of label addresses.
+
+Parrot's opcode compiler is a tool that's tasked with taking raw opcode files
+with a C<.ops> extension and converting them into several different formats,
+all of which need to be syntactically correct C code for compilation.
+
 =head2 Dynops
+
+Parrot has about 1200 built-in opcodes. These represent operations which are
+sufficiently simple and fundamental, but at the same time are very common.
+However, these do not represent all the possible operations that some
+programmers are going to want to use. Of course, not all of those 1200 ops
+are unique, many of them are overloaded variants of one another. As an example
+there are about 36 variants of the C<set> opcode, to account for all the
+different types of values you may want to set to all the various kinds of
+registers. The number of unique operations therefore is much smaller then 1200.
+
+This is where I<dynops> come in. Dynops are dynamically-loadable libraries of
+ops that can be written and compiled separately from Parrot and loaded in at
+runtime. dynops, along with dynpmcs and runtime libraries are some of the
+primary ways that Parrot can be extended.
+
+Parrot ships with a small number of example dynops libraries in the file
+L<src/dynoplibs/>. These are small libraries of mostly nonsensical but
+demonstrative opcodes that can be used as an example to follow.
+
+Dynops can be writte in a C<.ops> file like the normal built-in ops are.
+The ops file should use C<#include "parrot/extend.h"> in addition to any
+other libraries the ops need. They can be compiled into C using the opcode
+compiler, then compiled into a shared library using a normal C compiler. Once
+compiled, the dynops can be loaded into Parrot using the .loadlib directive.
 
 =cut
 
