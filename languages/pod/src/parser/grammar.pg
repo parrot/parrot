@@ -133,7 +133,7 @@ token encoding_directive {
     <block_name>
     \n
     <.blank_line>
-
+    {*}
 }
 
 regex paragraph {
@@ -154,7 +154,7 @@ regex literal_paragraph {
 token block_name {
     <.pod_ws>
     <[_]+alpha+digit>+
-
+    {*}
 }
 
 token block_title {
@@ -175,9 +175,10 @@ regex formatted_text {
 
 regex format_code {
     $<code>=<[BCEFILSXZ]>
-    [ '<<<' <formatted_text> '>>>'
-    | '<<'  <formatted_text> '>>'
-    | '<'   <formatted_text> '>'
+    [ '<<<<' <formatted_text> '>>>>'
+    | '<<<'  <formatted_text> '>>>'
+    | '<<'   <formatted_text> '>>'
+    | '<'    <formatted_text> '>'
     ]
 
 }

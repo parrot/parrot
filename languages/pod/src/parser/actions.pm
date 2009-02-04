@@ -90,6 +90,20 @@ method paragraph($/) {
     make $par;
 }
 
+method encoding_directive($/) {
+    ## probably a block, not sure. XXX check this.
+    my $block := Pod::DocTree::Block.new();
+
+    my $name := $( $<block_name> );
+    make $block;
+}
+
+method block_name($/) {
+    ## is this the right node type? or should be literal?
+    ## XXX check spec.
+    make Pod::DocTree::Text.new( :name(~$/) );
+}
+
 method formatted_text($/) {
     make Pod::DocTree::Text.new( :name(~$/) );
 }
