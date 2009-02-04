@@ -21,7 +21,6 @@ for Pod.
 
     p6meta.'new_class'('Pod::DocTree::File', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Heading', 'parent'=>base)
-    p6meta.'new_class'('Pod::DocTree::Text', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Block', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::List', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Item', 'parent'=>base)

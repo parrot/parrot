@@ -43,9 +43,38 @@ method pod_sequence($/, $key) {
 method heading($/) {
     my $head := Pod::DocTree::Heading.new();
     $head.level(~$<digit>);
+
+    if $<block_title> {
+        my $title := $( $<block_title>[0] );
+        $head.title( $title );
+    }
     make $head;
 }
 
+method begin_directive($/) {
+    my $block := Pod::DocTree::Block.new();
+
+    make $block;
+}
+
+method for_directive($/) {
+    my $block := Pod::DocTree::Block.new();
+
+    make $block;
+}
+
+method over_directive($/) {
+    my $list := Pod::DocTree::List.new();
+    make $list;
+}
+
+method item($/) {
+    make Pod::DocTree::Item.new();
+}
+
+method block_title($/) {
+    make Pod::DocTree::Text.new( :name("text") );
+}
 
 # Local Variables:
 #   mode: cperl
