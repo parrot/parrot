@@ -23,19 +23,13 @@ for Pod.
     p6meta.'new_class'('Pod::DocTree::Heading', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Text', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Block', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::List', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Item', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Text', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Format', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Paragraph', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::Literal', 'parent'=>base)
 
-    p6meta.'new_class'('Markdown::Emphasis', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Entity', 'parent'=>base)
-    p6meta.'new_class'('Markdown::HorizontalRule', 'parent'=>base)
-    p6meta.'new_class'('Markdown::ItemizedList', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Line', 'parent'=>base)
-    p6meta.'new_class'('Markdown::ListItem', 'parent'=>base)
-    p6meta.'new_class'('Markdown::OrderedList', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Para', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Space', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Strong', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Title', 'parent'=>base)
-    p6meta.'new_class'('Markdown::Word', 'parent'=>base)
 .end
 
 

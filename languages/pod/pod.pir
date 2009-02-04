@@ -9,20 +9,20 @@ pod.pir - A Pod compiler.
 
 as a command line (without interactive mode) :
 
-    $ parrot markdown.pbc document.text
-    $ parrot markdown.pbc --target=parse document.text
+    $ parrot pod.pbc document.text
+    $ parrot pod.pbc --target=parse document.text
                                    PAST
                                    HTML
 
 or as a library :
 
-     load_bytecode 'markdown.pbc'
-     $P0 = compreg 'markdown'
-     $S0 = <<'MARKDOWN'
+     load_bytecode 'pod.pbc'
+     $P0 = compreg 'pod
+     $S0 = <<'POD'
  Title
  =====
  Some text.
- MARKDOWN
+ POD
      $P1 = $P0.'compile'($S0)
      $S0 = $P1()
      print $S0
@@ -117,7 +117,6 @@ to the Pod compiler.
 
 .include 'src/gen_grammar.pir'
 .include 'src/gen_actions.pir'
-#.include 'src/gen_builtins.pir'
 .include 'src/Pod/DocTree/node.pir'
 
 
