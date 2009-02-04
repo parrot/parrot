@@ -259,7 +259,7 @@ it:
 
   $P0(1, 2, 3)
 
-You can get it's name or I<change> it's name:
+You can get its name or I<change> its name:
 
   $S0 = $P0               # Get the current name
   $P0 = "MyNewSubName"    # Set a new name
@@ -444,7 +444,7 @@ This is important because PIR doesn't have anything corresponding to blocks
 or nested scopes like some other languages have. Lexical subroutines play
 the role of nested scopes when they are needed.
 
-If the subroutine is lexical, you can get it's C<:outer> with the C<get_outer>
+If the subroutine is lexical, you can get its C<:outer> with the C<get_outer>
 method on the Sub PMC:
 
   $P1 = $P0.'get_outer'()
@@ -694,8 +694,8 @@ can be retrieved with the C<get_namespace> opcode:
 
 Namespaces are arranged into a large n-ary tree. There is the root namespace
 at the top of the tree. In the root namespace are various special HLL
-namespaces. Each HLL compiler gets it's own HLL namespace where it can store
-it's compiled data. Each HLL namespace may have a large hierarchy of other
+namespaces. Each HLL compiler gets its own HLL namespace where it can store
+its compiled data. Each HLL namespace may have a large hierarchy of other
 namespaces. The C<.namespace> directive that we've seen sets the current
 namespace. In PIR code, we have multiple ways to address a namespace:
 

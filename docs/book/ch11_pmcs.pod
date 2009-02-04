@@ -131,7 +131,7 @@ using a macro with the same name as the PMC, but all upper-case:
 
   Parrot_Foo_Attributes * attrs = PARROT_FOO(SELF);
   attrs->bar = 7;                 /* it's an INTVAL */
-  attrs->baz = pmc_new( ... )     /* It's a PMC */
+  attrs->baz = pmc_new( ... )     /* it's a PMC */
 
 Notice how the type name of the attributes structure is C<Parrot_>,
 followed by the name of the PMC with the same capitalization as is used

@@ -194,7 +194,7 @@ programming platform.
 =head2 Build Requirements
 
 There are a number of requirements for building Parrot from source, and a
-number of optional libraries and components that can be used to extend it's
+number of optional libraries and components that can be used to extend its
 capabilities. None of these requirements or optional components are necessary
 unless you are building Parrot from the source code.
 

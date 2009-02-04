@@ -194,7 +194,7 @@ Or, if you need more flexibility, you can use a I<heredoc> string literal:
   it doesn't use quotation marks. The string continues
   until the ending token (the thing in quotes next to
   the << above) is found. The terminator must appear on
-  it's own line, must appear at the beginning of the
+  its own line, must appear at the beginning of the
   line, and may not have any trailing whitespace.
 
   End_Token
@@ -293,7 +293,7 @@ lexical analysis and parsing. You should push the limits at your own risk.
 =head2 Register Allocator
 
 Now's a decent time to talk about Parrot's register allocator N<it's also
-sometimes humorously referred to as the "register allogator", due to an
+sometimes humorously referred to as the "register alligator", due to an
 oft-repeated typo and the fact that the algorithm will bite you if you get
 too close to it>. When you use a register like C<$P5>, you aren't necessarily
 talking about the fifth register in memory. This is important since you can
@@ -338,7 +338,7 @@ salutation C<hello world!>.
 Parrot's compiler and register allocator are smart enough to realize that
 the two registers in the example above, C<$S0> and C<$S1> are used exclusively
 of one another. C<$S0> is assigned a value in line 2, and is read in line 3,
-but is never accessed after that. So, Parrot determines that it's lifespan
+but is never accessed after that. So, Parrot determines that its lifespan
 ends at line 3. The register C<$S1> is used first on line 4, and is accessed
 again on line 5. Sinec these two do not overlap, Parrot's compiler can
 determine that it can use only one register for both operations. This saves
@@ -474,7 +474,7 @@ front of them, and they've already been optimized into smaller numbers by
 the register allocator. The exact translation from PIR statement to PASM
 instruction isn't too important N<Unless you're hacking on the Parrot
 compiler!>, so we don't have to worry about it for now. We will talk more
-about PASM, it's syntax and its instruction set in X<CHP-5> Chapter 5.
+about PASM, its syntax and its instruction set in X<CHP-5> Chapter 5.
 Here are examples of some PIR symbolic operations:
 
   $I0 = $I1 + 5      # Addition
@@ -744,9 +744,9 @@ these libraries in more detail in A<CHP-6> "PIR Standard Library".
 =head1 Classes and Objects
 
 It may seem more appropriate for a discussion of PIR's support for classes
-and objects to reside in it's own chapter, instead of appearing in a generic
+and objects to reside in its own chapter, instead of appearing in a generic
 chapter about PIR programming "basics". However, part of PIR's core
-functionality is it's support for object-oriented programming. PIR doesn't
+functionality is its support for object-oriented programming. PIR doesn't
 use all the fancy syntax as other OO languages, and it doesn't even support
 all the features that most modern OO languages have. What PIR does have is
 support for some of the basic structures and abilities, the necessary subset

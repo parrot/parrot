@@ -778,7 +778,7 @@ Threads are a means of splitting a process into multiple pieces that
 execute simultaneously.  It's a relatively easy way to get some
 parallelism without too much work. Threads don't solve all the
 parallelism problems your program may have N<And in fact, threading
-can cause it's own parallism problems, if you aren't careful>.
+can cause its own parallism problems, if you aren't careful>.
 Sometimes multiple processes on a single system, multiple processes
 on a cluster, or processes on multiple separate systems are better
 for parallelized tasks then using threads.
