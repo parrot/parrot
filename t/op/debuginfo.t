@@ -159,7 +159,8 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269" );
+# See "RT #43269 and .annotate
+pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline" );
 .sub main :main
     setfile "xyz.pir"
     setline 123
@@ -168,10 +169,11 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT
     'no_such_function'($S0, $I0)
 .end
 CODE
-/\(xyz.foo:123\)/
+/\(xyz.pir:126\)/
 OUTPUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT43269" );
+# See "RT #43269 and .annotate
+pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline" );
 .sub main :main
     setfile "foo.p6"
     setline 123
@@ -186,7 +188,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline", todo => "#RT
     'nsf'($P1)
 .end
 CODE
-/\(foo.p6:124\)/
+/\(foo.p6:128\)/
 OUTPUT
 
 # Local Variables:
