@@ -107,6 +107,7 @@ to the Pod compiler.
 
     $P0 = compreg 'pod'
 
+    init_parser()
     .local pmc opts
     opts = $P0.'process_args'(args)
 
@@ -115,9 +116,29 @@ to the Pod compiler.
 .end
 
 
+.sub init_parser
+    .local pmc blockstack, liststack
+
+    ## create a stack for storing nested blocks.
+    blockstack = new 'ResizablePMCArray'
+    set_hll_global ['Pod';'Grammar';'Actions'], "@?BLOCK", blockstack
+
+    ## create a stack for storing nested lists.
+    liststack = new 'ResizablePMCArray'
+    set_hll_global ['Pod';'Grammar';'Actions'], "@?LIST", liststack
+.end
+
+
 .include 'src/gen_grammar.pir'
 .include 'src/gen_actions.pir'
 .include 'src/Pod/DocTree/Node.pir'
+
+.namespace ['Pod';'Grammar';'Actions']
+
+.sub 'say'
+    .param pmc arg
+    say arg
+.end
 
 
 =back

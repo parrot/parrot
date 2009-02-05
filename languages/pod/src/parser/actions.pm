@@ -48,12 +48,17 @@ method heading($/) {
         my $title := $( $<block_title>[0] );
         $head.title( $title );
     }
+
+    our @?BLOCK;
+    @?BLOCK.unshift($head);
+
     make $head;
 }
 
 method begin_directive($/) {
     my $block := Pod::DocTree::Block.new();
-
+    our @?BLOCK;
+    @?BLOCK.unshift($block);
     make $block;
 }
 
@@ -65,17 +70,39 @@ method for_directive($/) {
 
 method over_directive($/) {
     my $list := Pod::DocTree::List.new();
+    our @?LIST;
+    @?LIST.unshift($list);
     make $list;
 }
 
 method back_directive($/) {
-    ## XXX thsi should probably be the List object
-    ## that's created in =over..
-    make Pod::DocTree::List.new();
+    our @?LIST;
+    my $count := @?LIST;
+    if $count > 0 {
+        my $list := @?LIST.shift();
+        make $list;
+    }
+    else {
+        $/.panic("unexpected '=back': no list to close");
+    }
 }
 
 method item_directive($/) {
-    make Pod::DocTree::Item.new();
+    ## get a reference to the current list object
+    our @?LIST;
+    my $count := @?LIST;
+    if $count > 0 {
+        my $currentlist := @?LIST[0];
+        ## store the new item in that list
+        my $item := Pod::DocTree::Item.new();
+        $currentlist.push($item);
+        make $item;
+    }
+    else {
+        $/.panic("unexpected '=item': no '=over' directive seen to start a list");
+    }
+
+
 }
 
 method block_title($/) {
