@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2006, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -79,24 +79,21 @@ OUTPUT
 # DOD sweep would occur, causing a bonus "DOD" line in the output, which makes
 # the test fail.
 pasm_output_like(
-    <<'CODE', <<'OUTPUT', "restart trace", todo => "lines are out of order due to buffering" );
+    <<'CODE', <<'OUTPUT', "restart trace" );
     printerr "ok 1\n"
     sweepoff
     set I0, 1
     trace I0
-    printerr "ok 2\n"
     dec I0
     trace I0
     sweepon
-    printerr "ok 3\n"
+    printerr "ok 2\n"
     end
 CODE
 /^ok\s1\n
 (?:\s+8.*)?\n
-ok\s2\n
 (?:\s+10.*)?\n
-(?:\s+12.*)?\n
-ok\s3\n$/x
+ok\s2\n$/x
 OUTPUT
 
 # This is the behavior as of Parrot 0.4.3
