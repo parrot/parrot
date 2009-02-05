@@ -157,7 +157,7 @@ realclean: \
     jako.realclean json.realclean \
     lisp.realclean lolcode.realclean lua.realclean \
     ook.realclean \
-    parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean punie.realclean pynie.realclean \
+    parrot_compiler.realclean perl6.realclean pheme.realclean PIR.realclean pipp.realclean pod.realclean punie.realclean pynie.realclean \
     regex.realclean \
     scheme.realclean squaak.realclean \
     urm.realclean
@@ -397,6 +397,16 @@ PIR.clean:
 	- $(MAKE) PIR clean
 PIR.realclean:
 	- $(MAKE) PIR realclean
+
+pod: pod.dummy
+pod.dummy:
+	- $(MAKE) pod
+pod.test:
+	- $(MAKE) pod test
+pod.clean:
+	- $(MAKE) pod clean
+pod.realclean:
+	- $(MAKE) pod realclean
 
 punie : punie.dummy
 punie.dummy:
