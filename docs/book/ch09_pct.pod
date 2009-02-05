@@ -95,7 +95,7 @@ is C<make_language_shell.pl>. C<make_language_shell.pl> is a tool for
 automatically creating all the necessary stub files for creating a new
 compiler for Parrot. It generates the driver file, parser grammar and
 actions files, builtin functions stub file, makefile, and test harness.
-All of these are demonstrative stubs and wil obviously need to be
+All of these are demonstrative stubs and will obviously need to be
 edited furiously or even completely overwritten, but they give a good idea
 of what is needed to start on development of the compiler.
 

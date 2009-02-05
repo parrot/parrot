@@ -18,7 +18,7 @@ course the list of things that qualify as "low-level" in Parrot can be
 pretty advanced compared to the functionality supplied by regular
 assembly language opcodes.
 
-Before we talk about opcodes, we have to a little bit of talking about
+Before we talk about opcodes, we shall discuss a little bit about
 the various runcores that invoke them.
 
 =head2 Runcores
@@ -44,7 +44,7 @@ requires an understanding of the Parrot runcores.
 
 Parrot has multiple runcores. Some are useful for particular maintenance
 tasks, some are only available as optimizations in certain compilers,
-some are intended for general use, and some are just interesing flights
+some are intended for general use, and some are just interesting flights
 of fancy with no practical benefits. Here we list the various runcores,
 their uses, and their benefits.
 
@@ -116,7 +116,7 @@ treated as a piece of data that can be stored as a C<void *> pointer. Each
 opcode becomes simply a label in a very large function, and pointers to the
 labels are stored in a large array. Calling an opcode is as easy as taking
 that opcode's number as the index of the label array, and calling the
-associated label. Sound complicated? It is a little, especially to C
+associated label. Sounds complicated? It is a little, especially to C
 programmers who are not used to using labels, much less treating them as
 first class data items.
 
@@ -172,7 +172,7 @@ it isn't optimized as aggressively as is possible.
 The precomputed goto core is an amazingly fast optimized core that uses
 the same computed goto feature, but performs the array dereferencing
 before the core even starts. The compiled bytecode is fed into a
-preprocessor that converts the bytecode instruction numbers into lable
+preprocessor that converts the bytecode instruction numbers into label
 pointer values. In the computed goto core, you have this
 operation to move to the next opcode:
 

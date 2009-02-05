@@ -144,7 +144,7 @@ all caps.
 The PMC compiler enables us to use a few pre-defined variable names
 throughout the file to make things easier. The C<INTERP> keyword always
 contains a reference to the current interpreter structure. This keyword is
-include by default in all VTABLE interfaces and all PMC methods. It is not
+included by default in all VTABLE interfaces and all PMC methods. It is not
 automatically included in any extra helper functions that you define in
 the PMC file.
 
