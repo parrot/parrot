@@ -973,18 +973,22 @@ emit_pbc_annotations(lexer_state * const lexer) {
 /*
 
 =item C<void
-emit_pbc(lexer_state * const lexer)>
+emit_pbc(lexer_state * const lexer, const char *outfile)>
 
 Generate Parrot Byte Code from the abstract syntax tree.
 This is the top-level function. After all instructions
-have been emitted, the PBC is written to a file.
+have been emitted, the PBC is written to the specified
+file (or "a.pbc" if outfile is NULL).
 
 =cut
 
 */
 void
-emit_pbc(lexer_state * const lexer) {
+emit_pbc(lexer_state * const lexer, const char *outfile) {
     subroutine *subiter;
+
+    if(!outfile)
+        outfile = "a.pbc";
 
     if (lexer->subs == NULL)
         return;
@@ -1020,7 +1024,7 @@ emit_pbc(lexer_state * const lexer) {
     emit_pbc_annotations(lexer);
 
     /* write the output to a file. */
-    write_pbc_file(lexer->bc, "a.pbc");  /* XXX fix output file specified by user */
+    write_pbc_file(lexer->bc, outfile);
 
     /* XXX just make sure no seg. faults  happened */
 /*

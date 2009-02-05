@@ -115,7 +115,7 @@ parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const filename, in
         else if (TEST_FLAG(lexer->flags, LEXER_FLAG_PREPROCESS))
             emit_pir_subs(lexer, outputfile);
         else if (TEST_FLAG(lexer->flags, LEXER_FLAG_OUTPUTPBC))
-            emit_pbc(lexer);
+            emit_pbc(lexer, outputfile);
         else
             /*
             fprintf(stderr, "Parse successful!\n");
@@ -215,7 +215,7 @@ parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsigned 
 
     /* XXX just want to make sure pirc doesn't segfault when doing bytecode stuff. */
     if (TEST_FLAG(lexer->flags, LEXER_FLAG_OUTPUTPBC)) {
-        emit_pbc(lexer);
+        emit_pbc(lexer, NULL);
     }
 
 /*
