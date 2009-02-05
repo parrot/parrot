@@ -117,7 +117,7 @@ to the Pod compiler.
 
 .include 'src/gen_grammar.pir'
 .include 'src/gen_actions.pir'
-.include 'src/Pod/DocTree/node.pir'
+.include 'src/Pod/DocTree/Node.pir'
 
 
 =back
