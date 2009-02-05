@@ -553,9 +553,9 @@ Compare two strings, return 1 if they are equal, 0 if they are not equal.
 
 Compare two strings, return 0 if they are equal, 1 if they are not equal.
 
-{{DEPRECATION NOTE: The return value of 'Parrot_str_equal' is reversed from the
-old logic, but 'Parrot_str_not_equal' is provided as a drop-in replacement
-for the old function.}}
+{{DEPRECATION NOTE: The return value of 'Parrot_str_equal' is reversed from
+the old logic, but 'Parrot_str_not_equal' is provided as a drop-in
+replacement for the old function.}}
 
 =head3 Parrot_str_grapheme_equal
 

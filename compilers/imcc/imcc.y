@@ -739,7 +739,7 @@ static void
 add_pcc_named_arg_var(PARROT_INTERP, ARGMOD(SymReg *cur_call),
     ARGIN(SymReg *name), ARGIN(SymReg *value))
 {
-    ASSERT_ARGS(add_pcc_named_param_var)
+    ASSERT_ARGS(add_pcc_named_arg_var)
     name->type |= VT_NAMED;
     add_pcc_arg(cur_call, name);
     add_pcc_arg(cur_call, value);

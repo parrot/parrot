@@ -50,6 +50,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, ARGIN_NULLOK(PMC *newhandle))
 {
+    ASSERT_ARGS(Parrot_io_stdhandle)
     PMC * result = PMCNULL;
     if (fileno == PIO_STDIN_FILENO || fileno == PIO_STDOUT_FILENO ||
             fileno == PIO_STDERR_FILENO) {

@@ -339,7 +339,8 @@ StringHandle object that isn't opened yet, returns an empty string.
             STRING *encoding;
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (!STRING_IS_NULL(encoding) &&
-                    Parrot_str_not_equal(INTERP, encoding, Parrot_str_new_constant(INTERP, "utf8")) == 0)
+                    Parrot_str_not_equal(INTERP, encoding,
+                        Parrot_str_new_constant(INTERP, "utf8")) == 0)
                 string_result = string_make(INTERP, "", 0, "unicode", 0);
             else
                 string_result = Parrot_str_new_constant(INTERP, "");

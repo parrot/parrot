@@ -75,9 +75,9 @@ On the commandline, a language is executed as:
 
 Where F<abc> is a symlink to the F<parrot> executable. On platforms that don't
 have symlinks, F<abc> may be a copy of the F<parrot> executable. On general
-principles, languages should not install themselves with the same name as their
-"real" counterpart, but should provide a build option to do so (so, the default
-installed executable for Python on Parrot should be F<pynie> or
+principles, languages should not install themselves with the same name as
+their "real" counterpart, but should provide a build option to do so (so, the
+default installed executable for Python on Parrot should be F<pynie> or
 F<parrot-python> but not F<python>).
 
 =item F</usr/lib/parrot/<version>/languages/*>
@@ -86,8 +86,8 @@ The languages directories may have subdirectories, including F<library> for
 their own set of libraries, and F<dynpmc> for dynamic pmcs.
 
 It is recommended that languages follow a standard pattern in installing their
-libraries so a bytecode compiled version of a module in the C<mylang> HLL named
-C<['Foo';'Bar']> is stored in
+libraries so a bytecode compiled version of a module in the C<mylang> HLL
+named C<['Foo';'Bar']> is stored in
 F<usr/lib/parrot/<version>/languages/<mylang>/library/Foo/Bar.pbc>
 
 =item F</usr/lib/parrot/tools/>
@@ -283,8 +283,9 @@ B<Fix 2>: Module system.
 
 Avoid already loaded pbc files.
 
-Source loading PIR statements like C<loadlib> and C<load_bytecode> should cache
-the file name and skip the file if it has already been loaded (as in perl5)
+Source loading PIR statements like C<loadlib> and C<load_bytecode> should
+cache the file name and skip the file if it has already been loaded (as in
+perl5) 
 
 B<Fix 3>: pbc_merge fixups
 
