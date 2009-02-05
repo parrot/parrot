@@ -11,12 +11,6 @@
 #ifndef PARROT_IMCC_PARSER_H_GUARD
 #define PARROT_IMCC_PARSER_H_GUARD
 
-#ifdef PARSER_MAIN
-#  define EXTERN
-#else
-#  define EXTERN extern
-#endif
-
 typedef struct _IdList {
     char* id;
     int unique_reg;
@@ -26,7 +20,7 @@ typedef struct _IdList {
 #include "imcparser.h"
 
 /* short ranged globals for lexer state */
-EXTERN int is_def;
+extern int pesky_global__is_def;
 
 #define KEY_BIT(argnum) (1 << (argnum))
 

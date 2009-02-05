@@ -3095,7 +3095,7 @@ yyreduce:
 
   case 20:
 #line 996 "compilers/imcc/imcc.y"
-    { is_def = 1; }
+    { pesky_global__is_def = 1; }
     break;
 
   case 21:
@@ -3103,33 +3103,33 @@ yyreduce:
     {
              mk_const_ident(interp, (yyvsp[(4) - (6)].s), (yyvsp[(3) - (6)].t), (yyvsp[(6) - (6)].sr), 1);
              mem_sys_free((yyvsp[(4) - (6)].s));
-             is_def = 0;
+             pesky_global__is_def = 0;
          }
     break;
 
   case 22:
 #line 1005 "compilers/imcc/imcc.y"
-    { is_def=1; }
+    { pesky_global__is_def=1; }
     break;
 
   case 23:
 #line 1006 "compilers/imcc/imcc.y"
     {
            (yyval.i) = mk_pmc_const(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(3) - (6)].s), (yyvsp[(4) - (6)].sr), (yyvsp[(6) - (6)].s));
-           is_def = 0;
+           pesky_global__is_def = 0;
          }
     break;
 
   case 24:
 #line 1011 "compilers/imcc/imcc.y"
-    { is_def=1; }
+    { pesky_global__is_def=1; }
     break;
 
   case 25:
 #line 1012 "compilers/imcc/imcc.y"
     {
            (yyval.i) = mk_pmc_const_named(interp, IMCC_INFO(interp)->cur_unit, (yyvsp[(3) - (6)].s), (yyvsp[(4) - (6)].sr), (yyvsp[(6) - (6)].s));
-           is_def = 0;
+           pesky_global__is_def = 0;
          }
     break;
 
@@ -3316,12 +3316,12 @@ yyreduce:
 
   case 59:
 #line 1158 "compilers/imcc/imcc.y"
-    { is_def=1; }
+    { pesky_global__is_def=1; }
     break;
 
   case 60:
 #line 1158 "compilers/imcc/imcc.y"
-    { (yyval.sr) = (yyvsp[(3) - (3)].sr); is_def=0; }
+    { (yyval.sr) = (yyvsp[(3) - (3)].sr); pesky_global__is_def=0; }
     break;
 
   case 61:
@@ -3705,7 +3705,7 @@ yyreduce:
 
   case 123:
 #line 1441 "compilers/imcc/imcc.y"
-    { is_def=1; }
+    { pesky_global__is_def=1; }
     break;
 
   case 124:
@@ -3718,7 +3718,7 @@ yyreduce:
            else
                ignored = mk_ident(interp, l->id, (yyvsp[(3) - (4)].t));
            UNUSED(ignored);
-           is_def=0;
+           pesky_global__is_def=0;
            (yyval.sr)=0;
          }
     break;
@@ -4017,7 +4017,7 @@ yyreduce:
 
   case 178:
 #line 1667 "compilers/imcc/imcc.y"
-    { is_def=1; }
+    { pesky_global__is_def=1; }
     break;
 
   case 179:
@@ -4035,7 +4035,7 @@ yyreduce:
                mem_sys_free(l1->id);
                mem_sys_free(l1);
            }
-           is_def=0; (yyval.i)=0;
+           pesky_global__is_def=0; (yyval.i)=0;
          }
     break;
 
@@ -4048,28 +4048,28 @@ yyreduce:
 
   case 181:
 #line 1687 "compilers/imcc/imcc.y"
-    { is_def=1; }
+    { pesky_global__is_def=1; }
     break;
 
   case 182:
 #line 1688 "compilers/imcc/imcc.y"
     {
            mk_const_ident(interp, (yyvsp[(4) - (6)].s), (yyvsp[(3) - (6)].t), (yyvsp[(6) - (6)].sr), 0);
-           is_def=0;
+           pesky_global__is_def=0;
            mem_sys_free((yyvsp[(4) - (6)].s));
          }
     break;
 
   case 184:
 #line 1695 "compilers/imcc/imcc.y"
-    { is_def=1; }
+    { pesky_global__is_def=1; }
     break;
 
   case 185:
 #line 1696 "compilers/imcc/imcc.y"
     {
            mk_const_ident(interp, (yyvsp[(4) - (6)].s), (yyvsp[(3) - (6)].t), (yyvsp[(6) - (6)].sr), 1);
-           is_def=0;
+           pesky_global__is_def=0;
            mem_sys_free((yyvsp[(4) - (6)].s));
          }
     break;

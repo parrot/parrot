@@ -28,9 +28,9 @@ typedef struct _basic_block {
     int          flag;
 } Basic_block;
 
-EXTERN enum block_enum_flags_t {
+enum block_enum_flags_t {
     BB_IS_SUB = 1 << 0
-} block_enum_flags;
+};
 
 
 typedef struct _loop_info {

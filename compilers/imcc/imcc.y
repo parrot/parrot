@@ -993,25 +993,25 @@ hll_def:
    ;
 
 constdef:
-     CONST { is_def = 1; } type IDENTIFIER '=' const
+     CONST { pesky_global__is_def = 1; } type IDENTIFIER '=' const
          {
              mk_const_ident(interp, $4, $3, $6, 1);
              mem_sys_free($4);
-             is_def = 0;
+             pesky_global__is_def = 0;
          }
    ;
 
 pmc_const:
-     CONST { is_def=1; } INTC var_or_i '=' any_string
+     CONST { pesky_global__is_def=1; } INTC var_or_i '=' any_string
          {
            $$ = mk_pmc_const(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6);
-           is_def = 0;
+           pesky_global__is_def = 0;
          }
 
-     | CONST { is_def=1; } STRINGC var_or_i '=' any_string
+     | CONST { pesky_global__is_def=1; } STRINGC var_or_i '=' any_string
          {
            $$ = mk_pmc_const_named(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6);
-           is_def = 0;
+           pesky_global__is_def = 0;
          }
    ;
 any_string:
@@ -1155,7 +1155,7 @@ sub_params:
    ;
 
 sub_param:
-   PARAM { is_def=1; } sub_param_type_def { $$ = $3; is_def=0; }
+   PARAM { pesky_global__is_def=1; } sub_param_type_def { $$ = $3; pesky_global__is_def=0; }
    ;
 
 sub_param_type_def:
@@ -1438,7 +1438,7 @@ pcc_results:
 
 pcc_result:
      RESULT target paramtype_list { $$ = $2; $$->type |= $3; }
-   | LOCAL { is_def=1; } type id_list_id
+   | LOCAL { pesky_global__is_def=1; } type id_list_id
          {
            IdList *l = $4;
            SymReg *ignored;
@@ -1447,7 +1447,7 @@ pcc_result:
            else
                ignored = mk_ident(interp, l->id, $3);
            UNUSED(ignored);
-           is_def=0;
+           pesky_global__is_def=0;
            $$=0;
          }
    ;
@@ -1664,7 +1664,7 @@ opt_unique_reg:
 labeled_inst:
      assignment
    | conditional_statement
-   | LOCAL { is_def=1; } type id_list
+   | LOCAL { pesky_global__is_def=1; } type id_list
          {
            IdList *l = $4;
            while (l) {
@@ -1678,24 +1678,24 @@ labeled_inst:
                mem_sys_free(l1->id);
                mem_sys_free(l1);
            }
-           is_def=0; $$=0;
+           pesky_global__is_def=0; $$=0;
          }
    | LEXICAL STRINGC COMMA target
          {
            set_lexical(interp, $4, $2); $$ = 0;
          }
-   | CONST { is_def=1; } type IDENTIFIER '=' const
+   | CONST { pesky_global__is_def=1; } type IDENTIFIER '=' const
          {
            mk_const_ident(interp, $4, $3, $6, 0);
-           is_def=0;
+           pesky_global__is_def=0;
            mem_sys_free($4);
          }
 
    | pmc_const
-   | GLOBAL_CONST { is_def=1; } type IDENTIFIER '=' const
+   | GLOBAL_CONST { pesky_global__is_def=1; } type IDENTIFIER '=' const
          {
            mk_const_ident(interp, $4, $3, $6, 1);
-           is_def=0;
+           pesky_global__is_def=0;
            mem_sys_free($4);
          }
    | TAILCALL sub_call

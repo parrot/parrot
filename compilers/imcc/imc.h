@@ -38,12 +38,6 @@
  #  error: flags wont fit
 #endif
 
-#ifdef MAIN
-#  define EXTERN
-#else
-#  define EXTERN extern
-#endif
-
 /* IMCC reserves this character for internally generated labels
  * and identifiers that won't collide with high level compiler generated names.
  */
