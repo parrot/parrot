@@ -168,7 +168,8 @@ init_world(PARROT_INTERP)
             (INTVAL)IGLOBALS_CLASSNAME_HASH, interp->class_hash);
 
     self           = pmc_new_noinit(interp, enum_class_ParrotInterpreter);
-    PMC_data(self) = interp;
+    VTABLE_set_pointer(interp, self, interp);
+    /* PMC_data(self) = interp; */
 
     VTABLE_set_pmc_keyed_int(interp, iglobals,
             (INTVAL)IGLOBALS_INTERPRETER, self);

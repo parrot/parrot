@@ -267,7 +267,8 @@ Sets C<struct_val> to C<*value>.
 */
 
     VTABLE void set_pointer(void *value) {
-        PMC_struct_val(SELF) = value;
+        /* PMC_struct_val(SELF) = value; */
+        PMC_data(SELF) = value;
     }
 
 /*
@@ -281,7 +282,8 @@ Returns C<struct_val>.
 */
 
     VTABLE void *get_pointer() {
-        return PMC_struct_val(SELF);
+        /* return PMC_struct_val(SELF); */
+        return PMC_data(SELF);
     }
 
 /*
