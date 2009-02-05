@@ -36,7 +36,6 @@ symbols for C<Boolean::True> and C<Boolean::False>.
 .end
 
 .sub 'get_string' :vtable
-  .param pmc self
    $I0 = self
    unless self goto f
   .return ("true")
