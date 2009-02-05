@@ -113,10 +113,10 @@ Resizes the array to C<size> elements.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
         if (!int_array) {
             /* empty - used fixed routine */
-            if (size < 64) {
-                SUPER(64);
+            if (size < 8) {
+                SUPER(8);
                 SET_ATTR_size(INTERP, SELF, size);
-                SET_ATTR_resize_threshold(INTERP, SELF, 64);
+                SET_ATTR_resize_threshold(INTERP, SELF, 8);
             }
             else {
                 SUPER(size);
