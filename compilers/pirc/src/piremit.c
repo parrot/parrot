@@ -987,7 +987,7 @@ void
 emit_pbc(lexer_state * const lexer, const char *outfile) {
     subroutine *subiter;
 
-    if(!outfile)
+    if (!outfile)
         outfile = "a.pbc";
 
     if (lexer->subs == NULL)

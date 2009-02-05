@@ -564,12 +564,12 @@ static void set_lexical(PARROT_INTERP,
     || PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_add_pcc_named_arg_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
-#define ASSERT_ARGS_add_pcc_named_param_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
@@ -1065,7 +1065,7 @@ static void
 add_pcc_named_arg_var(PARROT_INTERP, ARGMOD(SymReg *cur_call),
     ARGIN(SymReg *name), ARGIN(SymReg *value))
 {
-    ASSERT_ARGS(add_pcc_named_param_var)
+    ASSERT_ARGS(add_pcc_named_arg_var)
     name->type |= VT_NAMED;
     add_pcc_arg(cur_call, name);
     add_pcc_arg(cur_call, value);
