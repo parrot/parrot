@@ -1826,9 +1826,9 @@ bin_op:
 get_results:
      GET_RESULTS
          {
-           $$ = IMCC_create_itcall_label(interp);
-           $$->type &= ~ITCALL;
-           $$->type |= ITRESULT;
+           $<i>$ = IMCC_create_itcall_label(interp);
+           $<i>$->type &= ~ITCALL;
+           $<i>$->type |= ITRESULT;
          }
      '(' targetlist  ')'       {  $$ = 0; }
    ;
@@ -1907,7 +1907,7 @@ the_sub:
 sub_call:
      the_sub
          {
-           $$ = IMCC_create_itcall_label(interp);
+           $<i>$ = IMCC_create_itcall_label(interp);
            IMCC_itcall_sub(interp, $1);
          }
      '(' arglist ')'           { $$ = $<i>2; }
