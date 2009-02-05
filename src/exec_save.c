@@ -596,6 +596,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
     FILE *fp;
     int i;
+    size_t j;
 
     fp = fopen(file, "wb");
 
@@ -641,11 +642,11 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
     save_int(fp, 0x80);
 
     /* Text */
-    for (i = 0; i < obj->text.size; i++)
-        fprintf(fp, "%c", obj->text.code[i]);
+    for (j = 0; j < obj->text.size; j++)
+        fprintf(fp, "%c", obj->text.code[j]);
     /* Data */
-    for (i = 0; i < obj->data.size; i++)
-        fprintf(fp, "%c", obj->data.code[i]);
+    for (j = 0; j < obj->data.size; j++)
+        fprintf(fp, "%c", obj->data.code[j]);
     /* Text rellocations */
     for (i = 0; i < obj->text_rellocation_count; i++) {
         save_int(fp, obj->text_rellocation_table[i].offset);
