@@ -113,10 +113,10 @@ Resizes the array to C<size> elements.
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
         if (!int_array) {
             /* empty - used fixed routine */
-            if (size < 8) {
-                SUPER(8);
+            if (size < 64) {
+                SUPER(64);
                 SET_ATTR_size(INTERP, SELF, size);
-                SET_ATTR_resize_threshold(INTERP, SELF, 8);
+                SET_ATTR_resize_threshold(INTERP, SELF, 64);
             }
             else {
                 SUPER(size);
@@ -270,12 +270,12 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-        INTVAL size;
-        PMC *copy          = SUPER();
+        INTVAL  size;
+        PMC    *copy = SUPER();
 
         /* copy trimmed extra space */
         GET_ATTR_size(INTERP, SELF, size);
-        SET_ATTR_resize_threshold(INTERP, SELF, size);
+        SET_ATTR_resize_threshold(INTERP, copy, size);
 
         return copy;
     }
