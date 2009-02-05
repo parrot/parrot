@@ -108,8 +108,6 @@ struct namespace_t {
     Identifier *idents;
 };
 
-EXTERN Namespace * _namespace;
-
 struct _IMC_Unit;
 
 /* functions */

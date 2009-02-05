@@ -30,6 +30,9 @@ and SymbolTable (see symbol.h and symbol.c)
 #include "imc.h"
 
 /* Globals: */
+
+static Namespace * pesky_global__namespace;
+
 /* Code: */
 
 /* HEADERIZER HFILE: compilers/imcc/symreg.h */
@@ -130,9 +133,9 @@ push_namespace(SHIM_INTERP, ARGIN(const char *name))
     ASSERT_ARGS(push_namespace)
     Namespace * const ns = mem_allocate_zeroed_typed(Namespace);
 
-    ns->parent = _namespace;
+    ns->parent = pesky_global__namespace;
     ns->name   = str_dup(name);
-    _namespace = ns;
+    pesky_global__namespace = ns;
 }
 
 
@@ -151,7 +154,7 @@ void
 pop_namespace(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(pop_namespace)
-    Namespace * const ns = _namespace;
+    Namespace * const ns = pesky_global__namespace;
 
     if (!ns)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "pop() on empty namespace stack\n");
@@ -166,7 +169,7 @@ pop_namespace(PARROT_INTERP, ARGIN(const char *name))
         mem_sys_free(ident);
     }
 
-    _namespace = ns->parent;
+    pesky_global__namespace = ns->parent;
     mem_sys_free(ns);
 }
 
@@ -589,17 +592,17 @@ SymReg *
 mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_ident)
-    char   * const fullname = _mk_fullname(_namespace, name);
+    char   * const fullname = _mk_fullname(pesky_global__namespace, name);
     SymReg        *r        = mk_symreg(interp, fullname, t);
 
     r->type = VTIDENTIFIER;
 
-    if (_namespace) {
+    if (pesky_global__namespace) {
         Identifier * const ident = mem_allocate_zeroed_typed(Identifier);
 
         ident->name        = fullname;
-        ident->next        = _namespace->idents;
-        _namespace->idents = ident;
+        ident->next        = pesky_global__namespace->idents;
+        pesky_global__namespace->idents = ident;
     }
     else
         mem_sys_free(fullname);
@@ -1472,7 +1475,7 @@ find_sym(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(find_sym)
     if (IMCC_INFO(interp)->cur_unit)
-        return _find_sym(interp, _namespace,
+        return _find_sym(interp, pesky_global__namespace,
             &IMCC_INFO(interp)->cur_unit->hash, name);
 
     return NULL;
