@@ -15,8 +15,8 @@ src/packfile.c - Parrot PackFile API
 This file contains all the functions required for the processing of the
 structure of a PackFile. It is not intended to understand the byte code
 stream itself, but merely to dissect and reconstruct data from the
-various segments. See F<docs/parrotbyte.pod> for information about the
-structure of the frozen bytecode.
+various segments. See F<docs/pdds/pdd13_bytecode.pod> for information
+about the structure of the frozen bytecode.
 
 =over 4
 
@@ -3297,9 +3297,8 @@ fixup_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(const opcode_t *
 
 =item C<void PackFile_FixupTable_new_entry>
 
-I<What does this do?>
-
-RT #48260: Not yet documented!!!
+Adds a new fix-up entry with label and type.
+Creates a new PackFile FixupTable if none is present.
 
 =cut
 
@@ -3336,7 +3335,10 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
 
 =item C<static PackFile_FixupEntry * find_fixup>
 
-Finds the fix-up entry for C<name> and returns it.
+Finds the fix-up entry in a given FixupTable C<ft> for C<type> and C<name>
+and returns it.
+
+This ignores directories, for a recursive version see C<PackFile_find_fixup_entry>.
 
 =cut
 
@@ -3363,9 +3365,7 @@ find_fixup(ARGMOD(PackFile_FixupTable *ft), INTVAL type, ARGIN(const char *name)
 
 =item C<static INTVAL find_fixup_iter>
 
-I<What does this do?>
-
-RT #48260: Not yet documented!!!
+Internal iterator for C<PackFile_find_fixup_entry> to recurse into directories.
 
 =cut
 
@@ -3396,9 +3396,11 @@ find_fixup_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(void *user_da
 
 =item C<PackFile_FixupEntry * PackFile_find_fixup_entry>
 
-I<What does this do?>
-
-RT #48260: Not yet documented!!!
+Search the whole PackFile recursively for a fix-up entry
+with the given C<type> and C<name>, and returns the found entry or NULL.
+ 
+This also recurses into directories, compared to the simplier
+C<find_fixup> which just searches one PackFile_FixupTable.
 
 =cut
 
