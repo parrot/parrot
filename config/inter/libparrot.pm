@@ -53,11 +53,7 @@ sub runstep {
         @libs = ('libparrot.dll', 'libparrot.lib', 'libparrot.dll.a');
     }
     if ($^O eq 'cygwin') {
-        my @parrot_version = Parrot::BuildUtil::parrot_version();
-        my $dllsuffix = join("_",@parrot_version);
-        push @libpaths, ('/usr/bin/');
-        push @libpaths, (split /;/, $ENV{PATH});
-        @libs = ('libparrot.dll.a', 'cygparrot.dll', "cygparrot$dllsuffix.dll");
+        @libs = ('libparrot.dll.a');
     }
     if (defined $ENV{LD_LIBRARY_PATH}) {
         push @libpaths, (split /:/, $ENV{LD_LIBRARY_PATH});
