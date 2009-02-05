@@ -519,6 +519,7 @@ docs/project/metacommitter_guide.pod                        [main]doc
 docs/project/pause_guide.pod                                [main]doc
 docs/project/release_manager_guide.pod                      [main]doc
 docs/project/roles_responsibilities.pod                     [main]doc
+docs/project/support_policy.pod                             [main]doc
 docs/project/ticket_wrangler_guide.pod                      [main]doc
 docs/req/model_users.pod                                    [main]doc
 docs/resources/favicon.ico                                  [main]doc
