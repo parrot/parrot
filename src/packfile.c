@@ -3398,7 +3398,7 @@ find_fixup_iter(PARROT_INTERP, ARGIN(PackFile_Segment *seg), ARGIN(void *user_da
 
 Search the whole PackFile recursively for a fix-up entry
 with the given C<type> and C<name>, and returns the found entry or NULL.
- 
+
 This also recurses into directories, compared to the simplier
 C<find_fixup> which just searches one PackFile_FixupTable.
 
