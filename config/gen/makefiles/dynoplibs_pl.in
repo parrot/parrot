@@ -35,7 +35,13 @@ our $LIBPARROT = q[];
 #IF(parrot_is_shared):$LIBPARROT = q[@libparrot_ldflags@];
 
 # Here comes some stuff for Win32.
-our $PATHQUOTE = $^O eq 'MSWin32' ? '"' : '';
+our $PATHQUOTE = q[];
+if ($^O eq 'MSWin32') {
+    # Paths need quoting as they may contain spaces.
+    $PATHQUOTE = q["];
+    # absolute because we are building in src\dynoplibs
+    $LIBPARROT = '@build_dir@/libparrot.lib'; # the importlib, not the static one
+}
 
 # OPS2C Config
 our $OPS2C = "$PERL -I $PATHQUOTE" .
