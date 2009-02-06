@@ -22,7 +22,6 @@ subroutines.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "inter_call.str"
-#include "pmc/pmc_fixedintegerarray.h"
 
 /* HEADERIZER HFILE: include/parrot/inter_call.h */
 
@@ -1405,15 +1404,14 @@ check_named(PARROT_INTERP, ARGMOD(call_state *st))
 
             /* if this named arg is already filled, continue */
             if (st->named_done & (1 << n_named)) {
-                /* XXX: This reads past the end of the array. TT #233*/
-                INTVAL* int_array;
-                GETATTR_FixedIntegerArray_int_array(interp,
-                        st->dest.u.op.signature, int_array);
-                arg_sig = st->dest.sig = int_array[i+1];
+                if (i + 1 < st->dest.n) {
+                    arg_sig = st->dest.sig = VTABLE_get_integer_keyed_int(interp,
+                            st->dest.u.op.signature, i + 1);
 
-                /* skip associated opt flag arg as well */
-                if (arg_sig & PARROT_ARG_OPT_FLAG)
-                    i++;
+                    /* skip associated opt flag arg as well */
+                    if (arg_sig & PARROT_ARG_OPT_FLAG)
+                        i++;
+                }
 
                 continue;
             }
