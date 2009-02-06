@@ -157,7 +157,7 @@ stored for mocking.
 
     METHOD open(STRING *filename :optional, INTVAL got_filename :opt_flag,
                 STRING *mode :optional, INTVAL got_mode :opt_flag) {
-        STRING *open_mode, *old_string, *new_string, *encoding;
+        STRING *open_mode, *old_string;
         INTVAL flags;
 
         if (got_mode && !STRING_IS_NULL(mode))
@@ -170,6 +170,9 @@ stored for mocking.
         /* If StringHandle hasn't already been initialized, create a new string. */
         GET_ATTR_stringhandle(INTERP, SELF, old_string);
         if (STRING_IS_NULL(old_string)) {
+            STRING *new_string;
+            STRING *encoding;
+
             GET_ATTR_encoding(INTERP, SELF, encoding);
             if (!STRING_IS_NULL(encoding)
             &&  Parrot_str_not_equal(INTERP, encoding, CONST_STRING(INTERP, "utf8")) == 0)
@@ -377,7 +380,7 @@ Print the passed in integer, number, string, or PMC to the stringhandle.
 */
 
     METHOD print(PMC *to_print) {
-        STRING *string_to_print = VTABLE_get_string(INTERP, to_print);
+        STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
         Parrot_io_putps(interp, SELF, string_to_print);
     }
@@ -427,9 +430,9 @@ ignored, but stored for mocking.
 
     METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
         INTVAL flags;
-        STRING *nobuffer_string   = Parrot_str_new_constant(INTERP, "unbuffered");
-        STRING *linebuffer_string = Parrot_str_new_constant(INTERP, "line-buffered");
-        STRING *fullbuffer_string = Parrot_str_new_constant(INTERP, "full-buffered");
+        STRING * const nobuffer_string   = Parrot_str_new_constant(INTERP, "unbuffered");
+        STRING * const linebuffer_string = Parrot_str_new_constant(INTERP, "line-buffered");
+        STRING * const fullbuffer_string = Parrot_str_new_constant(INTERP, "full-buffered");
 
         GET_ATTR_flags(INTERP, SELF, flags);
 
