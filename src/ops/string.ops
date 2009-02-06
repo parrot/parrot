@@ -49,8 +49,7 @@ inline op ord(out INT, in STR, in INT) :base_core {
 
 =item B<chr>(out STR, in INT)
 
-The character specified by codepoint integer $2 in the current character set
-is returned in string $1.
+The character specified by codepoint integer $2 is returned in string $1.
 
 =cut
 
