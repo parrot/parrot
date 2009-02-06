@@ -18,8 +18,8 @@ course the list of things that qualify as "low-level" in Parrot can be
 pretty advanced compared to the functionality supplied by regular
 assembly language opcodes.
 
-Before we talk about opcodes, we shall discuss a little bit about
-the various runcores that invoke them.
+Before we talk about opcodes, we shall discuss the various runcores that
+invoke them.
 
 =head2 Runcores
 
