@@ -76,7 +76,7 @@ BEGIN {
        ["INVERSE_CONDITIONED_LINE(false)",  1],
       );
 }
-use Test::More tests => (7 + scalar(@cond_tests));
+use Test::More tests => (8 + scalar(@cond_tests));
 use Carp;
 use lib qw( . lib );
 use_ok('config::gen::makefiles');
@@ -140,9 +140,6 @@ my $f;
     local $/;
     $f = <OUT>;
 }
-END {
-    unlink "Makefile_$$.in", "Makefile_$$.out";
-}
 $index = undef;
 for my $c (@cond_tests) {
     my $result = result($c);
@@ -155,7 +152,25 @@ for my $c (@cond_tests) {
     }
 }
 
+# TT #279: reporting the makefile line number
+# step gen::makefiles died during execution:
+#  invalid op "IF" in "#IF(bla)" at "(bla)" at Configure.pl line 72
+open IN, ">", "Makefile_$$.in";
+print IN "# Test reporting sourcefile line numbers. TT #279\n";
+print IN "#IF(IF(bla)):test\n";
+close IN;
+eval {
+    $conf->genfile("Makefile_$$.in", "Makefile_$$.out",
+                   (makefile => 1, conditioned_lines => 1));
+};
+my $error = $@;
+ok($error eq "invalid op \"bla\" in \"IF(bla)\" at \"(bla)\" at Makefile_$$.in line 2\n",
+   "report correct error line");
+
 pass("Completed all tests in $0");
+END {
+    unlink "Makefile_$$.in", "Makefile_$$.out";
+}
 
 ################### DOCUMENTATION ###################
 
@@ -176,6 +191,7 @@ The tests in this file test gen::makefiles.
 =head1 AUTHOR
 
 James E Keenan
+Reini Urban
 
 =head1 SEE ALSO
 

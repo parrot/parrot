@@ -34,6 +34,13 @@ use Parrot::Configure::Utils qw(
     move_if_diff
 );
 
+# report the makefile and lineno
+sub makecroak {
+    my ($conf, $error) = @_;
+    my ($file, $line) = ($conf->{_compiler_file}, $conf->{_compiler_line});
+    die "$error at $file line $line\n";
+}
+
 our %file_types_info = (
     makefile => {
         comment_type    => '#',
@@ -396,9 +403,11 @@ sub genfile {
     # this loop can not be implemented as a foreach loop as the body
     # is dependent on <IN> being evaluated lazily
 
+    $conf->{_compiler_file} = $source;
     my $former_truth = -1;
   LINE:
     while ( my $line = <$in> ) {
+        $conf->{_compiler_line} = $.;
 
         # everything after the line starting with #perl is eval'ed
         if ( $line =~ /^#perl/ && $options{feature_file} ) {
@@ -413,7 +422,7 @@ sub genfile {
             # interpolate @foo@ values
             $text =~ s{ \@ (\w+) \@ }{\$conf->data->get("$1")}gx;
             eval $text;
-            die $@ if $@;
+            croak $@ if $@;
             last LINE;
         }
         if ( $options{conditioned_lines} ) {
@@ -531,7 +540,7 @@ sub genfile {
 
         if ( $options{replace_slashes} ) {
             if ( $line =~ m{/$} ) {
-                die "$source:$.: line ends in a slash\n";
+                croak "$source:$.: line ends in a slash\n";
             }
 
             $line =~ s{(/+)}{
@@ -651,18 +660,18 @@ sub cond_eval {
                     $op = 'NOT';
                 }
                 else {
-                    die "invalid op \"$op\" in \"$_[1]\" at \"$prevexpr\".\n";
+                    makecroak($conf, "invalid op \"$op\" in \"$_[1]\" at \"$prevexpr\"");
                 }
                 $key = next_expr($expr);
             }
             elsif ($prevexpr) {
-                die "Makefile conditional syntax error: missing op in \"$_[1]\" at \"$prevexpr\".\n";
+                makecroak($conf, "Makefile conditional syntax error: missing op in \"$_[1]\" at \"$prevexpr\"");
             }
             else {
                 last LOOP; # end of expr, nothing left
             }
             if ($prevexpr eq $expr) {
-                die "Makefile conditional parser error in \"$_[1]\" at \"$prevexpr\".\n";
+                makecroak($conf, "Makefile conditional parser error in \"$_[1]\" at \"$prevexpr\"");
             }
         }
         return $truth;
