@@ -122,10 +122,10 @@ static STRING* _get_string(Interp *interp)
 
 static PMC * _new_lua(Interp *interp, const char *name)
 {
-    PMC * key = key_append(interp,
+    PMC * const key = key_append(interp,
           key_new_cstring(interp, "Lua"),
           key_new_cstring(interp, name));
-    PMC * class_object = Parrot_oo_get_class(interp, key);
+    PMC * const class_object = Parrot_oo_get_class(interp, key);
     if (class_object == PMCNULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
               "Lua::%s not loaded", name);
@@ -136,7 +136,7 @@ static PMC* _load_function(Interp *interp);
 
 static PMC* _load_bool(Interp *interp)
 {
-    PMC* ret = pmc_new(interp, pmc_type(interp,
+    PMC* const ret = pmc_new(interp, pmc_type(interp,
           Parrot_str_new_constant(interp, "Boolean")));
     VTABLE_set_integer_native(interp, ret, _get_byte());
     return ret;
@@ -144,7 +144,7 @@ static PMC* _load_bool(Interp *interp)
 
 static PMC* _load_byte(Interp *interp)
 {
-    PMC* ret = pmc_new(interp, pmc_type(interp,
+    PMC* const ret = pmc_new(interp, pmc_type(interp,
           Parrot_str_new_constant(interp, "Integer")));
     VTABLE_set_integer_native(interp, ret, _get_byte());
     return ret;
@@ -152,7 +152,7 @@ static PMC* _load_byte(Interp *interp)
 
 static PMC* _load_integer(Interp *interp)
 {
-    PMC* ret = pmc_new(interp, pmc_type(interp,
+    PMC* const ret = pmc_new(interp, pmc_type(interp,
           Parrot_str_new_constant(interp, "Integer")));
     VTABLE_set_integer_native(interp, ret, _get_integer());
     return ret;
@@ -160,7 +160,7 @@ static PMC* _load_integer(Interp *interp)
 
 static PMC* _load_string(Interp *interp)
 {
-    PMC* ret = pmc_new(interp, pmc_type(interp,
+    PMC* const ret = pmc_new(interp, pmc_type(interp,
           Parrot_str_new_constant(interp, "String")));
     VTABLE_set_string_native(interp, ret, _get_string(interp));
     return ret;
@@ -199,8 +199,8 @@ static void _load_header(Interp *interp, PMC *script)
 static PMC* _load_instruction_list(Interp *interp)
 {
     int i;
-    int n = _get_integer();
-    PMC * ret = _new_lua(interp, "InstructionList");
+    const int n = _get_integer();
+    PMC * const ret = _new_lua(interp, "InstructionList");
     VTABLE_set_integer_native(interp, ret, n);
 
     for (i = 0; i < n; i++) {
@@ -213,13 +213,13 @@ static PMC* _load_instruction_list(Interp *interp)
 static PMC* _load_constant_list(Interp *interp)
 {
     int i;
-    int n = _get_integer();
-    PMC * ret = _new_lua(interp, "ConstantList");
+    const int n = _get_integer();
+    PMC * const ret = _new_lua(interp, "ConstantList");
     VTABLE_set_integer_native(interp, ret, n);
 
     for (i = 0; i < n; i++) {
         PMC* k;
-        int type = _get_byte();
+        const int type = _get_byte();
         switch (type) {
         case 0:
             k = _new_lua(interp, "Nil");
@@ -248,8 +248,8 @@ static PMC* _load_constant_list(Interp *interp)
 static PMC* _load_prototype_list(Interp *interp)
 {
     int i;
-    int n = _get_integer();
-    PMC * ret = _new_lua(interp, "PrototypeList");
+    const int n = _get_integer();
+    PMC * const ret = _new_lua(interp, "PrototypeList");
     VTABLE_set_integer_native(interp, ret, n);
 
     for (i = 0; i < n; i++) {
@@ -262,8 +262,8 @@ static PMC* _load_prototype_list(Interp *interp)
 static PMC* _load_line_list(Interp *interp)
 {
     int i;
-    int n = _get_integer();
-    PMC * ret = _new_lua(interp, "LineList");
+    const int n = _get_integer();
+    PMC * const ret = _new_lua(interp, "LineList");
     VTABLE_set_integer_native(interp, ret, n);
 
     for (i = 0; i < n; i++) {
@@ -276,12 +276,12 @@ static PMC* _load_line_list(Interp *interp)
 static PMC* _load_local_list(Interp *interp)
 {
     int i;
-    int n = _get_integer();
-    PMC * ret = _new_lua(interp, "LocalList");
+    const int n = _get_integer();
+    PMC * const ret = _new_lua(interp, "LocalList");
     VTABLE_set_integer_native(interp, ret, n);
 
     for (i = 0; i < n; i++) {
-        PMC* local = _new_lua(interp, "Local");
+        PMC* const local = _new_lua(interp, "Local");
         VTABLE_set_string_native(interp, local, _get_string(interp));
         VTABLE_set_attr_str(interp, local,
             Parrot_str_new_constant(interp, "startpc"), _load_integer(interp));
@@ -296,12 +296,12 @@ static PMC* _load_local_list(Interp *interp)
 static PMC* _load_upvalue_list(Interp *interp)
 {
     int i;
-    int n = _get_integer();
-    PMC * ret = _new_lua(interp, "UpvalueList");
+    const int n = _get_integer();
+    PMC * const ret = _new_lua(interp, "UpvalueList");
     VTABLE_set_integer_native(interp, ret, n);
 
     for (i = 0; i < n; i++) {
-        PMC* upvalue = _new_lua(interp, "Upvalue");
+        PMC* const upvalue = _new_lua(interp, "Upvalue");
         VTABLE_set_string_native(interp, upvalue, _get_string(interp));
         VTABLE_set_pmc_keyed_int(interp, ret, i, upvalue);
     }
@@ -311,7 +311,7 @@ static PMC* _load_upvalue_list(Interp *interp)
 
 static PMC* _load_function(Interp *interp)
 {
-    PMC * ret = _new_lua(interp, "Function");
+    PMC * const ret = _new_lua(interp, "Function");
 
     VTABLE_set_attr_str(interp, ret,
         Parrot_str_new_constant(interp, "source"), _load_string(interp));
@@ -379,7 +379,7 @@ Loads Lua 5.1 VM bytecode.
 
 */
     METHOD PMC* undump(STRING* luabytecode) {
-        PMC * script = _new_lua(INTERP, "Bytecode");
+        PMC * const script = _new_lua(INTERP, "Bytecode");
 
         _init(INTERP, luabytecode);
         _load_header(INTERP, script);

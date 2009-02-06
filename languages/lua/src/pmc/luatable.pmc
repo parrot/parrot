@@ -396,12 +396,12 @@ Marks the hash as live.
 */
     VTABLE void mark() {
         STRING *mode = NULL;
-        PMC    *meta = PMC_metadata(SELF);
+        PMC * const meta = PMC_metadata(SELF);
 
         if (meta) {
             PMC **m;
 #if 0
-            PMC *key = pmc_new(INTERP, dynpmc_LuaString);
+            PMC * const key = pmc_new(INTERP, dynpmc_LuaString);
             VTABLE_set_string_native(INTERP, key,
                     Parrot_str_new_constant(INTERP, "__mode"));
             m = lua_get(INTERP, PMC_hash(meta), key);
@@ -570,7 +570,7 @@ Need by NameSpace.export_to().
 
 */
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
-        PMC * pmc_key = pmc_new(INTERP, dynpmc_LuaString);
+        PMC * const pmc_key = pmc_new(INTERP, dynpmc_LuaString);
         VTABLE_set_string_native(INTERP, pmc_key, Parrot_str_copy(INTERP, key));
         value = VTABLE_clone(interp, value);
         *lua_set(INTERP, PMC_hash(SELF), pmc_key) = value;
@@ -607,8 +607,8 @@ The C<==> operation. Compares reference (not in depth).
     MULTI INTVAL is_equal(LuaTable value) {
         PMC * const meth = find_meth(INTERP, SELF, "__eq");
         if (meth) {
-            PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
-                                                   SELF, value);
+            PMC * const retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                          SELF, value);
 
             if (PMC_IS_NULL(retval))
                 return (INTVAL)0;
@@ -616,10 +616,7 @@ The C<==> operation. Compares reference (not in depth).
             return VTABLE_get_bool(INTERP, retval);
         }
 
-        if (SELF == value)
-            return (INTVAL)1;
-        else
-            return (INTVAL)0;
+        return (SELF == value) ? (INTVAL)1 : (INTVAL)0;
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
@@ -637,8 +634,8 @@ The C<==> operation. Compares reference (not in depth).
 #if 0
         PMC * const meth = find_meth(INTERP, SELF, "__cmp");
         if (meth) {
-            PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
-                                                   SELF, value);
+            PMC * const retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                          SELF, value);
 
             if (retval)
                 return (INTVAL)VTABLE_get_number(INTERP, retval);
@@ -720,8 +717,8 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     METHOD PMC* len() {
-        PMC   **pvalue;
-        PMC   *key = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC **pvalue;
+        PMC * const key = pmc_new(INTERP, dynpmc_LuaNumber);
         INTVAL idx = 1;
 
         VTABLE_set_integer_native(INTERP, key, idx);
@@ -746,17 +743,17 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     METHOD PMC* next(PMC* index) {
-        Node *n = lua_next(INTERP, PMC_hash(SELF), index);
+        Node * const n = lua_next(INTERP, PMC_hash(SELF), index);
 
         if (n) {
-            PMC *retval = pmc_new(INTERP, enum_class_Array);
+            PMC * const retval = pmc_new(INTERP, enum_class_Array);
             VTABLE_set_integer_native(INTERP, retval, 2);
             VTABLE_set_pmc_keyed_int(INTERP, retval, 0, n->key);
             VTABLE_set_pmc_keyed_int(INTERP, retval, 1, n->val);
             RETURN(PMC *retval);
         }
         else {
-            PMC *retval = pmc_new(INTERP, dynpmc_LuaNil);
+            PMC * const retval = pmc_new(INTERP, dynpmc_LuaNil);
             RETURN(PMC *retval);
         }
 
@@ -770,8 +767,9 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     METHOD PMC* rawequal(PMC *value) {
-        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        VTABLE_set_integer_native(INTERP, retval, (SELF == value) ? 1 : 0);
+        const INTVAL b = (SELF == value) ? 1 : 0;
+        PMC * const retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_integer_native(INTERP, retval, b);
         RETURN(PMC *retval);
     }
 

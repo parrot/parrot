@@ -90,7 +90,7 @@ information see F<src/pmc.c>.
 */
     METHOD PMC* clock() {
         const FLOATVAL f = clock() / (FLOATVAL)CLOCKS_PER_SEC;
-        PMC *retval = pmc_new(INTERP, dynpmc_LuaNumber);
+        PMC * const retval = pmc_new(INTERP, dynpmc_LuaNumber);
         VTABLE_set_number_native(INTERP, retval, f);
         RETURN(PMC *retval);
     }

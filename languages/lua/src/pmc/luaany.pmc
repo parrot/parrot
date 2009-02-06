@@ -159,8 +159,8 @@ Throws an exception.
 
         if (meth) {
             if (dynpmc_LuaFunction == PMC_type(meth)) {
-                PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
-                                                       SELF, key);
+                PMC * const retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                              SELF, key);
                 if (retval)
                     return retval;
 
@@ -285,13 +285,13 @@ Throws an exception.
 
             /* fix me */
 #if 1
-            retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
-            if (!retval)
-                retval = pmc_new(INTERP, dynpmc_LuaNil);
+        retval = Parrot_runops_fromc_args(INTERP, meth, "PP", SELF);
+        if (!retval)
+            retval = pmc_new(INTERP, dynpmc_LuaNil);
 #else
-            next = VTABLE_invoke(INTERP, meth, next);
+        next = VTABLE_invoke(INTERP, meth, next);
 #endif
-            return (opcode_t *)next;
+        return (opcode_t *)next;
     }
 
 /*
@@ -580,7 +580,7 @@ Without shortcut like in Default PMC.
 
 */
     METHOD PMC* get_metatable() {
-        PMC *nil = pmc_new(INTERP, dynpmc_LuaNil);
+        PMC * const nil = pmc_new(INTERP, dynpmc_LuaNil);
         RETURN(PMC *nil);
     }
 
@@ -618,7 +618,7 @@ Returns C<nil>.
 
 */
     METHOD PMC* tonumber() {
-        PMC *nil = pmc_new(INTERP, dynpmc_LuaNil);
+        PMC * const nil = pmc_new(INTERP, dynpmc_LuaNil);
         RETURN(PMC *nil);
     }
 

@@ -81,7 +81,7 @@ Creates and returns a clone of the scalar.
 
 */
     VTABLE PMC* clone() {
-        PMC *dest = pmc_new(INTERP, PMC_type(SELF));
+        PMC * const dest = pmc_new(INTERP, PMC_type(SELF));
         STRUCT_COPY(&PMC_union(dest), &PMC_union(SELF));
         return dest;
     }
@@ -160,12 +160,9 @@ Return always C<false>.
 
 */
     METHOD PMC *rawequal(PMC *value) {
-        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-        if (PMC_type(SELF) == PMC_type(value))
-            VTABLE_set_integer_native(INTERP, retval, 1);
-        else
-            VTABLE_set_integer_native(INTERP, retval, 0);
-
+        const INTVAL b = (PMC_type(SELF) == PMC_type(value)) ? 1 : 0;
+        PMC * const retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_integer_native(INTERP, retval, b);
         RETURN(PMC *retval);
     }
 

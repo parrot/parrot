@@ -215,14 +215,11 @@ The C<==> operation. Compares reference (not in depth).
             return VTABLE_get_bool(INTERP, retval);
         }
 
-        if (SELF == value)
-            return (INTVAL)1;
-        else
-            return (INTVAL)0;
+        return (SELF == value) ? (INTVAL)1 : (INTVAL)0;
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
-            return (INTVAL)0;
+        return (INTVAL)0;
     }
 
 /*
@@ -335,15 +332,12 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     METHOD PMC* rawequal(PMC *value) {
-        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-
-        if (PMC_type(SELF) == PMC_type(value)
-        && u_val(SELF)     == u_val(value)
-        && u_env(SELF)     == u_env(value))
-            VTABLE_set_integer_native(INTERP, retval, 1);
-        else
-            VTABLE_set_integer_native(INTERP, retval, 0);
-
+        const INTVAL b = (PMC_type(SELF) == PMC_type(value)
+                          && u_val(SELF) == u_val(value)
+                          && u_env(SELF) == u_env(value))
+                         ? 1 : 0;
+        PMC * const retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_integer_native(INTERP, retval, b);
         RETURN(PMC *retval);
     }
 

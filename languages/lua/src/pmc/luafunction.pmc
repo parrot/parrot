@@ -153,7 +153,7 @@ Return the string "function".
 */
     METHOD STRING *get_name() {
         const Parrot_sub * const sub = PMC_sub(SELF);
-        STRING *retval = Parrot_str_copy(INTERP, sub->name);
+        STRING * const retval = Parrot_str_copy(INTERP, sub->name);
         RETURN(STRING *retval);
     }
 
@@ -181,15 +181,12 @@ Return the string "function".
 
 */
     METHOD PMC* rawequal(PMC *value) {
-        PMC *retval = pmc_new(INTERP, dynpmc_LuaBoolean);
-
-        if (PMC_type(SELF)             == PMC_type(value)
-        && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
-        && (PMC_sub(SELF))->seg        == (PMC_sub(value))->seg)
-            VTABLE_set_integer_native(INTERP, retval, 1);
-        else
-            VTABLE_set_integer_native(INTERP, retval, 0);
-
+        const INTVAL b = (PMC_type(SELF) == PMC_type(value)
+          && (PMC_sub(SELF))->start_offs == (PMC_sub(value))->start_offs
+                 && (PMC_sub(SELF))->seg == (PMC_sub(value))->seg)
+                         ? 1 : 0;
+        PMC * const retval = pmc_new(INTERP, dynpmc_LuaBoolean);
+        VTABLE_set_integer_native(INTERP, retval, b);
         RETURN(PMC *retval);
     }
 
