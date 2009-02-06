@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -15,7 +15,7 @@ Inspired by computer language shootout.
 
 =cut
 
-.sub main :main
+.sub 'main' :main
     .param pmc argv
 
     load_bytecode "Getopt/Obj.pbc"
@@ -26,7 +26,7 @@ Inspired by computer language shootout.
 
     # Specification of command line arguments.
     .local pmc getopts
-    getopts = new "Getopt::Obj"
+    getopts = new [ 'Getopt::Obj' ]
     push getopts, "arr-size=i"
 
     .local pmc opt
@@ -34,18 +34,19 @@ Inspired by computer language shootout.
 
     .local int arr_size
     arr_size = 100
+
     .local int def
-    def = defined opt["arr-size"]
+    def = defined opt['arr-size']
     unless def goto use_default_arr_size
-        arr_size = opt['arr-size']
-use_default_arr_size:
+
+    arr_size = opt['arr-size']
+  use_default_arr_size:
 
     _bench( 'Array', arr_size )
     _bench( 'FixedFloatArray', arr_size )
     _bench( 'FixedIntegerArray', arr_size )
     _bench( 'FixedPMCArray', arr_size )
     _bench( 'FixedStringArray', arr_size )
-    _bench( 'IntList', arr_size )
     _bench( 'ResizableFloatArray', arr_size )
     _bench( 'ResizableIntegerArray', arr_size )
     _bench( 'ResizablePMCArray', arr_size )
