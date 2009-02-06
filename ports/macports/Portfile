@@ -3,7 +3,7 @@
 PortSystem              1.0
 
 name			parrot
-version			0.5.2
+version			0.9.0
 categories		lang devel
 maintainers             bfulgham coleda.com:will
 description		Open source virtual machine
@@ -15,10 +15,10 @@ long_description	\
         and a .NET bytecode translator.
 
 platforms		darwin
-homepage		http://www.parrotcode.org/
-master_sites		http://www.cpan.org/authors/id/R/RG/RGRJR/
+homepage		http://www.parrot.org/
+master_sites		ftp://ftp.parrot.org/pub/parrot/releases/devel/0.9.0
 
-checksums		md5 0a87f7e5437315f67c0848c5cb2b6d0b
+checksums		md5 7b70d9b8708e5ed01c210692a7afda0a
 
 depends_build		bin:perl:perl5
 depends_lib			port:gmp port:icu
@@ -28,9 +28,7 @@ configure.pre_args	--prefix=${prefix}/lib/parrot
 # build static to avoid runtime lib issues for now
 configure.args		--optimize --parrot_is_shared=0
 
-# install target is temporarily disabled as it might conflict with development
-# users of a port should have no such trouble, however.
-destroot.target         reallyinstall
+destroot.target         install
 
 build.type		gnu
 build.target		
