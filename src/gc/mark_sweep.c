@@ -753,7 +753,7 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *
 
     PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
 
-    ((GC_MS_PObj_Wrapper*)object)->next_ptr = pool->free_list;
+    ((GC_MS_PObj_Wrapper*)object)->next_ptr = (PObj *)pool->free_list;
     pool->free_list        = object;
 }
 
