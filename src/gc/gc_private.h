@@ -34,13 +34,13 @@ extern void *flush_reg_store(void);
 /* We're using this here to add an additional pointer to a PObj without
    having to actually add an entire pointer to every PObj-alike structure
    in Parrot. Astute observers may notice that if the PObj is comprised of
-   only an INTVAL, then there are some systems where sizeof(void*) can be
+   only an INTVAL, then there are some systems where sizeof(PObj*) can be
    larger then sizeof(PObj), thus creating overflow. However PObjs are never
    used by themselves, things like PMCs and STRINGs are cast to PObj in the
-   GC, so we should have plenty of space. */ 
+   GC, so we should have plenty of space. */
 typedef union GC_MS_PObj_Wrapper {
     PObj obj;
-    void *next_ptr;
+    PObj *next_ptr;
 } GC_MS_PObj_Wrapper;
 
 /* HEADERIZER BEGIN: src/gc/system.c */
