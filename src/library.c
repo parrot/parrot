@@ -272,6 +272,14 @@ get_search_paths(PARROT_INTERP, enum_lib_paths which)
     return VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
 }
 
+static const char path_separator = '/';
+
+#ifdef WIN32
+
+static const char win32_path_separator = '\\';
+
+#endif
+
 /*
 
 =item C<static int is_abs_path>
@@ -294,25 +302,24 @@ is_abs_path(ARGIN(const STRING *file))
         return 0;
     PARROT_ASSERT(file->encoding == Parrot_fixed_8_encoding_ptr ||
             file->encoding == Parrot_utf8_encoding_ptr);
+
+    /* XXX  ../foo, ./bar */
+    if (file_name[0] == path_separator
 #ifdef WIN32
-    if (file_name[0] == '\\' || file_name[0] == '/' ||
+            || (file_name[0] == win32_path_separator ||
             (isalpha((unsigned char)file_name[0]) && file->strlen > 2 &&
              (strncmp(file_name+1, ":\\", 2) == 0 ||
               strncmp(file_name+1, ":/",  2) == 0)))
-#else
-    if (file_name[0] == '/')     /* XXX  ../foo, ./bar */
 #endif
+            )
         {
             return 1;
         }
     return 0;
 }
 
-static const char path_separator = '/';
 
 #ifdef WIN32
-
-static const char win32_path_separator = '\\';
 
 /*
 
