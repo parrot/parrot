@@ -121,14 +121,14 @@ EOA
             (dest) = VTABLE_get_number(interp, attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /STRING\s*\*[^\*]/) {
+    elsif ($attrtype =~ /STRING\s*\*$/) {
         $decl .= <<"EOA";
             PMC *attr_value = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
             (dest) = VTABLE_get_string(interp, attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /PMC\s*\*[^\*]/) {
+    elsif ($attrtype =~ /PMC\s*\*$/) {
         $decl .= <<"EOA";
             (dest) = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
@@ -170,7 +170,7 @@ EOA
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /STRING\s*\*[^\*]/) {
+    elsif ($attrtype =~ /STRING\s*\*$/) {
         $decl .= <<"EOA";
             PMC *attr_value = pmc_new(interp, enum_class_String); \\
             VTABLE_set_string_native(interp, attr_value, value); \\
@@ -178,7 +178,7 @@ EOA
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /PMC\s\*[^\*]/) {
+    elsif ($attrtype =~ /PMC\s*\*$/) {
         $decl .= <<"EOA";
             VTABLE_set_attr_str(interp, pmc, \\
                               Parrot_str_new_constant(interp, "$attrname"), value); \\
