@@ -558,6 +558,7 @@ Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
     for (i = 0; i < obj->data.size; i++)
         fprintf(fp, "%c", obj->data.code[i]);
     /* Text rellocations */
+    /* XXX This is an infinite loop.  When i = 0, i-- goes to very large. */
     for (i = obj->text_rellocation_count - 1; i >= 0; i--) {
         save_int(fp, obj->text_rellocation_table[i].offset);
         save_short(fp, obj->text_rellocation_table[i].symbol_number);
