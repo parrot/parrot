@@ -57,7 +57,6 @@ sub new {
         $self->new_section( 'lolcode',     'lolcode.html',    '', 'languages/lolcode' ),
         $self->new_section( 'Lua',         'lua.html',        '', 'languages/lua' ),
         $self->new_section( 'Ook!',        'ook.html',        '', 'languages/ook' ),
-        $self->new_section( 'Perl6',       'perl6.html',      '', 'languages/perl6' ),
         $self->new_section( 'pheme',       'pheme.html',      '', 'languages/pheme' ),
         $self->new_section( 'Pipp',        'pipp.html',       '', 'languages/pipp' ),
         $self->new_section( 'PIR',         'pir.html',        '', 'languages/PIR' ),

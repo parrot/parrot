@@ -465,9 +465,6 @@ PDB                 = $(CUR_DIR)/parrot_debugger$(EXE)
 PBC_TO_EXE          = $(CUR_DIR)/pbc_to_exe$(EXE)
 PARROT_CONFIG       = $(CUR_DIR)/parrot_config$(EXE)
 
-# HLL Executables
-PERL6               = $(CUR_DIR)/perl6$(EXE)
-
 # Installable executables
 INSTALLABLEPARROT   = $(CUR_DIR)/installable_parrot$(EXE)
 INSTALLABLEDIS      = $(CUR_DIR)/installable_pbc_disassemble$(EXE)
@@ -476,7 +473,6 @@ INSTALLABLEPINFO    = $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPDB      = $(CUR_DIR)/installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG   = $(CUR_DIR)/installable_parrot_config$(EXE)
-INSTALLABLEPERL6    = $(CUR_DIR)/installable_perl6$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -644,10 +640,6 @@ help :
 	@echo " $(PARROT_CONFIG):"
 	@echo "                     Provide Parrot configuration information"
 	@echo ""
-	@echo "HLL Executables:"
-	@echo " $(PERL6):"
-	@echo "                     Generate C, compile, and link the Rakudo compiler"
-	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '$(PREFIX)' on Unix systems"
 	@echo ""
@@ -742,7 +734,7 @@ world : all parrot_utils
 
 parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLECONFIG) $(INSTALLABLEPERL6)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLECONFIG)
 
 
 flags_dummy :
@@ -775,20 +767,6 @@ $(PBC_TO_EXE) : pbc_to_exe.pir $(PARROT)
 $(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
-
-# HLL Executable targets
-#IF(win32):perl6 : $(PERL6)
-
-$(PERL6) : compilers $(PBC_TO_EXE)
-	$(MAKE) languages/perl6 perl6$(EXE)
-	$(CP) languages/perl6/perl6$(EXE) $(PERL6)
-	$(CHMOD) 0755 $(PERL6)
-	$(PERL6) -e"say 'Hello, world.'"
-
-$(INSTALLABLEPERL6) : $(PERL6)
-	$(MAKE) languages/perl6 installable_perl6$(EXE)
-	$(CP) languages/perl6/installable_perl6$(EXE) $(INSTALLABLEPERL6)
-	$(CHMOD) 0755 $(INSTALLABLEPERL6)
 
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
@@ -1618,7 +1596,6 @@ prog-clean :
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPDB) \
     pbc_to_exe.pir pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
-    $(PERL6) \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
