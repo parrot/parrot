@@ -125,21 +125,22 @@ sub result {
 }
 # test #IF(keys):line
 $conf->data->set( @conf_args, ('osname' => 'someplatform' ) );
-open IN, ">", "Makefile_$$.in";
-print IN "# There should only be =true results in .out\n";
+open my $IN, ">", "Makefile_$$.in";
+print $IN "# There should only be =true results in .out\n";
 for my $c (@cond_tests) {
     my $result = result($c);
-    print IN "#$c->[0]:$result\n";
+    print $IN "#$c->[0]:$result\n";
 }
-close IN;
+close $IN;
 $conf->genfile("Makefile_$$.in", "Makefile_$$.out",
 	       (makefile => 1, conditioned_lines => 1));
-open OUT, "<", "Makefile_$$.out";
+open my $OUT, "<", "Makefile_$$.out";
 my $f;
 {
     local $/;
-    $f = <OUT>;
+    $f = <$OUT>;
 }
+close $OUT;
 $index = undef;
 for my $c (@cond_tests) {
     my $result = result($c);
@@ -155,10 +156,10 @@ for my $c (@cond_tests) {
 # TT #279: reporting the makefile line number
 # step gen::makefiles died during execution:
 #  invalid op "IF" in "#IF(bla)" at "(bla)" at Configure.pl line 72
-open IN, ">", "Makefile_$$.in";
-print IN "# Test reporting sourcefile line numbers. TT #279\n";
-print IN "#IF(IF(bla)):test\n";
-close IN;
+open $IN, ">", "Makefile_$$.in";
+print $IN "# Test reporting sourcefile line numbers. TT #279\n";
+print $IN "#IF(IF(bla)):test\n";
+close $IN;
 eval {
     $conf->genfile("Makefile_$$.in", "Makefile_$$.out",
                    (makefile => 1, conditioned_lines => 1));
