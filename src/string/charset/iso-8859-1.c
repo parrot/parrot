@@ -97,7 +97,7 @@ static STRING * to_charset(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-static STRING * to_latin1(PARROT_INTERP,
+static STRING * to_iso_8859_1(PARROT_INTERP,
     ARGIN(STRING *src),
     ARGMOD_NULLOK(STRING *dest))
         __attribute__nonnull__(1)
@@ -159,7 +159,7 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 #define ASSERT_ARGS_to_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(src)
-#define ASSERT_ARGS_to_latin1 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_to_iso_8859_1 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_to_unicode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -201,9 +201,9 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * to_latin1>
+=item C<static STRING * to_iso_8859_1>
 
-Converts STRING C<src> to Latin1 in STRING C<dest>.
+Converts STRING C<src> to iso-8859-1 in STRING C<dest>.
 
 =cut
 
@@ -211,9 +211,9 @@ Converts STRING C<src> to Latin1 in STRING C<dest>.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-to_latin1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
+to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 {
-    ASSERT_ARGS(to_latin1)
+    ASSERT_ARGS(to_iso_8859_1)
     UINTVAL offs, src_len;
     String_iter iter;
 
@@ -224,7 +224,7 @@ to_latin1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
         dest->strlen  = src_len;
     }
     else {
-        /* latin1 is never bigger then source */
+        /* iso-8859-1 is never bigger then source */
         dest = src;
     }
     dest->bufused = src_len;
@@ -234,7 +234,7 @@ to_latin1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
         const UINTVAL c = iter.get_and_advance(interp, &iter);
         if (c >= 0x100)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
-                "lossy conversion to ascii");
+                "lossy conversion to iso-8559-1");
 
         ENCODING_SET_BYTE(interp, dest, offs, c);
     }
@@ -306,7 +306,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
     if (conversion_func)
         return conversion_func(interp, src, dest);
     else
-        return to_latin1(interp, src, dest);
+        return to_iso_8859_1(interp, src, dest);
 }
 
 
