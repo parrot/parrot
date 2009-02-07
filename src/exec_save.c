@@ -49,7 +49,7 @@ Save the C<Parrot_exec_objfile_t> to C<file>.
 void
 Parrot_exec_save(PARROT_INTERP, Parrot_exec_objfile_t *obj, const char *file)
 {
-    FILE * fp = fopen(file, "w");
+    FILE * const fp = fopen(file, "w");
     int    i;
     struct exec header;
     struct relocation_info rellocation;

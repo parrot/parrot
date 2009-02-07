@@ -479,7 +479,7 @@ arguments. The class is attached to the current HLL namespace.
     }
 
     VTABLE void init_pmc(PMC *init_data) {
-        PMC           *arg, *ns_name;
+        PMC           *arg;
         const INTVAL   arg_type = VTABLE_type(interp, init_data);
         STRING * const name_str = CONST_STRING(interp, "name");
 
@@ -1149,7 +1149,6 @@ Creates a new PMC object of the type of the class and calls init().
 
     VTABLE PMC *instantiate(PMC *init) {
         Parrot_Class_attributes  * const _class    = PARROT_CLASS(SELF);
-        STRING                   * const class_str = CONST_STRING(interp, "Class");
 
         Parrot_Object_attributes *obj_guts;
         PMC                      *object;
@@ -1158,7 +1157,7 @@ Creates a new PMC object of the type of the class and calls init().
         if (!_class->instantiated) {
             /* Check that we have all methods listed in resolve list. */
             const int resolve_count = VTABLE_elements(interp, _class->resolve_method);
-            INTVAL    cur_hll       = CONTEXT(interp)->current_HLL;
+            const INTVAL cur_hll    = CONTEXT(interp)->current_HLL;
             INTVAL    mro_length;
             int       i;
 
@@ -1325,8 +1324,7 @@ Returns whether the class is or inherits from C<*classname>.
 */
 
     VTABLE INTVAL isa(STRING *classname) {
-        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
-        PMC                            *want_class;
+        PMC *want_class;
 
         /* hard-code this one exception right away */
         if (Parrot_str_not_equal(interp, classname, CONST_STRING(interp, "Class")) == 0)

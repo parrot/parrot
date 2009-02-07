@@ -517,7 +517,6 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
     STRING * const bytecode_extension = CONST_STRING(interp, ".pbc");
     STRING * const pir_extension      = CONST_STRING(interp, ".pir");
     STRING * const pasm_extension     = CONST_STRING(interp, ".pasm");
-    int guess;
 
     test_path = Parrot_str_copy(interp, path);
 
@@ -538,7 +537,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
             STRING *orig_ext = Parrot_str_substr(interp, test_path, -4, 4, NULL, 0);
             /* First try substituting .pbc for the .pir extension */
             if (Parrot_str_not_equal(interp, orig_ext, pir_extension) == 0) {
-                STRING *without_ext = Parrot_str_chopn(interp, test_path, 4);
+                STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_append(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
                 if (result)
@@ -546,7 +545,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
             }
             /* Next try substituting .pir, then .pasm for the .pbc extension */
             else if (Parrot_str_not_equal(interp, orig_ext, bytecode_extension) == 0) {
-                STRING *without_ext = Parrot_str_chopn(interp, test_path, 4);
+                STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_append(interp, without_ext, pir_extension);
                 result = try_load_path(interp, test_path);
                 if (result)
@@ -562,9 +561,9 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
         /* Finally, try substituting .pbc for the .pasm extension. */
         if (Parrot_str_byte_length(interp, test_path) > 5) {
-            STRING *orig_ext = Parrot_str_substr(interp, test_path, -5, 5, NULL, 0);
+            STRING * const orig_ext = Parrot_str_substr(interp, test_path, -5, 5, NULL, 0);
             if (Parrot_str_not_equal(interp, orig_ext, pasm_extension) == 0) {
-                STRING *without_ext = Parrot_str_chopn(interp, test_path, 5);
+                STRING * const without_ext = Parrot_str_chopn(interp, test_path, 5);
                 test_path = Parrot_str_append(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
                 if (result)
@@ -599,7 +598,7 @@ Parrot_add_library_path(PARROT_INTERP,
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
         IGLOBALS_LIB_PATHS);
-    PMC * paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
+    PMC * const paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
     STRING * const path_str = Parrot_str_new(interp, path, 0);
     VTABLE_push_string(interp, paths, path_str);
 }
