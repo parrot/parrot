@@ -425,6 +425,12 @@ method elseif_clause($/) {
     make $past;
 }
 
+method switch_statement($/) {
+    my $past := PAST::Stmts.new( :name('switch') );
+
+    make $past;
+}
+
 method var_assign($/) {
     make PAST::Op.new(
         :pasttype('bind'),

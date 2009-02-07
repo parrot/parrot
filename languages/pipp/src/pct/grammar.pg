@@ -134,6 +134,7 @@ rule statement {
     | <constant_definition>            {*}  #= constant_definition
     | <global_declaration>             {*}  #= global_declaration
     | <if_statement>                   {*}  #= if_statement
+    | <switch_statement>               {*}  #= switch_statement
     | <while_statement>                {*}  #= while_statement
     | <do_while_statement>             {*}  #= do_while_statement
     | <for_statement>                  {*}  #= for_statement
@@ -209,6 +210,11 @@ rule if_statement {
 
 rule else_clause {
     'else' '{' <statement_list> '}'
+}
+
+rule switch_statement {
+    'switch' '(' <expression> ')'
+    '{' '}' {*}
 }
 
 rule elseif_clause {

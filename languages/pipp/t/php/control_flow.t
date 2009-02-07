@@ -309,7 +309,7 @@ round 8
 round 9
 OUT
 
-language_output_is( 'Pipp', <<'CODE', '', 'switch without a case', todo => 'not yet' );
+language_output_is( 'Pipp', <<'CODE', '', 'switch without a case' );
 <?php
 
 switch (22) {
