@@ -109,7 +109,7 @@ inline op cpu_ret() {
        we want to throw an error. Seriously people: Do not use this opcode
        directly in PIR. Ever. It absolutely makes no sense and it doesn't do
        anything productive. You've been warned. */
-    if(interp->run_core & PARROT_JIT_CORE) {
+    if (interp->run_core & PARROT_JIT_CORE) {
 #ifdef __GNUC__
 #  ifdef I386
         __asm__("ret");
@@ -292,8 +292,8 @@ inline op local_return(invar PMC) :flow {
     next = INTVAL2PTR(opcode_t *, return_addr);
 
     /* The return address must be within the current code segment. */
-    if (! ( next >= interp->code->base.data
-            && next < (interp->code->base.data + interp->code->base.size)) ) {
+    if (! (next >= interp->code->base.data
+           && next < (interp->code->base.data + interp->code->base.size))) {
         opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
             EXCEPTION_INVALID_OPERATION,
             "Address for 'local_return' must be within the current code segment");
@@ -378,12 +378,12 @@ Check register $1. If true, branch by $2.
 
 =cut
 
-inline op if(invar INT, inconst LABEL) {
+inline op if (invar INT, inconst LABEL) {
     if ($1 != 0)
         goto OFFSET($2);
 }
 
-inline op if(invar NUM, inconst LABEL) {
+inline op if (invar NUM, inconst LABEL) {
     if (!FLOAT_IS_ZERO($1))
         goto OFFSET($2);
 }
@@ -393,7 +393,7 @@ op if (invar STR, inconst LABEL) {
         goto OFFSET($2);
 }
 
-op if(invar PMC, inconst LABEL) {
+op if (invar PMC, inconst LABEL) {
     if (VTABLE_get_bool(interp, $1))
         goto OFFSET($2);
 }
