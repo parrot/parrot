@@ -834,10 +834,22 @@ PMC *
 Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 {
     ASSERT_ARGS(Parrot_cx_find_handler_local)
+
+    /*
+     * Quick&dirty way to avoid infinite recursion
+     * when an exception is thown while looking
+     * for a handler
+     */
+    static int already_doing = 0;
+
     Parrot_Context *context;
     PMC            *iter        = PMCNULL;
     STRING * const  handled_str = CONST_STRING(interp, "handled");
     STRING * const  iter_str    = CONST_STRING(interp, "handler_iter");
+
+    if (already_doing)
+        return NULL;
+    ++already_doing;
 
     /* Exceptions store the handler iterator for rethrow, other kinds of
      * tasks don't (though they could). */
@@ -868,6 +880,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
                         VTABLE_set_attr_str(interp, task, CONST_STRING(interp, "handler_iter"), iter);
                         VTABLE_set_pointer(interp, task, context);
                     }
+                    --already_doing;
                     return handler;
                 }
             }
@@ -883,6 +896,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
     /* Reached the end of the context chain without finding a handler. */
 
+    --already_doing;
     return PMCNULL;
 }
 
