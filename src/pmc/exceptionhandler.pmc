@@ -137,7 +137,7 @@ Check whether the handler has been invoked.
 */
 
     VTABLE INTVAL get_integer() {
-        Parrot_cont * const cc = PMC_cont(SELF);
+        const Parrot_cont * const cc = PMC_cont(SELF);
         return cc->invoked;
     }
 
@@ -152,10 +152,8 @@ Set up the environment for the exception handler to be invoked.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_cont      *cc           = PMC_cont(SELF);
-        Parrot_Context   *from_ctx     = CONTEXT(interp);
-        Parrot_Context   *to_ctx       = cc->to_ctx;
-        opcode_t         *pc           = cc->address;
+        Parrot_cont * const cc = PMC_cont(SELF);
+        opcode_t    * const pc = cc->address;
 
         Parrot_continuation_check(interp, SELF, cc);
         Parrot_continuation_rewind_environment(interp, SELF, cc);
@@ -211,8 +209,8 @@ Report whether the exception handler can handle a particular type of exception.
                 RETURN(INTVAL 0);
             }
             if (! PMC_IS_NULL(handled_types)) {
-                INTVAL elems = VTABLE_elements(interp, handled_types);
-                INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
+                const INTVAL elems = VTABLE_elements(interp, handled_types);
+                const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
                 INTVAL i;
 
                 for (i = 0; i < elems; i++) {
@@ -225,12 +223,12 @@ Report whether the exception handler can handle a particular type of exception.
                 RETURN(INTVAL 0);
             }
             if (core_struct->handled_types_except != PMCNULL) {
-                INTVAL elems = VTABLE_elements(interp, core_struct->handled_types_except);
-                INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
+                const INTVAL elems = VTABLE_elements(interp, core_struct->handled_types_except);
+                const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
                 INTVAL i;
 
                 for (i = 0; i < elems; i++) {
-                    INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
+                    const INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
                             core_struct->handled_types_except, i);
                     if (handled_type == type)
                         RETURN(INTVAL 0);
