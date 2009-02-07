@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -28,14 +28,14 @@ static INTVAL
 get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
 {
     Parrot_Class_attributes * const _class  = PARROT_CLASS(self);
-    INTVAL                          cur_hll = CONTEXT(interp)->current_HLL;
+    const INTVAL                    cur_hll = CONTEXT(interp)->current_HLL;
     int                             num_classes, i;
 
     CONTEXT(interp)->current_HLL = 0;
 
     /* First see if we can find it in the cache. */
     if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
-        INTVAL retval =
+        const INTVAL retval =
             VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
         CONTEXT(interp)->current_HLL = cur_hll;
         return retval;
@@ -266,7 +266,7 @@ of the given name walking up the inheritance tree.
 */
     VTABLE void set_attr_str(STRING *name, PMC *value) {
         Parrot_Object_attributes * const obj       = PARROT_OBJECT(SELF);
-        STRING        *vtable_meth_name = CONST_STRING(interp, "set_attr_str");
+        STRING        * const vtable_meth_name = CONST_STRING(interp, "set_attr_str");
         INTVAL         index;
 
         /* If there's a vtable override for 'set_attr_str' run that first. */

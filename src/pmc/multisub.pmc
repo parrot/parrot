@@ -81,14 +81,14 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
        ResizablePMCArray's VTABLE methods of the same names. Hopefully we
        don't need anything beyond that. */
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        PMC *sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        PMC * const sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
         if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
         return SUPER(key);
     }
 
     VTABLE PMC *get_pmc_keyed_string(STRING *s) {
-        PMC *sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
+        PMC * const sub = Parrot_mmd_sort_manhattan(INTERP, SELF);
         if (PMC_IS_NULL(sub))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1, "No applicable methods.\n");
         return SUPER(s);

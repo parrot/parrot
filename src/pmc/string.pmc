@@ -135,7 +135,7 @@ Returns the big numbers representation of the string.
 
     VTABLE PMC *get_bignum() {
         STRING * const s   = SELF.get_string();
-        PMC           *ret = pmc_new(INTERP, enum_class_BigInt);
+        PMC    * const ret = pmc_new(INTERP, enum_class_BigInt);
         VTABLE_set_string_native(INTERP, ret, s);
         return ret;
     }
