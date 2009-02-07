@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -11,20 +11,17 @@ t/php/control_flow.t - tests for Pipp
 
 =head1 DESCRIPTION
 
-Test control flow.
+Test control flow, that is C<if>, C<while>, C<for> and C<switch>.
 
 =cut
 
 # pragmata
 use strict;
 use warnings;
-
 use FindBin;
 use lib "$FindBin::Bin/../../../../lib", "$FindBin::Bin/../../lib";
 
-use Parrot::Config ();
-use Parrot::Test;
-use Test::More     tests => 18;
+use Parrot::Test  tests => 19;
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'if, one statement in block' );
 <?php
@@ -311,3 +308,12 @@ round 7
 round 8
 round 9
 OUT
+
+language_output_is( 'Pipp', <<'CODE', '', 'switch without a case', todo => 'not yet' );
+<?php
+
+switch (22) {
+}
+
+?>
+CODE
