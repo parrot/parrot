@@ -1,5 +1,5 @@
 # Copyright (C) 2007-2009, The Perl Foundation.
-# $Id: debian_packaging_guide.pod 35946 2009-01-24 06:06:14Z allison $
+# $Id$
 
 =head1 Ubuntu Packaging Guide
 

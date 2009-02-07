@@ -311,7 +311,7 @@ is_abs_path(ARGIN(const STRING *file))
              (strncmp(file_name+1, ":\\", 2) == 0 ||
               strncmp(file_name+1, ":/",  2) == 0)))
 #endif
-            )
+            /* no space before closing paren */)
         {
             return 1;
         }
