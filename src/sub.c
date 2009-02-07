@@ -355,13 +355,13 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
              * have to save these and restore them to avoid affecting
              * the running program.
              */
-            PMC *saved_ccont            = interp->current_cont;
-            opcode_t *current_args      = interp->current_args;
-            opcode_t *current_params    = interp->current_params;
-            opcode_t *current_returns   = interp->current_returns;
-            PMC      *args_signature    = interp->args_signature;
-            PMC      *params_signature  = interp->params_signature;
-            PMC      *returns_signature = interp->returns_signature;
+            PMC      * const saved_ccont       = interp->current_cont;
+            opcode_t * const current_args      = interp->current_args;
+            opcode_t * const current_params    = interp->current_params;
+            opcode_t * const current_returns   = interp->current_returns;
+            PMC      * const args_signature    = interp->args_signature;
+            PMC      * const params_signature  = interp->params_signature;
+            PMC      * const returns_signature = interp->returns_signature;
 
             Parrot_block_GC_mark(interp);
 
@@ -659,8 +659,8 @@ Verifies that the provided continuation is sane.
 */
 
 void
-Parrot_continuation_check(PARROT_INTERP, ARGIN(PMC *pmc),
-    ARGIN(Parrot_cont *cc))
+Parrot_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc),
+    ARGIN(const Parrot_cont *cc))
 {
     ASSERT_ARGS(Parrot_continuation_check)
     Parrot_Context *to_ctx       = cc->to_ctx;

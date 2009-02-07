@@ -332,8 +332,8 @@ void Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
         FUNC_MODIFIES(*sub_pmc);
 
 void Parrot_continuation_check(PARROT_INTERP,
-    ARGIN(PMC *pmc),
-    ARGIN(Parrot_cont *cc))
+    ARGIN(const PMC *pmc),
+    ARGIN(const Parrot_cont *cc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
