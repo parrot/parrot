@@ -119,88 +119,6 @@ PARROT_CAN_RETURN_NULL
 static PDB_breakpoint_t * current_breakpoint(ARGIN(PDB_t * pdb))
         __attribute__nonnull__(1);
 
-static void dbg_break(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_continue(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_delete(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_disable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_disassemble(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_echo(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(* pdb);
-
-static void dbg_enable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_eval(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_gcdebug(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(* pdb);
-
-static void dbg_help(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_info(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
-        __attribute__nonnull__(1);
-
-static void dbg_list(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_load(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_next(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_print(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_quit(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(* pdb);
-
-static void dbg_run(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_script(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_stack(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
-        __attribute__nonnull__(1);
-
-static void dbg_trace(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-static void dbg_watch(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void debugger_cmdline(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -293,64 +211,6 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(cmd)
 #define ASSERT_ARGS_current_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pdb)
-#define ASSERT_ARGS_dbg_break __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_continue __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_disable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_disassemble __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_echo __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb)
-#define ASSERT_ARGS_dbg_enable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_eval __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_gcdebug __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb)
-#define ASSERT_ARGS_dbg_help __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb)
-#define ASSERT_ARGS_dbg_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_load __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_print __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_quit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb)
-#define ASSERT_ARGS_dbg_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_script __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb)
-#define ASSERT_ARGS_dbg_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
-#define ASSERT_ARGS_dbg_watch __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pdb) \
-    || PARROT_ASSERT_ARG(cmd)
 #define ASSERT_ARGS_debugger_cmdline __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_dump_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -394,59 +254,59 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
  *  Command functions and help dispatch
  */
 
-typedef void (* debugger_func_t)(ARGIN(PDB_t * pdb), ARGIN(const char * cmd));
+typedef void (* debugger_func_t)(PDB_t * pdb, const char * cmd);
 
-
-static void
-dbg_break(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static int nomoreargs(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_break)
+    if (*skip_whitespace(cmd) == '\0')
+        return 1;
+    else {
+        Parrot_eprintf(pdb->debugger, "Spurious arg\n");
+        return 0;
+    }
+}
+
+static void dbg_break(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+{
     TRACEDEB_MSG("dbg_break");
 
     PDB_set_break(pdb->debugee, cmd);
 }
 
-static void
-dbg_continue(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_continue(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_continue)
     TRACEDEB_MSG("dbg_continue");
 
     PDB_continue(pdb->debugee, cmd);
 }
 
-static void
-dbg_delete(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_delete(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_delete)
     TRACEDEB_MSG("dbg_delete");
 
     PDB_delete_breakpoint(pdb->debugee, cmd);
 }
 
-static void
-dbg_disable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_disable(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_disable)
     TRACEDEB_MSG("dbg_disable");
 
     PDB_disable_breakpoint(pdb->debugee, cmd);
 }
 
-static void
-dbg_disassemble(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_disassemble(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_disassemble)
     TRACEDEB_MSG("dbg_disassemble");
 
     PDB_disassemble(pdb->debugee, cmd);
 }
 
-static void
-dbg_echo(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
+static void dbg_echo(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_echo)
     TRACEDEB_MSG("dbg_echo");
+
+    if (! nomoreargs(pdb, cmd))
+        return;
 
     if (pdb->state & PDB_ECHO) {
         TRACEDEB_MSG("Disabling echo");
@@ -458,25 +318,22 @@ dbg_echo(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
     }
 }
 
-static void
-dbg_enable(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_enable(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_enable)
     PDB_enable_breakpoint(pdb->debugee, cmd);
 }
 
-static void
-dbg_eval(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_eval(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_eval)
     PDB_eval(pdb->debugee, cmd);
 }
 
-static void
-dbg_gcdebug(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
+static void dbg_gcdebug(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_gcdebug)
     TRACEDEB_MSG("dbg_gcdebug");
+
+    if (! nomoreargs(pdb, cmd))
+        return;
 
     if (pdb->state & PDB_GCDEBUG) {
         TRACEDEB_MSG("Disabling gcdebug mode");
@@ -488,111 +345,96 @@ dbg_gcdebug(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
     }
 }
 
-static void
-dbg_help(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_help(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_help)
     TRACEDEB_MSG("dbg_help");
 
     PDB_help(pdb->debugee, cmd);
 }
 
-static void
-dbg_info(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
+static void dbg_info(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_info)
     TRACEDEB_MSG("dbg_info");
+
+    if (! nomoreargs(pdb, cmd))
+        return;
 
     PDB_info(pdb->debugger);
 }
 
-static void
-dbg_list(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_list(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_list)
     TRACEDEB_MSG("dbg_list");
 
     PDB_list(pdb->debugee, cmd);
 }
 
-static void
-dbg_load(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_load(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_load)
     TRACEDEB_MSG("dbg_load");
 
     PDB_load_source(pdb->debugee, cmd);
 }
 
-static void
-dbg_next(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_next(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_next)
     TRACEDEB_MSG("dbg_next");
 
     PDB_next(pdb->debugee, cmd);
 }
 
-static void
-dbg_print(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_print(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_print)
     TRACEDEB_MSG("dbg_print");
 
     PDB_print(pdb->debugee, cmd);
 }
 
-static void
-dbg_quit(ARGMOD(PDB_t * pdb), SHIM(const char * cmd))
+static void dbg_quit(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_quit)
     TRACEDEB_MSG("dbg_quit");
+
+    if (! nomoreargs(pdb, cmd))
+        return;
 
     pdb->state |= PDB_EXIT;
     pdb->state &= ~PDB_STOPPED;
 }
 
-static void
-dbg_run(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_run(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_run)
     TRACEDEB_MSG("dbg_run");
 
     PDB_init(pdb->debugee, cmd);
     PDB_continue(pdb->debugee, NULL);
 }
 
-static void
-dbg_script(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_script(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_script)
     TRACEDEB_MSG("dbg_script");
 
     PDB_script_file(pdb->debugee, cmd);
 }
 
-static void
-dbg_stack(ARGIN(PDB_t * pdb), SHIM(const char * cmd))
+static void dbg_stack(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_stack)
     TRACEDEB_MSG("dbg_stack");
+
+    if (! nomoreargs(pdb, cmd))
+        return;
 
     PDB_backtrace(pdb->debugee);
 }
 
-static void
-dbg_trace(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_trace(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_trace)
     TRACEDEB_MSG("dbg_trace");
 
     PDB_trace(pdb->debugee, cmd);
 }
 
-static void
-dbg_watch(ARGIN(PDB_t * pdb), ARGIN(const char * cmd))
+static void dbg_watch(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 {
-    ASSERT_ARGS(dbg_watch)
     TRACEDEB_MSG("dbg_watch");
 
     PDB_watchpoint(pdb->debugee, cmd);
