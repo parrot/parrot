@@ -458,7 +458,7 @@ OPS_FILES = @ops@ $(GEN_OPSFILES)
 PARROT              = $(CUR_DIR)/@test_prog@$(EXE)
 MINIPARROT          = $(CUR_DIR)/miniparrot$(EXE)
 DIS                 = $(CUR_DIR)/pbc_disassemble$(EXE)
-PDUMP               = $(CUR_DIR)/pdump$(EXE)
+PDUMP               = $(CUR_DIR)/pbc_dump$(EXE)
 PINFO               = $(CUR_DIR)/pbc_info$(EXE)
 PBCMERGE            = $(CUR_DIR)/pbc_merge$(EXE)
 PDB                 = $(CUR_DIR)/parrot_debugger$(EXE)
@@ -468,7 +468,7 @@ PARROT_CONFIG       = $(CUR_DIR)/parrot_config$(EXE)
 # Installable executables
 INSTALLABLEPARROT   = $(CUR_DIR)/installable_parrot$(EXE)
 INSTALLABLEDIS      = $(CUR_DIR)/installable_pbc_disassemble$(EXE)
-INSTALLABLEPDUMP    = $(CUR_DIR)/installable_pdump$(EXE)
+INSTALLABLEPDUMP    = $(CUR_DIR)/installable_pbc_dump$(EXE)
 INSTALLABLEPINFO    = $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE = $(CUR_DIR)/installable_pbc_merge$(EXE)
 INSTALLABLEPDB      = $(CUR_DIR)/installable_parrot_debugger$(EXE)
@@ -903,17 +903,17 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 # Parrot Dump
 #
 
-$(PDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
+$(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/pdump$(O) \
+    $(SRC_DIR)/pbc_dump$(O) \
     $(SRC_DIR)/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(SRC_DIR)/pdump$(O) : $(GEN_HEADERS)
+$(SRC_DIR)/pbc_dump$(O) : $(GEN_HEADERS)
 
-$(INSTALLABLEPDUMP) : $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
+$(INSTALLABLEPDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-    $(SRC_DIR)/pdump$(O) \
+    $(SRC_DIR)/pbc_dump$(O) \
     $(SRC_DIR)/packdump$(O) \
     @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
@@ -1597,7 +1597,7 @@ prog-clean :
     $(INSTALLABLEPDB) \
     pbc_to_exe.pir pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     $(IMCC_DIR)/main$(O) \
-    $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+    $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
@@ -1634,7 +1634,7 @@ archclean: dynoplibs-clean dynpmc-clean dynext-clean
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
     $(IMCC_DIR)/main$(O) \
-    $(PDUMP) $(SRC_DIR)/pdump$(O) $(SRC_DIR)/packdump$(O) \
+    $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \

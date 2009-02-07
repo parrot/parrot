@@ -25,8 +25,8 @@ make -s
 ./parrot -o n.pbc t/op/number_1.pasm
 mv n.pbc t/native_pbc/number_1.pbc
 
-make pdump
-./pdump -h t/native_pbc/number_1.pbc
-./pdump -h t/native_pbc/number_2.pbc
+make pbc_dump
+./pbc_dump -h t/native_pbc/number_1.pbc
+./pbc_dump -h t/native_pbc/number_2.pbc
 
 perl t/harness t/native_pbc/number.t

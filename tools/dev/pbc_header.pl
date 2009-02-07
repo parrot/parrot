@@ -30,7 +30,7 @@ If no options are given, a summary of the PBC header is printed to STDOUT.
 
 =head1 SEE ALSO
 
-The C<pdump> utility does a much more thorough job of showing bytecode file
+The C<pbc_dump> utility does a much more thorough job of showing bytecode file
 headers.
 
 =cut

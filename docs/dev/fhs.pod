@@ -56,7 +56,7 @@ host-specific or varies with time is stored elsewhere.
 
 This is the primary directory of executable commands on the system. All
 executables that are intended to be called directly by the user (i.e.
-parrot, pdump, disassemble, parrot-debugger, pbc_info,  pbg_merge, ...)
+parrot, parrot_debugger, pbc_disassemble, pbc_dump, pbc_info, pbg_merge, ...)
 should go here. The current version number should be appended to the
 binaries itself and a symlink needs to be created that points from the
 binary with version number to the normal name of the file without a

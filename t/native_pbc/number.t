@@ -32,20 +32,20 @@ Tests word-size/float-type/endian-ness for different architectures.
 # please add it:
 
   $ ./parrot -o n.pbc t/op/number_1.pasm
-  $ make pdump
-  $ ./pdump -h n.pbc
+  $ make pbc_dump
+  $ ./pbc_dump -h n.pbc
   $ mv n.pbc t/native_pbc/number_$(N).pbc
 
 # then
 # - increase number of tests
-# - include the pdump header info for reference
+# - include the pbc_dump header info for reference
 # - put the file into MANIFEST
 # - add the file as binary (svn add) and commit it
 # thanks -leo
 
 On test failures please add the output of
 
-  $ ./pdump -h t/native_pbc/number_${N}.pbc
+  $ ./pbc_dump -h t/native_pbc/number_${N}.pbc
 
 into your report. We need your wordsize/floattype/endianess.
 

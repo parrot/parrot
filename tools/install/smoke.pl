@@ -80,9 +80,9 @@ $exe = catfile($bindir, 'pbc_merge');
 $out = `$exe`;
 ok($out =~ /^pbc_merge/, "check pbc_merge");
 
-$exe = catfile($bindir, 'pdump');
+$exe = catfile($bindir, 'pbc_dump');
 $out = `$exe`;
-ok($out =~ /^pdump/, "check pdump");
+ok($out =~ /^pbc_dump/, "check pbc_dump");
 
 ok(system("$parrot -V") == 0, "display parrot version");
 

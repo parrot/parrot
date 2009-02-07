@@ -57,10 +57,10 @@ Files included in the =parrot= package:
   /usr/bin/parrot.exe
   /usr/bin/parrot_config.exe
   /usr/bin/parrot_debugger.exe
+  /usr/bin/pbc_dump.exe
   /usr/bin/pbc_info.exe
   /usr/bin/pbc_merge.exe
   /usr/bin/pbc_to_exe.exe
-  /usr/bin/pdump.exe
   /usr/lib/parrot/config_lib.pasm
   /usr/lib/parrot/myconfig
   /usr/lib/parrot/parrotbug

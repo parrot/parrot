@@ -25,8 +25,8 @@ bytecode file are stored in native order, unless otherwise specified.
 
 The B<Wordsize> (or C<opcode_t> size) must be 4 (32-bit) or 8 (64 bit). The
 bytecode loader is responsible for transforming the file into the VM native
-wordsize on the fly. For performance, a utility F<pdump> is provided to convert
-PBCs on disk if they cannot be recompiled. See F<src/pdump.c> for more
+wordsize on the fly. For performance, a utility F<pbc_dump> is provided to convert
+PBCs on disk if they cannot be recompiled. See F<src/pbc_dump.c> for more
 information.
 
 B<Byteorder> currently supports two values: (0-Little Endian, 1-Big Endian)
@@ -333,7 +333,7 @@ mentioned in some of the early Parrot documents.
 =head1 SEE ALSO
 
 F<packfile.c>, F<packfile.h>, F<packout.c>, F<packdump.c>, F<pf/*.c>, and the
-B<pdump> utility F<pdump.c>.
+B<pbc_dump> utility F<pbc_dump.c>.
 
 =head1 AUTHOR
 

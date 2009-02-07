@@ -4,13 +4,13 @@ $Id$
 
 =head1 NAME
 
-pdump - Dump or convert Parrot bytecode (PBC) files
+pbc_dump - Dump or convert Parrot bytecode (PBC) files
 
 =head1 SYNOPSIS
 
- pdump [-tdh] [--terse|--disassemble|--header-only] file.pbc
+ pbc_dump [-tdh] [--terse|--disassemble|--header-only] file.pbc
 
- pdump -o converted.pbc file.pbc
+ pbc_dump -o converted.pbc file.pbc
 
 =head1 DESCRIPTION
 
@@ -173,10 +173,10 @@ Print out the user help info.
 
 static void help(void)
 {
-    printf("pdump - dump or convert parrot bytecode (PBC) files\n");
+    printf("pbc_dump - dump or convert parrot bytecode (PBC) files\n");
     printf("usage:\n");
-    printf("pdump [-tdh] [--terse|--disassemble|--header-only] file.pbc\n");
-    printf("pdump -o converted.pbc file.pbc\n\n");
+    printf("pbc_dump [-tdh] [--terse|--disassemble|--header-only] file.pbc\n");
+    printf("pbc_dump -o converted.pbc file.pbc\n\n");
     printf("\t-d ... disassemble bytecode segments\n");
     printf("\t-h ... dump header only\n");
     printf("\t-t ... terse output\n");

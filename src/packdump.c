@@ -10,7 +10,7 @@ src/packdump.c - Functions for dumping packfile structures
 
 =head1 DESCRIPTION
 
-This is only used by the PBC dumper C<pdump>.
+This is only used by the PBC dumper C<pbc_dump>.
 
 =head2 Functions
 
@@ -397,7 +397,7 @@ PackFile_Fixup_dump(PARROT_INTERP, ARGIN(const PackFile_FixupTable *ft))
 
 =head1 SEE ALSO
 
-F<src/pdump.c>.
+F<src/pbc_dump.c>.
 
 =cut
 

@@ -115,7 +115,6 @@ rm -rf $RPM_BUILD_ROOT
 %exclude %{_bindir}/perl6
 %exclude %{_bindir}/parrot_debugger
 %exclude %{_bindir}/pbc_*
-%exclude %{_bindir}/pdump
 %{_bindir}/*
 %{_libdir}/parrot
 %{_libdir}/libparrot.so.*
@@ -135,7 +134,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_bindir}/pbc_info
 %{_bindir}/pbc_merge
 %{_bindir}/pbc_to_exe
-%{_bindir}/pdump
+%{_bindir}/pbc_dump
 %{_includedir}/parrot
 %{_libdir}/libparrot.so
 %{_libdir}/libparrot.a
