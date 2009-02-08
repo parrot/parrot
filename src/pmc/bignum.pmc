@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2004-2008, The Perl Foundation.
-$Id: bignum.pmc 36319 2009-02-03 08:25:42Z allison $
+$Id$
 
 =head1 NAME
 
@@ -27,6 +27,11 @@ C<BigNum> provides arbitrary precision integer mathematic functions.
 #ifdef S_SPLINT_S
 #  undef PARROT_HAS_GMP /* splint barfs on the gmp.h header */
 #endif /* S_SPLINT_S */
+
+/* Temporariliy disabled until someone fix it */
+#ifdef PARROT_HAS_GMP
+#  undef PARROT_HAS_GMP
+#endif
 
 #ifdef PARROT_HAS_GMP
 #  include <gmp.h>
