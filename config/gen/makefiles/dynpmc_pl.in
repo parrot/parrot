@@ -15,25 +15,25 @@ dynamic PMCs.
 
 use strict;
 use warnings;
-
-use File::Copy qw(copy);
 use FindBin;
 use lib "$FindBin::Bin/../..";
 use lib "$FindBin::Bin/../../lib";
+
+use File::Copy qw(copy);
 use Storable;
 
+# Config stuff
 # q[] isn't guaranteed to work, but it's safer than "" as some platforms
 # (eg FreeBSD) have ""s embedded in their substitution values. q[] is used
 # as Win32 paths have \'s in, which qq treats as escape sequences.
-# Config stuff
-our $CC = q[@cc@ -c];
-our $LD = q[@ld@];
-our $LDFLAGS = q[@ldflags@ @ld_debug@ @rpath_blib@ @linkflags@];
-our $LD_LOAD_FLAGS = q[@ld_load_flags@];
-our $PERL = q[@perl@];
-our $LOAD_EXT = q[@load_ext@];
-our $O = q[@o@];
-our $CFLAGS = q[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
+our $CC              = q[@cc@ -c];
+our $LD              = q[@ld@];
+our $LDFLAGS         = q[@ldflags@ @ld_debug@ @rpath_blib@ @linkflags@];
+our $LD_LOAD_FLAGS   = q[@ld_load_flags@];
+our $PERL            = q[@perl@];
+our $LOAD_EXT        = q[@load_ext@];
+our $O               = q[@o@];
+our $CFLAGS          = q[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
 
 our $LIBPARROT = q[];
 #IF(parrot_is_shared):$LIBPARROT = q[@libparrot_ldflags@];
