@@ -1,7 +1,7 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 Parrot Magic Cookies
+=head1 Polymorphic Containers
 
 =head2 Version
 
@@ -9,15 +9,15 @@ $Revision$
 
 =head2 Abstract
 
-This PDD describes the internal structure and behavior of the Parrot Magic
-Cookie (PMC) data type.
+This PDD describes the internal structure and behavior of the Polymorphic
+Container (PMC) data type.
 
 =head2 Description
 
 PMCs implement all internal data types more complex than a simple integer,
 float, or string, and also the data types of high-level languages.  Nothing
 outside the core of Parrot (in fact, nothing outside the data type's vtable
-routines) should infer anything about a PMC (hence the Magic part).
+routines) should infer anything about a PMC.
 
 This does mean, though, that you need to either know what functions are
 available and what they do, or have some method of finding out. Parrot defines
