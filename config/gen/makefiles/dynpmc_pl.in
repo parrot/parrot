@@ -63,7 +63,7 @@ sub compile_cmd {
     }
 
 
-    # XXX Reference to BGC - need long term solution for passing in include paths
+    # TT #290 - need long term solution for passing in include paths
     return
         "$CC " .
         '@cc_o_out@' . $target . " " .
