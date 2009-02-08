@@ -28,7 +28,7 @@ use Storable;
 # as Win32 paths have \'s in, which qq treats as escape sequences.
 our $CC              = q[@cc@ -c];
 our $LD              = q[@ld@];
-our $LDFLAGS         = q[@ldflags@ @ld_debug@ @rpath_blib@ @linkflags@];
+our $LDFLAGS         = q[@ldflags@ @ld_debug@ @rpath_blib@];
 our $LD_LOAD_FLAGS   = q[@ld_load_flags@];
 our $PERL            = q[@perl@];
 our $LOAD_EXT        = q[@load_ext@];
