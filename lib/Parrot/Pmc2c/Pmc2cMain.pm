@@ -89,13 +89,14 @@ sub new {
         unless ( defined $allargsref->{args} and ref( $allargsref->{args} ) eq q{ARRAY} );
 
     unshift @{ $allargsref->{include} },
-        ( ".", "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc/" );
+        '.', "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc", "$allargsref->{bin}/../../src/dynpmc";
 
     foreach my $opt qw(nolines) {
         if ( !defined $allargsref->{opt}{$opt} ) {
             $allargsref->{opt}{$opt} = 0;
         }
     }
+
     return bless( $allargsref, $class );
 }
 
