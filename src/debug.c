@@ -1265,10 +1265,10 @@ PDB_get_command(PARROT_INTERP)
         STRING * readline = CONST_STRING(pi, "readline_interactive");
         STRING * prompt = CONST_STRING(pi, "(pdb) ");
         STRING *s= Parrot_str_new(pi, NULL, 0);
-        PMC *stdin = Parrot_io_stdhandle(interp->debugger, 0, NULL);
+        PMC *tmp_stdin = Parrot_io_stdhandle(interp->debugger, 0, NULL);
 
         Parrot_PCCINVOKE(interp->debugger,
-            stdin, readline,
+            tmp_stdin, readline,
             "S->S", prompt, & s);
         {
         char * aux = Parrot_str_to_cstring(interp->debugger, s);
@@ -1282,7 +1282,7 @@ PDB_get_command(PARROT_INTERP)
 /*
         while (ch != EOF && ch != '\n' && (i < DEBUG_CMD_BUFFER_LENGTH)) {
             c[i++] = (char)ch;
-            ch     = fgetc(stdin);
+            ch     = fgetc(tmp_stdin);
         }
 
         c[i] = '\0';
