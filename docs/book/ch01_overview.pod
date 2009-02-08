@@ -2,68 +2,12 @@
 
 =head1 Project Overview
 
-Z<CHP-1>
+The heart of Parrot is a language-neutral runtime environment for
+dynamic languages, such as Ruby, Python, PHP and Perl.
 
-X<Parrot>
-The heart of Parrot is a grandiose idea that turned out to be more
-realistic than anyone originally could have believed: why not have a
-single interpreter for several languages? Before this question was
-asked, dynamic languages such as Perl, Python, Ruby, and Scheme had
-all had their own individual interpreters; most of which were not
-easily extensible, not modular, and not capable of interoperation.
-The solution, it was decided, was to create a single virtual machine
-for all such languages. That virtual machine is called Parrot.
-
-On April 1st, 2001, Simon CozensX<Cozens, Simon> published an article
-titled "Programming Parrot" as an April Fools' joke
-(U<http://www.perl.com/pub/a/2001/04/01/parrot.htm>).  It contained a
-contrived interview with Larry Wall and Guido van Rossum detailing
-their plans to merge Python and Perl into a new language called
-Parrot. This was a plausible ruse because both languages were
-undergoing massive redesigns: The Perl community was laying the
-groundwork for the next version, "Perl 6", and the Python team was
-working hard on a spec for "Python 3000". The Perl 6 project started
-moving in two different directions at once: the underlying interpreter
-architecture and the language grammar and semantics. As people
-realized that the two projects could become completely independent, it
-was decided to create a proper language-agnostic virtual machine to
-support the high-level efforts. The virtual machine was later dubbed
-"Parrot" in a fitting turn of life imitating art.
-
-The goal for the Parrot project was to create a language-neutral runtime
-environment for dynamic languages like Perl and Python. Of course, these
-two languages weren't the end, not for the Parrot team. They were
-thinking big. Parrot would have to support all the features other
-dynamic languages such as Ruby, Scheme, Befunge, PHP, and others.
-Threading and Unicode would be supported from the start, mitigating two
-thorns that had plagued Perl 5 developers for years. A robust exceptions
-system, a capability to compile into platform-independent bytecode, and
-a clean extension and embedding mechanism would be just some of the
-necessary and standard features. Parrot needed to have more then any of
-these languages had ever had by themselves, and it needed to do all
-these things right.
-
-The irony is that the language-neutrality of the interpreter was
-originally just a side effect of good design. Keeping the implementation
-independent of the syntax would make the codebase cleaner and easier to
-maintain. Plus, the Parrot team could get to work long before the Perl
-6 group even had their plans written.
-
-Since Parrot would support the features of the major dynamic languages
-and wasn't biased to a particular syntax, it could run all these
-languages with little additional effort.  It's generally acknowledged
-that different languages are suited to different tasks, and picking which
-language to use in a large software project is a common planning problem.
-There's never a perfect fit, at least not for all jobs. Developers find
-themselves settling for the language with the most advantages and the
-least noticeable disadvantages. The ability to easily combine multiple
-languages within a single project could be a huge benefit to developers.
-Before Parrot, language interoperability was a feature typically reserved
-for compiled languages such as C. Using well-tested libraries from one
-language, taking advantage of clean problem-domain expression in a second,
-and using languages according to their inherent strengths is the ultimate
-goal, one which the Parrot team is hoping to make a reality.
-
+The language-neutrality of the interpreter is partially a design
+decision for modularity. Keeping the implementation independent of the
+syntax makes the codebase cleaner and easier to maintain.
 Modular design also benefits future language designers, not just
 designers of current languages. Instead of targeting I<lex>/I<yacc> and
 reimplementing low-level features such as garbage collection and dynamic
@@ -72,25 +16,40 @@ high-level features of their language: syntax, libraries, capabilities.
 Parrot does all the necessary bookkeeping, exposing a rich interface with
 capabilities that few languages can make full use of.
 
-=head1 The Parrot Team
+A robust exceptions system, a capability to compile into
+platform-independent bytecode, and a clean extension and embedding
+mechanism would be just some of the necessary and standard features.
 
-As is typical of open source development projects, managing the
-development of Parrot is quite different from managing a commercial
-project of the same size and complexity.  There are no schedules, no
-deadlines, no hiring and firing, and no salaries, bonuses, or stock
-options. There are no employees or bosses; there is very little
-hierarchy whatsoever. Management in this context isn't about giving
-orders, it's about making sure everyone has what they need to keep
-moving forward. Like most open-source and open-content projects, the
-best leadership is to set a good example and stay out of the way.
+
+
+Since Parrot would support the features of the major dynamic languages
+and wasn't biased to a particular syntax, it could run all these
+languages with little additional effort.  
+
+Language interoperability is another core goal. Different languages are
+suited to different tasks, and picking which language to use in a large
+software project is a common planning problem.  There's never a perfect
+fit, at least not for all jobs. Developers find themselves settling for
+the language with the most advantages and the least noticeable
+disadvantages. The ability to easily combine multiple languages within a
+single project opens up the potential of using well-tested libraries
+from one language, taking advantage of clean problem-domain expression
+in a second, while binding it together in a third that elegantly
+captures the overall architecture. It's about using languages according
+to their inherent strengths, and mitigating the cost of their
+weaknesses.
+
+The name "Parrot" started with an April Fools' Day joke in 2001. Simon
+CozensX<Cozens, Simon> published an article titled "Programming Parrot",
+with a fictional interview between Larry Wall and Guido van Rossum
+detailing their plans to merge Python and Perl into a new language
+called Parrot (U<http://www.perl.com/pub/a/2001/04/01/parrot.htm>).
+
+=head2 The Parrot Team
 
 The Parrot development team is broken down into several distinct roles,
 which people assume according to their merits and their talents. This is
-a list of those roles, with a partial list of the folks who have taken
-responsibility for them.
-
-=head2 Project Team
-X<Project Team>
+a list of those roles.
 
 =over 4
 
@@ -113,54 +72,15 @@ Release managers have responsibility for executing a product release
 according to the release schedule. The release schedule is developed
 and maintained jointly with the project Architect.
 
-Current release managers are, in this order:
-
-    Jerry Gay
-X<Gay, Jerry>
-    Patrick Michaud
-X<Michaud, Patrick>
-    Matt Diephouse
-X<Diephouse, Matt>
-    Will Coleda
-X<Coleda, Will>
-    chromatic
-X<chromatic>
-    Allison Randal
-X<Randal, Allison>
-
-Information on the release procedure can be found in
-F<docs/project/release_manager_guide.pod>. Parrot releases a stable
-version, under the direction of one of these release managers, every
-month.
-
 =item Metacommitter
 
 All Metacommitters are responsible for managing commit access to the
-Parrot repository. Once the Architect or Pumpking approves a request
-for a contributor to be given commit access, a Metacommitter performs
-the necessary magic to give the new committer access to the SVN
-repository and the bugtracker. The Architect is a Metacommitter, but
-other Project Team members may also hold this role.
+Parrot repository. Once a contributor is selected commit access, a
+Metacommitter performs the necessary magic to give the new committer
+access to the SVN repository and the bugtracker. The Architect is a
+Metacommitter, but other Project Team members may also hold this role.
 
-Current metacommitters are:
-
-    Allison Randal
-X<Randal, Allison>
-    Chip Salzenberg
-X<Salzenberg, Chip>
-    Jerry Gay
-X<Gay, Jerry>
-    Will Coleda
-X<Coleda, Will>
-    Jesse Vincent
-X<Vincent, Jesse>
-
-The procedure on how to manage the list of Parrot committers can be
-found in F<docs/project/metacommiter_guide.pod>.
-
-=back
-
-=head2 Committers
+=item Committer
 
 X<Committers>
 Contributors who submit numerous, high-quality patches may be
@@ -169,8 +89,6 @@ full Parrot repository, but generally work only on one or more
 subprojects; Committer categories are described below. Contributors may be
 considered for commit access either by being nominated by another
 Committer, or by requesting it.
-
-=over 4
 
 =item Core Developer
 
@@ -182,24 +100,22 @@ the exceptions system, or the concurrency scheduler.
 Compiler Developers develop and maintain one or more Parrot front-end
 compilers such as IMCC, PIRC, PGE and TGE.
 
-=item High Level Language Developer
+=item High-Level Language Developer
 
 Developers who work on any of the high-level languages that target
 Parrot such as TCL, Lua or Perl 6, are High-Level Language Developers.
-Many of these language projects are located in the Parrot repository,
-although some are maintained in separate locations. It is the intention
-that all languages be developed separately from Parrot before the 1.0
-release.
+Some of these language projects are located in the Parrot repository,
+although most are maintained in separate locations.
 
 =item Build Manager
 
 Build Managers maintain and extend configuration and build subsystems.
 They review smoke reports and attempt to extend platform support.
 
-=item Lead Tester
+=item Tester
 
 Developing, maintaining, and extending test suite coverage and testing
-tool are the key tasks for the Lead Testers. Lead Testers are also
+tool are the key tasks for the Testers. Testers are also
 responsible for testing goals, including complete coverage of core
 components on targeted platforms.
 
@@ -211,16 +127,6 @@ Monsters, as they are affectionately known, are in charge of checking
 patches for conformance with coding standards and desirability of
 features.
 
-=back
-
-A list of committers that have a role they've taken responsibility for
-can be found in F<RESPONSIBLE_PARTIES>.
-
-=head2 Contributors
-X<Contributors>
-
-=over 4
-
 =item Cage Cleaners
 
 Parrot's cage, the development working environment, has a tendency to
@@ -228,155 +134,75 @@ get messy and disorganized over time. It's the responsibility of the
 aptly-named Cage Cleaners to ensure that coding standards are followed, that
 documentation is complete and accurate, that all tests are functioning
 properly, and that there are plenty of coding examples for new users to
-learn from. A class of tickets in the RT tracking system has been created
-especially for use by this group. This position encompasses tasks that
-run the gamut from entry-level to advanced, and is a good entry point
-for new users who want to get more familiar with Parrot internals.
+learn from. A class of tickets in the issue tracking system has been
+created especially for use by this group. This position encompasses
+tasks that run the gamut from entry-level to advanced, and is a good
+entry point for new users who want to get more familiar with Parrot
+internals.
 
 =item General Contributor
 
 Contributors are volunteers who write code or documentation patches,
 take part in email or online conversations, or contribute to the project
-in other important ways. All volunteer contributions are appreciated
-and recognized, with their names being added to the F<CREDITS> file in
-the Parrot repository. When a new contributor submits patches which have
-been accepted, they should add their name to this list.
+in other important ways. All volunteer contributions are appreciated.
 
 =back
 
-The list of general contributors can be found in F<CREDITS>.
+=head2 Development Cycles
 
-=head2 Furthermore
+X<development cycles;Parrot>
+The Parrot development cycle centers on monthly releases. Most monthly releases
+are development releases, and two releases a year are production releases. The
+production releases are numbered X.0 and X.5, while the development releases
+take a major or minor version number between each production release.
 
-X<Hansen, Ask BjE<oslash>rn>
-X<Spier, Robert>
-Last, but not least, is the glue that holds the project together.
-BjE<oslash>rn Hansen and Robert Spier manage the email, revision
-control, and bug-tracking systems, as well as the web sites for Parrot,
-U<http://www.parrotcode.org> and now U<http://www.parrot.org>. Without
-these systems, the project would grind to a screeching halt.
+Development proceeds at a steady pace with bugs reported, patches
+submitted, patches applied, and all sorts of other regular development
+tasks performed. The pace isn't so much a result of careful planning as
+it is the law of averages; on any given day someone, somewhere, is
+working on Parrot. In periods of high activity there are often many more
+people working on Parrot N<Or related tools, or high-level language
+compilers, etc.> then just one. 
 
-In the end, it is the developers themselves who hold the project
-together. Individuals bear their own share of responsibility for
-finding tasks that suit their skills, coordinating with others to keep
-duplicated effort minimal, and ensuring that the job gets done.
+Activity tends to spike when a release is approaching to close tickets, fix
+bugs, clean up documentation, and prepare the supporting files for the release.
+Immediately after the release, there is generally a flurry of branch merges,
+feature additions, or removal of deprecated features, since the week after the
+release allows the maximum time for testing before the next release. Releases
+also encourage feedback as casual users and testers get their hands on the
+newest version. These regular swells of activity are one of the major
+motivations for monthly releases.
 
-=head2 Where to go
+=head2 Getting Involved
 
-X<Parrot;mailing lists>
-Mailing lists are an important tool for communication, and the Parrot
-Development team maintains a special-purpose mailing list to coordinate
-the efforts of the many team members. The mailing list for Parrot is
-called "parrot-dev", and you can subscribe to it by sending a blank
-email message to  U<parrot-dev-subscribe@parrot.org>. The list is
-archived at U<http://dir.gmane.org/gmane.comp.compilers.parrot.devel>
-and available via NNTP at
+X<p2 (Parrot mailing list)>
+The first step to getting involved in the Parrot project, whether you
+want to hack code, write documentation, or help in other ways, is to
+join the mailing list. The topics on the list tend to
+revolve around practical matters: bug reports, notifications of
+changes committed to the subversion repository, questions on coding
+style, and how to implement particular features.
+
+The primary mailing list for Parrot is called "parrot-dev", and you can
+subscribe to it or view the archives through the web interface at
+U<http://lists.parrot.org/XXX>. The archives are also available on
+Google Groups at U<http://groups.google.com/group/parrot-dev> and via NNTP at
 U<nntp://news.gmane.org/gmane.comp.compilers.parrot.devel>.
-This list was previously called "parrot-porters", and even earlier
-"perl6-internals". If you want to access posts from earlier in Parrot's
-history, search for internet archives of those lists.
-
-You can also read the parrot-dev list via Google Groups at
-U<http://groups.google.com/group/parrot-dev>
 
 X<Parrot;sites>
 Parrot information and documentation can be accessed on the web in a
-variety of locations. The following web sites should have all the
-Parrot information you need to get started:
+variety of locations. The main website is U<http://www.parrot.org>,
+where you'll find recent news, and information about the project and
+foundation. The heart of development is U<http://trac.parrot.org>,
+Parrot's ticket submission and tracker, wiki, source code browser, and
+project roadmap.
 
-=over 4
-
-=item * U<http://www.parrot.org>
-
-=item * U<http://dev.perl.org/perl6>
-
-=item * U<http://bugs6.perl.org>
-
-=item * U<http://pugscode.org>
-
-=back
+Parrot developers, volunteers, and well-wishers also congregate on IRC
+at C<#parrot> on the U<irc://irc.perl.org> server. It's a good place to
+get real-time answers to questions, or just to see how things are
+progressing.
 
 =cut
-
-##########################################################################
-#                              PSEUDOPOD LEGEND
-#
-#  Interior Sequences
-#  ..................
-#  A<>         link anchor (source)
-#  B<>         bold text
-#  C<>         monospace text
-#  E<>         named character
-#  F<>         file name
-#  G<>         superscript
-#  H<>         subscript
-#  I<>         italicized text
-#  L<>         link to other manpage (see A<>)
-#  M<>         firstterm
-#  N<>         footnote
-#  Q<>         quoted text
-#  R<>         replaceable item
-#  S<>         text with non-breaking spaces
-#  T<>         cited title for book, etc.
-#  U<>         URL
-#  X<>         a single index term of the form:
-#                    primary:sortas;secondary:sortas;tertiary:sortas;;ETC
-#                    where ETC is either (see term) or (see also term)
-#                    only primary term is required
-#  Z<>         link anchor (destination)
-#
-#  Heads
-#  .....
-#  head0                    chapter title
-#  head{1-4}                section title (4 levels)
-#
-#  Command Paragraphs (begin/end Blocks)
-#  .....................................
-#  blockquote               quotation
-#  comment                  ignored text
-#  caution                  admonition
-#  epigraph                 quotation
-#  example                  container
-#  figure CAPTION           figure
-#  important                admonition
-#  note                     admonition
-#  programlisting           literal text
-#  screen                   literal text
-#  sidebar                  container
-#  table html [CAPTION]     table rendered in HTML
-#  table picture [CAPTION]  table rendered in plain text
-#  tip                      admonition
-#  warning                  admonition
-#
-#
-#  Command Paragraphs (for Blocks)
-#  ...............................
-#  This structure will be used only for comments. For example:
-#
-#    =for editor
-#    Check my spelling on this.
-#    =end
-#
-#  This will be rendered as a visible comment in the final output
-#  with a label at the top addressing it to "editor". The exception is
-#  =for ignore which will always be ignored by the parser.
-#
-#  Tables
-#  ......
-#  A 2x2 table with top header row looks like this:
-#
-#  =begin table An Example Table
-#  =headrow
-#  =row
-#  =cell Header for first column (row 1, col 1)
-#  =cell Header for 2nd column (row 1, col 2)
-#  =bodyrows
-#  =cell Cell for row 2, col 1
-#  =cell Cell for row 2, col 2
-#  =end table
-#
-#  For more information on PSEUDOPOD, write to tools@oreilly.com
-##########################################################################
 
 # Local variables:
 #   c-file-style: "parrot"

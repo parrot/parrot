@@ -1,72 +1,146 @@
 =pod
 
-=head1 Project Development
+=head1 Getting Started
 
-Z<CHP-2>
+=head1 Building Parrot
 
-The Parrot project is specially organized to be light-weight and
-efficient. The project is governed like a meritocracy; people who
-make valuable contributions are offered more responsibility. Communication
-is relaxed and informal, often intermittent through email and on IRC. As
-Dan is so fond of saying, "This is far too important to take seriously."
-The Parrot developers act a bit like a special forces unit where the
-objective is pursued because the whole team knows the task at hand, not
-because of any tight control from above.
+Z<CHP-2-SECT-2.2.2>
 
-=head2 Development Cycles
+X<Parrot;source code>
+The first step before you start playing with Parrot is to get a copy of
+the source code and compile it. You can download the latest monthly
+release from U<http://www.parrot.org/release/current>.
 
-Z<CHP-2-SECT-2.1>
+To build Parrot you'll need a C compiler and a make utility. Generally,
+you'll use F<gcc> and F<make>, but many different versions of these
+tools are supported on different operation systems. Perl is also needed
+for parts of the configuration and build process. The following
+command-line instructions will build the core virtual machine and
+compiler toolkit, and run the standard test suite.
 
-X<development cycles;Parrot>
-The Parrot development cycle centers on regular "point releases." A point
-release corresponds to a version change, such as 0.4.x to 0.5.x. These
-releases typically happen monthly, which is good because nobody has
-to guess when the next one will be. The architect and release managers
-decide whether the release is a "major" or minor one, depending on the
-changes that have been made and the features that have been added in the
-previous month. Usually one or two solid new features trigger a major
-point release. The Parrot team has specified a general roadmap of major
-point releases, and the expected features and changes that will trigger
-each one.
+  $ perl Configure.pl
+  $ make
+  $ make test
 
-Development proceeds at a steady pace with bugs reported, patches
-submitted, patches applied, and all sorts of other regular development
-tasks performed. The pace isn't so much a result of careful planning as
-it is the law of averages; on any given day someone, somewhere, is
-working on Parrot. In periods of high activity there are often many more
-people working on Parrot N<Or related tools, or high-level language
-compilers, etc.> then just one. Activity tends to spike when a release
-is approaching as last minute bugs, especially bugs in the build system
-or bugs that cause segmentation faults, are found and fixed by the team.
-After the release, there is an influx of new bug reports and other
-feedback as the casual users and testers get their hands on the newest
-version. These regular swells of activity are one of the major reasons
-why Parrot has monthly releases.
+Once you've compiled Parrot, you can run your first small script. Create
+a test file in the main F<parrot> directory called
+F<fjord.pasm> (F<.pasm> files are Parrot assembly language).
 
-=head2 Getting Involved
+  print "He's pining for the fjords.\n"
+  end
 
-Z<CHP-2-SECT-2.2>
+Now run this file with:
 
-X<p2 (Parrot mailing list)>
-X<Parrot;getting involved>
-The first step to getting involved in the Parrot project, whether you
-want to hack code, write documentation, or help in other ways, is to
-join the Parrot-porters (p2) mailing list. The topics on p2 tend to
-revolve around practical matters: bug reports, patches, notifications
-of changes committed to the subversion repository, and questions on
-coding style. Occasionally there are discussions about how to implement
-particular features, although such discussions are often better-suited
-for other communications media, such as IRC.
+  $ ./parrot fjord.pasm
 
-The Parrot developers, along with other volunteers and well-wishers
-tend to congregate on IRC to have more in-depth discussions. They
-maintain a chatroom C<#parrot> on the U<irc://irc.perl.org> server.
-To get real-time answers to questions, or just to see how things are
-progressing, the chatroom is the place to be.
+which will print:
+
+  He's pining for the fjords.
+
+Next, try out one of Parrot's high-level languages. Create a test file
+called F<hello.nqp>:
+
+  say "Hello, World!"
+
+Then run it as:
+
+  $ ./nqp hello.nqp
+
+With a few simple examples, you have 
+
+In the next few
+chapters we will discuss more aspects of Parrot programming using
+both PASM and PIR, and we will discuss some of the more advanced
+features of Parrot that make it an interesting and attractive
+programming platform.
+
+=head2 Build Requirements
+
+There are a number of requirements for building Parrot from source, and a
+number of optional libraries and components that can be used to extend its
+capabilities. None of these requirements or optional components are necessary
+unless you are building Parrot from the source code.
+
+=over 4
+
+=item* C Compiler
+
+Parrot can be built with a number of C compilers. Parrot is written using the
+C89 standard, and the Parrot project officially supports the most recent
+C89 compiler on major systems, including the most recent versions of Microsoft
+C Compiler and the GNU Compiler Collection (GCC).
+
+=item* make
+
+Make is a program to manage and automate the build process. Unix-based systems
+will typically have access to the C<make> command as part of the normal
+development tools. Windows systems can get the C<nmake> utility to perform the
+same task.
+
+=item* Subversion
+
+Subversion is the source control system that is used by the Parrot project.
+You need subversion to checkout the latest version of the source code. You can
+get subversion at L<http://subversion.tigris.org>, or through one of the
+common packaging systems.
+
+=item* bison and flex
+
+Bison and Flex are used to create the lexical analyzer and parser components
+for the PIR compilers IMCC and PIRC. These are not necessary most of the time
+unless you are planning to hack on IMCC and PIRC directly.
+
+=item* ICU
+
+ICU is a library for handling and manipulating Unicode text strings. Without
+ICU libraries installed, you wont be able to use Unicode with your built
+Parrot.
+
+=item* GMP
+
+GMP is a mathematics library for manipulating arbitrary precision and
+arbitrary size numbers. GMP is an optional library used by the BigInt
+and BigNum PMCs.
+
+=item* Readline
+
+The readline library allows some advanced behaviors on the command line such
+as command history.
+
+=item* PCRE
+
+PCRE is a library that provides access to the Perl 5 regular expression syntax.
+In order to use these regular expressions, you will want to install PCRE. To
+do that on Linux you use the command:
+
+  sudo apt-get install libpcre3-dev
+
+=item* GDBM
+
+=item* PQ
+
+=item* GLUT
+
+GLUT is an interface to the OpenGL API. It enables programs running on Parrot
+to have access to 3D graphics. To get GLUT on Linux systems you can use the
+command:
+
+  sudo apt-get install libglut3-dev
+
+=back
+
+In addition to these build requirements listed above, there are a number of
+Perl libraries needed to enable all tests and testing facilities, and to
+generate all the necessary documentation.
+
+To get the Perl packages for Parrot, you can use the commands:
+
+  sudo cpan Test::Base Test::Pod Test::Pod::Coverage Pod::Spell
+  sudo cpan File::HomeDir File::Which Readonly Regexp::Parser
+  sudo cpan Perl::Critic Perl::Critic::Bangs Test::Perl::Critic
+
 
 =head3 Use the source
-
-Z<CHP-2-SECT-2.2.1>
 
 X<Parrot;source code>
 The second step to participating in Parrot development is to get a
@@ -141,385 +215,7 @@ code, as well as benchmarks. More discussions about these topics will be
 found in A<CHP-3> Chapter 3, A<CHP-5> Chapter 5, and A<CHP-7> Chapter 7
 respectively.
 
-=head1 Building Parrot
-
-Z<CHP-2-SECT-2.2.2>
-
-X<Parrot;source code>
-The first step before you start playing with Parrot's PASM and PIR
-code is to get a copy of the source code and compile it. PASM is
-the Parrot assembly language and is introduced in A<CHP-5>Chapter 5.
-PIR, an intermediate-level language that is used most often in compiler
-development, is discussed in A<CHP-3>Chapter 3.
-
-The basic steps involved in building Parrot from the source code from
-the command line are: N<Not all operating systems have F<make>. Check
-the documentation for instructions for systems that aren't Unix-based.>
-
-  $ perl Configure.pl
-  $ make
-  $ make test
-
-X<PASM (Parrot assembly language);compiling>
-Once you've compiled Parrot, create a small test file in the main
-F<parrot> directory.  We'll call it F<fjord.pasm>.
-
-  print "He's pining for the fjords.\n"
-  end
-
-X<.pasm files>
-I<.pasm> is the standard extension for Parrot assembly language source
-files. Now you can run this file with:
-
-  $ ./parrot fjord.pasm
-
-And watch the result of the program execution. Instead of executing
-the program immediately, you could also compile it to bytecode:
-
-  $ ./parrot --output fjord.pbc fjord.pasm
-
-You specify the name of the output bytecode file with the C<--output>
-(or C<-o>) switch.  I<.pbc> is the standard extension for Parrot
-bytecode. To execute the compiled bytecode, run it through the
-F<parrot> interpreter:
-
-  $ ./parrot fjord.pbc
-
-This is, of course, a simple and contrived example. In the next few
-chapters we will discuss more aspects of Parrot programming using
-both PASM and PIR, and we will discuss some of the more advanced
-features of Parrot that make it an interesting and attractive
-programming platform.
-
-=head2 Build Requirements
-
-There are a number of requirements for building Parrot from source, and a
-number of optional libraries and components that can be used to extend its
-capabilities. None of these requirements or optional components are necessary
-unless you are building Parrot from the source code.
-
-=over 4
-
-=item* C Compiler
-
-Parrot can be built with a number of C compilers. Parrot is written using the
-C89 standard, and the Parrot project officially supports the most recent
-C89 compiler on major systems, including the most recent versions of Microsoft
-C Compiler and the GNU Compiler Collection (GCC).
-
-=item* make
-
-Make is a program to manage and automate the build process. Unix-based systems
-will typically have access to the C<make> command as part of the normal
-development tools. Windows systems can get the C<nmake> utility to perform the
-same task.
-
-=item* Subversion
-
-Subversion is the source control system that is used by the Parrot project.
-You need subversion to checkout the latest version of the source code. You can
-get subversion at L<http://subversion.tigris.org>, or on Linux systems you
-can use the command
-
-  sudo apt-get install subversion
-
-=item* bison and flex
-
-Bison and Flex are used to create the lexical analyzer and parser components
-for the PIR compilers IMCC and PIRC. These are not necessary most of the time
-unless you are planning to hack on IMCC and PIRC directly. On Linux systems you
-can use the command
-
-  sudo apt-get install bison flex
-
-=item* ICU
-
-ICU is a library for handling and manipulating Unicode text strings. Without
-ICU libraries installed, you wont be able to use Unicode with your built
-Parrot. On Linux systems you can get ICU with this command:
-
-  sudo apt-get install libicu-dev
-
-=item* GMP
-
-GMP is a mathematics library for manipulating arbitrary precision and arbitrary
-size numbers. GMP is used by the BigInt and BigNum PMCs, so without GMP you
-won't have access to these data types. To get GMP on Linux systems, use the
-command:
-
-  sudo apt-get install libgmp3-dev
-
-=item* Readline
-
-The readline library allows some advanced behaviors on the command line such
-as command history. You can get the readline library on Linux by using the
-command:
-
-  sudo apt-get install libreadline5-dev
-
-=item* PCRE
-
-PCRE is a library that provides access to the Perl 5 regular expression syntax.
-In order to use these regular expressions, you will want to install PCRE. To
-do that on Linux you use the command:
-
-  sudo apt-get install libpcre3-dev
-
-=item* GDBM
-
-=item* PQ
-
-=item* GLUT
-
-GLUT is an interface to the OpenGL API. It enables programs running on Parrot
-to have access to 3D graphics. To get GLUT on Linux systems you can use the
-command:
-
-  sudo apt-get install libglut3-dev
-
-=back
-
-In addition to these build requirements listed above, there are a number of
-Perl libraries needed to enable all tests and testing facilities, and to
-generate all the necessary documentation.
-
-To get the Perl packages for Parrot, you can use the commands:
-
-  sudo cpan Test::Base Test::Pod Test::Pod::Coverage Pod::Spell
-  sudo cpan File::HomeDir File::Which Readonly Regexp::Parser
-  sudo cpan Perl::Critic Perl::Critic::Bangs Test::Perl::Critic
-
-=head2 Patch submission
-
-Z<CHP-2-SECT-2.2.3>
-
-X<Parrot;patch submission>
-Parrot development proceeds through a continuous stream of patches.
-Patches are the currency of exchange in the project--the unit of
-work. Patches can fix bugs, add features, modify capabilities,
-remove cruft, and improve the suite of tests and the project
-documentation. If something needs to change, it will typically require
-the submission of a new patch.
-
-While anyone is free to submit a patch, only a small number of people have
-the ability to apply patches to the central Parrot repository.
-These people are called I<committers>. By allowing all people to get
-involved through patch submission and testing, the project can harness
-the efforts of a large group but still keep the same high quality
-as a small group of experienced developers.
-
-Every submitted patch is automatically forwarded to the p2 list where
-it's subject to peer review. Small patches typically spark little debate,
-and can be well-tested on many platforms before being committed to the
-repository. Patches tend to be small modular changes, which makes for
-easy testing and evaluation. Occasionally a large feature such as an entire
-language implementation is submitted in a single patch, but these are the
-exceptions.
-
-Submitting a patch is fairly straightforward. You create a file that
-lists all your changes, a diff or a patch, and email it to the ticket
-tracking system at U<parrotbug@parrotcode.org>. It's important to make
-sure your patch and your email have descriptive titles so that the
-committers and testers have a better idea about what it does. The body of
-your email should also include a good description about what you changed
-and why.
-
-It's important that you create your patches from a checked-out subversion
-repository, not from a tarball or a snapshot. This way, you can ensure
-that your diff is made against the latest version of the files. If you patch
-an old version, the problem may have already been resolved! Make sure
-the paths listed in the patch match those in the repository. There are two
-methods of creating patches that will do this for you. You can make changes
-directly in your checked-out copy of the subversion repository and
-then create diffs using the command C<svn diff>. Alternatively, you can
-make a copy of the repository and then create diffs between the two
-copies with the C<diff -u> command:
-
-  diff -u parrot/README parrot_changed/README
-
-Either method is fine, and both are equally common on p2. Your
-working style and the types of changes you make--small and modular
-versus large and sweeping--will influence which method you choose.
-
-Next, when you're making changes, take some extra time to consider how
-your patch affects the rest of the system. If your patch adds a new
-file, patch the main F<MANIFEST> file to include it. If you add a new
-feature, make sure to write tests for it. If you fix a bug, add a test
-to prove that it's fixed. See A<CHP-9-SECT-13>"Writing Tests" in Chapter
-9 for more on writing tests for Parrot. Tests are very important for
-Parrot development, and writing good tests is a valuable skill for
-developers to have. Before you submit a patch always recompile the
-system yourself with the patch included and run all tests to prove that
-it works. You can build and test Parrot completely by running the
-following commands:
-
-  make clean
-  perl Configure.pl
-  make
-  make test
-
-Consider the people who will review and apply your patch, and try
-to make their jobs easier. Patch filenames should be as descriptive as
-possible: F<fix_readme_aardvark_typo.patch> is far better than
-F<README.patch>. An attached file is better than a diff pasted into an
-email, because it can be applied without manual editing. The
-conventional extension for patch files is F<.patch>.
-
-In the email message, always start the subject with "[PATCH]", and
-make the subject as clear as possible: "[PATCH] misspelled aardvark in
-main README file" is better than "[PATCH] typo". The body of the
-message should clearly explain what the patch is supposed to do and
-why you're submitting it. Make a note if you're adding or deleting
-files so they won't be missed.
-
-Here is a good example of a patch submission using the subversion diff
-method (an actual patch from p2). It's short, sticks to the point, and
-clearly expresses the problem and the solution. The patch filename and
-the subject of the message are both descriptive:
-
-=for author
-
-Possible alternates: ticket #23501, #24053 (not from top level)
-
-=end for
-
-  Subject: [PATCH] Pointers in List_chunk not initialized
-  From: Bruce Gray
-  
-  On Win32, these tests are segfaulting due to invalid
-  pointers in List_chunk structs:
-  t/op/string.t             97-98
-  t/pmc/intlist.t           3-4
-  t/pmc/pmc.t               80
-  
-  The problem is caused by list.c/allocate_chunk not
-  initializing the pointers. This patch corrects the problem.
-  
-  --
-  Hope this helps,
-  Bruce Gray
-
-With the attached file F<list_chunk_initialize.patch>:
-
-
-  Index: list.c
-  =========================================
-  RCS file: /cvs/public/parrot/list.c,v
-  retrieving revision 1.23
-  diff -u -r1.23 list.c
-  --- list.c        27 Dec 2002 09:33:11 -0000        1.23
-  +++ list.c        28 Dec 2002 03:37:35 -0000
-  @@ -187,6 +187,10 @@
-       Parrot_block_GC_sweep(interpreter);
-       chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
-       chunk->items = items;
-  +    chunk->n_chunks = 0;
-  +    chunk->n_items  = 0;
-  +    chunk->next     = NULL;
-  +    chunk->prev     = NULL;
-       Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
-       Parrot_unblock_GC_mark(interpreter);
-       Parrot_unblock_GC_sweep(interpreter);
-
-=head3 Bug tracking
-
-Z<CHP-2-SECT-2.2.4>
-
-X<Parrot;bug tracking>
-Bug reports go to the same address as patch submissions
-(U<parrotbug@parrotcode.org>). Similar conventions apply: make the
-subject and the message as clear and descriptive as possible. The
-subject line should start with "[BUG]"  to make it immediately obvious
-what the message is about.
-
-X<Parrot;bug tracking>
-If you want to track a bug or patch you've submitted, the current
-queue of bugs and patches is publicly viewable at
-U<http://rt.perl.org>. Bug tracking for Parrot is handled by the
-Request Tracker (RT) ticket tracking system from Best Practical
-Solutions.
-
 =cut
-
-##########################################################################
-#                              PSEUDOPOD LEGEND
-#
-#  Interior Sequences
-#  ..................
-#  A<>         link anchor (source)
-#  B<>         bold text
-#  C<>         monospace text
-#  E<>         named character
-#  F<>         file name
-#  G<>         superscript
-#  H<>         subscript
-#  I<>         italicized text
-#  L<>         link to other manpage (see A<>)
-#  M<>         firstterm
-#  N<>         footnote
-#  Q<>         quoted text
-#  R<>         replaceable item
-#  S<>         text with non-breaking spaces
-#  T<>         cited title for book, etc.
-#  U<>         URL
-#  X<>         a single index term of the form:
-#                    primary:sortas;secondary:sortas;tertiary:sortas;;ETC
-#                    where ETC is either (see term) or (see also term)
-#                    only primary term is required
-#  Z<>         link anchor (destination)
-#
-#  Heads
-#  .....
-#  head0                    chapter title
-#  head{1-4}                section title (4 levels)
-#
-#  Command Paragraphs (begin/end Blocks)
-#  .....................................
-#  blockquote               quotation
-#  comment                  ignored text
-#  caution                  admonition
-#  epigraph                 quotation
-#  example                  container
-#  figure CAPTION           figure
-#  important                admonition
-#  note                     admonition
-#  programlisting           literal text
-#  screen                   literal text
-#  sidebar                  container
-#  table html [CAPTION]     table rendered in HTML
-#  table picture [CAPTION]  table rendered in plain text
-#  tip                      admonition
-#  warning                  admonition
-#
-#
-#  Command Paragraphs (for Blocks)
-#  ...............................
-#  This structure will be used only for comments. For example:
-#
-#    =for editor
-#    Check my spelling on this.
-#    =end
-#
-#  This will be rendered as a visible comment in the final output
-#  with a label at the top addressing it to "editor". The exception is
-#  =for ignore which will always be ignored by the parser.
-#
-#  Tables
-#  ......
-#  A 2x2 table with top header row looks like this:
-#  
-#  =begin table An Example Table
-#  =headrow
-#  =row
-#  =cell Header for first column (row 1, col 1)
-#  =cell Header for 2nd column (row 1, col 2)
-#  =bodyrows
-#  =cell Cell for row 2, col 1
-#  =cell Cell for row 2, col 2
-#  =end table
-#
-#  For more information on PSEUDOPOD, write to tools@oreilly.com
-##########################################################################
 
 # Local variables:
 #   c-file-style: "parrot"
