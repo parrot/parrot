@@ -63,7 +63,7 @@ sub compile_cmd {
     }
 
 
-    # TT #290 - need long term solution for passing in include paths
+    # TT #288 - need long term solution for passing in include paths
     return
         "$CC " .
         '@cc_o_out@' . $target . " " .
@@ -203,7 +203,7 @@ sub run {
     return system(@_) == 0;
 }
 
-# XXX: ordering of libs might be crucial
+# TT #289: ordering of libs might be crucial
 sub gather_groups_and_libs {
     my @pmcs = @_;
 
