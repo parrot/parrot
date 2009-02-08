@@ -48,6 +48,8 @@ bignum_init(PARROT_INTERP, PMC *self) {
 #ifdef PARROT_HAS_GMP
     attrs->bi = mem_allocate_zeroed_typed(BIGNUM);
     mpf_init(attrs->bi->b);
+#else
+    attrs->bi = NULL;
 #endif
     PMC_data(self) = attrs;
 }
@@ -659,7 +661,9 @@ BigNum object.
         bignum_clear(INTERP, SELF);
 
         attrs = (Parrot_BigNum_attributes*)PMC_data(SELF);
+#ifdef PARROT_HAS_GMP
         mem_sys_free(attrs->bi);
+#endif
         mem_sys_free(attrs);
     }
 
