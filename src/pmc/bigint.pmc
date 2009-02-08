@@ -84,7 +84,7 @@ bigint_set_str(PARROT_INTERP, PMC *self, char *value, int base) {
     mpz_set_str(bi->b, value, base);
 }
 
-static BIGNUM*
+static BIGINT*
 bigint_get_self(PARROT_INTERP, PMC *self) {
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
@@ -92,7 +92,7 @@ bigint_get_self(PARROT_INTERP, PMC *self) {
 }
 
 static void
-bigint_set_self(PARROT_INTERP, PMC *self, BIGNUM *value) {
+bigint_set_self(PARROT_INTERP, PMC *self, BIGINT *value) {
     BIGINT *bi;
     GETATTR_BigInt_bi(interp, self, bi);
     mpz_set(bi->b, (mpz_srcptr)((BIGINT*)value)->b);
@@ -401,12 +401,12 @@ bigint_set_str(PARROT_INTERP, PMC *self, char *value, int base) {
 }
 
 static void
-bigint_set_self(PARROT_INTERP, PMC *self, BIGNUM *value) {
+bigint_set_self(PARROT_INTERP, PMC *self, BIGINT *value) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no bigint lib loaded");
 }
 
-static BIGNUM*
+static BIGINT*
 bigint_get_self(PARROT_INTERP, PMC *self) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no bigint lib loaded");
