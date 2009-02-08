@@ -1,3 +1,9 @@
+parrot (0.9.0-2) unstable; urgency=low
+  * debian/control.in:
+    - Updated Description of all packages.
+
+ -- Allison Randal <allison@parrot.org>  Fri, 23 Jan 2009 15:16:25 -0800
+
 parrot (0.9.0-1) unstable; urgency=low
 
   * New upstream release (Closes: #444707).
