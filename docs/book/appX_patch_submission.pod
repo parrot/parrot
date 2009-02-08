@@ -1,0 +1,133 @@
+=pod
+
+=head1 Patch submission
+
+X<Parrot;patch submission>
+Parrot development proceeds through a continuous stream of patches.
+Patches are the currency of exchange in the project--the unit of
+work. Patches can fix bugs, add features, modify capabilities,
+remove cruft, and improve the suite of tests and the project
+documentation. If something needs to change, it will typically require
+the submission of a new patch.
+
+While anyone is free to submit a patch, only a small number of people have
+the ability to apply patches to the central Parrot repository.
+These people are called I<committers>. By allowing all people to get
+involved through patch submission and testing, the project can harness
+the efforts of a large group but still keep the same high quality
+as a small group of experienced developers.
+
+Every submitted patch is automatically forwarded to the p2 list where
+it's subject to peer review. Small patches typically spark little debate,
+and can be well-tested on many platforms before being committed to the
+repository. Patches tend to be small modular changes, which makes for
+easy testing and evaluation. Occasionally a large feature such as an entire
+language implementation is submitted in a single patch, but these are the
+exceptions.
+
+Submitting a patch is fairly straightforward. You create a file that
+lists all your changes, a diff or a patch, and email it to the ticket
+tracking system at U<parrotbug@parrotcode.org>. It's important to make
+sure your patch and your email have descriptive titles so that the
+committers and testers have a better idea about what it does. The body of
+your email should also include a good description about what you changed
+and why.
+
+It's important that you create your patches from a checked-out subversion
+repository, not from a tarball or a snapshot. This way, you can ensure
+that your diff is made against the latest version of the files. If you patch
+an old version, the problem may have already been resolved! Make sure
+the paths listed in the patch match those in the repository. There are two
+methods of creating patches that will do this for you. You can make changes
+directly in your checked-out copy of the subversion repository and
+then create diffs using the command C<svn diff>. Alternatively, you can
+make a copy of the repository and then create diffs between the two
+copies with the C<diff -u> command:
+
+  diff -u parrot/README parrot_changed/README
+
+Either method is fine, and both are equally common on p2. Your
+working style and the types of changes you make--small and modular
+versus large and sweeping--will influence which method you choose.
+
+Next, when you're making changes, take some extra time to consider how
+your patch affects the rest of the system. If your patch adds a new
+file, patch the main F<MANIFEST> file to include it. If you add a new
+feature, make sure to write tests for it. If you fix a bug, add a test
+to prove that it's fixed. See A<CHP-9-SECT-13>"Writing Tests" in Chapter
+9 for more on writing tests for Parrot. Tests are very important for
+Parrot development, and writing good tests is a valuable skill for
+developers to have. Before you submit a patch always recompile the
+system yourself with the patch included and run all tests to prove that
+it works. You can build and test Parrot completely by running the
+following commands:
+
+  make clean
+  perl Configure.pl
+  make
+  make test
+
+Consider the people who will review and apply your patch, and try
+to make their jobs easier. Patch filenames should be as descriptive as
+possible: F<fix_readme_aardvark_typo.patch> is far better than
+F<README.patch>. An attached file is better than a diff pasted into an
+email, because it can be applied without manual editing. The
+conventional extension for patch files is F<.patch>.
+
+In the email message, always start the subject with "[PATCH]", and
+make the subject as clear as possible: "[PATCH] misspelled aardvark in
+main README file" is better than "[PATCH] typo". The body of the
+message should clearly explain what the patch is supposed to do and
+why you're submitting it. Make a note if you're adding or deleting
+files so they won't be missed.
+
+Here is a good example of a patch submission using the subversion diff
+method (an actual patch from p2). It's short, sticks to the point, and
+clearly expresses the problem and the solution. The patch filename and
+the subject of the message are both descriptive:
+
+=for author
+
+Possible alternates: ticket #23501, #24053 (not from top level)
+
+=end for
+
+  Subject: [PATCH] Pointers in List_chunk not initialized
+  From: Bruce Gray
+  
+  On Win32, these tests are segfaulting due to invalid
+  pointers in List_chunk structs:
+  t/op/string.t             97-98
+  t/pmc/intlist.t           3-4
+  t/pmc/pmc.t               80
+  
+  The problem is caused by list.c/allocate_chunk not
+  initializing the pointers. This patch corrects the problem.
+  
+  --
+  Hope this helps,
+  Bruce Gray
+
+With the attached file F<list_chunk_initialize.patch>:
+
+
+  Index: list.c
+  =========================================
+  RCS file: /cvs/public/parrot/list.c,v
+  retrieving revision 1.23
+  diff -u -r1.23 list.c
+  --- list.c        27 Dec 2002 09:33:11 -0000        1.23
+  +++ list.c        28 Dec 2002 03:37:35 -0000
+  @@ -187,6 +187,10 @@
+       Parrot_block_GC_sweep(interpreter);
+       chunk = (List_chunk *)new_bufferlike_header(interpreter, sizeof(*chunk));
+       chunk->items = items;
+  +    chunk->n_chunks = 0;
+  +    chunk->n_items  = 0;
+  +    chunk->next     = NULL;
+  +    chunk->prev     = NULL;
+       Parrot_allocate_zeroed(interpreter, (Buffer *)chunk, size);
+       Parrot_unblock_GC_mark(interpreter);
+       Parrot_unblock_GC_sweep(interpreter);
+
+=cut
