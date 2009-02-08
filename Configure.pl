@@ -63,6 +63,8 @@ $conf->add_steps( @{ $steps_list_ref } );
 
 # from Parrot::Configure::Data
 $conf->options->set( %{$args} );
+# save the command-line for make reconfig
+$conf->data->set(configure_args => '"'.join("\" \"", map {qq($_)} @ARGV).'"');
 
 # Log files created by Configure.pl in MANIFEST.configure.generated
 $conf->{active_configuration} = 1;

@@ -20,6 +20,8 @@ DEVEL           = @DEVEL@
 VERSION         = @VERSION@$(DEVEL)
 SOVERSION       = @VERSION@
 
+CONFIG_ARGS     = @configure_args@
+
 # Override at least PREFIX with the install location if you're going
 # to be using this outside of your build area.
 BUILDPREFIX     =
@@ -1743,8 +1745,8 @@ distclean : realclean
 svnclobber : .svn
 	$(PERL) tools/dev/svnclobber.pl
 
-reconfig : clean
-	$(PERL) Configure.pl
+reconfig : realclean
+	$(PERL) Configure.pl $(CONFIG_ARGS)
 
 manitest :
 	$(PERL) tools/dev/manicheck.pl
