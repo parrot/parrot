@@ -244,7 +244,7 @@ this chapter.>
 
 Z<CHP-5-SECT-2.2.2>
 
-X<PMCs (Parrot Magic Cookies);object types>
+X<PMCs (Polymorphic Containers);object types>
 Internally, PMC types are represented by positive integers, and
 built-in types by negative integers. PASM provides two opcodes to deal
 with types. Use C<typeof> to look up the name of a type from its
@@ -262,7 +262,7 @@ register, C<typeof> returns the name of the type:
 
 In this example, C<typeof> returns the type name "String".
 
-X<PMCs (Parrot Magic Cookies);inheritance>
+X<PMCs (Polymorphic Containers);inheritance>
 X<Parrot;classes;inheritance>
 X<inheritance;with PMCs>
 All Parrot classes inherit from the class C<default>. The
@@ -337,7 +337,7 @@ take an integer, floating-point, or PMC final argument:
   mul P0, P1, I2
   mul P0, P1, N2
 
-X<PMCs (Parrot Magic Cookies);operations on>
+X<PMCs (Polymorphic Containers);operations on>
 Operations on a PMC are implemented by the vtable method of the
 destination (in the two-argument form) or the left source argument (in
 the three argument form). The result of an operation is entirely
@@ -456,7 +456,7 @@ in C<S0>. It generates a new string "abcd" and changes C<S0> to point
 to the new string. The second C<concat> concatenates "xy" onto the
 string "abcd" in C<S0> and stores the new string in C<S1>.
 
-X<PMCs (Parrot Magic Cookies);concatenation>
+X<PMCs (Polymorphic Containers);concatenation>
 For PMC registers, C<concat> has only a three-argument form with
 separate registers for source and destination:
 
@@ -1182,8 +1182,8 @@ specified number of bits:
 
 Z<CHP-5-SECT-3>
 
-In most of the examples we've shown so far, X<PMCs (Parrot Magic
-Cookies);working with> PMCs just duplicate the functionality of
+In most of the examples we've shown so far, X<PMCs (Polymorphic
+Containers);working with> PMCs just duplicate the functionality of
 integers, numbers, and strings. They wouldn't be terribly useful if
 that's all they did, though. PMCs offer several advanced features,
 each with its own set of operations.
@@ -1193,7 +1193,7 @@ each with its own set of operations.
 Z<CHP-5-SECT-3.1>
 
 PMCs can define complex types that hold multiple values. These are
-commonly called "X<PMCs (Parrot Magic Cookies);aggregate>
+commonly called "X<PMCs (Polymorphic Containers);aggregate>
 X<aggregate PMCs> aggregates." The most important feature added for
 aggregates is keyed access. Elements within an aggregate PMC can be
 stored and retrieved by a numeric or string key. PASM also offers a
@@ -1208,7 +1208,7 @@ described here.
 
 Z<CHP-5-SECT-3.1.1>
 
-X<PMCs (Parrot Magic Cookies);arrays>
+X<PMCs (Polymorphic Containers);arrays>
 The C<Array>X<Array PMC> PMC is an ordered aggregate with
 zero-based integer keys. The syntax for X<keyed access to PMCs> keyed access to a
 PMC puts the key in square brackets after the register name:
@@ -1250,7 +1250,7 @@ A<CHP-11-SECT-1>"PASM Opcodes" in Chapter 11).
 
 Z<CHP-5-SECT-3.1.2>
 
-X<PMCs (Parrot Magic Cookies);hashes>
+X<PMCs (Polymorphic Containers);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate with
 string keys:
 
@@ -1332,7 +1332,7 @@ since they don't define any order for their keys.
 
 Z<CHP-5-SECT-3.1.4>
 
-X<PMCs (Parrot Magic Cookies);data structures>
+X<PMCs (Polymorphic Containers);data structures>
 Arrays and hashes can hold any data type, including other aggregates.
 Accessing elements deep within nested data structures is a common
 operation, so PASM provides a way to do it in a single instruction.
@@ -1362,8 +1362,8 @@ or string values.
 
 Z<CHP-5-SECT-3.2>
 
-We mentioned before that C<set> on two X<PMCs (Parrot Magic
-Cookies);assignment> PMCs simply aliases them both to the same object,
+We mentioned before that C<set> on two X<PMCs (Polymorphic
+Containers);assignment> PMCs simply aliases them both to the same object,
 and that C<clone> creates a complete duplicate object. But if you just
 want to assign the value of one PMC to another PMC, you need the
 C<assign>X<assign opcode (PASM)> opcode:
@@ -1394,7 +1394,7 @@ or reuse the source object (as with C<set>).
 
 Z<CHP-5-SECT-3.3>
 
-X<PMCs (Parrot Magic Cookies);properties>
+X<PMCs (Polymorphic Containers);properties>
 PMCs can have additional values attached to them as "properties" of
 the PMC. What these properties do is entirely up to the language being
 implemented. Perl 6 uses them to store extra information about a

@@ -819,7 +819,7 @@ structure. Thread safety is far too big a topic to cover in this book,
 but trust us when we say it's something worth being concerned with.
 
 X<Parrot;native data type;;(see PMCs)>
-X<PMCs (Parrot Magic Cookies);Parrot's native data type> 
+X<PMCs (Polymorphic Containers);Parrot's native data type> 
 PMCs are complex structures, even the simplest ones. We can't count on
 the hardware or even the operating system to provide us atomic access.
 Parrot has to provide that atomicity itself, which is expensive. Getting
@@ -901,7 +901,7 @@ override.
 
 Z<CHP-8-SECT-5.1>
 
-X<PMCs (Parrot Magic Cookies);handling method calls>
+X<PMCs (Polymorphic Containers);handling method calls>
 Parrot's object system is very simple--in fact, a PMC only has to handle
 method calls to be considered an object. Just handling methods covers
 well over 90% of the object functionality that most programs use, since
@@ -1038,7 +1038,7 @@ allocation system has its own garbage collection scheme. Parrot also
 has some strict rules over what can be referenced and from where.
 This allows it to have a more efficient garbage collection system.
 
-X<PMCs (Parrot Magic Cookies);garbage collection and>
+X<PMCs (Polymorphic Containers);garbage collection and>
 X<garbage collection;Parrot;PMC and>
 The first allocation system is responsible for PMC and string
 structures. These are fixed-sized objects that Parrot allocates out of
