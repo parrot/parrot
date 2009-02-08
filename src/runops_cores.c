@@ -359,7 +359,7 @@ runops_debugger_core(PARROT_INTERP, ARGIN(opcode_t *pc))
                     interp->code->base.data,
                     interp->code->base.data +
                     interp->code->base.size,
-                    interp->pdb->cur_opcode);
+                    pc);
         }
 
         CONTEXT(interp)->current_pc = pc;
