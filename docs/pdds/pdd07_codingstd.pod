@@ -1,26 +1,23 @@
 # Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Conventions and Guidelines for Parrot Source Code
 
-docs/pdds/pdd07_codingstd.pod - Conventions and Guidelines for Parrot Source
-Code
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This document describes the various rules, guidelines and advice for those
 wishing to contribute to the source code of Parrot, in such areas as code
 structure, naming conventions, comments etc.
 
-=head1 SYNOPSIS
+=head2 Synopsis
 
 Not applicable.
 
-=head1 DESCRIPTION
+=head2 Description
 
 One of the criticisms of Perl 5 is that its source code is impenetrable to
 newcomers, due to such things as inconsistent or obscure variable naming
@@ -50,10 +47,10 @@ Items labelled I<may> are tentative suggestions to be used at your discretion.
 Note that since Parrot is substantially implemented in C, these rules apply to
 C language source code unless otherwise specified.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 
-=head2 Language Standards and Portability
+=head3 Language Standards and Portability
 
 =over 4
 
@@ -84,7 +81,7 @@ it is run where the features it depends on are not available.
 =back
 
 
-=head2 Code Formatting
+=head3 Code Formatting
 
 The following I<must> apply:
 
@@ -239,7 +236,7 @@ should be indented to the right of the innermost unclosed punctuation, e.g.:
 =back
 
 
-=head2 Code Structure
+=head3 Code Structure
 
 The following I<must> apply:
 
@@ -337,7 +334,7 @@ number next to it.
 =back
 
 
-=head2 Smart Editor Style Support
+=head3 Smart Editor Style Support
 
 All developers using Emacs must ensure that their Emacs instances load the
 elisp source file F<editor/parrot.el> before opening Parrot source files.
@@ -400,7 +397,7 @@ that Emacs know about typedefs.  We should provide a simple script to update a
 list of typedefs, and parrot.el should read it or contain it. }}
 
 
-=head2 Portability
+=head3 Portability
 
 Parrot runs on many, many platforms, and will no doubt be ported to ever more
 bizarre and obscure ones over time.  You should never assume an operating
@@ -412,9 +409,9 @@ on a GNU feature without noticing.  To avoid this, know what features of gcc
 are GNU extensions, and use them only when they're protected by #ifdefs.
 
 
-=head2 Defensive Programming
+=head3 Defensive Programming
 
-=head3 Use Parrot data structures instead of C strings and arrays
+=head4 Use Parrot data structures instead of C strings and arrays
 
 C arrays, including strings, are very sharp tools without safety guards, and
 Parrot is a large program maintained by many people.  Therefore:
@@ -427,7 +424,7 @@ overflow or memory leak.
 Note that efficiency of some low-level operations may be a reason to break
 this rule.  Be prepared to justify your choices to a jury of your peers.
 
-=head3 Pass only C<unsigned char> to C<isxxx()> and C<toxxx()>
+=head4 Pass only C<unsigned char> to C<isxxx()> and C<toxxx()>
 
 Pass only values in the range of C<unsigned char> (and the special value -1,
 a.k.a. C<EOF>) to the isxxx() and toxxx() library functions.  Passing signed
@@ -435,7 +432,7 @@ characters to these functions is a very common error and leads to incorrect
 behavior at best and crashes at worst.  And under most of the compilers Parrot
 targets, C<char> I<is> signed.
 
-=head3 The C<const> keyword on arguments
+=head4 The C<const> keyword on arguments
 
 Use the C<const> keyword as often as possible on pointers.  It lets
 the compiler know when you intend to modify the contents of something.
@@ -453,7 +450,7 @@ variable:
 Without the C<const>, the compiler has to assume that C<strlen()> is
 actually initializing the contents of C<p>.
 
-=head3 The C<const> keyword on variables
+=head4 The C<const> keyword on variables
 
 If you're declaring a temporary pointer, declare it C<const>, with the
 const to the right of the C<*>, to indicate that the pointer should not
@@ -476,7 +473,7 @@ to the left of the type, as in:
         /* do something */
     }
 
-=head3 Localizing variables
+=head4 Localizing variables
 
 Declare variables in the innermost scope possible.
 
@@ -503,9 +500,9 @@ the variables happen to have the same names.
 You could hoist the C<int i;> outside the test, but then you'd have an
 C<i> that's visible after it's used, which is confusing at best.
 
-=head2 Subversion properties
+=head3 Subversion Properties
 
-=head3 svn:ignore
+=head4 svn:ignore
 
 Sometimes new files will be created in the configuration and build process of
 Parrot. These files should not show up when checking the distribution with
@@ -527,7 +524,7 @@ the MANIFEST and MANIFEST.SKIP files should be regenerated with:
 
 and the files then committed to the Parrot svn repository.
 
-=head3 svn:mime-type
+=head4 svn:mime-type
 
 The C<svn:mime-type> property must be set to C<text/plain> for all test
 files, and may be set to C<text/plain> for other source code files in
@@ -543,7 +540,7 @@ following to your F<~/.subversion/config>:
 The F<t/distro/file_metadata.t> test checks that the files needing
 this property have it set.
 
-=head3 svn:keywords
+=head4 svn:keywords
 
 The C<svn:keywords> property should be set to:
 
@@ -556,7 +553,7 @@ on each file with a mime-type of C<text/plain>.  Do this with the command:
 The F<t/distro/file_metadata.t> test checks that the files needing
 this property have it set.
 
-=head3 svn:eol-style
+=head4 svn:eol-style
 
 The C<svn:eol-style> property makes sure that whenever a file is checked out
 of subversion it has the correct end-of-line characters appropriate for
@@ -578,7 +575,7 @@ Set the C<svn:eol-style> property to C<LF> with the command:
 The F<t/distro/file_metadata.t> test checks that the files needing
 this property have it set.
 
-=head2 Naming conventions
+=head3 Naming Conventions
 
 =over 4
 
@@ -798,7 +795,7 @@ example have the following macros:
 =back
 
 
-=head2 Code comments
+=head3 Code Comments
 
 The importance of good code documentation cannot be stressed enough. To make
 your code understandable by others (and indeed by yourself when you come to
@@ -930,7 +927,7 @@ branch, e.g.
 
 =back
 
-=head2 Extensibility
+=head3 Extensibility
 
 Over the lifetime of Parrot, the source code will undergo many major changes
 never envisaged by its original authors. To this end, your code should balance
@@ -956,7 +953,7 @@ to later use a C<PMC *> at the same point: c.f. UTF-8 hash keys in Perl 5.
 Of course, private code hidden behind an API can play more fast and loose than
 code which gets exposed.
 
-=head2 Performance
+=head3 Performance
 
 We want Parrot to be fast. Very fast. But we also want it to be portable and
 extensible. Based on the 90/10 principle, (or 80/20, or 95/5, depending on who
@@ -979,7 +976,7 @@ zillions of #ifdefs.
 
 And remember to document it.
 
-=head1 EXEMPTIONS
+=head2 Exemptions
 
 Not all files can strictly fall under these guidelines as they are
 automatically generated by other tools, or are external files included in
@@ -993,7 +990,7 @@ C<lib/Parrot/Distribution.pm> (in either of the methods C<is_c_exemption()>
 or C<is_perl_exemption()>).  One can use wildcards in the list to exempt,
 for example, all files under a given directory.
 
-=head1 REFERENCES
+=head2 References
 
 none
 
