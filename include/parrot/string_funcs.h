@@ -298,10 +298,11 @@ STRING * Parrot_str_new_init(PARROT_INTERP,
     ARGIN_NULLOK(const char *buffer),
     UINTVAL len,
     ARGIN(const ENCODING *encoding),
-    ARGIN_NULLOK(const CHARSET *charset),
+    ARGIN(const CHARSET *charset),
     UINTVAL flags)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(4);
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -638,7 +639,8 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
     || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_Parrot_str_new_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(encoding)
+    || PARROT_ASSERT_ARG(encoding) \
+    || PARROT_ASSERT_ARG(charset)
 #define ASSERT_ARGS_Parrot_str_new_noinit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_str_not_equal __attribute__unused__ int _ASSERT_ARGS_CHECK = \

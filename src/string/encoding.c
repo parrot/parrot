@@ -58,29 +58,6 @@ static All_encodings *all_encodings;
 
 /*
 
-=item C<void parrot_init_encodings_2>
-
-Helper function for initializing characterset encodings. Initializes the
-C<all_encodings> array.
-
-=cut
-
-*/
-
-void
-parrot_init_encodings_2(void)
-{
-    ASSERT_ARGS(parrot_init_encodings_2)
-    const int n = all_encodings->n_encodings;
-    int i;
-
-    for (i = 0; i < n; ++i) {
-        all_encodings->enc[i].name->charset = Parrot_default_charset_ptr;
-    }
-}
-
-/*
-
 =item C<void parrot_deinit_encodings>
 
 Deinitialize encodings and free all memory used by them.
@@ -338,9 +315,31 @@ register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
                 (n + 1) * sizeof (One_encoding));
     all_encodings->n_encodings++;
     all_encodings->enc[n].encoding = encoding;
-    all_encodings->enc[n].name = Parrot_str_new_constant(interp, encodingname);
 
     return 1;
+}
+
+/*
+
+=item C<void Parrot_str_internal_register_encoding_names>
+
+Helper function for initializing characterset encoding names. We can't create
+the STRING names until the default encodings and charsets are already initted,
+so the name generation is split into a second init stage.
+
+=cut
+
+*/
+
+
+void
+Parrot_str_internal_register_encoding_names(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_str_internal_register_encoding_names)
+    int n;
+    for (n = 0; n < all_encodings->n_encodings; n++)
+        all_encodings->enc[n].name =
+            Parrot_str_new_constant(interp, all_encodings->enc[n].encoding->name);
 }
 
 /*

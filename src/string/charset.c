@@ -63,6 +63,9 @@ static All_charsets *all_charsets;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void Parrot_str_internal_register_charset_names(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static INTVAL register_charset(PARROT_INTERP,
     ARGIN(const char *charsetname),
     ARGIN(CHARSET *charset))
@@ -73,6 +76,9 @@ static INTVAL register_charset(PARROT_INTERP,
 static void register_static_converters(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_str_internal_register_charset_names \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_register_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(charsetname) \
@@ -340,10 +346,31 @@ register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
                 (n + 1) * sizeof (One_charset));
     all_charsets->n_charsets++;
     all_charsets->set[n].charset = charset;
-    all_charsets->set[n].name = Parrot_str_new_constant(interp, charsetname);
     all_charsets->set[n].n_converters = 0;
 
     return 1;
+}
+
+/*
+
+=item C<static void Parrot_str_internal_register_charset_names>
+
+Helper function for initializing characterset names. We can't create the
+STRING names until the default encodings and charsets are already initted,
+so the name generation is split into a second init stage.
+
+=cut
+
+*/
+
+static void
+Parrot_str_internal_register_charset_names(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_str_internal_register_charset_names)
+    int n;
+    for (n = 0; n < all_charsets->n_charsets; n++)
+        all_charsets->set[n].name =
+            Parrot_str_new_constant(interp, all_charsets->set[n].charset->name);
 }
 
 /*
@@ -462,10 +489,12 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
     Parrot_charset_binary_init(interp);
     Parrot_charset_unicode_init(interp);
 
-    /*
-     * now encoding strings don't have a charset yet - set default
+    /* Now that the plugins are registered, we can create STRING
+     * names for them.
      */
-    parrot_init_encodings_2();
+    Parrot_str_internal_register_encoding_names(interp);
+    Parrot_str_internal_register_charset_names(interp);
+
     /*
      * now install charset converters
      */

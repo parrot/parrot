@@ -762,7 +762,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len,
-        ARGIN(const ENCODING *encoding), ARGIN_NULLOK(const CHARSET *charset), UINTVAL flags)
+        ARGIN(const ENCODING *encoding), ARGIN(const CHARSET *charset), UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_str_new_init)
     DECL_CONST_CAST;
