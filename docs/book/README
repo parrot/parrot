@@ -4,23 +4,17 @@ this folder:
 
  1) Overview
  2) Getting Started
- 3) PIR Basics
- 4) PIR Subroutines
- 5) PASM
- 6) Standard Library
- 7) Testing and Debugging
- 8) Parrot Architecture
- 9) Parrot Compiler Tools
-10) High-Level Languages
-11) PMCs
-12) Opcodes and Runcores
-13) NCI (proposed, if there is enough material about using NCI to warrant a chapter)
-14) Reference
+ 3) High-Level Languages
+ 4) Parrot Compiler Tools
+ 5) Parrot Intermediate Representation (PIR)
+ 6) Parrot Assembly Language (PASM)
+ 7) Writing your own PMCs
+ 8) Testing and Debugging
+ 9) Standard Library (maybe)
 
 This list will probably change as time goes on, as more topics need to be
-covered. I'm sure other authors are going to think it's stupid and completely
-rearrange it to be better.
+covered.
 
-Top-level headings in each chapter are level1 headings. All sub-headings in the chapter
-are level 2 and below. All pages in the book should contain the VIM suffix (which is
-a codingstd for all of the Parrot repo) and the Pseudopod cheatsheet.
+Top-level headings in each chapter (the chapter title) are level 1 headings.
+All sub-headings in the chapter are level 2 and below. All chapter files should
+contain the VIM suffix (which is a codingstd for all of the Parrot repo).
