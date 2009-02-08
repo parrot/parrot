@@ -144,11 +144,11 @@ typedef struct parrot_interp_t Interp;
 #  define UINTVAL2PTR(any, d)    (any)(d)
 #else
 #  if PTR_SIZE == LONG_SIZE
-#    define INTVAL2PTR(any, d)    (any)(unsigned long)(d)
-#    define UINTVAL2PTR(any, d)    (any)(unsigned long)(d)
+#    define INTVAL2PTR(any, d)    ((any)(unsigned long)(d))
+#    define UINTVAL2PTR(any, d)    ((any)(unsigned long)(d))
 #  else
-#    define INTVAL2PTR(any, d)    (any)(unsigned int)(d)
-#    define UINTVAL2PTR(any, d)    (any)(unsigned int)(d)
+#    define INTVAL2PTR(any, d)    ((any)(unsigned int)(d))
+#    define UINTVAL2PTR(any, d)    ((any)(unsigned int)(d))
 #  endif /* PTR_SIZE == LONG_SIZE */
 #endif /* PTR_SIZE == INTVAL_SIZE */
 #define PTR2INTVAL(p)    INTVAL2PTR(INTVAL, (p))

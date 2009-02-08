@@ -670,7 +670,7 @@ Parrot_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc),
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG))
         fprintf(stderr,
                 "[invoke cont    %p, to_ctx %p, from_ctx %p (refs %d)]\n",
-                (void *)pmc, (void *)to_ctx, (void *)from_ctx, (int)from_ctx->ref_count);
+                (const void *)pmc, (void *)to_ctx, (void *)from_ctx, (int)from_ctx->ref_count);
 #endif
     if (!to_ctx)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,

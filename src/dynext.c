@@ -397,13 +397,13 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         char   * const cinit_func_name = Parrot_str_to_cstring(interp, init_func_name);
 
         /* get load_func */
-        load_func       = (PMC * (*)(PARROT_INTERP))
-            D2FPTR(Parrot_dlsym(handle, cload_func_name));
+	void * dlsymfunc = Parrot_dlsym(handle, cload_func_name);
+        load_func = (PMC * (*)(PARROT_INTERP)) D2FPTR(dlsymfunc);
         Parrot_str_free_cstring(cload_func_name);
 
         /* get init_func */
-        init_func       = (void (*)(PARROT_INTERP, PMC *))
-            D2FPTR(Parrot_dlsym(handle, cinit_func_name));
+        dlsymfunc = Parrot_dlsym(handle, cinit_func_name);
+        init_func = (void (*)(PARROT_INTERP, PMC *)) D2FPTR(dlsymfunc);
         Parrot_str_free_cstring(cinit_func_name);
     }
     else {
