@@ -99,6 +99,11 @@ sub generate_accessor {
     my $pmcname        = $pmc->{name};
     my $attrtype       = $self->{type};
     my $attrname       = $self->{name};
+
+    # Store regexes used to check some types to avoid repetitions
+    my $isptrtostring = qr/STRING\s*\*$/;
+    my $isptrtopmc    = qr/PMC\s*\*$/;
+
     my $decl           = <<"EOA";
 
 /* Generated macro accessors for '$attrname' attribute of $pmcname PMC. */
@@ -121,14 +126,14 @@ EOA
             (dest) = VTABLE_get_number(interp, attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /STRING\s*\*$/) {
+    elsif ($attrtype =~ $isptrtostring) {
         $decl .= <<"EOA";
             PMC *attr_value = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
             (dest) = VTABLE_get_string(interp, attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /PMC\s*\*$/) {
+    elsif ($attrtype =~ $isptrtopmc) {
         $decl .= <<"EOA";
             (dest) = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
@@ -170,7 +175,7 @@ EOA
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /STRING\s*\*$/) {
+    elsif ($attrtype =~ $isptrtostring) {
         $decl .= <<"EOA";
             PMC *attr_value = pmc_new(interp, enum_class_String); \\
             VTABLE_set_string_native(interp, attr_value, value); \\
@@ -178,7 +183,7 @@ EOA
                               Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
 EOA
     }
-    elsif ($attrtype =~ /PMC\s*\*$/) {
+    elsif ($attrtype =~ $isptrtopmc) {
         $decl .= <<"EOA";
             VTABLE_set_attr_str(interp, pmc, \\
                               Parrot_str_new_constant(interp, "$attrname"), value); \\
