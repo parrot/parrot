@@ -1195,6 +1195,13 @@ PDB_get_command(PARROT_INTERP)
     char         *c;
     PDB_t        * const pdb = interp->pdb;
 
+/***********************************
+   **** Testing ****
+   Do not delete yet
+   the commented out
+   parts
+***********************************/
+
     /* flush the buffered data */
     fflush(stdout);
 
@@ -1244,21 +1251,43 @@ PDB_get_command(PARROT_INTERP)
 
         c = pdb->cur_command;
 
-        Parrot_io_eprintf(pdb->debugger, "\n(pdb) ");
+        /*Parrot_io_eprintf(pdb->debugger, "\n(pdb) ");*/
+        Parrot_io_eprintf(pdb->debugger, "\n");
 
         /* skip leading whitespace */
+/*
         do {
             ch = fgetc(stdin);
         } while (isspace((unsigned char)ch) && ch != '\n');
+*/
+        {
+        Interp * pi = interp->debugger;
+        STRING * readline = CONST_STRING(pi, "readline_interactive");
+        STRING * prompt = CONST_STRING(pi, "(pdb) ");
+        STRING *s= Parrot_str_new(pi, NULL, 0);
+        PMC *stdin = Parrot_io_stdhandle(interp->debugger, 0, NULL);
+
+        Parrot_PCCINVOKE(interp->debugger,
+            stdin, readline,
+            "S->S", prompt, & s);
+        fprintf(stderr, "Hi\n");
+        {
+        char * aux = Parrot_str_to_cstring(interp->debugger, s);
+        strcpy(c, aux);
+        Parrot_str_free_cstring(aux);
+        }
+        ch = '\n';
+        }
 
         /* generate string (no more than buffer length) */
+/*
         while (ch != EOF && ch != '\n' && (i < DEBUG_CMD_BUFFER_LENGTH)) {
             c[i++] = (char)ch;
             ch     = fgetc(stdin);
         }
 
         c[i] = '\0';
-
+*/
         if (ch == -1)
             strcpy(c, "quit");
     }
