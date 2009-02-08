@@ -90,10 +90,15 @@ libraries so a bytecode compiled version of a module in the C<mylang> HLL
 named C<['Foo';'Bar']> is stored in
 F<usr/lib/parrot/<version>/languages/<mylang>/library/Foo/Bar.pbc>
 
-=item F</usr/lib/parrot/tools/>
+=item F</usr/lib/parrot/<version>/tools/>
 
 Parrot tools that don't belong in the bin/ directory and don't belong in the
 runtime, corresponds to F<tools/dev/> and/or F<tools/build> in the repository.
+
+=item F</usr/share/doc/parrot/<version/>
+
+Parrot documentation files, generally raw Pod, but possibly also formatted
+HTML. May have subdirectories F<pod/>, F<html/>, etc.
 
 =back
 
