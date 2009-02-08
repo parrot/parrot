@@ -589,14 +589,15 @@ pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         PMC * const item           =
             (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
 
-        /* nested namespace with same name */
-        if (item->vtable->base_type == enum_class_NameSpace)
-            return enum_type_undef;
-
-        if (!PMC_IS_NULL(item))
-            return VTABLE_get_integer(interp, item);
-
-        return Parrot_get_datatype_enum(interp, name);
+        if (!PMC_IS_NULL(item)) {
+            /* nested namespace with same name */
+            if (item->vtable->base_type == enum_class_NameSpace)
+                return enum_type_undef;
+            else
+                return VTABLE_get_integer(interp, item);
+        }
+	else
+            return Parrot_get_datatype_enum(interp, name);
     }
 }
 
