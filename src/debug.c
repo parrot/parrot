@@ -1261,17 +1261,17 @@ PDB_get_command(PARROT_INTERP)
         } while (isspace((unsigned char)ch) && ch != '\n');
 */
         {
-        Interp * pi = interp->debugger;
-        STRING * readline = CONST_STRING(pi, "readline_interactive");
-        STRING * prompt = CONST_STRING(pi, "(pdb) ");
-        STRING *s= Parrot_str_new(pi, NULL, 0);
-        PMC *tmp_stdin = Parrot_io_stdhandle(interp->debugger, 0, NULL);
+        Interp * interpdeb = interp->pdb->debugger;
+        STRING * readline = CONST_STRING(interpdeb, "readline_interactive");
+        STRING * prompt = CONST_STRING(interpdeb, "(pdb) ");
+        STRING *s= Parrot_str_new(interpdeb, NULL, 0);
+        PMC *tmp_stdin = Parrot_io_stdhandle(interpdeb, 0, NULL);
 
-        Parrot_PCCINVOKE(interp->debugger,
+        Parrot_PCCINVOKE(interpdeb,
             tmp_stdin, readline,
             "S->S", prompt, & s);
         {
-        char * aux = Parrot_str_to_cstring(interp->debugger, s);
+        char * aux = Parrot_str_to_cstring(interpdeb, s);
         strcpy(c, aux);
         Parrot_str_free_cstring(aux);
         }

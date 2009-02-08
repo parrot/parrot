@@ -25,7 +25,9 @@ These are the vtable functions for the Sub (subroutine) base class
 static void
 print_sub_name(PARROT_INTERP, PMC *sub)
 {
-    Interp * const tracer = interp->debugger ? interp->debugger : interp;
+    Interp * const tracer = (interp->pdb && interp->pdb->debugger) ?
+        interp->pdb->debugger :
+	interp;
 
     /* sub was located via globals */
     Parrot_io_eprintf(tracer, "# Calling sub '%Ss'\n# ",

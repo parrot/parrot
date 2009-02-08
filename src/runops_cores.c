@@ -135,19 +135,26 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
     dod = arena_base->dod_runs;
     gc = arena_base->collect_runs;
-    if (!interp->debugger) {
+    if (interp->pdb) {
+        debugger = interp->pdb->debugger;
+        PARROT_ASSERT(debugger);
+    }
+    else {
         PMC *pio;
 
-        debugger = interp->debugger =
-            /*
-             * using a distinct interpreter for tracing should be ok
-             * - just in case, make it easy to switch
-             */
-#if 1
-            make_interpreter(interp, 0);
+        /*
+         * using a distinct interpreter for tracing should be ok
+         * - just in case, make it easy to switch
+         */
+#if 0
+        debugger = interp:
 #else
-            interp;
+        Parrot_debugger_init(interp);
+        PARROT_ASSERT(interp->pdb);
+        debugger = interp->pdb->debugger;
 #endif
+        PARROT_ASSERT(debugger);
+
         /* set the top of the stack so GC can trace it for GC-able pointers
          * see trace_system_areas() in src/cpu_dep.c */
         debugger->lo_var_ptr = interp->lo_var_ptr;
@@ -162,8 +169,6 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
             Parrot_io_setbuf(debugger, pio, 8192);
         }
     }
-    else
-        debugger = interp->debugger;
 
     trace_op(interp, code_start, code_end, pc);
     while (pc) {

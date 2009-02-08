@@ -49,7 +49,9 @@ void
 print_pbc_location(PARROT_INTERP)
 {
     ASSERT_ARGS(print_pbc_location)
-    Interp * const tracer = interp->debugger ? interp->debugger : interp;
+    Interp * const tracer = (interp->pdb && interp->pdb->debugger) ?
+        interp->pdb->debugger :
+        interp;
     Parrot_io_eprintf(tracer, "%Ss\n",
             Parrot_Context_infostr(interp,
                 CONTEXT(interp)));

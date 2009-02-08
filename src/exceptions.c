@@ -115,9 +115,12 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
     Parrot_io_flush(interp, Parrot_io_STDERR(interp));
 
-    if (interp->debugger) {
-        Parrot_io_flush(interp->debugger, Parrot_io_STDOUT(interp->debugger));
-        Parrot_io_flush(interp->debugger, Parrot_io_STDERR(interp->debugger));
+    if (interp->pdb) {
+        Interp * interpdeb = interp->pdb->debugger;
+	if (interpdeb) {
+            Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
+            Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
+        }
     }
 
     if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, "")) == 1) {

@@ -356,8 +356,7 @@ struct parrot_interp_t {
 
     const char *output_file;                  /* where to write output */
 
-    PDB_t  *pdb;                              /* Debug system */
-    Interp *debugger;                         /* trace / debug interpreter */
+    PDB_t  *pdb;                              /* debug /trace system */
 
     struct Stack_Chunk *dynamic_env;          /* current dynamic environment */
 

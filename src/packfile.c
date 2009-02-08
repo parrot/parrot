@@ -2882,8 +2882,8 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
      * which gives misleading trace messages
      */
     if (really && Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
-        Interp * const tracer = interp->debugger ?
-            interp->debugger : interp;
+        Interp * const tracer = interp->pdb->debugger ?
+            interp->pdb->debugger : interp;
         Parrot_io_eprintf(tracer, "*** switching to %s\n",
                 new_cs->base.name);
     }

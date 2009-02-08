@@ -37,7 +37,9 @@ static void
 print_sub_name(PARROT_INTERP, PMC *sub)
 {
     Parrot_coro * const co     = PMC_coro(sub);
-    Interp      * const tracer = interp->debugger ? interp->debugger : interp;
+    Interp      * const tracer = (interp->pdb && interp->pdb->debugger) ?
+        interp->pdb->debugger :
+        interp;
 
     Parrot_io_eprintf(tracer, "# %s coro '%Ss'",
         !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ?

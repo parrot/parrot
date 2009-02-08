@@ -156,8 +156,6 @@ main(int argc, char *argv[])
 
     /*Parrot_set_config_hash();  TODO link with cfg */
 
-    /* attach pdb structure */
-    interp->debugger = pdb->debugger;
     pdb->state       = PDB_ENTER;
 
     Parrot_block_GC_mark(interp);

@@ -160,7 +160,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     if (arena_base->DOD_block_level)
         return;
 
-    if (interp->debugger) {
+    if (interp->pdb && interp->pdb->debugger) {
         /*
          * if the other interpreter did a DOD run, it can set
          * live bits of shared objects, but these aren't reset, because

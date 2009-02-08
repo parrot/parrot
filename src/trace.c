@@ -83,7 +83,7 @@ void
 trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     ASSERT_ARGS(trace_pmc_dump)
-    Interp * const debugger = interp->debugger;
+    Interp * const debugger = interp->pdb->debugger;
 
     if (!pmc) {
         Parrot_io_eprintf(debugger, "(null)");
@@ -170,7 +170,7 @@ int
 trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(trace_key_dump)
-    Interp * const debugger = interp->debugger;
+    Interp * const debugger = interp->pdb->debugger;
 
     int len = Parrot_io_eprintf(debugger, "[");
 
@@ -255,7 +255,7 @@ trace_op_dump(PARROT_INTERP,
     ASSERT_ARGS(trace_op_dump)
     INTVAL s, n;
     int more = 0, var_args;
-    Interp * const debugger = interp->debugger;
+    Interp * const debugger = interp->pdb->debugger;
     op_info_t * const info = &interp->op_info_table[*pc];
     PMC *sig;
     int type;
