@@ -1,20 +1,18 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Exceptions
 
-docs/pdds/pdd23_exceptions.pod - Parrot Exceptions
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This document defines the requirements and implementation strategy for
 Parrot's exception system.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 I<Exceptions> are indications by running code that something unusual -- an
 "exception" to the normal processing -- has occurred.  When code detects an
@@ -33,7 +31,7 @@ information describing the exceptional condition: the nature of the exception,
 the error message describing it, and other ancillary information.  The
 specific type (class) of an exception object indicates its category.)
 
-=head2 Exception Opcodes
+=head3 Exception Opcodes
 
 These are the opcodes relevant to exceptions and exception handlers:
 
@@ -124,7 +122,7 @@ argument in the type, not the payload}}
 
 =back
 
-=head2 Exception Introspection Opcodes
+=head3 Exception Introspection Opcodes
 
 These are the opcodes relevant to introspection of the exception handler
 stack:
@@ -138,7 +136,7 @@ Return the quantity of currently active exception handlers.
 =back
 
 
-=head2 Order of Operations in Exception Handling
+=head3 Order of Operations in Exception Handling
 
 When B<throw> is called, for all active exception handlers, in LIFO order:
 
@@ -179,9 +177,9 @@ that it may be queried by the embedding program. The embedding program
 may choose to handle the exception and continue execution by invoking
 the exception's continuation.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Exception Object Interface
+=head3 Exception Object Interface
 
 All of Parrot's standard exceptions provide at least the following interface.
 It is recommended that all classes intended for throwing also provide at least
@@ -236,7 +234,7 @@ sub, or for the point of the call a level deeper for the rest.
 
 =back
 
-=head2 Standard Parrot Exceptions
+=head3 Standard Parrot Exceptions
 
 Parrot comes with a small hierarchy of classes designed for use as exceptions.
 Parrot throws them when internal Parrot errors occur, but any user code can
@@ -297,7 +295,7 @@ variable that was not found, [1] the LexPad in which it was not found.
 
 =back
 
-=head2 Opcodes that Throw Exceptions
+=head3 Opcodes that Throw Exceptions
 
 Exceptions have been incorporated into built-in opcodes in a limited way.  For
 the most part, they're used when the return value is either impractical to
@@ -395,9 +393,9 @@ exceptional opcodes, instead of needing to be defined for each one. And,
 it still keeps the error information out-of-band, instead of mixing the
 error in with normal return values. }}
 
-=head2 Exception Object Interface
+=head3 Exception Object Interface
 
-=head3 Retrieving the Exception Message
+=head4 Retrieving the Exception Message
 
 The exception message is stored in the 'message' attribute:
 
@@ -410,7 +408,7 @@ The exception message is stored in the 'message' attribute:
   say message
 
 
-=head3 Resuming after Exceptions
+=head4 Resuming after Exceptions
 
 Exceptions thrown by standard Parrot opcodes (like the one thrown by
 C<get_hll_global> above or by the C<throw> opcode) are always resumable,
@@ -437,15 +435,15 @@ in the 'resume' attribute of the exception.
   continuation = exception['resume']
   continuation()
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
   src/ops/core.ops
   src/exceptions.c

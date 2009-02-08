@@ -1,20 +1,18 @@
 # Copyright (C) 2001-2006, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Lexical Variables
 
-docs/pdds/pdd20_lexical_vars.pod - Lexical variables
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This document defines the requirements and implementation strategy for
 lexically scoped variables.
 
-=head1 SYNOPSIS
+=head2 Synopsis
 
     .sub foo
         .lex "$a", P0
@@ -53,15 +51,15 @@ lexically scoped variables.
         P0 = find_lex "x"   # SUCCEEDS
     .end
 
-=head1 DESCRIPTION
+=head2 Description
 
 For Parrot purposes, "lexical variables" are variables stored in a
 hash (or hash-like) PMC associated with a subroutine invocation,
 a.k.a. a call frame.
 
-=head2 Conceptual Model
+=head3 Conceptual Model
 
-=head3 LexInfo PMC
+=head4 LexInfo PMC
 
 LexInfo PMCs contain what is known at compile time about lexical variables of
 a given subroutine: their names (for most languages), perhaps their types,
@@ -73,7 +71,7 @@ e.g. Closure) that uses lexical variables will be populated with a PMC of
 HLL-mapped type LexInfo.  (Note that this type may actually be Null in some
 HLLs, e.g. Tcl.)
 
-=head3 LexPad PMC
+=head4 LexPad PMC
 
 LexPads hold what becomes known at run time about lexical variables of a given
 invocation of a given subroutine: their values, of course, and for some
@@ -103,7 +101,7 @@ of course, opcodes can cheat ... er, can be written in optimized C.  :-)
 TODO: Describe how lexical naming system interacts with non-ASCII character
       sets.
 
-=head3 Lexical Lookup Algorithm
+=head4 Lexical Lookup Algorithm
 
 If Parrot is asked to access a lexical variable named $var, Parrot
 follows the following strategy.  Note that fetch and store use the
@@ -125,7 +123,7 @@ through these steps:
   4. Set $sub to $sub.outer.  (That is, the textually enclosing subroutine.)
      But if $sub has no outer sub, REPORT FAILURE.
 
-=head3 LexPad and LexInfo are optional; the ":lex" attribute
+=head4 LexPad and LexInfo are optional; the ":lex" attribute
 
 Parrot does not assume that every subroutine needs lexical variables.
 Therefore, Parrot defaults to I<not> creating LexInfo or LexPad PMCs.  It only
@@ -139,7 +137,7 @@ However, an absence of ".lex" directives is normal for some languages
 languages, the additional Subroutine attribute ":lex" should be specified.  It
 forces Parrot to create LexInfo and LexPads.
 
-=head3 Closures
+=head4 Closures
 
 NOTE: This section should be taken using the "as-if" rule: Parrot behaves as
 if this section were literally true.  As always, short cuts (development and
@@ -151,7 +149,7 @@ brevity, is a list of LexPads to be searched when looking for lexical
 variables.  Its implementation may be as simple as a basic PMC array, but any
 ordered integer-indexed collection will do.
 
-=head3 Closure creation: Capturing the lexical environment
+=head4 Closure creation: Capturing the lexical environment
 
 The C<newclosure> op creates a Closure from a Subroutine and gives that
 Closure a new LexEnv attribute.  The LexEnv is then populated with pointers to
@@ -179,7 +177,7 @@ NOTE: The C<newclosure> opcode should check to make sure that the target
 Subroutine has an C<:outer()> attribute that points back to the currently
 running Subroutine.  This is a requirement for closures.
 
-=head3 Closure runtime: Using the lexical environment
+=head4 Closure runtime: Using the lexical environment
 
 At runtime, the C<find_lex> opcode behaves differently in closures.  It has no
 need to walk the call stack finding LexPads - they have all already been
@@ -188,7 +186,7 @@ C<find_lex> I<ignores> the call stack, and instead searches (1) the current
 call frame's LexPad - i.e. the Closure's own lexicals -- and then (2) the
 LexPads in the LexEnv.
 
-=head3 HLL Type Mapping
+=head4 HLL Type Mapping
 
 The implementation of lexical variables in the PIR compiler depends on two new
 PMCs: LexPad and LexInfo.  However, the default Parrot LexPad and LexInfo PMCs
@@ -205,7 +203,7 @@ reliable compile-time information about lexicals; without any compile-time
 information to store, there's no need for TclLexInfo to do anything
 interesting.
 
-=head3 Nested Subroutines Have Outies; the ":outer" attribute
+=head4 Nested Subroutines Have Outies; the ":outer" attribute
 
 For HLLs that support nested subroutines, Parrot provides a way to denote that
 a given subroutine is conceptually "inside" another.  Lookup for lexical
@@ -239,9 +237,9 @@ Note that the "foo" sub B<must> be compiled first; in other words, "foo" must
 appear before "a" in the source text.  Compilers can easily do this via
 preorder traversal of lexically-nested subs.
 
-=head2 Required Interfaces: LexPad, LexInfo, Closure
+=head3 Required Interfaces: LexPad, LexInfo, Closure
 
-=head3 LexInfo
+=head4 LexInfo
 
 Below are the standard LexInfo methods that all HLL LexInfo PMCs may support.
 Each LexInfo PMC should only define the methods that it can usefully
@@ -283,7 +281,7 @@ And these two opcodes also have an identical effect:
 
 =back
 
-=head3 LexPad
+=head4 LexPad
 
 LexPads start by implementing the Hash interface: variable names are string
 keys, and variable values are PMCs.
@@ -305,7 +303,7 @@ Return the associated LexInfo.
 
 =back
 
-=head3 Closure
+=head4 Closure
 
 For debugging and introspection, the Closure PMC should support:
 
@@ -318,7 +316,7 @@ Array) of LexPads captured at C<newclosure> time.
 
 =back
 
-=head2 Default Parrot LexPad and LexInfo
+=head3 Default Parrot LexPad and LexInfo
 
 The default LexInfo supports lexicals only as aliases for PMC registers.  It
 therefore implements C<declare_lex_preg()>.  (Internally, it could be a Hash
@@ -330,7 +328,7 @@ asked to look up a variable, it finds the corresponding register number by
 querying its associated LexInfo.  It then gets or sets the given numbered
 register in its associated Parrot Context structure.
 
-=head2 Introspection without Call Frame PMCs
+=head3 Introspection without Call Frame PMCs
 
 Due to implementation concerns, it will not be until late in Parrot
 development -- if ever -- that call frames will be available to user code as
@@ -376,19 +374,19 @@ frames become visible as PMCs.
 
 TODO: Full interpreter introspection interface.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 TK.
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head1 References
 
 =over 4
 

@@ -1,23 +1,21 @@
 # Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Calling Conventions
 
-docs/pdds/pdd03_calling_conventions.pod - Parrot Calling Conventions
-
-=head1 ABSTRACT
+=head2 Abstract
 
 Parrot's inter-routine calling conventions.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 SYNOPSIS
+=head2 Synopsis
 
 Not applicable.
 
-=head1 DESCRIPTION
+=head2 Description
 
 This document describes how to pass arguments from registers to subroutines,
 and how subroutines can extract their parameters into registers for use.
@@ -27,7 +25,7 @@ very little difference between a call and a return. Because of this, the
 conversion rules are the same regardless of whether code is invoking a
 subroutine or a return continuation.
 
-=head2 Common Features of Argument/Return Opcodes
+=head3 Common Features of Argument/Return Opcodes
 
 There are four opcodes involved in parameter and return value propagation:
 
@@ -73,7 +71,7 @@ Bit 31 (and higher, where available) will not be used.
 Some values and registers do not correspond directly to values passed or
 received.  (See the descriptions of the OPT_FLAG and NAMED bits, below.)
 
-=head3 Flag Words; Common Flag Word Bits
+=head4 Flag Words; Common Flag Word Bits
 
 Each integer in the flag string controls the processing of the corresponding
 value or register.
@@ -89,7 +87,7 @@ return-value opcodes:
 
 Don't set these bits yourself; the assembler will do it.
 
-=head2 Passing Arguments, Returning Values
+=head3 Passing Arguments, Returning Values
 
 Just before calling a subroutine with C<invokecc> or calling a method with
 C<call_methodcc>, use the C<set_args> opcode to tell Parrot where the
@@ -100,7 +98,7 @@ Similarly, just before returning from such a subroutine or method, use
 the C<set_returns> opcode to tell Parrot where the return values will
 come from and how to expand them for the caller's use.
 
-=head3 Flag Word Bits For 'Setting'
+=head4 Flag Word Bits For 'Setting'
 
 These bits of each flag word have these meanings specific to C<set_args> and
 C<set_returns>:
@@ -142,7 +140,7 @@ specifying the name of the next argument (or returned value).
 
 =back
 
-=head2 Accepting Parameters, Accepting Return Values
+=head3 Accepting Parameters, Accepting Return Values
 
 As the I<first opcode> in a subroutine that will be called with
 C<invokecc> or a method that will be called with C<call_methodcc>, use
@@ -157,7 +155,7 @@ NOTE: It should be obvious, but in case it's not: You must name only registers
 as targets of these opcodes, not constants.  (You can't store anything into a
 constant.  That would make it a variable.)
 
-=head3 Flag Word Bits For 'Getting'
+=head4 Flag Word Bits For 'Getting'
 
 These bits of each flag word have these meanings specific to C<get_params> and
 C<get_results>:
@@ -222,7 +220,7 @@ constant specifying the name of the next argument (or returned value).
 
 =back
 
-=head3 Overflow and underflow
+=head4 Overflow and underflow
 
 If too many or too few values are provided for the given target registers,
 Parrot by default will throw an exception for C<get_params>, but not for
@@ -243,13 +241,13 @@ regardless of the error flag settings.
 RT#45357 - which exception?  We really could use an exception subsystem.
 Oh, wait, that's my job.  Never mind.  --Chip
 
-=head3 Ordering of named values (outgoing)
+=head4 Ordering of named values (outgoing)
 
 Named values (arguments, or values to return) must be listed textually after
 all the positional values.  C<FLAT> and non-C<FLAT> values may be mixed in any
 order.
 
-=head3 Ordering of named targets (incoming)
+=head4 Ordering of named targets (incoming)
 
 Named targets (parameters, or returned values) must appear I<after> all the
 positional targets.  A C<SLURPY> positional target, if present, must be the
@@ -278,7 +276,7 @@ NAMED SLURPY hash        (optional)
 
 =back
 
-=head3 Mixing named and positional values
+=head4 Mixing named and positional values
 
 Positional targets can only be filled with positional values.
 
@@ -286,7 +284,7 @@ Named targets can be filled with either positional or named values.
 However, if a named target was already filled by a positional value, and
 then a named value is also given, this is an overflow error.
 
-=head3 Type Conversions
+=head4 Type Conversions
 
 Unlike the C<set_*> opcodes, the C<get_*> opcodes must perform conversion from
 one register type to another.  Here are the conversion rules:
@@ -324,11 +322,11 @@ to a new String[1] which has been C<assign>ed the given string.
 substitute an alternative type for each default low-level Parrot type (array,
 hash, string, number, etc.).
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Not applicable.
 
-=head1 BUGS
+=head2 Bugs
 
 Required features are missing:
 
@@ -340,9 +338,9 @@ Specific exceptions to throw for specific errors.
 
 =back
 
-=head1 PIR SYNTAX EXAMPLES
+=head2 PIR Syntax Examples
 
-=head2 Function Calls
+=head3 Function Calls
 
   foo(1, i)                       # 2 positional arguments
   foo(x, ar :flat, y)             # flattening array
@@ -353,7 +351,7 @@ Specific exceptions to throw for specific errors.
   # all together now: three positional (one flat) with two named (one flat)
   foo(a, b, c :flat, 'x' => 3, 'y' => 4, z :flat :named('z'))
 
-=head2 Parameters
+=head3 Parameters
 
   .param int i                    # positional parameter
   .param pmc argv :slurpy         # slurpy array
@@ -362,20 +360,20 @@ Specific exceptions to throw for specific errors.
   .param int has_x :opt_flag      # flag 0/1 x was passed
   .param pmc kw :slurpy :named    # slurpy hash
 
-=head2 Return Values
+=head3 Return Values
 
   .return (i, ar: flat, value :named('key') )
 
-=head2 Call Results
+=head3 Call Results
 
   x = foo()                       # single result
   (i, j :optional, ar :slurpy, value :named('key') ) = foo()
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 L<pdd23_exceptions.pod>
 

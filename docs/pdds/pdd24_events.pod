@@ -1,20 +1,18 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Events
 
-docs/pdds/pdd24_events.pod - Parrot Events
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This document defines the requirements and implementation strategy for
 Parrot's event subsystem.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
@@ -30,7 +28,7 @@ $Revision$
 
 =back
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 An event is a notification that something has happened: the user has
 manipulated a GUI element, an I/O request has completed, a signal has
@@ -38,7 +36,7 @@ been triggered, or a timer has expired.  Most systems these days have an
 event handler (often two or three, which is something of a problem),
 because handling events is so fundamental to modern GUI programming.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Parrot's event handling system is integrated with the central concurrency
 scheduler. When an event is created (by a GUI element, etc), it is added to
@@ -82,7 +80,7 @@ relevant event handlers can be found for the event.
 The operation to query the concurrency scheduler and find if it has any tasks
 to process is as cheap as possible, so it may be queried at regular intervals.
 
-=head2 Event API
+=head3 Event API
 
 An event is a PMC object that contains a type, data for the event, and a
 priority.
@@ -123,7 +121,7 @@ used by the event handler.
 In addition to the attributes, an event uses a private PMC flag to mark itself
 as fatal or non-fatal.
 
-=head3 Event Vtable Entries
+=head4 Event Vtable Entries
 
 =over 4
 
@@ -149,7 +147,7 @@ parameter, or has a parent of that type.
 
 =back
 
-=head2 Event Handler API
+=head3 Event Handler API
 
 An event handler contains a code object, as well as metainformation about
 where it was registered. More specifically, it contains a continuation object,
@@ -194,7 +192,7 @@ The interpreter pointer may be a proxy that simply provides the interface of
 an interpreter object, and knows how to communicate with its remote
 interpreter object (in threaded or clustering concurrency).
 
-=head3 Event Handler Vtable Entries
+=head4 Event Handler Vtable Entries
 
 =over 4
 
@@ -237,7 +235,7 @@ Invoke the event handler.
 
 =back
 
-=head2 Opcodes
+=head3 Opcodes
 
 The following opcodes are used with the event system:
 
@@ -278,7 +276,7 @@ handler to the primary.
 
 =back
 
-=head2 Event Type Hierarchy
+=head3 Event Type Hierarchy
 
 Parrot defines a core set of event types. Users may also define their own
 event types. An event type of 'allevents' is effectively the parent of all
@@ -323,7 +321,7 @@ by other event handlers in a final way.
       interrupt
       childdie
 
-=head2 Signals
+=head3 Signals
 
 Signals are a special form of event. Parrot presents them as mildly special,
 as a remnant of Perl's Unix heritage, but under the hood they're not treated
@@ -344,7 +342,7 @@ into events and puts them in the event task list, and will be processed and
 dispatched to an event handler in order of priority and age just like other
 events.
 
-=head2 Timers
+=head3 Timers
 
 A timer is a special kind of event with a time delay. A timer can act as any
 builtin or custom event type. Timers can be be flagged as repeating. Parrot
@@ -352,15 +350,15 @@ provides builtin timers for greater portability. Some platforms provide their
 own implementations of timers, which may be used when performance on a
 particular platform is more important than portability.
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 src/events.c
 

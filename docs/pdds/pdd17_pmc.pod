@@ -1,20 +1,18 @@
 # Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Magic Cookies
 
-docs/pdds/pdd17_pmc.pod - Parrot Magic Cookies
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the internal structure and behavior of the Parrot Magic
 Cookie (PMC) data type.
 
-=head1 DESCRIPTION
+=head2 Description
 
 PMCs implement all internal data types more complex than a simple integer,
 float, or string, and also the data types of high-level languages.  Nothing
@@ -25,8 +23,6 @@ This does mean, though, that you need to either know what functions are
 available and what they do, or have some method of finding out. Parrot defines
 a standard set of functions that each PMC provides. More complex features are
 constructed out of these fundamental building blocks.
-
-=head1 DESCRIPTION
 
 =over 4
 
@@ -41,9 +37,9 @@ constructed out of these fundamental building blocks.
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Internal structure
+=head3 Internal structure
 
 All PMCs have the form:
 
@@ -116,7 +112,7 @@ running on top of Parrot. For instance, a Perl 5 C<SV> will map onto one (or
 more) types of PMC, while particular Python datatypes will map onto different
 types of PMC.
 
-=head2 Defining PMCs
+=head3 Defining PMCs
 
 PMCs are declared by the C<pmclass> keyword:
 
@@ -221,7 +217,7 @@ HLL. May only be used together with the C<hll> modifier.
 
 =back
 
-=head3 Defining attributes
+=head4 Defining attributes
 
 The attributes of a PMC (both public and private) live in a custom
 struct for the PMC, stored in the C<data> member of the C<PMC> struct.
@@ -259,7 +255,7 @@ to either override those vtable functions that directly access data struct
 members in the child PMC, define the parents as roles instead of classes, or
 declare the multiply inheriting child in PIR or an HLL.
 
-=head3 Defining vtable functions
+=head4 Defining vtable functions
 
 Vtable functions are defined as C functions within the body of the C<pmclass>
 declaration, and are marked with C<VTABLE>.
@@ -295,14 +291,14 @@ type of C<SELF>.
 
 =back
 
-=head3 Methods
+=head4 Methods
 
 Methods are declared in the body of the C<pmclass> or C<prole>
 declaration with C<METHOD>.
 
   METHOD inspect(STRING *what :optional, int got_what :opt_flag) {...}
 
-=head2 PMCs and Namespaces
+=head3 PMCs and Namespaces
 
 Like high-level classes, low-level PMCs are tied to a corresponding
 namespace. By default this is a namespace with the same name as the PMC
@@ -320,7 +316,7 @@ namespace.
 HLLs can choose to provide direct access to Parrot's core PMC types by
 aliasing them within the HLL namespace.
 
-=head2 Inheritance
+=head3 Inheritance
 
 PMCs can inherit behavior and state from other PMCs. Inheritance is performed
 in the C<pmclass> declaration using the C<extends> keyword.
@@ -328,7 +324,7 @@ in the C<pmclass> declaration using the C<extends> keyword.
   pmclass Foo extends Bar {
   }
 
-=head2 Composition
+=head3 Composition
 
 Composition is another form of code reuse in PMCs. Unlike inheritance,
 composed roles aren't complete stand-alone PMCs, they are just bundles of
@@ -360,7 +356,7 @@ Core roles live in src/role and have a file extension of C<.pr>.
 
 Roles are composed into a PMC with the C<does> modifier.
 
-=head2 PMCs and high-level objects
+=head3 PMCs and high-level objects
 
 High-level objects, as specified in PDD15, need to be able to inherit
 from PMCs. Subclassing a low-level PMC from a high-level class makes an
@@ -433,9 +429,9 @@ means all the core low-level PMC types), it must respect the standard
 interface.
 
 
-=head1 REFERENCE
+=head2 Definitions
 
-=head2 Vtable Functions
+=head3 Vtable Functions
 
 Vtables decouple the interface and implementation of various object functions.
 The actual vtable structure contains pointers to functions that implement the
@@ -448,7 +444,7 @@ interpreter. The second parameter is the PMC itself.
 The following list details each of the vtable functions, their prototypes, and
 their behavior.
 
-=head3 Core Vtable Functions
+=head4 Core Vtable Functions
 
 =over 4
 
@@ -614,7 +610,7 @@ merged.]
 
 =back
 
-=head3 Accessors
+=head4 Accessors
 
 =over 4
 
@@ -808,7 +804,7 @@ PMC.
 
 =back
 
-=head3 Aggregate Vtable Functions
+=head4 Aggregate Vtable Functions
 
 Many of the following functions have a *_keyed form, a *_keyed_int form, and a
 *_keyed_str form. The keyed forms take a PMC *, INTVAL, or STRING * key as a
@@ -1065,7 +1061,7 @@ feature needs review together with the Iterator PMC.]
 
 =back
 
-=head3 Math Vtable Functions
+=head4 Math Vtable Functions
 
 =over 4
 
@@ -1228,7 +1224,7 @@ operation, modifying the value of I<self>.
 
 =back
 
-=head3 Logical Vtable Functions
+=head4 Logical Vtable Functions
 
 =over 4
 
@@ -1422,7 +1418,7 @@ inplace negation, modifying the value of I<self>.
 
 =back
 
-=head3 String Vtable Functions
+=head4 String Vtable Functions
 
 =over 4
 
@@ -1458,7 +1454,7 @@ it as a PMC in I<dest> or as a string return value.
 
 =back
 
-=head3 Code Vtable Functions
+=head4 Code Vtable Functions
 
 =over 4
 
@@ -1470,7 +1466,7 @@ Invoke the code object I<self>.
 
 =back
 
-=head3 Class/Object Vtable Functions
+=head4 Class/Object Vtable Functions
 
 =over 4
 
@@ -1588,13 +1584,13 @@ generate methods on the fly?]
 
 
 
-=head2 Core PMCs
+=head3 Core PMCs
 
 Parrot has a number of core PMC types that all programs can guarantee will be
 available to them. (With the possible exception of Parrot programs executing
 on an embedded device or other restricted environment)
 
-=head3 Scalar types
+=head4 Scalar types
 
 =over 4
 
@@ -1716,7 +1712,7 @@ C<ResizablePMCArray>, but that's likely to change.
 
 =back
 
-=head3 Array types
+=head4 Array types
 
 Note that for the following types you can set the size of the array by using
 the VTABLE_set_integer_native() method. Assigning an integer to the array as a
@@ -1781,7 +1777,7 @@ A dynamically sized array which holds only String values.
 
 =back
 
-=head3 Hash types
+=head4 Hash types
 
 =over 4
 
@@ -1821,7 +1817,7 @@ collection.
 
 =back
 
-=head3 Subroutine types
+=head4 Subroutine types
 
 =over 4
 
@@ -1872,15 +1868,15 @@ A subroutine implementing a language compiler. (Derived from NCI.)
 
 =back
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
   docs/pmc2c.pod
 

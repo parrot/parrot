@@ -1,42 +1,40 @@
 # Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Strings
 
-docs/pdds/pdd28_strings.pod - Parrot Strings
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the conventions for strings in Parrot,
 including but not limited to support for multiple character sets,
 encodings, and languages.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DEFINITIONS
+=head2 Definitions
 
-=head2 Character
+=head3 Character
 
 A character is the abstract description of a symbol. It's the smallest
 chunk of text a computer knows how to deal with. Internally to
 the computer, a character (just like everything else) is a number, so
 a few further definitions are needed.
 
-=head2 Character Set
+=head3 Character Set
 
 The Unicode Standard prefers the concepts of I<character repertoire> (a
 collection of characters) and I<character code> (a mapping which tells you
 what number represents which character in the repertoire). Character set is
 commonly used to mean the standard which defines both a repertoire and a code.
 
-=head2 Codepoint
+=head3 Codepoint
 
 A codepoint is the numeric representation of a character according to a
 given character set. So in ASCII, the character C<A> has codepoint 0x41.
 
-=head2 Encoding
+=head3 Encoding
 
 An encoding determines how a codepoint is represented inside a computer.
 Simple encodings like ASCII define that the codepoints 0-127 simply
@@ -51,14 +49,14 @@ the character set determines higher-level semantics. Typically,
 character set functions will ask a string's encoding functions to
 retrieve data from the string, and then process the retrieved data.
 
-=head2 Combining Character
+=head3 Combining Character
 
 A combining character is a Unicode concept. It is a character which
 modifies the preceding character. For instance, accents, lines, circles,
 boxes, etc. which are not to be displayed on their own, but to be
 composed with the preceding character.
 
-=head2 Grapheme
+=head3 Grapheme
 
 In linguistics, a grapheme is a single symbol in a writing system (letter,
 number, punctuation mark, kanji, hiragana, Arabic glyph, Devanagari symbol,
@@ -70,7 +68,7 @@ displayed, in other words, a bundle of a character and all of its combining
 characters.  Because graphemes are the highest-level abstract idea of a
 "character", they're useful for converting between character sets.
 
-=head2 Normalization Form
+=head3 Normalization Form
 
 A normalization form standardizes the representation of a string by
 transforming a sequence of combining characters into a more complex character
@@ -81,12 +79,12 @@ Unicode Standard defines four normalization forms: NFC and NFKC are
 composition, NFD and NFKD are decomposition. See L<Unicode Normalization
 Forms|http://www.unicode.org/reports/tr15/> for more details.
 
-=head2 Grapheme Normalization Form
+=head3 Grapheme Normalization Form
 
 Grapheme normalization form (NFG) is a normalization which allocates exactly
 one codepoint to each grapheme.
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 3
 
@@ -118,7 +116,7 @@ format that is a sequence of 32-bit Unicode codepoints in NFG.
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Parrot was designed from the outset to support multiple string formats:
 multiple character sets and multiple encodings. We don't standardize on
@@ -132,7 +130,7 @@ is most efficient for them.) To put it in simple terms: if you find yourself
 writing C<*s++> or any other C string idioms, you need to stop and think if
 that's what you really mean. Not everything is byte-based anymore.
 
-=head2 Grapheme Normalization Form
+=head3 Grapheme Normalization Form
 
 Unicode characters can be expressed in a number of different ways according to
 the Unicode Standard. This is partly to do with maintaining compatibility with
@@ -197,7 +195,7 @@ codepoint-based. For languages that don't currently have Unicode support, the
 grapheme operations will allow them to safely manipulate Unicode data without
 changing their string semantics.
 
-=head3 Advantages
+=head4 Advantages
 
 Applications that don't care about graphemes can handle a NFG codepoint in a
 string as if it's any other character. Only applications that care about the
@@ -213,7 +211,7 @@ Because any grapheme from any character set can be represented by a single NFG
 codepoint, NFG strings are useful as an intermediate representation for
 converting between string types.
 
-=head3 Disadvantages
+=head4 Disadvantages
 
 A 32-bit encoding is quite large, considering the fact that the Unicode
 codespace only requires up to C<0x10FFFF>. The Unicode Consortium's FAQ notes
@@ -229,7 +227,7 @@ Parrot already needs to keep track of what normalization form a given string
 is in, and provide functions to convert between normalization forms. The
 conceptual cost of one additional normalization form is relatively small.
 
-=head3 The grapheme table
+=head4 The grapheme table
 
 When constructing strings in NFG, graphemes not expressible as a single
 character in Unicode are represented by a dynamic codepoint index into the
@@ -248,7 +246,7 @@ following Perl 5 pseudocode, for the grapheme C<0x438 0x30F>:
                 });
    push @string, $codepoint;
 
-=head2 String API
+=head3 String API
 
 Strings in the Parrot core should use the Parrot C<STRING> structure. Parrot
 developers generally shouldn't deal with C<char *> or other string-like types
@@ -338,7 +336,7 @@ from the parrot string structure. It's been commented out for years.}}
 complicates the entire string subsystem for a tiny optimization on substring
 operations, and offset math is messy with encodings that aren't byte-based.}}
 
-=head3 Conversions between normalization form, encoding, and charset
+=head4 Conversions between normalization form, encoding, and charset
 
 Conversion will be done with a function called C<Parrot_str_grapheme_copy>:
 
@@ -355,48 +353,48 @@ characters in non-NFG strings). This conversion effectively uses an
 intermediate NFG representation.
 
 
-=head2 String Interface Functions
+=head3 String Interface Functions
 
 The current string functions will be maintained, with some modifications for
 the addition of the NFG string format. Many string functions that are part of
 Parrot's external API will be renamed for the standard "Parrot_*" naming
 conventions.
 
-=head3 Parrot_str_set (was string_set)
+=head4 Parrot_str_set (was string_set)
 
 Set one string to a copy of the value of another string.
 
-=head3 Parrot_str_new_COW (was Parrot_make_COW_reference)
+=head4 Parrot_str_new_COW (was Parrot_make_COW_reference)
 
 Create a new copy-on-write string. Creating a new string header, clone the
 struct members of the original string, and point to the same string buffer as
 the original string.
 
-=head3 Parrot_str_reuse_COW (was Parrot_reuse_COW_reference)
+=head4 Parrot_str_reuse_COW (was Parrot_reuse_COW_reference)
 
 Create a new copy-on-write string. Clone the struct members of the original
 string into a passed in string header, and point the reused string header to
 the same string buffer as the original string.
 
-=head3 Parrot_str_write_COW (was Parrot_unmake_COW)
+=head4 Parrot_str_write_COW (was Parrot_unmake_COW)
 
 If the specified Parrot string is copy-on-write, copy the string's contents
 to a new string buffer and clear the copy-on-write flag.
 
-=head3 Parrot_str_concat (was string_concat)
+=head4 Parrot_str_concat (was string_concat)
 
 Concatenate two strings. Takes three arguments: two strings, and one integer
 value of flags. If both string arguments are null, return a new string created
 according to the integer flags.
 
-=head3 Parrot_str_append (was string_append)
+=head4 Parrot_str_append (was string_append)
 
 Append one string to another and return the result. In the default case, the
 return value is the same as the first string argument (modifying that argument
 in place). If the first argument is COW or read-only, then the return value is
 a new string.
 
-=head3 Parrot_str_new (was string_from_cstring)
+=head4 Parrot_str_new (was string_from_cstring)
 
 Return a new string with the default encoding and character set. Accepts two
 arguments, a C string (C<char *>) to initialize the value of the string, and
@@ -406,11 +404,11 @@ isn't passed, the function will calculate the length.
 {{NOTE: the integer length isn't really necessary, and is under consideration
 for deprecation.}}
 
-=head3 Parrot_str_new_noinit (was string_make_empty)
+=head4 Parrot_str_new_noinit (was string_make_empty)
 
 Returns a new empty string with the default encoding and chararacter set.
 
-=head3 Parrot_str_new_init (was string_make_direct)
+=head4 Parrot_str_new_init (was string_make_direct)
 
 Returns a new string of the requested encoding, character set, and
 normalization form, initializing the string value to the value passed in.  The
@@ -425,49 +423,49 @@ a string name for the character set. This behavior is no longer supported, but
 C<Parrot_find_encoding> and C<Parrot_find_charset> can look up the encoding or
 character set structs. }}
 
-=head3 Parrot_str_new_constant (was const_string)
+=head4 Parrot_str_new_constant (was const_string)
 
 Creates and returns a new Parrot constant string. Takes one C string (a C<char
 *>) as an argument, the value of the constant string. The length of the C
 string is calculated internally.
 
-=head3 Parrot_str_resize (was string_grow)
+=head4 Parrot_str_resize (was string_grow)
 
 Resize the string buffer of the given string adding the number of bytes passed
 in the integer argument. If the argument is negative, remove the given number
 of bytes. Throws an exception if shrinking the string buffer size will
 truncate the string (if C<strlen> will be longer than C<buflen>).
 
-=head3 Parrot_str_length (was string_compute_strlen)
+=head4 Parrot_str_length (was string_compute_strlen)
 
 Returns the number of characters in the string. Combining characters are each
 counted separately. Variable-width encodings may lookahead.
 
-=head3 Parrot_str_grapheme_length
+=head4 Parrot_str_grapheme_length
 
 Returns the number of graphemes in the string. Groups of combining characters
 count as a single grapheme.
 
-=head3 Parrot_str_byte_length (was string_length)
+=head4 Parrot_str_byte_length (was string_length)
 
 Returns the number of bytes in the string. The character width of
 variable-width encodings is ignored. Combining characters are not treated any
 differently than other characters. This is equivalent to accessing the
 C<strlen> member of the C<STRING> struct directly.
 
-=head3 Parrot_str_indexed (was string_index)
+=head4 Parrot_str_indexed (was string_index)
 
 Returns the character at the specified index (the Nth character from the start
 of the string). Combining characters are counted separately. Variable-width
 encodings will lookahead to capture full character values.
 
-=head3 Parrot_str_grapheme_indexed
+=head4 Parrot_str_grapheme_indexed
 
 Returns the grapheme at the given index (the Nth grapheme from the string's
 start). Groups of combining characters count as a single grapheme, so this
 function may return multiple characters.
 
-=head3 Parrot_str_find_index (was string_str_index)
+=head4 Parrot_str_find_index (was string_str_index)
 
 Search for a given substring within a string. If it's found, return an integer
 index to the substring's location (the Nth character from the start of the
@@ -475,81 +473,81 @@ string). Combining characters are counted separately. Variable-width encodings
 will lookahead to capture full character values. Returns -1 unless the
 substring is found.
 
-=head3 Parrot_str_copy (was string_copy)
+=head4 Parrot_str_copy (was string_copy)
 
 Make a COW copy a string (a new string header pointing to the same string
 buffer).
 
-=head3 Parrot_str_grapheme_copy (new)
+=head4 Parrot_str_grapheme_copy (new)
 
 Accepts two string arguments: a destination and a source. Iterates through the
 source string one grapheme at a time and appends it to the destination string.
 
 This function can be used to convert a string of one format to another format.
 
-=head3 Parrot_str_repeat (was string_repeat)
+=head4 Parrot_str_repeat (was string_repeat)
 
 Return a string containing the passed string argument, repeated the number of
 times in the integer argument.
 
-=head3 Parrot_str_substr (was string_substr)
+=head4 Parrot_str_substr (was string_substr)
 
 Return a substring starting at an integer offset with an integer length. The
 offset and length specify characters. Combining characters are counted
 separately. Variable-width encodings will lookahead to capture full character
 values.
 
-=head3 Parrot_str_grapheme_substr
+=head4 Parrot_str_grapheme_substr
 
 Return a substring starting at an integer offset with an integer length. The
 offset and length specify graphemes. Groups of combining characters count as a
 single grapheme.
 
-=head3 Parrot_str_replace (was string_replace)
+=head4 Parrot_str_replace (was string_replace)
 
 Replaces a substring within the first string argument with the second string
 argument. An integer offset and length, in characters, specify where the
 removed substring starts and how long it is.
 
-=head3 Parrot_str_grapheme_replace
+=head4 Parrot_str_grapheme_replace
 
 Replaces a substring within the first string argument with the second string
 argument. An integer offset and length in graphemes specify where the removed
 substring starts and how long it is.
 
-=head3 Parrot_str_chopn (was string_chopn)
+=head4 Parrot_str_chopn (was string_chopn)
 
 Chop the requested number of characters off the end of a string without
 modifying the original string.
 
-=head3 Parrot_str_chopn_inplace (was string_chopn_inplace).
+=head4 Parrot_str_chopn_inplace (was string_chopn_inplace).
 
 Chop the requested number of characters off the end of a string, modifying the
 original string.
 
-=head3 Parrot_str_grapheme_chopn
+=head4 Parrot_str_grapheme_chopn
 
 Chop the requested number of graphemes off the end of a string without
 modifying the original string.
 
-=head3 Parrot_str_compare (was string_compare)
+=head4 Parrot_str_compare (was string_compare)
 
 Compare two strings to each other. Return 0 if they are equal, 1 if the first
 is greater and -1 if the second is greater. Uses character set collation order
 for the comparison. (Two strings that are logically equivalent in terms of
 display, but stored in different normalizations are not equal.)
 
-=head3 Parrot_str_grapheme_compare
+=head4 Parrot_str_grapheme_compare
 
 Compare two strings to each other. Return 0 if they are equal, 1 if the first
 is greater and -1 if the second is greater. Uses NFG normalization to compare
 the two strings.
 
-=head3 Parrot_str_equal
+=head4 Parrot_str_equal
 
 Compare two strings, return 1 if they are equal, 0 if they are not equal.
 
-=head3 Parrot_str_not_equal (was string_equal)
+=head4 Parrot_str_not_equal (was string_equal)
 
 Compare two strings, return 0 if they are equal, 1 if they are not equal.
 
@@ -557,31 +555,31 @@ Compare two strings, return 0 if they are equal, 1 if they are not equal.
 the old logic, but 'Parrot_str_not_equal' is provided as a drop-in
 replacement for the old function.}}
 
-=head3 Parrot_str_grapheme_equal
+=head4 Parrot_str_grapheme_equal
 
 Compare two strings using NFG normalization, return 1 if they are equal, 0 if
 they are not equal.
 
-=head2 Internal String Functions
+=head3 Internal String Functions
 
 The following functions are used internally and are not part of the public
 interface.
 
-=head3 Parrot_str_init (was string_init)
+=head4 Parrot_str_init (was string_init)
 
 Initialize Parrot's string subsystem, including string allocation and garbage
 collection.
 
-=head3 Parrot_str_finish (was string_deinit)
+=head4 Parrot_str_finish (was string_deinit)
 
 Terminate and clean up Parrot's string subsystem, including string allocation
 and garbage collection.
 
-=head3 Parrot_str_free (was string_free)
+=head4 Parrot_str_free (was string_free)
 
 Free the string's header.
 
-=head3 string_max_bytes
+=head4 string_max_bytes
 
 Calculate the number of bytes needed to hold a given number of characters in a
 particular encoding, multiplying the maximum possible width of a character in
@@ -589,67 +587,67 @@ the encoding by the number of characters requested.
 
 {{NOTE: pretty primitive and not very useful. May be deprecated.}}
 
-=head2 Deprecated String Functions
+=head3 Deprecated String Functions
 
 The following string functions are slated to be deprecated.
 
-=head3 string_primary_encoding_for_representation
+=head4 string_primary_encoding_for_representation
 
 Not useful, it only ever returned ASCII.
 
-=head3 string_rep_compatible
+=head4 string_rep_compatible
 
 Only useful on a very narrow set of string encodings/character sets.
 
-=head3 string_make
+=head4 string_make
 
 A crippled version of a string initializer, now replaced with the full version
 C<Parrot_string_new_init>.
 
-=head3 string_capacity
+=head4 string_capacity
 
 This was used to calculate the size of the buffer after the C<strstart>
 pointer. Deprecated with C<strstart>.
 
-=head3 string_ord
+=head4 string_ord
 
 Replaced by C<Parrot_str_indexed>.
 
-=head3 string_chr
+=head4 string_chr
 
 This is handled just fine by C<Parrot_str_new>, we don't need a special
 version for a single character.
 
-=head3 make_writable
+=head4 make_writable
 
 An archaic function that uses a method of describing strings that hasn't been
 allowed for years.
 
-=head3 string_to_cstring_nullable
+=head4 string_to_cstring_nullable
 
 Just the implementation of string_to_cstring, no need for a separate function
 that specially allows returning a NULL string.
 
-=head3 string_increment
+=head4 string_increment
 
 Old Perl 5-style behavior where "aa" goes to "bb". Only useful for ASCII
 strings, and not terribly useful even there.
 
-=head3 Parrot_string_cstring
+=head4 Parrot_string_cstring
 
 Unsafe, and behavior handled by Parrot_str_to_cstring.
 
 
-=head3 Parrot_string_split
+=head4 Parrot_string_split
 
 Is the same as Parrot_str_split.
 
-=head2 String PMC API
+=head3 String PMC API
 
 The String PMC provides a high-level object interface to the string
 functionality. It contains a standard Parrot string, holding the string data.
 
-=head3 Vtable Functions
+=head4 Vtable Functions
 
 The String PMC implements the following vtable functions.
 
@@ -804,7 +802,7 @@ C<char> that corresponds to the passed integer value key. {{DEPRECATE}}
 
 =back
 
-=head3 Methods
+=head4 Methods
 
 The String PMC provides the following methods.
 
@@ -842,7 +840,7 @@ ASCII strings, fix or deprecate. }}
 =back
 
 
-=head1 REFERENCES
+=head2 References
 
 http://sirviente.9grid.es/sources/plan9/sys/doc/utf.ps - Plan 9's Runes are
 not dissimilar to NFG strings, and this is a good introduction to the Unicode

@@ -1,32 +1,30 @@
 # Copyright (C) 2007, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Intermediate Representation
 
-docs/pdds/pdd19_pir.pod - Parrot Intermediate Representation
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This document outlines the architecture and core syntax of Parrot
 Intermediate Representation (PIR).
 
-=head1 DESCRIPTION
+=head2 Description
 
 PIR is a stable, middle-level language intended both as a target for the
 generated output from high-level language compilers, and for human use
 developing core features and extensions for Parrot.
 
-=head2 Basic Syntax
+=head3 Basic Syntax
 
 A valid PIR program consists of a sequence of statements, directives, comments
 and empty lines.
 
-=head3 Statements
+=head4 Statements
 
 A statement starts with an optional label, contains an instruction, and is
 terminated by a newline (<NL>). Each statement must be on its own line.
@@ -37,18 +35,18 @@ An instruction may be either a low-level opcode or a higher-level PIR
 operation, such as a subroutine call, a method call, a directive, or PIR
 syntactic sugar.
 
-=head3 Directives
+=head4 Directives
 
 A directive provides information for the PIR compiler that is outside the
 normal flow of executable statements. Directives are all prefixed with a ".",
 as in C<.local> or C<.sub>.
 
-=head3 Comments
+=head4 Comments
 
 Comments start with C<#> and last until the following newline. PIR also allows
 comments in Pod format. Comments, Pod content, and empty lines are ignored.
 
-=head3 Identifiers
+=head4 Identifiers
 
 Identifiers start with a letter or underscore, then may contain additionally
 letters, digits, and underscores. Identifiers don't have any limit on length
@@ -77,7 +75,7 @@ The following are PIR keywords, and cannot be used as identifiers:
  goto      if       int         null
  num       pmc      string      unless
 
-=head3 Labels
+=head4 Labels
 
 A label declaration consists of a label name followed by a colon. A label name
 conforms to the standard requirements for identifiers. A label declaration may
@@ -95,7 +93,7 @@ subroutines.
      ...
   label1:
 
-=head3 Registers and Variables
+=head4 Registers and Variables
 
 There are two ways of referencing Parrot's registers. The first is
 through named local variables declared with C<.local>.
@@ -113,7 +111,7 @@ correspondence between the value of I<n> and the position of the
 register in the register set, C<$P42> may be stored in the zeroth PMC
 register, if it is the only register in the subroutine.
 
-=head2 Constants
+=head3 Constants
 
 Constants may be used in place of registers or variables. A constant is not
 allowed on the left side of an assignment, or in any other context where the
@@ -178,7 +176,7 @@ sets are currently: C<ascii> (the default), C<binary>, C<unicode>
 
 =back
 
-=head2 String escape sequences
+=head3 String escape sequences
 
 Inside double-quoted strings the following escape sequences are processed.
 
@@ -213,7 +211,7 @@ C<0x> and C<0b> denote hex and binary constants respectively.
 
 =back
 
-=head2 Directives
+=head3 Directives
 
 =over 4
 
@@ -389,7 +387,7 @@ Then you're asking for a bigger bytecode file as a result.
 
 =back
 
-=head3 Subroutine flags
+=head4 Subroutine flags
 
 =over 4
 
@@ -539,7 +537,7 @@ This flag allows to override this.
 =back
 
 
-=head3 Directives used for Parrot calling conventions.
+=head4 Directives used for Parrot calling conventions.
 
 =over 4
 
@@ -604,7 +602,7 @@ C<:slurpy>, C<:named>, C<:optional>, and C<:opt_flag>.
 
 =back
 
-=head3 Directives for subroutine parameters
+=head4 Directives for subroutine parameters
 
 =over 4
 
@@ -617,7 +615,7 @@ C<:slurpy>, C<:named>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
 =back
 
-=head3 Parameter Passing and Getting Flags
+=head4 Parameter Passing and Getting Flags
 
 See L<PDD03|pdds/pdd03_calling_conventions.pod> for a description of
 the meaning of the flag bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
@@ -625,7 +623,7 @@ and C<FLAT>, which correspond to the calling convention flags
 C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 
 
-=head3 Catching Exceptions
+=head4 Catching Exceptions
 
 Using the C<push_eh> op you can install an exception handler. If an exception
 is thrown, Parrot will execute the installed exception handler. In order to
@@ -657,7 +655,7 @@ stored in the exception.
 See L<PDD23|pdds/pdd23_exceptions.pod> for accessing the various attributes
 of the exception object.
 
-=head2 Syntactic Sugar
+=head3 Syntactic Sugar
 
 Any PASM opcode is a valid PIR instruction. In addition, PIR defines some
 syntactic shortcuts. These are provided for ease of use by humans producing
@@ -807,7 +805,7 @@ method is not allowed.
 
 =back
 
-=head2 Assignment and Morphing
+=head3 Assignment and Morphing
 
 The C<=> syntactic sugar in PIR, when used in the simple case of:
 
@@ -828,7 +826,7 @@ arguments are a direct C assignment (assign to container semantics).
 For assign to value semantics for two PMC arguments use C<assign>, which calls
 the C<assign_pmc> vtable function.
 
-=head2 Macros
+=head3 Macros
 
 This section describes the macro layer of the PIR language. The macro layer of
 the PIR compiler handles the following directives:
@@ -893,7 +891,7 @@ except that a constant expansion cannot take any arguments, and the
 substitution of a C<.macro_const> contains no newlines, so it can be used
 within a line of code.
 
-=head3 Macro parameter list
+=head4 Macro parameter list
 
 The parameter list for a macro is specified in parentheses after the name of
 the macro. Macro parameters are not typed.
@@ -979,7 +977,7 @@ which will result in the output:
 
 =back
 
-=head3 Unique local labels
+=head4 Unique local labels
 
 Within the macro body, the user can declare a unique label identifier using
 the value of a macro parameter, like so:
@@ -991,7 +989,7 @@ the value of a macro parameter, like so:
   .endm
 
 
-=head3 Unique local variables
+=head4 Unique local variables
 
 B<Note: this is not yet implemented in IMCC>.
 
@@ -1065,7 +1063,7 @@ C<.macro_label> and locals declared with C<.macro_local> expansions, this
 means that multiple expansions of a macro will not result in conflicting
 label or local names.
 
-=head3 Ordinary local variables
+=head4 Ordinary local variables
 
 Defining a non-unique variable can still be done, using the normal syntax:
 
@@ -1098,9 +1096,9 @@ Obviously, this will result in an error, as the variable C<b> is defined
 twice.  If you intend the macro to create unique variables names, use
 C<.macro_local> instead of C<.local> to take advantage of the name munging.
 
-=head1 EXAMPLES
+=head2 Examples
 
-=head2 Subroutine Definition
+=head3 Subroutine Definition
 
 A simple subroutine, marked with C<:main>, indicating it's the entry point
 in the file. Other sub flags include C<:load>, C<:init>, etc.
@@ -1116,7 +1114,7 @@ in the file. Other sub flags include C<:load>, C<:init>, etc.
 
     .end
 
-=head2 Subroutine Call
+=head3 Subroutine Call
 
 Invocation of a subroutine. In this case a continuation subroutine is
 created.
@@ -1138,7 +1136,7 @@ created.
       .get_result r
     .end_call
 
-=head2 NCI Call
+=head3 NCI Call
 
     load_lib $P0, "libname"
     dlfunc $P1, $P0, "funcname", "signature"
@@ -1152,7 +1150,7 @@ created.
       .get_result r
     .end_call
 
-=head2 Subroutine Call Syntactic Sugar
+=head3 Subroutine Call Syntactic Sugar
 
 Below there are three different ways to invoke the subroutine C<sub_label>.
 The first retrieves a single return value, the second retrieves 3 return
@@ -1172,7 +1170,7 @@ Instead of the label a subroutine object can be used too:
    $P0(args)
 
 
-=head2 Methods
+=head3 Methods
 
   .namespace [ "Foo" ]
 
@@ -1192,7 +1190,7 @@ Instead of the label a subroutine object can be used too:
 The variable "self" automatically refers to the invocating object, if the
 subroutine declaration contains "method".
 
-=head2 Calling Methods
+=head3 Calling Methods
 
 The syntax is very similar to subroutine calls. The call is done with
 C<.meth_call> which must immediately be preceded by the C<.invocant>:
@@ -1215,7 +1213,7 @@ C<.meth_call> which must immediately be preceded by the C<.invocant>:
 The return continuation is optional. The method can be a string
 constant or a string variable.
 
-=head2 Returning and Yielding
+=head3 Returning and Yielding
 
   .return ( a, b )      # return the values of a and b
 
@@ -1232,7 +1230,7 @@ Similarly, one can yield using the .yield directive
   .yield ()            # yield with no value
 
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 There are multiple implementations of PIR, each of which will meet this
 specification for the syntax. Currently there are the following
@@ -1259,15 +1257,15 @@ and completed.
 =back
 
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 N/A
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 N/A
 
-=head1 REFERENCES
+=head2 References
 
 N/A
 

@@ -1,20 +1,18 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Concurrency
 
-docs/pdds/pdd25_concurrency.pod - Parrot Concurrency
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This document defines the requirements and implementation strategy for
 Parrot's concurrency models.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
@@ -41,7 +39,7 @@ implementation
 
 =back
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 Concurrency is a parallel execution of units of code (on multiprocessor
 machines), or a flexible ordering of serial units of code (on single processor
@@ -51,7 +49,7 @@ for input or system resources doesn't hold up the entire application.
 
 A task is a unit of code that can be executed concurrently.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Rather than defining a single canonical threading model, Parrot defines
 an infrastructure that supports multiple concurrency models and provides
@@ -90,7 +88,7 @@ scheduler. This PDD doesn't directly address independent-interpreter
 concurrency, but does include occasional notes on how it integrates with
 shared-interpreter concurrency.
 
-=head2 Supported Concurrency Models
+=head3 Supported Concurrency Models
 
 The following are a few of the concurrency models Parrot intends to
 support. The biggest differences between them are in how they handle
@@ -98,7 +96,7 @@ variables shared across concurrent tasks.  But the design is such that
 each of the different models can run simultaneously, coordinated through the
 central concurrency scheduler.
 
-=head3 Mutex/Lock Concurrency
+=head4 Mutex/Lock Concurrency
 
 In this model, before performing an operation on a shared variable, you
 must first acquire a lock on it. Once a lock is acquired, any other
@@ -115,7 +113,7 @@ The first thing that any vtable function of a shared PMC must do is to
 acquire the mutex of the PMCs in its parameter list (in ascending
 address order). In this model only PMCs can be shared.
 
-=head3 STM Concurrency
+=head4 STM Concurrency
 
 Parrot's preferred model of concurrency is based on Software
 Transactional Memory. In this model, rather than locking a shared
@@ -139,14 +137,14 @@ safety mode, STM tasks may be configured to fail validation on any
 transaction attempting to commit to a variable locked by a mutex/lock
 task.
 
-=head3 POSIX Concurrency
+=head4 POSIX Concurrency
 
 This is the POSIX "share-everything" style of threading, such as is used
 in Perl 5's "pthread" model, as well as the thread models for Ruby and
 Python. [Recommended reading: "Programming with POSIX Threads" by Dave
 Butenhof.]
 
-=head3 Process-type Concurrency
+=head4 Process-type Concurrency
 
 This is the Perl 5 "iThreads" threading model. In this model no data is
 shared implicitly, and all sharing must be done on purpose and
@@ -154,7 +152,7 @@ explicitly. It resembles the Unix
 fork-process-with-shared-memory-segment model, not a surprise as it was
 originally developed with emulation of Unix's fork system in mind.
 
-=head3 Independent Concurrency
+=head4 Independent Concurrency
 
 Independent tasks have no contact with the internal data of any other
 task in the current process. These are implemented as STM concurrency
@@ -164,7 +162,7 @@ Note that independent tasks may still communicate back and forth by
 passing either atomic things (ints, floats, and pointers) or static
 buffers that can become the property of the destination thread.
 
-=head3 Intel Threading Building Blocks
+=head4 Intel Threading Building Blocks
 
 Threading Building Blocks (TBB) is a library of tools for data-parallel
 programming, dividing large data sets into small pieces so that
@@ -185,7 +183,7 @@ variables with any other types of concurrent tasks in Parrot.
 Note that since TBB is a C++ library, it is only available when Parrot
 is compiled with a C++ compiler.
 
-=head2 Concurrrency Scheduler API
+=head3 Concurrrency Scheduler API
 
 The concurrency scheduler has two parts, a Scheduler PMC, which has an
 instance stored in the interpreter struct, and a set of core routines in
@@ -249,13 +247,13 @@ The list of handlers is a simple stack of handler PMCs currently waiting for
 an appropriate task (event, exception). See PDD 24 on Events for more details
 on event handlers.
 
-=head3 Flags
+=head4 Flags
 
 PMC flags 0-7 are reserved for private use by a PMC. The scheduler uses flag 0
 to indicate whether the priority index is currently valid or needs to be
 recalculated before the next use.
 
-=head3 Vtable Functions
+=head4 Vtable Functions
 
 =over 4
 
@@ -270,7 +268,7 @@ the task list. If there are no tasks remaining in the task list, return null.
 
 =back
 
-=head3 Methods
+=head4 Methods
 
 =over 4
 
@@ -289,7 +287,7 @@ $P3. Returns a null PMC if an appropriate handler is not found.
 
 =back
 
-=head2 Task PMC API
+=head3 Task PMC API
 
 The interface of the Task PMC is also the minimum required interface for all
 subclasses, extensions, and alternate implementations of a task.
@@ -347,7 +345,7 @@ The code block is optional and only for tasks that are associated with a
 simple code block. The interpreter structure is also optional and only used
 for thread-like tasks that maintain their own interpreter state.
 
-=head3 Vtable Functions
+=head4 Vtable Functions
 
 =over 4
 
@@ -361,7 +359,7 @@ Set an attribute of the task.
 
 =back
 
-=head2 Opcodes
+=head3 Opcodes
 
 =over 4
 
@@ -400,15 +398,15 @@ Kill a task without waiting for it to complete.
 
 =back
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 Dec 2003 - (Dan ponders threads based on POSIX and Perl 5 experience)
 <http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64b22ab7de0a7a6/889b5d8c4cd267b7?lnk=gst&q=threads&rnum=3#889b5d8c4cd267b7>

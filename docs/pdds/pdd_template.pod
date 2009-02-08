@@ -1,47 +1,45 @@
 # Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 PDD Template
 
-docs/pdds/pdd_template.pod - PDD Template
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 ABSTRACT
+=head2 Abstract
 
 Summary of the contents of the PDD.
 
-=head1 SYNOPSIS I<(optional)>:
+=head2 Synopsis I<(optional)>
 
 Code snippets showing the semantics of the PDD (if applicable).
 
-=head1 DESCRIPTION
+=head2 Description
 
 Description of the subject.
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 Definitions of important terms. (optional)
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Implementation details.
 
-=head1 LANGUAGE NOTES
+=head2 Language Notes
 
 Notes on application to high-level languages. (optional)
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 Any associated documents.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 List of footnotes to the text.
 
-=head1 REFERENCES
+=head2 References
 
 List of references.
 

@@ -1,20 +1,18 @@
 # Copyright (C) 2007, The Perl Foundation
 # $Id$
 
-=head1 NAME
+=head1 Compiler Tools - Abstract Syntax Tree
 
-docs/pdds/pdd26_ast.pod - Parrot Abstract Syntax Tree
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the node types and semantics of the Parrot
 Abstract Syntax Tree representation.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 The Parrot Abstract Syntax Tree (PAST) is a set of Parrot
 classes useful for generating an abstract semantic representation
@@ -29,9 +27,9 @@ needed by many of the high level languages targeted by Parrot,
 while also being extensible to support the unique needs of
 specific languages.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 PAST::Node
+=head3 PAST::Node
 
 C<PAST::Node> is the base class for all nodes in an abstract
 syntax tree.  Each C<PAST::Node> element has an array of
@@ -110,13 +108,13 @@ the (resulting) value of C<attrname> for the invocant.
 
 =back
 
-=head2 PAST::Stmts
+=head3 PAST::Stmts
 
 C<PAST::Stmts> is simply a C<PAST::Node> used to contain a
 sequence of other PAST nodes to be evaluated.  It has no
 specific methods or attributes.
 
-=head2 PAST::Val
+=head3 PAST::Val
 
 C<PAST::Val> nodes represent constant values in the abstract
 syntax tree.  The C<value> attribute represents the value of
@@ -136,7 +134,7 @@ the value attribute given above.
 
 =back
 
-=head2 PAST::Var
+=head3 PAST::Var
 
 C<PAST::Var> nodes represent variable-like items within the
 abstract syntax tree.  The C<name> attribute (inherited from
@@ -268,7 +266,7 @@ C<slurpy>.
 
 =back
 
-=head2 PAST::Op
+=head3 PAST::Op
 
 C<PAST::Op> nodes represent the operations in an abstract
 syntax tree.  The primary function of the node is given by
@@ -464,7 +462,7 @@ child's (%0) is used as the result of this operation.
 
 =back
 
-=head2 PAST::Block
+=head3 PAST::Block
 
 C<PAST::Block> nodes represent lexical scopes within an abstract
 syntax tree, and roughly translate to individual Parrot subroutines.
@@ -549,19 +547,15 @@ responsibility of the external compiler to support this).
 
 =back
 
-=head2 PAST::CompUnit
+=head3 PAST::CompUnit
 
 C<PAST::CompUnit> nodes are used for the abstract representation
 of compilation units.  Specific attributes and semantics are
 yet to be determined.
 
-=head1 REFERENCES
+=head2 References
 
 NA.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2007, The Perl Foundation.
 
 =cut
 

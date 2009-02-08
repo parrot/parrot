@@ -1,19 +1,17 @@
 # Copyright (C) 2005-2007, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Namespaces
 
-docs/pdds/pdd21_namespaces.pod - Parrot Namespaces
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 ABSTRACT
+=head2 Abstract
 
 Description and implementation of Parrot namespaces.
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
@@ -33,14 +31,14 @@ array of name strings
 
 =back
 
-=head1 DEFINITIONS
+=head2 Definitions
 
-=head2 "HLL"
+=head3 "HLL"
 
 A High Level Language, such as Perl, Python, or Tcl, in contrast to PIR, which
 is a low-level language.
 
-=head2 "current namespace"
+=head3 "current namespace"
 
 The I<current namespace> at runtime is the namespace associated with the
 currently executing subroutine.  PASM assigns each subroutine a namespace when
@@ -52,9 +50,9 @@ initialize the runtime current namespace as well as determine where to store
 compiled symbols.)
 
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Namespace Indexing Syntax
+=head3 Namespace Indexing Syntax
 
 Namespaces are denoted in Parrot as simple strings, multidimentional
 hash keys, or arrays of name strings.
@@ -67,7 +65,7 @@ C<["a"; "b"]>.
 
 There is no limit to namespace nesting.
 
-=head2 Naming Conventions
+=head3 Naming Conventions
 
 Parrot's target languages have a wide variety of namespace models. By
 implementing an API and standard conventions, it should be possible to
@@ -116,7 +114,7 @@ complicates symbol exportation.
 
 =back
 
-=head2 Namespace PMC API
+=head3 Namespace PMC API
 
 Most languages leave their symbols plain, which makes lookups quite
 straightforward.  Others use sigils or other mangling techniques, complicating
@@ -125,7 +123,7 @@ the problem of interoperability.
 Parrot namespaces assist with interoperability by providing two interface
 subsets: the I<untyped interface> and the I<typed interface>.
 
-=head4 Untyped Interface
+=head5 Untyped Interface
 
 Each HLL may, when working with its own namespace objects, use the I<untyped
 interface>, which allows direct naming in the native style of the namespace's
@@ -154,7 +152,7 @@ the namespace name with which you found the namespace in the first place.
 
 =back
 
-=head4 Typed Interface
+=head5 Typed Interface
 
 When a given namespace's HLL is either different from the current HLL or
 unknown, an HLL should generally use only the language-agnostic namespace
@@ -260,9 +258,9 @@ base namespace PMC.  Maybe a standard method "expand_export_list()"?
 
 =back
 
-=head2 Compiler PMC API
+=head3 Compiler PMC API
 
-=head3 Methods
+=head4 Methods
 
 =over 4
 
@@ -316,12 +314,12 @@ On failure, an exception is thrown.
 
 =back
 
-=head2 Subroutine PMC API
+=head3 Subroutine PMC API
 
 Some information must be available about subroutines to implement the correct
 behavior about namespaces.
 
-=head3 Methods
+=head4 Methods
 
 =over 4
 
@@ -334,7 +332,7 @@ opposed to the namespace(s) that it may have been exported to.)
 
 =back
 
-=head2 Namespace Opcodes
+=head3 Namespace Opcodes
 
 The namespace opcodes all have 3 variants: one that operates from the
 currently selected namespace (i.e. the namespace of the currently
@@ -462,16 +460,16 @@ the given namespace does not exist it is created.
 
 =back
 
-=head2 HLL Namespace Mapping
+=head3 HLL Namespace Mapping
 
 In order to make this work, Parrot must somehow figure out what type of
 namespace PMC to create.
 
-=head3 Default Namespace
+=head4 Default Namespace
 
 The default namespace PMC will implement Parrot's current behavior.
 
-=head3 Compile-time Creation
+=head4 Compile-time Creation
 
 This Perl:
 
@@ -493,7 +491,7 @@ should map roughly to this PIR:
 In this case, the C<main> sub would be tied to Perl 5 by the C<.HLL>
 directive, so a Perl 5 namespace would be created.
 
-=head3 Run-time Creation
+=head4 Run-time Creation
 
 Consider the following Perl 5 program:
 
@@ -529,11 +527,11 @@ In this case, C<set_global> should see that it was called from "main",
 which is in a Perl 5 namespace, so it will create the "Foo" namespace as
 a Perl 5 namespace.
 
-=head1 LANGUAGE NOTES
+=head2 Language Notes
 
-=head2 Perl 6
+=head3 Perl 6
 
-=head3 Sigils
+=head4 Sigils
 
 Perl 6 may wish to be able to access the namespace as a hash with sigils.
 That is certainly possible, even with subroutines and methods.  It's not
@@ -545,9 +543,9 @@ allow the namespace PMC to be used as a hash.  The C<find_sub> method would,
 in this case, append a "&" sigil to the front of the sub/method name and
 search in the internal hash.
 
-=head2 Python
+=head3 Python
 
-=head3 Importing from Python
+=head4 Importing from Python
 
 Since functions and variables overlap in Python's namespaces, when exporting
 to another HLL's namespace, the Python namespace PMC's C<export_to> method
@@ -555,16 +553,16 @@ should use introspection to determine whether C<x> should be added using
 C<add_var> or C<add_sub>.  C<$I0 = does $P0, "Sub"> may be enough to decide
 correctly.
 
-=head3 Subroutines and Namespaces
+=head4 Subroutines and Namespaces
 
 Since Python's subroutines and namespaces are just variables (the namespace
 collides there), the Python PMC's C<find_var> method may return subroutines as
 variables.
 
 
-=head2 Examples
+=head3 Examples
 
-=head3 Aliasing
+=head4 Aliasing
 
 Perl:
 
@@ -591,7 +589,7 @@ PIR:
     ...
   .end
 
-=head3 Cross-language Exportation
+=head4 Cross-language Exportation
 
 Perl 5:
 
@@ -617,15 +615,15 @@ PIR (without error checking):
     "write"("this is a tcl command")
   .end
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 None.
 

@@ -1,24 +1,22 @@
 # Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Design Documents
 
-docs/pdds/pdd00_pdd.pod - Parrot Design Documents
-
-=head1 VERSION
+=head1 Version
 
 $Revision$
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This document defines the content and format of Parrot Design Documents
 (PDDs).
 
-=head1 SYNOPSIS
+=head2 Synopsis
 
 Not applicable.
 
-=head1 DESCRIPTION
+=head2 Description
 
 PDDs are living documents, which should be maintained to reflect the current
 and contemplated design of Parrot.
@@ -58,14 +56,14 @@ PDDs may document design trade-offs, i.e. the paths not chosen. In many cases
 they don't, just to keep the PDDs relatively short and readable. The history
 of Parrot's design is retrievable from the source repository.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 All newly created PDDs will adhere to the PDD standard current as of the time
 of proposal. An example of the currently accepted layout is given in
 F<docs/pdds/pdd_template.pod>, which should be used as a template for any
 future PDDs.
 
-=head2 FORMAT
+=head3 Format
 
 All PDDs will be written in POD parseable by the current stable release of
 Perl 5. Although XML is a viable solution and has its vocal supporters, and
@@ -90,44 +88,44 @@ sections:
 
 =over 4
 
-=item NAME:
+=item I<name>:
 
 A short, general description of a specific part of the Parrot design. This may
 be a particular subsystem (e.g. the garbage collector), or a more general
 topic (e.g. basic Parrot datatypes).
 
-=item VERSION:
+=item Version:
 
 Document version.  Since Parrot is currently kept in a Subversion repository,
 the $$-delimited keyword "Revision" will do nicely.
 
-=item MAINTAINER I<(optional)>:
+=item Maintainer I<(optional)>:
 
 The name and current email address for the point of contact for the PDD. This
 is the person to whom questions, comments, and patches should generally be
 addressed. This need not be the author of the document.  By default, all PDDs
 are maintained by the Parrot Architect.
 
-=item ABSTRACT:
+=item Abstract:
 
 A quick blurb explaining the purpose of the PDD.
 
-=item SYNOPSIS I<(optional)>:
+=item Synopsis I<(optional)>:
 
 Code snippets showing the semantics of the PDD (if applicable).
 
-=item DESCRIPTION:
+=item Description:
 
 A description of the general nature of the PDD and how it relates to
 Parrot.
 
-=item IMPLEMENTATION:
+=item Implementation:
 
 A major section of the PDD that encapsulates a free-form discussion of any and
 all applicable information related to the final observations, conclusions, and
 what-have-you that required writing the document in the first place.
 
-=item ATTACHMENTS:
+=item Attachments:
 
 References to supporting files that should be considered part of the PDD.
 Text files and image files may be in any widely accepted format, which is
@@ -137,7 +135,7 @@ Text files and image files should only provide supplemental information; no
 fair hiding all the info in an attachment just to not have to write an
 implementation section.
 
-=item REFERENCES:
+=item References:
 
 References to additional sources of information, but not those necessary for
 the PDD itself.
@@ -146,13 +144,13 @@ the PDD itself.
 
 The PDD author may add any additional sections he or she wishes.
 
-=head2 SUBMISSION CRITERIA
+=head3 Submission Criteria
 
 Proposed PDDs should be submitted to the parrot-porters mailing list (located
 at parrot-porters@perl.org) for discussion, criticism and general kibitzing.
 Acceptance of a particular PDD is ultimately up to the Parrot Architect.
 
-=head2 PDD TRANSLATIONS
+=head3 PDD Translations
 
 Translations of PDDs into other languages should meet these guidelines:
 
@@ -160,20 +158,20 @@ Translations of PDDs into other languages should meet these guidelines:
 
 =item *
 
-The C<MAINTAINER> section should record who made the translation.
+The C<Maintainer> section should record who made the translation.
 
 =item *
 
-The C<VERSION> section should include an additional note of the translation
+The C<Version> section should include an additional note of the translation
 version.
 
 =back
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 (none)
 
-=head1 REFERENCES
+=head2 References
 
 (none)
 

@@ -1,24 +1,22 @@
 # Copyright (C) 2001-2005, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Bytecode
 
-docs/pdds/pdd13_bytecode.pod - Parrot Bytecode
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the file format for Parrot Bytecode (PBC) files and the
 interface through which they may be manipulated programatically.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 SYNOPSIS
+=head2 Synopsis
 
 Not applicable.
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
@@ -40,21 +38,21 @@ Parrot internals.
 =back
 
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 None.
 
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Changes From The Current Implementation
+=head3 Changes From The Current Implementation
 
 A number of things in this proposed PDD differ from what is currently
 implemented. This section details these changes and some of the reasoning
 behind them.
 
 
-=head3 Packfile Header
+=head4 Packfile Header
 
 The format of the packfile header has changed completely, based upon a
 proposal at
@@ -70,7 +68,7 @@ of running the bytecode file, to enable cross-version compatibility that will
 be needed in the future.
 
 
-=head3 Segment Header
+=head4 Segment Header
 
 Having the type associated with the segment inside the VM is fine, but since
 it is in the directory segment anyway it seems odd to duplicate it here. Also
@@ -78,14 +76,14 @@ removed the id (did not seem to be used anywhere) and the second size (always
 computable by knowing the size of this header, so it appears redundant).
 
 
-=head3 Fixup Segment
+=head4 Fixup Segment
 
 We need to support unicode sub names, so fixup labels should be an index into
 the constants table to the relevant string instead of just a C string as they
 are now.
 
 
-=head3 Annotations Segment
+=head4 Annotations Segment
 
 This is new and replaces and builds upon the debug segment. See here for some
 on-list discussion:
@@ -93,7 +91,7 @@ on-list discussion:
 L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/b0d36dafb42d96c4/4d6ad2ad2243e677?lnk=gst&rnum=2#4d6ad2ad2243e677>
 
 
-=head3 Packfile PMCs
+=head4 Packfile PMCs
 
 This idea will see packfiles and segments within them being represented by
 PMCs, easing memory management and providing an interface to packfiles for
@@ -107,7 +105,7 @@ L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/778ea
 
 
 
-=head2 Packfiles
+=head3 Packfiles
 
 This section of the documentation describes the format of Parrot packfiles.
 These contain the bytecode (sequence of instructions), constants table, fixup
@@ -118,7 +116,7 @@ of Parrot opcodes, not bytes. An opcode corresponds to a word size in length.
 The word size is specified in the packfile header.
 
 
-=head3 Packfile Header
+=head4 Packfile Header
 
 PBC files start with a variable length header. All data in this header is
 stored as strings or in a single byte so endianness and word size need not be
@@ -195,7 +193,7 @@ as defined in the header. If the word length and byte ordering of the machine
 that is reading the PBC file do not match these, it needs to transform the
 words making up the rest of the packfile.
 
-=head4 Bytecode File Version Numbers
+=head5 Bytecode File Version Numbers
 
 The bytecode file version number exists to decouple the format of the bytecode
 file from the version of the Parrot implementation that is reading/writing it.
@@ -233,7 +231,7 @@ version first in the format:
   MAJOR.MINOR DATE NAME DESCRIPTION
 
 
-=head3 Directory Format Header
+=head4 Directory Format Header
 
 Packfiles contain a directory describing the segments that it contains.
 This header specifies the format of the directory.
@@ -257,7 +255,7 @@ the packfile.
 This header must be followed immediately by a directory segment.
 
 
-=head3 Packfile Segment Header
+=head4 Packfile Segment Header
 
 All segments, regardless of type, start with a 1 opcode segment header. All
 other segments below are prefixed with this.
@@ -270,14 +268,14 @@ other segments below are prefixed with this.
   +--------+--------+--------------------------------------------------------+
 
 
-=head3 Segment Padding
+=head4 Segment Padding
 
 All segments must have trailing zero (NULL) values appended so they are a
 multiple of 16 bytes in length. (This allows wordsize support of up to
 128 bits.)
 
 
-=head3 Directory Segment
+=head4 Directory Segment
 
 This segment lists the other segments that make up the packfile and where in
 the file they are located. It must occur immediately after the directory
@@ -330,7 +328,7 @@ an individual entry.
   +--------+--------+--------------------------------------------------------+
 
 
-=head3 Default Segment
+=head4 Default Segment
 
 The default segment has no additional headers. It will, if possible, be memory
 mapped. More than one may exist in the packfile, and they are identified by
@@ -338,7 +336,7 @@ name. They may be used for storing any data that does not fit into any other
 segment, for example the source code from a high level language (HLL).
 
 
-=head3 Bytecode Segment
+=head4 Bytecode Segment
 
 This segment has no additonal headers. It stores a stream of instructions in
 bytecode format. Instructions have variable length. Each instruction starts
@@ -380,7 +378,7 @@ following forms.
   +------------------+-------------------------------------------------------+
 
 
-=head3 Constants Segment
+=head4 Constants Segment
 
 This segment stores number, string and PMC constants. It adds one extra field
 to its header.
@@ -409,12 +407,12 @@ the type of constant that follows.
 All constants that are not a multiple of the word size in length must be
 padded with trailing zero bytes up to a word size boundary.
 
-=head4 Number Constants
+=head5 Number Constants
 
 The number is stored in the format defined in the Packfile header. Any padding
 that is needed will follow.
 
-=head4 String Constants
+=head5 String Constants
 
 String constants are stored in the following format, with offsets relative to
 the start of the constant including its type.
@@ -437,13 +435,13 @@ the start of the constant including its type.
   | 5      | n      | String data with trailing zero padding as required.    |
   +--------+--------+--------------------------------------------------------+
 
-=head4 PMC Constants
+=head5 PMC Constants
 
 PMCs that can be saved in packfiles as constants implement the freeze and thaw
 v-table methods. Their frozen data is placed in a string, stored in the same
 format as a string constant.
 
-=head4 Key Constants
+=head5 Key Constants
 
 Key constants are made up a number of components, where one component is a
 "dimension" in the key. The number of components in the key is stored at the
@@ -480,7 +478,7 @@ into the constants table.
 {{ TODO: Figure out slice bits and document them here. }}
 
 
-=head3 Fixup Segment
+=head4 Fixup Segment
 
 The fixup segment maps names of subs to offsets in the bytecode stream. It
 adds one extra field to its header.
@@ -512,7 +510,7 @@ following form.
   +--------+--------+--------------------------------------------------------+
 
 
-=head3 PIR Debug Segment
+=head4 PIR Debug Segment
 
 This segment stores the filenames and line numbers of PIR code that was
 compiled to bytecode. The segment comes in two parts.
@@ -552,7 +550,7 @@ This is followed by the line number for each instruction in the bytecode
 segment.
 
 
-=head3 Annotations Segment
+=head4 Annotations Segment
 
 Annotations allow any instruction in the bytecode stream to have zero or more
 key/value pairs associated with it. These can be retrived at runtime. High
@@ -669,7 +667,7 @@ required. Note that this also implies that annotations must be placed in
 the same order as the instructions.
 
 
-=head3 Dependencies Segment
+=head4 Dependencies Segment
 
 This segment holds a table of external and possibly dynamically loaded items
 that are needed for this packfile to run. This includes:
@@ -725,7 +723,7 @@ format:
 
 
 
-=head2 Packfile PMCs
+=head3 Packfile PMCs
 
 A packfile will be represented in memory by Parrot as a tree of PMCs. These
 will provide a programatic way to construct and walk packfiles, both for the
@@ -735,24 +733,24 @@ Parrot internals and from programs running on the Parrot VM.
 consider switching these PMCs over to use them at some point. }}
 
 
-=head3 Packfile.pmc
+=head4 Packfile.pmc
 
 This PMC represents the packfile overall. It will be constructed by the VM
 when reading a packfile. It implements the following methods.
 
-=head4 C<get_string> (v-table)
+=head5 C<get_string> (v-table)
 
 Serializes this packfile data structure into a bytestream ready to be written
 to disk (that is, maps from PMCs to on-disk representation).
 
-=head4 C<set_string_native> (v-table)
+=head5 C<set_string_native> (v-table)
 
 Takes a string containing an entire packfile in the on-disk format, attempts
 to unpack it into a tree of Packfile PMCs and sets this Packfile PMC to
 represent the top of that tree (that is, maps from on-disk representation to a
 tree of PMCs).
 
-=head4 C<get_integer_keyed_str> (v-table)
+=head5 C<get_integer_keyed_str> (v-table)
 
 Used to get data about fields in the header that have an integer value. Valid
 keys are:
@@ -781,7 +779,7 @@ keys are:
 
 =back
 
-=head4 C<get_string_keyed_str> (v-table)
+=head5 C<get_string_keyed_str> (v-table)
 
 Used to get data about fields in the header that have a string value. Valid
 keys are:
@@ -792,7 +790,7 @@ keys are:
 
 =back
 
-=head4 C<set_integer_keyed_str> (v-table)
+=head5 C<set_integer_keyed_str> (v-table)
 
 Used to set fields in the packfile header. Some fields are not allowed to be
 written since they are determined by the VM when serializing the packfile for
@@ -819,23 +817,23 @@ algorithm when the packfile is serialized (by calling the C<get_string>
 v-table method). Setting an invalid uuid_type value will cause an exception
 to be thrown immediately.
 
-=head4 C<get_directory()>
+=head5 C<get_directory()>
 
 Returns the PackfileDirectory PMC that represents the directory segment at the
 start of the packfile.
 
 
-=head3 PackfileSegment.pmc
+=head4 PackfileSegment.pmc
 
 An abstract PMC that is the base class for all other segments. It has two
 abstract methods, which are to be implemented by all subclasses. They will not
 be listed under the method list for other segment PMCs to save space.
 
-=head4 C<STRING* pack()>
+=head5 C<STRING* pack()>
 
 Packs the segment into the on-disk format and returns a string holding it.
 
-=head4 C<unpack(STRING*)>
+=head5 C<unpack(STRING*)>
 
 Takes the packed representation for a segment of the given type and then
 unpacks it, setting this PMC to represent that segment as a result of the
@@ -843,71 +841,71 @@ unpacking. If an error occurs during the unpacking process, an exception will
 be thrown.
 
 
-=head3 PackfileDirectory.pmc (isa PackfileSegment)
+=head4 PackfileDirectory.pmc (isa PackfileSegment)
 
 This PMC represents a directory segment. Essentially it is an array of
 PackfileSegment PMCs. When indexed using an integer key, it gets the segment
 at that position in the segments table. When indexed using a string key, it
 looks for a segment of that name. It implements the following methods:
 
-=head4 C<elements> (v-table)
+=head5 C<elements> (v-table)
 
 Gets the number of segments listed in the directory.
 
-=head4 C<get_pmc_keyed_int> (v-table)
+=head5 C<get_pmc_keyed_int> (v-table)
 
 Gets a PackfileSegment PMC or an appropriate subclass of it representing the
 segment at the specified index in the directory segment.
 
-=head4 C<get_string_keyed_int> (v-table)
+=head5 C<get_string_keyed_int> (v-table)
 
 Gets a string containing the name of the segment at the specified index in the
 directory segment.
 
-=head4 C<get_pmc_keyed_str> (v-table)
+=head5 C<get_pmc_keyed_str> (v-table)
 
 Searches the directory for a segment with the given name and, if one exists,
 returns a PackfileSegment PMC (or one of its subclasses) representing it.
 
-=head4 C<set_pmc_keyed_str> (v-table)
+=head5 C<set_pmc_keyed_str> (v-table)
 
 Adds a PackfileSegment PMC (or a subclass of it) to the directory with the
 name specified by the key. This is the only way to add another segment to the
 directory. If a segment of the given name already exists in the directory, it
 will be replaced with the supplied PMC.
 
-=head4 C<delete_keyed_str> (v-table)
+=head5 C<delete_keyed_str> (v-table)
 
 Removes the PackfileSegment PMC from the directory which has the name
 specified by the key.  This is the only way to remove a segment from the
 directory.
 
 
-=head3 RawSegment.pmc (isa PackfileSegment)
+=head4 RawSegment.pmc (isa PackfileSegment)
 
 This PMC presents a segment of a packfile as an array of integers. This is the
 lowest possible level of access to a segment, and covers both the default and
 bytecode segment types. It implements the following methods:
 
-=head4 C<get_integer_keyed_int> (v-table)
+=head5 C<get_integer_keyed_int> (v-table)
 
 Reads the integer at the specified offset into the segment, excluding the data
 in the common segment header but including the data making up additional
 fields in the header for a specific type of segment.
 
-=head4 C<set_integer_keyed_int> (v-table)
+=head5 C<set_integer_keyed_int> (v-table)
 
 Stores an integer at the specified offset into the segment. Will throw an
 exception if the segment is memory mapped.
 
-=head4 C<elements> (v-table)
+=head5 C<elements> (v-table)
 
 Gets the length of the segment in words, excluding the length of the common
 segment but including the data making up additional fields in the header for a
 specific type of segment.
 
 
-=head3 PackfileConstantTable.pmc (isa PackfileSegment)
+=head4 PackfileConstantTable.pmc (isa PackfileSegment)
 
 This PMC represents a constants table. It provides access to constants through
 the keyed integer interface (the interpreter may choose to access underlying
@@ -918,50 +916,50 @@ grow automatically.
 
 The PMC implements the following methods:
 
-=head4 C<elements> (v-table)
+=head5 C<elements> (v-table)
 
 Gets the number of constants contained in the table.
 
-=head4 C<get_number_keyed_int> (v-table)
+=head5 C<get_number_keyed_int> (v-table)
 
 Gets the value of the number constant at the specified index in the constants
 table. If the constant at that position in the table is not a number, an
 exception will be thrown.
 
-=head4 C<get_string_keyed_int> (v-table)
+=head5 C<get_string_keyed_int> (v-table)
 
 Gets the value of the string constant at the specified index in the constants
 table. If the constant at that position in the table is not a string, an
 exception will be thrown.
 
-=head4 C<get_pmc_keyed_int> (v-table)
+=head5 C<get_pmc_keyed_int> (v-table)
 
 Gets the value of the PMC or key constant at the specified index in the
 constants table. If the constant at that position in the table is not a PMC
 or key, an exception will be thrown.
 
-=head4 C<set_number_keyed_int> (v-table)
+=head5 C<set_number_keyed_int> (v-table)
 
 Sets the value of the number constant at the specified index in the constants
 table. If the constant at that position in the table is not already a number
 constant, an exception will be thrown. If it does not exist, the table will be
 extended.
 
-=head4 C<set_string_keyed_int> (v-table)
+=head5 C<set_string_keyed_int> (v-table)
 
 Sets the value of the string constant at the specified index in the constants
 table. If the constant at that position in the table is not already a string
 constant, an exception will be thrown. If it does not exist, the table will be
 extended.
 
-=head4 C<set_pmc_keyed_int> (v-table)
+=head5 C<set_pmc_keyed_int> (v-table)
 
 Sets the value of the PMC or key constant at the specified index in the
 constants table. If the constant at that position in the table is not already
 a PMC or key constant, an exception will be thrown. If it does not exist, the
 table will be extended.
 
-=head4 C<int get_type(int)>
+=head5 C<int get_type(int)>
 
 Returns an integer value denoting the type of the constant at the specified
 index. Possible values are:
@@ -981,83 +979,83 @@ index. Possible values are:
   +--------+-----------------------------------------------------------------+
 
 
-=head3 PackfileFixupTable.pmc (isa PackfileSegment)
+=head4 PackfileFixupTable.pmc (isa PackfileSegment)
 
 This PMC provides a keyed integer interface to the fixup table. Each entry in
 the table is represented by a PackfileFixupEntry PMC. It implements the
 following methods:
 
-=head4 C<elements> (v-table)
+=head5 C<elements> (v-table)
 
 Gets the number of entries in the fixup table.
 
-=head4 C<get_pmc_keyed_int> (v-table)
+=head5 C<get_pmc_keyed_int> (v-table)
 
 Gets a PackfileFixupEntry PMC for the fixup entry at the position given in
 the key. If the index is out of range, an exception will be thrown.
 
-=head4 C<set_pmc_keyed_int> (v-table)
+=head5 C<set_pmc_keyed_int> (v-table)
 
 Used to add a PackfileFixupEntry PMC to the fixups table or to replace an
 existing one. If the PMC that is supplied is not of type PackfileFixupEntry,
 an exception will thrown.
 
 
-=head3 PackfileFixupEntry.pmc
+=head4 PackfileFixupEntry.pmc
 
 This PMC represents an entry in the fixup table. It implements the following
 methods.
 
-=head4 C<get_string> (v-table)
+=head5 C<get_string> (v-table)
 
 Gets the label field of the fixup entry.
 
-=head4 C<set_string_native> (v-table)
+=head5 C<set_string_native> (v-table)
 
 Sets the label field of the fixup entry.
 
-=head4 C<get_integer> (v-table)
+=head5 C<get_integer> (v-table)
 
 Gets the offset field of the fixup entry.
 
-=head4 C<set_integer_native> (v-table)
+=head5 C<set_integer_native> (v-table)
 
 Sets the offset field of the fixup entry.
 
-=head4 C<int get_type()>
+=head5 C<int get_type()>
 
 Gets the type of the fixup entry. See the entries table for possible fixup
 types.
 
-=head4 C<set_type(int)>
+=head5 C<set_type(int)>
 
 Sets the type of the fixup entry. See the entries table for possible fixup
 types. Specifying an invalid type will result in an exception.
 
 
-=head3 PackfileAnnotations.pmc (isa PackfileSegment)
+=head4 PackfileAnnotations.pmc (isa PackfileSegment)
 
 This PMC represents the bytecode annotations table. The key ID to key name and
 key type mappings are stored in a separate PackfileAnnotationKeys PMC. Each
 (offset, key, value) entry is represented by a PackfileAnnotation PMC. The
 following methods are implemented:
 
-=head4 C<PMC* get_key_list()>
+=head5 C<PMC* get_key_list()>
 
 Returns a PackfileAnnotationKeys PMC containing the names and types of the
 annotation keys. Fetch and add to this to create a new annotation key.
 
-=head4 C<elements> (v-table)
+=head5 C<elements> (v-table)
 
 Gets the number of annotations in the table.
 
-=head4 C<get_pmc_keyed_int> (v-table)
+=head5 C<get_pmc_keyed_int> (v-table)
 
 Gets the annotation at the specified index. If there is no annotation at that
 index, an exception will be thrown. The PMC that is returned will always be a
 PackfileAnnotation PMC.
 
-=head4 C<set_pmc_keyed_int> (v-table)
+=head5 C<set_pmc_keyed_int> (v-table)
 
 Sets the annotation at the specified index. If there is no annotation at that
 index, it is added to the list of annotations. An exception will be thrown
@@ -1078,82 +1076,82 @@ unless all of the following conditions are met:
 =back
 
 
-=head3 PackfileAnnotationKeys.pmc
+=head4 PackfileAnnotationKeys.pmc
 
 This PMC represents the table of keys and the type of value that is stored
 against that key. It implements the following methods:
 
-=head4 C<get_string_keyed_int> (v-table)
+=head5 C<get_string_keyed_int> (v-table)
 
 Gets the name of the annotation key specified by the index. An exception will
 be thrown if the index is out of range.
 
-=head4 C<set_string_keyed_int> (v-table)
+=head5 C<set_string_keyed_int> (v-table)
 
 Sets the name of the annotation key specified by the index. If there is no key
 with that index currently, a key at that position in the table will be added.
 
-=head4 C<get_integer_keyed_int> (v-table)
+=head5 C<get_integer_keyed_int> (v-table)
 
 Gets an integer representing the type of the value that is stored with the key
 at the specified index. An exception will be thrown if the index is out of
 range.
 
-=head4 C<set_integer_keyed_int> (v-table)
+=head5 C<set_integer_keyed_int> (v-table)
 
 Sets the type of the value that is stored with the key at the specified index.
 If there is no key with that index currently, a key at that position in the
 table will be added.
 
 
-=head3 PackfileAnnotation.pmc
+=head4 PackfileAnnotation.pmc
 
 This PMC represents an individual bytecode annotation entry in the annotations
 segment. It implements the following methods:
 
-=head4 C<int get_offset()>
+=head5 C<int get_offset()>
 
 Gets the offset into the bytecode of the instruction that is being annotated.
 
-=head4 C<set_offset(int)>
+=head5 C<set_offset(int)>
 
 Sets the offset into the bytecode of the instruction that is being annotated.
 
-=head4 C<int get_key_id()>
+=head5 C<int get_key_id()>
 
 Gets the ID of the key of the annotation.
 
-=head4 C<int set_key_id()>
+=head5 C<int set_key_id()>
 
 Sets the ID of the key of the annotation.
 
-=head4 C<get_integer> (v-table)
+=head5 C<get_integer> (v-table)
 
 Gets the value of the annotation. This may be, depending upon the type of the
 annotation, an integer annotation or an index into the constants table.
 
-=head4 C<set_integer> (v-table)
+=head5 C<set_integer> (v-table)
 
 Sets the value of the annotation. This may be, depending upon the type of the
 annotation, an integer annotation or an index into the constants table.
 
 
-=head1 LANGUAGE NOTES
+=head2 Language Notes
 
 None.
 
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
 
-=head1 REFERENCES
+=head2 References
 
 None.
 

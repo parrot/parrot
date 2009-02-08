@@ -1,25 +1,23 @@
 # Copyright (C) 2001-2008, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 I/O
 
-docs/pdds/pdd22_io.pod - Parrot I/O
-
-=head1 ABSTRACT
+=head2 Abstract
 
 Parrot's I/O subsystem.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 A "stream" allows input or output operations on a source/destination
 such as a file, keyboard, or text console. Streams are also called
 "filehandles", though only some of them have anything to do with files.
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
@@ -32,9 +30,9 @@ concurrency models.
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Composition
+=head3 Composition
 
 Currently, the Parrot I/O subsystem uses a per-interpreter stack to
 provide a layer-based approach to I/O. Each layer implements a subset of
@@ -47,7 +45,7 @@ resolved when the class is loaded. This strategy eliminates the need to
 search a stack on each I/O call, while still allowing a "layered"
 combination of functionality for different platforms.
 
-=head2 Concurrency Model for Asynchronous I/O
+=head3 Concurrency Model for Asynchronous I/O
 
 Currently, Parrot only implements synchronous I/O operations. Initially,
 the asynchronous operations will be implemented separately from the
@@ -89,7 +87,7 @@ share no variables with the calling code other than the status object.
 [See L<http://en.wikipedia.org/wiki/Asynchronous_I/O>, for a relatively
 comprehensive list of asynchronous I/O implementation options.]
 
-=head2 FileHandle PMC API
+=head3 FileHandle PMC API
 
 Methods
 
@@ -272,7 +270,7 @@ No asynchronous version.
 
 =back
 
-=head2 Status Object PMC API
+=head3 Status Object PMC API
 
 =over 4
 
@@ -319,7 +317,7 @@ object, otherwise do nothing.
 
 =back
 
-=head2 I/O Iterator PMC API
+=head3 I/O Iterator PMC API
 
 [Implementation NOTE: this may either be the default Iterator object
 applied to a FileHandle or Socket object, a separate Iterator object for
@@ -352,7 +350,7 @@ the next line/block of data when it retrieves the current one.]
 
 =back
 
-=head2 I/O Opcodes
+=head3 I/O Opcodes
 
 The signatures for the asynchronous operations are nearly identical to
 the synchronous operations, but the asynchronous operations take an
@@ -366,9 +364,9 @@ information. For now assume that they can either return a status object,
 or return nothing. Error handling is discussed more thoroughly below in
 L<Error Handling>.
 
-=head2 I/O Stream Opcodes
+=head3 I/O Stream Opcodes
 
-=head3 Opening and closing streams
+=head4 Opening and closing streams
 
 =over 4
 
@@ -406,7 +404,7 @@ passing it a status object.
 
 =back
 
-=head3 Retrieving existing streams
+=head4 Retrieving existing streams
 
 These opcodes do not have asynchronous variants.
 
@@ -425,7 +423,7 @@ specify the mode.
 
 =back
 
-=head3 Writing to streams
+=head4 Writing to streams
 
 =over 4
 
@@ -466,7 +464,7 @@ If they want an asynchronous version, they can use C<print>.]
 
 =back
 
-=head3 Reading from streams
+=head4 Reading from streams
 
 =over 4
 
@@ -517,7 +515,7 @@ to be a synchronous one.]
 
 =back
 
-=head3 Retrieving and setting stream properties
+=head4 Retrieving and setting stream properties
 
 =over 4
 
@@ -574,7 +572,7 @@ asynchronously.
 
 =back
 
-=head2 Filesystem Opcodes
+=head3 Filesystem Opcodes
 
 [Okay, I'm seriously considering moving most of these to methods on the
 ParrotIO object. More than that, moving them into a role that is
@@ -707,7 +705,7 @@ callback, passing it a status object.
 
 =back
 
-=head2 Network I/O Opcodes
+=head3 Network I/O Opcodes
 
 Most of these opcodes conform to the standard UNIX interface, but the
 layer API allows alternate implementations for each.
@@ -826,7 +824,7 @@ type of shutdown:
 
 
 
-=head2 Error Handling
+=head3 Error Handling
 
 Currently some of the networking opcodes (C<connect>, C<recv>, C<send>,
 C<poll>, C<bind>, and C<listen>) return an integer indicating the status
@@ -836,7 +834,7 @@ strategies for error notification, and others have no way of marking
 errors at all. We want to unify all I/O opcodes so they use a consistent
 strategy for error notification.
 
-=head3 Synchronous operations
+=head4 Synchronous operations
 
 Synchronous I/O operations return an integer status code indicating
 success or failure in addition to their ordinary return value(s). This
@@ -847,7 +845,7 @@ additional integer is cheap.
 strategy as asynchronous ones?]
 
 
-=head3 Asynchronous operations
+=head4 Asynchronous operations
 
 Asynchronous I/O operations return a status object. The status object
 contains an integer status code, string status/error message, and
@@ -861,7 +859,7 @@ call. If no error callback is set, then the standard callback will be
 invoked, and the user will need to check for error conditions in the
 status object as the first operation of the handler code.
 
-=head3 Exceptions
+=head4 Exceptions
 
 At some point in the future, I/O objects may also provide a way to throw
 exceptions on error conditions. This feature will be enabled by calling
@@ -872,7 +870,7 @@ Note that exception handlers for asynchronous I/O operations will likely
 have to be set at a global scope because execution will have left the
 dynamic scope of the I/O call by the time the error occurs.
 
-=head2 IPv6 Support
+=head3 IPv6 Support
 
 The transition from IPv4 to IPv6 is in progress, though not likely to be
 complete anytime soon. Most operating systems today offer at least
@@ -915,15 +913,15 @@ See the relevant IETF RFCs: "Application Aspects of IPv6 Transition"
 (http://www.ietf.org/rfc/rfc4038.txt) and "Basic Socket Interface
 Extensions for IPv6" (http://www.ietf.org/rfc/rfc3493.txt).
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
   src/io/io.c
   src/ops/io.ops

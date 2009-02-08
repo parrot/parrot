@@ -1,16 +1,17 @@
-=head1 NAME
+# Copyright (C) 2007-2008, The Perl Foundation.
+# $Id$
 
-docs/pdds/pdd18_security.pod - Security Model
+=head1 Security Model
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the security infrastructure of Parrot.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 Parrot will be used in a variety of different application contexts, each with
 its own unique security needs.
@@ -40,13 +41,13 @@ static analysis.
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Parrot's security infrastructure is not an independent, encapsulated
 subsystem.  It is a series of related features and functionality spread
 throughout the virtual machine.
 
-=head2 Resource Quotas
+=head3 Resource Quotas
 
 Resource quotas ensure that an interpreter doesn't use more CPU time, memory,
 or system resources than are allowed. Quotas are most useful when running code
@@ -56,7 +57,7 @@ badly. CPU time is managed by the runloop. The memory system handles memory
 quotas, the I/O system handles file open and pending I/O count quotas, and so
 on.
 
-=head2 Privileges
+=head3 Privileges
 
 A privilege system is used to restrict code from performing certain
 actions. When privilege checking is in force the code may need a particular
@@ -108,7 +109,7 @@ May load libraries at runtime.
 
 =back
 
-=head3 Users
+=head4 Users
 
 For the most part, a "user" in the Parrot privilege system doesn't correspond
 to a literal user (though it may, if Parrot is running embedded in a database
@@ -117,7 +118,7 @@ identified by a user ID, and authenticated with a pass key. The privilege ID
 can be cheaply passed around, and validated whenever a restricted action is
 performed.
 
-=head3 Opcode Disabling
+=head4 Opcode Disabling
 
 All opcodes in Parrot can be selectively disabled, by short name (C<print>),
 long name (including signature, C<print_sc>), or by group (C<io>, C<net>,
@@ -135,7 +136,7 @@ multiple groups, as in:
       ...
   }
 
-=head3 Library Loading
+=head4 Library Loading
 
 In certain environments, it's desirable to be able to restrict what libraries
 may be loaded by code running on the virtual machine. The allowed library list
@@ -152,14 +153,14 @@ also be a useful development tool, as running your daily development
 environment with library loading restrictions turned on means you always know
 exactly what dependencies the code base has.
 
-=head3 Resource Access
+=head4 Resource Access
 
 Access to resources such as the local disk, network, are controlled through
 the privilege system. Resource access limitations are a combination of
 disabled opcodes, blocked library loading, and privilege checks within
 standard libraries for I/O, network, etc.
 
-=head2 Sandboxing
+=head3 Sandboxing
 
 A sandbox is a virtual machine within the virtual machine. It's a safe zone to
 contain code from an untrusted source. In the extreme case, a sandbox is
@@ -171,7 +172,7 @@ send some data back to the code that called it. The sandbox system works
 together with the privileges system, in that by default code in the sandbox
 has no privileges outside the sandbox, but may be granted privileges.
 
-=head2 Data Firewall
+=head3 Data Firewall
 
 Any data that originates from user input (command-line, user prompt, web form,
 file access, network operation) is a potential security risk. The best place
@@ -192,7 +193,7 @@ regular expression (PGE rule) or subroutine.
 The same filter rules applied within the data firewall can be called
 explicitly on any data.
 
-=head2 Bytecode Validation
+=head3 Bytecode Validation
 
 In normal operation the interpreter assumes that the bytecode that it executes
 is valid -- that is, any parameters to opcodes are sane, data structures are
@@ -201,7 +202,7 @@ bytecode is not necessarily valid. The interpreter then, at runtime, makes
 sure that all specified register numbers are within valid range, and string
 and PMC structures used are valid.
 
-=head2 Auditing Hooks
+=head3 Auditing Hooks
 
 Even in dynamic languages, it's possible to perform a degree of static
 analysis for security risks. The opcode syntax tree (OST) produced by the
@@ -216,13 +217,13 @@ OST phase, and inserting an additional phase to scan the OST. Because the OST
 form is standard across high-level languages running on Parrot, the tools can
 be written once and applied to many languages.
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 
-=head1 REFERENCES
+=head2 References
 
 "Exploring the Broken Web": http://talks.php.net/show/osdc07
 

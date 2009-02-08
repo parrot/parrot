@@ -1,31 +1,29 @@
 # Copyright (C) 2001-2007, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Objects and Classes
 
-docs/pdds/pdd15_objects.pod - Object and Class semantics for Parrot
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the semantics of Parrot's object and class systems.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DEFINITIONS
+=head2 Definitions
 
-=head2 Object
+=head3 Object
 
 An object is a value that incorporates both data and behavior
 related to that data.
 
-=head2 Class
+=head3 Class
 
 A class defines a pattern of characteristics and behaviors from which
 objects are constructed.
 
-=head2 Attribute
+=head3 Attribute
 
 An attribute is a slot in an object that contains a value, generally a
 PMC. Attributes are referenced by class name/attribute name pairs.
@@ -37,35 +35,35 @@ system does allow it. In order to safely support advanced dynamic
 features in HLLs, attributes are not accessible via fixed attribute
 offsets, but only via named lookup.
 
-=head2 Method
+=head3 Method
 
 A method is a piece of code that you invoke by name through an object.
 Methods implement the behaviour of an object.
 
-=head2 Parent class
+=head3 Parent class
 
 Also called the super-class. The parent class is, in an inheritance situation,
 the class being derived from. If A derives from B, B is the parent class of A.
 
-=head2 Child class
+=head3 Child class
 
 Also called the sub-class. The child class is, in an inheritance situation,
 the class doing the deriving. If A derives from B, A is the child class.
 
-=head2 Role
+=head3 Role
 
 A role adds attributes and methods into a class without inheritance. The
 composed class retains a list of roles applied to it (so they can be
 checked with C<does>), but otherwise maintains no distinction between
 composed attributes and methods and those defined in the class.
 
-=head2 Delegate
+=head3 Delegate
 
 An object that is transparently (to the user) embedded in another object.
 Delegate objects are used in those cases where we can't inherit from a class
 because the class is from a different object universe.
 
-=head2 Property
+=head3 Property
 
 A property is a role that only adds attributes and accessors.
 
@@ -73,11 +71,11 @@ Properties are generally assigned at runtime, and a particular property may or
 may not exist on a PMC at any particular time. Properties are not restricted
 to objects as such--any PMC may have a property attached to it.
 
-=head2 Interface
+=head3 Interface
 
 An interface is a role that only adds methods.
 
-=head1 DESCRIPTION
+=head2 Description
 
 =over 4
 
@@ -131,7 +129,7 @@ and moving the object to it is allowable)
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 There are four pieces to the object implementation. There are the PMCs for the
 classes, roles, and objects, the opcodes the engine uses to do objecty things,
@@ -148,7 +146,7 @@ inheritance it must not emit code which would add multiple parents to a class.
 class, but currently it doesn't.)
 
 
-=head2 Class PMC API
+=head3 Class PMC API
 
 There are two PMC classes, C<Class> and C<Object>.  Class PMCs hold all
 the class-specific information. Instantiating a new OO class creates a
@@ -255,7 +253,7 @@ new class next time they access the old class?)
 
 Class PMCs also have the "I am a class" flag set on them.
 
-=head3 Classes, Namespaces, and the Class Registry
+=head4 Classes, Namespaces, and the Class Registry
 
 Extending an existing class that has been instantiated creates a new
 class object that replaces the old class object in the Namespace.
@@ -291,7 +289,7 @@ and no Namespace object referencing it (to mark it as live). When a
 class is garbage collected, it should remove itself from the registry.
 
 
-=head3 Class Vtable Entries
+=head4 Class Vtable Entries
 
 To make this work all Classes need the following vtable entries.
 
@@ -411,7 +409,7 @@ Currently Parrot only supports mutating a class' metainformation for
 Class classes. This is a restriction which will be lifted at some point
 soon.
 
-=head3 Class Methods
+=head4 Class Methods
 
 These methods are just syntactic sugar for the vtable functions. They are
 not included in the Class PMC by default, but added to Class as a role.
@@ -557,7 +555,7 @@ Return introspection information for the class.
 
 =back
 
-=head2 Object PMC API
+=head3 Object PMC API
 
 C<Object> PMCs are the actual objects, and hold all the per-object
 instance data.
@@ -612,7 +610,7 @@ In a static language like C#.Net:
   o1.foo(); # calls B's method
   o2.foo(); # calls B's method
 
-=head3 Object Vtable Entries
+=head4 Object Vtable Entries
 
 All Objects need the following vtable entries.
 
@@ -689,7 +687,7 @@ or array) or attribute access.
 
 =back
 
-=head2 Role PMC API
+=head3 Role PMC API
 
 An instance of the Role PMC has five attributes, which are:
 
@@ -720,7 +718,7 @@ role they're associated with.
 
 =back
 
-=head3 Role Vtable Entries
+=head4 Role Vtable Entries
 
 All Roles need the following vtable entries.
 
@@ -791,7 +789,7 @@ Remove a role from the role.
 
 =back
 
-=head3 Role Methods
+=head4 Role Methods
 
 These methods are just syntactic sugar for the vtable functions. They are
 not included in the Role PMC by default, but added to Role as a role.
@@ -880,7 +878,7 @@ Return introspection information for the role.
 
 =back
 
-=head3 Role Conflict Resolution
+=head4 Role Conflict Resolution
 
 When a role is added to a class, we try to compose it right away, and
 throw an exception on any conflicts that are detected. A conflict occurs
@@ -925,7 +923,7 @@ the role will be added to the multi-methods of the MultiSub PMC already
 in the class. Any attempt to combine a multi with a non-multi will
 result in an error.
 
-=head2 Opcodes
+=head3 Opcodes
 
 The following ops are provided to deal with objects. Please note that
 method calls are governed by Parrot's calling conventions, and as such
@@ -1124,7 +1122,7 @@ to the requested string name.
 
 =back
 
-=head2 PIR Class Definitions
+=head3 PIR Class Definitions
 
 PIR provides some syntactic sugar for declaring classes.
 
@@ -1155,7 +1153,7 @@ If the class object has not yet been created at the point when the PIR subs
 are compiled, the methods and vtable overrides are temporarily stored in the
 associated namespace.
 
-=head2 Vtable Overriding
+=head3 Vtable Overriding
 
 Classes may override the vtable functions, allowing objects of a class to
 behave like a primitive PMC. To use these properly at a low-level
@@ -1168,7 +1166,7 @@ To override a vtable function, either add the :vtable pragma to the
 declaration of the method, or pass a named parameter "vtable" into the
 C<add_method> method on a class or role.
 
-=head2 What The Bytecode Sees
+=head3 What The Bytecode Sees
 
 The bytecode is isolated from most of the internal details of the
 implementation. This allows both for flexibility in the implementation and
@@ -1180,18 +1178,18 @@ and modifications of existing classes) should be transparent as well.
 
 
 
-=head1 EXAMPLES
+=head2 Examples
 
 The following examples all assume we're working with basic Object objects
 and Class classes.
 
-=head2 Creating a new class
+=head3 Creating a new class
 
 To create a new class C<Foo> which has no parent classes:
 
    newclass $P0, "Foo"
 
-=head2 Creating a new class with multiple parents
+=head3 Creating a new class with multiple parents
 
 To create a class C<Foo> with the parents C<A> and C<B>, the code would be:
 
@@ -1200,7 +1198,7 @@ To create a class C<Foo> with the parents C<A> and C<B>, the code would be:
    subclass $P2, $P0, "Foo"
    addparent $P2, $P1
 
-=head2 Creating a new class with attributes
+=head3 Creating a new class with attributes
 
 Adding the attributes C<a> and C<b> to the new class C<Foo>:
 
@@ -1208,7 +1206,7 @@ Adding the attributes C<a> and C<b> to the new class C<Foo>:
   addattribute $P0, "a"
   addattribute $P0, "b"
 
-=head2 Instantiating an object
+=head3 Instantiating an object
 
 Assuming we want an object of class C<Foo>:
 
@@ -1217,7 +1215,7 @@ Assuming we want an object of class C<Foo>:
   FooClass = get_class "Foo"
   MyObject = FooClass.new()
 
-=head2 Calling a method on an object
+=head3 Calling a method on an object
 
 Calling the method C<Xyzzy> on an object, assuming the PDD03 calling
 conventions are respected:
@@ -1234,13 +1232,13 @@ Or, if a return continuation needs constructing:
   set S0, "Xyzzy"
   callmethodcc
 
-=head2 Accessing attributes from within a class
+=head3 Accessing attributes from within a class
 
 With named access:
 
   getattribute $P1, $P0, "Foo\x0b"
 
-=head1 Explanations
+=head2 Explanations
 
 To get a new class, you can do a C<newclass>, which creates a new class
 with no parents besides Parrot's default super-ish parent class.
@@ -1262,11 +1260,11 @@ When adding in extra parents in a multiple-inheritance scenario, subclass the
 first class in the immediate parent list then use the C<addparent> op to add
 in the rest of the immediate parents.
 
-=head1 LANGUAGE NOTES
+=head2 Language Notes
 
 Notes on some of the OO-related needs of various languages.
 
-=head2 PMCs
+=head3 PMCs
 
 Ruby: Just like Smalltalk, everything is an object.  I'm hoping to be able to
 implement core Ruby classes (String, Array, Hash, Module, etc)  something like
@@ -1279,13 +1277,13 @@ this.
      \      /
     RubyString
 
-=head2 Objectspace
+=head3 Objectspace
 
 Ruby: Objectspace in Ruby allows the programmer to iterate through every live
 object in the system.  There is some debate about how to make this play nice
 with different garbage collection schemes.
 
-=head2 Classes
+=head3 Classes
 
 A class is a collection of methods and attributes. It would be desirable, for
 those classes whose definition is fully known at compile time, to have a
@@ -1293,12 +1291,12 @@ convenient way to have the class along with its attributes and methods stored
 into a PBC file rather than created at runtime. However, creation of new
 classes at runtime will be needed too.
 
-=head2 Meta-classes
+=head3 Meta-classes
 
 Ruby: Ruby has meta-classes.  It would be nice if classes were objects in
 Parrot's OO model.
 
-=head2 Attributes
+=head3 Attributes
 
 Attributes are instance data associated with a class (or role, however those
 are supported). They may not always be of a type specified by a PMC, though
@@ -1318,7 +1316,7 @@ difference between the type of the reference and the type of the value).
 
 Ruby: Attributes can be dynamically added and removed at runtime.
 
-=head2 Methods
+=head3 Methods
 
 Perl 6: Methods may be public (anyone can invoke them) or private (only
 invokable by the class they are defined in). Additionally, submethods are
@@ -1329,7 +1327,7 @@ methods that do not get inherited.
 Ruby: has a method_missing that gets called when method resolution fails to
 find a method.  Methods can be dynamically added and removed at runtime.
 
-=head2 Constructors
+=head3 Constructors
 
 A constructor is run when an object is instantiated.
 
@@ -1337,7 +1335,7 @@ A constructor is run when an object is instantiated.
 different signatures), and the correct one is called based upon the passed
 parameters.
 
-=head2 Inheritance
+=head3 Inheritance
 
 Perl 6: Multiple inheritance.
 
@@ -1345,7 +1343,7 @@ Perl 6: Multiple inheritance.
 
 Ruby: Single inheritance but support for mixins of Ruby modules.
 
-=head2 Interfaces
+=head3 Interfaces
 
 An interface specifies a set of methods that must be implemented by a class
 that inherits (or implements) the interface, but does not provide any form of
@@ -1354,7 +1352,7 @@ implementation for them.
 .Net: Interfaces are pretty much what was just describe above. XXX Need to
 check behavior of you implement two interfaces with methods of the same name.
 
-=head2 Roles
+=head3 Roles
 
 A role consists of a set of methods and attributes. It cannot be instantiated
 on its own, but must be composed into a class. When this happens its methods
@@ -1371,7 +1369,7 @@ all that is needed. An open question is whether Parrot worry about collision
 detection? For compile time composition that's easy to punt to the compiler;
 for runtime composition, that's not so easy though.
 
-=head2 Introspection (aka Reflection)
+=head3 Introspection (aka Reflection)
 
 Perl 6: Reflection provides access to a list of methods that a class has, its
 parent classes and the roles it does, as well as the name of the class and its
@@ -1382,7 +1380,7 @@ the method is declared multi are available.
 as the name of the class and its parent. The types of attributes and
 signatures of methods are also available.
 
-=head2 Inner Classes
+=head3 Inner Classes
 
 An inner class is essentially a class defined within a class. Therefore it has
 access to things private to its outer class.
@@ -1392,7 +1390,7 @@ Perl 6: Inner classes are allowed, and may also be private.
 .Net: Inner classes are allowed and may be private, public, protected or
 internal.
 
-=head2 Delegation
+=head3 Delegation
 
 Delegation is where a method call is "forwarded" to another class. Parrot may
 provide support for simple cases of it directly, or could just provide a "no
@@ -1402,7 +1400,7 @@ delegation.
 Perl 6: Delegation support is highly flexible, even allowing a regex to match
 method names that should be delegated to a particular object.
 
-=head2 Prototype-based OO
+=head3 Prototype-based OO
 
 Prototype-based OO has no classes. All objects are cloned from existing
 objects and modified. Requires lightweight singleton creation, without
@@ -1414,7 +1412,7 @@ Io are examples of prototype-based 00.) An example from Io:
   Dog bark := method("yap" print) # It has a method 'bark'
   Dog bark  # call the method 'bark', printing 'yap'
 
-=head2 Translation
+=head3 Translation
 
 The following list a set of languages, then within each language what the
 Parrot term translates to.
@@ -1457,15 +1455,15 @@ Instance Variables map to what we call attributes
 
 =back
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
   docs/pdds/pdd15_object_metamodel.png
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 None.
 
