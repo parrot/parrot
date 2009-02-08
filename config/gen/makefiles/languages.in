@@ -524,10 +524,10 @@ up-primitivearc:
 	cd primitivearc && $(GIT) pull
 
 co-shakespeare:
-	- $(HG) clone 'http:////bitbucket.org//riffraff//shakespeare-parrot'
+	- $(HG) clone 'http:////bitbucket.org//riffraff//shakespeare-parrot' shakespeare
 
 up-shakespeare:
-	cd shakespeare-parrot && $(HG) pull
+	cd shakespeare && $(HG) pull
 
 co-rakudo:
 	- $(GIT) clone 'git:////github.com//rakudo//rakudo.git'
