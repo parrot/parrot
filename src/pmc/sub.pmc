@@ -27,7 +27,7 @@ print_sub_name(PARROT_INTERP, PMC *sub)
 {
     Interp * const tracer = (interp->pdb && interp->pdb->debugger) ?
         interp->pdb->debugger :
-	interp;
+        interp;
 
     /* sub was located via globals */
     Parrot_io_eprintf(tracer, "# Calling sub '%Ss'\n# ",

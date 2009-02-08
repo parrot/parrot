@@ -397,7 +397,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         char   * const cinit_func_name = Parrot_str_to_cstring(interp, init_func_name);
 
         /* get load_func */
-	void * dlsymfunc = Parrot_dlsym(handle, cload_func_name);
+        void * dlsymfunc = Parrot_dlsym(handle, cload_func_name);
         load_func = (PMC * (*)(PARROT_INTERP)) D2FPTR(dlsymfunc);
         Parrot_str_free_cstring(cload_func_name);
 

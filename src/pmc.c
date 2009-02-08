@@ -596,7 +596,7 @@ pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
             else
                 return VTABLE_get_integer(interp, item);
         }
-	else
+        else
             return Parrot_get_datatype_enum(interp, name);
     }
 }

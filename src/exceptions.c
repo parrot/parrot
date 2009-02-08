@@ -117,7 +117,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
     if (interp->pdb) {
         Interp * interpdeb = interp->pdb->debugger;
-	if (interpdeb) {
+        if (interpdeb) {
             Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
             Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
         }
