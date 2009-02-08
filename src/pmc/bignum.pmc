@@ -39,22 +39,30 @@ typedef struct BIGNUM {
     mpf_t b;
 } BIGNUM;
 
+#endif
 
 static void
 bignum_init(PARROT_INTERP, PMC *self) {
     Parrot_BigNum_attributes *attrs =
         mem_allocate_zeroed_typed(Parrot_BigNum_attributes);
+#ifdef PARROT_HAS_GMP
     attrs->bi = mem_allocate_zeroed_typed(BIGNUM);
     mpf_init(attrs->bi->b);
+#endif
     PMC_data(self) = attrs;
 }
 
+
 static void
 bignum_clear(PARROT_INTERP, PMC *self) {
+#ifdef PARROT_HAS_GMP
     BIGNUM *bi;
     GETATTR_BigNum_bi(interp, self, bi);
     mpf_clear(bi->b);
+#endif
 }
+
+#ifdef PARROT_HAS_GMP
 
 static void
 bignum_set(PARROT_INTERP, PMC *dest, PMC *src) {
@@ -367,6 +375,7 @@ typedef struct BIGNUM {
     FLOATVAL b; /* bogus definition for users without libgmp*/
 } BIGNUM;
 
+#if 0
 static void
 bignum_init(PARROT_INTERP, PMC *self) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
@@ -378,6 +387,7 @@ bignum_clear(PARROT_INTERP, PMC *self) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no bignum lib loaded");
 }
+#endif
 
 static void
 bignum_set_long(PARROT_INTERP, PMC *self, long value) {
