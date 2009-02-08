@@ -1270,7 +1270,6 @@ PDB_get_command(PARROT_INTERP)
         Parrot_PCCINVOKE(interp->debugger,
             stdin, readline,
             "S->S", prompt, & s);
-        fprintf(stderr, "Hi\n");
         {
         char * aux = Parrot_str_to_cstring(interp->debugger, s);
         strcpy(c, aux);
