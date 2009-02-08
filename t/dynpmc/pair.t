@@ -1,10 +1,11 @@
 #! parrot
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 .const int NUM_OF_TESTS = 8
 
 .sub main :main
+    loadlib $P1, 'pair'
     load_bytecode 'library/Test/More.pir'
 
     .local pmc plan, is, ok

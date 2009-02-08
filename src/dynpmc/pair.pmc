@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2008, The Perl Foundation.
+Copyright (C) 2005-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -9,6 +9,8 @@ src/pmc/pair.pmc - Pair PMC
 =head1 DESCRIPTION
 
 A Pair PMC represents one key => value mapping like a one element hash.
+
+'EclectusPair' subclasses this.
 
 =head2 Functions
 
@@ -21,7 +23,7 @@ A Pair PMC represents one key => value mapping like a one element hash.
 #include "parrot/parrot.h"
 #include "pmc_pair.h"
 
-pmclass Pair need_ext {
+pmclass Pair dynpmc need_ext {
     ATTR PMC *key;
     ATTR PMC *value;
 
@@ -174,7 +176,7 @@ Sets this pair to hold the value of another.
 */
 
     void set_pmc(PMC *pair) {
-        if (pair->vtable->base_type == enum_class_Pair) {
+        if (pair->vtable->base_type == SELF->vtable->base_type) {
             Parrot_Pair_attributes * const from = PARROT_PAIR(SELF);
             Parrot_Pair_attributes * const to   = PARROT_PAIR(SELF);
 
