@@ -53,36 +53,35 @@ The metatable supports the OO mecanism.
 
 
 PMC *
-find_meth(PARROT_INTERP, PMC *obj, const char *name) {
-    PMC   *meta = NULL;
-    INTVAL type = PMC_type(obj);
+_LuaAny_find_meth(PARROT_INTERP, PMC *obj, const char *name) {
+    PMC *meta = NULL;
+    const INTVAL type = PMC_type(obj);
 
-    if (dynpmc_LuaString == type) {
-        meta = Parrot_find_global_s(interp,
-                                    Parrot_str_new_constant(interp, "string"),
-                                    Parrot_str_new_constant(interp, "mt_string"));
+    if (type == dynpmc_LuaTable) {
+        meta = _LuaTable_get_metatable(interp, obj);
+    }
+    else if (type == dynpmc_LuaUserdata) {
+        meta = _LuaUserdata_get_metatable(interp, obj);
+    }
+    else if (type == dynpmc_LuaString) {
+        meta = _LuaString_get_metatable(interp);
     }
 
-    if (dynpmc_LuaFunction != type) {
-        if (obj->pmc_ext)
-            meta = PMC_metadata(obj);
+    if (!meta)
+        return NULL;
 
-        if (meta && dynpmc_LuaTable != PMC_type(meta))
-            return meta;
+    if (dynpmc_LuaTable != PMC_type(meta)) {
+        return meta;
     }
-
-    if (meta) {
+    else {
         PMC *method;
-        PMC *key = pmc_new(interp, dynpmc_LuaString);
+        PMC * const key = pmc_new(interp, dynpmc_LuaString);
         VTABLE_set_string_native(interp, key, Parrot_str_new_constant(interp, name));
 
         method = VTABLE_get_pmc_keyed(interp, meta, key);
 
-        if (dynpmc_LuaNil != PMC_type(method))
-            return method;
+        return (dynpmc_LuaNil != PMC_type(method)) ? method : NULL;
     }
-
-    return NULL;
 }
 
 
@@ -155,7 +154,7 @@ Throws an exception.
 
 */
     VTABLE PMC* get_pmc_keyed(PMC *key) {
-        PMC * const meth = find_meth(INTERP, SELF, "__index");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__index");
 
         if (meth) {
             if (dynpmc_LuaFunction == PMC_type(meth)) {
@@ -184,7 +183,7 @@ Throws an exception.
 
 */
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__newindex");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__newindex");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -210,7 +209,7 @@ Throws an exception.
 
 */
     VTABLE PMC* neg(PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__unm");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__unm");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -225,7 +224,7 @@ Throws an exception.
     }
 
     VTABLE void i_neg() {
-        PMC * const  meth = find_meth(INTERP, SELF, "__unm");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__unm");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -276,7 +275,7 @@ Throws an exception.
 
 */
     VTABLE opcode_t* invoke(void *next) {
-        PMC * const meth = find_meth(INTERP, SELF, "__call");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__call");
         PMC *retval;
 
         if (!meth)
@@ -336,7 +335,7 @@ Throws an exception.
 
 */
     MULTI PMC* add(DEFAULT value, PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__add");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__add");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
@@ -350,7 +349,7 @@ Throws an exception.
     }
 
     MULTI void i_add(DEFAULT value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__add");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__add");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -362,7 +361,7 @@ Throws an exception.
     }
 
     MULTI PMC* subtract(DEFAULT value, PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__sub");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__sub");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
@@ -376,7 +375,7 @@ Throws an exception.
     }
 
     MULTI void i_subtract(DEFAULT value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__sub");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__sub");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to perform arithmetic on a %Ss value", SELF.name());
@@ -388,7 +387,7 @@ Throws an exception.
     }
 
     MULTI PMC* multiply(DEFAULT value, PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__mul");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__mul");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -403,7 +402,7 @@ Throws an exception.
     }
 
     MULTI void i_multiply(DEFAULT value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__mul");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__mul");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -416,7 +415,7 @@ Throws an exception.
     }
 
     MULTI PMC* divide(DEFAULT value, PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__div");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__div");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -431,7 +430,7 @@ Throws an exception.
     }
 
     MULTI void i_divide(DEFAULT value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__div");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__div");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -444,7 +443,7 @@ Throws an exception.
     }
 
     MULTI PMC* modulus(DEFAULT value, PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__mod");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__mod");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -459,7 +458,7 @@ Throws an exception.
     }
 
     MULTI void i_modulus(DEFAULT value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__mod");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__mod");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -472,7 +471,7 @@ Throws an exception.
     }
 
     MULTI PMC* pow(DEFAULT value, PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__pow");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__pow");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -487,7 +486,7 @@ Throws an exception.
     }
 
     MULTI void i_pow(DEFAULT value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__pow");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__pow");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -500,7 +499,7 @@ Throws an exception.
     }
 
     MULTI PMC* concatenate(DEFAULT value, PMC *dest) {
-        PMC * const meth = find_meth(INTERP, SELF, "__concat");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__concat");
 
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
@@ -515,7 +514,7 @@ Throws an exception.
     }
 
     MULTI void i_concatenate(DEFAULT value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__concat");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__concat");
         if (!meth)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
                 "attempt to concatenate a %Ss value", SELF.name());
@@ -593,7 +592,7 @@ Without shortcut like in Default PMC.
 
 */
     METHOD PMC* len() {
-        PMC * const meth = find_meth(INTERP, SELF, "__len");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__len");
         PMC *retval;
 
         if (!meth)
@@ -634,7 +633,7 @@ Common implementation (use C<__tostring> or C<get_string>).
 
 */
     METHOD PMC* tostring() {
-        PMC * const meth = find_meth(INTERP, SELF, "__tostring");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__tostring");
         PMC *retval;
 
         if (meth) {

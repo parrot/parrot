@@ -23,6 +23,11 @@ This implementation is based on the Lua 4.0 one.
 
 #include "lua_private.h"
 
+PMC *
+_LuaTable_get_metatable(PARROT_INTERP, PMC *obj) {
+    return PMC_metadata(obj);
+}
+
 #define LUA_ASSERT(c, s)         assert(((void)(s), (c)))
 
 #define PMC_hash(s) (LuaHash *)PMC_struct_val((s))
@@ -508,7 +513,7 @@ C<table> accessor.
         if (pvalue)
             value = *pvalue;
         else {
-            PMC * const meth = find_meth(INTERP, SELF, "__index");
+            PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__index");
             if (meth) {
                 if (dynpmc_LuaFunction == PMC_type(meth)) {
                     value = Parrot_runops_fromc_args(INTERP, meth, "PPP",
@@ -536,7 +541,7 @@ C<table> mutator.
 */
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         if (! lua_get(INTERP, PMC_hash(SELF), key)) {
-            PMC * const meth = find_meth(INTERP, SELF, "__newindex");
+            PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__newindex");
             if (meth) {
                 if (dynpmc_LuaFunction == PMC_type(meth)) {
                     Parrot_runops_fromc_args(INTERP, meth, "vPPP", SELF,
@@ -605,7 +610,7 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     MULTI INTVAL is_equal(LuaTable value) {
-        PMC * const meth = find_meth(INTERP, SELF, "__eq");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__eq");
         if (meth) {
             PMC * const retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                           SELF, value);
@@ -632,7 +637,7 @@ The C<==> operation. Compares reference (not in depth).
 */
     MULTI INTVAL cmp(LuaTable value) {
 #if 0
-        PMC * const meth = find_meth(INTERP, SELF, "__cmp");
+        PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__cmp");
         if (meth) {
             PMC * const retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
                                                           SELF, value);
@@ -641,7 +646,7 @@ The C<==> operation. Compares reference (not in depth).
                 return (INTVAL)VTABLE_get_number(INTERP, retval);
         }
 #else
-        PMC * const _lt = find_meth(INTERP, SELF, "__lt");
+        PMC * const _lt = _LuaAny_find_meth(INTERP, SELF, "__lt");
 
         if (_lt) {
             PMC *retval = Parrot_runops_fromc_args(INTERP, _lt, "PPP",
@@ -651,7 +656,7 @@ The C<==> operation. Compares reference (not in depth).
             if (r)
                 return (INTVAL)-1;
             else {
-                PMC * const _le = find_meth(INTERP, SELF, "__le");
+                PMC * const _le = _LuaAny_find_meth(INTERP, SELF, "__le");
                 if (_le) {
                     retval = Parrot_runops_fromc_args(INTERP, _le, "PPP",
                                                       SELF, value);
@@ -701,7 +706,7 @@ The C<==> operation. Compares reference (not in depth).
 
 */
     METHOD PMC* get_metatable() {
-        PMC *retval = PMC_metadata(SELF);
+        PMC *retval = _LuaUserdata_get_metatable(INTERP, SELF);
 
         if (!retval)
             retval = pmc_new(INTERP, dynpmc_LuaNil);

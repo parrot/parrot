@@ -18,7 +18,10 @@ extern INTVAL dynpmc_LuaUserdata;
 
 #define PMC_type(pmc)      ((pmc)->vtable->base_type)
 
-extern PMC * find_meth(PARROT_INTERP, PMC *obj, const char *name);
+extern PMC * _LuaAny_find_meth(PARROT_INTERP, PMC *obj, const char *name);
+extern PMC * _LuaString_get_metatable(PARROT_INTERP);
+extern PMC * _LuaTable_get_metatable(PARROT_INTERP, PMC *obj);
+extern PMC * _LuaUserdata_get_metatable(PARROT_INTERP, PMC *obj);
 
 #endif /* PARROT_LUA_PRIVATE_H_GUARD */
 
