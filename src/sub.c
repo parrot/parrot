@@ -62,7 +62,8 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
     PObj *obj;
     int   i;
 
-    if (ctx->gc_mark == context_gc_mark) return;
+    if (ctx->gc_mark == context_gc_mark)
+        return;
     ctx->gc_mark = context_gc_mark;
 
     /* don't mark the context if it's actually dead */
