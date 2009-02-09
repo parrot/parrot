@@ -58,7 +58,7 @@ src/builtins/inplace.pir - Inplace assignments
 
 Patrick Michaud <pmichaud@pobox.com> is the current author and
 maintainer.  Patches and suggestions can be sent to
-<parrot-porters@perl.org> or <perl-compiler@perl.org> .
+<parrot-dev@lists.parrot.org> or <perl-compiler@perl.org> .
 
 =cut
 

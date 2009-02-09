@@ -5,7 +5,7 @@
 ---
 name: parrot
 version: 0.9.0
-author: parrot-dev@parrot.org
+author: parrot-dev@lists.parrot.org
 abstract: a virtual machine designed for dynamic languages
 license: artistic2
 no_index:

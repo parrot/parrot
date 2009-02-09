@@ -260,7 +260,7 @@ compilers/pct/src/PCT/HLLCompiler.pir.
 
 =over 4
 
-=item * Parrot mailing list: parrot-porters@perl.org
+=item * Parrot mailing list: parrot-dev@lists.parrot.org
 
 =item * IRC: join #parrot on irc.perl.org
 

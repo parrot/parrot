@@ -64,7 +64,7 @@ Select the username from the "Add members" listbox, and select
 =back
 
 Congratulate the new member publicly by sending an email to
-parrot-porters@perl.org, and copying the new committer.
+parrot-dev@lists.parrot.org, and copying the new committer.
 
 =head2 To manage the list of Metacommitters
 

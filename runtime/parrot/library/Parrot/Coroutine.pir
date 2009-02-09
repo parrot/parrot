@@ -223,7 +223,7 @@ to 'yielded' ..., except that one might at any time transition to
 
 =back
 
-Please report any others you find to C<E<lt>parrot-porters@perl.orgE<gt>>.
+Please report any others you find to C<E<lt>parrot-dev@lists.parrot.orgE<gt>>.
 
 =head1 SEE ALSO
 

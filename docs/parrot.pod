@@ -126,8 +126,8 @@ OpenVMS (Alpha), FreeBSD (x86).
 =head2 Authors
 
 Parrot is developed and maintained by the members of the
-C<parrot-porters@perl.org> mailing list. The list is archived at:
-L<http://nntp.perl.org/group/perl.perl6.internals>
+C<parrot-dev@lists.parrot.org> mailing list. The list is archived at:
+L<http://groups.google.com/group/parrot-dev/>
 
 =over 4
 

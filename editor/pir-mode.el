@@ -13,7 +13,7 @@
 ;;   (add-to-list 'auto-mode-alist '("\\.pir\\'" . pir-mode))
 
 ;; If you have any problems with this, you're on your own,
-;; You could always try asking on parrot-porters@perl.org.
+;; You could always try asking on parrot-dev@lists.parrot.org.
 
 ;;; Code:
 (require 'regexp-opt)
@@ -422,7 +422,7 @@ following lines to your `.emacs' file:
   (add-to-list 'auto-mode-alist '(\"\\\\.pir\\\\'\" . pir-mode))
 
 If you have any problems with this, you're on your own. You could always
-try asking on parrot-porters@perl.org."
+try asking on parrot-dev@lists.parrot.org."
   (interactive)
   (kill-all-local-variables)
   (use-local-map pir-mode-map)

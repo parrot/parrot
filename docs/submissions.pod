@@ -262,8 +262,8 @@ You will notice that some of the content is generated directly from the Parrot
 repository. So the usual rules for Parrot patches apply for this content.
 
 For changes specific for parrotcode.org please send patches to B<webmaster>
-I<at> B<perl> I<dot> B<org>, and cc B<parrot-porters> I<at> B<perl> I<dot>
-B<org>.
+I<at> B<perl> I<dot> B<org>, and cc B<parrot-dev> I<at> B<lists> I<dot>
+B<parrot> I<dot> B<org>.
 
 =head1 Getting Commit Privileges
 
@@ -293,7 +293,7 @@ L<http://www.perlfoundation.org/contributor_license_agreement>
 
 =item 4
 
-Request commit access via the C<parrot-porters> mailing list, or via IRC
+Request commit access via the C<parrot-dev> mailing list, or via IRC
 (#parrot on irc.perl.org).  The existing commiters will discuss your request in
 the next couple of weeks.
 

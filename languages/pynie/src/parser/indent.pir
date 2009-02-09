@@ -120,7 +120,7 @@ src/parser/indent.pir - Helper parsing function for Python indents
 
 Patrick Michaud <pmichaud@pobox.com> is the current author and
 maintainer.  Patches and suggestions can be sent to
-<parrot-porters@perl.org> or <perl-compiler@perl.org> .
+<parrot-dev@lists.parrot.org> or <perl-compiler@perl.org> .
 
 =cut
 

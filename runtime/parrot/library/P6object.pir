@@ -705,8 +705,8 @@ will be used in lieu of this one.)
 =head1 AUTHOR
 
 Written and maintained by Patrick R. Michaud, C<< pmichaud at pobox.com >>.
-Please send patches, feedback, and suggestions to the parrot-porters
-mailing list or to C< parrotbug@parrotcode.org >.
+Please send patches, feedback, and suggestions to the parrot-dev mailing
+list or to C< parrotbug@parrotcode.org >.
 
 =head1 COPYRIGHT
 

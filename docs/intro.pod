@@ -387,9 +387,9 @@ entitled I<Testing Parrot> that will help with this.
 =head2 The Parrot Mailing List
 
 Much Parrot development and discussion takes place on the
-parrot-porters mailing list. You can subscribe by sending an email to
-C<parrot-porters-subscribe@perl.org> or read the NNTP archive at
-L<http://www.nntp.perl.org/group/perl.perl6.internals>.
+parrot-dev mailing list. You can subscribe by filling out the form at
+L<http://lists.parrot.org/mailman/listinfo/parrot-dev> or read the NNTP
+archive at L<http://groups.google.com/group/parrot-dev/>.
 
 =head2 IRC
 

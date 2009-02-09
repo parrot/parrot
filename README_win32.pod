@@ -235,7 +235,7 @@ XXX
 =back
 
 This document is maintained by The Parrot Developers
-(E<lt>parrot-porters@perl.orgE<gt>).
+(E<lt>parrot-dev@lists.parrot.orgE<gt>).
 
 =head1 SEE ALSO
 
