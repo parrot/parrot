@@ -758,13 +758,9 @@ $(PARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) CFLAGS \
 	@rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-pbc_to_exe.pir : $(PARROT) tools/dev/pbc_to_exe_gen.pl
-	$(PERL) tools/dev/pbc_to_exe_gen.pl \
-    > pbc_to_exe.pir
-
-$(PBC_TO_EXE) : pbc_to_exe.pir $(PARROT)
-	$(PARROT) -o pbc_to_exe.pbc pbc_to_exe.pir
-	$(PARROT) pbc_to_exe.pir pbc_to_exe.pbc
+$(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir $(PARROT)
+	$(PARROT) -o pbc_to_exe.pbc tools/dev/pbc_to_exe.pir
+	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
 $(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
@@ -1597,7 +1593,7 @@ prog-clean :
     $(INSTALLABLEPINFO) \
     $(INSTALLABLEPBCMERGE) \
     $(INSTALLABLEPDB) \
-    pbc_to_exe.pir pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
+    pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
     $(IMCC_DIR)/main$(O) \
     $(PDUMP) $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) \
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \

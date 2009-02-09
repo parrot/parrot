@@ -1,18 +1,4 @@
-#! perl
-
-# Copyright (C) 2008, The Perl Foundation.
-# $Id$
-
-use strict;
-use warnings;
-
-print do { local $/; <DATA> };
-
-__END__
 #! parrot
-
-# DO NOT EDIT; your changes will be lost.
-# This file was generated automatically by tools/dev/pbc_to_exe_gen.pl
 
 =head1 TITLE
 
@@ -26,7 +12,7 @@ pbc_to_exe
   pbc_to_exe my.pbc --install
   => installable_my.exe
 
-Warning! With -install there must be no directory prefix in the first arg yet.
+Warning! With --install there must be no directory prefix in the first arg yet.
 
 =cut
 
@@ -41,25 +27,65 @@ Warning! With -install there must be no directory prefix in the first arg yet.
     .local string out
 
     (infile, cfile, objfile, exefile) = 'handle_args'(argv)
-    $I0                               = length infile
-    if $I0 goto open_outfile
-    die "infile not specified"
+    unless infile > '' goto err_infile
+
+    .local string codestring
+    codestring = 'generate_code'(infile)
 
   open_outfile:
     .local pmc outfh
     outfh = open cfile, 'w'
-    if outfh goto args_handled
-    die "infile not specified"
+    unless outfh goto err_outfh
+    print outfh, <<'HEADER'
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+HEADER
 
-  args_handled:
-    .local pmc data
-    data = 'generate_data'(infile)
-    out  = 'program_code'(data)
-    print outfh, out
+    print outfh, codestring
+
+    print outfh, <<'MAIN'
+        int main(int argc, char *argv[])
+        {
+            PackFile     *pf;
+            Parrot_Interp interp;
+
+            Parrot_set_config_hash();
+
+            interp = Parrot_new( NULL );
+
+            if (!interp)
+                return 1;
+
+            Parrot_set_executable_name(interp,
+                Parrot_str_new(interp, argv[0], 0));
+            Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
+
+            pf = PackFile_new(interp, 0);
+
+            if (!PackFile_unpack(interp, pf,
+                    (const opcode_t *)program_code, bytecode_size))
+                return 1;
+
+            do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+
+            Parrot_loadbc(interp, pf);
+
+            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+            Parrot_runcode(interp, argc, argv);
+            Parrot_destroy(interp);
+            Parrot_exit(interp, 0);
+        }
+MAIN
+
     close outfh
-
     'compile_file'(cfile, objfile)
     'link_file'(objfile, exefile)
+    .return ()
+
+  err_infile:
+    die "cannot read infile"
+  err_outfh:
+    die "cannot write outfile"
 .end
 
 
@@ -76,7 +102,7 @@ Warning! With -install there must be no directory prefix in the first arg yet.
     if argc == 3 goto check_install
     .return ()
 
-check_install:
+  check_install:
     .local string infile, install
 
     $P0    = shift args
@@ -85,7 +111,7 @@ check_install:
     if install == '--install' goto proper_install
     .return ()
 
-proper_install:
+  proper_install:
     .local string cfile, objfile, obj, exefile, exe
 
     $P0    = '_config'()
@@ -107,7 +133,7 @@ proper_install:
     objfile    .= obj
     .return(infile, cfile, objfile, exefile)
 
-proper_args:
+  proper_args:
     .local string infile, cfile, objfile, obj, exefile, exe
 
     $P0    = '_config'()
@@ -137,185 +163,54 @@ proper_args:
     .return(infile, cfile, objfile, exefile)
 .end
 
-
-.sub 'generate_data'
+.sub 'generate_code'
     .param string infile
+    .local pmc ifh
+    ifh = open infile, 'r'
+    unless ifh goto err_infile
+    .local string codestring
+    .local int size
+    codestring = "const Parrot_UInt1 program_code[] = {"
+    size = 0
 
-    .local pmc infh
-               infh = open infile, 'r'
+  read_loop:
+    .local string pbcstring
+    .local int pbclength
 
-    if infh goto file_open
+    pbcstring = read ifh, 16384
+    pbclength = length pbcstring
+    unless pbclength > 0 goto read_done
+
+    .local int pos
+    pos = 0
+  code_loop:
+    unless pos < pbclength goto code_done
+    $I0 = ord pbcstring, pos
+    $S0 = $I0
+    codestring .= $S0
+    codestring .= ','
+    inc pos
+    inc size
+    $I0 = size % 32
+    unless $I0 == 0 goto code_loop
+    codestring .= "\n"
+    goto code_loop
+  code_done:
+    goto read_loop
+
+  read_done:
+    close ifh
+
+    codestring .= "\n};\n\n"
+    codestring .= "const int bytecode_size = "
+    $S0 = size
+    codestring .= $S0
+    codestring .= ";\n"
+    .return (codestring)
+
+  err_infile:
     die "cannot open infile"
-
-  file_open:
-    # read the file one opcode at a time -- for simplicity. optimize later
-    .local int buffer_size
-    $P0 = _config()
-    buffer_size = $P0['longsize']  # sizeof (opcode_t)
-
-    .local string bytecode
-                  bytecode = ''
-    .local int    size
-                  size = 0
-    .local pmc    data
-                  data = new 'Hash'
-    .local pmc    all_bytes
-                  all_bytes = new 'ResizablePMCArray'
-    .local int    at_eof
-    .local int    string_length
-    .local string byte_string
-    .local int    byte
-    .local int    bytes_per_line
-                  bytes_per_line=64
-
-
-  loop:
-    at_eof = infh.'eof'()
-    if at_eof goto end_loop
-
-    # read one byte at a time
-    byte_string = read infh, 1
-    string_length = length byte_string
-    unless string_length goto end_loop
-
-    # convert byte to integer
-    byte = ord byte_string
-    # convert integer to string
-    $S0 = byte
-    # add string for the byte
-    bytecode .= $S0
-    bytecode .= ','
-    size += 1
-    $I0 = size % bytes_per_line
-    if $I0 != 0 goto loop
-    bytecode .= "\n"
-    goto loop
-  end_loop:
-
-    data['BYTECODE'] = bytecode
-    data['SIZE']     = size
-
-    .return (data)
 .end
-
-
-.sub 'program_code'
-    .param pmc    data
-    .local string template, out
-
-    template = 'pc_template'()
-    out = 'merge_data'(template, data)
-
-    .return (out)
-.end
-
-
-# template data functions
-.sub 'pc_template'
-    .local string out
-
-    out = 'header'()
-
-    $S0 = <<'END_PC'
-const Parrot_UInt1 program_code[] = {
-@BYTECODE@
-};
-
-const int bytecode_size = @SIZE@;
-
-END_PC
-
-    out .= $S0
-    $S0  = 'body'()
-    out .= $S0
-
-    .return (out)
-.end
-
-
-.sub 'header'
-    $S0 = <<'END_HEADER'
-#include "parrot/parrot.h"
-#include "parrot/embed.h"
-
-END_HEADER
-    .return ($S0)
-.end
-
-
-.sub 'body'
-    $S0 = <<'END_BODY'
-int main(int argc, char *argv[])
-{
-    PackFile     *pf;
-    Parrot_Interp interp;
-
-    Parrot_set_config_hash();
-
-    interp = Parrot_new( NULL );
-
-    if (!interp)
-        return 1;
-
-    Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
-    Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
-
-    pf = PackFile_new(interp, 0);
-
-    if (!PackFile_unpack(interp, pf, (const opcode_t *)program_code, bytecode_size))
-        return 1;
-
-    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
-
-    Parrot_loadbc(interp, pf);
-
-    PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-    Parrot_runcode(interp, argc, argv);
-    Parrot_destroy(interp);
-    Parrot_exit(interp, 0);
-}
-END_BODY
-    .return ($S0)
-.end
-
-
-# template merging functions
-.sub 'merge_data'
-    .param string template
-    .param pmc    data
-
-    .local pmc    iter
-    iter = new 'Iterator', data
-
-    .local string symbol, value
-
-  it_loop:
-    unless iter goto it_done
-    $P0 = shift iter
-    symbol = 'get_symbol'($P0)
-    value  = iter[$P0]
-      repl_loop:
-        $I0 = index template, symbol
-        if -1 == $I0 goto repl_done
-        $I1 = length symbol
-        substr template, $I0, $I1, value
-        goto repl_loop
-      repl_done:
-    goto it_loop
-
-  it_done:
-    .return (template)
-.end
-
-
-.sub 'get_symbol'
-    .param string var
-    $S0 = '@'
-    $S1 = concat $S0, var
-    $S1 = concat $S1, $S0
-    .return ($S1)
-.end
-
 
 # util functions
 .sub 'compile_file'
@@ -472,8 +367,7 @@ END_BODY
 
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
