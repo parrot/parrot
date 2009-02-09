@@ -42,10 +42,10 @@ how the slow core works:
 
   while(1) {
       pc = NEXT_OPCODE;
-	  if(pc < LOW_BOUND || pc > HIGH_BOUND)
-	      throw exception;
-	  DISPATCH_OPCODE(pc);
-	  UPDATE_INTERPRETER();
+      if(pc < LOW_BOUND || pc > HIGH_BOUND)
+          throw exception;
+      DISPATCH_OPCODE(pc);
+      UPDATE_INTERPRETER();
   }
 
 =head2 Fast Core
@@ -60,7 +60,7 @@ current context for each dispatch.
 
   while(1) {
       pc = NEXT_OPCODE;
-	  DISPATCH_OPCODE(pc);
+      DISPATCH_OPCODE(pc);
   }
 
 =head2 Switch Core
@@ -71,13 +71,13 @@ architecture works:
 
   for( ; ; current_opcode++) {
       switch(*current_opcode) {
-	      case opcode_1:
-		      ...
-	      case opcode_2:
-		      ...
-		  case opcode_3:
-		      ...
-	  }
+          case opcode_1:
+              ...
+          case opcode_2:
+              ...
+          case opcode_3:
+              ...
+      }
   }
 
 This is quite a fast architecture for dispatching opcodes because it all
@@ -110,10 +110,10 @@ different opcodes, so they are stored in an array:
 
   void *my_labels[] = {
       &&label1,
-	  &&label2,
-	  &&label3
+      &&label2,
+      &&label3
   };
-  
+
   label1:
       ...
   label2:

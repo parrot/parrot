@@ -377,7 +377,7 @@ typedef struct BIGNUM {
     FLOATVAL b; /* bogus definition for users without libgmp*/
 } BIGNUM;
 
-#if 0
+#  if 0
 static void
 bignum_init(PARROT_INTERP, PMC *self) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
@@ -389,7 +389,7 @@ bignum_clear(PARROT_INTERP, PMC *self) {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no bignum lib loaded");
 }
-#endif
+#  endif
 
 static void
 bignum_set_long(PARROT_INTERP, PMC *self, long value) {
