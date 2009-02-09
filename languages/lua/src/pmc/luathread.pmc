@@ -74,7 +74,8 @@ Raises an exception. Use C<init_pmc()>.
     VTABLE void init_pmc(PMC *sub) {
         PMC * const classobj = Parrot_oo_get_class_str(INTERP,
                           Parrot_str_new_constant(INTERP, "Parrot::Coroutine"));
-        Parrot_LuaThread_attributes * const t = mem_allocate_zeroed_typed(Parrot_LuaThread_attributes);
+        Parrot_LuaThread_attributes * const t =
+              mem_allocate_zeroed_typed(Parrot_LuaThread_attributes);
         PMC *init_args;
 
         if (PMC_IS_NULL(classobj))
