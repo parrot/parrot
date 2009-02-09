@@ -961,15 +961,18 @@ sub _generate_test_functions {
                 my $iculibs = $PConfig{has_icu} ? $PConfig{icu_shared} : q{};
                 my $libparrot =
                     $PConfig{parrot_is_shared}
-                    ? ("$PConfig{rpath_blib} " .
-                      (($^O =~ m/MSWin32/ and $PConfig{cc} eq 'cl')
-                         ? "" : "-L$PConfig{blib_dir} "))
-                    . (
-                      $^O =~ m/MSWin32/
-                    ? $PConfig{libparrot_ldflags}
-                    : "-lparrot"
-                    )
-                    : File::Spec->join( $PConfig{blib_dir}, $PConfig{libparrot_static} );
+                      ? ("$PConfig{rpath_blib} "
+                        . (($^O =~ m/MSWin32/ and $PConfig{cc} =~ /\bcl\b/)
+                          ? ""
+                          : "-L$PConfig{blib_dir} "))
+                        . ($^O =~ m/MSWin32/
+                          ? File::Spec->join(
+                              @PConfig{qw/build_dir libparrot_ldflags/},
+                          )
+                          : "-lparrot")
+                      : File::Spec->join(
+                          @PConfig{qw/build_dir blib_dir libparrot_static/},
+                      );
                 my $cmd =
                       "$PConfig{link} $PConfig{linkflags} $PConfig{ld_debug} "
                     . "$obj_f $cfg $PConfig{ld_out}$exe_f "
