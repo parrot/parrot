@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2008, The Perl Foundation.
+Copyright (C) 2005-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -22,15 +22,17 @@ This implementation is based on C<Parrot::Coroutine>.
 
 #include "lua_private.h"
 
+#define t_val(pmc) (PARROT_LUATHREAD(pmc))->val
+#define t_env(pmc) (PARROT_LUATHREAD(pmc))->env
+
 static PMC* curr_func(PARROT_INTERP) {
-    Parrot_Context *ctx = CONTEXT(interp);
-    PMC *sub = ctx->current_sub;
-    return sub;
+    Parrot_Context * const ctx = CONTEXT(interp);
+    return ctx->current_sub;
 }
 
 static PMC* getcurrenv(PARROT_INTERP) {
     PMC *env = NULL;
-    PMC *sub = curr_func(interp);
+    PMC * const sub = curr_func(interp);
     if (sub) {
         env = PMC_metadata(sub);
     }
@@ -44,6 +46,9 @@ pmclass LuaThread
     need_ext
     group lua_group
     hll lua {
+
+    ATTR PMC    *val;
+    ATTR PMC    *env;
 
 /*
 
@@ -69,18 +74,20 @@ Raises an exception. Use C<init_pmc()>.
     VTABLE void init_pmc(PMC *sub) {
         PMC * const classobj = Parrot_oo_get_class_str(INTERP,
                           Parrot_str_new_constant(INTERP, "Parrot::Coroutine"));
+        Parrot_LuaThread_attributes * const t = mem_allocate_zeroed_typed(Parrot_LuaThread_attributes);
         PMC *init_args;
 
         if (PMC_IS_NULL(classobj))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
                            "Parrot::Coroutine not found");
 
+        PMC_data(SELF) = t;
         init_args = pmc_new(INTERP, enum_class_Hash);
         VTABLE_set_pmc_keyed_str(INTERP, init_args,
                                  Parrot_str_new_constant(INTERP, "initial_sub"), sub);
-        PMC_pmc_val(SELF) = VTABLE_instantiate(INTERP, classobj, init_args);
-        PMC_metadata(SELF) = getcurrenv(INTERP);
-        PObj_custom_mark_SET(SELF);
+        t_val(SELF) = VTABLE_instantiate(INTERP, classobj, init_args);
+        t_env(SELF) = getcurrenv(INTERP);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -93,10 +100,27 @@ Marks the Parrot::Coroutine as live.
 
 */
     VTABLE void mark() {
-        if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
-        if (PMC_metadata(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
+        if (t_val(SELF))
+            pobject_lives(INTERP, (PObj *)t_val(SELF));
+        if (t_env(SELF))
+            pobject_lives(INTERP, (PObj *)t_env(SELF));
+    }
+
+/*
+
+=item C<void destroy()>
+
+Call finalizer and free the thread.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        Parrot_LuaThread_attributes *u = PARROT_LUATHREAD(SELF);
+        if (u) {
+            mem_sys_free(u);
+            PMC_data(SELF) = NULL;
+        }
     }
 
 /*
@@ -131,7 +155,7 @@ Return the string "thread".
 
 */
     VTABLE PMC* get_attr_str(STRING *key) {
-        return PMC_pmc_val(SELF);
+        return t_val(SELF);
     }
 
 /*
@@ -153,7 +177,8 @@ Return the string "thread".
 
 */
     VTABLE void set_pmc(PMC *value) {
-        PMC_pmc_val(SELF) = PMC_pmc_val(value);
+        t_val(SELF) = t_val(value);
+        t_env(SELF) = t_env(value);
     }
 
 /*
@@ -191,7 +216,7 @@ Return the string "thread".
 
 */
     METHOD PMC* getfenv() {
-        PMC *retval = PMC_metadata(SELF);
+        PMC *retval = t_env(SELF);
 
         if (!retval)
             retval = pmc_new(INTERP, dynpmc_LuaNil);
@@ -222,7 +247,7 @@ Return the string "thread".
 
 */
     METHOD void setfenv(PMC *env) {
-        PMC_metadata(SELF) = env;
+        t_env(SELF) = env;
     }
 
 }
