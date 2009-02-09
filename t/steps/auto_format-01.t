@@ -97,9 +97,12 @@ $step = test_step_constructor_and_description($conf);
     );
 }
 {
+    use Config;
+    my $p5format = '%.15' . $Config{sPRIgldbl};
+    $p5format =~ s/"//g;; # Perl 5's Config value has embedded double quotes
     $conf->data->set( nv => 'long double' );
     auto::format::_set_floatvalfmt_nvsize($conf);
-    is($conf->data->get( 'floatvalfmt' ), '%Lf',
+    is($conf->data->get( 'floatvalfmt' ), $p5format,
         "floatvalfmt set as expected");
     is($conf->data->get( 'nvsize' ), $conf->data->get( 'hugefloatvalsize' ),
         "nvsize set as expected");
