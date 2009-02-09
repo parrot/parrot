@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -18,13 +18,12 @@ my @pdddirs = (
 
 my @pddfiles = ();
 foreach my $dir (@pdddirs) {
-    my @pdds;
     opendir my $DIRH, $dir
         or croak "Unable to open directory handle: $!";
-    @pdds = map { qq|$dir/$_| } grep { m/^pdd\d{2,}_.*\.pod$/ }
+    my @pdds = map { qq|$dir/$_| } grep { m/^pdd\d{2,}_.*\.pod$/ }
         readdir $DIRH;
     closedir $DIRH or croak "Unable to close directory handle: $!";
-    @pddfiles = (@pddfiles, @pdds);
+    push @pddfiles, @pdds;
 }
 
 my @diagnostics = ();
@@ -52,12 +51,11 @@ sub check_pdd_formatting {
     my $diag = q{};
     my @toolong = ();
     my @sections_needed = qw(
-        NAME
-        VERSION
-        ABSTRACT
-        DESCRIPTION
-        IMPLEMENTATION
-        REFERENCES
+        Version
+        Abstract
+        Description
+        Implementation
+        References
     );
     my %sections_seen = map { $_, 0 } @sections_needed;
     my @lines;
@@ -72,7 +70,7 @@ sub check_pdd_formatting {
             push @toolong, ($i + 1);
         }
         foreach my $need ( @sections_needed ) {
-            $sections_seen{$need}++ if $lines[$i] =~ m{^=head1\s+$need};
+            $sections_seen{$need}++ if $lines[$i] =~ m{^=head2\s+$need};
         }
     }
     untie @lines or croak "Unable to untie from $pdd: $!";
@@ -84,7 +82,7 @@ sub check_pdd_formatting {
     }
     foreach my $need ( keys %sections_seen ) {
         if ( ! $sections_seen{$need} ) {
-            $diag .= qq{$base lacks 'head1' $need section\n};
+            $diag .= qq{$base lacks 'head2' $need section\n};
         }
     }
     return $diag;
