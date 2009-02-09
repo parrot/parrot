@@ -268,10 +268,10 @@ MAIN
     .param int install :optional
 
     $P0 = '_config'()
-    .local string cc, ld, link_dynamic, linkflags, ld_out, libparrot, libs, o
+    .local string cc, link, link_dynamic, linkflags, ld_out, libparrot, libs, o
     .local string rpath, osname, build_dir, slash, icushared
     cc           = $P0['cc']
-    ld           = $P0['ld']
+    link         = $P0['link']
     link_dynamic = $P0['link_dynamic']
     linkflags    = $P0['linkflags']
     ld_out       = $P0['ld_out']
@@ -302,8 +302,6 @@ MAIN
     pathquote  = '"'
   not_windows:
 
-    .local string link
-    link  = ld
     link .= ' '
     link .= ld_out
     link .= exefile
