@@ -131,24 +131,29 @@ debugging.  See L<About runcores> for details.
 
 =item -R, --runcore CORE
 
-Select the runcore. The following cores are available:
+Select the runcore. The following cores are available in Parrot, but not all
+may be available on your system:
 
   slow, bounds  bounds checking core (default)
-  fast          fast core (no bounds checking, profiling, or tracing)
-  switch        switch core
-  cgp           computed goto-predereferenced core
   cgoto         computed goto core
-  jit           JIT core
+  cgp           computed goto-predereferenced core
   cgp-jit       computed goto-predereferenced core with JIT
-  switch-jit    switch core with JIT
   exec          exec core (uses JIT at compile time to generate native code)
-  trace         bounds checking core w/ trace info (see 'parrot --help-debug')
+  fast          fast core (no bounds checking, profiling, or tracing)
   gcdebug       performs a full GC run before every op dispatch (good for
                 debugging GC problems)
+  jit           JIT core
+  switch        switch core
+  switch-jit    switch core with JIT
+  trace         bounds checking core w/ trace info (see 'parrot --help-debug')
 
 =item -b, --bounds-checks, --slow-core
 
 Select the bounds-checking slow core (default).
+
+=item -g, --computed-goto-core
+
+Select the CGoto core (if available).
 
 =item -C, --CGP-core
 
@@ -156,11 +161,8 @@ Select the CGP (CGoto Predereferenced) core (if available).
 
 =item -f, --fast-core
 
-Select the fast (or function) core.
-
-=item -g, --computed-goto-core
-
-Select the CGoto core (if available).
+Select the fast (or function) core.  Bounds checking, profiling, and tracing
+are not available. (That's why it's so fast.)
 
 =item -j, --jit-core
 
