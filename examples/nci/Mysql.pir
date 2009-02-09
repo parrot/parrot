@@ -15,6 +15,8 @@ This is an initial version, be careful and not expect too much.
 
 =cut
 
+.include 'datatypes.pasm'
+
 ########################################################################
 
 .namespace ['Mysql']
@@ -421,7 +423,7 @@ done:
     $I1 = 0
     $I2 = 0
 nextcol:
-    desc [$I2] = -69
+    desc [$I2] = .DATATYPE_CSTR
     inc $I2
     desc [$I2] = 1
     inc $I2

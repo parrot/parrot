@@ -37,7 +37,7 @@
 #
 # Command line options:
 # -d Parrot debugger mode. Jumps to the debugger after each
-#    TRON line inform.
+#    TRON line inform and after the 'Ready' prompt.
 # -t Trace on. Same as the TRON instruction
 # -p all remaining arguments are executed as PRINT instructions
 #-----------------------------------------------------------------------
@@ -542,11 +542,13 @@ fail:
 
     arg1 = self.'evaluate'(tokenizer)
     $P0 = tokenizer.'get'()
+    if_null $P0, fail
     $I0 = defined $P0
     unless $I0 goto fail
     ne $P0, ',', fail
     arg2 = self.'evaluate'(tokenizer)
     $P0 = tokenizer.'get'()
+    if_null $P0, fail
     $I0 = defined $P0
     unless $I0 goto fail
     ne $P0, ')', fail
@@ -575,6 +577,7 @@ nextarg:
     push args, arg
     null arg
     delim = tokenizer.'get'()
+    if_null delim, fail
     $I0 = defined delim
     unless $I0 goto fail
     eq delim, ')', endargs
@@ -1084,9 +1087,11 @@ emptyargs:
 
 getvar:
     $P2 = tokenizer.'get'()
+    if_null $P2, donevar
     eq $P2, '.', dotted
     eq $P2, '(', isfunctor
     tokenizer.'back'()
+donevar:
     .return(var)
 
 isfunctor:
@@ -1142,12 +1147,17 @@ fail:
     $P0 = self.'eval_base'(tokenizer, token)
 again:
     $P1 = tokenizer.'get'()
+    if_null $P1, done
+    $I0 = defined $P1
+    unless $I0 goto done
     eq $P1, '[', keyit
     tokenizer.'back'()
+done:
     .return($P0)
 keyit:
     $P2 = self.'evaluate'(tokenizer)
     $P1 = tokenizer.'get'()
+    if_null $P1, fail
     eq $P1, ']', last
     ne $P1, ',', fail
     $P3 = $P0 [$P2]
@@ -1174,8 +1184,10 @@ fail:
     $P0 = self.'eval_base_1'(tokenizer, token)
 more:
     $P1 = tokenizer.'get'()
+    if_null $P1, done
     eq $P1, '^', dopow
     tokenizer.'back'()
+done:
     .return($P0)
 dopow:
     $P2 = self.'eval_unary'(tokenizer)
@@ -1193,8 +1205,10 @@ dopow:
     $P0 = self.'eval_pow'(tokenizer, token)
 more:
     $P1 = tokenizer.'get'()
+    if_null $P1, done
     eq $P1, 'MOD', domod
     tokenizer.'back'()
+done:
     .return($P0)
 domod:
     $P2 = self.'eval_pow'(tokenizer)
@@ -1245,9 +1259,11 @@ fail:
     $P0 = self.'eval_unary'(tokenizer, token)
 more:
     $P1 = tokenizer.'get'()
+    if_null $P1, done
     eq $P1, '*', domul
     eq $P1, '/', dodiv
     tokenizer.'back'()
+done:
     .return($P0)
 domul:
     $P2 = self.'eval_unary'(tokenizer)
@@ -1271,9 +1287,11 @@ dodiv:
     $P0 = self.'eval_mul'(tokenizer, token)
 more:
     $P1 = tokenizer.'get'()
+    if_null $P1, done
     eq $P1, '+', doadd
     eq $P1, '-', dosub
     tokenizer.'back'()
+done:
     .return($P0)
 
 doadd:
@@ -1312,10 +1330,12 @@ dosub:
     $P0 = self.'eval_add'(tokenizer, token)
 more:
     $P1 = tokenizer.'get'()
+    if_null $P1, done
     eq $P1, '=', doequal
     eq $P1, '<', doless
     eq $P1, '>', dogreat
     tokenizer.'back'()
+done:
     .return($P0)
 doequal:
     $P2 = self.'eval_add'(tokenizer)
@@ -1593,9 +1613,15 @@ finish:
     .local pmc program
     program = getattribute self, 'program'
     .local string line
+    .local pmc debugger
+    debugger = getattribute self, 'debugger'
 
     say 'Ready'
+    
 reinit:
+    unless debugger goto doreadline
+    debug_break
+doreadline:
     line = readlinebas(stdin, 1)
 
     .local pmc tokenizer
@@ -1603,6 +1629,7 @@ reinit:
 
     tokenizer = newTokenizer(line)
     token = tokenizer.'get'()
+    if_null token, reinit
     $I0 = isa token, 'Integer'
     unless $I0 goto execute
 
@@ -1666,6 +1693,7 @@ keyed:
 keyed_next:
     index = self.'evaluate'(tokenizer)
     op = tokenizer.'get'()
+    if_null op, fail
     eq op, ']', last
     ne op, ',', fail
     auxobj = obj[index]
@@ -1921,6 +1949,7 @@ fail:
     .local pmc arg
     arg = self.'evaluate'(tokenizer)
     $P1 = tokenizer.'get'()
+    if_null $P1, notype
     $I1 = defined $P1
     unless $I1 goto notype
     ne $P1, ',', notype
@@ -2023,7 +2052,9 @@ on_error_exit:
     self.'set_error_exit'($I0)
     goto finish
 on_error_goto:
-    $P0 = self.'evaluate'(tokenizer)
+    $P0 = tokenizer.'get'()
+    $I0 = defined $P0
+    unless $I0 goto fail
     $I0 = $P0
     self.'set_error_goto'($I0)
     goto finish
@@ -2334,10 +2365,12 @@ endstr:
     goto doit
 
 endline:
-    last = new 'Undef'
+#    last = new 'Undef'
+    null last
     setattribute self, 'last', last
     .local pmc none
-    none = new 'Undef'
+#    none = new 'Undef'
+    null none
     .return(none)
 
 doit:
