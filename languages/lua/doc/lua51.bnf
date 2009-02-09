@@ -1,11 +1,9 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 The Complete Syntax of Lua
 
-lua51.bnf - The Complete Syntax of Lua
-
-=head1 DESCRIPTION
+=head2 Description
 
 The following grammar comes from "Lua 5.1 Reference Manual".
 

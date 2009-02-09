@@ -1,11 +1,9 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
-=head1 TITLE
+=head1 Status of Lua on Parrot
 
-Status of Lua on Parrot
-
-=head1 Introduction
+=head2 Introduction
 
 Lua is an extension programming language designed to support general
 procedural programming with data description facilities. It also offers
@@ -19,7 +17,7 @@ The reference manual is available on L<http://www.lua.org/manual/>.
 
 This implementation is aligned with Lua 5.1 specifications.
 
-=head1 PIR Compiler/Interpreter
+=head2 PIR Compiler/Interpreter
 
 C<lua.pbc> is the interpreter/compiler, see F<languages/lua/src/lua51.pir>
 & F<languages/lua/lua.pir>.
@@ -62,7 +60,7 @@ The lexicography part could be checked with F<languages/lua/test_lex.pir>.
 
 The code generation could be examined with F<languages/lua/luap.pir>.
 
-=head2 KNOWN PROBLEMS
+=head3 KNOWN PROBLEMS
 
 in F<languages/lua/t/closure.t> :
 
@@ -85,7 +83,7 @@ in F<languages/lua/t/closure.t> :
 
 C<y> variable is not different.
 
-=head1 Perl Compiler (deprecated)
+=head2 Perl Compiler (deprecated)
 
 This compiler is written in Perl5 :
 
@@ -125,7 +123,7 @@ F<languages/lua/src/yapp/Lua/pir.pm>
 
 =back
 
-=head1 Lua Types
+=head2 Lua Types
 
 There are eight basic types in Lua, each of them is implemented by a PMC.
 
@@ -164,15 +162,15 @@ Lua types.
 
 F<languages/lua/src/pmc/lua.pmc> is a singleton PMC what holds some static methods.
 
-=head2 TODO
+=head3 TODO
 
 Arguments passing in C<invoke> method of C<table>. Where are there ?
 
-=head2 IMPROVEMENT
+=head3 IMPROVEMENT
 
 C<table> with a mixed array and hash (like Lua 5).
 
-=head1 Lua Standard Libraries
+=head2 Lua Standard Libraries
 
 Lua 5.1 defines the following standard libraries:
 
@@ -202,11 +200,11 @@ F<languages/lua/src/lib/luaaux.pir> is the equivalent of Auxiliary Library.
 
 F<languages/lua/src/lib/luaregex.pir> implements a regex compiler using PGE.
 
-=head2 TODO
+=head3 TODO
 
 Complete some of these libraries.
 
-=head1 Extension Libraries
+=head2 Extension Libraries
 
 These libraries are loaded dynamically with the Lua function C<require>.
 
@@ -242,16 +240,16 @@ These libraries are loaded dynamically with the Lua function C<require>.
 
 =back
 
-=head1 Next Milestones
+=head2 Next Milestones
 
 Debugging & stabilisation.
 
-=head2 FEEDBACK
+=head3 FEEDBACK
 
 I try to summarize all my feedback, here :
 L<http://www.nntp.perl.org/group/perl.perl6.internals/2007/10/msg40493.html>.
 
-=head1 Related Projects
+=head2 Related Projects
 
 Klaas-Jan Stol works on 2 projects :
 
@@ -269,7 +267,7 @@ A Lua bytecode to PIR compiler
 
 See L<http://kjs.home.fmf.nl/>.
 
-=head1 AUTHOR
+=head2 Author
 
 Francois Perrad.
 
