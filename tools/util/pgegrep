@@ -185,9 +185,12 @@ print the filename for each match
 
 	end
 handler:
-	.local pmc exception
+	.local pmc exception, pmcmsg
 	.local string message
-	.get_results (exception, message)
+	.get_results (exception)
+	pmcmsg = getattribute exception, 'message'
+	pop_eh
+        message = pmcmsg
         message  = "pgegrep: " . message
         die message
 .end
