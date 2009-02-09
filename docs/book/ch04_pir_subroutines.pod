@@ -1038,7 +1038,32 @@ Here is a quick example of a simple coroutine:
 This is obviously a contrived example, but it demonstrates how the coroutine
 stores it's state. The coroutine stores it's state when we reach a C<.yield>
 directive, and when the coroutine is called again it picks up where it last
-left off.
+left off. Coroutines also handle parameters in a way that might not be
+intuitive. Here's an example of this:
+
+  .sub StoredConstant
+    .param int x
+    .yield(x)
+    .yield(x)
+    .yield(x)
+  .end
+
+  .sub main :main
+    $I0 = StoredConstant(5)       # $I0 = 5
+    $I0 = StoredConstant(6)       # $I0 = 5
+    $I0 = StoredConstant(7)       # $I0 = 5
+    $I0 = StoredConstant(8)       # $I0 = 8
+  .end
+
+Notice how even though we are calling the C<StoredConstant> coroutine with
+different arguments each time, the value of parameter C<x> doesn't change
+until the coroutine's state resets after the last C<.yield>. Remember that
+a continuation takes a snapshot of the current state, and the C<.yield>
+directive takes a continuation. The next time we call the coroutine, it
+invokes the continuation internally, and returns us to the exact same place in
+the exact same condition as we were when we called the C<.yield>. In order
+to reset the coroutine and enable it to take a new parameter, we must either
+execute a C<.return> directive or reach the end of the coroutine.
 
 =head2 Multiple Dispatch
 
