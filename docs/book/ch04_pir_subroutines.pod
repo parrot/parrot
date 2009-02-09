@@ -348,22 +348,21 @@ and then return the result of the second call directly. This is called
 a X<tailcall> tailcall, and is an important opportunity for optimization.
 Here's a contrived example in pseudocode:
 
- call add_two(5)
+  call add_two(5)
 
- subroutine add_two(value)
-	 value = add_one(value)
-	 return add_one(value)
+  subroutine add_two(value)
+    value = add_one(value)
+    return add_one(value)
 
-In this example, the subroutine C<add_two> makes two calls to
-c<add_one>. The second call to C<add_one> is used as the return
-value. C<add_one> is called and its result is immediately returned
-to the caller of C<add_two>, it is never stored in a local register or
-variable in C<add_two>, it's immediately returned. We can
-optimize this situation if we realize that the second call to
+In this example, the subroutine C<add_two> makes two calls to c<add_one>. The
+second call to C<add_one> is used as the return value. C<add_one> is called
+and its result is immediately returned to the caller of C<add_two>, it is
+never stored in a local register or variable in C<add_two>, it's immediately
+returned. We can optimize this situation if we realize that the second call to
 C<add_one> is returning to the same place that C<add_two> is, and therefore
-can utilize the same return continuation as C<add_two> uses. The
-two subroutine calls can share a return continution, instead of
-having to create a new continuation for each call.
+can utilize the same return continuation as C<add_two> uses. The two
+subroutine calls can share a return continution, instead of having to create
+a new continuation for each call.
 
 X<.tailcall directive>
 In PIR code, we use the C<.tailcall> directive to make a tailcall like this,
@@ -376,14 +375,14 @@ tailcall. In PIR, we can write this example:
       value = add_two(5)
       say value
   .end
-  
+
   .sub add_two
       .param int value
       .local int val2
       val2 = add_one(value
       .tailcall add_one(val2)
   .end
-  
+
   .sub add_one
       .param int a
       .local int b
@@ -512,8 +511,16 @@ these lexical subroutines to simulate this behavior that HLLs require:
 
   .sub 'MyInner' :outer('MyOuter')
       .lex int z
-      #x, y, and z are all visible here
+      #x, y, and z are all "visible" here
   .end
+
+In the example above we put the word C<"visible"> in quotes. This is because
+lexically-defined variables need to be accessed with the C<get_lex> and
+C<set_lex> opcodes. These two opcodes don't just access the value of a
+register, where the value is stored while it's being used, but they also make
+sure to interact with the C<LexPad> PMC that's storing the data. If the value
+isn't properly stored in the LexPad, then they won't be available in nested
+inner subroutines, or available from C<:outer> subroutines either.
 
 =head3 Lexical Variables
 
@@ -530,9 +537,10 @@ scoping rules.
 =head3 LexPad and LexInfo PMCs
 
 Information about lexical variables in a subroutine is stored in two different
-types of PMCs: The LexPad and LexInfo PMCs. Neither of these PMC types are
-really usable from PIR code, but are instead used by Parrot internally to
-store information about lexical variables.
+types of PMCs: The LexPad PMC that we already mentioned breifly, and the
+LexInfo PMCs which we haven't. Neither of these PMC types are really usable
+from PIR code, but are instead used by Parrot internally to store information
+about lexical variables.
 
 C<LexInfo> PMCs are used to store information about lexical variables at
 compile time. This is read-only information that is generated during
@@ -587,11 +595,11 @@ separate compilation units: The C<main> subroutine and the C<fact> subroutine.
 Here is a way to rewrite that algorithm using only a single subroutine instead:
 
   .sub main
-      $I1 = 5         # counter
-      call fact       # same as bsr fact
+      $I1 = 5           # counter
+      call fact         # same as "bsr fact"
       print $I0
       print "\n"
-      $I1 = 6         # counter
+      $I1 = 6           # counter
       call fact
       print $I0
       print "\n"
@@ -606,42 +614,19 @@ Here is a way to rewrite that algorithm using only a single subroutine instead:
       ret
   .end
 
-The unit of code from the C<fact> label definition to C<ret> is a
-reusable routine. There are several problems with this simple
-approach. In terms of the interface, the caller has to know to pass the
-argument to C<fact> in C<$I1> and to get the result from C<$I0>. This is
-different from how subroutines are normally invoked in PIR.
+The unit of code from the C<fact> label definition to C<ret> is a reusable
+routine, but is only usable from within the C<main> subroutine. There are
+several problems with this simple approach. In terms of the interface, the
+caller has to know to pass the argument to C<fact> in C<$I1> and to get the
+result from C<$I0>. This is different from how subroutines are normally
+invoked in PIR.
 
-Another disadvantage of this approach is that C<main> and C<fact>
-share the same compilation unit, so they're parsed and processed as
-one piece of code. They share registers, and they would also share LexInfo
-and LexPad PMCs, if any were needed by C<main>. This is a problem when trying
-to follow normal encapsulation guidelines.
-
-=head3 PASM Subroutines
-
-Z<CHP-4-SECT-1.2>
-
-X<subroutines;PASM>
-X<PASM (Parrot assembly language);subroutines>
-PIR code can include pure PASM compilation units. These are wrapped in
-the C<.emit> and C<.eom> directives instead of C<.sub> and C<.end>.
-The C<.emit> directive doesn't take a name, it only acts as a
-container for the PASM code N<in terms of parser terminology, the C<.emit>
-directive causes the parser to transition into PASM mode. The C<.eom> directive
-causes the parser to transition back into PIR mode>. These primitive
-compilation units can be useful for grouping PASM functions or function
-wrappers. Subroutine entry labels inside C<.emit> blocks have to be global
-labels:
-
-  .emit
-  _substr:
-      ...
-      ret
-  _grep:
-      ...
-      ret
-  .eom
+Another disadvantage of this approach is that C<main> and C<fact> share the
+same compilation unit, so they're parsed and processed as one piece of code.
+They share registers. They would also share LexInfo and LexPad PMCs, if any
+were needed by C<main>. The C<fact> routine is also not easily usable from
+outside the c<main> subroutine, so other parts of your code won't have access
+to it. This is a problem when trying to follow normal encapsulation guidelines.
 
 =head2 Namespaces, Methods, and VTABLES
 
@@ -652,9 +637,30 @@ X<methods;in PIR>
 X<classes;methods>
 X<. (dot);. (method call);instruction (PIR)>
 PIR provides syntax to simplify writing methods and method calls for
-object-oriented programming. These calls follow the Parrot
-calling conventions as well. First we want to discuss I<namespaces>
-in Parrot.
+object-oriented programming. We've seen some method calls in the examples
+above, especially when we were talking about the interfaces to certain PMC
+types. We've also seen a little bit of information about classes and objects
+in the previous chapter. PIR allows you to define your own classes, and with
+those classes you can define method interfaces to them. Method calls follow
+the same Parrot calling conventions that we have seen above, including all the
+various parameter configurations, lexical scoping, and other aspects we have
+already talked about.
+
+Classes can be defined in two ways: in C and compiled to machine code, and
+in PIR. The former is how the built-in PMC types are defined, like
+C<ResizablePMCArray>, or C<Integer>. These PMC types are either built with
+Parrot at compile time, or are compiled into a shared library called a
+I<dynpmc> and loaded into Parrot at runtime. We will talk about writing PMCs
+in C, and dealing with dynpmcs in chapter 11.
+
+The second type of class can be defined in PIR at runtime. We saw some
+examples of this in the last chapter using the C<newclass> and C<subclass>
+opcodes. We also talked about class attribute values. Now, we're going to talk
+about associating subroutines with these classes, and they're called
+I<methods>. Methods are just like other normal subroutines with two major
+changes: they are marked with the C<:method> flag, and they exist in a
+I<namespace>. Before we can talk about methods, we need to discuss
+namespaces first.
 
 =head3 Namespaces
 
@@ -665,11 +671,11 @@ X<.namespace>
 Namespaces provide a mechanism where names can be reused. This may not
 sound like much, but in large complicated systems, or systems with
 many included libraries, it can be very handy. Each namespace get's its
-own area for function names and global variables. This way, you can have
+own area for function names and global variables. This way you can have
 multiple functions named C<create> or C<new> or C<convert>, for
-instance, without having to use I<Multi-Method Dispatch> (MMD), which we
-will describe later. Namespaces are also important for defining classes,
-which we will also talk about a little later.
+instance, without having to use I<Multi-Method Dispatch> (MMD) which we
+will describe later. Namespaces are also vital for defining classes and their
+methods, which we already mentioned. We'll talk about all those uses here.
 
 Namespaces are specified with the C<.namespace []> directive. The brackets
 are not optional, but the keys inside them are. Here are some examples:
@@ -693,11 +699,37 @@ can be retrieved with the C<get_namespace> opcode:
   $P0 = get_namespace ["Foo"]     # get PMC for namespace "Foo"
 
 Namespaces are arranged into a large n-ary tree. There is the root namespace
-at the top of the tree. In the root namespace are various special HLL
+at the top of the tree, and in the root namespace are various special HLL
 namespaces. Each HLL compiler gets its own HLL namespace where it can store
-its compiled data. Each HLL namespace may have a large hierarchy of other
-namespaces. The C<.namespace> directive that we've seen sets the current
-namespace. In PIR code, we have multiple ways to address a namespace:
+its data during compilation and runtime. Each HLL namespace may have a large
+hierarchy of other namespaces. We'll talk more about HLL namespaces and their
+significance in chapter 10.
+
+The root namespace is a busy place. Everybody could be lazy and use it to store
+all their subroutines and global variables, and then we would run into all
+sorts of collisions. One library would define a function "Foo", and then
+another library could try to create another subroutine with the same name.
+This is called I<namespace pollution>, because everybody is trying to put
+things into the root namespace, and those things are all unrelated to each
+other. Best practices requires that namespaces be used to hold private
+information away from public information, and to keep like things together.
+
+As an example, the namespace C<Integers> could be used to store subroutines
+that deal with integers. The namespace C<images> could be used to store
+subroutines that deal with creating and manipulating images. That way, when
+we have a subroutine that adds two numbers together, and a subroutine that
+performs additive image composition, we can name them both C<add> without any
+conflict or confusion. And within the C<image> namespace we could have sub
+namespaces for C<jpeg> and C<MRI> and C<schematics>, and each of these could
+have a C<add> method without getting into each other's way.
+
+The short version is this: use namespaces. There aren't any penalties to them,
+and they do a lot of work to keep things organized and separated.
+
+=head3 Namespace PMC
+
+The C<.namespace> directive that we've seen sets the current namespace. In
+PIR code, we have multiple ways to address a namespace:
 
   # Get namespace "a/b/c" starting at the root namespace
   $P0 = get_root_namespace ["a" ; "b" ; "c"]
@@ -717,7 +749,7 @@ subroutine PMCs from it using the following functions:
   $P1 = get_global ["Foo"], $S0   # Get global in namespace "Foo"
   $P1 = get_global $P0, $S0       # Get global in $P0 namespace PMC
 
-=head3 Namespace PMCs
+=head3 Operations on the Namespace PMC
 
 We've seen above how to find a Namespace PMC. Once you have it, there are a
 few things you can do with it. You can find methods and variables that are
@@ -978,6 +1010,35 @@ C<.yield> can return a value N<or many values, or no values> to the caller.
 It is basically the same as a C<.return> in this regard.
 
 =back
+
+Here is a quick example of a simple coroutine:
+
+  .sub MyCoro
+    .yield(1)
+    .yield(2)
+    .yield(3)
+    .return(4)
+  .end
+
+  .sub main :main
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+  .end
+
+This is obviously a contrived example, but it demonstrates how the coroutine
+stores it's state. The coroutine stores it's state when we reach a C<.yield>
+directive, and when the coroutine is called again it picks up where it last
+left off.
 
 =head2 Multiple Dispatch
 

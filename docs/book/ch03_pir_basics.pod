@@ -521,13 +521,13 @@ types and their autoboxed PMC equivalents:
   $S0 = $P0      # Stringify. "5"
   $N0 = $P0      # Numify. 5.0
   $I0 = $P0      # De-box. $I0 = 5
-  
+
   $P1 = new 'String'
   $P1 = "5 birds"
   $S1 = $P1      # De-box. $S1 = "5 birds"
   $I1 = $P1      # Intify. 5
   $N1 = $P1      # Numify. 5.0
-  
+
   $P2 = new 'Number'
   $P2 = 3.14
   $S2 = $P2      # Stringify. "3.14"
@@ -905,7 +905,7 @@ Another is the severity and the type:
 
   $P0["severity"] = 1   # An integer value
   $P0["type"] = 2       # Also an Integer
-  
+
 Finally, there is a spot for additional data to be included:
 
   $P0["payload"] = $P2  # Any arbitrary PMC
@@ -948,7 +948,7 @@ if you want:
   set_addr $P0, my_handler
   push_eh $P0
   ...
-  
+
   my_handler:
     ...
 
