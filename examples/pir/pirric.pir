@@ -36,6 +36,8 @@
 # - Calls to functions in foreign namespaces
 #
 # Command line options:
+# -d Parrot debugger mode. Jumps to the debugger after each
+#    TRON line inform.
 # -t Trace on. Same as the TRON instruction
 # -p all remaining arguments are executed as PRINT instructions
 #-----------------------------------------------------------------------
@@ -92,6 +94,7 @@
     addattribute runnerclass, 'curline'
     addattribute runnerclass, 'vars'
     addattribute runnerclass, 'stack'
+    addattribute runnerclass, 'debugger'
     addattribute runnerclass, 'tron'
 
     $P0 = get_class 'String'
@@ -207,6 +210,7 @@ read_args:
     le $I0, $I1, no_prog
     .local string arg
     arg = args[$I1]
+    if arg == '-d' goto opt_debugger
     if arg == '-t' goto opt_tron
     if arg == '-p' goto print_items
 
@@ -215,6 +219,11 @@ read_args:
 
     $I0 = 1
     goto start
+
+opt_debugger:
+    runner.'debugger'()
+    inc $I1
+    goto read_args
 
 opt_tron:
     runner.'trace'(1)
@@ -377,6 +386,9 @@ done:
     $P0 = new 'Integer'
     $P0 = 0
     setattribute self, 'tron', $P0
+    $P0 = new 'Integer'
+    $P0 = 0
+    setattribute self, 'debugger', $P0
     $P1 = new 'ResizablePMCArray'
     setattribute self, 'stack', $P1
     $P2 = new 'Integer'
@@ -466,6 +478,12 @@ setmode:
     $P0 = getattribute self, 'curline'
     $S0 = $P0
     .return($S0)
+.end
+
+#-----------------------------------------------------------------------
+.sub debugger :method
+    $P0 = getattribute self, 'debugger'
+    $P0 = 1
 .end
 
 #-----------------------------------------------------------------------
@@ -1361,6 +1379,7 @@ noline:
     .local pmc program
     .local pmc stack
     .local pmc iter
+    .local pmc debugger
     .local pmc tron
     .local pmc pircontrol
     .local int stopline
@@ -1374,6 +1393,7 @@ noline:
     stack = getattribute self, 'stack'
 
     tron = getattribute self, 'tron'
+    debugger = getattribute self, 'debugger'
     stopline = 0
 
     pcurline = new 'Integer'
@@ -1399,6 +1419,9 @@ runit:
     print '['
     print curline
     print ']'
+
+    unless debugger goto executeline    
+    debug_break
 
 executeline:
     program = getattribute self, 'program'

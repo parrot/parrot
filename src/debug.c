@@ -1144,6 +1144,7 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         Parrot_ex_throw_from_c_args(interp, NULL, 0, "No file loaded to debug");
 
     if (!(interp->pdb->state & PDB_BREAK)) {
+        TRACEDEB_MSG("Parrot_debugger_break - in BREAK state");
         new_runloop_jump_point(interp);
         if (setjmp(interp->current_runloop->resume)) {
             fprintf(stderr, "Unhandled exception in debugger\n");
@@ -1154,7 +1155,7 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
         interp->pdb->state     |= PDB_STOPPED;
         interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
 
-        PDB_set_break(interp, NULL);
+        /*PDB_set_break(interp, NULL);*/
 
         debugger_cmdline(interp);
 
@@ -1163,8 +1164,9 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
     }
     else {
         interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
-        PDB_set_break(interp, NULL);
+        /*PDB_set_break(interp, NULL);*/
     }
+    TRACEDEB_MSG("Parrot_debugger_break done");
 }
 
 /*
@@ -1552,6 +1554,8 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
     unsigned char    regleft;
     int              i, reg_number;
 
+    TRACEDEB_MSG("PDB_cond");
+
     /* Return if no more arguments */
     if (!(command && *command)) {
         Parrot_io_eprintf(interp->pdb->debugger, "No condition specified\n");
@@ -1928,6 +1932,7 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
         (void)PDB_program_end(interp);
     #endif
     pdb->state |= PDB_RUNNING;
+    pdb->state &= ~PDB_BREAK;
     pdb->state &= ~PDB_STOPPED;
 }
 
@@ -2299,7 +2304,9 @@ PDB_break(PARROT_INTERP)
     PDB_condition_t  *watchpoint = pdb->watchpoint;
     PDB_breakpoint_t *breakpoint;
 
+/*
     TRACEDEB_MSG("PDB_break");
+*/
 
     /* Check the watchpoints first. */
     while (watchpoint) {
