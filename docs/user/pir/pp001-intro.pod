@@ -55,7 +55,7 @@ registers. The register types are:
 
 =item S - string
 
-=item P - PMC (Parrot Magic Cookie)
+=item P - polymorphic container (PMC)
 
 =back
 
@@ -329,7 +329,7 @@ assign the string to the correct register type:
 
 With the PIR syntax shown in this article you should be able to start
 writing simple programs. Next article we will look into available
-Parrot Magic Cookies (PMCs), and how they can be used.
+Polymorphic Containers (PMCs), and how they can be used.
 
 =head2 Author
 

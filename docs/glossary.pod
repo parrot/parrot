@@ -264,14 +264,13 @@ extension C<.pir>.
 
 =item PMC
 
-Parrot Magic Cookie:  these classes are the primitives that
+Polymorphic Container:  these classes are the primitives that
 HLLs use to represent their fundamental types, such as Perl's
 scalar values.
 
-=item POD
+=item Pod
 
-(Perl's) Plain Old Documentation: the preferred form for all kinds of
-documentation in Parrot. See L<perlpod> for details.
+The preferred format for all kinds of documentation in Parrot.
 
 =item POST
 

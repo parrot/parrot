@@ -67,7 +67,7 @@ Parrot's internal string type, which contains character encoding information.
 
 =item C<Parrot_PMC>
 
-A Parrot Magic Cookie.  This is the opaque external type for (PMC *).  Note
+A Polymorphic Container.  This is the opaque external type for (PMC *).  Note
 that this is a macro, so there can be only one C<Parrot_PMC> declaration per
 line.
 

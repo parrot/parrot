@@ -37,7 +37,7 @@ significantly reduce the amount of operations and CPU time.
 To be more specific about the software CPU, it will contain a large number of
 registers. The current design provides for four groups of N registers; each
 group will hold a different data type: integers, floating-point numbers,
-strings, and PMCs. (Parrot Magic Cookies, detailed below.)
+strings, and PMCs. (Polymorphic Containers, detailed below.)
 
 Registers will be stored in register frames, which can be pushed and popped
 onto the register stack. For instance, a subroutine or a block might need its

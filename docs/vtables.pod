@@ -7,7 +7,7 @@ docs/vtables.pod - Parrot Vtables
 
 =head1 Implementing Variable Types with Vtables
 
-This is a guide to creating your own PMC (Parrot Magic Cookie) classes.  It
+This is a guide to creating your own PMC (Polymorphic Container) classes.  It
 tells you what you need to write in order to add new variable types to Parrot.
 
 =head2 Overview

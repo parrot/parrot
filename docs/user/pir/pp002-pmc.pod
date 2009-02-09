@@ -41,7 +41,7 @@ Now, on to business ...
 
 Integers, strings, and arbitrary floating point numbers are
 common data types in most programming languages, but what's
-a PMC? PMC stands for "Parrot Magic Cookie". PMCs are how
+a PMC? PMC stands for "Polymorphic Container". PMCs are how
 Parrot handles more complicated structures and behaviors
 (hence the magic :) Some examples of PMC usage would be for
 arrays, hashes, data structures, objects, etc. Anything that

@@ -62,7 +62,7 @@ for Perl 5 based test scripts.
 =head2 Testing Parrot Assembler
 
 PASM tests are mostly used for testing ops.  Appropriate test files for basic
-ops are F<t/op/*.t>.  Perl Magic Cookies are tested in F<t/pmc/*.t>.  Add the
+ops are F<t/op/*.t>.  Polymorphic Containers are tested in F<t/pmc/*.t>.  Add the
 new test like this:
 
     pasm_output_is(<<'CODE', <<'OUTPUT', "name for test");
