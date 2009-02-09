@@ -1097,6 +1097,64 @@ reasons for having multisubs in the first place!>. It's only when
 multiple functions in a single namespace need to have the same name that
 a multi is used.
 
+Multisubs take a special designator called a I<multi signature>. The multi
+signature tells Parrot what particular combination of input parameters the
+multi accepts. Each multi will have a different signature, and Parrot will
+be able to dispatch to each one depending on the arguments passed. The
+multi signature is specified in the C<:multi> directive:
+
+  .sub 'Add' :multi(I, I)
+    .param int x
+    .param int y
+    .return(x + y)
+  .end
+
+  .sub 'Add' :multi(N, N)
+    .param num x
+    .param num y
+    .return(x + y)
+  .end
+
+  .sub Start :main
+    $I0 = Add(1, 2)      # 3
+    $N0 = Add(3.14, 2.0) # 5.14
+    $S0 = Add("a", "b")  # ERROR! No (S, S) variant!
+  .end
+
+Multis can take I, N, S, and P types, but they can also use C<_> (underscore)
+to denote a wildcard, and a string that can be the name of a particular PMC
+type:
+
+  .sub 'Add' :multi(I, I)  # Two integers
+    ...
+
+  .sub 'Add' :multi(I, 'Float')  # An integer and Float PMC
+    ...
+
+                           # Two Integer PMCs
+  .sub 'Add' :multi('Integer', _)
+    ...
+
+When we call a multi PMC, Parrot will try to take the most specific
+best-match variant, and will fall back to more general variants if a perfect
+best-match cannot be found. So if we call C<'Add'(1, 2)>, Parrot will dispatch
+to the C<(I, I)> variant. If we call C<'Add'(1, "hi")>, Parrot will match the
+C<(I, _)> variant, since the string in the second argument doesn't match C<I>
+or C<'Float'>. Parrot can also choose to automatically promote one of the I,
+N, or S values to an Integer, Float, or String PMC.
+
+To make the decision about which multi variant to call, Parrot takes a
+I<Manhattan Distance> between the two. Parrot calculates the I<distance>
+between the multi signatures and the argument signature. Every difference
+counts as one step. A difference can be an autobox from a primitive type
+to a PMC, or the conversion from one primitive type to another, or the
+matching of an argument to a C<_> wildcard. After Parrot calculates the
+distance to each variant, it calls the function with the lowest distance.
+Notice that it's possible to define a variant that is impossible to call:
+for every potential combination of arguments there is a better match. This
+isn't necessarily a common occurance, but it's something to watch out for
+in systems with a lot of multis.
+
 =cut
 
 # Local variables:
