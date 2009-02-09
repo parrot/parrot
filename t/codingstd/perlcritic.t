@@ -2,10 +2,37 @@
 # Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
+=head1 NAME
+
+t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
+
+=head1 SYNOPSIS
+
+ # test all files
+ % prove t/codingstd/perlcritic.t
+
+ % perl t/codingstd/perlcritic.t [--theme=sometheme]
+
+ # test specific files
+ % perl t/codingstd/perlcritic.t src/foo.pl lib/parrot/bar.pm
+
+=head1 DESCRIPTION
+
+By default, tests all perl source files for some very specific perl coding
+violations.
+
+This test uses a standard perlcriticrc file, located in
+F<tools/utils/perlcritic.conf>
+
+If you wish to run a specific policy, the easiest way to do so is to
+temporarily add a custom theme to the configuration file and then specify
+that on the command line to this script.
+
+=cut
+
 use strict;
 use warnings;
-
-use lib qw{lib};
+use lib qw( lib ../lib ../../lib );
 
 use File::Spec;
 use Getopt::Long;
@@ -29,7 +56,7 @@ GetOptions(
     'theme=s'   => \$theme
 );
 
-my $config = File::Spec->catfile( qw{tools util perlcritic.conf} );
+my $config = File::Spec->catfile( $PConfig{build_dir}, qw{tools util perlcritic.conf} );
 
 Test::Perl::Critic->import(
     -profile => $config,
@@ -52,18 +79,7 @@ if ( !@ARGV ) {
              grep { $_->read !~ m/use v6;/ }
              $dist->get_perl_language_files();
 } else {
-    my $node = shift;
-    if (-f $node) {
-        @files = ($node);
-    } elsif (-d $node) {
-
-        $node = File::Spec->rel2abs( $node );
-        @files = grep { m/^$node/ }
-                 map { $_->path }
-                 $dist->get_perl_language_files();
-    } else {
-        die "invalid file '$node' specified.\n";
-    }
+    @files = <@ARGV>;
 }
 
 plan(tests => scalar(@files));
@@ -74,37 +90,6 @@ sub give_up {
   plan(skip_all => "$excuse required to criticize code.");
   exit;
 }
-
-
-__END__
-
-=head1 NAME
-
-t/codingstd/perlcritic.t - use perlcritic for perl coding stds.
-
-=head1 SYNOPSIS
-
- % prove t/codingstd/perlcritic.t
-
- % perl t/codingstd/perlcritic.t [--theme=sometheme] [file|directory]
-
-=head1 DESCRIPTION
-
-By default, tests all perl source files for some very specific perl coding
-violations.
-
-Optionally specify a file on the command line to test B<only>
-that file. If you specify a directory, any perl files under that directory
-are tested.
-
-This test uses a standard perlcriticrc file, located in
-F<tools/utils/perlcritic.conf>
-
-If you wish to run a specific policy, the easiest way to do so is to
-temporarily add a custom theme to the configuration file and then specify
-that on the command line to this script.
-
-=cut
 
 # Local Variables:
 #   mode: cperl
