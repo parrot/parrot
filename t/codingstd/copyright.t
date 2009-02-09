@@ -46,7 +46,7 @@ my ( @no_copyright_files, @outdated_copyright_files );
 my @gmtime       = gmtime(time);
 my $current_year = $gmtime[5] + 1900;
 my $copyright_text =
-    "Copyright \\(C\\) (\\d{4}\\-$current_year|$current_year), The Perl Foundation.";
+    "Copyright \\(C\\) (\\d{4}\\-$current_year|$current_year), Parrot Foundation.";
 
 foreach my $file (@files) {
 
