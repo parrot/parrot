@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
 # gen_makefiles-01.t
 
@@ -11,11 +11,11 @@ BEGIN {
     @cond_tests =
       (
        # perl-syntax       true or false
-       ["IF(true)", 		1],
-       ["IF(false)", 		0],
-       ["UNLESS(true)",	        0],
-       ["UNLESS(false)",	1],
-       ["IF(true | false)",	1],
+       ["IF(true)",             1],
+       ["IF(false)",            0],
+       ["UNLESS(true)",         0],
+       ["UNLESS(false)",        1],
+       ["IF(true | false)",     1],
        ["IF(true & false)",     0],
        ["IF(true or true)",     1],
        ["IF(true or false)",    1],
@@ -27,16 +27,16 @@ BEGIN {
        ["IF(false and false)",  0],
        ["UNLESS(true|false)",   0],
        ["UNLESS(true&false)",   1],
-       ["IF(!false)", 		1],
-       ["IF(true)", 		1],
-       ["ELSIF(value)", 	0],
-       ["ELSE", 	        0],
-       ["IF(false)", 		0],
-       ["ELSIF(value)", 	1],
-       ["ELSE", 	        0],
-       ["IF(false)", 		0],
-       ["ELSIF(false)", 	0],
-       ["ELSE", 	        1],
+       ["IF(!false)",           1],
+       ["IF(true)",             1],
+       ["ELSIF(value)",         0],
+       ["ELSE",                 0],
+       ["IF(false)",            0],
+       ["ELSIF(value)",         1],
+       ["ELSE",                 0],
+       ["IF(false)",            0],
+       ["ELSIF(false)",         0],
+       ["ELSE",                 1],
        # Exercise the parser
        ["IF(true and (!false and value))",  1],
        ["IF(true and (!false) and value)",  1],
@@ -54,10 +54,10 @@ BEGIN {
        ["IF(not (false or value))",         0],
        ["IF(true and not false)",           1],
        # platform
-       ["IF(someplatform)",		    1],
-       ["IF(not someplatform)",		    0],
-       ["UNLESS(someplatform)",		    0],
-       ["UNLESS(not someplatform)",	    1],
+       ["IF(someplatform)",                 1],
+       ["IF(not someplatform)",             0],
+       ["UNLESS(someplatform)",             0],
+       ["UNLESS(not someplatform)",         1],
        # key==value
        ["IF(value==xx)",                    1],
        ["IF(value==xxy)",                   0],
@@ -65,21 +65,24 @@ BEGIN {
        ["UNLESS(value==xxy)",               1],
        ["IF(true & (value==xx & (!false)))",1],
        # These are invalid:
-       #["IF(value == xx)",                  0], # invalid op error
-       #["IF(value = xx)",                   0], # invalid op error
+       #["IF(value == xx)",                 0], # invalid op error
+       #["IF(value = xx)",                  0], # invalid op error
        ["IF(value=xx)",                     0], # also invalid, no warning. checks for key value=xx
 
        # Legacy syntax                 true or false
-       ["CONDITIONED_LINE(true)", 	    1],
+       ["CONDITIONED_LINE(true)",           1],
        ["INVERSE_CONDITIONED_LINE(true)",   0],
-       ["CONDITIONED_LINE(false)", 	    0],
+       ["CONDITIONED_LINE(false)",          0],
        ["INVERSE_CONDITIONED_LINE(false)",  1],
       );
 }
-use Test::More tests => (8 + scalar(@cond_tests));
+
+use Test::More tests => (8 + @cond_tests);
 use Carp;
 use lib qw( . lib );
+
 use_ok('config::gen::makefiles');
+
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw(
@@ -96,16 +99,20 @@ my ($args, $step_list_ref) = process_options(
     }
 );
 
-my $conf = Parrot::Configure->new;
-my $pkg = q{gen::makefiles};
+my $conf = Parrot::Configure->new();
+my $pkg  = 'gen::makefiles';
+
 $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
-my $step = test_step_constructor_and_description($conf);
+
+my $step           = test_step_constructor_and_description($conf);
 my $missing_SOURCE = 0;
-my %makefiles = %{ $step->{makefiles} };
+my %makefiles      = %{ $step->{makefiles} };
+
 foreach my $k ( keys %makefiles ) {
     $missing_SOURCE++ unless (-f $makefiles{$k}{SOURCE});
 }
+
 is($missing_SOURCE, 0, "No Makefile source file missing");
 ok(-f $step->{CFLAGS_source}, "CFLAGS source file located");
 
@@ -121,27 +128,36 @@ sub result {
     $s =~ s/[\()]//g;
     $s =~ s/ /_/g;
     $s .= ("_".++$index) if $s =~ /^(ELSE|ELSIF)/;
+
     return $s."=".($c->[1]?"true":"false");
 }
+
 # test #IF(keys):line
 $conf->data->set( @conf_args, ('osname' => 'someplatform' ) );
+
 open my $IN, ">", "Makefile_$$.in";
 print $IN "# There should only be =true results in .out\n";
 for my $c (@cond_tests) {
     my $result = result($c);
     print $IN "#$c->[0]:$result\n";
 }
+
 close $IN;
+
 $conf->genfile("Makefile_$$.in", "Makefile_$$.out",
-	       (makefile => 1, conditioned_lines => 1));
+           (makefile => 1, conditioned_lines => 1));
+
 open my $OUT, "<", "Makefile_$$.out";
+
 my $f;
 {
     local $/;
     $f = <$OUT>;
 }
+
 close $OUT;
 $index = undef;
+
 for my $c (@cond_tests) {
     my $result = result($c);
     if ($c->[2] and $c->[2] =~ /^TODO(.*)$/) {
@@ -164,13 +180,15 @@ eval {
     $conf->genfile("Makefile_$$.in", "Makefile_$$.out",
                    (makefile => 1, conditioned_lines => 1));
 };
+
 my $error = $@;
 ok($error eq "invalid op \"bla\" in \"IF(bla)\" at \"(bla)\" at Makefile_$$.in line 2\n",
    "report correct error line");
 
 pass("Completed all tests in $0");
+
 END {
-    unlink "Makefile_$$.in", "Makefile_$$.out";
+    unlink "Makefile_$$.in", "Makefile_$$.out", "Makefile_$$.out.tmp";
 }
 
 ################### DOCUMENTATION ###################
