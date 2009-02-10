@@ -52,10 +52,6 @@ FixedStringArray:\s\d+\.\d+s\n
 \n
 1\s\*\s1000\s=\s1000\n
 100\s\*\s1000\s=\s100000\n
-IntList:\s\d+\.\d+s\n
-\n
-1\s\*\s1000\s=\s1000\n
-100\s\*\s1000\s=\s100000\n
 ResizableFloatArray:\s\d+\.\d+s\n
 \n
 1\s\*\s1000\s=\s1000\n
