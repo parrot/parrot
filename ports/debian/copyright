@@ -15,9 +15,6 @@ compilers/imcc/imcc.y, compilers/imcc/main.c, compilers/imcc/parser_util.c,
 languages/cola/:
 Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
 
-languages/regex/lib/Regex/Grammar.pm:
-(c) Copyright 1998-2001 Francois Desarmenien, all rights reserved.
-
 languages/urm:
 2003 (c) by Marcus Thiesen
 
