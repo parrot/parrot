@@ -1440,7 +1440,7 @@ runit:
     print curline
     print ']'
 
-    unless debugger goto executeline    
+    unless debugger goto executeline
     debug_break
 
 executeline:
@@ -1617,7 +1617,7 @@ finish:
     debugger = getattribute self, 'debugger'
 
     say 'Ready'
-    
+
 reinit:
     unless debugger goto doreadline
     debug_break
