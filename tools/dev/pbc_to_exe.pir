@@ -25,6 +25,7 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     .local string objfile
     .local string exefile
     .local string out
+    .local int    closeresult
 
     (infile, cfile, objfile, exefile) = 'handle_args'(argv)
     unless infile > '' goto err_infile
@@ -77,7 +78,11 @@ HEADER
         }
 MAIN
 
-    close outfh
+    # The close opcode does not return a result code,
+    # use the method instead.
+    closeresult = outfh.'close'()
+    unless closeresult == 0 goto err_close
+
     'compile_file'(cfile, objfile)
     'link_file'(objfile, exefile)
     .return ()
@@ -86,6 +91,8 @@ MAIN
     die "cannot read infile"
   err_outfh:
     die "cannot write outfile"
+  err_close:
+    die "cannot close outfile"
 .end
 
 

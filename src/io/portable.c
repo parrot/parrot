@@ -224,14 +224,17 @@ INTVAL
 Parrot_io_close_portable(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_close_portable)
+    INTVAL result = 0;
     FILE * const fptr = (FILE *)Parrot_io_get_os_handle(interp, filehandle);
 
-    if (fptr)
-        fclose(fptr);
+    if (fptr) {
+        if (fclose(fptr) != 0)
+            result = errno;
+    }
 
     Parrot_io_set_os_handle(interp, filehandle, (PIOHANDLE)NULL);
 
-    return 0;
+    return result;
 }
 
 

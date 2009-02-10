@@ -331,14 +331,16 @@ INTVAL
 Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 {
     ASSERT_ARGS(Parrot_io_close_unix)
+    INTVAL result = 0;
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
     /* BSD and Solaris need explicit fsync() */
     if (file_descriptor >= 0) {
         fsync(file_descriptor);
-        close(file_descriptor);
+        if (close(file_descriptor) != 0)
+            result = errno;
     }
     Parrot_io_set_os_handle(interp, filehandle, -1);
-    return 0;
+    return result;
 }
 
 /*
