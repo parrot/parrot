@@ -203,7 +203,6 @@ sub run {
     return system(@_) == 0;
 }
 
-# TT #289: ordering of libs might be crucial
 sub gather_groups_and_libs {
     my @pmcs = @_;
 
