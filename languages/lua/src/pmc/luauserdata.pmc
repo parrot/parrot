@@ -23,10 +23,11 @@ the Lua C<Userdata> type.
 
 #define u_val(pmc) (PARROT_LUAUSERDATA(pmc))->val
 #define u_env(pmc) (PARROT_LUAUSERDATA(pmc))->env
+#define u_mt(pmc)  (PARROT_LUAUSERDATA(pmc))->mt
 
 PMC *
 _LuaUserdata_get_metatable(PARROT_INTERP, PMC *obj) {
-    return PMC_metadata(obj);
+    return u_mt(obj);
 }
 
 static PMC* curr_func(PARROT_INTERP) {
@@ -46,12 +47,11 @@ static PMC* curr_func(PARROT_INTERP) {
 }
 
 static PMC* getcurrenv(PARROT_INTERP) {
-    PMC *env = NULL;
-    PMC *sub = curr_func(interp);
+    PMC * const sub = curr_func(interp);
     if (sub) {
-        env = PMC_metadata(sub);
+        return PMC_metadata(sub);
     }
-    return env;
+    return NULL;
 }
 
 
@@ -65,6 +65,7 @@ pmclass LuaUserdata
 
     ATTR PMC    *val;
     ATTR PMC    *env;
+    ATTR PMC    *mt;
 
 /*
 
@@ -79,7 +80,6 @@ Initializes the userdata.
         Parrot_LuaUserdata_attributes *u = mem_allocate_zeroed_typed(Parrot_LuaUserdata_attributes);
         PMC_data(SELF) = u;
         u_env(SELF) = getcurrenv(INTERP);
-        PMC_metadata(SELF) = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -97,8 +97,8 @@ Marks the userdata as live.
             pobject_lives(INTERP, (PObj *)u_val(SELF));
         if (u_env(SELF))
             pobject_lives(INTERP, (PObj *)u_env(SELF));
-        if (PMC_metadata(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_metadata(SELF));
+        if (u_mt(SELF))
+            pobject_lives(INTERP, (PObj *)u_mt(SELF));
     }
 
 /*
@@ -167,9 +167,9 @@ Return the string "userdata".
 */
     VTABLE void set_pmc(PMC *value) {
         /* TODO: should be get_attr_str() and getfenv() */
-        u_val(SELF)        = u_val(value);
-        u_env(SELF)        = u_env(value);
-        PMC_metadata(SELF) = PMC_metadata(value);
+        u_val(SELF) = u_val(value);
+        u_env(SELF) = u_env(value);
+        u_mt(SELF)  = u_mt(value);
     }
 
 /*
@@ -212,8 +212,8 @@ The C<==> operation. Compares reference (not in depth).
     MULTI INTVAL is_equal(LuaUserdata value) {
         PMC * const meth = _LuaAny_find_meth(INTERP, SELF, "__eq");
         if (meth) {
-            PMC *retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
-                                                   SELF, value);
+            PMC * const retval = Parrot_runops_fromc_args(INTERP, meth, "PPP",
+                                                          SELF, value);
             if (PMC_IS_NULL(retval))
                 return (INTVAL)0;
 
@@ -366,9 +366,9 @@ The C<==> operation. Compares reference (not in depth).
 */
     METHOD void set_metatable(PMC *meta) {
         if (dynpmc_LuaNil == PMC_type(meta))
-            PMC_metadata(SELF) = NULL;
+            u_mt(SELF) = NULL;
         else
-            PMC_metadata(SELF) = meta;
+            u_mt(SELF) = meta;
     }
 
 }
