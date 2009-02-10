@@ -58,3 +58,20 @@ Either long and time-consuming, or Just Plain Evil.
 
 * Try and make a GUI app run!
 
+The following tickets were stored in parrot's RT system.
+
+They have now been marked as rejected in that system, but are listed
+here for posterity, so they can easily be migrated into dotnet's new
+ticketing system, whatever that may be.
+
+#58590: [PATCH] dotnet make
+  http://rt.perl.org/rt3/Ticket/Display.html?id=58590
+
+#48130: [TODO] [dotnet] Why does sig_token have to be set to 0xFFFF in make_bytecde_pmc()?
+  http://rt.perl.org/rt3/Ticket/Display.html?id=48130
+
+#48128: [TODO] [dotnet] Does a null first byte need special handling in dotnetsignature.pmc?
+  http://rt.perl.org/rt3/Ticket/Display.html?id=48128
+
+#42349: [TODO] dotnet - fix various ops for 64 bit architectures
+  http://rt.perl.org/rt3/Ticket/Display.html?id=42349
