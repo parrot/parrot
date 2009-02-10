@@ -858,6 +858,132 @@ Those values added as attributes don't need to be strings, even though
 both of the ones in the example are. They can be integers, numbers
 or PMCs too.
 
+=head1 Input and Output
+
+Like almost everything else in Parrot, input and output are handled by PMCs.
+Using the C<print> opcode or the C<say> opcode like we've already seen in
+some examples does this internally without your knowledge. However, we can
+do it explicitly too. First we'll talk about basic I/O, and then we will talk
+about using PMC-based filehandles for more advanced operations.
+
+=head2 Basic I/O Opcodes
+
+We've seen C<print> and C<say>. These are carry-over artifacts from Perl, when
+Parrot was simply the VM backend to the Perl 6 language. C<print> prints
+the given string argument, or the stringified form of the argument, if it's
+not a string, to standard output. C<say> does the same thing but also appends
+a trailing newline to it. Another opcode worth mentioning is the C<printerr>
+opcode, which prints an argument to the standard error output instead.
+
+We can read values from the standard input using the C<read> and C<readline>
+ops. C<read> takes an integer value and returns a string with that many
+characters. C<readline> reads an entire line of input from the standard
+input, and returns the string without the trailing newline. Here is a simple
+echo program that reads in characters from the user and echos them to
+standard output:
+
+  .sub main
+    loop_top:
+      $S0 = read 10
+      print $S0
+      goto loop_top
+  .end
+
+=head2 Filehandles
+
+The ops we have seen so far are useful if all your I/O operations are limited
+to the standard streams. However, there are plenty of other places where
+you might want to get data from and send data to. Things like files, sockets,
+and databases all might need to have data sent to them. These things can be
+done by using a file handle.
+
+Filehandles are PMCs that describe a file and keep track of an I/O operations
+internal state. We can get Filehandles for the standard streams using dedicated
+opcodes:
+
+  $P0 = getstdin    # Standard input handle
+  $P1 = getstdout   # Standard output handle
+  $P2 = getstderr   # Standard error handle
+
+If we have a file, we can create a handle to it using the C<open> op:
+
+  $P0 = open "my/file/name.txt"
+
+We can also specify the exact mode that the file handle will be in:
+
+  $P0 = open "my/file/name.txt", "wa"
+
+The mode string at the end should be familiar to C programmers, because they
+are mostly the same values:
+
+  r  : read
+  w  : write
+  wa : append
+  p  : pipe
+
+So if we want a handle that we can read and write to, we write the mode string
+C<"rw">. If we want to be able to read and write to it, but we don't want
+write operations to overwrite the existing contents, we use C<"rwa"> instead.
+
+When we are done with a filehandle that we've created, we can shut it down
+with the C<close> op. Notice that we don't want to be closing any of the
+standard streams.
+
+  close $P0
+
+With a filehandle, we can perform all the same operations as we could earlier,
+but we pass the filehandle as an additional argument to tell the op where to
+write or read the data from.
+
+  print "hello"       # Write "hello!" to STDOUT
+
+  $P0 = getstdout
+  print $P0, "hello"  # Same, but more explicit
+
+  say $P0, " world!"  # say to STDOUT
+
+  $P1 = open "myfile.txt", "wa"
+  print $P1, "foo"    # Write "foo" to myfile.txt
+
+=head2 Filehandle PMCs
+
+Let's see a little example of a program that reads in data from a file, and
+prints it to STDOUT.
+
+  .sub main
+    $P0 = getstdout
+    $P1 = open "myfile.txt", "r"
+    loop_top:
+      $S0 = readline $P1
+      say $P0, $S0
+      if $P1 goto loop_top
+    close $P1
+  .end
+
+This example shows that treating a filehandle PMC like a boolean value
+returns whether or not we have reached the end of the file. A true return
+value means there is more file to read. A false return value means we are at
+the end. In addition to this behavior, Filehandle PMCs have a number of methods
+that can be used to perform various operations. 
+
+  $P0.'open'()
+  $P0.'isatty'()
+  $P0.'close'()
+  $P0.'is_closed'()
+  $P0.'read'()
+  $P0.'readline'()
+  $P0.'readline_interactive'()
+  $P0.'readall'()
+  $P0.'flush'()
+  $P0.'print'()
+  $P0.'puts'()
+  $P0.'buffer_tpe'()
+  $P0.'buffer_size'()
+  $P0.'mode'()
+  $P0.'encoding'()
+  $P0.'eof'()
+  $P0.'get_fd'()
+
 =head1 Exceptions
 
 Parrot includes a robust exception mechanism that is not only used internally
