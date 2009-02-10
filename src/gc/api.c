@@ -13,7 +13,7 @@ The collector itself is composed of various interchangable cores that each
 may operate very differently internally. The functions in this file can be used
 throughtout Parrot without having to be concerned about the internal operations
 of the GC. This is documented in PDD 9 with supplementary notes in
-F<docs/dev/dod.pod> and F<docs/memory_internals.pod>.
+F<docs/memory_internals.pod>.
 
 =head1 FUNCTIONS
 
@@ -523,8 +523,7 @@ Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)
 
 =head1 SEE ALSO
 
-F<include/parrot/gc_api.h>, F<src/cpu_dep.c>, F<docs/dev/dod.dev> and
-F<docs/pdds/pdd09_gc.pod>.
+F<include/parrot/gc_api.h>, F<src/cpu_dep.c> and F<docs/pdds/pdd09_gc.pod>.
 
 =head1 HISTORY
 

@@ -603,7 +603,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
     Arenas *arena_base;
 
     /*
-     * If the object is shared, we have to use the arena and dod
+     * If the object is shared, we have to use the arena and gc
      * pointers of the originating interpreter.
      *
      * We are possibly changing another interpreter's data here, so
@@ -705,7 +705,7 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         }
     }
 
-    /* requires that num_free_objects be updated in Parrot_do_gc_run. If dod
+    /* requires that num_free_objects be updated in Parrot_do_gc_run. If gc
      * is disabled, then we must check the free list directly. */
     if (!pool->free_list)
         (*pool->alloc_objects) (interp, pool);

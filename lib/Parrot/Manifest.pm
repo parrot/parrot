@@ -160,7 +160,6 @@ sub _get_special {
         docs/compiler_faq.pod                           [devel]doc
         docs/configuration.pod                          [devel]doc
         docs/debug.pod                                  [devel]doc
-        docs/dev/dod.pod                                [devel]doc
         docs/dev/events.pod                             [devel]doc
         docs/dev/fhs.pod                                [devel]doc
         docs/dev/infant.pod                             [devel]doc
