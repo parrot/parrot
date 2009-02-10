@@ -41,7 +41,6 @@ use Parrot::Docs::Section::IMCC;
 use Parrot::Docs::Section::Perl;
 use Parrot::Docs::Section::Libs;
 use Parrot::Docs::Section::Tools;
-use Parrot::Docs::Section::BigNum;
 use Parrot::Docs::Section::Compilers;
 use Parrot::Docs::Section::Languages;
 use Parrot::Docs::Section::Config;
@@ -65,7 +64,6 @@ sub new {
         Parrot::Docs::Section::C->new,         Parrot::Docs::Section::Ops->new,
         Parrot::Docs::Section::IMCC->new,      Parrot::Docs::Section::Perl->new,
         Parrot::Docs::Section::Libs->new,      Parrot::Docs::Section::Tools->new,
-        Parrot::Docs::Section::BigNum->new,    Parrot::Docs::Section::Compilers->new,
         Parrot::Docs::Section::Languages->new, Parrot::Docs::Section::Config->new,
         Parrot::Docs::Section::Tests->new,     Parrot::Docs::Section::EditorPlugins->new,
     );
@@ -129,8 +127,6 @@ sub write_docs {
 =item C<Parrot::Docs::Section::Libs>
 
 =item C<Parrot::Docs::Section::Tools>
-
-=item C<Parrot::Docs::Section::BigNum>
 
 =item C<Parrot::Docs::Section::Compilers>
 
