@@ -436,7 +436,7 @@ Parrot_gc_profile_start(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_profile_start)
     if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
-        interp->profile->dod_time = Parrot_floatval_time();
+        interp->profile->gc_time = Parrot_floatval_time();
 }
 
 /*
@@ -459,18 +459,18 @@ Parrot_gc_profile_end(PARROT_INTERP, int what)
         const FLOATVAL     now     = Parrot_floatval_time();
 
         profile->data[what].numcalls++;
-        profile->data[what].time += now - profile->dod_time;
+        profile->data[what].time += now - profile->gc_time;
 
         /*
          * we've recorded the time of a DOD/GC piece from
-         * dod_time until now, so add this to the start of the
+         * gc_time until now, so add this to the start of the
          * currently executing opcode, which hasn't run this
          * interval.
          */
-        profile->starttime += now - profile->dod_time;
+        profile->starttime += now - profile->gc_time;
 
         /* prepare start for next step */
-        profile->dod_time   = now;
+        profile->gc_time    = now;
     }
 }
 

@@ -141,7 +141,7 @@ typedef struct Arenas {
     /*
      * statistics for DOD and GC
      */
-    size_t  dod_runs;           /* Number of times we've done a DOD sweep */
+    size_t  gc_runs;           /* Number of times we've done a DOD sweep */
     size_t  lazy_gc_runs;       /* Number of successful lazy DOD sweep */
     size_t  collect_runs;       /* Number of times we've
                                  * done a memory compaction

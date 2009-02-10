@@ -1863,7 +1863,7 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
     }
 
     /* normal or lazy DOD run */
-    arena_base->dod_runs++;
+    arena_base->gc_runs++;
     arena_base->lazy_gc = (flags & GC_lazy_FLAG);
     gc_gms_init_mark(interp);
     if (gc_gms_trace_root(interp, !arena_base->lazy_gc) &&

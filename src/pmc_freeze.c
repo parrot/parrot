@@ -1823,7 +1823,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
 {
     ASSERT_ARGS(run_thaw)
     visit_info info;
-    int dod_block = 0;
+    int gc_block = 0;
     const UINTVAL bufused = image->bufused;
 
     info.image = image;
@@ -1842,7 +1842,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
         Parrot_do_gc_run(interp, 1);
         Parrot_block_GC_mark(interp);
         Parrot_block_GC_sweep(interp);
-        dod_block = 1;
+        gc_block = 1;
     }
 
     info.what = what;   /* _NORMAL or _CONSTANTS */
@@ -1863,7 +1863,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
     image->bufused = bufused;
     PARROT_ASSERT(image->strstart >= (char *)PObj_bufstart(image));
 
-    if (dod_block) {
+    if (gc_block) {
         Parrot_unblock_GC_mark(interp);
         Parrot_unblock_GC_sweep(interp);
     }

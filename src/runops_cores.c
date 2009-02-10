@@ -350,7 +350,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     Arenas * const arena_base = interp->arena_base;
     Interp *debugger;
 
-    dod = arena_base->dod_runs;
+    dod = arena_base->gc_runs;
     gc = arena_base->collect_runs;
     if (interp->pdb) {
         debugger = interp->pdb->debugger;
@@ -398,8 +398,8 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         DO_OP(pc, interp);
         trace_op(interp, code_start, code_end, pc);
 
-        if (dod != arena_base->dod_runs) {
-            dod = arena_base->dod_runs;
+        if (dod != arena_base->gc_runs) {
+            dod = arena_base->gc_runs;
             Parrot_io_eprintf(debugger, "       DOD\n");
         }
 

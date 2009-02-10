@@ -236,7 +236,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     }
 
     /* Note it */
-    arena_base->dod_runs++;
+    arena_base->gc_runs++;
     --arena_base->DOD_block_level;
 
     return;

@@ -246,7 +246,7 @@ interpinfo(PARROT_INTERP, INTVAL what)
             ret = arena_base->memory_allocated;
             break;
         case DOD_RUNS:
-            ret = arena_base->dod_runs;
+            ret = arena_base->gc_runs;
             break;
         case LAZY_DOD_RUNS:
             ret = arena_base->lazy_gc_runs;

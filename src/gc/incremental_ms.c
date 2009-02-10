@@ -980,7 +980,7 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
             (void)parrot_gc_ims_collect(interp, 0);
             break;
         case GC_IMS_FINISHED:
-            ++arena_base->dod_runs;
+            ++arena_base->gc_runs;
             g_ims->state = GC_IMS_CONSUMING;
             /* fall through */
         case GC_IMS_CONSUMING:
@@ -1049,7 +1049,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
     }
 
     /* make the test happy that checks the count ;) */
-    arena_base->dod_runs++;
+    arena_base->gc_runs++;
 
     lazy = flags & GC_lazy_FLAG;
 
