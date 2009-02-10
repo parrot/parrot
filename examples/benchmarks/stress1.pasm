@@ -12,7 +12,7 @@ examples/benchmarks/stress1.pasm - GC stress-testing
 =head1 DESCRIPTION
 
 Creates 500 arrays with 20000 elements each. Prints out the number of
-DOD runs made.
+GC runs made.
 
 =cut
 
@@ -53,7 +53,7 @@ ol2:	bsr buildarray
 	interpinfo I1, 2
 	print "\nA total of "
 	print I1
-	print " DOD runs were made\n"
+	print " GC runs were made\n"
 
 	dec I20
 	if I20, mloop

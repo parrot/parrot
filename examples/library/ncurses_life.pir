@@ -180,7 +180,7 @@ getout:
     interpinfo $I1, 2
     print "A total of "
     print $I1
-    say " DOD runs were made"
+    say " GC runs were made"
 
     interpinfo $I1, 3
     print "A total of "

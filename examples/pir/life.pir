@@ -111,7 +111,7 @@ getout:	time $N6
 	interpinfo $I1, 2
 	print "A total of "
 	print $I1
-	print " DOD runs were made\n"
+	print " GC runs were made\n"
 
 	interpinfo $I1, 3
 	print "A total of "

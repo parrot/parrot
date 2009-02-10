@@ -55,8 +55,8 @@ From C<perldoc perlthrtut>:
 # translate to PIR by leo
 
 # Runs here (i386/linux 256MB mem) w.
-#  ARENA_DOD_FLAGS = 1    MAX=500   (~  95 threads)
-#  ARENA_DOD_FLAGS = 0    MAX=1000  (~ 168 threads)
+#  ARENA_GC_FLAGS = 1    MAX=500   (~  95 threads)
+#  ARENA_GC_FLAGS = 0    MAX=1000  (~ 168 threads)
 
 
 .sub _main

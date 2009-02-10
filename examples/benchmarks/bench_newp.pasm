@@ -20,7 +20,7 @@ prints out some statistics indicating:
 
 =item * the total number of bytes allocated
 
-=item * the total of DOD runs made
+=item * the total of GC runs made
 
 =item * the total number of collection runs made
 
@@ -64,7 +64,7 @@ fill:	new P1, 'Integer'
 	interpinfo I1, 2
 	print "A total of "
 	print I1
-	print " DOD runs were made\n"
+	print " GC runs were made\n"
 	interpinfo I1, 3
 	print "A total of "
 	print I1

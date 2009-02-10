@@ -15,7 +15,7 @@ Creates a lot of PMCs, and then prints out some statistics indicating:
 
 =over 4
 
-=item * the total number of DOD runs made
+=item * the total number of GC runs made
 
 =item * the number of active PMCs
 
@@ -61,7 +61,7 @@ l2:
 	interpinfo I1, 2
 	print "A total of "
 	print I1
-	print " DOD runs were made\n"
+	print " GC runs were made\n"
 	interpinfo I1, 4
 	print I1
 	print " active PMCs\n"
