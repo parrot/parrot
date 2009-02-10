@@ -386,7 +386,7 @@ None.
 
 None.
 
-=head1 References
+=head2 References
 
 =over 4
 
