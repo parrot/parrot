@@ -36,7 +36,7 @@ WriteMakefile(
     'PREREQ_PM'    => { 'ExtUtils::CBuilder' => 0 },
 #IF(win32):    'LIBS'         => [ $config{C_LIBS} ],
 #ELSE:    'LIBS'         => [ $config{ALL_PARROT_LIBS} ],
-#IF(win32):    'OBJECT'       => "@libparrot_ldflags@ Embed@o@",
+#IF(win32):    'OBJECT'       => q|@libparrot_ldflags@ Embed@o@|,
     'INC'          => "-I$config{INCLUDE}",
     'PM'           => { map { $_ => "blib/$_" } <lib/Parrot/*pm> },
     'clean'        => { FILES => '*.xs t/greet.pbc' },

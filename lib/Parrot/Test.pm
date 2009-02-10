@@ -966,9 +966,7 @@ sub _generate_test_functions {
                           ? ""
                           : "-L$PConfig{blib_dir} "))
                         . ($^O =~ m/MSWin32/
-                          ? File::Spec->join(
-                              @PConfig{qw/build_dir libparrot_ldflags/},
-                          )
+                          ? $PConfig{libparrot_ldflags}
                           : "-lparrot")
                       : File::Spec->join(
                           @PConfig{qw/build_dir blib_dir libparrot_static/},
