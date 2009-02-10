@@ -45,6 +45,7 @@ sub runstep {
             }
         }
         else {
+            $link =~ s/\bcc\b/CC/;
             unless ($conf->data->get('rpath')) {
                 $conf->data->set( 'rpath', '-R' );
             }
