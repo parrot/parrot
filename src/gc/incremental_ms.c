@@ -1011,7 +1011,7 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
 
 =item C<static void parrot_gc_ims_run>
 
-Interface to C<Parrot_do_dod_run>. C<flags> is one of:
+Interface to C<Parrot_do_gc_run>. C<flags> is one of:
 
   GC_lazy_FLAG   ... timely destruction
   GC_finish_FLAG ... run until live bits are clear

@@ -348,7 +348,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
-    Parrot_do_dod_run(interp, GC_finish_FLAG);
+    Parrot_do_gc_run(interp, GC_finish_FLAG);
 
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data

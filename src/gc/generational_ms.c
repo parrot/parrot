@@ -741,7 +741,7 @@ gc_gms_more_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     if (pool->skip)
         pool->skip = 0;
     else if (pool->last_Arena) {
-        Parrot_do_dod_run(interp, GC_trace_stack_FLAG);
+        Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
         if (pool->num_free_objects <= pool->replenish_level)
             pool->skip = 1;
     }
@@ -1829,7 +1829,7 @@ gc_gms_end_cycle(PARROT_INTERP)
 
 =item C<static void parrot_gc_gms_run>
 
-Interface to C<Parrot_do_dod_run>. C<flags> is one of:
+Interface to C<Parrot_do_gc_run>. C<flags> is one of:
 
   GC_lazy_FLAG   ... timely destruction
   GC_finish_FLAG ... run a final sweep to destruct objects at

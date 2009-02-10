@@ -85,7 +85,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING * new_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-void Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
+void Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 void Parrot_gc_free_buffer(SHIM_INTERP,
@@ -143,7 +143,7 @@ void Parrot_gc_profile_start(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_do_dod_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_do_gc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \

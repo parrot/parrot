@@ -1839,7 +1839,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
      * collected under us.
      */
     if (1 || (Parrot_str_byte_length(interp, image) > THAW_BLOCK_DOD_SIZE)) {
-        Parrot_do_dod_run(interp, 1);
+        Parrot_do_gc_run(interp, 1);
         Parrot_block_GC_mark(interp);
         Parrot_block_GC_sweep(interp);
         dod_block = 1;

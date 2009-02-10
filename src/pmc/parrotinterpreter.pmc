@@ -702,7 +702,7 @@ Finish thawing.
     }
 
     METHOD run_gc() {
-        Parrot_do_dod_run(PMC_data_typed(SELF, Parrot_Interp), 0);
+        Parrot_do_gc_run(PMC_data_typed(SELF, Parrot_Interp), 0);
     }
 
 /*

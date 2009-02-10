@@ -500,7 +500,7 @@ Parrot_gc_ms_run_init(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_do_dod_run>
+=item C<void Parrot_do_gc_run>
 
 Calls the configured garbage collector to find and reclaim unused
 headers.
@@ -510,9 +510,9 @@ headers.
 */
 
 void
-Parrot_do_dod_run(PARROT_INTERP, UINTVAL flags)
+Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)
 {
-    ASSERT_ARGS(Parrot_do_dod_run)
+    ASSERT_ARGS(Parrot_do_gc_run)
     interp->arena_base->do_gc_mark(interp, flags);
     parrot_gc_context(interp);
 }

@@ -1219,10 +1219,10 @@ Trigger a dead object detection (DOD) sweep unconditionally.
 
 op sweep(inconst INT) {
     if ($1)
-        Parrot_do_dod_run(interp, 0);
+        Parrot_do_gc_run(interp, 0);
     else
         if (interp->arena_base->num_early_DOD_PMCs)
-            Parrot_do_dod_run(interp, GC_lazy_FLAG);
+            Parrot_do_gc_run(interp, GC_lazy_FLAG);
 }
 
 =item B<collect>()
