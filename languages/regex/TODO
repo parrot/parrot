@@ -1,0 +1,11 @@
+The following tickets were stored in parrot's RT system.
+
+They have now been marked as rejected in that system, but are listed
+here for posterity, so they can easily be migrated into regex's new
+ticketing system, whatever that may be.
+
+#48168: [TODO] [regex] Implement init_pmc
+  http://rt.perl.org/rt3/Ticket/Display.html?id=48168
+
+#48170: [TODO] [regex] Remove 'use of uninitialized value' issues in match.pmc
+  http://rt.perl.org/rt3/Ticket/Display.html?id=48170
