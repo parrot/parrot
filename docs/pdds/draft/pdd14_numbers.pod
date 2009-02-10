@@ -1,24 +1,22 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Numbers
 
-docs/pdds/pdd14_numbers.pod - Parrot Numbers
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes Parrot's numeric data types.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 This PDD details the basic numeric datatypes that the Parrot core knows how to
 deal with, including the core numeric PMCs.
 
-=head2 Integer data types
+=head3 Integer data types
 
 Parrot provides a native integer data type, generally known as an "Int". The
 size of the integer is chosen at Parrot configuration time, the same size as
@@ -34,7 +32,7 @@ native integer arguments. When passed to a subroutine or method call, a native
 integer may be autoboxed as an C<Integer> PMC, or as an HLL type mapped to
 C<Integer>.
 
-=head2 Floating-point data types
+=head3 Floating-point data types
 
 Parrot provides a native floating-point data type, generally known as a "Num".
 The size of the float is chosen at Parrot configuration time, the same size as
@@ -49,7 +47,7 @@ variants that take native float arguments. When passed to a subroutine or
 method call, a native float may be autoboxed as a C<Float> PMC, or as an HLL
 type mapped to C<Float>.
 
-=head2 Integer PMC
+=head3 Integer PMC
 
 The C<Integer> PMC is a high-level integer type, providing the features of a
 integer data type appropriate for use in a high-level language. Some languages
@@ -59,7 +57,7 @@ implement their own high-level integer data type.
 
 The C<Integer> PMC has a single attribute, the integer value.
 
-=head3 Integer Vtable Functions
+=head4 Integer Vtable Functions
 
 =over 4
 
@@ -162,7 +160,7 @@ Thaws the C<Integer> PMC from storage.
 
 =back
 
-=head3 Integer Multis
+=head4 Integer Multis
 
 Many of the math vtable functions are defined as multiple dispatch functions.
 
@@ -212,7 +210,7 @@ Presumably the C<Integer> and C<BigInt> cases are covered by C<DEFAULT>.}}
 
 =back
 
-=head3 Integer Methods
+=head4 Integer Methods
 
 =over 4
 
@@ -223,15 +221,15 @@ Converts the decimal integer to another base (anything from base 2 to base
 
 =back
 
-=head2 Float PMC
+=head3 Float PMC
 
-=head2 BigInt PMC
+=head3 BigInt PMC
 
 The big number library provides Parrot with both a collection of (nearly)
 infinite precision numeric types and an implementation of an extended decimal
 arithmetic (EDA).
 
-=head2 Why decimal arithmetic?
+=head3 Why decimal arithmetic?
 
 There are benefits in using the big number library to provide both values of
 effectively unlimited precision and a defined arithmetic, complete with
@@ -243,7 +241,7 @@ is not much greater than that needed to provide a base-2 big number library.
 There is a trade-off in both space and speed, but given the nature of dynamic
 languages, this should not present too great a burden.
 
-=head2 Numeric types provided
+=head3 Numeric types provided
 
 The bignumber library provides the following data types to Parrot:
 
@@ -286,7 +284,7 @@ objects are or do. They should merely be used as arguments to big number
 functions. The objects will be managed by Parrot's garbage collection in a
 similar manner to strings.
 
-=head2 Special Values
+=head3 Special Values
 
 Additionally the library provides special values which represent the result of
 otherwise undefined operations (division by zero, for instance).  Positive and
@@ -296,7 +294,7 @@ an operation with at least one argument which is C<NaN> will be C<NaN>. If the
 argument is a signalling C<NaN>, an exception will also be raised.  See the
 EDA for full details.
 
-=head2 Context
+=head3 Context
 
 All operations occur within a defined context.  This tells the operations how
 they should treat their arguments, what sort of rounding to perform, and what
@@ -348,7 +346,7 @@ The current I<context> determines the numeric type during a particular
 operation. This makes it easy to upgrade from one numeric form to another and
 also allows for considerable code-reuse within the library.
 
-=head2 Exception Classes
+=head3 Exception Classes
 
 The following exception classes are available:
 
@@ -388,7 +386,7 @@ The exponent of a number has underflowed.
 
 =back
 
-=head2 Rounding
+=head3 Rounding
 
 The rounding part of the context defines the rounding algorithm to used.  The
 following contexts are available (examples assume a precision of 5):
@@ -439,7 +437,7 @@ This is rounding towards C<Inf>.
 
 =back
 
-=head2 Operations
+=head3 Operations
 
 The library provides the following operations. They function exactly as those
 described in the Standard Decimal Arithmetic (SDA), with some extension to
@@ -492,7 +490,7 @@ returns an INTVAL.
 
 =back
 
-=head2 Conversion to and from strings
+=head3 Conversion to and from strings
 
 A one to one conversion between the abstract representation above and a string
 is provided by the library, and acts as defined by the standard decimal
@@ -504,13 +502,13 @@ works with native strings.  Versions which work with Parrot STRINGs will also
 be provided, although in a separate file to the rest of the library.  (They
 will share a common private header file).
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Functions are provided which implement the arithmetic, conversion, creation
 and destruction of big numbers by dealing with otherwise opaque big number
 objects.
 
-=head2 Big number representation
+=head3 Big number representation
 
 A big number is represented by the following structure, capable of being
 allocated, tracked, and destroyed by the Parrot garbage collection system.
@@ -533,7 +531,7 @@ appropriate private I<flags>, using internal macros.  Infinity has one flag
 field, NaN another flag field, and sNaN a third.  In general the flags should
 not be examined directly, even within the module.
 
-=head2 Context
+=head3 Context
 
  typedef struct {
     INTVAL        precision;  /* number of digs to retain */
@@ -553,7 +551,7 @@ context available in an interpreter structure (and accessible).  Big integers
 and fixed-fraction number are provided by creating a context with an
 appropriate precision whenever a call into the library is made.
 
-=head2 Exceptional Conditions
+=head3 Exceptional Conditions
 
 When the module raises an exceptional condition, control passes to
 C<BN_nonfatal()>. this examines the error which has occurred and the current
@@ -564,23 +562,23 @@ this mechanism interacts with Parrot's own is yet to be decided.
 
 The possible exceptions are detailed in the extended decimal arithmetic.
 
-=head1 Tests
+=head2 Tests
 
 The Standard Decimal Arithmetic provides a collection of tests for both its
 base and extended behavior.
 
-=head1 TODO
+=head2 TODO
 
 Fill in the remaining functions from the EDA, verify that the test suite still
 passes, integrate the library into the rest of Parrot, provide PMC types and
 suitable opcodes.  Conversion to and from Parrot strings, conversion to and
 from floating point types, sprintf output of bignumbers.
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
-=head1 REFERENCES
+=head2 References
 
 IBM's Standard Decimal Arithmetic, with tests
 (L<http://speleotrove.com/decimal/>)

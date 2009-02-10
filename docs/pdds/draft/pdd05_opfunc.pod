@@ -1,11 +1,9 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Opcode Function specs
 
-docs/pdds/pdd05_opfunc.pod - Opcode Function specs
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD specifies how the opcode functions should behave and how they are
 called by the Parrot interpreter.
@@ -15,7 +13,7 @@ Parrot. }}
 
 {{ NOTE: standardize on underscores or no underscores? }}
 
-=head1 DESCRIPTION
+=head2 Description
 
 The opcode functions are the workhorse of the Parrot engine. They control
 program flow and do most of the work in a program. (The rest being done by the
@@ -53,7 +51,7 @@ TIL-ified. If there is no I<inner function> for some reason, then your opcode
 will likely run slower (as the interpreter would need to set up the registers
 and other stuff that would normally get stripped away for speed)
 
-=head2 The wrapping function
+=head3 The wrapping function
 
 This is the function that the interpreter actually executes. It has all the
 intimate knowledge of its parameters embedded in it, and is responsible for
@@ -63,14 +61,14 @@ This function is generally created automatically by C<opcode_process.pl>, so
 the programmer doesn't have to create it. If, for some reason, you do need or
 want to write it (for example if you have no inner function) that's fine.
 
-=head2 The inner function
+=head3 The inner function
 
 The inner function is the code that actually does the work. This is generally
 a chunk of C code, though the interpreter will be able to call perl code soon.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Prototype declaration of inner function
+=head3 Prototype declaration of inner function
 
    RETURN function(INPUT[, INPUT[, INPUT...]])
 
@@ -161,7 +159,7 @@ For example:
 
 is a simple opcode function that corresponds to the C<addI> opcode.
 
-=head1 TODO
+=head2 TODO
 
 =over 4
 
@@ -169,19 +167,19 @@ is a simple opcode function that corresponds to the C<addI> opcode.
 
 =back
 
-=head1 REFERENCES
+=head2 References
 
 Oploop PDD, PDD 4 (Internal types)
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 VERSION
+=head2 Version
 
 1.0
 
-=head2 CURRENT
+=head3 Current
 
     Maintainer: Dan Sugalski <dan@sidhe.org>
     Class: Internals
@@ -192,11 +190,11 @@ None.
     PDD Format: 1
     Language: English
 
-=head2 HISTORY
+=head3 History
 
 None. First version
 
-=head1 CHANGES
+=head2 Changes
 
 None. First version
 

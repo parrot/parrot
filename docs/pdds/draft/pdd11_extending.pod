@@ -1,17 +1,15 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 The Parrot Extension System
 
-docs/pdds/pdd11_extending.pod - The Parrot Extension System
-
-=head1 ABSTRACT
+=head2 Abstract
 
 The extension API for Parrot is a simple, somewhat abstract, interface to
 Parrot for code written in C or other compiled languages. It provides about
 the same level of access to Parrot  that bytecode programs have.
 
-=head1 DESCRIPTION
+=head2 Description
 
 The API presents to C programs roughly the same interface presented to
 bytecode programs--that is, a C extension can see everything that a bytecode
@@ -32,9 +30,9 @@ B<Note:> The extension API has not yet been completely specified. New
 functions may be added, and those described below may change or be removed.
 You have been warned...
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 API - Group 1: Internals-unaware functions
+=head3 API - Group 1: Internals-unaware functions
 
 These functions are the ones that are largely unaware of the structure and
 architecture of Parrot. They deal mainly in data as abstract entities, and
@@ -42,7 +40,7 @@ Parrot itself as a black box that, at best, can make subroutine or method
 calls. This is sufficient for many extensions which act as black box
 processing units and in turn treat Parrot itself as a black box.
 
-=head3 PMC access functions
+=head4 PMC access functions
 
 The following functions are for storing and retrieving data inside PMCs. Note
 that use of the _keyed functions with non-aggregate PMCs will generally just
@@ -202,7 +200,7 @@ the PMC stored at element <key> of the passed-in PMC.
 
 =back
 
-=head3 Creation and destruction
+=head4 Creation and destruction
 
 Functions used to create and destroy PMCs, Parrot_Strings, etc.
 
@@ -271,7 +269,7 @@ run.
 
 =back
 
-=head3 Subroutine and method calls
+=head4 Subroutine and method calls
 
 Functions to call Parrot subroutines and methods
 
@@ -293,7 +291,7 @@ as a variadic argument list.
 
 =back
 
-=head2 API - Group 2: Internals aware
+=head3 API - Group 2: Internals aware
 
 The internals-aware functions are for those extensions that need to query or
 alter the state of Parrot's internals in some way.
@@ -327,21 +325,21 @@ Return the value of a PMC register.
 
 =back
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 F<docs/glossary.pod>
 
-=head1 VERSION
+=head2 Version
 
-=head2 CURRENT
+=head3 Current
 
     Maintainer:
     Class: Internals
@@ -352,7 +350,7 @@ F<docs/glossary.pod>
     PDD Format: 1
     Language: English
 
-=head2 HISTORY
+=head3 History
 
 =over 4
 
@@ -362,7 +360,7 @@ None. First version
 
 =back
 
-=head1 CHANGES
+=head2 Changes
 
 =over 4
 

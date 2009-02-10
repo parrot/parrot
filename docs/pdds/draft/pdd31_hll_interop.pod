@@ -1,21 +1,19 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Inter-language calling
 
-docs/pdds/pddxx_language_interop.pod - Inter-language calling
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes Parrot's conventions and support for communication between
 high-level languages (HLLs).  It is focused mostly on what implementors should
 do in order to provide this capability to their users.
 
-=head1 DESCRIPTION
+=head2 Description
 
 The ability to mix different high-level languages at runtime has always been
 an important design goal of Parrot.  Another important goal, that of
@@ -33,7 +31,7 @@ Parrot community, and save the fancy footwork for intra-language calling.
 However, this PDD B<is> binding on Parrot implementors, who must provide a
 stable platform for language interoperability to the language implementors.
 
-=head2 Ground rules
+=head3 Ground rules
 
 In order to avoid N**2 complexity and the resulting coordination headaches,
 each language compiler provides an interface as a target for other languages
@@ -137,11 +135,11 @@ language's calling conventions.
 
 =back
 
-=head1 HALF-BAKED IDEAS
+=head2 Half-Baked Ideas
 
 {{ Every draft PDD should have one of these.  ;-}  -- rgr, 28-Jul-08.  }}
 
-=head2 Common syntax for declaring exported functions?
+=head3 Common syntax for declaring exported functions?
 
 I assume we will need some additional namespace support.  Not clear yet
 whether it's better to mark the ones that or OK for external calling, or the
@@ -168,7 +166,7 @@ query the set of methods for the one most suitable.
 {{ Proposal rejected, because we aren't going with "external" and "internal"
 subroutine variants, so it's not needed. --allison }}
 
-=head2 More namespace complexity?
+=head3 More namespace complexity?
 
 {{ Proposal rejected, because we aren't going with "external" and "internal"
 subroutine variants, so it's not needed. --allison }}
@@ -192,7 +190,7 @@ even if different calling conventions and/or data conversions are required.
 {{ Of course, this wouldn't be necessary if all external subs were multisubs.
 -- rgr, 31-Jul-08. }}
 
-=head2 Multiple type hierarchies?
+=head3 Multiple type hierarchies?
 
 Different languages will have to "dress up" the Parrot type/class hierarchy
 differently.  For example, Common Lisp specifies that C<STRING> is a subtype
@@ -225,14 +223,14 @@ which language "owns" the dispatch.
 
 {{ Absolutely not true. --allison }}
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 {{ Collect definitions of new jargon words here, once we figure out what they
 should be.  -- rgr, 29-Jul-08. }}
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Plain Parrot Semantics
+=head3 Plain Parrot Semantics
 
 Fortunately, "plain Parrot" is pretty powerful, so the "common denominator" is
 not in fact the lowest possible.  For example, not all Parrot languages
@@ -244,13 +242,13 @@ required for named arguments.
 
 {{ This needs more?  -- rgr, 28-Jul-08. }}
 
-=head2 Strings
+=head3 Strings
 
     {{ I am probably not competent to write this section.  At the very least,
     it requires discussion of languages that expect strings to be mutable
     versus . . . Java.  -- rgr, 28-Jul-08. }}
 
-=head2 Other scalar data types
+=head3 Other scalar data types
 
 All Parrot language implementations should stick to native Parrot PMC types
 for scalar data, except in case of dire need.  To see with this is so, take
@@ -296,7 +294,7 @@ other languages" --allison}}
 {{ Must also discuss morphing:  If some languages do it and other do not, then
 care must be taken at the boundaries.  -- rgr, 31-Jul-08. }}
 
-=head3 Defining new scalar data types
+=head4 Defining new scalar data types
 
 There will be cases where existing Parrot PMC classes cannot represent a
 primitive HLL scalar type, and so a new PMC class is required.  In this case,
@@ -395,7 +393,7 @@ about interoperability. --allison }}
 The rest of this section details exceptions and caveats in dealing with scalar
 data types.
 
-=head3 "Fuzzy" scalars
+=head4 "Fuzzy" scalars
 
 Some languages are willing to coerce strings to numbers and vice versa without
 any special action on the part of the programmer and others are not.  The
@@ -411,7 +409,7 @@ handle, for example, morphing when a string value is assigned to an integer
 scalar, and what to do if that value is later used as an integer again.
 --allison }}
 
-=head3 C<Complex> numbers
+=head4 C<Complex> numbers
 
 Not all languages support complex numbers, so if an exported function requires
 a complex argument, it should either throw a suitable error, or coerce an
@@ -423,7 +421,7 @@ compiler that acceptable numeric type.
 and what results it returns, there's nothing unique about complex numbers.
 --allison }}
 
-=head3 C<Ratio> numbers
+=head4 C<Ratio> numbers
 
 Not all languages support ratios (rather few, actually), so if an exported
 function requires a ratio as an argument, it should either throw a suitable
@@ -440,7 +438,7 @@ and what results it returns, there's nothing unique about ratios. --allison }}
     {{ Parrot does not support these yet, so this is not a current issue.  --
     rgr, 28-Jul-08. }}
 
-=head2 Aggregate data types
+=head3 Aggregate data types
 
 {{ I probably haven't done these issues justice; I don't know enough Java or
 Tcl to grok this part of the list discussion.  -- rgr, 28-Jul-08. }}
@@ -476,7 +474,7 @@ in some fashion.  [finish.  -- rgr, 29-Jul-08.]
 
 {{ Not clear where you're going with this --allison }}
 
-=head2 Functional data types
+=head3 Functional data types
 
 In a sense, functional types (i.e. callable objects) are the easiest things to
 pass across languages, since they require no mapping at all.  On the other
@@ -486,7 +484,7 @@ hope of using an API written in another language that requires them.
 {{ Hmmm? They're just subs, how would they not be callable from another
 language? --allison }}
 
-=head2 Datum vs. object
+=head3 Datum vs. object
 
 Some languages present everything to the programmer as an object; in such
 languages, code only exists in methods.  A few languages have no methods, only
@@ -519,7 +517,7 @@ module author.  -- rgr, 29-Jul-08. }}
 what you're describing here isn't introspection, it's actually the standard
 vtable functions.  --allison }}
 
-=head3 Defining methods across language boundaries
+=head4 Defining methods across language boundaries
 
 {{ Is the term "unimethod" acceptable here?  -- rgr, 29-Jul-08.  They're just
 methods or subroutines, and it's just "single dispatch". --allison}}
@@ -569,7 +567,7 @@ should take care to make it generally usable.
 
 {{ Not sure what you mean here. --allison }}
 
-=head3 Subclassing across language boundaries
+=head4 Subclassing across language boundaries
 
 {{ This is an important feature, but requires compatible metamodels.  -- rgr,
 29-Jul-08.
@@ -578,7 +576,7 @@ Or Proxy PMCs, which is how we're currently handling inheritance across
 metamodel boundaries. --allison
 }}
 
-=head3 Method vs. multimethod
+=head4 Method vs. multimethod
 
 {{ This is the issue where some languages (e.g. Common Lisp) use only
 multimethods, where others (e.g. Ruby) use only unimethods.  (S04 says
@@ -595,7 +593,7 @@ in one language and injecting it into the namespace of another language isn't
 the primary focus of language interoperability. Using libraries from other
 languages is. --allison }}
 
-=head1 REFERENCES
+=head2 References
 
 None.
 

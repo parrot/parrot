@@ -1,16 +1,14 @@
-# Copyright (C) 2001-2004, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Indexing Aggregate PMCs
 
-docs/pdds/pdd08_keys.pod - Indexing Aggregate PMCs
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD aims to clear up the confusion regarding the implementation of keyed
 access to PMCs in Parrot.
 
-=head1 DESCRIPTION
+=head2 Description
 
 First, let's define some terminology. An C<aggregate PMC> is one which stores
 or references other values as elements.  The aggregate PMC allows indexed
@@ -38,9 +36,9 @@ C<$b> is then assigned to this value.
 
 Now, how does this all get implemented?
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 The key structure
+=head3 The key structure
 
 The key structure must bundle multiple keys.  This is to allow indexing into
 multidimensional aggregate PMCs.  These keys may be specified as integer,
@@ -94,7 +92,7 @@ generated while the aggregate PMC is being traversed.
 These definitions, along with declarations of support routines used to
 manipulate keys, can be found in F<include/parrot/key.h>
 
-=head2 Aggregate and non-aggregate PMCs
+=head3 Aggregate and non-aggregate PMCs
 
 We've already said that what separates the aggregate PMCs from the
 non-aggregates is their implementation of the C<_keyed> vtable methods. So it
@@ -111,7 +109,7 @@ screw-up, since code which indexes a non-aggregate shouldn't be generated.
 
 =back
 
-=head2 C<_keyed> vtable methods
+=head3 C<_keyed> vtable methods
 
 So what of these magical C<_keyed> vtable methods? They are generated when you
 add the C<keyed> tag to the appropriate entry in F<src/vtable.tbl>. They are
@@ -173,7 +171,7 @@ applicable method - C<..._index> and C<..._index_s> for integer and string
 indexing respectively. However, this didn't give us the flexibility and
 scalability that key structures give us.
 
-=head2 Input to the assembler
+=head3 Input to the assembler
 
 There are several different valid specifications of an aggregate key to the
 assembler. These are:
@@ -200,7 +198,7 @@ and registers with any number of levels; and register keys which are
 represented by a single PMC register that is assumed to  contain a PMC of the
 Key class.
 
-=head2 What the assembler did next
+=head3 What the assembler did next
 
 When the assembler sees an aggregate key, it "detaches" the key to form a
 separate argument. It then decides on the type of key. For  integer keys (both
@@ -230,7 +228,7 @@ produces an op named C<set_p_kic>, and this:
 
 produces an op named C<set_p_ki>.
 
-=head2 Bytecode representation
+=head3 Bytecode representation
 
 The bytecode representation of these keys are as follows: constant keys are
 treated just like another constant, and are an index into the packfile's
@@ -255,9 +253,9 @@ number (for registers) or an index into the appropriate constant table.
 The type values shown above are actually the C<PARROT_ARG_*> values taken from
 F<include/parrot/op.h>.
 
-=head1 VERSION
+=head2 Version
 
-=head2 CURRENT
+=head3 Current
 
    Maintainer: Simon Cozens <simon@netthink.co.uk>
    Class: Internals
@@ -268,7 +266,7 @@ F<include/parrot/op.h>.
    PDD Format: 1
    Language: English
 
-=head2 HISTORY
+=head3 History
 
 =over 4
 
@@ -290,7 +288,7 @@ variant vtable methods.
 
 =back
 
-=head1 REFERENCES
+=head2 References
 
 To come.
 

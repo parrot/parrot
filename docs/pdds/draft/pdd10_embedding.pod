@@ -1,11 +1,9 @@
-# Copyright (c) 2001-2006, The Perl Foundation.
+# Copyright (c) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot's Embedding and Extending Interface
 
-docs/pdds/embedding.pod - Parrot's Embedding and Extending Interface
-
-=head1 ABSTRACT
+=head2 Abstract
 
 What we believe people will do when embedding and extending Parrot, why they
 do it, and how.
@@ -13,11 +11,11 @@ do it, and how.
 {{ NOTE: some of this will later move into pdds 11 & 12, but for now
 just want to get the stub checked in. }}
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 Why embed:
 
@@ -135,7 +133,7 @@ level?
 
 =back
 
-=head1 DEFINITIONS
+=head2 Definitions
 
 Embedding - using libparrot from within another program, likely with a
 C/NCI/FFI interface
@@ -145,7 +143,7 @@ Extending - writing Parrot extensions, likely through C or another language
 In practice, there is little difference between the two; mostly in terms of
 who has control.  The necessary interfaces should stay the same.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Implementation details.
 
@@ -168,7 +166,7 @@ as a test both of the sanity of the external interface as well as NCI
 
 =back
 
-=head2 Working with Interpreters
+=head3 Working with Interpreters
 
 It is the external code's duty to create, manage, and destroy interpreters.
 
@@ -188,7 +186,7 @@ C<Parrot_destroy ( interp )> destroys an interpreter and frees its resources.
 
 I<Note: It is not clear what happens if this interpreter has active children.>
 
-=head2 Working with Source Code and PBC Files
+=head3 Working with Source Code and PBC Files
 
 Perhaps the most common case for working with code is loading it from an
 external file.  This may often be PBC, but it must also be possible to load
@@ -228,33 +226,33 @@ The potential return values are the same as for loading code from disk.
 
 I<Note: this declaration should move from F<interpreter.h> to F<embed.h>.>
 
-=head2 Working with PMCs
+=head3 Working with PMCs
 
 TBD.
 
-=head2 Calling Functions
+=head3 Calling Functions
 
 TBD.
 
-=head2 Calling Opcodes
+=head3 Calling Opcodes
 
 TBD.
 
-=head1 LANGUAGE NOTES
+=head2 Language Notes
 
 It should be possible to register a compiler for an HLL with an interpreter
 such that it is possible to load source code written in that language or pass
 source code to an interpreter successfully.
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 Any associated documents.
 
-=head1 FOOTNOTES
+=head2 Footnotes
 
 List of footnotes to the text.
 
-=head1 REFERENCES
+=head2 References
 
 List of references.
 

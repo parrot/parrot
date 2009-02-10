@@ -1,15 +1,13 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Assembly Language
 
-docs/pdds/pdd06_pasm.pod - Parrot Assembly Language
-
-=head1 ABSTRACT
+=head2 Abstract
 
 The format of Parrot's bytecode assembly language.
 
-=head1 DESCRIPTION
+=head2 Description
 
 Parrot's bytecode can be thought of as a form of machine language for a
 virtual super CISC machine. It makes sense, then, to define an assembly
@@ -20,7 +18,7 @@ rather than indirectly through a high-level language.
 useful as a specification of the format of PASM than as a comprehensive
 listing of all opcodes. }}
 
-=head1 QUESTIONS
+=head2 Questions
 
 =over 4
 
@@ -59,7 +57,7 @@ listing of all opcodes. }}
 
 =back
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 Parrot opcodes take the format of:
 
@@ -84,7 +82,7 @@ PC.
 All registers have a type prefix of P, S, I, or N, for PMC, string, integer,
 and number respectively.
 
-=head1 Assembly Syntax
+=head2 Assembly Syntax
 
 All assembly opcodes contain only ASCII lowercase letters, digits, and the
 underscore.
@@ -154,7 +152,7 @@ Below is an overview of the grammar of a PASM file.
 
 
 
-=head1 OPCODE LIST
+=head2 Opcode List
 
 In the following list, there may be multiple (but unlisted) versions of an
 opcode. If an opcode takes a register that might be keyed, the keyed version
@@ -182,7 +180,7 @@ refers to a generic register (P, S, I, or N). A lowercase p, s, i, or n means
 either a register or constant of the appropriate type (PMC, string, integer,
 or number)
 
-=head2 Control flow
+=head3 Control flow
 
 The control flow opcodes check conditions and manage program flow.
 
@@ -221,7 +219,7 @@ Pop the location off the top of the stack and go there.
 
 =back
 
-=head2 Data manipulation
+=head3 Data manipulation
 
 These ops handle manipulating the data in registers
 
@@ -317,7 +315,7 @@ Copies string y z times into string x.
 
 =back
 
-=head2 Transcendental operations
+=head3 Transcendental operations
 
 These opcodes handle the transcendental math functions. The destination
 register here must always be either a numeric or a PMC register.
@@ -402,7 +400,7 @@ Return e to the Y power
 
 =back
 
-=head2 Register and stack ops
+=head3 Register and stack ops
 
 These opcodes deal with registers and stacks
 
@@ -458,7 +456,7 @@ access to any other branches when looking this way).
 
 =back
 
-=head2 Names, pads, and globals
+=head3 Names, pads, and globals
 
 These operations are responsible for finding names in lexical or global
 scopes, as well as storing data into those slots.  A static scope is captured
@@ -509,7 +507,7 @@ Store X in the default global symbol table with a name of Y.
 
 =back
 
-=head2 Exceptions
+=head3 Exceptions
 
 These opcodes deal with exception handling at the lowest level. Exception
 handlers are dynamically scoped, and any exception handler set in a scope will
@@ -538,7 +536,7 @@ exception handler.
 
 =back
 
-=head2 Object things
+=head3 Object things
 
 These opcodes deal with PMCs as objects, rather than as opaque data items.
 
@@ -565,7 +563,7 @@ FALSE.
 
 =back
 
-=head2 Module handling
+=head3 Module handling
 
 These opcodes deal with loading in bytecode or executable code libraries, and
 fetching info about those libraries. This is all dealing with precompiled
@@ -600,7 +598,7 @@ Find the string library that handles strings of type Y. Return its name in X.
 
 =back
 
-=head2 I/O operations
+=head3 I/O operations
 
 Reads and writes read and write records, for some value of record.
 
@@ -653,7 +651,7 @@ outstanding I/O ops, number of ops on the filehandle, and so forth.
 
 =back
 
-=head2 Threading ops
+=head3 Threading ops
 
 =over 4
 
@@ -671,7 +669,7 @@ Push an unlock request on the stack
 
 =back
 
-=head2 Interpreter ops
+=head3 Interpreter ops
 
 =over 4
 
@@ -743,7 +741,7 @@ allocation to Buffers since the last time we compacted the memory heap.
 
 =back
 
-=head2 Garbage collection
+=head3 Garbage collection
 
 =over 4
 
@@ -767,7 +765,7 @@ interpreter to fire one off when it deems it necessary.
 
 =back
 
-=head2 Key operations
+=head3 Key operations
 
 Keys are used to get access to individual elements of an aggregate variable.
 This is done to allow for opaque, packed, and multidimensional aggregate
@@ -825,7 +823,7 @@ entry.
 
 =back
 
-=head2 Properties
+=head3 Properties
 
 Properties are a sort of runtime note attached to a PMC. Any PMC can have
 properties on it. Properties live in a flat namespace, and they are not in any
@@ -855,7 +853,7 @@ Fetch the properties from Y, put them in a Hash, and put the Hash in X.
 
 =back
 
-=head2 Symbolic support for HLLs
+=head3 Symbolic support for HLLs
 
 =over 4
 
@@ -885,7 +883,7 @@ Fetches the 'current package' marker.
 
 =back
 
-=head2 Foreign library access
+=head3 Foreign library access
 
 These are the ops we use to load in and interface to non-parrot libraries.
 
@@ -987,7 +985,7 @@ not explicitly return parameters or calling convention metadata parameters.
 
 =back
 
-=head2 Runtime compilation
+=head3 Runtime compilation
 
 These opcodes deal with runtime creation of bytecode and compilation of source
 code.
@@ -1023,19 +1021,19 @@ whenever anyone invokes the compile op with the name X.
 
 =back
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 None.
 
-=head1 VERSION
+=head2 Version
 
 1.9
 
-=head2 CURRENT
+=head3 Current
 
     Maintainer: Dan Sugalski
     Class: Internals
@@ -1046,7 +1044,7 @@ None.
     PDD Format: 1
     Language: English
 
-=head2 HISTORY
+=head3 History
 
 =over 4
 
@@ -1092,7 +1090,7 @@ None. First version
 
 =back
 
-=head1 CHANGES
+=head2 Changes
 
 =over 4
 

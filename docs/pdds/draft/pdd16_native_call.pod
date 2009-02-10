@@ -1,16 +1,14 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 NCI conventions and definitions
 
-docs/pdds/pdd16_native_call.pod - NCI conventions and definitions
-
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
 
-=head1 DESCRIPTION
+=head2 Description
 
 The NCI is designed to allow Parrot to interface to I<most> of the functions
 in a C library without having to write any C code for that interface. It
@@ -34,9 +32,9 @@ parseable anyway, and there is no generic way to query a function for its
 signature) the signature must be passed in when the linkage between the C
 function and parrot is made.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Function signatures
+=head3 Function signatures
 
 The following list are the valid letters in the function signatures for
 Parrot's NCI. Note that only letters and numbers are valid, and each letter
@@ -128,7 +126,7 @@ explanation in the L<callbacks> section.
 
 Note that not all types are valid as return types.
 
-=head2 Example NCI call
+=head3 Example NCI call
 
 This section describes the simplest example for NCI possible. To every NCI
 invocation, there are two parts: the native function to be invoked, and the
@@ -169,7 +167,7 @@ like this:
   .end
 
 
-=head2 Callbacks
+=head3 Callbacks
 
 Some libraries, particularly ones implementing more complex functionality such
 as databases or GUIs, want callbacks, that is ways to call a function under
@@ -250,7 +248,7 @@ Parrot itself handles all the nasty bits involved in collecting up the
 interpreter pointer, creating the wrapping PMCs, stuffing data various places,
 and generally dealing with the bookkeeping.
 
-=head2 Example Callback
+=head3 Example Callback
 
 This section contains an example to register a callback function and have
 it call back into Parrot.
@@ -312,17 +310,17 @@ to be known.
 The file containing this C code should be compiled as a shared library
 (specifying the C<include> directory so C<<parrot/parrot.h>> can be found.)
 
-=head1 REFERENCES
+=head2 References
 
 L<pdd06_pasm.pod>
 
-=head1 SEE ALSO
+=head2 See Also
 
 L<t/pmc/nci.t>, L<src/nci_test.c>
 
-=head1 VERSION
+=head2 Version
 
-=head2 CURRENT
+=head3 Current
 
     Maintainer: Dan Sugalski
     Class: Internals
@@ -333,7 +331,7 @@ L<t/pmc/nci.t>, L<src/nci_test.c>
     PDD Format: 1
     Language: English
 
-=head2 HISTORY
+=head3 History
 
 =over 4
 

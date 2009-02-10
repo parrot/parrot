@@ -1,35 +1,33 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 Parrot Compiler Tools
 
-docs/pdds/draft/pdd29_compiler_tools.pod - Parrot Compiler Tools
-
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 MAINTAINER
+=head2 Maintainer
 
 Will "Coke" Coleda
 Klaas-Jan Stol
 
-=head1 DEFINITIONS
+=head2 Definitions
 
-=head2 Compiler
+=head3 Compiler
 
 In this document, when we speak of a I<compiler>, we mean
 PCT-based compilers.
 
-=head2 HLL
+=head3 HLL
 
 A High-Level Language. Examples are: Perl, Ruby, Python, Lua, Tcl, etc.
 
-=head1 ABSTRACT
+=head2 Abstract
 
 This PDD specifies the Parrot Compiler Tools (PCT).
 
-=head1 SYNOPSIS
+=head2 Synopsis
 
 Creating a PCT-based compiler can be done as follows:
 
@@ -60,7 +58,7 @@ The script is located in C<tools/dev/mk_language_shell.pl>.
 term.  In a sense, this script can also be considered part of the parrot
 compiler "tools", as it is used to create a compiler.  }}
 
-=head2 Parser Synopsis
+=head3 Parser Synopsis
 
  grammar Foo is PCT::Grammar;
 
@@ -85,7 +83,7 @@ compiler "tools", as it is used to create a compiler.  }}
      | <number> {*}      #= number
  }
 
-=head2 Actions Synopsis
+=head3 Actions Synopsis
 
 {{ Is this a good idea? }}
 
@@ -114,7 +112,7 @@ compiler "tools", as it is used to create a compiler.  }}
      make $( $/{$key} );
  }
 
-=head2 Running the compiler
+=head3 Running the compiler
 
 Running the compiler is then done as follows:
 
@@ -123,7 +121,7 @@ Running the compiler is then done as follows:
 {{ other options? Maybe --target=pbc in the future, once PBC can be
    generated? }}
 
-=head1 DESCRIPTION
+=head2 Description
 
 The Parrot Compiler Tools are specially designed to easily create a
 compiler targeting the Parrot Virtual Machine. The tools themselves
@@ -146,7 +144,7 @@ The PCT is a set of libraries and programs, to:
    list these as =items }}
 
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
 The PCT is made up of the following libraries and programs:
 
@@ -169,7 +167,7 @@ Not Quite Perl (6) (NQP) language is typically used in all PCT-based
 compilers. NQP is a subset of the Perl 6 language, and is a
 high-level language as an alternative for PIR.
 
-=head2 Compilation phases
+=head3 Compilation phases
 
 A PCT-based compiler has by default four compilation phases, or
 I<transformations>. Phases can be removed and added through the API of
@@ -195,7 +193,7 @@ The POST is converted into executable Parrot Intermediate Representation.
 
 =back
 
-=head3 Source to Parse Tree
+=head4 Source to Parse Tree
 
 The first stage of a PCT-based compiler is done by the C<parser>. The
 parser is defined as a set of Perl 6 Rules, which is processed by the
@@ -207,7 +205,7 @@ implements the parser.
 During the first stage, the source (input string) is parsed, resulting
 in a C<parse tree>.
 
-=head3 Parse tree to PAST
+=head4 Parse tree to PAST
 
 The second stage converts the parse tree into a Parrot Abstract Syntax Tree
 (PAST). PAST is a data structure consisting of PAST nodes, each of which
@@ -222,7 +220,7 @@ attribute of the HLLCompiler. Such classes are implemented in NQP.
    and in the future maybe other languages.
 }}
 
-=head3 PAST to POST
+=head4 PAST to POST
 
 The third transformation converts the PAST into a Parrot Opcode Syntax Tree
 (POST). PAST nodes represent HLL constructs, which are transformed into a
@@ -230,14 +228,14 @@ set of low-level POST nodes. A POST node is a low-level node, representing
 a single instruction, label, or a subroutine. While a PAST is very close to
 a HLL program, a POST is much closer to PIR code.
 
-=head3 POST to PIR
+=head4 POST to PIR
 
 The last transformation generates PIR code from the POST.
 
 The generated PIR is then fed into the Parrot executable, and processed
 into Parrot Byte Code (PBC) by the PIR compiler.
 
-=head2 Parrot Grammar Engine
+=head3 Parrot Grammar Engine
 
 The Parrot Grammar Engine (PGE) is a component that I<executes> regular
 expressions. Besides I<classic> regular expressions, it also understands
@@ -246,33 +244,33 @@ Perl 6 Rules. Such rules are special regular expressions to define a grammar.
 The I<start> symbol in a grammar is named C<TOP>; this is the top-level
 rule that is executed when the parser is invoked.
 
-=head3 Operator precedence parsing
+=head4 Operator precedence parsing
 
 {{ insert stuff about using an operator prec. table here }}
 
-=head2 Parrot Abstract Syntax Tree
+=head3 Parrot Abstract Syntax Tree
 
 The PCT includes a set of PAST classes. PAST classes represent common language
 constructs, such as a C<while statement>.
 These are described extensively in L<docs/pdds/pdd26_ast.pod>.
 
-=head2 Parrot Opcode Syntax Tree
+=head3 Parrot Opcode Syntax Tree
 
-=head3 POST::Node
+=head4 POST::Node
 
 POST::Node is the base class for all other POST classes.
 
-=head3 POST::Op
+=head4 POST::Op
 
-=head3 POST::Ops
+=head4 POST::Ops
 
-=head3 POST::Label
+=head4 POST::Label
 
-=head3 POST::Sub
+=head4 POST::Sub
 
 
 
-=head2 PCT::Grammar
+=head3 PCT::Grammar
 
 The class C<PCT::Grammar> is a built-in grammar class that can be used as
 a parent class for a custom grammar. This class defines a number of rules and
@@ -291,13 +289,13 @@ The following rules are predefined:
 
 =back
 
-=head2 PCT::HLLCompiler
+=head3 PCT::HLLCompiler
 
 All PCT-based compilers use a HLLCompiler object as a compiler driver.
 It acts as a I<facade> for the compiler. This object invokes the different
 compiler phases.
 
-=head3 HLLCompiler API Methods
+=head4 HLLCompiler API Methods
 
 {{ TODO: complete this }}
 
@@ -334,11 +332,11 @@ information.
 
 =back
 
-=head1 ATTACHMENTS
+=head2 Attachments
 
 None.
 
-=head1 REFERENCES
+=head2 References
 
 docs/pdd26_ast.pod
 

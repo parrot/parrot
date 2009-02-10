@@ -1,19 +1,17 @@
-# Copyright (C) 2001-2007, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
-=head1 NAME
+=head1 A high-level overview of Parrot
 
-docs/pdds/pdd01_overview.pod - A high-level overview of Parrot
-
-=head1 ABSTRACT
+=head2 Abstract
 
 A high-level overview of the Parrot virtual machine.
 
-=head1 VERSION
+=head2 Version
 
 $Revision$
 
-=head1 DESCRIPTION
+=head2 Description
 
 Parrot is a virtual machine for dynamic languages like Python, PHP, Ruby, and
 Perl. A dynamic language is one that allows things like extension of the code
@@ -25,9 +23,9 @@ paradigm shift to dynamic languages leads the way to other more advanced
 dynamic features like higher-order functions, closures, continuations, and
 coroutines.
 
-=head1 IMPLEMENTATION
+=head2 Implementation
 
-=head2 Parser
+=head3 Parser
 
 While individual high-level languages may implement their own parser,
 most will use Parrot's parser grammar engine (PGE). The parser grammar
@@ -45,18 +43,18 @@ ending in a syntax tree that is close to the semantics of Parrot's
 bytecode. Some compilers will also insert optimization stages into the
 compilation process between the common transformation stages.
 
-=head2 IMCC
+=head3 IMCC
 
 The intermediate code compiler (IMCC) is the main F<parrot> executable,
 and encapsulates several core low-level components.
 
-=head3 PASM & PIR parser
+=head4 PASM & PIR parser
 
 This Bison and Flex based parser/lexer handles Parrot's assembly
 language, PASM, and the slightly higher-level language, PIR (Parrot
 Intermediate Representation).
 
-=head3 Bytecode compiler
+=head4 Bytecode compiler
 
 The bytecode compiler module takes a syntax tree from the parser and emits an
 unoptimized stream of bytecode. This code is suitable for passing straight to
@@ -65,13 +63,13 @@ the interpreter, though it is probably not going to be very fast.
 Note that currently, the only way to generate bytecode is by first
 generating PASM or PIR.
 
-=head3 Optimizer
+=head4 Optimizer
 
 The optimizer module takes the bytecode stream from the compiler and
 optionally the syntax tree the bytecode was generated from, and optimizes the
 bytecode.
 
-=head3 Interpreter
+=head4 Interpreter
 
 The interpreter module takes the bytecode stream from either the optimizer or
 the bytecode compiler and executes it. There must always be at least one
@@ -84,7 +82,7 @@ example, for programs that produced Java bytecode, where one of the
 interpreter modules would take the bytecode stream and spit out Java bytecode
 instead of interpreting it.
 
-=head3 Standalone pieces
+=head4 Standalone pieces
 
 Each piece of IMCC can, with enough support hidden away (in the form of an
 interpreter for the parsing module, for example), stand on its own. This means
@@ -96,12 +94,12 @@ have a standalone optimizer which can spend a lot of time groveling over
 bytecode, far more than you might want to devote to optimizing
 one-liners or code that'll run only once or twice.
 
-=head2 Subsystems
+=head3 Subsystems
 
 The following subsystems are each responsible for a key component of
 Parrot's core functionality.
 
-=head3 I/O subsystem
+=head4 I/O subsystem
 
 The I/O subsystem provides source- and platform-independent synchronous
 and asynchronous I/O to Parrot. How this maps to the OS's underlying I/O
@@ -112,7 +110,7 @@ Additionally, the I/O subsystem allows a program to push filters onto an
 input stream if necessary, to manipulate the data before it is presented to a
 program.
 
-=head3 Regular expression engine
+=head4 Regular expression engine
 
 The parser grammar engine (PGE) is also Parrot's regular expression
 engine. The job of the regular expression engine is to compile regular
@@ -122,14 +120,14 @@ classes, and apply the matching rules of the classes to strings.
 The regular expression engine is available to any language running on
 Parrot.
 
-=head3 Data transformation engine
+=head4 Data transformation engine
 
 The tree grammar engine (TGE) is also a general-purpose data
 transformation tool (somewhat similar to XSLT).
 
-=head2 API levels
+=head3 API Levels
 
-=head3 Embedding
+=head4 Embedding
 
 The embedding API is the set of calls exported to an embedding application.
 This is a small, simple set of calls, requiring minimum effort to use.
@@ -140,7 +138,7 @@ interpreter within another application with very little programming or
 intellectual effort. Generally it should take less than thirty minutes for a
 simple interface, though more complete integration will take longer.
 
-=head3 Extensions
+=head4 Extensions
 
 The extension API is the set of calls exported to Parrot extensions. They
 provide access to most of the things an extension needs to do, while hiding
@@ -148,14 +146,14 @@ the implementation details. (So that, for example, we can change the way
 scalars are stored without having to rewrite, or even recompile, an
 extension).
 
-=head3 Guts
+=head4 Guts
 
 The guts-level APIs are the routines used within a component. These aren't
 guaranteed to be stable, and shouldn't be used outside a component. (For
 example, an extension to the interpreter shouldn't call any of the parser's
 internal routines).
 
-=head2 Target Platforms
+=head3 Target Platforms
 
 The ultimate goal of Parrot is portability to more-or-less the same
 platforms as Perl 5, including AIX, BeOS, BSD/OS, Cygwin, Darwin,
@@ -172,9 +170,9 @@ prior to the 1.0 release. As we approach the 1.0 release we will
 actively seek porters for as many other platforms as possible.
 
 
-=head1 LANGUAGE NOTES
+=head2 Language Notes
 
-=head2 Parrot for small platforms
+=head3 Parrot for small platforms
 
 One goal of the Parrot project, though not a requirement of the 1.0
 release, is to run on small devices such as the Palm.  For small
@@ -186,13 +184,13 @@ Perl, string eval, do, use, and require  will not be available (although
 loading of precompiled modules via do, use, or require may be
 supported).
 
-=head2 Bytecode compilation
+=head3 Bytecode compilation
 
 One straightforward use of the Parrot system is to precompile a program into
 bytecode and save it for later use. Essentially, we would compile a program as
 normal, but then simply freeze the bytecode to disk for later loading.
 
-=head2 Your HLL in, Java, CLI, or whatever out
+=head3 Your HLL in, Java, CLI, or whatever out
 
 The previous section assumes that we will be emitting Parrot bytecode.
 However, there are other possibilities: we could translate the bytecode
@@ -200,7 +198,7 @@ to Java bytecode or .NET code, or even to a native executable. In
 principle, Parrot could also act as a front end to other modular
 compilers such as gcc or HP's GEM compiler system.
 
-=head1 REFERENCES
+=head2 References
 
 To come.
 
