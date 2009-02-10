@@ -246,21 +246,6 @@ void Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 /* HEADERIZER END: src/gc/incremental_ms.c */
 
 /* write barrier */
-#if PARROT_GC_IMS
-#  define GC_WRITE_BARRIER(interp, agg, old, _new) \
-    do { \
-        if (!PMC_IS_NULL(_new)   && \
-                PObj_live_TEST(agg) && \
-                (PObj_get_FLAGS(agg) & PObj_custom_GC_FLAG) && \
-                !PObj_live_TEST(_new)) { \
-            Parrot_dod_ims_wb((interp), (agg), (_new)); \
-        } \
-    } while (0)
-
-#  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) \
-          GC_WRITE_BARRIER((interp), (agg), (old), (_new))
-#endif
-
 #if PARROT_GC_MS
 #  define GC_WRITE_BARRIER(interp, agg, old, _new) do { } while (0)
 #  define GC_WRITE_BARRIER_KEY(interp, agg, old, old_key, _new, new_key) do { } while (0)
