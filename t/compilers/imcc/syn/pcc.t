@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 
 ##############################
 # Parrot Calling Conventions
@@ -524,7 +524,23 @@ CODE
 my $too_many_args_args = join ',', 1 .. 20_000;
 $too_many_args =~ s/_ARGS_/$too_many_args_args/;
 
-pir_output_is( $too_many_args, "didn't segfault\n", "calling a sub with way too many params" );
+pir_output_is( $too_many_args, "didn't segfault\n", "calling a sub with way too many args" );
+
+my $too_many_params = <<'CODE';
+.sub main :main
+    'foo'()
+    say "didn't segfault"
+.end
+
+.sub foo
+    _PARAMS_
+.end
+CODE
+
+my $too_many_params_params = join map { "    .param pmc xx$_\n" } 1 .. 20_000;
+$too_many_params =~ s/_PARAMS_/$too_many_params_params/;
+
+pir_output_is( $too_many_params, "didn't segfault\n", "calling a sub with way too many params" );
 
 # Local Variables:
 #   mode: cperl
