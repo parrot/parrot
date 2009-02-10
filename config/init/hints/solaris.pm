@@ -40,9 +40,14 @@ sub runstep {
         %gnuc = eval $conf->cc_run() or die "Can't run the test program: $!";
         if ( defined $gnuc{__GNUC__} ) {
             $link = 'g++';
+            unless ($conf->data->get('rpath')) {
+                $conf->data->set( 'rpath', '-Wl,-rpath=' );
+            }
         }
         else {
-            $link =~ s/\bcc\b/CC/;
+            unless ($conf->data->get('rpath')) {
+                $conf->data->set( 'rpath', '-R' );
+            }
         }
         $conf->data->set( link => $link );
         $conf->data->deltrigger( "cc", "solaris_link" );
@@ -64,6 +69,8 @@ sub runstep {
         else {
             $conf->data->set( cc_shared => '-KPIC' );
         }
+        $conf->data->set( 'has_dynamic_linking', '1' );
+        $conf->data->set( 'parrot_is_shared', '1' );
         $conf->data->deltrigger( "gccversion", "solaris_cc_shared" );
     };
     $conf->data->settrigger(
