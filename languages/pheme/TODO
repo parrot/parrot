@@ -67,3 +67,13 @@ Predicates:
 	- port?
 	- predicates are disjoint
 	- empty list satisfies none
+
+
+The following tickets were stored in parrot's RT system.
+
+They have now been marked as rejected in that system, but are listed
+here for posterity, so they can easily be migrated into pheme's new
+ticketing system, whatever that may be.
+
+#60208: [BUG] pheme -- t/null test fails in r32229
+  http://rt.perl.org/rt3/Ticket/Display.html?id=60208
