@@ -198,7 +198,7 @@ Report whether the exception handler can handle a particular type of exception.
         ||  VTABLE_isa(INTERP, exception, ex_str)) {
             PMC *handled_types;
             PMC *handled_types_except;
-	    INTVAL min_severity, max_severity;
+            INTVAL min_severity, max_severity;
             GET_ATTR_handled_types(INTERP, SELF, handled_types);
             GET_ATTR_handled_types_except(INTERP, SELF, handled_types_except);
             GET_ATTR_max_severity(INTERP, SELF, max_severity);
