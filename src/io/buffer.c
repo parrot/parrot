@@ -656,6 +656,9 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
                     Parrot_io_get_file_position(interp, filehandle)));
         Parrot_io_flush(interp, filehandle);
 
+        buffer_flags |= PIO_BF_WRITEBUF;
+        Parrot_io_set_buffer_flags(interp, filehandle, buffer_flags);
+
         buffer_next = Parrot_io_get_buffer_next(interp, filehandle);
         memmove(buffer_start, ((const char *)buffer + avail), diff);
 
