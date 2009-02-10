@@ -562,11 +562,11 @@ Remove one reference of $1.
 =cut
 
 op register(invar PMC) {
-  dod_register_pmc(interp, $1);
+  gc_register_pmc(interp, $1);
 }
 
 op unregister(invar PMC) {
-  dod_unregister_pmc(interp, $1);
+  gc_unregister_pmc(interp, $1);
 }
 
 

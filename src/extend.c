@@ -1311,7 +1311,7 @@ Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
 {
     ASSERT_ARGS(Parrot_register_pmc)
     PARROT_CALLIN_START(interp);
-    dod_register_pmc(interp, pmc);
+    gc_register_pmc(interp, pmc);
     PARROT_CALLIN_END(interp);
 }
 
@@ -1333,7 +1333,7 @@ Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
 {
     ASSERT_ARGS(Parrot_unregister_pmc)
     PARROT_CALLIN_START(interp);
-    dod_unregister_pmc(interp, pmc);
+    gc_unregister_pmc(interp, pmc);
     PARROT_CALLIN_END(interp);
 }
 

@@ -2778,7 +2778,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
 
     /* Invoke the subroutine object with the given CallSignature object */
     Parrot_pcc_invoke_from_sig_object(interp, sub_obj, sig_obj);
-    dod_unregister_pmc(interp, sig_obj);
+    gc_unregister_pmc(interp, sig_obj);
 
 }
 

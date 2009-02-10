@@ -125,7 +125,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
      * we need to anchor it.
      *
      */
-    dod_register_pmc(interp, user_data);
+    gc_register_pmc(interp, user_data);
 
     /*
      * Finally, the external lib awaits a function pointer.
@@ -142,7 +142,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
         PMC_data(cb) = F2DPTR(Parrot_callback_C);
     else
         PMC_data(cb) = F2DPTR(Parrot_callback_D);
-    dod_register_pmc(interp, cb);
+    gc_register_pmc(interp, cb);
 
     return cb;
 }

@@ -213,7 +213,7 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
 
 =head1 SEE ALSO
 
-F<src/pmc.c:dod_register_pmc()>
+F<src/pmc.c:gc_register_pmc()>
 
 =cut
 

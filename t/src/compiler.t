@@ -61,7 +61,7 @@ run(PARROT_INTERP, int argc, char *argv[])
     }
 
     /* keep eval PMC alive */
-    dod_register_pmc(interp, prog);
+    gc_register_pmc(interp, prog);
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
@@ -128,7 +128,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     }
 
     /* keep eval PMC alive */
-    dod_register_pmc(interp, prog);
+    gc_register_pmc(interp, prog);
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
@@ -221,7 +221,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     }
 
     /* keep eval PMC alive */
-    dod_register_pmc(interp, prog);
+    gc_register_pmc(interp, prog);
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
@@ -314,7 +314,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     }
 
     /* keep eval PMC alive */
-    dod_register_pmc(interp, prog);
+    gc_register_pmc(interp, prog);
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");
@@ -406,7 +406,7 @@ compile_run(PARROT_INTERP, const char *src, STRING *type, int argc,
     }
 
     /* keep eval PMC alive */
-    dod_register_pmc(interp, prog);
+    gc_register_pmc(interp, prog);
 
     /* locate function to run */
     smain = Parrot_str_new_constant(interp, "main");

@@ -749,11 +749,11 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
 =back
 
-=head2 DOD registry interface
+=head2 GC registry interface
 
 =over 4
 
-=item C<void dod_register_pmc>
+=item C<void gc_register_pmc>
 
 Registers the PMC with the interpreter's DOD registry.
 
@@ -763,9 +763,9 @@ Registers the PMC with the interpreter's DOD registry.
 
 PARROT_EXPORT
 void
-dod_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    ASSERT_ARGS(dod_register_pmc)
+    ASSERT_ARGS(gc_register_pmc)
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_GC_mark(interp);
 
@@ -778,7 +778,7 @@ dod_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<void dod_unregister_pmc>
+=item C<void gc_unregister_pmc>
 
 Unregisters the PMC from the interpreter's DOD registry.
 
@@ -787,9 +787,9 @@ Unregisters the PMC from the interpreter's DOD registry.
 */
 
 void
-dod_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
-    ASSERT_ARGS(dod_unregister_pmc)
+    ASSERT_ARGS(gc_unregister_pmc)
     PARROT_ASSERT(interp->DOD_registry);
 
     VTABLE_delete_keyed(interp, interp->DOD_registry, pmc);
