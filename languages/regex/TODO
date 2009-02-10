@@ -9,3 +9,6 @@ ticketing system, whatever that may be.
 
 #48170: [TODO] [regex] Remove 'use of uninitialized value' issues in match.pmc
   http://rt.perl.org/rt3/Ticket/Display.html?id=48170
+
+#42393: [TODO] regex - FIXME items in languages/regex/lib/Regex/Grammar.y
+  http://rt.perl.org/rt3/Ticket/Display.html?id=42393
