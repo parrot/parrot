@@ -123,7 +123,7 @@ Tests the ExceptionHandler PMC.
     push_eh outcatch
     $I0 = subclass_handler_catches(myhandler)
   outcatch:
-    todo($I0, 'Exception Handler subclass catch exception')
+    ok($I0, 'Exception Handler subclass catch exception')
 .end
 
 .sub subclass_exception_handler
@@ -178,9 +178,11 @@ Tests the ExceptionHandler PMC.
     throw $P0
 
   subclassed_failed:
+    .get_results($P0)
     .return(0)
 
   subclassed_handler:
+    .get_results($P0)
     .return(1)
 .end
 
@@ -200,9 +202,11 @@ Tests the ExceptionHandler PMC.
     throw $P0
 
   subclassed_failed:
+    .get_results($P0)
     .return(0)
 
   subclassed_handler:
+    .get_results($P0)
     .return(1)
 .end
 
