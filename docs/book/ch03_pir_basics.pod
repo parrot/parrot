@@ -316,12 +316,12 @@ be allocated. However, the downside of the register allocator is that it
 takes more time to execute during the compilation phase. Here's an example
 of where a register could be reused:
 
-.sub main
-  $S0 = "hello "
-  print $S0
-  $S1 = "world!"
-  print $S1
-.end
+  .sub main
+    $S0 = "hello "
+    print $S0
+    $S1 = "world!"
+    print $S1
+  .end
 
 We'll talk about subroutines in more detail in the next chapter. For now,
 we can dissect this little bit of code to see what is happening. The C<.sub>
@@ -345,12 +345,12 @@ determine that it can use only one register for both operations. This saves
 the second allocation. Notice that this code with only one register performs
 identically to the previous example:
 
-.sub main
-  $S0 = "hello "
-  print $S0
-  $S0 = "world!"
-  print $S0
-.end
+  .sub main
+    $S0 = "hello "
+    print $S0
+    $S0 = "world!"
+    print $S0
+  .end
 
 In some situations it can be helpful to turn the allocator off and avoid
 expensive optimizations. Such situations are subroutines where there are a
@@ -762,11 +762,11 @@ are a standard list of functions that all PMCs implement N<or, PMCs can
 choose not to implement each interface explicitly and instead let Parrot
 call the default implementations>. 
 
-VTABLES are very strict: There are a fixed number with fixed names and
+VTABLEs are very strict: There are a fixed number with fixed names and
 fixed argument lists. You can't just create any random VTABLE interface that
 you want to create, you can only make use of the ones that Parrot supplies
 and expects. To circumvent this limitation, PMCs may have METHODS in
-addition to VTABLES. METHODS are arbitrary code functions that can be
+addition to VTABLEs. METHODs are arbitrary code functions that can be
 written in C, may have any name, and may implement any behavior.
 
 =head2 VTABLE Interfaces
