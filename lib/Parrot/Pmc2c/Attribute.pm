@@ -104,6 +104,7 @@ sub generate_accessor {
     my $isptrtostring = qr/STRING\s*\*$/;
     my $isptrtopmc    = qr/PMC\s*\*$/;
 
+    my $inherit        = 1;
     my $decl           = <<"EOA";
 
 /* Generated macro accessors for '$attrname' attribute of $pmcname PMC. */
@@ -116,21 +117,21 @@ EOA
         $decl .= <<"EOA";
             PMC *attr_value = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
-            (dest) = VTABLE_get_integer(interp, attr_value); \\
+            (dest) = (PMC_IS_NULL(attr_value) ? (INTVAL) 0: VTABLE_get_integer(interp, attr_value)); \\
 EOA
     }
     elsif ($attrtype eq "FLOATVAL") {
         $decl .= <<"EOA";
             PMC *attr_value = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
-            (dest) = VTABLE_get_number(interp, attr_value); \\
+            (dest) =  (PMC_IS_NULL(attr_value) ? (FLOATVAL) 0.0: VTABLE_get_number(interp, attr_value)); \\
 EOA
     }
     elsif ($attrtype =~ $isptrtostring) {
         $decl .= <<"EOA";
             PMC *attr_value = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
-            (dest) = VTABLE_get_string(interp, attr_value); \\
+            (dest) =  (PMC_IS_NULL(attr_value) ? (STRING *) 0: VTABLE_get_string(interp, attr_value)); \\
 EOA
     }
     elsif ($attrtype =~ $isptrtopmc) {
@@ -141,6 +142,7 @@ EOA
     }
 
     else {
+        $inherit = 0;
         $decl .= <<"EOA";
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
                 "Attributes of type '$attrtype' cannot be " \\
@@ -205,6 +207,8 @@ EOA
     }
 
 EOA
+
+    $self->{inherit} = $inherit;
 
     $h->emit($decl);
 

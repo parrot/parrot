@@ -160,6 +160,26 @@ Initializes a PMCProxy PMC.
             Parrot_oo_extract_methods_from_namespace(interp, SELF,
                     proxy_info->_namespace);
         }
+
+        { /* Create inherited attributes */
+            /* Each attribute is prefixed with his type
+             * and terminated by an space,
+             * the list is '\0' terminated
+             */
+            const char * attr = interp->vtables[type_num]->attribute_defs;
+            while (* attr) {
+                const char * const current = attr + 1;
+                size_t l;
+                char attrtype = * attr;
+                while (* attr != ' ') ++attr;
+                l= attr - current;
+                if (attrtype != ':') {
+                    STRING *sattr = Parrot_str_new(interp, current, l);
+                    SELF.add_attribute(sattr, NULL);
+                }
+                ++attr;
+            }
+        }
     }
 
 /*

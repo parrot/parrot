@@ -435,6 +435,7 @@ sub vtable_decl {
         NULL,       /* isa_hash */
         NULL,       /* class */
         NULL,       /* mro */
+        attr_defs,  /* attribute_defs */
         NULL,       /* ro_variant_vtable */
         $methlist
     };
@@ -487,6 +488,34 @@ sub init_func {
 void
 Parrot_${classname}_class_init(PARROT_INTERP, int entry, int pass)
 {
+    static const char attr_defs [] =
+EOC
+    $cout .= '        "';
+
+    my $attributes = $self->attributes;
+    foreach my $attribute ( @$attributes ) {
+        my $attrtype       = $attribute->{type};
+        my $typeid = ':'; # Unhandled
+        if ($attrtype eq "INTVAL") {
+            $typeid = 'I';
+        }
+        elsif ($attrtype eq "FLOATVAL") {
+            $typeid = 'F';
+        }
+        elsif ($attrtype =~ /STRING\s*\*$/) {
+            $typeid = 'S';
+        }
+        elsif ($attrtype =~ /PMC\s*\*$/) {
+            $typeid = 'F';
+        }
+
+        $cout .= $typeid;
+        $cout .= $attribute->name;
+        $cout .= ' ';
+    }
+
+    $cout .= "\";\n";
+    $cout .= <<"EOC";
 $vtable_decl
 EOC
 

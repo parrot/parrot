@@ -93,6 +93,8 @@ END_PMC
 void
 Parrot_a_class_init(PARROT_INTERP, int entry, int pass)
 {
+    static const char attr_defs [] =
+        "";
     const VTABLE temp_base_vtable = {
 END_C
 

@@ -192,20 +192,22 @@ Report whether the exception handler can handle a particular type of exception.
         STRING * const sev    = CONST_STRING(interp, "severity");
         STRING * const ex_str = CONST_STRING(interp, "Exception");
 
-        Parrot_ExceptionHandler_attributes * const core_struct =
-                    PARROT_EXCEPTIONHANDLER(SELF);
         INTVAL severity = VTABLE_get_integer_keyed_str(interp, exception, sev);
 
         if (exception->vtable->base_type == enum_class_Exception
         ||  VTABLE_isa(INTERP, exception, ex_str)) {
-            PMC * handled_types;
+            PMC *handled_types;
+            PMC *handled_types_except;
+	    INTVAL min_severity, max_severity;
             GET_ATTR_handled_types(INTERP, SELF, handled_types);
+            GET_ATTR_handled_types_except(INTERP, SELF, handled_types_except);
+            GET_ATTR_max_severity(INTERP, SELF, max_severity);
+            GET_ATTR_min_severity(INTERP, SELF, min_severity);
 
-            if (severity < core_struct->min_severity) {
+            if (severity < min_severity) {
                 RETURN(INTVAL 0);
             }
-            if (core_struct->max_severity > 0
-                 &&  severity                  > core_struct->max_severity) {
+            if (max_severity > 0 &&  severity > max_severity) {
                 RETURN(INTVAL 0);
             }
             if (! PMC_IS_NULL(handled_types)) {
@@ -222,22 +224,21 @@ Report whether the exception handler can handle a particular type of exception.
 
                 RETURN(INTVAL 0);
             }
-            if (core_struct->handled_types_except != PMCNULL) {
-                const INTVAL elems = VTABLE_elements(interp, core_struct->handled_types_except);
+            if (handled_types_except != PMCNULL) {
+                const INTVAL elems = VTABLE_elements(interp, handled_types_except);
                 const INTVAL type  = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "type"));
                 INTVAL i;
 
                 for (i = 0; i < elems; i++) {
                     const INTVAL handled_type = VTABLE_get_integer_keyed_int(interp,
-                            core_struct->handled_types_except, i);
+                            handled_types_except, i);
                     if (handled_type == type)
                         RETURN(INTVAL 0);
                 }
 
                 RETURN(INTVAL 1);
             }
-            else if (core_struct->max_severity > 0 ||
-                    core_struct->min_severity > 0) {
+            else if (max_severity > 0 || min_severity > 0) {
                 RETURN(INTVAL 1);
             }
 

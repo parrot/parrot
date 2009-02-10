@@ -175,6 +175,7 @@ typedef struct _vtable {
     PMC    *pmc_class;      /* for PMCs: a PMC of that type
                                for objects: the class PMC */
     PMC    *mro;            /* array PMC of [class, parents ... ] */
+    const char *attribute_defs; /* list of PMC attributes */
     struct _vtable *ro_variant_vtable; /* A variant of this vtable with the
                                    opposite IS_READONLY flag */
     /* Vtable Functions */
