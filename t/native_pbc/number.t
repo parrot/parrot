@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
 
-use Parrot::Test skip_all => "Ongoing work in TT #254";
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -21,6 +21,19 @@ t/native_pbc/number.t - Floating-Point Numbers
 =head1 DESCRIPTION
 
 Tests word-size/float-type/endian-ness for different architectures.
+
+These tests usually only work on releases, not on svn checkouts
+and if every release has updated native pbc test files.
+
+See F<tools/dev/mk_native_pbc> to create the platform-specific native pbcs.
+
+=head1 PLATFORMS
+
+  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
+  _2   i386 32 bit opcode_t, 32 bit intval, long double (linux-gcc-ix86)
+  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
+  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+  _5   big-endian 64-bit                     (irix or similar)
 
 =cut
 
@@ -93,11 +106,20 @@ END_OUTPUT
 #         dirformat = 1
 # ]
 TODO: {
-local $TODO = "Known problem on 64bit with reading 32bit dirs. See TT #254"
-  if $PConfig{ptrsize} == 8;
+    local $TODO;
+    if ($PConfig{ptrsize} == 8) {
+        $TODO = "Known problem on 64bit with reading 32bit dirs. See TT #254"
+    } elsif ($PConfig{DEVEL}) {
+        $TODO = "devel versions are not guaranteed to succeed";
+    }
 
 pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
     or diag "May need to regenerate t/native_pbc/number_1.pbc; read test file";
+
+pbc_output_is( undef, $output, "i386 long double float 32 bit opcode_t")
+    or diag "May need to regenerate t/native_pbc/number_2.pbc; read test file";
+
+}
 
 # darwin/ppc:
 # HEADER => [
@@ -109,9 +131,13 @@ pbc_output_is( undef, $output, "i386 double float 32 bit opcode_t" )
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
+
+TODO: {
+local $TODO = "devel versions are not guaranteed to succeed"
+  if $PConfig{DEVEL};
+
 pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
-    or diag "May need to regenerate t/native_pbc/number_2.pbc; read test file";
-}
+    or diag "May need to regenerate t/native_pbc/number_3.pbc; read test file";
 
 # any ordinary 64-bit intel unix:
 # HEADER => [
@@ -123,18 +149,15 @@ pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-TODO: {
-local $TODO = "Known problem on 64bit double-float gentoo-amd64, but not solaris-64int. See TT #254"
-  if $PConfig{ptrsize} == 8;
 
-pbc_output_is(undef, $output, "x86_64 double float 64 bit opcode_t")
-    or diag "May need to regenerate t/native_pbc/number_3.pbc; read test file";
+pbc_output_is(undef, $output, "i86_64 LE 64 bit opcode_t, 64 bit intval")
+    or diag "May need to regenerate t/native_pbc/number_4.pbc; read test file";
+
+# Formerly there were also a test for:
+# pbc_output_is(undef, $output, "big-endian 64-bit irix")
+#   or diag "May need to regenerate t/native_pbc/number_5.pbc; read test file";
+
 }
-
-# Formerly there were tests for:
-# pbc_output_is(undef, <<OUTPUT, "i386 long double float 32 bit opcode_t"); #_2
-# pbc_output_is(undef, <<OUTPUT, "little-endian 64-bit tru64");             #_4
-# pbc_output_is(undef, <<OUTPUT, "big-endian 64-bit irix");                 #_5
 
 # Local Variables:
 #   mode: cperl

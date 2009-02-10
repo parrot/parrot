@@ -6,7 +6,9 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test skip_all => 'ongoing PBC format changes'; # tests => 1;
+use Parrot::Config;
+
+use Parrot::Test tests => 1;
 
 =head1 NAME
 
@@ -19,6 +21,19 @@ t/native_pbc/string.t - PBC string tests
 =head1 DESCRIPTION
 
 Tests word-size/string/endian-ness for different architectures.
+
+These tests usually only work on releases, not on svn checkouts
+and if every release has updated native pbc test files.
+
+See F<tools/dev/mk_native_pbc> to create the platform-specific native pbcs.
+
+=head1 PLATFORMS
+
+  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
+  _2   i386 32 bit opcode_t, 32 bit intval, long double (linux-gcc-ix86)
+  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
+  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+  _5   big-endian 64-bit                     (irix or similar)
 
 =cut
 
@@ -49,7 +64,13 @@ END_OUTPUT
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
+TODO: {
+local $TODO = "devel versions are not guaranteed to succeed"
+  if $PConfig{DEVEL};
+
 pbc_output_is( undef, $output, "i386 32 bit opcode_t, 32 bit intval" );
+
+}
 
 # Local Variables:
 #   mode: cperl

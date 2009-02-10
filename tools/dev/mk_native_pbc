@@ -1,32 +1,131 @@
 #!/bin/sh
 
-# generate t/native_pbc_{1,2}.pbc
-# this should be run on i386 systems to regenerate the first two
-# native tests
-# NOTE: This will need a perl compiled with long double support
+# sh tools/dev/mk_native_pbc [--noconf]
+#
+# generate t/native_pbc/_{1,2}.pbc
+# This should only be run on known systems to regenerate the native pbcs.
+# Better do not try that on mingw, use cygwin instead.
+#
+# NOTE:  For _2 this will need a compiler with long double support
 # NOTE2: Installing ccache speeds this process up considerably
+# NOTE3: Do not svn commit this on a devel release,
+#        update the VERSION and rm .parrot_current_rev
 
-# run it as:
-# $ sh tools/dev/mk_native_pbc
+#  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
+#  _2   i386 32 bit opcode_t, 32 bit intval, long double (linux-gcc-ix86)
+#  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
+#  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+#  _5   big-endian 64-bit                     (irix or similar)
 
-make -s progclean
-make -s -C imcc clean
-perl Configure.pl --debugging --floatval="long double" --nomanicheck
+#tests:
+#parrot -o i.pbc -a - <<EOF
+#  print 0x10203040
+#  end
+#  EOF
+# t/op/number_1.pasm
+# t/op/string_133.pasm
+
+# check 32/64 bit, endianess, hugefloat
+N=
+enable_long_double=
+conf=
+exe=
+
+# unfortunately there are older perls around
+byteorder=$(perl -V:byteorder | perl -ne "s/byteorder='(\d+)';/\\1/; print")
+ptrsize=$(perl -V:ptrsize)
+
+if [ "$ptrsize" == "ptrsize='4';" ]
+then
+    if [ "$byteorder" == "1234" ]
+    then
+        N=1
+        if [ "$(perl -V:uselongdouble)" == "uselongdouble='define';" ]; then
+            enable_long_double=1
+            conf=" --floatval=double"
+        fi
+    else
+        if [ "$byteorder" == "4321" ]
+        then
+            N=3
+        else
+            if [ "$byteorder" == "12345678" \
+                 -a "$(perl -V:osname)" == "osname='cygwin';" ]
+            then
+                echo "detected cygwin use64bitint: ok"
+                N=1
+                exe=.exe
+            else
+                echo "unsupported perl -V:byteorder $byteorder"
+                exit 1
+            fi
+        fi
+    fi
+else
+    if [ "$ptrsize" == "ptrsize='8';" ]
+    then
+        if [ "$byteorder" == "12345678" ]
+        then
+            N=4
+        else
+            N=5
+        fi
+    else
+        echo "unsupported perl -V:ptrsize $ptrsize"
+        exit 1
+    fi
+fi
+
+if [ "$enable_long_double" == "1" ]; then
+    if [ "$1" != "--noconf" ]; then
+      make -s prog-clean
+      perl Configure.pl --debugging --floatval="long double" --nomanicheck
+    fi
+    tail myconfig
+    make -s || exit 1
+    [ -e t/op/number_1.pasm ] || perl t/harness t/op/number.t
+    [ -e t/op/string_133.pasm ] || perl t/harness t/op/string.t
+    ./parrot -o t/native_pbc/integer_2.pbc -a - <<EOF
+print 0x10203040
+end
+EOF
+    [ $? -le 0 ] && echo "t/native_pbc/integer_2.pbc updated"
+    ./parrot -o t/native_pbc/number_2.pbc t/op/number_1.pasm && echo "t/native_pbc/number_2.pbc updated"
+    ./parrot -o t/native_pbc/string_2.pbc t/op/string_133.pasm  && echo "t/native_pbc/string_2.pbc updated"
+
+    make pbc_dump$exe
+    ./pbc_dump -h t/native_pbc/number_2.pbc
+fi
+
+if [ "$1" != "--noconf" ]; then
+    make -s prog-clean
+    perl Configure.pl --debugging $conf --nomanicheck
+fi
 tail myconfig
-make -s
-./parrot -o n.pbc t/op/number_1.pasm
-mv n.pbc t/native_pbc/number_2.pbc
+make -s || exit 1
 
-make -s progclean
-make -s -C imcc clean
-perl Configure.pl --debugging --floatval=double --nomanicheck
-tail myconfig
-make -s
-./parrot -o n.pbc t/op/number_1.pasm
-mv n.pbc t/native_pbc/number_1.pbc
+[ -e t/op/number_1.pasm ] || perl t/harness t/op/number.t
+[ -e t/op/string_133.pasm ] || perl t/harness t/op/string.t
+./parrot -o t/native_pbc/integer_${N}.pbc -a - <<EOF
+print 0x10203040
+end
+EOF
+[ $? -le 0 ] && echo "t/native_pbc/integer_${N}.pbc updated"
+./parrot -o t/native_pbc/number_${N}.pbc t/op/number_1.pasm && echo "t/native_pbc/number_${N}.pbc updated"
+./parrot -o t/native_pbc/string_${N}.pbc t/op/string_133.pasm  && echo "t/native_pbc/string_${N}.pbc updated"
 
-make pbc_dump
-./pbc_dump -h t/native_pbc/number_1.pbc
-./pbc_dump -h t/native_pbc/number_2.pbc
+make pbc_dump$exe
+./pbc_dump -h t/native_pbc/number_${N}.pbc
 
-perl t/harness t/native_pbc/number.t
+perl t/harness t/native_pbc/integer.t && \
+    perl t/harness t/native_pbc/number.t && \
+    perl t/harness t/native_pbc/string.t
+
+echo ""
+if [ -e .parrot_current_rev ]
+then
+    echo "Do not commit these native_pbcs on devel versions, it must be a release candidate!"
+else
+    cd t/native_pbc
+    echo svn commit -m'native_pbc platform updates'
+fi
