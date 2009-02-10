@@ -698,7 +698,7 @@ parrot_gc_ims_reinit(PARROT_INTERP)
     Gc_ims_private *g_ims;
     Arenas * const  arena_base = interp->arena_base;
 
-    arena_base->lazy_dod = 0;
+    arena_base->lazy_gc = 0;
     Parrot_gc_ms_run_init(interp);
 
     /*
@@ -745,7 +745,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
 
     todo = (size_t)(g_ims->alloc_trigger * g_ims->throttle * work_factor);
 
-    PARROT_ASSERT(arena_base->lazy_dod == 0);
+    PARROT_ASSERT(arena_base->lazy_gc == 0);
     Parrot_gc_trace_children(interp, todo);
 
     /* check if we are finished with marking -- the end is self-referential */
@@ -1104,7 +1104,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
 
     /* if we stopped early, the lazy run was successful */
     if (g_ims->state < GC_IMS_COLLECT)
-        ++arena_base->lazy_dod_runs;
+        ++arena_base->lazy_gc_runs;
 
     g_ims->lazy = 0;
 }

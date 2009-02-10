@@ -142,7 +142,7 @@ typedef struct Arenas {
      * statistics for DOD and GC
      */
     size_t  dod_runs;           /* Number of times we've done a DOD sweep */
-    size_t  lazy_dod_runs;      /* Number of successful lazy DOD sweep */
+    size_t  lazy_gc_runs;       /* Number of successful lazy DOD sweep */
     size_t  collect_runs;       /* Number of times we've
                                  * done a memory compaction
                                  */
@@ -168,7 +168,7 @@ typedef struct Arenas {
     PMC* gc_mark_start;         /* first PMC marked during a DOD run */
     PMC* gc_mark_ptr;           /* last PMC marked during a DOD run */
     PMC* gc_trace_ptr;          /* last PMC trace_children was called on */
-    int lazy_dod;               /* flag that indicates whether we should stop
+    int lazy_gc;                /* flag that indicates whether we should stop
                                    when we've seen all impatient PMCs */
     /*
      * DOD, GC blocking

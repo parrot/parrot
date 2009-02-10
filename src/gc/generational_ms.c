@@ -1598,14 +1598,14 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
 {
     ASSERT_ARGS(trace_children_cb)
     Arenas * const arena_base = interp->arena_base;
-    const int lazy_dod = arena_base->lazy_dod;
+    const int lazy_gc = arena_base->lazy_gc;
     Gc_gms_hdr *h;
 
     for (h = pool->gray; h != pool->white;) {
         PMC * const current = (PMC*)GMSH_to_PObj(h);
         UINTVAL bits;
 
-        if (lazy_dod && arena_base->num_early_PMCs_seen >=
+        if (lazy_gc && arena_base->num_early_PMCs_seen >=
                 arena_base->num_early_DOD_PMCs) {
             return 1;
         }
@@ -1864,9 +1864,9 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
 
     /* normal or lazy DOD run */
     arena_base->dod_runs++;
-    arena_base->lazy_dod = (flags & GC_lazy_FLAG);
+    arena_base->lazy_gc = (flags & GC_lazy_FLAG);
     gc_gms_init_mark(interp);
-    if (gc_gms_trace_root(interp, !arena_base->lazy_dod) &&
+    if (gc_gms_trace_root(interp, !arena_base->lazy_gc) &&
             gc_gms_trace_children(interp)) {
         gc_gms_sweep(interp);
         gc_gms_set_gen(interp);
@@ -1875,7 +1875,7 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
         /*
          * successful lazy DOD run
          */
-        ++arena_base->lazy_dod_runs;
+        ++arena_base->lazy_gc_runs;
     }
     gc_gms_end_cycle(interp);
     --arena_base->DOD_block_level;

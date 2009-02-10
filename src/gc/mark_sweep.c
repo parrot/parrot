@@ -195,7 +195,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     }
 
     ++arena_base->DOD_block_level;
-    arena_base->lazy_dod = flags & GC_lazy_FLAG;
+    arena_base->lazy_gc = flags & GC_lazy_FLAG;
 
     /* tell the threading system that we're doing DOD mark */
     pt_DOD_start_mark(interp);
@@ -228,7 +228,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
         pt_DOD_stop_mark(interp); /* XXX */
 
         /* successful lazy DOD count */
-        ++arena_base->lazy_dod_runs;
+        ++arena_base->lazy_gc_runs;
 
         Parrot_gc_clear_live_bits(interp);
         if (interp->profile)
@@ -352,7 +352,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     Parrot_IOData_mark(interp, interp->piodata);
 
     /* quick check if we can already bail out */
-    if (arena_base->lazy_dod
+    if (arena_base->lazy_gc
     &&  arena_base->num_early_PMCs_seen >= arena_base->num_early_DOD_PMCs)
         return 0;
 
@@ -954,7 +954,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 {
     ASSERT_ARGS(Parrot_gc_trace_children)
     Arenas * const arena_base = interp->arena_base;
-    const int      lazy_dod   = arena_base->lazy_dod;
+    const int      lazy_gc    = arena_base->lazy_gc;
     PMC           *current    = arena_base->gc_mark_start;
 
     /*
@@ -974,7 +974,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
     do {
         PMC *next;
 
-        if (lazy_dod && arena_base->num_early_PMCs_seen >=
+        if (lazy_gc && arena_base->num_early_PMCs_seen >=
                 arena_base->num_early_DOD_PMCs) {
             return 0;
         }
