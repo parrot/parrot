@@ -27,7 +27,7 @@ typedef enum {
 typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, void *);
 typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
 typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
-typedef void (*dod_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
+typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
 
 #if PARROT_GC_GMS
 /*
@@ -103,7 +103,7 @@ typedef struct Small_Object_Pool {
     get_free_object_fn_type     get_free_object;
     alloc_objects_fn_type       alloc_objects;
     alloc_objects_fn_type       more_objects;
-    dod_object_fn_type          dod_object;
+    gc_object_fn_type           gc_object;
     /* gets and removes a free object from the pool's free list */
     /* allocates more objects */
     struct Memory_Pool *mem_pool;

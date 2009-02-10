@@ -491,8 +491,8 @@ Parrot_gc_ms_run_init(PARROT_INTERP)
     ASSERT_ARGS(Parrot_gc_ms_run_init)
     Arenas * const arena_base       = interp->arena_base;
 
-    arena_base->dod_trace_ptr       = NULL;
-    arena_base->dod_mark_start      = NULL;
+    arena_base->gc_trace_ptr        = NULL;
+    arena_base->gc_mark_start       = NULL;
     arena_base->num_early_PMCs_seen = 0;
     arena_base->num_extended_PMCs   = 0;
 }

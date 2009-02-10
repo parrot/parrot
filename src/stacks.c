@@ -386,7 +386,7 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
     if (cur_chunk->refcount <= 0) {
         Small_Object_Pool * const pool = cur_chunk->pool;
 
-        pool->dod_object(interp, pool, (PObj *)cur_chunk);
+        pool->gc_object(interp, pool, (PObj *)cur_chunk);
         pool->add_free_object(interp, pool, (PObj *)cur_chunk);
     }
 

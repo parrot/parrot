@@ -1605,7 +1605,7 @@ not.
 
 TODO - Have a count of shared PMCs and check it during DOD.
 
-TODO - Evaluate if a interpreter lock is cheaper when C<dod_mark_ptr> is
+TODO - Evaluate if a interpreter lock is cheaper when C<gc_mark_ptr> is
 updated.
 
 =cut

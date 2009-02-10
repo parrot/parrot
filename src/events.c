@@ -1051,7 +1051,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
     event->type   = EVENT_TYPE_IO;
     event->interp = interp;
     /*
-     * TODO dod_register these PMCs as long as the event system
+     * TODO gc_register these PMCs as long as the event system
      *      owns these 3
      *      unregister, when event is passed to interp again
      */

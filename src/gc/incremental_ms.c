@@ -749,7 +749,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
     Parrot_gc_trace_children(interp, todo);
 
     /* check if we are finished with marking -- the end is self-referential */
-    next = arena_base->dod_mark_start;
+    next = arena_base->gc_mark_start;
 
     if (next == PMC_next_for_GC(next))
         g_ims->state = GC_IMS_START_SWEEP;
