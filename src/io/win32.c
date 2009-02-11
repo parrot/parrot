@@ -305,7 +305,7 @@ Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
     PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
     if (os_handle != INVALID_HANDLE_VALUE) {
         if (CloseHandle(os_handle) == 0)
-            result = GetLastError ();
+            result = GetLastError();
         Parrot_io_set_os_handle(interp, filehandle, INVALID_HANDLE_VALUE);
     }
     return 0;
