@@ -669,13 +669,13 @@ op_name(PARROT_INTERP, int k)
 {
     ASSERT_ARGS(op_name)
     switch (k) {
-        case PARROT_PROF_DOD_p1:
+        case PARROT_PROF_GC_p1:
             return "DOD_mark_root";
-        case PARROT_PROF_DOD_p2:
+        case PARROT_PROF_GC_p2:
             return "DOD_mark_next";
-        case PARROT_PROF_DOD_cp:
+        case PARROT_PROF_GC_cp:
             return "DOD_collect_PMC";
-        case PARROT_PROF_DOD_cb:
+        case PARROT_PROF_GC_cb:
             return "DOD_collect_buffers";
         case PARROT_PROF_GC:
             return "GC";

@@ -775,7 +775,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *a
     Parrot_gc_sweep(interp, pool);
 
     if (interp->profile && (flag & POOL_PMC))
-        Parrot_gc_profile_end(interp, PARROT_PROF_DOD_cp);
+        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);
 
     *n_obj += pool->total_objects - pool->num_free_objects;
 
@@ -826,7 +826,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
     UNUSED(ignored);
 
     if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_DOD_cb);
+        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cb);
 
     g_ims->state           = GC_IMS_COLLECT;
     g_ims->n_objects       = n_objects;

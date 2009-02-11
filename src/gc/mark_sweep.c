@@ -222,7 +222,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
         UNUSED(ignored);
 
         if (interp->profile)
-            Parrot_gc_profile_end(interp, PARROT_PROF_DOD_cb);
+            Parrot_gc_profile_end(interp, PARROT_PROF_GC_cb);
     }
     else {
         pt_gc_stop_mark(interp); /* XXX */
@@ -232,7 +232,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
 
         Parrot_gc_clear_live_bits(interp);
         if (interp->profile)
-            Parrot_gc_profile_end(interp, PARROT_PROF_DOD_p2);
+            Parrot_gc_profile_end(interp, PARROT_PROF_GC_p2);
     }
 
     /* Note it */
@@ -361,7 +361,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
         trace_system_areas(interp);
 
     if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_DOD_p1);
+        Parrot_gc_profile_end(interp, PARROT_PROF_GC_p1);
 
     return 1;
 }
@@ -854,7 +854,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
     Parrot_gc_sweep(interp, pool);
 
     if (interp->profile && (flag & POOL_PMC))
-        Parrot_gc_profile_end(interp, PARROT_PROF_DOD_cp);
+        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);
 
     *total_free += pool->num_free_objects;
 
@@ -1009,7 +1009,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
     arena_base->gc_trace_ptr  = NULL;
 
     if (interp->profile)
-        Parrot_gc_profile_end(interp, PARROT_PROF_DOD_p2);
+        Parrot_gc_profile_end(interp, PARROT_PROF_GC_p2);
 
     return 1;
 }

@@ -83,7 +83,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
         clear_cow(interp, pool, 0);
 
     if (interp->profile && (flag & POOL_PMC))
-        Parrot_gc_profile_end(interp, PARROT_PROF_DOD_cp);
+        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);
 
     *total_free += pool->num_free_objects;
 

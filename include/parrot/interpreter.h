@@ -153,10 +153,10 @@ typedef struct warnings_t {
  * one entry per op at (op + extra) */
 
 typedef enum {
-     PARROT_PROF_DOD_p1,        /* pass 1 mark root set */
-     PARROT_PROF_DOD_p2,        /* pass 2 mark next_for_GC */
-     PARROT_PROF_DOD_cp,        /* collect PMCs */
-     PARROT_PROF_DOD_cb,        /* collect buffers */
+     PARROT_PROF_GC_p1,        /* pass 1 mark root set */
+     PARROT_PROF_GC_p2,        /* pass 2 mark next_for_GC */
+     PARROT_PROF_GC_cp,        /* collect PMCs */
+     PARROT_PROF_GC_cb,        /* collect buffers */
      /* DOD must be 0..3 */
      PARROT_PROF_GC,
      PARROT_PROF_EXCEPTION,
