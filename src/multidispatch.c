@@ -839,13 +839,15 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
     const INTVAL sig_len    = Parrot_str_byte_length(interp, string_sig);
     INTVAL       tuple_size = 0;
     INTVAL       args_ended = 0;
-    INTVAL       i;
+    INTVAL       i, seen_invocant = 0;
 
     /* First calculate the number of arguments participating in MMD */
     for (i = 0; i < sig_len; ++i) {
         INTVAL type = Parrot_str_indexed(interp, string_sig, i);
         if (type == '-')
             break;
+        if (type == 'i')
+            continue;
 
         tuple_size++;
     }
@@ -853,7 +855,7 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
     VTABLE_set_integer_native(interp, type_tuple, tuple_size);
 
     for (i = 0; i < sig_len; ++i) {
-        INTVAL type = Parrot_str_indexed(interp, string_sig, i);
+        INTVAL type = Parrot_str_indexed(interp, string_sig, i + seen_invocant);
         if (args_ended)
             break;
 
@@ -879,6 +881,7 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
                         Parrot_ex_throw_from_c_args(interp, NULL,
                             EXCEPTION_INVALID_OPERATION,
                             "Multiple Dispatch: only the first argument can be an invocant");
+                    seen_invocant = 1;
                 }
                 else {
                     PMC *pmc_arg = VTABLE_get_pmc_keyed_int(interp, sig_obj, i);
