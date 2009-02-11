@@ -136,6 +136,7 @@ help:
 	@echo "  test-php:          Run the test suite for the reference implementation."
 	@echo "  test-pmc:          Run the test suite for Pipp's PMCs."
 	@echo "  smoke:             Run the test suite and send report to the smolder server"
+	@echo "  codetest:          Run file metadata and coding standards tests."
 	@echo ""
 	@echo "Cleaning:"
 	@echo "  clean:             Clean up."
@@ -265,6 +266,64 @@ t/php_qa_testsuite/php5/tests:
 #t/php_qa_testsuite/php5/Zend/tests:
 	#cd php_qa_testsuite && cvs -d :pserver:cvsread@cvs.php.net:/repository/ZendEngine2 checkout -r PHP_5_3 php5/Zend/tests
 
+codetest: codetest-c codetest-make codetest-perl codetest-pir codetest-pod
+
+T_C     = src//pmc//*.pmc src//pmc//php_private.h src//pmc//pipp_hash.c src//pmc//pipp_hash.h
+T_MAKE  = config//makefiles//root.in
+T_PERL  = Configure.pl t//harness t//php//*.t src//build//genskel.pl \
+          lib//Parrot//Test//*.pm lib//Parrot//Test//Pipp//*.pm
+T_PIR   = *.pir src//classes//*.pir src//common//*.pir src//pct//quote_expression.pir
+T_POD   = docs//*.pod
+
+codetest-c:
+	- $(PERL) @build_dir@/t/codingstd/c_code_coda.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/c_cppcomments.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/c_indent.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/c_macro_args.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/c_operator.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/c_parens.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/c_returns.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/copyright.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/cuddled_else.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/filenames.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/linelength.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/svn_id.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/tabs.t $(T_C)
+	- $(PERL) @build_dir@/t/codingstd/trailing_space.t $(T_C)
+
+codetest-make:
+	- $(PERL) @build_dir@/t/codingstd/copyright.t $(T_MAKE)
+	- $(PERL) @build_dir@/t/codingstd/filenames.t $(T_MAKE)
+	- $(PERL) @build_dir@/t/codingstd/make_code_coda.t $(T_MAKE)
+	- $(PERL) @build_dir@/t/codingstd/linelength.t $(T_MAKE)
+	- $(PERL) @build_dir@/t/codingstd/svn_id.t $(T_MAKE)
+	- $(PERL) @build_dir@/t/codingstd/trailing_space.t $(T_MAKE)
+
+codetest-perl:
+#	- $(PERL) @build_dir@/t/codingstd/copyright.t $(T_PERL)
+	- $(PERL) @build_dir@/t/codingstd/cuddled_else.t $(T_PERL)
+	- $(PERL) @build_dir@/t/codingstd/filenames.t $(T_PERL)
+#	- $(PERL) @build_dir@/t/codingstd/linelength.t $(T_PERL)
+	- $(PERL) @build_dir@/t/codingstd/perlcritic.t $(T_PERL)
+	- $(PERL) @build_dir@/t/codingstd/svn_id.t $(T_PERL)
+	- $(PERL) @build_dir@/t/codingstd/trailing_space.t $(T_PERL)
+
+codetest-pir:
+#	- $(PERL) @build_dir@/t/codingstd/copyright.t $(T_PIR)
+	- $(PERL) @build_dir@/t/codingstd/filenames.t $(T_PIR)
+#	- $(PERL) @build_dir@/t/codingstd/linelength.t $(T_PIR)
+	- $(PERL) @build_dir@/t/codingstd/pir_code_coda.t $(T_PIR)
+	- $(PERL) @build_dir@/t/codingstd/svn_id.t $(T_PIR)
+	- $(PERL) @build_dir@/t/codingstd/tabs.t $(T_PIR)
+	- $(PERL) @build_dir@/t/codingstd/trailing_space.t $(T_PIR)
+
+codetest-pod:
+#	- $(PERL) @build_dir@/t/codingstd/copyright.t $(T_POD)
+	- $(PERL) @build_dir@/t/codingstd/linelength.t $(T_POD)
+	- $(PERL) @build_dir@/t/codingstd/svn_id.t $(T_POD)
+	- $(PERL) @build_dir@/t/codingstd/tabs.t $(T_POD)
+	- $(PERL) @build_dir@/t/codingstd/trailing_space.t $(T_POD)
+	- $(PERL) @build_dir@/t/doc/pod.t $(T_POD)
 
 # cleaning up
 clean: clean-pmc clean-test clean-hash
