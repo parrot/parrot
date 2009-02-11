@@ -198,7 +198,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     arena_base->lazy_gc = flags & GC_lazy_FLAG;
 
     /* tell the threading system that we're doing DOD mark */
-    pt_DOD_start_mark(interp);
+    pt_gc_start_mark(interp);
     Parrot_gc_ms_run_init(interp);
 
     /* compact STRING pools to collect free headers and allocated buffers */
@@ -214,7 +214,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
         arena_base->gc_mark_ptr  = NULL;
 
         /* mark is now finished */
-        pt_DOD_stop_mark(interp);
+        pt_gc_stop_mark(interp);
 
         /* Now put unused PMCs and Buffers on the free list */
         ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
@@ -225,7 +225,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
             Parrot_gc_profile_end(interp, PARROT_PROF_DOD_cb);
     }
     else {
-        pt_DOD_stop_mark(interp); /* XXX */
+        pt_gc_stop_mark(interp); /* XXX */
 
         /* successful lazy DOD count */
         ++arena_base->lazy_gc_runs;
@@ -969,7 +969,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
     if (interp->profile)
         Parrot_gc_profile_start(interp);
 
-    pt_DOD_mark_root_finished(interp);
+    pt_gc_mark_root_finished(interp);
 
     do {
         PMC *next;

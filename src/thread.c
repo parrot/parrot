@@ -1035,7 +1035,7 @@ pt_gc_count_threads(PARROT_INTERP)
 
 Waits until all threads have reached the desired stage.  Takes an interpreter,
 starting stage and ending stage as arguments.  Updates the thread information.
-Used in C<pt_DOD_start_mark> and C<pt_DOD_stop_mark>.
+Used in C<pt_gc_start_mark> and C<pt_gc_stop_mark>.
 
 =cut
 
@@ -1594,7 +1594,7 @@ pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
 
 =over 4
 
-=item C<void pt_DOD_start_mark>
+=item C<void pt_gc_start_mark>
 
 Record that the mark phase of DOD is about to begin. In the presence of shared
 PMCs, we can only run one DOD run at a time because C<< PMC->next_for_GC >> may
@@ -1613,13 +1613,13 @@ updated.
 */
 
 void
-pt_DOD_start_mark(PARROT_INTERP)
+pt_gc_start_mark(PARROT_INTERP)
 {
-    ASSERT_ARGS(pt_DOD_start_mark)
+    ASSERT_ARGS(pt_gc_start_mark)
     Shared_gc_info *info;
     int             block_level;
 
-    DEBUG_ONLY(fprintf(stderr, "%p: pt_DOD_start_mark\n", interp));
+    DEBUG_ONLY(fprintf(stderr, "%p: pt_gc_start_mark\n", interp));
     /* if no other threads are running, we are safe */
     if (!running_threads)
         return;
@@ -1682,7 +1682,7 @@ pt_DOD_start_mark(PARROT_INTERP)
 
 /*
 
-=item C<void pt_DOD_mark_root_finished>
+=item C<void pt_gc_mark_root_finished>
 
 Records that DOD has finished for the root set.  EXCEPTION_UNIMPLEMENTED
 
@@ -1691,9 +1691,9 @@ Records that DOD has finished for the root set.  EXCEPTION_UNIMPLEMENTED
 */
 
 void
-pt_DOD_mark_root_finished(PARROT_INTERP)
+pt_gc_mark_root_finished(PARROT_INTERP)
 {
-    ASSERT_ARGS(pt_DOD_mark_root_finished)
+    ASSERT_ARGS(pt_gc_mark_root_finished)
     if (!running_threads)
         return;
     /*
@@ -1707,7 +1707,7 @@ pt_DOD_mark_root_finished(PARROT_INTERP)
 
 /*
 
-=item C<void pt_DOD_stop_mark>
+=item C<void pt_gc_stop_mark>
 
 Records that the mark phase of DOD has completed.
 
@@ -1716,9 +1716,9 @@ Records that the mark phase of DOD has completed.
 */
 
 void
-pt_DOD_stop_mark(PARROT_INTERP)
+pt_gc_stop_mark(PARROT_INTERP)
 {
-    ASSERT_ARGS(pt_DOD_stop_mark)
+    ASSERT_ARGS(pt_gc_stop_mark)
     if (!running_threads)
         return;
     /*
