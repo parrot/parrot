@@ -112,6 +112,15 @@ if the arg is a Namespace or Class PMC
 
 See TT #159
 
+=item C<.HLL_map>
+
+Languages should use this instead:
+
+  $P0 = getinterp
+  $P0.'hll_map'(TypeA, TypeB)
+
+See TT #314
+
 =back
 
 =head1 Functions
