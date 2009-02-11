@@ -1042,12 +1042,13 @@ handler:
     .complex_op_is("-2-3i", "3.590565-0.530921i", 'sinh' )
 
     eq osname, "openbsd", fail
+    eq osname, "MSWin32", fail
     .complex_op_is("0-2i", "-0.000000-0.909297i", 'sinh' )
     .complex_op_is("0+2i", "-0.000000+0.909297i", 'sinh' )
     .return()
 
 fail:
-    skip( 2, 'failing on your platform' )
+    skip( 2, 'sinh 0+2i, sinh 0-2i failing on your platform' )
 .end
 
 .sub cosh_of_complex_numbers

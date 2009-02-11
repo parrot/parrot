@@ -169,10 +169,22 @@ OUTPUT
 # Operations on a single NUMVAL
 #
 
-SKIP: {
-    skip 'failing on your platform' => 1 if $^O =~ m/openbsd/i;
+my $output = <<OUTPUT;
+-0
+0
+-123.456789
+123.456789
+-0
+0
+-123.456789
+123.456789
+OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "turn a native number into its negative" );
+if ($^O =~ m/openbsd|win32/i) {
+    $output =~ s/-0$/0/mg;
+}
+
+pasm_output_is( <<'CODE', $output, "turn a native number into its negative" );
         set N0, 0
         neg N0
         print N0
@@ -208,17 +220,6 @@ pasm_output_is( <<'CODE', <<OUTPUT, "turn a native number into its negative" );
         print "\n"
         end
 CODE
--0
-0
--123.456789
-123.456789
--0
-0
--123.456789
-123.456789
-OUTPUT
-
-}
 
 pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native number" );
         set N0, 0

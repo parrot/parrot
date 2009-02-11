@@ -503,20 +503,18 @@ ok 1
 ok 2
 OUTPUT
 
-SKIP: {
-    skip 'failing on your platform' => 1 if $^O =~ m/openbsd/i;
+my $output = '-0';
+if ($^O =~ m/openbsd|win32/i) {
+    $output =~ s/-0$/0/mg;
+}
 
-pasm_output_like( << 'CODE', << 'OUTPUT', "neg 0" );
+pasm_output_is( << 'CODE', $output, "neg 0" );
     new P0, ['Float']
     set P0, 0.0
     neg P0
         print P0
     end
 CODE
-/^-0/
-OUTPUT
-
-}
 
 pasm_output_is( << 'CODE', << 'OUTPUT', "Equality" );
     new P0, ['Float']
