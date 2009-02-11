@@ -74,7 +74,7 @@ FixedPMCArray:\s\d+\.\d+s\n
     q{arriter_o1.pir}  => qq(100000\n100000\n100000\n111111\n),
     q{bench_newp.pasm} => qr/^\d+\.\d+\sseconds.\s\d+\.\d+\sloops\/sec\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sPMC\sstructs\n
@@ -89,56 +89,56 @@ FixedPMCArray:\s\d+\.\d+s\n
         ResizablePMCArray\s100000\n$/x,
     q{gc_alloc_new.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
     q{gc_alloc_reuse.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
     q{gc_generations.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
     q{gc_header_new.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
     q{gc_header_reuse.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
     q{gc_waves_headers.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
     q{gc_waves_sizeable_data.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
         There\sare\s\d+\stotal\sBuffer\sstructs\n$/x,
     q{gc_waves_sizeable_headers.pasm} => qr/^\d+\.\d+\sseconds\.\n
         A\stotal\sof\s\d+\sbytes\swere\sallocated\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         A\stotal\sof\s\d+\scollection\sruns\swere\smade\n
         Copying\sa\stotal\sof\s\d+\sbytes\n
         There\sare\s\d+\sactive\sBuffer\sstructs\n
@@ -170,30 +170,30 @@ FixedPMCArray:\s\d+\.\d+s\n
     q{primes_i.pasm} => qr/^N\sprimes\sup\sto\s10000\sis:\s1229\n
         last\sis:\s9973\nElapsed\stime:\s\d+\.\d+\n$/x,
     q{shared_ref.pasm} => qq(),
-    q{stress.pasm}     => qr/^A\stotal\sof\s\d+\sDOD\sruns\s
+    q{stress.pasm}     => qr/^A\stotal\sof\s\d+\sGC\sruns\s
         were\smade\n$/x,
     q{stress1.pasm} => qr/^\d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\.\d+\n
-        A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n$/x,
+        A\stotal\sof\s\d+\sGC\sruns\swere\smade\n$/x,
     q{stress2.pasm} => qq(),
-    q{stress3.pasm} => qr/^A\stotal\sof\s\d+\sDOD\sruns\swere\smade\n
+    q{stress3.pasm} => qr/^A\stotal\sof\s\d+\sGC\sruns\swere\smade\n
         \d+\sactive\sPMCs\n
         \d+\stotal\s\sPMCs\n$/x,
     q{vpm.pir} => qq(100000;\nl hackerjust another per\n)
