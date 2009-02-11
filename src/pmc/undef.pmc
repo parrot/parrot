@@ -57,7 +57,7 @@ appropriate type.
 
     VTABLE void assign_pmc(PMC *other) {
         if (!PObj_is_object_TEST(other))
-            pmc_reuse(INTERP, SELF, other->vtable->type, 0);
+            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
 
         /* don't want to call set_pmc if we're assigning an Undef to an Undef */
         if (other->vtable->base_type != enum_class_Undef)
