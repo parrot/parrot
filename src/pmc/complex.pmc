@@ -1248,7 +1248,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
         d = sqrt(re*re + im*im);
-        VTABLE_morph(INTERP, SELF, enum_class_Float);   /* XXX */
+        VTABLE_morph(INTERP, SELF, interp->vtables[enum_class_Float]->pmc_class);
         VTABLE_set_number_native(INTERP, SELF, d);
     }
 

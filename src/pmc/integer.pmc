@@ -46,7 +46,7 @@ upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
     /* Do an in-place upgrade to a Bignum of SELF and return a pointer
        to it (which is probably redundant, but whatever). */
     const INTVAL a = VTABLE_get_integer(interp, self);
-    VTABLE_morph(interp, self, enum_class_BigInt);
+    VTABLE_morph(interp, self, interp->vtables[enum_class_BigInt]->pmc_class);
     VTABLE_set_integer_native(interp, self, a);
     return self;
 }
@@ -451,7 +451,7 @@ Adds C<value> to C<SELF> inplace.
     MULTI void i_add(Complex value) {
         const INTVAL a = SELF.get_integer();
 
-        VTABLE_morph(INTERP, SELF, value->vtable->base_type);
+        VTABLE_morph(INTERP, SELF, value->vtable->pmc_class);
         VTABLE_set_number_native(INTERP, SELF,
                 SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
@@ -609,7 +609,7 @@ Subtracts C<value> from C<SELF> inplace.
     MULTI void i_subtract(Complex value) {
         const INTVAL a = SELF.get_integer();
 
-        VTABLE_morph(INTERP, SELF, value->vtable->base_type);
+        VTABLE_morph(INTERP, SELF, value->vtable->pmc_class);
         VTABLE_set_number_native(INTERP, SELF,
                 (FLOATVAL)a - VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,
@@ -1272,7 +1272,7 @@ Increments the integer.
         if ((c^a) >= 0 || (c^1) >= 0)
             VTABLE_set_integer_native(interp, SELF, c);
         else {
-            VTABLE_morph(INTERP, SELF, enum_class_BigInt);
+            VTABLE_morph(INTERP, SELF, interp->vtables[enum_class_BigInt]->pmc_class);
             VTABLE_set_integer_native(INTERP, SELF, a);
             VTABLE_increment(interp, SELF);
         }
@@ -1296,7 +1296,7 @@ Decrements the integer.
         if ((c^a) >= 0 || (c^~1) >= 0)
             VTABLE_set_integer_native(interp, SELF, c);
         else {
-            VTABLE_morph(interp, SELF, enum_class_BigInt);
+            VTABLE_morph(interp, SELF, interp->vtables[enum_class_BigInt]->pmc_class);
             VTABLE_set_integer_native(interp, SELF, a);
             VTABLE_decrement(interp, SELF);
         }

@@ -48,7 +48,7 @@ Does nothing.
 
 */
 
-    VTABLE void morph(INTVAL type) {
+    VTABLE void morph(PMC* type) {
     }
 
 /*

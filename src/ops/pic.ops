@@ -109,7 +109,7 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
                 goto ADDRESS(handler);
             }
             /* #RT42354 preserve type system */
-            VTABLE_morph(interp, left, enum_class_BigInt);
+            VTABLE_morph(interp, left, interp->vtables[enum_class_BigInt]->pmc_class);
             VTABLE_set_integer_native(interp, left, a);
             $2 = VTABLE_subtract_int(interp, left, b, left);
         }
