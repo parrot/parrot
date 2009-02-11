@@ -162,7 +162,7 @@ typedef struct Arenas {
                                  * anything */
     UINTVAL memory_collected;   /* Total amount of memory copied
                                    during collection */
-    UINTVAL num_early_DOD_PMCs; /* how many PMCs want immediate destruction */
+    UINTVAL num_early_gc_PMCs;  /* how many PMCs want immediate destruction */
     UINTVAL num_early_PMCs_seen;/* how many such PMCs has DOD seen */
     UINTVAL num_extended_PMCs;  /* active PMCs having pmc_ext */
     PMC* gc_mark_start;         /* first PMC marked during a DOD run */

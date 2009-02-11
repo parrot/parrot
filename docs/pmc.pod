@@ -85,7 +85,7 @@ connection, it has to take care of freeing or closing these system resources.
 The PMC's B<destroy> vtable is called, when this PMC is found to be dead during
 DOD.
 
-=item PObj_needs_early_DOD_FLAG
+=item PObj_needs_early_gc_FLAG
 
 Set this flag too, if the PMC needs timely destruction, e.g. to close a file
 handle at the end of a block scope, if the PMC isn't alive any more.

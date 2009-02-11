@@ -353,7 +353,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 
     /* quick check if we can already bail out */
     if (arena_base->lazy_gc
-    &&  arena_base->num_early_PMCs_seen >= arena_base->num_early_DOD_PMCs)
+    &&  arena_base->num_early_PMCs_seen >= arena_base->num_early_gc_PMCs)
         return 0;
 
     /* Find important stuff on the system stack */
@@ -623,7 +623,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
     arena_base = interp->arena_base;
 
-    if (PObj_needs_early_DOD_TEST(obj))
+    if (PObj_needs_early_gc_TEST(obj))
         ++arena_base->num_early_PMCs_seen;
 
     if (PObj_high_priority_DOD_TEST(obj) && arena_base->gc_trace_ptr) {
@@ -975,7 +975,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
         PMC *next;
 
         if (lazy_gc && arena_base->num_early_PMCs_seen >=
-                arena_base->num_early_DOD_PMCs) {
+                arena_base->num_early_gc_PMCs) {
             return 0;
         }
 
@@ -985,7 +985,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
         PObj_get_FLAGS(current) |= PObj_custom_GC_FLAG;
 
         /* clearing the flag is much more expensive then testing */
-        if (!PObj_needs_early_DOD_TEST(current))
+        if (!PObj_needs_early_gc_TEST(current))
             PObj_high_priority_DOD_CLEAR(current);
 
         /* mark properties */

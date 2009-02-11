@@ -282,8 +282,8 @@ Parrot_gc_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
     Arenas * const arena_base = interp->arena_base;
 
     /* TODO collect objects with finalizers */
-    if (PObj_needs_early_DOD_TEST(p))
-        --arena_base->num_early_DOD_PMCs;
+    if (PObj_needs_early_gc_TEST(p))
+        --arena_base->num_early_gc_PMCs;
 
     if (PObj_active_destroy_TEST(p))
         VTABLE_destroy(interp, pmc);

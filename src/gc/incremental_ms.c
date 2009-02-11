@@ -1082,7 +1082,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
 
     if (g_ims->state >= GC_IMS_COLLECT) {
         /* we are beyond sweep, timely destruction is done */
-        if (arena_base->num_early_PMCs_seen >= arena_base->num_early_DOD_PMCs)
+        if (arena_base->num_early_PMCs_seen >= arena_base->num_early_gc_PMCs)
             return;
 
         /* when not all seen, start a fresh cycle */
@@ -1096,7 +1096,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
      *  run through all steps until we see enough PMCs that need timely
      *  destruction or we finished sweeping
      */
-    while (arena_base->num_early_PMCs_seen < arena_base->num_early_DOD_PMCs) {
+    while (arena_base->num_early_PMCs_seen < arena_base->num_early_gc_PMCs) {
         parrot_gc_ims_run_increment(interp);
         if (g_ims->state >= GC_IMS_COLLECT)
             break;

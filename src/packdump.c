@@ -114,7 +114,7 @@ static const char *flag_bit_names[] =
     "need_finalize",
     "is_special_PMC",
     "high_priority_DOD",
-    "needs_early_DOD",
+    "needs_early_gc",
     "is_class",
     "is_object"
 };

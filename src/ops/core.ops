@@ -1221,7 +1221,7 @@ op sweep(inconst INT) {
     if ($1)
         Parrot_do_gc_run(interp, 0);
     else
-        if (interp->arena_base->num_early_DOD_PMCs)
+        if (interp->arena_base->num_early_gc_PMCs)
             Parrot_do_gc_run(interp, GC_lazy_FLAG);
 }
 
@@ -1283,8 +1283,8 @@ when unused during the lazy sweep, triggered by C<sweep 0>.
 =cut
 
 op needs_destroy(invar PMC) {
-     PObj_needs_early_DOD_SET($1);
-     ++interp->arena_base->num_early_DOD_PMCs;
+     PObj_needs_early_gc_SET($1);
+     ++interp->arena_base->num_early_gc_PMCs;
 }
 
 =back

@@ -1477,7 +1477,7 @@ parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
     int priority;
 
     PObj_live_SET(obj);
-    priority =  PObj_needs_early_DOD_TEST(obj);
+    priority =  PObj_needs_early_gc_TEST(obj);
     if (priority)
         ++interp->arena_base->num_early_PMCs_seen;
     h = PObj_to_GMSH(obj);
@@ -1606,12 +1606,12 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
         UINTVAL bits;
 
         if (lazy_gc && arena_base->num_early_PMCs_seen >=
-                arena_base->num_early_DOD_PMCs) {
+                arena_base->num_early_gc_PMCs) {
             return 1;
         }
         /* TODO propagate flag in pobject_lives */
         arena_base->gc_trace_ptr = current;
-        if (!PObj_needs_early_DOD_TEST(current))
+        if (!PObj_needs_early_gc_TEST(current))
             PObj_high_priority_DOD_CLEAR(current);
 
         /* mark children */
@@ -1672,8 +1672,8 @@ sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
 
     for (h = pool->white; h != pool->free_list; h = h->next) {
         PMC * const obj = (PMC*)GMSH_to_PObj(h);
-        if (PObj_needs_early_DOD_TEST(obj))
-            --arena_base->num_early_DOD_PMCs;
+        if (PObj_needs_early_gc_TEST(obj))
+            --arena_base->num_early_gc_PMCs;
         if (PObj_active_destroy_TEST(obj))
             VTABLE_destroy(interp, (PMC *)obj);
         if (PObj_is_PMC_EXT_TEST(obj) && obj->pmc_ext) {

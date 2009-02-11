@@ -268,9 +268,9 @@ typedef enum PObj_enum {
      */
     b_PObj_is_special_PMC_FLAG  = POBJ_FLAG(26),
 
-    /* true if this is connected by some route to a needs_early_DOD object */
+    /* true if this is connected by some route to a needs_early_gc object */
     PObj_high_priority_DOD_FLAG = POBJ_FLAG(27),
-    PObj_needs_early_DOD_FLAG   = (POBJ_FLAG(27) | POBJ_FLAG(28)),
+    PObj_needs_early_gc_FLAG    = (POBJ_FLAG(27) | POBJ_FLAG(28)),
 
     /* True if the PMC is a class */
     PObj_is_class_FLAG          = POBJ_FLAG(29),
@@ -355,7 +355,7 @@ typedef enum PObj_enum {
                 (PObj_active_destroy_FLAG | \
                  PObj_custom_mark_FLAG | \
                  PObj_is_PMC_EXT_FLAG | \
-                 PObj_needs_early_DOD_FLAG))) \
+                 PObj_needs_early_gc_FLAG))) \
         DOD_flag_SET(is_special_PMC, o); \
     else \
         DOD_flag_CLEAR(is_special_PMC, o); \
@@ -364,9 +364,9 @@ typedef enum PObj_enum {
 #define PObj_is_special_PMC_TEST(o) DOD_flag_TEST(is_special_PMC, o)
 #define PObj_is_special_PMC_SET(o) DOD_flag_SET(is_special_PMC, o)
 
-#define PObj_needs_early_DOD_TEST(o) PObj_flag_TEST(needs_early_DOD, o)
-#define PObj_needs_early_DOD_SET(o) PObj_special_SET(needs_early_DOD, o)
-#define PObj_needs_early_DOD_CLEAR(o) PObj_special_CLEAR(needs_early_DOD, o)
+#define PObj_needs_early_gc_TEST(o) PObj_flag_TEST(needs_early_gc, o)
+#define PObj_needs_early_gc_SET(o) PObj_special_SET(needs_early_gc, o)
+#define PObj_needs_early_gc_CLEAR(o) PObj_special_CLEAR(needs_early_gc, o)
 
 #define PObj_high_priority_DOD_TEST(o)   PObj_flag_TEST(high_priority_DOD, o)
 #define PObj_high_priority_DOD_SET(o)     PObj_special_SET(high_priority_DOD, o)
