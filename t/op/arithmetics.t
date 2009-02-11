@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 29;
 
 # test for GMP
 use Parrot::Config;
@@ -166,7 +166,7 @@ CODE
 OUTPUT
 
 #
-# Operations on a single NUMVAL
+# print -0.0 as -0
 #
 
 TODO: {
@@ -174,7 +174,7 @@ TODO: {
     @todo = ( todo => '-0.0 not implemented, TT #313' )
         if $^O =~ m/(?:openbsd|win32)/i;
 
-pasm_output_is( <<'CODE', <<OUTPUT, 'negate a native number', @todo );
+pasm_output_is( <<'CODE', <<OUTPUT, 'negate -0.0', @todo );
         set N0, 0
         neg N0
         print N0
@@ -183,6 +183,25 @@ pasm_output_is( <<'CODE', <<OUTPUT, 'negate a native number', @todo );
         neg N0
         print N0
         print "\n"
+        set N0, -0.0
+        neg N1, N0
+        print N1
+        print "\n"
+CODE
+-0
+0
+-0
+0
+OUTPUT
+
+}
+
+
+#
+# Operations on a single NUMVAL
+#
+
+pasm_output_is( <<'CODE', <<OUTPUT, 'negate a native number' );
         set N0, 123.4567890
         neg N0
         print N0
@@ -196,10 +215,6 @@ pasm_output_is( <<'CODE', <<OUTPUT, 'negate a native number', @todo );
         neg N1, N0
         print N1
         print "\n"
-        set N0, -0.0
-        neg N1, N0
-        print N1
-        print "\n"
         set N0, 123.4567890
         neg N1, N0
         print N1
@@ -210,17 +225,12 @@ pasm_output_is( <<'CODE', <<OUTPUT, 'negate a native number', @todo );
         print "\n"
         end
 CODE
--0
-0
 -123.456789
 123.456789
--0
 0
 -123.456789
 123.456789
 OUTPUT
-
-}
 
 pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native number" );
         set N0, 0
@@ -913,8 +923,12 @@ CODE
 OUTPUT
 }
 
+TODO: {
+    my @todo;
+    @todo = ( todo => 'inf is not platform-independent' )
+        if $^O eq 'MSWin32' and $PConfig{cc} =~ /cl/i;
 
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith" );
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith", @todo );
 .sub 'test' :main
     $N0 = 'Inf'
     say $N0
@@ -926,6 +940,7 @@ Inf
 NaN
 OUTPUT
 
+}
 
 # Local Variables:
 #   mode: cperl

@@ -718,7 +718,7 @@ handler:
     is( $S3, $S1, $S4 )
 .endm
 
-.macro complex_op_todo( val, res, op )
+.macro complex_op_todo( val, res, op, todo )
     $P1 = new ['Complex']
     $P2 = new ['Complex']
     set $P1, .val
@@ -726,13 +726,14 @@ handler:
     set $S0, .val
     set $S1, .res
     set $S2, .op
+    set $S3, .todo
 
     #XXX: can't do $P1.'$S2'()
     $P2 = $P1. $S2()
     $S3 = sprintf "%f%+fi", $P2
 
-    concat $S4, $S2, " of "
-    concat $S4, $S4, $S0
+    concat $S5, $S2, " of "
+    concat $S5, $S5, $S4
 
     $I0 = cmp_str $S1, $S3
     $I0 = not $I0
@@ -1070,8 +1071,8 @@ handler:
     .return()
 
 todo:
-    .complex_op_todo("0-2i", "-0.000000-0.909297i", 'sinh, TT #313' )
-    .complex_op_todo("0+2i", "-0.000000+0.909297i", 'sinh, TT #313' )
+    .complex_op_todo("0-2i", "-0.000000-0.909297i", 'sinh', 'TT #313' )
+    .complex_op_todo("0+2i", "-0.000000+0.909297i", 'sinh', 'TT #313' )
     .return()
 .end
 
