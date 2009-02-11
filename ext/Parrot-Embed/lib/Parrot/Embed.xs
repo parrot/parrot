@@ -130,15 +130,46 @@ CODE:
     real_interp     = interp->interp;
     p_global        = Parrot_str_new_constant( real_interp, global );
 
-    if ( items == 3 )
+    if (items == 3)
         namespace   = ST(2);
     else
         namespace   = &PL_sv_undef;
 
     if (namespace  != &PL_sv_undef )
     {
-        p_namespace = Parrot_str_new_constant( real_interp, SvPVX(namespace) );
-        pmc         = Parrot_find_global_s(real_interp, p_namespace, p_global);
+        char *ns_copy = savepv(SvPV_nolen(namespace));
+        char *ns_str  = ns_copy;
+        char *prev    = ns_str;
+        PMC  *ns      = NULL;
+
+        while (*ns_str++)
+        {
+            STRING *ns_part;
+
+            if (! (*ns_str == ':' && *(ns_str + 1) == ':'))
+                continue;
+
+            *ns_str = 0;
+            ns_str += 2;
+
+            if (!ns)
+                ns = Parrot_find_global_cur(real_interp,
+                    Parrot_str_new_constant(real_interp, prev));
+            else
+                ns = Parrot_find_global_n(real_interp, ns,
+                    Parrot_str_new_constant(real_interp, prev));
+            prev    = ns_str;
+        }
+
+        if (!ns)
+            ns = Parrot_find_global_cur(real_interp,
+                Parrot_str_new_constant(real_interp, prev));
+        else
+            ns = Parrot_find_global_n(real_interp, ns,
+                Parrot_str_new_constant(real_interp, prev));
+
+        pmc          = Parrot_find_global_n(real_interp, ns, p_global);
+        Safefree(ns_copy);
     }
     else
         pmc         = Parrot_find_global_cur( real_interp, p_global );

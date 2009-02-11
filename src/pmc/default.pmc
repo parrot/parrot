@@ -112,7 +112,7 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
         if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
             pmc->vtable = interp->vtables[pmc->vtable->base_type + 1];
         else if (!on && (pmc->vtable->flags & (VTABLE_IS_CONST_FLAG)))
-            VTABLE_morph(interp, pmc, interp->vtables[pmc->vtable->base_type - 1]->pmc_class);
+            VTABLE_morph(interp, pmc, pmc->vtable->base_type - 1);
         else if (on && (pmc->vtable->flags & VTABLE_HAS_READONLY_FLAG))
             pmc->vtable = pmc->vtable->ro_variant_vtable;
         else if (!on && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)
@@ -624,7 +624,7 @@ Defaults fall back to C<set_pmc> and C<set_string_native>.
 
 /*
 
-=item C<void morph(PMC* type)>
+=item C<void morph(INTVAL type)>
 
 Changes the PMC to a PMC of a new type
 
@@ -632,8 +632,8 @@ Changes the PMC to a PMC of a new type
 
 */
 
-    VTABLE void morph(PMC* type) {
-        pmc_reuse(INTERP, SELF, VTABLE_get_integer(interp, type), 0);
+    VTABLE void morph(INTVAL type) {
+        pmc_reuse(INTERP, SELF, type, 0);
     }
 
 /*

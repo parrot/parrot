@@ -44,23 +44,21 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
     is ($I0, 0, "no it doesn't")
 
     # Test morph (doesn't actually perform a morph)
-    $P2 = get_class 'String'
-    morph $P1, $P2
+    morph $P1, "String"
     $P0 = getattribute $P1, "message"
     $S0 = $P0
     is($S0, "Morphing [MyObject] to type String", "Morph VTABLE override 1")
 
-    $P2 = get_class 'Integer'
-    morph $P1, $P2
+    morph $P1, "Integer"
     $P0 = getattribute $P1, "message"
     $S0 = $P0
     is($S0, "Morphing [MyObject] to type Integer", "Morph VTABLE override 1")
-
+    
     # Test invoke. Doesn't currently work so we need to fix that.
     #$P0 = $P1("invoked!")
     #$S0 = $P0
     #is($S0, "invoked!", "Invoke VTABLE override return value")
-
+    
     #$P0 = getattribute $P1, "message"
     #$S0 = $P0
     #is($S0, "invoked!", "Invoke VTABLE override sideeffects")

@@ -40,7 +40,7 @@ appropriate type.
 */
 
     VTABLE void set_pmc(PMC *other) {
-        pmc_reuse(INTERP, SELF, enum_class_Ref, 0);
+        VTABLE_morph(INTERP, SELF, enum_class_Ref);
         VTABLE_set_pmc(INTERP, SELF, other);
     }
 
@@ -57,7 +57,7 @@ appropriate type.
 
     VTABLE void assign_pmc(PMC *other) {
         if (!PObj_is_object_TEST(other))
-            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
+            VTABLE_morph(INTERP, SELF, other->vtable->base_type);
 
         /* don't want to call set_pmc if we're assigning an Undef to an Undef */
         if (other->vtable->base_type != enum_class_Undef)
@@ -104,7 +104,7 @@ Morphs the current PMC to an C<Integer> and sets the value from C<value>.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
+        VTABLE_morph(INTERP, SELF, enum_class_Integer);
         VTABLE_set_integer_native(INTERP, SELF, value);
     }
 
@@ -133,7 +133,7 @@ Morphs the current PMC to a C<Float> and sets the value from C<value>.
 */
 
     VTABLE void set_number_native(FLOATVAL value) {
-        pmc_reuse(INTERP, SELF, enum_class_Float, 0);
+        VTABLE_morph(INTERP, SELF, enum_class_Float);
         VTABLE_set_number_native(INTERP, SELF, value);
     }
 
@@ -165,7 +165,7 @@ Morphs the current PMC to a C<String> and sets the value from C<value>.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        pmc_reuse(interp, SELF, enum_class_String, 0);
+        VTABLE_morph(INTERP, SELF, UNDEF_STRING_CLASS);
         VTABLE_set_string_native(INTERP, SELF, value);
     }
 

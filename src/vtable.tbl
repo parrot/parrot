@@ -11,7 +11,7 @@ void init()
 void init_pmc(PMC* initializer)
 PMC* instantiate(PMC* sig)
 PMC* instantiate_str(STRING* rep, INTVAL flags)
-void morph(PMC* type) :write
+void morph(INTVAL type) :write
 void mark()
 void destroy()
 PMC* get_namespace()

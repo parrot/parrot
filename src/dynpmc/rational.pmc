@@ -78,7 +78,7 @@ static void rat_add_integer(PARROT_INTERP, PMC *self, int value, PMC *dest) {
 
     if (dest) {
         if (self != dest)
-            VTABLE_morph(interp, dest, self->vtable->pmc_class);
+            VTABLE_morph(interp, dest, self->vtable->base_type);
     }
     else {
         dest = pmc_new(interp, self->vtable->base_type);
@@ -108,7 +108,7 @@ static void rat_add_float(PARROT_INTERP, PMC *self, double value, PMC *dest) {
     mpq_t t;
 
     if (dest)
-        VTABLE_morph(interp, dest, self->vtable->pmc_class);
+        VTABLE_morph(interp, dest, self->vtable->base_type);
     else
         dest = pmc_new(interp, self->vtable->base_type);
 
@@ -133,7 +133,7 @@ Multiplys a Rational-PMC with an integer "value" and stores the result in (anoth
 static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value, PMC *dest) {
   #ifdef PARROT_HAS_GMP
     if (dest)
-        VTABLE_morph(interp, dest, self->vtable->pmc_class);
+        VTABLE_morph(interp, dest, self->vtable->base_type);
     else
         dest = pmc_new(interp, self->vtable->base_type);
 
@@ -158,7 +158,7 @@ static void rat_multiply_float(PARROT_INTERP, PMC *self, double value, PMC *dest
     mpq_t t;
 
     if (dest)
-        VTABLE_morph(interp, dest, self->vtable->pmc_class);
+        VTABLE_morph(interp, dest, self->vtable->base_type);
     else
         dest = pmc_new(interp, self->vtable->base_type);
 
@@ -185,7 +185,7 @@ static void rat_divide_integer(PARROT_INTERP, PMC *self, int value, PMC *dest) {
     mpq_t t;
 
     if (dest)
-        VTABLE_morph(interp, dest, self->vtable->pmc_class);
+        VTABLE_morph(interp, dest, self->vtable->base_type);
     else
         dest = pmc_new(interp, self->vtable->base_type);
 
@@ -212,7 +212,7 @@ static void rat_divide_float(PARROT_INTERP, PMC *self, double value, PMC *dest) 
     mpq_t t;
 
     if (dest)
-        VTABLE_morph(interp, dest, self->vtable->pmc_class);
+        VTABLE_morph(interp, dest, self->vtable->base_type);
     else
         dest = pmc_new(interp, self->vtable->base_type);
 
@@ -240,7 +240,7 @@ static void rat_power_int(PARROT_INTERP, PMC *self, int value, PMC *dest) {
     mpz_t t;
 
     if (dest)
-        VTABLE_morph(interp, dest, self->vtable->pmc_class);
+        VTABLE_morph(interp, dest, self->vtable->base_type);
     else
         dest = pmc_new(interp, self->vtable->base_type);
 
@@ -563,7 +563,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     MULTI PMC *add(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
         if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->pmc_class);
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -673,7 +673,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     MULTI PMC *subtract(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
         if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->pmc_class);
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -783,7 +783,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     MULTI PMC *multiply(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
         if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->pmc_class);
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -893,7 +893,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     MULTI PMC *divide(Rational value, PMC* dest) {
       #ifdef PARROT_HAS_GMP
         if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->pmc_class);
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -993,7 +993,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     VTABLE PMC *neg(PMC* dest) {
       #ifdef PARROT_HAS_GMP
         if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->pmc_class);
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1029,7 +1029,7 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
     VTABLE PMC *absolute(PMC* dest) {
       #ifdef PARROT_HAS_GMP
         if (dest)
-            VTABLE_morph(INTERP, dest, SELF->vtable->pmc_class);
+            VTABLE_morph(INTERP, dest, SELF->vtable->base_type);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 

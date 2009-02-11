@@ -99,8 +99,7 @@ Tests mainly morphing undef to other types.
 .sub string_pmc_morph_to_undef
     .local pmc pmc1
     pmc1 = new ['String']
-    $P0 = get_class 'Undef'
-    morph pmc1, $P0
+    morph pmc1, 'Undef'
     $S1 = typeof pmc1
     is( $S1, 'Undef', 'PMC String morph to undef' )
 .end

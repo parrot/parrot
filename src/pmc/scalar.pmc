@@ -73,7 +73,7 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
     else {
         /* Overflow; must promote dest to BigInt, and do a BigInt shift. */
         if (self == dest)
-            pmc_reuse(interp, self, enum_class_BigInt, 0);
+            VTABLE_morph(interp, self, enum_class_BigInt);
         else
             dest = pmc_new(interp, enum_class_BigInt);
 
@@ -86,6 +86,21 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
 
 pmclass scalar {
 
+/*
+
+=item C<void morph(INTVAL type)>
+
+Morphs the scalar to the specified type.
+
+=cut
+
+*/
+
+    VTABLE void morph(INTVAL type) {
+        if (SELF->vtable->base_type == type)
+            return;
+        pmc_reuse(INTERP, SELF, type, 0);
+    }
 /*
 
 =item C<void assign_pmc(PMC *value)>
@@ -102,12 +117,13 @@ according to the type of C<*value>.
         STRING        *s_num;
         STRING        *s_str;
 
-        if (SELF->vtable->base_type == enum_class_Boolean)
+        if (SELF->vtable->base_type == enum_class_Boolean) {
             /* doesn't morph */
-            pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
+            SELF.morph(value->vtable->base_type);
+        }
 
         if (value->vtable->base_type == enum_class_Undef) {
-            pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
+            SELF.morph(value->vtable->base_type);
             return;
         }
 
@@ -132,7 +148,7 @@ according to the type of C<*value>.
             SELF.set_string_native(v);
             return;
         }
-        pmc_reuse(INTERP, SELF, enum_class_Ref, 0);
+        SELF.morph(enum_class_Ref);
         SELF.set_pmc(value);
     }
 
@@ -229,7 +245,7 @@ Adds C<value> to C<SELF> inplace.
     MULTI void i_add(Complex value) {
         const FLOATVAL a = SELF.get_number();
 
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        VTABLE_morph(INTERP, SELF, value->vtable->base_type);
         VTABLE_set_number_native(INTERP, SELF,
                 a + VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,
@@ -277,7 +293,7 @@ Subtracts C<value> from C<SELF> inplace.
     MULTI PMC *subtract(Complex value, PMC *dest) {
         const FLOATVAL a = SELF.get_number();
         if (dest)
-            pmc_reuse(INTERP, dest, value->vtable->base_type, 0);
+            VTABLE_morph(INTERP, dest, value->vtable->base_type);
         else
             dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
@@ -314,7 +330,7 @@ Subtracts C<value> from C<SELF> inplace.
     MULTI void i_subtract(Complex value) {
         const FLOATVAL a = SELF.get_number();
 
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        VTABLE_morph(INTERP, SELF, value->vtable->base_type);
         VTABLE_set_number_native(INTERP, SELF,
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,

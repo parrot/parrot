@@ -140,6 +140,19 @@ Returns the name of the PMC, not the name of the referenced PMC.
         return SUPER();
     }
 
+/*
+
+=item C<void morph(INTVAL type)>
+
+Changes the PMC to a PMC of a new type.
+
+=cut
+
+*/
+    VTABLE void morph(INTVAL type) {
+        SUPER(type);
+    }
+
 }
 
 /*
