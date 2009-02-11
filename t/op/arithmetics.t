@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -169,22 +169,12 @@ OUTPUT
 # Operations on a single NUMVAL
 #
 
-my $output = <<OUTPUT;
--0
-0
--123.456789
-123.456789
--0
-0
--123.456789
-123.456789
-OUTPUT
+TODO: {
+    my @todo;
+    @todo = ( todo => '-0.0 not implemented, TT #313' )
+        if $^O =~ m/(?:openbsd|win32)/i;
 
-if ($^O =~ m/openbsd|win32/i) {
-    $output =~ s/-0$/0/mg;
-}
-
-pasm_output_is( <<'CODE', $output, "turn a native number into its negative" );
+pasm_output_is( <<'CODE', <<OUTPUT, 'negate a native number', @todo );
         set N0, 0
         neg N0
         print N0
@@ -220,6 +210,17 @@ pasm_output_is( <<'CODE', $output, "turn a native number into its negative" );
         print "\n"
         end
 CODE
+-0
+0
+-123.456789
+123.456789
+-0
+0
+-123.456789
+123.456789
+OUTPUT
+
+}
 
 pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native number" );
         set N0, 0

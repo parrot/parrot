@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 =head1 NAME
@@ -718,6 +718,28 @@ handler:
     is( $S3, $S1, $S4 )
 .endm
 
+.macro complex_op_todo( val, res, op )
+    $P1 = new ['Complex']
+    $P2 = new ['Complex']
+    set $P1, .val
+
+    set $S0, .val
+    set $S1, .res
+    set $S2, .op
+
+    #XXX: can't do $P1.'$S2'()
+    $P2 = $P1. $S2()
+    $S3 = sprintf "%f%+fi", $P2
+
+    concat $S4, $S2, " of "
+    concat $S4, $S4, $S0
+
+    $I0 = cmp_str $S1, $S3
+    $I0 = not $I0
+
+    todo( $I0, $S4 )
+.endm
+
 .sub ln_of_complex_numbers
     .complex_op_is("-2+0i", "0.693147+3.141593i", 'ln' )
     .complex_op_is("-1+0i", "0.000000+3.141593i", 'ln' )
@@ -1041,14 +1063,16 @@ handler:
     .complex_op_is("-2+3i", "3.590565+0.530921i", 'sinh' )
     .complex_op_is("-2-3i", "3.590565-0.530921i", 'sinh' )
 
-    eq osname, "openbsd", fail
-    eq osname, "MSWin32", fail
+    eq osname, "openbsd", todo
+    eq osname, "MSWin32", todo
     .complex_op_is("0-2i", "-0.000000-0.909297i", 'sinh' )
     .complex_op_is("0+2i", "-0.000000+0.909297i", 'sinh' )
     .return()
 
-fail:
-    skip( 2, 'sinh 0+2i, sinh 0-2i failing on your platform' )
+todo:
+    .complex_op_todo("0-2i", "-0.000000-0.909297i", 'sinh, TT #313' )
+    .complex_op_todo("0+2i", "-0.000000+0.909297i", 'sinh, TT #313' )
+    .return()
 .end
 
 .sub cosh_of_complex_numbers
