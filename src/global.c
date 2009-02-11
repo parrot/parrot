@@ -430,7 +430,7 @@ Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *_namespace))
 {
     ASSERT_ARGS(Parrot_ns_get_name)
     PMC *names;
-    Parrot_pcc_invoke_method_from_c_args(interp, _namespace, CONST_STRING(interp, "get_name"), "->P", &names);
+    Parrot_PCCINVOKE(interp, _namespace, CONST_STRING(interp, "get_name"), "->P", &names);
     return names;
 }
 
