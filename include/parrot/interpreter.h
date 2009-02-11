@@ -382,7 +382,7 @@ struct parrot_interp_t {
     /* 8:   PMC *PBC_Libs                Hash of load_bytecode cde */
     /* 9:   PMC *Executable              String PMC with name from argv[0]. */
 
-    PMC *DOD_registry;                        /* root set of registered PMCs */
+    PMC *gc_registry;                         /* root set of registered PMCs */
 
     PMC *HLL_info;                            /* HLL names and types */
     PMC *HLL_namespace;                       /* cache of HLL toplevel ns */

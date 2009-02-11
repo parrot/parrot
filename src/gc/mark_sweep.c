@@ -341,8 +341,8 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     pobject_lives(interp, (PObj *)interp->class_hash);
 
     /* Mark the registry */
-    PARROT_ASSERT(interp->DOD_registry);
-    pobject_lives(interp, (PObj *)interp->DOD_registry);
+    PARROT_ASSERT(interp->gc_registry);
+    pobject_lives(interp, (PObj *)interp->gc_registry);
 
     /* Mark the MMD cache. */
     if (interp->op_mmd_cache)

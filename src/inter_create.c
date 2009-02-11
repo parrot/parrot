@@ -232,7 +232,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->profile         = NULL;
 
     /* create the root set registry */
-    interp->DOD_registry    = pmc_new(interp, enum_class_AddrRegistry);
+    interp->gc_registry     = pmc_new(interp, enum_class_AddrRegistry);
 
     /* create exceptions list */
     interp->current_runloop_id    = 0;

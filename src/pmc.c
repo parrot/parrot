@@ -769,9 +769,9 @@ gc_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
     /* Better not trigger a DOD run with a potentially unanchored PMC */
     Parrot_block_GC_mark(interp);
 
-    PARROT_ASSERT(interp->DOD_registry);
+    PARROT_ASSERT(interp->gc_registry);
 
-    VTABLE_set_pmc_keyed(interp, interp->DOD_registry, pmc, PMCNULL);
+    VTABLE_set_pmc_keyed(interp, interp->gc_registry, pmc, PMCNULL);
     Parrot_unblock_GC_mark(interp);
 }
 
@@ -790,9 +790,9 @@ void
 gc_unregister_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_unregister_pmc)
-    PARROT_ASSERT(interp->DOD_registry);
+    PARROT_ASSERT(interp->gc_registry);
 
-    VTABLE_delete_keyed(interp, interp->DOD_registry, pmc);
+    VTABLE_delete_keyed(interp, interp->gc_registry, pmc);
 }
 
 
