@@ -21,6 +21,16 @@ The C<-w> command line option for parrot can also be used to enable all
 warnings. You can use C<make warnings_tests> to run the standard test suite
 with this option.
 
+=head1 Command line options
+
+=over 4
+
+=item * Remove individual runcore command line flags...
+
+See RT #46503.
+
+=back
+
 =head1 Languages
 
 =over 4
