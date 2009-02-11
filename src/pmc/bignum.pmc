@@ -326,7 +326,7 @@ bignum_cmp_int(PARROT_INTERP, PMC *self, INTVAL value) {
 static void
 bignum_abs(PARROT_INTERP, PMC *self, PMC *dest) {
     BIGNUM *bi_self, *bi_dest;
-    VTABLE_morph(interp, dest, enum_class_BigNum);
+    pmc_reuse(interp, dest, enum_class_BigNum, 0);
     GETATTR_BigNum_bi(interp, self, bi_self);
     GETATTR_BigNum_bi(interp, dest, bi_dest);
     mpf_abs(bi_dest->b, bi_self->b);
@@ -335,7 +335,7 @@ bignum_abs(PARROT_INTERP, PMC *self, PMC *dest) {
 static void
 bignum_neg(PARROT_INTERP, PMC *self, PMC *dest) {
     BIGNUM *bi_self, *bi_dest;
-    VTABLE_morph(interp, dest, enum_class_BigNum);
+    pmc_reuse(interp, dest, enum_class_BigNum, 0);
     GETATTR_BigNum_bi(interp, self, bi_self);
     GETATTR_BigNum_bi(interp, dest, bi_dest);
     mpf_neg(bi_dest->b, bi_self->b);
@@ -910,7 +910,7 @@ Decrements the integer.
 
     MULTI PMC *subtract(BigNum value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -920,7 +920,7 @@ Decrements the integer.
 
     MULTI PMC *subtract(Integer value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -937,7 +937,7 @@ Decrements the integer.
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1024,7 +1024,7 @@ Decrements the integer.
 
     VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1044,7 +1044,7 @@ Decrements the integer.
     MULTI PMC *divide(BigNum value, PMC *dest) {
         BIGNUM *bi;
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1063,7 +1063,7 @@ Decrements the integer.
 
     MULTI PMC *divide(Integer value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1080,7 +1080,7 @@ Decrements the integer.
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1128,7 +1128,7 @@ Decrements the integer.
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1157,7 +1157,7 @@ Decrements the integer.
 
     MULTI PMC *modulus(BigNum value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1167,7 +1167,7 @@ Decrements the integer.
 
     MULTI PMC *modulus(Integer value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1292,7 +1292,7 @@ Inplace shift left.
 
     MULTI PMC *bitwise_shl(BigNum value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1304,7 +1304,7 @@ Inplace shift left.
 
     MULTI PMC *bitwise_shl(Integer value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1321,7 +1321,7 @@ Inplace shift left.
 
     VTABLE PMC *bitwise_shl_int(INTVAL value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1372,7 +1372,7 @@ Inplace shift left.
 
     MULTI PMC *bitwise_shr(BigNum value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1384,7 +1384,7 @@ Inplace shift left.
 
     MULTI PMC *bitwise_shr(Integer value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 
@@ -1402,7 +1402,7 @@ Inplace shift left.
 
     VTABLE PMC *bitwise_shr_int(INTVAL value, PMC *dest) {
         if (dest)
-            VTABLE_morph(interp, dest, SELF->vtable->base_type);
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
         else
             dest = pmc_new(INTERP, SELF->vtable->base_type);
 

@@ -1578,6 +1578,22 @@ Used to unarchive the class.
 
 /*
 
+=item C<INTVAL get_integer()>
+
+This is just a temporary hack. Type ID numbers shouldn't be externally
+visible to the average PIR user. However, we need this for now to interface
+with functions like pmc_new and pmc_reuse, which take type ID numbers still.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return PARROT_CLASS(SELF)->id;
+    }
+
+/*
+
 =item C<void thawfinish(visit_info *info)>
 
 Called after the class has been thawed.

@@ -164,9 +164,8 @@ Have $1 turn itself into a PMC of type $2.
 
 =cut
 
-inline op morph(invar PMC, in STR) {
-  INTVAL type = pmc_type(interp, $2);
-  VTABLE_morph(interp, $1, type);
+inline op morph(invar PMC, in PMC) {
+  VTABLE_morph(interp, $1, $2);
 }
 
 =item B<exec>(in STR)

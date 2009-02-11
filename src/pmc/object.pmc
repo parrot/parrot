@@ -854,7 +854,7 @@ Used to mark a PMC as read-only shared.
 
 /*
 
-=item C<void morph(INTVAL type)>
+=item C<void morph(PMC* type)>
 
 Changes the PMC to a PMC of a new type
 
@@ -862,17 +862,15 @@ Changes the PMC to a PMC of a new type
 
 */
 
-    VTABLE void morph(INTVAL type) {
+    VTABLE void morph(PMC* type) {
         PMC    * const classobj = VTABLE_get_class(interp, SELF);
         STRING * meth_name      = CONST_STRING(interp, "morph");
         /* If there's a vtable override for 'morph' run that instead. */
         PMC * const method = Parrot_oo_find_vtable_override(interp,
                 classobj, meth_name);
 
-        if (!PMC_IS_NULL(method)) {
-            PMC * const _class = Parrot_oo_get_class_str(interp, interp->vtables[type]->whoami);
-            Parrot_run_meth_fromc_args(interp, method, SELF, meth_name, "vP", _class);
-        }
+        if (!PMC_IS_NULL(method))
+            Parrot_run_meth_fromc_args(interp, method, SELF, meth_name, "vP", type);
         else
             SUPER(type);
     }
