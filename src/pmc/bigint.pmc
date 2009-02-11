@@ -313,7 +313,7 @@ bigint_cmp_int(PARROT_INTERP, PMC *self, INTVAL value) {
 static void
 bigint_abs(PARROT_INTERP, PMC *self, PMC *dest) {
     BIGINT *bi_self, *bi_dest;
-    VTABLE_morph(interp, dest, interp->vtables[enum_class_BigInt]->pmc_class);
+    pmc_reuse(interp, dest, enum_class_BigInt, 0);
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_abs(bi_dest->b, bi_self->b);
@@ -322,7 +322,7 @@ bigint_abs(PARROT_INTERP, PMC *self, PMC *dest) {
 static void
 bigint_neg(PARROT_INTERP, PMC *self, PMC *dest) {
     BIGINT *bi_self, *bi_dest;
-    VTABLE_morph(interp, dest, interp->vtables[enum_class_BigInt]->pmc_class);
+    pmc_reuse(interp, dest, enum_class_BigInt, 0);
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_neg(bi_dest->b, bi_self->b);
