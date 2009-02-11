@@ -162,11 +162,11 @@ typedef struct _Sync {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_shared_GC_block(PARROT_INTERP)
+void Parrot_shared_gc_block(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_shared_GC_unblock(PARROT_INTERP)
+void Parrot_shared_gc_unblock(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void pt_add_to_interpreters(PARROT_INTERP,
