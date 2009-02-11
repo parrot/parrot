@@ -1,4 +1,4 @@
-/* inter_call.h
+/* call.h
  *  Copyright (C) 2001-2008, The Perl Foundation.
  *  SVN Info
  *  $Id$
@@ -88,8 +88,18 @@ typedef enum arg_pass_t {
     PARROT_PASS_RESULTS         = 0x01
 } arg_pass_t;
 
-/* HEADERIZER BEGIN: src/inter_call.c */
+/* HEADERIZER BEGIN: src/call/pcc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP,
+    ARGIN_NULLOK(PMC* obj),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_convert_arg(PARROT_INTERP, ARGMOD(call_state *st))
@@ -268,6 +278,10 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_Parrot_pcc_build_sig_object_from_varargs \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig)
 #define ASSERT_ARGS_Parrot_convert_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(st)
@@ -350,7 +364,282 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(ctx)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/inter_call.c */
+/* HEADERIZER END: src/call/pcc.c */
+
+/* HEADERIZER BEGIN: src/call/ops.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+void free_runloop_jump_point(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void new_runloop_jump_point(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void * Parrot_run_meth_fromc(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
+    SHIM(STRING *meth))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void* Parrot_run_meth_fromc_arglist(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
+    ARGIN(STRING *meth),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
+    ARGIN(STRING *meth),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+INTVAL Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
+    ARGIN(STRING *meth),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void* Parrot_run_meth_fromc_args(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
+    ARGIN(STRING *meth),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
+    ARGIN(STRING *meth),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN_NULLOK(PMC *obj),
+    ARGIN(STRING *meth),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+Parrot_Context * Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void * Parrot_runops_fromc_arglist(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+INTVAL Parrot_runops_fromc_arglist_reti(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_runops_fromc_args(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CAN_RETURN_NULL
+void * Parrot_runops_fromc_args_event(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP,
+    ARGIN(PMC *sub),
+    ARGIN(const char *sig),
+    ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+void destroy_runloop_jump_points(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void really_destroy_runloop_jump_points(
+    ARGIN_NULLOK(Parrot_runloop *jump_point));
+
+void runops(PARROT_INTERP, size_t offs)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_free_runloop_jump_point __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_runloop_jump_point __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_run_meth_fromc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_Parrot_run_meth_fromc_arglist __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(meth) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_run_meth_fromc_arglist_retf \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(meth) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_run_meth_fromc_arglist_reti \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(meth) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_run_meth_fromc_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(meth) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_run_meth_fromc_args_retf \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(meth) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_run_meth_fromc_args_reti \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(meth) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_runops_fromc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_Parrot_runops_fromc_arglist __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_runops_fromc_arglist_retf \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_runops_fromc_arglist_reti \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_runops_fromc_args __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_runops_fromc_args_event \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_runops_fromc_args_retf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_Parrot_runops_fromc_args_reti __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sig)
+#define ASSERT_ARGS_destroy_runloop_jump_points __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_really_destroy_runloop_jump_points \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_runops __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/call/ops.c */
 
 #define ASSERT_SIG_PMC(sig) \
     PARROT_ASSERT(PObj_is_PMC_TEST(sig)); \

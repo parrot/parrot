@@ -2,11 +2,9 @@
 Copyright (C) 2001-2008, The Perl Foundation.
 $Id$
 
-=head1 NAME
+=head1 Calling Ops
 
-src/inter_run.c - Parrot Interpreter - Run Ops and Methods
-
-=head1 DESCRIPTION
+=head1 Description
 
 Various functions that call the run loop.
 
@@ -22,7 +20,7 @@ Various functions that call the run loop.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
-/* HEADERIZER HFILE: include/parrot/interpreter.h */
+/* HEADERIZER HFILE: include/parrot/call.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

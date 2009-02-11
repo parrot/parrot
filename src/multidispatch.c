@@ -280,125 +280,6 @@ Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC
     return Parrot_mmd_sort_manhattan_by_sig_pmc(interp, candidate_list, invoke_sig);
 }
 
-
-/*
-
-=item C<PMC* Parrot_build_sig_object_from_varargs>
-
-Take a varargs list, and convert it into a CallSignature PMC. The CallSignature
-stores the original short signature string, and an array of integer types to
-pass on to the multiple dispatch search.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC*
-Parrot_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC* obj),
-        ARGIN(const char *sig), va_list args)
-{
-    ASSERT_ARGS(Parrot_build_sig_object_from_varargs)
-    PMC         *type_tuple    = PMCNULL;
-    PMC         *returns       = PMCNULL;
-    PMC         *call_object   = pmc_new(interp, enum_class_CallSignature);
-    STRING      *string_sig    = Parrot_str_new_constant(interp, sig);
-    const INTVAL sig_len       = Parrot_str_byte_length(interp, string_sig);
-    INTVAL       in_return_sig = 0;
-    INTVAL       i;
-
-    if (!sig_len)
-        return call_object;
-
-    VTABLE_set_string_native(interp, call_object, string_sig);
-
-    /* Process the varargs list */
-    for (i = 0; i < sig_len; ++i) {
-        const INTVAL type = Parrot_str_indexed(interp, string_sig, i);
-
-        /* Only create the returns array if it's needed */
-        if (in_return_sig && PMC_IS_NULL(returns)) {
-            returns = pmc_new(interp, enum_class_ResizablePMCArray);
-            VTABLE_set_attr_str(interp, call_object, CONST_STRING(interp, "results"), returns);
-        }
-
-        if (in_return_sig) {
-            STRING * const signature = CONST_STRING(interp, "signature");
-            /* Returns store the original passed-in pointer, so they can pass
-             * the result back to the caller. */
-            PMC * const val_pointer = pmc_new(interp, enum_class_CPointer);
-            VTABLE_push_pmc(interp, returns, val_pointer);
-
-            switch (type) {
-                case 'I':
-                    VTABLE_set_pointer(interp, val_pointer, (void *)va_arg(args, INTVAL *));
-                    VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "I"));
-                    break;
-                case 'N':
-                    VTABLE_set_pointer(interp, val_pointer, (void *)va_arg(args, FLOATVAL *));
-                    VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "N"));
-                    break;
-                case 'S':
-                    VTABLE_set_pointer(interp, val_pointer, (void *)va_arg(args, STRING **));
-                    VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "S"));
-                    break;
-                case 'P':
-                    VTABLE_set_pointer(interp, val_pointer, (void *)va_arg(args, PMC **));
-                    VTABLE_set_string_keyed_str(interp, val_pointer, signature, CONST_STRING(interp, "P"));
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "Multiple Dispatch: invalid argument type %c!", type);
-             }
-        }
-        else {
-            /* Regular arguments just set the value */
-            switch (type) {
-                case 'I':
-                    VTABLE_push_integer(interp, call_object, va_arg(args, INTVAL));
-                    break;
-                case 'N':
-                    VTABLE_push_float(interp, call_object, va_arg(args, FLOATVAL));
-                    break;
-                case 'S':
-                    VTABLE_push_string(interp, call_object, va_arg(args, STRING *));
-                    break;
-                case 'P':
-                {
-                    PMC * const pmc_arg = va_arg(args, PMC *);
-                    VTABLE_push_pmc(interp, call_object, pmc_arg);
-                    break;
-                }
-                case '-':
-                    i++; /* skip '>' */
-                    in_return_sig = 1;
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_INVALID_OPERATION,
-                        "Multiple Dispatch: invalid argument type %c!", type);
-            }
-        }
-    }
-
-    /* Check if we have an invocant, and add it to the front of the arguments */
-    if (!PMC_IS_NULL(obj)) {
-        string_sig = Parrot_str_concat(interp, CONST_STRING(interp, "Pi"), string_sig, 0);
-        VTABLE_set_string_native(interp, call_object, string_sig);
-        VTABLE_unshift_pmc(interp, call_object, obj);
-    }
-
-    /* Build a type_tuple for multiple dispatch */
-    type_tuple = Parrot_mmd_build_type_tuple_from_sig_obj(interp, call_object);
-    VTABLE_set_pmc(interp, call_object, type_tuple);
-
-    return call_object;
-}
-
-
 /*
 
 =item C<void Parrot_mmd_multi_dispatch_from_c_args>
@@ -425,7 +306,7 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 
     va_list args;
     va_start(args, sig);
-    sig_object = Parrot_build_sig_object_from_varargs(interp, PMCNULL, sig, args);
+    sig_object = Parrot_pcc_build_sig_object_from_varargs(interp, PMCNULL, sig, args);
     va_end(args);
 
     /* Check the cache. */

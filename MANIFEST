@@ -898,6 +898,7 @@ include/parrot/atomic/gcc_pcc.h                             [main]include
 include/parrot/atomic/gcc_x86.h                             [main]include
 include/parrot/atomic/sparc.h                               [main]include
 include/parrot/caches.h                                     [main]include
+include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
 include/parrot/charset.h                                    [main]include
 include/parrot/compiler.h                                   [main]include
@@ -920,7 +921,6 @@ include/parrot/global_setup.h                               [main]include
 include/parrot/hash.h                                       [main]include
 include/parrot/hll.h                                        [main]include
 include/parrot/imcc.h                                       [main]include
-include/parrot/inter_call.h                                 [main]include
 include/parrot/interpreter.h                                [main]include
 include/parrot/io.h                                         [main]include
 include/parrot/io_portable.h                                [main]include
@@ -2528,6 +2528,8 @@ runtime/parrot/library/yaml_dumper.pir                      [library]
 src/atomic/gcc_x86.c                                        []
 src/atomic/sparc_v9.s                                       []
 src/byteorder.c                                             []
+src/call/ops.c                                              []
+src/call/pcc.c                                              []
 src/datatypes.c                                             []
 src/debug.c                                                 []
 src/dynext.c                                                []
@@ -2569,11 +2571,9 @@ src/global.c                                                []
 src/global_setup.c                                          []
 src/hash.c                                                  []
 src/hll.c                                                   []
-src/inter_call.c                                            []
 src/inter_cb.c                                              []
 src/inter_create.c                                          []
 src/inter_misc.c                                            []
-src/inter_run.c                                             []
 src/interp_guts.h                                           []
 src/interpreter.c                                           []
 src/io/api.c                                                []

@@ -57,16 +57,6 @@ typedef struct _multi_func_list {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_build_sig_object_from_varargs(PARROT_INTERP,
-    ARGIN_NULLOK(PMC* obj),
-    ARGIN(const char *sig),
-    va_list args)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
 void Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
     ARGIN(const char *sub_name),
     ARGIN(const char *short_sig),
@@ -217,10 +207,6 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_Parrot_build_sig_object_from_varargs \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sig)
 #define ASSERT_ARGS_Parrot_mmd_add_multi_from_c_args \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

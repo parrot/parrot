@@ -302,7 +302,7 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/string_funcs.h"
 #include "parrot/misc.h"
 #include "parrot/sub.h"
-#include "parrot/inter_call.h"
+#include "parrot/call.h"
 #include "parrot/key.h"
 #include "parrot/exit.h"
 #include "parrot/nci.h"

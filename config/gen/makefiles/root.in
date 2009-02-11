@@ -395,12 +395,12 @@ INTERP_O_FILES = \
     $(SRC_DIR)/global_setup$(O) \
     $(SRC_DIR)/hash$(O) \
     $(SRC_DIR)/hll$(O) \
-    $(SRC_DIR)/inter_call$(O)  \
+    $(SRC_DIR)/call/pcc$(O)  \
     $(SRC_DIR)/inter_cb$(O)  \
     $(SRC_DIR)/inter_create$(O)  \
     $(SRC_DIR)/inter_misc$(O)  \
     $(SRC_DIR)/interpreter$(O)  \
-    $(SRC_DIR)/inter_run$(O)  \
+    $(SRC_DIR)/call/ops$(O)  \
     $(SRC_DIR)/key$(O) \
     $(SRC_DIR)/library$(O) \
     $(SRC_DIR)/list$(O) \
@@ -572,7 +572,7 @@ STR_FILES = \
     $(SRC_DIR)/global.str \
     $(SRC_DIR)/global_setup.str \
     $(SRC_DIR)/hll.str \
-    $(SRC_DIR)/inter_call.str \
+    $(SRC_DIR)/call/pcc.str \
     $(SRC_DIR)/inter_cb.str \
     $(SRC_DIR)/inter_create.str \
     $(SRC_DIR)/inter_misc.str \
@@ -1084,8 +1084,8 @@ $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h
 
 $(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES)
 
-$(SRC_DIR)/inter_call$(O) : $(SRC_DIR)/inter_call.c $(GENERAL_H_FILES) \
-    $(SRC_DIR)/inter_call.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
+$(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
+    $(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
 
 $(SRC_DIR)/inter_cb$(O) : $(SRC_DIR)/inter_cb.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_cb.str
@@ -1096,7 +1096,7 @@ $(SRC_DIR)/inter_misc$(O) : $(SRC_DIR)/inter_misc.c $(GENERAL_H_FILES) \
 $(SRC_DIR)/inter_create$(O) : $(SRC_DIR)/inter_create.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_create.str
 
-$(SRC_DIR)/inter_run$(O) : $(SRC_DIR)/inter_run.c $(GENERAL_H_FILES)
+$(SRC_DIR)/call/ops$(O) : $(SRC_DIR)/call/ops.c $(GENERAL_H_FILES)
 
 $(IO_DIR)/api$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h $(IO_DIR)/api.str
 
