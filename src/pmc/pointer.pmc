@@ -40,19 +40,6 @@ Initializes the pointer.
 
 /*
 
-=item C<void morph(INTVAL type)>
-
-Does nothing.
-
-=cut
-
-*/
-
-    VTABLE void morph(PMC* type) {
-    }
-
-/*
-
 =item C<void mark()>
 
 Marks the pointer as live.
