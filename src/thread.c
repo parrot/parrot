@@ -1749,7 +1749,7 @@ pt_DOD_stop_mark(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_shared_DOD_block>
+=item C<void Parrot_shared_gc_block>
 
 Blocks stop-the-world DOD runs.
 
@@ -1759,9 +1759,9 @@ Blocks stop-the-world DOD runs.
 
 PARROT_EXPORT
 void
-Parrot_shared_DOD_block(PARROT_INTERP)
+Parrot_shared_gc_block(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_shared_DOD_block)
+    ASSERT_ARGS(Parrot_shared_gc_block)
     Shared_gc_info * const info = get_pool(interp);
 
     if (info) {
@@ -1773,7 +1773,7 @@ Parrot_shared_DOD_block(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_shared_DOD_unblock>
+=item C<void Parrot_shared_gc_unblock>
 
 Unblocks stop-the-world DOD runs.
 
@@ -1783,9 +1783,9 @@ Unblocks stop-the-world DOD runs.
 
 PARROT_EXPORT
 void
-Parrot_shared_DOD_unblock(PARROT_INTERP)
+Parrot_shared_gc_unblock(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_shared_DOD_unblock)
+    ASSERT_ARGS(Parrot_shared_gc_unblock)
     Shared_gc_info * const info = get_pool(interp);
     if (info) {
         int level;

@@ -93,8 +93,8 @@ typedef struct _Thread_data {
 
     Parrot_Interp       joiner;         /* thread that is trying to join this */
 
-    /* for wr access to interpreter e.g. for DOD/GC
-     * if only used for DOD/GC the lock could be in the arena
+    /* for wr access to interpreter e.g. for GC
+     * if only used for GC the lock could be in the arena
      * instead here, or in the interpreter, with negative size impact
      * for the non-threaded case
      */
@@ -162,11 +162,11 @@ typedef struct _Sync {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_shared_DOD_block(PARROT_INTERP)
+void Parrot_shared_GC_block(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_shared_DOD_unblock(PARROT_INTERP)
+void Parrot_shared_GC_unblock(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void pt_add_to_interpreters(PARROT_INTERP,
@@ -261,9 +261,9 @@ PMC * pt_transfer_sub(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(d);
 
-#define ASSERT_ARGS_Parrot_shared_DOD_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_shared_gc_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_shared_DOD_unblock __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_shared_gc_unblock __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_add_to_interpreters __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

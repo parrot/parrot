@@ -22,13 +22,13 @@
 #define Parrot_block_GC_mark(interp) \
         { \
             (interp)->arena_base->DOD_block_level++; \
-            Parrot_shared_DOD_block(interp); \
+            Parrot_shared_gc_block(interp); \
         }
 
 #define Parrot_unblock_GC_mark(interp) \
         if ((interp)->arena_base->DOD_block_level) { \
             (interp)->arena_base->DOD_block_level--; \
-            Parrot_shared_DOD_unblock(interp); \
+            Parrot_shared_gc_unblock(interp); \
         }
 
 /* Macros for recursively blocking and unblocking GC */
