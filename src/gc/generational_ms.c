@@ -1612,7 +1612,7 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
         /* TODO propagate flag in pobject_lives */
         arena_base->gc_trace_ptr = current;
         if (!PObj_needs_early_gc_TEST(current))
-            PObj_high_priority_DOD_CLEAR(current);
+            PObj_high_priority_gc_CLEAR(current);
 
         /* mark children */
         if (PObj_custom_mark_TEST(current)) {

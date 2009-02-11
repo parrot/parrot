@@ -626,9 +626,9 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
     if (PObj_needs_early_gc_TEST(obj))
         ++arena_base->num_early_PMCs_seen;
 
-    if (PObj_high_priority_DOD_TEST(obj) && arena_base->gc_trace_ptr) {
+    if (PObj_high_priority_gc_TEST(obj) && arena_base->gc_trace_ptr) {
         /* set obj's parent to high priority */
-        PObj_high_priority_DOD_SET(arena_base->gc_trace_ptr);
+        PObj_high_priority_gc_SET(arena_base->gc_trace_ptr);
         hi_prio = 1;
     }
     else
@@ -986,7 +986,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 
         /* clearing the flag is much more expensive then testing */
         if (!PObj_needs_early_gc_TEST(current))
-            PObj_high_priority_DOD_CLEAR(current);
+            PObj_high_priority_gc_CLEAR(current);
 
         /* mark properties */
         if (PMC_metadata(current))

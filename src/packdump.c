@@ -113,7 +113,7 @@ static const char *flag_bit_names[] =
     "data_is_PMC_array",
     "need_finalize",
     "is_special_PMC",
-    "high_priority_DOD",
+    "high_priority_gc",
     "needs_early_gc",
     "is_class",
     "is_object"

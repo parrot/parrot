@@ -269,7 +269,7 @@ typedef enum PObj_enum {
     b_PObj_is_special_PMC_FLAG  = POBJ_FLAG(26),
 
     /* true if this is connected by some route to a needs_early_gc object */
-    PObj_high_priority_DOD_FLAG = POBJ_FLAG(27),
+    PObj_high_priority_gc_FLAG  = POBJ_FLAG(27),
     PObj_needs_early_gc_FLAG    = (POBJ_FLAG(27) | POBJ_FLAG(28)),
 
     /* True if the PMC is a class */
@@ -368,9 +368,9 @@ typedef enum PObj_enum {
 #define PObj_needs_early_gc_SET(o) PObj_special_SET(needs_early_gc, o)
 #define PObj_needs_early_gc_CLEAR(o) PObj_special_CLEAR(needs_early_gc, o)
 
-#define PObj_high_priority_DOD_TEST(o)   PObj_flag_TEST(high_priority_DOD, o)
-#define PObj_high_priority_DOD_SET(o)     PObj_special_SET(high_priority_DOD, o)
-#define PObj_high_priority_DOD_CLEAR(o) PObj_special_CLEAR(high_priority_DOD, o)
+#define PObj_high_priority_gc_TEST(o)   PObj_flag_TEST(high_priority_gc, o)
+#define PObj_high_priority_gc_SET(o)     PObj_special_SET(high_priority_gc, o)
+#define PObj_high_priority_gc_CLEAR(o) PObj_special_CLEAR(high_priority_gc, o)
 
 #define PObj_custom_mark_SET(o)   PObj_special_SET(custom_mark, o)
 #define PObj_custom_mark_CLEAR(o)   PObj_special_CLEAR(custom_mark, o)
