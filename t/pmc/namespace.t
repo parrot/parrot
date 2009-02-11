@@ -1,17 +1,17 @@
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 66;
+use Parrot::Test tests => 67;
 use Parrot::Config;
 
 =head1 NAME
 
-t/pmc/namespace.t - test the NameSpace PMC as described in PDD21.
+t/pmc/namespace.t - test the NameSpace PMC as described in PDD 21.
 
 =head1 SYNOPSIS
 
@@ -1787,6 +1787,30 @@ CODE
 1
 0
 1
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', 'adding :anon sub to a namespace, TT #56' );
+.namespace ['Foo']
+.sub main :main
+    .const 'Sub' $P0 = 'bar'
+
+    set_global 'ok', $P0
+    $P1 = get_global 'ok'
+    say $P1
+    $S0 = ok()
+    say $S0
+    $S0 = nok()
+    say $S0
+.end
+
+.namespace []
+.sub 'nok' :anon :subid('bar')
+    .return( 'ok 1' )
+.end
+CODE
+/
+ok 1
+Could not find non-existent sub nok/
 OUT
 
 # Local Variables:
