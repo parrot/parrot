@@ -14,12 +14,12 @@
 #define PARROT_STRING_H_GUARD
 
 #include "parrot/config.h"
-#include "parrot/pobj.h"
 
 struct parrot_string_t;
 
 #ifdef PARROT_IN_CORE
 
+#include "parrot/pobj.h"
 #include "parrot/parrot.h"
 
 typedef struct parrot_string_t STRING;
