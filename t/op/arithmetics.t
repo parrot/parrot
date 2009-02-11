@@ -33,29 +33,23 @@ number types.
 pasm_output_is( <<'CODE', <<OUTPUT, "take the negative of a native integer" );
         set I0, 0
         neg I0
-        print I0
-        print "\n"
+        say I0
         set I0, 1234567890
         neg I0
-        print I0
-        print "\n"
+        say I0
         set I0, -1234567890
         neg I0
-        print I0
-        print "\n"
+        say I0
         set I0, 0
         set I1, 0
         neg I1, I0
-        print I1
-        print "\n"
+        say I1
         set I0, 1234567890
         neg I1, I0
-        print I1
-        print "\n"
+        say I1
         set I0, -1234567890
         neg I1, I0
-        print I1
-        print "\n"
+        say I1
         end
 CODE
 0
@@ -69,29 +63,23 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native integer" );
         set I0, 0
         abs I0
-        print I0
-        print "\n"
+        say I0
         set I0, 1234567890
         abs I0
-        print I0
-        print "\n"
+        say I0
         set I0, -1234567890
         abs I0
-        print I0
-        print "\n"
+        say I0
         set I0, 0
         set I1, 0
         abs I1, I0
-        print I1
-        print "\n"
+        say I1
         set I0, 1234567890
         abs I1, I0
-        print I1
-        print "\n"
+        say I1
         set I0, -1234567890
         abs I1, I0
-        print I1
-        print "\n"
+        say I1
         end
 CODE
 0
@@ -109,11 +97,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "add native integer to native integer" );
         set I0, 4000
         set I1, -123
         add I2, I0, I1
-        print I2
-        print "\n"
+        say I2
         add I0, I0, I1
-        print I0
-        print "\n"
+        say I0
         end
 CODE
 3877
@@ -124,11 +110,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "subtract native integer from native integer
         set I0, 4000
         set I1, -123
         sub I2, I0, I1
-        print I2
-        print "\n"
+        say I2
         sub I0, I0, I1
-        print I0
-        print "\n"
+        say I0
         end
 CODE
 4123
@@ -139,11 +123,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "multiply native integer with native integer
         set I0, 4000
         set I1, -123
         mul I2, I0, I1
-        print I2
-        print "\n"
+        say I2
         mul I0, I0, I1
-        print I0
-        print "\n"
+        say I0
         end
 CODE
 -492000
@@ -154,11 +136,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "divide native integer by native integer" );
         set I0, 4000
         set I1, -123
         div I2, I0, I1
-        print I2
-        print "\n"
+        say I2
         div I0, I0, I1
-        print I0
-        print "\n"
+        say I0
         end
 CODE
 -32
@@ -177,21 +157,23 @@ TODO: {
 pasm_output_is( <<'CODE', <<OUTPUT, 'negate -0.0', @todo );
         set N0, 0
         neg N0
-        print N0
-        print "\n"
+        say N0
         set N0, -0.0
         neg N0
-        print N0
-        print "\n"
+        say N0
         set N0, -0.0
         neg N1, N0
-        print N1
-        print "\n"
+        say N1
+        set N0, 0
+        set N1, 1
+        neg N1, N0
+        say N1
+        end
 CODE
 -0
 0
--0
 0
+-0
 OUTPUT
 
 }
@@ -204,30 +186,20 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, 'negate a native number' );
         set N0, 123.4567890
         neg N0
-        print N0
-        print "\n"
+        say N0
         set N0, -123.4567890
         neg N0
-        print N0
-        print "\n"
-        set N0, 0
-        set N1, 1
-        neg N1, N0
-        print N1
-        print "\n"
+        say N0
         set N0, 123.4567890
         neg N1, N0
-        print N1
-        print "\n"
+        say N1
         set N0, -123.4567890
         neg N1, N0
-        print N1
-        print "\n"
+        say N1
         end
 CODE
 -123.456789
 123.456789
-0
 -123.456789
 123.456789
 OUTPUT
@@ -235,40 +207,32 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "take the absolute of a native number" );
         set N0, 0
         abs N0
-        print N0
-        print "\n"
+        say N0
         set N0, -0.0
         abs N0
-        print N0
-        print "\n"
+        say N0
         set N0, 123.45678901
         abs N0
-        print N0
-        print "\n"
+        say N0
         set N0, -123.45678901
         abs N0
-        print N0
-        print "\n"
+        say N0
         set N0, 0
         set N1, 1
         abs N1, N0
-        print N1
-        print "\n"
+        say N1
         set N0, 0.0
         set N1, 1
         abs N1, N0
-        print N1
-        print "\n"
+        say N1
         set N0, 123.45678901
         set N1, 1
         abs N1, N0
-        print N1
-        print "\n"
+        say N1
         set N0, -123.45678901
         set N1, 1
         abs N1, N0
-        print N1
-        print "\n"
+        say N1
         end
 CODE
 0
@@ -284,56 +248,45 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "ceil of a native number" );
        set N0, 0
        ceil N0
-       print N0
-       print "\n"
+       say N0
        set N0, 123.45678901
        ceil N0
-       print N0
-       print "\n"
+       say N0
        set N0, -123.45678901
        ceil N0
-       print N0
-       print "\n"
+       say N0
        set N0, 0
        set N1, 1
        ceil N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, 0.0
        set N1, 1
        ceil N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, 123.45678901
        set N1, 1
        ceil N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, -123.45678901
        set N1, 1
        ceil N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, 0
        set I1, 1
        ceil I1, N0
-       print I1
-       print "\n"
+       say I1
        set N0, 0.0
        set I1, 1
        ceil I1, N0
-       print I1
-       print "\n"
+       say I1
        set N0, 123.45678901
        set I1, 1
        ceil I1, N0
-       print I1
-       print "\n"
+       say I1
        set N0, -123.45678901
        set I1, 1
        ceil I1, N0
-       print I1
-       print "\n"
+       say I1
        end
 CODE
 0
@@ -352,56 +305,45 @@ OUTPUT
 pasm_output_is( <<'CODE', <<OUTPUT, "floor of a native number" );
        set N0, 0
        floor N0
-       print N0
-       print "\n"
+       say N0
        set N0, 123.45678901
        floor N0
-       print N0
-       print "\n"
+       say N0
        set N0, -123.45678901
        floor N0
-       print N0
-       print "\n"
+       say N0
        set N0, 0
        set N1, 1
        floor N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, 0.0
        set N1, 1
        floor N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, 123.45678901
        set N1, 1
        floor N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, -123.45678901
        set N1, 1
        floor N1, N0
-       print N1
-       print "\n"
+       say N1
        set N0, 0
        set I1, 1
        floor I1, N0
-       print I1
-       print "\n"
+       say I1
        set N0, 0.0
        set I1, 1
        floor I1, N0
-       print I1
-       print "\n"
+       say I1
        set N0, 123.45678901
        set I1, 1
        floor I1, N0
-       print I1
-       print "\n"
+       say I1
        set N0, -123.45678901
        set I1, 1
        floor I1, N0
-       print I1
-       print "\n"
+       say I1
        end
 CODE
 0
@@ -424,14 +366,11 @@ pasm_output_is( <<'CODE', <<OUTPUT, "add native integer to native number" );
         set I0, 4000
         set N0, -123.123
         add N1, N0, I0
-        print N1
-        print "\n"
+        say N1
         add N0, N0, I0
-        print N0
-        print "\n"
+        say N0
         add N0, I0
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 3876.877
@@ -443,14 +382,11 @@ pasm_output_is( <<'CODE', <<OUTPUT, "subtract native integer from native number"
         set I0, 4000
         set N0, -123.123
         sub N1, N0, I0
-        print N1
-        print "\n"
+        say N1
         sub N0, N0, I0
-        print N0
-        print "\n"
+        say N0
         sub N0, I0
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 -4123.123
@@ -462,14 +398,11 @@ pasm_output_is( <<'CODE', <<OUTPUT, "multiply native number with native integer"
         set I0, 4000
         set N0, -123.123
         mul N1, N0, I0
-        print N1
-        print "\n"
+        say N1
         mul N0, N0, I0
-        print N0
-        print "\n"
+        say N0
         mul N0, -2
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 -492492
@@ -481,21 +414,16 @@ pasm_output_is( <<'CODE', <<OUTPUT, "divide native number by native integer" );
         set I0, 4000
         set N0, -123.123
         div N1, N0, I0
-        print N1
-        print "\n"
+        say N1
         div N0, N0, I0
-        print N0
-        print "\n"
+        say N0
         div N0, 1
-        print N0
-        print "\n"
+        say N0
         set N0, 100.000
         div N0, 100
-        print N0
-        print "\n"
+        say N0
         div N0, 0.01
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 -0.03078075
@@ -512,11 +440,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "add native number to native number" );
         set N2, 4000.246
         set N0, -123.123
         add N1, N0, N2
-        print N1
-        print "\n"
+        say N1
         add N0, N0, N2
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 3877.123
@@ -527,11 +453,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "subtract native number from native number" 
         set N2, 4000.246
         set N0, -123.123
         sub N1, N0, N2
-        print N1
-        print "\n"
+        say N1
         sub N0, N0, N2
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 -4123.369
@@ -542,11 +466,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "multiply native number with native number" 
         set N2, 4000.246
         set N0, -123.123
         mul N1, N0, N2
-        print N1
-        print "\n"
+        say N1
         mul N0, N0, N2
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 -492522.288258
@@ -557,11 +479,9 @@ pasm_output_is( <<'CODE', <<OUTPUT, "divide native number by native number" );
         set N2, 4000.246
         set N0, -123.123
         div N1, N0, N2
-        print N1
-        print "\n"
+        say N1
         div N0, N0, N2
-        print N0
-        print "\n"
+        say N0
         end
 CODE
 -0.0307788571002883
@@ -574,7 +494,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "lcm_I_I_I" );
         lcm I2, I1, I0
         eq I2, 10, OK1
         print "not "
-OK1:    print "ok 1\n"
+OK1:    say "ok 1"
 
         set I1, 17
         lcm I2, I1, I0
