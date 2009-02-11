@@ -143,8 +143,8 @@ cardmarking, should be indicated by defining the preprocessor variable
 C<ARENA_DOD_FLAGS> to 1.
 
 F<pobj.h> provides macros to facilitate referencing individual object flags:
-C<DOD_flag_SET>, C<DOD_flag_CLEAR> and C<DOD_flag_TEST>. They make up a
-portable way of manipulating the DOD-relevant object flags.
+C<gc_flag_SET>, C<gc_flag_CLEAR> and C<gc_flag_TEST>. They make up a portable
+way of manipulating the GC-relevant object flags.
 
 =head1 Variable sized items
 

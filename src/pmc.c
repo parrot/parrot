@@ -666,7 +666,7 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
         if (PObj_is_PMC_EXT_TEST(_class))
             Parrot_gc_free_pmc_ext(interp, _class);
 
-        DOD_flag_CLEAR(is_special_PMC, _class);
+        gc_flag_CLEAR(is_special_PMC, _class);
 
         PMC_pmc_val(_class)    = (PMC  *)0xdeadbeef;
         PMC_struct_val(_class) = (void *)0xdeadbeef;
