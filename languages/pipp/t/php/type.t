@@ -187,7 +187,7 @@ language_output_is( 'Pipp', <<'CODE', <<'OUT', 'is_null(NULL)' );
   echo is_null($undef_var), "\n";
   $a = 'first letter';
   echo is_null($a), "\n";
-  
+
 ?>
 CODE
 1

@@ -127,3 +127,10 @@ echo "Hello, World!\n";   # comment till end of line
 CODE
 Hello, World!
 OUT
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

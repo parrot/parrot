@@ -111,7 +111,7 @@ TODO: see C<t/php/closures.t>
 
 =head1 Namespaces
 
-A namespace is introduced with the keyword B<namespace>. 
+A namespace is introduced with the keyword B<namespace>.
 The namespaced code can be enclosed in brackets.
 The namespace declaration needs to be the first statement in the file.
 With brackets, there can be multiple namespaces per file. Nesting is not possible.
@@ -127,7 +127,7 @@ No global code can precede the first B<namespace> directive.
 =head2 Implementation in Pipp
 
 In order to ease implementation and testing, there are
-some divergences in Pipp. 
+some divergences in Pipp.
 
 =over 4
 
@@ -169,7 +169,7 @@ some divergences in Pipp.
 
 =head1 Including and requiring
 
-C<require_once()> is supported, but might have issues with variables. 
+C<require_once()> is supported, but might have issues with variables.
 
 =head1 Extensions
 

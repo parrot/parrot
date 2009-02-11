@@ -127,3 +127,10 @@ my @tests = (
 
 plan( tests => scalar(@tests) );
 run_tests(\@tests);
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

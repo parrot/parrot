@@ -254,7 +254,7 @@ SKIP: {
 
     language_output_is( 'Pipp', <<'CODE', <<'OUT', 'dollar followed by a space' );
 <?php
- 
+
 echo ";$ ;", "\n";
 
 ?>
@@ -324,8 +324,8 @@ no variable expansion: $dummy
 no variable expansion in twiddles: {$dummy}
 backslash at end: \
 backslash not at end: \dummy
-backslash before a space: \ 
-escaped backslash before a space: \ 
+backslash before a space: \
+escaped backslash before a space: \
 not a newline: \n
 not a carriage return: \r
 not a tab: \t
@@ -370,11 +370,11 @@ CODE
 variable expansion: INTERPOLATED
 backslash at end: \
 backslash not at end: \dummy
-backslash before a space: \ 
-escaped backslash before a space: \ 
-a newline: 
+backslash before a space: \
+escaped backslash before a space: \
+a newline:
 
-a tab: 	
+a tab:
 an octal: A
 an hex: A
 single quote: '

@@ -1,7 +1,7 @@
 # $Id$
 
 =head1 NAME
- 
+
 Pipp - Testing
 
 =head1 Testsuite
@@ -12,7 +12,7 @@ below the directory subdirs of F<pipp/t>.
 These tests are executed by 'make test'.
 
 Run individual tests e.g.:
-  
+
   perl t/harness --verbose t/in_php/01_sea_only.t
 
 =head1 How to run the PHP test suite
@@ -44,7 +44,7 @@ Something like this worked for me under Linux.
 
   # run the test-suite
   ./sapi/cli/php run-tests.php -v --keep-all | tee run-tests.log
-  
+
 Good luck.
 
 =head1 Author

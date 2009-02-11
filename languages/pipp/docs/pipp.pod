@@ -1,7 +1,7 @@
 # $Id$
 
 =head1 NAME
- 
+
 Pipp - Introduction
 
 =head1 What is Pipp?

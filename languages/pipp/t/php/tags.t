@@ -70,11 +70,11 @@ CODE
 OUT
 
 language_output_is( 'Pipp', <<'CODE', <<'OUT', 'messy script tags' );
-<script          
-       language      = 
+<script
+       language      =
     'php'
-            > 
-    echo "hello world\n"; 
+            >
+    echo "hello world\n";
     </script            >
 CODE
 hello world

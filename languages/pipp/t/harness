@@ -9,13 +9,13 @@ languages/pipp/t/harness - A harness for Pipp
 
   cd languages && perl pipp/t/harness --files --master
 
-  cd languages/pipp && perl t/harness 
+  cd languages/pipp && perl t/harness
 
   cd languages/pipp && perl t/harness --with-phc
 
   cd languages/pipp && perl t/harness --with-pct
 
-  cd languages/pipp && perl t/harness --verbose t/hello.t 
+  cd languages/pipp && perl t/harness --verbose t/hello.t
 
 =head1 DESCRIPTION
 
@@ -41,7 +41,7 @@ use lib "$FindBin::Bin/../../../lib", "$FindBin::Bin/../lib";
 use Cwd                     ();
 use File::Spec              ();
 use TAP::Harness            3.12;     # support closures for the 'exec' option
-use TAP::Harness::Archive   0.12; 
+use TAP::Harness::Archive   0.12;
 use Parrot::Config          qw( %PConfig );
 use Getopt::Long;
 use Parrot::Harness::Smoke;
@@ -72,12 +72,12 @@ if ( $files_flag ) {
     print join( "\n", @files );
     print "\n" if scalar(@files);
 }
-else { 
+else {
     my $path_to_parrot = Parrot::Test::path_to_parrot();
     my @cmd = ( "$path_to_parrot/parrot$PConfig{exe}", "$path_to_parrot/languages/pipp/pipp.pbc" );
     $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PCT';
 
-    if ( $php_flag ) { 
+    if ( $php_flag ) {
          $ENV{PARROT_PIPP_TEST_MODULE} = 'Parrot::Test::Pipp::PHP';
          @cmd = qw{ php-cgi -q -C -n } ;
     }
@@ -122,10 +122,10 @@ else {
 
               # all other directories contain test scripts written in Perl
               return [ $PConfig{perl}, $test_file ];
-          };  
-    if ( $archive_flag ) { 
+          };
+    if ( $archive_flag ) {
         my %env_data = Parrot::Harness::Smoke::collect_test_environment_data();
-       
+
         my $report_file = ['pipp_test_run.tar.gz'];
         my $harness = TAP::Harness::Archive->new(
             {
@@ -143,7 +143,8 @@ else {
             $env_data{project_id}  = 10;
             Parrot::Harness::Smoke::send_archive_to_smolder(%env_data);
         }
-    } else {
+    }
+    else {
        my $harness = TAP::Harness->new(
            {
                exec       => $exec_sub,
