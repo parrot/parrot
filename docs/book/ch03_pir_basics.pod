@@ -966,23 +966,93 @@ value means there is more file to read. A false return value means we are at
 the end. In addition to this behavior, Filehandle PMCs have a number of methods
 that can be used to perform various operations. 
 
-  $P0.'open'()
-  $P0.'isatty'()
-  $P0.'close'()
-  $P0.'is_closed'()
-  $P0.'read'()
-  $P0.'readline'()
-  $P0.'readline_interactive'()
-  $P0.'readall'()
-  $P0.'flush'()
-  $P0.'print'()
-  $P0.'puts'()
-  $P0.'buffer_tpe'()
-  $P0.'buffer_size'()
-  $P0.'mode'()
-  $P0.'encoding'()
-  $P0.'eof'()
-  $P0.'get_fd'()
+=over 4
+
+=item C<$P0.'open'(STRING filename, STRING mode)>
+
+Opens the filehandle. Takes two optional strings: the name of the file to open
+and the open mode. If no filename is given, the previous filename associated
+with the filehandle is opened. If no mode is given, the previously-used mode
+is used.
+
+=item C<$P0.'isatty'()>
+
+Returns a boolean value whether the filehandle is a TTY terminal
+
+=item C<$P0.'close'()>
+
+Closes the filehandle. Can be reopened with C<.'open'> later.
+
+=item C<$P0.'is_closed'()>
+
+Returns true if the filehandle is closed, false if it is opened.
+
+=item C<$P0.'read'(INTVAL length)>
+
+Reads C<length> bytes from the filehandle.
+
+=item C<$P0.'readline'()
+
+Reads an entire line (up to a newline character or EOF) from the filehandle.
+
+=item C<$P0.'readline_interactive'(STRING prompt)>
+
+Displays the string C<prompt> and then reads a line of input.
+
+=item C<$P0.'readall'(STRING name)>
+
+Reads the entire file C<name> into a string. If the filehandle is closed,
+it will open the file given by C<name>, read the entire file, and then close
+the handle. If the filehandle is already open, C<name> should not be passed
+(it is an optional parameter).
+
+=item C<$P0.'flush'()>
+
+Flushes the buffer
+
+=item C<$P0.'print'(PMC to_print)>
+
+Prints the given value to the filehandle
+
+=item C<$P0.'puts'(STRING to_print)>
+
+Prints the given string value to the filehandle
+
+=item C<$P0.'buffer_type'(STRING new_type)>
+
+If C<new_type> is given, changes the buffer to the new type. If it is not,
+returns the current type. Acceptable types are:
+
+  unbuffered
+  line-buffered
+  full-buffered
+
+=item C<$P0.'buffer_size'(INTVAL size)>
+
+If C<size> is given, set the size of the buffer. If not, returns the size of
+the current buffer.
+
+=item C<$P0.'mode'()>
+
+Returns the current file access mode.
+
+=item C<$P0.'encoding'(STRING encoding)>
+
+Sets the filehandle's string encoding to C<encoding> if given, returns the
+current encoding otherwise.
+
+=item C<$P0.'eof'()>
+
+Returns true if the filehandle is at the end of the current file, false
+otherwise.
+
+=item C<$P0.'get_fd'()>
+
+Returns the integer file descriptor of the current file, but only on operating
+systems that use file descriptors. Returns C<-1> on systems that do not
+support this.
+
+=back
 
 =head1 Exceptions
 
