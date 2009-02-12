@@ -113,7 +113,7 @@ sub runstep {
     _handle_execcapable($conf, $execcapable);
 
     # test for executable malloced memory
-    if ( -e "config/auto/jit/test_exec_$osname.in" ) {
+    if ( -e "config/auto/jit/test_exec_${osname}_c.in" ) {
         print " (has_exec_protect " if $verbose;
         $conf->cc_gen("config/auto/jit/test_exec_${osname}_c.in");
         eval { $conf->cc_build(); };
