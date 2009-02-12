@@ -1240,7 +1240,7 @@ gc_gms_set_gen(PARROT_INTERP)
      * 2) Merge the blacks to the existing older generation
      *    The plan to use depends on the interpreter, specifically, if
      *    we are doing a lazy run, entering a new scope, or what not.
-     * 3) If we are leaving a scope (denoted by a lazy DOD run
+     * 3) If we are leaving a scope (denoted by a lazy GC run
      *    and we had created one or more generations in this scope
      *    go back by resetting the generation number to the outer
      *    scope's generation

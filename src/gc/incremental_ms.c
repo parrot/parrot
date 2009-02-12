@@ -52,20 +52,15 @@ an array, hash, or reference PMC.
 
 All objects have one of three colors: white, grey, or black.
 
-At the beginning of a DOD run all objects are white (not yet visited).
+At the beginning of a GC mark run all objects are white (not yet visited).
 During marking objects are greyed (visited - found alive), but their
 contents isn't yet scanned. A fully scanned grey object gets finally
-colored black. It will not again be rescanned in this DOD run.
+colored black. It will not again be rescanned in this run.
 
 Only aggregates can be grey, non-containers are blackened immediately.
 
 Objects on the free-list are sometimes denoted having the color off-white
 or ecru.
-
-=item DOD
-
-Dead object detection. Please note that in Parrot src and docs this
-stands for the stop-the-world garbage collector that recycles objects.
 
 =item GC
 
@@ -75,7 +70,7 @@ which makes string and buffer memory non-moving.
 
 =item collector
 
-The DOD and reclamation system.
+The reclamation system.
 
 =item mutator
 
@@ -106,7 +101,7 @@ The weak tri-color invariant is: there is at least one such path to a
 white object, so that it's reachable.
 
 The strong invariant is the basic idea of mark and sweep too. But as the
-mutator isn't running during DOD the invariant is never violated.
+mutator isn't running during mark phase, the invariant is never violated.
 
 Due to this invariant, after the root set has been marked and when all
 greyed objects are marked (blackened), the white objects have to be
@@ -179,9 +174,9 @@ arranged like in this scheme:
    free-list-ptr     to-space          scan-pointer      from-space
 
 Objects get "moved" during collection by rearranging the doubly-linked
-object pointers. At the end of a DOD run (when the last grey object is
+object pointers. At the end of a mark run (when the last grey object is
 blackened), the from-space and the free-list are merged serving
-as the new free-list of the next DOD cycle. This operation is just a few
+as the new free-list of the next GC cycle. This operation is just a few
 pointer manipulations that replaces the sweep phase of a mark and sweep
 collector.
 
@@ -191,7 +186,7 @@ collector.
 
 =item a) initialization
 
-After interpreter creation the DOD system is initialized by marking
+After interpreter creation the GC system is initialized by marking
 parts of the root set (globals, internal structures).
 
 =item b) program operation
@@ -203,14 +198,14 @@ be less then one too, but this could highly increase average memory usage.
 
 To keep the memory usage limited k > 1 must hold.
 
-=item c) near the end of a DOD cycle
+=item c) near the end of a mark phase
 
 The rest of the root set is scanned, i.e. the registers. By deferring
 scanning of registers all temporaries that might have exist somewhen
-just stay unscanned - they will be collected in this DOD cycle, if
-we allocate new objects white or in the next DOD cycle.
+just stay unscanned - they will be collected in this mark phase, if
+we allocate new objects white or in the next mark phase.
 
-=item d) finishing a DOD cycle
+=item d) finishing a mark phase
 
 The current sweep of the whole arena is done, or with implicit reclamation:
 
@@ -222,7 +217,7 @@ constitute the from-space of the new collection cycle.
 Now he meaning of the black bit is reversed effectively setting the new
 from-space to white.
 
-The next DOD cycle is initialized in one step a) and the new cycle starts.
+The next mark phase is initialized in one step a) and the new cycle starts.
 
 Alternatively the mutator could run and allocate objects for some time,
 without starting the collector again, if there are plenty of free objects on
@@ -247,7 +242,7 @@ accurate. This avoids copying of dead buffer memory.
                        MS                 IMS               IMIR
   ------------------------------------------------------------------------
   operation            stop-the-world     incremental       incremental
-  time per DOD cycle   unbounded          bounded           bounded
+  time per mark phase  unbounded          bounded           bounded
   size overhead        1 word             1 word            2 words
   time overhead        O(2*live + dead)   O(2*live + dead)  O(live)   2)
 
@@ -279,7 +274,7 @@ to the right of the object that gets blackened.
 =item big aggregates
 
 Greying has to be done in increments. Big aggregates can't have a mark
-vtable that could run arbitrarily long. This means that the DOD system
+vtable that could run arbitrarily long. This means that the GC system
 must know the layout of arrays, hashes, and objects. This is currently
 true for arrays and objects but not for hashes. But the latter need some
 refactoring of internals anyway.
@@ -297,11 +292,11 @@ The interpreter arena has a count of currently active objects that need
 timely destruction. When during scope exit an high priority sweep is
 triggered, we have basically two cases:
 
-1) all of these objects were already seen by this DOD run - the scope
+1) all of these objects were already seen in this mark phase - the scope
 exit can continue.
 
 2) Not all objects were seen - they might be alive or not. This means
-that the DOD cycle must run to the end to decide, if these objects are
+that the mark phase must run to the end to decide, if these objects are
 alive (or again until all are found alive).
 
 To increase performance its likely that we need some additional
@@ -469,7 +464,7 @@ static int sweep_cb(PARROT_INTERP,
  * that this amount of the total size could be freed
  *
  * This factor also depends on the allocation color of buffer headers,
- * which is set to black now. So we are always one DOD cycle behind
+ * which is set to black now. So we are always one mark phase behind
  * and the statistics are rather wrong.
  */
 #define MEM_POOL_RECLAIM      0.2
@@ -482,7 +477,7 @@ static int sweep_cb(PARROT_INTERP,
 
 typedef enum {          /* these states have to be in execution order */
     GC_IMS_INITIAL,     /* memory subsystem setup */
-    GC_IMS_STARTING,    /* wait for DOD_block to clear */
+    GC_IMS_STARTING,    /* wait for gc_block_level to clear */
     GC_IMS_RE_INIT,     /* start of normal operation - mark root */
     GC_IMS_MARKING,     /* mark children */
     GC_IMS_START_SWEEP, /* mark finished, start sweep buffers */
@@ -569,7 +564,7 @@ gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     /*
      * buffers are born black, PMCs not yet?
      * XXX this does not solve the problem of storing keys in hashes
-     *     in the next DOD cycle (if the key isn't marked elsewhere ?)
+     *     in the next mark phase (if the key isn't marked elsewhere ?)
      */
     PObj_flags_SETTO(ptr, pool == arena_base->pmc_pool ? 0 : PObj_live_FLAG);
     --pool->num_free_objects;
@@ -1076,7 +1071,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
         return;
     }
 
-    /* lazy DOD handling */
+    /* lazy GC handling */
     IMS_DEBUG((stderr, "\nLAZY state = %d\n", g_ims->state));
     g_ims->lazy = lazy;
 

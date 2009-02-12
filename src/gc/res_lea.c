@@ -120,7 +120,7 @@ xrealloc(void *p, size_t size)
 =item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)>
 
 COWable objects (strings or Buffers) use an INTVAL before C<bufstart> for
-refcounting in DOD.
+refcounting in GC.
 
 =cut
 

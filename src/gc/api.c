@@ -425,7 +425,7 @@ Parrot_gc_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj 
 
 =item C<void Parrot_gc_profile_start>
 
-Records the start time of a DOD run when profiling is enabled.
+Records the start time of a GC mark run when profiling is enabled.
 
 =cut
 
@@ -443,7 +443,7 @@ Parrot_gc_profile_start(PARROT_INTERP)
 
 =item C<void Parrot_gc_profile_end>
 
-Records the end time of the DOD part C<what> run when profiling is
+Records the end time of the GC mark run part C<what> run when profiling is
 enabled. Also record start time of next part.
 
 =cut
@@ -462,7 +462,7 @@ Parrot_gc_profile_end(PARROT_INTERP, int what)
         profile->data[what].time += now - profile->gc_time;
 
         /*
-         * we've recorded the time of a DOD/GC piece from
+         * we've recorded the time of a GC piece from
          * gc_time until now, so add this to the start of the
          * currently executing opcode, which hasn't run this
          * interval.
@@ -478,7 +478,7 @@ Parrot_gc_profile_end(PARROT_INTERP, int what)
 
 =item C<void Parrot_gc_ms_run_init>
 
-Prepares the collector for a mark & sweep DOD run. This is the
+Prepares the collector for a mark & sweep GC run. This is the
 initializer function for the MS garbage collector.
 
 =cut

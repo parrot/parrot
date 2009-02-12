@@ -239,10 +239,10 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
     /* If not enough room, try to find some */
     if (pool->top_block->free < size) {
         /*
-         * force a DOD run to get live flags set
+         * force a GC mark run to get live flags set
          * for incremental M&S collection is run from there
          * but only if there may be something worth collecting!
-         * TODO pass required allocation size to the DOD system,
+         * TODO pass required allocation size to the GC system,
          *      so that collection can be skipped if needed
          */
         if (!interp->arena_base->gc_mark_block_level

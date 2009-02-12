@@ -162,7 +162,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
 
     if (interp->pdb && interp->pdb->debugger) {
         /*
-         * if the other interpreter did a DOD run, it can set
+         * if the other interpreter did a GC mark run, it can set
          * live bits of shared objects, but these aren't reset, because
          * they are in a different arena. When now such a PMC points to
          * other non-shared object, these wouldn't be marked and hence
@@ -197,7 +197,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     ++arena_base->gc_mark_block_level;
     arena_base->lazy_gc = flags & GC_lazy_FLAG;
 
-    /* tell the threading system that we're doing DOD mark */
+    /* tell the threading system that we're doing GC mark */
     pt_gc_start_mark(interp);
     Parrot_gc_ms_run_init(interp);
 
@@ -247,7 +247,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
 
 =item C<int Parrot_gc_trace_root>
 
-Traces the root set. Returns 0 if it's a lazy DOD run and all objects
+Traces the root set. Returns 0 if it's a lazy GC run and all objects
 that need timely destruction were found.
 
 C<trace_stack> can have these values:
@@ -280,7 +280,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     Parrot_Context   *ctx;
     PObj             *obj;
 
-    /* note: adding locals here did cause increased DOD runs */
+    /* note: adding locals here did cause increased GC runs */
     mark_context_start();
 
     if (trace == GC_TRACE_SYSTEM_ONLY) {
@@ -319,7 +319,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
      * XXX these PMCs are constant and shouldn't get collected
      * but t/library/dumper* fails w/o this marking.
      *
-     * It seems that the Class PMC gets DODed - these should
+     * It seems that the Class PMC gets GCed - these should
      * get created as constant PMCs.
      */
     mark_vtables(interp);
@@ -607,7 +607,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
      * pointers of the originating interpreter.
      *
      * We are possibly changing another interpreter's data here, so
-     * the mark phase of DOD must run only on one interpreter of a pool
+     * the mark phase of GC must run only on one interpreter of a pool
      * at a time. However, freeing unused objects can occur in parallel.
      * And: to be sure that a shared object is dead, we have to finish
      * the mark phase of all interpreters in a pool that might reference
@@ -681,7 +681,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
 =item C<static void more_traceable_objects>
 
-We're out of traceable objects. First we try a DOD run to free some up. If
+We're out of traceable objects. First we try a GC run to free some up. If
 that doesn't work, allocate a new arena.
 
 =cut
@@ -764,7 +764,7 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *
 
 Free object allocator for the MS garbage collector system. If there are no
 free objects, call C<gc_ms_add_free_object> to either free them up with a
-DOD run, or allocate new objects. If there are objects available on the
+GC run, or allocate new objects. If there are objects available on the
 free list, pop it off and return it.
 
 =cut
