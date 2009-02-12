@@ -157,7 +157,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     /* XXX these should go into the interpreter */
     int total_free     = 0;
 
-    if (arena_base->DOD_block_level)
+    if (arena_base->gc_mark_block_level)
         return;
 
     if (interp->pdb && interp->pdb->debugger) {
@@ -194,7 +194,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
         return;
     }
 
-    ++arena_base->DOD_block_level;
+    ++arena_base->gc_mark_block_level;
     arena_base->lazy_gc = flags & GC_lazy_FLAG;
 
     /* tell the threading system that we're doing DOD mark */
@@ -237,7 +237,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
 
     /* Note it */
     arena_base->gc_runs++;
-    --arena_base->DOD_block_level;
+    --arena_base->gc_mark_block_level;
 
     return;
 }

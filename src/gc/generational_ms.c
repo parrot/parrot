@@ -1846,10 +1846,10 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
     Arenas * const arena_base = interp->arena_base;
     Gc_gms_private *g_gms;
 
-    if (arena_base->DOD_block_level) {
+    if (arena_base->gc_mark_block_level) {
         return;
     }
-    ++arena_base->DOD_block_level;
+    ++arena_base->gc_mark_block_level;
     g_gms = arena_base->gc_private;
     if (flags & GC_finish_FLAG) {
         Small_Object_Pool * const pool = arena_base->pmc_pool;
@@ -1858,7 +1858,7 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
         /* XXX need to sweep over objects that have finalizers only */
         Parrot_forall_header_pools(interp, POOL_PMC, 0, sweep_cb_pmc);
         gc_gms_end_cycle(interp);
-        --arena_base->DOD_block_level;
+        --arena_base->gc_mark_block_level;
         return;
     }
 
@@ -1878,7 +1878,7 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
         ++arena_base->lazy_gc_runs;
     }
     gc_gms_end_cycle(interp);
-    --arena_base->DOD_block_level;
+    --arena_base->gc_mark_block_level;
 }
 
 /*

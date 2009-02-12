@@ -245,7 +245,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
          * TODO pass required allocation size to the DOD system,
          *      so that collection can be skipped if needed
          */
-        if (!interp->arena_base->DOD_block_level
+        if (!interp->arena_base->gc_mark_block_level
         &&   interp->arena_base->mem_allocs_since_last_collect) {
             Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
 #if !PARROT_GC_IMS
@@ -374,10 +374,10 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     Arenas * const      arena_base = interp->arena_base;
 
     /* Bail if we're blocked */
-    if (arena_base->GC_block_level)
+    if (arena_base->gc_sweep_block_level)
         return;
 
-    ++arena_base->GC_block_level;
+    ++arena_base->gc_sweep_block_level;
 
     if (interp->profile)
         Parrot_gc_profile_start(interp);
@@ -583,7 +583,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     if (interp->profile)
         Parrot_gc_profile_end(interp, PARROT_PROF_GC);
 
-    --arena_base->GC_block_level;
+    --arena_base->gc_sweep_block_level;
 }
 
 /*

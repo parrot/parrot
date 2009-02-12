@@ -947,7 +947,7 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
     Arenas * const arena_base    = interp->arena_base;
     Gc_ims_private * const g_ims = (Gc_ims_private *)arena_base->gc_private;
 
-    if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD)
+    if (arena_base->gc_mark_block_level || g_ims->state == GC_IMS_DEAD)
         return;
 
     ++g_ims->increments;
@@ -1028,7 +1028,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
     Arenas * const         arena_base = interp->arena_base;
     Gc_ims_private * const g_ims      = (Gc_ims_private *)arena_base->gc_private;
 
-    if (arena_base->DOD_block_level || g_ims->state == GC_IMS_DEAD)
+    if (arena_base->gc_mark_block_level || g_ims->state == GC_IMS_DEAD)
         return;
 
     if (flags & GC_finish_FLAG) {

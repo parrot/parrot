@@ -46,7 +46,7 @@ void
 Parrot_go_collect(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_go_collect)
-    if (interp->arena_base->GC_block_level) {
+    if (interp->arena_base->gc_sweep_block_level) {
         return;
     }
     interp->arena_base->collect_runs++;        /* fake it */

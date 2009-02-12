@@ -334,8 +334,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      * Need to turn off DOD blocking, else things stay alive and IO
      * handles aren't closed
      */
-    interp->arena_base->DOD_block_level    =
-        interp->arena_base->GC_block_level = 0;
+    interp->arena_base->gc_mark_block_level  = 0;  
+    interp->arena_base->gc_sweep_block_level = 0;
 
     if (Interp_trace_TEST(interp, ~0)) {
         Parrot_io_eprintf(interp, "FileHandle objects (like stdout and stderr)"
