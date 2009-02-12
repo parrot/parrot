@@ -157,7 +157,6 @@ typedef enum {
      PARROT_PROF_GC_p2,        /* pass 2 mark next_for_GC */
      PARROT_PROF_GC_cp,        /* collect PMCs */
      PARROT_PROF_GC_cb,        /* collect buffers */
-     /* DOD must be 0..3 */
      PARROT_PROF_GC,
      PARROT_PROF_EXCEPTION,
      PARROT_PROF_EXTRA

@@ -27,7 +27,7 @@ typedef enum {
 
 /* Objects, classes and PMCarrays all use the same data scheme:
  * PMC_data() holds a malloced array, PMC_int_val() is the size of it
- * this simplifies DOD mark a lot
+ * this simplifies the GC mark phase a lot
  *
  * The active destroy flag is necessary to free the malloced array.
  */

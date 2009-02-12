@@ -18,7 +18,7 @@
 #include "parrot/gc_mark_sweep.h"
 #include "parrot/parrot.h"
 
-/* Macros for recursively blocking and unblocking DOD */
+/* Macros for recursively blocking and unblocking GC mark */
 #define Parrot_block_GC_mark(interp) \
         { \
             (interp)->arena_base->gc_mark_block_level++; \
@@ -31,7 +31,7 @@
             Parrot_shared_gc_unblock(interp); \
         }
 
-/* Macros for recursively blocking and unblocking GC */
+/* Macros for recursively blocking and unblocking GC sweep */
 #define Parrot_block_GC_sweep(interp) \
         (interp)->arena_base->gc_sweep_block_level++
 
@@ -39,7 +39,7 @@
         if ((interp)->arena_base->gc_sweep_block_level) \
             (interp)->arena_base->gc_sweep_block_level--
 
-/* Macros for testing if the DOD and GC are blocked */
+/* Macros for testing if the GC mark and sweep are blocked */
 #define Parrot_is_blocked_GC_mark(interp) \
         ((interp)->arena_base->gc_mark_block_level)
 

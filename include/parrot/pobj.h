@@ -248,7 +248,7 @@ typedef enum PObj_enum {
     /* Mark the object as on the free list */
     b_PObj_on_free_list_FLAG    = POBJ_FLAG(19),
 
-/* DOD/GC FLAGS */
+/* GC FLAGS */
     /* Set to true if the PObj has a custom mark routine */
     PObj_custom_mark_FLAG       = POBJ_FLAG(20),
     /* Mark the buffer as needing GC */
@@ -261,7 +261,7 @@ typedef enum PObj_enum {
 /* PMC specific FLAGs */
     /* call object finalizer */
     PObj_need_finalize_FLAG     = POBJ_FLAG(25),
-    /* a PMC that needs special handling in DOD, i.e one that has either:
+    /* a PMC that needs special handling in GC, i.e one that has either:
      * - metadata
      * - data_is_PMC_array_FLAG
      * - custom_mark_FLAG

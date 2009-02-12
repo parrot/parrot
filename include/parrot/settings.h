@@ -14,13 +14,13 @@
 #define PARROT_SETTINGS_H_GUARD
 
 /*
- * DOD/GC switches
+ * GC switches
  */
 
 /* If you are trying to debug GC problems which only occur on large test cases,
  * turning on GC_DEBUG should help make the problem appear with smaller data
- * samples by reducing various numbers, and causing DOD and allocation runs
- * to occur more frequently. It does significantly reduce performance. */
+ * samples by reducing various numbers, and causing GC runs to occur more
+ * frequently. It does significantly reduce performance. */
 #ifndef DISABLE_GC_DEBUG
 #  define DISABLE_GC_DEBUG 0
 #endif /* DISABLE_GC_DEBUG */

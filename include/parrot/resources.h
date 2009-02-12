@@ -139,7 +139,7 @@ typedef struct Arenas {
     void (*finalize_gc_system) (PARROT_INTERP);
     void (*init_pool)(PARROT_INTERP, struct Small_Object_Pool *);
     /*
-     * statistics for DOD and GC
+     * statistics for GC
      */
     size_t  gc_mark_runs;       /* Number of times we've done a mark run*/
     size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
@@ -152,7 +152,7 @@ typedef struct Arenas {
     size_t  header_allocs_since_last_collect;   /* The number of header
                                                  * blocks allocated from
                                                  * the system since the last
-                                                 * DOD run */
+                                                 * GC run */
     size_t  memory_allocated;     /* The total amount of
                                    * allocatable memory
                                    * allocated. Doesn't count
@@ -162,17 +162,17 @@ typedef struct Arenas {
     UINTVAL memory_collected;     /* Total amount of memory copied
                                      during collection */
     UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
-    UINTVAL num_early_PMCs_seen;  /* how many such PMCs has DOD seen */
+    UINTVAL num_early_PMCs_seen;  /* how many such PMCs has GC seen */
     UINTVAL num_extended_PMCs;    /* active PMCs having pmc_ext */
-    PMC* gc_mark_start;           /* first PMC marked during a DOD run */
-    PMC* gc_mark_ptr;             /* last PMC marked during a DOD run */
+    PMC* gc_mark_start;           /* first PMC marked during a GC run */
+    PMC* gc_mark_ptr;             /* last PMC marked during a GC run */
     PMC* gc_trace_ptr;            /* last PMC trace_children was called on */
     int lazy_gc;                  /* flag that indicates whether we should stop
                                      when we've seen all impatient PMCs */
     /*
-     * DOD, GC blocking
+     * GC blocking
      */
-    UINTVAL gc_mark_block_level;  /* How many outstanding DOD block
+    UINTVAL gc_mark_block_level;  /* How many outstanding GC block
                                      requests are there? */
     UINTVAL gc_sweep_block_level; /* How many outstanding GC block
                                      requests are there? */
