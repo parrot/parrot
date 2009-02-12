@@ -549,11 +549,11 @@ inline op find_multi(out PMC, in STR, in STR) {
 =item B<register>(invar PMC)
 
 Add a reference of PMC $1 to the interpreter's root set of PMCs. This is needed
-for extensions to make sure that the PMC is properly marked during DOD, if that
+for extensions to make sure that the PMC is properly marked during GC, if that
 PMC is not known to Parrot's core elsewhere.
 
 A PMC can be registered multiple times.  If it's unregistered and the
-registration count reaches zero, it will be destroyed during the next DOD run.
+registration count reaches zero, it will be destroyed during the next GC run.
 
 =item B<unregister>(invar PMC)
 

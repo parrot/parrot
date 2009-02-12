@@ -1188,9 +1188,9 @@ op getinterp(out PMC) {
 
 ###############################################################################
 
-=head2 Dead Object Detection/Garbage Collection
+=head2 Garbage Collection
 
-Opcodes that interact with the DOD and GC subsystems.
+Opcodes that interact with the GC subsystem.
 
 =over 4
 
@@ -1200,18 +1200,18 @@ Opcodes that interact with the DOD and GC subsystems.
 
 =item B<sweep>(inconst INT)
 
-Triggers a DOD run, based on the value of $1, where:
+Triggers a GC run, based on the value of $1, where:
 
 =over
 
 =item * 0
 
-Trigger a DOD run only if there are things that have flagged themselves as
+Trigger a GC run only if there are things that have flagged themselves as
 really needing to be collected.
 
 =item * 1
 
-Trigger a dead object detection (DOD) sweep unconditionally.
+Trigger a GC run unconditionally.
 
 =back
 
@@ -1237,7 +1237,7 @@ op collect() {
 
 =item B<sweepoff>()
 
-Disable DOD sweeps. (Nestable)
+Disable GC runs. (Nestable)
 
 =cut
 
@@ -1247,7 +1247,7 @@ op sweepoff() {
 
 =item B<sweepon>()
 
-Re-enable DOD sweeps.
+Re-enable GC runs.
 
 =cut
 
