@@ -92,16 +92,6 @@ typedef enum arg_pass_t {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP,
-    ARGIN_NULLOK(PMC* obj),
-    ARGIN(const char *sig),
-    va_list args)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-PARROT_EXPORT
 void Parrot_convert_arg(PARROT_INTERP, ARGMOD(call_state *st))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -183,6 +173,16 @@ void parrot_pass_args(PARROT_INTERP,
         FUNC_MODIFIES(*dest_ctx)
         FUNC_MODIFIES(*src_indexes)
         FUNC_MODIFIES(*dest_indexes);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC* Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP,
+    ARGIN_NULLOK(PMC* obj),
+    ARGIN(const char *sig),
+    va_list args)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_pcc_invoke_from_sig_object(PARROT_INTERP,
@@ -278,10 +278,6 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_Parrot_pcc_build_sig_object_from_varargs \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sig)
 #define ASSERT_ARGS_Parrot_convert_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(st)
@@ -317,6 +313,10 @@ STRING* set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(src_ctx) \
     || PARROT_ASSERT_ARG(dest_ctx)
+#define ASSERT_ARGS_Parrot_pcc_build_sig_object_from_varargs \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sig)
 #define ASSERT_ARGS_Parrot_pcc_invoke_from_sig_object \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

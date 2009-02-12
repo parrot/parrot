@@ -175,6 +175,9 @@ void pt_add_to_interpreters(PARROT_INTERP,
 
 void pt_clone_code(Parrot_Interp d, Parrot_Interp s);
 void pt_clone_globals(Parrot_Interp d, Parrot_Interp s);
+void pt_free_pool(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void pt_gc_mark_root_finished(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -182,9 +185,6 @@ void pt_gc_start_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void pt_gc_stop_mark(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-void pt_free_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void pt_join_threads(PARROT_INTERP)
@@ -269,13 +269,13 @@ PMC * pt_transfer_sub(
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_pt_clone_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_pt_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_gc_mark_root_finished __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_gc_start_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_gc_stop_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_pt_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pt_join_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
