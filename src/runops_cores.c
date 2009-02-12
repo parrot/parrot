@@ -401,12 +401,12 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         if (gc_mark_runs != arena_base->gc_mark_runs) {
             gc_mark_runs  = arena_base->gc_mark_runs;
-            Parrot_io_eprintf(debugger, "       DOD\n");
+            Parrot_io_eprintf(debugger, "       GC mark\n");
         }
 
         if (gc_collect_runs != arena_base->gc_collect_runs) {
             gc_collect_runs  = arena_base->gc_collect_runs;
-            Parrot_io_eprintf(debugger, "       GC\n");
+            Parrot_io_eprintf(debugger, "       GC collect\n");
         }
     }
 

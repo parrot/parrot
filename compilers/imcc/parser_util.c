@@ -625,7 +625,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
     do_yylex_init(interp, &yyscanner);
 
-    /* we create not yet anchored PMCs - e.g. Subs: turn off DOD */
+    /* we create not yet anchored PMCs - e.g. Subs: turn off GC */
     Parrot_block_GC_mark(interp);
 
     if (IMCC_INFO(interp)->last_unit) {
@@ -934,7 +934,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     IMCC_INFO(interp)->line        = 1;
 
     /*
-     * the Parrot_str_compare() called from pmc_type() triggers DOD
+     * the Parrot_str_compare() called from pmc_type() triggers GC
      * which can destroy packfiles under construction
      */
     Parrot_block_GC_mark(interp);

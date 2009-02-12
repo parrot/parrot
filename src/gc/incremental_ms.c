@@ -1117,13 +1117,13 @@ be greyed or the aggregate must be rescanned -- so grey it.
 
 */
 
-#define DOD_IMS_GREY_NEW 1
+#define GC_IMS_GREY_NEW 1
 
 void
 Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
 {
     ASSERT_ARGS(Parrot_gc_ims_wb)
-#if DOD_IMS_GREY_NEW
+#if GC_IMS_GREY_NEW
     IMS_DEBUG((stderr, "%d agg %p mark %p\n",
                 ((Gc_ims_private *)interp->arena_base->
                 gc_private)->state, agg, _new));

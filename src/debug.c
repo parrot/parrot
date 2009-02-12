@@ -3341,7 +3341,7 @@ PDB_info(PARROT_INTERP)
             interpinfo(interp, ACTIVE_PMCS));
     Parrot_io_eprintf(interp, "Extended PMCs = %ld\n",
             interpinfo(interp, EXTENDED_PMCS));
-    Parrot_io_eprintf(interp, "Timely DOD PMCs = %ld\n",
+    Parrot_io_eprintf(interp, "Timely GC PMCs = %ld\n",
             interpinfo(interp, IMPATIENT_PMCS));
     Parrot_io_eprintf(interp, "Total PMCs = %ld\n",
             interpinfo(interp, TOTAL_PMCS));

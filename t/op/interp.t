@@ -76,7 +76,7 @@ dos
 OUTPUT
 
 # Need to disable GC while trace is on, as there's a non-zero chance that a
-# GC sweep would occur, causing a bonus "DOD" line in the output, which makes
+# GC sweep would occur, causing a bonus "GC mark" line in the output, which makes
 # the test fail.
 pasm_output_like(
     <<'CODE', <<'OUTPUT', "restart trace" );

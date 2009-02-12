@@ -23,7 +23,7 @@ F<docs/memory_internals.pod>.
 
 */
 
-#define DOD_C_SOURCE
+#define GC_C_SOURCE
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "gc_private.h"

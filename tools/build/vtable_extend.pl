@@ -90,7 +90,7 @@ can.
 /* HEADERIZER STOP */
 
 /* Some internal notes. Parrot will die a horrible and bizarre death
-   if the stack start pointer's not set and a DOD run is
+   if the stack start pointer's not set and a GC run is
    triggered. The pointer *will* be set by the interpreter if the
    interpreter calls code which calls these functions, so most
    extension code is safe, no problem.

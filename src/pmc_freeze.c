@@ -448,7 +448,7 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 /* when thawing a string longer then this size, we first do a GC run and then
  * block GC - the system can't give us more headers */
 
-#define THAW_BLOCK_DOD_SIZE 100000
+#define THAW_BLOCK_GC_SIZE 100000
 
 /* preallocate freeze image for aggregates with this estimation */
 #if FREEZE_ASCII
@@ -1838,7 +1838,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
      * info->thaw_ptr becomes invalid - seems that the hash got
      * collected under us.
      */
-    if (1 || (Parrot_str_byte_length(interp, image) > THAW_BLOCK_DOD_SIZE)) {
+    if (1 || (Parrot_str_byte_length(interp, image) > THAW_BLOCK_GC_SIZE)) {
         Parrot_do_gc_run(interp, 1);
         Parrot_block_GC_mark(interp);
         Parrot_block_GC_sweep(interp);
