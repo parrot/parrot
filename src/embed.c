@@ -113,10 +113,10 @@ extern void Parrot_initialize_core_pmcs(PARROT_INTERP);
 Initializes the new interpreter when it hasn't been initialized before.
 
 Additionally sets the stack top, so that Parrot objects created
-in inner stack frames will be visible during DODs stack walking code.
+in inner stack frames will be visible during GC stack walking code.
 B<stack_top> should be the address of an automatic variable in the caller's
 stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
-frames so that they are not destroyed during DOD runs.
+frames so that they are not destroyed during GC runs.
 
 Use this function when you call into Parrot before entering a run loop.
 

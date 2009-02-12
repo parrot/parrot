@@ -90,7 +90,7 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
     /*
      * ATT: all items that are owned by the HLL_info structure
      *      have to be created as constant objects, because
-     *      this structure isn't marked by DOD/GC
+     *      this structure isn't marked by GC
      */
     PMC * const entry = constant_pmc_new(interp, enum_class_FixedPMCArray);
 

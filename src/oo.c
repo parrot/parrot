@@ -745,7 +745,7 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class))
  * quick'n'dirty method cache
  * RT #45987: use a hash if method_name is not constant
  *       i.e. from obj.$Sreg(args)
- *       If this hash is implemented mark it during DOD
+ *       If this hash is implemented mark it during GC
  */
 
 /*

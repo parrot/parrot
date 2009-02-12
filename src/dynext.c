@@ -384,7 +384,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
 
     /*
      * work around gcc 3.3.3 and other problem with dynpmcs
-     * something during library loading doesn't stand a DOD run
+     * something during library loading doesn't stand a GC run
      */
     Parrot_block_GC_mark(interp);
 

@@ -250,7 +250,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.
-     * Actually, we could enable DOD/GC earlier, but here all setup is
+     * Actually, we could enable GC earlier, but here all setup is
      * done
      */
     Parrot_unblock_GC_mark(interp);
@@ -331,7 +331,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      * Be sure that an async collector hasn't live bits set now, so
      * trigger a finish run
      *
-     * Need to turn off DOD blocking, else things stay alive and IO
+     * Need to turn off GC blocking, else things stay alive and IO
      * handles aren't closed
      */
     interp->arena_base->gc_mark_block_level  = 0;
@@ -344,7 +344,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     }
 
     /* Destroys all PMCs, even constants and the FileHandle objects for
-     * std{in, out, err}, so don't be verbose about DOD'ing. */
+     * std{in, out, err}, so don't be verbose about GC'ing. */
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 

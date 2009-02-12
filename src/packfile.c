@@ -3617,7 +3617,7 @@ PackFile_Constant_new(SHIM_INTERP)
 
 Delete the C<PackFile_Constant> C<self>.
 
-Don't delete C<PMC>s or C<STRING>s, they are destroyed via DOD/GC.
+Don't delete C<PMC>s or C<STRING>s, they are destroyed via GC.
 
 =cut
 
@@ -3785,7 +3785,7 @@ PackFile_Constant_unpack_pmc(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
     /*
      * TODO use thaw_constants
      * current issue: a constant Sub with attached properties
-     *                doesn't DOD mark the properties
+     *                doesn't GC mark the properties
      * for a constant PMC *all* contents have to be in the constant pools
      */
     pmc = Parrot_thaw(interp, image);

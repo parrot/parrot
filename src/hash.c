@@ -1054,7 +1054,7 @@ Creates and stores a new hash in C<hptr>.
 FIXME: This function can go back to just returning the hash struct
 pointer once Buffers can define their own custom mark routines.
 
-The problem is: During DODs stack walking the item on the stack must be
+The problem is: During GC stack walking the item on the stack must be
 a PMC. When an auto C<Hash*> is seen, it doesn't get properly marked
 (only the C<Hash*> buffer is marked, not its contents). By passing the
 C<**hptr> up to the Hash's init function, the newly constructed PMC is

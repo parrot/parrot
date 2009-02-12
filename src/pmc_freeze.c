@@ -445,8 +445,8 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 /* normal freeze can use next_for_GC ptrs or a seen hash */
 #define FREEZE_USE_NEXT_FOR_GC 0
 
-/* when thawing a string longer then this size, we first do a DOD run and then
- * block DOD/GC - the system can't give us more headers */
+/* when thawing a string longer then this size, we first do a GC run and then
+ * block GC - the system can't give us more headers */
 
 #define THAW_BLOCK_DOD_SIZE 100000
 
@@ -1829,8 +1829,8 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
     info.image = image;
     /*
      * if we are thawing a lot of PMCs, its cheaper to do
-     * a DOD run first and then block DOD - the limit should be
-     * chosen so that no more then one DOD run would be triggered
+     * a GC run first and then block GC - the limit should be
+     * chosen so that no more then one GC run would be triggered
      *
      * XXX
      *
@@ -1885,7 +1885,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
 
 This function must not consume any resources (except the image itself).
 It uses the C<next_for_GC> pointer, so its not reentrant and must not be
-interrupted by a DOD run.
+interrupted by a GC run.
 
 =cut
 
@@ -1938,7 +1938,7 @@ Parrot_freeze(PARROT_INTERP, ARGIN(PMC* pmc))
 #if FREEZE_USE_NEXT_FOR_GC
     ASSERT_ARGS(Parrot_freeze)
     /*
-     * we could do a DOD run here before, to free resources
+     * we could do a GC run here before, to free resources
      */
     return Parrot_freeze_at_destruct(interp, pmc);
 #else

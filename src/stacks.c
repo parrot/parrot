@@ -118,7 +118,7 @@ new_stack(PARROT_INTERP, ARGIN(const char *name))
 
 =item C<void mark_stack>
 
-Mark entries in a stack structure during DOD.
+Mark entries in a stack structure during GC.
 
 =cut
 

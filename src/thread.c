@@ -1332,16 +1332,16 @@ pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
         if (retval) {
             PMC *parent_ret;
             /*
-             * clone the PMC into caller, if its not a shared PMC
+             * clone the PMC into caller, if it's not a shared PMC
              * the PMC is not in the parents root set nor in the
-             * stack so block DOD during clone
+             * stack so block GC during clone
              * XXX should probably acquire the parent's interpreter mutex
              */
             Parrot_block_GC_mark(parent);
             parent_ret = make_local_copy(parent, interp, retval);
 
             /* this PMC is living only in the stack of this currently
-             * dying interpreter, so register it in parent's DOD registry
+             * dying interpreter, so register it in parent's GC registry
              * XXX is this still needed?
              */
             gc_register_pmc(parent, parent_ret);
@@ -1590,20 +1590,20 @@ pt_add_to_interpreters(PARROT_INTERP, ARGIN_NULLOK(Parrot_Interp new_interp))
 
 =back
 
-=head2 DOD Synchronization Functions
+=head2 GC Synchronization Functions
 
 =over 4
 
 =item C<void pt_gc_start_mark>
 
-Record that the mark phase of DOD is about to begin. In the presence of shared
-PMCs, we can only run one DOD run at a time because C<< PMC->next_for_GC >> may
+Record that the mark phase of GC is about to begin. In the presence of shared
+PMCs, we can only run one GC run at a time because C<< PMC->next_for_GC >> may
 be changed.
 
-C<flags> are the DOD flags. We check if we need to collect shared objects or
+C<flags> are the GC flags. We check if we need to collect shared objects or
 not.
 
-TODO - Have a count of shared PMCs and check it during DOD.
+TODO - Have a count of shared PMCs and check it during GC.
 
 TODO - Evaluate if a interpreter lock is cheaper when C<gc_mark_ptr> is
 updated.
@@ -1673,7 +1673,7 @@ pt_gc_start_mark(PARROT_INTERP)
 
     DEBUG_ONLY(fprintf(stderr, "actually mark\n"));
     /*
-     * we can't allow parallel running DODs both would mess with shared PMCs
+     * We can't allow parallel running GCs; both would mess with shared PMCs'
      * next_for_GC pointers
      */
     LOCK(interpreter_array_mutex);
@@ -1684,7 +1684,7 @@ pt_gc_start_mark(PARROT_INTERP)
 
 =item C<void pt_gc_mark_root_finished>
 
-Records that DOD has finished for the root set.  EXCEPTION_UNIMPLEMENTED
+Records that GC has finished for the root set.  EXCEPTION_UNIMPLEMENTED
 
 =cut
 
@@ -1699,7 +1699,7 @@ pt_gc_mark_root_finished(PARROT_INTERP)
     /*
      * TODO now check, if we are the owner of a shared memory pool
      * if yes:
-     * - now run DOD_mark on all members of our pool
+     * - now mark all members of our pool
      * - if all shared PMCs are marked by all threads then
      *   - we can continue to free unused objects
      */
@@ -1709,7 +1709,7 @@ pt_gc_mark_root_finished(PARROT_INTERP)
 
 =item C<void pt_gc_stop_mark>
 
-Records that the mark phase of DOD has completed.
+Records that the mark phase of GC has completed.
 
 =cut
 
@@ -1751,7 +1751,7 @@ pt_gc_stop_mark(PARROT_INTERP)
 
 =item C<void Parrot_shared_gc_block>
 
-Blocks stop-the-world DOD runs.
+Blocks stop-the-world GC runs.
 
 =cut
 
@@ -1775,7 +1775,7 @@ Parrot_shared_gc_block(PARROT_INTERP)
 
 =item C<void Parrot_shared_gc_unblock>
 
-Unblocks stop-the-world DOD runs.
+Unblocks stop-the-world GC runs.
 
 =cut
 

@@ -26,7 +26,7 @@ can.
 */
 
 /* Some internal notes. Parrot will die a horrible and bizarre death
-   if the stack start pointer's not set and a DOD run is
+   if the stack start pointer's not set and a GC run is
    triggered. The pointer *will* be set by the interpreter if the
    interpreter calls code which calls these functions, so most
    extension code is safe, no problem.
@@ -1297,9 +1297,8 @@ Parrot_find_language(SHIM_INTERP, SHIM(char *language))
 
 =item C<void Parrot_register_pmc>
 
-Add a reference of the PMC to the interpreters DOD registry. This
-prevents PMCs only known to extension from getting destroyed during DOD
-runs.
+Add a reference of the PMC to the interpreter's GC registry. This prevents PMCs
+only known to extension from getting destroyed during GC runs.
 
 =cut
 
@@ -1319,9 +1318,8 @@ Parrot_register_pmc(PARROT_INTERP, Parrot_PMC pmc)
 
 =item C<void Parrot_unregister_pmc>
 
-Remove a reference of the PMC from the interpreters DOD registry. If the
-reference count reaches zero, the PMC will be destroyed during the next
-DOD run.
+Remove a reference of the PMC from the interpreter's GC registry. If the
+reference count reaches zero, the PMC will be destroyed during the next GC run.
 
 =cut
 

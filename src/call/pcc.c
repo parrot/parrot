@@ -1881,7 +1881,7 @@ parrot_pass_args(PARROT_INTERP,
 
     Parrot_process_args(interp, &st, param_or_result);
 
-    /* If we created a slurpy, we had to DOD register it so it did not get
+    /* If we created a slurpy, we had to GC register it so it did not get
      * collected during arg processing; we'll now unregister it. */
 }
 

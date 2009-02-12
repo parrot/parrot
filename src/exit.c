@@ -71,7 +71,7 @@ Parrot_exit(PARROT_INTERP, int status)
     /* call all the exit handlers */
     /* we are well "below" the runloop now, where lo_var_ptr
      * is set usually - exit handlers may run some resource-hungry
-     * stuff like printing profile stats - a DOD run would kill
+     * stuff like printing profile stats - a GC run would kill
      * resources - RT#46405 reset stacktop or better disable GC
      */
     /*

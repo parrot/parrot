@@ -121,7 +121,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
      * We are going to be passing the user_data PMC to external code, but
      * it may go out of scope until the callback is called -- we don't know
      * for certain as we don't know when the callback will be called.
-     * Therefore, to prevent the PMC from being destroyed by a DOD sweep,
+     * Therefore, to prevent the PMC from being destroyed by a GC sweep,
      * we need to anchor it.
      *
      */
