@@ -28,7 +28,7 @@ Send the output to OUTFILE. By default, output is directed to STDOUT.
     .local string infile, outfile
 
     load_bytecode "TGE.pbc"
-    load_bytecode "Getopt/Obj.pir"
+    load_bytecode "Getopt/Obj.pbc"
 
     # Grab program name for error reporting
     prog = shift args
