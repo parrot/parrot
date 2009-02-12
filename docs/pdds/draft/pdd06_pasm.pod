@@ -700,9 +700,9 @@ The total amount of system memory allocated for later parceling out to
 Buffers.  Doesn't include any housekeeping memory, memory for Buffer or PMC
 structs, or things of that nature.
 
-=item 2 DOD_RUNS
+=item 2 GC_RUNS
 
-The total number of dead object detection runs that have been made.
+The total number of garbage collection runs that have been made.
 
 =item 3 COLLECT_RUNS
 

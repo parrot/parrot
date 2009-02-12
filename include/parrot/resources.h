@@ -187,7 +187,7 @@ typedef struct Arenas {
 
 typedef enum {
     TOTAL_MEM_ALLOC = 1,
-    DOD_RUNS,
+    GC_RUNS,
     COLLECT_RUNS,
     ACTIVE_PMCS,
     ACTIVE_BUFFERS,
@@ -197,7 +197,7 @@ typedef enum {
     MEM_ALLOCS_SINCE_COLLECT,
     TOTAL_COPIED,
     IMPATIENT_PMCS,
-    LAZY_DOD_RUNS,
+    LAZY_GC_RUNS,
     EXTENDED_PMCS,
     CURRENT_RUNCORE,
 

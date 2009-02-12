@@ -227,7 +227,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     else {
         pt_gc_stop_mark(interp); /* XXX */
 
-        /* successful lazy DOD count */
+        /* successful lazy GC count */
         ++arena_base->lazy_gc_runs;
 
         Parrot_gc_clear_live_bits(interp);

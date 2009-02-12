@@ -3329,10 +3329,10 @@ PDB_info(PARROT_INTERP)
     ASSERT_ARGS(PDB_info)
     Parrot_io_eprintf(interp, "Total memory allocated = %ld\n",
             interpinfo(interp, TOTAL_MEM_ALLOC));
-    Parrot_io_eprintf(interp, "DOD runs = %ld\n",
-            interpinfo(interp, DOD_RUNS));
-    Parrot_io_eprintf(interp, "Lazy DOD runs = %ld\n",
-            interpinfo(interp, LAZY_DOD_RUNS));
+    Parrot_io_eprintf(interp, "gc runs = %ld\n",
+            interpinfo(interp, GC_RUNS));
+    Parrot_io_eprintf(interp, "Lazy gc runs = %ld\n",
+            interpinfo(interp, LAZY_GC_RUNS));
     Parrot_io_eprintf(interp, "Collect runs = %ld\n",
             interpinfo(interp, COLLECT_RUNS));
     Parrot_io_eprintf(interp, "Collect memory = %ld\n",
