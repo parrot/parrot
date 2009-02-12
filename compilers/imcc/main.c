@@ -413,6 +413,9 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
                 break;
             case 'b':
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                        "The -b option is deprecated, use the -R or "
+                        "--runcore options instead.");
                 SET_FLAG(PARROT_BOUNDS_FLAG);
                 break;
             case 'p':
@@ -425,18 +428,33 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     SET_TRACE(PARROT_TRACE_OPS_FLAG);
                 break;
             case 'j':
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                        "The -j option is deprecated, use the -R or "
+                        "--runcore options instead.");
                 SET_CORE(PARROT_JIT_CORE);
                 break;
             case 'S':
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                        "The -S option is deprecated, use the -R or "
+                        "--runcore options instead.");
                 SET_CORE(PARROT_SWITCH_CORE);
                 break;
             case 'C':
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                        "The -C option is deprecated, use the -R or "
+                        "--runcore options instead.");
                 SET_CORE(PARROT_CGP_CORE);
                 break;
             case 'f':
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                        "The -f option is deprecated, use the -R or "
+                        "--runcore options instead.");
                 SET_CORE(PARROT_FAST_CORE);
                 break;
             case 'g':
+                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
+                        "The -g option is deprecated, use the -R or "
+                        "--runcore options instead.");
                 SET_CORE(PARROT_CGOTO_CORE);
                 break;
             case 'd':
