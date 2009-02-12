@@ -141,11 +141,10 @@ typedef struct Arenas {
     /*
      * statistics for DOD and GC
      */
-    size_t  gc_runs;           /* Number of times we've done a DOD sweep */
-    size_t  lazy_gc_runs;       /* Number of successful lazy DOD sweep */
-    size_t  collect_runs;       /* Number of times we've
-                                 * done a memory compaction
-                                 */
+    size_t  gc_mark_runs;       /* Number of times we've done a mark run*/
+    size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
+    size_t  gc_collect_runs;    /* Number of times we've done a memory
+                                   compaction */
     size_t  mem_allocs_since_last_collect;      /* The number of memory
                                                  * allocations from the
                                                  * system since the last
@@ -187,8 +186,8 @@ typedef struct Arenas {
 
 typedef enum {
     TOTAL_MEM_ALLOC = 1,
-    GC_RUNS,
-    COLLECT_RUNS,
+    GC_MARK_RUNS,
+    GC_COLLECT_RUNS,
     ACTIVE_PMCS,
     ACTIVE_BUFFERS,
     TOTAL_PMCS,
@@ -197,7 +196,7 @@ typedef enum {
     MEM_ALLOCS_SINCE_COLLECT,
     TOTAL_COPIED,
     IMPATIENT_PMCS,
-    LAZY_GC_RUNS,
+    GC_LAZY_MARK_RUNS,
     EXTENDED_PMCS,
     CURRENT_RUNCORE,
 

@@ -245,14 +245,14 @@ interpinfo(PARROT_INTERP, INTVAL what)
 #endif
             ret = arena_base->memory_allocated;
             break;
-        case GC_RUNS:
-            ret = arena_base->gc_runs;
+        case GC_MARK_RUNS:
+            ret = arena_base->gc_mark_runs;
             break;
-        case LAZY_GC_RUNS:
-            ret = arena_base->lazy_gc_runs;
+        case GC_LAZY_MARK_RUNS:
+            ret = arena_base->gc_lazy_mark_runs;
             break;
-        case COLLECT_RUNS:
-            ret = arena_base->collect_runs;
+        case GC_COLLECT_RUNS:
+            ret = arena_base->gc_collect_runs;
             break;
         case ACTIVE_PMCS:
             ret = arena_base->pmc_pool->total_objects -

@@ -72,19 +72,19 @@ pin/unpin
 
     init = stringinfo $S6, .STRINGINFO_STRSTART
 
-    $I0 = interpinfo .INTERPINFO_COLLECT_RUNS
+    $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
   loop1:
     collect
-    $I1 = interpinfo .INTERPINFO_COLLECT_RUNS
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     eq $I0, $I1, loop1
 
     before = stringinfo $S6, .STRINGINFO_STRSTART
     unpin $S6
 
-    $I0 = interpinfo .INTERPINFO_COLLECT_RUNS
+    $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
   loop2:
     collect
-    $I1 = interpinfo .INTERPINFO_COLLECT_RUNS
+    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
     eq $I0, $I1, loop1
 
     after = stringinfo $S6, .STRINGINFO_STRSTART

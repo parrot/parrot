@@ -1862,8 +1862,8 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
         return;
     }
 
-    /* normal or lazy DOD run */
-    arena_base->gc_runs++;
+    /* normal or lazy mark run */
+    arena_base->gc_mark_runs++;
     arena_base->lazy_gc = (flags & GC_lazy_FLAG);
     gc_gms_init_mark(interp);
     if (gc_gms_trace_root(interp, !arena_base->lazy_gc) &&
@@ -1873,9 +1873,9 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
     }
     else {
         /*
-         * successful lazy DOD run
+         * successful lazy mark run
          */
-        ++arena_base->lazy_gc_runs;
+        ++arena_base->gc_lazy_mark_runs;
     }
     gc_gms_end_cycle(interp);
     --arena_base->gc_mark_block_level;

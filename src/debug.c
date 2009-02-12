@@ -3329,12 +3329,12 @@ PDB_info(PARROT_INTERP)
     ASSERT_ARGS(PDB_info)
     Parrot_io_eprintf(interp, "Total memory allocated = %ld\n",
             interpinfo(interp, TOTAL_MEM_ALLOC));
-    Parrot_io_eprintf(interp, "gc runs = %ld\n",
-            interpinfo(interp, GC_RUNS));
-    Parrot_io_eprintf(interp, "Lazy gc runs = %ld\n",
-            interpinfo(interp, LAZY_GC_RUNS));
-    Parrot_io_eprintf(interp, "Collect runs = %ld\n",
-            interpinfo(interp, COLLECT_RUNS));
+    Parrot_io_eprintf(interp, "GC mark runs = %ld\n",
+            interpinfo(interp, GC_MARK_RUNS));
+    Parrot_io_eprintf(interp, "Lazy gc mark runs = %ld\n",
+            interpinfo(interp, GC_LAZY_MARK_RUNS));
+    Parrot_io_eprintf(interp, "GC collect runs = %ld\n",
+            interpinfo(interp, GC_COLLECT_RUNS));
     Parrot_io_eprintf(interp, "Collect memory = %ld\n",
             interpinfo(interp, TOTAL_COPIED));
     Parrot_io_eprintf(interp, "Active PMCs = %ld\n",

@@ -35,7 +35,7 @@ handle "external" strings.
 
 =item C<void Parrot_go_collect(PARROT_INTERP)>
 
-Does nothing other than increment the interpreter's C<collect_runs>
+Does nothing other than increment the interpreter's C<gc_collect_runs>
 count.
 
 =cut
@@ -49,7 +49,7 @@ Parrot_go_collect(PARROT_INTERP)
     if (interp->arena_base->gc_sweep_block_level) {
         return;
     }
-    interp->arena_base->collect_runs++;        /* fake it */
+    interp->arena_base->gc_collect_runs++;        /* fake it */
 }
 
 /*

@@ -385,7 +385,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
     /* We're collecting */
     arena_base->mem_allocs_since_last_collect    = 0;
     arena_base->header_allocs_since_last_collect = 0;
-    arena_base->collect_runs++;
+    arena_base->gc_collect_runs++;
 
     /* total - reclaimable == currently used. Add a minimum block to the
      * current amount, so we can avoid having to allocate it in the future. */
