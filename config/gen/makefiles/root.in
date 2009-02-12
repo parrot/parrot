@@ -466,6 +466,7 @@ PBCMERGE            = $(CUR_DIR)/pbc_merge$(EXE)
 PDB                 = $(CUR_DIR)/parrot_debugger$(EXE)
 PBC_TO_EXE          = $(CUR_DIR)/pbc_to_exe$(EXE)
 PARROT_CONFIG       = $(CUR_DIR)/parrot_config$(EXE)
+PIRC                = $(CUR_DIR)/pirc$(EXE)
 
 # Installable executables
 INSTALLABLEPARROT   = $(CUR_DIR)/installable_parrot$(EXE)
@@ -765,6 +766,13 @@ $(PBC_TO_EXE) : tools/dev/pbc_to_exe.pir $(PARROT)
 $(PARROT_CONFIG) : tools/util/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
+
+#IF(win32):pirc : $(PIRC)
+
+$(PIRC) : $(PARROT)
+	$(MAKE) compilers/pirc
+	$(CP) compilers/pirc/pirc$(EXE) $(PIRC)
+	$(CHMOD) 0755 $(PIRC)
 
 $(MINIPARROT) : $(SRC_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
     lib/Parrot/OpLib/core.pm $(SRC_DIR)/null_config$(O)
