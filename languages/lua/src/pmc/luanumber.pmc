@@ -195,7 +195,7 @@ Returns a Parrot string representation of the number.
 
 */
     VTABLE void set_string_native(STRING *value) {
-        SELF.morph(dynpmc_LuaString);
+        pmc_reuse(INTERP, SELF, dynpmc_LuaString, 0);
         SELF.set_string_native(value);
     }
 

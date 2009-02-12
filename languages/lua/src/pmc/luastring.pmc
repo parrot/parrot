@@ -138,7 +138,7 @@ Return the string "string".
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        SELF.morph(dynpmc_LuaNumber);
+        pmc_reuse(INTERP, SELF, dynpmc_LuaNumber, 0);
         SELF.set_integer_native(value);
     }
 
@@ -150,7 +150,7 @@ Return the string "string".
 
 */
     VTABLE void set_number_native(FLOATVAL value) {
-        SELF.morph(dynpmc_LuaNumber);
+        pmc_reuse(INTERP, SELF, dynpmc_LuaNumber, 0);
         SELF.set_number_native(value);
     }
 

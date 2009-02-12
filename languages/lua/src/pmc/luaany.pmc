@@ -90,20 +90,6 @@ pmclass LuaAny
     dynpmc
     group lua_group
     hll lua {
-/*
-
-=item C<void morph(INTVAL type)>
-
-Changes the PMC to a PMC of a new type
-
-=cut
-
-*/
-    VTABLE void morph(INTVAL type) {
-        if (PMC_type(SELF) == type)
-            return;
-        pmc_reuse(INTERP, SELF, type, 0);
-    }
 
 /*
 
@@ -139,8 +125,10 @@ Returns the address of the PMC.
 
 */
     VTABLE void assign_pmc(PMC *value) {
-        VTABLE_morph(INTERP, SELF, PMC_type(value));
-        if (PMC_type(value) != dynpmc_LuaNil)
+        const INTVAL type = PMC_type(value);
+        if (PMC_type(SELF) != type)
+            pmc_reuse(INTERP, SELF, type, 0);
+        if (type != dynpmc_LuaNil)
             SELF.set_pmc(value);
     }
 
