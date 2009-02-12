@@ -41,16 +41,16 @@ indirection to access these data.
 Each PMC has 8 private flags B<PObj_private0_FLAG> -  B<PObj_private7_FLAG>,
 which can be used for storing 8 bits.
 
-=head1 PMCs and DOD
+=head1 PMCs and GC
 
 =head2 Overview
 
-The DOD system doesn't make any assumptions about your PMC's layout. Whenever a
+The GC system doesn't make any assumptions about your PMC's layout. Whenever a
 PMC is found in the root set, B<pobject_lives()> is called with that PMC.  The
 PMC is responsible to mark all contained or referenced active Parrot objects
 (Buffers or other PMCs).
 
-=head2 DOD related flags
+=head2 GC related flags
 
 =over 4
 
@@ -83,7 +83,7 @@ connection, it has to take care of freeing or closing these system resources.
 =item PObj_active_destroy_FLAG
 
 The PMC's B<destroy> vtable is called, when this PMC is found to be dead during
-DOD.
+GC.
 
 =item PObj_needs_early_gc_FLAG
 

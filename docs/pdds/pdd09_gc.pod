@@ -166,7 +166,7 @@ dead (the "trace" phase) and freeing dead objects for later reuse (the
 "sweep" phase). The sweep phase is also known as the collection phase. The
 trace phase is also known as the "mark phase" and less frequently as the
 "dead object detection" phase. The use of the term "dead object detection"
-and it's acronym DOD has been deprecated.
+and its acronym DOD has been deprecated.
 
 =head3 Initial Marking
 

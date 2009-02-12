@@ -58,10 +58,10 @@ destroyed in an appropriate order. This is also called on interpreter shutdown.
 
 =item mark
 
-Mark all objects as being live by calling B<pobject_lives> called from DOD.
+Mark all objects as being live by calling B<pobject_lives> called from GC.
 While the functionality is the same, it will not be implemented on top of this
 general scheme for performance reasons. This leads to some code duplication,
-but DOD is run permanently and deserves all the speed it can get.
+but GC is run permanently and deserves all the speed it can get.
 
 =back
 
@@ -96,8 +96,8 @@ PMC's extended data area. The B<todo_list> gets built by appending (or
 prepending) the current PMC to a B<mark_ptr>, which then points to the current
 PMC, forming a linked list of items.
 
-This pointer is also used during DOD's B<mark()> functionality, so that DOD has
-to be turned off during operations using this scheme.
+This pointer is also used during GC's B<mark()> functionality, so that
+GC has to be turned off during operations using this scheme.
 
 As the B<next_for_GC> pointer is inside the PMC, this scheme isn't thread-safe
 at low-level, because shared PMCs also would share this pointer, so that there
@@ -106,7 +106,7 @@ can be only one operation at a time.
 =item todo list
 
 A B<List> called B<todo> holds items still to be worked on. This method is
-slower and consumes more resources, but doesn't interfere with DOD runs and is
+slower and consumes more resources, but doesn't interfere with GC runs and is
 thread-safe.
 
 =back
@@ -162,7 +162,7 @@ Plain scalars (not being able to contain other PMCs) don't have a
 B<next_for_GC> pointer. This is an optimization reducing the size of scalars
 and increasing performance considerably.
 
-Second, the B<next_for_GC> pointers have to be cleared beforehand. DOD uses
+Second, the B<next_for_GC> pointers have to be cleared beforehand. GC uses
 only a nibble-sized flag area located inside the PMCs arena to manage, if a PMC
 was seen already by checking the live bit. The B<next_for_GC> pointer is just
 set and never cleared to avoid touching a PMCs memory and polluting caches when

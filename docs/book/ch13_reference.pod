@@ -1267,7 +1267,7 @@ Z<CHP-13-TABLE-1>
 
 =cell C<2>
 
-=cell Number of DOD sweeps performed.
+=cell Number of GC mark runs performed.
 
 =row
 
@@ -1303,7 +1303,7 @@ Z<CHP-13-TABLE-1>
 
 =cell C<8>
 
-=cell Number of new PMC or buffer headers allocated since last DOD run.
+=cell Number of new PMC or buffer headers allocated since last mark run.
 
 =row
 
@@ -2017,7 +2017,7 @@ X<register opcode (PASM)>
   register R<PMC>
 
 Register the given PMC in the interpreter's root set, so that it's
-visible during DOD.
+visible during the mark phase.
 
 I<Arguments: P>
 
@@ -2535,8 +2535,8 @@ X<sweep opcode (PASM)>
 
   sweep R<LAZY>
 
-Trigger a dead object detection (DOD) sweep. If R<LAZY> is set to 1,
-only objects that need timely destruction may be destroyed.
+Trigger a GC mark run. If R<LAZY> is set to 1, only objects that need timely
+destruction may be destroyed.
 
 I<Arguments: IC>
 
@@ -2546,7 +2546,7 @@ X<sweepoff opcode (PASM)>
 
   sweepoff
 
-Disable DOD sweeps (nestable).
+Disable GC mark runs (nestable).
 
 =head3 sweepon
 
@@ -2554,7 +2554,7 @@ X<sweepon opcode (PASM)>
 
   sweepon
 
-Re-enable DOD sweeps.
+Re-enable GC mark runs.
 
 =head3 sysinfo
 
@@ -3618,7 +3618,7 @@ Turn on warnings.
 
 =item -G,--no-gc
 
-Turn off DOD/GC. This is for debugging only.
+Turn off GC. This is for debugging only.
 
 =item -.,--wait
 

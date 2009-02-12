@@ -700,17 +700,17 @@ The total amount of system memory allocated for later parceling out to
 Buffers.  Doesn't include any housekeeping memory, memory for Buffer or PMC
 structs, or things of that nature.
 
-=item 2 GC_RUNS
+=item 2 GC_MARK_RUNS
 
-The total number of garbage collection runs that have been made.
+The total number of garbage collection mark runs that have been made.
 
-=item 3 COLLECT_RUNS
+=item 3 GC_COLLECT_RUNS
 
-The total number of memory collection runs that have been made.
+The total number of garbage collection sweep runs that have been made.
 
 =item 4 ACTIVE_PMCS
 
-The number of PMCs considered active. This means the DOD scan hasn't noted
+The number of PMCs considered active. This means the GC scan hasn't noted
 them as dead.
 
 =item 5 ACTIVE_BUFFERS
@@ -730,7 +730,7 @@ The total number of Buffer structs the interpreter has available.
 =item 8 HEADERS_ALLOC_SINCE_COLLECT
 
 The number of new Buffer header block allocations that have been made since
-the last DOD run. (Buffers, when allocated, are allocated in chunks)
+the last GC mark run. (Buffers, when allocated, are allocated in chunks)
 
 =item 9 MEM_ALLOCS_SINCE_COLLECT
 

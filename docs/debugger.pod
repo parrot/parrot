@@ -354,8 +354,8 @@ Example:
 
   (pdb) info
   Total memory allocated = 81936
-  DOD runs = 6
-  Collect runs = 0
+  GC mark runs = 6
+  GC collect runs = 0
   Active PMCs = 8197
   Active buffers = 7
   Total PMCs = 21840

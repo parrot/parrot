@@ -203,9 +203,9 @@ subsystem and can slow down execution considerably.
 
 =item -G, --no-gc
 
-This turns off DOD (Dead Object Detection) and GC. This may be useful to find
-GC related bugs. Don't use this option for longer running programs: as memory
-is no longer recycled, it may quickly become exhausted.
+This turns off GC. This may be useful to find GC related bugs. Don't use this
+option for longer running programs: as memory is no longer recycled, it may
+quickly become exhausted.
 
 =item --leak-test, --destroy-at-end
 

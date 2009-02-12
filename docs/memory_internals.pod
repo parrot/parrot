@@ -132,15 +132,19 @@ other data fields, depending on type.
 
 =head2 GC-related PObj flags
 
-Only three flags need to be checked during a DOD run: C<PObj_live_FLAG>,
+Only three flags need to be checked during a mark run: C<PObj_live_FLAG>,
 C<PObj_on_free_list_FLAG>, and C<PObj_is_special_PMC_FLAG>.  Normally these
 flags are stored in C<PObj-E<gt>flags>, meaning that each PMC must be accessed
-during the DOD run.
+during the mark run.
 
-An alternative approach is to store the DOD-Flags together somewhere, such as
+An alternative approach is to store the GC-Flags together somewhere, such as
 in the individual arenas, as a packed array of bits. This approach, called
 cardmarking, should be indicated by defining the preprocessor variable
-C<ARENA_DOD_FLAGS> to 1.
+C<ARENA_GC_FLAGS> to 1.
+
+{{ ARENA_GC_FLAGS (nee ARENA_DOD_FLAGS) seems to have been deprecated or
+changed without concomitant update to this document.  Someone should figure out
+what this macro used to be and whether it's still relevant.  -cotto }}
 
 F<pobj.h> provides macros to facilitate referencing individual object flags:
 C<gc_flag_SET>, C<gc_flag_CLEAR> and C<gc_flag_TEST>. They make up a portable
@@ -186,11 +190,11 @@ provide this, such as the glibc malloc based on Doug Lea's allocator.
 
 Using this allocator, all variable sized items are just allocated via a plain
 C<malloc()> call, or resized with C<realloc()>, and after they lose their
-existence (ie when DOD detects that the managing buffer header is no longer in
-use) they are C<free()>ed. That's all. The underlying allocator collects these
-pieces, coalesces them if possible to form bigger pieces, and then puts them on
-free lists, sorted by size.  Eventually, when a new allocation request arrives,
-it may give them back to Parrot.
+existence (ie when the mark phase detects that the managing buffer header is no
+longer in use) they are C<free()>ed. That's all. The underlying allocator
+collects these pieces, coalesces them if possible to form bigger pieces, and
+then puts them on free lists, sorted by size.  Eventually, when a new
+allocation request arrives, it may give them back to Parrot.
 
 So here, the variable length C<memory_pool> is unused. You can consider this
 pool to live inside the allocator. Buffers allocated this way don't move
@@ -224,9 +228,10 @@ string and marks such COW strings with C<TAIL_moved> and stores the new address
 in the buffer header, so other users of this string can be updated to reuse the
 same string (RT#47764 one or all other users?).
 
-The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During DOD
-all dead users increment the refcount, living users set it to an huge value.
-When freeing the buffer, the string is only freed if the refcount reaches zero.
+The C<malloc()>/C<free()> approach stores a refcount at C<bufstart>. During the
+mark phase all dead users increment the refcount, living users set it to an
+huge value.  When freeing the buffer, the string is only freed if the refcount
+reaches zero.
 
 =head1 Simplified Figure
 

@@ -258,13 +258,13 @@ Parrot.
 
 =item C<Parrot_register_pmc(interp, pmc)>
 
-Add a reference to the PMC to the interpreter's DOD registry. This prevents
-PMCs known only to extensions from getting destroyed during  DOD runs.
+Add a reference to the PMC to the interpreter's GC registry. This prevents
+PMCs known only to extensions from getting destroyed during GC runs.
 
 =item C<Parrot_unregister_pmc(interp, pmc)>
 
-Remove a reference to the PMC from the interpreter's DOD registry.  If the
-reference count reaches zero, the PMC will be destroyed during the  next DOD
+Remove a reference to the PMC from the interpreter's GC registry.  If the
+reference count reaches zero, the PMC will be destroyed during the next GC
 run.
 
 =back
