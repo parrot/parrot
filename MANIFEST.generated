@@ -86,6 +86,8 @@ pbc_to_exe                                        [main]bin
 pbc_to_exe.exe                                    [main]bin
 pdb                                               [main]bin
 pdb.exe                                           [main]bin
+pirc                                              [main]bin
+pirc.exe                                          [main]bin
 runtime/parrot/dynext/apl_group.bundle            [library]
 runtime/parrot/dynext/apl_group.dll               [library]
 runtime/parrot/dynext/apl_group.dylib             [library]

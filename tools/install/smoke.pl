@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 23;
+use Test::More tests => 24;
 
 =head1 NAME
 
@@ -71,6 +71,7 @@ my $exe;
 my $out;
 my $FH;
 my $parrot = catfile($bindir, 'parrot');
+my $pirc = catfile($bindir, 'pirc');
 
 #
 # parrot executable
@@ -97,6 +98,19 @@ print $FH "token TOP { \\s* }\n";
 close $FH;
 $out = `$parrot $libdir/parrot/library/PGE/Perl6Grammar.pir $filename`;
 ok($out =~ /^\n## <::TOP>/, "check PGE");
+unlink($filename);
+
+$filename = 'test.pir';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH <<'PIR';
+.sub main
+    say "hello world!"
+.end
+PIR
+close $FH;
+$out = `$pirc -n $filename`;
+ok($out eq "ok\n", "check pirc");
 unlink($filename);
 
 # compilers/tge is typically not installed
