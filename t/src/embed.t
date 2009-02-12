@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -8,22 +8,62 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan skip_all => 'TT #306; many symbols not exported, embedding parrot fails';
+plan tests => 2;
 
 =head1 NAME
 
-t/src/compiler.t - Compile and run a PIR program from C.
+t/src/embed.t - Embedding parrot
 
 =head1 SYNOPSIS
 
-    % prove t/src/compiler.t
+    % prove t/src/embed.t
 
 =head1 DESCRIPTION
 
-Show steps to run a program from C. Functionality should be
-gathered in some API calls..
+Embedding parrot in C
 
 =cut
+
+c_output_is( <<'CODE', <<'OUTPUT', "Hello world" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+int main(void)
+{
+    Parrot_Interp interp;
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    Parrot_printf(interp, "Hello, parrot\n");
+
+    Parrot_exit(interp, 0);
+    return 0;
+}
+CODE
+Hello, parrot
+OUTPUT
+
+
+# Old tests, skipped al
+
+SKIP: {
+
+    skip('TT #306; many symbols not exported, embedding parrot fails', 1);
+
+########################################################################
 
 c_output_is( <<'CODE', <<'OUTPUT', "Parrot Compile API Single call" );
 
@@ -466,6 +506,8 @@ CODE
 Pir compiler returned no prog
 Pir compiler returned no prog
 OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl
