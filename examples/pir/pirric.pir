@@ -221,6 +221,7 @@ read_args:
     goto start
 
 opt_debugger:
+    debug_init
     runner.'debugger'()
     inc $I1
     goto read_args

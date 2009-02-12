@@ -1005,6 +1005,7 @@ Parrot_debugger_init(PARROT_INTERP)
         /* Allocate space for command line buffers, NUL terminated c strings */
         pdb->cur_command = (char *)mem_sys_allocate_zeroed(DEBUG_CMD_BUFFER_LENGTH + 1);
         pdb->last_command = (char *)mem_sys_allocate_zeroed(DEBUG_CMD_BUFFER_LENGTH + 1);
+        pdb->file = mem_allocate_zeroed_typed(PDB_file_t);
     }
 
     /* PDB_disassemble(interp, NULL); */
@@ -3162,7 +3163,8 @@ PDB_list(PARROT_INTERP, ARGIN(const char *command))
     PDB_t         *pdb = interp->pdb;
     unsigned long  n   = 10;
 
-    if (!pdb->file) {
+    TRACEDEB_MSG("PDB_list");
+    if (!pdb->file || !pdb->file->line) {
         Parrot_io_eprintf(pdb->debugger, "No source file loaded\n");
         return;
     }
