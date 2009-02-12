@@ -64,8 +64,9 @@ sub handle_long_options {
 sub get_test_prog_args {
     my ($optsref, $gc_debug, $run_exec) = @_;
 
-    my %opts = %{ $optsref };
+    my %opts = remap_runcore_opts( $optsref );
     my $args = join(' ', map { "-$_" } keys %opts );
+
     $args =~ s/-O/-O$opts{O}/ if exists $opts{O};
     $args =~ s/-D/-D$opts{D}/;
     $args .= ' --gc-debug'    if $gc_debug;
@@ -75,6 +76,22 @@ sub get_test_prog_args {
     $args .= ' --run-exec'    if $run_exec;
 
     return $args;
+}
+
+sub remap_runcore_opts
+{
+    my ($opts_ref) = @_;
+    my %remap      = (
+        'j' => '-runcore=jit',
+        'g' => '-runcore=cgoto',
+        'C' => '-runcore=cgp',
+        'S' => '-runcore=switch',
+        'b' => '-runcore=bounds',
+        'f' => '-runcore=fast',
+    );
+
+    return map { $_ => ( exists $remap{$_} ? $remap{$_} : $opts_ref->{$_} ) }
+        keys %{ $opts_ref };
 }
 
 sub Usage {
