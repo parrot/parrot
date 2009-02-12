@@ -154,6 +154,15 @@ END_PRINT
 
 print OUT <<'END_PRINT';
 
+/* from config/auto/neg_0 */
+END_PRINT
+if (@has_negative_zero@) {
+    print OUT <<'END_PRINT';
+#define PARROT_HAS_NEGATIVE_ZERO 1
+END_PRINT
+}
+
+print OUT <<'END_PRINT';
 
 #endif /* PARROT_FEATURE_H_GUARD */
 END_PRINT

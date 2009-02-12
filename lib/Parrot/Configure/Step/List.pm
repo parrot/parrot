@@ -50,6 +50,7 @@ my @steps = qw(
     auto::memalign
     auto::signal
     auto::socklen_t
+    auto::neg_0
     auto::env
     auto::gmp
     auto::readline

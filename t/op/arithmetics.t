@@ -152,7 +152,7 @@ OUTPUT
 TODO: {
     my @todo;
     @todo = ( todo => '-0.0 not implemented, TT #313' )
-        if $^O =~ m/(?:openbsd|win32)/i;
+        if $^O =~ m/(?:openbsd)/i;
 
 pasm_output_is( <<'CODE', <<OUTPUT, 'negate -0.0', @todo );
         set N0, 0
@@ -843,12 +843,7 @@ CODE
 OUTPUT
 }
 
-TODO: {
-    my @todo;
-    @todo = ( todo => 'inf is not platform-independent' )
-        if $^O eq 'MSWin32' and $PConfig{cc} =~ /cl/i;
-
-pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith", @todo );
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith" );
 .sub 'test' :main
     $N0 = 'Inf'
     say $N0
@@ -859,8 +854,6 @@ CODE
 Inf
 NaN
 OUTPUT
-
-}
 
 # Local Variables:
 #   mode: cperl

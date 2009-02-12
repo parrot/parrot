@@ -506,7 +506,7 @@ OUTPUT
 TODO: {
     my @todo;
     @todo = ( todo => '-0.0 not implemented, TT #313' )
-        if $^O =~ m/(?:openbsd|win32)/i;
+        if $^O =~ m/(?:openbsd)/i;
 
 pasm_output_like( <<'CODE', <<'OUTPUT', 'neg 0', @todo );
     new P0, ['Float']
