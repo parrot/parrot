@@ -341,7 +341,6 @@ REGISTER       "$"[SNIP]{DIGITS}
 ".get_results"    { return TK_GET_RESULTS; }
 ".globalconst"    { return TK_GLOBALCONST; }
 ".HLL"            { return TK_HLL; }
-".HLL_map"        { return TK_HLL_MAP; }
 ".invocant"       { return TK_INVOCANT; }
 ".lex"            { return TK_LEX; }
 ".line"           { return TK_LINE; }

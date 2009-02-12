@@ -2000,43 +2000,6 @@ set_hll(lexer_state * const lexer, char const * const hll) {
 }
 
 
-/*
-
-=item C<void
-set_hll_map(lexer_state * const lexer, char * const stdtype, char * const maptype)>
-
-Set a HLL PMC data type mapping; whenever Parrot needs to create a PMC object of
-a type that is mapped to a user type, user type will be instantiated. For instance,
-after the mapping:
-
- .HLL_map "Integer" = "Perl6Int"
-
-whenever Parrot needs to create a Integer PMC, a Perl6Int is created instead.
-
-Code taken from imcc.y; needs testing.
-
-=cut
-
-*/
-void
-set_hll_map(lexer_state * const lexer, char const * const stdtype, char const * const maptype) {
-    Parrot_Context *ctx           = CONTEXT(lexer->interp);
-    STRING * const  built_in_name = Parrot_str_new(lexer->interp, stdtype, strlen(stdtype));
-    STRING * const  language_name = Parrot_str_new(lexer->interp, maptype, strlen(maptype));
-    int             built_in_type = pmc_type(lexer->interp, built_in_name);
-    int             language_type = pmc_type(lexer->interp, language_name);
-
-    /* check if both the built-in and language types exist. */
-
-    if (built_in_type <= 0)
-        yypirerror(lexer->yyscanner, lexer, "type '%s' is not a built-in type", stdtype);
-
-    if (language_type <= 0)
-        yypirerror(lexer->yyscanner, lexer, "user type '%s' cannot be found", maptype);
-
-    Parrot_register_HLL_type(lexer->interp, ctx->current_HLL, built_in_type, language_type);
-}
-
 
 /*
 

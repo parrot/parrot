@@ -455,8 +455,6 @@ key *add_key(struct lexer_state * const lexer, key * const keylist, expression *
 
 void load_library(struct lexer_state * const lexer, char const * const library);
 void set_hll(struct lexer_state * const lexer, char const * const hll);
-void set_hll_map(struct lexer_state * const lexer, char const * const stdtype,
-                 char const * const hlltype);
 
 void set_sub_flag(struct lexer_state * const lexer, sub_flag flag);
 

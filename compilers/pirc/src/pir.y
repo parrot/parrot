@@ -254,7 +254,6 @@ static char const * const pir_type_names[] = { "int", "string", "pmc", "num" };
 
 
 %token TK_HLL               ".HLL"
-       TK_HLL_MAP           ".HLL_map"
        TK_LOADLIB           ".loadlib"
 
 %token TK_SUB               ".sub"
@@ -588,7 +587,6 @@ pir_chunk         : sub_def
                   | const_decl_chunk
                   | namespace_decl
                   | hll_specifier
-                  | hll_mapping
                   | loadlib
                   | location_directive
                   | macro_definition
@@ -676,10 +674,6 @@ location_directive: ".line" TK_INTC
 
 hll_specifier     : ".HLL" TK_STRINGC
                         { set_hll(lexer, $2); }
-                  ;
-
-hll_mapping       : ".HLL_map" TK_STRINGC '=' TK_STRINGC
-                        { set_hll_map(lexer, $2, $4); }
                   ;
 
 namespace_decl    : ".namespace" '[' opt_namespace ']'
