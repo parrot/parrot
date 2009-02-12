@@ -21,7 +21,7 @@ object.
 
 =cut
 
-.namespace [ 'abc::Compiler' ]
+.namespace [ 'abc'; 'Compiler' ]
 
 .loadlib 'abc_group'
 
