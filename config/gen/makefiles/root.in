@@ -1622,7 +1622,7 @@ prog-clean :
 	$(RM_F) \
     $(SRC_DIR)/string/private_cstring.h \
     "$(SRC_DIR)/*.str" "$(SRC_DIR)/io/*.str" "$(SRC_DIR)/pmc/*.str" \
-    "src/pmc/*.c" "src/pmc/pmc_*.h" "src/pmc/*.dump" \
+    "$(SRC_DIR)/call/*.str" "src/pmc/*.c" "src/pmc/pmc_*.h" "src/pmc/*.dump" \
     vtable.dump "*.def" "*.lib" "*.exp"
 
 archclean: dynoplibs-clean dynpmc-clean dynext-clean
