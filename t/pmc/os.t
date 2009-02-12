@@ -13,6 +13,7 @@ use File::Spec;
 
 my $MSWin32 = $^O =~ m!MSWin32!;
 my $cygwin  = $^O =~ m!cygwin!;
+my $solaris = $^O =~ m!solaris!;
 my $MSVC = grep { $PConfig{cc} eq $_ } (qw(cl cl.exe));
 
 =head1 NAME
@@ -37,7 +38,23 @@ END {
 
 # test 'cwd'
 my $cwd = File::Spec->canonpath(getcwd);
-pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
+if (File::Spec->case_tolerant(substr($cwd,0,2))) {
+    $cwd = lc($cwd);
+    pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
+.sub main :main
+        $P1 = new ['OS']
+        $S1 = $P1."cwd"()
+        $S2 = downcase $S1
+        print $S2
+        print "\n"
+        end
+.end
+CODE
+$cwd
+OUT
+}
+else {
+    pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
         $P1 = new ['OS']
         $S1 = $P1."cwd"()
@@ -48,13 +65,18 @@ pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 CODE
 $cwd
 OUT
+}
 
 #  TEST chdir
 chdir "src";
 my $upcwd = File::Spec->canonpath(getcwd);
 chdir '..';
 
-pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
+if (File::Spec->case_tolerant(substr($cwd,0,2))) {
+    $cwd = lc($cwd);
+    $upcwd = lc($upcwd);
+
+    pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
         $P1 = new ['OS']
 
@@ -62,15 +84,15 @@ pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
-        print $S1
-        print "\n"
+        $S2 = downcase $S1
+        say $S2
 
         $S1 = ".."
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
-        print $S1
-        print "\n"
+        $S2 = downcase $S1
+        say $S2
 
         end
 .end
@@ -78,13 +100,40 @@ CODE
 $upcwd
 $cwd
 OUT
+}
+else {
+    pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
+.sub main :main
+        $P1 = new ['OS']
+
+        $S1 = "src"
+        $P1."chdir"($S1)
+
+        $S1 = $P1."cwd"()
+        say $S1
+
+        $S1 = ".."
+        $P1."chdir"($S1)
+
+        $S1 = $P1."cwd"()
+        say $S1
+
+        end
+.end
+CODE
+$upcwd
+$cwd
+OUT
+}
 
 # Test mkdir
 
 my $xpto = $upcwd;
 $xpto =~ s/src([\/\\]?)$/xpto$1/;
 
-pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
+if (File::Spec->case_tolerant(substr($cwd,0,2))) {
+
+    pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
         $P1 = new ['OS']
 
@@ -94,15 +143,15 @@ pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
-        print $S1
-        print "\n"
+        $S2 = downcase $S1
+        say $S2
 
         $S1 = ".."
         $P1."chdir"($S1)
 
         $S1 = $P1."cwd"()
-        print $S1
-        print "\n"
+        $S2 = downcase $S1
+        say $S2
 
         end
 .end
@@ -110,6 +159,33 @@ CODE
 $xpto
 $cwd
 OUT
+}
+else {
+    pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
+.sub main :main
+        $P1 = new ['OS']
+
+        $S1 = "xpto"
+        $I1 = 0o555
+        $P1."mkdir"($S1,$I1)
+        $P1."chdir"($S1)
+
+        $S1 = $P1."cwd"()
+        say $S1
+
+        $S1 = ".."
+        $P1."chdir"($S1)
+
+        $S1 = $P1."cwd"()
+        say $S1
+
+        end
+.end
+CODE
+$xpto
+$cwd
+OUT
+}
 
 # Test remove on a directory
 mkdir "xpto" unless -d "xpto";
@@ -163,6 +239,9 @@ done:
 .end
 CODE
 } else {
+  TODO: {
+    local $TODO = "stat on solaris" if $solaris;
+
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
@@ -177,6 +256,7 @@ done:
         end
 .end
 CODE
+}
 }
 
 # test readdir
@@ -222,7 +302,7 @@ OUT
 my $lstat;
 
 SKIP: {
-    skip 'lstat not available on Win 32 yet', 1 if $MSWin32;
+    skip 'lstat not on Win32, faling on solaris', 1 if $MSWin32 or $solaris;
 
     my @s = lstat('xpto');
     if ($cygwin) {
