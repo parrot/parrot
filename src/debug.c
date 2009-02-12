@@ -3327,32 +3327,35 @@ void
 PDB_info(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_info)
-    Parrot_io_eprintf(interp, "Total memory allocated = %ld\n",
-            interpinfo(interp, TOTAL_MEM_ALLOC));
-    Parrot_io_eprintf(interp, "GC mark runs = %ld\n",
-            interpinfo(interp, GC_MARK_RUNS));
-    Parrot_io_eprintf(interp, "Lazy gc mark runs = %ld\n",
-            interpinfo(interp, GC_LAZY_MARK_RUNS));
-    Parrot_io_eprintf(interp, "GC collect runs = %ld\n",
-            interpinfo(interp, GC_COLLECT_RUNS));
-    Parrot_io_eprintf(interp, "Collect memory = %ld\n",
-            interpinfo(interp, TOTAL_COPIED));
-    Parrot_io_eprintf(interp, "Active PMCs = %ld\n",
-            interpinfo(interp, ACTIVE_PMCS));
-    Parrot_io_eprintf(interp, "Extended PMCs = %ld\n",
-            interpinfo(interp, EXTENDED_PMCS));
-    Parrot_io_eprintf(interp, "Timely GC PMCs = %ld\n",
-            interpinfo(interp, IMPATIENT_PMCS));
-    Parrot_io_eprintf(interp, "Total PMCs = %ld\n",
-            interpinfo(interp, TOTAL_PMCS));
-    Parrot_io_eprintf(interp, "Active buffers = %ld\n",
-            interpinfo(interp, ACTIVE_BUFFERS));
-    Parrot_io_eprintf(interp, "Total buffers = %ld\n",
-            interpinfo(interp, TOTAL_BUFFERS));
-    Parrot_io_eprintf(interp, "Header allocations since last collect = %ld\n",
-            interpinfo(interp, HEADER_ALLOCS_SINCE_COLLECT));
-    Parrot_io_eprintf(interp, "Memory allocations since last collect = %ld\n",
-            interpinfo(interp, MEM_ALLOCS_SINCE_COLLECT));
+    Parrot_Interp itdeb = interp->pdb->debugger;
+    Parrot_Interp itp = interp->pdb->debugee;
+
+    Parrot_io_eprintf(itdeb, "Total memory allocated = %ld\n",
+            interpinfo(itp, TOTAL_MEM_ALLOC));
+    Parrot_io_eprintf(itdeb, "GC mark runs = %ld\n",
+            interpinfo(itp, GC_MARK_RUNS));
+    Parrot_io_eprintf(itdeb, "Lazy gc mark runs = %ld\n",
+            interpinfo(itp, GC_LAZY_MARK_RUNS));
+    Parrot_io_eprintf(itdeb, "GC collect runs = %ld\n",
+            interpinfo(itp, GC_COLLECT_RUNS));
+    Parrot_io_eprintf(itdeb, "Collect memory = %ld\n",
+            interpinfo(itp, TOTAL_COPIED));
+    Parrot_io_eprintf(itdeb, "Active PMCs = %ld\n",
+            interpinfo(itp, ACTIVE_PMCS));
+    Parrot_io_eprintf(itdeb, "Extended PMCs = %ld\n",
+            interpinfo(itp, EXTENDED_PMCS));
+    Parrot_io_eprintf(itdeb, "Timely GC PMCs = %ld\n",
+            interpinfo(itp, IMPATIENT_PMCS));
+    Parrot_io_eprintf(itdeb, "Total PMCs = %ld\n",
+            interpinfo(itp, TOTAL_PMCS));
+    Parrot_io_eprintf(itdeb, "Active buffers = %ld\n",
+            interpinfo(itp, ACTIVE_BUFFERS));
+    Parrot_io_eprintf(itdeb, "Total buffers = %ld\n",
+            interpinfo(itp, TOTAL_BUFFERS));
+    Parrot_io_eprintf(itdeb, "Header allocations since last collect = %ld\n",
+            interpinfo(itp, HEADER_ALLOCS_SINCE_COLLECT));
+    Parrot_io_eprintf(itdeb, "Memory allocations since last collect = %ld\n",
+            interpinfo(itp, MEM_ALLOCS_SINCE_COLLECT));
 }
 
 /*
