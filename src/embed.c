@@ -440,9 +440,9 @@ again:
 #endif
     /* if we've opened a file (or stdin) with PIO, read it in */
     if (io) {
+        char  *cursor;
         size_t chunk_size = program_size > 0 ? program_size : 1024;
         INTVAL wanted     = program_size;
-        char  *cursor;
         size_t read_result;
 
         program_code = (char *)mem_sys_allocate(chunk_size);
@@ -461,6 +461,7 @@ again:
                 Parrot_io_eprintf(interp,
                             "Parrot VM: Could not reallocate buffer "
                             "while reading packfile from PIO.\n");
+                fclose(io);
                 return NULL;
             }
 
