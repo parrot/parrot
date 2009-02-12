@@ -1755,7 +1755,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
     }
 
 
-    /* Instance initialization. We need a custom DOD marking and destroy. */
+    /* Instance initialization. We need a custom GC marking and destroy. */
     void init()
     {
         PObj_custom_mark_SET(SELF);
@@ -1882,7 +1882,7 @@ pmclass DotNetAssembly dynpmc group dotnet {
         }
 
         /* We create some PMCs that aren't reachable for a while, and GC
-           runs will eat them. Thus we'll block DOD while we do it (and
+           runs will eat them. Thus we'll block GC while we do it (and
            unblock it again later). */
         Parrot_block_GC_mark(INTERP);
 

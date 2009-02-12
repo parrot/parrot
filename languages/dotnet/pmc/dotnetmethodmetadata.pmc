@@ -13,7 +13,7 @@
 
 pmclass DotNetMethodMetadata dynpmc group dotnet {
 
-    /* Instance initialization. We need a custom DOD marking and destroy. */
+    /* Instance initialization. We need a custom GC marking and destroy. */
     void init()
     {
         PObj_custom_mark_SET(SELF);
