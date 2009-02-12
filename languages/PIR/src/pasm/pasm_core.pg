@@ -60,7 +60,7 @@ rule core_op {
 | errorsoff           <arg_hack> #<int_constant>
 | runinterp           <arg_hack> #<target> \, <int_constant>
 | getinterp           <arg_hack> #<target> 
-  # DOD/GC            
+  # GC            
 | sweep               <arg_hack> #<int_constant>
 | collect             
 | sweepoff            
