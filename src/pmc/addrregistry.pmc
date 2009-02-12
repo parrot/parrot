@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/pmc/addrregistry.pmc - A DOD Registry PMC
+src/pmc/addrregistry.pmc - A GC Registry PMC
 
 =head1 DESCRIPTION
 

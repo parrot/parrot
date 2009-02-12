@@ -40,7 +40,7 @@ and these methods:
 #include "parrot/embed.h"
 
 /*
- * can't do multi-threaded DOD/GC yet
+ * can't do multi-threaded GC yet
  * XXX a quick hack to pass the few tests
  */
 static void
@@ -133,7 +133,7 @@ Initializes the thread.
 
         UNLOCK(interpreter_array_mutex);
 
-        /* can't allow DOD runs for now */
+        /* can't allow GC runs for now */
         stop_GC(INTERP, PMC_data_typed(SELF, Parrot_Interp));
     }
 
@@ -156,7 +156,7 @@ Create a new thread by cloning the passed interpreter.
 
         UNLOCK(interpreter_array_mutex);
 
-        /* can't allow DOD runs for now */
+        /* can't allow GC runs for now */
         stop_GC(INTERP, PMC_data_typed(SELF, Parrot_Interp));
     }
 }

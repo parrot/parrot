@@ -448,7 +448,7 @@ arguments. The class is attached to the current HLL namespace.
     VTABLE void init() {
         Parrot_Class_attributes * const _class = mem_allocate_zeroed_typed(Parrot_Class_attributes);
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
@@ -1208,7 +1208,7 @@ Creates a new PMC object of the type of the class and calls init().
         /* Create object. */
         object = pmc_new_noinit(interp, enum_class_Object);
 
-        /* Set custom DOD mark and destroy on the object. */
+        /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(object);
         PObj_active_destroy_SET(object);
 

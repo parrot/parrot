@@ -684,7 +684,7 @@ Creates a clone of the object.
         /* If we get here, no custom clone. Create a new object PMC. */
         cloned = pmc_new_noinit(interp, enum_class_Object);
 
-        /* Set custom DOD mark and destroy on the object. */
+        /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(cloned);
         PObj_active_destroy_SET(cloned);
 
@@ -783,7 +783,7 @@ Called after the object has been thawed.
 */
 
     void thawfinish(visit_info *info) {
-        /* Set custom DOD mark and destroy on the object. */
+        /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 

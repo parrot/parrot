@@ -89,7 +89,7 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
        be constructed in an interpreter that is later destroyed */
 #if  0
     /* RT #46659
-     * a quick hack, to prevent freeing that string during DOD
+     * a quick hack, to prevent freeing that string during GC
      * triggered in t/pmc/pmc_62.t when configured with --gc=libc
      */
     static STRING *ro;
@@ -1081,7 +1081,7 @@ Add class C<parent> to the list of our parents.
 
 =item C<void visit(visit_info *info)>
 
-Used by DOD to mark the PMC.
+Used by GC to mark the PMC.
 
 =cut
 

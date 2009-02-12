@@ -265,7 +265,7 @@ for writing to disc and later loading via C<load_bytecode>.
             res->strstart = adr;
         }
 
-        /* We block DOD while doing the packing, since GC run during a pack
+        /* We block GC while doing the packing, since GC run during a pack
            has been observed to cause problems. There may be a Better Fix.
            See RT #40410 for example of the problem (note on line that
            segfaults, it is *cursor that is pointing to dealloced memory). */

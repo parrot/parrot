@@ -45,7 +45,7 @@ Clones the interpreter as specified by the flags.
 void
 clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
 {
-    /* we block DOD runs while cloning since C<d> is not yet running */
+    /* we block GC runs while cloning since C<d> is not yet running */
     Parrot_block_GC_mark(d);
 
     d->scheduler = pmc_new(d, enum_class_Scheduler);

@@ -78,7 +78,7 @@ Initializes the timer.
         Parrot_Timer_attributes * const core_struct =
             mem_allocate_zeroed_typed(Parrot_Timer_attributes);
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 

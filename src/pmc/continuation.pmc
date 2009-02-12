@@ -240,8 +240,8 @@ destination to continue execution.
              * the register pointer is already switched back
              * to the caller, therefore the registers of the
              * sub we are returning from aren't marked, if
-             * inside argument passing a DOD run is triggered
-             * therefore we have to block DOD
+             * inside argument passing a GC run is triggered
+             * therefore we have to block GC
              */
             opcode_t *src_indexes  = interp->current_args;
             opcode_t *dest_indexes = to_ctx->current_results;

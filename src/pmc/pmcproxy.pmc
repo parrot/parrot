@@ -83,7 +83,7 @@ Initializes a PMCProxy PMC.
         STRING       * const name            = CONST_STRING(interp, "proxy");
         PMC_data(SELF)                       = _pmc;
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 

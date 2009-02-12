@@ -118,7 +118,7 @@ Initializes an Exporter PMC.
         exp->globals         = PMCNULL;
         PMC_data(SELF)       = exp;
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
     }

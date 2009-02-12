@@ -85,7 +85,7 @@ Initializes the exception with default values.
         Parrot_Exception_attributes * const core_struct =
             mem_allocate_zeroed_typed(Parrot_Exception_attributes);
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
@@ -119,7 +119,7 @@ Initializes the exception with supplied values.
 
         INTVAL ishash = VTABLE_isa(interp, values, CONST_STRING(interp, 'Hash'));
 
-        /* Set flags for custom DOD mark and destroy. */
+        /* Set flags for custom GC mark and destroy. */
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
 
