@@ -106,12 +106,12 @@ a line
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "timely destruction" );
-    interpinfo I0, 2    # DOD runs
+    interpinfo I0, 2    # GC mark runs
     open P0, "$temp_file", 'w'
         needs_destroy P0
     print P0, "a line\\n"
     null P0            # kill it
-    sweep 0            # a lazy DOD has to close the PIO
+    sweep 0            # a lazy GC has to close the PIO
     open P0, "$temp_file", 'r'
     read S0, P0, 20
     print S0

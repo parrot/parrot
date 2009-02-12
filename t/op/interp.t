@@ -75,8 +75,8 @@ uno
 dos
 OUTPUT
 
-# Need to disable DOD while trace is on, as there's a non-zero chance that a
-# DOD sweep would occur, causing a bonus "DOD" line in the output, which makes
+# Need to disable GC while trace is on, as there's a non-zero chance that a
+# GC sweep would occur, causing a bonus "DOD" line in the output, which makes
 # the test fail.
 pasm_output_like(
     <<'CODE', <<'OUTPUT', "restart trace" );

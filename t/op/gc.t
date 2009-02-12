@@ -19,12 +19,12 @@ t/op/gc.t - Garbage Collection
 =head1 DESCRIPTION
 
 Tests garbage collection with the C<interpinfo> operation and various
-DOD/GC related bugs.
+GC related bugs.
 
 =cut
 
 pasm_output_is( <<'CODE', '1', "sweep 1" );
-      interpinfo I1, 2   # How many DOD runs have we done already?
+      interpinfo I1, 2   # How many GC mark runs have we done already?
       sweep 1
       interpinfo I2, 2   # Should be one more now
       sub I3, I2, I1
@@ -33,7 +33,7 @@ pasm_output_is( <<'CODE', '1', "sweep 1" );
 CODE
 
 pasm_output_is( <<'CODE', '0', "sweep 0" );
-      interpinfo I1, 2   # How many DOD runs have we done already?
+      interpinfo I1, 2   # How many GC mark runs have we done already?
       sweep 0
       interpinfo I2, 2   # Should be same
       sub I3, I2, I1
@@ -43,7 +43,7 @@ CODE
 
 pasm_output_is( <<'CODE', '1', "sweep 0, with object that need destroy" );
       new P0, 'Undef'
-      interpinfo I1, 2   # How many DOD runs have we done already?
+      interpinfo I1, 2   # How many GC mark runs have we done already?
       needs_destroy P0
       sweep 0
       interpinfo I2, 2   # Should be one more now
@@ -55,7 +55,7 @@ CODE
 pasm_output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy" );
       new P0, 'Undef'
       needs_destroy P0
-      interpinfo I1, 2   # How many DOD runs have we done already?
+      interpinfo I1, 2   # How many GC mark runs have we done already?
       new P0, 'Undef'    # kill object
       sweep 0
       interpinfo I2, 2   # Should be one more now
@@ -63,7 +63,7 @@ pasm_output_is( <<'CODE', '10', "sweep 0, with object that need destroy/destroy"
       sweep 0
       interpinfo I4, 2   # Should be same as last
       sub I5, I4, I2
-      print I3           # These create PMCs that need early DOD, so we need
+      print I3           # These create PMCs that need early GC, so we need
       print I5           # to put them after the second sweep op.
       end
 CODE
