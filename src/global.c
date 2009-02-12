@@ -836,8 +836,10 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
     const INTVAL cur_id = CONTEXT(interp)->current_HLL;
 
     PMC *ns;
+
     /* PF structures aren't fully constructed yet */
     Parrot_block_GC_mark(interp);
+
     /* store relative to HLL namespace */
     CONTEXT(interp)->current_HLL = PMC_sub(sub)->HLL_id;
 
@@ -849,6 +851,7 @@ Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
     /* store a :multi sub */
     if (!PMC_IS_NULL(PMC_sub(sub)->multi_signature))
         store_sub_in_multi(interp, sub, ns);
+
     /* store other subs (as long as they're not :anon) */
     else if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
         STRING * const ns_entry_name = PMC_sub(sub)->ns_entry_name;

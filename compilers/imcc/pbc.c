@@ -1465,7 +1465,6 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     else
         sub->ns_entry_name = sub->name;
 
-
     Parrot_store_sub_in_namespace(interp, sub_pmc);
 
     pfc->type     = PFC_PMC;

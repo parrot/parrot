@@ -4448,10 +4448,13 @@ PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))
 {
     ASSERT_ARGS(PackFile_append_pbc)
     PackFile * const pf = Parrot_readbc(interp, filename);
+
     if (!pf)
         return NULL;
+
     PackFile_add_segment(interp, &interp->initial_pf->directory,
             &pf->directory.base);
+
     do_sub_pragmas(interp, pf->cur_cs, PBC_LOADED, NULL);
     return pf;
 }
@@ -4488,12 +4491,16 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
             "\"load_bytecode\" no file name");
 
     parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
+
     /* check if wo_ext is loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
         interp->iglobals, IGLOBALS_PBC_LIBS);
+
     if (VTABLE_exists_keyed_str(interp, is_loaded_hash, wo_ext))
         return;
+
     pbc = CONST_STRING(interp, "pbc");
+
     if (Parrot_str_not_equal(interp, ext, pbc) == 0)
         file_type = PARROT_RUNTIME_FT_PBC;
     else
@@ -4505,9 +4512,10 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
             "\"load_bytecode\" couldn't find file '%Ss'", file_str);
 
     /* remember wo_ext => full_path mapping */
-    VTABLE_set_string_keyed_str(interp, is_loaded_hash,
-            wo_ext, path);
+    VTABLE_set_string_keyed_str(interp, is_loaded_hash, wo_ext, path);
+
     filename = Parrot_str_to_cstring(interp, path);
+
     if (file_type == PARROT_RUNTIME_FT_PBC) {
         PackFile *pf = PackFile_append_pbc(interp, filename);
         Parrot_str_free_cstring(filename);
@@ -4519,8 +4527,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
     else {
         STRING *err;
         PackFile_ByteCode * const cs =
-            (PackFile_ByteCode *)IMCC_compile_file_s(interp,
-                filename, &err);
+            (PackFile_ByteCode *)IMCC_compile_file_s(interp, filename, &err);
         Parrot_str_free_cstring(filename);
 
         if (cs)
@@ -4530,6 +4537,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
                 "compiler returned NULL ByteCode '%Ss' - %Ss", file_str, err);
     }
 }
+
 
 /*
 

@@ -23,19 +23,15 @@ isa_ok( $interp, $module );
 
 my $result = eval { $interp->load_file($abc_pbc) };
 my $except = $@;
-ok( $result, '... returning true if it could load the file' );
-is( $except, '', '... throwing no exeption if so' );
+ok( $result,     '... returning true if it could load the file' );
+is( $except, '', '... throwing no exception if so' );
 
 my $abc = $interp->find_global( 'main', 'abc::Compiler' );
 isa_ok( $abc, 'Parrot::PMC' );
 
-SKIP: {
-    skip( 'Cannot find namespaced names yet', 2 );
-
-    my $pmc  = $abc->invoke('PS', '2+3');
-    ok( $pmc, 'invoke() should return a PMC, given that signature' );
-    is( $pmc->get_string(), 1, 'value returned in the PMC' );
-}
+my $pmc  = $abc->invoke('PS', '2+3');
+ok( $pmc, 'invoke() should return a PMC, given that signature' );
+is( $pmc->get_string(), 1, 'value returned in the PMC' );
 
 # Local Variables:
 #   mode: cperl
