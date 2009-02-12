@@ -39,9 +39,13 @@ sub runstep {
     my $has_neg_0 = 0;
     if ( !$@ ) {
         my $test = $conf->cc_run();
-        $has_neg_0 = $self->_evaluate_cc_run($conf, $test, $has_neg_0, $verbose);
+        $has_neg_0 = $self->_evaluate_cc_run(
+            $conf,
+            $test,
+            $has_neg_0,
+            $verbose,
+        );
     }
-    $conf->cc_clean();
     $conf->data->set( has_negative_zero => $has_neg_0 );
 
     return 1;
