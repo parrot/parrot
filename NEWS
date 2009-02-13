@@ -9,6 +9,7 @@ New in February 2009 release
   + removed Zcode implementation
 - Tools
   + pbc_disassemble options added
+  + pbc_dump renamed from pdump
 
 New in January 2009 release (0.9.0)
 - Implementation
