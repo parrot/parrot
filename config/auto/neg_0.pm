@@ -46,6 +46,7 @@ sub runstep {
             $verbose,
         );
     }
+    $conf->cc_clean();
     $conf->data->set( has_negative_zero => $has_neg_0 );
 
     return 1;
