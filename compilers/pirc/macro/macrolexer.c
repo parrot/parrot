@@ -991,7 +991,7 @@ static yyconst flex_int16_t yy_rule_linenum[72] =
 
 /*
  * $Id$
- * Copyright (C) 2007-2008, The Perl Foundation.
+ * Copyright (C) 2007-2009, Parrot Foundation.
  */
 
 /*
