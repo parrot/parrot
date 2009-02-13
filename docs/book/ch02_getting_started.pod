@@ -23,8 +23,9 @@ compiler toolkit, and run the standard test suite.
   $ make test
 
 Once you've compiled Parrot, you can run your first small script. Create
-a test file in the main F<parrot> directory called
-F<fjord.pasm> (F<.pasm> files are Parrot assembly language).
+a test file in the main F<parrot> directory called F<fjord.pasm>. C<.pasm>
+files are written in primative Parrot Assembly Language (PASM) which is a
+low-level programming interface to Parrot.
 
   print "He's pining for the fjords.\n"
   end
@@ -45,14 +46,19 @@ called F<hello.nqp>:
 Then run it as:
 
   $ ./nqp hello.nqp
+  
+This will print, of course, the phrase "Hello, World". NQP stands for I<Not
+Quite Perl>, it's a mini language that's very similar to the Perl 6 programming
+language. NQP is part of the Parrot Compiler Tools (PCT) and is an integral
+part of building compilers for Parrot. We will talk more about NQP and the
+rest of the PCT tools, and how to use these for building compilers for Parrot
+in chapter 9.
 
-With a few simple examples, you have 
-
-In the next few
-chapters we will discuss more aspects of Parrot programming using
-both PASM and PIR, and we will discuss some of the more advanced
-features of Parrot that make it an interesting and attractive
-programming platform.
+In the next few chapters we will discuss more aspects of Parrot programming
+using low-level PASM language, and a higher-level interface language called
+PIR. Chapters 3 and 4 will talk about PIR, which is the primary way to program
+Parrot directly. Chapter 5 will talk about PASM, and the low-level programming
+interface.
 
 =head2 Build Requirements
 
