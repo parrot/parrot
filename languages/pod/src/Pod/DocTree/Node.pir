@@ -26,6 +26,7 @@ for Pod.
     p6meta.'new_class'('Pod::DocTree::Item', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Text', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Format', 'parent'=>base)
+    p6meta.'new_class'('Pod::DocTree::FormatCode', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Paragraph', 'parent'=>base)
     p6meta.'new_class'('Pod::DocTree::Literal', 'parent'=>base)
 

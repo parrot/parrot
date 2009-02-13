@@ -46,13 +46,13 @@ regex pod_sequence {
 token pod_directive {
     ^^ '=pod' \n
     <.blank_line>
-
+    {*}
 }
 
 token cut_directive {
     ^^ '=cut' \n
     <.blank_line>?
-
+    {*}
 }
 
 token heading {
@@ -80,7 +80,7 @@ token end_directive {
     <block_name>
     \n
     <.blank_line>
-
+    {*}
 }
 
 token for_directive {

@@ -62,10 +62,36 @@ method begin_directive($/) {
     make $block;
 }
 
+method pod_directive($/) {
+    my $block := Pod::DocTree::Block.new();
+    our @?BLOCK;
+    @?BLOCK.unshift($block);
+    make $block;
+}
+
 method for_directive($/) {
     my $block := Pod::DocTree::Block.new();
-
+    our @?BLOCK;
+    @?BLOCK.unshift($block);
     make $block;
+}
+
+method cut_directive($/) {
+    our @?BLOCK;
+    my $count := @?BLOCK;
+    if $count > 0 {
+        my $block := @?BLOCK.shift();
+        make $block;
+    }
+}
+
+method end_directive($/) {
+    our @?BLOCK;
+    my $count := @?BLOCK;
+    if $count > 0 {
+        my $block := @?BLOCK.shift();
+        make $block;
+    }
 }
 
 method over_directive($/) {
@@ -155,13 +181,13 @@ method format_code($/) {
         $name := 'link';
     }
     elsif $<code> eq 'S' {
-
+        $name := 'XXX';
     }
     elsif $<code> eq 'X' {
-
+        $name := 'XXX';
     }
     elsif $<code> eq 'Z' {
-
+        $name := 'XXX';
     }
     $fcode.name($name);
     $fcode.push($text);
