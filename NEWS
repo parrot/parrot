@@ -1,12 +1,17 @@
 # $Id$
 
-New in February 2009 release
+New in February 2009 release (r35855 to r36683)
 
 - Implementation
   + Support for portable 'Inf' and 'NaN'
   + pbc_disassemble prints constants in constants table
   + Removed (incomplete) Bignum implementation
   + Pair is now a dynamic loadable PMC
+  + Various function name sanification
+  + New implementation of Strings component
+  + Replace various PMC value union access code by VTABLE method invocations
+  + Replace various PMC value unions by ATTRibutes
+  + Removed SArray PMC. Use FixedPMCArray instead.
 - Documentation
   + Book
     - updates to Chapter 2 (getting started)
@@ -26,6 +31,9 @@ New in February 2009 release
     - :vtable subs now have proper access to 'self' pseudo variable
 - Languages
   + add new 'Pod' documentation parser
+  + Pipp (PHP implementation):
+    - support for 'print', 'dirname', 'implode', 'str_replace', 'switch'
+    - various grammar fixes
   + ECMAScript
     + add 'quit', 'readline' builtins
     + fix 'Boolean' type and 'print' builtin
@@ -34,18 +42,27 @@ New in February 2009 release
   + Rakudo
     - left the nest and is now at http://github.com/rakudo/rakudo/
     - build instructions can be found at http://tinyurl.com/rakudo
-- Cleanup
+  + lazy-k
+    - left the nest and is now at http://github.com/bschmalhofer/lazy-k.git
+  + unlambda
+    - left the nest and is now at http://github.com/bschmalhofer/unlambda/
+  + WMLScript
+    - left the nest and is now at http://github.com/fperrad/wmlscript.git
   + removed Zcode implementation
+- Tools
+  + pmc2C
+    - ATTRs are now inherited automatically in subclassing PMCs
 - Deprecations
   + Parrot_readbc, Parrot_loadbc renamed to Parrot_pbc_read, Parrot_pbc_load.
   + .HLL_map directive in favour of 'hll_map' method on Parrot interpreter
+  + Data::Escape library
 - Tools
   + pbc_disassemble options added
   + pbc_dump renamed from pdump
 - Miscellaneous
   + Parrot is now Copyright Parrot Foundation
   + Parrot's SVN repository is now hosted at https://svn.parrot.org
-  + Various code cleanups and bug fixes
+  + Various code cleanups, consting, 64-bit incompatibilities and other bug fixes
 
 
 New in January 2009 release (0.9.0)
