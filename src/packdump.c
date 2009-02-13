@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$

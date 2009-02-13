@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2002-2008, The Perl Foundation.
+Copyright (C) 2002-2008, Parrot Foundation.
 License:  Artistic 2.0, see README and LICENSE for details
 $Id$
 
