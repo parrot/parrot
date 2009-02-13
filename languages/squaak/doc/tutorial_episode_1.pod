@@ -262,7 +262,7 @@ compilers/pct/src/PCT/HLLCompiler.pir.
 
 =item * Parrot mailing list: parrot-dev@lists.parrot.org
 
-=item * IRC: join #parrot on irc.perl.org
+=item * IRC: join #parrot on irc.parrot.org
 
 =item * Getting started with PCT: docs/pct/gettingstarted.pod
 

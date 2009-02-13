@@ -195,7 +195,7 @@ L<http://lists.parrot.org/pipermail/parrot-commits/>
 The mailing list is the main resource for Parrot development. However, there
 is an IRC channel which you may find useful if your problem is better solved
 with real-time discussion.  Visit the channel #parrot on the IRC
-server L<irc.perl.org>.  Alternative IRC servers are
+server L<irc.parrot.org>.  Alternative IRC servers are
 L<irc.rhizomatic.net> and L<irc.pobox.com>.
 
 

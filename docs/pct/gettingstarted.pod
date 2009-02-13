@@ -13,7 +13,7 @@ around (see Parrot's glossary at L<http://www.parrotcode.org/glossary.html>),
 this document will get you up and running within 10 minutes (that excludes
 building Parrot). Once you begin, it's a matter of getting your hands dirty and
 get experienced using the tools. Feel free to ask questions on
-irc.perl.org#parrot.
+irc.parrot.org#parrot.
 
 =head1 GETTING STARTED
 
@@ -220,7 +220,7 @@ Parrot), pynie (Python on Parrot), and cardinal (Ruby on Parrot).
 =head2 IRC
 
 Everyday, a bunch of Parrot enthusiasts can be found on #parrot on
-irc.perl.org. You're welcome to ask questions.
+irc.parrot.org. You're welcome to ask questions.
 
 =head1 SUGGESTIONS
 

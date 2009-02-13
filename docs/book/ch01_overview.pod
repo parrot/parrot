@@ -198,7 +198,7 @@ Parrot's ticket submission and tracker, wiki, source code browser, and
 project roadmap.
 
 Parrot developers, volunteers, and well-wishers also congregate on IRC
-at C<#parrot> on the U<irc://irc.perl.org> server. It's a good place to
+at C<#parrot> on the U<irc://irc.parrot.org> server. It's a good place to
 get real-time answers to questions, or just to see how things are
 progressing.
 

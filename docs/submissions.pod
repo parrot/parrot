@@ -294,7 +294,7 @@ L<http://www.perlfoundation.org/contributor_license_agreement>
 =item 4
 
 Request commit access via the C<parrot-dev> mailing list, or via IRC
-(#parrot on irc.perl.org).  The existing commiters will discuss your request in
+(#parrot on irc.parrot.org).  The existing commiters will discuss your request in
 the next couple of weeks.
 
 If approved, a metacommiter will update the permissions to allow you to commit

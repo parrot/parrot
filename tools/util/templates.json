@@ -49,7 +49,7 @@ for supporting this project.  Our next release is @release.nextdate@.</p>
 Bug Day
 
 On @bugday.day@, @bugday.date@, please join us on IRC in #parrot
-(irc.perl.org) to work on closing out as many RT (https://rt.perl.org/
+(irc.parrot.org) to work on closing out as many RT (https://rt.perl.org/
 rt3/) tickets as possible in the parrot queue. This will help us get
 ready for the next release of parrot: @release.version@, scheduled for @release.day@,
 @release.date@. You'll find C, parrot assembly, perl, documentation,

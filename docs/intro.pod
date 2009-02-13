@@ -393,7 +393,7 @@ archive at L<http://groups.google.com/group/parrot-dev/>.
 
 =head2 IRC
 
-The Parrot IRC channel is hosted on irc.perl.org and is named C<#parrot>.
+The Parrot IRC channel is hosted on irc.parrot.org and is named C<#parrot>.
 Alternative IRC servers are at irc.pobox.com and irc.rhizomatic.net.
 
 =cut
