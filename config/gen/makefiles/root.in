@@ -554,10 +554,13 @@ all : \
     dynpmc \
     dynoplibs \
     compilers \
-    $(PBC_TO_EXE) \
-    $(PARROT_CONFIG) \
     $(DIS) \
-    $(PBCMERGE)
+    $(PARROT_CONFIG) \
+    $(PBC_TO_EXE) \
+    $(PBCMERGE) \
+    $(PDB) \
+    $(PDUMP) \
+    $(PINFO) \
 
 $(GEN_LIBRARY) : $(PARROT)
 
