@@ -2,6 +2,9 @@
 
 New in February 2009 release
 
+- Languages
+  + Lua
+    - left the nest and is now at http://github.com/fperrad/lua/
 - Cleanup
   + removed Zcode implementation
 
