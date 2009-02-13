@@ -1,5 +1,5 @@
 # Copyright (C) 2009, The Perl Foundation.
-# $Id: neg_0.pm 30367 2008-08-20 02:21:59Z rurban $
+# $Id$
 
 =head1 NAME
 
