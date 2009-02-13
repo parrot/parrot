@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2008, Parrot Foundation.
+# Copyright (C) 2002-2009, Parrot Foundation.
 # $Id$
 
 This is a list of project roles, with a partial list of the folks who have
@@ -23,6 +23,7 @@ Release Manager                 Bob Rogers
                                 chromatic
                                 Will Coleda
                                 Andrew Whitworth
+                                Klaas-Jan Stol
 
 Metacommitter                   Allison Randal
                                 Jerry Gay
