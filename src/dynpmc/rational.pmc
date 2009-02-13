@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, The Perl Foundation.
+Copyright (C) 2008-2009, The Perl Foundation.
 $Id$
 
 =pod
@@ -54,8 +54,8 @@ Returns a string representation of a Rational-PMC to a certain base.
 */
 static STRING *rat_get_string_to_base(PARROT_INTERP, PMC *self, int base) {
   #ifdef PARROT_HAS_GMP
-    char * const cstr = mpq_get_str(NULL, (int) base, RT(self));
-    STRING * pstr     = Parrot_str_new(interp, cstr, 0);
+    char * const cstr   = mpq_get_str(NULL, (int) base, RT(self));
+    STRING * const pstr = Parrot_str_new(interp, cstr, 0);
     Parrot_str_free_cstring(cstr);
     return pstr;
   #else
@@ -320,7 +320,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     VTABLE PMC *clone() {
       #ifdef PARROT_HAS_GMP
         mpz_t num, den;
-        PMC *ret = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const ret = pmc_new(INTERP, SELF->vtable->base_type);
         mpq_get_num(num, RT(SELF));
         mpq_get_den(den, RT(SELF));
         mpq_set_num(RT(ret), num);
@@ -431,7 +431,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
         mpz_init(q);
         mpz_tdiv_q(q, mpq_numref(RT(SELF)), mpq_denref(RT(SELF)));
         if (mpz_fits_slong_p(q)) {
-            INTVAL ret = (INTVAL) mpz_get_si(q);
+            const INTVAL ret = (INTVAL) mpz_get_si(q);
             mpz_clear(q);
             return ret;
         }
@@ -454,8 +454,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE FLOATVAL get_number() {
       #ifdef PARROT_HAS_GMP
-        double d;
-        d = mpq_get_d(RT(SELF));
+        const double d = mpq_get_d(RT(SELF));
         return (FLOATVAL) d;
       #else
         RAISE_EXCEPTION

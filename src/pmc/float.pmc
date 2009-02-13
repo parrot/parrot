@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2008, The Perl Foundation.
+Copyright (C) 2003-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -34,7 +34,7 @@ Initializes the number to zero.
 */
 
     VTABLE void init() {
-        Parrot_Float_attributes *fattr = mem_allocate_zeroed_typed(Parrot_Float_attributes);
+        Parrot_Float_attributes * const fattr = mem_allocate_zeroed_typed(Parrot_Float_attributes);
         fattr->fv = 0.0;
         PMC_data(SELF) = fattr;
     }
@@ -63,7 +63,7 @@ Make an exact copy of this PMC.
 
     VTABLE PMC *clone() {
         FLOATVAL fv;
-        PMC *dest = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
         GET_ATTR_fv(INTERP, SELF, fv);
         SET_ATTR_fv(INTERP, dest, fv);
         return dest;
@@ -117,7 +117,7 @@ Returns an integer representation of the number (by casting).
 
     VTABLE INTVAL get_integer() {
         /* two steps avoid casting warnings */
-        FLOATVAL n = SELF.get_number();
+        const FLOATVAL n = SELF.get_number();
         return (INTVAL) n;
     }
 

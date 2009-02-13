@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -89,7 +89,7 @@ static STRING
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Hash: Cannot use NULL key");
     else {
-        STRING *keystr = key_string(interp, key);
+        STRING * const keystr = key_string(interp, key);
         if (STRING_IS_NULL(keystr))
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_UNEXPECTED_NULL, "Hash: Cannot use NULL STRING key");
@@ -271,7 +271,7 @@ Returns the size of the hash.
 
     VTABLE FLOATVAL get_number() {
         /* doing this in two steps avoids dodgy cast warnings with -O */
-        INTVAL size = parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
+        const INTVAL size = parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
         return (FLOATVAL)size;
     }
 
@@ -554,14 +554,15 @@ Returns the PMC value for the element at C<*key>.
     }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        Hash   * const hash = (Hash *)PMC_struct_val(SELF);
+        const Hash * const hash = (Hash *)PMC_struct_val(SELF);
         STRING        *keystr;
         HashBucket    *b;
         PMC           *nextkey;
-        PMC           *result;
 
         /* called from iterator with an integer idx in key */
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_hash_iterator_FLAGS) {
+            PMC *result;
+
             /* check if we really have Hash_key_type_int */
             if (hash->key_type == Hash_key_type_int) {
                 void *idx           = parrot_hash_get_idx(INTERP, hash, key);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -50,7 +50,6 @@ Creates and returns a clone of the key.
         PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PMC *dkey        = dest;
         PMC *key         = SELF;
-        PMC *p;
 
         PObj_custom_mark_SET(dest);
 
@@ -71,8 +70,10 @@ Creates and returns a clone of the key.
                     break;
                 case KEY_pmc_FLAG:
                 case KEY_pmc_FLAG | KEY_register_FLAG:
-                    p = key_pmc(INTERP, key);
+                    {
+                    PMC * const p = key_pmc(INTERP, key);
                     key_set_pmc(INTERP, dkey, VTABLE_clone(INTERP, p));
+                    }
                     break;
                 default:
                     break;
@@ -81,7 +82,7 @@ Creates and returns a clone of the key.
             key = key_next(INTERP, key);
 
             if (key) {
-                p    = key_new(INTERP);
+                PMC * const p = key_new(INTERP);
                 key_append(INTERP, dkey, p);
                 dkey = p;
             }
@@ -284,7 +285,7 @@ PMC_int_val(-1) means end of iteration.
 */
 
     VTABLE PMC *nextkey_keyed(PMC *agg, INTVAL what) {
-        PMC         *ret = SELF;
+        PMC  * const ret = SELF;
         const INTVAL n   = VTABLE_elements(INTERP, agg);
 
         switch (what) {
@@ -418,9 +419,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     void thaw(visit_info *info) {
-        IMAGE_IO * const io    = info->image_io;
-        INTVAL     const flags = VTABLE_shift_integer(INTERP, io)
-                                    & KEY_type_FLAGS;
+        IMAGE_IO * const io = info->image_io;
+        const INTVAL flags  = VTABLE_shift_integer(INTERP, io) & KEY_type_FLAGS;
 
         PObj_get_FLAGS(SELF) |= flags;
         PObj_custom_mark_SET(SELF);

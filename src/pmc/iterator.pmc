@@ -140,9 +140,9 @@ Make a clone of the iterator.
 */
 
     VTABLE PMC *clone() {
-        STRING     *name    = CONST_STRING(interp, "set_key");
-        PMC * const key     = (PMC *)PMC_struct_val(SELF);
-        PMC * const res     = pmc_new_init(INTERP, SELF->vtable->base_type,
+        STRING * const name = CONST_STRING(interp, "set_key");
+        PMC    * const key  = (PMC *)PMC_struct_val(SELF);
+        PMC    * const res  = pmc_new_init(INTERP, SELF->vtable->base_type,
                                            SELF.get_pmc());
         Parrot_PCCINVOKE(interp, res, name, "P->", VTABLE_clone(interp, key));
         return res;
@@ -351,7 +351,7 @@ Reset the Iterator. C<value> must be one of
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        PMC *key, *agg;
+        PMC *agg;
         if (value < ITERATE_FROM_START || value > ITERATE_FROM_END)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Illegal set_integer on iterator");
@@ -365,6 +365,7 @@ Reset the Iterator. C<value> must be one of
                 VTABLE_nextkey_keyed(INTERP, agg, NULL, value);
         }
         else {
+            PMC *key;
             if (!PMC_struct_val(SELF))
                 key = key_new(INTERP);
             else
@@ -487,7 +488,7 @@ See F<docs/pdds/pdd03_calling_conventions.pod>.
 
         /* iterator constructor */
         if (REG_INT(interp, 3) == 1) {
-            PMC *arg = REG_PMC(interp, 5);
+            PMC * const arg = REG_PMC(interp, 5);
             PMC *iter;
 
             if (PObj_is_object_TEST(arg)) {

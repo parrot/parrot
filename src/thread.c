@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -958,7 +958,7 @@ remove_queued_suspend_gc(PARROT_INTERP)
 {
     ASSERT_ARGS(remove_queued_suspend_gc)
     parrot_event *ev    = NULL;
-    QUEUE        *queue = interp->task_queue;
+    QUEUE * const queue = interp->task_queue;
     QUEUE_ENTRY  *prev  = NULL;
     QUEUE_ENTRY  *cur;
 

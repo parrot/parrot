@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -792,21 +792,21 @@ appended.
 */
 
     VTABLE STRING *get_string() {
-        char   *s  = bigint_get_string(INTERP, SELF, 10);
-        STRING *ps = Parrot_str_new(INTERP, s, 0);
+        char   * const s  = bigint_get_string(INTERP, SELF, 10);
+        STRING * const ps = Parrot_str_new(INTERP, s, 0);
         mem_sys_free(s);
         return ps;
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL base) {
-        char   *s  = bigint_get_string(INTERP, SELF, base);
-        STRING *ps = Parrot_str_new(INTERP, s, 0);
+        char   * const s  = bigint_get_string(INTERP, SELF, base);
+        STRING * const ps = Parrot_str_new(INTERP, s, 0);
         mem_sys_free(s);
         return ps;
     }
 
     VTABLE STRING *get_repr() {
-        STRING *s = SELF.get_string();
+        STRING * const s = SELF.get_string();
         return Parrot_str_append(INTERP, s, CONST_STRING(INTERP, "L"));
     }
 /*
@@ -1017,7 +1017,7 @@ Decrements the integer.
 
     MULTI PMC *pow(PMC *value, PMC *dest) {
         /* XXX only Integer RHS currently */
-        INTVAL r = VTABLE_get_integer(INTERP, value);
+        const INTVAL r = VTABLE_get_integer(INTERP, value);
         dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bigint_pow_bigint_int(INTERP, SELF, r, dest);
