@@ -939,7 +939,10 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     }
 
     /* Ensure the bytecode version is one we can read. Currently, we only
-     * support bytecode versions matching the current one. */
+     * support bytecode versions matching the current one.
+     *
+     * tools/dev/pbc_header.pl --upd t/native_pbc/ *.pbc
+     * stamps version and fingerprint in the native tests. */
     if (header->bc_major != PARROT_PBC_MAJOR
     &&  header->bc_minor != PARROT_PBC_MINOR) {
         Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read bytecode "
@@ -970,9 +973,11 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     TRACE_PRINTF(("PackFile_unpack: Wordsize %d.\n", header->wordsize));
     TRACE_PRINTF(("PackFile_unpack: Floattype %d (%s).\n",
                   header->floattype,
-                  header->floattype ?
-                  "x86 little endian 12 byte long double" :
-                  "IEEE-754 8 byte double"));
+                  header->floattype == FLOATTYPE_8
+                      ? FLOATTYPE_8_NAME
+                      : header->floattype == FLOATTYPE_16
+                          ? FLOATTYPE_16_NAME
+                          : FLOATTYPE_12_NAME));
     TRACE_PRINTF(("PackFile_unpack: Byteorder %d (%sendian).\n",
                   header->byteorder, header->byteorder ? "big " : "little-"));
 
@@ -1225,13 +1230,17 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
     header->bc_major    = PARROT_PBC_MAJOR;
     header->bc_minor    = PARROT_PBC_MINOR;
 #if NUMVAL_SIZE == 8
-    header->floattype = 0;
+    header->floattype = FLOATTYPE_8;
 #else
 #  if (NUMVAL_SIZE == 12) && PARROT_BIGENDIAN
-    header->floattype = 1;
+    header->floattype = FLOATTYPE_12;
 #  else
+#    if (NUMVAL_SIZE == 16)
+    header->floattype = FLOATTYPE_16;
+#    else
     exit_fatal(1, "PackFile_set_header: Unsupported floattype NUMVAL_SIZE=%d,"
                " PARROT_BIGENDIAN=%d\n", NUMVAL_SIZE, PARROT_BIGENDIAN);
+#    endif
 #  endif
 #endif
 }
@@ -4061,8 +4070,10 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
         self->groups[i]                  = mem_allocate_typed(PackFile_Annotations_Group);
         self->groups[i]->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
         self->groups[i]->entries_offset  = PF_fetch_opcode(seg->pf, &cursor);
-        TRACE_PRINTF_VAL(("PackFile_Annotations_unpack: group[%d]/%d bytecode_offset=%d entries_offset=%d\n",
-                          i, self->num_groups, self->groups[i]->bytecode_offset, self->groups[i]->entries_offset));
+        TRACE_PRINTF_VAL((
+           "PackFile_Annotations_unpack: group[%d]/%d bytecode_offset=%d entries_offset=%d\n",
+           i, self->num_groups, self->groups[i]->bytecode_offset,
+           self->groups[i]->entries_offset));
     }
 
     /* Unpack entries. */

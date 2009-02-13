@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -60,6 +60,41 @@ static void cvt_num12_num8_le(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
+static void cvt_num16_num12(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16_num12_le(
+    ARGOUT(unsigned char *dest),
+    ARGIN(unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16_num8(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16_num8_be(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16_num8_le(
+    ARGOUT(unsigned char *dest),
+    ARGIN(unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
 PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_be_4(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
@@ -97,6 +132,21 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 #define ASSERT_ARGS_cvt_num12_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
     || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num16_num12 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num16_num12_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num16_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num16_num8_be __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_cvt_num16_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_fetch_op_be_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_op_be_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -129,6 +179,7 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
  *
  * Floattype 0 = IEEE-754 8 byte double
  * Floattype 1 = x86 little endian 12 byte long double
+ * Floattype 2 = IEEE-754 16 byte long double
  *
  */
 
@@ -193,10 +244,49 @@ nul:
 
 /*
 
+=item C<static void cvt_num12_num8>
+
+Converts i386 LE 12-byte long double to IEEE 754 8 byte double.
+
+not yet implemented (throws internal_exception).
+
+=cut
+
+*/
+
+static void
+cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num16_num8)
+    exit_fatal(1, "TODO cvt_num16_num8\n");
+}
+
+/*
+
+=item C<static void cvt_num16_num12>
+
+Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double .
+
+Not yet implemented (throws internal_exception).
+
+=cut
+
+*/
+
+static void
+cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num16_num12)
+    exit_fatal(1, "TODO cvt_num16_num12\n");
+}
+
+/*
+
 =item C<static void cvt_num12_num8_be>
 
 Converts a 12-byte i386 long double into a big-endian IEEE 754 8-byte double.
-converting to BE not yet implemented (throws internal_exception).
+
+Converting to BE not yet implemented (throws internal_exception).
 
 =cut
 
@@ -206,9 +296,10 @@ static void
 cvt_num12_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num12_num8_be)
-    cvt_num12_num8(dest, src);
-    /* TODO endianize */
-    exit_fatal(1, "TODO cvt_num12_num8_be\n");
+    unsigned char b[8];
+    cvt_num12_num8(b, src);
+    /* TODO test endianize */
+    fetch_buf_le_8(dest, b);
 }
 
 /*
@@ -229,6 +320,70 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
     unsigned char b[8];
     cvt_num12_num8(b, src);
     fetch_buf_le_8(dest, b);
+}
+
+/*
+
+=item C<static void cvt_num16_num8_le>
+
+Converts a IEEE 754 16-byte long double into a little-endian IEEE 754
+8-byte double.
+
+Not yet implemented (throws internal_exception).
+
+=cut
+
+*/
+
+static void
+cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num16_num8_le)
+    unsigned char b[8];
+    cvt_num16_num8(b, src);
+    fetch_buf_le_8(dest, b);
+}
+
+/*
+
+=item C<static void cvt_num16_num8_be>
+
+Converts a IEEE 754 16-byte IA64 long double into a big-endian IEEE 754 8-byte double.
+
+Not yet implemented (throws internal_exception).
+
+=cut
+
+*/
+
+static void
+cvt_num16_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num16_num8_be)
+    unsigned char b[8];
+    cvt_num16_num8(b, src);
+    fetch_buf_be_8(dest, b);
+}
+
+/*
+
+=item C<static void cvt_num16_num12_le>
+
+Converts a IEEE 754 16-byte BE long double into a 12-byte i386 long double.
+
+Not yet implemented (throws internal_exception).
+
+=cut
+
+*/
+
+static void
+cvt_num16_num12_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num16_num12_le)
+    unsigned char b[12];
+    cvt_num16_num12(b, src);
+    fetch_buf_le_12(dest, b);
 }
 
 /*
@@ -643,6 +798,9 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     else if (pf->header->floattype == FLOATTYPE_12) {
         *((const unsigned char **) (stream)) += 12;
     }
+    else if (pf->header->floattype == FLOATTYPE_16) {
+        *((const unsigned char **) (stream)) += 16;
+    }
     return f;
 }
 
@@ -933,20 +1091,52 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         else
             pf->fetch_op = fetch_op_le_8;
 
-        if (pf->header->floattype)
-            pf->fetch_nv = cvt_num12_num8_le;
-        else
+        if (pf->header->floattype == FLOATTYPE_8 && NUMVAL_SIZE == 8)
             pf->fetch_nv = fetch_buf_le_8;
+        else if (pf->header->floattype == FLOATTYPE_12 && NUMVAL_SIZE == 12)
+            pf->fetch_nv = fetch_buf_le_12;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 16)
+            pf->fetch_nv = fetch_buf_le_16;
+        else if (pf->header->floattype == FLOATTYPE_12 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num12_num8_le;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 12)
+            pf->fetch_nv = cvt_num16_num12_le;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num16_num8_le;
+        else
+            exit_fatal(1,
+              "PackFile_unpack: unsupported float conversion %d to %d, PARROT_BIGENDIAN=%d\n",
+              NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+        return 0;
     }
     else {
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_be_4;
         else
             pf->fetch_op = fetch_op_be_8;
+
+        if (pf->header->floattype == FLOATTYPE_8 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = fetch_buf_be_8;
+        else if (pf->header->floattype == FLOATTYPE_12 && NUMVAL_SIZE == 12)
+            pf->fetch_nv = fetch_buf_be_12;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 16)
+            pf->fetch_nv = fetch_buf_be_16;
+        else if (pf->header->floattype == FLOATTYPE_12 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num12_num8;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 12)
+            pf->fetch_nv = cvt_num16_num12;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num16_num8;
+        else {
+            exit_fatal(1,
+                       "PackFile_unpack: unsupported float conversion %d to %d, PARROT_BIGENDIAN=%d\n",
+                       NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+        }
     }
 
 #else
 
+    pf->fetch_iv = pf->fetch_op;
     /* this Parrot is on a LITTLE ENDIAN machine */
     if (need_endianize) {
         if (pf->header->wordsize == 4)
@@ -954,23 +1144,46 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         else
             pf->fetch_op = fetch_op_be_8;
 
-        if (pf->header->floattype)
-            pf->fetch_nv = cvt_num12_num8_be;
-        else
+        if (pf->header->floattype == FLOATTYPE_8 && NUMVAL_SIZE == 8)
             pf->fetch_nv = fetch_buf_be_8;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 16)
+            pf->fetch_nv = fetch_buf_be_16;
+        else if (pf->header->floattype == FLOATTYPE_12 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num12_num8_be;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num16_num8_be;
+        else {
+            exit_fatal(1,
+                       "PackFile_unpack: unsupported float conversion %d to %d, PARROT_BIGENDIAN=%d\n",
+                       NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+            return;
+        }
     }
     else {
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_le_4;
         else
             pf->fetch_op = fetch_op_le_8;
-        if (NUMVAL_SIZE == 8 && pf->header->floattype)
-            pf->fetch_nv = cvt_num12_num8;
-        else if (NUMVAL_SIZE != 8 && ! pf->header->floattype)
+
+        if (pf->header->floattype == FLOATTYPE_8 && NUMVAL_SIZE == 8)
             pf->fetch_nv = fetch_buf_le_8;
+        else if (pf->header->floattype == FLOATTYPE_12 && NUMVAL_SIZE == 12)
+            pf->fetch_nv = fetch_buf_le_12;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 16)
+            pf->fetch_nv = fetch_buf_le_16;
+        else if (pf->header->floattype == FLOATTYPE_12 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num12_num8;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 12)
+            pf->fetch_nv = cvt_num16_num12;
+        else if (pf->header->floattype == FLOATTYPE_16 && NUMVAL_SIZE == 8)
+            pf->fetch_nv = cvt_num16_num8;
+        else {
+            exit_fatal(1,
+                       "PackFile_unpack: unsupported float conversion %d to %d, PARROT_BIGENDIAN=%d\n",
+                       NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+        }
     }
 #endif
-    pf->fetch_iv = pf->fetch_op;
 }
 
 /*
@@ -984,6 +1197,8 @@ Initial review by leo 2003.11.21
 Most routines moved from F<src/packfile.c>.
 
 Renamed PackFile_* to PF_*
+
+Added 16 byte types.
 
 =head1 TODO
 

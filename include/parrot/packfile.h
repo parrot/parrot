@@ -28,7 +28,15 @@
 #define FLOATTYPE_8_NAME      "IEEE-754 8 byte double"
 #define FLOATTYPE_12          1
 #define FLOATTYPE_12_NAME     "x86 little endian 12 byte long double"
-#define FLOATTYPE_MAX         1
+#define FLOATTYPE_16          2
+#define FLOATTYPE_16_NAME     "IEEE-754 16 byte long double"
+#define FLOATTYPE_MAX         2
+/* Unsupported NaN difference, but patches welcome */
+#define FLOATTYPE_16MIPS      3
+#define FLOATTYPE_16MIPS_NAME "MIPS 16 byte long double"
+/* Not yet set into silicon AFAIK */
+#define FLOATTYPE_32          4
+#define FLOATTYPE_32_NAME     "256-bit extended double"
 
 #define TRACE_PACKFILE 0
 
@@ -1123,6 +1131,13 @@ void fetch_buf_be_16(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*rb);
 
+void fetch_buf_be_32(
+    ARGOUT(unsigned char *rb),
+    ARGIN(const unsigned char *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*rb);
+
 void fetch_buf_be_4(
     ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
@@ -1145,6 +1160,13 @@ void fetch_buf_le_12(
         FUNC_MODIFIES(*rb);
 
 void fetch_buf_le_16(
+    ARGOUT(unsigned char *rb),
+    ARGIN(const unsigned char *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*rb);
+
+void fetch_buf_le_32(
     ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
@@ -1187,6 +1209,9 @@ opcode_t fetch_op_le(opcode_t w);
 #define ASSERT_ARGS_fetch_buf_be_16 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_buf_be_32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(rb) \
+    || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_buf_be_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
@@ -1197,6 +1222,9 @@ opcode_t fetch_op_le(opcode_t w);
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_buf_le_16 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(rb) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_fetch_buf_le_32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_buf_le_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \

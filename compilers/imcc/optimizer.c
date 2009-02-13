@@ -910,14 +910,28 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
 
-    /* construct a FLOATVAL_FMT with needed precision */
+    /* construct a FLOATVAL_FMT with needed precision.
+      TT #308  XXX Should use Configure.pl to figure these out,
+      but it's not clear just what is needed.
+      The value of '16' for NUMVAL_SIZE == 8 was one larger than the
+      default FLOATVAL_FMT of '15' determined by Configure.pl.  The
+      reason for this difference, if there is one, should be documented.
+      The values of.18Lg and .31Lg are guesses.
+    */
 #if NUMVAL_SIZE == 8
     fmt = "%0.16g";
 #elif NUMVAL_SIZE == 12
     fmt = "%0.18Lg";
+#elif NUMVAL_SIZE == 16
+    fmt = "%0.31Lg";
 #else
     fmt = FLOATVAL_FMT;
-    IMCC_warning(interp, "subs_constants", "used default FLOATVAL_FMT\n");
+    /* Since it's not clear why this is needed, it's not clear what to
+       do if it's an unknown case.
+    */
+    IMCC_fatal(interp, 0,
+       "IMCC_subst_constants:  unexpected NUMVAL_SIZE = %d\n",
+       NUMVAL_SIZE);
 #endif
 
     tmp = NULL;

@@ -66,7 +66,7 @@ my %h;
 is( $h{magic}, "\xfe\x50\x42\x43\x0a\x1a\x0a", "magic string 0xfePBC0x0a0x1a0x0a len=7" );
 ok( $h{wordsize} == 2 || $h{wordsize} == 4 || $h{wordsize} == 8,  "wordsize: $h{wordsize}" );
 ok( $h{byteorder} < 2, "byteorder: $h{byteorder}" );
-ok( $h{floattype} < 4, "floattype: $h{floattype}" );
+ok( $h{floattype} < 3, "floattype: $h{floattype}" );
 is( $h{major}, $PConfig{MAJOR}, "major version: $h{major} vs $PConfig{MAJOR}" );
 is( $h{minor}, $PConfig{MINOR}, "minor version: $h{minor} vs $PConfig{MINOR}" );
 is( $h{patch}, $PConfig{PATCH}, "patch version: $h{patch} vs $PConfig{PATCH}" );

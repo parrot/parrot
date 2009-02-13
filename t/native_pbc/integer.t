@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 5;
 
 =head1 NAME
 
@@ -30,10 +30,11 @@ See F<tools/dev/mk_native_pbc> to create the platform-specific native pbcs.
 =head1 PLATFORMS
 
   _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
-  _2   i386 32 bit opcode_t, 32 bit intval, long double (linux-gcc-ix86)
+  _2   i386 32 bit opcode_t, 32 bit intval, 12 bit long double (linux-gcc-ix86)
   _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
   _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-  _5   big-endian 64-bit                     (irix or similar)
+  _5   x86_64 16 bit long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
+  _6   big-endian 64-bit                     (MIPS irix or similar)
 
 =cut
 
@@ -86,11 +87,16 @@ TODO: {
 
 pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval" )
     or diag "May need to regenerate t/native_pbc/integer_1.pbc; read test file";
-}
 
-TODO: {
-local $TODO = "devel versions are not guaranteed to succeed"
-  if $PConfig{DEVEL};
+# HEADER => [
+#         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
+#         byteorder = 0   (interpreter's byteorder       = 0)
+#         floattype = 1   (interpreter's NUMVAL_SIZE     = 12)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
+#         no endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
 pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval long double" )
     or diag "May need to regenerate t/native_pbc/integer_2.pbc; read test file";
 
@@ -108,6 +114,12 @@ pbc_output_is( undef, '270544960', "i386 32 bit opcode_t, 32 bit intval long dou
 pbc_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval")
     or diag "May need to regenerate t/native_pbc/integer_3.pbc; read test file";
 
+}
+
+TODO: {
+local $TODO = "devel versions are not guaranteed to succeed"
+  if $PConfig{DEVEL};
+
 # any ordinary 64-bit intel unix:
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
@@ -122,9 +134,22 @@ pbc_output_is(undef, '270544960', "PPC BE 32 bit opcode_t, 32 bit intval")
 pbc_output_is(undef, '270544960', "i86_64 LE 64 bit opcode_t, 64 bit intval")
     or diag "May need to regenerate t/native_pbc/integer_4.pbc; read test file";
 
+# HEADER => [
+#         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
+#         byteorder = 0   (interpreter's byteorder       = 0)
+#         floattype = 2   (interpreter's NUMVAL_SIZE     = 16)
+#         parrot-version 0.9.0, bytecode-version 3.34
+#         UUID type = 0, UUID size = 0
+#         no endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
+
+pbc_output_is(undef, '270544960', "i86_64 LE 64 bit opcode_t, 64 bit intval, long double")
+    or diag "May need to regenerate t/native_pbc/integer_5.pbc; read test file";
+
 # Formerly following tests had been set up:
 # pbc_output_is(undef, '270544960', "big-endian 64-bit (irix)");
-#    or diag "May need to regenerate t/native_pbc/integer_5.pbc; read test file";
+#    or diag "May need to regenerate t/native_pbc/integer_6.pbc; read test file";
 
 }
 

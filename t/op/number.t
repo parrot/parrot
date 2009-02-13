@@ -7,6 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 56;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -21,6 +22,8 @@ t/op/number.t - Number Registers
 Tests the use of Parrot floating-point number registers.
 
 =cut
+
+my $output;
 
 pasm_output_is( <<CODE, <<OUTPUT, "set_n_nc" );
         set     N0, 1.0
@@ -1078,19 +1081,21 @@ CODE
 0.5
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "sqrt_n_n" );
+# long double succeeds
+$output = $PConfig{numvalsize} == 8
+  ? '1.4142135623731
+1.41421356237309
+' : '1.4142135623731
+1.4142135623731
+';
+pasm_output_is( <<'CODE', $output, "sqrt_n_n" );
         set N1, 2
         sqrt N2, N1
-        print N2
-        print "\n"
+        say N2
         sqrt N2, 2.0
-        print N2
-        print "\n"
+        say N2
         end
 CODE
-1.4142135623731
-1.41421356237309
-OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_n by zero" );
         set N0, 0

@@ -6,6 +6,9 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Test tests => 78;
+use Parrot::Config;
+
+my $output;
 
 # these tests are run with -O1 by TestCompiler and show
 # generated PASM code for various optimizations at level 1
@@ -1151,18 +1154,25 @@ OUT
 
 ##############################
 
-pir_2_pasm_like( <<'CODE', <<'OUT', "constant add big nums" );
+$output = $PConfig{numvalsize} == 8
+  ? '/^# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html\?id=32392
+_main:
+   set N0, 1\.6e\+0?22
+   end$/
+' : '/^# IMCC does produce b0rken PASM files
+# see http://guest@rt.perl.org/rt3/Ticket/Display.html\?id=32392
+_main:
+   set N0, 16000000000000000000000
+   end$/
+';
+
+pir_2_pasm_like( <<'CODE', $output, "constant add big nums" );
 .sub _main
    add $N0, 10.0e20, 15.0e21
    end
 .end
 CODE
-/^# IMCC does produce b0rken PASM files
-# see http://guest@rt.perl.org/rt3/Ticket/Display.html\?id=32392
-_main:
-   set N0, 1\.6e\+0?22
-   end$/
-OUT
 
 ##############################
 SKIP: {

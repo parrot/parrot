@@ -12,10 +12,11 @@
 #        update the VERSION and rm .parrot_current_rev
 
 #  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
-#  _2   i386 32 bit opcode_t, 32 bit intval, long double (linux-gcc-ix86)
+#  _2   i386 32 bit opcode_t, 32 bit intval, 12 bit long double (linux-gcc-ix86)
 #  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
 #  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-#  _5   big-endian 64-bit                     (irix or similar)
+#  _5   x86_64 16 bit long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
+#  _6   big-endian 64-bit                     (irix or similar)
 
 #tests:
 #parrot -o i.pbc -a - <<EOF
@@ -39,25 +40,28 @@ if [ "$ptrsize" == "ptrsize='4';" ]
 then
     if [ "$byteorder" == "1234" ]
     then
+        echo "1: i386 32 bit opcode_t, 32 bit intval"
         N=1
         if [ "$(perl -V:uselongdouble)" == "uselongdouble='define';" ]; then
             enable_long_double=1
-            conf=" --floatval=double"
+            # force double on 2nd run not to default to long double
+            conf=" --floatval='double'"
         fi
     else
         if [ "$byteorder" == "4321" ]
         then
+            echo "3: PPC BE 32 bit opcode_t, 32 bit intval"
             N=3
         else
             if [ "$byteorder" == "12345678" \
                  -a "$(perl -V:osname)" == "osname='cygwin';" ]
             then
-                echo "detected cygwin use64bitint: ok"
+                echo "1: cygwin use64bitint"
                 N=1
                 exe=.exe
             else
-                echo "unsupported perl -V:byteorder $byteorder"
-                exit 1
+                echo "Sorry, unsupported perl - parrot ptrsize mismatch."
+                exit
             fi
         fi
     fi
@@ -66,9 +70,12 @@ else
     then
         if [ "$byteorder" == "12345678" ]
         then
+            echo "4+5: x86_64 double float 64 bit opcode_t + long double"
             N=4
+            enable_long_double=1
         else
-            N=5
+            echo "6: big-endian 64-bit"
+            N=6
         fi
     else
         echo "unsupported perl -V:ptrsize $ptrsize"
@@ -83,18 +90,11 @@ if [ "$enable_long_double" == "1" ]; then
     fi
     tail myconfig
     make -s || exit 1
+    M=$((N+1))
     [ -e t/op/number_1.pasm ] || perl t/harness t/op/number.t
-    [ -e t/op/string_133.pasm ] || perl t/harness t/op/string.t
-    ./parrot -o t/native_pbc/integer_2.pbc -a - <<EOF
-print 0x10203040
-end
-EOF
-    [ $? -le 0 ] && echo "t/native_pbc/integer_2.pbc updated"
-    ./parrot -o t/native_pbc/number_2.pbc t/op/number_1.pasm && echo "t/native_pbc/number_2.pbc updated"
-    ./parrot -o t/native_pbc/string_2.pbc t/op/string_133.pasm  && echo "t/native_pbc/string_2.pbc updated"
-
+    ./parrot -o t/native_pbc/number_${M}.pbc t/op/number_1.pasm && echo "t/native_pbc/number_${M}.pbc updated"
     make pbc_dump$exe
-    ./pbc_dump -h t/native_pbc/number_2.pbc
+    ./pbc_dump -h t/native_pbc/number_${M}.pbc
 fi
 
 if [ "$1" != "--noconf" ]; then

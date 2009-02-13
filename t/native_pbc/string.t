@@ -30,10 +30,11 @@ See F<tools/dev/mk_native_pbc> to create the platform-specific native pbcs.
 =head1 PLATFORMS
 
   _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
-  _2   i386 32 bit opcode_t, 32 bit intval, long double (linux-gcc-ix86)
+  _2   i386 32 bit opcode_t, 32 bit intval, 12 bit long double (linux-gcc-ix86)
   _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
   _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-  _5   big-endian 64-bit                     (irix or similar)
+  _5   x86_64 16 bit long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
+  _6   big-endian 64-bit                     (MIPS irix or similar)
 
 =cut
 
