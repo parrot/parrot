@@ -457,7 +457,9 @@ static int sub_pragma(PARROT_INTERP,
     (cursor) += ROUND_16((const char *)(cursor) - (const char *)(st))/sizeof (opcode_t)
 
 #if TRACE_PACKFILE
-void Parrot_trace_eprintf(ARGIN(const char *s), ...) {
+void
+Parrot_trace_eprintf(ARGIN(const char *s), ...)
+{
     va_list args;
     va_start(args, s);
     vfprintf(stderr, s, args);

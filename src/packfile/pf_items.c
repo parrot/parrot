@@ -114,10 +114,6 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#if TRACE_PACKFILE
-void Parrot_trace_eprintf(ARGIN(const char *s), ...);
-#endif
-
 /*
  * round val up to whole size, return result in bytes
  */

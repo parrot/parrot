@@ -30,9 +30,9 @@
 #define FLOATTYPE_12_NAME     "x86 little endian 12 byte long double"
 #define FLOATTYPE_MAX         1
 
-#define TRACE_PACKFILE 2
+#define TRACE_PACKFILE 0
+
 #if TRACE_PACKFILE
-void Parrot_trace_eprintf(ARGIN(const char *s), ...);
 #  define TRACE_PRINTF(args)       if (pf->options) Parrot_trace_eprintf args
 #  if TRACE_PACKFILE == 2
 #    define TRACE_PRINTF_VAL(args) if (pf->options & 2) Parrot_trace_eprintf args
@@ -776,6 +776,9 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*seg);
 
+void Parrot_trace_eprintf(ARGIN(const char *s), ...)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(self)
@@ -923,6 +926,8 @@ const opcode_t * PackFile_Annotations_unpack(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(seg) \
     || PARROT_ASSERT_ARG(cursor)
+#define ASSERT_ARGS_Parrot_trace_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(s)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile.c */
 
@@ -1118,13 +1123,6 @@ void fetch_buf_be_16(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*rb);
 
-void fetch_buf_be_32(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
 void fetch_buf_be_4(
     ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
@@ -1147,13 +1145,6 @@ void fetch_buf_le_12(
         FUNC_MODIFIES(*rb);
 
 void fetch_buf_le_16(
-    ARGOUT(unsigned char *rb),
-    ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*rb);
-
-void fetch_buf_le_32(
     ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
         __attribute__nonnull__(1)
@@ -1196,9 +1187,6 @@ opcode_t fetch_op_le(opcode_t w);
 #define ASSERT_ARGS_fetch_buf_be_16 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_fetch_buf_be_32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(rb) \
-    || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_buf_be_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
@@ -1209,9 +1197,6 @@ opcode_t fetch_op_le(opcode_t w);
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_buf_le_16 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(rb) \
-    || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_fetch_buf_le_32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(rb) \
     || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_buf_le_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
