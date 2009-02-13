@@ -535,12 +535,12 @@ D: Cardinal(Ruby on Parrot), ECMAScript PGE grammar,
 D: Python PGE grammar, C99 PGE Grammar
 D: Various Config Fixes, Compiler Warnings, etc
 
-N: Klaas-Jan Stol a.k.a. kj[s]?
+N: Klaas-Jan Stol
 D: clean-ups of compilers/imcc and its documentation.
 D: compilers/pirc and languages/PIR.
 D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
-D: languages/json
-U: kjs
+D: languages/json, languages/squaak
+U: kj, kjs
 E: parrotcode@gmail.com
 
 N: Larry Wall
