@@ -161,6 +161,11 @@ if (@has_negative_zero@) {
 #define PARROT_HAS_NEGATIVE_ZERO 1
 END_PRINT
 }
+else {
+    print OUT <<'END_PRINT';
+#undef PARROT_HAS_NEGATIVE_ZERO
+END_PRINT
+}
 
 print OUT <<'END_PRINT';
 
