@@ -82,7 +82,7 @@ Parse raw serialized PBC file data into the Packfile data structure.
 
 =cut
 
-Implementation note: taken from the bottom end of Parrot_readbc().
+Implementation note: taken from the bottom end of Parrot_pbc_read().
 */
     VTABLE void set_string_native(STRING *str) {
         PackFile *pf = PMC_data_typed(SELF, PackFile *);

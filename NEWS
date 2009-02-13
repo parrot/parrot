@@ -10,6 +10,8 @@ New in February 2009 release
     - build instructions can be found at http://tinyurl.com/rakudo
 - Cleanup
   + removed Zcode implementation
+- Deprecations
+  + Parrot_readbc, Parrot_loadbc renamed to Parrot_pbc_read, Parrot_pbc_load.
 - Tools
   + pbc_disassemble options added
   + pbc_dump renamed from pdump

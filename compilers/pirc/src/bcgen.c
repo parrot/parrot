@@ -380,7 +380,7 @@ new_bytecode(Interp *interp, char const * const filename) {
 
     /* Create a new packfile and load it into the parrot interpreter */
     bc->packfile = PackFile_new(interp, 0);
-    Parrot_loadbc(interp, bc->packfile);
+    Parrot_pbc_load(interp, bc->packfile);
 
     /* store a pointer to the parrot interpreter, which saves passing around
      * the interp as an extra argument.

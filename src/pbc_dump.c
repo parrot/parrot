@@ -32,6 +32,11 @@ Dump the bytecode header only.
 
 Terse output.
 
+=item C<-e> C--debug>
+
+Display detailed packfile reader debugging information if
+F<include/parrot/packfile.h> enables TRACE_PACKFILE
+
 =item C<-o converted.pbc>
 
 Repacks a PBC file into the platform's native binary format for better
@@ -180,6 +185,9 @@ static void help(void)
     printf("\t-d ... disassemble bytecode segments\n");
     printf("\t-h ... dump header only\n");
     printf("\t-t ... terse output\n");
+#if TRACE_PACKFILE
+    printf("\t--debug debug output\n");
+#endif
     printf("\n\t-o converted.pbc repacks a PBC file into "
            "the platform's native\n");
     printf("\t   binary format for better efficiency on reading "
@@ -192,6 +200,7 @@ static struct longopt_opt_decl options[] = {
     { '?', '?', OPTION_optional_FLAG, { "--help" } },
     { 't', 't', OPTION_optional_FLAG, { "--terse" } },
     { 'd', 'd', OPTION_optional_FLAG, { "--disassemble" } },
+    { 'e', 'e', OPTION_optional_FLAG, { "--debug" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } }
 };
 
@@ -215,6 +224,7 @@ main(int argc, const char **argv)
     int disas = 0;
     int convert = 0;
     int header = 0;
+    int debug = 0;
     const char *file = NULL;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
@@ -237,6 +247,9 @@ main(int argc, const char **argv)
             case 'd':
                 disas = 1;
                 break;
+            case 'e':
+                debug = 1;
+                break;
             case 'o':
                 file = opt.opt_arg;
                 convert = 1;
@@ -254,13 +267,13 @@ main(int argc, const char **argv)
     argv += opt.opt_index;
 
 
-    pf = Parrot_readbc(interp, *argv);
+    pf = Parrot_pbc_read(interp, *argv, debug);
 
     if (!pf) {
         printf("Can't read PBC\n");
         return 1;
     }
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
     if (convert) {
         size_t size;
         opcode_t *pack;

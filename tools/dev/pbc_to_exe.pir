@@ -69,7 +69,7 @@ HEADER
 
             do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
 
-            Parrot_loadbc(interp, pf);
+            Parrot_pbc_load(interp, pf);
 
             PackFile_fixup_subs(interp, PBC_MAIN, NULL);
             Parrot_runcode(interp, argc, argv);

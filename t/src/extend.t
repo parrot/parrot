@@ -440,11 +440,11 @@ main(int argc, char *argv[])
 static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
-    PackFile *pf = Parrot_readbc(interp, "$temp_pbc");
+    PackFile *pf = Parrot_pbc_read(interp, "$temp_pbc", 0);
     STRING   *name = Parrot_str_new_constant(interp, "_sub1");
     PMC      *sub, *arg;
 
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
     sub = Parrot_find_global_cur(interp, name);
     Parrot_call_sub(interp, sub, "v");
     Parrot_eprintf(interp, "back\\n");
@@ -514,12 +514,12 @@ main(int argc, char *argv[])
 static opcode_t*
 the_test(PARROT_INTERP, opcode_t *cur_op, opcode_t *start)
 {
-    PackFile         *pf   = Parrot_readbc(interp, "$temp_pbc");
+    PackFile         *pf   = Parrot_pbc_read(interp, "$temp_pbc", 0);
     STRING           *name = Parrot_str_new_constant(interp, "_sub1");
     PMC              *sub;
     Parrot_runloop jump_point;
 
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
     sub = Parrot_find_global_cur(interp, name);
 
     if (setjmp(jump_point.resume)) {
@@ -602,14 +602,14 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    packfile = Parrot_readbc( interp, "$temp_pbc" );
+    packfile = Parrot_pbc_read( interp, "$temp_pbc", 0 );
 
     if (!packfile) {
         printf( "Boo\\n" );
         return 1;
     }
 
-    Parrot_loadbc( interp, packfile );
+    Parrot_pbc_load( interp, packfile );
     Parrot_runcode( interp, 1, code );
 
     Parrot_destroy( interp );
@@ -684,8 +684,8 @@ main(int argc, char* argv[])
         return 1;
     }
 
-    pf = Parrot_readbc( interp, "$temp_pbc" );
-    Parrot_loadbc( interp, pf );
+    pf = Parrot_pbc_read( interp, "$temp_pbc", 0 );
+    Parrot_pbc_load( interp, pf );
 
     sub      = Parrot_find_global_cur( interp, Parrot_str_new_constant( interp, "add" ) );
     result   = Parrot_call_sub( interp, sub, "III", 100, 200 );

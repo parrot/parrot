@@ -80,13 +80,13 @@ main(int argc, char *argv[])
 
     filename = parseflags(interp, &argc, &argv);
 
-    pf = Parrot_readbc(interp, filename);
+    pf = Parrot_pbc_read(interp, filename, 0);
 
     if (!pf) {
         return 1;
     }
 
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
     Parrot_runcode(interp, argc, argv);
     Parrot_destroy(interp);
 

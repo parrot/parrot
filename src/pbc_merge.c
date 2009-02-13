@@ -228,7 +228,7 @@ help(PARROT_INTERP)
 =item C<static PackFile* pbc_merge_loadpbc>
 
 This function loads a PBC file and unpacks it. We can't
-use Parrot_readbc because that is specified to also
+use Parrot_pbc_read because that is specified to also
 fixup the segments, which we don't want.
 
 =cut
@@ -270,7 +270,7 @@ pbc_merge_loadpbc(PARROT_INTERP, ARGIN(const char *fullname))
         Parrot_exit(interp, 1);
     }
 
-    /* Read in program. Nabbed from Parrot_readpbc. */
+    /* Read in program. Nabbed from Parrot_pbc_read. */
     chunk_size   = program_size > 0 ? program_size : 1024;
     program_code = (char *)mem_sys_allocate(chunk_size);
     wanted       = program_size;

@@ -20,8 +20,8 @@ embed.pod - Parrot embedding system
             return 1;
         }
 
-        pf = Parrot_readbc(interp, "foo.pbc");
-        Parrot_loadbc(interp, pf);
+        pf = Parrot_pbc_read(interp, "foo.pbc", 0);
+        Parrot_pbc_load(interp, pf);
         Parrot_runcode(interp, argc, argv);
 
         Parrot_destroy(interp);
@@ -242,12 +242,12 @@ Initializes the IMCC subsystem.  Required for compiling PIR.
 
 =over 4
 
-=item C<Parrot_PackFile Parrot_readbc(PARROT_INTERP, const char *path)>
+=item C<Parrot_PackFile Parrot_pbc_read(PARROT_INTERP, const char *path, const int debug)>
 
 Reads Parrot bytecode or PIR from the file referenced by C<path>.  Returns
-a packfile structure for use by C<Parrot_loadbc()>.
+a packfile structure for use by C<Parrot_pbc_load()>. C<debug> should be 0.
 
-=item C<void Parrot_loadbc(PARROT_INTERP, Parrot_PackFile pf)>
+=item C<void Parrot_pbc_load(PARROT_INTERP, Parrot_PackFile pf)>
 
 Loads a packfile into the interpreter.  After this operation the interpreter
 is ready to run the bytecode in the packfile.

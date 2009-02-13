@@ -208,7 +208,7 @@ should be an Exception PMC instead.
 I<Note: I suppose NULL would work as well; it might be more C-like.  Continue
 considering.>
 
-I<Note also: the current C<Parrot_readbc()> and C<Parrot_loadbc()> exposes the
+I<Note also: the current C<Parrot_pbc_read()> and C<Parrot_pbc_load()> exposes the
 details of packfiles to the external API and uses two operations to perform a
 single logical operation.>
 

@@ -84,7 +84,7 @@ CODE:
 
     interp = Parrot_new( (Parrot_Interp)parent );
     pf     = PackFile_new( interp, 0 );
-    Parrot_loadbc( interp, pf );
+    Parrot_pbc_load( interp, pf );
 
     /* Can't use RETVAL/OUTPUT here because typemap loses class variable */
     ST(0)  = sv_newmortal();
@@ -100,13 +100,13 @@ PREINIT:
     Parrot_PackFile pf;
 CODE:
     real_interp = interp->interp;
-    pf          = Parrot_readbc( real_interp, filename );
+    pf          = Parrot_pbc_read( real_interp, filename, 0 );
 
     if (!pf)
         Perl_croak( aTHX_
         "File '%s' not found in $parrot_interpreter->load_file()", filename );
 
-    Parrot_loadbc( real_interp, pf );
+    Parrot_pbc_load( real_interp, pf );
     RETVAL = 1;
 OUTPUT:
     RETVAL

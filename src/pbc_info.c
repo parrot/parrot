@@ -70,7 +70,7 @@ main(int argc, char *argv[])
 
     interp = Parrot_new(NULL);
 
-    pf = Parrot_readbc(interp, argv[1]);
+    pf = Parrot_pbc_read(interp, argv[1], 0);
 
     /*
      * add some more segments

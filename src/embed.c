@@ -374,7 +374,7 @@ Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
 
 /*
 
-=item C<PackFile * Parrot_readbc>
+=item C<PackFile * Parrot_pbc_read>
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
@@ -385,7 +385,7 @@ Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PackFile *
-Parrot_readbc(PARROT_INTERP, ARGIN_NULLOK(const char *fullname))
+Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int debug)
 {
     FILE     *io        = NULL;
     INTVAL    is_mapped = 0;
@@ -528,6 +528,9 @@ again:
 
     pf = PackFile_new(interp, is_mapped);
 
+    /* Make the cmdline option available to the unpackers */
+    pf->options = debug;
+
     if (!PackFile_unpack(interp, pf, (opcode_t *)program_code,
             (size_t)program_size)) {
         Parrot_io_eprintf(interp, "Parrot VM: Can't unpack packfile %s.\n",
@@ -556,9 +559,9 @@ again:
 
 /*
 
-=item C<void Parrot_loadbc>
+=item C<void Parrot_pbc_load>
 
-Loads the C<PackFile> returned by C<Parrot_readbc()>.
+Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
 =cut
 
@@ -566,7 +569,7 @@ Loads the C<PackFile> returned by C<Parrot_readbc()>.
 
 PARROT_EXPORT
 void
-Parrot_loadbc(PARROT_INTERP, NOTNULL(PackFile *pf))
+Parrot_pbc_load(PARROT_INTERP, NOTNULL(PackFile *pf))
 {
     if (pf == NULL) {
         Parrot_io_eprintf(interp, "Invalid packfile\n");
@@ -1237,7 +1240,7 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     pf->cur_cs->base.data = program_code;
     pf->cur_cs->base.size = 2;
 
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
 
     run_native = func;
 

@@ -8,7 +8,7 @@ pbc_disassemble - Parrot disassembler
 
 =head1 SYNOPSIS
 
-    pbc_disassemble [-bh?] [-o outfile] [file.pbc]
+    pbc_disassemble [-bdh?] [-o outfile] [file.pbc]
 
 =head1 DESCRIPTION
 
@@ -52,6 +52,9 @@ static void help(void)
     printf("pbc_disassemble -o converted.pasm file.pbc\n\n");
     printf("  -b\t\t ... bare .pasm without header and left column\n");
     printf("  -h\t\t ... dump Constant-table header only\n");
+#if TRACE_PACKFILE
+    printf("  -d\t\t ... debug\n");
+#endif
     printf("  -o filename\t ... output to filename\n");
     exit(EXIT_SUCCESS);
 }
@@ -60,6 +63,7 @@ static struct longopt_opt_decl options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
     { '?', '?', OPTION_optional_FLAG, { "--help" } },
     { 'b', 'b', OPTION_optional_FLAG, { "--bare" } },
+    { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } }
 };
 
@@ -81,6 +85,7 @@ main(int argc, const char *argv[])
     Parrot_Interp interp;
     const char *outfile = NULL;
     int option = 0;
+    int debug = 0;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
 
@@ -102,6 +107,9 @@ main(int argc, const char *argv[])
             case 'o':
                 outfile = opt.opt_arg;
                 break;
+            case 'd':
+                debug = 1;
+                break;
             case '?':
             default:
                 help();
@@ -114,14 +122,14 @@ main(int argc, const char *argv[])
     argc -= opt.opt_index;
     argv += opt.opt_index;
 
-    pf = Parrot_readbc(interp, argc ? *argv : "-");
+    pf = Parrot_pbc_read(interp, argc ? *argv : "-", debug);
 
     if (!pf) {
         printf("Can't read PBC\n");
         return 1;
     }
 
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
 
     do_dis(interp, outfile, option);
 
@@ -160,7 +168,7 @@ Florian Ragwitz: Moved POD documentation that's not necessary to know how to
 actually run the disassembler to normal C comments (Wed, 16 Nov 2005).
 
 Reini Urban: Renamed from disassemble to pbc_disassemble (2008-07-03).
-             Add options: help, -h, -o, bare (2009-01-29)
+             Add options: help, -h, -o, --debug, --bare (2009-01-29)
 
 =cut
 

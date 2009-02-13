@@ -60,24 +60,31 @@ static void cvt_num12_num8_le(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_be_4(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_be_8(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_le_4(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_mixed_be(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
@@ -107,7 +114,9 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-#define TRACE_PACKFILE 0
+#if TRACE_PACKFILE
+void Parrot_trace_eprintf(ARGIN(const char *s), ...);
+#endif
 
 /*
  * round val up to whole size, return result in bytes
@@ -236,6 +245,7 @@ Fetches an C<opcode_t> operation in little-endian format.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t
 fetch_op_test(ARGIN(const unsigned char *b))
 {
@@ -262,6 +272,7 @@ Fetch an opcode and convert to LE
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t
 fetch_op_mixed_le(ARGIN(const unsigned char *b))
 {
@@ -298,6 +309,7 @@ C<OPCODE_T_SIZE> macro, and proceeds accordingly.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t
 fetch_op_mixed_be(ARGIN(const unsigned char *b))
 {
@@ -332,6 +344,7 @@ Fetches a 4-byte big-endian opcode.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t
 fetch_op_be_4(ARGIN(const unsigned char *b))
 {
@@ -366,6 +379,7 @@ Fetches an 8-byte big-endian opcode.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t
 fetch_op_be_8(ARGIN(const unsigned char *b))
 {
@@ -396,6 +410,7 @@ Fetches a 4-byte little-endian opcode
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t
 fetch_op_le_4(ARGIN(const unsigned char *b))
 {
@@ -430,6 +445,7 @@ Fetches an 8-byte little-endian opcode
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static opcode_t
 fetch_op_le_8(ARGIN(const unsigned char *b))
 {
@@ -461,6 +477,7 @@ Fetches an C<opcode_t> from the stream, converting byteorder if needed.
 */
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 opcode_t
 PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream))
 {
@@ -470,9 +487,7 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
         return *(*stream)++;
     o = (pf->fetch_op)(*((const unsigned char **)stream));
     *((const unsigned char **) (stream)) += pf->header->wordsize;
-#if TRACE_PACKFILE
-    Parrot_io_eprintf(NULL, "  PF_fetch_opcode: 0x%lx (%ld)\n", o, o);
-#endif
+    TRACE_PRINTF_VAL(("  PF_fetch_opcode: 0x%lx (%ld)\n", o, o));
     return o;
 }
 
@@ -606,35 +621,31 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     FLOATVAL f;
     double d;
     if (!pf || !pf->fetch_nv) {
-#if TRACE_PACKFILE
-        Parrot_io_eprintf(NULL, "PF_fetch_number: Native [%d bytes]\n",
-                sizeof (FLOATVAL));
-#endif
+        TRACE_PRINTF(("PF_fetch_number: Native [%d bytes]\n",
+                      sizeof (FLOATVAL)));
         memcpy(&f, (const char*)*stream, sizeof (FLOATVAL));
+        TRACE_PRINTF_VAL(("PF_fetch_number: %f\n", f));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
         return f;
     }
     f = (FLOATVAL) 0;
-#if TRACE_PACKFILE
-    Parrot_io_eprintf(NULL, "PF_fetch_number: Byteordering..\n");
-#endif
-    /* Here is where the size transforms get messy.
-       Floattype 0 = IEEE-754 8 byte double
-       Floattype 1 = x86 little endian 12 byte long double
-    */
-    if (NUMVAL_SIZE == 8 && pf->header->floattype) {
+    TRACE_PRINTF(("PF_fetch_number: Byteordering..\n"));
+    /* 12->8 has a messy cast. */
+    if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_12) {
         (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
         f = d;
+        TRACE_PRINTF_VAL(("PF_fetch_number: cast %f\n", f));
     }
     else {
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
+        TRACE_PRINTF_VAL(("PF_fetch_number: %f\n", f));
     }
-    if (pf->header->floattype) {
-        *((const unsigned char **) (stream)) += 12;
-    }
-    else {
+    if (pf->header->floattype == FLOATTYPE_8) {
         *((const unsigned char **) (stream)) += 8;
+    }
+    else if (pf->header->floattype == FLOATTYPE_12) {
+        *((const unsigned char **) (stream)) += 12;
     }
     return f;
 }
@@ -718,21 +729,19 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
     /* These may need to be separate */
     size = (size_t)PF_fetch_opcode(pf, cursor);
-
-#if TRACE_PACKFILE
-    Parrot_io_eprintf(NULL, "PF_fetch_string(): flags are 0x%04x...\n", flags);
-    Parrot_io_eprintf(NULL, "PF_fetch_string(): charset_nr is %ld...\n",
-           charset_nr);
-    Parrot_io_eprintf(NULL, "PF_fetch_string(): size is %ld...\n", size);
-#endif
+    TRACE_PRINTF(("PF_fetch_string(): flags are 0x%04x...\n", flags));
+    TRACE_PRINTF(("PF_fetch_string(): charset_nr is %ld...\n",
+                  charset_nr));
+    TRACE_PRINTF(("PF_fetch_string(): size is %ld...\n", size));
 
     charset_name = Parrot_charset_c_name(interp, charset_nr);
     s = string_make(interp, (const char *)*cursor, size, charset_name, flags);
 
-#if TRACE_PACKFILE == 3
-    Parrot_io_eprintf(NULL, "PF_fetch_string(): string is: ");
-    Parrot_io_putps(interp, Parrot_io_STDERR(interp), s);
-    Parrot_io_eprintf(NULL, "\n");
+#if TRACE_PACKFILE == 2
+    if (pf->options & 3) {
+        /* print only printable characters */
+        Parrot_io_eprintf(NULL, "PF_fetch_string(): string is '%s'\n", s->strstart);
+    }
 #endif
 
 /*    s = string_make(interp, *cursor, size,
@@ -740,9 +749,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
                                flags); */
 
     size = ROUND_UP_B(size, wordsize);
-#if TRACE_PACKFILE == 2
-    Parrot_io_eprintf(NULL, "PF_fetch_string(): round size up to %ld.\n", size);
-#endif
+    TRACE_PRINTF(("PF_fetch_string(): round size up to %ld.\n", size));
     *((const unsigned char **) (cursor)) += size;
     return s;
 }
@@ -766,7 +773,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     opcode_t padded_size = s->bufused;
     char *charcursor;
 
-#if TRACE_PACKFILE == 2
+#if TRACE_PACKFILE == 3
     Parrot_io_eprintf(NULL, "PF_store_string(): size is %ld...\n", s->bufused);
 #endif
 

@@ -179,19 +179,19 @@ main(int argc, char *argv[])
     ext      = strrchr(filename, '.');
 
     if (ext && STREQ(ext, ".pbc")) {
-        Parrot_PackFile pf = Parrot_readbc(interp, filename);
+        Parrot_PackFile pf = Parrot_pbc_read(interp, filename, 0);
 
         if (!pf)
             return 1;
 
-        Parrot_loadbc(interp, pf);
+        Parrot_pbc_load(interp, pf);
         PackFile_fixup_subs(interp, PBC_MAIN, NULL);
     }
     else {
         Parrot_PackFile pf        = PackFile_new(interp, 0);
         int             pasm_file = 0;
 
-        Parrot_loadbc(interp, pf);
+        Parrot_pbc_load(interp, pf);
 
         IMCC_push_parser_state(interp);
         IMCC_INFO(interp)->state->file = filename;

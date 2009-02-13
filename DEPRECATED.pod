@@ -150,6 +150,11 @@ Subs marked with C<:vtable> or C<:method> flags are no longer given a
 namespace entry by default.  Use the C<:nsentry> flag to cause this
 to happen.  See RT #60586 and RT #53302.
 
+=item Parrot_readbc, Parrot_loadbc. [post 0.8.1]
+
+They have been renamed to C<Parrot_pbc_read>, C<Parrot_pbc_load>.
+C<Parrot_pbc_read> has one third int argument. See TT #266.
+
 =back
 
 =head1 Compiler tools

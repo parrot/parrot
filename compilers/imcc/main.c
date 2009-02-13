@@ -990,7 +990,7 @@ compile_to_bytecode(PARROT_INTERP,
               opt_desc, opt_level);
 
     pf = PackFile_new(interp, 0);
-    Parrot_loadbc(interp, pf);
+    Parrot_pbc_load(interp, pf);
 
     IMCC_push_parser_state(interp);
     IMCC_INFO(interp)->state->file = sourcefile;
@@ -1094,11 +1094,11 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
     /* If the input file is Parrot bytecode, then we simply read it
        into a packfile, which Parrot then loads */
     if (STATE_LOAD_PBC(interp)) {
-        PackFile * const pf = Parrot_readbc(interp, sourcefile);
+        PackFile * const pf = Parrot_pbc_read(interp, sourcefile, 0);
 
         if (!pf)
             IMCC_fatal_standalone(interp, 1, "main: Packfile loading failed\n");
-        Parrot_loadbc(interp, pf);
+        Parrot_pbc_load(interp, pf);
     }
     else
         compile_to_bytecode(interp, sourcefile, output_file);
@@ -1116,10 +1116,10 @@ imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
             PackFile *pf;
 
             IMCC_info(interp, 1, "Loading %s\n", output_file);
-            pf = Parrot_readbc(interp, output_file);
+            pf = Parrot_pbc_read(interp, output_file, 0);
             if (!pf)
                 IMCC_fatal_standalone(interp, 1, "Packfile loading failed\n");
-            Parrot_loadbc(interp, pf);
+            Parrot_pbc_load(interp, pf);
             SET_STATE_LOAD_PBC(interp);
         }
     }
