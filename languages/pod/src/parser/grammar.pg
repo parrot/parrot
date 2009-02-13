@@ -148,7 +148,7 @@ regex literal_paragraph {
     ^^
     [ <.pod_ws> <formatted_text> \n ]+
     <.blank_line>
-
+    {*}
 }
 
 token block_name {
@@ -180,7 +180,7 @@ regex format_code {
     | '<<'   <formatted_text> '>>'
     | '<'    <formatted_text> '>'
     ]
-
+    {*}
 }
 
 token pod_ws {
