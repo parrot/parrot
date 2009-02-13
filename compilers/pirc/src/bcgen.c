@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008-2009, The Perl Foundation.
+ * Copyright (C) 2008-2009, Parrot Foundation.
  */
 #include <stdio.h>
 #include <assert.h>

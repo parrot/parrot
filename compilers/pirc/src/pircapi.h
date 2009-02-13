@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2009, The Perl Foundation.
+ * Copyright (C) 2009, Parrot Foundation.
  */
 
 #ifndef PARROT_PIR_PIRCAPI_H_GUARD

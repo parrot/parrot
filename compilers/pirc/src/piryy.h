@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008, The Perl Foundation.
+ * Copyright (C) 2008-2009, Parrot Foundation.
  */
 
 /* This file declared parser/lexer related functions, so that any changes
