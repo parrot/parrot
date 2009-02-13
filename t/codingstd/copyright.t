@@ -41,12 +41,12 @@ my @make_files = $DIST->get_make_language_files();
 my @all_files  = ( @c_files, @perl_files, @make_files );
 
 my @files = @ARGV ? <@ARGV> : @all_files;
-my ( @no_copyright_files, @outdated_copyright_files );
+my ( @no_copyright_files, @bad_format_copyright_files );
 
 my @gmtime       = gmtime(time);
 my $current_year = $gmtime[5] + 1900;
 my $copyright_text =
-    "Copyright \\(C\\) (\\d{4}\\-$current_year|$current_year), Parrot Foundation.";
+    "Copyright \\(C\\) (\\d{4}\\-\\d{4}|\\d{4}), Parrot Foundation.";
 
 foreach my $file (@files) {
 
@@ -64,7 +64,7 @@ foreach my $file (@files) {
 
     # is the copyright text correct?
     if ( $buf !~ m{$copyright_text}m ) {
-        push @outdated_copyright_files, $path;
+        push @bad_format_copyright_files, $path;
     }
 }
 
@@ -75,23 +75,29 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
         $/ => "No copyright statement found in " . scalar @no_copyright_files . " files:",
     @no_copyright_files,
     "The copyright statement should read something like:",
-    "  Copyright (C) C<start-year>-$current_year, The Perl Foundation.",
+    "  Copyright (C) C<start-year>-C<last-year-modified>, Parrot Foundation.",
     "To find the C<start-year>, use a command such as:",
-    "  svn log C<filename> | grep 'lines' | tail -n 1"
+    "  svn log C<filename> | grep 'lines' | tail -n 1",
+    "To find the C<last-year-modified>, use a command such as:",
+    "  svn log C<filename> | grep 'lines' | head -n 1"
     );
 
 SKIP:
 {
-    skip( "Waiting for decision as to whether copyright dates are necessary", 1 );
-    ok( !scalar(@outdated_copyright_files), 'Copyright statement up to date' )
+    skip( "Waiting for full transistion to Parrot Foundation", 1 );
+    ok( !scalar(@bad_format_copyright_files), 'Copyright statement in the right format' )
         or diag(
         join
-            $/ => "Outdated copyright statement found in "
-            . scalar @outdated_copyright_files
+            $/ => "Bad format in copyright statement found in "
+            . scalar @bad_format_copyright_files
             . " files:",
-        @outdated_copyright_files,
+        @bad_format_copyright_files,
         "Please update to read something like:",
-        "  Copyright (C) xxxx-$current_year, The Perl Foundation."
+        "  Copyright (C) C<start-year>-C<last-year-modified>, Parrot Foundation.",
+        "To find the C<start-year>, use a command such as:",
+        "  svn log C<filename> | grep 'lines' | tail -n 1",
+        "To find the C<last-year-modified>, use a command such as:",
+        "  svn log C<filename> | grep 'lines' | head -n 1"
         );
 }
 
