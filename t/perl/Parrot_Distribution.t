@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More tests => 29;
+use Test::More tests => 28;
 use File::Spec;
 
 =head1 NAME
