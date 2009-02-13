@@ -5,6 +5,9 @@ New in February 2009 release
 - Languages
   + Lua
     - left the nest and is now at http://github.com/fperrad/lua/
+  + Rakudo
+    - left the nest and is now at http://github.com/rakudo/rakudo/
+    - build instructions can be found at http://tinyurl.com/rakudo
 - Cleanup
   + removed Zcode implementation
 - Tools
