@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
 =head1 TITLE
@@ -61,7 +61,7 @@ print $OUT qq{
 [Setup]
 AppName=Parrot
 AppVerName=Parrot-$version
-AppPublisher=The Parrot Foundation
+AppPublisher=Parrot Foundation
 AppPublisherURL=http://www.parrot.org/
 AppSupportURL=http://www.parrot.org/
 AppUpdatesURL=http://www.parrot.org/
