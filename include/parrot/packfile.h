@@ -271,6 +271,7 @@ typedef struct PackFile {
 
     PackFile_ByteCode  * cur_cs;   /* used during PF loading */
 
+    INTVAL    options;
     INTVAL    need_wordsize;
     INTVAL    need_endianize;
 

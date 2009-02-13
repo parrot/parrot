@@ -8,13 +8,15 @@ pbc_disassemble - Parrot disassembler
 
 =head1 SYNOPSIS
 
-    pbc_disassemble file.pbc
+    pbc_disassemble [-bh?] [-o outfile] [file.pbc]
 
 =head1 DESCRIPTION
 
 This uses the C<Parrot_disassemble()> function from F<src/embed.c>,
 which in turn uses the C<PDB_disassemble()> function from
 F<src/debug.c>.
+
+Without non-option arguments it reads the pbc from STDIN.
 
 =head2 Functions
 
@@ -30,7 +32,36 @@ F<src/debug.c>.
 #include <stdlib.h>
 #include <ctype.h>
 
-static void do_dis(Parrot_Interp);
+static void do_dis(Parrot_Interp, const char *, Parrot_disassemble_options);
+
+/*
+
+=item C<static void help(void)>
+
+Print out the user help info.
+
+=cut
+
+*/
+
+static void help(void)
+{
+    printf("pbc_disassemble - dump or convert parrot bytecode (PBC) files\n");
+    printf("usage:\n");
+    printf("pbc_disassemble [-bh] [--bare|--header-only] [file.pbc]\n");
+    printf("pbc_disassemble -o converted.pasm file.pbc\n\n");
+    printf("  -b\t\t ... bare .pasm without header and left column\n");
+    printf("  -h\t\t ... dump Constant-table header only\n");
+    printf("  -o filename\t ... output to filename\n");
+    exit(EXIT_SUCCESS);
+}
+
+static struct longopt_opt_decl options[] = {
+    { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
+    { '?', '?', OPTION_optional_FLAG, { "--help" } },
+    { 'b', 'b', OPTION_optional_FLAG, { "--bare" } },
+    { 'o', 'o', OPTION_required_FLAG, { "--output" } }
+};
 
 /*
 
@@ -44,45 +75,62 @@ command-line and disassembles it.
 */
 
 int
-main(int argc, char *argv[])
+main(int argc, const char *argv[])
 {
-    Parrot_Interp interp;
-    char *filename;
     Parrot_PackFile pf;
+    Parrot_Interp interp;
+    const char *outfile = NULL;
+    int option = 0;
+    struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
+    int status;
 
     interp = Parrot_new(NULL);
-
     if (!interp) {
         return 1;
     }
-
-    /* set the top of the stack so GC can trace it for GC-able pointers
-     * see trace_system_areas() in src/cpu_dep.c */
-    interp->lo_var_ptr = &interp;
-
-    if (argc != 2) {
-        fprintf(stderr, "Usage: pbc_disassemble programfile \n");
-        Parrot_exit(interp, 1);
+    /* init and set top of stack */
+    Parrot_init_stacktop(interp, &status);
+    while ((status = longopt_get(interp,
+                    argc, argv, options, &opt)) > 0) {
+        switch (opt.opt_id) {
+            case 'h':
+                option += enum_DIS_HEADER;
+                break;
+            case 'b':
+                option += enum_DIS_BARE;
+                break;
+            case 'o':
+                outfile = opt.opt_arg;
+                break;
+            case '?':
+            default:
+                help();
+                break;
+        }
     }
+    if (status == -1) {
+        help();
+    }
+    argc -= opt.opt_index;
+    argv += opt.opt_index;
 
-    filename = argv[1];
-
-    pf = Parrot_readbc(interp, filename);
+    pf = Parrot_readbc(interp, argc ? *argv : "-");
 
     if (!pf) {
+        printf("Can't read PBC\n");
         return 1;
     }
 
     Parrot_loadbc(interp, pf);
 
-    do_dis(interp);
+    do_dis(interp, outfile, option);
 
     Parrot_exit(interp, 0);
 }
 
 /*
 
-=item C<static void do_dis(PARROT_INTERP)>
+=item C<static void do_dis(PARROT_INTERP, outfile, options)>
 
 Do the disassembling.
 
@@ -91,9 +139,9 @@ Do the disassembling.
 */
 
 static void
-do_dis(PARROT_INTERP)
+do_dis(PARROT_INTERP, const char *outfile, Parrot_disassemble_options options)
 {
-    Parrot_disassemble(interp);
+    Parrot_disassemble(interp, outfile, options);
 }
 
 /*
@@ -112,6 +160,7 @@ Florian Ragwitz: Moved POD documentation that's not necessary to know how to
 actually run the disassembler to normal C comments (Wed, 16 Nov 2005).
 
 Reini Urban: Renamed from disassemble to pbc_disassemble (2008-07-03).
+             Add options: help, -h, -o, bare (2009-01-29)
 
 =cut
 

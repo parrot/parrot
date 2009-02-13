@@ -1041,7 +1041,7 @@ print_constant_table(PARROT_INTERP) {
     INTVAL i;
 
     /* TODO: would be nice to print the name of the file as well */
-    Parrot_io_printf(interp, "Constant-table\n");
+    Parrot_io_printf(interp, "=head1 Constant-table\n\n");
 
     for (i = 0; i < numconstants; ++i) {
         PackFile_Constant *c = interp->code->const_table->constants[i];
@@ -1111,7 +1111,7 @@ print_constant_table(PARROT_INTERP) {
         }
     }
 
-    Parrot_io_printf(interp, "\n");
+    Parrot_io_printf(interp, "\n=cut\n\n");
 }
 
 
@@ -1129,7 +1129,7 @@ This is used by the Parrot disassembler.
 
 PARROT_EXPORT
 void
-Parrot_disassemble(PARROT_INTERP)
+Parrot_disassemble(PARROT_INTERP, const char *outfile, Parrot_disassemble_options options)
 {
     PDB_line_t *line;
     PDB_t      *pdb             = mem_allocate_zeroed_typed(PDB_t);
@@ -1147,11 +1147,15 @@ Parrot_disassemble(PARROT_INTERP)
     debugs = (interp->code->debugs != NULL);
 
     print_constant_table(interp);
+    if (options & enum_DIS_HEADER)
+        return;
 
-    Parrot_io_printf(interp, "%12s-%12s", "Seq_Op_Num", "Relative-PC");
+    if (!(options & enum_DIS_BARE))
+        Parrot_io_printf(interp, "# %12s-%12s", "Seq_Op_Num", "Relative-PC");
 
     if (debugs) {
-        Parrot_io_printf(interp, " %6s:\n", "SrcLn#");
+        if (!(options & enum_DIS_BARE))
+            Parrot_io_printf(interp, " %6s:\n", "SrcLn#");
         num_mappings = interp->code->debugs->num_mappings;
     }
     else {
@@ -1169,16 +1173,17 @@ Parrot_disassemble(PARROT_INTERP)
             if (op_code_seq_num == interp->code->debugs->mappings[curr_mapping]->offset) {
                 const int filename_const_offset =
                     interp->code->debugs->mappings[curr_mapping]->filename;
-                Parrot_io_printf(interp, "Current Source Filename %Ss\n",
+                Parrot_io_printf(interp, "# Current Source Filename '%Ss'\n",
                         interp->code->const_table->constants[filename_const_offset]->u.string);
                 curr_mapping++;
             }
         }
 
-        Parrot_io_printf(interp, "%012i-%012i",
-                op_code_seq_num, line->opcode - interp->code->base.data);
+        if (!(options & enum_DIS_BARE))
+            Parrot_io_printf(interp, "%012i-%012i",
+                             op_code_seq_num, line->opcode - interp->code->base.data);
 
-        if (debugs)
+        if (debugs && !(options & enum_DIS_BARE))
             Parrot_io_printf(interp, " %06i: ",
                     interp->code->debugs->base.data[op_code_seq_num]);
 

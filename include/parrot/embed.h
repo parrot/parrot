@@ -22,6 +22,11 @@
 
 typedef int Parrot_warnclass;
 
+typedef enum {
+    enum_DIS_BARE      = 1,
+    enum_DIS_HEADER    = 2
+} Parrot_disassemble_options;
+
 PARROT_EXPORT Parrot_Interp Parrot_new(Parrot_Interp parent);
 
 PARROT_EXPORT void Parrot_init_stacktop(Parrot_Interp, void *);
@@ -58,7 +63,7 @@ PARROT_EXPORT void Parrot_destroy(Parrot_Interp);
 
 PARROT_EXPORT Parrot_Opcode * Parrot_debug(Parrot_Interp, Parrot_Interp, Parrot_Opcode *pc);
 
-PARROT_EXPORT void Parrot_disassemble(Parrot_Interp);
+PARROT_EXPORT void Parrot_disassemble(Parrot_Interp, const char *outfile, Parrot_disassemble_options options);
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
