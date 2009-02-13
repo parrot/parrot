@@ -2,7 +2,33 @@
 
 New in February 2009 release
 
+- Implementation
+  + Support for portable 'Inf' and 'NaN'
+  + pbc_disassemble prints constants in constants table
+  + Removed (incomplete) Bignum implementation
+  + Pair is now a dynamic loadable PMC
+- Documentation
+  + Book
+    - updates to Chapter 2 (getting started)
+    - updates to Chapter 3 (PIR basics)
+    - updates to Chapter 4 (PIR subroutines)
+    - updates to Chapter 10 (HLLs)
+    - updates to Chapter 12 (opcodes)
+  + Function documentation
+  + Pod documentation style modernized; no longer Perl 5 style.
+  + PMC has an additional acronym: Poly Morphic Container
+  + The DOD (Dead Object Detection) acronym is no longer used;
+    use 'GC' to refer to the Garbage Collector component.
+- Compilers
+  + IMCC
+    - :named flag can now take string registers as argument
+    - A single '=cut' directive is now ignored (without initial Pod directive)
+    - :vtable subs now have proper access to 'self' pseudo variable
 - Languages
+  + add new 'Pod' documentation parser
+  + ECMAScript
+    + add 'quit', 'readline' builtins
+    + fix 'Boolean' type and 'print' builtin
   + Lua
     - left the nest and is now at http://github.com/fperrad/lua/
   + Rakudo
@@ -12,9 +38,15 @@ New in February 2009 release
   + removed Zcode implementation
 - Deprecations
   + Parrot_readbc, Parrot_loadbc renamed to Parrot_pbc_read, Parrot_pbc_load.
+  + .HLL_map directive in favour of 'hll_map' method on Parrot interpreter
 - Tools
   + pbc_disassemble options added
   + pbc_dump renamed from pdump
+- Miscellaneous
+  + Parrot is now Copyright Parrot Foundation
+  + Parrot's SVN repository is now hosted at https://svn.parrot.org
+  + Various code cleanups and bug fixes
+
 
 New in January 2009 release (0.9.0)
 - Implementation
