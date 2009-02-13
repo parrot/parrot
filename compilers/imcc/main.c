@@ -4,7 +4,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2003-2008, The Perl Foundation.
+ * Copyright (C) 2003-2009, Parrot Foundation.
  */
 
 /*
@@ -269,7 +269,7 @@ Parrot_version(PARROT_INTERP)
     ASSERT_ARGS(Parrot_version)
     printf("This is parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
-    printf("Copyright (C) 2001-2008, The Perl Foundation.\n\
+    printf("Copyright (C) 2001-2009, Parrot Foundation.\n\
 \n\
 This code is distributed under the terms of the Artistic License 2.0.\
 \n\
