@@ -658,7 +658,6 @@ sub perl_script_file_directories {
             APL/tools
             BASIC/compiler BASIC/interpreter
             dotnet dotnet/build dotnet/tools
-            lua
             pipp
             python
             regex
@@ -712,7 +711,6 @@ sub perl_module_file_directories {
             dotnet/build/SRM dotnet/t
             jako/lib/Jako
             jako/lib/Jako/Construct
-            lua/Lua lua/t/Parrot/Test
             parrot_compiler/lib/Parrot/Test
             perl6/t/01-sanity
             pipp/lib/Parrot/Test pipp/lib/Parrot/Test/Pipp
