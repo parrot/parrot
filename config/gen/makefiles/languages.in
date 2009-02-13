@@ -22,7 +22,7 @@ LANGUAGES = \
     ecmascript \
     forth \
     jako json \
-    lisp lolcode lua \
+    lisp lolcode \
     ook \
     parrot_compiler pheme PIR pipp punie pynie \
     regex \
@@ -76,6 +76,8 @@ help:
 	@echo ""
 	@echo "  co-lazy-k:     Try to fetch lazy-k"
 	@echo ""
+	@echo "  co-lua:        Try to fetch lua"
+	@echo ""
 	@echo "  co-m4:         Try to fetch Parrot m4"
 	@echo ""
 	@echo "  co-pjs:        Try to fetch PJS"
@@ -100,6 +102,8 @@ help:
 	@echo "  up-hq9plus:    Try to update HQ9+"
 	@echo ""
 	@echo "  up-lazy-k:     Try to update lazy-k"
+	@echo ""
+	@echo "  up-lua:        Try to update lua"
 	@echo ""
 	@echo "  up-m4:         Try to update Parrot m4"
 	@echo ""
@@ -133,7 +137,7 @@ test-separate: all \
     ecmascript.test \
     forth.test \
     jako.test json.test \
-    lisp.test lolcode.test lua.test \
+    lisp.test lolcode.test \
     ook.test \
     parrot_compiler.test pheme.test PIR.test pipp.test punie.test pynie.test \
     regex.test \
@@ -149,7 +153,7 @@ clean: \
     forth.clean \
     jako.clean json.clean \
     lisp.clean \
-    lolcode.clean lua.clean \
+    lolcode.clean \
     ook.clean \
     parrot_compiler.clean pheme.clean PIR.clean pipp.clean punie.clean pynie.clean \
     regex.clean \
@@ -164,7 +168,7 @@ realclean: \
     ecmascript.realclean \
     forth.realclean \
     jako.realclean json.realclean \
-    lisp.realclean lolcode.realclean lua.realclean \
+    lisp.realclean lolcode.realclean \
     ook.realclean \
     parrot_compiler.realclean pheme.realclean PIR.realclean pipp.realclean pod.realclean punie.realclean pynie.realclean \
     regex.realclean \
@@ -337,16 +341,6 @@ lolcode.clean:
 lolcode.realclean:
 	- $(MAKE) lolcode realclean
 
-lua: lua.dummy
-lua.dummy:
-	- $(MAKE) lua
-lua.test:
-	- $(MAKE) lua test
-lua.clean:
-	- $(MAKE) lua clean
-lua.realclean:
-	- $(MAKE) lua realclean
-
 ook : ook.dummy
 ook.dummy:
 	- $(MAKE) ook
@@ -470,9 +464,9 @@ urm.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-gil co-hq9plus co-lazy-k co-m4 co-markdown co-pjs \
+co-all: co-eclectus co-gil co-hq9plus co-lazy-k co-lua co-m4 co-markdown co-pjs \
     co-primitivearc co-rakudo co-shakespeare co-tcl co-unlambda co-wmlscript
-up-all: up-eclectus up-gil up-hq9plus up-lazy-k up-m4 up-markdown up-pjs \
+up-all: up-eclectus up-gil up-hq9plus up-lazy-k up-lua up-m4 up-markdown up-pjs \
     up-primitivearc up-rakudo up-shakespeare up-tcl up-unlambda up-wmlscript
 
 co-eclectus:
@@ -498,6 +492,12 @@ co-lazy-k:
 
 up-lazy-k:
 	cd lazy-k && $(GIT) pull
+
+co-lua:
+	- $(GIT) clone 'git:////github.com//fperrad//lua.git'
+
+up-lua:
+	cd lua && $(GIT) pull
 
 co-m4:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//m4.git'

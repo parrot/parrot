@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 24;
+use Test::More tests => 23;
 
 =head1 NAME
 
@@ -201,12 +201,6 @@ close $FH;
 $out = `$parrot languages/lolcode/lolcode.pbc $filename`;
 ok($out eq "HAI WORLD!\n", "check lolcode");
 unlink($filename);
-
-$out = `$parrot languages/lua/lua.pbc -e "print(nil)"`;
-ok($out eq "nil\n", "check lua");
-
-$out = `$parrot languages/ook/ook.pbc`;
-ok($out eq q{}, "check ook");
 
 $filename = 'test.l';
 open $FH, '>', $filename

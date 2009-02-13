@@ -55,7 +55,6 @@ sub new {
         $self->new_section( 'forth',       'forth.html',      '', 'languages/forth' ),
         $self->new_section( 'Jako',        'jako.html',       '', 'languages/jako' ),
         $self->new_section( 'lolcode',     'lolcode.html',    '', 'languages/lolcode' ),
-        $self->new_section( 'Lua',         'lua.html',        '', 'languages/lua' ),
         $self->new_section( 'Ook!',        'ook.html',        '', 'languages/ook' ),
         $self->new_section( 'pheme',       'pheme.html',      '', 'languages/pheme' ),
         $self->new_section( 'Pipp',        'pipp.html',       '', 'languages/pipp' ),

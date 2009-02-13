@@ -42,7 +42,7 @@ sub _init {
         ecmascript
         forth
         jako json
-        lisp lolcode lua
+        lisp lolcode
         ook
         parrot_compiler pheme PIR pipp punie pynie
         pod

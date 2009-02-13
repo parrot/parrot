@@ -85,7 +85,7 @@ my @unified_testable_languages
               cola
               dotnet
               jako
-              lisp lua
+              lisp
               ook
               parrot_compiler pipp punie
               regex
