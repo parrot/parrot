@@ -877,7 +877,7 @@ $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_E
 
 $(SRC_DIR)/parrot_debugger$(O) : $(GENERAL_H_FILES)
 
-$(PDB) : $(SRC_DIR)/parrot_debugger$(O) $(LIBPARROT)
+$(PDB) : $(SRC_DIR)/parrot_debugger$(O) $(SRC_DIR)/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
     $(SRC_DIR)/parrot_debugger$(O) \
     $(SRC_DIR)/parrot_config$(O) \
