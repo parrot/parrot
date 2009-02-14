@@ -267,7 +267,7 @@ static void
 Parrot_version(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_version)
-    printf("This is parrot version " PARROT_VERSION);
+    printf("This is Parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
     printf("Copyright (C) 2001-2009, Parrot Foundation.\n\
 \n\
