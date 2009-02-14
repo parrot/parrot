@@ -124,9 +124,10 @@ my %options = (
     destdir     => '',
     exec_prefix => '/usr',
     bindir      => '/usr/bin',
-    libdir      => '/usr/lib/parrot',
-    includedir  => '/usr/include/parrot',
-    docdir      => '/usr/share/doc/parrot',
+    libdir      => '/usr/lib',       # parrot/ subdir added below
+    includedir  => '/usr/include',   # parrot/ subdir added below
+    docdir      => '/usr/share/doc', # parrot/ subdir added below
+    version     => '',
     'dry-run'   => 0,
 );
 
@@ -138,6 +139,11 @@ foreach (@ARGV) {
     else {
         push @manifests, $_;
     }
+}
+
+my $parrotdir = "parrot";
+if ($options{version}) {
+    $parrotdir = File::Spec->catdir( $parrotdir, $options{version} );
 }
 
 # We'll report multiple occurrences of the same file
@@ -173,7 +179,12 @@ while (<>) {
     @meta{ split( /,/, $meta ) } = ();
     $meta{$_} = 1 for ( keys %meta );          # Laziness
 
-    if ( $meta{lib} ) {
+    if ( /^runtime/ ) {
+	 # have to catch this case early.
+        $dest =~ s/^runtime\/parrot\///;
+        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
+    }
+    elsif ( $meta{lib} ) {
 
         # don't allow libraries to be installed into subdirs of libdir
         $dest = File::Spec->catdir( $options{libdir}, basename($dest) );
@@ -188,11 +199,13 @@ while (<>) {
         }
     }
     elsif ( $meta{include} ) {
-        $dest =~ s/^include//;
-        $dest = File::Spec->catdir( $options{includedir}, $dest );
+        $dest =~ s/^include\/parrot//;
+        $dest = File::Spec->catdir( $options{includedir}, $parrotdir, $dest );
     }
     elsif ( $meta{doc} ) {
-        $dest = File::Spec->catdir( $options{docdir}, $dest );
+        $dest =~ s/^docs\/resources/resources/; # resources go in the top level of docs
+        $dest =~ s/^docs/pod/; # other docs are actually raw Pod
+        $dest = File::Spec->catdir( $options{docdir}, $parrotdir, $dest );
     }
     elsif ( $meta{pkgconfig} ) {
 
@@ -200,13 +213,10 @@ while (<>) {
         # as it is typically done with automake installed packages.  If there
         # is a use case to make this configurable we'll add a seperate
         # --pkgconfigdir option.
-        $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $dest );
-    }
-    elsif ( /\[library]/ ) {
-        $dest =~ s/^runtime/$options{libdir}/;
+        $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $parrotdir, $dest );
     }
     else {
-        $dest = File::Spec->catdir( $options{prefix}, $dest );
+        die "Unknown install location in MANIFEST: $_";
     }
 
     $dest = File::Spec->catdir( $options{buildprefix}, $dest )

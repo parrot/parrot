@@ -91,7 +91,7 @@ sub runstep {
         mandir         => $mandir,
 
         # parrot internal use only
-        doc_dir => $datadir . "/doc/parrot",
+        doc_dir => $datadir . "/doc",
     );
 
     return 1;
