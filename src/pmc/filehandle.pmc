@@ -476,7 +476,7 @@ Print the passed in integer, number, string, or PMC to the filehandle.
 */
 
     METHOD print(PMC *to_print) {
-        STRING *string_to_print = VTABLE_get_string(INTERP, to_print);
+        STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
         Parrot_io_putps(interp, SELF, string_to_print);
     }
@@ -546,9 +546,9 @@ Full buffering, bytes are sent when the buffer is full.
 
     METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
         INTVAL flags;
-        STRING *nobuffer_string   = CONST_STRING(INTERP, "unbuffered");
-        STRING *linebuffer_string = CONST_STRING(INTERP, "line-buffered");
-        STRING *fullbuffer_string = CONST_STRING(INTERP, "full-buffered");
+        STRING * const nobuffer_string   = CONST_STRING(INTERP, "unbuffered");
+        STRING * const linebuffer_string = CONST_STRING(INTERP, "line-buffered");
+        STRING * const fullbuffer_string = CONST_STRING(INTERP, "full-buffered");
 
         if (got_type) {
             if (Parrot_str_not_equal(INTERP, new_type, nobuffer_string) == 0)

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -118,7 +118,7 @@ Changes the current working directory to the one specified by C<path>.
 #endif
         Parrot_str_free_cstring(cpath);
         if (error) {
-            char *errmsg = strerror(errno);
+            const char * const errmsg = strerror(errno);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
                 errmsg);
         }
@@ -185,9 +185,9 @@ Creates a directory specified by C<path> with mode C<mode>.
         char * const cpath = Parrot_str_to_cstring(interp, path);
         /* should we validate mode? */
 #ifdef WIN32
-        int error = _mkdir(cpath);
+        const int error = _mkdir(cpath);
 #else
-        int error = mkdir(cpath, (mode_t)mode);
+        const int error = mkdir(cpath, (mode_t)mode);
 #endif
         Parrot_str_free_cstring(cpath);
         if (error) {

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2009, The Perl Foundation.
 $Id$
 
 =head1 NAME
@@ -37,7 +37,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
     }
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        STRING *_sub = CONST_STRING(interp, "Sub");
+        STRING * const _sub = CONST_STRING(interp, "Sub");
         if (!VTABLE_isa(interp, value, _sub))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "attempt to set non Sub PMC");
@@ -125,10 +125,6 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
 F<src/multidispatch.c>,
 F<$perl6/doc/trunk/design/apo/A12.pod>,
 F<$perl6/doc/trunk/design/syn/S12.pod>
-
-=head1 HISTORY
-
-Initial version                  - leo 14.03.2005
 
 =cut
 
