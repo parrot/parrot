@@ -159,7 +159,7 @@ parrot_init_library_paths(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_init_library_paths)
     PMC *paths;
-    STRING *entry;
+    STRING *entry, *version, *versionlib;
 
     PMC * const iglobals = interp->iglobals;
     PMC * const config_hash =
@@ -192,6 +192,12 @@ parrot_init_library_paths(PARROT_INTERP)
     entry = CONST_STRING(interp, "lib/parrot/");
     VTABLE_push_string(interp, paths, entry);
 
+    version = CONST_STRING(interp, PARROT_VERSION);
+    versionlib = Parrot_str_append(interp, entry, version);
+    entry = Parrot_str_append(interp, versionlib, CONST_STRING(interp, "/include/"));
+    VTABLE_push_string(interp, paths, entry);
+
+
     /* define library paths */
     paths = pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
@@ -211,6 +217,8 @@ parrot_init_library_paths(PARROT_INTERP)
     VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "lib/parrot/");
     VTABLE_push_string(interp, paths, entry);
+    entry = Parrot_str_append(interp, versionlib, CONST_STRING(interp, "/library/"));
+    VTABLE_push_string(interp, paths, entry);
 
     /* define dynext paths */
     paths = pmc_new(interp, enum_class_ResizableStringArray);
@@ -221,6 +229,8 @@ parrot_init_library_paths(PARROT_INTERP)
     entry = CONST_STRING(interp, "");
     VTABLE_push_string(interp, paths, entry);
     entry = CONST_STRING(interp, "lib/parrot/dynext/");
+    VTABLE_push_string(interp, paths, entry);
+    entry = Parrot_str_append(interp, versionlib, CONST_STRING(interp, "/dynext/"));
     VTABLE_push_string(interp, paths, entry);
 
     /* shared exts */
