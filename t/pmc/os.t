@@ -14,7 +14,7 @@ use File::Spec;
 my $MSWin32 = $^O =~ m!MSWin32!;
 my $cygwin  = $^O =~ m!cygwin!;
 my $solaris = $^O =~ m!solaris!;
-my $MSVC = grep { $PConfig{cc} eq $_ } (qw(cl cl.exe));
+my $MSVC = $PConfig{cc} =~ m/\bcl(?:\.exe)?/i;
 
 =head1 NAME
 
