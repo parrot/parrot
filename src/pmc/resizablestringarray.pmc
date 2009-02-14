@@ -29,8 +29,6 @@ pmclass ResizableStringArray extends FixedStringArray need_ext provides array {
 
 =over 4
 
-=over 4
-
 =item C<void init()>
 
 Initializes the array.

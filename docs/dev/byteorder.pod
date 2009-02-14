@@ -83,6 +83,8 @@ This set of functions will convert an unsigned character buffer into big endian
 format.  Only a C<memcpy> is performed if the native format is already big
 endian.
 
+=back
+
 =head1 Low level FLOATVAL fetch and convert functions
 
 We support two different floattypes, stored in the pbc header as 0 or 1.
