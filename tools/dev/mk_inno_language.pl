@@ -49,10 +49,10 @@ my $cmd = <languages/$lang/*.cmd>
         ? qq{Source: ".\\languages\\$lang\\*.cmd"; DestDir: "{app}\\bin"; Flags:}
         : '; no .cmd';
 my $pmc = <languages/$lang/src/pmc/*.pmc>
-        ? qq{Source: ".\\languages\\$lang\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
+        ? qq{Source: ".\\languages\\$lang\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\$version\\dynext"; Flags:}
         : '; no pmc';
 my $ops = <languages/$lang/src/ops/*.ops>
-        ? qq{Source: ".\\languages\\$lang\\src\\ops\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
+        ? qq{Source: ".\\languages\\$lang\\src\\ops\\*.dll"; DestDir: "{app}\\lib\\parrot\\$version\\dynext"; Flags:}
         : '; no ops';
 
 my $filename = 'parrot-' . $lclang . '.iss';
@@ -78,7 +78,7 @@ SolidCompression=yes
 Uninstallable=no
 
 [Files]
-Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\languages\\$lang"; Flags:
+Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\$version\\languages\\$lang"; Flags:
 $exe
 $cmd
 $pmc
