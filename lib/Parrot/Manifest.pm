@@ -128,16 +128,17 @@ sub _get_manifest_entry {
         $loc =
               exists( $special->{$_} ) ? $special->{$_}
             : !m[/]                    ? '[]'
-            : m[^LICENSE/]             ? '[main]doc'
-            : m[^docs/]                ? '[main]doc'
-            : m[^editor/]              ? '[devel]'
-            : m[^examples/]            ? '[main]doc'
+            : m[README]                ? '[]doc'
+            : m[^docs/user/]           ? '[main]doc'
+            : m[^docs/ops/]            ? '[main]doc'
+            : m[^docs/pmc/]            ? '[main]doc'
+            : m[^docs/pct/]            ? '[devel]doc'
+            : m[^examples/]            ? '[examples]'
             : m[^include/]             ? '[main]include'
             : ( m[^languages/(\w+)/] and $1 ne 'conversion' ) ? "[$1]"
-            : m[^lib/]        ? '[devel]'
+            : m[^lib/Parrot/]        ? '[devel]lib'
+            : m[^t/]          ? '[test]'
             : m[^runtime/]    ? '[library]'
-            : m[^tools/docs/] ? '[devel]'
-            : m[^tools/dev/]  ? '[devel]'
             :                   '[]';
     }
 
@@ -154,33 +155,22 @@ sub _get_special {
         README.win32.pod                                [devel]doc
         README.win32.pod                                [devel]doc
         RESPONSIBLE_PARTIES                             [main]doc
-        TODO                                            [main]doc
         parrot-config                                   [main]bin
         docs/compiler_faq.pod                           [devel]doc
-        docs/configuration.pod                          [devel]doc
         docs/debug.pod                                  [devel]doc
-        docs/dev/events.pod                             [devel]doc
-        docs/dev/fhs.pod                                [devel]doc
-        docs/dev/infant.pod                             [devel]doc
-        docs/dev/pmc_freeze.pod                         [devel]doc
-        examples/sdl/anim_image.pir                     [devel]
-        examples/sdl/anim_image_dblbuf.pir              [devel]
-        examples/sdl/blue_font.pir                      [devel]
-        examples/sdl/blue_rect.pir                      [devel]
-        examples/sdl/bounce_parrot_logo.pir             [devel]
-        examples/sdl/lcd/clock.pir                      [devel]
-        examples/sdl/move_parrot_logo.pir               [devel]
-        examples/sdl/parrot_small.png                   [devel]
-        examples/sdl/raw_pixels.pir                     [devel]
-        languages/t/harness                             []
-        runtime/parrot/dynext/README                    [devel]doc
-        runtime/parrot/include/README                   [devel]doc
-        src/call_list.txt                               [devel]doc
+        docs/faq.pod                                    [main]doc
+        docs/gettingstarted.pod                         [main]doc
+        docs/glossary.pod                               [main]doc
+        docs/intro.pod                                  [main]doc
+        languages/t/harness                             [test]
+        src/call_list.txt                               [devel]
         src/ops/ops.num                                 [devel]
-        tools/build/ops2c.pl                            [devel]
-        tools/build/ops2pm.pl                           [devel]
-        tools/build/pbc2c.pl                            [devel]
-        tools/build/revision_c.pl                       [devel]
+        tools/build/ops2c.pl                            [devel]bin
+        tools/build/ops2pm.pl                           [devel]bin
+        tools/build/pbc2c.pl                            [devel]bin
+        tools/build/revision_c.pl                       [devel]bin
+        tools/dev/pbc_to_exe.pir                        [devel]bin
+        tools/dev/reconfigure.pl                        [devel]bin
         src/vtable.tbl                                  [devel]
     );
 
@@ -352,9 +342,9 @@ sub _compose_manifest_skip {
 # Ignore the SVN directories
 \\B\\.svn\\b
 
-# debian/ should not go into release tarballs
-^debian\$
-^debian/
+# ports/ should not go into release tarballs
+^ports\$
+^ports/
 END_HEADER
 
     foreach my $directory ( sort keys %ignore ) {
