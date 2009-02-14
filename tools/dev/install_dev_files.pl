@@ -142,7 +142,7 @@ while (<>) {
         $dest = File::Spec->catdir( $options{libdir}, $parrotdir, "tools", "dev", basename($dest) );
     }
     elsif ( /^compilers/ ) {
-	$dest =~ s/^compilers/languages/;
+        $dest =~ s/^compilers/languages/;
         $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
     }
     else {

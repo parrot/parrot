@@ -180,7 +180,7 @@ while (<>) {
     $meta{$_} = 1 for ( keys %meta );          # Laziness
 
     if ( /^runtime/ ) {
-	 # have to catch this case early.
+         # have to catch this case early.
         $dest =~ s/^runtime\/parrot\///;
         $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
     }
