@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 2;
+plan tests => 3;
 
 =head1 NAME
 
@@ -23,6 +23,39 @@ t/src/embed.t - Embedding parrot
 Embedding parrot in C
 
 =cut
+
+c_output_is( <<'CODE', <<'OUTPUT', "Minimal embed, using just the embed.h header" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+int main(int argc, char **argv)
+{
+    Parrot_Interp interp;
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    if (argc)
+      Parrot_set_executable_name(interp, argv [0]);
+
+    puts("Done");
+    Parrot_exit(interp, 0);
+    return 0;
+}
+CODE
+Done
+OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', "Hello world" );
 
