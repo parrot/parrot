@@ -158,8 +158,6 @@ main 10
 OUTPUT
 }
 
-SKIP: {
-    skip 'failing on win32' => 1 if $^O =~ m/win32/i;
 
 pir_output_is( <<'CODE', <<'OUTPUT', "thread type 2" );
 .sub main :main
@@ -204,10 +202,6 @@ ParrotThread tid 1
 from 10 interp
 OUTPUT
 
-}
-
-SKIP: {
-    skip 'failing on win32' => 1 if $^O =~ m/win32/i;
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'thread - kill' );
 .sub main :main
@@ -242,7 +236,6 @@ in thread
 done
 OUTPUT
 
-}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "join, get retval" );
 .sub _main
@@ -295,9 +288,8 @@ CODE
 500500
 OUTPUT
 
-SKIP: {
-    skip( "detatch broken on $^O", 1 ) if ( $^O =~ /MSWin32/ );
-    pir_output_like( <<'CODE', <<'OUTPUT', "detach" );
+
+pir_output_like( <<'CODE', <<'OUTPUT', "detach" );
 .sub main :main
     .local pmc foo
     .local pmc queue
@@ -324,7 +316,7 @@ wait:
 CODE
 /(done\nthread\n)|(thread\ndone\n)/
 OUTPUT
-}
+
 
 pir_output_is( <<'CODE', <<'OUTPUT', "share a PMC" );
 .sub main :main
