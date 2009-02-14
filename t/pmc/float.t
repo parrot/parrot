@@ -8,6 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
 use Parrot::Test tests => 61;
+use Parrot::Config;
 
 =head1 NAME
 
@@ -506,7 +507,7 @@ OUTPUT
 TODO: {
     my @todo;
     @todo = ( todo => '-0.0 not implemented, TT #313' )
-        if $^O =~ m/(?:openbsd|mswin32)/i;
+        unless $PConfig{has_negative_zero};
 
 pasm_output_like( <<'CODE', <<'OUTPUT', 'neg 0', @todo );
     new P0, ['Float']

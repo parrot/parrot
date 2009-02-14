@@ -1043,10 +1043,10 @@ handler:
 
 .sub sinh_of_complex_numbers
     .local pmc config_hash, interp
-    .local string osname
+    .local string has_negative_zero
     interp = getinterp
     config_hash = interp[.IGLOBALS_CONFIG_HASH]
-    osname = config_hash["osname"]
+    has_negative_zero = config_hash["has_negative_zero"]
 
     .complex_op_is("-2+0i", "-3.626860+0.000000i", 'sinh' )
     .complex_op_is("-1+0i", "-1.175201+0.000000i", 'sinh' )
@@ -1064,8 +1064,7 @@ handler:
     .complex_op_is("-2+3i", "3.590565+0.530921i", 'sinh' )
     .complex_op_is("-2-3i", "3.590565-0.530921i", 'sinh' )
 
-    eq osname, "openbsd", todo
-    eq osname, "MSWin32", todo
+    unless has_negative_zero goto todo
     .complex_op_is("0-2i", "-0.000000-0.909297i", 'sinh' )
     .complex_op_is("0+2i", "-0.000000+0.909297i", 'sinh' )
     .return()
