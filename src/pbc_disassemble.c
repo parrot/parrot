@@ -32,7 +32,7 @@ Without non-option arguments it reads the pbc from STDIN.
 #include <stdlib.h>
 #include <ctype.h>
 
-static void do_dis(Parrot_Interp, const char *, Parrot_disassemble_options);
+static void do_dis(Parrot_Interp, const char *, int);
 
 /*
 
@@ -138,7 +138,7 @@ main(int argc, const char *argv[])
 
 /*
 
-=item C<static void do_dis(PARROT_INTERP, outfile, options)>
+=item C<static void do_dis(PARROT_INTERP, outfile, int)>
 
 Do the disassembling.
 
@@ -147,9 +147,9 @@ Do the disassembling.
 */
 
 static void
-do_dis(PARROT_INTERP, const char *outfile, Parrot_disassemble_options options)
+do_dis(PARROT_INTERP, const char *outfile, int options)
 {
-    Parrot_disassemble(interp, outfile, options);
+    Parrot_disassemble(interp, outfile, (Parrot_disassemble_options) options);
 }
 
 /*
