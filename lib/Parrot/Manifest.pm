@@ -142,6 +142,7 @@ sub _get_manifest_entry {
             : m[^runtime/]                    ? '[library]'
             : m[^runtime/parrot/library/PCT]  ? '[pct]'
             : m[^docs/pct]                    ? '[pct]doc'
+            : m[^runtime/parrot/library/PCT]  ? '[pge]'
             : m[^runtime/parrot/library/TGE]  ? '[tge]'
             : m[^runtime/parrot/library/JSON] ? '[json]'
             : m[^docs/project]                ? '[devel]doc'
