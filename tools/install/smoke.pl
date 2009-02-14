@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 23;
+use Test::More tests => 22;
 
 =head1 NAME
 
@@ -17,14 +17,14 @@ tools/install/smoke.pl - checks parrot in install directory
 
 =head1 SYNOPSIS
 
-parrot in bin
+parrot in install tree
 
     % cd /usr/local/parrot-$version
-    % perl tools/install/smoke.pl
+    % perl smoke.pl
 
-parrot in .
+parrot in build tree
 
-    % perl tools/install/smoke.pl --bindir=. --libdir=./runtime
+    % perl tools/install/smoke.pl --bindir=.
 
 test installation in DESTDIR:
 
@@ -46,23 +46,17 @@ try to detect missing parts.
 
 Override default value : 'bin'
 
-=item --libdir=/usr/lib
-
-Override default value : 'lib'
-
 =back
 
 =cut
 
-my ($bindir, $libdir, $DESTDIR);
+my ($bindir, $DESTDIR);
 my $opts = GetOptions(
     'bindir=s'  => \$bindir,
-    'libdir=s'  => \$libdir,
     'DESTDIR=s' => \$DESTDIR,
 );
 
 $bindir = 'bin' unless $bindir;
-$libdir = 'lib' unless $libdir;
 
 chdir $DESTDIR if ($DESTDIR);
 
@@ -87,6 +81,22 @@ ok($out =~ /^pbc_dump/, "check pbc_dump");
 
 ok(system("$parrot -V") == 0, "display parrot version");
 
+$out = `$parrot -V`;
+$out =~ m/version (\S+) built/;
+my $version = $1;
+
+my $libdir = ($bindir eq 'bin')
+           ? "lib/parrot/$version/library"
+           : 'runtime/parrot/library';
+
+my $langdir = ($bindir eq 'bin')
+            ? "lib/parrot/$version/languages"
+            : 'languages';
+
+my $compdir = ($bindir eq 'bin')
+            ? "lib/parrot/$version/languages"
+            : 'compilers';
+
 #
 # some compiler tools
 #
@@ -96,7 +106,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "token TOP { \\s* }\n";
 close $FH;
-$out = `$parrot $libdir/parrot/library/PGE/Perl6Grammar.pir $filename`;
+$out = `$parrot $libdir/PGE/Perl6Grammar.pir $filename`;
 ok($out =~ /^\n## <::TOP>/, "check PGE");
 unlink($filename);
 
@@ -119,7 +129,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "transform past (ROOT) { }\n";
 close $FH;
-$out = `$parrot compilers/tge/tgc.pir $filename`;
+$out = `$parrot $compdir/tge/tgc.pir $filename`;
 ok($out =~ /^\n\.sub '_ROOT_past'/, "check TGE");
 unlink($filename);
 
@@ -129,7 +139,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "say('hello world!');\n";
 close $FH;
-$out = `$parrot compilers/nqp/nqp.pbc $filename`;
+$out = `$parrot $compdir/nqp/nqp.pbc $filename`;
 ok($out eq "hello world!\n", "check nqp");
 unlink($filename);
 
@@ -142,7 +152,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "1 + 2\n";
 close $FH;
-$out = `$parrot languages/abc/abc.pbc $filename`;
+$out = `$parrot $langdir/abc/abc.pbc $filename`;
 ok($out eq "3\n", "check abc");
 unlink($filename);
 
@@ -151,21 +161,21 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "\"Hello world!\"";
 close $FH;
-$out = `$parrot languages/APL/APL.pbc $filename`;
+$out = `$parrot $langdir/APL/APL.pbc $filename`;
 ok($out eq "Hello world!\n", "check APL");
 unlink($filename);
 
-$out = `$parrot languages/bf/bf.pbc`;
+$out = `$parrot $langdir/bf/bf.pbc`;
 ok($out =~ /^usage/, "check bf");
-$out = `$parrot languages/bf/bfc.pbc`;
+$out = `$parrot $langdir/bf/bfc.pbc`;
 ok($out =~ /^usage/, "check bfc");
-$out = `$parrot languages/bf/bfco.pbc`;
+$out = `$parrot $langdir/bf/bfco.pbc`;
 ok($out =~ /^usage/, "check bfco");
 
-$out = `$parrot languages/cardinal/cardinal.pbc -e "print 'hello world';"`;
+$out = `$parrot $langdir/cardinal/cardinal.pbc -e "print 'hello world';"`;
 ok($out eq "hello world", "check cardinal");
 
-$out = `$parrot languages/dotnet/net2pbc.pbc`;
+$out = `$parrot $langdir/dotnet/net2pbc.pbc`;
 ok($out =~ /^Usage/, "check dotnet");
 
 $filename = 'test.js';
@@ -173,7 +183,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print(\"Hello World from JS\\n\");";
 close $FH;
-$out = `$parrot languages/ecmascript/js.pbc $filename`;
+$out = `$parrot $langdir/ecmascript/js.pbc $filename`;
 ok($out eq "Hello World from JS\n\n", "check ecmascript");
 unlink($filename);
 
@@ -184,7 +194,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "( print \"Hello, World!\" )\n";
 close $FH;
-$out = `$parrot languages/lisp/lisp.pbc $filename`;
+$out = `$parrot $langdir/lisp/lisp.pbc $filename`;
 ok($out eq "Hello, World!\n", "check lisp");
 unlink($filename);
 }
@@ -198,7 +208,7 @@ HAI 1.2
 KTHXBYE
 LOLCODE
 close $FH;
-$out = `$parrot languages/lolcode/lolcode.pbc $filename`;
+$out = `$parrot $langdir/lolcode/lolcode.pbc $filename`;
 ok($out eq "HAI WORLD!\n", "check lolcode");
 unlink($filename);
 
@@ -207,7 +217,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "( write \"Hello, World!\\n\" )\n";
 close $FH;
-$out = `$parrot languages/pheme/pheme.pbc $filename`;
+$out = `$parrot $langdir/pheme/pheme.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pheme");
 unlink($filename);
 
@@ -216,7 +226,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "<?php echo \"Hello, World!\\n\"; ?>";
 close $FH;
-$out = `$parrot languages/pipp/pipp.pbc $filename`;
+$out = `$parrot $langdir/pipp/pipp.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pipp");
 unlink($filename);
 
@@ -225,7 +235,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print \"Hello, World!\\n\";\n";
 close $FH;
-$out = `$parrot languages/punie/punie.pbc $filename`;
+$out = `$parrot $langdir/punie/punie.pbc $filename`;
 ok($out eq "Hello, World!\n", "check punie");
 unlink($filename);
 
@@ -234,7 +244,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print 'Hello, World!'\n";
 close $FH;
-$out = `$parrot languages/pynie/pynie.pbc $filename`;
+$out = `$parrot $langdir/pynie/pynie.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pynie");
 unlink($filename);
 
@@ -243,7 +253,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH "print(\"Hello, World!\")\n";
 close $FH;
-$out = `$parrot languages/squaak/squaak.pbc $filename`;
+$out = `$parrot $langdir/squaak/squaak.pbc $filename`;
 ok($out eq "Hello, World!\n", "check squaak");
 unlink($filename);
 
