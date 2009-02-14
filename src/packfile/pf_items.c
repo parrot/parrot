@@ -1129,8 +1129,9 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_nv = cvt_num16_num8;
         else {
             exit_fatal(1,
-                       "PackFile_unpack: unsupported float conversion %d to %d, PARROT_BIGENDIAN=%d\n",
-                       NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+                       "PackFile_unpack: unsupported float conversion %d to %d,"
+                       " PARROT_BIGENDIAN=%d\n", NUMVAL_SIZE,
+                       pf->header->floattype, PARROT_BIGENDIAN);
         }
     }
 
@@ -1154,8 +1155,9 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_nv = cvt_num16_num8_be;
         else {
             exit_fatal(1,
-                       "PackFile_unpack: unsupported float conversion %d to %d, PARROT_BIGENDIAN=%d\n",
-                       NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+                       "PackFile_unpack: unsupported float conversion %d to %d,"
+                       " PARROT_BIGENDIAN=%d\n", NUMVAL_SIZE,
+                       pf->header->floattype, PARROT_BIGENDIAN);
             return;
         }
     }
@@ -1179,8 +1181,9 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_nv = cvt_num16_num8;
         else {
             exit_fatal(1,
-                       "PackFile_unpack: unsupported float conversion %d to %d, PARROT_BIGENDIAN=%d\n",
-                       NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+                       "PackFile_unpack: unsupported float conversion %d to %d,"
+                       " PARROT_BIGENDIAN=%d\n", NUMVAL_SIZE,
+                       pf->header->floattype, PARROT_BIGENDIAN);
         }
     }
 #endif

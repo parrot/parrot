@@ -97,7 +97,7 @@ fetch_iv_be(INTVAL w)
 #  if INTVAL_SIZE == 4
     return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w >> 24);
 #  else
-#      if INTVAL_SIZE == 8
+#    if INTVAL_SIZE == 8
     INTVAL r;
     r = w << 56;
     r |= (w & 0xff00) << 40;
@@ -108,10 +108,10 @@ fetch_iv_be(INTVAL w)
     r |= (w & 0xff000000000000) >> 40;
     r |= (w & 0xff00000000000000) >> 56;
     return r;
-#      else
+#    else
     exit_fatal(1, "Unsupported INTVAL_SIZE=%d\n",
                INTVAL_SIZE);
-#      endif
+#    endif
 #  endif
 #endif
 }

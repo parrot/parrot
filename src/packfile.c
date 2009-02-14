@@ -460,6 +460,7 @@ static int sub_pragma(PARROT_INTERP,
 void
 Parrot_trace_eprintf(ARGIN(const char *s), ...)
 {
+    ASSERT_ARGS(Parrot_trace_eprintf)
     va_list args;
     va_start(args, s);
     vfprintf(stderr, s, args);
