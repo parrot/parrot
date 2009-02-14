@@ -138,7 +138,6 @@ sub _get_manifest_entry {
             : m[^runtime/]    ? '[library]'
             : m[^tools/docs/] ? '[devel]'
             : m[^tools/dev/]  ? '[devel]'
-            : m[^(apps/\w+)/] ? "[$1]"
             :                   '[]';
     }
 
