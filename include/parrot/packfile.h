@@ -41,9 +41,10 @@
 #define TRACE_PACKFILE 0
 
 #if TRACE_PACKFILE
-#  define TRACE_PRINTF(args)       if (pf->options) Parrot_trace_eprintf (args)
+/* Here we pass multipe args to a macro so the args may not be bracketed here! */
+#  define TRACE_PRINTF(args)       if (pf->options) Parrot_trace_eprintf args
 #  if TRACE_PACKFILE == 2
-#    define TRACE_PRINTF_VAL(args) if (pf->options & 2) Parrot_trace_eprintf (args)
+#    define TRACE_PRINTF_VAL(args) if (pf->options & 2) Parrot_trace_eprintf args
 #  else
 #    define TRACE_PRINTF_VAL(args)
 #  endif
