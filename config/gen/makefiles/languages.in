@@ -519,7 +519,7 @@ co-pipp:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//pipp.git'
 
 up-pipp:
-	cd pjs && $(GIT) pull
+	cd pipp && $(GIT) pull
 
 co-pjs:
 	- $(SVN) checkout 'http:////parrotjs.googlecode.com//svn//trunk' pjs
