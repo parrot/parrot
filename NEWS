@@ -33,7 +33,7 @@ New in February 2009 release (r35855 to r36683)
   + add new 'Pod' documentation parser
   + Pipp (PHP implementation):
     - Pipp is now at http://github.com/bschmalhofer/pipp
-    - support for 'print', 'dirname', 'implode', 'str_replace', 'switch'
+    - support for 'print', 'dirname', 'implode', 'str_replace',
     - various grammar fixes
   + ECMAScript
     + add 'quit', 'readline' builtins
