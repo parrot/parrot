@@ -19,10 +19,10 @@ sub runstep {
     # We do one bit of its work early here, because we need the result now.
     $cc = $conf->options->get('cc') if defined $conf->options->get('cc');
 
-    my $is_msvc  = $cc =~ m/\bcl(?:\.exe)?/;
-    my $is_intel = $cc =~ m/\bicl(?:\.exe)?/;
-    my $is_mingw = $cc =~ m/\bgcc(?:\.exe)?/;
-    my $is_bcc   = $cc =~ m/\bbcc32(?:\.exe)?/;
+    my $is_msvc  = $cc =~ m/\bcl(?:\.exe)?/i;
+    my $is_intel = $cc =~ m/\bicl(?:\.exe)?/i;
+    my $is_mingw = $cc =~ m/\bgcc(?:\.exe)?/i;
+    my $is_bcc   = $cc =~ m/\bbcc32(?:\.exe)?/i;
 
     $conf->data->set(
         win32  => 1,
