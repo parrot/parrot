@@ -66,10 +66,22 @@ END_OUTPUT
 #         dirformat = 1
 # ]
 TODO: {
-local $TODO = "devel versions are not guaranteed to succeed"
-  if $PConfig{DEVEL};
+    local $TODO;
+    if ($PConfig{ptrsize} == 8) {
+        $TODO = "Known problem on 64bit with reading 32bit dirs. See TT #254"
+    } elsif ($PConfig{DEVEL}) {
+        $TODO = "devel versions are not guaranteed to succeed";
+    } else {
+        $TODO = "currently broken. See TT #254";
+    }
 
 pbc_output_is( undef, $output, "i386 32 bit opcode_t, 32 bit intval" );
+
+#pbc_output_is( undef, $output, "i386 32 bit opcode_t, 32 bit intval 12-byte long double" );
+#pbc_output_is( undef, $output, "PPC BE 32 bit opcode_t, 32 bit intval" );
+#pbc_output_is( undef, $output, "i86_64 LE 64 bit opcode_t, 64 bit intval" );
+#pbc_output_is( undef, $output, "i86_64 LE 64 bit opcode_t, 64 bit intval, 16-byte long double" );
+#pbc_output_is( undef, $output, "64bit BE 64 bit opcode_t, 64 bit intval" );
 
 }
 

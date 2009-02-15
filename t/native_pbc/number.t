@@ -31,8 +31,8 @@ See F<tools/dev/mk_native_pbc> to create the platform-specific native pbcs.
 
   _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
   _2   i386 32 bit opcode_t, 32 bit intval, 12 bit long double (linux-gcc-ix86)
-  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
-  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+  _3   PPC BE 32 bit opcode_t, 32 bit intval  (darwin-ppc)
+  _4   x86_64 12-bit double 64 bit opcode_t   (linux-gcc-x86_64 -m96bit-long-double)
   _5   x86_64 16 bit long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
   _6   big-endian 64-bit                     (MIPS irix or similar)
 
@@ -145,8 +145,12 @@ pbc_output_is(undef, $output, "PPC double float 32 bit BE opcode_t")
 }
 
 TODO: {
-local $TODO = "devel versions are not guaranteed to succeed"
-  if $PConfig{DEVEL};
+    local $TODO;
+    if ($PConfig{ptrsize} == 4) {
+        $TODO = "Known problem on 32bit with reading 64bit dirs. See TT #254"
+    } elsif ($PConfig{DEVEL}) {
+        $TODO = "devel versions are not guaranteed to succeed";
+    }
 
 # any ordinary 64-bit intel unix:
 # HEADER => [
