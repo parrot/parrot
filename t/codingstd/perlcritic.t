@@ -70,8 +70,8 @@ if ( !@ARGV ) {
 
     # We want to skip any language's perl files except those which have declared
     # they wish to be tested.
-    # As languages are leaving the, there a currently no languages that want
-    # to be tested in the root 'make codetest'.
+    # As languages are leaving the Parrot repository, there are currently no
+    # languages that want to be tested in the root 'make codetest'.
 
     my $languages_dir = File::Spec->catdir( $PConfig{build_dir}, 'languages');
     my $filter_languages = qr/^\Q$languages_dir$PConfig{slash}\E(?!dummy)/x;
