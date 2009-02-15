@@ -1233,14 +1233,15 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
 #if NUMVAL_SIZE == 8
     header->floattype = FLOATTYPE_8;
 #else
-#  if (NUMVAL_SIZE == 12) && PARROT_BIGENDIAN
+#  if (NUMVAL_SIZE == 12) && !PARROT_BIGENDIAN
     header->floattype = FLOATTYPE_12;
 #  else
 #    if (NUMVAL_SIZE == 16)
     header->floattype = FLOATTYPE_16;
 #    else
     exit_fatal(1, "PackFile_set_header: Unsupported floattype NUMVAL_SIZE=%d,"
-               " PARROT_BIGENDIAN=%d\n", NUMVAL_SIZE, PARROT_BIGENDIAN);
+               " PARROT_BIGENDIAN=%d\n", NUMVAL_SIZE, 
+               PARROT_BIGENDIAN ? "big-endian" : "little-endian");
 #    endif
 #  endif
 #endif
@@ -4551,8 +4552,8 @@ PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eva
 
 =head1 HISTORY
 
-Parrot_readbc and Parrot_loadbc renamed. Trace macros and 64-bit fixes
-by Reini Urban 2009.
+Parrot_readbc and Parrot_loadbc renamed. Trace macros, long double and 
+64-bit conversion work by Reini Urban 2009.
 
 Rework by Melvin; new bytecode format, make bytecode portable. (Do
 endian conversion and wordsize transforms on the fly.)
