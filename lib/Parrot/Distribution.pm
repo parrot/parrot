@@ -511,7 +511,6 @@ sub get_perl_exemption_regexp {
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
         languages/dotnet/config/N2PConfig_pm.in
         languages/regex/lib/Regex/Grammar.pm
-        languages/pipp/src/pct/actions.pm
         compilers/nqp/
         compilers/ncigen/src/parser/actions.pm
         lib/Digest/Perl/
@@ -658,7 +657,6 @@ sub perl_script_file_directories {
             APL/tools
             BASIC/compiler BASIC/interpreter
             dotnet dotnet/build dotnet/tools
-            pipp
             python
             regex
             scheme scheme/Scheme
@@ -713,7 +711,6 @@ sub perl_module_file_directories {
             jako/lib/Jako/Construct
             parrot_compiler/lib/Parrot/Test
             perl6/t/01-sanity
-            pipp/lib/Parrot/Test pipp/lib/Parrot/Test/Pipp
             regex/lib
             scheme scheme/Scheme
             urm/lib/URM

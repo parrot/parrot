@@ -24,7 +24,7 @@ LANGUAGES = \
     jako json \
     lisp lolcode \
     ook \
-    parrot_compiler pheme PIR pipp punie pynie \
+    parrot_compiler pheme PIR punie pynie \
     regex \
     scheme squaak \
     urm
@@ -139,7 +139,7 @@ test-separate: all \
     jako.test json.test \
     lisp.test lolcode.test \
     ook.test \
-    parrot_compiler.test pheme.test PIR.test pipp.test punie.test pynie.test \
+    parrot_compiler.test pheme.test PIR.test punie.test pynie.test \
     regex.test \
     scheme.test squaak.test \
     urm.test
@@ -155,7 +155,7 @@ clean: \
     lisp.clean \
     lolcode.clean \
     ook.clean \
-    parrot_compiler.clean pheme.clean PIR.clean pipp.clean punie.clean pynie.clean \
+    parrot_compiler.clean pheme.clean PIR.clean punie.clean pynie.clean \
     regex.clean \
     scheme.clean squaak.clean \
     urm.clean
@@ -170,7 +170,7 @@ realclean: \
     jako.realclean json.realclean \
     lisp.realclean lolcode.realclean \
     ook.realclean \
-    parrot_compiler.realclean pheme.realclean PIR.realclean pipp.realclean pod.realclean punie.realclean pynie.realclean \
+    parrot_compiler.realclean pheme.realclean PIR.realclean pod.realclean punie.realclean pynie.realclean \
     regex.realclean \
     scheme.realclean squaak.realclean \
     urm.realclean
@@ -370,16 +370,6 @@ pheme.clean:
 	- $(MAKE) pheme clean
 pheme.realclean:
 	- $(MAKE) pheme realclean
-
-pipp : pipp.dummy
-pipp.dummy:
-	- $(MAKE) pipp
-pipp.test:
-	- $(MAKE) pipp test
-pipp.clean:
-	- $(MAKE) pipp clean
-pipp.realclean:
-	- $(MAKE) pipp realclean
 
 PIR: PIR.dummy
 PIR.dummy:

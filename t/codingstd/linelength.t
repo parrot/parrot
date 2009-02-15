@@ -44,7 +44,6 @@ my %lang_is_checked = map { $_ => 1 } qw{
     cardinal
     dotnet
     ook
-    pipp
 };
 
 my $build_dir = $PConfig{build_dir};

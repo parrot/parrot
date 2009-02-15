@@ -44,7 +44,7 @@ sub _init {
         jako json
         lisp lolcode
         ook
-        parrot_compiler pheme PIR pipp punie pynie
+        parrot_compiler pheme PIR punie pynie
         pod
         regex
         scheme squaak
