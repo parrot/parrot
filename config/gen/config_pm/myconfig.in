@@ -18,4 +18,4 @@ Summary of my parrot @VERSION@ (r@revision@) configuration:
   Types:
     iv=@iv@, intvalsize=@intvalsize@, intsize=@intsize@, opcode_t=@opcode_t@, opcode_t_size=@opcode_t_size@,
     ptrsize=@ptrsize@, ptr_alignment=@ptr_alignment@ byteorder=@byteorder@, 
-    nv=@nv@, numvalsize=@numvalsize@, doublesize=@doublesize@
+    nv=@nv@, numvalsize=@numvalsize@, doublesize=@doublesize@, longdoublesize=@hugefloatvalsize@
