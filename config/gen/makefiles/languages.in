@@ -82,6 +82,8 @@ help:
 	@echo ""
 	@echo "  co-m4:         Try to fetch Parrot m4"
 	@echo ""
+	@echo "  co-pipp:       Try to fetch Pipp"
+	@echo ""
 	@echo "  co-pjs:        Try to fetch PJS"
 	@echo ""
 	@echo "  co-primitivearc: Try to fetch primitivearc"
@@ -110,6 +112,8 @@ help:
 	@echo "  up-lua:        Try to update lua"
 	@echo ""
 	@echo "  up-m4:         Try to update Parrot m4"
+	@echo ""
+	@echo "  up-pipp:       Try to update Pipp"
 	@echo ""
 	@echo "  up-pjs:        Try to update PJS"
 	@echo ""
@@ -458,9 +462,9 @@ urm.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-fun co-gil co-hq9plus co-lazy-k co-lua co-m4 co-markdown co-pjs \
+co-all: co-eclectus co-fun co-gil co-hq9plus co-lazy-k co-lua co-m4 co-markdown co-pipp co-pjs \
     co-primitivearc co-rakudo co-shakespeare co-tcl co-unlambda co-wmlscript
-up-all: up-eclectus up-fun up-gil up-hq9plus up-lazy-k up-lua up-m4 up-markdown up-pjs \
+up-all: up-eclectus up-fun up-gil up-hq9plus up-lazy-k up-lua up-m4 up-markdown up-pipp up-pjs \
     up-primitivearc up-rakudo up-shakespeare up-tcl up-unlambda up-wmlscript
 
 co-eclectus:
@@ -510,6 +514,12 @@ co-markdown:
 
 up-markdown:
 	cd markdown && $(GIT) pull
+
+co-pipp:
+	- $(GIT) clone 'git:////github.com//bschmalhofer//pipp.git'
+
+up-pipp:
+	cd pjs && $(GIT) pull
 
 co-pjs:
 	- $(SVN) checkout 'http:////parrotjs.googlecode.com//svn//trunk' pjs
