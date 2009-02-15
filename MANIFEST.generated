@@ -254,5 +254,6 @@ src/ops/core_ops_cgp.c                            []
 src/ops/core_ops_switch.c                         []
 src/parrot_config.c                               []
 src/string_private_cstring.h                      []
-tools/build/dynpmc.pl                             [devel]bin
+tools/build/dynpmc.pl                             []
 tools/install/smoke.pl                            []
+lib/Parrot/Config/Generated.pm                    [devel]lib

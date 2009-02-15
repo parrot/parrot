@@ -130,6 +130,11 @@ while (<>) {
     elsif ( $meta{share} ) {
         $dest = File::Spec->catdir( $options{datadir}, $parrotdir, basename($dest) );
     }
+    elsif ( $meta{include} ) {
+        $dest =~ s/^src//; # strip off leading src/ dir
+        $dest =~ s/^include\/parrot//;
+        $dest = File::Spec->catdir( $options{includedir}, $parrotdir, $dest );
+    }
     elsif ( $meta{doc} ) {
         $dest =~ s/^docs/pod/; # docs dir are actually raw Pod
         $dest = File::Spec->catdir( $options{docdir}, $parrotdir, $dest );
@@ -139,7 +144,10 @@ while (<>) {
         $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
     }
     elsif ( /^tools/ ) {
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, "tools", "dev", basename($dest) );
+        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
+    }
+    elsif ( /^VERSION/ ) {
+        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
     }
     elsif ( /^compilers/ ) {
         $dest =~ s/^compilers/languages/;

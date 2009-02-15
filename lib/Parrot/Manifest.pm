@@ -140,6 +140,7 @@ sub _get_manifest_entry {
             : m[^lib/Parrot/]                 ? '[devel]lib'
             : m[^t/]                          ? '[test]'
             : m[^runtime/]                    ? '[library]'
+            : m[^src/pmc/.*\.h]               ? '[devel]include'
             : m[^runtime/parrot/library/PCT]  ? '[pct]'
             : m[^docs/pct]                    ? '[pct]doc'
             : m[^runtime/parrot/library/PCT]  ? '[pge]'
@@ -174,13 +175,14 @@ sub _get_special {
         languages/t/harness                             [test]
         src/call_list.txt                               [devel]share
         src/ops/ops.num                                 [devel]share
-        tools/build/ops2c.pl                            [devel]
-        tools/build/ops2pm.pl                           [devel]
-        tools/build/pbc2c.pl                            [devel]
-        tools/build/revision_c.pl                       [devel]
-        tools/dev/pbc_to_exe.pir                        [devel]
-        tools/dev/reconfigure.pl                        [devel]
         src/vtable.tbl                                  [devel]share
+        VERSION                                         [devel]
+        tools/build/ops2c.pl                            [devel]
+        tools/build/pbc2c.pl                            [devel]
+        tools/dev/pbc_to_exe.pir                        [devel]
+        tools/dev/gen_makefile.pl                       [devel]
+        tools/dev/reconfigure.pl                        [devel]
+        lib/File/Which.pm                               [devel]lib
     );
 
     return \%special;
