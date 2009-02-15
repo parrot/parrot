@@ -14,9 +14,10 @@ our @EXPORT_OK = qw(
 );
 use lib qw( lib );
 use Parrot::BuildUtil ();
+use FindBin qw($Bin);
 
 our $script         = q{Configure.pl};
-our $parrot_version = Parrot::BuildUtil::parrot_version();
+our $parrot_version = Parrot::BuildUtil::parrot_version("$Bin/../../");
 our $svnid          = '$Id$';
 
 sub print_version {

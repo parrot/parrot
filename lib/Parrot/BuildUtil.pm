@@ -42,9 +42,18 @@ sub parrot_version {
     }
 
     # Obtain the official version number from the VERSION file.
-    open my $VERSION, '<', 'VERSION' or die 'Could not open VERSION file!';
-    chomp( $parrot_version = <$VERSION> );
-    close $VERSION or die $!;
+    if (-e 'VERSION') {
+        open my $VERSION, '<', 'VERSION' or die 'Could not open VERSION file!';
+        chomp( $parrot_version = <$VERSION> );
+        close $VERSION or die $!;
+    }
+    else { # we're in an installed copy of Parrot
+        my $path = shift;
+	$path = '' unless $path;
+        open my $VERSION, '<', "$path/VERSION" or die 'Could not open VERSION file!';
+        chomp( $parrot_version = <$VERSION> );
+        close $VERSION or die $!;
+    }
 
     $parrot_version =~ s/\s+//g;
     @parrot_version = split( /\./, $parrot_version );
