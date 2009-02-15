@@ -215,6 +215,10 @@ while (<>) {
         # --pkgconfigdir option.
         $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $parrotdir, $dest );
     }
+    elsif ( /^compilers/ ) {
+	$dest =~ s/^compilers/languages/;
+        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
+    }
     else {
         die "Unknown install location in MANIFEST: $_";
     }
