@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -50,7 +50,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'agid hash' );
 .sub _main :main
-    load_bytecode 'compilers/tge/TGE/Tree.pir'
+    load_bytecode 'TGE.pbc'
     .local pmc tree
     tree = new ['TGE';'Tree']
     .local int id

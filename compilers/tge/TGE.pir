@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 
 =head1 NAME
 
@@ -80,22 +80,25 @@ applies to a child of the current node (generally inherited attributes).
 
 .namespace [ 'TGE' ]
 
-.sub '__onload' :load
+.sub '__onload_first' :load
+    # use other modules
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PGE/Util.pbc'
+.end
+
+.include "compilers/tge/TGE/Parser.pir"
+.include "compilers/tge/TGE/Rule.pir"
+.include "compilers/tge/TGE/Tree.pir"
+.include "compilers/tge/TGE/Grammar.pir"
+.include "compilers/tge/TGE/Compiler.pir"
+
+.sub '__onload_last' :load
     # make sure we execute this sub only once
     $P0 = get_global '$!tge_loaded'
     unless null $P0 goto end
     $P0 = new 'Integer'
     assign $P0, 1
     set_global '$!tge_loaded', $P0
-
-    # use other modules
-    load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Util.pbc'
-    load_bytecode 'compilers/tge/TGE/Rule.pbc'
-    load_bytecode 'compilers/tge/TGE/Tree.pbc'
-    load_bytecode 'compilers/tge/TGE/Parser.pbc'
-    load_bytecode 'compilers/tge/TGE/Grammar.pbc'
-    load_bytecode 'compilers/tge/TGE/Compiler.pbc'
 
     # import <die> and <line_number> rules from PGE::Util
     $P0 = get_class ['TGE';'Parser']
@@ -107,7 +110,6 @@ applies to a child of the current node (generally inherited attributes).
   end:
     .return ()
 .end
-
 
 
 =head1 AUTHOR

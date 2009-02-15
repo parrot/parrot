@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 # $Id$
 
 use strict;
@@ -21,7 +21,7 @@ t/parser.t - TGE::Parser tests
 pir_output_is( <<'CODE', <<'OUT', "parse a basic attribute grammar" );
 
 .sub _main :main
-    load_bytecode "compilers/tge/TGE.pir"
+    load_bytecode 'TGE.pbc'
 
     .local string source
     source = <<'GRAMMAR'
@@ -66,7 +66,7 @@ OUT
 pir_error_output_like( <<'CODE', qr/Syntax error at line 4, near "transform "/, "parse failure" );
 
 .sub _main :main
-    load_bytecode "compilers/tge/TGE.pir"
+    load_bytecode 'TGE.pbc'
 
     .local string source
     source = <<'GRAMMAR'

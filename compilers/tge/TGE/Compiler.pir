@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2009, The Perl Foundation.
 
 =head1 NAME
 
@@ -11,8 +11,6 @@ TGE::Compiler - A compiler for the grammar syntax of TGE.
 .namespace [ 'TGE'; 'Compiler' ]
 
 .sub __onload :load
-    load_bytecode 'TGE.pbc'
-
     $P0 = get_class [ 'TGE'; 'Grammar' ]
     $P1 = subclass $P0, [ 'TGE'; 'Compiler' ]
 .end
