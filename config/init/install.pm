@@ -35,6 +35,19 @@ sub runstep {
     $ep =~ s{/\z}{} if defined $ep;
     my $eprefix = $ep ? $ep : $prefix;
 
+    # Install in versioned subdirectories, "/usr/lib/parrot/1.5.0/...". Skip
+    # the "/parrot" or "/1.5.0" subdirectories if these are included in the
+    # prefix.
+    my $versiondir = '';
+    unless ($prefix =~ /parrot/) {
+        $versiondir .= '/parrot';
+    }
+    my $version = $conf->option_or_data('VERSION');
+    unless ($prefix =~ /$version/) {
+        $versiondir .= "/$version"; 
+        $versiondir .= $conf->option_or_data('DEVEL');
+    }
+
     #  --bindir=DIR           user executables [EPREFIX/bin]
     my $bindir = assign_dir( $conf, 'bindir', $eprefix, '/bin' );
 
@@ -91,7 +104,8 @@ sub runstep {
         mandir         => $mandir,
 
         # parrot internal use only
-        doc_dir => $datadir . "/doc",
+        doc_dir        => $datadir . "/doc",
+        versiondir     => $versiondir,
     );
 
     return 1;
