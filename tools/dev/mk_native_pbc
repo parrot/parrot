@@ -32,17 +32,23 @@ enable_long_double=
 conf=
 exe=
 
-# unfortunately there are older perls around
-byteorder=$(perl -V:byteorder | perl -ne "s/byteorder='(\d+)';/\\1/; print")
-ptrsize=$(perl -V:ptrsize)
+byteorder=$(./parrot_config byteorder)
+ptrsize=$(./parrot_config ptrsize)
+# 8 or 12 or 16 on intel
+numvalsize=$(./parrot_config numvalsize)
 
-if [ "$ptrsize" == "ptrsize='4';" ]
+if [ "$ptrsize" == "4" ]
 then
     if [ "$byteorder" == "1234" ]
     then
-        echo "1: i386 32 bit opcode_t, 32 bit intval"
-        N=1
-        if [ "$(perl -V:uselongdouble)" == "uselongdouble='define';" ]; then
+        if [ "$numvalsize" == "12" ]
+        then
+            N=2
+            echo "2: i386 32-bit opcode_t, 32-bit intval, 12-byte long double"
+        else
+            N=1
+            echo "1: i386 32-bit opcode_t, 32-bit intval, 8-byte double"
+            # try --floatval="long double" and see if that makes 12
             enable_long_double=1
             # force double on 2nd run not to default to long double
             conf=" --floatval='double'"
@@ -50,11 +56,11 @@ then
     else
         if [ "$byteorder" == "4321" ]
         then
+            N=6
             echo "3: PPC BE 32 bit opcode_t, 32 bit intval"
-            N=3
         else
             if [ "$byteorder" == "12345678" \
-                 -a "$(perl -V:osname)" == "osname='cygwin';" ]
+                 -a "$(./parrot_config osname)" == "cygwin" ]
             then
                 echo "1: cygwin use64bitint"
                 N=1
@@ -66,37 +72,33 @@ then
         fi
     fi
 else
-    if [ "$ptrsize" == "ptrsize='8';" ]
+    if [ "$ptrsize" == "8" ]
     then
         if [ "$byteorder" == "12345678" ]
         then
-            echo "4+5: x86_64 double float 64 bit opcode_t + long double"
-            N=4
-            enable_long_double=1
+            if [ "$numvalsize" == "8" ]
+            then
+                N=4
+                echo "4: x86_64 double float 64 bit opcode_t, 8-byte double"
+                # try --floatval="long double" and see if that makes 16
+                enable_long_double=1
+                # force double on 2nd run not to default to long double
+                conf=" --floatval='double'"
+            else
+                N=5
+                echo "5: x86_64 double float 64 bit opcode_t, 16-byte long double"
+            fi
         else
-            echo "6: big-endian 64-bit"
             N=6
+            echo "6: big-endian 64-bit"
         fi
     else
-        echo "unsupported perl -V:ptrsize $ptrsize"
+        echo "unsupported ptrsize $ptrsize"
         exit 1
     fi
 fi
 
-if [ "$enable_long_double" == "1" ]; then
-    if [ "$1" != "--noconf" ]; then
-      make -s prog-clean
-      perl Configure.pl --debugging --floatval="long double" --nomanicheck
-    fi
-    tail myconfig
-    make -s || exit 1
-    M=$((N+1))
-    [ -e t/op/number_1.pasm ] || perl t/harness t/op/number.t
-    ./parrot -o t/native_pbc/number_${M}.pbc t/op/number_1.pasm && echo "t/native_pbc/number_${M}.pbc updated"
-    make pbc_dump$exe
-    ./pbc_dump -h t/native_pbc/number_${M}.pbc
-fi
-
+echo ""
 if [ "$1" != "--noconf" ]; then
     make -s prog-clean
     perl Configure.pl --debugging $conf --nomanicheck
@@ -121,10 +123,36 @@ perl t/harness t/native_pbc/integer.t && \
     perl t/harness t/native_pbc/number.t && \
     perl t/harness t/native_pbc/string.t
 
+if [ "$enable_long_double" == "1" ]; then
+    if [ "$1" == "--noconf" ]; then
+      echo "Hmm. You have no long double, and we want to try --floatval=long double"
+      echo "However for this you must reconfigure your parrot and you gave --noconf"
+      exit
+    fi
+    make -s prog-clean
+    perl Configure.pl --debugging --floatval="long double" --nomanicheck
+    tail myconfig
+    make -s || exit 1
+    hugefloatvalsize=$(./parrot_config hugefloatvalsize)
+    numvalsize=$(./parrot_config numvalsize)
+    if [ "hugefloatvalsize" == "12" ]; then echo "Only 12 byte long double. Sorry"; exit; fi
+    if [ "numvalsize" == "12" ]; then echo "Only 12 byte double. Sorry"; exit; fi
+    M=$((N+1))
+    [ -e t/op/number_1.pasm ] || perl t/harness t/op/number.t
+    ./parrot -o t/native_pbc/number_${M}.pbc t/op/number_1.pasm && echo "t/native_pbc/number_${M}.pbc updated"
+    make pbc_dump$exe
+    ./pbc_dump -h t/native_pbc/number_${M}.pbc
+
+    perl t/harness t/native_pbc/integer.t && \
+      perl t/harness t/native_pbc/number.t && \
+      perl t/harness t/native_pbc/string.t
+fi
+
 echo ""
 if [ -e .parrot_current_rev ]
 then
     echo "Do not commit these native_pbcs on devel versions, it must be a release candidate!"
+    echo "For a release, be sure to fix the VERSION file to the new version"
 else
     cd t/native_pbc
     echo svn commit -m'native_pbc platform updates'
