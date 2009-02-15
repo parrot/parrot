@@ -64,6 +64,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "Hello world" );
 
 #include "parrot/embed.h"
 #include "parrot/extend.h"
+#include "parrot/interpreter.h"
 
 void fail(const char *msg);
 
@@ -76,17 +77,34 @@ void fail(const char *msg)
 int main(void)
 {
     Parrot_Interp interp;
+    Parrot_String compiler;
+    Parrot_String errstr;
+    Parrot_PMC *code;
+
+    /* Create the interprter and show a message using parrot io */
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
-
     Parrot_printf(interp, "Hello, parrot\n");
+
+    /* Compile and execute a pir sub */
+    compiler = Parrot_new_string(interp, "PIR", 3, (const char *)NULL, 0);
+    code = Parrot_compile_string(interp, compiler,
+".sub main\n"
+"  say 'Hello, pir'\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+    Parrot_call_sub(interp, code, "");
 
     Parrot_exit(interp, 0);
     return 0;
 }
 CODE
 Hello, parrot
+Hello, pir
 OUTPUT
 
 
