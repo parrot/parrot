@@ -39,8 +39,8 @@ my @now = gmtime;
 my $date = sprintf("%04d%02d%02d", 1900 + $now[5], 1 + $now[4], $now[3]);
 
 my $license = (-f "languages/$lang/LICENSE")
-            ? "languages\\$lang\\LICENSE"
-            : '.\\LICENSE';
+            ? qq{LicenseFile=languages\\$lang\\LICENSE}
+            : '; no LicenseFile';
 
 my $exe = <languages/$lang/*.exe>
         ? qq{Source: ".\\languages\\$lang\\*.exe"; DestDir: "{app}\\bin"; Flags:}
@@ -48,6 +48,9 @@ my $exe = <languages/$lang/*.exe>
 my $cmd = <languages/$lang/*.cmd>
         ? qq{Source: ".\\languages\\$lang\\*.cmd"; DestDir: "{app}\\bin"; Flags:}
         : '; no .cmd';
+my $pbc = <languages/$lang/*.pbc>
+        ? qq{Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\$version\\languages\\$lang"; Flags:}
+        : '; no .pbc';
 my $pmc = <languages/$lang/src/pmc/*.pmc>
         ? qq{Source: ".\\languages\\$lang\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\$version\\dynext"; Flags:}
         : '; no pmc';
@@ -70,7 +73,7 @@ AppPublisherURL=http://www.parrot.org/
 DefaultDirName={sd}$prefix
 DefaultGroupName=Parrot
 AllowNoIcons=yes
-LicenseFile=$license
+$license
 OutputDir=.\\
 OutputBaseFilename=setup-parrot-$version-$lclang-$date
 Compression=lzma
@@ -78,9 +81,9 @@ SolidCompression=yes
 Uninstallable=no
 
 [Files]
-Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\$version\\languages\\$lang"; Flags:
 $exe
 $cmd
+$pbc
 $pmc
 $ops
 
