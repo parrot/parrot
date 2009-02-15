@@ -1,11 +1,11 @@
 # $Id$
 
-New in February 2009 release (r35855 to r36683)
+New in February 2009 release (r35855 to r36724)
 
 - Implementation
-  + Support for portable 'Inf' and 'NaN'
+  + Support for portable 'Inf', 'NaN' and -0.0
   + pbc_disassemble prints constants in constants table
-  + Disabled incomplete BigNum implementation
+  + New experimental BigNum implementation
   + Pair is now a dynamic loadable PMC
   + Various function name sanification
   + New implementation of Strings component
