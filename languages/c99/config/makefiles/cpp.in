@@ -2,7 +2,7 @@
 ## $Id$
 
 ## arguments we want to run parrot with
-PARROT_ARGS =
+PARROT_ARGS   =
 
 ## configuration settings
 BUILD_DIR     = @build_dir@
@@ -10,12 +10,11 @@ LOAD_EXT      = @load_ext@
 O             = @o@
 
 ## Setup some commands
-LN_S          = @lns@
 PERL          = @perl@
-RM_RF         = @rm_rf@
+RM_F          = @rm_f@
 CP            = @cp@
-PARROT        = ../../../../parrot@exe@
 CAT           = @cat@
+PARROT        = ../../../../parrot@exe@
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 
@@ -30,23 +29,18 @@ PMC_DIR       = src/pmc
 
 all: cpp.pbc
 
-C_GROUP = $(PMC_DIR)/c_group$(LOAD_EXT)
-
 SOURCES = cpp.pir \
   src/gen_grammar.pir \
   src/gen_actions.pir \
-  src/gen_builtins.pir \
-#  $(C_GROUP)
+  src/gen_builtins.pir
 
 BUILTINS_PIR = \
-  src/builtins/say.pir \
-
-# PMCS = c
-# PMC_SOURCES = $(PMC_DIR)/c.pmc
+  src/builtins/say.pir
 
 # the default target
 cpp.pbc: $(PARROT) $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o cpp.pbc cpp.pir
+	$(CP) cpp.pbc ../../cpp.pbc
 
 src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
@@ -59,12 +53,6 @@ src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 
 src/gen_builtins.pir: $(BUILTINS_PIR)
 	$(CAT) $(BUILTINS_PIR) >src/gen_builtins.pir
-
-$(C_GROUP): $(PARROT) $(PMC_SOURCES)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) generate $(PMCS)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) compile $(PMCS)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) linklibs $(PMCS)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) copy --destination=$(PARROT_DYNEXT) $(PMCS)
 
 # regenerate the Makefile
 Makefile: ../../config/makefiles/cpp.in
@@ -98,26 +86,13 @@ testclean:
 
 CLEANUPS = \
   cpp.pbc \
-  src/gen_grammar.pir \
-  src/gen_actions.pir \
-  src/gen_builtins.pir \
-  $(PMC_DIR)/*.h \
-  $(PMC_DIR)/*.c \
-  $(PMC_DIR)/*.dump \
-  $(PMC_DIR)/*$(O) \
-  $(PMC_DIR)/*$(LOAD_EXT) \
-  $(PMC_DIR)/*.exp \
-  $(PMC_DIR)/*.ilk \
-  $(PMC_DIR)/*.manifest \
-  $(PMC_DIR)/*.pdb \
-  $(PMC_DIR)/*.lib \
-
+  "src/gen_*.pir"
 
 clean:
-	$(RM_RF) $(CLEANUPS)
+	$(RM_F) $(CLEANUPS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean
 
