@@ -180,6 +180,10 @@ Replace usage with the escape opcode.  See TT #107
 
 See TT #109
 
+=item tools/build/dynoplibs.pl and tools/build/dynpmc.pl [post 0.9.1]
+
+Replaced with makefiles. See TT #338.
+
 =back
 
 =cut
