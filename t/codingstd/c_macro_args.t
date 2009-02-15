@@ -86,6 +86,9 @@ sub check_macro_args {
                     # eliminate macros that deal with flags, since they're special
                     next if $macro =~ m/(TEST|SET|CLEAR)$/;
 
+                    # skip those two varargs macros, already called as TRACE_PRINTF((args))
+                    next if $macro =~ m/^TRACE_PRINTF(_VAL)?$/;
+
                     # Any remaining usage must be improper
                     if ($definition =~ m/\b\Q$arg\E\b/) {
                         push (@defines, "$path: $macro has unwrapped arg: $arg\n");
