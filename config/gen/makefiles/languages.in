@@ -1,7 +1,7 @@
 # Copyright (C) 2002-2009, The Perl Foundation.
 # $Id$
 
-# setup of commands
+# some commands and locations
 @make_set_make@
 PERL          = @perl@
 MAKE          = @make_c@
@@ -70,6 +70,8 @@ help:
 	@echo ""
 	@echo "  co-eclectus:   Try to fetch eclectus"
 	@echo ""
+	@echo "  co-fun:        Try to fetch fun"
+	@echo ""
 	@echo "  co-gil:        Try to fetch gil"
 	@echo ""
 	@echo "  co-hq9plus:    Try to fetch HQ9+"
@@ -96,6 +98,8 @@ help:
 	@echo "  up-all:        Try to update externally managed languages"
 	@echo ""
 	@echo "  up-eclectus:   Try to update eclectus"
+	@echo ""
+	@echo "  up-fun:        Try to update fun"
 	@echo ""
 	@echo "  up-gil:        Try to update gil"
 	@echo ""
@@ -454,9 +458,9 @@ urm.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-gil co-hq9plus co-lazy-k co-lua co-m4 co-markdown co-pjs \
+co-all: co-eclectus co-fun co-gil co-hq9plus co-lazy-k co-lua co-m4 co-markdown co-pjs \
     co-primitivearc co-rakudo co-shakespeare co-tcl co-unlambda co-wmlscript
-up-all: up-eclectus up-gil up-hq9plus up-lazy-k up-lua up-m4 up-markdown up-pjs \
+up-all: up-eclectus up-fun up-gil up-hq9plus up-lazy-k up-lua up-m4 up-markdown up-pjs \
     up-primitivearc up-rakudo up-shakespeare up-tcl up-unlambda up-wmlscript
 
 co-eclectus:
@@ -464,6 +468,12 @@ co-eclectus:
 
 up-eclectus:
 	cd eclectus &&  $(GIT) pull
+
+co-fun:
+	- $(GIT) clone 'git:////github.com//TiMBuS//fun.git'
+
+up-fun:
+	cd fun &&  $(GIT) pull
 
 co-gil:
 	- $(GIT) clone 'git:////github.com//tene//gil.git'
