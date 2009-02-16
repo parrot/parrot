@@ -49,7 +49,7 @@ sub parrot_version {
     }
     else { # we're in an installed copy of Parrot
         my $path = shift;
-	$path = '' unless $path;
+        $path = '' unless $path;
         open my $VERSION, '<', "$path/VERSION" or die 'Could not open VERSION file!';
         chomp( $parrot_version = <$VERSION> );
         close $VERSION or die $!;
