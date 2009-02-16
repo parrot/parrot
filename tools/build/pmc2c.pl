@@ -6,7 +6,8 @@ use strict;
 use warnings;
 use Getopt::Long ();
 use FindBin qw($Bin);
-use lib "$Bin/../../lib";
+use lib "$Bin/../lib";    # install location
+use lib "$Bin/../../lib"; # build location
 use Parrot::Pmc2c::Pmc2cMain ();
 
 my ( %action, %options, @pmc_include_paths );
