@@ -192,8 +192,6 @@ parrot_init_library_paths(PARROT_INTERP)
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/include/"), 0);
         VTABLE_push_string(interp, paths, entry);
     }
-    entry = CONST_STRING(interp, "lib/parrot/include/");
-    VTABLE_push_string(interp, paths, entry);
 
 
     /* define library paths */
@@ -210,8 +208,6 @@ parrot_init_library_paths(PARROT_INTERP)
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/library/"), 0);
         VTABLE_push_string(interp, paths, entry);
     }
-    entry = CONST_STRING(interp, "lib/parrot/library/");
-    VTABLE_push_string(interp, paths, entry);
 
     /* define dynext paths */
     paths = pmc_new(interp, enum_class_ResizableStringArray);
@@ -224,8 +220,6 @@ parrot_init_library_paths(PARROT_INTERP)
         VTABLE_push_string(interp, paths, entry);
     }
     entry = CONST_STRING(interp, "");
-    VTABLE_push_string(interp, paths, entry);
-    entry = CONST_STRING(interp, "lib/parrot/dynext/");
     VTABLE_push_string(interp, paths, entry);
 
     /* shared exts */
