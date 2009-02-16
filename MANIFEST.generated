@@ -258,4 +258,5 @@ tools/build/dynpmc.pl                             []
 tools/install/smoke.pl                            []
 lib/Parrot/Config/Generated.pm                    [devel]lib
 lib/Parrot/PMC.pm                                 [devel]lib
+lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm                [devel]lib
 compilers/nqp/nqp.pbc                             [nqp]
