@@ -43,7 +43,7 @@ sub runstep {
         $versiondir .= '/parrot';
     }
     my $version = $conf->option_or_data('VERSION');
-    unless ($prefix =~ /$version/) {
+    if ($version && $prefix !~ /$version/) {
         $versiondir .= "/$version"; 
         $versiondir .= $conf->option_or_data('DEVEL');
     }
