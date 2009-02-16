@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 25;
+use Test::More tests => 28;
 
 =head1 NAME
 
@@ -106,6 +106,30 @@ unlink($filename);
 
 SKIP:
 {
+skip("Befunge", 1) unless (-d "$langdir/befunge");
+$filename = 'test.bef';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH <<'CODE';
+<                   p 04   "v"
+  ^ >
+I                       @   _v
+                            !,
+  _   2! |                  :
+    . \-  %2/36 `21  $   <  ^<   "<- then everything is ok!" +37
+  !      #
+  3      >
+         <       v  ,  _ ^# -8 : g20 "f you can see a 4 here ->" 8 4
+                 > :8- ^
+CODE
+close $FH;
+$out = `$parrot $langdir/befunge/befunge.pbc $filename`;
+ok($out eq "If you can see a 4 here ->4 <- then everything is ok!\n", "check befunge");
+unlink($filename);
+}
+
+SKIP:
+{
 skip("bf", 3) unless (-d "$langdir/bf");
 $out = `$parrot $langdir/bf/bf.pbc`;
 ok($out =~ /^usage/, "check bf");
@@ -120,6 +144,19 @@ SKIP:
 skip("Cardinal", 1) unless (-d "$langdir/cardinal");
 $out = `$parrot $langdir/cardinal/cardinal.pbc -e "print 'hello world';"`;
 ok($out eq "hello world", "check cardinal");
+}
+
+SKIP:
+{
+skip("ChitChat", 1) unless (-d "$langdir/chitchat");
+$filename = 'test.smalltalk';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "Transcript show: 'Hello, world!'.";
+close $FH;
+$out = `$parrot $langdir/chitchat/chitchat.pbc $filename`;
+ok($out eq "Hello, world!\n", "check chitchat");
+unlink($filename);
 }
 
 SKIP:
@@ -139,6 +176,19 @@ print $FH "print(\"Hello World from JS\\n\");";
 close $FH;
 $out = `$parrot $langdir/ecmascript/js.pbc $filename`;
 ok($out eq "Hello World from JS\n\n", "check ecmascript");
+unlink($filename);
+}
+
+SKIP:
+{
+skip("fun", 1) unless (-d "$langdir/fun");
+$filename = 'test.fun';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "\"Hello World!\".";
+close $FH;
+$out = `$parrot $langdir/fun/fun.pbc $filename`;
+ok($out eq "Hello World!\n", "check fun");
 unlink($filename);
 }
 
@@ -183,13 +233,6 @@ unlink($filename);
 
 SKIP:
 {
-skip("Lua", 1) unless (-d "$langdir/lua");
-$out = `$parrot $langdir/lua/lua.pbc -e "print(nil)"`;
-ok($out eq "nil\n", "check lua");
-}
-
-SKIP:
-{
 skip("LOLCODE", 1) unless (-d "$langdir/lolcode");
 $filename = 'test.lolcode';
 open $FH, '>', $filename
@@ -203,6 +246,13 @@ close $FH;
 $out = `$parrot $langdir/lolcode/lolcode.pbc $filename`;
 ok($out eq "HAI WORLD!\n", "check lolcode");
 unlink($filename);
+}
+
+SKIP:
+{
+skip("Lua", 1) unless (-d "$langdir/lua");
+$out = `$parrot $langdir/lua/lua.pbc -e "print(nil)"`;
+ok($out eq "nil\n", "check lua");
 }
 
 SKIP:
