@@ -118,7 +118,7 @@ while (<>) {
     $meta =~ s/^\[(.*?)\]//;
     next unless $package;    # Skip if this file belongs to no package
 
-    next unless $package =~ /devel|pct|tge/;
+    next unless $package =~ /devel|pct|tge|nqp/;
 
     my %meta;
     @meta{ split( /,/, $meta ) } = ();
