@@ -44,7 +44,7 @@ sub runstep {
     }
     my $version = $conf->option_or_data('VERSION');
     if ($version && $prefix !~ /$version/) {
-        $versiondir .= "/$version"; 
+        $versiondir .= "/$version";
         $versiondir .= $conf->option_or_data('DEVEL');
     }
 
