@@ -135,10 +135,11 @@ sub _get_manifest_entry {
             : m[^docs/pct/]                   ? '[pct]doc'
             : m[^examples/]                   ? '[examples]'
             : m[^include/]                    ? '[main]include'
+            : m[^t/]                          ? '[test]'
+            : m[/t/]                          ? '[test]'
             : ( m[^languages/(\w+)/] and $1 ne 'conversion' ) ? "[$1]"
             : ( m[^compilers/(\w+)/] and $1 ne 'conversion' ) ? "[$1]"
             : m[^lib/Parrot/]                 ? '[devel]lib'
-            : m[^t/]                          ? '[test]'
             : m[^runtime/]                    ? '[library]'
             : m[^src/pmc/.*\.h]               ? '[devel]include'
             : m[^runtime/parrot/library/PCT]  ? '[pct]'
