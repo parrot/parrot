@@ -975,6 +975,17 @@ and the open mode. If no filename is given, the previous filename associated
 with the filehandle is opened. If no mode is given, the previously-used mode
 is used.
 
+  $P0 = new 'Filehandle'
+  $P0.'open'("myfile.txt", "r")
+  
+  $P0 = open "myfile.txt", "r"   # Same!
+  
+The C<open> opcode internally creates a new filehandle PMC and calls the
+C<'open'()> method on it. So even though the above two code snippets act in
+an identical way, the later one is a little more concise to write. The caveat
+is that the C<open> opcode creates a new PMC for every call, while the
+C<'open'()> method call can reuse an existing filehandle PMC for a new file.
+
 =item C<$P0.'isatty'()>
 
 Returns a boolean value whether the filehandle is a TTY terminal
@@ -983,6 +994,13 @@ Returns a boolean value whether the filehandle is a TTY terminal
 
 Closes the filehandle. Can be reopened with C<.'open'> later.
 
+  $P0.'close'()
+  
+  close $P0   # Same
+  
+The C<close> opcode calls the C<'close'()> method on the Filehandle PMC
+internally, so these two calls are equivalent.
+
 =item C<$P0.'is_closed'()>
 
 Returns true if the filehandle is closed, false if it is opened.
@@ -990,6 +1008,13 @@ Returns true if the filehandle is closed, false if it is opened.
 =item C<$P0.'read'(INTVAL length)>
 
 Reads C<length> bytes from the filehandle.
+
+  $S0 = read $P0, 10
+  
+  $P0.'read'(10)
+
+The two calls are equivalent, and the C<read> opcode calls the C<'read'()>
+method internally.
 
 =item C<$P0.'readline'()
 
@@ -1012,7 +1037,15 @@ Flushes the buffer
 
 =item C<$P0.'print'(PMC to_print)>
 
-Prints the given value to the filehandle
+Prints the given value to the filehandle. The C<print> opcode uses the
+C<'print'()> method internally.
+
+  print "Hello"
+  
+  $P0 = getstdout
+  print $P0, "Hello!"    # Same
+  
+  $P0.'print'("Hello!")  # Same
 
 =item C<$P0.'puts'(STRING to_print)>
 
