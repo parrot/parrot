@@ -179,7 +179,7 @@ sub _get_special {
         src/vtable.tbl                                  [devel]share
         VERSION                                         [devel]
         tools/build/ops2c.pl                            [devel]
-        tools/build/pbc2c.pl                            [devel]
+        tools/build/pmc2c.pl                            [devel]
         tools/dev/pbc_to_exe.pir                        [devel]
         tools/dev/gen_makefile.pl                       [devel]
         tools/dev/reconfigure.pl                        [devel]
