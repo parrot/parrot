@@ -72,9 +72,9 @@ Destroys this PMC.
 */
 
     VTABLE PMC *instantiate(PMC *sig) {
-        PMC * const ret    = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        opcode_t   *arg_op = interp->current_args;
-        INTVAL      init   = 0;
+        PMC            * const ret    = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        const opcode_t * const arg_op = interp->current_args;
+        INTVAL init;
 
         if (VTABLE_elements(interp, sig) == 2) {
             switch (VTABLE_get_integer_keyed_int(INTERP, sig, 1)) {
@@ -98,7 +98,7 @@ Destroys this PMC.
 
 
     VTABLE void init() {
-        Parrot_Integer_attributes* attrs =
+        Parrot_Integer_attributes* const attrs =
             mem_allocate_zeroed_typed(Parrot_Integer_attributes);
         attrs->iv = 0;
         PMC_data(SELF) = attrs;
@@ -120,7 +120,7 @@ Creates an exact duplicate of this PMC.
 
 */
     VTABLE PMC *clone() {
-        PMC *clone = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const clone = pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, clone, SELF.get_integer());
         return clone;
     }
@@ -805,7 +805,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -825,7 +825,7 @@ Divides C<SELF> by C<value> inplace.
 
 
     MULTI void i_divide(DEFAULT value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -866,7 +866,7 @@ Divides C<SELF> by C<value> inplace.
 
 
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
         FLOATVAL f;
 
         if (FLOAT_IS_ZERO(d))
@@ -918,7 +918,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     MULTI void i_floor_divide(DEFAULT value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
         FLOATVAL f;
 
         if (FLOAT_IS_ZERO(d))
@@ -1191,7 +1191,7 @@ Returns the result of comparing the integer with C<*value>.
 */
 
     MULTI INTVAL cmp(String value) {
-        FLOATVAL fdiff = SELF.get_number() - VTABLE_get_number(INTERP, value);
+        const FLOATVAL fdiff = SELF.get_number() - VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(fdiff)) {
             const INTVAL idiff =
@@ -1229,7 +1229,7 @@ Returns the result of numerically comparing the integer with C<*value>.
 */
 
     MULTI INTVAL cmp_num(String value) {
-        FLOATVAL fdiff = SELF.get_number() - VTABLE_get_number(INTERP, value);
+        const FLOATVAL fdiff = SELF.get_number() - VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(fdiff)) {
             const INTVAL idiff =
