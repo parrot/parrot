@@ -25,8 +25,7 @@ depends_lib			port:gmp port:icu
 
 configure.cmd		perl Configure.pl
 configure.pre_args	--prefix=${prefix}/lib/parrot
-# build static to avoid runtime lib issues for now
-configure.args		--optimize --parrot_is_shared=0
+configure.args		--optimize
 
 destroot.target         install
 
@@ -38,15 +37,18 @@ test.target		test
 
 destroot.destdir	 PREFIX=${destroot}${prefix}/lib/parrot
 
+# install the docs and create shortcuts for the executables.
 post-destroot {
 	set bindir	${destroot}${prefix}/bin
-	set docdir      ${destroot}${prefix}/share/doc/${name}
 	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/parrot"
+	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/parrot_config"
+	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/parrot_debugger"
+	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/pbc_disassemble"
+	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/pbc_info"
+	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/pbc_merge"
+	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/pbc_to_exe"
+	system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/pbc_dump"
 
+	set docdir      ${destroot}${prefix}/share/doc/${name}
 	xinstall -m 755 -d ${docdir}
-}
-
-platform darwin 8 {
-	configure.args-append --cc=/usr/bin/gcc-4.0 --link=/usr/bin/gcc-4.0 \
-		--ld=/usr/bin/gcc-4.0 --cxx=/usr/bin/g++-4.0
 }
