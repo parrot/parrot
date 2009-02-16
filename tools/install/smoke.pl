@@ -89,10 +89,6 @@ my $libdir = ($bindir eq 'bin')
            ? "lib/parrot/$version/library"
            : 'runtime/parrot/library';
 
-my $langdir = ($bindir eq 'bin')
-            ? "lib/parrot/$version/languages"
-            : 'languages';
-
 my $compdir = ($bindir eq 'bin')
             ? "lib/parrot/$version/languages"
             : 'compilers';

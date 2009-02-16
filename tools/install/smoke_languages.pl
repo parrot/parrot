@@ -124,14 +124,14 @@ ok($out eq "hello world", "check cardinal");
 
 SKIP:
 {
-skip(".NET", 3) unless (-d "$langdir/dotnet");
+skip(".NET", 1) unless (-d "$langdir/dotnet");
 $out = `$parrot $langdir/dotnet/net2pbc.pbc`;
 ok($out =~ /^Usage/, "check dotnet");
 }
 
 SKIP:
 {
-skip("EcmaScript", 3) unless (-d "$langdir/ecmascript");
+skip("EcmaScript", 1) unless (-d "$langdir/ecmascript");
 $filename = 'test.js';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
@@ -296,6 +296,7 @@ skip("Rakudo", 2) unless (-d "$langdir/rakudo");
 $out = `$parrot $langdir/rakudo/perl6.pbc -e "say 'hello world'"`;
 ok($out eq "hello world\n", "check rakudo");
 
+skip("perl6.cmd", 1) if ($bindir eq '.');
 $exe = catfile($bindir, 'perl6');
 $out = `$exe -v`;
 ok($out =~ /Rakudo/, "check rakudo");
