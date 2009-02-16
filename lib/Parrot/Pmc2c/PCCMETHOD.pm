@@ -5,6 +5,7 @@ package Parrot::Pmc2c::PCCMETHOD;
 use strict;
 use warnings;
 use Carp qw(longmess croak);
+use Parrot::Pmc2c::PCCMETHOD_BITS;
 
 =head1 NAME
 
@@ -70,20 +71,6 @@ use constant REGNO_INT => 0;
 use constant REGNO_NUM => 1;
 use constant REGNO_STR => 2;
 use constant REGNO_PMC => 3;
-
-# refactor to a simple module import, RT#42286
-BEGIN {
-    my $bits   = 'Parrot/Pmc2c/PCCMETHOD_BITS.pl';
-    my %consts = do $bits;
-    unless (%consts) {
-        die $@ if $@;
-        die "$bits: $!";
-    }
-    require constant;
-    while ( my ( $k, $v ) = each %consts ) {
-        constant->import( $k, $v );
-    }
-}
 
 =head3
     regtype to argtype conversion hash
