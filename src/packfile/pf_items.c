@@ -358,7 +358,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num16_num8)
     long double d;
-    memcpy(&d, src, 16);
+    memcpy(&d, src, sizeof (unsigned char));
     *dest = (double)d; /* TODO: test */
 }
 
@@ -379,7 +379,7 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num8_num16)
     double d;
-    memcpy(&d, src, 8);
+    memcpy(&d, src, sizeof (unsigned char));
     *dest = (long double)d; /* TODO: test */
 }
 
@@ -400,7 +400,7 @@ cvt_num8_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num8_num16)
     double d;
-    memcpy(&d, src, 8);
+    memcpy(&d, src, sizeof (unsigned char));
     *dest = (long double)d; /* TODO: test */
 }
 
@@ -946,14 +946,13 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_number)
     /* When we have alignment all squared away we don't need
-     * to use memcpy() for native byteorder.
-     */
+     * to use memcpy() for native byteorder.  */
     FLOATVAL f;
     double d;
     if (!pf || !pf->fetch_nv) {
         TRACE_PRINTF(("PF_fetch_number: Native [%d bytes]\n",
                       sizeof (FLOATVAL)));
-        memcpy(&f, (const char*)*stream, sizeof (FLOATVAL));
+        memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
         TRACE_PRINTF_VAL(("PF_fetch_number: %f\n", f));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
