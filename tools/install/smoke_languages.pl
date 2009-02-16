@@ -71,7 +71,7 @@ $out =~ m/version (\S+) built/;
 my $version = $1;
 
 my $langdir = ($bindir eq 'bin')
-            ? "lib/parrot/$version/languages"
+            ? ($^O eq 'MSWin32') ? 'lib/parrot/languages' : "lib/parrot/$version/languages"
             : 'languages';
 
 #

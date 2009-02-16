@@ -49,13 +49,13 @@ my $cmd = <languages/$lang/*.cmd>
         ? qq{Source: ".\\languages\\$lang\\*.cmd"; DestDir: "{app}\\bin"; Flags:}
         : '; no .cmd';
 my $pbc = <languages/$lang/*.pbc>
-        ? qq{Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\$version\\languages\\$lang"; Flags:}
+        ? qq{Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
 my $pmc = <languages/$lang/src/pmc/*.pmc>
-        ? qq{Source: ".\\languages\\$lang\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\$version\\dynext"; Flags:}
+        ? qq{Source: ".\\languages\\$lang\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no pmc';
 my $ops = <languages/$lang/src/ops/*.ops>
-        ? qq{Source: ".\\languages\\$lang\\src\\ops\\*.dll"; DestDir: "{app}\\lib\\parrot\\$version\\dynext"; Flags:}
+        ? qq{Source: ".\\languages\\$lang\\src\\ops\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no ops';
 
 my $filename = 'parrot-' . $lclang . '.iss';

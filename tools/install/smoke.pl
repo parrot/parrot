@@ -86,11 +86,11 @@ $out =~ m/version (\S+) built/;
 my $version = $1;
 
 my $libdir = ($bindir eq 'bin')
-           ? "lib/parrot/$version/library"
+           ? ($^O eq 'MSWin32') ? 'lib/parrot/library' : "lib/parrot/$version/library"
            : 'runtime/parrot/library';
 
 my $compdir = ($bindir eq 'bin')
-            ? "lib/parrot/$version/languages"
+           ? ($^O eq 'MSWin32') ? 'lib/parrot/languages' : "lib/parrot/$version/languages"
             : 'compilers';
 
 #
