@@ -257,4 +257,5 @@ src/string_private_cstring.h                      []
 tools/build/dynpmc.pl                             []
 tools/install/smoke.pl                            []
 lib/Parrot/Config/Generated.pm                    [devel]lib
+lib/Parrot/PMC.pm                                 [devel]lib
 compilers/nqp/nqp.pbc                             [nqp]
