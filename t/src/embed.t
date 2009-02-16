@@ -57,6 +57,11 @@ CODE
 Done
 OUTPUT
 
+# Unskip this after commit patch in TT #343
+SKIP : {
+
+    skip('Not ready yet, skipped until next release', 1);
+
 c_output_is( <<'CODE', <<'OUTPUT', "Hello world" );
 
 #include <stdio.h>
@@ -107,6 +112,7 @@ Hello, parrot
 Hello, pir
 OUTPUT
 
+}
 
 # Old tests, skipped al
 
