@@ -48,12 +48,15 @@
 #  define TRACE_PRINTF(args)       if (pf->options) Parrot_trace_eprintf args
 #  if TRACE_PACKFILE == 2
 #    define TRACE_PRINTF_VAL(args) if (pf->options & 2) Parrot_trace_eprintf args
+#    define TRACE_PRINTF_2(args)   Parrot_trace_eprintf args
 #  else
 #    define TRACE_PRINTF_VAL(args)
+#    define TRACE_PRINTF_2(args)
 #  endif
 #else
 #  define TRACE_PRINTF(args)
 #  define TRACE_PRINTF_VAL(args)
+#  define TRACE_PRINTF_2(args)
 #endif
 
 /*

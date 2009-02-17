@@ -377,12 +377,12 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     memset(dest, 0, 12);
     /* simply copy over sign + exp */
-    TRACE_PRINTF_VAL(("  cvt_num16_num12: sign+exp=0x%2x\n", src[15]));
+    TRACE_PRINTF_2(("  cvt_num16_num12: sign+exp=0x%2x\n", src[15]));
     dest[11] = src[15];
     dest[12] = src[14];
     /* and trunc the rest */
     memcpy(dest[10], src[13], 10);
-    TRACE_PRINTF_VAL(("  cvt_num16_num12: mantissa=0x%10x, double=%lf\n",
+    TRACE_PRINTF_2(("  cvt_num16_num12: mantissa=0x%10x, double=%lf\n",
                       src[13], (long double)dest));
 }
 #endif
@@ -433,7 +433,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     double d;
     memcpy(&d, src, 8);
     ld = (long double)d; /* TODO: test compiler cast */
-    TRACE_PRINTF_VAL(("  cvt_num16_num8: ld=%lf, d=%f\n", ld, d));
+    TRACE_PRINTF_2(("  cvt_num16_num8: ld=%lf, d=%f\n", ld, d));
     memcpy(dest, &ld, 16);
 
 #else
@@ -536,7 +536,7 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     double d;
     memcpy(&d, src, 8);
     ld = (long double)d; /* TODO: test compiler cast */
-    TRACE_PRINTF_VAL(("  cvt_num8_num16: d=%f, ld=%lf\n", d, ld));
+    TRACE_PRINTF_2(("  cvt_num8_num16: d=%f, ld=%lf\n", d, ld));
     memcpy(dest, &ld, 16);
 }
 
@@ -561,7 +561,7 @@ cvt_num8_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     double d;
     memcpy(&d, src, 8);
     ld = (long double)d; /* TODO: test compiler cast */
-    TRACE_PRINTF_VAL(("  cvt_num8_num12: ld=%lf, d=%f\n", ld, d));
+    TRACE_PRINTF_2(("  cvt_num8_num12: ld=%lf, d=%f\n", ld, d));
     memcpy(dest, &ld, 12);
 }
 #endif
@@ -586,7 +586,7 @@ cvt_num8_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num8_num12_be)
     unsigned char b[8];
     fetch_buf_be_8(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_VAL(("  cvt_num8_num12_be: 0x%8x\n", b));
+    TRACE_PRINTF_2(("  cvt_num8_num12_be: 0x%8x\n", b));
     cvt_num8_num12(dest, b);
 }
 #endif
@@ -610,7 +610,7 @@ cvt_num8_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num8_num16_le)
     unsigned char b[8];
     fetch_buf_be_8(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_VAL(("  cvt_num8_num16_le: 0x%8x\n", b));
+    TRACE_PRINTF_2(("  cvt_num8_num16_le: 0x%8x\n", b));
     cvt_num8_num16(dest, b);
 }
 #endif
@@ -634,7 +634,7 @@ cvt_num12_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num12_num16_le)
     unsigned char b[12];
     fetch_buf_be_12(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_VAL(("  cvt_num12_num16_le: 0x%8x\n", b));
+    TRACE_PRINTF_2(("  cvt_num12_num16_le: 0x%8x\n", b));
     cvt_num12_num16(dest, b);
 }
 #endif
@@ -658,7 +658,7 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
     ASSERT_ARGS(cvt_num12_num8_le)
     unsigned char b[12];
     fetch_buf_le_12(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_VAL(("  cvt_num12_num8_le: 0x%12x\n", b));
+    TRACE_PRINTF_2(("  cvt_num12_num8_le: 0x%12x\n", b));
     cvt_num12_num8(dest, b);
 }
 #endif
@@ -683,7 +683,7 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
     ASSERT_ARGS(cvt_num16_num8_le)
     unsigned char b[16];
     fetch_buf_le_16(b, src);
-    TRACE_PRINTF_VAL(("  cvt_num16_num8_le: 0x%16x\n", b));
+    TRACE_PRINTF_2(("  cvt_num16_num8_le: 0x%16x\n", b));
     cvt_num16_num8(dest, b);
 }
 #endif
@@ -707,7 +707,7 @@ cvt_num16_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num16_num8_be)
     unsigned char b[16];
     fetch_buf_be_16(b, src);
-    TRACE_PRINTF_VAL(("  cvt_num16_num8_be: 0x%16x\n", b));
+    TRACE_PRINTF_2(("  cvt_num16_num8_be: 0x%16x\n", b));
     cvt_num16_num8(dest, b);
 }
 #endif
@@ -731,7 +731,7 @@ cvt_num16_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ASSERT_ARGS(cvt_num16_num12_be)
     unsigned char b[16];
     fetch_buf_be_16(b, src);
-    TRACE_PRINTF_VAL(("  cvt_num16_num12_be: 0x%16x\n", b));
+    TRACE_PRINTF_2(("  cvt_num16_num12_be: 0x%16x\n", b));
     cvt_num16_num12(dest, b);
 }
 #endif
