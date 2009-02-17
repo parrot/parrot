@@ -852,10 +852,10 @@ file are inserted as if they were written at the point where the
 C<.include> directive occurs.
 
 The include file is searched for in the current directory and in
-runtime/parrot/include, in that order. The first file of that name to be found
-is included.
+runtime/parrot/include, in that order. The first file of that name to
+be found is included.
 
-{{ NOTE: the C<.include> directive's search order is subject to change. }}
+The C<.include> directive's search order is subject to change.
 
 =item * C<.macro> <identifier> [<parameters>]
 
@@ -1258,7 +1258,7 @@ IMCC; these constructs are marked with notes saying so.
 =item * compilers/pirc
 
 This is a new implementation which will fix several of IMCC's
-shortcomings. It will replace IMCC in the not too distant future.
+shortcomings. It will replace IMCC.
 
 =item * languages/PIR
 
