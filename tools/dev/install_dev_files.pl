@@ -73,7 +73,7 @@ my %options = (
     includedir  => '/usr/include',   # parrot/ subdir added below
     docdir      => '/usr/share/doc', # parrot/ subdir added below
     datadir     => '/usr/share/',    # parrot/ subdir added below
-    srcdir      => '/usr/src/',    # parrot/ subdir added below
+    srcdir      => '/usr/src/',      # parrot/ subdir added below
     'dry-run'   => 0,
 );
 
@@ -133,7 +133,7 @@ while (<>) {
     }
     elsif ( $meta{include} ) {
         $dest =~ s/^src//; # strip off leading src/ dir
-        $dest =~ s/^include\/parrot//;
+        $dest =~ s/^include//;
         $dest = File::Spec->catdir( $options{includedir}, $parrotdir, $dest );
     }
     elsif ( $meta{src} ) {

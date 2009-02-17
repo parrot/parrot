@@ -199,7 +199,7 @@ while (<>) {
         }
     }
     elsif ( $meta{include} ) {
-        $dest =~ s/^include\/parrot//;
+        $dest =~ s/^include//;
         $dest = File::Spec->catdir( $options{includedir}, $parrotdir, $dest );
     }
     elsif ( $meta{doc} ) {

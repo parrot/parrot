@@ -53,6 +53,8 @@ include/parrot/oplib/ops.h                        [main]include
 include/parrot/platform.h                         [main]include
 include/parrot/platform_interface.h               [main]include
 include/parrot/vtable.h                           [main]include
+include/parrot/platform_limits.h                  [devel]include
+include/parrot/pbcversion.h                       [devel]include
 installable_parrot                                [main]bin
 installable_parrot.exe                            [main]bin
 installable_parrot_config                         [main]bin
@@ -264,3 +266,12 @@ vtable.dump                                       [devel]src
 src/pmc/default.dump                              [devel]src
 src/pmc/string.dump                               [devel]src
 src/pmc/scalar.dump                               [devel]src
+src/pmc/multisub.dump                             [devel]src
+src/pmc/resizablepmcarray.dump                    [devel]src
+src/pmc/fixedpmcarray.dump                        [devel]src
+src/pmc/pmc_default.h                             [devel]include
+src/pmc/pmc_string.h                              [devel]include
+src/pmc/pmc_scalar.h                              [devel]include
+src/pmc/pmc_multisub.h                            [devel]include
+src/pmc/pmc_resizablepmcarray.h                   [devel]include
+src/pmc/pmc_fixedpmcarray.h                       [devel]include
