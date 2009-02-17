@@ -34,8 +34,11 @@
 /* Unsupported NaN difference, but patches welcome */
 #define FLOATTYPE_16MIPS      3
 #define FLOATTYPE_16MIPS_NAME "MIPS 16 byte long double"
+/* See http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/IBMp690/IBM/usr/share/man/info/en_US/a_doc_lib/aixprggd/genprogc/128bit_long_double_floating-point_datatype.htm */
+#define FLOATTYPE_16AIX       4
+#define FLOATTYPE_16AIX_NAME "AIX 16 byte long double"
 /* Not yet set into silicon AFAIK */
-#define FLOATTYPE_32          4
+#define FLOATTYPE_32          5
 #define FLOATTYPE_32_NAME     "256-bit extended double"
 
 #define TRACE_PACKFILE 0
