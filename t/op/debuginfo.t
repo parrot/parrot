@@ -23,19 +23,24 @@ as well as backtrace tests.
 
 =cut
 
-pasm_output_like( <<'CODE', <<'OUTPUT', "getline, getfile" );
+$ENV{TEST_PROG_ARGS} ||= '';
+my $nolineno = $ENV{TEST_PROG_ARGS} =~ /-f|-g/
+    ? "\\(unknown file\\)\n-1" : "debuginfo_\\d+\\.pasm\n\\d";
+
+SKIP: {
+skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /-f/;
+
+pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 .pcc_sub main:
     getfile S0
     getline I0
-    print S0
-    print "\n"
-    print I0
-    print "\n"
+    say S0
+    say I0
     end
 CODE
-/debuginfo_\d+\.pasm
-\d/
+/$nolineno/
 OUTPUT
+}
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
 .sub main
@@ -159,8 +164,14 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f|-g/
+    ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
+
+SKIP: {
+skip "disabled on fast-core",2 if $ENV{TEST_PROG_ARGS} =~ /-f/;
+
 # See "RT #43269 and .annotate
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline" );
+pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
 .sub main :main
     setfile "xyz.pir"
     setline 123
@@ -169,11 +180,13 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline" );
     'no_such_function'($S0, $I0)
 .end
 CODE
-/\(xyz.pir:126\)/
+/$nolineno/
 OUTPUT
 
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f|-g/
+    ? '\(\(unknown file\):-1\)' : '\(foo.p6:128\)';
 # See "RT #43269 and .annotate
-pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline" );
+pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
 .sub main :main
     setfile "foo.p6"
     setline 123
@@ -188,8 +201,10 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "setfile and setline" );
     'nsf'($P1)
 .end
 CODE
-/\(foo.p6:128\)/
+/$nolineno/
 OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl

@@ -279,6 +279,10 @@ opcode_t *
 runops_fast_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_fast_core)
+
+    /* disable pc */
+    CONTEXT(interp)->current_pc = NULL;
+
     while (pc) {
         DO_OP(pc, interp);
     }
@@ -307,6 +311,10 @@ opcode_t *
 runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 {
     ASSERT_ARGS(runops_cgoto_core)
+
+    /* disable pc */
+    CONTEXT(interp)->current_pc = NULL;
+
 #ifdef HAVE_COMPUTED_GOTO
     pc = cg_core(pc, interp);
     return pc;
