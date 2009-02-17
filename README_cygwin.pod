@@ -20,7 +20,7 @@ See L</loadlib DLL versioning>.
 
 =head1 Packages
 
-You'll need the following Cygwin packages to run and build Parrot 
+You'll need the following Cygwin packages to run and build Parrot
 by your own.
 
 Runtime requirements:
@@ -36,15 +36,15 @@ Optional requirements:
 Build requirements:
 
   gcc make perl parrot readline libncurses-devel libgmp-devel
-  libgdbm-devel pcre-devel 
+  libgdbm-devel pcre-devel
 
 Optional build requirements:
 
-  libicu-devel openssl-devel 
+  libicu-devel openssl-devel
 
-  for Cygwin/X opengl: freeglut libglut-devel xorg-x11-devel 
+  for Cygwin/X opengl: freeglut libglut-devel xorg-x11-devel
 
-Optional perl packages for testing: 
+Optional perl packages for testing:
 
   L<Test::TAP::HTMLMatrix> if you want to run the smoke tests
   with C<make smoke>.
@@ -71,8 +71,9 @@ by not installing it or asking Parrot to ignore it (C<--without-icu>).
 You can use the w32api and opengl packages for native Windows opengl support,
 or the freeglut package for the X Server.
 
-Configure.pl will detect freeglut if freeglut is installed and DISPLAY 
-is set, otherwise it checks for w32api and opengl with GLUT.
+Configure.pl will detect freeglut if freeglut is installed and DISPLAY
+is set, otherwise it checks for w32api and opengl with GLUT. Note that DISPLAY
+must be set I<before> running Configure.pl.
 
   Determining if your platform supports OpenGL.............yes, freeglut 3.4.
   Determining if your platform supports OpenGL...................yes, GLUT 3.
@@ -82,7 +83,7 @@ Required packages:
 
   w32api opengl
 
-or 
+or
 
   freeglut libglut-devel xorg-x11-devel xorg-x11-base xorg-x11-bin-dlls
 
@@ -112,7 +113,7 @@ for cygwin, and as the name says it will never be :)
 =item perl fatal error - unable to remap Glob.dll
 
 Something like:
-  F<perl.exe>: *** fatal error - unable to remap 
+  F<perl.exe>: *** fatal error - unable to remap
   F<C:\cygwin\lib\perl5\5.10\i686-cygwin\auto\File\Glob\Glob.dll>
   to same address as parent(C<0x860000>) != C<0x14D0000>
 
@@ -134,8 +135,8 @@ See below.
 
 Building with an already installed library fails. See RT#39742
 
-Be sure that there's no other libparrot.dll.a or libparrot.a 
-in the linker libpath. 
+Be sure that there's no other libparrot.dll.a or libparrot.a
+in the linker libpath.
 
 F</usr/lib/libparrot.dll.a>, F</usr/local/lib/libparrot.dll.a>
 
