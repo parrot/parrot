@@ -94,7 +94,7 @@ Returns the boolean value of the C<Integer> (false if 0, true otherwise).
 
 Returns the integer value of the C<Integer> as a floating-point number.
 
-=item C<get_bignum()>
+=item C<get_bigint()>
 
 Returns the integer value of the C<Integer> in a new C<BigInt> PMC.
 
@@ -225,7 +225,7 @@ Converts the decimal integer to another base (anything from base 2 to base
 
 =head3 BigInt PMC
 
-The big number library provides Parrot with both a collection of (nearly)
+The bigint library provides Parrot with both a collection of (nearly)
 infinite precision numeric types and an implementation of an extended decimal
 arithmetic (EDA).
 
@@ -258,7 +258,7 @@ Numbers with decimal fractional parts, again with no limit on size.
 =item Big floats with fixed fractional parts
 
 Numbers with a fixed maximum number of digits in their fractional part, again
-with no limit on size.
+with no limit on size;. i.e BigRat.
 
 =back
 
@@ -586,6 +586,8 @@ IBM's Standard Decimal Arithmetic, with tests
 The Perl modules Math::BigInt and Math::BigFloat.
 
 Alex Gough's suggestions for bigint/bignum implementation.
+
+GNU gmp. That's we currently use: mpz and mpf.
 
 =cut
 
