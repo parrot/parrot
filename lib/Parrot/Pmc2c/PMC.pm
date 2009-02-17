@@ -430,7 +430,7 @@ sub dump_is_current {
     return 0 unless -e $dumpfile;
 
     my $pmcfile  = $self->filename('.pmc');
-    return ( stat $dumpfile )[9] > ( stat $pmcfile )[9];
+    return ( stat $dumpfile )[9] >= ( stat $pmcfile )[9];
 }
 
 1;
