@@ -259,6 +259,7 @@ foreach ( @files, @installable_exe ) {
     }
     else {
         next unless -e $src;
+        next if $^O eq 'cygwin' and -e "$src.exe"; # stat works, copy not
         copy( $src, $dest ) or die "copy $src to $dest: $!\n";
         print "$dest\n";
     }
