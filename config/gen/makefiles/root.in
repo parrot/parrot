@@ -2145,6 +2145,7 @@ install-dev: install
     --destdir=$(DESTDIR) \
     --docdir=$(DOC_DIR) \
     --datadir=$(DATA_DIR) \
+    --srcdir=@srcdir@ \
 #UNLESS(win32):    --version=$(VERSION) \
     MANIFEST MANIFEST.generated
 
