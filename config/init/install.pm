@@ -84,6 +84,9 @@ sub runstep {
     #  --mandir=DIR           man documentation [PREFIX/man]
     my $mandir = assign_dir( $conf, 'mandir', $prefix, '/man' );
 
+    #  --srcdir=DIR           source code files PREFIX/src]
+    my $srcdir = assign_dir( $conf, 'srcdir', $prefix, '/src' );
+
     $conf->data->set(
         prefix         => $prefix,
         exec_prefix    => $eprefix,
@@ -102,6 +105,7 @@ sub runstep {
         oldincludedir  => $oldincludedir,
         infodir        => $infodir,
         mandir         => $mandir,
+        srcdir         => $srcdir,
 
         # parrot internal use only
         doc_dir        => $datadir . "/doc",

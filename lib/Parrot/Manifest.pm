@@ -142,6 +142,8 @@ sub _get_manifest_entry {
             : m[^lib/Parrot/]                 ? '[devel]lib'
             : m[^runtime/]                    ? '[library]'
             : m[^src/pmc/.*\.h]               ? '[devel]include'
+            : m[^src/pmc/.*\.pmc]             ? '[devel]src'
+            : m[^src/dynpmc/.*\.pmc]          ? '[devel]src'
             : m[^runtime/parrot/library/PCT]  ? '[pct]'
             : m[^docs/pct]                    ? '[pct]doc'
             : m[^runtime/parrot/library/PCT]  ? '[pge]'
@@ -174,9 +176,8 @@ sub _get_special {
         docs/pmc2c.pod                                  [devel]doc
         docs/vtables.pod                                [devel]doc
         languages/t/harness                             [test]
-        src/call_list.txt                               [devel]share
-        src/ops/ops.num                                 [devel]share
-        src/vtable.tbl                                  [devel]share
+        src/ops/ops.num                                 [devel]src
+        src/vtable.tbl                                  [devel]src
         VERSION                                         [devel]
         tools/build/ops2c.pl                            [devel]
         tools/build/pmc2c.pl                            [devel]

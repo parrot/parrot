@@ -245,7 +245,7 @@ languages/pipp/src/common/php_pcre.pbc            [pipp]
 languages/punie/punie.pbc                         [punie]
 languages/pynie/pynie.pbc                         [pynie]
 languages/squaak/squaak.pbc                       [squaak]
-src/call_list.txt                                 [devel]share
+src/call_list.txt                                 [devel]src
 src/glut_callbacks.c                              []
 src/jit_emit.h                                    []
 src/nci.c                                         []
@@ -260,3 +260,7 @@ lib/Parrot/Config/Generated.pm                    [devel]lib
 lib/Parrot/PMC.pm                                 [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm                [devel]lib
 compilers/nqp/nqp.pbc                             [nqp]
+vtable.dump                                       [devel]src
+src/pmc/default.dump                              [devel]src
+src/pmc/string.dump                               [devel]src
+src/pmc/scalar.dump                               [devel]src

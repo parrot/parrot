@@ -73,6 +73,7 @@ my %options = (
     includedir  => '/usr/include',   # parrot/ subdir added below
     docdir      => '/usr/share/doc', # parrot/ subdir added below
     datadir     => '/usr/share/',    # parrot/ subdir added below
+    srcdir      => '/usr/src/',    # parrot/ subdir added below
     'dry-run'   => 0,
 );
 
@@ -134,6 +135,10 @@ while (<>) {
         $dest =~ s/^src//; # strip off leading src/ dir
         $dest =~ s/^include\/parrot//;
         $dest = File::Spec->catdir( $options{includedir}, $parrotdir, $dest );
+    }
+    elsif ( $meta{src} ) {
+        $dest =~ s/^src//; # strip off leading src/ dir
+        $dest = File::Spec->catdir( $options{srcdir}, $parrotdir, $dest );
     }
     elsif ( $meta{doc} ) {
         $dest =~ s/^docs/pod/; # docs dir are actually raw Pod
