@@ -9,29 +9,29 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 28;
+use Test::More tests => 29;
 
 =head1 NAME
 
-tools/install/smoke-languages.pl - checks some languages in install directory
+tools/install/smoke_languages.pl - checks some languages in install directory
 
 =head1 SYNOPSIS
 
 parrot in install tree
 
     % cd /usr/local/parrot-$version
-    % perl tools/install/smoke-languages.pl
+    % perl tools/install/smoke_languages.pl
 
 parrot in build tree
 
-    % perl tools/install/smoke-languages.pl --bindir=.
+    % perl tools/install/smoke_languages.pl --bindir=.
 
 test installation in DESTDIR:
 
     % cd /usr/src/parrot
     % mkdir .inst
     % make install DESTDIR=.inst
-    % perl tools/install/smoke-languages.pl DESTDIR=.inst
+    % perl tools/install/smoke_languages.pl DESTDIR=.inst
 
 =head1 DESCRIPTION
 
@@ -272,6 +272,19 @@ print $FH "Hello, World!\n\n";
 close $FH;
 $out = `$parrot $langdir/markdown/markdown.pbc $filename`;
 ok($out eq "<p>Hello, World!</p>\n\n", "check markdown");
+unlink($filename);
+}
+
+SKIP:
+{
+skip("matrixy", 1) unless (-d "$langdir/matrixy");
+$filename = 'test.oct';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "printf(\"Hello, world!\n\");";
+close $FH;
+$out = `$parrot $langdir/matrixy/matrixy.pbc $filename`;
+ok($out eq "Hello, world!\n", "check matrixy");
 unlink($filename);
 }
 
