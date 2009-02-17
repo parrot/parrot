@@ -1,5 +1,5 @@
 /* atomic/fallback.h
- *  Copyright (C) 2006, The Perl Foundation.
+ *  Copyright (C) 2006, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

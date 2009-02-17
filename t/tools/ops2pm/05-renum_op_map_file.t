@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 # 05-renum_op_map_file.t
 

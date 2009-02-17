@@ -1,6 +1,6 @@
 # $Id$
 
-# Copyright (C) 2002-2006, The Perl Foundation.
+# Copyright (C) 2002-2006, Parrot Foundation.
 
 package Regex::Parse::P6C;
 

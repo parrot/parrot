@@ -1,6 +1,6 @@
 package Regex::Ops;
 
-# Copyright (C) 2002-2007, The Perl Foundation.
+# Copyright (C) 2002-2007, Parrot Foundation.
 # $Id$
 
 use strict;

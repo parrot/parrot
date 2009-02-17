@@ -247,7 +247,7 @@ Bob Rogers C<E<lt>rogers-perl6@rgrjr.dyndns.orgE<gt>>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, The Perl Foundation.
+Copyright (C) 2006-2008, Parrot Foundation.
 This program is free software. It is subject to the same
 license as The Parrot Interpreter.
 

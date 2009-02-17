@@ -1,4 +1,4 @@
-1 REM Copyright (C) 2009, The Perl Foundation.
+1 REM Copyright (C) 2009, Parrot Foundation.
 2 REM $Id$
 3 REM
 110 REM +--------------------------------------------------------------------+

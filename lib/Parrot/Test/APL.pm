@@ -2,7 +2,7 @@
 
 package Parrot::Test::APL;
 
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 
 use strict;
 use warnings;

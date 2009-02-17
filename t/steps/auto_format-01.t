@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 # auto_format-01.t
 

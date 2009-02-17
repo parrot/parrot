@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 package Parrot::Configure::Options::Conf::Shared;
 

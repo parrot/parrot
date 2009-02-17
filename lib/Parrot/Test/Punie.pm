@@ -1,6 +1,6 @@
 # $Id$
 
-# Copyright (C) 2005-2007, The Perl Foundation.
+# Copyright (C) 2005-2007, Parrot Foundation.
 
 package Parrot::Test::Punie;
 

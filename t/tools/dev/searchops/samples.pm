@@ -1,5 +1,5 @@
 package samples;
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -124,7 +124,7 @@ inline op loadlib(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -144,7 +144,7 @@ as the Parrot interpreter itself.
  $debug = q{
 /*
  * $Id$
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * Copyright (C) 2002-2008, Parrot Foundation.
  */
 
 /*
@@ -245,7 +245,7 @@ inline op chopn(out STR, in STR, in INT) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 LICENSE
 
@@ -317,7 +317,7 @@ See F<src/ops/math.ops> for the general C<infix> and C<n_infix> syntax.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 LICENSE
 

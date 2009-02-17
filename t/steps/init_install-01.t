@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # init_install-01.t
 use strict;

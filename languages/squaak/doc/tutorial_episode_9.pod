@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 =head1 Episode 9: Wrap up and Conclusion

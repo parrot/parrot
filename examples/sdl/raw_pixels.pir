@@ -96,7 +96,7 @@ chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

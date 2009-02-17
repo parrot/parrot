@@ -1,5 +1,5 @@
 /* atomic/gcc_pcc.h
- *  Copyright (C) 2006-2008, The Perl Foundation.
+ *  Copyright (C) 2006-2008, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

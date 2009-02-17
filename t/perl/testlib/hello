@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
     # Get @ARGV as a ResizableStringArray

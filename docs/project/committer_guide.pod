@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 =head1 Committer Guide
@@ -98,7 +98,7 @@ C<perl t/doc/pod.t path/to/my/file >.
 Each text file needs to have near its beginning the line (or equivalent
 depending upon the current language's comment character):
 
-  # Copyright (C) <creation_year>-<current_year>, The Perl Foundation.
+  # Copyright (C) <creation_year>-<current_year>, Parrot Foundation.
 
 =head1 Removing files
 

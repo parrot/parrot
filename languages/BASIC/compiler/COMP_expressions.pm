@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2003-2007, The Perl Foundation.
+# Copyright (C) 2003-2007, Parrot Foundation.
 # $Id$
 
 use subs qw(fetchvar);

@@ -1,5 +1,5 @@
 /* pic.h
- *  Copyright (C) 2005, The Perl Foundation.
+ *  Copyright (C) 2005, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

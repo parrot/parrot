@@ -3,7 +3,7 @@
 #
 # A Jako module for interfacing with the SDL library.
 #
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2007, Parrot Foundation.
 # This program is free software. Its use is subject to the same
 # license as Parrot.
 #

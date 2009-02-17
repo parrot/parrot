@@ -1,6 +1,6 @@
 # Aux. functions needed by the parser.  (For cleanliness)
 #
-# Copyright (C) 2003-2008, The Perl Foundation.
+# Copyright (C) 2003-2008, Parrot Foundation.
 # $Id$
 
 use vars qw( %usertypes );

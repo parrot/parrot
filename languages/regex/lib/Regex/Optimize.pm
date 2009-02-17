@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2006, The Perl Foundation.
+# Copyright (C) 2002-2006, Parrot Foundation.
 # $Id$
 
 =head1 PACKAGE

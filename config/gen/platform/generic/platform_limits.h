@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2008, The Perl Foundation.
+ * Copyright (C) 2008, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_GENERIC_PLATFORM_LIMITS_GUARD

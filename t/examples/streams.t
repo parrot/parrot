@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2006, The Perl Foundation.
+# Copyright (C) 2005-2006, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -218,7 +218,7 @@ read:[   95 Please send patches and suggestions to the Perl 6 Internals mailing 
 read:[   96 ]
 read:[   97 =head1 COPYRIGHT]
 read:[   98 ]
-read:[   99 Copyright (C) 2004-2008, The Perl Foundation.]
+read:[   99 Copyright (C) 2004-2008, Parrot Foundation.]
 read:[  100 ]
 read:[  101 =cut]
 read:[  102 ]

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2006, Parrot Foundation.
 # $Id$
 package Parrot::Pmc2c::Emitter;
 use strict;

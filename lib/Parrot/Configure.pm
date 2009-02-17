@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, The Perl Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 package Parrot::Configure;

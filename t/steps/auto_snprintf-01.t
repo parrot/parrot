@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 # auto_snprintf-01.t
 

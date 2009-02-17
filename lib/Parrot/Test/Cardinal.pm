@@ -2,7 +2,7 @@
 
 package Parrot::Test::Cardinal;
 
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 # $Id$
 package Parrot::Ops2pm::Base;
 use strict;

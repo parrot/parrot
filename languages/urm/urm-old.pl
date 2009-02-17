@@ -2,7 +2,7 @@
 # urm.pl
 # 2003 (c) by Marcus Thiesen
 # Maybe you can use it for debugging
-# Copyright (C) 2003-2006, The Perl Foundation.
+# Copyright (C) 2003-2006, Parrot Foundation.
 # $Id$
 
 use strict;

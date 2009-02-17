@@ -1,4 +1,4 @@
-# Copyright (c) 2001-2009, The Perl Foundation.
+# Copyright (c) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 Parrot's Embedding and Extending Interface

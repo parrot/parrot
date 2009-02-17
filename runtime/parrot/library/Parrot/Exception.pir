@@ -56,7 +56,7 @@ Patrick R. Michaud <pmichaud@pobox.com>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2007-2008, The Perl Foundation.
+Copyright (C) 2007-2008, Parrot Foundation.
 
 =cut
 

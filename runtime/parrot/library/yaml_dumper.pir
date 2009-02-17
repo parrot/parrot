@@ -1,4 +1,4 @@
-# Copyright 2008, The Perl Foundation.
+# Copyright 2008, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -184,7 +184,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, The Perl Foundation.
+Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

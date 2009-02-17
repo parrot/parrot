@@ -1,7 +1,7 @@
 # Some utility subs for aiding the test process.
 # ##############################################
 
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006, Parrot Foundation.
 # $Id$
 
 package DotNetTesting;

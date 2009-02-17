@@ -1,7 +1,7 @@
 #! perl
 package Foo;
 
-# Copyright (C) 2004-2007, The Perl Foundation.
+# Copyright (C) 2004-2007, Parrot Foundation.
 # $Id$
 
 use strict;

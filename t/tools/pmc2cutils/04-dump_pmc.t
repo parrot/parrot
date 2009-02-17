@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
 # 04-dump_pmc.t
 

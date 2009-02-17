@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -256,7 +256,7 @@ version(void)
     fprintf(stderr,
             "This is parrot version " PARROT_VERSION " built for "
             PARROT_ARCHNAME "\n\
-Copyright (C) 2001-2003, The Perl Foundation.\n\
+Copyright (C) 2001-2003, Parrot Foundation.\n\
 \n\
 Parrot may be copied only under the terms of either the Artistic License or the\
 \n\

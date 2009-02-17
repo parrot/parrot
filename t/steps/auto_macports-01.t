@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2009, The Perl Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 # auto_macports-01.t
 

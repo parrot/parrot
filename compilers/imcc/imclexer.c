@@ -2392,7 +2392,7 @@ static yyconst flex_int16_t yy_chk[7039] =
  * Intermediate Code Compiler for Parrot
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * Copyright (C) 2002-2008, Parrot Foundation.
  *
  * The tokenizer.
  *

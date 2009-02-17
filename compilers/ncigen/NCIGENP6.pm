@@ -1,7 +1,7 @@
 #!/home/tewk/srcs/parrot/perl6
 
 # $Id$
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 
 use v6;
 

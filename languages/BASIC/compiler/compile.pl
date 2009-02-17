@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2003-2007, The Perl Foundation.
+# Copyright (C) 2003-2007, Parrot Foundation.
 # $Id$
 
 # Remember, this is BAD PERL later to be translated to PASM

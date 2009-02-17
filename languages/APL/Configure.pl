@@ -1,6 +1,6 @@
 #! perl
 # $Id$
-# Copyright (C) 2008 The Perl Foundation
+# Copyright (C) 2008 Parrot Foundation
 
 use strict;
 use warnings;

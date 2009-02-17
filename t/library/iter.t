@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
 
 .const int TESTS = 47

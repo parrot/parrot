@@ -6,7 +6,7 @@
 # better code.
 # Inherits from SRM::Base.
 
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006, Parrot Foundation.
 
 package SRM::OptRegister;
 use strict;

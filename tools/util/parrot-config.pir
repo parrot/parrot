@@ -25,7 +25,7 @@ Leopold Toetsch E<lt>lt@toetsch.atE<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2006, The Perl Foundation.
+Copyright (C) 2004-2006, Parrot Foundation.
 
 =cut
 

@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2006-2008, The Perl Foundation.
+ * Copyright (C) 2006-2008, Parrot Foundation.
  */
 
 #ifndef PARROT_DOTNET_PMC_STRUCTURES_H_GUARD

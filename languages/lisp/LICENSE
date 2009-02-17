@@ -1,6 +1,6 @@
 		       The Artistic License 2.0
 
-	    Copyright (c) 2000-2006, The Perl Foundation.
+	    Copyright (c) 2000-2006, Parrot Foundation.
 
      Everyone is permitted to copy and distribute verbatim copies
       of this license document, but changing it is not allowed.
@@ -54,7 +54,7 @@ Definitions
 
     "Original License" means this Artistic License as Distributed with
     the Standard Version of the Package, in its current version or as
-    it may be modified by The Perl Foundation in the future.
+    it may be modified by Parrot Foundation in the future.
 
     "Source" form means the source code, documentation source, and
     configuration files for the Package.

@@ -5,7 +5,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * Copyright (C) 2002-2008, Parrot Foundation.
  *
  * Grammar of the PIR language parser.
  *

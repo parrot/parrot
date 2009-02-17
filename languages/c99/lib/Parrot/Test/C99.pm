@@ -1,5 +1,5 @@
 # $Id$
-# Copyright (C) 2006, The Perl Foundation.
+# Copyright (C) 2006, Parrot Foundation.
 
 
 package Parrot::Test::C99;

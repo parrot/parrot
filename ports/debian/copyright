@@ -7,7 +7,7 @@ It was downloaded from http://parrot.org/
 
 Copyright for most of the code is held by:
 
-Copyright (C) 2001-2009, The Perl Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 
 Some files have a different copyright:
 
@@ -32,7 +32,7 @@ http://www.perlfoundation.org/attachment/legal/artistic-2_0.txt.
 
 		       The Artistic License 2.0
 
-	    Copyright (c) 2000-2006, The Perl Foundation.
+	    Copyright (c) 2000-2006, Parrot Foundation.
 
      Everyone is permitted to copy and distribute verbatim copies
       of this license document, but changing it is not allowed.
@@ -86,7 +86,7 @@ Definitions
 
     "Original License" means this Artistic License as Distributed with
     the Standard Version of the Package, in its current version or as
-    it may be modified by The Perl Foundation in the future.
+    it may be modified by Parrot Foundation in the future.
 
     "Source" form means the source code, documentation source, and
     configuration files for the Package.

@@ -2564,7 +2564,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/WMLScript/wmlsconsole.pir	1970-01-01 00:00:00.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/WMLScript/wmlsconsole.pir	2008-12-25 13:44:20.569000000 +0000
 @@ -0,0 +1,101 @@
-+# Copyright (C) 2006-2008, The Perl Foundation.
++# Copyright (C) 2006-2008, Parrot Foundation.
 +# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlsconsole.pir 33752 2008-12-09T18:54:29.527603Z fperrad  $
 +
 +=head1 NAME
@@ -2668,7 +2668,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/WMLScript/wmlsfloat.pir	1970-01-01 00:00:00.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/WMLScript/wmlsfloat.pir	2008-12-25 13:44:20.569000000 +0000
 @@ -0,0 +1,355 @@
-+# Copyright (C) 2006-2008, The Perl Foundation.
++# Copyright (C) 2006-2008, Parrot Foundation.
 +# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlsfloat.pir 33686 2008-12-08T15:50:21.922911Z fperrad  $
 +
 +=head1 NAME
@@ -3026,7 +3026,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/WMLScript/wmlslang.pir	1970-01-01 00:00:00.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/WMLScript/wmlslang.pir	2008-12-25 13:44:20.569000000 +0000
 @@ -0,0 +1,663 @@
-+# Copyright (C) 2006-2008, The Perl Foundation.
++# Copyright (C) 2006-2008, Parrot Foundation.
 +# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlslang.pir 33686 2008-12-08T15:50:21.922911Z fperrad  $
 +
 +=head1 NAME
@@ -3692,7 +3692,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/WMLScript/wmlsstring.pir	1970-01-01 00:00:00.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/WMLScript/wmlsstring.pir	2008-12-25 13:44:20.584625000 +0000
 @@ -0,0 +1,1101 @@
-+# Copyright (C) 2006-2008, The Perl Foundation.
++# Copyright (C) 2006-2008, Parrot Foundation.
 +# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlsstring.pir 33686 2008-12-08T15:50:21.922911Z fperrad  $
 +
 +=head1 NAME
@@ -4796,7 +4796,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/config/makefiles/root.in	2008-06-23 02:30:48.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/config/makefiles/root.in	2008-12-25 13:44:20.631500000 +0000
 @@ -1,21 +1,40 @@
- # Copyright (C) 2006-2007, The Perl Foundation.
+ # Copyright (C) 2006-2007, Parrot Foundation.
  # $Id: /mirror/trunk/languages/WMLScript/config/makefiles/root.in 28688 2008-06-23T00:33:41.905243Z coke  $
  
 -RM_F    = @rm_f@
@@ -4993,7 +4993,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/runtime/wmlsconsole.pir	2008-12-17 06:55:15.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/runtime/wmlsconsole.pir	1970-01-01 00:00:00.000000000 +0000
 @@ -1,101 +0,0 @@
--# Copyright (C) 2006-2008, The Perl Foundation.
+-# Copyright (C) 2006-2008, Parrot Foundation.
 -# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlsconsole.pir 33752 2008-12-09T18:54:29.527603Z fperrad  $
 -
 -=head1 NAME
@@ -5097,7 +5097,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/runtime/wmlsfloat.pir	2008-12-17 06:55:15.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/runtime/wmlsfloat.pir	1970-01-01 00:00:00.000000000 +0000
 @@ -1,355 +0,0 @@
--# Copyright (C) 2006-2008, The Perl Foundation.
+-# Copyright (C) 2006-2008, Parrot Foundation.
 -# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlsfloat.pir 33686 2008-12-08T15:50:21.922911Z fperrad  $
 -
 -=head1 NAME
@@ -5455,7 +5455,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/runtime/wmlslang.pir	2008-12-17 06:55:15.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/runtime/wmlslang.pir	1970-01-01 00:00:00.000000000 +0000
 @@ -1,663 +0,0 @@
--# Copyright (C) 2006-2008, The Perl Foundation.
+-# Copyright (C) 2006-2008, Parrot Foundation.
 -# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlslang.pir 33686 2008-12-08T15:50:21.922911Z fperrad  $
 -
 -=head1 NAME
@@ -6121,7 +6121,7 @@
 --- origsrc/parrot-0.8.2/languages/WMLScript/runtime/wmlsstring.pir	2008-12-17 06:55:15.000000000 +0000
 +++ src/parrot-0.8.2/languages/WMLScript/runtime/wmlsstring.pir	1970-01-01 00:00:00.000000000 +0000
 @@ -1,1101 +0,0 @@
--# Copyright (C) 2006-2008, The Perl Foundation.
+-# Copyright (C) 2006-2008, Parrot Foundation.
 -# $Id: /mirror/trunk/languages/WMLScript/runtime/wmlsstring.pir 33686 2008-12-08T15:50:21.922911Z fperrad  $
 -
 -=head1 NAME
@@ -11784,7 +11784,7 @@
 --- origsrc/parrot-0.8.2/languages/unlambda/config/makefiles/root.in	2008-06-23 02:30:45.000000000 +0000
 +++ src/parrot-0.8.2/languages/unlambda/config/makefiles/root.in	2008-12-28 17:09:58.974750000 +0000
 @@ -1,36 +1,65 @@
- # Copyright (C) 2008, The Perl Foundation.
+ # Copyright (C) 2008, Parrot Foundation.
 -# $Id: /mirror/trunk/languages/unlambda/config/makefiles/root.in 28688 2008-06-23T00:33:41.905243Z coke  $
 +# $Id: root.in 34502 2008-12-28 17:09:53Z rurban $
  
@@ -12766,7 +12766,7 @@
 +++ src/parrot-0.8.2/t/tools/dump_pbc.t	2008-12-28 12:37:59.584125000 +0000
 @@ -1,6 +1,6 @@
  #! perl
- # Copyright (C) 2008, The Perl Foundation.
+ # Copyright (C) 2008, Parrot Foundation.
 -# $Id: /mirror/trunk/t/tools/dump_pbc.t 28046 2008-06-02T20:16:19.945499Z bernhard  $
 +# $Id: dump_pbc.t 28039 2008-06-02 20:16:19Z bernhard $
  
@@ -12776,7 +12776,7 @@
 +++ src/parrot-0.8.2/t/tools/parrot_config.t	2008-12-29 16:14:57.349750000 +0000
 @@ -0,0 +1,125 @@
 +#! perl
-+# Copyright (C) 2008, The Perl Foundation.
++# Copyright (C) 2008, Parrot Foundation.
 +# $Id: parrot_config.t 30553 2008-08-26 01:31:47Z chromatic $
 +
 +=head1 NAME
@@ -12904,7 +12904,7 @@
 +++ src/parrot-0.8.2/t/tools/parrot_debugger.t	2008-12-29 16:14:57.334125000 +0000
 @@ -1,6 +1,6 @@
  #! perl
- # Copyright (C) 2007-2008, The Perl Foundation.
+ # Copyright (C) 2007-2008, Parrot Foundation.
 -# $Id: /mirror/trunk/t/tools/parrot_debugger.t 30584 2008-08-26T01:31:47.766857Z chromatic  $
 +# $Id: parrot_debugger.t 34575 2008-12-29 14:53:54Z rurban $
  
@@ -12949,7 +12949,7 @@
 +++ src/parrot-0.8.2/t/tools/pbc_disassemble.t	2008-12-29 16:14:57.287250000 +0000
 @@ -0,0 +1,120 @@
 +#! perl
-+# Copyright (C) 2007-2008, The Perl Foundation.
++# Copyright (C) 2007-2008, Parrot Foundation.
 +# $Id: pbc_disassemble.t 34223 2008-12-22 03:24:34Z petdance $
 +
 +=head1 NAME
@@ -13072,7 +13072,7 @@
 +++ src/parrot-0.8.2/t/tools/pbc_info.t	2008-12-29 16:14:57.318500000 +0000
 @@ -0,0 +1,120 @@
 +#! perl
-+# Copyright (C) 2007-2008, The Perl Foundation.
++# Copyright (C) 2007-2008, Parrot Foundation.
 +# $Id: pbc_info.t 34223 2008-12-22 03:24:34Z petdance $
 +
 +=head1 NAME
@@ -13195,7 +13195,7 @@
 +++ src/parrot-0.8.2/t/tools/pbc_merge.t	2008-12-28 12:37:59.537250000 +0000
 @@ -1,6 +1,6 @@
  #! perl
- # Copyright (C) 2005-2007, The Perl Foundation.
+ # Copyright (C) 2005-2007, Parrot Foundation.
 -# $Id: /mirror/trunk/t/tools/pbc_merge.t 18563 2007-05-16T00:53:55.855429Z chromatic  $
 +# $Id: pbc_merge.t 18563 2007-05-16 00:53:55Z chromatic $
  
@@ -13205,7 +13205,7 @@
 +++ src/parrot-0.8.2/t/tools/pdump.t	2008-12-29 16:14:57.318500000 +0000
 @@ -0,0 +1,120 @@
 +#! perl
-+# Copyright (C) 2007-2008, The Perl Foundation.
++# Copyright (C) 2007-2008, Parrot Foundation.
 +# $Id: pdump.t 34223 2008-12-22 03:24:34Z petdance $
 +
 +=head1 NAME
@@ -13328,7 +13328,7 @@
 +++ src/parrot-0.8.2/t/tools/pmc2c.t	2008-12-28 12:37:59.552875000 +0000
 @@ -1,6 +1,6 @@
  #! perl
- # Copyright (C) 2005-2008, The Perl Foundation.
+ # Copyright (C) 2005-2008, Parrot Foundation.
 -# $Id: /mirror/trunk/t/tools/pmc2c.t 28412 2008-06-16T02:39:40.990285Z chromatic  $
 +# $Id: pmc2c.t 28405 2008-06-16 02:39:40Z chromatic $
  
@@ -13658,7 +13658,7 @@
  
 +__src/pmc/@lang@.pmc__
 +/*
-+Copyright (C) 20xx, The Perl Foundation.
++Copyright (C) 20xx, Parrot Foundation.
 +@Id@
 +
 +=head1 NAME
@@ -13853,7 +13853,7 @@
 +__src/ops/@lang@.ops__
 +/*
 + * @id@
-+ * Copyright (C) 20xx, The Perl Foundation.
++ * Copyright (C) 20xx, Parrot Foundation.
 + */
 +
 +#include "parrot/dynext.h"

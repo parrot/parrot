@@ -2,7 +2,7 @@
 # as List ops. Most optimizations should go here, since the List form
 # is really suitable only for peephole optimization.
 
-# Copyright (C) 2004-2006, The Perl Foundation.
+# Copyright (C) 2004-2006, Parrot Foundation.
 # $Id$
 
 package Regex::TreeOptimize;

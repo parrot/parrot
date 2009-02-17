@@ -1,5 +1,5 @@
 /* gc_pools.h
- *  Copyright (C) 2001-2009, The Perl Foundation.
+ *  Copyright (C) 2001-2009, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

@@ -1,6 +1,6 @@
 # $Id$
 
-# Copyright (C) 2005-2008, The Perl Foundation.
+# Copyright (C) 2005-2008, Parrot Foundation.
 
 package URM::Test;
 

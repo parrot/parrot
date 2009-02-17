@@ -1440,7 +1440,7 @@ static yyconst flex_int16_t yy_rule_linenum[209] =
 
 /*
  * $Id$
- * Copyright (C) 2007-2009, The Perl Foundation.
+ * Copyright (C) 2007-2009, Parrot Foundation.
  */
 
 /*

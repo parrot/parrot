@@ -1,5 +1,5 @@
 # $Id$
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007, Parrot Foundation.
 
 class Pynie::Grammar::Actions;
 

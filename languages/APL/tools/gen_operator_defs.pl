@@ -879,7 +879,7 @@ APL operators in all possible configurations.
 
 =head1 LICENSE
 
-Copyright (C) 2005-2006, The Perl Foundation.
+Copyright (C) 2005-2006, Parrot Foundation.
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.

@@ -2,7 +2,7 @@ package Regex::Rewrite;
 use Regex::Ops::Tree;
 use Regex::Ops::List;
 
-# Copyright (C) 2002-2006, The Perl Foundation.
+# Copyright (C) 2002-2006, Parrot Foundation.
 # $Id$
 
 require 'Regex.pm';

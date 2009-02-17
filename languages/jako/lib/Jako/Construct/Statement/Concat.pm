@@ -1,7 +1,7 @@
 #
 # Conct.pm
 #
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # This program is free software. It is subject to the same license
 # as the Parrot interpreter.
 #

@@ -1,6 +1,6 @@
 package t::APL;
 
-# Copyright (C) 2006-2007, The Perl Foundation.
+# Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
 
 # Fail a little more gracefully for those without Test::Base installed.

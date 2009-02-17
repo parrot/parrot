@@ -1,4 +1,4 @@
-# Copyright (C) 2005, The Perl Foundation.
+# Copyright (C) 2005, Parrot Foundation.
 # $Id$
 
 package init::hints::vms;

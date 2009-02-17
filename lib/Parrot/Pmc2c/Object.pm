@@ -1,6 +1,6 @@
 package Parrot::Pmc2c::Object;
 
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 use base 'Parrot::Pmc2c';

@@ -1,4 +1,4 @@
-1 rem Copyright (C) 2009, The Perl Foundation.
+1 rem Copyright (C) 2009, Parrot Foundation.
 2 rem $Id$
 3 rem
 10 rem +----------------------------------------------------------------------+

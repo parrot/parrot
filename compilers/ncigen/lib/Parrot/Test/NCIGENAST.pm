@@ -1,5 +1,5 @@
 # $Id$
-# Copyright (C) 2006-2008, The Perl Foundation.
+# Copyright (C) 2006-2008, Parrot Foundation.
 
 package Parrot::Test::NCIGENAST;
 

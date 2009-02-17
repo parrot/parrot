@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, The Perl Foundation.
+# Copyright (C) 2004-2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -284,7 +284,7 @@ Obtain a perl.org account at L<https://auth.perl.org/auth/account>
 =item 3
 
 Submit a Perl Contributor License Agreement; this document signifies that you
-have the authority to license your work to The Perl Foundation for inclusion in
+have the authority to license your work to Parrot Foundation for inclusion in
 their projects.  You may need to discuss this with your employer if you
 contribute to Parrot on work time or with work resources, or depending on your
 employment agreement.

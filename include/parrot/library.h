@@ -1,5 +1,5 @@
 /* library.h
- *  Copyright (C) 2004, The Perl Foundation.
+ *  Copyright (C) 2004, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:

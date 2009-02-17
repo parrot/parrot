@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2005, The Perl Foundation.
+# Copyright (C) 2002-2005, Parrot Foundation.
 # $Id$
 
   # Get the input as a string, don't care about buffer overflow yet

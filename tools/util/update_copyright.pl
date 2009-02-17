@@ -1,7 +1,7 @@
 #! perl
 # $Id$
 
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -39,7 +39,7 @@ foreach my $file (@ARGV) {
             next;
         }
         else {
-            $contents =~ s/$copyright_re/Copyright (C) $old_year-$year, The Perl Foundation./;
+            $contents =~ s/$copyright_re/Copyright (C) $old_year-$year, Parrot Foundation./;
             open my $ofh, '>', $file;
             print {$ofh} $contents;
             close $ofh;

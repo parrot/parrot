@@ -14,7 +14,7 @@ So far, Punie handles constants (strings, integers, floats), variables, print
 statements, conditionals, do blocks, comma lists, and some basic math
 and logic ops. 
 
-Punie is Copyright (C) 2005-2006, The Perl Foundation.
+Punie is Copyright (C) 2005-2006, Parrot Foundation.
 
 LICENSE INFORMATION
 -------------------

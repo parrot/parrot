@@ -14,7 +14,7 @@ use Data::Dumper;
 sub perl_test_prefix {
 my $temp = <<'EOT';
 #! perl
-# Copyright (C) 2001-2008, The Perl Foundation.
+# Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
 use strict;

@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, The Perl Foundation.
+# Copyright (C) 2007-2008, Parrot Foundation.
 # $Id$
 
 .namespace [ 'PIR::Compiler' ]
@@ -229,7 +229,7 @@ depending on the context.
 
 =head1 LICENSE
 
-Copyright (C) 2007, The Perl Foundation.
+Copyright (C) 2007, Parrot Foundation.
 
 This is free software; you may redistribute it and/or modify
 it under the same terms as Parrot.

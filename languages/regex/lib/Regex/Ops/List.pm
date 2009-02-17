@@ -1,6 +1,6 @@
 # This file is rotting and needs a cleanup desperately.
 
-# Copyright (C) 2002-2006, The Perl Foundation.
+# Copyright (C) 2002-2006, Parrot Foundation.
 # $Id$
 
 package Regex::Ops::List;

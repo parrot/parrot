@@ -1,4 +1,4 @@
-# Copyright (C) 2008, The Perl Foundation.
+# Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -945,7 +945,7 @@ sub gen_glut_callbacks {
 #
 # This file is generated automatically by config/gen/opengl.pm
 
-Copyright (C) 2008, The Perl Foundation.
+Copyright (C) 2008, Parrot Foundation.
 
 =head1 NAME
 

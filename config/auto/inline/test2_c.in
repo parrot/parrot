@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2009, The Perl Foundation.
+Copyright (C) 2003-2009, Parrot Foundation.
 $Id$
 
 test to check if compiler supports __inline
