@@ -49,8 +49,13 @@ print << "EOF";
  *
  */
 
+#ifndef PARROT_PBCVERSION_H_GUARD
+#define PARROT_PBCVERSION_H_GUARD
+
 #define PARROT_PBC_MAJOR $major
 #define PARROT_PBC_MINOR $minor
+
+#endif /* PARROT_PBCVERSION_H_GUARD */
 
 /*
  * Local variables:
