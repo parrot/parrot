@@ -24,7 +24,7 @@ as well as backtrace tests.
 =cut
 
 $ENV{TEST_PROG_ARGS} ||= '';
-my $nolineno = $ENV{TEST_PROG_ARGS} =~ /-f|-g/
+my $nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
     ? "\\(unknown file\\)\n-1" : "debuginfo_\\d+\\.pasm\n\\d";
 
 SKIP: {
@@ -164,7 +164,7 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f|-g/
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
     ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
 
 SKIP: {
@@ -183,7 +183,7 @@ CODE
 /$nolineno/
 OUTPUT
 
-$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f|-g/
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
     ? '\(\(unknown file\):-1\)' : '\(foo.p6:128\)';
 # See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
