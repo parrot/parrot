@@ -40,7 +40,7 @@ sub dump_pmc {
 
     # make sure that a default.dump will always be created if it doesn't
     # already exist; do so by adding default.pmc to list of files for dumping
-    unshift @files, './src/pmc/default.pmc' unless -e './src/pmc/default.dump';
+    unshift @files, 'default.pmc' unless -e './src/pmc/default.dump';
 
     # load and parse all pmc files in @files
     for my $filename (@files) {
