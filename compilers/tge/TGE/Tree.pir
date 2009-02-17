@@ -282,10 +282,6 @@ got_id:
 .end
 
 
-=head1 AUTHOR
-
-Allison Randal <allison@perl.org>
-
 =cut
 
 # Local Variables:

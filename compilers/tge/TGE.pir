@@ -112,10 +112,6 @@ applies to a child of the current node (generally inherited attributes).
 .end
 
 
-=head1 AUTHOR
-
-Allison Randal <allison@perl.org>
-
 =cut
 
 # Local Variables:
