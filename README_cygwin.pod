@@ -72,8 +72,10 @@ You can use the w32api and opengl packages for native Windows opengl support,
 or the freeglut package for the X Server.
 
 Configure.pl will detect freeglut if freeglut is installed and DISPLAY
-is set, otherwise it checks for w32api and opengl with GLUT. Note that DISPLAY
-must be set I<before> running Configure.pl.
+is set, otherwise it checks for w32api and opengl with GLUT.
+In case that freeglut is installed, DISPLAY must be set I<before> running
+Configure.pl. If not using freeglut, then DISPLAY must B<not> be set.
+C<export DISPLAY=127.0.0.1:0.0> is the typical setting.
 
   Determining if your platform supports OpenGL.............yes, freeglut 3.4.
   Determining if your platform supports OpenGL...................yes, GLUT 3.
