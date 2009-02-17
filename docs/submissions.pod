@@ -283,13 +283,13 @@ Obtain a perl.org account at L<https://auth.perl.org/auth/account>
 
 =item 3
 
-Submit a Perl Contributor License Agreement; this document signifies that you
+Submit a Parrot Contributor License Agreement; this document signifies that you
 have the authority to license your work to Parrot Foundation for inclusion in
 their projects.  You may need to discuss this with your employer if you
 contribute to Parrot on work time or with work resources, or depending on your
 employment agreement.
 
-L<http://www.perlfoundation.org/contributor_license_agreement>
+L<http://www.parrot.org/files/parrot_cla.pdf>
 
 =item 4
 
