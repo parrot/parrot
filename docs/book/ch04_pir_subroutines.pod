@@ -143,6 +143,13 @@ they're stored in typed integer variables. The C<fact> subroutine
 uses C<.param> and the C<.return> directives for retrieving parameters
 and returning results. The final printed result is 120.
 
+Execution of the program starts at the C<:main> subroutine or, if no
+subroutines are declared with C<:main> at the first subroutine in the file.
+If multiple subroutines are declared with C<:main>, the last of them is
+treated as the starting point. Eventually, declaring multiple subroutines
+with C<:main> might cause a syntax error or some other bad behavior, so it's
+not a good idea to rely on it now.
+
 =head3 Named Parameters
 
 Parameters that are passed in a strict order like we've seen above are
@@ -315,6 +322,17 @@ C<get_namespace> method:
 
 Subroutine PMCs are very useful things, and we will show more of their uses
 throughout this chapter.
+
+=head2 The Commandline
+
+Programs written in Parrot have access to arguments passed on the command
+line like any other program would.
+
+  .sub MyMain :main
+    .param pmc all_args :slurpy
+    ...
+  .end
+
 
 =head2 Continuation Passing Style
 
