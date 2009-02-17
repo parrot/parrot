@@ -1,10 +1,5 @@
 /*
- * Copyright (C) 2002-2008, The Perl Foundation.
- */
-
-/*
- * XXX - We need a description of the file here
- *
+ * Copyright (C) 2002-2009, Parrot Foundation.
  * $Id$
  */
 

@@ -1,7 +1,7 @@
 /*
  * $Id$
- * Copyright (C) 2003-2008, The Perl Foundation.
- */
+ * Copyright (C) 2003-2009, Parrot Foundation.
+*/
 
 /*
 

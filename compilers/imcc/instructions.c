@@ -1,7 +1,6 @@
-/* $Id$ */
-
 /*
- * Copyright (C) 2002-2008, The Perl Foundation.
+ * $Id$
+ * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
 #include <stdlib.h>

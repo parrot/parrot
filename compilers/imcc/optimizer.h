@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2002-2007, The Perl Foundation.
+ * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_OPTIMIZER_H_GUARD
