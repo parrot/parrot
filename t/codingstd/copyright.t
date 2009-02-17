@@ -84,7 +84,7 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
 
 SKIP:
 {
-    skip( "Waiting for full transistion to Parrot Foundation", 1 );
+    skip( "Waiting for full transition to Parrot Foundation", 1 );
     ok( !scalar(@bad_format_copyright_files), 'Copyright statement in the right format' )
         or diag(
         join
