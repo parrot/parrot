@@ -1,16 +1,20 @@
 #! perl
-# Copyright (C) 2007, The Perl Foundation.
+# Copyright (C) 2007-2009, The Perl Foundation.
 # $Id$
 # auto_macports-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 52;
+use Test::More;
 use Carp;
 use Cwd;
 use File::Spec;
 use File::Temp qw( tempdir );
 use lib qw( lib t/configure/testlib );
+
+plan( skip_all => 'Macports is Darwin only' ) unless $^O =~ /darwin/;
+plan( tests    => 52 );
+
 use_ok('config::init::defaults');
 use_ok('config::auto::macports');
 use Parrot::Configure;
@@ -56,13 +60,11 @@ $conf->replenish($serialized);
 } );
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
-SKIP: {
-    skip 'Macports is Darwin only', 2 unless $^O =~ /darwin/;
-    # mock no Macports-default directories
-    $step->{ports_root} = File::Spec->catdir( qw( / my ridiculous foobar ) );
-    ok($step->runstep($conf), "runstep() returned true value");
-    is($step->result(), 'no', "Got expected result");
-}
+
+# mock no Macports-default directories
+$step->{ports_root} = File::Spec->catdir( qw( / my ridiculous foobar ) );
+ok($step->runstep($conf), "runstep() returned true value");
+is($step->result(), 'no', "Got expected result");
 
 $conf->replenish($serialized);
 
@@ -75,26 +77,24 @@ $conf->replenish($serialized);
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
 my $cwd = cwd();
-SKIP: {
-    skip 'Macports is Darwin only', 9 unless $^O =~ /darwin/;
-    my $tdir = tempdir( CLEANUP => 1 );
-    $step->{ports_root} = $tdir;
-    ok(chdir $tdir, "Able to change to temporary directory");
-    ok( (mkdir 'lib'), "Able to make lib directory");
-    ok( (mkdir 'include'), "Able to make include directory");
 
-    ok($step->runstep($conf), "runstep() returned true value");
-    is($step->result(), q{yes}, "Got expected result");
+my $tdir = tempdir( CLEANUP => 1 );
+$step->{ports_root} = $tdir;
+ok(chdir $tdir, "Able to change to temporary directory");
+ok( (mkdir 'lib'), "Able to make lib directory");
+ok( (mkdir 'include'), "Able to make include directory");
 
-    is($conf->data->get('ports_base_dir'), $tdir,
-        "ports base directory set as expected");
-    is($conf->data->get('ports_lib_dir'), qq{$tdir/lib},
-        "ports 'lib' directory set as expected");
-    is($conf->data->get('ports_include_dir'), qq{$tdir/include},
-        "ports 'include' directory set as expected");
+ok($step->runstep($conf), "runstep() returned true value");
+is($step->result(), q{yes}, "Got expected result");
 
-    ok(chdir $cwd, "Able to change back to original directory after testing");
-}
+is($conf->data->get('ports_base_dir'), $tdir,
+    "ports base directory set as expected");
+is($conf->data->get('ports_lib_dir'), qq{$tdir/lib},
+    "ports 'lib' directory set as expected");
+is($conf->data->get('ports_include_dir'), qq{$tdir/include},
+    "ports 'include' directory set as expected");
+
+ok(chdir $cwd, "Able to change back to original directory after testing");
 
 $conf->replenish($serialized);
 
@@ -177,18 +177,16 @@ $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
 # mock no Macports root directory
 $step->{ports_root} = undef;
-SKIP: {
-    skip 'Macports is Darwin only', 3 unless $^O =~ /darwin/;
-    my ($stdout, $stderr);
-    my $ret = capture sub { $step->runstep($conf) }, \$stdout, \$stderr;
-    ok($ret, "runstep() returned true value");
-    is($step->result(), 'no', "Got expected result");
-    like(
-        $stdout,
-        qr/^Could not locate Macports root directory/,
-        "Got expected verbose output"
-    );
-}
+
+my ($stdout, $stderr);
+my $ret = capture sub { $step->runstep($conf) }, \$stdout, \$stderr;
+ok($ret, "runstep() returned true value");
+is($step->result(), 'no', "Got expected result");
+like(
+    $stdout,
+    qr/^Could not locate Macports root directory/,
+    "Got expected verbose output"
+);
 
 pass("Completed all tests in $0");
 
