@@ -83,7 +83,7 @@ Developers <parrot-dev@lists.parrot.org>".
 
 Update the debian/copyright file in ~/deb/parrot/parrot-<version>/. Check for
 any removed files that no longer need copyright notices. Update the years in
-the Perl Foundation copyright line if needed.
+the Parrot Foundation copyright line if needed.
 
 =item 7.
 
