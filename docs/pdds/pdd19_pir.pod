@@ -70,7 +70,7 @@ cannot be used as identifiers. Some opcode names are, in fact, PIR keywords,
 which therefore cannot be used as identifiers. This, too, will be resolved
 in a future re-implementation of the PIR compiler.
 
-The following are PIR keywords, and cannot be used as identifiers:
+The following are PIR keywords, and cannot currently be used as identifiers:
 
  goto      if       int         null
  num       pmc      string      unless
@@ -265,12 +265,19 @@ given this preamble:
 Define a constant named I<identifier> of type I<type> and assign value
 I<const> to it. The I<type> must be C<int>, C<num>, C<string> or a string
 constant indicating the PMC type. This allows you to create PMC constants
-representing Subroutines.
-The constant is stored in the constant table of the current bytecode file.
+representing subroutines; the value of the constant in that case is the
+name of the subroutine. If the referred subroutine has an C<:immediate>
+flag and it returns a value, then that value is stored instead of the
+subroutine.
+
+C<.const> declarations representing subroutines can only be written
+within a C<.sub>.  The constant is stored in the constant table of the
+current bytecode file.
 
 =item .globalconst <type> <identifier> = <const>
 
 As C<.const> above, but the defined constant is globally accessible.
+C<.globalconst> may only be used withing a C<.sub>.
 
 =item .sub
 
@@ -319,8 +326,8 @@ loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 
 =item .HLL <hll_name>
 
-Define the HLL namespace for the current file. Takes one string constant,
-the name of the HLL. By default, the HLL namespace is 'parrot'.
+Define the HLL namespace from that point on in the file. Takes one string
+constant, the name of the HLL. By default, the HLL namespace is 'parrot'.
 
 =item .HLL_map <core_type> = <user_type>
 
@@ -341,6 +348,8 @@ For example, with this code snippet:
     ...
 
 all subroutines for language I<Foo> would use a dynamic lexpad pmc.
+
+{{ .HLL_map is deprecated. See TT#314 }}
 
 =item .line <integer>
 
@@ -383,7 +392,8 @@ you instead of the above annotate directive emit:
 
   .annotate "line", "42"
 
-Then you're asking for a bigger bytecode file as a result.
+then instead "42" is stored as a string, taking up more space in the resulting
+bytecode file.
 
 =back
 
@@ -417,7 +427,7 @@ what B<:load> does (above); to get both behaviours, use B<:init :load>.
 Do not install this subroutine in the namespace. Allows the subroutine
 name to be reused.
 
-=item :multi(Type1, Type2...)
+=item :multi(type1, type2...)
 
 Engage in multiple dispatch with the listed types.
 See L<docs/pdds/pdd27_multi_dispatch.pod> for more information on the
@@ -437,23 +447,24 @@ file.
 
 {{ TODO: need a freeze/thaw reference }}.
 
-For example, C<examples/shootout/revcomp.pir> contains the following (slightly
-abbreviated) definition:
+For instance, after compilation of the sub 'init', that sub is executed
+immediately (hence the :immediate flag). Instead of storing the sub
+'init' in the constants table, the value returned by 'init' is stored,
+which in this example is a FixedIntegerArrray.
 
-    .sub tr_00_init :immediate
-    .local pmc tr_array
-    tr_array = new 'FixedIntegerArray'
-    tr_array = 256
-    ## [code to initialize tr_array omitted.]
-    .return (tr_array)
+    .sub main :main
+      .const "Sub" initsub = "init"
     .end
 
-This code is run at compile time, and the returned C<tr_array> is stored
-in the bytecode file in place of the sub.  Other subs may then do:
+    .sub init :immediate
+      .local pmc array
+      array = new 'FixedIntegerArray'
+      array = 256 # set size to 256
 
-    .const 'Sub' tr_00 = 'tr_00_init'
+      # code to initialize array
+      .return (array)
+    .end
 
-in order to fetch the constant.
 
 =item :postcomp
 
