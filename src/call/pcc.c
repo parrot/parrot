@@ -3013,7 +3013,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
 =head1 SEE ALSO
 
-F<include/parrot/interpreter.h>, F<src/inter_run.c>, F<src/pmc/sub.pmc>.
+F<include/parrot/interpreter.h>, F<src/call/ops.c>, F<src/pmc/sub.pmc>.
 
 =cut
 

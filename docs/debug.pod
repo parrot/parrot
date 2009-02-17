@@ -285,7 +285,7 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
             lo_var_ptr = 134537224
             core = (opcode_t *(*)(Parrot_Interp, 
         opcode_t *)) 0xb7c9d940 <runops_slow_core at src/runops_cores.c:169>
-    #6  0xb7c6854e in runops (interp=0x804e008, offs=0) at src/inter_run.c:100
+    #6  0xb7c6854e in runops (interp=0x804e008, offs=0) at src/call/ops.c:100
             offset = 0
             old_runloop_id = 0
             our_runloop_level = 1
@@ -293,7 +293,7 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
     #7  0xb7c687da in runops_args (interp=0x804e008, sub=0x8204d58, obj=0x80912d8, 
         meth_unused=0x0, sig=0xb7eefca6 "vP", 
         ap=0xbfec614c "@M \bï¿½bï¿½ï¿½Pï¿½\222K\230ï¿½\004\b@\236\"\b@M \bXM
-	    \b\004ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½\bï¿½\004\b\001") at src/inter_run.c:216
+	    \b\004ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½\bï¿½\004\b\001") at src/call/ops.c:216
             offset = 0
             dest = (opcode_t *) 0x8239730
             ctx = (Parrot_Context *) 0x822a3b0
@@ -301,7 +301,7 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
             sig_p = 0xb7eefca7 "P"
             old_ctx = (Parrot_Context * const) 0x804e298
     #8  0xb7c688fb in Parrot_runops_fromc_args (interp=0x804e008, sub=0x8204d58, 
-        sig=0xb7eefca6 "vP") at src/inter_run.c:293
+        sig=0xb7eefca6 "vP") at src/call/ops.c:293
             args = 0xbfec614c "@M \bï¿½bï¿½ï¿½Pï¿½\222K\230ï¿½\004\b@\236\"\b@M
 		\bXM \b\004ï¿½ï¿½ï¿½ï¿½tï¿½ï¿½\bï¿½\004\b\001"
             ctx = (Parrot_Context *) 0xb7fa1548

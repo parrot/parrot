@@ -130,7 +130,7 @@ sub new {
             $self->c_item(
 'Parrot Interpreter: Callback Function Handling; Creation and Destruction; Misc functions; Run Ops and Methods.',
                 'pairs'   => ['interpreter'],
-                'sources' => [ 'inter_cb', 'inter_create', 'inter_misc', 'inter_run' ],
+                'sources' => [ 'inter_cb', 'inter_create', 'inter_misc' ],
                 'headers' => ['interp_guts']
             ),
             $self->c_pair_item( '', 'exit' ),

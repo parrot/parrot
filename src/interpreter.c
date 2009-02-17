@@ -1374,7 +1374,7 @@ enable_event_checking(PARROT_INTERP)
 =head1 SEE ALSO
 
 F<include/parrot/interpreter.h>, F<src/inter_cb.c>, F<src/inter_create.c>,
- F<src/inter_misc.c>, F<src/inter_run.c>.
+ F<src/inter_misc.c>, F<src/call/ops.c>.
 
 =cut
 
