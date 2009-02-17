@@ -1462,7 +1462,7 @@ fulltest :
 #IF(cg_flag):	testC \
 	testf \
 #IF(cg_flag):	testg \
-#IF(cg_flag):	testj \
+#IF(jitcapable):	testj \
 	testr \
 	testS \
 	src_tests \
