@@ -13,9 +13,8 @@
 #ifndef PARROT_STRING_H_GUARD
 #define PARROT_STRING_H_GUARD
 
+#include "parrot/core_types.h"
 #include "parrot/config.h"
-
-struct parrot_string_t;
 
 #ifdef PARROT_IN_CORE
 

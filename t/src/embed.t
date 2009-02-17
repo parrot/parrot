@@ -57,11 +57,6 @@ CODE
 Done
 OUTPUT
 
-# Unskip this after commit patch in TT #343
-SKIP : {
-
-    skip('Not ready yet, skipped until next release', 1);
-
 c_output_is( <<'CODE', <<'OUTPUT', "Hello world" );
 
 #include <stdio.h>
@@ -69,7 +64,6 @@ c_output_is( <<'CODE', <<'OUTPUT', "Hello world" );
 
 #include "parrot/embed.h"
 #include "parrot/extend.h"
-#include "parrot/interpreter.h"
 
 void fail(const char *msg);
 
@@ -84,7 +78,7 @@ int main(void)
     Parrot_Interp interp;
     Parrot_String compiler;
     Parrot_String errstr;
-    Parrot_PMC *code;
+    Parrot_PMC code;
 
     /* Create the interprter and show a message using parrot io */
     interp = Parrot_new(NULL);
@@ -111,8 +105,6 @@ CODE
 Hello, parrot
 Hello, pir
 OUTPUT
-
-}
 
 # Old tests, skipped al
 

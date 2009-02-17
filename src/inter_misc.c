@@ -152,47 +152,6 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
 
 /*
 
-=item C<PMC * Parrot_compile_string>
-
-Compile code string.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_compile_string(PARROT_INTERP, ARGIN(STRING *type),
-        ARGIN(const char *code), ARGOUT(STRING **error))
-{
-    ASSERT_ARGS(Parrot_compile_string)
-
-    /* For the benefit of embedders that does not load any pbc
-     * before compiling a string
-     */
-    if (! interp->initial_pf) {
-        PackFile *pf = PackFile_new_dummy(interp, "compile_string");
-        /* Assumption: there is no valid reason to fail to create it.
-         * If the assumption changes, replace the assertio with a
-         * runtime check
-         */
-        PARROT_ASSERT(interp->initial_pf);
-    }
-
-    if (Parrot_str_compare(interp, CONST_STRING(interp, "PIR"), type) == 0)
-        return IMCC_compile_pir_s(interp, code, error);
-
-    if (Parrot_str_compare(interp, CONST_STRING(interp, "PASM"), type) == 0)
-        return IMCC_compile_pasm_s(interp, code, error);
-
-    *error = CONST_STRING(interp, "Invalid interpreter type");
-    return NULL;
-}
-
-/*
-
 =item C<void * Parrot_compile_file>
 
 Compile code file.

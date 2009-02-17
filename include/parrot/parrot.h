@@ -18,6 +18,8 @@
 #ifndef PARROT_PARROT_H_GUARD
 #define PARROT_PARROT_H_GUARD
 
+#include "parrot/core_types.h"
+
 #if defined(INSIDE_GLOBAL_SETUP)
 #  define VAR_SCOPE
 #else
@@ -116,7 +118,6 @@ typedef jmp_buf Parrot_jump_buff;
 #define OPCODE_TYPE_JAVA 4871757
 #define OPCODE_TYPE_MSNET 0x2e4e4554
 
-typedef struct PMC PMC;
 typedef void STRING_FUNCS;
 typedef struct parrot_interp_t Interp;
 

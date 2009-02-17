@@ -15,6 +15,7 @@
 #ifndef PARROT_EMBED_H_GUARD
 #define PARROT_EMBED_H_GUARD
 
+#include "parrot/core_types.h"  /* types used */
 #include "parrot/compiler.h"    /* compiler capabilities */
 #include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
@@ -58,6 +59,9 @@ PARROT_EXPORT void Parrot_setup_argv(Parrot_Interp, int argc, const char **argv)
 PARROT_EXPORT void Parrot_setup_opt(Parrot_Interp, int n, char *argv);
 
 PARROT_EXPORT void Parrot_runcode(Parrot_Interp, int argc, char **argv);
+
+PARROT_EXPORT Parrot_PMC Parrot_compile_string(Parrot_Interp,
+        Parrot_String type, const char *code, Parrot_String *error);
 
 PARROT_EXPORT void Parrot_destroy(Parrot_Interp);
 

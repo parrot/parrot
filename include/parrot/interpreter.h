@@ -110,12 +110,8 @@ struct parrot_interp_t;
 
 #ifdef PARROT_IN_CORE
 
-#define Parrot_String   STRING *
-#define Parrot_PMC      PMC *
 #define Parrot_Language Parrot_Int
 #define Parrot_Vtable struct _vtable*
-
-typedef struct parrot_interp_t *Parrot_Interp;
 
 typedef Parrot_Interp_flag Interp_flags;
 typedef Parrot_Run_core_t Run_Cores;
@@ -610,19 +606,6 @@ void * Parrot_compile_file(PARROT_INTERP,
         FUNC_MODIFIES(*error);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC * Parrot_compile_string(PARROT_INTERP,
-    ARGIN(STRING *type),
-    ARGIN(const char *code),
-    ARGOUT(STRING **error))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*error);
-
-PARROT_EXPORT
 void Parrot_compreg(PARROT_INTERP,
     ARGIN(STRING *type),
     NOTNULL(Parrot_compiler_func_t func))
@@ -675,11 +658,6 @@ STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(fullname) \
     || PARROT_ASSERT_ARG(error)
-#define ASSERT_ARGS_Parrot_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(type) \
-    || PARROT_ASSERT_ARG(code) \
-    || PARROT_ASSERT_ARG(error)
 #define ASSERT_ARGS_Parrot_compreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(type) \
@@ -727,9 +705,6 @@ PARROT_EXPORT void enable_event_checking(PARROT_INTERP);
 #endif /* CTX_LEAK_DEBUG */
 
 #else /* !PARROT_IN_CORE */
-
-struct Parrot_Interp_;
-typedef struct Parrot_Interp_ *Parrot_Interp;
 
 typedef void * *(*native_func_t)(PARROT_INTERP,
                                  void *cur_opcode,

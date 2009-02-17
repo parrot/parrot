@@ -22,6 +22,8 @@ This file implements the Parrot embedding interface.
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
 
+#include "../compilers/imcc/imc.h"
+
 /* HEADERIZER HFILE: none */ /* The visible types are different than what we use in here */
 
 /* HEADERIZER BEGIN: static */
@@ -1248,6 +1250,44 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
         CONTEXT(interp)->constants = interp->code->const_table->constants;
 
     runops(interp, interp->resume_offset);
+}
+
+/*
+
+=item C<Parrot_PMC Parrot_compile_string>
+
+Compile code string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+Parrot_PMC
+Parrot_compile_string(PARROT_INTERP, Parrot_String type,
+        const char *code, Parrot_String *error)
+{
+
+    /* For the benefit of embedders that does not load any pbc
+     * before compiling a string
+     */
+    if (! interp->initial_pf) {
+        PackFile *pf = PackFile_new_dummy(interp, "compile_string");
+        /* Assumption: there is no valid reason to fail to create it.
+         * If the assumption changes, replace the assertio with a
+         * runtime check
+         */
+        PARROT_ASSERT(interp->initial_pf);
+    }
+
+    if (Parrot_str_compare(interp, Parrot_str_new(interp, "PIR", 3), type) == 0)
+        return IMCC_compile_pir_s(interp, code, error);
+
+    if (Parrot_str_compare(interp, Parrot_str_new(interp, "PASM", 4), type) == 0)
+        return IMCC_compile_pasm_s(interp, code, error);
+
+    *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
+    return NULL;
 }
 
 /*

@@ -16,6 +16,7 @@
 #define PARROT_EXTEND_H_GUARD
 
 #include <stdarg.h>
+#include "parrot/core_types.h"
 #include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
@@ -26,8 +27,6 @@
    but that would be really annoying */
 #if defined(PARROT_IN_CORE)
 
-#define Parrot_String STRING *
-#define Parrot_PMC PMC *
 #define Parrot_Language Parrot_Int
 #define Parrot_VTABLE VTABLE *
 
@@ -43,8 +42,6 @@
 
 #else
 
-typedef void * Parrot_String;
-typedef void * Parrot_PMC;
 typedef Parrot_Int Parrot_Language;
 typedef void * Parrot_Encoding;
 typedef void * Parrot_CharType;
