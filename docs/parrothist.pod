@@ -105,4 +105,6 @@ Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth.
 
  chromatic   0.9.0          2009-Jan-20     "From Outer Space"
 
+ kjs         0.9.1          2009-Feb-17     "Final Countdown"
+
 =cut

@@ -1,5 +1,9 @@
 #1 $Id$
 
+2009.02.17    kjs
+	* Released 0.9.1
+	See NEWS for more.
+
 2009.01.20    chromatic
 	* Released 0.9.0
 	See NEWS for more.
@@ -158,7 +162,7 @@
 
 2006.07.20    audreyt
 	* --maintainer prerequesites are now bison 2.2+ and flex 2.5.3x
-	  (or some such --leo) 
+	  (or some such --leo)
           (at the moment code is checking for 2.0 -- ambs)
 
 2006.07.17    chip
@@ -188,15 +192,15 @@
 2006.03.06    leo
         * Shifted argument type bits left by 2 according to r11754
 	  change of docs/pdds/pdd03_calling_conventions.pod
-	* if you are creating PASM then code needs adjustment  
+	* if you are creating PASM then code needs adjustment
 
 2006.02.22    leo
 	* Released 0.4.2
 	See NEWS for more.
 
 2006.01.16    bernhard
-	 * rename src/dynclasses to src/dynpmc 
-	 * rename src/classes to src/pmc 
+	 * rename src/dynclasses to src/dynpmc
+	 * rename src/classes to src/pmc
 
 2006.01.15    leo
 

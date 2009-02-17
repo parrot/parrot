@@ -1,20 +1,20 @@
 {
-    "release.version"  : "0.9.0",
-    "release.name"     : "From Outer Space",
+    "release.version"  : "0.9.1",
+    "release.name"     : "Final Countdown",
     "release.day"      : "Tuesday",
-    "release.date"     : "20 January 2009",
-    "release.nextdate" : "17 February 2009",
+    "release.date"     : "17 February 2009",
+    "release.nextdate" : "17 March 2009",
 
-    "web.root"         : "http://parrotcode.org/",
+    "web.root"         : "http://parrot.org/",
     "web.source"       : "source.html",
     "web.openpatches"  : "openpatches.html",
-    "web.repository"   : "https://svn.perl.org/parrot/trunk/",
+    "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 Feb 2009",
+    "bugday.date"      : "14 Mar 2009",
 
     "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
-    "wiki.bugday"      : "bug_day_2009_02_14",
+    "wiki.bugday"      : "bug_day_2009_03_14",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
     "subversion.root"  : "http://subversion.tigris.org/",

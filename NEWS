@@ -1,7 +1,6 @@
 # $Id$
 
-New in February 2009 release (r35855 to r36724)
-
+New in 0.9.1
 - Implementation
   + Support for portable 'Inf', 'NaN' and -0.0
   + pbc_disassemble prints constants in constants table

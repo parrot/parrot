@@ -1,4 +1,4 @@
-This is Parrot, version 0.9.0
+This is Parrot, version 0.9.1
 ------------------------------
 
 Parrot is Copyright (C) 2001-2009, Parrot Foundation.
@@ -121,7 +121,7 @@ previous versions, please see NEWS.
 MAILING LISTS
 -------------
 
-The mailing list for parrot is parrot-dev@lists.parrot.org. Subscribe by 
+The mailing list for parrot is parrot-dev@lists.parrot.org. Subscribe by
 filling out the form at http://lists.parrot.org/mailman/listinfo/parrot-dev
 It is archived at http://lists.parrot.org/pipermail/parrot-dev/
 
