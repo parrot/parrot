@@ -28,7 +28,7 @@ my $nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
     ? "\\(unknown file\\)\n-1" : "debuginfo_\\d+\\.pasm\n\\d";
 
 SKIP: {
-skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /-f/;
+skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /[^-]?-[fg]/;
 
 pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 .pcc_sub main:
@@ -168,7 +168,7 @@ $nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
     ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
 
 SKIP: {
-skip "disabled on fast-core",2 if $ENV{TEST_PROG_ARGS} =~ /-f/;
+skip "disabled on this core",2 if $ENV{TEST_PROG_ARGS} =~ /[^-]?-[fgjS]/;
 
 # See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
