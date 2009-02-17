@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2007, The Perl Foundation.
+ * Copyright (C) 2004-2007, Parrot Foundation.
  */
 
 #ifndef PARROT_JIT_IA64_JIT_EMIT_H_GUARD

@@ -992,7 +992,7 @@ inline op xor(invar PMC, invar PMC, invar PMC) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2009, The Perl Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 
 =head1 LICENSE
 

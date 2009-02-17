@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2009, The Perl Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME

@@ -1,5 +1,5 @@
 ! sparc-v9.s
-! Copyright 2006 The Perl Foundation
+! Copyright 2006 Parrot Foundation
 
 ! Contains atomic-ops support routines for Sparc chips supporting a compare-and-swap instruction.
 

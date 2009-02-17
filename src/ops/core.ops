@@ -1462,7 +1462,7 @@ inline op annotations(out PMC, in STR) {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, The Perl Foundation.
+Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 LICENSE
 

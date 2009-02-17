@@ -1,5 +1,5 @@
 /* iso_8859_1.h
- *  Copyright (C) 2004-2007, The Perl Foundation.
+ *  Copyright (C) 2004-2007, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
