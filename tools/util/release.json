@@ -6,17 +6,18 @@
     "release.nextdate" : "17 March 2009",
 
     "web.root"         : "http://parrot.org/",
-    "web.source"       : "source.html",
+    "web.source"       : "download",
     "web.openpatches"  : "openpatches.html",
     "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
     "bugday.date"      : "14 Mar 2009",
 
-    "wiki.root"        : "http://www.perlfoundation.org/parrot/index.cgi?",
+    "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
     "wiki.bugday"      : "bug_day_2009_03_14",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/0.9.1/",
     "subversion.root"  : "http://subversion.tigris.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }

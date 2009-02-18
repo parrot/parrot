@@ -179,29 +179,6 @@ See also L<Appendix 1|"Appendix 1 - Releasing from a branch"> below.
 
 =item 8.
 
-=over 4
-
-=item a. CPAN
-
-In PAUSE, assign yourself co-maintainer permissions on all modules owned by
-PARROTRE.
-
-Upload to CPAN.
-
-NOTE: you may get a failure message from the CPAN Indexer about the content of
-META.yml. Don't panic, the tarball still uploaded okay.  You do need to fix
-META.yml for the next release. Under "no_index" list any modules that aren't
-properly part of the Parrot distribution.
-
-Once you get a reply from the PAUSE indexer, log in to PAUSE to clean up module
-permissions. Under "View Permissions" search for your PAUSE ID. Any new modules
-added in this release will list your PAUSE ID as the "owner". Change the owner
-to PARROTRE.
-
-See F<docs/project/pause_guide.pod> for more details.
-
-=item b. FTP
-
 SSH to ftp-osl.osuosl.org. (If you don't have the necessary login information,
 get it from one of the previous release managers.)
 
@@ -230,8 +207,6 @@ out to the FTP mirrors.
 
 Check your changes at F<ftp://ftp.parrot.org/pub/parrot/releases>. It should
 only take a few minutes for the mirrors to sync.
-
-=back
 
 =item 9.
 

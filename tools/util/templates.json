@@ -6,10 +6,10 @@ On behalf of the Parrot team, I'm proud to announce Parrot @release.version@
 \"@release.name@.\" Parrot (@web.root@) is a virtual machine aimed
 at running all dynamic languages.
 
-Parrot @release.version@ is available via CPAN (soon), or follow the download
-instructions at @web.root@@web.source@.  For those who would like to develop on
-Parrot, or help develop Parrot itself, we recommend using Subversion on
-the source code repository to get the latest and best Parrot code.
+Parrot @release.version@ is available on Parrot's FTP site, or follow the
+download instructions at @web.root@@web.source@.  For those who would like to
+develop on Parrot, or help develop Parrot itself, we recommend using Subversion
+on the source code repository to get the latest and best Parrot code.
 
 Parrot @release.version@ News:
 @NEWS@
@@ -27,13 +27,12 @@ Enjoy!
 &quot;@release.name@.&quot; <a href=\"@web.root@\">Parrot</a>
 is a virtual machine aimed at running all dynamic languages.</p>
 
-<p>Parrot @release.version@ is available via <a href=\"@cpan.search@\">CPAN</a>
-(soon), or <a href=\"@web.root@@web.source@\">follow the download
+<p>Parrot @release.version@ is available on <a href=\"@ftp.path@\">Parrot's FTP
+site</a>, or <a href=\"@web.root@@web.source@\">follow the download
 instructions</a>.  For those who would like to develop on Parrot, or help
 develop Parrot itself, we recommend using <a
-href=\"@subversion.root@\">Subversion</a>  on
-<a href=\"@web.repository@\">our source code repository</a> to get the latest
-and best Parrot code.</p>
+href=\"@subversion.root@\">Subversion</a>  on <a href=\"@web.repository@\">our
+source code repository</a> to get the latest and best Parrot code.</p>
 
 <p>Parrot @release.version@ News:<br/>
 <pre>@NEWS@</pre></p>
