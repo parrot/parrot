@@ -334,7 +334,7 @@ nul:
 
 Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double .
 
-Not yet implemented (throws internal_exception).
+Experimental untested version.
 See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
 
 =cut
@@ -415,7 +415,8 @@ cvt_num12_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts IEEE 754 16-byte long double to IEEE 754 8 byte double.
 
-Untested.
+Fails on longdoublesize=12 with fatal exception.
+Untested on longdoublesize=16.
 
 =cut
 
@@ -651,7 +652,7 @@ Untested.
 
 */
 
-#if !PARROT_BIGENDIAN
+#if PARROT_BIGENDIAN
 static void
 cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
 {
