@@ -249,6 +249,8 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
 
 Converts i386 LE 12-byte long double to IEEE 754 8-byte double.
 
+Tested ok.
+
 =cut
 
 */
@@ -381,9 +383,9 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     dest[11] = src[15];
     dest[12] = src[14];
     /* and trunc the rest */
-    memcpy(dest[10], src[13], 10);
+    memcpy(&dest[10], &src[13], 10);
     TRACE_PRINTF_2(("  cvt_num16_num12: mantissa=0x%10x, double=%lf\n",
-                      src[13], (long double)dest));
+                    src[13], (long double)*dest));
 }
 #endif
 
@@ -547,7 +549,7 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts i386 8-byte double to i386 12 byte long double.
 
-Untested.
+Tested ok.
 
 =cut
 
@@ -561,8 +563,8 @@ cvt_num8_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     long double ld;
     double d;
     memcpy(&d, src, 8);
-    ld = (long double)d; /* TODO: test compiler cast */
-    TRACE_PRINTF_2(("  cvt_num8_num12: ld=%lf, d=%f\n", ld, d));
+    ld = (long double)d; /* compiler cast */
+    /*TRACE_PRINTF_2(("  cvt_num8_num12: ld=%lf, d=%f\n", ld, d));*/
     memcpy(dest, &ld, 12);
 }
 #endif
@@ -1153,7 +1155,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
         return f;
     }
     f = (FLOATVAL) 0;
-    TRACE_PRINTF(("PF_fetch_number: Byteordering..\n"));
+    TRACE_PRINTF(("PF_fetch_number: Converting...\n"));
     /* 12->8 has a messy cast. */
     if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_12) {
         (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
