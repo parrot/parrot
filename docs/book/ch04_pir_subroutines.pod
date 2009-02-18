@@ -950,7 +950,7 @@ VTABLE interfaces are declared with the C<:vtable> flag:
 in which case the subroutine must have the same name as the VTABLE
 interface it is intended to implement. VTABLE interfaces all have very
 specific names, and you can't override one with just any arbitrary name.
-However, if you would like to namethe function something different but
+However, if you would like to name the function something different but
 still use it as a VTABLE interface, you could add an additional name
 parameter to the flag:
 
@@ -973,7 +973,7 @@ as VTABLE interfaces. This means we can have the following:
 
   .local pmc myclass = new "MyClass"
   say myclass                 # say converts to string internally
-  $S0 = myclass               # Convert to a string, store in SS0
+  $S0 = myclass               # Convert to a string, store in $S0
   $S0 = myclass.'ToString'()  # The same
 
 Inside a VTABLE interface definition, the C<self> local variable contains
