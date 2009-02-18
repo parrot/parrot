@@ -147,6 +147,10 @@ Parrot_PMC Parrot_get_pmcreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+Parrot_PMC Parrot_get_root_namespace(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 Parrot_String Parrot_get_strreg(PARROT_INTERP, Parrot_Int regnum)
         __attribute__nonnull__(1);
 
@@ -236,6 +240,12 @@ PARROT_EXPORT
 Parrot_PMC Parrot_PMC_get_pmc_intkey(PARROT_INTERP,
     Parrot_PMC pmc,
     Parrot_Int key)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+Parrot_PMC Parrot_PMC_get_pmc_strkey(PARROT_INTERP,
+    Parrot_PMC pmc,
+    Parrot_String key)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -437,6 +447,8 @@ int Parrot_vfprintf(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_pmcreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_root_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_strreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -469,6 +481,8 @@ int Parrot_vfprintf(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_PMC_get_numval_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_PMC_get_pmc_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_PMC_get_pmc_strkey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_PMC_get_pointer_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

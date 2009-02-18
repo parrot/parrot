@@ -168,6 +168,24 @@ Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
 
 /*
 
+=item C<Parrot_PMC Parrot_get_root_namespace>
+
+Return the root namespace
+
+=cut
+
+*/
+
+PARROT_EXPORT
+Parrot_PMC
+Parrot_get_root_namespace(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_get_root_namespace)
+    return interp->root_namespace;
+}
+
+/*
+
 =item C<Parrot_String Parrot_PMC_get_string_intkey>
 
 Return the integer keyed string value of the passed-in PMC
@@ -234,6 +252,29 @@ Parrot_PMC_get_pmc_intkey(PARROT_INTERP,
     Parrot_PMC retval;
     PARROT_CALLIN_START(interp);
     retval = VTABLE_get_pmc_keyed_int(interp, pmc, key);
+    PARROT_CALLIN_END(interp);
+    return retval;
+}
+
+/*
+
+=item C<Parrot_PMC Parrot_PMC_get_pmc_strkey>
+
+Return the string keyed PMC value of the passed-in PMC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+Parrot_PMC
+Parrot_PMC_get_pmc_strkey(PARROT_INTERP,
+        Parrot_PMC pmc, Parrot_String key)
+{
+    ASSERT_ARGS(Parrot_PMC_get_pmc_strkey)
+    Parrot_PMC retval;
+    PARROT_CALLIN_START(interp);
+    retval = VTABLE_get_pmc_keyed_str(interp, pmc, key);
     PARROT_CALLIN_END(interp);
     return retval;
 }
