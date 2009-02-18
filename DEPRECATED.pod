@@ -31,18 +31,6 @@ See RT #46503.
 
 =back
 
-=head1 Languages
-
-=over 4
-
-=item * Rakudo Perl moves to its own repository [post 0.9.0]
-
-Rakudo Perl (languages/perl6) will be moving to its own repository
-shortly after the 0.9.0 release.  The new location is yet to be
-determined. See TT #267.
-
-=back
-
 =head1 PMCS
 
 =over 4
