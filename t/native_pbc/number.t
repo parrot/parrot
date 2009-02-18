@@ -148,6 +148,7 @@ TODO: {
     local $TODO;
     if ($PConfig{ptrsize} == 4) {
         $TODO = "Known problem on 32bit with reading 64bit dirs. See TT #254"
+        # Unknown PMC type to thaw 0
     } elsif ($PConfig{DEVEL}) {
         $TODO = "devel versions are not guaranteed to succeed";
     }
