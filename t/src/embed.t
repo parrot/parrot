@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 3;
+plan tests => 4;
 
 =head1 NAME
 
@@ -57,7 +57,7 @@ CODE
 Done
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', "Hello world" );
+c_output_is( <<'CODE', <<'OUTPUT', "Hello world from main" );
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,7 +80,7 @@ int main(void)
     Parrot_String errstr;
     Parrot_PMC code;
 
-    /* Create the interprter and show a message using parrot io */
+    /* Create the interpreter and show a message using parrot io */
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");
@@ -89,7 +89,7 @@ int main(void)
     /* Compile and execute a pir sub */
     compiler = Parrot_new_string(interp, "PIR", 3, (const char *)NULL, 0);
     code = Parrot_compile_string(interp, compiler,
-".sub main\n"
+".sub main :main\n"
 "  say 'Hello, pir'\n"
 "\n"
 ".end\n"
@@ -104,6 +104,72 @@ int main(void)
 CODE
 Hello, parrot
 Hello, pir
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "Hello world from a sub" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_String compiler;
+    Parrot_String errstr;
+    Parrot_PMC code;
+    Parrot_PMC rootns;
+    Parrot_String parrotname;
+    Parrot_PMC parrotns;
+    Parrot_String subname;
+    Parrot_PMC sub;
+
+    /* Create the interpreter */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    /* Compile pir code */
+    compiler = Parrot_new_string(interp, "PIR", 3, (const char *)NULL, 0);
+    code = Parrot_compile_string(interp, compiler,
+".sub main :main\n"
+"  say 'Must not be seen!'\n"
+"\n"
+".end\n"
+"\n"
+".sub hello\n"
+"  say 'Hello, sub'\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+
+    /* Get parrot namespace */
+    rootns = Parrot_get_root_namespace(interp);
+    parrotname = Parrot_new_string(interp, "parrot", 6, (const char *)NULL, 0);
+    parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns,  parrotname);
+    /* Get the sub */
+    subname = Parrot_new_string(interp, "hello", 5, (const char *)NULL, 0);
+    sub = Parrot_PMC_get_pmc_strkey(interp, parrotns,  subname);
+    /* Execute it */
+    Parrot_call_sub(interp, sub, "");
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+Hello, sub
 OUTPUT
 
 # Old tests, skipped al
