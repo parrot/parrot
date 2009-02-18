@@ -50,7 +50,7 @@ int main(int argc, char **argv)
       Parrot_set_executable_name(interp, argv [0]);
 
     puts("Done");
-    Parrot_exit(interp, 0);
+    Parrot_destroy(interp);
     return 0;
 }
 CODE
@@ -98,7 +98,7 @@ int main(void)
     );
     Parrot_call_sub(interp, code, "");
 
-    Parrot_exit(interp, 0);
+    Parrot_destroy(interp);
     return 0;
 }
 CODE
