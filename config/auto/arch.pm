@@ -71,6 +71,11 @@ sub runstep {
         $cpuarch = 'i386';
         $osname  = 'cygwin';
     }
+    elsif ( $cpuarch eq 'i86pc' and $osname eq 'solaris' ) {
+        # That's only the perl 32/64 bit setting. We can override it with
+        # -m64 / -m32 for ccflags and ldflags though.
+        $cpuarch = $archname =~ /-64int/ ? 'x86_64' : 'i386';
+    }
 
     if ( $archname =~ m/powerpc/ ) {
         $cpuarch = 'ppc';
