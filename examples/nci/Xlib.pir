@@ -22,6 +22,8 @@ alignment.
 
 ########################################################################
 
+.include 'datatypes.pasm'
+
 #-----------------------------------------------------------------------
 .sub fail
     .param string msg
@@ -584,11 +586,11 @@ doit:
     .local int long_t
     .local int ptr_t
     .local int time_t
-    char_t = -93
-    int_t = -91
-    long_t = -90
-    ptr_t = -70
-    time_t = -76
+    char_t = .DATATYPE_CHAR
+    int_t = .DATATYPE_INT
+    long_t = .DATATYPE_LONG
+    ptr_t = .DATATYPE_PTR
+    time_t = .DATATYPE_UINT32
 
     arg = new 'FixedIntegerArray'
     set arg, 45
@@ -894,7 +896,7 @@ doit:
     disp = getattribute self, attr_display
     $I0 = disp.'InternAtom'('WM_DELETE_WINDOW')
     $P0 = new 'ResizableIntegerArray'
-    $P0[0] = -91
+    $P0[0] = .DATATYPE_INT
     $P0[1] = 1
     $P0[2] = 0
     $P1 = new 'ManagedStruct', $P0
