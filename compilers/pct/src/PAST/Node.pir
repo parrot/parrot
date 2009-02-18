@@ -685,6 +685,16 @@ subid for the block if one does not already exist.
     $I0 = exists self['subid']
     if $I0 goto getset_value
     value = self.'unique'()
+    .local pmc suffix
+    suffix = get_global '$!subid_suffix'
+    unless null suffix goto have_suffix
+    $I0 = time
+    $S0 = $I0
+    $S0 = concat '_', $S0
+    suffix = box $S0
+    set_global '$!subid_suffix', suffix
+  have_suffix:
+    value .= suffix
     has_value = 1
   getset_value:
     .tailcall self.'attr'('subid', value, has_value)
