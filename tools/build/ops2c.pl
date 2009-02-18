@@ -4,7 +4,9 @@
 
 use warnings;
 use strict;
-use lib 'lib';
+use FindBin qw($Bin);
+use lib "$Bin/../lib";    # install location
+use lib "$Bin/../../lib"; # build location
 use Parrot::Ops2c::Auxiliary qw( Usage getoptions );
 use Parrot::Ops2c::Utils ();
 

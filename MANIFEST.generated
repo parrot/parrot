@@ -260,6 +260,7 @@ tools/install/smoke.pl                            []
 lib/Parrot/Config/Generated.pm                    [devel]lib
 lib/Parrot/PMC.pm                                 [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm                [devel]lib
+lib/Parrot/OpLib/core.pm                          [devel]lib
 compilers/nqp/nqp.pbc                             [nqp]
 vtable.dump                                       [devel]src
 src/pmc/default.dump                              [devel]src
@@ -272,5 +273,7 @@ src/pmc/pmc_default.h                             [devel]include
 src/pmc/pmc_string.h                              [devel]include
 src/pmc/pmc_scalar.h                              [devel]include
 src/pmc/pmc_multisub.h                            [devel]include
+src/pmc/pmc_object.h                              [devel]include
 src/pmc/pmc_resizablepmcarray.h                   [devel]include
 src/pmc/pmc_fixedpmcarray.h                       [devel]include
+src/pmc/pmc_fixedintegerarray.h                   [devel]include
