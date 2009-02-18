@@ -245,7 +245,6 @@ GEN_LIBRARY = \
     $(LIBRARY_DIR)/Data/Dumper/Base.pbc \
     $(LIBRARY_DIR)/Data/Dumper/Default.pbc \
     $(LIBRARY_DIR)/Data/Dumper.pbc \
-    $(LIBRARY_DIR)/Data/Escape.pbc \
     $(LIBRARY_DIR)/Digest/MD5.pbc \
     $(LIBRARY_DIR)/dumper.pbc \
     $(LIBRARY_DIR)/yaml_dumper.pbc \

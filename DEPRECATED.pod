@@ -152,13 +152,9 @@ and parentheses, per Synopsis 12.  See TT #168
 
 =back
 
-=head1 standard library
+=head1 build tools
 
 =over 4
-
-=item Data::Escape [post 0.9.0]
-
-Replace usage with the escape opcode.  See TT #107
 
 =item tools/build/dynoplibs.pl and tools/build/dynpmc.pl [post 0.9.1]
 
