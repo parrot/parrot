@@ -4,7 +4,7 @@ $Id$
 
 */
 
-@testheaders@
+@TEMP_testheaders@
 
 /* Don't want stdio influencing our ability to include headers. Some day soon
    we won't be using stdio  */
@@ -13,7 +13,7 @@ $Id$
 int
 main(int argc, char* argv[])
 {
-    printf("@testheader@ OK\n");
+    printf("@TEMP_testheader@ OK\n");
     return 0;
 }
 

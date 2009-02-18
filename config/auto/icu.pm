@@ -156,13 +156,13 @@ sub runstep {
 
     # Add -I $Icuheaders if necessary.
     my $header = "unicode/ucnv.h";
-    $conf->data->set( testheaders => "#include <$header>\n" );
-    $conf->data->set( testheader  => "$header" );
+    $conf->data->set( TEMP_testheaders => "#include <$header>\n" );
+    $conf->data->set( TEMP_testheader  => "$header" );
     $conf->cc_gen('config/auto/headers/test_c.in');
 
     # Clean up.
-    $conf->data->set( testheaders => undef );
-    $conf->data->set( testheader  => undef );
+    $conf->data->set( TEMP_testheaders => undef );
+    $conf->data->set( TEMP_testheader  => undef );
     eval { $conf->cc_build(); };
     my $ccflags_status = ( ! $@ && $conf->cc_run() =~ /^$header OK/ );
     _handle_ccflags_status(

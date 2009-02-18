@@ -43,14 +43,14 @@ sub runstep {
         # work on *BSD where some headers are documented as relying on others
         # being included first.
         foreach my $use_headers ( [$header], [ @found_headers, $header ] ) {
-            $conf->data->set( testheaders =>
+            $conf->data->set( TEMP_testheaders =>
                 join( '', map { "#include <$_>\n" } @$use_headers ) );
-            $conf->data->set( testheader => $header );
+            $conf->data->set( TEMP_testheader => $header );
 
             $conf->cc_gen('config/auto/headers/test_c.in');
 
-            $conf->data->set( testheaders => undef );
-            $conf->data->set( testheader  => undef );
+            $conf->data->set( TEMP_testheaders => undef );
+            $conf->data->set( TEMP_testheader  => undef );
 
             eval { $conf->cc_build(); };
             if ( !$@ && $conf->cc_run() =~ /^$header OK/ ) {
