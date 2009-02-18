@@ -27,28 +27,41 @@ sub _init {
     $data{description} = q{Generate Digest PMC files};
     $data{result}      = q{};
     $data{digest}      = {
-        MD2         => {},
-        MD4         => {},
-        MD5         => {},
+        MD2         => {
+            md_result => '[0-9a-f]{32}',
+        },
+        MD4         => {
+            md_result => '[0-9a-f]{32}',
+        },
+        MD5         => {
+            md_result => 'f96b697d7cb7938d525a2f31aaf161d0',
+        },
         RIPEMD160   => {
+            md_result => '[0-9a-f]{40}',
             md_inc => 'ripemd',
         },
-        SHA         => {},
+        SHA         => {
+            md_result => '[0-9a-f]{40}',
+        },
         SHA1        => {
+            md_result => '[0-9a-f]{40}',
             md_inc => 'sha',
             md_ctx => 'SHA_CTX',
             md_digest => 'SHA_DIGEST',
         },
         SHA256      => {
+            md_result => '[0-9a-f]{64}',
             md_inc => 'sha',
             version_needed => '0.9.8a',
         },
         SHA512      => {
+            md_result => '[0-9a-f]{128}',
             md_inc => 'sha',
             version_needed => '0.9.8a',
         },
     };
     $data{digest_pmc_template} = 'config/gen/crypto/digest_pmc.in';
+    $data{digest_t_template} = 'config/gen/crypto/digest_t.in';
     return \%data;
 }
 
@@ -77,7 +90,10 @@ sub runstep {
             ? '#if 0'
             : '#ifndef OPENSSL_NO_' . $md
         );
+        $conf->data->set( TEMP_md_skip => $val->{version_needed} || '0.9' );
+        $conf->data->set( TEMP_md_result => $val->{md_result} );
         $conf->genfile( $self->{digest_pmc_template} => "src/dynpmc/${file}.pmc" );
+        $conf->genfile( $self->{digest_t_template} => "t/dynpmc/${file}.t" );
     }
 
     return 1;
