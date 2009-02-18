@@ -64,12 +64,12 @@ sub runstep {
 
     while (my ($md, $val) = each %{ $self->{digest} } ) {
         my $file = lc $md;
-        $conf->data->set( md_name => $md );
-        $conf->data->set( md_file => $file );
-        $conf->data->set( md_inc => $val->{md_inc} || $file );
-        $conf->data->set( md_ctx => $val->{md_ctx} || $md . '_CTX' );
-        $conf->data->set( md_digest => $val->{md_digest} || $md . '_DIGEST' );
-        $conf->data->set( md_guard => (
+        $conf->data->set( TEMP_md_name => $md );
+        $conf->data->set( TEMP_md_file => $file );
+        $conf->data->set( TEMP_md_inc => $val->{md_inc} || $file );
+        $conf->data->set( TEMP_md_ctx => $val->{md_ctx} || $md . '_CTX' );
+        $conf->data->set( TEMP_md_digest => $val->{md_digest} || $md . '_DIGEST' );
+        $conf->data->set( TEMP_md_guard => (
                 ( exists $val->{version_needed} )
                     and
                 ( $openssl_version lt $val->{version_needed} )

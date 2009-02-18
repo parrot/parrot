@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/dynpmc/@md_file@.pmc - @md_name@ wrapper of libcrypto (libssl)
+src/dynpmc/@TEMP_md_file@.pmc - @TEMP_md_name@ wrapper of libcrypto (libssl)
 
 =head1 DESCRIPTION
 
@@ -18,9 +18,9 @@ See L<www.openssl.org>
 
 */
 
-#include <openssl/@md_inc@.h>
+#include <openssl/@TEMP_md_inc@.h>
 
-pmclass @md_name@
+pmclass @TEMP_md_name@
     dynpmc
     need_ext
     group digest_group
@@ -34,13 +34,13 @@ pmclass @md_name@
 
 */
     void init() {
-@md_guard@
-        @md_ctx@ *c    = mem_allocate_zeroed_typed(@md_ctx@);
+@TEMP_md_guard@
+        @TEMP_md_ctx@ *c    = mem_allocate_zeroed_typed(@TEMP_md_ctx@);
         PMC_data(SELF) = c;
         PObj_active_destroy_SET(SELF);
 #else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
-            "@md_name@ is disabled");
+            "@TEMP_md_name@ is disabled");
 #endif
     }
 
@@ -52,8 +52,8 @@ pmclass @md_name@
 
 */
     void destroy() {
-@md_guard@
-        @md_ctx@ *c = PMC_data_typed(SELF, @md_ctx@ *);
+@TEMP_md_guard@
+        @TEMP_md_ctx@ *c = PMC_data_typed(SELF, @TEMP_md_ctx@ *);
         if (c) {
             mem_sys_free(c);
             PMC_data(SELF) = NULL;
@@ -69,11 +69,11 @@ pmclass @md_name@
 
 */
     PMC* clone() {
-@md_guard@
+@TEMP_md_guard@
         PMC     *retval  = pmc_new_noinit(INTERP, SELF->vtable->base_type);
-        @md_ctx@ *c       = mem_allocate_zeroed_typed(@md_ctx@);
+        @TEMP_md_ctx@ *c       = mem_allocate_zeroed_typed(@TEMP_md_ctx@);
 
-        memcpy(c, PMC_data(SELF), sizeof (@md_ctx@));
+        memcpy(c, PMC_data(SELF), sizeof (@TEMP_md_ctx@));
         PMC_data(retval) = c;
 
         PObj_active_destroy_SET(retval);
@@ -98,9 +98,9 @@ pmclass @md_name@
 
 */
     METHOD void Init() {
-@md_guard@
-        @md_ctx@ *c = PMC_data_typed(SELF, @md_ctx@ *);
-        (void)@md_name@_Init(c);
+@TEMP_md_guard@
+        @TEMP_md_ctx@ *c = PMC_data_typed(SELF, @TEMP_md_ctx@ *);
+        (void)@TEMP_md_name@_Init(c);
 #endif
     }
 
@@ -112,9 +112,9 @@ pmclass @md_name@
 
 */
     METHOD void Update(STRING *buf) {
-@md_guard@
-        @md_ctx@ *c = PMC_data_typed(SELF, @md_ctx@ *);
-        (void)@md_name@_Update(c, (unsigned char *)buf->strstart, buf->bufused);
+@TEMP_md_guard@
+        @TEMP_md_ctx@ *c = PMC_data_typed(SELF, @TEMP_md_ctx@ *);
+        (void)@TEMP_md_name@_Update(c, (unsigned char *)buf->strstart, buf->bufused);
 #endif
     }
 
@@ -126,13 +126,13 @@ pmclass @md_name@
 
 */
     METHOD STRING* Final() {
-@md_guard@
-        unsigned char digest[@md_digest@_LENGTH];
-        @md_ctx@      *c = PMC_data_typed(SELF, @md_ctx@ *);
+@TEMP_md_guard@
+        unsigned char digest[@TEMP_md_digest@_LENGTH];
+        @TEMP_md_ctx@      *c = PMC_data_typed(SELF, @TEMP_md_ctx@ *);
         STRING       *retval;
 
-        (void)@md_name@_Final(digest, c);
-        retval = Parrot_str_new(INTERP, (char *)digest, @md_digest@_LENGTH);
+        (void)@TEMP_md_name@_Final(digest, c);
+        retval = Parrot_str_new(INTERP, (char *)digest, @TEMP_md_digest@_LENGTH);
 
         RETURN(STRING *retval);
 #else
