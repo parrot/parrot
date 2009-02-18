@@ -24,7 +24,7 @@ sub runstep {
     my $verbose = $conf->options->get('verbose');
     my $gcc     = $conf->data->get('gccversion');
 
-    # whenn running on gcc, we just define the config item
+    # when running on gcc, we just define the config item
     if ( defined $gcc ) {
 
         # HAS_foo defines PARROT_HAS_`uc foo`
