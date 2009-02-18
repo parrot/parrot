@@ -11,6 +11,9 @@ Determines the CPU architecture, the operating system.
 
 This code was formerly part of configuration step class auto::jit.
 
+TODO #356: This checks for the perl5 architecture, not for possible
+commandline overrides, such as -m64, -m32 or -Wl,-melf_x86_64.
+
 =cut
 
 package auto::arch;
