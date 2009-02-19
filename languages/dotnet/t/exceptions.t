@@ -9,7 +9,7 @@ use lib qw( lib ../lib ../../lib dotnet dotnet/t );
 
 use DotNetTesting;
 
-use Test::More tests => 9;
+use Test::More tests => skip_all;
 
 ## Testing classes for this file.t';
 #
