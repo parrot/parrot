@@ -256,7 +256,7 @@ in the current namespace with the C<get_global> opcode:
   $P0 = get_global "MySubName"
 
 Or, if you want to find a subroutine from a different namespace, you need
-to first the the namespace PMC and then pass that to C<get_global>:
+to first select the namespace PMC and then pass that to C<get_global>:
 
   $P0 = get_namespace "MyNamespace"
   $P1 = get_global $P0, "MySubName"
