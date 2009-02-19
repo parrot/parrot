@@ -1049,8 +1049,8 @@ directive. C<.yield> plays several roles:
 
 =item * Identifies coroutines
 
-When Parrot sees a yield, it knows to create a coroutine PMC object
-instead of a Subroutine one.
+When Parrot sees a yield, it knows to create a Coroutine PMC object
+instead of a Sub PMC.
 
 =item * Creates a continuation
 
@@ -1209,7 +1209,7 @@ distance to each variant, it calls the function with the lowest distance.
 Notice that it's possible to define a variant that is impossible to call:
 for every potential combination of arguments there is a better match. This
 isn't necessarily a common occurance, but it's something to watch out for
-in systems with a lot of multis.
+in systems with a lot of multis and a limited number of data types in use.
 
 =cut
 
