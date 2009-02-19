@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 4;
+plan tests => 5;
 
 =head1 NAME
 
@@ -170,6 +170,62 @@ int main(void)
 }
 CODE
 Hello, sub
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "External sub" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+void hello(Parrot_Interp interp);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+void hello(Parrot_Interp interp)
+{
+    Parrot_printf(interp, "Hello from C\n");
+}
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_String compiler;
+    Parrot_String errstr;
+    Parrot_PMC code;
+    Parrot_PMC hellosub;
+
+    /* Create the interpreter */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    /* Compile pir */
+    compiler = Parrot_new_string(interp, "PIR", 3, (const char *)NULL, 0);
+    code = Parrot_compile_string(interp, compiler,
+".sub externcall\n"
+"  .param pmc ec\n"
+"  ec()\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "vJ");
+    Parrot_call_sub(interp, code, "vP", hellosub);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+Hello from C
 OUTPUT
 
 # Old tests, skipped al
