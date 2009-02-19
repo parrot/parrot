@@ -1129,7 +1129,8 @@ $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/multidispatch$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/multidispatch.str $(SRC_DIR)/pmc/pmc_nci.h
+$(SRC_DIR)/multidispatch$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/multidispatch.str \
+	$(SRC_DIR)/pmc/pmc_nci.h
 
 $(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str
 
