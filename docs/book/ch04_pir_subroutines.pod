@@ -52,7 +52,7 @@ PIR's simplest subroutine call syntax looks much like a subroutine
 call from a high-level language. This example calls the subroutine
 C<fact> with two arguments and assigns the result to C<$I0>:
 
-     ($I0, $I1) = 'fact'(count, product)
+  $I0 = 'fact'(count, product)
 
 This simple statement hides a great deal of complexity. It generates a
 subroutine PMC object, creates a continuation PMC object to return
