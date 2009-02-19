@@ -10,17 +10,15 @@ LOAD_EXT      = @load_ext@
 O             = @o@
 
 ## Setup some commands
-LN_S          = @lns@
 PERL          = @perl@
-RM_RF         = @rm_rf@
+RM_F          = @rm_f@
 CP            = @cp@
-PARROT        = ../../parrot@exe@
 CAT           = @cat@
+PARROT        = ../../parrot@exe@
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
-RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
-#CONDITIONED_LINE(darwin):
-#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
-#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
+#IF(darwin):
+#IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
 ## places to look for things
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
@@ -71,7 +69,7 @@ $(SQUAAK_GROUP): $(PARROT) $(PMC_SOURCES)
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=squaak
+	$(PERL) Configure.pl
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -101,26 +99,27 @@ testclean:
 
 CLEANUPS = \
   squaak.pbc \
-  src/gen_grammar.pir \
-  src/gen_actions.pir \
-  src/gen_builtins.pir \
-  $(PMC_DIR)/*.h \
-  $(PMC_DIR)/*.c \
-  $(PMC_DIR)/*.dump \
-  $(PMC_DIR)/*$(O) \
-  $(PMC_DIR)/*$(LOAD_EXT) \
-  $(PMC_DIR)/*.exp \
-  $(PMC_DIR)/*.ilk \
-  $(PMC_DIR)/*.manifest \
-  $(PMC_DIR)/*.pdb \
-  $(PMC_DIR)/*.lib \
+  "src/gen_*.pir"
+
+PMC_CLEANUPS = \
+  "$(PMC_DIR)/*.h" \
+  "$(PMC_DIR)/*.c" \
+  "$(PMC_DIR)/*.dump" \
+  "$(PMC_DIR)/*$(O)" \
+#IF(win32):  "$(PMC_DIR)/*.exp" \
+#IF(win32):  "$(PMC_DIR)/*.ilk" \
+#IF(win32):  "$(PMC_DIR)/*.manifest" \
+#IF(win32):  "$(PMC_DIR)/*.pdb" \
+#IF(win32):  "$(PMC_DIR)/*.lib" \
+  "$(PMC_DIR)/*$(LOAD_EXT)"
 
 
-clean:
-	$(RM_RF) $(CLEANUPS)
+clean: testclean
+	$(RM_F) $(CLEANUPS)
+#	$(RM_F) $(PMC_CLEANUPS)
 
 realclean: clean
-	$(RM_RF) Makefile
+	$(RM_F) Makefile
 
 distclean: realclean
 
@@ -128,3 +127,4 @@ distclean: realclean
 #   mode: makefile
 # End:
 # vim: ft=make:
+
