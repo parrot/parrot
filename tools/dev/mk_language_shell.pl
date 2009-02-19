@@ -188,9 +188,9 @@ BUILD_DIR     = @build_dir@
 LOAD_EXT      = @load_ext@
 O             = @o@
 BIN_DIR       = @bin_dir@
-LIB_DIR       = @lib_dir@
-DOC_DIR       = @doc_dir@
-MANDIR        = @mandir@
+LIB_DIR       = @lib_dir@@versiondir@
+DOC_DIR       = @doc_dir@@versiondir@
+MANDIR        = @mandir@@versiondir@
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 
 ## Setup some commands
@@ -316,15 +316,15 @@ test-installable: installable
 	echo "1" | ./installable_@lclang@@exe@
 
 install: installable
-	$(CP) installable_@lclang@@exe@ $(DESTDIR)$(BIN_DIR)/parrot-@lclang@@exe@
-	@cd $(OPS_DIR) && $(OPSBUILD) copy "--destination=$(DESTDIR)$(LIB_DIR)/parrot/dynext" $(OPSLIB)
-	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(DESTDIR)$(LIB_DIR)/parrot/dynext" $(PMCS)
-	-$(MKPATH) $(LIB_DIR)/parrot/languages/@lclang@
-	$(CP) @lclang@.pbc $(DESTDIR)$(LIB_DIR)/parrot/languages/@lclang@/@lclang@.pbc
-	-$(MKPATH) $(DESTDIR)$(MANDIR)/man1
-	$(POD2MAN) doc/running.pod > $(DESTDIR)$(MANDIR)/man1/parrot-@lclang@.1
-	-$(MKPATH) $(DESTDIR)$(DOC_DIR)/languages/@lclang@
-	$(CP) $(DOCS) $(DESTDIR)$(DOC_DIR)/languages/@lclang@
+	$(CP) installable_@lclang@@exe@ $(BIN_DIR)/parrot-@lclang@@exe@
+	@cd $(OPS_DIR) && $(OPSBUILD) copy "--destination=$(LIB_DIR)/dynext" $(OPSLIB)
+	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(LIB_DIR)/dynext" $(PMCS)
+	-$(MKPATH) $(LIB_DIR)/languages/@lclang@
+	$(CP) @lclang@.pbc $(LIB_DIR)/languages/@lclang@/@lclang@.pbc
+	-$(MKPATH) $(MANDIR)/man1
+	$(POD2MAN) doc/running.pod > $(MANDIR)/man1/parrot-@lclang@.1
+	-$(MKPATH) $(DOC_DIR)/languages/@lclang@
+	$(CP) $(DOCS) $(DOC_DIR)/languages/@lclang@
 
 win32-inno-installer: installable
 	-$(MKPATH) man/man1
