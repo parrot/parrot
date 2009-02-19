@@ -1095,8 +1095,7 @@ CODE
 2301
 OUTPUT
 
-pir_output_like(
-    <<"CODE", <<'OUTPUT', 'warn on in main', todo => "RT #46819 core undef doesn't warn here. Should it?" );
+pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in main' );
 .sub 'test' :main
 .include "warnings.pasm"
     warningson .PARROT_WARNINGS_UNDEF_FLAG
@@ -1107,7 +1106,7 @@ pir_output_like(
     print \$P0
 .end
 CODE
-/uninit/
+/Stringifying an Undef PMC/
 OUTPUT
 
 pir_output_is( <<"CODE", <<'OUTPUT', 'warn on in sub' );
@@ -1125,8 +1124,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_like(
-    <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2', todo => "RT #46819 core undef doesn't warn here. Should it?" );
+pir_output_like( <<"CODE", <<'OUTPUT', 'warn on in sub, turn off in f2' );
 .sub 'test' :main
 .include "warnings.pasm"
     _f1()
@@ -1145,7 +1143,7 @@ pir_output_like(
     warningsoff .PARROT_WARNINGS_UNDEF_FLAG
 .end
 CODE
-/uninit.*\n.*\nback\nok/
+/Stringifying an Undef PMC/
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', ':postcomp' );
