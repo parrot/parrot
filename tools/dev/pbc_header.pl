@@ -39,6 +39,8 @@ use Getopt::Long;
 use Digest::MD5 qw(md5);
 
 my %opt;
+use constant FP_LEN => 12;
+my $word_size = 4;
 
 main();
 
@@ -50,7 +52,7 @@ sub get_fp {
     my @lines = <$IN>;
     close $IN;
 
-    my $len = 10;
+    my $len = FP_LEN;
     my $fingerprint = md5 join "\n", grep { !/^#/ } @lines;
 
     return substr $fingerprint, 0, $len;
@@ -61,21 +63,63 @@ sub get_version {
     open my $IN, '<', $version_file or die "Can't read $version_file";
     my $v = <$IN>;
     close $IN;
-    $v =~ /^(\d+)\.(\d+)/;
+    $v =~ /^(\d+)\.(\d+).?(\d+)?/;
+    my ($major, $minor, $patch) = ($1, $2, $3 ? $3 : 0);
+    die "Can't read $version_file" unless defined $major;
+    return ( $major, $minor, $patch );
+}
 
-    return ( $1, $2 );
+sub get_bc_version {
+    my $compat_file = 'PBC_COMPAT';
+    my ( $major, $minor );
+    open my $IN, '<', $compat_file or die "Can't read $compat_file";
+    while (<$IN>) {
+        if (/^(\d+)\.0*(\d+)/) {
+            ( $major, $minor ) = ( $1, $2 );
+            last;
+        }
+    }
+    die "Can't read $compat_file" unless defined $major;
+    close $IN;
+    return ( $major, $minor );
 }
 
 sub update_fp {
     my (@args) = @_;
 
     my $fp = get_fp();
-    my ( $major, $minor ) = get_version();
+    my ( $major, $minor, $patch ) = get_version();
+    my ( $bc_major, $bc_minor ) = get_bc_version();
     for my $f (@args) {
+        my $b;
         open my $F, "+<", "$f" or die "Can't open $f: $!";
-        seek $F, 2, 0;    # pos 2: major, minor
-        print $F pack "cc", $major, $minor;
-        seek $F, 6, 0;    # pos 6: pad = finger_print
+        binmode $F;
+        # magic8, wordsize byteorder floattype
+        # parrot_major parrot_minor parrot_patch
+        # bc_major bc_minor uuid_type uuid_size
+        seek $F, 11, 0;      # pos 11: major, minor, patch
+        print $F pack "ccc", $major, $minor, $patch;
+        #seek $F, 14, 0;    # pos 14: major, minor
+        print $F pack "cc", $bc_major, $bc_minor;
+        # uuid_type = 1, uuid_size = 10, uuid_data = $fp
+        read $F, $b, 8;
+        my ($type, $uuid_len) = unpack "cc", $b;
+        if ($type != 1 or $uuid_len != FP_LEN) {
+            # if uuid_type was 0 or of different size copy the tail first
+            my $leftover = (18 + $uuid_len) % 16;
+            my $n = $leftover == 0 ? 0 : 16 - $leftover;
+            # we can skip the copy if there's enough room already (pad:14=>2)
+            goto SEEK if $n < FP_LEN;
+            my $dirstart = 18 + $uuid_len + $n;
+            seek $F, $dirstart, 0;   # skip to dir
+            my $size = -s $F;
+            read $F, $b, $size - $dirstart;
+            seek $F, $dirstart, 0;   # again to dir
+            print $F $b;
+        }
+      SEEK:
+        seek $F, 16, 0;   # back to pos 16: uuid_type, uuid_size
+        print $F pack "cc", 1, FP_LEN;
         print $F $fp;
         close $F;
     }
@@ -86,6 +130,7 @@ sub update_fp {
 sub pbc_info {
     for my $f (@ARGV) {
         open my $F, "<", "$f" or die "Can't open $f: $!";
+        binmode $F;
         print "$f\n";
 
         show_pbc_file_info($F);
@@ -103,8 +148,8 @@ BEGIN {
 sub show_pbc_file_info {
     my $F = shift;
 
-    # [bad assumption?  -- rgr, 10-Feb-08.]
-    my $word_size = 4;
+    # [bad assumption?  -- rgr, 10-Feb-08.
+    #  No, header format is the same also for 64bit - rurban 2009-02-19]
     my $word_unpack = 'V';
     my $packfile_offset = 0;
 
@@ -145,7 +190,7 @@ sub show_pbc_file_info {
     read $F, $uuid, $uuid_len+$n;
     $packfile_offset += ($uuid_len+$n)/$word_size;
     if ($uuid_type) {
-        printf "\t%-14s= '%s'\n", 'UUID', unpack "${n}H", $uuid;
+        printf "\t%-14s= '%s'\n", 'UUID', unpack "H$uuid_len", $uuid;
     }
     printf "\t%-14s= %3d\n", 'pad', $n;
 
@@ -161,8 +206,7 @@ sub main {
     my (@args) = $^O eq 'MSWin32' ? <@ARGV> : @ARGV;
 
     $upd_fp and do {
-        die "Sorry. --update-fingerprint currently breaks your files. TT #357";
-        #update_fp(@args);
+        update_fp(@args);
         exit;
     };
 

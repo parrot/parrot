@@ -113,6 +113,11 @@ You'd need 32-bit and 64-bit, little-endian and big-endian platforms.
 linux-gcc x86_64 or solaris, plus and darwin/ppc and irix are usually enough.
 C<svn commit> the changed F<t/native_pbc/*.pbc> files.
 
+If not possible, run at least
+C<perl tools/dev/pbc_header.pl --upd t/native_pbc/*.pbc>
+to update version and fingerprint in the native tests. 
+This is needed to mark pbc-incompatible changes.
+
 Please check with C<prove t/native_pbc/*.t>.
 
 =item h
