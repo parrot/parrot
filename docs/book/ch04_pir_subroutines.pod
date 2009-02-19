@@ -980,6 +980,44 @@ Inside a VTABLE interface definition, the C<self> local variable contains
 the PMC on which the VTABLE interface is invoked, just like in a method
 declaration.
 
+=head2 Roles
+
+As we've seen above and in the previous chapter, Class PMCs and NameSpace
+PMCs work to keep classes and methods together in a logical way. There is
+another factor to add to this mix: The Role PMC.
+
+Roles are like classes, but don't stand on their own. They represent
+collections of methods and VTABLES that can be added into an existing class.
+Adding a role to a class is called I<composing> that role, and any class
+that has been composed with a role C<does> that role.
+
+Roles are created as PMC and can be manipulated through opcodes and methods
+like other PMCs:
+
+  $P0 = new 'Role'
+  $P1 = get_global "MyRoleSub"
+  $P0.'add_method'("MyRoleSub", $P1)
+
+Once we've created a role and added methods to it, we can add that role to
+a class, or even to another role:
+
+  $P1 = new 'Role'
+  $P2 = new 'Class'
+  $P1.'add_role'($P0)
+  $P2.'add_role'($P0)
+  add_role $P2, $P0    # Same!
+
+Now that we have added the role, we can check whether we implement it:
+
+  $I0 = does $P2, $P0  # Yes
+
+We can get a list of roles from our Class PMC:
+
+  $P3 = $P2.'roles'()
+
+Roles are very useful for ensuring that related classes all implement a common
+interface.  
+
 =head2 Coroutines
 
 X<PIR;Coroutines>
