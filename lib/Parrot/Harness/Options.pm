@@ -105,7 +105,8 @@ perl t/harness [options] [testfiles]
     -b         ... run bounds checked
     --run-exec ... run exec core
     -f         ... run fast core
-    -v         ... run verbose
+    -v         ... run parrot with -v : This is NOT the same as prove -v
+                   All tests run with this option will probably fail
     -d         ... run debug
     -r         ... assemble to PBC run PBC
     -O[012]    ... optimize
