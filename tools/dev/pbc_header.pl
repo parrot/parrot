@@ -161,7 +161,8 @@ sub main {
     my (@args) = $^O eq 'MSWin32' ? <@ARGV> : @ARGV;
 
     $upd_fp and do {
-        update_fp(@args);
+        die "Sorry. --update-fingerprint currently breaks your files. TT #357";
+        #update_fp(@args);
         exit;
     };
 
