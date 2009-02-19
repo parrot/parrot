@@ -23,6 +23,7 @@ functions in F<src/string.c>.
 #include "parrot/parrot.h"
 
 pmclass String extends scalar provides string provides scalar {
+    ATTR STRING * str_val;
 
 /*
 
@@ -35,9 +36,36 @@ Initializes the string.
 */
 
     VTABLE void init() {
-        PMC_str_val(SELF) = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
-        PObj_custom_mark_SET(SELF);
+
+        Parrot_String_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_String_attributes);
+
+        attrs->str_val = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        PMC_data(SELF) = attrs;
+
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroys this String PMC.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+
+        /* There's a bug that causes this function to be called several times,
+         * even for a simple PIR hello world.  The null check/assignment allows
+         * parrot not to explode, but obviously something's goofy. */
+        if (PMC_data(SELF))
+            mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
+    }
+
 
 /*
 
@@ -49,15 +77,15 @@ Class method to construct a String from the string representation C<rep>.
 
 */
     VTABLE PMC *instantiate_str(STRING *rep, INTVAL flags) {
-        PMC *res;
-        const INTVAL type = SELF->vtable->base_type;
+        PMC         *res;
+        const INTVAL type   = SELF->vtable->base_type;
 
         if (flags & PObj_constant_FLAG)
             res = constant_pmc_new(INTERP, type);
         else
             res = pmc_new(INTERP, type);
 
-        PMC_str_val(res) = rep;
+        SET_ATTR_str_val(INTERP, res, rep);
         return res;
     }
 
@@ -72,8 +100,11 @@ Marks the string as live.
 */
 
     VTABLE void mark() {
-        if (PMC_str_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_str_val(SELF));
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+
+        if (str_val)
+            pobject_lives(INTERP, (PObj *)str_val);
     }
 
 /*
@@ -87,7 +118,7 @@ Creates a copy of the string.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         VTABLE_set_string_native(INTERP, dest, Parrot_str_copy(INTERP, SELF.get_string()));
         return dest;
@@ -151,8 +182,9 @@ Returns the string itself.
 */
 
     VTABLE STRING *get_string() {
-        STRING * const s = PMC_str_val(SELF);
-        return s ? Parrot_str_copy(INTERP, s) : NULL;
+        STRING *str_val;
+        GET_ATTR_str_val(INTERP, SELF, str_val);
+        return str_val ? Parrot_str_copy(INTERP, str_val) : NULL;
     }
 
 /*
@@ -221,7 +253,8 @@ Sets the value of the string to that of the specified C<string>.
              const char *copy = Parrot_str_to_cstring(INTERP, value);
              value            = Parrot_str_new_constant(INTERP, copy);
         }
-        PMC_str_val(SELF) = value;
+
+        SET_ATTR_str_val(INTERP, SELF, value);
     }
 
 /*
@@ -235,7 +268,8 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        PMC_str_val(SELF) = Parrot_str_set(INTERP, SELF.get_string(), value);
+        SET_ATTR_str_val(INTERP, SELF,
+                Parrot_str_set(INTERP, SELF.get_string(), value));
     }
 
 /*
@@ -250,8 +284,8 @@ the specified C<String> PMC.
 */
 
     VTABLE void set_string_same(PMC *value) {
-        PMC_str_val(SELF) =
-            Parrot_str_set(INTERP, SELF.get_string(), VTABLE_get_string(INTERP, value));
+        SET_ATTR_str_val(INTERP, SELF,
+            Parrot_str_set(INTERP, SELF.get_string(), VTABLE_get_string(INTERP, value)));
     }
 
 /*
@@ -447,7 +481,11 @@ they match.
     VTABLE INTVAL is_equal(PMC *value) {
         STRING * const s = VTABLE_get_string(INTERP, SELF);
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return (INTVAL)(0 == Parrot_str_not_equal(INTERP, s, v));
+        return (INTVAL)(Parrot_str_equal(INTERP, s, v));
+    }
+
+    MULTI INTVAL is_equal(PMC *value) {
+        return SELF.is_equal(value);
     }
 
 /*
@@ -480,7 +518,7 @@ Compares the string with C<value>; returns FALSE if they match.
     VTABLE INTVAL is_equal_string(PMC *value) {
         STRING * const s = VTABLE_get_string(INTERP, SELF);
         STRING * const v = VTABLE_get_string(INTERP, value);
-        return Parrot_str_not_equal(INTERP, s, v) == 0;
+        return Parrot_str_equal(INTERP, s, v);
     }
 
 /*
@@ -941,10 +979,12 @@ Checks if the ascii STRING C<str> is just an integer.
     }
 
     VTABLE PMC *share_ro() {
-        PMC * const ret = SUPER();
+        STRING       *str_val;
+        PMC   * const ret    = SUPER();
 
+        GET_ATTR_str_val(INTERP, SELF, str_val);
         /* prevent wrong garbage collection */
-        PObj_is_shared_SET(PMC_str_val(SELF));
+        PObj_is_shared_SET(str_val);
         return ret;
     }
 
