@@ -99,6 +99,7 @@ pmclass NCI need_ext {
     ATTR STRING    *pcc_params_signature;   /* The signature. */
     ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
     ATTR INTVAL     jitted;                 /* Is this a jitted NCI stub. */
+    ATTR PMC       *multi_sig;              /* type tuple array (?) */
 
 /*
 
@@ -111,7 +112,10 @@ Return the MMD signature PMC, if any or a Null PMC.
 */
 
     METHOD get_multisig() {
-        PMC *sig = PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+        PMC *sig;
+        GET_ATTR_multi_sig(INTERP, SELF, sig);
+        if (sig == PMCNULL)
+            sig = PMCNULL;
         RETURN(PMC *sig);
     }
 
@@ -141,7 +145,6 @@ Initializes the NCI with a C<NULL> function pointer.
 
     VTABLE void init() {
         PMC_struct_val(SELF) = NULL;
-        PMC_pmc_val(SELF)    = PMCNULL;
         PMC_data(SELF)       = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
 
         /* Mark that we're not a raw NCI. */
@@ -239,9 +242,9 @@ Creates and returns a clone of the NCI.
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
         Parrot_NCI_attributes *nci_info_ret;
 
-        PMC * const ret     = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const ret     = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_struct_val(ret) = PMC_struct_val(SELF);
-        PMC_pmc_val(ret)    = PMCNULL;
+        SET_ATTR_multi_sig(INTERP, ret, PMCNULL);
         PMC_data(ret)       = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
         nci_info_ret        = PARROT_NCI(ret);
 

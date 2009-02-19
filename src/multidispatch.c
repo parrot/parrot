@@ -45,6 +45,7 @@ not highest type in table.
 #include "parrot/multidispatch.h"
 #include "parrot/oplib/ops.h"
 #include "multidispatch.str"
+#include "pmc/pmc_nci.h"
 
 /* HEADERIZER HFILE: include/parrot/multidispatch.h */
 
@@ -899,8 +900,9 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     INTVAL i, n, args, dist, j, m;
 
     /* has to be a builtin multi method */
-    if (pmc->vtable->base_type == enum_class_NCI)
-        multi_sig = PMC_pmc_val(pmc);
+    if (pmc->vtable->base_type == enum_class_NCI) {
+        GETATTR_NCI_multi_sig(interp, pmc, multi_sig);
+    }
     else {
         /* not a multi; no distance */
         if (!PMC_sub(pmc)->multi_signature)
@@ -1294,7 +1296,7 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     PMC    *multi_sig = mmd_build_type_tuple_from_type_list(interp, type_list);
 
     if (sub_obj->vtable->base_type == enum_class_NCI) {
-        PMC_pmc_val(sub_obj) = multi_sig;
+        SETATTR_NCI_multi_sig(interp, sub_obj, multi_sig);
     }
     else if (VTABLE_isa(interp, sub_obj, sub_str)
          ||  VTABLE_isa(interp, sub_obj, closure_str)) {
@@ -1340,7 +1342,7 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
                                     F2DPTR(multi_func_ptr));
 
     /* Attach a type tuple array to the NCI sub for multi dispatch */
-    PMC_pmc_val(sub_obj) = multi_sig;
+    SETATTR_NCI_multi_sig(interp, sub_obj, multi_sig);
 
     mmd_add_multi_to_namespace(interp, ns_name, sub_name_str, sub_obj);
     mmd_add_multi_global(interp, sub_name_str, sub_obj);
