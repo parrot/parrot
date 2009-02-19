@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -18,7 +18,7 @@ Tests that vtable method delegation works on a C<Ref> PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(41)
+    plan(42)
 
     basic_ref_tests()
     setref_tests()
@@ -72,21 +72,17 @@ Tests that vtable method delegation works on a C<Ref> PMC.
     set $P3, 0.5
     new $P1, ['Ref'], $P2
     assign $P1, 1
-    $S0 = $P1
-    #XXX: not sure why the string conversion is needed
-    $I0 = $S0 == '1'
-    ok(1, "assign'd Ref has correct value")
+    $I0 = $P1
+    is($I0, 1, "Ref has correct value")
+    $I0 = $P2
+    is($I0, 1, "assigned Ref has correct value")
     assign $P1, $P3
-    $S0 = $P1
-    $I0 = $S0 == '.5'
-    skip(3,'pending new Ref semantic')
-    #ok($I0, "assign'd Ref has correct value")
-    $S0 = $P2
-    $I0 = $S0 == '0'
-    #ok($I0, "assign'd Ref has correct value")
-    $S0 = $P3
-    $I0 = $S0 == '.5'
-    #ok($I0, "assign'd Ref has correct value")
+    $N0 = $P1
+    is($N0, 0.5, "assigned Ref has correct value")
+    $I0 = $P2
+    is($I0, 1, "previously assigned Ref maintained previous value")
+    $N0 = $P3
+    is($N0, 0.5, "assigned Ref has correct value")
 .end
 
 .sub sharedref_tests
