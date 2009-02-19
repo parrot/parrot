@@ -215,7 +215,7 @@ this to provide a default value:
 
 Optional parameters can be positional or named parameters. When using them
 with positional parameters, they must appear at the end of the list of
-postional parameters. Also, the C<:opt_flag> parameter must always appear
+positional parameters. Also, the C<:opt_flag> parameter must always appear
 directly after the C<:optional> parameter.
 
   .sub 'Foo'
@@ -432,7 +432,7 @@ with the C<set_addr> opcode:
 
 To jump to the continuation's stored label and return the context to the
 state it was in when the continuation was created, use the C<invoke> opcode
-or the C<()> notaton:
+or the C<()> notation:
 
   invoke $P0  # Explicit using "invoke" opcode
   $P0()       # Same, but nicer syntax
@@ -495,7 +495,7 @@ C<z> which is only visible inside that block. The outer block has no
 knowledge of C<z> at all. However, the inner block does have access to the
 variables C<x> and C<y>. This is an example of nested scopes where the
 visibility of different data items can change in a single subroutine. As
-we've discussed above, Parrot does't have any direct analog for this
+we've discussed above, Parrot doesn't have any direct analog for this
 situation: If we tried to write the code above directly, we would end up
 with this PIR code:
 
@@ -555,7 +555,7 @@ scoping rules.
 =head3 LexPad and LexInfo PMCs
 
 Information about lexical variables in a subroutine is stored in two different
-types of PMCs: The LexPad PMC that we already mentioned breifly, and the
+types of PMCs: The LexPad PMC that we already mentioned briefly, and the
 LexInfo PMCs which we haven't. Neither of these PMC types are really usable
 from PIR code, but are instead used by Parrot internally to store information
 about lexical variables.
