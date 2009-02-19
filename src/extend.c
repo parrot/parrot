@@ -1415,6 +1415,29 @@ Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)
 
 /*
 
+=item C<Parrot_PMC Parrot_sub_new_from_c_func>
+
+Returns a PMC sub wrapper for a c function
+
+=cut
+
+*/
+
+PARROT_EXPORT
+Parrot_PMC
+Parrot_sub_new_from_c_func(PARROT_INTERP,
+        void (*func)(void), const char * signature)
+{
+    Parrot_String sig = Parrot_new_string(interp, signature, strlen(signature),
+        (char *) NULL, 0);
+    Parrot_PMC sub = pmc_new(interp, enum_class_NCI);
+    VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
+    PObj_get_FLAGS(sub) |= PObj_private1_FLAG;
+    return sub;
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

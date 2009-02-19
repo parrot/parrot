@@ -403,6 +403,12 @@ void Parrot_set_strreg(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+Parrot_PMC Parrot_sub_new_from_c_func(PARROT_INTERP,
+    void (*func)(void),
+    const char * signature)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_unregister_pmc(PARROT_INTERP, Parrot_PMC pmc)
         __attribute__nonnull__(1);
 
@@ -537,6 +543,8 @@ int Parrot_vfprintf(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_set_pmcreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_set_strreg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_sub_new_from_c_func __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_unregister_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
