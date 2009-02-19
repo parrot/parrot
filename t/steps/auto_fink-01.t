@@ -1,14 +1,18 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 # auto_fink-01.t
 
 use strict;
 use warnings;
-use Test::More tests =>  55;
+use Test::More;
 use Carp;
 use File::Temp;
 use lib qw( lib t/configure/testlib );
+
+plan( skip_all => 'fink is Darwin only' ) unless $^O =~ /darwin/i;
+plan( tests => 55 );
+
 use_ok('config::init::defaults');
 use_ok('config::auto::fink');
 
@@ -45,10 +49,7 @@ my $step = test_step_constructor_and_description($conf);
 # (a) OS is Darwin.
 # (b) Either Fink is not installed or it is installed correctly, i.e., we can
 # locate the Fink subdirectories we need for later Parrot configuration steps.
-SKIP: {
-    skip 'Fink is Darwin only', 1 unless $^O =~ /darwin/;
-    ok($step->runstep($conf), "runstep() returned true value");
-}
+ok($step->runstep($conf), "runstep() returned true value");
 
 $conf->replenish($serialized);
 
@@ -78,8 +79,8 @@ $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
 $step->{fink_conf} = q{my_ridiculous_foobar};
 my $msg = q{Fink not installed};
-SKIP: {
-    skip 'Fink is Darwin only', 2 unless $^O =~ /darwin/;
+
+{
     ok($step->runstep($conf), "runstep() returned true value");
     is($step->result(), $msg, "Got expected result for $msg");
 }
@@ -94,8 +95,7 @@ $conf->replenish($serialized);
 } );
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
-SKIP:  {
-    skip 'Fink is Darwin only', 2 unless $^O =~ /darwin/;
+{
     # mock Fink config file with no Basepath
     my $tfile = File::Temp->new();
     open my $fh, ">", $tfile
@@ -119,8 +119,7 @@ $conf->replenish($serialized);
 } );
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
-SKIP:  {
-    skip 'Fink is Darwin only', 2 unless $^O =~ /darwin/;
+{
     # mock Fink config file with non-existent Basepath
     my $tfile = File::Temp->new();
     open my $fh, ">", $tfile
@@ -170,8 +169,7 @@ $conf->replenish($serialized);
 } );
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
-SKIP:  {
-    skip 'Fink is Darwin only', 3 unless $^O =~ /darwin/;
+{
     # mock no Fink
     $step->{fink_conf} = q{my_ridiculous_foobar};
     my $msg = q{Fink not installed};
@@ -198,8 +196,7 @@ $conf->replenish($serialized);
 } );
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
-SKIP:  {
-    skip 'Fink is Darwin only', 3 unless $^O =~ /darwin/;
+{
     # mock Fink config file with no Basepath
     my $tfile = File::Temp->new();
     open my $fh, ">", $tfile
@@ -232,8 +229,7 @@ $conf->replenish($serialized);
 } );
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
-SKIP:  {
-    skip 'Fink is Darwin only', 3 unless $^O =~ /darwin/;
+{
     # mock Fink config file with non-existent Basepath
     my $tfile = File::Temp->new();
     open my $fh, ">", $tfile
