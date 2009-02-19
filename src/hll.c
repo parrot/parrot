@@ -177,7 +177,7 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
     entry    = new_hll_entry(interp, hll_name);
 
     /* register HLL name */
-    name     = constant_pmc_new_noinit(interp, enum_class_String);
+    name     = constant_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, name, hll_name);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, name);
@@ -251,7 +251,7 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_name, PMCNULL);
 
     /* register dynlib */
-    name    = constant_pmc_new_noinit(interp, enum_class_String);
+    name    = constant_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, name, hll_lib);
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_lib, name);
