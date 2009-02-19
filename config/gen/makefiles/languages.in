@@ -84,6 +84,8 @@ help:
 	@echo ""
 	@echo "  co-m4:         Try to fetch Parrot m4"
 	@echo ""
+	@echo "  co-perk:       Try to fetch Perk"
+	@echo ""
 	@echo "  co-pipp:       Try to fetch Pipp"
 	@echo ""
 	@echo "  co-pjs:        Try to fetch PJS"
@@ -116,6 +118,8 @@ help:
 	@echo "  up-matrixy:    Try to update matrixy"
 	@echo ""
 	@echo "  up-m4:         Try to update Parrot m4"
+	@echo ""
+	@echo "  up-perk:       Try to update Perk"
 	@echo ""
 	@echo "  up-pipp:       Try to update Pipp"
 	@echo ""
@@ -467,10 +471,10 @@ urm.realclean:
 
 # check out all known externally managed languages
 co-all: co-eclectus co-fun co-gil co-hq9plus co-lazy-k co-lua \
-    co-m4 co-matrixy co-markdown co-pipp co-pjs \
+    co-m4 co-matrixy co-markdown co-perk co-pipp co-pjs \
     co-primitivearc co-rakudo co-shakespeare co-tcl co-unlambda co-wmlscript
 up-all: up-eclectus up-fun up-gil up-hq9plus up-lazy-k up-lua \
-    up-m4 up-matrixy up-markdown up-pipp up-pjs \
+    up-m4 up-matrixy up-markdown up-perk up-pipp up-pjs \
     up-primitivearc up-rakudo up-shakespeare up-tcl up-unlambda up-wmlscript
 
 co-eclectus:
@@ -526,6 +530,12 @@ co-matrixy:
 
 up-matrixy:
 	cd matrixy && $(SVN) up
+
+co-perk:
+	- $(GIT) clone 'git:////github.com///chrisdolan//perk.git'
+
+up-perk:
+	cd perk && $(GIT) pull
 
 co-pipp:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//pipp.git'
