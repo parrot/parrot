@@ -35,8 +35,8 @@ to F<languages/xyz> if an explicit C<path> isn't given):
     src/parser/grammar.pg
     src/parser/grammar-oper.pg
     src/parser/actions.pm
-    src/pmc/Xyz.pmc
-    src/ops/Xyz.ops
+    src/pmc/xyz.pmc
+    src/ops/xyz.ops
     t/harness
     t/00-sanity.t
 
@@ -236,9 +236,9 @@ SOURCES = @lclang@.pir \
 BUILTINS_PIR = \
   src/builtins/say.pir
 
-PMCS = @lang@
-PMC_SOURCES = $(PMC_DIR)/@lang@.pmc
-OPS_SOURCES = $(OPS_DIR)/@lang@.ops
+PMCS = @lclang@
+PMC_SOURCES = $(PMC_DIR)/@lclang@.pmc
+OPS_SOURCES = $(OPS_DIR)/@lclang@.ops
 DOCS = MAINTAINER README TODO
 
 # the default target
@@ -641,7 +641,7 @@ method quote($/) {
 # End:
 # vim: expandtab shiftwidth=4:
 
-__src/pmc/@lang@.pmc__
+__src/pmc/@lclang@.pmc__
 /*
 Copyright (C) 20xx, Parrot Foundation.
 @Id@
@@ -835,7 +835,7 @@ the end of the APLv.
  * End:
  * vim: expandtab shiftwidth=4:
  */
-__src/ops/@lang@.ops__
+__src/ops/@lclang@.ops__
 /*
  * @id@
  * Copyright (C) 20xx, Parrot Foundation.
