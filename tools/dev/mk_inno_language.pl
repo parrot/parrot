@@ -42,21 +42,30 @@ my $license = (-f "languages/$lang/LICENSE")
             ? qq{LicenseFile=languages\\$lang\\LICENSE}
             : '; no LicenseFile';
 
-my $exe = <languages/$lang/*.exe>
-        ? qq{Source: ".\\languages\\$lang\\*.exe"; DestDir: "{app}\\bin"; Flags:}
+my $exe = <languages/$lang/parrot-*.exe>
+        ? qq{Source: ".\\languages\\$lang\\parrot-*.exe"; DestDir: "{app}\\bin"; Flags:}
         : '; no .exe';
-my $cmd = <languages/$lang/*.cmd>
-        ? qq{Source: ".\\languages\\$lang\\*.cmd"; DestDir: "{app}\\bin"; Flags:}
-        : '; no .cmd';
 my $pbc = <languages/$lang/*.pbc>
         ? qq{Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
+my $lib = <languages/$lang/library/*.pbc>
+        ? qq{Source: ".\\languages\\$lang\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang\\library"; Flags:}
+        : '; no .pbc lib';
 my $pmc = <languages/$lang/src/pmc/*.pmc>
         ? qq{Source: ".\\languages\\$lang\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no pmc';
 my $ops = <languages/$lang/src/ops/*.ops>
         ? qq{Source: ".\\languages\\$lang\\src\\ops\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no ops';
+my $man = (-d "languages/$lang/man")
+        ? qq{Source: ".\\languages\\$lang\\man\\*"; DestDir: "{app}\\man"; Flags: ignoreversion recursesubdirs}
+        : '; no man';
+my $doc = (-d "languages/$lang/doc")
+        ? qq{Source: ".\\languages\\$lang\\doc\\*"; DestDir: "{app}\\share\\doc\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
+        : '; no doc';
+my $readme = (-f "languages/$lang/README")
+           ? qq{Source: ".\\languages\\$lang\\README"; DestDir: "{app}\\share\\doc\\languages\\$lang"; Flags:}
+           : '; no README';
 
 my $filename = 'parrot-' . $lclang . '.iss';
 open my $OUT, '>', $filename
@@ -82,10 +91,13 @@ Uninstallable=no
 
 [Files]
 $exe
-$cmd
 $pbc
+$lib
 $pmc
 $ops
+$man
+$doc
+$readme
 
 };
 
