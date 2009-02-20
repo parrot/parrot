@@ -198,6 +198,7 @@ PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 PERL          = @perl@
 RM_F          = @rm_f@
 CP            = @cp@
+CHMOD         = @chmod@
 CAT           = @cat@
 MKPATH        = @mkpath@
 POD2MAN       = pod2man
@@ -317,6 +318,7 @@ test-installable: installable
 
 install: installable
 	$(CP) installable_@lclang@@exe@ $(BIN_DIR)/parrot-@lclang@@exe@
+	$(CHMOD) 0755 $(BIN_DIR)/parrot-@lclang@@exe@
 	@cd $(OPS_DIR) && $(OPSBUILD) copy "--destination=$(LIB_DIR)/dynext" $(OPSLIB)
 	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(LIB_DIR)/dynext" $(PMCS)
 	-$(MKPATH) $(LIB_DIR)/languages/@lclang@
