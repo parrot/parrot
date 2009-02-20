@@ -59,8 +59,8 @@ Destroys this String PMC.
     VTABLE void destroy() {
 
         /* There's a bug that causes this function to be called several times
-         * during t/pmc/thread.t.  The null check/assignment allows the test to
-         * pass, but obviously something's goofy. */
+         * during t/pmc/thread.t test 18.  The null check/assignment allows the
+         * test to pass, but obviously something's goofy. */
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
         PMC_data(SELF) = NULL;
@@ -119,7 +119,7 @@ Creates a copy of the string.
 
     VTABLE PMC *clone() {
         PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
-        PObj_custom_mark_destroy_SET(dest);
+        PObj_custom_mark_destroy_SETALL(dest);
         VTABLE_set_string_native(INTERP, dest, Parrot_str_copy(INTERP, SELF.get_string()));
         return dest;
     }
