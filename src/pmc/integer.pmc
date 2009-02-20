@@ -74,7 +74,7 @@ Destroys this PMC.
     VTABLE PMC *instantiate(PMC *sig) {
         PMC            * const ret    = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         const opcode_t * const arg_op = interp->current_args;
-        INTVAL init;
+        INTVAL                 init   = 0;
 
         if (VTABLE_elements(interp, sig) == 2) {
             switch (VTABLE_get_integer_keyed_int(INTERP, sig, 1)) {
