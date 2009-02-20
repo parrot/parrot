@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 16;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -393,31 +393,44 @@ OUT
     unlink "xpto" if -f "xpto";
 }
 
-# Test link to dir.
-TODO: {
-    local $TODO = "Hardlinks to a directory may require root permissions";
-
-    my $prevnl = [ stat("tools") ]->[3];
-    pir_output_is( <<'CODE', <<"OUT", "Test dirlink" );
+my $prevnl = [ stat("tools") ]->[3];
+pir_output_is( <<"CODE", <<"OUT", "Test dirlink" );
 .sub main :main
-        $P1 = new ['OS']
+    .local pmc os
+    .local string xpto, tools
+    os    = new ['OS']
+    xpto  = "xpto"
+    tools = "tools"
 
-        $S1 = "xpto"
-        $S2 = "tools"
-        $P1."link"($S2, $S1)
+    push_eh no_root_perms
+    os."link"(tools, xpto)
+    pop_eh
 
-        print "ok\n"
+    .local pmc statvals
+    statvals = os.'stat'(tools)
 
-        end
+    # nlink
+    .local int nlink
+    nlink = statvals[3]
+
+    gt nlink, $prevnl, is_okay
+    end
+
+  no_root_perms:
+    .local pmc e, c
+    .get_results( e )
+    pop_eh
+    c = e['message']
+    eq c, 'Operation not permitted', is_okay
+    end
+
+  is_okay:
+    say "ok"
+    end
 .end
 CODE
 ok
 OUT
-
-    my $nl = [ stat("tools") ]->[3];
-    ok( $nl > $prevnl, "hard link to dir was really created" );
-    unlink "xpto" if -d "xpto";
-}
 
 # Local Variables:
 #   mode: cperl
