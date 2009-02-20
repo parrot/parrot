@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 I/O
@@ -84,7 +84,7 @@ The lightweight tasks typically used by the asynchronous I/O system
 capture no state other than the arguments passed to the I/O call, and
 share no variables with the calling code other than the status object.
 
-[See L<http://en.wikipedia.org/wiki/Asynchronous_I/O>, for a relatively
+[See L<http://en.wikipedia.org/wiki/Asynchronous_I/O> for a relatively
 comprehensive list of asynchronous I/O implementation options.]
 
 =head3 FileHandle PMC API
@@ -105,16 +105,16 @@ bare minimum.]
 
 =item C<new>
 
-  $P0 = new 'FileHandle'
+  $P0 = new [ 'FileHandle' ]
 
 Creates a new I/O stream object. [Note that this is usually performed
 via the C<open> opcode.]
 
 =item C<open>
 
-  $P0 = $P1.open()
-  $P0 = $P1.open($S2)
-  $P0 = $P1.open($S2, $S3)
+  $P0 = $P1.'open'()
+  $P0 = $P1.'open'($S2)
+  $P0 = $P1.'open'($S2, $S3)
 
 Opens a stream on an existing I/O stream object, and returns a status
 object. With no arguments, it can be used to reopen a previously opened
@@ -133,8 +133,8 @@ object.
 
 =item C<close>
 
-  $P0 = $P1.close()
-  $P0 = $P1.close($P2)
+  $P0 = $P1.'close'()
+  $P0 = $P1.'close'($P2)
 
 Closes an I/O stream, but leaves destruction of the I/O object to the
 GC. The C<close> method returns a PMC status object.
@@ -147,14 +147,14 @@ you the option of executing an action when the stream has been closed.]
 
 =item C<print>
 
-  $P0 = $P1.print($I2)
-  $P0 = $P1.print($N2)
-  $P0 = $P1.print($S2)
-  $P0 = $P1.print($P2)
-  $P0 = $P1.print($I2, $P3)
-  $P0 = $P1.print($N2, $P3)
-  $P0 = $P1.print($S2, $P3)
-  $P0 = $P1.print($P2, $P3)
+  $P0 = $P1.'print'($I2)
+  $P0 = $P1.'print'($N2)
+  $P0 = $P1.'print'($S2)
+  $P0 = $P1.'print'($P2)
+  $P0 = $P1.'print'($I2, $P3)
+  $P0 = $P1.'print'($N2, $P3)
+  $P0 = $P1.'print'($S2, $P3)
+  $P0 = $P1.'print'($P2, $P3)
 
 Writes an integer, float, string, or PMC value to an I/O stream object.
 Returns a PMC status object.
@@ -165,10 +165,10 @@ passing it a status object.
 
 =item C<read>
 
-  $S0 = $P1.read($I2)
-  $P0 = $P1.read($I2, $P3)
+  $S0 = $P1.'read'($I2)
+  $P0 = $P1.'read'($I2, $P3)
 
-Retrieves a specified number of bytes $I2, from a stream $P1 into a
+Retrieves a specified number of bytes ($I2) from a stream $P1 into a
 string $S0. By default it reads in bytes, but the FileHandle object can
 be configured to read in code points instead, by setting the character
 set and encoding on the filehandle object. If there are fewer bytes
@@ -186,8 +186,8 @@ contained in the string.]
 
 =item C<readline>
 
-  $S0 = $P1.readline()
-  $P0 = $P1.readline($P2)
+  $S0 = $P1.'readline'()
+  $P0 = $P1.'readline'($P2)
 
 Retrieves a single line from a stream $P1 into a string $S1. Calling
 C<readline> flags the stream as operating in line-buffer mode (see the
@@ -202,8 +202,8 @@ string of bytes.
 
 =item C<record_separator>
 
-  $S0 = $P1.record_separator()
-  $P0.record_separator($S1)
+  $S0 = $P1.'record_separator'()
+  $P0.'record_separator'($S1)
 
 Accessor (get and set) for the I/O stream's record separator attribute.
 The default value is a newline (CR, LF, CRLF, etc. depending on the
@@ -211,8 +211,8 @@ platform).
 
 =item C<buffer_type>
 
-  $S0 = $P1.buffer_type()
-  $P0.buffer_type($S1)
+  $S0 = $P1.'buffer_type'()
+  $P0.'buffer_type'($S1)
 
 Accessor (get and set) for the I/O stream's buffer type attribute. The
 attribute is set or returned as a string value of 'unbuffered' (bytes sent as
@@ -221,8 +221,8 @@ encountered), or 'full-buffered' (bytes sent when the buffer is full).
 
 =item C<buffer_size>
 
-  $I0 = $P1.buffer_size()
-  $P0.buffer_size($I1)
+  $I0 = $P1.'buffer_size'()
+  $P0.'buffer_size'($I1)
 
 Accessor (get and set) for the I/O stream's buffer size attribute. The
 size is specified in bytes (positive integer value), though the buffer
@@ -243,15 +243,15 @@ resizing it without flushing would truncate the buffer.
 
 =item C<mode>
 
-  $S0 = $P1.mode()
+  $S0 = $P1.'mode'()
 
 Accessor (get only) for the I/O stream's read mode. This returns the mode
 string used to open the I/O stream.
 
 =item C<encoding>
 
-  $S0 = $P1.encoding()
-  $P0.encoding($S1)
+  $S0 = $P1.'encoding'()
+  $P0.'encoding'($S1)
 
 Accessor (get and set) for the I/O stream's encoding attribute. Currently,
 the only valid value to set is 'utf8' which turns on UTF-8 reading/writing
@@ -259,7 +259,7 @@ mode for the stream. The default behavior is fixed-width 8-bit characters.
 
 =item C<get_fd> [RT #48312]
 
-  $I0 = $P1.get_fd()
+  $I0 = $P1.'get_fd'()
 
 For stream objects that are simple wrappers around a Unix filehandle,
 C<get_fd> retrieves the Unix integer file descriptor of the object.
@@ -292,7 +292,7 @@ completion or while still running, C<false> for an error.
 
 =item C<return>
 
-  $P0 = $P1.return()
+  $P0 = $P1.'return'()
 
 Retrieves the return value of the asynchronous operation from the status
 object. Returns a NULL PMC while still running, or if the operation had
@@ -300,7 +300,7 @@ no return value.
 
 =item C<error>
 
-  $P0 = $P1.error()
+  $P0 = $P1.'error'()
 
 Retrieves the error object from the status object, if the execution of
 the asynchronous operation terminated with an error. The error object is
@@ -310,7 +310,7 @@ null PMC.
 
 =item C<throw>
 
-  $P0.throw()
+  $P0.'throw'()
 
 Throw an exception from the status object if it contains an error
 object, otherwise do nothing.
@@ -327,7 +327,7 @@ I/O objects, or an Iterator role applied to I/O objects.]
 
 =item C<new>
 
-    new $P0, 'Iterator', $P1
+    new $P0, [ 'Iterator' ], $P1
 
 Create a new iterator object $P0 from I/O object $P1.
 
@@ -502,7 +502,7 @@ string of bytes.
   $S0 = peek
   $S0 = peek $P1
 
-['peek', 'seek', 'tell', and 'poll' are all candidates for moving from
+[C<peek>, C<seek>, C<tell>, and C<poll> are all candidates for moving from
 opcodes to FileHandle object methods.]
 
 C<peek> retrieves the next byte from a stream into a string, but doesn't
@@ -577,12 +577,12 @@ asynchronously.
 [Okay, I'm seriously considering moving most of these to methods on the
 ParrotIO object. More than that, moving them into a role that is
 composed into the ParrotIO object when needed. For the ones that have
-the form 'C<opcodename io_object, arguments>', I can't see that it's
-much less effort than 'C<io_object.methodname(arguments)>' for either
+the form C<opcodename io_object, arguments>, I can't see that it's
+much less effort than C<io_object.'methodname'(arguments)> for either
 manually writing PIR or generating PIR. The slowest thing about I/O is
 I/O, so I can't see that we're getting much speed gain out of making
-them opcodes. The ones to keep as opcodes are 'C<unlink>', 'C<rmdir>', and
-'C<opendir>'.]
+them opcodes. The ones to keep as opcodes are C<unlink>, C<rmdir>, and
+C<opendir>.]
 
 =over 4
 
@@ -711,7 +711,7 @@ Most of these opcodes conform to the standard UNIX interface, but the
 layer API allows alternate implementations for each.
 
 [These I'm also considering moving to methods in a role for the Socket
-object. Keep 'socket' as an opcode, or maybe just make 'socket' an
+object. Keep C<socket> as an opcode, or maybe just make C<socket> an
 option on creating a new Socket object.]
 
 =over 4
@@ -822,8 +822,6 @@ type of shutdown:
 
 =back
 
-
-
 =head3 Error Handling
 
 Currently some of the networking opcodes (C<connect>, C<recv>, C<send>,
@@ -923,12 +921,12 @@ None.
 
 =head2 References
 
-  src/io/io.c
-  src/ops/io.ops
-  include/parrot/io.h
-  runtime/parrot/library/Stream/*
-  src/io/io_unix.c
-  src/io/io_win32.c
+  F<src/io/io.c>
+  F<src/ops/io.ops>
+  F<include/parrot/io.h>
+  F<runtime/parrot/library/Stream/*>
+  F<src/io/io_unix.c>
+  F<src/io/io_win32.c>
   Perl 5's IO::AIO
   Perl 5's POE
 
