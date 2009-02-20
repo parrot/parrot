@@ -320,8 +320,8 @@ must be compatible with the type of the destination register.
 Generally, "compatible" means that the source and destination have to
 be the same type, but there are a few exceptions:
 
-  sub I0, I1, 2          # I0 = I1 - 2
-  sub N0, N1, 1.5        # N0 = N1 - 1.5
+  sub P0, P1, 2          # P0 = P1 - 2
+  sub P0, P1, 1.5        # P0 = P1 - 1.5
 
 If the destination register is an integer register, like C<I0>, the
 other arguments must be integer registers or integer constants. A
@@ -422,14 +422,8 @@ X<PASM (Parrot assembly language);string operations>
 String operations work with string registers and with PMCs that
 implement a string class.
 
-Most operations on string registers generate new strings in the
-destination register. Some operations have an optimized form that
-modifies an existing string in place. These are denoted by an C<_r>
-suffix, as in C<substr_r>.N<Please note that C<substr_r> has been
-deprecated.>
-
 String operations on PMC registers require all their string arguments
-to be PMCs.
+to be String PMCs.
 
 =head3 Concatenating strings
 
@@ -985,17 +979,13 @@ by the string C<"__">) into a single string, and stores it in C<S0>.
 =head3 Splitting strings
 
 Splitting a string yields a new array containing the resulting
-substrings of the original string. Since regular expressions aren't
-implemented yet, the current implementation of the C<split> opcode
-just splits individual characters, much like Perl 5's C<split> with
-an empty pattern.
-
+substrings of the original string.
 
   split P0, "", "abc"
   set P1, P0[0]
-  print P1		# 'a'
+  print P1              # 'a'
   set P1, P0[2]
-  print P1		# 'c'
+  print P1              # 'c'
   end
 
 This example splits the string "abc" into individual characters and
