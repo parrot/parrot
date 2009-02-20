@@ -2051,8 +2051,9 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
                     dir->segments[i]->name);
             return 0;
         }
-        else
+        else {
             TRACE_PRINTF_VAL(("PackFile_Segment_unpack ok. pos=0x%x\n", pos));
+        }
 
         /* BUG: on 64bit reading 32bit lurking here! */
         if (pf->need_wordsize) {
