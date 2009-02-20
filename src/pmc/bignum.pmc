@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -281,6 +281,7 @@ bignum_add_bignum_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 static void
 bignum_add_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL value, PMC *dest) {
     BIGNUM *bn, *bn_self, *bn_dest;
+    GETATTR_BigNum_bn(interp, self, bn);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
     mpf_set_d(bn->b, value);
@@ -310,6 +311,7 @@ bignum_sub_bignum_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 static void
 bignum_sub_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL value, PMC *dest) {
     BIGNUM *bn, *bn_self, *bn_dest;
+    GETATTR_BigNum_bn(interp, self, bn);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
     mpf_set_d(bn->b, value);
@@ -336,6 +338,7 @@ bignum_mul_bignum_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 static void
 bignum_mul_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL value, PMC *dest) {
     BIGNUM *bn, *bn_self, *bn_dest;
+    GETATTR_BigNum_bn(interp, self, bn);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
     mpf_set_d(bn->b, value);
