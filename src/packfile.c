@@ -3482,7 +3482,7 @@ PackFile_find_fixup_entry(PARROT_INTERP, INTVAL type, ARGIN(char *name))
     ep->type = type;
     ep->name = name;
 
-    if (PackFile_map_segments(interp, dir, find_fixup_iter, (void *) ep));
+    if (PackFile_map_segments(interp, dir, find_fixup_iter, (void *) ep))
         return ep;
 
     return NULL;
