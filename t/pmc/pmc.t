@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -7,8 +7,8 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 16;
-use Parrot::PMC qw(%pmc_types);
+use Parrot::Test tests => 15;
+use Parrot::PMC '%pmc_types';
 
 =head1 NAME
 
@@ -173,26 +173,6 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "issame" );
 CODE
 1001
 OUTPUT
-
-SKIP: {
-    skip( "no instantiate", 1 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', "instantiate - no args" );
-    get_class P2, "Integer"
-    set I0, 0   # unproto
-    set I3, 0   # no P args
-    instantiate P3
-    typeof S0, P3
-    print S0
-    print "\n"
-    set I0, P3
-    print I0
-    print "\n"
-    end
-CODE
-Integer
-0
-OUTPUT
-}
 
 pasm_output_is( <<'CODE', <<'OUT', ".const - Sub constant" );
 .pcc_sub :main main:
