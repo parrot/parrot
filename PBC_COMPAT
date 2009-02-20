@@ -21,7 +21,7 @@
 # better, if you have an i386 box at hand, regenerate the PBCs
 # with tools/dev/mk_native_pbc and commit the changes
 
-# or TODO much better: all .pbc files should make-depend on PBC_COMPAT
+# TODO TT #361: all .pbc files should make-depend on PBC_COMPAT
 
 # Also, if you're removing an opcode, be sure to run "make opsrenumber"
 
