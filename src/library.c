@@ -219,7 +219,7 @@ parrot_init_library_paths(PARROT_INTERP)
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"), 0);
         VTABLE_push_string(interp, paths, entry);
     }
-    entry = CONST_STRING(interp, "");
+    entry = CONST_STRING(interp, "dynext/");
     VTABLE_push_string(interp, paths, entry);
 
     /* shared exts */
@@ -653,21 +653,30 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
 
     for (i = 0; i < n; ++i) {
         STRING * const path = VTABLE_get_string_keyed_int(interp, paths, i);
+        STRING *found_name;
 
-        if (Parrot_str_byte_length(interp, prefix) && !is_abs_path(path))
-            full_name = path_concat(interp, prefix, path);
-        else
-            full_name = Parrot_str_copy(interp, path);
-
+        full_name = Parrot_str_copy(interp, path);
         full_name = path_append(interp, full_name, file);
 
-        full_name =
+        found_name =
             (type & PARROT_RUNTIME_FT_DYNEXT)
                 ? try_load_path(interp, full_name)
                 : try_bytecode_extensions(interp, full_name);
 
-        if (full_name)
-            return full_name;
+        if (found_name)
+            return found_name;
+
+        if (Parrot_str_byte_length(interp, prefix) && !is_abs_path(path)) {
+            full_name = path_concat(interp, prefix, full_name);
+
+            found_name =
+                (type & PARROT_RUNTIME_FT_DYNEXT)
+                    ? try_load_path(interp, full_name)
+                    : try_bytecode_extensions(interp, full_name);
+
+            if (found_name)
+                return found_name;
+        }
     }
 
     full_name =
