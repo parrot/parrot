@@ -187,10 +187,11 @@ PARROT_ARGS   =
 BUILD_DIR     = @build_dir@
 LOAD_EXT      = @load_ext@
 O             = @o@
+VERSION       = @versiondir@
 BIN_DIR       = @bin_dir@
-LIB_DIR       = @lib_dir@@versiondir@
-DOC_DIR       = @doc_dir@@versiondir@
-MANDIR        = @mandir@@versiondir@
+LIB_DIR       = @lib_dir@$(VERSION)
+DOC_DIR       = @doc_dir@$(VERSION)
+MANDIR        = @mandir@@$(VERSION)
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 
 ## Setup some commands
@@ -205,7 +206,6 @@ PARROT        = ../../parrot@exe@
 PBC_TO_EXE    = ../../pbc_to_exe@exe@
 PMCBUILD      = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
 OPSBUILD      = $(PERL) $(BUILD_DIR)/tools/build/dynoplibs.pl
-RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 #IF(darwin):
 #IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
@@ -225,7 +225,7 @@ OPSLIB        = @lclang@
 
 build: $(@UCLANG@_GROUP) $(@UCLANG@_OPS) @lclang@.pbc
 
-all: $(@UCLANG@_GROUP) $(@UCLANG@_OPS) @lclang@.pbc @lclang@@exe@ installable
+all: build @lclang@@exe@ installable
 
 SOURCES = @lclang@.pir \
   src/gen_grammar.pir \
