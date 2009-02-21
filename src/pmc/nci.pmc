@@ -20,6 +20,9 @@ The vtable functions for the native C call functions.
 
 #include "parrot/parrot.h"
 
+typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
+typedef INTVAL (*nci_jit_sub_t)(PARROT_INTERP, PMC *, char *);
+
 void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info);
 void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info) {
         char   *sig_c      = Parrot_str_to_cstring(interp, sig);
@@ -96,6 +99,7 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
 pmclass NCI need_ext {
     ATTR STRING    *signature;              /* The signature. */
     ATTR void      *func;                   /* Function pointer to what we'll call. */
+    ATTR void      *orig_func;              /* Function pointer used to create func*/
     ATTR STRING    *pcc_params_signature;   /* The signature. */
     ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
     ATTR INTVAL     jitted;                 /* Is this a jitted NCI stub. */
@@ -144,8 +148,7 @@ Initializes the NCI with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = NULL;
-        PMC_data(SELF)       = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
+        PMC_data(SELF) = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
 
         /* Mark that we're not a raw NCI. */
         PObj_flag_CLEAR(private2, SELF);
@@ -164,7 +167,7 @@ Sets the specified function pointer and signature (C<*key>).
 */
 
     VTABLE void set_pointer(void *ptr) {
-        PMC_struct_val(SELF) = ptr;
+        SET_ATTR_orig_func(INTERP, SELF, ptr);
         PObj_flag_SET(private2, SELF);
     }
 
@@ -174,7 +177,7 @@ Sets the specified function pointer and signature (C<*key>).
         char                     * const key_c = Parrot_str_to_cstring(INTERP, key);
 
         /* Store the original function and signature. */
-        PMC_struct_val(SELF) = func;
+        SET_ATTR_orig_func(INTERP, SELF, func);
         nci_info->signature  = string_make(interp, key_c, strlen(key_c),
                                     NULL, PObj_constant_FLAG);
         Parrot_str_free_cstring(key_c);
@@ -241,10 +244,9 @@ Creates and returns a clone of the NCI.
     VTABLE PMC *clone() {
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
         Parrot_NCI_attributes *nci_info_ret;
+        void                  *orig_func;
 
         PMC * const ret     = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_struct_val(ret) = PMC_struct_val(SELF);
-        SET_ATTR_multi_sig(INTERP, ret, PMCNULL);
         PMC_data(ret)       = mem_allocate_zeroed_typed(Parrot_NCI_attributes);
         nci_info_ret        = PARROT_NCI(ret);
 
@@ -253,6 +255,7 @@ Creates and returns a clone of the NCI.
          * ManagedStruct or Buffer?
          */
         nci_info_ret->func                  = nci_info_self->func;
+        nci_info_ret->orig_func             = nci_info_self->orig_func;
         nci_info_ret->signature             = nci_info_self->signature;
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->arity                 = nci_info_self->arity;
@@ -290,24 +293,28 @@ shifted down.
 */
 
     VTABLE opcode_t *invoke(void *next) {
+
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        nci_sub_t                     func;
+        void                         *orig_func;
+        PMC                          *cont;
 
-        typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
-
-        nci_sub_t func = PObj_flag_TEST(private2, SELF)
-            ? (nci_sub_t) D2FPTR(PMC_struct_val(SELF))
+        GET_ATTR_orig_func(INTERP, SELF, orig_func);
+        func = PObj_flag_TEST(private2, SELF)
+            ? (nci_sub_t) D2FPTR(orig_func)
             : (nci_sub_t) D2FPTR(nci_info->func);
-
-        PMC *cont;
 
         if (!func)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "attempt to call NULL function");
 
         if (nci_info->jitted) {
-            typedef INTVAL (*nci_jit_sub_t)(PARROT_INTERP, PMC *, char *);
 
             nci_jit_sub_t jit_func = (nci_jit_sub_t) D2FPTR(nci_info->func);
+
+            /* XXX: Some i386 jit code depends on this.  If t/pmc/nci.t passes
+             * without it, the next line is safe to remove. */
+            PMC_struct_val(SELF) = nci_info->orig_func;
 
             /* Parrot_eprintf(interp, "JITTED %S\n", nci_info->signature); */
             jit_func(INTERP, SELF,

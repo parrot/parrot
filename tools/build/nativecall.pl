@@ -195,6 +195,7 @@ sub print_head {
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_nci.h"
 #include "nci.str"
 
 /* HEADERIZER HFILE: none */
@@ -428,13 +429,15 @@ pcf_${return}_$fix_params(PARROT_INTERP, PMC *self)
 {
     typedef $ret_type (*func_t)($proto);
     func_t pointer;
+    void *orig_func;
     $call_state
     $return_data
     $other_decl
     Parrot_init_arg_nci(interp, &st, \"$sig\");
     $extra_preamble
 
-    pointer =  (func_t)D2FPTR(PMC_struct_val(self));
+    GETATTR_NCI_orig_func(interp, self, orig_func);
+    pointer = (func_t)D2FPTR(orig_func);
     $return_assign ($ret_type)(*pointer)($call_params);
     $final_assign
     $extra_postamble
@@ -451,12 +454,14 @@ static void
 pcf_${return}_(PARROT_INTERP, PMC *self)
 {
     $ret_type (*pointer)(void);
+    void *orig_func;
     $return_data
     $other_decl
     $call_state
     $extra_preamble
 
-    pointer =  ($ret_type (*)(void))D2FPTR(PMC_struct_val(self));
+    GETATTR_NCI_orig_func(interp, self, orig_func);
+    pointer = ($ret_type (*)(void))D2FPTR(orig_func);
     $return_assign ($ret_type)(*pointer)();
     $final_assign
     $extra_postamble

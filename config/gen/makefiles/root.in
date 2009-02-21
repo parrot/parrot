@@ -1160,7 +1160,8 @@ $(SRC_DIR)/vtables$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/vtables.c
 
 $(SRC_DIR)/gc/system$(O) : $(GENERAL_H_FILES)  $(SRC_DIR)/gc/gc_private.h
 
-$(SRC_DIR)/nci.c : $(SRC_DIR)/call_list.txt $(BUILD_TOOLS_DIR)/nativecall.pl
+$(SRC_DIR)/nci.c : $(SRC_DIR)/call_list.txt $(BUILD_TOOLS_DIR)/nativecall.pl \
+	$(SRC_DIR)/pmc/pmc_nci.h
 	$(PERL) $(BUILD_TOOLS_DIR)/nativecall.pl $(SRC_DIR)/call_list.txt
 
 $(SRC_DIR)/warnings$(O) : $(GENERAL_H_FILES)
