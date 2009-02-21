@@ -191,7 +191,7 @@ VERSION       = @versiondir@
 BIN_DIR       = @bin_dir@
 LIB_DIR       = @lib_dir@$(VERSION)
 DOC_DIR       = @doc_dir@$(VERSION)
-MANDIR        = @mandir@@$(VERSION)
+MANDIR        = @mandir@$(VERSION)
 PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
 
 ## Setup some commands
