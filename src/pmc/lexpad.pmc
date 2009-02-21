@@ -91,7 +91,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE void set_pointer(void *ctx) {
-        SET_ATTR_ctx(INTERP, SELF, ctx);
+        SET_ATTR_ctx(INTERP, SELF, (struct Parrot_Context *)ctx);
     }
 
     VTABLE INTVAL elements() {
