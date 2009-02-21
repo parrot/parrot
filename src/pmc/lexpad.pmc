@@ -29,7 +29,8 @@ These are the vtable functions for the lexpad PMC.
  */
 
 pmclass LexPad provides hash no_ro {
-    ATTR PMC * lexinfo;
+    ATTR PMC                   *lexinfo;
+    ATTR struct Parrot_Context *ctx;
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -90,7 +91,7 @@ Return the LexInfo PMC, if any or a Null PMC.
     }
 
     VTABLE void set_pointer(void *ctx) {
-        PMC_struct_val(SELF) = ctx;
+        SET_ATTR_ctx(INTERP, SELF, ctx);
     }
 
     VTABLE INTVAL elements() {
@@ -119,8 +120,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         INTVAL            regno;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
+        GET_ATTR_ctx(INTERP, SELF, ctx);
         hash = (Hash *)PMC_struct_val(info);
-        ctx  = (Parrot_Context *)PMC_struct_val(SELF);
         b    = parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
@@ -144,8 +145,8 @@ Return the LexInfo PMC, if any or a Null PMC.
         INTVAL             regno;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
+        GET_ATTR_ctx(INTERP, SELF, ctx);
         hash = (Hash *)PMC_struct_val(info);
-        ctx  = (Parrot_Context *)PMC_struct_val(SELF);
         b    = parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
