@@ -312,8 +312,8 @@ shifted down.
 
             nci_jit_sub_t jit_func = (nci_jit_sub_t) D2FPTR(nci_info->func);
 
-            /* XXX: Some i386 jit code depends on this.  If t/pmc/nci.t passes
-             * without it, the next line is safe to remove. */
+            /* TT #365 - Some i386 jit code depends on this.  If t/pmc/nci.t
+             * passes without it, the next line is safe to remove. */
             PMC_struct_val(SELF) = nci_info->orig_func;
 
             /* Parrot_eprintf(interp, "JITTED %S\n", nci_info->signature); */
