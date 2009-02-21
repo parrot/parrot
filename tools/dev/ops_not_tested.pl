@@ -55,7 +55,9 @@ print "$opcount opcodes found$/";
 my $pbcfiles;
 File::Find::find(
     {
-        wanted => sub { m/\.pbc$/i and push @$pbcfiles => $File::Find::name },
+        wanted => sub { m/\.pbc$/i
+                        and $File::Find::dir !~ m/native_pbc/
+                        and push @$pbcfiles => $File::Find::name },
         nochdir => 1,
     },
     @dirs,
