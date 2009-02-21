@@ -302,7 +302,7 @@ OUT
 my $lstat;
 
 SKIP: {
-    skip 'lstat not on Win32, faling on solaris', 1 if $MSWin32 or $solaris;
+    skip 'lstat not on Win32, falling on solaris', 1 if $MSWin32 or $solaris;
 
     my @s = lstat('xpto');
     if ($cygwin) {
@@ -393,8 +393,11 @@ OUT
     unlink "xpto" if -f "xpto";
 }
 
-my $prevnl = [ stat("tools") ]->[3];
-pir_output_is( <<"CODE", <<"OUT", "Test dirlink" );
+SKIP: {
+    skip "Hardlinks to files not possible on Windows", 1 if $MSWin32 or $cygwin;
+
+    my $prevnl = [ stat("tools") ]->[3];
+    pir_output_is( <<"CODE", <<"OUT", "Test dirlink" );
 .sub main :main
     .local pmc os
     .local string xpto, tools
@@ -431,6 +434,7 @@ pir_output_is( <<"CODE", <<"OUT", "Test dirlink" );
 CODE
 ok
 OUT
+}
 
 # Local Variables:
 #   mode: cperl
