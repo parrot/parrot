@@ -334,8 +334,10 @@ initialize_parents(PARROT_INTERP, PMC *object, PMC *all_parents)
 
         meth = Parrot_oo_find_vtable_override_for_class(interp, parent, name);
 
-        if (!PMC_IS_NULL(meth))
-            Parrot_run_meth_fromc_args(interp, meth, object, name, "v");
+        if (!PMC_IS_NULL(meth)) {
+            PMC *sig_obj = Parrot_pcc_build_sig_object_from_varargs(interp, object, "->", NULL);
+            Parrot_pcc_invoke_from_sig_object(interp, meth, sig_obj);
+        }
     }
 }
 
