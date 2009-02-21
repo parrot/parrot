@@ -137,10 +137,6 @@ typedef struct Parrot_sub_arginfo {
 } Parrot_sub_arginfo;
 
 
-/*
- * Sub and Closure share a Parrot_sub structure.
- * Closures have additionally an 'outer_ctx'
- */
 typedef struct Parrot_sub {
     PackFile_ByteCode *seg;     /* bytecode segment */
     size_t   start_offs;        /* sub entry in ops from seg->base.data */
@@ -173,8 +169,7 @@ typedef struct Parrot_sub {
 
 #define PMC_sub(pmc) ((pmc)->vtable->base_type == enum_class_Sub || \
                       (pmc)->vtable->base_type == enum_class_Coroutine || \
-                      (pmc)->vtable->base_type == enum_class_Eval || \
-                      (pmc)->vtable->base_type == enum_class_Closure ? \
+                      (pmc)->vtable->base_type == enum_class_Eval ? \
     (Parrot_sub *)PMC_struct_val(pmc) : \
     Parrot_get_sub_pmc_from_subclass(interp, (pmc)))
 

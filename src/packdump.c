@@ -288,7 +288,6 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     }
                     break;
                 case enum_class_Sub:
-                case enum_class_Closure:
                 case enum_class_Coroutine:
                     sub = PMC_sub(pmc);
                     if (sub->namespace_name) {
