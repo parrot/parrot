@@ -109,7 +109,7 @@ sub update_fp {
             my $leftover = (18 + $uuid_len) % 16;
             my $n = $leftover == 0 ? 0 : 16 - $leftover;
             # we can skip the copy if there's enough room already (pad:14=>2)
-            goto SEEK if $n < FP_LEN;
+            goto SEEK if $n > FP_LEN;
             my $dirstart = 18 + $uuid_len + $n;
             seek $F, $dirstart, 0;   # skip to dir
             my $size = -s $F;
