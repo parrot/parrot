@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 DESCRIPTION
@@ -99,6 +99,29 @@ Destroys the struct, freeing the allocated memory.
         }
 
         return;
+    }
+
+
+/*
+
+=item C<PMC * clone()>
+
+Creates a clone of this PMC; clones any unmanaged memory it holds too.  Note
+that the latter is only a shallow copy, as there's no general way of knowing
+how to clone I<that> data.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC *dest = pmc_new_init(interp, SELF->vtable->base_type,
+            PMC_pmc_val(SELF));
+
+        if (PMC_data(SELF))
+            memmove(PMC_data(dest), PMC_data(SELF), PMC_int_val(SELF));
+
+        return dest;
     }
 
 }

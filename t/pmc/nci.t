@@ -2134,7 +2134,7 @@ Triple: 6
 Sum: 12
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
+pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
 
 .include "datatypes.pasm"
   new  P8, 'OrderedHash'
@@ -2156,16 +2156,15 @@ OUTPUT
   push P6, 0
 
   new  P5, 'ManagedStruct', P6
-  set  P9[ 'y' ], 200
+  set  P5[ 'nested'; 'y' ], 200
   set  P5[ 'x' ], 100
 
   set I0, P5[ 'x' ]
   set I1, P5[ 'nested'; 'y' ]
   print "Old X: "
-  print I0
-  print "\nOld Y: "
-  print I1
-  print "\n"
+  say I0
+  print "Old Y: "
+  say I1
 
   set_args "0,0,0", P5, 1, 2
   loadlib P1, "libnci_test"
@@ -2176,15 +2175,13 @@ OUTPUT
   set P6, P5[ 'nested' ]
   set I1, P6[ 'y' ]
   print "X: "
-  print I0
-  print "\nY: "
-  print I1
-  print "\n"
+  say I0
+  print "Y: "
+  say I1
   # extract struct
   set P6, P5[ 'nested' ]
   set I1, P6[ 'y' ]
-  print I1
-  print "\n"
+  say I1
   end
 CODE
 Old X: 100
@@ -2536,7 +2533,7 @@ CODE
 OUTPUT
 
 pir_output_is(
-    << 'CODE', << 'OUTPUT', 'nested structs should be independent', todo => 'RT #31292' );
+    << 'CODE', << 'OUTPUT', 'nested structs should be independent' );
 .include 'datatypes.pasm'
 
 .sub 'test' :main
@@ -2563,6 +2560,7 @@ pir_output_is(
     .local pmc nci_func
     nci_func = dlfunc libnci_test, 'nci_vpii', 'vpii'
 
+    print_values( outer )
     nci_func( outer, 1, 100 )
     print_values( outer )
 
@@ -2574,6 +2572,7 @@ pir_output_is(
     nci_func( other, 2, 200 )
 
     print_values( outer )
+    print_values( other )
 .end
 
 .sub 'print_values'
@@ -2583,10 +2582,9 @@ pir_output_is(
     x = outer['x']
     y = outer[ 'nested'; 'y' ]
     print "X: "
-    print x
-    print "\nY: "
-    print y
-    print "\n"
+    say x
+    print "Y: "
+    say y
 .end
 
 .sub 'make_outer_struct'
@@ -2611,10 +2609,14 @@ pir_output_is(
     .return( outer )
 .end
 CODE
+X: 0
+Y: 0
 X: 1
 Y: 100
 X: 1
 Y: 100
+X: 2
+Y: 200
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "arity" );

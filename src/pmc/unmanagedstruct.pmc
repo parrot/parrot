@@ -160,14 +160,13 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
 
     if (*type == enum_type_struct_ptr || *type == enum_type_struct) {
         /* the struct PMC is hanging off the initializer element
-         * as property "_struct"
-         */
+         * as property "_struct" */
         PMC * const ptr = VTABLE_get_pmc_keyed_int(interp, init, ix);
         init            = VTABLE_getprop(interp, ptr, CONST_STRING(interp, "_struct"));
 
-        PARROT_ASSERT(init &&
-            (init->vtable->base_type == enum_class_UnManagedStruct ||
-             init->vtable->base_type == enum_class_ManagedStruct));
+        PARROT_ASSERT(init
+            && (init->vtable->base_type == enum_class_UnManagedStruct
+            ||  init->vtable->base_type == enum_class_ManagedStruct));
 
         /* array of structs */
         if (max > 1) {
@@ -182,6 +181,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
 
             p += offs * count;
         }
+
         if (init->vtable->base_type == enum_class_UnManagedStruct) {
             /* now point PMC_data of this struct to the real data */
             if (*type == enum_type_struct_ptr) {
@@ -189,17 +189,17 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
                 PARROT_ASSERT((PTR2INTVAL(p) & (PARROT_PTR_ALIGNMENT - 1)) == 0);
                 PMC_data(init) = *(void**)p;
             }
-            else {
-                /* or just an offset for nested structs */
+
+            /* or just an offset for nested structs */
+            else
                 PMC_data(init) = p;
-            }
         }
-        else if (init->vtable->base_type == enum_class_ManagedStruct &&
-            *type == enum_type_struct_ptr) {
+        else if (init->vtable->base_type == enum_class_ManagedStruct
+             && *type                    == enum_type_struct_ptr) {
             /* a nested struct pointer belonging to us
              * p is the location of the struct pointer in the
-             * outer struct, the inner is at PMC_data(init)
-             */
+             * outer struct, the inner is at PMC_data(init) */
+
             PARROT_ASSERT((PTR2INTVAL(p) & (PARROT_PTR_ALIGNMENT - 1)) == 0);
             *(void **)p = PMC_data(init);
         }
@@ -215,6 +215,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
     size = data_types[*type - enum_first_type].size;
     return p + count * size;
 }
+
 
 /*
 
@@ -521,8 +522,8 @@ set_string(PARROT_INTERP, char *p, int type, STRING *value)
 calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
         int type, size_t offs)>
 
-Alignment of contained structures is the alignment of the
-biggest item in that C<struct>.
+Alignment of contained structures is the alignment of the biggest item in that
+C<struct>.
 
 i386: C<long long> or C<double> is aligned on 4.
 
@@ -542,8 +543,7 @@ calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
 
     if (type == enum_type_struct || type == enum_type_struct_ptr) {
         /* a nested structs alignment is the biggest item in it
-         * so go through that struct and check
-         */
+         * so go through that struct and check */
         nested = VTABLE_getprop(interp, type_pmc, CONST_STRING(interp, "_struct"));
         nested_init = PMC_pmc_val(nested);
     }
@@ -587,8 +587,8 @@ calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
 =item C<static size_t
 calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)>
 
-Calculates the offsets for the C<struct>. See C<init_pmc()> for a
-description of C<*value>.
+Calculates the offsets for the C<struct>. See C<init_pmc()> for a description
+of C<*value>.
 
 =cut
 
@@ -597,8 +597,10 @@ description of C<*value>.
 static size_t
 calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
 {
-    INTVAL i, n = (size_t)VTABLE_elements(interp, value);
-    int size;
+    STRING *_struct = CONST_STRING(interp, "_struct");
+    INTVAL  n       = (size_t)VTABLE_elements(interp, value);
+    INTVAL  i;
+    int     size;
 
     if (n % 3)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -611,24 +613,35 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
         int  offs     = (int)VTABLE_get_integer_keyed_int(interp, value, i + 2);
 
         if (type < enum_first_type || type >= enum_last_type)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "Illegal type in initializer for struct");
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
+                "Illegal type in initializer for struct");
 
         if (count <= 0) {
             count = 1;
-            VTABLE_set_integer_keyed_int(interp, value, i+1, count);
+            VTABLE_set_integer_keyed_int(interp, value, i + 1, count);
         }
 
         if (offs <= 0) {
             offs = toff = calc_align(interp, pmc, type_pmc, type, toff);
-            VTABLE_set_integer_keyed_int(interp, value, i+2, offs);
+            VTABLE_set_integer_keyed_int(interp, value, i + 2, offs);
         }
         else
             toff = offs;
 
         if (type == enum_type_struct) {
-            PMC *nested = VTABLE_getprop(interp, type_pmc, CONST_STRING(interp, "_struct"));
+            PMC *nested = VTABLE_getprop(interp, type_pmc, _struct);
             size        = VTABLE_get_integer(interp, nested);
+        }
+        else if (type == enum_type_struct_ptr) {
+            PMC *nested = VTABLE_getprop(interp, type_pmc, _struct);
+
+            /* must clone this struct so as not to share its memory */
+            if (nested->vtable->base_type == enum_class_ManagedStruct)
+                VTABLE_setprop(interp, type_pmc, _struct,
+                    VTABLE_clone(interp, nested));
+
+            size = data_types[type - enum_first_type].size;
         }
         else
             size = data_types[type - enum_first_type].size;
@@ -739,8 +752,8 @@ Returns whether the two C<struct>s are equivalent.
 */
 
     VTABLE INTVAL is_equal(PMC *value) {
-        return (SELF->vtable == value->vtable &&
-            PMC_data(SELF) == PMC_data(value));
+        return (SELF->vtable   == value->vtable
+        &&      PMC_data(SELF) == PMC_data(value));
     }
 
 /*
