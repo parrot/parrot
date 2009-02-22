@@ -28,9 +28,13 @@ to F<languages/xyz> if an explicit C<path> isn't given):
     STATUS
     Configure.pl
     xyz.pir
+    config/makefiles/ops.in
+    config/makefiles/pmc.in
     config/makefiles/root.in
     doc/running.pod
     doc/Xyz.pod
+    dynext/.ignore
+    library/.ignore
     src/builtins/say.pir
     src/parser/grammar.pg
     src/parser/grammar-oper.pg
@@ -162,13 +166,57 @@ use strict;
 use warnings;
 use 5.008;
 
-my $build_dir = '../..';
-my $hll       = '@lclang@';
-my $cmd       = qq{$^X -Ilib tools/dev/reconfigure.pl --step=gen::languages --languages=$hll};
+#  Get a list of parrot-configs to invoke.
+my @parrot_config_exe = (
+    'parrot/parrot_config',
+    '../../parrot_config',
+    'parrot_config',
+);
 
-print "Running '$cmd' in $build_dir\n";
-chdir $build_dir;
-`$cmd`
+#  Get configuration information from parrot_config
+my %config = read_parrot_config(@parrot_config_exe);
+unless (%config) {
+    die "Unable to locate parrot_config.";
+}
+
+#  Create the Makefile using the information we just got
+create_makefiles(%config);
+
+sub read_parrot_config {
+    my @parrot_config_exe = @_;
+    my %config = ();
+    for my $exe (@parrot_config_exe) {
+        no warnings;
+        if (open my $PARROT_CONFIG, '-|', "$exe --dump") {
+            print "Reading configuration information from $exe\n";
+            while (<$PARROT_CONFIG>) {
+                $config{$1} = $2 if (/(\w+) => '(.*)'/);
+            }
+            close $PARROT_CONFIG;
+            last if %config;
+        }
+    }
+    %config;
+}
+
+
+#  Generate Makefiles from a configuration
+sub create_makefiles {
+    my %config = @_;
+    my %makefiles = (
+        'config/makefiles/root.in' => 'Makefile',
+        'config/makefiles/pmc.in'  => 'src/pmc/Makefile',
+        'config/makefiles/ops.in'  => 'src/ops/Makefile',
+    );
+    my $build_tool = $config{libdir} . $config{versiondir}
+                   . '/tools/dev/gen_makefile.pl';
+
+    foreach my $template (keys %makefiles) {
+        my $makefile = $makefiles{$template};
+        print "Creating $makefile\n";
+        system($config{perl}, $build_tool, $template, $makefile);
+    }
+}
 
 # Local Variables:
 #   mode: cperl
@@ -177,6 +225,175 @@ chdir $build_dir;
 # End:
 # vim: expandtab shiftwidth=4:
 
+__config/makefiles/ops.in__
+## @Id@
+
+# values from parrot_config
+VERSION_DIR   = @versiondir@
+INCLUDE_DIR   = @includedir@$(VERSION_DIR)
+LIB_DIR       = @libdir@$(VERSION_DIR)
+#STAGING_DIR   = ../../dynext
+STAGING_DIR   = @build_dir@/runtime/parrot/dynext
+#INSTALL_DIR   = $(LIB_DIR)/languages/@lclang@/dynext
+INSTALL_DIR   = $(LIB_DIR)/dynext
+
+# Set up extensions
+LOAD_EXT      = @load_ext@
+O             = @o@
+
+# Setup some commands
+PERL          = @perl@
+RM_F          = @rm_f@
+CHMOD         = @chmod@
+CP            = @cp@
+CC            = @cc@ -c
+LD            = @ld@
+LDFLAGS       = @ldflags@ @ld_debug@ @rpath_blib@ @linkflags@
+LD_LOAD_FLAGS = @ld_load_flags@
+CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CC_OUT        = @cc_o_out@
+LD_OUT        = @ld_out@
+#IF(parrot_is_shared):LIBPARROT     = @libparrot_ldflags@
+#ELSE:LIBPARROT     =
+
+BUILD_TOOLS_DIR = $(LIB_DIR)/tools/build
+OPS2C           = $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl
+
+INCLUDES        = -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
+LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+
+OPS_FILE = @lclang@.ops
+
+
+all: staging
+
+generate: $(OPS_FILE)
+	$(OPS2C) C --dynamic $(OPS_FILE)
+	$(OPS2C) CSwitch --dynamic $(OPS_FILE)
+#IF(cg_flag):	$(OPS2C) CGoto --dynamic $(OPS_FILE)
+#IF(cg_flag):	$(OPS2C) CGP --dynamic $(OPS_FILE)
+
+compile: generate
+	$(CC) $(CC_OUT) @lclang@_ops$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops.c
+	$(CC) $(CC_OUT) @lclang@_ops_switch$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_switch.c
+#IF(cg_flag):	$(CC) $(CC_OUT) @lclang@_ops_cg$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_cg.c
+#IF(cg_flag):	$(CC) $(CC_OUT) @lclang@_ops_cgp$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_cgp.c
+
+linklibs: compile
+	$(LD) $(LD_OUT) @lclang@_ops$(LOAD_EXT) @lclang@_ops$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) @lclang@_ops_switch$(LOAD_EXT) @lclang@_ops_switch$(O) $(LINKARGS)
+#IF(cg_flag):	$(LD) $(LD_OUT) @lclang@_ops_cg$(LOAD_EXT) @lclang@_ops_cg$(O) $(LINKARGS)
+#IF(cg_flag):	$(LD) $(LD_OUT) @lclang@_ops_cgp$(LOAD_EXT) @lclang@_ops_cgp$(O) $(LINKARGS)
+
+staging: linklibs
+#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+	$(CP) "*$(LOAD_EXT)" $(STAGING_DIR)
+
+install:
+#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
+
+Makefile: ../../config/makefiles/ops.in
+	cd ../.. && $(PERL) Configure.pl
+
+clean:
+	$(RM_F) "*$(LOAD_EXT)" "*$(O)" "*.c" "*.h" \
+	    "$(STAGING_DIR)/@lclang@_ops*$(LOAD_EXT)"
+
+realclean: clean
+	$(RM_F) Makefile
+
+uninstall:
+	$(RM_F) "$(INSTALL_DIR)/@lclang@_ops*$(LOAD_EXT)"
+
+__config/makefiles/pmc.in__
+## @Id@
+
+# values from parrot_config
+VERSION_DIR   = @versiondir@
+INCLUDE_DIR   = @includedir@$(VERSION_DIR)
+LIB_DIR       = @libdir@$(VERSION_DIR)
+SRC_DIR       = @srcdir@$(VERSION_DIR)
+TOOLS_DIR     = @libdir@$(VERSION_DIR)/tools/lib
+#STAGING_DIR   = ../../dynext
+STAGING_DIR   = @build_dir@/runtime/parrot/dynext
+#INSTALL_DIR   = $(LIB_DIR)/languages/@lclang@/dynext
+INSTALL_DIR   = $(LIB_DIR)/dynext
+
+# Set up extensions
+LOAD_EXT      = @load_ext@
+O             = @o@
+
+# Setup some commands
+PERL          = @perl@
+RM_F          = @rm_f@
+CHMOD         = @chmod@
+CP            = @cp@
+CC            = @cc@ -c
+LD            = @ld@
+LDFLAGS       = @ldflags@ @ld_debug@
+LD_LOAD_FLAGS = @ld_load_flags@
+CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CC_OUT        = @cc_o_out@
+LD_OUT        = @ld_out@
+#IF(parrot_is_shared):LIBPARROT     = @libparrot_ldflags@
+#ELSE:LIBPARROT     =
+
+BUILD_TOOLS_DIR = $(LIB_DIR)/tools/build
+PMC2C_INCLUDES  = --include $(SRC_DIR) --include $(SRC_DIR)/pmc
+PMC2C           = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl
+PMC2CD          = $(PMC2C) --dump $(PMC2C_INCLUDES)
+PMC2CC          = $(PMC2C) --c $(PMC2C_INCLUDES)
+
+INCLUDES        = -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
+LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+
+PMC_SOURCES = \
+  @lclang@.pmc
+
+@uclang@_GROUP = @lclang@_group
+
+OBJS = \
+  lib-$(@uclang@_GROUP)$(O) \
+  @lclang@$(O)
+
+
+all : staging
+
+generate : $(PMC_SOURCES)
+	$(PMC2CD) @lclang@.pmc
+	$(PMC2CC) @lclang@.pmc
+	$(PMC2C) --library $(@uclang@_GROUP) --c $(PMC_SOURCES)
+
+compile : generate
+	$(CC) $(CC_OUT) @lclang@$(O) $(INCLUDES) $(CFLAGS) @lclang@.c
+	$(CC) $(CC_OUT) lib-$(@uclang@_GROUP)$(O) $(INCLUDES) $(CFLAGS) $(@uclang@_GROUP).c
+
+linklibs : compile
+	$(LD) $(LD_OUT) $(@uclang@_GROUP)$(LOAD_EXT) $(OBJS) $(LINKARGS)
+
+staging : linklibs
+#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+	$(CP) "*$(LOAD_EXT)" $(STAGING_DIR)
+
+install :
+#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
+
+Makefile: ../../config/makefiles/pmc.in
+	cd ../.. && $(PERL) Configure.pl
+
+clean:
+	$(RM_F) "*$(LOAD_EXT)" "*$(O)" "*.c" "*.h" "*.dump" \
+	    "$(STAGING_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)"
+#IF(win32):	$(RM_F) "*.exp" "*.ilk" "*.manifext" "*.pdb" "*.lib"
+
+realclean: clean
+	$(RM_F) Makefile
+
+uninstall:
+	$(RM_F) "$(INSTALL_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)"
+
 __config/makefiles/root.in__
 ## @Id@
 
@@ -184,47 +401,47 @@ __config/makefiles/root.in__
 PARROT_ARGS   =
 
 ## configuration settings
-BUILD_DIR     = @build_dir@
-LOAD_EXT      = @load_ext@
-O             = @o@
 VERSION       = @versiondir@
 BIN_DIR       = @bin_dir@
 LIB_DIR       = @lib_dir@$(VERSION)
 DOC_DIR       = @doc_dir@$(VERSION)
 MANDIR        = @mandir@$(VERSION)
-PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
+
+# Set up extensions
+LOAD_EXT      = @load_ext@
+O             = @o@
+
+# Various paths
+PERL6GRAMMAR  = $(LIB_DIR)/library/PGE/Perl6Grammar.pbc
+NQP           = $(LIB_DIR)/languages/nqp/nqp.pbc
+PCT           = $(LIB_DIR)/library/PCT.pbc
+PMC_DIR       = src/pmc
+OPS_DIR       = src/ops
 
 ## Setup some commands
+MAKE          = @make_c@
 PERL          = @perl@
-RM_F          = @rm_f@
-CP            = @cp@
-CHMOD         = @chmod@
 CAT           = @cat@
+CHMOD         = @chmod@
+CP            = @cp@
 MKPATH        = @mkpath@
+RM_F          = @rm_f@
+RM_RF         = @rm_rf@
 POD2MAN       = pod2man
 #IF(parrot_is_shared and not(cygwin or win32)):export LD_RUN_PATH := @blib_dir@:$(LD_RUN_PATH)
 PARROT        = ../../parrot@exe@
 PBC_TO_EXE    = ../../pbc_to_exe@exe@
-PMCBUILD      = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
-OPSBUILD      = $(PERL) $(BUILD_DIR)/tools/build/dynoplibs.pl
 #IF(darwin):
 #IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
-## places to look for things
-PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
-PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
-PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
-NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
-
-PMC_DIR       = src/pmc
-OPS_DIR       = src/ops
-OPSLIB        = @lclang@
-
 @UCLANG@_GROUP = $(PMC_DIR)/@lclang@_group$(LOAD_EXT)
 @UCLANG@_OPS = $(OPS_DIR)/@lclang@_ops$(LOAD_EXT)
 
-build: $(@UCLANG@_GROUP) $(@UCLANG@_OPS) @lclang@.pbc
+build: \
+  $(@UCLANG@_OPS) \
+  $(@UCLANG@_GROUP) \
+  @lclang@.pbc
 
 all: build @lclang@@exe@ installable
 
@@ -240,7 +457,7 @@ BUILTINS_PIR = \
 PMCS = @lclang@
 PMC_SOURCES = $(PMC_DIR)/@lclang@.pmc
 OPS_SOURCES = $(OPS_DIR)/@lclang@.ops
-DOCS = MAINTAINER README TODO
+DOCS = MAINTAINER README
 
 # the default target
 @lclang@.pbc: $(SOURCES)
@@ -262,17 +479,11 @@ src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 src/gen_builtins.pir: $(BUILTINS_PIR)
 	$(CAT) $(BUILTINS_PIR) > src/gen_builtins.pir
 
-$(@UCLANG@_GROUP): $(PMC_SOURCES)
-	@cd $(PMC_DIR) && $(PMCBUILD) generate $(PMCS)
-	@cd $(PMC_DIR) && $(PMCBUILD) compile  $(PMCS)
-	@cd $(PMC_DIR) && $(PMCBUILD) linklibs $(PMCS)
-	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(PARROT_DYNEXT)" $(PMCS)
+$(@UCLANG@_GROUP): $(PMC_SOURCES) config/makefiles/pmc.in
+	$(MAKE) $(PMC_DIR)
 
-$(@UCLANG@_OPS): $(OPS_SOURCES)
-	@cd $(OPS_DIR) && $(OPSBUILD) generate $(OPSLIB)
-	@cd $(OPS_DIR) && $(OPSBUILD) compile  $(OPSLIB)
-	@cd $(OPS_DIR) && $(OPSBUILD) linklibs $(OPSLIB)
-	@cd $(OPS_DIR) && $(OPSBUILD) copy "--destination=$(PARROT_DYNEXT)" $(OPSLIB)
+$(@UCLANG@_OPS) : $(OPS_SOURCES) config/makefiles/ops.in
+	$(MAKE) $(OPS_DIR)
 
 installable: installable_@lclang@@exe@
 
@@ -317,10 +528,10 @@ test-installable: installable
 	echo "1" | ./installable_@lclang@@exe@
 
 install: installable
+	$(MAKE) $(OPS_DIR) install
+	$(MAKE) $(PMC_DIR) install
 	$(CP) installable_@lclang@@exe@ $(BIN_DIR)/parrot-@lclang@@exe@
 	$(CHMOD) 0755 $(BIN_DIR)/parrot-@lclang@@exe@
-	@cd $(OPS_DIR) && $(OPSBUILD) copy "--destination=$(LIB_DIR)/dynext" $(OPSLIB)
-	@cd $(PMC_DIR) && $(PMCBUILD) copy "--destination=$(LIB_DIR)/dynext" $(PMCS)
 	-$(MKPATH) $(LIB_DIR)/languages/@lclang@
 	$(CP) @lclang@.pbc $(LIB_DIR)/languages/@lclang@/@lclang@.pbc
 	-$(MKPATH) $(MANDIR)/man1
@@ -328,12 +539,20 @@ install: installable
 	-$(MKPATH) $(DOC_DIR)/languages/@lclang@
 	$(CP) $(DOCS) $(DOC_DIR)/languages/@lclang@
 
+uninstall:
+	$(MAKE) $(OPS_DIR) uninstall
+	$(MAKE) $(PMC_DIR) uninstall
+	$(RM_F) $(BIN_DIR)/parrot-@lclang@@exe@
+	$(RM_RF) $(LIB_DIR)/languages/@lclang@
+	$(RM_F) $(MANDIR)/man1/parrot-@lclang@.1
+	$(RM_RF) $(DOC_DIR)/languages/@lclang@
+
 win32-inno-installer: installable
 	-$(MKPATH) man/man1
 	$(POD2MAN) doc/running.pod > man/man1/parrot-@lclang@.1
 	-$(MKPATH) man/html
 	pod2html --infile doc/running.pod --outfile man/html/parrot-@lclang@.html
-	$(CP) installable_@lclang@@exe@ parrot-@lclang@@exe@
+	$(CP) installable_@lclang@@exe@ parrot-@lclang@.exe
 	cd @build_dir@ && $(PERL) tools/dev/mk_inno_language.pl @lclang@
 	cd @build_dir@ && iscc parrot-@lclang@.iss
 
@@ -343,33 +562,20 @@ testclean:
 CLEANUPS = \
   @lclang@.pbc \
   "src/gen_*.pir" \
+  "*.c" \
+  "*$(O)" \
   @lclang@@exe@ \
+IF(win32):  parrot-@lclang@.exe \
   installable_@lclang@@exe@
 
-PMC_CLEANUPS = \
-  "$(PMC_DIR)/*.h" \
-  "$(PMC_DIR)/*.c" \
-  "$(PMC_DIR)/*.dump" \
-  "$(PMC_DIR)/*$(O)" \
-#IF(win32):  "$(PMC_DIR)/*.exp" \
-#IF(win32):  "$(PMC_DIR)/*.ilk" \
-#IF(win32):  "$(PMC_DIR)/*.manifest" \
-#IF(win32):  "$(PMC_DIR)/*.pdb" \
-#IF(win32):  "$(PMC_DIR)/*.lib" \
-  "$(PMC_DIR)/*$(LOAD_EXT)"
-
-OPS_CLEANUPS = \
-  "$(OPS_DIR)/*.c" \
-  "$(OPS_DIR)/*.h" \
-  "$(OPS_DIR)/*$(O)" \
-  "$(OPS_DIR)/*$(LOAD_EXT)"
-
 clean: testclean
+	$(MAKE) $(OPS_DIR) clean
+	$(MAKE) $(PMC_DIR) clean
 	$(RM_F) $(CLEANUPS)
-	$(RM_F) $(PMC_CLEANUPS)
-	$(RM_F) $(OPS_CLEANUPS)
 
 realclean: clean
+	$(MAKE) $(OPS_DIR) realclean
+	$(MAKE) $(PMC_DIR) realclean
 	$(RM_F) Makefile
 
 distclean: realclean
@@ -420,6 +626,11 @@ A number of additional options are available:
 #   fill-column:78
 # End:
 # vim: expandtab shiftwidth=4:
+
+__dynext/.ignore__
+
+__library/.ignore__
+
 __@lclang@.pir__
 =head1 TITLE
 
