@@ -138,9 +138,11 @@ main(int argc, const char *argv[])
 
 /*
 
-=item C<static void do_dis(PARROT_INTERP, outfile, int)>
+=item C<static void do_dis(PARROT_INTERP, outfile, option)>
 
 Do the disassembling.
+
+C<option> is currently used to pass debugging flags to the packfile reader.
 
 =cut
 
