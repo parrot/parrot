@@ -11,14 +11,11 @@ O             = @o@
 EXE           = @exe@
 
 ## Setup some commands
-LN_S          = @lns@
 PERL          = @perl@
 RM_RF         = @rm_rf@
-CP            = @cp@
 PARROT        = ../../parrot$(EXE)
 CAT           = @cat@
 BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
-RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 #CONDITIONED_LINE(darwin):
 #CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
@@ -83,7 +80,7 @@ $(LOLCODE_GROUP): $(PARROT) $(PMC_SOURCES)
 
 # regenerate the Makefile
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=lolcode
+	$(PERL) Configure.pl
 
 # This is a listing of all targets, that are meant to be called by users
 help:
