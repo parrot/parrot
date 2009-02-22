@@ -8,7 +8,12 @@ tools/dev/mk_language_shell.pl -- create initial files for a new language
 
 =head1 SYNOPSIS
 
-% perl tools/dev/mk_language_shell.pl Xyz [path]
+ % perl tools/dev/mk_language_shell.pl [options] Xyz [path]
+
+option:
+
+ --with-ops
+ --with-pmc
 
 =head1 DESCRIPTION
 
@@ -66,7 +71,14 @@ use warnings;
 use lib 'lib';
 use File::Path;
 use File::Spec;
+use Getopt::Long;
 use Parrot::Config qw/ %PConfig /;
+
+my ($with_ops, $with_pmc);
+GetOptions(
+    'with-ops' => \$with_ops,
+    'with-pmc' => \$with_pmc,
+);
 
 unless (@ARGV) {
     die "usage: $0 language [path]\n";
@@ -81,6 +93,9 @@ my $uclang = uc $lang;
 my $script = $0;
 my $rev = '$Revision$';
 $rev =~ s/^\D*(\d+)\D*$/r$1/;
+
+my $no_ops = $with_ops ? '' : '#';
+my $no_pmc = $with_pmc ? '' : '#';
 
 ##  get the path from the command line, or if not supplied then
 ##  use languages/$lclang.
@@ -100,6 +115,8 @@ while (<DATA>) {
     s{\@Id\@}     {\$Id\$}ig;
     s{\@script\@} {$script}ig;
     s{\@rev\@}    {$rev}ig;
+    s{\@no_ops\@} {$no_ops}ig;
+    s{\@no_pmc\@} {$no_pmc}ig;
     if (/^__(.*)__$/) { start_new_file("$path$PConfig{slash}$1"); }
     elsif ($fh) { print $fh $_; }
 }
@@ -121,8 +138,22 @@ unless ($ARGV[1]) {
 ##  create any needed parent subdirectories.
 sub start_new_file {
     my ($filepath) = @_;
-    if ($fh) { close $fh; undef $fh; }
-    if (-e $filepath) { print "skipping $filepath\n"; return; }
+    if ($fh) {
+        close $fh;
+        undef $fh;
+    }
+    if (-e $filepath) {
+        print "skipping $filepath\n";
+        return;
+    }
+    if (!$with_ops and $filepath =~ /ops/) {
+        print "no ops: skipping $filepath\n";
+        return;
+    }
+    if (!$with_pmc and $filepath =~ /pmc/) {
+        print "no pmc: skipping $filepath\n";
+        return;
+    }
     my ($volume, $dir, $base) = File::Spec->splitpath($filepath);
     my $filedir = File::Spec->catpath($volume, $dir);
     unless (-d $filedir) {
@@ -205,8 +236,8 @@ sub create_makefiles {
     my %config = @_;
     my %makefiles = (
         'config/makefiles/root.in' => 'Makefile',
-        'config/makefiles/pmc.in'  => 'src/pmc/Makefile',
-        'config/makefiles/ops.in'  => 'src/ops/Makefile',
+@no_pmc@        'config/makefiles/pmc.in'  => 'src/pmc/Makefile',
+@no_ops@        'config/makefiles/ops.in'  => 'src/ops/Makefile',
     );
     my $build_tool = $config{libdir} . $config{versiondir}
                    . '/tools/dev/gen_makefile.pl';
@@ -256,8 +287,7 @@ LD_OUT        = @ld_out@
 #IF(parrot_is_shared):LIBPARROT     = @libparrot_ldflags@
 #ELSE:LIBPARROT     =
 
-BUILD_TOOLS_DIR = $(LIB_DIR)/tools/build
-OPS2C           = $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl
+OPS2C           = $(PERL) $(LIB_DIR)/tools/build/ops2c.pl
 
 INCLUDES        = -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
 LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
@@ -293,6 +323,9 @@ install:
 #IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
 	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
 
+uninstall:
+	$(RM_F) "$(INSTALL_DIR)/@lclang@_ops*$(LOAD_EXT)"
+
 Makefile: ../../config/makefiles/ops.in
 	cd ../.. && $(PERL) Configure.pl
 
@@ -302,9 +335,6 @@ clean:
 
 realclean: clean
 	$(RM_F) Makefile
-
-uninstall:
-	$(RM_F) "$(INSTALL_DIR)/@lclang@_ops*$(LOAD_EXT)"
 
 __config/makefiles/pmc.in__
 ## @Id@
@@ -339,9 +369,8 @@ LD_OUT        = @ld_out@
 #IF(parrot_is_shared):LIBPARROT     = @libparrot_ldflags@
 #ELSE:LIBPARROT     =
 
-BUILD_TOOLS_DIR = $(LIB_DIR)/tools/build
 PMC2C_INCLUDES  = --include $(SRC_DIR) --include $(SRC_DIR)/pmc
-PMC2C           = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl
+PMC2C           = $(PERL) $(LIB_DIR)/tools/build/pmc2c.pl
 PMC2CD          = $(PMC2C) --dump $(PMC2C_INCLUDES)
 PMC2CC          = $(PMC2C) --c $(PMC2C_INCLUDES)
 
@@ -358,41 +387,41 @@ OBJS = \
   @lclang@$(O)
 
 
-all : staging
+all: staging
 
-generate : $(PMC_SOURCES)
+generate: $(PMC_SOURCES)
 	$(PMC2CD) @lclang@.pmc
 	$(PMC2CC) @lclang@.pmc
 	$(PMC2C) --library $(@uclang@_GROUP) --c $(PMC_SOURCES)
 
-compile : generate
+compile: generate
 	$(CC) $(CC_OUT) @lclang@$(O) $(INCLUDES) $(CFLAGS) @lclang@.c
 	$(CC) $(CC_OUT) lib-$(@uclang@_GROUP)$(O) $(INCLUDES) $(CFLAGS) $(@uclang@_GROUP).c
 
-linklibs : compile
+linklibs: compile
 	$(LD) $(LD_OUT) $(@uclang@_GROUP)$(LOAD_EXT) $(OBJS) $(LINKARGS)
 
-staging : linklibs
+staging: linklibs
 #IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
 	$(CP) "*$(LOAD_EXT)" $(STAGING_DIR)
 
-install :
+install:
 #IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
 	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
+
+uninstall:
+	$(RM_F) $(INSTALL_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)
 
 Makefile: ../../config/makefiles/pmc.in
 	cd ../.. && $(PERL) Configure.pl
 
 clean:
 	$(RM_F) "*$(LOAD_EXT)" "*$(O)" "*.c" "*.h" "*.dump" \
-	    "$(STAGING_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)"
+	    $(STAGING_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)
 #IF(win32):	$(RM_F) "*.exp" "*.ilk" "*.manifext" "*.pdb" "*.lib"
 
 realclean: clean
 	$(RM_F) Makefile
-
-uninstall:
-	$(RM_F) "$(INSTALL_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)"
 
 __config/makefiles/root.in__
 ## @Id@
@@ -445,18 +474,18 @@ build: \
 
 all: build @lclang@@exe@ installable
 
-SOURCES = @lclang@.pir \
+SOURCES = \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
-  $(@UCLANG@_GROUP)
+  @lclang@.pir
 
 BUILTINS_PIR = \
   src/builtins/say.pir
 
-PMCS = @lclang@
-PMC_SOURCES = $(PMC_DIR)/@lclang@.pmc
-OPS_SOURCES = $(OPS_DIR)/@lclang@.ops
+@no_pmc@PMC_DEPS = config/makefiles/pmc.in $(PMC_DIR)/@lclang@.pmc
+@no_ops@OPS_DEPS = config/makefiles/ops.in $(OPS_DIR)/@lclang@.ops
+
 DOCS = MAINTAINER README
 
 # the default target
@@ -479,11 +508,11 @@ src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 src/gen_builtins.pir: $(BUILTINS_PIR)
 	$(CAT) $(BUILTINS_PIR) > src/gen_builtins.pir
 
-$(@UCLANG@_GROUP): $(PMC_SOURCES) config/makefiles/pmc.in
-	$(MAKE) $(PMC_DIR)
+$(@UCLANG@_GROUP): $(PMC_DEPS)
+@no_pmc@	$(MAKE) $(PMC_DIR)
 
-$(@UCLANG@_OPS) : $(OPS_SOURCES) config/makefiles/ops.in
-	$(MAKE) $(OPS_DIR)
+$(@UCLANG@_OPS): $(OPS_DEPS)
+@no_ops@	$(MAKE) $(OPS_DIR)
 
 installable: installable_@lclang@@exe@
 
@@ -528,8 +557,8 @@ test-installable: installable
 	echo "1" | ./installable_@lclang@@exe@
 
 install: installable
-	$(MAKE) $(OPS_DIR) install
-	$(MAKE) $(PMC_DIR) install
+@no_ops@	$(MAKE) $(OPS_DIR) install
+@no_pmc@	$(MAKE) $(PMC_DIR) install
 	$(CP) installable_@lclang@@exe@ $(BIN_DIR)/parrot-@lclang@@exe@
 	$(CHMOD) 0755 $(BIN_DIR)/parrot-@lclang@@exe@
 	-$(MKPATH) $(LIB_DIR)/languages/@lclang@
@@ -540,8 +569,8 @@ install: installable
 	$(CP) $(DOCS) $(DOC_DIR)/languages/@lclang@
 
 uninstall:
-	$(MAKE) $(OPS_DIR) uninstall
-	$(MAKE) $(PMC_DIR) uninstall
+@no_ops@	$(MAKE) $(OPS_DIR) uninstall
+@no_pmc@	$(MAKE) $(PMC_DIR) uninstall
 	$(RM_F) $(BIN_DIR)/parrot-@lclang@@exe@
 	$(RM_RF) $(LIB_DIR)/languages/@lclang@
 	$(RM_F) $(MANDIR)/man1/parrot-@lclang@.1
@@ -565,17 +594,17 @@ CLEANUPS = \
   "*.c" \
   "*$(O)" \
   @lclang@@exe@ \
-IF(win32):  parrot-@lclang@.exe \
+#IF(win32):  parrot-@lclang@.exe \
   installable_@lclang@@exe@
 
 clean: testclean
-	$(MAKE) $(OPS_DIR) clean
-	$(MAKE) $(PMC_DIR) clean
+@no_ops@	$(MAKE) $(OPS_DIR) clean
+@no_pmc@	$(MAKE) $(PMC_DIR) clean
 	$(RM_F) $(CLEANUPS)
 
 realclean: clean
-	$(MAKE) $(OPS_DIR) realclean
-	$(MAKE) $(PMC_DIR) realclean
+@no_ops@	$(MAKE) $(OPS_DIR) realclean
+@no_pmc@	$(MAKE) $(PMC_DIR) realclean
 	$(RM_F) Makefile
 
 distclean: realclean
@@ -657,7 +686,7 @@ object.
 
 .namespace [ '@lang@::Compiler' ]
 
-.loadlib '@lclang@_group'
+@no_pmc@.loadlib '@lclang@_group'
 
 .sub 'onload' :anon :load :init
     load_bytecode 'PCT.pbc'
