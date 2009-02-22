@@ -43,8 +43,6 @@ my @all_files  = ( @c_files, @perl_files, @make_files );
 my @files = @ARGV ? <@ARGV> : @all_files;
 my ( @no_copyright_files, @bad_format_copyright_files );
 
-my @gmtime       = gmtime(time);
-my $current_year = $gmtime[5] + 1900;
 my $copyright_text =
     "Copyright \\(C\\) (\\d{4}\\-\\d{4}|\\d{4}), Parrot Foundation.";
 
