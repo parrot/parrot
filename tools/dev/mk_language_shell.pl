@@ -12,6 +12,7 @@ tools/dev/mk_language_shell.pl -- create initial files for a new language
 
 option:
 
+ --with-doc
  --with-ops
  --with-pmc
 
@@ -28,9 +29,7 @@ For a language 'Xyz', this script will create the following
 files and directories (relative to C<path>, which defaults
 to F<languages/xyz> if an explicit C<path> isn't given):
 
-    MAINTAINER
     README
-    STATUS
     Configure.pl
     xyz.pir
     config/makefiles/ops.in
@@ -74,8 +73,9 @@ use File::Spec;
 use Getopt::Long;
 use Parrot::Config qw/ %PConfig /;
 
-my ($with_ops, $with_pmc);
+my ($with_doc, $with_ops, $with_pmc);
 GetOptions(
+    'with-doc' => \$with_doc,
     'with-ops' => \$with_ops,
     'with-pmc' => \$with_pmc,
 );
@@ -94,6 +94,7 @@ my $script = $0;
 my $rev = '$Revision$';
 $rev =~ s/^\D*(\d+)\D*$/r$1/;
 
+my $no_doc = $with_doc ? '' : '#';
 my $no_ops = $with_ops ? '' : '#';
 my $no_pmc = $with_pmc ? '' : '#';
 
@@ -115,6 +116,7 @@ while (<DATA>) {
     s{\@Id\@}     {\$Id\$}ig;
     s{\@script\@} {$script}ig;
     s{\@rev\@}    {$rev}ig;
+    s{\@no_doc\@} {$no_doc}ig;
     s{\@no_ops\@} {$no_ops}ig;
     s{\@no_pmc\@} {$no_pmc}ig;
     if (/^__(.*)__$/) { start_new_file("$path$PConfig{slash}$1"); }
@@ -146,12 +148,20 @@ sub start_new_file {
         print "skipping $filepath\n";
         return;
     }
+    if (!$with_doc and $filepath =~ /doc/) {
+        print "no doc: skipping $filepath\n";
+        return;
+    }
     if (!$with_ops and $filepath =~ /ops/) {
         print "no ops: skipping $filepath\n";
         return;
     }
     if (!$with_pmc and $filepath =~ /pmc/) {
         print "no pmc: skipping $filepath\n";
+        return;
+    }
+    if (!$with_ops and!$with_pmc and $filepath =~ /dynext/) {
+        print "no dynext: skipping $filepath\n";
         return;
     }
     my ($volume, $dir, $base) = File::Spec->splitpath($filepath);
@@ -178,17 +188,6 @@ Language '@lang@' was created with @script@, @rev@.
 
 See doc/@lang@.pod for the documentation, and
 doc/running.pod for the command-line options.
-
-__MAINTAINER__
-# @Id@
-
-N: My Name
-E: My Email
-
-__STATUS__
-Number of tests passing:
-Percentage of implementation finished:
-TODO:
 
 __Configure.pl__
 # @Id@
@@ -486,7 +485,7 @@ BUILTINS_PIR = \
 @no_pmc@PMC_DEPS = config/makefiles/pmc.in $(PMC_DIR)/@lclang@.pmc
 @no_ops@OPS_DEPS = config/makefiles/ops.in $(OPS_DIR)/@lclang@.ops
 
-DOCS = MAINTAINER README
+DOCS = README
 
 # the default target
 @lclang@.pbc: $(SOURCES)
@@ -563,24 +562,24 @@ install: installable
 	$(CHMOD) 0755 $(BIN_DIR)/parrot-@lclang@@exe@
 	-$(MKPATH) $(LIB_DIR)/languages/@lclang@
 	$(CP) @lclang@.pbc $(LIB_DIR)/languages/@lclang@/@lclang@.pbc
-	-$(MKPATH) $(MANDIR)/man1
-	$(POD2MAN) doc/running.pod > $(MANDIR)/man1/parrot-@lclang@.1
-	-$(MKPATH) $(DOC_DIR)/languages/@lclang@
-	$(CP) $(DOCS) $(DOC_DIR)/languages/@lclang@
+@no_doc@	-$(MKPATH) $(MANDIR)/man1
+@no_doc@	$(POD2MAN) doc/running.pod > $(MANDIR)/man1/parrot-@lclang@.1
+@no_doc@	-$(MKPATH) $(DOC_DIR)/languages/@lclang@
+@no_doc@	$(CP) $(DOCS) $(DOC_DIR)/languages/@lclang@
 
 uninstall:
 @no_ops@	$(MAKE) $(OPS_DIR) uninstall
 @no_pmc@	$(MAKE) $(PMC_DIR) uninstall
 	$(RM_F) $(BIN_DIR)/parrot-@lclang@@exe@
 	$(RM_RF) $(LIB_DIR)/languages/@lclang@
-	$(RM_F) $(MANDIR)/man1/parrot-@lclang@.1
-	$(RM_RF) $(DOC_DIR)/languages/@lclang@
+@no_doc@	$(RM_F) $(MANDIR)/man1/parrot-@lclang@.1
+@no_doc@	$(RM_RF) $(DOC_DIR)/languages/@lclang@
 
 win32-inno-installer: installable
-	-$(MKPATH) man/man1
-	$(POD2MAN) doc/running.pod > man/man1/parrot-@lclang@.1
-	-$(MKPATH) man/html
-	pod2html --infile doc/running.pod --outfile man/html/parrot-@lclang@.html
+@no_doc@	-$(MKPATH) man/man1
+@no_doc@	$(POD2MAN) doc/running.pod > man/man1/parrot-@lclang@.1
+@no_doc@	-$(MKPATH) man/html
+@no_doc@	pod2html --infile doc/running.pod --outfile man/html/parrot-@lclang@.html
 	$(CP) installable_@lclang@@exe@ parrot-@lclang@.exe
 	cd @build_dir@ && $(PERL) tools/dev/mk_inno_language.pl @lclang@
 	cd @build_dir@ && iscc parrot-@lclang@.iss
@@ -657,8 +656,6 @@ A number of additional options are available:
 # vim: expandtab shiftwidth=4:
 
 __dynext/.ignore__
-
-__library/.ignore__
 
 __@lclang@.pir__
 =head1 TITLE
