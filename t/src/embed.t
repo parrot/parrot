@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test;
 
-plan tests => 5;
+plan tests => 6;
 
 =head1 NAME
 
@@ -220,6 +220,75 @@ int main(void)
     );
     hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "vJ");
     Parrot_call_sub(interp, code, "vP", hellosub);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
+Hello from C
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "Insert external sub in namespace" );
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+void fail(const char *msg);
+void hello(Parrot_Interp interp);
+
+void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+void hello(Parrot_Interp interp)
+{
+    Parrot_printf(interp, "Hello from C\n");
+}
+
+int main(void)
+{
+    Parrot_Interp interp;
+    Parrot_String compiler;
+    Parrot_String errstr;
+    Parrot_PMC code;
+    Parrot_PMC hellosub;
+    Parrot_PMC rootns;
+    Parrot_String parrotname;
+    Parrot_PMC parrotns;
+    Parrot_String helloname;
+    void *discard;
+
+    /* Create the interpreter */
+    interp = Parrot_new(NULL);
+    if (! interp)
+        fail("Cannot create parrot interpreter");
+
+    /* Compile pir */
+    compiler = Parrot_new_string(interp, "PIR", 3, (const char *)NULL, 0);
+    code = Parrot_compile_string(interp, compiler,
+".sub externcall\n"
+"  hello()\n"
+"\n"
+".end\n"
+"\n",
+        &errstr
+    );
+
+    /* Create extern sub and insert in parrot namespace */
+    rootns = Parrot_get_root_namespace(interp);
+    parrotname = Parrot_new_string(interp, "parrot", 6, (const char *)NULL, 0);
+    parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
+    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "");
+    helloname = Parrot_new_string(interp, "hello", 5, (const char *)NULL, 0);
+    Parrot_PMC_set_pmc_strkey(interp, parrotns, helloname, hellosub);
+
+    /* Call it */
+    discard = Parrot_call_sub(interp, code, "");
 
     Parrot_destroy(interp);
     return 0;
