@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 29;
+use Test::More tests => 30;
 
 =head1 NAME
 
@@ -359,10 +359,10 @@ skip("Rakudo", 2) unless (-d "$langdir/rakudo");
 $out = `$parrot $langdir/rakudo/perl6.pbc -e "say 'hello world'"`;
 ok($out eq "hello world\n", "check rakudo");
 
-skip("perl6.cmd", 1) if ($bindir eq '.');
+skip("perl6 executable", 1) if ($bindir eq '.');
 $exe = catfile($bindir, 'perl6');
 $out = `$exe -v`;
-ok($out =~ /Rakudo/, "check rakudo");
+ok($out =~ /Rakudo/, "check perl6");
 }
 
 SKIP:
@@ -496,6 +496,28 @@ close $FH;
 $out = `$parrot $langdir/unlambda/unl.pbc $filename`;
 ok($out eq "Hello world\n", "check unlambda");
 unlink($filename);
+}
+
+SKIP:
+{
+skip("WMLScript", 1) unless (-d "$langdir/wmlscript");
+skip("WMLScript, not wmlsc", 1) unless (`wmlsc -h` =~ /wmlsc/);
+
+$filename = 'test.wmls';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH <<'CODE';
+extern function main()
+{
+    Console.println("Hello World!");
+}
+CODE
+close $FH;
+`wmlsc $filename`;
+$out = `$parrot $langdir/wmlscript/wmlsi.pbc ${filename}c main`;
+ok($out eq "Hello World!\n", "check wmlscript");
+unlink($filename);
+unlink($filename . 'c');
 }
 
 # Local Variables:
