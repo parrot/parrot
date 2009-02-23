@@ -33,6 +33,7 @@ LIB_DIR         := @libdir@
 INCLUDE_DIR     := @includedir@
 DATA_DIR        := @datadir@
 DOC_DIR         := @doc_dir@
+VERSION_DIR     = @versiondir@
 
 
 ###############################################################################
@@ -2132,7 +2133,7 @@ install: installable
     --includedir=$(INCLUDE_DIR) \
     --destdir=$(DESTDIR) \
     --docdir=$(DOC_DIR) \
-#UNLESS(win32):    --version=$(VERSION) \
+#UNLESS(win32):    --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
 install-dev: install
@@ -2147,7 +2148,7 @@ install-dev: install
     --docdir=$(DOC_DIR) \
     --datadir=$(DATA_DIR) \
     --srcdir=@srcdir@ \
-#UNLESS(win32):    --version=$(VERSION) \
+#UNLESS(win32):    --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
 ###############################################################################

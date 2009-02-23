@@ -141,10 +141,7 @@ foreach (@ARGV) {
     }
 }
 
-my $parrotdir = "parrot";
-if ($options{version}) {
-    $parrotdir = File::Spec->catdir( $parrotdir, $options{version} );
-}
+my $parrotdir = $options{versiondir};
 
 # We'll report multiple occurrences of the same file
 my %seen;
