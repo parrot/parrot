@@ -335,6 +335,11 @@ clean:
 realclean: clean
 	$(RM_F) Makefile
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
+
 __config/makefiles/pmc.in__
 ## @Id@
 
@@ -421,6 +426,11 @@ clean:
 
 realclean: clean
 	$(RM_F) Makefile
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
 
 __config/makefiles/root.in__
 ## @Id@
