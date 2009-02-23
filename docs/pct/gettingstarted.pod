@@ -107,16 +107,12 @@ C<languages/foo>, type:
 
  $ perl tools/dev/mk_language_shell Foo languages/foo
 
-This will create a complete language that compiles out of the box, except for
-the fact that there's no Makefile yet. In order to resolve that, you should
-(re)run the Configure.pl script:
-
- $ perl Configure.pl
-
-This will regenerate all makefiles, including the one for your language. Now,
-in order to compile your language, type:
+This will create a complete language that compiles out of the box.  You first 
+need to run the C<Configure.PL> Perl script to generate the C<Makefile>.  Then
+you can run C<make> and C<make test>.
 
  $ cd languages/foo
+ $ perl Configure.pl
  $ make
  $ make test
 
@@ -126,6 +122,7 @@ setting up the tests for your language very easy!
 The generated directories and files have the following structure:
 
  foo/
+    /Configure.pl                # configuration script
     /config/makefiles/root.in    # input for the Makefile generator
                                  # as long as you don't add source files,
                                  # there's no need to update this file.
@@ -136,15 +133,23 @@ The generated directories and files have the following structure:
                /grammar-oper.pg  # file containing a default operator table.
 
         /builtins/
-                 /say.pir      # a file containing a built-in function
-                               # add more "standard library" routines here
-    /t/
-      /00-sanity.t             # a test file
-      /harness                 # file to set up the test framework
-                               # more tests can be added here
+                 /say.pir        # a file containing a built-in function
 
-    /foo.pir                   # file containing the main routine
-    /README                    # an almost empty readme file
+        /pmc/
+                 /foo.pmc        # file defining vtable functions 
+
+        /ops/
+                 /foo.ops        # file defining opcodes 
+                                 # TODO: add more "standard library" routines here
+    /t/
+      /00-sanity.t               # a test file
+      /harness                   # file to set up the test framework
+                                 # more tests can be added here
+
+    /foo.pir                     # file containing the main routine
+    /README                      # an almost empty readme file
+    /STATUS                      # an almost empty status file
+    /MAINTAINER                  # a file for you to add your details to
 
 
 When you want to run a script through your language's compiler, (assuming
