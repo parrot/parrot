@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -63,7 +63,7 @@ Initializes the pointer object.
 */
 
     VTABLE void init() {
-        Parrot_CPointer_attributes *pdata_struct =
+        Parrot_CPointer_attributes * const pdata_struct =
             mem_allocate_typed(Parrot_CPointer_attributes);
 
         PMC_data(SELF)        = pdata_struct;
@@ -92,12 +92,12 @@ pointer.
 
         if (data->pointer) {
             if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-                PMC **pmc_pointer = (PMC **) data->pointer;
+                PMC ** const pmc_pointer = (PMC **) data->pointer;
                 PARROT_ASSERT(*pmc_pointer);
                 pobject_lives(interp, (PObj *) *pmc_pointer);
             }
             else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
-                STRING **str_pointer = (STRING **) data->pointer;
+                STRING ** const str_pointer = (STRING **) data->pointer;
                 PARROT_ASSERT(*str_pointer);
                 pobject_lives(interp, (PObj *) *str_pointer);
             }
@@ -215,11 +215,11 @@ integer or PMC).
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "I")) == 0) {
-            INTVAL *int_pointer = (INTVAL *) data->pointer;
+            const INTVAL * const int_pointer = (INTVAL *) data->pointer;
             return *int_pointer;
         }
         else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             return VTABLE_get_integer(interp, *pmc_pointer);
         }
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -242,11 +242,11 @@ integer or PMC).
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "I")) == 0) {
-            INTVAL *int_pointer = (INTVAL *) data->pointer;
+            INTVAL * const int_pointer = (INTVAL *) data->pointer;
             *int_pointer = value;
         }
         else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             VTABLE_set_integer_native(interp, *pmc_pointer, value);
         }
         else {
@@ -270,11 +270,11 @@ to a number or PMC).
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "N")) == 0) {
-            FLOATVAL *num_pointer = (FLOATVAL *) data->pointer;
+            const FLOATVAL * const num_pointer = (FLOATVAL *) data->pointer;
             return *num_pointer;
         }
         else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             return VTABLE_get_number(interp, *pmc_pointer);
         }
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -296,11 +296,11 @@ to a number or PMC).
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "N")) == 0) {
-            FLOATVAL *num_pointer = (FLOATVAL *) data->pointer;
+            FLOATVAL * const num_pointer = (FLOATVAL *) data->pointer;
             *num_pointer = value;
         }
         else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             VTABLE_set_number_native(interp, *pmc_pointer, value);
         }
         else {
@@ -324,11 +324,11 @@ to a string or PMC).
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
-            STRING **str_pointer = (STRING **) data->pointer;
+            STRING ** const str_pointer = (STRING **) data->pointer;
             return *str_pointer;
         }
         else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             return VTABLE_get_string(interp, *pmc_pointer);
         }
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -350,11 +350,11 @@ to a string or PMC).
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
-            STRING **str_pointer = (STRING **) data->pointer;
+            STRING ** const str_pointer = (STRING **) data->pointer;
             *str_pointer = value;
         }
         else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             VTABLE_set_string_native(interp, *pmc_pointer, value);
         }
         else {
@@ -374,10 +374,10 @@ Returns the PMC value that the pointer points to (if the pointer is to a PMC).
 */
 
     VTABLE PMC *get_pmc() {
-        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        const Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             return *pmc_pointer;
         }
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -395,10 +395,10 @@ Sets the PMC value that the pointer points to (if the pointer is to a PMC).
 */
 
     VTABLE void set_pmc(PMC *value) {
-        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        const Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
         if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
-            PMC **pmc_pointer = (PMC **) data->pointer;
+            PMC ** const pmc_pointer = (PMC **) data->pointer;
             *pmc_pointer = value;
         }
         else {
@@ -418,7 +418,7 @@ Returns whether the pointer is not C<NULL>.
 */
 
     VTABLE INTVAL get_bool() {
-        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        const Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
         return (INTVAL)(data->pointer != NULL);
     }
 
@@ -433,7 +433,7 @@ Returns whether the pointer has the same value as C<*pmc2>.
 */
 
     VTABLE INTVAL is_same(PMC *pmc2) {
-        Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        const Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
         return (INTVAL)(SELF->vtable  == pmc2->vtable &&
                         data->pointer == VTABLE_get_pointer(interp, pmc2));
     }
