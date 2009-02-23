@@ -902,7 +902,7 @@ end:
 
     defined $I0, $P1
     $I0 = not $I0
-    ok( $I1, 'Unassigned var is undefined' )
+    ok( $I0, 'Unassigned var is undefined' )
 
     set $P0["a"], 1
     defined $I0, $P0["a"]
