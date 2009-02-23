@@ -229,7 +229,7 @@ Tests the Class PMC.
     pop_eh
 
   t_no_args:
-    ok($I1, 'add_method() with no args fails')
+    ok($I0, 'add_method() with no args fails')
 
     $I0 = 1
     push_eh t_one_arg
@@ -238,7 +238,7 @@ Tests the Class PMC.
     pop_eh
 
   t_one_arg:
-    ok($I1, 'add_method() with valid single arg fails')
+    ok($I0, 'add_method() with valid single arg fails')
 
     # note this test depends on 'add_attribute' and 'attributes'
     class.'add_attribute'( 'foo', 'String' )
