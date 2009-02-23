@@ -346,6 +346,13 @@ void Parrot_PMC_set_pmc_pmckey(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_PMC_set_pmc_strkey(PARROT_INTERP,
+    Parrot_PMC pmc,
+    Parrot_String key,
+    Parrot_PMC value)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_PMC_set_pointer_intkey(PARROT_INTERP,
     ARGIN(Parrot_PMC pmc),
     Parrot_Int key,
@@ -521,6 +528,8 @@ int Parrot_vfprintf(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_PMC_set_pmc_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_PMC_set_pmc_pmckey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_PMC_set_pmc_strkey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_PMC_set_pointer_intkey __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

@@ -585,6 +585,27 @@ Parrot_PMC_set_pmc_intkey(PARROT_INTERP,
 
 /*
 
+=item C<void Parrot_PMC_set_pmc_strkey>
+
+Assign the passed-in pmc to the passed-in slot of the passed-in PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_PMC_set_pmc_strkey(PARROT_INTERP,
+        Parrot_PMC pmc, Parrot_String key, Parrot_PMC value)
+{
+    ASSERT_ARGS(Parrot_PMC_set_pmc_strkey)
+    PARROT_CALLIN_START(interp);
+    VTABLE_set_pmc_keyed_str(interp, pmc, key, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
 =item C<void Parrot_PMC_set_pmc_pmckey>
 
 Assign the passed-in pmc to the passed-in slot of the passed-in PMC.
