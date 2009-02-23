@@ -72,8 +72,6 @@ line.
 
 =item C<Parrot_Float>
 
-=item C<Parrot_Int>
-
 =item C<Parrot_UInt>
 
 Parrot's numeric types.
