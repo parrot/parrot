@@ -1,34 +1,52 @@
 # Copyright (C) 2003-2009, Parrot Foundation.
 # $Id$
 
-PERL        := @perl@
-RM_F        := @rm_f@
-LOAD_EXT    := @load_ext@
-RUNTIME_DIR := @build_dir@/runtime/parrot/dynext
-O           := @o@
+PERL          := @perl@
+RM_F          := @rm_f@
+CP            := @cp@
+CHMOD         := @chmod@
+LOAD_EXT      := @load_ext@
+BUILD_DIR     := @build_dir@
+INSTALL_DIR   := $(BUILD_DIR)@slash@runtime@slash@parrot@slash@dynext
+O             := @o@
+CC            := @cc@ -c
+LD            := @ld@
+LDFLAGS       := @ldflags@ @ld_debug@ @rpath_blib@
+LD_LOAD_FLAGS := @ld_load_flags@
+CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CC_OUT        := @cc_o_out@
+LD_OUT        := @ld_out@
+#IF(parrot_is_shared):LIBPARROT := @libparrot_ldflags@
+#ELSE:LIBPARROT :=
+
+BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
+BUILD_LIB_DIR   := $(BUILD_DIR)@slash@blib@slash@lib
+PMC2C           := $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
+INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
+#IF(win32):LINKARGS         := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#ELSIF(cc==gcc):LINKARGS       := -Wl,-L $(BUILD_LIB) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#ELSE:LINKARGS         := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
 # add your dynamic pmcs here
 #
 # gdbmhash is only built when 'libgdbm.so' is available
 #
-PMCS := \
-  dynlexpad \
-  foo \
-  pair \
-  rotest \
-#IF(has_gdbm):  gdbmhash \
-  rational \
-#IF(has_crypto):  md2 \
-#IF(has_crypto):  md4 \
-#IF(has_crypto):  md5 \
-#IF(has_crypto):  ripemd160 \
-#IF(has_crypto):  sha \
-#IF(has_crypto):  sha1 \
-#IF(has_crypto):  sha256 \
-#IF(has_crypto):  sha512 \
-  subproxy
-
-BUILD := $(PERL) @build_dir@/tools/build/dynpmc.pl
+PMC_TARGETS := \
+  dynlexpad$(LOAD_EXT) \
+  foo$(LOAD_EXT) \
+  pair$(LOAD_EXT) \
+  rotest$(LOAD_EXT) \
+#IF(has_gdbm):  gdbmhash$(LOAD_EXT) \
+  rational$(LOAD_EXT) \
+#IF(has_crypto):  md2$(LOAD_EXT) \
+#IF(has_crypto):  md4$(LOAD_EXT) \
+#IF(has_crypto):  md5$(LOAD_EXT) \
+#IF(has_crypto):  ripemd160$(LOAD_EXT) \
+#IF(has_crypto):  sha$(LOAD_EXT) \
+#IF(has_crypto):  sha1$(LOAD_EXT) \
+#IF(has_crypto):  sha256$(LOAD_EXT) \
+#IF(has_crypto):  sha512$(LOAD_EXT) \
+  subproxy$(LOAD_EXT)
 
 # some *.pmc file are generated
 GEN_PMC_DEFINITIONS := \
@@ -41,11 +59,196 @@ GEN_PMC_DEFINITIONS := \
 #IF(has_crypto):  sha256.pmc \
 #IF(has_crypto):  sha512.pmc
 
-all :
-	@$(BUILD) generate $(PMCS)
-	@$(BUILD) compile $(PMCS)
-	@$(BUILD) linklibs $(PMCS)
-	@$(BUILD) copy --destination=$(RUNTIME_DIR) $(PMCS)
+PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
+PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
+
+all : install
+
+install : $(PMC_TARGETS)
+#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
+
+
+dynlexpad$(LOAD_EXT): dynlexpad$(O)
+	$(LD) $(LD_OUT) dynlexpad$(LOAD_EXT) dynlexpad$(O) $(LINKARGS)
+
+dynlexpad$(O): dynlexpad.c
+	$(CC) $(CC_OUT) dynlexpad$(O) $(INCLUDES) $(CFLAGS) dynlexpad.c
+
+dynlexpad.c: dynlexpad.dump
+	$(PMC2CC) dynlexpad.pmc
+
+dynlexpad.dump: dynlexpad.pmc
+	$(PMC2CD) dynlexpad.pmc
+
+foo$(LOAD_EXT): foo$(O)
+	$(LD) $(LD_OUT) foo$(LOAD_EXT) foo$(O) $(LINKARGS)
+
+foo$(O): foo.c
+	$(CC) $(CC_OUT) foo$(O) $(INCLUDES) $(CFLAGS) foo.c
+
+foo.c: foo.dump
+	$(PMC2CC) foo.pmc
+
+foo.dump: foo.pmc
+	$(PMC2CD) foo.pmc
+
+pair$(LOAD_EXT): pair$(O)
+	$(LD) $(LD_OUT) pair$(LOAD_EXT) pair$(O) $(LINKARGS)
+
+pair$(O): pair.c
+	$(CC) $(CC_OUT) pair$(O) $(INCLUDES) $(CFLAGS) pair.c
+
+pair.c: pair.dump
+	$(PMC2CC) pair.pmc
+
+pair.dump: pair.pmc
+	$(PMC2CD) pair.pmc
+
+rotest$(LOAD_EXT): rotest$(O)
+	$(LD) $(LD_OUT) rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)
+
+rotest$(O): rotest.c
+	$(CC) $(CC_OUT) rotest$(O) $(INCLUDES) $(CFLAGS) rotest.c
+
+rotest.c: rotest.dump
+	$(PMC2CC) rotest.pmc
+
+rotest.dump: rotest.pmc
+	$(PMC2CD) rotest.pmc
+
+gdbmhash$(LOAD_EXT): gdbmhash$(O)
+	$(LD) $(LD_OUT) gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS)
+
+gdbmhash$(O): gdbmhash.c
+	$(CC) $(CC_OUT) gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
+
+gdbmhash.c: gdbmhash.dump
+	$(PMC2CC) gdbmhash.pmc
+
+gdbmhash.dump: gdbmhash.pmc
+	$(PMC2CD) gdbmhash.pmc
+
+rational$(LOAD_EXT): rational$(O)
+	$(LD) $(LD_OUT) rational$(LOAD_EXT) rational$(O) $(LINKARGS)
+
+rational$(O): rational.c
+	$(CC) $(CC_OUT) rational$(O) $(INCLUDES) $(CFLAGS) rational.c
+
+rational.c: rational.dump
+	$(PMC2CC) rational.pmc
+
+rational.dump: rational.pmc
+	$(PMC2CD) rational.pmc
+
+md2$(LOAD_EXT): md2$(O)
+	$(LD) $(LD_OUT) md2$(LOAD_EXT) md2$(O) $(LINKARGS)
+
+md2$(O): md2.c
+	$(CC) $(CC_OUT) md2$(O) $(INCLUDES) $(CFLAGS) md2.c
+
+md2.c: md2.dump
+	$(PMC2CC) md2.pmc
+
+md2.dump: md2.pmc
+	$(PMC2CD) md2.pmc
+
+md4$(LOAD_EXT): md4$(O)
+	$(LD) $(LD_OUT) md4$(LOAD_EXT) md4$(O) $(LINKARGS)
+
+md4$(O): md4.c
+	$(CC) $(CC_OUT) md4$(O) $(INCLUDES) $(CFLAGS) md4.c
+
+md4.c: md4.dump
+	$(PMC2CC) md4.pmc
+
+md4.dump: md4.pmc
+	$(PMC2CD) md4.pmc
+
+md5$(LOAD_EXT): md5$(O)
+	$(LD) $(LD_OUT) md5$(LOAD_EXT) md5$(O) $(LINKARGS)
+
+md5$(O): md5.c
+	$(CC) $(CC_OUT) md5$(O) $(INCLUDES) $(CFLAGS) md5.c
+
+md5.c: md5.dump
+	$(PMC2CC) md5.pmc
+
+md5.dump: md5.pmc
+	$(PMC2CD) md5.pmc
+
+ripemd160$(LOAD_EXT): ripemd160$(O)
+	$(LD) $(LD_OUT) ripemd160$(LOAD_EXT) ripemd160$(O) $(LINKARGS)
+
+ripemd160$(O): ripemd160.c
+	$(CC) $(CC_OUT) ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
+
+ripemd160.c: ripemd160.dump
+	$(PMC2CC) ripemd160.pmc
+
+ripemd160.dump: ripemd160.pmc
+	$(PMC2CD) ripemd160.pmc
+
+sha$(LOAD_EXT): sha$(O)
+	$(LD) $(LD_OUT) sha$(LOAD_EXT) sha$(O) $(LINKARGS)
+
+sha$(O): sha.c
+	$(CC) $(CC_OUT) sha$(O) $(INCLUDES) $(CFLAGS) sha.c
+
+sha.c: sha.dump
+	$(PMC2CC) sha.pmc
+
+sha.dump: sha.pmc
+	$(PMC2CD) sha.pmc
+
+sha1$(LOAD_EXT): sha1$(O)
+	$(LD) $(LD_OUT) sha1$(LOAD_EXT) sha1$(O) $(LINKARGS)
+
+sha1$(O): sha1.c
+	$(CC) $(CC_OUT) sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
+
+sha1.c: sha1.dump
+	$(PMC2CC) sha1.pmc
+
+sha1.dump: sha1.pmc
+	$(PMC2CD) sha1.pmc
+
+sha256$(LOAD_EXT): sha256$(O)
+	$(LD) $(LD_OUT) sha256$(LOAD_EXT) sha256$(O) $(LINKARGS)
+
+sha256$(O): sha256.c
+	$(CC) $(CC_OUT) sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
+
+sha256.c: sha256.dump
+	$(PMC2CC) sha256.pmc
+
+sha256.dump: sha256.pmc
+	$(PMC2CD) sha256.pmc
+
+sha512$(LOAD_EXT): sha512$(O)
+	$(LD) $(LD_OUT) sha512$(LOAD_EXT) sha512$(O) $(LINKARGS)
+
+sha512$(O): sha512.c
+	$(CC) $(CC_OUT) sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
+
+sha512.c: sha512.dump
+	$(PMC2CC) sha512.pmc
+
+sha512.dump: sha512.pmc
+	$(PMC2CD) sha512.pmc
+
+subproxy$(LOAD_EXT): subproxy$(O)
+	$(LD) $(LD_OUT) subproxy$(LOAD_EXT) subproxy$(O) $(LINKARGS)
+
+subproxy$(O): subproxy.c
+	$(CC) $(CC_OUT) subproxy$(O) $(INCLUDES) $(CFLAGS) subproxy.c
+
+subproxy.c: subproxy.dump
+	$(PMC2CC) subproxy.pmc
+
+subproxy.dump: subproxy.pmc
+	$(PMC2CD) subproxy.pmc
+
 
 test : all
 	cd ../.. && $(PERL) -Ilib t/harness t/dynpmc/*.t
