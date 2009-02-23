@@ -2,25 +2,25 @@
 # $Id$
 
 # Setup some commands
-PERL     = @perl@
-RM_F     = @rm_f@
-CP       = @cp@
-PARROT   = ../../parrot@exe@
+PERL     := @perl@
+CP       := @cp@
+RM_F     := @rm_f@
+PARROT   := ../../parrot@exe@
 
-TOOL_DIR = ../..
-PGE_DIR  = ../../compilers/pge
-TEST_DIR = ../../t/compilers/pct
+TOOL_DIR := ../..
+PGE_DIR  := ../../compilers/pge
+TEST_DIR := ../../t/compilers/pct
 
 # Where to put things
-PARROT_LIBRARY    = ../../runtime/parrot/library
+PARROT_LIBRARY := ../../runtime/parrot/library
 
-PCT_TARGETS = \
+PCT_TARGETS := \
   $(PARROT_LIBRARY)/PCT.pbc \
   $(PARROT_LIBRARY)/PCT/PAST.pbc \
   $(PARROT_LIBRARY)/PCT/Grammar.pbc \
   $(PARROT_LIBRARY)/PCT/HLLCompiler.pbc
 
-PCT_SOURCES = \
+PCT_SOURCES := \
   PCT.pir \
   src/PCT/Grammar.pir \
   src/PCT/HLLCompiler.pir \

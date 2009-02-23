@@ -3,18 +3,18 @@
 
 # some commands and locations
 @make_set_make@
-PERL          = @perl@
-MAKE          = @make_c@
-RM_F          = @rm_f@
-BUILD_DIR     = @build_dir@
-RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
-GIT           = git
-HG            = hg
-SVN           = svn
+MAKE          := @make_c@
+PERL          := @perl@
+RM_F          := @rm_f@
+BUILD_DIR     := @build_dir@
+RECONFIGURE   := $(PERL) @build_dir@/tools/dev/reconfigure.pl
+GIT           := git
+HG            := hg
+SVN           := svn
 
 # List of languages that are currently managed in the Parrot svn repository
 # When adding or removing languages, please update the list
-LANGUAGES = \
+LANGUAGES := \
     abc APL \
     BASIC befunge bf \
     c99 cardinal chitchat cola \

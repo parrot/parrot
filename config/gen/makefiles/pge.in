@@ -2,20 +2,20 @@
 # $Id$
 
 # Setup some commands
-PERL     = @perl@
-RM_F     = @rm_f@
-CP       = @cp@
-PARROT   = ../../parrot@exe@
+PERL     := @perl@
+CP       := @cp@
+RM_F     := @rm_f@
+PARROT   := ../../parrot@exe@
 
-TOOL_DIR = ../..
+TOOL_DIR := ../..
 
 # Where to put things
-PARROT_LIBRARY    = ../../runtime/parrot/library
+PARROT_LIBRARY := ../../runtime/parrot/library
 
 # the default target
 all: $(PARROT_LIBRARY)/PGE.pbc
 
-SOURCES = \
+SOURCES := \
   PGE.pir \
   PGE/Exp.pir \
   PGE/Match.pir \
@@ -23,7 +23,7 @@ SOURCES = \
   PGE/Perl6Regex.pir \
   PGE/OPTable.pir \
   PGE/P5Regex.pir \
-  PGE/builtins.pg \
+  PGE/builtins.pg
 
 $(PARROT_LIBRARY)/PGE.pbc: PGE.pbc
 	$(CP) PGE.pbc $(PARROT_LIBRARY)

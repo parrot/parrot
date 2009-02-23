@@ -1,19 +1,19 @@
 # Copyright (C) 2003-2009, Parrot Foundation.
 # $Id$
 
-PERL        = @perl@
-RM_F        = @rm_f@
-LOAD_EXT    = @load_ext@
-RUNTIME_DIR = @build_dir@/runtime/parrot/dynext
-O           = @o@
+PERL        := @perl@
+RM_F        := @rm_f@
+LOAD_EXT    := @load_ext@
+RUNTIME_DIR := @build_dir@/runtime/parrot/dynext
+O           := @o@
 
 # add your dynamic op libraries here
 #
-OPLIBS = \
+OPLIBS := \
   myops \
   dan
 
-BUILD = $(PERL) @build_dir@/tools/build/dynoplibs.pl
+BUILD := $(PERL) @build_dir@/tools/build/dynoplibs.pl
 
 all :
 	@$(BUILD) generate $(OPLIBS)

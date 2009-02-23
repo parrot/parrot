@@ -3,13 +3,13 @@
 
 # setup of commands
 @make_set_make@
-PERL      = @perl@
-MAKE      = @make@
-RM_F      = @rm_f@
+MAKE      := @make@
+PERL      := @perl@
+RM_F      := @rm_f@
 
 # add new languages here
 # remove obsolete languages here
-EXT = \
+EXT := \
     Parrot-Embed
 
 # the default target

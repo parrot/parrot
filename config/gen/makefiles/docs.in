@@ -2,14 +2,14 @@
 # $Id$
 
 # Setup of some commands
-PERL   = @perl@
-RM_F   = @rm_f@
-MKPATH = @mkpath@
-CHMOD  = @chmod@
-PERLDOC = @perldoc@
+PERL    := @perl@
+CHMOD   := @chmod@
+MKPATH  := @mkpath@
+RM_F    := @rm_f@
+PERLDOC := @perldoc@
 
 # long list of .pod files
-POD = @TEMP_pod@
+POD := @TEMP_pod@
 
 #
 # Targets

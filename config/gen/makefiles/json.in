@@ -1,13 +1,13 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
-PERL     = @perl@
-RM_F     = @rm_f@
-PARROT   = ../../parrot@exe@
+PERL     := @perl@
+RM_F     := @rm_f@
+PARROT   := ../../parrot@exe@
 
-TOOL_DIR = ../..
-PGE_DIR  = ../../compilers/pge
-TGE_DIR  = ../../compilers/tge
+TOOL_DIR := ../..
+PGE_DIR  := ../../compilers/pge
+TGE_DIR  := ../../compilers/tge
 
 # the default target
 all: JSON.pbc

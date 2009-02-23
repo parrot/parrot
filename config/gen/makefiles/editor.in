@@ -1,17 +1,17 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 
-OPS_DIR     = ../src/ops
-#IF(win32):VIM_DIR     = $(USERPROFILE)/vimfiles
-#ELSE:VIM_DIR     = $(HOME)/.vim
-VIM_FT_DIR  = $(VIM_DIR)/plugin
-VIM_IN_DIR  = $(VIM_DIR)/indent
-VIM_SYN_DIR = $(VIM_DIR)/syntax
+OPS_DIR     := ../src/ops
+#IF(win32):VIM_DIR     := $(USERPROFILE)/vimfiles
+#ELSE:VIM_DIR     := $(HOME)/.vim
+VIM_FT_DIR  := $(VIM_DIR)/plugin
+VIM_IN_DIR  := $(VIM_DIR)/indent
+VIM_SYN_DIR := $(VIM_DIR)/syntax
 
-PERL   = @perl@
-CP     = @cp@
-MKPATH = @mkpath@
-RM_F   = @rm_f@
+PERL   := @perl@
+CP     := @cp@
+MKPATH := @mkpath@
+RM_F   := @rm_f@
 
 default: all
 

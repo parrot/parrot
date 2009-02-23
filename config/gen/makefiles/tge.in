@@ -2,13 +2,13 @@
 # $Id$
 
 # Setup some commands
-PERL     = @perl@
-RM_F     = @rm_f@
-PARROT   = ../../parrot@exe@
+PERL     := @perl@
+RM_F     := @rm_f@
+PARROT   := ../../parrot@exe@
 
 # Where to put things
-PARROT_LIBRARY    = ../../runtime/parrot/library
-PERL6GRAMMAR      = $(PARROT_LIBRARY)/PGE/Perl6Grammar.pbc
+PARROT_LIBRARY    := ../../runtime/parrot/library
+PERL6GRAMMAR      := $(PARROT_LIBRARY)/PGE/Perl6Grammar.pbc
 
 # the default target
 all: $(PARROT_LIBRARY)/TGE.pbc

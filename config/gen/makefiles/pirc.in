@@ -4,31 +4,31 @@
 .SUFFIXES : .c @o@
 
 # Setup some commands
-PERL          = @perl@
-RM_F          = @rm_f@
-PARROT        = ../../parrot@exe@
-TOOL_DIR      = ../..
-CC            = @cc@
-CP            = @cp@
-BUILD         = $(PERL) @build_dir@/tools/build/dynpmc.pl
-O             = @o@
-EXE           = @exe@
-BUILD_DIR     = @build_dir@
-RECONFIGURE   = $(PERL) @build_dir@/tools/dev/reconfigure.pl
+PERL          := @perl@
+RM_F          := @rm_f@
+PARROT        := ../../parrot@exe@
+TOOL_DIR      := ../..
+CC            := @cc@
+CP            := @cp@
+BUILD         := $(PERL) @build_dir@/tools/build/dynpmc.pl
+O             := @o@
+EXE           := @exe@
+BUILD_DIR     := @build_dir@
+RECONFIGURE   := $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
-LIBPARROT     = @libparrot@
+LIBPARROT     := @libparrot@
 
-CC_INC        = -I../../include
-C_LIBS        = @libs@
-CC_SHARED     = @cc_shared@
-CFLAGS        = $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
-LINK_DYNAMIC  = @link_dynamic@
-LINK          = @link@
-LINKFLAGS     = @linkflags@ @link_debug@ @ld_debug@
-LD            = @ld@
-LDFLAGS       = @ldflags@ @ld_debug@
+CC_INC        := -I../../include
+C_LIBS        := @libs@
+CC_SHARED     := @cc_shared@
+CFLAGS        := $(CC_INC) @ccflags@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@ $(CC_SHARED)
+LINK_DYNAMIC  := @link_dynamic@
+LINK          := @link@
+LINKFLAGS     := @linkflags@ @link_debug@ @ld_debug@
+LD            := @ld@
+LDFLAGS       := @ldflags@ @ld_debug@
 
-SOURCES       = \
+SOURCES       := \
   src/main.c \
   src/pirparser.c \
   src/pirlexer.c \
@@ -44,7 +44,7 @@ SOURCES       = \
   src/pircapi.c \
   src/pirop.c
 
-OBJS          = \
+OBJS          := \
   src/main$(O) \
   src/pirparser$(O) \
   src/pirlexer$(O) \

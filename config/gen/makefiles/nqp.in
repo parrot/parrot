@@ -2,22 +2,22 @@
 # $Id$
 
 # Setup some commands
-PERL     = @perl@
-RM_F     = @rm_f@
-PARROT   = ../../parrot@exe@
+PERL     := @perl@
+RM_F     := @rm_f@
+PARROT   := ../../parrot@exe@
 
-PARROT_LIBRARY = @build_dir@/runtime/parrot/library
-PGE_LIBRARY  = @build_dir@/runtime/parrot/library/PGE
+PARROT_LIBRARY := @build_dir@/runtime/parrot/library
+PGE_LIBRARY    := @build_dir@/runtime/parrot/library/PGE
 
 all: nqp.pbc
 
-SOURCES = \
+SOURCES := \
   nqp.pir \
   src/Grammar.pg \
   src/Grammar/Actions.pir \
   src/builtins.pir
 
-BOOTSRC = \
+BOOTSRC := \
   bootstrap/nqp.pir \
   bootstrap/actions.pm
 
@@ -60,7 +60,7 @@ test: all
 # this target has nothing to do
 testclean:
 
-CLEANUPS = \
+CLEANUPS := \
   nqp.pbc \
   src/Grammar_gen.pir \
   bootstrap/gen_actions.pir \

@@ -1,17 +1,17 @@
 # Copyright (C) 2003-2009, Parrot Foundation.
 # $Id$
 
-PERL        = @perl@
-RM_F        = @rm_f@
-LOAD_EXT    = @load_ext@
-RUNTIME_DIR = @build_dir@/runtime/parrot/dynext
-O           = @o@
+PERL        := @perl@
+RM_F        := @rm_f@
+LOAD_EXT    := @load_ext@
+RUNTIME_DIR := @build_dir@/runtime/parrot/dynext
+O           := @o@
 
 # add your dynamic pmcs here
 #
 # gdbmhash is only built when 'libgdbm.so' is available
 #
-PMCS = \
+PMCS := \
   dynlexpad \
   foo \
   pair \
@@ -28,10 +28,10 @@ PMCS = \
 #IF(has_crypto):  sha512 \
   subproxy
 
-BUILD = $(PERL) @build_dir@/tools/build/dynpmc.pl
+BUILD := $(PERL) @build_dir@/tools/build/dynpmc.pl
 
 # some *.pmc file are generated
-GEN_PMC_DEFINITIONS = \
+GEN_PMC_DEFINITIONS := \
 #IF(has_crypto):  md2.pmc \
 #IF(has_crypto):  md4.pmc \
 #IF(has_crypto):  md5.pmc \

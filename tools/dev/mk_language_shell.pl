@@ -259,39 +259,39 @@ __config/makefiles/ops.in__
 ## @Id@
 
 # values from parrot_config
-VERSION_DIR   = @versiondir@
-INCLUDE_DIR   = @includedir@$(VERSION_DIR)
-LIB_DIR       = @libdir@$(VERSION_DIR)
-#STAGING_DIR   = ../../dynext
-STAGING_DIR   = @build_dir@/runtime/parrot/dynext
-#INSTALL_DIR   = $(LIB_DIR)/languages/@lclang@/dynext
-INSTALL_DIR   = $(LIB_DIR)/dynext
+VERSION_DIR   := @versiondir@
+INCLUDE_DIR   := @includedir@$(VERSION_DIR)
+LIB_DIR       := @libdir@$(VERSION_DIR)
+#STAGING_DIR   := ../../dynext
+STAGING_DIR   := @build_dir@/runtime/parrot/dynext
+#INSTALL_DIR   := $(LIB_DIR)/languages/@lclang@/dynext
+INSTALL_DIR   := $(LIB_DIR)/dynext
 
 # Set up extensions
-LOAD_EXT      = @load_ext@
-O             = @o@
+LOAD_EXT      := @load_ext@
+O             := @o@
 
 # Setup some commands
-PERL          = @perl@
-RM_F          = @rm_f@
-CHMOD         = @chmod@
-CP            = @cp@
-CC            = @cc@ -c
-LD            = @ld@
-LDFLAGS       = @ldflags@ @ld_debug@ @rpath_blib@ @linkflags@
-LD_LOAD_FLAGS = @ld_load_flags@
-CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
-CC_OUT        = @cc_o_out@
-LD_OUT        = @ld_out@
-#IF(parrot_is_shared):LIBPARROT     = @libparrot_ldflags@
-#ELSE:LIBPARROT     =
+PERL          := @perl@
+RM_F          := @rm_f@
+CHMOD         := @chmod@
+CP            := @cp@
+CC            := @cc@ -c
+LD            := @ld@
+LDFLAGS       := @ldflags@ @ld_debug@ @rpath_blib@ @linkflags@
+LD_LOAD_FLAGS := @ld_load_flags@
+CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CC_OUT        := @cc_o_out@
+LD_OUT        := @ld_out@
+#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
+#ELSE:LIBPARROT     :=
 
-OPS2C           = $(PERL) $(LIB_DIR)/tools/build/ops2c.pl
+OPS2C           := $(PERL) $(LIB_DIR)/tools/build/ops2c.pl
 
-INCLUDES        = -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
-LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+INCLUDES        := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
+LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
-OPS_FILE = @lclang@.ops
+OPS_FILE := @lclang@.ops
 
 
 all: staging
@@ -344,49 +344,49 @@ __config/makefiles/pmc.in__
 ## @Id@
 
 # values from parrot_config
-VERSION_DIR   = @versiondir@
-INCLUDE_DIR   = @includedir@$(VERSION_DIR)
-LIB_DIR       = @libdir@$(VERSION_DIR)
-SRC_DIR       = @srcdir@$(VERSION_DIR)
-TOOLS_DIR     = @libdir@$(VERSION_DIR)/tools/lib
-#STAGING_DIR   = ../../dynext
-STAGING_DIR   = @build_dir@/runtime/parrot/dynext
-#INSTALL_DIR   = $(LIB_DIR)/languages/@lclang@/dynext
-INSTALL_DIR   = $(LIB_DIR)/dynext
+VERSION_DIR   := @versiondir@
+INCLUDE_DIR   := @includedir@$(VERSION_DIR)
+LIB_DIR       := @libdir@$(VERSION_DIR)
+SRC_DIR       := @srcdir@$(VERSION_DIR)
+TOOLS_DIR     := @libdir@$(VERSION_DIR)/tools/lib
+#STAGING_DIR   := ../../dynext
+STAGING_DIR   := @build_dir@/runtime/parrot/dynext
+#INSTALL_DIR   := $(LIB_DIR)/languages/@lclang@/dynext
+INSTALL_DIR   := $(LIB_DIR)/dynext
 
 # Set up extensions
-LOAD_EXT      = @load_ext@
-O             = @o@
+LOAD_EXT      := @load_ext@
+O             := @o@
 
 # Setup some commands
-PERL          = @perl@
-RM_F          = @rm_f@
-CHMOD         = @chmod@
-CP            = @cp@
-CC            = @cc@ -c
-LD            = @ld@
-LDFLAGS       = @ldflags@ @ld_debug@
-LD_LOAD_FLAGS = @ld_load_flags@
-CFLAGS        = @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
-CC_OUT        = @cc_o_out@
-LD_OUT        = @ld_out@
-#IF(parrot_is_shared):LIBPARROT     = @libparrot_ldflags@
-#ELSE:LIBPARROT     =
+PERL          := @perl@
+RM_F          := @rm_f@
+CHMOD         := @chmod@
+CP            := @cp@
+CC            := @cc@ -c
+LD            := @ld@
+LDFLAGS       := @ldflags@ @ld_debug@
+LD_LOAD_FLAGS := @ld_load_flags@
+CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CC_OUT        := @cc_o_out@
+LD_OUT        := @ld_out@
+#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
+#ELSE:LIBPARROT     :=
 
-PMC2C_INCLUDES  = --include $(SRC_DIR) --include $(SRC_DIR)/pmc
-PMC2C           = $(PERL) $(LIB_DIR)/tools/build/pmc2c.pl
-PMC2CD          = $(PMC2C) --dump $(PMC2C_INCLUDES)
-PMC2CC          = $(PMC2C) --c $(PMC2C_INCLUDES)
+PMC2C_INCLUDES  := --include $(SRC_DIR) --include $(SRC_DIR)/pmc
+PMC2C           := $(PERL) $(LIB_DIR)/tools/build/pmc2c.pl
+PMC2CD          := $(PMC2C) --dump $(PMC2C_INCLUDES)
+PMC2CC          := $(PMC2C) --c $(PMC2C_INCLUDES)
 
-INCLUDES        = -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
-LINKARGS        = $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+INCLUDES        := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
+LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
-PMC_SOURCES = \
+PMC_SOURCES := \
   @lclang@.pmc
 
-@uclang@_GROUP = @lclang@_group
+@uclang@_GROUP := @lclang@_group
 
-OBJS = \
+OBJS := \
   lib-$(@uclang@_GROUP)$(O) \
   @lclang@$(O)
 
@@ -436,46 +436,61 @@ __config/makefiles/root.in__
 ## @Id@
 
 ## arguments we want to run parrot with
-PARROT_ARGS   =
+PARROT_ARGS   :=
 
 ## configuration settings
-VERSION       = @versiondir@
-BIN_DIR       = @bin_dir@
-LIB_DIR       = @lib_dir@$(VERSION)
-DOC_DIR       = @doc_dir@$(VERSION)
-MANDIR        = @mandir@$(VERSION)
+VERSION       := @versiondir@
+BIN_DIR       := @bin_dir@
+LIB_DIR       := @lib_dir@$(VERSION)
+DOC_DIR       := @doc_dir@$(VERSION)
+MANDIR        := @mandir@$(VERSION)
 
 # Set up extensions
-LOAD_EXT      = @load_ext@
-O             = @o@
+LOAD_EXT      := @load_ext@
+O             := @o@
 
 # Various paths
-PERL6GRAMMAR  = $(LIB_DIR)/library/PGE/Perl6Grammar.pbc
-NQP           = $(LIB_DIR)/languages/nqp/nqp.pbc
-PCT           = $(LIB_DIR)/library/PCT.pbc
-PMC_DIR       = src/pmc
-OPS_DIR       = src/ops
+PERL6GRAMMAR  := $(LIB_DIR)/library/PGE/Perl6Grammar.pbc
+NQP           := $(LIB_DIR)/languages/nqp/nqp.pbc
+PCT           := $(LIB_DIR)/library/PCT.pbc
+PMC_DIR       := src/pmc
+OPS_DIR       := src/ops
 
 ## Setup some commands
-MAKE          = @make_c@
-PERL          = @perl@
-CAT           = @cat@
-CHMOD         = @chmod@
-CP            = @cp@
-MKPATH        = @mkpath@
-RM_F          = @rm_f@
-RM_RF         = @rm_rf@
-POD2MAN       = pod2man
+MAKE          := @make_c@
+PERL          := @perl@
+CAT           := @cat@
+CHMOD         := @chmod@
+CP            := @cp@
+MKPATH        := @mkpath@
+RM_F          := @rm_f@
+RM_RF         := @rm_rf@
+POD2MAN       := pod2man
 #IF(parrot_is_shared and not(cygwin or win32)):export LD_RUN_PATH := @blib_dir@:$(LD_RUN_PATH)
-PARROT        = ../../parrot@exe@
-PBC_TO_EXE    = ../../pbc_to_exe@exe@
+PARROT        := ../../parrot@exe@
+PBC_TO_EXE    := ../../pbc_to_exe@exe@
 #IF(darwin):
 #IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
-@UCLANG@_GROUP = $(PMC_DIR)/@lclang@_group$(LOAD_EXT)
-@UCLANG@_OPS = $(OPS_DIR)/@lclang@_ops$(LOAD_EXT)
+@UCLANG@_GROUP := $(PMC_DIR)/@lclang@_group$(LOAD_EXT)
+@UCLANG@_OPS := $(OPS_DIR)/@lclang@_ops$(LOAD_EXT)
 
+@no_pmc@PMC_DEPS := config/makefiles/pmc.in $(PMC_DIR)/@lclang@.pmc
+@no_ops@OPS_DEPS := config/makefiles/ops.in $(OPS_DIR)/@lclang@.ops
+
+SOURCES := \
+  src/gen_grammar.pir \
+  src/gen_actions.pir \
+  src/gen_builtins.pir \
+  @lclang@.pir
+
+BUILTINS_PIR := \
+  src/builtins/say.pir
+
+DOCS := README
+
+# the default target
 build: \
   $(@UCLANG@_OPS) \
   $(@UCLANG@_GROUP) \
@@ -483,21 +498,6 @@ build: \
 
 all: build @lclang@@exe@ installable
 
-SOURCES = \
-  src/gen_grammar.pir \
-  src/gen_actions.pir \
-  src/gen_builtins.pir \
-  @lclang@.pir
-
-BUILTINS_PIR = \
-  src/builtins/say.pir
-
-@no_pmc@PMC_DEPS = config/makefiles/pmc.in $(PMC_DIR)/@lclang@.pmc
-@no_ops@OPS_DEPS = config/makefiles/ops.in $(OPS_DIR)/@lclang@.ops
-
-DOCS = README
-
-# the default target
 @lclang@.pbc: $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o @lclang@.pbc @lclang@.pir
 
