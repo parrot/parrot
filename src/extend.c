@@ -1449,6 +1449,7 @@ Parrot_PMC
 Parrot_sub_new_from_c_func(PARROT_INTERP,
         void (*func)(void), const char * signature)
 {
+    ASSERT_ARGS(Parrot_sub_new_from_c_func)
     Parrot_String sig = Parrot_new_string(interp, signature, strlen(signature),
         (char *) NULL, 0);
     Parrot_PMC sub = pmc_new(interp, enum_class_NCI);
