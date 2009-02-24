@@ -57,7 +57,7 @@ myops_ops$(LOAD_EXT): myops_ops$(O)
 	$(LD) $(LD_OUT) myops_ops$(LOAD_EXT) myops_ops$(O) $(LINKARGS)
 
 myops_ops$(O): myops_ops.c
-	$(CC) $(CC_OUT) myops_ops$(O) $(INCLUDES) $(CFLAGS) myops_ops.c
+	$(CC) $(CC_OUT)myops_ops$(O) $(INCLUDES) $(CFLAGS) myops_ops.c
 
 myops_ops.c: myops.ops
 	$(OPS2C) C --dynamic myops.ops
@@ -66,7 +66,7 @@ myops_ops_switch$(LOAD_EXT): myops_ops_switch$(O)
 	$(LD) $(LD_OUT) myops_ops_switch$(LOAD_EXT) myops_ops_switch$(O) $(LINKARGS)
 
 myops_ops_switch$(O): myops_ops_switch.c
-	$(CC) $(CC_OUT) myops_ops_switch$(O) $(INCLUDES) $(CFLAGS) myops_ops_switch.c
+	$(CC) $(CC_OUT)myops_ops_switch$(O) $(INCLUDES) $(CFLAGS) myops_ops_switch.c
 
 myops_ops_switch.c: myops.ops
 	$(OPS2C) CSwitch --dynamic myops.ops
@@ -75,7 +75,7 @@ myops_ops_cg$(LOAD_EXT): myops_ops_cg$(O)
 	$(LD) $(LD_OUT) myops_ops_cg$(LOAD_EXT) myops_ops_cg$(O) $(LINKARGS)
 
 myops_ops_cg$(O): myops_ops_cg.c
-	$(CC) $(CC_OUT) myops_ops_cg$(O) $(INCLUDES) $(CFLAGS) myops_ops_cg.c
+	$(CC) $(CC_OUT)myops_ops_cg$(O) $(INCLUDES) $(CFLAGS) myops_ops_cg.c
 
 myops_ops_cg.c: myops.ops
 	$(OPS2C) CGoto --dynamic myops.ops
@@ -84,7 +84,7 @@ myops_ops_cgp$(LOAD_EXT): myops_ops_cgp$(O)
 	$(LD) $(LD_OUT) myops_ops_cgp$(LOAD_EXT) myops_ops_cgp$(O) $(LINKARGS)
 
 myops_ops_cgp$(O): myops_ops_cgp.c
-	$(CC) $(CC_OUT) myops_ops_cgp$(O) $(INCLUDES) $(CFLAGS) myops_ops_cgp.c
+	$(CC) $(CC_OUT)myops_ops_cgp$(O) $(INCLUDES) $(CFLAGS) myops_ops_cgp.c
 
 myops_ops_cgp.c: myops.ops
 	$(OPS2C) CGP --dynamic myops.ops
@@ -93,7 +93,7 @@ dan_ops$(LOAD_EXT): dan_ops$(O)
 	$(LD) $(LD_OUT) dan_ops$(LOAD_EXT) dan_ops$(O) $(LINKARGS)
 
 dan_ops$(O): dan_ops.c
-	$(CC) $(CC_OUT) dan_ops$(O) $(INCLUDES) $(CFLAGS) dan_ops.c
+	$(CC) $(CC_OUT)dan_ops$(O) $(INCLUDES) $(CFLAGS) dan_ops.c
 
 dan_ops.c: dan.ops
 	$(OPS2C) C --dynamic dan.ops
@@ -102,7 +102,7 @@ dan_ops_switch$(LOAD_EXT): dan_ops_switch$(O)
 	$(LD) $(LD_OUT) dan_ops_switch$(LOAD_EXT) dan_ops_switch$(O) $(LINKARGS)
 
 dan_ops_switch$(O): dan_ops_switch.c
-	$(CC) $(CC_OUT) dan_ops_switch$(O) $(INCLUDES) $(CFLAGS) dan_ops_switch.c
+	$(CC) $(CC_OUT)dan_ops_switch$(O) $(INCLUDES) $(CFLAGS) dan_ops_switch.c
 
 dan_ops_switch.c: dan.ops
 	$(OPS2C) CSwitch --dynamic dan.ops
@@ -111,7 +111,7 @@ dan_ops_cg$(LOAD_EXT): dan_ops_cg$(O)
 	$(LD) $(LD_OUT) dan_ops_cg$(LOAD_EXT) dan_ops_cg$(O) $(LINKARGS)
 
 dan_ops_cg$(O): dan_ops_cg.c
-	$(CC) $(CC_OUT) dan_ops_cg$(O) $(INCLUDES) $(CFLAGS) dan_ops_cg.c
+	$(CC) $(CC_OUT)dan_ops_cg$(O) $(INCLUDES) $(CFLAGS) dan_ops_cg.c
 
 dan_ops_cg.c: dan.ops
 	$(OPS2C) CGoto --dynamic dan.ops
@@ -120,7 +120,7 @@ dan_ops_cgp$(LOAD_EXT): dan_ops_cgp$(O)
 	$(LD) $(LD_OUT) dan_ops_cgp$(LOAD_EXT) dan_ops_cgp$(O) $(LINKARGS)
 
 dan_ops_cgp$(O): dan_ops_cgp.c
-	$(CC) $(CC_OUT) dan_ops_cgp$(O) $(INCLUDES) $(CFLAGS) dan_ops_cgp.c
+	$(CC) $(CC_OUT)dan_ops_cgp$(O) $(INCLUDES) $(CFLAGS) dan_ops_cgp.c
 
 dan_ops_cgp.c: dan.ops
 	$(OPS2C) CGP --dynamic dan.ops

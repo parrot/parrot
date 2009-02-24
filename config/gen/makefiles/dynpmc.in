@@ -99,7 +99,7 @@ dynlexpad$(LOAD_EXT): dynlexpad$(O)
 	$(LD) $(LD_OUT) dynlexpad$(LOAD_EXT) dynlexpad$(O) $(LINKARGS)
 
 dynlexpad$(O): dynlexpad.c
-	$(CC) $(CC_OUT) dynlexpad$(O) $(INCLUDES) $(CFLAGS) dynlexpad.c
+	$(CC) $(CC_OUT)dynlexpad$(O) $(INCLUDES) $(CFLAGS) dynlexpad.c
 
 dynlexpad.c: dynlexpad.dump
 	$(PMC2CC) dynlexpad.pmc
@@ -111,7 +111,7 @@ foo$(LOAD_EXT): foo$(O)
 	$(LD) $(LD_OUT) foo$(LOAD_EXT) foo$(O) $(LINKARGS)
 
 foo$(O): foo.c
-	$(CC) $(CC_OUT) foo$(O) $(INCLUDES) $(CFLAGS) foo.c
+	$(CC) $(CC_OUT)foo$(O) $(INCLUDES) $(CFLAGS) foo.c
 
 foo.c: foo.dump
 	$(PMC2CC) foo.pmc
@@ -123,7 +123,7 @@ pair$(LOAD_EXT): pair$(O)
 	$(LD) $(LD_OUT) pair$(LOAD_EXT) pair$(O) $(LINKARGS)
 
 pair$(O): pair.c
-	$(CC) $(CC_OUT) pair$(O) $(INCLUDES) $(CFLAGS) pair.c
+	$(CC) $(CC_OUT)pair$(O) $(INCLUDES) $(CFLAGS) pair.c
 
 pair.c: pair.dump
 	$(PMC2CC) pair.pmc
@@ -135,7 +135,7 @@ rotest$(LOAD_EXT): rotest$(O)
 	$(LD) $(LD_OUT) rotest$(LOAD_EXT) rotest$(O) $(LINKARGS)
 
 rotest$(O): rotest.c
-	$(CC) $(CC_OUT) rotest$(O) $(INCLUDES) $(CFLAGS) rotest.c
+	$(CC) $(CC_OUT)rotest$(O) $(INCLUDES) $(CFLAGS) rotest.c
 
 rotest.c: rotest.dump
 	$(PMC2CC) rotest.pmc
@@ -147,7 +147,7 @@ gdbmhash$(LOAD_EXT): gdbmhash$(O)
 	$(LD) $(LD_OUT) gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS) $(LIB_GDBM)
 
 gdbmhash$(O): gdbmhash.c
-	$(CC) $(CC_OUT) gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
+	$(CC) $(CC_OUT)gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
 
 gdbmhash.c: gdbmhash.dump
 	$(PMC2CC) gdbmhash.pmc
@@ -159,7 +159,7 @@ rational$(LOAD_EXT): rational$(O)
 	$(LD) $(LD_OUT) rational$(LOAD_EXT) rational$(O) $(LINKARGS)
 
 rational$(O): rational.c
-	$(CC) $(CC_OUT) rational$(O) $(INCLUDES) $(CFLAGS) rational.c
+	$(CC) $(CC_OUT)rational$(O) $(INCLUDES) $(CFLAGS) rational.c
 
 rational.c: rational.dump
 	$(PMC2CC) rational.pmc
@@ -171,13 +171,13 @@ digest_group$(LOAD_EXT): $(OBJS_DIGEST) lib-digest_group$(O)
 	$(LD) $(LD_OUT) digest_group$(LOAD_EXT) lib-digest_group$(O) $(OBJS_DIGEST) $(LINKARGS) $(LIB_CRYPTO)
 
 lib-digest_group$(O): digest_group.c
-	$(CC) $(CC_OUT) lib-digest_group$(O) $(INCLUDES) $(CFLAGS) digest_group.c
+	$(CC) $(CC_OUT)lib-digest_group$(O) $(INCLUDES) $(CFLAGS) digest_group.c
 
 digest_group.c: $(OBJS_DIGEST)
 	$(PMC2C) --library digest_group --c $(PMCS_DIGEST)
 
 md2$(O): md2.c
-	$(CC) $(CC_OUT) md2$(O) $(INCLUDES) $(CFLAGS) md2.c
+	$(CC) $(CC_OUT)md2$(O) $(INCLUDES) $(CFLAGS) md2.c
 
 md2.c: md2.dump
 	$(PMC2CC) md2.pmc
@@ -186,7 +186,7 @@ md2.dump: md2.pmc
 	$(PMC2CD) md2.pmc
 
 md4$(O): md4.c
-	$(CC) $(CC_OUT) md4$(O) $(INCLUDES) $(CFLAGS) md4.c
+	$(CC) $(CC_OUT)md4$(O) $(INCLUDES) $(CFLAGS) md4.c
 
 md4.c: md4.dump
 	$(PMC2CC) md4.pmc
@@ -195,7 +195,7 @@ md4.dump: md4.pmc
 	$(PMC2CD) md4.pmc
 
 md5$(O): md5.c
-	$(CC) $(CC_OUT) md5$(O) $(INCLUDES) $(CFLAGS) md5.c
+	$(CC) $(CC_OUT)md5$(O) $(INCLUDES) $(CFLAGS) md5.c
 
 md5.c: md5.dump
 	$(PMC2CC) md5.pmc
@@ -204,7 +204,7 @@ md5.dump: md5.pmc
 	$(PMC2CD) md5.pmc
 
 ripemd160$(O): ripemd160.c
-	$(CC) $(CC_OUT) ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
+	$(CC) $(CC_OUT)ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
 
 ripemd160.c: ripemd160.dump
 	$(PMC2CC) ripemd160.pmc
@@ -213,7 +213,7 @@ ripemd160.dump: ripemd160.pmc
 	$(PMC2CD) ripemd160.pmc
 
 sha$(O): sha.c
-	$(CC) $(CC_OUT) sha$(O) $(INCLUDES) $(CFLAGS) sha.c
+	$(CC) $(CC_OUT)sha$(O) $(INCLUDES) $(CFLAGS) sha.c
 
 sha.c: sha.dump
 	$(PMC2CC) sha.pmc
@@ -222,7 +222,7 @@ sha.dump: sha.pmc
 	$(PMC2CD) sha.pmc
 
 sha1$(O): sha1.c
-	$(CC) $(CC_OUT) sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
+	$(CC) $(CC_OUT)sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
 
 sha1.c: sha1.dump
 	$(PMC2CC) sha1.pmc
@@ -231,7 +231,7 @@ sha1.dump: sha1.pmc
 	$(PMC2CD) sha1.pmc
 
 sha256$(O): sha256.c
-	$(CC) $(CC_OUT) sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
+	$(CC) $(CC_OUT)sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
 
 sha256.c: sha256.dump
 	$(PMC2CC) sha256.pmc
@@ -240,7 +240,7 @@ sha256.dump: sha256.pmc
 	$(PMC2CD) sha256.pmc
 
 sha512$(O): sha512.c
-	$(CC) $(CC_OUT) sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
+	$(CC) $(CC_OUT)sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
 
 sha512.c: sha512.dump
 	$(PMC2CC) sha512.pmc
@@ -252,7 +252,7 @@ subproxy$(LOAD_EXT): subproxy$(O)
 	$(LD) $(LD_OUT) subproxy$(LOAD_EXT) subproxy$(O) $(LINKARGS)
 
 subproxy$(O): subproxy.c
-	$(CC) $(CC_OUT) subproxy$(O) $(INCLUDES) $(CFLAGS) subproxy.c
+	$(CC) $(CC_OUT)subproxy$(O) $(INCLUDES) $(CFLAGS) subproxy.c
 
 subproxy.c: subproxy.dump
 	$(PMC2CC) subproxy.pmc
