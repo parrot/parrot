@@ -310,12 +310,16 @@ Update the C2 wiki entry at L<http://c2.com/cgi/wiki?ParrotCode>.
 
 =item 12.
 
-Close any release-related tickets in trac. Migrate any critical tickets
-to the next milestone; non-critical tickets can have their milestone unset.
+Review the milestone for the current release in Trac at
+L<https://trac.parrot.org/parrot/roadmap>. Close any completed
+release-related tickets. Edit the milestone to mark it as "Completed".
+Marking a milestone as completed will migrate all open tickets to a
+selected milestone (generally the next milestone). Non-critical tickets
+can have their milestone unset.
 
 =item 13.
 
-Add the version to trac so new bug reports can be filed against your
+Add the version to Trac so new bug reports can be filed against your
 buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>
 
 Remove any sufficiently old versions listed there.
