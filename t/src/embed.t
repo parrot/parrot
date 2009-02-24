@@ -46,9 +46,6 @@ int main(int argc, char **argv)
     if (! interp)
         fail("Cannot create parrot interpreter");
 
-    if (argc)
-      Parrot_set_executable_name(interp, argv [0]);
-
     puts("Done");
     Parrot_destroy(interp);
     return 0;

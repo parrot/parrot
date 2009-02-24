@@ -23,3 +23,6 @@ lorito: lorito.o
 	$(LD) -o lorito lorito.o $(LDFLAGS)
 
 #-----------------------------------------------------------------------
+
+clean:
+	rm -f lorito lorito.o

@@ -56,6 +56,8 @@ int main(int argc, char **argv)
     if (! interp)
         fail("Cannot create parrot interpreter");
 
+    Parrot_set_executable_name(interp, Parrot_new_string(interp,
+            argv[0], strlen(argv[0]), (const char *) NULL, 0));
     Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
 
     r = lorito_main(interp, argc, argv);

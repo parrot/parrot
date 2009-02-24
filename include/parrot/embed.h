@@ -44,7 +44,7 @@ PARROT_EXPORT void Parrot_set_debug(Parrot_Interp, Parrot_UInt);
 PARROT_EXPORT void Parrot_clear_debug(Parrot_Interp, Parrot_UInt);
 PARROT_EXPORT Parrot_UInt Parrot_test_debug(Parrot_Interp, Parrot_UInt);
 
-PARROT_EXPORT void Parrot_set_executable_name(Parrot_Interp, Parrot_Pointer);
+PARROT_EXPORT void Parrot_set_executable_name(Parrot_Interp, Parrot_String);
 
 PARROT_EXPORT void Parrot_set_run_core(Parrot_Interp, Parrot_Run_core_t core);
 

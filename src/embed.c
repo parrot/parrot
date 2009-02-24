@@ -201,10 +201,10 @@ C<parrot> binary).
 
 PARROT_EXPORT
 void
-Parrot_set_executable_name(PARROT_INTERP, Parrot_Pointer name)
+Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)
 {
     PMC * const name_pmc = pmc_new(interp, enum_class_String);
-    VTABLE_set_string_native(interp, name_pmc, (STRING *)name);
+    VTABLE_set_string_native(interp, name_pmc, name);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_EXECUTABLE,
         name_pmc);
 }
