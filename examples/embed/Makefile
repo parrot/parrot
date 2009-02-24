@@ -7,8 +7,9 @@
 # export LD_RUN_PATH=/parrot_directory/blib/lib
 # make
 
-# This assumes a posix environment with sh style shell,
-# may need changes with other shells or other make tools.
+# This assumes a posix environment with sh style shell.
+# May need changes with other shells or other make tools.
+# For MSVC use nmake -f Makefile.msvc
 
 CC = `parrot_config cc`
 CCFLAGS = `parrot_config ccflags`
@@ -19,7 +20,7 @@ O = `parrot_config o`
 EXE = `parrot_config exe`
 INCLUDEDIR = `parrot_config prefix`/include
 
-all: lorito
+all: lorito$(EXE)
 
 #-----------------------------------------------------------------------
 

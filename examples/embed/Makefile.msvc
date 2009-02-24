@@ -1,0 +1,33 @@
+# Copyright (C) 2009, Parrot Foundation.
+## $Id: Makefile 36979 2009-02-24 20:23:35Z NotFound $
+
+# Microsoft Visual C++ Makefile
+# To build this example in a parrot development environment:
+
+# adjust PARROT_PREFIX below
+# nmake -f Makefile.msvc
+
+PARROT_PREFIX = c:\usr\src\perl\parrot\parrot-msvc6
+# c:\parrot
+CC 	= cl
+CCFLAGS = -nologo -GF -W4 -MD -Zi -DNDEBUG -DWIN32 -D_CONSOLE -DNO_STRICT -Zm400
+LD 	= link -nologo
+INCLUDEDIR = $(PARROT_PREFIX)\include
+LDFLAGS = $(PARROT_PREFIX)\libparrot.lib
+O 	= .obj
+EXE 	= .exe
+
+all: lorito$(EXE)
+
+#-----------------------------------------------------------------------
+
+lorito$(O): lorito.c
+	$(CC) $(CCFLAGS) -c -I $(INCLUDEDIR) lorito.c
+
+lorito$(EXE): lorito$(O)
+	$(LD) -out:lorito$(EXE) lorito$(O) $(LDFLAGS)
+
+#-----------------------------------------------------------------------
+
+clean:
+	rm -f lorito$(EXE) lorito$(O)
