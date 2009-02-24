@@ -395,17 +395,19 @@ of releases across multiple release managers.  Releases are scheduled for
 the 3rd Tuesday of each month. Version numbers for each release will be
 determined each month, and will depend on the features actually present in
 that release.
+The starred releases are Parrot's twice-yearly deprecation points.
 
- - March 17, 2009    - 1.0.0 - allison
- - April 21, 2009    - 1.1   - fperrad
- - May 19, 2009      - 1.2   - tewk
- - June 16, 2009     - 1.3   - whiteknight
- - July 21, 2009     - 1.5   - cotto
- - August 18, 2009   - 1.6   - rgrjr
- - Sept 21, 2009     - 1.7   -
- - Oct 20, 2009      - 1.8   -
- - Nov 24, 2009      - 1.9   -
- - Dec 22, 2009      - 1.10  -
+ - March 17, 2009    - 1.0* - allison
+ - April 21, 2009    - 1.1  - fperrad
+ - May 19, 2009      - 1.2  - tewk
+ - June 16, 2009     - 1.3  - whiteknight
+ - July 21, 2009     - 1.4* - cotto
+ - August 18, 2009   - 1.5  - rgrjr
+ - Sept 21, 2009     - 1.6  -
+ - Oct 20, 2009      - 1.7  -
+ - Nov 24, 2009      - 1.8  -
+ - Dec 22, 2009      - 1.9  -
+ - Jan 18, 2010      - 2.0* -
 
 =cut
 
