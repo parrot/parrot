@@ -16,16 +16,16 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT := @libparrot_ldflags@
-#ELSE:LIBPARROT :=
+#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
+#ELSE:LIBPARROT     :=
 
 BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
 BUILD_LIB_DIR   := $(BUILD_DIR)@slash@blib@slash@lib
 PMC2C           := $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
 INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
-#IF(win32):LINKARGS         := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#IF(win32):LINKARGS        := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 #ELSIF(cc==gcc):LINKARGS       := -Wl,-L $(BUILD_LIB) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
-#ELSE:LINKARGS         := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#ELSE:LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
 PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
 PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
@@ -38,26 +38,28 @@ PMC_TARGETS := \
   rotest$(LOAD_EXT) \
 #IF(has_gdbm):  gdbmhash$(LOAD_EXT) \
   rational$(LOAD_EXT) \
-#IF(has_crypto):  md2$(LOAD_EXT) \
-#IF(has_crypto):  md4$(LOAD_EXT) \
-#IF(has_crypto):  md5$(LOAD_EXT) \
-#IF(has_crypto):  ripemd160$(LOAD_EXT) \
-#IF(has_crypto):  sha$(LOAD_EXT) \
-#IF(has_crypto):  sha1$(LOAD_EXT) \
-#IF(has_crypto):  sha256$(LOAD_EXT) \
-#IF(has_crypto):  sha512$(LOAD_EXT) \
+#IF(has_crypto):  digest_group$(LOAD_EXT) \
   subproxy$(LOAD_EXT)
 
-# some *.pmc file are generated
-GEN_PMC_DEFINITIONS := \
-#IF(has_crypto):  md2.pmc \
-#IF(has_crypto):  md4.pmc \
-#IF(has_crypto):  md5.pmc \
-#IF(has_crypto):  ripemd160.pmc \
-#IF(has_crypto):  sha.pmc \
-#IF(has_crypto):  sha1.pmc \
-#IF(has_crypto):  sha256.pmc \
-#IF(has_crypto):  sha512.pmc
+PMCS_DIGEST := \
+  md2.pmc \
+  md4.pmc \
+  md5.pmc \
+  ripemd160.pmc \
+  sha.pmc \
+  sha1.pmc \
+  sha256.pmc \
+  sha512.pmc
+
+OBJS_DIGEST := \
+  md2$(O) \
+  md4$(O) \
+  md5$(O) \
+  ripemd160$(O) \
+  sha$(O) \
+  sha1$(O) \
+  sha256$(O) \
+  sha512$(O)
 
 #IF(win32 and cc==gcc):LIB_GDBM := -llibgdbm
 #ELSIF(win32):LIB_GDBM := libgdbm.lib
@@ -66,6 +68,10 @@ GEN_PMC_DEFINITIONS := \
 #IF(win32 and cc==gcc):LIB_CRYPTO := -lcrypto
 #ELSIF(win32):LIB_CRYPTO := libcrypto.lib
 #ELSE:LIB_CRYPTO := -lcrypto
+
+# some *.pmc file are generated
+GEN_PMC_DEFINITIONS := \
+#IF(has_crypto):  $(PMCS_DIGEST)
 
 all : install
 
@@ -146,8 +152,14 @@ rational.c: rational.dump
 rational.dump: rational.pmc
 	$(PMC2CD) rational.pmc
 
-md2$(LOAD_EXT): md2$(O)
-	$(LD) $(LD_OUT) md2$(LOAD_EXT) md2$(O) $(LINKARGS) $(LIB_CRYPTO)
+digest_group$(LOAD_EXT): $(OBJS_DIGEST) lib-digest_group$(O)
+	$(LD) $(LD_OUT) digest_group$(LOAD_EXT) lib-digest_group$(O) $(OBJS_DIGEST) $(LINKARGS) $(LIB_CRYPTO)
+
+lib-digest_group$(O): digest_group.c
+	$(CC) $(CC_OUT) lib-digest_group$(O) $(INCLUDES) $(CFLAGS) digest_group.c
+
+digest_group.c: $(OBJS_DIGEST)
+	$(PMC2C) --library digest_group --c $(PMCS_DIGEST)
 
 md2$(O): md2.c
 	$(CC) $(CC_OUT) md2$(O) $(INCLUDES) $(CFLAGS) md2.c
@@ -158,9 +170,6 @@ md2.c: md2.dump
 md2.dump: md2.pmc
 	$(PMC2CD) md2.pmc
 
-md4$(LOAD_EXT): md4$(O)
-	$(LD) $(LD_OUT) md4$(LOAD_EXT) md4$(O) $(LINKARGS) $(LIB_CRYPTO)
-
 md4$(O): md4.c
 	$(CC) $(CC_OUT) md4$(O) $(INCLUDES) $(CFLAGS) md4.c
 
@@ -169,9 +178,6 @@ md4.c: md4.dump
 
 md4.dump: md4.pmc
 	$(PMC2CD) md4.pmc
-
-md5$(LOAD_EXT): md5$(O)
-	$(LD) $(LD_OUT) md5$(LOAD_EXT) md5$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 md5$(O): md5.c
 	$(CC) $(CC_OUT) md5$(O) $(INCLUDES) $(CFLAGS) md5.c
@@ -182,9 +188,6 @@ md5.c: md5.dump
 md5.dump: md5.pmc
 	$(PMC2CD) md5.pmc
 
-ripemd160$(LOAD_EXT): ripemd160$(O)
-	$(LD) $(LD_OUT) ripemd160$(LOAD_EXT) ripemd160$(O) $(LINKARGS) $(LIB_CRYPTO)
-
 ripemd160$(O): ripemd160.c
 	$(CC) $(CC_OUT) ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
 
@@ -193,9 +196,6 @@ ripemd160.c: ripemd160.dump
 
 ripemd160.dump: ripemd160.pmc
 	$(PMC2CD) ripemd160.pmc
-
-sha$(LOAD_EXT): sha$(O)
-	$(LD) $(LD_OUT) sha$(LOAD_EXT) sha$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 sha$(O): sha.c
 	$(CC) $(CC_OUT) sha$(O) $(INCLUDES) $(CFLAGS) sha.c
@@ -206,9 +206,6 @@ sha.c: sha.dump
 sha.dump: sha.pmc
 	$(PMC2CD) sha.pmc
 
-sha1$(LOAD_EXT): sha1$(O)
-	$(LD) $(LD_OUT) sha1$(LOAD_EXT) sha1$(O) $(LINKARGS) $(LIB_CRYPTO)
-
 sha1$(O): sha1.c
 	$(CC) $(CC_OUT) sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
 
@@ -218,9 +215,6 @@ sha1.c: sha1.dump
 sha1.dump: sha1.pmc
 	$(PMC2CD) sha1.pmc
 
-sha256$(LOAD_EXT): sha256$(O)
-	$(LD) $(LD_OUT) sha256$(LOAD_EXT) sha256$(O) $(LINKARGS) $(LIB_CRYPTO)
-
 sha256$(O): sha256.c
 	$(CC) $(CC_OUT) sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
 
@@ -229,9 +223,6 @@ sha256.c: sha256.dump
 
 sha256.dump: sha256.pmc
 	$(PMC2CD) sha256.pmc
-
-sha512$(LOAD_EXT): sha512$(O)
-	$(LD) $(LD_OUT) sha512$(LOAD_EXT) sha512$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 sha512$(O): sha512.c
 	$(CC) $(CC_OUT) sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
