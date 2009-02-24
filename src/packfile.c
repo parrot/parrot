@@ -2978,7 +2978,7 @@ clone_constant(PARROT_INTERP, ARGIN(PackFile_Constant *old_const))
         PMC_sub(new_sub)->seg = PMC_sub(old_sub)->seg;
 
         /* Vtable overrides and methods were already cloned, so don't reclone them. */
-        if  (PMC_sub(new_sub)->vtable_index == -1
+        if (PMC_sub(new_sub)->vtable_index == -1
         && !(PMC_sub(old_sub)->comp_flags   &  SUB_COMP_FLAG_METHOD))
             Parrot_store_sub_in_namespace(interp, new_sub);
 
