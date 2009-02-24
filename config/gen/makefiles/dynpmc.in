@@ -73,6 +73,21 @@ OBJS_DIGEST := \
 GEN_PMC_DEFINITIONS := \
 #IF(has_crypto):  $(PMCS_DIGEST)
 
+CLEANUPS := \
+  "*.c" \
+  "pmc_*.h" \
+  "*_group.h" \
+  "*.dump" \
+  "*$(O)" \
+#IF(win32):  "*.lib" \
+#IF(win32):  "*.pdb" \
+#IF(win32):  "*.ilk" \
+#IF(win32):  "*.exp" \
+#IF(win32):  "*.def" \
+#IF(win32):  "*.manifest" \
+  "*$(LOAD_EXT)"
+
+
 all : install
 
 install : $(PMC_TARGETS)
@@ -250,25 +265,13 @@ test : all
 	cd ../.. && $(PERL) -Ilib t/harness t/dynpmc/*.t
 
 testclean :
-	$(RM_F) "../../t/dynpmc/*.pir" "../../t/dynpmc/*.pbc"
-	$(RM_F) $(DIGEST)
+	$(RM_F) "../../t/dynpmc/*.pir"
 
-# win32 import library
-# win32 program data base - contains debugging info
-# win32 incremental link status files
-# win32 exported functions and data items
-# win32 export definition files
-dynext-clean :
-	$(RM_F) "*.lib" "*.pdb" "*.ilk" "*.exp" "*.def" "*.manifest"
+clean :
+	$(RM_F) $(CLEANUPS)
 
-clean : testclean dynext-clean
-	$(RM_F) "*.c" "pmc_*.h" "*_group.h" "*$(LOAD_EXT)" "*.dump" "lib-*" "*$(O)"
-
-archclean :
-	$(RM_F) "*$(LOAD_EXT)" "*$(O)" Makefile
-
-realclean: clean
-	$(RM_F) Makefile $(GEN_PMC_DEFINITIONS)
+realclean:
+	$(RM_F)  $(CLEANUPS) Makefile $(GEN_PMC_DEFINITIONS)
 
 distclean: realclean
 

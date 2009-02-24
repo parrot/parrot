@@ -16,14 +16,14 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT := @libparrot_ldflags@
-#ELSE:LIBPARROT :=
+#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
+#ELSE:LIBPARROT     :=
 
 BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
 OPS2C           := $(PERL) -I$(BUILD_DIR)@slash@lib $(BUILD_TOOLS_DIR)@slash@ops2c.pl
 INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
-#IF(win32):LINKARGS         := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
-#ELSE:LINKARGS         := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#IF(win32):LINKARGS        := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#ELSE:LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
 OPS_TARGETS := \
 #IF(cg_flag):  myops_ops_cg$(LOAD_EXT) \
@@ -34,6 +34,18 @@ OPS_TARGETS := \
 #IF(cg_flag):  dan_ops_cgp$(LOAD_EXT) \
   dan_ops$(LOAD_EXT) \
   dan_ops_switch$(LOAD_EXT)
+
+CLEANUPS := \
+  "*.c" \
+  "*.h" \
+  "*$(O)" \
+#IF(win32):  "*.lib" \
+#IF(win32):  "*.pdb" \
+#IF(win32):  "*.ilk" \
+#IF(win32):  "*.exp" \
+#IF(win32):  "*.def" \
+#IF(win32):  "*.manifest" \
+  "*$(LOAD_EXT)"
 
 
 all : $(OPS_TARGETS)
@@ -114,27 +126,16 @@ dan_ops_cgp.c: dan.ops
 	$(OPS2C) CGP --dynamic dan.ops
 
 test : all
-	 cd ../.. && $(PERL) -Ilib t/harness t/dynoplibs/*.t
+	cd ../.. && $(PERL) -Ilib t/harness t/dynoplibs/*.t
 
 testclean :
-	 $(RM_F) "../../t/dynoplibs/*.pir" "../../t/dynoplibs/*.pbc"
+	$(RM_F) "../../t/dynoplibs/*.pir" "../../t/dynoplibs/*.pasm"
 
-# win32 import library
-# win32 program data base - contains debugging info
-# win32 incremental link status files
-# win32 exported functions and data items
-# win32 export definition files
-dynext-clean :
-	$(RM_F) "*.lib" "*.pdb" "*.ilk" "*.exp" "*.def" "*.manifest"
+clean :
+	$(RM_F) $(CLEANUPS)
 
-clean : testclean dynext-clean
-	$(RM_F) "*.h" "*.c" "*$(LOAD_EXT)" "*$(O)"
-
-archclean :
-	$(RM_F) "*$(LOAD_EXT)" "*$(O)" Makefile
-
-realclean: clean
-	$(RM_F) Makefile
+realclean:
+	$(RM_F) $(CLEANUPS) Makefile
 
 distclean: realclean
 
