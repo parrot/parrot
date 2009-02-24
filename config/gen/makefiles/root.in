@@ -2137,7 +2137,7 @@ install: installable
     --includedir=$(INCLUDE_DIR) \
     --destdir=$(DESTDIR) \
     --docdir=$(DOC_DIR) \
-#UNLESS(win32):    --versiondir=$(VERSION_DIR) \
+    --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
 install-dev: install
@@ -2152,7 +2152,7 @@ install-dev: install
     --docdir=$(DOC_DIR) \
     --datadir=$(DATA_DIR) \
     --srcdir=@srcdir@ \
-#UNLESS(win32):    --versiondir=$(VERSION_DIR) \
+    --versiondir=$(VERSION_DIR) \
     MANIFEST MANIFEST.generated
 
 ###############################################################################
