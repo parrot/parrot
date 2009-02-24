@@ -27,10 +27,10 @@ INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pm
 #ELSIF(cc==gcc):LINKARGS       := -Wl,-L $(BUILD_LIB) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 #ELSE:LINKARGS         := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
+PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
+PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
+
 # add your dynamic pmcs here
-#
-# gdbmhash is only built when 'libgdbm.so' is available
-#
 PMC_TARGETS := \
   dynlexpad$(LOAD_EXT) \
   foo$(LOAD_EXT) \
@@ -59,8 +59,12 @@ GEN_PMC_DEFINITIONS := \
 #IF(has_crypto):  sha256.pmc \
 #IF(has_crypto):  sha512.pmc
 
-PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
-PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
+#IF(win32 and cc==gcc):LIB_GDBM := -llibgdbm
+#ELSIF(win32):LIB_GDBM := libgdbm.lib
+#ELSE:LIB_GDBM := -lgdbm
+
+#IF(win32 and cc!=gcc):LIB_CRYPTO := -lcrypto
+#ELSE:LIB_CRYPTO := libcrypto.lib
 
 all : install
 
@@ -118,7 +122,7 @@ rotest.dump: rotest.pmc
 	$(PMC2CD) rotest.pmc
 
 gdbmhash$(LOAD_EXT): gdbmhash$(O)
-	$(LD) $(LD_OUT) gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) gdbmhash$(LOAD_EXT) gdbmhash$(O) $(LINKARGS) $(LIB_GDBM)
 
 gdbmhash$(O): gdbmhash.c
 	$(CC) $(CC_OUT) gdbmhash$(O) $(INCLUDES) $(CFLAGS) gdbmhash.c
@@ -142,7 +146,7 @@ rational.dump: rational.pmc
 	$(PMC2CD) rational.pmc
 
 md2$(LOAD_EXT): md2$(O)
-	$(LD) $(LD_OUT) md2$(LOAD_EXT) md2$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) md2$(LOAD_EXT) md2$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 md2$(O): md2.c
 	$(CC) $(CC_OUT) md2$(O) $(INCLUDES) $(CFLAGS) md2.c
@@ -154,7 +158,7 @@ md2.dump: md2.pmc
 	$(PMC2CD) md2.pmc
 
 md4$(LOAD_EXT): md4$(O)
-	$(LD) $(LD_OUT) md4$(LOAD_EXT) md4$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) md4$(LOAD_EXT) md4$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 md4$(O): md4.c
 	$(CC) $(CC_OUT) md4$(O) $(INCLUDES) $(CFLAGS) md4.c
@@ -166,7 +170,7 @@ md4.dump: md4.pmc
 	$(PMC2CD) md4.pmc
 
 md5$(LOAD_EXT): md5$(O)
-	$(LD) $(LD_OUT) md5$(LOAD_EXT) md5$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) md5$(LOAD_EXT) md5$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 md5$(O): md5.c
 	$(CC) $(CC_OUT) md5$(O) $(INCLUDES) $(CFLAGS) md5.c
@@ -178,7 +182,7 @@ md5.dump: md5.pmc
 	$(PMC2CD) md5.pmc
 
 ripemd160$(LOAD_EXT): ripemd160$(O)
-	$(LD) $(LD_OUT) ripemd160$(LOAD_EXT) ripemd160$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) ripemd160$(LOAD_EXT) ripemd160$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 ripemd160$(O): ripemd160.c
 	$(CC) $(CC_OUT) ripemd160$(O) $(INCLUDES) $(CFLAGS) ripemd160.c
@@ -190,7 +194,7 @@ ripemd160.dump: ripemd160.pmc
 	$(PMC2CD) ripemd160.pmc
 
 sha$(LOAD_EXT): sha$(O)
-	$(LD) $(LD_OUT) sha$(LOAD_EXT) sha$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) sha$(LOAD_EXT) sha$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 sha$(O): sha.c
 	$(CC) $(CC_OUT) sha$(O) $(INCLUDES) $(CFLAGS) sha.c
@@ -202,7 +206,7 @@ sha.dump: sha.pmc
 	$(PMC2CD) sha.pmc
 
 sha1$(LOAD_EXT): sha1$(O)
-	$(LD) $(LD_OUT) sha1$(LOAD_EXT) sha1$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) sha1$(LOAD_EXT) sha1$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 sha1$(O): sha1.c
 	$(CC) $(CC_OUT) sha1$(O) $(INCLUDES) $(CFLAGS) sha1.c
@@ -214,7 +218,7 @@ sha1.dump: sha1.pmc
 	$(PMC2CD) sha1.pmc
 
 sha256$(LOAD_EXT): sha256$(O)
-	$(LD) $(LD_OUT) sha256$(LOAD_EXT) sha256$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) sha256$(LOAD_EXT) sha256$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 sha256$(O): sha256.c
 	$(CC) $(CC_OUT) sha256$(O) $(INCLUDES) $(CFLAGS) sha256.c
@@ -226,7 +230,7 @@ sha256.dump: sha256.pmc
 	$(PMC2CD) sha256.pmc
 
 sha512$(LOAD_EXT): sha512$(O)
-	$(LD) $(LD_OUT) sha512$(LOAD_EXT) sha512$(O) $(LINKARGS)
+	$(LD) $(LD_OUT) sha512$(LOAD_EXT) sha512$(O) $(LINKARGS) $(LIB_CRYPTO)
 
 sha512$(O): sha512.c
 	$(CC) $(CC_OUT) sha512$(O) $(INCLUDES) $(CFLAGS) sha512.c
