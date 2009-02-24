@@ -310,16 +310,16 @@ generate: $(OPS_FILE)
 #IF(cg_flag):	$(OPS2C) CGP --dynamic $(OPS_FILE)
 
 compile: generate
-	$(CC) $(CC_OUT) @lclang@_ops$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops.c
-	$(CC) $(CC_OUT) @lclang@_ops_switch$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_switch.c
-#IF(cg_flag):	$(CC) $(CC_OUT) @lclang@_ops_cg$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_cg.c
-#IF(cg_flag):	$(CC) $(CC_OUT) @lclang@_ops_cgp$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_cgp.c
+	$(CC) $(CC_OUT)@lclang@_ops$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops.c
+	$(CC) $(CC_OUT)@lclang@_ops_switch$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_switch.c
+#IF(cg_flag):	$(CC) $(CC_OUT)@lclang@_ops_cg$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_cg.c
+#IF(cg_flag):	$(CC) $(CC_OUT)@lclang@_ops_cgp$(O) $(INCLUDES) $(CFLAGS) @lclang@_ops_cgp.c
 
 linklibs: compile
-	$(LD) $(LD_OUT) @lclang@_ops$(LOAD_EXT) @lclang@_ops$(O) $(LINKARGS)
-	$(LD) $(LD_OUT) @lclang@_ops_switch$(LOAD_EXT) @lclang@_ops_switch$(O) $(LINKARGS)
-#IF(cg_flag):	$(LD) $(LD_OUT) @lclang@_ops_cg$(LOAD_EXT) @lclang@_ops_cg$(O) $(LINKARGS)
-#IF(cg_flag):	$(LD) $(LD_OUT) @lclang@_ops_cgp$(LOAD_EXT) @lclang@_ops_cgp$(O) $(LINKARGS)
+	$(LD) $(LD_OUT)@lclang@_ops$(LOAD_EXT) @lclang@_ops$(O) $(LINKARGS)
+	$(LD) $(LD_OUT)@lclang@_ops_switch$(LOAD_EXT) @lclang@_ops_switch$(O) $(LINKARGS)
+#IF(cg_flag):	$(LD) $(LD_OUT)@lclang@_ops_cg$(LOAD_EXT) @lclang@_ops_cg$(O) $(LINKARGS)
+#IF(cg_flag):	$(LD) $(LD_OUT)@lclang@_ops_cgp$(LOAD_EXT) @lclang@_ops_cgp$(O) $(LINKARGS)
 
 staging: linklibs
 #IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
@@ -418,11 +418,11 @@ generate: $(PMC_SOURCES)
 	$(PMC2C) --library $(@uclang@_GROUP) --c $(PMC_SOURCES)
 
 compile: generate
-	$(CC) $(CC_OUT) @lclang@$(O) $(INCLUDES) $(CFLAGS) @lclang@.c
-	$(CC) $(CC_OUT) lib-$(@uclang@_GROUP)$(O) $(INCLUDES) $(CFLAGS) $(@uclang@_GROUP).c
+	$(CC) $(CC_OUT)@lclang@$(O) $(INCLUDES) $(CFLAGS) @lclang@.c
+	$(CC) $(CC_OUT)lib-$(@uclang@_GROUP)$(O) $(INCLUDES) $(CFLAGS) $(@uclang@_GROUP).c
 
 linklibs: compile
-	$(LD) $(LD_OUT) $(@uclang@_GROUP)$(LOAD_EXT) $(OBJS) $(LINKARGS)
+	$(LD) $(LD_OUT)$(@uclang@_GROUP)$(LOAD_EXT) $(OBJS) $(LINKARGS)
 
 staging: linklibs
 #IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
