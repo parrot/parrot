@@ -43,6 +43,10 @@ See RT #46503.
 
 =item * tqueue [post 0.9.0] (TT #192)
 
+=item * slice [post 1.3] (TT #372)
+
+=item * bound_nci [post 1.3] (TT #373)
+
 =back
 
 =head1 Class Features
