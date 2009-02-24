@@ -430,7 +430,7 @@ INTVAL PackFile_add_segment(SHIM_INTERP,
 
 PARROT_EXPORT
 void PackFile_Annotations_add_entry(PARROT_INTERP,
-    ARGMOD(struct PackFile_Annotations *self),
+    ARGMOD(PackFile_Annotations *self),
     opcode_t offset,
     opcode_t key,
     opcode_t type,
@@ -441,7 +441,7 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
 
 PARROT_EXPORT
 void PackFile_Annotations_add_group(PARROT_INTERP,
-    ARGMOD(struct PackFile_Annotations *self),
+    ARGMOD(PackFile_Annotations *self),
     opcode_t offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -751,18 +751,18 @@ void mark_const_subs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void PackFile_Annotations_destroy(SHIM_INTERP,
-    ARGMOD(struct PackFile_Segment *seg))
+    ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*seg);
 
 void PackFile_Annotations_dump(PARROT_INTERP,
-    ARGIN(const struct PackFile_Segment *seg))
+    ARGIN(const PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PMC * PackFile_Annotations_lookup(PARROT_INTERP,
-    ARGIN(struct PackFile_Annotations *self),
+    ARGIN(PackFile_Annotations *self),
     opcode_t offset,
     ARGIN_NULLOK(STRING *key))
         __attribute__nonnull__(1)
@@ -770,7 +770,7 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_Annotations_pack(PARROT_INTERP,
-    ARGIN(struct PackFile_Segment *seg),
+    ARGIN(PackFile_Segment *seg),
     ARGMOD(opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -778,7 +778,7 @@ opcode_t * PackFile_Annotations_pack(PARROT_INTERP,
         FUNC_MODIFIES(*cursor);
 
 size_t PackFile_Annotations_packed_size(PARROT_INTERP,
-    ARGIN(struct PackFile_Segment *seg))
+    ARGIN(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
