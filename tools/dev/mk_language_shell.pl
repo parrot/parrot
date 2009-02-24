@@ -293,6 +293,13 @@ LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
 OPS_FILE := @lclang@.ops
 
+CLEANUPS := \
+  "*$(LOAD_EXT)" \
+  "*$(O)" \
+  "*.c" \
+  "*.h" \
+  "$(STAGING_DIR)/@lclang@_ops*$(LOAD_EXT)"
+
 
 all: staging
 
@@ -329,11 +336,10 @@ Makefile: ../../config/makefiles/ops.in
 	cd ../.. && $(PERL) Configure.pl
 
 clean:
-	$(RM_F) "*$(LOAD_EXT)" "*$(O)" "*.c" "*.h" \
-	    "$(STAGING_DIR)/@lclang@_ops*$(LOAD_EXT)"
+	$(RM_F) $(CLEANUPS)
 
-realclean: clean
-	$(RM_F) Makefile
+realclean:
+	$(RM_F) $(CLEANUPS) Makefile
 
 # Local variables:
 #   mode: makefile
@@ -390,6 +396,19 @@ OBJS := \
   lib-$(@uclang@_GROUP)$(O) \
   @lclang@$(O)
 
+CLEANUPS := \
+  "*$(LOAD_EXT)" \
+  "*$(O)" \
+  "*.c" \
+  "*.h" \
+  "*.dump" \
+#IF(win32):  "*.exp" \
+#IF(win32):  "*.ilk" \
+#IF(win32):  "*.manifext" \
+#IF(win32):  "*.pdb" \
+#IF(win32):  "*.lib" \
+  $(STAGING_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)
+
 
 all: staging
 
@@ -420,12 +439,10 @@ Makefile: ../../config/makefiles/pmc.in
 	cd ../.. && $(PERL) Configure.pl
 
 clean:
-	$(RM_F) "*$(LOAD_EXT)" "*$(O)" "*.c" "*.h" "*.dump" \
-	    $(STAGING_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)
-#IF(win32):	$(RM_F) "*.exp" "*.ilk" "*.manifext" "*.pdb" "*.lib"
+	$(RM_F) $(CLEANUPS)
 
-realclean: clean
-	$(RM_F) Makefile
+realclean:
+	$(RM_F) $(CLEANUPS) Makefile
 
 # Local variables:
 #   mode: makefile
@@ -611,10 +628,10 @@ clean: testclean
 @no_pmc@	$(MAKE) $(PMC_DIR) clean
 	$(RM_F) $(CLEANUPS)
 
-realclean: clean
+realclean: testclean
 @no_ops@	$(MAKE) $(OPS_DIR) realclean
 @no_pmc@	$(MAKE) $(PMC_DIR) realclean
-	$(RM_F) Makefile
+	$(RM_F) $(CLEANUPS) Makefile
 
 distclean: realclean
 
