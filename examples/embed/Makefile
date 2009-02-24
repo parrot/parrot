@@ -11,18 +11,20 @@ CC = `parrot_config cc`
 CCFLAGS = `parrot_config ccflags`
 LD = `parrot_config ld`
 LDFLAGS = `parrot_config libparrot_ldflags`
+O = `parrot_config o`
+EXE = `parrot_config exe`
 
 all: lorito
 
 #-----------------------------------------------------------------------
 
-lorito.o: lorito.c
+lorito$(O): lorito.c
 	$(CC) $(CCFLAGS) -c -I ~/parrot/include lorito.c
 
-lorito: lorito.o
-	$(LD) -o lorito lorito.o $(LDFLAGS)
+lorito: lorito$(O)
+	$(LD) -o lorito$(EXE) lorito$(O) $(LDFLAGS)
 
 #-----------------------------------------------------------------------
 
 clean:
-	rm -f lorito lorito.o
+	rm -f lorito$(EXE) lorito$(O)
