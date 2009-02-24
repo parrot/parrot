@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -15,6 +15,7 @@ use IO::CaptureOutput qw | capture |;
 
 my $cwd = cwd();
 my $conf = Parrot::Configure->new;
+$conf->data->set( make => 'make' );
 
 my $nonexistent = 'config/gen/makefiles/foobar';
 eval { $conf->genfile(  $nonexistent => 'CFLAGS', comment_type => '#', ); };
