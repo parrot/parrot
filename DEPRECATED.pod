@@ -3,7 +3,7 @@
 =head1 Deprecation in Parrot
 
 This is a list of currently deprecated features of Parrot.  Every deprecation
-has an associated RT or TT ticket.  Each item indicates the last release it's
+has an associated Trac ticket [1].  Each item indicates the last release it's
 guaranteed to appear in.
 
 When deprecated items are removed, all usage of the feature in the
@@ -25,9 +25,9 @@ with this option.
 
 =over 4
 
-=item * Remove individual runcore command line flags...
+=item Remove individual runcore command line flags [post 0.9.1]
 
-See RT #46503.
+L<http://rt.perl.org/rt3/Ticket/Display.html?id=46503>
 
 =back
 
@@ -35,17 +35,29 @@ See RT #46503.
 
 =over 4
 
-=item * pointer [post 0.9.0] (TT #187)
+=item pointer [post 0.9.0]
 
-=item * random [post 0.9.0] (TT #189)
+L<https://trac.parrot.org/parrot/ticket/187>
 
-=item * ref [post 0.9.0] (TT #190)
+=item random [post 0.9.0]
 
-=item * tqueue [post 0.9.0] (TT #192)
+L<https://trac.parrot.org/parrot/ticket/189>
 
-=item * slice [post 1.3] (TT #372)
+=item ref [post 0.9.0]
 
-=item * bound_nci [post 1.3] (TT #373)
+L<https://trac.parrot.org/parrot/ticket/190>
+
+=item tqueue [post 0.9.0]
+
+L<https://trac.parrot.org/parrot/ticket/192>
+
+=item slice [post 1.3]
+
+L<https://trac.parrot.org/parrot/ticket/372>
+
+=item bound_nci [post 1.3]
+
+L<https://trac.parrot.org/parrot/ticket/373>
 
 =back
 
@@ -53,17 +65,19 @@ See RT #46503.
 
 =over 4
 
-=item * PMC union struct [post 0.5.0]
+=item PMC union struct [post 0.5.0]
 
-See RT #48014. This will be removed once all core PMCs have been updated.
+This will be removed once all core PMCs have been updated.
 
-=item * :anon and :vtable named parameters to add_method [post 0.8.2]
+L<http://rt.perl.org/rt3/Ticket/Display.html?id=48014>
+
+=item :anon and :vtable named parameters to add_method [post 0.8.2]
 
 If you want to override a vtable method/function when building a Class, then
 use the method C<add_vtable_override> instead of calling C<add_method> with
 one or both of these flags.
 
-See TT #158
+L<https://trac.parrot.org/parrot/ticket/158>
 
 =back
 
@@ -71,9 +85,9 @@ See TT #158
 
 =over 4
 
-=item * Assignment syntax with opcodes [post 0.8.2]
+=item Assignment syntax with opcodes [post 0.8.2]
 
-See RT #36283.  When the first argument of an opcode is C<OUT>, then
+When the first argument of an opcode is C<OUT>, then
 the assignment syntax will be allowed, as it is today.
 
 In any other case (i.e. C<INOUT>, C<IN>), this will become
@@ -87,7 +101,9 @@ Will have to be:
     print $S0
     substr $P0, 1, 2, "x"
 
-=item * named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc [post 0.9.0]
+L<http://rt.perl.org/rt3/Ticket/Display.html?id=36283>
+
+=item named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc [post 0.9.0]
 
 Class PMC name resolution will be the following.
 
@@ -100,16 +116,16 @@ if the arg is a ResizableStringArray
 if the arg is a Namespace or Class PMC
   The passed in class or the class attatched to the passed in namespace.
 
-See TT #159
+L<https://trac.parrot.org/parrot/ticket/159>
 
-=item C<.HLL_map>
+=item C<.HLL_map> [post 0.9.1]
 
 Languages should use this instead:
 
   $P0 = getinterp
   $P0.'hll_map'(TypeA, TypeB)
 
-See TT #314
+L<https://trac.parrot.org/parrot/ticket/314>
 
 =back
 
@@ -117,29 +133,32 @@ See TT #314
 
 =over 4
 
-=item Old-style MMD functions [post 0.7.1]
+=item mmd_cvt_to_types [post 0.7.1]
 
-mmd_cvt_to_types.
-
-See RT #60626.
+L<http://rt.perl.org/rt3/Ticket/Display.html?id=60626>
 
 =item src/pic.c and src/pic_jit.c [post 0.8.1]
 
 These two files were a thin prototype implementation of Polymorphic Inline
 Caching that only ever applied to 4 opcodes, one of which has now been removed.
-The files (and all functions in them) are deprecated, and will be removed. See
-RT #60048.
+The files (and all functions in them) are deprecated, and will be removed.
+
+L<http://rt.perl.org/rt3/Ticket/Display.html?id=60048>
 
 =item Subs marked with C<:vtable>/C<:method> aren't in namespace [post 0.8.2]
 
 Subs marked with C<:vtable> or C<:method> flags are no longer given a
 namespace entry by default.  Use the C<:nsentry> flag to cause this
-to happen.  See RT #60586 and RT #53302.
+to happen.
+
+L<http://rt.perl.org/rt3/Ticket/Display.html?id=53302>
 
 =item Parrot_readbc, Parrot_loadbc. [post 0.8.1]
 
 They have been renamed to C<Parrot_pbc_read>, C<Parrot_pbc_load>.
-C<Parrot_pbc_read> has one third int argument. See TT #266.
+C<Parrot_pbc_read> has one third int argument.
+
+L<https://trac.parrot.org/parrot/ticket/266>
 
 =back
 
@@ -150,7 +169,9 @@ C<Parrot_pbc_read> has one third int argument. See TT #266.
 =item P6protoobject stringification [post 0.9.0]
 
 Stringification of protoobjects will return the full name of the type
-and parentheses, per Synopsis 12.  See TT #168
+and parentheses, per Synopsis 12.
+
+L<https://trac.parrot.org/parrot/ticket/168>
 
 =back
 
@@ -160,7 +181,21 @@ and parentheses, per Synopsis 12.  See TT #168
 
 =item tools/build/dynoplibs.pl and tools/build/dynpmc.pl [post 0.9.1]
 
-Replaced with makefiles. See TT #338.
+Replaced with makefiles.
+
+L<https://trac.parrot.org/parrot/ticket/338>
+
+=back
+
+=head1 Footnotes
+
+=over 4
+
+=item 1
+
+L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
+
+Older tickets may be listed at L<RT|https://rt.perl.org/rt3>.
 
 =back
 
