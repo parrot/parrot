@@ -17,14 +17,22 @@ A parrot embedding test
 /**********************************************************************/
 
 void fail(const char *msg);
+Parrot_String create_string(Parrot_Interp interp, const char *name);
 int lorito_main(Parrot_Interp interp, int argc, char **argv);
 
 /**********************************************************************/
+
+/* Auxiliary functions */
 
 void fail(const char *msg)
 {
     fprintf(stderr, "lorito failed: %s\n", msg);
     exit(EXIT_FAILURE);
+}
+
+Parrot_String create_string(Parrot_Interp interp, const char *name)
+{
+    return Parrot_new_string(interp, name, strlen(name), (const char *) NULL, 0);
 }
 
 /**********************************************************************/
@@ -33,16 +41,38 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
 {
     char *source;
     Parrot_PackFile pf;
+    const char * stname = NULL;
+    int i;
+
     if (argc < 2)
         fail("no args");
-    source = argv[1];
+    i = 1;
+    if (strcmp(argv[i], "--start") == 0) {
+        ++i;
+	if (i >= argc)
+            fail("Option needs argument");
+	stname = argv[i];
+	++i;
+    }
+    source = argv[i];
 
     pf = Parrot_pbc_read(interp, source, 0);
     if (! pf)
         fail("Cannot load file");
     Parrot_pbc_load(interp, pf);
 
-    Parrot_runcode(interp, argc - 1, argv + 1);
+    if (stname) {
+        Parrot_PMC rootns = Parrot_get_root_namespace(interp);
+	Parrot_String parrotname = create_string(interp, "parrot");
+        Parrot_PMC parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
+        Parrot_String name = create_string(interp, stname);
+        Parrot_PMC start = Parrot_PMC_get_pmc_strkey(interp, parrotns, name);
+        void *discard;
+        discard = Parrot_call_sub(interp, start, "");
+    }
+    else {
+        Parrot_runcode(interp, argc - 1, argv + 1);
+    }
 
     return 0;
 }
