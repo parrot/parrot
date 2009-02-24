@@ -3,7 +3,7 @@
 
 # To build this example in a parrot development environment:
 
-# PATH=$PATH:/parrot_directory
+# PATH=/parrot_directory:$PATH
 # export LD_RUN_PATH=/parrot_directory/blib/lib
 # make
 
@@ -26,7 +26,7 @@ all: lorito
 lorito$(O): lorito.c
 	$(CC) $(CCFLAGS) -c -I $(INCLUDEDIR) lorito.c
 
-lorito: lorito$(O)
+lorito$(EXE): lorito$(O)
 	$(LD) $(LD_OUT)lorito$(EXE) lorito$(O) $(LDFLAGS)
 
 #-----------------------------------------------------------------------
