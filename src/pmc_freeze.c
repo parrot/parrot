@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -436,7 +436,7 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 /*
- * define this to 1 for testing
+ * define this to 1 for testing. TODO: 1 is broken.
  */
 #ifndef FREEZE_ASCII
 #  define FREEZE_ASCII 0
@@ -860,9 +860,6 @@ push_opcode_pmc(PARROT_INTERP, ARGIN(IMAGE_IO *io), ARGIN(PMC* v))
 =item C<static INTVAL shift_opcode_integer>
 
 Removes and returns an integer from the start of the C<*io> "stream".
-
-TODO - The shift functions aren't portable yet. We need to have a
-packfile header for wordsize and endianess.
 
 =cut
 
