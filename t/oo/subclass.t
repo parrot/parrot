@@ -250,12 +250,15 @@ Tests OO features related to subclassing.
     $I3 = isa barbaz_class, "Class"
     ok ($I3, 'new class isa Class')
 
-    # How do you set the value of a non-constant key PMC?
-    # $P3 = new 'Key'
-    # $P2 = new $P3
-    todo (0, 'set the value of a non-constant key PMC')
+    .local pmc kbarbaz, kbaz
+    kbarbaz = new 'Key'
+    kbarbaz = 'Bar'
+    kbaz = new 'Key'
+    kbaz = 'Baz'
+    push kbarbaz, kbaz
+    ok (1, 'set the value of a non-constant key PMC')
 
-    barbaz_object = new barbaz_class #remove this when todo is accomplished
+    barbaz_object = new kbarbaz
 
     $S1 = typeof barbaz_object
     is ($S1, 'Bar;Baz', 'instance is typeof Bar;Baz')
