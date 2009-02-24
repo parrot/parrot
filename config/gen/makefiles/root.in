@@ -678,6 +678,7 @@ help :
 	@echo ""
 	@echo "Smoke Testing:"
 	@echo "  smolder_test:      Run the test suite and send report to the smolder server"
+	@echo "  smolder_coretest:  Run the minimal 'core functionality' suite and send report to the smolder server."
 	@echo "  smoke:             Alias for smolder_test"
 	@echo ""
 	@echo "Benchmarks:"
@@ -1446,6 +1447,9 @@ test : test_prep test_pbc_annotation_persistence
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) --archive --send-to-smolder
+
+smolder_coretest : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) --core-tests --archive --send-to-smolder
 
 smoke : smolder_test
 
