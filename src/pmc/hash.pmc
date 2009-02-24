@@ -19,6 +19,7 @@ These are the vtable functions for the Hash PMC.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_iterator.h"
 
 /*
 
@@ -538,7 +539,7 @@ Returns the PMC value for the element at C<*key>.
         PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC * const key      = pmc_new(INTERP, enum_class_Key);
 
-        PMC_struct_val(iter) = key;
+        SETATTR_Iterator_key(INTERP, iter, key);
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
         PMC_data(key)        = (void *)INITBucketIndex;
 
