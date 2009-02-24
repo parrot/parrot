@@ -63,8 +63,9 @@ GEN_PMC_DEFINITIONS := \
 #ELSIF(win32):LIB_GDBM := libgdbm.lib
 #ELSE:LIB_GDBM := -lgdbm
 
-#IF(win32 and cc!=gcc):LIB_CRYPTO := -lcrypto
-#ELSE:LIB_CRYPTO := libcrypto.lib
+#IF(win32 and cc==gcc):LIB_CRYPTO := -lcrypto
+#ELSIF(win32):LIB_CRYPTO := libcrypto.lib
+#ELSE:LIB_CRYPTO := -lcrypto
 
 all : install
 
