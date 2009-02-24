@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 29;
+use Parrot::Test tests => 30;
 
 # test for GMP
 use Parrot::Config;
@@ -853,6 +853,33 @@ pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - basic arith" );
 CODE
 Inf
 NaN
+OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "Inf/NaN - rounding" );
+.sub 'test' :main
+    $N0 = 'NaN'
+    $N1 = floor $N0
+    say $N1
+    $N2 = ceil $N0
+    say $N2
+    $N0 = 'Inf'
+    $N1 = floor $N0
+    say $N1
+    $N2 = ceil $N0
+    say $N2
+    $N0 = '-Inf'
+    $N1 = floor $N0
+    say $N1
+    $N2 = ceil $N0
+    say $N2
+.end
+CODE
+NaN
+NaN
+Inf
+Inf
+-Inf
+-Inf
 OUTPUT
 
 # Local Variables:
