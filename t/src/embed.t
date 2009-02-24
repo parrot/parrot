@@ -280,7 +280,7 @@ int main(void)
     rootns = Parrot_get_root_namespace(interp);
     parrotname = Parrot_new_string(interp, "parrot", 6, (const char *)NULL, 0);
     parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
-    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "v");
+    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "vJ");
     helloname = Parrot_new_string(interp, "hello", 5, (const char *)NULL, 0);
     Parrot_PMC_set_pmc_strkey(interp, parrotns, helloname, hellosub);
 
