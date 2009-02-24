@@ -1,25 +1,117 @@
 # Copyright (C) 2003-2009, Parrot Foundation.
 # $Id$
 
-PERL        := @perl@
-RM_F        := @rm_f@
-LOAD_EXT    := @load_ext@
-RUNTIME_DIR := @build_dir@/runtime/parrot/dynext
-O           := @o@
+PERL          := @perl@
+RM_F          := @rm_f@
+CP            := @cp@
+CHMOD         := @chmod@
+LOAD_EXT      := @load_ext@
+BUILD_DIR     := @build_dir@
+INSTALL_DIR   := $(BUILD_DIR)/runtime/parrot/dynext
+O             := @o@
+CC            := @cc@ -c
+LD            := @ld@
+LDFLAGS       := @ldflags@ @ld_debug@ @rpath_blib@ @linkflags@
+LD_LOAD_FLAGS := @ld_load_flags@
+CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
+CC_OUT        := @cc_o_out@
+LD_OUT        := @ld_out@
+#IF(parrot_is_shared):LIBPARROT := @libparrot_ldflags@
+#ELSE:LIBPARROT :=
 
-# add your dynamic op libraries here
-#
-OPLIBS := \
-  myops \
-  dan
+BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
+OPS2C           := $(PERL) -I$(BUILD_DIR)@slash@lib $(BUILD_TOOLS_DIR)@slash@ops2c.pl
+INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
+#IF(win32):LINKARGS         := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#ELSE:LINKARGS         := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
-BUILD := $(PERL) @build_dir@/tools/build/dynoplibs.pl
+OPS_TARGETS := \
+#IF(cg_flag):  myops_ops_cg$(LOAD_EXT) \
+#IF(cg_flag):  myops_ops_cgp$(LOAD_EXT) \
+  myops_ops$(LOAD_EXT) \
+  myops_ops_switch$(LOAD_EXT) \
+#IF(cg_flag):  dan_ops_cg$(LOAD_EXT) \
+#IF(cg_flag):  dan_ops_cgp$(LOAD_EXT) \
+  dan_ops$(LOAD_EXT) \
+  dan_ops_switch$(LOAD_EXT)
 
-all :
-	@$(BUILD) generate $(OPLIBS)
-	@$(BUILD) compile $(OPLIBS)
-	@$(BUILD) linklibs $(OPLIBS)
-	@$(BUILD) copy --destination=$(RUNTIME_DIR) $(OPLIBS)
+
+all : $(OPS_TARGETS)
+#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
+
+
+myops_ops$(LOAD_EXT): myops_ops$(O)
+	$(LD) $(LD_OUT) myops_ops$(LOAD_EXT) myops_ops$(O) $(LINKARGS)
+
+myops_ops$(O): myops_ops.c
+	$(CC) $(CC_OUT) myops_ops$(O) $(INCLUDES) $(CFLAGS) myops_ops.c
+
+myops_ops.c: myops.ops
+	$(OPS2C) C --dynamic myops.ops
+
+myops_ops_switch$(LOAD_EXT): myops_ops_switch$(O)
+	$(LD) $(LD_OUT) myops_ops_switch$(LOAD_EXT) myops_ops_switch$(O) $(LINKARGS)
+
+myops_ops_switch$(O): myops_ops_switch.c
+	$(CC) $(CC_OUT) myops_ops_switch$(O) $(INCLUDES) $(CFLAGS) myops_ops_switch.c
+
+myops_ops_switch.c: myops.ops
+	$(OPS2C) CSwitch --dynamic myops.ops
+
+myops_ops_cg$(LOAD_EXT): myops_ops_cg$(O)
+	$(LD) $(LD_OUT) myops_ops_cg$(LOAD_EXT) myops_ops_cg$(O) $(LINKARGS)
+
+myops_ops_cg$(O): myops_ops_cg.c
+	$(CC) $(CC_OUT) myops_ops_cg$(O) $(INCLUDES) $(CFLAGS) myops_ops_cg.c
+
+myops_ops_cg.c: myops.ops
+	$(OPS2C) CGoto --dynamic myops.ops
+
+myops_ops_cgp$(LOAD_EXT): myops_ops_cgp$(O)
+	$(LD) $(LD_OUT) myops_ops_cgp$(LOAD_EXT) myops_ops_cgp$(O) $(LINKARGS)
+
+myops_ops_cgp$(O): myops_ops_cgp.c
+	$(CC) $(CC_OUT) myops_ops_cgp$(O) $(INCLUDES) $(CFLAGS) myops_ops_cgp.c
+
+myops_ops_cgp.c: myops.ops
+	$(OPS2C) CGP --dynamic myops.ops
+
+dan_ops$(LOAD_EXT): dan_ops$(O)
+	$(LD) $(LD_OUT) dan_ops$(LOAD_EXT) dan_ops$(O) $(LINKARGS)
+
+dan_ops$(O): dan_ops.c
+	$(CC) $(CC_OUT) dan_ops$(O) $(INCLUDES) $(CFLAGS) dan_ops.c
+
+dan_ops.c: dan.ops
+	$(OPS2C) C --dynamic dan.ops
+
+dan_ops_switch$(LOAD_EXT): dan_ops_switch$(O)
+	$(LD) $(LD_OUT) dan_ops_switch$(LOAD_EXT) dan_ops_switch$(O) $(LINKARGS)
+
+dan_ops_switch$(O): dan_ops_switch.c
+	$(CC) $(CC_OUT) dan_ops_switch$(O) $(INCLUDES) $(CFLAGS) dan_ops_switch.c
+
+dan_ops_switch.c: dan.ops
+	$(OPS2C) CSwitch --dynamic dan.ops
+
+dan_ops_cg$(LOAD_EXT): dan_ops_cg$(O)
+	$(LD) $(LD_OUT) dan_ops_cg$(LOAD_EXT) dan_ops_cg$(O) $(LINKARGS)
+
+dan_ops_cg$(O): dan_ops_cg.c
+	$(CC) $(CC_OUT) dan_ops_cg$(O) $(INCLUDES) $(CFLAGS) dan_ops_cg.c
+
+dan_ops_cg.c: dan.ops
+	$(OPS2C) CGoto --dynamic dan.ops
+
+dan_ops_cgp$(LOAD_EXT): dan_ops_cgp$(O)
+	$(LD) $(LD_OUT) dan_ops_cgp$(LOAD_EXT) dan_ops_cgp$(O) $(LINKARGS)
+
+dan_ops_cgp$(O): dan_ops_cgp.c
+	$(CC) $(CC_OUT) dan_ops_cgp$(O) $(INCLUDES) $(CFLAGS) dan_ops_cgp.c
+
+dan_ops_cgp.c: dan.ops
+	$(OPS2C) CGP --dynamic dan.ops
 
 test : all
 	 cd ../.. && $(PERL) -Ilib t/harness t/dynoplibs/*.t
