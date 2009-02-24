@@ -347,7 +347,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_make_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
-        ARGIN_NULLOK(STRING *str_key))
+        ARGIN(STRING *str_key))
 {
     ASSERT_ARGS(Parrot_make_namespace_keyed_str)
     return internal_ns_keyed_str(interp, base_ns, str_key, INTERN_NS_CREAT);
