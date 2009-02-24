@@ -107,7 +107,7 @@ Defaults iteration mode to iterate from start.
             mem_allocate_zeroed_typed(Parrot_Iterator_attributes);
 
         attrs->aggregate = aggregate;
-        attrs->key       = NULL;
+        attrs->key       = PMCNULL;
         PMC_data(SELF)   = attrs;
 
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -310,7 +310,7 @@ Returns true if the idx/key is not C<-1>.
     VTABLE INTVAL get_bool() {
         PMC *key;
         GET_ATTR_key(INTERP, SELF, key);
-        return key && PMC_int_val(key) != -1;
+        return !PMC_is_null(INTERP, key) && PMC_int_val(key) != -1;
     }
 
 /*
