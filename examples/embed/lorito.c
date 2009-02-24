@@ -96,7 +96,7 @@ options:
         Parrot_String name = create_string(interp, stname);
         Parrot_PMC start = Parrot_PMC_get_pmc_strkey(interp, parrotns, name);
         void *discard;
-        discard = Parrot_call_sub(interp, start, "");
+        discard = Parrot_call_sub(interp, start, "v");
     }
     else {
         Parrot_runcode(interp, argc - i, argv + i);

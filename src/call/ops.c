@@ -203,8 +203,15 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
     interp->current_object = obj;
     dest = VTABLE_invoke(interp, sub, NULL);
     if (!dest)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
             "Subroutine returned a NULL address");
+
+    /* The following code assumes that an empty signature is not valid,
+     * check that condition and throws in that case.
+     */
+    if (sig[0] == '\0')
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
+                "Invalid empty signature");
 
     if (PMC_IS_NULL(obj)) {
         /* skip over the return type */

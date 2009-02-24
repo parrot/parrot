@@ -93,7 +93,7 @@ int main(void)
 "\n",
         &errstr
     );
-    Parrot_call_sub(interp, code, "");
+    Parrot_call_sub(interp, code, "v");
 
     Parrot_destroy(interp);
     return 0;
@@ -160,7 +160,7 @@ int main(void)
     subname = Parrot_new_string(interp, "hello", 5, (const char *)NULL, 0);
     sub = Parrot_PMC_get_pmc_strkey(interp, parrotns,  subname);
     /* Execute it */
-    Parrot_call_sub(interp, sub, "");
+    Parrot_call_sub(interp, sub, "v");
 
     Parrot_destroy(interp);
     return 0;
@@ -280,12 +280,12 @@ int main(void)
     rootns = Parrot_get_root_namespace(interp);
     parrotname = Parrot_new_string(interp, "parrot", 6, (const char *)NULL, 0);
     parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
-    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "");
+    hellosub = Parrot_sub_new_from_c_func(interp, (void (*)())& hello, "v");
     helloname = Parrot_new_string(interp, "hello", 5, (const char *)NULL, 0);
     Parrot_PMC_set_pmc_strkey(interp, parrotns, helloname, hellosub);
 
     /* Call it */
-    discard = Parrot_call_sub(interp, code, "");
+    discard = Parrot_call_sub(interp, code, "v");
 
     Parrot_destroy(interp);
     return 0;
