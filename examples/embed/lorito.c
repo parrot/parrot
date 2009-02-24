@@ -43,17 +43,45 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
     Parrot_PackFile pf;
     const char * stname = NULL;
     int i;
+    Parrot_Run_core_t runcore = PARROT_FAST_CORE;
 
-    if (argc < 2)
-        fail("no args");
     i = 1;
+
+options:
+    if (i >= argc)
+        fail("No file to load");
+
     if (strcmp(argv[i], "--start") == 0) {
         ++i;
 	if (i >= argc)
             fail("Option needs argument");
 	stname = argv[i];
 	++i;
+	goto options;
     }
+    if (strcmp(argv[i], "--runcore") == 0) {
+        ++i;
+	if (i >= argc)
+            fail("Option needs argument");
+	if (strcmp(argv[i], "slow") == 0)
+	    runcore = PARROT_SLOW_CORE;
+	else if (strcmp(argv[i], "fast") == 0)
+	    runcore = PARROT_FAST_CORE;
+	else if (strcmp(argv[i], "cgoto") == 0)
+	    runcore = PARROT_CGOTO_CORE;
+	else if (strcmp(argv[i], "jit") == 0)
+	    runcore = PARROT_JIT_CORE;
+	else if (strcmp(argv[i], "gcdebug") == 0)
+	    runcore = PARROT_GC_DEBUG_CORE;
+	else
+	    fail ("Invalid runcore");
+
+	++i;
+	goto options;
+    }
+
+    Parrot_set_run_core(interp, runcore);
+
     source = argv[i];
 
     pf = Parrot_pbc_read(interp, source, 0);
@@ -71,7 +99,7 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
         discard = Parrot_call_sub(interp, start, "");
     }
     else {
-        Parrot_runcode(interp, argc - 1, argv + 1);
+        Parrot_runcode(interp, argc - i, argv + i);
     }
 
     return 0;
