@@ -38,13 +38,19 @@ $prefix =~ s/\//\\/g;
 my @now = gmtime;
 my $date = sprintf("%04d%02d%02d", 1900 + $now[5], 1 + $now[4], $now[3]);
 
-my $license = (-f "languages/$lang/LICENSE")
+my $license = -f "languages/$lang/LICENSE"
             ? qq{LicenseFile=languages\\$lang\\LICENSE}
             : '; no LicenseFile';
 
-my $exe = <languages/$lang/parrot-*.exe>
-        ? qq{Source: ".\\languages\\$lang\\parrot-*.exe"; DestDir: "{app}\\bin"; Flags:}
-        : '; no .exe';
+my $exe = $lang eq 'rakudo'
+        ? ( -f 'languages/rakudo/perl6.exe'
+            ? qq{Source: ".\\languages\\$lang\\perl6.exe"; DestDir: "{app}\\bin"; Flags:}
+            : '; no perl6.exe'
+        )
+        : ( <languages/$lang/parrot-*.exe>
+            ? qq{Source: ".\\languages\\$lang\\parrot-*.exe"; DestDir: "{app}\\bin"; Flags:}
+            : '; no .exe'
+        );
 my $pbc = <languages/$lang/*.pbc>
         ? qq{Source: ".\\languages\\$lang\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
@@ -57,13 +63,13 @@ my $pmc = <languages/$lang/src/pmc/*.pmc>
 my $ops = <languages/$lang/src/ops/*.ops>
         ? qq{Source: ".\\languages\\$lang\\src\\ops\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no ops';
-my $man = (-d "languages/$lang/man")
+my $man = -d "languages/$lang/man"
         ? qq{Source: ".\\languages\\$lang\\man\\*"; DestDir: "{app}\\man"; Flags: ignoreversion recursesubdirs}
         : '; no man';
-my $doc = (-d "languages/$lang/doc")
+my $doc = -d "languages/$lang/doc"
         ? qq{Source: ".\\languages\\$lang\\doc\\*"; DestDir: "{app}\\share\\doc\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
         : '; no doc';
-my $readme = (-f "languages/$lang/README")
+my $readme = -f "languages/$lang/README"
            ? qq{Source: ".\\languages\\$lang\\README"; DestDir: "{app}\\share\\doc\\languages\\$lang"; Flags:}
            : '; no README';
 
