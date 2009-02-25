@@ -87,7 +87,8 @@ options:
     pf = Parrot_pbc_read(interp, source, 0);
     if (! pf)
         fail("Cannot load file");
-        Parrot_pbc_load(interp, pf);
+
+    Parrot_pbc_load(interp, pf);
 
     if (stname) {
         Parrot_PMC rootns = Parrot_get_root_namespace(interp);
