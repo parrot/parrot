@@ -161,7 +161,7 @@ numbers.
 
 The master list of VTABLE interfaces can be found in F<src/vtable.tbl> in
 the root directory of the Parrot source, with documentation in
-F<docs/pdds/pdd02_vtables.pod>. A few of these are very important, for
+F<docs/pdds/pdd17_pmc.pod>. A few of these are very important, for
 instance:
 
 =over 3
