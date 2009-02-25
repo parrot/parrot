@@ -53,31 +53,31 @@ options:
 
     if (strcmp(argv[i], "--start") == 0) {
         ++i;
-	if (i >= argc)
+        if (i >= argc)
             fail("Option needs argument");
-	stname = argv[i];
-	++i;
-	goto options;
+        stname = argv[i];
+        ++i;
+        goto options;
     }
     if (strcmp(argv[i], "--runcore") == 0) {
         ++i;
-	if (i >= argc)
-            fail("Option needs argument");
-	if (strcmp(argv[i], "slow") == 0)
-	    runcore = PARROT_SLOW_CORE;
-	else if (strcmp(argv[i], "fast") == 0)
-	    runcore = PARROT_FAST_CORE;
-	else if (strcmp(argv[i], "cgoto") == 0)
-	    runcore = PARROT_CGOTO_CORE;
-	else if (strcmp(argv[i], "jit") == 0)
-	    runcore = PARROT_JIT_CORE;
-	else if (strcmp(argv[i], "gcdebug") == 0)
-	    runcore = PARROT_GC_DEBUG_CORE;
-	else
-	    fail ("Invalid runcore");
-
-	++i;
-	goto options;
+        if (i >= argc)
+                fail("Option needs argument");
+        if (strcmp(argv[i], "slow") == 0)
+            runcore = PARROT_SLOW_CORE;
+        else if (strcmp(argv[i], "fast") == 0)
+            runcore = PARROT_FAST_CORE;
+        else if (strcmp(argv[i], "cgoto") == 0)
+            runcore = PARROT_CGOTO_CORE;
+        else if (strcmp(argv[i], "jit") == 0)
+            runcore = PARROT_JIT_CORE;
+        else if (strcmp(argv[i], "gcdebug") == 0)
+            runcore = PARROT_GC_DEBUG_CORE;
+        else
+            fail("Invalid runcore");
+    
+        ++i;
+        goto options;
     }
 
     Parrot_set_run_core(interp, runcore);
@@ -87,11 +87,11 @@ options:
     pf = Parrot_pbc_read(interp, source, 0);
     if (! pf)
         fail("Cannot load file");
-    Parrot_pbc_load(interp, pf);
+        Parrot_pbc_load(interp, pf);
 
     if (stname) {
         Parrot_PMC rootns = Parrot_get_root_namespace(interp);
-	Parrot_String parrotname = create_string(interp, "parrot");
+        Parrot_String parrotname = create_string(interp, "parrot");
         Parrot_PMC parrotns = Parrot_PMC_get_pmc_strkey(interp, rootns, parrotname);
         Parrot_String name = create_string(interp, stname);
         Parrot_PMC start = Parrot_PMC_get_pmc_strkey(interp, parrotns, name);
