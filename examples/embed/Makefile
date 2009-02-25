@@ -11,14 +11,14 @@
 # May need changes with other shells or other make tools.
 # For MSVC use nmake -f Makefile.msvc
 
-CC = `parrot_config cc`
-CCFLAGS = `parrot_config ccflags`
-LD = `parrot_config ld`
-LD_OUT = `parrot_config ld_out`
-LDFLAGS = `parrot_config libparrot_ldflags`
-O = `parrot_config o`
-EXE = `parrot_config exe`
-INCLUDEDIR = `parrot_config prefix`/include
+CC = $(shell parrot_config cc)
+CCFLAGS = $(shell parrot_config ccflags)
+LD = $(shell parrot_config ld)
+LD_OUT = $(shell parrot_config ld_out)
+LDFLAGS = $(shell parrot_config libparrot_ldflags)
+O = $(shell parrot_config o)
+EXE = $(shell parrot_config exe)
+INCLUDEDIR = $(shell parrot_config prefix)/include
 
 all: lorito$(EXE)
 
