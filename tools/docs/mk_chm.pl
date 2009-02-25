@@ -12,7 +12,7 @@ tools/dev/mk_chm.pl - Create files for HTML Help Workshop
 
 =head1 DESCRIPTION
 
-Creates the following files :
+Alters files in docs/html and creates the following files :
 
  parrot.hhp
  index.hhk
@@ -23,7 +23,19 @@ Creates the following files :
 use strict;
 use warnings;
 use lib qw( lib ../lib ../../lib );
+
+use File::Copy;
+use File::Find;
 use Parrot::Config;
+
+copy('docs/resources/parrot.css', 'docs/html/parrot.css');
+copy('docs/resources/parrot_logo.png', 'docs/html/parrot_logo.png');
+find(\&alter_html, 'docs/html');
+
+sub alter_html {
+    return unless (/\.html$/);
+    system(qq{perl -i.bak -pe "s{\.\./resources/}{};" $_});
+}
 
 my $version = $PConfig{VERSION} . $PConfig{DEVEL};
 
@@ -58,7 +70,7 @@ Display compile progress=Yes
 Full-text search=Yes
 Index file=index.hhk
 Language=0x0409 English (UNITED STATES)
-Title=Parrot VM
+Title=Parrot VM $version
 
 [WINDOWS]
 Main=,"toc.hhc","index.hhk","index.html","index.html",,,,,0x22520,,0x603006,,,,,,,,0
