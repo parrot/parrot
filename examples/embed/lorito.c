@@ -17,18 +17,60 @@ A parrot embedding test
 /**********************************************************************/
 
 void fail(const char *msg);
+unsigned int getuintval(const char *s);
+Parrot_Run_core_t getruncore(const char *name);
+
 Parrot_String create_string(Parrot_Interp interp, const char *name);
 int lorito_main(Parrot_Interp interp, int argc, char **argv);
 
 /**********************************************************************/
 
-/* Auxiliary functions */
+/* Auxiliary generic functions */
 
 void fail(const char *msg)
 {
     fprintf(stderr, "lorito failed: %s\n", msg);
     exit(EXIT_FAILURE);
 }
+
+unsigned int getuintval(const char *s)
+{
+    char *aux;
+    unsigned long int n = strtoul(s, &aux, 0);
+    if (*aux != '\0')
+        fail("Invalid number");
+    return n;
+}
+
+struct runcoreinfo {
+    Parrot_Run_core_t id;
+    const char *name;
+};
+
+Parrot_Run_core_t getruncore(const char *name)
+{
+    static const struct runcoreinfo cores [] = {
+        { PARROT_SLOW_CORE,     "slow" },
+        { PARROT_FAST_CORE,     "fast" },
+        { PARROT_CGOTO_CORE,    "cgoto" },
+        { PARROT_JIT_CORE,      "jit" },
+        { PARROT_GC_DEBUG_CORE, "gcdebug" },
+        { PARROT_SWITCH_CORE,   "switch" }
+    };
+    static const unsigned int n = sizeof (cores)/sizeof (runcoreinfo);
+    unsigned int i;
+    for (i= 0; i < n; ++i) {
+        if (strcmp(name, cores[i].name) == 0)
+            break;
+    }
+    if (i >= n)
+        fail("Invalid runcore");
+    return cores[i].id;
+}
+
+/**********************************************************************/
+
+/* Auxiliary parrot functions */
 
 Parrot_String create_string(Parrot_Interp interp, const char *name)
 {
@@ -43,45 +85,32 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
     Parrot_PackFile pf;
     const char * stname = NULL;
     int i;
-    Parrot_Run_core_t runcore = PARROT_FAST_CORE;
 
-    i = 1;
+    for (i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--trace") == 0) {
+            ++i;
+            if (i >= argc)
+                fail("Option needs argument");
+            Parrot_set_trace(interp, getuintval(argv[i]));
+        }
+        else if (strcmp(argv[i], "--start") == 0) {
+            ++i;
+            if (i >= argc)
+                fail("Option needs argument");
+            stname = argv[i];
+        }
+        else if (strcmp(argv[i], "--runcore") == 0) {
+            ++i;
+            if (i >= argc)
+                fail("Option needs argument");
+            Parrot_set_run_core(interp, getruncore(argv[i]));
+        }
+        else
+            break;
+    }
 
-options:
     if (i >= argc)
         fail("No file to load");
-
-    if (strcmp(argv[i], "--start") == 0) {
-        ++i;
-        if (i >= argc)
-            fail("Option needs argument");
-        stname = argv[i];
-        ++i;
-        goto options;
-    }
-    if (strcmp(argv[i], "--runcore") == 0) {
-        ++i;
-        if (i >= argc)
-                fail("Option needs argument");
-        if (strcmp(argv[i], "slow") == 0)
-            runcore = PARROT_SLOW_CORE;
-        else if (strcmp(argv[i], "fast") == 0)
-            runcore = PARROT_FAST_CORE;
-        else if (strcmp(argv[i], "cgoto") == 0)
-            runcore = PARROT_CGOTO_CORE;
-        else if (strcmp(argv[i], "jit") == 0)
-            runcore = PARROT_JIT_CORE;
-        else if (strcmp(argv[i], "gcdebug") == 0)
-            runcore = PARROT_GC_DEBUG_CORE;
-        else
-            fail("Invalid runcore");
-    
-        ++i;
-        goto options;
-    }
-
-    Parrot_set_run_core(interp, runcore);
-
     source = argv[i];
 
     pf = Parrot_pbc_read(interp, source, 0);
@@ -115,8 +144,7 @@ int main(int argc, char **argv)
     if (! interp)
         fail("Cannot create parrot interpreter");
 
-    Parrot_set_executable_name(interp, Parrot_new_string(interp,
-            argv[0], strlen(argv[0]), (const char *) NULL, 0));
+    Parrot_set_executable_name(interp, create_string(interp, argv[0]));
     Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
 
     r = lorito_main(interp, argc, argv);
