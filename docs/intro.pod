@@ -220,7 +220,7 @@ mapped to real numbered registers.
   .end
 
 The C<.local> directive indicates that the named register is only needed inside
-the current compilation unit (that is, between C<.sub> and C<.end>). Following
+the current subroutine (that is, between C<.sub> and C<.end>). Following
 C<.local> is a type. This can be C<int> (for I registers), C<float> (for N
 registers), C<string> (for S registers), C<pmc> (for P registers) or the name
 of a PMC type.

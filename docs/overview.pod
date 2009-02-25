@@ -68,7 +68,7 @@ bytes to skip over for a given opcode.
 
 There will be global and private opcode tables; that is to say, an area of the
 bytecode can define a set of custom operations that it will use.  These areas
-will roughly map to compilation units of the original source; each precompiled
+will roughly map to the subroutines of the original source; each precompiled
 module will have its own opcode table.
 
 For a closer look at Parrot ops, see F<docs/pdds/pdd06_pasm.pod>.

@@ -87,7 +87,7 @@ disc and run. This is mainly needed for tests.
 =item -v, --verbose
 
 One C<-v> shows which files are worked on and prints a summary over register
-usage and optimization stats per I<compilation unit>.  With two C<-v> switches,
+usage and optimization stats per I<subroutine>.  With two C<-v> switches,
 C<parrot> prints a line per individual processing step too.
 
 =item -y, --yydebug
