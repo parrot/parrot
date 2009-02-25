@@ -2,12 +2,13 @@
 
 =head1 Deprecation in Parrot
 
-This is a list of currently deprecated features of Parrot.  Every deprecation
-has an associated Trac ticket [1].  Each item indicates the last release it's
-guaranteed to appear in.
-
 Please see L<docs/project/support_policy.pod> for the parrot
 project's policy regarding deprecated features.
+
+This is a list of currently deprecated features of Parrot.  Every deprecation
+has an associated Trac ticket [1].  Each item indicates the first release
+in which it is eligible for removal. If the release listed is one that
+has already occurred, this feature may be removed at any time.
 
 Following the 1.0 release, whenever deprecated items are removed, information
 regarding how to cope with the removal will be added to
@@ -50,11 +51,11 @@ L<https://trac.parrot.org/parrot/ticket/190>
 
 L<https://trac.parrot.org/parrot/ticket/192>
 
-=item slice [eligible in 1.4]
+=item slice [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/372>
 
-=item bound_nci [eligible in 1.4]
+=item bound_nci [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/373>
 
