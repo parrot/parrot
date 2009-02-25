@@ -190,8 +190,8 @@ F<~/ftp/releases/devel>.
 
  $ mkdir ~/ftp/releases/devel/a.b.c
 
-If the release is in the stable series (1.0, 1.5, 2.0, 2.5, etc) create
-the new directory in F<~/ftp/releases/stable> instead.
+If the release is in the stable series (L<Appendix 2 - Upcoming releases>)
+create the new directory in F<~/ftp/releases/stable> instead.
 
  $ mkdir ~/ftp/releases/stable/a.b.c
 
@@ -396,9 +396,8 @@ that beer!
 
 To make a monthly release schedule possible, we're spreading the burden
 of releases across multiple release managers.  Releases are scheduled for
-the 3rd Tuesday of each month. Version numbers for each release will be
-determined each month, and will depend on the features actually present in
-that release.
+the 3rd Tuesday of each month.
+
 The starred releases are Parrot's twice-yearly deprecation points.
 
  - March 17, 2009    - 1.0* - allison
