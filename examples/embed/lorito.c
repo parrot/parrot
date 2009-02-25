@@ -57,7 +57,7 @@ Parrot_Run_core_t getruncore(const char *name)
         { PARROT_GC_DEBUG_CORE, "gcdebug" },
         { PARROT_SWITCH_CORE,   "switch" }
     };
-    static const unsigned int n = sizeof (cores)/sizeof (runcoreinfo);
+    static const unsigned int n = sizeof (cores)/sizeof (struct runcoreinfo);
     unsigned int i;
     for (i= 0; i < n; ++i) {
         if (strcmp(name, cores[i].name) == 0)
