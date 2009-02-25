@@ -340,6 +340,12 @@ sub title {
     my $text = $self->read;
 
     return ''
+        unless $text =~ /^=head1\s+([^\n\r]+)\s*[\n\r]+/smo;
+
+    return $1
+        if ($1 ne 'NAME' and $1 ne 'TITLE');
+
+    return ''
         unless $text =~ /^=head1\s+(?:NAME|TITLE)\s*[\n\r]+([^\n\r]+)/smo;
 
     $text = $1;
