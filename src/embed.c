@@ -582,6 +582,22 @@ Parrot_pbc_load(PARROT_INTERP, NOTNULL(PackFile *pf))
     interp->code       = pf->cur_cs;
 }
 
+/*
+
+=item C<void Parrot_pbc_fixup_loaded>
+
+Fixups after pbc loading
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pbc_fixup_loaded(PARROT_INTERP)
+{
+    PackFile_fixup_subs(interp, PBC_LOADED, NULL);
+}
 
 /*
 

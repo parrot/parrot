@@ -118,6 +118,7 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
         fail("Cannot load file");
 
     Parrot_pbc_load(interp, pf);
+    Parrot_pbc_fixup_loaded(interp);
 
     if (stname) {
         Parrot_PMC rootns = Parrot_get_root_namespace(interp);

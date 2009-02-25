@@ -54,6 +54,8 @@ PARROT_EXPORT Parrot_PackFile Parrot_pbc_read(Parrot_Interp, const char *, const
 
 PARROT_EXPORT void Parrot_pbc_load(Parrot_Interp, Parrot_PackFile);
 
+PARROT_EXPORT void Parrot_pbc_fixup_loaded(Parrot_Interp);
+
 PARROT_EXPORT void Parrot_setup_argv(Parrot_Interp, int argc, const char **argv);
 
 PARROT_EXPORT void Parrot_setup_opt(Parrot_Interp, int n, char *argv);
