@@ -1,0 +1,8 @@
+The following tickets were stored in parrot's RT system.
+
+They have now been marked as rejected in that system, but are listed
+here for posterity, so they can easily be migrated into lolcodes's new
+ticketing system, whatever that may be.
+
+#52178: [TODO] Improve variable declarations in LOLCODE
+  http://rt.perl.org/rt3/Ticket/Display.html?id=52178
