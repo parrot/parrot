@@ -24,7 +24,7 @@ specifically by including this C<PIR> code:
 
 =over 4
 
-=item Remove individual runcore command line flags [post 0.9.1]
+=item Remove individual runcore command line flags [BEFORE 1.0]
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=46503>
 
@@ -34,27 +34,27 @@ L<http://rt.perl.org/rt3/Ticket/Display.html?id=46503>
 
 =over 4
 
-=item pointer [post 0.9.0]
+=item pointer [BEFORE 1.0]
 
 L<https://trac.parrot.org/parrot/ticket/187>
 
-=item random [post 0.9.0]
+=item random [BEFORE 1.0]
 
 L<https://trac.parrot.org/parrot/ticket/189>
 
-=item ref [post 0.9.0]
+=item ref [BEFORE 1.0]
 
 L<https://trac.parrot.org/parrot/ticket/190>
 
-=item tqueue [post 0.9.0]
+=item tqueue [BEFORE 1.0]
 
 L<https://trac.parrot.org/parrot/ticket/192>
 
-=item slice [post 1.3]
+=item slice [eligible in 1.4]
 
 L<https://trac.parrot.org/parrot/ticket/372>
 
-=item bound_nci [post 1.3]
+=item bound_nci [eligible in 1.4]
 
 L<https://trac.parrot.org/parrot/ticket/373>
 
@@ -64,13 +64,13 @@ L<https://trac.parrot.org/parrot/ticket/373>
 
 =over 4
 
-=item PMC union struct [post 0.5.0]
+=item PMC union struct [BEFORE 1.0]
 
 This will be removed once all core PMCs have been updated.
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=48014>
 
-=item :anon and :vtable named parameters to add_method [post 0.8.2]
+=item :anon and :vtable named parameters to add_method [BEFORE 1.0]
 
 If you want to override a vtable method/function when building a Class, then
 use the method C<add_vtable_override> instead of calling C<add_method> with
@@ -84,7 +84,7 @@ L<https://trac.parrot.org/parrot/ticket/158>
 
 =over 4
 
-=item Assignment syntax with opcodes [post 0.8.2]
+=item Assignment syntax with opcodes [BEFORE 1.0]
 
 When the first argument of an opcode is C<OUT>, then
 the assignment syntax will be allowed, as it is today.
@@ -102,7 +102,7 @@ Will have to be:
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=36283>
 
-=item named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc [post 0.9.0]
+=item named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc [BEFORE 1.0]
 
 Class PMC name resolution will be the following.
 
@@ -117,7 +117,7 @@ if the arg is a Namespace or Class PMC
 
 L<https://trac.parrot.org/parrot/ticket/159>
 
-=item C<.HLL_map> [post 0.9.1]
+=item C<.HLL_map> [BEFORE 1.0]
 
 Languages should use this instead:
 
@@ -132,11 +132,11 @@ L<https://trac.parrot.org/parrot/ticket/314>
 
 =over 4
 
-=item mmd_cvt_to_types [post 0.7.1]
+=item mmd_cvt_to_types [BEFORE 1.0]
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=60626>
 
-=item src/pic.c and src/pic_jit.c [post 0.8.1]
+=item src/pic.c and src/pic_jit.c [BEFORE 1.0]
 
 These two files were a thin prototype implementation of Polymorphic Inline
 Caching that only ever applied to 4 opcodes, one of which has now been removed.
@@ -144,7 +144,7 @@ The files (and all functions in them) are deprecated, and will be removed.
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=60048>
 
-=item Subs marked with C<:vtable>/C<:method> aren't in namespace [post 0.8.2]
+=item Subs marked with C<:vtable>/C<:method> aren't in namespace [BEFORE 1.0]
 
 Subs marked with C<:vtable> or C<:method> flags are no longer given a
 namespace entry by default.  Use the C<:nsentry> flag to cause this
@@ -152,7 +152,7 @@ to happen.
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=53302>
 
-=item Parrot_readbc, Parrot_loadbc. [post 0.8.1]
+=item Parrot_readbc, Parrot_loadbc. [BEFORE 1.0]
 
 They have been renamed to C<Parrot_pbc_read>, C<Parrot_pbc_load>.
 C<Parrot_pbc_read> has one third int argument.
@@ -165,7 +165,7 @@ L<https://trac.parrot.org/parrot/ticket/266>
 
 =over 4
 
-=item P6protoobject stringification [post 0.9.0]
+=item P6protoobject stringification [BEFORE 1.0]
 
 Stringification of protoobjects will return the full name of the type
 and parentheses, per Synopsis 12.
@@ -178,7 +178,7 @@ L<https://trac.parrot.org/parrot/ticket/168>
 
 =over 4
 
-=item tools/build/dynoplibs.pl and tools/build/dynpmc.pl [post 0.9.1]
+=item tools/build/dynoplibs.pl and tools/build/dynpmc.pl [BEFORE 1.0]
 
 Replaced with makefiles.
 
