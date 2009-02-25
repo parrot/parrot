@@ -162,11 +162,7 @@ destroy_context(PARROT_INTERP)
 
     while (context) {
         Parrot_Context * const prev = context->caller_ctx;
-        if (context->n_regs_used) {
-            mem_sys_free(context->n_regs_used);
-            context->n_regs_used = NULL;
-        }
-        mem_sys_free(context);
+        Parrot_free_context(interp, context, 1);
         context = prev;
     }
 
