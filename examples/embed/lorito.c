@@ -141,6 +141,7 @@ int main(int argc, char **argv)
     Parrot_Interp interp;
     int r;
 
+    Parrot_set_config_hash();
     interp = Parrot_new(NULL);
     if (! interp)
         fail("Cannot create parrot interpreter");

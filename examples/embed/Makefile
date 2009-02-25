@@ -19,6 +19,7 @@ LDFLAGS = $(shell parrot_config libparrot_ldflags)
 O = $(shell parrot_config o)
 EXE = $(shell parrot_config exe)
 INCLUDEDIR = $(shell parrot_config prefix)/include
+CONFIG = $(shell parrot_config prefix)/src/parrot_config
 
 all: lorito$(EXE)
 
@@ -28,7 +29,7 @@ lorito$(O): lorito.c
 	$(CC) $(CCFLAGS) -c -I $(INCLUDEDIR) lorito.c
 
 lorito$(EXE): lorito$(O)
-	$(LD) $(LD_OUT)lorito$(EXE) lorito$(O) $(LDFLAGS)
+	$(LD) $(LD_OUT)lorito$(EXE) lorito$(O) $(CONFIG)$(O) $(LDFLAGS)
 
 #-----------------------------------------------------------------------
 
