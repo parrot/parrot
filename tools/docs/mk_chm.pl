@@ -58,6 +58,7 @@ Display compile progress=Yes
 Full-text search=Yes
 Index file=index.hhk
 Language=0x0409 English (UNITED STATES)
+Title=Parrot VM
 
 [WINDOWS]
 Main=,"toc.hhc","index.hhk","index.html","index.html",,,,,0x22520,,0x603006,,,,,,,,0
