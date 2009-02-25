@@ -47,6 +47,13 @@ html:
 html-clean:
 	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new()->delete_html_docs()"
 
+chm:
+	cd .. && $(PERL) tools/docs/mk_chm.pl
+	cd html && hhc parrot.hhp
+
+chm-clean:
+	$(RM_F) "html/*.hhc" "html/*.hhk" "html/*.hhp" "html/*.chm"
+
 @TEMP_pod_build@
 
 # Local variables:
