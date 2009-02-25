@@ -6,20 +6,19 @@ This is a list of currently deprecated features of Parrot.  Every deprecation
 has an associated Trac ticket [1].  Each item indicates the last release it's
 guaranteed to appear in.
 
-When deprecated items are removed, all usage of the feature in the
-repository should be updated or removed, including documentation.
+Please see L<docs/project/support_policy.pod> for the parrot
+project's policy regarding deprecated features.
 
-When deprecating opcodes, in addition to the ticket, be sure to mark the
-opcode with the :deprecated flag; this will allow users to enable deprecation
-warnings selectively with:
+Following the 1.0 release, whenever deprecated items are removed, information
+regarding how to cope with the removal will be added to
+L<https://trac.parrot.org/parrot/wiki/Deprecation>.
+
+When running parrot, you can receive warnings about deprecated opcodes.
+Either run parrot with the C<-w> option to enable all warnings, or
+specifically by including this C<PIR> code:
 
  .include 'include/warnings.pasm'
  warningson .PARROT_WARNINGS_DEPRECATED_FLAG
-
-And then receive runtime warnings if they are using any deprecated opcodes.
-The C<-w> command line option for parrot can also be used to enable all
-warnings. You can use C<make warnings_tests> to run the standard test suite
-with this option.
 
 =head1 Command line options
 
