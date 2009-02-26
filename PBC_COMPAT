@@ -30,9 +30,9 @@
 3.36	2000.02.20	coke	removed closure PMC
 3.35	2009.02.15	rurban	added bignum.pmc
 3.34	2009.01.23	coke	removed intlist, enumerate, multiarray, pair, delegate, deleg_pmc PMCs
-3.33    2009.01.20	chromatic	removed n_neg opcode
-3.32    2009.01.19	chromatic	removed remaining n_* math/bitwise ops
-3.31    2009.01.12	whiteknight	remove stm.ops and all opcodes therein
+3.33	2009.01.20	chromatic	removed n_neg opcode
+3.32	2009.01.19	chromatic	removed remaining n_* math/bitwise ops
+3.31	2009.01.12	whiteknight	remove stm.ops and all opcodes therein
 3.30	2009.01.10	coke	removed find_global_p_s_s and store_global_s_s_p
 3.29	2009.01.07	coke	removed store_global_p_s_p
 3.28	2009.01.07	jonathan	changes for bytecode annoations (packfile and ops)
@@ -46,21 +46,21 @@
 3.20	2008.10.23	pmichaud	make opsrenumber fix
 3.19	2008.08.04	coke	remove getclass opcodes
 3.18	2008.07.16	bernhard	remove opcode getfd
-3.17    2008.06.26	jonathan	sub PMC freeze format changed
-3.16    2008.04.23	pmichaud	remove other user stack opcodes
-3.15    2008.04.22	pmichaud	remove saveall/restoreall opcodes
-3.14    2008.04.04	chromatic	enabled div_i_ic_ic and div_n_nc_nc opcodes
-3.13    2008.03.29	chromatic	added does_i_p_pc opcode
-3.12    2008.03.26	coke	deleted classoffset
-3.11    2008.03.26	coke	deleted getattribute_p_p_i,setattribute_p_p_i
-3.10    2007.12.18	coke	deleted print_newline opcode
+3.17	2008.06.26	jonathan	sub PMC freeze format changed
+3.16	2008.04.23	pmichaud	remove other user stack opcodes
+3.15	2008.04.22	pmichaud	remove saveall/restoreall opcodes
+3.14	2008.04.04	chromatic	enabled div_i_ic_ic and div_n_nc_nc opcodes
+3.13	2008.03.29	chromatic	added does_i_p_pc opcode
+3.12	2008.03.26	coke	deleted classoffset
+3.11	2008.03.26	coke	deleted getattribute_p_p_i,setattribute_p_p_i
+3.10	2007.12.18	coke	deleted print_newline opcode
 3.09	2007.12.13	chromatic	added copy_p_p opcode
 3.08	2007.12.12	allison	added addhandler_p opcode
 3.07	2007.12.12	tewk	added die_s die_sc die_p die_pc opcodes
 3.06	2007.11.28	coke	remove classname opcode
-3.05    2007.10.29      allison         add get_eh, get_all_eh, and count_eh opcodes
-3.04    2007.10.28      paultcochrane   remove clear_eh opcode
-3.03	2007.10.17	coke    	released 0.4.17
+3.05	2007.10.29	allison	 add get_eh, get_all_eh, and count_eh opcodes
+3.04	2007.10.28	paultcochrane	remove clear_eh opcode
+3.03	2007.10.17	coke		released 0.4.17
 3.02	2007.09.20	bernhard	remove opcode hash
 3.02	2007.09.07	bernhard	deprecate opcode substr_r
 3.01	2007.08.17	chromatic	store HLL names as strings in frozen Sub PMCs
