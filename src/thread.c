@@ -20,6 +20,7 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 
 #include "parrot/parrot.h"
 #include "parrot/atomic.h"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: include/parrot/thread.h */
 
@@ -198,11 +199,15 @@ make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PMC *arg))
          * working as one might expect mainly because the segment is
          * not correctly copied
          */
+        Parrot_sub     *ret_val_sub, *arg_sub;
+
         ret_val               = Parrot_clone(interp, arg);
-        PMC_sub(ret_val)->seg = PMC_sub(arg)->seg;
+        PMC_get_sub(interp, ret_val, ret_val_sub);
+        PMC_get_sub(interp, arg,     arg_sub);
+        ret_val_sub->seg = arg_sub->seg;
         /* Skip vtable overrides and methods. */
-        if (PMC_sub(ret_val)->vtable_index == -1
-                && !(PMC_sub(ret_val)->comp_flags & SUB_COMP_FLAG_METHOD)) {
+        if (ret_val_sub->vtable_index == -1
+                && !(ret_val_sub->comp_flags & SUB_COMP_FLAG_METHOD)) {
             Parrot_store_sub_in_namespace(interp, ret_val);
         }
     }
@@ -490,7 +495,7 @@ thread_func(ARGIN_NULLOK(void *arg))
     Parrot_runloop   jump_point;
     int              lo_var_ptr;
     UINTVAL          tid;
-    PMC             *sub;
+    PMC             *sub_pmc;
     PMC             *sub_arg;
     PMC * const      self    = (PMC*) arg;
     PMC             *ret_val = NULL;
@@ -501,7 +506,7 @@ thread_func(ARGIN_NULLOK(void *arg))
 
     /* need to set it here because argument passing can trigger GC */
     interp->lo_var_ptr = &lo_var_ptr;
-    sub                = (PMC *)PMC_struct_val(self);
+    sub_pmc            = (PMC *)PMC_struct_val(self);
     sub_arg            = PMC_pmc_val(self);
 
     if (setjmp(jump_point.resume)) {
@@ -523,7 +528,7 @@ thread_func(ARGIN_NULLOK(void *arg))
         Parrot_ex_add_c_handler(interp, &jump_point);
         Parrot_unblock_GC_mark(interp);
         Parrot_unblock_GC_sweep(interp);
-        ret_val = Parrot_runops_fromc_args(interp, sub, "PF", sub_arg);
+        ret_val = Parrot_runops_fromc_args(interp, sub_pmc, "PF", sub_arg);
     }
 
     /* thread is finito */
@@ -622,11 +627,15 @@ pt_ns_clone(PARROT_INTERP, ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
 
             if (PMC_IS_NULL(dval)) {
                 PMC * const copy = make_local_copy(d, s, val);
+                Parrot_sub *val_sub;
+
+                if (val->vtable->base_type == enum_class_Sub)
+                    PMC_get_sub(interp, val, val_sub);
 
                 /* Vtable overrides and methods were already cloned, so don't reclone them. */
-                if (!(val->vtable->base_type == enum_class_Sub
-                        && (PMC_sub(val)->vtable_index != -1
-                        || PMC_sub(val)->comp_flags & SUB_COMP_FLAG_METHOD))) {
+                if (! (val->vtable->base_type == enum_class_Sub
+                    && (  val_sub->vtable_index != -1
+                       || val_sub->comp_flags & SUB_COMP_FLAG_METHOD))) {
                     VTABLE_set_pmc_keyed_str(d, dest_ns, key, copy);
                 }
             }

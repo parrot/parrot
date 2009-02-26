@@ -33,6 +33,7 @@ TODO:
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: include/parrot/pic.h */
 
@@ -51,7 +52,7 @@ static int args_match_params(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 static int call_is_safe(PARROT_INTERP,
-    ARGIN(PMC *sub),
+    ARGIN(PMC *sub_pmc),
     ARGMOD(opcode_t **set_args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -59,7 +60,7 @@ static int call_is_safe(PARROT_INTERP,
         FUNC_MODIFIES(*set_args);
 
 PARROT_WARN_UNUSED_RESULT
-static int jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub))
+static int jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -104,11 +105,11 @@ static int returns_match_results(PARROT_INTERP,
     || PARROT_ASSERT_ARG(start)
 #define ASSERT_ARGS_call_is_safe __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sub_pmc) \
     || PARROT_ASSERT_ARG(set_args)
 #define ASSERT_ARGS_jit_can_compile_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub)
+    || PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_ops_jittable __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sub) \
@@ -204,12 +205,16 @@ are used then JIT supports. Returns 1 if it does not use too many registers.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub))
+jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(jit_can_compile_sub)
     const jit_arch_info * const info = Parrot_jit_init(interp);
     const jit_arch_regs * const regs = info->regs + JIT_CODE_SUB_REGS_ONLY;
-    INTVAL * const n_regs_used       = PMC_sub(sub)->n_regs_used;
+    INTVAL                     *n_regs_used;
+    Parrot_sub                 *sub;
+
+    PMC_get_sub(interp, sub_pmc, sub);
+    n_regs_used = sub->n_regs_used;
 
     /* if the sub is using more regs than the arch has
      * we don't JIT it at all
@@ -336,14 +341,16 @@ Returns C<0> otherwise.
 
 PARROT_WARN_UNUSED_RESULT
 static int
-call_is_safe(PARROT_INTERP, ARGIN(PMC *sub), ARGMOD(opcode_t **set_args))
+call_is_safe(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGMOD(opcode_t **set_args))
 {
     ASSERT_ARGS(call_is_safe)
-    PMC *called, *sig_results;
+    PMC        *called, *sig_results;
+    Parrot_sub *sub;
+    PMC        *sig_args;
+    opcode_t   *pc  = *set_args;
 
-    opcode_t * pc        = *set_args;
-    PMC * const sig_args =
-        PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
+    PMC_get_sub(interp, sub_pmc, sub);
+    sig_args = sub->seg->const_table->constants[pc[1]]->u.key;
 
     /* ignore the signature for now */
     pc += 2 + VTABLE_elements(interp, sig_args);
@@ -351,10 +358,10 @@ call_is_safe(PARROT_INTERP, ARGIN(PMC *sub), ARGMOD(opcode_t **set_args))
     if (*pc != PARROT_OP_set_p_pc)
        return 0;
 
-    called = PMC_sub(sub)->seg->const_table->constants[pc[2]]->u.key;
+    called = sub->seg->const_table->constants[pc[2]]->u.key;
 
     /* we can JIT just recursive subs for now */
-    if (called != sub)
+    if (called != sub_pmc)
         return 0;
 
     pc += 3;
@@ -362,7 +369,7 @@ call_is_safe(PARROT_INTERP, ARGIN(PMC *sub), ARGMOD(opcode_t **set_args))
     if (*pc != PARROT_OP_get_results_pc)
         return 0;
 
-    sig_results  = PMC_sub(sub)->seg->const_table->constants[pc[1]]->u.key;
+    sig_results  = sub->seg->const_table->constants[pc[1]]->u.key;
     pc          += 2 + VTABLE_elements(interp, sig_results);
 
     if (*pc != PARROT_OP_invokecc_p)
@@ -463,12 +470,13 @@ RT#48260: Not yet documented!!!
 
 PARROT_WARN_UNUSED_RESULT
 int
-parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *sig_args),
+parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *sig_args),
         ARGIN(PMC *sig_results), ARGOUT(int *flags))
 {
     ASSERT_ARGS(parrot_pic_is_safe_to_jit)
 #ifdef HAS_JIT
-    opcode_t *base, *start, *end;
+    opcode_t   *base, *start, *end;
+    Parrot_sub *sub;
 
     *flags = 0;
 
@@ -482,32 +490,32 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *sig_args),
     /* 1) if the JIT system can't JIT_CODE_SUB_REGS_ONLY
      *    or the sub is using too many registers
      */
-    if (!jit_can_compile_sub(interp, sub))
+    if (!jit_can_compile_sub(interp, sub_pmc))
         return 0;
 
     /*
      * 2) check if get_params is matching set_args
      */
 
-    base  = PMC_sub(sub)->seg->base.data;
-    start = base + PMC_sub(sub)->start_offs;
-    end   = base + PMC_sub(sub)->end_offs;
+    PMC_get_sub(interp, sub_pmc, sub);
+    base  = sub->seg->base.data;
+    start = base + sub->start_offs;
+    end   = base + sub->end_offs;
 
-    if (!args_match_params(interp, sig_args, PMC_sub(sub)->seg, start))
+    if (!args_match_params(interp, sig_args, sub->seg, start))
         return 0;
 
     /*
      * 3) verify if all opcodes are JITtable, also check set_returns
      *   if it's reached
      */
-    if (!ops_jittable(interp, sub, sig_results,
-                PMC_sub(sub)->seg, start, end, flags))
+    if (!ops_jittable(interp, sub_pmc, sig_results, sub->seg, start, end, flags))
         return 0;
 
     return 1;
 #else
     UNUSED(interp);
-    UNUSED(sub);
+    UNUSED(sub_pmc);
     UNUSED(sig_args);
     UNUSED(sig_results);
     UNUSED(flags);
@@ -527,24 +535,31 @@ RT#48260: Not yet documented!!!
 */
 
 funcptr_t
-parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(PMC *sub), int flags)
+parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc), int flags)
 {
     ASSERT_ARGS(parrot_pic_JIT_sub)
 #ifdef HAS_JIT
 #  ifdef PIC_TEST
     UNUSED(interp);
-    UNUSED(sub);
+    UNUSED(sub_pmc);
     return (funcptr_t) pic_test_func;
 #  else
     /*
      * create JIT code - just a test
      */
-    opcode_t * const base  = PMC_sub(sub)->seg->base.data;
-    opcode_t * const start = base + PMC_sub(sub)->start_offs;
-    opcode_t * const end   = base + PMC_sub(sub)->end_offs;
+    Parrot_sub        *sub;
+    opcode_t          *base;
+    opcode_t          *start;
+    opcode_t          *end;
+    Parrot_jit_info_t *jit_info;
+
+    PMC_get_sub(interp, sub_pmc, sub);
+    base  = sub->seg->base.data;
+    start = base + sub->start_offs;
+    end   = base + sub->end_offs;
     /* TODO pass Sub */
 
-    Parrot_jit_info_t * jit_info = parrot_build_asm(interp,
+    jit_info = parrot_build_asm(interp,
                          start, end, NULL, JIT_CODE_SUB_REGS_ONLY | flags);
 
     if (!jit_info)
@@ -554,7 +569,7 @@ parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(PMC *sub), int flags)
 #  endif
 #else
     UNUSED(interp);
-    UNUSED(sub);
+    UNUSED(sub_pmc);
     UNUSED(flags);
 
     return NULLfunc;

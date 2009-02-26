@@ -34,19 +34,22 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 #include "parrot/oplib/ops.h"
 
 static void
-print_sub_name(PARROT_INTERP, PMC *sub)
+print_sub_name(PARROT_INTERP, PMC *sub_pmc)
 {
-    Parrot_coro * const co     = PMC_coro(sub);
+    /* It's acually a Parrot_coro, but this avoids casting warnings. */
+    Parrot_sub          *co;
     Interp      * const tracer = (interp->pdb && interp->pdb->debugger) ?
         interp->pdb->debugger :
         interp;
 
-    Parrot_io_eprintf(tracer, "# %s coro '%Ss'",
-        !(PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF) ?
-        "Calling" : "yielding from",
-        Parrot_full_sub_name(interp, sub));
+    GETATTR_Coroutine_sub(interp, sub_pmc, co);
 
-    if (co->ctx && (PObj_get_FLAGS(sub) & SUB_FLAG_CORO_FF)) {
+    Parrot_io_eprintf(tracer, "# %s coro '%Ss'",
+        !(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF) ?
+        "Calling" : "yielding from",
+        Parrot_full_sub_name(interp, sub_pmc));
+
+    if (co->ctx && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF)) {
         Parrot_io_eprintf(tracer, " to '%Ss'",
                 Parrot_full_sub_name(interp,
                     co->ctx->caller_ctx->current_sub));
@@ -73,7 +76,10 @@ Clone the couroutine.
 */
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = new_coroutine(INTERP);
+        Parrot_Coroutine_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_Coroutine_attributes);
+        attrs->sub = (Parrot_sub*)new_coroutine(INTERP);
+        PMC_data(SELF) = attrs;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -88,7 +94,8 @@ Destroys the coroutine.
 */
 
     VTABLE void destroy() {
-        Parrot_coro * const sub = PMC_coro(SELF);
+        Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
+        Parrot_sub                  *sub   = attrs->sub;
 
         if (sub->ctx)
             Parrot_free_context(interp, sub->ctx, 1);
@@ -97,16 +104,18 @@ Destroys the coroutine.
     }
 
     VTABLE PMC *clone() {
-        Parrot_coro * const sub = mem_allocate_typed(Parrot_coro);
-        PMC         * const ret = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        Parrot_coro * const coro_sub = mem_allocate_typed(Parrot_coro);
+        PMC         * const ret      = pmc_new(INTERP, SELF->vtable->base_type);
+        Parrot_sub         *sub;
 
         PObj_custom_mark_destroy_SETALL(ret);
 
-        PMC_struct_val(ret) = sub;
+        SET_ATTR_sub(INTERP, ret, coro_sub);
 
-        memcpy(sub, PMC_sub(SELF), sizeof (Parrot_coro));
+        PMC_get_sub(INTERP, SELF, sub);
+        memcpy(coro_sub, sub, sizeof (Parrot_coro));
 
-        sub->name           = Parrot_str_copy(INTERP, sub->name);
+        coro_sub->name      = Parrot_str_copy(INTERP, coro_sub->name);
 
         return ret;
     }
@@ -123,7 +132,8 @@ Swaps the "context".
 
     VTABLE opcode_t *invoke(void *next) {
         PackFile_ByteCode  *wanted_seg;
-        Parrot_coro * const co = PMC_coro(SELF);
+        Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
+        Parrot_coro * const co = (Parrot_coro*)attrs->sub;
         opcode_t    * dest     = co->address;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
@@ -253,7 +263,8 @@ Marks the coroutine as live.
 */
 
     VTABLE void mark() {
-        Parrot_coro * const co = PMC_coro(SELF);
+        Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
+        Parrot_coro * const co = (Parrot_coro *)attrs->sub;
 
         if (co) {
             if (co->ctx)

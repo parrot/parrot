@@ -21,6 +21,7 @@
 #include "imc.h"
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
+#include "../../src/pmc/pmc_sub.h"
 #include "pbc.h"
 #include "parser.h"
 #include "optimizer.h"
@@ -694,7 +695,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
          * TODO if a sub was denoted :main return that instead
          */
         sub                  = pmc_new(interp, enum_class_Eval);
-        sub_data             = PMC_sub(sub);
+        PMC_get_sub(interp, sub, sub_data);
         sub_data->seg        = new_cs;
         sub_data->start_offs = 0;
         sub_data->end_offs   = new_cs->base.size;

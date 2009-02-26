@@ -21,6 +21,7 @@ This file implements the Parrot embedding interface.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_sub.h"
 
 #include "../compilers/imcc/imc.h"
 
@@ -869,8 +870,9 @@ static PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)
-    opcode_t i;
-    PMC *sub_pmc;
+    opcode_t    i;
+    Parrot_sub *sub_pmc_sub;
+    PMC        *sub_pmc;
 
     PackFile_ByteCode   * const cur_cs = interp->code;
     PackFile_FixupTable * const ft     = cur_cs->fixups;
@@ -885,8 +887,9 @@ set_current_sub(PARROT_INTERP)
         if (ft->fixups[i]->type == enum_fixup_sub) {
             const opcode_t ci      = ft->fixups[i]->offset;
             PMC           *sub_pmc = ct->constants[ci]->u.key;
-            Parrot_sub    *sub     = PMC_sub(sub_pmc);
+            Parrot_sub    *sub;
 
+            PMC_get_sub(interp, sub_pmc, sub);
             if (sub->seg == cur_cs) {
                 const size_t offs = sub->start_offs;
 
@@ -904,7 +907,8 @@ set_current_sub(PARROT_INTERP)
     /* if we didn't find anything put a dummy PMC into current_sub */
 
     sub_pmc                      = pmc_new(interp, enum_class_Sub);
-    PMC_sub(sub_pmc)->start_offs = 0;
+    PMC_get_sub(interp, sub_pmc, sub_pmc_sub);
+    sub_pmc_sub->start_offs      = 0;
     CONTEXT(interp)->current_sub = sub_pmc;
 
     return sub_pmc;

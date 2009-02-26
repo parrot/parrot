@@ -34,6 +34,7 @@ used and not per subroutine or even opcode, it works per bytecode segment.
 #include "jit_emit.h"
 #include "parrot/packfile.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_sub.h"
 
 #define JIT_SEGS 0
 
@@ -1294,8 +1295,11 @@ set_reg_usage(PARROT_INTERP, const opcode_t *pc)
         if (ft->fixups[i]->type == enum_fixup_sub) {
             const int ci               = ft->fixups[i]->offset;
             PMC        * const sub_pmc = ct->constants[ci]->u.key;
-            Parrot_sub * const sub     = PMC_sub(sub_pmc);
-            const size_t offs          = pc - sub->seg->base.data;
+            Parrot_sub        *sub;
+            size_t             offs;
+
+            PMC_get_sub(interp, sub_pmc, sub);
+            offs = pc - sub->seg->base.data;
 
             if (offs >= sub->start_offs && offs < sub->end_offs) {
                 CONTEXT(interp)->n_regs_used = sub->n_regs_used;

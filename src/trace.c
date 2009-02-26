@@ -24,6 +24,7 @@ src/test_main.c
 
 #include "trace.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: src/trace.h */
 
@@ -84,6 +85,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 {
     ASSERT_ARGS(trace_pmc_dump)
     Interp * const debugger = interp->pdb->debugger;
+    Parrot_sub    *sub;
 
     if (!pmc) {
         Parrot_io_eprintf(debugger, "(null)");
@@ -142,9 +144,9 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
     else if (pmc->vtable->base_type == enum_class_RetContinuation
             ||  pmc->vtable->base_type == enum_class_Continuation
             ||  pmc->vtable->base_type == enum_class_Sub) {
+        PMC_get_sub(interp, pmc, sub);
         Parrot_io_eprintf(debugger, "%S=PMC(%#p pc:%d)",
-                VTABLE_name(interp, pmc), pmc,
-                PMC_sub(pmc)->start_offs);
+                VTABLE_name(interp, pmc), pmc, sub->start_offs);
     }
     else if (PObj_is_object_TEST(pmc)) {
         Parrot_io_eprintf(debugger, "Object(%Ss)=PMC(%#p)",

@@ -27,6 +27,7 @@ These are the vtable functions for the namespace PMC.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_sub.h"
 
 static void add_to_class(
         Interp *interp,
@@ -56,8 +57,10 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
 {
     Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(self);
     PMC              *       vtable   = nsinfo->vtable;
-    Parrot_sub       * const sub      = PMC_sub(value);
     PMC              * const classobj = VTABLE_get_class(interp, self);
+    Parrot_sub              *sub;
+
+    PMC_get_sub(interp, value, sub);
 
     /* Handle vtable methods with two underscores at the start. */
     if (sub->vtable_index == -1) {
@@ -270,7 +273,8 @@ really a public API.
 
                 /* Extract the first alternate and check if it is a method */
                 PMC *pmc_sub = VTABLE_get_pmc_keyed_int(interp, value, 0);
-                Parrot_sub * const sub = PMC_sub(pmc_sub);
+                Parrot_sub *sub;
+                PMC_get_sub(INTERP, pmc_sub, sub);
 
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
                     STRING *method_name = key;

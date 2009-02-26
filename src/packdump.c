@@ -22,6 +22,7 @@ This is only used by the PBC dumper C<pbc_dump>.
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -289,7 +290,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     break;
                 case enum_class_Sub:
                 case enum_class_Coroutine:
-                    sub = PMC_sub(pmc);
+                    PMC_get_sub(interp, pmc, sub);
                     if (sub->namespace_name) {
                         switch (sub->namespace_name->vtable->base_type) {
                             case enum_class_String:

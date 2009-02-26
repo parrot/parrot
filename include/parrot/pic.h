@@ -163,7 +163,7 @@ void parrot_PIC_prederef(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 int parrot_pic_is_safe_to_jit(PARROT_INTERP,
-    ARGIN(PMC *sub),
+    ARGIN(PMC *sub_pmc),
     ARGIN(PMC *sig_args),
     ARGIN(PMC *sig_results),
     ARGOUT(int *flags))
@@ -174,19 +174,19 @@ int parrot_pic_is_safe_to_jit(PARROT_INTERP,
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*flags);
 
-funcptr_t parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(PMC *sub), int flags)
+funcptr_t parrot_pic_JIT_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc), int flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_parrot_pic_is_safe_to_jit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sub_pmc) \
     || PARROT_ASSERT_ARG(sig_args) \
     || PARROT_ASSERT_ARG(sig_results) \
     || PARROT_ASSERT_ARG(flags)
 #define ASSERT_ARGS_parrot_pic_JIT_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub)
+    || PARROT_ASSERT_ARG(sub_pmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pic_jit.c */
 

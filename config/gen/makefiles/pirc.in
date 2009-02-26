@@ -83,7 +83,7 @@ src/piremit$(O): src/piremit.c src/piremit.h
 src/hdocprep$(O): src/hdocprep.c src/hdocprep.l
 src/pirmacro$(O): src/pirmacro.c src/pirmacro.h
 src/pirregalloc$(O): src/pirregalloc.c src/pirregalloc.h
-src/bcgen$(O): src/bcgen.c src/bcgen.h
+src/bcgen$(O): src/bcgen.c src/bcgen.h ../../src/pmc/pmc_sub.h
 src/pirpcc$(O): src/pirpcc.c src/pirpcc.h
 src/pirerr$(O): src/pirerr.c src/pirerr.h
 src/pircapi$(O): src/pircapi.c src/pircapi.h

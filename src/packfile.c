@@ -30,6 +30,7 @@ about the structure of the frozen bytecode.
 #include "jit.h"
 #include "../compilers/imcc/imc.h"
 #include "packfile.str"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -580,11 +581,12 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
      * These casts are a quick fix to allow parrot build with c++,
      * a refactor of the macros will be a cleaner solution.  */
     DECL_CONST_CAST;
-    int todo    = 0;
-    int pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
-                                          & ~SUB_FLAG_IS_OUTER;
-
-    if (!pragmas && !Sub_comp_INIT_TEST(PARROT_const_cast(PMC *, sub_pmc)))
+    Parrot_sub *sub;
+    int         todo    = 0;
+    int         pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
+                                                  & ~SUB_FLAG_IS_OUTER;
+    PMC_get_sub(interp, PARROT_const_cast(PMC *, sub_pmc), sub);
+    if (!pragmas && !Sub_comp_INIT_TEST(sub))
         return 0;
 
     switch (action) {
@@ -596,7 +598,7 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
 
             /* :init functions need to be called at MAIN time, so return 1 */
             /* symreg.h:P_INIT */
-            if (Sub_comp_INIT_TEST(PARROT_const_cast(PMC *, sub_pmc)))
+            if (Sub_comp_INIT_TEST(sub))
                 todo = 1;
 
             break;
@@ -667,7 +669,8 @@ static PMC*
 do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
 {
     ASSERT_ARGS(do_1_sub_pragma)
-    Parrot_sub const *sub = PMC_sub(sub_pmc);
+    Parrot_sub *sub;
+    PMC_get_sub(interp, sub_pmc, sub);
 
     switch (action) {
         case PBC_IMMEDIATE:
@@ -703,7 +706,7 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
                 PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
 
                 /* if loaded no need for init */
-                Sub_comp_INIT_CLEAR(sub_pmc);
+                Sub_comp_INIT_CLEAR(sub);
                 run_sub(interp, sub_pmc);
             }
             break;
@@ -727,9 +730,9 @@ do_1_sub_pragma(PARROT_INTERP, ARGMOD(PMC *sub_pmc), pbc_action_enum_t action)
             }
 
             /* run :init tagged functions */
-            if (action == PBC_MAIN && Sub_comp_INIT_TEST(sub_pmc)) {
+            if (action == PBC_MAIN && Sub_comp_INIT_TEST(sub)) {
                 /* if loaded no need for init */
-                Sub_comp_INIT_CLEAR(sub_pmc);
+                Sub_comp_INIT_CLEAR(sub);
 
                 /* if inited no need for load */
                 PObj_get_FLAGS(sub_pmc) &= ~SUB_FLAG_PF_LOAD;
@@ -861,17 +864,19 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
             {
                 /* offset is an index into const_table holding the Sub PMC */
                 PMC           *sub_pmc;
+                Parrot_sub    *sub;
                 const opcode_t ci = ft->fixups[i]->offset;
 
                 if (ci < 0 || ci >= ct->const_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "Illegal fixup offset (%d) in enum_fixup_sub");
 
-                sub_pmc                    = ct->constants[ci]->u.key;
-                PMC_sub(sub_pmc)->eval_pmc = eval_pmc;
+                sub_pmc       = ct->constants[ci]->u.key;
+                PMC_get_sub(interp, sub_pmc, sub);
+                sub->eval_pmc = eval_pmc;
 
-                if (((PObj_get_FLAGS(sub_pmc)     & SUB_FLAG_PF_MASK)
-                ||   (Sub_comp_get_FLAGS(sub_pmc) & SUB_COMP_FLAG_MASK))
+                if (((PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_MASK)
+                ||   (Sub_comp_get_FLAGS(sub) & SUB_COMP_FLAG_MASK))
                 &&    sub_pragma(interp, action, sub_pmc)) {
                     PMC * const result = do_1_sub_pragma(interp, sub_pmc,
                                                          action);
@@ -2967,22 +2972,24 @@ clone_constant(PARROT_INTERP, ARGIN(PackFile_Constant *old_const))
 
     if (old_const->type == PFC_PMC
     &&  VTABLE_isa(interp, old_const->u.key, _sub)) {
-        PMC *old_sub;
-        PMC *new_sub;
+        PMC        *old_sub_pmc, *new_sub_pmc;
+        Parrot_sub *old_sub,     *new_sub;
         PackFile_Constant * const ret = mem_allocate_typed(PackFile_Constant);
 
         ret->type = old_const->type;
-        old_sub   = old_const->u.key;
-        new_sub   = Parrot_thaw_constants(interp, Parrot_freeze(interp, old_sub));
+        old_sub_pmc   = old_const->u.key;
+        new_sub_pmc   = Parrot_thaw_constants(interp, Parrot_freeze(interp, old_sub_pmc));
 
-        PMC_sub(new_sub)->seg = PMC_sub(old_sub)->seg;
+        PMC_get_sub(interp, new_sub_pmc, new_sub);
+        PMC_get_sub(interp, old_sub_pmc, old_sub);
+        new_sub->seg = old_sub->seg;
 
         /* Vtable overrides and methods were already cloned, so don't reclone them. */
-        if (PMC_sub(new_sub)->vtable_index == -1
-        && !(PMC_sub(old_sub)->comp_flags   &  SUB_COMP_FLAG_METHOD))
-            Parrot_store_sub_in_namespace(interp, new_sub);
+        if (new_sub->vtable_index == -1
+        && !(old_sub->comp_flags   &  SUB_COMP_FLAG_METHOD))
+            Parrot_store_sub_in_namespace(interp, new_sub_pmc);
 
-        ret->u.key = new_sub;
+        ret->u.key = new_sub_pmc;
 
         return ret;
     }

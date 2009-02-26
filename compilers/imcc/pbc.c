@@ -6,6 +6,7 @@
 #include "imc.h"
 #include "pbc.h"
 #include "parrot/packfile.h"
+#include "../src/pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: compilers/imcc/pbc.h */
 
@@ -101,7 +102,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC* create_lexinfo(PARROT_INTERP,
     ARGMOD(IMC_Unit *unit),
-    ARGIN(PMC *sub),
+    ARGIN(PMC *sub_pmc),
     int need_lex)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -238,7 +239,7 @@ static void verify_signature(PARROT_INTERP,
 #define ASSERT_ARGS_create_lexinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(unit) \
-    || PARROT_ASSERT_ARG(sub)
+    || PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_find_global_label __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name) \
@@ -1146,7 +1147,7 @@ current compilation unit.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC*
-create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
+create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
                int need_lex)
 {
     ASSERT_ARGS(create_lexinfo)
@@ -1165,7 +1166,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
                 SymReg *n;
                 if (!lex_info) {
                     lex_info = pmc_new_noinit(interp, lex_info_id);
-                    VTABLE_init_pmc(interp, lex_info, sub);
+                    VTABLE_init_pmc(interp, lex_info, sub_pmc);
                 }
 
                 /* at least one lexical name */
@@ -1173,16 +1174,18 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
                 PARROT_ASSERT(n);
 
                 while (n) {
-                    STRING  *lex_name;
-                    const int k = n->color;
+                    STRING     *lex_name;
+                    const int   k = n->color;
+                    Parrot_sub *sub;
                     PARROT_ASSERT(k >= 0);
 
                     lex_name = constants[k]->u.string;
                     PARROT_ASSERT(PObj_is_string_TEST(lex_name));
 
+                    PMC_get_sub(interp, sub_pmc, sub);
                     IMCC_debug(interp, DEBUG_PBC_CONST,
                             "add lexical '%s' to sub name '%s'\n",
-                            n->name, (char*)PMC_sub(sub)->name->strstart);
+                            n->name, (char*)sub->name->strstart);
 
                     Parrot_PCCINVOKE(interp, lex_info,
                             string_from_literal(interp, "declare_lex_preg"),
@@ -1197,7 +1200,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub),
 
     if (!lex_info && (unit->outer || need_lex)) {
         lex_info = pmc_new_noinit(interp, lex_info_id);
-        VTABLE_init_pmc(interp, lex_info, sub);
+        VTABLE_init_pmc(interp, lex_info, sub_pmc);
     }
 
     return lex_info;
@@ -1220,10 +1223,11 @@ static PMC*
 find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 {
     ASSERT_ARGS(find_outer)
-    subs_t *s;
-    PMC    *current;
-    STRING *cur_name;
-    size_t  len;
+    subs_t      *s;
+    PMC         *current;
+    STRING      *cur_name;
+    Parrot_sub *sub;
+    size_t      len;
 
     if (!unit->outer)
         return NULL;
@@ -1253,7 +1257,8 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
         IMCC_fatal(interp, 1, "Undefined :outer sub '%s'.\n",
                    unit->outer->name);
 
-    cur_name = PMC_sub(current)->name;
+    PMC_get_sub(interp, current, sub);
+    cur_name = sub->name;
 
     if (cur_name->strlen == len
     && (memcmp((char*)cur_name->strstart, unit->outer->name, len) == 0))
@@ -1286,7 +1291,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     ASSERT_ARGS(add_const_pmc_sub)
     PMC                 *ns_pmc;
     PMC                 *sub_pmc;
-    Parrot_sub          *sub;
+    Parrot_sub          *sub, *outer_sub;
 
     const int            k            = add_const_table(interp);
     PackFile_ConstTable *ct           = interp->code->const_table;
@@ -1348,9 +1353,9 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     }
 
     /* Set flags and get the sub info. */
-    PObj_get_FLAGS(sub_pmc)     |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
-    Sub_comp_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
-    sub                          = PMC_sub(sub_pmc);
+    PObj_get_FLAGS(sub_pmc) |= (r->pcc_sub->pragma & SUB_FLAG_PF_MASK);
+    PMC_get_sub(interp, sub_pmc, sub);
+    Sub_comp_get_FLAGS(sub) |= (r->pcc_sub->pragma & SUB_COMP_FLAG_MASK);
 
     r->color  = add_const_str(interp, r);
     sub->name = ct->constants[r->color]->u.string;
@@ -1471,6 +1476,9 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
     pfc->u.key    = sub_pmc;
     unit->sub_pmc = sub_pmc;
 
+    if (sub->outer_sub)
+        PMC_get_sub(interp, sub->outer_sub, outer_sub);
+
     IMCC_debug(interp, DEBUG_PBC_CONST,
             "add_const_pmc_sub '%s' flags %x color %d (%s) "
             "lex_info %s :outer(%s)\n",
@@ -1478,7 +1486,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
             (char *) sub_pmc->vtable->whoami->strstart,
             sub->lex_info ? "yes" : "no",
             sub->outer_sub ?
-                (char *)PMC_sub(sub->outer_sub)->name->strstart :
+                (char *)outer_sub->name->strstart :
                 "*none*");
 
     /*

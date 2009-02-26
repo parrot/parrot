@@ -9,6 +9,7 @@
 #include "parrot/parrot.h"
 
 #include "parrot/interpreter.h"
+#include "../../../src/pmc/pmc_sub.h"
 
 /* #include "parrot/embed.h" */
 
@@ -791,6 +792,7 @@ static PMC *
 find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_state * const lexer)
 {
     PMC          *current;
+    Parrot_sub   *sub;
     STRING       *cur_name;
     size_t        len;
     global_label *outersub;
@@ -836,7 +838,8 @@ find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_s
         return NULL;
     }
 
-    cur_name = PMC_sub(current)->name;
+    PMC_get_sub(interp, current, sub);
+    cur_name = sub->name;
 
     /* XXX can't this be a call to Parrot_str_compare() ? */
     if (cur_name->strlen == len && (memcmp((char *)cur_name->strstart, outername, len) == 0))
@@ -1003,9 +1006,9 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
 
     interp                = bc->interp;
     sub_pmc               = create_sub_pmc(bc, info->iscoroutine, info->instanceof);
-    sub                   = PMC_sub(sub_pmc);
     subname_index         = add_string_const(bc, info->subname, "ascii");
     subname_const         = bc->interp->code->const_table->constants[subname_index];
+    PMC_get_sub(interp, sub_pmc, sub);
 
     /* set start and end offset of this sub in the bytecode.
      * This is calculated during the parsing phase.
@@ -1027,8 +1030,8 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     sub->multi_signature  = generate_multi_signature(bc, info->multi_types, info->num_multi_types);
 
     /* copy sub pragma flags such as :immediate etc. */
-    PObj_get_FLAGS(sub_pmc)     |= subpragmas & SUB_FLAG_PF_MASK;
-    Sub_comp_get_FLAGS(sub_pmc) |= subpragmas & SUB_COMP_FLAG_MASK;
+    PObj_get_FLAGS(sub_pmc) |= subpragmas & SUB_FLAG_PF_MASK;
+    Sub_comp_get_FLAGS(sub) |= subpragmas & SUB_COMP_FLAG_MASK;
 
 
     /* store register usage of this sub. */

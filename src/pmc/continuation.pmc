@@ -23,6 +23,7 @@ more information.
 
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
+#include "pmc_sub.h"
 
 /*
 
@@ -289,8 +290,10 @@ Experimental: return caller PMC or PMCNULL if none.
     METHOD caller() {
         Parrot_cont *cc     = PMC_cont(SELF);
         PMC         *caller = cc->to_ctx->current_sub;
+        Parrot_sub  *sub;
 
-        if (!caller || !PMC_sub(caller)->seg)
+        PMC_get_sub(INTERP, caller, sub);
+        if (!caller || !sub->seg)
             caller = PMCNULL;
 
         RETURN(PMC *caller);

@@ -609,7 +609,7 @@ PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable
 .pmc.dump :
 	$(PMC2CD) $<
 
-.pmc.c :
+.pmc.c : $(SRC_DIR)/pmc/pmc_sub.h
 	$(PMC2CC) $<
 
 # not all makes might understand this, so the rules are generated
@@ -913,6 +913,7 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 #
 # Parrot Dump
 #
+$(SRC_DIR)/packdump$(O) : $(SRC_DIR)/pmc/pmc_sub.h
 
 $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1013,7 +1014,8 @@ examples/pasm/hello$(EXE): examples/pasm/hello$(O)
 
 $(SRC_DIR)/global_setup$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global_setup.str
 
-$(SRC_DIR)/global$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global.str
+$(SRC_DIR)/global$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global.str \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/pmc$(O) : $(GENERAL_H_FILES)
 
@@ -1025,7 +1027,7 @@ $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h
+$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/debug.str
 
@@ -1072,12 +1074,13 @@ $(SRC_DIR)/platform$(O) : $(GENERAL_H_FILES)
 #IF(platform_asm):
 $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
     $(SRC_DIR)/debug.str
 
-$(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/sub.str
+$(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/sub.str \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/string/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/string/private_cstring.h
 
@@ -1091,9 +1094,10 @@ $(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exceptions.str
 
 $(SRC_DIR)/events$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
-$(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h
+$(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES)
 
@@ -1129,12 +1133,13 @@ $(SRC_DIR)/main$(O) : $(SRC_DIR)/main.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/multidispatch$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/multidispatch.str \
-	$(SRC_DIR)/pmc/pmc_nci.h
+	$(SRC_DIR)/pmc/pmc_nci.h $(SRC_DIR)/pmc/pmc_sub.h
 
-$(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str
+$(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(PF_DIR)/pf_items$(O) : $(GENERAL_H_FILES)
 
@@ -1142,7 +1147,7 @@ $(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/register$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/runops_cores$(O) : $(GENERAL_H_FILES)
 
@@ -1150,7 +1155,8 @@ $(SRC_DIR)/stacks$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/tsq$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/embed$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h
+$(SRC_DIR)/embed$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/dataypes$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dataypes.c
 
@@ -1180,7 +1186,8 @@ $(SRC_DIR)/string/encoding$(O) : $(SRC_DIR)/string/encoding.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c $(GENERAL_H_FILES)
 
-$(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES)
+$(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
+	$(SRC_DIR)/pmc/pmc_sub.h
 
 $(IO_DIR)/filehandle$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 

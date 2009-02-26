@@ -46,6 +46,7 @@ not highest type in table.
 #include "parrot/oplib/ops.h"
 #include "multidispatch.str"
 #include "pmc/pmc_nci.h"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: include/parrot/multidispatch.h */
 
@@ -141,7 +142,8 @@ static PMC* Parrot_mmd_arg_tuple_func(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
-static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
+static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP,
+    ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -227,7 +229,7 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_mmd_get_cached_multi_sig \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub)
+    || PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_Parrot_mmd_maybe_candidate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc) \
@@ -857,11 +859,15 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
+Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(Parrot_mmd_get_cached_multi_sig)
-    if (VTABLE_isa(interp, sub, CONST_STRING(interp, "Sub"))) {
-        PMC *multi_sig = PMC_sub(sub)->multi_signature;
+    if (VTABLE_isa(interp, sub_pmc, CONST_STRING(interp, "Sub"))) {
+        Parrot_sub *sub;
+        PMC        *multi_sig;
+
+        PMC_get_sub(interp, sub_pmc, sub);
+        multi_sig = sub->multi_signature;
 
         if (multi_sig->vtable->base_type == enum_class_FixedPMCArray) {
             PMC *converted_sig = mmd_cvt_to_types(interp, multi_sig);
@@ -869,7 +875,7 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub))
             if (PMC_IS_NULL(converted_sig))
                 return PMCNULL;
 
-            multi_sig = PMC_sub(sub)->multi_signature = converted_sig;
+            multi_sig = sub->multi_signature = converted_sig;
         }
 
         return multi_sig;
@@ -896,8 +902,9 @@ static UINTVAL
 mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 {
     ASSERT_ARGS(mmd_distance)
-    PMC *multi_sig, *mro;
-    INTVAL i, n, args, dist, j, m;
+    PMC        *multi_sig, *mro;
+    Parrot_sub *sub;
+    INTVAL      args, dist, i, j, n, m;
 
     /* has to be a builtin multi method */
     if (pmc->vtable->base_type == enum_class_NCI) {
@@ -905,7 +912,8 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     }
     else {
         /* not a multi; no distance */
-        if (!PMC_sub(pmc)->multi_signature)
+        PMC_get_sub(interp, pmc, sub);
+        if (!sub->multi_signature)
             return 0;
 
         multi_sig = Parrot_mmd_get_cached_multi_sig(interp, pmc);
@@ -1287,10 +1295,11 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
         ARGIN(STRING *sub_name), ARGIN(STRING *long_sig), ARGIN(PMC *sub_obj))
 {
     ASSERT_ARGS(Parrot_mmd_add_multi_from_long_sig)
-    PMC    *type_list   = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
-    STRING *ns_name     = VTABLE_get_string_keyed_int(interp, type_list, 0);
-    STRING *sub_str     = CONST_STRING(interp, "Sub");
-    STRING *closure_str = CONST_STRING(interp, "Closure");
+    Parrot_sub *sub;
+    STRING     *sub_str     = CONST_STRING(interp, "Sub");
+    STRING     *closure_str = CONST_STRING(interp, "Closure");
+    PMC        *type_list   = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
+    STRING     *ns_name     = VTABLE_get_string_keyed_int(interp, type_list, 0);
 
     /* Attach a type tuple array to the sub for multi dispatch */
     PMC    *multi_sig = mmd_build_type_tuple_from_type_list(interp, type_list);
@@ -1300,7 +1309,8 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     }
     else if (VTABLE_isa(interp, sub_obj, sub_str)
          ||  VTABLE_isa(interp, sub_obj, closure_str)) {
-        PMC_sub(sub_obj)->multi_signature = multi_sig;
+        PMC_get_sub(interp, sub_obj, sub);
+        sub->multi_signature = multi_sig;
     }
 
     mmd_add_multi_to_namespace(interp, ns_name, sub_name, sub_obj);

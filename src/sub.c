@@ -21,6 +21,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "sub.str"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 
@@ -336,14 +337,16 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING*
-Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
+Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 {
     ASSERT_ARGS(Parrot_full_sub_name)
-    if (sub && VTABLE_defined(interp, sub)) {
-        Parrot_sub * const s = PMC_sub(sub);
+    if (sub_pmc && VTABLE_defined(interp, sub_pmc)) {
+        Parrot_sub *sub;
 
-        if (PMC_IS_NULL(s->namespace_stash)) {
-            return s->name;
+        PMC_get_sub(interp, sub_pmc, sub);
+
+        if (PMC_IS_NULL(sub->namespace_stash)) {
+            return sub->name;
         }
         else {
             PMC    *ns_array;
@@ -366,7 +369,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
 
             Parrot_block_GC_mark(interp);
 
-            ns_array = Parrot_ns_get_name(interp, s->namespace_stash);
+            ns_array = Parrot_ns_get_name(interp, sub->namespace_stash);
 
             /* Restore stuff that might have got overwritten */
             interp->current_cont      = saved_ccont;
@@ -377,8 +380,8 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
             interp->params_signature  = params_signature;
             interp->returns_signature = returns_signature;
 
-            if (s->name)
-                VTABLE_push_string(interp, ns_array, s->name);
+            if (sub->name)
+                VTABLE_push_string(interp, ns_array, sub->name);
 
             res = Parrot_str_join(interp, j, ns_array);
             Parrot_unblock_GC_mark(interp);
@@ -430,7 +433,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
     if (!VTABLE_isa(interp, ctx->current_sub, CONST_STRING(interp, "Sub")))
         return 1;
 
-    sub = PMC_sub(ctx->current_sub);
+    PMC_get_sub(interp, ctx->current_sub, sub);
     /* set the sub name */
     info->subname = sub->name;
 
@@ -574,20 +577,30 @@ void
 Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 {
     ASSERT_ARGS(Parrot_capture_lex)
-    Parrot_Context * const ctx      = CONTEXT(interp);
-    Parrot_sub * const current_sub  = PMC_sub(ctx->current_sub);
-    Parrot_sub *sub;
-    Parrot_Context *old;
+    Parrot_Context * const ctx          = CONTEXT(interp);
+    Parrot_sub            *current_sub, *outer_sub;
+    Parrot_sub            *sub;
+    Parrot_Context        *old;
+
+    PMC_get_sub(interp, ctx->current_sub, current_sub);
 
     /* MultiSub gets special treatment */
     if (VTABLE_isa(interp, sub_pmc, CONST_STRING(interp, "MultiSub"))) {
+
         PMC * const iter = VTABLE_get_iter(interp, sub_pmc);
+
         while (VTABLE_get_bool(interp, iter)) {
-            PMC * const child_pmc        = VTABLE_shift_pmc(interp, iter);
-            Parrot_sub * const child_sub = PMC_sub(child_pmc);
+
+            PMC        * const child_pmc = VTABLE_shift_pmc(interp, iter);
+            Parrot_sub        *child_sub, *child_outer_sub;
+
+            PMC_get_sub(interp, child_pmc, child_sub);
+
             if (!PMC_IS_NULL(child_sub->outer_sub))
+
+                PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
                 if (0 == Parrot_str_not_equal(interp, current_sub->subid,
-                                      PMC_sub(child_sub->outer_sub)->subid)) {
+                                      child_outer_sub->subid)) {
                 old = child_sub->outer_ctx;
                 child_sub->outer_ctx = Parrot_context_ref(interp, ctx);
                 if (old)
@@ -598,14 +611,15 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
     }
 
     /* the sub_pmc has to have an outer_sub that is the caller */
-    sub = PMC_sub(sub_pmc);
+    PMC_get_sub(interp, sub_pmc, sub);
     if (PMC_IS_NULL(sub->outer_sub))
         return;
 
 #if 0
     /* verify that the current sub is sub_pmc's :outer */
+    PMC_get_sub(interp, sub->outer_sub, outer_sub);
     if (0 != Parrot_str_not_equal(interp, current_sub->subid,
-                         PMC_sub(sub->outer_sub)->subid)) {
+                         outer_sub->subid)) {
         Parrot_ex_throw_from_c_args(interp, NULL,
             EXCEPTION_INVALID_OPERATION, "'%Ss' isn't the :outer of '%Ss'",
             current_sub->name, sub->name);
@@ -728,21 +742,26 @@ PARROT_CANNOT_RETURN_NULL
 Parrot_sub *
 Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, ARGIN(PMC *subclass)) {
     ASSERT_ARGS(Parrot_get_sub_pmc_from_subclass)
-    PMC *key, *sub_pmc;
+    PMC        *key, *sub_pmc;
+    Parrot_sub *sub;
 
     /* Ensure we really do have a subclass of sub. */
     if (VTABLE_isa(interp, subclass, CONST_STRING(interp, "Sub"))) {
         /* If it's actually a PMC still, probably does the same structure
          * underneath. */
-        if (!PObj_is_object_TEST(subclass))
-            return (Parrot_sub *)PMC_struct_val(subclass);
+        if (!PObj_is_object_TEST(subclass)) {
+            GETATTR_Sub_sub(interp, subclass, sub);
+            return sub;
+        }
 
         /* Get the Sub PMC itself. */
         key = pmc_new(interp, enum_class_String);
         VTABLE_set_string_native(interp, key, CONST_STRING(interp, "Sub"));
         sub_pmc = VTABLE_get_attr_keyed(interp, subclass, key, CONST_STRING(interp, "proxy"));
-        if (sub_pmc->vtable->base_type == enum_class_Sub)
-            return (Parrot_sub *)PMC_struct_val(sub_pmc);
+        if (sub_pmc->vtable->base_type == enum_class_Sub) {
+            GETATTR_Sub_sub(interp, sub_pmc, sub);
+            return sub;
+        }
     }
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Attempting to do sub operation on non-Sub.");

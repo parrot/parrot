@@ -30,6 +30,7 @@ example compiler used by japh16.pasm
 
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+#include "../../src/pmc/pmc_sub.h"
 
 #define C_DEBUG 0
 
@@ -230,7 +231,7 @@ japh_compiler(PARROT_INTERP, const char *program)
      * create sub PMC
      */
     sub = pmc_new(interp, enum_class_Eval);
-    sub_data = PMC_sub(sub);
+    PMC_get_sub(interp, sub, sub_data);
     sub_data->seg = cur_cs;
     sub_data->address = cur_cs->base.data;
     sub_data->end = cur_cs->base.data + cur_cs->base.size;

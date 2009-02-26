@@ -19,6 +19,7 @@ is determined by the PASM/PIR compiler in the register allocation pass
 
 #include "parrot/parrot.h"
 #include "parrot/register.h"
+#include "../pmc/pmc_sub.h"
 
 
 /* set CTX_LEAK_DEBUG_FULL to 1 for enhanced context debugging.
@@ -574,7 +575,8 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
         if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)
             && ctx->current_sub) {
             /* can't probably Parrot_io_eprintf here */
-            const Parrot_sub * const doomed = PMC_sub(ctx->current_sub);
+            Parrot_sub *doomed;
+            PMC_get_sub(interp, ctx->current_sub, doomed);
 
             if (doomed) {
                 fprintf(stderr, "[free  ctx %p of sub '%s']\n",
@@ -655,9 +657,11 @@ Parrot_context_ref_trace(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
     ASSERT_ARGS(Parrot_context_ref_trace)
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
         const char *name = "unknown";
+        Parrot_sub *sub;
 
+        PMC_get_sub(interp, ctx->current_sub, sub);
         if (ctx->current_sub)
-            name = (char *)(PMC_sub(ctx->current_sub)->name->strstart);
+            name = (char *)(sub->name->strstart);
 
         fprintf(stderr, "[reference to context %p ('%s') taken at %s:%d]\n",
                 (void *)ctx, name, file, line);

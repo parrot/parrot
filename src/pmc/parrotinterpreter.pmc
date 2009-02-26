@@ -30,6 +30,7 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/dynext.h"
 #include "parrot/io.h"
 #include "pmc_class.h"
+#include "pmc_sub.h"
 
 /*
 
@@ -459,7 +460,9 @@ Introspection interface. C<key> can be:
         s = CONST_STRING(interp, "annotations");
 
         if (Parrot_str_not_equal(interp, item, s) == 0) {
-            PMC *sub = ctx->current_sub;
+            Parrot_sub *sub;
+            PMC        *sub_pmc = ctx->current_sub;
+            PMC_get_sub(interp, sub_pmc, sub);
             if (ctx == CONTEXT(interp)) {
                 /* We can't know the current program counter for the currently
                  * executing sub, so can't return annotations for that. */
@@ -467,9 +470,9 @@ Introspection interface. C<key> can be:
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                             "Cannot get annotations at depth 0; use annotations op instead.");
             }
-            if (!PMC_IS_NULL(sub) && sub->vtable->base_type == enum_class_Sub &&
-                    PMC_sub(sub)->seg->annotations) {
-                PackFile_ByteCode *seg = PMC_sub(sub)->seg;
+            if (!PMC_IS_NULL(sub_pmc) && sub_pmc->vtable->base_type == enum_class_Sub &&
+                    sub->seg->annotations) {
+                PackFile_ByteCode *seg = sub->seg;
                 opcode_t *pc = ctx->current_pc;
                 return PackFile_Annotations_lookup(interp,  seg->annotations,
                         pc - seg->base.data, NULL);

@@ -99,7 +99,7 @@ typedef enum {
 } sub_comp_flags_enum;
 #undef SUB_FLAG
 
-#define Sub_comp_get_FLAGS(o) ((PMC_sub(o))->comp_flags)
+#define Sub_comp_get_FLAGS(o) ((o)->comp_flags)
 #define Sub_comp_flag_TEST(flag, o) (Sub_comp_get_FLAGS(o) & SUB_COMP_FLAG_ ## flag)
 #define Sub_comp_flag_SET(flag, o) (Sub_comp_get_FLAGS(o) |= SUB_COMP_FLAG_ ## flag)
 #define Sub_comp_flag_CLEAR(flag, o) (Sub_comp_get_FLAGS(o) &= ~(UINTVAL)(SUB_COMP_FLAG_ ## flag))
@@ -167,11 +167,18 @@ typedef struct Parrot_sub {
     struct Parrot_Context *outer_ctx;   /* outer context, if a closure */
 } Parrot_sub;
 
-#define PMC_sub(pmc) ((pmc)->vtable->base_type == enum_class_Sub || \
-                      (pmc)->vtable->base_type == enum_class_Coroutine || \
-                      (pmc)->vtable->base_type == enum_class_Eval ? \
-    (Parrot_sub *)PMC_struct_val(pmc) : \
-    Parrot_get_sub_pmc_from_subclass(interp, (pmc)))
+#define PMC_get_sub(interp, pmc, sub) \
+    do { \
+        if ((pmc)->vtable->base_type == enum_class_Sub || \
+           (pmc)->vtable->base_type == enum_class_Coroutine || \
+           (pmc)->vtable->base_type == enum_class_Eval)  \
+        {\
+            GETATTR_Sub_sub((interp), (pmc), (sub)); \
+        } \
+        else { \
+            (sub) = Parrot_get_sub_pmc_from_subclass((interp), (pmc)); \
+        } \
+    } while (0);
 
 /* the first entries must match Parrot_sub, so we can cast
  * these two to the other type
@@ -208,8 +215,6 @@ typedef struct Parrot_coro {
     opcode_t *address;           /* next address to run - toggled each time */
     struct Stack_Chunk *dynamic_state; /* next dynamic state */
 } Parrot_coro;
-
-#define PMC_coro(pmc) ((Parrot_coro *)PMC_struct_val(pmc))
 
 typedef struct Parrot_cont {
     /* continuation destination */
@@ -267,7 +272,7 @@ STRING* Parrot_Context_infostr(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub))
+STRING* Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT

@@ -20,6 +20,7 @@ evaluation and execution.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_sub.h"
 
 static void
 clear_fixups(PARROT_INTERP, Parrot_sub *sub_data)
@@ -56,9 +57,13 @@ static PMC*
 get_sub(PARROT_INTERP, PMC *self, int idx)
 {
     INTVAL               i, n;
-    PackFile_ByteCode   *seg = PMC_sub(self)->seg;
+    Parrot_sub          *sub;
+    PackFile_ByteCode   *seg;
     PackFile_FixupTable *ft;
     PackFile_ConstTable *ct;
+
+    PMC_get_sub(interp, self, sub);
+    seg = sub->seg;
 
     if (!seg)
         return PMCNULL;
@@ -88,10 +93,14 @@ get_sub(PARROT_INTERP, PMC *self, int idx)
 static void
 mark_subs(PARROT_INTERP, PMC *self)
 {
-    PackFile_ByteCode   * const seg = PMC_sub(self)->seg;
+    Parrot_sub          *sub;
+    PackFile_ByteCode   *seg;
     PackFile_FixupTable *ft;
     PackFile_ConstTable *ct;
     INTVAL               i;
+
+    PMC_get_sub(interp, self, sub);
+    seg = sub->seg;
 
     if (!seg)
         return;
@@ -123,9 +132,9 @@ pmclass Eval extends Sub need_ext {
         Parrot_sub *sub_data;
         SUPER();
 
-        sub_data      = PMC_sub(SELF);
-        PObj_custom_mark_destroy_SETALL(SELF);
+        PMC_get_sub(INTERP, SELF, sub_data);
         sub_data->seg = NULL;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 /*
 
@@ -160,7 +169,9 @@ Invokes the first subroutine in the eval code.
          */
         PackFile_Segment  *seg;
         PackFile_ByteCode *cur_cs;
-        Parrot_sub        *sub_data = PMC_sub(SELF);
+        Parrot_sub        *sub_data;
+
+        PMC_get_sub(INTERP, SELF, sub_data);
 
         if (!sub_data) {
             SUPER();
@@ -219,10 +230,14 @@ for writing to disc and later loading via C<load_bytecode>.
 */
 
     VTABLE STRING *get_string() {
+        Parrot_sub        *sub;
         PackFile          *pf  = PackFile_new(INTERP, 0);
-        PackFile_ByteCode *seg = PMC_sub(SELF)->seg;
+        PackFile_ByteCode *seg;
         STRING            *res;
         size_t             size, aligned_size;
+
+        PMC_get_sub(INTERP, SELF, sub);
+        seg = sub->seg;
 
         PackFile_add_segment(INTERP, &pf->directory, (PackFile_Segment *)seg);
 
@@ -322,6 +337,7 @@ Unarchives the code.
         STRING           *packed = VTABLE_shift_string(INTERP, io);
         PackFile         *pf;
         PackFile_Segment *seg;
+        Parrot_sub       *sub;
         size_t            i;
 
         SUPER(info);
@@ -338,7 +354,8 @@ Unarchives the code.
             seg = pf->directory.segments[i];
 
             if (seg->type == PF_BYTEC_SEG) {
-                PMC_sub(SELF)->seg = (PackFile_ByteCode *)seg;
+                PMC_get_sub(INTERP, SELF, sub);
+                sub->seg = (PackFile_ByteCode *)seg;
                 break;
             }
         }

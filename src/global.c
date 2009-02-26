@@ -18,6 +18,7 @@ src/global.c - Access to global PMCs
 
 #include "parrot/parrot.h"
 #include "global.str"
+#include "pmc/pmc_sub.h"
 
 /* HEADERIZER HFILE: include/parrot/global.h */
 /* HEADERIZER BEGIN: static */
@@ -25,7 +26,7 @@ src/global.c - Access to global PMCs
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static PMC * get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub))
+static PMC * get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -70,7 +71,7 @@ static PMC * internal_ns_maybe_create(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 static void store_sub_in_multi(PARROT_INTERP,
-    ARGIN(PMC *sub),
+    ARGIN(PMC *sub_pmc),
     ARGIN(PMC *ns))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -78,7 +79,7 @@ static void store_sub_in_multi(PARROT_INTERP,
 
 #define ASSERT_ARGS_get_namespace_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub)
+    || PARROT_ASSERT_ARG(sub_pmc)
 #define ASSERT_ARGS_internal_ns_keyed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(base_ns) \
@@ -97,7 +98,7 @@ static void store_sub_in_multi(PARROT_INTERP,
     || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_store_sub_in_multi __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub) \
+    || PARROT_ASSERT_ARG(sub_pmc) \
     || PARROT_ASSERT_ARG(ns)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -769,11 +770,15 @@ return the Associated HLL namespace PMC instead.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub))
+get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(get_namespace_pmc)
-    PMC * const nsname = PMC_sub(sub)->namespace_name;
-    PMC * const nsroot = Parrot_get_HLL_namespace(interp, PMC_sub(sub)->HLL_id);
+    Parrot_sub *sub;
+    PMC        *nsname, *nsroot;
+
+    PMC_get_sub(interp, sub_pmc, sub);
+    nsname = sub->namespace_name;
+    nsroot = Parrot_get_HLL_namespace(interp, sub->HLL_id);
 
     /* If we have a NULL, return the HLL namespace */
     if (PMC_IS_NULL(nsname))
@@ -799,22 +804,27 @@ If no multisub by that name currently exists, we create one.
 */
 
 static void
-store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(PMC *ns))
+store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 {
     ASSERT_ARGS(store_sub_in_multi)
-    STRING * const ns_entry_name = PMC_sub(sub)->ns_entry_name;
-    PMC    *multisub = VTABLE_get_pmc_keyed_str(interp, ns, ns_entry_name);
+    Parrot_sub *sub;
+    STRING     *ns_entry_name;
+    PMC        *multisub;
+
+    PMC_get_sub(interp, sub_pmc, sub);
+    ns_entry_name = sub->ns_entry_name;
+    multisub      = VTABLE_get_pmc_keyed_str(interp, ns, ns_entry_name);
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
     if (PMC_IS_NULL(multisub)) {
         multisub = pmc_new(interp, enum_class_MultiSub);
         /* we have to push the sub onto the MultiSub before we try to store
         it because storing requires information from the sub */
-        VTABLE_push_pmc(interp, multisub, sub);
+        VTABLE_push_pmc(interp, multisub, sub_pmc);
         VTABLE_set_pmc_keyed_str(interp, ns, ns_entry_name, multisub);
     }
     else
-        VTABLE_push_pmc(interp, multisub, sub);
+        VTABLE_push_pmc(interp, multisub, sub_pmc);
 }
 
 /*
@@ -830,34 +840,36 @@ same name if it's defined as a multi.
 
 PARROT_EXPORT
 void
-Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
+Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 {
     ASSERT_ARGS(Parrot_store_sub_in_namespace)
     const INTVAL cur_id = CONTEXT(interp)->current_HLL;
 
-    PMC *ns;
+    PMC        *ns;
+    Parrot_sub *sub;
 
     /* PF structures aren't fully constructed yet */
     Parrot_block_GC_mark(interp);
 
     /* store relative to HLL namespace */
-    CONTEXT(interp)->current_HLL = PMC_sub(sub)->HLL_id;
+    PMC_get_sub(interp, sub_pmc, sub);
+    CONTEXT(interp)->current_HLL = sub->HLL_id;
 
-    ns = get_namespace_pmc(interp, sub);
+    ns = get_namespace_pmc(interp, sub_pmc);
 
     /* attach a namespace to the sub for lookups */
-    PMC_sub(sub)->namespace_stash = ns;
+    sub->namespace_stash = ns;
 
     /* store a :multi sub */
-    if (!PMC_IS_NULL(PMC_sub(sub)->multi_signature))
-        store_sub_in_multi(interp, sub, ns);
+    if (!PMC_IS_NULL(sub->multi_signature))
+        store_sub_in_multi(interp, sub_pmc, ns);
 
     /* store other subs (as long as they're not :anon) */
-    else if (!(PObj_get_FLAGS(sub) & SUB_FLAG_PF_ANON)) {
-        STRING * const ns_entry_name = PMC_sub(sub)->ns_entry_name;
-        PMC    * const nsname        = PMC_sub(sub)->namespace_name;
+    else if (!(PObj_get_FLAGS(sub_pmc) & SUB_FLAG_PF_ANON)) {
+        STRING * const ns_entry_name = sub->ns_entry_name;
+        PMC    * const nsname        = sub->namespace_name;
 
-        Parrot_store_global_n(interp, ns, ns_entry_name, sub);
+        Parrot_store_global_n(interp, ns, ns_entry_name, sub_pmc);
 
         /* TEMPORARY HACK - cache invalidation should be a namespace function */
         if (!PMC_IS_NULL(nsname)) {

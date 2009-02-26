@@ -40,6 +40,7 @@ segments from the input PBC files.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_sub.h"
 
 
 /* This struct describes an input file. */
@@ -454,7 +455,8 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                     case enum_class_Sub:
                     case enum_class_Coroutine:
                         {
-                        Parrot_sub * const sub = PMC_sub(copy->u.key);
+                        Parrot_sub *sub;
+                        PMC_get_sub(interp, copy->u.key, sub);
                         sub->start_offs += inputs[i]->code_start;
                         sub->end_offs += inputs[i]->code_start;
                         }

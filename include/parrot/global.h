@@ -153,7 +153,7 @@ void Parrot_store_global_s(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
+void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -205,7 +205,7 @@ void Parrot_store_sub_in_namespace(PARROT_INTERP, ARGIN(PMC *sub))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_store_sub_in_namespace __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(sub)
+    || PARROT_ASSERT_ARG(sub_pmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/global.c */
 
