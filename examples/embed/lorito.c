@@ -95,6 +95,12 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
                 fail("Option needs argument");
             Parrot_set_trace(interp, getuintval(argv[i]));
         }
+        if (strcmp(argv[i], "--warnings") == 0) {
+            ++i;
+            if (i >= argc)
+                fail("Option needs argument");
+            Parrot_setwarnings(interp, getuintval(argv[i]));
+        }
         else if (strcmp(argv[i], "-e") == 0) {
             ++i;
             if (i >= argc)
@@ -163,7 +169,6 @@ int main(int argc, char **argv)
         fail("Cannot create parrot interpreter");
 
     Parrot_set_executable_name(interp, create_string(interp, argv[0]));
-    Parrot_setwarnings(interp, PARROT_WARNINGS_ALL_FLAG);
 
     r = lorito_main(interp, argc, argv);
 
