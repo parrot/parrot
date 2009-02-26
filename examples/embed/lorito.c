@@ -83,15 +83,23 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
 {
     char *source;
     Parrot_PackFile pf;
-    const char * stname = NULL;
+    const char *stname = NULL;
+    const char *exec = NULL;
     int i;
 
+    /* Incompatible options are not checked yet */
     for (i = 1; i < argc; ++i) {
         if (strcmp(argv[i], "--trace") == 0) {
             ++i;
             if (i >= argc)
                 fail("Option needs argument");
             Parrot_set_trace(interp, getuintval(argv[i]));
+        }
+        else if (strcmp(argv[i], "-e") == 0) {
+            ++i;
+            if (i >= argc)
+                fail("Option needs argument");
+            exec = argv[i];
         }
         else if (strcmp(argv[i], "--start") == 0) {
             ++i;
@@ -107,6 +115,14 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
         }
         else
             break;
+    }
+
+    if (exec) {
+        Parrot_String compiler = create_string(interp, "PIR");
+	Parrot_String errstr;
+        Parrot_PMC code = Parrot_compile_string(interp, compiler, exec, &errstr);
+        void *discard = Parrot_call_sub(interp, code, "v");
+        return 0;
     }
 
     if (i >= argc)
