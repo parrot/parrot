@@ -170,8 +170,8 @@ typedef struct Parrot_sub {
 #define PMC_get_sub(interp, pmc, sub) \
     do { \
         if ((pmc)->vtable->base_type == enum_class_Sub || \
-           (pmc)->vtable->base_type == enum_class_Coroutine || \
-           (pmc)->vtable->base_type == enum_class_Eval)  \
+            (pmc)->vtable->base_type == enum_class_Coroutine || \
+            (pmc)->vtable->base_type == enum_class_Eval)  \
         {\
             GETATTR_Sub_sub((interp), (pmc), (sub)); \
         } \
