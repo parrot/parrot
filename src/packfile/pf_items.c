@@ -1464,6 +1464,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_op = fetch_op_le_4;
         else
             pf->fetch_op = fetch_op_le_8;
+        pf->fetch_iv = pf->fetch_op;
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
@@ -1502,6 +1503,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_op = fetch_op_be_4;
         else
             pf->fetch_op = fetch_op_be_8;
+        pf->fetch_iv = pf->fetch_op;
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
@@ -1536,13 +1538,13 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
 
 #else  /* ENDIAN */
 
-    pf->fetch_iv = pf->fetch_op;
     /* this Parrot is on a LITTLE ENDIAN machine */
     if (need_endianize) {
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_be_4;
         else
             pf->fetch_op = fetch_op_be_8;
+        pf->fetch_iv = pf->fetch_op;
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
@@ -1592,6 +1594,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
             pf->fetch_op = fetch_op_le_4;
         else
             pf->fetch_op = fetch_op_le_8;
+        pf->fetch_iv = pf->fetch_op;
 
         switch (pf->header->floattype) {
 #  if NUMVAL_SIZE == 8
