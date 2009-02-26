@@ -397,7 +397,7 @@ SKIP: {
     skip "Hardlinks to files not possible on Windows", 1 if $MSWin32 or $cygwin;
 
     my $prevnl = [ stat("tools") ]->[3];
-    pir_output_is( <<"CODE", <<"OUT", "Test dirlink" );
+    pir_output_like( <<"CODE", <<"OUT", "Test dirlink" );
 .sub main :main
     .local pmc os
     .local string xpto, tools
@@ -420,11 +420,12 @@ SKIP: {
     end
 
   no_root_perms:
-    .local pmc e, c
+    .local pmc e
+    .local string message
     .get_results( e )
     pop_eh
-    c = e['message']
-    eq c, 'Operation not permitted', is_okay
+    message = e['message']
+    say message
     end
 
   is_okay:
@@ -432,7 +433,7 @@ SKIP: {
     end
 .end
 CODE
-ok
+/link.* failed for OS PMC:/
 OUT
 }
 

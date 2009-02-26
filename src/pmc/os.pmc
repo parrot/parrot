@@ -401,7 +401,7 @@ Creates a hard link, where available(?)
         if (error) {
             const char * const errmsg = strerror(errno);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-                errmsg);
+                "link() failed for OS PMC: %s\n", errmsg);
         }
 #else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
