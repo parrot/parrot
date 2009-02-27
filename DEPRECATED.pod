@@ -47,10 +47,6 @@ L<https://trac.parrot.org/parrot/ticket/189>
 
 L<https://trac.parrot.org/parrot/ticket/190>
 
-=item tqueue [BEFORE 1.0]
-
-L<https://trac.parrot.org/parrot/ticket/192>
-
 =item slice [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/372>
