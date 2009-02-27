@@ -19,11 +19,12 @@ Tests the C<Key> PMC.
 .sub main :main
     .include 'include/test_more.pir'
 
-    plan(8)
+    plan(10)
 
     traverse_key_chain()
     extract_int_from_string_keys()
     extract_string_from_int_keys()
+    use_number_keys()
     do_not_collect_string_keys_early_rt_60128()
     todo(0, 'register and non-register string keys should be COW (RT #60128)' )
 .end
@@ -86,6 +87,22 @@ e2:
     set $P1, $P0[2]
     is( $P1, 'ok2', 'retrieve key is const int, set key was str const' )
 .end
+
+.sub use_number_keys
+    .local pmc hash, key
+    .local string foo
+
+    hash = new ['Hash']
+    key  = new ['Key']
+
+    key = 1.234
+    is(key, "1.234", "number-valued Key stringification works")
+
+    hash[key] = "FOO"
+    foo = hash[key]
+    is(foo, "FOO", "set/get via number-valued Key works")
+.end
+
 
 .sub do_not_collect_string_keys_early_rt_60128
     .local pmc proc, a
