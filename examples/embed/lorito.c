@@ -125,7 +125,7 @@ int lorito_main(Parrot_Interp interp, int argc, char **argv)
 
     if (exec) {
         Parrot_String compiler = create_string(interp, "PIR");
-	Parrot_String errstr;
+        Parrot_String errstr;
         Parrot_PMC code = Parrot_compile_string(interp, compiler, exec, &errstr);
         void *discard = Parrot_call_sub(interp, code, "v");
         return 0;
