@@ -634,7 +634,7 @@ pt_ns_clone(PARROT_INTERP, ARGOUT(Parrot_Interp d), ARGOUT(PMC *dest_ns),
 
                 /* Vtable overrides and methods were already cloned, so don't reclone them. */
                 if (! (val->vtable->base_type == enum_class_Sub
-                    && (  val_sub->vtable_index != -1
+                    && (val_sub->vtable_index != -1
                        || val_sub->comp_flags & SUB_COMP_FLAG_METHOD))) {
                     VTABLE_set_pmc_keyed_str(d, dest_ns, key, copy);
                 }
