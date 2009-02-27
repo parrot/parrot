@@ -46,7 +46,7 @@ if ( $^O eq "cygwin" ) {
     }
 }
 if ( $platforms{$^O} ) {
-    plan tests => 20;
+    plan tests => 15;
 }
 else {
     plan skip_all => "No threading yet or test not enabled for '$^O'";
@@ -288,36 +288,6 @@ CODE
 500500
 OUTPUT
 
-
-pir_output_like( <<'CODE', <<'OUTPUT', "detach" );
-.sub main :main
-    .local pmc foo
-    .local pmc queue
-    .local pmc thread
-    foo = get_global '_foo'
-    queue = new ['TQueue'] # flag for when the thread is done
-    thread = new ['ParrotThread']
-    thread.'run_clone'(foo, queue)
-
-    thread.'detach'()
-wait:
-    defined $I0, queue
-    if $I0 == 0 goto wait
-    print "done\n"
-.end
-
-.sub _foo
-    .param pmc queue
-    print "thread\n"
-    sleep 0.1
-    $P1 = new ['Integer']
-    push queue, $P1
-.end
-CODE
-/(done\nthread\n)|(thread\ndone\n)/
-OUTPUT
-
-
 pir_output_is( <<'CODE', <<'OUTPUT', "share a PMC" );
 .sub main :main
     .local pmc foo
@@ -353,54 +323,6 @@ thread
 done
 21
 OUTPUT
-
-pir_output_is( <<'CODE', <<'OUT', "multi-threaded" );
-.sub main :main
-    .local pmc queue
-    queue = new ['TQueue']
-    .local pmc tmpInt
-    tmpInt = new ['Integer']
-    tmpInt = 1
-    push queue, tmpInt
-    tmpInt = new ['Integer']
-    tmpInt = 2
-    push queue, tmpInt
-    tmpInt = new ['Integer']
-    tmpInt = 3
-    push queue, tmpInt
-
-    .local pmc thread
-    thread = new ['ParrotThread']
-    .local pmc foo
-    foo = get_global '_foo'
-    thread.'run_clone'(foo, queue)
-    thread.'join'()
-    print "done main\n"
-.end
-
-.sub _foo
-    .param pmc queue
-    $I0 = queue
-    print $I0
-    print "\n"
-loop:
-    $I0 = queue
-    if $I0 == 0 goto done
-    shift $P0, queue
-    print $P0
-    print "\n"
-    branch loop
-done:
-    print "done thread\n"
-.end
-CODE
-3
-1
-2
-3
-done thread
-done main
-OUT
 
 pir_output_is( <<'CODE', <<'OUT', "sub name lookup in new thread" );
 .sub check
@@ -1015,135 +937,6 @@ in main:
 ok (equal)
 42
 OUTPUT
-
-pir_output_is( <<'CODE', <<'OUT', 'multi-threaded strings via SharedRef' );
-.sub main :main
-    .local pmc queue
-    .local pmc tmp_string
-    .local pmc shared_ref
-
-    queue = new ['TQueue']
-    tmp_string = new ['String']
-    tmp_string = "ok 1\n"
-    shared_ref = new ['SharedRef'], tmp_string
-    push queue, shared_ref
-    tmp_string = new ['String']
-    tmp_string = "ok 2\n"
-    shared_ref = new ['SharedRef'], tmp_string
-    push queue, shared_ref
-    tmp_string = new ['String']
-    tmp_string = "ok 3\n"
-    shared_ref = new ['SharedRef'], tmp_string
-    push queue, shared_ref
-
-    .local pmc thread
-    .local pmc foo
-
-    thread = new ['ParrotThread']
-    foo = get_global '_foo'
-    thread.'run_clone'(foo, queue)
-    thread.'join'()
-    print "done main\n"
-.end
-
-.sub _foo
-    .param pmc queue
-    $I0 = queue
-    print $I0
-    print "\n"
-loop:
-    $I0 = queue
-    if $I0 == 0 goto done
-    shift $P0, queue
-    print $P0
-    branch loop
-done:
-    print "done thread\n"
-.end
-CODE
-3
-ok 1
-ok 2
-ok 3
-done thread
-done main
-OUT
-
-SKIP: {
-    skip( "no shared Strings yet", 2 );
-    pasm_output_is( <<'CODE', <<'OUT', "thread safe queue strings 1" );
-    new P10, ['TQueue']
-    print "ok 1\n"
-    set I0, P10
-    print I0
-    print "\n"
-    new P7, ['String']
-    set P7, "ok 2\n"
-    push P10, P7
-    new P7, ['String']
-    set P7, "ok 3\n"
-    push P10, P7
-    set I0, P10
-    print I0
-    print "\n"
-
-    shift P8, P10
-    print P8
-    shift P8, P10
-    print P8
-    end
-CODE
-ok 1
-0
-2
-ok 2
-ok 3
-OUT
-
-    pasm_output_is( <<'CODE', <<'OUT', "multi-threaded strings" );
-    new P10, ['TQueue']
-    new P7, ['String']
-    set P7, "ok 1\n"
-    push P10, P7
-    new P7, ['String']
-    set P7, "ok 2\n"
-    push P10, P7
-    new P7, ['String']
-    set P7, "ok 3\n"
-    push P10, P7
-    set P6, P10
-
-    get_global P5, "_foo"
-    new P2, ['ParrotThread']
-    callmethod "thread3"
-    set I5, P2
-    getinterp P2
-    callmethod "join"
-    print "done main\n"
-    end
-
-.pcc_sub _foo:
-    set I0, P6
-    print I0
-    print "\n"
-loop:
-    set I0, P6
-    unless I0, ex
-    shift P8, P6
-    print P8
-    branch loop
-ex:
-    print "done thread\n"
-    returncc
-CODE
-3
-ok 1
-ok 2
-ok 3
-done thread
-done main
-OUT
-}
 
 # Local Variables:
 #   mode: cperl

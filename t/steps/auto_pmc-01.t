@@ -184,7 +184,6 @@ my @dummy_options = qw(
     fixedstringarray.pmc
     hash.pmc
     orderedhash.pmc
-    tqueue.pmc
     os.pmc
     file.pmc
     addrregistry.pmc

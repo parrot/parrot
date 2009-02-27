@@ -2313,11 +2313,12 @@ threads are still under development, so you can expect significant
 changes in the near future.
 
 As outlined in the previous chapter, Parrot implements three different
-threading models. The following example uses the third model, which
-takes advantage of shared data. It uses a C<TQueue> (thread-safe
-queue) object to synchronize the two parallel running threads. This
-is only a simple example to illustrate threads, not a typical usage of
-threads (no-one really wants to spawn two threads just to print out a
+threading models. (B<Note>:  As of version 1.0, the C<TQueue> PMC will be
+deprecated, rendering the following discussion obsolete.) The following
+example uses the third model, which takes advantage of shared data. It uses a
+C<TQueue> (thread-safe queue) object to synchronize the two parallel running
+threads. This is only a simple example to illustrate threads, not a typical
+usage of threads (no-one really wants to spawn two threads just to print out a
 simple string).
 
     find_global P5, "_th1"              # locate thread function

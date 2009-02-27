@@ -75,10 +75,8 @@ orderedhash.pmc    49
 
 # other
 
-tqueue.pmc    50
+parrotclass.pmc    50
+parrotobject.pmc    51
 
-parrotclass.pmc    51
-parrotobject.pmc    52
-
-os.pmc    53
-file.pmc    54
+os.pmc    52
+file.pmc    53
