@@ -949,7 +949,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
      * tools/dev/pbc_header.pl --upd t/native_pbc/ *.pbc
      * stamps version and fingerprint in the native tests. */
     if (header->bc_major != PARROT_PBC_MAJOR
-    &&  header->bc_minor != PARROT_PBC_MINOR) {
+    ||  header->bc_minor != PARROT_PBC_MINOR) {
         Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read "
             "bytecode files with version %d.%d.\n",
             header->bc_major, header->bc_minor);
