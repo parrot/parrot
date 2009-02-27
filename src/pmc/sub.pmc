@@ -493,7 +493,7 @@ Returns whether the two subroutines are equal.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
+    MULTI INTVAL is_equal(PMC *value) {
 
         Parrot_sub *my_sub, *value_sub;
 
