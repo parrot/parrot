@@ -22,6 +22,7 @@ This file implements various functions for creating and writing packfiles.
 
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
+#include "pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -281,12 +282,14 @@ PackFile_Constant_pack(PARROT_INTERP,
         break;
 
     case PFC_KEY:
-        for (i = 0, key = self->u.key; key; key = (PMC *)PMC_data(key), i++)
-            ;
+        for (i = 0, key = self->u.key; key; i++){
+            GETATTR_Key_next_key(interp, key, key);
+        }
+
         /* number of key components */
         *cursor++ = i;
         /* and now type / value per component */
-        for (key = self->u.key; key; key = (PMC *)PMC_data(key)) {
+        for (key = self->u.key; key;) {
             const opcode_t type = PObj_get_FLAGS(key);
             slice_bits = 0;
             if ((type & (KEY_start_slice_FLAG|KEY_inf_slice_FLAG)) ==
@@ -337,6 +340,7 @@ PackFile_Constant_pack(PARROT_INTERP,
                             "unsupported constant type\n");
                     Parrot_exit(interp, 1);
             }
+            GETATTR_Key_next_key(interp, key, key);
         }
 
         break;

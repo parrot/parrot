@@ -1022,7 +1022,7 @@ $(SRC_DIR)/pmc$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/pmc_freeze$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc_freeze.str
 
-$(SRC_DIR)/hash$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/hash$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
@@ -1051,7 +1051,7 @@ $(SRC_DIR)/exec_start$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
 $(SRC_DIR)/exec_save$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@
 
-$(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str
+$(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str $(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/gc/mark_sweep$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 
@@ -1103,7 +1103,8 @@ $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
 $(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
-    $(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
+	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
+	$(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/inter_cb$(O) : $(SRC_DIR)/inter_cb.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_cb.str
@@ -1140,11 +1141,11 @@ $(SRC_DIR)/multidispatch$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/multidispatch.str \
 	$(SRC_DIR)/pmc/pmc_nci.h $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/packfile$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/packfile.str \
-	$(SRC_DIR)/pmc/pmc_sub.h
+	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h
 
 $(PF_DIR)/pf_items$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 

@@ -28,6 +28,7 @@ don't apply.
 */
 
 #include "parrot/parrot.h"
+#include "pmc/pmc_key.h"
 
 #define INITIAL_BUCKETS 16
 
@@ -1195,22 +1196,26 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 void *
-parrot_hash_get_idx(SHIM_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
+parrot_hash_get_idx(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
 {
     ASSERT_ARGS(parrot_hash_get_idx)
     HashBucket       *b;
     void             *res;
     INTVAL            i  = PMC_int_val(key);
-    const BucketIndex bi = (BucketIndex)PMC_data(key);
+    PMC              *fake_bi;
+    BucketIndex       bi;
 
     /* idx directly in the bucket store, which is at negative
      * address from the data pointer */
     /* locate initial */
     const INTVAL size = (INTVAL)N_BUCKETS(hash->mask + 1);
 
+    GETATTR_Key_next_key(interp, key, fake_bi);
+    bi = (BucketIndex)fake_bi;
+
     if (bi == INITBucketIndex) {
         i             = 0;
-        PMC_data(key) = NULL;
+        SETATTR_Key_next_key(interp, key, NULL);
     }
     else if (i >= size || i < 0) {
         PMC_int_val(key) = -1;

@@ -20,6 +20,7 @@ subroutines.
 #include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "pcc.str"
+#include "../pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -678,7 +679,7 @@ start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
         /* create key needed to iterate the hash */
         st->key              = pmc_new(interp, enum_class_Key);
         PMC_int_val(st->key) = 0;
-        PMC_data(st->key)    = (void *)INITBucketIndex;
+        SETATTR_Key_next_key(interp, st->key, (PMC *)INITBucketIndex);
     }
     else {
         /* src ought to be an array */

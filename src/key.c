@@ -21,6 +21,7 @@ The base vtable calling functions.
 #include "parrot/parrot.h"
 #include "parrot/key.h"
 #include "key.str"
+#include "pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: include/parrot/key.h */
 
@@ -494,9 +495,15 @@ PMC *
 key_next(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_next)
-    return VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext
-        ? (PMC *)PMC_data(key)
-        : NULL;
+    PMC *next_key;
+
+    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key")) && key->pmc_ext) {
+        GETATTR_Key_next_key(interp, key, next_key);
+        return next_key;
+    }
+    else {
+        return NULL;
+    }
 }
 
 
@@ -519,16 +526,20 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
+key_append(PARROT_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
 {
     ASSERT_ARGS(key_append)
     PMC *tail = key1;
+    PMC *tail_next;
 
-    while (PMC_data(tail)) {
-        tail = (PMC *)PMC_data(tail);
+    GETATTR_Key_next_key(interp, tail, tail_next);
+
+    while (tail_next) {
+        tail = tail_next;
+        GETATTR_Key_next_key(interp, tail, tail_next);
     }
 
-    PMC_data(tail) = key2;
+    SETATTR_Key_next_key(interp, tail, key2);
 
     return key1;
 }
@@ -550,6 +561,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_mark)
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
+    PMC          *next_key;
 
     if (flags == KEY_string_FLAG)
         pobject_lives(interp, (PObj *)PMC_str_val(key));
@@ -557,13 +569,15 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
     /*
      * KEY_hash_iterator_FLAGS denote a hash key iteration, PMC_data() is
      * the bucket_index and not the next key component
+     * Note to self: shoot whoever thought this was a good idea.
      */
     if (flags == KEY_hash_iterator_FLAGS)
         return;
 
     /* if iteration hasn't started, above flag isn't set yet */
-    if (PMC_data(key) && PMC_data(key) != (void *)INITBucketIndex)
-        pobject_lives(interp, (PObj *)PMC_data(key));
+    GETATTR_Key_next_key(interp, key, next_key);
+    if (next_key && (void *)next_key != (void *)INITBucketIndex)
+        pobject_lives(interp, (PObj *)next_key);
 
 }
 
@@ -590,8 +604,9 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     STRING * const semicolon = CONST_STRING(interp, " ; ");
     STRING * const quote     = CONST_STRING(interp, "'");
     STRING        *value     = Parrot_str_new(interp, "[ ", 2);
+    PMC           *next_key;
 
-    for (; key; key = (PMC *)PMC_data(key)) {
+    for (;key;) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 value = Parrot_str_append(interp, value,
@@ -629,8 +644,11 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
                 break;
         }
 
-        if (PMC_data(key))
+        GETATTR_Key_next_key(interp, key, next_key);
+        if (next_key)
             value = Parrot_str_append(interp, value, semicolon);
+
+        GETATTR_Key_next_key(interp, key, key);
     }
 
     value = Parrot_str_append(interp, value, Parrot_str_new(interp, " ]", 2));

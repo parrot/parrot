@@ -45,7 +45,8 @@ typedef enum {
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
-PMC * key_append(SHIM_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
+PMC * key_append(PARROT_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*key1);
@@ -169,7 +170,8 @@ STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_key_append __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(key1) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key1) \
     || PARROT_ASSERT_ARG(key2)
 #define ASSERT_ARGS_key_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

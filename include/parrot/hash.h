@@ -137,9 +137,10 @@ HashBucket * parrot_hash_get_bucket(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-void * parrot_hash_get_idx(SHIM_INTERP,
+void * parrot_hash_get_idx(PARROT_INTERP,
     ARGIN(const Hash *hash),
     ARGMOD(PMC *key))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*key);
@@ -281,7 +282,8 @@ void parrot_new_pmc_hash_x(PARROT_INTERP,
     || PARROT_ASSERT_ARG(hash) \
     || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_parrot_hash_get_idx __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(hash) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(hash) \
     || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_parrot_hash_put __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

@@ -31,6 +31,7 @@ about the structure of the frozen bytecode.
 #include "../compilers/imcc/imc.h"
 #include "packfile.str"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -3734,9 +3735,10 @@ PackFile_Constant_pack_size(PARROT_INTERP, ARGIN(const PackFile_Constant *self))
         case PFC_KEY:
             packed_size = 1;
 
-            for (component = self->u.key; component;
-                    component = (PMC *)PMC_data(component))
+            for (component = self->u.key; component;){
                 packed_size += 2;
+                GETATTR_Key_next_key(interp, component, component);
+            }
             break;
 
         case PFC_PMC:
@@ -3915,11 +3917,11 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
             pmc_enum = enum_class_Slice;
 
         if (tail) {
-            PMC_data(tail) = constant_pmc_new_noinit(interp, pmc_enum);
-            tail = (PMC *)PMC_data(tail);
+            SETATTR_Key_next_key(interp, tail, constant_pmc_new(interp, pmc_enum));
+            GETATTR_Key_next_key(interp, tail, tail);
         }
         else
-            head = tail = constant_pmc_new_noinit(interp, pmc_enum);
+            head = tail = constant_pmc_new(interp, pmc_enum);
 
         VTABLE_init(interp, tail);
 

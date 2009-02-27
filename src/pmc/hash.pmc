@@ -20,6 +20,7 @@ These are the vtable functions for the Hash PMC.
 
 #include "parrot/parrot.h"
 #include "pmc_iterator.h"
+#include "pmc_key.h"
 
 /*
 
@@ -541,7 +542,7 @@ Returns the PMC value for the element at C<*key>.
 
         SETATTR_Iterator_key(INTERP, iter, key);
         PObj_get_FLAGS(key) |= KEY_hash_iterator_FLAGS;
-        PMC_data(key)        = (void *)INITBucketIndex;
+        SETATTR_Key_next_key(INTERP, key, (PMC *)INITBucketIndex);
 
         /* -1 for an empty hash, 0 for a non-empty hash.  */
         PMC_int_val(key)     =

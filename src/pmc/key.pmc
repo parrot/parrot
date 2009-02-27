@@ -21,6 +21,8 @@ These are the vtable functions for the Key PMC class.
 #include "parrot/parrot.h"
 
 pmclass Key need_ext {
+    ATTR PMC *next_key; /* Sometimes it's the next key, sometimes it's not.
+                           The Key code is like that. */
 
 /*
 
@@ -33,7 +35,25 @@ Initializes the key.
 */
 
     VTABLE void init() {
-        PObj_custom_mark_SET(SELF);
+
+        Parrot_Key_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_Key_attributes);
+
+        PMC_data(SELF) = attrs;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroy this Key, but not in the way anyone reading its code would want.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -47,11 +67,11 @@ Creates and returns a clone of the key.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = pmc_new_noinit(INTERP, SELF->vtable->base_type);
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
         PMC *dkey        = dest;
         PMC *key         = SELF;
 
-        PObj_custom_mark_SET(dest);
+        PObj_custom_mark_destroy_SETALL(dest);
 
         for (; key ;) {
             switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
@@ -323,7 +343,7 @@ PMC_int_val(-1) means end of iteration.
 
                 /* iterating over a hash additionally needs the Bucket index */
                 if (KEY_IS_HASH_ITERATOR(ret))
-                    PMC_data(ret) = (void *)INITBucketIndex;
+                    SET_ATTR_next_key(INTERP, ret, (PMC *)INITBucketIndex);
 
                 break;
             case ITERATE_GET_NEXT:
@@ -377,14 +397,18 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 */
 
     VTABLE void visit(visit_info *info) {
+
+        Parrot_Key_attributes *attrs;
         /* at end a PMCNULL is written during thaw, which should stop visiting
          * the key */
 
-        /* this two-stage casting avoids type punning warnings with -O */
-        DPOINTER ** const data = (DPOINTER **)&PMC_data(SELF);
-        PMC      ** const pos  = (PMC **)data;
-        info->thaw_ptr         = pos;
-        (info->visit_pmc_now)(INTERP, *pos, info);
+        /* Sometimes visit gets an uninitialized Key.  Initialize it. */
+        if (!PMC_data(SELF))
+            SELF.init();
+
+        attrs = (Parrot_Key_attributes *)PMC_data(SELF);
+        info->thaw_ptr  = &attrs->next_key;
+        (info->visit_pmc_now)(INTERP, attrs->next_key, info);
     }
 
     void freeze(visit_info *info) {
@@ -447,10 +471,11 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         PMC *key = SELF;
 
         while (1) {
-            PMC * const next = (PMC *)PMC_data(key);
+            PMC *next;
+            GET_ATTR_next_key(INTERP, key, next);
 
             if (PMC_IS_NULL(next)) {
-                PMC_data(key) = NULL;
+                SET_ATTR_next_key(INTERP, key, NULL);
                 break;
             }
 
