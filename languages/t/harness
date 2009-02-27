@@ -27,7 +27,7 @@ or
 
 =item Selected languages
 
-    cd languages && perl t/harness --languages=pynie,punie
+    cd languages && perl t/harness --languages=abc,lolcode
 
 =item Per Language Harness
 
@@ -85,7 +85,7 @@ my @unified_testable_languages
               jako
               lisp
               ook
-              parrot_compiler punie
+              parrot_compiler
               regex
             );
 my @harnesses
