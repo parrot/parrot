@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -22,6 +22,7 @@ L<http://e2fsprogs.sourceforge.net/>
 .namespace ['uuid']
 
 .sub '__onload' :anon :load :init
+    load_bytecode 'Math/Rand.pbc'
     $P0 = subclass 'FixedIntegerArray', 'uuid'
 .end
 
@@ -96,16 +97,23 @@ CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
     .local pmc res
     new res, 'uuid'
     set res, N
-    new $P0, 'Random'
+    .local pmc rand
+    rand = get_hll_global [ 'Math'; 'Rand' ], 'rand'
+    .local pmc srand
+    srand = get_hll_global [ 'Math'; 'Rand' ], 'srand'
+    .local int RAND_MAX
+    $P0 = get_hll_global [ 'Math'; 'Rand' ], 'RAND_MAX'
+    RAND_MAX = $P0()
+    inc RAND_MAX
     time $I0    # less than enough entropy
-    set $P0, $I0
+    srand($I0)
     .local int i
     i = 0
   L1:
     unless i < N goto L2
-    $N0 = $P0
-    $N0 *= 256
-    $I0 = floor $N0
+    $I0 = rand()
+    $I0 *= 256
+    $I0 /= RAND_MAX
     res[i] = $I0
     inc i
     goto L1
@@ -133,16 +141,23 @@ CURRENTLY, UNUSABLE. NEED A SOURCE OF ENTROPY.
     .local pmc res
     new res, 'uuid'
     set res, N
-    new $P0, 'Random'
-    time $I0    # less than enough entropy
-    set $P0, $I0
+    .local pmc rand
+    rand = get_hll_global [ 'Math'; 'Rand' ], 'rand'
+    .local pmc srand
+    srand = get_hll_global [ 'Math'; 'Rand' ], 'srand'
+     .local int RAND_MAX
+    $P0 = get_hll_global [ 'Math'; 'Rand' ], 'RAND_MAX'
+    RAND_MAX = $P0()
+    inc RAND_MAX
+   time $I0    # less than enough entropy
+    srand($I0)
     .local int i
     i = 10
   L1:
     unless i < N goto L2
-    $N0 = $P0
-    $N0 *= 256
-    $I0 = floor $N0
+    $I0 = rand()
+    $I0 *= 256
+    $I0 /= RAND_MAX
     res[i] = $I0
     inc i
     goto L1
