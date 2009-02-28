@@ -51,7 +51,7 @@ then
             # try --floatval="long double" and see if that makes 12
             enable_long_double=1
             # force double on 2nd run not to default to long double
-            conf=" --floatval='double'"
+            conf=" --floatval=double"
         fi
     else
         if [ "$byteorder" == "4321" ]
@@ -83,14 +83,24 @@ else
                 # try --floatval="long double" and see if that makes 16
                 enable_long_double=1
                 # force double on 2nd run not to default to long double
-                conf=" --floatval='double'"
+                conf=" --floatval=double"
             else
                 N=5
-                echo "5: x86_64 double float 64 bit opcode_t, 16-byte long double"
+                echo "5: x86_64 64 bit opcode_t, 16-byte long double"
             fi
         else
-            N=6
-            echo "6: big-endian 64-bit"
+            if [ "$numvalsize" == "8" ]
+            then
+                N=6
+                echo "6: big-endian 64-bit"
+                # try --floatval="long double" and see if that makes 16
+                enable_long_double=1
+                # force double on 2nd run not to default to long double
+                conf=" --floatval=double"
+            else
+                N=7
+                echo "7: ppc/BE 64 bit opcode_t, 16-byte long double"
+            fi
         fi
     else
         echo "unsupported ptrsize $ptrsize"

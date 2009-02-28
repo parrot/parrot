@@ -12,9 +12,9 @@ Parrot::BuildUtil - Utilities for building Parrot
 
 =head1 DESCRIPTION
 
-This package holds three subroutines:  C<parrot_version()>, C<slurp_file>,
-and C<generated_file_header>. Subroutines are not exported--each must be
-requested by using a fully qualified name.
+This package holds pre-configure time subroutines, which are not exported
+and should not require Parrot::Config.
+Each must be requested by using a fully qualified name.
 
 =head1 SUBROUTINES
 
@@ -134,13 +134,35 @@ END_HEADER
     return $header;
 }
 
+=item C<get_bc_version()>
+
+Return an array of ($bc_major, $bc_minor) from F<PBC_COMPAT>.
+This is used in the native_pbc tests.
+
+See also F<tools/dev/pbc_header.pl> and F<tools/build/pbcversion_h.pl>.
+
+=cut
+
+sub get_bc_version {
+    my $compat_file = 'PBC_COMPAT';
+    my ( $bc_major, $bc_minor );
+    open my $IN, '<', $compat_file or die "Can't read $compat_file";
+    while (<$IN>) {
+        if (/^(\d+)\.0*(\d+)/) {
+            ( $bc_major, $bc_minor ) = ( $1, $2 );
+            last;
+        }
+    }
+    unless ( defined $bc_major && defined $bc_minor ) {
+        die "No bytecode version found in '$compat_file'.";
+    }
+    close $IN;
+    return ( $bc_major, $bc_minor );
+}
+
 1;
 
 =back
-
-=head1 AUTHOR
-
-Gregor N. Purdy.  Revised by James E Keenan.
 
 =cut
 

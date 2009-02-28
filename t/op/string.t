@@ -2358,6 +2358,7 @@ ok 9
 ok 10
 OUTPUT
 
+# string_133.pasm, used for t/native_pbc/string.t
 pasm_output_is( <<'CODE', <<'OUTPUT', 'bxors 2' );
  set S1, "a2c"
  set S2, "Dw"
@@ -2450,6 +2451,7 @@ OUTPUT
 
 SKIP: {
     skip( "No unicode yet", 1 );
+    # This was the previous test used for t/native_pbc/string.t
     pasm_output_is( <<'CODE', <<'OUTPUT', 'bnots 2' );
  getstdout P0
  push P0, "utf8"
