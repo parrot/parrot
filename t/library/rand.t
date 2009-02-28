@@ -20,7 +20,7 @@ t/library/rand.t - rand tests
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'rand / srand' );
 .sub test :main
-    load_bytecode 'Math/rand.pbc'
+    load_bytecode 'Math/Rand.pbc'
     .local pmc rand
     rand = get_global [ 'Math'; 'Rand' ], 'rand'
     .local pmc srand
@@ -50,7 +50,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'RAND_MAX' );
 .sub test :main
-    load_bytecode 'Math/rand.pbc'
+    load_bytecode 'Math/Rand.pbc'
     .local pmc rand_max
     rand_max = get_global [ 'Math'; 'Rand' ], 'RAND_MAX'
     $I0 = rand_max()

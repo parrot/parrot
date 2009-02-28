@@ -34,7 +34,7 @@ Portage of the following C implementation, given as example by ISO/IEC 9899:1999
 
 =head1 USAGE
 
-    load_bytecode 'library/Math/rand.pbc'
+    load_bytecode 'library/Math/Rand.pbc'
     .local pmc rand
     rand = get_global [ 'Math'; 'Rand' ], 'rand'
     .local pmc srand

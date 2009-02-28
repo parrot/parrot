@@ -252,7 +252,7 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/Getopt/Obj.pbc \
     $(LIBRARY_DIR)/JSON.pbc \
     $(LIBRARY_DIR)/Math/Random/mt19937ar.pbc \
-    $(LIBRARY_DIR)/Math/rand.pbc \
+    $(LIBRARY_DIR)/Math/Rand.pbc \
     $(LIBRARY_DIR)/MIME/Base64.pbc \
     $(LIBRARY_DIR)/NCI/call_toolkit_init.pbc \
     $(LIBRARY_DIR)/ncurses.pbc \
