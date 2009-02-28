@@ -1733,6 +1733,15 @@ test-clean :
     "t/stress/*.pbc" \
     "t/tools/*.pbc"
 	$(RM_F) \
+	"t/dynpmc/md2.t" \
+	"t/dynpmc/md4.t" \
+	"t/dynpmc/md5.t" \
+	"t/dynpmc/ripemd160.t" \
+	"t/dynpmc/sha.t" \
+	"t/dynpmc/sha1.t" \
+	"t/dynpmc/sha256.t" \
+	"t/dynpmc/sha512.t" \
+	$(RM_F) \
     "t/src/*.c" \
     "t/src/*.pdb" \
     "t/src/*.manifest"
