@@ -80,8 +80,6 @@ Portage of the following C implementation, given as example by ISO/IEC 9899:1999
 .end
 
 
-=back
-
 =head1 AUTHORS
 
 Francois Perrad
