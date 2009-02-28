@@ -608,19 +608,21 @@ win32-inno-installer: installable
 @no_doc@	-$(MKPATH) man/html
 @no_doc@	pod2html --infile doc/running.pod --outfile man/html/parrot-@lclang@.html
 	$(CP) installable_@lclang@@exe@ parrot-@lclang@.exe
-	cd @build_dir@ && $(PERL) tools/dev/mk_inno_language.pl @lclang@
-	cd @build_dir@ && iscc parrot-@lclang@.iss
+	$(PERL) @build_dir@/tools/dev/mk_inno_language.pl @lclang@
+	iscc parrot-@lclang@.iss
 
 # clean intermediate test files
 testclean:
 
-CLEANUPS = \
+CLEANUPS := \
   @lclang@.pbc \
   "src/gen_*.pir" \
   "*.c" \
   "*$(O)" \
   @lclang@@exe@ \
 #IF(win32):  parrot-@lclang@.exe \
+#IF(win32):  parrot-@lclang@.iss \
+#IF(win32):  "setup-parrot-*.exe" \
   installable_@lclang@@exe@
 
 clean: testclean
