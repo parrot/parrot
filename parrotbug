@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# Copyright (C) 2004-2007, Parrot Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 #
 
@@ -15,10 +15,10 @@ use File::Spec;
 use Getopt::Long;
 
 
-my $VERSION = "0.6.1";
+my $VERSION = "1.0";
 
 # These are the standard addresses for reporting bugs.
-my %std_to = 
+my %std_to =
   ( bug => 'parrotbug@parrotcode.org',
     ok  => 'parrotstatus-ok@parrotcode.org',
     nok => 'parrotstatus-nok@parrotcode.org',
@@ -436,7 +436,7 @@ sub edit_bug_report {
 
     # Launch editor.
     my $retval;
-    $retval = system("$editor $filename");
+    $retval = system($editor, $filename);
 
     # Check whether editor run was successful.
     die <<EOT if $retval;
