@@ -7,6 +7,7 @@ CP            := @cp@
 CHMOD         := @chmod@
 LOAD_EXT      := @load_ext@
 BUILD_DIR     := @build_dir@
+RECONFIGURE   := $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 INSTALL_DIR   := $(BUILD_DIR)@slash@runtime@slash@parrot@slash@dynext
 O             := @o@
 CC            := @cc@ -c
@@ -23,9 +24,8 @@ BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
 BUILD_LIB_DIR   := $(BUILD_DIR)@slash@blib@slash@lib
 PMC2C           := $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
 INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
-#IF(win32):LINKARGS        := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
-#ELSIF(cc==gcc):LINKARGS       := -Wl,-L $(BUILD_LIB) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
-#ELSE:LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+#IF(!cygwin and cc==gcc):LINKARGS       := -Wl,-L $(BUILD_LIB_DIR) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
+#ELSE:LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 
 PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
 PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
@@ -78,22 +78,25 @@ CLEANUPS := \
   "pmc_*.h" \
   "*_group.h" \
   "*.dump" \
-  "*$(O)" \
+#IF(o):  "*@o@" \
 #IF(win32):  "*.lib" \
 #IF(win32):  "*.pdb" \
 #IF(win32):  "*.ilk" \
 #IF(win32):  "*.exp" \
 #IF(win32):  "*.def" \
 #IF(win32):  "*.manifest" \
-  "*$(LOAD_EXT)"
+#IF(load_ext):  "*@load_ext@"
 
 
 all : install
 
 install : $(PMC_TARGETS)
-#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+#IF(cygwin or hpux):	$(CHMOD) 0775 "*$(LOAD_EXT)"
 	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
+#IF(cygwin or hpux):	$(CHMOD) 0775 "$(INSTALL_DIR)/*$(LOAD_EXT)"
 
+Makefile: ../../config/gen/makefiles/dynpmc.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=src/dynpmc/Makefile
 
 dynlexpad$(LOAD_EXT): dynlexpad$(O)
 	$(LD) $(LD_OUT)dynlexpad$(LOAD_EXT) dynlexpad$(O) $(LINKARGS)

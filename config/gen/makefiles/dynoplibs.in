@@ -7,6 +7,7 @@ CP            := @cp@
 CHMOD         := @chmod@
 LOAD_EXT      := @load_ext@
 BUILD_DIR     := @build_dir@
+RECONFIGURE   := $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
 INSTALL_DIR   := $(BUILD_DIR)/runtime/parrot/dynext
 O             := @o@
 CC            := @cc@ -c
@@ -22,8 +23,7 @@ LD_OUT        := @ld_out@
 BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
 OPS2C           := $(PERL) -I$(BUILD_DIR)@slash@lib $(BUILD_TOOLS_DIR)@slash@ops2c.pl
 INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
-#IF(win32):LINKARGS        := @libs@ @icu_shared@ $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
-#ELSE:LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
+LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 
 OPS_TARGETS := \
 #IF(cg_flag):  myops_ops_cg$(LOAD_EXT) \
@@ -38,20 +38,23 @@ OPS_TARGETS := \
 CLEANUPS := \
   "*.c" \
   "*.h" \
-  "*$(O)" \
+#IF(o):  "*@o@" \
 #IF(win32):  "*.lib" \
 #IF(win32):  "*.pdb" \
 #IF(win32):  "*.ilk" \
 #IF(win32):  "*.exp" \
 #IF(win32):  "*.def" \
 #IF(win32):  "*.manifest" \
-  "*$(LOAD_EXT)"
+#IF(load_ext):  "*@load_ext@"
 
 
 all : $(OPS_TARGETS)
-#IF(cygwin or hpux):	CHMOD 0775 "*$(LOAD_EXT)"
+#IF(cygwin or hpux):	$(CHMOD) 0775 "*$(LOAD_EXT)"
 	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
+#IF(cygwin or hpux):	$(CHMOD) 0775 "$(INSTALL_DIR)/*$(LOAD_EXT)"
 
+Makefile: ../../config/gen/makefiles/dynoplibs.in
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=src/dynoplibs/Makefile
 
 myops_ops$(LOAD_EXT): myops_ops$(O)
 	$(LD) $(LD_OUT)myops_ops$(LOAD_EXT) myops_ops$(O) $(LINKARGS)
