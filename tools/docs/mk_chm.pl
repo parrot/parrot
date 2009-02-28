@@ -27,6 +27,7 @@ use lib qw( lib ../lib ../../lib );
 use File::Copy;
 use File::Find;
 use Parrot::Config;
+use Parrot::Docs::Section::Parrot;
 
 copy('docs/resources/parrot.css', 'docs/html/parrot.css');
 copy('docs/resources/parrot_logo.png', 'docs/html/parrot_logo.png');
@@ -39,23 +40,11 @@ sub alter_html {
 
 my $version = $PConfig{VERSION} . $PConfig{DEVEL};
 
-my $filename = 'docs/html/index.html';
-open my $IN, '<', $filename
-    or die "Can't open $filename ($!)";
-my $toc;
-while (<$IN>) {
-    if (/^<a href=\"(\w+\.\w+)\">(.*)<\/a>/) {
-        $toc .= <<"TEXT";
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="$2">
-              <param name="Local" value="$1">
-            </OBJECT>
-TEXT
-    }
-}
-close $IN;
+my $docs = Parrot::Docs::Section::Parrot->new;
+my $dist = Parrot::Distribution->new;
+my $toc  = $docs->build_toc_chm( $dist );
 
-$filename = 'docs/html/parrot.hhp';
+my $filename = 'docs/html/parrot.hhp';
 open my $OUT, '>', $filename
     or die "Can't open $filename ($!)";
 print $OUT <<"TEXT";
@@ -108,16 +97,9 @@ print $OUT <<"TEXT";
       <param name="ImageType" value="Folder">
     </OBJECT>
     <UL>
-      <LI> <OBJECT type="text/sitemap">
-          <param name="Name" value="Contents">
-          <param name="Local" value="index.html">
-          <param name="ImageNumber" value="1">
-        </OBJECT>
-        <UL>
-$toc        </UL>
+$toc
       <LI> <OBJECT type="text/sitemap">
           <param name="Name" value="Book">
-          <param name="ImageNumber" value="1">
         </OBJECT>
         <UL>
           <LI> <OBJECT type="text/sitemap">

@@ -190,6 +190,54 @@ sub contents_relative_to_source {
     return @contents;
 }
 
+sub build_toc_chm {
+    my $self = shift;
+    my $source = shift;
+    my $indent = shift || q{ } x 6;
+
+    my $toc = q{};
+    $toc .= qq{$indent<LI> <OBJECT type="text/sitemap">\n};
+    $toc .= qq{$indent    <param name="Name" value="$self->{NAME}">\n};
+    $toc .= qq{$indent    <param name="Local" value="$self->{INDEX_PATH}">\n}
+        if (exists $self->{INDEX_PATH});
+    $indent .= q{ } x 2;
+    $toc .= qq{$indent</OBJECT>\n};
+    $toc .= qq{$indent<UL>\n};
+    foreach my $content ( @{ $self->{CONTENTS} } ) {
+        if ( ref $content ) {
+            if ( $content->isa('Parrot::Docs::Group') ) {
+                $toc .= $content->build_toc_chm( $source, $indent );
+            }
+            else {
+                foreach my $item ( @{ $content->{CONTENTS} } ) {
+                    my @rel_paths  = $self->file_paths_relative_to_source( $source, $item );
+                    foreach my $rel_path (@rel_paths) {
+                        my $file = $source->file_with_relative_path($rel_path);
+                        next if ( !$file->contains_pod && !$file->is_docs_link );
+                        $toc .= qq{$indent  <LI> <OBJECT type="text/sitemap">\n};
+                        $toc .= qq{$indent      <param name="Name" value="$rel_path">\n};
+                        $toc .= qq{$indent      <param name="Local" value="$rel_path.html">\n};
+                        $toc .= qq{$indent    </OBJECT>\n};
+                    }
+                }
+            }
+        }
+        else {
+            my @rel_paths  = $self->file_paths_relative_to_source( $source, $content );
+            foreach my $rel_path (@rel_paths) {
+                my $file = $source->file_with_relative_path($rel_path);
+                next if ( !$file->contains_pod && !$file->is_docs_link );
+                $toc .= qq{$indent  <LI> <OBJECT type="text/sitemap">\n};
+                $toc .= qq{$indent      <param name="Name" value="$rel_path">\n};
+                $toc .= qq{$indent      <param name="Local" value="$rel_path.html">\n};
+                $toc .= qq{$indent    </OBJECT>\n};
+            }
+        }
+    }
+    $toc .= qq{$indent</UL>\n};
+    return $toc;
+}
+
 =back
 
 =head1 SEE ALSO
