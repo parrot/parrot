@@ -42,10 +42,10 @@ my $version = $PConfig{VERSION} . $PConfig{DEVEL};
 my $filename = 'docs/html/index.html';
 open my $IN, '<', $filename
     or die "Can't open $filename ($!)";
-my $index;
+my $toc;
 while (<$IN>) {
     if (/^<a href=\"(\w+\.\w+)\">(.*)<\/a>/) {
-        $index .= <<"TEXT";
+        $toc .= <<"TEXT";
           <LI> <OBJECT type="text/sitemap">
               <param name="Name" value="$2">
               <param name="Local" value="$1">
@@ -101,7 +101,7 @@ open $OUT, '>', $filename
 print $OUT <<"TEXT";
 <HTML>
   <HEAD>
-    <meta name="generator" content="idl2html 2.60 (Perl 5.010000)">
+    <meta name="generator" content="(Perl $])">
   </HEAD>
   <BODY>
     <OBJECT type="text/site properties">
@@ -109,11 +109,12 @@ print $OUT <<"TEXT";
     </OBJECT>
     <UL>
       <LI> <OBJECT type="text/sitemap">
-          <param name="Name" value="What's in the Parrot distribution?">
+          <param name="Name" value="Contents">
+          <param name="Local" value="index.html">
           <param name="ImageNumber" value="1">
         </OBJECT>
         <UL>
-$index        </UL>
+$toc        </UL>
       <LI> <OBJECT type="text/sitemap">
           <param name="Name" value="Book">
           <param name="ImageNumber" value="1">
