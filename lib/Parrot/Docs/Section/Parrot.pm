@@ -57,15 +57,23 @@ sub new {
     my $self = shift;
 
     return $self->SUPER::new(
-        'Contents',                            'index.html',
-        'What\'s in the Parrot distribution?', Parrot::Docs::Section::Info->new,
-        Parrot::Docs::Section::Docs->new,      Parrot::Docs::Section::Examples->new,
-        Parrot::Docs::Section::PMCs->new,      Parrot::Docs::Section::DynaPMCs->new,
-        Parrot::Docs::Section::C->new,         Parrot::Docs::Section::Ops->new,
-        Parrot::Docs::Section::IMCC->new,      Parrot::Docs::Section::Perl->new,
-        Parrot::Docs::Section::Libs->new,      Parrot::Docs::Section::Tools->new,
-        Parrot::Docs::Section::Languages->new, Parrot::Docs::Section::Config->new,
-        Parrot::Docs::Section::Tests->new,     Parrot::Docs::Section::EditorPlugins->new,
+        'Contents', 'index.html',
+        'What\'s in the Parrot distribution?',
+        Parrot::Docs::Section::Info->new,
+        Parrot::Docs::Section::Docs->new,
+        Parrot::Docs::Section::Examples->new,
+        Parrot::Docs::Section::PMCs->new,
+        Parrot::Docs::Section::DynaPMCs->new,
+        Parrot::Docs::Section::C->new,
+        Parrot::Docs::Section::Ops->new,
+        Parrot::Docs::Section::IMCC->new,
+        Parrot::Docs::Section::Perl->new,
+        Parrot::Docs::Section::Libs->new,
+        Parrot::Docs::Section::Tools->new,
+        Parrot::Docs::Section::Languages->new,
+        Parrot::Docs::Section::Config->new,
+        Parrot::Docs::Section::Tests->new,
+        Parrot::Docs::Section::EditorPlugins->new,
     );
 }
 
