@@ -1740,7 +1740,7 @@ test-clean :
 	"t/dynpmc/sha.t" \
 	"t/dynpmc/sha1.t" \
 	"t/dynpmc/sha256.t" \
-	"t/dynpmc/sha512.t" \
+	"t/dynpmc/sha512.t"
 	$(RM_F) \
     "t/src/*.c" \
     "t/src/*.pdb" \
