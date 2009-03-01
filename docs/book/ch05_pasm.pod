@@ -271,16 +271,21 @@ default functionality, but mainly throws exceptions when the default
 variant of a method is called (meaning the subclass didn't define the
 method).
 
-=head3 Type morphing
+=head3 Autoboxing
 
 Z<CHP-5-SECT-2.2.3>
 
-X<typemorphing>
-The classes C<Undef>X<Undef PMC>, C<Int>,
-C<Num>X<Num PMC>, and C<String>X<String PMC> implement
-Perl's polymorphic scalar behavior. Assigning a string to a number PMC
-morphs it into a string PMC. Assigning an integer value morphs it to a
-C<Int>, and assigning C<undef> morphs it to C<Undef>:
+X<Auboboxing>
+As we've seen in the previous chapters about PIR, we can convert between
+primitive string, integer, and number types and PMCs. PIR used the C<=>
+operator to make these conversions. PASM doesn't have any symbolic operators
+so we have to use the underlying opcodes directly. In this case, the C<set>
+opcode is used to perform data copying and data conversions automatically.
+
+Assigning a primitive data type to a PMC of a String, Integer, or Float type
+converts that PMC to the new type. So, assigning a string to a Number PMC
+converts it into a String PMC. Assigning an integer value converts it to a
+C<Integer>, and assigning C<undef> morphs it to C<Undef>:
 
   new P0, "String"
   set P0, "Ford\n"
@@ -289,13 +294,15 @@ C<Int>, and assigning C<undef> morphs it to C<Undef>:
   print P0           # prints 42
   print "\n"
   typeof S0, P0
-  print S0           # prints "Int"
+  print S0           # prints "Integer"
   print "\n"
   end
 
 C<P0> starts as a C<String>, but when C<set> assigns it an integer
 value 42 (replacing the old string value C<"Ford">), it changes type
-to C<Int>.
+to C<Integer>. This behavior only works for the wrapper PMC types for the
+primitive values string, int, and num. Other PMC classes will have different
+behaviors when you try to assign a primitive value to them.
 
 =head2 Math Operations
 
@@ -419,11 +426,9 @@ variant that implements C's C<atan2()>:
 Z<CHP-5-SECT-2.4>
 
 X<PASM (Parrot assembly language);string operations>
-String operations work with string registers and with PMCs that
-implement a string class.
-
-String operations on PMC registers require all their string arguments
-to be String PMCs.
+String operations work with string registers and with PMCs that implement a
+string class. String operations on PMC registers require all their string
+arguments to be String PMCs.
 
 =head3 Concatenating strings
 
@@ -969,7 +974,7 @@ PMC in the final string result.
   push P0, 0
   push P0, "parrot"
   join S0, "__", P0
-  print S0		# prints "hi__0__1__0__parrot"
+  print S0              # prints "hi__0__1__0__parrot"
   end
 
 This example builds a C<Array> in C<P0> with the values C<"hi">,
@@ -993,92 +998,6 @@ stores them in an array in C<P0>. It then prints out the first and
 third elements of the array. For now, the split pattern (the second
 argument to the opcode) is ignored except for a test to make sure that
 its length is zero.
-
-=head2 I/O Operations
-
-Z<CHP-5-SECT-2.5>
-
-X<PASM (Parrot assembly language);I/O operations>
-The I/O subsystem has at least one set of significant revisions ahead,
-so you can expect this section to change. It's worth an introduction,
-though, because the basic set of opcodes is likely to stay the same,
-even if their arguments and underlying functionality change.
-
-=head3 Open and close a file
-
-Z<CHP-5-SECT-2.5.1>
-
-The C<open>X<open opcode (PASM)> opcode opens a file for access. It
-takes three arguments: a destination register, the name of the file,
-and a modestring. It returns a C<ParrotIO>X<ParrotIO object> object on
-success and a C<Undef>X<Undef PMC> X<I/O;failure> object on
-failure. The C<ParrotIO> object hides OS-specific details.
-
-  open P0, "people.txt", "r"
-
-The modestring specifies whether the file is opened in read-only
-(C<r>), write-only (C<w>), read-write (C<rw>), or append
-mode (C<wa>).
-
-The C<close>X<close opcode (PASM)> opcode closes a C<ParrotIO> object:
-
-  close P0        # close a PIO
-
-=head3 Output operations
-
-Z<CHP-5-SECT-2.5.2>
-
-We already saw the C<print>X<print opcode (PASM)> opcode in several
-examples above. The one argument form prints a register or constant to
-C<stdout>. It also has a two-argument form: the first argument is the
-C<ParrotIO> object where the value is printed.
-
-  print P0, "xxx"         # print to PIO in P0
-
-The C<getstdin>, C<getstdout>, and C<getstderr> opcodes return
-C<ParrotIO> objects for the C<stdio> streams:
-
-  getstdin P0
-  gestdout P0
-  getstderr P0
-
-Printing to C<stderr> has a shortcut:
-
-  printerr "troubles"
-  getstderr P10
-  print P10, "troubles"	  # same
-
-=head3 Reading from files
-
-Z<CHP-5-SECT-2.5.3>
-
-The C<read>X<read opcode (PASM)> opcode reads a specified number of
-bytes from either C<stdin> or a C<ParrotIO> object:
-
-  read S0, I0             # read from stdin up to I0 bytes into S0
-  read S0, P0, I0         # read from the PIO in P0 up to I0 bytes
-
-C<readline>X<readline opcode (PASM)> is a variant of C<read> that
-works with C<ParrotIO> objects. It reads a whole line at a time,
-terminated by the newline character:
-
-  getstdin P0
-  readline S0, P0         # read a line from stdin
-
-The C<seek>X<seek opcode (PASM)> opcode sets the current file position
-on a C<ParrotIO> object. It takes four arguments: a destination
-register, a C<ParrotIO> object, an offset, and a flag specifying the
-origin point:
-
-  seek I0, P0, I1, I2
-
-In this example, the position of C<P0> is set by an offset (C<I1>)
-from an origin point (C<I2>). 0 means the offset is from the start of
-the file, 1 means the offset is from the current position, and 2 means
-the offset is from the end of the file. The return value (in C<I0>) is
-0 when the position is successfully set and -1 when it fails. C<seek>
-also has a five-argument form that seeks with a 64-bit offset,
-constructed from two 32-bit arguments.
 
 =head2 Logical and Bitwise Operations
 
@@ -1545,11 +1464,9 @@ C<_num> and C<_str> suffixes.
   gt_num P0, P1, label     # always numerically
 
 Finally, the C<eq_addr> opcode branches if two PMCs or strings are
-actually the same object (have the same address), and the C<is_null>
-opcode branches if a PMC is NULL (has no assigned address):
+actually the same object (have the same address):
 
   eq_addr P0, P1, same_pmcs_found
-  is_null P2, the_pmc_is_null
 
 =head2 Iteration
 
@@ -1613,23 +1530,6 @@ condition fails, and it branches to C<out>. The example is more
 complex than it needs to be just to count to 10, but it nicely shows
 the major components of a
 loop.
-
-=head1 Stacks and Register Frames
-
-Z<CHP-5-SECT-5>
-
-X<Parrot;stacks;>
-Parrot has a control stack to handle the passage of control between
-subroutines and coroutines.
-
-=head2 Control Stack
-
-Z<CHP-5-SECT-5.1>
-
-The X<stacks;control> X<control stack> control stack, also known as
-the X<stacks;call> X<call stack> call stack, stores return addresses
-for subroutines called by C<bsr> and exception handlers. There are no
-instructions for directly manipulating the control stack.
 
 =head1 Lexicals and Globals
 
@@ -1778,12 +1678,9 @@ X<registers;usage for subroutine calls>
 X<subroutines;register usage>
 X<subroutines;calling conventions>
 A C<bsr> or C<jsr> is fine for a simple subroutine call, but few
-subroutines are quite that simple. The biggest issues revolve around
-register usage. Parrot has 32 registers of each type, and the caller
-and the subroutine share the same set of registers. How does the
-subroutine keep from destroying the caller's values?  More
-importantly, who is responsible for saving and restoring registers?
-Where are arguments for the subroutine stored? Where are the
+subroutines are quite that simple. Who is responsible for saving and
+restoring the registers, however, so that they don't get overwritten when
+we perform a c<bsr> or C<jsr>? How are arguments passed? Where are the
 subroutine's return values stored? A number of different answers are
 possible. You've seen how many ways Parrot has of storing values. The
 critical point is that the caller and the called subroutine have to
@@ -2648,9 +2545,7 @@ object and stores the method object in C<P0> for you:
 
     set S0, "_half"             # set method name
     set P2, P3                  # the object
-    savetop                     # preserve registers
     callmethodcc                # create return continuation, call
-    restoretop
     print I5                    # result of method call
     print "\n"
 
@@ -2770,9 +2665,7 @@ the class:
 
     set S0, "_half"             # set method name
     set P2, P5                  # the object
-    savetop                     # preserve registers
     callmethodcc                # create return continuation, call
-    restoretop
     print I5
     print "\n"
 
@@ -2785,9 +2678,9 @@ objects. C<isa>X<isa opcode (PASM)> checks whether an object belongs to or
 inherits from a particular class. C<can>X<can opcode (PASM)> checks whether
 an object has a particular method. Both return a true or false value.
 
-    isa I0, P3, "Foo"		# 1
-    isa I0, P3, "Bar"		# 1
-    can I0, P3, "__add"		# 1
+    isa I0, P3, "Foo"           # 1
+    isa I0, P3, "Bar"           # 1
+    can I0, P3, "__add"         # 1
 
 =head2 Complete Example
 
@@ -2840,9 +2733,7 @@ Z<CHP-5-SECT-12.6>
 
     set S0, "_half"             # set method name
     set P2, P3                  # the object
-    savetop                     # preserve registers
     callmethodcc                # create return continuation, call
-    restoretop
     print I5                    # prints 50
     print "\n"
 
