@@ -608,7 +608,7 @@ win32-inno-installer: installable
 @no_doc@	-$(MKPATH) man/html
 @no_doc@	pod2html --infile doc/running.pod --outfile man/html/parrot-@lclang@.html
 	$(CP) installable_@lclang@@exe@ parrot-@lclang@.exe
-	$(PERL) @build_dir@/tools/dev/mk_inno_language.pl @lclang@
+	$(PERL) $(LIB_DIR)/tools/dev/mk_inno_language.pl @lclang@
 	iscc parrot-@lclang@.iss
 
 # clean intermediate test files
