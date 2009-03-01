@@ -895,7 +895,7 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
     if (PObj_is_class_TEST(_class)) {
         SLOTTYPE * const class_array    = PMC_data_typed(_class, SLOTTYPE *);
         PMC *const       class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
-        class_name                      = PMC_str_val(class_name_pmc);
+        class_name                      = VTABLE_get_string(interp, class_name_pmc);
     }
     else
         class_name = _class->vtable->whoami;
