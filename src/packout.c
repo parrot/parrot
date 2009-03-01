@@ -220,8 +220,8 @@ PackFile_find_in_const(PARROT_INTERP,
     ASSERT_ARGS(PackFile_find_in_const)
     int i;
     for (i = 0; i < ct->const_count; i++)
-        if (type == PFC_STRING && ct->constants[i]->u.string ==
-            PMC_str_val(key))
+        if (type == PFC_STRING && Parrot_str_equal(interp,
+                    ct->constants[i]->u.string, VTABLE_get_string(interp, key)))
             return i;
         else if (type == PFC_NUMBER && ct->constants[i]->u.number ==
                  VTABLE_get_integer(interp, key))
