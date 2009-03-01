@@ -36,6 +36,7 @@ Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
                                 CGoto JIT EXEC   Thr Sig
 --------------------------------------------------------------------------------
 aix5.3-power-gcc4.2          B8   -    -    -             Y    ?     ?  20080510
+cygwin1.7.0-x86-gcc4.3.2      4   Y    Y    -     -   -   Y    Y     Y  20090301
 freebsd-x86-gcc-3.4.6             Y    ?    ?     ?   ?   Y    Y     ?  20080519
 linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519
 linux-s390x-gcc4.1.2         B4   ?    -    -     Y   Y   Y    Y/2   ?  20080908
