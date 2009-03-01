@@ -71,11 +71,11 @@ book-clean:
 	$(RM_F) "book/*.html"
 
 chm:
-	cd .. && $(PERL) tools/docs/mk_chm.pl
-	cd html && hhc parrot.hhp
+#IF(win32):	cd .. && $(PERL) tools/docs/mk_chm.pl
+#IF(win32):	-cd html && hhc parrot.hhp
 
 chm-clean:
-	$(RM_F) "html/*.hhc" "html/*.hhk" "html/*.hhp" "html/*.chm"
+#IF(win32):	$(RM_F) "html/*.hhc" "html/*.hhk" "html/*.hhp" "html/*.chm"
 
 @TEMP_pod_build@
 
