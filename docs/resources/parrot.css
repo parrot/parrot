@@ -96,3 +96,9 @@ div#footer {
 #breadcrumb {
 	font-weight: bold;
 }
+
+/* =item constructs no <dt><dd> just <dt>, so we fake it */
+dt {
+	padding-top: 0.5em;
+	padding-bottom: 1em;
+}

@@ -746,7 +746,7 @@ W: http://www.bofh.org.uk:8080/
 N: Reini Urban
 U: rurban
 E: rurban@cpan.org
-D: cygwin fixes
+D: cygwin, 64-bit pbc compat, float converters, bignum.pmc
 
 N: Richard Tibbetts
 D: Divide by zero exceptions in some PMCs
