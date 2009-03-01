@@ -21,8 +21,15 @@ These are the vtable functions for the Key PMC class.
 #include "parrot/parrot.h"
 
 pmclass Key need_ext {
-    ATTR PMC *next_key; /* Sometimes it's the next key, sometimes it's not.
-                           The Key code is like that. */
+    ATTR PMC      *next_key; /* Sometimes it's the next key, sometimes it's
+                                not.  The Key code is like that. */
+    ATTR INTVAL    int_key;  /* int value of this key, or something magical if
+                                it's a hash iterator key */
+    ATTR FLOATVAL  num_key;  /* num value of this key, if any */
+    ATTR STRING   *str_key;  /* STRING value of this key, if any */
+                             /* Theoretically there'd also be a pmc_key here,
+                              * but that code looks broken and unneeded. */
+
 
 /*
 
@@ -307,6 +314,7 @@ PMC_int_val(-1) means end of iteration.
     VTABLE PMC *nextkey_keyed(PMC *agg, INTVAL what) {
         PMC  * const ret = SELF;
         const INTVAL n   = VTABLE_elements(INTERP, agg);
+        INTVAL       int_key;
 
         switch (what) {
             case ITERATE_FROM_START_KEYS:
@@ -337,9 +345,12 @@ PMC_int_val(-1) means end of iteration.
                  &&  agg->vtable->base_type != enum_class_OrderedHash)
                     PObj_get_FLAGS(ret) |= KEY_hash_iterator_FLAGS;
         init:
-                PMC_int_val(ret) = 0;
-                if (!n)
-                    PMC_int_val(ret) = -1;
+                if (!n) {
+                    SET_ATTR_int_key(INTERP, ret, -1);
+                }
+                else {
+                    SET_ATTR_int_key(INTERP, ret, 0);
+                }
 
                 /* iterating over a hash additionally needs the Bucket index */
                 if (KEY_IS_HASH_ITERATOR(ret))
@@ -352,20 +363,24 @@ PMC_int_val(-1) means end of iteration.
                  * so, if we are iterating over a hash do nothing
                  * */
                 if (!KEY_IS_HASH_ITERATOR(ret)) {
-                    if (PMC_int_val(ret) < n - 1)
-                        ++PMC_int_val(ret);
-                    else
-                        PMC_int_val(ret) = -1;
+                    GET_ATTR_int_key(INTERP, ret, int_key);
+                    if (int_key < n - 1) {
+                        SET_ATTR_int_key(INTERP, ret, int_key+1);
+                    }
+                    else {
+                        SET_ATTR_int_key(INTERP, ret, -1);
+                    }
                 }
                 break;
             case ITERATE_GET_PREV:
-                if (PMC_int_val(ret) >= 0)
-                    --PMC_int_val(ret);
+                GET_ATTR_int_key(INTERP, ret, int_key);
+                if (int_key >= 0)
+                    SET_ATTR_int_key(INTERP, ret, int_key-1);
                 break;
             case ITERATE_FROM_END:
                 PObj_get_FLAGS(ret) &= ~KEY_type_FLAGS;
                 PObj_get_FLAGS(ret) |= KEY_integer_FLAG;
-                PMC_int_val(ret)     = n - 1;
+                SET_ATTR_int_key(INTERP, ret, n-1);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL,
@@ -433,7 +448,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 break;
             case KEY_string_FLAG:
             case KEY_string_FLAG | KEY_register_FLAG:
-                VTABLE_push_string(INTERP, io, VTABLE_get_string(INTERP, SELF));
+                VTABLE_push_string(INTERP, io, key_string(INTERP, SELF));
                 break;
             default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
@@ -449,16 +464,19 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         PObj_get_FLAGS(SELF) |= flags;
         PObj_custom_mark_SET(SELF);
 
+        if (!PMC_data(SELF))
+            SELF.init();
+
         /* get contents */
         switch (flags) {
             case KEY_integer_FLAG:
-                PMC_int_val(SELF) = VTABLE_shift_integer(INTERP, io);
+                SET_ATTR_int_key(INTERP, SELF, VTABLE_shift_integer(INTERP, io));
                 break;
             case KEY_number_FLAG:
                 VTABLE_set_number_native(INTERP, SELF, VTABLE_shift_float(INTERP, io));
                 break;
             case KEY_string_FLAG:
-                PMC_str_val(SELF) = VTABLE_shift_string(INTERP, io);
+                VTABLE_set_string_native(INTERP, SELF, VTABLE_shift_string(INTERP, io));
                 break;
             default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,

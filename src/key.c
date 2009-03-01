@@ -66,7 +66,7 @@ key_new_integer(PARROT_INTERP, INTVAL value)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-    PMC_int_val(key)     = value;
+    SETATTR_Key_int_key(interp, key, value);
 
     return key;
 }
@@ -118,7 +118,7 @@ key_new_string(PARROT_INTERP, ARGIN(STRING *value))
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_string_FLAG;
-    PMC_str_val(key)     = value;
+    SETATTR_Key_str_key(interp, key, value);
 
     return key;
 }
@@ -182,12 +182,12 @@ Set the integer C<value> in C<key>.
 
 PARROT_EXPORT
 void
-key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
+key_set_integer(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value)
 {
     ASSERT_ARGS(key_set_integer)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_integer_FLAG;
-    PMC_int_val(key)     = value;
+    SETATTR_Key_int_key(interp, key, value);
 
     return;
 }
@@ -205,12 +205,12 @@ Set the register C<value> in C<key>.
 
 PARROT_EXPORT
 void
-key_set_register(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
+key_set_register(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
 {
     ASSERT_ARGS(key_set_register)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_register_FLAG | flag;
-    PMC_int_val(key)     = value;
+    SETATTR_Key_int_key(interp, key, value);
 
     return;
 }
@@ -251,12 +251,12 @@ Set the string C<value> in C<key>.
 
 PARROT_EXPORT
 void
-key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
+key_set_string(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 {
     ASSERT_ARGS(key_set_string)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_string_FLAG;
-    PMC_str_val(key)     = value;
+    SETATTR_Key_str_key(interp, key, value);
 
     return;
 }
@@ -326,31 +326,42 @@ INTVAL
 key_integer(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_integer)
+    INTVAL  int_key;
+    STRING *str_key;
+
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         case KEY_hash_iterator_FLAGS:
 
         case KEY_integer_FLAG:
-            return PMC_int_val(key);
+            GETATTR_Key_int_key(interp, key, int_key);
+            return int_key;
         case KEY_integer_FLAG | KEY_register_FLAG:
-            return REG_INT(interp, PMC_int_val(key));
+            GETATTR_Key_int_key(interp, key, int_key);
+            return REG_INT(interp, int_key);
 
         case KEY_number_FLAG:
             return PMC_num_val(key);
         case KEY_number_FLAG | KEY_register_FLAG:
-            return REG_NUM(interp, PMC_int_val(key));
+            GETATTR_Key_int_key(interp, key, int_key);
+            return REG_NUM(interp, int_key);
 
         case KEY_pmc_FLAG | KEY_register_FLAG:
             {
-            PMC * const reg = REG_PMC(interp, PMC_int_val(key));
+            PMC *reg;
+            GETATTR_Key_int_key(interp, key, int_key);
+            reg = REG_PMC(interp, int_key);
             return VTABLE_get_integer(interp, reg);
             }
 
         case KEY_string_FLAG:
-            return Parrot_str_to_int(interp, PMC_str_val(key));
+            GETATTR_Key_str_key(interp, key, str_key);
+            return Parrot_str_to_int(interp, str_key);
         case KEY_string_FLAG | KEY_register_FLAG:
             {
-            STRING * const s_reg = REG_STR(interp, PMC_int_val(key));
+            STRING *s_reg;
+            GETATTR_Key_int_key(interp, key, int_key);
+            s_reg = REG_STR(interp, int_key);
             return Parrot_str_to_int(interp, s_reg);
             }
 
@@ -390,17 +401,22 @@ FLOATVAL
 key_number(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_number)
+    INTVAL int_key;
+
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
         return PMC_num_val(key);
     case KEY_number_FLAG | KEY_register_FLAG:
-        return REG_NUM(interp, PMC_int_val(key));
+        GETATTR_Key_int_key(interp, key, int_key);
+        return REG_NUM(interp, int_key);
     case KEY_pmc_FLAG:
         return VTABLE_get_number(interp, key);
                                                  /*  PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         {
-        PMC * const reg = REG_PMC(interp, PMC_int_val(key));
+        PMC *reg;
+        GETATTR_Key_int_key(interp, key, int_key);
+        reg = REG_PMC(interp, int_key);
         return VTABLE_get_number(interp, reg);
         }
     default:
@@ -427,18 +443,23 @@ STRING *
 key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_string)
+    INTVAL int_key;
+
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         /* remember to COW strings instead of returning them directly */
         case KEY_string_FLAG:
         {
-            STRING *s = PMC_str_val(key);
+            STRING *s;
+            GETATTR_Key_str_key(interp, key, s);
             if (s)
                 s = Parrot_str_new_COW(interp, s);
             return s;
         }
         case KEY_string_FLAG | KEY_register_FLAG:
         {
-            STRING *s = REG_STR(interp, PMC_int_val(key));
+            STRING *s;
+            GETATTR_Key_int_key(interp, key, int_key);
+            s = REG_STR(interp, int_key);
             if (s)
                 s = Parrot_str_new_COW(interp, s);
             return s;
@@ -446,18 +467,23 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
                                                /*   PMC_pmc_val(key)); */
         case KEY_pmc_FLAG | KEY_register_FLAG:
         {
-            PMC * const reg = REG_PMC(interp, PMC_int_val(key));
+            PMC *reg;
+            GETATTR_Key_int_key(interp, key, int_key);
+            reg = REG_PMC(interp, int_key);
             return VTABLE_get_string(interp, reg);
         }
         case KEY_integer_FLAG:
-            return Parrot_str_from_int(interp, PMC_int_val(key));
+            GETATTR_Key_int_key(interp, key, int_key);
+            return Parrot_str_from_int(interp, int_key);
         case KEY_integer_FLAG | KEY_register_FLAG:
-            return Parrot_str_from_int(interp, REG_INT(interp, PMC_int_val(key)));
+            GETATTR_Key_int_key(interp, key, int_key);
+            return Parrot_str_from_int(interp, REG_INT(interp, int_key));
 
         case KEY_number_FLAG:
             return Parrot_str_from_num(interp, PMC_num_val(key));
         case KEY_number_FLAG | KEY_register_FLAG:
-            return Parrot_str_from_num(interp, REG_NUM(interp, PMC_int_val(key)));
+            GETATTR_Key_int_key(interp, key, int_key);
+            return Parrot_str_from_num(interp, REG_NUM(interp, int_key));
 
         default:
         case KEY_pmc_FLAG:
@@ -484,9 +510,12 @@ PMC *
 key_pmc(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_pmc)
+    INTVAL int_key;
+
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_pmc_FLAG | KEY_register_FLAG:
-        return REG_PMC(interp, PMC_int_val(key));
+        GETATTR_Key_int_key(interp, key, int_key);
+        return REG_PMC(interp, int_key);
     default:
         return key; /* PMC_pmc_val(key); */
     }
@@ -577,9 +606,12 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(key_mark)
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
     PMC          *next_key;
+    STRING       *str_key;
 
-    if (flags == KEY_string_FLAG)
-        pobject_lives(interp, (PObj *)PMC_str_val(key));
+    if (flags == KEY_string_FLAG) {
+        GETATTR_Key_str_key(interp, key, str_key);
+        pobject_lives(interp, (PObj *)str_key);
+    }
 
     /*
      * KEY_hash_iterator_FLAGS denote a hash key iteration, PMC_data() is
@@ -620,20 +652,25 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     STRING * const quote     = CONST_STRING(interp, "'");
     STRING        *value     = Parrot_str_new(interp, "[ ", 2);
     PMC           *next_key;
+    INTVAL         int_key;
+    STRING        *str_key;
 
     for (;key;) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
+                GETATTR_Key_int_key(interp, key, int_key);
                 value = Parrot_str_append(interp, value,
-                    Parrot_str_from_int(interp, PMC_int_val(key)));
+                    Parrot_str_from_int(interp, int_key));
                 break;
             case KEY_number_FLAG:
+                GETATTR_Key_int_key(interp, key, int_key);
                 value = Parrot_str_append(interp, value,
-                    Parrot_str_from_num(interp, PMC_int_val(key)));
+                    Parrot_str_from_num(interp, int_key));
                 break;
             case KEY_string_FLAG:
+                GETATTR_Key_str_key(interp, key, str_key);
                 value = Parrot_str_append(interp, value, quote);
-                value = Parrot_str_append(interp, value, PMC_str_val(key));
+                value = Parrot_str_append(interp, value, str_key);
                 value = Parrot_str_append(interp, value, quote);
                 break;
             case KEY_pmc_FLAG:
@@ -641,24 +678,29 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
                     VTABLE_get_string(interp, key));
                 break;
             case KEY_integer_FLAG | KEY_register_FLAG:
+                GETATTR_Key_int_key(interp, key, int_key);
                 value = Parrot_str_append(interp, value,
                         Parrot_str_from_int(interp,
-                            REG_INT(interp, PMC_int_val(key))));
+                            REG_INT(interp, int_key)));
                 break;
             case KEY_number_FLAG | KEY_register_FLAG:
+                GETATTR_Key_int_key(interp, key, int_key);
                 value = Parrot_str_append(interp, value,
                         Parrot_str_from_num(interp,
-                            REG_NUM(interp, PMC_int_val(key))));
+                            REG_NUM(interp, int_key)));
                 break;
             case KEY_string_FLAG | KEY_register_FLAG:
                 value = Parrot_str_append(interp, value, quote);
+                GETATTR_Key_int_key(interp, key, int_key);
                 value = Parrot_str_append(interp, value,
-                    REG_STR(interp, PMC_int_val(key)));
+                    REG_STR(interp, int_key));
                 value = Parrot_str_append(interp, value, quote);
                 break;
             case KEY_pmc_FLAG | KEY_register_FLAG:
                 {
-                PMC * const reg = REG_PMC(interp, PMC_int_val(key));
+                PMC *reg;
+                GETATTR_Key_int_key(interp, key, int_key);
+                reg = REG_PMC(interp, int_key);
                 value           = Parrot_str_append(interp, value,
                                     VTABLE_get_string(interp, reg));
                 }

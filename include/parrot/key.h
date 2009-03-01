@@ -121,7 +121,8 @@ PMC * key_pmc(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void key_set_integer(SHIM_INTERP, ARGMOD(PMC *key), INTVAL value)
+void key_set_integer(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*key);
 
@@ -139,15 +140,17 @@ void key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
         FUNC_MODIFIES(*key);
 
 PARROT_EXPORT
-void key_set_register(SHIM_INTERP,
+void key_set_register(PARROT_INTERP,
     ARGMOD(PMC *key),
     INTVAL value,
     INTVAL flag)
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*key);
 
 PARROT_EXPORT
-void key_set_string(SHIM_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
+void key_set_string(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*key);
@@ -203,7 +206,8 @@ STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_key_set_integer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(key)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_key_set_number __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(key)
@@ -212,9 +216,11 @@ STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
     || PARROT_ASSERT_ARG(key) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_key_set_register __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(key)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_key_set_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(key) \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(key) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_key_set_to_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

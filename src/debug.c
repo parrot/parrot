@@ -2638,11 +2638,13 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                 case KEY_string_FLAG:
                     dest[size++] = '"';
                     {
-                        char * const temp = Parrot_str_to_cstring(interp, PMC_str_val(k));
+                        char * const temp = Parrot_str_to_cstring(interp,
+                                VTABLE_get_string(interp, k));
                         strcpy(&dest[size], temp);
                         Parrot_str_free_cstring(temp);
                     }
-                    size += Parrot_str_byte_length(interp, PMC_str_val(k));
+                    size += Parrot_str_byte_length(interp,
+                            VTABLE_get_string(interp, (k)));
                     dest[size++] = '"';
                     break;
                 case KEY_integer_FLAG|KEY_register_FLAG:

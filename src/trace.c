@@ -33,11 +33,13 @@ src/test_main.c
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-static STRING* trace_class_name(ARGIN(const PMC* pmc))
-        __attribute__nonnull__(1);
+static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_trace_class_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pmc)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -55,7 +57,7 @@ Obtains the class name of the PMC.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING*
-trace_class_name(ARGIN(const PMC* pmc))
+trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 {
     ASSERT_ARGS(trace_class_name)
     STRING *class_name;
@@ -63,7 +65,7 @@ trace_class_name(ARGIN(const PMC* pmc))
         SLOTTYPE * const class_array = (SLOTTYPE *)PMC_data(pmc);
         PMC * const class_name_pmc = get_attrib_num(class_array,
                                                     PCD_CLASS_NAME);
-        class_name = PMC_str_val(class_name_pmc);
+        class_name = VTABLE_get_string(interp, class_name_pmc);
     }
     else
         class_name = pmc->vtable->whoami;
@@ -103,7 +105,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         Parrot_io_eprintf(debugger, "**************** PMC is on free list *****\n");
     }
     if (pmc->vtable->pmc_class == pmc) {
-        STRING * const name = trace_class_name(pmc);
+        STRING * const name = trace_class_name(interp, pmc);
         Parrot_io_eprintf(debugger, "Class=%Ss:PMC(%#p)", name, pmc);
     }
     else if (pmc->vtable->base_type == enum_class_String) {

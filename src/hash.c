@@ -1201,7 +1201,7 @@ parrot_hash_get_idx(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
     ASSERT_ARGS(parrot_hash_get_idx)
     HashBucket       *b;
     void             *res;
-    INTVAL            i  = PMC_int_val(key);
+    INTVAL            i  = VTABLE_get_integer(interp, key);
     PMC              *fake_bi;
     BucketIndex       bi;
 
@@ -1218,7 +1218,9 @@ parrot_hash_get_idx(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
         SETATTR_Key_next_key(interp, key, NULL);
     }
     else if (i >= size || i < 0) {
-        PMC_int_val(key) = -1;
+        /* NOTE: These instances of SETATTR_Key_int_key can't be VTABLE
+         * functions because of the "special" way hash iterators work. */
+        SETATTR_Key_int_key(interp, key, -1);
         return NULL;
     }
 
@@ -1239,7 +1241,7 @@ parrot_hash_get_idx(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
     if (i >= size)
         i = -1;
 
-    PMC_int_val(key) = i;
+    SETATTR_Key_int_key(interp, key, i);
 
     return res;
 }

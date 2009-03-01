@@ -232,7 +232,8 @@ Get integer value of current position plus idx.
         PMC        *key;
 
         GET_ATTR_key(INTERP, SELF, key);
-        return VTABLE_get_integer_keyed_int(INTERP, agg, PMC_int_val(key) +idx);
+        return VTABLE_get_integer_keyed_int(INTERP, agg,
+                VTABLE_get_integer(INTERP, key) +idx);
     }
 
 /*
@@ -262,7 +263,8 @@ Get number value of current position plus idx.
         PMC        *key;
 
         GET_ATTR_key(INTERP, SELF, key);
-        return VTABLE_get_number_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
+        return VTABLE_get_number_keyed_int(INTERP, agg,
+                VTABLE_get_integer(INTERP, key) + idx);
     }
 
 
@@ -294,7 +296,8 @@ Get string value of current position plus idx.
         PMC        *key;
 
         GET_ATTR_key(INTERP, SELF, key);
-        return VTABLE_get_string_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
+        return VTABLE_get_string_keyed_int(INTERP, agg,
+                VTABLE_get_integer(INTERP, key) + idx);
     }
 
 /*
@@ -310,7 +313,8 @@ Returns true if the idx/key is not C<-1>.
     VTABLE INTVAL get_bool() {
         PMC *key;
         GET_ATTR_key(INTERP, SELF, key);
-        return !PMC_is_null(INTERP, key) && PMC_int_val(key) != -1;
+        return !PMC_is_null(INTERP, key) &&
+                VTABLE_get_integer(INTERP, key) != -1;
     }
 
 /*
@@ -371,7 +375,8 @@ Returns the element for C<key>.
         PMC        *key;
 
         GET_ATTR_key(INTERP, SELF, key);
-        return VTABLE_get_pmc_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
+        return VTABLE_get_pmc_keyed_int(INTERP, agg,
+                VTABLE_get_integer(INTERP, key) + idx);
     }
 
 /*
@@ -636,7 +641,7 @@ the next one.
 
         GET_ATTR_key(INTERP, SELF, key);
 
-        if (PMC_int_val(key) == -1)
+        if (VTABLE_get_integer(INTERP, key) == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
@@ -676,7 +681,8 @@ Returns whether an element for C<idx> exists in the aggregate.
         PMC * const agg = SELF.get_pmc();
         PMC        *key;
         GET_ATTR_key(INTERP, SELF, key);
-        return VTABLE_exists_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
+        return VTABLE_exists_keyed_int(INTERP, agg,
+                VTABLE_get_integer(INTERP, key) + idx);
     }
 
 /*
@@ -720,7 +726,8 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
         PMC        *key;
 
         GET_ATTR_key(INTERP, SELF, key);
-        return VTABLE_defined_keyed_int(INTERP, agg, PMC_int_val(key) + idx);
+        return VTABLE_defined_keyed_int(INTERP, agg,
+                VTABLE_get_integer(INTERP, key) + idx);
     }
 
     VTABLE PMC *get_iter() {

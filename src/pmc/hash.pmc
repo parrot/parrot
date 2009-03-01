@@ -545,8 +545,8 @@ Returns the PMC value for the element at C<*key>.
         SETATTR_Key_next_key(INTERP, key, (PMC *)INITBucketIndex);
 
         /* -1 for an empty hash, 0 for a non-empty hash.  */
-        PMC_int_val(key)     =
-            parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF)) ? 0 : -1;
+        SETATTR_Key_int_key(INTERP, key,
+            parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF)) ? 0 : -1);
 
         return iter;
     }

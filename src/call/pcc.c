@@ -678,7 +678,7 @@ start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
 
         /* create key needed to iterate the hash */
         st->key              = pmc_new(interp, enum_class_Key);
-        PMC_int_val(st->key) = 0;
+        VTABLE_set_integer_native(interp, st->key, 0);
         SETATTR_Key_next_key(interp, st->key, (PMC *)INITBucketIndex);
     }
     else {

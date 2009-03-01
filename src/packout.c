@@ -306,7 +306,7 @@ PackFile_Constant_pack(PARROT_INTERP,
             switch (type & KEY_type_FLAGS) {
                 case KEY_integer_FLAG:
                     *cursor++ = PARROT_ARG_IC | slice_bits;
-                    *cursor++ = PMC_int_val(key);
+                    GETATTR_Key_int_key(interp, key, *cursor++);
                     break;
                 case KEY_number_FLAG:
                     *cursor++ = PARROT_ARG_NC | slice_bits;
@@ -321,19 +321,19 @@ PackFile_Constant_pack(PARROT_INTERP,
 
                 case KEY_integer_FLAG | KEY_register_FLAG:
                     *cursor++ = PARROT_ARG_I | slice_bits;
-                    *cursor++ = PMC_int_val(key);
+                    GETATTR_Key_int_key(interp, key, *cursor++);
                     break;
                 case KEY_number_FLAG | KEY_register_FLAG:
                     *cursor++ = PARROT_ARG_N | slice_bits;
-                    *cursor++ = PMC_int_val(key);
+                    GETATTR_Key_int_key(interp, key, *cursor++);
                     break;
                 case KEY_string_FLAG | KEY_register_FLAG:
                     *cursor++ = PARROT_ARG_S | slice_bits;
-                    *cursor++ = PMC_int_val(key);
+                    GETATTR_Key_int_key(interp, key, *cursor++);
                     break;
                 case KEY_pmc_FLAG | KEY_register_FLAG:
                     *cursor++ = PARROT_ARG_P | slice_bits;
-                    *cursor++ = PMC_int_val(key);
+                    GETATTR_Key_int_key(interp, key, *cursor++);
                     break;
                 default:
                     Parrot_io_eprintf(NULL, "PackFile_Constant_pack: "
