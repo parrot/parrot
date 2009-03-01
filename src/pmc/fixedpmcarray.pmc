@@ -663,10 +663,11 @@ Return a new iterator for SELF.
 
         Parrot_PCCINVOKE(interp, iter, name, "P->", key);
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-        PMC_int_val(key)     = 0;
 
         if (PMC_int_val(SELF) == 0)
-            PMC_int_val(key) = -1;
+            VTABLE_set_integer_native(INTERP, key, -1);
+        else
+            VTABLE_set_integer_native(INTERP, key, 0);
 
         return iter;
     }

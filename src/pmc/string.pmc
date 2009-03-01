@@ -806,10 +806,11 @@ Return length of the string.
 
         Parrot_PCCINVOKE(interp, iter, name, "P->", key);
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
-        PMC_int_val(key)     = 0;
 
         if (!Parrot_str_byte_length(INTERP, VTABLE_get_string(INTERP, SELF)))
-            PMC_int_val(key) = -1;
+            VTABLE_set_integer_native(INTERP, key, -1);
+        else
+            VTABLE_set_integer_native(INTERP, key, 0);
 
         return iter;
     }
