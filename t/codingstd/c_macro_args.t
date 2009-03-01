@@ -46,7 +46,7 @@ sub check_macro_args {
         $buf =~ s{ (?:
                        (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                      | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
-                     | /\*[^@] .*? \*/                         # remove C comment
+                     | /\*[^@] .*? \*/                     # remove C comment
                    )
                 }{}gsx;
 
@@ -87,7 +87,7 @@ sub check_macro_args {
                     next if $macro =~ m/(TEST|SET|CLEAR)$/;
 
                     # skip those two varargs macros, already called as TRACE_PRINTF((args))
-                    next if $macro =~ m/^TRACE_PRINTF(_VAL)?$/;
+                    next if $macro =~ m/^TRACE_PRINTF(_VAL|_ALIGN)?$/;
 
                     # Any remaining usage must be improper
                     if ($definition =~ m/\b\Q$arg\E\b/) {

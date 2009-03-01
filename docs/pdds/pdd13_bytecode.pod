@@ -45,11 +45,11 @@ None.
 
 =head2 Implementation
 
-=head3 Changes From The Current Implementation
+=head3 Changes
 
-A number of things in this proposed PDD differ from what is currently
-implemented. This section details these changes and some of the reasoning
-behind them.
+A number of things in this proposed PDD differ from the old implementation,
+and few items are not yet implemented. This section details these changes and
+some of the reasoning behind them.
 
 
 =head4 Packfile Header
@@ -146,6 +146,7 @@ Note that in this section only, offsets and lengths are in bytes.
   |        |        | Must be one of:                                        |
   |        |        |    0x00 - IEEE 754 8 byte double                       |
   |        |        |    0x01 - i386 little endian 12 byte long double       |
+  |        |        |    0x02 - IEEE 754 16 byte long double                 |
   +--------+--------+--------------------------------------------------------+
   | 11     | 1      | Major version number of the version of Parrot that     |
   |        |        | wrote this bytecode file. For example, if Parrot 0.9.5 |
@@ -185,7 +186,7 @@ Note that in this section only, offsets and lengths are in bytes.
   +--------+--------+--------------------------------------------------------+
   | 18 + u | n      | Zero-padding to make the total header length a         |
   |        |        | multiple of 16 bytes in length.                        |
-  |        |        |    n = u % 16 == 0 ? 0 : 16 - (u % 16)                 |
+  |        |        |    n = u % 16 ? 16 - (u % 16) : 0                      |
   +--------+--------+--------------------------------------------------------+
 
 Everything beyond the header is an opcode, with word length and byte ordering
@@ -225,10 +226,23 @@ bytecode file format. In fact, once Parrot is in production use it will be
 preferable to write as early a bytecode format as is possible, to allow the
 greatest compatibility with previous Parrots.
 
-These versions will be listed in the PBC_COMPAT file, sorted with the latest
+These versions are listed in the PBC_COMPAT file, sorted with the latest
 version first in the format:
 
   MAJOR.MINOR DATE NAME DESCRIPTION
+
+=head4 8-byte ptr_alignment
+
+We should be aware that some systems such as a Sparc/PPC 64-bit use strict
+8-byte ptr_alignment per default, and all C<(opcode_t*)cursor++> or
+C<(opcode_t*)cursor +=> advances must ensure that the cursor ptr is 8-byte
+aligned. We enforce 16-byte alignment at the start and end of all segments
+and ptrsize alignment for all items (strings, integers, and opcode_t ops),
+but not in-between, esp. with 4-byte integers and 4-byte opcode_t pointers.
+
+So we relax pointer alignment strictness on Sparc64, but may add a
+C<--64compat> option to parrot in the future to produce 8-byte aligned data.
+Operations on aligned pointers are much faster than on un-aligned pointers.
 
 
 =head4 Directory Format Header

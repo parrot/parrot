@@ -161,10 +161,6 @@ PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_cvt_num12_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest) \
     || PARROT_ASSERT_ARG(src)
@@ -219,8 +215,6 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
        PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_fetch_op_mixed_le __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_fetch_op_test __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(b)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -233,6 +227,11 @@ static opcode_t fetch_op_test(ARGIN(const unsigned char *b))
  * round val up to whole opcode_t, return result in opcodes
  */
 #define ROUND_UP(val, size) (((val) + ((size) - 1))/(size))
+
+/*
+ * offset not in ptr diff, but in byte
+ */
+#define OFFS(cursor) ((const char *)(cursor) - (const char *)(pf->src))
 
 /*
  * low level FLOATVAL fetch and convert functions
@@ -274,22 +273,22 @@ cvt_num12_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        exp  11 bits 62-52
        man  52 bits 51-0
 
-         +------+------+------+------+------+------+-...--+------+
-         |byte 0|byte 1|byte 2|byte 3|byte 4|byte 5| ...  |byte12|
-         S|    E       |                F                        |
-         +------+------+------+------+------+------+-...--+------+
-         1|<----15---->|<-------------80 bits------------------->|
-         <-----------------------96 bits------------------------->
-              12-byte LONG DOUBLE FLOATING-POINT (i386 special)
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |src[11]|src[10]|src[9] |src[8] |src[7] |src[6] | ...   |src[0] |
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------80 bits---------------------->|
+    <----------------------------96 bits---------------------------->
 
-         +------+------+------+------+------+------+------+------+
-         |byte 0|byte 1|byte 2|byte 3|byte 4|byte 5|byte 6|byte 7|
-         S|    E   |                    F                        |
-         +------+------+------+------+------+------+------+------+
-         1|<--11-->|<-----------------52 bits------------------->|
-         <-----------------------64 bits------------------------->
-                 8-byte DOUBLE FLOATING-POINT
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+    |dest[7]|dest[6]|dest[5]|dest[4]|dest[3]|dest[2]|dest[1]|dest[0]|
+    S|    E    |                           F                        |
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+    1|<---11-->|<---------------------52 bits---------------------->|
+    <----------------------------64 bits---------------------------->
+                       8-byte DOUBLE FLOATING-POINT
     */
+
     memset(dest, 0, 8);
     /* exponents 15 -> 11 bits */
     s = src[9] & 0x80; /* sign */
@@ -335,9 +334,9 @@ nul:
 =item C<static void cvt_num16_num12>
 
 Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double .
-
-Experimental untested version.
 See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
+
+Untested.
 
 =cut
 
@@ -359,20 +358,20 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        exp  15 bits 94-80
        man  80 bits 79-0
 
-         +------+------+------+------+------+------+-...--+------+
-         |byte 0|byte 1|byte 2|byte 3|byte 4|byte 5| ...  |byte15|
-         S|    E       |                  F                      |
-         +------+------+------+------+------+------+-...--+------+
-         1|<----15---->|<-------------112 bits------------------>|
-         <-----------------------128 bits------------------------>
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------112 bits--------------------->|
+    <---------------------------128 bits---------------------------->
             16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
 
-         +------+------+------+------+------+------+-...--+------+
-         |byte 0|byte 1|byte 2|byte 3|byte 4|byte 5| ...  |byte11|
-         S|    E       |                F                        |
-         +------+------+------+------+------+------+-...--+------+
-         1|<----15---->|<-------------80 bits------------------->|
-         <-----------------------96 bits------------------------->
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |dest[11]dest[10]dest[9]|dest[8]|dest[7]|dest[6]| ...   |dest[0]|
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------80 bits---------------------->|
+    <----------------------------96 bits---------------------------->
               12-byte LONG DOUBLE FLOATING-POINT (i386 special)
 
     */
@@ -395,30 +394,69 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts i386 LE 12-byte long double to IEEE 754 LE 16-byte long double.
 
-TODO: Inaccurate implementation 12->8->16. Need to follow cvt_num12_num8
-See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
+Untested.
+Fallback 12->8->16 disabled.
 
 =cut
 
 */
 
+#if (NUMVAL_SIZE == 16)
 static void
 cvt_num12_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num12_num16)
+#  if 0
     unsigned char b[8];
     cvt_num12_num8(b, src);
     cvt_num8_num16(dest, b);
-}
+#  endif
+    /*
+       12-byte double (96 bits):
+       sign  1  bit 95
+       exp  15 bits 94-80
+       man  80 bits 79-0
+    to 16-byte double (128 bits):
+       sign  1  bit 127
+       exp  15 bits 126-112
+       man 112 bits 111-0
 
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |src[11]|src[10]| src[9]| src[8]| src[7]| src[6]| ...   | src[0]|
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------80 bits---------------------->|
+    <----------------------------96 bits---------------------------->
+              12-byte LONG DOUBLE FLOATING-POINT (i386 special)
+
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |dest[15]dest[14]dest[13]dest[12]dest[11]dest[10] ...   |dest[0]|
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------112 bits--------------------->|
+    <---------------------------128 bits---------------------------->
+            16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
+
+    */
+
+    memset(dest, 0, 16);
+    /* simply copy over sign + exp */
+    TRACE_PRINTF_2(("  cvt_num12_num16: sign+exp=0x%2x\n", src[11]));
+    dest[15] = src[11];
+    dest[14] = src[12];
+    /* and trunc the rest */
+    memcpy(&dest[13], &src[9], 10);
+    TRACE_PRINTF_2(("  cvt_num12_num15: mantissa=0x%10x, double=%lf\n",
+                    src[19], (long double)*dest));
+}
+#endif
 /*
 
 =item C<static void cvt_num16_num8>
 
 Converts IEEE 754 16-byte long double to IEEE 754 8 byte double.
 
-Fails on longdoublesize=12 with fatal exception.
-Untested on longdoublesize=16.
+Tested ok.
 
 =cut
 
@@ -429,25 +467,24 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num16_num8)
 
-#if NUMVAL_SIZE == 16
+    if ((sizeof (long double) == 16) && (sizeof (double) == 8)) {
 
-    /* The compiler can do this for us */
-    long double ld;
-    double d;
-    memcpy(&d, src, 8);
-    ld = (long double)d; /* TODO: test compiler cast */
-    TRACE_PRINTF_2(("  cvt_num16_num8: ld=%lf, d=%f\n", ld, d));
-    memcpy(dest, &ld, 16);
+        long double ld;
+        double d;
 
-#else
+        memcpy(&ld, src, 16);
+        d = (double)ld; /* compiler cast */
+        memcpy(dest, &d, 8);
 
-    int expo, i, s;
-#  ifdef __LCC__
-    int expo2;
-#  endif
+    }
+    else {
 
-    /* TODO: Have only 12-byte long double, need to disect it */
-    exit_fatal(1, "TODO cvt_num16_num8\n");
+        int expo, i, s;
+#ifdef __LCC__
+        int expo2;
+#endif
+
+    /* Have only 12-byte long double, or no long double at all. Need to disect it */
 
     /*
        16-byte double (128 bits):
@@ -459,63 +496,63 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        exp  11 bits 62-52
        man  52 bits 51-0
 
-         +------+------+------+------+------+------+-...--+------+
-         |byte 0|byte 1|byte 2|byte 3|byte 4|byte 5| ...  |byte15|
-         S|    E       |                  F                      |
-         +------+------+------+------+------+------+-...--+------+
-         1|<----15---->|<-------------112 bits------------------>|
-         <-----------------------128 bits------------------------>
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------112 bits--------------------->|
+    <---------------------------128 bits---------------------------->
             16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
 
-         +------+------+------+------+------+------+------+------+
-         |byte 0|byte 1|byte 2|byte 3|byte 4|byte 5|byte 6|byte 7|
-         S|    E   |                    F                        |
-         +------+------+------+------+------+------+------+------+
-         1|<--11-->|<-----------------52 bits------------------->|
-         <-----------------------64 bits------------------------->
-                 8-byte DOUBLE FLOATING-POINT
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+    |dest[7]|dest[6]|dest[5]|dest[4]|dest[3]|dest[2]|dest[1]|dest[0]|
+    S|    E    |                           F                        |
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+    1|<---11-->|<---------------------52 bits---------------------->|
+    <----------------------------64 bits---------------------------->
+                       8-byte DOUBLE FLOATING-POINT
+
    */
 
-    memset(dest, 0, 16);
-    s = src[15] & 0x80; /* 10000000 */
-    /* 15->8 exponents bits */
-    expo = ((src[15] & 0x7f)<< 8 | src[14]);
-    if (expo == 0) {
-nul:
+        memset(dest, 0, 8);
+        s = src[15] & 0x80; /* 10000000 */
+        /* 15->11 exponents bits */
+        expo = ((src[15] & 0x7f)<< 8 | src[14]);
+        if (expo == 0) {
+          nul:
+            if (s)
+                dest[7] |= 0x80;
+            return;
+        }
+#ifdef __LCC__
+        /* LCC blows up mysteriously until a temporary variable is
+         * added. */
+        expo2 = expo - 16383;
+        expo  = expo2;
+#else
+        expo -= 16383;       /* - same bias as with 12-byte */
+#endif
+        expo += 1023;       /* + bias 8byte */
+        if (expo <= 0)       /* underflow */
+            goto nul;
+        if (expo > 0x7ff) {  /* inf/nan */
+            dest[7] = 0x7f;
+            dest[6] = src[7] == 0xc0 ? 0xf8 : 0xf0 ;
+            goto nul;
+        }
+        expo <<= 4;
+        dest[6] = (expo & 0xff);
+        dest[7] = (expo & 0x7f00) >> 8;
         if (s)
             dest[7] |= 0x80;
-        return;
+        /* long double frac 112 bits => 52 bits
+           src[13] &= 0x7f; reset integer bit */
+        for (i = 0; i < 6; i++) {
+            dest[i+1] |= (i==5 ? src[13]&0x7f : src[i+7]) >> 3;
+            dest[i] |= (src[i+7] & 0x1f) << 5;
+        }
+        dest[0] |= src[1] >> 3;
     }
-#  ifdef __LCC__
-    /* LCC blows up mysteriously until a temporary variable is
-     * added. */
-    expo2 = expo - 16383;
-    expo  = expo2;
-#  else
-    expo -= 16383;       /* - same bias as with 12-byte */
-#  endif
-    expo += 1023;       /* + bias 8byte */
-    if (expo <= 0)       /* underflow */
-        goto nul;
-    if (expo > 0x7ff) {  /* inf/nan */
-        dest[7] = 0x7f;
-        dest[6] = src[7] == 0xc0 ? 0xf8 : 0xf0 ;
-        goto nul;
-    }
-    expo <<= 4;
-    dest[6] = (expo & 0xff);
-    dest[7] = (expo & 0x7f00) >> 8;
-    if (s)
-        dest[7] |= 0x80;
-    /* long double frac 63 bits => 52 bits
-       src[7] &= 0x7f; reset integer bit */
-    for (i = 0; i < 6; i++) {
-        dest[i+1] |= (i==5 ? src[7]&0x7f : src[i+2]) >> 3;
-        dest[i] |= (src[i+2] & 0x1f) << 5;
-    }
-    dest[0] |= src[1] >> 3;
-
-#endif
 }
 
 /*
@@ -530,6 +567,7 @@ Untested.
 
 */
 
+#if (NUMVAL_SIZE == 16)
 static void
 cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -539,9 +577,10 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     double d;
     memcpy(&d, src, 8);
     ld = (long double)d; /* TODO: test compiler cast */
-    TRACE_PRINTF_2(("  cvt_num8_num16: d=%f, ld=%lf\n", d, ld));
+    /*TRACE_PRINTF_2(("  cvt_num8_num16: d=%f, ld=%lf\n", d, ld));*/
     memcpy(dest, &ld, 16);
 }
+#endif
 
 /*
 
@@ -576,7 +615,7 @@ cvt_num8_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts a big-endian IEEE 754 8-byte double to i386 LE 12-byte long double.
 
-Untested.
+Tested ok.
 
 =cut
 
@@ -588,8 +627,8 @@ cvt_num8_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num8_num12_be)
     unsigned char b[8];
-    fetch_buf_be_8(b, src);  /* TODO test endianize */
-    TRACE_PRINTF_2(("  cvt_num8_num12_be: 0x%8x\n", b));
+    fetch_buf_be_8(b, src);
+    /*TRACE_PRINTF_2(("  cvt_num8_num12_be: 0x%8x\n", b));*/
     cvt_num8_num12(dest, b);
 }
 #endif
@@ -752,6 +791,7 @@ Untested.
 
 */
 
+#if (NUMVAL_SIZE == 16) && !PARROT_BIGENDIAN
 static void
 cvt_num8_num16_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -760,29 +800,9 @@ cvt_num8_num16_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     fetch_buf_be_8(b, src);
     cvt_num8_num16(dest, b);
 }
+#endif
 
-/*
-
-=item C<static opcode_t fetch_op_test>
-
-Fetches an C<opcode_t> operation in little-endian format.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static opcode_t
-fetch_op_test(ARGIN(const unsigned char *b))
-{
-    ASSERT_ARGS(fetch_op_test)
-    union {
-        unsigned char buf[4];
-        opcode_t o;
-    } u;
-    fetch_buf_le_4(u.buf, b);
-    return u.o;
-}
+#if 0
 
 /*
 
@@ -803,7 +823,7 @@ static opcode_t
 fetch_op_mixed_le(ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_op_mixed_le)
-#if OPCODE_T_SIZE == 4
+#  if OPCODE_T_SIZE == 4
     union {
         unsigned char buf[8];
         opcode_t o[2];
@@ -811,7 +831,7 @@ fetch_op_mixed_le(ARGIN(const unsigned char *b))
     /* wordsize = 8 then */
     fetch_buf_le_8(u.buf, b);
     return u.o[0]; /* or u.o[1] */
-#else
+#  else
     union {
         unsigned char buf[4];
         opcode_t o;
@@ -821,7 +841,7 @@ fetch_op_mixed_le(ARGIN(const unsigned char *b))
     u.o = 0;
     fetch_buf_le_4(u.buf, b);
     return u.o;
-#endif
+#  endif
 }
 
 /*
@@ -840,7 +860,7 @@ static opcode_t
 fetch_op_mixed_be(ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_op_mixed_be)
-#if OPCODE_T_SIZE == 4
+#  if OPCODE_T_SIZE == 4
     union {
         unsigned char buf[8];
         opcode_t o[2];
@@ -848,7 +868,7 @@ fetch_op_mixed_be(ARGIN(const unsigned char *b))
     /* wordsize = 8 then */
     fetch_buf_be_8(u.buf, b);
     return u.o[1]; /* or u.o[0] */
-#else
+#  else
     union {
         unsigned char buf[4];
         opcode_t o;
@@ -857,8 +877,10 @@ fetch_op_mixed_be(ARGIN(const unsigned char *b))
     u.o = 0;
     fetch_buf_be_4(u.buf, b);
     return u.o;
-#endif
+#  endif
 }
+
+#endif
 
 /*
 
@@ -998,6 +1020,8 @@ fetch_op_le_8(ARGIN(const unsigned char *b))
 
 Fetches an C<opcode_t> from the stream, converting byteorder if needed.
 
+When used for freeze/thaw the C<pf> argument might be NULL.
+
 =cut
 
 */
@@ -1012,8 +1036,9 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
     if (!pf || !pf->fetch_op)
         return *(*stream)++;
     o = (pf->fetch_op)(*((const unsigned char **)stream));
+    TRACE_PRINTF_VAL(("  PF_fetch_opcode: 0x%lx (%ld), at 0x%x\n",
+                      o, o, OFFS(*stream)));
     *((const unsigned char **) (stream)) += pf->header->wordsize;
-    TRACE_PRINTF_VAL(("  PF_fetch_opcode: 0x%lx (%ld)\n", o, o));
     return o;
 }
 
@@ -1065,6 +1090,8 @@ Fetches an C<INTVAL> from the stream, converting byteorder if needed.
 XXX assumes C<sizeof (INTVAL) == sizeof (opcode_t)> - we don't have
 C<INTVAL> size in the PackFile header.
 
+When used for freeze/thaw the C<pf> argument might be NULL.
+
 =cut
 
 */
@@ -1075,12 +1102,18 @@ PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_integer)
     INTVAL i;
+
     if (!pf || pf->fetch_iv == NULL)
         return *(*stream)++;
     i = (pf->fetch_iv)(*((const unsigned char **)stream));
-
+    TRACE_PRINTF_VAL(("  PF_fetch_integer: 0x%x (%d) at 0x%x\n", i, i,
+                      OFFS(*stream)));
     /* XXX assume sizeof (opcode_t) == sizeof (INTVAL) on the
-     * machine producing this PBC
+     * machine producing this PBC.
+     *
+     * TODO TT #364 on Sparc 64bit: On pbc wordsize=4 but native ptrsize=8 and
+     * ptr_alignment=8 the advance by 4 will signal BUS (invalid address alignment)
+     * in PF_fetch_integer and elsewhere.
      */
     *((const unsigned char **) (stream)) += pf->header->wordsize;
     return i;
@@ -1149,13 +1182,13 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
         TRACE_PRINTF(("PF_fetch_number: Native [%d bytes]\n",
                       sizeof (FLOATVAL)));
         memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
-        TRACE_PRINTF_VAL(("PF_fetch_number: %f\n", f));
+        TRACE_PRINTF_VAL(("PF_fetch_number: %f at 0x%x\n", f, OFFS(*stream)));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
         return f;
     }
     f = (FLOATVAL) 0;
-    TRACE_PRINTF(("PF_fetch_number: Converting...\n"));
+    TRACE_PRINTF(("PF_fetch_number at 0x%x: Converting...\n", OFFS(*stream)));
     /* 12->8 has a messy cast. */
     if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_12) {
         (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
@@ -1174,6 +1207,15 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     }
     else if (pf->header->floattype == FLOATTYPE_16) {
         *((const unsigned char **) (stream)) += 16;
+    }
+    else if (pf->header->floattype == FLOATTYPE_16MIPS) {
+        *((const unsigned char **) (stream)) += 16;
+    }
+    else if (pf->header->floattype == FLOATTYPE_16AIX) {
+        *((const unsigned char **) (stream)) += 16;
+    }
+    else if (pf->header->floattype == FLOATTYPE_4) {
+        *((const unsigned char **) (stream)) += 4;
     }
     return f;
 }
@@ -1233,6 +1275,8 @@ Opcode format is:
     opcode_t size
     * data
 
+When used for freeze/thaw the C<pf> argument might be NULL.
+
 =cut
 
 */
@@ -1257,28 +1301,29 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
     /* These may need to be separate */
     size = (size_t)PF_fetch_opcode(pf, cursor);
-    TRACE_PRINTF(("PF_fetch_string(): flags are 0x%04x...\n", flags));
-    TRACE_PRINTF(("PF_fetch_string(): charset_nr is %ld...\n",
-                  charset_nr));
-    TRACE_PRINTF(("PF_fetch_string(): size is %ld...\n", size));
-
+    TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
+    TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
+    TRACE_PRINTF(("size=%ld.\n", size));
     charset_name = Parrot_charset_c_name(interp, charset_nr);
     s = string_make(interp, (const char *)*cursor, size, charset_name, flags);
 
 #if TRACE_PACKFILE == 2
     if (pf->options & 3) {
         /* print only printable characters */
-        Parrot_io_eprintf(NULL, "PF_fetch_string(): string is '%s'\n", s->strstart);
+        Parrot_io_eprintf(NULL, "PF_fetch_string(): string is '%s' at 0x%x\n",
+                          s->strstart, OFFS(*cursor));
     }
 #endif
 
 /*    s = string_make(interp, *cursor, size,
             encoding_lookup_index(encoding),
                                flags); */
-
+    TRACE_PRINTF_ALIGN(("-s ROUND_UP_B: cursor=0x%x, size=%d, wordsize=%d\n",
+                        (const char *)*cursor + size, size, wordsize));
     size = ROUND_UP_B(size, wordsize);
     TRACE_PRINTF(("PF_fetch_string(): round size up to %ld.\n", size));
     *((const unsigned char **) (cursor)) += size;
+    TRACE_PRINTF_ALIGN(("+s ROUND_UP_B: cursor=0x%x, size=%d\n", *cursor, size));
     return s;
 }
 
@@ -1386,11 +1431,17 @@ PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
     ASSERT_ARGS(PF_fetch_cstring)
     const size_t str_len = strlen((const char *)(*cursor)) + 1;
     char * const p = (char *)mem_sys_allocate(str_len);
-
     const int wordsize = pf->header->wordsize;
 
+    TRACE_PRINTF(("PF_fetch_cstring(): size is %ld...\n", str_len));
     strcpy(p, (const char*) (*cursor));
+    TRACE_PRINTF_VAL(("PF_fetch_cstring(): string is '%s' at 0x%x\n",
+                      p, OFFS(*cursor)));
+    TRACE_PRINTF_ALIGN(("-s ROUND_UP_B: cursor=0x%x, size=%d, wordsize=%d (cstring)\n",
+                        *cursor, str_len, wordsize));
     *((const unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
+    TRACE_PRINTF_ALIGN(("+s ROUND_UP_B: cursor=0x%x, offset=0x%x\n",
+                        *cursor, OFFS(*cursor)));
 
     return p;
 }

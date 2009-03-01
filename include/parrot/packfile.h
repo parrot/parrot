@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2007, Parrot Foundation
+ * Copyright (C) 2001-2009, Parrot Foundation
  */
 
 /* packfile.h
@@ -30,22 +30,25 @@
 #define FLOATTYPE_12_NAME     "x86 little endian 12 byte long double"
 #define FLOATTYPE_16          2
 #define FLOATTYPE_16_NAME     "IEEE-754 16 byte long double"
+/* Supported until here. */
 #define FLOATTYPE_MAX         2
-/* Unsupported NaN difference, but patches welcome */
+/* Non IEEE-754 versions, yet unsupported. */
+/* NaN difference, but patches welcome */
 #define FLOATTYPE_16MIPS      3
 #define FLOATTYPE_16MIPS_NAME "MIPS 16 byte long double"
 /* See http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/IBMp690/IBM/usr/share/man/info/en_US/a_doc_lib/aixprggd/genprogc/128bit_long_double_floating-point_datatype.htm */
 #define FLOATTYPE_16AIX       4
-#define FLOATTYPE_16AIX_NAME "AIX 16 byte long double"
-/* Not yet set into silicon AFAIK */
-#define FLOATTYPE_32          5
-#define FLOATTYPE_32_NAME     "256-bit extended double"
+#define FLOATTYPE_16AIX_NAME  "AIX 16 byte long double"
+/* IEEE-754 old and tiny, yet unsupported */
+#define FLOATTYPE_4           5
+#define FLOATTYPE_4_NAME      "4-byte float"
 
 #define TRACE_PACKFILE 0
 
 #if TRACE_PACKFILE
 /* Here we pass multipe args to a macro so the args may not be bracketed here! */
-#  define TRACE_PRINTF(args)       if (pf->options) Parrot_trace_eprintf args
+#  define TRACE_PRINTF(args)       if (pf->options & 1) Parrot_trace_eprintf args
+#  define TRACE_PRINTF_ALIGN(args) if (pf->options & 4) Parrot_trace_eprintf args
 #  if TRACE_PACKFILE == 2
 #    define TRACE_PRINTF_VAL(args) if (pf->options & 2) Parrot_trace_eprintf args
 #    define TRACE_PRINTF_2(args)   Parrot_trace_eprintf args
@@ -56,6 +59,7 @@
 #else
 #  define TRACE_PRINTF(args)
 #  define TRACE_PRINTF_VAL(args)
+#  define TRACE_PRINTF_ALIGN(args)
 #  define TRACE_PRINTF_2(args)
 #endif
 
