@@ -266,7 +266,7 @@ running with parrot.
 =head1 Running code
 
 Additionally the generated code can be run immediately inside imcc.
-All parrot runtime options like B<-j> or B<-t> are available.
+All parrot runtime options like B<-R jit> or B<-t> are available.
 
 =head1 FILES
 

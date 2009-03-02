@@ -11,6 +11,9 @@ src/test_main.c - A sample test program
 C<examples/c/test_main.c> is being retained as an example of a non-trivial, but
 still clean, Parrot embedding.
 
+While it bears some resemblance to IMCC, no effort is made to keep this
+sample up to date with respect to the latest parrot functionality.
+
 =head2 Functions
 
 =over 4

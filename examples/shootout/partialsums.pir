@@ -1,4 +1,4 @@
-#!./parrot -C
+#!./parrot -R cgp
 #
 # partialsums N  (N = 2500000 for shootout)
 #

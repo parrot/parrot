@@ -1,4 +1,4 @@
-#!./parrot -j
+#!./parrot -R jit
 #
 # spectralnorm.pir N         (N = 100 for shootout)
 # by Michal Jurosz

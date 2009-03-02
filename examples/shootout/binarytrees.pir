@@ -1,4 +1,4 @@
-#!./parrot -C
+#!./parrot -R cgp
 #
 # binarytrees.pir N         (N = 16 for shootout)
 # by Joshua Isom, modified by Leopold Toetsch

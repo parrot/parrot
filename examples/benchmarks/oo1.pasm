@@ -10,7 +10,7 @@
 # python oo1.py                 1.2 (first time)
 # python oo1.py                 0.51
 
-# parrot -C oo1.pasm            -g           -O3
+# parrot -R cgp oo1.pasm            -g           -O3
 
 # original list fixed           4.9     (leaks mem ~ 110 M used)
 # don't clone vtable            4.4
@@ -22,7 +22,7 @@
 # anchor P1                                   1.36
 # Dan's new object layout                     1.05
 
-# parrot -j oo1.pasm
+# parrot -R jit oo1.pasm
 # find_global hack                            1.51
 # reuse exception                             1.30
 # reuse regsave mem                           1.23
@@ -30,10 +30,10 @@
 # Dan's new object layout                     1.00
 
 
-# parrot -C oo1-prop.pasm
+# parrot -R cgp oo1-prop.pasm
 #   invokecc                                  0.75
 #   RetCont out of loop                       0.57
-# parrot -j oo1-prop.pasm                     0.54
+# parrot -R jit oo1-prop.pasm                     0.54
 
 .namespace [ "Foo" ]
 

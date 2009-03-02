@@ -1,11 +1,11 @@
-#!./parrot -j
+#!./parrot -R jit
 =head1 NAME
 
 examples/shootout/mandelbrot.pir - Print the Mandelbrot set
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/shootout/mandelbrot.pir -j 600 > out.pbm
+    % ./parrot examples/shootout/mandelbrot.pir -R jit 600 > out.pbm
 
 =head1 DESCRIPTION
 

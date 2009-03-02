@@ -113,7 +113,7 @@ Step 3: Set a breakpoint on runops_jit
 
 Step 4: Run your program under C<gdb> with JIT and debugging on
 
-  gdb> run -j -D4 test.pbc
+  gdb> run -R jit -D4 test.pbc
 
 Step 5: C<gdb> will stop at the beginning of runops_jit. Step through the lines
 until just before the JITed code is executed (the line will be something like

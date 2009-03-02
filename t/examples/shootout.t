@@ -35,7 +35,7 @@ Test the PIR shootout examples in 'examples/shootout/*.pir'.
 To add a new test, you do not have to modify this script:
 
  1. add your script (toto.pir) to examples/shootout
- 2. put parrot options in the first line (e.g  "#!./parrot -Oc -Cj")
+ 2. put parrot options in the first line (e.g  "#!./parrot -Oc -R cgp-jit")
  3. make sure you have default argument values
  4. put the expected output as a file : toto.pir_output
  5. if you need an input file (to be read from stdin), call it toto.pir_input

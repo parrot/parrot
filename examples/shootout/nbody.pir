@@ -1,4 +1,4 @@
-#!./parrot -j
+#!./parrot -R jit
 # The Computer Language Shootout
 # http://shootout.alioth.debian.org/
 #

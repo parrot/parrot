@@ -1,4 +1,4 @@
-#!./parrot -j
+#!./parrot -R jit
 #
 # nsieve N  (N = 9 for shootout)
 # by Leopold Toetsch

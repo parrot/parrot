@@ -1,4 +1,4 @@
-#!parrot -j
+#!parrot -R jit
 # Reads from stdin a file in the format made by fasta.pir
 # N = 2500000 for fasta
 

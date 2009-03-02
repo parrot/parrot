@@ -146,7 +146,7 @@ usage(ARGMOD(FILE *fp))
 {
     ASSERT_ARGS(usage)
     fprintf(fp,
-            "parrot -[abcCEfgGhjprStvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
+            "parrot -[acEGhprtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
             "[-O [level]] [-o FILE] <file>\n");
 }
 
@@ -219,13 +219,13 @@ help(void)
     "    -L add path to library search\n"
     "   <Run core options>\n"
     "    -R --runcore CORE\n"
-    "    -b --bounds-checks|--slow-core\n"
-    "    -C --CGP-core\n"
-    "    -f --fast-core\n"
-    "    -g --computed-goto-core\n"
-    "    -j --jit-core\n"
+    "    --bounds-checks|--slow-core\n"
+    "    --CGP-core\n"
+    "    --fast-core\n"
+    "    --computed-goto-core\n"
+    "    --jit-core\n"
     "    -p --profile\n"
-    "    -S --switched-core\n"
+    "    --switched-core\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
@@ -293,7 +293,6 @@ included in the Parrot source tree.\n\n");
 
 static struct longopt_opt_decl options[] = {
     { '.', '.', (OPTION_flags)0, { "--wait" } },
-    { 'C', 'C', (OPTION_flags)0, { "--CGP-core" } },
     { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
     { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
     { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
@@ -301,20 +300,15 @@ static struct longopt_opt_decl options[] = {
     { 'L', 'L', OPTION_required_FLAG, { NULL } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
-    { 'S', 'S', (OPTION_flags)0, { "--switched-core" } },
     { 'V', 'V', (OPTION_flags)0, { "--version" } },
     { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
                                  { "--leak-test", "--destroy-at-end" } },
     { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
     { 'a', 'a', (OPTION_flags)0, { "--pasm" } },
-    { 'b', 'b', (OPTION_flags)0, { "--bounds-checks", "--slow-core" } },
     { 'c', 'c', (OPTION_flags)0, { "--pbc" } },
     { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
     { '\0', OPT_HELP_DEBUG, (OPTION_flags)0, { "--help-debug" } },
-    { 'f', 'f', (OPTION_flags)0, { "--fast-core" } },
-    { 'g', 'g', (OPTION_flags)0, { "--computed-goto-core" } },
     { 'h', 'h', (OPTION_flags)0, { "--help" } },
-    { 'j', 'j', (OPTION_flags)0, { "--jit-core" } },
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
     { '\0', OPT_PBC_OUTPUT, (OPTION_flags)0, { "--output-pbc" } },
     { 'p', 'p', (OPTION_flags)0, { "--profile" } },
@@ -412,12 +406,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                         "main: Unrecognized runcore '%s' specified."
                         "\n\nhelp: parrot -h\n", opt.opt_arg);
                 break;
-            case 'b':
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                        "The -b option is deprecated, use the -R or "
-                        "--runcore options instead.");
-                SET_FLAG(PARROT_BOUNDS_FLAG);
-                break;
             case 'p':
                 SET_FLAG(PARROT_PROFILE_FLAG);
                 break;
@@ -426,36 +414,6 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                     SET_TRACE(strtoul(opt.opt_arg, 0, 16));
                 else
                     SET_TRACE(PARROT_TRACE_OPS_FLAG);
-                break;
-            case 'j':
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                        "The -j option is deprecated, use the -R or "
-                        "--runcore options instead.");
-                SET_CORE(PARROT_JIT_CORE);
-                break;
-            case 'S':
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                        "The -S option is deprecated, use the -R or "
-                        "--runcore options instead.");
-                SET_CORE(PARROT_SWITCH_CORE);
-                break;
-            case 'C':
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                        "The -C option is deprecated, use the -R or "
-                        "--runcore options instead.");
-                SET_CORE(PARROT_CGP_CORE);
-                break;
-            case 'f':
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                        "The -f option is deprecated, use the -R or "
-                        "--runcore options instead.");
-                SET_CORE(PARROT_FAST_CORE);
-                break;
-            case 'g':
-                Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
-                        "The -g option is deprecated, use the -R or "
-                        "--runcore options instead.");
-                SET_CORE(PARROT_CGOTO_CORE);
                 break;
             case 'd':
                 if (opt.opt_arg && is_all_hex_digits(opt.opt_arg)) {

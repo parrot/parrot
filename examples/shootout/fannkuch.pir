@@ -1,4 +1,4 @@
-#!./parrot -j
+#!./parrot -R jit
 #
 # fannkuch.pir N         (N = 9 for shootout)
 # by Joshua Isom

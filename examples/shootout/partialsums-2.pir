@@ -1,4 +1,4 @@
-#!./parrot -j
+#!./parrot -R jit
 #
 # partialsums N  (N = 2500000 for shootout)
 #

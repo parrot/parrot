@@ -1,10 +1,10 @@
-#!./parrot -Oc -Cj
+#!./parrot -Oc -R cgp-jit
 #
 # Ack by Leopold Toetsch
 # Fib and Tak by Joshua Isom
 
 # use less registers (leo)
-# time ./parrot -Oc -Cj recursive-2.pir 11
+# time ./parrot -Oc -R cgp-jit recursive-2.pir 11
 # real 2.32 s   (AMD X2@2000)
 # modified default value to n=3. Karl Forner
 

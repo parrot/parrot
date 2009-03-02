@@ -1,6 +1,6 @@
-#!./parrot -j
+#!./parrot -R jit
 #
-# ./parrot -j sumcol.pir < sum8M
+# ./parrot -R jit sumcol.pir < sum8M
 # by Joshua Isom
 # N.B. it is called the sum-file benchmark on the computer shootout (KF)
 

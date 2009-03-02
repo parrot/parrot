@@ -1,4 +1,4 @@
-#!./parrot -C
+#!./parrot -R cgp
 #
 # random.pir N         (N = 900000 for shootout)
 # by Joshua Isom

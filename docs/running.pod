@@ -147,24 +147,24 @@ may be available on your system:
   switch-jit    switch core with JIT
   trace         bounds checking core w/ trace info (see 'parrot --help-debug')
 
-=item -b, --bounds-checks, --slow-core
+=item --bounds-checks, --slow-core
 
 Select the bounds-checking slow core (default).
 
-=item -g, --computed-goto-core
+=item --computed-goto-core
 
 Select the CGoto core (if available).
 
-=item -C, --CGP-core
+=item --CGP-core
 
 Select the CGP (CGoto Predereferenced) core (if available).
 
-=item -f, --fast-core
+=item --fast-core
 
 Select the fast (or function) core.  Bounds checking, profiling, and tracing
 are not available. (That's why it's so fast.)
 
-=item -j, --jit-core
+=item --jit-core
 
 Run with the JIT subsystem (if available).
 
@@ -172,7 +172,7 @@ Run with the JIT subsystem (if available).
 
 Run with the slow core and print an execution profile.
 
-=item -S, --switched-core
+=item --switched-core
 
 TODO:  This needs to be documented briefly here and also in glossary.pod.
 

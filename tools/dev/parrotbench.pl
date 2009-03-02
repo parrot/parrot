@@ -63,7 +63,7 @@ Here is an example parrotbench.conf:
     exclude   = waves
 
     [benchmark parrotj]
-    exe       = ../../parrot -j
+    exe       = ../../parrot -R jit
     type      = .pasm
     type      = .pir
 

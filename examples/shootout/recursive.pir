@@ -1,4 +1,4 @@
-#!./parrot -Oc -Cj
+#!./parrot -Oc -R cgp-jit
 #
 # Ack by Leopold Toetsch
 # Fib and Tak by Joshua Isom

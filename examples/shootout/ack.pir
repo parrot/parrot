@@ -1,4 +1,4 @@
-#!./parrot -Oc -Cj
+#!./parrot -Oc -R cgp-jit
 # OUTPUT="Ack(3, 9) = 4093\n"
 #
 # RQ (Karl)

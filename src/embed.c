@@ -717,7 +717,7 @@ op_name(PARROT_INTERP, int k)
 =item C<static FLOATVAL calibrate>
 
 With this calibration, reported times of C<parrot -p> almost match those
-measured with time C<parrot -b>.
+measured with time C<parrot -R bounds>.
 
 =cut
 

@@ -13,7 +13,7 @@ examples/library/md5sum.pir - calculate MD5 checksums
 The main purpose of this script is testing the Digest/MD5.pir library.
 It should behave very much like md5sum(1).
 
-Running parrot with -j will give a significant performance boost (often
+Running parrot with C<-R jit> will give a significant performance boost (often
 about ten-fold).
 
 =head1 AUTHOR

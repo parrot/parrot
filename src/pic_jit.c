@@ -160,7 +160,7 @@ Parrot_jit_init(PARROT_INTERP);
     .return ($I0)
 .end
 ... prints 42, if PIC_TEST is 1, because the C function is called
-    with -C and -S runcores.
+    with cgp and switch runcores.
 */
 
 /*

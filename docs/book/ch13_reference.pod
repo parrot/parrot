@@ -3573,20 +3573,20 @@ goto core> if it's available. Otherwise the I<fast core> is used.
 
 =over 4
 
-=item -b,--bounds-checks
+=item --bounds-checks
 
 Activate bounds checking. This also runs with the I<slow core> as a
 side effect.
 
-=item -f,--fast-core
+=item --fast-core
 
 Run with the I<fast core>.
 
-=item -g,--computed-goto-core
+=item --computed-goto-core
 
 Run the I<computed goto core> (CGoto).
 
-=item -j,--jit-core
+=item --jit-core
 
 Run with the I<JIT core> if available.
 
@@ -3596,15 +3596,11 @@ Activate profiling. This prints a summary of opcode usage and
 execution times after the program stops. It also runs within the
 I<slow core>.
 
-=item -C,--CGP-core
+=item --CGP-core
 
 Run with the I<CGoto-Prederefed> core.
 
-=item -P,--predereferenced-core
-
-Run with the I<Prederefed core>.
-
-=item -S,--switched-core
+=item --switched-core
 
 Run with the I<Switched core>.
 

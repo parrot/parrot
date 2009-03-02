@@ -33,7 +33,7 @@ done by the "exec" target in the root Makefile like so:
 
 This generates the "myprog" executable, which runs equivalently to
 
-    ./parrot -j myprog.pbc
+    ./parrot -R jit myprog.pbc
 
 minus the time required to JIT-compile the bytecode.
 

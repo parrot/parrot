@@ -1,4 +1,4 @@
-#!./parrot -C
+#!./parrot -R cgp
 #
 # pidigits N  (N = 1000 for shootout)
 #

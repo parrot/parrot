@@ -517,7 +517,7 @@ the symbol file, after it got built in F<parrot_build_asm>.
     # gdb confirmations should be off
     parrot -o $1.pbc -d1 $1.pasm
     echo "b runops_jit
-    r -D4 -j $1.pbc
+    r -D4 -R jit $1.pbc
     n
     add-symbol-file $1.o 0
     s

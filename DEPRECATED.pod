@@ -21,16 +21,6 @@ specifically by including this C<PIR> code:
  .include 'include/warnings.pasm'
  warningson .PARROT_WARNINGS_DEPRECATED_FLAG
 
-=head1 Command line options
-
-=over 4
-
-=item Remove individual runcore command line flags [BEFORE 1.0] 
-
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=46503> 
-
-=back
-
 =head1 Configuration
 
 =over 4
