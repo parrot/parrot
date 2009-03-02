@@ -43,7 +43,7 @@ my $d = Parrot::Docs::Directory->new( catfile(qw(lib Parrot Docs)) );
 my @a = $d->files_of_type('Perl module');
 
 # This will fail if you add a new module.
-is( @a, 7, 'files_of_type succeed' );
+is( @a, 8, 'files_of_type succeed' );
 @a = $d->files_of_type('foo');
 is( @a, 0, 'files_of_type fail' );
 

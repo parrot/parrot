@@ -35,6 +35,7 @@ use warnings;
 
 use Parrot::Docs::Directory;
 use Parrot::Docs::POD2HTML;
+use Parrot::Docs::Text2HTML;
 
 =item C<new_item($text, @paths)>
 
@@ -149,11 +150,11 @@ sub write_html {
 
     foreach my $rel_path (@rel_paths) {
         my $file      = $source->file_with_relative_path($rel_path);
-        my $formatter = Parrot::Docs::POD2HTML->new;
 
         if ( $file->contains_pod ) {
             print "\n", $rel_path unless $silent;
 
+            my $formatter = Parrot::Docs::POD2HTML->new;
             $formatter->write_html( $source, $target, $rel_path, $self );
 
             $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
@@ -174,8 +175,10 @@ sub write_html {
         elsif ( $file->is_docs_link ) {
             print "\n", $rel_path unless $silent;
 
-            # Link to the actual file rather than the HTML version.
-            $index_html .= $formatter->html_link( $target->relative_path( $file->path ),
+            my $formatter = Parrot::Docs::Text2HTML->new;
+            $formatter->write_html( $source, $target, $rel_path, $self );
+
+            $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
                 $source->relative_path( $file->path ) );
 
             $index_html .= "<br>\n";
