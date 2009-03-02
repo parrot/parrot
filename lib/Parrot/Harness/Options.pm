@@ -78,9 +78,15 @@ sub get_test_prog_args {
     return $args;
 }
 
+# Given a hashref of options, convert to a hash; convert
+# some keys that used to map directly to parrot options. These keys
+# are not expected to have any values, so we cheat and push a parrot
+# commandline line option key/value into the key, and ignore the value.
+
 sub remap_runcore_opts
 {
     my ($opts_ref) = @_;
+
     my %remap      = (
         'j' => '-runcore=jit',
         'g' => '-runcore=cgoto',
@@ -90,8 +96,15 @@ sub remap_runcore_opts
         'f' => '-runcore=fast',
     );
 
-    return map { $_ => ( exists $remap{$_} ? $remap{$_} : $opts_ref->{$_} ) }
-        keys %{ $opts_ref };
+    my %mapped;
+    foreach my $opt (keys %$opts_ref) {
+        if (exists $remap{$opt}) {
+            $mapped{$remap{$opt}} = undef;
+        } else {
+            $mapped{$opt} = $opts_ref->{$opt};
+        }
+    }
+    return %mapped;
 }
 
 sub Usage {
