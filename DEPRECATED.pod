@@ -21,13 +21,13 @@ specifically by including this C<PIR> code:
  .include 'include/warnings.pasm'
  warningson .PARROT_WARNINGS_DEPRECATED_FLAG
 
-=head1 Command line options
+=head1 Configuration
 
 =over 4
 
-=item Remove individual runcore command line flags [BEFORE 1.0]
+=item Always build with core PMC set (remove config option) [eligible in 1.1]
 
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=46503>
+L<https://trac.parrot.org/parrot/ticket/310>
 
 =back
 
