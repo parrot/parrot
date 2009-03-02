@@ -89,7 +89,7 @@ OUT
 
 # PackfileConstantTable.get_type and PackfileConstantTable.get_*_keyed_int
 
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'get_type, get_*_keyed_int' );
+pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'get_type, get_*_keyed_int', todo=> 'See TT #385.' );
 .sub 'test' :main
     .local pmc pf, pfdir, pftable
     .local int size, this, type
