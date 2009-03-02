@@ -69,6 +69,8 @@ installable_pbc_info.exe                          [main]bin
 installable_pbc_info                              [main]bin
 installable_pbc_merge.exe                         [main]bin
 installable_pbc_merge                             [main]bin
+installable_pbc_to_exe.exe                        [main]bin
+installable_pbc_to_exe                            [main]bin
 languages/abc/abc.pbc                             [abc]
 languages/APL/APL.pbc                             [APL]
 languages/befunge/befunge.pbc                     [befunge]

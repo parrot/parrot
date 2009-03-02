@@ -476,6 +476,7 @@ INSTALLABLEDIS      := $(CUR_DIR)/installable_pbc_disassemble$(EXE)
 INSTALLABLEPDUMP    := $(CUR_DIR)/installable_pbc_dump$(EXE)
 INSTALLABLEPINFO    := $(CUR_DIR)/installable_pbc_info$(EXE)
 INSTALLABLEPBCMERGE := $(CUR_DIR)/installable_pbc_merge$(EXE)
+INSTALLABLEPBCTOEXE := $(CUR_DIR)/installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB      := $(CUR_DIR)/installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG   := $(CUR_DIR)/installable_parrot_config$(EXE)
 
@@ -745,7 +746,7 @@ world : all parrot_utils
 
 parrot_utils : $(PDUMP) $(DIS) $(PINFO) $(PDB) $(PBCMERGE) $(PBC_TO_EXE) $(PARROT_CONFIG)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLECONFIG)
+installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPINFO) $(INSTALLABLEPDB) $(INSTALLABLEPBCMERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG)
 
 
 flags_dummy :
@@ -874,6 +875,9 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 $(INSTALLABLECONFIG) : $(SRC_DIR)/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc tools/util/parrot-config.pir
 	$(PBC_TO_EXE) parrot_config.pbc --install
+
+$(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE)
+	$(CP) $(PBC_TO_EXE) $(INSTALLABLEPBCTOEXE)
 
 #
 # Parrot Debugger
