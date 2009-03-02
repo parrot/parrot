@@ -74,7 +74,7 @@ for my $op (@$Parrot::OpLib::core::ops) {
 $ENV{TEST_PROG_ARGS} ||= '';
 
 plan skip_all => 'IMCC cannot do parse-only with JIT enabled'
-    if $ENV{TEST_PROG_ARGS} =~ /-j/;
+    if $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/;
 
 plan skip_all => 'IMCC cannot do parse-only with switched core'
     if $ENV{TEST_PROG_ARGS} =~ /-S/;
