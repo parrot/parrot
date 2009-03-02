@@ -46,36 +46,37 @@ undefined values) is undefined, and may be rather funky.
 .include "interpinfo.pasm"
 
 .sub _config
-    .local pmc CONF
     .local string conf_file
     conf_file = interpinfo .INTERPINFO_RUNTIME_PREFIX
     conf_file .= "/runtime/parrot/include/config.fpmc"
 
-    open CONF, conf_file, 'r'
-    $I0 = defined CONF
-    if $I0 goto ok1
-    printerr "Can't read '"
-    printerr conf_file
-    printerr "': "
-    err $S0
-    printerr $S0
-    printerr "\n"
-    exit 1
-
-ok1:
+    .local pmc CONF
+    CONF = new 'FileHandle'
+    push_eh error
     .local string image
-    .local pmc one
-    # If it gets above 64k, we've got bigger problems.
-    read image, CONF, 60000
-    close CONF
+    image = CONF.'readall'(conf_file)
+    pop_eh
+
     .local pmc conf_hash
     thaw conf_hash, image
 
+    .local pmc one
     one = new 'Integer'
     one = 1
     setprop conf_hash, '_ro', one
 
     .return( conf_hash )
+
+error:
+    .local pmc ex
+    .get_results (ex)
+    $S0 = "Can't read '"
+    $S0 .= conf_file
+    $S0 .= "' : "
+    $S1 = err
+    $S0 .= $S1
+    ex = $S0
+    rethrow ex
 .end
 
 =head1 AUTHOR
@@ -85,7 +86,7 @@ Please send patches and suggestions to the Parrot porters mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 
