@@ -6,6 +6,7 @@ PERL    := @perl@
 CHMOD   := @chmod@
 MKPATH  := @mkpath@
 RM_F    := @rm_f@
+RM_RF   := @rm_rf@
 PERLDOC := @perldoc@
 
 # long list of .pod files
@@ -45,7 +46,7 @@ html:
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent
 
 html-clean:
-	$(PERL) -I../lib -MParrot::Distribution -e "Parrot::Distribution->new()->delete_html_docs()"
+	$(RM_RF) html
 
 BOOK:= \
   ch01_overview.pod \
@@ -70,11 +71,11 @@ book-dummy:
 book-clean:
 	$(RM_F) "book/*.html"
 
-chm:
+htmlhelp: book html
 #IF(win32):	cd .. && $(PERL) tools/docs/mk_chm.pl
 #IF(win32):	-cd html && hhc parrot.hhp
 
-chm-clean:
+htmlhelp-clean:
 #IF(win32):	$(RM_F) "html/*.hhc" "html/*.hhk" "html/*.hhp" "html/*.chm"
 
 @TEMP_pod_build@

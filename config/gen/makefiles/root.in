@@ -657,6 +657,7 @@ help :
 	@echo "  docs:              Generate documentation from POD in the sources."
 	@echo "  html:              Generate HTML documentation from POD in the sources."
 	@echo "  html-clean:        Remove the HTML documentation."
+	@echo "  htmlhelp:          Compile HTML documentation (CHM format)."
 	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the standard test suite."
@@ -1273,12 +1274,6 @@ $(IMCC_O_FILES) : $(IMCC_H_FILES) $(ALL_H_FILES)
 #IF(has_perldoc):docs : docs.dummy
 #ELSE:docs : docs.stub
 
-#IF(has_perldoc):html : html.dummy
-#ELSE:html : html.stub
-
-html.stub:
-	@echo "Perldoc is required, but not detected."
-
 docs.stub:
 	@echo "Perldoc is required, but not detected."
 
@@ -1288,11 +1283,29 @@ docs.dummy :
 docs-clean :
 	$(MAKE) docs clean
 
+#IF(has_perldoc):html : html.dummy
+#ELSE:html : html.stub
+
+html.stub:
+	@echo "Perldoc is required, but not detected."
+
 html.dummy :
 	$(MAKE) docs html
 
 html-clean :
 	$(MAKE) docs html-clean
+
+#IF(has_perldoc):htmlhelp : htmlhelp.dummy
+#ELSE:htmlhelp : htmlhelp.stub
+
+htmlhelp.stub:
+	@echo "Perldoc is required, but not detected."
+
+htmlhelp.dummy :
+	$(MAKE) docs htmlhelp
+
+htmlhelp-clean :
+	$(MAKE) docs htmlhelp-clean
 
 ###############################################################################
 #
