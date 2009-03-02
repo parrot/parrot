@@ -387,10 +387,10 @@ PMC2CC          := $(PMC2C) --c $(PMC2C_INCLUDES)
 INCLUDES        := -I$(INCLUDE_DIR) -I$(INCLUDE_DIR)/pmc
 LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT)
 
+@uclang@_GROUP := @lclang@_group
+
 PMC_SOURCES := \
   @lclang@.pmc
-
-@uclang@_GROUP := @lclang@_group
 
 OBJS := \
   lib-$(@uclang@_GROUP)$(O) \
@@ -484,8 +484,8 @@ RM_F          := @rm_f@
 RM_RF         := @rm_rf@
 POD2MAN       := pod2man
 #IF(parrot_is_shared and not(cygwin or win32)):export LD_RUN_PATH := @blib_dir@:$(LD_RUN_PATH)
-PARROT        := ../../parrot@exe@
-PBC_TO_EXE    := ../../pbc_to_exe@exe@
+PARROT        := $(BIN_DIR)/parrot@exe@
+PBC_TO_EXE    := $(BIN_DIR)/pbc_to_exe@exe@
 #IF(darwin):
 #IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
@@ -507,6 +507,19 @@ BUILTINS_PIR := \
 
 DOCS := README
 
+BUILD_CLEANUPS := \
+  @lclang@.pbc \
+  "src/gen_*.pir" \
+  "*.c" \
+  "*$(O)" \
+  @lclang@@exe@ \
+#IF(win32):  parrot-@lclang@.exe \
+#IF(win32):  parrot-@lclang@.iss \
+#IF(win32):  "setup-parrot-*.exe" \
+  installable_@lclang@@exe@
+
+TEST_CLEANUPS :=
+
 # the default target
 build: \
   $(@UCLANG@_OPS) \
@@ -527,7 +540,7 @@ src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg src/parser/grammar-op
 	    src/parser/grammar.pg \
 	    src/parser/grammar-oper.pg
 
-src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
+src/gen_actions.pir: $(NQP) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
 
@@ -545,7 +558,6 @@ installable: installable_@lclang@@exe@
 installable_@lclang@@exe@: @lclang@.pbc
 	$(PBC_TO_EXE) @lclang@.pbc --install
 
-# regenerate the Makefile
 Makefile: config/makefiles/root.in
 	$(PERL) Configure.pl
 
@@ -578,7 +590,7 @@ help:
 test: build
 	$(PERL) t/harness
 
-# TODO: rename build_dir. basic run for missing libs
+# basic run for missing libs
 test-installable: installable
 	echo "1" | ./installable_@lclang@@exe@
 
@@ -611,29 +623,18 @@ win32-inno-installer: installable
 	$(PERL) $(LIB_DIR)/tools/dev/mk_inno_language.pl @lclang@
 	iscc parrot-@lclang@.iss
 
-# clean intermediate test files
 testclean:
+	$(RM_F) $(TEST_CLEANUPS)
 
-CLEANUPS := \
-  @lclang@.pbc \
-  "src/gen_*.pir" \
-  "*.c" \
-  "*$(O)" \
-  @lclang@@exe@ \
-#IF(win32):  parrot-@lclang@.exe \
-#IF(win32):  parrot-@lclang@.iss \
-#IF(win32):  "setup-parrot-*.exe" \
-  installable_@lclang@@exe@
-
-clean: testclean
+clean:
 @no_ops@	$(MAKE) $(OPS_DIR) clean
 @no_pmc@	$(MAKE) $(PMC_DIR) clean
-	$(RM_F) $(CLEANUPS)
+	$(RM_F) $(TEST_CLEANUPS) $(BUILD_CLEANUPS)
 
-realclean: testclean
+realclean:
 @no_ops@	$(MAKE) $(OPS_DIR) realclean
 @no_pmc@	$(MAKE) $(PMC_DIR) realclean
-	$(RM_F) $(CLEANUPS) Makefile
+	$(RM_F) $(TEST_CLEANUPS) $(BUILD_CLEANUPS) Makefile
 
 distclean: realclean
 
