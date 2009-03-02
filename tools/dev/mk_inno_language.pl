@@ -41,6 +41,10 @@ my $date = sprintf("%04d%02d%02d", 1900 + $now[5], 1 + $now[4], $now[3]);
 
 my $license = -f 'LICENSE'
             ? qq{LicenseFile=LICENSE}
+            : -f 'COPYING'
+            ? qq{LicenseFile=COPYING}
+            : -f 'COPYRIGHT'
+            ? qq{LicenseFile=COPYRIGHT}
             : '; no LicenseFile';
 
 my $exe = $lang eq 'rakudo'
