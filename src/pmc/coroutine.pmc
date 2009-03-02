@@ -65,11 +65,11 @@ pmclass Coroutine extends Sub need_ext {
 
 =item C<void init()>
 
-Initializes the co-routine.
+Initializes the coroutine.
 
 =item C<PMC *clone()>
 
-Clone the couroutine.
+Clone the coroutine.
 
 =cut
 
@@ -110,7 +110,7 @@ Destroys the coroutine.
 
         PObj_custom_mark_destroy_SETALL(ret);
 
-        SET_ATTR_sub(INTERP, ret, coro_sub);
+        SET_ATTR_sub(INTERP, ret, (Parrot_sub *)coro_sub);
 
         PMC_get_sub(INTERP, SELF, sub);
         memcpy(coro_sub, sub, sizeof (Parrot_coro));
