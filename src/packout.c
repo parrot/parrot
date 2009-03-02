@@ -219,13 +219,15 @@ PackFile_find_in_const(PARROT_INTERP,
 {
     ASSERT_ARGS(PackFile_find_in_const)
     int i;
-    for (i = 0; i < ct->const_count; i++)
-        if (type == PFC_STRING && Parrot_str_equal(interp,
-                    ct->constants[i]->u.string, VTABLE_get_string(interp, key)))
+    STRING *s;
+    for (i = 0; i < ct->const_count; i++) {
+        GETATTR_Key_str_key(interp, key, s);
+        if (type == PFC_STRING && ct->constants[i]->u.string == s)
             return i;
         else if (type == PFC_NUMBER && ct->constants[i]->u.number ==
                  VTABLE_get_integer(interp, key))
             return i;
+    }
     Parrot_io_eprintf(NULL, "find_in_const: couldn't find const for key\n");
     Parrot_exit(interp, 1);
 }
