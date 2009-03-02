@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2005, 2009 Parrot Foundation.
 # $Id$
 
 use strict;
@@ -56,12 +56,10 @@ my @fields = qw(
     bc_minor
     uuid_type
     uuid_size
-    uuid_data
-    dir_format
 );
 
 my %h;
-@h{@fields} = unpack "a7CCCCCCCCCCCCC", $pbc;
+@h{@fields} = unpack "a7CCCCCCCCCC", $pbc;
 
 is( $h{magic}, "\xfe\x50\x42\x43\x0a\x1a\x0a", "magic string 0xfePBC0x0a0x1a0x0a len=7" );
 ok( $h{wordsize} == 2 || $h{wordsize} == 4 || $h{wordsize} == 8,  "wordsize: $h{wordsize}" );

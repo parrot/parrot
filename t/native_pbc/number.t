@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -50,6 +50,9 @@ native pbcs.
   _7   big-endian 64 bit opcode_t, 64 bit intval, 16 byte long double
        (Sparc64/Solaris --floatval="long double")
 
+  _8   i386 32 bit opcode_t, 32 bit intval, 4 byte single float
+       (linux-gcc-i386 or cygwin with --floatval="float")
+
 =cut
 
 # tt #357: need better testmatrix for coverage overview
@@ -57,8 +60,8 @@ native pbcs.
 # 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
 my $testmatrix = <<EOF;
        8_le 12_le 16_le 8_be 16_be
-8_le     1     1    ?     ?     ?
-12_le    1     1    ?     ?     ?
+8_le     1     1    0     1     ?
+12_le    1     1    0     0     ?
 16_le    1     1    1     ?     ?
 8_be     1     1    ?     1     ?
 16_be    1     1    1     ?     1
@@ -145,6 +148,15 @@ my $arch = this_arch();
 my $todo = generate_skip_list($arch, '?');
 my $skip = generate_skip_list($arch, '0');
 
+# special failures: 64bit cannot read 32bit
+if ($PConfig{ptrsize} == 8) {
+    my $todo_msg = "TT #254 64bit cannot read 32bit";
+    $todo->{1} = $todo_msg;
+    $todo->{2} = $todo_msg;
+    $todo->{3} = $todo_msg;
+    $todo->{8} = $todo_msg;
+}
+
 my $output = << 'END_OUTPUT';
 1
 4
@@ -192,14 +204,27 @@ sub test_pbc_number {
     # check if skip or todo
   SKIP: {
     if ( $skip->{$id} ) {
-        skip "$cvt not yet implemented", 1
+        my $skip_msg = $skip->{$id};
+        if (length $skip_msg > 2) {
+            skip "$cvt $skip_msg", 1;
+        }
+        else {
+            skip "$cvt not yet implemented", 1;
+        }
     }
     elsif ( $todo->{$id} ) {
         skip $skip_msg, 1
           if ($bc ne bc_version("t/native_pbc/number_$id.pbc"));
+        my $todo_msg = $todo->{$id};
+        if (length $todo_msg > 2) {
+            $todo_msg = "$cvt $todo_msg"
+        }
+        else {
+            $todo_msg = "$cvt yet untested, TT #357. "
+                       . "Please report success."
+        }
         pbc_output_is( undef, $output, "$cvt $desc",
-                       todo => "$cvt yet untested, TT #357. "
-                       . "Please report success." );
+                       todo => "$todo_msg" );
     }
     else {
         skip $skip_msg, 1
@@ -282,8 +307,11 @@ test_pbc_number(5, "i86_64 LE 64 bit opcode_t, long double");
 # ]
 test_pbc_number(6, "big-endian 64-bit, 8-byte double");
 
-# PowerPC64 --floatval="long double"
-test_pbc_number(7, "big-endian 64-bit, 16-byte long double");
+# ppc/mips -m64 --floatval="long double"
+#test_pbc_number(7, "big-endian 64-bit, 8-byte int, 16-byte double");
+
+# i386 --floatval=float
+#test_pbc_number(8, "i386 4-byte float, 32 bit opcode_t, 4-byte int");
 
 # Local Variables:
 #   mode: cperl

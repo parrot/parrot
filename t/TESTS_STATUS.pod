@@ -123,7 +123,8 @@ weak. Tests under B<t/dynops/>.
 
 =item Packfiles
 
-B<Poor>. For more exotic platforms tests under B<t/native_pbc> are rarely updated.
+B<Poor>. For more exotic platforms tests under B<t/native_pbc> are
+rarely updated.
 
 =back
 

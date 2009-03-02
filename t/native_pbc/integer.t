@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2005,2009 Parrot Foundation.
 # $Id$
 
 use strict;
@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test tests => 7;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -50,6 +50,9 @@ native pbcs.
   _7   big-endian 64 bit opcode_t, 64 bit intval, 16 byte long double
        (Sparc64/Solaris --floatval="long double")
 
+  _8   i386 32 bit opcode_t, 32 bit intval, 4 byte single float
+       (linux-gcc-i386 or cygwin with --floatval="float")
+
 =cut
 
 =begin comment
@@ -80,7 +83,7 @@ into your report. We need your wordsize/floattype/endianess.
 
 =cut
 
-my @archtest = qw(4_le 4_le 4_be 4_le 8_le 8_be 8_be);
+my @archtest = qw(4_le 4_le 4_be 8_le 8_le 8_be 8_be 4_le);
 sub this_arch {
     return $PConfig{intvalsize}
       . "_"
@@ -104,6 +107,15 @@ my $arch = this_arch();
 my $todo = {};
 my $skip = {};
 
+# special failures: 64bit cannot read 32bit
+if ($PConfig{ptrsize} == 8) {
+    my $todo_msg = "TT #254 64bit cannot read 32bit";
+    $todo->{1} = $todo_msg;
+    $todo->{2} = $todo_msg;
+    $todo->{3} = $todo_msg;
+    $todo->{8} = $todo_msg;
+}
+
 # expected result
 my $output = '270544960';
 
@@ -126,14 +138,27 @@ sub test_pbc_integer {
     # check if skip or todo
   SKIP: {
     if ( $skip->{$id} ) {
-        skip "$cvt not yet implemented", 1
+        my $skip_msg = $skip->{$id};
+        if (length $skip_msg > 2) {
+            skip "$cvt $skip_msg", 1;
+        }
+        else {
+            skip "$cvt not yet implemented", 1;
+        }
     }
     elsif ( $todo->{$id} ) {
         skip $skip_msg, 1
           if ($bc ne bc_version($file));
+        my $todo_msg = $todo->{$id};
+        if (length $todo_msg > 2) {
+            $todo_msg = "$cvt $todo_msg"
+        }
+        else {
+            $todo_msg = "$cvt yet untested, TT #357. "
+                       . "Please report success."
+        }
         pbc_output_is( undef, $output, "$cvt $desc",
-                       todo => "$cvt yet untested, TT #357. "
-                       . "Please report success." );
+                       todo => "$todo_msg" );
     }
     else {
         skip $skip_msg, 1
@@ -218,7 +243,10 @@ test_pbc_integer(5, "i86_64 LE 64 bit opcode_t, 8-byte int, 16-byte double");
 test_pbc_integer(6, "big-endian 64-bit, 8-byte int, 8-byte double");
 
 # ppc/mips -m64 --floatval="long double"
-test_pbc_integer(7, "big-endian 64-bit, 8-byte int, 16-byte double");
+#test_pbc_integer(7, "big-endian 64-bit, 8-byte int, 16-byte double");
+
+# i386 --floatval=float
+#test_pbc_integer(8, "i386 4-byte float, 32 bit opcode_t, 4-byte int");
 
 # Local Variables:
 #   mode: cperl
