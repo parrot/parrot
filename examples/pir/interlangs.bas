@@ -7,10 +7,10 @@
 140 REM + from pirric basic interpreter                                      +
 150 REM + First build perl6, ecmascript and pipp                             +
 160 REM + Then do:                                                           +
-170 REM + ../../parrot -L /yourparrotdir/languages/perl6                     +
-180 REM +              -L /yourparrotdir/languages/ecmascript                +
-190 REM +              -L /yourparrotdir/languages/pipp                      +
-200 REM +               pirric.pir perl6-js.bas                              +
+170 REM + ../../parrot -L /yourparrotdir/languages/perl6 \                   +
+180 REM +              -L /yourparrotdir/languages/ecmascript \              +
+190 REM +              -L /yourparrotdir/languages/pipp \                    +
+200 REM +               pirric.pir interlang.bas                             +
 210 REM +--------------------------------------------------------------------+
 220 REM
 1000 REM Load languages
