@@ -110,10 +110,8 @@ pbc_merge.exe                                     [main]bin
 pbc_merge                                         [main]bin
 pbc_to_exe.exe                                    [main]bin
 pbc_to_exe                                        [main]bin
-pdb.exe                                           [main]bin
-pdb                                               [main]bin
-pirc.exe                                          [main]bin
-pirc                                              [main]bin
+parrot_debugger.exe                               [main]bin
+parrot_debugger                                   [main]bin
 runtime/parrot/dynext/apl_group.bundle            [apl]
 runtime/parrot/dynext/apl_group.dll               [apl]
 runtime/parrot/dynext/apl_group.dylib             [apl]
