@@ -612,8 +612,7 @@ PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable
 .pmc.dump :
 	$(PMC2CD) $<
 
-#IF(win32 and msvcversion):.pmc.c :
-#ELSE:.pmc.c : $(SRC_DIR)/pmc/pmc_sub.h
+.pmc.c :
 	$(PMC2CC) $<
 
 # not all makes might understand this, so the rules are generated
