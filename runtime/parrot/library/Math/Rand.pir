@@ -21,7 +21,7 @@ Portage of the following C implementation, given as example by ISO/IEC 9899:1999
 
   static unsigned long int next = 1;
   //
-  int rand(void);
+  int rand(void)
   {
       next = next * 1103515245 + 12345;
       return (unsigned int)(next/65536) % 32768;
@@ -67,6 +67,12 @@ Portage of the following C implementation, given as example by ISO/IEC 9899:1999
     $I0 = $P0
     $I0 *= 1103515245
     $I0 += 12345
+    ge $I0, 0, noadj
+    $I0 += 0x80000000 # not hit for 64bit int
+    goto done
+noadj:
+    $I0 &= 0xffffffff # noop for 32bit int
+done:
     set $P0, $I0
     $I0 /= 65536
     $I0 %= 32768

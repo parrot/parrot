@@ -41,11 +41,11 @@ pir_output_is( << 'CODE', << 'OUTPUT', 'rand / srand' );
 .end
 CODE
 16838
-5759
+5758
 10113
-17516
+17515
 16838
-5759
+5758
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'RAND_MAX' );
