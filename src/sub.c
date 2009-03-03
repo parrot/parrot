@@ -596,15 +596,15 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 
             PMC_get_sub(interp, child_pmc, child_sub);
 
-            if (!PMC_IS_NULL(child_sub->outer_sub))
-
+            if (!PMC_IS_NULL(child_sub->outer_sub)) {
                 PMC_get_sub(interp, child_sub->outer_sub, child_outer_sub);
                 if (Parrot_str_equal(interp, current_sub->subid,
                                       child_outer_sub->subid)) {
-                old = child_sub->outer_ctx;
-                child_sub->outer_ctx = Parrot_context_ref(interp, ctx);
-                if (old)
-                    Parrot_free_context(interp, old, 1);
+                    old = child_sub->outer_ctx;
+                    child_sub->outer_ctx = Parrot_context_ref(interp, ctx);
+                    if (old)
+                        Parrot_free_context(interp, old, 1);
+                }
             }
         }
         return;
