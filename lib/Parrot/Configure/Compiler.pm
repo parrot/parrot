@@ -374,8 +374,7 @@ sub genfile {
         if ( $options{file_type} eq 'makefile' ) {
             $options{replace_slashes}   = 1;
             $options{conditioned_lines} = 1;
-            $options{no_simply_expanded_var} =
-                $conf->data->get('make') eq 'nmake';
+            $options{no_simply_expanded_var} = ! $conf->data->get('gmake_version');
         }
     }
 
