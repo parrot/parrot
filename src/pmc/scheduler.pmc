@@ -429,12 +429,12 @@ Deletes a handler from the scheduler.
         for (index = 0; index < elements; ++index) {
             PMC *handler = VTABLE_get_pmc_keyed_int(INTERP, handlers, index);
             if (!PMC_IS_NULL(handler)) {
-                if (Parrot_str_not_equal(INTERP, type, except_str) == 0
+                if (Parrot_str_equal(INTERP, type, except_str)
                 &&  handler->vtable->base_type == enum_class_ExceptionHandler) {
                     VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
                     RETURN(void);
                 }
-                else if (Parrot_str_not_equal(INTERP, type, event_str) == 0
+                else if (Parrot_str_equal(INTERP, type, event_str)
                      && handler->vtable->base_type == enum_class_EventHandler) {
                     VTABLE_set_pmc_keyed_int(INTERP, handlers, index, PMCNULL);
                     RETURN(void);
@@ -529,9 +529,9 @@ If no type argument is passed, counts all handlers.
             STRING *event     = CONST_STRING(INTERP, "event");
 
             if (!PMC_IS_NULL(handler)) {
-                if (((Parrot_str_not_equal(INTERP, type, exception) == 0)
+                if ((Parrot_str_equal(INTERP, type, exception)
                 &&   handler->vtable->base_type == enum_class_ExceptionHandler)
-                || ((Parrot_str_not_equal(INTERP, type, event) == 0)
+                || (Parrot_str_equal(INTERP, type, event)
                 &&  handler->vtable->base_type == enum_class_EventHandler))
                         count++;
             }

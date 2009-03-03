@@ -551,11 +551,11 @@ Full buffering, bytes are sent when the buffer is full.
         STRING * const fullbuffer_string = CONST_STRING(INTERP, "full-buffered");
 
         if (got_type) {
-            if (Parrot_str_not_equal(INTERP, new_type, nobuffer_string) == 0)
+            if (Parrot_str_equal(INTERP, new_type, nobuffer_string))
                 Parrot_io_setbuf(INTERP, SELF, PIOCTL_NONBUF);
-            else if (Parrot_str_not_equal(INTERP, new_type, linebuffer_string) == 0)
+            else if (Parrot_str_equal(INTERP, new_type, linebuffer_string))
                 Parrot_io_setlinebuf(INTERP, SELF);
-            else if (Parrot_str_not_equal(INTERP, new_type, fullbuffer_string) == 0)
+            else if (Parrot_str_equal(INTERP, new_type, fullbuffer_string))
                 Parrot_io_setbuf(INTERP, SELF, PIO_UNBOUND);
         }
 

@@ -784,22 +784,22 @@ The number of optional named arguments
         }
 
         /* Return the argument information that was requested. */
-        if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "pos_required")) == 0) {
+        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_required"))) {
             count_found = (INTVAL)sub->arg_info->pos_required;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "pos_optional")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_optional"))) {
             count_found = (INTVAL)sub->arg_info->pos_optional;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "pos_slurpy")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "pos_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->pos_slurpy;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "named_required")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_required"))) {
             count_found = (INTVAL)sub->arg_info->named_required;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "named_optional")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_optional"))) {
             count_found = (INTVAL)sub->arg_info->named_optional;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "named_slurpy")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "named_slurpy"))) {
             count_found = (INTVAL)sub->arg_info->named_slurpy;
         }
         else {

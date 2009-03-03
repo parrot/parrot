@@ -944,13 +944,13 @@ Provides introspection of a specific piece of information about the PMC.
 */
 
     PMC *inspect_str(STRING *name) {
-        if (Parrot_str_not_equal(interp, name, CONST_STRING(interp, "flags")) == 0) {
+        if (Parrot_str_equal(interp, name, CONST_STRING(interp, "flags"))) {
             PMC *found = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found,
                     (INTVAL)PObj_get_FLAGS(SELF));
             return found;
         }
-        else if (Parrot_str_not_equal(interp, name, CONST_STRING(interp, "mro")) == 0) {
+        else if (Parrot_str_equal(interp, name, CONST_STRING(interp, "mro"))) {
             return VTABLE_clone(interp, SELF->vtable->mro);
         }
         else

@@ -91,12 +91,12 @@ pointer.
             pobject_lives(interp, (PObj *)data->sig);
 
         if (data->pointer) {
-            if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+            if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
                 PMC ** const pmc_pointer = (PMC **) data->pointer;
                 PARROT_ASSERT(*pmc_pointer);
                 pobject_lives(interp, (PObj *) *pmc_pointer);
             }
-            else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
+            else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "S"))) {
                 STRING ** const str_pointer = (STRING **) data->pointer;
                 PARROT_ASSERT(*str_pointer);
                 pobject_lives(interp, (PObj *) *str_pointer);
@@ -214,11 +214,11 @@ integer or PMC).
     VTABLE INTVAL get_integer() {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "I")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "I"))) {
             const INTVAL * const int_pointer = (INTVAL *) data->pointer;
             return *int_pointer;
         }
-        else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             return VTABLE_get_integer(interp, *pmc_pointer);
         }
@@ -241,11 +241,11 @@ integer or PMC).
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "I")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "I"))) {
             INTVAL * const int_pointer = (INTVAL *) data->pointer;
             *int_pointer = value;
         }
-        else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             VTABLE_set_integer_native(interp, *pmc_pointer, value);
         }
@@ -269,11 +269,11 @@ to a number or PMC).
     VTABLE FLOATVAL get_number() {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "N")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "N"))) {
             const FLOATVAL * const num_pointer = (FLOATVAL *) data->pointer;
             return *num_pointer;
         }
-        else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             return VTABLE_get_number(interp, *pmc_pointer);
         }
@@ -295,11 +295,11 @@ to a number or PMC).
     VTABLE void set_number_native(FLOATVAL value) {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "N")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "N"))) {
             FLOATVAL * const num_pointer = (FLOATVAL *) data->pointer;
             *num_pointer = value;
         }
-        else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             VTABLE_set_number_native(interp, *pmc_pointer, value);
         }
@@ -323,11 +323,11 @@ to a string or PMC).
     VTABLE STRING *get_string() {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "S"))) {
             STRING ** const str_pointer = (STRING **) data->pointer;
             return *str_pointer;
         }
-        else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             return VTABLE_get_string(interp, *pmc_pointer);
         }
@@ -349,11 +349,11 @@ to a string or PMC).
     VTABLE void set_string_native(STRING *value) {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "S")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "S"))) {
             STRING ** const str_pointer = (STRING **) data->pointer;
             *str_pointer = value;
         }
-        else if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             VTABLE_set_string_native(interp, *pmc_pointer, value);
         }
@@ -376,7 +376,7 @@ Returns the PMC value that the pointer points to (if the pointer is to a PMC).
     VTABLE PMC *get_pmc() {
         const Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             return *pmc_pointer;
         }
@@ -397,7 +397,7 @@ Sets the PMC value that the pointer points to (if the pointer is to a PMC).
     VTABLE void set_pmc(PMC *value) {
         const Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (Parrot_str_not_equal(interp, data->sig, CONST_STRING(interp, "P")) == 0) {
+        if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
             PMC ** const pmc_pointer = (PMC **) data->pointer;
             *pmc_pointer = value;
         }

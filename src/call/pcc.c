@@ -1305,7 +1305,7 @@ locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
                 ? st->dest.ctx->constants[idx]->u.string
                 : CTX_REG_STR(st->dest.ctx, idx);
 
-        if (st->name == param || Parrot_str_not_equal(interp, st->name, param) == 0) {
+        if (st->name == param || Parrot_str_equal(interp, st->name, param)) {
             ++i;
             st->dest.sig = VTABLE_get_integer_keyed_int(interp,
                     st->dest.u.op.signature, i);

@@ -179,8 +179,7 @@ Parrot_encoding_number(PARROT_INTERP, ARGIN(const STRING *encodingname))
     int i;
 
     for (i = 0; i < n; ++i) {
-        if (!Parrot_str_not_equal(interp, all_encodings->enc[i].name,
-                          encodingname))
+        if (Parrot_str_equal(interp, all_encodings->enc[i].name, encodingname))
             return i;
     }
     return -1;

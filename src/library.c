@@ -535,7 +535,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
         if (Parrot_str_byte_length(interp, test_path) > 4) {
             STRING *orig_ext = Parrot_str_substr(interp, test_path, -4, 4, NULL, 0);
             /* First try substituting .pbc for the .pir extension */
-            if (Parrot_str_not_equal(interp, orig_ext, pir_extension) == 0) {
+            if (Parrot_str_equal(interp, orig_ext, pir_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_append(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);
@@ -543,7 +543,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
                     return result;
             }
             /* Next try substituting .pir, then .pasm for the .pbc extension */
-            else if (Parrot_str_not_equal(interp, orig_ext, bytecode_extension) == 0) {
+            else if (Parrot_str_equal(interp, orig_ext, bytecode_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 4);
                 test_path = Parrot_str_append(interp, without_ext, pir_extension);
                 result = try_load_path(interp, test_path);
@@ -561,7 +561,7 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
         /* Finally, try substituting .pbc for the .pasm extension. */
         if (Parrot_str_byte_length(interp, test_path) > 5) {
             STRING * const orig_ext = Parrot_str_substr(interp, test_path, -5, 5, NULL, 0);
-            if (Parrot_str_not_equal(interp, orig_ext, pasm_extension) == 0) {
+            if (Parrot_str_equal(interp, orig_ext, pasm_extension)) {
                 STRING * const without_ext = Parrot_str_chopn(interp, test_path, 5);
                 test_path = Parrot_str_append(interp, without_ext, bytecode_extension);
                 result = try_load_path(interp, test_path);

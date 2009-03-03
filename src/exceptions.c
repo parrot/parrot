@@ -123,7 +123,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         }
     }
 
-    if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, "")) == 1) {
+    if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, ""))) {
         Parrot_io_eprintf(interp, "%S\n", message);
 
         /* caution against output swap (with PDB_backtrace) */
@@ -206,7 +206,7 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
         if (severity < EXCEPT_error) {
             PMC * const resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
-            if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, "")) == 1) {
+            if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, ""))) {
                 Parrot_io_eprintf(interp, "%S\n", message);
             }
             else {

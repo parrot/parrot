@@ -210,7 +210,7 @@ Parrot_charset_number(PARROT_INTERP, ARGIN(const STRING *charsetname))
     const int n = all_charsets->n_charsets;
 
     for (i = 0; i < n; ++i) {
-        if (!Parrot_str_not_equal(interp, all_charsets->set[i].name, charsetname))
+        if (Parrot_str_equal(interp, all_charsets->set[i].name, charsetname))
             return i;
     }
     return -1;

@@ -92,7 +92,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
     if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
         STRING *method_name = key;
 
-        if (0 != Parrot_str_not_equal(interp, sub->method_name, CONST_STRING(interp, "")))
+        if (Parrot_str_not_equal(interp, sub->method_name, CONST_STRING(interp, "")))
             method_name = sub->method_name;
         add_to_class(interp, nsinfo, classobj, method_name, value);
     }
@@ -279,7 +279,7 @@ really a public API.
                 if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
                     STRING *method_name = key;
 
-                    if (0 != Parrot_str_not_equal(interp, sub->method_name, CONST_STRING(interp, "")))
+                    if (Parrot_str_not_equal(interp, sub->method_name, CONST_STRING(interp, "")))
                         method_name = sub->method_name;
 
                     add_to_class(INTERP, nsinfo, classobj, method_name, value);

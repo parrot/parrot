@@ -808,7 +808,7 @@ Adds the supplied PMC to the list of parents for the class.
             STRING * const current_name = VTABLE_get_string(interp, current_parent);
 
             /* throw an exception if we already have this parent */
-            if (Parrot_str_not_equal(interp, current_name, parent_name) == 0)
+            if (Parrot_str_equal(interp, current_name, parent_name))
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "The class '%S' already has a parent class '%S'. "
@@ -970,40 +970,40 @@ Array of Class PMCs representing the direct parents of this class.
         /* What should we return? */
         PMC *found;
 
-        if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "name")) == 0) {
+        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "name"))) {
             found = pmc_new(interp, enum_class_String);
             VTABLE_set_string_native(interp, found, _class->name);
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "id")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "id"))) {
             found = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found, _class->id);
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "namespace")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "namespace"))) {
             /* Should not clone this. */
             return _class->_namespace;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "attributes")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "attributes"))) {
             found = _class->attrib_metadata;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "attrib_index")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "attrib_index"))) {
             found = _class->attrib_index;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "methods")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "methods"))) {
             found = _class->methods;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "vtable_overrides")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "vtable_overrides"))) {
             found = _class->vtable_overrides;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "parents")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "parents"))) {
             found = _class->parents;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "all_parents")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "all_parents"))) {
             found = _class->all_parents;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "roles")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "roles"))) {
             found = _class->roles;
         }
-        else if (Parrot_str_not_equal(interp, what, CONST_STRING(interp, "flags")) == 0) {
+        else if (Parrot_str_equal(interp, what, CONST_STRING(interp, "flags"))) {
             found = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found,
                 (INTVAL)PObj_get_FLAGS(SELF));
@@ -1290,7 +1290,7 @@ Returns whether the class is or inherits from C<*class>.
                                : make_class_name(interp, SELF);
 
             /* Check if the passed name is the same as the stored short name. */
-            INTVAL name_match = Parrot_str_not_equal(interp, classname, self_name) == 0;
+            INTVAL name_match = Parrot_str_equal(interp, classname, self_name);
 
             Parrot_str_free(interp, classname);
             if (is_proxy)
@@ -1329,7 +1329,7 @@ Returns whether the class is or inherits from C<*classname>.
         PMC *want_class;
 
         /* hard-code this one exception right away */
-        if (Parrot_str_not_equal(interp, classname, CONST_STRING(interp, "Class")) == 0)
+        if (Parrot_str_equal(interp, classname, CONST_STRING(interp, "Class")))
             return 1;
 
         want_class = Parrot_oo_get_class_str(interp, classname);
