@@ -28,7 +28,7 @@ $optsref = {
 ($gc_debug, $run_exec) = (0,0);
 $args = get_test_prog_args($optsref, $gc_debug, $run_exec);
 like($args, qr/-d/, "Got expected option");
-like($args, qr/-g/, "Got expected option");
+like($args, qr/--runcore=cgoto/, "Got expected option");
 like($args, qr/-D40/, "Got expected option");
 
 $optsref = {
@@ -40,7 +40,7 @@ $optsref = {
 ($gc_debug, $run_exec) = (0,0);
 $args = get_test_prog_args($optsref, $gc_debug, $run_exec);
 like($args, qr/-d/, "Got expected option");
-like($args, qr/-g/, "Got expected option");
+like($args, qr/--runcore=cgoto/, "Got expected option");
 like($args, qr/-D40/, "Got expected option");
 like($args, qr/-O2/, "Got expected option");
 
@@ -52,7 +52,7 @@ $optsref = {
 ($gc_debug, $run_exec) = (1,0);
 $args = get_test_prog_args($optsref, $gc_debug, $run_exec);
 like($args, qr/-d/, "Got expected option");
-like($args, qr/-g/, "Got expected option");
+like($args, qr/--runcore=cgoto/, "Got expected option");
 like($args, qr/-D40/, "Got expected option");
 like($args, qr/\s--gc-debug/, "Got expected option");
 
@@ -64,7 +64,7 @@ $optsref = {
 ($gc_debug, $run_exec) = (0,1);
 $args = get_test_prog_args($optsref, $gc_debug, $run_exec);
 like($args, qr/-d/, "Got expected option");
-like($args, qr/-g/, "Got expected option");
+like($args, qr/--runcore=cgoto/, "Got expected option");
 like($args, qr/-D40/, "Got expected option");
 like($args, qr/\s--run-exec/, "Got expected option");
 
