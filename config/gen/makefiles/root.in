@@ -167,6 +167,7 @@ GEN_CONFIGS := \
     lib/Parrot/Config/Generated.pm \
     lib/Parrot/PMC.pm \
     runtime/parrot/include/config.fpmc \
+    runtime/parrot/library/config.pir \
     $(SRC_DIR)/platform.c \
 #IF(platform_asm):    $(SRC_DIR)/platform_asm.s \
 #IF(has_opengl):    config/gen/call_list/opengl.in \
