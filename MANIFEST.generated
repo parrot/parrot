@@ -55,6 +55,7 @@ include/parrot/platform.h                         [main]include
 include/parrot/platform_interface.h               [main]include
 include/parrot/platform_limits.h                  [devel]include
 include/parrot/vtable.h                           [main]include
+install_config.fpmc                               [main]lib
 installable_parrot_config.exe                     [main]bin
 installable_parrot_config                         [main]bin
 installable_parrot_debugger.exe                   [main]bin
@@ -183,7 +184,7 @@ runtime/parrot/dynext/subproxy.dylib              [library]
 runtime/parrot/dynext/subproxy.so                 [library]
 runtime/parrot/include/call_bits.pasm             [main]
 runtime/parrot/include/cclass.pasm                [main]
-runtime/parrot/include/config.fpmc                [main]
+runtime/parrot/include/config.fpmc                []
 runtime/parrot/include/datatypes.pasm             [main]
 runtime/parrot/include/errors.pasm                [main]
 runtime/parrot/include/except_severity.pasm       [main]

@@ -182,9 +182,14 @@ while (<>) {
         $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
     }
     elsif ( $meta{lib} ) {
-
-        # don't allow libraries to be installed into subdirs of libdir
-        $dest = File::Spec->catdir( $options{libdir}, basename($dest) );
+        if ( $dest =~ /^install_/ ) {
+            $dest =~ s/^install_//;            # parrot with different config
+            $dest = File::Spec->catdir( $options{libdir}, $parrotdir, 'include', $dest );
+        }
+        else {
+            # don't allow libraries to be installed into subdirs of libdir
+            $dest = File::Spec->catdir( $options{libdir}, basename($dest) );
+        }
     }
     elsif ( $meta{bin} ) {
         my $copy = $dest;
