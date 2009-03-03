@@ -4,10 +4,6 @@
 
 config.pir - Access Parrot configuration data
 
-=head1 VERSION
-
-version 0.01
-
 =head1 SYNOPSIS
 
   .sub _some
@@ -44,11 +40,20 @@ undefined values) is undefined, and may be rather funky.
 =cut
 
 .include "interpinfo.pasm"
+.include "stat.pasm"
 
 .sub _config
-    .local string conf_file
-    conf_file = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    conf_file .= "/runtime/parrot/include/config.fpmc"
+    .local string prefix, conf_file
+    prefix = interpinfo .INTERPINFO_RUNTIME_PREFIX
+
+    $S0 = concat prefix, "/runtime"
+    $I0 = stat $S0, .STAT_EXISTS
+    if $I0 goto L1
+    conf_file = prefix . "/lib/parrot/include/config.fpmc"
+    goto L2
+  L1:
+    conf_file = prefix . "/runtime@versiondir@/include/config.fpmc"
+  L2:
 
     .local pmc CONF
     CONF = new 'FileHandle'

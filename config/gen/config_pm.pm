@@ -31,6 +31,7 @@ sub _init {
     $data{result}      = q{};
     $data{templates}    = {
         myconfig        => 'config/gen/config_pm/myconfig.in',
+        config_pir      => 'config/gen/config_pm/config_pir.in',
         Config_pm       => 'config/gen/config_pm/Config_pm.in',
         config_lib      => 'config/gen/config_pm/config_lib_pasm.in',
     };
@@ -44,6 +45,11 @@ sub runstep {
 
     my $template = $self->{templates}->{myconfig};
     $conf->genfile($template, 'myconfig' );
+
+    $template = $self->{templates}->{config_pir};
+    my $gen_pir = q{runtime/parrot/library/config.pir};
+    $conf->append_configure_log($gen_pir);
+    $conf->genfile($template, $gen_pir );
 
     $template = $self->{templates}->{Config_pm};
     open( my $IN, "<", $template )
