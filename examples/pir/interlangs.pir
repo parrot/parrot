@@ -6,9 +6,9 @@
 
 # First build perl6, ecmascript and pipp
 # Then do:
-# ../../parrot -L /yourparrotdir/languages/rakudo
-#              -L /yourparrotdir/languages/ecmascript
-#              -L /yourparrotdir/languages/pipp
+# ../../parrot -L /yourparrotdir/languages/rakudo \
+#              -L /yourparrotdir/languages/ecmascript \
+#              -L /yourparrotdir/languages/pipp \
 #              interlangs.pir
 
 #-----------------------------------------------------------------------
