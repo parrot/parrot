@@ -6,7 +6,7 @@
 The procedure below describes how to manage the list of Parrot committers.
 
 See F<docs/project/roles_responsibilities.pod> for more details on the
-various roles in the Parrot project, including the Metacomitter role.
+various roles in the Parrot project, including the Metacommitter role.
 
 =head2 Instructions the new committer must follow
 
@@ -38,7 +38,7 @@ Login to Trac at L<https://trac.parrot.org/parrot/>
 
 =item 2
 
-Navitate to the Admin -> Permissions page,
+Navigate to the Admin -> Permissions page,
 L<https://trac.parrot.org/parrot/admin/general/perm>
 
 =item 3
@@ -56,7 +56,7 @@ the "parrot_committers" group.
 
 =item 5
 
-Select the username from the "Add Group Member to parrot_commiters"
+Select the username from the "Add Group Member to parrot_committers"
 listbox, and click the "Add" button. (Note that the username won't
 appear in the drop box until they've been granted "developer"
 permissions.)

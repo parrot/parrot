@@ -294,10 +294,10 @@ L<http://www.parrot.org/files/parrot_cla.pdf>
 =item 4
 
 Request commit access via the C<parrot-dev> mailing list, or via IRC
-(#parrot on irc.parrot.org).  The existing commiters will discuss your request in
+(#parrot on irc.parrot.org).  The existing committers will discuss your request in
 the next couple of weeks.
 
-If approved, a metacommiter will update the permissions to allow you to commit
+If approved, a metacommitter will update the permissions to allow you to commit
 to Parrot; see C<RESPONSIBLE_PARTIES> for the current list.  Welcome aboard!
 
 =back

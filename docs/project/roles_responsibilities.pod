@@ -42,7 +42,7 @@ Contributor to be given commit access, a Metacommitter provides that
 access. The Architect is a Metacommitters, but other Project Team
 members also hold this role.
 
-See F<docs/project/metacommiter_guide.pod> for more information.
+See F<docs/project/metacommitter_guide.pod> for more information.
 
 =head1 Committers
 

@@ -167,7 +167,7 @@ the source from the subversion repository directly. Anyone can get
 anonymous access to read the files and download a working copy to
 explore and test. For commit access, volunteers need a
 U<http://auth.perl.org> username, and need to be approved by a
-Metacommiter. To download the most recent version from SVN, type this
+Metacommitter. To download the most recent version from SVN, type this
 command into your terminal N<This is for Linux users, on Mac or
 Windows systems, follow the instructions from your SVN client>:
 
