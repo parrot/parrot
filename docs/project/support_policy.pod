@@ -18,64 +18,106 @@ strongly on its release schedule.
 
 =head2 Release Schedule
 
-Parrot currently follows a monthly cycle; we produce a new stable release of
-Parrot on the third Tuesday of each month.  This will continue into the
-forseeable future.
+The Parrot team makes twelve releases a year, on the third Tuesday of
+every month. We make two kinds of releases, "supported" releases and
+"developer" releases.
 
-However, we will concentrate our efforts to produce two milestone releases each
-year, one in January and one on July.  The January release will be an I<x>.0
-release and the July release will be an I<x>.5 release.  Don't read too much
-into these numbers; they represent the points at which we believe we will have
-delivered complete sets of major features.
+The supported releases happen in January and July. The January releases
+are numbered X.0 (the first X.0 release is in March). The July releases
+are numbered X.6, following 6 months after the January release (the
+first July release is 1.4, following 4 months after 1.0).  The supported
+releases:
+
+  - Receive update releases for critical bug/security fixes (1.0.1, etc).
+  - Have documented deprecations between each supported release.
+  - Are intended for distribution packaging.
+  - Are intended for users.
+
+The developer releases happen every month between two supported
+releases. The developer releases:
+
+  - Track the latest monthly feature additions and removals from trunk.
+  - Do not receive bug/security releases. (Fixes appear in the next
+    developer or supported release).
+  - Are intended for developers.
 
 =head2 Deprecations
 
-We will regularly deprecate features and remove them.  All deprecations must
-have an announcement in at least one stable release before removal.  In
-practice, the milestone releases mark the points at which we will begin
-removing deprecated features.  That is, a feature deprecated in Parrot 2.1
-(February 2010 release) will likely be removed for Parrot 2.6 (August 2010
-release).  Likewise, a feature deprecated in Parrot 2.5 (June 2010) I<may> be
-removed as early as Parrot 2.6 (August 2010) -- but it is likely we will
-stagger the removal to give several months of notice between deprecation and
-removal.
+To allow for healthy growth in the project, in addition to adding new
+features we will also regularly deprecate features and remove them. To
+ease the burden of these changes on the users, our policy is to notify
+users of these deprecations in at least one supported release before
+removal. Deprecation notices are listed in the file L<DEPRECATED.pod>,
+together with a version number to help us track when the feature is safe
+to remove.
+
+For example, if a feature exists in Parrot 2.0 (January 2010), and is
+not listed for deprecation in that release, the user can be confident
+that it will still exist at the next supported release, Parrot 2.6 (July
+2010).
+
+After a feature is announced as deprecated, it might not appear in the
+next supported release. We sometimes delay removing deprecated features
+for various reasons, including dependencies by other parts of the core.
+
+The developer releases have more flexibility in feature removal, while
+still meeting the deprecation requirements for support releases. A
+feature that has a deprecation notification in the 2.0 release may be
+removed from any monthly developer release between 2.0 and the next
+supported release, though we're likely to stagger the removals. An
+experimental feature that was never included in a supported release may
+be removed before a supported release without a deprecation cycle.
 
 =head2 Supported Older Versions
 
-We support a version of Parrot by accepting patches and bug reports for that
-version and by answering questions and helping to explain the code to users and
-developers.  We will do our best to fix all reported bugs, though we reserve
-the right to triage bugs based on their severity, the difficulty of reproducing
-them, their platform characteristics, and other criteria.  As we are primarily
-volunteers, we offer no warranty nor guarantee of support other than our pride
-in producing great software as a community.
+We support a version of Parrot by accepting patches and bug reports for
+that version and by answering questions and helping to explain the code
+to users and developers.  We will do our best to fix all reported bugs,
+though we triage bugs based on their severity, the difficulty of
+reproducing them, their platform characteristics, and other criteria.
+As we are primarily volunteers, we offer no warranty nor guarantee of
+support other than our pride in producing great software as a community.
 
-We support only the most recent milestone family.  That is, after the 1.0
-release, we will support releases numbered 1.x.  After 1.5, we reserve the
-right to drop support for previous 1.x releases.  We offer no guarantees of
-support for older releases; volunteers I<may> provide support for these
-versions, but that is their own decision and not an official policy.
+For supported releases, we will make additional releases (1.0.1, 1.0.2,
+etc) to address critical bugs or security problems. What's considered
+"critical" we'll have to judge on a case-by-case basis, but the users
+can be confident that bugfix releases will not add or remove features,
+and we'll work to keep the changes as minimal as possible while
+resolving the problem.
 
-We recommend that you update to the most recent monthly stable release in a
-milestone family.  We I<may> release patches for previous releases, but in
-general we will not release updates for previous releases.
+If you decide to use developer releases to get the latest feature
+developments, we encourage you to update to each monthly release. If you
+do encounter a problem, it may have already been fixed in a later
+supported or developer release.
 
-We heartily recommend that you take the initiative to help us help you, by
-providing useful information about potential bugs and by answer diagnostic
-questions -- perhaps even trying patches or specific revisions.
+On the whole, we're happy to support releases as much as a year old. We
+might even go as far as making a bug/security release for a supported
+release up to two years old, depending on the circumstances. As a
+voluteer project we don't have the resources to commit to making
+bug/security releases farther back than that. Depending on the nature of
+your problem, it's likely you'll be able to get help from individual
+volunteers within the project or commercial support organizations,
+though that help may take the form of helping you upgrade.
 
-We reserve the right to release updates to address severe security problems,
-per our determination of applicability and severity.
+If you have received an older release packaged by an operating system
+vendor or third party, please ask your vendor to get in touch with us,
+as we're glad to provide them with guidance for the upgrade.
 
-If you have received an older release packaged by an operating system vendor or
-third party, please contact your vendor for updated support.
+We heartily recommend that you take the initiative to help us help you,
+by providing useful information about potential bugs and by answering
+diagnostic questions -- perhaps even trying patches or specific
+revisions.
 
-=head2 Forward Compatibility
+=head2 Bytecode Compatibility
 
-We reserve the right to change the format of bytecode in the future, in
-accordance with our deprecation guidelines.  We plan to develop tools to
-migrate from bytecode formats, but we recommend that you rely on the Parrot
-Compiler Toolkit (PCT) to generate code for distribution.
+In future releases, we might make changes to the bytecode format that
+would prevent bytecode generated on one supported release from running
+on a later supported release. These changes will follow our usual
+deprecation guidelines, with adequate advance notice. We plan to develop
+tools to migrate between bytecode formats (let us know if you have an
+urgent need for them), but we generally recommend that you distribute
+your code in a source form (in the high-level language or PIR), and
+allow Parrot to generate the bytecode as a local optimization.
 
 =head2 Platform Support
 
@@ -92,20 +134,27 @@ We may not support all additional features on every platform (JIT, native
 binaries, alternate runcores), but the default configuration and runstate of
 Parrot will work on all supported platforms.
 
-We do not preclude supporting other platforms and compilers, but we cannot
-commit to supporting such platforms without at least one champion for each
-platform.  We reserve the right not to support a platform if doing so would
-create an undesirable support burden for the other major platforms.
+Other platforms and compilers will also be supported, but we can't
+commit to supporting a platform without at least one champion who has
+the skills to make portability fixes, and is willing to test the monthly
+developer releases, or preferably a regular checkout of trunk.  We might
+not include a platform in our offical support list (even with a
+champion) if supporting that platform would create an undesirable
+support burden for the other major platforms.
 
 =head2 Deprecation Candidates
 
-If it's publicly available, a backwards-incompatible changes requires
-deprecation:
+If it has been included in at least one supported release, a
+backwards-incompatible change requires deprecation:
 
 =over 4
 
-=item * bytecode changes (ops or core PMC removals, renames)
+=item * bytecode changes (opcode or core PMC removals, renames)
 
 =item * PARROT_API function changes
+
+=item * PIR or PASM syntax changes
+
+=item * API changes in the compiler tools
 
 =back
