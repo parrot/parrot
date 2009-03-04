@@ -28,18 +28,31 @@ are numbered X.6, following 6 months after the January release (the
 first July release is 1.4, following 4 months after 1.0).  The supported
 releases:
 
-  - Receive update releases for critical bug/security fixes (1.0.1, etc).
-  - Have documented deprecations between each supported release.
-  - Are intended for distribution packaging.
-  - Are intended for users.
+=over 4
+
+=item * Receive update releases for critical bug/security fixes (1.0.1, etc).
+
+=item * Have documented deprecations between each supported release.
+
+=item * Are intended for distribution packaging.
+
+=item * Are intended for users.
+
+=back
 
 The developer releases happen every month between two supported
 releases. The developer releases:
 
-  - Track the latest monthly feature additions and removals from trunk.
-  - Do not receive bug/security releases. (Fixes appear in the next
-    developer or supported release).
-  - Are intended for developers.
+=over 4
+
+=item * Track the latest monthly feature additions and removals from trunk.
+
+=item * Do not receive bug/security releases. (Fixes appear in the next
+developer or supported release).
+
+=item * Are intended for developers.
+
+=back
 
 =head2 Deprecations
 
