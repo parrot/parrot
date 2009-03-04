@@ -1,6 +1,8 @@
 # Copyright (C) 2001-2003, Parrot Foundation.
 # $Id$
 
+=begin pod
+
 =head1 NAME
 
 examples/mops/mops.c - Calculate M ops/s
@@ -32,9 +34,21 @@ Prints out:
 
 =back
 
-=cut
+=head1 SEE ALSO
 
-sub main() {
+F<examples/benchmarks/mops.pasm>,
+F<examples/mops/mops.c>,
+F<examples/mops/mops.cs>,
+F<examples/mops/mops.il>,
+F<examples/mops/mops.pl>,
+F<examples/mops/mops.ps>,
+F<examples/mops/mops.py>,
+F<examples/mops/mops.rb>,
+F<examples/mops/mops.scheme>.
+
+=end pod
+
+sub MAIN() {
 	my ($I1, $I2, $I3, $I4, $I5, $N1, $N2, $N4, $N5);
 $I2 = 0;                      # set    I2, 0
 $I3 = 1;                      # set    I3, 1
@@ -75,16 +89,3 @@ print "M op/s:        ",$N1,"\n"; # print  "M op/s:        "
                               #
 }				# end main
 
-=head1 SEE ALSO
-
-F<examples/benchmarks/mops.pasm>,
-F<examples/mops/mops.c>,
-F<examples/mops/mops.cs>,
-F<examples/mops/mops.il>,
-F<examples/mops/mops.pl>,
-F<examples/mops/mops.ps>,
-F<examples/mops/mops.py>,
-F<examples/mops/mops.rb>,
-F<examples/mops/mops.scheme>.
-
-=cut
