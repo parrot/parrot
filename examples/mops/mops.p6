@@ -36,6 +36,7 @@ Prints out:
 =head1 SEE ALSO
 
 F<examples/benchmarks/mops.pasm>,
+F<examples/benchmarks/mops_intval.pasm>,
 F<examples/mops/mops.c>,
 F<examples/mops/mops.cs>,
 F<examples/mops/mops.il>,
