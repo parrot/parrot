@@ -1,36 +1,35 @@
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =begin pod
 
 =head1 NAME
 
-examples/mops/mops.c - Calculate M ops/s
+examples/mops/mops.p6 - Benchmark Integer Mops
 
 =head1 SYNOPSIS
 
-    % make examples/mops/mops
-    % time examples/mops/mops
+    % perl6 examples/mops/mops.p6
 
 =head1 DESCRIPTION
 
-A Perl 6 implementation of the F<examples/mops/mops.pasm> example
-program, for speed comparisons.
+A Perl 6 implementation of the F<examples/benchmarks/mops.pasm>
+benchmark, for speed comparisons.
 
-Calculates a value for M ops/s (million operations per second) using
-integer arithmetic.
+Calculates a value for Mops (also known as M ops/s or million
+operations per second) using integer arithmetic.
 
 Prints out:
 
 =over 4
 
-=item * the number of look iterations, 
+=item * the number of loop iterations, 
 
 =item * the estimated number of ops performed,
 
 =item * the elapsed time, and 
 
-=item * the number of M op/s.
+=item * the calculated Mops.
 
 =back
 
