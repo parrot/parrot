@@ -14,7 +14,7 @@ $Revision$
 
 =head2 Synopsis
 
-Not applicable.
+PBC should be cross-platform and in the future cross-version compatible.
 
 =head2 Description
 
@@ -47,9 +47,10 @@ None.
 
 =head3 Changes
 
-A number of things in this proposed PDD differ from the old implementation,
-and few items are not yet implemented. This section details these changes and
-some of the reasoning behind them.
+A number of things in this PDD differ from the older implementation,
+and few items with the more convenient PMC access are not yet implemented.
+This section details these changes from the old implementation
+and some of the reasoning behind them.
 
 
 =head4 Packfile Header
@@ -57,11 +58,10 @@ some of the reasoning behind them.
 The format of the packfile header has changed completely, based upon a
 proposal at
 L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/1f1af615edec7449/ebfdbb5180a9d813?lnk=gst>
-and the requirement to have a UUID. I also observed that the INT field in the
-previous header format is used nowhere in Parrot and appears redundant, and
-that we were missing storing a patch version number along with the major and
-minor, which made the version number less useful. The opcode type is also gone
-due to non-use.
+and the requirement to have a UUID. The old INT field in the previous header
+format is used nowhere in Parrot and was removed, the parrot patch version
+number along with the major and minor was added. The opcode type is also gone
+due to non-use. The opcode type is always long.
 
 The version number now reflects the earliest version of Parrot that is capable
 of running the bytecode file, to enable cross-version compatibility that will
@@ -97,9 +97,8 @@ This idea will see packfiles and segments within them being represented by
 PMCs, easing memory management and providing an interface to packfiles for
 Parrot programs.
 
-This part of the proposal is based upon a few previous discussions, mostly on
-IRC or in realspace. Here are mailing list comments that provide one of the
-motivations or hints of the proposal.
+Here are mailing list comments that provide one of the motivations or hints
+of the original proposal.
 
 L<http://groups.google.com/group/perl.perl6.internals/browse_thread/thread/778ea0ac4c8676f7/b249306b543b040a?lnk=gst&q=packfile+PMCs&rnum=2#b249306b543b040a>
 
@@ -112,8 +111,8 @@ These contain the bytecode (sequence of instructions), constants table, fixup
 table, debug data, annotations and possibly more.
 
 Note that, unless otherwise stated, all offsets and lengths are given in terms
-of Parrot opcodes, not bytes. An opcode corresponds to a word size in length.
-The word size is specified in the packfile header.
+of Parrot opcodes, not bytes. An opcode corresponds to the word size, defined
+as long. The ptrsize is silently assumed to be the same as the opcode size.
 
 
 =head4 Packfile Header
@@ -129,7 +128,7 @@ Note that in this section only, offsets and lengths are in bytes.
   +--------+--------+--------------------------------------------------------+
   | 0      | 8      | 0xFE 0x50 0x42 0x43 0x0D 0x0A 0x1A 0x0A                |
   |        |        | Parrot "Magic String" to identify a PBC file. In C,    |
-  |        |        | this is the string C<\376PBC\r\n\032\n> (ASCII) or     |
+  |        |        | this is the string C<\376PBC\r\n\032\n> or             |
   |        |        | C<\xfe\x50\x42\x43\x0d\x0a\x1a\x0a>.                   |
   +--------+--------+--------------------------------------------------------+
   | 8      | 1      | Word size in bytes of words making up the segments of  |
@@ -199,6 +198,9 @@ words making up the rest of the packfile.
 The bytecode file version number exists to decouple the format of the bytecode
 file from the version of the Parrot implementation that is reading/writing it.
 It has a major and a minor part.
+
+Though we aim at cross-version portability, it is not implemented yet. So we
+currently exit when reading an incompatible bytecode file version number.
 
 The major version number should be incremented whenever there is a change to
 the layout of bytecode files. This includes new segments, changes to segment
@@ -739,8 +741,8 @@ format:
 
 =head3 Packfile PMCs
 
-A packfile will be represented in memory by Parrot as a tree of PMCs. These
-will provide a programatic way to construct and walk packfiles, both for the
+A packfile can be represented in memory by Parrot as a tree of PMCs. These
+provide a programatic way to construct and walk packfiles, both for the
 Parrot internals and from programs running on the Parrot VM.
 
 {{ TODO... ManagedStruct and UnmanagedStruct may be helpful for these;
