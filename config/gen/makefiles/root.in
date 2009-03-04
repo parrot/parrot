@@ -512,28 +512,28 @@ MAKE := @make_c@
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .h .pmc .dump $(O) .str .pir .pbc
+.SUFFIXES : .c .s .pmc .dump $(O) .str .pir .pbc
 
 # Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
 # (etc) should go. Otherwise it will insert them after the first space, which
 # makes life go horribly wrong if $(CC) contains spaces but can't have -I
 # arguments (etc) injected in the middle.
 # There is probably a better way to do this, but I can't work it out right now.
-.c$(O) :
+.c$(O) : # suffix rule (limited support)
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 # XXX probably should detect assembler, but right now this is only used on Sparc
 
-.s$(O) :
+.s$(O) : # suffix rule (limited support)
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 # XXX These obviously require parrot: had trouble adding parrot as a dependency
 # here, though. Ignored on Mac OS X, at least.
 
-.pir.pbc :
+.pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
 
-.pbc$(O) :
+.pbc$(O) : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
 
 
@@ -569,7 +569,7 @@ all : \
 $(GEN_LIBRARY) : $(PARROT)
 
 # constant string support
-.c.str :
+.c.str : # suffix rule (limited support)
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl $< > $@
 
 STR_FILES := \
@@ -609,10 +609,10 @@ PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
 PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
 PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable
 
-.pmc.dump :
+.pmc.dump : # suffix rule (limited support)
 	$(PMC2CD) $<
 
-.pmc.c :
+.pmc.c : # suffix rule (limited support)
 	$(PMC2CC) $<
 
 # not all makes might understand this, so the rules are generated

@@ -61,7 +61,7 @@ OBJS          := \
   src/pircapi$(O) \
   src/pirop$(O)
 
-.c$(O) :
+.c$(O) : # suffix rule (limited support)
 	@$(PERL) ../../tools/dev/cc_flags.pl -v ../../CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 
