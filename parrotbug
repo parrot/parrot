@@ -17,13 +17,6 @@ use Getopt::Long;
 
 my $VERSION = "1.0";
 
-# These are the standard addresses for reporting bugs.
-my %std_to =
-  ( bug => 'parrotbug@parrotcode.org',
-    ok  => 'parrotstatus-ok@parrotcode.org',
-    nok => 'parrotstatus-nok@parrotcode.org',
-  );
-
 my $parrotdir = File::Spec->curdir();
 my ( %opts, %parrot, %report );
 my ( $editor, $user, $domain, $msgid, $tmpfile );
@@ -87,17 +80,17 @@ sub generate_filename {
 }
 
 
-# Check whether a subject is trivial. A subject is not considered trivial
+# Check whether a summary is trivial. A summary is not considered trivial
 # if it's an ok or a nok report.
-# Return 1 if trivial, 0 otherwise (subject acceptable).
-sub trivial_subject {
-    my $subject = shift;
+# Return 1 if trivial, 0 otherwise (summary acceptable).
+sub trivial_summary {
+    my $summary = shift;
 
     return 0 if $opts{ok} || $opts{nok};
-    if ( $subject =~
+    if ( $summary =~
          /^(y(es)?|no?|help|parrot( (bug|problem))?|bug|problem)$/i ||
-         length($subject) < 4 ||
-         $subject !~ /\s/ ) {
+         length($summary) < 4 ||
+         $summary !~ /\s/ ) {
         return 1;
     }
     else {
@@ -114,7 +107,7 @@ sub trivial_subject {
 # Initialize the program. 
 # 
 # Get parrot information, process the options, create the message
-# information (subject, to, body, etc.) depending on the type of report
+# information (summary, to, body, etc.) depending on the type of report
 # (ok, nok or bug report).
 sub init {
     $is_linux   = lc($^O) eq 'linux';
@@ -151,9 +144,9 @@ sub init {
     help() unless GetOptions
       ( \%opts,
         "help|h", "version|V",
-        "send", "dump", "save",
+        "dump", "save",
         "from|f=s", "to|test|t=s", "editor|e=s",
-        "subject|s=s", "category|C=s", "severity|S=s",
+        "summary|s=s", "category|C=s", "severity|S=s",
         "input|input-file|i=s", "output|output-file|o=s",
         "ok", "nok", "ack!", "quiet|q!" );
 
@@ -165,8 +158,7 @@ sub init {
             last ok_report unless defined $opts{ok};
 
             # This is an ok report, woohoo!
-            $report{to} = $std_to{ok};
-            $report{subject} = "OK: parrot $parrot{version} "
+            $report{summary} = "OK: parrot $parrot{version} "
               . "on $Config{archname} $Config{osvers}";
             $report{body} = "Parrot reported to build OK on this system.\n";
             $report{category} = "install";
@@ -193,8 +185,7 @@ sub init {
             last nok_report unless defined $opts{nok};
 
             # This a nok report, how sad... :-(
-            $report{to} = $std_to{nok};
-            $report{subject} = "Not OK: parrot $parrot{version} "
+            $report{summary} = "Not OK: parrot $parrot{version} "
               . "on $Config{archname} $Config{osvers}";
             $report{category} = "install";
             $report{severity} = "none";
@@ -202,8 +193,7 @@ sub init {
         };
 
         # Neither an ok nor a nok.
-        $report{to} = $std_to{bug};
-        $report{subject}  = $opts{subject}  || "";
+        $report{summary}  = $opts{summary}  || "";
         $report{category} = $opts{category} || "";
         $report{severity} = $opts{severity} || "";
     };
@@ -221,7 +211,7 @@ sub init {
 	    : $is_macos ? $ENV{USER}
 	    : eval { getpwuid($<) };	# May be missing
 
-    # User address, used in message and in Reply-To header.
+    # User address, used in message
     $report{from} = $opts{from} || "";
 
    # Editor
@@ -231,24 +221,6 @@ sub init {
       || ( $is_macos && "" )
       || "vi";
 
-
-    ## 
-    ## Mail information.
-    ## 
-
-    # Message-Id.
-    eval "use Mail::Util;";
-    if ( $@ eq "" ) {
-        $domain = Mail::Util::maildomain();
-    }
-    elsif ($is_mswin32) {
-        $domain = $ENV{USERDOMAIN};
-    }
-    else {
-        require Sys::Hostname;
-        $domain = Sys::Hostname::hostname();
-    }
-    $msgid = "<parrotbug_${VERSION}_${$}_".time."\@$domain>";
 }
 
 
@@ -258,8 +230,8 @@ sub init {
 
 # Query missing information in order to have a complete report.
 sub query_missing_info {
-    $report{subject} = "" if trivial_subject( $report{subject} );
-    $report{subject}  = ask_for_subject()     unless $report{subject};
+    $report{summary} = "" if trivial_summary( $report{summary} );
+    $report{summary}  = ask_for_summary()     unless $report{summary};
     $report{category} = ask_for_alternative( "category", \@categories)
       unless $report{category};
     $report{severity} = ask_for_alternative( "severity", \@severities)
@@ -401,32 +373,32 @@ EOT
 }
 
 
-# Prompt for subject of message.
+# Prompt for summary of message.
 #
-# Return the subject chosen.
+# Return the summary chosen.
 # 
-# Die if more than 5 wrong subjects.
-sub ask_for_subject {
+# Die if more than 5 wrong summaries.
+sub ask_for_summary {
     print <<EOT unless $opts{quiet};
-First of all, please provide a subject for the message. It should be a
+First of all, please provide a summary for the message. It should be a
 concise description of the bug or problem. "parrot bug" or "parrot
 problem" is not a concise description.
 
 EOT
 
-    my $subject;
+    my $summary;
     my $err = 0;
     do {
-        $err and print "\nThat doesn't look like a good subject. "
+        $err and print "\nThat doesn't look like a good summary. "
           . "Please be more verbose.\n";
-        print "Subject: ";
-        $subject = <STDIN>;
-        $subject = q{} unless defined $subject;
-        chomp $subject;
+        print "Summary: ";
+        $summary = <STDIN>;
+        $summary = q{} unless defined $summary;
+        chomp $summary;
         die "Aborting.\n" if $err++ == 5;
-    } while ( trivial_subject($subject) );
+    } while ( trivial_summary($summary) );
     print "\n\n\n";
-    return $subject;
+    return $summary;
 }
 
 
@@ -500,8 +472,18 @@ EOT
 sub format_message {
     my $report = "";
 
+    # ... summary ...
+    $report .= "Summary: $report{summary}\n";
+
+    # ... sender ...
+    $report .= "Reported by: $report{from}\n";
+
+    # ... bug report ...
+    $report .= "---\n$report{body}\n";
+
     # OS, arch, compiler...
     $report .= <<EOT;
+
 ---
 osname= $Config{osname}
 osvers= $Config{osvers}
@@ -521,9 +503,6 @@ Flags:
     severity=$report{severity}
 EOT
     $report .= "    ack=no\n" if ! $opts{ack};
-
-    # ... bug report ...
-    $report .= "---\n$report{body}\n";
 
     # ... myconfig ...
     $report .= "---\n$parrot{myconfig}\n---\n";
@@ -560,7 +539,7 @@ Options:
                          developers. Only use --ok if *everything* was ok:
                          if there were *any* problems at all, use --nok.
   --nok                  Report unsuccessful build on this system.
-  --subject <subject>    Subject to include with the message.
+  --summary <summary>    Summary to include with the message.
   --category <category>  Category of the bug report.
   --severity <severity>  Severity of the bug report.
   --from <address>       Your email address.
@@ -569,14 +548,12 @@ Options:
   --input-file           File containing the body of the report. Use this
                          to quickly send a prepared message.
   --output-file          File where parrotbug will save its bug report.
-  --to <address>         Email address to send report to. (testing only)
 
   Note: you will be prompted if the program miss some information.
 
 Actions:
   --dump           Dump message.
   --save           Save message.
-  --send           Send message.
   --help           Print this help message and exit.
   --version        Print version information and exit.
 
@@ -597,64 +574,10 @@ sub save_report {
     print OUTPUT format_message();
     close OUTPUT or die "Cannot open '$opts{output}': $!";
 
-    print "Message saved.\n";
+    print "Message saved. Please submit a ticket and attach this file at
+    https://trac.parrot.org/parrot/newticket\n";
 }
 
-
-# Send message to final recipient.
-sub send_report {
-    print "==> Sending message to recipient...\n";
-
-    # On linux certain mail implementations won't accept the subject
-    # as "~s subject" and thus the Subject header will be corrupted
-    # so don't use Mail::Send to be safe
-    eval "require Mail::Send";
-    if ( $@ eq "" && !$is_linux) {
-	my $msg = new Mail::Send Subject => $report{subject}, To => $report{to};
-	$msg->add( "Reply-To", $report{from} );
-
-	my $fh = $msg->open;
-        print $fh format_message();
-	$fh->close;
-
-	print "\nMessage sent.\n";
-
-    }
-    else {
-	my $sendmail = "";
-	for ( qw[ /usr/lib/sendmail /usr/sbin/sendmail 
-                  /usr/ucblib/sendmail /var/qmail/bin/sendmail ] ) {
-	    $sendmail = $_, last if -e $_;
-	}
-
-	die <<EOT if $sendmail eq "";
-I am terribly sorry, but I cannot find sendmail, or a close
-equivalent, and the perl package Mail::Send has not been installed, so
-I can't send your bug report. We apologize for the inconvenience.
-
-So you may attempt to find some way of sending your message, it has
-been left in the file '$tmpfile'.
-EOT
-
-	open(SENDMAIL, "|$sendmail -t -oi") || die "'|$sendmail -t -oi' failed: $!";
-
-	print SENDMAIL <<EOT;
-To: $report{to}
-Subject: $report{subject}
-Reply-To: $report{from}
-Message-Id: $msgid
-
-EOT
-
-        print SENDMAIL format_message();
-	if (close(SENDMAIL)) {
-	    printf "\nMessage sent.\n";
-        }
-        else {
-	    warn "\nSendmail returned status '", $? >> 8, "'\n";
-	}
-    }
-}
 
 
 # Print version information (of the parrotbug program) and exit.
@@ -673,21 +596,19 @@ EOT
 sub what_next {
     dump_report() if $opts{dump};
     save_report() if $opts{save};
-    send_report() if $opts{send};
 
-    return if $opts{dump} || $opts{save} || $opts{send};
+    return if $opts{dump} || $opts{save};
 
     # No actions provided on command-line, prompt for action.
 
     my $action;
     do {
-        print "Action (send,display,edit,save,quit): ";
+        print "Action (display,edit,save,quit): ";
         $action = <STDIN>;
        sw: for ($action) {
              dump_report(), last sw if /^d/i;
              edit_report(), last sw if /^e/i;
              save_report(), last sw if /^sa/i;
-             send_report(), last sw if /^se/i;
              print "Uh?\n" unless /^q/i;
          };
     } until ( $action =~ /^q/i );
@@ -730,9 +651,9 @@ Report successful build on this system to parrot developers Only use
 C<--ok> if B<everything> was ok; if there were B<any> problems at all,
 use C<--nok>.
 
-=item B<--subject>
+=item B<--summary>
 
-Subject of the report. You will be prompted if you don't supply one on
+Summary of the report. You will be prompted if you don't supply one on
 the command-line.
 
 =item B<--category>
@@ -754,22 +675,9 @@ provide one, but you'll still need to validate it.
 
 Editor to use for editing the bug report.
 
-=item B<--ack>, B<--noack>
-
-Don't send a bug received acknowledgement.
-
-=item B<--input-file>
-
-File containing the body of the report. Use this to quickly send a
-prepared message.
-
 =item B<--output-file>
 
 File where parrotbug will save its bug report, if you ask it to do so.
-
-=item B<--to>
-
-Email address to send report to. (for testing purposes only)
 
 =back
 
@@ -790,10 +698,6 @@ Dump formatted report on standard output.
 Save message to a file, in order for you to send it later from your
 own. See C<--output> flag.
 
-=item B<--send>
-
-Try to send a mail with the report.
-
 =item B<--help>
 
 Print a short synopsis and exit.
@@ -803,11 +707,6 @@ Print a short synopsis and exit.
 Print version information and exit.
 
 =back
-
-
-=head1 AUTHORS
-
-Jerome Quelin (E<lt>jquelin@cpan.orgE<gt>), with lots of good stuff taken from perlbug.
 
 
 =head1 SEE ALSO
