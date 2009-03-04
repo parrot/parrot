@@ -155,7 +155,7 @@ new_sub(PARROT_INTERP)
 
 =item C<Parrot_sub * new_closure>
 
-Returns a new C<Parrot_sub> with its own sctatchpad.
+Returns a new C<Parrot_sub> with its own scratchpad.
 
 XXX: Need to document semantics in detail.
 
