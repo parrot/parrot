@@ -1,17 +1,12 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 =head1 Metacommitter Guide
 
-From F<docs/project/roles_responsibilities.pod>:
-
- All Metacommitters are responsible for managing commit access to the Parrot
- repository. Once the Architect or Pumpking approves a request for a
- Contributor to be given commit access, a Metacommitter provides that access.
- The Architect and Pumpking are Metacommitters, but other Project Team members
- may also hold this role.
-
 The procedure below describes how to manage the list of Parrot committers.
+
+See F<docs/project/roles_responsibilities.pod> for more details on the
+various roles in the Parrot project, including the Metacomitter role.
 
 =head2 Instructions the new committer must follow
 
@@ -22,23 +17,13 @@ the Metacommitter can add commit rights.
 
 =item 1
 
-Create a bitcard.org id with the username you'd like to use
-
-=item 2
-
-Login to L<https://rt.perl.org/rt3/> with the id, so the user name is available
-in RT for assigning tickets, and so it is registered in the list of users
-eligible for parrot commit bit. Your login id is shown at the top of the 
-page, e.g. C<Logged in as coke>. B<This> is the id you must provide to the
-metacommitter so they can add you.
-
-=item 3
-
-Go to L<https://svn.perl.org/accounts/> and follow the directions there to
-setup an svn password for your bitcard account; while the id is the same,
-the passwords are separate.
+Create an account on L<https://trac.parrot.org/parrot>.
 
 =back
+
+You only need to create one account for both the "parrot" and
+"languages" repositories, though the Metacommitter will need to grant
+permissions to the two repositories separately.
 
 =head2 Instructions for the Metacommitter
 
@@ -49,22 +34,42 @@ the Metacommitter can add commit rights.
 
 =item 1
 
-Login to RT at L<https://rt.perl.org/rt3/>
+Login to Trac at L<https://trac.parrot.org/parrot/>
 
 =item 2
 
-Navigate to the Parrot Commit group,
-L<https://rt.perl.org/rt3/Admin/Groups/Members.html?id=178234>
+Navitate to the Admin -> Permissions page,
+L<https://trac.parrot.org/parrot/admin/general/perm>
 
 =item 3
 
-Select the username from the "Add members" listbox, and select
-"Modify Members" button
+If the user is not already in the "developer" group (for access to
+administer tickets), enter the username in the "Add Subject to Group"
+box, and add them to the "developer" group.
+
+
+=item 4
+
+Navigate to the Admin -> Subversion Access page
+L<https://trac.parrot.org/parrot/admin/subversion/svnauthz> and select
+the "parrot_committers" group.
+
+=item 5
+
+Select the username from the "Add Group Member to parrot_commiters"
+listbox, and click the "Add" button. (Note that the username won't
+appear in the drop box until they've been granted "developer"
+permissions.)
 
 =back
 
 Congratulate the new member publicly by sending an email to
 parrot-dev@lists.parrot.org, and copying the new committer.
+
+
+The steps for the "languages" repository and Trac instance are the same,
+except the URLs are L<https://trac.parrot.org/languages/...> and the
+committer group is "languages_committers".
 
 =head2 To manage the list of Metacommitters
 
@@ -74,8 +79,9 @@ Only existing Metacommitters can perform this activity.
 
 =item 1
 
-navigate to L<https://rt.perl.org/rt3/Admin/Groups/Members.html?id=178219>
-and add/remove users as desired.
+Navigate to the Admin -> Permissions page
+L<https://trac.parrot.org/parrot/admin/general/perm> and add/remove
+"admin" users as desired.
 
 =back 
 
@@ -87,15 +93,14 @@ Only existing Metacommitters can perform this activity.
 
 =item 1
 
-navigate to L<https://rt.perl.org/rt3/Admin/Groups/Members.html?id=20479>
-and add/remove users as desired. Be sure to verify that the userid is the
-one the user shows as logged in as. (Some bugadmins have multiple RT accounts.)
+Navigate to the Admin -> Permissions page
+L<https://trac.parrot.org/parrot/admin/general/perm> and add/remove
+"developer" users as desired.
+
+Verify that the username is the one the user intends to use to
+administer tickets. (Some bugadmins have multiple Trac accounts.)
 
 =back
-
-=head1 AUTHOR
-
-Jerry Gay a.k.a. particle
 
 =head1 SEE ALSO
 

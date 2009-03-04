@@ -23,39 +23,24 @@ architectual issues. The architect is primarily but not solely responsible
 for making design decisions and documenting them in Parrot Design Documents;
 responsibility for design and design documentation of project subcomponents
 may be given to other members of the Project Team, or may be held jointly.
-The Architect also works with the Pumpking and Release Managers to develop and
-maintain the release schedule.
-
-=head2 Project Manager
-
-The Project Manager has primary responsibility for tracking project progress.
-The Project Manager holds a weekly meeting with the Project Team and key
-Committers, and reports back to TPF and project sponsors. The Project Manager
-also manages project priorities and developer concerns.
-
-=head2 Pumpking
-
-The Pumpking has primary responsibility for the project source. The Pumpking
-is the lead developer, and as such reviews patches, defines coding standards,
-and assists the efforts of Committers and Contributors. The Pumpking also
-develops and maintains the release schedule with the Architect and Release
-Managers.
+The Architect also works with Release Managers to develop and maintain
+the release schedule.
 
 =head2 Release Manager
 
-Release managers have responsibility for executing a product release,
+Release Managers have responsibility for executing a product release,
 according to the release schedule. The release schedule is developed and
-maintained jointly with the Architect and the Pumpking.
+maintained jointly with the Release Managers and the Architect.
 
 See F<docs/project/release_manager_guide.pod> for more information.
 
 =head2 Metacommitter
 
-All Metacommitters are responsible for managing commit access to the Parrot
-repository. Once the Architect or Pumpking approves a request for a
-Contributor to be given commit access, a Metacommitter provides that access.
-The Architect and Pumpking are Metacommitters, but other Project Team members
-may also hold this role.
+All Metacommitters are responsible for managing commit access to the
+Parrot repository. Once the Architect approves a request for a
+Contributor to be given commit access, a Metacommitter provides that
+access. The Architect is a Metacommitters, but other Project Team
+members also hold this role.
 
 See F<docs/project/metacommiter_guide.pod> for more information.
 
@@ -69,7 +54,7 @@ either by being nominated by another Committer, or by asking for it.
 
 =head2 Core Developer
 
-Develops and maintains core subsystems (e.g. IO, Exceptions.)
+Develops and maintains core subsystems (e.g. I/O, Exceptions.)
 
 =head2 Compiler Developer
 
@@ -93,7 +78,8 @@ platforms.
 
 =head2 Platform Porter
 
-Develops and maintains installation packages on various platforms.
+Develops and maintains Parrot for a particular platform, making
+portablility fixes or creating installation packages.
 
 =head2 Patch Monster
 
@@ -122,17 +108,10 @@ internals necessary.
 =head2 Cage Cleaner
 
 Fixes failing tests, makes sure coding standards are implemented, reviews
-documentation and examples. A class of tickets in the tracking system (RT) has
-been created for use by this group. This position encompasses tasks from entry
-level to advanced, and is a good way to get familiar with Parrot internals.
-
-=head1 STABILITY
-
-This document is 'Stable'. Changes must be approved by the Project Team.
-
-=head1 AUTHOR
-
-Jerry Gay a.k.a. particle
+documentation and examples. A class of tickets in the tracking system
+(Trac) has been created for use by this group. This position encompasses
+tasks from entry level to advanced, and is a good way to get familiar
+with Parrot internals.
 
 =head1 SEE ALSO
 
