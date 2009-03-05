@@ -38,7 +38,9 @@ Initialize the structure.  (Create a blank PackFile_Segment object.)
 
 */
     VTABLE void init() {
-        PMC_data(SELF) = PackFile_Segment_new(interp, NULL, "", 0);
+        PackFile_Segment *seg = PackFile_Segment_new(interp, NULL, "", 0);
+        PMC_data(SELF) = seg;
+        seg->type = PF_UNKNOWN_SEG;
     }
 
 

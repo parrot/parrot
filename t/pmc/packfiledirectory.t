@@ -170,12 +170,12 @@ OUT
 
 # PackfileDirectory.set_pmc_keyed_str
 
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.set_pmc_keyed_str', todo => 'implement this' );
+pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.set_pmc_keyed_str' );
 .sub 'test' :main
     .local pmc pf, pfdir
     pf    = _pbc()
     pfdir = pf.'get_directory'()
-    $P0   = pfdir[0]
+    $P0   = new [ 'PackfileRawSegment' ]
     $S0   = 'BYTECODE_foo'
     pfdir[$S0] = $P0
     $I0   = elements pfdir

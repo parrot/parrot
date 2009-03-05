@@ -57,12 +57,15 @@ Fetch a segment PMC from the array.
     VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
         const PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
         PackFile_Segment *pfseg;
-        PMC *rv;
-        int pmc_type;
+        PMC              *rv;
+        int              pmc_type;
+
         if (index < 0 || index >= (INTVAL)pfd->num_segments)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        "PackfileDirectory: index out of bounds!");
+                    "PackfileDirectory: index out of bounds!");
+
         pfseg = pfd->segments[index];
+
         switch (pfseg->type) {
             case PF_DIR_SEG:
                 pmc_type = enum_class_PackfileDirectory;
@@ -80,7 +83,8 @@ Fetch a segment PMC from the array.
                 pmc_type = enum_class_PackfileRawSegment;
                 break;
         }
-        rv = pmc_new(interp, pmc_type);
+
+        rv           = pmc_new(interp, pmc_type);
         PMC_data(rv) = pfseg;
         return rv;
     }
@@ -156,7 +160,31 @@ name already existed, it will be replaced with the new segment.
 
 */
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
+        PackFile_Segment *add_seg = PMC_data_typed(segment, PackFile_Segment *);
+
+        const int total = pfd->num_segments;
+        int       i;
+
+        for (i = 0; i < total; i++) {
+            const PackFile_Segment * const pfseg = pfd->segments[i];
+
+            if (!Parrot_str_compare(interp, name,
+                    Parrot_str_new_constant(interp, pfseg->name))) {
+                    add_seg->pf = pfd->base.pf;
+                    pfd->segments[i] = add_seg;
+                return;
+            }
+        }
+
+        add_seg->name = Parrot_str_to_cstring(interp, name);
+        add_seg->pf = pfd->base.pf;
+        PackFile_add_segment(interp, pfd, add_seg);
+    }
+
+    VTABLE void set_pmc_keyed(PMC *key, PMC *segment)  {
+        STRING *s_key = VTABLE_get_string(interp, key);
+        VTABLE_set_pmc_keyed_str(interp, SELF, s_key, segment);
     }
 
 
