@@ -504,7 +504,7 @@ this are:
  is assoc('right')    # Right associative. May also be "left" or "list"
  is pirop('add')      # Operands are passed to the PIR operator "and"
  is subname('mySub')  # Operands are passed to the function "mySub"
- is pasttyle('if')    # Operands are passed as children to an "if" PAST node in
+ is pasttype('if')    # Operands are passed as children to an "if" PAST node in
                       # the parse tree
  is parsed(&myRule)   # The token is parsed and identified using the rule
                       # "myRule" from the top-down parser
