@@ -1227,10 +1227,10 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
     else if ((UINTVAL) n & 1) {     /* seen PMCs have bit 0 set */
         seen = 1;
     }
-    else if ((UINTVAL) n & 2) { /* prev PMC was same type */
+    else if ((UINTVAL) n & 2) {     /* prev PMC was same type */
         *type = info->last_type;
     }
-    else {                       /* type follows */
+    else {                          /* type follows */
         *type = VTABLE_shift_integer(interp, io);
         info->last_type = *type;
         if (*type <= 0)
