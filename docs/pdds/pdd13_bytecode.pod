@@ -354,7 +354,7 @@ segment, for example the source code from a high level language (HLL).
 
 =head4 Bytecode Segment
 
-This segment has no additonal headers. It stores a stream of instructions in
+This segment has no additional headers. It stores a stream of instructions in
 bytecode format. Instructions have variable length. Each instruction starts
 with an operation code (opcode).
 
@@ -569,7 +569,7 @@ segment.
 =head4 Annotations Segment
 
 Annotations allow any instruction in the bytecode stream to have zero or more
-key/value pairs associated with it. These can be retrived at runtime. High
+key/value pairs associated with it. These can be retrieved at runtime. High
 level languages can use annotations to store file names, line numbers, column
 numbers and any other data, for debug purposes or otherwise, that they need.
 

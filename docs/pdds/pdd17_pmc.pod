@@ -461,7 +461,7 @@ turns it into a PMC of the appropriate class.
 
 Alternative entry point called when a PMC is first instantiated.  Accepts a
 PMC parameter used to initialize the given object.  Interpretation of the PMC
-initializer is left open, each PMC is free to choose its own implemention. A
+initializer is left open, each PMC is free to choose its own implementation. A
 null value passed as the initializer parameter is allowed.
 
 NOTE: It is strongly suggested that init_pmc(PMCNULL) be equivalent to

@@ -46,7 +46,7 @@ string, number or PMC.
 
 For this reason the following structure was produced.  Individual keys (e.g. a
 single C<Integer> or C<String>) are stored in a C<Key> PMC.  The type of the
-key is encoded in the private flags of the PMC as speficied below.   The value
+key is encoded in the private flags of the PMC as specified below.   The value
 of the C<Key> PMC is stored in the PMC's cache (i.e. C<PMC_pmc_val(key)>,
 C<PMC_int_val(key)>).
 

@@ -234,7 +234,7 @@ literals -- no wildcards or other special meaning.  There is no default list
 of items to export, so $P3 of null and $P3 of an empty array have the same
 behavior.
 
-NOTE: Exportation may entail non-obvious, odd, or even mischievious behavior.
+NOTE: Exportation may entail non-obvious, odd, or even mischievous behavior.
 For example, Perl's pragmata are implemented as exports, and they don't
 actually export anything.
 

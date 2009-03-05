@@ -80,7 +80,7 @@ word.  Doesn't the C community call these "bounce routines"?  Or something?
 The language will never provide a wrapper for its subs. For the most part,
 wrappers will be unnecessary. Where a wrapper is desired to make a library
 from some other language act more like a "native" library, the person who
-desires the native behavior can implement the wrapper and make it publically
+desires the native behavior can implement the wrapper and make it publicly
 available.  --allison }}
 
 {{ I am discovering that there are five different viewpoints here,
@@ -94,7 +94,7 @@ called "glue") as they see fit.  In particular, they may be inlined in the
 caller, or integral to the callee.
 
 Ideally, of course, the "plain Parrot" layer will be close enough to the
-semantics of both languages that glue code is unnecesary, and the call can be
+semantics of both languages that glue code is unnecessary, and the call can be
 made directly.  Language implementors are encouraged to dispense with glue
 whenever possible, even if glue is sometimes required for the general case.
 
@@ -466,7 +466,7 @@ know how to do.  The choices are therefore to (a) treat them like black boxes
 in the other language, or (b) provide a separate functional or OO API (or
 both) for calling from other languages.
 
-{{ (a) is generally prefered --allison }}
+{{ (a) is generally preferred --allison }}
 
 Several questions arise for languages with multiple representations for
 aggregate types.  Typically, this is because these types are more restricted

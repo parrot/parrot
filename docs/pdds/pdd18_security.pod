@@ -34,7 +34,7 @@ features (runtime eval of code, modification of global namespaces).
 =item * Database engine embedding, i.e. server-side execution of high-level
 languages as stored procedures, also needs control over resource access (disk
 access, network connections), and limits on loaded code, but additionally
-needs adminstrator configured lists of allowed libraries and library paths.
+needs administrator configured lists of allowed libraries and library paths.
 
 =item * Security auditing tools need hooks in the compilation process for
 static analysis.

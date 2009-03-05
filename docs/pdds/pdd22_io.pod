@@ -55,7 +55,7 @@ to implement the other someday, but it's not an immediate priority.
 Synchronous opcodes are differentiated from asynchronous opcodes by the
 presence of a callback argument in the asynchronous calls.  Asynchronous
 calls that don't supply callbacks (perhaps if the user wants to manually
-check later if the operation succeded) are enough of a fringe case that
+check later if the operation succeeded) are enough of a fringe case that
 they don't need opcodes. They can access the functionality via methods
 on ParrotIO objects.
 

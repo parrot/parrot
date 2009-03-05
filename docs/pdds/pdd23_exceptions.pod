@@ -189,7 +189,7 @@ this interface as well.
 
 =item B<PMC *get_attr_str(STRING *name)>
 
-Retreive an attribute from the Exception. All exceptions will have at least
+Retrieve an attribute from the Exception. All exceptions will have at least
 C<message>, C<severity>, C<resume>, and C<payload> attributes.
 
 The C<message> is an exception's human-readable self-description.  Note that

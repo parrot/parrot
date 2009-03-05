@@ -406,7 +406,7 @@ for deprecation.}}
 
 =head4 Parrot_str_new_noinit (was string_make_empty)
 
-Returns a new empty string with the default encoding and chararacter set.
+Returns a new empty string with the default encoding and character set.
 
 =head4 Parrot_str_new_init (was string_make_direct)
 
@@ -810,7 +810,7 @@ The String PMC provides the following methods.
 
 =item replace
 
-Replace every occurance of one string with another.
+Replace every occurrence of one string with another.
 
 =item to_int
 
@@ -828,7 +828,7 @@ Translate an ASCII string with entries from a translation table.
 
 =item reverse
 
-Reverse a string, one grapheme at a time. {{ NOTE: Currenly only works for
+Reverse a string, one grapheme at a time. {{ NOTE: Currently only works for
 ASCII strings, because it reverses one C<char> at a time. }}
 
 
