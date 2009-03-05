@@ -17,7 +17,7 @@ Sets R to the empty list (the NIL symbol).
 =cut
 
 .macro NIL (R)
-  find_global .R, "SYMBOLS", "NIL"
+  get_global .R, ["SYMBOLS"], "NIL"
 .endm
 
 =head2 .TRUE(R)
@@ -27,7 +27,7 @@ Sets R to true (the TRUE symbol).
 =cut
 
 .macro TRUE (R)
-  find_global .R, "SYMBOLS", "T"
+  get_global .R, ["SYMBOLS"], "T"
 .endm
 
 .macro CONSTANT (P)

@@ -13,22 +13,22 @@ cl.pir - Set up the package 'COMMON-LISP'
 
     .local pmc package
     .PACKAGE(package, "COMMON-LISP")
-    store_global "PACKAGES", "COMMON-LISP", package
-    store_global "PACKAGES", "CL", package
+    set_global ["PACKAGES"], "COMMON-LISP", package
+    set_global ["PACKAGES"], "CL", package
 
     .local pmc t
     t = package.'_intern_symbol'("T")                      # Create the T symbol, T meaning true
     t.'_set_value'(t)
     t.'_set_package'(package)
     t.'_set_special'(t)
-    store_global "SYMBOLS", "T", t                       # Quick alias to T
+    set_global ["SYMBOLS"], "T", t                       # Quick alias to T
 
     .local pmc nil
     nil = package.'_intern_symbol'("NIL")                  # Create the NIL symbol
     nil.'_set_value'(nil)
     nil.'_set_package'(package)
     nil.'_set_special'(t)
-    store_global "SYMBOLS", "NIL",  nil                  # Quick alias to NIL
+    set_global ["SYMBOLS"], "NIL",  nil                  # Quick alias to NIL
 
     .INTEGER(value,1)
     .DEFVAR(symbol, package, "*GENSYM-COUNTER*", value)

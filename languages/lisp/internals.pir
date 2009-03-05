@@ -21,7 +21,7 @@ internals.pir - lexical and global variables, function call
   upcase symname, symname
 
   push_eh PACKAGE_NOT_FOUND                     # Set an error handler
-  find_global package, "PACKAGES", pkgname      # Look for the package
+  get_global package, ["PACKAGES"], pkgname     # Look for the package
   pop_eh
 
   retv = package.'_lookup_symbol'(symname)        # Lookup the symbol
@@ -110,7 +110,7 @@ DONE:
 
   symname = symbol.'_get_name_as_string'()
 
-  store_global pkgname, symname, symbol
+  set_global pkgname, symname, symbol
 .end
 
 
@@ -201,7 +201,7 @@ DONE:
   upcase symname, symname
 
   push_eh PACKAGE_NOT_CREATED
-  find_global package, "PACKAGES", pkgname
+  get_global [package], "PACKAGES", pkgname
   pop_eh
 
   symbol = package.'_intern_symbol'(symname)

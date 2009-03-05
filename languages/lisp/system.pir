@@ -16,8 +16,8 @@ Used in bootstrapping.
 
     .PACKAGE(package, "SYSTEM")
 
-     store_global "PACKAGES", "SYSTEM", package
-     store_global "PACKAGES", "SYS",    package
+     set_global ["PACKAGES"], "SYSTEM", package
+     set_global ["PACKAGES"], "SYS",    package
 
     _init_reader_macros( package )
 
@@ -193,7 +193,7 @@ DONE:
 
      push_eh PACKAGE_NOT_FOUND
      .local pmc retv
-     retv = find_global "PACKAGES", pkgname_str
+     retv = get_global ["PACKAGES"], pkgname_str
      if_null retv, PACKAGE_NOT_FOUND
      pop_eh
 
@@ -227,7 +227,7 @@ DONE:
     pkgname_str = pkgname
     upcase pkgname_str
 
-    store_global "PACKAGES", pkgname_str, package
+    set_global ["PACKAGES"], pkgname_str, package
 
     .local pmc retv
     .TRUE(retv)
@@ -256,7 +256,7 @@ DONE:
     pkgname_str = pkgname
     upcase pkgname_str
 
-    store_global "PACKAGES", pkgname_str, package
+    set_global ["PACKAGES"], pkgname_str, package
 
     goto DONE
 
