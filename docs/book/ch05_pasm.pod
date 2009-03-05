@@ -1542,7 +1542,7 @@ languages like Perl make it desirable to manipulate variables by name,
 instead of just by register or stack location. These languages also
 have global variables, which are visible throughout the entire
 program. Storing a global variable in a register would either tie up
-that register for the lifetime of the program or require some unweildy way
+that register for the lifetime of the program or require some unwieldy way
 to shuffle the data into and out of registers.
 
 Parrot provides structures for storing both global and lexically
@@ -2007,7 +2007,7 @@ language:
 
 Within the Parrot interpreter there are currently three registered
 languages: C<PASM>, C<PIR>, and C<PASM1>. The first two are for parrot
-assembly language and parrot intermediate represention code. The third
+assembly language and parrot intermediate representation code. The third
 is for evaluating single statements in PASM. Parrot automatically adds
 an C<end> opcode at the end of C<PASM1> strings before they're
 compiled.

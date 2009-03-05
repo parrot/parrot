@@ -176,7 +176,7 @@ values back into Ruby types. This seems sane, and it would probably even
 work well. Now, expand this to all the languages on Parrot. We would need
 wrappers or converters to allow every pair of languages to communicate,
 which requires C<N^2> libraries to make it work! As the number of languages
-hosted on the platform increases, this clearly becomes an untennable
+hosted on the platform increases, this clearly becomes an untenable
 solution.
 
 So, what do we do? How do we make very different languages like Common

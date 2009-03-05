@@ -778,7 +778,7 @@ Threads are a means of splitting a process into multiple pieces that
 execute simultaneously.  It's a relatively easy way to get some
 parallelism without too much work. Threads don't solve all the
 parallelism problems your program may have N<And in fact, threading
-can cause its own parallism problems, if you aren't careful>.
+can cause its own parallelism problems, if you aren't careful>.
 Sometimes multiple processes on a single system, multiple processes
 on a cluster, or processes on multiple separate systems are better
 for parallelized tasks then using threads.
@@ -802,7 +802,7 @@ be a corrupted combination of the two. It will be one or the other value,
 depending on which thread wrote to the memory location last. Composite
 data structures, on the other hand, are not handled atomically. Two
 threads both accessing a large data structure can write incompatible data
-into different fields. To avoid this, these stuctures can be protected
+into different fields. To avoid this, these structures can be protected
 with special devices called mutexes. Mutexes N<depending on the exact
 implementation and semantics, Mutexes can also be known as locks,
 spinlocks, semaphores, or critical sections.> are special structures that

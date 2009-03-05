@@ -74,7 +74,7 @@ does not, and will not, have high-level looping structures like C<while>
 or C<for> loops. PIR has some support for basic C<if> branching constructs,
 but will not support more complicated C<if>/C<then>/C<else> branch
 structures. Because of these omissions PIR can become a little bit messy
-and unweildy for large programs. Luckily, there are a large group of
+and unwieldy for large programs. Luckily, there are a large group of
 high-level languages (HLL) that can be used to program Parrot instead. PIR
 is used primarily to write the compilers and libraries for these languages,
 while those languages can be used for writing larger and more complicated

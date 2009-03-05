@@ -189,7 +189,7 @@ the exact order of variables, especially as argument lists get very long.
 Sometimes there are parameters to a function that don't always need to be
 passed, or values for a parameter which should be given a default value
 if a different value hasn't been explicitly provided. Parrot provides
-a mechanism for allowing optional parameters to be specifed, so an
+a mechanism for allowing optional parameters to be specified, so an
 error won't be raised if the parameter isn't provided. Parrot also
 provides a flag value that can be tested to determine if an optional
 parameter has been provided or not, so a default value can be supplied.
@@ -352,7 +352,7 @@ control flow manipulation including all subroutine, method, and
 coroutine calls, are performed using continuations. This mechanism
 is mostly hidden from developers who build applications on top of
 Parrot. The power and flexibility is available if people want to use
-it, but it's hidden behind more familiar constucts if not.
+it, but it's hidden behind more familiar constructs if not.
 
 Doing all sorts of flow control using continuations is called
 X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
@@ -379,13 +379,13 @@ never stored in a local register or variable in C<add_two>, it's immediately
 returned. We can optimize this situation if we realize that the second call to
 C<add_one> is returning to the same place that C<add_two> is, and therefore
 can utilize the same return continuation as C<add_two> uses. The two
-subroutine calls can share a return continution, instead of having to create
+subroutine calls can share a return continuation, instead of having to create
 a new continuation for each call.
 
 X<.tailcall directive>
 In PIR code, we use the C<.tailcall> directive to make a tailcall like this,
 instead of the C<.return> directive. C<.tailcall> performs this optimization
-by reusing the return continution of the parent function to make the
+by reusing the return continuation of the parent function to make the
 tailcall. In PIR, we can write this example:
 
   .sub main :main
@@ -1208,7 +1208,7 @@ matching of an argument to a C<_> wildcard. After Parrot calculates the
 distance to each variant, it calls the function with the lowest distance.
 Notice that it's possible to define a variant that is impossible to call:
 for every potential combination of arguments there is a better match. This
-isn't necessarily a common occurance, but it's something to watch out for
+isn't necessarily a common occurrence, but it's something to watch out for
 in systems with a lot of multis and a limited number of data types in use.
 
 =cut
