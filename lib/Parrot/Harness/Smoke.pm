@@ -100,23 +100,47 @@ sub send_archive_to_smolder {
 }
 
 sub collect_test_environment_data {
-    return (
-        'Architecture' => $PConfig{cpuarch},
+    my ($branch, @mods);
+    # rename sun4 to sparc
+    my $arch = $PConfig{cpuarch} eq 'sun4' ? 'sparc' : $PConfig{cpuarch};
+    # add the 32/64 bit suffix to the cpuarch
+    if ($PConfig{cpuarch} !~ /\d$/) {
+      $arch = $PConfig{cpuarch} . (8*$PConfig{wordsize});
+    }
+    my $devel = $PConfig{DEVEL};
+    # check for local-modifications if -d .svn and query to continue
+    if (-d ".svn") {
+        my $status = `svn status`;
+        @mods = grep /\S/, map { /^M +(.+)$/ and $1 } split(/\n/, $status);
+        if (@mods) {
+            $devel .= (" ".@mods." mods");
+        }
+        my $info = `svn info .`;
+        ($branch) = $info =~ m{URL: .+/parrot/(\w+)$}m;
+    }
+    my @data = (
+        'Architecture' => $arch,
         'Compiler'     => _get_compiler_version(),
-        'DEVEL'        => $PConfig{DEVEL},
+        'DEVEL'        => $devel,
         'Optimize'     => ($PConfig{optimize} || 'none'),
         'Perl Version' => (sprintf('%vd', $^V) . " $PConfig{archname}"),
         'Platform'     => $PConfig{osname},
         'SVN Revision' => $PConfig{revision},
         'Version'      => $PConfig{VERSION},
     );
+    push @data, ( 'Branch' => $branch ) if $branch;
+    push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
+    return @data;
 }
 
 # this can be expanded to more than just GCC
 sub _get_compiler_version {
     my $compiler = $PConfig{cc};
-    if($compiler eq 'gcc') {
+    if ($compiler =~ /gcc/ and $PConfig{gccversion}) {
         $compiler .= " $PConfig{gccversion}";
+    }
+    elsif ($compiler =~ /cl/ and $PConfig{msvcversion}) {
+        $compiler .= " $PConfig{msvcversion}";
     }
     return $compiler;
 }
@@ -124,9 +148,6 @@ sub _get_compiler_version {
 sub generate_html_smoke_report {
     my $argsref = shift;
     my $html_fn = $argsref->{file};
-    my @smoke_config_vars = qw(
-        osname archname cc build_dir cpuarch revision VERSION optimize DEVEL
-    );
 
     eval {
         require Test::TAP::HTMLMatrix;
@@ -134,6 +155,8 @@ sub generate_html_smoke_report {
     };
     die "You must have Test::TAP::HTMLMatrix installed.\n\n$@"
         if $@;
+
+    my @test_env_data = collect_test_environment_data();
 
     {
       no warnings qw/redefine once/;
@@ -168,14 +191,15 @@ sub generate_html_smoke_report {
       my $end = time();
 
       my $duration = $end - $start;
-
+      my %hash = @test_env_data;
+      my $branch = $hash{Branch} ||= 'trunk';
       my $v = Test::TAP::HTMLMatrix->new(
         $model,
         join("\n",
              "duration: $duration",
-             "branch: unknown",
+             "branch: $branch",
              "harness_args: " . (($argsref->{args}) ? $argsref->{args} : "N/A"),
-             map { "$_: $PConfig{$_}" } sort @smoke_config_vars),
+             map { "$_: $hash{$_}" } keys %hash),
       );
 
       $v->has_inline_css(1); # no separate css file
