@@ -2782,8 +2782,6 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
                          opcode_t offset, ARGIN(const char *filename))
 {
     ASSERT_ARGS(Parrot_debug_add_mapping)
-    PackFile_Constant             *fnconst;
-    PackFile_DebugFilenameMapping *mapping;
     PackFile_ConstTable * const    ct         = debug->code->const_table;
     int                            insert_pos = 0;
 
@@ -2810,23 +2808,46 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     }
 
     /* Need to put filename in constants table. */
-    ct->const_count   = ct->const_count + 1;
-    mem_realloc_n_typed(ct->constants, ct->const_count, PackFile_Constant *);
+    {
+        /* Set up new entry and insert it. */
+        PackFile_DebugFilenameMapping *mapping =
+                mem_allocate_typed(PackFile_DebugFilenameMapping);
+        STRING *namestr = Parrot_str_new_init(interp, filename, strlen(filename),
+                PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, 0);
+        size_t count = ct->const_count;
+        size_t i;
 
-    fnconst           = PackFile_Constant_new(interp);
-    fnconst->type     = PFC_STRING;
-    fnconst->u.string = Parrot_str_new_init(interp, filename,
-                            strlen(filename), PARROT_DEFAULT_ENCODING,
-                            PARROT_DEFAULT_CHARSET, PObj_constant_FLAG);
-    ct->constants[ct->const_count - 1] = fnconst;
+        mapping->offset       = offset;
 
-    /* Set up new entry and insert it. */
-    mapping               = mem_allocate_typed(PackFile_DebugFilenameMapping);
-    mapping->offset       = offset;
-    mapping->filename     = ct->const_count - 1;
+        /* Check if there is already a constant with this filename */
+        for (i= 0; i < count; ++i) {
+            if (ct->constants[i]->type == PFC_STRING &&
+                    Parrot_str_equal(interp, namestr, ct->constants[i]->u.string))
+                break;
+        }
+        if (i < count) {
+            /* There is one, use it */
+            count = i;
+       }
+       else {
+            /* Not found, create a new one */
+            PackFile_Constant             *fnconst;
+            ct->const_count   = ct->const_count + 1;
+            mem_realloc_n_typed(ct->constants, ct->const_count, PackFile_Constant *);
 
-    debug->mappings[insert_pos] = mapping;
-    debug->num_mappings         = debug->num_mappings + 1;
+            fnconst           = PackFile_Constant_new(interp);
+            fnconst->type     = PFC_STRING;
+            fnconst->u.string = Parrot_str_new_init(interp, filename, strlen(filename),
+                    PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET,
+                    PObj_constant_FLAG);
+            ct->constants[ct->const_count - 1] = fnconst;
+        }
+
+        /* Set the mapped value */
+        mapping->filename     = count;
+        debug->mappings[insert_pos] = mapping;
+        debug->num_mappings         = debug->num_mappings + 1;
+    }
 }
 
 
