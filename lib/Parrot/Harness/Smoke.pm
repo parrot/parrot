@@ -118,6 +118,22 @@ sub collect_test_environment_data {
         my $info = `svn info .`;
         ($branch) = $info =~ m{URL: .+/parrot/(\w+)$}m;
     }
+    my $me = $^O eq 'MSWin32' ? $ENV{'USERNAME'}
+           : $^O eq 'os2' ? $ENV{'USER'} || $ENV{'LOGNAME'}
+           : $^O eq 'MacOS' ? $ENV{'USER'}
+           : eval { getpwuid($<) };
+    my $domain = '';
+    eval "use Mail::Util;";
+    if (!$@) {
+        $domain = Mail::Util::maildomain();
+    }
+    elsif ($^O eq 'MSWin32') {
+        $domain = $ENV{'USERDOMAIN'};
+    }
+    else {
+        eval { require Sys::Hostname;
+        $domain = Sys::Hostname::hostname(); }
+    }
     my @data = (
         'Architecture' => $arch,
         'Compiler'     => _get_compiler_version(),
@@ -127,6 +143,7 @@ sub collect_test_environment_data {
         'Platform'     => $PConfig{osname},
         'SVN Revision' => $PConfig{revision},
         'Version'      => $PConfig{VERSION},
+        'Submitter'    => "$me\@$domain"
     );
     push @data, ( 'Branch' => $branch ) if $branch;
     push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
