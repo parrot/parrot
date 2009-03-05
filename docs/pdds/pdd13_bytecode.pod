@@ -6,7 +6,7 @@
 =head2 Abstract
 
 This PDD describes the file format for Parrot Bytecode (PBC) files and the
-interface through which they may be manipulated programatically.
+interface through which they may be manipulated programmatically.
 
 =head2 Version
 
@@ -742,7 +742,7 @@ format:
 =head3 Packfile PMCs
 
 A packfile can be represented in memory by Parrot as a tree of PMCs. These
-provide a programatic way to construct and walk packfiles, both for the
+provide a programmatic way to construct and walk packfiles, both for the
 Parrot internals and from programs running on the Parrot VM.
 
 {{ TODO... ManagedStruct and UnmanagedStruct may be helpful for these;

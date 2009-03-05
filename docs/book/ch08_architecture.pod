@@ -686,7 +686,7 @@ and acceptable for an event handler to throw an exception, allocate
 memory, or manipulate thread or global state safely. Event handlers
 can even acquire locks if they need to. Even though event handlers have
 all these capabilities, it doesn't mean they should be used with
-impugnity. An event handler blocking on a lock can easily deadlock a
+impunity. An event handler blocking on a lock can easily deadlock a
 program that hasn't been properly designed. Parrot gives you plenty of
 rope, it's up to the programmer not to trip on it.
 

@@ -315,7 +315,7 @@ The pieces that can be found in the byte code segment are as follows:
   +----------+----------+----------+----------+
 
 The number of arguments and the type of each argument can usually be determined
-by consulting Parrot::Opcode, or programatically by obtaining the op_info_t
+by consulting Parrot::Opcode, or programmatically by obtaining the op_info_t
 structure for the opcode in question.
 
 There are currently 4 opcodes that can take a variable number of arguments:

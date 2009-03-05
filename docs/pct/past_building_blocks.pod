@@ -202,7 +202,7 @@ results in:
 =head2 Typical use
 
 Nodes of type PAST::Var are used to represent variables and their declarations
-(based on the C<:isdecl> flag, see below). Whereever a variable is used in the
+(based on the C<:isdecl> flag, see below). Wherever a variable is used in the
 source language, this can be represented by a PAST::Var node.
 
 =head2 Attributes

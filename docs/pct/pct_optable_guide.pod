@@ -37,7 +37,7 @@ Consider the following example grammar:
  }
 
 
-An expresson such as C<1 + 2> will result in a parse tree like this:
+An expression such as C<1 + 2> will result in a parse tree like this:
 
  expression
    mulexpr
