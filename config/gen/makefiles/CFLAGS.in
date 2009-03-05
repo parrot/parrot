@@ -5,11 +5,12 @@
 #
 # Note, empty regex/options are just ignored.
 #
-src/platform.c      -{-Wcast-qual}           # noisy
-src/spf_render.c    -{-Wformat-nonliteral}   # noisy
+src/platform.c      -{-Wcast-qual}          # noisy
+src/spf_render.c    -{-Wformat-nonliteral}  # noisy
 src/tsq.c           -{@optimize@}           # never optimize tsq.c!
 src/ops/core_ops_cg.c      -{@optimize@}    # takes too long
 src/ops/core_ops_switch.c  -{@optimize@}    # Overwhelms some compilers.
+#IF(cpuarch==amd64):src/gc/system.c  -{@optimize@}              # TT #405 amd64 --optimize problem
 
 # io should be -Wunused clean
 {^src/io/}              s/-Wno-unused/-Wunused/

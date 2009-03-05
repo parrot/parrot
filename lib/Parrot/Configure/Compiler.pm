@@ -401,6 +401,10 @@ sub genfile {
         print {$out} @comment, "\n"; # extra newline after header
     }
 
+    if ($target eq 'CFLAGS') {
+        $options{conditioned_lines} = 1;
+    }
+
     # this loop can not be implemented as a foreach loop as the body
     # is dependent on <IN> being evaluated lazily
 
