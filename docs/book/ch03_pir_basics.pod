@@ -1016,7 +1016,7 @@ Reads C<length> bytes from the filehandle.
 The two calls are equivalent, and the C<read> opcode calls the C<'read'()>
 method internally.
 
-=item C<$P0.'readline'()
+=item C<$P0.'readline'()>
 
 Reads an entire line (up to a newline character or EOF) from the filehandle.
 
