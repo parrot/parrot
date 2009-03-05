@@ -24,11 +24,11 @@ as well as backtrace tests.
 =cut
 
 $ENV{TEST_PROG_ARGS} ||= '';
-my $nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
+my $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/
     ? "\\(unknown file\\)\n-1" : "debuginfo_\\d+\\.pasm\n\\d";
 
 SKIP: {
-skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /[^-]?-[fg]/;
+skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/;
 
 pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 .pcc_sub main:
@@ -164,11 +164,11 @@ called from Sub 'rec' pc (\d+|-1) \(.*?:(\d+|-1)\)
 called from Sub 'main' pc (\d+|-1) \(.*?:(\d+|-1)\)$/
 OUTPUT
 
-$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
     ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
 
 SKIP: {
-skip "disabled on this core",2 if $ENV{TEST_PROG_ARGS} =~ /[^-]?-[fgjS]/;
+skip "disabled on this core",2 if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto|jit|switch)/;
 
 # See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
@@ -183,7 +183,7 @@ CODE
 /$nolineno/
 OUTPUT
 
-$nolineno = $ENV{TEST_PROG_ARGS} =~ /-f/
+$nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto|jit|switch)/
     ? '\(\(unknown file\):-1\)' : '\(foo.p6:128\)';
 # See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );

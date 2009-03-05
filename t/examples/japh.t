@@ -38,8 +38,8 @@ if ( $PConfig{bigendian} ) {
 if ( $PConfig{intvalsize} == 8 ) {
     $todo{2} = 'works only with 32-bit integer values';
 }
-if ( defined( $ENV{TEST_PROG_ARGS}) && $ENV{TEST_PROG_ARGS} =~ /-j/ ) {
-    $todo{4} = 'broken with -j';
+if ( defined( $ENV{TEST_PROG_ARGS}) && $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ) {
+    $todo{4} = 'broken with JIT';
 }
 
 # run all tests and tell about todoness

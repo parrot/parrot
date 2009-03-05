@@ -153,7 +153,7 @@ ok 1
 ok 2
 OUT
 
-    my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
+    my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?
        ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
     pasm_output_is( <<'CODE', <<'OUT', "Timer setup - initializer/start/repeat" , @todo );
 .include "timer.pasm"

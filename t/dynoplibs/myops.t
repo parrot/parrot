@@ -67,7 +67,7 @@ OUTPUT
     my @todo;
 
     if ( $ENV{TEST_PROG_ARGS} ) {
-        @todo = ( todo => 'broken with -j' ) if $ENV{TEST_PROG_ARGS} =~ /-j/;
+        @todo = ( todo => 'broken with JIT' ) if $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/;
     }
 
     my $quine = <<'END_PASM';
@@ -77,7 +77,7 @@ END_PASM
     pasm_output_is( $quine, $quine, 'a short cheating quine', @todo );
 }
 
-    my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
+    my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?
        ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
 
 pir_output_is( << 'CODE', << 'OUTPUT', "one alarm", @todo );
@@ -112,9 +112,9 @@ OUTPUT
 
 SKIP: {
     skip "three alarms, infinite loop under mingw32", 2 if $is_mingw;
-    skip "dynops weird in CGP with events", 2 if $ENV{TEST_PROG_ARGS} =~ /-g/;
+    skip "dynops weird in CGP with events", 2 if $ENV{TEST_PROG_ARGS} =~ /--runcore=cgoto/;
 
-    my @todo = $ENV{TEST_PROG_ARGS} =~ /-j/ ?
+    my @todo = $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ?
        ( todo => 'RT #49718, add scheduler features to JIT' ) : ();
 
     pir_output_like( << 'CODE', << 'OUTPUT', "three alarm", @todo );

@@ -733,9 +733,9 @@ OUTPUT
 my @todo;
 
 if ( $ENV{TEST_PROG_ARGS} ) {
-    push @todo, ( todo => 'Broken with CGP' ) if $ENV{TEST_PROG_ARGS} =~ /-C/;
-    push @todo, ( todo => 'Broken with JIT' ) if $ENV{TEST_PROG_ARGS} =~ /-j/;
-    push @todo, ( todo => 'Broken with -S' )  if $ENV{TEST_PROG_ARGS} =~ /-S/;
+    push @todo, ( todo => 'Broken with CGP' ) if $ENV{TEST_PROG_ARGS} =~ /--runcore=cgp/;
+    push @todo, ( todo => 'Broken with JIT' ) if $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/;
+    push @todo, ( todo => 'Broken with switch core' )  if $ENV{TEST_PROG_ARGS} =~ /--runcore=switch/;
 }
 pir_output_unlike( <<'CODE', qr/not/, "globals + constant table subs issue", @todo );
 .namespace [ 'Foo' ]

@@ -77,7 +77,7 @@ plan skip_all => 'IMCC cannot do parse-only with JIT enabled'
     if $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/;
 
 plan skip_all => 'IMCC cannot do parse-only with switched core'
-    if $ENV{TEST_PROG_ARGS} =~ /-S/;
+    if $ENV{TEST_PROG_ARGS} =~ /--runcore=switch/;
 
 plan tests => scalar keys %cmds;
 
