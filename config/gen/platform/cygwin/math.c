@@ -22,12 +22,16 @@ math stuff
 */
 
 /*
- * force atan2() to use IEEE behavior
+ * force atan2() to use fast IEEE behavior
  */
 
 #include <math.h>
 
+#ifndef __STRICT_ANSI__
 _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
+#else
+_LIB_VERSION_TYPE _LIB_VERSION = _POSIX_;
+#endif
 
 #if DOUBLE_SIZE == 2 * INT_SIZE
 /*
@@ -63,7 +67,10 @@ Parrot_signbit(double x)
 =item C<int
 Parrot_signbit_l(long double x)>
 
-RT#48260: Not yet documented!!!
+Same as Parrot_signbit for long double.
+
+Return true if the Numval has a negative sign.
+This is mostly for handling the -0.0 case.
 
 =cut
 
