@@ -23,6 +23,7 @@ This is only used by the PBC dumper C<pbc_dump>.
 #include "parrot/parrot.h"
 #include "parrot/packfile.h"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_key.h"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -173,12 +174,13 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         break;
 
     case PFC_KEY:
-        for (i = 0, key = self->u.key; key; key = (PMC*)PMC_data(key), i++)
-            ;
+        for (i = 0, key = self->u.key; key; i++) {
+            GETATTR_Key_next_key(interp, key, key);
+        }
         /* number of key components */
         Parrot_io_printf(interp, "    [ 'PFC_KEY' (%ld items)\n", i);
         /* and now type / value per component */
-        for (key = self->u.key; key; key = (PMC*)PMC_data(key)) {
+        for (key = self->u.key; key; ) {
             opcode_t type = PObj_get_FLAGS(key);
 
             Parrot_io_printf(interp, "       {\n");
@@ -254,6 +256,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                             "unsupported constant type\n");
                     Parrot_exit(interp, 1);
             }
+            GETATTR_Key_next_key(interp, key, key);
         }
         Parrot_io_printf(interp, "    ],\n");
         break;

@@ -24,11 +24,12 @@ the Parrot debugger, and the C<debug> ops.
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "parrot/embed.h"
-#include "interp_guts.h"
 #include "parrot/oplib.h"
-#include "trace.h"
 #include "parrot/debugger.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_key.h"
+#include "interp_guts.h"
+#include "trace.h"
 #include "debug.str"
 
 /* Hand switched debugger tracing
@@ -2675,7 +2676,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                     dest[size++] = '?';
                     break;
                 }
-                k = PMC_data_typed(k, PMC *);
+                GETATTR_Key_next_key(interp, k, k);
                 if (k)
                     dest[size++] = ';';
             }

@@ -920,7 +920,7 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 #
 # Parrot Dump
 #
-$(SRC_DIR)/packdump$(O) : $(SRC_DIR)/pmc/pmc_sub.h
+$(SRC_DIR)/packdump$(O) : $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h
 
 $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1084,7 +1084,7 @@ $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
-    $(SRC_DIR)/debug.str
+    $(SRC_DIR)/debug.str $(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/sub.str \
 	$(SRC_DIR)/pmc/pmc_sub.h
