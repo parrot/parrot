@@ -180,7 +180,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         /* number of key components */
         Parrot_io_printf(interp, "    [ 'PFC_KEY' (%ld items)\n", i);
         /* and now type / value per component */
-        for (key = self->u.key; key; ) {
+        for (key = self->u.key; key;) {
             opcode_t type = PObj_get_FLAGS(key);
 
             Parrot_io_printf(interp, "       {\n");
