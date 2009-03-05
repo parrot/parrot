@@ -47,7 +47,7 @@ const char * desc_fp_encoding(unsigned char c)
     switch(c) {
         case FpEncodingIEEE_754_8:  return "IEEE 754 8 byte double";
         case FpEncodingIEEE_i386_12:  return "i386 little endian 12 byte long double";
-        case FpEncodingIEEE_754_16:  return "IEEE 754 16 byte lobg double";
+        case FpEncodingIEEE_754_16:  return "IEEE 754 16 byte long double";
         default: return unknown;
     }
 }
@@ -214,6 +214,8 @@ bool operator < (const DirEntry & de1, const DirEntry & de2)
 }
 
 //**********************************************************************
+
+// Check that segments does not overlap
 
 void check_overlap(const std::vector<DirEntry> & directory)
 {
@@ -501,6 +503,7 @@ void PbcFile::dump_segment_pir_debug(ifstream &pbcfile)
     unsigned long segsize = read_opcode(pbcfile);
     cout << "Segment size: " << segsize << '\n';
 
+    // Alignment bug?
     pbcfile.ignore(8);
 /*
     pbcfile.ignore(16 - opcode_size);
@@ -631,6 +634,7 @@ unsigned long PbcFile::read_opcode(ifstream &pbcfile)
         }
         break;
     default:
+        // This must have been catched before reaching this point
         throw std::logic_error("Bad byte order");
     }
     return result;
