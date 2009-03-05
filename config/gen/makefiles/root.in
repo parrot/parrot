@@ -1084,10 +1084,10 @@ $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 $(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
-    $(SRC_DIR)/debug.str $(SRC_DIR)/pmc/pmc_key.h
+    $(SRC_DIR)/debug.str $(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h
 
 $(SRC_DIR)/sub$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/sub.str \
-	$(SRC_DIR)/pmc/pmc_sub.h
+	$(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_continuation.h
 
 $(SRC_DIR)/string/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/string/private_cstring.h
 
@@ -1097,7 +1097,8 @@ $(SRC_DIR)/longopt$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/dynext$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dynext.str
 
-$(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exceptions.str
+$(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exceptions.str \
+	$(SRC_DIR)/pmc/pmc_continuation.h
 
 $(SRC_DIR)/events$(O) : $(GENERAL_H_FILES)
 
@@ -1110,7 +1111,7 @@ $(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES)
 
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
-	$(SRC_DIR)/pmc/pmc_key.h
+	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h
 
 $(SRC_DIR)/inter_cb$(O) : $(SRC_DIR)/inter_cb.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_cb.str
@@ -1121,7 +1122,8 @@ $(SRC_DIR)/inter_misc$(O) : $(SRC_DIR)/inter_misc.c $(GENERAL_H_FILES) \
 $(SRC_DIR)/inter_create$(O) : $(SRC_DIR)/inter_create.c $(GENERAL_H_FILES) \
     $(SRC_DIR)/inter_create.str
 
-$(SRC_DIR)/call/ops$(O) : $(SRC_DIR)/call/ops.c $(GENERAL_H_FILES)
+$(SRC_DIR)/call/ops$(O) : $(SRC_DIR)/call/ops.c $(GENERAL_H_FILES) \
+	$(SRC_DIR)/pmc/pmc_continuation.h
 
 $(IO_DIR)/api$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h $(IO_DIR)/api.str
 
@@ -1139,7 +1141,8 @@ $(SRC_DIR)/gc/memory$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/main$(O) : $(SRC_DIR)/main.c $(GENERAL_H_FILES)
 
-$(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/pic$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
+	$(SRC_DIR)/pmc/pmc_continuation.h
 
 $(SRC_DIR)/pic_jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
@@ -1199,7 +1202,8 @@ $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
 
 $(IO_DIR)/filehandle$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
-$(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c
+$(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
+	$(SRC_DIR)/pmc/pmc_continuation.h
 
 $(OPS_DIR)/pic.ops : $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
 

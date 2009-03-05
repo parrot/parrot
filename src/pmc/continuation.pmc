@@ -47,6 +47,7 @@ more information.
  */
 
 pmclass Continuation need_ext {
+    ATTR struct Parrot_cont *cont; /* the continuation struct */
 
 /*
 
@@ -59,7 +60,11 @@ Initializes the continuation.
 */
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = new_continuation(INTERP, NULL);
+        Parrot_Continuation_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_Continuation_attributes);
+        PMC_data(SELF) = attrs;
+
+        PMC_cont(SELF) = new_continuation(INTERP, NULL);
         PObj_custom_mark_destroy_SETALL(SELF);
         /* PANIC("don't do that"); */
         /*
@@ -115,8 +120,9 @@ Destroys the continuation.
                 Parrot_free_context(interp, cc->from_ctx, 1);
 
             mem_sys_free(cc);
-            PMC_struct_val(SELF) = NULL;
         }
+        mem_sys_free(PMC_data(SELF));
+        PMC_data(SELF) = NULL;
     }
 /*
 
@@ -131,11 +137,11 @@ Creates and returns a clone of the continuation.
     VTABLE PMC *clone() {
         Parrot_cont * const cc_self = PMC_cont(SELF);
         Parrot_cont * const cc      = new_continuation(INTERP, cc_self);
-        PMC         * const ret     = pmc_new_noinit(INTERP, enum_class_Continuation);
+        PMC         * const ret     = pmc_new(INTERP, enum_class_Continuation);
 
         PObj_custom_mark_destroy_SETALL(ret);
-        cc->runloop_id       = cc_self->runloop_id;
-        PMC_struct_val(ret)  = cc;
+        cc->runloop_id = cc_self->runloop_id;
+        PMC_cont(ret)  = cc;
 
         return ret;
     }

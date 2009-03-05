@@ -22,6 +22,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "parrot/oplib/ops.h"
 #include "sub.str"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_continuation.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
 

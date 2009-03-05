@@ -38,8 +38,12 @@ Initializes the continuation.
 */
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = new_ret_continuation(INTERP);
-        PMC_pmc_val(SELF)    = NULL;
+        Parrot_RetContinuation_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_RetContinuation_attributes);
+        PMC_data(SELF) = attrs;
+
+        PMC_cont(SELF) = new_ret_continuation(INTERP);
+        PMC_data(SELF) = attrs;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -54,7 +58,7 @@ Initializes the continuation.
         if (cc)
             mem_sys_free(cc);
 
-        PMC_struct_val(SELF) = NULL;
+        mem_sys_free(PMC_data(SELF));
     }
 /*
 

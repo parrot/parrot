@@ -21,6 +21,7 @@ Define the the core subsystem for exceptions.
 #include "parrot/parrot.h"
 #include "parrot/exceptions.h"
 #include "exceptions.str"
+#include "pmc/pmc_continuation.h"
 
 #ifdef PARROT_HAS_BACKTRACE
 #  include <execinfo.h>

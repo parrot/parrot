@@ -105,7 +105,7 @@ src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $
 src/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 src/pmc/$pmc\$(O): src/pmc/$pmc.str \$(NONGEN_HEADERS) \\
-    $parent_headers $include_headers
+    $parent_headers $include_headers src/pmc/pmc_continuation.h
 
 END
     }

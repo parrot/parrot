@@ -31,6 +31,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "interp_guts.h"
 #include "trace.h"
 #include "debug.str"
+#include "pmc/pmc_continuation.h"
 
 /* Hand switched debugger tracing
  * Set to 1 to enable tracing to stderr

@@ -230,7 +230,7 @@ typedef struct Parrot_cont {
     int invoked;                     /* flag when a handler has been invoked. */
 } Parrot_cont;
 
-#define PMC_cont(pmc) ((Parrot_cont *)PMC_struct_val(pmc))
+#define PMC_cont(pmc) (PARROT_CONTINUATION(pmc)->cont)
 
 typedef struct Parrot_Context_info {
     STRING   *subname;

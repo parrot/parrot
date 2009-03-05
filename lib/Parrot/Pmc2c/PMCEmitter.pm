@@ -75,6 +75,9 @@ sub generate_c_file {
 
     $self->gen_includes;
 
+    # The PCC code needs Continuation-related macros from these headers.
+    $c->emit("#include \"pmc_continuation.h\"\n");
+
     $c->emit( $self->preamble );
 
     $self->gen_methods;

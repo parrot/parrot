@@ -21,6 +21,7 @@ subroutines.
 #include "parrot/oplib/ops.h"
 #include "pcc.str"
 #include "../pmc/pmc_key.h"
+#include "../pmc/pmc_continuation.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 

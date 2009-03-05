@@ -45,10 +45,9 @@ Initializes the exception handler.
             mem_allocate_zeroed_typed(Parrot_ExceptionHandler_attributes);
         Parrot_cont * const cc     = new_continuation(INTERP, NULL);
 
-        PMC_struct_val(SELF)       = cc;
         cc->invoked                = 0;
-        PMC_pmc_val(SELF)          = PMCNULL;
         PMC_data(SELF)             = core_struct;
+        PMC_cont(SELF)             = cc;
         core_struct->min_severity  = 0;
         core_struct->max_severity  = 0;
         core_struct->handled_types = PMCNULL;
@@ -90,13 +89,13 @@ Mark any active exception handler data as live.
      */
 
     VTABLE void destroy() {
-        Parrot_cont                        * const cc          = PMC_cont(SELF);
+        Parrot_cont                        * const cc          = (Parrot_cont *)PMC_cont(SELF);
         Parrot_ExceptionHandler_attributes * const core_struct =
             PARROT_EXCEPTIONHANDLER(SELF);
 
         if (cc) {
             mem_sys_free(cc);
-            PMC_struct_val(SELF) = NULL;
+            PMC_cont(SELF) = NULL;
         }
 
         if (core_struct) {
@@ -122,7 +121,7 @@ Mark whether the handler has been invoked.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_cont * const cc = PMC_cont(SELF);
+        Parrot_cont * const cc = (Parrot_cont *)PMC_cont(SELF);
         cc->invoked = value;
     }
 
@@ -137,7 +136,7 @@ Check whether the handler has been invoked.
 */
 
     VTABLE INTVAL get_integer() {
-        const Parrot_cont * const cc = PMC_cont(SELF);
+        const Parrot_cont * const cc = (Parrot_cont *)PMC_cont(SELF);
         return cc->invoked;
     }
 
@@ -152,7 +151,7 @@ Set up the environment for the exception handler to be invoked.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Parrot_cont * const cc = PMC_cont(SELF);
+        Parrot_cont * const cc = (Parrot_cont *)PMC_cont(SELF);
         opcode_t    * const pc = cc->address;
 
         Parrot_continuation_check(interp, SELF, cc);

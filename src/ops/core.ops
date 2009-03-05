@@ -6,6 +6,7 @@
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
 #include "../interp_guts.h"
+#include "../pmc/pmc_continuation.h"
 
 VERSION = PARROT_VERSION;
 
