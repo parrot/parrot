@@ -6,6 +6,11 @@ It uses a file stream (Stream::ParrotIO) that is processed linewise with
 Stream::Lines. A counter stream creates line numbers, both are combined to
 one stream and then dumped.
 
+=head1 NOTE
+
+When updating this file, be sure to change L<t/example/streams.t>, as its
+tests rely on the content of this file
+
 =head1 FUNCTIONS
 
 =over 4
