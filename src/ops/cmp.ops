@@ -842,7 +842,7 @@ inline op iseq(out INT, in NUM, in NUM) {
 }
 
 inline op iseq(out INT, in STR, in STR) {
-  $1 = ( Parrot_str_equal(interp, $2, $3) ? 1 : 0 );
+  $1 = (Parrot_str_equal(interp, $2, $3) ? 1 : 0);
 }
 
 inline op iseq(out INT, invar PMC, invar PMC) {
@@ -873,7 +873,7 @@ inline op isne(out INT, in NUM, in NUM) {
 }
 
 inline op isne(out INT, in STR, in STR) {
-  $1 = ( Parrot_str_not_equal(interp, $2, $3) ? 1 : 0 );
+  $1 = (Parrot_str_not_equal(interp, $2, $3) ? 1 : 0);
 }
 
 inline op isne(out INT, invar PMC, invar PMC) {

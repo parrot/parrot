@@ -100,7 +100,8 @@ sub remap_runcore_opts
     foreach my $opt (keys %$opts_ref) {
         if (exists $remap{$opt}) {
             $mapped{$remap{$opt}} = undef;
-        } else {
+        }
+        else {
             $mapped{$opt} = $opts_ref->{$opt};
         }
     }

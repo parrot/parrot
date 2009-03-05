@@ -641,6 +641,9 @@ E: michael_scott@mac.com
 U: mikescott
 W: http://xrl.us/sml
 
+U: mikeh
+D: codingstd patches
+
 N: Michael Stevens
 D: Remove an unused variable in C-land
 
