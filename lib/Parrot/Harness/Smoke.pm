@@ -119,10 +119,8 @@ sub collect_test_environment_data {
         ($branch) = $info =~ m{URL: .+/parrot/(\w+)$}m;
     }
     my $me = $^O eq 'MSWin32' ? $ENV{'USERNAME'}
-           : $^O eq 'os2' ? $ENV{'USER'} || $ENV{'LOGNAME'}
-           : $^O eq 'MacOS' ? $ENV{'USER'}
-           : eval { getpwuid($<) };
-    my $domain = '';
+           : $ENV{'LOGNAME'} || eval { getpwuid($<) };
+    my $domain = 'unknown';
     eval "use Mail::Util;";
     if (!$@) {
         $domain = Mail::Util::maildomain();
@@ -143,7 +141,7 @@ sub collect_test_environment_data {
         'Platform'     => $PConfig{osname},
         'SVN Revision' => $PConfig{revision},
         'Version'      => $PConfig{VERSION},
-        'Submitter'    => "$me\@$domain"
+        'Submitter'    => $ENV{"SMOLDER_SUBMITTER"} || "$me\@$domain"
     );
     push @data, ( 'Branch' => $branch ) if $branch;
     push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
