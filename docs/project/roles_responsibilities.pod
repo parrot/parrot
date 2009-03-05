@@ -19,7 +19,7 @@ suitable skills by existing Project Team members.
 
 The architect has primary responsibility for setting overall direction of the
 project, and to facilitate team communication and understanding of
-architectual issues. The architect is primarily but not solely responsible
+architectural issues. The architect is primarily but not solely responsible
 for making design decisions and documenting them in Parrot Design Documents;
 responsibility for design and design documentation of project subcomponents
 may be given to other members of the Project Team, or may be held jointly.
@@ -79,7 +79,7 @@ platforms.
 =head2 Platform Porter
 
 Develops and maintains Parrot for a particular platform, making
-portablility fixes or creating installation packages.
+portability fixes or creating installation packages.
 
 =head2 Patch Monster
 

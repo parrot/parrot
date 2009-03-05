@@ -147,7 +147,7 @@ in the C interface.
 
 If there was a specific language, tool, or platform that you wanted tested
 before merging but couldn't get any response from the responsible person, you
-may want to include some warning in the annoucement that you weren't able to
+may want to include some warning in the announcement that you weren't able to
 test that piece fully.
 
 =cut

@@ -106,7 +106,7 @@ supported or developer release.
 On the whole, we're happy to support releases as much as a year old. We
 might even go as far as making a bug/security release for a supported
 release up to two years old, depending on the circumstances. As a
-voluteer project we don't have the resources to commit to making
+volunteer project we don't have the resources to commit to making
 bug/security releases farther back than that. Depending on the nature of
 your problem, it's likely you'll be able to get help from individual
 volunteers within the project or commercial support organizations,
