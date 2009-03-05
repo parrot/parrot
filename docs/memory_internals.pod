@@ -96,7 +96,7 @@ requires the garbage collector to supply 4 additional function pointers: a
 function to allocate a new arena for the pool, a function to find more items
 (possibly through running the garbage collector, or allocating objects
 otherwise), a function to add an unused item to the free list, and a function
-to retreive a new free item from the pool.
+to retrieve a new free item from the pool.
 
 Every pool maintains a list of unused items within the pool, called the
 C<free_list> When there is need for a new object it is taken off the free
@@ -152,7 +152,7 @@ way of manipulating the GC-relevant object flags.
 
 =head1 Variable sized items
 
-Variable-sized items do not exist by themselves, they are always preceeded by
+Variable-sized items do not exist by themselves, they are always preceded by
 a buffer structure that contains information about them. These buffer
 structures are described above, and the C<UnionVal cache> item typically
 points to the memory block that contains the data. The variable-sized data

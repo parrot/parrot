@@ -314,7 +314,7 @@ may be garbage collected before you are finished using it.
 
 =item C<void Parrot_unregister_pmc(Parrot_PMC pmc)>
 
-Unegisters an externally created PMC from the garbage collector.  You MUST call
+Unregisters an externally created PMC from the garbage collector.  You MUST call
 this after you are finished using PMCs you create outside of Parrot bytecode,
 or risk memory leaks.
 

@@ -24,7 +24,7 @@ parser.
 =item bcg
 
 Byte Code Generation: bcg will be part of the Parrot Compiler
-tools. It will aid in coverting POST to byte code.
+tools. It will aid in converting POST to byte code.
 
 =item Continuations
 

@@ -27,7 +27,7 @@ Steve Muchnick's MIR language, and I'm taking a few things from it.
 
 I expect the IR compiler to be FAST, simple, and maintainable,
 and never develop featuritis; however I want it to be adequate
-for all languages targetting parrot. Did I mention that it
+for all languages targeting parrot. Did I mention that it
 needs to be FAST?
 
 Register Allocation

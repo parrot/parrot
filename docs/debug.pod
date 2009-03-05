@@ -203,7 +203,7 @@ Static functions will appears as C<(unknown)>.
 
 =item * There must be some means available for walking the stack at runtime.
 On x86(-64)? the "stack pointer" must be in C<[re]sp> register.  For example,
-this C<gcc> compliiation flag would break backtracing (except for functions
+this C<gcc> compilation flag would break backtracing (except for functions
 that do dynamic allocation on the stack as this optimization can no be allied
 to them).  C<perl Configure.pl --ccflags=-fomit-frame-pointer>
 

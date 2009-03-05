@@ -51,7 +51,7 @@ If the function name might collide with a Parrot opcode, quote it:
 
 You can also use the full PCC for these calls. See
 L<docs/pdd19_pir.pod/Parameter Passing and Getting Flags> and other
-quesitons below for more information.
+questions below for more information.
 
 =head2 How do I generate a method call in PIR?
 
@@ -446,7 +446,7 @@ You can also explicitly create an exception object and throw it:
 =head2 How do I catch an exception in PIR?
 
 Use C<push_eh> to push an exception handler onto the stack. End the set of
-instructions that might throw the exception you're intrested in with
+instructions that might throw the exception you're interested in with
 C<pop_eh>.
 
     push_eh handler

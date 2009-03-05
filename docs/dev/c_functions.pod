@@ -88,7 +88,7 @@ if you pass in an uninitialized pointer, the compiler will throw a warning.
 
 Output pointers are pointers that are passed into a function, it's existing
 contents are ignored, and new contents are created for it. It's called an
-output because the data in the pointed-to structure are populared inside
+output because the data in the pointed-to structure are populated inside
 the function and passed back out to the caller. If you have a pointer that
 points to valid data and you pass it as an ARGOUT parameter, the compiler
 will throw a warning. Unlike input arguments, you can typically pass an
