@@ -37,7 +37,8 @@ sub runstep {
         $align = $conf->data->get('ptr_alignment');
         $result_str .= "configured: ";
     }
-    elsif ( $conf->data->get_p5('OSNAME') eq 'hpux' && $conf->data->get_p5('ccflags') !~ /DD64/ ) {
+    elsif ( $conf->data->get_p5('OSNAME') eq 'hpux'
+            && $conf->data->get_p5('ccflags') !~ /DD64/ ) {
 
         # HP-UX 10.20/32 hangs in this test.
         $align = 4;
@@ -94,8 +95,16 @@ sub _evaluate_ptr_alignment {
 sub _finalize_result_str {
     my $self = shift;
     my ($align, $result_str) = @_;
-    $result_str .= " $align byte";
-    $result_str .= "s" unless $align == 1;
+    # On 8-byte ptr_alignment we cannot read 4-byte pbc's. Warn the user about it.
+    # TODO: inform the user to use --64compat for parrot. Milestone v2.6
+    if ($align > 4) {
+        $result_str .= " $align byte";
+        $result_str .= "s\n   (Warning: 4-byte pbc's cannot be read!)";
+    }
+    else {
+        $result_str .= " $align byte";
+        $result_str .= "s" unless $align == 1;
+    }
     $self->set_result($result_str);
 }
 
