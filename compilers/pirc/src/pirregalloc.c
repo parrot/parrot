@@ -76,7 +76,7 @@ reset_register_count(lsr_allocator * const lsr) {
 new_linear_scan_register_allocator(struct lexer_state * lexer)>
 
 Constructor for a linear scan register allocator.
-Initializates the allocator, and returns it.
+Initializes the allocator, and returns it.
 
 =cut
 
@@ -520,7 +520,7 @@ linear_scan_register_allocation(lsr_allocator * const lsr) {
         for (i = lsr->active[type]; i != NULL; i = i->nexta)
             cache_interval_object(lsr, i);
 
-        /* intialize active intervals list to NULL */
+        /* initialize active intervals list to NULL */
         lsr->active[type] = NULL;
 
         /* fprintf(stderr, "Lin.scan.reg.alloc.: %u variables to be mapped\n",

@@ -3743,7 +3743,7 @@ yyreduce:
                            *
                            * Note that this usage is Perfectly Safe, as long as we are sure
                            * that $0 has in fact a <ival>. As "condition" is only used in
-                           * exactly one place in the whole grammer, we can be sure of this.
+                           * exactly one place in the whole grammar, we can be sure of this.
                            */
                           if (((yyvsp[(0) - (3)].ival) != NEED_INVERT_OPNAME) && ((yyvsp[(2) - (3)].ival) == OP_GE || (yyvsp[(2) - (3)].ival) == OP_GT))
                               set_instrf(lexer, opnames[(yyvsp[(2) - (3)].ival) + 1], "%E%T", (yyvsp[(3) - (3)].expr), (yyvsp[(1) - (3)].targ));

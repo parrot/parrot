@@ -2839,7 +2839,7 @@ YY_RULE_SETUP
 #line 178 "compilers/imcc/imcc.l"
 {
         /* heredocs have highest priority
-         * arrange them befor all wildcard state matches
+         * arrange them before all wildcard state matches
          */
 
         /* Newline in the heredoc. Realloc and cat on. */

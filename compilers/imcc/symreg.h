@@ -40,7 +40,7 @@ enum VARTYPE {              /* variable type can be */
 enum LIFEFLAG {    /* The status of a var inside a basic block can be */
     LF_use       = 1 << 0, /* block uses the the var before defining it */
     LF_def       = 1 << 1, /* block defines the variable */
-    LF_lv_in     = 1 << 2, /* variable is alive at the begining of the block */
+    LF_lv_in     = 1 << 2, /* variable is alive at the beginning of the block */
     LF_lv_out    = 1 << 3, /* variable is alive at the end of the block */
     LF_lv_inside = 1 << 4, /* variable is alive at some moment in the block */
     LF_lv_all    = 1 << 5  /* variable is alive throughout the block */

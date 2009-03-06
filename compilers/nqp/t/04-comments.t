@@ -4,7 +4,7 @@
 
 say('1..2');
 
-#Comment preceeding
+#Comment preceding
 say("ok 1");
 
 say("ok 2"); #Comment following

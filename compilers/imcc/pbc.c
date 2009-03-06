@@ -2107,7 +2107,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         /*
          * allocate code and pic_index
          *
-         * pic_index is half the size of the code, as one PIC-cachable opcode
+         * pic_index is half the size of the code, as one PIC-cacheable opcode
          * is at least two opcodes wide - see below how to further decrease
          * this storage
          */

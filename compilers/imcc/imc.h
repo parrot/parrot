@@ -446,7 +446,7 @@ int try_find_op(PARROT_INTERP,
 /* imclexer.c */
 void IMCC_print_inc(PARROT_INTERP);
 
-/* Call convention independant API */
+/* Call convention independent API */
 
 /* HEADERIZER BEGIN: compilers/imcc/pcc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

@@ -217,7 +217,7 @@ set_sub_vtable(lexer_state * const lexer, char const * vtablename) {
         add_self_parameter(lexer);
 
         /* always set the :vtable flag, even if :method was already set.
-         * XXX emit a warning or somethign? Is :vtable + :method still useful?
+         * XXX emit a warning or something? Is :vtable + :method still useful?
          */
         SET_FLAG(CURRENT_SUB(lexer)->flags, PIRC_SUB_FLAG_VTABLE);
     }

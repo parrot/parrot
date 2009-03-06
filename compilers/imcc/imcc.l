@@ -177,7 +177,7 @@ SP              [ ]
 
 <heredoc2>{EOL} {
         /* heredocs have highest priority
-         * arrange them befor all wildcard state matches
+         * arrange them before all wildcard state matches
          */
 
         /* Newline in the heredoc. Realloc and cat on. */

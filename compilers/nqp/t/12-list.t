@@ -8,5 +8,5 @@ my $list := (1,2,3);
 my $indexer := 0;
 
 for $list {
-    print("ok "); print($_); say(" checking loop via indeces");
+    print("ok "); print($_); say(" checking loop via indices");
 }

@@ -1760,7 +1760,7 @@ assignment:
    | target '[' keylist ']' '=' var
             { $$ = iINDEXSET(interp, IMCC_INFO(interp)->cur_unit, $1, $3, $6); }
      /* Removing this line causes test failures in t/compilers/tge/* for
-        some reason. Eventualy it should be removed and the normal handling
+        some reason. Eventually it should be removed and the normal handling
         of ops should be used for all forms of "new". */
    | target '=' 'new' classname '[' keylist ']'
             { $$ = iNEW(interp, IMCC_INFO(interp)->cur_unit, $1, $4, $6, 1); }

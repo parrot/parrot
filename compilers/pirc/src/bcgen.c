@@ -715,7 +715,7 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
             }
             default:
                 fprintf(stderr, "invalid multi entry type");
-                break; /* XXX fatal; throw excpetion? */
+                break; /* XXX fatal; throw exception? */
         }
 
         /* store the signature PMC in the array */

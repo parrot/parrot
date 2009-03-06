@@ -415,7 +415,7 @@ find_register(NOTNULL(lexer_state * const lexer), pir_type type, int regno) {
         if (iter->info.id.regno == regno) {
 
             /*
-            fprintf(stderr, "Found regster $%c%d\n", pir_register_types[type], regno);
+            fprintf(stderr, "Found register $%c%d\n", pir_register_types[type], regno);
             */
 
             /* update the end point of this register's live interval */

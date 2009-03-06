@@ -21,7 +21,7 @@ typedef enum interval_flags {
  * The realreg field is the final register. Note that this is a signed integer;
  * Initially, all PASM registers (so, the real actual registers) are set to -1
  * in the data structures. This is to indicate that no register was allocated.
- * This is fine, because we will never need 2^32 registers anywway.
+ * This is fine, because we will never need 2^32 registers anyway.
  *
  * Live interval objects can be on one of two lists: the interval list, or the active
  * list.

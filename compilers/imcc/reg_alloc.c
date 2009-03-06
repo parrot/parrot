@@ -20,7 +20,7 @@ It is a partial implementation of a Briggs-style register allocator
 The following parts are just missing:
 
  - Renumbering
- - Coaelesceing
+ - Coalescing
 
 =head2 Functions
 
@@ -791,7 +791,7 @@ build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     /* Calculate interferences between each chain and populate the the Y-axis */
     for (x = 0; x < n_symbols; x++) {
-        /* If symbol was never used in a statment, it can't interfere */
+        /* If symbol was never used in a statement, it can't interfere */
         int y;
         if (!unit->reglist[x]->first_ins)
             continue;
@@ -931,7 +931,7 @@ interferes(PARROT_INTERP, ARGIN(const IMC_Unit *unit),
      * can't interfere.
      *
      * Even if r0 and r1 are called in the same instruction, and even
-     * if this instrucion does modify r0, if its value is never used
+     * if this instruction does modify r0, if its value is never used
      * later, then they can share the same register.
      */
 #if 1

@@ -496,7 +496,7 @@ Parses a whitespace term.
 
 =item C<parse_quant(PMC mob)>
 
-Parses a quantifier, such as *, +, ?, :, and all of their wonderous
+Parses a quantifier, such as *, +, ?, :, and all of their wondrous
 combinations.
 
 =cut

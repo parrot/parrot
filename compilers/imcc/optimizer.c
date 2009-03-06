@@ -57,7 +57,7 @@ constant_propagation
 post_optimizer: currently pcc_optimize in pcc.c
 ---------------
 
-runs after register alloocation
+runs after register allocation
 
 e.g. eliminate new Px .PerlUndef because Px where different before
 

@@ -15,7 +15,7 @@ say('1..7');
 
 
 {
-    say("ok 3 # statements can preceed blocks");
+    say("ok 3 # statements can precede blocks");
     {
         say("ok 4 # blocks can nest");
     }

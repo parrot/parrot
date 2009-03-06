@@ -1544,7 +1544,7 @@ condition         : target rel_op expression
                            *
                            * Note that this usage is Perfectly Safe, as long as we are sure
                            * that $0 has in fact a <ival>. As "condition" is only used in
-                           * exactly one place in the whole grammer, we can be sure of this.
+                           * exactly one place in the whole grammar, we can be sure of this.
                            */
                           if (($<ival>0 != NEED_INVERT_OPNAME) && ($2 == OP_GE || $2 == OP_GT))
                               set_instrf(lexer, opnames[$2 + 1], "%E%T", $3, $1);

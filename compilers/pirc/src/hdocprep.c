@@ -852,7 +852,7 @@ process_heredocs(PARROT_INTERP, NOTNULL(char * const filename), NOTNULL(FILE *ou
     fp = fopen(filename, "r");
 
     if (fp == NULL) {
-        fprintf(stderr, "heredoc preprocesor: error opening file '%s'\n", filename);
+        fprintf(stderr, "heredoc preprocessor: error opening file '%s'\n", filename);
         exit(EXIT_FAILURE);
     }
 

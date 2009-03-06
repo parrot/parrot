@@ -1176,7 +1176,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
         key          = key->nextkey;
 
         /* for registers, point ->reg to the original, needed by
-         * life analyses & coloring */
+         * life analysis & coloring */
         if (REG_NEEDS_ALLOC(keys[i]))
             key->reg = keys[i];
     }

@@ -34,7 +34,7 @@ enum block_enum_flags_t {
 
 
 typedef struct _loop_info {
-    Set         *loop;       /* loop set containg bb's */
+    Set         *loop;       /* loop set containing bb's */
     Set         *exits;      /* blocks that exit the loop */
     int          depth;      /* depth of this loop */
     unsigned int n_entries;  /* nr of entries to this loop */

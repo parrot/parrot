@@ -258,7 +258,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
     char s[16];
 
     /* Avoid allocations on frequent number of params.
-     * Arbitrary value, some fine tunning may be good.
+     * Arbitrary value, some fine tuning may be good.
      */
     #define PCC_GET_ARGS_LIMIT 15
     SymReg *regcache[PCC_GET_ARGS_LIMIT + 1];
