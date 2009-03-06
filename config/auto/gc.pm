@@ -16,7 +16,7 @@ Eventually, C<--gc> will be able to take any of the following values:
 
 =item C<gc>
 
-The default. Use the memory allocator in F<src/recources.c>.
+The default. Use the memory allocator in F<src/resources.c>.
 
 =item C<libc>
 

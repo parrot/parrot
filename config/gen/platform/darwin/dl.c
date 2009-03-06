@@ -149,7 +149,7 @@ Parrot_dlopen(const char *filename)
             return (void *)header;
 
         /*
-         * that didn't work either; go ahead and report the orignal error
+         * that didn't work either; go ahead and report the original error
          */
 
         switch (dyld_result) {

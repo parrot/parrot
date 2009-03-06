@@ -9,7 +9,7 @@ config/auto/pcre.pm - Probe for pcre library
 
 Determines whether the platform supports pcre library.
 
-This library is used via NCI mecanism.
+This library is used via NCI mechanism.
 
 =cut
 

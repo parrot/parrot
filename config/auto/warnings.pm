@@ -204,7 +204,7 @@ is determined by the C<cc> value of the C<Parrot::Configure> object passed
 in as the first argument to the method (not counting C<$self>.  The warning
 to be checked is passed in as the second argument to the method.
 
-Returns true if the warning flag is recognised by the compiler and undef
+Returns true if the warning flag is recognized by the compiler and undef
 otherwise.
 
 =cut

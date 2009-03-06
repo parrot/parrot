@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-config/init/install.pm - autoconf compatabile installation paths
+config/init/install.pm - autoconf compatible installation paths
 
 =head1 DESCRIPTION
 
