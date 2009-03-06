@@ -54,7 +54,7 @@ compiled symbols.)
 
 =head3 Namespace Indexing Syntax
 
-Namespaces are denoted in Parrot as simple strings, multidimentional
+Namespaces are denoted in Parrot as simple strings, multidimensional
 hash keys, or arrays of name strings.
 
 A namespace may appear in Parrot source code as the string C<"a"> or the

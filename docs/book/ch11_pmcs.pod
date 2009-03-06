@@ -11,7 +11,7 @@ entire list of other data types as well. PMCs are the basis for all higher
 order data types in Parrot, and are flexible enough to be used for any
 purpose that an HLL needs.
 
-All the common PMC types are included in the Parrot repository and built directy
+All the common PMC types are included in the Parrot repository and built directly
 into libparrot and the parrot executable. However, the system is not rigid; new
 PMC types can be defined externally and loaded into Parrot at a later time. In
 this way, HLLs and libraries and applications can add new data types to Parrot

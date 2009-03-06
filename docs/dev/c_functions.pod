@@ -75,7 +75,7 @@ a shim, then use C<SHIM_INTERP>, not C<SHIM(PARROT_INTERP)>.
 =head2 What are input and output arguments?
 
 Pointers are dangerous because they are so versatile. You can pass a pointer
-to a function only to have that function modify the data that the poiner
+to a function only to have that function modify the data that the pointer
 is pointing to. In Parrot, we decorate all our pointer parameters with
 keywords like C<ARGIN>, C<ARGOUT>, and C<ARGMOD> to specify whether the
 pointer is an input only, an output only, or is modified.

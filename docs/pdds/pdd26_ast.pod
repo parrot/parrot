@@ -213,7 +213,7 @@ register variable within the current block. Register variables
 are mapped to Parrot registers, and are useful for handling the
 PIR pseudo-variable C<self> and storing intermediate results.
 Names given to the C<name> attribute must conform to rules for
-PIR identifiers. If no C<name> atribute is set, Parrot registers
+PIR identifiers. If no C<name> attribute is set, Parrot registers
 are used. In this case, setting the C<isdecl> does not have any
 effect.
 

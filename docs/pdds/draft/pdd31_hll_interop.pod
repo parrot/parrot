@@ -310,7 +310,7 @@ C<Complex> type provided by Parrot assumes that its components are
 floating-point numbers.  This is a suitable representation type for C<(COMPLEX
 REAL)>, but CL partitions "COMPLEX" into C<(COMPLEX REAL)> and C<(COMPLEX
 RATIONAL)>, with the latter being further divided into C<(COMPLEX RATIO)>,
-C<(COMPLEX INTEGER)>, etc.  The straighforward way to provide this
+C<(COMPLEX INTEGER)>, etc.  The straightforward way to provide this
 functionality is to define a C<ComplexRational> PMC that is built on
 C<Complex> and has real and imaginary PMC components that are constrained to
 be Integer, Bigint, or Ratio PMCs.
@@ -509,7 +509,7 @@ The caller can then use his/her language's binding of the introspection API to
 poke around in the other module, and find the necessary tools to call the
 other.  For Scheme, this would mean functions for finding Ruby classes and
 providing functional wrappers around methods.  For Ruby, I admit this would
-probably be even wierder.  In any case, it is important that the calling user
+probably be even weirder.  In any case, it is important that the calling user
 not need anything out of the ordinary, from either language or the called
 module author.  -- rgr, 29-Jul-08. }}
 

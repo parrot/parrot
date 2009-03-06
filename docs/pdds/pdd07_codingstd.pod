@@ -461,7 +461,7 @@ be modified.
     w->max  = 14;
     w->name = "Ted";
 
-This prevents you from modifying C<w> inadvertantly.
+This prevents you from modifying C<w> inadvertently.
 
     new_wango = w++; /* Error */
 

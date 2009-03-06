@@ -82,7 +82,7 @@ are not intended to be executed directly by users or scripts.
 This is libparrot$(SOEXT).$(SOVERSION) if the parrot binary was linked
 dynamically. Otherwise nothing.
 
-Also Parrot usees a single subdirectory called I</usr/lib/parrot> to
+Also Parrot uses a single subdirectory called I</usr/lib/parrot> to
 store all architecture-dependent data exclusively used by parrot. These
 files are grouped by the parrot version they belong to. So we'll have
 I</usr/lib/parrot/0.4.0>, I</usr/lib/parrot/0.4.1>, etc.

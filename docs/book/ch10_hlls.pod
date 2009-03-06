@@ -136,7 +136,7 @@ Let's take a closer look at namespaces then we have in previous chapters.
 Namespaces, as we mentioned before can be nested to an arbitrary depth
 starting with the root namespace. In practice, the root namespace is
 not used often, and is typically left for use by the Parrot internals.
-Directly beneth the root namespace are the X<HLL Namespaces> HLL
+Directly beneath the root namespace are the X<HLL Namespaces> HLL
 Namespaces, named after the HLLs that the application software is written
 in. HLL namespaces are all lower-case, such as "perl6", or "cardinal",
 or "pynie". By sticking to this convention, multiple HLL compilers can

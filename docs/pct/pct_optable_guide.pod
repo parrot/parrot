@@ -78,7 +78,7 @@ top-down parsing to bottom-up, and after parsing the operators (and
 related operands), the parser switches back from bottom-up to top-down
 again.
 
-Buttom up parsing is very well suited for expressions that consist of
+Bottom up parsing is very well suited for expressions that consist of
 terms, unary and binary operators with no two terms in a row.
 
 In order to define the entry point of the bottom-up, operator parsing

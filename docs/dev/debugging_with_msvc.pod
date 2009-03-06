@@ -37,7 +37,7 @@ L<http://msdn2.microsoft.com/en-us/library/8wtf2dfz(VS.80).aspx>.
 Detect some buffer overruns.  See
 L<http://msdn2.microsoft.com/en-us/library/8dbf701c(VS.80).aspx>.
 
-=head3 C</Wp64> - Detect 64-bit compatability problems
+=head3 C</Wp64> - Detect 64-bit compatibility problems
 
 I<Don't> use this one. Leave 64-bit checking to the real 64-bit
 compilers.

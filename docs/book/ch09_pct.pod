@@ -120,7 +120,7 @@ allocators, among other components. All these things are internal to
 Parrot and aren't the concern of the compiler implementer. Plus, these
 are all well beyond the scope of this book>. The lexical analyzer converts
 the HLL input file into individual tokens. A token may consist of an
-individual punctuation mark("+"), an indentifier ("myVar"), or a keyword
+individual punctuation mark("+"), an identifier ("myVar"), or a keyword
 ("while"), or any other artifact that cannot be sensibly broken down. The
 parser takes a stream of these input tokens, and attempts to match them
 against a given pattern, or grammar. The matching process orders the input
@@ -172,7 +172,7 @@ regular expressions use a copy (or a subset) of Perl 5's regular
 expressions, PGE is much more powerful then those too.
 
 PGE uses a recursive descent algorithm N<it also uses an operator
-precedence parser, when you ask it nicely>which should be very familar
+precedence parser, when you ask it nicely>which should be very familiar
 to users of the Perl 5 module C<Parse::RecDescent>. In fact, both were
 originally designed by the same developer, Damian Conway. Recursive
 Descent, for those who get into the algorithmic details, is a top-down

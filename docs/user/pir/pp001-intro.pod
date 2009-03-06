@@ -174,7 +174,7 @@ PIR includes the C<unless> keyword as well.
 =head2 Calling Functions
 
 Subroutines can easily be created using the C<.sub> keyword shown
-before. If you do not need parameters, itis just as simple as I show in
+before. If you do not need parameters, it is just as simple as I show in
 the following code:
 
   .sub main :main

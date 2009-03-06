@@ -363,7 +363,7 @@ correct design decision.
 Z<CHP-8-SECT-3.1>
 
 X<interpreter, Parrot;registers>
-As we've seen in previous chapers, Parrot has four basic types of
+As we've seen in previous chapters, Parrot has four basic types of
 registers: PMC, string, integer, and floating-point numbers, one for
 each of the core data types. We separate the register types for ease
 of implementation, garbage collection, and space efficiency. Since
@@ -482,7 +482,7 @@ constructs. The second was doing it in a way that allowed Perl code to
 use Ruby objects, Ruby code to use Python objects, and Lisp code to
 use both.N<Or vice-versa> Parrot's solution is the PMC datatype.
 
-A PMC, as we've seen in previous chapers, is an abstract variable type.
+A PMC, as we've seen in previous chapters, is an abstract variable type.
 The languages we're working to support--Perl, Python, and Ruby for
 example--have base variables that are far more complex than just an
 integer or floating-point number.  If we want them to exchange any
@@ -1143,7 +1143,7 @@ that most closely matches the types of the parameters in the call.
 One very notable thing about subs and methods that do multimethod
 dispatch is that the named subroutines and methods live outside of any
 namespace. By default, when searching for a method or subroutine,
-Parrot first looks for an explict sub or method of that name in the
+Parrot first looks for an explicit sub or method of that name in the
 current namespace (or the inheritance hierarchy of an object), then
 for the default subroutine or method (AUTOLOAD or its equivalent) in
 the inheritance hierarchy, and only when those fail will it look for a

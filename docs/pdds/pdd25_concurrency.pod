@@ -177,13 +177,13 @@ PIR/PASM.
 Like Parrot, TBB is task-based. Since TBB performs its own scheduling,
 TBB tasks in Parrot will be given a lightweight scheduler that only has
 the responsibility of passing messages, events, etc, back and forth
-betwen the TBB task and the central scheduler. TBB tasks will not share
+between the TBB task and the central scheduler. TBB tasks will not share
 variables with any other types of concurrent tasks in Parrot.
 
 Note that since TBB is a C++ library, it is only available when Parrot
 is compiled with a C++ compiler.
 
-=head3 Concurrrency Scheduler API
+=head3 Concurrency Scheduler API
 
 The concurrency scheduler has two parts, a Scheduler PMC, which has an
 instance stored in the interpreter struct, and a set of core routines in

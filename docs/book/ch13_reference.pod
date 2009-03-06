@@ -1666,7 +1666,7 @@ X<new opcode (PASM)>
   new R<DEST>, R<TYPE>, R<INITIALIZE>, R<PROPS>
 
 Create a new PMC of type R<TYPE>. R<INITIALIZE> is an array PMC
-containing initialization data for the new PMC. R<PROPS> is a propety hash.
+containing initialization data for the new PMC. R<PROPS> is a property hash.
 
 I<Arguments: P, I or P, I, P or P, I, P, P>
 
@@ -2887,7 +2887,7 @@ Flatten the passed array PMC and provide args for PCC calls.
 
 =head3 .globalconst
 
-X<.cglobalonst directive>
+X<.globalconst directive>
 
   .globalconst R<TYPE>R<NAME> = R<VALUE>
 

@@ -151,7 +151,7 @@ Other platforms and compilers will also be supported, but we can't
 commit to supporting a platform without at least one champion who has
 the skills to make portability fixes, and is willing to test the monthly
 developer releases, or preferably a regular checkout of trunk.  We might
-not include a platform in our offical support list (even with a
+not include a platform in our official support list (even with a
 champion) if supporting that platform would create an undesirable
 support burden for the other major platforms.
 

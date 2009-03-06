@@ -86,7 +86,7 @@ Parrot must also have a way to combine multiple keys into a key that can be
 treated as a single unit.  This is done by forming a singly linked list such
 that each key points at the next.  Within a single Key PMC, the pointer to the
 next key is stored in C<PMC_data(key)>.  The linked list structure allows the
-use of partial keys in multidimentional lookups, since the next key can be
+use of partial keys in multidimensional lookups, since the next key can be
 generated while the aggregate PMC is being traversed.
 
 These definitions, along with declarations of support routines used to

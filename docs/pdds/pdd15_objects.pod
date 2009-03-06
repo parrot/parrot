@@ -844,7 +844,7 @@ and C<alias>; see L<Role Conflict Resolution> for more details.
 An accessor for the roles composed into the role. It returns an Array of all
 roles as PMC objects. If any roles that were composed into this one were
 themselves made up of a composition of other roles, the roles they were made
-up of will also be included in the value returned by this accesor. However,
+up of will also be included in the value returned by this accessor. However,
 no role will be mentioned more than once. The accessor is read-only.
 
 =item add_method
