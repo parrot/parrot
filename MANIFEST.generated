@@ -262,6 +262,7 @@ src/ops/core_ops_cgp.c                            []
 src/ops/core_ops_switch.c                         []
 src/parrot_config.c                               []
 src/pmc/boolean.dump                              [devel]src
+src/pmc/continuation.dump                         [devel]src
 src/pmc/default.dump                              [devel]src
 src/pmc/fixedpmcarray.dump                        [devel]src
 src/pmc/float.dump                                [devel]src
@@ -269,6 +270,7 @@ src/pmc/hash.dump                                 [devel]src
 src/pmc/integer.dump                              [devel]src
 src/pmc/multisub.dump                             [devel]src
 src/pmc/pmc_boolean.h                             [devel]include
+src/pmc/pmc_continuation.h                        [devel]include
 src/pmc/pmc_default.h                             [devel]include
 src/pmc/pmc_fixedintegerarray.h                   [devel]include
 src/pmc/pmc_fixedpmcarray.h                       [devel]include
