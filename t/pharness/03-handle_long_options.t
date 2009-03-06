@@ -13,11 +13,12 @@ eval {
 };
 plan( skip_all => 't/harness only runs once configuration has completed' )
     if $@;
-plan( tests =>  6 );
+plan( tests => 12 );
 use Carp;
 use Parrot::Harness::Options qw( handle_long_options );
 
 my (@argv, $longopts);
+my %still_argv;
 @argv = qw(
     -wv
     -O2
@@ -29,10 +30,33 @@ my (@argv, $longopts);
 ($longopts, @argv) = handle_long_options(@argv);
 ok($longopts->{running_make_test}, "Captured long option");
 ok($longopts->{gc_debug}, "Captured long option");
-my %still_argv = map {$_, 1} @argv;
-ok($still_argv{'-wv'}, "Combined short options still present in @ARGV");
-ok($still_argv{'-O2'}, "Short options with values still present in @ARGV");
-ok($still_argv{'t/postconfigure/*.t'}, "Arguments still present in @ARGV");
+%still_argv = map {$_, 1} @argv;
+ok($still_argv{'-wv'}, "Combined short options still present in \@ARGV");
+ok($still_argv{'-O2'}, "Short options with values still present in \@ARGV");
+ok($still_argv{'t/postconfigure/*.t'}, "Arguments still present in \@ARGV");
+
+@argv = qw(
+    --archive
+    t/postconfigure/*.t
+); # */
+
+($longopts, @argv) = handle_long_options(@argv);
+ok($longopts->{archive}, "Captured long option");
+ok(! $longopts->{send_to_smolder}, "Smolder test not requested");
+%still_argv = map {$_, 1} @argv;
+ok($still_argv{'t/postconfigure/*.t'}, "Arguments still present in \@ARGV");
+
+@argv = qw(
+    --archive
+    --send-to-smolder
+    t/postconfigure/*.t
+); # */
+
+($longopts, @argv) = handle_long_options(@argv);
+ok($longopts->{archive}, "Captured long option");
+ok($longopts->{send_to_smolder}, "Smolder test requested");
+%still_argv = map {$_, 1} @argv;
+ok($still_argv{'t/postconfigure/*.t'}, "Arguments still present in \@ARGV");
 
 pass("Completed all tests in $0");
 
