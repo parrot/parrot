@@ -146,6 +146,23 @@ const char * desc_key_type(opcode t)
     }
 }
 
+const opcode
+    AnnotationTypeInteger = 0x00,
+    AnnotationTypeString =  0x01,
+    AnnotationTypeNumber =  0x02,
+    AnnotationTypePMC =     0x03;
+
+const char * desc_annotation_type(opcode t)
+{
+    switch(t) {
+        case AnnotationTypeInteger: return "Integer";
+        case AnnotationTypeString:  return "String";
+        case AnnotationTypeNumber:  return "Number";
+        case AnnotationTypePMC:     return "PMC";
+        default:                    return unknown;
+    }
+}
+
 //**********************************************************************
 
 class ReadError : public runtime_error
@@ -600,10 +617,50 @@ void PbcFile::dump_segment_pir_debug(ifstream &pbcfile)
     }
 }
 
-void PbcFile::dump_segment_annotations(ifstream &/*pbcfile*/)
+void PbcFile::dump_segment_annotations(ifstream &pbcfile)
 {
     TagEmit tag("SegmentAnnotations", cout);
-    cout << "*** UNIMPLEMENTED ***\n";
+
+    opcode segsize = read_opcode(pbcfile);
+    cout << "Segment size: " << segsize << '\n';
+
+    pbcfile.ignore(16 - opcode_size);
+    // Untested with opcode_size 8
+    if (pbc_version <= 0x0325 && opcode_size == 8)
+        pbcfile.ignore(16);
+
+    opcode tablelength = read_opcode(pbcfile);
+    cout << "Number of annotations: " << tablelength << '\n';
+
+    for (opcode i= 0; i < tablelength; ++i) {
+        cout << i;
+        opcode name = read_opcode(pbcfile);
+        cout << " Name: " << name;
+        opcode type = read_opcode(pbcfile);
+        cout << " Type: " << desc_annotation_type(type) << '\n';
+    }
+
+    opcode grouplength = read_opcode(pbcfile);
+    cout << "Number of annotation groups: " << grouplength << '\n';
+    for (opcode i= 0; i < grouplength; ++i) {
+        cout << i;
+        opcode bcpos = read_opcode(pbcfile);
+        cout << " Bytecode offset: " << bcpos;
+        opcode value = read_opcode(pbcfile);
+        cout << " Value: " << value << '\n';
+    }
+
+    opcode mappings = read_opcode(pbcfile);
+    cout << "Number of mappings: " << mappings << '\n';
+    for (opcode i= 0; i < mappings; ++i) {
+        cout << i;
+        opcode bcpos = read_opcode(pbcfile);
+        cout << " Bytecode offset: " << bcpos;
+        opcode annotation = read_opcode(pbcfile);
+        cout << " Annotation key: " << annotation;
+        opcode value = read_opcode(pbcfile);
+        cout << " Value: " << value << '\n';
+    }
 }
 
 void PbcFile::dump_segment_pic_data(ifstream &/*pbcfile*/)
