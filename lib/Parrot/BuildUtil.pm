@@ -153,7 +153,7 @@ sub get_bc_version {
             last;
         }
     }
-    unless ( defined $bc_major && defined $bc_minor ) {
+    unless ( defined $bc_major ) {
         die "No bytecode version found in '$compat_file'.";
     }
     close $IN;
