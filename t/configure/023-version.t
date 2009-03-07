@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  6;
+use Test::More tests =>  7;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -28,6 +28,9 @@ my $errstr;
     my ( $pv, @pv );
     $pv = Parrot::BuildUtil::parrot_version();
     is( $pv, q{0.4.11}, "Correct version number returned in scalar context" );
+
+    @pv = Parrot::BuildUtil::parrot_version();
+    is_deeply( \@pv, [ 0, 4, 11 ], "Correct version number returned in list context" );
 
     unlink q{VERSION}
         or croak "Unable to delete file from tempdir after testing";

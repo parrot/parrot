@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests =>  6;
+use Test::More tests => 10;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -23,13 +23,22 @@ my $errstr;
     ok( ( mkdir "lib" ),        "Able to make directory lib" );
     ok( ( mkdir "lib/Parrot" ), "Able to make directory lib/Parrot" );
 
-    # Case 5:  Valid version number
+    # Case 6:  Installed copy of Parrot
+    my $installed_dir = q{lib/Parrot/something};
+    ok( ( mkdir $installed_dir ), "Able to make directory $installed_dir" );
+    ok( chdir $installed_dir,
+        "Changed deeper into temporary directory for testing" );
     make_VERSION_file(q{0.4.11});
+    ok( chdir $tdir, "Changed back to temporary directory" );
     my ( $pv, @pv );
-    @pv = Parrot::BuildUtil::parrot_version();
-    is_deeply( \@pv, [ 0, 4, 11 ], "Correct version number returned in list context" );
+    $pv = Parrot::BuildUtil::parrot_version($installed_dir);
+    is( $pv, q{0.4.11},
+        "Correct version number returned in scalar context" );
+    @pv = Parrot::BuildUtil::parrot_version($installed_dir);
+    is_deeply( \@pv, [ 0, 4, 11 ],
+        "Correct version number returned in list context" );
 
-    unlink q{VERSION}
+    unlink qq{$installed_dir/VERSION}
         or croak "Unable to delete file from tempdir after testing";
     ok( chdir $cwd, "Able to change back to directory after testing" );
 }
