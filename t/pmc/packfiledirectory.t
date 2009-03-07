@@ -104,8 +104,7 @@ OUT
 
 
 # PackfileDirectory.get_string_keyed_int
-{
-    my $EXPECTED = <<EXPECTED;
+my $EXPECTED = <<EXPECTED;
 BYTECODE_runtime/parrot/library/uuid.pir
 FIXUP_runtime/parrot/library/uuid.pir
 CONSTANT_runtime/parrot/library/uuid.pir
@@ -113,10 +112,10 @@ PIC_idx_runtime/parrot/library/uuid.pir
 BYTECODE_runtime/parrot/library/uuid.pir_DB
 EXPECTED
 
-    $EXPECTED =~ s/\//\\/g
-        if $^O eq 'MSWin32';
+$EXPECTED =~ s/\//\\/g
+  if $^O eq 'MSWin32';
 
-    pir_output_is( <<'CODE' . $get_uuid_pbc, $EXPECTED, 'PackfileDirectory.get_string_keyed_int' );
+pir_output_is( <<'CODE' . $get_uuid_pbc, $EXPECTED, 'PackfileDirectory.get_string_keyed_int' );
 .sub 'test' :main
     .local pmc pf, pfdir
     pf    = _pbc()
@@ -133,7 +132,6 @@ EXPECTED
     .return()
 .end
 CODE
-}
 
 
 # PackfileDirectory.get_pmc_keyed_str
@@ -169,8 +167,8 @@ OUT
 
 
 # PackfileDirectory.set_pmc_keyed_str
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.set_pmc_keyed_str' );
+my $EXPECTED_foo = $EXPECTED . "BYTECODE_foo\n";
+pir_output_is( <<'CODE' . $get_uuid_pbc, $EXPECTED_foo, 'PackfileDirectory.set_pmc_keyed_str' );
 .sub 'test' :main
     .local pmc pf, pfdir
     pf    = _pbc()
@@ -190,14 +188,6 @@ pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.set_pmc_key
     .return()
 .end
 CODE
-BYTECODE_runtime/parrot/library/uuid.pir
-FIXUP_runtime/parrot/library/uuid.pir
-CONSTANT_runtime/parrot/library/uuid.pir
-PIC_idx_runtime/parrot/library/uuid.pir
-BYTECODE_runtime/parrot/library/uuid.pir_DB
-BYTECODE_foo
-OUT
-
 
 # Local Variables:
 #   mode: cperl
