@@ -28,19 +28,23 @@ using std::setfill;
 
 const char unknown[] = "Unknown";
 
+const unsigned char
+    ByteOrderLE = 0,
+    ByteOrderBE = 1;
+
 const char * desc_byte_order(unsigned char c)
 {
     switch(c) {
-        case 0:  return "Little endian";
-        case 1:  return "Big endian";
+        case ByteOrderLE: return "Little endian";
+        case ByteOrderBE: return "Big endian";
         default: return unknown;
     }
 }
 
 const unsigned char
-   FpEncodingIEEE_754_8 = 0,
-   FpEncodingIEEE_i386_12 = 1,
-   FpEncodingIEEE_754_16 = 2;
+    FpEncodingIEEE_754_8 = 0,
+    FpEncodingIEEE_i386_12 = 1,
+    FpEncodingIEEE_754_16 = 2;
 
 const char * desc_fp_encoding(unsigned char c)
 {
@@ -242,17 +246,18 @@ class PbcFile
 {
 public:
     PbcFile();
-    void check_directory_format(ifstream &pbcfile);
     void read(const char *filename);
+    void read_header(ifstream &pbcfile);
+    void check_directory_format(ifstream &pbcfile);
     void read_directory(ifstream &pbcfile);
+    void dump_segment(const DirEntry & entry, ifstream &pbcfile);
+    void dump_segment_fixup(ifstream &pbcfile);
+    void dump_segment_constant(ifstream &pbcfile);
+    void dump_segment_bytecode(ifstream &pbcfile);
+    void dump_segment_pir_debug(ifstream &pbcfile);
     void dump_constant_string(ifstream &pbcfile);
     void dump_constant_number(ifstream &pbcfile);
     void dump_constant_key(ifstream &pbcfile);
-    void dump_segment_constant(ifstream &pbcfile);
-    void dump_segment_bytecode(ifstream &pbcfile);
-    void dump_segment_fixup(ifstream &pbcfile);
-    void dump_segment_pir_debug(ifstream &pbcfile);
-    void dump_segment(const DirEntry & entry, ifstream &pbcfile);
     string read_cstring(ifstream &pbcfile);
     unsigned long read_opcode(ifstream &pbcfile);
 private:
@@ -260,8 +265,6 @@ private:
     unsigned int pbc_version;
 
     unsigned char byte_order;
-    static const unsigned char bo_little = 0;
-    static const unsigned char bo_big = 1;
     unsigned char fp_encoding;
 
     std::vector<DirEntry> directory;
@@ -272,23 +275,28 @@ PbcFile::PbcFile()
     opcode_size = 0;
 }
 
-void PbcFile::check_directory_format(ifstream &pbcfile)
-{
-    unsigned char dir_format = pbcfile.get();
-    cout << "Directory format: " << (int) dir_format << '\n';
-    pbcfile.ignore(3);
-
-    pbcfile.ignore(12);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
-}
-
 void PbcFile::read(const char *filename)
 {
     ifstream pbcfile(filename);
     if (! pbcfile.is_open())
         throw std::runtime_error("Can't open file");
 
+    read_header(pbcfile);
+
+    check_directory_format(pbcfile);
+    read_directory(pbcfile);
+    check_overlap(directory);
+
+    std::sort(directory.begin(), directory.end());
+
+    cout << "<Segments>\n";
+    for (size_t i= 0; i < directory.size(); ++i)
+        dump_segment(directory[i], pbcfile);
+    cout << "</Segments>\n";
+}
+
+void PbcFile::read_header(ifstream &pbcfile)
+{
     signature(pbcfile);
     unsigned char opcode_size = pbcfile.get();
     unsigned char byte_order = pbcfile.get();
@@ -316,6 +324,8 @@ void PbcFile::read(const char *filename)
     this->pbc_version = ((unsigned int) pbc_major) * 8 + pbc_minor;
     this->byte_order = byte_order;
     this->fp_encoding = fp_encoding;
+    if (byte_order != ByteOrderLE && byte_order != ByteOrderBE)
+        throw std::runtime_error("Invalid byte order");
 
     unsigned char uuid_type = pbcfile.get();
     cout <<
@@ -328,128 +338,69 @@ void PbcFile::read(const char *filename)
     unsigned int curpos = 18 + uuid_length;
     unsigned int endheader = ((curpos + 15) / 16) * 16;
     pbcfile.ignore(endheader - 18);
-
-    check_directory_format(pbcfile);
-    read_directory(pbcfile);
-    check_overlap(directory);
-
-    std::sort(directory.begin(), directory.end());
-
-    for (size_t i= 0; i < directory.size(); ++i)
-        dump_segment(directory[i], pbcfile);
 }
 
-void PbcFile::dump_constant_string(ifstream &pbcfile)
+void PbcFile::check_directory_format(ifstream &pbcfile)
 {
-    unsigned long flags = read_opcode(pbcfile);
-    cout << "Flags: 0x" << hex << flags << dec << '\n';
-    unsigned long charset = read_opcode(pbcfile);
-    cout << "Charset: " << charset << '\n';
+    unsigned char dir_format = pbcfile.get();
+    cout << "Directory format: " << (int) dir_format << '\n';
+    pbcfile.ignore(3);
 
-    //unsigned long encoding = read_opcode(pbcfile);
-    //cout << "Encoding: "<< encoding << '\n';
-
-    unsigned long length = read_opcode(pbcfile);
-    cout << "Length: "<< length << '\n';
-    cout << '\'';
-    for (unsigned long i= 0; i < length; ++i) {
-        unsigned char c = pbcfile.get();
-        if (c >= 32 && c < 128)
-            cout << c;
-        else
-            cout << "\\x" << hex << setw(2) << setfill('0') <<
-                (unsigned int) c << dec;
-    }
-    cout << "'\n";
-    for (unsigned int i= length; i % opcode_size; ++i) {
-        pbcfile.ignore(1);
-    }
+    pbcfile.ignore(12);
+    if (pbc_version <= 0x0325 && opcode_size == 8)
+        pbcfile.ignore(16);
 }
 
-void PbcFile::dump_constant_number(ifstream &pbcfile)
+void PbcFile::read_directory(ifstream &pbcfile)
 {
-    cout << "Number constant (not shown)\n";
-    switch(fp_encoding) {
-        case FpEncodingIEEE_754_8:
-            pbcfile.ignore(8);
-            break;
-        case FpEncodingIEEE_i386_12:
-            pbcfile.ignore(12);
-            break;
-        case FpEncodingIEEE_754_16:
-            pbcfile.ignore(16);
-            break;
-    }
-}
+    unsigned long size = read_opcode(pbcfile);
+    cout << "Directory segment size: " << size << '\n';
 
-void PbcFile::dump_constant_key(ifstream &pbcfile)
-{
-    unsigned long components = read_opcode(pbcfile);
-    cout << "Key components: " << components << '\n';
-    for (unsigned long i= 0; i < components; ++i) {
-        cout << "  " << i << ' ';
-        unsigned long type = read_opcode(pbcfile);
-        cout << "Type: " << desc_key_type (type) <<
-            " (0x" << hex << type << dec << ") ";
-        unsigned long value = read_opcode(pbcfile);
-        cout << "Value: " << value << '\n';
-    }
-}
-
-void PbcFile::dump_segment_constant(ifstream &pbcfile)
-{
-    cout << "<SegmentConstantTable>\n";
-
-    unsigned long segsize = read_opcode(pbcfile);
-    cout << "Segment size: " << segsize << '\n';
     pbcfile.ignore(16 - opcode_size);
     if (pbc_version <= 0x0325 && opcode_size == 8)
         pbcfile.ignore(16);
 
-    unsigned long tablelength = read_opcode(pbcfile);
-    cout << "Number of constants: " << tablelength << '\n';
+    unsigned long entries = read_opcode(pbcfile);
+    cout << "Directory entries: " << entries << '\n';
 
-    for (unsigned long n= 0; n < tablelength; ++n) {
-        cout << "Constant " << n;
+    for (unsigned int n= 0; n < entries; ++n)
+    {
         unsigned long type = read_opcode(pbcfile);
-        cout << " Type: " << desc_constant_type(type) <<
-             " (0x" << hex << type << dec << ")\n";
-        switch(type) {
-            case ConstantTypeString:
-            case ConstantTypePMC:
-                dump_constant_string(pbcfile);
-                break;
-            case ConstantTypeNumber:
-                dump_constant_number(pbcfile);
-                break;
-            case ConstantTypeKey:
-                dump_constant_key(pbcfile);
-                break;
-            default:
-                throw std::runtime_error("Unimplemented");
-        }
+        cout << n << ": Type: '" << desc_segment_type(type) << "' Name: '";
+        string name = read_cstring(pbcfile);
+	cout << name;
+        unsigned long offset = read_opcode(pbcfile);
+        unsigned long length = read_opcode(pbcfile);
+        cout << "'\n   Offset: " << offset << " Length: " << length << '\n';
+        DirEntry entry(name, type, offset, length);
+        directory.push_back(entry);
     }
-
-    cout << "</SegmentConstantTable>\n";
 }
 
-void PbcFile::dump_segment_bytecode(ifstream &pbcfile)
+void PbcFile::dump_segment(const DirEntry &entry, ifstream &pbcfile)
 {
-    cout << "<SegmentBytecode>\n";
-
-    unsigned long segsize = read_opcode(pbcfile);
-    cout << "Segment size: " << segsize << '\n';
-    pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
-
-    for (unsigned long n= 0; n < segsize; ++n) {
-        unsigned long code = read_opcode(pbcfile);
-        cout << ' ' << hex << setfill('0') << setw(opcode_size * 2) << code << dec;
+    cout << "Segment '" << entry.getName() << "'\n";
+    unsigned long const type = entry.getType();
+    cout << "Type: " << desc_segment_type(type) <<
+        " (0x" << hex << type << dec << ")\n";
+    pbcfile.seekg(entry.getOffset() * opcode_size);
+    switch(type)
+    {
+    case SegmentTypeFixup:
+        dump_segment_fixup(pbcfile);
+        break;
+    case SegmentTypeConstantTable:
+        dump_segment_constant(pbcfile);
+        break;
+    case SegmentTypeBytecode:
+        dump_segment_bytecode(pbcfile);
+        break;
+    case SegmentTypePIRDebug:
+        dump_segment_pir_debug(pbcfile);
+        break;
+    default:
+        cout << "(unimplemented)\n";
     }
-    cout << '\n';
-
-    cout << "</SegmentBytecode>\n";
 }
 
 void PbcFile::dump_segment_fixup(ifstream &pbcfile)
@@ -496,6 +447,62 @@ void PbcFile::dump_segment_fixup(ifstream &pbcfile)
     cout << "</SegmentFixup>\n";
 }
 
+void PbcFile::dump_segment_constant(ifstream &pbcfile)
+{
+    cout << "<SegmentConstantTable>\n";
+
+    unsigned long segsize = read_opcode(pbcfile);
+    cout << "Segment size: " << segsize << '\n';
+    pbcfile.ignore(16 - opcode_size);
+    if (pbc_version <= 0x0325 && opcode_size == 8)
+        pbcfile.ignore(16);
+
+    unsigned long tablelength = read_opcode(pbcfile);
+    cout << "Number of constants: " << tablelength << '\n';
+
+    for (unsigned long n= 0; n < tablelength; ++n) {
+        cout << "Constant " << n;
+        unsigned long type = read_opcode(pbcfile);
+        cout << " Type: " << desc_constant_type(type) <<
+             " (0x" << hex << type << dec << ") ";
+        switch(type) {
+            case ConstantTypeString:
+            case ConstantTypePMC:
+                dump_constant_string(pbcfile);
+                break;
+            case ConstantTypeNumber:
+                dump_constant_number(pbcfile);
+                break;
+            case ConstantTypeKey:
+                dump_constant_key(pbcfile);
+                break;
+            default:
+                throw std::runtime_error("Unimplemented");
+        }
+    }
+
+    cout << "</SegmentConstantTable>\n";
+}
+
+void PbcFile::dump_segment_bytecode(ifstream &pbcfile)
+{
+    cout << "<SegmentBytecode>\n";
+
+    unsigned long segsize = read_opcode(pbcfile);
+    cout << "Segment size: " << segsize << '\n';
+    pbcfile.ignore(16 - opcode_size);
+    if (pbc_version <= 0x0325 && opcode_size == 8)
+        pbcfile.ignore(16);
+
+    for (unsigned long n= 0; n < segsize; ++n) {
+        unsigned long code = read_opcode(pbcfile);
+        cout << ' ' << hex << setfill('0') << setw(opcode_size * 2) << code << dec;
+    }
+    cout << '\n';
+
+    cout << "</SegmentBytecode>\n";
+}
+
 void PbcFile::dump_segment_pir_debug(ifstream &pbcfile)
 {
     cout << "<SegmentPIRDebug>\n";
@@ -534,68 +541,60 @@ void PbcFile::dump_segment_pir_debug(ifstream &pbcfile)
     cout << "</SegmentPIRDebug>\n";
 }
 
-void PbcFile::dump_segment(const DirEntry &entry, ifstream &pbcfile)
+void PbcFile::dump_constant_string(ifstream &pbcfile)
 {
-    cout << "Segment '" << entry.getName() << "'\n";
-    unsigned long const type = entry.getType();
-    cout << "Type: " << desc_segment_type(type) <<
-        " (0x" << hex << type << dec << ")\n";
-    pbcfile.seekg(entry.getOffset() * opcode_size);
-    switch(type)
-    {
-    case SegmentTypeFixup:
-        dump_segment_fixup(pbcfile);
-        break;
-    case SegmentTypeConstantTable:
-        dump_segment_constant(pbcfile);
-        break;
-    case SegmentTypeBytecode:
-        dump_segment_bytecode(pbcfile);
-        break;
-    case SegmentTypePIRDebug:
-        dump_segment_pir_debug(pbcfile);
-        break;
-    default:
-        cout << "(unimplemented)\n";
+    unsigned long flags = read_opcode(pbcfile);
+    cout << "Flags: 0x" << hex << flags << dec;
+    unsigned long charset = read_opcode(pbcfile);
+    cout << " Charset: " << charset;
+
+    //unsigned long encoding = read_opcode(pbcfile);
+    //cout << " Encoding: "<< encoding;
+
+    unsigned long length = read_opcode(pbcfile);
+    cout << " Length: "<< length;
+    cout << " \'";
+    for (unsigned long i= 0; i < length; ++i) {
+        unsigned char c = pbcfile.get();
+        if (c >= 32 && c < 128)
+            cout << c;
+        else
+            cout << "\\x" << hex << setw(2) << setfill('0') <<
+                (unsigned int) c << dec;
+    }
+    cout << "'\n";
+    for (unsigned int i= length; i % opcode_size; ++i) {
+        pbcfile.ignore(1);
     }
 }
 
-void PbcFile::read_directory(ifstream &pbcfile)
+void PbcFile::dump_constant_number(ifstream &pbcfile)
 {
-    unsigned long size = read_opcode(pbcfile);
-    cout << "Directory segment size: " << size << '\n';
+    cout << "Number constant (not shown)\n";
+    switch(fp_encoding) {
+        case FpEncodingIEEE_754_8:
+            pbcfile.ignore(8);
+            break;
+        case FpEncodingIEEE_i386_12:
+            pbcfile.ignore(12);
+            break;
+        case FpEncodingIEEE_754_16:
+            pbcfile.ignore(16);
+            break;
+    }
+}
 
-    pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
-
-    unsigned long entries = read_opcode(pbcfile);
-    cout << "Directory entries: " << entries << '\n';
-
-    for (unsigned int n= 0; n < entries; ++n)
-    {
+void PbcFile::dump_constant_key(ifstream &pbcfile)
+{
+    unsigned long components = read_opcode(pbcfile);
+    cout << "Key components: " << components << '\n';
+    for (unsigned long i= 0; i < components; ++i) {
+        cout << "  " << i << ' ';
         unsigned long type = read_opcode(pbcfile);
-        cout << n << ": Type: '" << desc_segment_type(type) << "' Name: '";
-        string name;
-        char c;
-        unsigned int namelen= 0;
-        while ((c = pbcfile.get()))
-        {
-            cout << c;
-            name+= c;
-            ++namelen;
-        }
-        ++namelen;
-        while(namelen % opcode_size)
-        {
-            c= pbcfile.get();
-            ++namelen;
-        }
-        unsigned long offset = read_opcode(pbcfile);
-        unsigned long length = read_opcode(pbcfile);
-        cout << "'\n   Offset: " << offset << " Length: " << length << '\n';
-        DirEntry entry(name, type, offset, length);
-        directory.push_back(entry);
+        cout << "Type: " << desc_key_type (type) <<
+            " (0x" << hex << type << dec << ") ";
+        unsigned long value = read_opcode(pbcfile);
+        cout << "Value: " << value << '\n';
     }
 }
 
@@ -606,8 +605,13 @@ string PbcFile::read_cstring(ifstream &pbcfile)
     while ((c= pbcfile.get())) {
         r+= c;
     }
+
+    // cstrings are padded with trailing zeroes to opcode size
     for (unsigned long l = r.size() + 1; l % opcode_size; ++l)
         pbcfile.ignore(1);
+
+    if(! pbcfile)
+        throw ReadError("cstring");
     return r;
 }
 
@@ -621,13 +625,13 @@ unsigned long PbcFile::read_opcode(ifstream &pbcfile)
     unsigned long result = 0;
     switch(byte_order)
     {
-    case bo_little:
+    case ByteOrderLE:
         for (unsigned int i= 0; i < opcode_size; ++i) {
             result <<= 8;
             result += buffer [opcode_size - 1 - i];
         }
         break;
-    case bo_big:
+    case ByteOrderBE:
         for (unsigned int i= 0; i < opcode_size; ++i) {
             result <<= 8;
             result += buffer [i];
