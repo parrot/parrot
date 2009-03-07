@@ -25,11 +25,13 @@ my $cwd = cwd();
     # Case 5:  Valid version number
     make_VERSION_file(q{0.4.11});
     my ( $pv, @pv );
-    $pv = Parrot::BuildUtil::parrot_version();
-    is( $pv, q{0.4.11}, "Correct version number returned in scalar context" );
-
     @pv = Parrot::BuildUtil::parrot_version();
-    is_deeply( \@pv, [ 0, 4, 11 ], "Correct version number returned in list context" );
+    is_deeply( \@pv, [ 0, 4, 11 ],
+        "Correct version number returned in list context" );
+
+    $pv = Parrot::BuildUtil::parrot_version();
+    is( $pv, q{0.4.11},
+        "Correct version number returned in scalar context" );
 
     unlink q{VERSION}
         or croak "Unable to delete file from tempdir after testing";
