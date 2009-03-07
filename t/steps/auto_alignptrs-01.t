@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 22;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -62,34 +62,6 @@ $conf->data->set('ptr_alignment' => $align);
 $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 is($step->result(), qq{configured:  $align bytes}, "Expected result was set");
-
-$conf->replenish($serialized);
-
-########## mock an HPUX special case ##########
-
-($args, $step_list_ref) = process_options(
-    {
-        argv => [ ],
-        mode => q{configure},
-    }
-);
-
-$conf->add_steps($pkg);
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-
-my $orig_OSNAME = $conf->data->get_p5('OSNAME');
-my $orig_ccflags = $conf->data->get_p5('ccflags');
-
-$conf->data->set_p5('OSNAME' => 'hpux');
-$conf->data->set_p5('ccflags' => '');
-$ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
-like($step->result(), qr/^for hpux:/, "Expected result was set");
-
-# restore prior to subsequent tests
-$conf->data->set_p5('OSNAME' => $orig_OSNAME);
-$conf->data->set_p5('ccflags' => $orig_ccflags);
 
 pass("Completed all tests in $0");
 
