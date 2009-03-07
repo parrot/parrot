@@ -1649,7 +1649,8 @@ prog-clean :
     $(SRC_DIR)/pbc_info$(O) $(PINFO) \
     $(PDB) $(SRC_DIR)/parrot_debugger$(O) \
     $(PBCMERGE) $(SRC_DIR)/pbc_merge$(O) \
-    $(DIS) $(SRC_DIR)/pbc_disassemble$(O) \
+    $(DIS) $(SRC_DIR)/pbc_disassemble$(O)
+	$(RM_F) \
     $(SRC_DIR)/main$(O) \
     $(SRC_DIR)/null_config$(O) \
     $(SRC_DIR)/parrot_config$(O) \
