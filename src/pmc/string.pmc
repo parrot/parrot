@@ -249,8 +249,10 @@ Sets the value of the string to that of the specified C<string>.
 
     VTABLE void set_string_native(STRING *value) {
         /* Only allow constant PMCs to embed constant strings */
-        if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value))
-             value = Parrot_str_copy(INTERP, value);
+        if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
+             const char *copy = Parrot_str_to_cstring(INTERP, value);
+             value            = Parrot_str_new_constant(INTERP, copy);
+        }
 
         SET_ATTR_str_val(INTERP, SELF, value);
     }
