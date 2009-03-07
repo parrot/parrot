@@ -53,6 +53,12 @@ At the current time, automated smoke reports are collected and displayed via
 the Smolder system at L<http://smolder.plusthree.com>.  Such reports require
 the Perl 5 F<LWP::UserAgent> module, available from CPAN.
 
+On network problem or for offline use you may send tar reports later
+with that command:
+
+  perl -Ilib -MParrot::Harness::Smoke \
+    -e'Parrot::Harness::Smoke::send_archive_to_smolder(Parrot::Harness::Smoke::collect_test_environment_data())'
+
 =head2 C<generate_html_smoke_report()>
 
 This subroutine generates a type of HTML-smoke report formerly collected and
@@ -190,6 +196,8 @@ sub collect_test_environment_data {
         'Submitter'    => $ENV{"SMOLDER_SUBMITTER"} || "$me\@$domain"
     );
     push @data, ( 'Branch' => $branch ) if $branch;
+    push @data, ( 'Configure args' => $PConfig{configure_args} )
+      if $PConfig{configure_args};
     push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
     return @data;
 }
