@@ -47,7 +47,6 @@ have the same number of elements because there is a one-to-one mapping.
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 #include "parrot/dynext.h"
-#include "pmc/pmc_parrotlibrary.h"
 
 
 /* HEADERIZER HFILE: none */
@@ -471,8 +470,7 @@ static oplib_init_f
 get_dynamic_op_lib_init(SHIM_INTERP, ARGIN(const PMC *lib))
 {
     ASSERT_ARGS(get_dynamic_op_lib_init)
-    return (oplib_init_f)D2FPTR(
-            ((Parrot_ParrotLibrary_attributes *)PMC_data(lib))->oplib_init);
+    return (oplib_init_f)D2FPTR(PMC_struct_val(lib));
 }
 
 

@@ -476,7 +476,6 @@ sub _print_preamble_header {
     print $fh <<END_C;
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
-#include "../pmc/pmc_parrotlibrary.h"
 
 $self->{sym_export} op_lib_t *$self->{init_func}(long init);
 
@@ -1063,7 +1062,7 @@ $self->{sym_export} PMC*
 $load_func(PARROT_INTERP)
 {
     PMC *const lib      = pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = $self->{init_func};
+    PMC_struct_val(lib) = (void *) $self->{init_func};
     dynop_register(interp, lib);
     return lib;
 }
