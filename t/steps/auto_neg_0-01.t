@@ -61,17 +61,19 @@ $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 
 my $d_neg_0;
+my $orig_has_neg_0 = 0;
+my $verbose = $conf->data->get('verbose');
 
 $d_neg_0 = '-0';
 
-ok( $step->_evaluate_cc_run($conf, $d_neg_0),
+ok( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
     '_evaluate_cc_run() completed satisfactorily' );
 
 is( $step->result(), 'yes', 'Got expected result');
 
 $d_neg_0 = '0';
 
-ok( !$step->_evaluate_cc_run($conf, $d_neg_0),
+ok( !$step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
     '_evaluate_cc_run() completed satisfactorily' );
 is( $step->result(), 'no', 'Got expected result' );
 
