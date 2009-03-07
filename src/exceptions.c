@@ -111,7 +111,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     STRING * const message     = VTABLE_get_string(interp, exception);
     INTVAL         exit_status = 1;
     const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
-    PMC * const annotations;
+    PMC *annotations;
 
     /* flush interpreter output to get things printed in order */
     Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
