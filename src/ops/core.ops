@@ -7,6 +7,7 @@
 #include "parrot/embed.h"
 #include "../interp_guts.h"
 #include "../pmc/pmc_continuation.h"
+#include "../pmc/pmc_parrotlibrary.h"
 
 VERSION = PARROT_VERSION;
 
@@ -1344,14 +1345,22 @@ inline op loadlib(out PMC, in STR) {
 }
 
 op dlfunc(out PMC, invar PMC, in STR, in STR) {
-    char * const name = Parrot_str_to_cstring(interp, ($3));
-    void * const ptr  = Parrot_dlsym(
-                            PMC_IS_NULL($2) ? NULL :
-                            VTABLE_defined(interp, $2) ? PMC_data($2) :
-                            NULL,
-                            name);
+    char * const  name      = Parrot_str_to_cstring(interp, ($3));
+    void         *dl_handle = NULL;
+    void         *ptr       = NULL;
+    funcptr_t     p;
 
-    funcptr_t p = D2FPTR(ptr);
+    if (!PMC_IS_NULL($2) && $2->vtable->base_type == enum_class_ParrotLibrary) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
+    }
+
+    ptr = Parrot_dlsym(
+            PMC_IS_NULL($2) ? NULL :
+            VTABLE_defined(interp, $2) ? dl_handle :
+            NULL,
+            name);
+
+    p = D2FPTR(ptr);
 
     if (p == NULLfunc) {
         const char * err = Parrot_dlerror();
@@ -1368,8 +1377,14 @@ op dlfunc(out PMC, invar PMC, in STR, in STR) {
 }
 
 op dlvar(out PMC, invar PMC, in STR) {
-    char * const name = Parrot_str_to_cstring(interp, ($3));
-    void * const p = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : PMC_data($2), name);
+    char * const  name      = Parrot_str_to_cstring(interp, ($3));
+    void *        p         = NULL;
+    void         *dl_handle = NULL;
+
+    if (!PMC_IS_NULL($2) && $2->vtable->base_type == enum_class_ParrotLibrary) {
+        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
+        p         = Parrot_dlsym(PMC_IS_NULL($2) ? NULL : dl_handle, name);
+    }
     if (p == NULL) {
         const char * const err = Parrot_dlerror();
         Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
