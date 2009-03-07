@@ -105,7 +105,7 @@ The name of this method may change, as per discussion on p6i.
 
   check_done:
     .local pmc  fetch_layout
-    find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
 
     .local pmc layout
     layout = fetch_layout( 'Rect' )

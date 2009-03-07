@@ -121,7 +121,7 @@ about the interface here.
     .param int flags  :named('flags')
 
     .local pmc SetVideoMode
-    SetVideoMode = find_global 'SDL::NCI', 'SetVideoMode'
+    SetVideoMode = get_hll_global ['SDL::NCI'], 'SetVideoMode'
 
     .local pmc screen
     screen = SetVideoMode( width, height, bpp, flags )
@@ -178,7 +178,7 @@ this.
 
 .sub quit :method
     .local pmc SDL_Quit
-    SDL_Quit = find_global 'SDL::NCI', 'Quit'
+    SDL_Quit = get_hll_global ['SDL::NCI'], 'Quit'
     SDL_Quit()
 .end
 

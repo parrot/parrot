@@ -39,7 +39,7 @@ All SDL::Font objects have the following methods:
 
 .sub _sdl_init :load
     .local pmc init_ttf
-    init_ttf = find_global 'SDL', '_init_ttf'
+    init_ttf = get_hll_global ['SDL'], '_init_ttf'
     init_ttf()
 
     .local pmc   font_class
@@ -65,7 +65,7 @@ drawn, in pixels.
     .param int    font_size :named( 'point_size' )
 
     .local pmc OpenFont
-    OpenFont = find_global 'SDL::NCI::TTF', 'OpenFont'
+    OpenFont = get_hll_global ['SDL::NCI::TTF'], 'OpenFont'
 
     .local pmc font
     font = OpenFont( font_name, font_size )
@@ -137,7 +137,7 @@ C<SDL::Surface> containing the rendered font.
     font_surface.'init'( 'height' => 0, 'width' => 0 )
 
     .local pmc RenderText_Solid
-    find_global RenderText_Solid, 'SDL::NCI::TTF', 'RenderText_Solid'
+    get_hll_global RenderText_Solid, ['SDL::NCI::TTF'], 'RenderText_Solid'
 
     .local pmc color
     color = color_pmc.'color'()

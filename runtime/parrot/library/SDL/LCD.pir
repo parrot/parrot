@@ -51,7 +51,7 @@ An SDL::LCD object has the following methods:
     .local pmc digits
     digits = new 'SDL::Image'
     digits.'init'( 'runtime/parrot/library/SDL/LCD.png' )
-    global 'digits' = digits
+    set_global 'digits', digits
 
     newclass class, 'SDL::LCD'
     addattribute class, 'value'
@@ -176,7 +176,7 @@ LEN_OK:
     drect.'x'( 0 )
     drect.'y'( 0 )
 
-    digits         = find_global 'digits'
+    digits         = get_global 'digits'
 
     i = 0
 LOOP:
@@ -256,7 +256,6 @@ Sets the x position of the LCD.
 .sub xpos :method
     .param int val
 
-    $I0 = classoffset self, "SDL::LCD"
     $P0 = getattribute self, 'xpos'
     $P0 = val
 .end

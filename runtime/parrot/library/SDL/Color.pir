@@ -86,7 +86,7 @@ is none and 255 is the maximum possible.
     .param int blue  :named( 'b' )
 
     .local pmc fetch_layout
-    find_global fetch_layout, 'SDL::NCI', 'fetch_layout'
+    get_hll_global fetch_layout, ['SDL::NCI'], 'fetch_layout'
 
     .local pmc layout
     layout = fetch_layout( 'Color' )

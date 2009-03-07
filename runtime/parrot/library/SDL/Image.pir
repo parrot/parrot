@@ -44,7 +44,7 @@ An SDL::Image object has the following methods:
 
   create_class:
     .local pmc init_image
-    init_image = find_global 'SDL', '_init_image'
+    init_image = get_hll_global ['SDL'], '_init_image'
     init_image()
 
     subclass image_class, 'SDL::Surface', 'SDL::Image'
@@ -62,7 +62,7 @@ image.
     .param string filename :named( 'file' )
 
     .local pmc IMG_Load
-    IMG_Load = find_global 'SDL::NCI', 'IMG_Load'
+    IMG_Load = get_hll_global ['SDL::NCI'], 'IMG_Load'
 
     .local pmc image
 
