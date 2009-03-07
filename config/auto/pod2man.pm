@@ -61,12 +61,6 @@ sub _initial_content_check {
     }
 }
 
-sub _handle_no_pod2man {
-    my $self = shift;
-    $self->set_result('failed');
-    return 0;
-}
-
 1;
 
 # Local Variables:
