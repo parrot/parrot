@@ -15,7 +15,6 @@ use lib qw( lib );
 use Parrot::BuildUtil;
 
 my $cwd = cwd();
-my $errstr;
 {
     my $tdir = tempdir( CLEANUP => 1 );
     ok( chdir $tdir, "Changed to temporary directory for testing" );
