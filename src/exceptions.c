@@ -111,6 +111,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     STRING * const message     = VTABLE_get_string(interp, exception);
     INTVAL         exit_status = 1;
     const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
+    PMC * const annotations;
 
     /* flush interpreter output to get things printed in order */
     Parrot_io_flush(interp, Parrot_io_STDOUT(interp));
@@ -140,6 +141,17 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         /* caution against output swap (with PDB_backtrace) */
         fflush(stderr);
         PDB_backtrace(interp);
+    }
+
+    Parrot_PCCINVOKE(interp, exception, CONST_STRING(interp, "annotations"), "->P", &annotations);
+
+    if (!PMC_IS_NULL(annotations)) {
+        PMC *file = VTABLE_get_pmc_keyed_str(interp, annotations, CONST_STRING(interp, "file"));
+        if (!PMC_IS_NULL(file)) {
+            PMC *line = VTABLE_get_pmc_keyed_str(interp, annotations, CONST_STRING(interp, "line"));
+            if (!PMC_IS_NULL(line))
+                Parrot_io_eprintf(interp, "current source: (%Ps:%Ps)\n", file, line);
+        }
     }
 
     /*
