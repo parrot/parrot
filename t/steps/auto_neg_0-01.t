@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 19;
+use Test::More tests => 31;
 use Carp;
 
 use lib qw( lib t/configure/testlib );
@@ -66,16 +66,68 @@ my $verbose = $conf->data->get('verbose');
 
 $d_neg_0 = '-0';
 
-ok( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
+is( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
+    1,
     '_evaluate_cc_run() completed satisfactorily' );
 
 is( $step->result(), 'yes', 'Got expected result');
 
 $d_neg_0 = '0';
 
-ok( !$step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
+is( $step->_evaluate_cc_run($conf, $d_neg_0, $orig_has_neg_0, $verbose),
+    0,
     '_evaluate_cc_run() completed satisfactorily' );
 is( $step->result(), 'no', 'Got expected result' );
+
+$conf->replenish($serialized);
+
+########## --verbose; _evaluate_cc_run() ##########
+
+($args, $step_list_ref) = process_options( {
+    argv => [ q{--verbose} ],
+    mode => q{configure},
+} );
+rerun_defaults_for_testing($conf, $args );
+$conf->add_steps($pkg);
+$conf->options->set( %{$args} );
+$step = test_step_constructor_and_description($conf);
+
+$verbose = $conf->options->get('verbose');
+my $has_neg_0;
+
+$d_neg_0 = '-0';
+{
+    my ($stdout, $stderr);
+    capture(
+        sub {
+            $has_neg_0 = $step->_evaluate_cc_run(
+                $conf, $d_neg_0, $orig_has_neg_0, $verbose
+            ),
+        },
+        \$stdout,
+    );
+    is( $has_neg_0, 1,
+        'Got expected return value from _evaluate_cc_run()' );
+    is( $step->result(), 'yes', 'Got expected result: yes' );
+    like( $stdout, qr/\(yes\)/, 'Got expected verbose output' );
+}
+
+$d_neg_0 = '0';
+{
+    my ($stdout, $stderr);
+    capture(
+        sub {
+            $has_neg_0 = $step->_evaluate_cc_run(
+                $conf, $d_neg_0, $orig_has_neg_0, $verbose
+            ),
+        },
+        \$stdout,
+    );
+    is( $has_neg_0, 0,
+        'Got expected return value from _evaluate_cc_run()' );
+    is( $step->result(), 'no', 'Got expected result: no' );
+    like( $stdout, qr/\(no\)/, 'Got expected verbose output' );
+}
 
 pass("Completed all tests in $0");
 
