@@ -842,9 +842,12 @@ Parrot_sprintf_format(PARROT_INTERP,
                             {
                             STRING * const string = obj->getstring(interp,
                                                         info.type, obj);
-                            STRING * const ts     = handle_flags(interp, &info,
-                                                        string, 0, NULL);
-                            targ = Parrot_str_append(interp, targ, ts);
+                            /* XXX Silently ignore? */
+                            if (!STRING_IS_NULL(string)) {
+                                STRING * const ts = handle_flags(interp,
+                                        &info, string, 0, NULL);
+                                targ = Parrot_str_append(interp, targ, ts);
+                            }
                             }
                             break;
 
