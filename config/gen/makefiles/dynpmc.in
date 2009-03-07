@@ -91,9 +91,9 @@ CLEANUPS := \
 all : install
 
 install : $(PMC_TARGETS)
-#IF(cygwin or hpux):	$(CHMOD) 0775 "*$(LOAD_EXT)"
-	$(CP) "*$(LOAD_EXT)" $(INSTALL_DIR)
-#IF(cygwin or hpux):	$(CHMOD) 0775 "$(INSTALL_DIR)/*$(LOAD_EXT)"
+#IF(cygwin or hpux):	$(CHMOD) 0775 *$(LOAD_EXT)
+	$(CP) *$(LOAD_EXT) $(INSTALL_DIR)
+#IF(cygwin or hpux):	$(CHMOD) 0775 $(INSTALL_DIR)/*$(LOAD_EXT)
 
 Makefile: ../../config/gen/makefiles/dynpmc.in
 	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=src/dynpmc/Makefile
