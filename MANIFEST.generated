@@ -278,6 +278,7 @@ src/pmc/pmc_float.h                               [devel]include
 src/pmc/pmc_hash.h                                [devel]include
 src/pmc/pmc_integer.h                             [devel]include
 src/pmc/pmc_multisub.h                            [devel]include
+src/pmc/pmc_parrotlibrary.h                       [devel]include
 src/pmc/pmc_object.h                              [devel]include
 src/pmc/pmc_resizablepmcarray.h                   [devel]include
 src/pmc/pmc_scalar.h                              [devel]include

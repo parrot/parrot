@@ -21,6 +21,7 @@ Functions for loading and initializing dynamic link libraries.
 #include "parrot/parrot.h"
 #include "parrot/dynext.h"
 #include "dynext.str"
+#include "pmc/pmc_parrotlibrary.h"
 
 /* HEADERIZER HFILE: include/parrot/dynext.h */
 
@@ -420,7 +421,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
         /* we could set a private flag in the PMC header too
          * but currently only ops files have struct_val set */
 
-        if (PMC_struct_val(lib_pmc))
+        if (((Parrot_ParrotLibrary_attributes *)PMC_data(lib_pmc))->oplib_init)
             type = CONST_STRING(interp, "Ops");
         else
             type = CONST_STRING(interp, "PMC");
