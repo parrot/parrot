@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 19;
 use Carp;
 
 use lib qw( lib t/configure/testlib );
@@ -68,17 +68,12 @@ ok( $step->_evaluate_cc_run($conf, $d_neg_0),
     '_evaluate_cc_run() completed satisfactorily' );
 
 is( $step->result(), 'yes', 'Got expected result');
-is( $conf->data->get('has_negative_zero'), 1,
-    'has_negative_zero set as expected' );
 
 $d_neg_0 = '0';
 
 ok( !$step->_evaluate_cc_run($conf, $d_neg_0),
     '_evaluate_cc_run() completed satisfactorily' );
 is( $step->result(), 'no', 'Got expected result' );
-
-is( $conf->data->get('has_negative_zero'), 0,
-    "has_negative_zero set as expected" );
 
 pass("Completed all tests in $0");
 

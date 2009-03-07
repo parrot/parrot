@@ -57,7 +57,6 @@ sub _evaluate_cc_run {
     my ($conf, $test, $has_neg_0, $verbose) = @_;
     $has_neg_0 = ($test =~ m/^-0/ ? 1 : 0);
     $self->set_result( $has_neg_0 ? 'yes' : 'no' );
-    $conf->data->set( has_negative_zero => $has_neg_0 );
     print $has_neg_0 ? ' (yes) ' : ' (no) ' if $verbose;
     return $has_neg_0;
 }
