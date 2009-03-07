@@ -49,8 +49,6 @@ Optional perl packages for testing:
   L<Test::TAP::HTMLMatrix> if you want to run the smoke tests
   with C<make smoke>.
 
-  L<Test::Base> for some APL language tests.
-
   perl L<Test::Perl::Critic> and L<Perl::Critic>
 
 =over 4

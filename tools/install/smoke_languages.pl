@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 30;
+use Test::More tests => 29;
 
 =head1 NAME
 
@@ -88,19 +88,6 @@ print $FH "1 + 2\n";
 close $FH;
 $out = `$parrot $langdir/abc/abc.pbc $filename`;
 ok($out eq "3\n", "check abc");
-unlink($filename);
-}
-
-SKIP:
-{
-skip("APL", 1) unless (-d "$langdir/apl");
-$filename = 'test.apl';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH "\"Hello world!\"";
-close $FH;
-$out = `$parrot $langdir/APL/APL.pbc $filename`;
-ok($out eq "Hello world!\n", "check APL");
 unlink($filename);
 }
 

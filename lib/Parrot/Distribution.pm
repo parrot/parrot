@@ -654,7 +654,6 @@ sub perl_script_file_directories {
     return map $self->directory_with_name($_) => 'compilers/imcc',
         'editor', 'examples/benchmarks', 'examples/mops', 'languages',
         map( "languages/$_" => qw<
-            APL/tools
             BASIC/compiler BASIC/interpreter
             dotnet dotnet/build dotnet/tools
             python
@@ -703,7 +702,6 @@ sub perl_module_file_directories {
             gen gen/cpu/i386 gen/cpu/x86_64 init init/hints inter> ),
         'ext/Parrot-Embed/lib/Parrot',
         map( "languages/$_" => qw<
-            APL/t
             BASIC/compiler
             bc/lib/Parrot/Test bc/lib/Parrot/Test/Bc
             dotnet/build/SRM dotnet/t

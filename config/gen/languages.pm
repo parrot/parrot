@@ -36,7 +36,7 @@ sub _init {
     $data{description} = q{Configure languages};
     $data{result} = q{};
     $data{default_languages} = qq{
-        APL abc
+        abc
         befunge bf
         cardinal chitchat cola c99
         ecmascript

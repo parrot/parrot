@@ -1050,11 +1050,11 @@ Returns a vector-like PMC.
 
 Change the existing @lang@ by passing in an existing vector.
 
-If the new property is larger than our old property, pad the end of the APLv
+If the new property is larger than our old property, pad the end of the vector
 with elements from the beginning.
 
 If the new property is shorter than our old property, truncate elements from
-the end of the APLv.
+the end of the vector.
 
 =cut
 

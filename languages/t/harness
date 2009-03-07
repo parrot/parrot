@@ -78,7 +78,7 @@ my @unified_testable_languages
     = defined $languages_list ?
           split( /\s*,\s*/, $languages_list )
           :
-          qw( abc APL
+          qw( abc
               befunge bf
               cola
               dotnet

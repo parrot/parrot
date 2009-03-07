@@ -41,7 +41,6 @@ sub new {
         '',
         $self->new_item( '', 'languages/t/harness' ),
         $self->new_section( 'abc',         'abc.html',        '', 'languages/abc' ),
-        $self->new_section( 'APL',         'apl.html',        '', 'languages/APL' ),
         $self->new_section( 'BASIC',       'basic.html',      '', 'languages/BASIC' ),
         $self->new_section( 'Befunge',     'befunge.html',    '', 'languages/befunge' ),
         $self->new_section( 'BF',          'bf.html',         '', 'languages/bf' ),

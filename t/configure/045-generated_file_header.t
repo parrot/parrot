@@ -13,7 +13,7 @@ use Parrot::BuildUtil;
 
 {
     my $header;
-    my ( $filename, $style ) = ( 'foobar', 'APL' );
+    my ( $filename, $style ) = ( 'foobar', 'SPAF' );
     eval { $header = Parrot::BuildUtil::generated_file_header( $filename, $style ); };
     like(
         $@,

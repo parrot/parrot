@@ -40,7 +40,6 @@ my $num_col_limit = 100;
 
 # a list of high level languages where we want to test line length
 my %lang_is_checked = map { $_ => 1 } qw{
-    APL
     cardinal
     dotnet
     ook

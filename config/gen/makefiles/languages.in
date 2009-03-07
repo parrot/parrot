@@ -15,7 +15,7 @@ SVN           := svn
 # List of languages that are currently managed in the Parrot svn repository
 # When adding or removing languages, please update the list
 LANGUAGES := \
-    abc APL \
+    abc \
     BASIC befunge bf \
     c99 cardinal chitchat cola \
     dotnet \
@@ -146,7 +146,7 @@ test-unified: all
 	$(PERL) t/harness
 
 test-separate: all \
-    abc.test APL.test \
+    abc.test \
     befunge.test bf.test \
     c99.test cardinal.test chitchat.test cola.test \
     dotnet.test \
@@ -161,7 +161,7 @@ test-separate: all \
     urm.test
 
 clean: \
-    abc.clean APL.clean \
+    abc.clean \
     BASIC.clean befunge.clean bf.clean \
     c99.clean cardinal.clean chitchat.clean cola.clean \
     dotnet.clean \
@@ -177,7 +177,7 @@ clean: \
     urm.clean
 
 realclean: \
-    abc.realclean APL.realclean \
+    abc.realclean \
     befunge.realclean bf.realclean \
     c99.realclean cardinal.realclean chitchat.realclean cola.realclean \
     dotnet.realclean \
@@ -207,16 +207,6 @@ abc.clean:
 	- $(MAKE) abc clean
 abc.realclean:
 	- $(MAKE) abc realclean
-
-APL : APL.dummy
-APL.dummy:
-	- $(MAKE) APL
-APL.test:
-	- $(MAKE) APL test
-APL.clean:
-	- $(MAKE) APL clean
-APL.realclean:
-	- $(MAKE) APL realclean
 
 BASIC : BASIC.dummy
 BASIC.dummy:
