@@ -104,8 +104,8 @@ sub collect_test_environment_data {
     # rename sun4 to sparc
     my $arch = $PConfig{cpuarch} eq 'sun4' ? 'sparc' : $PConfig{cpuarch};
     # add the 32/64 bit suffix to the cpuarch
-    if ($PConfig{cpuarch} !~ /\d$/) {
-      $arch = $PConfig{cpuarch} . (8*$PConfig{wordsize});
+    if ($arch !~ /\d$/) {
+      $arch .= 8 * $PConfig{wordsize};
     }
     my $devel = $PConfig{DEVEL};
     # check for local-modifications if -d .svn and query to continue
