@@ -211,6 +211,13 @@ sub _get_compiler_version {
     elsif ($compiler =~ /cl/ and $PConfig{msvcversion}) {
         $compiler .= " $PConfig{msvcversion}";
     }
+    # catch cc or ccache
+    elsif ($PConfig{gccversion}) {
+        $compiler .= " (gcc $PConfig{gccversion})";
+    }
+    elsif ($PConfig{msvcversion}) {
+        $compiler .= " (msvc $PConfig{msvcversion})";
+    }
     return $compiler;
 }
 
