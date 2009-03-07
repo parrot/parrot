@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test tests => 4;
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -70,7 +70,10 @@ my $bc = ($bc_major . "." . $bc_minor);
 my $arch = this_arch();
 # all should pass
 my $todo = {};
-my $skip = {};
+my $skip = {
+  2 => "dummy",
+  5 => "dummy"
+};
 # special failures: 64bit cannot read 32bit
 if ($PConfig{ptrsize} == 8) {
     my $todo_msg = "TT #254 64bit cannot read 32bit";
@@ -148,8 +151,10 @@ sub test_pbc_string {
 #         dirformat = 1
 # ]
 test_pbc_string(1, "i386 LE 32 bit opcode_t, 4-byte int" );
+test_pbc_string(2, "dummy" );
 test_pbc_string(3, "PPC BE 32 bit opcode_t, 4-byte int");
 test_pbc_string(4, "i86_64 LE 64 bit opcode_t, 8-byte int");
+test_pbc_string(5, "dummy" );
 test_pbc_string(6, "big-endian 64-bit, 8-byte int, 8-byte double");
 
 # Local Variables:
