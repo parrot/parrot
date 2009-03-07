@@ -58,7 +58,7 @@ my %cmds;
 for my $op (@$Parrot::OpLib::core::ops) {
     my @regtypes = $op->arg_types;
 
-    ## for now, avoid opcodes with regtypes i don't know how to represent
+    ## for now, avoid opcodes with regtypes i do not know how to represent
     next unless @regtypes == grep { defined $$object_map{$_} } @regtypes;
 
     ## extract the basename of the opcode
