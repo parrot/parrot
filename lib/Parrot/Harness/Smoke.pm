@@ -10,7 +10,54 @@ Parrot::Harness::Smoke - Subroutines used by harness-scripts to generate smoke r
 This package exports on request subroutines used by the root F<t/harness>
 and by language implementation F<t/harness> to generate smoke reports.
 
-Following subroutines are supported:
+=head1 SUBROUTINES
+
+The module currently exports three subroutines on demand.
+
+=head2 C<collect_test_environment_data()>
+
+    %env_data = collect_test_environment_data();
+
+Subroutine collects environmental data via:
+
+=over 4
+
+=item * Analysis of the results of Parrot configuration (C<%PConfig>).
+
+=item * Environmental variables
+
+=item * Analysis of C<.svn> metadata
+
+=item * Application of CPAN modules.  F<Mail::Util> and F<Sys::Hostname> are
+used, if available.
+
+=back
+
+You may directly affect I<Submitter> data by setting the following environmental
+variable(s):
+
+=over 4
+
+=item *  All systems.  C<$ENV{'SMOLDER_SUBMITTER'}>.
+
+=item * Win32 only.  C<$ENV{'USERNAME'}> or C<$ENV{'LOGNAME'}>, plus
+C<$ENV{'USERDOMAIN'}>.
+
+=back
+
+=head2 C<send_archive_to_smolder()>
+
+    send_archive_to_smolder( %env_data );
+
+At the current time, automated smoke reports are collected and displayed via
+the Smolder system at L<http://smolder.plusthree.com>.  Such reports require
+the Perl 5 F<LWP::UserAgent> module, available from CPAN.
+
+=head2 C<generate_html_smoke_report()>
+
+This subroutine generates a type of HTML-smoke report formerly collected and
+displayed on Parrot's smoke server.  It has been superseded by Smolder
+reporting but is still available for other uses.
 
     generate_html_smoke_report (
         tests       => \@tests,
@@ -18,9 +65,8 @@ Following subroutines are supported:
         file        => 'smoke.html',
     );
 
-    my %env_data = collect_test_environment_data();
-
-    send_archive_to_smolder( %env_data );
+This subroutine requires CPAN modules F<Test::TAP::HTMLMatrix> and
+F<Test::TAP::Model::Visual>.
 
 =cut
 
