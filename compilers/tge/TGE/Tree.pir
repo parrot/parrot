@@ -281,9 +281,6 @@ got_id:
     .return (id)
 .end
 
-
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

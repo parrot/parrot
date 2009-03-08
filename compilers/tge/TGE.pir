@@ -112,8 +112,6 @@ applies to a child of the current node (generally inherited attributes).
 .end
 
 
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
