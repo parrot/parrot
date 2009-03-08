@@ -1308,8 +1308,8 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     s = string_make(interp, (const char *)*cursor, size, charset_name, flags);
 
     /* print only printable characters */
-    TRACE_PRINTF_VAL((NULL, "PF_fetch_string(): string is '%s' at 0x%x\n",
-                          s->strstart, OFFS(*cursor)));
+    TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
+                      s->strstart, OFFS(*cursor)));
 
 /*    s = string_make(interp, *cursor, size,
             encoding_lookup_index(encoding),
