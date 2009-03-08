@@ -6,6 +6,7 @@ TGE::Grammar - The base class for all tree grammars.
 
 =head1 SYNOPSIS
 
+(To come.)
 
 =head1 DESCRIPTION
 
