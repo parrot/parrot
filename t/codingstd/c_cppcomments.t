@@ -49,6 +49,10 @@ Parrot::Test::Util::Runloop->testloop(
     diag_prefix => 'C++ comments found'
 );
 
+# TT # 414 (https://trac.parrot.org/parrot/ticket/414):
+# In the POD inside a C source code file, a hyperlink such as 
+# https://trac.parrot.org will be inaccurately reported as a C++-style
+# comment.
 sub check_cppcomments {
     my $buf = shift;
     $buf =~ s{ (?:
