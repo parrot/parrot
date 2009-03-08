@@ -24,7 +24,7 @@ LANGUAGES := \
     jako json \
     lisp lolcode \
     ook \
-    parrot_compiler pheme PIR pynie \
+    parrot_compiler pheme PIR pod pynie \
     regex \
     scheme squaak \
     urm
@@ -175,7 +175,7 @@ test-separate: all \
     jako.test json.test \
     lisp.test lolcode.test \
     ook.test \
-    parrot_compiler.test pheme.test PIR.test pynie.test \
+    parrot_compiler.test pheme.test PIR.test pod.test pynie.test \
     regex.test \
     scheme.test squaak.test \
     urm.test
@@ -191,7 +191,7 @@ clean: \
     lisp.clean \
     lolcode.clean \
     ook.clean \
-    parrot_compiler.clean pheme.clean PIR.clean pynie.clean \
+    parrot_compiler.clean pheme.clean PIR.clean pod.clean pynie.clean \
     regex.clean \
     scheme.clean squaak.clean \
     urm.clean
