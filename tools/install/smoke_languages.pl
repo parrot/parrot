@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 29;
+use Test::More tests => 30;
 
 =head1 NAME
 
@@ -272,6 +272,19 @@ print $FH "printf(\"Hello, world!\n\");";
 close $FH;
 $out = `$parrot $langdir/matrixy/matrixy.pbc $filename`;
 ok($out eq "Hello, world!\n", "check matrixy");
+unlink($filename);
+}
+
+SKIP:
+{
+skip("Paraplegic", 1) unless (-d "$langdir/paraplegic");
+$filename = 'test.apl';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "\"Hello world!\"";
+close $FH;
+$out = `$parrot $langdir/paraplegic/APL.pbc $filename`;
+ok($out eq "Hello world!\n", "check Paraplegic");
 unlink($filename);
 }
 
