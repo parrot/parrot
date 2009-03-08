@@ -235,7 +235,7 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
      */
     sc = CONST_STRING(interp, "_interpreter");
     passed_interp = VTABLE_getprop(interp, user_data, sc);
-    if (PMC_data(passed_interp) != interp)
+    if (VTABLE_get_pointer(interp, passed_interp) != interp)
         PANIC(interp, "callback gone to wrong interpreter");
 
     sc = CONST_STRING(interp, "_synchronous");

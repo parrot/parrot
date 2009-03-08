@@ -323,7 +323,7 @@ Invokes the PMC $2 using interp $1.
 =cut
 
 op runinterp(invar PMC, in PMC) {
-    Interp * const new_interp = (Interp *)PMC_data($1);
+    Interp * const new_interp = (Interp *)VTABLE_get_pointer(interp, $1);
     opcode_t *pc;
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
     pc = (opcode_t *)VTABLE_invoke(new_interp, $2, NULL);
