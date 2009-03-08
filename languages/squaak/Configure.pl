@@ -49,6 +49,7 @@ sub create_makefiles {
     );
     my $build_tool = $config{libdir} . $config{versiondir}
                    . '/tools/dev/gen_makefile.pl';
+    $build_tool = "../../tools/dev/gen_makefile.pl" unless -e $build_tool;
 
     foreach my $template (keys %makefiles) {
         my $makefile = $makefiles{$template};
