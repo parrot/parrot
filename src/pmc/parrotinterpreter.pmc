@@ -32,6 +32,8 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "pmc_class.h"
 #include "pmc_sub.h"
 
+#define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
+
 /*
 
 =item C<void
@@ -162,8 +164,8 @@ create_interp(PMC *self, Parrot_Interp parent)
     if (self->vtable->base_type == enum_class_ParrotThread)
         flag = PARROT_IS_THREAD;
 
-    new_interp     = make_interpreter(parent, (INTVAL)flag);
-    PMC_data(self) = new_interp;
+    new_interp       = make_interpreter(parent, (INTVAL)flag);
+    PMC_interp(self) = new_interp;
 
     VTABLE_set_pmc_keyed_int(new_interp, new_interp->iglobals,
         (INTVAL) IGLOBALS_INTERPRETER, self);
@@ -180,6 +182,7 @@ recursion_limit(PARROT_INTERP, PMC *self, int l)
 }
 
 pmclass ParrotInterpreter need_ext no_ro {
+    ATTR struct parrot_interp_t *interp; /* this PMC's interpreter */
 
 /*
 
@@ -225,11 +228,14 @@ Initializes the interpreter.
         /*
          * init/init_pmc may be called internally (from thread creation in
          * ParrotThread::init_pmc() or stand-alone
-         * so we check, if the interpreter is already setup
+         * so we check, if the interpreter is already set up
          */
         if (!PMC_data(SELF)) {
+            Parrot_ParrotInterpreter_attributes *attrs =
+                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+            PMC_data(SELF) = attrs;
             create_interp(SELF, INTERP);
-            PARROT_ASSERT(PMC_data(SELF));
+            PARROT_ASSERT(attrs->interp);
         }
 
         PMC_struct_val(SELF) = NULL;
@@ -249,9 +255,9 @@ C<parent> and uses that thread.
 */
 
     VTABLE void init_pmc(PMC *parent) {
-        Parrot_Interp p = PMC_data_typed(parent, Parrot_Interp);
+        Parrot_Interp p = PMC_interp(parent);
 
-        if (!PMC_data(SELF))
+        if (!PMC_interp(SELF))
             create_interp(SELF, p);
 
         PMC_struct_val(SELF) = NULL;
@@ -268,8 +274,16 @@ Sets C<struct_val> to C<*value>.
 */
 
     VTABLE void set_pointer(void *value) {
-        /* PMC_struct_val(SELF) = value; */
-        PMC_data(SELF) = value;
+
+        /* XXX: init_world in src/global_setup.c needs to create a
+         * ParrotInterpreter through pmc_new_noinit.  If this PMC hasn't been
+         * initialized, cheat by initializing instead. */
+        if (!PMC_data(SELF)) {
+            Parrot_ParrotInterpreter_attributes *attrs =
+                mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+            PMC_data(SELF) = attrs;
+        }
+        PMC_interp(SELF) = (struct parrot_interp_t *)value;
     }
 
 /*
@@ -283,8 +297,7 @@ Returns C<struct_val>.
 */
 
     VTABLE void *get_pointer() {
-        /* return PMC_struct_val(SELF); */
-        return PMC_data(SELF);
+        return PMC_interp(SELF);
     }
 
 /*
@@ -298,7 +311,7 @@ Returns the thread id of the interpreter.
 */
 
     VTABLE INTVAL get_integer() {
-        const Parrot_Interp i = PMC_data_typed(SELF, Parrot_Interp);
+        const Parrot_Interp i = PMC_interp(SELF);
         return (INTVAL)i->thread_data->tid;
     }
 
@@ -313,7 +326,7 @@ Runs the interpreter's byte code.
 */
 
     VTABLE opcode_t *invoke(void *next) {
-        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_interp(SELF);
 
         /* setup code */
         pt_thread_prepare_for_run(new_interp, interp);
@@ -339,7 +352,7 @@ Returns the PMC global value for C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_interp(SELF);
 
         if (key >= 0 && key < IGLOBALS_SIZE)
             return VTABLE_get_pmc_keyed_int(new_interp,
@@ -497,7 +510,7 @@ Returns the interpreter info for C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_interp(SELF);
 
         if (key == -1)
             return (INTVAL)new_interp->flags;
@@ -516,7 +529,7 @@ Sets the interpreter info for C<key> to C<val>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL val) {
-        Interp * const new_interp = PMC_data_typed(SELF, Interp *);
+        Interp * const new_interp = PMC_interp(SELF);
 
         /* set interpreter flags */
         if (key == -1) {
@@ -543,8 +556,8 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
     VTABLE PMC *clone() {
         PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
 
-        clone_interpreter((Parrot_Interp)PMC_data(dest),
-                          (Parrot_Interp)PMC_data(SELF), PARROT_CLONE_DEFAULT);
+        clone_interpreter(PMC_interp(dest),
+                          PMC_interp(SELF), PARROT_CLONE_DEFAULT);
 
         return dest;
     }
@@ -563,8 +576,8 @@ have the same thread id.
 */
 
     VTABLE INTVAL is_equal(PMC *val) {
-        Parrot_Interp self  = PMC_data_typed(SELF, Parrot_Interp);
-        Parrot_Interp other = PMC_data_typed(val, Parrot_Interp);
+        Parrot_Interp self  = PMC_interp(SELF);
+        Parrot_Interp other = PMC_interp(val);
 
         if (!self->thread_data && !other->thread_data)
             return 1;
@@ -644,8 +657,15 @@ Finish thawing.
             SUPER(info);
         }
         else if (info->extra_flags == EXTRA_IS_NULL) {
-            PMC_data(SELF) = INTERP;
-            info->what     = VISIT_THAW_CONSTANTS;
+
+            if (!PMC_data(SELF)) {
+                Parrot_ParrotInterpreter_attributes *attrs =
+                    mem_allocate_zeroed_typed(Parrot_ParrotInterpreter_attributes);
+                PMC_data(SELF) = attrs;
+            }
+
+            PMC_interp(SELF) = INTERP;
+            info->what       = VISIT_THAW_CONSTANTS;
         }
     }
 
@@ -705,7 +725,7 @@ Finish thawing.
     }
 
     METHOD run_gc() {
-        Parrot_do_gc_run(PMC_data_typed(SELF, Parrot_Interp), 0);
+        Parrot_do_gc_run(PMC_interp(SELF), 0);
     }
 
 /*

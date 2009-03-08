@@ -2,11 +2,11 @@
 Copyright (C) 2001-2007, Parrot Foundation.
 $Id$
 
-=head1 NAME
+=head1 Name
 
 src/pmc/parrotthread.pmc - Threaded Interpreter
 
-=head1 DESCRIPTION
+=head1 Description
 
 ParrotThread extends ParrotInterpreter to provide a threaded interpreter
 which supports:
@@ -39,6 +39,8 @@ and these methods:
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
+#define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
+
 /*
  * can't do multi-threaded GC yet
  * XXX a quick hack to pass the few tests
@@ -62,8 +64,7 @@ static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
                             INTVAL clone_flags, PMC *sub, PMC *args) {
     INTVAL tid = VTABLE_get_integer(interp, thread);
 
-    clone_interpreter(PMC_data_typed(thread, Parrot_Interp),
-                      interp, clone_flags);
+    clone_interpreter(PMC_interp(thread), interp, clone_flags);
 
     interp->flags &= ~PARROT_THR_COPY_INTERP; /* XXX */
     pt_thread_run(interp, thread, sub, args);
@@ -129,12 +130,12 @@ Initializes the thread.
         LOCK(interpreter_array_mutex);
 
         SUPER();
-        pt_add_to_interpreters(INTERP, PMC_data_typed(SELF, Parrot_Interp));
+        pt_add_to_interpreters(INTERP, PMC_interp(SELF));
 
         UNLOCK(interpreter_array_mutex);
 
         /* can't allow GC runs for now */
-        stop_GC(INTERP, PMC_data_typed(SELF, Parrot_Interp));
+        stop_GC(INTERP, PMC_interp(SELF));
     }
 
 /*
@@ -151,13 +152,13 @@ Create a new thread by cloning the passed interpreter.
         LOCK(interpreter_array_mutex);
         SUPER(parent);
 
-        pt_add_to_interpreters(PMC_data_typed(parent, Parrot_Interp),
-                               PMC_data_typed(SELF,   Parrot_Interp));
+        pt_add_to_interpreters(PMC_interp(parent),
+                               PMC_interp(SELF));
 
         UNLOCK(interpreter_array_mutex);
 
         /* can't allow GC runs for now */
-        stop_GC(INTERP, PMC_data_typed(SELF, Parrot_Interp));
+        stop_GC(INTERP, PMC_interp(SELF));
     }
 }
 
@@ -165,7 +166,7 @@ Create a new thread by cloning the passed interpreter.
 
 =back
 
-=head1 HISTORY
+=head1 History
 
 2003.12.18 leo initial review.
 
