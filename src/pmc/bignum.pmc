@@ -280,12 +280,12 @@ bignum_add_bignum_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 
 static void
 bignum_add_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL value, PMC *dest) {
-    BIGNUM *bn, *bn_self, *bn_dest;
-    GETATTR_BigNum_bn(interp, self, bn);
+    BIGNUM *bn_value, *bn_self, *bn_dest;
+    GETATTR_BigNum_bn(interp, self, bn_value);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
-    mpf_set_d(bn->b, value);
-    mpf_add(bn_dest->b, bn_self->b, bn->b);
+    mpf_set_d(bn_value->b, value);
+    mpf_add(bn_dest->b, bn_self->b, bn_value->b);
 }
 
 static void
@@ -310,12 +310,12 @@ bignum_sub_bignum_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 
 static void
 bignum_sub_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL value, PMC *dest) {
-    BIGNUM *bn, *bn_self, *bn_dest;
-    GETATTR_BigNum_bn(interp, self, bn);
+    BIGNUM *bn_tmp, *bn_self, *bn_dest;
+    GETATTR_BigNum_bn(interp, self, bn_tmp);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
-    mpf_set_d(bn->b, value);
-    mpf_sub(bn_dest->b, bn_self->b, bn->b);
+    mpf_set_d(bn_tmp->b, value);
+    mpf_sub(bn_dest->b, bn_self->b, bn_tmp->b);
 }
 
 static void
@@ -337,12 +337,12 @@ bignum_mul_bignum_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 
 static void
 bignum_mul_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL value, PMC *dest) {
-    BIGNUM *bn, *bn_self, *bn_dest;
-    GETATTR_BigNum_bn(interp, self, bn);
+    BIGNUM *bn_tmp, *bn_self, *bn_dest;
+    GETATTR_BigNum_bn(interp, self, bn_tmp);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
-    mpf_set_d(bn->b, value);
-    mpf_mul(bn_dest->b, bn_self->b, bn->b);
+    mpf_set_d(bn_tmp->b, value);
+    mpf_mul(bn_dest->b, bn_self->b, bn_tmp->b);
 }
 
 static void
