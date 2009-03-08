@@ -44,7 +44,7 @@ configure script.
 
 The main Parrot executable.
 
-=item F</usr/lib/parrot/library/>
+=item F</usr/lib/parrot/<version>/library/>
 
 Parrot runtime libraries, corresponds to F<runtime/parrot/library/> in the
 repository.
