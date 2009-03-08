@@ -96,7 +96,7 @@ sub _finalize_result_str {
     my $self = shift;
     my ($align, $result_str) = @_;
     # On 8-byte ptr_alignment we cannot read 4-byte pbc's. Warn the user about it.
-    # TODO: inform the user to use --64compat for parrot. Milestone v2.6
+    # TT 413: inform the user to use --64compat for parrot. Milestone v2.6
     if ($align > 4) {
         $result_str .= " $align byte";
         $result_str .= "s\n   (Warning: 4-byte pbc's cannot be read!)";

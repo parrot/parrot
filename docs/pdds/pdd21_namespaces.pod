@@ -123,7 +123,7 @@ the problem of interoperability.
 Parrot namespaces assist with interoperability by providing two interface
 subsets: the I<untyped interface> and the I<typed interface>.
 
-=head5 Untyped Interface
+=head4 Untyped Interface
 
 Each HLL may, when working with its own namespace objects, use the I<untyped
 interface>, which allows direct naming in the native style of the namespace's
@@ -152,7 +152,7 @@ the namespace name with which you found the namespace in the first place.
 
 =back
 
-=head5 Typed Interface
+=head4 Typed Interface
 
 When a given namespace's HLL is either different from the current HLL or
 unknown, an HLL should generally use only the language-agnostic namespace

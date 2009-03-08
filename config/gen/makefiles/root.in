@@ -1781,7 +1781,8 @@ test-clean :
      "test$(EXE)" \
      "test.*"
 	$(RM_F) \
-     "parrot_test_run.tar.gz"
+     "parrot_test_run.tar.gz" \
+	 ".pod_examinable*.sto"
 
 imcc-clean:
 	$(RM_F) \

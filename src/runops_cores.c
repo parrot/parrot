@@ -176,7 +176,7 @@ next opcode, which means faster throughput. Remember that whatever dispatch
 mechanism is used will be called after every single opcode, and some large
 programs may have millions of opcodes! Every single machine instruction
 that can be cut out of the dispatch mechanism could increase the execution
-speed of Parrot in a significant and noticable way. N<The dispatch mechanism
+speed of Parrot in a significant and noticable way. B<The dispatch mechanism
 used by the various runcores is hardly the largest performance bottleneck in
 Parrot anyway, but we like to use faster cores to shave every little bit of
 speed out of the system>.
@@ -186,6 +186,8 @@ available with compilers that support computed goto, such as GCC. Parrot
 will not have access to this core if it is built with a different compiler.
 
 =head2 Tracing Core
+
+To come.
 
 =head2 Profiling Core
 

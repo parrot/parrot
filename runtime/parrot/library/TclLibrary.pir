@@ -113,6 +113,8 @@ libtcl_loaded:
     f_tclinit(interp)
 .end
 
+=over 4
+
 =item _init
 
 Performs the initialization of Tcl bridge, namely instantiates TclLibrary class
@@ -235,9 +237,6 @@ standard_names_e:
     '_init_tclobj'()
 
 .end
-
-=comment
-=cut
 
 #
 #static SV *
@@ -402,7 +401,7 @@ elsewhere - reuse it from there)
     die message
 .end
 
-
+=back
 
 
 =head1 SEE ALSO
