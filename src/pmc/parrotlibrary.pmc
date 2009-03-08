@@ -10,10 +10,6 @@ src/pmc/parrotlibrary.pmc - Dynamic Library
 
 Class for holding info about a dynamic library.
 
-     PMC data
-     PMC_struct_val(SELF)   oplib init function
-     PMC_data(SELF)         DLL handle
-
 Properties:
 
     _filename               full path/file of lib
@@ -35,9 +31,11 @@ a ParrotLibrary PMC.
 #include "parrot/parrot.h"
 
 #define PMC_dlhandle(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->dl_handle
+#define PMC_oplib_init(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->oplib_init
 
 pmclass ParrotLibrary need_ext provides library {
-    ATTR void * dl_handle;
+    ATTR void * dl_handle;  /* DLL handle */
+    ATTR void * oplib_init; /* oplib init function */
 
 /*
 
@@ -54,7 +52,6 @@ Initializes the library with a C<NULL> oplib init function.
             mem_allocate_zeroed_typed(Parrot_ParrotLibrary_attributes);
         PMC_data(SELF) = attrs;
         PObj_active_destroy_SET(SELF);
-        PMC_struct_val(SELF) = NULL;
     }
 
 /*
@@ -87,7 +84,7 @@ Creates and returns a clone of the library.
 
     VTABLE PMC *clone() {
         PMC *dest            = pmc_new(INTERP, SELF->vtable->base_type);
-        PMC_struct_val(dest) = PMC_struct_val(SELF);
+        PMC_oplib_init(dest) = PMC_oplib_init(SELF);
         PMC_dlhandle(dest)   = PMC_dlhandle(SELF);
 
         if (PMC_metadata(SELF))

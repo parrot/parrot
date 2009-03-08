@@ -1094,7 +1094,8 @@ $(SRC_DIR)/string/primitives$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/longopt$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/dynext$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dynext.str
+$(SRC_DIR)/dynext$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/dynext.str \
+	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exceptions.str \
 	$(SRC_DIR)/pmc/pmc_continuation.h
@@ -1106,7 +1107,8 @@ $(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
 	$(SRC_DIR)/pmc/pmc_sub.h
 
-$(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES)
+$(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES) \
+	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
