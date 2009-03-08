@@ -836,7 +836,7 @@ inline op pow(out NUM, in NUM, in INT) :base_core {
             e = -e;
         }
     }
-    while (e) { 
+    while (e) {
         if (e & 1) {
             res *= n2;
         }
