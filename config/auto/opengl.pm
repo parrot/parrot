@@ -110,20 +110,24 @@ GLUT 3.7.6,
 see L<http://www.transmissionzero.co.uk/computing/using-glut-with-mingw/>.
 
 
+=head3 Cygwin/X
+
+Requires a X server and F<libglut-devel>, F<libGL-devel>, F<libGLU-devel>,
+F<freeglut> and its dependencies.
+
+This is tried first.
+
 =head3 Cygwin/w32api
 
 The Cygwin/w32api for native opengl support
+is only tried if F</usr/include/GL> does not exist.
+
+The problem is that the L<NCI|pdds/draft/pdd16_native_call.pod>
+tries the header files to create the imports and not the libraries,
+and if the F</usr/include/GL> headers are found these are used, despite
+the w32api GLUT libraries are defined.
 
 F<opengl>, F<w32api>
-
-=head3 Cygwin/X
-
-Requires a X server.
-
-F<freeglut>, F<libglut-devel>, F<xorg-x11-devel>
-
-This is detected if freeglut is installed and DISPLAY is set.
-It requires an X server.
 
 =cut
 
@@ -164,10 +168,10 @@ sub runstep {
             conf            => $conf,
             osname          => $osname,
             cc              => $conf->data->get('cc'),
-            # Prefer Cygwin/w32api over Cygwin/X, but use X when DISPLAY is set
-            ($^O eq 'cygwin') ?
-             ($ENV{DISPLAY} ? (cygwin => '-lglut -L/usr/X11R6/lib -lGLU -lGL')
-                            : (cygwin => '/usr/bin/glut32.dll -lglu32 -lopengl32'))
+            ($^O eq 'cygwin') ?  # Cygwin/X is used when /usr/include/GL is found
+             (-d '/usr/include/GL'
+                ? (cygwin => '-lglut -L/usr/X11R6/lib -lGLU -lGL')
+                : (cygwin => '-lglut32 -lglu32 -lopengl32'))
              : (),
             win32_gcc       => '-lglut32 -lglu32 -lopengl32',
             win32_nongcc    => 'opengl32.lib glu32.lib glut32.lib',

@@ -66,14 +66,20 @@ by not installing it or asking Parrot to ignore it (C<--without-icu>).
 
 =item opengl
 
-You can use the w32api and opengl packages for native Windows opengl support,
-or the freeglut package for the X Server.
+Building is tricky:
 
-Configure.pl will detect freeglut if freeglut is installed and DISPLAY
-is set, otherwise it checks for w32api and opengl with GLUT.
-In case that freeglut is installed, DISPLAY must be set I<before> running
-Configure.pl. If not using freeglut, then DISPLAY must B<not> be set.
-C<export DISPLAY=127.0.0.1:0.0> is the typical setting.
+If the freeglut package for the X Server is installed, this
+is used, otherwise the w32api and opengl packages for native
+Windows opengl support are tried.  
+
+In order to use the w32api native GLUT there must be no
+F</usr/include/GL> directory.
+ 
+The problem is that the L<NCI|pdds/draft/pdd16_native_call.pod> 
+tries the header files to create the imports and not the
+libraries, and if the /usr/include/GL headers are found
+these are used, despite the w32api GLUT libraries are
+defined.
 
   Determining if your platform supports OpenGL.............yes, freeglut 3.4.
   Determining if your platform supports OpenGL...................yes, GLUT 3.
@@ -81,11 +87,11 @@ C<export DISPLAY=127.0.0.1:0.0> is the typical setting.
 
 Required packages:
 
+  libglut-devel libGL-devel libGLU-devel libglut3 ... 
+
+or if C<libglut-devel> and C<libGL-devel> is not installed:
+
   w32api opengl
-
-or
-
-  freeglut libglut-devel xorg-x11-devel xorg-x11-base xorg-x11-bin-dlls
 
 =item SDL
 
