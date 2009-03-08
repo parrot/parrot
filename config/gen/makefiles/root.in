@@ -651,6 +651,7 @@ help :
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '$(PREFIX)' on Unix systems"
+	@echo "  install-dev:       Same as 'install' but also install support for development."
 	@echo ""
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
