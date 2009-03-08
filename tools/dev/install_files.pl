@@ -195,6 +195,7 @@ while (<>) {
         my $copy = $dest;
         $dest =~ s/^installable_//;            # parrot with different config
         $dest = File::Spec->catdir( $options{bindir}, $dest );
+        # TODO track bin here to check later below
         if ( $copy =~ /^installable/ ) {
             push @installable_exe, [ $src, $dest ];
             next;
@@ -251,8 +252,36 @@ unless ( $options{'dry-run'} ) {
         }
     }
 }
+# TT #347
+# 1. skip build_dir-only binaries for @installable_exe
+for (@installable_exe) {
+    my ( $i, $dest ) = @$_;
+    my ($file) = $i =~ /installable_(.+)$/;
+    next unless $file;
+    my @f = map { $_ ? $_->[0] : '' } @files;
+    if (grep(/^$file$/, @f)) {
+        if (-e $file) {
+            print "skipping $file, using installable_$file instead\n";
+            @files = map {$_ and $_->[0] !~ /^$file$/ ? $_ : undef} @files;
+        }
+    }
+}
+# 2. for every .exe check if there's an installable. Fail if not
+foreach my $f (@files ) {
+    next unless $_;
+    my ( $f, $dest ) = @$_;
+    my $i;
+    # This logic will fail on non-win32 if the generated files are really
+    # generated as with rt #40817. We don't have [main]bin here.
+    $i = "installable_$f" if $f =~ /\.exe$/;
+    next unless $i;
+    unless (map {$_->[0] =~ /^$i$/} @installable_exe) {
+        die "$i is missing in MANIFEST or MANIFEST.generated\n";
+    }
+}
 print("Installing ...\n");
 foreach ( @files, @installable_exe ) {
+    next unless $_;
     my ( $src, $dest ) = @$_;
     $dest = $options{destdir} . $dest;
     if ( $options{'dry-run'} ) {
