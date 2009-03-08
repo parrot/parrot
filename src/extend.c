@@ -837,6 +837,26 @@ Parrot_PMC_push_numval(PARROT_INTERP, Parrot_PMC pmc, Parrot_Float value)
 
 /*
 
+=item C<void Parrot_PMC_push_pmcval>
+
+Push the passed-in Parrot PMC onto the passed in PMC
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_PMC_push_pmcval(PARROT_INTERP, Parrot_PMC pmc, Parrot_PMC value)
+{
+    ASSERT_ARGS(Parrot_PMC_push_pmcval)
+    PARROT_CALLIN_START(interp);
+    VTABLE_push_pmc(interp, pmc, value);
+    PARROT_CALLIN_END(interp);
+}
+
+/*
+
 =item C<void Parrot_PMC_delete_pmckey>
 
 Deletes the value associated with the passed-in PMC from the PMC.
@@ -1442,7 +1462,7 @@ Parrot_get_vtable(PARROT_INTERP, Parrot_Int id)
 
 =item C<Parrot_PMC Parrot_sub_new_from_c_func>
 
-Returns a PMC sub wrapper for a c function
+Returns a PMC sub wrapper for a c function.
 
 =cut
 
@@ -1460,6 +1480,32 @@ Parrot_sub_new_from_c_func(PARROT_INTERP,
     VTABLE_set_pointer_keyed_str(interp, sub, sig, F2DPTR(func));
     PObj_get_FLAGS(sub) |= PObj_private1_FLAG;
     return sub;
+}
+
+/*
+
+=item C<Parrot_PMC Parrot_PMC_newclass>
+
+Create a class with the type given
+
+=cut
+
+*/
+
+PARROT_EXPORT
+Parrot_PMC
+Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
+{
+    ASSERT_ARGS(Parrot_PMC_newclass)
+    Parrot_PMC result;
+    Parrot_PMC hllns;
+    INTVAL hll;
+    PARROT_CALLIN_START(interp);
+
+    result = pmc_new_init(interp, enum_class_Class, classtype);
+
+    PARROT_CALLIN_END(interp);
+    return result;
 }
 
 /*
