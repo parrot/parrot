@@ -3450,8 +3450,25 @@ PDB_backtrace(PARROT_INTERP)
 
     if (!PMC_IS_NULL(sub)) {
         str = Parrot_Context_infostr(interp, ctx);
-        if (str)
-            Parrot_io_eprintf(interp, "%Ss\n", str);
+        if (str) {
+            Parrot_io_eprintf(interp, "%Ss", str);
+            if (interp->code->annotations) {
+                PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
+                        ctx->current_pc - interp->code->base.data + 1, NULL);
+                if (!PMC_IS_NULL(annot)) {
+                    PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
+                            Parrot_str_new_constant(interp, "file"));
+                    PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
+                            Parrot_str_new_constant(interp, "line"));
+                    if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
+                        STRING *file = VTABLE_get_string(interp, pfile);
+                        INTVAL line = VTABLE_get_integer(interp, pline);
+                        Parrot_io_eprintf(interp, " (%Ss:%li)", file, (long)line);
+                    }
+                }
+            }
+            Parrot_io_eprintf(interp, "\n");
+        }
     }
 
     /* backtrace: follow the continuation chain */
@@ -3486,8 +3503,25 @@ PDB_backtrace(PARROT_INTERP)
         }
 
         /* print the context description */
-        if (rec_level == 0)
-            Parrot_io_eprintf(interp, "%Ss\n", str);
+        if (rec_level == 0) {
+            Parrot_io_eprintf(interp, "%Ss", str);
+            if (interp->code->annotations) {
+                PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
+                        sub_cont->to_ctx->current_pc - interp->code->base.data + 1, NULL);
+                if (!PMC_IS_NULL(annot)) {
+                    PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
+                            Parrot_str_new_constant(interp, "file"));
+                    PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
+                            Parrot_str_new_constant(interp, "line"));
+                    if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
+                        STRING *file = VTABLE_get_string(interp, pfile);
+                        INTVAL line = VTABLE_get_integer(interp, pline);
+                        Parrot_io_eprintf(interp, " (%Ss:%li)", file, (long)line);
+                    }
+                }
+            }
+            Parrot_io_eprintf(interp, "\n");
+        }
 
         /* get the next Continuation */
         ctx = PMC_cont(sub)->to_ctx;
