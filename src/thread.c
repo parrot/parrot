@@ -499,7 +499,7 @@ thread_func(ARGIN_NULLOK(void *arg))
     PMC             *sub_arg;
     PMC * const      self    = (PMC*) arg;
     PMC             *ret_val = NULL;
-    Parrot_Interp    interp  = (Parrot_Interp)PMC_data(self);
+    Parrot_Interp    interp  = (Parrot_Interp)VTABLE_get_pointer(interp, self);
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
@@ -732,7 +732,8 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
     ASSERT_ARGS(pt_thread_run)
     PMC *old_dest_interp;
     PMC *parent;
-    Interp * const interpreter = (Parrot_Interp)PMC_data(dest_interp);
+    Interp * const interpreter = (Parrot_Interp)VTABLE_get_pointer(interp,
+            dest_interp);
 
     Parrot_block_GC_sweep(interpreter);
     Parrot_block_GC_mark(interpreter);
@@ -751,8 +752,8 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
     dest_interp     = pmc_new_noinit(interpreter, enum_class_ParrotThread);
 
     /* so it's not accidentally deleted */
-    PMC_data(old_dest_interp) = NULL;
-    PMC_data(dest_interp)     = interpreter;
+    VTABLE_set_pointer(interp, old_dest_interp, NULL);
+    VTABLE_set_pointer(interp, dest_interp, interpreter);
 
     VTABLE_set_pmc_keyed_int(interpreter, interpreter->iglobals,
         (INTVAL) IGLOBALS_INTERPRETER, dest_interp);
@@ -764,7 +765,9 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
      * TODO check if thread flags are consistent
      */
     if (interp->flags & PARROT_THR_COPY_INTERP)
-        clone_interpreter(interpreter, (Parrot_Interp)PMC_data(parent), PARROT_CLONE_DEFAULT);
+        clone_interpreter(interpreter,
+                (Parrot_Interp)VTABLE_get_pointer(interp, parent),
+                PARROT_CLONE_DEFAULT);
     /*
      * TODO thread pools
      */
