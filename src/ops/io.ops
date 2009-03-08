@@ -90,6 +90,29 @@ inline op getstderr(out PMC) :base_io {
 
 #########################################
 
+=item B<setstdout>(invar PMC)
+
+Sets the standard output for a bare C<print> op to go to the supplied ParrotIO
+PMC.  Call C<getstdout> first if you care about retaining the previous PMC.
+
+=item B<setstderr>(invar PMC)
+
+Sets the standard error for a bare C<printerr> op to go to the supplied
+ParrotIO PMC.  Call C<getstderr> first if you care about retaining the previous
+PMC.
+
+=cut
+
+inline op setstdout(invar PMC) :base_io {
+        _PIO_STDOUT(interp) = $1;
+}
+
+inline op setstderr(invar PMC) :base_io {
+        _PIO_STDERR(interp) = $1;
+}
+
+#########################################
+
 =item B<open>(out PMC, in STR, in STR)
 
 Open URL (file, address, database, in core image) named $2 with

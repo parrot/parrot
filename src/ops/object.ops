@@ -1,6 +1,5 @@
 /*
 
-Copyright (C) 2001-2008, Parrot Foundation.
 $Id$
 
 object.ops
@@ -532,7 +531,7 @@ inline op inspect(out PMC, in PMC, in STR) :object_classes {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 
 =head1 LICENSE
 

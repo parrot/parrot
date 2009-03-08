@@ -135,43 +135,6 @@ inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math :depreca
 
 =over 4
 
-=cut
-
-=item B<splice>(invar PMC, invar PMC, in INT, in INT)
-
-Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
-The values are put into the aggregate by a shallow copy. If the values would
-be reused, they have to be B<clone>d.
-
-=cut
-
-inline op splice(invar PMC, invar PMC, in INT, in INT) {
-    VTABLE_splice(interp, $1, $2, $3, $4);
-}
-
-
-=item B<iter>(out PMC, invar PMC)
-
-Return a new Iterator PMC $1 for aggregate $2.
-
-=cut
-
-inline op iter(out PMC, invar PMC) :base_core {
-    $1 = VTABLE_get_iter(interp, $2);
-}
-
-########################################
-
-=item B<morph>(invar PMC, in STR)
-
-Have $1 turn itself into a PMC of type $2.
-
-=cut
-
-inline op morph(invar PMC, in PMC) {
-  VTABLE_morph(interp, $1, $2);
-}
-
 =item B<exec>(in STR)
 
 Execute the passed-in command. Completely tosses the current process
@@ -249,36 +212,6 @@ op trap() :deprecated {
 #endif
 }
 
-=item B<pow>(out NUM, in NUM, in INT)
-
-Set $1 to $2 raised to the power $3.
-
-=cut
-
-inline op pow(out NUM, in NUM, in INT) :base_core {
-    FLOATVAL n2 = $2;
-    FLOATVAL res = 1.0;
-    INTVAL   e  = $3;
-    int s = 1;
-    if (e != 0) {
-        if (e < 0) {
-            s = -1;
-            e = -e;
-        }
-    }
-    while (e) {
-        if (e & 1) {
-            res *= n2;
-        }
-        n2 *= n2;
-        e >>= 1;
-    }
-    if (s < 0) {
-        res = 1.0/res;
-    }
-    $1 = res;
-}
-
 ########################################
 
 =item B<need_finalize>(invar PMC)
@@ -293,30 +226,6 @@ op need_finalize(invar PMC) :deprecated {
         PObj_get_FLAGS(pmc) |= PObj_need_finalize_FLAG;
     }
 }
-
-#########################################
-
-=item B<setstdout>(invar PMC)
-
-Sets the standard output for a bare C<print> op to go to the supplied ParrotIO
-PMC.  Call C<getstdout> first if you care about retaining the previous PMC.
-
-=item B<setstderr>(invar PMC)
-
-Sets the standard error for a bare C<printerr> op to go to the supplied
-ParrotIO PMC.  Call C<getstderr> first if you care about retaining the previous
-PMC.
-
-=cut
-
-inline op setstdout(invar PMC) :base_io {
-        _PIO_STDOUT(interp) = $1;
-}
-
-inline op setstderr(invar PMC) :base_io {
-        _PIO_STDERR(interp) = $1;
-}
-
 
 ########################################
 
@@ -357,22 +266,6 @@ inline op substr_r(out STR, in STR, in INT, in INT) :base_core :deprecated {
   if (!dest)
     dest = new_string_header(interp, 0);
   $1 = Parrot_str_substr(interp, $2, $3, $4, &dest, 1);
-}
-
-=item C<find_sub_not_null>(out PMC, in STR)
-
-inline op find_sub_not_null(out PMC, in STR) :base_core {
-    opcode_t *dest = expr NEXT();
-    PMC *sub = Parrot_find_name_op(interp, $2, dest);
-
-    if (PMC_IS_NULL(sub)) {
-        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
-                       EXCEPTION_GLOBAL_NOT_FOUND,
-                       "Could not find non-existent sub %Ss", $2);
-        goto ADDRESS(handler);
-    }
-
-    $1 = sub;
 }
 
 =back

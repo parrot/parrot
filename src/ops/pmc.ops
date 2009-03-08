@@ -1,6 +1,5 @@
 /*
 
-Copyright (C) 2001-2008, Parrot Foundation.
 $Id$
 
 pmc.ops
@@ -393,6 +392,18 @@ inline op shift(out PMC, invar PMC) {
     $1 = VTABLE_shift_pmc(interp, $2);
 }
 
+=item B<splice>(invar PMC, invar PMC, in INT, in INT)
+
+Replace $4 values at offset $3 in aggregate $1 with the PMCs in aggregate $2.
+The values are put into the aggregate by a shallow copy. If the values would
+be reused, they have to be B<clone>d.
+
+=cut
+
+inline op splice(invar PMC, invar PMC, in INT, in INT) {
+    VTABLE_splice(interp, $1, $2, $3, $4);
+}
+
 
 =back
 
@@ -597,11 +608,35 @@ op box(out PMC, in STR) {
     VTABLE_set_string_native(interp, $1, $2);
 }
 
+########################################
+
+=item B<iter>(out PMC, invar PMC)
+
+Return a new Iterator PMC $1 for aggregate $2.
+
+=cut
+
+inline op iter(out PMC, invar PMC) :base_core {
+    $1 = VTABLE_get_iter(interp, $2);
+}
+
+########################################
+
+=item B<morph>(invar PMC, in STR)
+
+Have $1 turn itself into a PMC of type $2.
+
+=cut
+
+inline op morph(invar PMC, in PMC) {
+  VTABLE_morph(interp, $1, $2);
+}
+
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 
 =head1 LICENSE
 

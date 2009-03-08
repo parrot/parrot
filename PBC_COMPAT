@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+3.38	2009.03.07	coke	migrated ops out of experimental.ops, making them permanent.
 3.37	2009.02.26	jkeenan	removed tqueue PMC
 3.36	2009.02.20	coke	removed closure PMC
 3.35	2009.02.15	rurban	added bignum.pmc

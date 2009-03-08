@@ -797,6 +797,8 @@ inline op neg(out PMC, invar PMC) :base_core {
 
 =item B<pow>(out NUM, in NUM, in NUM)
 
+=item B<pow>(out NUM, in NUM, in INT)
+
 =item B<pow>(invar PMC, invar PMC, invar PMC)
 
 =item B<pow>(invar PMC, invar PMC, in INT)
@@ -823,6 +825,29 @@ inline op pow(invar PMC, invar PMC, in NUM) :base_core {
       $1 = VTABLE_pow_float(interp, $2, $3, $1);
 }
 
+inline op pow(out NUM, in NUM, in INT) :base_core {
+    FLOATVAL n2 = $2;
+    FLOATVAL res = 1.0;
+    INTVAL   e  = $3;
+    int s = 1;
+    if (e != 0) {
+        if (e < 0) {
+            s = -1;
+            e = -e;
+        }
+    }
+    while (e) { 
+        if (e & 1) {
+            res *= n2;
+        }
+        n2 *= n2;
+        e >>= 1;
+    }
+    if (s < 0) {
+        res = 1.0/res;
+    }
+    $1 = res;
+}
 
 ########################################
 
@@ -1250,7 +1275,7 @@ inline op fact(out NUM, in INT) :advanced_math {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 
 =head1 LICENSE
 

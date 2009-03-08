@@ -390,6 +390,23 @@ op find_name(out PMC, in STR) {
     $1 = Parrot_find_name_op(interp, $2, expr NEXT());
 }
 
+=item C<find_sub_not_null>(out PMC, in STR)
+
+inline op find_sub_not_null(out PMC, in STR) :base_core {
+    opcode_t *dest = expr NEXT();
+    PMC *sub = Parrot_find_name_op(interp, $2, dest);
+
+    if (PMC_IS_NULL(sub)) {
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
+                       EXCEPTION_GLOBAL_NOT_FOUND,
+                       "Could not find non-existent sub %Ss", $2);
+        goto ADDRESS(handler);
+    }
+
+    $1 = sub;
+}
+
+
 =back
 
 =head1 COPYRIGHT
