@@ -83,11 +83,11 @@ get collected.
 
 =head3 Stop-the-world
 
-A common disadvantage of a simple mark implementation is that the entire system
-(including all threads that use the same memory pools) must be suspended while
-the whole memory set is examined during marking and collection.  Normal
-operation continues only after the whole GC cycle is performed. This can lead
-to arbitrarily long pauses during program execution.
+A common disadvantage of a simple mark implementation is that the entire
+system (including all threads that use the same memory pools) must be
+suspended while the whole memory set is examined during marking and
+collection.  Normal operation continues only after the whole GC cycle is
+performed. This can lead to arbitrarily long pauses during program execution.
 
 =head3 Incremental
 
