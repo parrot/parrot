@@ -25,7 +25,7 @@ Tests the BigNum PMC.
 =cut
 
 if ( $PConfig{gmp} ) {
-    plan tests => 30;
+    plan tests => 32;
 }
 else {
     plan skip_all => "No BigNum PMC enabled";
@@ -167,14 +167,14 @@ pasm_output_is( <<'CODE', <<'OUT', "add_int", @todo_str );
    add P2, P0, 1000000
    set S0, P2
    say S0
-   set P0, "100000000000000000000"
+   set P0, "100000000000000000000.01"
    add P2, P0, 1000000
    set S0, P2
    say S0
    end
 CODE
 1999999
-100000000000001000000
+100000000000001000000.01
 OUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub bignum" );
@@ -385,13 +385,13 @@ ok 1
 ok 2
 OUT
 
-my @todo_ov = ( todo => "bignum overflow" );
+my @todo_sig = ( todo => "missing signature" );
 for my $op ( "/", "%" ) {
-    for my $type ( "BigNum", "Integer" ) {
-        pir_output_is( <<"CODE", <<OUTPUT, "bignum $op by zero $type", $op eq '/' ? () : @todo_str );
+    for my $type ( "BigNum", "BigInt", "Integer" ) {
+        pir_output_is( <<"CODE", <<OUTPUT, "bignum $op by zero $type", ($op eq '/' and $type ne 'BigInt') ? () : @todo_sig );
 .sub _main :main
     \$P0 = new ['BigNum']
-    set \$P0, "1000000000000000000000"
+    set \$P0, "1000000000000000000000.123"
     \$P1 = new ['BigNum']
     ## divide by a zero $type
     \$P2 = new ['$type']
@@ -433,7 +433,7 @@ OUTPUT
         die "\$PConfig{intvalsize} == $PConfig{intvalsize}?\n";
     }
 
-    pasm_output_is( <<CODE, <<OUT, "add overflow Integer", @todo_ov );
+    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
    new P0, ['Integer']
    set P0, $a
    new P1, ['Integer']
@@ -456,19 +456,19 @@ ex:
    end
 CODE
 $c Integer
-$d BigNum
-$e BigNum
+$d BigInt
+$e BigInt
 ok
 OUT
 
-    pasm_output_is( <<CODE, <<OUT, "add overflow Integer", @todo_ov );
+    pasm_output_is( <<CODE, <<OUT, "add overflow Integer" );
    new P0, ['Integer']
    set P0, $a
    new P1, ['Integer']
    set P1, $b
    new P2, ['Integer']
    new P3, ['BigNum']
-   set I3, 3
+   set I3, 3.0
 lp:
    add P2, P0, P1
    set S0, P2
@@ -484,8 +484,8 @@ ex:
    end
 CODE
 $c Integer
-$d BigNum
-$e BigNum
+$d BigInt
+$e BigInt
 ok
 OUT
 }
