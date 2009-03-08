@@ -32,10 +32,14 @@ Dump the bytecode header only.
 
 Terse output.
 
-=item C<-e> C--debug>
+=item C<-D> C--debug> 1-7
 
 Display detailed packfile reader debugging information if
-F<include/parrot/packfile.h> enables TRACE_PACKFILE
+F<include/parrot/packfile.h> enables TRACE_PACKFILE.
+
+  1  print general debug info
+  2  print alignment info
+  4  print values
 
 =item C<-o converted.pbc>
 
@@ -156,8 +160,12 @@ PackFile_header_dump(PARROT_INTERP, PackFile *pf)
     Parrot_io_printf(interp, "\tparrot-version %d.%d.%d, bytecode-version %d.%d\n",
                      pf->header->major, pf->header->minor, pf->header->patch,
                      pf->header->bc_major, pf->header->bc_minor);
-    Parrot_io_printf(interp, "\tUUID type = %d, UUID size = %d\n",
+    Parrot_io_printf(interp, "\tUUID: type = %d, size = %d",
                      pf->header->uuid_type, pf->header->uuid_size);
+    if (pf->header->uuid_size)
+        Parrot_io_printf(interp, ", '%s'\n", pf->header->uuid_data);
+    else
+        Parrot_io_printf(interp, "\n");
     Parrot_io_printf(interp, "\t%s endianize, %s opcode, %s numval transform\n",
             pf->need_endianize ? "**need**" : "no",
             pf->need_wordsize ? "**need**" : "no",
@@ -186,21 +194,26 @@ static void help(void)
     printf("\t-h ... dump header only\n");
     printf("\t-t ... terse output\n");
 #if TRACE_PACKFILE
-    printf("\t--debug debug output\n");
+    printf("\t-D<1-7> --debug debug output\n");
+    printf("\t   1 general info\n");
+    printf("\t   2 alignment\n");
+    printf("\t   4 values\n");
 #endif
-    printf("\n\t-o converted.pbc repacks a PBC file into "
+    printf("\t-o converted.pbc ... repacks a PBC file into "
            "the platform's native\n");
     printf("\t   binary format for better efficiency on reading "
            "non native PBCs\n");
     exit(EXIT_SUCCESS);
 }
 
-static struct longopt_opt_decl options[] = {
+static struct longopt_opt_decl opt_options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
     { '?', '?', OPTION_optional_FLAG, { "--help" } },
     { 't', 't', OPTION_optional_FLAG, { "--terse" } },
     { 'd', 'd', OPTION_optional_FLAG, { "--disassemble" } },
-    { 'e', 'e', OPTION_optional_FLAG, { "--debug" } },
+#if TRACE_PACKFILE
+    { 'D', 'D', OPTION_required_FLAG, { "--debug" } },
+#endif
     { 'o', 'o', OPTION_required_FLAG, { "--output" } }
 };
 
@@ -223,8 +236,7 @@ main(int argc, const char **argv)
     int terse = 0;
     int disas = 0;
     int convert = 0;
-    int header = 0;
-    int debug = 0;
+    int options = PFOPT_UTILS;
     const char *file = NULL;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
@@ -236,10 +248,10 @@ main(int argc, const char **argv)
     /* init and set top of stack */
     Parrot_init_stacktop(interp, &status);
     while ((status = longopt_get(interp,
-                    argc, argv, options, &opt)) > 0) {
+                    argc, argv, opt_options, &opt)) > 0) {
         switch (opt.opt_id) {
             case 'h':
-                header = 1;
+                options += PFOPT_HEADERONLY;
                 break;
             case 't':
                 terse = 1;
@@ -247,9 +259,11 @@ main(int argc, const char **argv)
             case 'd':
                 disas = 1;
                 break;
-            case 'e':
-                debug = 1;
+#if TRACE_PACKFILE
+            case 'D':
+                options += atoi(opt.opt_arg) << 2;
                 break;
+#endif
             case 'o':
                 file = opt.opt_arg;
                 convert = 1;
@@ -267,7 +281,7 @@ main(int argc, const char **argv)
     argv += opt.opt_index;
 
 
-    pf = Parrot_pbc_read(interp, *argv, debug);
+    pf = Parrot_pbc_read(interp, *argv, options);
 
     if (!pf) {
         printf("Can't read PBC\n");
@@ -304,7 +318,7 @@ main(int argc, const char **argv)
     }
 
     PackFile_header_dump(interp, pf);
-    if (header) {
+    if (options & PFOPT_HEADERONLY) {
         Parrot_exit(interp, 0);
     }
     /* install a dumper function */

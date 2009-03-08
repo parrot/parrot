@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-pbc_info - PacFile demo
+pbc_info - PackFile demo
 
 =head1 SYNOPSIS
 
@@ -70,7 +70,7 @@ main(int argc, char *argv[])
 
     interp = Parrot_new(NULL);
 
-    pf = Parrot_pbc_read(interp, argv[1], 0);
+    pf = Parrot_pbc_read(interp, argv[1], PFOPT_UTILS);
 
     /*
      * add some more segments

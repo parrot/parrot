@@ -541,8 +541,9 @@ again:
         return NULL;
     }
 
-    /* Set :main routine */
-    do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
+    if (!(pf->options & PFOPT_HEADERONLY))
+        /* Set :main routine */
+        do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
 
     /* JITting and/or prederefing the sub/the bytecode is done
      * in switch_to_cs before actual usage of the segment */

@@ -231,7 +231,7 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 /*
  * offset not in ptr diff, but in byte
  */
-#define OFFS(cursor) ((const char *)(cursor) - (const char *)(pf->src))
+#define OFFS(cursor) ((pf) ? ((const char *)(cursor) - (const char *)(pf->src)) : 0)
 
 /*
  * low level FLOATVAL fetch and convert functions
@@ -1307,13 +1307,9 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
     charset_name = Parrot_charset_c_name(interp, charset_nr);
     s = string_make(interp, (const char *)*cursor, size, charset_name, flags);
 
-#if TRACE_PACKFILE == 2
-    if (pf->options & 3) {
-        /* print only printable characters */
-        Parrot_io_eprintf(NULL, "PF_fetch_string(): string is '%s' at 0x%x\n",
-                          s->strstart, OFFS(*cursor));
-    }
-#endif
+    /* print only printable characters */
+    TRACE_PRINTF_VAL((NULL, "PF_fetch_string(): string is '%s' at 0x%x\n",
+                          s->strstart, OFFS(*cursor)));
 
 /*    s = string_make(interp, *cursor, size,
             encoding_lookup_index(encoding),

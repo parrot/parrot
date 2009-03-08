@@ -457,6 +457,8 @@ static int sub_pragma(PARROT_INTERP,
 #define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
 #define ALIGN_16(st, cursor) \
     (cursor) += ROUND_16((const char *)(cursor) - (const char *)(st))/sizeof (opcode_t)
+/* offset not in ptr diff, but in byte */
+#define OFFS(cursor) ((pf) ? ((const char *)(cursor) - (const char *)(pf->src)) : 0)
 
 #if TRACE_PACKFILE
 void
@@ -910,7 +912,7 @@ Unpacks a C<PackFile> from a block of memory, ensuring that the magic number is
 valid and that Parrot can read this bytecode version, Parrot, and performing
 any required endian and word size transforms.
 
-Returns size of unpacked if everything is okay, else zero (0).
+Returns size of unpacked opcodes if everything is okay, else zero (0).
 
 =cut
 
@@ -954,7 +956,8 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
         Parrot_io_eprintf(NULL, "PackFile_unpack: This Parrot cannot read "
             "bytecode files with version %d.%d.\n",
             header->bc_major, header->bc_minor);
-        return 0;
+        if (!(self->options & PFOPT_UTILS))
+            return 0;
     }
 
     /* Check wordsize, byte order and floating point number type are valid. */
@@ -1037,8 +1040,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     TRACE_PRINTF(("PackFile_unpack: Directory read, offset %d.\n",
                   (INTVAL)cursor - (INTVAL)packed));
-
     self->directory.base.file_offset = (INTVAL)cursor - (INTVAL)self->src;
+    if (self->options & PFOPT_HEADERONLY)
+        return cursor - packed;
 
     /* now unpack dir, which unpacks its contents ... */
     Parrot_block_GC_mark(interp);
@@ -1245,7 +1249,7 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
     header->floattype = FLOATTYPE_16;
 #    else
     exit_fatal(1, "PackFile_set_header: Unsupported floattype NUMVAL_SIZE=%d,"
-               " PARROT_BIGENDIAN=%d\n", NUMVAL_SIZE,
+               " PARROT_BIGENDIAN=%s\n", NUMVAL_SIZE,
                PARROT_BIGENDIAN ? "big-endian" : "little-endian");
 #    endif
 #  endif
@@ -1311,7 +1315,7 @@ PackFile_new(PARROT_INTERP, INTVAL is_mapped)
     PackFile * const pf = mem_allocate_zeroed_typed(PackFile);
     pf->header          = mem_allocate_zeroed_typed(PackFile_Header);
     pf->is_mmap_ped     = is_mapped;
-    pf->options         = 0;
+    pf->options         = PFOPT_NONE;
 
     /* fill header with system specific data */
     PackFile_set_header(pf->header);
@@ -1833,20 +1837,16 @@ PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
         TRACE_PRINTF(("PackFile_Segment_unpack: special\n"));
 
         cursor = (f)(interp, self, cursor);
-        TRACE_PRINTF_VAL(("  PackFile_Segment_unpack: offset=0x%x\n",
-                          pf->src - cursor));
-
         if (!cursor)
             return NULL;
     }
 
-    TRACE_PRINTF_VAL(("pre-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      pf->src - cursor, pf->src, cursor));
-
+    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                      OFFS(cursor), pf->src, cursor));
     /* FIXME on 64bit reading 32bit */
     ALIGN_16(self->pf->src, cursor);
-    TRACE_PRINTF_VAL(("ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      pf->src - cursor, pf->src, cursor));
+    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                      OFFS(cursor), pf->src, cursor));
     return cursor;
 }
 
@@ -2030,13 +2030,12 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         seg->dir         = dir;
     }
 
-    TRACE_PRINTF_VAL(("pre-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      pf->src - cursor, pf->src, cursor));
-
+    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                      OFFS(cursor), pf->src, cursor));
     /* FIXME on 64bit reading 32bit */
     ALIGN_16(pf->src, cursor);
-    TRACE_PRINTF_VAL(("ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      pf->src - cursor, pf->src, cursor));
+    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                      OFFS(cursor), pf->src, cursor));
 
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
@@ -2061,7 +2060,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
             TRACE_PRINTF_VAL(("PackFile_Segment_unpack ok. pos=0x%x\n", pos));
         }
 
-        /* BUG: on 64bit reading 32bit lurking here! */
+        /* FIXME bug on 64bit reading 32bit lurking here! TT #254 */
         if (pf->need_wordsize) {
 #if OPCODE_T_SIZE == 8
             if (pf->header->wordsize == 4)

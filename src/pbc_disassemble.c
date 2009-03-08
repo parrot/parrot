@@ -53,7 +53,10 @@ static void help(void)
     printf("  -b\t\t ... bare .pasm without header and left column\n");
     printf("  -h\t\t ... dump Constant-table header only\n");
 #if TRACE_PACKFILE
-    printf("  -d\t\t ... debug\n");
+    printf("\t-D<1-7> --debug debug output\n");
+    printf("\t   1 general info\n");
+    printf("\t   2 alignment\n");
+    printf("\t   4 values\n");
 #endif
     printf("  -o filename\t ... output to filename\n");
     exit(EXIT_SUCCESS);
@@ -63,7 +66,9 @@ static struct longopt_opt_decl options[] = {
     { 'h', 'h', OPTION_optional_FLAG, { "--header-only" } },
     { '?', '?', OPTION_optional_FLAG, { "--help" } },
     { 'b', 'b', OPTION_optional_FLAG, { "--bare" } },
-    { 'd', 'd', OPTION_optional_FLAG, { "--debug" } },
+#if TRACE_PACKFILE
+    { 'D', 'D', OPTION_required_FLAG, { "--debug" } },
+#endif
     { 'o', 'o', OPTION_required_FLAG, { "--output" } }
 };
 
@@ -85,7 +90,7 @@ main(int argc, const char *argv[])
     Parrot_Interp interp;
     const char *outfile = NULL;
     int option = 0;
-    int debug = 0;
+    int debug = PFOPT_UTILS;
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
 
@@ -107,9 +112,11 @@ main(int argc, const char *argv[])
             case 'o':
                 outfile = opt.opt_arg;
                 break;
-            case 'd':
-                debug = 1;
+#if TRACE_PACKFILE
+            case 'D':
+                debug += atoi(opt.opt_arg) << 2;
                 break;
+#endif
             case '?':
             default:
                 help();
@@ -171,6 +178,7 @@ actually run the disassembler to normal C comments (Wed, 16 Nov 2005).
 
 Reini Urban: Renamed from disassemble to pbc_disassemble (2008-07-03).
              Add options: help, -h, -o, --debug, --bare (2009-01-29)
+             Force option 1 for passing version check (2009-03-07)
 
 =cut
 
