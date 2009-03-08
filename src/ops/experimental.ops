@@ -7,16 +7,20 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-experimental.ops - Experimental Operations
+experimental.ops - Experimental Opcodes
 
 =cut
 
 =head1 DESCRIPTION
 
-This file contains operations that are in an experimental state. Do not
-rely upon the existence of the ops in this file when writing production code.
-No decision has yet been made as to whether they are accepted as regular
-Parrot ops or not. They are included here for testing purposes only!
+This file contains experimental opcodes.
+
+These opcodes should be considered implicitly deprecated - that is, they
+may be removed in any release.
+
+If you rely on any of these opcodes, please open a
+L<https://trac.parrot.org/|Trac ticket>.
+
 
 =cut
 
@@ -44,7 +48,7 @@ $1 = gcd($4, $5) = $2 * $4 + $3 * $5 (d = gcd(a, b) = x*a + y*b)
 
 =cut
 
-inline op gcd(out INT, in NUM, in NUM) :advanced_math {
+inline op gcd(out INT, in NUM, in NUM) :advanced_math :deprecated {
 
   FLOATVAL q     = 0;
   FLOATVAL c     = 0;
@@ -61,7 +65,7 @@ inline op gcd(out INT, in NUM, in NUM) :advanced_math {
   $1 = (INTVAL)temp2;
 }
 
-inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math {
+inline op gcd(out INT, out INT, out INT, in INT, in INT) :advanced_math :deprecated {
   /* r0 = q1*r1 + r2 */
   INTVAL r0 = $4 < 0 ? -$4 : $4;
   INTVAL r1 = $5 < 0 ? -$5 : $5;
@@ -177,7 +181,7 @@ wrong.
 
 =cut
 
-inline op exec(in STR) {
+inline op exec(in STR) :deprecated {
   Parrot_Exec_OS_Command(interp, $1);
 }
 
@@ -189,7 +193,7 @@ a Key PMC that you can use with "new", for example.
 
 =cut
 
-op classname(out PMC, invar PMC) :object_base {
+op classname(out PMC, invar PMC) :object_base :deprecated {
     PMC *ns = Parrot_ns_get_name(interp,
                                     VTABLE_get_namespace(interp, $2));
     if (PMC_IS_NULL(ns) || VTABLE_elements(interp, ns) < 2) {
@@ -236,7 +240,7 @@ For other architectures, this is a C<noop>.
 
 =cut
 
-op trap() {
+op trap() :deprecated {
 #if defined(__GNUC__) && defined(i386)
     __asm__("int3");       /* opcode 0xcc */
 #endif
@@ -283,7 +287,7 @@ The ParrotObject $1 needs the __finalize method during GC.
 
 =cut
 
-op need_finalize(invar PMC) {
+op need_finalize(invar PMC) :deprecated {
     PMC* pmc = $1;
     if (PObj_is_object_TEST(pmc)) {
         PObj_get_FLAGS(pmc) |= PObj_need_finalize_FLAG;
@@ -322,7 +326,7 @@ Invokes the PMC $2 using interp $1.
 
 =cut
 
-op runinterp(invar PMC, in PMC) {
+op runinterp(invar PMC, in PMC) :deprecated {
     Interp * const new_interp = (Interp *)VTABLE_get_pointer(interp, $1);
     opcode_t *pc;
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
@@ -348,7 +352,7 @@ B<Handle with care.>
 
 =cut
 
-inline op substr_r(out STR, in STR, in INT, in INT) :base_core {
+inline op substr_r(out STR, in STR, in INT, in INT) :base_core :deprecated {
   STRING *dest = $1;
   if (!dest)
     dest = new_string_header(interp, 0);
@@ -375,7 +379,7 @@ inline op find_sub_not_null(out PMC, in STR) :base_core {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 
 =head1 LICENSE
 
