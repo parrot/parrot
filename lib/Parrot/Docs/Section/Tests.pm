@@ -45,7 +45,6 @@ sub new {
         $self->new_group( 'Compilers Tests',        '', 't/compilers' ),
         $self->new_group( 'Configure Tests',        '', 't/configure' ),
         $self->new_group( 'Distribution Tests',     '', 't/distro' ),
-        $self->new_group( 'Documentation Tests',    '', 't/doc' ),
         $self->new_group( 'Examples Tests',         '', 't/examples' ),
         $self->new_group( 'Libraries Tests',        '', 't/library' ),
         $self->new_group( 'Native Bytecode Tests',  '', 't/native_pbc' ),
