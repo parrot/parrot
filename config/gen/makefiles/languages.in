@@ -68,6 +68,8 @@ help:
 	@echo ""
 	@echo "  co-all:        Try to fetch externally managed languages"
 	@echo ""
+	@echo "  co-APL:        Try to fetch APL"
+	@echo ""
 	@echo "  co-eclectus:   Try to fetch eclectus"
 	@echo ""
 	@echo "  co-fun:        Try to fetch fun"
@@ -76,13 +78,17 @@ help:
 	@echo ""
 	@echo "  co-hq9plus:    Try to fetch HQ9+"
 	@echo ""
+	@echo "  co-kea-cl:     Try to fetch kea-cl"
+	@echo ""
 	@echo "  co-lazy-k:     Try to fetch lazy-k"
 	@echo ""
 	@echo "  co-lua:        Try to fetch lua"
 	@echo ""
-	@echo "  co-matrixy:    Try to fetch matrixy"
-	@echo ""
 	@echo "  co-m4:         Try to fetch Parrot m4"
+	@echo ""
+	@echo "  co-markdown:   Try to fetch markdown"
+	@echo ""
+	@echo "  co-matrixy:    Try to fetch matrixy"
 	@echo ""
 	@echo "  co-paraplegic: Try to fetch Paraplegic"
 	@echo ""
@@ -102,8 +108,12 @@ help:
 	@echo ""
 	@echo "  co-unlambda:   Try to fetch unlambda"
 	@echo ""
+	@echo "  co-wmlscript:  Try to fetch wmlscript"
+	@echo ""
 	@echo "NOTE: These make targets assume that you have run the corresponding co target."
 	@echo "  up-all:        Try to update externally managed languages"
+	@echo ""
+	@echo "  up-APL:        Try to update APL"
 	@echo ""
 	@echo "  up-eclectus:   Try to update eclectus"
 	@echo ""
@@ -113,13 +123,17 @@ help:
 	@echo ""
 	@echo "  up-hq9plus:    Try to update HQ9+"
 	@echo ""
+	@echo "  up-kea-cl:     Try to update kea-cl"
+	@echo ""
 	@echo "  up-lazy-k:     Try to update lazy-k"
 	@echo ""
 	@echo "  up-lua:        Try to update lua"
 	@echo ""
-	@echo "  up-matrixy:    Try to update matrixy"
-	@echo ""
 	@echo "  up-m4:         Try to update Parrot m4"
+	@echo ""
+	@echo "  up-markdown:   Try to update markdown"
+	@echo ""
+	@echo "  up-matrixy:    Try to update matrixy"
 	@echo ""
 	@echo "  up-paraplegic: Try to update Paraplegic"
 	@echo ""
@@ -138,6 +152,8 @@ help:
 	@echo "  up-tcl:        Try to update Partcl"
 	@echo ""
 	@echo "  up-unlambda:   Try to update unlambda"
+	@echo ""
+	@echo "  up-wmlscript:  Try to update wmlscript"
 	@echo ""
 
 # regenerate the Makefile
@@ -454,12 +470,18 @@ urm.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-fun co-gil co-hq9plus co-lazy-k co-lua \
+co-all: co-APL co-eclectus co-fun co-gil co-hq9plus co-kea-cl co-lazy-k co-lua \
     co-m4 co-matrixy co-markdown co-paraplegic co-perk co-pipp co-pjs \
     co-primitivearc co-rakudo co-shakespeare co-tcl co-unlambda co-wmlscript
-up-all: up-eclectus up-fun up-gil up-hq9plus up-lazy-k up-lua \
+up-all: up-APL up-eclectus up-fun up-gil up-hq9plus up-kea-cl up-lazy-k up-lua \
     up-m4 up-matrixy up-markdown up-paraplegic up-perk up-pipp up-pjs \
     up-primitivearc up-rakudo up-shakespeare up-tcl up-unlambda up-wmlscript
+
+co-APL:
+	- $(SVN) checkout 'https:////svn.parrot.org//parrot//trunk//languages//APL' APL
+
+up-APL:
+	cd APL && $(SVN) up
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//eclectus.git'
@@ -484,6 +506,12 @@ co-hq9plus:
 
 up-hq9plus:
 	cd hq9plus && $(GIT) pull
+
+co-kea-cl:
+	- $(SVN) checkout 'https:////rgrjr.dyndns.org//svn//kea-cl//trunk' kea-cl
+
+up-kea-cl:
+	cd kea-cl && $(SVN) up
 
 co-lazy-k:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//lazy-k.git'
@@ -522,7 +550,7 @@ up-paraplegic:
 	cd paraplegic && $(SVN) up
 
 co-perk:
-	- $(GIT) clone 'git:////github.com///chrisdolan//perk.git'
+	- $(GIT) clone 'git:////github.com//chrisdolan//perk.git'
 
 up-perk:
 	cd perk && $(GIT) pull
@@ -545,17 +573,17 @@ co-primitivearc:
 up-primitivearc:
 	cd primitivearc && $(GIT) pull
 
-co-shakespeare:
-	- $(HG) clone 'http:////bitbucket.org//riffraff//shakespeare-parrot' shakespeare
-
-up-shakespeare:
-	cd shakespeare && $(HG) pull
-
 co-rakudo:
 	- $(GIT) clone 'git:////github.com//rakudo//rakudo.git'
 
 up-rakudo:
 	cd rakudo && $(GIT) pull
+
+co-shakespeare:
+	- $(HG) clone 'http:////bitbucket.org//riffraff//shakespeare-parrot' shakespeare
+
+up-shakespeare:
+	cd shakespeare && $(HG) pull
 
 co-tcl:
 	- $(SVN) checkout 'http:////partcl.googlecode.com//svn//trunk' tcl
