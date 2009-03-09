@@ -166,11 +166,5 @@ if [ "$enable_long_double" == "1" ]; then
 fi
 
 echo ""
-if [ -e .parrot_current_rev ]
-then
-    echo "Do not commit these native_pbcs on devel versions, it must be a release candidate!"
-    echo "For a release, be sure to fix the VERSION file to the new version"
-else
-    cd t/native_pbc
-    echo svn commit -m'native_pbc platform updates'
-fi
+echo "cd t/native_pbc"
+echo svn commit -m'native_pbc platform updates'
