@@ -1,7 +1,7 @@
 # Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
 
-=head1 Conventions and Guidelines for Parrot Source Code
+=head1 PDD 7: Conventions and Guidelines for Parrot Source Code
 
 =head2 Version
 

@@ -1,7 +1,7 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
-=head1 A high-level overview of Parrot
+=head1 [DRAFT] PDD 1: Overview
 
 =head2 Abstract
 

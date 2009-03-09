@@ -1,7 +1,7 @@
 # Copyright (C) 2007, Parrot Foundation.
 # $Id$
 
-=head1 Parrot Intermediate Representation
+=head1 PDD 19: Parrot Intermediate Representation (PIR)
 
 =head2 Version
 

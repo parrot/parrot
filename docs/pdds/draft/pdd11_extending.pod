@@ -1,7 +1,7 @@
 # Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
-=head1 The Parrot Extension System
+=head1 [DRAFT] PDD 11: Extending
 
 =head2 Abstract
 

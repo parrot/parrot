@@ -1,7 +1,7 @@
 # Copyright (c) 2001-2009, Parrot Foundation.
 # $Id$
 
-=head1 Parrot's Embedding and Extending Interface
+=head1 [DRAFT] PDD10: Embedding and Extending
 
 =head2 Abstract
 
