@@ -10,7 +10,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-pmc.ops - PMC Operations
+pmc.ops - PMC Opcodes
 
 =head1 DESCRIPTION
 

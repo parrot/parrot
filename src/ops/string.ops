@@ -7,7 +7,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-string.ops - String Operations
+string.ops - String Opcodes
 
 =head1 DESCRIPTION
 

@@ -13,7 +13,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-core.ops - Parrot Core Ops
+core.ops - Core Opcodes
 
 =cut
 

@@ -11,7 +11,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-debug.ops
+debug.ops - Debugging Opcodes
 
 =cut
 

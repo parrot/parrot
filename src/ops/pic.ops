@@ -12,7 +12,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-pic.ops - PIC (Polymorphic Inline Cache) opcode variants
+pic.ops - PIC (Polymorphic Inline Cache) Opcodes [deprecated]
 
 =cut
 

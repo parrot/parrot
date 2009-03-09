@@ -9,7 +9,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-obscure.ops
+obscure.ops - Obscure Mathmatical Opcodes
 
 =cut
 

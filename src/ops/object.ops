@@ -11,7 +11,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-object.ops
+object.ops - Class and Object Opcodes
 
 =head1 DESCRIPTION
 

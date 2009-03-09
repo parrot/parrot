@@ -7,7 +7,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-set.ops - Register Loading Ops
+set.ops - Assignment Opcodes
 
 =head1 DESCRIPTION
 

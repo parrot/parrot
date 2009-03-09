@@ -10,7 +10,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-io.ops
+io.ops - I/O Opcodes
 
 =cut
 

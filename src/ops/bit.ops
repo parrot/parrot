@@ -22,7 +22,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-bit.ops - Bitwise Operations
+bit.ops - Bitwise Opcodes
 
 =head1 DESCRIPTION
 

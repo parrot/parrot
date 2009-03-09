@@ -7,7 +7,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-math.ops - Mathematical Operations
+math.ops - Mathematical Opcodes
 
 =cut
 
