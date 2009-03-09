@@ -61,8 +61,8 @@ native pbcs.
 my $testmatrix = <<EOF;
        8_le 12_le 16_le 8_be 16_be
 8_le     1     1    1     1     ?
-12_le    1     1    ?     0     ?
-16_le    1     0    1     ?     ?
+12_le    1     1    0     0     ?
+16_le    0     0    1     ?     ?
 8_be     1     1    ?     1     ?
 16_be    1     1    1     ?     1
 EOF
