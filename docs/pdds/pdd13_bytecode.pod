@@ -11,10 +11,11 @@ interface through which they may be manipulated programmatically.
 =head2 Version
 
 $Revision$
-
+ 
 =head2 Synopsis
-
-PBC should be cross-platform and in the future cross-version compatible.
+ 
+Parrot bytecode is a binary representation of instructions and data for
+execution on the virtual machine.
 
 =head2 Description
 
@@ -36,11 +37,6 @@ provide a programming interface to them, both from Parrot programs and the
 Parrot internals.
 
 =back
-
-
-=head2 Definitions
-
-None.
 
 
 =head2 Implementation
@@ -201,9 +197,6 @@ The bytecode file version number exists to decouple the format of the bytecode
 file from the version of the Parrot implementation that is reading/writing it.
 It has a major and a minor part.
 
-Though we aim at cross-version portability, it is not implemented yet. So we
-currently exit when reading an incompatible bytecode file version number.
-
 The major version number should be incremented whenever there is a change to
 the layout of bytecode files. This includes new segments, changes to segment
 headers or changes to the format of the data held within a segment.
@@ -225,13 +218,15 @@ PMC
 
 =back
 
-A single version of Parrot can support reading and writing of more than one
-bytecode file format. In fact, once Parrot is in production use it will be
-preferable to write as early a bytecode format as is possible, to allow the
-greatest compatibility with previous Parrots.
+Parrot currently exits when reading an incompatible bytecode file
+version number. It is possible for a single version of Parrot to support
+reading and writing more than one bytecode file format, but this is not
+currently implemented. Future versions of Parrot may also provide a
+bytecode migration tool, to convert a bytecode file to a more recent
+format.
 
-These versions are listed in the PBC_COMPAT file, sorted with the latest
-version first in the format:
+The bytecode format versions are listed in the PBC_COMPAT file, sorted
+with the latest version first in the file:
 
   MAJOR.MINOR DATE NAME DESCRIPTION
 
