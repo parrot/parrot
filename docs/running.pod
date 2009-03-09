@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-Parrot - running
+Parrot - Running
 
 =head1 VERSION
 
@@ -331,16 +331,8 @@ but run JIT code when possible.
   ass ... assemble sourcefile
   obj ..  produce native (ELF) object file for the EXEC subsystem
 
-=head1 BUGS
-
-Yes.
-
 =head1 FILES
 
 F<main.c>
-
-=head1 AUTHOR
-
-Leopold Toetsch C<lt@toetsch.at>
 
 =cut
