@@ -12,19 +12,22 @@ To prepare a release:
 As soon as you become the release manager: review the goals for the release on
 the Parrot roadmap (L<https://trac.parrot.org/parrot/wiki/ParrotRoadmap>) and
 announce the tasks to the Parrot mailing list.  Make sure everyone knows what
-they've committed to accomplish in time for the release.  Ask the previous
-release manager to review PAUSE permissions so that PARROTRE owns all files.
+they've committed to accomplish in time for the release.
 
-A couple of weeks in advance: Ask people to run C<make fulltest> and report
-(and hopefully fix!) any problems they find.
+A couple of weeks in advance: Ask people to run C<make fulltest> and
+report (and hopefully fix!) any problems they find. Also check in with
+language project leads for release blockers, to allow time to fix them.
 
 A couple of days in advance: announce the new release to
-parrot-dev@lists.parrot.org and to the IRC channel #parrot.  Ask whether there
-are any showstopping bugs.  It's also good to ask for updates to F<NEWS>,
-F<CREDITS>, F<PLATFORMS>, F<RESPONSIBLE_PARTIES> and L<https://trac.parrot.org/parrot/wiki/Languages>.
+parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether
+there are any showstopping bugs. Check in again with the language
+project leads. It's also good to ask for updates to F<NEWS>, F<CREDITS>,
+F<PLATFORMS>, F<RESPONSIBLE_PARTIES> and
+L<https://trac.parrot.org/parrot/wiki/Languages>.
 
-You might also select a name for your release. For example, you could
-select a name from L<http://en.wikipedia.org/wiki/List_of_parrots>.
+You might also select a name (and optionally a quote) for your release.
+For example, you could select a name from
+L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
 Set up your account on L<http://www.parrot.org/> and ask one of Allison, Jerry,
 Jeff, Will, or chromatic to bestow you story-creating powers.
