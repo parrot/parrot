@@ -12,7 +12,7 @@ How to submit bug reports, patches and new files to Parrot.
 =head1 How To Submit A Bug Report
 
 If you encounter an error while working with Parrot, and don't understand what
-is causing it, then submit a bug report using the F<parrotbug> utility. The
+is causing it, then create a bug report using the F<parrotbug> utility. The
 simplest way to use it is to run
 
     % ./parrotbug
@@ -99,36 +99,45 @@ The format for entries in F<CREDITS> is defined at the top of the file.
 
 =item 2
 
-Create a plain text email.
+Go to Parrot's ticket tracking system at
+L<https://trac.parrot.org/parrot/>. Log in, or create an account if you
+don't have one yet.
 
 =item 3
 
-Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
+Select "New Ticket" L<https://trac.parrot.org/parrot/newticket>.
 
 =item 4
 
-Give the message a clear and concise subject.
+Give a clear and concise Summary.
 
 Prefix it with a C<[PATCH]> identifier.
 
 =item 5
 
-The message body should contain an explanation of the purpose of the patch, and
+The Description should contain an explanation of the purpose of the patch, and
 a list of all files affected with summary of the changes made in each file.
 Optionally, the output of the C<diffstat(1)> utility when run on your patch(s)
 may be included at the bottom of the message body.
 
 =item 6
 
-Attach the patch file(s).
-
-Double-check that you've actually done this, because it's easy to forget.
-
-B<DO NOT> paste the patch file content into the body of the message.
+Set the Type of the ticket to "patch". Set other relevant drop-down
+menus, such as Version (the version of Parrot where you encountered the
+problem), Platform, or Severity.
 
 =item 7
 
-Send the mail.
+Check the box for "I have files to attach to this ticket"
+
+Double-check that you've actually done this, because it's easy to forget.
+
+B<DO NOT> paste the patch file content into the Description.
+
+=item 7
+
+Click the "Create ticket" button. On the next page attach your patch
+file(s).
 
 =back
 
@@ -195,27 +204,34 @@ to diff the file against /dev/null like this:
 
 =item 3
 
-Create a plain text email.
+Go to Parrot's ticket tracking system at
+L<https://trac.parrot.org/parrot/>. Log in, or create an account if you
+don't have one yet.
 
 =item 4
 
-Set the recipient to B<parrotbug> I<at> B<parrotcode> I<dot> B<org>.
+Select "New Ticket" L<https://trac.parrot.org/parrot/newticket>.
 
 =item 5
 
-Give the message a clear and concise subject.
+Give a clear and concise Summary.
 
 Prefix it with a C<[NEW]> identifier.
 
 =item 6
 
-The message body should contain an explanation of the purpose of the feature
+The Description should contain an explanation of the purpose of the feature
 you are adding.  Optionally, include the output of the C<diffstat(1)> utility
 when run on your patch(es).
 
 =item 7
 
-Attach the patch for MANIFEST and your new file(s).
+Set the Type of the ticket to "patch". Set other relevant drop-down
+menus, such as Version, Platform, or Severity.
+
+=item 8
+
+Check the box for "I have files to attach to this ticket"
 
 Double-check that you've actually done this, because it's easy to forget.
 
@@ -224,13 +240,14 @@ message.
 
 =item 8
 
-Send the mail.
+Click the "Create ticket" button. On the next page attach the patch for
+MANIFEST and your new file(s).
 
 =back
 
 =head1 What Happens Next?
 
-RT creates a ticket for the submission, and you will receive an automatic reply
+Trac creates a ticket for the submission, and you will receive an automatic reply
 with details of the ticket identifier. This identifier should be used in all
 further correspondence concerning the submission.
 
@@ -253,17 +270,8 @@ L<http://www.parrotcode.org/openpatches.html>
 
 =head1 Patches for the Parrot website
 
-The sources for L<http://www.parrotcode.org> are managed in a subversion
-repository. The repository can be fetched from
-https://svn.perl.org/perl.org/docs/live/parrotcode/. A read only copy can be
-retrieved with 'guest/guest'.
-
-You will notice that some of the content is generated directly from the Parrot
-repository. So the usual rules for Parrot patches apply for this content.
-
-For changes specific for parrotcode.org please send patches to B<webmaster>
-I<at> B<perl> I<dot> B<org>, and cc B<parrot-dev> I<at> B<lists> I<dot>
-B<parrot> I<dot> B<org>.
+The L<http://www.parrot.org> website is hosted in a Drupal CMS. Submit
+changes through the usual ticket interface in Trac.
 
 =head1 Getting Commit Privileges
 
@@ -279,7 +287,7 @@ described in this document.  This process may take weeks or months.
 
 =item 2
 
-Obtain a perl.org account at L<https://auth.perl.org/auth/account>
+Obtain a Trac account at L<https://trac.parrot.org/parrot>
 
 =item 3
 
@@ -303,10 +311,5 @@ to Parrot; see C<RESPONSIBLE_PARTIES> for the current list.  Welcome aboard!
 =back
 
 Thanks for your help!
-
-=head1 HISTORY
-
-Adapted by Michael Scott from a tutorial submitted by Aldo Calpini, with some
-additional remarks from Bruce Gray.
 
 =cut
