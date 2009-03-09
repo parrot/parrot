@@ -73,7 +73,7 @@ static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
 
     PObj_active_destroy_CLEAR(thread);
     PObj_custom_mark_CLEAR(thread);
-    PMC_int_val(thread) = tid;
+    VTABLE_set_integer_native(interp, thread, tid);
 
     return tid;
 }

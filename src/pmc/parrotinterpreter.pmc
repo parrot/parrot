@@ -183,6 +183,7 @@ recursion_limit(PARROT_INTERP, PMC *self, int l)
 
 pmclass ParrotInterpreter need_ext no_ro {
     ATTR struct parrot_interp_t *interp; /* this PMC's interpreter */
+    ATTR INTVAL                  tid;    /* thread id */
 
 /*
 

@@ -31,7 +31,10 @@ unrelated thread.
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
 
+#define PMC_tid(x) ((Parrot_ParrotRunningThread_attributes *)PMC_data(x))->tid
+
 pmclass ParrotRunningThread no_ro {
+    ATTR INTVAL tid; /* thread id */
 
 /*
 
@@ -44,7 +47,24 @@ Create a new, invalid handle to a running thread.
 */
 
     VTABLE void init() {
-        PMC_int_val(SELF) = -1;
+        Parrot_ParrotRunningThread_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_ParrotRunningThread_attributes);
+        attrs->tid = -1;
+        PMC_data(SELF) = attrs;
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroy this PMC.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -59,7 +79,7 @@ the Thread ID specified in C<tid>.
 */
 
     VTABLE void init_pmc(PMC *tid) {
-        PMC_int_val(SELF) = VTABLE_get_integer(INTERP, tid);
+        PMC_tid(SELF) = VTABLE_get_integer(INTERP, tid);
     }
 
 /*
@@ -73,7 +93,7 @@ Return the thread ID of this thread.
 */
 
     VTABLE INTVAL get_integer() {
-        return PMC_int_val(SELF);
+        return PMC_tid(SELF);
     }
 
 /*
@@ -90,7 +110,7 @@ Change the thread ID we refer to to C<new_tid>.
         if (new_tid < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INTERP_ERROR,
                 "Attempt to set invalid thread id %d", (int)new_tid);
-        PMC_int_val(SELF) = new_tid;
+        PMC_tid(SELF) = new_tid;
     }
 /*
 
@@ -106,7 +126,7 @@ Join the thread, returning whatever its main method returns.
             (UINTVAL)VTABLE_get_integer(INTERP, SELF));
 
         /* invalidate self */
-        PMC_int_val(SELF) = -1;
+        PMC_tid(SELF) = -1;
 
         RETURN(PMC *ret);
     }
