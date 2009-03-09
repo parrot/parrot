@@ -368,8 +368,10 @@ void PbcFile::read_header(ifstream &pbcfile)
 
     cout <<
         "Opcode size            : " << (int) opcode_size << '\n' <<
-        "Byte order             : " << desc_byte_order(byte_order) << '\n' <<
-        "Floating point encoding: " << desc_fp_encoding(fp_encoding) << '\n' <<
+        "Byte order             : " << desc_byte_order(byte_order) <<
+                " (" << (int) byte_order << ")\n" <<
+        "Floating point encoding: " << desc_fp_encoding(fp_encoding) <<
+                " (" << (int) fp_encoding << ")\n" <<
         "Parrot version         : " <<
         (int) major << '.' << (int) minor << '.' << (int) patch << '\n' <<
         "PBC version            : " <<
@@ -388,7 +390,8 @@ void PbcFile::read_header(ifstream &pbcfile)
 
     unsigned char uuid_type = pbcfile.get();
     cout <<
-        "UUID type              : " << desc_uuid_type(uuid_type) << '\n'
+        "UUID type              : " << desc_uuid_type(uuid_type) <<
+                " (" << (int) uuid_type << ")\n"
         ;
     unsigned char uuid_length = pbcfile.get();
     cout <<
@@ -425,12 +428,16 @@ void PbcFile::read_directory(ifstream &pbcfile)
     for (unsigned int n= 0; n < entries; ++n)
     {
         opcode type = read_opcode(pbcfile);
-        cout << n << ": Type: '" << desc_segment_type(type) << "' Name: '";
+        cout <<
+            n << ": Type: '" << desc_segment_type(type) <<
+                " (" << type << ") "
+            "' Name: '";
         string name = read_cstring(pbcfile);
         cout << name;
         opcode offset = read_opcode(pbcfile);
         opcode length = read_opcode(pbcfile);
-        cout << "'\n   Offset: " << offset << " Length: " << length << '\n';
+        cout <<
+            "'\n   Offset: " << offset << " Length: " << length << '\n';
         DirEntry entry(name, type, offset, length);
         directory.push_back(entry);
     }
@@ -492,13 +499,17 @@ void PbcFile::dump_segment_fixup(ifstream &pbcfile)
     TagEmit tag("SegmentFixup", cout);
 
     opcode segsize = read_opcode(pbcfile);
-    cout << "Segment size: " << segsize << '\n';
-    pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
+    cout << "Segment size: " << segsize;
+
+    opcode itype = read_opcode(pbcfile);
+    cout << " itype: " << itype;
+    opcode id = read_opcode(pbcfile);
+    cout << " id: " << id;
+    opcode size = read_opcode(pbcfile);
+    cout << " size: " << size;
 
     opcode tablelength = read_opcode(pbcfile);
-    cout << "Number of fixups: " << tablelength << '\n';
+    cout << " Number of fixups: " << tablelength << '\n';
 
     for (opcode n= 0; n < tablelength; ++n) {
         cout << "Fixup " << n;
@@ -534,13 +545,17 @@ void PbcFile::dump_segment_constant(ifstream &pbcfile)
     TagEmit tag("SegmentConstantTable", cout);
 
     opcode segsize = read_opcode(pbcfile);
-    cout << "Segment size: " << segsize << '\n';
-    pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
+    cout << "Segment size: " << segsize;
+
+    opcode itype = read_opcode(pbcfile);
+    cout << " itype: " << itype;
+    opcode id = read_opcode(pbcfile);
+    cout << " id: " << id;
+    opcode size = read_opcode(pbcfile);
+    cout << " size: " << size;
 
     opcode tablelength = read_opcode(pbcfile);
-    cout << "Number of constants: " << tablelength << '\n';
+    cout << " Number of constants: " << tablelength << '\n';
 
     for (opcode n= 0; n < tablelength; ++n) {
         cout << "Constant " << n;
@@ -569,12 +584,17 @@ void PbcFile::dump_segment_bytecode(ifstream &pbcfile)
     TagEmit tag("SegmentBytecode", cout);
 
     opcode segsize = read_opcode(pbcfile);
-    cout << "Segment size: " << segsize << '\n';
-    pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
+    cout << "Segment size: " << segsize;
 
-    for (opcode n= 0; n < segsize; ++n) {
+    opcode itype = read_opcode(pbcfile);
+    cout << " itype: " << itype;
+    opcode id = read_opcode(pbcfile);
+    cout << " id: " << id;
+    opcode size = read_opcode(pbcfile);
+    cout << " size: " << size;
+    cout << '\n';
+
+    for (opcode n= 0; n < size; ++n) {
         opcode code = read_opcode(pbcfile);
         cout << ' ' << hex << setfill('0') << setw(opcode_size * 2) << code << dec;
     }
@@ -586,19 +606,17 @@ void PbcFile::dump_segment_pir_debug(ifstream &pbcfile)
     TagEmit tag("SegmentPIRDebug", cout);
 
     opcode segsize = read_opcode(pbcfile);
-    cout << "Segment size: " << segsize << '\n';
+    cout << "Segment size: " << segsize;
 
-    // Alignment bug?
-    pbcfile.ignore(8);
-/*
-    pbcfile.ignore(16 - opcode_size);
-*/
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
+    opcode itype = read_opcode(pbcfile);
+    cout << " itype: " << itype;
+    opcode id = read_opcode(pbcfile);
+    cout << " id: " << id;
+    opcode size = read_opcode(pbcfile);
+    cout << " size: " << size;
+    cout << '\n';
 
-    opcode tablelength = read_opcode(pbcfile);
-    cout << "Number of mappings: " << tablelength << '\n';
-
+    opcode tablelength = size;
     for (opcode n= 0; n < tablelength; ++n) {
         opcode linenum = read_opcode(pbcfile);
         cout << " Line: " << linenum;
@@ -622,12 +640,15 @@ void PbcFile::dump_segment_annotations(ifstream &pbcfile)
     TagEmit tag("SegmentAnnotations", cout);
 
     opcode segsize = read_opcode(pbcfile);
-    cout << "Segment size: " << segsize << '\n';
+    cout << "Segment size: " << segsize;
 
-    pbcfile.ignore(16 - opcode_size);
-    // Untested with opcode_size 8
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
+    opcode itype = read_opcode(pbcfile);
+    cout << " itype: " << itype;
+    opcode id = read_opcode(pbcfile);
+    cout << " id: " << id;
+    opcode size = read_opcode(pbcfile);
+    cout << " size: " << size;
+    cout << '\n';
 
     opcode tablelength = read_opcode(pbcfile);
     cout << "Number of annotations: " << tablelength << '\n';
