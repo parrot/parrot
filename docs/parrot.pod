@@ -5,11 +5,10 @@
 
 docs/parrot.pod - Parrot
 
-=head1 The Parrot Bytecode Interpreter
+=head1 The Parrot Virtual Machine
 
-Parrot is a common bytecode format and interpreter for dynamic languages; it is
-designed to run Perl 6 code efficiently, but is also intended to be
-language-agnostic.
+Parrot is a language-agnostic common bytecode format and interpreter for
+dynamic languages.
 
 =head2 Documentation
 
@@ -139,7 +138,7 @@ See:
 
 =item * L<http://www.parrot.org/>
 
-=item * L<http://dev.perl.org/>
+=item * L<https://trac.parrot.org/>
 
 =item * L<https://svn.parrot.org/>
 
