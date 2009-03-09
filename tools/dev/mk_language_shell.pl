@@ -569,7 +569,7 @@ help:
 	@echo "  build:             @lclang@.pbc"
 	@echo "                     This is the default."
 	@echo "  @lclang@@exe@      Self-hosting binary not to be installed."
-	@echo "  all:               @lclang@.pbc @lclang@@exe@ installable Makefile"
+	@echo "  all:               @lclang@.pbc @lclang@@exe@ installable"
 	@echo "  installable:       Create libs and self-hosting binaries to be installed."
 	@echo "  install:           Install the installable targets and docs."
 	@echo ""
@@ -588,7 +588,7 @@ help:
 	@echo ""
 
 test: build
-	$(PERL) t/harness
+	$(PERL) -I$(LIB_DIR)/tools/lib t/harness
 
 # basic run for missing libs
 test-installable: installable
@@ -1167,7 +1167,6 @@ use strict;
 use warnings;
 use 5.008;
 
-use lib qw( . lib ../lib ../../lib ../../lib );
 use Parrot::Test::Harness language => '@lang@',
                           compiler => '@lclang@.pbc';
 
