@@ -8,6 +8,7 @@ MKPATH  := @mkpath@
 RM_F    := @rm_f@
 RM_RF   := @rm_rf@
 PERLDOC := @perldoc@
+VERSION := @VERSION@@DEVEL@
 
 # long list of .pod files
 POD := @TEMP_pod@
@@ -43,7 +44,7 @@ clean:
 	$(RM_F) packfile-c.pod $(POD)
 
 html:
-	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent
+	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
 
 html-clean:
 	$(RM_RF) html
