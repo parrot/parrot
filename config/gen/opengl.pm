@@ -967,8 +967,8 @@ cannot be used.
 
 #define PARROT_IN_EXTENSION
 
-#include <$glut_header>
 #include "parrot/parrot.h"
+#include <$glut_header>
 
 
 typedef enum {

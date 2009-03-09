@@ -897,6 +897,11 @@ D: Nicer command line handling in ops2c.pl
 N: Tony Payne
 D: Example hanoi.pasm
 
+N: Ujwal Reddy Malipeddi
+U: ujwalic
+E: ujwalic@gmail.com
+D: OpenGL/GLUT include file order with MSVS
+
 N: Uri Guttman
 D: Lot of general Parrot design hints
 
