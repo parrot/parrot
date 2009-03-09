@@ -21,6 +21,7 @@ Threads are created by creating new C<ParrotInterpreter> objects.
 #include "parrot/parrot.h"
 #include "parrot/atomic.h"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_parrotinterpreter.h"
 
 /* HEADERIZER HFILE: include/parrot/thread.h */
 
@@ -506,8 +507,8 @@ thread_func(ARGIN_NULLOK(void *arg))
 
     /* need to set it here because argument passing can trigger GC */
     interp->lo_var_ptr = &lo_var_ptr;
-    sub_pmc            = (PMC *)PMC_struct_val(self);
-    sub_arg            = PMC_pmc_val(self);
+    GETATTR_ParrotInterpreter_sub(interp, self, sub_pmc);
+    sub_arg            = VTABLE_get_pmc(interp, self);
 
     if (setjmp(jump_point.resume)) {
         /* caught exception */
@@ -774,8 +775,10 @@ pt_thread_run(PARROT_INTERP, ARGOUT(PMC *dest_interp), ARGIN(PMC *sub), ARGIN_NU
 
     pt_thread_prepare_for_run(interpreter, interp);
 
-    PMC_struct_val(dest_interp) = pt_transfer_sub(interpreter, interp, sub);
-    PMC_pmc_val(dest_interp)    = make_local_args_copy(interpreter, interp, arg);
+    SETATTR_ParrotInterpreter_sub(interp, dest_interp,
+            pt_transfer_sub(interpreter, interp, sub));
+    VTABLE_set_pmc(interp, dest_interp,
+            make_local_args_copy(interpreter, interp, arg));
 
     /*
      * set regs according to pdd03

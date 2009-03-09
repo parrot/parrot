@@ -166,10 +166,6 @@ Create a new thread by cloning the passed interpreter.
 
 =back
 
-=head1 History
-
-2003.12.18 leo initial review.
-
 =cut
 
 */

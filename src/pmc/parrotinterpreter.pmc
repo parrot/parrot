@@ -33,6 +33,8 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "pmc_sub.h"
 
 #define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
+#define PMC_args(x)   ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->args
+#define PMC_sub(x)    ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->sub
 
 /*
 
@@ -184,6 +186,8 @@ recursion_limit(PARROT_INTERP, PMC *self, int l)
 pmclass ParrotInterpreter need_ext no_ro {
     ATTR struct parrot_interp_t *interp; /* this PMC's interpreter */
     ATTR INTVAL                  tid;    /* thread id */
+    ATTR PMC                    *args;   /* args passed to this thread */
+    ATTR PMC                    *sub;    /* this thread's sub */
 
 /*
 
@@ -238,9 +242,6 @@ Initializes the interpreter.
             create_interp(SELF, INTERP);
             PARROT_ASSERT(attrs->interp);
         }
-
-        PMC_struct_val(SELF) = NULL;
-        PMC_pmc_val(SELF)    = NULL;
     }
 
 /*
@@ -260,8 +261,6 @@ C<parent> and uses that thread.
 
         if (!PMC_interp(SELF))
             create_interp(SELF, p);
-
-        PMC_struct_val(SELF) = NULL;
     }
 
 /*
@@ -336,11 +335,40 @@ Runs the interpreter's byte code.
          * possibly clone of share the arguments r/o args can be passed as is */
 
         /* calculate offset and run */
-        runops(new_interp, (size_t)((opcode_t *)PMC_struct_val(SELF) -
+        runops(new_interp, (size_t)((opcode_t *)PMC_sub(SELF) -
             (opcode_t *)interp->code->base.data));
 
         return (opcode_t *)next;
     }
+
+/*
+
+=item C<PMC *get_pmc()>
+
+Return this Thread's args.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_pmc() {
+        return PMC_args(SELF);
+    }
+
+/*
+
+=item C<void set_pmc(PMC *args)>
+
+Set this Thread's args.
+
+=cut
+
+*/
+
+    VTABLE void set_pmc(PMC *args) {
+        PMC_args(SELF) = args;
+    }
+
 
 /*
 
@@ -644,7 +672,7 @@ Finish thawing.
         /*  HLL_info */
         if (info->what == VISIT_THAW_NORMAL ||
                 info->what == VISIT_THAW_CONSTANTS) {
-            pos = &PMC_pmc_val(SELF);
+            pos = &PMC_args(SELF);
         }
         else
             pos = &INTERP->HLL_info;
@@ -671,11 +699,11 @@ Finish thawing.
     }
 
     void thawfinish(visit_info *info) {
-        PMC * const new_info = PMC_pmc_val(SELF);
+        PMC * const new_info = PMC_args(SELF);
         const INTVAL  m      = VTABLE_elements(INTERP, new_info);
         INTVAL  i;
 
-        PMC_pmc_val(SELF) = NULL;
+        PMC_args(SELF) = NULL;
 
         /* merge new_info */
         /* TODO compare old entries */

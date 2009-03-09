@@ -1103,7 +1103,8 @@ $(SRC_DIR)/exceptions$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/exceptions.str \
 
 $(SRC_DIR)/events$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
+$(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h \
+	$(SRC_DIR)/pmc/pmc_parrotinterpreter.h
 
 $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
 	$(SRC_DIR)/pmc/pmc_sub.h
