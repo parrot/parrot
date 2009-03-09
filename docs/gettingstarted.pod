@@ -202,24 +202,13 @@ L<irc.rhizomatic.net> and L<irc.pobox.com>.
 
 =head2 I've developed a patch. What should I do with it?
 
-See L<submissions.pod> for details.
+See F<docs/submissions.pod> for details.
 
 =head2 I've found a bug, what now?
 
-See L<submissions.pod> for details.
+See F<docs/submissions.pod> for details.
 
 =head2 What other useful resources are there for developers?
 
-There are several other useful resources that can be found via:
-
-L<http://www.parrot.org/parrot/wiki/WhereIsIt>
-
-=over 4
-
-=item * Parrot Wiki
-
-Located at:
-
-L<http://trac.parrot.org/parrot/wiki>
-
-=back
+A number of other useful resources that can be found via on the Parrot
+wiki, located at L<http://trac.parrot.org/parrot/wiki>.
