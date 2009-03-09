@@ -12,7 +12,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-dan.ops - Parrot ops emitted by Dan's compiler
+dan.ops - Sample Dynamic Opcodes 1
 
 =head1 DESCRIPTION
 

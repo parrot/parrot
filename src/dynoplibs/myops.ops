@@ -8,7 +8,7 @@ VERSION = PARROT_VERSION;
 
 =head1 NAME
 
-myops.ops - Parrot Sample Ops
+myops.ops - Sample Dynamic Opcodes 2
 
 =cut
 
