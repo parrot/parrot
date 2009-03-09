@@ -1063,7 +1063,7 @@ $self->{sym_export} PMC*
 $load_func(PARROT_INTERP)
 {
     PMC *const lib      = pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = $self->{init_func};
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) $self->{init_func};
     dynop_register(interp, lib);
     return lib;
 }
