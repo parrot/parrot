@@ -53,12 +53,14 @@ Parrot::Test::Util::Runloop->testloop(
 # In the POD inside a C source code file, a hyperlink such as 
 # https://trac.parrot.org will be inaccurately reported as a C++-style
 # comment.
+# Quick fix added
 sub check_cppcomments {
     my $buf = shift;
     $buf =~ s{ (?:
                    (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                  | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string
                  | /\* .*? \*/                         # remove C comment
+		 | https?:\/\/                         # TT # 414 quick fix
                )
             }{}gsx;
 
