@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  50;
+use Test::More tests =>  51;
 use Carp;
 use Cwd;
 use File::Path qw( mkpath );
@@ -52,7 +52,7 @@ my $cwd = cwd();
     my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
     mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
     my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
-    is( $step->_check_jitcapability($corejit, $cpuarch, $osname), 0,
+    is( $step->_check_jitcapability($corejit, $cpuarch, $osname, 8), 0,
         "Got expected value for _check_jitcapability(): no core.jit case");
 
     chdir $cwd or croak "Unable to change back to starting directory";
@@ -71,7 +71,7 @@ my $cwd = cwd();
         or croak "Unable to open handle to file for testing";
     print $FH qq{Hello, JIT\n};
     close $FH or croak "Unable to close handle to file for testing";
-    is( $step->_check_jitcapability($corejit, $cpuarch, $osname), 0,
+    is( $step->_check_jitcapability($corejit, $cpuarch, $osname, 8), 0,
         "Got expected value for _check_jitcapability(): no JIT on this architecture case");
 
     chdir $cwd or croak "Unable to change back to starting directory";
@@ -92,7 +92,7 @@ my $cwd = cwd();
     close $FH or croak "Unable to close handle to file for testing";
     my $orig = $step->{jit_is_working};
     $step->{jit_is_working} = { $cpuarch => 1 };
-    is( $step->_check_jitcapability($corejit, $cpuarch, $osname), 1,
+    is( $step->_check_jitcapability($corejit, $cpuarch, $osname, 8), 1,
         "Got expected value for _check_jitcapability(): mock JIT case");
     $step->{jit_is_working} = $orig;
 
@@ -114,8 +114,30 @@ my $cwd = cwd();
     close $FH or croak "Unable to close handle to file for testing";
     my $orig = $step->{jit_is_working};
     $step->{jit_is_working} = { $cpuarch => 1 };
-    is( $step->_check_jitcapability($corejit, $cpuarch, $osname), 0,
+    is( $step->_check_jitcapability($corejit, $cpuarch, $osname, 8), 0,
         "Got expected value for _check_jitcapability(): mock darwin-i386 case");
+    $step->{jit_is_working} = $orig;
+
+    chdir $cwd or croak "Unable to change back to starting directory";
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    chdir $tdir or croak "Unable to change to temporary directory";
+    my $jitbase = 'foo';
+    my $cpuarch = 'i386';
+    my $osname = 'MSWin32';
+    my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
+    mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
+    my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
+    open my $FH, '>', $corejit
+        or croak "Unable to open handle to file for testing";
+    print $FH qq{Hello, JIT\n};
+    close $FH or croak "Unable to close handle to file for testing";
+    my $orig = $step->{jit_is_working};
+    $step->{jit_is_working} = { $cpuarch => 1 };
+    is( $step->_check_jitcapability($corejit, $cpuarch, $osname, 4), 0,
+        "Got expected value for _check_jitcapability(): mock single-float");
     $step->{jit_is_working} = $orig;
 
     chdir $cwd or croak "Unable to change back to starting directory";

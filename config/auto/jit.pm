@@ -53,6 +53,7 @@ sub runstep {
 
     my $cpuarch     = $conf->data->get('cpuarch');
     my $osname      = $conf->data->get('osname');
+    my $nvsize      = $conf->data->get('nvsize');
 
     my $jitbase  = $self->{jitbase_default};   # base path for jit sources
 
@@ -62,7 +63,7 @@ sub runstep {
         if $verbose;
 
     my $jitcapable =
-        $self->_check_jitcapability($corejit, $cpuarch, $osname);
+        $self->_check_jitcapability($corejit, $cpuarch, $osname, $nvsize);
 
     my $jitarchname = "$cpuarch-$osname";
     _handle_asm( {
@@ -148,7 +149,7 @@ sub runstep {
 
 sub _check_jitcapability {
     my $self = shift;
-    my ($corejit, $cpuarch, $osname) = @_;
+    my ($corejit, $cpuarch, $osname, $nvsize) = @_;
     my $jitcapable = 0;
     if ( -e $corejit ) {
 
@@ -160,6 +161,12 @@ sub _check_jitcapability {
         # This was discussed in RT #43145 (which has been resolved).
         if ( $self->{jit_is_working}->{$cpuarch} ) {
             $jitcapable = 1;
+        }
+
+        # Can only jit double. For long double see patch in TT #352.
+        # float not yet planned.
+        if ( $nvsize != 8 ) {
+            $jitcapable = 0;
         }
 
         # Another exception
