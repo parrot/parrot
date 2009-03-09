@@ -128,28 +128,8 @@ OpenVMS (Alpha), FreeBSD (x86).
 Parrot is developed and maintained by the members of the
 C<parrot-dev@lists.parrot.org> mailing list. The list is archived at:
 L<http://groups.google.com/group/parrot-dev/>
-
-=over 4
-
-=item * Allison Randal is the chief architect.
-
-=item * Chip Salzenberg (C<chip@pobox.com>) was the second chief architect.
-
-=item * Dan Sugalski (C<dan@sidhe.org>) was the chief architect for the first
-I<5 years> of the project.  Parrot is largely his brainchild.
-
-=item * Leopold Toetsch (C<lt@toetsch.at>) was the release manager for some
-time. This position is currently rotated through several members of the
-project team.
-
-=item * Simon Cozens, Jeff Goff and Steve Fink were the release managers 
-for releases 0.0.1 - 0.0.4, 0.0.5 - 0.0.8, and 0.0.9 - 0.0.11 respectively.
-They have all subsequently recovered.
-
-=item * Many, many other people have contributed their time and expertise
+Many people have contributed their time and expertise
 to the Parrot project; see the F<CREDITS> file for details.
-
-=back
 
 =head2 Web pages
 
