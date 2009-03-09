@@ -35,7 +35,8 @@ Currently C<rational.pmc> only has some C<static> functions for code sharing.
    typedef struct RATIONAL {
       mpq_t q;
    } RATIONAL;
-#  define RT(x)         ((RATIONAL*) PMC_struct_val(x))->q
+#  define PMC_rational(x) ((Parrot_Rational_attributes *)PMC_data(x))->rational
+#  define RT(x)           ((Parrot_Rational_attributes *)PMC_data(x))->rational->q
 #else
 #  define RT(x)
 #endif
@@ -267,6 +268,7 @@ static void rat_power_int(PARROT_INTERP, PMC *self, int value, PMC *dest) {
 */
 
 pmclass Rational dynpmc provides scalar {
+    ATTR struct RATIONAL *rational;
 /*
 
 =head2 Methods
@@ -302,11 +304,12 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
 */
     VTABLE void init() {
       #ifdef PARROT_HAS_GMP
-        PMC_struct_val(SELF) = malloc(sizeof (RATIONAL));
+        Parrot_Rational_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_Rational_attributes);
+        PMC_data(SELF)     = attrs;
+        PMC_rational(SELF) = (RATIONAL *)malloc(sizeof (RATIONAL));
         mpq_init(RT(SELF));
         PObj_active_destroy_SET(SELF);
-      #else
-        PMC_struct_val(SELF) = NULL;
       #endif
     }
 
@@ -343,7 +346,8 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
     VTABLE void destroy() {
       #ifdef PARROT_HAS_GMP
         mpq_clear(RT(SELF));
-        mem_sys_free(PMC_struct_val(SELF));
+        mem_sys_free(RT(SELF));
+        mem_sys_free(PMC_data(SELF));
       #else
         RAISE_EXCEPTION
       #endif
