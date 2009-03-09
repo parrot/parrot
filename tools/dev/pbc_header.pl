@@ -39,24 +39,9 @@ use Getopt::Long;
 use Digest::MD5 qw(md5);
 
 my %opt;
-use constant FP_LEN => 12;
 my $word_size = 4;
 
 main();
-
-sub get_fp {
-
-    # s. also fingerprint_c.pl
-    my $compat_file = 'PBC_COMPAT';
-    open my $IN, '<', $compat_file or die "Can't read $compat_file";
-    my @lines = <$IN>;
-    close $IN;
-
-    my $len = FP_LEN;
-    my $fingerprint = md5 join "\n", grep { !/^#/ } @lines;
-
-    return substr $fingerprint, 0, $len;
-}
 
 sub get_version {
     my $version_file = 'VERSION';
@@ -69,27 +54,10 @@ sub get_version {
     return ( $major, $minor, $patch );
 }
 
-sub get_bc_version {
-    my $compat_file = 'PBC_COMPAT';
-    my ( $major, $minor );
-    open my $IN, '<', $compat_file or die "Can't read $compat_file";
-    while (<$IN>) {
-        if (/^(\d+)\.0*(\d+)/) {
-            ( $major, $minor ) = ( $1, $2 );
-            last;
-        }
-    }
-    die "Can't read $compat_file" unless defined $major;
-    close $IN;
-    return ( $major, $minor );
-}
-
 sub update_fp {
     my (@args) = @_;
 
-    my $fp = get_fp();
     my ( $major, $minor, $patch ) = get_version();
-    my ( $bc_major, $bc_minor ) = get_bc_version();
     for my $f (@args) {
         my $b;
         open my $F, "+<", "$f" or die "Can't open $f: $!";
@@ -99,28 +67,32 @@ sub update_fp {
         # bc_major bc_minor uuid_type uuid_size
         seek $F, 11, 0;      # pos 11: major, minor, patch
         print $F pack "ccc", $major, $minor, $patch;
-        #seek $F, 14, 0;    # pos 14: major, minor
-        print $F pack "cc", $bc_major, $bc_minor;
-        # uuid_type = 1, uuid_size = 10, uuid_data = $fp
+        goto SKIP; # disabled
+
+        # stamp with the fingerprint UUID
+        # uuid_type = 1, uuid_size = 12, uuid_data = $fp
+        seek $F, 16, 0;
         read $F, $b, 8;
         my ($type, $uuid_len) = unpack "cc", $b;
-        if ($type != 1 or $uuid_len != FP_LEN) {
-            # if uuid_type was 0 or of different size copy the tail first
-            my $leftover = (18 + $uuid_len) % 16;
-            my $n = $leftover == 0 ? 0 : 16 - $leftover;
-            # we can skip the copy if there's enough room already (pad:14=>2)
-            goto SEEK if $n > FP_LEN;
-            my $dirstart = 18 + $uuid_len + $n;
-            seek $F, $dirstart, 0;   # skip to dir
-            my $size = -s $F;
-            read $F, $b, $size - $dirstart;
-            seek $F, $dirstart, 0;   # again to dir
-            print $F $b;
-        }
+        # copy the tail first
+        my $leftover = (18 + $uuid_len) % 16;
+        my $n = $leftover == 0 ? 0 : 16 - $leftover;
+        my $dirstart = 18 + $uuid_len + $n;
+        seek $F, $dirstart, 0;   # Fw to dir
+        my $size = -s $F;
+        read $F, $b, $size - $dirstart; # read rest of the file
+        my $fp = md5($b);
+        my $fp_len = length $fp;
+        $leftover = (18 + $fp_len) % 16;
+        $n = $leftover == 0 ? 0 : 16 - $leftover;
+        $dirstart = 18 + $fp_len + $n;
+        seek $F, $dirstart, 0;   # Back to new dir
+        print $F $b; # print tail
       SEEK:
         seek $F, 16, 0;   # back to pos 16: uuid_type, uuid_size
-        print $F pack "cc", 1, FP_LEN;
+        print $F pack "cc", 1, $fp_len;
         print $F $fp;
+      SKIP:
         close $F;
     }
 
