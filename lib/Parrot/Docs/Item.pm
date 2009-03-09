@@ -74,6 +74,7 @@ sub new {
 
     $self = bless {
         TEXT     => $text,
+        TITLE    => $text,
         CONTENTS => \@contents,
     }, $self;
 
@@ -155,10 +156,18 @@ sub write_html {
             print "\n", $rel_path unless $silent;
 
             my $formatter = Parrot::Docs::POD2HTML->new;
+            $formatter->no_errata_section(1); # don't dump errors into HTML output
             $formatter->write_html( $source, $target, $rel_path, $self );
 
-            $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
-                $source->relative_path( $file->path ) );
+            my $title = $self->{TITLE} || $file->short_description;
+
+            if ($title) {
+                $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
+                    $title );
+            } else {
+                $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
+                    $source->relative_path( $file->path ) );
+            }
 
             $index_html .= "<br>\n";
 
@@ -181,24 +190,16 @@ sub write_html {
             $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
                 $source->relative_path( $file->path ) );
 
-            $index_html .= "<br>\n";
         }
     }
 
     return '' unless $index_html;
 
-    if ( !$self->{TEXT} and @short_desc ) {
-        my $short_desc = join '. ', @short_desc;
-
-        $short_desc .= '.' unless $short_desc =~ /\.$/o;
-
-        $self->{TEXT} = $short_desc;
+    if ( $self->{DESCRIPTION} ) {
+        $index_html .= "<br>$self->{DESCRIPTION}\n";
     }
 
-    if ( $self->{TEXT} ) {
-        $index_html .= "$self->{TEXT}<br>\n";
-        $index_html = '<p>' . $index_html . "</p>\n";
-    }
+    $index_html = '<li>' . $index_html . "</li>\n";
 
     return $index_html;
 }

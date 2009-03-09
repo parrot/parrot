@@ -293,6 +293,7 @@ sub pod_as_html {
 
     if ( $self->contains_pod ) {
         my $formatter = Parrot::Docs::POD2HTML->new;
+        $formatter->no_errata_section(1); # don't dump errors into HTML output
 
         $self->{POD_HTML} = $formatter->html_for_file($self);
     }

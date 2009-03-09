@@ -63,7 +63,9 @@ sub new {
     # RT#43709 - Groups should only contain items or paths.
 
     $self = $self->SUPER::new( $text, @contents );
-    $self->{NAME} = $name;
+    $self->{NAME}  = $name;
+    $self->{TITLE} = $name;
+    $self->{PATH}  = $text;
 
     return $self;
 }
@@ -84,6 +86,18 @@ sub name {
     my $self = shift;
 
     return $self->{NAME};
+}
+
+=item C<version()>
+
+Returns the documentation version number.
+
+=cut
+
+sub version {
+    my $self = shift;
+
+    return $self->{VERSION};
 }
 
 =item C<html_link()>
@@ -110,17 +124,7 @@ sub write_html {
     my $index_html = $self->write_contents_html(@_);
 
     if ($index_html) {
-
-        # If none of the items are in a para then the whole group is.
-
-        if ( $index_html !~ /<p>/ ) {
-            $index_html = "<p>\n" . $index_html . "</p>\n\n";
-        }
-
-        $index_html = "<p>$self->{TEXT}</p>\n\n" . $index_html if $self->{TEXT};
-        $index_html =
-qq(<h2>$self->{NAME}</h2>\n\n)
-            . $index_html;
+        $index_html = "<h2>$self->{TITLE}</h2>\n\n<ul>$index_html</ul>\n\n";
     }
 
     return $index_html;

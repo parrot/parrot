@@ -1,17 +1,17 @@
 # Copyright (C) 2004, Parrot Foundation.
-# $Id$
+# $Id: Examples.pm 37201 2009-03-08 12:07:48Z fperrad $
 
 =head1 NAME
 
-Parrot::Docs::Section::DynaPMCs - Dynamic PMCs documentation section
+Parrot::Docs::Section::PDDs - PDDs documentation section
 
 =head1 SYNOPSIS
 
-        use Parrot::Docs::Section::DynaPMCs;
+    use Parrot::Docs::Section::PDDs;
 
 =head1 DESCRIPTION
 
-A documentation section describing all the dynamic PMCs.
+A documentation section describing all the Parrot design documents.
 
 =head2 Class Methods
 
@@ -19,12 +19,15 @@ A documentation section describing all the dynamic PMCs.
 
 =cut
 
-package Parrot::Docs::Section::DynaPMCs;
+package Parrot::Docs::Section::PDDs;
 
 use strict;
 use warnings;
 
 use base qw( Parrot::Docs::Section );
+
+use Parrot::Docs::Item;
+use Parrot::Docs::Group;
 
 =item C<new()>
 
@@ -36,9 +39,10 @@ sub new {
     my $self = shift;
 
     return $self->SUPER::new(
-        'Dynamic PMCs', 'dynapmc.html', '',
-        $self->new_group( 'Loading', '', 'src/dynpmc' ),
-        $self->new_group( 'Runtime', '', 'runtime/parrot/include' ),
+        'Parrot Design Documents (PDDs)',
+        'pdds.html',
+        '',
+        $self->new_group( 'Design Documents',  '', 'docs/pdds' ),
     );
 }
 

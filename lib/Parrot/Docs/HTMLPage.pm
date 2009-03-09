@@ -25,7 +25,7 @@ package Parrot::Docs::HTMLPage;
 use strict;
 use warnings;
 
-=item C<header($title, $navigation, $resources)>
+=item C<header($title, $navigation, $resources, $version)>
 
 Returns the page header with the specified title and navigation bar.
 C<$resources> should be the relative path from the page to
@@ -40,6 +40,7 @@ sub header {
     my $title      = shift || 'Untitled';
     my $navigation = shift || '';
     my $resources  = shift || '';
+    my $version    = shift || '';
     my $breadcrumb = $navigation;
     $breadcrumb .= " &raquo; " if $navigation;
     $breadcrumb .= $title;
@@ -49,7 +50,7 @@ sub header {
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>$title</title>
+        <title>Parrot $version - $title</title>
         <link rel="stylesheet" type="text/css"
             href="$resources/parrot.css"
             media="all">
@@ -85,17 +86,24 @@ sub footer {
     my $self       = shift;
     my $navigation = shift || '';
     my $resources  = shift || '';
+    my $version    = shift || '';
 
-    <<"FOOTER";
+    my $footer = <<"FOOTER";
             </div> <!-- "mainbody" -->
             <div id="divider"></div>
             <div id="footer">
 	        Copyright &copy; 2002-2009, Parrot Foundation.
+FOOTER
+
+    $footer .= "\n<br>Parrot version $version" if $version;
+    $footer .= <<"FOOTER";
             </div>
         </div> <!-- "wrapper" -->
     </body>
 </html>
 FOOTER
+
+    return $footer;
 }
 
 =back

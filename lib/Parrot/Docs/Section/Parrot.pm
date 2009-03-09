@@ -30,22 +30,20 @@ use base qw( Parrot::Docs::Section );
 
 use Parrot::Distribution;
 
-use Parrot::Docs::Section::Info;
-use Parrot::Docs::Section::Docs;
+use Parrot::Docs::Section::Developer;
 use Parrot::Docs::Section::Examples;
 use Parrot::Docs::Section::PMCs;
-use Parrot::Docs::Section::DynaPMCs;
-use Parrot::Docs::Section::C;
+#use Parrot::Docs::Section::C;
 use Parrot::Docs::Section::Ops;
-use Parrot::Docs::Section::IMCC;
-use Parrot::Docs::Section::Perl;
-use Parrot::Docs::Section::Libs;
+#use Parrot::Docs::Section::IMCC;
+#use Parrot::Docs::Section::Perl;
+#use Parrot::Docs::Section::Libs;
 use Parrot::Docs::Section::Tools;
 use Parrot::Docs::Section::Compilers;
-use Parrot::Docs::Section::Languages;
-use Parrot::Docs::Section::Config;
-use Parrot::Docs::Section::Tests;
-use Parrot::Docs::Section::EditorPlugins;
+#use Parrot::Docs::Section::Languages;
+#use Parrot::Docs::Section::Config;
+#use Parrot::Docs::Section::Tests;
+use Parrot::Docs::Section::PDDs;
 
 =item C<new()>
 
@@ -57,23 +55,52 @@ sub new {
     my $self = shift;
 
     return $self->SUPER::new(
-        'Contents', 'index.html',
-        'What\'s in the Parrot distribution?',
-        Parrot::Docs::Section::Info->new,
-        Parrot::Docs::Section::Docs->new,
-        Parrot::Docs::Section::Examples->new,
-        Parrot::Docs::Section::PMCs->new,
-        Parrot::Docs::Section::DynaPMCs->new,
-        Parrot::Docs::Section::C->new,
-        Parrot::Docs::Section::Ops->new,
-        Parrot::Docs::Section::IMCC->new,
-        Parrot::Docs::Section::Perl->new,
-        Parrot::Docs::Section::Libs->new,
-        Parrot::Docs::Section::Tools->new,
-        Parrot::Docs::Section::Languages->new,
-        Parrot::Docs::Section::Config->new,
-        Parrot::Docs::Section::Tests->new,
-        Parrot::Docs::Section::EditorPlugins->new,
+        'Home', 'index.html',
+        'This documentation is a snapshot from the Parrot source.',
+        $self->new_group(
+            'Introduction',
+            '',
+            $self->new_item( 'Introduction to Parrot', 'docs/intro.pod'),
+            $self->new_item( 'Getting Started', 'docs/book/ch02_getting_started.pod'),
+            $self->new_item( 'Navigating the Docs', 'docs/parrot.pod'),
+            $self->new_item( 'Roles & Responsibilities', 'docs/project/roles_responsibilities.pod'),
+            $self->new_item( 'Release History', 'docs/parrothist.pod'),
+            $self->new_item( 'Donors', 'DONORS.pod'),
+            $self->new_item( 'Glossary', 'docs/glossary.pod'),
+        ),
+        $self->new_group(
+            'Working with Parrot',
+            '',
+            $self->new_item( 'Running Parrot', 'docs/running.pod'),
+            $self->new_item( 'Testing Parrot', 'docs/tests.pod'),
+            Parrot::Docs::Section::Examples->new,
+            $self->new_item( 'Developer FAQ', 'docs/gettingstarted.pod'),
+            $self->new_item( 'Submitting Bug Reports & Patches', 'docs/submissions.pod' ),
+        ),
+        $self->new_group(
+            'Implementing Languages on Parrot',
+            '',
+            $self->new_item( 'Compiler Tools', 'docs/book/ch09_pct.pod'),
+            $self->new_item( 'Compiler FAQ', 'docs/compiler_faq.pod'),
+        ),
+        $self->new_group(
+            'Design, Internals & Development',
+            '',
+            $self->new_item( 'Overview', 'docs/overview.pod'),
+            Parrot::Docs::Section::PDDs->new,
+            Parrot::Docs::Section::PMCs->new,
+            Parrot::Docs::Section::Ops->new,
+            Parrot::Docs::Section::Developer->new,
+            Parrot::Docs::Section::Tools->new,
+            $self->new_item( 'Syntax Highlighting for Vim & Emacs', 'editor/README.pod'),
+        ),
+
+#        Parrot::Docs::Section::C->new,
+#        Parrot::Docs::Section::IMCC->new,
+#        Parrot::Docs::Section::Perl->new,
+#        Parrot::Docs::Section::Libs->new,
+#        Parrot::Docs::Section::Tests->new,
+#        Parrot::Docs::Section::Config->new,
     );
 }
 
@@ -96,13 +123,15 @@ once by the root section, it is not passed to subsections.
 =cut
 
 sub write_docs {
-    my $self   = shift;
-    my $silent = shift || 0;
-    my $delete = shift || 0;
-    my $dist   = Parrot::Distribution->new;
+    my $self    = shift;
+    my $silent  = shift || 0;
+    my $delete  = shift || 0;
+    my $version = shift || '';
+    my $dist    = Parrot::Distribution->new;
 
     $dist->delete_html_docs if $delete;
 
+    $self->{VERSION} = $version;
     $self->write_html( $dist, $dist->html_docs_directory, $silent );
 
     return;
@@ -121,8 +150,6 @@ sub write_docs {
 =item C<Parrot::Docs::Section::Examples>
 
 =item C<Parrot::Docs::Section::PMCs>
-
-=item C<Parrot::Docs::Section::DynaPMCs>
 
 =item C<Parrot::Docs::Section::C>
 
@@ -143,8 +170,6 @@ sub write_docs {
 =item C<Parrot::Docs::Section::Config>
 
 =item C<Parrot::Docs::Section::Tests>
-
-=item C<Parrot::Docs::Section::EditorPlugins>
 
 =back
 
