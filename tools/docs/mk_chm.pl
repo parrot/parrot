@@ -62,7 +62,7 @@ Language=0x0409 English (UNITED STATES)
 Title=Parrot VM $version
 
 [WINDOWS]
-Main=,"toc.hhc","index.hhk","index.html","index.html",,,,,0x22520,,0x603006,,,,,,,,0
+Main=,"toc.hhc","index.hhk","index.html","index.html",,,,,0x22520,,0x60304e,,,,,,,,0
 
 [FILES]
 index.html
