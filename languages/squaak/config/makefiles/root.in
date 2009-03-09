@@ -16,11 +16,9 @@ LOAD_EXT      := @load_ext@
 O             := @o@
 
 # Various paths
-PERL6GRAMMAR  := $(LIB_DIR)/library/PGE/Perl6Grammar.pbc
-NQP           := $(LIB_DIR)/languages/nqp/nqp.pbc
-PCT           := $(LIB_DIR)/library/PCT.pbc
-PMC_DIR       := src/pmc
-OPS_DIR       := src/ops
+PERL6GRAMMAR  := @build_dir@/runtime/parrot/library/PGE/Perl6Grammar.pbc
+NQP           := @build_dir@/compilers/nqp/nqp.pbc
+PCT           := @build_dir@/runtime/parrot/library/PCT.pbc
 
 ## Setup some commands
 MAKE          := @make_c@
@@ -33,8 +31,8 @@ RM_F          := @rm_f@
 RM_RF         := @rm_rf@
 POD2MAN       := pod2man
 #IF(parrot_is_shared and not(cygwin or win32)):export LD_RUN_PATH := @blib_dir@:$(LD_RUN_PATH)
-PARROT        := ../../parrot@exe@
-PBC_TO_EXE    := ../../pbc_to_exe@exe@
+PARROT        := @build_dir@/parrot@exe@
+PBC_TO_EXE    := @build_dir@/pbc_to_exe@exe@
 #IF(darwin):
 #IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
@@ -52,6 +50,19 @@ BUILTINS_PIR := \
 
 DOCS := README
 
+BUILD_CLEANUPS := \
+  squaak.pbc \
+  "src/gen_*.pir" \
+  "*.c" \
+  "*$(O)" \
+  squaak@exe@ \
+#IF(win32):  parrot-squaak.exe \
+#IF(win32):  parrot-squaak.iss \
+#IF(win32):  "setup-parrot-*.exe" \
+  installable_squaak@exe@
+
+TEST_CLEANUPS :=
+
 build: squaak.pbc
 
 all: build squaak@exe@ installable
@@ -67,7 +78,7 @@ src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	    --output=src/gen_grammar.pir \
 	    src/parser/grammar.pg
 
-src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
+src/gen_actions.pir: $(NQP) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
 
@@ -79,7 +90,6 @@ installable: installable_squaak@exe@
 installable_squaak@exe@: squaak.pbc
 	$(PBC_TO_EXE) squaak.pbc --install
 
-# regenerate the Makefile
 Makefile: config/makefiles/root.in
 	$(PERL) Configure.pl
 
@@ -91,7 +101,7 @@ help:
 	@echo "  build:             squaak.pbc"
 	@echo "                     This is the default."
 	@echo "  squaak@exe@         Self-hosting binary not to be installed."
-	@echo "  all:               squaak.pbc squaak@exe@ installable Makefile"
+	@echo "  all:               squaak.pbc squaak@exe@ installable"
 	@echo "  installable:       Create libs and self-hosting binaries to be installed."
 	@echo "  install:           Install the installable targets and docs."
 	@echo ""
@@ -112,7 +122,7 @@ help:
 test: build
 	$(PERL) t/harness
 
-# TODO: rename build_dir. basic run for missing libs
+# basic run for missing libs
 test-installable: installable
 	echo "1" | ./installable_squaak@exe@
 
@@ -142,25 +152,14 @@ win32-inno-installer: installable
 	$(PERL) @build_dir@/tools/dev/mk_inno_language.pl squaak
 	iscc parrot-squaak.iss
 
-# clean intermediate test files
 testclean:
+	$(RM_F) $(TEST_CLEANUPS)
 
-CLEANUPS := \
-  squaak.pbc \
-  "src/gen_*.pir" \
-  "*.c" \
-  "*$(O)" \
-  squaak@exe@ \
-#IF(win32):  parrot-squaak.exe \
-#IF(win32):  parrot-squaak.iss \
-#IF(win32):  "setup-parrot-*.exe" \
-  installable_squaak@exe@
+clean:
+	$(RM_F) $(TEST_CLEANUPS) $(BUILD_CLEANUPS)
 
-clean: testclean
-	$(RM_F) $(CLEANUPS)
-
-realclean: testclean
-	$(RM_F) $(CLEANUPS) Makefile
+realclean:
+	$(RM_F) $(TEST_CLEANUPS) $(BUILD_CLEANUPS) Makefile
 
 distclean: realclean
 
