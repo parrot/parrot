@@ -98,6 +98,8 @@ help:
 	@echo ""
 	@echo "  co-primitivearc: Try to fetch primitivearc"
 	@echo ""
+	@echo "  co-punie:      Try to fetch Punie"
+	@echo ""
 	@echo "  co-rakudo:     Try to fetch Rakudo"
 	@echo ""
 	@echo "  co-shakespeare: Try to fetch shakespeare"
@@ -141,9 +143,11 @@ help:
 	@echo ""
 	@echo "  up-primitivearc: Try to update primitivearc"
 	@echo ""
-	@echo "  up-shakespeare: Try to update shakespeare"
+	@echo "  up-punie:      Try to update Punie"
 	@echo ""
 	@echo "  up-rakudo:     Try to update Rakudo"
+	@echo ""
+	@echo "  up-shakespeare: Try to update shakespeare"
 	@echo ""
 	@echo "  up-tcl:        Try to update Partcl"
 	@echo ""
@@ -466,12 +470,51 @@ urm.realclean:
 # helpers for checking out externally managed languages
 
 # check out all known externally managed languages
-co-all: co-eclectus co-fun co-gil co-hq9plus co-kea-cl co-lazy-k co-lua \
-    co-m4 co-matrixy co-markdown co-paraplegic co-perk co-pipp co-pjs \
-    co-primitivearc co-rakudo co-shakespeare co-tcl co-unlambda co-wmlscript
-up-all: up-eclectus up-fun up-gil up-hq9plus up-kea-cl up-lazy-k up-lua \
-    up-m4 up-matrixy up-markdown up-paraplegic up-perk up-pipp up-pjs \
-    up-primitivearc up-rakudo up-shakespeare up-tcl up-unlambda up-wmlscript
+co-all: \
+    co-eclectus \
+    co-fun \
+    co-gil \
+    co-hq9plus \
+    co-kea-cl \
+    co-lazy-k \
+    co-lua \
+    co-m4 \
+    co-matrixy \
+    co-markdown \
+    co-paraplegic \
+    co-perk \
+    co-pipp \
+    co-pjs \
+    co-primitivearc \
+    co-punie \
+    co-rakudo \
+    co-shakespeare \
+    co-tcl \
+    co-unlambda \
+    co-wmlscript
+
+up-all: \
+    up-eclectus \
+    up-fun \
+    up-gil \
+    up-hq9plus \
+    up-kea-cl \
+    up-lazy-k \
+    up-lua \
+    up-m4 \
+    up-matrixy \
+    up-markdown \
+    up-paraplegic \
+    up-perk \
+    up-pipp \
+    up-pjs \
+    up-primitivearc \
+    up-punie \
+    up-rakudo \
+    up-shakespeare \
+    up-tcl \
+    up-unlambda \
+    up-wmlscript
 
 co-eclectus:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//eclectus.git'
@@ -562,6 +605,12 @@ co-primitivearc:
 
 up-primitivearc:
 	cd primitivearc && $(GIT) pull
+
+co-punie:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//punie//trunk' punie
+
+up-punie:
+	cd punie && $(SVN) up
 
 co-rakudo:
 	- $(GIT) clone 'git:////github.com//rakudo//rakudo.git'
