@@ -60,9 +60,9 @@ native pbcs.
 # 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
 my $testmatrix = <<EOF;
        8_le 12_le 16_le 8_be 16_be
-8_le     1     1    0     1     ?
-12_le    1     1    0     0     ?
-16_le    1     1    1     ?     ?
+8_le     1     1    1     1     ?
+12_le    1     1    ?     0     ?
+16_le    1     0    1     ?     ?
 8_be     1     1    ?     1     ?
 16_be    1     1    1     ?     1
 EOF
@@ -151,10 +151,10 @@ my $skip = generate_skip_list($arch, '0');
 # special failures: 64bit cannot read 32bit
 if ($PConfig{ptrsize} == 8) {
     my $todo_msg = "TT #254 64bit cannot read 32bit";
-    $todo->{1} = $todo_msg;
-    $todo->{2} = $todo_msg;
-    $todo->{3} = $todo_msg;
-    $todo->{8} = $todo_msg;
+    $skip->{1} = $todo_msg;
+    $skip->{2} = $todo_msg;
+    $skip->{3} = $todo_msg;
+    $skip->{8} = $todo_msg;
 }
 
 my $output = << 'END_OUTPUT';

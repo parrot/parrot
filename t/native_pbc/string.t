@@ -77,10 +77,9 @@ my $skip = {
 # special failures: 64bit cannot read 32bit
 if ($PConfig{ptrsize} == 8) {
     my $todo_msg = "TT #254 64bit cannot read 32bit";
-    $todo->{1} = $todo_msg;
-    $todo->{2} = $todo_msg;
-    $todo->{3} = $todo_msg;
-    $todo->{8} = $todo_msg;
+    $skip->{1} = $todo_msg;
+    $skip->{3} = $todo_msg;
+    $skip->{8} = $todo_msg;
 }
 
 my $output = << 'END_OUTPUT';
