@@ -25,4 +25,5 @@ Otherwise I run the tests that were passed on the command line.
 
 =cut
 
+use lib qw{ ../../../lib };
 use Parrot::Test::Harness language => 'befunge';

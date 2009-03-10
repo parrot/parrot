@@ -16,7 +16,7 @@ You should compile and test the files with:
 
 Then you can run your Befunge program with:
 
-     $ ../../parrot befunge.pbc [-d] foo.bef
+     $ ../../../parrot befunge.pbc [-d] foo.bef
 
 The -d flag enables debugging within the befunge interpreter (not yet
 fully implemented, this is a work in progress). Type 'help' in the

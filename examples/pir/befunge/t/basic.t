@@ -6,14 +6,15 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+use FindBin;
+BEGIN { use lib qw{ ../../../lib }; }
+
 use Test::More tests => 1;
 use Parrot::Test;
 
-use FindBin;
-
 # execute test.bef
 my $language_dir = $FindBin::Bin . '/..';
-my $parrot       = "../../parrot";
+my $parrot       = "../../../parrot";
 
 # flatten filenames (don't use directories)
 my $out_f = 'test.out';
