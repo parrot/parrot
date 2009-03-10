@@ -62,7 +62,7 @@ static void cvt_num12_num8(
 
 static void cvt_num12_num8_le(
     ARGOUT(unsigned char *dest),
-    ARGIN(unsigned char *src))
+    ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
@@ -97,7 +97,7 @@ static void cvt_num16_num8_be(
 
 static void cvt_num16_num8_le(
     ARGOUT(unsigned char *dest),
-    ARGIN(unsigned char *src))
+    ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
@@ -695,7 +695,7 @@ Untested.
 
 #if PARROT_BIGENDIAN
 static void
-cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
+cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num12_num8_le)
     unsigned char b[12];
@@ -720,7 +720,7 @@ Untested.
 
 #if PARROT_BIGENDIAN
 static void
-cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(unsigned char *src))
+cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num16_num8_le)
     unsigned char b[16];
@@ -1370,16 +1370,13 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
         size_t i;
         mem_sys_memcopy(charcursor, s->strstart, s->bufused);
         charcursor += s->bufused;
-
-        if (s->bufused % sizeof (opcode_t)) {
-            for (i = 0; i < (sizeof (opcode_t) -
-                        (s->bufused % sizeof (opcode_t))); i++) {
-                *charcursor++ = 0;
-            }
+        /* Pad up to sizeof(opcode_t) boundary. */
+        while ( (unsigned long) (charcursor - (char *) cursor) % sizeof(opcode_t)) {
+            *charcursor++ = 0;
         }
     }
-    PARROT_ASSERT(((long)charcursor & 3) == 0);
-    cursor = (opcode_t *)charcursor;
+    PARROT_ASSERT(((unsigned long) (charcursor - (char *) cursor) % sizeof(opcode_t)) == 0);
+    cursor += (charcursor - (char *) cursor) / sizeof(opcode_t);
 
     return cursor;
 }
