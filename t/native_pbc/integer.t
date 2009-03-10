@@ -9,7 +9,7 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test tests => 6;
+use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
 
 =head1 NAME
 
