@@ -1,4 +1,4 @@
-=head1 INFORMATION
+=head1 Lines Example
 
 This example demonstrates what C<Stream::Lines> does.
 

@@ -1,4 +1,4 @@
-=head1 INFORMATION
+=head1 Bytes Example
 
 This example shows the usage of C<Stream::read_bytes>.
 
