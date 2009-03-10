@@ -134,7 +134,7 @@ Double-check that you've actually done this, because it's easy to forget.
 
 B<DO NOT> paste the patch file content into the Description.
 
-=item 7
+=item 8
 
 Click the "Create ticket" button. On the next page attach your patch
 file(s).
@@ -238,7 +238,7 @@ Double-check that you've actually done this, because it's easy to forget.
 B<DO NOT> paste the content of the new file or files into the body of the
 message.
 
-=item 8
+=item 9
 
 Click the "Create ticket" button. On the next page attach the patch for
 MANIFEST and your new file(s).
