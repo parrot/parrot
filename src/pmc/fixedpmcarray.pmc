@@ -380,7 +380,7 @@ array.
 
     VTABLE void set_pmc(PMC *value) {
         INTVAL size;
-        INTVAL is_set_same;
+        INTVAL i;
 
         if (SELF == value)
             return;
@@ -392,26 +392,12 @@ array.
         if (PMC_data(SELF))
             mem_sys_free(PMC_data(SELF));
 
-        /* If the value is a FixedPMCArray or a ResizablePMCArray itself, we
-         * can just copy the data directly. Otherwise, must use interface. */
-        is_set_same    = value->vtable->base_type == enum_class_FixedPMCArray ||
-                         value->vtable->base_type == enum_class_ResizablePMCArray;
-
-        size           = PMC_int_val(SELF) = is_set_same ?
-                                                PMC_int_val(value) :
-                                                VTABLE_elements(INTERP, value);
+        size           = PMC_int_val(SELF) = VTABLE_elements(INTERP, value);
         PMC_data(SELF) = mem_allocate_n_zeroed_typed(size, PMC *);
 
-        if (is_set_same) {
-            mem_sys_memcopy(PMC_data(SELF), PMC_data(value), size * sizeof (PMC *));
-        }
-        else {
-            INTVAL i;
-            for (i = 0; i < size; i++)
-                ((PMC**)PMC_data(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
-        }
+        for (i = 0; i < size; i++)
+            ((PMC**)PMC_data(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
 
-        PMC_int_val2(SELF) = size;
         PObj_custom_mark_SET(SELF);
     }
 /*
