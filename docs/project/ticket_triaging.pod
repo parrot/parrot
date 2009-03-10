@@ -42,11 +42,11 @@ status of C<new>.
 Involves deciding whether the ticket is a real bug, a feature request, a
 duplicate, or spam.
 
-It is especially important that all C<new> bugs which are marked [TODO],
-[PATCH] or [CAGE] be checked that they really are bugs of the given class.
-This is because some bugs, such as [TODO] and [CAGE] get their status set to
-C<open> to indicate that something should be done, rather than something is
-being done.
+It is especially important to check that all C<new> bugs which are marked
+[TODO], [PATCH], or [CAGE] really are bugs of the given class.  This is because
+some bugs, such as [TODO] and [CAGE], get their status set to C<open> to
+indicate that something should be done, rather than that someone is doing
+something.
 
 =over 4
 
@@ -69,8 +69,8 @@ If not, ask for more input.
 
 Is the subject line in the format C<"[TODO] subsystem - issue>?
 
-C<[TODO]> tickets should have their status changed to C<open> to prevent them
-from appearing in a listing of C<new> tickets.
+Change the status of C<[TODO]> tickets to C<open> to prevent them from
+appearing in a listing of C<new> tickets.
 
 =item Is it a [PATCH] ticket?
 
@@ -157,15 +157,18 @@ are best; the exact wording is often important.
 =item Platform details.
 
 These include operating system and version, compiler information, processor
-architecture, and versions of included libraries.  The file F<parrot_config.pasm> may be useful.
+architecture, and versions of included libraries.  The file
+F<parrot_config.pasm> may be useful.
 
 =item Steps to reproduce.
 
-At what point did you see the failure?  Can you reproduce it?  Do you have a small PIR program which demonstrates the problem?
+At what point did you see the failure?  Can you reproduce it?  Do you have a
+small PIR program which demonstrates the problem?
 
 =item Failure diagnostics.
 
-Verbose diagnostics from C<prove -v> -- including all error messages and diagnostics -- are often necessary to resolve test failures.
+Verbose diagnostics from C<prove -v> -- including all error messages and
+diagnostics -- are often necessary to resolve test failures.
 
 =item Backtraces.
 
@@ -173,6 +176,10 @@ Segfaults and other crashes within Parrot are much easier to resolve given a
 backtrace on a Parrot built with debugging symbols.
 
 =back
+
+[PATCH] tickets for code almost always need tests and often need documentation.
+Feel free to ask the submitter to work on both, or to contact another committer
+for help in identifying and creating the appropriate tests and documentation.
 
 =head3 Severity Guidelines
 
@@ -214,6 +221,12 @@ lower priority.
 Defects affecting non-core platforms have a lower priority (which reflects that
 we probably lack the expertise to deal with that platform).
 
+=item Is there a test case suitable for the test suite?
+
+A defect reported with a patch to the test suite (or a test case easily added
+to the test suite) may have a higher priority; it's much easier to diagnose and
+fix such problems.
+
 =back
 
 =head1 TIPS FOR CORRESPONDENCE
@@ -247,12 +260,7 @@ Something like:
 they'll submit another ticket/patch/whatever or perhaps some day become a
 Parrot developer.
 
-=head2 Don't say "problem"
-
-Supposedly it's better customer relations to use I<issue(s)> instead of
-I<problem(s)>.
-
-=head2 Make it clear why the ticket status changed
+=head2 Make it clear why the ticket status has changed
 
 Always note why you're changing a ticket's status, particularly if you're
 closing or rejecting it.  Nothing will irritate people more then letting them
