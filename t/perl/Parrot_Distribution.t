@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More tests => 27;
+use Test::More tests => 26;
 use File::Spec;
 
 =head1 NAME
@@ -52,7 +52,6 @@ ok( !$d->file_for_perl_module('Parrot::Dummy'), 'Perl module file not there' );
 my %pmc_source_file_directories = map { $_->path => 1 } $d->pmc_source_file_directories();
 
 my @old_directory_list = (
-    'languages/dotnet/pmc',
     map { File::Spec->catdir( 'src', $_ ) } qw(dynpmc pmc)
 );
 
