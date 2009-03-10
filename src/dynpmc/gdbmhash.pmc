@@ -45,6 +45,13 @@ When a PMC is requested, a String PMC is returned.
 #include <gdbm.h>
 #include "parrot/extend.h"
 
+typedef struct GDBM_FH {
+    GDBM_FILE f;
+} GDBM_FH;
+
+#define PMC_dbfh(x) ((Parrot_GDBMHash_attributes *)PMC_data(x))->db_handle->f
+
+
 /*
 
 =item C<static STRING* make_hash_key(PARROT_INTERP, PMC *key)>
@@ -67,6 +74,7 @@ static STRING* make_hash_key(PARROT_INTERP, NOTNULL(PMC * key))
 
 
 pmclass GDBMHash provides hash dynpmc lib gdbm {
+    ATTR struct GDBM_FH *db_handle;
 
 /*
 
@@ -94,15 +102,26 @@ So we do a bit of cheating here, and load it during class initialization.
     }
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = NULL;
+        Parrot_GDBMHash_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_GDBMHash_attributes);
+
+        attrs->db_handle = mem_allocate_zeroed_typed(GDBM_FH);
+        PMC_data(SELF)   = attrs;
+        PObj_active_destroy_SET(SELF);
+    }
+
+    VTABLE void destroy() {
+        mem_sys_free(
+                ((Parrot_GDBMHash_attributes *)PMC_data(SELF))->db_handle);
+        mem_sys_free(PMC_data(SELF));
     }
 
     void* get_pointer() {
-        return PMC_struct_val(SELF);
+        return PMC_dbfh(SELF);
     }
 
     void set_pointer(void* p) {
-        PMC_struct_val(SELF) = p;
+        PMC_dbfh(SELF) = (GDBM_FILE)p;
     }
 
 /*
@@ -121,7 +140,7 @@ Open a or create a new dbm file.
 
         Parrot_str_free_cstring(c_db_name);
 
-        PMC_struct_val(SELF) = dbf;
+        PMC_dbfh(SELF) = dbf;
     }
 
 /*
@@ -133,12 +152,10 @@ A uninitialized GDBMHash returns 0.
 
 =cut
 
-RT #46395: This can be optimized by keeping track of number of elements
-
 */
 
     VTABLE INTVAL get_integer() {
-        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        GDBM_FILE dbf = PMC_dbfh(SELF);
         if (! dbf) {
             return 0;
         }
@@ -166,7 +183,7 @@ Returns true if the hash size is not zero.
 */
 
     VTABLE INTVAL get_bool() {
-        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        GDBM_FILE dbf = PMC_dbfh(SELF);
         if (! dbf) {
             return 0;
         }
@@ -191,7 +208,7 @@ Returns true if the hash size is not zero.
 
     void set_string_keyed(PMC* key, STRING* value) {
         STRING* keystr;
-        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm, val_gdbm;
 
         if (!key) return;
@@ -220,7 +237,7 @@ Returns the string value for the element at C<*key>.
 
     STRING* get_string_keyed(PMC *key) {
         STRING *keystr, *val;
-        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm, val_gdbm;
 
         if (!key)
@@ -327,7 +344,7 @@ Returns whether a key C<*key> exists in the hash.
 
     INTVAL exists_keyed(PMC* key) {
         STRING* keystr;
-        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm;
 
         if (!key) return 0;
@@ -352,7 +369,7 @@ Deletes the element associated with C<*key>.
 
     void delete_keyed(PMC* key) {
         STRING* keystr;
-        GDBM_FILE dbf = (GDBM_FILE)PMC_struct_val(SELF);
+        GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm;
 
         if (!key) return;
