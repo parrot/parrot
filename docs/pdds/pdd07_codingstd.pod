@@ -807,7 +807,7 @@ files.
 =item Developer files
 
 Each source file (e.g. a F<foo.c>, F<foo.h> pair), should contain inline
-POD documentation containing information on the implementation decisions
+Pod documentation containing information on the implementation decisions
 associated with the source file. (Note that this is in contrast to PDDs,
 which describe design decisions). In addition, more discussive
 documentation can be placed in F<*.pod> files in the F<docs/dev>
@@ -819,34 +819,30 @@ In principle, someone coming to a particular source file for the first time
 should be able to read the inline documentation file and gain an immediate
 overview of what the source file is for, the algorithms it implements, etc.
 
-The POD documentation should follow the standard POD layout:
+The Pod documentation should follow the layout:
 
 =over 4
 
-=item Copyright
-
-The Parrot copyright statement.
-
-=item SVN
+=item Version
 
 A SVN id string.
 
-=item NAME
+=item Title
 
-src/foo.c - Foo
+    =head1 Foo
 
-=item SYNOPSIS
+=item Synopsis
 
 When appropriate, some simple examples of usage.
 
-=item DESCRIPTION
+=item Description
 
 A description of the contents of the file, how the implementation works, data
 structures and algorithms, and anything that may be of interest to your
 successors, e.g. benchmarks of differing hash algorithms, essays on how to do
 integer arithmetic.
 
-=item SEE ALSO
+=item See Also
 
 Links to pages and books that may contain useful information relevant to the
 stuff going on in the code -- e.g. the book you stole the hash function from.
@@ -890,9 +886,12 @@ Each comment should be of the form
 
     */
 
-This inline POD documentation is parsed to HTML by running:
+This inline Pod documentation is parsed to HTML by running:
 
-    % perl tools/docs/write_docs.pl -s
+    $ perl tools/docs/write_docs.pl --delete
+
+or:
+    $ make html
 
 =item Optimizations
 
