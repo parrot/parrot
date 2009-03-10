@@ -195,7 +195,8 @@ while (<>) {
         my $copy = $dest;
         $dest =~ s/^installable_//;            # parrot with different config
         $dest = File::Spec->catdir( $options{bindir}, $dest );
-        # TODO track bin here to check later below
+        # track bin here to check later below
+        # https://trac.parrot.org/parrot/ticket/434
         if ( $copy =~ /^installable/ ) {
             push @installable_exe, [ $src, $dest ];
             next;
