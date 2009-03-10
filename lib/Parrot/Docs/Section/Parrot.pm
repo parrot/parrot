@@ -67,6 +67,7 @@ sub new {
             $self->new_item( 'Release History', 'docs/parrothist.pod'),
             $self->new_item( 'Donors', 'DONORS.pod'),
             $self->new_item( 'Glossary', 'docs/glossary.pod'),
+            $self->new_item( 'Support Policy', 'docs/project/support_policy.pod'),
         ),
         $self->new_group(
             'Working with Parrot',
