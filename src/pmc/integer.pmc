@@ -22,12 +22,6 @@ integer type without going to an I register.
 #include "parrot/parrot.h"
 
 #include "pmc_bigint.h"
-/* RT#46619 create MMD headers to in Pmc2c.pm */
-/*
-extern INTVAL Parrot_BigInt_multi_is_equal_BigInt(PARROT_INTERP, PMC*, PMC*);
-extern PMC *Parrot_BigInt_multiply_int(PARROT_INTERP,
-        PMC *pmc, INTVAL value, PMC *dest) ;
-*/
 
 static void
 maybe_throw_overflow_error(PARROT_INTERP)
