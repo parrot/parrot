@@ -718,7 +718,7 @@ sub_3: 345
 OUTPUT
 
 pir_output_like(
-    <<'CODE', <<'OUT', 'read on null PMC throws exception', todo => 'not yet implemented' );
+    <<'CODE', <<'OUT', 'read on null PMC throws exception', todo => 'not yet implemented TT #433' );
 .sub main :main
     null $P1
     $S0 = read $P1, 1
