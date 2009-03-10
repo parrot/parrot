@@ -385,7 +385,8 @@ To make a monthly release schedule possible, we're spreading the burden
 of releases across multiple release managers.  Releases are scheduled for
 the 3rd Tuesday of each month.
 
-The starred releases are Parrot's twice-yearly deprecation points.
+The starred releases are Parrot's twice-yearly supported releases, see
+F<docs/project/support_policy.pod>.
 
  - March 17, 2009    - 1.0* - allison
  - April 21, 2009    - 1.1  - fperrad
