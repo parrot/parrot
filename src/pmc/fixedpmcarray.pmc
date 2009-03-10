@@ -26,7 +26,12 @@ never be set for user arrays.
 
 #include "parrot/parrot.h"
 
+#define PMC_size(x)  ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->size
+#define PMC_array(x) ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->pmc_array
+
 pmclass FixedPMCArray need_ext provides array {
+    ATTR INTVAL   size;      /* number of elements in the array */
+    ATTR PMC    **pmc_array; /* pointer to PMC array */
 
 /*
 
@@ -39,10 +44,10 @@ Sort this array, optionally using the provided cmp_func
 */
 
     METHOD sort(PMC *cmp_func :optional) {
-        const UINTVAL n = (UINTVAL) PMC_int_val(SELF);
+        const UINTVAL n = (UINTVAL) PMC_size(SELF);
 
         if (n > 1)
-           Parrot_quicksort(interp, PMC_data_typed(SELF, void **), n, cmp_func);
+           Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
     }
 
 /*
@@ -62,10 +67,11 @@ Initializes the array.
 */
 
     VTABLE void init() {
-        PMC_int_val(SELF) = 0;
-        PMC_data(SELF)    = NULL;
-        PObj_active_destroy_SET(SELF);
-        PObj_custom_mark_SET(SELF);
+        Parrot_FixedPMCArray_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_FixedPMCArray_attributes);
+
+        PMC_data(SELF) = attrs;
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -79,11 +85,10 @@ Destroys the array.
 */
 
     VTABLE void destroy() {
-        if (PMC_data(SELF)) {
-            mem_sys_free(PMC_data(SELF));
-            PMC_data(SELF) = NULL;
+        if (PMC_array(SELF)) {
+            mem_sys_free(PMC_array(SELF));
         }
-        PMC_int_val(SELF) = 0;
+        mem_sys_free(PMC_data(SELF));
     }
 
 /*
@@ -98,13 +103,13 @@ Creates and returns a copy of the array.
 
     VTABLE PMC *clone() {
         PMC * const dest  = pmc_new(INTERP, SELF->vtable->base_type);
-        const INTVAL size = PMC_int_val(SELF);
+        const INTVAL size = PMC_size(SELF);
 
         if (size) {
-            PMC_int_val(dest) = size;
-            PMC_data(dest)    = mem_allocate_n_typed(size, PMC *);
-            mem_copy_n_typed(PMC_data(dest), PMC_data(SELF), size, PMC *);
-            PObj_custom_mark_SET(dest);
+            PMC_size(dest) = size;
+            PMC_array(dest)    = mem_allocate_n_typed(size, PMC *);
+            mem_copy_n_typed(PMC_array(dest), PMC_array(SELF), size, PMC *);
+            PObj_custom_mark_destroy_SETALL(dest);
         }
 
         return dest;
@@ -134,7 +139,7 @@ fixed sized array).
 */
 
     VTABLE INTVAL elements() {
-        return PMC_int_val(SELF);
+        return PMC_size(SELF);
     }
 
 /*
@@ -314,11 +319,11 @@ Returns the PMC value of the element at index C<key>.
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
         PMC **data;
 
-        if (key < 0 || key >= PMC_int_val(SELF))
+        if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedPMCArray: index out of bounds!"));
 
-        data = (PMC **)PMC_data(SELF);
+        data = PMC_array(SELF);
         return data[key];
     }
 
@@ -363,19 +368,19 @@ array.
         int i;
         PMC **data;
 
-        if (PMC_int_val(SELF) && size)
+        if (PMC_size(SELF) && size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("FixedPMCArray: Can't resize!"));
         if (!size)
             return;
 
-        PMC_int_val(SELF) = size;
-        data              = mem_allocate_n_zeroed_typed(size, PMC *);
+        PMC_size(SELF) = size;
+        data           = mem_allocate_n_zeroed_typed(size, PMC *);
 
         for (i = 0; i < size; i++)
             data[i] = PMCNULL;
 
-        PMC_data(SELF) = data;
+        PMC_array(SELF) = data;
     }
 
     VTABLE void set_pmc(PMC *value) {
@@ -389,16 +394,16 @@ array.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("Can't set self from this type"));
 
-        if (PMC_data(SELF))
-            mem_sys_free(PMC_data(SELF));
+        if (PMC_array(SELF))
+            mem_sys_free(PMC_array(SELF));
 
-        size           = PMC_int_val(SELF) = VTABLE_elements(INTERP, value);
-        PMC_data(SELF) = mem_allocate_n_zeroed_typed(size, PMC *);
+        size            = PMC_size(SELF) = VTABLE_elements(INTERP, value);
+        PMC_array(SELF) = mem_allocate_n_zeroed_typed(size, PMC *);
 
         for (i = 0; i < size; i++)
-            ((PMC**)PMC_data(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
+            (PMC_array(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
 
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 /*
 
@@ -538,11 +543,11 @@ Sets the PMC value of the element at index C<key> to C<*src>.
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) {
         PMC **data;
 
-        if (key < 0 || key >= PMC_int_val(SELF))
+        if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedPMCArray: index out of bounds!"));
 
-        data      = (PMC**)PMC_data(SELF);
+        data      = PMC_array(SELF);
         GC_WRITE_BARRIER(INTERP, SELF, data[key], src);
         data[key] = src;
     }
@@ -650,7 +655,7 @@ Return a new iterator for SELF.
         Parrot_PCCINVOKE(interp, iter, name, "P->", key);
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
 
-        if (PMC_int_val(SELF) == 0)
+        if (PMC_size(SELF) == 0)
             VTABLE_set_integer_native(INTERP, key, -1);
         else
             VTABLE_set_integer_native(INTERP, key, 0);
@@ -671,11 +676,11 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 */
     VTABLE INTVAL exists_keyed_int(INTVAL key) {
         PMC **data;
-        if (key < 0 || key >= PMC_int_val(SELF))
+        if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedPMCArray: index out of bounds!"));
 
-        data = (PMC**)PMC_data(SELF);
+        data = PMC_array(SELF);
         return !PMC_IS_NULL(data[key]);
     }
 
@@ -701,7 +706,7 @@ of this array.
 */
 
     void splice(PMC *value, INTVAL offset, INTVAL count) {
-        if (count + offset > PMC_int_val(SELF))
+        if (count + offset > PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 _("FixedPMCArray: index out of bounds!"));
 
@@ -734,7 +739,7 @@ Used to unarchive the array.
     VTABLE void visit(visit_info *info) {
         INTVAL  i;
         const INTVAL n = VTABLE_elements(INTERP, SELF);
-        PMC   **pos    = (PMC **)PMC_data(SELF);
+        PMC   **pos    = PMC_array(SELF);
 
         for (i = 0; i < n; ++i, ++pos) {
             info->thaw_ptr = pos;
@@ -787,13 +792,13 @@ Mark the array.
 */
 
     VTABLE void mark() {
-        PMC ** const data = PMC_data_typed(SELF, PMC **);
+        PMC ** const data = PMC_array(SELF);
         INTVAL i;
 
         if (!data)
             return;
 
-        for (i = PMC_int_val(SELF) - 1; i >= 0; --i)
+        for (i = PMC_size(SELF) - 1; i >= 0; --i)
             if (data[i])
                 pobject_lives(interp, (PObj *)data[i]);
     }
