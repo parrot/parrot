@@ -44,7 +44,7 @@ sub _init {
         jako json
         lisp lolcode
         ook
-        parrot_compiler pheme PIR pynie
+        parrot_compiler PIR pynie
         pod
         regex
         scheme squaak
@@ -64,12 +64,7 @@ sub runstep {
 
     foreach my $language ( split ' ', $languages ) {        # split ' ' splits on all whitespace
         my $langdir = "languages/$language";
-        if ( $language eq 'dotnet' ) {
-            # RT#47792
-            # languages/dotnet/Configure.pl works only after the root 'perl Configure.pl'.
-            # system( 'cd languages/dotnet; perl Configure.pl' );
-        }
-        elsif ( $language eq 'c99' ) {
+        if ( $language eq 'c99' ) {
             $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");
             $conf->genfile("$langdir/config/makefiles/cpp.in"      => "$langdir/src/cpp/Makefile");
         }
