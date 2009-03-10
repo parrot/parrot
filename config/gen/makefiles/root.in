@@ -1498,22 +1498,22 @@ check : test
 # 'testC', 'testg' and 'testj' are tested only
 # when the needed runcores are available
 fulltest :
-	-@make@ testb
-#IF(cg_flag):	-@make@ testC
-	-@make@ testf
-#IF(cg_flag):	-@make@ testg
-#IF(jitcapable):	-@make@ testj
-	-@make@ testr
-	-@make@ testS
-	-@make@ src_tests
-	-@make@ run_tests
-	-@make@ perl_tests
-	-@make@ codetest
-	-@make@ benchmark_tests
-	-@make@ doc_tests
-	-@make@ manifest_tests
-	-@make@ examples_tests
-	-@make@ distro_tests
+	-@make@ testb \
+#IF(cg_flag):	testC \
+	testf \
+#IF(cg_flag):	testg \
+#IF(jitcapable):	testj \
+	testr \
+	testS \
+	src_tests \
+	run_tests \
+	perl_tests \
+	codetest \
+	benchmark_tests \
+	doc_tests \
+	manifest_tests \
+	examples_tests \
+	distro_tests
 
 # bounds checking, slow core
 testb : test_prep
