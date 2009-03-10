@@ -335,18 +335,3 @@ mentioned in some of the early Parrot documents.
 F<packfile.c>, F<packfile.h>, F<packout.c>, F<packdump.c>, F<pf/*.c>, and the
 B<pbc_dump> utility F<pbc_dump.c>.
 
-=head1 AUTHOR
-
-Gregor N. Purdy C<gregor@focusresearch.com>
-
-Format 1 description by Leopold Toetsch C<lt@toetsch.at>
-
-Variable argument opcodes update by Jonathan Worthington C<jonathan@jwcs.net>
-
-New debug segment format by Jonathan Worthington C<jonathan@jwcs.net>
-
-PBC Header updates by Reini Urban C<rurban@x-ray.at>
-
-=head1 VERSION
-
-2009-01-29
