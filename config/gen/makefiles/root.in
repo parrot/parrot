@@ -1515,6 +1515,24 @@ fulltest :
 	examples_tests \
 	distro_tests
 
+fulltest_all :
+	-@make@ testb
+#IF(cg_flag):	-@make@ testC
+	-@make@ testf
+#IF(cg_flag):	-@make@ testg
+#IF(jitcapable):	-@make@ testj
+	-@make@ testr
+	-@make@ testS
+	-@make@ src_tests
+	-@make@ run_tests
+	-@make@ perl_tests
+	-@make@ codetest
+	-@make@ doc_tests
+	-@make@ manifest_tests
+	-@make@ examples_tests
+	-@make@ distro_tests
+	-@make@ benchmark_tests
+
 # bounds checking, slow core
 testb : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -b $(RUNCORE_TEST_FILES)
