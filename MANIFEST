@@ -516,7 +516,7 @@ docs/project/pause_guide.pod                                [devel]doc
 docs/project/release_manager_guide.pod                      [devel]doc
 docs/project/roles_responsibilities.pod                     [devel]doc
 docs/project/support_policy.pod                             [devel]doc
-docs/project/ticket_wrangler_guide.pod                      [devel]doc
+docs/project/ticket_triaging.pod                            [devel]doc
 docs/project/ubuntu_packaging_guide.pod                     [devel]doc
 docs/req/model_users.pod                                    []
 docs/resources/favicon.ico                                  []
