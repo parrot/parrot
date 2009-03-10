@@ -16,7 +16,7 @@ SVN           := svn
 # When adding or removing languages, please update the list
 LANGUAGES := \
     abc \
-    BASIC befunge bf \
+    BASIC bf \
     c99 cardinal chitchat cola \
     dotnet \
     ecmascript \
