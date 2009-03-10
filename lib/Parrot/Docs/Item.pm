@@ -164,7 +164,8 @@ sub write_html {
             if ($title) {
                 $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
                     $title );
-            } else {
+            }
+            else {
                 $index_html .= $formatter->html_link( $formatter->append_html_suffix($rel_path),
                     $source->relative_path( $file->path ) );
             }
