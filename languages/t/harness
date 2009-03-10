@@ -79,7 +79,7 @@ my @unified_testable_languages
           split( /\s*,\s*/, $languages_list )
           :
           qw( abc
-              befunge bf
+              bf
               cola
               dotnet
               jako

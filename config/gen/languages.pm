@@ -37,7 +37,7 @@ sub _init {
     $data{result} = q{};
     $data{default_languages} = qq{
         abc
-        befunge bf
+        bf
         cardinal chitchat cola c99
         ecmascript
         forth

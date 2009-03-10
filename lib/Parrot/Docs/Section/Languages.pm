@@ -42,7 +42,6 @@ sub new {
         $self->new_item( '', 'languages/t/harness' ),
         $self->new_section( 'abc',         'abc.html',        '', 'languages/abc' ),
         $self->new_section( 'BASIC',       'basic.html',      '', 'languages/BASIC' ),
-        $self->new_section( 'Befunge',     'befunge.html',    '', 'languages/befunge' ),
         $self->new_section( 'BF',          'bf.html',         '', 'languages/bf' ),
         $self->new_section( 'C99',         'c99.html',        '', 'languages/c99' ),
         $self->new_section( 'Cardinal',    'cardinal.html',   '', 'languages/cardinal' ),
