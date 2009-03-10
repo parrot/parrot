@@ -167,7 +167,7 @@ test-unified: all
 
 test-separate: all \
     abc.test \
-    befunge.test bf.test \
+    bf.test \
     c99.test cardinal.test chitchat.test cola.test \
     dotnet.test \
     ecmascript.test \
@@ -182,7 +182,7 @@ test-separate: all \
 
 clean: \
     abc.clean \
-    BASIC.clean befunge.clean bf.clean \
+    BASIC.clean bf.clean \
     c99.clean cardinal.clean chitchat.clean cola.clean \
     dotnet.clean \
     ecmascript.clean \
@@ -198,7 +198,7 @@ clean: \
 
 realclean: \
     abc.realclean \
-    befunge.realclean bf.realclean \
+    bf.realclean \
     c99.realclean cardinal.realclean chitchat.realclean cola.realclean \
     dotnet.realclean \
     ecmascript.realclean \
@@ -235,16 +235,6 @@ BASIC.test:
 # Don't know how to test BASIC
 BASIC.clean:
 # Don't know how to clean BASIC
-
-befunge : befunge.dummy
-befunge.dummy:
-	- $(MAKE) befunge
-befunge.test:
-	- $(MAKE) befunge test
-befunge.clean:
-	- $(MAKE) befunge clean
-befunge.realclean:
-	- $(MAKE) befunge realclean
 
 bf : bf.dummy
 bf.dummy:
