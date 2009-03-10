@@ -1,6 +1,6 @@
 # SQLite3 Database Backend for DBDI
 # $Id$
-# Copyright (C) 2008 Parrot Foundation
+# Copyright (C) 2008, Parrot Foundation.
 
 use v6;
 

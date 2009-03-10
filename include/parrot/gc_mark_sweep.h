@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2002-2008, Parrot Foundation
+ * Copyright (C) 2002-2008, Parrot Foundation.
  */
 
 #ifndef PARROT_GC_MARK_SWEEP_H_GUARD

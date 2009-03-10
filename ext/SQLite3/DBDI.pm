@@ -1,6 +1,6 @@
 # Basic Perl 6 database layer
 # $Id$
-# Copyright (C) 2008 Parrot Foundation
+# Copyright (C) 2008, Parrot Foundation.
 
 use v6;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2009, Parrot Foundation
+ * Copyright (C) 2001-2009, Parrot Foundation.
  */
 
 /* packfile.h

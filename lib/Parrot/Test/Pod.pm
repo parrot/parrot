@@ -1,4 +1,4 @@
-# Copyright (C) 2009, The Parrot Foundation.
+# Copyright (C) 2009, Parrot Foundation.
 # $Id$
 package Parrot::Test::Pod;
 use strict;

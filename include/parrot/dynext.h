@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2007, Parrot Foundation
+ * Copyright (C) 2003-2007, Parrot Foundation.
  */
 
 /* dynext.h
