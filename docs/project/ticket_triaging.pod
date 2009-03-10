@@ -1,42 +1,34 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =pod
 
 =head1 NAME
 
-docs/project/ticket_wrangler_guide.pod - Tips for Ticket Wranglers
+docs/project/ticket_triaging.pod - Managing Tickets
 
 =head1 ABSTRACT
 
-This document attempts to outline a set of "best practices" for dealing with
-tickets in Parrot's RT system.  It is targeted at Parrot developers and "Ticket
-Wranglers" and is I<not> intended as advice or instruction for end users.  Ticket
-filing procedures for end users are documented in F<docs/submissions.pod>.
+This document attempts to outline a set of best practices for dealing with
+tickets in Parrot's tracking system.  It is targeted at Parrot developers and
+Ticket Wranglers and is I<not> intended as advice or instruction for end users.
+Ticket filing procedures for end users are documented in
+F<docs/submissions.pod>.
 
 =head1 WHAT ABOUT TRAC?
 
 Our preferred method of bug tracking at this point is trac:
 L<https://trac.parrot.org/>
 
-We still have several hundred tickets at the old RT system (see below), but
-our goal is to close out those tickets and (if necessary), replace them
-with trac tickets.
+All Parrot developers are expected to pitch in and help keep the ticket tracker
+in a healthy state.  I<This means you!> Most of the document below still makes
+sense in terms of activities in trac, but the specifics are of course different
+with the new system.
 
-Most of the document below still makes sense in terms of activities in trac,
-but the specifics are of course different with the new system.
-
-=head1 WHAT IS A TICKET WRANGLER?
-
-A developer with sufficient permissions to modify the tickets in Parrot's RT
-system.  All Parrot developers are expected to pitch in and help keep the ticket
-tracker in a healthy state.  I<This means you!>
-
-=head1 WHERE IS IT?
-
-The Parrot ticket tracker is currently the same as the I<Perlbug> system used for
-Perl5 Development.  It is available at L<https://rt.perl.org>.
-The Parrot issues are in the queue I<parrot>.
+We still have several hundred tickets at the old RT system, but our goal is to
+close out those tickets and (if necessary), replace them with trac tickets.
+The old system is available at L<https://rt.perl.org>.  The Parrot issues are
+in the queue I<parrot>.
 
 =head1 TICKET HANDLING PROCEDURES
 
@@ -48,7 +40,7 @@ status of C<new>.
 =head3 Bug Triage
 
 Involves deciding whether the ticket is a real bug, a feature request, a
-duplicate or spam.
+duplicate, or spam.
 
 It is especially important that all C<new> bugs which are marked [TODO],
 [PATCH] or [CAGE] be checked that they really are bugs of the given class.
@@ -65,10 +57,9 @@ will no longer have permissions to view the ticket.
 
 =item Is this a duplication of an existing ticket?
 
-RT doesn't handle that case in a graceful manner. Set the relationship
-'dependent on' to the duplicate issue. Add a comment to the ticket along the
-lines of "Duplicate of Ticket #123" and change the Tag field to "duplicate".
-Also, change the status to "rejected".
+Under the Action section, chose the "resolve as" option and select "duplicate"
+from the dropdown.  Add a comment to the ticket along the lines of "Duplicate
+of Ticket #123".
 
 =item Is there enough information?
 
@@ -112,61 +103,135 @@ This way you will receive further correspondence about the ticket.
 
 =item make manitest
 
-=item add the patch author to CREDITS or update the author's entry
+=item add the patch author to F<CREDITS> or update the author's entry
 
-=item add correspondence to the ticket stating that the patch was applied
-and include the svn revision number in your response.
+=item add correspondence to the ticket stating that the patch was applied.
+Include the SVN revision number in your response.
 
 =item make sure that the ticket's 'Tag' includes 'Patch'
 
-=item set the ticket's 'Patch Status' to 'Applied'
+=item set the ticket's 'Patch status' to 'Applied'
 
-=item set the ticket's 'Status' to 'resolved'
+=item set the ticket's 'resolve as' to 'resolved'
 
 =back
 
 =head2 Old Tickets
 
-If the ticket is more then I<1 month> old then it's considered I<old>.
+If the ticket is more then I<1 month> old, then it's I<old>.
 
 =over 4
 
 =item Ping the requestor
 
-Give the requestor at least I<1 week> to respond.  If no response is received
-then add a comment to the ticket saying that it is stalled because of no
-response from the requestor. Change the status to C<stalled>.
+Give the requestor at least I<1 week> to respond.  If you receive no response,
+add a comment to the ticket saying that it is stalled because of no response
+from the requestor. Change the status to C<stalled>.
 
 If it's a [PATCH] ticket, it's possible that the patch was applied but the
 ticket/patch status was never changed.   Also, not all list traffic regarding a
-ticket ends up in RT.  It's best to look at the SVN repo to attempt to
-determine if the ticket was resolved.
+ticket ends up in the tracker.  Look at the SVN repo to attempt to determine if
+the ticket was resolved.
 
 =item Review of stalled tickets
 
-Sometimes tickets are marked C<stalled> because there's no hope if fixing them
-soon. Sometimes, no response is available from the requestor, or it can't be
-verified. Periodically, these tickets should be reviewed, and when possible,
-moved back to C<open> or C<closed>, as appropriate.
+Sometimes tickets are C<stalled> because there's no hope if fixing them soon.
+Sometimes, no response is available from the requestor, or no one can verify
+the report.  Review these tickets periodically.  When possible, change their
+status to C<open> or C<closed> as appropriate.
+
+=back
+
+=head3 Necessary Information
+
+As alluded to earlier, tickets are much easier to resolve when they include
+sufficient information.  For bugs, this is:
+
+=over 4
+
+=item Specific error messages.
+
+These can come from Parrot or the operating system.  Copied and pasted messages
+are best; the exact wording is often important.
+
+=item Platform details.
+
+These include operating system and version, compiler information, processor
+architecture, and versions of included libraries.  The file F<parrot_config.pasm> may be useful.
+
+=item Steps to reproduce.
+
+At what point did you see the failure?  Can you reproduce it?  Do you have a small PIR program which demonstrates the problem?
+
+=item Failure diagnostics.
+
+Verbose diagnostics from C<prove -v> -- including all error messages and diagnostics -- are often necessary to resolve test failures.
+
+=item Backtraces.
+
+Segfaults and other crashes within Parrot are much easier to resolve given a
+backtrace on a Parrot built with debugging symbols.
+
+=back
+
+=head3 Severity Guidelines
+
+Occasionally the severity of a problem may govern how volunteers direct their
+resources to resolving tickets.  Here are several criteria by which to
+determine the severity of a report.
+
+=over
+
+=item Is there an exploitable security problem?
+
+Can a malicious user destroy data, access sensitive information, or obtain
+undesired permissions to the rest of the system?  If so, this is a high
+priority ticket.
+
+=item Is there a crash from a pure-PIR program?
+
+Users should never be able to crash Parrot writing normal PIR code.  Such
+problems need high priority tickets.
+
+=item Does the defect prevent a successful configuration, build, or
+installation of Parrot?
+
+If Parrot cannot build, install, or run, the ticket has a high priority.
+
+=item Does the defect cause test failures on a core platform?
+
+All tests should pass on all core platforms in all releases of Parrot (as well
+as on trunk).  Test failures, with the appropriate diagnostic information, are
+moderate priority.
+
+=item Is the defect reproducable in the current development version?
+
+Reproducable defects have a normal priority.  Unreproducable tickets have a
+lower priority.
+
+=item Does the defect affect a core platform?
+
+Defects affecting non-core platforms have a lower priority (which reflects that
+we probably lack the expertise to deal with that platform).
 
 =back
 
 =head1 TIPS FOR CORRESPONDENCE
 
-=head2 Don't be a Butthead
+=head2 Be Nice
 
 Remember that every word you type into the ticket tracker is I<On The Record>.
 Try not to say anything that could offend or hurt the feelings of I<anyone>.
 That includes the ticket submitter and other developers.  When, as a Parrot
 developer with commit rights, you send correspondence you are representing the
-Parrot project and by proxy TPF.  If in doubt, either send the message
-privately or not at all.
+Parrot project and, by proxy, The Parrot Foundation.  If in doubt, either send
+the message privately or not at all.
 
 =head2 Say thank you!
 
 Try to add a little token of appreciation to every message you send in response
-to a ticket.  Ticket requestors are doing labor for free!  The least you can do is
-let them know that you appreciate their efforts.
+to a ticket.  Ticket requestors are doing labor for free!  The least you can do
+is let them know that you appreciate their efforts.
 
 Something like:
 
@@ -178,20 +243,20 @@ Something like:
 
     Thanks for X!
 
-Can work wonders.  If you can make someone feel good about themselves maybe
+... can work wonders.  If you can make someone feel good about themselves maybe
 they'll submit another ticket/patch/whatever or perhaps some day become a
 Parrot developer.
 
 =head2 Don't say "problem"
 
-Supposedly it's better customer relations to use I<issue(s)> instead of the
-I<problem(s)>.  Don't ask me why...
+Supposedly it's better customer relations to use I<issue(s)> instead of
+I<problem(s)>.
 
 =head2 Make it clear why the ticket status changed
 
-Always note why the ticket is having it's status changed.  Particularly if it
-is being closed or rejected.  Nothing will irritate people more then letting
-them think that their ticket was unimportant or ignored.
+Always note why you're changing a ticket's status, particularly if you're
+closing or rejecting it.  Nothing will irritate people more then letting them
+think that their ticket was unimportant or ignored.
 
 =head2 Example Correspondence
 
@@ -240,7 +305,7 @@ or
 or
 
     This doesn't appear to be an issue anymore.
-    Thanks for submitting
+    Thanks for submitting.
 
     -J
 
@@ -281,9 +346,9 @@ much easier.
 
 =item Commit file names
 
-You don't need to include the filename in the commit message as that's part
-of the commit itself. However, if your commit affects multiple directories,
-you may mention that, especially if it's part of a group of commits.
+You don't need to include the filename in the commit message as that's part of
+the commit itself. However, if your commit affects multiple directories, you
+may mention that, especially if it's part of a group of commits.
 
   [PDD07]: whitespace -- part 5
   ~ removed trailing spaces and tabs from t/exit/, t/dynpmc/, t/dynoplibs/
@@ -297,7 +362,8 @@ message, it can be useful to number the commit messages. For example:
   ~ added regex attribute to Keyphrase class
   ~ filled in some more SmartLinkServer attribute init code
   ~ expanded LinkTree class functionality
-  still TODO: merge smartlink and spec info, emit html, improve cmdline option code
+  still TODO: merge smartlink and spec info, emit html, improve cmdline
+  option code
 
 You may optionally include items that are still todo, as it helps make your
 intentions clear.
@@ -320,9 +386,5 @@ new ticket's url in our system when you close the original ticket.
 L<https://rt.cpan.org/Dist/Display.html?Queue=parrot>
 
 =back
-
-=head1 AUTHOR
-
-Joshua Hoblitt (JHOBLITT) C<jhoblitt@cpan.org>
 
 =cut
