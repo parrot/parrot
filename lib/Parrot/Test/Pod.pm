@@ -44,8 +44,14 @@ our %second_analysis_subs = (
                 # other testing purposes
                 if ($full_file =~ m{
                         t/tools/dev/searchops/samples\.pm
-                        |
-                        languages/pod/test\.pod
+                        | languages/pod/test\.pod
+                        | xconf/samples/yourfoobar
+                        | t/configure/testlib/verbosefoobar
+                        | t/configure/testlib/ddefectivefoobar
+                        | t/configure/testlib/adefectivefoobar
+                        | t/configure/testlib/cdefectivefoobar
+                        | t/configure/testlib/bdefectivefoobar
+                        | xconf/samples/testfoobar
                     }x
                 ) {
                     delete $files_needing_analysis->{ $file };
