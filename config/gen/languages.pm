@@ -38,7 +38,7 @@ sub _init {
     $data{default_languages} = qq{
         abc
         bf
-        cardinal chitchat cola c99
+        cardinal chitchat cola
         ecmascript
         forth
         jako json
@@ -64,14 +64,7 @@ sub runstep {
 
     foreach my $language ( split ' ', $languages ) {        # split ' ' splits on all whitespace
         my $langdir = "languages/$language";
-        if ( $language eq 'c99' ) {
-            $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");
-            $conf->genfile("$langdir/config/makefiles/cpp.in"      => "$langdir/src/cpp/Makefile");
-        }
-        else {
-            $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile"
-            );
-        }
+        $conf->genfile("$langdir/config/makefiles/root.in"     => "$langdir/Makefile");
     }
 
     return 1;
