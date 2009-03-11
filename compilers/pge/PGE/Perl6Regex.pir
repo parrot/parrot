@@ -1061,16 +1061,16 @@ Parse a goal.
     mob.'to'(pos)
     goal = regex(mob, 'tighter'=>'infix:')
     unless goal goto fail_goal
-    goal = goal['expr']
     pos = goal.'to'()
+    goal = goal['expr']
     ##  skip any leading whitespace before expression
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     ##  parse the goal, down to concatenation precedence
     mob.'to'(pos)
     expr = regex(mob, 'tighter'=>'infix:')
     unless expr goto fail_expr
-    expr = expr['expr']
     pos = expr.'to'()
+    expr = expr['expr']
     mob.'to'(pos)
     failsub = mob.'new'(mob, 'grammar'=>'PGE::Exp::Subrule')
     failsub.'to'(pos)
