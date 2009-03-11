@@ -29,15 +29,13 @@ my $need_testing_ref = $self->identify_files_for_POD_testing( {
 
 my $bad_files = join( "\n", sort @{ $need_testing_ref } );
 my $nbad_files = scalar @{ $need_testing_ref };
-TODO: {
-    local $TODO = "not quite done yet";
-    # only ok if everything passed
-    is(
-        $bad_files,
-        q{},
-        'No todo items found'
-    );
-}
+
+# only ok if everything passed
+is(
+    $bad_files,
+    q{},
+    'No todo items found'
+);
 
 diag("\nFound $nbad_files files with 'todo', 'fixme' or 'XXX' items.\n")
     if $nbad_files;
