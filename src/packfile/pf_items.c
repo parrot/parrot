@@ -1370,13 +1370,13 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
         size_t i;
         mem_sys_memcopy(charcursor, s->strstart, s->bufused);
         charcursor += s->bufused;
-        /* Pad up to sizeof(opcode_t) boundary. */
-        while ( (unsigned long) (charcursor - (char *) cursor) % sizeof(opcode_t)) {
+        /* Pad up to sizeof (opcode_t) boundary. */
+        while ((unsigned long) (charcursor - (char *) cursor) % sizeof (opcode_t)) {
             *charcursor++ = 0;
         }
     }
-    PARROT_ASSERT(((unsigned long) (charcursor - (char *) cursor) % sizeof(opcode_t)) == 0);
-    cursor += (charcursor - (char *) cursor) / sizeof(opcode_t);
+    PARROT_ASSERT(((unsigned long) (charcursor - (char *) cursor) % sizeof (opcode_t)) == 0);
+    cursor += (charcursor - (char *) cursor) / sizeof (opcode_t);
 
     return cursor;
 }
