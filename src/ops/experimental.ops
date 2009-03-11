@@ -191,7 +191,7 @@ op classname(out PMC, invar PMC) :object_base :deprecated {
 
 =over 4
 
-=item C<trap>
+=item B<trap>()
 
 Break into debugger. Implementation notes:
 
