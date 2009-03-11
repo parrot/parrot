@@ -7,12 +7,10 @@ config/gen/languages.pm - Build files for language implementations
 
 =head1 DESCRIPTION
 
-Config step for languages.  Builds C<languages/Makefile> and loops over
-list of languages.  Special support for C<languages/dotnet>.
+Config step for languages.  Loops over list of languages.
 
 A space separated list of languages can be passed in with the option
-'languages'.  An empty list of languages is OK. This means that only
-C<languages/Makefile> will be regenerated.
+'languages'.  An empty list of languages is OK.
 
 =head1 TODO
 
@@ -47,14 +45,11 @@ sub _init {
         scheme
         urm
     };
-    $data{languages_source} = q{config/gen/makefiles/languages.in};
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
-
-    $conf->genfile( $self->{languages_source} => 'languages/Makefile' );
 
     my $languages = $conf->options->get('languages');
     $languages = $self->{default_languages} unless defined $languages;
