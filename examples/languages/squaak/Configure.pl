@@ -13,7 +13,7 @@ sub create_makefiles {
 #        'config/makefiles/pmc.in'  => 'src/pmc/Makefile',
 #        'config/makefiles/ops.in'  => 'src/ops/Makefile',
     );
-    my $build_tool = '../../tools/dev/gen_makefile.pl';
+    my $build_tool = '../../../tools/dev/gen_makefile.pl';
 
     foreach my $template (keys %makefiles) {
         my $makefile = $makefiles{$template};
