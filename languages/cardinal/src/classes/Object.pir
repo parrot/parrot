@@ -288,7 +288,6 @@ Get a list of all methods in the object.
 
 =cut
 
-.include 'library/dumper.pir'
 .sub 'methods' :method
     $P0 = class self
     $P1 = $P0.'methods'()
