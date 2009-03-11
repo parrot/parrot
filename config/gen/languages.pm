@@ -44,7 +44,7 @@ sub _init {
         ook
         parrot_compiler pynie
         regex
-        scheme squaak
+        scheme
         urm
     };
     $data{languages_source} = q{config/gen/makefiles/languages.in};
