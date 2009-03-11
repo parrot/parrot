@@ -155,7 +155,7 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 
     if (PMC_IS_NULL(new_filehandle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Unable to open filehandle");
+            "Unable to open filehandle from file descriptor");
 
     if (Parrot_io_get_flags(interp, new_filehandle) & PIO_F_CONSOLE)
         Parrot_io_setlinebuf(interp, new_filehandle);

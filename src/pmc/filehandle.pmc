@@ -229,7 +229,8 @@ filehandle, rather than modifying the invocant).
 
         if (PMC_IS_NULL(filehandle))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Unable to open filehandle");
+                "Unable to open filehandle from path '%S'",
+                open_filename);
 
         Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
 
