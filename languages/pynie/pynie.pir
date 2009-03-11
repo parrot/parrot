@@ -33,11 +33,7 @@ object.
 .include 'src/gen_grammar.pir'
 .include 'src/gen_actions.pir'
 .include 'src/parser/indent.pir'
-
-.include 'src/builtins/funcs.pir'
-.include 'src/builtins/io.pir'
-.include 'src/builtins/lists.pir'
-.include 'src/builtins/oper.pir'
+.include 'src/gen_builtins.pir'
 
 
 .sub '__onload' :load :init
