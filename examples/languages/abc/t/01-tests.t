@@ -63,7 +63,7 @@ $ prove languages/abc/t/01-tests.t
 =cut
 
 # abc build directory
-my $abcdir = "$PConfig{'build_dir'}/languages/abc";
+my $abcdir = "$PConfig{'build_dir'}/examples/languages/abc";
 
 # files to load tests from
 my @files = qw(
