@@ -45,7 +45,6 @@ sub _init {
         lisp lolcode
         ook
         parrot_compiler PIR pynie
-        pod
         regex
         scheme squaak
         urm
