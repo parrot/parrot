@@ -509,15 +509,16 @@ sub get_perl_exemption_regexp {
 
     my $parrot_dir = $self->path();
     my @paths = map { File::Spec->catdir( $parrot_dir, File::Spec->canonpath($_) ) } qw{
-        languages/dotnet/config/N2PConfig_pm.in
-        languages/regex/lib/Regex/Grammar.pm
         compilers/nqp/
         compilers/ncigen/src/parser/actions.pm
+        examples/sdl/
+        examples/languages/abc/src/parser/actions.pm
+        examples/languages/squaak/src/parser/actions.pm
+        languages/regex/lib/Regex/Grammar.pm
         lib/Digest/Perl/
         lib/File/
         lib/IO/
         lib/Pod/
-        examples/sdl/
     };
 
     my $regex = join '|', map { quotemeta $_ } @paths;
