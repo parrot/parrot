@@ -10,15 +10,15 @@ use Parrot::Distribution;
 
 =head1 NAME
 
-t/codingstd/fixme.t - checks for "FIXME" and similar notes in C source and headers
+t/codingstd/c_todo.t - checks for "FIXME" and similar notes in C source and headers
 
 =head1 SYNOPSIS
 
     # test all files
-    % prove t/codingstd/fixme.t
+    % prove t/codingstd/c_todo.t
 
     # test specific files
-    % perl t/codingstd/fixme.t src/foo.c include/parrot/bar.h
+    % perl t/codingstd/c_todo.t src/foo.c include/parrot/bar.h
 
 =head1 DESCRIPTION
 
