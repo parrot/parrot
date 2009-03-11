@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 # gen_languages-01.t
 
 use strict;
 use warnings;
-use Test::More tests =>  7;
+use Test::More tests =>  6;
 use Carp;
 use lib qw( lib );
 use_ok('config::gen::languages');
@@ -31,8 +31,6 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 ok($step->{default_languages}, "default languages string is present");
-ok(-f $step->{languages_source},
-    "source file for languages/Makefile located");
 
 pass("Completed all tests in $0");
 
