@@ -80,9 +80,9 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
     "  svn log C<filename> | grep 'lines' | head -n 1"
     );
 
-SKIP:
+TODO:
 {
-    skip( "Waiting for full transition to Parrot Foundation", 1 );
+    local $TODO = "Waiting for full transition to Parrot Foundation";
     ok( !scalar(@bad_format_copyright_files), 'Copyright statement in the right format' )
         or diag(
         join
