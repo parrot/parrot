@@ -41,7 +41,7 @@ sub _init {
         cardinal chitchat cola
         ecmascript
         forth
-        jako json
+        jako
         lisp lolcode
         ook
         parrot_compiler PIR pynie
