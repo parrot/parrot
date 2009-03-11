@@ -65,7 +65,13 @@ help:
 	@echo ""
 	@echo "  co-all:        Try to fetch externally managed languages"
 	@echo ""
+	@echo "  co-dotnet:     Try to fetch dotnet"
+	@echo ""
+	@echo "  co-c99:        Try to fetch C99"
+	@echo ""
 	@echo "  co-eclectus:   Try to fetch eclectus"
+	@echo ""
+	@echo "  co-ecmascript: Try to fetch EcmaScript"
 	@echo ""
 	@echo "  co-fun:        Try to fetch fun"
 	@echo ""
@@ -73,9 +79,13 @@ help:
 	@echo ""
 	@echo "  co-hq9plus:    Try to fetch HQ9+"
 	@echo ""
+	@echo "  co-json:       Try to fetch Json"
+	@echo ""
 	@echo "  co-kea-cl:     Try to fetch kea-cl"
 	@echo ""
 	@echo "  co-lazy-k:     Try to fetch lazy-k"
+	@echo ""
+	@echo "  co-lolcode:    Try to fetch LOLCODE"
 	@echo ""
 	@echo "  co-lua:        Try to fetch lua"
 	@echo ""
@@ -89,9 +99,15 @@ help:
 	@echo ""
 	@echo "  co-perk:       Try to fetch Perk"
 	@echo ""
+	@echo "  co-pheme:      Try to fetch Pheme"
+	@echo ""
 	@echo "  co-pipp:       Try to fetch Pipp"
 	@echo ""
+	@echo "  co-pir:        Try to fetch PIR"
+	@echo ""
 	@echo "  co-pjs:        Try to fetch PJS"
+	@echo ""
+	@echo "  co-pod:        Try to fetch POD"
 	@echo ""
 	@echo "  co-primitivearc: Try to fetch primitivearc"
 	@echo ""
@@ -110,7 +126,13 @@ help:
 	@echo "NOTE: These make targets assume that you have run the corresponding co target."
 	@echo "  up-all:        Try to update externally managed languages"
 	@echo ""
+	@echo "  up-dotnet:     Try to update dotnet"
+	@echo ""
+	@echo "  up-c99:        Try to update C99"
+	@echo ""
 	@echo "  up-eclectus:   Try to update eclectus"
+	@echo ""
+	@echo "  up-ecmascript: Try to update EcmaScript"
 	@echo ""
 	@echo "  up-fun:        Try to update fun"
 	@echo ""
@@ -118,9 +140,13 @@ help:
 	@echo ""
 	@echo "  up-hq9plus:    Try to update HQ9+"
 	@echo ""
+	@echo "  up-json:       Try to update Json"
+	@echo ""
 	@echo "  up-kea-cl:     Try to update kea-cl"
 	@echo ""
 	@echo "  up-lazy-k:     Try to update lazy-k"
+	@echo ""
+	@echo "  up-lolcode:    Try to update LOLCODE"
 	@echo ""
 	@echo "  up-lua:        Try to update lua"
 	@echo ""
@@ -134,9 +160,15 @@ help:
 	@echo ""
 	@echo "  up-perk:       Try to update Perk"
 	@echo ""
+	@echo "  up-pheme:      Try to update Pheme"
+	@echo ""
 	@echo "  up-pipp:       Try to update Pipp"
 	@echo ""
+	@echo "  up-pir:        Try to update PIR"
+	@echo ""
 	@echo "  up-pjs:        Try to update PJS"
+	@echo ""
+	@echo "  up-pod:        Try to update POD"
 	@echo ""
 	@echo "  up-primitivearc: Try to update primitivearc"
 	@echo ""
@@ -347,20 +379,28 @@ urm.realclean:
 
 # check out all known externally managed languages
 co-all: \
+    co-dotnet \
+    co-c99 \
     co-eclectus \
+    co-ecmascript \
     co-fun \
     co-gil \
     co-hq9plus \
+    co-json \
     co-kea-cl \
     co-lazy-k \
+    co-lolcode \
     co-lua \
     co-m4 \
     co-matrixy \
     co-markdown \
     co-paraplegic \
     co-perk \
+    co-pheme \
     co-pipp \
+    co-pir \
     co-pjs \
+    co-pod \
     co-primitivearc \
     co-punie \
     co-rakudo \
@@ -370,20 +410,28 @@ co-all: \
     co-wmlscript
 
 up-all: \
+    up-dotnet \
+    up-c99 \
     up-eclectus \
+    up-ecmascript \
     up-fun \
     up-gil \
     up-hq9plus \
+    up-json \
     up-kea-cl \
     up-lazy-k \
+    up-lolcode \
     up-lua \
     up-m4 \
     up-matrixy \
     up-markdown \
     up-paraplegic \
     up-perk \
+    up-pheme \
     up-pipp \
+    up-pir \
     up-pjs \
+    up-pod \
     up-primitivearc \
     up-punie \
     up-rakudo \
@@ -392,11 +440,29 @@ up-all: \
     up-unlambda \
     up-wmlscript
 
+co-dotnet:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//dotnet//trunk' dotnet
+
+up-dotnet:
+	cd dotnet && $(SVN) up
+
+co-c99:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//c99//trunk' c99
+
+up-c99:
+	cd c99 && $(SVN) up
+
 co-eclectus:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//eclectus.git'
 
 up-eclectus:
 	cd eclectus &&  $(GIT) pull
+
+co-ecmascript:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//ecmascript//trunk' ecmascript
+
+up-ecmascript:
+	cd ecmascript && $(SVN) up
 
 co-fun:
 	- $(GIT) clone 'git:////github.com//TiMBuS//fun.git'
@@ -416,6 +482,12 @@ co-hq9plus:
 up-hq9plus:
 	cd hq9plus && $(GIT) pull
 
+co-json:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//json//trunk' json
+
+up-json:
+	cd json && $(SVN) up
+
 co-kea-cl:
 	- $(SVN) checkout 'https:////rgrjr.dyndns.org//svn//kea-cl//trunk' kea-cl
 
@@ -427,6 +499,12 @@ co-lazy-k:
 
 up-lazy-k:
 	cd lazy-k && $(GIT) pull
+
+co-lolcode:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//lolcode//trunk' lolcode
+
+up-lolcode:
+	cd lolcode && $(SVN) up
 
 co-lua:
 	- $(GIT) clone 'git:////github.com//fperrad//lua.git'
@@ -464,17 +542,35 @@ co-perk:
 up-perk:
 	cd perk && $(GIT) pull
 
+co-pheme:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//pheme//trunk' pheme
+
+up-pheme:
+	cd pheme && $(SVN) up
+
 co-pipp:
 	- $(GIT) clone 'git:////github.com//bschmalhofer//pipp.git'
 
 up-pipp:
 	cd pipp && $(GIT) pull
 
+co-pir:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//pir//trunk' pir
+
+up-pir:
+	cd pir && $(SVN) up
+
 co-pjs:
 	- $(SVN) checkout 'http:////parrotjs.googlecode.com//svn//trunk' pjs
 
 up-pjs:
 	cd pjs && $(SVN) up
+
+co-pod:
+	- $(SVN) checkout 'https:////svn.parrot.org//languages//pod//trunk' pod
+
+up-pod:
+	cd pod && $(SVN) up
 
 co-primitivearc:
 	- $(GIT) clone 'git:////github.com//stefano//primitivearc.git'
