@@ -9,11 +9,11 @@ use Test::More tests => 1;
 
 =head1 NAME
 
-t/perl/opcode-doc.t - check opcode documentation
+t/perl/opcode_doc.t - check opcode documentation
 
 =head1 SYNOPSIS
 
-    % prove t/perl/opcode-doc.t
+    % prove t/perl/opcode_doc.t
 
 =head1 DESCRIPTION
 
