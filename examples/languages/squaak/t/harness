@@ -4,5 +4,5 @@
 
 use FindBin;
 use lib qw( . lib ../lib ../../../lib );
-use Parrot::Test::Harness language => 'Squaak', compiler => 'squaak.pbc';
-
+use Parrot::Test::Harness language => 'Squaak',
+                          exec => ['../../../parrot', 'squaak.pbc'];
