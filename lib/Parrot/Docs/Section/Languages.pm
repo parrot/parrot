@@ -46,7 +46,6 @@ sub new {
         $self->new_section( 'C99',         'c99.html',        '', 'languages/c99' ),
         $self->new_section( 'Cardinal',    'cardinal.html',   '', 'languages/cardinal' ),
         $self->new_section( 'ChitChat',    'chitchat.html',   '', 'languages/chitchat' ),
-        $self->new_section( 'Cola',        'cola.html',       '', 'languages/cola' ),
         $self->new_section( 'Common Lisp', 'lisp.html',       '', 'languages/lisp' ),
         $self->new_section( '.Net',        'dotnet.html',     '', 'languages/dotnet' ),
         $self->new_section( 'ecmascript',  'ecmascript.html', '', 'languages/ecmascript' ),

@@ -35,7 +35,7 @@ sub _init {
     $data{result} = q{};
     $data{default_languages} = qq{
         bf
-        cardinal chitchat cola
+        cardinal chitchat
         forth
         jako
         lisp

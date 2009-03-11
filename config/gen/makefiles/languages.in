@@ -16,7 +16,7 @@ SVN           := svn
 # When adding or removing languages, please update the list
 LANGUAGES := \
     BASIC bf \
-    cardinal chitchat cola \
+    cardinal chitchat \
     forth \
     jako \
     lisp \
@@ -196,7 +196,7 @@ test-unified: all
 
 test-separate: all \
     bf.test \
-    cardinal.test chitchat.test cola.test \
+    cardinal.test chitchat.test \
     forth.test \
     jako.test \
     lisp.test \
@@ -208,7 +208,7 @@ test-separate: all \
 
 clean: \
     BASIC.clean bf.clean \
-    cardinal.clean chitchat.clean cola.clean \
+    cardinal.clean chitchat.clean \
     forth.clean \
     jako.clean \
     lisp.clean \
@@ -220,7 +220,7 @@ clean: \
 
 realclean: \
     bf.realclean \
-    cardinal.realclean chitchat.realclean cola.realclean \
+    cardinal.realclean chitchat.realclean \
     forth.realclean \
     jako.realclean \
     lisp.realclean \
@@ -274,16 +274,6 @@ chitchat.clean:
 	- $(MAKE) chitchat clean
 chitchat.realclean:
 	- $(MAKE) chitchat realclean
-
-cola : cola.dummy
-cola.dummy:
-	- $(MAKE) cola
-cola.test:
-	- $(MAKE) cola test
-cola.clean:
-	- $(MAKE) cola clean
-cola.realclean:
-	- $(MAKE) cola realclean
 
 forth : forth.dummy
 forth.dummy:

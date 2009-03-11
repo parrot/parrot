@@ -58,7 +58,6 @@ my %type_for_suffix = (
     'bf'           => 'BF code',
     'bnf'          => 'Grammar file',
     'c'            => 'C code',
-    'cola'         => 'Cola code',
     'cs'           => 'C# code',
     'declarations' => 'Library declarations file',
     'def'          => 'Library definitions file',

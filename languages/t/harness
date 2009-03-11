@@ -80,7 +80,6 @@ my @unified_testable_languages
           :
           qw( abc
               bf
-              cola
               dotnet
               jako
               lisp
