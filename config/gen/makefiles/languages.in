@@ -15,18 +15,15 @@ SVN           := svn
 # List of languages that are currently managed in the Parrot svn repository
 # When adding or removing languages, please update the list
 LANGUAGES := \
-    abc \
     BASIC bf \
-    c99 cardinal chitchat cola \
-    dotnet \
-    ecmascript \
+    cardinal chitchat cola \
     forth \
-    jako json \
-    lisp lolcode \
+    jako \
+    lisp \
     ook \
-    parrot_compiler pheme PIR pod pynie \
+    parrot_compiler pynie \
     regex \
-    scheme squaak \
+    scheme \
     urm
 
 # the default target
@@ -158,7 +155,7 @@ help:
 
 # regenerate the Makefile
 Makefile: ../config/gen/makefiles/languages.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=""
+	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::makefiles --target=languages/Makefile
 
 test:   test-unified
 
@@ -166,49 +163,39 @@ test-unified: all
 	$(PERL) t/harness
 
 test-separate: all \
-    abc.test \
     bf.test \
-    c99.test cardinal.test chitchat.test cola.test \
-    dotnet.test \
-    ecmascript.test \
+    cardinal.test chitchat.test cola.test \
     forth.test \
-    jako.test json.test \
-    lisp.test lolcode.test \
+    jako.test \
+    lisp.test \
     ook.test \
-    parrot_compiler.test pheme.test PIR.test pod.test pynie.test \
+    parrot_compiler.test pynie.test \
     regex.test \
-    scheme.test squaak.test \
+    scheme.test \
     urm.test
 
 clean: \
-    abc.clean \
     BASIC.clean bf.clean \
-    c99.clean cardinal.clean chitchat.clean cola.clean \
-    dotnet.clean \
-    ecmascript.clean \
+    cardinal.clean chitchat.clean cola.clean \
     forth.clean \
-    jako.clean json.clean \
+    jako.clean \
     lisp.clean \
-    lolcode.clean \
     ook.clean \
-    parrot_compiler.clean pheme.clean PIR.clean pod.clean pynie.clean \
+    parrot_compiler.clean pynie.clean \
     regex.clean \
-    scheme.clean squaak.clean \
+    scheme.clean \
     urm.clean
 
 realclean: \
-    abc.realclean \
     bf.realclean \
-    c99.realclean cardinal.realclean chitchat.realclean cola.realclean \
-    dotnet.realclean \
-    ecmascript.realclean \
+    cardinal.realclean chitchat.realclean cola.realclean \
     forth.realclean \
-    jako.realclean json.realclean \
-    lisp.realclean lolcode.realclean \
+    jako.realclean \
+    lisp.realclean \
     ook.realclean \
-    parrot_compiler.realclean pheme.realclean PIR.realclean pod.realclean pynie.realclean \
+    parrot_compiler.realclean pynie.realclean \
     regex.realclean \
-    scheme.realclean squaak.realclean \
+    scheme.realclean \
     urm.realclean
 
 
@@ -217,16 +204,6 @@ realclean: \
 #
 
 # The *.dummy targets are a replacement for the target .PHONY in 'GNU make'
-
-abc : abc.dummy
-abc.dummy:
-	- $(MAKE) abc
-abc.test:
-	- $(MAKE) abc test
-abc.clean:
-	- $(MAKE) abc clean
-abc.realclean:
-	- $(MAKE) abc realclean
 
 BASIC : BASIC.dummy
 BASIC.dummy:
@@ -245,16 +222,6 @@ bf.clean:
 	- $(MAKE) bf clean
 bf.realclean:
 	- $(MAKE) bf realclean
-
-c99 : c99.dummy
-c99.dummy:
-	- $(MAKE) c99
-c99.test:
-	- $(MAKE) c99 test
-c99.clean:
-	- $(MAKE) c99 clean
-c99.realclean:
-	- $(MAKE) c99 realclean
 
 cardinal : cardinal.dummy
 cardinal.dummy:
@@ -286,27 +253,6 @@ cola.clean:
 cola.realclean:
 	- $(MAKE) cola realclean
 
-dotnet : dotnet.dummy
-dotnet.dummy:
-	cd dotnet && $(PERL) Configure.pl
-	- $(MAKE) dotnet
-dotnet.test:
-	- $(MAKE) dotnet test
-dotnet.clean:
-	- $(MAKE) dotnet clean
-dotnet.realclean:
-	- $(MAKE) dotnet realclean
-
-ecmascript : ecmascript.dummy
-ecmascript.dummy:
-	- $(MAKE) ecmascript
-ecmascript.test:
-	- $(MAKE) ecmascript test
-ecmascript.clean:
-	- $(MAKE) ecmascript clean
-ecmascript.realclean:
-	- $(MAKE) ecmascript realclean
-
 forth : forth.dummy
 forth.dummy:
 	- $(MAKE) forth
@@ -327,16 +273,6 @@ jako.clean:
 jako.realclean:
 	- $(MAKE) jako realclean
 
-json: json.dummy
-json.dummy:
-	- $(MAKE) json
-json.test:
-	- $(MAKE) json test
-json.clean:
-	- $(MAKE) json clean
-json.realclean:
-	- $(MAKE) json realclean
-
 lisp: lisp.dummy
 lisp.dummy:
 	- $(MAKE) lisp
@@ -346,16 +282,6 @@ lisp.clean:
 	- $(MAKE) lisp clean
 lisp.realclean:
 	- $(MAKE) lisp realclean
-
-lolcode: lolcode.dummy
-lolcode.dummy:
-	- $(MAKE) lolcode
-lolcode.test:
-	- $(MAKE) lolcode test
-lolcode.clean:
-	- $(MAKE) lolcode clean
-lolcode.realclean:
-	- $(MAKE) lolcode realclean
 
 ook : ook.dummy
 ook.dummy:
@@ -376,36 +302,6 @@ parrot_compiler.clean:
 	- $(MAKE) parrot_compiler clean
 parrot_compiler.realclean:
 	- $(MAKE) parrot_compiler realclean
-
-pheme : pheme.dummy
-pheme.dummy:
-	- $(MAKE) pheme
-pheme.test:
-	- $(MAKE) pheme test
-pheme.clean:
-	- $(MAKE) pheme clean
-pheme.realclean:
-	- $(MAKE) pheme realclean
-
-PIR: PIR.dummy
-PIR.dummy:
-	- $(MAKE) PIR
-PIR.test:
-	- $(MAKE) PIR test
-PIR.clean:
-	- $(MAKE) PIR clean
-PIR.realclean:
-	- $(MAKE) PIR realclean
-
-pod: pod.dummy
-pod.dummy:
-	- $(MAKE) pod
-pod.test:
-	- $(MAKE) pod test
-pod.clean:
-	- $(MAKE) pod clean
-pod.realclean:
-	- $(MAKE) pod realclean
 
 pynie : pynie.dummy
 pynie.dummy:
@@ -436,16 +332,6 @@ scheme.clean :
 	- $(MAKE) scheme clean
 scheme.realclean :
 	- $(MAKE) scheme realclean
-
-squaak: squaak.dummy
-squaak.dummy:
-	- $(MAKE) squaak
-squaak.test:
-	- $(MAKE) squaak test
-squaak.clean:
-	- $(MAKE) squaak clean
-squaak.realclean:
-	- $(MAKE) squaak realclean
 
 urm: urm.dummy
 urm.dummy:
