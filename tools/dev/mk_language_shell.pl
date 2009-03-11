@@ -588,7 +588,7 @@ help:
 	@echo ""
 
 test: build
-	$(PERL) -I$(LIB_DIR)/tools/lib t/harness
+	$(PERL) -I$(LIB_DIR)/tools/lib t/harness --bindir=$(BIN_DIR)
 
 # basic run for missing libs
 test-installable: installable
@@ -1165,10 +1165,29 @@ __t/harness__
 # pragmata
 use strict;
 use warnings;
+use Getopt::Long;
 use 5.008;
 
-use Parrot::Test::Harness language => '@lang@',
-                          compiler => '@lclang@.pbc';
+our %harness_args = (
+    language  => '@lang@',
+    verbosity => 0,
+);
+
+GetOptions(
+        'verbosity=i'       => \$harness_args{verbosity},
+        'bindir=s'          => \my $bindir,
+        # A sensible default is num_cores + 1.
+        # Many people have two cores these days.
+        'jobs:3'            => \$harness_args{jobs},
+);
+
+if ($bindir) {
+    $harness_args{exec} = [$bindir.'/parrot', '@lclang@.pbc'];
+} else {
+    $harness_args{compiler} = '@lclang@.pbc';
+}
+
+eval 'use Parrot::Test::Harness %harness_args';
 
 __t/00-sanity.t__
 # This just checks that the basic parsing and call to builtin say() works.
