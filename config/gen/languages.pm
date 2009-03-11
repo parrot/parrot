@@ -39,7 +39,6 @@ sub _init {
         abc
         bf
         cardinal chitchat cola
-        ecmascript
         forth
         jako
         lisp lolcode
