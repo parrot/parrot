@@ -83,7 +83,7 @@ sub check_op_doc {
     analyse( $filename, \%op );
 }
 
-foreach my $file (<ops/*.ops>) {
+foreach my $file (<src/ops/*.ops>) {
     check_op_doc $file;
 }
 
