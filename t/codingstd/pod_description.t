@@ -47,14 +47,11 @@ foreach my $file ( @{ $need_testing_ref } ) {
 my $empty_description_files = join( "\n", sort @empty_description);
 my $nempty_description      = scalar( @empty_description );
 
-TODO: {
-    local $TODO = "not quite done yet";
-    is(
-        $empty_description_files,
-        q{},
-        'All Pod files have non-empty DESCRIPTION sections'
-    );
-}
+is(
+    $empty_description_files,
+    q{},
+    'All Pod files have non-empty DESCRIPTION sections'
+);
 
 diag("\nFound $nempty_description files without DESCRIPTION sections.\n")
     if $nempty_description;
