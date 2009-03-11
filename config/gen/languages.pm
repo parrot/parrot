@@ -44,7 +44,7 @@ sub _init {
         jako
         lisp lolcode
         ook
-        parrot_compiler PIR pynie
+        parrot_compiler pynie
         regex
         scheme squaak
         urm
