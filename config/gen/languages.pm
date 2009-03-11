@@ -41,7 +41,7 @@ sub _init {
         cardinal chitchat cola
         forth
         jako
-        lisp lolcode
+        lisp
         ook
         parrot_compiler pynie
         regex
