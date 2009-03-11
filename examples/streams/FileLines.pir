@@ -8,8 +8,8 @@ one stream and then dumped.
 
 =head1 NOTE
 
-When updating this file, be sure to verify L<t/example/streams.t>, as its
-tests rely on the content of this file
+When updating this file, be sure to verify L<t/examples/streams.t>, as its
+tests rely on the content of this file.
 
 =head1 FUNCTIONS
 
