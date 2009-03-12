@@ -37,7 +37,7 @@ The NCI interface is contained in libpcre.pir.
 
 =item sub init()
 
-Intialize the pcre library. The library handle is returned as a PMC
+Initialize the pcre library. The library handle is returned as a PMC
 and is additionally stored as global 'PCRE', 'lib'.
 
 =cut

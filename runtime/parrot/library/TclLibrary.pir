@@ -243,7 +243,7 @@ standard_names_e:
 #SvFromTclObj(pTHX_ Tcl_Obj *objPtr)
 =item pmc _pmc_from_tclobj(pmc interp, pmc tclobj)
 
-This is a (static) funciton that will convert Tcl object to pmc
+This is a (static) function that will convert Tcl object to pmc
 
 =cut
 

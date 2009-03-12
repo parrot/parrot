@@ -131,7 +131,7 @@ NOMATCH:
 .end
 
 =for todo
-    # or use convinience function
+    # or use convenience function
     print "copy_substring\n"
     i = 0
     repeat match, " ", 500

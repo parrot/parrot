@@ -224,7 +224,7 @@ representing a color, fills a portion of this surface with the given color.
 =item update_rect( rect )
 
 If this is a single-buffered surface (unless you've explicitly requested double
-buffering when intializing your SDL::App), updates the portion of this surface
+buffering when initializing your SDL::App), updates the portion of this surface
 represented by the SDL::Rect.
 
 Do this on the main surface to see your changes.

@@ -459,7 +459,7 @@ yes:
 .end
 
 
-# reguest handler sub - not a method
+# request handler sub - not a method
 # this is called from the async select code, i.e from the event
 # subsystem
 .sub req_handler
@@ -640,7 +640,7 @@ TODO doc CGI urls.
 
 =item check_cgi(url)
 
-Check if a request url is a CGI request. If yes, return the reulst of the
+Check if a request url is a CGI request. If yes, return the result of the
 CGI invocation.
 
 =cut
@@ -1075,7 +1075,7 @@ create header response items.
     goto fin
 no_200:
     if ccc != '301' goto no_301
-    line .= ' Moved Permamently'
+    line .= ' Moved Permanently'
     goto fin
 no_301:
     if ccc != '404' goto no_404

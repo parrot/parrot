@@ -95,7 +95,7 @@ order.
 
 =item _load_opengl_libs()
 
-Opens all relevent OpenGL system libraries.  For portability, tries each of
+Opens all relevant OpenGL system libraries.  For portability, tries each of
 the known different filenames for each library in turn before giving up.
 
 =cut

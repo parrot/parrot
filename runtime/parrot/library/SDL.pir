@@ -40,7 +40,7 @@ When you load this file with C<load_bytecode>, it initializes the C<SDL_video>
 subsystem.  You'll have to use the appropriate IMC modules or initialize the
 other subsystems manually.
 
-The subsystem initalizers include:
+The subsystem initializers include:
 
 =over 4
 

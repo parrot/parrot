@@ -95,7 +95,7 @@ Our nice little module.
 
 =item C<init()>
 
-Creates the Specs and notOptStop attribute, interal stuff.
+Creates the Specs and notOptStop attribute, internal stuff.
 
 =cut
 
@@ -565,7 +565,7 @@ When a required argument is missing, throws an exception with the message
 
 =head2 Class Getopt::Obj::Spec
 
-Interal use only, at least don't do any new "Getopt::Obj::Spec" yourself...
+Internal use only, at least don't do any new "Getopt::Obj::Spec" yourself...
 This makes an easy holder for each possible match.
 
 =over 4
@@ -809,7 +809,7 @@ How to handle an unknown arg, currently kept in argv.
 
 =item *
 
-Should a lonesome hyphen be a permited value as not an option.  Currently kept
+Should a lonesome hyphen be a permitted value as not an option.  Currently kept
 in argv in case the program wants it, such as indicating stdin or stdout.
 
 =item *

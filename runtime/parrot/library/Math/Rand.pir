@@ -10,7 +10,7 @@ Math/rand.pir - the ANSI C rand pseudorandom number generator
 The C<rand> function computes a sequence of pseudo-random integers in the
 range 0 to C<RAND_MAX>.
 
-The C<srand> function uses the argment as a seed for a new sequence of
+The C<srand> function uses the argument as a seed for a new sequence of
 pseudo-random numbers to be returned by subsequent calls to C<rand>.
 If C<srand> is then called with the same seed value, the sequence of
 pseudo-random numbers shall be repeated. If C<rand> is called before any calls

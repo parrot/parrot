@@ -25,7 +25,7 @@ TCPStream
 =head1 DESCRIPTION
 
 This is a high-level sockets library designed to mimic Tcl's socket builtins. As
-such, it uses C<print> and C<say> instaed of C<send> and C<readline> and
+such, it uses C<print> and C<say> instead of C<send> and C<readline> and
 C<slurp> instead of C<recv>.
 
 =head1 VTABLE FUNCTIONS
@@ -48,7 +48,7 @@ C<slurp> instead of C<recv>.
 
 =item C<init>
 
-Iniitialize a TCPStream object (create a socket and a buffer).
+Initialize a TCPStream object (create a socket and a buffer).
 
 =cut
 
