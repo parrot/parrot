@@ -1,45 +1,26 @@
-#! perl
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
+use 5.008;
 
-my $perlbin = `../../../parrot_config perl`;
-my $builddir = `../../../parrot_config build_dir`;
-my $slash = `../../../parrot_config slash`;
-my $make = `../../../parrot_config make`;
+create_makefiles();
 
-chomp($perlbin);
-chomp($builddir);
-chomp($slash);
-chomp($make);
+sub create_makefiles {
+    my %makefiles = (
+        'config/makefiles/root.in' => 'Makefile',
+#        'config/makefiles/pmc.in'  => 'src/pmc/Makefile',
+#        'config/makefiles/ops.in'  => 'src/ops/Makefile',
+    );
+    my $build_tool = '../../../tools/dev/gen_makefile.pl';
 
-my $build_tool = $perlbin . " "
-               . $builddir
-               . $slash
-               . "tools"
-               . $slash
-               . "dev"
-               . $slash
-               . "gen_makefile.pl";
-
-my %makefiles = (
-    "config/makefiles/root.in" => "Makefile",
-);
-
-foreach my $template (keys %makefiles) {
-    my $makefile = $makefiles{$template};
-    print "Creating $makefile\n";
-    system("$build_tool $template $makefile");
+    foreach my $template (keys %makefiles) {
+        my $makefile = $makefiles{$template};
+        print "Creating $makefile\n";
+        system('perl', $build_tool, $template, $makefile);
+    }
 }
-
-print <<"END";
-
-You can now use '$make' to build ABC.
-END
-
-exit;
 
 # Local Variables:
 #   mode: cperl
@@ -47,3 +28,4 @@ exit;
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4:
+

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use 5.008;
 
-use lib qw( . lib ../lib ../../lib ../../lib );
+use lib qw( . lib ../lib ../../lib ../../../lib );
 
 use Parrot::Test::Harness language => 'abc',
                           compiler => 'abc.pbc';

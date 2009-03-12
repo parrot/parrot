@@ -2,87 +2,114 @@
 # $Id$
 
 ## arguments we want to run parrot with
-PARROT_ARGS =
+PARROT_ARGS   :=
 
 ## configuration settings
-BUILD_DIR     = @build_dir@
-LOAD_EXT      = @load_ext@
-O             = @o@
+VERSION       := @versiondir@
+BIN_DIR       := @bin_dir@
+LIB_DIR       := @lib_dir@$(VERSION)
+DOC_DIR       := @doc_dir@$(VERSION)
+MANDIR        := @mandir@$(VERSION)
+
+# Set up extensions
+LOAD_EXT      := @load_ext@
+O             := @o@
+
+# Various paths
+PERL6GRAMMAR  := @build_dir@/runtime/parrot/library/PGE/Perl6Grammar.pbc
+NQP           := @build_dir@/compilers/nqp/nqp.pbc
+PCT           := @build_dir@/runtime/parrot/library/PCT.pbc
 
 ## Setup some commands
-LN_S          = @lns@
-PERL          = @perl@
-RM_RF         = @rm_rf@
-CP            = @cp@
-PARROT        = $(BUILD_DIR)/parrot@exe@
-CAT           = @cat@
-BUILD_DYNPMC  = $(PERL) $(BUILD_DIR)/tools/build/dynpmc.pl
-RECONFIGURE   = $(PERL) $(BUILD_DIR)/tools/dev/reconfigure.pl
-#CONDITIONED_LINE(darwin):
-#CONDITIONED_LINE(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
-#CONDITIONED_LINE(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
+MAKE          := @make_c@
+PERL          := @perl@
+CAT           := @cat@
+CHMOD         := @chmod@
+CP            := @cp@
+MKPATH        := @mkpath@
+RM_F          := @rm_f@
+RM_RF         := @rm_rf@
+POD2MAN       := pod2man
+#IF(parrot_is_shared and not(cygwin or win32)):export LD_RUN_PATH := @blib_dir@:$(LD_RUN_PATH)
+PARROT        := @build_dir@/parrot@exe@
+PBC_TO_EXE    := @build_dir@/pbc_to_exe@exe@
+#IF(darwin):
+#IF(darwin):# MACOSX_DEPLOYMENT_TARGET must be defined for OS X compilation/linking
+#IF(darwin):export MACOSX_DEPLOYMENT_TARGET := @osx_version@
 
-## places to look for things
-PARROT_DYNEXT = $(BUILD_DIR)/runtime/parrot/dynext
-PGE_LIBRARY   = $(BUILD_DIR)/runtime/parrot/library/PGE
-PERL6GRAMMAR  = $(PGE_LIBRARY)/Perl6Grammar.pbc
-NQP           = $(BUILD_DIR)/compilers/nqp/nqp.pbc
-PCT           = $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
-
-PMC_DIR       = src/pmc
-
-all: abc.pbc
-
-ABC_GROUP = $(PMC_DIR)/abc_group$(LOAD_EXT)
-
-SOURCES = abc.pir \
+SOURCES := \
   src/gen_grammar.pir \
   src/gen_actions.pir \
   src/gen_builtins.pir \
-#  $(ABC_GROUP)
+  abc.pir
 
-BUILTINS_PIR = \
-  src/builtins/all.pir \
+BUILTINS_PIR := \
+  src/builtins/all.pir
 
-# PMCS = abc
-# PMC_SOURCES = $(PMC_DIR)/abc.pmc
+DOCS := README
+
+BUILD_CLEANUPS := \
+  abc.pbc \
+  "src/gen_*.pir" \
+  "*.c" \
+  "*$(O)" \
+  abc@exe@ \
+#IF(win32):  parrot-abc.exe \
+#IF(win32):  parrot-abc.iss \
+#IF(win32):  "setup-parrot-*.exe" \
+  installable_abc@exe@
+
+TEST_CLEANUPS := \
+  "t/*.pir" \
+  "t/*.out"
 
 # the default target
-abc.pbc: $(PARROT) $(SOURCES)
+build: abc.pbc
+
+all: build abc@exe@ installable
+
+abc.pbc: $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) -o abc.pbc abc.pir
+
+abc@exe@: abc.pbc
+	$(PBC_TO_EXE) abc.pbc
 
 src/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg src/parser/grammar-oper.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
 	    --output=src/gen_grammar.pir \
 	    src/parser/grammar.pg \
-	    src/parser/grammar-oper.pg \
+	    src/parser/grammar-oper.pg
 
-src/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
+src/gen_actions.pir: $(NQP) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
 
 src/gen_builtins.pir: $(BUILTINS_PIR)
-	$(CAT) $(BUILTINS_PIR) >src/gen_builtins.pir
+	$(CAT) $(BUILTINS_PIR) > src/gen_builtins.pir
 
-$(ABC_GROUP): $(PARROT) $(PMC_SOURCES)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) generate $(PMCS)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) compile $(PMCS)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) linklibs $(PMCS)
-	cd $(PMC_DIR) && $(BUILD_DYNPMC) copy --destination=$(PARROT_DYNEXT) $(PMCS)
+installable: installable_abc@exe@
 
-# regenerate the Makefile
+installable_abc@exe@: abc.pbc
+	$(PBC_TO_EXE) abc.pbc --install
+
 Makefile: config/makefiles/root.in
-	cd $(BUILD_DIR) && $(RECONFIGURE) --step=gen::languages --languages=abc
+	$(PERL) Configure.pl
 
 # This is a listing of all targets, that are meant to be called by users
 help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               abc.pbc"
+	@echo "  build:             abc.pbc"
 	@echo "                     This is the default."
+	@echo "  abc@exe@            Self-hosting binary not to be installed."
+	@echo "  all:               abc.pbc abc@exe@ installable"
+	@echo "  installable:       Create libs and self-hosting binaries to be installed."
+	@echo "  install:           Install the installable targets and docs."
+	@echo ""
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
+	@echo "  test-installable:  Test self-hosting targets."
 	@echo "  testclean:         Clean up test results."
 	@echo ""
 	@echo "Cleaning:"
@@ -94,34 +121,46 @@ help:
 	@echo "  help:              Print this help message."
 	@echo ""
 
-test: all
-	prove -r t
+test: build
+	$(PERL) t/harness
+
+# basic run for missing libs
+test-installable: installable
+	echo "1" | ./installable_abc@exe@
+
+install: installable
+	$(CP) installable_abc@exe@ $(BIN_DIR)/parrot-abc@exe@
+	$(CHMOD) 0755 $(BIN_DIR)/parrot-abc@exe@
+	-$(MKPATH) $(LIB_DIR)/languages/abc
+	$(CP) abc.pbc $(LIB_DIR)/languages/abc/abc.pbc
+	-$(MKPATH) $(MANDIR)/man1
+	$(POD2MAN) abc.pir > $(MANDIR)/man1/parrot-abc.1
+	-$(MKPATH) $(DOC_DIR)/languages/abc
+	$(CP) $(DOCS) $(DOC_DIR)/languages/abc
+
+uninstall:
+	$(RM_F) $(BIN_DIR)/parrot-abc@exe@
+	$(RM_RF) $(LIB_DIR)/languages/abc
+	$(RM_F) $(MANDIR)/man1/parrot-abc.1
+	$(RM_RF) $(DOC_DIR)/languages/abc
+
+win32-inno-installer: installable
+	-$(MKPATH) man/man1
+	$(POD2MAN) abc.pir > man/man1/parrot-abc.1
+	-$(MKPATH) man/html
+	pod2html --infile abc.pir --outfile man/html/parrot-abc.html
+	$(CP) installable_abc@exe@ parrot-abc.exe
+	$(PERL) -I@build_dir@/lib @build_dir@/tools/dev/mk_inno_language.pl abc
+	iscc parrot-abc.iss
 
 testclean:
-	$(RM_RF) "t/*.pir" "t/*.out"
+	$(RM_F) $(TEST_CLEANUPS)
 
-CLEANUPS = \
-  abc.pbc \
-  src/gen_grammar.pir \
-  src/gen_actions.pir \
-  src/gen_builtins.pir \
-  $(PMC_DIR)/*.h \
-  $(PMC_DIR)/*.c \
-  $(PMC_DIR)/*.dump \
-  $(PMC_DIR)/*$(O) \
-  $(PMC_DIR)/*$(LOAD_EXT) \
-  $(PMC_DIR)/*.exp \
-  $(PMC_DIR)/*.ilk \
-  $(PMC_DIR)/*.manifest \
-  $(PMC_DIR)/*.pdb \
-  $(PMC_DIR)/*.lib \
+clean:
+	$(RM_F) $(TEST_CLEANUPS) $(BUILD_CLEANUPS)
 
-
-clean: testclean
-	$(RM_RF) $(CLEANUPS)
-
-realclean: clean
-	$(RM_RF) Makefile
+realclean:
+	$(RM_F) $(TEST_CLEANUPS) $(BUILD_CLEANUPS) Makefile
 
 distclean: realclean
 
@@ -129,3 +168,4 @@ distclean: realclean
 #   mode: makefile
 # End:
 # vim: ft=make:
+
