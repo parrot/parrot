@@ -518,7 +518,7 @@ Returns a string comprised of all of the list, separated by the string SEPARATOR
 
 =item reverse()
 
-Returns a list of the elements in revese order.
+Returns a list of the elements in reverse order.
 
 =cut
 

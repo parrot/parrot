@@ -7,7 +7,7 @@ is s.length, 11, '.length'
 elem = s[s.length]
 is elem, nil, '[] with no bounds checking'
 #returns 115 for 1.8
-is s[1], 'a', '[+] with positivt int' 
+is s[1], 'a', '[+] with positive int' 
 is s[-2], 'n', '[-] with negative int'
 is s[0,6], 'parrot', '[index,length] for substring'
 s[-4] = "rules!" 

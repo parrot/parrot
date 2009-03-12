@@ -19,6 +19,6 @@ num = 1 * 2
 ok num == 2, '*'
 num = 4 % 2
 ok num == 0, '%'
-# somthing is up with the / 
+# something is up with the / 
 #num = 4 / 2
 #ok num == 2, 'div'

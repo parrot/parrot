@@ -41,7 +41,7 @@ object.
 .include 'src/gen_actions.pir'
 .namespace [ 'cardinal';'Compiler' ]
 
-#no caridinal_group found on my machine
+#no cardinal_group found on my machine
 #.loadlib 'cardinal_group'
 
 .sub 'onload' :anon :load :init

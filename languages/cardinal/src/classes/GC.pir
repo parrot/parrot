@@ -94,7 +94,7 @@ Perform initializations and create the GC class
     .return(1)
     test = new 'CardinalString'
     test = "yo"
-    # Nope AddrResgistry is not what I expected, we cant use it.
+    # Nope AddrRegistry is not what I expected, we cant use it.
     # We need to create Hash to store all the objects, Use WeakRefs to store the pmcs?
     addr_space = new 'AddrRegistry'
     $I0 = get_addr test

@@ -413,7 +413,7 @@ Run C<block> once for each item in C<self>, with the item passed as an arg.
     $P1 = "Cant iterate from "
     $P2 = $P0.'class'()
     $P1.'concat'($P2)
-#say "continous_range..."
+#say "continuous_range..."
 #say $P2
     .return ($P2)
     #throw $P2

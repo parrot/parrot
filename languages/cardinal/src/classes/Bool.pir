@@ -3,7 +3,7 @@
 =head1 TITLE
 
 Bool - Cardinal boolean class
-Swipped from RAKUDO
+Swiped from RAKUDO
 
 =head1 DESCRIPTION
 
