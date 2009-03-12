@@ -339,6 +339,8 @@ void PbcFile::read(const char *filename)
     if (! pbcfile.is_open())
         throw runtime_error("Can't open file");
 
+    TagEmit filetag("PbcFile", cout);
+
     read_header(pbcfile);
 
     check_directory_format(pbcfile);
@@ -354,6 +356,8 @@ void PbcFile::read(const char *filename)
 
 void PbcFile::read_header(ifstream &pbcfile)
 {
+    TagEmit tag("Header", cout);
+
     signature(pbcfile);
     unsigned char opcode_size = pbcfile.get();
     unsigned char byte_order = pbcfile.get();
@@ -405,17 +409,22 @@ void PbcFile::read_header(ifstream &pbcfile)
 
 void PbcFile::check_directory_format(ifstream &pbcfile)
 {
-    unsigned char dir_format = pbcfile.get();
-    cout << "Directory format: " << (int) dir_format << '\n';
-    pbcfile.ignore(3);
+    TagEmit tag("DirectoryFormat", cout);
 
-    pbcfile.ignore(12);
+    opcode dir_format = read_opcode(pbcfile);
+    cout << "Directory format: " << dir_format << '\n';
+    if (dir_format != 1)
+        throw runtime_error("Unknown directory format");
+
+    pbcfile.ignore(16 - opcode_size);
     if (pbc_version <= 0x0325 && opcode_size == 8)
         pbcfile.ignore(16);
 }
 
 void PbcFile::read_directory(ifstream &pbcfile)
 {
+    TagEmit tag("Directory", cout);
+
     opcode size = read_opcode(pbcfile);
     cout << "Directory segment size: " << size << '\n';
 
