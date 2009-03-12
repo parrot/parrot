@@ -40,7 +40,6 @@ use Parrot::Docs::Section::Ops;
 #use Parrot::Docs::Section::Libs;
 use Parrot::Docs::Section::Tools;
 use Parrot::Docs::Section::Compilers;
-#use Parrot::Docs::Section::Languages;
 #use Parrot::Docs::Section::Config;
 #use Parrot::Docs::Section::Tests;
 use Parrot::Docs::Section::PDDs;
@@ -165,8 +164,6 @@ sub write_docs {
 =item C<Parrot::Docs::Section::Tools>
 
 =item C<Parrot::Docs::Section::Compilers>
-
-=item C<Parrot::Docs::Section::Languages>
 
 =item C<Parrot::Docs::Section::Config>
 
