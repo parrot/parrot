@@ -119,7 +119,7 @@ created as a Coroutine PMC:
 
   .sub foo
       # do something
-      .return bar(42)           # tail call sub bar
+      .tailcall bar(42)           # tail call sub bar
   .end
 
   .sub bar
