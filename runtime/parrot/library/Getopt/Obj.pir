@@ -4,7 +4,7 @@ library/Getopt/Obj.pir - parse long and short command line options
 
 =head1 SYNOPSIS
 
-.sub main :main
+  .sub main :main
     .param pmc argv
 
     .local string prog_name
@@ -38,7 +38,7 @@ library/Getopt/Obj.pir - parse long and short command line options
      opts = getopts."get_options"(argv)
      .local string foo
      foo = opts["Foobar"]
- .end
+  .end
 
 =head1 DESCRIPTION
 
