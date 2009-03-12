@@ -73,7 +73,7 @@ sub warning{
     print STDERR "WARNING: $warning is not standard URM at line $linenr\n";
 }
 
-### memory managment:
+### memory management:
 
 my $stackcount = 0;
 my %look_tbl;

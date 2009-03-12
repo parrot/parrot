@@ -482,7 +482,7 @@ sub Shields
 	end if
 end sub
 sub Menu
-	print "SH  Sheilds     LR Long Range Scan"
+	print "SH  Shields     LR Long Range Scan"
 	print "NA  Navigate    SR Short Range Scan"
 	print "ST  Status      PH Phasers"
 	print "                TO Torpedos"

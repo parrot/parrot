@@ -120,7 +120,7 @@ LOOP_END:
         invokecc P0
         end
 
-# Given the content of P21, create a label of integers concateneted in S26.
+# Given the content of P21, create a label of integers concatenated in S26.
 MAKE_LABEL:
         set I25, P21
         set I26, 0

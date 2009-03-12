@@ -1,5 +1,5 @@
 
-# this is the test program for the forth implementation targetting parrot.
+# this is the test program for the forth implementation targeting parrot.
 # this script can be passed the names of any number of test files. each test is
 # a series of input/output pairs, with optional comments that start with #s.
 #

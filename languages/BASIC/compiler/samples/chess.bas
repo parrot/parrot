@@ -271,7 +271,7 @@ end sub
 3230 GOTO 3100
 3300 IF MZ = 1 THEN 2000
 3500 REM: coup de l'ordinateur  ' Computer's move
-3520 GOSUB 8800			' Initilaize the move tree
+3520 GOSUB 8800			' Initialize the move tree
 _STARTASM
  	time $I0
 	et=$I0
@@ -511,7 +511,7 @@ _ENDASM
 8580 IF G = 200 THEN 8600
 8590 G = G + 1
 8600 RETURN
-8800 REM: initialisation de l'arbre des coups  (Initilaize the move tree)
+8800 REM: initialisation de l'arbre des coups  (Initialize the move tree)
 8820 IF T = 0 THEN 8880
 8830 FOR I = 0 TO 4
 8840 S(0, I) = S(1, I)

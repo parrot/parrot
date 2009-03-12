@@ -54,7 +54,7 @@
 1410   LET RES$=RES$+" "+K$
 1420   PRINT RES$
 1499 RETURN
-1500 REM Initialzations
+1500 REM Initializations
 1520 REM Read in keywords
 1521   LET REPLIES=1
 1530   READ REP$(REPLIES)

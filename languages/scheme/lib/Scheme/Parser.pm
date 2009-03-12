@@ -85,7 +85,7 @@ Scheme::Parser - The Scheme token parser
 
 The parser reads a list of tokens and turns it into a tree structure.
 The Nodes of the tree are hash references with either the attribute C<value>
-or the attribute C<children>. C<children> is an array reference with subbnodes.
+or the attribute C<children>. C<children> is an array reference with sub-nodes.
 
 =head1 AUTHOR
 
