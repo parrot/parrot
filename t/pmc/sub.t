@@ -892,13 +892,7 @@ caller 1 main
 ok
 OUTPUT
 
-{
-
-    # the test has different output when run with --run-pbc (make testr)
-    # actually not - compiling creates 2 'initial'
-    #                running emts 'main'
-
-    my $code = <<'CODE';
+pir_output_is( <<'CODE', <<'OUT', ':immediate :postcomp' );
 .sub optc :immediate :postcomp
     print "initial\n"
 .end
@@ -906,22 +900,10 @@ OUTPUT
     say "main"
 .end
 CODE
-    my $descr = ':immediate :postcomp';
-    if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ ) {
-        pir_output_is( $code, <<'OUT', $descr );
 initial
 initial
 main
 OUT
-    }
-    else {
-        pir_output_is( $code, <<'OUT', $descr );
-initial
-initial
-main
-OUT
-    }
-}
 
 pir_output_like( <<'CODE', <<'OUTPUT', ':anon' );
 .sub main :main

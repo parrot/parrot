@@ -11,7 +11,7 @@ use Parrot::Config;
 use Parrot::Test;
 
 plan skip_all => 'No reason to compile invalid PBC here'
-    if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/-r/;
+    if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/--run-pbc/;
 
 plan tests => 5;
 

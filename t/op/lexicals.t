@@ -12,7 +12,7 @@ use Parrot::Test;
 $ENV{TEST_PROG_ARGS} ||= '';
 
 plan( skip_all => 'lexicals not thawed properly from PBC, RT #60652' )
-    if $ENV{TEST_PROG_ARGS} =~ /-r/;
+    if $ENV{TEST_PROG_ARGS} =~ /--run-pbc/;
 
 plan( tests => 47 );
 

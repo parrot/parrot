@@ -94,6 +94,7 @@ sub remap_runcore_opts
         'S' => '-runcore=switch',
         'b' => '-runcore=bounds',
         'f' => '-runcore=fast',
+        'r' => '-run-pbc',
     );
 
     my %mapped;

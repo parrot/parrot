@@ -33,7 +33,7 @@ ResizableStringArray
 OUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
-my @todo = $ENV{TEST_PROG_ARGS} =~ /-r/
+my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
     ? ( todo => 'classes and HLL maps not thawed from PBC, RT #60648' )
     : ();
 pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using object)", @todo );

@@ -645,8 +645,8 @@ OUTPUT
 
 SKIP:
 {
-    skip( "immediate test, doesn't with -r (from .pbc)", 1 )
-        if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/-r/ );
+    skip( "immediate test, doesn't with --run-pbc", 1 )
+        if ( exists $ENV{TEST_PROG_ARGS} and $ENV{TEST_PROG_ARGS} =~ m/--run-pbc/ );
 
     pir_output_is( <<'CODE', <<'OUTPUT', "get_global in current" );
 .HLL 'bork'
