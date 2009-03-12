@@ -152,7 +152,8 @@ static const opcode_t * directory_unpack(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*segp);
+        FUNC_MODIFIES(*segp)
+        FUNC_MODIFIES(*cursor);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -453,12 +454,22 @@ static int sub_pragma(PARROT_INTERP,
     extern int Parrot_exec_run;
 #endif
 
-/* TODO: This is broken on 64/32 transformations. See TT #254 */
-#define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
-#define ALIGN_16(st, cursor) \
-    (cursor) += ROUND_16((const char *)(cursor) - (const char *)(st))/sizeof (opcode_t)
 /* offset not in ptr diff, but in byte */
-#define OFFS(cursor) ((pf) ? ((const char *)(cursor) - (const char *)(pf->src)) : 0)
+#define OFFS(pf, cursor) ((pf) ? ((const char *)(cursor) - (const char *)((pf)->src)) : 0)
+/**
+ * Possible values for ALIGN_16
+ *   4 (32bit): 0 1 2 3
+ *   8 (64bit): 0 1
+ * e.g. reading 4 byte wordsize on 8 byte wordsize: possible ptrs end in 0 4 8 c.
+ *   offs(c)/8 => 4/8 = 0 => impossible to align with 8 byte ptr.
+ * Limitation TT #254: ALIGN_16  may only be used native, e.g. in the writer,
+ * but not with 64bit reading 32bit!
+ */
+#define ROUND_16(val) (((val) & 0xf) ? 16 - ((val) & 0xf) : 0)
+#define ALIGN_16(pf, cursor)                                    \
+    (cursor) += ROUND_16(OFFS(pf, cursor))/sizeof (opcode_t)
+/* pad to 16 in bytes */
+#define PAD_16_B(size) ((size) % 16 ? 16 - (size) % 16 : 0)
 
 #if TRACE_PACKFILE
 void
@@ -854,9 +865,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PackFile_ByteCode *self),
     ASSERT_ARGS(do_sub_pragmas)
     PackFile_FixupTable * const ft = self->fixups;
     PackFile_ConstTable * const ct = self->const_table;
-#if TRACE_PACKFILE
     PackFile            * const pf = self->base.pf;
-#endif
     opcode_t i;
 
     TRACE_PRINTF(("PackFile: do_sub_pragmas (action=%d)\n", action));
@@ -997,7 +1006,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     }
     else if (header->uuid_type == 1) {
         /* Read in the UUID. We'll put it in a NULL-terminated string, just in
-         * case pepole use it that way. */
+         * case people use it that way. */
         header->uuid_data = (unsigned char *)
             mem_sys_allocate(header->uuid_size + 1);
 
@@ -1015,9 +1024,10 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     /* Set cursor to position after what we've read, allowing for padding to a
      * 16 byte boundary. */
     header_read_length  = PACKFILE_HEADER_BYTES + header->uuid_size;
-    header_read_length += header_read_length % 16 ?
-        16 - header_read_length % 16 : 0;
+    header_read_length += PAD_16_B(header_read_length);
     cursor              = packed + (header_read_length / sizeof (opcode_t));
+    TRACE_PRINTF(("PackFile_unpack: pad=%d\n",
+                  (char *)cursor - (char *)packed));
 
     /* Set what transforms we need to do when reading the rest of the file. */
     PackFile_assign_transforms(self);
@@ -1445,6 +1455,8 @@ default_unpack(ARGMOD(PackFile_Segment *self), ARGIN(const opcode_t *cursor))
     }
     else {
         int i;
+        TRACE_PRINTF(("default_unpack: pre-fetch %d ops into data\n",
+                      self->size));
         for (i = 0; i < (int)self->size; i++) {
             self->data[i] = PF_fetch_opcode(self->pf, &cursor);
             TRACE_PRINTF(("default_unpack: transformed op[#%d]/%d %u\n",
@@ -1784,17 +1796,25 @@ PackFile_Segment_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self),
         ARGIN(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_Segment_pack)
-    const size_t align             = 16 / sizeof (opcode_t);
+    /*const size_t align             = 16 / sizeof (opcode_t);*/
     PackFile_Segment_pack_func_t f =
         self->pf->PackFuncs[self->type].pack;
+#if TRACE_PACKFILE
+    PackFile * const pf  = self->pf;
+#endif
 
     cursor = default_pack(self, cursor);
 
     if (f)
         cursor = (f)(interp, self, cursor);
 
-    if (align && (cursor - self->pf->src) % align)
-        cursor += align - (cursor - self->pf->src) % align;
+    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                        OFFS(pf, cursor), pf->src, cursor));
+    ALIGN_16(self->pf, cursor);
+    /*if (align && (cursor - self->pf->src) % align)
+      cursor += align - (cursor - self->pf->src) % align;*/
+    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                      OFFS(pf, cursor), pf->src, cursor));
 
     return cursor;
 }
@@ -1824,6 +1844,7 @@ PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
 {
     ASSERT_ARGS(PackFile_Segment_unpack)
     PackFile_Segment_unpack_func_t f = self->pf->PackFuncs[self->type].unpack;
+    int offs;
 #if TRACE_PACKFILE
     PackFile * const pf  = self->pf;
 #endif
@@ -1841,12 +1862,13 @@ PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
             return NULL;
     }
 
-    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      OFFS(cursor), pf->src, cursor));
-    /* FIXME on 64bit reading 32bit */
-    ALIGN_16(self->pf->src, cursor);
-    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      OFFS(cursor), pf->src, cursor));
+    offs = OFFS(self->pf, cursor);
+    TRACE_PRINTF_ALIGN(("-S ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                        offs, self->pf->src, cursor));
+    offs += PAD_16_B(offs);
+    cursor = (const opcode_t *)((const char *)(self->pf->src) + offs);
+    TRACE_PRINTF_ALIGN(("+S ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                        offs, self->pf->src, cursor));
     return cursor;
 }
 
@@ -1958,6 +1980,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
     PackFile           * const pf  = dir->base.pf;
     const opcode_t            *pos;
     size_t                     i;
+    int                        offs;
 
     dir->num_segments = PF_fetch_opcode(pf, &cursor);
     TRACE_PRINTF(("directory_unpack: %ld num_segments\n", dir->num_segments));
@@ -2003,7 +2026,8 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
                 return 0;
             }
             TRACE_PRINTF_VAL(("Segment offset: new pos 0x%x "
-                "(src=0x%x cursor=0x%x).\n", pos - pf->src, pf->src, cursor));
+                              "(src=0x%x cursor=0x%x).\n",
+                              OFFS(pf, pos), pf->src, cursor));
         }
         else
             pos = pf->src + seg->file_offset;
@@ -2030,12 +2054,13 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         seg->dir         = dir;
     }
 
+    offs = OFFS(pf, cursor);
     TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      OFFS(cursor), pf->src, cursor));
-    /* FIXME on 64bit reading 32bit */
-    ALIGN_16(pf->src, cursor);
+                      offs, pf->src, cursor));
+    offs += PAD_16_B(offs);
+    cursor = (const opcode_t *)((const char *)(pf->src) + offs);
     TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
-                      OFFS(cursor), pf->src, cursor));
+                      offs, pf->src, cursor));
 
     /* and now unpack contents of dir */
     for (i = 0; cursor && i < dir->num_segments; i++) {
@@ -2073,7 +2098,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         else
             delta = pos - cursor;
 
-        TRACE_PRINTF_VAL(("  delta=%d pos=0x%x cursor=0x%x\n",
+        TRACE_PRINTF_VAL(("  delta=%d, pos=0x%x, cursor=0x%x\n",
                           delta, pos, cursor));
 
         if ((size_t)delta != tmp || dir->segments[i]->op_count != tmp)
@@ -2233,8 +2258,9 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
     ASSERT_ARGS(directory_pack)
     PackFile_Directory * const dir      = (PackFile_Directory *)self;
     const size_t               num_segs = dir->num_segments;
-    const size_t               align    = 16/sizeof (opcode_t);
+    /*const size_t               align    = 16/sizeof (opcode_t);*/
     size_t i;
+    PackFile           * const pf       = self->pf;
 
     *cursor++ = num_segs;
 
@@ -2246,8 +2272,13 @@ directory_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self), ARGOUT(opcode_t *cu
         *cursor++ = seg->op_count;
     }
 
-    if (align && (cursor - self->pf->src) % align)
-        cursor += align - (cursor - self->pf->src) % align;
+    TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                      OFFS(pf, cursor), pf->src, cursor));
+    ALIGN_16(pf, cursor);
+    TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
+                      OFFS(pf, cursor), pf->src, cursor));
+    /*if (align && (cursor - self->pf->src) % align)
+      cursor += align - (cursor - self->pf->src) % align;*/
 
     /* now pack all segments into new format */
     for (i = 0; i < dir->num_segments; i++) {

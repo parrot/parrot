@@ -231,7 +231,7 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 /*
  * offset not in ptr diff, but in byte
  */
-#define OFFS(cursor) ((pf) ? ((const char *)(cursor) - (const char *)(pf->src)) : 0)
+#define OFFS(pf, cursor) ((pf) ? ((const char *)(cursor) - (const char *)((pf)->src)) : 0)
 
 /*
  * low level FLOATVAL fetch and convert functions
@@ -456,7 +456,7 @@ cvt_num12_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts IEEE 754 16-byte long double to IEEE 754 8 byte double.
 
-Tested ok.
+First variant ok, 2nd not ok.
 
 =cut
 
@@ -478,7 +478,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     }
     else {
-
+        /* FIXME: This codepath fails */
         int expo, i, s;
 #ifdef __LCC__
         int expo2;
@@ -904,13 +904,13 @@ fetch_op_be_4(ARGIN(const unsigned char *b))
     fetch_buf_be_4(u.buf, b);
 #if PARROT_BIGENDIAN
 #  if OPCODE_T_SIZE == 8
-    return u.o >> 32;
+    return (Parrot_Int4)(u.o >> 32);
 #  else
     return u.o;
 #  endif
 #else
 #  if OPCODE_T_SIZE == 8
-    return (opcode_t)(fetch_iv_le((INTVAL)u.o) & 0xffffffff);
+    return (Parrot_Int4)(fetch_iv_le((INTVAL)u.o) & 0xffffffff);
 #  else
     return (opcode_t) fetch_iv_le((INTVAL)u.o);
 #  endif
@@ -944,7 +944,7 @@ fetch_op_be_8(ARGIN(const unsigned char *b))
     return u.o[1];
 #  endif
 #else
-    return (opcode_t)fetch_iv_le((INTVAL)u.o[0]);
+    return (opcode_t) fetch_iv_le((INTVAL)u.o[0]);
 #endif
 }
 
@@ -970,13 +970,14 @@ fetch_op_le_4(ARGIN(const unsigned char *b))
     fetch_buf_le_4(u.buf, b);
 #if PARROT_BIGENDIAN
 #  if OPCODE_T_SIZE == 8
-    return u.o >> 32;
+    return (Parrot_Int4)(u.o >> 32);
 #  else
     return (opcode_t) fetch_iv_be((INTVAL)u.o);
 #  endif
 #else
 #  if OPCODE_T_SIZE == 8
-    return u.o & 0xffffffff;
+    /* without the cast we would not get a negative int, the vtable indices */
+    return (Parrot_Int4)(u.o & 0xffffffff);
 #  else
     return u.o;
 #  endif
@@ -1007,7 +1008,7 @@ fetch_op_le_8(ARGIN(const unsigned char *b))
 #  if OPCODE_T_SIZE == 8
     return u.o[0];
 #  else
-    return (opcode_t)fetch_op_be((INTVAL)u.o[1]);
+    return (opcode_t) fetch_op_be((INTVAL)u.o[1]);
 #  endif
 #else
     return u.o[0];
@@ -1037,7 +1038,7 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
         return *(*stream)++;
     o = (pf->fetch_op)(*((const unsigned char **)stream));
     TRACE_PRINTF_VAL(("  PF_fetch_opcode: 0x%lx (%ld), at 0x%x\n",
-                      o, o, OFFS(*stream)));
+                      o, o, OFFS(pf, *stream)));
     *((const unsigned char **) (stream)) += pf->header->wordsize;
     return o;
 }
@@ -1107,7 +1108,7 @@ PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
         return *(*stream)++;
     i = (pf->fetch_iv)(*((const unsigned char **)stream));
     TRACE_PRINTF_VAL(("  PF_fetch_integer: 0x%x (%d) at 0x%x\n", i, i,
-                      OFFS(*stream)));
+                      OFFS(pf, *stream)));
     /* XXX assume sizeof (opcode_t) == sizeof (INTVAL) on the
      * machine producing this PBC.
      *
@@ -1182,13 +1183,13 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
         TRACE_PRINTF(("PF_fetch_number: Native [%d bytes]\n",
                       sizeof (FLOATVAL)));
         memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
-        TRACE_PRINTF_VAL(("PF_fetch_number: %f at 0x%x\n", f, OFFS(*stream)));
+        TRACE_PRINTF_VAL(("PF_fetch_number: %f at 0x%x\n", f, OFFS(pf, *stream)));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
         return f;
     }
     f = (FLOATVAL) 0;
-    TRACE_PRINTF(("PF_fetch_number at 0x%x: Converting...\n", OFFS(*stream)));
+    TRACE_PRINTF(("PF_fetch_number at 0x%x: Converting...\n", OFFS(pf, *stream)));
     /* 12->8 has a messy cast. */
     if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_12) {
         (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
@@ -1309,7 +1310,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
-                      s->strstart, OFFS(*cursor)));
+                      s->strstart, OFFS(pf, *cursor)));
 
 /*    s = string_make(interp, *cursor, size,
             encoding_lookup_index(encoding),
@@ -1429,12 +1430,12 @@ PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
     TRACE_PRINTF(("PF_fetch_cstring(): size is %ld...\n", str_len));
     strcpy(p, (const char*) (*cursor));
     TRACE_PRINTF_VAL(("PF_fetch_cstring(): string is '%s' at 0x%x\n",
-                      p, OFFS(*cursor)));
+                      p, OFFS(pf, *cursor)));
     TRACE_PRINTF_ALIGN(("-s ROUND_UP_B: cursor=0x%x, size=%d, wordsize=%d (cstring)\n",
                         *cursor, str_len, wordsize));
     *((const unsigned char **) (cursor)) += ROUND_UP_B(str_len, wordsize);
     TRACE_PRINTF_ALIGN(("+s ROUND_UP_B: cursor=0x%x, offset=0x%x\n",
-                        *cursor, OFFS(*cursor)));
+                        *cursor, OFFS(pf, *cursor)));
 
     return p;
 }
