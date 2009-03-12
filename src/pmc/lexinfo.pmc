@@ -62,15 +62,18 @@ subroutine.
     }
 
     VTABLE void init_pmc(PMC *sub) {
+        Hash *hash;
         PARROT_ASSERT(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
 
-        parrot_new_pmc_hash_x(INTERP, SELF,
+        hash = parrot_create_hash(INTERP,
             (PARROT_DATA_TYPE)enum_hash_int,
             Hash_key_type_STRING,
             (hash_comp_fn)Parrot_str_not_equal,     /* STRING compare */
             (hash_hash_key_fn)Parrot_str_to_hashval); /*        hash    */
 
+        PMC_struct_val(SELF) = hash;
+        hash->container      = SELF;
         PObj_active_destroy_SET(SELF);
     }
 

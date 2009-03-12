@@ -233,6 +233,18 @@ void parrot_chash_destroy_values(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*hash);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_MALLOC
+Hash * parrot_create_hash(PARROT_INTERP,
+    PARROT_DATA_TYPE val_type,
+    Hash_key_type hkey_type,
+    ARGIN(hash_comp_fn compare),
+    ARGIN(hash_hash_key_fn keyhash))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5);
+
 void parrot_new_hash_x(PARROT_INTERP,
     ARGOUT(Hash **hptr),
     PARROT_DATA_TYPE val_type,
@@ -244,18 +256,6 @@ void parrot_new_hash_x(PARROT_INTERP,
         __attribute__nonnull__(5)
         __attribute__nonnull__(6)
         FUNC_MODIFIES(*hptr);
-
-void parrot_new_pmc_hash_x(PARROT_INTERP,
-    ARGMOD(PMC *container),
-    PARROT_DATA_TYPE val_type,
-    Hash_key_type hkey_type,
-    NOTNULL(hash_comp_fn compare),
-    NOTNULL(hash_hash_key_fn keyhash))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(5)
-        __attribute__nonnull__(6)
-        FUNC_MODIFIES(*container);
 
 #define ASSERT_ARGS_parrot_dump_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(hash)
@@ -323,14 +323,13 @@ void parrot_new_pmc_hash_x(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(hash) \
     || PARROT_ASSERT_ARG(func)
+#define ASSERT_ARGS_parrot_create_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(compare) \
+    || PARROT_ASSERT_ARG(keyhash)
 #define ASSERT_ARGS_parrot_new_hash_x __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(hptr) \
-    || PARROT_ASSERT_ARG(compare) \
-    || PARROT_ASSERT_ARG(keyhash)
-#define ASSERT_ARGS_parrot_new_pmc_hash_x __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(container) \
     || PARROT_ASSERT_ARG(compare) \
     || PARROT_ASSERT_ARG(keyhash)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

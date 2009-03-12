@@ -55,14 +55,13 @@ Free hash structure.
         PMC_data(SELF)      = addr_registry;
         PObj_custom_mark_destroy_SETALL(SELF);
 
-        parrot_new_pmc_hash_x(INTERP, SELF, enum_type_int, Hash_key_type_PMC,
+        registry = parrot_create_hash(INTERP, enum_type_int, Hash_key_type_PMC,
                               int_compare, key_hash_int);
 
-        registry            = (Hash *)PMC_struct_val(SELF);
+        PMC_struct_val(SELF) = registry;
+        addr_registry->hash  = registry;
+        registry->container  = SELF;
 
-        /* this hack can go away when parrot_new_pmc_hash_x behaves */
-        addr_registry->hash = registry;
-        registry->container = SELF;
     }
 
     VTABLE void destroy() {

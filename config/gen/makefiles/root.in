@@ -718,7 +718,6 @@ help :
 	@echo "  update:            svn update."
 	@echo "  status:            svn status."
 	@echo "  patch:             Create a patch for sending to bugs-parrot."
-	@echo "  rsync:             Update with rsync."
 	@echo ""
 	@echo "Development:"
 	@echo "  lint:              An alias for sunlint."
@@ -1847,10 +1846,6 @@ pmcrenumber :
 
 update :
 	svn -q update
-
-# Is this still working ?
-rsync :
-	rsync -av cvs.perl.org::parrot-HEAD $(CUR_DIR)
 
 status :
 	svn -q status
