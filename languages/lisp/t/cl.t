@@ -191,7 +191,7 @@ my @test_cases = (
     [ q{ ( print (values 3 4 5 ) ) },
       q{3},
       q{values},
-      todo => 'values is not evalueted',
+      todo => 'values is not evaluated',
     ],
 );
 

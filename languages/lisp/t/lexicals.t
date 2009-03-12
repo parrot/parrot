@@ -6,7 +6,7 @@ lisp/t/lexicals.t - test lexical variables
 
 =head1 DESCRIPTION
 
-PDD20 compatablility.
+PDD20 compatibility.
 
 =cut
 

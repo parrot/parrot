@@ -294,7 +294,7 @@ CALL_MACRO:
    # VALID_IN_PARROT_0_2_0 if ntretv == 0 goto LOOP               # If macro is NULL, start loop again
    goto APPEND_TO_LIST                    # else add the return value to list
 
-DELIMIT_CHAR:                             # We've hit the delimter char -
+DELIMIT_CHAR:                             # We've hit the delimiter char -
   read char, stream, 1                    # consume it, and return the list
   goto DONE
 
