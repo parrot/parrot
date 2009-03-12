@@ -7,7 +7,7 @@ of line numbers, the other writes just a few lines.
 
 The Stream::Combiner combines both streams line by line.
 We specify our own combiner sub that concatenates the strings
-read from both streams together, seperated by a space.
+read from both streams together, separated by a space.
 
 If you specify no combiner sub, a default one will be used that
 just concatenates both strings. If the _counter sub would add

@@ -48,7 +48,7 @@ specified type.
     print $S4
     print "\n"
 
-    # Rerieve the transformed tree
+    # Retrieve the transformed tree
     $P5 = AGI.'get'('result')
 #    $S5 = typeof $P5
 #    print $S5

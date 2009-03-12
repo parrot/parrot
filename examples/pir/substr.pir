@@ -11,7 +11,7 @@ examples/pir/substr.pir - playing with substr
 
 =head1 DESCRIPTION
 
-A excuberating C<substr> version of "Hello World".
+A exuberating C<substr> version of "Hello World".
 
 =cut
 

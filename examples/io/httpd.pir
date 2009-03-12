@@ -234,7 +234,7 @@ SERVE_blob:
     goto NEXT
 
 SERVE_docroot:
-    rep = 'HTTP/1.1 301 Moved Permamently'
+    rep = 'HTTP/1.1 301 Moved Permanently'
     rep .= CRLF
     rep .= "Server: "
     rep .= SERVER_NAME

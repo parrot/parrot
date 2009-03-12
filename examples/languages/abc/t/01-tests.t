@@ -28,7 +28,7 @@ tab C<\t+>. The three columns are:
 =item B<expression>
 
 The exact expression that is passed to the abc compiler as source code.
-This input is pasted as a double quotes delimted string into PIR code.
+This input is pasted as a double quotes delimited string into PIR code.
 This means that you can use \n to indicate newlines.
 
 =item B<expected>

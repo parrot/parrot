@@ -89,7 +89,7 @@ Number of vertical units the field should have.
 
 =item level
 
-Initial seed for the PRNG that is used to calulate the field.
+Initial seed for the PRNG that is used to calculate the field.
 
 =item mines
 
@@ -704,7 +704,7 @@ END:
 
 =item reveal_recursive( x, y, width, height ) B<(internal)>
 
-Reveals the specified field recursivly.
+Reveals the specified field recursively.
 
 The width and height are the dimensions of the board, they
 have to be specified for performance reasons.

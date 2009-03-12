@@ -96,7 +96,7 @@ ex:
 .sub __init :method
     .local int w, h
     .local num scale, xstart, ystart
-    # mandelbrot set is witdh [-2, 0.25] heigth [ -1, 1]
+    # mandelbrot set is width [-2, 0.25] height [ -1, 1]
     # round up, scale *200
     xstart = -2.0
     ystart = -1.0
@@ -567,7 +567,7 @@ Optimized build
 
 L<http://en.wikipedia.org/wiki/Mandelbrot_set>
 
-If you want faster mandelbrot with iteractive zooming use Xaos:
+If you want faster mandelbrot with interactive zooming use Xaos:
 
 L<http://xaos.sourceforge.net/english.php>
 

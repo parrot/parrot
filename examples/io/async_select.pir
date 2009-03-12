@@ -54,7 +54,7 @@ spin:
 .sub io_handler
     .param pmc pio
     .param pmc data
-    $S0 = read pio, 4	# arbitray - could of course read more
+    $S0 = read pio, 4	# arbitrary - could of course read more
     $I0 = length $S0
     unless $I0 goto ex
     print $S0

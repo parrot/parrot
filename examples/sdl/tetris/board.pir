@@ -37,7 +37,7 @@ END:
 
 =head1 METHODS
 
-A Board object has the folloging methods:
+A Board object has the following methods:
 
 =over 4
 
@@ -756,7 +756,7 @@ SKIP_NEXTBLOCK:
 
 Has to be called at frequent intervals.
 
-Returns 1 if a redraw is necessay, 0 otherwise.
+Returns 1 if a redraw is necessary, 0 otherwise.
 
 =cut
 

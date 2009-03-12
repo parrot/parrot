@@ -1,7 +1,7 @@
 =head1 Comparison Branching
 
 A simple C<goto> is the most simple version of flow control, but its
-usefullness is very limited. In most cases, branches should be
+usefulness is very limited. In most cases, branches should be
 conditional. The C<if> statement implements a conditional branch,
 jumping only if a given condition is satisfied. These conditions can
 use various boolean relational operators C<=>, C<< < >>, C<< > >> and

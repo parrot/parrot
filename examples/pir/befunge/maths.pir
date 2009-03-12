@@ -110,7 +110,7 @@
 #
 # maths__sub()
 #
-# substraction.
+# subtraction.
 # befunge stack:
 #   before:     ... a b
 #   after:      ... a-b

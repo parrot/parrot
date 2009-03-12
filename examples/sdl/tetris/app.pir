@@ -160,7 +160,7 @@ END:
 The application's main loop.
 
 Returns if the user requested a shutdown.
-An exeption is thrown if an error occurs.
+An exception is thrown if an error occurs.
 
 =cut
 

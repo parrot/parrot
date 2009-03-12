@@ -10,7 +10,7 @@
 #
 # Only one instruction per line.
 #
-# Instuctions implemented:
+# Instructions implemented:
 # - Flow control: GOTO, GOSUB, RETURN, RUN, END, STOP, CONT, EXIT
 # - Conditional: IF/ELSE
 # - Loop: FOR/NEXT

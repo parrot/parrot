@@ -365,7 +365,7 @@ XXX continue
 
 =item parameter C<extent>
 
-The size of the block's subblocks, in pixels.
+The size of the block's sub-blocks, in pixels.
 
 =back
 
@@ -575,7 +575,7 @@ BLOCK_MOVEDOWN_OKAY:
 
 =item app = block."application"()
 
-Returns the application object assosicated with the block's board.
+Returns the application object associated with the block's board.
 
 =cut
 

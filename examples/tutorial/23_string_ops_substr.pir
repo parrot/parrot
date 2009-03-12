@@ -3,7 +3,7 @@
 We can pick apart a string and pull substrings out of it using the
 C<substr> command. C<substr> takes a string, a starting position and
 optionally an ending position. It returns all the characters in
-the string between the starting and ending posiions. If the ending
+the string between the starting and ending positions. If the ending
 position is left out, C<substr> returns all the characters until the
 end of the string.
 

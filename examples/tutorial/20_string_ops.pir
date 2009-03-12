@@ -1,6 +1,6 @@
 =head1 String Operations
 
-Some operations aren't mathematical at all. Contcatenation is an example
+Some operations aren't mathematical at all. Concatenation is an example
 of this type of operation that joins two strings together to form a
 larger string. Like the other operations we've seen, concatenation also
 has one form that returns the result, and one form that modifies the

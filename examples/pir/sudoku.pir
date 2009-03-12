@@ -1585,7 +1585,7 @@ err:
 # 0  ... no change
 # 1  ... changes
 # this implements half of TODO item 1 (digit '7' ...)
-# scan_dbl finds both occurencies of the blocked '7' but needs more testing still
+# scan_dbl finds both occurrences of the blocked '7' but needs more testing still
 
 .sub scan_dbl :method
     .param pmc rcss
@@ -2401,7 +2401,7 @@ A Sudoku has 2 dimensions and 3 connected views (row, column, and
 square). There are 1-dim tests, which work for all views. 2-dim tests
 are a bit more tricky to generalize and not yet done properly.
 
-Basically: as only 2 views are independant, all these tests can
+Basically: as only 2 views are independent, all these tests can
 work on 2 of 3 views:
 
   square, row
