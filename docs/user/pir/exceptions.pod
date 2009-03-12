@@ -1,0 +1,46 @@
+=head1 Exceptions
+
+This is a basic overview of how to deal with exceptions from PIR.
+There are two main topics: throwing exceptions and catching exceptions.  We'll start with the first.
+
+=head2 Throwing exceptions
+
+If you're going to be using exceptions, you probably want to start by including two pasm files that define constants for exception type and severity.
+
+    .include 'include/except_types.pasm'
+    .include 'include/except_severity.pasm'
+
+You create exceptions just like you create any other object, with C<new>.
+
+    .local pmc ex
+    ex = new 'Exception'
+
+You usually want to at least set a descriptive message about what went wrong.
+
+    ex = "Everything is horrible, dood."
+
+You also usually want to set a severity and sometimes a type.  You can find these in L<runtime/parrot/include/except_severity.pasm>.
+
+    ex['severity'] = .EXCEPT_DOOMED
+    ex['type'] = .CONTROL_ERROR
+
+You actually throw the exception by using the C<throw> op.
+
+    throw ex
+
+Put all together, it looks like this:
+
+=head3 Throw Example
+
+    .include 'include/except_types.pasm'
+    .include 'include/except_severity.pasm'
+    .local pmc ex
+    ex = new 'Exception'
+    ex = "Everything is horrible, dood."
+    ex['severity'] = .EXCEPT_DOOMED
+    ex['type'] = .CONTROL_ERROR
+    throw ex
+
+=head2 Catching exceptions
+
+...
