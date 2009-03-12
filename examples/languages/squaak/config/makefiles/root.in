@@ -149,7 +149,7 @@ win32-inno-installer: installable
 	-$(MKPATH) man/html
 	pod2html --infile squaak.pir --outfile man/html/parrot-squaak.html
 	$(CP) installable_squaak@exe@ parrot-squaak.exe
-	$(PERL) @build_dir@/tools/dev/mk_inno_language.pl squaak
+	$(PERL) -I@build_dir@/lib @build_dir@/tools/dev/mk_inno_language.pl squaak
 	iscc parrot-squaak.iss
 
 testclean:
