@@ -675,7 +675,6 @@ help :
 	@echo "  benchmark_tests:   Run all benchmarks."
 	@echo "  warnings_tests:    Run standard test suite with warnings enabled."
 	@echo "  manitest:          Check for new and missing files."
-	@echo "  doc_tests:         Check POD syntax of all files containing POD."
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
 	@echo "  examples_tests:    Test the example scripts."
@@ -1424,8 +1423,6 @@ DISTRO_TEST_FILES := \
     t/distro/*.t
 BENCHMARK_TEST_FILES := \
     t/benchmark/*.t
-DOC_TEST_FILES := \
-    t/doc/*.t
 PERL_TEST_FILES := \
     t/perl/*.t
 CODINGSTD_TEST_FILES := \
@@ -1509,7 +1506,6 @@ fulltest :
 	perl_tests \
 	codetest \
 	benchmark_tests \
-	doc_tests \
 	manifest_tests \
 	examples_tests \
 	distro_tests
@@ -1526,7 +1522,6 @@ fulltest_all :
 	-@make@ run_tests
 	-@make@ perl_tests
 	-@make@ codetest
-	-@make@ doc_tests
 	-@make@ manifest_tests
 	-@make@ examples_tests
 	-@make@ distro_tests
@@ -1607,10 +1602,6 @@ examples_tests :
 # benchmark tests
 benchmark_tests : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(BENCHMARK_TEST_FILES)
-
-# doc tests
-doc_tests :
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(DOC_TEST_FILES)
 
 # Running a benchmark
 mopsbench : test_prep
@@ -2126,7 +2117,6 @@ cover: \
     cover-perl \
     cover-codingstd \
     cover-benchmark \
-    cover-doc \
     cover-distro
 	build_dir=$$PWD; \
     for dir in $(COVER_DIRS); \
@@ -2174,9 +2164,6 @@ cover-codingstd: cover.dummy
 
 cover-benchmark: cover.dummy
 	-@make@ benchmark_tests
-
-cover-doc: cover.dummy
-	-@make@ doc_tests
 
 cover-distro: cover.dummy
 	-@make@ distro_tests
