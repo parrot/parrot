@@ -62,12 +62,15 @@ my $pbc = <*.pbc>
 my $lib = <library/*.pbc>
         ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang\\library"; Flags:}
         : '; no .pbc lib';
-my $pmc = <src/pmc/*.pmc>
+my $pmc = <src/pmc/*.dll>
         ? qq{Source: ".\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no pmc';
-my $ops = <src/ops/*.ops>
+my $ops = <src/ops/*.dll>
         ? qq{Source: ".\\src\\ops\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
         : '; no ops';
+my $dynext = <dynext/*.dll>
+           ? qq{Source: ".\\dynext\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
+           : '; no dynext';
 my $man = -d 'man'
         ? qq{Source: ".\\man\\*"; DestDir: "{app}\\man"; Flags: ignoreversion recursesubdirs}
         : '; no man';
@@ -106,6 +109,7 @@ $pbc
 $lib
 $pmc
 $ops
+$dynext
 $man
 $doc
 $readme
