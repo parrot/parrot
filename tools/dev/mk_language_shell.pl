@@ -1183,7 +1183,8 @@ GetOptions(
 
 if ($bindir) {
     $harness_args{exec} = [$bindir.'/parrot', '@lclang@.pbc'];
-} else {
+}
+else {
     $harness_args{compiler} = '@lclang@.pbc';
 }
 
