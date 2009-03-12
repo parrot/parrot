@@ -416,9 +416,12 @@ void PbcFile::check_directory_format(ifstream &pbcfile)
     if (dir_format != 1)
         throw runtime_error("Unknown directory format");
 
-    pbcfile.ignore(16 - opcode_size);
-    if (pbc_version <= 0x0325 && opcode_size == 8)
-        pbcfile.ignore(16);
+    opcode unused = read_opcode(pbcfile);
+    unused = read_opcode(pbcfile);
+    unused = read_opcode(pbcfile);
+
+    for (opcode n = opcode_size * 4; n % 16; ++n)
+        pbcfile.ignore(1);
 }
 
 void PbcFile::read_directory(ifstream &pbcfile)
