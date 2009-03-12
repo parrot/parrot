@@ -315,6 +315,7 @@ public:
     void dump_constant_string(ifstream &pbcfile);
     void dump_constant_number(ifstream &pbcfile);
     void dump_constant_key(ifstream &pbcfile);
+    void dump_bytes_hex(ifstream &pbcfile, opcode length);
     string read_cstring(ifstream &pbcfile);
     opcode read_opcode(ifstream &pbcfile);
 private:
@@ -725,17 +726,20 @@ void PbcFile::dump_constant_string(ifstream &pbcfile)
 
 void PbcFile::dump_constant_number(ifstream &pbcfile)
 {
-    cout << "Number constant (not shown)\n";
+    cout << "Number constant: ";
     switch(fp_encoding) {
         case FpEncodingIEEE_754_8:
-            pbcfile.ignore(8);
+            dump_bytes_hex(pbcfile, 8);
             break;
         case FpEncodingIEEE_i386_12:
-            pbcfile.ignore(12);
+            dump_bytes_hex(pbcfile, 12);
             break;
         case FpEncodingIEEE_754_16:
-            pbcfile.ignore(16);
+            dump_bytes_hex(pbcfile, 16);
             break;
+        default:
+            // This must have been catched before reaching this point
+            throw std::logic_error("Bad number type");
     }
 }
 
@@ -751,6 +755,16 @@ void PbcFile::dump_constant_key(ifstream &pbcfile)
         opcode value = read_opcode(pbcfile);
         cout << "Value: " << value << '\n';
     }
+}
+
+void PbcFile::dump_bytes_hex(ifstream &pbcfile, opcode length)
+{
+    cout << "0x" << hex;
+    for (opcode i= 0; i < length; ++i) {
+        unsigned char c = pbcfile.get();
+        cout << setw(2) << setfill('0') << (unsigned int) c;
+    }
+    cout << dec << '\n';
 }
 
 string PbcFile::read_cstring(ifstream &pbcfile)
