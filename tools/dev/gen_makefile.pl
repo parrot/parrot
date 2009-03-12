@@ -18,10 +18,6 @@ my $args = process_options(
     {
         step              => 'gen::makefiles',
         mode              => 'reconfigure',
-        file_type         => 'makefile',
-        conditioned_lines => 1,
-        replace_slashes   => 1,
-        expand_gmake_syntax => 1,
     }
 );
 exit(1) unless ( defined $args );
@@ -32,7 +28,11 @@ my $makefile = $ARGV[1];
 my $conf = Parrot::Configure->new();
 $conf->options->set( %{$args} );
 $conf->data()->get_PConfig(); #load configuration data
-$conf->genfile( $template => $makefile);
+$conf->genfile(
+    $template           => $makefile,
+    file_type           => 'makefile',
+    expand_gmake_syntax => 1,
+);
 
 exit(0);
 
