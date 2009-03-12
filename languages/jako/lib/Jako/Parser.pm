@@ -794,7 +794,7 @@ sub parse {
             $self->require_semicolon;
 
            #
-           # TODO: Call is really an expression, but here its treated as a statment with the assign.
+           # TODO: Call is really an expression, but here its treated as a statement with the assign.
            #
 
             my $call = Jako::Construct::Expression::Call->new( $block, $left, $func_name, @args );

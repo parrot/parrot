@@ -11,7 +11,7 @@ TODO
 
 A subclass of Jako::Construct.
 
-Maintains a symbol table, a referenct to its parent block, and a list of
+Maintains a symbol table, a reference to its parent block, and a list of
 content Constructs.
 
 =cut

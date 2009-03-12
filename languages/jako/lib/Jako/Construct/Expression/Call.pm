@@ -21,9 +21,9 @@ sub new {
     my $class = shift;
     my ( $block, $dest, $ident, @args ) = @_;
 
-    confess( "Dest (" . ref($block) . ") not Identifer!" )
+    confess( "Dest (" . ref($block) . ") not Identifier!" )
         unless UNIVERSAL::isa( $dest, 'Jako::Construct::Expression::Value::Identifier' );
-    confess( "Ident (" . ref($block) . ") not Identifer!" )
+    confess( "Ident (" . ref($block) . ") not Identifier!" )
         unless UNIVERSAL::isa( $ident, 'Jako::Construct::Expression::Value::Identifier' );
     confess( "Block (" . ref($block) . ") not!" )
         unless UNIVERSAL::isa( $block, 'Jako::Construct::Block' );

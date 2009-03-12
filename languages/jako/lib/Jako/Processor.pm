@@ -126,7 +126,7 @@ sub pos {
 #
 # Without an argument, gives the current token. With an argument, gives the
 # token at that absolute position. If a count is given, then that many tokens
-# (at most, given the possibilitiy of running off the end) are returned. If
+# (at most, given the possibility of running off the end) are returned. If
 # a count is not given, 1 is inferred.
 #
 
