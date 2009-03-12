@@ -67,10 +67,8 @@ my $result = GetOptions( 'languages=s'   => \$languages_list );
 # BASIC                No t/harness, two implementations
 # ecmascript           No t/harness
 # forth                No t/harness
-# perl6                test scripts are written in Perl 6, not Perl 5
 # pheme                test scripts are written in Scheme, not Perl 5
 # PIR                  many test failures
-# pynie                test scripts are written in PIR, not Perl 5
 # scheme               many test failures
 # urm                  uses deprecated parrot features
 

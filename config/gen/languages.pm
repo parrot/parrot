@@ -40,7 +40,7 @@ sub _init {
         jako
         lisp
         ook
-        parrot_compiler pynie
+        parrot_compiler
         regex
         scheme
         urm
