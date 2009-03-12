@@ -262,7 +262,7 @@ static PMC*
 get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     /*
-     * exessive args are passed as NULL
+     * excessive args are passed as NULL
      * used by e.g. MMD infix like __add
      */
     if (n < st->src.n)

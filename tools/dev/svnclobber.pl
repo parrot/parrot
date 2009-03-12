@@ -17,7 +17,7 @@ This is a dangerous script. It deletes all files that are not checked
 into SVN.
 
 Usually this script is invoked by C<make svnclobber> of the root Parrot makefile.
-In case that there is no Makefile, this script can also be invoked dirctly.
+In case that there is no Makefile, this script can also be invoked directly.
 
 =head1 HISTORY
 

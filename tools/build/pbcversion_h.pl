@@ -12,7 +12,7 @@ tools/build/pbcversion_h.pl - Create pbcversion.h
 
 =head1 DESCRIPTION
 
-The F<PBC_COMPAT> file is used to maintain Parrot bytecode compatability. This
+The F<PBC_COMPAT> file is used to maintain Parrot bytecode compatibility. This
 script extracts the latest major and minor bytecode version numbers and places
 them in a header file.
 

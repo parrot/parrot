@@ -19,7 +19,7 @@ pbc_header.pl - PBC header info and manipulation
 =head1 DESCRIPTION
 
 The F<PBC_COMPAT> file is used to maintain Parrot bytecode
-compatability. During release preparation (and other changes to
+compatibility. During release preparation (and other changes to
 PBC_COMPAT) the fingerprint of existing bytecode files is invalidated.
 
 This utility updates the version and fingerprint information in the bytecode,

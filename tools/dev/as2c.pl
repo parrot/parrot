@@ -6,7 +6,7 @@
 
 =head1 NAME
 
-as2c.pl - convert gas assember listing to i386 code array
+as2c.pl - convert gas assembler listing to i386 code array
 
 =head1 DESCRIPTION
 

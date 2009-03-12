@@ -155,7 +155,7 @@ $toc
               <param name="Local" value="../book/ch13_reference.html">
             </OBJECT>
           <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Appendice : Patch Submission">
+              <param name="Name" value="Appendix : Patch Submission">
               <param name="Local" value="../book/appX_patch_submission.html">
             </OBJECT>
         </UL>

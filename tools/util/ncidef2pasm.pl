@@ -50,7 +50,7 @@ will be exposed to subsequent defs.
 =head2 defs
 
 This section holds the definitions of functions. Each function is
-assumed to be in the immediate preceeding library. The definition of
+assumed to be in the immediate preceding library. The definition of
 the function is:
 
   return_type name [param [param [param ...]]]

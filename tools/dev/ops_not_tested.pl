@@ -19,13 +19,13 @@ use Parrot::OpLib::core;
              tested? (yes, maybe I want to write some tests :p)
 
 10:25 <@leo> toor: run 'make testr', then create a script that runs
-             disasseble [sic] $_.pbc for all @pbcs,
+             disassemble [sic] $_.pbc for all @pbcs,
              extract the opcode, sort, uniq and compare with
              lib/Parrot/OpLib/core.pm
 10:26 <@leo> disassemble even
 10:26 <@leo> $ make disassemble
 10:28 <toor> leo: and if I make a perl5 script that does that
-             automagicly, is it usefull [sic] for the
+             automagically, is it usefull [sic] for the
              project?
 10:28 <@leo> very useful
 10:28 <toor> ok, looks that I've got something to start :)
