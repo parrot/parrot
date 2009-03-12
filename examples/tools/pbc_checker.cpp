@@ -605,13 +605,17 @@ void PbcFile::dump_segment_bytecode(ifstream &pbcfile)
     cout << " id: " << id;
     opcode size = read_opcode(pbcfile);
     cout << " size: " << size;
-    cout << '\n';
+    cout << hex;
 
     for (opcode n= 0; n < size; ++n) {
         opcode code = read_opcode(pbcfile);
-        cout << ' ' << hex << setfill('0') << setw(opcode_size * 2) << code << dec;
+	if ((n % 8) == 0)
+	    cout << '\n' << setfill('0') << setw (7) << n << ':';
+	else
+	    cout << ' ';
+        cout << setfill('0') << setw(opcode_size * 2) << code;
     }
-    cout << '\n';
+    cout << dec << '\n';
 }
 
 void PbcFile::dump_segment_pir_debug(ifstream &pbcfile)
