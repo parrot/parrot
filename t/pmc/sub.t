@@ -1436,7 +1436,11 @@ CODE
 I can has outer?
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names' );
+$ENV{TEST_PROG_ARGS} ||= '';
+my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
+    ? ( todo => 'lexicals not thawed properly from PBC, RT #60652' )
+    : ();
+pir_output_is( <<'CODE', <<'OUTPUT', ':outer with identical sub names', @todo );
 .sub 'main' :main
     $P0 = get_hll_global ['ABC'], 'outer'
     $P0('ABC lex')

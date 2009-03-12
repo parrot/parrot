@@ -97,7 +97,11 @@ CODE
 main
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "pushaction as closure" );
+$ENV{TEST_PROG_ARGS} ||= '';
+my @todo = $ENV{TEST_PROG_ARGS} =~ /--run-pbc/
+    ? ( todo => 'lexicals not thawed properly from PBC, RT #60652' )
+    : ();
+pir_output_is( <<'CODE', <<'OUTPUT', "pushaction as closure", @todo );
 .sub main :main
     .local pmc a
     .lex 'a', a
