@@ -113,6 +113,8 @@ help:
 	@echo ""
 	@echo "  co-punie:      Try to fetch Punie"
 	@echo ""
+	@echo "  co-pynie:      Try to fetch Pynie"
+	@echo ""
 	@echo "  co-rakudo:     Try to fetch Rakudo"
 	@echo ""
 	@echo "  co-shakespeare: Try to fetch shakespeare"
@@ -173,6 +175,8 @@ help:
 	@echo "  up-primitivearc: Try to update primitivearc"
 	@echo ""
 	@echo "  up-punie:      Try to update Punie"
+	@echo ""
+	@echo "  up-pynie:      Try to update Pynie"
 	@echo ""
 	@echo "  up-rakudo:     Try to update Rakudo"
 	@echo ""
@@ -383,6 +387,7 @@ co-all: \
     co-pod \
     co-primitivearc \
     co-punie \
+    co-pynie \
     co-rakudo \
     co-shakespeare \
     co-tcl \
@@ -414,6 +419,7 @@ up-all: \
     up-pod \
     up-primitivearc \
     up-punie \
+    up-pynie \
     up-rakudo \
     up-shakespeare \
     up-tcl \
@@ -563,6 +569,12 @@ co-punie:
 
 up-punie:
 	cd punie && $(SVN) up
+
+co-pynie:
+	- $(SVN) checkout 'http:////pynie.googlecode.com//svn//trunk' pynie
+
+up-pynie:
+	cd pynie && $(SVN) up
 
 co-rakudo:
 	- $(GIT) clone 'git:////github.com//rakudo//rakudo.git'
