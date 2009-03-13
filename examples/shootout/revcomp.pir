@@ -1,5 +1,6 @@
-#!parrot -R jit
+#!parrot
 # Reads from stdin a file in the format made by fasta.pir
+# ./parrot -R jit
 # N = 2500000 for fasta
 
 # 2.2 s on AMD@2000/512K cache

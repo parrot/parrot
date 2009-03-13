@@ -1,6 +1,6 @@
-#!./parrot -R jit
+#!./parrot
 #
-# nsieve-bits-2 N  (N = 9 for shootout)
+# ./parrot -R jit nsieve-bits-2.pir N  (N = 9 for shootout)
 # by Leopold Toetsch
 # reset bits
 # modified by Karl Forner to accept shootout default value of N=2

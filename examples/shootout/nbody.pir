@@ -1,7 +1,8 @@
-#!./parrot -R jit
+#!./parrot
 # The Computer Language Shootout
 # http://shootout.alioth.debian.org/
 #
+# ./parrot -R jit
 # Contributed by Joshua Isom
 # speed up  from 1m25 to 6s by Leopold Toetsch
 # changed default value to 1000 to match shootout default (karl)

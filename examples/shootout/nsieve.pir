@@ -1,6 +1,6 @@
-#!./parrot -R jit
+#!./parrot
 #
-# nsieve N  (N = 9 for shootout)
+# ./parrot -R jit nsieve.pir N  (N = 9 for shootout)
 # by Leopold Toetsch
 # modified by Joshua Isom
 # modified by Karl Forner to accept shootout default value of N=2

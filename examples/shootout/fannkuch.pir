@@ -1,6 +1,6 @@
-#!./parrot -R jit
+#!./parrot
 #
-# fannkuch.pir N         (N = 9 for shootout)
+# ./parrot -R jit fannkuch.pir N         (N = 9 for shootout)
 # by Joshua Isom
 # modified by karl : default value of N=7 to match shootout output
 
