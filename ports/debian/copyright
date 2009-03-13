@@ -11,12 +11,8 @@ Copyright (C) 2001-2009, Parrot Foundation.
 
 Some files have a different copyright:
 
-compilers/imcc/imcc.y, compilers/imcc/main.c, compilers/imcc/parser_util.c,
-languages/cola/:
+compilers/imcc/imcc.y, compilers/imcc/main.c, compilers/imcc/parser_util.c:
 Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
-
-languages/urm:
-2003 (c) by Marcus Thiesen
 
 lib/Pod/:
 Copyright (c) 2001-2002 Sean M. Burke.  All rights reserved.
