@@ -30,38 +30,41 @@ native pbcs.
 
 =head1 PLATFORMS
 
-  _1   i386 32 bit opcode_t, 32 bit intval, 8 byte double
+  _1   (8_le) i386 32 bit opcode_t, 4 byte intval, 8 byte double
        (linux-gcc-i386, freebsd-gcc, cygwin, ...)
 
-  _2   i386 32 bit opcode_t, 32 bit intval, 12 byte long double
+  _2   (12_le) i386 32 bit opcode_t, 4 byte intval, 12 byte long double
        (linux-gcc-i386 or cygwin with --floatval="long double")
 
-  _3   PPC BE 32 bit opcode_t, 32 bit intval, 8 byte double
-       (darwin-ppc)
+  _3   (8_be) PPC BE 32 bit opcode_t, 4 byte intval, 8 byte double
+       (darwin-ppc or sparc32)
 
-  _4   x86_64 64 bit opcode_t, 64 bit intval, 8 byte double
+  _4   (8_le) x86_64 64 bit opcode_t, 8 byte intval, 8 byte double
        (linux-gcc-x86_64 resp. amd64, solaris-cc-64int)
 
-  _5   x86_64 64 bit opcode_t, 64 bit intval, 16 byte long double
+  _5   (16_le) x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double
        (linux-gcc-x86_64, solaris-cc-64int --floatval="long double")
 
-  _6   big-endian 64 bit opcode_t, 64 bit intval, 8 byte double
+  _6   (8_be) big-endian 64 bit opcode_t, 8 byte intval, 8 byte double
        (Sparc64/Solaris, MIPS irix or similar)
 
-  _7   big-endian 64 bit opcode_t, 64 bit intval, 16 byte long double
+  _7   (16_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double
        (Sparc64/Solaris --floatval="long double")
 
-  _8   i386 32 bit opcode_t, 32 bit intval, 4 byte single float
+  _8   (4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float
        (linux-gcc-i386 or cygwin with --floatval="float")
+
+  _9   (4_be) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
+       (darwin/ppc with --floatval="float")
 
 =cut
 
 
 =begin comment
 
-# these are PBC files generated from t/op/number_1.pasm with
-# different architectures
-# if your wordsize/floattype/endianess is not covered here
+# These are PBC files generated from t/op/number_1.pasm with
+# different architectures.
+# If your wordsize/floattype/endianess is not covered here
 # please add it:
 
   $ ./parrot -o n.pbc t/op/number_1.pasm
@@ -84,7 +87,7 @@ into your report. We need your wordsize/floattype/endianess.
 
 =cut
 
-# tt #357: better testmatrix for coverage overview
+# TT #357: better testmatrix for coverage overview
 # float conversion src: left-side (pbc) to dest: upper-side (platform)
 # 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
 my $testmatrix = <<EOF;
@@ -127,7 +130,6 @@ sub this_arch {
       . "_"
       . (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
 }
-
 sub bc_version($) {
     my $f = shift;
     my $b;
@@ -138,6 +140,7 @@ sub bc_version($) {
     my ($bc_major, $bc_minor) = unpack "cc", $b;
     return ($bc_major . "." . $bc_minor);
 }
+
 my ( $bc_major, $bc_minor ) = Parrot::BuildUtil::get_bc_version();
 my $bc = ($bc_major . "." . $bc_minor);
 my $arch = this_arch();
@@ -228,77 +231,89 @@ sub test_pbc_number {
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 0   (interpreter's byteorder       = 0)
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-#         parrot-version 0.9.1, bytecode-version 3.36
+#         parrot-version 0.9.1, bytecode-version 3.38
 #         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(1, "i386 8-byte double float, 32 bit opcode_t");
+test_pbc_number(1, "(8_le) i386 32 bit opcode_t, 4 byte intval, 8 byte double");
 
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 0   (interpreter's byteorder       = 0)
 #         floattype = 1   (interpreter's NUMVAL_SIZE     = 12)
-#         parrot-version 0.9.1, bytecode-version 3.36
+#         parrot-version 0.9.1, bytecode-version 3.38
 #         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(2, "i386 12-byte long double float, 32 bit opcode_t");
+test_pbc_number(2, "(12_le) i386 32 bit opcode_t, 4 byte intval, 12 byte long double");
 
 # darwin/ppc:
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
 #         byteorder = 1   (interpreter's byteorder       = 1)
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-#         parrot-version 0.9.0, bytecode-version 3.34
+#         parrot-version 0.9.1, bytecode-version 3.38
 #         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(3, "PPC double float 32 bit BE opcode_t");
+test_pbc_number(3, "(8_be) PPC BE 32 bit opcode_t, 4 byte intval, 8 byte double");
 
 # any ordinary 64-bit intel unix:
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-#         parrot-version 0.9.1, bytecode-version 3.36
+#         parrot-version 0.9.1, bytecode-version 3.38
 #         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(4, "i86_64 LE 64 bit opcode_t, 8-byte double");
+test_pbc_number(4, "(8_le) x86_64 64 bit opcode_t, 8 byte intval, 8 byte double");
 
 # i86_64 with floatval='long double'
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)
 #         floattype = 2   (interpreter's NUMVAL_SIZE     = 16)
-#         parrot-version 0.9.0, bytecode-version 3.34
+#         parrot-version 0.9.1, bytecode-version 3.38
 #         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(5, "i86_64 LE 64 bit opcode_t, long double");
+test_pbc_number(5, "(16_le) x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double");
 
 # PowerPC64 -m64
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 1   (interpreter's byteorder       = 0)
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-#         parrot-version 0.9.1, bytecode-version 3.35
+#         parrot-version 0.9.1, bytecode-version 3.38
 #         UUID type = 0, UUID size = 0
 #         *need* endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(6, "big-endian 64-bit, 8-byte double");
+test_pbc_number(6, "(8_be) big-endian 64 bit opcode_t, 8 byte intval, 8 byte double");
 
 # ppc/mips -m64 --floatval="long double"
-#test_pbc_number(7, "big-endian 64-bit, 8-byte int, 16-byte double");
+# HEADER => [
+#         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
+#         byteorder = 1   (interpreter's byteorder       = 0)
+#         floattype = 2   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 0.9.1, bytecode-version 3.38
+#         UUID type = 0, UUID size = 0
+#         *need* endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
+#test_pbc_number(7, "(16_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
 
 # i386 --floatval=float
-#test_pbc_number(8, "i386 4-byte float, 32 bit opcode_t, 4-byte int");
+#test_pbc_number(8, "(4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
+
+# ppc -m32 --floatval=float
+#test_pbc_number(9, "(4_le) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 # Local Variables:
 #   mode: cperl
