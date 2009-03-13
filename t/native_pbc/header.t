@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+use Parrot::Test tests => 9;
 
 use File::Temp;
 use Parrot::Config;
@@ -68,7 +68,7 @@ ok( $h{floattype} < 3, "floattype: $h{floattype}" );
 is( $h{major}, $PConfig{MAJOR}, "major version: $h{major} vs $PConfig{MAJOR}" );
 is( $h{minor}, $PConfig{MINOR}, "minor version: $h{minor} vs $PConfig{MINOR}" );
 is( $h{patch}, $PConfig{PATCH}, "patch version: $h{patch} vs $PConfig{PATCH}" );
-# see pbcversion.h. 3.19 currently
+# see pbcversion.h or PBC_COMPAT
 ok( $h{bc_major} > 0,           "bc major version: $h{bc_major}" );
 ok( $h{bc_minor} > 0,           "bc minor version: $h{bc_minor}" );
 

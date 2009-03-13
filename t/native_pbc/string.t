@@ -10,6 +10,7 @@ use Parrot::Config;
 use Parrot::BuildUtil;
 
 use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+#use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -74,13 +75,6 @@ my $skip = {
   2 => "dummy",
   5 => "dummy"
 };
-# special failures: 64bit cannot read 32bit
-if ($PConfig{ptrsize} == 8) {
-    my $todo_msg = "TT #254 64bit cannot read 32bit";
-    $skip->{1} = $todo_msg;
-    $skip->{3} = $todo_msg;
-    $skip->{8} = $todo_msg;
-}
 
 my $output = << 'END_OUTPUT';
 %Ec

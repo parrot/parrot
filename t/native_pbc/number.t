@@ -10,6 +10,7 @@ use Parrot::Config;
 use Parrot::BuildUtil;
 
 use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+#use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -55,17 +56,6 @@ native pbcs.
 
 =cut
 
-# tt #357: need better testmatrix for coverage overview
-# float conversion src: left-side (pbc) to dest: upper-side (platform)
-# 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
-my $testmatrix = <<EOF;
-       8_le 12_le 16_le 8_be 16_be
-8_le     1     1    1     1     ?
-12_le    1     1    0     0     ?
-16_le    0     0    1     ?     ?
-8_be     1     1    ?     1     ?
-16_be    1     1    1     ?     1
-EOF
 
 =begin comment
 
@@ -94,12 +84,18 @@ into your report. We need your wordsize/floattype/endianess.
 
 =cut
 
-#	8_le 12_le 16_le 8_be 16_be
-#8_le     1     1    ?     ?     ?
-#12_le    1     1    ?     ?     ?
-#16_le    1     1    1     ?     ?
-#8_be     1     1    ?     1     ?
-#16_be    1     1    1     ?     1
+# tt #357: better testmatrix for coverage overview
+# float conversion src: left-side (pbc) to dest: upper-side (platform)
+# 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
+my $testmatrix = <<EOF;
+       8_le 12_le 16_le 8_be 16_be
+8_le     1     1    1     1     1
+12_le    1     1    0     0     0
+16_le    1     0    1     0     1
+8_be     1     1    1     1     1
+16_be    1     1    1     0     1
+EOF
+
 my $destarch = { '8_le'  => [1,4], '12_le' => [2], '16_le' => [5],
                  '8_be'  => [3,6], '16_be' => [7] };
 # the reverse: which tests for which arch
@@ -147,15 +143,6 @@ my $bc = ($bc_major . "." . $bc_minor);
 my $arch = this_arch();
 my $todo = generate_skip_list($arch, '?');
 my $skip = generate_skip_list($arch, '0');
-
-# special failures: 64bit cannot read 32bit
-if ($PConfig{ptrsize} == 8) {
-    my $todo_msg = "TT #254 64bit cannot read 32bit";
-    $skip->{1} = $todo_msg;
-    $skip->{2} = $todo_msg;
-    $skip->{3} = $todo_msg;
-    $skip->{8} = $todo_msg;
-}
 
 my $output = << 'END_OUTPUT';
 1
