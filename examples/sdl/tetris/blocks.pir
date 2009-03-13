@@ -58,7 +58,7 @@ blocks.pir - tetris block classes
     $P0 = get_class "Tetris::Block::6"
     push blocks, $P0
 
-    store_global "Tetris::Block", "blocks", blocks
+    set_hll_global [ "Tetris::Block" ], "blocks", blocks
 END:
 .end
 

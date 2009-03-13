@@ -876,7 +876,7 @@ TDB
     .local pmc blocks
     .local pmc ret
 
-    blocks = find_global "Tetris::Block", "blocks"
+    blocks = get_hll_global [ "Tetris::Block" ], "blocks"
 
     if id != -1 goto OK
 

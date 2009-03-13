@@ -15,7 +15,7 @@ B<Note:> The Tetris::App class is implemented as a singleton.
     ...
 
     # create a new random C<next block> on board 3
-    app = find_global "Tetris::App", "app"
+    app = get_hll_global [ "Tetris::App" ], "app"
     app."nextBlock"( 3 )
 
 =head1 CLASS INFORMATION
@@ -77,7 +77,7 @@ This method throws an exception if an error occurs.
 
 .sub BUILD :method
     # create the app object
-    store_global "Tetris::App", "app", self
+    set_hll_global [ "Tetris::App" ], "app", self
 
     $P0 = new 'Hash'
     setattribute self, 'DebugFlags', $P0
@@ -165,7 +165,7 @@ An exception is thrown if an error occurs.
 =cut
 
 .sub _app_timer
-    find_global $P0, "Tetris::App", "app"
+    get_hll_global $P0, [ "Tetris::App" ], "app"
     $P0."timer"()
 .end
 
@@ -189,7 +189,7 @@ An exception is thrown if an error occurs.
 
 .sub initTimer :method
     $P0 = new "Array"
-    $P1 = find_global "Tetris::App", "_app_timer"
+    $P1 = get_hll_global [ "Tetris::App" ], "_app_timer"
     $P0 = 8
     $P0[0] = .PARROT_TIMER_NSEC
     $P0[1] = 0.1

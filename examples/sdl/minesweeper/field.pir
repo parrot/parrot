@@ -177,7 +177,7 @@ SDL surface to use for drawing.
     $P0.'pos'( 305, 2 )
     $P0.'size'( 30, 30 )
 
-    $P1 = find_global 'Mines::Field', '_button_clicked'
+    $P1 = get_hll_global [ 'Mines::Field' ], '_button_clicked'
     $P0.'setAction'( STATUS_PLAYING, $P1 )
     $P0.'setAction'( STATUS_WON, $P1 )
     $P0.'setAction'( STATUS_LOST, $P1 )
@@ -314,10 +314,10 @@ Draws the field, then the LCDs and the smiley button.
     maxy    = 0
 
     if debug goto DEBUG
-    image = find_global "Mines::Field", "field"
+    image = get_hll_global [ "Mines::Field" ], "field"
     branch IMAGE_OK
 DEBUG:
-    image = find_global "Mines::Field", "field_debug"
+    image = get_hll_global [ "Mines::Field" ], "field_debug"
 IMAGE_OK:
     $P0 = new 'Hash'
     $P0['x'] = 0
@@ -976,12 +976,12 @@ This method is called automatically when this module is loaded.
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines.png"
     image = new "SDL::Image", $P0
-    store_global "Mines::Field", "field", image
+    set_hll_global [ "Mines::Field" ], "field", image
 
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines_debug.png"
     image = new "SDL::Image", $P0
-    store_global "Mines::Field", "field_debug", image
+    set_hll_global [ "Mines::Field" ], "field_debug", image
 
     newclass $P0, "Mines::Field"
     addattribute $P0, 'field'
