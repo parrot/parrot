@@ -736,6 +736,17 @@ Generic method for compilers invoked from a shell command line.
     .param pmc args
     .param pmc adverbs         :slurpy :named
 
+    ## this bizarre piece of code causes the compiler to
+    ## immediately abort if it looks like it's being run
+    ## from Perl's Test::Harness.  We expect to remove this
+    ## check eventually (or make it a lot smarter than it
+    ## is here).
+    $S0 = args[2]
+    $I0 = index $S0, '@INC'
+    if $I0 < 0 goto not_harness
+    exit 0
+  not_harness:
+
     load_bytecode 'dumper.pbc'
     load_bytecode 'PGE/Dumper.pbc'
 
