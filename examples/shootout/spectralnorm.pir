@@ -1,6 +1,6 @@
-#!./parrot -R jit
+#!./parrot
 #
-# spectralnorm.pir N         (N = 100 for shootout)
+# ./parrot -R jit spectralnorm.pir N         (N = 100 for shootout)
 # by Michal Jurosz
 # modified by Karl Forner to accept shootout default value of N=100
 
