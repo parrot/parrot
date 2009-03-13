@@ -62,7 +62,7 @@ Tests the object/class subsystem.
     PMC_as_classes__derived_3()
     subclassing_Class()
     namespace_vs_name()
-    multpile_anon_classes()
+    multiple_anon_classes()
     subclassed_Integer_bug()
     equality_of_subclassed_Integer()
     short_name_attributes()
@@ -414,7 +414,7 @@ l1:
     setattribute $P3, "i", $P5
 
     getattribute $P6, $P2, "i"
-    is( $P6, 100, 'attribute value on 1st object is specfic to obj' )
+    is( $P6, 100, 'attribute value on 1st object is specific to obj' )
 
     getattribute $P6, $P3, "i"
     is( $P6, 'One hundred', 'attribute value on 2nd obj is specific to obj' )
@@ -1037,12 +1037,12 @@ l1:
 .namespace []       # Reset to root namespace for next test
 
 #RT #33103
-.sub multpile_anon_classes
+.sub multiple_anon_classes
      newclass $P0, "City3"
      subclass $P1, $P0
      newclass $P2, "State3"
      subclass $P3, $P2
-     ok( 1,  "muliple anon classes didn't croak (bug #33103)" )
+     ok( 1,  "multiple anon classes didn't croak (bug #33103)" )
 .end
 
 .sub subclassed_Integer_bug

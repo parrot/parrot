@@ -104,7 +104,7 @@ The time at which this Task was inserted into the task list.
 
 =item C<code>
 
-A C<Sub> or descendent PMC related to this task.
+A C<Sub> or descendant PMC related to this task.
 
 =item C<interp>
 

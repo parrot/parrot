@@ -997,7 +997,7 @@ Checks if the ascii STRING C<str> is just an integer.
 
 =item C<INTEGER reverse_index(STRING *substring, INTVAL start)>
 
-Find last occurence of C<substring>, but not after the C<start> position.
+Find last occurrence of C<substring>, but not after the C<start> position.
 
 =cut
 

@@ -21,7 +21,7 @@ t/pmc/sys.t - System Tests
 
 =head1 DESCRIPTION
 
-Tests system dependend stuff
+Tests system dependent stuff
 
 =cut
 

@@ -778,7 +778,7 @@ Map core_type to hll_type.
 
 =item METHOD stdhandle(INTVAL fileno, PMC *newhandle :optional)
 
-Returns the standard parrot handler asscoiated with the interpreter.
+Returns the standard parrot handler associated with the interpreter.
 The valid values for fileno are listed in include/stdio.pasm
 
 Optionally sets the parrot handler passed as second argument

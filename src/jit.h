@@ -70,7 +70,7 @@ enum {
  *  size:           The size of the arena in bytes
  *  op_map:         Maps opcode offsets to native code.
  *  map_size:       The size of the map in bytes.
- *  fixups:         List of fixupes.
+ *  fixups:         List of fixups.
  */
 
 typedef struct Parrot_jit_arena_t {

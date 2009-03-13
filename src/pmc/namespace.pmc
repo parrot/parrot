@@ -447,7 +447,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
     VTABLE void *get_pointer_keyed_str(STRING *key) {
         PMC *ns = (PMC *)parrot_hash_get(INTERP, NS_HASH(SELF), key);
 
-        /* Be extra carefull about returnning PMCNULL */
+        /* Be extra careful about returning PMCNULL */
         if (! PMC_IS_NULL(ns)) {
             if ((PObj_get_FLAGS(ns) & FPA_is_ns_ext) &&
                     ns->vtable->base_type == enum_class_FixedPMCArray)

@@ -25,7 +25,7 @@ in that aggregate.
     goto iter_loop
   iter_end:
 
-The C<new> can alteratively be written as:
+The C<new> can alternatively be written as:
 
   iterator = iter array
 
@@ -335,7 +335,7 @@ Returns the number of remaining elements in the aggregate. TODO.
 
 =item C<PMC *get_pmc()>
 
-Returns this Interator's aggregate.
+Returns this Iterator's aggregate.
 
 =cut
 

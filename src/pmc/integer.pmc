@@ -1312,7 +1312,7 @@ Sets C<dest> to the absolute value of SELF.
     VTABLE PMC *absolute(PMC *dest) {
         const INTVAL a = abs(SELF.get_integer());
 
-        /* RT #46635 overlflow for -maxint */
+        /* RT #46635 overflow for -maxint */
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, a);

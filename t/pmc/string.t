@@ -68,7 +68,7 @@ Tests the C<String> PMC.
     test_string_reverse_index()
     out_of_bounds_substr_positive_offset()
     out_of_bounds_substr_negative_offset()
-    excpetion_to_int_2()
+    exception_to_int_2()
     exception_to_int_3()
 
     # END_OF_TESTS
@@ -349,7 +349,7 @@ TRUE4:  ok( $I0, 'String "0123" is true' )
         set $I0, 1
         if $P4, TRUE5
         set $I0, 0
-TRUE5:  nok( $I0, 'uninitizalized String is false' )
+TRUE5:  nok( $I0, 'uninitialized String is false' )
 .end
 
 .sub test_concat
@@ -997,7 +997,7 @@ handler:
     .exception_is( 'Cannot take substr outside string' )
 .end
 
-.sub excpetion_to_int_2
+.sub exception_to_int_2
     .local pmc s
     s = new ['String']
     s = "123"

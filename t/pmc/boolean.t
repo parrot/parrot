@@ -186,7 +186,7 @@ end:
     does b, p, "scalar"
     is(b, 1, "Boolean does scalar")
     does b, p, "boolean"
-    is(b, 1, "Boolean does boolean (big suprise there)")
+    is(b, 1, "Boolean does boolean (big surprise there)")
     does b, p, "no_interface"
     is(b, 0, "Boolean doesn't do no_interface")
 .end

@@ -381,7 +381,7 @@ Returns the boolean value of the pointer.
 
 =item C<METHOD arity()>
 
-Return the arity of the NCI (the number of arugments).
+Return the arity of the NCI (the number of arguments).
 
 =cut
 

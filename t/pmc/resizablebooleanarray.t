@@ -645,10 +645,10 @@ lp2:
     ne $I1, 0, err
     inc $I0
     lt $I0, $I2, lp2
-    ok(1, "zeoredness tests passed")
+    ok(1, "zeroedness tests passed")
     .return()
 err:
-    ok(0, "zeoredness tests failed")
+    ok(0, "zeroedness tests failed")
     print "#Found non-zero value "
     print $I1
     print " at "

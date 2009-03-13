@@ -848,7 +848,7 @@ Sets the sub that is the outer of this one.
 
 =item C<INTVAL arity()>
 
-Return the arity of the Sub (the number of arugments, excluding optional and
+Return the arity of the Sub (the number of arguments, excluding optional and
 slurpy arguments).
 
 =cut

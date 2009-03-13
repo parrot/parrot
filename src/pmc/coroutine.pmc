@@ -36,7 +36,7 @@ stopped. See the L<Glossary|docs/glossary.pod> for more information.
 static void
 print_sub_name(PARROT_INTERP, PMC *sub_pmc)
 {
-    /* It's acually a Parrot_coro, but this avoids casting warnings. */
+    /* It's actually a Parrot_coro, but this avoids casting warnings. */
     Parrot_sub          *co;
     Interp      * const tracer = (interp->pdb && interp->pdb->debugger) ?
         interp->pdb->debugger :

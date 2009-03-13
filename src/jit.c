@@ -164,7 +164,7 @@ make_branch_list(PARROT_INTERP,
      *      target is unpredictable because of the set_addr opcode, we
      *      need to find a solution for this, in the mean time, we will
      *      make each section have its own arena and try to avoid
-     *      going in and out from them as much as posible.
+     *      going in and out from them as much as possible.
      *
      *  PARROT_JUMP_RESTART
      *      If the parrot program counter is zero, fall out of the

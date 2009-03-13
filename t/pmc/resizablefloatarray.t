@@ -137,7 +137,7 @@ ok 2
 ok 3
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indeded elements" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "Setting negatively indexed elements" );
     new P0, ['ResizableFloatArray']
     set P0, 1
 
@@ -153,7 +153,7 @@ CODE
 caught something
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indeded elements" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "Getting negatively indexed elements" );
     new P0, ['ResizableFloatArray']
     set P0, 1
 
