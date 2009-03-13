@@ -1,8 +1,0 @@
-# $Id$
-
-Known deficencies in Parrot Common Lisp:
-
-Some broken features.
-
-( print "asdf" ) print asdf and not "asdf"
-

@@ -71,7 +71,6 @@ my @steps = qw(
     gen::parrot_include
     gen::opengl
     gen::call_list
-    gen::languages
     gen::makefiles
     gen::platform
     gen::config_pm

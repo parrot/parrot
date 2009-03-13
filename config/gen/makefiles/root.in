@@ -151,7 +151,6 @@ GEN_MAKEFILES := \
     compilers/tge/Makefile \
     editor/Makefile \
     ext/Makefile \
-    languages/Makefile \
     src/dynoplibs/Makefile
 
 GEN_CONFIGS := \
@@ -707,11 +706,6 @@ help :
 	@echo ""
 	@echo "Language implementations:"
 	@echo "  compilers:         Proxy for default target of pge and tge compilers"
-	@echo "  languages:         Proxy for default target of languages/Makefile"
-	@echo "  languages-test:    Proxy for target 'test' of languages/Makefile"
-	@echo "  languages-test-unified:  Proxy for target 'test-unified' of languages/Makefile"
-	@echo "  languages-test-separate: Proxy for target 'test-separate' of languages/Makefile"
-	@echo "  languages-clean:   Proxy for target 'clean' of languages/Makefile"
 	@echo ""
 	@echo "Fetch from source repository:"
 	@echo "  update:            svn update."
@@ -1354,7 +1348,7 @@ dynoplibs-clean :
 
 ###############################################################################
 #
-# language implementation targets:
+# compiler implementation targets:
 #
 ###############################################################################
 
@@ -1366,32 +1360,6 @@ compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
-
-languages : languages.dummy
-
-languages.dummy :
-	$(MAKE) languages
-
-languages-test :
-	$(MAKE) languages test
-
-languages-test-unified :
-	$(MAKE) languages test-unified
-
-languages-test-separate :
-	$(MAKE) languages test-separate
-
-languages-clean :
-	$(MAKE) languages clean
-
-languages-realclean :
-	$(MAKE) languages realclean
-
-###############################################################################
-#
-# compiler implementation targets:
-#
-###############################################################################
 
 compilers-clean :
 	$(MAKE) compilers/pct clean
@@ -1625,7 +1593,6 @@ clean : \
     test-clean \
     prog-clean \
     dynext-clean \
-    languages-clean \
 #IF(has_perldoc):    docs-clean \
 #IF(has_perldoc):    html-clean \
     dynpmc-clean \
@@ -1802,7 +1769,6 @@ imcc-clean:
 
 # a failing step of cleaning, usually doesn't concern the following steps
 realclean : clean
-	-$(MAKE) languages       realclean
 	-$(MAKE) compilers/pirc  realclean
 	-$(MAKE) src/dynpmc      realclean
 	$(RM_RF) \

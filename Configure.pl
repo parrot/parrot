@@ -164,11 +164,6 @@ Tells Configure.pl not to run the MANIFEST check.
 
 Sets the location where parrot will be installed.
 
-=item C<--languages="list of languages">
-
-Specify a list of languages to process (space separated.)
-Used in combination with C<--step=gen::languages> to regenerate makefiles.
-
 =item C<--ask>
 
 This turns on the user prompts during configuration.  Available only in
@@ -627,7 +622,6 @@ configuration file.
     gen::parrot_include
     gen::opengl
     gen::call_list
-    gen::languages
     gen::makefiles
     gen::platform
     gen::config_pm
