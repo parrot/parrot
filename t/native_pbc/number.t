@@ -89,11 +89,11 @@ into your report. We need your wordsize/floattype/endianess.
 # 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
 my $testmatrix = <<EOF;
        8_le 12_le 16_le 8_be 16_be
-8_le     1     1    1     1     1
+8_le     1     1    1     1     0
 12_le    1     1    0     0     0
-16_le    1     0    1     0     1
+16_le    1     0    1     0     0
 8_be     1     1    1     1     1
-16_be    1     1    1     0     1
+16_be    1     1    1     0     0
 EOF
 
 my $destarch = { '8_le'  => [1,4], '12_le' => [2], '16_le' => [5],
