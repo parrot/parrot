@@ -156,6 +156,15 @@ C<Parrot_pbc_read> has one third int argument.
 
 L<https://trac.parrot.org/parrot/ticket/266>
 
+=item C API coding standards cleanup [eligible in 1.1]
+
+All C API functions that aren't currently named according to the
+'Parrot_<system>_*' scheme will be renamed. If you depend on these
+functions in an extending/embedding interface or C-level custom PMCs,
+check in 1.4 or 2.0 for the new names.
+
+L<https://trac.parrot.org/parrot/ticket/443>
+
 =back
 
 =head1 Compiler tools
