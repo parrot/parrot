@@ -65,10 +65,7 @@ my $result = GetOptions( 'languages=s'   => \$languages_list );
 # Various languages are not yet in unified testing; some will never be.
 #
 # BASIC                No t/harness, two implementations
-# ecmascript           No t/harness
 # forth                No t/harness
-# pheme                test scripts are written in Scheme, not Perl 5
-# PIR                  many test failures
 # scheme               many test failures
 # urm                  uses deprecated parrot features
 
@@ -76,9 +73,8 @@ my @unified_testable_languages
     = defined $languages_list ?
           split( /\s*,\s*/, $languages_list )
           :
-          qw( abc
+          qw(
               bf
-              dotnet
               jako
               lisp
               ook

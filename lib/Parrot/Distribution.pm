@@ -653,7 +653,6 @@ sub perl_script_file_directories {
         'editor', 'examples/benchmarks', 'examples/mops', 'languages',
         map( "languages/$_" => qw<
             BASIC/compiler BASIC/interpreter
-            dotnet dotnet/build dotnet/tools
             python
             regex
             scheme scheme/Scheme
@@ -701,12 +700,9 @@ sub perl_module_file_directories {
         'ext/Parrot-Embed/lib/Parrot',
         map( "languages/$_" => qw<
             BASIC/compiler
-            bc/lib/Parrot/Test bc/lib/Parrot/Test/Bc
-            dotnet/build/SRM dotnet/t
             jako/lib/Jako
             jako/lib/Jako/Construct
             parrot_compiler/lib/Parrot/Test
-            perl6/t/01-sanity
             regex/lib
             scheme scheme/Scheme
             urm/lib/URM
