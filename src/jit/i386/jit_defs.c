@@ -59,7 +59,7 @@ PMC*
 get_nci_P(PARROT_INTERP, ARGMOD(call_state *st), int n)
 {
     /*
-     * exessive args are passed as NULL
+     * excessive args are passed as NULL
      * used by e.g. MMD infix like __add
      */
     if (n < st->src.n)
@@ -1499,7 +1499,7 @@ jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP)
  *
  * TODO factor out common code
  *      use jit_emit_mov_RM_{in} functions (load/store base indexed)
- *      and a macro to retrive sp
+ *      and a macro to retrieve sp
  */
 int
 jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip)
@@ -1911,7 +1911,7 @@ Parrot_jit_begin(Parrot_jit_info_t *jit_info,
  *
  *   args[0] ...    NULL / return value address
  *   args[1..n] ... addresses of n arguments
- *   args[n + 1] .. opcode_t* next - ususally just returned
+ *   args[n + 1] .. opcode_t* next - usually just returned
  */
 
 void
@@ -2029,7 +2029,7 @@ Parrot_jit_emit_finit(Parrot_jit_info_t *jit_info)
 /*
  * XXX needs some fixing
  * s. t/sub/pmc_{8,9}.t: the 2 print in tail call without that 'end'
- *    are recogniced as one non JIIted block
+ *    are recognized as one non JITted block
  */
 void
 Parrot_jit_normal_op(Parrot_jit_info_t *jit_info,
@@ -2581,7 +2581,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             /* EAX is char* */
             emitm_movl_i_m(pc, 0, emit_EBP, 0, 1, temp_calls_offset + 8); /* len */
 
-            /* overrights address of st in EBP(4) */
+            /* overwrites address of st in EBP(4) */
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
 
             emitm_call_cfunc(pc, Parrot_str_new);

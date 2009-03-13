@@ -36,7 +36,7 @@ typedef enum {
     ISR1 = r11,         /* temp aka intermediate scratch reg 1 */
     r12,
     ISR2 = r12,         /* temp reg 2 */
-    BP   = r13,         /* register base pointer (peristent) */
+    BP   = r13,         /* register base pointer (persistent) */
     OP_MAP = r14,       /* cached op_map (persistent) */
     CODE_START = r15,   /* cached code begint (persistent) */
     INTERP = r16,       /* cached interpreter register (persistent) */

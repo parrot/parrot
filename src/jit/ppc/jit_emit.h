@@ -186,7 +186,7 @@ enum { JIT_PPC_CALL, JIT_PPC_BRANCH, JIT_PPC_UBRANCH };
  * If AA = 0, the branch target address is the sum of LI and the address of
  * this instruction.
  * If AA = 1, the branch target address is the value of LI.
- * If LK = 1, the effextive address of the instruction following the branch
+ * If LK = 1, the effective address of the instruction following the branch
  * instruction is placed into the link register.
  *
  */

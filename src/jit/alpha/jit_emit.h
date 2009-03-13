@@ -141,7 +141,7 @@ enum { JIT_ALPHABRANCH, JIT_ALPHABSR };
 /* Load / Store a Parrot register.
  *
  * Perform a memory operation using a Parrot register as the source or
- * the destinatination.
+ * the destination.
  *
  */
 

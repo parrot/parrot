@@ -460,7 +460,7 @@ emit_mla(char *pc,
     return pc;
 }
 
-/* operand2 immedate constants are expressed as val rotate right (2 * n),
+/* operand2 immediate constants are expressed as val rotate right (2 * n),
    where val is 8 bits, n is 4 bits. This uses the 12 bits available to
    generate many useful common constants, far more than would be given by a
    12 bit number 0 - 0xFFF.
@@ -797,10 +797,10 @@ Parrot_jit_arith_const_alternate(Parrot_jit_info_t *jit_info,
 /* branching on if cannot (in future) be conditional (easily), because we
    want to set the flags.
    Yes, for seriously advanced stuff you can
-   1: chain compatible comparisons (eg someting setting LE and something else
+   1: chain compatible comparisons (eg something setting LE and something else
       setting LE can be done with the second conditional)
    2: use TEQ which doesn't change the V flag (or C, IIRC), and chain that with
-      someting else that did set the V flag
+      something else that did set the V flag
 
    but that's JIT v5 or later (where v3 can hold intermediate values in CPU
    registers, and v4 can do some things conditionally)
@@ -1080,7 +1080,7 @@ arm_sync_d_i_cache(void *start, void *end)
         Parrot_ex_throw_from_c_args(interp, NULL, JIT_ERROR,
                "Synchronising I and D caches failed with errno=%d\n", -result);
 #      else
-#        error "ARM needs to sync D and I caches, and I don't know how to embed assmbler on this C compiler"
+#        error "ARM needs to sync D and I caches, and I don't know how to embed assembler on this C compiler"
 #      endif
 #    else
 /* Not strictly true - on RISC OS it's OS_SynchroniseCodeAreas  */

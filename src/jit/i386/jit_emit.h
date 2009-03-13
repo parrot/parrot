@@ -1423,7 +1423,7 @@ char * div_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r1);
 char * mod_rr_n(PARROT_INTERP, Parrot_jit_info_t *jit_info, int r);
 
 /* ST(i) %= MEM
- * please note the hardccded jumps */
+ * please note the hardcoded jumps */
 #  define jit_emit_cmod_RM_n(interp, pc, r, offs)  \
     if (r)  \
       emitm_fxch((pc), (r)); \
@@ -1737,7 +1737,7 @@ void jit_restore_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP);
  *
  * TODO factor out common code
  *      use jit_emit_mov_RM_{in} functions (load/store base indexed)
- *      and a macro to retrive sp
+ *      and a macro to retrieve sp
  */
 
 int jit_save_regs_call(Parrot_jit_info_t *jit_info, PARROT_INTERP, int skip);
@@ -1836,7 +1836,7 @@ void Parrot_jit_begin(Parrot_jit_info_t *jit_info, PARROT_INTERP);
  *
  *   args[0] ...    NULL / return value address
  *   args[1..n] ... addresses of n arguments
- *   args[n + 1] .. opcode_t* next - ususally just returned
+ *   args[n + 1] .. opcode_t* next - usually just returned
  */
 
 void Parrot_jit_begin_sub_regs(Parrot_jit_info_t *jit_info, PARROT_INTERP);

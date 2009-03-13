@@ -447,7 +447,7 @@ enum { JIT_HPPA_BRANCH, JIT_HPPA_CALL };
 
 /*  emit_cmpbranch
  *
- *      Braches to dest if cond is satisfied.
+ *      Branches to dest if cond is satisfied.
  *      Doesn't save a return address.
  */
 
@@ -539,7 +539,7 @@ Parrot_emit_jump_to_ret(Parrot_jit_info_t *jit_info, PARROT_INTERP)
  * specifically, we load the FDP (Function Descriptor Pointer) into ISR2,
  * get the address and r19 set, load the IP, and calculate the displacement
  * right shiff it by 3 and branch there.
- * The FDP will cointain the actual function address the second time it's
+ * The FDP will contain the actual function address the second time it's
  * called.
  * But for EXEC using BRANCH AND LINK, this is because the address of
  * the code generated in the JIT could (probably will) be 65535 * 4 bytes
@@ -658,7 +658,7 @@ Parrot_jit_dofixup(Parrot_jit_info_t *jit_info, PARROT_INTERP)
                 emit_bl(fixup_ptr, 0);
                 /* Make the return address pass the actual branch */
                 emit_addimm11(fixup_ptr, r2, r2, 8);
-                /* Branch without modifing r2 */
+                /* Branch without modifying r2 */
                 emit_bv(fixup_ptr, CIR, r0, 1);
                 jit_emit_nop(fixup_ptr);
                 break;
