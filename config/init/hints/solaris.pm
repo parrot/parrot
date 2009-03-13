@@ -102,22 +102,6 @@ sub runstep {
     };
     $conf->data->settrigger( "gccversion", "solaris_ieee", $solaris_ieee_cb );
 
-    # Sparc64 Sun Pro cc has a strict default ptr_alignment of 8
-    # See TT #364
-    my $solaris_memalign_cb = sub {
-        my ( $key, $gccversion ) = @_;
-
-        if ($gccversion) {
-            # Don't know how to do this for gcc.
-        }
-        elsif ($conf->data->get('byteorder') eq '87654321') { # sun pro cc Sparc64 only
-            my $linkflags = $conf->data->get('linkflags');
-            $conf->data->add( ' ', linkflags => '-xmemalign=4s' )
-                unless $linkflags =~ /-xmemalign/;
-        }
-        $conf->data->deltrigger( "gccversion", "solaris_memalign" );
-    };
-    $conf->data->settrigger( "gccversion", "solaris_memalign", $solaris_memalign_cb );
 }
 
 1;
