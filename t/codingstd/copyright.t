@@ -48,7 +48,7 @@ my ( @no_copyright_files,
 
 my $copyright_simple =
     qr/Copyright \(C\) \d{4}/i;
-my $copyright_re =
+my $copyright_parrot =
     qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.$/m;
 
 foreach my $file (@files) {
@@ -67,7 +67,7 @@ foreach my $file (@files) {
 
     # is the copyright text correct?
     # If so, remove it...
-    if ( ! ($buf =~ s/$copyright_re//) ) {
+    if ( ! ($buf =~ s/$copyright_parrot//) ) {
         push @bad_format_copyright_files, $path;
     }
     # ... and then see if any other copyright notices exist.
@@ -76,6 +76,14 @@ foreach my $file (@files) {
     }
 }
 
+my $suggested_version=<<END_SUGGESTION;
+  Copyright (C) C<start-year>-C<last-year-modified>, Parrot Foundation.
+To find the C<start-year>, use a command such as:
+  svn log C<filename> | grep 'lines' | tail -n 1
+To find the C<last-year-modified>, use a command such as:
+  svn log C<filename> | grep 'lines' | head -n 1
+END_SUGGESTION
+
 # run the tests
 ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
     or diag(
@@ -83,11 +91,7 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
         $/ => "No copyright statement found in " . scalar @no_copyright_files . " files:",
     @no_copyright_files,
     "The copyright statement should read something like:",
-    "  Copyright (C) C<start-year>-C<last-year-modified>, Parrot Foundation.",
-    "To find the C<start-year>, use a command such as:",
-    "  svn log C<filename> | grep 'lines' | tail -n 1",
-    "To find the C<last-year-modified>, use a command such as:",
-    "  svn log C<filename> | grep 'lines' | head -n 1"
+    $suggested_version
     );
 
 TODO:
@@ -101,11 +105,7 @@ TODO:
             . " files:",
         @bad_format_copyright_files,
         "Please update to read something like:",
-        "  Copyright (C) C<start-year>-C<last-year-modified>, Parrot Foundation.",
-        "To find the C<start-year>, use a command such as:",
-        "  svn log C<filename> | grep 'lines' | tail -n 1",
-        "To find the C<last-year-modified>, use a command such as:",
-        "  svn log C<filename> | grep 'lines' | head -n 1"
+        $suggested_version
         );
 
     ok( !scalar(@duplicate_copyright_files), 'Duplicate Copyright statements' )
@@ -115,7 +115,9 @@ TODO:
             . scalar @duplicate_copyright_files
             . " files:",
         @duplicate_copyright_files,
-        "Please get copyright assigned to Parrot Foundation and remove alternate notice."
+        "Please get copyright assigned to Parrot Foundation",
+        "and remove alternate notice; Or remove duplicated",
+        "notice for Parrot Foundation."
         );
 }
 
