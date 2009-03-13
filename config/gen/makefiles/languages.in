@@ -21,7 +21,7 @@ LANGUAGES := \
     jako \
     lisp \
     ook \
-    parrot_compiler pynie \
+    parrot_compiler \
     regex \
     scheme \
     urm
@@ -201,7 +201,7 @@ test-separate: all \
     jako.test \
     lisp.test \
     ook.test \
-    parrot_compiler.test pynie.test \
+    parrot_compiler.test \
     regex.test \
     scheme.test \
     urm.test
@@ -213,7 +213,7 @@ clean: \
     jako.clean \
     lisp.clean \
     ook.clean \
-    parrot_compiler.clean pynie.clean \
+    parrot_compiler.clean \
     regex.clean \
     scheme.clean \
     urm.clean
@@ -225,7 +225,7 @@ realclean: \
     jako.realclean \
     lisp.realclean \
     ook.realclean \
-    parrot_compiler.realclean pynie.realclean \
+    parrot_compiler.realclean \
     regex.realclean \
     scheme.realclean \
     urm.realclean
@@ -324,16 +324,6 @@ parrot_compiler.clean:
 	- $(MAKE) parrot_compiler clean
 parrot_compiler.realclean:
 	- $(MAKE) parrot_compiler realclean
-
-pynie : pynie.dummy
-pynie.dummy:
-	- $(MAKE) pynie
-pynie.test:
-	- $(MAKE) pynie test
-pynie.clean:
-	- $(MAKE) pynie clean
-pynie.realclean:
-	- $(MAKE) pynie realclean
 
 regex: regex.dummy
 regex.dummy:
