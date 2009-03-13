@@ -7,7 +7,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Distribution;
-use Test::More tests => 2;
+use Test::More tests => 3;
 
 =head1 NAME
 
@@ -41,8 +41,13 @@ my @make_files = $DIST->get_make_language_files();
 my @all_files  = ( @c_files, @perl_files, @make_files );
 
 my @files = @ARGV ? <@ARGV> : @all_files;
-my ( @no_copyright_files, @bad_format_copyright_files );
+my ( @no_copyright_files,
+     @bad_format_copyright_files,
+     @duplicate_copyright_files
+);
 
+my $copyright_simple =
+    qr/Copyright \(C\) \d{4}/i;
 my $copyright_re =
     qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.$/m;
 
@@ -55,14 +60,19 @@ foreach my $file (@files) {
     my $buf = $DIST->slurp($path);
 
     # does there exist a copyright statement at all?
-    if ( $buf !~ m{Copyright \(C\) \d{4}}m ) {
+    if ( $buf !~ $copyright_simple ) {
         push @no_copyright_files, $path;
         next;
     }
 
     # is the copyright text correct?
-    if ( ! ($buf =~ $copyright_re) ) {
+    # If so, remove it...
+    if ( ! ($buf =~ s/$copyright_re//) ) {
         push @bad_format_copyright_files, $path;
+    }
+    # ... and then see if any other copyright notices exist.
+    elsif ($buf =~ $copyright_simple) {
+        push @duplicate_copyright_files, $path; 
     }
 }
 
@@ -96,6 +106,16 @@ TODO:
         "  svn log C<filename> | grep 'lines' | tail -n 1",
         "To find the C<last-year-modified>, use a command such as:",
         "  svn log C<filename> | grep 'lines' | head -n 1"
+        );
+
+    ok( !scalar(@duplicate_copyright_files), 'Duplicate Copyright statements' )
+        or diag(
+        join
+            $/ => "Duplicate copyright statement found in "
+            . scalar @duplicate_copyright_files
+            . " files:",
+        @duplicate_copyright_files,
+        "Please get copyright assigned to Parrot Foundation and remove alternate notice."
         );
 }
 
