@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 29;
+use Test::More tests => 30;
 
 =head1 NAME
 
@@ -88,6 +88,30 @@ print $FH "1 + 2\n";
 close $FH;
 $out = `$parrot $langdir/abc/abc.pbc $filename`;
 ok($out eq "3\n", "check abc");
+unlink($filename);
+}
+
+SKIP:
+{
+skip("Befunge", 1) unless (-d "$langdir/befunge");
+$filename = 'test.bef';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH <<'CODE';
+<                   p 04   "v"
+  ^ >
+I                       @   _v
+                            !,
+  _   2! |                  :
+    . \-  %2/36 `21  $   <  ^<   "<- then everything is ok!" +37
+  !      #
+  3      >
+         <       v  ,  _ ^# -8 : g20 "f you can see a 4 here ->" 8 4
+                 > :8- ^
+CODE
+close $FH;
+$out = `$parrot $langdir/befunge/befunge.pbc $filename`;
+ok($out eq "If you can see a 4 here ->4 <- then everything is ok!\n", "check befunge");
 unlink($filename);
 }
 
