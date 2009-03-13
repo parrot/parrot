@@ -1,10 +1,11 @@
-/* Copyright (C) 2003-2008, Parrot Foundation.  */
+/*
+  Copyright (C) 2003-2008, Parrot Foundation.
+  $Id$
+*/
 
 /*
  * exec_dep.h
  *
- * SVN Info
- *    $Id$
  * Overview:
  *    i386 dependent functions to emit an executable.
  * History:

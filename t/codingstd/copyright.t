@@ -43,8 +43,8 @@ my @all_files  = ( @c_files, @perl_files, @make_files );
 my @files = @ARGV ? <@ARGV> : @all_files;
 my ( @no_copyright_files, @bad_format_copyright_files );
 
-my $copyright_text =
-    "Copyright \\(C\\) (\\d{4}\\-\\d{4}|\\d{4}), Parrot Foundation.";
+my $copyright_re =
+    qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.$/m;
 
 foreach my $file (@files) {
 
@@ -61,7 +61,7 @@ foreach my $file (@files) {
     }
 
     # is the copyright text correct?
-    if ( $buf !~ m{$copyright_text}m ) {
+    if ( ! ($buf =~ $copyright_re) ) {
         push @bad_format_copyright_files, $path;
     }
 }

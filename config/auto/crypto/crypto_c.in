@@ -1,5 +1,7 @@
-/* Copyright (C) 2008, Parrot Foundation. */
-/* $Id$ */
+/*
+  Copyright (C) 2008, Parrot Foundation.
+  $Id$
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
