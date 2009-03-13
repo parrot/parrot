@@ -1,10 +1,11 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw(lib . ../lib ../../lib);
+
 use Parrot::Test tests => 21;
 use Test::More;
 
@@ -413,7 +414,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "Multi keys" );
     matrix = new ['FixedPMCArray']
     matrix = 1
     row = new ['FixedPMCArray']
-    row = 4           # assing with an integer, number, pmc, string
+    row = 4           # set the size by assigning an integer, number or pmc
     matrix[0] = row
     matrix[0;0] = 128
     matrix[0;1] = 128.128
