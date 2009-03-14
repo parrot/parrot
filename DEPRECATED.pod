@@ -167,7 +167,8 @@ L<https://trac.parrot.org/parrot/ticket/443>
 
 =item src/hash.c API cleanup [eligible in 1.1]
 
-After the 1.0 release, the following functions will return a Hash* instead of taking a Hash** as an argument:
+The following functions will be changed to return a C<Hash*> instead of
+taking a C<Hash**> as an argument:
 
 =over 4
 
