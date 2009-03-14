@@ -72,13 +72,6 @@ installable_pbc_merge.exe                         [main]bin
 installable_pbc_merge                             [main]bin
 installable_pbc_to_exe.exe                        [main]bin
 installable_pbc_to_exe                            [main]bin
-languages/bf/bfco.pbc                             [bf]
-languages/bf/bfc.pbc                              [bf]
-languages/bf/bf.pbc                               [bf]
-languages/cardinal/cardinal.pbc                   [cardinal]
-languages/forth/forth.pbc                         [forth]
-languages/lisp/lisp.pbc                           [lisp]
-languages/ook/ook.pbc                             [ook]
 lib/Parrot/Config/Generated.pm                    [devel]lib
 libparrot.dll                                     [main]bin
 lib/Parrot/OpLib/core.pm                          [devel]lib
@@ -125,10 +118,6 @@ runtime/parrot/dynext/rational.bundle             [library]
 runtime/parrot/dynext/rational.dll                [library]
 runtime/parrot/dynext/rational.dylib              [library]
 runtime/parrot/dynext/rational.so                 [library]
-runtime/parrot/dynext/ruby_group.bundle           [cardinal]
-runtime/parrot/dynext/ruby_group.dll              [cardinal]
-runtime/parrot/dynext/ruby_group.dylib            [cardinal]
-runtime/parrot/dynext/ruby_group.so               [cardinal]
 runtime/parrot/dynext/subproxy.bundle             [library]
 runtime/parrot/dynext/subproxy.dll                [library]
 runtime/parrot/dynext/subproxy.dylib              [library]
