@@ -38,12 +38,6 @@ use Parrot::Config qw/ %PConfig /;
 
 my $num_col_limit = 100;
 
-# a list of high level languages where we want to test line length
-my %lang_is_checked = map { $_ => 1 } qw{
-    cardinal
-    ook
-};
-
 my $build_dir = $PConfig{build_dir};
 my $manifest = maniread( File::Spec->catfile( $build_dir, 'MANIFEST' ) );
 
@@ -98,9 +92,6 @@ sub source_files {
 
         # skip files specified in __DATA__ section
         next if exists $skip_files{$file};
-
-        # skip languages files, unless specifically included above
-        next if $file =~ m{^languages/([^/]+)/} && !$lang_is_checked{$1};
 
         push @files => $full_path
             if $file =~ m{\.(c|pmc|ops|pod)$};

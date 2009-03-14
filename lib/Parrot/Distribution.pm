@@ -206,7 +206,7 @@ BEGIN {
             ops => { file_exts => ['ops'] },
             lex => {
                 file_exts   => ['l'],
-                except_dirs => [qw{ languages/lisp examples/library }],
+                except_dirs => [qw{ examples/library }],
             },
             yacc => { file_exts => ['y'] },
             perl => {
@@ -511,7 +511,6 @@ sub get_perl_exemption_regexp {
         examples/sdl/
         examples/languages/abc/src/parser/actions.pm
         examples/languages/squaak/src/parser/actions.pm
-        languages/regex/lib/Regex/Grammar.pm
         lib/Digest/Perl/
         lib/File/
         lib/IO/
@@ -650,14 +649,7 @@ sub perl_script_file_directories {
     my $self = shift;
 
     return map $self->directory_with_name($_) => 'compilers/imcc',
-        'editor', 'examples/benchmarks', 'examples/mops', 'languages',
-        map( "languages/$_" => qw<
-            BASIC/compiler BASIC/interpreter
-            python
-            regex
-            scheme scheme/Scheme
-            urm
-            > ),
+        'editor', 'examples/benchmarks', 'examples/mops',
         map( "tools/$_" => qw<build dev docs util> ),;
 }
 
@@ -698,22 +690,6 @@ sub perl_module_file_directories {
             auto/cpu/sun4 auto/cpu/x86_64
             gen gen/cpu/i386 gen/cpu/x86_64 init init/hints inter> ),
         'ext/Parrot-Embed/lib/Parrot',
-        map( "languages/$_" => qw<
-            BASIC/compiler
-            jako/lib/Jako
-            jako/lib/Jako/Construct
-            parrot_compiler/lib/Parrot/Test
-            regex/lib
-            scheme scheme/Scheme
-            urm/lib/URM
-            > ),
-        map( "languages/jako/lib/Jako/Construct/$_" => qw<
-            Block Block/Conditional Block/Loop Declaration
-            Expression Expression/Value Statement Type
-            > ),
-        map( "languages/regex/lib/$_" => qw<
-            Parrot/Test Regex Regex/CodeGen Regex/Ops Regex/Parse
-            > ),
         map( "lib/$_" => qw<
             Class Digest/Perl File Parrot Parse Pod Pod/Simple Test Text
             > ),
