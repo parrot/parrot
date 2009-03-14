@@ -1,7 +1,7 @@
 Source: parrot
 Section: interpreters
 Priority: optional
-Maintainer: Parrot Developers <parrot-dev@lists.parrot.org>
+Maintainer: Debian Parrot Maintainers <pkg-parrot-devel@lists.alioth.debian.org>
 Uploaders: Allison Randal <allison@parrot.org>, Nuno Carvalho <mestre.smash@gmail.com>, Patrick Michaud <pmichaud@pobox.com>
 Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libgdbm-dev, libreadline-dev
 Standards-Version: 3.7.2
