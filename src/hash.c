@@ -274,7 +274,7 @@ Creates and returns a hash value from a string.
 Takes an interpreter, a pointer to a string, and a seed value.
 Returns the hash value.
 
-Used by Parrot_new_cstring_hash.
+Used by parrot_new_cstring_hash.
 
 =cut
 
