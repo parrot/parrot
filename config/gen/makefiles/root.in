@@ -1208,14 +1208,20 @@ $(OPS_DIR)/pic.ops : $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
 # .h files are built along with .c
 $(INC_DIR)/oplib/core_ops.h: $(OPS_DIR)/core_ops.c
 
-$(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm
+$(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
+	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
+	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm \
+	$(SRC_DIR)/pmc/pmc_continuation.h
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
 
-$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
+$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c 
 
 $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c
 
-$(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm lib/Parrot/OpTrans/CPrederef.pm
+$(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
+	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
+	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm \
+	lib/Parrot/OpTrans/CPrederef.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
 
 @TEMP_cg_c@
