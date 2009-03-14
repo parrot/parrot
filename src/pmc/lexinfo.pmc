@@ -112,6 +112,48 @@ Returns the number of elements in the LexInfo hash.
         return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(SELF));
     }
 
+
+/*
+
+=item C<PMC *inspect_str(STRING *what)>
+
+Introspects this LexInfo structure. The only valid introspection key is
+C<symbols>, which gets an array of the names of the symbols in this lexpad.
+
+=cut
+
+*/
+
+    VTABLE PMC *inspect_str(STRING *what) {
+        if (Parrot_str_equal(interp, what, CONST_STRING(interp, "symbols"))) {
+            PMC *result     = pmc_new(interp, enum_class_ResizableStringArray);
+            Hash *hash      = (Hash *)PMC_struct_val(SELF);
+            UINTVAL entries = hash->entries;
+            UINTVAL found   = 0;
+            INTVAL  i;
+
+            for (i = hash->mask; i >= 0; --i) {
+                HashBucket *bucket = hash->bi[i];
+                while (bucket) {
+                    if (++found > entries)
+                        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                            "Detected corruption at LexInfo hash %p entries %d",
+                            hash, (int)entries);
+
+                    PARROT_ASSERT(bucket->key);
+                    VTABLE_push_string(interp, result, (STRING *)bucket->key);
+                    
+                    bucket = bucket->next;
+                }
+            }
+
+            return result;
+        }
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Unknown introspection value '%S'", what);
+    }
+
 /*
 
 =item C<void visit(visit_info *info)>
