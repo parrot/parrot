@@ -5,34 +5,49 @@
 
 =head1 NAME
 
-examples/nci/PQt.C - Qt/Parrot Library
+examples/nci/PQt.cpp - Qt/Parrot Library
 
 =head1 SYNOPSIS
 
 Compile with:
 
-    g++ -fPIC -I$QTDIR/include -L$QTDIR -c PQt.C
+*NIX:
 
-    gcc -shared -o libPQt.so PQt.o $QTDIR/lib/libqt.so
+    $ g++ -fPIC -I$QTDIR/include -I$QTDIR/include/QtGui -L$QTDIR -c PQt.cpp
+
+    $ gcc -shared -o libPQt.so PQt.o $QTDIR/lib/libQtCore4.so $QTDIR/lib/libQtGui4.so
+
+Windows:
+
+    > "%VS90COMNTOOLS%\vsvars32.bat"
+
+    > set INCLUDE=%QTDIR%\include;%QTDIR%\include\QtGui;%INCLUDE%
+    
+    > set LIB=%QTDIR%\lib;%LIB%
+
+    > cl /LD PQt.cpp QtGui4.lib QtCore4.lib
 
 Or something like that...
 
 =head1 DESCRIPTION
 
-Qt Native interface for Parrot. See F<examples/nci/QtHelloWorld.pasm>
+Qt Native interface for Parrot. See F<examples/nci/QtHelloWorld.pir>
 for more information.
 
 =cut
 
 */
 
-#include <qapplication.h>
-#include <qlabel.h>
-extern "C" {
-#include <stdio.h>
-#include <dlfcn.h>
+#ifdef _WIN32
+  #define PQT_API __declspec(dllexport)
+#else
+  #define PQT_API 
+#endif
 
-QApplication * pApp;
+#include <QtGui>
+extern "C" {
+
+PQT_API QApplication * pApp;
 
 /*
 
@@ -45,7 +60,7 @@ QApplication * pApp;
 =cut
 
 */
-QApplication *QApplication_new(void) {
+PQT_API QApplication *QApplication_new(void) {
     int PQtargc = 0;
     char *PQtargv[2];
     PQtargv[0] = "";
@@ -62,22 +77,9 @@ QApplication *QApplication_new(void) {
 
 */
 
-void QApplication_exec(QApplication *app)
+PQT_API void QApplication_exec(QApplication *app)
 {
     app->exec();
-}
-
-/*
-
-=item C<void QApplication_setMainWidget(QApplication *app, QWidget *w)>
-
-=cut
-
-*/
-
-void QApplication_setMainWidget(QApplication *app, QWidget *w)
-{
-    app->setMainWidget(w);
 }
 
 /*
@@ -94,7 +96,7 @@ void QApplication_setMainWidget(QApplication *app, QWidget *w)
 
 */
 
-QLabel * QLabel_new(const char *txt)
+PQT_API QLabel * QLabel_new(const char *txt)
 {
     QLabel * pLabel = new QLabel(txt, 0);
     return pLabel;
@@ -108,7 +110,7 @@ QLabel * QLabel_new(const char *txt)
 
 */
 
-void QLabel_show(QLabel *label)
+PQT_API void QLabel_show(QLabel *label)
 {
     label->show();
 }
@@ -121,7 +123,7 @@ void QLabel_show(QLabel *label)
 
 */
 
-void QLabel_resize(QLabel *label, int x, int y)
+PQT_API void QLabel_resize(QLabel *label, int x, int y)
 {
     label->resize(x, y);
 }
@@ -134,7 +136,7 @@ void QLabel_resize(QLabel *label, int x, int y)
 
 =head1 SEE ALSO
 
-F<examples/nci/QtHelloWorld.pasm>,
+F<examples/nci/QtHelloWorld.pir>,
 F<docs/pdds/pdd03_calling_conventions.pod>.
 
 =cut

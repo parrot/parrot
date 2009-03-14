@@ -11,12 +11,12 @@ examples/nci/QtHelloWorld.pasm - Qt Example
 
 =head1 DESCRIPTION
 
-Sample "Hello World" with Qt, via Parrot Native Call Interface (nci). See
+Sample "Hello World" with Qt, via Parrot Native Call Interface (NCI). See
 F<docs/pdds/pdd03_calling_conventions.pod>.
 
-Qt is a multiplatform C++ GUI application framework
-(Lhttp://doc.trolltech.com/3.1/aboutqt.html>). You'll need to build
-F<libPQt.so> and install it in F<runtime/parrot/dynext> for this to
+Qt - A cross-platform application and UI framework
+(L<http://www.qtsoftware.com/about/news/lgpl-license-option-added-to-qt>). You'll need to build
+F<libPQt.so> or F<PQt.dll> and install it in F<runtime/parrot/dynext> for this to
 work, see F<examples/nci/PQt.C> for more information.
 
 Note that this will either need JIT for building the NCI-functions on
@@ -35,30 +35,24 @@ F<src/call_list.txt> and rebuilding Parrot.
     set P2, P5  # remember pApp
 
 # get and invoke QLabel_new
-    set S5, "Hello, world!"
     dlfunc P0, P1, "QLabel_new", "pt"
     # if you need more labels, save P0 = QLabel_new() function
+    set_args "0", "Hello, world!"
+    get_results "0", P5
     invokecc P0
     set P6, P5  # save pLabel
 
 # size the QLabel
-    set I5, 30  # y
-    set I6, 120 # x
     dlfunc P0, P1, "QLabel_resize", "vpii"
+    set_args "0,0,0", P6, 120, 30
     invokecc P0
 
-# register the label
-    dlfunc P0, P1, "QApplication_setMainWidget", "vpp"
-    set P5, P6  # pLabel
-    set P6, P2  # pApp
-    invokecc P0
-    # P5  = label
     dlfunc P0, P1, "QLabel_show", "vp"
     invokecc P0
 
 # and go
     dlfunc P0, P1,"QApplication_exec", "vp"
-    set P5, P2  # app
+    set_args "0", P2
     invokecc P0
     end
 

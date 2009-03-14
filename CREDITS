@@ -901,6 +901,8 @@ N: Ujwal Reddy Malipeddi
 U: ujwalic
 E: ujwalic@gmail.com
 D: OpenGL/GLUT include file order with MSVS
+D: Fixed and updated Qt/NCI example for Windows
+D: Cleaned up warnings on Windows
 
 N: Uri Guttman
 D: Lot of general Parrot design hints
