@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 64;
+use Parrot::Test tests => 65;
 use Parrot::Config;
 
 =head1 NAME
@@ -1434,6 +1434,36 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'set_outer' );
 .end
 CODE
 I can has outer?
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'set_outer and eval' );
+.sub main :main
+    'example_outer'()
+.end
+
+.sub 'example_outer'
+    .lex "Foo", $P0
+    $P0 = new ['String']
+    $P0 = 'I can has outer from eval?'
+
+    $S1 = <<'PIR'
+.sub example_inner
+    $P0 = find_lex "Foo"
+    say $P0
+.end
+PIR
+    $P1 = compreg 'PIR'
+    $P1 = $P1($S1)
+    
+    $P3 = new 'ParrotInterpreter'
+    $P3 = $P3['sub']
+    $P2 = $P1[0]
+    $P2.'set_outer'($P3)
+    
+    $P1()
+.end
+CODE
+I can has outer from eval?
 OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';

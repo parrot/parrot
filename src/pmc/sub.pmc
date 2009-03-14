@@ -929,6 +929,13 @@ slurpy arguments).
                                            enum_class_LexInfo);
             sub->lex_info = pmc_new_init(interp, lex_info_id, SELF);
         }
+
+        /* If we've got a context around for the outer sub, set it as the
+         * outer context. */
+        if (CONTEXT(interp)->caller_ctx->caller_ctx->current_sub == outer)
+            sub->outer_ctx = CONTEXT(interp)->caller_ctx->caller_ctx;
+        else if (CONTEXT(interp)->caller_ctx->current_sub == outer)
+            sub->outer_ctx = CONTEXT(interp)->caller_ctx;
     }
 
     METHOD get_multisig() {
