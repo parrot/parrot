@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 ###############################################################################
@@ -1214,7 +1214,7 @@ $(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	$(SRC_DIR)/pmc/pmc_continuation.h
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
 
-$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c 
+$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
 
 $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c
 
