@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2006, Parrot Foundation.
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -32,12 +32,6 @@ Get the TODO JAPHs working or decide that they are not suitable for testing.
 
 # known reasons for failure
 my %todo = ();
-if ( $PConfig{bigendian} ) {
-    $todo{2} = 'works only on little endian';
-}
-if ( $PConfig{intvalsize} == 8 ) {
-    $todo{2} = 'works only with 32-bit integer values';
-}
 if ( defined( $ENV{TEST_PROG_ARGS}) && $ENV{TEST_PROG_ARGS} =~ /--runcore=jit/ ) {
     $todo{4} = 'broken with JIT';
 }
