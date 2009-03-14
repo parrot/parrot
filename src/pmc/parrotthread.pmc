@@ -2,11 +2,11 @@
 Copyright (C) 2001-2007, Parrot Foundation.
 $Id$
 
-=head1 Name
+=head1 NAME
 
 src/pmc/parrotthread.pmc - Threaded Interpreter
 
-=head1 Description
+=head1 DESCRIPTION
 
 ParrotThread extends ParrotInterpreter to provide a threaded interpreter
 which supports:
