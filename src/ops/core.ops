@@ -917,7 +917,6 @@ inline op die(in INT, in INT) :flow {
         _exit($2);
     else {
         opcode_t * const ret       = expr NEXT();
-        PMC             *resume    = new_ret_continuation_pmc(interp, ret);
         PMC             *exception = Parrot_ex_build_exception(interp, $1,
                                                                $2, NULL);
         opcode_t * const dest      = Parrot_ex_throw_from_op(interp,
