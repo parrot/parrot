@@ -933,9 +933,9 @@ slurpy arguments).
         /* If we've got a context around for the outer sub, set it as the
          * outer context. */
         if (CONTEXT(interp)->caller_ctx->caller_ctx->current_sub == outer)
-            sub->outer_ctx = CONTEXT(interp)->caller_ctx->caller_ctx;
+            sub->outer_ctx = Parrot_context_ref(interp, CONTEXT(interp)->caller_ctx->caller_ctx);
         else if (CONTEXT(interp)->caller_ctx->current_sub == outer)
-            sub->outer_ctx = CONTEXT(interp)->caller_ctx;
+            sub->outer_ctx = Parrot_context_ref(interp, CONTEXT(interp)->caller_ctx);
     }
 
     METHOD get_multisig() {
