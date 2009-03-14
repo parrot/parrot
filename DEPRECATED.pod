@@ -165,6 +165,22 @@ check in 1.4 or 2.0 for the new names.
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
+=item src/hash.c API cleanup [eligible in 1.1]
+
+After the 1.0 release, the following functions will return a Hash* instead of taking a Hash** as an argument:
+
+=over 4
+
+=item * parrot_new_hash_x
+
+=item * parrot_new_cstring_hash
+
+=item * parrot_new_pointer_hash
+
+=back
+
+L<https://trac.parrot.org/parrot/ticket/447>
+
 =back
 
 =head1 Compiler tools
