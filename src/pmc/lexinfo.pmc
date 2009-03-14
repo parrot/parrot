@@ -142,7 +142,7 @@ C<symbols>, which gets an array of the names of the symbols in this lexpad.
 
                     PARROT_ASSERT(bucket->key);
                     VTABLE_push_string(interp, result, (STRING *)bucket->key);
-                    
+
                     bucket = bucket->next;
                 }
             }
