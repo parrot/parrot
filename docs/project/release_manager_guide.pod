@@ -106,6 +106,22 @@ what those tests complain about, or fix them so they don't complain.
 
 =item g
 
+If this is a developer release, or there have been no new entries to the
+F<PBC_COMPAT> file, skip this step.
+
+If this is a supported release, and new entries to F<PBC_COMPAT> have been
+added since the last supported release, make a new entry with a new major
+version number for this release at the top of the list.
+
+  3.0     2007.10.17      coke    released 0.4.17
+
+Delete all minor version numbers since the last major bytecode version number,
+as these are only used in development and not relevant to the bytecode support
+policy. (Those changes are all included within the major version number
+increase for the supported release.)
+
+=item h
+
 Make sure everything works:
 
  $ make realclean
