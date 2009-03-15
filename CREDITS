@@ -188,7 +188,10 @@ E: bdwheele@indiana.edu
 N: Bruce Gray
 U: util
 E: bruce.gray@acm.org
-D: debugging tutorial remarks
+D: Improvements to Config, Build, and Test sub-systems.
+D: Cage cleaning, codingstd, warnings, and doc corrections.
+D: Win32 platform fixes.
+S: Auburn, AL, USA
 
 N: Bryan C. Warnock
 D: The First Perl 6 Summarizer
