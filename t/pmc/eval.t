@@ -316,11 +316,11 @@ hello from foo_2
 2 1 1 1
 OUTPUT
 
-TODO: {
-    local $TODO = "cannot 'rm' an open file on windows. TT#121" if $^O =~ /(MSWin32|cygwin)/;
+(my $fh, $temp_pbc)  = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 ); 
+close $fh;
+        
 pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
 .sub main :main
-
   .local pmc f1, f2
   .local pmc io, os
   f1 = compi("foo_1", "hello from foo_1")
@@ -358,7 +358,6 @@ pir_output_is( <<"CODE", <<'OUTPUT', "eval.get_string - same file" );
 CODE
 hello from foo_1
 OUTPUT
-}
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
 
