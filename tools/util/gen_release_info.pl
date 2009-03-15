@@ -19,7 +19,7 @@ suitable for graphs, charts, and reports.
 
 my $repo_url = 'https://svn.parrot.org/parrot/tags';
 
-##  ceate a release information data structure
+##  create a release information data structure
 my $r = {
     map { $_->{number} => $_ }
     map { m{^(RELEASE_)(.*)/}
