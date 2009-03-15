@@ -72,13 +72,13 @@ my $dynext = <dynext/*.dll>
            ? qq{Source: ".\\dynext\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
            : '; no dynext';
 my $man = -d 'man'
-        ? qq{Source: ".\\man\\*"; DestDir: "{app}\\man"; Flags: ignoreversion recursesubdirs}
+        ? qq{Source: ".\\man\\*"; DestDir: "{app}\\man\\parrot"; Flags: ignoreversion recursesubdirs}
         : '; no man';
 my $doc = -d 'doc'
-        ? qq{Source: ".\\doc\\*"; DestDir: "{app}\\share\\doc\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
+        ? qq{Source: ".\\doc\\*"; DestDir: "{app}\\share\\doc\\parrot\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
         : '; no doc';
 my $readme = -f 'README'
-           ? qq{Source: ".\\README"; DestDir: "{app}\\share\\doc\\languages\\$lang"; Flags:}
+           ? qq{Source: ".\\README"; DestDir: "{app}\\share\\doc\\parrot\\languages\\$lang"; Flags:}
            : '; no README';
 
 my $filename = 'parrot-' . $lclang . '.iss';
