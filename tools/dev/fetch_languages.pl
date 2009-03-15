@@ -15,9 +15,9 @@ fetch_languages.pl - A helper to fetch language implementations from the SCM rep
 
 Creates a directory called 'languages' and checks out the languages.
 
-=HISTORY
+=head1 HISTORY
 
-Salvaged from https:/svn.parrot.org/parrot/trunk/config/gen/makefiles/languages.in@37396.
+2009-03-14 Salvaged from https:/svn.parrot.org/parrot/trunk/config/gen/makefiles/languages.in@37396.
 
 =cut
 
