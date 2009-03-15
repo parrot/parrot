@@ -85,6 +85,24 @@ L<https://trac.parrot.org/parrot/ticket/450>
 
 =back
 
+=head1 Bytecode
+
+=over 4
+
+=item packfile structure [eligible in 1.1]
+
+L<https://trac.parrot.org/parrot/ticket/451>
+
+=item opcode numbering [eligible in 1.1]
+
+L<https://trac.parrot.org/parrot/ticket/451>
+
+=item PMC numbering [eligible in 1.1]
+
+L<https://trac.parrot.org/parrot/ticket/451>
+
+=back
+
 =head1 Class Features
 
 =over 4
