@@ -28,64 +28,65 @@ Release Manager                 Bob Rogers
 Metacommitter                   Allison Randal
                                 Jerry Gay
                                 Will Coleda
-                                Jesse Vincent
+                                chromatic
+                                Jeff Horwitz
 
 
 Committers
 ----------
 
 Core Developer                  Jonathan Worthington
-                                Matt Diephouse
                                 Bernhard Schmalhofer
                                 Kevin Tew
                                 Bob Rogers
                                 Nuno Carvalho
                                 chromatic
-                                Chip Salzenberg
                                 Allison Randal
                                 Andrew Whitworth
+                                Christoph Otto
+                                Julian Albo
+                                Mark Glines
 
-Compiler Developer              Vishal Soni (BCG, IMCC)
-                                Patrick Michaud (PGE, PCT)
+Compiler Developer              Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
                                 Klaas-Jan Stol (PIRC)
 
 High Level Language Developer   Patrick Michaud (Perl 6, NQP)
-                                Matt Diephouse (Tcl)
                                 Will Coleda (Tcl)
                                 Stephen Weeks (Cardinal (Ruby), Lolcode)
                                 Francois Perrad (Lua, Pipp (PHP))
                                 Bernhard Schmalhofer (Pipp (PHP), Eclectus (Scheme))
                                 Kevin Tew (Cardinal (Ruby))
-                                Christoh Otto (Pipp (PHP))
+                                Christoph Otto (Pipp (PHP))
 
-Build Manager                   Joshua Hoblitt
-
-Lead Tester                     Jerry Gay
-
-Platform Porter                 Allison Randal (Debian)
+Platform Porter                 Allison Randal (Debian, Ubuntu)
                                 Aldo Calpini (PocketPC)
                                 Francois Perrad (MinGW32)
                                 Reini Urban (cygwin)
+                                Will Coleda (MacPorts)
+                                Jerry Gay (Windows)
+
 
 Patch Monster                   chromatic
                                 Jonathan Worthington
-                                Paul Cochrane
                                 Jerry Gay
-                                Matt Diephouse
                                 Will Coleda
                                 James Keenan
+                                Francois Perrad
+                                Christoph Otto
+                                Julian Albo
+                                Mark Glines
 
 
 Contributors
 ------------
 
 Cage Cleaner                    James Keenan
-                                Paul Cochrane
-                                Mike Mattie
-                                Steve Peters
                                 Jerry Gay
                                 chromatic
                                 Andy Lester
+                                Francois Perrad
+                                Mark Glines
+                                Bruce Gray
 
 General Contributor             See CREDITS
