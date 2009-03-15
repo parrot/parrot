@@ -539,7 +539,7 @@ different functions to call with different signatures:
     ...
  .end
 
- .sub 'infix:+' :multi('CLispRatio', 'Number)
+ .sub 'infix:+' :multi('CLispRatio', 'Number')
     ...
  .end
 
