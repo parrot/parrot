@@ -55,6 +55,30 @@ L<https://trac.parrot.org/parrot/ticket/372>
 
 L<https://trac.parrot.org/parrot/ticket/373>
 
+=item moved to dynpmc [eligible in 1.1]
+
+AddrRegistry, CodeString, Env, Eval, File, OS, PCCMETHOD_Test, StringHandle,
+and Timer.
+
+L<https://trac.parrot.org/parrot/ticket/448>
+
+=back
+
+=head1 Opcodes
+
+=over 4
+
+=item moved to dynop [eligible in 1.1]
+
+Parts or all of: bit.ops, debug.ops, io.ops, math.ops, obscure.ops, set.ops
+(the obscure and rarely used parts), sys.ops.
+
+L<https://trac.parrot.org/parrot/ticket/449>
+
+=item experimental ops [eligible in 1.1]
+
+L<src/ops/experimental.ops>
+
 =back
 
 =head1 Class Features
@@ -220,9 +244,5 @@ L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
 Older tickets may be listed at L<RT|https://rt.perl.org/rt3>.
 
 =back
-
-=head1 See Also
-
-L<src/ops/experimental.ops>
 
 =cut
