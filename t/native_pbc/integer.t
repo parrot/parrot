@@ -10,7 +10,7 @@ use Parrot::Config;
 use Parrot::BuildUtil;
 
 use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
-#use Parrot::Test tests => 6;
+#use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -244,7 +244,7 @@ test_pbc_integer(6, "(8_be) big-endian 64 bit opcode_t, 8 byte intval, 8 byte do
 #         *need* endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-#test_pbc_integer(7, "(8_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
+test_pbc_integer(7, "(8_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
 
 # i386 --floatval=float
 #test_pbc_integer(8, "(4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
