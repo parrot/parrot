@@ -27,6 +27,7 @@ use 5.008;
 
 use Getopt::Long;
 use Pod::Usage;
+use Cwd;
 
 my ( $update_flag, $checkout_flag ) = ( 0, 1 );
 GetOptions( "update" => \$update_flag ) or pod2usage();
@@ -230,15 +231,17 @@ my @hlls = (
 );
 
 foreach (@hlls) {
-    if ($checkout_flag) {
+    if ($checkout_flag && ! -d $_->{name}) {
         my @cmd = ( @{ $checkout_cmd{ $_->{scm} } }, $_->{repository}, $_->{name} );
-        print "Running: @cmd\n";
+        my $dir = getcwd();
+        print "Running: '@cmd' in $dir.\n";
         system(@cmd);
     }
     if ($update_flag) {
         chdir $_->{name};
-        my @cmd = ( @{ $update_cmd{ $_->{scm} } }, $_->{repository}, $_->{name} );
-        print "Running: @cmd\n";
+        my @cmd = ( @{ $update_cmd{ $_->{scm} } } );
+        my $dir = getcwd();
+        print "Running: '@cmd' in $dir.\n";
         system(@cmd);
         chdir '..';
     }
