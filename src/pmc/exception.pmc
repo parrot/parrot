@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -753,35 +753,43 @@ sub, or for the point of the call a level deeper for the rest.
         /* Get starting context, then loop over them. */
         GET_ATTR_resume(interp, SELF, resume);
         if (!PMC_IS_NULL(resume)) {
-            Parrot_cont *cont = PMC_cont(resume);
+            Parrot_cont    *cont    = PMC_cont(resume);
             Parrot_Context *cur_ctx = cont->to_ctx;
+
             while (cur_ctx) {
-                PMC        *frame = pmc_new(interp, enum_class_Hash);
-                PMC        *annotations;
+                PMC        *frame       = pmc_new(interp, enum_class_Hash);
+                PMC        *annotations = NULL;
                 Parrot_sub *sub;
 
                 /* Get sub and put it in the hash. */
                 PMC *sub_pmc = cur_ctx->current_sub;
-                if (sub_pmc == NULL)
+
+                if (!sub_pmc)
                     sub_pmc = PMCNULL;
+
                 VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "sub"), sub_pmc);
 
                 /* Look up any annotations and put them in the hash. */
-                if (!PMC_IS_NULL(sub_pmc) && sub_pmc->vtable->base_type == enum_class_Sub) {
+                if (!PMC_IS_NULL(sub_pmc)
+                &&  sub_pmc->vtable->base_type == enum_class_Sub) {
 
                     PMC_get_sub(interp, sub_pmc, sub);
 
                     if (sub->seg->annotations) {
                         PackFile_ByteCode *seg = sub->seg;
-                        opcode_t *pc = cur_ctx == cont->to_ctx ?
-                            cont->address : cur_ctx->current_pc;
-                        annotations = PackFile_Annotations_lookup(interp,  seg->annotations,
-                            pc - seg->base.data, NULL);
+                        opcode_t          *pc  = cur_ctx == cont->to_ctx
+                                               ? cont->address
+                                               : cur_ctx->current_pc;
+
+                        annotations = PackFile_Annotations_lookup(interp,
+                                        seg->annotations, pc - seg->base.data,
+                                        NULL);
                     }
                 }
-                else {
+
+                if (!annotations)
                     annotations = pmc_new(interp, enum_class_Hash);
-                }
+
                 VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "annotations"), annotations);
 
                 /* Push frame and go to next caller. */
