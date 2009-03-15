@@ -101,14 +101,11 @@ HTML. May have subdirectories F<pod/>, F<html/>, etc.
 =back
 
 Bootstrapping the configuration hash should not read a config file when the
-hash is already contained in the pmc or executable. {{ See #57418 [TODO]
+hash is already contained in the pmc or executable. {{ See RT #57418 [TODO]
 optimize _config to omit .include "library/config.pir" on installables. }}
 The same problem is for every C<.include>, C<loadlib> and C<load_bytecode>
 statement in installed files where the target is not installed. If in doubt
-install the missing library by patching the installation code.  For
-C<load_bytecode 'PGE/Text.pbc'> in some lua src we should take care, that
-this compiler pbc is really installed or if not merge it into the main
-F<lua.pbc>.
+install the missing library by patching the installation code.
 
 Test executables are binary different to installable executables because of
 this embedded configuration hash. Test executables contain configuration
@@ -118,9 +115,9 @@ the same as the ones that are installed. Otherwise, subtle bugs can leak
 into the installed executables which can never be caught by the tests.
 
 There are's also a long-standing conflict in building Parrot with an already
-installed shared libparrot.so. See #39742-installed-conflict.patch which
-adds the blib/lib path to PATH resp. LD_RUN_PATH to all parrot executable
-invocations.
+installed shared libparrot.so. See RT #39742.
+For win32 this was solved to put the dll into build_dir, for
+compilers withour rpath support this is still a problem.
 
 =head2 Dependencies
 
@@ -185,7 +182,7 @@ files in the same directories as executables. The C includes and the PIR
 includes also need to be separate.
 
 C<make install> currently does not work with an already installed shared
-libparrot.so on most platforms. {{See a patch for this in RT #39742.}}
+libparrot.so on some platforms. {{See a patch for this in RT #39742.}}
 
 =over 4
 
@@ -261,8 +258,8 @@ renamed.
  current instr.: 'parrot;Pipp;__onload' pc 47 (src/common/pipp.pir:92)
  called from Sub 'parrot;Pipp;pipp' pc -1 ((unknown file):-1)
 
-B<Fix 1>: Install all deps and make sure that every HLL is installed at
-F<library/HLLNAME.pbc>
+B<Fix 1>: Install all deps and make sure that every HLL is installed at 
+F<lib_dir/parrot/version/languages>. See also L<pdd31_hll_interop.pod>
 
 {{NOTE: This may be a sign that we need to rethink our language build
 strategy. Trying to glom everything into a single C executable is less than
