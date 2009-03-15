@@ -341,10 +341,10 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
             return REG_INT(interp, int_key);
 
         case KEY_number_FLAG:
-            return PMC_num_val(key);
+            return (INTVAL)PMC_num_val(key);
         case KEY_number_FLAG | KEY_register_FLAG:
             GETATTR_Key_int_key(interp, key, int_key);
-            return REG_NUM(interp, int_key);
+            return (INTVAL)REG_NUM(interp, int_key);
 
         case KEY_pmc_FLAG | KEY_register_FLAG:
             {
