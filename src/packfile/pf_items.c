@@ -394,7 +394,7 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts i386 LE 12-byte long double to IEEE 754 LE 16-byte long double.
 
-Untested.
+Tested ok.
 Fallback 12->8->16 disabled.
 
 =cut
@@ -483,6 +483,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 #ifdef __LCC__
         int expo2;
 #endif
+        exit_fatal(1, "cvt_num16_num8: long double conversion unsupported");
 
     /* Have only 12-byte long double, or no long double at all. Need to disect it */
 
@@ -663,7 +664,7 @@ cvt_num8_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts a little-endian 12-byte double to big-endian 16-byte long double.
 
-Untested.
+Tested nok.
 
 =cut
 
@@ -685,9 +686,9 @@ cvt_num12_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 =item C<static void cvt_num12_num8_le>
 
-Converts a little-endian 12-byte i386 long double into a IEEE 754 8-byte double.
+Converts a little-endian 12-byte i386 long double into a big-endian IEEE 754 8-byte double.
 
-Untested.
+Tested nok.
 
 =cut
 
@@ -702,6 +703,7 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     fetch_buf_le_12(b, src);  /* TODO test endianize */
     TRACE_PRINTF_2(("  cvt_num12_num8_le: 0x%12x\n", b));
     cvt_num12_num8(dest, b);
+    exit_fatal(1, "cvt_num12_num8_le: long double conversion unsupported");
 }
 #endif
 
@@ -712,7 +714,7 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 Converts a little-endian IEEE 754 intel 16-byte long double into a
 big-endian IEEE 754 8-byte double.
 
-Untested.
+Tested nok. Produces all zeros.
 
 =cut
 
@@ -727,6 +729,7 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     fetch_buf_le_16(b, src);
     TRACE_PRINTF_2(("  cvt_num16_num8_le: 0x%16x\n", b));
     cvt_num16_num8(dest, b);
+    exit_fatal(1, "cvt_num16_num8_le: long double conversion unsupported");
 }
 #endif
 
@@ -1368,7 +1371,6 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
     charcursor = (char *)cursor;
 
     if (s->strstart) {
-        size_t i;
         mem_sys_memcopy(charcursor, s->strstart, s->bufused);
         charcursor += s->bufused;
         /* Pad up to sizeof (opcode_t) boundary. */
