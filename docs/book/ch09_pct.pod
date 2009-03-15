@@ -448,8 +448,8 @@ X<Parser, Operator precedence> parser is. Operator precedence parsers
 work similarly to more versatile bottom-up parsers such as Lex or Yacc, but
 are optimized for use with expressions and equations. The "things" in an
 equation are split into two subtypes: I<terms> and I<operators>. Operators
-themselves are split into a number of types including postfix (C<-a>),
-suffix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumix
+themselves are split into a number of types including prefix (C<-a>),
+postfix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumix
 (C<a[b]>), and list (C<1, 2, 3>). Each operator gets its own precedence
 number that specifies how closely it binds to the terms. In the example above,
 the expression is parsed
