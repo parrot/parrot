@@ -548,7 +548,7 @@ different functions to call with different signatures:
  .end
 
 This list can be a bit intimidating, and it's hard to imagine that it would
-be necessary to write up a new function to handle addition addition between
+be necessary to write up a new function to handle addition between
 every conceivable pair of operands. Fortunately for us all, this isn't the
 case because all these data types have those VTABLE interfaces that we can
 use. For most data types Parrot already has basic arithmetic operations
