@@ -25,7 +25,7 @@ F<src/call_list.txt> and rebuilding Parrot.
 
 =cut
 .sub main
-    
+
     .local pmc libpqt
     loadlib libpqt, "libPQt"
     if libpqt goto loaded
