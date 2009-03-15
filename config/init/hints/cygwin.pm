@@ -60,6 +60,14 @@ sub runstep {
         $define = join( ',', 'inet_aton', $define );
     }
     $conf->options->set( define => $define );
+
+    # default to gcc-4 on cygwin-1.7.
+    # -shared-libgcc should be used also, but this will be the new default soon.
+    my $cygwin = `/bin/uname -r`;
+    if ($cygwin =~ /^1\.7\./) {
+        $conf->data->set(cc => 'gcc-4') unless $conf->options->get('cc');
+        $conf->data->set(ld => 'g++-4') unless $conf->options->get('ld');
+    }
 }
 
 1;
