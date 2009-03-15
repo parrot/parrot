@@ -79,6 +79,10 @@ L<https://trac.parrot.org/parrot/ticket/449>
 
 L<src/ops/experimental.ops>
 
+=item myops & dan ops [eligible in 1.1]
+
+L<https://trac.parrot.org/parrot/ticket/450>
+
 =back
 
 =head1 Class Features
