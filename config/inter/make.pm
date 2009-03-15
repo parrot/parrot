@@ -38,21 +38,21 @@ sub runstep {
     # undef means we don't have GNU make... default to not having it
     $conf->data->set( gmake_version => undef );
 
-    my $canidates;
+    my $candidates;
     if ( $^O eq 'cygwin') {
         # On Cygwin prefer make over nmake.
-        $canidates = ['gmake', 'make'];
+        $candidates = ['gmake', 'make'];
     }
     elsif ($conf->option_or_data('cc') =~ /cl(\.exe)?$/i) {
         # Windows, Visual C++, prefer nmake
         # This test should use something more stable than the compiler
         # executable name.  'msvcversion' might be good, but is determined
         # after this check.
-        $canidates = [ 'nmake', 'mingw32-make', 'gmake', 'make' ];
+        $candidates = [ 'nmake', 'mingw32-make', 'gmake', 'make' ];
     }
     else {
         # Default
-        $canidates = ['gmake', 'mingw32-make', 'nmake', 'make'];
+        $candidates = ['gmake', 'mingw32-make', 'nmake', 'make'];
     }
 
     my $prog;
@@ -62,7 +62,7 @@ sub runstep {
     # first pick wins.
     $prog ||= $ENV{ uc($util) };
     $prog ||= $conf->options->get($util);
-    $prog ||= check_progs( $canidates, $verbose );
+    $prog ||= check_progs( $candidates, $verbose );
     if ( !$prog ) {
         $prog = ( $conf->options->get('ask') )
             ? prompt( $prompt, $prog ? $prog : $conf->data->get($util) )
@@ -76,7 +76,7 @@ sub runstep {
         $self->set_result('yes');
     }
     else {
-        $prog = check_progs( $canidates, $verbose );
+        $prog = check_progs( $candidates, $verbose );
 
         unless ($prog) {
 
