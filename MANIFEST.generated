@@ -90,6 +90,8 @@ pbc_to_exe.exe                                    [main]bin
 pbc_to_exe                                        [main]bin
 parrot_debugger.exe                               [main]bin
 parrot_debugger                                   [main]bin
+pirc.exe                                          [main]bin
+pirc                                              [main]bin
 runtime/parrot/dynext/digest_group.bundle         [library]
 runtime/parrot/dynext/digest_group.dll            [library]
 runtime/parrot/dynext/digest_group.dylib          [library]
