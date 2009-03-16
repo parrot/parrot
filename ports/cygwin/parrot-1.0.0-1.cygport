@@ -7,7 +7,7 @@ DIFF_EXCLUDES="MANIFEST.* parrot.pc myconfig config_lib.pasm Makefile TAGS"
 DLLVER=$(echo $PV|sed -e's,\.,_,g')
 cygwin2=
 DOCDIR="/usr/share/doc"
-PKG_NAMES="${PN} lib${PN}0 lib${PN}-devel ${PN}-docs"
+PKG_NAMES="${PN} lib${PN}1 ${PN}-devel ${PN}-docs"
 PKG_HINTS="${PKG_NAMES}"
 
 parrot_exists_check() {
@@ -32,8 +32,7 @@ src_compile() {
   test -e Configure.pl || lndirs
   test -e config_lib.pasm && make realclean
 
-  cfg=
-  perl Configure.pl $cfg --prefix=/usr --optimize --mandir=/usr/share/man 
+  perl Configure.pl --prefix=/usr --optimize --mandir=/usr/share/man 
   # only cygwin-1.5 -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
   if [ -z "$cygwin2" ]; then
     sed -e"s,/usr/share/doc/parrot/${PV}\",/usr/share/doc/${P}\"," -i config_lib.pasm
@@ -125,49 +124,47 @@ src_install () {
 PKG_CONTENTS[0]=" \
 --exclude=usr/bin/cygparrot${DLLVER}.dll \
 --exclude=usr/include \
---exclude=usr/bin/parrot-* \
---exclude=usr/lib/parrot/${PV}/dynext/perl6_*.dll \
---exclude=usr/lib/parrot/${PV}/library/P6object.* \
 --exclude=usr/share/doc/parrot/${PV}/languages \
---exclude=usr/share/doc/parrot/${PV}/DEPRECATED.pod \
+--exclude=usr/share/doc/parrot/DEPRECATED.pod \
 --exclude=usr/share/doc/parrot/${PV}/PBC_COMPAT \
 --exclude=usr/share/doc/parrot/${PV}/html \
 --exclude=usr/share/doc/parrot/${PV}/pod/project \
---exclude=usr/share/man/man1/parrot-*1.gz \
 usr/bin \
 usr/share \
 usr/lib/parrot/parrotbug \
-usr/lib/parrot/${PV}/include/config_lib.pasm \
 usr/lib/parrot/${PV}/myconfig \
 usr/lib/parrot/${PV}/VERSION \
 usr/lib/parrot/${PV}/dynext \
 usr/lib/parrot/${PV}/library \
+usr/lib/parrot/${PV}/languages \
+usr/lib/parrot/${PV}/include/config_lib.pasm \
 usr/lib/parrot/${PV}/include/interpinfo.pasm \
 usr/lib/parrot/${PV}/include/config.fpmc \
 "
 
-# libparrot0
+# libparrot1
 PKG_CONTENTS[1]=" \
 usr/bin/cygparrot${DLLVER}.dll"
 
-# libparrot-devel
+# parrot-devel
 PKG_CONTENTS[2]=" \
 --exclude=usr/lib/parrot/${PV}/dynext \
 --exclude=usr/lib/parrot/${PV}/languages \
 --exclude=usr/lib/parrot/${PV}/library \
---exclude=usr/lib/parrot/${PV}/config_lib.pasm \
 --exclude=usr/lib/parrot/${PV}/myconfig \
---exclude=usr/lib/parrot/${PV}/parrotbug \
+--exclude=usr/lib/parrot/parrotbug \
 --exclude=usr/lib/parrot/${PV}/VERSION \
+--exclude=usr/lib/parrot/${PV}/include/config_lib.pasm \
 --exclude=usr/lib/parrot/${PV}/include/interpinfo.pasm \
 --exclude=usr/lib/parrot/${PV}/include/config.fpmc \
 --exclude=usr/share/doc/parrot/${PV}/html \
 usr/include \
 usr/lib \
-usr/share/doc/parrot/${PV}/DEPRECATED.pod \
+usr/share/doc/parrot/DEPRECATED.pod \
 usr/share/doc/parrot/${PV}/PBC_COMPAT \
 usr/share/doc/parrot/${PV}/pod/project \
 usr/src/parrot/${PV}"
 
 # parrot-docs
-PKG_CONTENTS[5]="usr/share/doc/parrot/${PV}/html"
+PKG_CONTENTS[3]=" \
+usr/share/doc/parrot/${PV}/html"

@@ -1,0 +1,1122 @@
+parrot
+----------------------------------
+Parrot is a virtual machine designed to efficiently compile and
+execute bytecode for interpreted languages. Parrot is a target for Perl 6 
+and a lot of other languages.
+
+Runtime requirements:
+  libparrot1 libreadline6 libncurses8 libintl8 libicu38 libgmp3 libgdbm4
+
+Optional requirements:
+  w32api pcre libpq5 openssl
+
+Build requirements:
+  readline libncurses-devel libicu-devel libgmp-devel libgdbm-devel perl 
+  make gcc
+
+Optional build requirements:
+  pcre-devel openssl-devel
+
+Optional test packages:
+  perl L<Test::TAP::HTMLMatrix> if you want to run C<make smoke>.
+  perl L<Test::Perl::Critic> and L<Perl::Critic> for C<make codingstd>
+
+Canonical homepage:
+  http://www.parrotcode.org/
+
+Canonical download:
+  http://www.parrotcode.org/release/devel
+
+-------------------------------------------------------------------------------
+
+Build instructions:
+
+  cd /usr/src
+  cygport parrot-<VER>-<REL>.cygport all
+
+This will create:
+  /usr/src/parrot-<VER>-<REL>-src.tar.bz2
+  /usr/src/parrot-<VER>-<REL>.tar.bz2
+  /usr/src/libparrot1-<VER>-<REL>.tar.bz2
+  /usr/src/parrot-devel-<VER>-<REL>.tar.bz2
+  /usr/src/parrot-docs-<VER>-<REL>.tar.bz2
+
+Or use 'cygport parrot-<VER>-<REL>.cygport prep' to get a patched 
+source directory.
+
+-------------------------------------------------------------------------------
+
+Files included in the =parrot= package:
+
+  /usr/bin/parrot.exe
+  /usr/bin/parrot_config.exe
+  /usr/bin/parrot_debugger.exe
+  /usr/bin/pbc_disassemble.exe
+  /usr/bin/pbc_dump.exe
+  /usr/bin/pbc_info.exe
+  /usr/bin/pbc_merge.exe
+  /usr/bin/pbc_to_exe.exe
+  /usr/share/doc/Cygwin/parrot.README
+  /usr/share/doc/parrot/1.0.0/LICENSE
+  /usr/share/doc/parrot/1.0.0/NEWS
+  /usr/share/doc/parrot/1.0.0/PLATFORMS
+  /usr/share/doc/parrot/1.0.0/pod/compiler_faq.pod
+  /usr/share/doc/parrot/1.0.0/pod/debug.pod
+  /usr/share/doc/parrot/1.0.0/pod/faq.pod
+  /usr/share/doc/parrot/1.0.0/pod/gettingstarted.pod
+  /usr/share/doc/parrot/1.0.0/pod/glossary.pod
+  /usr/share/doc/parrot/1.0.0/pod/intro.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/bit.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/cmp.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/core.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/debug.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/experimental.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/io.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/math.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/object.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/obscure.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/pic.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/pmc.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/set.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/string.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/sys.pod
+  /usr/share/doc/parrot/1.0.0/pod/ops/var.pod
+  /usr/share/doc/parrot/1.0.0/pod/pct/gettingstarted.pod
+  /usr/share/doc/parrot/1.0.0/pod/pct/past_building_blocks.pod
+  /usr/share/doc/parrot/1.0.0/pod/pct/pct_optable_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/pmc/array.pod
+  /usr/share/doc/parrot/1.0.0/pod/pmc/documentation.pod
+  /usr/share/doc/parrot/1.0.0/pod/pmc/struct.pod
+  /usr/share/doc/parrot/1.0.0/pod/pmc/subs.pod
+  /usr/share/doc/parrot/1.0.0/pod/pmc2c.pod
+  /usr/share/doc/parrot/1.0.0/pod/user/pir/exceptions.pod
+  /usr/share/doc/parrot/1.0.0/pod/user/pir/pp001-intro.pod
+  /usr/share/doc/parrot/1.0.0/pod/user/pir/pp002-pmc.pod
+  /usr/share/doc/parrot/1.0.0/pod/user/pir/pp003-oop.pod
+  /usr/share/doc/parrot/1.0.0/pod/vtables.pod
+  /usr/share/doc/parrot/1.0.0/README
+  /usr/share/doc/parrot/1.0.0/RESPONSIBLE_PARTIES
+  /usr/share/doc/parrot/ChangeLog
+  /usr/share/doc/parrot/CREDITS
+  /usr/share/doc/parrot/DONORS.pod
+  /usr/share/doc/parrot/LICENSE
+  /usr/share/doc/parrot/NEWS
+  /usr/share/doc/parrot/README
+  /usr/share/doc/parrot/README_cygwin.pod
+  /usr/share/doc/parrot/TODO
+  /usr/share/emacs/site-lisp/parrot.el
+  /usr/share/emacs/site-lisp/parrot.README
+  /usr/share/emacs/site-lisp/pasm.el
+  /usr/share/emacs/site-lisp/pir-mode.el
+  /usr/share/man/man1/parrot.1.gz
+  /usr/share/man/man1/parrot_debugger.1.gz
+  /usr/share/man/man1/pbc_disassemble.1.gz
+  /usr/share/man/man1/pbc_info.1.gz
+  /usr/share/man/man1/pbc_merge.1.gz
+  /usr/share/man/man1/pbc_to_exe.1.gz
+  /usr/share/vim/vimfiles/ftplugin/parrot.vim
+  /usr/share/vim/vimfiles/syntax/pasm.vim
+  /usr/share/vim/vimfiles/syntax/pir.vim
+  /usr/share/vim/vimfiles/syntax/pmc.vim
+  /usr/lib/parrot/parrotbug
+  /usr/lib/parrot/1.0.0/myconfig
+  /usr/lib/parrot/1.0.0/VERSION
+  /usr/lib/parrot/1.0.0/dynext/digest_group.dll
+  /usr/lib/parrot/1.0.0/dynext/dynlexpad.dll
+  /usr/lib/parrot/1.0.0/dynext/libglutcb.dll
+  /usr/lib/parrot/1.0.0/dynext/libnci_test.dll
+  /usr/lib/parrot/1.0.0/dynext/rational.dll
+  /usr/lib/parrot/1.0.0/dynext/subproxy.dll
+  /usr/lib/parrot/1.0.0/library/CGI/QueryHash.pbc
+  /usr/lib/parrot/1.0.0/library/CGI/QueryHash.pir
+  /usr/lib/parrot/1.0.0/library/Config/JSON.pir
+  /usr/lib/parrot/1.0.0/library/config.pbc
+  /usr/lib/parrot/1.0.0/library/config.pir
+  /usr/lib/parrot/1.0.0/library/Crow.pir
+  /usr/lib/parrot/1.0.0/library/Data/Dumper/Base.pbc
+  /usr/lib/parrot/1.0.0/library/Data/Dumper/Base.pir
+  /usr/lib/parrot/1.0.0/library/Data/Dumper/Default.pbc
+  /usr/lib/parrot/1.0.0/library/Data/Dumper/Default.pir
+  /usr/lib/parrot/1.0.0/library/Data/Dumper.pbc
+  /usr/lib/parrot/1.0.0/library/Data/Dumper.pir
+  /usr/lib/parrot/1.0.0/library/Data/Replace.pir
+  /usr/lib/parrot/1.0.0/library/Digest/MD5.pir
+  /usr/lib/parrot/1.0.0/library/dumper.pbc
+  /usr/lib/parrot/1.0.0/library/dumper.pir
+  /usr/lib/parrot/1.0.0/library/Getopt/Obj.pbc
+  /usr/lib/parrot/1.0.0/library/Getopt/Obj.pir
+  /usr/lib/parrot/1.0.0/library/HTTP/Daemon.pir
+  /usr/lib/parrot/1.0.0/library/Iter.pir
+  /usr/lib/parrot/1.0.0/library/JSON.pir
+  /usr/lib/parrot/1.0.0/library/libpcre.pir
+  /usr/lib/parrot/1.0.0/library/Math/Rand.pbc
+  /usr/lib/parrot/1.0.0/library/Math/Rand.pir
+  /usr/lib/parrot/1.0.0/library/Math/Random/mt19937ar.pbc
+  /usr/lib/parrot/1.0.0/library/Math/Random/mt19937ar.pir
+  /usr/lib/parrot/1.0.0/library/MIME/Base64.pbc
+  /usr/lib/parrot/1.0.0/library/MIME/Base64.pir
+  /usr/lib/parrot/1.0.0/library/NCI/call_toolkit_init.pbc
+  /usr/lib/parrot/1.0.0/library/NCI/call_toolkit_init.pir
+  /usr/lib/parrot/1.0.0/library/ncurses.declarations
+  /usr/lib/parrot/1.0.0/library/ncurses.pasm
+  /usr/lib/parrot/1.0.0/library/ncurses.pbc
+  /usr/lib/parrot/1.0.0/library/ncurses.pir
+  /usr/lib/parrot/1.0.0/library/OpenGL.pbc
+  /usr/lib/parrot/1.0.0/library/OpenGL.pir
+  /usr/lib/parrot/1.0.0/library/OpenGL_funcs.pir
+  /usr/lib/parrot/1.0.0/library/P6object.pbc
+  /usr/lib/parrot/1.0.0/library/P6object.pir
+  /usr/lib/parrot/1.0.0/library/Parrot/Coroutine.pbc
+  /usr/lib/parrot/1.0.0/library/Parrot/Coroutine.pir
+  /usr/lib/parrot/1.0.0/library/Parrot/Exception.pbc
+  /usr/lib/parrot/1.0.0/library/Parrot/Exception.pir
+  /usr/lib/parrot/1.0.0/library/parrotlib.pbc
+  /usr/lib/parrot/1.0.0/library/parrotlib.pir
+  /usr/lib/parrot/1.0.0/library/pcore.pir
+  /usr/lib/parrot/1.0.0/library/pcre.pbc
+  /usr/lib/parrot/1.0.0/library/pcre.pir
+  /usr/lib/parrot/1.0.0/library/PCT/Grammar.pbc
+  /usr/lib/parrot/1.0.0/library/PCT/HLLCompiler.pbc
+  /usr/lib/parrot/1.0.0/library/PCT/PAST.pbc
+  /usr/lib/parrot/1.0.0/library/PCT.pbc
+  /usr/lib/parrot/1.0.0/library/Pg.pir
+  /usr/lib/parrot/1.0.0/library/PGE/Dumper.pbc
+  /usr/lib/parrot/1.0.0/library/PGE/Dumper.pir
+  /usr/lib/parrot/1.0.0/library/PGE/Glob.pbc
+  /usr/lib/parrot/1.0.0/library/PGE/Glob.pir
+  /usr/lib/parrot/1.0.0/library/PGE/Hs.pir
+  /usr/lib/parrot/1.0.0/library/PGE/Perl6Grammar.pbc
+  /usr/lib/parrot/1.0.0/library/PGE/Perl6Grammar.pir
+  /usr/lib/parrot/1.0.0/library/PGE/Text.pbc
+  /usr/lib/parrot/1.0.0/library/PGE/Text.pir
+  /usr/lib/parrot/1.0.0/library/PGE/Util.pbc
+  /usr/lib/parrot/1.0.0/library/PGE/Util.pir
+  /usr/lib/parrot/1.0.0/library/PGE.pbc
+  /usr/lib/parrot/1.0.0/library/postgres.declarations
+  /usr/lib/parrot/1.0.0/library/postgres.pasm
+  /usr/lib/parrot/1.0.0/library/postgres.pir
+  /usr/lib/parrot/1.0.0/library/Protoobject.pbc
+  /usr/lib/parrot/1.0.0/library/Protoobject.pir
+  /usr/lib/parrot/1.0.0/library/random_lib.pir
+  /usr/lib/parrot/1.0.0/library/Range.pir
+  /usr/lib/parrot/1.0.0/library/SDL/App.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Button.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Color.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Constants.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Event.pir
+  /usr/lib/parrot/1.0.0/library/SDL/EventHandler.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Font.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Image.pir
+  /usr/lib/parrot/1.0.0/library/SDL/LCD.pir
+  /usr/lib/parrot/1.0.0/library/SDL/LCD.png
+  /usr/lib/parrot/1.0.0/library/SDL/Rect.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Sprite.pir
+  /usr/lib/parrot/1.0.0/library/SDL/StopWatch.pir
+  /usr/lib/parrot/1.0.0/library/SDL/Surface.pir
+  /usr/lib/parrot/1.0.0/library/SDL.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Base.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Base.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Combiner.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Combiner.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Coroutine.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Coroutine.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Filter.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Filter.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Lines.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Lines.pir
+  /usr/lib/parrot/1.0.0/library/Stream/ParrotIO.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/ParrotIO.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Replay.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Replay.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Sub.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Sub.pir
+  /usr/lib/parrot/1.0.0/library/Stream/Writer.pbc
+  /usr/lib/parrot/1.0.0/library/Stream/Writer.pir
+  /usr/lib/parrot/1.0.0/library/String/Utils.pir
+  /usr/lib/parrot/1.0.0/library/Tcl/Glob.pir
+  /usr/lib/parrot/1.0.0/library/TclLibrary.pir
+  /usr/lib/parrot/1.0.0/library/tcpstream.pir
+  /usr/lib/parrot/1.0.0/library/Test/Builder/Output.pir
+  /usr/lib/parrot/1.0.0/library/Test/Builder/Test.pir
+  /usr/lib/parrot/1.0.0/library/Test/Builder/Tester.pir
+  /usr/lib/parrot/1.0.0/library/Test/Builder/TestPlan.pir
+  /usr/lib/parrot/1.0.0/library/Test/Builder.pir
+  /usr/lib/parrot/1.0.0/library/Test/Class.pir
+  /usr/lib/parrot/1.0.0/library/Test/More.pir
+  /usr/lib/parrot/1.0.0/library/TGE.pbc
+  /usr/lib/parrot/1.0.0/library/uuid.pir
+  /usr/lib/parrot/1.0.0/library/YAML/Dumper/Base.pir
+  /usr/lib/parrot/1.0.0/library/YAML/Dumper/Default.pir
+  /usr/lib/parrot/1.0.0/library/YAML/Dumper.pir
+  /usr/lib/parrot/1.0.0/library/YAML/Parser/Syck.pir
+  /usr/lib/parrot/1.0.0/library/yaml_dumper.pir
+  /usr/lib/parrot/1.0.0/languages/nqp/bootstrap/actions.pm
+  /usr/lib/parrot/1.0.0/languages/nqp/bootstrap/nqp.pir
+  /usr/lib/parrot/1.0.0/languages/nqp/nqp.pbc
+  /usr/lib/parrot/1.0.0/languages/nqp/nqp.pir
+  /usr/lib/parrot/1.0.0/languages/nqp/src/builtins.pir
+  /usr/lib/parrot/1.0.0/languages/nqp/src/Grammar/Actions.pir
+  /usr/lib/parrot/1.0.0/languages/nqp/src/Grammar.pg
+  /usr/lib/parrot/1.0.0/languages/nqp/TODO.pod
+  /usr/lib/parrot/1.0.0/languages/pct/PCT.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/PAST/Compiler.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/PAST/Node.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/PAST.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/PCT/Grammar.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/PCT/HLLCompiler.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/PCT/Node.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/POST/Compiler.pir
+  /usr/lib/parrot/1.0.0/languages/pct/src/POST/Node.pir
+  /usr/lib/parrot/1.0.0/languages/pge/demo.pir
+  /usr/lib/parrot/1.0.0/languages/pge/P6Rule.grammar
+  /usr/lib/parrot/1.0.0/languages/pge/PGE/builtins.pg
+  /usr/lib/parrot/1.0.0/languages/pge/PGE/Exp.pir
+  /usr/lib/parrot/1.0.0/languages/pge/PGE/Match.pir
+  /usr/lib/parrot/1.0.0/languages/pge/PGE/OPTable.pir
+  /usr/lib/parrot/1.0.0/languages/pge/PGE/P5Regex.pir
+  /usr/lib/parrot/1.0.0/languages/pge/PGE/Perl6Regex.pir
+  /usr/lib/parrot/1.0.0/languages/pge/PGE/Regex.pir
+  /usr/lib/parrot/1.0.0/languages/pge/PGE.pir
+  /usr/lib/parrot/1.0.0/languages/pge/STATUS
+  /usr/lib/parrot/1.0.0/languages/tge/tgc.pir
+  /usr/lib/parrot/1.0.0/languages/tge/TGE/Compiler.pir
+  /usr/lib/parrot/1.0.0/languages/tge/TGE/Grammar.pir
+  /usr/lib/parrot/1.0.0/languages/tge/TGE/Parser.pg
+  /usr/lib/parrot/1.0.0/languages/tge/TGE/Rule.pir
+  /usr/lib/parrot/1.0.0/languages/tge/TGE/Tree.pir
+  /usr/lib/parrot/1.0.0/languages/tge/TGE.pir
+  /usr/lib/parrot/1.0.0/include/config_lib.pasm
+  /usr/lib/parrot/1.0.0/include/interpinfo.pasm
+  /usr/lib/parrot/1.0.0/include/config.fpmc
+
+Files included in the =libparrot1= package:
+
+  /usr/bin/cygparrot1_0_0.dll
+
+Files included in the =parrot-devel= package:
+
+  /usr/include/parrot/1.0.0/parrot/atomic/fallback.h
+  /usr/include/parrot/1.0.0/parrot/atomic/gcc_pcc.h
+  /usr/include/parrot/1.0.0/parrot/atomic/gcc_x86.h
+  /usr/include/parrot/1.0.0/parrot/atomic/sparc.h
+  /usr/include/parrot/1.0.0/parrot/atomic.h
+  /usr/include/parrot/1.0.0/parrot/caches.h
+  /usr/include/parrot/1.0.0/parrot/call.h
+  /usr/include/parrot/1.0.0/parrot/cclass.h
+  /usr/include/parrot/1.0.0/parrot/charset.h
+  /usr/include/parrot/1.0.0/parrot/compiler.h
+  /usr/include/parrot/1.0.0/parrot/config.h
+  /usr/include/parrot/1.0.0/parrot/core_pmcs.h
+  /usr/include/parrot/1.0.0/parrot/core_types.h
+  /usr/include/parrot/1.0.0/parrot/datatypes.h
+  /usr/include/parrot/1.0.0/parrot/debugger.h
+  /usr/include/parrot/1.0.0/parrot/dynext.h
+  /usr/include/parrot/1.0.0/parrot/embed.h
+  /usr/include/parrot/1.0.0/parrot/encoding.h
+  /usr/include/parrot/1.0.0/parrot/enums.h
+  /usr/include/parrot/1.0.0/parrot/events.h
+  /usr/include/parrot/1.0.0/parrot/exceptions.h
+  /usr/include/parrot/1.0.0/parrot/exec.h
+  /usr/include/parrot/1.0.0/parrot/exit.h
+  /usr/include/parrot/1.0.0/parrot/extend.h
+  /usr/include/parrot/1.0.0/parrot/extend_vtable.h
+  /usr/include/parrot/1.0.0/parrot/feature.h
+  /usr/include/parrot/1.0.0/parrot/gc_api.h
+  /usr/include/parrot/1.0.0/parrot/gc_mark_sweep.h
+  /usr/include/parrot/1.0.0/parrot/gc_pools.h
+  /usr/include/parrot/1.0.0/parrot/global.h
+  /usr/include/parrot/1.0.0/parrot/global_setup.h
+  /usr/include/parrot/1.0.0/parrot/hash.h
+  /usr/include/parrot/1.0.0/parrot/has_header.h
+  /usr/include/parrot/1.0.0/parrot/hll.h
+  /usr/include/parrot/1.0.0/parrot/imcc.h
+  /usr/include/parrot/1.0.0/parrot/interpreter.h
+  /usr/include/parrot/1.0.0/parrot/io.h
+  /usr/include/parrot/1.0.0/parrot/io_portable.h
+  /usr/include/parrot/1.0.0/parrot/io_unix.h
+  /usr/include/parrot/1.0.0/parrot/io_win32.h
+  /usr/include/parrot/1.0.0/parrot/key.h
+  /usr/include/parrot/1.0.0/parrot/library.h
+  /usr/include/parrot/1.0.0/parrot/list.h
+  /usr/include/parrot/1.0.0/parrot/longopt.h
+  /usr/include/parrot/1.0.0/parrot/memory.h
+  /usr/include/parrot/1.0.0/parrot/misc.h
+  /usr/include/parrot/1.0.0/parrot/multidispatch.h
+  /usr/include/parrot/1.0.0/parrot/nci.h
+  /usr/include/parrot/1.0.0/parrot/oo.h
+  /usr/include/parrot/1.0.0/parrot/oo_private.h
+  /usr/include/parrot/1.0.0/parrot/op.h
+  /usr/include/parrot/1.0.0/parrot/oplib/core_ops.h
+  /usr/include/parrot/1.0.0/parrot/oplib/core_ops_cg.h
+  /usr/include/parrot/1.0.0/parrot/oplib/core_ops_cgp.h
+  /usr/include/parrot/1.0.0/parrot/oplib/core_ops_switch.h
+  /usr/include/parrot/1.0.0/parrot/oplib/ops.h
+  /usr/include/parrot/1.0.0/parrot/oplib.h
+  /usr/include/parrot/1.0.0/parrot/packfile.h
+  /usr/include/parrot/1.0.0/parrot/parrot.h
+  /usr/include/parrot/1.0.0/parrot/pbcversion.h
+  /usr/include/parrot/1.0.0/parrot/pic.h
+  /usr/include/parrot/1.0.0/parrot/platform.h
+  /usr/include/parrot/1.0.0/parrot/platform_interface.h
+  /usr/include/parrot/1.0.0/parrot/platform_limits.h
+  /usr/include/parrot/1.0.0/parrot/pmc.h
+  /usr/include/parrot/1.0.0/parrot/pmc_freeze.h
+  /usr/include/parrot/1.0.0/parrot/pobj.h
+  /usr/include/parrot/1.0.0/parrot/register.h
+  /usr/include/parrot/1.0.0/parrot/resources.h
+  /usr/include/parrot/1.0.0/parrot/scheduler.h
+  /usr/include/parrot/1.0.0/parrot/scheduler_private.h
+  /usr/include/parrot/1.0.0/parrot/settings.h
+  /usr/include/parrot/1.0.0/parrot/slice.h
+  /usr/include/parrot/1.0.0/parrot/stacks.h
+  /usr/include/parrot/1.0.0/parrot/stat.h
+  /usr/include/parrot/1.0.0/parrot/string.h
+  /usr/include/parrot/1.0.0/parrot/string_funcs.h
+  /usr/include/parrot/1.0.0/parrot/string_primitives.h
+  /usr/include/parrot/1.0.0/parrot/sub.h
+  /usr/include/parrot/1.0.0/parrot/thread.h
+  /usr/include/parrot/1.0.0/parrot/thr_pthread.h
+  /usr/include/parrot/1.0.0/parrot/thr_windows.h
+  /usr/include/parrot/1.0.0/parrot/tsq.h
+  /usr/include/parrot/1.0.0/parrot/vtable.h
+  /usr/include/parrot/1.0.0/parrot/vtables.h
+  /usr/include/parrot/1.0.0/parrot/warnings.h
+  /usr/include/parrot/1.0.0/pmc/pmc_boolean.h
+  /usr/include/parrot/1.0.0/pmc/pmc_continuation.h
+  /usr/include/parrot/1.0.0/pmc/pmc_default.h
+  /usr/include/parrot/1.0.0/pmc/pmc_fixedintegerarray.h
+  /usr/include/parrot/1.0.0/pmc/pmc_fixedpmcarray.h
+  /usr/include/parrot/1.0.0/pmc/pmc_float.h
+  /usr/include/parrot/1.0.0/pmc/pmc_hash.h
+  /usr/include/parrot/1.0.0/pmc/pmc_integer.h
+  /usr/include/parrot/1.0.0/pmc/pmc_multisub.h
+  /usr/include/parrot/1.0.0/pmc/pmc_object.h
+  /usr/include/parrot/1.0.0/pmc/pmc_parrotlibrary.h
+  /usr/include/parrot/1.0.0/pmc/pmc_resizablepmcarray.h
+  /usr/include/parrot/1.0.0/pmc/pmc_scalar.h
+  /usr/include/parrot/1.0.0/pmc/pmc_string.h
+  /usr/include/parrot/1.0.0/pmc/pmc_sub.h
+  /usr/include/parrot/1.0.0/pmc/pmc_undef.h
+  /usr/lib/libparrot.dll.a
+  /usr/lib/parrot/1.0.0/include/call_bits.pasm
+  /usr/lib/parrot/1.0.0/include/cclass.pasm
+  /usr/lib/parrot/1.0.0/include/datatypes.pasm
+  /usr/lib/parrot/1.0.0/include/errors.pasm
+  /usr/lib/parrot/1.0.0/include/except_severity.pasm
+  /usr/lib/parrot/1.0.0/include/except_types.pasm
+  /usr/lib/parrot/1.0.0/include/fp_equality.pasm
+  /usr/lib/parrot/1.0.0/include/hllmacros.pir
+  /usr/lib/parrot/1.0.0/include/iglobals.pasm
+  /usr/lib/parrot/1.0.0/include/interpcores.pasm
+  /usr/lib/parrot/1.0.0/include/interpdebug.pasm
+  /usr/lib/parrot/1.0.0/include/interpflags.pasm
+  /usr/lib/parrot/1.0.0/include/interptrace.pasm
+  /usr/lib/parrot/1.0.0/include/iterator.pasm
+  /usr/lib/parrot/1.0.0/include/longopt.pasm
+  /usr/lib/parrot/1.0.0/include/mmd.pasm
+  /usr/lib/parrot/1.0.0/include/opengl_defines.pasm
+  /usr/lib/parrot/1.0.0/include/parrotlib.pbc
+  /usr/lib/parrot/1.0.0/include/pmctypes.pasm
+  /usr/lib/parrot/1.0.0/include/signal.pasm
+  /usr/lib/parrot/1.0.0/include/sockets.pasm
+  /usr/lib/parrot/1.0.0/include/stat.pasm
+  /usr/lib/parrot/1.0.0/include/stdio.pasm
+  /usr/lib/parrot/1.0.0/include/stringinfo.pasm
+  /usr/lib/parrot/1.0.0/include/sysinfo.pasm
+  /usr/lib/parrot/1.0.0/include/test_more.pir
+  /usr/lib/parrot/1.0.0/include/timer.pasm
+  /usr/lib/parrot/1.0.0/include/tm.pasm
+  /usr/lib/parrot/1.0.0/include/warnings.pasm
+  /usr/lib/parrot/1.0.0/tools/build/ops2c.pl
+  /usr/lib/parrot/1.0.0/tools/build/pmc2c.pl
+  /usr/lib/parrot/1.0.0/tools/dev/gen_makefile.pl
+  /usr/lib/parrot/1.0.0/tools/dev/pbc_to_exe.pir
+  /usr/lib/parrot/1.0.0/tools/dev/reconfigure.pl
+  /usr/lib/parrot/1.0.0/tools/lib/File/Which.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/BuildUtil.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Config/Generated.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Config.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Compiler.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Data.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Messages.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options/Conf/CLI.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options/Conf/File.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options/Conf/Shared.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options/Conf.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options/Reconf.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options/Test/Prepare.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options/Test.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Options.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Step/List.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Step/Methods.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Step.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Test.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Trace.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure/Utils.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Configure.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Distribution.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Directory.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/File.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Group.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/HTMLPage.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Item.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/POD2HTML.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/C.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Compilers.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Config.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Developer.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Examples.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/IMCC.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Info.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Libs.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Ops.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Parrot.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/PDDs.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Perl.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/PMCs.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Tests.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section/Tools.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Section.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Docs/Text2HTML.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Harness/DefaultTests.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Harness/Options.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Harness/Smoke.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Headerizer.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/IO/Directory.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/IO/File.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/IO/Path.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Manifest.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Op.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpLib/core.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Ops2c/Auxiliary.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Ops2c/Utils.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Ops2pm/Auxiliary.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Ops2pm/Base.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Ops2pm.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpsFile.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpsRenumber.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpTrans/C.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpTrans/CGoto.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpTrans/CGP.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpTrans/Compiled.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpTrans/CPrederef.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpTrans/CSwitch.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/OpTrans.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/PMC.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Attribute.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/ComposedMethod.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Dumper.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Emitter.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Library.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Method.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/MethodEmitter.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/MULTI.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Object.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Parser.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PCCMETHOD.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/default.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/Null.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/Object.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/ParrotClass.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/PrintTree.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/Ref.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/RO.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC/SharedRef.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMC.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/Pmc2cMain.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/PMCEmitter.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/UtilFunctions.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Pmc2c/VTable.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Revision.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/SearchOps.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Cardinal.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Harness.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Perl6.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/PGE.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/PIR_PGE.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Pod/Utils.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Pod.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Util/Runloop.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test/Util.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Test.pm
+  /usr/lib/parrot/1.0.0/tools/lib/Parrot/Vtable.pm
+  /usr/lib/pkgconfig/parrot/1.0.0/parrot.pc
+  /usr/share/doc/parrot/DEPRECATED.pod
+  /usr/share/doc/parrot/1.0.0/PBC_COMPAT
+  /usr/share/doc/parrot/1.0.0/pod/project/branching_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/cage_cleaners_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/committer_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/debian_packaging_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/metacommitter_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/pause_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/release_manager_guide.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/roles_responsibilities.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/support_policy.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/ticket_triaging.pod
+  /usr/share/doc/parrot/1.0.0/pod/project/ubuntu_packaging_guide.pod
+  /usr/src/parrot/1.0.0/call_list.txt
+  /usr/src/parrot/1.0.0/dynpmc/dynlexpad.pmc
+  /usr/src/parrot/1.0.0/dynpmc/foo.pmc
+  /usr/src/parrot/1.0.0/dynpmc/gdbmhash.pmc
+  /usr/src/parrot/1.0.0/dynpmc/pair.pmc
+  /usr/src/parrot/1.0.0/dynpmc/rational.pmc
+  /usr/src/parrot/1.0.0/dynpmc/rotest.pmc
+  /usr/src/parrot/1.0.0/dynpmc/subproxy.pmc
+  /usr/src/parrot/1.0.0/ops/ops.num
+  /usr/src/parrot/1.0.0/pmc/addrregistry.pmc
+  /usr/src/parrot/1.0.0/pmc/array.pmc
+  /usr/src/parrot/1.0.0/pmc/bigint.pmc
+  /usr/src/parrot/1.0.0/pmc/bignum.pmc
+  /usr/src/parrot/1.0.0/pmc/boolean.dump
+  /usr/src/parrot/1.0.0/pmc/boolean.pmc
+  /usr/src/parrot/1.0.0/pmc/bound_nci.pmc
+  /usr/src/parrot/1.0.0/pmc/callsignature.pmc
+  /usr/src/parrot/1.0.0/pmc/capture.pmc
+  /usr/src/parrot/1.0.0/pmc/class.pmc
+  /usr/src/parrot/1.0.0/pmc/codestring.pmc
+  /usr/src/parrot/1.0.0/pmc/complex.pmc
+  /usr/src/parrot/1.0.0/pmc/continuation.dump
+  /usr/src/parrot/1.0.0/pmc/continuation.pmc
+  /usr/src/parrot/1.0.0/pmc/coroutine.pmc
+  /usr/src/parrot/1.0.0/pmc/cpointer.pmc
+  /usr/src/parrot/1.0.0/pmc/default.dump
+  /usr/src/parrot/1.0.0/pmc/default.pmc
+  /usr/src/parrot/1.0.0/pmc/env.pmc
+  /usr/src/parrot/1.0.0/pmc/eval.pmc
+  /usr/src/parrot/1.0.0/pmc/eventhandler.pmc
+  /usr/src/parrot/1.0.0/pmc/exception.pmc
+  /usr/src/parrot/1.0.0/pmc/exceptionhandler.pmc
+  /usr/src/parrot/1.0.0/pmc/exporter.pmc
+  /usr/src/parrot/1.0.0/pmc/file.pmc
+  /usr/src/parrot/1.0.0/pmc/filehandle.pmc
+  /usr/src/parrot/1.0.0/pmc/fixedbooleanarray.pmc
+  /usr/src/parrot/1.0.0/pmc/fixedfloatarray.pmc
+  /usr/src/parrot/1.0.0/pmc/fixedintegerarray.pmc
+  /usr/src/parrot/1.0.0/pmc/fixedpmcarray.dump
+  /usr/src/parrot/1.0.0/pmc/fixedpmcarray.pmc
+  /usr/src/parrot/1.0.0/pmc/fixedstringarray.pmc
+  /usr/src/parrot/1.0.0/pmc/float.dump
+  /usr/src/parrot/1.0.0/pmc/float.pmc
+  /usr/src/parrot/1.0.0/pmc/hash.dump
+  /usr/src/parrot/1.0.0/pmc/hash.pmc
+  /usr/src/parrot/1.0.0/pmc/integer.dump
+  /usr/src/parrot/1.0.0/pmc/integer.pmc
+  /usr/src/parrot/1.0.0/pmc/iterator.pmc
+  /usr/src/parrot/1.0.0/pmc/key.pmc
+  /usr/src/parrot/1.0.0/pmc/lexinfo.pmc
+  /usr/src/parrot/1.0.0/pmc/lexpad.pmc
+  /usr/src/parrot/1.0.0/pmc/managedstruct.pmc
+  /usr/src/parrot/1.0.0/pmc/multisub.dump
+  /usr/src/parrot/1.0.0/pmc/multisub.pmc
+  /usr/src/parrot/1.0.0/pmc/namespace.pmc
+  /usr/src/parrot/1.0.0/pmc/nci.pmc
+  /usr/src/parrot/1.0.0/pmc/null.pmc
+  /usr/src/parrot/1.0.0/pmc/object.pmc
+  /usr/src/parrot/1.0.0/pmc/orderedhash.pmc
+  /usr/src/parrot/1.0.0/pmc/os.pmc
+  /usr/src/parrot/1.0.0/pmc/packfile.pmc
+  /usr/src/parrot/1.0.0/pmc/packfileannotation.pmc
+  /usr/src/parrot/1.0.0/pmc/packfileannotationkeys.pmc
+  /usr/src/parrot/1.0.0/pmc/packfileannotations.pmc
+  /usr/src/parrot/1.0.0/pmc/packfileconstanttable.pmc
+  /usr/src/parrot/1.0.0/pmc/packfiledirectory.pmc
+  /usr/src/parrot/1.0.0/pmc/packfilefixupentry.pmc
+  /usr/src/parrot/1.0.0/pmc/packfilefixuptable.pmc
+  /usr/src/parrot/1.0.0/pmc/packfilerawsegment.pmc
+  /usr/src/parrot/1.0.0/pmc/packfilesegment.pmc
+  /usr/src/parrot/1.0.0/pmc/parrotinterpreter.pmc
+  /usr/src/parrot/1.0.0/pmc/parrotlibrary.pmc
+  /usr/src/parrot/1.0.0/pmc/parrotrunningthread.pmc
+  /usr/src/parrot/1.0.0/pmc/parrotthread.pmc
+  /usr/src/parrot/1.0.0/pmc/pccmethod_test.pmc
+  /usr/src/parrot/1.0.0/pmc/pmcproxy.pmc
+  /usr/src/parrot/1.0.0/pmc/pointer.pmc
+  /usr/src/parrot/1.0.0/pmc/random.pmc
+  /usr/src/parrot/1.0.0/pmc/ref.pmc
+  /usr/src/parrot/1.0.0/pmc/resizablebooleanarray.pmc
+  /usr/src/parrot/1.0.0/pmc/resizablefloatarray.pmc
+  /usr/src/parrot/1.0.0/pmc/resizableintegerarray.pmc
+  /usr/src/parrot/1.0.0/pmc/resizablepmcarray.dump
+  /usr/src/parrot/1.0.0/pmc/resizablepmcarray.pmc
+  /usr/src/parrot/1.0.0/pmc/resizablestringarray.pmc
+  /usr/src/parrot/1.0.0/pmc/retcontinuation.pmc
+  /usr/src/parrot/1.0.0/pmc/role.pmc
+  /usr/src/parrot/1.0.0/pmc/scalar.dump
+  /usr/src/parrot/1.0.0/pmc/scalar.pmc
+  /usr/src/parrot/1.0.0/pmc/scheduler.pmc
+  /usr/src/parrot/1.0.0/pmc/schedulermessage.pmc
+  /usr/src/parrot/1.0.0/pmc/sharedref.pmc
+  /usr/src/parrot/1.0.0/pmc/slice.pmc
+  /usr/src/parrot/1.0.0/pmc/string.dump
+  /usr/src/parrot/1.0.0/pmc/string.pmc
+  /usr/src/parrot/1.0.0/pmc/stringhandle.pmc
+  /usr/src/parrot/1.0.0/pmc/sub.dump
+  /usr/src/parrot/1.0.0/pmc/sub.pmc
+  /usr/src/parrot/1.0.0/pmc/task.pmc
+  /usr/src/parrot/1.0.0/pmc/timer.pmc
+  /usr/src/parrot/1.0.0/pmc/undef.dump
+  /usr/src/parrot/1.0.0/pmc/undef.pmc
+  /usr/src/parrot/1.0.0/pmc/unmanagedstruct.pmc
+  /usr/src/parrot/1.0.0/vtable.dump
+  /usr/src/parrot/1.0.0/vtable.tbl
+
+Files included in the =parrot-docs= package:
+
+  /usr/share/doc/parrot/1.0.0/html/compilers/pct/src/PAST/Compiler.pir.html
+  /usr/share/doc/parrot/1.0.0/html/config/auto/cgoto.pm.html
+  /usr/share/doc/parrot/1.0.0/html/config/auto/sizes.pm.html
+  /usr/share/doc/parrot/1.0.0/html/config/gen/makefiles.pm.html
+  /usr/share/doc/parrot/1.0.0/html/config/init/defaults.pm.html
+  /usr/share/doc/parrot/1.0.0/html/Configure.pl.html
+  /usr/share/doc/parrot/1.0.0/html/CREDITS.html
+  /usr/share/doc/parrot/1.0.0/html/developer.html
+  /usr/share/doc/parrot/1.0.0/html/docs/book/ch02_getting_started.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/book/ch09_pct.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/compiler_faq.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/configuration.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/debug.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/debugger.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/byteorder.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/c_functions.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/debugging_with_msvc.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/events.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/fhs.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/headerizer.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/infant.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/jit_i386.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/longopt.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/optimizer.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/parrot_api.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/pccmethods.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/pcc_state.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/pmc_freeze.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/dev/pmc_obj_design_meeting_notes.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/embed.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/gettingstarted.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/glossary.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/intro.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/jit.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/memory_internals.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/native_exec.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/ops/core.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/overview.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/packfile-c.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/parrot.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/parrotbyte.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/parrothist.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd01_overview.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd05_opfunc.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd06_pasm.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd08_keys.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd10_embedding.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd11_extending.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd14_numbers.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd16_native_call.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd29_compiler_tools.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd30_install.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/draft/pdd31_hll_interop.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd00_pdd.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd03_calling_conventions.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd07_codingstd.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd09_gc.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd13_bytecode.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd15_objects.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd17_pmc.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd18_security.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd19_pir.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd20_lexical_vars.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd21_namespaces.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd22_io.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd23_exceptions.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd24_events.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd25_concurrency.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd26_ast.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd27_multiple_dispatch.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd28_strings.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pdds/pdd_template.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/pmc/struct.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/porting_intro.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/project/metacommitter_guide.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/project/release_manager_guide.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/project/roles_responsibilities.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/project/support_policy.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/running.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/submissions.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/tests.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/user/pir/exceptions.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/user/pir/pp001-intro.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/user/pir/pp002-pmc.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/user/pir/pp003-oop.pod.html
+  /usr/share/doc/parrot/1.0.0/html/docs/vtables.pod.html
+  /usr/share/doc/parrot/1.0.0/html/DONORS.pod.html
+  /usr/share/doc/parrot/1.0.0/html/editor/README.pod.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/addit.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/addit.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/addit.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/addit2.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/array_access.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/arriter.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/arriter.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/arriter_o1.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/bench_newp.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/fib.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/fib.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/float4.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/freeze.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/freeze.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_alloc_new.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_alloc_reuse.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_generations.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_header_new.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_header_reuse.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_waves_headers.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_waves_sizeable_data.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/gc_waves_sizeable_headers.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/mops.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/mops.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/mops_intval.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/oon.txt.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes.c.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes2.c.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes2.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes2.py.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes2_i.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/primes_i.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/shared_ref.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/shared_ref.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/stress.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/stress.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/stress1.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/stress1.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/stress2.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/stress2.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/benchmarks/stress3.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/library/ncurses_life.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/mops/mops.c.html
+  /usr/share/doc/parrot/1.0.0/html/examples/mops/mops.cs.html
+  /usr/share/doc/parrot/1.0.0/html/examples/mops/mops.p6.html
+  /usr/share/doc/parrot/1.0.0/html/examples/mops/mops.pl.html
+  /usr/share/doc/parrot/1.0.0/html/examples/mops/mops.py.html
+  /usr/share/doc/parrot/1.0.0/html/examples/mops/mops.rb.html
+  /usr/share/doc/parrot/1.0.0/html/examples/mops/README.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/ls.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/Mysql.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/mysqltest.p6.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/mysqltest.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/PQt.cpp.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/QtHelloWorld.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/QtHelloWorld.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/win32api.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/Xlib.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/Xlibconstants.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/xlibtest.nqp.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/xlibtest.p6.html
+  /usr/share/doc/parrot/1.0.0/html/examples/nci/xlibtest.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pasm/cat.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pasm/fact.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pasm/hello.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pasm/trace.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/befunge/Changes.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/befunge/MAINTAINER.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/befunge/README.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/befunge/t/harness.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/circle.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/euclid.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/hanoi.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/io.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/life.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/local_label.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/mandel.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/quine_ord.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/readline.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/substr.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/sudoku.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/pir/uniq.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/Bytes.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/Combiner.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/Coroutine.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/FileLines.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/Filter.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/Include.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/Lines.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/ParrotIO.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/SubCounter.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/SubHello.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/streams/Writer.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/subs/bsr_ret.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/subs/coroutine.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/subs/jsr_ret.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/subs/multi_retvals.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/subs/no_retval.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples/subs/pasm_sub1.pasm.html
+  /usr/share/doc/parrot/1.0.0/html/examples/subs/single_retval.pir.html
+  /usr/share/doc/parrot/1.0.0/html/examples.html
+  /usr/share/doc/parrot/1.0.0/html/index.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Config.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure/Compiler.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure/Data.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure/Options/Conf/Shared.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure/Options.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure/Step/List.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure/Step.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure/Utils.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Configure.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Op.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpLib/core.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Ops2c/Auxiliary.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Ops2c/Utils.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Ops2pm/Auxiliary.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Ops2pm.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpsFile.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpTrans/C.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpTrans/CGoto.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpTrans/CGP.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpTrans/Compiled.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpTrans/CPrederef.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpTrans/CSwitch.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/OpTrans.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Test.pm.html
+  /usr/share/doc/parrot/1.0.0/html/lib/Parrot/Vtable.pm.html
+  /usr/share/doc/parrot/1.0.0/html/ops.html
+  /usr/share/doc/parrot/1.0.0/html/parrotbug.html
+  /usr/share/doc/parrot/1.0.0/html/pdds.html
+  /usr/share/doc/parrot/1.0.0/html/pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynoplibs/dan.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynoplibs/myops.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/dynlexpad.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/gdbmhash.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/md2.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/md4.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/md5.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/pair.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/rational.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/ripemd160.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/sha.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/sha1.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/sha256.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/dynpmc/sha512.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/gc/mark_sweep.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/list.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/main.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/multidispatch.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/bit.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/cmp.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/core.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/debug.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/experimental.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/io.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/math.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/object.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/obscure.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/pic.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/pmc.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/set.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/string.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/sys.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/ops/var.ops.html
+  /usr/share/doc/parrot/1.0.0/html/src/packfile/pf_items.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/pbc_dump.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/addrregistry.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/array.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/bigint.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/bignum.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/boolean.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/bound_nci.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/callsignature.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/capture.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/class.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/codestring.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/complex.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/continuation.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/coroutine.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/cpointer.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/default.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/env.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/eval.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/eventhandler.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/exception.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/exceptionhandler.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/exporter.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/file.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/filehandle.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/fixedbooleanarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/fixedfloatarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/fixedintegerarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/fixedpmcarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/fixedstringarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/float.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/hash.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/integer.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/iterator.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/key.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/lexinfo.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/lexpad.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/managedstruct.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/multisub.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/namespace.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/nci.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/null.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/object.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/orderedhash.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/os.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfile.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfileannotation.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfileannotationkeys.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfileannotations.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfileconstanttable.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfiledirectory.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfilefixupentry.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfilefixuptable.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfilerawsegment.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/packfilesegment.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/parrotinterpreter.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/parrotlibrary.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/parrotrunningthread.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/parrotthread.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/pccmethod_test.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/pmcproxy.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/pointer.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/random.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/ref.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/resizablebooleanarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/resizablefloatarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/resizableintegerarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/resizablepmcarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/resizablestringarray.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/retcontinuation.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/role.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/scalar.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/scheduler.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/schedulermessage.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/sharedref.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/slice.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/string.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/stringhandle.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/sub.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/task.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/timer.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/undef.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc/unmanagedstruct.pmc.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/pmc_freeze.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/scheduler.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/thread.c.html
+  /usr/share/doc/parrot/1.0.0/html/src/utils.c.html
+  /usr/share/doc/parrot/1.0.0/html/t/distro/file_metadata.t.html
+  /usr/share/doc/parrot/1.0.0/html/t/dynpmc/dynlexpad.t.html
+  /usr/share/doc/parrot/1.0.0/html/t/op/jit.t.html
+  /usr/share/doc/parrot/1.0.0/html/t/pmc/orderedhash.t.html
+  /usr/share/doc/parrot/1.0.0/html/t/pmc/signal.t.html
+  /usr/share/doc/parrot/1.0.0/html/t/pmc/threads.t.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/c2str.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/dynoplibs.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/dynpmc.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/headerizer.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/jit2c.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/nativecall.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/ops2c.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/ops2pm.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/parrot_config_c.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/pmc2c.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/vtable_extend.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/build/vtable_h.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/bench_op.pir.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/cc_flags.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/gen_class.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/install_files.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/lib_deps.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/list_unjitted.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/mk_language_shell.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/nm.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/parrotbench.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/pbc_header.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/dev/symlink.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/docs/write_docs.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools/util/ncidef2pasm.pl.html
+  /usr/share/doc/parrot/1.0.0/html/tools.html
+
+-------------------------------------------------------------------------------
+
+Port Notes:
+
+----- version parrot-1.0.0-1 -----
+* renamed libparrot-devel to parrot-devel
+* parrot-docs with html docs added
+
+----- version parrot-0.9.1-1 (never released) -----
+* cygwin 1.7, gcc-4.3 only
+* opengl requires now a removed/renamed /usr/include/GL
+* based on trunk
+* parrot-languages and parrot-perl6 removed.
+  This will be splitted into extra packages.
+* versioned includedir and libdir
+* removed the postinstall and preremove hacks
+
+----- version parrot-0.8.2-1 -----
+* merged from branches/pdd30install_stage3
+
+----- version parrot-0.8.0-1 -----
+* building and testing with already installed parrot supported
+* includes the patches from 0.7.1-1, plus
+* a merge from the branch pdd30_install, without the languages/jvm
+
+----- version parrot-0.7.1-1 -----
+* building with already installed parrot now supported, testing not.
+* includes the patches from 0.7.0-1, plus
+* a merge from the branch cygwin070patches,
+  without the languages/jvm
+
+----- version parrot-0.7.0-1 -----
+* removed /usr/runtime and its preremove and postinstall scripts
+* added parrot_exists_check to .cygport. Already installed parrot 
+  still not supported, despite my #39742 patch
+* other minor .cygport improvements: export PATH in seperate lines to fix check
+* new patches: 
+  [perl #39742] [BUG]   installed conflict
+  [perl #58034] [TODO]  config_args
+  [perl #56996] [TODO]  FHS runtime paths
+* enhanced patch: 
+  [perl #56554] [TODO]  make install -C languages
+* upstream fixed patches:
+  [perl #56544] [PATCH] install_files.pl
+  [perl #56998] [TODO]  rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
+  [perl #57006] [PATCH] add cygwin opengl config quirks
+  [perl #57296] [TODO]  make install -C languages
+* fixed pipp, perl6, pheme, tcl installables. added pcbc's to library  
+
+----- version parrot-0.6.4-2 -----
+* fixed invalid parrot languages and perl6 paths referencing the build_dir
+* fixed runtime lib_path to favor FHS compliant paths
+* temp. add a /usr/runtime symlink. will be removed soon
+* added myconfig parrotbug VERSION to /usr/lib/parrot
+* moved language dll's to parrot-languages
+* added more sublanguage exe's: bfc, bfco
+* added usr/lib/parrot/include/config.fpmc usr/lib/parrot/include/interpinfo.pasm 
+  to parrot
+
+----- version parrot-0.6.4-1 -----
+* libparrot.dll renamed to cygparrot0_6_4.dll
+* moved examples to from libparrot-devel to parrot
+* Added list of local patches to myconfig
+     [perl #51944] [DOCS]  Cygwin Readme
+     [perl #56544] [PATCH] install_files.pl
+     [perl #56558] [PATCH] pdb rename to parrot_debugger
+     [perl #56562] [PATCH] root.in: add cygwin importlib
+     [perl #56998] [TODO]  rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
+     [perl #57006] [PATCH] add cygwin opengl config quirks
+     [perl #57110] [PATCH] ncurses for cygwin
+     [perl #57112] [PATCH] postgres for cygwin
+     [perl #57114] [PATCH] urm RealBin issue
+
+----- version parrot-0.6.3-1 -----
+* first port, with the help from #parrot, fedora spec, 
+  gentoo ebuild and freebsd ports.
+* the php implementation plumhead is still named plumhead.
+  will be renamed to pipp from the next release 0.6.4 on.
+
+Cygwin port maintained by: Reini Urban <rurban@x-ray.at>
+Please address all questions to the Cygwin mailing list 
+at <cygwin@cygwin.com>
