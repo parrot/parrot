@@ -53,6 +53,8 @@ Parrot maintains a stack of exception handlers.  When an exception is
 thrown, Parrot iterates through the stack looking for a handler that
 can handle the exception.  When it finds a valid exception handler,
 the exception handler is invoked with the exception as an argument.
+Exception handlers run in the context of the C<throw> that they're
+handling.
 
 You create exception handlers just like you create any other object, with
 C<new>.
