@@ -18,7 +18,7 @@ Description: Virtual machine for dynamic languages
 
 Package: libparrot%SOVERSION%
 Architecture: any
-Section: libs
+Section: universe/libs
 Depends: ${shlibs:Depends}
 Provides: libparrot
 Conflicts: libparrot
@@ -28,14 +28,14 @@ Description: Parrot shared library
  
 Package: libparrot-dev
 Architecture: any
-Section: libdevel
+Section: universe/devel
 Depends: libparrot%SOVERSION% (= ${binary:Version}), parrot
 Description: Parrot shared library development files
  This package contains files needed to develop applications which embed Parrot.
 
 Package: parrot-doc
 Architecture: all
-Section: doc
+Section: universe/doc
 Suggests: perl-doc
 Description: Parrot documentation
  Parrot manual pages and raw Pod documentation. If you are developing a
