@@ -1,5 +1,19 @@
 # $Id$
 
+New in 1.0.0
+- Implementation
+  + Support for language builds from an installed Parrot.
+- Documentation
+  + New user documentation for exceptions.
+- Languages
+  + Pynie
+    - left the nest and is now at http://pynie.googlecode.com/
+  + Cardinal
+    - left the nest and is now at http://github.com/cardinal
+  + ABC, Squaak, and Befunge moved to examples/.
+  + All remaining languages moved to https://svn.parrot.org/languages/
+
+
 New in 0.9.1
 - Implementation
   + Support for portable 'Inf', 'NaN' and -0.0
