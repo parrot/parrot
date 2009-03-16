@@ -2,7 +2,7 @@
 
 =head1 Deprecation in Parrot
 
-Please see L<docs/project/support_policy.pod> for the parrot
+Please see F<docs/project/support_policy.pod> for the parrot
 project's policy regarding deprecated features.
 
 This is a list of currently deprecated features of Parrot.  Every deprecation
@@ -81,7 +81,7 @@ L<https://trac.parrot.org/parrot/ticket/449>
 
 =item experimental ops [eligible in 1.1]
 
-L<src/ops/experimental.ops>
+F<src/ops/experimental.ops>
 
 =item myops & dan ops [eligible in 1.1]
 
@@ -323,6 +323,8 @@ The C< $(...) > syntax for obtaining a result object from a Match
 object will no longer work.  The new syntax is yet to be determined.
 
 L<https://trac.parrot.org/parrot/ticket/459>
+
+=back
 
 =cut
 
