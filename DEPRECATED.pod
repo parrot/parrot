@@ -149,7 +149,8 @@ Will have to be:
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=36283>
 
-=item named class/pmc lookup in pir syntax such as new, isa, subclass, get_class, etc [eligible in 1.1]
+=item named class/pmc lookup in pir syntax such as new, isa, subclass, 
+    get_class, etc [eligible in 1.1]
 
 Class PMC name resolution will be the following.
 
