@@ -232,6 +232,12 @@ taking a C<Hash**> as an argument:
 
 L<https://trac.parrot.org/parrot/ticket/447>
 
+=item Parrot_add_library_path [eligible in 1.1]
+
+Will be renamed to C<Parrot_lib_add_path_from_cstring>.
+
+L<https://trac.parrot.org/parrot/ticket/455>
+
 =back
 
 =head1 Compiler tools
