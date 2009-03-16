@@ -49,4 +49,49 @@ Put all together, it looks like this:
 
 =head2 Catching exceptions
 
-...
+Parrot maintains a stack of exception handlers.  When an exception is thrown, Parrot iterates through the stack looking for a handler that can handle the exception.  When it finds a valid exception handler, the exception handler is invoked with the exception as an argument.
+
+You create exception handlers just like you create any other object, with
+C<new>.
+
+    .local pmc eh
+    eh = new 'ExceptionHandler'
+
+You set the target of the exception handler (the code that will be invoked) with the C<set_attr> opcode.  Usually this will be a label.
+You manipulate the exception handler stack with the C<push_eh> and C<pop_eh> opcodes.  This is a fairly standard use of exception handlers:
+
+    .local pmc eh
+    eh = new 'ExceptionHandler'
+    set_addr eh, handler
+    push_eh eh
+    ... # code that might throw an exception
+    pop_eh
+    .return (1) # Success!
+  handler:
+    .local pmc ex
+    .get_results (ex)
+    ... # code that prints a warning, logs an error, whatever
+    .return (0) # Failure!
+
+Sometimes you want to be more specific in what you catch.  You can set filters on the exception handler based on exception type and severity.  The methods you use include C<.min_severity()>, C<.max_severity()>, C<.handle_types()>, and C<.handle_types_except()>.
+
+Here's an example of a sub that catches only error exceptions and prints an appropriate log message before exiting.
+
+    .sub 'dostuff'
+        .local pmc eh
+        eh = new 'ExceptionHandler'
+        set_addr eh, handler
+        eh.'min_severity'(.EXCEPT_ERROR)
+        push_eh eh
+        ... # stuff that might throw an error
+        pop_eh
+        .return (1)
+      handler:
+        .local pmc ex
+        .local string msg
+        .get_results (ex)
+        print "There was a fatal error in dostuff: "
+        msg = ex
+        say ex
+        exit 1
+    .end
