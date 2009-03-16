@@ -248,6 +248,8 @@ L<https://trac.parrot.org/parrot/ticket/455>
 
 =head1 Compiler tools
 
+=head2 P6object
+
 =over 4
 
 =item P6protoobject stringification [BEFORE 1.0]
@@ -258,6 +260,73 @@ and parentheses, per Synopsis 12.
 L<https://trac.parrot.org/parrot/ticket/168>
 
 =back
+
+=head2 Parrot Grammar Engine
+
+The following "built-in" PGE rules and methods from previous 
+versions of Synopsis 5 are deprecated and are eligible
+for removal in 1.1:
+
+=over 4
+
+=item Deprecated rules and methods [eligible in 1.1]
+
+Deprecated rules:
+    C<null>, C<fail>, C<sp>, C<lt>, C<gt>, C<dot>
+
+Deprecated methods:
+    .text .item .result_object
+
+L<https://trac.parrot.org/parrot/ticket/460>
+
+=item Stringification, numification
+
+C< PGE::Match > objects will stringify or numify based on
+the text that is matched, not the result object.
+
+L<https://trac.parrot.org/parrot/ticket/461>
+
+=back
+
+=head2 Parrot Compiler Toolkit
+
+=over 4
+
+=item PCT::HLLCompiler stages
+
+The interface various methods for adding, removing, and modifying 
+the list stages in a PCT::HLLCompiler object will likely change
+shortly after the 1.0 release.  (The existing actual stages
+will remain; only the mechanism for specifying the order of
+individual stages is likely to change.)
+
+L<https://trac.parrot.org/parrot/ticket/462>
+
+=item PCT::HLLCompiler from Perl 5's Test::Harness
+
+In order to facilitate using PCT::HLLCompiler with test harnesses,
+the C<command_line> method of PCT::HLLCompiler object exits silently 
+if it detects that it is being run in a sample run from Perl's
+Test::Harness.  Currently this detection is done by checking the
+second command line argument for "@INC"; future releases may
+use a different detection mechanism or eliminate it altogether.
+
+L<https://trac.parrot.org/parrot/ticket/463>
+
+=back
+
+=head2 Not Quite Perl (NQP)
+
+=over 4
+
+=item C< $(...) > syntax  [eligible in July 2009]
+
+The C< $(...) > syntax for obtaining a result object from a Match
+object will no longer work.  The new syntax is yet to be determined.
+
+L<https://trac.parrot.org/parrot/ticket/459>
+
+=cut
 
 =head1 build tools
 
