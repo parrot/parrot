@@ -33,7 +33,6 @@ src_compile() {
   test -e config_lib.pasm && make realclean
 
   cfg=
-  if [ -n "$cygwin2" ]; then cfg="--cc=gcc-4 --ld='g++-4' --link='g++-4'"; fi
   perl Configure.pl $cfg --prefix=/usr --optimize --mandir=/usr/share/man 
   # only cygwin-1.5 -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
   if [ -z "$cygwin2" ]; then
