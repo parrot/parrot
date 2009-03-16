@@ -42,8 +42,6 @@ You should check where the file is going to be before you run this.
 
 .end
 
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
