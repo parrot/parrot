@@ -157,7 +157,7 @@ Class PMC name resolution will be the following.
 if the arg is a STRING
   Relative to the current Namespace
 
-if the arg is a ResizableStringArray
+if the arg is a Array (of any sort) or Key
   Relative to the current HLL Namespace
 
 if the arg is a Namespace or Class PMC
