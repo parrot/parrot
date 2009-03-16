@@ -40,7 +40,6 @@ docs/pdds/pdd18_security.pod
 docs/pdds/pdd07_codingstd.pod
 docs/pdds/pdd03_calling_conventions.pod
 docs/pdds/pdd20_lexical_vars.pod
-docs/pdds/README
 docs/pdds/pdd26_ast.pod
 docs/pdds/pdd19_pir.pod
 docs/pdds/pdd_template.pod
@@ -53,9 +52,12 @@ docs/pdds/pdd15_object_metamodel.png
 docs/user/pir/pp001-intro.pod
 docs/user/pir/pp003-oop.pod
 docs/user/pir/pp002-pmc.pod
+docs/user/pir/exceptions.pod
 docs/multidispatch.pod
 docs/resources/favicon.ico
+docs/resources/parrot_logo.png
 docs/resources/parrot_small.png
+docs/resources/parrot.css
 docs/resources/up.gif
 docs/resources/perl.css
 docs/vtables.pod
@@ -70,11 +72,13 @@ docs/pmc.pod
 docs/project/release_manager_guide.pod
 docs/project/cage_cleaners_guide.pod
 docs/project/pause_guide.pod
+docs/project/ticket_triaging.pod
 docs/project/branching_guide.pod
 docs/project/metacommitter_guide.pod
-docs/project/ticket_wrangler_guide.pod
 docs/project/committer_guide.pod
+docs/project/support_policy.pod
 docs/project/debian_packaging_guide.pod
+docs/project/ubuntu_packaging_guide.pod
 docs/project/roles_responsibilities.pod
 docs/faq.pod
 docs/configuration.pod
@@ -103,7 +107,6 @@ docs/book/ch07_testing_and_debugging.pod
 docs/book/ch13_reference.pod
 docs/book/ch08_architecture.pod
 docs/book/ch09_pct.pod
-docs/book/appendix.pod
 docs/book/ch11_pmcs.pod
 docs/book/ch06_library.pod
 docs/book/ch04_pir_subroutines.pod
@@ -111,6 +114,7 @@ docs/book/figs/p6e_0801.png
 docs/book/ch01_overview.pod
 docs/book/ch05_pasm.pod
 docs/book/README
+docs/book/appX_patch_submission.pod
 docs/memory_internals.pod
 docs/submissions.pod
 docs/debug.pod
