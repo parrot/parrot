@@ -32,7 +32,7 @@ lexically scoped variables.
 
     .sub 'corge'
         print "hi"
-    .end                     # no .lex and no :lex, thus: no LexInfo, no LexPad
+    .end # no .lex and no :lex, thus: no LexInfo, no LexPad
 
 
     # Lexical behavior varies by HLL.  For example,
