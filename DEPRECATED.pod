@@ -263,23 +263,22 @@ L<https://trac.parrot.org/parrot/ticket/168>
 
 =head2 Parrot Grammar Engine
 
-The following "built-in" PGE rules and methods from previous 
-versions of Synopsis 5 are deprecated and are eligible
-for removal in 1.1:
-
 =over 4
 
 =item Deprecated rules and methods [eligible in 1.1]
+
+The following "built-in" PGE rules and methods are from previous 
+versions of Synopsis 5.
 
 Deprecated rules:
     C<null>, C<fail>, C<sp>, C<lt>, C<gt>, C<dot>
 
 Deprecated methods:
-    .text .item .result_object
+    C<.text>, C<.item>, C<.result_object>
 
 L<https://trac.parrot.org/parrot/ticket/460>
 
-=item Stringification, numification
+=item Stringification, numification [eligible in 1.1]
 
 C< PGE::Match > objects will stringify or numify based on
 the text that is matched, not the result object.
@@ -292,17 +291,16 @@ L<https://trac.parrot.org/parrot/ticket/461>
 
 =over 4
 
-=item PCT::HLLCompiler stages
+=item PCT::HLLCompiler stages [eligible in 1.1]
 
-The interface various methods for adding, removing, and modifying 
-the list stages in a PCT::HLLCompiler object will likely change
-shortly after the 1.0 release.  (The existing actual stages
-will remain; only the mechanism for specifying the order of
-individual stages is likely to change.)
+The interface of various methods for adding, removing, and modifying 
+the list stages in a PCT::HLLCompiler object is subject to change.
+The existing actual stages will remain; only the mechanism for specifying
+the order of individual stages is likely to change.
 
 L<https://trac.parrot.org/parrot/ticket/462>
 
-=item PCT::HLLCompiler from Perl 5's Test::Harness
+=item PCT::HLLCompiler from Perl 5's Test::Harness [eligible in 1.1]
 
 In order to facilitate using PCT::HLLCompiler with test harnesses,
 the C<command_line> method of PCT::HLLCompiler object exits silently 
@@ -319,7 +317,7 @@ L<https://trac.parrot.org/parrot/ticket/463>
 
 =over 4
 
-=item C< $(...) > syntax  [eligible in July 2009]
+=item C< $(...) > syntax  [eligible in 1.5]
 
 The C< $(...) > syntax for obtaining a result object from a Match
 object will no longer work.  The new syntax is yet to be determined.
