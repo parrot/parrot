@@ -500,7 +500,8 @@ thread_func(ARGIN_NULLOK(void *arg))
     PMC             *sub_arg;
     PMC * const      self    = (PMC*) arg;
     PMC             *ret_val = NULL;
-    Parrot_Interp    interp  = (Parrot_Interp)VTABLE_get_pointer(interp, self);
+    Parrot_Interp    interp  =
+       (Parrot_Interp)((Parrot_ParrotInterpreter_attributes *)PMC_data(self))->interp;
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
