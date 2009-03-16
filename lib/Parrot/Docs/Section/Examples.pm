@@ -45,7 +45,6 @@ sub new {
         $self->new_group( 'PASM and PIR',          '', 'examples/pasm' ),
         $self->new_group( 'PIR',                   '', 'examples/pir' ),
         $self->new_group( 'Subroutines',           '', 'examples/subs' ),
-        $self->new_group( 'IO',                    '', 'examples/io' ),
         $self->new_group( 'Streams',               '', 'examples/streams' ),
         $self->new_group( 'Benchmarking',          '', 'examples/benchmarks' ),
         $self->new_group( 'Speed Comparison',      '', 'examples/mops' ),

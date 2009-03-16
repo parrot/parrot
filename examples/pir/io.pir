@@ -42,10 +42,6 @@ You should check where the file is going to be before you run this.
 
 .end
 
-=head1 SEE ALSO
-
-F<examples/io>.
-
 =cut
 
 # Local Variables:

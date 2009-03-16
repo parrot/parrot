@@ -21,7 +21,7 @@ A lot. The code is by now just an objectified version of httpd.pir.
 
 =head1 SEE ALSO
 
-RFC2616, F<examples/io/httpd2.pir>
+RFC2616
 
 =head1 AUTHOR
 
