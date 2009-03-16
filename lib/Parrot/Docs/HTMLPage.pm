@@ -61,7 +61,9 @@ sub header {
         <div id="wrapper">
             <div id="header">
 
+                <a href="http://www.parrot.org">
                 <img border=0 src="$resources/parrot_logo.png" id="logo" alt="parrot">
+                </a>
             </div> <!-- "header" -->
             <div id="divider"></div>
             <div id="mainbody">
