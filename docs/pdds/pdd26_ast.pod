@@ -525,6 +525,12 @@ syntax tree can use this method on a top-level C<PAST::Block>
 to specify the C<scope> attribute to be used for all
 variable nodes that don't otherwise provide one.
 
+=item subid([value])
+
+Get/set the unique subid to be used for this block.  If
+no subid is explicitly set, a unique subid is randomly
+generated for the block.
+
 =item pirflags([value])
 
 Get/set any PIR flags to be used when generating the block.
