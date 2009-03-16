@@ -877,157 +877,11 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
             sizeof (*jit_info->arena.op_map) / 4, 0);
 }
 
-EXTERN INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
-EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
-
-#define NATIVECODE jit_info->native_ptr
-#define ROFFS_PMC(x) REG_OFFS_PMC(jit_info->cur_op[(x)])
-#define ROFFS_INT(x) REG_OFFS_INT(jit_info->cur_op[(x)])
 #  define CONST(i) (int *)(jit_info->cur_op[i] * \
        sizeof (PackFile_Constant) + \
        offsetof(PackFile_Constant, u))
-#  define CALL(f) Parrot_exec_add_text_rellocation_func(jit_info->objfile, \
-       jit_info->native_ptr, (f)); \
-       emitm_calll(jit_info->native_ptr, EXEC_CALLDISP);
 
-char*
-jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
-{
-    char *L1, *L2, *L3, *L4;
-    /*
-     * mov $2, %edi
-     * mov (vtable)%edi, %eax
-     * mov (offset)%eax, %esi
-     * cmp Parrot_FixedIntegerArray_get_integer_keyed_int, %esi
-     * jne L1
-     */
-    jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDI, ROFFS_PMC(2));
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, emit_None, 1,
-            offsetof(struct PMC, vtable));
-    emitm_movl_m_r(interp, NATIVECODE, emit_ESI, emit_EAX, emit_None, 1, offset);
-    jit_emit_cmp_ri_i(interp, NATIVECODE, emit_ESI,
-            Parrot_FixedIntegerArray_get_integer_keyed_int);
-    L1 = NATIVECODE;
-    emitm_jxs(NATIVECODE, emitm_jnz, 0);
-    /*
-     * mov $3, %ecx
-     * cmp %ecx, 0
-     * js L2
-     * mov (int_val)%edi, %eax
-     * cmp %ecx, $eax
-     * jge L3
-     *
-     */
-    if (MAP(3)) {
-        jit_emit_mov_rr_i(NATIVECODE, emit_ECX, MAP(3));
-    }
-    else {
-        jit_emit_mov_RM_i(interp, NATIVECODE, emit_ECX, ROFFS_INT(3));
-    }
-    /*  range check */
-    jit_emit_cmp_ri_i(interp, NATIVECODE, emit_ECX, 0);
-    L2 = NATIVECODE;
-    emitm_jxs(NATIVECODE, emitm_js, 0);
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct PMC, cache._i._int_val));
-    jit_emit_cmp_rr_i(NATIVECODE, emit_ECX, emit_EAX);
-    L3 = NATIVECODE;
-    emitm_jxs(NATIVECODE, emitm_jnl, 0);
-
-    /*
-     * mov (data)%edi, %eax
-     * mov (%eax, %ecx, 4), %eax
-     * jmp L4
-     */
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct PMC, data));
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EAX, emit_ECX, 4, 0);
-
-    L4 = NATIVECODE;
-    emitm_jumps(NATIVECODE, 0);
-    /* L1: L2: L3: */
-    L1[1] = (char)(NATIVECODE - L1 - 2);
-    L2[1] = (char)(NATIVECODE - L2 - 2);
-    L3[1] = (char)(NATIVECODE - L3 - 2);
-    return L4;
-}
-
-char*
-jit_set_p_ki_i(Parrot_jit_info_t *jit_info, PARROT_INTERP, size_t offset)
-{
-    char *L1, *L2, *L3, *L4;
-    /*
-     * mov $1, %edi
-     * mov (vtable)%edi, %eax
-     * mov (offset)%eax, %esi
-     * cmp Parrot_FixedIntegerArray_set_integer_keyed_int, %esi
-     * jne L1
-     */
-    jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDI, ROFFS_PMC(1));
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, emit_None, 1,
-            offsetof(struct PMC, vtable));
-    emitm_movl_m_r(interp, NATIVECODE, emit_ESI, emit_EAX, emit_None, 1, offset);
-    jit_emit_cmp_ri_i(interp, NATIVECODE, emit_ESI,
-            Parrot_FixedIntegerArray_set_integer_keyed_int);
-    L1 = NATIVECODE;
-    emitm_jxs(NATIVECODE, emitm_jnz, 0);
-    /*
-     * mov $2, %ecx
-     * cmp %ecx, 0
-     * js L2
-     * mov (int_val)%edi, %eax
-     * cmp %ecx, $eax
-     * jge L3
-     *
-     */
-    if (MAP(2)) {
-        jit_emit_mov_rr_i(NATIVECODE, emit_ECX, MAP(2));
-    }
-    else {
-        jit_emit_mov_RM_i(interp, NATIVECODE, emit_ECX, ROFFS_INT(2));
-    }
-    /*  range check */
-    jit_emit_cmp_ri_i(interp, NATIVECODE, emit_ECX, 0);
-    L2 = NATIVECODE;
-    emitm_jxs(NATIVECODE, emitm_js, 0);
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct PMC, cache._i._int_val));
-    jit_emit_cmp_rr_i(NATIVECODE, emit_ECX, emit_EAX);
-    L3 = NATIVECODE;
-    emitm_jxs(NATIVECODE, emitm_jnl, 0);
-
-    /*
-     * mov (data)%eax, %eax
-     * mov $3, %edx
-     * mov $edx, (%eax, %ecx, 4)
-     * jmp L4
-     */
-    emitm_movl_m_r(interp, NATIVECODE, emit_EAX, emit_EDI, 0, 1,
-            offsetof(struct PMC, data));
-    if (MAP(3)) {
-        jit_emit_mov_rr_i(NATIVECODE, emit_EDX, MAP(3));
-    }
-    else {
-        jit_emit_mov_RM_i(interp, NATIVECODE, emit_EDX, ROFFS_INT(3));
-    }
-    emitm_movl_r_m(interp, NATIVECODE, emit_EDX, emit_EAX, emit_ECX, 4, 0);
-
-    L4 = NATIVECODE;
-    emitm_jumps(NATIVECODE, 0);
-    /* L1: L2: L3: */
-    L1[1] = (char)(NATIVECODE - L1 - 2);
-    L2[1] = (char)(NATIVECODE - L2 - 2);
-    L3[1] = (char)(NATIVECODE - L3 - 2);
-    return L4;
-}
-
-#undef NATIVECODE
-#undef ROFFS_PMC
-#undef ROFFS_INT
-
-/*
- * for vtable calls registers are already saved back
- */
+/* for vtable calls registers are already saved back */
 void
 Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
                 PARROT_INTERP, int n, int *args)
@@ -1044,13 +898,6 @@ Parrot_jit_vtable_n_op(Parrot_jit_info_t *jit_info,
     offset  = offsetof(VTABLE, absolute);
     offset += nvtable * sizeof (void *);
     op      = *jit_info->cur_op;
-
-    if (op == PARROT_OP_set_i_p_ki) {
-        L4 = jit_set_i_p_ki(jit_info, interp, offset);
-    }
-    else if (op == PARROT_OP_set_p_ki_i) {
-        L4 = jit_set_p_ki_i(jit_info, interp, offset);
-    }
 
     /* get params $i, 0 is opcode */
     for (idx = n; idx > 0; idx--) {
