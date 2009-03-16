@@ -1,0 +1,156 @@
+parrot (1.0.0-1ubuntu1~ppa2~intrepid1) intrepid; urgency=low
+  * New upstream release
+
+ -- Allison Randal <allison@parrot.org>  Sun, 15 Mar 2009 23:09:36 -0700
+
+parrot (1.0.0-1) unstable; urgency=low
+  * New upstream release
+  * debian/control.in:
+    - Updated Description of all packages.
+  * debian/copyright:
+    - Changed copyright holder to Parrot Foundation, reflecting change in
+      distribution.
+    - Removed copyright info for files no longer in distribution.
+
+ -- Allison Randal <allison@parrot.org>  Sun, 15 Mar 2009 05:57:31 +0000
+
+parrot (0.9.0-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/control.in:
+    - Build-Depends removed optional library libicu36-dev.
+      Removed optional library libgmp3-dev.
+    - Depends for libparrot-dev removed optional library
+      libicu34-dev.
+  * debian/rules
+    - Removed --optimize flag from configure, known problems
+      on 64-bit architectures.
+    - Changed 'reallyinstall' target to 'install', matching
+      change in source makefile.
+  * debian/parrot-doc.docs
+    - Updated to sync with doc files in distribution.
+  * debian/copyright:
+    - Updated copyright years.
+
+ -- Allison Randal <allison@parrot.org>  Fri, 23 Jan 2009 15:16:25 -0800
+
+parrot (0.7.0-1) unstable; urgency=low
+
+  * New upstream release
+
+ -- Nuno Carvalho <mestre.smash@gmail.com>  Tue, 02 Sep 2008 13:05:31 +0100
+
+parrot (0.6.4-1) unstable; urgency=low
+
+  * New upstream release
+  * debian/copyright:
+    - Added license link.
+    - Updated copyright years.
+    - Removed copyright info for files no longer in distribution.
+
+ -- Nuno Carvalho <mestre.smash@gmail.com>  Sat, 16 Aug 2008 14:15:14 +0200
+
+parrot (0.5.1-1) unstable; urgency=low
+
+  * New upstream release (Closes: #444707).
+  * debian/control.in:
+    - Build-Depends updated to libicu-dev from libicu36-dev
+      (Closes: #456835).
+    - Depends for libparrot-dev updated to libicu-dev from
+      libicu34-dev (Closes: #431289).
+    - New maintainer: Parrot Debian Maintainers
+      (Closes: #444708)
+    - New uploaders: Allison Randal, Nuno Carvalho,
+      Patrick Michaud
+    - Updated long and short package descriptions.
+  * debian/rules
+    - Removed install of install_config.o file, no longer in
+      distribution.
+  * debian/libparrot0.4.12.install
+    - Deleted, replaced by debian/libparrot.install.
+  * debian/parrot-doc.docs
+    - Updated to sync with doc files in distribution.
+    - Sorted for easier diffs between generated file lists.
+  * debian/copyright:
+    - Added license link.
+    - Updated copyright years.
+    - Removed copyright info for files no longer in distribution.
+
+ -- Allison Randal <allison@perl.org>  Sun, 30 Dec 2007 17:21:45 +0000
+
+parrot (0.4.13-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Wed, 20 Jun 2007 22:43:49 +0200
+
+parrot (0.4.12-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon, 18 Jun 2007 20:08:49 +0200
+
+parrot (0.4.6-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Thu, 10 Aug 2006 04:48:00 +0200
+
+parrot (0.4.5-1) unstable; urgency=low
+
+  * New upstream release.
+  * Use DH_COMPAT 5.
+  * Bump up Standards-Version to 3.7.2 (no changes).
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon,  3 Jul 2006 16:47:52 +0200
+
+parrot (0.4.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bump Standards-Version to 3.7.2 (no changes).
+  * Clean up Makefiles in languages/{APL,pheme,perl6,pugs}.
+  * Clean up object/temp files in languages/{pugs,perl6} while running
+    realclean.
+  * Install src/*_config.o into /usr/lib/parrot/config/.
+    + Yes, that's ugly, but I don't see any other possibility for other
+      programs, like pugs, to link against parrot properly.
+
+ -- Florian Ragwitz <rafl@debian.org>  Tue, 16 May 2006 17:17:02 +0200
+
+parrot (0.4.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * Changed Section of parrot-doc to `docs'.
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon,  3 Apr 2006 04:25:56 +0200
+
+parrot (0.4.2-1) unstable; urgency=low
+
+  * New upstream release.
+  * Enabled optimisation.
+  * Added libreadline-dev to Build-Depends.
+  * Install parrot.pc for pkg-config.
+  * Removed lintian overrides. lintian now knows about parrot.
+  * Properly clean src/nci_test.o.
+  * Removed bc and m4 Build-Depends. They weren't really needed.
+
+ -- Florian Ragwitz <rafl@debian.org>  Wed, 22 Feb 2006 23:40:06 +0100
+
+parrot (0.4.1-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Sun,  8 Jan 2006 18:43:54 +0100
+
+parrot (0.4.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon,  5 Dec 2005 16:50:40 +0100
+
+parrot (0.3.1-1) unstable; urgency=low
+
+  * Initial release (Closes: #297902).
+
+ -- Florian Ragwitz <rafl@debian.org>  Mon, 31 Oct 2005 22:24:32 +0100
+
