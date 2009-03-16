@@ -1,29 +1,28 @@
 # -*- sh -*-
 DESCRIPTION="Parrot Virtual Machine"
-HOMEPAGE="http://www.parrotcode.org/"
-# The release managers change with every release. Check this link
-#SRC_URI=$(lwp-request -m HEAD -x -e "http://www.parrotcode.org/release/devel" 2>&1 | grep "/authors/id" | tail -n1 | perl -ane 'print $F[2]')
-# or since 0.8.2 at:
-SRC_URI="ftp://ftp.parrot.org/pub/${PN}/releases/devel/${PV}/${PN}-${PV}.tar.gz"
-# SRC_DIR="parrot-${PV}"
+HOMEPAGE="http://www.parrot.org/"
+SRC_URI="ftp://ftp.parrot.org/pub/parrot/releases/devel/${PV}/${PN}-${PV}.tar.gz"
 LICENSE="Artistic2"
 DIFF_EXCLUDES="MANIFEST.* parrot.pc myconfig config_lib.pasm Makefile TAGS"
 DLLVER=$(echo $PV|sed -e's,\.,_,g')
-
-PKG_NAMES="${PN} lib${PN}0 lib${PN}-devel ${PN}-perl6 ${PN}-languages"
+cygwin2=
+DOCDIR="/usr/share/doc"
+PKG_NAMES="${PN} lib${PN}0 lib${PN}-devel ${PN}-docs"
 PKG_HINTS="${PKG_NAMES}"
 
 parrot_exists_check() {
-  for d in /usr/local/lib/parrot /usr/local/include/parrot \
-	   /usr/include/parrot /usr/lib/parrot \
-	   /usr/lib/libparrot.dll.a /usr/local/lib/libparrot.dll.a
-  do
+  #/usr/local/lib/parrot /usr/lib/parrot
+  inst="/usr/local/include/parrot /usr/include/parrot  \
+	/usr/lib/libparrot.dll.a /usr/local/lib/libparrot.dll.a"
+  for d in $inst; do
     if [ -e $d ]; then
-      echo "Testing with $d is brave and might not work"
-#      echo "Testing with $d is not yet supported! Remove or rename first"
-#      exit
+      # With the local cygwin patches until 0.8.1 it did work, but this was not
+      # accepted upstream, so we have to live with this limitation.
+      # echo "Testing with $d is brave and might not work"
+      echo "Building and testing with $d is not yet supported! Remove or rename first."
     fi
   done
+  for d in $inst; do if [ -e $d ]; then exit; fi; done
 }
 
 src_compile() {
@@ -33,45 +32,29 @@ src_compile() {
   test -e Configure.pl || lndirs
   test -e config_lib.pasm && make realclean
 
-  # stable by irc:#parrot
-  lang_stable="abc cardinal eclectus lolcode perl6 pipp punie pynie squaak"
-  # 100% ok by make smoke
-  lang_alltests_ok="bf regex unlambda"
-  perl Configure.pl --prefix=/usr --optimize --mandir=/usr/share/man 
-  # -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
-  # cygwin-1.7 will have this changed.
-  sed -e"s,/usr/share/doc/parrot\",/usr/share/doc/${P}\"," -i config_lib.pasm
+  cfg=
+  if [ -n "$cygwin2" ]; then cfg="--cc=gcc-4 --ld='g++-4' --link='g++-4'"; fi
+  perl Configure.pl $cfg --prefix=/usr --optimize --mandir=/usr/share/man 
+  # only cygwin-1.5 -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
+  if [ -z "$cygwin2" ]; then
+    sed -e"s,/usr/share/doc/parrot/${PV}\",/usr/share/doc/${P}\"," -i config_lib.pasm
+  fi
 
-  cygmake all parrot_utils perl6.exe
+  cygmake all installable
+  cygmake -C editor
+  cygmake docs html
 
   cat >>myconfig <<EOF
   Locally applied patches:
-     [perl #39742] [BUG]   installed conflict
-     [perl #51944] [DOCS]  Cygwin Readme
-     [perl #56544] [PATCH] install_files.pl
-     [perl #56998] [PATCH] rename cygwin dll to cygparrot$MAJOR_$MINOR_$PATCH.dll
-     [perl #57006] [PATCH] add cygwin opengl config quirks
-     [perl #56554] [TODO]  make install -C languages
-     [perl #58034] [TODO]  config_args
-     [perl #56996] [TODO]  FHS runtime paths
-     [perl #57548] [TODO]  CONDITIONED_LINE_enh
+TT #253 r37202 opengl detection
+TT #280 r37214 bignum.pmc compiler warnings
 EOF
-
-  # Build executables for the other languages.
-  cygmake languages
-
-  cygmake -C editor
-
 }
 
 src_check () {
   cd ${B}
   parrot_exists_check
-
   cygtest
-  cygmake test spectest_regression -C languages/perl6
-  cygmake languages-smoke
-
 }
 
 src_install () {
@@ -81,60 +64,25 @@ src_install () {
   mkdir -p $man1
 
   # already in core now
-  make reallyinstall DESTDIR=${D} DOC_DIR="/usr/share/doc/${P}"
+  make install DESTDIR=${D}
+  make install-dev DESTDIR=${D}
 
-  #cygmake installable_perl6.exe -C languages/perl6
-  rm $man1/parrot-perl6.1
-
-  cd ${B}
-  #mkdir languages/bin
-  for dir in languages/* ; do
-    lang=$( basename $dir )
-    [ $lang = parrot_compiler ] && continue
-    if [ ! -f $lang -a -d $dir -a -f $dir/${lang}.pbc ] ; then
-        cd languages/$lang
-	make installable || ../../pbc_to_exe ${lang}.pbc --install
-	make install DESTDIR=${D} DOC_DIR="/usr/share/doc/${P}"
-	# TODO: do some standalone testing with renamed builddir
-	#test -e ${lang}.pir -a ! -e $man1/parrot-${lang}.1 && pod2man ${lang}.pir > $man1/parrot-${lang}.1
-        #test -e installable_${lang}.exe && cp installable_${lang}.exe ../bin/parrot-${lang}.exe
-        cd ${B}
-    fi
-  done
-  cd ${B}
-
+  # now fix the wrong build_dir in the pbc_to_exe files
+  sed -e"s,\"${B}\",\"/usr\"," \
+      < config_lib.pasm > ${D}/usr/lib/${PN}/${PV}/include/config_lib.pasm
   # said who? gentoo or freebsd
   insinto /usr/lib/${PN}
-  # now fix the wrong build_dir in the pbc_to_exe files
-  sed -e"s,\"${B}\",\"/usr\"," -e"s,-L${B}/blib/lib,," \
-      -e"s,/usr/share/doc/parrot\",/usr/share/doc/${P}\"," \
-      < config_lib.pasm > ${D}/usr/lib/${PN}/config_lib.pasm
-  # sed -e"s,\"-L${B}/blib/lib,\"," -i config_lib.pasm
-  # sed -e"s,$B,/usr/lib/${PN}," -i config_lib.pasm
-  doins myconfig VERSION parrotbug
+  doins parrotbug
 
-  exeinto /usr/bin
-  doexe parrot_config.exe cygparrot${DLLVER}.dll
-  #cp languages/perl6/installable_perl6.exe ${D}/usr/bin/perl6.exe
-
-  insinto /usr/lib
-  doins libparrot.dll.a
-
-  insinto /usr/lib/parrot/library
-  doins runtime/parrot/library/config.pir
-  insinto /usr/lib/parrot/include
-  doins runtime/parrot/include/config.fpmc runtime/parrot/include/interpinfo.pasm
+  insinto /usr/lib/parrot/${PV}
+  doins myconfig
 
   # necessary for mod_parrot-0.3
-  insinto /usr/lib/${PN}/src/
-  doins "${B}/src/install_config.o" "${B}/src/null_config.o" "${B}/src/parrot_config.o"
+  #insinto /usr/lib/${PN}/${PV}/src/
+  #doins "${B}/src/install_config.o" "${B}/src/null_config.o" "${B}/src/parrot_config.o"
 
-  insinto /usr/include/parrot
-  doins ${B}/include/parrot/pbcversion.h
-
-  pod2html DEPRECATED.pod > DEPRECATED.html
-  dodoc README RESPONSIBLE_PARTIES ABI_CHANGES ChangeLog CREDITS NEWS README_cygwin.pod \
-    DONORS.pod PLATFORMS TODO PBC_COMPAT DEPRECATED.html languages\LANGUAGES_STATUS.pod
+  #pod2html DEPRECATED.pod > DEPRECATED.html
+  dodoc ABI_CHANGES ChangeLog CREDITS README_cygwin.pod DONORS.pod TODO DEPRECATED.pod
 
   # editor support (make vim-install installs into ~/.vim/)
   insinto /usr/share/emacs/site-lisp
@@ -145,7 +93,6 @@ src_install () {
   doins ${B}/editor/pir.vim ${B}/editor/pasm.vim ${B}/editor/pmc.vim
   mkdir -p ${D}/usr/share/vim/vimfiles/ftplugin
   cp ${B}/editor/filetype_parrot.vim ${D}/usr/share/vim/vimfiles/ftplugin/parrot.vim
-  # TODO: put this via postinstall into ~/.vim/
   #mkdir -p ${D}/etc/defaults/.vim
   #cp ${B}/editor/skeleton.pir ${D}/etc/defaults/.vim/
 
@@ -156,65 +103,48 @@ src_install () {
   pod2man src/pbc_disassemble.c > $man1/pbc_disassemble.1
   pod2man src/pbc_info.c > $man1/pbc_info.1
   pod2man src/pbc_merge.c > $man1/pbc_merge.1
-  pod2man pbc_to_exe.pir > $man1/pbc_to_exe.1
-  pod2man languages/perl6/perl6.pir > $man1/perl6.1
+  pod2man tools/dev/pbc_to_exe.pir > $man1/pbc_to_exe.1
 
-  # Language examples and docs
-  for dir in languages/* ; do
-    test \! -d $dir && continue
-    lang=$( basename $dir )
-    [ $lang = parrot_compiler ] && continue
-    [ $lang = t ] && continue
-
-    cd languages/$lang
-    docinto languages/$lang
-    dodoc MAINTAINER README Changes ChangeLog CREDITS
-    #test -e $lang.pir && pod2man $lang.pir > $man1/parrot-$lang.1
-    test -d docs && dodoc docs/*
-
-    test -d examples && (insinto /usr/share/doc/${P}/languages/${lang}/examples; doins examples/*)
-    cd ${B}
-  done
-  # not yet ready
-  rm $man1/parrot-forth.1
   cd $man1
-  for f in *.1; do gzip $f; done
+  for f in *.1; do
+    b=$(basename $f .1)
+    if [ -e ${D}/usr/bin/$b.exe ]; then
+      test -s $f || rm $f
+      gzip $f
+    else
+      rm $f
+    fi
+  done
   cd ${B}
+
+  cp -r docs/html $D/usr/share/doc/parrot/${PV}/html/
+  #insinto /usr/share/doc/parrot/${PV}/docs/html
+  #doins docs/html
 }
 
 # parrot
 PKG_CONTENTS[0]=" \
 --exclude=usr/bin/cygparrot${DLLVER}.dll \
 --exclude=usr/include \
---exclude=usr/bin/perl6.exe \
 --exclude=usr/bin/parrot-* \
---exclude=usr/lib/parrot/dynext/apl_*.dll \
---exclude=usr/lib/parrot/dynext/dotnet*.dll \
---exclude=usr/lib/parrot/dynext/eclectus_*.dll \
---exclude=usr/lib/parrot/dynext/lua_*.dll \
---exclude=usr/lib/parrot/dynext/perl6_*.dll \
---exclude=usr/lib/parrot/dynext/php_*.dll \
---exclude=usr/lib/parrot/dynext/wmls_*.dll \
---exclude=usr/lib/parrot/library/php_*.pbc \
---exclude=usr/lib/parrot/library/pipplib.pbc \
---exclude=usr/lib/parrot/library/P6object.pbc \
---exclude=usr/share/doc/${P}/languages \
---exclude=usr/share/doc/${P}/docs/dev \
---exclude=usr/share/doc/${P}/docs/project \
---exclude=usr/share/doc/${P}/DEPRECATED.html \
---exclude=usr/share/doc/${P}/PBC_COMPAT \
+--exclude=usr/lib/parrot/${PV}/dynext/perl6_*.dll \
+--exclude=usr/lib/parrot/${PV}/library/P6object.* \
+--exclude=usr/share/doc/parrot/${PV}/languages \
+--exclude=usr/share/doc/parrot/${PV}/DEPRECATED.pod \
+--exclude=usr/share/doc/parrot/${PV}/PBC_COMPAT \
+--exclude=usr/share/doc/parrot/${PV}/html \
+--exclude=usr/share/doc/parrot/${PV}/pod/project \
 --exclude=usr/share/man/man1/parrot-*1.gz \
---exclude=usr/share/man/man1/perl6.1.gz \
 usr/bin \
 usr/share \
-usr/lib/parrot/config_lib.pasm \
-usr/lib/parrot/myconfig \
 usr/lib/parrot/parrotbug \
-usr/lib/parrot/VERSION \
-usr/lib/parrot/dynext \
-usr/lib/parrot/library \
-usr/lib/parrot/include/interpinfo.pasm \
-usr/lib/parrot/include/config.fpmc \
+usr/lib/parrot/${PV}/include/config_lib.pasm \
+usr/lib/parrot/${PV}/myconfig \
+usr/lib/parrot/${PV}/VERSION \
+usr/lib/parrot/${PV}/dynext \
+usr/lib/parrot/${PV}/library \
+usr/lib/parrot/${PV}/include/interpinfo.pasm \
+usr/lib/parrot/${PV}/include/config.fpmc \
 "
 
 # libparrot0
@@ -223,46 +153,22 @@ usr/bin/cygparrot${DLLVER}.dll"
 
 # libparrot-devel
 PKG_CONTENTS[2]=" \
---exclude=usr/lib/parrot/dynext \
---exclude=usr/lib/parrot/library \
---exclude=usr/lib/parrot/config_lib.pasm \
---exclude=usr/lib/parrot/myconfig \
---exclude=usr/lib/parrot/parrotbug \
---exclude=usr/lib/parrot/VERSION \
---exclude=usr/lib/parrot/include/interpinfo.pasm \
---exclude=usr/lib/parrot/include/config.fpmc \
+--exclude=usr/lib/parrot/${PV}/dynext \
+--exclude=usr/lib/parrot/${PV}/languages \
+--exclude=usr/lib/parrot/${PV}/library \
+--exclude=usr/lib/parrot/${PV}/config_lib.pasm \
+--exclude=usr/lib/parrot/${PV}/myconfig \
+--exclude=usr/lib/parrot/${PV}/parrotbug \
+--exclude=usr/lib/parrot/${PV}/VERSION \
+--exclude=usr/lib/parrot/${PV}/include/interpinfo.pasm \
+--exclude=usr/lib/parrot/${PV}/include/config.fpmc \
+--exclude=usr/share/doc/parrot/${PV}/html \
 usr/include \
 usr/lib \
-usr/share/doc/${P}/DEPRECATED.html \
-usr/share/doc/${P}/PBC_COMPAT \
-usr/share/doc/${P}/docs/dev \
-usr/share/doc/${P}/docs/project \
-"
+usr/share/doc/parrot/${PV}/DEPRECATED.pod \
+usr/share/doc/parrot/${PV}/PBC_COMPAT \
+usr/share/doc/parrot/${PV}/pod/project \
+usr/src/parrot/${PV}"
 
-# parrot-perl6
-PKG_CONTENTS[3]=" \
-usr/bin/perl6.exe \
-usr/lib/parrot/library/P6object.pbc \
-usr/lib/parrot/dynext/perl6_*.dll \
-usr/share/doc/${P}/languages/perl6 \
-usr/share/man/man1/perl6.1.gz \
-"
-
-# parrot-languages
-PKG_CONTENTS[4]=" \
---exclude=usr/share/doc/${P}/languages/perl6 \
-usr/bin/parrot-*.exe \
-usr/lib/parrot/dynext/apl_*.dll \
-usr/lib/parrot/dynext/dotnet*.dll \
-usr/lib/parrot/dynext/eclectus_*.dll \
-usr/lib/parrot/dynext/php_*.dll \
-usr/lib/parrot/dynext/wmls_*.dll \
-usr/lib/parrot/library/php_*.pbc \
-usr/lib/parrot/library/pipplib.pbc \
-usr/share/doc/${P}/languages \
-usr/share/man/man1/parrot-*1.gz \
-"
-
-#broken:
-#usr/lib/parrot/dynext/lua_*.dll \
-
+# parrot-docs
+PKG_CONTENTS[5]="usr/share/doc/parrot/${PV}/html"
