@@ -31,7 +31,7 @@ use base qw( Parrot::Docs::Section );
 use Parrot::Distribution;
 
 use Parrot::Docs::Section::Developer;
-use Parrot::Docs::Section::Examples;
+#use Parrot::Docs::Section::Examples;
 use Parrot::Docs::Section::PMCs;
 #use Parrot::Docs::Section::C;
 use Parrot::Docs::Section::Ops;
@@ -73,7 +73,7 @@ sub new {
             '',
             $self->new_item( 'Running Parrot', 'docs/running.pod'),
             $self->new_item( 'Testing Parrot', 'docs/tests.pod'),
-            Parrot::Docs::Section::Examples->new,
+#            Parrot::Docs::Section::Examples->new,
             $self->new_item( 'Developer FAQ', 'docs/gettingstarted.pod'),
             $self->new_item( 'Submitting Bug Reports & Patches', 'docs/submissions.pod' ),
         ),
