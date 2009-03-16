@@ -232,6 +232,12 @@ taking a C<Hash**> as an argument:
 
 L<https://trac.parrot.org/parrot/ticket/447>
 
+C<Parrot_new_INTVAL_hash> will also be rewritten to return a Hash* and will be
+renamed to C<parrot_new_intval_hash> for consistency with other similar
+functions.
+
+L<https://trac.parrot.org/parrot/ticket/456>
+
 =item Parrot_add_library_path [eligible in 1.1]
 
 Will be renamed to C<Parrot_lib_add_path_from_cstring>.
