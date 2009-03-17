@@ -111,7 +111,7 @@ L<https://trac.parrot.org/parrot/ticket/451>
 
 =over 4
 
-=item PMC union struct [BEFORE 1.0]
+=item PMC union struct [eligible in 1.1]
 
 This will be removed once all core PMCs have been updated.
 
