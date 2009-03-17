@@ -1,5 +1,6 @@
 parrot (1.0.0-1ubuntu1~ppa2~intrepid1) intrepid; urgency=low
   * New upstream release
+  * Bumped Standards-Version to 3.8.0
 
  -- Allison Randal <allison@parrot.org>  Sun, 15 Mar 2009 23:09:36 -0700
 
@@ -18,10 +19,10 @@ parrot (0.9.0-1) unstable; urgency=low
 
   * New upstream release
   * debian/control.in:
-    - Build-Depends removed optional library libicu36-dev.
+    - Build-Depends removed optional library libicu-dev.
       Removed optional library libgmp3-dev.
     - Depends for libparrot-dev removed optional library
-      libicu34-dev.
+      libicu-dev.
   * debian/rules
     - Removed --optimize flag from configure, known problems
       on 64-bit architectures.
