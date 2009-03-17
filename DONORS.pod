@@ -8,25 +8,29 @@ whose financial contributions help support the development of Parrot.
 
 =over 4
 
-=item *
+=item * The Perl Foundation
 
- N: The Perl Foundation
- W: perlfoundation.org
+L<http://perlfoundation.org>
 
-=item * 
+=item * NLnet Foundation
 
- N: NLnet Foundation
- W: nlnet.nl
+L<http://nlnet.nl>
 
-=item * 
+=item * The Mozilla Foundation
 
- N: The Mozilla Foundation
- W: www.mozilla.org
+L<http://www.mozilla.org>
 
-=item  * 
+=item  * Best Practical
 
- N: Best Practical
- W: bestpractical.com
+L<http://bestpractical.com>
+
+=item  * ActiveState
+
+L<http://activestate.com>
+
+=item  * BBC
+
+L<http://bbc.co.uk>
 
 =back
 
