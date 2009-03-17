@@ -13,10 +13,10 @@ parrot (0.9.0-1) unstable; urgency=low
 
   * New upstream release
   * debian/control.in:
-    - Build-Depends removed optional library libicu36-dev.
+    - Build-Depends removed optional library libicu-dev.
       Removed optional library libgmp3-dev.
     - Depends for libparrot-dev removed optional library
-      libicu34-dev.
+      libicu-dev.
   * debian/rules
     - Removed --optimize flag from configure, known problems
       on 64-bit architectures.
