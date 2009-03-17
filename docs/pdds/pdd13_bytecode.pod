@@ -184,11 +184,10 @@ Note that in this section only, offsets and lengths are in bytes.
   |        |        |    n = u % 16 ? 16 - (u % 16) : 0                      |
   +--------+--------+--------------------------------------------------------+
 
-Everything beyond the header is an opcode, with word length and byte ordering as
-defined in the header.
-If the word length and byte ordering of the machine that is reading the PBC file
-do not match these, it needs to transform the words making up the rest of the
-packfile.
+Everything beyond the header is an opcode, with word length and byte ordering
+as defined in the header.  If the word length and byte ordering of the machine
+that is reading the PBC file do not match these, it needs to transform the
+words making up the rest of the packfile.
 
 =over 4
 
@@ -359,7 +358,8 @@ segment, for example the source code from a high level language (HLL).
 =head4 Bytecode Segment
 
 This segment has no additional headers. It stores a stream of instructions in
-bytecode format, with the length given in the last field of the segment header.
+bytecode format, with the length given in the last field of the segment
+header.
 
 Instructions have variable length. Each instruction starts with an operation
 code (opcode).
