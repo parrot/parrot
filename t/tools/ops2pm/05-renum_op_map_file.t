@@ -84,7 +84,7 @@ ok(-d $samplesdir, "Able to locate samples directory");
     ##### Stage 3:  Add some opcodes and regenerate ops.num #####
 
   TODO: {
-        local $TODO = 'Post 1.0 regeneration problematic';
+        local $TODO = 'Post 1.0 regeneration problematic, TT #469';
     my @stage3 = qw( pic_ops.original );
     copy_into_position($samplesdir, \@stage3, q{original}, $opsdir);
     ($lastcode, $lastnumber) = run_test_stage(
@@ -133,6 +133,8 @@ ok(-d $samplesdir, "Able to locate samples directory");
 
     ###### Stage 5:  Delete some opcodes and regenerate ops.num #####
 
+  TODO: {
+        local $TODO = 'Post 1.0 regeneration should work just like pre-1.0 regeneration, TT #469';
     my @stage5 = qw( bit_ops.second );
     copy_into_position($samplesdir, \@stage5, q{second}, $opsdir);
     ($lastcode, $lastnumber) = run_test_stage(
@@ -166,6 +168,7 @@ ok(-d $samplesdir, "Able to locate samples directory");
         "Stage 6:  Got expected last opcode:  additions permitted");
     is($lastnumber, 194,
         "Stage 6:  Got expected last opcode number:  additions permitted");
+  }
 
     # Go back where we started to activate cleanup
     chdir $cwd or croak "Unable to change back to starting directory: $!";
