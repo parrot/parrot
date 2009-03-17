@@ -166,7 +166,7 @@ If you plan to get involved in development, you'll want to check out
 the source from the subversion repository directly. Anyone can get
 anonymous access to read the files and download a working copy to
 explore and test. For commit access, volunteers need a
-U<http://auth.perl.org> username, and need to be approved by a
+U<https://trac.parrot.org> username, and need to be approved by a
 Metacommitter. To download the most recent version from SVN, type this
 command into your terminal N<This is for Linux users, on Mac or
 Windows systems, follow the instructions from your SVN client>:
@@ -189,20 +189,14 @@ you're reading right now was created in F<docs/book/> by ordinary
 contributors. Most other documentation files found here are parsed and
 converted to HTML for display at U<http://www.parrot.org>.
 
-The F<languages/> directory contains the code that implements various
-language compilers N<This isn't entirely true. As of the 1.0 release
-of Parrot, all HLLs are supposed to reside elsewhere, not in the
-Parrot repository. If the languages disappear from there, we'll
-probably be nice enough to leave a note telling you where it went>:
+There are a number of existing language implementations for Parrot:
 Perl 6, Python ("Pynie"), Ruby ("Cardinal"), PHP ("Pipp"), Lisp, Lua,
 Tcl ("partcl"), WMLScript, Forth, Scheme, Befunge, BASIC, and many
 others. These language compilers are in various stages of partial
 completion. The page L<https://trac.parrot.org/parrot/wiki/Languages>
-provides meta information on
-the included languages and on the many language projects that are
-being developed and maintained outside the Parrot repository. If you
-have a language you're particularly interested to see implemented on
-Parrot, you can see how far along the effort is, or you can start the
+provides meta information on these languages and where to find them.
+If you have a language you're particularly interested to see implemented
+on Parrot, you can see how far along the effort is, or you can start the
 work to implement it yourself. We'll talk more about creating new
 compilers in Chapter 10: High-Level Languages, if you're interested.
 
