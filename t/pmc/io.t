@@ -431,6 +431,8 @@ file_content_is( $temp_file, <<'OUTPUT', 'unbuffered file contents' );
 Howdy World
 OUTPUT
 
+SKIP: {
+    skip( "segfault, see TT #418", 1 );
 pir_output_is( <<"CODE", <<'OUTPUT', 'I/O buffering' );
 .sub main
     .local string filename
@@ -488,6 +490,7 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'I/O buffering' );
 CODE
 Successful
 OUTPUT
+}
 
 # RT #46843
 pir_output_is( <<'CODE', <<'OUT', 'standard file descriptors' );
