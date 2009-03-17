@@ -239,8 +239,8 @@ done:
 .end
 CODE
 } else {
-  TODO: {
-    local $TODO = "stat on solaris" if $solaris;
+  SKIP: {
+    skip 'broken test TT #457', 1 if $solaris;
 
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
@@ -302,7 +302,8 @@ OUT
 my $lstat;
 
 SKIP: {
-    skip 'lstat not on Win32, falling on solaris', 1 if $MSWin32 or $solaris;
+    skip 'lstat not on Win32', 1 if $MSWin32;
+    skip 'broken test TT #457', 1 if $solaris;
 
     my @s = lstat('xpto');
     if ($cygwin) {
@@ -377,7 +378,7 @@ SKIP: {
         $P1 = new ['OS']
 
         $S1 = "xpto"
-        $S2 = "MANIFEST"
+        $S2 = "myconfig"
         $P1."link"($S2, $S1)
 
         print "ok\n"
@@ -388,7 +389,7 @@ CODE
 ok
 OUT
 
-    my $nl = [ stat("MANIFEST") ]->[3];
+    my $nl = [ stat("myconfig") ]->[3];
     ok( $nl > 1, "hard link to file was really created" );
     unlink "xpto" if -f "xpto";
 }
