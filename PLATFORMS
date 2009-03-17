@@ -44,7 +44,7 @@ linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
 linux-x86_64-gcc4.3.2         8   Y    -    -     Y   Y   Y    Y     ?  20081118
 opensolaris-x86-gcc_4.0.3     4   Y    Y    ?     ?   ?   Y    Y/2   ?  20080325
 sol8-sparc-cc                B    -    -    -     -   -   -    Y     ?  20090317
-sol8-sparc-gcc_4.1.0         B    -    -    -     -   -   -    Y/87  ?  20080818
+sol8-sparc-gcc_4.1.0         B    -    -    -     -   -   -    Y/42  ?  20090317
 win32-x86-mingw_gcc4.3.0          Y    Y    -     -   -   Y    Y/88  ?  20081203
 win32-x86-msvc_6.0            4   -    Y    -     -   -   Y    Y/8   ?  20090315
 win32-x64-msvc_9.0            8   -    -    -     -   -   Y    Y/51  ?  20081203
