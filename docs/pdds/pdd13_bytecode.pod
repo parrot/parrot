@@ -184,10 +184,11 @@ Note that in this section only, offsets and lengths are in bytes.
   |        |        |    n = u % 16 ? 16 - (u % 16) : 0                      |
   +--------+--------+--------------------------------------------------------+
 
-Everything beyond the header is an opcode, with word length and byte ordering
-as defined in the header. If the word length and byte ordering of the machine
-that is reading the PBC file do not match these, it needs to transform the
-words making up the rest of the packfile.
+Everything beyond the header is an opcode, with word length and byte ordering as
+defined in the header.
+If the word length and byte ordering of the machine that is reading the PBC file
+do not match these, it needs to transform the words making up the rest of the
+packfile.
 
 =over 4
 
@@ -279,6 +280,12 @@ other segments below are prefixed with this.
   | 0      | 1      | The total size of the segment in opcodes, including    |
   |        |        | this header.                                           |
   +--------+--------+--------------------------------------------------------+
+  | 1      | 1      | Internal type of the segment                           |
+  +--------+--------+--------------------------------------------------------+
+  | 2      | 1      | Internal id                                            |
+  +--------+--------+--------------------------------------------------------+
+  | 3      | 1      | Size of the following op array, 0 if none              |
+  +--------+--------+--------------------------------------------------------+
 
 
 =head4 Segment Padding
@@ -352,8 +359,10 @@ segment, for example the source code from a high level language (HLL).
 =head4 Bytecode Segment
 
 This segment has no additional headers. It stores a stream of instructions in
-bytecode format. Instructions have variable length. Each instruction starts
-with an operation code (opcode).
+bytecode format, with the length given in the last field of the segment header.
+
+Instructions have variable length. Each instruction starts with an operation
+code (opcode).
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |
@@ -393,8 +402,9 @@ following forms.
 
 =head4 Constants Segment
 
-This segment stores number, string and PMC constants. It adds one extra field
-to its header.
+This segment stores number, string and PMC constants.
+
+The first element is the number of constants contained.
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |
@@ -450,6 +460,8 @@ the start of the constant including its type.
   | 5      | n      | String data with trailing zero padding as required.    |
   +--------+--------+--------------------------------------------------------+
 
+Note: the Encoding field is not implemented yet.
+
 =item * PMC Constants
 
 PMCs that can be saved in packfiles as constants implement the freeze and thaw
@@ -496,17 +508,12 @@ into the constants table.
 
 =head4 Fixup Segment
 
-The fixup segment maps names of subs to offsets in the bytecode stream. It
-adds one extra field to its header.
+The fixup segment maps names of subs to offsets in the bytecode stream.
+
+The number of fixup table entries, n, is given by the last field of the
+segment header.
 
 {{ TODO: I think label fixups are no longer used. Check if that is so. }}
-
-  +--------+--------+--------------------------------------------------------+
-  | Offset | Length | Description                                            |
-  +--------+--------+--------------------------------------------------------+
-  | 1      | 1      | Number of fixup table entries that follow.             |
-  |        |        |    n                                                   |
-  +--------+--------+--------------------------------------------------------+
 
 This is followed by n fixup table entries, of variable length, that take the
 following form.
@@ -515,14 +522,16 @@ following form.
   | Offset | Length | Description                                            |
   +--------+--------+--------------------------------------------------------+
   | 0      | 1      | Type of the fixup. Must be:                            |
-  |        |        |    0x01 - Subroutine fixup                             |
+  |        |        |    0x01 - Subroutine fixup constant string             |
+  |        |        |    0x02 - Subroutine fixup ascii string                |
   +--------+--------+--------------------------------------------------------+
-  | 1      | 1      | The label that is being fixed up. A string constant,   |
-  |        |        | stored as an index into the constants table.           |
+  | 1      | -      | The label that is being fixed up. A string constant,   |
+  |        |        | stored as an index into the constants table in the 01  |
+  |        |        | case, a NULL terminated ASCII string padded to word    |
+  |        |        | length with zeroes in the 02.                          |
   +--------+--------+--------------------------------------------------------+
-  | 2      | 1      | For subroutine fixups, this is an index into the       |
-  |        |        | constants table for the sub PMC corresponding to the   |
-  |        |        | label.                                                 |
+  | -      | 1      | This is an index into the constants table for the sub  |
+  |        |        |  PMC corresponding to the label.                       |
   +--------+--------+--------------------------------------------------------+
 
 
@@ -533,23 +542,27 @@ compiled to bytecode. The segment comes in two parts.
 
 =over 4
 
+=item A list of mappings between instructions in the bytecode and line
+numbers, with one entry per instruction
+
 =item A list of mappings between offsets in the bytecode and filenames,
 indicating that the bytecode from that point on until the next entry was
 generated from the PIR found in the given filename
 
-=item A list of mappings between instructions in the bytecode and line
-numbers, with one entry per instruction
-
 =back
 
-The segment starts with:
+The length of the table of line numbers mapping is given by the last field
+of the segment header.
+
+Then come the table:
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |
   +--------+--------+--------------------------------------------------------+
-  | 1      | 1      | Number of filename mappings that follow.               |
-  |        |        |    n                                                   |
+  | 0      | 1      | Line number for the offset in the bytecode.            |
   +--------+--------+--------------------------------------------------------+
+
+Then come an opcode with n, the number of file mappings.
 
 Then come n mappings.
 
@@ -561,9 +574,6 @@ Then come n mappings.
   | 1      | 1      | A string constant holding the filename, stored as an   |
   |        |        | index into the constants table.                        |
   +--------+--------+--------------------------------------------------------+
-
-This is followed by the line number for each instruction in the bytecode
-segment.
 
 
 =head4 Annotations Segment
@@ -590,6 +600,8 @@ allows for faster lookup of annotations).
 example, starting at instruction 235, the annotation "line" has value "42").
 
 =back
+
+The last field of the segment header is not used.
 
 The first word in the segment supplies the number of keys.
 
