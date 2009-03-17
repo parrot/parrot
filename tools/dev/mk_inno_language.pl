@@ -76,6 +76,8 @@ my $man = -d 'man'
         : '; no man';
 my $doc = -d 'doc'
         ? qq{Source: ".\\doc\\*"; DestDir: "{app}\\share\\doc\\parrot\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
+        : -d 'docs'
+        ? qq{Source: ".\\docs\\*"; DestDir: "{app}\\share\\doc\\parrot\\languages\\$lang"; Flags: ignoreversion recursesubdirs}
         : '; no doc';
 my $readme = -f 'README'
            ? qq{Source: ".\\README"; DestDir: "{app}\\share\\doc\\parrot\\languages\\$lang"; Flags:}
