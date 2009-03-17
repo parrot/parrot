@@ -50,15 +50,27 @@ my %update_cmd = (
 my @hlls = (
 
     {
-        name       => 'dotnet',
+        name       => 'bf',
         scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/dotnet/trunk'
+        repository => 'https://svn.parrot.org/languages/bf/trunk'
     },
 
     {
         name       => 'c99',
         scm        => 'SVN',
         repository => 'https://svn.parrot.org/languages/c99/trunk'
+    },
+
+    {
+        name       => 'chitchat',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/chitchat/trunk'
+    },
+
+    {
+        name       => 'dotnet',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/dotnet/trunk'
     },
 
     {
@@ -71,6 +83,12 @@ my @hlls = (
         name       => 'ecmascript',
         scm        => 'SVN',
         repository => 'https://svn.parrot.org/languages/ecmascript/trunk'
+    },
+
+    {
+        name       => 'forth',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/forth/trunk'
     },
 
     {
@@ -92,6 +110,12 @@ my @hlls = (
     },
 
     {
+        name       => 'jako',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/jako/trunk'
+    },
+
+    {
         name       => 'json',
         scm        => 'SVN',
         repository => 'https://svn.parrot.org/languages/json/trunk'
@@ -107,6 +131,12 @@ my @hlls = (
         name       => 'lazy-k',
         scm        => 'GIT',
         repository => 'git://github.com/bschmalhofer/lazy-k.git'
+    },
+
+    {
+        name       => 'lisp',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/lisp/trunk'
     },
 
     {
@@ -137,6 +167,12 @@ my @hlls = (
         name       => 'matrixy',
         scm        => 'SVN',
         repository => 'http://matrixy.googlecode.com/svn/trunk'
+    },
+
+    {
+        name       => 'ook',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/ook/trunk'
     },
 
     {
@@ -206,6 +242,12 @@ my @hlls = (
     },
 
     {
+        name       => 'scheme',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/scheme/trunk'
+    },
+
+    {
         name       => 'shakespeare',
         scm        => 'HG',
         repository => 'http://bitbucket.org/riffraff/shakespeare-parrot'
@@ -221,6 +263,12 @@ my @hlls = (
         name       => 'unlambda',
         scm        => 'GIT',
         repository => 'git://github.com/bschmalhofer/unlambda.git'
+    },
+
+    {
+        name       => 'urm',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/urm/trunk'
     },
 
     {
