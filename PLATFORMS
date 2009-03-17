@@ -27,7 +27,7 @@ sol10-sparc-cc_5.9           B8   Y    -    -     Y   Y   Y    Y/3*1 ?  20090217
 sol10-sparc-gcc_4.0.2        B4*2 Y    -    -     Y   Y   Y    Y/1   ?  20080510
 sol10-sparc-gcc_4.0.2        B8   Y    -    -     Y   Y   Y    Y/2   ?  20080518
 win32-x86-mingw_gcc3.4.5          Y    Y    -     -   -   Y    Y     Y  20090217
-win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y     ?  20081216
+win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y     ?  20090317
 
 
 Extra Platforms:
