@@ -22,11 +22,12 @@ New in 1.0.0
   + Expanded language shell generator for new languages.
   + 'parrotbug' utility repurposed for the Trac interface.
 - Deprecations
-  + Removed deprecated Tqueue, Closure PMC.
+  + Removed deprecated Tqueue and Closure PMCs.
   + String, Key, NCI, LexPad, Iterator, Sub, Continuation, RetContinuation,
     ExceptionHandler, ParrotLibrary, ParrotInterpreter, ParrotThread,
-    ParrotRunningThread, Rational, FixedPMCArray, ResizablePMCArray, GDBMHash,
-    PMCs now use declared attributes (ATTR), in place of deprecated UnionVal.
+    ParrotRunningThread, Rational, FixedPMCArray, ResizablePMCArray, and
+    GDBMHash PMCs now use declared attributes (ATTR), in place of the
+    deprecated UnionVal.
 
 
 New in 0.9.1
