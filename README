@@ -26,10 +26,6 @@ to run various configure and build scripts.
 For most of the platforms that we are supporting initially, Parrot should build
 out of the box.  PLATFORM lists our target platforms.
 
-The current configure system is primitive, as it's only a temporary solution.
-It will be happy with most any answers you decide to feed it. Garbage In,
-Garbage Out.
-
 INSTRUCTIONS
 ------------
 
@@ -66,12 +62,7 @@ Now, the interpreter should build.  If you are building the ICU library
 (this is the default on most systems), you need to use GNU make instead
 (or something compatible with it).
 
-NOTE: If you have trouble linking parrot, this *may* be due to a pre-existing
-parrot version installed via 'make install'. Until this issue is resolved,
-you may have to delete the installed version of parrot before building a new
-one. Our apologies.
-
-You can test parrot by running "make test". You can run the tests in parallel
+You can test Parrot by running "make test". You can run the tests in parallel
 with "make TEST_JOBS=3 test".
 
 You can run the full test suite with
@@ -81,15 +72,12 @@ You can run the full test suite with
 Note: PLATFORMS contains notes about whether test failures are expected
 on your system.
 
-On some systems you can install parrot:
+You can install Parrot with:
 
     make install
 
-This installs a bunch of files in /usr/local. The parrot executable is in
-/usr/local/bin.   Please note that this feature is currently experimental.
-(It's so experimental that you have to read the directions it gives you.)
-
-If you want to install Parrot into a non-standard location use:
+By default, this installs in /usr/local, with the Parrot executable in
+/usr/local/bin. If you want to install Parrot into another location use:
 
     perl Configure.pl --prefix=/Users/foo/parrot-0.7.0
     make install
@@ -121,16 +109,9 @@ previous versions, please see NEWS.
 MAILING LISTS
 -------------
 
-The mailing list for parrot is parrot-dev@lists.parrot.org. Subscribe by
+The mailing list for Parrot is parrot-dev@lists.parrot.org. Subscribe by
 filling out the form at http://lists.parrot.org/mailman/listinfo/parrot-dev
 It is archived at http://lists.parrot.org/pipermail/parrot-dev/
-
-The old development list is archived at
-http://www.nntp.perl.org/group/perl.perl6.internals
-and available via NNTP at nntp://nntp.perl.org/perl.perl6.internals
-
-You can also read the (old) list via Google Groups at
-http://groups-beta.google.com/group/perl.perl6.internals
 
 FEEDBACK, PATCHES, etc.
 -----------------------
@@ -144,12 +125,6 @@ WEB SITES
 The following web sites have all the information you need about Parrot:
     http://www.parrot.org/
     http://trac.parrot.org/
-    http://www.parrotblog.org/
-
-And Perl6:
-    http://rakudo.org/
-    http://dev.perl.org/perl6/
-    http://pugscode.org/
 
 Have fun,
    The Parrot Team.
