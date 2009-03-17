@@ -850,7 +850,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
     if (already_doing) {
         Parrot_io_eprintf(interp,
-            "** Exception catched while looking for a handler, trying next **\n");
+            "** Exception caught while looking for a handler, trying next **\n");
         if (! keep_context)
             return NULL;
         /*
