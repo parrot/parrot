@@ -1,6 +1,6 @@
 Name:           parrot
 Version:        0.9.1
-Release:        1%{?dist}
+Release:        1%{dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
 Group:          Development/Libraries
@@ -11,13 +11,14 @@ BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  gmp-devel
 BuildRequires:  gdbm-devel
-BuildRequires:  /usr/bin/perldoc
 BuildRequires:  libicu-devel
+BuildRequires:  perl-Test-Harness
 
-%package languages
-Summary:        Parrot Virtual Machine languages
+%package docs
+Summary:        Parrot Virtual Machine documentation
 License:        Artistic 2.0
 Group:          Development/Libraries
+BuildRequires:  /usr/bin/perldoc
 
 %package devel
 Summary:        Parrot Virtual Machine development headers and libraries
@@ -31,8 +32,9 @@ Parrot is a virtual machine designed to efficiently compile and execute
 bytecode for dynamic languages. Parrot is the target for Rakudo Perl 6,
 as well as variety of other languages.
 
-%description languages
-High-level languages which run on the Parrot virtual machine.
+%description docs
+Documentation in text-, POD- and HTML-format (docs/html-subdirectory) and also
+examples about the Parrot Virtual Machine
 
 %description devel
 Parrot Virtual Machine development headers and libraries.
@@ -43,10 +45,17 @@ Parrot Virtual Machine development headers and libraries.
 %{__perl} -pi -e 's,"lib/,"%{_lib}/, if (/CONST_STRING\(interp,/)' \
     src/library.c
 %{__perl} -pi -e "s,'/usr/lib','%{_libdir}',;s,runtime/lib/,runtime/%{_lib}/," \
-    tools/dev/install_files.pl \
-    tools/dev/mk_manifests.pl
+    tools/dev/install_files.pl
 
 %build
+if test "%{_vendor}" = "suse"
+then
+    LIBS='-lncurses -lm'
+else
+    LIBS='-lcurses -lm'
+fi
+
+%ifarch i386 x86_64
 %{__perl} Configure.pl \
     --prefix=%{_usr} \
     --libdir=%{_libdir} \
@@ -59,12 +68,16 @@ Parrot Virtual Machine development headers and libraries.
     --parrot_is_shared \
     --lex=/usr/bin/flex \
     --yacc=/usr/bin/yacc \
-    --libs='-lcurses -lm'
+    --libs="$LIBS"
+%else
+# PowerPC
+%{__perl} Configure.pl \
+    --prefix=%{_usr} \
+    --libdir=%{_libdir}
+%endif
 
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
 make
-make languages
-make perl6
 make parrot_utils
 make installable
 make html
@@ -76,7 +89,8 @@ export LD_LIBRARY_PATH=$( pwd )/blib/lib
 make install DESTDIR=$RPM_BUILD_ROOT
 
 # Drop the docs so rpm can pick them up itself.
-rm -rf $RPM_BUILD_ROOT/%{_docdir}/parrot
+rm -rf $RPM_BUILD_ROOT%{_usr}/share/doc/parrot    # necessary for SuSE
+#rm -rf $RPM_BUILD_ROOT/%{_docdir}/parrot         # for Solaris?
 
 # Force permissions on doc directories.
 find docs examples -type d -exec chmod 755 {} \;
@@ -108,23 +122,18 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
-%doc RESPONSIBLE_PARTIES TODO
-%doc docs examples
 %exclude %{_bindir}/parrot_config
-%exclude %{_bindir}/perl6
 %exclude %{_bindir}/parrot_debugger
 %exclude %{_bindir}/pbc_*
 %{_bindir}/*
 %{_libdir}/parrot
 %{_libdir}/libparrot.so.*
-%{_usr}/compilers
 
-%files languages
+%files docs
 %defattr(-,root,root,-)
-%{_bindir}/perl6
-%{_usr}/languages
-%{_usr}/runtime
+%doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
+%doc RESPONSIBLE_PARTIES TODO
+%doc docs examples
 
 %files devel
 %defattr(-,root,root,-)
