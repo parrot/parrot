@@ -107,4 +107,6 @@ Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth.
 
  kjs         0.9.1          2009-Feb-17     "Final Countdown"
 
+ Allison     1.0.0          2009-Mar-17     "Haru Tatsu"
+
 =cut

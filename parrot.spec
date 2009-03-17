@@ -1,11 +1,11 @@
 Name:           parrot
-Version:        0.9.1
+Version:        1.0.0
 Release:        1%{dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
-Source0:        ftp://ftp.parrot.org/pub/parrot/releases/devel/parrot/parrot-%{version}.tar.gz
+Source0:        ftp://ftp.parrot.org/pub/parrot/releases/stable/%{version}/parrot-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
@@ -150,6 +150,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Tue Mar 17 2009 Allison Randal <allison@parrot.org> 1.0.0
+- updated to 1.0.0
+
 * Tue Jan 23 2009 Reini Urban <rurban@x-ray.at> 0.9.0
 - added make installable, perl6 is still not installable
 - added parrot_utils to devel

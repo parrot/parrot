@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', <<'OUT', 'get_integer_keyed_str' );
     say $I0
 .end
 CODE
-0
+1
 OUT
 
 

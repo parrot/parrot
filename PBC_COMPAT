@@ -27,45 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
-3.38	2009.03.07	coke	migrated ops out of experimental.ops, making them permanent.
-3.37	2009.02.26	jkeenan	removed tqueue PMC
-3.36	2009.02.20	coke	removed closure PMC
-3.35	2009.02.15	rurban	added bignum.pmc
-3.34	2009.01.23	coke	removed intlist, enumerate, multiarray, pair, delegate, deleg_pmc PMCs
-3.33	2009.01.20	chromatic	removed n_neg opcode
-3.32	2009.01.19	chromatic	removed remaining n_* math/bitwise ops
-3.31	2009.01.12	whiteknight	remove stm.ops and all opcodes therein
-3.30	2009.01.10	coke	removed find_global_p_s_s and store_global_s_s_p
-3.29	2009.01.07	coke	removed store_global_p_s_p
-3.28	2009.01.07	jonathan	changes for bytecode annoations (packfile and ops)
-3.27	2008.01.07	coke	removed find_global_p_p_s, find_global_p_s, store_global_p_s
-3.26	2008.12.30	chromatic	removed deprecated infix, n_infix, get_mro opcodes
-3.25	2008.11.15	tewk	changed size of Parrot_sub structure which effects frozen sub pmc size
-3.24	2008.11.24	pmichaud	added capture_lex opcode
-3.23	2008.11.15	chromatic	added box opcodes
-3.22	2008.11.11	coke	remove morph_p_i, add_multi_i_i_i_p, find_multi_p_i_i_i
-3.21	2008.11.06	coke	remove new_p_i, new_p_i_p, find_type_i_p, find_type_i_s, valid_type_i_i, typeof_i_p, typeof_i_p_k, typeof_i_p_ik, typeof_s_i
-3.20	2008.10.23	pmichaud	make opsrenumber fix
-3.19	2008.08.04	coke	remove getclass opcodes
-3.18	2008.07.16	bernhard	remove opcode getfd
-3.17	2008.06.26	jonathan	sub PMC freeze format changed
-3.16	2008.04.23	pmichaud	remove other user stack opcodes
-3.15	2008.04.22	pmichaud	remove saveall/restoreall opcodes
-3.14	2008.04.04	chromatic	enabled div_i_ic_ic and div_n_nc_nc opcodes
-3.13	2008.03.29	chromatic	added does_i_p_pc opcode
-3.12	2008.03.26	coke	deleted classoffset
-3.11	2008.03.26	coke	deleted getattribute_p_p_i,setattribute_p_p_i
-3.10	2007.12.18	coke	deleted print_newline opcode
-3.09	2007.12.13	chromatic	added copy_p_p opcode
-3.08	2007.12.12	allison	added addhandler_p opcode
-3.07	2007.12.12	tewk	added die_s die_sc die_p die_pc opcodes
-3.06	2007.11.28	coke	remove classname opcode
-3.05	2007.10.29	allison	 add get_eh, get_all_eh, and count_eh opcodes
-3.04	2007.10.28	paultcochrane	remove clear_eh opcode
-3.03	2007.10.17	coke	released 0.4.17
-3.02	2007.09.20	bernhard	remove opcode hash
-3.02	2007.09.07	bernhard	deprecate opcode substr_r
-3.01	2007.08.17	chromatic	store HLL names as strings in frozen Sub PMCs
+4.0	2009.03.17	allison	released 1.0.0
 3.0	2007.07.23	jonathan	implementing new PBC header format
 2.0	2005.11.22	leo	changed PBC format (HLL_info)
 1.0	2005.10.15	jonathan	changed debug segment format

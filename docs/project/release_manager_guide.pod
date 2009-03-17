@@ -53,7 +53,7 @@ Increment the version number in the following files:
 F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
 F<README>.
 
-Note: C<Source0> in parrot.spec might have to be adapted as well.
+Note: C<Source0> in F<parrot.spec> might have to be adapted as well.
 
 Also update the version number, date, and your name in the
 the file: F<docs/parrothist.pod>.
@@ -79,7 +79,7 @@ fields that must be updated at each release:
 
 =item C<release.*>
 
-The date of the next release is in L<Appendix 2|"Appendix 2 - Upcoming releases">.
+The date of the next release is in L<Appendix 1|"Appendix 1 - Upcoming releases">.
 
 =item C<bugday.date>
 
@@ -188,7 +188,7 @@ F<~/ftp/releases/devel>.
 
  $ mkdir ~/ftp/releases/devel/a.b.c
 
-If the release is in the stable series (L<Appendix 2 - Upcoming releases>)
+If the release is in the stable series (L<Appendix 1 - Upcoming releases>)
 create the new directory in F<~/ftp/releases/stable> instead.
 
  $ mkdir ~/ftp/releases/stable/a.b.c
@@ -257,7 +257,9 @@ are checked.
 
 Under "Administer" -> "Site building" -> "URL Redirects", change the URL for
 "release/current" to the FTP directory for the new release (for example,
-F<ftp://ftp.parrot.org/pub/parrot/releases/devel/0.8.1>).
+F<ftp://ftp.parrot.org/pub/parrot/releases/devel/0.8.1>). Also update
+the URL for "release/developer" or "release/supported" depending on
+which type of release this is.
 
 =back
 
@@ -293,8 +295,7 @@ Modify the topic on #parrot, e.g.:
 
 =item d
 
-Update the wiki frontpage at L<http://www.perlfoundation.org/parrot/index.cgi?parrot>.
-Update the next planned release date on the wiki at L<http://www.perlfoundation.org/parrot/index.cgi?release_schedule_2008>.
+Update the wiki frontpage at L<http://trac.parrot.org/parrot/>.
 
 =item e
 
@@ -342,14 +343,13 @@ F<README>, F<RESPONSIBLE_PARTIES>.
 
 =head1 Appendix 1 - Upcoming releases
 
-To make a monthly release schedule possible, we're spreading the burden
-of releases across multiple release managers.  Releases are scheduled for
+To make a monthly release schedule possible, we spread the burden of
+releases across multiple release managers. Releases are scheduled for
 the 3rd Tuesday of each month.
 
 The starred releases are Parrot's twice-yearly supported releases, see
 F<docs/project/support_policy.pod>.
 
- - March 17, 2009    - 1.0* - allison
  - April 21, 2009    - 1.1  - fperrad
  - May 19, 2009      - 1.2  - tewk
  - June 16, 2009     - 1.3  - whiteknight
