@@ -1,17 +1,32 @@
 # $Id$
 
 New in 1.0.0
-- Implementation
-  + Support for language builds from an installed Parrot.
 - Documentation
   + New user documentation for exceptions.
+  + Updates to Chapters 4 & 5 of the Parrot book.
+  + Improved and expanded generated HTML documentation, as the input for
+    http://docs.parrot.org.
+  + Added Compiled HTML Help (.chm) version of documentation.
+  + Cleanups and fixes.
 - Languages
   + Pynie
     - left the nest and is now at http://pynie.googlecode.com/
   + Cardinal
     - left the nest and is now at http://github.com/cardinal
+  + APL
+    - left the nest and is now at http://paraplegic.googlecode.com/
   + ABC, Squaak, and Befunge moved to examples/.
   + All remaining languages moved to https://svn.parrot.org/languages/
+- Tools
+  + Support for language builds from an installed Parrot.
+  + Expanded language shell generator for new languages.
+  + 'parrotbug' utility repurposed for the Trac interface.
+- Deprecations
+  + Removed deprecated Tqueue, Closure PMC.
+  + String, Key, NCI, LexPad, Iterator, Sub, Continuation, RetContinuation,
+    ExceptionHandler, ParrotLibrary, ParrotInterpreter, ParrotThread,
+    ParrotRunningThread, Rational, FixedPMCArray, ResizablePMCArray, GDBMHash,
+    PMCs now use declared attributes (ATTR), in place of deprecated UnionVal.
 
 
 New in 0.9.1
