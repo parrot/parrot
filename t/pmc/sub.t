@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 65;
+use Parrot::Test tests => 66;
 use Parrot::Config;
 
 =head1 NAME
@@ -1535,6 +1535,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', ':subid and identical string constants' );
 CODE
 abc
 abc
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'copy sub to self' );
+.sub 'main'
+    $P0 = new ['Sub']
+    assign $P0, $P0
+    say 'no segfault'
+.end
+CODE
+no segfault
 OUTPUT
 
 # Local Variables:

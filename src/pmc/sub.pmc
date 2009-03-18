@@ -127,7 +127,7 @@ Sets the name of the subroutine.
     VTABLE void set_string_native(STRING *subname) {
         Parrot_sub *sub;
         PMC_get_sub(INTERP, SELF, sub);
-        sub->name              = Parrot_str_copy(INTERP, subname);
+        sub->name = Parrot_str_copy(INTERP, subname);
     }
 
 /*
@@ -435,7 +435,8 @@ Set SELF to the data in other.
             memcpy(my_sub, other_sub, sizeof (struct Parrot_sub));
 
             /* copy the name so it's a different string in memory */
-            my_sub->name = Parrot_str_copy(INTERP, my_sub->name);
+            if (my_sub->name != NULL)
+                my_sub->name = Parrot_str_copy(INTERP, my_sub->name);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
