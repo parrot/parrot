@@ -218,21 +218,6 @@ L<https://trac.parrot.org/parrot/ticket/443>
 
 =item src/hash.c API cleanup [eligible in 1.1]
 
-The following functions will be changed to return a C<Hash*> instead of
-taking a C<Hash**> as an argument:
-
-=over 4
-
-=item * parrot_new_hash_x
-
-=item * parrot_new_cstring_hash
-
-=item * parrot_new_pointer_hash
-
-=back
-
-L<https://trac.parrot.org/parrot/ticket/447>
-
 C<Parrot_new_INTVAL_hash> will also be rewritten to return a Hash* and will be
 renamed to C<parrot_new_intval_hash> for consistency with other similar
 functions.
