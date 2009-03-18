@@ -56,55 +56,35 @@ Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth.
              0.4.7          2006-Nov-14     "Caique"
 
  Jerry       0.4.8b         2007-Jan-16     "Eponymous"
-
  Patrick     0.4.9          2007-Feb-22     "Socorro"
-
  Will        0.4.10         2007-Mar-20     "Release Formerly Known as Prince"
-
  Matt        0.4.11         2007-Apr-17     "Tax Bird"
-
  chromatic   0.4.12         2007-May-15     "Of The Caribbean"
-
  Allison     0.4.13         2007-Jun-19     "Clifton"
-
  Jerry       0.4.14         2007-Jul-17     "Now, with Seat Belts!"
-
  Patrick     0.4.15         2007-Aug-22     "Augean Stable"
-
  Jerry       0.4.16         2007-Sep-18     "A Farewell to Alex"
-
  Will        0.4.17         2007-Oct-17     "Two for Finching"
 
  chromatic   0.5.0          2007-Nov-20     "Caulked Snack"
-
  Jonathan    0.5.1          2007-Dec-18     "Hatachi"
-
  Bob         0.5.2          2008-Jan-15     "P.e. nipalensis"
-
  Patrick     0.5.3          2008-Feb-20     "Way of the Parrot"
 
  Barney      0.6.0          2008-Mar-18     "P&P"
-
  Jerry       0.6.1          2008-Apr-15     "Bird of Paradise"
-
  chromatic   0.6.2          2008-May-20     "Reverse Sublimation"
-
  smash       0.6.3          2008-Jun-17     "Beautiful Parrot"
-
  Barney      0.6.4          2008-Jul-15     "St. Vincent Amazon"
 
  Bob         0.7.0          2008-Aug-19     "Severe Macaw"
-
  Patrick     0.7.1          2008-Sep-16     "Manu Aloha"
 
  particle    0.8.0          2008-Oct-21     "Pareto Principle"
-
  chromatic   0.8.1          2008-Nov-18     "Tio Richie"
-
  Whiteknight 0.8.2          2008-Dec-16     "Feliz Loro"
 
  chromatic   0.9.0          2009-Jan-20     "From Outer Space"
-
  kjs         0.9.1          2009-Feb-17     "Final Countdown"
 
  Allison     1.0.0          2009-Mar-17     "Haru Tatsu"
