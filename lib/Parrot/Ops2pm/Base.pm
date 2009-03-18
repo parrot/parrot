@@ -157,7 +157,8 @@ sub prepare_ops {
                 # empty experimental.ops file is OK.
                 warn $message;
                 next;
-            } else {
+            }
+            else {
                 die $message;
             }
         }

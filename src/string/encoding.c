@@ -251,7 +251,7 @@ const ENCODING*
 Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding)
 {
     ASSERT_ARGS(Parrot_get_encoding)
-    if (number_of_encoding >= all_encodings->n_encodings || 
+    if (number_of_encoding >= all_encodings->n_encodings ||
         number_of_encoding < 0)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding;
