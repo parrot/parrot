@@ -563,7 +563,7 @@ EOC
             PObj_constant_FLAG|PObj_external_FLAG));
 
         /* set up isa hash */
-        parrot_new_hash(interp, &isa_hash);
+        isa_hash = parrot_new_hash(interp);
         vt_clone->isa_hash     = isa_hash;
 EOC
     }
@@ -573,7 +573,7 @@ EOC
         vt_clone->provides_str = CONST_STRING_GEN(interp, "$provides");
 
         /* set up isa hash */
-        parrot_new_hash(interp, &isa_hash);
+        isa_hash = parrot_new_hash(interp);
         vt_clone->isa_hash     = isa_hash;
 EOC
     }

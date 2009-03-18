@@ -1411,8 +1411,7 @@ Parrot_mmd_cache_create(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_mmd_cache_create)
     /* String hash. */
-    Hash *cache;
-    parrot_new_hash(interp, &cache);
+    Hash *cache = parrot_new_hash(interp);
     return cache;
 }
 

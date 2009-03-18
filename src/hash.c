@@ -37,18 +37,6 @@ don't apply.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PARROT_MALLOC
-static Hash * create_hash(PARROT_INTERP,
-    PARROT_DATA_TYPE val_type,
-    Hash_key_type hkey_type,
-    ARGIN(hash_comp_fn compare),
-    ARGIN(hash_hash_key_fn keyhash))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int cstring_compare(SHIM_INTERP,
@@ -126,10 +114,6 @@ static int STRING_compare(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_create_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(compare) \
-    || PARROT_ASSERT_ARG(keyhash)
 #define ASSERT_ARGS_cstring_compare __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(a) \
     || PARROT_ASSERT_ARG(b)
@@ -824,7 +808,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
 /*
 
-=item C<void parrot_new_hash>
+=item C<Hash* parrot_new_hash>
 
 Creates a new Parrot STRING hash in C<hptr>.
 
@@ -833,16 +817,16 @@ Creates a new Parrot STRING hash in C<hptr>.
 */
 
 PARROT_EXPORT
-void
-parrot_new_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
+PARROT_CANNOT_RETURN_NULL
+Hash*
+parrot_new_hash(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_new_hash)
-    parrot_new_hash_x(interp,
-            hptr,
+    return parrot_create_hash(interp,
             enum_type_PMC,
             Hash_key_type_STRING,
-            STRING_compare,     /* STRING compare */
-            (hash_hash_key_fn)key_hash_STRING);    /*        hash */
+            STRING_compare,
+            (hash_hash_key_fn)key_hash_STRING);
 }
 
 
@@ -861,18 +845,17 @@ void
 parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
 {
     ASSERT_ARGS(parrot_new_pmc_hash)
-    parrot_new_pmc_hash_x(interp,
-            container,
-            enum_type_PMC,
-            Hash_key_type_STRING,
-            STRING_compare,     /* STRING compare */
-            (hash_hash_key_fn)key_hash_STRING);    /*        hash */
+    Hash * const hash = parrot_create_hash(interp, enum_type_PMC,
+            Hash_key_type_STRING, STRING_compare,
+            (hash_hash_key_fn)key_hash_STRING);
+    PMC_struct_val(container) = hash;
+    hash->container           = container;
 }
 
 
 /*
 
-=item C<void parrot_new_cstring_hash>
+=item C<Hash* parrot_new_cstring_hash>
 
 Creates a new C string hash in C<hptr>.
 
@@ -881,22 +864,22 @@ Creates a new C string hash in C<hptr>.
 */
 
 PARROT_EXPORT
-void
-parrot_new_cstring_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
+PARROT_CANNOT_RETURN_NULL
+Hash*
+parrot_new_cstring_hash(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_new_cstring_hash)
-    parrot_new_hash_x(interp,
-            hptr,
+    return parrot_create_hash(interp,
             enum_type_PMC,
             Hash_key_type_cstring,
-            (hash_comp_fn)cstring_compare,     /* cstring compare */
-            (hash_hash_key_fn)key_hash_cstring);    /*        hash */
+            (hash_comp_fn)cstring_compare,
+            (hash_hash_key_fn)key_hash_cstring);
 }
 
 
 /*
 
-=item C<static Hash * create_hash>
+=item C<Hash * parrot_create_hash>
 
 Creates and initializes a hash.  Function pointers determine its behaviors.
 The container passed in is the address of the hash PMC that is using it.  The
@@ -911,11 +894,11 @@ Memory from this function must be freed.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
-static Hash *
-create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
+Hash *
+parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
         ARGIN(hash_comp_fn compare), ARGIN(hash_hash_key_fn keyhash))
 {
-    ASSERT_ARGS(create_hash)
+    ASSERT_ARGS(parrot_create_hash)
     HashBucket  *bp;
     Hash * const hash = mem_allocate_zeroed_typed(Hash);
     size_t       i;
@@ -1048,84 +1031,21 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
 
 /*
 
-=item C<void parrot_new_hash_x>
+=item C<Hash * parrot_new_pointer_hash>
 
-Creates and stores a new hash in C<hptr>.
-
-FIXME: This function can go back to just returning the hash struct
-pointer once Buffers can define their own custom mark routines.
-
-The problem is: During GC stack walking the item on the stack must be
-a PMC. When an auto C<Hash*> is seen, it doesn't get properly marked
-(only the C<Hash*> buffer is marked, not its contents). By passing the
-C<**hptr> up to the Hash's init function, the newly constructed PMC is
-on the stack I<including> this newly constructed Hash, so that it gets
-marked properly.
-
-=cut
-
-*/
-
-void
-parrot_new_hash_x(PARROT_INTERP,
-        ARGOUT(Hash **hptr),
-        PARROT_DATA_TYPE val_type,
-        Hash_key_type hkey_type,
-        NOTNULL(hash_comp_fn compare),
-        NOTNULL(hash_hash_key_fn keyhash))
-{
-    ASSERT_ARGS(parrot_new_hash_x)
-    *hptr = create_hash(interp, val_type, hkey_type, compare, keyhash);
-}
-
-
-/*
-
-=item C<void parrot_new_pmc_hash_x>
-
-Creates a new PMC hash.
-
-Like parrot_new_hash_x but w/o the described problems.  The passed in
-C<container> PMC gets stored in the Hash and the newly created Hash is in
-PMC_struct_val(container).
-
-=cut
-
-*/
-
-void
-parrot_new_pmc_hash_x(PARROT_INTERP,
-        ARGMOD(PMC *container),
-        PARROT_DATA_TYPE val_type,
-        Hash_key_type hkey_type,
-        NOTNULL(hash_comp_fn compare),
-        NOTNULL(hash_hash_key_fn keyhash))
-{
-    ASSERT_ARGS(parrot_new_pmc_hash_x)
-    Hash * const hash         = create_hash(interp, val_type, hkey_type,
-                                            compare, keyhash);
-    PMC_struct_val(container) = hash;
-    hash->container           = container;
-}
-
-
-/*
-
-=item C<void parrot_new_pointer_hash>
-
-Creates a new hash with void * keys and values, storing it via the passed-in
-Hash **.
+Create and return a new hash with void * keys and values.
 
 =cut
 
 */
 
 PARROT_EXPORT
-void
-parrot_new_pointer_hash(PARROT_INTERP, ARGOUT(Hash **hptr))
+PARROT_CANNOT_RETURN_NULL
+Hash *
+parrot_new_pointer_hash(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_new_pointer_hash)
-    parrot_new_hash_x(interp, hptr, enum_type_ptr, Hash_key_type_ptr,
+    return parrot_create_hash(interp, enum_type_ptr, Hash_key_type_ptr,
             pointer_compare, key_hash_pointer);
 }
 
@@ -1148,12 +1068,15 @@ PMC*
 Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(Parrot_new_INTVAL_hash)
+    Hash *hash;
     PMC * const h = (flags & PObj_constant_FLAG)
                   ? constant_pmc_new_noinit(interp, enum_class_Hash)
                   : pmc_new_noinit(interp, enum_class_Hash);
 
-    parrot_new_pmc_hash_x(interp, h, enum_type_INTVAL, Hash_key_type_int,
-            int_compare, key_hash_int);
+    hash = parrot_create_hash(interp, 
+            enum_type_INTVAL, Hash_key_type_int, int_compare, key_hash_int);
+    PMC_struct_val(h) = hash;
+    hash->container   = h;
     PObj_active_destroy_SET(h);
     return h;
 }

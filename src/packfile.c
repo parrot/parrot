@@ -152,8 +152,7 @@ static const opcode_t * directory_unpack(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*segp)
-        FUNC_MODIFIES(*cursor);
+        FUNC_MODIFIES(*segp);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -3078,8 +3077,7 @@ find_constants(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct))
         PARROT_ASSERT(interp->thread_data);
 
         if (!interp->thread_data->const_tables) {
-            interp->thread_data->const_tables = mem_allocate_typed(Hash);
-            parrot_new_pointer_hash(interp, &interp->thread_data->const_tables);
+            interp->thread_data->const_tables = parrot_new_pointer_hash(interp);
         }
 
         tables     = interp->thread_data->const_tables;

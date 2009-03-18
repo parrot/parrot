@@ -5495,7 +5495,7 @@ define_macro(PARROT_INTERP, ARGIN(const char *name), ARGIN(const params_t *param
         m = mem_allocate_zeroed_typed(macro_t);
 
         if (!IMCC_INFO(interp)->macros)
-            parrot_new_cstring_hash(interp, &IMCC_INFO(interp)->macros);
+            IMCC_INFO(interp)->macros = parrot_new_cstring_hash(interp);
         parrot_hash_put(interp, IMCC_INFO(interp)->macros,
             PARROT_const_cast(char *, name), m);
     }

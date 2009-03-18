@@ -65,7 +65,7 @@ Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
     /* when called from global PMC initialization, not all vtables have isa_hash
      * when called at runtime, they do */
     if (base_vtable->isa_hash) {
-        parrot_new_hash(interp, &new_vtable->isa_hash);
+        new_vtable->isa_hash = parrot_new_hash(interp);
         parrot_hash_clone(interp, base_vtable->isa_hash, new_vtable->isa_hash);
     }
 
