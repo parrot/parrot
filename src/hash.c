@@ -1073,7 +1073,7 @@ Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
                   ? constant_pmc_new_noinit(interp, enum_class_Hash)
                   : pmc_new_noinit(interp, enum_class_Hash);
 
-    hash = parrot_create_hash(interp, 
+    hash = parrot_create_hash(interp,
             enum_type_INTVAL, Hash_key_type_int, int_compare, key_hash_int);
     PMC_struct_val(h) = hash;
     hash->container   = h;
