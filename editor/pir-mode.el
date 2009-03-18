@@ -156,7 +156,7 @@ newline or semicolon after an end keyword."
     "ParrotRunningThread" "ParrotThread" "Pointer" "Random" "Ref"
     "ResizableBooleanArray" "ResizableFloatArray" "ResizableIntegerArray"
     "ResizablePMCArray" "ResizableStringArray" "RetContinuation"
-    "Role" "Scalar" "SharedRef" "Slice" "String" "Sub" "Super"
+    "Role" "Scalar" "SharedRef" "String" "Sub" "Super"
     "Timer" "UnManagedStruct" "Undef" "VtableCache"))
 
 (defvar pir-ops

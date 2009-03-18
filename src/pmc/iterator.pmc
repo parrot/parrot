@@ -402,20 +402,13 @@ Reset the Iterator. C<value> must be one of
         /* reset iterator on aggregate */
         agg = SELF.get_pmc();
 
-        if (agg->vtable->base_type == enum_class_Slice) {
-            /* it's an xrange serving as its own aggregate */
-            SET_ATTR_key(INTERP, SELF,
-                VTABLE_nextkey_keyed(INTERP, agg, NULL, value));
-        }
-        else {
-            PMC *key;
-            GET_ATTR_key(INTERP, SELF, key);
-            if (PMC_is_null(INTERP, key))
-                key = key_new(INTERP);
+        PMC *key;
+        GET_ATTR_key(INTERP, SELF, key);
+        if (PMC_is_null(INTERP, key))
+            key = key_new(INTERP);
 
-            SET_ATTR_key(INTERP, SELF,
+        SET_ATTR_key(INTERP, SELF,
                 VTABLE_nextkey_keyed(INTERP, key, agg, value));
-        }
     }
 
 /*

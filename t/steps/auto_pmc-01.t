@@ -210,7 +210,6 @@ my @dummy_options = qw(
     role.pmc
     scalar.pmc
     scheduler.pmc
-    slice.pmc
     task.pmc
     undef.pmc
 );

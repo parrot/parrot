@@ -3961,8 +3961,6 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
         opcode_t        op;
 
         type &= ~PF_VT_SLICE_BITS;
-        if (!head && slice_bits)
-            pmc_enum = enum_class_Slice;
 
         if (tail) {
             SETATTR_Key_next_key(interp, tail, constant_pmc_new(interp, pmc_enum));

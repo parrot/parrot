@@ -368,7 +368,7 @@ class ArgGenerator:
 
 class PMCTypeGenerator:
     pmc_list = []
-    pmc_blacklist = ['Slice']
+    pmc_blacklist = []
 
     def populatePMCList(self, parrot_root):
         pmc_pm = parrot_root + "/lib/Parrot/PMC.pm"
