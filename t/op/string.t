@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 162;
+use Parrot::Test tests => 163;
 use Parrot::Config;
 
 =head1 NAME
@@ -1299,6 +1299,18 @@ pir_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat 
     repeat $P1, $P0, -1
 .end
 CODE
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'encodingname OOB' );
+.sub main
+    $I0 = -1
+
+    $S0 = encodingname -1
+    $S0 = encodingname $I0
+    say 'ok'
+.end
+CODE
+ok
+OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 3-arg form' );
       set S0, "Parrot"

@@ -229,7 +229,8 @@ STRING*
 Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
     ASSERT_ARGS(Parrot_encoding_name)
-    if (number_of_encoding >= all_encodings->n_encodings)
+    if (number_of_encoding >= all_encodings->n_encodings ||
+        number_of_encoding < 0)
         return NULL;
     return all_encodings->enc[number_of_encoding].name;
 }
@@ -275,7 +276,8 @@ const char *
 Parrot_encoding_c_name(SHIM_INTERP, INTVAL number_of_encoding)
 {
     ASSERT_ARGS(Parrot_encoding_c_name)
-    if (number_of_encoding >= all_encodings->n_encodings)
+    if (number_of_encoding >= all_encodings->n_encodings ||
+        number_of_encoding < 0)
         return NULL;
     return all_encodings->enc[number_of_encoding].encoding->name;
 }
