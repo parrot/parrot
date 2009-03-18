@@ -1,5 +1,10 @@
 # $Id$
 
+New in 1.1.0
+- Deprecations
+  + Removed deprecated/experimental ops: gcd, exec, classname, need_finalize,
+    runinterp, substr_r
+
 New in 1.0.0
 - Documentation
   + New user documentation for exceptions.
