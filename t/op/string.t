@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 161;
+use Parrot::Test tests => 160;
 use Parrot::Config;
 
 =head1 NAME
@@ -2030,32 +2030,6 @@ ok 3
 ok 4
 OUTPUT
 }
-
-pasm_output_is( <<'CODE', <<'OUTPUT', 'experimental opcode substr_r_s_s|sc_i|ic_i|ic' );
-    set S4, "12345JAPH01"
-    set I4, 5
-    set I5, 4
-    substr_r    S5, S4, I4, I5
-    print   S5
-    substr_r S5, S4, I4, 4
-    print  S5
-    substr_r S5, S4, 5, I5
-    print  S5
-    substr_r S5, S4, 5, 4
-    print  S5
-    substr_r S5, "12345JAPH01", I4, I5
-    print  S5
-    substr_r S5, "12345JAPH01", I4, 4
-    print  S5
-    substr_r S5, "12345JAPH01", 5, I5
-    print  S5
-    substr_r S5, "12345JAPH01", 5, 4
-    print  S5
-    print  "\n"
-    end
-CODE
-JAPHJAPHJAPHJAPHJAPHJAPHJAPHJAPH
-OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'assign' );
     set S4, "JAPH\n"

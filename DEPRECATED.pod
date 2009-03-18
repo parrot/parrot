@@ -81,7 +81,7 @@ L<https://trac.parrot.org/parrot/ticket/449>
 
 =item experimental ops [eligible in 1.1]
 
-F<src/ops/experimental.ops>
+F<src/ops/experimental.ops> - only the C<trap> opcode remains
 
 =item myops & dan ops [eligible in 1.1]
 

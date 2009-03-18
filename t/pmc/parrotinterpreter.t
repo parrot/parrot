@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 5;
+use Parrot::Test tests => 2;
 
 =head1 NAME
 
@@ -30,68 +30,6 @@ pir_output_is( <<'CODE', <<'OUT', 'create new interpreter' );
 .end
 CODE
 ok 1
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'run passed code pmc in another interpreter' );
-.sub main :main
-    $S0 = <<"PIR"
-.sub test :main
-    print "Hello, world\\n"
-.end
-PIR
-    # Compile it.
-    $P0 = compreg "PIR"
-    $P1 = $P0($S0)
-    # Invoke in different interpreter.
-    $P2 = new ['ParrotInterpreter']
-    runinterp $P2, $P1
-    print "survived\n"
-.end
-CODE
-Hello, world
-survived
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'running passed code pmc in another interpreter' );
-.sub 'main' :main
-     $S0 = <<'PIR'
- .sub 'main' :main
-     say "help, i'm stuck inside an interpreter!"
- .end
-PIR
-     $P0 = new ['ParrotInterpreter']
-     $P1 = compreg 'PIR'
-     $P2 = $P1($S0)
-     runinterp $P0, $P2
-     say "nobody cares."
-     end
- .end
-CODE
-help, i'm stuck inside an interpreter!
-nobody cares.
-OUT
-
-pir_output_is( <<'CODE', <<'OUT', 'accessing PMCs from nested interp' );
-.sub 'main' :main
-     $S0 = <<'PIR'
- .sub 'main' :main
-     $P0 = get_global 'some_string'
-    $P0 = 'Accessing globals from other interpreters.'
- .end
-PIR
-     $P3 = new ['String']
-     set_global 'some_string', $P3
-
-     $P0 = new ['ParrotInterpreter']
-     $P1 = compreg 'PIR'
-     $P2 = $P1($S0)
-     runinterp $P0, $P2
-     $S1 = $P3
-     say $S1
-     end
- .end
-CODE
-Accessing globals from other interpreters.
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'setting HLL map dynamically' );

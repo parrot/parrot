@@ -148,9 +148,19 @@ sub prepare_ops {
         my $temp_ops = Parrot::OpsFile->new( [$f], $self->{nolines} );
         die "$self->{script}: Could not read ops file '$f'!\n"
             unless defined $temp_ops;
-        die "OPS invalid for $f" unless ref $temp_ops->{OPS};
 
         my $experimental = $f =~ /experimental/;
+
+        if (! ref $temp_ops->{OPS}) {
+            my $message = "OPS invalid for $f";
+            if ($experimental) {
+                # empty experimental.ops file is OK.
+                warn $message;
+                next;
+            } else {
+                die $message;
+            }
+        }
 
         # mark experimental ops
         if ($experimental) {
