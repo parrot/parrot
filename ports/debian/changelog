@@ -2,6 +2,7 @@ parrot (1.0.0-1) unstable; urgency=low
   * New upstream release
   * debian/control.in:
     - Updated Description of all packages.
+    - Bumped Standards-Version to 3.8.1
   * debian/copyright:
     - Changed copyright holder to Parrot Foundation, reflecting change in
       distribution.
