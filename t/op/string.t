@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 160;
+use Parrot::Test tests => 162;
 use Parrot::Config;
 
 =head1 NAME
@@ -1277,6 +1277,27 @@ OUTPUT
 pasm_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB' );
     repeat S0, "japh", -1
     end
+CODE
+
+pir_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB, repeat_p_p_p' );
+.sub main
+    $P0 = new ['String']
+    $P1 = new ['String']
+    $P2 = new ['Integer']
+
+    $P2 = -1
+
+    repeat $P1, $P0, $P2
+.end
+CODE
+
+pir_error_output_like( <<'CODE', qr/Cannot repeat with negative arg\n/, 'repeat OOB, repeate_p_p_i' );
+.sub main
+    $P0 = new ['String']
+    $P1 = new ['String']
+
+    repeat $P1, $P0, -1
+.end
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', 'index, 3-arg form' );
