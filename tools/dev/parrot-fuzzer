@@ -253,18 +253,7 @@ class ArgGenerator:
         pir_preamble = ""
         self.args['s'] = []
         for n in range(self.arg_counts['s']):
-            str_val = ''
-            chars = string.printable + string.punctuation + string.whitespace
-            str_len = random.randint(0,10)
-            for m in range(str_len):
-                char = chars[random.randint(0, len(chars)-1)]
-                if char == '"':
-                    char = '\\"'
-                if char == '\\':
-                    char = '\\\\'
-                if char == '\n' or char == '\r':
-                    char = ''
-                str_val += char
+            str_val = self.getString()
             pir_preamble += "    $S" + str(n) + " = \"" + str_val + "\"\n"
             self.args['s'].append('$S' + str(n))
         return pir_preamble
@@ -322,7 +311,7 @@ class ArgGenerator:
         pir_preamble = ""
         self.args['sc'] = []
         for n in range(self.arg_counts['sc']):
-            self.args['sc'].append('"Fooooo'+str(n)+'"')
+            self.args['sc'].append('"'+self.getString()+'"')
         return pir_preamble
 
     def generateIntConstArgs(self):
@@ -366,6 +355,21 @@ class ArgGenerator:
             self.args['nc'].append(str(num_val))
         return pir_preamble
 
+    def getString(self):
+        str_val = ''
+        chars = string.printable + string.punctuation + string.whitespace
+        str_len = random.randint(0,10)
+        for m in range(str_len):
+            char = chars[random.randint(0, len(chars)-1)]
+            if char == '"':
+                char = '\\"'
+            if char == '\\':
+                char = '\\\\'
+            if char == '\n' or char == '\r':
+                char = ''
+            str_val += char
+        return str_val
+
 class PMCTypeGenerator:
     pmc_list = []
     pmc_blacklist = []
@@ -387,7 +391,7 @@ class PMCTypeGenerator:
 class OpfuncGenerator:
     opfunc_list = []
     opfunc_blacklist = [
-            'branch_cs', #known to segfault
+            'branch_cs', # TT# 470 - known to segfault
             'check_events', #only for testing
             'check_events__', #not for direct use
             'clears', #clearing all [SPIN] registers isn't useful
@@ -402,7 +406,6 @@ class OpfuncGenerator:
             'debug_print',
             'die',
             'enternative',
-            'exec',
             'exit',
             'gc_debug',
             'if',
@@ -417,6 +420,8 @@ class OpfuncGenerator:
             'profile',
             'push_eh',
             'returncc',
+            'rethrow',
+            'runinterp',
             'setn_ind',
             'sets_ind',
             'seti_ind',
