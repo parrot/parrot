@@ -68,7 +68,7 @@ C<--switched-core> and C<--profile>.
 Generate this number of instructions during test run.  The default is 3.  Note
 that a larger number such as 20 does not necessarily result in more failures.
 
-=back 4
+=back
 
 =cut
 
