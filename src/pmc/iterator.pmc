@@ -395,6 +395,7 @@ Reset the Iterator. C<value> must be one of
 
     VTABLE void set_integer_native(INTVAL value) {
         PMC *agg;
+        PMC *key;
         if (value < ITERATE_FROM_START || value > ITERATE_FROM_END)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Illegal set_integer on iterator");
@@ -402,7 +403,6 @@ Reset the Iterator. C<value> must be one of
         /* reset iterator on aggregate */
         agg = SELF.get_pmc();
 
-        PMC *key;
         GET_ATTR_key(INTERP, SELF, key);
         if (PMC_is_null(INTERP, key))
             key = key_new(INTERP);
