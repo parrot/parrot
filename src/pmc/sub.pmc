@@ -121,7 +121,10 @@ Sets the name of the subroutine.
     VTABLE STRING *get_string() {
         Parrot_sub *sub;
         PMC_get_sub(INTERP, SELF, sub);
-        return Parrot_str_copy(INTERP, sub->name);
+        if (sub->name != NULL) {
+            return Parrot_str_copy(INTERP, sub->name);
+        }
+        return NULL;
     }
 
     VTABLE void set_string_native(STRING *subname) {

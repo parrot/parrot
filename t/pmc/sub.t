@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 66;
+use Parrot::Test tests => 67;
 use Parrot::Config;
 
 =head1 NAME
@@ -1545,6 +1545,16 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'copy sub to self' );
 .end
 CODE
 no segfault
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'get_string null check' );
+.sub 'main'
+    $P0 = new ['Sub']
+    $S0 = $P0
+    say 'ok'
+.end
+CODE
+ok
 OUTPUT
 
 # Local Variables:
