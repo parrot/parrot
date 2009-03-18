@@ -34,7 +34,7 @@ use GenerateCore qw|
 |;
 use IO::CaptureOutput qw | capture |;
 
-my @dynopsfiles = qw( src/dynoplibs/dan.ops src/dynoplibs/myops.ops );
+my @dynopsfiles = qw( src/dynoplibs/myops.ops );
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
@@ -59,16 +59,12 @@ my ( $msg, $tie );
     test_dynops( [qw( CGP      myops.ops )] );
     test_dynops( [qw( C        myops.ops )] );
     test_dynops( [qw( CSwitch  myops.ops )] );
-    test_dynops( [qw( CGoto    dan.ops )] );
-    test_dynops( [qw( CGP      dan.ops )] );
-    test_dynops( [qw( C        dan.ops )] );
-    test_dynops( [qw( CSwitch  dan.ops )] );
 
     {
         my ($self, $stdout, $stderr);
         capture(
             sub { $self = Parrot::Ops2c::Utils->new( {
-                        argv => [qw( CSwitch  dan.ops dan.ops )],
+                        argv => [qw( CSwitch  myops.ops myops.ops )],
                         flag => { dynamic => 1 },
                 } ); },
             \$stdout,
@@ -77,7 +73,7 @@ my ( $msg, $tie );
         ok( defined $self,
             "Constructor correctly returned when provided >= 1 arguments" );
         like( $stderr,
-            qr/Ops file 'dan\.ops' mentioned more than once!/, "Error message is correct" );
+            qr/Ops file 'myops\.ops' mentioned more than once!/, "Error message is correct" );
 
         my $c_header_file = $self->print_c_header_file();
         ok( -e $c_header_file, "$c_header_file created" );

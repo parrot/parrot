@@ -32,7 +32,7 @@ use GenerateCore qw|
     $num
     $skip
 |;
-my @dynopsfiles = qw( src/dynoplibs/dan.ops src/dynoplibs/myops.ops );
+my @dynopsfiles = qw( src/dynoplibs/myops.ops );
 
 ok( chdir $main::topdir, "Positioned at top-level Parrot directory" );
 my $cwd = cwd();
@@ -56,10 +56,6 @@ my $cwd = cwd();
     test_dynops_nolines( [qw( CGP      myops.ops )] );
     test_dynops_nolines( [qw( C        myops.ops )] );
     test_dynops_nolines( [qw( CSwitch  myops.ops )] );
-    test_dynops_nolines( [qw( CGoto    dan.ops )] );
-    test_dynops_nolines( [qw( CGP      dan.ops )] );
-    test_dynops_nolines( [qw( C        dan.ops )] );
-    test_dynops_nolines( [qw( CSwitch  dan.ops )] );
 
     ok( chdir($cwd), "returned to starting directory" );
 }
