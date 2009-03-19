@@ -226,7 +226,7 @@ newline or semicolon after an end keyword."
     ":slurpy" ":unique_reg" ":vtable" ":wrap"))
 
 (defvar pir-dotted-directives
-  '(".HLL" ".HLL_map" ".arg" ".const" ".constant" ".emit" ".end" ".endm"
+  '(".HLL" ".arg" ".const" ".constant" ".emit" ".end" ".endm"
     ".endnamespace" ".eom" ".get_results" ".global" ".globalconst"
     ".include" ".invocant" ".lex" ".line" ".loadlib" ".macro" ".meth_call"
     ".namespace" ".nci_call" ".pcc_begin" ".pcc_begin_return"
