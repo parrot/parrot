@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Copyright (C) 2009, Parrot Foundation
-# $id$
+# $Id$
 
 from fusil.application    import Application
 from fusil.process.watch  import WatchProcess
