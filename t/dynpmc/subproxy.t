@@ -11,7 +11,7 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/dynpmc/subproxy.t - test if Sub is overridable by .HLL_map
+t/dynpmc/subproxy.t - test if Sub is overridable via hll_map()
 
 =head1 SYNOPSIS
 
@@ -19,8 +19,8 @@ t/dynpmc/subproxy.t - test if Sub is overridable by .HLL_map
 
 =head1 DESCRIPTION
 
-Tests the .HLL_map of Sub PMCs. The test is using .SubProxy, which
-happens to be a .Sub.
+Tests the hll mapping of Sub PMCs. The test is using SubProxy, which
+happens to be a Sub.
 
 =cut
 
@@ -38,16 +38,15 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "test type of HLL_mapped .Sub" );
+pir_output_is( << 'CODE', << 'OUTPUT', "test type of hll_map'ped .Sub" );
 .sub main :main
-    .const 'Sub' b = 'bar'
+    .local pmc b, f
+    b = get_global 'bar'
     $S0 = typeof b
-    print $S0
-    print "\n"
-    .const 'Sub' f = 'foo'
+    say $S0
+    f = get_root_global ['some'], 'foo'
     $S0 = typeof f
-    print $S0
-    print "\n"
+    say $S0
 .end
 
 .sub bar
@@ -56,7 +55,14 @@ pir_output_is( << 'CODE', << 'OUTPUT', "test type of HLL_mapped .Sub" );
 
 .HLL "Some"
 .loadlib "subproxy"
-.HLL_map "Sub" = "SubProxy"
+.sub load :anon :immediate
+    .local pmc interp
+    .local pmc sub,subproxy
+    interp = getinterp
+    sub = get_class 'Sub'
+    subproxy = get_class 'SubProxy'
+    interp.'hll_map'(sub,subproxy)
+.end
 
 .sub foo
     noop
