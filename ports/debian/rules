@@ -10,11 +10,12 @@ else
 	CFLAGS += -O2
 endif
 
-debian/control: debian/control.in VERSION
-	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' $< > $@
+debian-control-stamp: debian/control.in VERSION
+	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' $< > debian/control
+	touch $@
 
-configure: debian/control configure-stamp
-configure-stamp:
+configure: configure-stamp
+configure-stamp: debian-control-stamp
 	dh_testdir
 	perl Configure.pl --prefix=/usr
 	touch configure-stamp

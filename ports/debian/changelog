@@ -3,6 +3,9 @@ parrot (1.0.0-1) unstable; urgency=low
   * debian/control.in:
     - Updated Description of all packages.
     - Bumped Standards-Version to 3.8.1
+  * debian/rules:
+    - Integrate Ubuntu packaging changes to automatically generate
+      debian/control.
   * debian/copyright:
     - Changed copyright holder to Parrot Foundation, reflecting change in
       distribution.
