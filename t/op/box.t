@@ -18,7 +18,7 @@ Tests all box operators.
 
 .const int TESTS = 24
 
-# must set these up before the .HLL_map statements later
+# must set these up before the hll_map calls later
 .sub '__setup' :immediate
     $P0 = subclass 'Integer', 'MyInt'
     $P0 = subclass 'String',  'MyString'
@@ -93,10 +93,25 @@ Tests all box operators.
 .end
 
 .HLL 'for_test'
+.sub anon :anon :init
+  .local pmc interp
+  .local pmc cint, myint
+  .local pmc cstr, mystr
+  .local pmc cnum, mynum
+  interp = getinterp
 
-.HLL_map 'Integer' = 'MyInt'
-.HLL_map 'String'  = 'MyString'
-.HLL_map 'Float'   = 'MyFloat'
+  cint  = get_class 'Integer'
+  myint = get_class 'MyInt'
+  interp.'hll_map'(cint,myint)
+
+  cstr  = get_class 'String'
+  mystr = get_class 'MyString'
+  interp.'hll_map'(cstr,mystr)
+
+  cnum  = get_class 'Float'
+  mynum = get_class 'MyFloat'
+  interp.'hll_map'(cnum,mynum)
+.end
 
 .sub 'box_int'
     .include 'include/test_more.pir'
