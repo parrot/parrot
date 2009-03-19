@@ -10,8 +10,19 @@ else
 	CFLAGS += -O2
 endif
 
-debian-control-stamp: debian/control.in VERSION
-	perl -p -e 's/%SOVERSION%/$(SOVERSION)/g' $< > debian/control
+CONTROL_FILES = \
+  debian/control.in \
+  debian/parrot.install.in \
+  debian/parrot-doc.install.in \
+  debian/libparrot-dev.install.in
+
+debian-control-stamp: $(CONTROL_FILES) VERSION
+	for infile in $(CONTROL_FILES); do \
+	    outfile=`echo $$infile | sed "s/\.in$$//"`; \
+	    sed -e "s/@VERSION@/$(VERSION)/g" \
+	        -e "s/@SOVERSION@/$(SOVERSION)/g" \
+	            <$$infile >$$outfile; \
+	done
 	touch $@
 
 configure: configure-stamp
