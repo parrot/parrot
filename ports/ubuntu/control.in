@@ -8,13 +8,21 @@ Standards-Version: 3.8.0
 
 Package: parrot
 Architecture: any
-Depends: ${shlibs:Depends}
+Depends: parrot-minimal (= ${binary:Version})
 Suggests: parrot-doc
-Recommends: perl
+Provides: parrot-test, parrot-data-dumper
 Description: Virtual machine for dynamic languages
  Parrot is a bytecode-based virtual machine designed for dynamic languages.
  Parrot hosts a variety of language implementations, including Tcl, Javascript,
  Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
+
+Package: parrot-minimal
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: A minimal install of the Parrot VM
+ This package contains the core Parrot virtual machine. It's all that you need
+ to get up and running in the average use case, and is sufficient to run most
+ language implementations.
 
 Package: libparrot%SOVERSION%
 Architecture: any
@@ -41,3 +49,13 @@ Description: Parrot documentation
  Parrot manual pages and raw Pod documentation. If you are developing a
  compiler or extensions for Parrot, you will need this. If you're only using a
  Parrot hosted language, the language-specific documentation is sufficient.
+
+Package: parrot-devel
+Architecture: any
+Section: universe/devel
+Depends: parrot, perl
+Provides: parrot-pge, parrot-tge, parrot-pct, parrot-nqp
+Description: Parrot development tools
+ This package contains development tools for the Parrot virtual machine. It is
+ essential for developing language implementations to run on Parrot, but not
+ needed for running languages once they've been installed.
