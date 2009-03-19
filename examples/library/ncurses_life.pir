@@ -280,7 +280,7 @@ printloop:
     # TODO skip unprintable out of screen
     if CHARACTER_OFFSET >= total goto dumpend
 
-    substr_r $S0, world, CHARACTER_OFFSET, 1
+    substr $S0, world, CHARACTER_OFFSET, 1
     if $S0 != "*" goto incit
 
     X_COORD = CHAR_POS % size
@@ -391,7 +391,7 @@ NW:
     check %= len
 
     # $S0 is always overwritten, so reuse it
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto North
     inc count
 
@@ -401,7 +401,7 @@ North:
     check += pos
     check %= len
 
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto NE
     inc count
 
@@ -412,7 +412,7 @@ NE:
     check += pos
     check %= len
 
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto West
     inc count
 West:
@@ -421,7 +421,7 @@ West:
     check += pos
     check %= len
 
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto East
     inc count
 
@@ -431,7 +431,7 @@ East:
     check += pos
     check %= len
 
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto SW
     inc count
 
@@ -441,7 +441,7 @@ SW:
     check += pos
     check %= len
 
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto South
     inc count
 
@@ -451,7 +451,7 @@ South:
     check += pos
     check %= len
 
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto SE
     inc count
 SE:
@@ -460,12 +460,12 @@ SE:
     check += pos
     check %= len
 
-    substr_r $S0, world, check, 1
+    substr $S0, world, check, 1
     if $S0 != "*" goto checkl
     inc count
 
 checkl:
-    substr_r $S0, world, pos, 1
+    substr $S0, world, pos, 1
     if $S0 == "*" goto check_alive
 
 # If eq 3, put a star in else a space

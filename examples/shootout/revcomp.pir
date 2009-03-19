@@ -76,7 +76,7 @@ done:
 	i = 0
 	$S0 = 'x'
 print_loop:
-	$S0 = substr_r line, i, 60
+	$S0 = substr line, i, 60
 	print $S0
 	print "\n"
 	i += 60
