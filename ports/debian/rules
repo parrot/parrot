@@ -94,9 +94,9 @@ binary-arch: build install
 	dh_strip -a
 	dh_compress -a
 	dh_fixperms -a
-	dh_installdeb -a
 	dh_makeshlibs -plibparrot$(SOVERSION)
 	dh_shlibdeps -a -Llibparrot$(SOVERSION) -l$(CURDIR)/debian/libparrot$(SOVERSION)/usr/lib
+	dh_installdeb -a
 	dh_gencontrol -a
 	dh_md5sums -a
 	dh_builddeb -a

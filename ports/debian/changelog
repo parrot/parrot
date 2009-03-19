@@ -6,10 +6,16 @@ parrot (1.0.0-1) unstable; urgency=low
   * debian/rules:
     - Integrate Ubuntu packaging changes to automatically generate
       debian/control.
+    - Re-order dh_installdeb in binary-arch to run after dh_makeshlibs and
+      shlibdeps so that the library gets installed properly (patch from David
+      Nusinow)
   * debian/copyright:
     - Changed copyright holder to Parrot Foundation, reflecting change in
       distribution.
     - Removed copyright info for files no longer in distribution.
+  * libparrot.postinst
+    - Added so ldconfig gets called properly by dh_makeshlibs (patch from
+      David Nusinow)
 
  -- Allison Randal <allison@parrot.org>  Tue, 17 Mar 2009 22:48:45 -0700
 
