@@ -15,6 +15,12 @@ parrot (1.0.0-1) unstable; urgency=low
 
  -- Allison Randal <allison@parrot.org>  Sun, 15 Mar 2009 05:57:31 +0000
 
+parrot (0.9.0-1ubuntu1) intrepid; urgency=low
+
+  * New upstream release.
+
+ -- Allison Randal <allison@parrot.org>  Tue, 03 Feb 2009 23:21:12 +0000
+
 parrot (0.9.0-1) unstable; urgency=low
 
   * New upstream release
@@ -34,6 +40,12 @@ parrot (0.9.0-1) unstable; urgency=low
     - Updated copyright years.
 
  -- Allison Randal <allison@parrot.org>  Fri, 23 Jan 2009 15:16:25 -0800
+
+parrot (0.8.1-0ubuntu1) intrepid; urgency=low
+
+  * New upstream release
+
+ -- Allison Randal <allison@parrot.org>  Fri, 12 Dec 2008 16:40:43 +0800
 
 parrot (0.7.0-1) unstable; urgency=low
 
