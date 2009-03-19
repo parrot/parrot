@@ -38,14 +38,16 @@ ok
 OUTPUT
 
 my $loadlib = <<'EOC';
-#
-# the .loadlib directive gets run before the .HLL_map below is parsed,
-# therefore the .DynLexPad constant is already available
-#
 .loadlib "dynlexpad"
 
 .HLL "Some"
-.HLL_map "LexPad" = "DynLexPad"
+.sub load :anon :init
+  .local pmc interp, lexpad, dynlexpad
+  interp = getinterp
+  lexpad = get_class 'LexPad'
+  dynlexpad = get_class 'DynLexPad'
+  interp.'hll_map'(lexpad, dynlexpad)
+.end
 
 EOC
 
