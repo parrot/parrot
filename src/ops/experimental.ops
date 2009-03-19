@@ -51,6 +51,8 @@ op trap() :deprecated {
 #endif
 }
 
+=back
+
 =head1 COPYRIGHT
 
 Copyright (C) 2001-2009, Parrot Foundation.
