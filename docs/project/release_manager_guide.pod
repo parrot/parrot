@@ -168,12 +168,11 @@ Make sure everything works:
 
 =item 7.
 
-Tag the release as "RELEASE_a_b_c", where a.b.c is the version number. If
-you're working in trunk, be sure to specify the revision number generated
-in step 3, above.
+Tag the release as "RELEASE_a_b_c", where a.b.c is the version number.
+Specify the revision number generated in step 3, above.
 
  $ export SVNPARROT=https://svn.parrot.org/parrot
- $ svn copy -m "tagged release a.b.c" \
+ $ svn copy -r <REV> -m "tagged release a.b.c" \
    $SVNPARROT/trunk $SVNPARROT/tags/RELEASE_a_b_c
 
 =item 8.
@@ -195,7 +194,7 @@ create the new directory in F<~/ftp/releases/stable> instead.
 
 Copy the tarball from your machine into the new directory.
 
- $ scp parrot-a.b.c.tar.gz ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
+ $ scp parrot-a.b.c.tar.gz <USERNAME>@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/.
 
 (Or using C<wget> or whatever tool you prefer.)
 
