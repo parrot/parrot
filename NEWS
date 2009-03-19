@@ -4,6 +4,7 @@ New in 1.1.0
 - Deprecations
   + Removed ops: gcd, exec, classname, need_finalize, runinterp, substr_r
   + Removed dynamic op: mul 
+  + Removed .HLL_map directive; use interp's .hll_map() instead
 
 New in 1.0.0
 - Documentation

@@ -165,15 +165,6 @@ if the arg is a Namespace or Class PMC
 
 L<https://trac.parrot.org/parrot/ticket/159>
 
-=item C<.HLL_map> [eligible in 1.1]
-
-Languages should use this instead:
-
-  $P0 = getinterp
-  $P0.'hll_map'(TypeA, TypeB)
-
-L<https://trac.parrot.org/parrot/ticket/314>
-
 =back
 
 =head1 Functions

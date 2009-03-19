@@ -820,7 +820,7 @@ do_loadlib(PARROT_INTERP, ARGIN(const char *lib))
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> HLL HLL_MAP TK_LINE TK_FILE
+%token <t> HLL TK_LINE TK_FILE
 %token <t> GOTO ARG IF UNLESS PNULL SET_RETURN SET_YIELD
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> NEW ADV_INVOCANT
@@ -973,21 +973,6 @@ hll_def:
                 Parrot_register_HLL(interp, hll_name);
 
             IMCC_INFO(interp)->cur_namespace = NULL;
-            $$ = 0;
-         }
-   | HLL_MAP STRINGC '=' STRINGC
-         {
-            Parrot_Context *ctx           = CONTEXT(interp);
-            STRING * const  built_in_name =
-                Parrot_str_unescape(interp, $2 + 1, '"', NULL);
-            STRING * const language_name  =
-                Parrot_str_unescape(interp, $4 + 1, '"', NULL);
-
-            int             built_in_type = pmc_type(interp, built_in_name);
-            int             language_type = pmc_type(interp, language_name);
-
-            Parrot_register_HLL_type(interp, ctx->current_HLL,
-                built_in_type, language_type);
             $$ = 0;
          }
    ;

@@ -329,28 +329,6 @@ loaded again in C<:load>, so there is no need to call C<loadlib> at runtime.
 Define the HLL namespace from that point on in the file. Takes one string
 constant, the name of the HLL. By default, the HLL namespace is 'parrot'.
 
-=item .HLL_map <core_type> = <user_type>
-
-Whenever Parrot has to create PMCs inside C code on behalf of the running
-user program, it consults the current type mapping for the executing HLL
-and creates a PMC of type I<user_type> instead of I<core_type>, if such
-a mapping is defined. I<core_type> and I<user_type> may be any valid string
-constant.
-
-For example, with this code snippet:
-
-  .loadlib 'dynlexpad'
-
-  .HLL 'Foo'
-  .HLL_map 'LexPad' = 'DynLexPad'
-
-  .sub main :main
-    ...
-
-all subroutines for language I<Foo> would use a dynamic lexpad pmc.
-
-{{ .HLL_map is deprecated. See TT#314 }}
-
 =item .line <integer>
 
 Set the current PIR line number to the value specified. This is useful in
