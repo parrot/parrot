@@ -87,7 +87,6 @@ Parrot Options:
    --floatval=(type)    Use the given type for FLOATVAL
    --opcode=(type)      Use the given type for opcodes
    --ops=(files)        Use the given ops files
-   --pmc=(files)        Use the given PMC files
 
    --cgoto=0            Don't build cgoto core - recommended when short of mem
    --jitcapable         Use JIT

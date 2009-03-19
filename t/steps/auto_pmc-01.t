@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests =>  32;
+use Test::More tests =>  28;
 use Carp;
 use Cwd;
 use File::Path qw| mkpath |;
@@ -140,92 +140,6 @@ my $cwd = cwd();
 
     ok( chdir $cwd, 'changed back to original directory after testing' );
 }
-
-$conf->replenish($serialized);
-
-########## --pmc ##########
-# What happens when user tells Configure.pl to use only 
-# specified PMCs to build Parrot?
-###########################
-
-my @dummy_options = qw(
-    default.pmc
-    null.pmc
-    env.pmc
-    key.pmc
-    random.pmc
-    unmanagedstruct.pmc
-    managedstruct.pmc
-    exception.pmc
-    parrotlibrary.pmc
-    parrotinterpreter.pmc
-    parrotthread.pmc
-    lexpad.pmc
-    timer.pmc
-    pointer.pmc
-    sub.pmc
-    continuation.pmc
-    retcontinuation.pmc
-    exceptionhandler.pmc
-    coroutine.pmc
-    eval.pmc
-    nci.pmc
-    float.pmc
-    integer.pmc
-    bigint.pmc
-    complex.pmc
-    string.pmc
-    boolean.pmc
-    ref.pmc
-    sharedref.pmc
-    array.pmc
-    fixedintegerarray.pmc
-    iterator.pmc
-    fixedstringarray.pmc
-    hash.pmc
-    orderedhash.pmc
-    os.pmc
-    file.pmc
-    addrregistry.pmc
-    bound_nci.pmc
-    capture.pmc
-    class.pmc
-    codestring.pmc
-    exporter.pmc
-    fixedbooleanarray.pmc
-    fixedfloatarray.pmc
-    fixedpmcarray.pmc
-    lexinfo.pmc
-    multisub.pmc
-    namespace.pmc
-    object.pmc
-    parrotrunningthread.pmc
-    pccmethod_test.pmc
-    pmcproxy.pmc
-    resizablebooleanarray.pmc
-    resizablefloatarray.pmc
-    resizableintegerarray.pmc
-    resizablepmcarray.pmc
-    resizablestringarray.pmc
-    role.pmc
-    scalar.pmc
-    scheduler.pmc
-    task.pmc
-    undef.pmc
-);
-my $dummy_options = join q{ } => @dummy_options;
-
-($args, $step_list_ref) = process_options(
-    {
-        argv => [ qq{--pmc=$dummy_options} ],
-        mode => q{configure},
-    }
-);
-
-$conf->options->set( %{$args} );
-$step = test_step_constructor_and_description($conf);
-$ret = $step->runstep($conf);
-ok( $ret, "runstep() returned true value" );
 
 pass("Completed all tests in $0");
 

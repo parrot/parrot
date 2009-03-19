@@ -311,10 +311,6 @@ Use the given type for opcodes.
 
 Use the given ops files.
 
-=item C<--pmc=(files)>
-
-Use the given PMC files.
-
 =item C<--cgoto=0>
 
 Don't build cgoto core. This is recommended when you are short of memory.
@@ -585,7 +581,6 @@ configuration file.
     inter::encoding
     inter::types
     auto::ops
-    auto::pmc
     auto::alignptrs
     auto::headers
     auto::sizes

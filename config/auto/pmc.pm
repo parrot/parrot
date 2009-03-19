@@ -7,7 +7,7 @@ config/auto/pmc.pm - PMC Files
 
 =head1 DESCRIPTION
 
-Asks the user to select which PMC files to include.
+Prepare PMC files for inclusion.
 
 =cut
 
@@ -38,9 +38,7 @@ sub runstep {
 
     my @pmc = sort_pmcs( @{ $self->{srcpmc} } );
 
-    my $pmc_list = $conf->options->get('pmc')
-        ? $conf->options->get('pmc')
-        : join( ' ', grep { defined $_ } @pmc );
+    my $pmc_list = join( ' ', grep { defined $_ } @pmc );
 
     # names of class files for src/pmc/Makefile
     ( my $TEMP_pmc_o   = $pmc_list ) =~ s/\.pmc/\$(O)/g;
