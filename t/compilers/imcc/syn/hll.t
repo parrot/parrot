@@ -50,7 +50,6 @@ pir_output_is( <<'CODE', <<'OUT', ".param :slurpy (using object)", @todo );
 .end
 
 .HLL 'misc'
-.HLL_map 'ResizablePMCArray' = 'Stack'
 .sub anon :anon :init
   .local pmc interp
   .local pmc rpa,stack
