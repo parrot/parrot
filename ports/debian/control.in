@@ -16,7 +16,7 @@ Description: Virtual machine for dynamic languages
  Parrot hosts a variety of language implementations, including Tcl, Javascript,
  Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
 
-Package: libparrot%SOVERSION%
+Package: libparrot@SOVERSION@
 Architecture: any
 Section: libs
 Depends: ${shlibs:Depends}
@@ -29,7 +29,7 @@ Description: Parrot shared library
 Package: libparrot-dev
 Architecture: any
 Section: libdevel
-Depends: libparrot%SOVERSION% (= ${binary:Version}), parrot
+Depends: libparrot@SOVERSION@ (= ${binary:Version}), parrot
 Description: Parrot shared library development files
  This package contains files needed to develop applications which embed Parrot.
 
