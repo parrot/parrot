@@ -20,8 +20,8 @@ Package: parrot-minimal
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: A minimal install of the Parrot VM
- This package contains the core Parrot interpreter. It's all that you need to
- get up and running in the average use case, and is sufficient to run most
+ This package contains the core Parrot virtual machine. It's all that you need
+ to get up and running in the average use case, and is sufficient to run most
  language implementations.
 
 Package: libparrot@SOVERSION@
@@ -53,6 +53,7 @@ Description: Parrot documentation
 
 Package: parrot-devel
 Architecture: any
+Section: devel
 Depends: parrot, perl
 Provides: parrot-pge, parrot-tge, parrot-pct, parrot-nqp
 Description: Parrot development tools
