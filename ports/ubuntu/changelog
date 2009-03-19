@@ -79,6 +79,28 @@ parrot (0.5.1-1) unstable; urgency=low
 
  -- Allison Randal <allison@perl.org>  Sun, 30 Dec 2007 17:21:45 +0000
 
+parrot (0.4.13-1ubuntu3) hardy; urgency=low
+
+  * Replace libicu36-dev with libicu-dev.
+
+ -- Steve Kowalik <stevenk@ubuntu.com>  Sun, 16 Dec 2007 11:30:08 +1100
+
+parrot (0.4.13-1ubuntu2) gutsy; urgency=low
+
+  * Move debian/control generation to configure-stamp, since the configure
+    target isn't called by anything, and call it as a stamp target, so it
+    gets remade every time.
+
+ -- Steve Kowalik <stevenk@ubuntu.com>  Mon, 16 Jul 2007 00:59:22 +1000
+
+parrot (0.4.13-1ubuntu1) gutsy; urgency=low
+
+  * Merge from debian unstable, remaining changes:
+    - Depend on libicu36 and libicu36-dev
+    - Update maintainer field.
+
+ -- Luke Yelavich <themuso@ubuntu.com>  Mon,  9 Jul 2007 16:11:36 +1000
+
 parrot (0.4.13-1) unstable; urgency=low
 
   * New upstream release.
@@ -90,6 +112,12 @@ parrot (0.4.12-1) unstable; urgency=low
   * New upstream release.
 
  -- Florian Ragwitz <rafl@debian.org>  Mon, 18 Jun 2007 20:08:49 +0200
+
+parrot (0.4.6-1ubuntu1) feisty; urgency=low
+
+  * Depend on libicu36 and libicu36-dev
+
+ -- Vassilis Pandis <pandisv@yahoo.co.uk>  Wed, 31 Jan 2007 15:35:09 +0000
 
 parrot (0.4.6-1) unstable; urgency=low
 
