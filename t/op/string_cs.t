@@ -489,7 +489,7 @@ abcdefg
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 16 ) unless $PConfig{has_icu};
+    skip( 'no ICU lib', 17 ) unless $PConfig{has_icu};
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
 .sub main :main
     set $S0, iso-8859-1:"TÖTSCH"
