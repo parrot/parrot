@@ -1,6 +1,6 @@
-usr/bin/parrot
-usr/bin/pbc_disassemble
-usr/bin/pbc_dump
-usr/bin/pbc_info
-usr/bin/pbc_merge
-usr/lib/parrot/*
+usr/lib/parrot/@VERSION@/include/*
+usr/lib/parrot/@VERSION@/dynext/*
+usr/lib/parrot/@VERSION@/library/Test/*
+usr/lib/parrot/@VERSION@/library/Data/*
+usr/lib/parrot/@VERSION@/library/dumper.pir
+usr/lib/parrot/@VERSION@/library/dumper.pbc

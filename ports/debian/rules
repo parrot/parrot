@@ -13,7 +13,9 @@ endif
 CONTROL_FILES = \
   debian/control.in \
   debian/parrot.install.in \
+  debian/parrot-minimal.install.in \
   debian/parrot-doc.install.in \
+  debian/parrot-devel.install.in \
   debian/libparrot-dev.install.in
 
 debian-control-stamp: $(CONTROL_FILES) VERSION
@@ -48,7 +50,7 @@ build-stamp: configure-stamp
 clean:
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot_config.1 debian/pbc_dump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/nci_test.o src/main.o ext/Parrot-Embed/Makefile.PL languages/PIR/Makefile languages/perl5/Makefile languages/pynie/Makefile runtime/parrot/include/signal.pasm test.c test.ldo
+	rm -f build-stamp configure-stamp debian/parrot.1 debian/parrot_config.1 debian/pbc_dump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/main.o ext/Parrot-Embed/Makefile.PL test.c test.ldo
 	[ ! -f Makefile ] || $(MAKE) distclean
 	dh_clean 
 
@@ -63,9 +65,6 @@ install: build debian/libparrot$(SOVERSION).install
 	dh_installdirs
 	find $(CURDIR)/debian/tmp -type f
 	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
-	install -m755 $(CURDIR)/debian/tmp/usr/bin/parrot_debugger $(CURDIR)/debian/parrot/usr/bin/parrot-debugger
-	install -m644 src/null_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
-	install -m644 src/parrot_config.o $(CURDIR)/debian/libparrot-dev/usr/lib/parrot/config
 
 
 # Build architecture-independent files here.
