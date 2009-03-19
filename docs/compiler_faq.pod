@@ -36,8 +36,8 @@ This looks like a function call in many HLLs:
    $P0( $P1, $P2, $P3 )
 
 where $P0 is the function object, and $P1, $P2, and $P3 are its
-parameters. You can also use a function's label in place of the
-object:
+parameters. You can also use a function's name in place of the
+object, as long as it's in the same namespace.
 
    somefunctionlabel( $P1, $P2, $P3 )
 
