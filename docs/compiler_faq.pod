@@ -108,23 +108,29 @@ Then use the op C<newclosure> to capture the environment.
 Any subroutine that contains a C<.yield> directive is automatically
 created as a Coroutine PMC:
 
+=begin PIR
   .sub my_coro             # automagically a Coroutine PMC
-     ...
+     .param pmc result
+     #...
      .yield (result)
-     ...
+     #...
   .end
-
+=end PIR
 
 =head2 How do I generate a tail call in PIR?
 
+=begin PIR
   .sub foo
-      # do something
+      # ...
       .tailcall bar(42)           # tail call sub bar
   .end
 
   .sub bar
-      # ...
+      .param int answer
+      inc answer
+      .return(answer)
   .end
+=end PIR
 
 The sub C<bar> will return to the caller of C<foo>. (Warning! This fails
 in some cases. XXX Find the RT ticket and reference it here.)
