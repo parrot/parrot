@@ -10,7 +10,7 @@ has an associated Trac ticket [1].  Each item indicates the first release
 in which it is eligible for removal. If the release listed is one that
 has already occurred, this feature may be removed at any time.
 
-Following the 1.0 release, whenever deprecated items are removed, information
+Whenever deprecated items are removed, information
 regarding how to cope with the removal will be added to
 L<https://trac.parrot.org/parrot/wiki/Deprecation>.
 
