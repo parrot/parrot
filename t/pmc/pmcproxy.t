@@ -18,7 +18,7 @@ Tests the PMCProxy PMC.
 
 .sub main :main
     .include 'include/test_more.pir'
-    plan(44)
+    plan(45)
 
     new_tests()
     get_class_tests()
@@ -36,6 +36,9 @@ Tests the PMCProxy PMC.
     new $P0, ['PMCProxy']
     ok(1, "new PMCProxy didn't explode")
     isa_ok($P0, "PMCProxy")
+
+    $I0 = isa $P0, 'Foo'
+    is($I0, 0, "non-default isa on PMCProxy works")
 .end
 
 
