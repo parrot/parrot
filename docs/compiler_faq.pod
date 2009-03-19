@@ -187,11 +187,7 @@ for details.
 
 =head2 How do I fetch a variable from the global namespace?
 
-There are two possible ways.  Either use the special PIR syntax:
-
-    $P0 = global 'name_of_the_global'
-
-or the C<get_root_global> or C<get_hll_global> op:
+Use the C<get_root_global> or C<get_hll_global> op:
 
     get_hll_global $P0, ['name'; 'space'], 'name_of_the_global'
     get_hll_global $P1, 'name_of_the_global'
