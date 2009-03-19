@@ -316,12 +316,14 @@ be allocated. However, the downside of the register allocator is that it
 takes more time to execute during the compilation phase. Here's an example
 of where a register could be reused:
 
+=begin PIR
   .sub main
     $S0 = "hello "
     print $S0
     $S1 = "world!"
     print $S1
   .end
+=end PIR
 
 We'll talk about subroutines in more detail in the next chapter. For now,
 we can dissect this little bit of code to see what is happening. The C<.sub>
@@ -345,12 +347,14 @@ determine that it can use only one register for both operations. This saves
 the second allocation. Notice that this code with only one register performs
 identically to the previous example:
 
+=begin PIR
   .sub main
     $S0 = "hello "
     print $S0
     $S0 = "world!"
     print $S0
   .end
+=end PIR
 
 In some situations it can be helpful to turn the allocator off and avoid
 expensive optimizations. Such situations are subroutines where there are a
@@ -564,9 +568,11 @@ source file must be defined in a compilation unit. We've already seen an
 example for the simplest syntax for a PIR compilation unit. It starts with
 the C<.sub> directive and ends with the C<.end> directive:
 
+=begin PIR
   .sub main
       print "Hello, Polly.\n"
   .end
+=end PIR
 
 Again, we don't need to name the subroutine C<main>, it's just a common
 convention. This example defines a compilation unit named C<main> that
@@ -574,6 +580,7 @@ prints a string C<"Hello, Polly.">. The first compilation unit in a file
 is normally executed first but you can flag any compilation unit as the
 first one to execute with the C<:main> marker.
 
+=begin PIR
   .sub first
       print "Polly want a cracker?\n"
   .end
@@ -581,12 +588,14 @@ first one to execute with the C<:main> marker.
   .sub second :main
       print "Hello, Polly.\n"
   .end
+=end PIR
 
 This code prints out "Hello, Polly." but not "Polly want a cracker?".
 This is because the function C<second> has the C<:main> flag, so it is
 executed first. The function C<first>, which doesn't have this flag
 is never executed. However, if we change around this example a little:
 
+=begin PIR
   .sub first :main
       print "Polly want a cracker?\n"
   .end
@@ -594,6 +603,7 @@ is never executed. However, if we change around this example a little:
   .sub second
       print "Hello, Polly.\n"
   .end
+=end PIR
 
 The output now is "Polly want a cracker?". Execution in PIR starts
 at the C<:main> function and continues until the end of that function
@@ -627,6 +637,7 @@ X<goto instruction (PIR)>
 The most basic branching instruction is the unconditional branch:
 C<goto>.
 
+=begin PIR
   .sub _main
       goto L1
       print "never printed"
@@ -634,12 +645,14 @@ C<goto>.
       print "after branch\n"
       end
   .end
+=end PIR
 
 The first C<print> statement never runs because the C<goto> always
 skips over it to the label C<L1>.
 
 The conditional branches combine C<if> or C<unless> with C<goto>.
 
+=begin PIR
   .sub _main
       $I0 = 42
       if $I0 goto L1
@@ -647,6 +660,7 @@ The conditional branches combine C<if> or C<unless> with C<goto>.
   L1: print "after branch\n"
       end
   .end
+=end PIR
 
 X<if (conditional);instruction (PIR)>
 X<unless (conditional);instruction (PIR)>
@@ -660,6 +674,7 @@ The comparison operators (C<E<lt>>, C<E<lt>=>, C<==>, C<!=>, C<E<gt>>,
 C<E<gt>=>) can combine with C<if ...  goto>. These branch when the
 comparison is true:
 
+=begin PIR
   .sub _main
       $I0 = 42
       $I1 = 43
@@ -669,6 +684,7 @@ comparison is true:
       print "after branch\n"
       end
   .end
+=end PIR
 
 This example compares C<$I0> to C<$I1> and branches to the label C<L1>
 if C<$I0> is less than C<$I1>. The C<if $I0 E<lt> $I1 goto L1>
@@ -682,6 +698,7 @@ X<PIR (Parrot intermediate representation);loop constructs>
 PIR has no special loop constructs. A combination of conditional and
 unconditional branches handle iteration:
 
+=begin PIR
   .sub _main
       $I0 = 1               # product
       $I1 = 5               # counter
@@ -695,6 +712,7 @@ unconditional branches handle iteration:
       print "\n"
       end
   .end
+=end PIR
 
 X<do-while style loop;(PIR)>
 This example calculates the factorial C<5!>. Each time through the
@@ -708,6 +726,7 @@ X<while-style loop (PIR)>
 For a I<while>-style loop with the condition test at the start, use a
 conditional branch together with an unconditional branch:
 
+=begin PIR
   .sub _main
       $I0 = 1               # product
       $I1 = 5               # counter
@@ -723,6 +742,7 @@ conditional branch together with an unconditional branch:
       print "\n"
       end
   .end
+=end PIR
 
 This example tests the counter C<$I1> at the start of the loop. At the
 end of the loop, it unconditionally branches back to the start of the
@@ -882,12 +902,14 @@ input, and returns the string without the trailing newline. Here is a simple
 echo program that reads in characters from the user and echos them to
 standard output:
 
+=begin PIR
   .sub main
     loop_top:
       $S0 = read 10
       print $S0
       goto loop_top
   .end
+=end PIR
 
 =head2 Filehandles
 
@@ -950,6 +972,7 @@ write or read the data from.
 Let's see a little example of a program that reads in data from a file, and
 prints it to STDOUT.
 
+=begin PIR
   .sub main
     $P0 = getstdout
     $P1 = open "myfile.txt", "r"
@@ -959,6 +982,7 @@ prints it to STDOUT.
       if $P1 goto loop_top
     close $P1
   .end
+=end PIR
 
 This example shows that treating a filehandle PMC like a boolean value
 returns whether or not we have reached the end of the file. A true return
