@@ -1625,6 +1625,7 @@ prog-clean :
     $(INSTALLABLEPDUMP) \
     $(INSTALLABLEPINFO) \
     $(INSTALLABLEPBCMERGE) \
+    $(INSTALLABLEPBCTOEXE) \
     $(INSTALLABLEPDB) \
     $(INSTALLABLECONFIG) \
     pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
