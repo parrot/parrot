@@ -13,6 +13,9 @@ parrot (1.0.0-1) unstable; urgency=low
     - Changed copyright holder to Parrot Foundation, reflecting change in
       distribution.
     - Removed copyright info for files no longer in distribution.
+  * parrot.install.in, parrot-doc.install.in, libparrot-dev.install.in
+    - Added template files, replace parrot.install, parrot-doc.install, and
+      libparrot-dev.install
   * libparrot.postinst
     - Added so ldconfig gets called properly by dh_makeshlibs (patch from
       David Nusinow)
