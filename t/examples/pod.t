@@ -22,13 +22,14 @@ BEGIN {
     }
 }
 
-my $self = Parrot::Test::Pod->new( {
-    argv => [ @ARGV ],
-} );
+my @files = @ARGV;
 
-my $need_testing_ref = $self->identify_files_for_POD_testing();
+if (!@files) {
+  my $podTester = Parrot::Test::Pod->new();
+  @files = @{$podTester->identify_files_for_POD_testing()};
+}
 
-foreach my $file ( @{ $need_testing_ref } ) {
+foreach my $file ( @files ) {
     foreach my $contents (get_samples($file)) {
         compile_pir_ok($contents, $file);
     }
