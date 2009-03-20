@@ -1,8 +1,8 @@
-parrot (1.0.0-1ubuntu1~ppa4~intrepid1) intrepid; urgency=low
+parrot (1.0.0-1ubuntu1~ppa8~intrepid1) intrepid; urgency=low
   * New upstream release
   * Bumped Standards-Version to 3.8.0
 
- -- Allison Randal <allison@parrot.org>  Thu, 19 Mar 2009 00:07:28 -0700
+ -- Allison Randal <allison@parrot.org>  Thu, 19 Mar 2009 01:56:39 -0700
 
 parrot (1.0.0-1) unstable; urgency=low
   * New upstream release

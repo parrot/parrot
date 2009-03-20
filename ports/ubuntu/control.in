@@ -24,7 +24,7 @@ Description: A minimal install of the Parrot VM
  to get up and running in the average use case, and is sufficient to run most
  language implementations.
 
-Package: libparrot%SOVERSION%
+Package: libparrot@SOVERSION@
 Architecture: any
 Section: universe/libs
 Depends: ${shlibs:Depends}
@@ -37,7 +37,7 @@ Description: Parrot shared library
 Package: libparrot-dev
 Architecture: any
 Section: universe/devel
-Depends: libparrot%SOVERSION% (= ${binary:Version}), parrot
+Depends: libparrot@SOVERSION@ (= ${binary:Version}), parrot
 Description: Parrot shared library development files
  This package contains files needed to develop applications which embed Parrot.
 
