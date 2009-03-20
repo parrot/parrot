@@ -173,9 +173,13 @@ build problems.
 
 Create a file called F<hello.pir> that contains the following code.
 
+=begin PIR
+
   .sub main
       print "Hello world!\n"
   .end
+
+=end PIR
 
 Then run it by typing:
 
@@ -195,29 +199,41 @@ care of deciding which variant of the instruction to use for us.
 We can modify hello.pir to first store the string C<Hello world!\n> in a
 register and then use that register with the print instruction.
 
+=begin PIR
+
   .sub main
       set S0, "Hello world!\n"
       print S0
   .end
+
+=end PIR
 
 Here we have stated exactly which register to use. However, by
 replacing C<S0> with C<$S0> we can delegate the choice of which
 register to use to Parrot.  It is also possible to use an C<=>
 notation instead of writing the C<set> instruction.
 
+=begin PIR
+
   .sub main
       $S0 = "Hello world!\n"
       print $S0
   .end
 
+=end PIR
+
 To make PIR even more readable, named registers can be used. These are later
 mapped to real numbered registers.
+
+=begin PIR
 
   .sub main
       .local string hello
       hello = "Hello world!\n"
       print hello
   .end
+
+=end PIR
 
 The C<.local> directive indicates that the named register is only needed inside
 the current subroutine (that is, between C<.sub> and C<.end>). Following
@@ -235,6 +251,8 @@ replacing them with a label at the start of the instructions.
 
 This example introduces some more instructions and PIR syntax. Lines starting
 with a C<#> are comments.
+
+=begin PIR
 
   .sub main
       # State the number of squares to sum.
@@ -261,6 +279,8 @@ with a C<#> are comments.
       print total
       print ".\n"
   .end
+
+=end PIR
 
 PIR provides a bit of syntactic sugar that makes it look more high level than
 assembly. For example:
@@ -298,6 +318,8 @@ programming is one place where using goto is not bad form!
 
 In this example we define a factorial function and recursively call it to
 compute factorial.
+
+=begin PIR
 
   .sub factorial
       # Get input parameter.
@@ -337,6 +359,8 @@ compute factorial.
       inc i
       if i <= 10 goto loop
   .end
+
+=end PIR
 
 The first line, C<.param int n>, specifies that this subroutine takes one
 integer parameter and that we'd like to refer to the register it was passed in
