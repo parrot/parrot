@@ -978,7 +978,7 @@ prints it to STDOUT.
     $P1 = open "myfile.txt", "r"
     loop_top:
       $S0 = readline $P1
-      say $P0, $S0
+      print $P0, $S0
       if $P1 goto loop_top
     close $P1
   .end
