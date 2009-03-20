@@ -202,16 +202,14 @@ register and then use that register with the print instruction.
 =begin PIR
 
   .sub main
-      set S0, "Hello world!\n"
-      print S0
+      set $S0, "Hello world!\n"
+      print $S0
   .end
 
 =end PIR
 
-Here we have stated exactly which register to use. However, by
-replacing C<S0> with C<$S0> we can delegate the choice of which
-register to use to Parrot.  It is also possible to use an C<=>
-notation instead of writing the C<set> instruction.
+This sample shows the explicit use of the C<set> opcode. PIR
+provides some syntactic relief here with the C<=> operator.
 
 =begin PIR
 
