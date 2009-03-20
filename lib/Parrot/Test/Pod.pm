@@ -176,7 +176,7 @@ sub identify_files_for_POD_testing {
         if ($@) {
             croak "$sto exists on disk but could not retrieve from it";
         }
-        else {
+        elsif (exists $args->{second_analysis}) {
             # go to second-level analysis
             $files_needing_analysis =
                 $second_analysis_subs{$args->{second_analysis}}(
@@ -227,11 +227,13 @@ sub identify_files_for_POD_testing {
         }
         nstore $files_needing_analysis, $sto;
         # go to second-level analysis
-        $files_needing_analysis =
-            $second_analysis_subs{$args->{second_analysis}}(
-                $files_needing_analysis,
-                $self->{build_dir},
-            );
+        if (exists $args->{second_analysis}) {
+            $files_needing_analysis =
+                $second_analysis_subs{$args->{second_analysis}}(
+                    $files_needing_analysis,
+                    $self->{build_dir},
+                );
+        }
     }
 
     return [ keys %{ $files_needing_analysis } ];

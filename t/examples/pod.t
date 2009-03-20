@@ -6,8 +6,12 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
+use File::Temp qw(tempfile);
 use Test::More qw(no_plan);
+
 use Parrot::Test;
+use Parrot::Config qw(%PConfig);
+
 
 use lib qw( lib );
 BEGIN {
@@ -22,17 +26,32 @@ my $self = Parrot::Test::Pod->new( {
     argv => [ @ARGV ],
 } );
 
-my $need_testing_ref = $self->identify_files_for_POD_testing( {
-    second_analysis => 'oreilly_summary_malformed',
-} );
+my $need_testing_ref = $self->identify_files_for_POD_testing();
 
 foreach my $file ( @{ $need_testing_ref } ) {
     foreach my $contents (get_samples($file)) {
-        pir_output_like($contents,qr//,"$file\n$contents");
+        compile_pir_ok($contents, $file);
     }
 }
 
 #################### SUBROUTINES ####################
+
+sub compile_pir_ok {
+    my $code = shift;
+    my $file = shift;
+
+    my ($fh,$tempfile) = tempfile(SUFFIX => '.pir', UNLINK => 1);
+    print {$fh} $code;
+    close $fh;
+
+    my $cmd = File::Spec->curdir() . $PConfig{slash} .
+              $PConfig{test_prog} . " -o " . File::Spec->devnull() . " " .
+              $tempfile;
+
+    my $description = "$file\n$code";
+
+    is(system($cmd), 0 , $description);
+}
 
 sub get_samples {
     my $file = shift;
@@ -61,8 +80,9 @@ t/examples/pod.t - Compile examples found in POD
 
 =head1 DESCRIPTION
 
-Tests the syntax for any embedded PIR for all files listed in F<MANIFEST> and
-F<MANIFEST.generated>. Any invalid examples are reported in the test output.
+Tests the syntax for any embedded PIR in POD, for all files in the
+repository that contain POD.  Any invalid examples are reported in the
+test output.
 
 =cut
 
