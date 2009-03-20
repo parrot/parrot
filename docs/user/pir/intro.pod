@@ -81,9 +81,13 @@ this article will focus on the first 3 register types.
 
 Let me start with a simple and typical example:
 
+=begin PIR
+
   .sub main :main
        print "hello world\n"
   .end
+
+=end PIR
 
 To run it, save the code in a C<hello.pir> file and pass it to the
 parrot virtual machine:
@@ -177,6 +181,8 @@ Subroutines can easily be created using the C<.sub> keyword shown
 before. If you do not need parameters, it is just as simple as I show in
 the following code:
 
+=begin PIR
+
   .sub main :main
      hello()
   .end
@@ -185,9 +191,13 @@ the following code:
     print "Hello World\n"
   .end
 
+=end PIR
+
 Now, I want to make my C<hello> subroutine a little more useful, such
 that I can greet other people. For that I will use the C<.param>
 keyword to define the parameters C<hello> can handle:
+
+=begin PIR
 
   .sub main :main
      hello("leo")
@@ -200,6 +210,9 @@ keyword to define the parameters C<hello> can handle:
      print person
      print "\n"
   .end
+
+=end PIR
+
 
 If I need more parameters I just need to add more C<.param> lines.
 
@@ -224,6 +237,8 @@ results list:
 Now, for a little more complicated example, let me show how I would
 code Factorial subroutine:
 
+=begin PIR
+
   .sub main :main
      $I1 = factorial(5)
      print $I1
@@ -240,6 +255,8 @@ code Factorial subroutine:
      $I2 *= i
      .return ($I2)
   .end
+
+=cut
 
 This example also shows that PIR subroutines may be recursive just as in
 a high-level language.
@@ -267,12 +284,16 @@ arguments. For that there are two syntaxes:
 Note that with named arguments, you may rearrange the order of your
 parameters at will.
 
+=begin PIR
+
   .sub foo
     .param string "name"    => a
     .param int    "age"     => b
     .param string "gender"  => c
     # ...
   .end
+
+=end PIR
 
 This subroutine may be called in any of the following ways:
 
@@ -285,11 +306,15 @@ and any other permutation you can think of as long as you use the named
 argument syntax. Note that any positional parameters must be passed
 before the named parameters. So, the following is allowed:
 
+=begin PIR
+
   .sub main
     .param int a
     .param int b :named("age")
     # ...
   .end
+
+=end PIR
 
 Whereas the following is not:
 

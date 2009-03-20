@@ -88,13 +88,17 @@ C<.handle_types()>, and C<.handle_types_except()>.
 Here's an example of a sub that catches only error exceptions and prints
 an appropriate log message before exiting.
 
+=begin PIR
+
+    .include 'include/except_severity.pasm'
+
     .sub 'dostuff'
         .local pmc eh
         eh = new 'ExceptionHandler'
         set_addr eh, handler
         eh.'min_severity'(.EXCEPT_ERROR)
         push_eh eh
-        ... # stuff that might throw an error
+        # ... stuff that might throw an error
         pop_eh
         .return (1)
       handler:
@@ -106,3 +110,7 @@ an appropriate log message before exiting.
         say ex
         exit 1
     .end
+
+=end PIR
+
+=cut

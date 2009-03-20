@@ -37,6 +37,8 @@ is some code to illustrate this example:
 
 =head3 Example 1:
 
+=begin PIR
+
     .namespace [ "Person" ]
 
     .sub run
@@ -48,6 +50,8 @@ is some code to illustrate this example:
     .sub run
         say "Running process #53"
     .end
+
+=end PIR
 
 As you might guess, the C<.namespace> directive tells Parrot
 what namespace to group subroutines under.  A namespace ends when
@@ -76,11 +80,15 @@ created with C<newclass>.  Here's a simple example:
 
 =head3 Example 2: A classic Dog
 
+=begin PIR
+
     .sub _ :main
         $P0 = newclass 'Dog'
         .local pmc spot
         spot = new 'Dog'
     .end
+
+=end PIR
 
 You may notice that I didn't use the return value of
 C<newclass>.  That's only because this is a simple example.  :-)
@@ -100,6 +108,8 @@ subroutine name. Here's a familiar example to anyone who has
 read L<perlboot>.
 
 =head3 Example 3: Barnyard animals
+
+=begin PIR
 
     .namespace [ "Cow" ]
 
@@ -137,6 +147,8 @@ read L<perlboot>.
         porky.'speak'()
     .end
 
+=end PIR
+
 It's important to note that even though I've declared the
 namespaces and put subroutines in them, this does not
 automatically create classes. The C<newclass> declarations
@@ -160,6 +172,8 @@ you could also have written:
 Another example of this is shown below.
 
 =head3 Example 4: variable methods
+
+=begin PIR
 
     .namespace [ 'Foo' ]
 
@@ -185,6 +199,8 @@ Another example of this is shown below.
         f.m()
     .end
 
+=end PIR
+
 =head2 But where do I store my stuff?
 
 So far I've talked about namespaces and creating classes
@@ -209,6 +225,8 @@ illustrate with just one animal and you can infer how to do the
 same for the rest):
 
 =head3 Example 5: Naming my animals
+
+=begin PIR
 
     .namespace [ "Dog" ]
 
@@ -239,6 +257,8 @@ same for the rest):
         dog.'speak'()
         print "!\n"
     .end
+
+=end PIR
 
 Whew! There's a lot of new stuff in this code. I'll take them
 starting from the top of the program and working towards the
@@ -336,6 +356,8 @@ Jonathan Scott Duff
 
 =head3 Example 6: Full barnyard listing
 
+=begin PIR
+
     .namespace [ "Animal" ]
 
     .sub setname :method
@@ -400,5 +422,7 @@ Jonathan Scott Duff
         dog.'speak'()
         pig.'speak'()
     .end
+
+=end PIR
 
 =cut

@@ -84,6 +84,8 @@ and outputs them one per line:
 
 =head3 Example 2: reading command line arguments, take 1
 
+=begin PIR
+
     .sub _ :main
         .param pmc args
       loop:
@@ -94,6 +96,8 @@ and outputs them one per line:
         goto loop
       end_loop:
     .end
+
+=end PIR
 
 The C<.param> directive tells parrot that I want this
 subroutine to accept a single parameter and that parameter
@@ -116,6 +120,8 @@ each indexed value.
 
 =head3 Example 3: reading command line arguments, take 2
 
+=begin PIR
+
     .sub _ :main
         .param pmc args
         .local int argc
@@ -132,6 +138,8 @@ each indexed value.
         goto loop
       end_loop:
     .end
+
+=end PIR
 
 Line 4 shows something interesting about aggregates. Similar
 to perl, when you assign an aggregate to an integer thing
@@ -163,12 +171,16 @@ actual PMC:
 
 =head3 Example 4: Typing the C<args> PMC
 
+=begin PIR
+
     .sub _ :main
         .param pmc args
         $S0 = typeof args
         print $S0
         print "\n"
     .end
+
+=end PIR
 
 When you run this program it should output
 "ResizableStringArray". If you assign the result of the
@@ -208,6 +220,8 @@ environment variables:
 
 =head3 Example 5: output environment
 
+=begin PIR
+
     .sub _ :main
         .local pmc env, iter
         .local string key, value
@@ -225,6 +239,8 @@ environment variables:
         goto iterloop
       iterend:
     .end
+
+=end PIR
 
 Lines 3 and 4 create my new PMCs. Line 3 creates a new
 C<Env> PMC which at the moment of its existence contains a
@@ -252,6 +268,8 @@ over the command line this same way? Sure!
 
 =head3 Example 6: reading command line arguments, take 3
 
+=begin PIR
+
     .sub _ :main
         .param pmc args
         .local pmc cmdline
@@ -264,6 +282,8 @@ over the command line this same way? Sure!
         goto loop
       end_loop:
     .end
+
+=end PIR
 
 Notice how this code approaches the simplicity of the
 original that destructively iterated the C<args> PMC. Using
@@ -287,6 +307,8 @@ distribution (parrot/docs)
 
 =head3 Example 7: Output random numbers
 
+=begin PIR
+
     .sub _ :main
         $P0 = new 'Random'
         $N0 = $P0
@@ -297,7 +319,11 @@ distribution (parrot/docs)
         print "\n"
     .end
 
+=end PIR
+
 =head3 Example 8: Triggering an exception
+
+=begin PIR
 
     .sub _ :main
         $P0 = new 'Exception'
@@ -305,7 +331,11 @@ distribution (parrot/docs)
         throw $P0
     .end
 
+=end PIR
+
 =head3 Example 9: Setting a timer
+
+=begin PIR
 
     .include "timer.pasm"                   # for the timer constants
 
@@ -332,6 +362,7 @@ distribution (parrot/docs)
        goto loop
     .end
 
+=end PIR
 
 =head2 Author
 
