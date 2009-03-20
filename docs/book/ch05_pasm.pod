@@ -53,11 +53,15 @@ value in place, without consuming a new Parrot register to hold the
 value. The arguments can be either registers or constants, although the
 destination argument cannot be constant.
 
+=begin PASM
+
   LABEL:
       print "The answer is: "
       print 42
       print "\n"
       end                # halt the interpreter
+
+=end PASM
 
 X<PASM (Parrot assembly language);labels>
 A label names a line of code so other instructions can refer to it.

@@ -10,17 +10,8 @@ use File::Temp qw(tempfile);
 use Test::More qw(no_plan);
 
 use Parrot::Test;
+use Parrot::Test::Pod;
 use Parrot::Config qw(%PConfig);
-
-
-use lib qw( lib );
-BEGIN {
-    eval 'use Parrot::Test::Pod';
-    if ($@) {
-        plan skip_all => 'Prerequisites for Parrot::Test::Pod not satisfied';
-        exit;
-    }
-}
 
 my @files = @ARGV;
 
@@ -30,26 +21,28 @@ if (!@files) {
 }
 
 foreach my $file ( @files ) {
-    foreach my $contents (get_samples($file)) {
-        compile_pir_ok($contents, $file);
+    foreach my $snippet (get_samples($file)) {
+        compile_ok($snippet);
     }
 }
 
 #################### SUBROUTINES ####################
 
-sub compile_pir_ok {
-    my $code = shift;
-    my $file = shift;
+sub compile_ok {
+    my $snippet = shift;
 
-    my ($fh,$tempfile) = tempfile(SUFFIX => '.pir', UNLINK => 1);
-    print {$fh} $code;
+    my ($fh,$tempfile) = tempfile(
+        SUFFIX => '.' . lc $snippet->{type},
+        UNLINK => 1
+    );
+    print {$fh} $snippet->{code};
     close $fh;
 
     my $cmd = File::Spec->curdir() . $PConfig{slash} .
               $PConfig{test_prog} . " -o " . File::Spec->devnull() . " " .
               $tempfile;
 
-    my $description = "$file\n$code";
+    my $description = $snippet->{file} . "\n" . $snippet->{code};
 
     is(system($cmd), 0 , $description);
 }
@@ -64,7 +57,15 @@ sub get_samples {
         $contents = <$fh>;
     }
 
-    return $contents =~ (/^=begin PIR$(.*?)^=end PIR$/smg);
+    my @snippets;
+    while ($contents =~ /^=begin (PIR|PASM)(.*?)^=end \1$/smg) {
+        push @snippets, {
+            file => $file,
+            type => $1,
+            code => $2,
+        };
+    }
+    return @snippets;
 }
 
 =head1 NAME
