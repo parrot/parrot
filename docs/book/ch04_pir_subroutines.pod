@@ -108,6 +108,8 @@ The subroutine C<fact> is a separate compilation unit, assembled and
 processed after the C<main> function.  Parrot resolves global symbols
 like the C<fact> label between different units.
 
+=begin PIR
+
   # factorial.pir
   .sub main
      .local int count
@@ -135,6 +137,8 @@ like the C<fact> label between different units.
      .return p
   .end
 
+=end PIR
+
 This example defines two local named variables, C<count> and
 C<product>, and assigns them the values 1 and 5. It calls the C<fact>
 subroutine passing the two variables as arguments. In the call, the
@@ -161,6 +165,8 @@ a '''named parameter'''. Instead of passing parameters by their position
 in the string, parameters are passed by name and can be in any order.
 Here's an example:
 
+=begin PIR
+
  .sub 'MySub'
     .param int yrs :named("age")
     .param string call :named("name")
@@ -175,11 +181,17 @@ Here's an example:
     'MySub'("age" => 42, "name" => "Bob")
  .end
 
+=end PIR
+
 In the example above, we could have easily reversed the order too:
+
+=begin PIR
 
  .sub main :main
     'MySub'("name" => "Bob", "age" => 42)    # Same!
  .end
+
+=end PIR
 
 Named arguments can be a big help because you don't have to worry about
 the exact order of variables, especially as argument lists get very long.
@@ -388,6 +400,8 @@ instead of the C<.return> directive. C<.tailcall> performs this optimization
 by reusing the return continuation of the parent function to make the
 tailcall. In PIR, we can write this example:
 
+=begin PIR
+
   .sub main :main
       .local int value
       value = add_two(5)
@@ -407,6 +421,8 @@ tailcall. In PIR, we can write this example:
       b = a + 1
       return b
   .end
+
+=end PIR
 
 This example above will print out the correct value "7".
 
@@ -520,6 +536,8 @@ coroutines, and multisubs, which we will discuss later>. There are no blocks
 in PIR that have their own scope besides subroutines. Fortunately, we can use
 these lexical subroutines to simulate this behavior that HLLs require:
 
+=begin PIR
+
   .sub 'MyOuter'
       .lex int x
       .lex int y
@@ -531,6 +549,8 @@ these lexical subroutines to simulate this behavior that HLLs require:
       .lex int z
       #x, y, and z are all "visible" here
   .end
+
+=end PIR
 
 In the example above we put the word C<"visible"> in quotes. This is because
 lexically-defined variables need to be accessed with the C<get_lex> and
@@ -612,6 +632,8 @@ subroutine for calculating factorials could be considered to have used two
 separate compilation units: The C<main> subroutine and the C<fact> subroutine.
 Here is a way to rewrite that algorithm using only a single subroutine instead:
 
+=begin PIR
+
   .sub main
       $I1 = 5           # counter
       call fact         # same as "bsr fact"
@@ -631,6 +653,8 @@ Here is a way to rewrite that algorithm using only a single subroutine instead:
       if $I1 > 0 goto L1
       ret
   .end
+
+=end PIR
 
 The unit of code from the C<fact> label definition to C<ret> is a reusable
 routine, but is only usable from within the C<main> subroutine. There are
@@ -843,6 +867,8 @@ keyword. C<self> isn't the only name you can call this value, however.
 You can also use the C<:invocant> flag to define a new name for the invocant
 object:
 
+=begin PIR
+
   .sub "MyMethod" :method
     $S0 = self                    # Already defined as "self"
     say $S0
@@ -854,9 +880,13 @@ object:
     say $S0
   .end
 
+=end PIR
+
 This example defines two methods in the C<Foo> class. It calls one
 from the main body of the subroutine and the other from within the
 first method:
+
+=begin PIR
 
   .sub main
     .local pmc class
@@ -879,6 +909,8 @@ first method:
   .sub other_meth :method       # define another method
      print "in other_meth\n"    # as above Parrot provides a return
   .end                          # statement
+
+=end PIR
 
 Each method call looks up the method name in the object's class namespace.
 The C<.sub> directive automatically makes a symbol table entry for the
