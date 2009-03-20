@@ -534,9 +534,8 @@ Iterator shift_float: -8.8
 Iterator get_integer: 7
 OUTPUT
 
-SKIP: {
-    skip( "N/Y: length of rest of array ", 1 );
-    pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
+TODO: {
+    pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access", todo => "N/Y: length of rest of array ");
     .include "iterator.pasm"
 
     new P2, ['ResizablePMCArray']    # array with 4 elements
