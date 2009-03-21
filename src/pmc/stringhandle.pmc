@@ -71,10 +71,13 @@ Create a copy of the stringhandle.
         PMC * const copy = pmc_new(INTERP, enum_class_StringHandle);
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
 
-        data_struct->flags        = old_struct->flags;
-        data_struct->stringhandle = Parrot_str_copy(INTERP, old_struct->stringhandle);
-        data_struct->mode         = Parrot_str_copy(INTERP, old_struct->mode);
-        data_struct->encoding     = Parrot_str_copy(INTERP, old_struct->encoding);
+        if (old_struct->stringhandle != NULL)
+            data_struct->stringhandle = Parrot_str_copy(INTERP, old_struct->stringhandle);
+        if (old_struct->mode != NULL)
+            data_struct->mode     = Parrot_str_copy(INTERP, old_struct->mode);
+        if (old_struct->encoding != NULL)
+            data_struct->encoding = Parrot_str_copy(INTERP, old_struct->encoding);
+        data_struct->flags    = old_struct->flags;
 
         return copy;
     }
