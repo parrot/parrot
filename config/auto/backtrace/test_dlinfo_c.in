@@ -6,6 +6,9 @@ check that Dl_info is avaible
 */
 
 #include <execinfo.h>
+#ifndef __USE_GNU
+#  define __USE_GNU
+#endif
 #include <dlfcn.h>
 #include <stdlib.h>
 
