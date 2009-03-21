@@ -124,7 +124,7 @@ sub new {
         unless -d $args->{build_dir};
     croak "Test cannot be run unless MANIFEST exists in build dir"
         unless -f "$args->{build_dir}/MANIFEST";
-    croak "Test cannot be run unless MANIFEST exists in build dir"
+    croak "Test cannot be run unless MANIFEST.generated exists in build dir"
         unless -f "$args->{build_dir}/MANIFEST.generated";
 
     $args->{manifest}     = maniread("$args->{build_dir}/MANIFEST");
