@@ -60,7 +60,7 @@ sub get_samples {
     }
 
     my @snippets;
-    while ($contents =~ /^=begin (PIR|PASM)(.*?)^=end \1$/smg) {
+    while ($contents =~ /^=begin (PIR|PASM)$(.*?)^=end \1$/smg) {
         push @snippets, {
             file => $file,
             type => $1,
