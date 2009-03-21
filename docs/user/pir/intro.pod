@@ -258,8 +258,6 @@ code Factorial subroutine:
 
 =end PIR
 
-=cut
-
 This example also shows that PIR subroutines may be recursive just as in
 a high-level language.
 
