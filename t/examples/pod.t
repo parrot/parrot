@@ -16,7 +16,9 @@ use Parrot::Config qw(%PConfig);
 my @files = @ARGV;
 
 if (!@files) {
-  my $podTester = Parrot::Test::Pod->new();
+  my $podTester = Parrot::Test::Pod->new( {
+    argv => [ @ARGV ],
+  } );
   @files = @{$podTester->identify_files_for_POD_testing()};
 }
 
