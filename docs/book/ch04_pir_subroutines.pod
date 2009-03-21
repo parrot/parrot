@@ -880,7 +880,7 @@ object:
     say $S0
   .end
 
-=end PIR
+=end PIR - See TT #483
 
 This example defines two methods in the C<Foo> class. It calls one
 from the main body of the subroutine and the other from within the
