@@ -29,7 +29,7 @@ These are the vtable functions for the lexinfo PMC.
  * needed (except for freeze/thaw
  */
 
-pmclass LexInfo need_ext provides hash no_ro {
+pmclass LexInfo extends Hash need_ext provides hash no_ro {
 
 /*
 
@@ -172,13 +172,6 @@ The implementation of the Hash PMC is called.
 
 */
 
-    VTABLE void visit(visit_info *info) {
-        Parrot_Hash_visit(INTERP, SELF, info);
-    }
-
-    VTABLE void freeze(visit_info *info) {
-        Parrot_Hash_freeze(INTERP, SELF, info);
-    }
 
     VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
