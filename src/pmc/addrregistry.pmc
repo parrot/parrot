@@ -31,7 +31,7 @@ C<Parrot_register_pmc> if it isn't visible to Parrot.
 #include "parrot/hash.h"
 #include "pmc_hash.h"
 
-pmclass AddrRegistry need_ext provides hash {
+pmclass AddrRegistry extends Hash need_ext provides hash {
     ATTR Hash *hash;    /* a PMC Hash */
 /*
 
@@ -180,10 +180,6 @@ reaches 0, delete the entry.
 
 /*
 
-=item C<PMC *get_iter ()>
-
-Return a new iterator for the PMC.
-
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 If called from iteration, return the key PMC, else PMCNULL is returned.
@@ -191,10 +187,6 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
 =cut
 
 */
-
-    VTABLE PMC *get_iter() {
-        return Parrot_Hash_get_iter(INTERP, SELF);
-    }
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         Hash * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
