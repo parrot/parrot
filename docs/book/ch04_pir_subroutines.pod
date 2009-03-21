@@ -117,7 +117,7 @@ like the C<fact> label between different units.
      count = 5
      product = 1
 
-     $I0 = fact(count, product)
+     $I0 = 'fact'(count, product)
 
      print $I0
      print "\n"
@@ -134,7 +134,7 @@ like the C<fact> label between different units.
      dec c
      branch loop
   fin:
-     .return p
+     .return (p)
   .end
 
 =end PIR
@@ -168,11 +168,11 @@ Here's an example:
 =begin PIR
 
  .sub 'MySub'
-    .param int yrs :named("age")
+    .param string yrs :named("age")
     .param string call :named("name")
     $S0 = "Hello " . call
     $S1 = "You are " . yrs
-    $S1 = $S1 . " years old
+    $S1 = $S1 . " years old"
     print $S0
     print $S1
  .end
@@ -411,7 +411,7 @@ tailcall. In PIR, we can write this example:
   .sub add_two
       .param int value
       .local int val2
-      val2 = add_one(value
+      val2 = add_one(value)
       .tailcall add_one(val2)
   .end
 
@@ -419,7 +419,7 @@ tailcall. In PIR, we can write this example:
       .param int a
       .local int b
       b = a + 1
-      return b
+      .return (b)
   .end
 
 =end PIR
@@ -539,14 +539,16 @@ these lexical subroutines to simulate this behavior that HLLs require:
 =begin PIR
 
   .sub 'MyOuter'
-      .lex int x
-      .lex int y
+      .local int x,y
+      .lex 'x', x
+      .lex 'y', y
       'MyInner'()
       # only x and y are visible here
   .end
 
   .sub 'MyInner' :outer('MyOuter')
-      .lex int z
+      .local int z
+      .lex 'z', z
       #x, y, and z are all "visible" here
   .end
 
@@ -636,13 +638,11 @@ Here is a way to rewrite that algorithm using only a single subroutine instead:
 
   .sub main
       $I1 = 5           # counter
-      call fact         # same as "bsr fact"
-      print $I0
-      print "\n"
+      bsr fact
+      say $I0
       $I1 = 6           # counter
-      call fact
-      print $I0
-      print "\n"
+      bsr fact
+      say $I0
       end
 
   fact:
@@ -867,7 +867,7 @@ keyword. C<self> isn't the only name you can call this value, however.
 You can also use the C<:invocant> flag to define a new name for the invocant
 object:
 
-=begin PIR
+=begin PIR - See TT #483
 
   .sub "MyMethod" :method
     $S0 = self                    # Already defined as "self"
