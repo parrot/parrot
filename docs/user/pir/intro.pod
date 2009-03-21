@@ -256,6 +256,8 @@ code Factorial subroutine:
      .return ($I2)
   .end
 
+=end PIR
+
 =cut
 
 This example also shows that PIR subroutines may be recursive just as in
@@ -287,9 +289,9 @@ parameters at will.
 =begin PIR
 
   .sub foo
-    .param string "name"    => a
-    .param int    "age"     => b
-    .param string "gender"  => c
+    .param string a :named('name')
+    .param int    b :named('age')
+    .param string c :named('gender')
     # ...
   .end
 
