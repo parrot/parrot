@@ -337,26 +337,27 @@ distribution (parrot/docs)
 
 =begin PIR
 
-    .include "timer.pasm"                   # for the timer constants
+    .include 'timer.pasm'                   # for the timer constants
 
     .sub expired
-       print "Timer has expired!\n"
+       say 'Timer has expired!'
+       exit 1
     .end
 
-    .sub _ :main
+    .sub main :main
        $P0 = new 'Timer'
-       $P1 = global "expired"
+       $P1 = get_global 'expired'
 
        $P0[.PARROT_TIMER_HANDLER] = $P1    # call sub in $P1 when timer goes off
-       $P0[.PARROT_TIMER_SEC] = 2          # trigger every 2 seconds
-       $P0[.PARROT_TIMER_REPEAT] = -1      # repeat indefinitely
+       $P0[.PARROT_TIMER_SEC]     = 2      # trigger in 10 seconds
+       $P0[.PARROT_TIMER_REPEAT]  = 1      # repeat indefinitely
        $P0[.PARROT_TIMER_RUNNING] = 1      # start timer immediately
-       global "timer" = $P0                # keep the timer around
+       set_global 'timer', $P0             # keep the timer around
 
        $I0 = 0
-      loop:
+    loop:
        print $I0
-       print ": running...\n"
+       say ': running...'
        inc $I0
        sleep 1                             # wait a second
        goto loop
