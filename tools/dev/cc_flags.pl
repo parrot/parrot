@@ -89,7 +89,7 @@ while (<$F>) {
     }
 }
 
-my ($cfile) = grep /\.[cs]$/, @ARGV;
+my ($cfile) = grep /\.c$/, @ARGV;
 
 my ( $inject_point, $where );
 
