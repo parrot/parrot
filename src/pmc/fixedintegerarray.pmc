@@ -571,7 +571,6 @@ Return a new Iterator for this PMC.
 
 */
 
-    
     VTABLE PMC *get_iter() {
         STRING     *name     = CONST_STRING(interp, "set_key");
         PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
