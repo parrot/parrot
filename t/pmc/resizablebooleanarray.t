@@ -24,7 +24,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
     .include 'test_more.pir'
 
-    plan(64)
+    plan(65)
 
     setting_array_size()
     setting_first_element()
@@ -48,6 +48,7 @@ out-of-bounds test. Checks INT and PMC keys.
     pop_into_sparse()
     clone_tests()
     alternate_clone_tests()
+    get_iter_test()
 
 .end
 
@@ -830,6 +831,24 @@ ok_5:
 ok_6:
     is(failed, 0, "all alternate clone tests passed")
 .end
+
+.sub get_iter_test
+    $P0 = new ['ResizableBooleanArray']
+    $P0 = 3
+    $P0[0] = 1
+    $P0[1] = 0
+    $P0[2] = 1
+    $P1 = iter $P0
+loop:
+    unless $P1 goto loop_end
+    $S2 = shift $P1
+    $S0 = concat $S0, $S2
+    goto loop
+  loop_end:
+    is($S0, "101", "get_iter works")
+.end
+
+
 
 # Local Variables:
 #   mode: pir
