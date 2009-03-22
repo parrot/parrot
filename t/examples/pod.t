@@ -44,29 +44,52 @@ sub compile_ok {
               $PConfig{test_prog} . " -o " . File::Spec->devnull() . " " .
               $tempfile;
 
-    my $description = $snippet->{file} . "\n" . $snippet->{code};
+    my $description = $snippet->{file} . ':' .$snippet->{line};
 
-    is(system($cmd), 0 , $description);
+    TODO: {
+        local $TODO = $snippet->{todo} if $snippet->{todo};
+        is(system($cmd), 0 , $description);
+    }
+
 }
 
 sub get_samples {
     my $file = shift;
 
-    my $contents;
-    {
-        local undef $/;
-        open my $fh, '<', $file;
-        $contents = <$fh>;
-    }
+    open my $fh, '<', $file;
 
     my @snippets;
-    while ($contents =~ /^=begin (PIR|PASM)$(.*?)^=end \1$/smg) {
-        push @snippets, {
-            file => $file,
-            type => $1,
-            code => $2,
-        };
+    my $snippet = {};
+    my $code = '';
+    my $target;
+
+    my $in_code = 0;
+    while (my $line = <$fh>) {
+
+        if ( $in_code )  {
+            if ($line =~ /^=end $target$/) {
+                $snippet->{code} = $code;
+                push @snippets, $snippet;
+                $code = '';
+                $snippet = {};
+                $in_code = 0;
+            }
+            else {
+                $code .= $line;
+            }
+        }
+        elsif ( $line =~ /^=begin ((PIR|PASM)( .*)?)$/ ) {
+            $in_code = 1;
+            $snippet->{file} = $file;
+            $snippet->{line} = $.;
+            $snippet->{type} = $2;
+            $snippet->{todo} = $3;
+            $target = $1; 
+        }
     }
+
+    # We don't check for an example in progress here because no file
+    # should end with =end.
     return @snippets;
 }
 
