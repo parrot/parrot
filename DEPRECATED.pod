@@ -317,6 +317,16 @@ L<https://trac.parrot.org/parrot/ticket/338>
 
 =back
 
+=head1 parrot library
+
+=over 4
+
+=item Data::Replace [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/108>
+
+=back
+
 =head1 Footnotes
 
 =over 4
