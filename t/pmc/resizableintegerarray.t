@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
@@ -423,6 +423,29 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift integer" );
 CODE
 2 20 10
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_iter" );
+.sub 'main' :main
+    $P0 = new ['ResizableIntegerArray']
+    $P0[0] = 42
+    $P0[1] = 43
+    $P0[2] = 44
+    push $P0, 999
+    $P1 = iter $P0
+loop:
+    unless $P1 goto loop_end
+    $S2 = shift $P1
+    say $S2
+    goto loop
+loop_end:
+.end
+CODE
+42
+43
+44
+999
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
