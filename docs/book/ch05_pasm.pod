@@ -2894,11 +2894,11 @@ an index as arguments and returns the attribute PMC at that position:
 
 or
 
-=begin PASM TODO
+=begin PASM
 
     getattribute P10, P2, "Foo\x0.i"  # named get
 
-=end PASM TODO
+=end PASM
 
 To set the value of an attribute PMC, first retrieve it with
 C<getattribute> and then assign to the returned PMC. Because PMC
