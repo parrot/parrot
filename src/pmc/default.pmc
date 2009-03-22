@@ -984,10 +984,6 @@ inspect_str.
 
 Returns SELF. A PMC is its own class.
 
-=item C<PMC *get_attr_str(STRING *attr)>
-
-Look for NCI methods and properties.
-
 =cut
 
 */
@@ -1007,32 +1003,6 @@ Look for NCI methods and properties.
 
         return _class;
 
-    }
-
-    VTABLE PMC *get_attr_str(STRING *name) {
-        PMC *p = VTABLE_find_method(INTERP, SELF, name);
-
-        if (PMC_IS_NULL(p))
-            return PMCNULL;
-
-        if (VTABLE_isa(INTERP, p, CONST_STRING(INTERP, "NCI"))) {
-            PMC * const bound_meth = VTABLE_clone(INTERP, p);
-            bound_meth->vtable     = interp->vtables[enum_class_Bound_NCI];
-            VTABLE_set_pmc(INTERP, bound_meth, SELF);
-
-            return bound_meth;
-        }
-        else if (p->vtable->base_type == enum_class_MultiSub) {
-            PMC * const bound_meth      = pmc_new(INTERP, enum_class_Bound_NCI);
-            VTABLE_set_pmc(INTERP, bound_meth, SELF);
-            PMC_struct_val(bound_meth)  = p;
-            PObj_get_FLAGS(bound_meth) |= PObj_private0_FLAG;
-
-            return bound_meth;
-        }
-
-        /* RT #46671 bound user functions */
-        return p;
     }
 
 /*

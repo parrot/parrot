@@ -340,6 +340,8 @@ Queries this object's class to find the method with the given name.
             PMC * const cur_class =
                 VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
 
+            const Parrot_Class_attributes * const class_info = PARROT_CLASS(cur_class);
+
             /* If there's a vtable override for 'find_method' in the current
              * class, run that first. */
             method = Parrot_oo_find_vtable_override_for_class(interp, cur_class,
@@ -352,7 +354,6 @@ Queries this object's class to find the method with the given name.
             /* If it's from this universe or the class doesn't inherit from
              * anything outside of it... */
             if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
-                const Parrot_Class_attributes * const class_info = PARROT_CLASS(cur_class);
                 if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
                     /* Found it! */
                     method = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
@@ -360,27 +361,8 @@ Queries this object's class to find the method with the given name.
                 }
             }
             else {
-                /* Delegate the lookup to the class. */
-                PMC * const del_class = VTABLE_get_pmc_keyed_int(interp, obj->attrib_store,
-                    alien_parents_pos);
-                method = VTABLE_find_method(interp, del_class, name);
-
-                if (!PMC_IS_NULL(method)) {
-                    /* Found it. However, if we just hand this back and it's
-                     * an NCI and we call it, we will get the wrong invocant
-                     * passed. Therefore, we need to close the NCI and make it
-                     * into a BoundNCI. */
-                    if (method->vtable->base_type == enum_class_NCI) {
-                        method         = VTABLE_clone(interp, method);
-                        method->vtable = interp->vtables[enum_class_Bound_NCI];
-                        VTABLE_set_pmc(interp, method, del_class);
-                    }
-
-                    /* Found a method, so we're done. */
-                    break;
-                }
-
-                alien_parents_pos++;
+                Parrot_ex_throw_from_c_args(INTERP, NULL, -1, 
+                        "Class %Ss inherits from alien parents.", class_info->name);
             }
         }
 
