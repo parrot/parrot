@@ -202,23 +202,17 @@ register and then use that register with the print instruction.
 =begin PIR
 
   .sub main
-      set $S0, "Hello world!\n"
-      print $S0
-  .end
-
-=end PIR
-
-This sample shows the explicit use of the C<set> opcode. PIR
-provides some syntactic relief here with the C<=> operator.
-
-=begin PIR
-
-  .sub main
       $S0 = "Hello world!\n"
       print $S0
   .end
 
 =end PIR
+
+PIR does not allow us to set a register directly. We need to prefix the
+register name with C<$> when referring to a register. The compiler will map $S0
+to one of the available string registers, for example S0, and set the value.
+This example also uses the syntactic sugar provided by the C<=> operator.  C<=>
+is simply a more readable way of using the C<set> opcode.  
 
 To make PIR even more readable, named registers can be used. These are later
 mapped to real numbered registers.
