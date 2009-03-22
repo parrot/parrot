@@ -437,11 +437,6 @@ Return a representation of the hash contents.
         HashBucket * const b =
             parrot_hash_get_bucket(INTERP, (Hash *)PMC_struct_val(SELF), key);
 
-        /*
-         * RT #46647 current behaviour of $S0 = hsh['no_such_key'] in
-         *      PGE and possibly more code needs an empty STRING
-         *      (--leo)
-         */
         if (!b)
             return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
 
@@ -483,11 +478,6 @@ Returns the string value for the element at C<*key>.
         keystr = make_hash_key(INTERP, key);
         b      = parrot_hash_get_bucket(INTERP, hash, keystr);
 
-        /*
-         * RT #46647 current behaviour of $S0 = hsh['no_such_key'] in
-         *      PGE and possibly more code needs an empty STRING
-         *      (--leo)
-         */
         if (!b)
             return Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
 
