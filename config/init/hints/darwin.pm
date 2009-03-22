@@ -56,7 +56,7 @@ sub runstep {
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
 
-        # RT 43147:  When built against a dynamic libparrot,
+        # TT #344:  When built against a dynamic libparrot,
         # installable_parrot records the path to the blib version
         # of the library.
 
