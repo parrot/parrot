@@ -183,9 +183,6 @@ sub process_code_start_token {
 
     if ( $text =~ /^Parrot::/o ) {
 
-        # RT #43715 - C<Perl::Module> should really be L<Perl::Module>
-        # but this will do until the docs are changed.
-
         my $href = $self->href_for_perl_module($text);
 
         esc($text);
