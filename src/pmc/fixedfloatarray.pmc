@@ -100,6 +100,32 @@ Creates and returns a copy of the array.
 
 /*
 
+=item C<PMC *get_iter()>
+
+Return an Iterator for this PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *get_iter() {
+        STRING     *name     = CONST_STRING(interp, "set_key");
+        PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC * const key      = pmc_new(INTERP, enum_class_Key);
+
+        Parrot_PCCINVOKE(interp, iter, name, "P->", key);
+        PObj_get_FLAGS(key) |= KEY_integer_FLAG;
+
+        if (SELF.get_integer() == 0)
+            VTABLE_set_integer_native(INTERP, key, -1);
+        else
+            VTABLE_set_integer_native(INTERP, key, 0);
+
+        return iter;
+    }
+
+/*
+
 =item C<INTVAL get_bool()>
 
 Returns whether the array has any elements (meaning been initialized, for a

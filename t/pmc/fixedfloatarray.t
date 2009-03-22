@@ -20,7 +20,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(24)
+    plan(25)
 
     array_size_tests()
     element_set_tests()
@@ -29,6 +29,7 @@ out-of-bounds test. Checks INT and PMC keys.
     clone_tests()
     what_is_truth()
     interface_check()
+    get_iter_test()
 .end
 
 .sub array_size_tests
@@ -220,6 +221,24 @@ end:
     does b, p, "no_interface"
     is(b, 0, "FFA does not do no_interface")
 .end
+
+.sub get_iter_test
+    $P0 = new ['FixedFloatArray']
+    $P0 = 3
+    $P0[0] = 1.1
+    $P0[1] = 99.99
+    $P0[2] = -345.001
+    $P1 = iter $P0
+loop:
+    unless $P1 goto loop_end
+    $S2 = shift $P1
+    $S0 = concat $S0, $S2
+    $S0 = concat $S0, ","
+    goto loop
+  loop_end:
+    is($S0, "1.1,99.99,-345.001,", "get_iter works")
+.end
+
 
 # Local Variables:
 #   mode: pir

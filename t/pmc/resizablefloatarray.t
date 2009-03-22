@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 21;
+use Parrot::Test tests => 22;
 
 =head1 NAME
 
@@ -487,6 +487,26 @@ pir_output_is( << 'CODE', << 'OUTPUT', "unshift float" );
 .end
 CODE
 2 20.2 10.1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "get_iter" );
+.sub main :main
+    $P0 = new ['ResizableFloatArray']
+    $P0[0] = 1.1
+    $P0[1] = 99.99
+    $P0[2] = -345.001
+    $P1 = iter $P0
+loop:
+    unless $P1 goto loop_end
+    $S2 = shift $P1
+    say $S2
+    goto loop
+  loop_end:
+.end
+CODE
+1.1
+99.99
+-345.001
 OUTPUT
 
 # Local Variables:
