@@ -32,61 +32,28 @@ C<Parrot_register_pmc> if it isn't visible to Parrot.
 #include "pmc_hash.h"
 
 pmclass AddrRegistry extends Hash need_ext provides hash {
-    ATTR Hash *hash;    /* a PMC Hash */
 /*
 
 =item C<void init()>
 
 Initializes the instance.
 
-=item C<void destroy()>
-
-Free hash structure.
-
 =cut
 
 */
 
     VTABLE void init() {
-        Hash                       *registry;
-        Parrot_AddrRegistry_attributes * const addr_registry =
-            mem_allocate_zeroed_typed(Parrot_AddrRegistry_attributes);
+        Hash  *registry = parrot_create_hash(INTERP,
+                enum_type_int,
+                Hash_key_type_PMC,
+                int_compare,
+                key_hash_int);
 
-        PMC_data(SELF)      = addr_registry;
+        /* prevent set_pointer from trying to delete an invalid hash */
+        PMC_struct_val(SELF) = NULL;
+        SELF.set_pointer(registry);
         PObj_custom_mark_destroy_SETALL(SELF);
 
-        registry = parrot_create_hash(INTERP, enum_type_int, Hash_key_type_PMC,
-                              int_compare, key_hash_int);
-
-        PMC_struct_val(SELF) = registry;
-        addr_registry->hash  = registry;
-        registry->container  = SELF;
-
-    }
-
-    VTABLE void destroy() {
-        if (PMC_data(SELF)) {
-            Parrot_AddrRegistry_attributes * const registry = PARROT_ADDRREGISTRY(SELF);
-
-            parrot_hash_destroy(INTERP, registry->hash);
-            mem_sys_free(registry);
-            PMC_data(SELF) = NULL;
-        }
-    }
-
-/*
-
-=item C<void mark()>
-
-Marks the hash as live.
-
-=cut
-
-*/
-
-    VTABLE void mark() {
-        if (PMC_data(SELF))
-            parrot_mark_hash(INTERP, PARROT_ADDRREGISTRY(SELF)->hash);
     }
 
 /*
@@ -108,7 +75,7 @@ Returns true if the hash size is not zero.
 */
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        Hash   *hash  = PARROT_ADDRREGISTRY(SELF)->hash;
+        Hash   *hash  = (Hash *)SELF.get_pointer();
         void   *value = parrot_hash_get(INTERP, hash, key);
 
         if (value)
@@ -118,11 +85,11 @@ Returns true if the hash size is not zero.
     }
 
     VTABLE INTVAL elements() {
-        return parrot_hash_size(INTERP, PARROT_ADDRREGISTRY(SELF)->hash);
+        return parrot_hash_size(INTERP, (Hash *)SELF.get_pointer());
     }
 
     VTABLE INTVAL get_bool() {
-        return parrot_hash_size(INTERP, PARROT_ADDRREGISTRY(SELF)->hash) != 0;
+        return parrot_hash_size(INTERP, (Hash *)SELF.get_pointer()) != 0;
     }
 /*
 
@@ -146,7 +113,7 @@ reaches 0, delete the entry.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        Hash       * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
+        Hash       * const hash = (Hash *)SELF.get_pointer();
         void       *oldval      = parrot_hash_get(INTERP, hash, key);
         long        newval      = 1;
         UNUSED(value);
@@ -158,12 +125,12 @@ reaches 0, delete the entry.
     }
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        Hash *hash = PARROT_ADDRREGISTRY(SELF)->hash;
+        Hash *hash = (Hash *)SELF.get_pointer();
         parrot_hash_put(INTERP, hash, key, (void *)value);
     }
 
     VTABLE void delete_keyed(PMC *key) {
-        Hash       * const hash  = PARROT_ADDRREGISTRY(SELF)->hash;
+        Hash       * const hash  = (Hash *)SELF.get_pointer();
         void              *value = parrot_hash_get(INTERP, hash, key);
 
         /* these casts look bad, but they avoid type punning warnings with -O */
@@ -189,7 +156,7 @@ If called from iteration, return the key PMC, else PMCNULL is returned.
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        Hash * const hash = PARROT_ADDRREGISTRY(SELF)->hash;
+        Hash * const hash = (Hash *)SELF.get_pointer();
 
         if (KEY_IS_HASH_ITERATOR(key))
             return (PMC *)parrot_hash_get_idx(INTERP, hash, key);

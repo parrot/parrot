@@ -54,7 +54,7 @@ Marks the OrderedHash as live.
 */
 
     VTABLE void mark() {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         INTVAL  i;
 
         if (!h)
@@ -90,7 +90,7 @@ Marks the OrderedHash as live.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         const INTVAL n = h->entries;
         HashBucket *b;
 
@@ -137,7 +137,7 @@ Marks the OrderedHash as live.
 */
 
     VTABLE STRING *get_string_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         const INTVAL n = h->entries;
 
         HashBucket *b;
@@ -186,7 +186,7 @@ Returns the integer value associated with C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         const INTVAL n = h->entries;
         HashBucket *b;
 
@@ -236,7 +236,7 @@ Returns the floating-point value for the element at C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         const INTVAL n = h->entries;
         HashBucket *b;
 
@@ -288,7 +288,7 @@ The created key = "\1idx".
 */
 
     VTABLE void set_pmc_keyed_int(INTVAL idx, PMC *val) {
-        Hash * const     h = (Hash *)PMC_struct_val(SELF);
+        Hash * const     h = (Hash *)SELF.get_pointer();
         const INTVAL     n = h->entries;
         STRING * const fmt = CONST_STRING(INTERP, "\1%d");
 
@@ -379,7 +379,7 @@ The created key = "\1idx".
 */
 
     VTABLE INTVAL exists_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         const INTVAL n = h->entries;
         HashBucket  *b;
 
@@ -401,7 +401,7 @@ The created key = "\1idx".
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
             PMC        *item, *next;
             HashBucket *b;
-            Hash       * const h   = (Hash *)PMC_struct_val(SELF);
+            Hash       * const h   = (Hash *)SELF.get_pointer();
             INTVAL             idx = key_integer(INTERP, key);
             const INTVAL       n   = h->entries;
 
@@ -429,7 +429,7 @@ The created key = "\1idx".
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
-        const Hash * const       h = (Hash *)PMC_struct_val(SELF);
+        const Hash * const       h = (Hash *)SELF.get_pointer();
         const HashBucket * const b = parrot_hash_get_bucket(INTERP, h, key);
 
         return (b && b->key);
@@ -449,7 +449,7 @@ The created key = "\1idx".
 
     VTABLE INTVAL defined_keyed(PMC *key) {
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
-            Hash * const h   = (Hash *)PMC_struct_val(SELF);
+            Hash * const h   = (Hash *)SELF.get_pointer();
             INTVAL       idx = key_integer(INTERP, key);
             const INTVAL n   = h->entries;
 
@@ -481,7 +481,7 @@ The created key = "\1idx".
     }
 
     VTABLE INTVAL defined_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         const INTVAL n = h->entries;
         HashBucket  *b;
 
@@ -536,7 +536,7 @@ Deletes the key C<*key> from the hash.
     }
 
     VTABLE void delete_keyed_int(INTVAL idx) {
-        Hash * const h = (Hash *)PMC_struct_val(SELF);
+        Hash * const h = (Hash *)SELF.get_pointer();
         const INTVAL n = h->entries;
         HashBucket  *b;
 
@@ -556,7 +556,7 @@ Deletes the key C<*key> from the hash.
     }
 
     VTABLE void delete_keyed_str(STRING *key) {
-        const Hash * const h = (Hash *)PMC_struct_val(SELF);
+        const Hash * const h = (Hash *)SELF.get_pointer();
         HashBucket * const b = parrot_hash_get_bucket(INTERP, h, key);
 
         if (!b)
@@ -579,8 +579,8 @@ the clone via integers has different indices, if items were deleted.
 
     VTABLE PMC *clone() {
         PMC  * const dest   = pmc_new(INTERP, SELF->vtable->base_type);
-        Hash * const hash   = (Hash *)PMC_struct_val(SELF);
-        Hash * const h_dest = (Hash *)PMC_struct_val(dest);
+        Hash * const hash   = (Hash *)SELF.get_pointer();
+        Hash * const h_dest = (Hash *)VTABLE_get_pointer(INTERP, dest);
         UINTVAL     i;
 
         for (i = 0; i <= N_BUCKETS(hash->mask-1); i++) {
@@ -627,7 +627,7 @@ preserve key/value order.
             case VISIT_FREEZE_NORMAL:
             case VISIT_FREEZE_AT_DESTRUCT:
                 {
-                    Hash     * const hash = (Hash *)PMC_struct_val(SELF);
+                    Hash     * const hash = (Hash *)SELF.get_pointer();
                     IMAGE_IO * const io   = info->image_io;
                     UINTVAL i;
 
