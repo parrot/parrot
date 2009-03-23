@@ -37,13 +37,17 @@ lexinfo.
 
 */
     void init_pmc(PMC* lexinfo) {
+        Hash *hash;
         if (VTABLE_elements(interp, lexinfo)) {
             PMC_pmc_val(SELF) =
                 pmc_new_init(interp, enum_class_LexPad, lexinfo);
         }
         else
             PMC_pmc_val(SELF) = NULL;
-        parrot_new_pmc_hash(interp, SELF);
+
+        hash                 = parrot_new_hash(INTERP);
+        PMC_struct_val(SELF) = hash;
+        hash->container      = SELF;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 

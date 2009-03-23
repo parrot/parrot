@@ -1560,7 +1560,8 @@ todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
 {
     ASSERT_ARGS(todo_list_seen)
     HashBucket * const b =
-        parrot_hash_get_bucket(interp, (Hash *)PMC_struct_val(info->seen), pmc);
+        parrot_hash_get_bucket(interp,
+                (Hash *)VTABLE_get_pointer(interp, info->seen), pmc);
 
     if (b) {
         *id = (UINTVAL) b->value;
@@ -1569,7 +1570,8 @@ todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
 
     info->id += 4;      /* next id to freeze */
     *id = info->id;
-    parrot_hash_put(interp, (Hash *)PMC_struct_val(info->seen), pmc, (void*)*id);
+    parrot_hash_put(interp,
+            (Hash *)VTABLE_get_pointer(interp, info->seen), pmc, (void*)*id);
     /* remember containers */
     if (pmc->pmc_ext)
         list_unshift(interp, (List *)PMC_data(info->todo), pmc, enum_type_PMC);

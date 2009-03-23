@@ -834,7 +834,7 @@ parrot_new_hash(PARROT_INTERP)
 
 =item C<void parrot_new_pmc_hash>
 
-Creates a new Parrot STRING hash in PMC_struct_val(container).
+Creates a new Parrot STRING hash in C<container>.
 
 =cut
 
@@ -845,13 +845,8 @@ void
 parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
 {
     ASSERT_ARGS(parrot_new_pmc_hash)
-    Hash * const hash = parrot_create_hash(interp,
-            enum_type_PMC,
-            Hash_key_type_STRING,
-            STRING_compare,
-            (hash_hash_key_fn)key_hash_STRING);
-    PMC_struct_val(container) = hash;
-    hash->container           = container;
+    Hash * const hash = parrot_new_hash(interp);
+    VTABLE_set_pointer(interp, container, hash);
 }
 
 

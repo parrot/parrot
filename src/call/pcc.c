@@ -901,7 +901,8 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
         if (!PMC_IS_NULL(st->key)) {
             st->src.slurp_i++;
             st->name = (STRING *)parrot_hash_get_idx(interp,
-                            (Hash *)PMC_struct_val(st->src.slurp), st->key);
+                            (Hash *)VTABLE_get_pointer(interp, st->src.slurp),
+                            st->key);
             PARROT_ASSERT(st->name);
             UVal_pmc(st->val) = VTABLE_get_pmc_keyed_str(interp,
                 st->src.slurp, st->name);
