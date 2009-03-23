@@ -133,16 +133,8 @@ main(int argc, char *argv[])
 {
     int nextarg;
     Parrot_Interp     interp;
-
-    /*
-    Parrot_Interp     debugger = Parrot_new(interp);
-    PDB_t            *pdb      = mem_allocate_zeroed_typed(PDB_t);
-    */
     PDB_t *pdb;
     const char       *scriptname = NULL;
-    const char       *filename;
-    char             *ext;
-    void             *yyscanner;
 
     Parrot_set_config_hash();
 
@@ -161,64 +153,74 @@ main(int argc, char *argv[])
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 
-    do_yylex_init(interp, &yyscanner);
-
-    if (argc < 2) {
-        fprintf(stderr, "Usage: parrot_debugger programfile [program-options]\n");
-        Parrot_exit(interp, 1);
-    }
-
     nextarg = 1;
-    if (strcmp(argv[nextarg], "--script") == 0)
+    if (argv[nextarg] && strcmp(argv[nextarg], "--script") == 0)
     {
         scriptname = argv [++nextarg];
         ++nextarg;
     }
 
-    filename = argv[nextarg];
-    ext      = strrchr(filename, '.');
+    if (argv[nextarg]) {
+        const char *filename = argv[nextarg];
+        const char *ext      = strrchr(filename, '.');
 
-    if (ext && STREQ(ext, ".pbc")) {
-        Parrot_PackFile pf = Parrot_pbc_read(interp, filename, 0);
+        if (ext && STREQ(ext, ".pbc")) {
+            Parrot_PackFile pf = Parrot_pbc_read(interp, filename, 0);
 
-        if (!pf)
-            return 1;
+            if (!pf)
+                return 1;
 
-        Parrot_pbc_load(interp, pf);
-        PackFile_fixup_subs(interp, PBC_MAIN, NULL);
-    }
-    else {
-        Parrot_PackFile pf        = PackFile_new(interp, 0);
-        int             pasm_file = 0;
+            Parrot_pbc_load(interp, pf);
+            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+        }
+        else {
+            void            *yyscanner;
+            Parrot_PackFile  pf        = PackFile_new(interp, 0);
+            int              pasm_file = 0;
 
-        Parrot_pbc_load(interp, pf);
+            do_yylex_init(interp, &yyscanner);
 
-        IMCC_push_parser_state(interp);
-        IMCC_INFO(interp)->state->file = filename;
+            Parrot_pbc_load(interp, pf);
 
-        if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
-            IMCC_fatal_standalone(interp, EXCEPTION_PIO_ERROR,
-                    "Error reading source file %s.\n",
-                    filename);
+            IMCC_push_parser_state(interp);
+            IMCC_INFO(interp)->state->file = filename;
+
+            if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
+                IMCC_fatal_standalone(interp, EXCEPTION_PIO_ERROR,
+                        "Error reading source file %s.\n",
+                        filename);
+            }
+
+            if (ext && STREQ(ext, ".pasm"))
+                pasm_file = 1;
+
+            emit_open(interp, 1, NULL);
+            IMCC_INFO(interp)->state->pasm_file = pasm_file;
+            yyparse(yyscanner, interp);
+            imc_compile_all_units(interp);
+
+            imc_cleanup(interp, yyscanner);
+
+            fclose(imc_yyin_get(yyscanner));
+            PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
+
+            /* load the source for debugger list */
+            PDB_load_source(interp, filename);
+
+            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
         }
 
-        if (ext && STREQ(ext, ".pasm"))
-            pasm_file = 1;
+    }
+    else {
+        /* Generate some code to be able to enter into runloop */
 
-        emit_open(interp, 1, NULL);
-        IMCC_INFO(interp)->state->pasm_file = pasm_file;
-        yyparse(yyscanner, interp);
-        imc_compile_all_units(interp);
+        STRING *compiler = Parrot_str_new_constant(interp, "PIR");
+        STRING *errstr = NULL;
+        const char source []= ".sub aux :main\nexit 0\n.end\n";
+        PMC *code = Parrot_compile_string(interp, compiler, source, &errstr);
 
-        imc_cleanup(interp, yyscanner);
-
-        fclose(imc_yyin_get(yyscanner));
-        PackFile_fixup_subs(interp, PBC_POSTCOMP, NULL);
-
-        /* load the source for debugger list */
-        PDB_load_source(interp, filename);
-
-        PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+        if (!STRING_IS_NULL(errstr))
+            Parrot_io_eprintf(interp, "%Ss\n", errstr);
     }
 
     Parrot_unblock_GC_mark(interp);
