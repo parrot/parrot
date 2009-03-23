@@ -845,8 +845,10 @@ void
 parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
 {
     ASSERT_ARGS(parrot_new_pmc_hash)
-    Hash * const hash = parrot_create_hash(interp, enum_type_PMC,
-            Hash_key_type_STRING, STRING_compare,
+    Hash * const hash = parrot_create_hash(interp,
+            enum_type_PMC,
+            Hash_key_type_STRING,
+            STRING_compare,
             (hash_hash_key_fn)key_hash_STRING);
     PMC_struct_val(container) = hash;
     hash->container           = container;
@@ -876,6 +878,56 @@ parrot_new_cstring_hash(PARROT_INTERP)
             (hash_hash_key_fn)key_hash_cstring);
 }
 
+
+/*
+
+=item C<Hash * parrot_new_pointer_hash>
+
+Create and return a new hash with void * keys and values.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+Hash *
+parrot_new_pointer_hash(PARROT_INTERP)
+{
+    ASSERT_ARGS(parrot_new_pointer_hash)
+    return parrot_create_hash(interp,
+            enum_type_ptr,
+            Hash_key_type_ptr,
+            pointer_compare,
+            key_hash_pointer);
+}
+
+
+/*
+
+=item C<Hash* parrot_new_intval_hash>
+
+Creates and returns new Hash PMC with INTVAL keys and values. C<flags> can be
+C<PObj_constant_FLAG> or 0.
+
+=cut
+
+*/
+
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+Hash*
+parrot_new_intval_hash(PARROT_INTERP)
+{
+    ASSERT_ARGS(parrot_new_intval_hash)
+    return parrot_create_hash(interp,
+            enum_type_INTVAL,
+            Hash_key_type_int,
+            int_compare,
+            key_hash_int);
+}
 
 /*
 
@@ -1026,50 +1078,6 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
     }
 
     parrot_hash_destroy(interp, hash);
-}
-
-
-/*
-
-=item C<Hash * parrot_new_pointer_hash>
-
-Create and return a new hash with void * keys and values.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-Hash *
-parrot_new_pointer_hash(PARROT_INTERP)
-{
-    ASSERT_ARGS(parrot_new_pointer_hash)
-    return parrot_create_hash(interp, enum_type_ptr, Hash_key_type_ptr,
-            pointer_compare, key_hash_pointer);
-}
-
-
-/*
-
-=item C<Hash* parrot_new_intval_hash>
-
-Creates and returns new Hash PMC with INTVAL keys and values. C<flags> can be
-C<PObj_constant_FLAG> or 0.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Hash*
-parrot_new_intval_hash(PARROT_INTERP)
-{
-    ASSERT_ARGS(parrot_new_intval_hash)
-    return parrot_create_hash(interp, enum_type_INTVAL, Hash_key_type_int,
-            int_compare, key_hash_int);
 }
 
 
