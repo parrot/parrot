@@ -207,14 +207,6 @@ check in 1.4 or 2.0 for the new names.
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
-=item src/hash.c API cleanup [eligible in 1.1]
-
-C<Parrot_new_INTVAL_hash> will also be rewritten to return a Hash* and will be
-renamed to C<parrot_new_intval_hash> for consistency with other similar
-functions.
-
-L<https://trac.parrot.org/parrot/ticket/456>
-
 =item Parrot_add_library_path [eligible in 1.1]
 
 Will be renamed to C<Parrot_lib_add_path_from_cstring>.

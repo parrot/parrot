@@ -1132,7 +1132,8 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
     info->visit_pmc_later = add_pmc_todo_list;
     /* we must use PMCs here, so that they get marked properly */
     info->todo = pmc_new(interp, enum_class_Array);
-    info->seen = Parrot_new_INTVAL_hash(interp, 0);
+    info->seen = pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pointer(interp, info->seen, parrot_new_intval_hash(interp));
 
     ft_init(interp, info);
 }

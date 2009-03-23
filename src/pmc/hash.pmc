@@ -175,15 +175,16 @@ Use C<ptr> as this PMC's Hash*.
 =cut
 
 */
-    
+
     VTABLE void set_pointer(void *ptr) {
         Hash *old_hash = (Hash *)PMC_struct_val(SELF);
         Hash *new_hash = (Hash *)ptr;
-        
+
         PMC_struct_val(SELF) = new_hash;
+        new_hash->container  = SELF;
         parrot_hash_destroy(INTERP, old_hash);
     }
-        
+
 /*
 
 =item C<void *get_pointer()>
@@ -1098,10 +1099,10 @@ Used to unarchive the hash.
             const INTVAL v_type = VTABLE_shift_integer(INTERP, io);
             Hash        *hash;
 
-            /* RT #46651 make a better interface for hash creation
-             * RT #46653 create hash with needed size in the first place */
+            /* RT #46653 create hash with needed size in the first place */
             if (k_type == Hash_key_type_int && v_type == enum_hash_int) {
-                PMC * const dummy     = Parrot_new_INTVAL_hash(INTERP, 0);
+                PMC * const dummy  = pmc_new(interp, enum_class_Hash);
+                VTABLE_set_pointer(INTERP, dummy, parrot_new_intval_hash(INTERP));
 
                 /* don't leak the hash if we're going to overwrite it anyway */
                 if (PMC_struct_val(SELF))

@@ -192,7 +192,7 @@ Hash* parrot_new_hash(PARROT_INTERP)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC* Parrot_new_INTVAL_hash(PARROT_INTERP, UINTVAL flags)
+Hash* parrot_new_intval_hash(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -288,7 +288,7 @@ Hash * parrot_create_hash(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parrot_new_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_new_INTVAL_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_parrot_new_intval_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_parrot_new_pmc_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

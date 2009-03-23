@@ -361,7 +361,7 @@ Queries this object's class to find the method with the given name.
                 }
             }
             else {
-                Parrot_ex_throw_from_c_args(INTERP, NULL, -1, 
+                Parrot_ex_throw_from_c_args(INTERP, NULL, -1,
                         "Class %Ss inherits from alien parents.", class_info->name);
             }
         }
