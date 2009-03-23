@@ -727,14 +727,11 @@ callback, passing it a status object.
 
 =back
 
-=head3 Network I/O Opcodes
+=head3 Network I/O Methods
 
-Most of these opcodes conform to the standard UNIX interface, but the
-layer API allows alternate implementations for each.
-
-[These I'm also considering moving to methods in a role for the Socket
-object. Keep C<socket> as an opcode, or maybe just make C<socket> an
-option on creating a new Socket object.]
+Most of these methods take a default set of arguments the same as the standard
+UNIX interface. Many also take additional optional arguments. There are no
+network-specific opcodes.
 
 =over 4
 
