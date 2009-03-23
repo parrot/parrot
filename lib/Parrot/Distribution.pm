@@ -371,9 +371,7 @@ sub get_c_language_files {
         $self->c_header_files,
         $self->pmc_source_files,
         $self->yacc_source_files,
-
-        #$self->lex_source_files,
-        map( $_->files_of_type('Lex file'), $self->lex_source_file_directories ),
+        $self->lex_source_files,
         $self->ops_source_files,
     );
 
@@ -385,7 +383,6 @@ sub get_c_language_files {
 
     return @c_language_files;
 
-    # RT #43691: lex_source_files() collects lisp files as well.
     # RT #50046: pir_source_files() fails to collect PIR .t files.
 }
 
