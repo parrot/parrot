@@ -19,7 +19,7 @@ These opcodes should be considered implicitly deprecated - that is, they
 may be removed in any release.
 
 If you rely on any of these opcodes, please open a
-L<https://trac.parrot.org/|Trac ticket>.
+Trac ticket at L<https://trac.parrot.org/>.
 
 
 =cut
@@ -40,6 +40,8 @@ Break into debugger. Implementation notes:
 
 For other architectures, this is a C<noop>.
 
+=back
+
 =cut
 
 op trap() :deprecated {
@@ -50,8 +52,6 @@ op trap() :deprecated {
     __asm__("trap");       /* opcode tr 31, 0, 0 */
 #endif
 }
-
-=back
 
 =head1 COPYRIGHT
 
