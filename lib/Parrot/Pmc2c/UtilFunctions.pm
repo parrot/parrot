@@ -9,7 +9,7 @@ use Fatal qw(open close);
 
 use base qw( Exporter );
 our @EXPORT_OK = qw( count_newlines return_statement dont_edit dynext_load_code
-    c_code_coda slurp spew splat filename escape_filename
+    c_code_coda slurp spew filename escape_filename
     args_from_parameter_list
     passable_args_from_parameter_list
 );
@@ -270,13 +270,6 @@ sub slurp {
 sub spew {
     my ( $filename, $data ) = @_;
     open my $fh, '>', $filename;
-    print {$fh} $data;
-    close $fh;
-}
-
-sub splat {
-    my ( $filename, $data ) = @_;
-    open my $fh, '>>', $filename;
     print {$fh} $data;
     close $fh;
 }
