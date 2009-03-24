@@ -25,10 +25,6 @@ specifically by including this C<PIR> code:
 
 =over 4
 
-=item Always build with core PMC set (remove config option) [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/310>
-
 =item Alternate GC configurations [eligible in 1.5]
 
 C<malloc>, C<malloc-trace> and C<libc> will be removed as potential

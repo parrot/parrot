@@ -8,6 +8,7 @@ New in 1.1.0
   + Removed dynamic op: mul 
   + Removed .HLL_map directive; use interp's .hll_map() instead
   + Removed PMCs: slice, bound_nci
+  * Removed Configure.pl option: --pmc
 
 New in 1.0.0
 - Documentation
