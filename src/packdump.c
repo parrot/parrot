@@ -200,7 +200,8 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
             switch (type) {
                 case KEY_integer_FLAG:
                     Parrot_io_printf(interp, "        TYPE        => INTEGER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n", PMC_int_val(key));
+                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                            VTABLE_get_integer(interp, key));
                     Parrot_io_printf(interp, "       },\n");
                     break;
                 case KEY_number_FLAG:
@@ -233,22 +234,26 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                     break;
                 case KEY_integer_FLAG | KEY_register_FLAG:
                     Parrot_io_printf(interp, "        TYPE        => I REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n", PMC_int_val(key));
+                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                            VTABLE_get_integer(interp, key));
                     Parrot_io_printf(interp, "       },\n");
                     break;
                 case KEY_number_FLAG | KEY_register_FLAG:
                     Parrot_io_printf(interp, "        TYPE        => N REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n", PMC_int_val(key));
+                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                            VTABLE_get_integer(interp, key));
                     Parrot_io_printf(interp, "       },\n");
                     break;
                 case KEY_string_FLAG | KEY_register_FLAG:
                     Parrot_io_printf(interp, "        TYPE        => S REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n", PMC_int_val(key));
+                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                            VTABLE_get_integer(interp, key));
                     Parrot_io_printf(interp, "       },\n");
                     break;
                 case KEY_pmc_FLAG | KEY_register_FLAG:
                     Parrot_io_printf(interp, "        TYPE        => P REGISTER\n");
-                    Parrot_io_printf(interp, "        DATA        => %ld\n", PMC_int_val(key));
+                    Parrot_io_printf(interp, "        DATA        => %ld\n",
+                            VTABLE_get_integer(interp, key));
                     Parrot_io_printf(interp, "       },\n");
                     break;
                 default:

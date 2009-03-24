@@ -33,7 +33,6 @@ pmclass CallSignature extends Capture need_ext provides array provides hash {
     ATTR PMC    *returns;    /* Result PMCs, if they were passed with the call */
     ATTR PMC    *type_tuple; /* Cached argument types for multiple dispatch */
     ATTR STRING *short_sig;  /* Simple string signature args & returns */
-    ATTR INTVAL  data_size;  /* ? */
 
 /*
 

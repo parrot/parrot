@@ -356,8 +356,9 @@ set_register_usage(PARROT_INTERP,
             while (key) {
                 const UINTVAL flags = PObj_get_FLAGS(key);
                 if (flags & KEY_register_FLAG) {
-                    INTVAL n = PMC_int_val(key);
+                    INTVAL n = 0;
                     if (flags & KEY_integer_FLAG) {
+                        n = VTABLE_get_integer(interp, key);
                         typ = 0;
                         if (n < 0)
                             n = -1 - n;

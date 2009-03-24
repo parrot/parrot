@@ -127,11 +127,11 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
     }
     else if (pmc->vtable->base_type == enum_class_Boolean) {
         Parrot_io_eprintf(debugger, "Boolean=PMC(%#p: %d)",
-                pmc, PMC_int_val(pmc));
+                pmc, VTABLE_get_integer(interp, pmc));
     }
     else if (pmc->vtable->base_type == enum_class_Integer) {
         Parrot_io_eprintf(debugger, "Integer=PMC(%#p: %d)",
-                pmc, PMC_int_val(pmc));
+                pmc, VTABLE_get_integer(interp, pmc));
     }
     else if (pmc->vtable->base_type == enum_class_BigInt) {
         STRING * const s = VTABLE_get_string(interp, pmc);
@@ -181,7 +181,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
     while (key) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         case KEY_integer_FLAG:
-            len += Parrot_io_eprintf(debugger, "%vi", PMC_int_val(key));
+            len += Parrot_io_eprintf(debugger, "%vi", VTABLE_get_integer(interp, key));
             break;
         case KEY_number_FLAG:
             len += Parrot_io_eprintf(debugger, "%vg", VTABLE_get_number(interp, key));
@@ -198,29 +198,29 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
             }
             break;
         case KEY_integer_FLAG|KEY_register_FLAG:
-            len += Parrot_io_eprintf(debugger, "I%vd=%vd", PMC_int_val(key),
-                    REG_INT(interp, PMC_int_val(key)));
+            len += Parrot_io_eprintf(debugger, "I%vd=%vd", VTABLE_get_integer(interp, key),
+                    REG_INT(interp, VTABLE_get_integer(interp, key)));
             break;
         case KEY_number_FLAG|KEY_register_FLAG:
-            len += Parrot_io_eprintf(debugger, "I%vd=%vd", PMC_int_val(key),
-                    REG_NUM(interp, PMC_int_val(key)));
+            len += Parrot_io_eprintf(debugger, "I%vd=%vd", VTABLE_get_integer(interp, key),
+                    REG_NUM(interp, VTABLE_get_integer(interp, key)));
             break;
         case KEY_string_FLAG|KEY_register_FLAG:
             {
-            const STRING * const s = REG_STR(interp, PMC_int_val(key));
+            const STRING * const s = REG_STR(interp, VTABLE_get_integer(interp, key));
             STRING* const escaped = Parrot_str_escape_truncate(
                             interp, s, 20);
             if (escaped)
-                len += Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"", PMC_int_val(key),
+                len += Parrot_io_eprintf(debugger, "S%vd=\"%Ss\"", VTABLE_get_integer(interp, key),
                         escaped);
             else
                 len += Parrot_io_eprintf(debugger, "S%vd=\"(null)\"",
-                        PMC_int_val(key));
+                        VTABLE_get_integer(interp, key));
             }
             break;
         case KEY_pmc_FLAG|KEY_register_FLAG:
-            len += Parrot_io_eprintf(debugger, "P%vd=", PMC_int_val(key));
-            trace_pmc_dump(debugger, REG_PMC(interp, PMC_int_val(key)));
+            len += Parrot_io_eprintf(debugger, "P%vd=", VTABLE_get_integer(interp, key));
+            trace_pmc_dump(debugger, REG_PMC(interp, VTABLE_get_integer(interp, key)));
             break;
         default:
             len += Parrot_io_eprintf(debugger, "??");

@@ -2539,7 +2539,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                     break;
                 case KEY_integer_FLAG:
                     Parrot_snprintf(interp, buf, sizeof (buf),
-                                    INTVAL_FMT, PMC_int_val(k));
+                                    INTVAL_FMT, VTABLE_get_integer(interp, k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
@@ -2563,25 +2563,25 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
                     break;
                 case KEY_integer_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interp, buf, sizeof (buf),
-                                    "I" INTVAL_FMT, PMC_int_val(k));
+                                    "I" INTVAL_FMT, VTABLE_get_integer(interp, k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_number_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interp, buf, sizeof (buf),
-                                    "N" INTVAL_FMT, PMC_int_val(k));
+                                    "N" INTVAL_FMT, VTABLE_get_integer(interp, k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_string_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interp, buf, sizeof (buf),
-                                    "S" INTVAL_FMT, PMC_int_val(k));
+                                    "S" INTVAL_FMT, VTABLE_get_integer(interp, k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;
                 case KEY_pmc_FLAG|KEY_register_FLAG:
                     Parrot_snprintf(interp, buf, sizeof (buf),
-                                    "P" INTVAL_FMT, PMC_int_val(k));
+                                    "P" INTVAL_FMT, VTABLE_get_integer(interp, k));
                     strcpy(&dest[size], buf);
                     size += strlen(buf);
                     break;

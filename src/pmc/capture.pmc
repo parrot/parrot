@@ -30,8 +30,9 @@ These are the vtable functions for the Capture PMC.
         PARROT_CAPTURE(obj)->hash = pmc_new((i), enum_class_Hash);
 
 pmclass Capture need_ext {
-    ATTR PMC *array;
-    ATTR PMC *hash;
+    ATTR PMC    *array;
+    ATTR PMC    *hash;
+    ATTR INTVAL  data_size;
 
 /*
 
@@ -52,7 +53,7 @@ Free structures.
         PMC_data(SELF)          = capture;
         capture->array          = NULL;
         capture->hash           = NULL;
-        PMC_int_val(SELF)       = CAPTURE_DATA_SIZE;
+        capture->data_size      = CAPTURE_DATA_SIZE;
         PObj_active_destroy_SET(SELF);
         PObj_custom_mark_SET(SELF);
     }
@@ -62,8 +63,6 @@ Free structures.
             mem_sys_free(PARROT_CAPTURE(SELF));
             PMC_data(SELF) = NULL;
         }
-
-        PMC_int_val(SELF)  = 0;
     }
 
 /*
@@ -524,7 +523,7 @@ Mark the array.
         if (!data)
             return;
 
-        for (i = PMC_int_val(SELF) - 1; i >= 0; --i)
+        for (i = PARROT_CAPTURE(SELF)->data_size - 1; i >= 0; --i)
             if (data[i])
                 pobject_lives(interp, (PObj *)data[i]);
     }
