@@ -85,9 +85,7 @@ our @EXPORT_OK = qw(
 
 @developing_tests = ( 't/distro/file_metadata.t' );
 # Add in all t/codingstd except for a few skips.
-push @developing_tests,
-  grep { ! m/(c_function_docs|c_todo|pod_description|pod_todo)\.t$/ }
-  glob 't/codingstd/*.t';
+push @developing_tests, glob 't/codingstd/*.t';
 
 sub get_default_tests {
     my ($core_tests_only, $runcore_tests_only) = @_;
