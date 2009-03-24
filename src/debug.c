@@ -397,12 +397,14 @@ static void dbg_watch(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 
 struct DebuggerCmd {
     debugger_func_t func;
+    const char * const shorthelp;
     const char * const help;
 };
 
 static const DebuggerCmd
     cmd_break = {
         & dbg_break,
+        "add a breakpoint",
 "Set a breakpoint at a given line number (which must be specified).\n\n\
 Optionally, specify a condition, in which case the breakpoint will only\n\
 activate if the condition is met. Conditions take the form:\n\n\
@@ -415,6 +417,7 @@ The command returns a number which is the breakpoint identifier."
     },
     cmd_continue = {
         & dbg_continue,
+        "continue the program execution",
 "Continue the program execution.\n\n\
 Without arguments, the program runs until a breakpoint is found\n\
 (or until the program terminates for some other reason).\n\n\
@@ -424,6 +427,7 @@ use \"run\" to re-run the program."
     },
     cmd_delete = {
         & dbg_delete,
+        "delete a breakpoint",
 "Delete a breakpoint.\n\n\
 The breakpoint to delete must be specified by its breakpoint number.\n\
 Deleted breakpoints are gone completely. If instead you want to\n\
@@ -431,6 +435,7 @@ temporarily disable a breakpoint, use \"disable\"."
     },
     cmd_disable = {
         & dbg_disable,
+        "disable a breakpoint",
 "Disable a breakpoint.\n\n\
 The breakpoint to disable must be specified by its breakpoint number.\n\
 Disabled breakpoints are not forgotten, but have no effect until re-enabled\n\
@@ -438,51 +443,62 @@ with the \"enable\" command."
     },
     cmd_disassemble = {
         & dbg_disassemble,
+        "disassemble the bytecode",
 "Disassemble code"
     },
     cmd_echo = {
         & dbg_echo,
+        "toggle echo of script commands",
 "Toggle echo mode.\n\n\
 In echo mode the script commands are written to stderr before executing."
     },
     cmd_enable = {
         & dbg_enable,
+        "reenable a disabled breakpoint",
 "Re-enable a disabled breakpoint."
     },
     cmd_eval = {
         & dbg_eval,
+        "run an instruction",
 "No documentation yet"
     },
     cmd_gcdebug = {
         & dbg_gcdebug,
+        "toggle gcdebug mode",
 "Toggle gcdebug mode.\n\n\
 In gcdebug mode a garbage collection cycle is run before each opcocde,\n\
 same as using the gcdebug core."
     },
     cmd_help = {
         & dbg_help,
+        "print this help",
 "Print a list of available commands."
     },
     cmd_info = {
         & dbg_info,
+        "print interpreter information",
 "Print information about the current interpreter"
     },
     cmd_list = {
         & dbg_list,
+        "list the source code file",
 "List the source code.\n\n\
 Optionally specify the line number to begin the listing from and the number\n\
 of lines to display."
     },
     cmd_listbreakpoints = {
         & dbg_listbreakpoints,
+        "list breakpoints",
 "List breakpoints."
     },
     cmd_load = {
         & dbg_load,
+        "load a source code file",
 "Load a source code file."
     },
     cmd_next = {
         & dbg_next,
+        "run the next instruction",
 "Execute a specified number of instructions.\n\n\
 If a number is specified with the command (e.g. \"next 5\"), then\n\
 execute that number of instructions, unless the program reaches a\n\
@@ -491,38 +507,45 @@ If no number is specified, it defaults to 1."
     },
     cmd_print = {
         & dbg_print,
+        "print the interpreter registers",
 "Print register: e.g. \"p i2\"\n\
 Note that the register type is case-insensitive. If no digits appear\n\
 after the register type, all registers of that type are printed."
     },
     cmd_quit = {
         & dbg_quit,
+        "exit the debugger",
 "Exit the debugger"
     },
     cmd_run = {
         & dbg_run,
+        "run the program",
 "Run (or restart) the program being debugged.\n\n\
 Arguments specified after \"run\" are passed as command line arguments to\n\
 the program.\n"
     },
     cmd_script = {
         & dbg_script,
+        "interprets a file as user commands",
 "Interprets a file s user commands.\n\
 Usage:\n\
 (pdb) script file.script"
     },
     cmd_stack = {
         & dbg_stack,
+        "examine the stack",
 "Print a stack trace of the parrot VM"
     },
     cmd_trace = {
         & dbg_trace,
+        "trace the next instruction",
 "Similar to \"next\", but prints additional trace information.\n\
 This is the same as the information you get when running Parrot with\n\
 the -t option.\n"
     },
     cmd_watch = {
         & dbg_watch,
+        "add a watchpoint",
 "Add a watchpoint"
     };
 
@@ -3329,32 +3352,16 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     }
     else {
         if (*cmdline == '\0') {
-            /* C89: strings need to be 509 chars or less */
-            Parrot_io_eprintf(interp->pdb->debugger, "\
-List of commands:\n\
-    disassemble  -- disassemble the bytecode\n\
-    load         -- load a source code file\n\
-    list     (l) -- list the source code file\n\
-    run      (r) -- run the program\n\
-    break    (b) -- add a breakpoint\n\
-    script   (f) -- interprets a file as user commands\n\
-    echo         -- toggle echo of script commands\n\
-    watch    (w) -- add a watchpoint\n\
-    delete   (d) -- delete a breakpoint\n\
-    disable      -- disable a breakpoint\n\
-    enable       -- reenable a disabled breakpoint\n\
-    continue (c) -- continue the program execution\n");
-            Parrot_io_eprintf(interp->pdb->debugger, "\
-    next     (n) -- run the next instruction\n\
-    eval     (e) -- run an instruction\n\
-    trace    (t) -- trace the next instruction\n\
-    print    (p) -- print the interpreter registers\n\
-    stack    (s) -- examine the stack\n\
-    info         -- print interpreter information\n\
-    gcdebug      -- toggle gcdebug mode\n\
-    quit     (q) -- exit the debugger\n\
-    help     (h) -- print this help\n\n\
-Type \"help\" followed by a command name for full documentation.\n\n");
+            unsigned int i;
+            Parrot_io_eprintf(interp->pdb->debugger, "List of commands:\n");
+            for (i= 0; i < sizeof (DebCmdList) / sizeof (DebuggerCmdList); ++i) {
+                const DebuggerCmdList *cmdlist = DebCmdList + i;
+                Parrot_io_eprintf(interp->pdb->debugger,
+                    "    %-12s-- %s\n", cmdlist->name, cmdlist->cmd->shorthelp);
+            }
+            Parrot_io_eprintf(interp->pdb->debugger, "\n"
+"Type \"help\" followed by a command name for full documentation.\n\n");
+
         }
         else {
             Parrot_io_eprintf(interp->pdb->debugger, "Unknown command: %s\n", command);
