@@ -647,7 +647,7 @@ NULL otherwise.  Remember to free the string with C<Parrot_str_free_cstring()>.
 
 =item C<STRING* Parrot_locate_runtime_file_str>
 
-Like above but use and return STRINGs. 
+Like above but use and return STRINGs.
 
 Locate the full path for C<file_name> and the given file type(s). If
 successful, returns a C-string allocated with C<Parrot_str_to_cstring> or
