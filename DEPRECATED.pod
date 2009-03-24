@@ -29,6 +29,13 @@ specifically by including this C<PIR> code:
 
 L<https://trac.parrot.org/parrot/ticket/310>
 
+=item Alternate GC configurations [eligible in 1.5]
+
+C<malloc>, C<malloc-trace> and C<libc> will be removed as potential
+options for the C<--gc> config option.
+
+L<https://trac.parrot.org/parrot/ticket/490>
+
 =back
 
 =head1 PMCS
