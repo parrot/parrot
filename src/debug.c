@@ -100,7 +100,7 @@ static const char* GDB_print_reg(PARROT_INTERP, int t, int n)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static const DebuggerCmd * get_cmd(const char **cmd);
+static const DebuggerCmd * get_cmd(ARGIN_NULLOK(const char **cmd));
 
 PARROT_WARN_UNUSED_RESULT
 static unsigned long get_uint(ARGMOD(const char **cmd), unsigned int def)

@@ -677,10 +677,6 @@ PackFile_Segment * PackFile_Segment_new_seg(PARROT_INTERP,
         FUNC_MODIFIES(*dir);
 
 PARROT_EXPORT
-void Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t * PackFile_Segment_pack(PARROT_INTERP,
@@ -743,6 +739,10 @@ void Parrot_destroy_constants(PARROT_INTERP)
 
 PARROT_EXPORT
 void Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
