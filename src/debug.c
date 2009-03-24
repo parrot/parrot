@@ -83,10 +83,6 @@ static void debugger_cmdline(PARROT_INTERP)
 static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         __attribute__nonnull__(1);
 
-static int GDB_B(PARROT_INTERP, ARGIN(const char *s))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static const char* GDB_P(PARROT_INTERP, ARGIN(const char *s))
@@ -165,9 +161,6 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_dump_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_GDB_B __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_GDB_P __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
@@ -3578,79 +3571,6 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     else
         return "no such reg";
 
-}
-
-/* RT #46141 move these to debugger interpreter
- */
-static PDB_breakpoint_t *gdb_bps;
-
-/*
- * GDB_pb   gdb> pb 244     # set breakpoint at opcode 244
- *
- * RT #46143 We can't remove the breakpoint yet, executing the next ins
- * most likely fails, as the length of the debug-brk stmt doesn't
- * match the old opcode
- * Setting a breakpoint will also fail, if the bytecode is r/o
- *
- */
-/*
-
-=item C<static int GDB_B>
-
-Inserts a break-point into a table (which it creates if necessary).
-Takes an instruction counter (?).
-
-Currently unused.
-
-Returns break-point count, or -1 if point is out of bounds.
-
-=cut
-
-*/
-
-static int
-GDB_B(PARROT_INTERP, ARGIN(const char *s))
-{
-    ASSERT_ARGS(GDB_B)
-    if ((unsigned long)s < 0x10000) {
-        /* HACK alarm pb 45 is passed as the integer not a string */
-        /* RT #46145 check if in bounds */
-        opcode_t * const pc = interp->code->base.data + (unsigned long)s;
-        PDB_breakpoint_t *bp, *newbreak;
-        int nr;
-
-        if (!gdb_bps) {
-            nr             = 0;
-            newbreak       = mem_allocate_typed(PDB_breakpoint_t);
-            newbreak->prev = NULL;
-            newbreak->next = NULL;
-            gdb_bps        = newbreak;
-        }
-        else {
-            /* create new one */
-            for (nr = 0, bp = gdb_bps; ; bp = bp->next, ++nr) {
-                if (bp->pc == pc)
-                    return nr;
-
-                if (!bp->next)
-                    break;
-            }
-
-            ++nr;
-            newbreak       = mem_allocate_typed(PDB_breakpoint_t);
-            newbreak->prev = bp;
-            newbreak->next = NULL;
-            bp->next       = newbreak;
-        }
-
-        newbreak->pc = pc;
-        newbreak->id = *pc;
-        *pc          = PARROT_OP_trap;
-
-        return nr;
-    }
-
-    return -1;
 }
 
 /*
