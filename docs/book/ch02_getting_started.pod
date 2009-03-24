@@ -27,8 +27,12 @@ a test file in the main F<parrot> directory called F<fjord.pasm>. C<.pasm>
 files are written in primative Parrot Assembly Language (PASM) which is a
 low-level programming interface to Parrot.
 
+=begin PASM
+
   print "He's pining for the fjords.\n"
   end
+
+=end PASM
 
 Now run this file with:
 
