@@ -1,0 +1,3 @@
+version=3
+
+ftp://ftp.parrot.org/pub/parrot/releases/stable/(?:[\d\.]+)/parrot-([\d\.]+).tar.gz
