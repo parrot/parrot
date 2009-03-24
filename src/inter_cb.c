@@ -139,9 +139,9 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
      * _D ... user_data is 1st parameter
      */
     if (type == 'C')
-        PMC_data(cb) = F2DPTR(Parrot_callback_C);
+        VTABLE_set_pointer(interp, cb, F2DPTR(Parrot_callback_C));
     else
-        PMC_data(cb) = F2DPTR(Parrot_callback_D);
+        VTABLE_set_pointer(interp, cb, F2DPTR(Parrot_callback_D));
     gc_register_pmc(interp, cb);
 
     return cb;
@@ -345,7 +345,7 @@ case_I:
         case 'p':
             /* created a UnManagedStruct */
             p_param = pmc_new(interp, enum_class_UnManagedStruct);
-            PMC_data(p_param) = external_data;
+            VTABLE_set_pointer(interp, p_param, external_data);
             pasm_sig[2] = 'P';
             param = (void*) p_param;
             break;
