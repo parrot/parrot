@@ -56,7 +56,7 @@ Description: Parrot documentation
 Package: parrot-devel
 Architecture: any
 Section: devel
-Depends: ${shlibs:Depends}, parrot, perl
+Depends: ${shlibs:Depends}, parrot, libparrot-dev, perl
 Provides: parrot-pge, parrot-tge, parrot-pct, parrot-nqp
 Conflicts: parrot ( < 1.0.0 ), libparrot-dev ( < 1.0.0 )
 Replaces: parrot ( < 1.0.0 ), libparrot-dev ( < 1.0.0 )
