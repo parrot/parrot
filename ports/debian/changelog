@@ -19,7 +19,7 @@ parrot (1.0.0-1) unstable; urgency=low
       libparrot-dev.install
   * parrot-minimal.install.in, parrot-devel.install.in
     - Added template files for new packages
-  * parrot-doc.docs
+  * parrot-doc.docs, libparrot-dev.dirs
     - Removed
   * libparrot.postinst
     - Added so ldconfig gets called properly by dh_makeshlibs (patch from
