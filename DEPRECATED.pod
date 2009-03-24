@@ -47,14 +47,6 @@ L<https://trac.parrot.org/parrot/ticket/189>
 
 L<https://trac.parrot.org/parrot/ticket/190>
 
-=item slice [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/372>
-
-=item bound_nci [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/373>
-
 =item moved to dynpmc [eligible in 1.1]
 
 AddrRegistry, CodeString, Env, Eval, File, OS, PCCMETHOD_Test, StringHandle,
