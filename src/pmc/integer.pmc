@@ -342,18 +342,6 @@ Adds C<value> to the integer and returns the result in C<*dest>.
 */
 
     MULTI PMC *add(Integer value, PMC *dest) {
-        /*
-         * SELF and value can both be PMCs that inherit
-         * from Integer:
-         *   cl = subclass "Integer", "MyInt"
-         * so we can't used PMC_int_val(SELF) in any of these
-         * Integer methods
-         *
-         * RT #46627
-         *   check for exact Integer type
-         *   e.g. MMD_Integer_EXACT
-         */
-
         const INTVAL a = SELF.get_integer();
         const INTVAL b = VTABLE_get_integer(INTERP, value);
         const INTVAL c = a + b;

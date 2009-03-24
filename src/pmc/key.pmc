@@ -305,7 +305,7 @@ Returns the key itself.
 =item C<PMC *nextkey_keyed(PMC *key, INTVAL what)>
 
 Returns the next key relative to the location specified in C<what>.
-PMC_int_val(-1) means end of iteration.
+int_key == -1 means end of iteration.
 
 =cut
 

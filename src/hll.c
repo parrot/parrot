@@ -492,9 +492,6 @@ Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
     if (hll_id == PARROT_HLL_NONE)
         return interp->root_namespace;
 
-    if (PMC_int_val(interp->HLL_namespace) < hll_id)
-        return PMCNULL;
-
     return VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace, hll_id);
 }
 
