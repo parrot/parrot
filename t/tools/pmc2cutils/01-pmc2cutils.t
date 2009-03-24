@@ -19,7 +19,7 @@ BEGIN {
     }
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 20;
+use Test::More tests => 19;
 
 use_ok('Parrot::Pmc2c::Pmc2cMain');
 
@@ -40,8 +40,6 @@ can_ok( $self, q{dump_vtable} );
 can_ok( $self, q{read_dump} );
 can_ok( $self, q{gen_c} );
 can_ok( $self, q{dump_pmc} );
-
-can_ok( 'Parrot::Pmc2c::UtilFunctions', q{open_file} );
 
 can_ok( 'Parrot::Pmc2c::Parser', q{parse_pmc} );
 can_ok( 'Parrot::Pmc2c::Parser', q{parse_flags} );
