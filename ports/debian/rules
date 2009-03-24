@@ -39,10 +39,11 @@ build-stamp: configure-stamp
 	dh_testdir
 	$(MAKE) installable
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" docs/running.pod debian/parrot.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" parrot_config debian/parrot_config.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" tools/util/parrot-config.pir debian/parrot_config.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" tools/dev/pbc_to_exe.pir debian/pbc_to_exe.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_dump.c debian/pbc_dump.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_disassemble.c debian/pbc_disassemble.1
-	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/parrot_debugger.c debian/parrot-debugger.1
+	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/parrot_debugger.c debian/parrot_debugger.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_info.c debian/pbc_info.1
 	pod2man --section=1 --release="Debian Project" --center="Debian GNU/Linux manual" src/pbc_merge.c debian/pbc_merge.1
 	touch build-stamp
@@ -72,7 +73,7 @@ binary-indep: build install
 	dh_testdir -i 
 	dh_testroot -i
 	dh_installchangelogs -i ChangeLog
-	dh_installman -plibparrot-dev debian/parrot_config.1
+	dh_installman -plibparrot-dev
 	dh_installdocs -i
 	dh_link -plibparrot-dev usr/lib/libparrot.so.$(SOVERSION) usr/lib/libparrot.so
 	dh_compress -pparrot-doc -X.pod
@@ -88,7 +89,8 @@ binary-arch: build install
 	dh_testdir -a
 	dh_testroot -a
 	dh_installchangelogs -a ChangeLog
-	dh_installman -pparrot debian/parrot.1 debian/pbc_dump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_info.1 debian/pbc_merge.1
+	dh_installman -pparrot-minimal debian/parrot.1
+	dh_installman -pparrot-devel debian/parrot_debugger.1 debian/pbc_disassemble.1 debian/pbc_dump.1 debian/pbc_info.1 debian/pbc_merge.1 debian/parrot_config.1 debian/pbc_to_exe.1
 	dh_installdocs -a
 	dh_strip -a
 	dh_compress -a

@@ -10,6 +10,10 @@ parrot (1.0.0-1) unstable; urgency=low
     - Re-order dh_installdeb in binary-arch to run after dh_makeshlibs and
       shlibdeps so that the library gets installed properly (patch from David
       Nusinow)
+    - Move manpage generation to new packages. Rename parrot-debugger.1 to
+      parrot_debugger.1 to match executable name. Generate pbc_to_exe and
+      parrot_config manpages from .pir source files (patch from David
+      Nusinow)
   * parrot.install.in, parrot-doc.install.in, libparrot-dev.install.in
     - Added template files, replace parrot.install, parrot-doc.install, and
       libparrot-dev.install
@@ -25,7 +29,7 @@ parrot (1.0.0-1) unstable; urgency=low
       distribution.
     - Removed copyright info for files no longer in distribution.
 
- -- Allison Randal <allison@parrot.org>  Wed, 18 Mar 2009 23:50:41 -0700
+ -- Allison Randal <allison@parrot.org>  Tue, 24 Mar 2009 01:28:57 -0700
 
 parrot (0.9.0-1) unstable; urgency=low
 
