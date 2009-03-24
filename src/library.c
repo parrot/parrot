@@ -632,7 +632,7 @@ Parrot_add_library_path_from_cstring(PARROT_INTERP,
         ARGIN(const char *path),
         enum_lib_paths which)
 {
-    ASSERT_ARGS(Parrot_add_library_path)
+    ASSERT_ARGS(Parrot_add_library_path_from_cstring)
     STRING * const path_str = Parrot_str_new(interp, path, 0);
     Parrot_add_library_path(interp, path_str, which);
 }
