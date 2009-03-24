@@ -62,7 +62,9 @@ subroutine.
     }
 
     VTABLE void init_pmc(PMC *sub) {
-        Hash *hash;
+        Hash                      *hash;
+        Parrot_LexInfo_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_LexInfo_attributes);
         PARROT_ASSERT(PObj_constant_TEST(SELF));
         PMC_pmc_val(SELF) = sub;
 
@@ -72,8 +74,6 @@ subroutine.
             (hash_comp_fn)Parrot_str_not_equal,     /* STRING compare */
             (hash_hash_key_fn)Parrot_str_to_hashval); /*        hash    */
 
-        Parrot_LexInfo_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_LexInfo_attributes);
         PMC_data(SELF) = attrs;
         SELF.set_pointer(hash);
         PObj_active_destroy_SET(SELF);

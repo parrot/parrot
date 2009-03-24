@@ -97,6 +97,7 @@ static STRING
                 EXCEPTION_UNEXPECTED_NULL, "Hash: Cannot use NULL STRING key");
         else
             return keystr;
+    }
 
 }
 
