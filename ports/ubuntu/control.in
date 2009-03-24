@@ -11,7 +11,7 @@ Architecture: any
 Depends: parrot-minimal (= ${binary:Version})
 Suggests: parrot-doc
 Provides: parrot-test, parrot-data-dumper
-Description: Virtual machine for dynamic languages
+Description: A virtual machine for dynamic languages
  Parrot is a bytecode-based virtual machine designed for dynamic languages.
  Parrot hosts a variety of language implementations, including Tcl, Javascript,
  Ruby, Lua, Scheme, PHP, Python, Perl 6, and a .NET bytecode translator.
@@ -39,7 +39,8 @@ Architecture: any
 Section: universe/devel
 Depends: libparrot@SOVERSION@ (= ${binary:Version}), parrot
 Description: Parrot shared library development files
- This package contains files needed to develop applications which embed Parrot.
+ This package contains header files and a static library, needed to develop
+ applications which embed Parrot.
 
 Package: parrot-doc
 Architecture: all
