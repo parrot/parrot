@@ -93,3 +93,11 @@ dt {
 	padding-top: 0.5em;
 	padding-bottom: 1em;
 }
+
+pre {
+        border: 1px dashed #3b5b91;
+        padding: 5px;
+        color: black;
+        background: #BFCa7d;
+        overflow: auto;
+}

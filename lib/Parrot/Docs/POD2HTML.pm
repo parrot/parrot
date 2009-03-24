@@ -33,6 +33,23 @@ use base qw( Pod::Simple::HTML );
 our $VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
+use Parrot::Distribution;
+
+=item C<new()>
+
+Extend C<Pod::Simple::HTML> method to accept PIR and PASM sections that
+contain example code, which will be put into a <pre> HTML element.
+
+=cut
+
+sub new {
+    my $new = shift->SUPER::new(@_);
+
+    $new->accept_targets('PIR', 'PASM');
+    delete(@{$new->{'Tagmap'}}{'Data','/Data'});
+
+    return $new;
+}
 
 =item C<do_beginning()>
 
@@ -124,6 +141,9 @@ sub process_start_token {
     }
     elsif ( $tagname eq 'Data' ) {
         $self->process_data_start_token($token);
+    }
+    elsif ( $tagname eq 'for' ) {
+        $self->process_for_start_token($token);
     }
     else {
         $self->process_other_start_token($token);
@@ -309,7 +329,29 @@ sub process_data_start_token {
         return;
     }
 
-    printf { $self->{'output_fh'} } "\n" . $next->text . "\n";
+    if  ($self->{IN_CODE_BLOCK}) {
+        print { $self->{'output_fh'} } $next->text;
+    }
+    else {
+        print { $self->{'output_fh'} } "\n" . $next->text . "\n";
+    }
+}
+
+=item C<process_for_start_token($token)>
+
+Processes a for start token.
+
+=cut
+
+sub process_for_start_token {
+    my $self  = shift;
+    my $token = shift;
+    my $target = $token->attr("target");
+
+    if ($target eq "PIR" || $target eq "PASM") {
+        print { $self->{'output_fh'} } '<pre>';
+        $self->{IN_CODE_BLOCK} = 1;
+    }
 }
 
 =item C<process_other_start_token($token)>
@@ -364,6 +406,10 @@ sub process_end_token {
     }
     elsif ( $tagname eq 'item-text' ) {
         $self->{IN_ITEM_TEXT} = 0;
+    }
+    elsif ( $tagname eq 'for' ) {
+        print { $self->{'output_fh'} } '</pre>' if $self->{IN_CODE_BLOCK};
+        $self->{IN_CODE_BLOCK} = 0;
     }
 
     print { $self->{'output_fh'} } $self->{'Tagmap'}{"/$tagname"} || return;
