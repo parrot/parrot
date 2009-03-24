@@ -112,6 +112,7 @@ static unsigned long get_ulong(ARGMOD(const char **cmd), unsigned long def)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*cmd);
 
+static void list_breakpoints(PDB_t *pdb);
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * nextarg(ARGIN_NULLOK(const char *command));
@@ -177,6 +178,7 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(cmd)
 #define ASSERT_ARGS_get_ulong __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(cmd)
+#define ASSERT_ARGS_list_breakpoints __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_nextarg __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_parse_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(str) \
@@ -313,6 +315,13 @@ static void dbg_list(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     TRACEDEB_MSG("dbg_list");
 
     PDB_list(pdb->debugee, cmd);
+}
+
+static void dbg_listbreakpoints(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+{
+    TRACEDEB_MSG("dbg_list");
+
+    list_breakpoints(pdb);
 }
 
 static void dbg_load(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
@@ -464,6 +473,10 @@ same as using the gcdebug core."
 Optionally specify the line number to begin the listing from and the number\n\
 of lines to display."
     },
+    cmd_listbreakpoints = {
+        & dbg_listbreakpoints,
+"List breakpoints."
+    },
     cmd_load = {
         & dbg_load,
 "Load a source code file."
@@ -533,6 +546,7 @@ DebuggerCmdList DebCmdList [] = {
     { "gcdebug",     &cmd_gcdebug },
     { "help",        &cmd_help },
     { "info",        &cmd_info },
+    { "L",           &cmd_listbreakpoints },
     { "l",           &cmd_list },
     { "list",        &cmd_list },
     { "load",        &cmd_load },
@@ -1685,7 +1699,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
                 line = line->next;
 
             /* Abort if the line number provided doesn't exist */
-            if (!line->next) {
+            if (line == NULL || !line->next) {
                 Parrot_io_eprintf(pdb->debugger,
                     "Can't set a breakpoint at line number %li\n", ln);
                 return;
@@ -1767,6 +1781,19 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     if (line)
         Parrot_io_eprintf(pdb->debugger, " line %li", line->number);
     Parrot_io_eprintf(pdb->debugger, " pos %li\n", newbreak->pc - interp->code->base.data);
+}
+
+static void
+list_breakpoints(PDB_t *pdb)
+{
+    ASSERT_ARGS(list_breakpoints)
+
+    PDB_breakpoint_t **lbreak;
+    for (lbreak = & pdb->breakpoint; *lbreak; lbreak = & (*lbreak)->next) {
+        PDB_breakpoint_t *br = *lbreak;
+        Parrot_io_eprintf(pdb->debugger, "Breakpoint %li at", br->id);
+        Parrot_io_eprintf(pdb->debugger, " pos %li\n", br->pc - pdb->debugee->code->base.data);
+    }
 }
 
 /*
