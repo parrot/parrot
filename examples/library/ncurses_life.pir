@@ -7,11 +7,11 @@ examples/library/ncurses_life.pir - Conway's Game of Life (ncurses version)
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/library/ncurses_life.pir examples/library/acorn.l
+    % ./parrot examples/library/ncurses_life.pir examples/library/acorn.life
 
 =head1 DESCRIPTION
 
-An C<ncurses> version of Conway's Life. F<acorn.l> is a I<life> file.
+An C<ncurses> version of Conway's Life. F<acorn.life> is a I<life> file.
 
 This version can load F<life.l> files (#P, #A, #R formats only). You get
 a lot of .l files by installing C<xlife>.
@@ -883,8 +883,13 @@ key_done:
 
 =head1 SEE ALSO
 
-F<examples/library/acorn.l>, F<examples/pasm/life.pasm>,
+F<examples/library/acorn.life>, F<examples/pasm/life.pasm>,
 F<library/ncurses.pasm>, F<library/ncurses.declarations>.
+
+=head1 NOTE
+
+The normal extension for life files is C<.l> - Parrot treats these
+as C<lex> files, however, so we use a more verbose extension
 
 =cut
 
