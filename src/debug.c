@@ -551,37 +551,35 @@ the -t option.\n"
 
 struct DebuggerCmdList {
     const char * const name;
+    char shortname;
     const DebuggerCmd * const cmd;
 };
 
 DebuggerCmdList DebCmdList [] = {
-    { "break",       &cmd_break },
-    { "continue",    &cmd_continue },
-    { "d",           &cmd_delete },
-    { "delete",      &cmd_delete },
-    { "disable",     &cmd_disable },
-    { "disassemble", &cmd_disassemble },
-    { "e",           &cmd_eval },
-    { "echo",        &cmd_echo },
-    { "enable",      &cmd_enable },
-    { "eval",        &cmd_eval },
-    { "f",           &cmd_script },
-    { "gcdebug",     &cmd_gcdebug },
-    { "help",        &cmd_help },
-    { "info",        &cmd_info },
-    { "L",           &cmd_listbreakpoints },
-    { "l",           &cmd_list },
-    { "list",        &cmd_list },
-    { "load",        &cmd_load },
-    { "next",        &cmd_next },
-    { "print",       &cmd_print },
-    { "quit",        &cmd_quit },
-    { "run",         &cmd_run },
-    { "script",      &cmd_script },
-    { "s",           &cmd_stack },
-    { "stack",       &cmd_stack },
-    { "trace",       &cmd_trace },
-    { "watch",       &cmd_watch },
+    { "break",       '\0', &cmd_break },
+    { "continue",    '\0', &cmd_continue },
+    { "delete",      'd',  &cmd_delete },
+    { "disable",     '\0', &cmd_disable },
+    { "disassemble", '\0', &cmd_disassemble },
+    { "e",           '\0', &cmd_eval },
+    { "echo",        '\0', &cmd_echo },
+    { "enable",      '\0', &cmd_enable },
+    { "eval",        '\0', &cmd_eval },
+    { "f",           '\0', &cmd_script },
+    { "gcdebug",     '\0', &cmd_gcdebug },
+    { "help",        '\0', &cmd_help },
+    { "info",        '\0', &cmd_info },
+    { "L",           '\0', &cmd_listbreakpoints },
+    { "list",        'l',  &cmd_list },
+    { "load",        '\0', &cmd_load },
+    { "next",        '\0', &cmd_next },
+    { "print",       '\0', &cmd_print },
+    { "quit",        '\0', &cmd_quit },
+    { "run",         '\0', &cmd_run },
+    { "script",      '\0', &cmd_script },
+    { "stack",       's',  &cmd_stack },
+    { "trace",       '\0', &cmd_trace },
+    { "watch",       '\0', &cmd_watch }
 };
 
 PARROT_WARN_UNUSED_RESULT
@@ -598,6 +596,7 @@ get_cmd(ARGIN_NULLOK(const char **cmd))
         char c;
         unsigned int i, l;
         int found = -1;
+        int hits = 0;
 
         *cmd = start;
         for (; (c= *next) != '\0' && !isspace((unsigned char)c); ++next)
@@ -606,20 +605,25 @@ get_cmd(ARGIN_NULLOK(const char **cmd))
         if (l == 0)
             return NULL;
         for (i= 0; i < sizeof (DebCmdList) / sizeof (DebuggerCmdList); ++i) {
-            if (strncmp(*cmd, DebCmdList[i].name, l) == 0) {
-                if (strlen(DebCmdList[i].name) == l) {
+            const DebuggerCmdList * const cmdlist = DebCmdList + i;
+            if (l == 1 && cmdlist->shortname == (*cmd)[0]) {
+                hits = 1;
+                found = i;
+                break;
+            }
+            if (strncmp(*cmd, cmdlist->name, l) == 0) {
+                if (strlen(cmdlist->name) == l) {
+                    hits = 1;
                     found = i;
                     break;
                 }
                 else {
-                    if (found == -1)
-                        found = i;
-                    else
-                        return NULL;
+                    ++hits;
+                    found = i;
                 }
             }
         }
-        if (found != -1) {
+        if (hits == 1) {
             *cmd = skip_whitespace(next);
             return DebCmdList[found].cmd;
         }
@@ -1316,11 +1320,7 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
         return 0;
     }
     else {
-        if (c == 0) {
-            /*
-            if (pdb->last_command)
-                PDB_run_command(interp, pdb->last_command);
-            */
+        if (*cmdline == '\0') {
             return 0;
         }
         else {
@@ -3343,8 +3343,7 @@ PDB_help(PARROT_INTERP, ARGIN(const char *command))
     ASSERT_ARGS(PDB_help)
     const DebuggerCmd *cmd;
 
-    /* Extract the command after leading whitespace (for error messages). */
-    const char * cmdline = skip_whitespace(command);
+    const char * cmdline = command;
     cmd = get_cmd(& cmdline);
 
     if (cmd) {
