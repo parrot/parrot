@@ -142,7 +142,7 @@ static void
 propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
         PMC * const pmc_true  = pmc_new(interp, enum_class_Integer);
-        PMC_int_val(pmc_true) = 1;
+        VTABLE_set_integer_native(interp, pmc_true, 1);
         VTABLE_set_pmc_keyed_str(interp, prop_hash, CONST_STRING(interp, "_ro"), pmc_true);
     }
 }
@@ -183,7 +183,7 @@ check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
         &&!Parrot_str_compare(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val  = pmc_new(interp, enum_class_Integer);
-        PMC_int_val(ret_val) = 1;
+        VTABLE_set_integer_native(interp, ret_val, 1);
         return ret_val;
     }
     else

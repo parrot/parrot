@@ -50,7 +50,6 @@ typedef enum {
  * class macros
  */
 
-#define CLASS_ATTRIB_COUNT(cl)  PMC_int_val2(cl)
 #define GET_CLASS(obj)          (obj)->vtable->pmc_class
 
 /* HEADERIZER BEGIN: src/oo.c */

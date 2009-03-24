@@ -92,7 +92,7 @@ key_new_number(PARROT_INTERP, FLOATVAL value)
     PMC * const key = pmc_new(interp, enum_class_Key);
 
     PObj_get_FLAGS(key) |= KEY_number_FLAG;
-    PMC_num_val(key) = value;
+    SETATTR_Key_num_key(interp, key, value);
 
     return key;
 }
@@ -233,7 +233,7 @@ key_set_number(PARROT_INTERP, ARGMOD(PMC *key), FLOATVAL value)
     ASSERT_ARGS(key_set_number)
     PObj_get_FLAGS(key) &= ~KEY_type_FLAGS;
     PObj_get_FLAGS(key) |=  KEY_number_FLAG;
-    PMC_num_val(key)     = value;
+    SETATTR_Key_num_key(interp, key, value);
 
     return;
 }
@@ -326,8 +326,9 @@ INTVAL
 key_integer(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_integer)
-    INTVAL  int_key;
-    STRING *str_key;
+    INTVAL   int_key;
+    STRING  *str_key;
+    FLOATVAL num_key;
 
     if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
@@ -341,7 +342,8 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
             return REG_INT(interp, int_key);
 
         case KEY_number_FLAG:
-            return (INTVAL)PMC_num_val(key);
+            GETATTR_Key_num_key(interp, key, num_key);
+            return (INTVAL)num_key;
         case KEY_number_FLAG | KEY_register_FLAG:
             GETATTR_Key_int_key(interp, key, int_key);
             return (INTVAL)REG_NUM(interp, int_key);
@@ -401,11 +403,13 @@ FLOATVAL
 key_number(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_number)
-    INTVAL int_key;
+    INTVAL   int_key;
+    FLOATVAL num_key;
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
     case KEY_number_FLAG:
-        return PMC_num_val(key);
+        GETATTR_Key_num_key(interp, key, num_key);
+        return num_key;
     case KEY_number_FLAG | KEY_register_FLAG:
         GETATTR_Key_int_key(interp, key, int_key);
         return REG_NUM(interp, int_key);
@@ -443,7 +447,8 @@ STRING *
 key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_string)
-    INTVAL int_key;
+    INTVAL   int_key;
+    FLOATVAL num_key;
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         /* remember to COW strings instead of returning them directly */
@@ -480,7 +485,8 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
             return Parrot_str_from_int(interp, REG_INT(interp, int_key));
 
         case KEY_number_FLAG:
-            return Parrot_str_from_num(interp, PMC_num_val(key));
+            GETATTR_Key_num_key(interp, key, num_key);
+            return Parrot_str_from_num(interp, num_key);
         case KEY_number_FLAG | KEY_register_FLAG:
             GETATTR_Key_int_key(interp, key, int_key);
             return Parrot_str_from_num(interp, REG_NUM(interp, int_key));

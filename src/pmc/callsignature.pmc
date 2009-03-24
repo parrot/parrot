@@ -33,6 +33,7 @@ pmclass CallSignature extends Capture need_ext provides array provides hash {
     ATTR PMC    *returns;    /* Result PMCs, if they were passed with the call */
     ATTR PMC    *type_tuple; /* Cached argument types for multiple dispatch */
     ATTR STRING *short_sig;  /* Simple string signature args & returns */
+    ATTR INTVAL  data_size;  /* ? */
 
 /*
 
@@ -53,7 +54,7 @@ Initializes a newly created CallSignature object.
         sig_struct->returns    = PMCNULL;
         sig_struct->array      = NULL;
         sig_struct->hash       = NULL;
-        PMC_int_val(SELF)      = CAPTURE_DATA_SIZE;
+        sig_struct->data_size  = CAPTURE_DATA_SIZE;
         PObj_active_destroy_SET(SELF);
         PObj_custom_mark_SET(SELF);
     }
@@ -186,9 +187,9 @@ Mark any referenced strings and PMCs.
     VTABLE void mark() {
         PMC ** const data = PMC_data_typed(SELF, PMC **);
         INTVAL i;
+        Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
 
-        if (PARROT_CALLSIGNATURE(SELF)) {
-            Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
+        if (attrs) {
 
             if (attrs->array)
                 pobject_lives(interp, (PObj*)attrs->array);
@@ -205,7 +206,7 @@ Mark any referenced strings and PMCs.
         if (!data)
             return;
 
-        for (i = PMC_int_val(SELF) - 1; i >= 0; --i)
+        for (i = attrs->data_size - 1; i >= 0; --i)
             if (data[i])
                 pobject_lives(interp, (PObj *)data[i]);
     }

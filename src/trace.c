@@ -188,7 +188,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
             break;
         case KEY_string_FLAG:
             {
-            const STRING * const s = PMC_str_val(key);
+            const STRING * const s = key_string(interp, key);
             STRING* const escaped = Parrot_str_escape_truncate(
                             interp, s, 20);
             if (escaped)

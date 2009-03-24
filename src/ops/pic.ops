@@ -90,16 +90,11 @@ inline op pic_inline_sub__(inconst INT, invar PMC, invar PMC) :pic {
     rt = VTABLE_type(interp, right);
     lr_types = (lt << 16) | rt;
     if (lru->u.type == lr_types) {
-        INTVAL a = lt == enum_class_Integer ? PMC_int_val(left) :
-            VTABLE_get_integer(interp, left);
-        INTVAL b = rt == enum_class_Integer ? PMC_int_val(right) :
-            VTABLE_get_integer(interp, right);
+        INTVAL a = VTABLE_get_integer(interp, left);
+        INTVAL b = VTABLE_get_integer(interp, right);
         INTVAL c = a - b;
         if ((c^a) >= 0 || (c^~b) >= 0) {
-            if (lt == enum_class_Integer)
-                PMC_int_val(left) = c;
-            else
-                VTABLE_set_integer_native(interp, left, c);
+            VTABLE_set_integer_native(interp, left, c);
         }
         else {
             if (PARROT_ERRORS_test(interp, PARROT_ERRORS_OVERFLOW_FLAG)) {
@@ -198,7 +193,7 @@ inline op pic_set_returns__(inconst PMC) :pic :flow {
     cc = PMC_cont(ccont);
     if (!cc->address) {
         interp->current_returns = CUR_OPCODE;
-        n = PMC_int_val(mic->m.sig);
+        n = VTABLE_get_integer(interp, mic->m.sig);
         goto OFFSET(n + 2);
     }
     caller_ctx = cc->to_ctx;

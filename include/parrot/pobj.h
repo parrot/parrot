@@ -58,8 +58,6 @@ typedef Buffer PObj;
 #define PMC_struct_val(pmc)   (pmc)->cache._ptrs._struct_val
 #define PMC_pmc_val(pmc)      (pmc)->cache._ptrs._pmc_val
 #define PMC_int_val(pmc)      (pmc)->cache._i._int_val
-#define PMC_int_val2(pmc)     (pmc)->cache._i._int_val2
-#define PMC_num_val(pmc)      (pmc)->cache._num_val
 #define PMC_str_val(pmc)      (pmc)->cache._string_val
 
 /* See src/gc/resources.c. the basic idea is that buffer memory is
