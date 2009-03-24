@@ -97,13 +97,14 @@ static STRING
                 EXCEPTION_UNEXPECTED_NULL, "Hash: Cannot use NULL STRING key");
         else
             return keystr;
-    }
+
 }
 
 /* Albeit the Hash PMC doesn't use PMC_data, it needs the next_for_GC pointer
  * We would get recursive marking of a deeply nested HoHoH...
  */
 pmclass Hash need_ext provides hash {
+    ATTR Hash *hash;
 
 /*
 
@@ -120,16 +121,18 @@ Free hash structure.
 */
 
     VTABLE void init() {
-        PMC_struct_val(SELF) = NULL;
+        Parrot_Hash_attributes *attr =
+            mem_allocate_zeroed_typed(Parrot_Hash_attributes);
+        PMC_data(SELF) = attr;
+        SELF.set_pointer(parrot_new_hash(INTERP));
         PObj_custom_mark_destroy_SETALL(SELF);
-        parrot_new_pmc_hash(INTERP, SELF);
     }
 
     VTABLE void destroy() {
         if (SELF.get_pointer()) {
             parrot_hash_destroy(INTERP, (Hash *)SELF.get_pointer());
-            PMC_struct_val(SELF) = NULL;
         }
+        mem_sys_free(PMC_data(SELF));
     }
 /*
 
@@ -163,7 +166,6 @@ Creates and returns a clone of the hash.
         parrot_hash_clone(INTERP, (Hash *)SELF.get_pointer(),
                    (Hash *)VTABLE_get_pointer(INTERP, dest));
 
-        ((Hash *)PMC_struct_val(dest))->container = dest;
         return dest;
     }
 
@@ -181,7 +183,7 @@ Use C<ptr> as this PMC's Hash*.
         Hash *old_hash = (Hash *)SELF.get_pointer();
         Hash *new_hash = (Hash *)ptr;
 
-        PMC_struct_val(SELF) = new_hash;
+        PARROT_HASH(SELF)->hash = new_hash;
         new_hash->container  = SELF;
         if (old_hash != NULL) {
             parrot_hash_destroy(INTERP, old_hash);
@@ -198,7 +200,7 @@ Get a pointer to this PMC's Hash*.
 
 */
     VTABLE void *get_pointer() {
-        return PMC_struct_val(SELF);
+        return PARROT_HASH(SELF)->hash;
     }
 
 /*

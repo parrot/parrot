@@ -132,20 +132,22 @@ pmclass NameSpace extends Hash provides hash need_ext no_ro {
 
 =item C<void init()>
 
-Initialize a C<NameSpace> PMC by calling C<Hash.init> and clearing
-other fields.
+Initialize a C<NameSpace> PMC.
 
 =cut
 
 */
 
     VTABLE void init() {
-        SUPER();                                /* _struct_val := Hash */
-        PMC_pmc_val(SELF)              = NULL;  /* parent */
-        PMC_data(SELF)                 =
+        SUPER();
+        PMC_pmc_val(SELF) = NULL;  /* parent */
+        PMC_data(SELF)    =
                 mem_allocate_zeroed_typed(Parrot_NameSpace_attributes);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class = PMCNULL;
+        PARROT_NAMESPACE(SELF)->_class = PMCNULL;
+        SELF.set_pointer(parrot_new_hash(INTERP));
+        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -183,7 +185,6 @@ Frees the namespace info struct.
 */
     VTABLE void destroy() {
         mem_sys_free(PARROT_NAMESPACE(SELF));
-        SUPER();
     }
 
 /*

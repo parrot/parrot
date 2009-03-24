@@ -72,8 +72,9 @@ subroutine.
             (hash_comp_fn)Parrot_str_not_equal,     /* STRING compare */
             (hash_hash_key_fn)Parrot_str_to_hashval); /*        hash    */
 
-        /* prevent set_pointer from trying to delete an invalid hash */
-        PMC_struct_val(SELF) = NULL;
+        Parrot_LexInfo_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_LexInfo_attributes);
+        PMC_data(SELF) = attrs;
         SELF.set_pointer(hash);
         PObj_active_destroy_SET(SELF);
     }

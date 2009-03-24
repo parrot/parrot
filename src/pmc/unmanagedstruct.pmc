@@ -91,7 +91,7 @@ key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)
         PMC * const types = PMC_pmc_val(pmc);
 
         if (types->vtable->base_type == enum_class_OrderedHash) {
-            Hash       * const hash = (Hash *)PMC_struct_val(types);
+            Hash       * const hash = (Hash *)VTABLE_get_pointer(interp, types);
             HashBucket * const b    = parrot_hash_get_bucket(interp, hash,
                 VTABLE_get_string(interp, key));
 

@@ -429,7 +429,7 @@ The created key = "\1idx".
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *key) {
-        const Hash * const       h = (Hash *)SELF.get_pointer();
+        const Hash       * const h = (Hash *)SELF.get_pointer();
         const HashBucket * const b = parrot_hash_get_bucket(INTERP, h, key);
 
         return (b && b->key);

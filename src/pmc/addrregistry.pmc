@@ -49,8 +49,9 @@ Initializes the instance.
                 int_compare,
                 key_hash_int);
 
-        /* prevent set_pointer from trying to delete an invalid hash */
-        PMC_struct_val(SELF) = NULL;
+        Parrot_AddrRegistry_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_AddrRegistry_attributes);
+        PMC_data(SELF) = attrs;
         SELF.set_pointer(registry);
         PObj_custom_mark_destroy_SETALL(SELF);
 

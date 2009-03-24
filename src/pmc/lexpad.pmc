@@ -97,14 +97,15 @@ Return the LexInfo PMC, if any or a Null PMC.
     VTABLE INTVAL elements() {
         PMC *info;
         GET_ATTR_lexinfo(INTERP, SELF, info);
-        return parrot_hash_size(INTERP, (Hash *)PMC_struct_val(info));
+        return parrot_hash_size(INTERP,
+                (Hash *)VTABLE_get_pointer(INTERP, info));
     }
 
     VTABLE INTVAL exists_keyed_str(STRING *name) {
         PMC *info;
         GET_ATTR_lexinfo(INTERP, SELF, info);
         return parrot_hash_get_bucket(INTERP,
-            (Hash *)PMC_struct_val(info), name) != 0;
+                (Hash *)VTABLE_get_pointer(INTERP, info), name) != 0;
     }
 
     VTABLE INTVAL exists_keyed(PMC *name) {
@@ -121,7 +122,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
         GET_ATTR_ctx(INTERP, SELF, ctx);
-        hash = (Hash *)PMC_struct_val(info);
+        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
         b    = parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
@@ -146,7 +147,7 @@ Return the LexInfo PMC, if any or a Null PMC.
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
         GET_ATTR_ctx(INTERP, SELF, ctx);
-        hash = (Hash *)PMC_struct_val(info);
+        hash = (Hash *)VTABLE_get_pointer(INTERP, info);
         b    = parrot_hash_get_bucket(INTERP, hash, name);
 
         if (!b)
