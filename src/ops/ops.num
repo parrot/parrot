@@ -1266,3 +1266,5 @@ find_name_p_s                  1241
 find_name_p_sc                 1242
 find_sub_not_null_p_s          1243
 find_sub_not_null_p_sc         1244
+load_language_s                1245
+load_language_sc               1246

@@ -165,6 +165,18 @@ inline op load_bytecode(in STR) :load_file {
     Parrot_load_bytecode(interp, $1);
 }
 
+=item B<load_language>(in STR)
+
+Load the compiler libraries for a language $1. Search the library path to
+locate the main compiler file in the standard locations.
+
+inline op load_language(in STR) :load_file {
+    Parrot_load_language(interp, $1);
+}
+
+
+=cut
+
 =back
 
 =cut
