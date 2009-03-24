@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -53,54 +53,10 @@ PARROT_EXPORT
 void
 IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...);
 
-/*
- * These constants correspond to the debugger commands.
- * To map command strings to their numeric values,
- * use the algorithm from parse_command().
- */
 
-enum DebugCmd {
-    debug_cmd_b           = 25245,
-    debug_cmd_c           = 25500,
-    debug_cmd_d           = 25755,
-    debug_cmd_e           = 26010,
-    debug_cmd_f           = 26265,
-    debug_cmd_h           = 26775,
-    debug_cmd_i           = 27030,
-    debug_cmd_l           = 27795,
-    debug_cmd_n           = 28305,
-    debug_cmd_p           = 28815,
-    debug_cmd_q           = 29070,
-    debug_cmd_r           = 29325,
-    debug_cmd_s           = 29580,
-    debug_cmd_t           = 29835,
-    debug_cmd_w           = 30600,
-    debug_cmd_int         = 175185,
-    debug_cmd_run         = 176460,
-    debug_cmd_num         = 174675,
-    debug_cmd_str         = 179265,
-    debug_cmd_pmc         = 163455,
-    debug_cmd_eval        = 277950,
-    debug_cmd_help        = 282540,
-    debug_cmd_info        = 281775,
-    debug_cmd_list        = 295035,
-    debug_cmd_load        = 268005,
-    debug_cmd_next        = 297330,
-    debug_cmd_quit        = 294780,
-    debug_cmd_break       = 409785,
-    debug_cmd_print       = 441150,
-    debug_cmd_stack       = 414120,
-    debug_cmd_trace       = 405705,
-    debug_cmd_watch       = 416160,
-    debug_cmd_enable      = 571455,
-    debug_cmd_delete      = 588285,
-    debug_cmd_script_file = 617610,
-    debug_cmd_disable     = 772140,
-    debug_cmd_continue    = 1053405,
-    debug_cmd_disassemble = 1903830,
-    debug_cmd_gcdebug     = 779790,
-    debug_cmd_echo        = 276675
-};
+typedef struct DebuggerCmd DebuggerCmd;
+typedef struct DebuggerCmdList DebuggerCmdList;
+
 
 /* HEADERIZER HFILE: include/parrot/debugger.h */
 
@@ -144,7 +100,7 @@ static const char* GDB_print_reg(PARROT_INTERP, int t, int n)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static const struct DebuggerCmd_t * get_command(unsigned long cmdhash);
+static const DebuggerCmd * get_cmd(const char **cmd);
 
 PARROT_WARN_UNUSED_RESULT
 static unsigned long get_uint(ARGMOD(const char **cmd), unsigned int def)
@@ -159,15 +115,6 @@ static unsigned long get_ulong(ARGMOD(const char **cmd), unsigned long def)
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char * nextarg(ARGIN_NULLOK(const char *command));
-
-PARROT_CAN_RETURN_NULL
-PARROT_IGNORABLE_RESULT
-static const char * parse_command(
-    ARGIN(const char *command),
-    ARGOUT(unsigned long *cmdP))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*cmdP);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -225,15 +172,12 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
     || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_GDB_print_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_get_command __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_get_cmd __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_get_uint __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(cmd)
 #define ASSERT_ARGS_get_ulong __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(cmd)
 #define ASSERT_ARGS_nextarg __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
-#define ASSERT_ARGS_parse_command __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(command) \
-    || PARROT_ASSERT_ARG(cmdP)
 #define ASSERT_ARGS_parse_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(str) \
     || PARROT_ASSERT_ARG(intP)
@@ -442,12 +386,12 @@ static void dbg_watch(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     PDB_watchpoint(pdb->debugee, cmd);
 }
 
-typedef struct DebuggerCmd_t {
+struct DebuggerCmd {
     debugger_func_t func;
     const char * const help;
-} DebuggerCmd;
+};
 
-static const struct DebuggerCmd_t
+static const DebuggerCmd
     cmd_break = {
         & dbg_break,
 "Set a breakpoint at a given line number (which must be specified).\n\n\
@@ -569,74 +513,83 @@ the -t option.\n"
 "Add a watchpoint"
     };
 
+struct DebuggerCmdList {
+    const char * const name;
+    const DebuggerCmd * const cmd;
+};
+
+DebuggerCmdList DebCmdList [] = {
+    { "break",       &cmd_break },
+    { "continue",    &cmd_continue },
+    { "d",           &cmd_delete },
+    { "delete",      &cmd_delete },
+    { "disable",     &cmd_disable },
+    { "disassemble", &cmd_disassemble },
+    { "e",           &cmd_eval },
+    { "echo",        &cmd_echo },
+    { "enable",      &cmd_enable },
+    { "eval",        &cmd_eval },
+    { "f",           &cmd_script },
+    { "gcdebug",     &cmd_gcdebug },
+    { "help",        &cmd_help },
+    { "info",        &cmd_info },
+    { "l",           &cmd_list },
+    { "list",        &cmd_list },
+    { "load",        &cmd_load },
+    { "next",        &cmd_next },
+    { "print",       &cmd_print },
+    { "quit",        &cmd_quit },
+    { "run",         &cmd_run },
+    { "script",      &cmd_script },
+    { "s",           &cmd_stack },
+    { "stack",       &cmd_stack },
+    { "trace",       &cmd_trace },
+    { "watch",       &cmd_watch },
+};
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-static const struct DebuggerCmd_t *
-get_command(unsigned long cmdhash)
+static const DebuggerCmd *
+get_cmd(ARGIN_NULLOK(const char **cmd))
 {
-    ASSERT_ARGS(get_command)
-    switch ((enum DebugCmd)cmdhash) {
-        case debug_cmd_break:
-            return & cmd_break;
-        case debug_cmd_continue:
-        case debug_cmd_c:
-            return & cmd_continue;
-        case debug_cmd_delete:
-        case debug_cmd_d:
-            return & cmd_delete;
-        case debug_cmd_disable:
-            return & cmd_disable;
-        case debug_cmd_disassemble:
-            return & cmd_disassemble;
-        case debug_cmd_echo:
-            return & cmd_echo;
-        case debug_cmd_enable:
-            return & cmd_enable;
-        case debug_cmd_eval:
-        case debug_cmd_e:
-            return & cmd_eval;
-        case debug_cmd_gcdebug:
-            return & cmd_gcdebug;
-        case debug_cmd_help:
-        case debug_cmd_h:
-            return & cmd_help;
-        case debug_cmd_info:
-            return & cmd_info;
-        case debug_cmd_list:
-        case debug_cmd_l:
-            return & cmd_list;
-        case debug_cmd_load:
-            return & cmd_load;
-        case debug_cmd_next:
-        case debug_cmd_n:
-            return & cmd_next;
-        case debug_cmd_print:
-        case debug_cmd_p:
-             return & cmd_print;
-        case debug_cmd_quit:
-        case debug_cmd_q:
-             return & cmd_quit;
-        case debug_cmd_r:
-        case debug_cmd_run:
-             return & cmd_run;
-        case debug_cmd_script_file:
-        case debug_cmd_f:
-            return & cmd_script;
-        case debug_cmd_stack:
-        case debug_cmd_s:
-            return & cmd_stack;
-        case debug_cmd_trace:
-        case debug_cmd_t:
-            return & cmd_trace;
-        case debug_cmd_watch:
-        case debug_cmd_w:
-            return & cmd_watch;
-        default:
+    ASSERT_ARGS(get_cmd)
+    if (cmd == NULL || *cmd == NULL)
+        return NULL;
+    else {
+        const char * const start = skip_whitespace(*cmd);
+        const char *next = start;
+        char c;
+        unsigned int i, l;
+        int found = -1;
+
+        *cmd = start;
+        for (; (c= *next) != '\0' && !isspace((unsigned char)c); ++next)
+            continue;
+        l = next - start;
+        if (l == 0)
+            return NULL;
+        for (i= 0; i < sizeof (DebCmdList) / sizeof (DebuggerCmdList); ++i) {
+            if (strncmp(*cmd, DebCmdList[i].name, l) == 0) {
+                if (strlen(DebCmdList[i].name) == l) {
+                    found = i;
+                    break;
+                }
+                else {
+                    if (found == -1)
+                        found = i;
+                    else
+                        return NULL;
+                }
+            }
+        }
+        if (found != -1) {
+            *cmd = skip_whitespace(next);
+            return DebCmdList[found].cmd;
+        }
+        else
             return NULL;
     }
 }
-
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -644,7 +597,7 @@ static const char *
 skip_whitespace(ARGIN(const char *cmd))
 {
     ASSERT_ARGS(skip_whitespace)
-    while (isspace((unsigned char)*cmd))
+    while (*cmd && isspace((unsigned char)*cmd))
         ++cmd;
     return cmd;
 }
@@ -880,46 +833,6 @@ parse_key(PARROT_INTERP, ARGIN(const char *str), ARGOUT(PMC **keyP))
 
     /* skip the closing brace on the key */
     return ++str;
-}
-
-/*
-
-=item C<static const char * parse_command>
-
-Convert the command at the beginning of a string into a numeric value
-that can be used as a switch key for fast lookup.
-
-=cut
-
-*/
-
-PARROT_CAN_RETURN_NULL
-PARROT_IGNORABLE_RESULT
-static const char *
-parse_command(ARGIN(const char *command), ARGOUT(unsigned long *cmdP))
-{
-    ASSERT_ARGS(parse_command)
-    int           i;
-    unsigned long c = 0;
-
-    /* Skip leading whitespace. */
-    command = skip_whitespace(command);
-
-    if (*command == '\0') {
-        *cmdP = c;
-        return NULL;
-    }
-
-    for (i = 0; isalpha((unsigned char) *command); command++, i++)
-        c += (tolower((unsigned char) *command) + (i + 1)) * ((i + 1) * 255);
-
-    /* Nonempty and did not start with a letter */
-    if (c == 0)
-        c = (unsigned long)-1;
-
-    *cmdP = c;
-
-    return command;
 }
 
 /*
@@ -1355,12 +1268,11 @@ PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
     const DebuggerCmd *cmd;
 
     /* keep a pointer to the command, in case we need to report an error */
-    /* get a number from what the user typed */
-    const char * cmdline = parse_command(command, &c);
+
+    const char * cmdline = command;
 
     TRACEDEB_MSG("PDB_run_command");
-
-    cmd = get_command(c);
+    cmd = get_cmd(& cmdline);
 
     if (cmd) {
         (* cmd->func)(pdb, cmdline);
@@ -3379,20 +3291,17 @@ void
 PDB_help(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_help)
-    unsigned long c;
     const DebuggerCmd *cmd;
 
     /* Extract the command after leading whitespace (for error messages). */
     const char * cmdline = skip_whitespace(command);
-    parse_command(cmdline, &c);
-
-    cmd = get_command(c);
+    cmd = get_cmd(& cmdline);
 
     if (cmd) {
         Parrot_io_eprintf(interp->pdb->debugger, "%s\n", cmd->help);
     }
     else {
-        if (c == 0) {
+        if (*cmdline == '\0') {
             /* C89: strings need to be 509 chars or less */
             Parrot_io_eprintf(interp->pdb->debugger, "\
 List of commands:\n\
