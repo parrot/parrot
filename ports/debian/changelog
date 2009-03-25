@@ -11,9 +11,8 @@ parrot (1.0.0-1) unstable; urgency=low
       shlibdeps so that the library gets installed properly (patch from David
       Nusinow)
     - Move manpage generation to new packages. Rename parrot-debugger.1 to
-      parrot_debugger.1 to match executable name. Generate pbc_to_exe and
-      parrot_config manpages from .pir source files (patch from David
-      Nusinow)
+      parrot_debugger.1 to match executable name. Generate parrot_config
+      manpage from .pir source files (patch from David Nusinow)
   * parrot.install.in, parrot-doc.install.in, libparrot-dev.install.in
     - Added template files, replace parrot.install, parrot-doc.install, and
       libparrot-dev.install
