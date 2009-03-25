@@ -496,7 +496,7 @@ op tell(out INT, out INT, invar PMC) :base_io {
 
 ########################################
 
-=item B<sockaddr>(out PMC, in STRING, in INT)
+=item B<sockaddr>(out PMC, in STR, in INT)
 
 Create new Sockaddr PMC.
 
@@ -556,7 +556,7 @@ op recv(out INT, in PMC, out STR) {
     $1 = Parrot_io_recv(interp, $2, &$3);
 }
 
-=item B<send>(out INT, in PMC, int STR)
+=item B<send>(out INT, in PMC, in STR)
 
 Send data to socket
 

@@ -28,15 +28,6 @@ These are the primary interface functions for working with socket objects.
 
 /*
 
-=back
-
-
-=over 4
-*/
-
-
-/*
-
 =item C<INTVAL Parrot_io_socket_is_closed>
 
 =cut
@@ -49,6 +40,7 @@ PARROT_CANNOT_RETURN_NULL
 INTVAL
 Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
 {
+    ASSERT_ARGS(Parrot_io_socket_is_closed)
     return 0;
 }
 
@@ -67,6 +59,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL usec)
 {
+    ASSERT_ARGS(Parrot_io_poll)
     if (PMC_IS_NULL(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Can't poll a NULL socket object");
@@ -92,6 +85,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_socket(PARROT_INTERP, INTVAL fam, INTVAL type, INTVAL proto)
 {
+    ASSERT_ARGS(Parrot_io_socket)
     return PIO_NEW_SOCKET(interp, fam, type, proto);
 }
 
@@ -110,6 +104,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_recv(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buf))
 {
+    ASSERT_ARGS(Parrot_io_recv)
     if (Parrot_io_socket_is_closed(pmc))
         return -1;
 
@@ -132,6 +127,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_send(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
 {
+    ASSERT_ARGS(Parrot_io_send)
     if (Parrot_io_socket_is_closed(pmc))
         return -1;
 
@@ -152,6 +148,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
+    ASSERT_ARGS(Parrot_io_connect)
     if (Parrot_io_socket_is_closed(pmc))
         return -1;
 
@@ -173,6 +170,7 @@ PARROT_EXPORT
 INTVAL
 Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
+    ASSERT_ARGS(Parrot_io_bind)
     if (Parrot_io_socket_is_closed(pmc))
         return -1;
 
@@ -194,6 +192,7 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
 {
+    ASSERT_ARGS(Parrot_io_listen)
     if (Parrot_io_socket_is_closed(pmc))
         return -1;
 
@@ -217,7 +216,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-
+    ASSERT_ARGS(Parrot_io_accept)
     if (Parrot_io_socket_is_closed(pmc))
         return PMCNULL;
 

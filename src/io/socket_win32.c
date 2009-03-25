@@ -42,7 +42,7 @@ Win32 System Programming, 2nd Edition.
 #  if PARROT_NET_DEVEL
 
 /* Helper macros to get sockaddr_in */
-#define SOCKADDR(p, t) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
+#    define SOCKADDR(p, t) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
 
 /*
 
@@ -405,7 +405,7 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
     return sockaddr;
 }
 
-#endif /* PARROT_NET_DEVEL */
+#  endif /* PARROT_NET_DEVEL */
 
 #endif /* PIO_OS_WIN32 */
 
