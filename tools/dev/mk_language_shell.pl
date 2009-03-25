@@ -32,9 +32,9 @@ to F<languages/xyz> if an explicit C<path> isn't given):
     README
     Configure.pl
     xyz.pir
-    config/makefiles/ops.in
-    config/makefiles/pmc.in
-    config/makefiles/root.in
+    build/Makefile.in
+    build/src/ops/Makefile.in
+    build/src/pmc/Makefile.in
     doc/running.pod
     doc/Xyz.pod
     dynext/.ignore
@@ -53,7 +53,7 @@ be used to repopulate a language directory with omitted files.
 
 After populating the language directory, the script attempts to
 run Configure.pl to automatically generate the Makefile
-from config/makefiles/root.in . This step is only executed if the
+from build/Makefile.in . This step is only executed if the
 optional C<path> argument is not specified.
 
 If all goes well, after creating the language shell one can simply
@@ -234,9 +234,9 @@ sub read_parrot_config {
 sub create_makefiles {
     my %config = @_;
     my %makefiles = (
-        'config/makefiles/root.in' => 'Makefile',
-@no_pmc@        'config/makefiles/pmc.in'  => 'src/pmc/Makefile',
-@no_ops@        'config/makefiles/ops.in'  => 'src/ops/Makefile',
+        'build/Makefile.in'         => 'Makefile',
+@no_pmc@        'build/src/pmc/Makefile.in' => 'src/pmc/Makefile',
+@no_ops@        'build/src/ops/Makefile.in' => 'src/ops/Makefile',
     );
     my $build_tool = $config{libdir} . $config{versiondir}
                    . '/tools/dev/gen_makefile.pl';
@@ -255,7 +255,7 @@ sub create_makefiles {
 # End:
 # vim: expandtab shiftwidth=4:
 
-__config/makefiles/ops.in__
+__build/src/ops/Makefile.in__
 ## @Id@
 
 # values from parrot_config
@@ -332,7 +332,7 @@ install:
 uninstall:
 	$(RM_F) "$(INSTALL_DIR)/@lclang@_ops*$(LOAD_EXT)"
 
-Makefile: ../../config/makefiles/ops.in
+Makefile: ../../build/src/ops/Makefile.in
 	cd ../.. && $(PERL) Configure.pl
 
 clean:
@@ -346,7 +346,7 @@ realclean:
 # End:
 # vim: ft=make:
 
-__config/makefiles/pmc.in__
+__build/src/pmc/Makefile.in__
 ## @Id@
 
 # values from parrot_config
@@ -435,7 +435,7 @@ install:
 uninstall:
 	$(RM_F) $(INSTALL_DIR)/$(@uclang@_GROUP)$(LOAD_EXT)
 
-Makefile: ../../config/makefiles/pmc.in
+Makefile: ../../build/src/pmc/Makefile.in
 	cd ../.. && $(PERL) Configure.pl
 
 clean:
@@ -449,7 +449,7 @@ realclean:
 # End:
 # vim: ft=make:
 
-__config/makefiles/root.in__
+__build/Makefile.in__
 ## @Id@
 
 ## arguments we want to run parrot with
@@ -493,8 +493,8 @@ PBC_TO_EXE    := $(BIN_DIR)/pbc_to_exe@exe@
 @UCLANG@_GROUP := $(PMC_DIR)/@lclang@_group$(LOAD_EXT)
 @UCLANG@_OPS := $(OPS_DIR)/@lclang@_ops$(LOAD_EXT)
 
-@no_pmc@PMC_DEPS := config/makefiles/pmc.in $(PMC_DIR)/@lclang@.pmc
-@no_ops@OPS_DEPS := config/makefiles/ops.in $(OPS_DIR)/@lclang@.ops
+@no_pmc@PMC_DEPS := build/src/pmc/Makefile.in $(PMC_DIR)/@lclang@.pmc
+@no_ops@OPS_DEPS := build/src/ops/Makefile.in $(OPS_DIR)/@lclang@.ops
 
 SOURCES := \
   src/gen_grammar.pir \
@@ -558,7 +558,7 @@ installable: installable_@lclang@@exe@
 installable_@lclang@@exe@: @lclang@.pbc
 	$(PBC_TO_EXE) @lclang@.pbc --install
 
-Makefile: config/makefiles/root.in
+Makefile: build/Makefile.in
 	$(PERL) Configure.pl
 
 # This is a listing of all targets, that are meant to be called by users
