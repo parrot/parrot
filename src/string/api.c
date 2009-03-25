@@ -29,18 +29,6 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "private_cstring.h"
 #include "parrot/resources.h"
 
-/*
- * this extra size is in the hope that some concat ops might
- * follow in a sequence.
- *
- * compiling 3180 chars of a bf program with bfc gives:
- *
- *             extra = 4          512          1024
- * GC runs          2376           74            36
- * mem copied      210 MB        6 MB          3 MB
- * time -C          5.2 s       0.3 s         0.2 s
- */
-
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \
     PARROT_ASSERT((s)->encoding); \
