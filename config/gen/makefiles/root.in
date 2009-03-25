@@ -2066,14 +2066,15 @@ splint-andy :
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
 COVER_DIRS := \
     $(SRC_DIR) \
-    $(SRC_DIR)/string/charset \
     $(SRC_DIR)/dynoplibs \
     $(SRC_DIR)/dynpmc \
-    $(SRC_DIR)/string/encoding \
     $(SRC_DIR)/gc \
     $(SRC_DIR)/ops \
     $(SRC_DIR)/packfile \
     $(SRC_DIR)/pmc \
+    $(SRC_DIR)/string \
+    $(SRC_DIR)/string/charset \
+    $(SRC_DIR)/string/encoding \
     $(IO_DIR) \
     $(IMCC_DIR)
 
