@@ -48,11 +48,6 @@ the Parrot debugger, and the C<debug> ops.
 /* Length of command line buffers */
 #define DEBUG_CMD_BUFFER_LENGTH 255
 
-/* Not sure how we want to handle this sort of cross-project header */
-PARROT_EXPORT
-void
-IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...);
-
 
 typedef struct DebuggerCmd DebuggerCmd;
 typedef struct DebuggerCmdList DebuggerCmdList;
@@ -1270,9 +1265,9 @@ PDB_script_file(PARROT_INTERP, ARGIN(const char *command))
 
     fd = fopen(command, "r");
     if (!fd) {
-        IMCC_warning(interp, "script_file: "
-            "Error reading script file %s.\n",
-            command);
+        Parrot_io_eprintf(interp->pdb->debugger,
+                "Error reading script file %s.\n",
+                command);
         return;
     }
     interp->pdb->script_file = fd;
