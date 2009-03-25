@@ -208,6 +208,12 @@ Will be renamed to C<Parrot_lib_add_path_from_cstring>.
 
 L<https://trac.parrot.org/parrot/ticket/455>
 
+=item parrot_new_pmc_hash [eligible in 1.5]
+
+This function will be removed.  parrot_new_hash should be used in its place.
+
+L<https://trac.parrot.org/parrot/ticket/494>
+
 =back
 
 =head1 Compiler tools
