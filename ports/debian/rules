@@ -16,6 +16,7 @@ CONTROL_FILES = \
   debian/parrot-minimal.install.in \
   debian/parrot-doc.install.in \
   debian/parrot-devel.install.in \
+  debian/libparrot.install.in \
   debian/libparrot-dev.install.in
 
 debian-control-stamp: $(CONTROL_FILES) VERSION
