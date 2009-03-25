@@ -167,6 +167,12 @@ SERVE_REQ:
 #    print "Request:\n"
 #    print req
 #    print "*******\n"
+    .local string response
+    .local string headers
+    response = '500 Internal Server Error'
+    headers = 'Server: '
+    headers .= SERVER_NAME
+    headers .= CRLF
 
 # parse
 # GET the_file HTTP*
@@ -221,44 +227,21 @@ SERVE_file:
     read file_content, fp, len
 
 SERVE_blob:
-    # TODO make more subs
-    # takes: file_content, len
-    rep = "HTTP/1.1 200 OK"
-    rep .= CRLF
-    rep .= "Server: "
-    rep .= SERVER_NAME
-    rep .= CRLF
-    rep .= "Content-Length: "
-    temp = to_string (len)
-    rep .= temp
-    rep .= CRLFCRLF
-    rep .= file_content
-    send ret, work, rep
+    response = '200 OK'
+    send_response(work, response, headers, file_content)
     # TODO provide a log method
     print "served file '"
     print url
     print "'\n"
-    close work
     goto NEXT
 
 SERVE_docroot:
-    rep = 'HTTP/1.1 301 Moved Permamently'
-    rep .= CRLF
-    rep .= "Server: "
-    rep .= SERVER_NAME
-    rep .= CRLF
-    rep .= 'Location: /docs/html/index.html'
-    rep .= CRLF
-    rep .= 'Content-Length: '
+    response = '301 Moved Permanently'
+    headers .= 'Location: /docs/html/index.html'
+    headers .= CRLF
     file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>."
-    length len, file_content
-    temp = to_string (len)
-    concat rep, temp
-    concat rep, CRLFCRLF
-    concat rep, file_content
-    send ret, work, rep
+    send_response(work, response, headers, file_content)
     print "Redirect to 'docs/html/index.html'\n"
-    close work
     goto NEXT
 
 SERVE_favicon:
@@ -272,25 +255,12 @@ handle_404_exception:
     # fall through
 
 SERVE_404:
-    $S0 = '404 Not found'
-    $S0 .= CRLF
-    $I0 = length $S0
-    rep = 'HTTP/1.1 404 Not Found'
-    rep .= CRLF
-    rep .= "Server: "
-    rep .= SERVER_NAME
-    rep .= CRLF
-    rep .= 'Content-Length: '
-    $S1 = $I0
-    rep .= $S1
-    rep .= CRLF
-    rep .= 'Content-Type: text/plain'
-    rep .= CRLFCRLF
-    rep .= $S0
+    response = '404 Not found'
+    file_content = response
+    send_response(work, response, headers, file_content)
     print "File not found: '"
     print url
     print "'\n"
-    send ret, work, rep
     goto NEXT
 
 ERR_NO_SOCKET:
@@ -303,6 +273,30 @@ ERR_bind:
 END:
     close sock
     end
+.end
+
+# send_response(socket, response_code, headers, body)
+# sends HTTP response to the socket and closes the socket afterwards.
+.sub send_response
+    .param pmc sock
+    .param string code
+    .param string headers
+    .param string body
+    .local string rep, temp
+    .local int len, ret
+    rep = "HTTP/1.1 "
+    rep .= code
+    rep .= CRLF
+    rep .= headers
+    rep .= "Content-Length: "
+    len = length body
+    temp = to_string (len)
+    rep .= temp
+    rep .= CRLFCRLF
+    rep .= body
+    send ret, sock, rep
+    close sock
+    .return()
 .end
 
 .sub to_string
