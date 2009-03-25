@@ -130,7 +130,7 @@ Parrot_io_socket_unix(PARROT_INTERP, int fam, int type, int proto)
     if (sock >= 0) {
         PMC * io = Parrot_io_new_socket_pmc(interp, PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
         PARROT_SOCKET(io)->os_handle = sock;
-        setsockopt(PARROT_SOCKET(io)->os_handle, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
+        setsockopt(PARROT_SOCKET(io)->os_handle, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
         SOCKADDR(io, remote)->sin_family = fam;
         return io;
     }
@@ -152,7 +152,7 @@ Parrot_io_connect_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r))
 {
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
-    if(!r)
+    if (!r)
         return -1;
 
     PARROT_SOCKET(socket)->remote = r;
