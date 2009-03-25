@@ -1795,7 +1795,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 }
 
 static void
-list_breakpoints(PDB_t *pdb)
+list_breakpoints(ARGIN(PDB_t *pdb))
 {
     ASSERT_ARGS(list_breakpoints)
 
