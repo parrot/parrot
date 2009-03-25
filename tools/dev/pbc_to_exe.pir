@@ -1,6 +1,6 @@
 #! parrot
 
-=head1 TITLE
+=head1 NAME
 
 pbc_to_exe
 
