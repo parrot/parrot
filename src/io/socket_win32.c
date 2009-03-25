@@ -72,6 +72,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_io_socket_win32(PARROT_INTERP, int fam, int type, int proto)
 {
+    ASSERT_ARGS(Parrot_io_socket_win32)
     int i;
     const int sock = socket(fam, type, proto);
     if (sock >= 0) {
@@ -97,6 +98,7 @@ Connects C<*io>'s socket to address C<*r>.
 INTVAL
 Parrot_io_connect_win32(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r))
 {
+    ASSERT_ARGS(Parrot_io_connect_win32)
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
     if (!r)
@@ -135,6 +137,7 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 INTVAL
 Parrot_io_bind_win32(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
 {
+    ASSERT_ARGS(Parrot_io_bind_win32)
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
     struct sockaddr_in * saddr;
 
@@ -167,6 +170,7 @@ C<SEQ> sockets.
 INTVAL
 Parrot_io_listen_win32(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
 {
+    ASSERT_ARGS(Parrot_io_listen_win32)
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
     if ((listen((int)io->os_handle, sec)) == -1) {
         return -1;
@@ -189,6 +193,7 @@ PARROT_CAN_RETURN_NULL
 PMC *
 Parrot_io_accept_win32(PARROT_INTERP, ARGMOD(PMC *socket))
 {
+    ASSERT_ARGS(Parrot_io_accept_win32)
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
     PMC * newio   = Parrot_io_new_socket_pmc(interp,
             PIO_F_SOCKET | PIO_F_READ|PIO_F_WRITE);
@@ -230,6 +235,7 @@ Send the message C<*s> to C<*io>'s connected socket.
 INTVAL
 Parrot_io_send_win32(SHIM_INTERP, ARGMOD(PMC *socket), ARGMOD(STRING *s))
 {
+    ASSERT_ARGS(Parrot_io_send_win32)
     int error, bytes, byteswrote;
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
@@ -282,6 +288,7 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 INTVAL
 Parrot_io_recv_win32(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(STRING **s))
 {
+    ASSERT_ARGS(Parrot_io_recv_win32)
     int error;
     unsigned int bytesread = 0;
     char buf[2048];
@@ -344,6 +351,7 @@ INTVAL
 Parrot_io_poll_win32(SHIM_INTERP, ARGMOD(PMC *socket), int which, int sec,
     int usec)
 {
+    ASSERT_ARGS(Parrot_io_poll_win32)
     int n;
     fd_set r, w, e;
     struct timeval t;
@@ -375,6 +383,7 @@ static void
 get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
             int port)
 {
+    ASSERT_ARGS(get_sockaddr_in)
     struct sockaddr_in *sa;
     /* Hard coded to IPv4 for now */
     const int family = AF_INET;
@@ -407,6 +416,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 {
+    ASSERT_ARGS(Parrot_io_sockaddr_in)
     PMC * sockaddr;
     char * s;
 
