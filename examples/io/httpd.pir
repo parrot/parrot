@@ -287,7 +287,8 @@ END:
     rep = "HTTP/1.1 "
     rep .= code
     rep .= CRLF
-
+    rep .= "Connection: close"
+    rep .= CRLF
     ret = exists headers['Content-Length']
     if ret goto SKIP_CONTENT_LENGTH
     len = length body
