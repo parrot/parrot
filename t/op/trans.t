@@ -266,7 +266,7 @@ ok 2
 OUTPUT
 
 my $runcore = $ENV{TEST_PROG_ARGS} || '';
-my @todo    = ( $runcore =~ /--runcore=jit/ ? ( todo => 'broken under JIT TT #201' ) : () );
+my @todo    = ( $runcore =~ /--runcore=jit/ ? ( todo => 'broken under JIT TT #38' ) : () );
 
 pasm_output_is( <<"CODE", <<OUTPUT, 'atan2', @todo );
         .include 'include/fp_equality.pasm'
