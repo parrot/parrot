@@ -247,13 +247,13 @@ Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
             PIO_F_SOCKET | PIO_F_READ|PIO_F_WRITE);
     Parrot_Socklen_t    addrlen = sizeof (struct sockaddr_in);
     struct sockaddr_in *saddr;
+    int newsock;
 
     PARROT_SOCKET(newio)->local  = PARROT_SOCKET(socket)->local;
     PARROT_SOCKET(newio)->remote = pmc_new(interp, enum_class_Sockaddr);
     saddr                        = SOCKADDR(newio, remote);
 
-    const int           newsock = accept(io->os_handle,
-           (struct sockaddr *)saddr, &addrlen);
+    newsock = accept(io->os_handle, (struct sockaddr *)saddr, &addrlen);
 
     if (newsock == -1) {
         return PMCNULL;
