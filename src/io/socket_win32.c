@@ -368,7 +368,8 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
     const int family = AF_INET;
 
     sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
-    if (inet_addr(host, &sa->sin_addr) != 0) {
+    sa->sin_addr.S_un.S_addr = inet_addr(host);
+    if (sa->sin_addr.S_un.S_addr != 0) {
         /* Success converting numeric IP */
     }
     else {
