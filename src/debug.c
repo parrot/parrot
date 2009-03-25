@@ -1806,7 +1806,10 @@ list_breakpoints(ARGIN(PDB_t *pdb))
     for (lbreak = & pdb->breakpoint; *lbreak; lbreak = & (*lbreak)->next) {
         PDB_breakpoint_t *br = *lbreak;
         Parrot_io_eprintf(pdb->debugger, "Breakpoint %li at", br->id);
-        Parrot_io_eprintf(pdb->debugger, " pos %li\n", br->pc - pdb->debugee->code->base.data);
+        Parrot_io_eprintf(pdb->debugger, " pos %li", br->pc - pdb->debugee->code->base.data);
+        if (br->skip == -1)
+            Parrot_io_eprintf(pdb->debugger, " (disabled)");
+        Parrot_io_eprintf(pdb->debugger, "\n");
     }
 }
 
