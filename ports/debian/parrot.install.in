@@ -4,3 +4,4 @@ usr/lib/parrot/@VERSION@/library/Test/*
 usr/lib/parrot/@VERSION@/library/Data/*
 usr/lib/parrot/@VERSION@/library/dumper.pir
 usr/lib/parrot/@VERSION@/library/dumper.pbc
+usr/lib/parrot/@VERSION@/library/Getopt/Obj.pbc
