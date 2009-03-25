@@ -168,11 +168,10 @@ SERVE_REQ:
 #    print req
 #    print "*******\n"
     .local string response
-    .local string headers
+    .local pmc headers
     response = '500 Internal Server Error'
-    headers = 'Server: '
-    headers .= SERVER_NAME
-    headers .= CRLF
+    headers = new 'Hash'
+    headers['Server'] = SERVER_NAME
 
 # parse
 # GET the_file HTTP*
@@ -237,8 +236,7 @@ SERVE_blob:
 
 SERVE_docroot:
     response = '301 Moved Permanently'
-    headers .= 'Location: /docs/html/index.html'
-    headers .= CRLF
+    headers['Location'] = '/docs/html/index.html'
     file_content = "Please go to <a href='docs/html/index.html'>Parrot Documentation</a>."
     send_response(work, response, headers, file_content)
     print "Redirect to 'docs/html/index.html'\n"
@@ -251,6 +249,7 @@ SERVE_favicon:
 handle_404_exception:
     .local pmc ex
     .get_results (ex)
+    pop_eh
     say "Trapped file not found exception."
     # fall through
 
@@ -280,19 +279,33 @@ END:
 .sub send_response
     .param pmc sock
     .param string code
-    .param string headers
+    .param pmc headers
     .param string body
-    .local string rep, temp
+    .local string rep, temp, headername
     .local int len, ret
+    .local pmc headers_iter
     rep = "HTTP/1.1 "
     rep .= code
     rep .= CRLF
-    rep .= headers
-    rep .= "Content-Length: "
+
+    ret = exists headers['Content-Length']
+    if ret goto SKIP_CONTENT_LENGTH
     len = length body
     temp = to_string (len)
+    headers['Content-Length'] = temp
+SKIP_CONTENT_LENGTH:
+
+    headers_iter = iter headers
+HEADER_LOOP:
+    headername = shift headers_iter
+    rep .= headername
+    rep .= ': '
+    temp = headers[headername]
     rep .= temp
-    rep .= CRLFCRLF
+    rep .= CRLF
+    if headers_iter goto HEADER_LOOP
+
+    rep .= CRLF
     rep .= body
     send ret, sock, rep
     close sock
