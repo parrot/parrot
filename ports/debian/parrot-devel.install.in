@@ -12,9 +12,14 @@ usr/lib/parrot/@VERSION@/library/PCT.pbc
 usr/lib/parrot/@VERSION@/library/PCT/*
 usr/lib/parrot/@VERSION@/library/P6object.pbc
 usr/lib/parrot/@VERSION@/library/Protoobject.pbc
+usr/lib/parrot/@VERSION@/library/Parrot/Exception.pbc
+usr/lib/parrot/@VERSION@/library/config.pir
+usr/lib/parrot/@VERSION@/library/config.pbc
 usr/lib/parrot/@VERSION@/languages/pge/*
 usr/lib/parrot/@VERSION@/library/PGE.pbc
 usr/lib/parrot/@VERSION@/library/PGE/*
 usr/lib/parrot/@VERSION@/languages/tge/*
 usr/lib/parrot/@VERSION@/library/TGE.pbc
+usr/lib/parrot/@VERSION@/VERSION
 usr/include/parrot/@VERSION@/pmc/*
+usr/src/parrot/@VERSION@/*
