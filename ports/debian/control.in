@@ -19,8 +19,8 @@ Description: A virtual machine for dynamic languages
 Package: parrot-minimal
 Architecture: any
 Depends: ${shlibs:Depends}
-Conflicts: parrot ( < 1.0.0 )
-Replaces: parrot ( < 1.0.0 )
+Conflicts: parrot ( << 1.0.0 )
+Replaces: parrot ( << 1.0.0 )
 Description: A minimal install of the Parrot VM
  This package contains the core Parrot virtual machine. It's all that you need
  to get up and running in the average use case, and is sufficient to run most
@@ -30,8 +30,6 @@ Package: libparrot@SOVERSION@
 Architecture: any
 Section: libs
 Depends: ${shlibs:Depends}
-Provides: libparrot
-Conflicts: libparrot
 Description: Parrot shared library
  This package contains the Parrot shared library, used by the Parrot virtual
  machine and by programs that embed Parrot.
@@ -58,8 +56,8 @@ Architecture: any
 Section: devel
 Depends: ${shlibs:Depends}, parrot, libparrot-dev, perl
 Provides: parrot-pge, parrot-tge, parrot-pct, parrot-nqp
-Conflicts: parrot ( < 1.0.0 ), libparrot-dev ( < 1.0.0 )
-Replaces: parrot ( < 1.0.0 ), libparrot-dev ( < 1.0.0 )
+Conflicts: parrot ( << 1.0.0 ), libparrot-dev ( << 1.0.0 )
+Replaces: parrot ( << 1.0.0 ), libparrot-dev ( << 1.0.0 )
 Description: Parrot development tools
  This package contains development tools for the Parrot virtual machine. It is
  essential for developing language implementations to run on Parrot, but not
