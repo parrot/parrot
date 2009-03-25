@@ -92,6 +92,7 @@ The code was heavily hacked by bernhard and leo.
 .const string SERVER_NAME = "Parrot-httpd/0.1"
 
 .include "stat.pasm"
+.include 'except_types.pasm'
 
 .sub main :main
     .local pmc sock, work, fp
@@ -208,7 +209,13 @@ SERVE_GET:
 SERVE_file:
     # try to open the file in url
     concat url, doc_root, url
+    .local pmc eh
+    eh = new 'ExceptionHandler'
+    set_addr eh, handle_404_exception
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    push_eh eh
     fp = open url, 'r'
+    pop_eh
     unless fp goto SERVE_404
     len = stat url, .STAT_FILESIZE
     read file_content, fp, len
@@ -258,8 +265,15 @@ SERVE_favicon:
     url = urldecode( '/docs/resources/favicon.ico')
     goto SERVE_file
 
+handle_404_exception:
+    .local pmc ex
+    .get_results (ex)
+    say "Trapped file not found exception."
+    # fall through
+
 SERVE_404:
     $S0 = '404 Not found'
+    $S0 .= CRLF
     $I0 = length $S0
     rep = 'HTTP/1.1 404 Not Found'
     rep .= CRLF
@@ -327,7 +341,7 @@ INC_IN:
     inc pos_in
     goto START
 END:
-   .return( out )
+    .return( out )
 .end
 
 .sub hex_to_int
