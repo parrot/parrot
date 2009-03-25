@@ -135,6 +135,102 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
     || PARROT_ASSERT_ARG(s)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/win32.c */
+/* HEADERIZER BEGIN: src/io/socket_win32.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_io_accept_win32(PARROT_INTERP, ARGMOD(PMC *socket))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_bind_win32(PARROT_INTERP,
+    ARGMOD(PMC *socket),
+    ARGMOD(PMC *sockaddr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(*sockaddr);
+
+INTVAL Parrot_io_connect_win32(PARROT_INTERP,
+    ARGMOD(PMC *socket),
+    ARGIN(PMC *r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_listen_win32(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_poll_win32(SHIM_INTERP,
+    ARGMOD(PMC *socket),
+    int which,
+    int sec,
+    int usec)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_recv_win32(PARROT_INTERP,
+    ARGMOD(PMC *socket),
+    ARGOUT(STRING **s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(*s);
+
+INTVAL Parrot_io_send_win32(SHIM_INTERP,
+    ARGMOD(PMC *socket),
+    ARGMOD(STRING *s))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(*s);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_io_socket_win32(PARROT_INTERP, int fam, int type, int proto)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_Parrot_io_accept_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket)
+#define ASSERT_ARGS_Parrot_io_bind_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(sockaddr)
+#define ASSERT_ARGS_Parrot_io_connect_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_Parrot_io_listen_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(socket)
+#define ASSERT_ARGS_Parrot_io_poll_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(socket)
+#define ASSERT_ARGS_Parrot_io_recv_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_Parrot_io_send_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_Parrot_io_sockaddr_in __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(addr)
+#define ASSERT_ARGS_Parrot_io_socket_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/io/socket_win32.c */
 
 #define PIO_INIT(interp) Parrot_io_init_win32((interp))
 #define PIO_OPEN(interp, pmc, file, flags) \
