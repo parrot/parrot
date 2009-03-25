@@ -362,7 +362,10 @@ IO_O_FILES := \
     $(IO_DIR)/unix$(O) \
     $(IO_DIR)/win32$(O) \
     $(IO_DIR)/portable$(O) \
-    $(IO_DIR)/filehandle$(O)
+    $(IO_DIR)/filehandle$(O) \
+    $(IO_DIR)/socket_api$(O) \
+    $(IO_DIR)/socket_unix$(O) \
+    $(IO_DIR)/socket_win32$(O)
 
 INTERP_O_FILES := \
     $(SRC_DIR)/string/api$(O) \

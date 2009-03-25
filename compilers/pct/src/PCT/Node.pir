@@ -295,6 +295,17 @@ Return true since the node is defined.
 .end
 
 
+=item VTABLE get_number()
+
+Number of elements in this node.
+
+=cut
+
+.sub '' :vtable('get_number') :method
+    $I0 = elements self
+    .return ($I0)
+.end
+
 =back
 
 =head1 AUTHOR

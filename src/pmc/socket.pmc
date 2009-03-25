@@ -1,0 +1,231 @@
+/*
+Copyright (C) 2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/socket.pmc - Socket PMC
+
+=head1 DESCRIPTION
+
+The Socket PMC performs network I/O operations.
+
+=head2 Vtable Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+#include "../src/io/io_private.h"
+
+//#include <sys/socket.h>
+
+pmclass Socket extends FileHandle need_ext {
+    ATTR PMC *local;           /* Local addr                   */
+    ATTR PMC *remote;          /* Remote addr                  */
+
+/*
+
+=item C<void init()>
+
+Initializes a newly created Socket object.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_Socket_attributes *data_struct =
+                mem_allocate_typed(Parrot_Socket_attributes);
+
+        PMC_data(SELF)      = data_struct;
+        data_struct->local  = PMCNULL;
+        data_struct->remote = PMCNULL;
+
+        /* Initialize the os_handle to the platform-specific value for closed. */
+#ifdef PIO_OS_WIN32
+    data_struct->os_handle    = (PIOHANDLE)INVALID_HANDLE_VALUE;
+#endif
+#ifdef PIO_OS_UNIX
+    data_struct->os_handle    = (PIOHANDLE)-1;
+#endif
+#ifdef PIO_OS_STDIO
+    data_struct->os_handle    = (PIOHANDLE)NULL;
+#endif
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Create a copy of the filehandle.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        Parrot_Socket_attributes * const old_struct  = PARROT_SOCKET(SELF);
+        PMC * const copy = Parrot_io_new_socket_pmc(interp, old_struct->flags);
+        Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
+
+        data_struct->os_handle    = Parrot_dup(old_struct->os_handle);
+        //memcpy(data_struct->local, old_struct->local, sizeof(struct sockaddr_in));
+        //memcpy(data_struct->remote, old_struct->remote, sizeof(struct sockaddr_in));
+
+        return SELF;
+    }
+
+/*
+
+=item C<void mark()>
+
+Mark active filehandle data as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_Socket_attributes * const data = PARROT_SOCKET(SELF);
+
+        if (data) {
+            if (data->local)
+                pobject_lives(interp, (PObj *)data->local);
+
+            if (data->remote)
+                pobject_lives(interp, (PObj *)data->remote);
+        }
+    }
+/*
+
+=item C<void destroy()>
+
+Free structures.
+
+=cut
+
+*/
+    VTABLE void destroy() {
+        if (PARROT_SOCKET(SELF)) {
+            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+
+            /* TODO Shutdown socket */
+        }
+    }
+
+    METHOD close() {
+        INTVAL status = 0;
+        close(PARROT_SOCKET(SELF)->os_handle);
+        RETURN(INTVAL status);
+    }
+
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+
+/*
+
+=item C<connect> 
+
+Connects a socket object to an address.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the socket operation is
+complete, it invokes the callback, passing it a status object and the
+socket object it was called on. [If you want notification when a connect
+operation is completed, you probably want to do something with that
+connected socket object.]
+
+=cut
+
+*/
+
+    METHOD connect(PMC * address) {
+        INTVAL res = Parrot_io_connect(INTERP, SELF, address);
+        RETURN(INTVAL res);
+    }
+
+/*
+
+=item C<recv> 
+
+Receives a message from a connected socket object. It returns
+the message in a string.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the recv operation is
+complete, it invokes the callback, passing it a status object and a
+string containing the received message.
+
+=cut
+
+*/
+
+    METHOD recv() {
+        STRING * result;
+        INTVAL read = Parrot_io_recv(INTERP, SELF, &result);
+        RETURN(STRING * result);
+    }
+
+/*
+
+=item C<send>
+
+Sends a message string to a connected socket object.
+
+The asynchronous version takes an additional final PMC callback
+argument, and only returns a status object. When the send operation is
+complete, it invokes the callback, passing it a status object.
+
+=cut
+
+*/
+
+    METHOD send(STRING *buf) {
+        INTVAL res = Parrot_io_send(INTERP, SELF, buf);
+        RETURN(INTVAL res);
+    }
+
+    METHOD bind(PMC *host) {
+        INTVAL res = Parrot_io_bind(INTERP, SELF, host);
+        RETURN(INTVAL res);
+    }
+
+    METHOD listen(INTVAL backlog) {
+        INTVAL res = Parrot_io_listen(INTERP, SELF, backlog);
+        RETURN(INTVAL res);
+    }
+
+    METHOD accept() {
+        PMC * res = Parrot_io_accept(INTERP, SELF);
+        RETURN(PMC * res);
+    }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+} /* end pmclass */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 ft=pmc:
+ */

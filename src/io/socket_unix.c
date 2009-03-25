@@ -30,16 +30,36 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include "../pmc/pmc_socket.h"
 
 #ifdef PIO_OS_UNIX
+
+#include <sys/socket.h>
 
 /* HEADERIZER HFILE: include/parrot/io_unix.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void get_sockaddr_in(PARROT_INTERP,
+    ARGIN(PMC * sockaddr),
+    ARGIN(const char* host),
+    int port)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+#define ASSERT_ARGS_get_sockaddr_in __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(sockaddr) \
+    || PARROT_ASSERT_ARG(host)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
+
+/*
+static void get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr),
+    ARGIN(const char* host), ARGIN(int port));
+*/
 
 /*
 
@@ -56,7 +76,7 @@ Very minimal stubs for now, maybe someone will run with these.
 
 =over 4
 
-=item C<STRING * Parrot_io_sockaddr_in>
+=item C<PMC * Parrot_io_sockaddr_in>
 
 C<Parrot_io_sockaddr_in()> is not part of the layer and so must be C<extern>.
 
@@ -67,50 +87,23 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 
 */
 
+/* Helper macros to get sockaddr_in */
+#define SOCKADDR(p, t) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
+
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING *
-Parrot_io_sockaddr_in(PARROT_INTERP, unsigned short port, ARGIN(STRING *addr))
+PMC *
+Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 {
-    struct sockaddr_in sa;
-    /* Hard coded to IPv4 for now */
-    const int family = AF_INET;
+    PMC * sockaddr;
+    char * s;
 
-    char * const s = Parrot_str_to_cstring(interp, addr);
-    /*
-     * due to a bug in OS/X, we've to zero the struct
-     * else bind is failing erratically
-     */
-    memset(&sa, 0, sizeof (sa));
-#  ifdef PARROT_DEF_INET_ATON
-    if (inet_aton(s, &sa.sin_addr) != 0) {
-#  else
-    /* positive retval is success */
-    if (inet_pton(family, s, &sa.sin_addr) > 0) {
-#  endif
-        /* Success converting numeric IP */
-    }
-    else {
-        /* Maybe it is a hostname, try to lookup */
-        /* XXX Check PIO option before doing a name lookup,
-         * it may have been toggled off.
-         */
-        struct hostent *he = gethostbyname(s);
-        /* XXX FIXME - Handle error condition better */
-        if (!he) {
-            fprintf(stderr, "gethostbyname failure [%s]\n", s);
-            Parrot_str_free_cstring(s);
-            return NULL;
-        }
-        memcpy((char*)&sa.sin_addr, he->h_addr, sizeof (sa.sin_addr));
-    }
-    Parrot_str_free_cstring(s);
-
-    sa.sin_family = family;
-    sa.sin_port = htons(port);
-
-    return string_make(interp, (char *)&sa, sizeof (struct sockaddr_in),
-            "binary", 0);
+    s = Parrot_str_to_cstring(interp, addr);
+    sockaddr = pmc_new(interp, enum_class_Sockaddr);
+    get_sockaddr_in(interp, sockaddr, s, port);
+    free(s);
+    return sockaddr;
 }
 
 
@@ -130,18 +123,18 @@ socket type and protocol number.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_io_socket_unix(PARROT_INTERP, ARGMOD(PMC *socket), int fam, int type, int proto)
+Parrot_io_socket_unix(PARROT_INTERP, int fam, int type, int proto)
 {
+    int i;
     const int sock = socket(fam, type, proto);
     if (sock >= 0) {
-        ParrotIO * const io = Parrot_io_new(interp, PIO_F_SOCKET, 0, PIO_F_READ|PIO_F_WRITE);
-        Parrot_io_set_os_handle(interp, socket, sock);
-        memset(&io->local, 0, sizeof (struct sockaddr_in));
-        memset(&io->remote, 0, sizeof (struct sockaddr_in));
-        io->remote.sin_family = fam;
+        PMC * io = Parrot_io_new_socket_pmc(interp, PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
+        PARROT_SOCKET(io)->os_handle = sock;
+        setsockopt(PARROT_SOCKET(io)->os_handle, SOL_SOCKET, SO_REUSEADDR, &i, sizeof(i));
+        SOCKADDR(io, remote)->sin_family = fam;
         return io;
     }
-    return NULL;
+    return PMCNULL;
 }
 
 /*
@@ -155,16 +148,17 @@ Connects C<*io>'s socket to address C<*r>.
 */
 
 INTVAL
-Parrot_io_connect_unix(SHIM_INTERP, SHIM(PMC *socket), ARGMOD(ParrotIO *io),
-        ARGIN_NULLOK(STRING *r))
+Parrot_io_connect_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r))
 {
-    struct sockaddr_in * saddr = &io->remote;
+    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
-    if (r)
-        memcpy(&io->remote, PObj_bufstart(r), sizeof (struct sockaddr_in));
+    if(!r)
+        return -1;
+
+    PARROT_SOCKET(socket)->remote = r;
 
 AGAIN:
-    if ((connect(io->fd, (struct sockaddr *)saddr,
+    if ((connect(io->os_handle, (struct sockaddr *)SOCKADDR(socket, remote),
             sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
             case EINTR:
@@ -192,17 +186,19 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 INTVAL
-Parrot_io_bind_unix(SHIM_INTERP, SHIM(PMC *socket), ARGMOD(ParrotIO *io),
-        ARGMOD(STRING *l))
+Parrot_io_bind_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
 {
-    struct sockaddr_in * saddr = &io->local;
+    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    struct sockaddr_in * saddr;
 
-    if (!l)
+    if (!sockaddr)
         return -1;
 
-    memcpy(&io->local, PObj_bufstart(l), sizeof (struct sockaddr_in));
+    PARROT_SOCKET(socket)->local = sockaddr;
 
-    if ((bind(io->fd, (struct sockaddr *) saddr,
+    saddr = SOCKADDR(socket, local);
+
+    if ((bind(io->os_handle, (struct sockaddr *) saddr,
             sizeof (struct sockaddr_in))) == -1) {
         return -1;
     }
@@ -222,10 +218,10 @@ C<SEQ> sockets.
 */
 
 INTVAL
-Parrot_io_listen_unix(SHIM_INTERP, SHIM(PMC *socket), ARGIN(ParrotIO *io),
-        INTVAL sec)
+Parrot_io_listen_unix(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
 {
-    if ((listen(io->fd, sec)) == -1) {
+    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    if ((listen(io->os_handle, sec)) == -1) {
         return -1;
     }
     return 0;
@@ -233,7 +229,7 @@ Parrot_io_listen_unix(SHIM_INTERP, SHIM(PMC *socket), ARGIN(ParrotIO *io),
 
 /*
 
-=item C<ParrotIO * Parrot_io_accept_unix>
+=item C<PMC * Parrot_io_accept_unix>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 
@@ -244,21 +240,26 @@ Accept a new connection and return a newly created C<ParrotIO> socket.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_io_accept_unix(PARROT_INTERP, SHIM(PMC *socket), ARGMOD(ParrotIO *io))
+Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
 {
-    ParrotIO * const    newio   = Parrot_io_new(interp, PIO_F_SOCKET, 0,
-                                    PIO_F_READ|PIO_F_WRITE);
+    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
+    PMC * newio   = Parrot_io_new_socket_pmc(interp,
+            PIO_F_SOCKET | PIO_F_READ|PIO_F_WRITE);
     Parrot_Socklen_t    addrlen = sizeof (struct sockaddr_in);
-    struct sockaddr_in *saddr   = &newio->remote;
-    const int           newsock = accept(io->fd, (struct sockaddr *)saddr,
-                                    &addrlen);
+    struct sockaddr_in *saddr;
+
+    PARROT_SOCKET(newio)->local  = PARROT_SOCKET(socket)->local;
+    PARROT_SOCKET(newio)->remote = pmc_new(interp, enum_class_Sockaddr);
+    saddr                        = SOCKADDR(newio, remote);
+
+    const int           newsock = accept(io->os_handle,
+           (struct sockaddr *)saddr, &addrlen);
 
     if (newsock == -1) {
-        mem_sys_free(newio);
-        return NULL;
+        return PMCNULL;
     }
 
-    newio->fd = newsock;
+    PARROT_SOCKET(newio)->os_handle = newsock;
 
     /* XXX FIXME: Need to do a getsockname and getpeername here to
      * fill in the sockaddr_in structs for local and peer */
@@ -280,10 +281,10 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 INTVAL
-Parrot_io_send_unix(SHIM_INTERP, SHIM(PMC *socket), ARGMOD(ParrotIO *io),
-        ARGMOD(STRING *s))
+Parrot_io_send_unix(SHIM_INTERP, ARGMOD(PMC *socket), ARGMOD(STRING *s))
 {
     int error, bytes, byteswrote;
+    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
     bytes = s->bufused;
     byteswrote = 0;
@@ -291,7 +292,7 @@ AGAIN:
     /*
      * Ignore encoding issues for now.
      */
-    if ((error = send(io->fd, (char *)s->strstart + byteswrote,
+    if ((error = send(io->os_handle, (char *)s->strstart + byteswrote,
                     bytes, 0)) >= 0) {
         byteswrote += error;
         bytes -= error;
@@ -313,7 +314,7 @@ AGAIN:
 #    endif
             case EPIPE:
                 /* XXX why close it here and not below */
-                close(io->fd);
+                close(io->os_handle);
                 return -1;
             default:
                 return -1;
@@ -332,15 +333,15 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 */
 
 INTVAL
-Parrot_io_recv_unix(PARROT_INTERP, SHIM(PMC *socket),
-        ARGMOD(ParrotIO *io), ARGOUT(STRING **s))
+Parrot_io_recv_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGOUT(STRING **s))
 {
     int error;
     unsigned int bytesread = 0;
     char buf[2048];
+    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
 AGAIN:
-    if ((error = recv(io->fd, buf, 2048, 0)) >= 0) {
+    if ((error = recv(io->os_handle, buf, 2048, 0)) >= 0) {
         bytesread += error;
         /* The charset should probably be 'binary', but right now httpd.pir
          * only works with 'ascii'
@@ -361,11 +362,11 @@ AGAIN:
 #    endif
             case ECONNRESET:
                 /* XXX why close it on err return result is -1 anyway */
-                close(io->fd);
+                close(io->os_handle);
                 *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
                 return -1;
             default:
-                close(io->fd);
+                close(io->os_handle);
                 *s = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
                 return -1;
         }
@@ -393,25 +394,26 @@ the read buffer.
 */
 
 INTVAL
-Parrot_io_poll_unix(SHIM_INTERP, SHIM(PMC *socket), ARGMOD(ParrotIO *io), int which,
-               int sec, int usec)
+Parrot_io_poll_unix(SHIM_INTERP, ARGMOD(PMC *socket), int which, int sec,
+    int usec)
 {
     int n;
     fd_set r, w, e;
     struct timeval t;
+    Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
 
     t.tv_sec = sec;
     t.tv_usec = usec;
     FD_ZERO(&r); FD_ZERO(&w); FD_ZERO(&e);
     /* These should be defined in header */
-    if (which & 1) FD_SET(io->fd, &r);
-    if (which & 2) FD_SET(io->fd, &w);
-    if (which & 4) FD_SET(io->fd, &e);
+    if (which & 1) FD_SET(io->os_handle, &r);
+    if (which & 2) FD_SET(io->os_handle, &w);
+    if (which & 4) FD_SET(io->os_handle, &e);
 AGAIN:
-    if ((select(io->fd+1, &r, &w, &e, &t)) >= 0) {
-        n = (FD_ISSET(io->fd, &r) ? 1 : 0);
-        n |= (FD_ISSET(io->fd, &w) ? 2 : 0);
-        n |= (FD_ISSET(io->fd, &e) ? 4 : 0);
+    if ((select(io->os_handle+1, &r, &w, &e, &t)) >= 0) {
+        n = (FD_ISSET(io->os_handle, &r) ? 1 : 0);
+        n |= (FD_ISSET(io->os_handle, &w) ? 2 : 0);
+        n |= (FD_ISSET(io->os_handle, &e) ? 4 : 0);
         return n;
     }
     else {
@@ -422,105 +424,41 @@ AGAIN:
     }
 }
 
-#  endif
-/*
-
-=item C<PMC * Parrot_io_pipe_unix>
-
-Very limited C<exec> for now.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PMC *
-Parrot_io_pipe_unix(PARROT_INTERP, SHIM(PMC *filehandle), ARGIN(const char *cmd), int flags)
+static void
+get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
+            int port)
 {
-    /*
-     * pipe(), fork() should be defined, if this header is present
-     *        if that's not true, we need a test
-     */
-#  ifdef PARROT_HAS_HEADER_UNISTD
-    int pid, err, fds[2];
+    struct sockaddr_in *sa;
+    /* Hard coded to IPv4 for now */
+    const int family = AF_INET;
 
-    err = pipe(fds);
-    if (err < 0) {
-        return NULL;
-    }
-
-    /* Parent - return IO stream */
-    if ((pid = fork()) > 0) {
-        ParrotIO * const io =
-            Parrot_io_new(interp, PIO_F_PIPE, 0, flags & (PIO_F_READ|PIO_F_WRITE));
-        if (flags & PIO_F_READ) {
-            /* close this writer's end of pipe */
-            close(fds[1]);
-            io->fd = fds[0];
-            io->fd2 = 0;
-        }
-        else {  /* assume write only for now */
-            /* close this reader's end */
-            close(fds[0]);
-            io->fd = fds[1];
-            io->fd2 = 0;
-        }
-        return io;
-    }
-
-    /* Child - exec process */
-    if (pid == 0) {
-        char *argv[10], *p, *c;
-        int n;
-
-        if (flags & PIO_F_WRITE) {
-            /* the other end is writing - we read from the pipe */
-            close(STDIN_FILENO);
-            close(fds[1]);
-            if (Parrot_dup(fds[0]) != STDIN_FILENO) {
-                exit(EXIT_SUCCESS);
-            }
-        }
-        else {
-            /* XXX redirect stdout, stderr to pipe */
-            close(STDIN_FILENO);
-            close(STDOUT_FILENO);
-            close(STDERR_FILENO);
-            if (Parrot_dup(fds[0]) != STDIN_FILENO
-             || Parrot_dup(fds[1]) != STDOUT_FILENO
-             || Parrot_dup(fds[1]) != STDERR_FILENO)
-            {
-                exit(EXIT_SUCCESS);
-            }
-        }
-        /*
-         * XXX ugly hack to be able to pass some arguments
-         *     split cmd at blanks
-         */
-        c = strdup(cmd);
-        for (n = 0, p = strtok(c, " "); n < 9 && p; p = strtok(NULL, " ")) {
-            if (n == 0)
-                cmd = p;
-            argv[n++] = p;
-        }
-        argv[n] = NULL;
-        execv(cmd, argv);       /* XXX use execvp ? */
-        /* Will never reach this unless exec fails. */
-        perror("execvp");
-        exit(EXIT_FAILURE);
-    }
-
-    perror("fork");
+    sa = (struct sockaddr_in*)VTABLE_get_pointer(interp, sockaddr);
+#  ifdef PARROT_DEF_INET_ATON
+    if (inet_aton(host, &sa->sin_addr) != 0) {
 #  else
-    UNUSED(l);
-    UNUSED(cmd);
-    UNUSED(flags);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "pipe() unimplemented");
+    /* positive retval is success */
+    if (inet_pton(family, host, &sa->sin_addr) > 0) {
 #  endif
-    return NULL;
+        /* Success converting numeric IP */
+    }
+    else {
+        /* Maybe it is a hostname, try to lookup */
+        /* XXX Check PIO option before doing a name lookup,
+         * it may have been toggled off.
+         */
+        struct hostent *he = gethostbyname(host);
+        /* XXX FIXME - Handle error condition better */
+        if (!he) {
+            fprintf(stderr, "gethostbyname failure [%s]\n", host);
+            return;
+        }
+        memcpy((char*)&sa->sin_addr, he->h_addr, sizeof (sa->sin_addr));
+    }
+
+    sa->sin_family = family;
+    sa->sin_port = htons(port);
 }
+#  endif
 
 
 #endif /* PIO_OS_UNIX */

@@ -154,6 +154,23 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
 #define PIO_FLUSH(interp, pmc) Parrot_io_flush_win32((interp), (pmc))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_win32((handle))
 
+#define PIO_POLL(interp, pmc, which, sec, usec) \
+    Parrot_io_poll_win32((interp), (pmc), (which), (sec), (usec))
+#define PIO_NEW_SOCKET(interp, fam, type, proto) \
+    Parrot_io_socket_win32((interp), (fam), (type), (proto))
+#define PIO_RECV(interp, pmc, buf) \
+    Parrot_io_recv_win32((interp), (pmc), (buf))
+#define PIO_SEND(interp, pmc, buf) \
+    Parrot_io_send_win32((interp), (pmc), (buf))
+#define PIO_CONNECT(interp, pmc, address) \
+    Parrot_io_connect_win32((interp), (pmc), (address))
+#define PIO_BIND(interp, pmc, address) \
+    Parrot_io_bind_win32((interp), (pmc), (address))
+#define PIO_LISTEN(interp, pmc, backlog) \
+    Parrot_io_listen_win32((interp), (pmc), (backlog))
+#define PIO_ACCEPT(interp, pmc) \
+    Parrot_io_accept_win32((interp), (pmc))
+
 #endif /* PARROT_IO_WIN32_H_GUARD */
 
 /*

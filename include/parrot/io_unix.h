@@ -155,6 +155,106 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/unix.c */
 
+
+/* HEADERIZER BEGIN: src/io/socket_unix.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_bind_unix(PARROT_INTERP,
+    ARGMOD(PMC *socket),
+    ARGMOD(PMC *sockaddr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(*sockaddr);
+
+INTVAL Parrot_io_connect_unix(PARROT_INTERP,
+    ARGMOD(PMC *socket),
+    ARGIN(PMC *r))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_listen_unix(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_poll_unix(SHIM_INTERP,
+    ARGMOD(PMC *socket),
+    int which,
+    int sec,
+    int usec)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*socket);
+
+INTVAL Parrot_io_recv_unix(PARROT_INTERP,
+    ARGMOD(PMC *socket),
+    ARGOUT(STRING **s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(*s);
+
+INTVAL Parrot_io_send_unix(SHIM_INTERP,
+    ARGMOD(PMC *socket),
+    ARGMOD(STRING *s))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*socket)
+        FUNC_MODIFIES(*s);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_io_socket_unix(PARROT_INTERP, int fam, int type, int proto)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_Parrot_io_accept_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket)
+#define ASSERT_ARGS_Parrot_io_bind_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(sockaddr)
+#define ASSERT_ARGS_Parrot_io_connect_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(r)
+#define ASSERT_ARGS_Parrot_io_listen_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(socket)
+#define ASSERT_ARGS_Parrot_io_poll_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(socket)
+#define ASSERT_ARGS_Parrot_io_recv_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_Parrot_io_send_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(socket) \
+    || PARROT_ASSERT_ARG(s)
+#define ASSERT_ARGS_Parrot_io_sockaddr_in __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(addr)
+#define ASSERT_ARGS_Parrot_io_socket_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/io/socket_unix.c */
+
+
+
 #define PIO_INIT(interp) Parrot_io_init_unix((interp))
 #define PIO_OPEN(interp, pmc, file, flags) \
     Parrot_io_open_unix((interp), (pmc), (file), (flags))
@@ -172,6 +272,23 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
 #define PIO_PEEK(interp, pmc, buf) Parrot_io_peek_unix((interp), (pmc), (buf))
 #define PIO_FLUSH(interp, pmc) Parrot_io_flush_unix((interp), (pmc))
 #define PIO_GETBLKSIZE(handle) Parrot_io_getblksize_unix((handle))
+
+#define PIO_POLL(interp, pmc, which, sec, usec) \
+    Parrot_io_poll_unix((interp), (pmc), (which), (sec), (usec))
+#define PIO_NEW_SOCKET(interp, fam, type, proto) \
+    Parrot_io_socket_unix((interp), (fam), (type), (proto))
+#define PIO_RECV(interp, pmc, buf) \
+    Parrot_io_recv_unix((interp), (pmc), (buf))
+#define PIO_SEND(interp, pmc, buf) \
+    Parrot_io_send_unix((interp), (pmc), (buf))
+#define PIO_CONNECT(interp, pmc, address) \
+    Parrot_io_connect_unix((interp), (pmc), (address))
+#define PIO_BIND(interp, pmc, address) \
+    Parrot_io_bind_unix((interp), (pmc), (address))
+#define PIO_LISTEN(interp, pmc, backlog) \
+    Parrot_io_listen_unix((interp), (pmc), (backlog))
+#define PIO_ACCEPT(interp, pmc) \
+    Parrot_io_accept_unix((interp), (pmc))
 
 #endif /* PARROT_IO_UNIX_H_GUARD */
 

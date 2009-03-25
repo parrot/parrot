@@ -1,0 +1,140 @@
+/*
+Copyright (C) 2008-2009, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/sockaddr.pmc - sockaddr_in holder
+
+=head1 DESCRIPTION
+
+The Sockaddr PMC holds raw c-pointer to sockaddr_in
+
+
+=head2 Vtable Functions
+
+These are the vtable functions for the Sockaddr class.
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    struct sockaddr_in;
+#ifdef __cplusplus
+}
+#endif
+
+pmclass Sockaddr need_ext {
+    ATTR void   *pointer; /* The stored pointer. */
+
+/*
+
+=item C<void init()>
+
+Initializes the pointer object.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_Sockaddr_attributes * const pdata_struct =
+            mem_allocate_typed(Parrot_Sockaddr_attributes);
+
+        PMC_data(SELF)        = pdata_struct;
+        pdata_struct->pointer = mem_allocate_zeroed_typed(struct sockaddr_in);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC and frees all allocated memory.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+
+        if (data) {
+            mem_sys_free(data->pointer);
+            mem_sys_free(data);
+            PMC_data(SELF) = NULL;
+        }
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Creates and returns a clone of the pointer.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC * const dest = pmc_new(INTERP, SELF->vtable->base_type);
+        memcpy(PARROT_SOCKADDR(dest)->pointer, PARROT_SOCKADDR(SELF)->pointer,
+                sizeof(struct sockaddr_in));
+        return dest;
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Returns the pointer.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        return data->pointer;
+    }
+
+/*
+
+=item C<void set_pointer(void *)>
+
+Sets the pointer.
+
+=cut
+
+*/
+
+/*
+    VTABLE void set_pointer(void *value) {
+        Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        return data->pointer;
+    }
+*/
+
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
+

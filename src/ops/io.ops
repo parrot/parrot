@@ -496,6 +496,76 @@ op tell(out INT, out INT, invar PMC) :base_io {
 
 ########################################
 
+=item B<sockaddr>(out PMC, in STRING, in INT)
+
+Create new Sockaddr PMC.
+
+=cut
+
+op sockaddr(out PMC, in STR, in INT) {
+    $1 = Parrot_io_sockaddr_in(interp, $2, $3);
+}
+
+=item B<socket>(out PMC, in INT, in INT, in INT)
+
+Create new Socket
+
+=cut
+
+op socket(out PMC, in INT, in INT, in INT) {
+    $1 = Parrot_io_socket(interp, $2, $3, $4);
+}
+
+=item B<bind>(out INT, in PMC, in PMC)
+
+Bind Socket to address
+
+=cut
+
+op bind(out INT, in PMC, in PMC) {
+    $1 = Parrot_io_bind(interp, $2, $3);
+}
+
+=item B<listen>(out INT, in PMC, in INT)
+
+Start listening on previously bounded socket
+
+=cut
+
+op listen(out INT, in PMC, in INT) {
+    $1 = Parrot_io_listen(interp, $2, $3);
+}
+
+=item B<accept>(out PMC, in PMC)
+
+Accept incoming connection
+
+=cut
+
+op accept(out PMC, in PMC) {
+    $1 = Parrot_io_accept(interp, $2);
+}
+
+=item B<recv>(out INT, in PMC, out STR)
+
+Recive data from socket
+
+=cut
+
+op recv(out INT, in PMC, out STR) {
+    $1 = Parrot_io_recv(interp, $2, &$3);
+}
+
+=item B<send>(out INT, in PMC, int STR)
+
+Recive data from socket
+
+=cut
+
+op send(out INT, in PMC, in STR) {
+    $1 = Parrot_io_send(interp, $2, $3);
+}
+
 =back
 
 =cut

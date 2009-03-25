@@ -20,7 +20,7 @@ These are the primary interface functions for working with socket objects.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
-#include "io.str"
+#include "api.str"
 
 #include <stdarg.h>
 
@@ -32,6 +32,27 @@ These are the primary interface functions for working with socket objects.
 
 
 =over 4
+*/
+
+
+/*
+
+=item C<INTVAL Parrot_io_socket_is_closed>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+INTVAL
+Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
+{
+    return 0;
+}
+
+/*
 
 =item C<INTVAL Parrot_io_poll>
 
@@ -71,8 +92,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_socket(PARROT_INTERP, INTVAL fam, INTVAL type, INTVAL proto)
 {
-    ParrotIOLayer * const l = interp->piodata->default_stack;
-    return PIO_NEW_SOCKET(interp, l, fam, type, proto);
+    return PIO_NEW_SOCKET(interp, fam, type, proto);
 }
 
 /*
@@ -130,7 +150,7 @@ Connects C<*pmc> to C<*address>.  Returns C<-1> on failure.
 
 PARROT_EXPORT
 INTVAL
-Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *address))
+Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     if (Parrot_io_socket_is_closed(pmc))
         return -1;
@@ -151,12 +171,12 @@ C<*address>.  Returns C<-1> on failure.
 
 PARROT_EXPORT
 INTVAL
-Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *address))
+Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 {
     if (Parrot_io_socket_is_closed(pmc))
         return -1;
 
-    return PIO_BIND(interp, address);
+    return PIO_BIND(interp, pmc, address);
 }
 
 /*
@@ -199,11 +219,35 @@ Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
 
     if (Parrot_io_socket_is_closed(pmc))
-        return -1;
+        return PMCNULL;
 
-    return PIO_ACCEPT(interp, l, io);
+    return PIO_ACCEPT(interp, pmc);
 }
 
+/*
+
+=item C<PMC * Parrot_io_new_socket_pmc>
+
+Creates a new I/O socket object. The value of C<flags> is set
+in the returned PMC.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_new_socket_pmc(PARROT_INTERP, INTVAL flags)
+{
+    ASSERT_ARGS(Parrot_io_new_socket_pmc)
+    PMC * const new_io = pmc_new(interp, enum_class_Socket);
+
+    Parrot_io_set_flags(interp, new_io, flags);
+
+    return new_io;
+}
 /*
 
 =back
