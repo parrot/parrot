@@ -44,7 +44,7 @@ Filenames are restricted to the characters C<a-zA-Z0-9_-.>
 
 =item Filenames length restriction
 
-Filenames are restricted to 32 characters.  Test currently "todoed".
+Filenames are restricted to 32 characters.
 
 =back
 
