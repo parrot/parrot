@@ -508,7 +508,7 @@ op sockaddr(out PMC, in STR, in INT) {
 
 =item B<socket>(out PMC, in INT, in INT, in INT)
 
-Create new Socket
+Create new socket
 
 =cut
 
@@ -518,7 +518,7 @@ op socket(out PMC, in INT, in INT, in INT) {
 
 =item B<bind>(out INT, in PMC, in PMC)
 
-Bind Socket to address
+Bind socket to address
 
 =cut
 
@@ -528,7 +528,7 @@ op bind(out INT, in PMC, in PMC) {
 
 =item B<listen>(out INT, in PMC, in INT)
 
-Start listening on previously bounded socket
+Start listening on previously bound socket
 
 =cut
 
@@ -548,7 +548,7 @@ op accept(out PMC, in PMC) {
 
 =item B<recv>(out INT, in PMC, out STR)
 
-Recive data from socket
+Receive data from socket
 
 =cut
 
@@ -558,7 +558,7 @@ op recv(out INT, in PMC, out STR) {
 
 =item B<send>(out INT, in PMC, int STR)
 
-Recive data from socket
+Send data to socket
 
 =cut
 
