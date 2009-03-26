@@ -123,13 +123,17 @@ tree as a PIR code object that can be compiled.
     name = code.'escape'(name)
     namecorou = code.'escape'(namecorou)
 
-    .local string subid
-    subid = ''
+    .local string pirflags
+    pirflags = adverbs['pirflags']
+
+    $I0 = index pirflags, ':subid'
+    if $I0 >= 0 goto have_subid
     $P0 = adverbs['subid']
     if null $P0 goto have_subid
     $S0 = code.'escape'($P0)
-    subid = concat ':subid(', $S0
-    concat subid, ')'
+    pirflags = concat pirflags, ' :subid('
+    concat pirflags, $S0
+    concat pirflags, ')'
   have_subid:
 
     ##   Perform reduction/optimization on the
@@ -155,7 +159,7 @@ tree as a PIR code object that can be compiled.
     ##   Generate the initial PIR code for a backtracking (uncut) rule.
     .local string returnop
     returnop = '.yield'
-    code.'emit'(<<"        CODE", name, subid, namecorou, .INTERPINFO_CURRENT_SUB)
+    code.'emit'(<<"        CODE", name, pirflags, namecorou, .INTERPINFO_CURRENT_SUB)
       .sub %0 :method %1
           .param pmc adverbs   :slurpy :named
           .local pmc mob
@@ -184,7 +188,7 @@ tree as a PIR code object that can be compiled.
   code_cutrule:
     ##   Initial code for a rule that cannot be backtracked into.
     returnop = '.return'
-    code.'emit'(<<"        CODE", name, subid)
+    code.'emit'(<<"        CODE", name, pirflags)
       .sub %0 :method %1
           .param pmc adverbs      :unique_reg :slurpy :named
           .local pmc mob
