@@ -8,13 +8,14 @@ categories		lang devel
 maintainers		bfulgham coleda.com:will
 description		Open source virtual machine (for Perl6 et al.)
 long_description	\
- 	Parrot is the new interpreter being designed from scratch to support \
-	the upcoming Perl 6 language.  It is being designed as a standalone \
-	virtual machine that can be used to execute bytecode-compiled \
-	dynamic languages such as Perl 6, Perl 5, Python, Tcl, etc.
+        Parrot is a virtual machine designed to efficiently compile and \
+        execute bytecode for dynamic languages. Parrot currently hosts a \
+        variety of language implementations in various stages of completion, \
+        including Tcl, Javascript, Ruby, Lua, Scheme, PHP, Python, Perl 6, \
+        and a .NET bytecode translator.
 
 platforms		darwin
-homepage		http://www.parrotcode.org/
+homepage		http://www.parrot.org/
 master_sites		ftp://ftp.parrot.org/pub/parrot/releases/stable/${version}/
 
 checksums		md5 649ce1fb7c0edaf89dc1cd52ff267b1a \
