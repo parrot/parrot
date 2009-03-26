@@ -21,10 +21,6 @@ Dynlib stuff
 
 */
 
-#ifdef PARROT_HAS_HEADER_DLFCN
-#  include <dlfcn.h>
-#endif
-
 #define PARROT_DLOPEN_FLAGS RTLD_LAZY
 
 /*

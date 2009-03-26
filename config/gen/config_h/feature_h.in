@@ -145,10 +145,15 @@ END_PRINT
 if (defined @backtrace@) {
     print OUT <<"END_PRINT";
 #define PARROT_HAS_BACKTRACE
+#include <execinfo.h>
+//__USE_GNU seems to mess up stdio.h on Linux; only include it for dlfcn.h ifndef
 #ifndef __USE_GNU
 #  define __USE_GNU
+#  include <dlfcn.h>
+#  undef __USE_GNU
+#else
+#  include <dlfcn.h>
 #endif
-#include <dlfcn.h>
 END_PRINT
 }
 

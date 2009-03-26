@@ -23,13 +23,6 @@ Define the the core subsystem for exceptions.
 #include "exceptions.str"
 #include "pmc/pmc_continuation.h"
 
-#ifdef PARROT_HAS_BACKTRACE
-#  include <execinfo.h>
-#  ifdef PARROT_HAS_DLINFO
-#    include <dlfcn.h>
-#  endif
-#endif
-
 /* HEADERIZER HFILE: include/parrot/exceptions.h */
 
 /* HEADERIZER BEGIN: static */
