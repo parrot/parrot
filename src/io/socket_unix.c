@@ -88,7 +88,10 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 */
 
 /* Helper macros to get sockaddr_in */
-#  define SOCKADDR(p, t) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
+#  define SOCKADDR_LOCAL(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
+                PARROT_SOCKET((p))->local))
+#  define SOCKADDR_REMOTE(p) ((struct sockaddr_in*)VTABLE_get_pointer(interp, \
+                PARROT_SOCKET((p))->remote))
 
 
 PARROT_WARN_UNUSED_RESULT
@@ -133,7 +136,7 @@ Parrot_io_socket_unix(PARROT_INTERP, int fam, int type, int proto)
         PMC * io = Parrot_io_new_socket_pmc(interp, PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
         PARROT_SOCKET(io)->os_handle = sock;
         setsockopt(PARROT_SOCKET(io)->os_handle, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
-        SOCKADDR(io, remote)->sin_family = fam;
+        SOCKADDR_REMOTE(io)->sin_family = fam;
         return io;
     }
     return PMCNULL;
@@ -161,7 +164,7 @@ Parrot_io_connect_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGIN(PMC *r))
     PARROT_SOCKET(socket)->remote = r;
 
 AGAIN:
-    if ((connect(io->os_handle, (struct sockaddr *)SOCKADDR(socket, remote),
+    if ((connect(io->os_handle, (struct sockaddr *)SOCKADDR_REMOTE(socket),
             sizeof (struct sockaddr_in))) != 0) {
         switch (errno) {
             case EINTR:
@@ -200,7 +203,7 @@ Parrot_io_bind_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
 
     PARROT_SOCKET(socket)->local = sockaddr;
 
-    saddr = SOCKADDR(socket, local);
+    saddr = SOCKADDR_LOCAL(socket);
 
     if ((bind(io->os_handle, (struct sockaddr *) saddr,
             sizeof (struct sockaddr_in))) == -1) {
@@ -257,7 +260,7 @@ Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
 
     PARROT_SOCKET(newio)->local  = PARROT_SOCKET(socket)->local;
     PARROT_SOCKET(newio)->remote = pmc_new(interp, enum_class_Sockaddr);
-    saddr                        = SOCKADDR(newio, remote);
+    saddr                        = SOCKADDR_REMOTE(newio);
 
     newsock = accept(io->os_handle, (struct sockaddr *)saddr, &addrlen);
 
