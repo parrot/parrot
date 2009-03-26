@@ -88,7 +88,7 @@ C<inet_aton()>, etc.) and take this out of platform specific compilation
 */
 
 /* Helper macros to get sockaddr_in */
-#  define SOCKADDR(p, (t)) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
+#  define SOCKADDR(p, t) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
 
 
 PARROT_WARN_UNUSED_RESULT
