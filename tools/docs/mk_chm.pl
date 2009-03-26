@@ -42,7 +42,8 @@ my $version = $PConfig{VERSION} . $PConfig{DEVEL};
 
 my $docs = Parrot::Docs::Section::Parrot->new;
 my $dist = Parrot::Distribution->new;
-my $toc  = $docs->build_toc_chm( $dist );
+my $toc   = $docs->build_toc_chm( $dist );
+my $index = $docs->build_index_chm( $dist );
 
 my $filename = 'docs/html/parrot.hhp';
 open my $OUT, '>', $filename
@@ -72,15 +73,15 @@ close $OUT;
 $filename = 'docs/html/index.hhk';
 open $OUT, '>', $filename
     or die "Can't open $filename ($!)";
-print $OUT <<'TEXT';
+print $OUT <<"TEXT";
 <HTML>
-  <HEAD>
-  </HEAD>
-  <BODY>
-    <UL>
-    </UL>
-  </BODY>
-</HTML>
+<HEAD>
+<meta name="generator" content="(Perl $])">
+</HEAD><BODY>
+<UL>
+$index
+</UL>
+</BODY></HTML>
 TEXT
 close $OUT;
 
@@ -89,79 +90,77 @@ open $OUT, '>', $filename
     or die "Can't open $filename ($!)";
 print $OUT <<"TEXT";
 <HTML>
-  <HEAD>
-    <meta name="generator" content="(Perl $])">
-  </HEAD>
-  <BODY>
-    <OBJECT type="text/site properties">
-      <param name="ImageType" value="Folder">
-    </OBJECT>
-    <UL>
+<HEAD>
+<meta name="generator" content="(Perl $])">
+</HEAD><BODY>
+<OBJECT type="text/site properties">
+	<param name="ImageType" value="Folder">
+</OBJECT>
+<UL>
 $toc
-      <LI> <OBJECT type="text/sitemap">
-          <param name="Name" value="Book">
-        </OBJECT>
-        <UL>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Overview">
-              <param name="Local" value="../book/ch01_overview.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Getting Started">
-              <param name="Local" value="../book/ch02_getting_started.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="PIR Basics">
-              <param name="Local" value="../book/ch03_pir_basics.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="PIR Subroutines">
-              <param name="Local" value="../book/ch04_pir_subroutines.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="PASM">
-              <param name="Local" value="../book/ch05_pasm.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Library">
-              <param name="Local" value="../book/ch06_library.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Testing and Debugging">
-              <param name="Local" value="../book/ch07_testing_and_debugging.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Architecture">
-              <param name="Local" value="../book/ch08_architecture.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Parrot Compiler Toolkit">
-              <param name="Local" value="../book/ch09_pct.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="High Level Languages">
-              <param name="Local" value="../book/ch10_hlls.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="PMC">
-              <param name="Local" value="../book/ch11_pmcs.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Opcodes">
-              <param name="Local" value="../book/ch12_opcodes.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="References">
-              <param name="Local" value="../book/ch13_reference.html">
-            </OBJECT>
-          <LI> <OBJECT type="text/sitemap">
-              <param name="Name" value="Appendix : Patch Submission">
-              <param name="Local" value="../book/appX_patch_submission.html">
-            </OBJECT>
-        </UL>
-    </UL>
-  </BODY>
-</HTML>
+	<LI> <OBJECT type="text/sitemap">
+		<param name="Name" value="Book">
+		</OBJECT>
+	<UL>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Overview">
+			<param name="Local" value="../book/ch01_overview.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Getting Started">
+			<param name="Local" value="../book/ch02_getting_started.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="PIR Basics">
+			<param name="Local" value="../book/ch03_pir_basics.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="PIR Subroutines">
+			<param name="Local" value="../book/ch04_pir_subroutines.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="PASM">
+			<param name="Local" value="../book/ch05_pasm.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Library">
+			<param name="Local" value="../book/ch06_library.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Testing and Debugging">
+			<param name="Local" value="../book/ch07_testing_and_debugging.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Architecture">
+			<param name="Local" value="../book/ch08_architecture.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Parrot Compiler Toolkit">
+			<param name="Local" value="../book/ch09_pct.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="High Level Languages">
+			<param name="Local" value="../book/ch10_hlls.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="PMC">
+			<param name="Local" value="../book/ch11_pmcs.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Opcodes">
+			<param name="Local" value="../book/ch12_opcodes.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="References">
+			<param name="Local" value="../book/ch13_reference.html">
+			</OBJECT>
+		<LI> <OBJECT type="text/sitemap">
+			<param name="Name" value="Appendix : Patch Submission">
+			<param name="Local" value="../book/appX_patch_submission.html">
+			</OBJECT>
+	</UL>
+-</UL>
+</BODY></HTML>
 TEXT
 close $OUT;
 

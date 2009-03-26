@@ -194,17 +194,18 @@ sub contents_relative_to_source {
     return @contents;
 }
 
+
 sub build_toc_chm {
     my $self = shift;
     my $source = shift;
-    my $indent = shift || q{ } x 6;
+    my $indent = shift || "\t";
 
     my $toc = q{};
     $toc .= qq{$indent<LI> <OBJECT type="text/sitemap">\n};
-    $toc .= qq{$indent    <param name="Name" value="$self->{NAME}">\n};
-    $toc .= qq{$indent    <param name="Local" value="$self->{INDEX_PATH}">\n}
+    $toc .= qq{$indent\t<param name="Name" value="$self->{NAME}">\n};
+    $toc .= qq{$indent\t<param name="Local" value="$self->{INDEX_PATH}">\n}
         if ( exists $self->{INDEX_PATH} );
-    $indent .= q{ } x 2;
+    $indent .= "\t";
     $toc .= qq{$indent</OBJECT>\n};
     $toc .= qq{$indent<UL>\n};
     foreach my $content ( @{ $self->{CONTENTS} } ) {
@@ -219,10 +220,10 @@ sub build_toc_chm {
                         my $file = $source->file_with_relative_path( $rel_path );
                         next if ( !$file->contains_pod && !$file->is_docs_link );
                         my $title = $file->title || $rel_path;
-                        $toc .= qq{$indent  <LI> <OBJECT type="text/sitemap">\n};
-                        $toc .= qq{$indent      <param name="Name" value="$title">\n};
-                        $toc .= qq{$indent      <param name="Local" value="$rel_path.html">\n};
-                        $toc .= qq{$indent    </OBJECT>\n};
+                        $toc .= qq{$indent<LI> <OBJECT type="text/sitemap">\n};
+                        $toc .= qq{$indent\t<param name="Name" value="$title">\n};
+                        $toc .= qq{$indent\t<param name="Local" value="$rel_path.html">\n};
+                        $toc .= qq{$indent\t</OBJECT>\n};
                     }
                 }
             }
@@ -233,15 +234,85 @@ sub build_toc_chm {
                 my $file = $source->file_with_relative_path( $rel_path );
                 next if ( !$file->contains_pod && !$file->is_docs_link );
                 my $title = $file->title || $rel_path;
-                $toc .= qq{$indent  <LI> <OBJECT type="text/sitemap">\n};
-                $toc .= qq{$indent      <param name="Name" value="$title">\n};
-                $toc .= qq{$indent      <param name="Local" value="$rel_path.html">\n};
-                $toc .= qq{$indent    </OBJECT>\n};
+                $toc .= qq{$indent<LI> <OBJECT type="text/sitemap">\n};
+                $toc .= qq{$indent\t<param name="Name" value="$title">\n};
+                $toc .= qq{$indent\t<param name="Local" value="$rel_path.html">\n};
+                $toc .= qq{$indent\t</OBJECT>\n};
             }
         }
     }
     $toc .= qq{$indent</UL>\n};
     return $toc;
+}
+
+
+sub build_index_chm {
+    my $self = shift;
+    my $source = shift;
+
+    eval 'require Pod::PseudoPod::Index';
+    return q{} if $@;
+
+    sub Pod::PseudoPod::Index::ourkeys {
+        my $self = shift;
+        $self->scan($self->{'index'});
+        return $self->{'ourkeys'};
+     }
+
+    sub Pod::PseudoPod::Index::scan {
+        my ($self,$node) = @_;
+        foreach my $key (sort {lc($a) cmp lc($b)} keys %{$node}) {
+            next if $key eq 'page';
+            push @{$self->{'ourkeys'}}, $key;
+            $self->scan($node->{$key});
+        }
+    }
+
+
+    foreach my $content ( @{ $self->{CONTENTS} } ) {
+        my @to_process;
+        if ( ref $content && $content->isa( 'Parrot::Docs::Group' ) ) {
+            $content->build_index_chm( $source );
+        }
+        elsif ( ref $content ) {
+            push @to_process, @{ $content->{CONTENTS} };
+        }
+        else {
+            push @to_process, $content;
+        }
+
+        foreach my $item ( @to_process ) {
+            my @rel_paths  = $self->file_paths_relative_to_source( $source, $item );
+            foreach my $rel_path (@rel_paths) {
+                my $file = $source->file_with_relative_path( $rel_path );
+
+                next if ( !$file->contains_pod && !$file->is_docs_link );
+                my $title = $file->title || $rel_path;
+
+                my $index_parser = Pod::PseudoPod::Index->new();
+                $index_parser->parse_file($file->{'PATH'});
+                my $ourkeys = $index_parser->ourkeys();
+
+                foreach my $k (@{$ourkeys}) {
+                    push @{$source->{'_INDEX'}{$k}}, $rel_path;
+                }
+            }
+        }
+    }
+
+    my $index;
+    for my $key (%{$source->{_INDEX}}) {
+        next if ! defined $source->{_INDEX}{$key};
+        next if $key =~ /^\s*$/;
+        $index .= qq{\t<LI> <OBJECT type="text/sitemap">\n};
+        $index .= qq{\t\t<param name="Keyword" value="$key">\n};
+        foreach my $ref (@{$source->{_INDEX}{$key}}) {
+            (my $shortkey = $key) =~ s/( opcode \(PASM\)| directive| \(.*\)| \(.*\) instruction (PIR))//;
+             $index .= qq{\t\t<param name="Local" value="$ref.html#$shortkey">\n};
+        }
+        $index .= qq{\t\t</OBJECT>\n};
+    }
+    return $index;
 }
 
 =back
