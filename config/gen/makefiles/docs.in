@@ -49,30 +49,7 @@ html:
 html-clean:
 	$(RM_RF) html
 
-BOOK:= \
-  ch01_overview.pod \
-  ch02_getting_started.pod \
-  ch03_pir_basics.pod \
-  ch04_pir_subroutines.pod \
-  ch05_pasm.pod \
-  ch06_library.pod \
-  ch07_testing_and_debugging.pod \
-  ch08_architecture.pod \
-  ch09_pct.pod \
-  ch10_hlls.pod \
-  ch11_pmcs.pod \
-  ch12_opcodes.pod \
-  ch13_reference.pod \
-  appX_patch_submission.pod
-
-book: book-dummy
-book-dummy:
-	cd book && ppod2html $(BOOK)
-
-book-clean:
-	$(RM_F) "book/*.html"
-
-htmlhelp: book html
+htmlhelp: html
 #IF(win32):	cd .. && $(PERL) tools/docs/mk_chm.pl
 #IF(win32):	-cd html && hhc parrot.hhp
 
