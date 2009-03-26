@@ -220,5 +220,5 @@ complete, it invokes the callback, passing it a status object.
  * Local variables:
  *   c-file-style: "parrot"
  * End:
- * vim: expandtab shiftwidth=4 ft=pmc:
+ * vim: expandtab shiftwidth=4:
  */
