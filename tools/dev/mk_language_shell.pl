@@ -32,9 +32,11 @@ to F<languages/xyz> if an explicit C<path> isn't given):
     README
     Configure.pl
     xyz.pir
+    build/PARROT_REVISION
     build/Makefile.in
     build/src/ops/Makefile.in
     build/src/pmc/Makefile.in
+    build/gen_parrot.pl
     doc/running.pod
     doc/Xyz.pod
     dynext/.ignore
@@ -92,7 +94,7 @@ my $uclang = uc $lang;
 ## the name and revision of the script, for use in the generated README
 my $script = $0;
 my $rev = '$Revision$';
-$rev =~ s/^\D*(\d+)\D*$/r$1/;
+$rev =~ s/^\D*(\d+)\D*$/$1/;
 
 my $no_doc = $with_doc ? '' : '#';
 my $no_ops = $with_ops ? '' : '#';
@@ -119,6 +121,7 @@ while (<DATA>) {
     s{\@no_doc\@} {$no_doc}ig;
     s{\@no_ops\@} {$no_ops}ig;
     s{\@no_pmc\@} {$no_pmc}ig;
+    s{\@rev\@}    {$rev}ig;
     if (/^__(.*)__$/) { start_new_file("$path$PConfig{slash}$1"); }
     elsif ($fh) { print $fh $_; }
 }
@@ -184,7 +187,7 @@ sub start_new_file {
 
 __DATA__
 __README__
-Language '@lang@' was created with @script@, @rev@.
+Language '@lang@' was created with @script@, r@rev@.
 
 See doc/@lang@.pod for the documentation, and
 doc/running.pod for the command-line options.
@@ -192,16 +195,44 @@ doc/running.pod for the command-line options.
 __Configure.pl__
 # @Id@
 
+=head1 NAME
+
+Configure.pl - a configure script for a high level language running on Parrot
+
+=head1 SYNOPSIS
+
+  perl Configure.pl --help
+
+  perl Configure.pl
+
+  perl Configure.pl --parrot_config=<path_to_parrot>
+
+  perl Configure.pl --gen-parrot [ -- --options-for-configure-parrot ]
+
+=cut
+
 use strict;
 use warnings;
 use 5.008;
 
+use Getopt::Long qw(:config auto_help);
+
+our ( $opt_parrot_config, $opt_gen_parrot);
+GetOptions( 'parrot_config=s', 'gen-parrot' );
+
+#  Update/generate parrot build if needed
+if ($opt_gen_parrot) {
+    system($^X, 'build/gen_parrot.pl', @ARGV);
+}
+
 #  Get a list of parrot-configs to invoke.
-my @parrot_config_exe = (
-    'parrot/parrot_config',
-    '../../parrot_config',
-    'parrot_config',
-);
+my @parrot_config_exe = $opt_parrot_config
+                      ? ( $opt_parrot_config )
+                      : (
+                          'parrot/parrot_config',
+                          '../../parrot_config',
+                          'parrot_config',
+                        );
 
 #  Get configuration information from parrot_config
 my %config = read_parrot_config(@parrot_config_exe);
@@ -255,6 +286,8 @@ sub create_makefiles {
 # End:
 # vim: expandtab shiftwidth=4:
 
+__build/PARROT_REVISION__
+@rev@
 __build/src/ops/Makefile.in__
 ## @Id@
 
@@ -642,6 +675,91 @@ distclean: realclean
 #   mode: makefile
 # End:
 # vim: ft=make:
+
+__build/gen_parrot.pl__
+#! perl
+
+=head1 TITLE
+
+gen_parrot.pl - script to obtain and build Parrot for @lang@
+
+=head2 SYNOPSIS
+
+    perl gen_parrot.pl [--option-for-Configure-pl]
+
+=head2 DESCRIPTION
+
+Maintains an appropriate copy of Parrot in the parrot/ subdirectory.
+The revision of Parrot to be used in the build is given by the
+build/PARROT_REVISION file.
+
+=cut
+
+use strict;
+use warnings;
+use 5.008;
+
+##  determine what revision of Parrot we require
+open my $REQ, 'build/PARROT_REVISION'
+    or die "cannot open build/PARROT_REVISION ($!)\n";
+my $required = <$REQ>;
+chomp $required;
+close $REQ;
+
+{
+    no warnings;
+    if (open my $REV, '-|', 'parrot/parrot_config revision') {
+        my $revision = <$REV>;
+        close $REV;
+        chomp $revision;
+        if ($revision >= $required) {
+            print "Parrot r$revision already available (r$required required)\n";
+            exit(0);
+        }
+    }
+}
+
+print "Checking out Parrot r$required via svn...\n";
+system("svn checkout -r $required https://svn.parrot.org/parrot/trunk parrot");
+
+chdir('parrot');
+
+
+##  If we have a Makefile from a previous build, do a 'make realclean'
+if (-f 'Makefile') {
+    my %config = read_parrot_config();
+    my $make = $config{'make'};
+    if ($make) {
+        print "Performing '$make realclean'\n";
+        system($make, 'realclean');
+    }
+}
+
+##  Configure Parrot
+system($^X, 'Configure.pl', @ARGV);
+
+my %config = read_parrot_config();
+my $make = $config{'make'};
+system( $make );
+system( $make, 'install-dev' );
+
+sub read_parrot_config {
+    my %config = ();
+    if (open my $CFG, 'config_lib.pasm') {
+        while (<$CFG>) {
+            $config{$1} = $2 if (/P0\["(.*?)"], "(.*?)"/);
+        }
+        close $CFG;
+    }
+    %config;
+}
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
 
 __doc/@lang@.pod__
 # @Id@
