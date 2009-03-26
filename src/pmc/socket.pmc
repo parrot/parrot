@@ -21,8 +21,6 @@ The Socket PMC performs network I/O operations.
 #include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
-//#include <sys/socket.h>
-
 pmclass Socket extends FileHandle need_ext {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
@@ -75,8 +73,6 @@ Create a copy of the filehandle.
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
 
         data_struct->os_handle    = Parrot_dup(old_struct->os_handle);
-        //memcpy(data_struct->local, old_struct->local, sizeof(struct sockaddr_in));
-        //memcpy(data_struct->remote, old_struct->remote, sizeof(struct sockaddr_in));
 
         return SELF;
     }
