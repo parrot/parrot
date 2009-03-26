@@ -134,10 +134,7 @@ Free structures.
 
 =over 4
 
-
-/*
-
-=item C<connect> 
+=item C<connect>
 
 Connects a socket object to an address.
 
@@ -159,7 +156,7 @@ connected socket object.]
 
 /*
 
-=item C<recv> 
+=item C<recv>
 
 Receives a message from a connected socket object. It returns
 the message in a string.
