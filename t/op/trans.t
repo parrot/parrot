@@ -205,7 +205,14 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, "sinh" );
+my $runcore = $ENV{TEST_PROG_ARGS} || '';
+my @bsdtodo = (
+    $runcore =~ /--runcore=jit/ &&  $^O =~ m/bsd/i
+        ? ( todo => 'broken under JIT TT #501' )
+        : ()
+);
+
+pasm_output_is( <<"CODE", <<OUTPUT, "sinh", @bsdtodo );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         sinh N2, N1
@@ -225,7 +232,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, "tanh" );
+pasm_output_is( <<"CODE", <<OUTPUT, "tanh", @bsdtodo );
         .include 'include/fp_equality.pasm'
         set N1, 1.0
         tanh N2, N1
@@ -265,14 +272,7 @@ ok 1
 ok 2
 OUTPUT
 
-my $runcore = $ENV{TEST_PROG_ARGS} || '';
-my @todo = (
-    $runcore =~ /--runcore=jit/
-        ? ( todo => 'broken under JIT TT #501' )
-        : ()
-);
-
-pasm_output_is( <<"CODE", <<OUTPUT, 'atan2', @todo );
+pasm_output_is( <<"CODE", <<OUTPUT, 'atan2' );
         .include 'include/fp_equality.pasm'
         set N0, 0.0
         set I0, 0
@@ -477,7 +477,7 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, "pow" );
+pasm_output_is( <<"CODE", <<OUTPUT, "pow", @bsdtodo );
         .include 'include/fp_equality.pasm'
         set N1, 3.0
         set I1, 3
