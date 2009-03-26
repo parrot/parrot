@@ -61,6 +61,7 @@ any value type.
     piropsig['istrue']     = 'IP'
     piropsig['add']        = 'PP+'
     piropsig['band']       = 'PPP'
+    piropsig['bxor']       = 'PPP'
     piropsig['bnot']       = 'PP'
     piropsig['bor']        = 'PPP'
     piropsig['concat']     = 'PP~'
