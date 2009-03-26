@@ -95,7 +95,7 @@ The code was heavily hacked by bernhard and leo.
 .include 'except_types.pasm'
 
 .sub main :main
-    .local pmc sock, work, fp
+    .local pmc listener, work, fp
     .local pmc fp               # read requested files from disk
     .local int port
     .local pmc address
@@ -111,12 +111,12 @@ The code was heavily hacked by bernhard and leo.
     port = 1234
 
     # TODO provide sys/socket constants
-    socket sock, 2, 1, 6	# PF_INET, SOCK_STREAM, tcp
-    unless sock goto ERR_NO_SOCKET
+    listener = socket 2, 1, 6	# PF_INET, SOCK_STREAM, tcp
+    unless listener goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port
     address = sockaddr host, port
-    ret = bind sock, address
+    ret = listener.'bind'(address)
     if ret == -1 goto ERR_bind
     $S0 = port
     print "Running webserver on port "
@@ -131,12 +131,12 @@ The code was heavily hacked by bernhard and leo.
     print "\n"
     print "Be sure that the HTML docs have been generated with 'make html'.\n"
 
-    listen ret, sock, 1
+    listener.'listen'(1)
 NEXT:
-    accept work, sock
+    work = listener.'accept'()
     req = ""
 MORE:
-    recv ret, work, buf
+    buf = work.'recv'()
     # charset I0, buf
     # charsetname S1, I0
     # print "\nret: "
@@ -147,6 +147,7 @@ MORE:
     # print buf
     # print "\nafter buf"
 
+    ret = length buf
     if ret <= 0 goto SERVE_REQ
     concat req, buf
     index pos, req, CRLFCRLF
@@ -270,7 +271,7 @@ ERR_bind:
     print "bind failed\n"
     # fall through
 END:
-    close sock
+    close listener
     end
 .end
 
@@ -308,8 +309,8 @@ HEADER_LOOP:
 
     rep .= CRLF
     rep .= body
-    send ret, sock, rep
-    close sock
+    ret = sock.'send'(rep)
+    sock.'close'()
     .return()
 .end
 
