@@ -43,6 +43,7 @@ Copyright (C) 2004-2009, Parrot Foundation.
     i = 1
 loop:
     key = argv[i]
+    if key == '--help' goto usage
     if key == '--dump' goto dump
     $I0 = defined conf_hash[key]
     if $I0 goto ok2
@@ -74,7 +75,7 @@ iter_end:
 usage:
     $S0 = argv[0]
     printerr $S0
-    printerr " [ <config-key> | --dump ]\n"
+    printerr " [ <config-key> | --dump | --help ]\n"
     exit 1
 .end
 
