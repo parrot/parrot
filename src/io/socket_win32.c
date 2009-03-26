@@ -54,7 +54,7 @@ static void get_sockaddr_in(PARROT_INTERP,
 #  if PARROT_NET_DEVEL
 
 /* Helper macros to get sockaddr_in */
-#    define SOCKADDR(p, t) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
+#    define SOCKADDR(p, (t)) ((struct sockaddr_in*)VTABLE_get_pointer(interp, PARROT_SOCKET((p))->t))
 
 /*
 
