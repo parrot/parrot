@@ -90,6 +90,7 @@ typedef enum {
         CONTROL_CONTINUE,
         CONTROL_ERROR,
         CONTROL_TAKE,
+        CONTROL_LEAVE,
 
         CONTROL_LOOP_NEXT,
         CONTROL_LOOP_LAST,

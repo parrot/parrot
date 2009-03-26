@@ -104,6 +104,7 @@ any value type.
     $P0.'push'(.CONTROL_CONTINUE)
     $P0.'push'(.CONTROL_ERROR)
     $P0.'push'(.CONTROL_TAKE)
+    $P0.'push'(.CONTROL_LEAVE)
     $P0.'push'(.CONTROL_LOOP_NEXT)
     $P0.'push'(.CONTROL_LOOP_LAST)
     $P0.'push'(.CONTROL_LOOP_REDO)
@@ -114,6 +115,9 @@ any value type.
     $P0 = new 'ResizablePMCArray'
     $P0.'push'(.CONTROL_OK)
     controltypes['OK'] = $P0
+    $P0 = new 'ResizablePMCArray'
+    $P0.'push'(.CONTROL_LEAVE)
+    controltypes['LEAVE'] = $P0
     $P0 = new 'ResizablePMCArray'
     $P0.'push'(.CONTROL_BREAK)
     controltypes['BREAK'] = $P0
