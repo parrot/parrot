@@ -79,9 +79,9 @@ Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int pro
     int i = 1;
     const int sock = socket(fam, type, proto);
     if (sock >= 0) {
-        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
+        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&i, sizeof (i));
         Parrot_io_set_os_handle(interp, s, sock);
-        SOCKADDR_REMOTE(io)->sin_family = fam;
+        SOCKADDR_REMOTE(s)->sin_family = fam;
         return 0;
     }
     return -1;
