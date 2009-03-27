@@ -315,13 +315,17 @@ L<https://trac.parrot.org/parrot/ticket/338>
 
 =back
 
-=head1 parrot library
+=head1 Parrot library
 
 =over 4
 
 =item Data::Replace [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/108>
+
+=item JSON, JSON, and Config;JSON [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/508>
 
 =back
 
