@@ -37,16 +37,16 @@ ptrsize=$(./parrot_config ptrsize)
 # 8 or 12 or 16 on intel
 numvalsize=$(./parrot_config numvalsize)
 
-if [ "$ptrsize" == "4" ]
+if [ "$ptrsize" = "4" ]
 then
-    if [ "$byteorder" == "1234" ]
+    if [ "$byteorder" = "1234" ]
     then
-        if [ "$numvalsize" == "12" ]
+        if [ "$numvalsize" = "12" ]
         then
             N=2
             echo "2: i386 32-bit opcode_t, 32-bit intval, 12-byte long double"
         else
-            if [ "$numvalsize" == "4" ]
+            if [ "$numvalsize" = "4" ]
             then
                 N=8
                 echo "8: i386 32-bit opcode_t, 32-bit intval, 4-byte float"
@@ -60,13 +60,13 @@ then
             fi
         fi
     else
-        if [ "$byteorder" == "4321" ]
+        if [ "$byteorder" = "4321" ]
         then
             N=3
             echo "3: PPC BE 32 bit opcode_t, 32 bit intval"
         else
-            if [ "$byteorder" == "12345678" \
-                 -a "$(./parrot_config osname)" == "cygwin" ]
+            if [ "$byteorder" = "12345678" \
+                 -a "$(./parrot_config osname)" = "cygwin" ]
             then
                 echo "1: cygwin use64bitint"
                 N=1
@@ -78,11 +78,11 @@ then
         fi
     fi
 else
-    if [ "$ptrsize" == "8" ]
+    if [ "$ptrsize" = "8" ]
     then
-        if [ "$byteorder" == "12345678" ]
+        if [ "$byteorder" = "12345678" ]
         then
-            if [ "$numvalsize" == "8" ]
+            if [ "$numvalsize" = "8" ]
             then
                 N=4
                 echo "4: x86_64 double float 64 bit opcode_t, 8-byte double"
@@ -95,7 +95,7 @@ else
                 echo "5: x86_64 64 bit opcode_t, 16-byte long double"
             fi
         else
-            if [ "$numvalsize" == "8" ]
+            if [ "$numvalsize" = "8" ]
             then
                 N=6
                 echo "6: big-endian 64-bit"
@@ -139,8 +139,8 @@ perl t/harness t/native_pbc/integer.t && \
     perl t/harness t/native_pbc/number.t && \
     perl t/harness t/native_pbc/string.t
 
-if [ "$enable_long_double" == "1" ]; then
-    if [ "$1" == "--noconf" ]; then
+if [ "$enable_long_double" = "1" ]; then
+    if [ "$1" = "--noconf" ]; then
       echo "Hmm. You have no long double, and we want to try --floatval=long double"
       echo "However for this you must reconfigure your parrot and you gave --noconf"
       exit
@@ -151,8 +151,8 @@ if [ "$enable_long_double" == "1" ]; then
     make -s || exit 1
     hugefloatvalsize=$(./parrot_config hugefloatvalsize)
     numvalsize=$(./parrot_config numvalsize)
-    #if [ "hugefloatvalsize" == "12" ]; then echo "Only 12 byte long double. Sorry"; exit; fi
-    #if [ "numvalsize" == "12" ]; then echo "Only 12 byte double. Sorry"; exit; fi
+    #if [ "hugefloatvalsize" = "12" ]; then echo "Only 12 byte long double. Sorry"; exit; fi
+    #if [ "numvalsize" = "12" ]; then echo "Only 12 byte double. Sorry"; exit; fi
     # 1+2, 4+5, 6+7
     M=$((N+1))
     [ -e t/op/number_1.pasm ] || perl t/harness t/op/number.t
