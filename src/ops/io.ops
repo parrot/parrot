@@ -494,28 +494,6 @@ op tell(out INT, out INT, invar PMC) :base_io {
   }
 }
 
-########################################
-
-=item B<sockaddr>(out PMC, in STR, in INT)
-
-Create new Sockaddr PMC.
-
-=cut
-
-op sockaddr(out PMC, in STR, in INT) {
-    $1 = Parrot_io_sockaddr_in(interp, $2, $3);
-}
-
-=item B<socket>(out PMC, in INT, in INT, in INT)
-
-Create new Socket PMC
-
-=cut
-
-op socket(out PMC, in INT, in INT, in INT) {
-    $1 = Parrot_io_socket(interp, PMCNULL, $2, $3, $4);
-}
-
 =back
 
 =cut

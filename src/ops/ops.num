@@ -1268,15 +1268,3 @@ find_sub_not_null_p_s          1243
 find_sub_not_null_p_sc         1244
 load_language_s                1245
 load_language_sc               1246
-socket_p_i_i_i                 1247
-socket_p_ic_i_i                1248
-socket_p_i_ic_i                1249
-socket_p_i_i_ic                1250
-socket_p_ic_i_ic               1251
-socket_p_i_ic_ic               1252
-socket_p_ic_ic_ic              1253
-socket_p_ic_ic_i               1254
-sockaddr_p_s_i                 1255
-sockaddr_p_sc_i                1256
-sockaddr_p_s_ic                1257
-sockaddr_p_sc_ic               1258
