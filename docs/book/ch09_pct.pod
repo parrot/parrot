@@ -11,7 +11,7 @@ Python, Ruby, Tcl, and PHP. In order to write code in these languages
 developers need there to be compilers that convert from the language
 into PIR or PASM (or even directly convert to Parrot Bytecode).
 People who have worked on compilers before may be anticipating us
-to use terms like "Lex and Yacc" here, but we promise that we wont.
+to use terms like "Lex and Yacc" here, but we promise that we won't.
 
 Instead of traditional lexical analyzers and parser-generators that
 have been the mainstay of compiler designers for decades, Parrot
@@ -35,18 +35,6 @@ while the C<PCT::Grammar>  and C<PCT::Grammar::Actions> classes handle
 building the parser and lexical analyzer. Creating a new HLL compiler
 is as easy as subclassing these three entities with methods specific
 to that high-level language.
-
-While it was originally designed as the backend for Perl 6, Parrot has
-since grown to become a language agnostic virtual machine. However,
-PCT is still very tied to Perl 6 development, and was actually developed
-by Perl 6 developers for Perl 6 development. The fact that it's very
-powerful, flexible, and useful for other languages is a nice bonus, N<And
-a mark of good design!> but the needs
-of other languages is not the driving force behind PCT. Perl 6 is such
-a large and varied language that a tool capable of implementing it is
-also capable of implementing many other languages as well, a fact that
-has been exploited by many language designers and implementers on
-Parrot.
 
 =head3 Grammars and Action Files
 
@@ -85,10 +73,9 @@ Parrot Abstract Syntax Tree (PAST).
 =head3 C<make_language_shell.pl>
 
 The Parrot repository contains a number of helpful utilities for doing
-some common development and building tasks with Parrot. These utilities
-are all currently written in Perl 5, although in future releases the
-majority will likely be built in Perl 6 and run on Parrot directly. This
-is a bootstrapping problem that the developers have not tackled yet.
+some common development and building tasks with Parrot. Many of these
+utilities are currently written in Perl 5, though some run on Parrot
+directly, and in future releases more will be migrated to Parrot.
 
 One of the tools of use to new compiler designers and language implementers
 is C<make_language_shell.pl>. C<make_language_shell.pl> is a tool for
