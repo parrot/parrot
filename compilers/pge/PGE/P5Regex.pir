@@ -15,9 +15,20 @@
     target = adverbs['target']
     target = downcase target
 
+    ##  If we're passed the results of a previous parse, use it.
     .local pmc match
+    $I0 = isa source, ['PGE';'Match']
+    if $I0 == 0 goto parse
+    $P0 = source['expr']
+    if null $P0 goto parse
+    $I0 = isa $P0, ['PGE';'Exp']
+    if $I0 == 0 goto parse
+    match = source
+    goto analyze
+
+  parse:
     $P0 = get_global "p5regex"
-    match = $P0(source)
+    match = $P0(source, adverbs :flat :named)
     if target != 'parse' goto check
     .return (match)
 
@@ -42,9 +53,20 @@
 
 .sub "p5regex"
     .param pmc mob
-    .local pmc optable
+    .param pmc adverbs        :slurpy :named
+
+    .local string stop, tighter
+    .local pmc stopstack, optable
+
+    stopstack = get_hll_global ['PGE';'P5Regex'], '@!stopstack'
     optable = get_hll_global ["PGE";"P5Regex"], "$optable"
-    $P0 = optable."parse"(mob)
+
+    stop = adverbs['stop']
+    tighter = adverbs['tighter']
+    push stopstack, stop
+    $P0 = optable."parse"(mob, 'stop'=>stop, 'tighter'=>tighter)
+    $S0 = pop stopstack
+
     .return ($P0)
 .end
 
@@ -91,6 +113,10 @@
     optable.'newtok'('infix:|', 'looser'=>'infix:',    'left'=>1,  'nows'=>1, 'match'=>'PGE::Exp::Alt')
 
     optable.'newtok'('close:}', 'looser'=>'infix:|', 'nows'=>1)            # XXX: hack
+
+    # Create a stack for holding stop tokens
+    $P0 = new 'ResizablePMCArray'
+    set_hll_global ['PGE';'P5Regex'], '@!stopstack', $P0
 
     $P0 = get_hll_global ["PGE";"P5Regex"], "compile_p5regex"
     compreg "PGE::P5Regex", $P0
@@ -149,8 +175,17 @@
   term_literal:
     litstart = pos
     litlen = 0
+    .local string stop
+    .local int stoplen
+    $P0 = get_hll_global ['PGE';'P5Regex'], '@!stopstack'
+    stop = $P0[-1]
+    stoplen = length stop
   term_literal_loop:
     if pos >= lastpos goto term_literal_end
+    if stoplen == 0 goto not_stop
+    $S0 = substr target, pos, stoplen
+    if $S0 == stop goto term_literal_end
+  not_stop:
     $S0 = substr target, pos, 1
     $I0 = index "[](){}*?+\\|^$.", $S0
     # if not in circumfix:( ) throw error on end paren
