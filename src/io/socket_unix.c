@@ -127,17 +127,16 @@ socket type and protocol number.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_io_socket_unix(PARROT_INTERP, int fam, int type, int proto)
+Parrot_io_socket_unix(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto)
 {
     ASSERT_ARGS(Parrot_io_socket_unix)
     int i;
     const int sock = socket(fam, type, proto);
     if (sock >= 0) {
-        PMC * io = Parrot_io_new_socket_pmc(interp, PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
-        PARROT_SOCKET(io)->os_handle = sock;
-        setsockopt(PARROT_SOCKET(io)->os_handle, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
-        SOCKADDR_REMOTE(io)->sin_family = fam;
-        return io;
+        setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
+        Parrot_io_set_os_handle(interp, s, sock);
+        SOCKADDR_REMOTE(s)->sin_family = fam;
+        return s;
     }
     return PMCNULL;
 }

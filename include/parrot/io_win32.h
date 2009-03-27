@@ -199,8 +199,13 @@ PMC * Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_io_socket_win32(PARROT_INTERP, int fam, int type, int proto)
-        __attribute__nonnull__(1);
+PMC * Parrot_io_socket_win32(PARROT_INTERP,
+    ARGIN(PMC * s),
+    int fam,
+    int type,
+    int proto)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_Parrot_io_accept_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -228,7 +233,8 @@ PMC * Parrot_io_socket_win32(PARROT_INTERP, int fam, int type, int proto)
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(addr)
 #define ASSERT_ARGS_Parrot_io_socket_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/io/socket_win32.c */
 
@@ -252,8 +258,8 @@ PMC * Parrot_io_socket_win32(PARROT_INTERP, int fam, int type, int proto)
 
 #define PIO_POLL(interp, pmc, which, sec, usec) \
     Parrot_io_poll_win32((interp), (pmc), (which), (sec), (usec))
-#define PIO_NEW_SOCKET(interp, fam, type, proto) \
-    Parrot_io_socket_win32((interp), (fam), (type), (proto))
+#define PIO_SOCKET(interp, socket, fam, type, proto) \
+    Parrot_io_socket_win32((interp), (socket), (fam), (type), (proto))
 #define PIO_RECV(interp, pmc, buf) \
     Parrot_io_recv_win32((interp), (pmc), (buf))
 #define PIO_SEND(interp, pmc, buf) \

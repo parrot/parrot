@@ -829,8 +829,13 @@ INTVAL Parrot_io_send(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_io_socket(PARROT_INTERP, INTVAL fam, INTVAL type, INTVAL proto)
-        __attribute__nonnull__(1);
+PMC * Parrot_io_socket(PARROT_INTERP,
+    ARGMOD_NULLOK(PMC * socket),
+    INTVAL fam,
+    INTVAL type,
+    INTVAL proto)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* socket);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT

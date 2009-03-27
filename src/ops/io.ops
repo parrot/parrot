@@ -508,62 +508,12 @@ op sockaddr(out PMC, in STR, in INT) {
 
 =item B<socket>(out PMC, in INT, in INT, in INT)
 
-Create new socket
+Create new Socket PMC
 
 =cut
 
 op socket(out PMC, in INT, in INT, in INT) {
-    $1 = Parrot_io_socket(interp, $2, $3, $4);
-}
-
-=item B<bind>(out INT, in PMC, in PMC)
-
-Bind socket to address
-
-=cut
-
-op bind(out INT, in PMC, in PMC) {
-    $1 = Parrot_io_bind(interp, $2, $3);
-}
-
-=item B<listen>(out INT, in PMC, in INT)
-
-Start listening on previously bound socket
-
-=cut
-
-op listen(out INT, in PMC, in INT) {
-    $1 = Parrot_io_listen(interp, $2, $3);
-}
-
-=item B<accept>(out PMC, in PMC)
-
-Accept incoming connection
-
-=cut
-
-op accept(out PMC, in PMC) {
-    $1 = Parrot_io_accept(interp, $2);
-}
-
-=item B<recv>(out INT, in PMC, out STR)
-
-Receive data from socket
-
-=cut
-
-op recv(out INT, in PMC, out STR) {
-    $1 = Parrot_io_recv(interp, $2, &$3);
-}
-
-=item B<send>(out INT, in PMC, in STR)
-
-Send data to socket
-
-=cut
-
-op send(out INT, in PMC, in STR) {
-    $1 = Parrot_io_send(interp, $2, $3);
+    $1 = Parrot_io_socket(interp, PMCNULL, $2, $3, $4);
 }
 
 =back

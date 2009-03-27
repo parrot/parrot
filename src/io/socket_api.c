@@ -83,10 +83,19 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_socket(PARROT_INTERP, INTVAL fam, INTVAL type, INTVAL proto)
+Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC * socket), INTVAL fam,
+            INTVAL type, INTVAL proto)
 {
     ASSERT_ARGS(Parrot_io_socket)
-    return PIO_NEW_SOCKET(interp, fam, type, proto);
+    PMC *new_socket;
+
+    if (PMC_IS_NULL(socket))
+        new_socket = Parrot_io_new_socket_pmc(interp,
+                PIO_F_SOCKET|PIO_F_READ|PIO_F_WRITE);
+    else
+        new_socket = socket;
+
+    return PIO_SOCKET(interp, socket, fam, type, proto);
 }
 
 /*
