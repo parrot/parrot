@@ -37,7 +37,6 @@ my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my $headerizer = Parrot::Headerizer->new;
 my @missing_docs;
-my @extra_docs;
 
 foreach my $file (@files) {
     my $path = @ARGV ? $file : $file->path;
@@ -67,15 +66,11 @@ foreach my $file (@files) {
         # if we're sent just a single file, output all function declarations
         # which aren't yet documented, otherwise just report the files
         # without docs.
-        if ( @ARGV == 1 ) {
-            if ( $buf !~ m/$decl_rx/g ) {
+        if ( $buf !~ m/$decl_rx/g ) {
+            if ( @ARGV == 1 ) {
                 push @missing_docs, "$function_decl\n";
             }
-        }
-        else {
-            # look for matching documentation.  This means the text
-            # '=item C<function_declaration>'
-            if ( $buf !~ m/$decl_rx/g ) {
+            else {
                 push @missing_docs, "$path\n";
                 last;
             }
