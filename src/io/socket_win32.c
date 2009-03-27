@@ -76,7 +76,7 @@ INTVAL
 Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int proto)
 {
     ASSERT_ARGS(Parrot_io_socket_win32)
-    int i;
+    int i = 1;
     const int sock = socket(fam, type, proto);
     if (sock >= 0) {
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
