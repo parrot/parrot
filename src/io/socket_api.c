@@ -69,7 +69,7 @@ Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL
 
 /*
 
-=item C<PMC * Parrot_io_socket>
+=item C<INTVAL Parrot_io_socket>
 
 Creates and returns a socket using the specified address family, socket type,
 and protocol number. Check the returned PMC with a boolean test to see whether
@@ -82,7 +82,7 @@ the socket was successfully created.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PMC *
+INTVAL
 Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC * socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {

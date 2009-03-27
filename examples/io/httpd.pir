@@ -111,13 +111,12 @@ The code was heavily hacked by bernhard and leo.
     port = 1234
 
     # TODO provide sys/socket constants
-    .local pmc sock
-    sock = new 'Socket'
-    listener = sock.'socket'(2, 1, 6)	# PF_INET, SOCK_STREAM, tcp
+    listener = new 'Socket'
+    listener.'socket'(2, 1, 6)	# PF_INET, SOCK_STREAM, tcp
     unless listener goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port
-    address = sock.'sockaddr'(host, port)
+    address = listener.'sockaddr'(host, port)
     ret = listener.'bind'(address)
     if ret == -1 goto ERR_bind
     $S0 = port

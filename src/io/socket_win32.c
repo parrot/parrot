@@ -61,7 +61,7 @@ static void get_sockaddr_in(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_io_socket_win32>
+=item C<INTVAL Parrot_io_socket_win32>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -72,7 +72,7 @@ socket type and protocol number.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC *
+INTVAL
 Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int proto)
 {
     ASSERT_ARGS(Parrot_io_socket_win32)
@@ -82,9 +82,9 @@ Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int pro
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
         Parrot_io_set_os_handle(interp, s, sock);
         SOCKADDR_REMOTE(io)->sin_family = fam;
-        return io;
+        return 0;
     }
-    return PMCNULL;
+    return -1;
 }
 
 /*

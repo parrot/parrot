@@ -220,7 +220,7 @@ PMC * Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-PMC * Parrot_io_socket_unix(PARROT_INTERP,
+INTVAL Parrot_io_socket_unix(PARROT_INTERP,
     ARGIN(PMC *s),
     int fam,
     int type,
