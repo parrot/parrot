@@ -144,7 +144,7 @@ Returns whether the Socket was successfully created.
 
 
     METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
-        if(Parrot_io_socket(interp, SELF, fam, type, proto) < 0)
+        if (Parrot_io_socket(interp, SELF, fam, type, proto) < 0)
             RETURN(PMC * PMCNULL);
         RETURN(PMC * SELF);
     }
