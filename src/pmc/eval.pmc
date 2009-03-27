@@ -370,6 +370,31 @@ Unarchives the code.
         /* PackFile_destroy(INTERP, pf); */
     }
 
+    VTABLE INTVAL elements() {
+        INTVAL               i, n;
+        Parrot_sub          *sub;
+        PackFile_ByteCode   *seg;
+        PackFile_FixupTable *ft;
+
+        PMC_get_sub(interp, SELF, sub);
+        seg = sub->seg;
+
+        if (!seg)
+            return 0;
+
+        ft = seg->fixups;
+        if (!ft)
+            return 0;
+
+        for (i = n = 0; i < ft->fixup_count; i++) {
+            PackFile_FixupEntry *e = ft->fixups[i];
+
+            if (e->type == enum_fixup_sub)
+                n++;
+        }
+
+        return n;
+    }
 }
 
 /*
