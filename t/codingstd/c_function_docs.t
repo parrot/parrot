@@ -50,7 +50,13 @@ foreach my $file (@files) {
         $escaped_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
 
         # strip out any ARG* modifiers
-        $escaped_decl =~ s/ARG(?:IN|MOD)\((.*?)\)/$1/g;
+        $escaped_decl =~ s/ARG(?:IN|MOD)(?:_NULLOK)?\((.*?)\)/$1/g;
+
+        # strip out the SHIM modifier
+        $escaped_decl =~ s/SHIM\((.*?)\)/$1/g;
+
+        # SHIM_INTERP is still a PARROT_INTERP
+        $escaped_decl =~ s/SHIM_INTERP/PARROT_INTERP/g;
 
         # escape [, ], (, ), and *
         $escaped_decl =~ s/\[/\\[/g;
