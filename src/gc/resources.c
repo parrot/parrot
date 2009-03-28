@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -131,7 +131,8 @@ static Memory_Pool * new_memory_pool(
 
 /*
 
-=item C<static void alloc_new_block>
+=item C<static void alloc_new_block(PARROT_INTERP, size_t size,
+Memory_Pool *pool, const char *why)>
 
 Allocate a new memory block. We allocate either the requested size or the
 default size, whichever is larger. Add the new block to the given memory
@@ -190,7 +191,7 @@ alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
 
 /*
 
-=item C<static void * mem_allocate>
+=item C<static void * mem_allocate(PARROT_INTERP, size_t size, Memory_Pool *pool)>
 
 Allocates memory for headers.
 
@@ -290,7 +291,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
 
 /*
 
-=item C<static const char* buffer_location>
+=item C<static const char* buffer_location(PARROT_INTERP, const PObj *b)>
 
 Recturns a constant string representing the location of the given
 PObj C<b> in one of the PMC registers. If the PMC is not located
@@ -326,7 +327,7 @@ buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
 
 /*
 
-=item C<static void debug_print_buf>
+=item C<static void debug_print_buf(PARROT_INTERP, const PObj *b)>
 
 Prints a debug statement with information about the given PObj C<b>.
 =cut
@@ -351,7 +352,7 @@ debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
 
 =over 4
 
-=item C<static void compact_pool>
+=item C<static void compact_pool(PARROT_INTERP, Memory_Pool *pool)>
 
 Compact the string buffer pool. Does not perform a GC scan, or mark items
 as being alive in any way.
@@ -588,7 +589,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
 /*
 
-=item C<void Parrot_go_collect>
+=item C<void Parrot_go_collect(PARROT_INTERP)>
 
 Scan the string pools and compact them. This does not perform a GC mark or
 sweep run, and does not check whether string buffers are still alive.
@@ -607,7 +608,7 @@ Parrot_go_collect(PARROT_INTERP)
 
 /*
 
-=item C<static size_t aligned_size>
+=item C<static size_t aligned_size(const Buffer *buffer, size_t len)>
 
 Determines the size of Buffer C<buffer> which has nominal length C<len>.
 The actual size in RAM of the Buffer might be different because of
@@ -634,7 +635,7 @@ aligned_size(ARGIN(const Buffer *buffer), size_t len)
 
 /*
 
-=item C<static char * aligned_mem>
+=item C<static char * aligned_mem(const Buffer *buffer, char *mem)>
 
 Returns a pointer to the aligned allocated storage for Buffer C<buffer>,
 which might not be the same as the pointer to C<buffeR> because of
@@ -663,7 +664,7 @@ aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
 
 /*
 
-=item C<static size_t aligned_string_size>
+=item C<static size_t aligned_string_size(size_t len)>
 
 Determines the size of a string of length C<len> in RAM, accounting for
 alignment.
@@ -686,7 +687,7 @@ aligned_string_size(size_t len)
 
 /*
 
-=item C<int Parrot_in_memory_pool>
+=item C<int Parrot_in_memory_pool(PARROT_INTERP, void *bufstart)>
 
 Determines if the given C<bufstart> pointer points to a location inside the
 memory pool. Returns 1 if the pointer is in the memory pool, 0 otherwise.
@@ -722,7 +723,7 @@ Parrot_in_memory_pool(PARROT_INTERP, ARGIN(void *bufstart))
 
 =over 4
 
-=item C<void Parrot_reallocate>
+=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)>
 
 Reallocate the Buffer's buffer memory to the given size. The
 allocated buffer will not shrink. If the buffer was allocated with
@@ -794,7 +795,7 @@ Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
 
 /*
 
-=item C<void Parrot_reallocate_string>
+=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)>
 
 Reallocate the STRING's buffer memory to the given size. The allocated
 buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
@@ -865,7 +866,7 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
 
 /*
 
-=item C<void Parrot_allocate>
+=item C<void Parrot_allocate(PARROT_INTERP, Buffer *buffer, size_t size)>
 
 Allocate buffer memory for the given Buffer pointer. The C<size>
 has to be a multiple of the word size.
@@ -890,7 +891,7 @@ Parrot_allocate(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
 
 /*
 
-=item C<void Parrot_allocate_aligned>
+=item C<void Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)>
 
 Like above, except the C<size> will be rounded up and the address of
 the buffer will have the same alignment as a pointer returned by
@@ -921,7 +922,7 @@ Parrot_allocate_aligned(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
 
 /*
 
-=item C<void Parrot_allocate_string>
+=item C<void Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)>
 
 Allocate the STRING's buffer memory to the given size. The allocated
 buffer maybe slightly bigger than the given C<size>. This function
@@ -964,7 +965,7 @@ Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
 
 /*
 
-=item C<static Memory_Pool * new_memory_pool>
+=item C<static Memory_Pool * new_memory_pool(size_t min_block, compact_f compact)>
 
 Allocate a new C<Memory_Pool> structures, and set some initial values.
 return a pointer to the new pool.
@@ -994,7 +995,7 @@ new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 
 /*
 
-=item C<void Parrot_initialize_memory_pools>
+=item C<void Parrot_initialize_memory_pools(PARROT_INTERP)>
 
 Initialize the managed memory pools. Parrot maintains two C<Memory_Pool>
 structures, the general memory pool and the constant string pool. Create
@@ -1022,7 +1023,7 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_destroy_memory_pools>
+=item C<void Parrot_destroy_memory_pools(PARROT_INTERP)>
 
 Destroys the memory pool and the constant string pool. Loop through both
 pools and destroy all memory blocks contained in them. Once all the
@@ -1058,7 +1059,7 @@ Parrot_destroy_memory_pools(PARROT_INTERP)
 
 /*
 
-=item C<static void merge_pools>
+=item C<static void merge_pools(Memory_Pool *dest, Memory_Pool *source)>
 
 Merge two memory pools together. Do this by moving all memory blocks
 from the C<*source> pool into the C<*dest> pool. The C<source> pool
@@ -1103,7 +1104,7 @@ merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 
 /*
 
-=item C<void Parrot_merge_memory_pools>
+=item C<void Parrot_merge_memory_pools(Interp *dest_interp, Interp *source_interp)>
 
 Merge the memory pools of two interpreter structures. Merge the general
 memory pool and the constant string pools from C<source_interp> into

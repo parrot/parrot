@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -28,7 +28,7 @@ setup function to initialize the memory pools.
 
 /*
 
-=item C<void * mem_sys_allocate>
+=item C<void * mem_sys_allocate(size_t size)>
 
 Uses C<malloc> to allocate system memory. Panics if the system cannot
 return memory.
@@ -55,7 +55,7 @@ mem_sys_allocate(size_t size)
 
 /*
 
-=item C<void * mem__internal_allocate>
+=item C<void * mem__internal_allocate(size_t size, const char *file, int line)>
 
 Calls C<malloc> to allocate memory from the system, Panics if there is no
 memory available. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
@@ -86,7 +86,7 @@ mem__internal_allocate(size_t size, ARGIN(const char *file), int line)
 
 /*
 
-=item C<void * mem_sys_allocate_zeroed>
+=item C<void * mem_sys_allocate_zeroed(size_t size)>
 
 Uses C<calloc> to allocate system memory.  Guaranteed to succeed, Panics
 otherwise.
@@ -113,7 +113,7 @@ mem_sys_allocate_zeroed(size_t size)
 
 /*
 
-=item C<void * mem__internal_allocate_zeroed>
+=item C<void * mem__internal_allocate_zeroed(size_t size, const char *file, int line)>
 
 Uses C<calloc> to allocate system memory.  Guaranteed to succeed, Panics
 otherwise. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
@@ -144,7 +144,7 @@ mem__internal_allocate_zeroed(size_t size, ARGIN(const char *file), int line)
 
 /*
 
-=item C<void * mem_sys_realloc>
+=item C<void * mem_sys_realloc(void *from, size_t size)>
 
 Resizes a chunk of memory.  Unlike C<realloc>, it can handle a
 NULL pointer, in which case it calls C<calloc> to create the memory
@@ -180,7 +180,7 @@ mem_sys_realloc(ARGFREE(void *from), size_t size)
 
 /*
 
-=item C<void * mem_sys_realloc_zeroed>
+=item C<void * mem_sys_realloc_zeroed(void *from, size_t size, size_t old_size)>
 
 Resizes a chunk of system memory and fills the newly allocated space
 with zeroes. If the pointer is C<NULL> a new memory block is
@@ -216,7 +216,8 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 
 /*
 
-=item C<void * mem__internal_realloc>
+=item C<void * mem__internal_realloc(void *from, size_t size,
+const char *file, int line)>
 
 Resizes a chunk of system memory.  Unlike C<realloc>, it can handle a
 NULL pointer, in which case a new memory block is allocated for the
@@ -253,7 +254,8 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
 
 /*
 
-=item C<void * mem__internal_realloc_zeroed>
+=item C<void * mem__internal_realloc_zeroed(void *from, size_t size,
+size_t old_size, const char *file, int line)>
 
 Reallocates a given buffer of size C<old_size> to C<size>. If the new size
 is larger then the old size, the difference is filled with zeros. Contains
@@ -293,7 +295,7 @@ mem__internal_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size,
 
 /*
 
-=item C<void mem_sys_free>
+=item C<void mem_sys_free(void *from)>
 
 Frees a chunk of memory back to the system.
 
@@ -315,7 +317,7 @@ mem_sys_free(ARGFREE(void *from))
 
 /*
 
-=item C<void mem__internal_free>
+=item C<void mem__internal_free(void *from, const char *file, int line)>
 
 Frees a chunk of memory back to the system. If
 C<DETAIL_MEMORY_DEBUG> macro is defined, prints debug information to
@@ -340,7 +342,7 @@ mem__internal_free(ARGFREE(void *from), ARGIN(const char *file), int line)
 
 /*
 
-=item C<void mem_setup_allocator>
+=item C<void mem_setup_allocator(PARROT_INTERP, void *stacktop)>
 
 Initializes the memory allocator and the garbage collection subsystem.
 Calls the initialization function associated with each collector, which

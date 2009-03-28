@@ -52,7 +52,7 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 
 /*
 
-=item C<PMC * new_pmc_header>
+=item C<PMC * new_pmc_header(PARROT_INTERP, UINTVAL flags)>
 
 Gets a new PMC header from the PMC pool's free list. Guaranteed to return a
 valid PMC object or else Parrot will panic. Sets the necessary flags for the
@@ -101,7 +101,7 @@ new_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<static PMC_EXT * new_pmc_ext>
+=item C<static PMC_EXT * new_pmc_ext(PARROT_INTERP)>
 
 Gets a new free C<PMC_EXT> structure from the PMC_EXT pool. A pointer to the
 new PMC_EXT is returned. Does not check to ensure the PMC_EXT is non-null
@@ -126,7 +126,7 @@ new_pmc_ext(PARROT_INTERP)
 
 /*
 
-=item C<void add_pmc_ext>
+=item C<void add_pmc_ext(PARROT_INTERP, PMC *pmc)>
 
 Obtains a new C<PMC_EXT> structure, and attaches it to the given C<PMC>.
 Sets the necessary flags associated with the PMC_EXT structure. Ensures
@@ -159,7 +159,7 @@ add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<void add_pmc_sync>
+=item C<void add_pmc_sync(PARROT_INTERP, PMC *pmc)>
 
 Adds a C<Sync*> structure to the given C<PMC>. Initializes the PMC's owner
 field and the synchronization mutext. Does not check to ensure the C<Sync *> is
@@ -187,7 +187,7 @@ add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<STRING * new_string_header>
+=item C<STRING * new_string_header(PARROT_INTERP, UINTVAL flags)>
 
 Returns a new C<STRING> header from the string pool or the constant string
 pool. Sets default flags on the string object: C<PObj_is_string_FLAG>,
@@ -219,7 +219,7 @@ new_string_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<Buffer * new_buffer_header>
+=item C<Buffer * new_buffer_header(PARROT_INTERP)>
 
 Creates and returns a new C<Buffer> from the buffer header pool.  Calls
 C<get_free_buffer> to do all the work.
@@ -241,7 +241,7 @@ new_buffer_header(PARROT_INTERP)
 
 /*
 
-=item C<void * new_bufferlike_header>
+=item C<void * new_bufferlike_header(PARROT_INTERP, size_t size)>
 
 Returns a new buffer-like header from the appropriate sized pool.
 
@@ -263,7 +263,7 @@ new_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<void Parrot_gc_free_pmc>
+=item C<void Parrot_gc_free_pmc(PARROT_INTERP, Small_Object_Pool *pool, PObj *p)>
 
 Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
 method if one is available. If the PMC uses a PMC_EXT structure, that is freed
@@ -303,7 +303,7 @@ Parrot_gc_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<void Parrot_gc_free_pmc_ext>
+=item C<void Parrot_gc_free_pmc_ext(PARROT_INTERP, PMC *p)>
 
 Frees the C<PMC_EXT> structure attached to a PMC, if it exists.
 
@@ -335,7 +335,7 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
 
 /*
 
-=item C<void Parrot_gc_free_sysmem>
+=item C<void Parrot_gc_free_sysmem(PARROT_INTERP, Small_Object_Pool *pool, PObj *b)>
 
 If the PMC uses memory allocated directly from the system, this function
 frees that memory.
@@ -359,7 +359,7 @@ Parrot_gc_free_sysmem(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<void Parrot_gc_free_buffer_malloc>
+=item C<void Parrot_gc_free_buffer_malloc(PARROT_INTERP, Small_Object_Pool *pool, PObj *b)>
 
 Frees the given buffer, returning the storage space to the operating system
 and removing it from Parrot's memory management system. If the buffer is COW,
@@ -394,7 +394,7 @@ Parrot_gc_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<void Parrot_gc_free_buffer>
+=item C<void Parrot_gc_free_buffer(PARROT_INTERP, Small_Object_Pool *pool, PObj *b)>
 
 Frees a buffer, returning it to the memory pool for Parrot to possibly
 reuse later.
@@ -423,7 +423,7 @@ Parrot_gc_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj 
 
 /*
 
-=item C<void Parrot_gc_profile_start>
+=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
 
 Records the start time of a GC mark run when profiling is enabled.
 
@@ -441,7 +441,7 @@ Parrot_gc_profile_start(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_gc_profile_end>
+=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
 
 Records the end time of the GC mark run part C<what> run when profiling is
 enabled. Also record start time of next part.
@@ -476,7 +476,7 @@ Parrot_gc_profile_end(PARROT_INTERP, int what)
 
 /*
 
-=item C<void Parrot_gc_ms_run_init>
+=item C<void Parrot_gc_ms_run_init(PARROT_INTERP)>
 
 Prepares the collector for a mark & sweep GC run. This is the
 initializer function for the MS garbage collector.
@@ -500,7 +500,7 @@ Parrot_gc_ms_run_init(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_do_gc_run>
+=item C<void Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)>
 
 Calls the configured garbage collector to find and reclaim unused
 headers.

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -23,7 +23,7 @@ src/vtables.c - Functions to build and manipulate vtables
 
 /*
 
-=item C<VTABLE * Parrot_new_vtable>
+=item C<VTABLE * Parrot_new_vtable(PARROT_INTERP)>
 
 Creates and returns a pointer to the new C<VTABLE>.
 
@@ -43,7 +43,7 @@ Parrot_new_vtable(SHIM_INTERP)
 
 /*
 
-=item C<VTABLE * Parrot_clone_vtable>
+=item C<VTABLE * Parrot_clone_vtable(PARROT_INTERP, const VTABLE *base_vtable)>
 
 Clones C<*base_vtable> and returns a pointer to the new C<VTABLE>.
 
@@ -76,7 +76,7 @@ Parrot_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 
 /*
 
-=item C<void Parrot_destroy_vtable>
+=item C<void Parrot_destroy_vtable(PARROT_INTERP, VTABLE *vtable)>
 
 Destroys C<*vtable>.
 
@@ -117,7 +117,7 @@ Parrot_destroy_vtable(PARROT_INTERP, ARGMOD(VTABLE *vtable))
 
 /*
 
-=item C<void parrot_alloc_vtables>
+=item C<void parrot_alloc_vtables(PARROT_INTERP)>
 
 Allocate memory for the vtables for all known classes (PMC types).
 
@@ -136,7 +136,7 @@ parrot_alloc_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_realloc_vtables>
+=item C<void parrot_realloc_vtables(PARROT_INTERP)>
 
 Reallocate memory for vtables, increasing the number of vtables by 16.
 
@@ -163,7 +163,7 @@ parrot_realloc_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_free_vtables>
+=item C<void parrot_free_vtables(PARROT_INTERP)>
 
 Free memory allocated for the vtables. Each vtable is destroyed
 through its destructor Parrot_destroy_vtable, after which the list
@@ -187,7 +187,7 @@ parrot_free_vtables(PARROT_INTERP)
 
 /*
 
-=item C<void mark_vtables>
+=item C<void mark_vtables(PARROT_INTERP)>
 
 Mark all vtables as being alive for the garbage collector.
 

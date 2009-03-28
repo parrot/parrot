@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -146,7 +146,7 @@ an available context is stored corresponds to the size of the context.
 
 /*
 
-=item C<void destroy_context>
+=item C<void destroy_context(PARROT_INTERP)>
 
 Frees allocated context memory.
 
@@ -182,7 +182,7 @@ destroy_context(PARROT_INTERP)
 
 /*
 
-=item C<void create_initial_context>
+=item C<void create_initial_context(PARROT_INTERP)>
 
 Creates the interpreter's initial context.
 
@@ -212,7 +212,7 @@ create_initial_context(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_gc_context>
+=item C<void parrot_gc_context(PARROT_INTERP)>
 
 Cleans up dead context memory; called by the garbage collector.  This only
 applies in the chunked context memory scheme.
@@ -242,7 +242,7 @@ parrot_gc_context(PARROT_INTERP)
 
 /*
 
-=item C<static void clear_regs>
+=item C<static void clear_regs(PARROT_INTERP, Parrot_Context *ctx)>
 
 Clears all registers in a context.  PMC and STRING registers contain PMCNULL
 and NULL, respectively.  Integer and float registers contain negative flag
@@ -294,7 +294,8 @@ clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 
 /*
 
-=item C<static void init_context>
+=item C<static void init_context(PARROT_INTERP, Parrot_Context *ctx,
+const Parrot_Context *old)>
 
 Initializes a freshly allocated or recycled context.
 
@@ -338,7 +339,7 @@ init_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
 
 /*
 
-=item C<Parrot_Context * Parrot_push_context>
+=item C<Parrot_Context * Parrot_push_context(PARROT_INTERP, const INTVAL *n_regs_used)>
 
 Creates and sets the current context to a new context, remembering the old
 context in C<caller_ctx>.  Suitable to use with C<Parrot_pop_context>.
@@ -369,7 +370,7 @@ Parrot_push_context(PARROT_INTERP, ARGIN(const INTVAL *n_regs_used))
 
 /*
 
-=item C<void Parrot_pop_context>
+=item C<void Parrot_pop_context(PARROT_INTERP)>
 
 Frees the context created with C<Parrot_push_context> and restores the previous
 context (the caller context).
@@ -405,7 +406,8 @@ Parrot_pop_context(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_Context * Parrot_alloc_context>
+=item C<Parrot_Context * Parrot_alloc_context(PARROT_INTERP,
+const INTVAL *number_regs_used, Parrot_Context *old)>
 
 Allocates and returns a new context.  Does not set this new context as the
 current context. Note that the register usage C<n_regs_used> is copied.  Use
@@ -505,7 +507,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
 
 /*
 
-=item C<Parrot_Context * Parrot_set_new_context>
+=item C<Parrot_Context * Parrot_set_new_context(PARROT_INTERP, const INTVAL *number_regs_used)>
 
 Allocates and returns a new context as the current context.  Note that the
 register usage C<n_regs_used> is copied.
@@ -533,7 +535,7 @@ Parrot_set_new_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used))
 
 /*
 
-=item C<void Parrot_free_context>
+=item C<void Parrot_free_context(PARROT_INTERP, Parrot_Context *ctx, int deref)>
 
 Frees the context if its reference count is zero.  If C<deref>
 is true, then reduce the reference count prior to determining
@@ -640,7 +642,8 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
 
 /*
 
-=item C<Parrot_Context * Parrot_context_ref_trace>
+=item C<Parrot_Context * Parrot_context_ref_trace(PARROT_INTERP,
+Parrot_Context *ctx, const char *file, int line)>
 
 Helper function to trace references when CTX_LEAK_DEBUG is set.
 
@@ -674,7 +677,7 @@ Parrot_context_ref_trace(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
 
 /*
 
-=item C<void Parrot_set_context_threshold>
+=item C<void Parrot_set_context_threshold(PARROT_INTERP, Parrot_Context *ctx)>
 
 Marks the context as possible threshold.
 
@@ -700,7 +703,7 @@ Parrot_set_context_threshold(SHIM_INTERP, SHIM(Parrot_Context *ctx))
 
 =cut
 
-=item C<void Parrot_clear_i>
+=item C<void Parrot_clear_i(PARROT_INTERP)>
 
 Sets all integer registers in the current context to 0.
 
@@ -721,7 +724,7 @@ Parrot_clear_i(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_clear_s>
+=item C<void Parrot_clear_s(PARROT_INTERP)>
 
 Sets all STRING registers in the current context to NULL.
 
@@ -742,7 +745,7 @@ Parrot_clear_s(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_clear_p>
+=item C<void Parrot_clear_p(PARROT_INTERP)>
 
 Sets all PMC registers in the current context to NULL.
 
@@ -763,7 +766,7 @@ Parrot_clear_p(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_clear_n>
+=item C<void Parrot_clear_n(PARROT_INTERP)>
 
 Sets all number registers in the current context to 0.0.
 

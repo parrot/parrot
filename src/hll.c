@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2008, Parrot Foundation.
+Copyright (C) 2005-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -65,7 +65,7 @@ static PMC* new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
 /*
 
-=item C<static PMC* new_hll_entry>
+=item C<static PMC* new_hll_entry(PARROT_INTERP, STRING *entry_name)>
 
 Create a new HLL information table entry.
 Takes an interpreter name and (optional) entry name.
@@ -119,7 +119,7 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
 /*
 
-=item C<void Parrot_init_HLL>
+=item C<void Parrot_init_HLL(PARROT_INTERP)>
 
 Initialises the HLL_info and HLL_namespace fields.  Takes an interpreter and
 calls C<Parrot_register_HLL> to register name within Parrot core.
@@ -142,7 +142,7 @@ Parrot_init_HLL(PARROT_INTERP)
 
 /*
 
-=item C<INTVAL Parrot_register_HLL>
+=item C<INTVAL Parrot_register_HLL(PARROT_INTERP, STRING *hll_name)>
 
 Return the HLL id if C<hll_name> is already registered in the interpreter.
 
@@ -209,7 +209,7 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 
 /*
 
-=item C<INTVAL Parrot_register_HLL_lib>
+=item C<INTVAL Parrot_register_HLL_lib(PARROT_INTERP, STRING *hll_lib)>
 
 Register an HLL library.
 Takes an interpreter name and a pointer to a library name.
@@ -264,7 +264,7 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 
 /*
 
-=item C<INTVAL Parrot_get_HLL_id>
+=item C<INTVAL Parrot_get_HLL_id(PARROT_INTERP, STRING *hll_name)>
 
 Return the ID of the given HLL name or -1 on error. C<parrot> has ID 0.
 
@@ -298,7 +298,7 @@ Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 
 /*
 
-=item C<STRING * Parrot_get_HLL_name>
+=item C<STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)>
 
 Returns the corresponding PMC's name.
 Takes an interpreter name and an id.
@@ -340,7 +340,8 @@ Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
 
 /*
 
-=item C<void Parrot_register_HLL_type>
+=item C<void Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
+INTVAL core_type, INTVAL hll_type)>
 
 Register a type mapping of C<< core_type => hll_type >> for the given HLL.
 
@@ -384,7 +385,7 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
 
 /*
 
-=item C<INTVAL Parrot_get_HLL_type>
+=item C<INTVAL Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)>
 
 Get an equivalent HLL type number for the language C<hll_id>.  If the given HLL
 doesn't remap the given type, or if C<hll_id> is the special value
@@ -432,7 +433,7 @@ Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 
 /*
 
-=item C<INTVAL Parrot_get_ctx_HLL_type>
+=item C<INTVAL Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)>
 
 Return an equivalent PMC type number according to the current HLL setings in
 the context.  If no type is registered, returns C<core_type>.
@@ -453,7 +454,7 @@ Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)
 
 /*
 
-=item C<PMC* Parrot_get_ctx_HLL_namespace>
+=item C<PMC* Parrot_get_ctx_HLL_namespace(PARROT_INTERP)>
 
 Return root namespace of the current HLL.
 
@@ -473,7 +474,7 @@ Parrot_get_ctx_HLL_namespace(PARROT_INTERP)
 
 /*
 
-=item C<PMC* Parrot_get_HLL_namespace>
+=item C<PMC* Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)>
 
 Return root namespace of the HLL with the ID of I<hll_id>.  If C<hll_id> is the
 special value C<PARROT_HLL_NONE>, return the global root namespace.
@@ -497,7 +498,7 @@ Parrot_get_HLL_namespace(PARROT_INTERP, int hll_id)
 
 /*
 
-=item C<void Parrot_regenerate_HLL_namespaces>
+=item C<void Parrot_regenerate_HLL_namespaces(PARROT_INTERP)>
 
 Create all HLL namespaces that don't already exist. This is necessary when
 creating a new interpreter which shares an old interpreter's HLL_info.

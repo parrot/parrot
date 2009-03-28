@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -50,7 +50,7 @@ static void trace_system_stack(PARROT_INTERP)
 
 /*
 
-=item C<void trace_system_areas>
+=item C<void trace_system_areas(PARROT_INTERP)>
 
 Initiates a trace of the system stack, looking for pointers which are being
 used by functions in the call chain, but which might not be marked as alive
@@ -140,7 +140,7 @@ trace_system_areas(PARROT_INTERP)
 
 /*
 
-=item C<static void trace_system_stack>
+=item C<static void trace_system_stack(PARROT_INTERP)>
 
 Traces the memory block starting at C<< interp->lo_var_ptr >>. This should be
 the address of a local variable which has been created on the stack early in
@@ -169,7 +169,7 @@ trace_system_stack(PARROT_INTERP)
 
 /*
 
-=item C<static size_t find_common_mask>
+=item C<static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)>
 
 Finds a mask covering the longest common bit-prefix of C<val1>
 and C<val2>.
@@ -208,7 +208,7 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 
 /*
 
-=item C<void trace_mem_block>
+=item C<void trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)>
 
 Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
 Attempt to find pointers to PObjs or buffers, and mark them as "alive"
