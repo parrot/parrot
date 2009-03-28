@@ -436,6 +436,38 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 
 /*
 
+=item C<const char * Parrot_get_vtable_name>
+
+Return the method name at the specified index in the vtable slot array.
+Use this function when you cannot access Parrot_vtable_slot_names directly.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_PURE_FUNCTION
+PARROT_CAN_RETURN_NULL
+const char *
+Parrot_get_vtable_name(PARROT_INTERP, INTVAL idx)
+{
+    ASSERT_ARGS(Parrot_get_vtable_name)
+
+    INTVAL low               = PARROT_VTABLE_LOW;
+    INTVAL high              = NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW;
+
+    PARROT_ASSERT(idx > 0);
+
+    if (idx < low || idx > high) {
+        return NULL;
+    }
+
+    return Parrot_vtable_slot_names[idx];
+}
+
+
+/*
+
 =item C<const char* Parrot_MMD_method_name>
 
 Return the method name for the given MMD enum.

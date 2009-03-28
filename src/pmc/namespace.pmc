@@ -58,6 +58,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
     Parrot_NameSpace_attributes * const nsinfo   = PARROT_NAMESPACE(self);
     PMC              *       vtable   = nsinfo->vtable;
     PMC              * const classobj = VTABLE_get_class(interp, self);
+    STRING           * vtable_key     = NULL;
     Parrot_sub              *sub;
 
     PMC_get_sub(interp, value, sub);
@@ -74,8 +75,14 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
 
     if (sub->vtable_index != -1) {
         /* Insert it in class, if there is a class */
-        if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj))
-            VTABLE_add_vtable_override(interp, classobj, key, value);
+        if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)) {
+            const char *vtable_key_c;
+            vtable_key_c = Parrot_get_vtable_name(interp, sub->vtable_index);
+            PARROT_ASSERT(vtable_key_c);
+            vtable_key = Parrot_str_new(interp, vtable_key_c,
+                strlen(vtable_key_c));
+            VTABLE_add_vtable_override(interp, classobj, vtable_key, value);
+        }
 
         /* Otherwise, store it in the namespace for the class to
          * retrieve later */
@@ -92,8 +99,14 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
     if (sub->comp_flags & SUB_COMP_FLAG_METHOD) {
         STRING *method_name = key;
 
-        if (Parrot_str_not_equal(interp, sub->method_name, CONST_STRING(interp, "")))
+        if (Parrot_str_equal(interp, sub->method_name, CONST_STRING(interp, ""))) {
+            if (sub->vtable_index != -1 && vtable_key != NULL) {
+                method_name = Parrot_str_copy(interp, vtable_key);
+            }
+        }
+        else {
             method_name = sub->method_name;
+        }
         add_to_class(interp, nsinfo, classobj, method_name, value);
     }
 
