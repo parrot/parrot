@@ -313,8 +313,6 @@ queue_broadcast(ARGMOD(QUEUE *queue))
 
 =item C<void queue_signal>
 
-RT#48260: Document this!
-
 =cut
 
 */
