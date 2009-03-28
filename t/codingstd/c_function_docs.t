@@ -48,7 +48,7 @@ foreach my $file (@files) {
         $function_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
 
         # strip out any ARG* modifiers
-        $function_decl =~ s/ARG(?:IN|MOD)(?:_NULLOK)?\((.*?)\)/$1/g;
+        $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|MOD)\((.*?)\)/$1/g;
 
         # strip out the SHIM modifier
         $function_decl =~ s/SHIM\((.*?)\)/$1/g;
@@ -69,15 +69,16 @@ foreach my $file (@files) {
         # it and the documented function doesn't.
         $escaped_decl =~ s/\s+/\\s+/g;
 
-        my $decl_rx_content = qr/^=item C<$escaped_decl>(.*?)^=cut/sm;
-        my $decl_rx_ws_only = qr/^=item C<$escaped_decl>\s+^=cut/sm;
+        my $decl_rx = qr/^=item C<$escaped_decl>(.*?)^=cut/sm;
 
         my $missing = '';
-        if ( $buf =~ m/$decl_rx_content/ ) {
-            # yay, docs!
-        }
-        elsif ($buf =~ $decl_rx_ws_only) {
-            $missing = 'boilerplate only';
+        if ( $buf =~ m/$decl_rx/) {
+            my $docs = $1;
+            $docs =~ s/\s//g;
+            if ($docs eq '') {
+                $missing = 'boilerplate only';
+            }
+            # else:  docs!
         }
         else {
             $missing = 'missing'; 
