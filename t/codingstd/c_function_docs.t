@@ -44,19 +44,19 @@ foreach my $file (@files) {
 
     for my $function_decl (@function_decls) {
 
-        my $escaped_decl = $function_decl;
-
         # strip out any PARROT_* prefixes
-        $escaped_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
+        $function_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
 
         # strip out any ARG* modifiers
-        $escaped_decl =~ s/ARG(?:IN|MOD)(?:_NULLOK)?\((.*?)\)/$1/g;
+        $function_decl =~ s/ARG(?:IN|MOD)(?:_NULLOK)?\((.*?)\)/$1/g;
 
         # strip out the SHIM modifier
-        $escaped_decl =~ s/SHIM\((.*?)\)/$1/g;
+        $function_decl =~ s/SHIM\((.*?)\)/$1/g;
 
         # SHIM_INTERP is still a PARROT_INTERP
-        $escaped_decl =~ s/SHIM_INTERP/PARROT_INTERP/g;
+        $function_decl =~ s/SHIM_INTERP/PARROT_INTERP/g;
+
+        my $escaped_decl = $function_decl;
 
         # escape [, ], (, ), and *
         $escaped_decl =~ s/\[/\\[/g;
@@ -83,7 +83,7 @@ foreach my $file (@files) {
             $missing = 'missing'; 
         }
         if ($missing) {
-            push @missing_docs, "$path: $function_decl ($missing)\n";
+            push @missing_docs, "$path ($missing)\n$function_decl\n";
         }
     }
 }
@@ -93,7 +93,7 @@ TODO: {
 
     ok( !scalar(@missing_docs), 'Functions documented' )
         or diag( scalar @missing_docs
-            . " functions lacking documentation = "
+            . " function(s) lacking documentation:\n"
             . join "#" x 70 . "\n", @missing_docs, "\n");
 }
 
