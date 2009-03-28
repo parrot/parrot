@@ -1,4 +1,4 @@
-# Copyright 200-2009, Parrot Foundation.
+# Copyright 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
