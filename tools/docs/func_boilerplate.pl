@@ -78,8 +78,6 @@ foreach my $file (@files) {
 
 $item_line
 
-TODO: Not yet documented!!!
-
 $cut_line
 
 */
