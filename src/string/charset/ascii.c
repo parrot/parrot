@@ -731,8 +731,6 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 =item C<static INTVAL is_cclass>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */
@@ -758,8 +756,6 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *source_string), UINTV
 /*
 
 =item C<static INTVAL find_cclass>
-
-RT#48260: Not yet documented!!!
 
 =cut
 
@@ -787,8 +783,6 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
 /*
 
 =item C<static INTVAL find_not_cclass>
-
-RT#48260: Not yet documented!!!
 
 =cut
 

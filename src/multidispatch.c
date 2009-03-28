@@ -604,8 +604,6 @@ Parrot_mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
 
 =item C<static INTVAL distance_cmp>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */

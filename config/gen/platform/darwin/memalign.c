@@ -28,8 +28,6 @@ memalign related stuff
 
 =item C<static unsigned long log2int(unsigned long x)>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -42,8 +40,6 @@ static unsigned long log2int(unsigned long x) {
 
 =item C<static unsigned long roundDownPowerOf2(unsigned long x)>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -55,8 +51,6 @@ static unsigned long roundDownPowerOf2(unsigned long x) {
 /*
 
 =item C<static unsigned long roundUpPowerOf2(unsigned long x)>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -73,8 +67,6 @@ static unsigned long roundUpPowerOf2(unsigned long x)
 /*
 
 =item C<static unsigned long roundUpToPageBoundary(unsigned long x)>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -96,8 +88,6 @@ typedef struct _memalign_marker_t {
 
 =item C<void *
 Parrot_memalign(size_t align, size_t size)>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -181,8 +171,6 @@ Parrot_memalign(size_t align, size_t size)
 
 =item C<void
 Parrot_free_memalign(void *p)>
-
-RT #48260: Not yet documented!!!
 
 =cut
 

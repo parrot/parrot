@@ -55,8 +55,6 @@ Parrot_signbit(double x)
 
 =item C<int Parrot_signbit_l(long double x)>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */

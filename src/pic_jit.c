@@ -462,8 +462,6 @@ op_is_ok:
 
 =item C<int parrot_pic_is_safe_to_jit>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */
@@ -527,8 +525,6 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *sig_arg
 /*
 
 =item C<funcptr_t parrot_pic_JIT_sub>
-
-RT#48260: Not yet documented!!!
 
 =cut
 

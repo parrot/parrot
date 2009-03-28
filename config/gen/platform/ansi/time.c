@@ -27,8 +27,6 @@ RT#48264
 
 =item C<INTVAL Parrot_intval_time(void)>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */
@@ -43,8 +41,6 @@ Parrot_intval_time(void)
 /*
 
 =item C<FLOATVAL Parrot_floatval_time(void)>
-
-RT#48260: Not yet documented!!!
 
 =cut
 
@@ -63,8 +59,6 @@ Parrot_floatval_time(void)
 /*
 
 =item C<void Parrot_sleep(unsigned int seconds)>
-
-RT#48260: Not yet documented!!!
 
 =cut
 

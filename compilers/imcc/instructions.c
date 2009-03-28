@@ -811,8 +811,6 @@ e_file_open(PARROT_INTERP, ARGIN(void *param))
 
 =item C<static int e_file_close>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */
@@ -830,8 +828,6 @@ e_file_close(PARROT_INTERP, SHIM(void *param))
 /*
 
 =item C<static int e_file_emit>
-
-RT#48260: Not yet documented!!!
 
 =cut
 

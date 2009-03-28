@@ -257,8 +257,6 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<int optimize>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -1222,8 +1220,6 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int branch_cond_loop_swap>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -1460,8 +1456,6 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 =item C<static int dead_code_remove>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -1543,8 +1537,6 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 /*
 
 =item C<static int used_once>
-
-RT #48260: Not yet documented!!!
 
 =cut
 

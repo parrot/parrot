@@ -427,8 +427,6 @@ validate(SHIM_INTERP, SHIM(STRING *source_string))
 
 =item C<static INTVAL is_cclass>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */
@@ -444,8 +442,6 @@ is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
 /*
 
 =item C<static INTVAL find_cclass>
-
-RT#48260: Not yet documented!!!
 
 =cut
 
@@ -463,8 +459,6 @@ find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 
 =item C<static INTVAL find_not_cclass>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */
@@ -480,8 +474,6 @@ find_not_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 /*
 
 =item C<static STRING * string_from_codepoint>
-
-RT#48260: Not yet documented!!!
 
 =cut
 

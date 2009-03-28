@@ -784,8 +784,6 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
 
 =item C<static int u_iscclass>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -880,8 +878,6 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
 =item C<static INTVAL is_cclass>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -908,8 +904,6 @@ is_cclass(PARROT_INTERP, INTVAL flags,
 /*
 
 =item C<static INTVAL find_cclass>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -950,8 +944,6 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 /*
 
 =item C<static INTVAL find_not_cclass>
-
-RT #48260: Not yet documented!!!
 
 =cut
 

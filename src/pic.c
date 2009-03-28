@@ -412,8 +412,6 @@ parrot_PIC_alloc_pic(PARROT_INTERP)
 
 =item C<void * parrot_pic_opcode>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -443,8 +441,6 @@ parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 
 =item C<static int pass_int>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -468,8 +464,6 @@ pass_int(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 
 =item C<static int pass_num>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -492,8 +486,6 @@ pass_num(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 /*
 
 =item C<static int pass_str>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -519,8 +511,6 @@ pass_str(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 
 =item C<static int pass_pmc>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -543,8 +533,6 @@ pass_pmc(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 /*
 
 =item C<static int pass_mixed>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -699,8 +687,6 @@ parrot_pic_check_sig(PARROT_INTERP, ARGIN(PMC *sig1), ARGIN(PMC *sig2),
 
 =item C<static int is_pic_param>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -782,8 +768,6 @@ is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t 
 /*
 
 =item C<static int is_pic_func>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -922,8 +906,6 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, ARGOUT(void **pc_pred), int core
 
 =item C<static void parrot_pic_move>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -957,8 +939,6 @@ parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
 /*
 
 =item C<void parrot_pic_find_infix_v_pp>
-
-RT #48260: Not yet documented!!!
 
 =cut
 

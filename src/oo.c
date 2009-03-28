@@ -619,8 +619,6 @@ init_object_cache(PARROT_INTERP)
 
 =item C<void destroy_object_cache>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -646,8 +644,6 @@ destroy_object_cache(PARROT_INTERP)
 /*
 
 =item C<static void invalidate_type_caches>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -684,8 +680,6 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
 /*
 
 =item C<static void invalidate_all_caches>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -868,8 +862,6 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
 =item C<static void debug_trace_find_meth>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -923,8 +915,6 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
 
 =item C<static PMC * find_method_direct_1>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -966,8 +956,6 @@ find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
 /*
 
 =item C<static PMC* C3_merge>
-
-RT #48260: Not yet documented!!!
 
 =cut
 

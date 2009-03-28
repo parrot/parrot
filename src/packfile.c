@@ -3235,8 +3235,6 @@ fixup_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 
 I<What does this do?>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */

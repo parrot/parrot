@@ -95,8 +95,6 @@ ParrotIOLayer pio_string_layer = {
 
 =item C<ParrotIOLayer * PIO_string_register_layer>
 
-RT#48260: Not yet documented!!!
-
 =cut
 
 */
@@ -112,8 +110,6 @@ PIO_string_register_layer(void)
 /*
 
 =item C<static size_t PIO_string_read>
-
-RT#48260: Not yet documented!!!
 
 =cut
 
@@ -134,8 +130,6 @@ PIO_string_read(SHIM_INTERP, ARGMOD(ParrotIOLayer *l), SHIM(ParrotIO *io), ARGOU
 /*
 
 =item C<static size_t PIO_string_write>
-
-RT#48260: Not yet documented!!!
 
 =cut
 

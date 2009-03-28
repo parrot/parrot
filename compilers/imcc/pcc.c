@@ -494,8 +494,6 @@ typedef struct move_info_t {
 
 =item C<static int pcc_reg_mov>
 
-RT #48260: Not yet documented!!!
-
 =cut
 
 */
@@ -565,8 +563,6 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
 /*
 
 =item C<static Instruction * move_regs>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
@@ -687,8 +683,6 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 /*
 
 =item C<static void insert_tail_call>
-
-RT #48260: Not yet documented!!!
 
 =cut
 
