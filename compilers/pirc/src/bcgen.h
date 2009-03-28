@@ -61,6 +61,7 @@ typedef struct lexical {
  */
 typedef struct sub_info {
     char const    *subname;
+    char const    *methodname;
     char const    *nsentry;
     char const    *subid;
     char const    *outersub;

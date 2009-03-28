@@ -256,6 +256,8 @@ set_sub_methodname(lexer_state * const lexer, char const * const methodname) {
         CURRENT_SUB(lexer)->methodname = methodname;
     else /* :method without a value defaults to the subname. */
         CURRENT_SUB(lexer)->methodname = CURRENT_SUB(lexer)->info.subname;
+    
+    CURRENT_SUB(lexer)->info.methodname = CURRENT_SUB(lexer)->methodname;
 
     /* :methods have an automatic "self" parameter */
     add_self_parameter(lexer);

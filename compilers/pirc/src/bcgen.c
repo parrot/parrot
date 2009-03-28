@@ -1057,6 +1057,12 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
     else
         sub->subid = subname_const->u.string;
 
+    /* if there was a :method, add it to the constants table, and set the method
+     * attribute to that STRING.
+     */
+    if (info->methodname)
+        sub->method_name = add_string_const_from_cstring(bc, info->methodname);
+
 
     /* store the sub in a namespace. XXX why, and in what namespace? sub->namespace_name?
      * XXX must this be done always? (this w.r.t. the recent discussion about :vtable/:method
