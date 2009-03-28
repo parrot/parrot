@@ -46,8 +46,11 @@ foreach my $file (@files) {
 
         my $escaped_decl = $function_decl;
 
-        # strip out any PARROT_* prefixes...
+        # strip out any PARROT_* prefixes
         $escaped_decl =~ s/^PARROT_[A-Z_]*\b\s*//g;        
+
+        # strip out any ARG* modifiers
+        $escaped_decl =~ s/ARG(?:IN|MOD)\((.*?)\)/$1/g;
 
         # escape [, ], (, ), and *
         $escaped_decl =~ s/\[/\\[/g;
@@ -55,8 +58,6 @@ foreach my $file (@files) {
         $escaped_decl =~ s/\(/\\(/g;
         $escaped_decl =~ s/\)/\\)/g;
         $escaped_decl =~ s/\*/\\*/g;
-
-
 
         # don't worry if the function declaration has embedded newlines in
         # it and the documented function doesn't.
