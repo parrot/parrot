@@ -1,8 +1,9 @@
 # $Id$
+# Copyright (C) 2004-2009, Parrot Foundation.
 
 =head1 TITLE
 
-dumper.pir - PIR version of Data::Dumper
+dumper.pir - PIR version of Perl 5's Data::Dumper module 
 
 =head1 VERSION
 
@@ -19,7 +20,7 @@ version 0.10
     ...
 
     END
-    .include "library/dumper.pir"
+    .include "dumper.pir"
 
 
 =head1 DESCRIPTION
@@ -31,7 +32,7 @@ version 0.10
 # first method prints usage information
 .sub __library_dumper_onload
     print "usage:"
-    print "\tload_bytecode \"library/Data/Dumper.pir\"\n"
+    print "\tload_bytecode \"Data/Dumper.pir\"\n"
     print "\t...\n"
     print "\tnew dumper, \"Data::Dumper\"\n"
     print "\tdumper.\"dumper\"( foo, \"foo\" )\n\n"
@@ -70,7 +71,7 @@ B<Note:> This function currently returns nothing. It should return
 the dumped data as a string, like Perl's Data::Dumper. Instead,
 everything is printed out using C<print>.
 
-B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.pir)
+B<Note: #2> Hash keys are now sorted using C<_sort()> (sort.pir)
 
 =cut
 
@@ -150,13 +151,13 @@ Returns the global dumper instance used by the non object interface.
     goto TYPE_OK
 
   load_dd_pir:
-    load_bytecode "library/Data/Dumper.pir"
+    load_bytecode "Data/Dumper.pir"
     get_class dd_class, "Data::Dumper"
     if null dd_class goto no_class
     goto TYPE_OK
 
   no_class:
-    print "fatal error: failure while loading library/Data/Dumper.pir\n"
+    print "fatal error: failure while loading Data/Dumper.pir\n"
     end
 TYPE_OK:
 
@@ -179,13 +180,9 @@ END:
 
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
 and maintainer.
-Please send patches and suggestions to the Perl 6 Internals mailing list.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
+
 
 # Local Variables:
 #   mode: pir
