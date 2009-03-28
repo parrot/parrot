@@ -47,7 +47,7 @@ foreach my $file (@files) {
         my $escaped_decl = $function_decl;
 
         # strip out any PARROT_* prefixes
-        $escaped_decl =~ s/^PARROT_[A-Z_]*\b\s*//g;        
+        $escaped_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
 
         # strip out any ARG* modifiers
         $escaped_decl =~ s/ARG(?:IN|MOD)\((.*?)\)/$1/g;
