@@ -1,4 +1,4 @@
-# Copyright 2008, Parrot Foundation.
+# Copyright 200-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -20,7 +20,7 @@ version 0.1
     ...
 
     END
-    .include "library/yaml_dumper.pir"
+    .include "yaml_dumper.pir"
 
 
 =head1 DESCRIPTION
@@ -32,7 +32,7 @@ version 0.1
 # first method prints usage information
 .sub __library_dumper_onload
     print "usage:"
-    print "\tload_bytecode \"library/YAML/Dumper.pir\"\n"
+    print "\tload_bytecode \"YAML/Dumper.pir\"\n"
     print "\t...\n"
     print "\tnew yaml, \"YAML::Dumper\"\n"
     print "\tyaml.\"yaml\"( foo, \"foo\" )\n\n"
@@ -71,7 +71,7 @@ B<Note:> This function currently returns nothing. It should return
 the dumped data as a string, like Perl's Data::Dumper. Instead,
 everything is printed out using C<print>.
 
-B<Note: #2> Hash keys are now sorted using C<_sort()> (library/sort.pir)
+B<Note: #2> Hash keys are now sorted using C<_sort()> (sort.pir)
 
 =cut
 
@@ -151,13 +151,13 @@ Returns the global dumper instance used by the non object interface.
     goto TYPE_OK
 
   load_yd_pir:
-    load_bytecode "library/YAML/Dumper.pir"
+    load_bytecode "YAML/Dumper.pir"
     get_class yd_class, "YAML::Dumper"
     if null yd_class goto no_class
     goto TYPE_OK
 
   no_class:
-    print "fatal error: failure while loading library/YAML/Dumper.pir\n"
+    print "fatal error: failure while loading YAML/Dumper.pir\n"
     end
 TYPE_OK:
 
@@ -182,11 +182,8 @@ Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
 and maintainer.
 Please send patches and suggestions to the Perl 6 Internals mailing list.
 
-=head1 COPYRIGHT
-
-Copyright (C) 2004-2008, Parrot Foundation.
-
 =cut
+
 
 # Local Variables:
 #   mode: pir
