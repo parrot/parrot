@@ -3,7 +3,7 @@
 
 =head1 TITLE
 
-dumper.pir - PIR version of Perl 5's Data::Dumper module 
+dumper.pir - PIR version of Perl 5's Data::Dumper module
 
 =head1 VERSION
 

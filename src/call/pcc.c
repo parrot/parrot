@@ -2972,7 +2972,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
                                    sigs, indexes, ctx, sig_obj);
 
     /* Set up the context object for the function invokation */
-    if(strncmp(signature, "Pi", 2) == 0) {
+    if (strncmp(signature, "Pi", 2) == 0) {
         interp->current_object = VTABLE_get_pmc_keyed_int(interp, sig_obj, 0);
     }
     else {
