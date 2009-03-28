@@ -53,6 +53,9 @@ foreach my $file (@files) {
         # strip out the SHIM modifier
         $function_decl =~ s/SHIM\((.*?)\)/$1/g;
 
+        # strip out the NULL modifiers
+        $function_decl =~ s/(?:NULLOK|NOTNULL)\((.*?)\)/$1/g;
+
         # SHIM_INTERP is still a PARROT_INTERP
         $function_decl =~ s/SHIM_INTERP/PARROT_INTERP/g;
 
