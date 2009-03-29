@@ -11,32 +11,34 @@ version 0.1
 
 =head1 SYNOPSIS
 
-    ...
+    .include "yaml_dumper.pir"
+
     # dump the P0 register
-    yaml( P0 )
+    yaml( $P0 )
 
     # dump the P0 register, with "name"
-    yaml( P0, "name" )
-    ...
-
-    END
-    .include "yaml_dumper.pir"
+    yaml( $P0, "name" )
 
 
 =head1 DESCRIPTION
 
-    PIR implementation of Perl 5's Data::Dumper module to dump YAML format.
+PIR implementation of Perl 5's Data::Dumper module to dump YAML format.
 
 =cut
 
 # first method prints usage information
-.sub __library_dumper_onload
-    print "usage:"
-    print "\tload_bytecode \"YAML/Dumper.pir\"\n"
-    print "\t...\n"
-    print "\tnew yaml, \"YAML::Dumper\"\n"
-    print "\tyaml.\"yaml\"( foo, \"foo\" )\n\n"
-    end
+.sub __library_yaml_dumper_print_usage
+    say "# usage:"
+    say ".sub main"
+    say "    load_bytecode 'YAML/Dumper.pir'"
+    say ''
+    say "    .local pmc foo, yaml_dumper"
+    say "    foo         = new 'ResizablePMCArray'"
+    say "    yaml_dumper =  new 'YAML::Dumper'"
+    say ''
+    say "    yaml_dumper.'yaml'( foo, 'foo' )"
+    say ".end"
+    say ''
 .end
 
 .include "errors.pasm"

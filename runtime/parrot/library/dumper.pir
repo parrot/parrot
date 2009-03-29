@@ -11,16 +11,13 @@ version 0.10
 
 =head1 SYNOPSIS
 
-    ...
-    # dump the P0 register
-    _dumper( P0 )
-
-    # dump the P0 register, with "name"
-    _dumper( P0, "name" )
-    ...
-
-    END
     .include "dumper.pir"
+    
+    # dump the $P0 register
+    _dumper( $P0 )
+
+    # dump the $P0 register, with "name"
+    _dumper( $P0, "name" )
 
 
 =head1 DESCRIPTION
@@ -30,13 +27,18 @@ version 0.10
 =cut
 
 # first method prints usage information
-.sub __library_dumper_onload
-    print "usage:"
-    print "\tload_bytecode \"Data/Dumper.pir\"\n"
-    print "\t...\n"
-    print "\tnew dumper, \"Data::Dumper\"\n"
-    print "\tdumper.\"dumper\"( foo, \"foo\" )\n\n"
-    end
+.sub __library_dumper_print_usage
+    say "# usage:"
+    say ".sub main"
+    say "    load_bytecode 'Data/Dumper.pir'"
+    say ''
+    say "    .local pmc foo, dumper"
+    say "    foo    = new 'ResizablePMCArray'"
+    say "    dumper = new 'Data::Dumper'"
+    say ''
+    say "    dumper.'dumper'( foo, 'foo' )"
+    say ".end"
+    say ''
 .end
 
 .include "errors.pasm"
