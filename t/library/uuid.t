@@ -20,7 +20,7 @@ t/library/uuid.t - uuid library tests
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'generate' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $S1 = typeof $P1
@@ -34,7 +34,7 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'generate' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     print $P1
@@ -46,7 +46,7 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'generate_random' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate_random'
     $P1 = $P0()
     print $P1
@@ -58,7 +58,7 @@ OUTPUT
 
 pir_output_like( << 'CODE', << 'OUTPUT', 'generate_time' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate_time'
     $P1 = $P0()
     print $P1
@@ -70,7 +70,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'parse' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     ($I0, $P1) = $P0("84949cc5-4701-4a84-895b-354c584a981b")
     print $I0
@@ -87,7 +87,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'parse' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     $I0 = $P0("84949cc5-4701-4a84-895b-354c584a981b")
     print $I0
@@ -140,7 +140,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'time' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'parse'
     ($I0, $P1) = $P0("84949cc5-4701-4a84-895b-354c584a981b")
     $I1 = $P1.'time'()
@@ -154,7 +154,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'type' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $I0 = $P1.'type'()
@@ -168,7 +168,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'variant' );
 .sub test :main
-    load_bytecode 'library/uuid.pbc'
+    load_bytecode 'uuid.pbc'
     $P0 = get_global ['uuid'], 'generate'
     $P1 = $P0()
     $I0 = $P1.'variant'()

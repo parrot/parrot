@@ -17,7 +17,7 @@ Testing Perl 6 objects.
 =cut
 
 .sub 'main' :main
-    load_bytecode 'library/Test/More.pbc'
+    load_bytecode 'Test/More.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace

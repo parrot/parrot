@@ -20,7 +20,7 @@ t/library/mt19937ar.t - Math::Random::MT tests
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT typeof' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $S0 = typeof mt
@@ -34,7 +34,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can init_genrand' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'init_genrand'
@@ -48,7 +48,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can init_by_array' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'init_by_array'
@@ -62,7 +62,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can genrand_int32' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'genrand_int32'
@@ -76,7 +76,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can genrand_int31' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'genrand_int31'
@@ -90,7 +90,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can genrand_real1' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'genrand_real1'
@@ -104,7 +104,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can genrand_real2' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'genrand_real2'
@@ -118,7 +118,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can genrand_real3' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'genrand_real3'
@@ -132,7 +132,7 @@ OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', 'MT can genrand_res53' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     $I0 = can mt, 'genrand_res53'
@@ -147,7 +147,7 @@ OUTPUT
 my $out = Parrot::Test::slurp_file(File::Spec->catfile( 't', 'library', 'mt19937ar.txt' ));
 pir_output_is( << 'CODE', $out, 'mt19937ar output' );
 .sub test :main
-    load_bytecode 'library/Math/Random/mt19937ar.pbc'
+    load_bytecode 'Math/Random/mt19937ar.pbc'
     .local pmc mt
     mt = new [ 'Math'; 'Random'; 'MT' ]
     .local pmc init
