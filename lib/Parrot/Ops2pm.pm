@@ -76,24 +76,63 @@ F<lib/Parrot/Ops2pm/Base.pm>.
 =item * Purpose
 
 When F<tools/build/ops2pm.pl> is called by F<make>, this method
-checks the number of ops strictly against F<src/ops/ops.num> and renumbers as
-needed.
+checks the number of ops strictly against F<src/ops/ops.num> and
+F<src/ops/ops.skip>.
 
 =item * Arguments
 
 None.  (Implicitly requires that the C<argv> and C<script> keys
 have been provided to the constructor.)
 
-=item * Return Value
+=item * Return Value and Side Effects
 
 Returns true value upon success.  Internally, sets these
-values in these elements in the object's data structure:  C<max_op_num>,
-C<skiptable> and C<optable>.
+values in these elements in the object's data structure:
 
-=item * Comments
+=over 4
 
-This is the default case.  In addition to F<src/ops/ops.num>, this method also
-draws upon information in F<src/ops/ops.skip>.
+=item * C<max_op_num>
+
+Scalar holding number of highest non-experimental op.  Example:
+
+    'max_op_num' => 1246,
+
+=item * C<optable>
+
+Reference to hash holding mapping of opcode names ops to their numbers.
+Example:
+
+  'optable' => {
+    'pow_p_p_i' => 650,
+    'say_s' => 463,
+    'lsr_p_p_i' => 207,
+    'lt_s_sc_ic' => 289,
+    # ...
+    'debug_init' => 429,
+    'iseq_i_nc_n' => 397,
+    'eq_addr_sc_s_ic' => 254
+  },
+
+Per F<src/ops/ops.num>, this mapping exists so that we can nail down
+the op numbers for the core opcodes in a particular version of the
+bytecode and provide backward-compatibility for bytecode.
+
+=item * C<skiptable>
+
+Reference to a 'seen-hash' of skipped opcodes.
+
+  'skiptable' => {
+    'bor_i_ic_ic' => 1,
+    'xor_i_ic_ic' => 1,
+    'tanh_n_nc' => 1,
+    # ...
+  },
+
+As F<src/ops/ops.skip> states, these are "... opcodes that could be listed in
+F<[src/ops/]ops.num> but aren't ever to be generated or implemented because
+they are useless and/or silly."
+
+=back
 
 =back
 
@@ -163,13 +202,17 @@ list of op codes found in the object's C<{ops}-E<gt>{OPS}> element.
 
 None.
 
-=item * Return Value
+=item * Return Value and Side Effects
 
-None.  Internally, sets the C<ops> key of the object's data structure.
+No return value.  Internally, re-sets the C<ops> key of the object's data
+structure.
 
 =item * Comment
 
-Will emit warnings under these circumstances:
+It is at this point that warnings about experimental opcodes will be
+emitted.  Example:
+
+    trap                      1247       experimental, not in ops.num
 
 =back
 
@@ -217,12 +260,10 @@ Final stage of preparation of ops.
 None.  (Same implicit requirements for the constructor as
 C<load_op_map_files()> above.)
 
-=item * Return Value
+=item * Return Value and Side Effects
 
-None.  Internally, sets the C<real_ops> key of the object's
-data structure.
-
-=item * Comment
+No return value.  Internally, adds the C<real_ops> key of the object's
+data structure.  Its value is a Parrot::OpsFile object.
 
 =back
 
