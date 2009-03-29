@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -181,7 +181,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static void set_graphemes>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
+UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets C<replace_count> graphemes in STRING C<source_string> starting at offset C<offset>.
 Gets the replacement graphemes from STRING C<insert_string>.
@@ -201,7 +202,7 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * to_iso_8859_1>
+=item C<static STRING * to_iso_8859_1(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts STRING C<src> to iso-8859-1 in STRING C<dest>.
 
@@ -243,7 +244,7 @@ to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING * to_unicode>
+=item C<static STRING * to_unicode(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts STRING C<src> to unicode STRING C<dest>.
 
@@ -286,7 +287,7 @@ to_unicode(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING * to_charset>
+=item C<static STRING * to_charset(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts the STRING C<src> to an ISO-8859-1 STRING C<dest>.
 
@@ -312,7 +313,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING* compose>
+=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
 
 ISO-8859-1 does not support composing, so we just copy the STRING C<src> and return the
 copy.
@@ -333,7 +334,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING* decompose>
+=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
 
 SO-8859-1 does not support decomposing, so we throw an exception.
 
@@ -352,7 +353,7 @@ decompose(PARROT_INTERP, SHIM(STRING *src))
 
 /*
 
-=item C<static void upcase>
+=item C<static void upcase(PARROT_INTERP, STRING *source_string)>
 
 Convert all graphemes in the STRING C<source_string> to upper case, for those
 graphemes that support cases.
@@ -385,7 +386,7 @@ upcase(PARROT_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void downcase>
+=item C<static void downcase(PARROT_INTERP, STRING *source_string)>
 
 Converts all graphemes in STRING C<source_string> to lower-case, for those graphemes
 that support cases.
@@ -417,7 +418,7 @@ downcase(PARROT_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void titlecase>
+=item C<static void titlecase(PARROT_INTERP, STRING *source_string)>
 
 Converts the graphemes in STRING C<source_string> to title case, for those graphemes
 that support cases.
@@ -458,7 +459,7 @@ titlecase(PARROT_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void upcase_first>
+=item C<static void upcase_first(PARROT_INTERP, STRING *source_string)>
 
 Converts the first grapheme in STRING C<source_string> to upper case, if it
 supports cases.
@@ -488,7 +489,7 @@ upcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void downcase_first>
+=item C<static void downcase_first(PARROT_INTERP, STRING *source_string)>
 
 Converts the first character of the STRING C<source_string> to lower case, if the
 grapheme supports lower case.
@@ -518,7 +519,7 @@ downcase_first(PARROT_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void titlecase_first>
+=item C<static void titlecase_first(PARROT_INTERP, STRING *source_string)>
 
 Converts the first grapheme in STRING C<source_string> to title case, if the grapheme
 supports case.
@@ -537,7 +538,7 @@ titlecase_first(PARROT_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static UINTVAL validate>
+=item C<static UINTVAL validate(PARROT_INTERP, STRING *src)>
 
 Returns 1 if the STRING C<src> is a valid ISO-8859-1 STRING. Returns 0 otherwise.
 
@@ -561,7 +562,8 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static INTVAL is_cclass>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
+const STRING *source_string, UINTVAL offset)>
 
 =cut
 
@@ -586,7 +588,8 @@ is_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_cclass>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -613,7 +616,8 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_not_cclass>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -640,7 +644,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static STRING * string_from_codepoint>
+=item C<static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
 Creates a new STRING from the single codepoint C<codepoint>.
 
@@ -661,7 +665,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<const CHARSET * Parrot_charset_iso_8859_1_init>
+=item C<const CHARSET * Parrot_charset_iso_8859_1_init(PARROT_INTERP)>
 
 Initializes the ISO-8859-1 charset by installing all the necessary function pointers.
 
@@ -709,7 +713,7 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 
 /*
 
-=item C<STRING * charset_cvt_iso_8859_1_to_ascii>
+=item C<STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts STRING C<src> in ISO-8859-1 to ASCII STRING C<dest>.
 

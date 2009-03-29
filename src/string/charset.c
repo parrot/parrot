@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -90,7 +90,7 @@ static void register_static_converters(PARROT_INTERP)
 
 /*
 
-=item C<CHARSET * Parrot_new_charset>
+=item C<CHARSET * Parrot_new_charset(PARROT_INTERP)>
 
 Allocates a new C<CHARSET> structure from the system.
 
@@ -110,7 +110,7 @@ Parrot_new_charset(SHIM_INTERP)
 
 /*
 
-=item C<void Parrot_charsets_encodings_deinit>
+=item C<void Parrot_charsets_encodings_deinit(PARROT_INTERP)>
 
 Deinitializes (unloads) the charset system. Frees all charsets and the array
 that holds the charsets back to the system.
@@ -140,7 +140,7 @@ Parrot_charsets_encodings_deinit(SHIM_INTERP)
 
 /*
 
-=item C<const CHARSET * Parrot_find_charset>
+=item C<const CHARSET * Parrot_find_charset(PARROT_INTERP, const char *charsetname)>
 
 Searches through the list of charsets for the charset given by C<charsetname>.
 Returns the charset if it is found, NULL otherwise.
@@ -169,7 +169,7 @@ Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))
 
 /*
 
-=item C<CHARSET * Parrot_load_charset>
+=item C<CHARSET * Parrot_load_charset(PARROT_INTERP, const char *charsetname)>
 
 Throws an exception (Can't load charsets dynamically yet. RT#58184).
 
@@ -192,7 +192,7 @@ Parrot_load_charset(PARROT_INTERP, ARGIN(const char *charsetname))
 
 /*
 
-=item C<INTVAL Parrot_charset_number>
+=item C<INTVAL Parrot_charset_number(PARROT_INTERP, const STRING *charsetname)>
 
 Return the number of the charset or -1 if not found.
 
@@ -218,7 +218,7 @@ Parrot_charset_number(PARROT_INTERP, ARGIN(const STRING *charsetname))
 
 /*
 
-=item C<INTVAL Parrot_charset_number_of_str>
+=item C<INTVAL Parrot_charset_number_of_str(PARROT_INTERP, const STRING *src)>
 
 Return the number of the charset of the given string or -1 if not found.
 
@@ -244,7 +244,7 @@ Parrot_charset_number_of_str(SHIM_INTERP, ARGIN(const STRING *src))
 
 /*
 
-=item C<STRING* Parrot_charset_name>
+=item C<STRING* Parrot_charset_name(PARROT_INTERP, INTVAL number_of_charset)>
 
 Returns the name of the charset given by the INTVAL index
 C<number_of_charset>.
@@ -267,7 +267,7 @@ Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
 
 /*
 
-=item C<const CHARSET * Parrot_get_charset>
+=item C<const CHARSET * Parrot_get_charset(PARROT_INTERP, INTVAL number_of_charset)>
 
 Returns the charset given by the INTVAL index C<number_of_charset>.
 
@@ -289,7 +289,7 @@ Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
 
 /*
 
-=item C<const char * Parrot_charset_c_name>
+=item C<const char * Parrot_charset_c_name(PARROT_INTERP, INTVAL number_of_charset)>
 
 Returns a NULL-terminated C string with the name of the charset given by
 INTVAL index C<number_of_charset>.
@@ -312,7 +312,8 @@ Parrot_charset_c_name(SHIM_INTERP, INTVAL number_of_charset)
 
 /*
 
-=item C<static INTVAL register_charset>
+=item C<static INTVAL register_charset(PARROT_INTERP, const char *charsetname,
+CHARSET *charset)>
 
 Adds a new charset C<charset> with name <charsetname> to the list of
 all charsets. Returns 0 and does nothing if a charset with that name
@@ -353,7 +354,7 @@ register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
 
 /*
 
-=item C<static void Parrot_str_internal_register_charset_names>
+=item C<static void Parrot_str_internal_register_charset_names(PARROT_INTERP)>
 
 Helper function for initializing characterset names. We can't create the
 STRING names until the default encodings and charsets are already initted,
@@ -375,7 +376,7 @@ Parrot_str_internal_register_charset_names(PARROT_INTERP)
 
 /*
 
-=item C<static void register_static_converters>
+=item C<static void register_static_converters(PARROT_INTERP)>
 
 Registers several standard converters between common charsets, including:
 
@@ -409,7 +410,8 @@ register_static_converters(PARROT_INTERP)
 
 /*
 
-=item C<INTVAL Parrot_register_charset>
+=item C<INTVAL Parrot_register_charset(PARROT_INTERP, const char *charsetname,
+CHARSET *charset)>
 
 Register a new charset C<charset> with name C<charsetname>. Charset may only
 be one of the 4 following names:
@@ -461,7 +463,7 @@ Parrot_register_charset(PARROT_INTERP, ARGIN(const char *charsetname),
 
 /*
 
-=item C<void Parrot_charsets_encodings_init>
+=item C<void Parrot_charsets_encodings_init(PARROT_INTERP)>
 
 Creates the initial charsets and encodings, and registers the initial
 charset converters.
@@ -503,7 +505,8 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
 
 /*
 
-=item C<INTVAL Parrot_make_default_charset>
+=item C<INTVAL Parrot_make_default_charset(PARROT_INTERP,
+const char *charsetname, CHARSET *charset)>
 
 Sets the current default charset to C<charset> with name C<charsetname>.
 
@@ -523,7 +526,7 @@ Parrot_make_default_charset(SHIM_INTERP, SHIM(const char *charsetname),
 
 /*
 
-=item C<const CHARSET * Parrot_default_charset>
+=item C<const CHARSET * Parrot_default_charset(PARROT_INTERP)>
 
 Returns the default charset.
 
@@ -543,7 +546,8 @@ Parrot_default_charset(SHIM_INTERP)
 
 /*
 
-=item C<charset_converter_t Parrot_find_charset_converter>
+=item C<charset_converter_t Parrot_find_charset_converter(PARROT_INTERP,
+const CHARSET *lhs, const CHARSET *rhs)>
 
 Finds a converter from charset C<lhs> to charset C<rhs>.
 
@@ -579,7 +583,8 @@ Parrot_find_charset_converter(SHIM_INTERP,
 
 /*
 
-=item C<void Parrot_register_charset_converter>
+=item C<void Parrot_register_charset_converter(PARROT_INTERP,
+const CHARSET *lhs, CHARSET *rhs, charset_converter_t func)>
 
 Registers a converter C<func> from charset C<lhs> to C<rhs>.
 

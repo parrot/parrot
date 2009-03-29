@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -210,7 +210,7 @@ static void ucs2_set_position(SHIM_INTERP,
 
 /*
 
-=item C<static STRING * to_encoding>
+=item C<static STRING * to_encoding(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts the string C<src> to this particular encoding.  If C<dest> is
 provided, it will contain the result.  Otherwise this function operates in
@@ -239,7 +239,7 @@ to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
 
 /*
 
-=item C<static UINTVAL get_codepoint>
+=item C<static UINTVAL get_codepoint(PARROT_INTERP, const STRING *src, UINTVAL offset)>
 
 Returns the codepoint in string C<src> at position C<offset>.
 
@@ -262,7 +262,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static void set_codepoint>
+=item C<static void set_codepoint(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL codepoint)>
 
 Sets, in string C<src> at position C<offset>, the codepoint C<codepoint>.
 
@@ -286,7 +286,7 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
 
 /*
 
-=item C<static UINTVAL get_byte>
+=item C<static UINTVAL get_byte(PARROT_INTERP, const STRING *src, UINTVAL offset)>
 
 Returns the byte in string C<src> at position C<offset>.
 
@@ -303,7 +303,7 @@ get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static void set_byte>
+=item C<static void set_byte(PARROT_INTERP, const STRING *src, UINTVAL offset, UINTVAL byte)>
 
 Sets, in string C<src> at position C<offset>, the byte C<byte>.
 
@@ -320,7 +320,7 @@ set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 
 /*
 
-=item C<static STRING * get_codepoints>
+=item C<static STRING * get_codepoints(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count)>
 
 Returns the codepoints in string C<src> at position C<offset> and length
 C<count>.
@@ -359,7 +359,7 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 
 /*
 
-=item C<static STRING * get_bytes>
+=item C<static STRING * get_bytes(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count)>
 
 Returns the bytes in string C<src> at position C<offset> and length C<count>.
 
@@ -379,7 +379,8 @@ get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
 
 /*
 
-=item C<static STRING * get_codepoints_inplace>
+=item C<static STRING * get_codepoints_inplace(PARROT_INTERP, STRING *src,
+UINTVAL offset, UINTVAL count, STRING *dest_string)>
 
 Gets from string C<src> at position C<offset> C<count> codepoints and returns
 them in C<return_string>.
@@ -400,7 +401,8 @@ get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static STRING * get_bytes_inplace>
+=item C<static STRING * get_bytes_inplace(PARROT_INTERP, STRING *src,
+UINTVAL offset, UINTVAL count, STRING *return_string)>
 
 Gets from string C<src> at position C<offset> C<count> bytes and returns them
 in C<return_string>.
@@ -421,7 +423,8 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void set_codepoints>
+=item C<static void set_codepoints(PARROT_INTERP, STRING *src,
+UINTVAL offset, UINTVAL count, STRING *new_codepoints)>
 
 Replaces in string C<src> at position C<offset> for C<count> codepoints with
 the contents of string C<new_codepoints>.
@@ -440,7 +443,8 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void set_bytes>
+=item C<static void set_bytes(PARROT_INTERP, STRING *src,
+UINTVAL offset, UINTVAL count, STRING *new_bytes)>
 
 Replaces in string C<src> at position C<offset> for C<count> bytes with the
 contents of string C<new_bytes>.
@@ -459,7 +463,7 @@ set_bytes(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void become_encoding>
+=item C<static void become_encoding(PARROT_INTERP, STRING *src)>
 
 Unconditionally makes the string be in this encoding, if that's valid
 
@@ -477,7 +481,7 @@ become_encoding(PARROT_INTERP, SHIM(STRING *src))
 
 /*
 
-=item C<static UINTVAL codepoints>
+=item C<static UINTVAL codepoints(PARROT_INTERP, STRING *src)>
 
 Returns the number of codepoints in string C<src>.
 
@@ -500,7 +504,7 @@ codepoints(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static UINTVAL bytes>
+=item C<static UINTVAL bytes(PARROT_INTERP, STRING *src)>
 
 Returns the number of bytes in string C<src>.
 
@@ -518,7 +522,7 @@ bytes(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static UINTVAL ucs2_decode_and_advance>
+=item C<static UINTVAL ucs2_decode_and_advance(PARROT_INTERP, String_iter *i)>
 
 Moves the string iterator C<i> to the next UCS-2 codepoint.
 
@@ -545,7 +549,7 @@ ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 
 /*
 
-=item C<static void ucs2_encode_and_advance>
+=item C<static void ucs2_encode_and_advance(PARROT_INTERP, String_iter *i, UINTVAL c)>
 
 With the string iterator C<i>, appends the codepoint C<c> and advances to the
 next position in the string.
@@ -567,7 +571,7 @@ ucs2_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 
 /*
 
-=item C<static void ucs2_set_position>
+=item C<static void ucs2_set_position(PARROT_INTERP, String_iter *i, UINTVAL n)>
 
 Moves the string iterator C<i> to the position C<n> in the string.
 
@@ -587,7 +591,7 @@ ucs2_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 
 /*
 
-=item C<static void iter_init>
+=item C<static void iter_init(PARROT_INTERP, const STRING *src, String_iter *iter)>
 
 Initializes for string C<src> the string iterator C<iter>.
 
@@ -614,7 +618,7 @@ iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
 
 /*
 
-=item C<ENCODING * Parrot_encoding_ucs2_init>
+=item C<ENCODING * Parrot_encoding_ucs2_init(PARROT_INTERP)>
 
 Initializes the UCS-2 encoding.
 

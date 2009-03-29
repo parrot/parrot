@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -154,7 +154,8 @@ static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 
 /*
 
-=item C<static void set_graphemes>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
+UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets the graphemes for STRING C<source_string>, starting at offset
 C<offset>. Replaces C<replace_count> graphemes from STRING
@@ -175,7 +176,7 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING* to_charset>
+=item C<static STRING* to_charset(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts the STRING C<src> to STRING C<dest> in binary mode. Throws
 an exception if a suitable conversion function is not found.
@@ -201,7 +202,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING* compose>
+=item C<static STRING* compose(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we cannot compose a binary string.
 
@@ -220,7 +221,7 @@ compose(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static STRING* decompose>
+=item C<static STRING* decompose(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we cannot decompose a binary string.
 
@@ -239,7 +240,7 @@ decompose(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void upcase>
+=item C<static void upcase(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we cannot convert a binary string to
 upper case.
@@ -257,7 +258,7 @@ upcase(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void downcase>
+=item C<static void downcase(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we cannot convert a binary string to
 lower-case.
@@ -275,7 +276,7 @@ downcase(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void titlecase>
+=item C<static void titlecase(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we cannot convert a binary string to
 title case.
@@ -293,7 +294,7 @@ titlecase(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void upcase_first>
+=item C<static void upcase_first(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we cannot set the first "character" of the
 binary string to uppercase.
@@ -311,7 +312,7 @@ upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void downcase_first>
+=item C<static void downcase_first(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we cannot set the first "character"
 of the binary string to lowercase.
@@ -329,7 +330,7 @@ downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void titlecase_first>
+=item C<static void titlecase_first(PARROT_INTERP, STRING *source_string)>
 
 Throws an exception because we can't convert the first "character"
 of binary data to title case.
@@ -347,7 +348,7 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static INTVAL compare>
+=item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)>
 
 Compare the two buffers, first by size, then with memcmp.
 
@@ -369,7 +370,8 @@ compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<static INTVAL cs_index>
+=item C<static INTVAL cs_index(PARROT_INTERP, STRING *source_string,
+STRING *search_string, UINTVAL offset)>
 
 Returns -1. It makes no sense to try and search for a substring in
 raw binary data.
@@ -388,7 +390,8 @@ cs_index(SHIM_INTERP, SHIM(STRING *source_string),
 
 /*
 
-=item C<static INTVAL cs_rindex>
+=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *source_string,
+STRING *search_string, UINTVAL offset)>
 
 Returns -1. It makes no sense to search for the last substring match
 in raw binary data.
@@ -407,7 +410,7 @@ cs_rindex(SHIM_INTERP, SHIM(STRING *source_string),
 
 /*
 
-=item C<static UINTVAL validate>
+=item C<static UINTVAL validate(PARROT_INTERP, STRING *source_string)>
 
 Returns 1. All sequential data is valid binary data.
 
@@ -425,7 +428,8 @@ validate(SHIM_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static INTVAL is_cclass>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
+const STRING *source_string, UINTVAL offset)>
 
 =cut
 
@@ -441,7 +445,8 @@ is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
 
 /*
 
-=item C<static INTVAL find_cclass>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -457,7 +462,8 @@ find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 
 /*
 
-=item C<static INTVAL find_not_cclass>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -473,7 +479,7 @@ find_not_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 
 /*
 
-=item C<static STRING * string_from_codepoint>
+=item C<static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
 =cut
 
@@ -493,7 +499,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<const CHARSET * Parrot_charset_binary_init>
+=item C<const CHARSET * Parrot_charset_binary_init(PARROT_INTERP)>
 
 Initialize the binary charset, including function pointers and
 settings.

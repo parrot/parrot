@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2008, Parrot Foundation.
+Copyright (C) 2005-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -225,7 +225,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static void set_graphemes>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
+UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets C<replace_count> graphemes in STRING C<source_string> starting at offset
 C<offset>.  Gets the graphemes to be replaced from STRING C<insert_string>.
@@ -246,7 +247,8 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * get_graphemes>
+=item C<static STRING * get_graphemes(PARROT_INTERP, STRING *source_string,
+UINTVAL offset, UINTVAL count)>
 
 Gets the graphemes from STRING C<source_string> starting at C<offset>. Gets
 C<count> graphemes total.
@@ -267,7 +269,8 @@ get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * get_graphemes_inplace>
+=item C<static STRING * get_graphemes_inplace(PARROT_INTERP,
+STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
 
 Gets C<count> graphemes in place from STRING C<source_string> starting at
 offset C<offset>. Puts them into STRING C<dest_string>.
@@ -289,7 +292,7 @@ get_graphemes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING* to_charset>
+=item C<static STRING* to_charset(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts input STRING C<src> to unicode STRING C<dest>.
 
@@ -315,7 +318,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING* compose>
+=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
 
 If Parrot is built with ICU, composes the STRING C<src>. Attempts to
 denormalize the STRING into the ICU default, NFC.
@@ -378,7 +381,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING* decompose>
+=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
 
 Decompose function for unicode charset. This function is not yet implemented.
 
@@ -398,7 +401,7 @@ decompose(PARROT_INTERP, SHIM(STRING *src))
 
 /*
 
-=item C<static void upcase>
+=item C<static void upcase(PARROT_INTERP, STRING *src)>
 
 Converts the STRING C<src> to all upper-case graphemes, for those characters
 which support upper-case versions.
@@ -493,7 +496,7 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static void downcase>
+=item C<static void downcase(PARROT_INTERP, STRING *src)>
 
 Converts all graphemes to lower-case, for those graphemes which have cases.
 
@@ -557,7 +560,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
 
 /*
 
-=item C<static void titlecase>
+=item C<static void titlecase(PARROT_INTERP, STRING *src)>
 
 Converts the string to title case, for those characters which support cases.
 
@@ -625,7 +628,7 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
 
 /*
 
-=item C<static void upcase_first>
+=item C<static void upcase_first(PARROT_INTERP, STRING *source_string)>
 
 Converts the first grapheme in the STRING C<source_string> to uppercase, if the
 grapheme supports it. Not implemented.
@@ -645,7 +648,7 @@ upcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void downcase_first>
+=item C<static void downcase_first(PARROT_INTERP, STRING *source_string)>
 
 Converts the first grapheme in the STRING C<source_string> to lower-case, if
 the grapheme supports it. Not implemented
@@ -665,7 +668,7 @@ downcase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static void titlecase_first>
+=item C<static void titlecase_first(PARROT_INTERP, STRING *source_string)>
 
 Converts the first grapheme in STRING C<source_string> to title case, if the
 string supports it. Not implemented.
@@ -685,7 +688,7 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static INTVAL compare>
+=item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)>
 
 Compares two STRINGs, C<lhs> and C<rhs>. Returns -1 if C<lhs> < C<rhs>. Returns
 0 if C<lhs> = C<rhs>. Returns 1 if C<lhs> > C<rhs>.
@@ -730,7 +733,8 @@ compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<static INTVAL cs_rindex>
+=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *source_string,
+STRING *search_string, UINTVAL offset)>
 
 Finds the last index of substring C<search_string> in STRING C<source_string>,
 starting from C<offset>. Not implemented.
@@ -751,7 +755,7 @@ cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
 
 /*
 
-=item C<static UINTVAL validate>
+=item C<static UINTVAL validate(PARROT_INTERP, STRING *src)>
 
 Returns 1 if the STRING C<src> is a valid unicode string, returns 0 otherwise.
 
@@ -782,7 +786,7 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static int u_iscclass>
+=item C<static int u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)>
 
 =cut
 
@@ -876,7 +880,8 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
 /*
 
-=item C<static INTVAL is_cclass>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
+const STRING *source_string, UINTVAL offset)>
 
 =cut
 
@@ -903,7 +908,8 @@ is_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_cclass>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -943,7 +949,8 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_not_cclass>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -991,7 +998,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static STRING * string_from_codepoint>
+=item C<static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
 Returns a one-codepoint string for the given codepoint.
 
@@ -1019,7 +1026,7 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static size_t compute_hash>
+=item C<static size_t compute_hash(PARROT_INTERP, const STRING *src, size_t seed)>
 
 Computes the hash of the given STRING C<src> with starting seed value C<seed>.
 
@@ -1049,7 +1056,7 @@ compute_hash(PARROT_INTERP, ARGIN(const STRING *src), size_t seed)
 
 /*
 
-=item C<const CHARSET * Parrot_charset_unicode_init>
+=item C<const CHARSET * Parrot_charset_unicode_init(PARROT_INTERP)>
 
 Initializes the Unicode charset by installing all the necessary function
 pointers.
