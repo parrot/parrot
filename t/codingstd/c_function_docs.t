@@ -48,7 +48,7 @@ foreach my $file (@files) {
         $function_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
 
         # strip out any ARG* modifiers
-        $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|MOD|FREE)\((.*?)\)/$1/g;
+        $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|OUT_NULLOK|MOD|MOD_NULLOK|FREE)\((.*?)\)/$1/g;
 
         # strip out the SHIM modifier
         $function_decl =~ s/SHIM\((.*?)\)/$1/g;
