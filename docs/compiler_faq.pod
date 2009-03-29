@@ -23,9 +23,7 @@ See L<http://www.parrotblog.org/2008/03/targeting-parrot-vm.html>.
 
 =head2 How do I embed source locations in my code for debugging?
 
-Use C<#line 42 "file.pir"> for this. Note that this command must be in the first
-column; there must not be any leading space, otherwise the command is treated
-as a comment (due to the C<#> character).
+Use C<.line 42 "file.pir"> for this.
 
 =head1 Subroutines
 
