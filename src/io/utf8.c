@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -33,7 +33,7 @@ representation.
 
 /*
 
-=item C<size_t Parrot_io_read_utf8>
+=item C<size_t Parrot_io_read_utf8(PARROT_INTERP, PMC *filehandle, STRING **buf)>
 
 Read a string from a filehandle in UTF-8 format and convert it to a Parrot
 string.
@@ -99,7 +99,7 @@ ok:
 
 /*
 
-=item C<size_t Parrot_io_write_utf8>
+=item C<size_t Parrot_io_write_utf8(PARROT_INTERP, PMC *filehandle, STRING *s)>
 
 Write a Parrot string to a filehandle in UTF-8 format.
 

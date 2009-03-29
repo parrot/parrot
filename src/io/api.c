@@ -436,7 +436,7 @@ Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 
 /*
 
-=item C<INTVAL Parrot_io_putps(PARROT_INTERP, PMC *pmc, ARGMOD_STRING *s)>
+=item C<INTVAL Parrot_io_putps(PARROT_INTERP, PMC *pmc, STRING *s)>
 
 Writes C<*s> to C<*pmc>. Parrot string version.
 

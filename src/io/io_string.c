@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006-2007, Parrot Foundation.
+Copyright (C) 2006-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -93,7 +93,7 @@ ParrotIOLayer pio_string_layer = {
 
 /*
 
-=item C<ParrotIOLayer * PIO_string_register_layer>
+=item C<ParrotIOLayer * PIO_string_register_layer(void)>
 
 =cut
 
@@ -109,7 +109,8 @@ PIO_string_register_layer(void)
 
 /*
 
-=item C<static size_t PIO_string_read>
+=item C<static size_t PIO_string_read(PARROT_INTERP, ParrotIOLayer *l,
+ParrotIO *io, STRING **buf)>
 
 =cut
 
@@ -129,7 +130,7 @@ PIO_string_read(SHIM_INTERP, ARGMOD(ParrotIOLayer *l), SHIM(ParrotIO *io), ARGOU
 
 /*
 
-=item C<static size_t PIO_string_write>
+=item C<static size_t PIO_string_write(PARROT_INTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)>
 
 =cut
 
