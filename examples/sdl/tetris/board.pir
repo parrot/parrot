@@ -15,14 +15,13 @@ board.pir - a tetris board class.
 
 =cut
 
-.include "library/dumper.pir"
-
 .namespace ["Tetris::Board"]
 
 .sub __onload :load
     $P0 = get_class "Tetris::Board"
     unless null $P0 goto END
 
+    load_bytecode "dumper.pbc"
     load_bytecode "examples/sdl/tetris/boarddata.pir"
     load_bytecode "examples/sdl/tetris/blocks.pir"
     get_class $P0, "Tetris::BoardData"

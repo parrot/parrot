@@ -26,8 +26,8 @@ Tests data dumping.
 # no. 1
 pir_output_is( <<'CODE', <<'OUT', "dumping array of sorted numbers" );
 
-.include "library/dumper.pir"
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -62,8 +62,8 @@ OUT
 # no. 2
 
 pir_output_is( <<'CODE', <<'OUT', "dumping unsorted numbers" );
-.include "library/dumper.pir"
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -98,8 +98,8 @@ OUT
 # no. 3
 pir_output_is( <<'CODE', <<'OUT', "dumping sorted strings" );
 
-.include "library/dumper.pir"
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -131,6 +131,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -145,7 +146,6 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
 
     _dumper( array, "strings" )
 .end
-.include "library/dumper.pir"
 CODE
 "strings" => ResizablePMCArray (size:8) [
     "charlie",
@@ -163,6 +163,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping different types" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -189,7 +190,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping different types" );
 
     _dumper( array, "array" )
 .end
-.include "library/dumper.pir"
 CODE
 "array" => ResizablePMCArray (size:20) [
     0.1,
@@ -219,6 +219,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping complex data" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -275,7 +276,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping complex data" );
     _dumper( hash1,"hash1" )
 
 .end
-.include "library/dumper.pir"
 CODE
 "hash1" => Hash {
 }
@@ -322,6 +322,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "properties" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc str
     .local pmc array
 
@@ -340,7 +341,6 @@ pir_output_is( <<'CODE', <<'OUT', "properties" );
     _dumper( array )
 
 .end
-.include "library/dumper.pir"
 CODE
 "VAR1" => ResizablePMCArray (size:2) [
     "test1",
@@ -355,6 +355,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "indent string" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc hash1
     .local pmc hash2
     .local pmc array1
@@ -385,7 +386,6 @@ pir_output_is( <<'CODE', <<'OUT', "indent string" );
     print indent
     print "'\n"
 .end
-.include "library/dumper.pir"
 CODE
 "hash" => Hash {
 |  "hash2" => Hash {
@@ -423,6 +423,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "back-referencing properties" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc hash
 
     new hash, 'Hash'
@@ -431,7 +432,6 @@ pir_output_is( <<'CODE', <<'OUT', "back-referencing properties" );
     setprop hash, "backref", hash
     _dumper( hash )
 .end
-.include "library/dumper.pir"
 CODE
 "VAR1" => Hash {
     "hello" => "world"
@@ -444,6 +444,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "self-referential properties (1)" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc hash
     .local pmc prop
 
@@ -455,7 +456,6 @@ pir_output_is( <<'CODE', <<'OUT', "self-referential properties (1)" );
     setprop hash, "self", prop
     _dumper( hash )
 .end
-.include "library/dumper.pir"
 CODE
 "VAR1" => Hash {
     "hello" => "world"
@@ -468,6 +468,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "self-referential properties (2)" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
     .local pmc hash1
     .local pmc hash2
@@ -490,7 +491,6 @@ pir_output_is( <<'CODE', <<'OUT', "self-referential properties (2)" );
     push array, prop
     _dumper( array )
 .end
-.include "library/dumper.pir"
 CODE
 "VAR1" => ResizablePMCArray (size:4) [
     Hash {
@@ -512,6 +512,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc temp
     .local pmc array
 
@@ -557,7 +558,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
     .end_return
 .end
 .namespace []
-.include "library/dumper.pir"
 CODE
 "VAR1" => ResizablePMCArray (size:2) [
     PMC 'TestClass' {
@@ -575,6 +575,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping 'null'" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
     .local pmc temp
 
@@ -596,7 +597,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping 'null'" );
 
     _dumper( array, "array" )
 .end
-.include "library/dumper.pir"
 CODE
 "array" => ResizablePMCArray (size:5) [
     0,
@@ -610,8 +610,8 @@ OUT
 # no. 14
 pir_output_is( << 'CODE', << 'OUT', "dumping strings" );
 
-.include "library/dumper.pir"
 .sub _test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
     array = new 'ResizablePMCArray'
 
@@ -643,6 +643,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping complex data in Hash" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -698,7 +699,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping complex data in Hash" );
     _dumper( hash1,"hash1" )
 
 .end
-.include "library/dumper.pir"
 CODE
 "hash1" => Hash {
 }
@@ -745,13 +745,13 @@ OUT
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping Integer PMC" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc int1
 
     new int1, 'Integer'
     int1 = 12345
     _dumper( int1, "Int:" )
 .end
-.include "library/dumper.pir"
 CODE
 "Int:" => 12345
 OUTPUT
@@ -760,13 +760,13 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping Float PMC" );
 
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc float1
 
     new float1, 'Float'
     float1 = 12345.678
     _dumper( float1, "Float:" )
 .end
-.include "library/dumper.pir"
 CODE
 "Float:" => 12345.678
 OUTPUT
@@ -774,6 +774,7 @@ OUTPUT
 # no. 18
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -781,7 +782,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC" );
     push array, "hello"
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => ResizablePMCArray (size:2) [
     12345,
@@ -792,6 +792,7 @@ OUTPUT
 # no. 19
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizableStringArray'
@@ -799,7 +800,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC" );
     push array, "world"
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => ResizableStringArray (size:2) [
     "hello",
@@ -810,6 +810,7 @@ OUTPUT
 # no. 20
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizableIntegerArray'
@@ -817,7 +818,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC" );
     push array, 67890
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => ResizableIntegerArray (size:2) [
     12345,
@@ -828,6 +828,7 @@ OUTPUT
 # no. 21
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'ResizableFloatArray'
@@ -835,7 +836,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC" );
     push array, 67.89
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => ResizableFloatArray (size:2) [
     123.45,
@@ -846,6 +846,7 @@ OUTPUT
 # no. 22
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'FixedPMCArray'
@@ -854,7 +855,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC" );
     array[1] = "hello"
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => FixedPMCArray (size:2) [
     12345,
@@ -865,6 +865,7 @@ OUTPUT
 # no. 23
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'FixedStringArray'
@@ -873,7 +874,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC" );
     array[1] = "world"
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => FixedStringArray (size:2) [
     "hello",
@@ -884,6 +884,7 @@ OUTPUT
 # no. 24
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'FixedIntegerArray'
@@ -892,7 +893,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC" );
     array[1] = 67890
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => FixedIntegerArray (size:2) [
     12345,
@@ -903,6 +903,7 @@ OUTPUT
 # no. 25
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC" );
 .sub test :main
+    load_bytecode "dumper.pbc"
     .local pmc array
 
     new array, 'FixedFloatArray'
@@ -911,7 +912,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC" );
     array[1] = 67.89
     _dumper( array, "array:" )
 .end
-.include "library/dumper.pir"
 CODE
 "array:" => FixedFloatArray (size:2) [
     123.45,
@@ -924,6 +924,7 @@ OUTPUT
 # no. 27
 pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper" );
 .sub main :main
+    load_bytecode "dumper.pbc"
     .local pmc o, cl
     cl = subclass 'ResizablePMCArray', 'bar'
     o = new cl
@@ -948,7 +949,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper" );
     print "\n}"
 .end
 .namespace []
-.include 'library/dumper.pir'
 
 CODE
 "VAR1" => PMC 'bar'  __value => {

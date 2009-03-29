@@ -11,7 +11,7 @@ version 0.1
 
 =head1 SYNOPSIS
 
-    .include "yaml_dumper.pir"
+    load_bytecode "dumper.pbc"
 
     # dump the P0 register
     yaml( $P0 )

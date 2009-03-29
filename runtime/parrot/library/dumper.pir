@@ -11,7 +11,7 @@ version 0.10
 
 =head1 SYNOPSIS
 
-    .include "dumper.pir"
+    load_bytecode "dumper.pbc"
     
     # dump the $P0 register
     _dumper( $P0 )

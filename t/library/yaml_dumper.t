@@ -26,8 +26,8 @@ Tests data dumping in YAML format.
 
 pir_output_is( <<'CODE', <<'OUT', "dumping array of sorted numbers" );
 
-.include "library/yaml_dumper.pir"
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -64,8 +64,8 @@ OUT
 
 
 pir_output_is( <<'CODE', <<'OUT', "dumping unsorted numbers" );
-.include "library/yaml_dumper.pir"
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -103,8 +103,8 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "dumping sorted strings" );
 
-.include "library/yaml_dumper.pir"
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -139,6 +139,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -153,7 +154,6 @@ pir_output_is( <<'CODE', <<'OUT', "sorting unsorted strings" );
 
     yaml( array, "strings" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -174,6 +174,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping different types" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -200,7 +201,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping different types" );
 
     yaml( array, "array" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -233,6 +233,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping complex data" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -289,7 +290,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping complex data" );
     yaml( hash1,"hash1" )
 
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -354,6 +354,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "properties", todo => 'not yet implemented' );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc str
     .local pmc array
 
@@ -372,7 +373,6 @@ pir_output_is( <<'CODE', <<'OUT', "properties", todo => 'not yet implemented' );
     yaml( array )
 
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -389,6 +389,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "indent string", todo => 'not supported' );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc hash1
     .local pmc hash2
     .local pmc array1
@@ -419,7 +420,6 @@ pir_output_is( <<'CODE', <<'OUT', "indent string", todo => 'not supported' );
     print indent
     print "'\n"
 .end
-.include "library/yaml_dumper.pir"
 CODE
 "hash" : Hash {
 |  "hash2" : Hash {
@@ -457,6 +457,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "back-referencing properties", todo => 'not yet implemented' );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc hash
 
     new hash, 'Hash'
@@ -465,7 +466,6 @@ pir_output_is( <<'CODE', <<'OUT', "back-referencing properties", todo => 'not ye
     setprop hash, "backref", hash
     yaml( hash )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 "VAR1" : Hash {
     "hello" : "world"
@@ -478,6 +478,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "self-referential properties (1)", todo => 'not yet implemented' );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc hash
     .local pmc prop
 
@@ -489,7 +490,6 @@ pir_output_is( <<'CODE', <<'OUT', "self-referential properties (1)", todo => 'no
     setprop hash, "self", prop
     yaml( hash )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 "VAR1" : Hash {
     "hello" : "world"
@@ -502,6 +502,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "self-referential properties (2)", todo => 'not yet implemented' );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
     .local pmc hash1
     .local pmc hash2
@@ -524,7 +525,6 @@ pir_output_is( <<'CODE', <<'OUT', "self-referential properties (2)", todo => 'no
     push array, prop
     yaml( array )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 "VAR1" : ResizablePMCArray (size:4) [
     Hash {
@@ -546,6 +546,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc temp
     .local pmc array
 
@@ -591,7 +592,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping objects" );
     .end_return
 .end
 .namespace []
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -612,6 +612,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping 'null'" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
     .local pmc temp
 
@@ -633,7 +634,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping 'null'" );
 
     yaml( array, "array" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -650,8 +650,8 @@ OUT
 
 pir_output_is( << 'CODE', << 'OUT', "dumping strings" );
 
-.include "library/yaml_dumper.pir"
 .sub _test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
     array = new 'ResizablePMCArray'
 
@@ -686,6 +686,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', "dumping complex data in Hash" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc hash1
     .local pmc hash2
     .local pmc hash3
@@ -741,7 +742,6 @@ pir_output_is( <<'CODE', <<'OUT', "dumping complex data in Hash" );
     yaml( hash1,"hash1" )
 
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -806,13 +806,13 @@ OUT
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping Integer PMC" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc int1
 
     new int1, 'Integer'
     int1 = 12345
     yaml( int1, "Int" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -824,13 +824,13 @@ OUTPUT
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping Float PMC" );
 
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc float1
 
     new float1, 'Float'
     float1 = 12345.678
     yaml( float1, "Float" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -842,6 +842,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizablePMCArray'
@@ -849,7 +850,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizablePMCArray PMC" );
     push array, "hello"
     yaml( array, "array" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -863,6 +863,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizableStringArray'
@@ -870,7 +871,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableStringArray PMC" );
     push array, "world"
     yaml( array, "array:" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -884,6 +884,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizableIntegerArray'
@@ -891,7 +892,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableIntegerArray PMC" );
     push array, 67890
     yaml( array, "array:" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -905,6 +905,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'ResizableFloatArray'
@@ -912,7 +913,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping ResizableFloatArray PMC" );
     push array, 67.89
     yaml( array, "array:" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -926,6 +926,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'FixedPMCArray'
@@ -934,7 +935,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedPMCArray PMC" );
     array[1] = "hello"
     yaml( array, "array:" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -948,6 +948,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'FixedStringArray'
@@ -956,7 +957,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedStringArray PMC" );
     array[1] = "world"
     yaml( array, "array:" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -970,6 +970,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'FixedIntegerArray'
@@ -978,7 +979,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedIntegerArray PMC" );
     array[1] = 67890
     yaml( array, "array:" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -992,6 +992,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC" );
 .sub test :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc array
 
     new array, 'FixedFloatArray'
@@ -1000,7 +1001,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "dumping FixedFloatArray PMC" );
     array[1] = 67.89
     yaml( array, "array:" )
 .end
-.include "library/yaml_dumper.pir"
 CODE
 ---
 {
@@ -1014,6 +1014,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper", todo => 'not yet implemented');
 .sub main :main
+    load_bytecode "yaml_dumper.pbc"
     .local pmc o, cl
     cl = subclass 'ResizablePMCArray', 'bar'
     o = new cl
@@ -1038,7 +1039,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "custom dumper", todo => 'not yet implement
     print "\n}"
 .end
 .namespace []
-.include 'library/yaml_dumper.pir'
 
 CODE
 ---

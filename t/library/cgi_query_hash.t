@@ -15,9 +15,8 @@ Test  [ 'CGI'; 'QueryHash' ]
 
 =cut
 
-.include "library/dumper.pir"
-
 .sub test :main
+    load_bytecode "dumper.pbc"
     .include 'include/test_more.pir'
 
     load_bytecode 'CGI/QueryHash.pbc'

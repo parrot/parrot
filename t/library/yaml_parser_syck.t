@@ -29,9 +29,9 @@ TODO: {
 
     pir_output_is( << 'CODE', << 'OUT', "basic parsing" );
 
-.include "YAML/Parser/Syck.pir"
-.include "dumper.pir"
 .sub test :main
+    load_bytecode "YAML/Parser/Syck.pbc"
+    load_bytecode "dumper.pbc"
 
   .local pmc loaded
   ( loaded ) = load( "---\n- key1: val1\n  key2: val2\n- elem1\n- elem12\n- elem123\n- elem1234\n- elem12345\n- elem123456\n- elem1234567\n- elem12345678\n" )

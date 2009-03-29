@@ -7,6 +7,8 @@ P6object - Perl 6-like methods and metaclasses for Parrot
 =head1 SYNOPSIS
 
     .sub 'main'
+        load_bytecode "dumper.pbc"
+
         # load this library
         load_bytecode 'P6object.pbc'
 
@@ -286,8 +288,6 @@ to map to a class name that already exists in Parrot (e.g., 'Hash'
 or 'Object').
 
 =cut
-
-.include 'library/dumper.pir'
 
 .sub 'register' :method
     .param pmc parrotclass
