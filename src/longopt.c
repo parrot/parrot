@@ -65,7 +65,8 @@ static char longopt_error_buffer[512];
 
 /*
 
-=item C<int longopt_get>
+=item C<int longopt_get(PARROT_INTERP, int argc, const char* argv[],
+const struct longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
 
 Gets long or short options, specified in C<options[]> (see
 F<docs/dev/longopt.dev>).
@@ -119,7 +120,9 @@ longopt_get(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
 
 /*
 
-=item C<static int longopt_get_longopt>
+=item C<static int longopt_get_longopt(PARROT_INTERP, int argc,
+const char* argv[], const struct longopt_opt_decl options[],
+struct longopt_opt_info* info_buf)>
 
 Find the option identifier of a long option.
 
@@ -213,7 +216,9 @@ longopt_get_longopt(PARROT_INTERP, int argc, ARGIN(const char* argv[]),
 
 /*
 
-=item C<static int longopt_get_shortopt>
+=item C<static int longopt_get_shortopt(PARROT_INTERP, int argc,
+const char* argv[], const struct longopt_opt_decl options[],
+struct longopt_opt_info* info_buf)>
 
 Find the option identifier of the next short option.
 

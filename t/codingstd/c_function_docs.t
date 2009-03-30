@@ -214,7 +214,6 @@ src/interpreter.c
 src/key.c
 src/library.c
 src/list.c
-src/longopt.c
 src/malloc-trace.c
 src/misc.c
 src/multidispatch.c
