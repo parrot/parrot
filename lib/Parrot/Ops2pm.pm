@@ -210,7 +210,7 @@ structure.
 =item * Comment
 
 It is at this point that warnings about experimental opcodes will be
-emitted.  Example:
+emitted if you are working in a checkout from the Parrot repository.  Example:
 
     trap                      1247       experimental, not in ops.num
 
@@ -284,9 +284,6 @@ sub prepare_real_ops {
         my $n      = $self->{optable}{$opname};    # former global
         if ( $n != $el->{CODE} ) {
             die "op $opname: number mismatch: ops.num $n vs. core.ops $el->{CODE}";
-        }
-        if ( $seq != $el->{CODE} ) {
-            die "op $opname: sequence mismatch: ops.num $seq vs. core.ops $el->{CODE}";
         }
         push @{ $real_ops->{OPS} }, $el;
         ++$seq;
