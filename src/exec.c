@@ -73,7 +73,8 @@ int Parrot_exec_run = 0;
 
 /*
 
-=item C<void Parrot_exec>
+=item C<void Parrot_exec(PARROT_INTERP, opcode_t *pc, opcode_t *code_start,
+opcode_t *code_end)>
 
 Call the jit to get the program code. Adds the members of the data
 section. And emits the executable.
@@ -143,7 +144,8 @@ Parrot_exec(PARROT_INTERP, ARGIN(opcode_t *pc),
 
 /*
 
-=item C<static void add_data_member>
+=item C<static void add_data_member(Parrot_exec_objfile_t *obj,
+const void *src, size_t len)>
 
 Adds a member to the data section, storing the size of it at
 C<< obj->data_size[N] >>.
@@ -183,7 +185,7 @@ add_data_member(ARGMOD(Parrot_exec_objfile_t *obj),
 
 /*
 
-=item C<static void exec_init>
+=item C<static void exec_init(Parrot_exec_objfile_t *obj)>
 
 Initialize the obj structure.
 
@@ -222,7 +224,8 @@ exec_init(ARGIN(Parrot_exec_objfile_t *obj))
 
 /*
 
-=item C<int Parrot_exec_add_symbol>
+=item C<int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj,
+const char *symbol, int stype)>
 
 Adds a symbol to the object file.
 
@@ -269,7 +272,8 @@ Parrot_exec_add_symbol(ARGMOD(Parrot_exec_objfile_t *obj),
 
 /*
 
-=item C<int * Parrot_exec_add_text_rellocation_reg>
+=item C<int * Parrot_exec_add_text_rellocation_reg(Parrot_exec_objfile_t *obj,
+char *nptr, const char *var, int offset, int disp)>
 
 Adds a register's text rellocation to the object file.  Wrapper
 around C<Parrot_exec_add_text_rellocation>.
@@ -293,7 +297,8 @@ Parrot_exec_add_text_rellocation_reg(ARGIN(Parrot_exec_objfile_t *obj),
 
 /*
 
-=item C<void Parrot_exec_add_text_rellocation_func>
+=item C<void Parrot_exec_add_text_rellocation_func(Parrot_exec_objfile_t *obj,
+char *nptr, const char *func_name)>
 
 Adds a function's text rellocation to the object file.  Wrapper
 around C<Parrot_exec_add_text_rellocation>.
@@ -313,7 +318,8 @@ Parrot_exec_add_text_rellocation_func(ARGIN(Parrot_exec_objfile_t *obj),
 
 /*
 
-=item C<void Parrot_exec_add_text_rellocation>
+=item C<void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj,
+char *nptr, int type, const char *symbol, int disp)>
 
 Adds a text rellocation to the object file.
 
@@ -361,7 +367,8 @@ Parrot_exec_add_text_rellocation(ARGIN(Parrot_exec_objfile_t *obj), ARGIN(char *
 
 /*
 
-=item C<static int symbol_list_find>
+=item C<static int symbol_list_find(const Parrot_exec_objfile_t *obj,
+const char *symbol)>
 
 Returns the index of C<symbol> in the symbol list. Returns -1 if it is
 not in the list.

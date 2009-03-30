@@ -46,7 +46,7 @@ static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 
 /*
 
-=item C<static STRING* trace_class_name>
+=item C<static STRING* trace_class_name(PARROT_INTERP, const PMC* pmc)>
 
 Obtains the class name of the PMC.
 
@@ -74,7 +74,7 @@ trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 
 /*
 
-=item C<void trace_pmc_dump>
+=item C<void trace_pmc_dump(PARROT_INTERP, PMC *pmc)>
 
 Prints a PMC to C<stderr>.
 
@@ -162,7 +162,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 
 /*
 
-=item C<int trace_key_dump>
+=item C<int trace_key_dump(PARROT_INTERP, PMC *key)>
 
 Prints a key to C<stderr>, returns the length of the output.
 
@@ -241,11 +241,12 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<void trace_op_dump>
-
-TODO: This isn't really part of the API, but here's its documentation.
+=item C<void trace_op_dump(PARROT_INTERP, const opcode_t *code_start,
+const opcode_t *pc)>
 
 Prints the PC, OP and ARGS. Used by C<trace_op()>.
+
+I<Not really part of the API.>
 
 =cut
 
@@ -476,12 +477,13 @@ done:
 
 /*
 
-=item C<void trace_op>
-
-TODO: This isn't really part of the API, but here's its documentation.
+=item C<void trace_op(PARROT_INTERP, const opcode_t *code_start,
+const opcode_t *code_end, const opcode_t *pc)>
 
 Prints the PC, OP and ARGS. Used by C<runops_trace()>. With bounds
 checking.
+
+I<Not really part of the API.>
 
 =cut
 

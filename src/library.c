@@ -126,7 +126,7 @@ static STRING* try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 
 /*
 
-=item C<void parrot_init_library_paths>
+=item C<void parrot_init_library_paths(PARROT_INTERP)>
 
 Create an array of StringArrays with library searchpaths and shared
 extension used for loading various files at runtime. The created
@@ -256,7 +256,7 @@ parrot_init_library_paths(PARROT_INTERP)
 
 /*
 
-=item C<static PMC* get_search_paths>
+=item C<static PMC* get_search_paths(PARROT_INTERP, enum_lib_paths which)>
 
 Return lib_paths as array of StringArrays with library searchpaths and shared
 extension used for loading various files at runtime.
@@ -296,7 +296,7 @@ static const char win32_path_separator = '\\';
 
 /*
 
-=item C<static int is_abs_path>
+=item C<static int is_abs_path(const STRING *file)>
 
 Determines whether a file name given by a fixed-8 or utf8 C<STRING> is an
 absolute file name. Returns C<1> if the filename is absolute, returns C<0>
@@ -337,7 +337,7 @@ is_abs_path(ARGIN(const STRING *file))
 
 /*
 
-=item C<static void cnv_to_win32_filesep>
+=item C<static void cnv_to_win32_filesep(STRING *path)>
 
 Converts a path with forward slashes to one with backward slashes.
 
@@ -363,7 +363,7 @@ cnv_to_win32_filesep(ARGMOD(STRING *path))
 
 /*
 
-=item C<static STRING* path_finalize>
+=item C<static STRING* path_finalize(PARROT_INTERP, STRING *path)>
 
 Ensures the given STRING C<path> has a C-style NULL character at the end. The
 length of the string is not increased to account for this NULL, however. In
@@ -401,7 +401,7 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
 
 /*
 
-=item C<static STRING* path_guarantee_trailing_separator>
+=item C<static STRING* path_guarantee_trailing_separator(PARROT_INTERP, STRING *path)>
 
 unary path argument. the path string will have a
 trailing path-separator appended if it is not
@@ -429,7 +429,7 @@ path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 
 /*
 
-=item C<static STRING* path_append>
+=item C<static STRING* path_append(PARROT_INTERP, STRING *l_path, STRING *r_path)>
 
 binary path arguments, the left arg is modified.
 a trailing separator is guaranteed for the left
@@ -453,7 +453,7 @@ path_append(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 
 /*
 
-=item C<static STRING* path_concat>
+=item C<static STRING* path_concat(PARROT_INTERP, STRING *l_path, STRING *r_path)>
 
 binary path arguments. A new string is created
 that is the concatenation of the two path components
@@ -480,7 +480,7 @@ path_concat(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 
 /*
 
-=item C<static STRING* try_load_path>
+=item C<static STRING* try_load_path(PARROT_INTERP, STRING* path)>
 
 Attempts to load a file with name C<path>. If the file is successfully located,
 the finalized name of the file is returned as a STRING. Otherwise, returns
@@ -511,7 +511,7 @@ try_load_path(PARROT_INTERP, ARGMOD(STRING* path))
 
 /*
 
-=item C<static STRING* try_bytecode_extensions>
+=item C<static STRING* try_bytecode_extensions(PARROT_INTERP, STRING* path)>
 
 Guess extensions, so that the user can drop the extensions
 leaving it up to the build process/install whether or not
@@ -591,7 +591,8 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
 /*
 
-=item C<void Parrot_add_library_path>
+=item C<void Parrot_add_library_path(PARROT_INTERP, STRING *path,
+enum_lib_paths which)>
 
 Add a path to the library searchpath of the given type.
 
@@ -615,7 +616,8 @@ Parrot_add_library_path(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_add_library_path_from_cstring>
+=item C<void Parrot_add_library_path_from_cstring(PARROT_INTERP,
+const char *path, enum_lib_paths which)>
 
 Add a path to the library searchpath of the given type (passing in a C string).
 
@@ -639,23 +641,12 @@ Parrot_add_library_path_from_cstring(PARROT_INTERP,
 
 /*
 
-=item C<char* Parrot_locate_runtime_file>
+=item C<STRING* Parrot_locate_runtime_file_str(PARROT_INTERP, STRING *file,
+enum_runtime_ft type)>
 
 Locate the full path for C<file_name> and the given file type(s). If
 successful, returns a C-string allocated with C<Parrot_str_to_cstring> or
 NULL otherwise.  Remember to free the string with C<Parrot_str_free_cstring()>.
-
-=item C<STRING* Parrot_locate_runtime_file_str>
-
-Like above but use and return STRINGs.
-
-Locate the full path for C<file_name> and the given file type(s). If
-successful, returns a C-string allocated with C<Parrot_str_to_cstring> or
-NULL otherwise.
-
-If successful, the returned STRING is 0-terminated so that
-C<result-E<gt>strstart> is usable as B<const char*> c-string for C library
-functions like fopen(3).  This is the preferred API function.
 
 The C<enum_runtime_ft type> is one or more of the types defined in
 F<include/parrot/library.h>.
@@ -729,6 +720,27 @@ Parrot_locate_runtime_file_str(PARROT_INTERP, ARGMOD(STRING *file),
     return full_name;
 }
 
+/*
+
+=item C<char* Parrot_locate_runtime_file(PARROT_INTERP, const char *file_name,
+enum_runtime_ft type)>
+
+Locate the full path for C<file_name> and the given file type(s). If
+successful, returns a C-string allocated with C<Parrot_str_to_cstring> or
+NULL otherwise.  Remember to free the string with C<Parrot_str_free_cstring()>.
+
+If successful, the returned STRING is 0-terminated so that
+C<result-E<gt>strstart> is usable as B<const char*> c-string for C library
+functions like fopen(3).  This is the preferred API function.
+
+The C<enum_runtime_ft type> is one or more of the types defined in
+F<include/parrot/library.h>.
+
+=cut
+
+*/
+
+
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
@@ -753,7 +765,7 @@ Parrot_locate_runtime_file(PARROT_INTERP, ARGIN(const char *file_name),
 
 /*
 
-=item C<char* Parrot_get_runtime_prefix>
+=item C<char* Parrot_get_runtime_prefix(PARROT_INTERP)>
 
 Return a malloced C-string for the runtime prefix.  The calling function
 must free it.
@@ -793,7 +805,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
 
 /*
 
-=item C<STRING * Parrot_get_runtime_path>
+=item C<STRING * Parrot_get_runtime_path(PARROT_INTERP)>
 
 Return a string for the runtime prefix.
 
@@ -833,7 +845,8 @@ Parrot_get_runtime_path(PARROT_INTERP)
 
 /*
 
-=item C<STRING * parrot_split_path_ext>
+=item C<STRING * parrot_split_path_ext(PARROT_INTERP, STRING *in,
+STRING **wo_ext, STRING **ext)>
 
 Split the pathstring C<in> into <path><filestem><ext>. Return the
 C<filestem> of the pathstring. Set C<wo_ext> to the part without

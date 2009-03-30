@@ -28,7 +28,8 @@ called by C<Parrot_exit()> when the interpreter exits.
 
 /*
 
-=item C<void Parrot_on_exit>
+=item C<void Parrot_on_exit(PARROT_INTERP, exit_handler_f function,
+void *arg)>
 
 Register the specified function to be called on exit.
 
@@ -54,7 +55,7 @@ Parrot_on_exit(PARROT_INTERP, NOTNULL(exit_handler_f function), ARGIN_NULLOK(voi
 
 /*
 
-=item C<void Parrot_exit>
+=item C<void Parrot_exit(PARROT_INTERP, int status)>
 
 Exit, calling any registered exit handlers.
 

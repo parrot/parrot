@@ -118,7 +118,6 @@ __DATA__
 # unchecked
 
 compilers/imcc/debug.c
-compilers/imcc/imc.c
 compilers/imcc/instructions.c
 compilers/imcc/main.c
 compilers/imcc/optimizer.c
@@ -137,7 +136,6 @@ compilers/pirc/src/pirmacro.c
 compilers/pirc/src/pirop.c
 compilers/pirc/src/pirpcc.c
 compilers/pirc/src/pirregalloc.c
-compilers/pirc/src/pirsymbol.c
 
 config/gen/platform/ansi/dl.c
 config/gen/platform/ansi/exec.c
@@ -168,15 +166,7 @@ include/parrot/atomic/gcc_pcc.h
 
 src/atomic/gcc_x86.c
 
-src/call/ops.c
 src/call/pcc.c
-
-src/gc/generational_ms.c
-
-src/io/io_string.c
-src/io/socket_api.c
-src/io/socket_unix.c
-src/io/socket_win32.c
 
 src/jit/hppa/jit_emit.h
 src/jit/amd64/jit_defs.c
@@ -191,19 +181,10 @@ src/jit/sun4/jit_emit.h
 src/jit/alpha/jit_emit.h
 src/jit/arm/jit_emit.h
 
-src/string/charset/ascii.c
-src/string/charset/binary.c
-src/string/charset/iso-8859-1.c
-src/string/charset/unicode.c
-
-src/byteorder.c
 src/debug.c
 src/dynext.c
-src/embed.c
 src/events.c
 src/exceptions.c
-src/exec.c
-src/exit.c
 src/extend.c
 src/global.c
 src/hash.c
@@ -212,11 +193,9 @@ src/inter_create.c
 src/inter_misc.c
 src/interpreter.c
 src/key.c
-src/library.c
 src/list.c
 src/malloc-trace.c
 src/misc.c
-src/multidispatch.c
 src/nci_test.c
 src/oo.c
 src/packdump.c
@@ -231,18 +210,26 @@ src/pic.c
 src/pic_jit.c
 src/pmc.c
 src/pmc_freeze.c
-src/runops_cores.c
 src/spf_render.c
 src/spf_vtable.c
-src/stacks.c
 src/sub.c
 src/thread.c
-src/trace.c
 src/tsq.c
 src/utils.c
 
 # Needs docs written. Boilerplate in place.
 src/datatypes.c
+src/gc/generational_ms.c
+src/io/io_string.c
+src/io/socket_api.c
+src/io/socket_unix.c
+src/io/socket_win32.c
+src/multidispatch.c
+src/string/charset/ascii.c
+src/string/charset/binary.c
+src/string/charset/iso-8859-1.c
+src/string/charset/unicode.c
+
 
 # Local Variables:
 #   mode: cperl

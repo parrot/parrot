@@ -84,7 +84,7 @@ const int valuetype_pirtype_clut[10] = {
 /*
 
 =item C<static int
-next_register(struct lexer_state * const lexer, pir_type type)>
+next_register(lexer_state * const lexer, pir_type type)>
 
 Returns a new register of the specified type.
 This is the vanilla register allocator.
@@ -675,8 +675,9 @@ find_global_constant(NOTNULL(lexer_state * const lexer), NOTNULL(char const * co
 
 /*
 
-=item C<static label *
-new_label(char * const name, unsigned offset)>
+=item C<static local_label *
+new_local_label(lexer_state * const lexer, char const * const name,
+unsigned offset)>
 
 Constructor for a label. Create a new label structure, fill out the details
 and return it. C<name> is the name of the label; C<offset> is its current

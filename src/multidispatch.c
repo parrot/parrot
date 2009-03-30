@@ -255,7 +255,8 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
 
 /*
 
-=item C<PMC* Parrot_mmd_find_multi_from_sig_obj>
+=item C<PMC* Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, STRING *name,
+PMC *invoke_sig)>
 
 Collect a list of possible candidates for a given sub name and call signature.
 Rank the possible candidates by Manhattan Distance, and return the best
@@ -285,7 +286,8 @@ Parrot_mmd_find_multi_from_sig_obj(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC
 
 /*
 
-=item C<void Parrot_mmd_multi_dispatch_from_c_args>
+=item C<void Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
+const char *name, const char *sig, ...)>
 
 Dispatches to a MultiSub from a variable-sized list of C arguments. The
 multiple dispatch system will figure out which sub should be called based on
@@ -343,7 +345,8 @@ Parrot_mmd_multi_dispatch_from_c_args(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_mmd_find_multi_from_long_sig>
+=item C<PMC * Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, STRING *name,
+STRING *long_sig)>
 
 Find the best candidate multi for a given sub name and signature. The signature
 is a string containing a comma-delimited list of type names.
@@ -378,7 +381,8 @@ Parrot_mmd_find_multi_from_long_sig(PARROT_INTERP, ARGIN(STRING *name),
 
 /*
 
-=item C<PMC * Parrot_mmd_sort_manhattan_by_sig_pmc>
+=item C<PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
+PMC *candidates, PMC *invoke_sig)>
 
 Given an array PMC (usually a MultiSub) and a CallSignature PMC, sorts the mmd
 candidates by their manhattan distance to the signature args and returns the
@@ -408,7 +412,7 @@ Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP, ARGIN(PMC *candidates),
 
 /*
 
-=item C<PMC * Parrot_mmd_sort_manhattan>
+=item C<PMC * Parrot_mmd_sort_manhattan(PARROT_INTERP, PMC *candidates)>
 
 Given an array PMC (usually a MultiSub) sorts the mmd candidates by their
 manhattan distance to the current args and returns the best one.
@@ -436,7 +440,7 @@ Parrot_mmd_sort_manhattan(PARROT_INTERP, ARGIN(PMC *candidates))
 
 /*
 
-=item C<static PMC* Parrot_mmd_arg_tuple_func>
+=item C<static PMC* Parrot_mmd_arg_tuple_func(PARROT_INTERP)>
 
 Return a list of argument types. PMC arguments are taken from registers
 according to calling conventions.
@@ -544,7 +548,8 @@ Parrot_mmd_arg_tuple_func(PARROT_INTERP)
 
 /*
 
-=item C<static void Parrot_mmd_search_classes>
+=item C<static void Parrot_mmd_search_classes(PARROT_INTERP, STRING *meth,
+PMC *arg_tuple, PMC *cl, INTVAL start_at_parent)>
 
 Search all the classes in all MultiSubs of the candidates C<cl> and return
 a list of all candidates. C<start_at_parent> is 0 to start at the class itself
@@ -602,7 +607,7 @@ Parrot_mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
 
 /*
 
-=item C<static INTVAL distance_cmp>
+=item C<static INTVAL distance_cmp(PARROT_INTERP, INTVAL a, INTVAL b)>
 
 =cut
 
@@ -632,7 +637,7 @@ distance_cmp(SHIM_INTERP, INTVAL a, INTVAL b)
 
 /*
 
-=item C<static PMC* mmd_build_type_tuple_from_type_list>
+=item C<static PMC* mmd_build_type_tuple_from_type_list(PARROT_INTERP, PMC *type_list)>
 
 Construct a FixedIntegerArray of type numbers from an array of
 type names. Used for multiple dispatch.
@@ -677,7 +682,7 @@ mmd_build_type_tuple_from_type_list(PARROT_INTERP, ARGIN(PMC *type_list))
 
 /*
 
-=item C<static PMC* mmd_build_type_tuple_from_long_sig>
+=item C<static PMC* mmd_build_type_tuple_from_long_sig(PARROT_INTERP, STRING *long_sig)>
 
 Construct a FixedIntegerArray of type numbers from a comma-delimited string of
 type names. Used for multiple dispatch.
@@ -700,7 +705,7 @@ mmd_build_type_tuple_from_long_sig(PARROT_INTERP, ARGIN(STRING *long_sig))
 
 /*
 
-=item C<PMC* Parrot_mmd_build_type_tuple_from_sig_obj>
+=item C<PMC* Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, PMC *sig_obj)>
 
 Construct a FixedIntegerArray of type numbers from the arguments of a Call
 Signature object. Used for multiple dispatch.
@@ -793,7 +798,7 @@ Parrot_mmd_build_type_tuple_from_sig_obj(PARROT_INTERP, ARGIN(PMC *sig_obj))
 
 /*
 
-=item C<static PMC* mmd_cvt_to_types>
+=item C<static PMC* mmd_cvt_to_types(PARROT_INTERP, PMC *multi_sig)>
 
 Given a ResizablePMCArray PMC containing some form of type identifier (either
 the string name of a class or a PMC representing the type), resolves all type
@@ -855,6 +860,14 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 }
 
 
+/*
+
+=item C<static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, PMC *sub_pmc)>
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 static PMC *
 Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
@@ -887,7 +900,7 @@ Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 /*
 
-=item C<static UINTVAL mmd_distance>
+=item C<static UINTVAL mmd_distance(PARROT_INTERP, PMC *pmc, PMC *arg_tuple)>
 
 Create Manhattan Distance of sub C<pmc> against given argument types.
 0xffff is the maximum distance
@@ -1026,7 +1039,7 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
 
 /*
 
-=item C<static PMC * Parrot_mmd_sort_candidates>
+=item C<static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP, PMC *arg_tuple, PMC *cl)>
 
 Sort the candidate list C<cl> by Manhattan Distance, returning the best
 candidate.
@@ -1060,7 +1073,7 @@ Parrot_mmd_sort_candidates(PARROT_INTERP, ARGIN(PMC *arg_tuple), ARGIN(PMC *cl))
 
 /*
 
-=item C<static PMC* Parrot_mmd_search_scopes>
+=item C<static PMC* Parrot_mmd_search_scopes(PARROT_INTERP, STRING *meth)>
 
 Search all scopes for MMD candidates matching the arguments given in
 C<arg_tuple>.
@@ -1087,7 +1100,7 @@ Parrot_mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
 
 /*
 
-=item C<static int mmd_maybe_candidate>
+=item C<static int Parrot_mmd_maybe_candidate(PARROT_INTERP, PMC *pmc, PMC *cl)>
 
 If the candidate C<pmc> is a Sub PMC, push it on the candidate list and
 return TRUE to stop further search.
@@ -1134,7 +1147,7 @@ Parrot_mmd_maybe_candidate(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *cl))
 
 /*
 
-=item C<static int mmd_search_local>
+=item C<static int mmd_search_local(PARROT_INTERP, STRING *name, PMC *candidates)>
 
 Search the current package namespace for matching candidates. Return
 TRUE if the MMD search should stop.
@@ -1155,7 +1168,8 @@ mmd_search_local(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *candidates))
 
 /*
 
-=item C<static void mmd_search_by_sig_obj>
+=item C<static void mmd_search_by_sig_obj(PARROT_INTERP, STRING *name,
+PMC *sig_obj, PMC *candidates)>
 
 Search the namespace of the first argument to the sub call for matching
 candidates.
@@ -1191,7 +1205,7 @@ mmd_search_by_sig_obj(PARROT_INTERP, ARGIN(STRING *name),
 
 /*
 
-=item C<static void mmd_search_global>
+=item C<static void mmd_search_global(PARROT_INTERP, STRING *name, PMC *cl)>
 
 Search the builtin namespace for matching candidates.
 
@@ -1217,7 +1231,7 @@ mmd_search_global(PARROT_INTERP, ARGIN(STRING *name), ARGIN(PMC *cl))
 
 /*
 
-=item C<static void mmd_add_multi_global>
+=item C<static void mmd_add_multi_global(PARROT_INTERP, STRING *sub_name, PMC *sub_obj)>
 
 Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
 stored in the global MULTI namespace.
@@ -1247,7 +1261,8 @@ mmd_add_multi_global(PARROT_INTERP, ARGIN(STRING *sub_name), ARGIN(PMC *sub_obj)
 
 /*
 
-=item C<static void mmd_add_multi_to_namespace>
+=item C<static void mmd_add_multi_to_namespace(PARROT_INTERP, STRING *ns_name,
+STRING *sub_name, PMC *sub_obj)>
 
 Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
 added as a method to a class.
@@ -1278,7 +1293,8 @@ mmd_add_multi_to_namespace(PARROT_INTERP, ARGIN(STRING *ns_name),
 
 /*
 
-=item C<void Parrot_mmd_add_multi_from_long_sig>
+=item C<void Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
+STRING *sub_name, STRING *long_sig, PMC *sub_obj)>
 
 Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
 stored in the global MULTI namespace.
@@ -1318,7 +1334,9 @@ Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_mmd_add_multi_from_c_args>
+=item C<void Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
+const char *sub_name, const char *short_sig,
+const char *long_sig, funcptr_t multi_func_ptr)>
 
 Create a MultiSub, or add a variant to an existing MultiSub. The MultiSub is
 stored in the specified namespace.
@@ -1358,7 +1376,8 @@ Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_mmd_add_multi_list_from_c_args>
+=item C<void Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
+const multi_func_list *mmd_info, INTVAL elements)>
 
 Create a collection of multiple dispatch subs from a C structure of
 information. Iterate through the list of details passed in. For each entry
@@ -1394,7 +1413,7 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
 
 /*
 
-=item C<MMD_Cache * Parrot_mmd_cache_create>
+=item C<MMD_Cache * Parrot_mmd_cache_create(PARROT_INTERP)>
 
 Creates and returns a new MMD cache.
 
@@ -1416,7 +1435,8 @@ Parrot_mmd_cache_create(PARROT_INTERP)
 
 /*
 
-=item C<static STRING * mmd_cache_key_from_values>
+=item C<static STRING * mmd_cache_key_from_values(PARROT_INTERP,
+const char *name, PMC *values)>
 
 Generates an MMD cache key from an array of values.
 
@@ -1461,7 +1481,8 @@ mmd_cache_key_from_values(PARROT_INTERP, ARGIN(const char *name),
 
 /*
 
-=item C<PMC * Parrot_mmd_cache_lookup_by_values>
+=item C<PMC * Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, MMD_Cache *cache,
+const char *name, PMC *values)>
 
 Takes an array of values for the call and does a lookup in the MMD cache.
 
@@ -1487,7 +1508,8 @@ Parrot_mmd_cache_lookup_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
 
 /*
 
-=item C<void Parrot_mmd_cache_store_by_values>
+=item C<void Parrot_mmd_cache_store_by_values(PARROT_INTERP, MMD_Cache *cache,
+const char *name, PMC *values, PMC *chosen)>
 
 Takes an array of values for the call along with a chosen candidate and puts
 it into the cache.
@@ -1511,7 +1533,8 @@ Parrot_mmd_cache_store_by_values(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
 
 /*
 
-=item C<static STRING * mmd_cache_key_from_types>
+=item C<static STRING * mmd_cache_key_from_types(PARROT_INTERP,
+const char *name, PMC *types)>
 
 Generates an MMD cache key from an array of types.
 
@@ -1558,7 +1581,8 @@ mmd_cache_key_from_types(PARROT_INTERP, ARGIN(const char *name),
 
 /*
 
-=item C<PMC * Parrot_mmd_cache_lookup_by_types>
+=item C<PMC * Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, MMD_Cache *cache,
+const char *name, PMC *types)>
 
 Takes an array of types for the call and does a lookup in the MMD cache.
 
@@ -1584,7 +1608,8 @@ Parrot_mmd_cache_lookup_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
 
 /*
 
-=item C<void Parrot_mmd_cache_store_by_types>
+=item C<void Parrot_mmd_cache_store_by_types(PARROT_INTERP, MMD_Cache *cache,
+const char *name, PMC *types, PMC *chosen)>
 
 Takes an array of types for the call along with a chosen candidate and puts
 it into the cache. The name parameter is optional, and if the cache is already
@@ -1609,7 +1634,7 @@ Parrot_mmd_cache_store_by_types(PARROT_INTERP, ARGMOD(MMD_Cache *cache),
 
 /*
 
-=item C<void Parrot_mmd_cache_mark>
+=item C<void Parrot_mmd_cache_mark(PARROT_INTERP, MMD_Cache *cache)>
 
 GC-marks an MMD cache.
 
@@ -1631,7 +1656,7 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
 
 /*
 
-=item C<void Parrot_mmd_cache_destroy>
+=item C<void Parrot_mmd_cache_destroy(PARROT_INTERP, MMD_Cache *cache)>
 
 Destroys an MMD cache.
 

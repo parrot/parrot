@@ -79,7 +79,7 @@ extern int Parrot_exec_run;
 
 /*
 
-=item C<Parrot_Interp Parrot_new>
+=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
 
 Returns a new Parrot interpreter.
 
@@ -111,7 +111,7 @@ extern void Parrot_initialize_core_pmcs(PARROT_INTERP);
 
 /*
 
-=item C<void Parrot_init_stacktop>
+=item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>
 
 Initializes the new interpreter when it hasn't been initialized before.
 
@@ -138,7 +138,7 @@ Parrot_init_stacktop(PARROT_INTERP, void *stack_top)
 
 /*
 
-=item C<void Parrot_set_flag>
+=item C<void Parrot_set_flag(PARROT_INTERP, INTVAL flag)>
 
 Sets on any of the following flags, specified by C<flag>, in the interpreter:
 
@@ -173,7 +173,7 @@ Parrot_set_flag(PARROT_INTERP, INTVAL flag)
 
 /*
 
-=item C<void Parrot_set_debug>
+=item C<void Parrot_set_debug(PARROT_INTERP, UINTVAL flag)>
 
 Set a debug flag: C<PARROT_DEBUG_FLAG>.
 
@@ -191,7 +191,7 @@ Parrot_set_debug(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_set_executable_name>
+=item C<void Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)>
 
 Sets the name of the executable launching Parrot (see C<pbc_to_exe> and the
 C<parrot> binary).
@@ -213,7 +213,7 @@ Parrot_set_executable_name(PARROT_INTERP, Parrot_String name)
 
 /*
 
-=item C<void Parrot_set_trace>
+=item C<void Parrot_set_trace(PARROT_INTERP, UINTVAL flag)>
 
 Set a trace flag: C<PARROT_TRACE_FLAG>
 
@@ -232,7 +232,7 @@ Parrot_set_trace(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_clear_flag>
+=item C<void Parrot_clear_flag(PARROT_INTERP, INTVAL flag)>
 
 Clears a flag in the interpreter.
 
@@ -250,7 +250,7 @@ Parrot_clear_flag(PARROT_INTERP, INTVAL flag)
 
 /*
 
-=item C<void Parrot_clear_debug>
+=item C<void Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)>
 
 Clears a flag in the interpreter.
 
@@ -268,7 +268,7 @@ Parrot_clear_debug(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_clear_trace>
+=item C<void Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)>
 
 Clears a flag in the interpreter.
 
@@ -286,7 +286,7 @@ Parrot_clear_trace(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<Parrot_Int Parrot_test_flag>
+=item C<Parrot_Int Parrot_test_flag(PARROT_INTERP, INTVAL flag)>
 
 Test the interpreter flags specified in C<flag>.
 
@@ -304,7 +304,7 @@ Parrot_test_flag(PARROT_INTERP, INTVAL flag)
 
 /*
 
-=item C<UINTVAL Parrot_test_debug>
+=item C<UINTVAL Parrot_test_debug(PARROT_INTERP, UINTVAL flag)>
 
 Test the interpreter flags specified in C<flag>.
 
@@ -322,7 +322,7 @@ Parrot_test_debug(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<UINTVAL Parrot_test_trace>
+=item C<UINTVAL Parrot_test_trace(PARROT_INTERP, UINTVAL flag)>
 
 Test the interpreter flags specified in C<flag>.
 
@@ -340,7 +340,7 @@ Parrot_test_trace(PARROT_INTERP, UINTVAL flag)
 
 /*
 
-=item C<void Parrot_set_run_core>
+=item C<void Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)>
 
 Sets the specified run core.
 
@@ -358,7 +358,7 @@ Parrot_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
 
 /*
 
-=item C<void Parrot_setwarnings>
+=item C<void Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)>
 
 Activates the given warnings.
 
@@ -377,7 +377,8 @@ Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
 
 /*
 
-=item C<PackFile * Parrot_pbc_read>
+=item C<PackFile * Parrot_pbc_read(PARROT_INTERP, const char *fullname,
+const int debug)>
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
@@ -563,7 +564,7 @@ again:
 
 /*
 
-=item C<void Parrot_pbc_load>
+=item C<void Parrot_pbc_load(PARROT_INTERP, PackFile *pf)>
 
 Loads the C<PackFile> returned by C<Parrot_pbc_read()>.
 
@@ -586,7 +587,7 @@ Parrot_pbc_load(PARROT_INTERP, NOTNULL(PackFile *pf))
 
 /*
 
-=item C<void Parrot_pbc_fixup_loaded>
+=item C<void Parrot_pbc_fixup_loaded(PARROT_INTERP)>
 
 Fixups after pbc loading
 
@@ -603,7 +604,7 @@ Parrot_pbc_fixup_loaded(PARROT_INTERP)
 
 /*
 
-=item C<static PMC* setup_argv>
+=item C<static PMC* setup_argv(PARROT_INTERP, int argc, char **argv)>
 
 Creates and returns C<ARGS> array PMC.
 
@@ -652,9 +653,9 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 
 /*
 
-=item C<static int prof_sort_f>
+=item C<static int prof_sort_f(const void *a, const void *b)>
 
-Sort function for profile data. Sorts by time.
+Sort function for profile data, by time.
 
 =cut
 
@@ -679,7 +680,7 @@ prof_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 
 /*
 
-=item C<static const char * op_name>
+=item C<static const char * op_name(PARROT_INTERP, int k)>
 
 Returns the name of the opcode.
 
@@ -715,7 +716,7 @@ op_name(PARROT_INTERP, int k)
 
 /*
 
-=item C<static FLOATVAL calibrate>
+=item C<static FLOATVAL calibrate(PARROT_INTERP)>
 
 With this calibration, reported times of C<parrot -p> almost match those
 measured with time C<parrot -R bounds>.
@@ -747,7 +748,7 @@ calibrate(PARROT_INTERP)
 
 /*
 
-=item C<static void print_profile>
+=item C<static void print_profile(PARROT_INTERP, int status, void *p)>
 
 Prints out a profile listing.
 
@@ -831,7 +832,7 @@ print_profile(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 /*
 
-=item C<static void print_debug>
+=item C<static void print_debug(PARROT_INTERP, int status, void *p)>
 
 Prints GC info.
 
@@ -854,7 +855,7 @@ print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
 
 /*
 
-=item C<static PMC* set_current_sub>
+=item C<static PMC* set_current_sub(PARROT_INTERP)>
 
 Search the fixup table for a PMC matching the argument.  On a match,
 set up the appropriate context.
@@ -918,7 +919,7 @@ set_current_sub(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_runcode>
+=item C<void Parrot_runcode(PARROT_INTERP, int argc, char **argv)>
 
 Sets up C<ARGV> and runs the ops.
 
@@ -1014,7 +1015,7 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 
 /*
 
-=item C<opcode_t * Parrot_debug>
+=item C<opcode_t * Parrot_debug(PARROT_INTERP, Parrot_Interp debugger, opcode_t * pc)>
 
 Runs the interpreter's bytecode in debugging mode.
 
@@ -1054,7 +1055,7 @@ Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
 
 /*
 
-=item C<static void print_constant_table>
+=item C<static void print_constant_table(PARROT_INTERP)>
 
 Print the contents of the constants table.
 
@@ -1143,7 +1144,8 @@ print_constant_table(PARROT_INTERP) {
 
 /*
 
-=item C<void Parrot_disassemble>
+=item C<void Parrot_disassemble(PARROT_INTERP, const char *outfile,
+Parrot_disassemble_options options)>
 
 Disassembles and prints out the interpreter's bytecode.
 
@@ -1235,7 +1237,7 @@ Parrot_disassemble(PARROT_INTERP, const char *outfile, Parrot_disassemble_option
 
 /*
 
-=item C<void Parrot_run_native>
+=item C<void Parrot_run_native(PARROT_INTERP, native_func_t func)>
 
 Run the C function C<func> through the program C<[enternative, end]>.
 This ensures that the function is run with the same setup as in other
@@ -1275,7 +1277,8 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
 
 /*
 
-=item C<Parrot_PMC Parrot_compile_string>
+=item C<Parrot_PMC Parrot_compile_string(PARROT_INTERP, Parrot_String type,
+const char *code, Parrot_String *error)>
 
 Compile code string.
 
