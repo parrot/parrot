@@ -115,6 +115,8 @@ foreach my $path (@files) {
 
 __DATA__
 
+# unchecked
+
 compilers/imcc/debug.c
 compilers/imcc/imc.c
 compilers/imcc/instructions.c
@@ -195,7 +197,6 @@ src/string/charset/iso-8859-1.c
 src/string/charset/unicode.c
 
 src/byteorder.c
-src/datatypes.c
 src/debug.c
 src/dynext.c
 src/embed.c
@@ -240,6 +241,8 @@ src/trace.c
 src/tsq.c
 src/utils.c
 
+# Needs docs written. Boilerplate in place.
+src/datatypes.c
 
 # Local Variables:
 #   mode: cperl

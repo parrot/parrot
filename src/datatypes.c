@@ -27,7 +27,7 @@ F<include/parrot/datatypes.h>.
 
 /*
 
-=item C<INTVAL Parrot_get_datatype_enum>
+=item C<INTVAL Parrot_get_datatype_enum(PARROT_INTERP, const STRING *type_name)>
 
 Return datatype C<enum> for C<STRING*> type_name.
 
@@ -58,7 +58,7 @@ Parrot_get_datatype_enum(PARROT_INTERP, ARGIN(const STRING *type_name))
 
 /*
 
-=item C<STRING * Parrot_get_datatype_name>
+=item C<STRING * Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)>
 
 Return datatype name for C<type>.
 
@@ -81,6 +81,13 @@ Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
     return string_make(interp, s, strlen(s), NULL, PObj_external_FLAG);
 }
 
+/*
+
+=item C<FLOATVAL floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num)>
+
+=cut
+
+*/
 
 PARROT_EXPORT
 FLOATVAL
