@@ -6,7 +6,8 @@ use strict;
 use warnings;
 
 use lib qw( . lib ../lib ../../lib );
-use Test::More tests => 1;
+use Test::More;
+use Parrot::Config qw(%PConfig);
 use Parrot::Distribution;
 use Parrot::Headerizer;
 
@@ -30,15 +31,26 @@ declared.
 =cut
 
 my $DIST = Parrot::Distribution->new;
-my @files = @ARGV ? @ARGV : $DIST->get_c_language_files();
 my $headerizer = Parrot::Headerizer->new;
-my @missing_docs;
 
-foreach my $file (@files) {
-    my $path = @ARGV ? $file : $file->path;
-    next unless $path =~ m/\.c|\.h$/;  # can't handle .ops or .pmc files yet
+# can't handle .ops or .pmc files yet
+my @files = grep {/\.(c|h)$/ } @ARGV ? @ARGV :
+    map {s/^$PConfig{build_dir}$PConfig{slash}//; $_} map {$_->path} $DIST->get_c_language_files();
+
+plan tests => scalar @files;
+
+my %todos;
+while (<DATA>) {
+    next if /^#/;
+    next if /^\s*$/;
+    chomp;
+    $todos{$_} = 1;
+}
+
+foreach my $path (@files) {
 
     my $buf = $DIST->slurp($path);
+    my @missing_docs;
 
     my @function_decls = $headerizer->extract_function_declarations($buf);
 
@@ -90,16 +102,146 @@ foreach my $file (@files) {
             push @missing_docs, "$path ($missing)\n$function_decl\n";
         }
     }
-}
 
-TODO: {
-    local $TODO = 'not all functions are documented yet.';
+    TODO: {
+        local $TODO = 'Missing function docs' if $todos{$path};
 
-    ok( !scalar(@missing_docs), 'Functions documented' )
+    ok ( ! @missing_docs, $path)
         or diag( scalar @missing_docs
             . " function(s) lacking documentation:\n"
-            . join "#" x 70 . "\n", @missing_docs, "\n");
+            . join ("\n", @missing_docs, "\n"));
+    }
 }
+
+__DATA__
+
+compilers/imcc/debug.c
+compilers/imcc/imc.c
+compilers/imcc/instructions.c
+compilers/imcc/main.c
+compilers/imcc/optimizer.c
+compilers/imcc/parser_util.c
+compilers/imcc/pbc.c
+compilers/imcc/pcc.c
+compilers/imcc/reg_alloc.c
+compilers/imcc/sets.c
+compilers/imcc/symreg.c
+compilers/pirc/src/bcgen.c
+compilers/pirc/src/pircapi.c
+compilers/pirc/src/pircompiler.c
+compilers/pirc/src/piremit.c
+compilers/pirc/src/pirerr.c
+compilers/pirc/src/pirmacro.c
+compilers/pirc/src/pirop.c
+compilers/pirc/src/pirpcc.c
+compilers/pirc/src/pirregalloc.c
+compilers/pirc/src/pirsymbol.c
+
+config/gen/platform/ansi/dl.c
+config/gen/platform/ansi/exec.c
+config/gen/platform/ansi/time.c
+config/gen/platform/darwin/dl.c
+config/gen/platform/darwin/memalign.c
+config/gen/platform/generic/dl.c
+config/gen/platform/generic/env.c
+config/gen/platform/generic/exec.c
+config/gen/platform/generic/math.c
+config/gen/platform/generic/memalign.c
+config/gen/platform/generic/memexec.c
+config/gen/platform/generic/stat.c
+config/gen/platform/generic/time.c
+config/gen/platform/netbsd/math.c
+config/gen/platform/openbsd/math.c
+config/gen/platform/openbsd/memexec.c
+config/gen/platform/solaris/math.c
+config/gen/platform/solaris/time.c
+config/gen/platform/win32/env.c
+
+examples/c/nanoparrot.c
+examples/c/test_main.c
+examples/compilers/japhc.c
+examples/embed/lorito.c
+
+include/parrot/atomic/gcc_pcc.h
+
+src/atomic/gcc_x86.c
+
+src/call/ops.c
+src/call/pcc.c
+
+src/gc/generational_ms.c
+
+src/io/io_string.c
+src/io/socket_api.c
+src/io/socket_unix.c
+src/io/socket_win32.c
+
+src/jit/hppa/jit_emit.h
+src/jit/amd64/jit_defs.c
+src/jit/arm/exec_dep.c
+src/jit/i386/exec_dep.c
+src/jit/ppc/exec_dep.c
+src/jit/ia64/jit_emit.h
+src/jit/mips/jit_emit.h
+src/jit/ppc/jit_emit.h
+src/jit/skeleton/jit_emit.h
+src/jit/sun4/jit_emit.h
+src/jit/alpha/jit_emit.h
+src/jit/arm/jit_emit.h
+
+src/string/charset/ascii.c
+src/string/charset/binary.c
+src/string/charset/iso-8859-1.c
+src/string/charset/unicode.c
+
+src/byteorder.c
+src/datatypes.c
+src/debug.c
+src/dynext.c
+src/embed.c
+src/events.c
+src/exceptions.c
+src/exec.c
+src/exit.c
+src/extend.c
+src/global.c
+src/global_setup.c
+src/hash.c
+src/inter_cb.c
+src/inter_create.c
+src/inter_misc.c
+src/interpreter.c
+src/key.c
+src/library.c
+src/list.c
+src/longopt.c
+src/malloc-trace.c
+src/misc.c
+src/multidispatch.c
+src/nci_test.c
+src/oo.c
+src/packdump.c
+src/packfile.c
+src/packfile/pf_items.c
+src/packout.c
+src/parrot_debugger.c
+src/pbc_disassemble.c
+src/pbc_dump.c
+src/pbc_merge.c
+src/pic.c
+src/pic_jit.c
+src/pmc.c
+src/pmc_freeze.c
+src/runops_cores.c
+src/spf_render.c
+src/spf_vtable.c
+src/stacks.c
+src/sub.c
+src/thread.c
+src/trace.c
+src/tsq.c
+src/utils.c
+
 
 # Local Variables:
 #   mode: cperl
