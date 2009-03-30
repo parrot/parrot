@@ -205,7 +205,6 @@ src/exec.c
 src/exit.c
 src/extend.c
 src/global.c
-src/global_setup.c
 src/hash.c
 src/inter_cb.c
 src/inter_create.c

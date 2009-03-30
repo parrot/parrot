@@ -50,7 +50,8 @@ static void parrot_set_config_hash_interpreter(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_set_config_hash_internal>
+=item C<void Parrot_set_config_hash_internal(const unsigned char* parrot_config,
+unsigned int parrot_config_size)>
 
 Called by Parrot_set_config_hash with the serialised hash which
 will be used in subsequently created Interpreters.
@@ -71,7 +72,7 @@ Parrot_set_config_hash_internal(ARGIN(const unsigned char* parrot_config),
 
 /*
 
-=item C<static void parrot_set_config_hash_interpreter>
+=item C<static void parrot_set_config_hash_interpreter(PARROT_INTERP)>
 
 Used internally to associate the config hash with an Interpreter
 using the last registered config data.
@@ -107,7 +108,7 @@ parrot_set_config_hash_interpreter(PARROT_INTERP)
 
 /*
 
-=item C<void init_world_once>
+=item C<void init_world_once(PARROT_INTERP)>
 
 Call init_world() if it hasn't been called before.
 
@@ -134,7 +135,7 @@ init_world_once(PARROT_INTERP)
 
 /*
 
-=item C<void init_world>
+=item C<void init_world(PARROT_INTERP)>
 
 This is the actual initialization code called by C<init_world_once()>.
 
@@ -189,7 +190,7 @@ init_world(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_global_setup_2>
+=item C<void parrot_global_setup_2(PARROT_INTERP)>
 
 called from inmidst of PMC bootstrapping between pass 0 and 1
 
