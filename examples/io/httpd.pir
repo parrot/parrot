@@ -93,6 +93,7 @@ The code was heavily hacked by bernhard and leo.
 
 .include "stat.pasm"
 .include 'except_types.pasm'
+.include 'socket.pasm'
 
 .sub main :main
     .local pmc listener, work, fp
@@ -112,7 +113,7 @@ The code was heavily hacked by bernhard and leo.
 
     # TODO provide sys/socket constants
     listener = new 'Socket'
-    listener.'socket'(2, 1, 6)	# PF_INET, SOCK_STREAM, tcp
+    listener.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)	# PF_INET, SOCK_STREAM, tcp
     unless listener goto ERR_NO_SOCKET
 
     # Pack a sockaddr_in structure with IP and port

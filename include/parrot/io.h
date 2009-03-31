@@ -905,7 +905,35 @@ extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 #define PIOCTL_LINEBUF             1
 #define PIOCTL_BLKBUF              2
 
+/*
+ * Enum definition of constants for Socket.socket.
+ * Happens to be same for corresponding values on Linux. Other implementations
+ * of socket API may have to map this values to system specific.
+ */
 
+/* &gen_from_enum(socket.pasm) */
+typedef enum {
+    PIO_PF_LOCAL    = 0,
+    PIO_PF_UNIX     = 1,
+    PIO_PF_INET     = 2,
+    PIO_PF_INET6    = 3,
+    PIO_PF_MAX      = 4     /* last elem */
+} Socket_Protocol_Family;
+
+typedef enum {
+    PIO_SOCK_STREAM     = 1,
+    PIO_SOCK_DGRAM      = 2,
+    PIO_SOCK_RAW        = 3,
+    PIO_SOCK_RDM        = 4,
+    PIO_SOCK_SEQPACKET  = 5,
+    PIO_SOCK_PACKET     = 10,
+} Socket_Socket_Type;
+
+typedef enum {
+    PIO_PROTO_TCP   = 6,
+    PIO_PROTO_UDP   = 17,
+} Socket_Protocol;
+/* &end_gen */
 
 #endif /* PARROT_IO_H_GUARD */
 

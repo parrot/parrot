@@ -114,6 +114,19 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 #  if PARROT_NET_DEVEL
 
 /*
+ * Mappping between PIO_PF_* constants and system-specific PF_* constants.
+ *
+ * Uses -1 for unsupported protocols.
+ */
+
+static int pio_pf[PIO_PF_MAX+1] = {
+    PF_LOCAL,   /* PIO_PF_LOCAL */
+    PF_UNIX,    /* PIO_PF_UNIX */
+    PF_INET,    /* PIO_PF_INET */
+    PF_INET6,   /* PIO_PF_INET6 */
+};
+
+/*
 
 =item C<INTVAL Parrot_io_socket_unix(PARROT_INTERP, PMC *s, int fam, int type,
 int proto)>
@@ -132,6 +145,13 @@ Parrot_io_socket_unix(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto
 {
     ASSERT_ARGS(Parrot_io_socket_unix)
     int i = 1;
+    /* convert Parrot's family to system family */
+    if (fam < 0 || fam >= PIO_PF_MAX)
+        return -1;
+    fam = pio_pf[fam];
+    if (fam < 0)
+        return -1;
+
     const int sock = socket(fam, type, proto);
     if (sock >= 0) {
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &i, sizeof (i));
