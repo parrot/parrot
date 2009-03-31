@@ -907,8 +907,9 @@ extern INTVAL           PIO_stdio_getblksize(PIOHANDLE fd);
 
 /*
  * Enum definition of constants for Socket.socket.
- * Happens to be same for corresponding values on Linux. Other implementations
- * of socket API may have to map this values to system specific.
+ * Note that these are the *parrot* values for these defines; the system
+ * values vary from one platform to the next.  See the lookup tables in
+ * socket_unix.c and socket_win32.c for the mappings.
  */
 
 /* &gen_from_enum(socket.pasm) */

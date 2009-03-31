@@ -66,10 +66,26 @@ static void get_sockaddr_in(PARROT_INTERP,
  */
 
 static int pio_pf[PIO_PF_MAX+1] = {
+#    ifdef PF_LOCAL
     PF_LOCAL,   /* PIO_PF_LOCAL */
+#    else
+    -1,         /* PIO_PF_LOCAL */
+#    endif
+#    ifdef PF_UNIX
     PF_UNIX,    /* PIO_PF_UNIX */
+#    else
+    -1,         /* PIO_PF_UNIX */
+#    endif
+#    ifdef PF_INET
     PF_INET,    /* PIO_PF_INET */
+#    else
+    -1,         /* PIO_PF_INET */
+#    endif
+#    ifdef PF_INET6
     PF_INET6,   /* PIO_PF_INET6 */
+#    else
+    -1,         /* PIO_PF_INET6 */
+#    endif
 };
 
 /*
@@ -90,7 +106,7 @@ INTVAL
 Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int proto)
 {
     ASSERT_ARGS(Parrot_io_socket_win32)
-    int i = 1;
+    int sock, i = 1;
     /* convert Parrot's family to system family */
     if (fam < 0 || fam >= PIO_PF_MAX)
         return -1;
@@ -98,7 +114,7 @@ Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int pro
     if (fam < 0)
         return -1;
 
-    const int sock = socket(fam, type, proto);
+    sock = socket(fam, type, proto);
     if (sock >= 0) {
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&i, sizeof (i));
         Parrot_io_set_os_handle(interp, s, sock);
