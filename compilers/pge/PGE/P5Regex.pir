@@ -200,7 +200,7 @@
     $I0 = pos - litstart
     $S0 = substr target, litstart, $I0
     $S0 = concat initchar, $S0
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
     goto end
   end:
     mob.'to'(pos)
@@ -344,7 +344,7 @@
     mob["isnegated"] = 1
   end:
     mob.'to'(pos)
-    mob.'result_object'(charlist)
+    mob.'!make'(charlist)
     .return (mob)
 
   err_close:

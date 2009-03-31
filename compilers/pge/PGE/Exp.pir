@@ -353,7 +353,7 @@ tree as a PIR code object that can be compiled.
     args = self.'getargs'(label, next)
     .local string literal
     .local int litlen
-    literal = self
+    literal = self.'ast'()
     litlen = length literal
 
     args['I'] = ''
@@ -414,10 +414,10 @@ tree as a PIR code object that can be compiled.
     $I0 = exp0['ignorecase']
     $I1 = exp1['ignorecase']
     if $I0 != $I1 goto concat_lit_shift
-    $S0 = exp0
-    $S1 = exp1
+    $S0 = exp0.'ast'()
+    $S1 = exp1.'ast'()
     concat $S0, $S1
-    exp0.'result_object'($S0)
+    exp0.'!make'($S0)
     goto concat_lit_loop
   concat_lit_shift:
     inc j
@@ -963,7 +963,7 @@ tree as a PIR code object that can be compiled.
     .param pmc label
     .param pmc next
     .local string token, test
-    token = self
+    token = self.'ast'()
 
     if token == '^' goto anchor_bos
     if token == '$' goto anchor_eos
@@ -1071,7 +1071,7 @@ tree as a PIR code object that can be compiled.
     .param pmc next
 
     .local string token
-    token = self
+    token = self.'ast'()
     self['negate'] = 1
     if token == '\D' goto digit
     if token == '\S' goto space
@@ -1106,7 +1106,7 @@ tree as a PIR code object that can be compiled.
     .param string next
     .local int cclass, negate
 
-    $S0 = self
+    $S0 = self.'ast'()
     code.'emit'("        %0: # cclass %1", label, $S0)
     code.'emit'("          if pos >= lastpos goto fail")
     cclass = self['cclass']
@@ -1304,7 +1304,7 @@ tree as a PIR code object that can be compiled.
     .param string next
 
     .local string charlist
-    $S0 = self
+    $S0 = self.'ast'()
     charlist = code.'escape'($S0)
 
     .local string test
@@ -1428,7 +1428,7 @@ tree as a PIR code object that can be compiled.
     .param string label
     .param string next
     .local string value, lang
-    value = self
+    value = self.'ast'()
     lang = self['lang']
     value = code.'escape'(value)
     lang = code.'escape'(lang)
@@ -1455,12 +1455,12 @@ tree as a PIR code object that can be compiled.
           mpos = pos
           ($P0 :optional, $I0 :opt_flag) = $P1(mob)
           if $I0 == 0 goto %0
-          mob.'result_object'($P0)
+          mob.'!make'($P0)
           push ustack, pos
           local_branch cstack, succeed
           pos = pop ustack
           null $P0
-          mob.'result_object'($P0)
+          mob.'!make'($P0)
           goto fail
         CODE
     .return ()

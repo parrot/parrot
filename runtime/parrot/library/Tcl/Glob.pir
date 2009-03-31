@@ -55,7 +55,7 @@ or the resulting PIR code (target='PIR').
     exp = new ['PGE';'Exp';'Concat']
     $I0 = 1
     $P0 = new ['PGE';'Exp';'Anchor']
-    $P0.'result_object'('^')
+    $P0.'!make'('^')
     exp[0] = $P0
     if null match goto analyze_1
     $P0 = match['expr']
@@ -63,7 +63,7 @@ or the resulting PIR code (target='PIR').
     inc $I0
   analyze_1:
     $P0 = new ['PGE';'Exp';'Anchor']
-    $P0.'result_object'('$')
+    $P0.'!make'('$')
     exp[$I0] = $P0
 
     .tailcall exp.'compile'(adverbs :flat :named)
@@ -162,7 +162,7 @@ parse C<PGE::Match> object.
 =item C<glob_literal(PMC mob, PMC adverbs)>
 
 Scan a literal from a string, stopping at any metacharacters such
-as C<*> or C<[>.  Return the matched portion, with the C<result_object>
+as C<*> or C<[>.  Return the matched portion, with the I<ast object>
 set to the decoded literal.
 
 =cut
@@ -177,7 +177,7 @@ set to the decoded literal.
     ($S0, $I0) = 'scan_literal'(target, pos, '*?[')
     if $I0 <= pos goto end
     mob.'to'($I0)
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
   end:
     .return (mob)
 .end
@@ -197,7 +197,7 @@ return a CCShortcut that is set to '.'
     ##   The '?' is already in mob['KEY'], so we don't need to find it here.
     (mob, pos) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     mob.'to'(pos)
-    mob.'result_object'('.')
+    mob.'!make'('.')
     .return (mob)
 .end
 
@@ -221,7 +221,7 @@ bit more complex, as we have to return a quantified '.'.
     mob['max'] = GLOB_INF
     ($P0, $I0) = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     $P0.'to'($I0)
-    $P0.'result_object'('.')
+    $P0.'!make'('.')
     mob[0] = $P0
     .return (mob)
 .end
@@ -277,7 +277,7 @@ Parse an enumerated character list, such as [abcd],
   scan_end:
     inc pos
     mob.'to'(pos)
-    mob.'result_object'(charlist)
+    mob.'!make'(charlist)
     .return (mob)
 
   err_noclose:
@@ -302,7 +302,7 @@ Parse an enumerated character list, such as [abcd],
     lastpos = length target
 
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
     mob.'to'(pos)
   alt_loop:
     if pos >= lastpos goto err_noclose
@@ -316,7 +316,7 @@ Parse an enumerated character list, such as [abcd],
     $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
     ($S0, pos) = 'scan_literal'(target, pos, ',}')
     $P0.'to'(pos)
-    $P0.'result_object'($S0)
+    $P0.'!make'($S0)
     mob[1] = $P0
     goto alt_loop
   end:

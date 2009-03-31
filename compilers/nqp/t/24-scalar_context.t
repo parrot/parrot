@@ -5,7 +5,7 @@
 plan(1);
 
 class XYZ {
-    method item() {
+    method ast() {
         'ok 1';
     }
 }

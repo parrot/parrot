@@ -333,7 +333,7 @@ Return a failed match if the stoptoken is found.
     $S0 = substr target, pos, litlen
     pos += litlen
     mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
     mob.'to'(pos)
     .return (mob)
 
@@ -376,7 +376,7 @@ Parses terms beginning with backslash.
   quoted_metachar:
     inc pos
     mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
-    mob.'result_object'(initchar)
+    mob.'!make'(initchar)
     mob.'to'(pos)
     .return (mob)
 
@@ -401,13 +401,13 @@ Parses terms beginning with backslash.
 
   term_literal:
     mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
-    mob.'result_object'(charlist)
+    mob.'!make'(charlist)
     mob.'to'(pos)
     .return (mob)
 
   term_charlist:
     mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
-    mob.'result_object'(charlist)
+    mob.'!make'(charlist)
     mob['isnegated'] = isnegated
     mob.'to'(pos)
     .return (mob)
@@ -921,7 +921,7 @@ Extract an enumerated character list.
     ##   create a node for the charlist
     term = mob.'new'(mob, 'grammar'=>'PGE::Exp::EnumCharList')
     term.'to'(pos)
-    term.'result_object'(charlist)
+    term.'!make'(charlist)
     goto combine
 
   subrule:
@@ -948,7 +948,7 @@ Extract an enumerated character list.
     ##   token is '<-', we need to match a char by concat dot
     $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::CCShortcut')
     $P0.'to'(pos)
-    $P0.'result_object'('.')
+    $P0.'!make'('.')
     mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Concat')
     mob.'to'(pos)
     mob[0] = term
@@ -1032,7 +1032,7 @@ Parses '...' literals.
     goto literal_iter
   literal_end:
     inc pos
-    mob.'result_object'(lit)
+    mob.'!make'(lit)
     mob.'to'(pos)
     .return (mob)
   literal_error:
@@ -1118,14 +1118,14 @@ Parse a modifier.
     if $I1 == 0 goto fail
     $S0 = substr target, $I0, $I1
     mob['key'] = $S0
-    mob.'result_object'(value)
+    mob.'!make'(value)
     $S0 = substr target, pos, 1
     if $S0 != '(' goto end
     $I0 = pos + 1
     pos = index target, ')', pos
     $I1 = pos - $I0
     $S0 = substr target, $I0, $I1
-    mob.'result_object'($S0)
+    mob.'!make'($S0)
     inc pos
   end:
     ### XXX pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
@@ -1167,7 +1167,7 @@ Parse a modifier.
     if $I0 < pos goto err_noclose
     $I1 = $I0 - pos
     $S1 = substr target, pos, $I1
-    mob.'result_object'($S1)
+    mob.'!make'($S1)
     pos = $I0 + len
     mob.'to'(pos)
     .return (mob)
@@ -1584,7 +1584,7 @@ Parse a modifier.
     .local string key
     .local string value
     key = self['key']
-    value = self
+    value = self.'ast'()
     if key == 'words' goto sigspace
     if key == 's' goto sigspace
     if key == 'w' goto sigspace
@@ -1634,9 +1634,9 @@ Parse a modifier.
     $I0 = defined closure_pp[lang]
     if $I0 == 0 goto end
     closure_fn = closure_pp[lang]
-    $S1 = self
+    $S1 = self.'ast'()
     $S1 = closure_fn($S1)
-    self.'result_object'($S1)
+    self.'!make'($S1)
   end:
     .return (self)
 .end
@@ -1683,7 +1683,7 @@ already present.
 
 .sub 'perl6exp' :method
     .param pmc pad
-    $S0 = self
+    $S0 = self.'ast'()
     if $S0 == ':::' goto cut_rule
     if $S0 == '<commit>' goto cut_match
     self['cutmark'] = PGE_CUT_GROUP

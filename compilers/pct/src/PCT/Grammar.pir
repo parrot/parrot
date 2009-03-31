@@ -80,9 +80,9 @@ throw an exception if a result object hasn't been set.
 
 =cut
 
-.sub 'item' :method
+.sub 'ast' :method
     .local pmc obj
-    obj = getattribute self, '$!item'
+    obj = getattribute self, '$!ast'
     unless null obj goto end
     die "No result object"
   end:
@@ -223,7 +223,7 @@ to enforce whitespace between lexical words.
 
   literal_end:
     mob.'to'(pos)
-    mob.'result_object'(literal)
+    mob.'!make'(literal)
     .return (mob)
 
   fail:
