@@ -9,6 +9,7 @@ use warnings;
 
 use WWW::Mechanize;
 use Getopt::Std;
+use Pod::Usage;
 
 
 my $server  = 'nopaste.snit.ch';
@@ -21,7 +22,7 @@ my $opt     = {
 
 getopt( 'c:n:t:', $opt );
 
-usage()
+pod2usage(2)
     unless defined $opt->{t};
 
 
@@ -50,22 +51,6 @@ $mech->submit_form(
 my @link = $mech->links;
 print "Your paste can be found at ", $link[0]->url, "\n";
 
-
-sub usage {
-    print <<USAGE;
-nopaste.pl - paste the contents of a file via $server
-
-  nopaste.pl -t "TITLE" [ -c CHANNEL ] [ -n NAME ] [ FILENAME ]
-
-    TITLE     the title of the paste
-    CHANNEL   the irc channel (defaults to #parrot)
-    NAME      the username (defaults to username or 'someone')
-    FILENAME  the name of the file to paste (defaults to STDIN)
-USAGE
-    exit 0;
-}
-
-########## DOCUMENTATION ##########
 
 =head1 NAME
 
