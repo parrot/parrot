@@ -34,6 +34,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
     my $parrot_is_shared = $conf->options->get('parrot_is_shared');
+    my $disable_rpath    = $conf->options->get('disable-rpath');
 
     $parrot_is_shared = integrate(
         $conf->data->get('parrot_is_shared'),
@@ -97,8 +98,9 @@ sub runstep {
 
     # Set -rpath (or equivalent) for executables to find the
     # shared libparrot in the build directory.
-    $conf->data->set(
-        rpath_blib => ( $parrot_is_shared && $conf->data->get('rpath') )
+    $conf->data->set( rpath_blib => ( ! $disable_rpath
+                                     && $parrot_is_shared
+                                     && $conf->data->get('rpath') )
         ? $conf->data->get('rpath')
             . $conf->data->get('build_dir')
             . $conf->data->get('slash')
@@ -108,8 +110,9 @@ sub runstep {
 
     # Set -rpath (or equivalent) for the installed executables to find the
     # installed shared libparrot.
-    $conf->data->set(
-        rpath_lib => ( $parrot_is_shared && $conf->data->get('rpath') )
+    $conf->data->set( rpath_lib => ( ! $disable_rpath
+                                    && $parrot_is_shared
+                                    && $conf->data->get('rpath') )
         ? $conf->data->get('rpath')
             . $conf->data->get('libdir')
         : ''

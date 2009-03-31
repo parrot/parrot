@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 package Parrot::Configure::Options::Conf::Shared;
 
@@ -21,6 +21,7 @@ our @shared_valid_options = qw{
     datadir
     debugging
     define
+    disable-rpath
     exec-prefix
     execcapable
     fatal

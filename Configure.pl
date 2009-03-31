@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use 5.008;
@@ -273,6 +273,14 @@ Specify which loader to use for shared libraries.
 =item C<--ldflags=(flags)>
 
 Use the given loader flags for shared libraries
+
+=item C<--disable-rpath>
+
+Specify that rpath should not be included in linking flags. With this
+configuration option, you must append the library build directory
+(usually blib/lib) to the LD_LIBRARY_PATH environment variable (or your
+platform equivalent). This option is primarily used for building Linux
+packages.
 
 =item C<--lex=(lexer)>
 
