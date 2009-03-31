@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2007, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -24,7 +24,7 @@ This file implements thread-safe queues for Parrot.
 
 /*
 
-=item C<QUEUE_ENTRY * pop_entry>
+=item C<QUEUE_ENTRY * pop_entry(QUEUE *queue)>
 
 Does a synchronized removal of the head entry off the queue and returns it.
 
@@ -46,7 +46,7 @@ pop_entry(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<QUEUE_ENTRY * peek_entry>
+=item C<QUEUE_ENTRY * peek_entry(const QUEUE *queue)>
 
 This does no locking, so the result might have changed by the time you
 get the entry, but a synchronized C<pop_entry()> will check again and
@@ -67,7 +67,7 @@ peek_entry(ARGIN(const QUEUE *queue))
 
 /*
 
-=item C<QUEUE_ENTRY * nosync_pop_entry>
+=item C<QUEUE_ENTRY * nosync_pop_entry(QUEUE *queue)>
 
 Grab an entry off the queue with no synchronization. Internal only,
 because it's darned evil and shouldn't be used outside the module. It's
@@ -100,7 +100,7 @@ nosync_pop_entry(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<QUEUE_ENTRY * wait_for_entry>
+=item C<QUEUE_ENTRY * wait_for_entry(QUEUE *queue)>
 
 Does a synchronized removal of the head entry off the queue, waiting if
 necessary until there is an entry, and then returns it.
@@ -128,7 +128,7 @@ wait_for_entry(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<void push_entry>
+=item C<void push_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
 
 Does a synchronized insertion of C<entry> onto the tail of the queue.
 
@@ -156,7 +156,7 @@ push_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void unshift_entry>
+=item C<void unshift_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
 
 Does a synchronized insertion of C<entry> into the head of the queue.
 
@@ -187,7 +187,7 @@ unshift_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void nosync_insert_entry>
+=item C<void nosync_insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
 
 Inserts a timed event according to C<abstime>. The caller has to hold the
 queue mutex.
@@ -240,7 +240,7 @@ nosync_insert_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void insert_entry>
+=item C<void insert_entry(QUEUE *queue, QUEUE_ENTRY *entry)>
 
 Does a synchronized insert of C<entry>.
 
@@ -260,7 +260,7 @@ insert_entry(ARGMOD(QUEUE *queue), ARGIN(QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void queue_lock>
+=item C<void queue_lock(QUEUE *queue)>
 
 Locks the queue's mutex.
 
@@ -277,7 +277,7 @@ queue_lock(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<void queue_unlock>
+=item C<void queue_unlock(QUEUE *queue)>
 
 Unlocks the queue's mutex.
 
@@ -294,7 +294,7 @@ queue_unlock(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<void queue_broadcast>
+=item C<void queue_broadcast(QUEUE *queue)>
 
 This function wakes up I<every> thread waiting on the queue.
 
@@ -311,7 +311,7 @@ queue_broadcast(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<void queue_signal>
+=item C<void queue_signal(QUEUE *queue)>
 
 =cut
 
@@ -326,7 +326,7 @@ queue_signal(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<void queue_wait>
+=item C<void queue_wait(QUEUE *queue)>
 
 Instructs the queue to wait.
 
@@ -343,7 +343,7 @@ queue_wait(ARGMOD(QUEUE *queue))
 
 /*
 
-=item C<void queue_timedwait>
+=item C<void queue_timedwait(QUEUE *queue, const struct timespec *abs_time)>
 
 Instructs the queue to wait for C<abs_time> seconds (?).
 
@@ -360,7 +360,7 @@ queue_timedwait(ARGMOD(QUEUE *queue), ARGIN(const struct timespec *abs_time))
 
 /*
 
-=item C<QUEUE* queue_init>
+=item C<QUEUE* queue_init(UINTVAL prio)>
 
 Initializes the queue, setting C<prio> as the queue's priority.
 
@@ -385,7 +385,7 @@ queue_init(UINTVAL prio)
 
 /*
 
-=item C<void queue_destroy>
+=item C<void queue_destroy(QUEUE *queue)>
 
 Destroys the queue, raising an exception if it is not empty.
 

@@ -181,7 +181,6 @@ src/jit/sun4/jit_emit.h
 src/jit/alpha/jit_emit.h
 src/jit/arm/jit_emit.h
 
-src/debug.c
 src/dynext.c
 src/events.c
 src/exceptions.c
@@ -195,7 +194,6 @@ src/interpreter.c
 src/key.c
 src/list.c
 src/malloc-trace.c
-src/misc.c
 src/nci_test.c
 src/oo.c
 src/packdump.c
@@ -212,13 +210,12 @@ src/pmc.c
 src/pmc_freeze.c
 src/spf_render.c
 src/spf_vtable.c
-src/sub.c
 src/thread.c
-src/tsq.c
 src/utils.c
 
 # Needs docs written. Boilerplate in place.
 src/datatypes.c
+src/debug.c
 src/gc/generational_ms.c
 src/io/io_string.c
 src/io/socket_api.c
@@ -229,6 +226,7 @@ src/string/charset/ascii.c
 src/string/charset/binary.c
 src/string/charset/iso-8859-1.c
 src/string/charset/unicode.c
+src/tsq.c
 
 
 # Local Variables:
