@@ -33,7 +33,7 @@ API.
 
 /*
 
-=item C<void string_set_data_directory>
+=item C<void string_set_data_directory(PARROT_INTERP, const char *dir)>
 
 Set the directory where ICU finds its data files (encodings, locales,
 etc.).
@@ -70,7 +70,8 @@ string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
 
 /*
 
-=item C<Parrot_UInt4 string_unescape_one>
+=item C<Parrot_UInt4 string_unescape_one(PARROT_INTERP, UINTVAL *offset,
+STRING *string)>
 
 Unescape a single character. We assume that we're at the start of a
 sequence, right after the \.
@@ -306,7 +307,7 @@ string_unescape_one(PARROT_INTERP, ARGMOD(UINTVAL *offset),
 
 =over 4
 
-=item C<INTVAL Parrot_char_digit_value>
+=item C<INTVAL Parrot_char_digit_value(PARROT_INTERP, UINTVAL character)>
 
 Returns the decimal digit value of the specified character if it is a decimal
 digit character. If not, then -1 is returned.
@@ -336,7 +337,7 @@ Parrot_char_digit_value(SHIM_INTERP, UINTVAL character)
 
 /*
 
-=item C<char * str_dup>
+=item C<char * str_dup(const char *old)>
 
 Duplicate a C string.  Just like strdup(), except it dies if it runs
 out of memory.
@@ -363,7 +364,7 @@ str_dup(ARGIN(const char *old))
 
 /*
 
-=item C<char * str_dup_remove_quotes>
+=item C<char * str_dup_remove_quotes(const char *old)>
 
 Duplicates a C string (minus the wrapping quotes).  Similar to strdup(),
 except it dies if it runs out of memory.

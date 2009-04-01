@@ -36,7 +36,7 @@ static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 
 /*
 
-=item C<void print_pbc_location>
+=item C<void print_pbc_location(PARROT_INTERP)>
 
 Prints the bytecode location of the warning or error to C<Parrot_io_STDERR>.
 
@@ -59,7 +59,7 @@ print_pbc_location(PARROT_INTERP)
 
 /*
 
-=item C<static INTVAL print_warning>
+=item C<static INTVAL print_warning(PARROT_INTERP, STRING *msg)>
 
 Prints the warning message and the bytecode location.
 
@@ -90,7 +90,8 @@ print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 
 =over 4
 
-=item C<INTVAL Parrot_warn>
+=item C<INTVAL Parrot_warn(PARROT_INTERP, INTVAL warnclass,
+const char *message, ...)>
 
 The Parrot C string warning/error reporter.
 

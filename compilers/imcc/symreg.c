@@ -119,7 +119,7 @@ static void resize_symhash(ARGMOD(SymHash *hsh))
 
 /*
 
-=item C<void push_namespace(PARROT_INTERP, const char *name)>
+=item C<void push_namespace>
 
 Begins a new namespace in PASM/PIR, named after the given C<name>.
 
@@ -141,7 +141,7 @@ push_namespace(SHIM_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<void pop_namespace(PARROT_INTERP, const char *name)>
+=item C<void pop_namespace>
 
 Ends the current namespace, popping back to the previous.  If the namespace
 stack is empty, throws a syntax error.
@@ -176,7 +176,7 @@ pop_namespace(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<static SymReg * _get_sym_typed(const SymHash *hsh, const char *name, int t)>
+=item C<static SymReg * _get_sym_typed>
 
 Gets a symbol from the hash, with the given C<name> of the specific type C<t>.
 
@@ -206,7 +206,7 @@ _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
 
 /*
 
-=item C<static SymReg * _mk_symreg(SymHash *hsh, const char *name, int t)>
+=item C<static SymReg * _mk_symreg>
 
 Makes a new SymReg in the given SymHash from a varname and type.
 
@@ -239,7 +239,7 @@ _mk_symreg(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 
 /*
 
-=item C<SymReg * mk_symreg(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg * mk_symreg>
 
 Makes a new SymReg in the current unit, given a varname and type.
 
@@ -264,7 +264,7 @@ mk_symreg(PARROT_INTERP, ARGIN(const char *name), int t)
 
 /*
 
-=item C<char * symreg_to_str(const SymReg *s)>
+=item C<char * symreg_to_str>
 
 Dumps a SymReg to a printable format.
 
@@ -307,7 +307,7 @@ symreg_to_str(ARGIN(const SymReg *s))
 
 /*
 
-=item C<SymReg * mk_temp_reg(PARROT_INTERP, int t)>
+=item C<SymReg * mk_temp_reg>
 
 Makes a new unique and temporary SymReg of the specified type C<t>.
 
@@ -331,7 +331,7 @@ mk_temp_reg(PARROT_INTERP, int t)
 
 /*
 
-=item C<SymReg * mk_pcc_sub(PARROT_INTERP, const char *name, int proto)>
+=item C<SymReg * mk_pcc_sub>
 
 Makes a SymReg representing a PCC sub of the given C<name> with the specified
 type.
@@ -358,7 +358,7 @@ mk_pcc_sub(PARROT_INTERP, ARGIN(const char *name), int proto)
 
 /*
 
-=item C<void add_namespace(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void add_namespace>
 
 Add the current namespace to a sub declaration.
 
@@ -396,7 +396,7 @@ add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<void add_pcc_arg(SymReg *r, SymReg *arg)>
+=item C<void add_pcc_arg>
 
 Adds a register or constant to the function arg list.
 
@@ -425,7 +425,7 @@ add_pcc_arg(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 
 /*
 
-=item C<void add_pcc_result(SymReg *r, SymReg *arg)>
+=item C<void add_pcc_result>
 
 Adds a register or constant to the function's return list.
 
@@ -456,7 +456,7 @@ add_pcc_result(ARGMOD(SymReg *r), ARGMOD(SymReg *arg))
 
 /*
 
-=item C<void add_pcc_multi(SymReg *r, SymReg *arg)>
+=item C<void add_pcc_multi>
 
 Adds a :multi signature to the sub.
 
@@ -479,7 +479,7 @@ add_pcc_multi(ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg *arg))
 
 /*
 
-=item C<void add_pcc_sub(SymReg *r, SymReg *arg)>
+=item C<void add_pcc_sub>
 
 Sets the current sub in the given SymReg to the second SymReg.
 
@@ -497,7 +497,7 @@ add_pcc_sub(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
 
 /*
 
-=item C<void add_pcc_cc(SymReg *r, SymReg *arg)>
+=item C<void add_pcc_cc>
 
 Adds a continuation (?) to the current sub.
 
@@ -515,7 +515,7 @@ add_pcc_cc(ARGMOD(SymReg *r), ARGIN(SymReg *arg))
 
 /*
 
-=item C<SymReg * mk_pasm_reg(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_pasm_reg>
 
 Makes a SymReg representing a PASM register.
 
@@ -547,7 +547,7 @@ mk_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<static char * _mk_fullname(const Namespace *ns, const char *name)>
+=item C<static char * _mk_fullname>
 
 Combines the namespace and name together, separated by a C<::>.  If there's no
 namespace, the name is returned on its own.
@@ -578,7 +578,7 @@ _mk_fullname(ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * mk_ident(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg * mk_ident>
 
 Makes a new identifier.
 
@@ -618,7 +618,7 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 
 /*
 
-=item C<SymReg* mk_ident_ur(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg* mk_ident_ur>
 
 Creates and returns a SymReg representing a unique (non-volatile) register.
 
@@ -641,8 +641,7 @@ mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
 
 /*
 
-=item C<static SymReg * mk_pmc_const_2(PARROT_INTERP, IMC_Unit *unit,
-SymReg *left, SymReg *rhs)>
+=item C<static SymReg * mk_pmc_const_2>
 
 Makes a constant PMC and inserts instructions to access it.
 
@@ -699,8 +698,7 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
 
 /*
 
-=item C<SymReg * mk_const_ident(PARROT_INTERP, const char *name, int t,
-SymReg *val, int global)>
+=item C<SymReg * mk_const_ident>
 
 Makes a new identifier constant with value val.
 
@@ -752,7 +750,7 @@ mk_const_ident(PARROT_INTERP, ARGIN(const char *name), int t,
 
 /*
 
-=item C<SymReg * _mk_const(SymHash *hsh, const char *name, int t)>
+=item C<SymReg * _mk_const>
 
 Makes a new constant (internal use only).
 
@@ -788,7 +786,7 @@ _mk_const(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
 
 /*
 
-=item C<static int int_overflows(const SymReg *r)>
+=item C<static int int_overflows>
 
 =cut
 
@@ -822,7 +820,7 @@ int_overflows(ARGIN(const SymReg *r))
 
 /*
 
-=item C<SymReg * mk_const(PARROT_INTERP, const char *name, int t)>
+=item C<SymReg * mk_const>
 
 Makes a new constant (and populates the cache of global symbols).
 
@@ -847,7 +845,7 @@ mk_const(PARROT_INTERP, ARGIN(const char *name), int t)
 
 /*
 
-=item C<static char * add_ns(PARROT_INTERP, const char *name)>
+=item C<static char * add_ns>
 
 Adds a namespace to the current sub.
 
@@ -894,8 +892,7 @@ add_ns(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * _mk_address(PARROT_INTERP, SymHash *hsh, const char *name,
-int uniq)>
+=item C<SymReg * _mk_address>
 
 Makes a new address (internal use only).
 
@@ -955,7 +952,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
 
 /*
 
-=item C<SymReg * mk_sub_label(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_sub_label>
 
 Makes and stores a new address label for a sub.  The label gets a fixup entry.
 
@@ -980,7 +977,7 @@ mk_sub_label(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * mk_sub_address(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_sub_address>
 
 Makes a symbol for a label.  The symbol gets a fixup entry.
 
@@ -1005,7 +1002,7 @@ mk_sub_address(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * mk_local_label(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_local_label>
 
 Makes a local symbol, giving it I<no> fixup entry.
 
@@ -1026,7 +1023,7 @@ mk_local_label(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * mk_label_address(PARROT_INTERP, const char *name)>
+=item C<SymReg * mk_label_address>
 
 Makes a new label address.
 
@@ -1047,7 +1044,7 @@ mk_label_address(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * dup_sym(const SymReg *r)>
+=item C<SymReg * dup_sym>
 
 Links keys to a keys structure = SymReg
 
@@ -1108,7 +1105,7 @@ dup_sym(ARGIN(const SymReg *r))
 
 /*
 
-=item C<SymReg * link_keys(PARROT_INTERP, int nargs, SymReg **keys, int force)>
+=item C<SymReg * link_keys>
 
 Links keys together in a keychain.
 
@@ -1204,7 +1201,7 @@ link_keys(PARROT_INTERP, int nargs, ARGMOD(SymReg **keys), int force)
 
 /*
 
-=item C<void free_sym(SymReg *r)>
+=item C<void free_sym>
 
 Frees all memory of the specified SymReg.  If it has a pcc_sub_t entry, frees
 all memory of that structure as well.
@@ -1250,7 +1247,7 @@ free_sym(ARGMOD(SymReg *r))
 
 /*
 
-=item C<void create_symhash(SymHash *hash)>
+=item C<void create_symhash>
 
 Creates a symbol hash table with space for 16 entries.
 
@@ -1270,7 +1267,7 @@ create_symhash(ARGOUT(SymHash *hash))
 
 /*
 
-=item C<static void resize_symhash(SymHash *hsh)>
+=item C<static void resize_symhash>
 
 Resizes a symbol hash table.
 
@@ -1330,7 +1327,7 @@ resize_symhash(ARGMOD(SymHash *hsh))
 
 /*
 
-=item C<void _store_symreg(SymHash *hsh, SymReg *r)>
+=item C<void _store_symreg>
 
 Stores a symbol in the hash (internal use only).
 
@@ -1358,7 +1355,7 @@ _store_symreg(ARGMOD(SymHash *hsh), ARGMOD(SymReg *r))
 
 /*
 
-=item C<void store_symreg(PARROT_INTERP, SymReg *r)>
+=item C<void store_symreg>
 
 Stores a symbol in the hash.
 
@@ -1376,7 +1373,7 @@ store_symreg(PARROT_INTERP, ARGMOD(SymReg *r))
 
 /*
 
-=item C<SymReg * _get_sym(const SymHash *hsh, const char *name)>
+=item C<SymReg * _get_sym>
 
 Fetches a symbol from the hash (internal use only).
 
@@ -1406,7 +1403,7 @@ _get_sym(ARGIN(const SymHash *hsh), ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * get_sym(PARROT_INTERP, const char *name)>
+=item C<SymReg * get_sym>
 
 Gets a symbol from the current unit's symbol table.
 
@@ -1426,8 +1423,7 @@ get_sym(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * _find_sym(PARROT_INTERP, const Namespace *nspace,
-const SymHash *hsh, const char *name)>
+=item C<SymReg * _find_sym>
 
 Find a symbol hash or ghash (internal use only);
 
@@ -1471,7 +1467,7 @@ _find_sym(PARROT_INTERP, ARGIN_NULLOK(const Namespace *nspace),
 
 /*
 
-=item C<SymReg * find_sym(PARROT_INTERP, const char *name)>
+=item C<SymReg * find_sym>
 
 Finds a symbol hash or ghash in the current unit, if it exists.  Otherwise
 returns NULL.
@@ -1496,7 +1492,7 @@ find_sym(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<void clear_sym_hash(SymHash *hsh)>
+=item C<void clear_sym_hash>
 
 Frees all memory of the symbols in the specified hash table.
 
@@ -1534,7 +1530,7 @@ clear_sym_hash(ARGMOD(SymHash *hsh))
 
 /*
 
-=item C<void debug_dump_sym_hash(const SymHash *hsh)>
+=item C<void debug_dump_sym_hash>
 
 Prints all identifiers in the specified hash table to stderr.
 
@@ -1560,7 +1556,7 @@ debug_dump_sym_hash(ARGIN(const SymHash *hsh))
 
 /*
 
-=item C<void clear_locals(IMC_Unit *unit)>
+=item C<void clear_locals>
 
 Deletes all local symbols and clears life info from the given IMC_Unit.
 
@@ -1597,7 +1593,7 @@ clear_locals(ARGIN_NULLOK(IMC_Unit *unit))
 
 /*
 
-=item C<void clear_globals(PARROT_INTERP)>
+=item C<void clear_globals>
 
 Clears global symbols.
 
@@ -1620,7 +1616,7 @@ clear_globals(PARROT_INTERP)
 
 /*
 
-=item C<unsigned int hash_str(const char *str)>
+=item C<unsigned int hash_str>
 
 Computes the hash value for the string argument.
 

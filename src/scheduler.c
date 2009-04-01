@@ -61,7 +61,7 @@ Functions to interface with the concurrency scheduler.
 
 =over 4
 
-=item C<void Parrot_cx_init_scheduler>
+=item C<void Parrot_cx_init_scheduler(PARROT_INTERP)>
 
 Initalize the concurrency scheduler for the interpreter.
 
@@ -88,7 +88,7 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_check_tasks>
+=item C<void Parrot_cx_check_tasks(PARROT_INTERP, PMC *scheduler)>
 
 If a wake request has been received, handle tasks.
 
@@ -106,7 +106,7 @@ Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_handle_tasks>
+=item C<void Parrot_cx_handle_tasks(PARROT_INTERP, PMC *scheduler)>
 
 Handle the pending tasks in the scheduler's task list. Returns when there are
 no more pending tasks. Returns 0 to terminate the scheduler runloop, or 1 to
@@ -162,7 +162,7 @@ Parrot_cx_handle_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_refresh_task_list>
+=item C<void Parrot_cx_refresh_task_list(PARROT_INTERP, PMC *scheduler)>
 
 Tell the scheduler to perform maintenance on its list of active tasks, checking
 for completed timers or sleep events, sorting for priority, checking for
@@ -187,7 +187,7 @@ Parrot_cx_refresh_task_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_runloop_wake>
+=item C<void Parrot_cx_runloop_wake(PARROT_INTERP, PMC *scheduler)>
 
 Wake a sleeping scheduler runloop (generally called when new tasks are added to
 the scheduler's task list).
@@ -207,7 +207,7 @@ Parrot_cx_runloop_wake(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 /*
 
-=item C<void Parrot_cx_runloop_end>
+=item C<void Parrot_cx_runloop_end(PARROT_INTERP)>
 
 Schedule an event to terminate the scheduler runloop.
 
@@ -226,7 +226,7 @@ Parrot_cx_runloop_end(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_schedule_task>
+=item C<void Parrot_cx_schedule_task(PARROT_INTERP, PMC *task)>
 
 Add a task to scheduler's task list. Cannot be called across
 interpreters/threads, must be called from within the interpreter's runloop.
@@ -249,7 +249,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<PMC * Parrot_cx_peek_task>
+=item C<PMC * Parrot_cx_peek_task(PARROT_INTERP)>
 
 Retrieve the the top task on the scheduler's task list, but don't remove it
 from the list.
@@ -273,7 +273,8 @@ Parrot_cx_peek_task(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_schedule_timer>
+=item C<void Parrot_cx_schedule_timer(PARROT_INTERP, STRING *type,
+FLOATVAL duration, FLOATVAL interval, INTVAL repeat, PMC *sub)>
 
 Create a new timer event due at C<diff> from now, repeated at C<interval>
 and running the passed C<sub>.
@@ -309,7 +310,7 @@ Parrot_cx_schedule_timer(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_cx_schedule_repeat>
+=item C<void Parrot_cx_schedule_repeat(PARROT_INTERP, PMC *task)>
 
 Add a repeat task to scheduler's task list.
 
@@ -340,7 +341,7 @@ Parrot_cx_schedule_repeat(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<void Parrot_cx_schedule_callback>
+=item C<void Parrot_cx_schedule_callback(PARROT_INTERP, PMC *user_data, char *ext_data)>
 
 Create a new callback event, with an argument for the call.
 
@@ -366,7 +367,7 @@ Parrot_cx_schedule_callback(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_cx_request_suspend_for_gc>
+=item C<void Parrot_cx_request_suspend_for_gc(PARROT_INTERP)>
 
 Tell the scheduler to suspend for GC at the next safe pause.
 
@@ -387,7 +388,7 @@ Parrot_cx_request_suspend_for_gc(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_delete_task>
+=item C<void Parrot_cx_delete_task(PARROT_INTERP, PMC *task)>
 
 Remove a task from the scheduler's task list.
 
@@ -412,7 +413,7 @@ Parrot_cx_delete_task(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<PMC * Parrot_cx_delete_suspend_for_gc>
+=item C<PMC * Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)>
 
 Remove a message that would suspend GC from the message queue. (Provided for
 backward compatibility in the threads implementation.)
@@ -467,7 +468,7 @@ Parrot_cx_delete_suspend_for_gc(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_add_handler_local>
+=item C<void Parrot_cx_add_handler_local(PARROT_INTERP, PMC *handler)>
 
 Add a handler to the current context's list of handlers.
 
@@ -489,7 +490,7 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 
 /*
 
-=item C<void Parrot_cx_delete_handler_local>
+=item C<void Parrot_cx_delete_handler_local(PARROT_INTERP, STRING *handler_type)>
 
 Remove the top task handler of a particular type from the context's list of
 handlers.
@@ -559,7 +560,7 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 
 /*
 
-=item C<INTVAL Parrot_cx_count_handlers_local>
+=item C<INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP, STRING *handler_type)>
 
 Count the number of active handlers of a particular type from the
 context's list of handlers.
@@ -626,7 +627,7 @@ Parrot_cx_count_handlers_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 
 /*
 
-=item C<void Parrot_cx_add_handler>
+=item C<void Parrot_cx_add_handler(PARROT_INTERP, PMC *handler)>
 
 Add a task handler to scheduler's list of handlers.
 
@@ -649,7 +650,7 @@ Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
 
 /*
 
-=item C<void Parrot_cx_delete_handler_typed>
+=item C<void Parrot_cx_delete_handler_typed(PARROT_INTERP, STRING *handler_type)>
 
 Remove the top task handler of a particular type from the scheduler's list of
 handlers.
@@ -672,7 +673,7 @@ Parrot_cx_delete_handler_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
 
 /*
 
-=item C<INTVAL Parrot_cx_count_handlers_typed>
+=item C<INTVAL Parrot_cx_count_handlers_typed(PARROT_INTERP, STRING *handler_type)>
 
 Count the number of active handlers of a particular type (event, exception) in
 the concurrency scheduler.
@@ -708,7 +709,7 @@ scheduler.
 
 =over 4
 
-=item C<void Parrot_cx_send_message>
+=item C<void Parrot_cx_send_message(PARROT_INTERP, STRING *messagetype, PMC *payload)>
 
 Send a message to a scheduler in a different interpreter/thread.
 
@@ -748,7 +749,7 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(P
 
 /*
 
-=item C<void Parrot_cx_broadcast_message>
+=item C<void Parrot_cx_broadcast_message(PARROT_INTERP, STRING *messagetype, PMC *data)>
 
 Send a message to the schedulers in all interpreters/threads linked to this
 one.
@@ -784,7 +785,7 @@ Functions that are used to interface with a specific task in the concurrency sch
 
 =over 4
 
-=item C<PMC * Parrot_cx_find_handler_for_task>
+=item C<PMC * Parrot_cx_find_handler_for_task(PARROT_INTERP, PMC *task)>
 
 Retrieve a handler appropriate to a given task. If the scheduler has no
 appropriate handler, returns PMCNULL.
@@ -819,7 +820,7 @@ Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<PMC * Parrot_cx_find_handler_local>
+=item C<PMC * Parrot_cx_find_handler_local(PARROT_INTERP, PMC *task)>
 
 Retrieve a handler appropriate to a given task from the local context. If the
 context has no appropriate handler, returns PMCNULL.
@@ -923,7 +924,7 @@ Parrot_cx_find_handler_local(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<void Parrot_cx_timer_invoke>
+=item C<void Parrot_cx_timer_invoke(PARROT_INTERP, PMC *timer)>
 
 Run the associated code block for a timer event, when the timer fires.
 
@@ -949,7 +950,7 @@ Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
 
 /*
 
-=item C<void Parrot_cx_invoke_callback>
+=item C<void Parrot_cx_invoke_callback(PARROT_INTERP, PMC *callback)>
 
 Run the associated code block for a callback event.
 
@@ -980,7 +981,7 @@ opcode_t* to allow for changing the code flow.
 =over 4
 
 
-=item C<opcode_t * Parrot_cx_schedule_sleep>
+=item C<opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, opcode_t *next)>
 
 Add a sleep timer to the scheduler. This function is called by the C<sleep>
 opcode.
@@ -1040,7 +1041,7 @@ Functions that are only used within the scheduler.
 
 =over 4
 
-=item C<static void scheduler_process_wait_list>
+=item C<static void scheduler_process_wait_list(PARROT_INTERP, PMC *scheduler)>
 
 Scheduler maintenance, scan the list of waiting tasks to see if any are ready
 to become active tasks.
@@ -1086,7 +1087,7 @@ scheduler_process_wait_list(PARROT_INTERP, ARGMOD(PMC *scheduler))
 
 =over 4
 
-=item C<static void scheduler_process_messages>
+=item C<static void scheduler_process_messages(PARROT_INTERP, PMC *scheduler)>
 
 Scheduler maintenance, scan the list of messages sent from other schedulers and
 take appropriate action on any received.

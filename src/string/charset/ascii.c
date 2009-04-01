@@ -180,7 +180,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<STRING * ascii_get_graphemes>
+=item C<STRING * ascii_get_graphemes(PARROT_INTERP, STRING *source_string,
+UINTVAL offset, UINTVAL count)>
 
 Retrieves the graphemes for the STRING C<source_string>, starting at
 C<offset> and ending at C<offset + count>.
@@ -201,7 +202,8 @@ ascii_get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static void set_graphemes>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
+UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets the graphemes for C<source_string>, starting at C<offset>. Replace
 C<replace_count> graphemes with those from STRING C<insert_string>.
@@ -222,7 +224,8 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<STRING * ascii_get_graphemes_inplace>
+=item C<STRING * ascii_get_graphemes_inplace(PARROT_INTERP,
+STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
 
 Retrieves the graphemes in place for ascii STRING C<source_string>,
 starting at C<offset>. Retrieves C<count> graphemes and puts them
@@ -245,7 +248,7 @@ ascii_get_graphemes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * to_ascii>
+=item C<static STRING * to_ascii(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Attempts to convert STRING C<src> to ASCII in STRING C<dest>. Throws
 an exception if unconvertable UNICODE characters are involved.
@@ -289,7 +292,7 @@ to_ascii(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING * to_unicode>
+=item C<static STRING * to_unicode(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts the ASCII STRING C<src> to UNICODE STRING C<dest>.
 
@@ -317,7 +320,7 @@ to_unicode(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
 /*
 
-=item C<static STRING * to_charset>
+=item C<static STRING * to_charset(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts STRING C<src> to ASCII charset STRING C<dest>.
 
@@ -344,7 +347,7 @@ to_charset(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRING *dest))
 /* A noop. can't compose ascii */
 /*
 
-=item C<static STRING* compose>
+=item C<static STRING* compose(PARROT_INTERP, STRING *src)>
 
 Can't compose ASCII strings, so performs a string copy on it and
 returns the new string.
@@ -364,7 +367,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 /* A noop. can't decompose ascii */
 /*
 
-=item C<static STRING* decompose>
+=item C<static STRING* decompose(PARROT_INTERP, STRING *src)>
 
 Can't decompose ASCII, so we perform a string copy instead and return
 a pointer to the new string.
@@ -383,7 +386,7 @@ decompose(PARROT_INTERP, ARGMOD(STRING *src))
 
 /*
 
-=item C<static void upcase>
+=item C<static void upcase(PARROT_INTERP, STRING *source_string)>
 
 Converts the STRING C<source_string> to all uppercase.
 
@@ -409,7 +412,7 @@ upcase(SHIM_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void downcase>
+=item C<static void downcase(PARROT_INTERP, STRING *source_string)>
 
 Converts the STRING C<source_string> to all lower-case.
 
@@ -435,7 +438,7 @@ downcase(SHIM_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void titlecase>
+=item C<static void titlecase(PARROT_INTERP, STRING *source_string)>
 
 Converts the STRING given by C<source_string> to title case, where
 the first character is upper case and all the rest of the characters
@@ -464,7 +467,7 @@ titlecase(SHIM_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void upcase_first>
+=item C<static void upcase_first(PARROT_INTERP, STRING *source_string)>
 
 Sets the first character in the STRING C<source_string> to upper case,
 but doesn't modify the rest of the string.
@@ -485,7 +488,7 @@ upcase_first(SHIM_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void downcase_first>
+=item C<static void downcase_first(PARROT_INTERP, STRING *source_string)>
 
 Sets the first character of the STRING C<source_string> to lowercase,
 but doesn't modify the rest of the characters.
@@ -506,7 +509,7 @@ downcase_first(SHIM_INTERP, ARGIN(STRING *source_string))
 
 /*
 
-=item C<static void titlecase_first>
+=item C<static void titlecase_first(PARROT_INTERP, STRING *source_string)>
 
 Converts the first letter of STRING C<source_string> to upper case,
 but doesn't modify the rest of the string.
@@ -527,7 +530,7 @@ titlecase_first(SHIM_INTERP, ARGMOD(STRING *source_string))
 
 /*
 
-=item C<INTVAL ascii_compare>
+=item C<INTVAL ascii_compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)>
 
 Compares two strings as ASCII strings. If STRING C<lhs> > C<rhs>, returns
 1. If C<lhs> == C<rhs> returns 0. If STRING C<lhs> < C<rhs>, returns  -1.
@@ -573,7 +576,8 @@ ascii_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<INTVAL mixed_cs_index>
+=item C<INTVAL mixed_cs_index(PARROT_INTERP, STRING *src, STRING *search,
+UINTVAL offs)>
 
 Searches for the first instance of STRING C<search> in STRING C<src>.
 returns the position where the substring is found if it is indeed found.
@@ -621,7 +625,8 @@ mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search),
 
 /*
 
-=item C<INTVAL ascii_cs_index>
+=item C<INTVAL ascii_cs_index(PARROT_INTERP, STRING *source_string,
+STRING *search_string, UINTVAL offset)>
 
 Searches for the first instance of STRING C<search> in STRING C<src>.
 returns the position where the substring is found if it is indeed found.
@@ -650,7 +655,8 @@ ascii_cs_index(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<INTVAL ascii_cs_rindex>
+=item C<INTVAL ascii_cs_rindex(PARROT_INTERP, STRING *source_string,
+STRING *search_string, UINTVAL offset)>
 
 Searches for the last instance of STRING C<search_string> in STRING
 C<source_string>. Starts searching at C<offset>.
@@ -679,7 +685,7 @@ ascii_cs_rindex(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static UINTVAL validate>
+=item C<static UINTVAL validate(PARROT_INTERP, STRING *src)>
 
 Verifies that the given string is valid ASCII. Returns 1 if it is ASCII,
 returns 0 otherwise.
@@ -707,7 +713,7 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static STRING * string_from_codepoint>
+=item C<static STRING * string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)>
 
 Creates a new STRING object from a single codepoint C<codepoint>. Returns
 the new STRING.
@@ -729,7 +735,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static INTVAL is_cclass>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
+const STRING *source_string, UINTVAL offset)>
 
 =cut
 
@@ -755,7 +762,8 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *source_string), UINTV
 
 /*
 
-=item C<static INTVAL find_cclass>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -782,7 +790,8 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static INTVAL find_not_cclass>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
+STRING *source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -808,7 +817,7 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
 
 /*
 
-=item C<size_t ascii_compute_hash>
+=item C<size_t ascii_compute_hash(PARROT_INTERP, const STRING *source_string, size_t seed)>
 
 Computes the hash of STRING C<source_string> starting with seed value
 C<seed>.
@@ -836,7 +845,7 @@ ascii_compute_hash(SHIM_INTERP, ARGIN(const STRING *source_string), size_t seed)
 
 /*
 
-=item C<const CHARSET * Parrot_charset_ascii_init>
+=item C<const CHARSET * Parrot_charset_ascii_init(PARROT_INTERP)>
 
 Initialize the ASCII charset but registering all the necessary
 function pointers and settings.
@@ -885,7 +894,7 @@ Parrot_charset_ascii_init(PARROT_INTERP)
 
 /*
 
-=item C<STRING * charset_cvt_ascii_to_binary>
+=item C<STRING * charset_cvt_ascii_to_binary(PARROT_INTERP, STRING *src, STRING *dest)>
 
 Converts an ASCII STRING C<src> to a binary STRING C<dest>.
 
@@ -916,7 +925,8 @@ charset_cvt_ascii_to_binary(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRI
 
 /*
 
-=item C<STRING * charset_cvt_ascii_to_iso_8859_1>
+=item C<STRING * charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, STRING *src,
+STRING *dest)>
 
 Converts ASCII STRING C<src> to ISO8859-1 STRING C<dest>.
 

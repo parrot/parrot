@@ -40,7 +40,7 @@ static void run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
 
 /*
 
-=item C<void stack_system_init>
+=item C<void stack_system_init(PARROT_INTERP)>
 
 Called from C<make_interpreter()> to initialize the interpreter's
 register stacks.
@@ -58,7 +58,7 @@ stack_system_init(SHIM_INTERP)
 
 /*
 
-=item C<Stack_Chunk_t * cst_new_stack_chunk>
+=item C<Stack_Chunk_t * cst_new_stack_chunk(PARROT_INTERP, const Stack_Chunk_t *chunk)>
 
 Get a new chunk either from the freelist or allocate one.
 
@@ -87,7 +87,7 @@ cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 
 /*
 
-=item C<Stack_Chunk_t * new_stack>
+=item C<Stack_Chunk_t * new_stack(PARROT_INTERP, const char *name)>
 
 Create a new stack and name it. C<< stack->name >> is used for
 debugging/error reporting.
@@ -116,7 +116,7 @@ new_stack(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<void mark_stack>
+=item C<void mark_stack(PARROT_INTERP, Stack_Chunk_t *chunk)>
 
 Mark entries in a stack structure during GC.
 
@@ -146,7 +146,7 @@ mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
 
 /*
 
-=item C<void stack_destroy>
+=item C<void stack_destroy(Stack_Chunk_t *top)>
 
 stack_destroy() doesn't need to do anything, since GC does it all.
 
@@ -164,7 +164,7 @@ stack_destroy(SHIM(Stack_Chunk_t *top))
 
 /*
 
-=item C<size_t stack_height>
+=item C<size_t stack_height(PARROT_INTERP, const Stack_Chunk_t *chunk)>
 
 Returns the height of the stack. The maximum "depth" is height - 1.
 
@@ -192,7 +192,7 @@ stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 
 /*
 
-=item C<Stack_Entry_t * stack_entry>
+=item C<Stack_Entry_t * stack_entry(PARROT_INTERP, Stack_Chunk_t *stack, INTVAL depth)>
 
 If C<< depth >= 0 >>, return the entry at that depth from the top of the
 stack, with 0 being the top entry. If C<depth < 0>, then return the
@@ -234,7 +234,7 @@ stack_entry(SHIM_INTERP, ARGIN(Stack_Chunk_t *stack), INTVAL depth)
 
 /*
 
-=item C<Stack_Entry_t* stack_prepare_push>
+=item C<Stack_Entry_t* stack_prepare_push(PARROT_INTERP, Stack_Chunk_t **stack_p)>
 
 Return a pointer, where new entries go for push.
 
@@ -260,7 +260,8 @@ stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 
 /*
 
-=item C<void stack_push>
+=item C<void stack_push(PARROT_INTERP, Stack_Chunk_t **stack_p,
+void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)>
 
 Push something on the generic stack.
 
@@ -307,7 +308,7 @@ stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
 
 /*
 
-=item C<Stack_Entry_t* stack_prepare_pop>
+=item C<Stack_Entry_t* stack_prepare_pop(PARROT_INTERP, Stack_Chunk_t **stack_p)>
 
 Return a pointer, where new entries are popped off.
 
@@ -336,7 +337,8 @@ stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 
 /*
 
-=item C<void * stack_pop>
+=item C<void * stack_pop(PARROT_INTERP, Stack_Chunk_t **stack_p,
+void *where, Stack_entry_type type)>
 
 Pop off an entry and return a pointer to the contents.
 
@@ -395,7 +397,7 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
 
 /*
 
-=item C<void * pop_dest>
+=item C<void * pop_dest(PARROT_INTERP)>
 
 Pop off a destination entry and return a pointer to the contents.
 
@@ -420,7 +422,8 @@ pop_dest(PARROT_INTERP)
 
 /*
 
-=item C<void * stack_peek>
+=item C<void * stack_peek(PARROT_INTERP, Stack_Chunk_t *stack_base,
+Stack_entry_type *type)>
 
 Peek at stack and return pointer to entry and the type of the entry.
 
@@ -451,7 +454,7 @@ stack_peek(PARROT_INTERP, ARGIN(Stack_Chunk_t *stack_base),
 
 /*
 
-=item C<Stack_entry_type get_entry_type>
+=item C<Stack_entry_type get_entry_type(const Stack_Entry_t *entry)>
 
 Returns the stack entry type of C<entry>.
 
@@ -470,7 +473,7 @@ get_entry_type(ARGIN(const Stack_Entry_t *entry))
 
 /*
 
-=item C<void Parrot_dump_dynamic_environment>
+=item C<void Parrot_dump_dynamic_environment(PARROT_INTERP, Stack_Chunk_t *dynamic_env)>
 
 Print a representation of the dynamic stack to the standard error (using
 C<Parrot_io_eprintf>).  This is used only temporarily for debugging.
@@ -518,7 +521,7 @@ Parrot_dump_dynamic_environment(PARROT_INTERP, ARGIN(Stack_Chunk_t *dynamic_env)
 
 /*
 
-=item C<static void run_cleanup_action>
+=item C<static void run_cleanup_action(PARROT_INTERP, Stack_Entry_t *e)>
 
 Runs the sub PMC from the Stack_Entry_t pointer with an INTVAL arg of 0.  Used
 in C<Parrot_push_action>.
@@ -541,7 +544,7 @@ run_cleanup_action(PARROT_INTERP, ARGIN(Stack_Entry_t *e))
 
 /*
 
-=item C<void Parrot_push_action>
+=item C<void Parrot_push_action(PARROT_INTERP, PMC *sub)>
 
 Pushes an action handler onto the dynamic environment.
 
@@ -564,7 +567,7 @@ Parrot_push_action(PARROT_INTERP, ARGIN(PMC *sub))
 
 /*
 
-=item C<void Parrot_push_mark>
+=item C<void Parrot_push_mark(PARROT_INTERP, INTVAL mark)>
 
 Push a cleanup mark onto the dynamic environment.
 
@@ -583,7 +586,7 @@ Parrot_push_mark(PARROT_INTERP, INTVAL mark)
 
 /*
 
-=item C<void Parrot_pop_mark>
+=item C<void Parrot_pop_mark(PARROT_INTERP, INTVAL mark)>
 
 Pop items off the dynamic environment up to the mark.
 

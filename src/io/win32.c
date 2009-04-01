@@ -64,7 +64,8 @@ static INTVAL io_is_tty_win32(PIOHANDLE fd);
 
 /*
 
-=item C<static INTVAL convert_flags_to_win32>
+=item C<static INTVAL convert_flags_to_win32(INTVAL flags, DWORD * fdwAccess,
+DWORD * fdwShareMode, DWORD * fdwCreate)>
 
 Convert to platform-specific bit open flags.
 
@@ -119,7 +120,7 @@ convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
 
 /*
 
-=item C<INTVAL Parrot_io_init_win32>
+=item C<INTVAL Parrot_io_init_win32(PARROT_INTERP)>
 
 Sets up the standard C<std*> IO handles.
 
@@ -171,7 +172,7 @@ Parrot_io_init_win32(PARROT_INTERP)
 
 /*
 
-=item C<INTVAL Parrot_io_getblksize_win32>
+=item C<INTVAL Parrot_io_getblksize_win32(PIOHANDLE fd)>
 
 Returns C<PIO_BLKSIZE>.
 
@@ -189,7 +190,8 @@ Parrot_io_getblksize_win32(SHIM(PIOHANDLE fd))
 
 /*
 
-=item C<PMC * Parrot_io_open_win32>
+=item C<PMC * Parrot_io_open_win32(PARROT_INTERP, PMC *filehandle,
+STRING *path, INTVAL flags)>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
@@ -253,7 +255,8 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<PMC * Parrot_io_fdopen_win32>
+=item C<PMC * Parrot_io_fdopen_win32(PARROT_INTERP, PMC *filehandle,
+PIOHANDLE fd, INTVAL flags)>
 
 Returns a new C<PMC> with C<fd> as its file descriptor.
 
@@ -289,7 +292,7 @@ Parrot_io_fdopen_win32(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
 
 /*
 
-=item C<INTVAL Parrot_io_close_win32>
+=item C<INTVAL Parrot_io_close_win32(PARROT_INTERP, PMC *filehandle)>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
 
@@ -313,7 +316,7 @@ Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed_win32>
+=item C<INTVAL Parrot_io_is_closed_win32(PARROT_INTERP, PMC *filehandle)>
 
 Test whether the filehandle has been closed.
 
@@ -333,7 +336,7 @@ Parrot_io_is_closed_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<static INTVAL io_is_tty_win32>
+=item C<static INTVAL io_is_tty_win32(PIOHANDLE fd)>
 
 Returns whether C<fd> is a console/tty.
 
@@ -352,7 +355,7 @@ io_is_tty_win32(PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL Parrot_io_flush_win32>
+=item C<INTVAL Parrot_io_flush_win32(PARROT_INTERP, PMC *filehandle)>
 
 Calls C<FlushFileBuffers()> to flush C<*io>'s file descriptor.
 
@@ -381,7 +384,7 @@ Parrot_io_flush_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_win32>
+=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PMC *filehandle, STRING **buf)>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -426,7 +429,7 @@ Parrot_io_read_win32(PARROT_INTERP,
 
 /*
 
-=item C<size_t Parrot_io_write_win32>
+=item C<size_t Parrot_io_write_win32(PARROT_INTERP, PMC *filehandle, STRING *s)>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor. Returns C<(size_t)-1> on
@@ -469,7 +472,8 @@ Parrot_io_write_win32(PARROT_INTERP,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_win32>
+=item C<PIOOFF_T Parrot_io_seek_win32(PARROT_INTERP, PMC *filehandle,
+PIOOFF_T off, INTVAL whence)>
 
 Hard seek.
 
@@ -502,7 +506,7 @@ Parrot_io_seek_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_win32>
+=item C<PIOOFF_T Parrot_io_tell_win32(PARROT_INTERP, PMC *filehandle)>
 
 Returns the current read/write position of C<*io>'s file descriptor.
 
@@ -527,7 +531,7 @@ Parrot_io_tell_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_peek_win32>
+=item C<size_t Parrot_io_peek_win32(PARROT_INTERP, PMC *filehandle, STRING **buf)>
 
 Retrieve the next character in the stream without modifying the stream. Not
 implemented for this platform.
@@ -548,7 +552,8 @@ Parrot_io_peek_win32(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_io_open_pipe_win32>
+=item C<PMC * Parrot_io_open_pipe_win32(PARROT_INTERP, PMC *filehandle,
+STRING *command, int flags)>
 
 Open a pipe. Not implemented for this platform.
 

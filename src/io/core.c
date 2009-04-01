@@ -34,7 +34,7 @@ PIOOFF_T piooffsetzero;
 
 /*
 
-=item C<void Parrot_io_init>
+=item C<void Parrot_io_init(PARROT_INTERP)>
 
 Sets up the interpreter's I/O storage and creates the C<STD*> handles.
 
@@ -78,7 +78,7 @@ Parrot_io_init(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_io_finish>
+=item C<void Parrot_io_finish(PARROT_INTERP)>
 
 Closes the interpreter's IO resourses.  Called during its interpreter
 destruction.
@@ -105,7 +105,7 @@ Parrot_io_finish(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_IOData_mark>
+=item C<void Parrot_IOData_mark(PARROT_INTERP, ParrotIOData *piodata)>
 
 Called from C<trace_active_PMCs()> to mark the IO data live.
 

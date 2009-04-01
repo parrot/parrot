@@ -28,7 +28,7 @@ This file implements various functions for creating and writing packfiles.
 
 /*
 
-=item C<opcode_t PackFile_pack_size(PARROT_INTERP, PackFile *self)>
+=item C<opcode_t PackFile_pack_size>
 
 Determine the size of the buffer needed in order to pack the PackFile
 into a contiguous region of memory.
@@ -68,7 +68,7 @@ PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 
 /*
 
-=item C<void PackFile_pack(PARROT_INTERP, PackFile *self, opcode_t *cursor)>
+=item C<void PackFile_pack>
 
 Pack the PackFile into a contiguous region of memory.
 
@@ -143,7 +143,7 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
 
 /*
 
-=item C<size_t PackFile_ConstTable_pack_size(PARROT_INTERP, PackFile_Segment *seg)>
+=item C<size_t PackFile_ConstTable_pack_size>
 
 Determine the size of the buffer needed in order to pack the PackFile
 constant table into a contiguous region of memory.
@@ -168,8 +168,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
 
 /*
 
-=item C<opcode_t * PackFile_ConstTable_pack(PARROT_INTERP,
-PackFile_Segment *seg, opcode_t *cursor)>
+=item C<opcode_t * PackFile_ConstTable_pack>
 
 Pack the PackFile ConstTable into a contiguous region of memory.
 
@@ -204,8 +203,7 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
 /*
 
-=item C<int PackFile_find_in_const(PARROT_INTERP,
-const PackFile_ConstTable *ct, PMC *key, int type)>
+=item C<int PackFile_find_in_const>
 
 This is really ugly, we don't know where our C<PARROT_ARG_SC> key
 constant is in constant table, so we have to search for it.
@@ -239,9 +237,7 @@ PackFile_find_in_const(PARROT_INTERP,
 
 /*
 
-=item C<opcode_t * PackFile_Constant_pack(PARROT_INTERP,
-const PackFile_ConstTable *const_table,
-const PackFile_Constant *self, opcode_t *cursor)>
+=item C<opcode_t * PackFile_Constant_pack>
 
 Pack a PackFile Constant into a contiguous region of memory.
 
