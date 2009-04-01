@@ -2,9 +2,9 @@
 # Copyright (C) 2008, Parrot Foundation.
 # $Id$
 
-.include 'include/hllmacros.pir'
+.include 'hllmacros.pir'
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(17)
 
