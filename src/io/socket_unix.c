@@ -76,7 +76,7 @@ Very minimal stubs for now, maybe someone will run with these.
 
 =over 4
 
-=item C<PMC * Parrot_io_sockaddr_in(PARROT_INTERP, STRING *addr, INTVAL port)>
+=item C<PMC * Parrot_io_sockaddr_in>
 
 C<Parrot_io_sockaddr_in()> is not part of the layer and so must be C<extern>.
 
@@ -115,8 +115,7 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 
 /*
 
-=item C<INTVAL Parrot_io_socket_unix(PARROT_INTERP, PMC *s, int fam, int type,
-int proto)>
+=item C<INTVAL Parrot_io_socket_unix>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -144,7 +143,7 @@ Parrot_io_socket_unix(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto
 
 /*
 
-=item C<INTVAL Parrot_io_connect_unix(PARROT_INTERP, PMC *socket, PMC *r)>
+=item C<INTVAL Parrot_io_connect_unix>
 
 Connects C<*io>'s socket to address C<*r>.
 
@@ -183,7 +182,7 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_bind_unix(PARROT_INTERP, PMC *socket, PMC *sockaddr)>
+=item C<INTVAL Parrot_io_bind_unix>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
 
@@ -215,7 +214,7 @@ Parrot_io_bind_unix(PARROT_INTERP, ARGMOD(PMC *socket), ARGMOD(PMC *sockaddr))
 
 /*
 
-=item C<INTVAL Parrot_io_listen_unix(PARROT_INTERP, PMC *socket, INTVAL sec)>
+=item C<INTVAL Parrot_io_listen_unix>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
@@ -237,7 +236,7 @@ Parrot_io_listen_unix(SHIM_INTERP, ARGMOD(PMC *socket), INTVAL sec)
 
 /*
 
-=item C<PMC * Parrot_io_accept_unix(PARROT_INTERP, PMC *socket)>
+=item C<PMC * Parrot_io_accept_unix>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 
@@ -281,7 +280,7 @@ Parrot_io_accept_unix(PARROT_INTERP, ARGMOD(PMC *socket))
 
 /*
 
-=item C<INTVAL Parrot_io_send_unix(PARROT_INTERP, PMC *socket, STRING *s)>
+=item C<INTVAL Parrot_io_send_unix>
 
 Send the message C<*s> to C<*io>'s connected socket.
 
@@ -334,7 +333,7 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_recv_unix(PARROT_INTERP, PMC *socket, STRING **s)>
+=item C<INTVAL Parrot_io_recv_unix>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
 
@@ -386,8 +385,7 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_poll_unix(PARROT_INTERP, PMC *socket, int which,
-int sec, int usec)>
+=item C<INTVAL Parrot_io_poll_unix>
 
 Utility function for polling a single IO stream with a timeout.
 
@@ -439,8 +437,7 @@ AGAIN:
 
 /*
 
-=item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr,
-const char* host, int port)>
+=item C<static void get_sockaddr_in>
 
 =cut
 

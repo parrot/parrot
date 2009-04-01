@@ -87,8 +87,7 @@ static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
 
 /*
 
-=item C<void Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, PMC *self,
-PMC *ns)>
+=item C<void Parrot_oo_extract_methods_from_namespace>
 
 Extract methods and vtable overrides from the given namespace and insert them
 into the class.
@@ -150,7 +149,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
 
 /*
 
-=item C<PMC * Parrot_oo_get_namespace(PARROT_INTERP, const PMC *classobj)>
+=item C<PMC * Parrot_oo_get_namespace>
 
 Lookup a namespace object from a class PMC.
 
@@ -176,7 +175,7 @@ Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
 
 /*
 
-=item C<PMC * Parrot_oo_get_class(PARROT_INTERP, PMC *key)>
+=item C<PMC * Parrot_oo_get_class>
 
 Lookup a class object from a namespace, string, or key PMC.
 
@@ -251,7 +250,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_oo_get_class_str(PARROT_INTERP, STRING *name)>
+=item C<PMC * Parrot_oo_get_class_str>
 
 Lookup a class object from a builtin string.
 
@@ -292,7 +291,7 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
 
 /*
 
-=item C<PMC * Parrot_oo_newclass_from_str(PARROT_INTERP, STRING *name)>
+=item C<PMC * Parrot_oo_newclass_from_str>
 
 Create a new class object from a string name.
 
@@ -322,8 +321,7 @@ Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
 
 /*
 
-=item C<PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
-PMC *classobj, STRING *name)>
+=item C<PMC * Parrot_oo_find_vtable_override_for_class>
 
 Lookup a vtable override in a specific class object.
 
@@ -348,8 +346,7 @@ Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_oo_find_vtable_override(PARROT_INTERP, PMC *classobj,
-STRING *name)>
+=item C<PMC * Parrot_oo_find_vtable_override>
 
 Lookup a vtable override in a class, including any vtable overrides inherited
 from parents.
@@ -396,7 +393,7 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
 
 /*
 
-=item C<INTVAL Parrot_get_vtable_index(PARROT_INTERP, const STRING *name)>
+=item C<INTVAL Parrot_get_vtable_index>
 
 Return index if C<name> is a valid vtable slot name.
 
@@ -439,7 +436,7 @@ Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 
 /*
 
-=item C<const char * Parrot_get_vtable_name(PARROT_INTERP, INTVAL idx)>
+=item C<const char * Parrot_get_vtable_name>
 
 Return the method name at the specified index in the vtable slot array.
 Use this function when you cannot access Parrot_vtable_slot_names directly.
@@ -471,7 +468,7 @@ Parrot_get_vtable_name(PARROT_INTERP, INTVAL idx)
 
 /*
 
-=item C<const char* Parrot_MMD_method_name(PARROT_INTERP, INTVAL idx)>
+=item C<const char* Parrot_MMD_method_name>
 
 Return the method name for the given MMD enum.
 
@@ -498,7 +495,7 @@ Parrot_MMD_method_name(SHIM_INTERP, INTVAL idx)
 
 /*
 
-=item C<static INTVAL fail_if_type_exists(PARROT_INTERP, PMC *name)>
+=item C<static INTVAL fail_if_type_exists>
 
 This function throws an exception if a PMC or class with the same name *
 already exists in the global type registry. The global type registry
@@ -544,7 +541,7 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
 
 /*
 
-=item C<INTVAL Parrot_oo_register_type(PARROT_INTERP, PMC *name, PMC *_namespace)>
+=item C<INTVAL Parrot_oo_register_type>
 
 This function registers a type in the global registry, first checking if it
 already exists. The global type registry will go away eventually, but this
@@ -593,7 +590,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
 
 /*
 
-=item C<void mark_object_cache(PARROT_INTERP)>
+=item C<void mark_object_cache>
 
 Marks all PMCs in the object method cache as live.  This shouldn't strictly be
 necessary, as they're likely all reachable from namespaces and classes, but
@@ -633,7 +630,7 @@ mark_object_cache(PARROT_INTERP)
 
 /*
 
-=item C<void init_object_cache(PARROT_INTERP)>
+=item C<void init_object_cache>
 
 Allocate memory for object cache.
 
@@ -652,7 +649,7 @@ init_object_cache(PARROT_INTERP)
 
 /*
 
-=item C<void destroy_object_cache(PARROT_INTERP)>
+=item C<void destroy_object_cache>
 
 =cut
 
@@ -678,7 +675,7 @@ destroy_object_cache(PARROT_INTERP)
 
 /*
 
-=item C<static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)>
+=item C<static void invalidate_type_caches>
 
 =cut
 
@@ -714,7 +711,7 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
 
 /*
 
-=item C<static void invalidate_all_caches(PARROT_INTERP)>
+=item C<static void invalidate_all_caches>
 
 =cut
 
@@ -732,7 +729,7 @@ invalidate_all_caches(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_invalidate_method_cache(PARROT_INTERP, STRING *_class)>
+=item C<void Parrot_invalidate_method_cache>
 
 Clear method cache for the given class. If class is NULL, caches for
 all classes are invalidated.
@@ -779,8 +776,7 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class))
 
 /*
 
-=item C<PMC * Parrot_find_method_direct(PARROT_INTERP, PMC *_class,
-STRING *method_name)>
+=item C<PMC * Parrot_find_method_direct>
 
 Find a method PMC for a named method, given the class PMC, current
 interpreter, and name of the method. Don't use a possible method cache.
@@ -811,8 +807,7 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
 
 /*
 
-=item C<PMC * Parrot_find_method_with_cache(PARROT_INTERP, PMC *_class,
-STRING *method_name)>
+=item C<PMC * Parrot_find_method_with_cache>
 
 Find a method PMC for a named method, given the class PMC, current
 interp, and name of the method.
@@ -897,8 +892,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 
 /*
 
-=item C<static void debug_trace_find_meth(PARROT_INTERP, const PMC *_class,
-const STRING *name, const PMC *sub)>
+=item C<static void debug_trace_find_meth>
 
 =cut
 
@@ -951,8 +945,7 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
 
 /*
 
-=item C<static PMC * find_method_direct_1(PARROT_INTERP, PMC *_class,
-STRING *method_name)>
+=item C<static PMC * find_method_direct_1>
 
 =cut
 
@@ -990,7 +983,7 @@ find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
 
 /*
 
-=item C<static PMC* C3_merge(PARROT_INTERP, PMC *merge_list)>
+=item C<static PMC* C3_merge>
 
 =cut
 
@@ -1085,7 +1078,7 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 
 /*
 
-=item C<PMC* Parrot_ComputeMRO_C3(PARROT_INTERP, PMC *_class)>
+=item C<PMC* Parrot_ComputeMRO_C3>
 
 Computes the C3 linearization for the given class.
 
@@ -1151,8 +1144,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
 /*
 
-=item C<void Parrot_ComposeRole(PARROT_INTERP, PMC *role, PMC *exclude,
-int got_exclude, PMC *alias, int got_alias, PMC *methods_hash, PMC *roles_list)>
+=item C<void Parrot_ComposeRole>
 
 Used by the Class and Object PMCs internally to compose a role into either of
 them. The C<role> parameter is the role that we are composing into the class

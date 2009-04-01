@@ -71,7 +71,7 @@ PMC * PMCNULL;
 
 /*
 
-=item C<INTVAL PMC_is_null(PARROT_INTERP, const PMC *pmc)>
+=item C<INTVAL PMC_is_null>
 
 Tests if the given pmc is null.
 
@@ -93,7 +93,7 @@ PMC_is_null(SHIM_INTERP, ARGIN_NULLOK(const PMC *pmc))
 
 /*
 
-=item C<PMC * pmc_new(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * pmc_new>
 
 Creates a new PMC of type C<base_type> (which is an index into the list of PMC
 types declared in C<vtables> in F<include/parrot/pmc.h>). Once the PMC has been
@@ -127,7 +127,7 @@ pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * pmc_reuse(PARROT_INTERP, PMC *pmc, INTVAL new_type, UINTVAL flags)>
+=item C<PMC * pmc_reuse>
 
 Reuse an existing PMC, turning it into an empty PMC of the new type. Any
 required internal structure will be put in place (such as the extension area)
@@ -220,7 +220,7 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 
 /*
 
-=item C<static PMC * get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)>
+=item C<static PMC * get_new_pmc_header>
 
 Gets a new PMC header.
 
@@ -315,7 +315,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 
 /*
 
-=item C<PMC * pmc_new_noinit(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * pmc_new_noinit>
 
 Creates a new PMC of type C<base_type> (which is an index into the list of PMC
 types declared in C<vtables> in F<include/parrot/pmc.h>). Unlike C<pmc_new()>,
@@ -343,7 +343,7 @@ pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * constant_pmc_new_noinit>
 
 Creates a new constant PMC of type C<base_type>.
 
@@ -363,7 +363,7 @@ constant_pmc_new_noinit(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * constant_pmc_new(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * constant_pmc_new>
 
 Creates a new constant PMC of type C<base_type>, then calls its C<init>.
 
@@ -385,7 +385,7 @@ constant_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)>
+=item C<PMC * pmc_new_init>
 
 As C<pmc_new()>, but passes C<init> to the PMC's C<init_pmc()> vtable entry.
 
@@ -413,7 +413,7 @@ pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGOUT(PMC *init))
 
 /*
 
-=item C<PMC * constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, PMC *init)>
+=item C<PMC * constant_pmc_new_init>
 
 As C<constant_pmc_new>, but passes C<init> to the PMC's C<init_pmc> vtable
 entry.
@@ -436,7 +436,7 @@ constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
 
 /*
 
-=item C<PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)>
+=item C<PMC * temporary_pmc_new>
 
 Creates a new temporary PMC of type C<base_type>, the call C<init>.  B<You> are
 responsible for freeing this PMC when it goes out of scope with
@@ -470,8 +470,7 @@ temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<static void pmc_free_to_pool(PARROT_INTERP, PMC *pmc,
-Small_Object_Pool *pool)>
+=item C<static void pmc_free_to_pool>
 
 =cut
 
@@ -495,7 +494,7 @@ pmc_free_to_pool(PARROT_INTERP, ARGMOD(PMC *pmc),
 
 /*
 
-=item C<void temporary_pmc_free(PARROT_INTERP, PMC *pmc)>
+=item C<void temporary_pmc_free>
 
 Frees a new temporary PMC created by C<temporary_pmc_new()>.  Do not call this
 with any other type of PMC.  Do not forget to call this (or you'll leak PMCs).
@@ -516,7 +515,7 @@ temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<static void pmc_free(PARROT_INTERP, PMC *pmc)>
+=item C<static void pmc_free>
 
 =cut
 
@@ -533,7 +532,7 @@ pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL get_new_vtable_index(PARROT_INTERP)>
+=item C<INTVAL get_new_vtable_index>
 
 =cut
 
@@ -554,7 +553,7 @@ get_new_vtable_index(PARROT_INTERP)
 
 /*
 
-=item C<INTVAL pmc_register(PARROT_INTERP, STRING *name)>
+=item C<INTVAL pmc_register>
 
 Registers the name of a new PMC type with Parrot, returning the INTVAL
 representing that type.
@@ -590,7 +589,7 @@ pmc_register(PARROT_INTERP, ARGIN(STRING *name))
 
 /*
 
-=item C<INTVAL pmc_type(PARROT_INTERP, STRING *name)>
+=item C<INTVAL pmc_type>
 
 Returns the PMC type for C<name>.
 
@@ -626,7 +625,7 @@ pmc_type(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
 
 /*
 
-=item C<INTVAL pmc_type_p(PARROT_INTERP, PMC *name)>
+=item C<INTVAL pmc_type_p>
 
 Returns the PMC type for C<name>.
 
@@ -653,7 +652,7 @@ pmc_type_p(PARROT_INTERP, ARGIN(PMC *name))
 
 /*
 
-=item C<static PMC * create_class_pmc(PARROT_INTERP, INTVAL type)>
+=item C<static PMC * create_class_pmc>
 
 Create a class object for this interpreter.  Takes an interpreter name and type
 as arguments.  Returns a pointer to the class object.
@@ -704,7 +703,7 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
 
 /*
 
-=item C<void Parrot_create_mro(PARROT_INTERP, INTVAL type)>
+=item C<void Parrot_create_mro>
 
 Create the MRO (method resolution order) array for this type.
 
@@ -775,7 +774,7 @@ Parrot_create_mro(PARROT_INTERP, INTVAL type)
 
 =over 4
 
-=item C<void gc_register_pmc(PARROT_INTERP, PMC *pmc)>
+=item C<void gc_register_pmc>
 
 Registers the PMC with the interpreter's GC registry.
 
@@ -800,7 +799,7 @@ gc_register_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<void gc_unregister_pmc(PARROT_INTERP, PMC *pmc)>
+=item C<void gc_unregister_pmc>
 
 Unregisters the PMC from the interpreter's GC registry.
 

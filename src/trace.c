@@ -46,7 +46,7 @@ static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 
 /*
 
-=item C<static STRING* trace_class_name(PARROT_INTERP, const PMC* pmc)>
+=item C<static STRING* trace_class_name>
 
 Obtains the class name of the PMC.
 
@@ -74,7 +74,7 @@ trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 
 /*
 
-=item C<void trace_pmc_dump(PARROT_INTERP, PMC *pmc)>
+=item C<void trace_pmc_dump>
 
 Prints a PMC to C<stderr>.
 
@@ -162,7 +162,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 
 /*
 
-=item C<int trace_key_dump(PARROT_INTERP, PMC *key)>
+=item C<int trace_key_dump>
 
 Prints a key to C<stderr>, returns the length of the output.
 
@@ -241,8 +241,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<void trace_op_dump(PARROT_INTERP, const opcode_t *code_start,
-const opcode_t *pc)>
+=item C<void trace_op_dump>
 
 Prints the PC, OP and ARGS. Used by C<trace_op()>.
 
@@ -477,8 +476,7 @@ done:
 
 /*
 
-=item C<void trace_op(PARROT_INTERP, const opcode_t *code_start,
-const opcode_t *code_end, const opcode_t *pc)>
+=item C<void trace_op>
 
 Prints the PC, OP and ARGS. Used by C<runops_trace()>. With bounds
 checking.

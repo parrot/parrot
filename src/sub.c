@@ -29,7 +29,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 
 /*
 
-=item C<void mark_context_start(void)>
+=item C<void mark_context_start>
 
 Indicate that a new round of context marking is about to take place.
 
@@ -49,7 +49,7 @@ mark_context_start(void)
 
 /*
 
-=item C<void mark_context(PARROT_INTERP, Parrot_Context* ctx)>
+=item C<void mark_context>
 
 Marks the context C<*ctx>.
 
@@ -132,7 +132,7 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 
 /*
 
-=item C<Parrot_sub * new_sub(PARROT_INTERP)>
+=item C<Parrot_sub * new_sub>
 
 Returns a new C<Parrot_sub>.
 
@@ -154,7 +154,7 @@ new_sub(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_sub * new_closure(PARROT_INTERP)>
+=item C<Parrot_sub * new_closure>
 
 Returns a new C<Parrot_sub> with its own scratchpad.
 
@@ -176,7 +176,7 @@ new_closure(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_cont * new_continuation(PARROT_INTERP, const Parrot_cont *to)>
+=item C<Parrot_cont * new_continuation>
 
 Returns a new C<Parrot_cont> to the context of C<to> with its own copy of the
 current interpreter context.  If C<to> is C<NULL>, then the C<to_ctx> is set
@@ -214,7 +214,7 @@ new_continuation(PARROT_INTERP, ARGIN_NULLOK(const Parrot_cont *to))
 
 /*
 
-=item C<Parrot_cont * new_ret_continuation(PARROT_INTERP)>
+=item C<Parrot_cont * new_ret_continuation>
 
 Returns a new C<Parrot_cont> pointing to the current context.
 
@@ -242,7 +242,7 @@ new_ret_continuation(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_coro * new_coroutine(PARROT_INTERP)>
+=item C<Parrot_coro * new_coroutine>
 
 Returns a new C<Parrot_coro>.
 
@@ -269,7 +269,7 @@ new_coroutine(PARROT_INTERP)
 
 /*
 
-=item C<PMC * new_ret_continuation_pmc(PARROT_INTERP, opcode_t *address)>
+=item C<PMC * new_ret_continuation_pmc>
 
 Returns a new C<RetContinuation> PMC. Uses one from the cache,
 if possible; otherwise, creates a new one.
@@ -292,7 +292,7 @@ new_ret_continuation_pmc(PARROT_INTERP, ARGIN_NULLOK(opcode_t *address))
 
 /*
 
-=item C<void invalidate_retc_context(PARROT_INTERP, PMC *cont)>
+=item C<void invalidate_retc_context>
 
 Make true Continuations from all RetContinuations up the call chain.
 
@@ -326,7 +326,7 @@ invalidate_retc_context(PARROT_INTERP, ARGMOD(PMC *cont))
 
 /*
 
-=item C<STRING* Parrot_full_sub_name(PARROT_INTERP, PMC* sub_pmc)>
+=item C<STRING* Parrot_full_sub_name>
 
 Return namespace, name, and location of subroutine.
 
@@ -394,8 +394,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
 
 /*
 
-=item C<int Parrot_Context_get_info(PARROT_INTERP, const Parrot_Context *ctx,
-Parrot_Context_info *info)>
+=item C<int Parrot_Context_get_info>
 
 Takes pointers to a context and its information table.
 Populates the table and returns 0 or 1. XXX needs explanation
@@ -487,7 +486,7 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
 
 /*
 
-=item C<STRING* Parrot_Context_infostr(PARROT_INTERP, const Parrot_Context *ctx)>
+=item C<STRING* Parrot_Context_infostr>
 
 Formats context information for display.  Takes a context pointer and
 returns a pointer to the text.  Used in debug.c and warnings.c
@@ -524,7 +523,7 @@ Parrot_Context_infostr(PARROT_INTERP, ARGIN(const Parrot_Context *ctx))
 
 /*
 
-=item C<PMC* Parrot_find_pad(PARROT_INTERP, STRING *lex_name, const Parrot_Context *ctx)>
+=item C<PMC* Parrot_find_pad>
 
 Locate the LexPad containing the given name. Return NULL on failure.
 
@@ -567,7 +566,7 @@ Parrot_find_pad(PARROT_INTERP, ARGIN(STRING *lex_name), ARGIN(const Parrot_Conte
 
 /*
 
-=item C<void Parrot_capture_lex(PARROT_INTERP, PMC *sub_pmc)>
+=item C<void Parrot_capture_lex>
 
 Capture the current lexical environment of a sub.
 
@@ -639,7 +638,7 @@ Parrot_capture_lex(PARROT_INTERP, ARGMOD(PMC *sub_pmc))
 
 /*
 
-=item C<PMC* parrot_new_closure(PARROT_INTERP, PMC *sub_pmc)>
+=item C<PMC* parrot_new_closure>
 
 Used where? XXX
 
@@ -667,8 +666,7 @@ parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 /*
 
-=item C<void Parrot_continuation_check(PARROT_INTERP, const PMC *pmc,
-const Parrot_cont *cc)>
+=item C<void Parrot_continuation_check>
 
 Verifies that the provided continuation is sane.
 
@@ -698,8 +696,7 @@ Parrot_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc),
 
 /*
 
-=item C<void Parrot_continuation_rewind_environment(PARROT_INTERP, PMC *pmc,
-Parrot_cont *cc)>
+=item C<void Parrot_continuation_rewind_environment>
 
 Restores the appropriate context for the continuation.
 
@@ -732,7 +729,7 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, SHIM(PMC *pmc),
 
 /*
 
-=item C<Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC *subclass)>
+=item C<Parrot_sub * Parrot_get_sub_pmc_from_subclass>
 
 Gets a Parrot_sub structure from something that isn't a Sub PMC, but rather a
 subclass.

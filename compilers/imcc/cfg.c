@@ -206,8 +206,7 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<static int check_invoke_type(PARROT_INTERP, const IMC_Unit *unit,
-const Instruction *ins)>
+=item C<static int check_invoke_type>
 
 Given an invoke-type instruction, returns the type of the invocation.
 
@@ -247,7 +246,7 @@ check_invoke_type(PARROT_INTERP, ARGIN(const IMC_Unit    *unit),
 
 /*
 
-=item C<void find_basic_blocks(PARROT_INTERP, IMC_Unit *unit, int first)>
+=item C<void find_basic_blocks>
 
 Finds all basic blocks in the given IMC_Unit, expanding PCC calls if first is
 true.
@@ -359,8 +358,7 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
 
 /*
 
-=item C<static void bb_check_set_addr(PARROT_INTERP, IMC_Unit *unit,
-Basic_block *bb, const SymReg *label)>
+=item C<static void bb_check_set_addr>
 
 Looks for a C<set_addr> op in the current unit referring to the given label.
 
@@ -396,7 +394,7 @@ bb_check_set_addr(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
 
 /*
 
-=item C<void build_cfg(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void build_cfg>
 
 Once the basic blocks have been computed, build_cfg computes the dependencies
 between them.
@@ -538,8 +536,7 @@ invok:
 
 /*
 
-=item C<static void bb_findadd_edge(PARROT_INTERP, IMC_Unit *unit,
-Basic_block *from, const SymReg *label)>
+=item C<static void bb_findadd_edge>
 
 Finds the placement of the given label and links its containing block to the
 given basic block.
@@ -580,7 +577,7 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
 
 /*
 
-=item C<int blocks_are_connected(const Basic_block *from, const Basic_block *to)>
+=item C<int blocks_are_connected>
 
 Returns true or false whether the given blocks are linked.
 
@@ -610,7 +607,7 @@ blocks_are_connected(ARGIN(const Basic_block *from),
 
 /*
 
-=item C<static void bb_add_edge(IMC_Unit *unit, Basic_block *from, Basic_block *to)>
+=item C<static void bb_add_edge>
 
 Adds an edge between the two given blocks.
 
@@ -653,7 +650,7 @@ bb_add_edge(ARGMOD(IMC_Unit *unit), ARGIN(Basic_block  *from),
 
 /*
 
-=item C<static void bb_remove_edge(IMC_Unit *unit, Edge *edge)>
+=item C<static void bb_remove_edge>
 
 Removes the given edge from the graph.
 
@@ -708,7 +705,7 @@ bb_remove_edge(ARGMOD(IMC_Unit *unit), ARGMOD(Edge *edge))
 
 /*
 
-=item C<static void free_edge(IMC_Unit *unit)>
+=item C<static void free_edge>
 
 Frees the memory of an IMC_Unit's edge list.
 
@@ -734,7 +731,7 @@ free_edge(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int edge_count(const IMC_Unit *unit)>
+=item C<int edge_count>
 
 Counts and returns the number of edges in the specified IMC_Unit.
 
@@ -760,7 +757,7 @@ edge_count(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void life_analysis(PARROT_INTERP, const IMC_Unit *unit)>
+=item C<void life_analysis>
 
 This driver routine calls analyse_life_symbol for each reglist in the specified
 IMC_Unit.
@@ -785,7 +782,7 @@ life_analysis(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<static void analyse_life_symbol(const IMC_Unit *unit, SymReg* r)>
+=item C<static void analyse_life_symbol>
 
 Analyzes the lifetime for a given symbol.
 
@@ -848,7 +845,7 @@ analyse_life_symbol(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg* r))
 
 /*
 
-=item C<void free_life_info(const IMC_Unit *unit, SymReg *r)>
+=item C<void free_life_info>
 
 Frees memory of the life analysis info structures.
 
@@ -878,7 +875,7 @@ free_life_info(ARGIN(const IMC_Unit *unit), ARGMOD(SymReg *r))
 
 /*
 
-=item C<static void analyse_life_block(const Basic_block* bb, SymReg *r)>
+=item C<static void analyse_life_block>
 
 Studies the state of the var r in the block bb.
 
@@ -959,7 +956,7 @@ analyse_life_block(ARGIN(const Basic_block* bb), ARGMOD(SymReg *r))
 
 /*
 
-=item C<static void propagate_need(Basic_block *bb, const SymReg *r, int i)>
+=item C<static void propagate_need>
 
 Follows the uses of the given symbol through all of the basic blocks of the
 unit.
@@ -1026,7 +1023,7 @@ propagate_need(ARGMOD(Basic_block *bb), ARGIN(const SymReg *r), int i)
 
 /*
 
-=item C<void compute_dominators(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void compute_dominators>
 
 Computes the dominators tree of the CFG.  Basic block A dominates B if each
 path to B passes through A
@@ -1167,7 +1164,7 @@ compute_dominators(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<void compute_dominance_frontiers(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void compute_dominance_frontiers>
 
 Algorithm to find dominance frontiers described in paper "A Simple, Fast
 Dominance Algorithm", Cooper et al. (2001)
@@ -1230,7 +1227,7 @@ compute_dominance_frontiers(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void free_dominators(IMC_Unit *unit)>
+=item C<static void free_dominators>
 
 Frees the memory in the given unit related to all dominators.
 
@@ -1258,7 +1255,7 @@ free_dominators(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void free_dominance_frontiers(IMC_Unit *unit)>
+=item C<static void free_dominance_frontiers>
 
 Frees the memory in the given unit related to all dominance frontiers.
 
@@ -1285,7 +1282,7 @@ free_dominance_frontiers(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void sort_loops(PARROT_INTERP, IMC_Unit *unit)>
+=item C<static void sort_loops>
 
 Sorts the loops found in the CFG of the current unit.
 
@@ -1365,7 +1362,7 @@ sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<void find_loops(PARROT_INTERP, IMC_Unit *unit)>
+=item C<void find_loops>
 
 Searches for loops in the CFG. We search for edges that go from a node to one
 of its dominators.
@@ -1400,7 +1397,7 @@ find_loops(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int natural_preheader(const IMC_Unit *unit, const Loop_info *loop_info)>
+=item C<int natural_preheader>
 
 For loop_info, finds the natural preheader of the loop, if any, and returns its
 index, otherwise returns -1.  A natural preheader exists if there is only one
@@ -1443,7 +1440,7 @@ natural_preheader(ARGIN(const IMC_Unit *unit), ARGIN(const Loop_info *loop_info)
 
 /*
 
-=item C<static void mark_loop(PARROT_INTERP, IMC_Unit *unit, const Edge *e)>
+=item C<static void mark_loop>
 
 Increases the loop_depth of all the nodes in a loop.
 
@@ -1530,7 +1527,7 @@ mark_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const Edge *e))
 
 /*
 
-=item C<static void free_loops(IMC_Unit *unit)>
+=item C<static void free_loops>
 
 Frees the memory associated with the loops in this unit.
 
@@ -1559,7 +1556,7 @@ free_loops(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<void search_predecessors_not_in(const Basic_block *node, Set *s)>
+=item C<void search_predecessors_not_in>
 
 Searches for predecessor edges for this node not in the given set (and adds
 them).
@@ -1589,7 +1586,7 @@ search_predecessors_not_in(ARGIN(const Basic_block *node), ARGMOD(Set *s))
 
 /*
 
-=item C<static void init_basic_blocks(IMC_Unit *unit)>
+=item C<static void init_basic_blocks>
 
 Initializes the basic blocks memory for this unit.
 
@@ -1615,7 +1612,7 @@ init_basic_blocks(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<void clear_basic_blocks(IMC_Unit *unit)>
+=item C<void clear_basic_blocks>
 
 Frees all of the blocks and CFG memory allocated for this unit.
 
@@ -1647,8 +1644,7 @@ clear_basic_blocks(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static Basic_block* make_basic_block(IMC_Unit *unit,
-Instruction *ins)>
+=item C<static Basic_block* make_basic_block>
 
 Creates, initializes, and returns a new Basic_block.
 
@@ -1689,7 +1685,7 @@ make_basic_block(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 
 /*
 
-=item C<Life_range * make_life_range(SymReg *r, int idx)>
+=item C<Life_range * make_life_range>
 
 Creates and returns a Life_range for the given register at the specified index.
 

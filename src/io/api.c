@@ -37,7 +37,7 @@ is used in Parrot ops.
 
 =over 4
 
-=item C<PMC * Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, PMC *newhandle)>
+=item C<PMC * Parrot_io_stdhandle>
 
 Get the current standard IO object and optionally set a new one.
 
@@ -63,7 +63,7 @@ Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, ARGIN_NULLOK(PMC *newhandle))
 
 /*
 
-=item C<PMC * Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)>
+=item C<PMC * Parrot_io_new_pmc>
 
 Creates a new I/O filehandle object. The value of C<flags> is set
 in the returned PMC.
@@ -91,7 +91,7 @@ Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)
 
 /*
 
-=item C<PMC * Parrot_io_open(PARROT_INTERP, PMC *pmc, STRING *path, STRING *mode)>
+=item C<PMC * Parrot_io_open>
 
 Return an open filehandle for a given string path and flags. Defaults to
 creating a new FileHandle PMC. If a PMC object is passed in, it uses that
@@ -124,7 +124,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
 
 /*
 
-=item C<PMC * Parrot_io_fdopen(PARROT_INTERP, PMC *pmc, PIOHANDLE fd, STRING *sflags)>
+=item C<PMC * Parrot_io_fdopen>
 
 Creates and returns a C<FileHandle> PMC for a given set of flags on an
 existing, open file descriptor.
@@ -167,7 +167,7 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 
 /*
 
-=item C<INTVAL Parrot_io_close(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_close>
 
 Closes the filehandle object.
 
@@ -192,7 +192,7 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_is_closed>
 
 Test whether a filehandle is closed.
 
@@ -216,7 +216,7 @@ Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<void Parrot_io_flush(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_io_flush>
 
 Flushes the C<ParrotIO> PMC C<*pmc>.
 
@@ -237,7 +237,7 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<STRING * Parrot_io_reads(PARROT_INTERP, PMC *pmc, size_t length)>
+=item C<STRING * Parrot_io_reads>
 
 Return a new C<STRING*> holding up to C<len> bytes.
 
@@ -261,7 +261,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 
 /*
 
-=item C<STRING * Parrot_io_readline(PARROT_INTERP, PMC *pmc)>
+=item C<STRING * Parrot_io_readline>
 
 Return a new C<STRING*> holding the next line read from the file.
 
@@ -285,7 +285,7 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_write(PARROT_INTERP, PMC *pmc, const void *buffer, size_t length)>
+=item C<INTVAL Parrot_io_write>
 
 Writes C<len> bytes from C<*buffer> to C<*pmc>.
 
@@ -317,7 +317,7 @@ Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek(PARROT_INTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)>
+=item C<PIOOFF_T Parrot_io_seek>
 
 Moves the read/write position of C<*pmc> to offset C<bytes> from the
 position indicated by C<w>. Typically C<w> will be C<0> for the start of
@@ -341,7 +341,7 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell(PARROT_INTERP, PMC *pmc)>
+=item C<PIOOFF_T Parrot_io_tell>
 
 Returns the current read/write position of C<*pmc>.
 
@@ -364,7 +364,7 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_peek(PARROT_INTERP, PMC *pmc, STRING **buffer)>
+=item C<INTVAL Parrot_io_peek>
 
 Retrieve the next character in the stream without modifying the stream. Calls
 the platform-specific implementation of 'peek'.
@@ -386,7 +386,7 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 
 /*
 
-=item C<INTVAL Parrot_io_eof(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_eof>
 
 Returns a boolean value indication whether C<*pmc>'s current read/write
 position is C<EOF>.
@@ -418,7 +418,7 @@ Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_puts(PARROT_INTERP, PMC *pmc, const char *s)>
+=item C<INTVAL Parrot_io_puts>
 
 Writes C<*s> tp C<*pmc>. C string version.
 
@@ -436,7 +436,7 @@ Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 
 /*
 
-=item C<INTVAL Parrot_io_putps(PARROT_INTERP, PMC *pmc, STRING *s)>
+=item C<INTVAL Parrot_io_putps>
 
 Writes C<*s> to C<*pmc>. Parrot string version.
 
@@ -463,7 +463,7 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
 
 /*
 
-=item C<INTVAL Parrot_io_fprintf(PARROT_INTERP, PMC *pmc, const char *s, ...)>
+=item C<INTVAL Parrot_io_fprintf>
 
 Writes a C string format with varargs to C<*pmc>.
 
@@ -490,7 +490,7 @@ Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 
 /*
 
-=item C<INTVAL Parrot_io_printf(PARROT_INTERP, const char *s, ...)>
+=item C<INTVAL Parrot_io_printf>
 
 Writes a C string format with varargs to C<stdout>.
 
@@ -526,7 +526,7 @@ Parrot_io_printf(PARROT_INTERP, ARGIN(const char *s), ...)
 
 /*
 
-=item C<INTVAL Parrot_io_eprintf(PARROT_INTERP, const char *s, ...)>
+=item C<INTVAL Parrot_io_eprintf>
 
 Writes a C string format with varargs to C<stderr>.
 
@@ -564,7 +564,7 @@ Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_getfd(PARROT_INTERP, PMC *pmc)>
+=item C<PIOHANDLE Parrot_io_getfd>
 
 Returns C<*pmc>'s file descriptor, or C<0> if it is not defined.
 
@@ -583,7 +583,7 @@ Parrot_io_getfd(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_is_tty(PARROT_INTERP, PMC *pmc)>
+=item C<INTVAL Parrot_io_is_tty>
 
 Returns a boolean value indicating whether C<*pmc> is a console/tty.
 
@@ -611,7 +611,7 @@ Parrot_io_is_tty(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =over 4
 
-=item C<PMC * Parrot_io_STDIN(PARROT_INTERP)>
+=item C<PMC * Parrot_io_STDIN>
 
 Returns the C<FileHandle> PMC for C<stdin>.
 
@@ -631,7 +631,7 @@ Parrot_io_STDIN(PARROT_INTERP)
 
 /*
 
-=item C<PMC * Parrot_io_STDOUT(PARROT_INTERP)>
+=item C<PMC * Parrot_io_STDOUT>
 
 Returns the C<FileHandle> PMC for C<stdout>.
 
@@ -651,7 +651,7 @@ Parrot_io_STDOUT(PARROT_INTERP)
 
 /*
 
-=item C<PMC * Parrot_io_STDERR(PARROT_INTERP)>
+=item C<PMC * Parrot_io_STDERR>
 
 Returns the C<FileHandle> PMC for C<stderr>.
 
@@ -679,7 +679,7 @@ These are used to create offsets for the C<seek> op.
 
 =over 4
 
-=item C<PIOOFF_T Parrot_io_make_offset(INTVAL offset)>
+=item C<PIOOFF_T Parrot_io_make_offset>
 
 Returns C<offset>.
 
@@ -697,7 +697,7 @@ Parrot_io_make_offset(INTVAL offset)
 
 /*
 
-=item C<PIOOFF_T Parrot_io_make_offset32(INTVAL hi, INTVAL lo)>
+=item C<PIOOFF_T Parrot_io_make_offset32>
 
 C<hi> is shifted 32 bytes to the left and C<or>ed together with C<lo>.
 This allows 64-bit seeks with only 32-bit C<INTVALS>.
@@ -715,7 +715,7 @@ Parrot_io_make_offset32(INTVAL hi, INTVAL lo)
 
 /*
 
-=item C<PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, PMC *pmc)>
+=item C<PIOOFF_T Parrot_io_make_offset_pmc>
 
 Returns the return value of the C<get_integer> vtable method on C<*pmc>.
 

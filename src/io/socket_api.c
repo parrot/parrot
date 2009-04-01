@@ -28,7 +28,7 @@ These are the primary interface functions for working with socket objects.
 
 /*
 
-=item C<INTVAL Parrot_io_socket_is_closed(PMC *socket)>
+=item C<INTVAL Parrot_io_socket_is_closed>
 
 =cut
 
@@ -115,8 +115,7 @@ Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
 
 /*
 
-=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PMC *pmc, INTVAL which,
-INTVAL sec, INTVAL usec)>
+=item C<INTVAL Parrot_io_poll>
 
 Polls C<*pmc> for the events in C<which> every C<sec> seconds + C<usec>
 microseconds.
@@ -139,8 +138,7 @@ Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL
 
 /*
 
-=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC * socket, INTVAL fam,
-INTVAL type, INTVAL proto)>
+=item C<INTVAL Parrot_io_socket>
 
 Creates and returns a socket using the specified address family, socket type,
 and protocol number. Check the returned PMC with a boolean test to see whether
@@ -185,7 +183,7 @@ Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC * socket), INTVAL fam,
 
 /*
 
-=item C<INTVAL Parrot_io_recv(PARROT_INTERP, PMC *pmc, STRING **buf)>
+=item C<INTVAL Parrot_io_recv>
 
 Receives a message from the connected socket C<*pmc> in C<*buf>.  Returns C<-1>
 if it fails.
@@ -207,7 +205,7 @@ Parrot_io_recv(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buf))
 
 /*
 
-=item C<INTVAL Parrot_io_send(PARROT_INTERP, PMC *pmc, STRING *buf)>
+=item C<INTVAL Parrot_io_send>
 
 Sends the message C<*buf> to the connected socket C<*pmc>.  Returns
 C<-1> if it cannot send the message.
@@ -230,7 +228,7 @@ Parrot_io_send(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *buf))
 
 /*
 
-=item C<INTVAL Parrot_io_connect(PARROT_INTERP, PMC *pmc, PMC *address)>
+=item C<INTVAL Parrot_io_connect>
 
 Connects C<*pmc> to C<*address>.  Returns C<-1> on failure.
 
@@ -251,7 +249,7 @@ Parrot_io_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
 /*
 
-=item C<INTVAL Parrot_io_bind(PARROT_INTERP, PMC *pmc, PMC *address)>
+=item C<INTVAL Parrot_io_bind>
 
 Binds C<*pmc>'s socket to the local address and port specified by
 C<*address>.  Returns C<-1> on failure.
@@ -273,7 +271,7 @@ Parrot_io_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
 
 /*
 
-=item C<INTVAL Parrot_io_listen(PARROT_INTERP, PMC *pmc, INTVAL backlog)>
+=item C<INTVAL Parrot_io_listen>
 
 Listens for new connections on socket C<*pmc>.  Returns C<-1> on failure.
 
@@ -295,7 +293,7 @@ Parrot_io_listen(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL backlog)
 
 /*
 
-=item C<PMC * Parrot_io_accept(PARROT_INTERP, PMC *pmc)>
+=item C<PMC * Parrot_io_accept>
 
 Accepts a new connection and returns a newly created C<ParrotIO> socket.
 Returns C<NULL> on failure.
@@ -319,7 +317,7 @@ Parrot_io_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<PMC * Parrot_io_new_socket_pmc(PARROT_INTERP, INTVAL flags)>
+=item C<PMC * Parrot_io_new_socket_pmc>
 
 Creates a new I/O socket object. The value of C<flags> is set
 in the returned PMC.

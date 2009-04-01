@@ -266,7 +266,7 @@ static opcode_t * runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 /*
 
-=item C<opcode_t * runops_fast_core(PARROT_INTERP, opcode_t *pc)>
+=item C<opcode_t * runops_fast_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations.  This performs no bounds checking, profiling, or tracing.
@@ -295,7 +295,7 @@ runops_fast_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 /*
 
-=item C<opcode_t * runops_cgoto_core(PARROT_INTERP, opcode_t *pc)>
+=item C<opcode_t * runops_cgoto_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the computed C<goto> core, performing no bounds checking,
@@ -341,7 +341,7 @@ runops_cgoto_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 /*
 
-=item C<static opcode_t * runops_trace_core(PARROT_INTERP, opcode_t *pc)>
+=item C<static opcode_t * runops_trace_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, using the tracing interpreter.
@@ -428,7 +428,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 /*
 
-=item C<opcode_t * runops_slow_core(PARROT_INTERP, opcode_t *pc)>
+=item C<opcode_t * runops_slow_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing and bounds checking enabled.
@@ -467,7 +467,7 @@ runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 /*
 
-=item C<opcode_t * runops_gc_debug_core(PARROT_INTERP, opcode_t *pc)>
+=item C<opcode_t * runops_gc_debug_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, performing a full GC run before each op.  This is very slow, but
@@ -503,7 +503,7 @@ runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 /*
 
-=item C<opcode_t * runops_profile_core(PARROT_INTERP, opcode_t *pc)>
+=item C<opcode_t * runops_profile_core>
 
 Runs the Parrot operations starting at C<pc> until there are no more
 operations, with tracing, bounds checking, and profiling enabled.
@@ -552,7 +552,7 @@ runops_profile_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
 /*
 
-=item C<opcode_t * runops_debugger_core(PARROT_INTERP, opcode_t *pc)>
+=item C<opcode_t * runops_debugger_core>
 
 Used by the debugger, under construction
 

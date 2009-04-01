@@ -50,7 +50,7 @@ static INTVAL io_is_tty_unix(PIOHANDLE fd);
 
 /*
 
-=item C<static INTVAL convert_flags_to_unix(INTVAL flags)>
+=item C<static INTVAL convert_flags_to_unix>
 
 Returns a UNIX-specific interpretation of C<flags> suitable for passing
 to C<open()> and C<fopen()> in C<Parrot_io_open_unix()> and
@@ -88,7 +88,7 @@ convert_flags_to_unix(INTVAL flags)
 
 /*
 
-=item C<INTVAL Parrot_io_init_unix(PARROT_INTERP)>
+=item C<INTVAL Parrot_io_init_unix>
 
 Sets up the interpreter's standard C<std*> IO handles. Returns C<0> on
 success and C<-1> on error.
@@ -128,8 +128,7 @@ Parrot_io_init_unix(PARROT_INTERP)
 
 /*
 
-=item C<PMC * Parrot_io_open_unix(PARROT_INTERP, PMC *filehandle,
-STRING *path, INTVAL flags)>
+=item C<PMC * Parrot_io_open_unix>
 
 Opens a string C<path>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 flag values.
@@ -246,7 +245,7 @@ Parrot_io_open_unix(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
 
 /*
 
-=item C<INTVAL Parrot_io_async_unix(PARROT_INTERP, PMC *filehandle, INTVAL b)>
+=item C<INTVAL Parrot_io_async_unix>
 
 Experimental asynchronous IO.
 
@@ -286,8 +285,7 @@ Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 
 /*
 
-=item C<PMC * Parrot_io_fdopen_unix(PARROT_INTERP, PMC *filehandle,
-PIOHANDLE fd, INTVAL flags)>
+=item C<PMC * Parrot_io_fdopen_unix>
 
 Returns a new C<FileHandle> PMC with the file descriptor passed in.
 
@@ -321,7 +319,7 @@ Parrot_io_fdopen_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd, INTV
 
 /*
 
-=item C<INTVAL Parrot_io_close_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_close_unix>
 
 Closes C<*io>'s file descriptor.
 
@@ -347,7 +345,7 @@ Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_is_closed_unix>
 
 Test whether the filehandle has been closed.
 
@@ -367,7 +365,7 @@ Parrot_io_is_closed_unix(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<static INTVAL io_is_tty_unix(PIOHANDLE fd)>
+=item C<static INTVAL io_is_tty_unix>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
 
@@ -384,7 +382,7 @@ io_is_tty_unix(PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL Parrot_io_getblksize_unix(PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_getblksize_unix>
 
 Various ways of determining block size.
 
@@ -430,7 +428,7 @@ Parrot_io_getblksize_unix(PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL Parrot_io_flush_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<INTVAL Parrot_io_flush_unix>
 
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
@@ -451,7 +449,7 @@ Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_read_unix>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -499,7 +497,7 @@ Parrot_io_read_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_write_unix(PARROT_INTERP, PMC *filehandle, STRING *s)>
+=item C<size_t Parrot_io_write_unix>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -545,8 +543,7 @@ Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PMC *filehandle,
-PIOOFF_T offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek_unix>
 
 Hard seek.
 
@@ -597,7 +594,7 @@ Parrot_io_seek_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<PIOOFF_T Parrot_io_tell_unix(PARROT_INTERP, PMC *filehandle)>
+=item C<PIOOFF_T Parrot_io_tell_unix>
 
 Returns the current read/write position on C<*io>'s file discriptor.
 
@@ -617,8 +614,7 @@ Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<PMC * Parrot_io_open_pipe_unix(PARROT_INTERP, PMC *filehandle,
-STRING *command, int flags)>
+=item C<PMC * Parrot_io_open_pipe_unix>
 
 Very limited C<exec> for now.
 
@@ -729,7 +725,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_peek_unix(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_peek_unix>
 
 Retrieve the next character in the stream without modifying the stream. Not
 implemented on this platform.

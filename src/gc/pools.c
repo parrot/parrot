@@ -84,7 +84,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
 
 =over 4
 
-=item C<void * get_free_buffer(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<void * get_free_buffer>
 
 Gets a free object or buffer from the given C<pool> and returns it.  If the
 object is larger then a standard C<PObj> structure, all additional memory is
@@ -122,7 +122,7 @@ get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
 
 =over 4
 
-=item C<Small_Object_Pool * new_pmc_pool(PARROT_INTERP)>
+=item C<Small_Object_Pool * new_pmc_pool>
 
 Creates and initializes a new pool for PMCs and returns it.
 
@@ -150,7 +150,7 @@ new_pmc_pool(PARROT_INTERP)
 
 /*
 
-=item C<Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)>
+=item C<Small_Object_Pool * new_bufferlike_pool>
 
 Creates a new pool for buffer-like structures. This is called from
 C<get_bufferlike_pool()>, and should probably not be called directly.
@@ -180,7 +180,7 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
 
 /*
 
-=item C<Small_Object_Pool * new_buffer_pool(PARROT_INTERP)>
+=item C<Small_Object_Pool * new_buffer_pool>
 
 Creates a new C<Small_Object_Pool> structure for managing buffer objects.
 
@@ -210,7 +210,7 @@ new_buffer_pool(PARROT_INTERP)
 
 /*
 
-=item C<Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)>
+=item C<Small_Object_Pool * new_string_pool>
 
 Creates a new pool for C<STRING>s and returns it. This calls
 C<get_bufferlike_pool> internally, which in turn calls C<new_bufferlike_pool>.
@@ -241,7 +241,7 @@ new_string_pool(PARROT_INTERP, INTVAL constant)
 
 /*
 
-=item C<Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)>
+=item C<Small_Object_Pool * get_bufferlike_pool>
 
 Makes and return a bufferlike header pool for objects of a given size. If a
 pool for objects of that size already exists, no new pool will be created and
@@ -286,7 +286,7 @@ get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
 
 /*
 
-=item C<size_t get_max_buffer_address(PARROT_INTERP)>
+=item C<size_t get_max_buffer_address>
 
 Calculates the maximum buffer address and returns it. This is done by looping
 through all the sized pools, and finding the pool whose C<end_arena_memory>
@@ -320,7 +320,7 @@ get_max_buffer_address(PARROT_INTERP)
 
 /*
 
-=item C<size_t get_min_buffer_address(PARROT_INTERP)>
+=item C<size_t get_min_buffer_address>
 
 Calculates the minimum buffer address and returns it. Loops through all sized
 pools, and finds the one with the smallest C<start_arena_memory> field. Notice
@@ -356,7 +356,7 @@ get_min_buffer_address(PARROT_INTERP)
 
 /*
 
-=item C<size_t get_max_pmc_address(PARROT_INTERP)>
+=item C<size_t get_max_pmc_address>
 
 Returns the maximum memory address used by the C<pmc_pool>.
 
@@ -375,7 +375,7 @@ get_max_pmc_address(PARROT_INTERP)
 
 /*
 
-=item C<size_t get_min_pmc_address(PARROT_INTERP)>
+=item C<size_t get_min_pmc_address>
 
 Returns the minimum memory address used by the C<pmc_pool>. Notice that the
 memory region between C<get_min_pmc_address> and C<get_max_pmc_address> may be
@@ -396,7 +396,7 @@ get_min_pmc_address(PARROT_INTERP)
 
 /*
 
-=item C<int is_buffer_ptr(PARROT_INTERP, const void *ptr)>
+=item C<int is_buffer_ptr>
 
 Checks whether the given C<ptr> is located within one of the sized
 header pools. Returns C<1> if it is, and C<0> if not.
@@ -425,7 +425,7 @@ is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
 /*
 
-=item C<int is_pmc_ptr(PARROT_INTERP, const void *ptr)>
+=item C<int is_pmc_ptr>
 
 Checks that C<ptr> is actually a PMC pointer. Returns C<1> if it is, C<0>
 otherwise.
@@ -445,7 +445,7 @@ is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
 
 /*
 
-=item C<void Parrot_initialize_header_pools(PARROT_INTERP)>
+=item C<void Parrot_initialize_header_pools>
 
 The initialization routine for the interpreter's header pools. Initializes
 pools for string headers, constant string headers, buffers, PMCs, PMC_EXTs, and
@@ -512,8 +512,7 @@ Parrot_initialize_header_pools(PARROT_INTERP)
 
 /*
 
-=item C<int Parrot_forall_header_pools(PARROT_INTERP, int flag, void *arg,
-pool_iter_fn func)>
+=item C<int Parrot_forall_header_pools>
 
 Iterates through header pools, invoking the given callback function on each
 pool in the list matching the given criteria. Determines which pools to iterate
@@ -599,7 +598,7 @@ Parrot_forall_header_pools(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
 
 /*
 
-=item C<static void free_pool(Small_Object_Pool *pool)>
+=item C<static void free_pool>
 
 Frees a pool and all of its arenas. Loops through the list of arenas backwards
 and returns each to the memory manager. Then, frees the pool structure itself.
@@ -626,8 +625,7 @@ free_pool(ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static int sweep_cb_buf(PARROT_INTERP, Small_Object_Pool *pool,
-int flag, void *arg)>
+=item C<static int sweep_cb_buf>
 
 Performs a final garbage collection sweep, then frees the pool. Calls
 C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
@@ -663,8 +661,7 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
 
 /*
 
-=item C<static int sweep_cb_pmc(PARROT_INTERP, Small_Object_Pool *pool,
-int flag, void *arg)>
+=item C<static int sweep_cb_pmc>
 
 Performs a garbage collection sweep of the given pmc pool, then frees it. Calls
 C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
@@ -686,7 +683,7 @@ sweep_cb_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 
 /*
 
-=item C<void Parrot_destroy_header_pools(PARROT_INTERP)>
+=item C<void Parrot_destroy_header_pools>
 
 Performs a garbage collection sweep on all pools, then frees them.  Calls
 C<Parrot_forall_header_pools> to loop over all the pools, passing
@@ -733,7 +730,7 @@ Parrot_destroy_header_pools(PARROT_INTERP)
 
 /*
 
-=item C<static void fix_pmc_syncs(Interp *dest_interp, Small_Object_Pool *pool)>
+=item C<static void fix_pmc_syncs>
 
 Walks through the given arena, looking for all live and shared PMCs,
 transferring their sync values to the destination interpreter.
@@ -773,7 +770,7 @@ fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
 
 /*
 
-=item C<void Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp)>
+=item C<void Parrot_merge_header_pools>
 
 Merges the header pools of C<source_interp> into those of C<dest_interp>.
 (Used to deal with shared objects left after interpreter destruction.)
