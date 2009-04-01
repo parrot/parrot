@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Carp qw( confess );
 
+
 =head1 NAME
 
 tools/build/headerizer.pl - Generates the function header parts of .h
@@ -61,6 +62,9 @@ One or more object file names.
 use Getopt::Long;
 use lib qw( lib );
 use Parrot::Config;
+use Parrot::Headerizer;
+
+my $headerizer = Parrot::Headerizer->new;
 
 my %warnings;
 my %opt;
@@ -163,11 +167,10 @@ sub extract_function_declarations_and_update_source {
     for my $decl ( @func_declarations ) {
         my $specs = function_components_from_declaration( $cfile_name, $decl );
         my $name = $specs->{name};
-        my $return_type = $specs->{return_type};
-        my $heading = "$return_type $name";
-        $heading = "static $heading" if $specs->{is_static};
 
-        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n/=item C<$heading>\n/sm or
+        my $heading = $headerizer->generate_documentation_signature($decl);
+
+        $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or
             warn "$name has no POD\n";
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";

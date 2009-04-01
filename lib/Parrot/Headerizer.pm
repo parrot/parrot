@@ -221,6 +221,62 @@ sub function_components_from_declaration {
     };
 }
 
+=item C<generate_documentation_signature>
+
+Given an extracted function signature, return a modified
+version suitable for inclusion in POD documentation.
+
+=cut
+
+sub generate_documentation_signature {
+    my $self = shift;
+    my $function_decl = shift;
+
+    $function_decl =~ s/\s+/ /g;
+
+    # strip out any PARROT_* prefixes
+    $function_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
+
+    # strip out any ARG* modifiers
+    $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|OUT_NULLOK|MOD|MOD_NULLOK|FREE)\((.*?)\)/$1/g;
+
+    # strip out the SHIM modifier
+    $function_decl =~ s/SHIM\((.*?)\)/$1/g;
+
+    # strip out the NULL modifiers
+    $function_decl =~ s/(?:NULLOK|NOTNULL)\((.*?)\)/$1/g;
+
+    # SHIM_INTERP is still a PARROT_INTERP
+    $function_decl =~ s/SHIM_INTERP/PARROT_INTERP/g;
+
+    # wrap with POD
+    $function_decl = "=item C<$function_decl>";
+
+    # Wrap long lines.
+    my $line_len = 80;
+    return $function_decl if length($function_decl)<= $line_len;
+
+    my @doc_chunks = split /\s+/, $function_decl;
+    my $split_decl = '';
+    my @line;
+    while (@doc_chunks) {
+        my $chunk = shift @doc_chunks;
+        if (length(join(' ', @line, $chunk)) <= $line_len) {
+            push @line, $chunk;
+        } else {
+            $split_decl .= join(' ', @line) . "\n";
+            @line=($chunk);
+        }
+    }
+    if (@line) {
+        $split_decl .= join(' ', @line) . "\n";
+    }
+    
+    $split_decl =~ s/\n$//;
+
+    return $split_decl;
+}
+
 =item C<squawk($file, $func, $error)>
 
 Headerizer-specific ways of complaining if something went wrong.

@@ -56,35 +56,9 @@ foreach my $path (@files) {
 
     for my $function_decl (@function_decls) {
 
-        # strip out any PARROT_* prefixes
-        $function_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
+        my $escaped_decl = $headerizer->generate_documentation_signature($function_decl);
 
-        # strip out any ARG* modifiers
-        $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|OUT_NULLOK|MOD|MOD_NULLOK|FREE)\((.*?)\)/$1/g;
-
-        # strip out the SHIM modifier
-        $function_decl =~ s/SHIM\((.*?)\)/$1/g;
-
-        # strip out the NULL modifiers
-        $function_decl =~ s/(?:NULLOK|NOTNULL)\((.*?)\)/$1/g;
-
-        # SHIM_INTERP is still a PARROT_INTERP
-        $function_decl =~ s/SHIM_INTERP/PARROT_INTERP/g;
-
-        my $escaped_decl = $function_decl;
-
-        # escape [, ], (, ), and *
-        $escaped_decl =~ s/\[/\\[/g;
-        $escaped_decl =~ s/\]/\\]/g;
-        $escaped_decl =~ s/\(/\\(/g;
-        $escaped_decl =~ s/\)/\\)/g;
-        $escaped_decl =~ s/\*/\\*/g;
-
-        # don't worry if the function declaration has embedded newlines in
-        # it and the documented function doesn't.
-        $escaped_decl =~ s/\s+/\\s+/g;
-
-        my $decl_rx = qr/^=item C<$escaped_decl>(.*?)^=cut/sm;
+        my $decl_rx = qr/^\Q$escaped_decl\E$(.*?)^=cut/sm;
 
         my $missing = '';
         if ( $buf =~ m/$decl_rx/) {
