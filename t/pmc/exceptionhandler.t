@@ -20,7 +20,7 @@ Tests the ExceptionHandler PMC.
 .include 'include/except_types.pasm'
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(8)
 

@@ -17,7 +17,7 @@ Tests the PMCProxy PMC.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     plan(45)
 
     new_tests()

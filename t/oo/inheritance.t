@@ -17,7 +17,7 @@ Tests OO features related to the removeparent opcode.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(4)
 

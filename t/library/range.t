@@ -17,7 +17,7 @@ Tests the Range class.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     load_bytecode 'Range.pir'
 
     plan(78)

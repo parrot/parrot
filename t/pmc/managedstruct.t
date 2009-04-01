@@ -17,7 +17,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     plan(24)
 
     set_managedstruct_size()

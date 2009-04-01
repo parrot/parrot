@@ -26,7 +26,7 @@ Tests all box operators.
 .end
 
 .sub 'main' :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     'plan'(TESTS)
 
@@ -49,6 +49,7 @@ Tests all box operators.
 .end
 
 .sub 'box_int'
+
     $P0 = box 100
     $I0 = $P0
     is( $I0, 100, 'value preserved when boxing int' )
@@ -114,7 +115,8 @@ Tests all box operators.
 .end
 
 .sub 'box_int'
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
+
     $P0 = box -100
     $I0 = $P0
     is( $I0, -100, 'value preserved when boxing int in HLL' )

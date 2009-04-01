@@ -18,7 +18,7 @@ type combinations.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
     plan(28)
     init_int_tests()
     num_tests()

@@ -21,7 +21,7 @@ Tests OO features related to names and namespaces.
 .namespace []
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(2)
 

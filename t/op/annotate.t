@@ -17,7 +17,7 @@ Test various use cases of the annotate directive.
 =cut
 
 .sub main :main
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     plan(33)
 

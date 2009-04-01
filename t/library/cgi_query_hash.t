@@ -17,7 +17,7 @@ Test  [ 'CGI'; 'QueryHash' ]
 
 .sub test :main
     load_bytecode "dumper.pbc"
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     load_bytecode 'CGI/QueryHash.pbc'
 

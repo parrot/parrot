@@ -14,7 +14,7 @@
     set_global 'TEST_VERBOSE', $P0
 
   import:
-    .include 'include/test_more.pir'
+    .include 'test_more.pir'
 
     'plan'( TESTS )
 
