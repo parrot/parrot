@@ -42,26 +42,26 @@ These are the primary interface functions for working with socket objects.
  */
 
 static int pio_pf[PIO_PF_MAX+1] = {
-#    ifdef PF_LOCAL
+#ifdef PF_LOCAL
     PF_LOCAL,   /* PIO_PF_LOCAL */
-#    else
+#else
     -1,         /* PIO_PF_LOCAL */
-#    endif
-#    ifdef PF_UNIX
+#endif
+#ifdef PF_UNIX
     PF_UNIX,    /* PIO_PF_UNIX */
-#    else
+#else
     -1,         /* PIO_PF_UNIX */
-#    endif
-#    ifdef PF_INET
+#endif
+#ifdef PF_INET
     PF_INET,    /* PIO_PF_INET */
-#    else
+#else
     -1,         /* PIO_PF_INET */
-#    endif
-#    ifdef PF_INET6
+#endif
+#ifdef PF_INET6
     PF_INET6,   /* PIO_PF_INET6 */
-#    else
+#else
     -1,         /* PIO_PF_INET6 */
-#    endif
+#endif
 };
 
 /*
@@ -70,36 +70,36 @@ static int pio_pf[PIO_PF_MAX+1] = {
  */
 
 static int pio_sock[PIO_SOCK_MAX+1] = {
-#    ifdef SOCK_PACKET
+#ifdef SOCK_PACKET
     SOCK_PACKET,    /* PIO_SOCK_PACKET */
-#    else
+#else
     -1,             /* PIO_SOCK_PACKET */
-#    endif
-#    ifdef SOCK_STREAM
+#endif
+#ifdef SOCK_STREAM
     SOCK_STREAM,    /* PIO_SOCK_STREAM */
-#    else
+#else
     -1,             /* PIO_SOCK_STREAM */
-#    endif
-#    ifdef SOCK_DGRAM
+#endif
+#ifdef SOCK_DGRAM
     SOCK_DGRAM,     /* PIO_SOCK_DGRAM */
-#    else
+#else
     -1,             /* PIO_SOCK_DGRAM */
-#    endif
-#    ifdef SOCK_RAW
+#endif
+#ifdef SOCK_RAW
     SOCK_RAW,       /* PIO_SOCK_RAW */
-#    else
+#else
     -1,             /* PIO_SOCK_RAW */
-#    endif
-#    ifdef SOCK_RDM
+#endif
+#ifdef SOCK_RDM
     SOCK_RDM,      /* PIO_SOCK_RDM */
-#    else
+#else
     -1,            /* PIO_SOCK_RDM */
-#    endif
-#    ifdef SOCK_SEQPACKET
+#endif
+#ifdef SOCK_SEQPACKET
     SOCK_SEQPACKET, /* PIO_SOCK_SEQPACKET */
-#    else
+#else
     -1,             /* PIO_SOCK_SEQPACKET */
-#    endif
+#endif
 };
 
 
