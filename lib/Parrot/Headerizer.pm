@@ -232,10 +232,13 @@ sub generate_documentation_signature {
     my $self = shift;
     my $function_decl = shift;
 
-    $function_decl =~ s/\s+/ /g;
+    # strip out any PARROT_* function modifiers
+    foreach my $key (%valid_macros) {
+        $function_decl =~ s/^$key$//m;
+    }
 
-    # strip out any PARROT_* prefixes
-    $function_decl =~ s/^\s*PARROT_[A-Z_]*\b\s+//gm;
+    $function_decl =~ s/^\s+//g;
+    $function_decl =~ s/\s+/ /g;
 
     # strip out any ARG* modifiers
     $function_decl =~ s/ARG(?:IN|IN_NULLOK|OUT|OUT_NULLOK|MOD|MOD_NULLOK|FREE)\((.*?)\)/$1/g;
