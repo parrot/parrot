@@ -92,6 +92,7 @@ src/gc/gc_malloc.c
 src/gc/generational_ms.c
 compilers/imcc/instructions.c
 compilers/imcc/optimizer.c
+compilers/imcc/parser_util.c
 compilers/imcc/pbc.c
 compilers/imcc/pcc.c
 compilers/imcc/reg_alloc.c

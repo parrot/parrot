@@ -311,8 +311,6 @@ is_op(PARROT_INTERP, ARGIN(const char *name))
 =item C<static Instruction * var_arg_ins(PARROT_INTERP, IMC_Unit *unit, const
 char *name, SymReg **r, int n, int emit)>
 
-TODO: Needs to be documented!!!
-
 =cut
 
 */
@@ -577,8 +575,6 @@ extern void* yy_scan_string(const char *);
 
 =item C<int do_yylex_init(PARROT_INTERP, yyscan_t* yyscanner)>
 
-TODO: Needs to be documented!!!
-
 =cut
 
 */
@@ -746,10 +742,8 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
 =item C<PMC * imcc_compile_pasm(PARROT_INTERP, const char *s)>
 
-TODO: Needs to be documented!!!
-
- * Note: This function is provided for backward compatibility. This
- * function can go away in future.
+Note: This function is provided for backward compatibility. This
+function can go away in future.
 
 =cut
 
@@ -769,10 +763,8 @@ imcc_compile_pasm(PARROT_INTERP, ARGIN(const char *s))
 
 =item C<PMC * imcc_compile_pir(PARROT_INTERP, const char *s)>
 
-TODO: Needs to be documented!!!
-
- * Note: This function is provided for backward compatibility. This
- * function can go away in future.
+Note: This function is provided for backward compatibility. This
+function can go away in future.
 
 =cut
 
@@ -793,8 +785,6 @@ imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
 =item C<PMC * IMCC_compile_pir_s(PARROT_INTERP, const char *s, STRING
 **error_message)>
 
-TODO: Needs to be documented!!!
-
 =cut
 
 */
@@ -814,8 +804,6 @@ IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
 =item C<PMC * IMCC_compile_pasm_s(PARROT_INTERP, const char *s, STRING
 **error_message)>
 
-TODO: Needs to be documented!!!
-
 =cut
 
 */
@@ -833,8 +821,6 @@ IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
 /*
 
 =item C<PMC * imcc_compile_pasm_ex(PARROT_INTERP, const char *s)>
-
-TODO: Needs to be documented!!!
 
 =cut
 
@@ -860,8 +846,6 @@ imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
 /*
 
 =item C<PMC * imcc_compile_pir_ex(PARROT_INTERP, const char *s)>
-
-TODO: Needs to be documented!!!
 
 =cut
 
@@ -1000,10 +984,8 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
 
 =item C<void * IMCC_compile_file(PARROT_INTERP, const char *s)>
 
-TODO: Needs to be documented!!!
-
- * Note: This function is provided for backward compatibility. This
- * function can go away in future.
+Note: This function is provided for backward compatibility. This
+function can go away in future.
 
 =cut
 
@@ -1022,8 +1004,6 @@ IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 
 =item C<void * IMCC_compile_file_s(PARROT_INTERP, const char *s, STRING
 **error_message)>
-
-TODO: Needs to be documented!!!
 
 =cut
 
@@ -1066,8 +1046,6 @@ register_compilers(PARROT_INTERP)
 
 =item C<static int change_op(PARROT_INTERP, IMC_Unit *unit, SymReg **r, int num,
 int emit)>
-
-TODO: Needs to be documented!!!
 
 =cut
 
@@ -1212,8 +1190,6 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
 =item C<static const char * try_rev_cmp(const char *name, SymReg **r)>
 
-TODO: Needs to be documented!!!
-
 =cut
 
 */
@@ -1282,8 +1258,6 @@ imcc_vfprintf(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const char *format), va_list 
 
 =item C<void imcc_init(PARROT_INTERP)>
 
-TODO: Needs to be documented!!!
-
 =cut
 
 */
@@ -1333,8 +1307,6 @@ imcc_destroy_macro_values(ARGMOD(void *value))
 /*
 
 =item C<void imcc_destroy(PARROT_INTERP)>
-
-TODO: Needs to be documented!!!
 
 =cut
 
