@@ -78,20 +78,6 @@ Parrot_io_socket_win32(PARROT_INTERP, ARGIN(PMC * s), int fam, int type, int pro
 {
     ASSERT_ARGS(Parrot_io_socket_win32)
     int sock, i = 1;
-    /* convert Parrot's family to system family */
-    if (fam < 0 || fam >= PIO_PF_MAX)
-        return -1;
-    fam = pio_pf[fam];
-    if (fam < 0)
-        return -1;
-
-    /* convert Parrot's socket type to system type */
-    if (type < 0 || type >= PIO_SOCK_MAX)
-        return -1;
-    type = pio_sock[type];
-    if (type < 0)
-        return -1;
-
     sock = socket(fam, type, proto);
     if (sock >= 0) {
         setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&i, sizeof (i));
