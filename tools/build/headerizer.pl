@@ -23,11 +23,7 @@ on the command line.
 
 =head1 TODO
 
-* Tell if there are funcs without docs
-
 * Generate docs from funcs
-
-* Test the POD of the stuff we're parsing.
 
 * Somehow handle static functions in the source file
 
