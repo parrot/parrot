@@ -94,7 +94,7 @@ static void rec_climb_back_and_mark(
 
 /*
 
-=item C<INTVAL intval_mod>
+=item C<INTVAL intval_mod(INTVAL i2, INTVAL i3)>
 
 NOTE: This "corrected mod" algorithm is based on the C code on page 70
 of [1]. Assuming correct behavior of the built-in mod operator (%) with
@@ -155,7 +155,7 @@ intval_mod(INTVAL i2, INTVAL i3)
 
 /*
 
-=item C<FLOATVAL floatval_mod>
+=item C<FLOATVAL floatval_mod(FLOATVAL n2, FLOATVAL n3)>
 
 Returns C<n2 mod n3>.
 
@@ -225,7 +225,7 @@ static unsigned short c = C;
 
 /*
 
-=item C<static void next_rand>
+=item C<static void next_rand(_rand_buf X)>
 
 Returns the next random number in C<X>.
 
@@ -258,7 +258,7 @@ next_rand(_rand_buf X)
 
 /*
 
-=item C<static FLOATVAL _erand48>
+=item C<static FLOATVAL _erand48(_rand_buf buf)>
 
 Returns a C<double> in the interval C<[0.0, 1.0)>.
 
@@ -278,7 +278,7 @@ _erand48(_rand_buf buf)
 
 /*
 
-=item C<static FLOATVAL _drand48>
+=item C<static FLOATVAL _drand48(void)>
 
 Returns a C<double> in the interval C<[0.0, 1.0)>.
 
@@ -295,7 +295,7 @@ _drand48(void)
 
 /*
 
-=item C<static long _jrand48>
+=item C<static long _jrand48(_rand_buf buf)>
 
 Returns a C<long> in the interval C<[-2^31, 2^31)>.
 
@@ -315,7 +315,7 @@ _jrand48(_rand_buf buf)
 
 /*
 
-=item C<static long _nrand48>
+=item C<static long _nrand48(_rand_buf buf)>
 
 Returns a C<long> in the interval C<[0, 2^31)>.
 
@@ -332,7 +332,7 @@ _nrand48(_rand_buf buf)
 
 /*
 
-=item C<static long _lrand48>
+=item C<static long _lrand48(void)>
 
 Returns a C<long> in the interval C<[0, 2^31)>.
 
@@ -349,7 +349,7 @@ _lrand48(void)
 
 /*
 
-=item C<static long _mrand48>
+=item C<static long _mrand48(void)>
 
 Returns a C<long> in the interval C<[-2^31, 2^31)>.
 
@@ -366,7 +366,7 @@ _mrand48(void)
 
 /*
 
-=item C<static void _srand48>
+=item C<static void _srand48(long seed)>
 
 Sets the high order 32 bits to the argument C<seed>. The low order 16
 bits are set to the arbitrary value 0x330e.
@@ -409,7 +409,7 @@ _srand48(long seed)
 
 /*
 
-=item C<FLOATVAL Parrot_float_rand>
+=item C<FLOATVAL Parrot_float_rand(INTVAL how_random)>
 
 Returns a C<FLOATVAL> in the interval C<[0.0, 1.0)>.
 
@@ -431,7 +431,7 @@ Parrot_float_rand(INTVAL how_random)
 
 /*
 
-=item C<INTVAL Parrot_uint_rand>
+=item C<INTVAL Parrot_uint_rand(INTVAL how_random)>
 
 Returns an C<INTVAL> in the interval C<[0, 2^31)>.
 
@@ -453,7 +453,7 @@ Parrot_uint_rand(INTVAL how_random)
 
 /*
 
-=item C<INTVAL Parrot_int_rand>
+=item C<INTVAL Parrot_int_rand(INTVAL how_random)>
 
 Returns an C<INTVAL> in the interval C<[-2^31, 2^31)>.
 
@@ -475,7 +475,7 @@ Parrot_int_rand(INTVAL how_random)
 
 /*
 
-=item C<INTVAL Parrot_range_rand>
+=item C<INTVAL Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)>
 
 Returns an C<INTVAL> in the range C<[from, to]>.
 
@@ -496,7 +496,7 @@ Parrot_range_rand(INTVAL from, INTVAL to, INTVAL how_random)
 
 /*
 
-=item C<void Parrot_srand>
+=item C<void Parrot_srand(INTVAL seed)>
 
 Seeds the random number generator with C<seed>.
 
@@ -529,7 +529,7 @@ typedef enum {
 
 /*
 
-=item C<PMC* tm_to_array>
+=item C<PMC* tm_to_array(PARROT_INTERP, const struct tm *tm)>
 
 Helper to convert a B<struct tm *> to an Array
 
@@ -561,7 +561,8 @@ tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 
 /*
 
-=item C<INTVAL Parrot_byte_index>
+=item C<INTVAL Parrot_byte_index(PARROT_INTERP, const STRING *base,
+const STRING *search, UINTVAL start_offset)>
 
 Looks for the location of a substring within a longer string.  Takes
 pointers to the strings and the offset within the string at which
@@ -609,7 +610,8 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
 
 /*
 
-=item C<INTVAL Parrot_byte_rindex>
+=item C<INTVAL Parrot_byte_rindex(PARROT_INTERP, const STRING *base,
+const STRING *search, UINTVAL start_offset)>
 
 Substring search (like Parrot_byte_index), but works backwards,
 from the rightmost end of the string.
@@ -648,7 +650,7 @@ Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
 
 /*
 
-=item C<static void rec_climb_back_and_mark>
+=item C<static void rec_climb_back_and_mark(int node_index, parrot_prm_context* c)>
 
 Recursive function, used by Parrot_register_move to
 climb back the graph of register moves operations.
@@ -698,7 +700,8 @@ rec_climb_back_and_mark(int node_index, ARGIN(parrot_prm_context* c))
 
 /*
 
-=item C<static void process_cycle_without_exit>
+=item C<static void process_cycle_without_exit(int node_index,
+parrot_prm_context* c)>
 
 Recursive function, used by Parrot_register_move to handle the case
 of cycles without exits, that are cycles of move ops between registers
@@ -737,7 +740,9 @@ process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
 
 /*
 
-=item C<void Parrot_register_move>
+=item C<void Parrot_register_move(PARROT_INTERP, int n_regs,
+unsigned char *dest_regs, unsigned char *src_regs, unsigned char temp_reg,
+reg_move_func mov, reg_move_func mov_alt, void *info)>
 
 Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
 
@@ -883,7 +888,7 @@ typedef INTVAL (*sort_func_t)(PARROT_INTERP, void *, void *);
 
 /*
 
-=item C<static INTVAL COMPARE>
+=item C<static INTVAL COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)>
 
 =cut
 
@@ -909,7 +914,7 @@ COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
 
 /*
 
-=item C<void Parrot_quicksort>
+=item C<void Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)>
 
 =cut
 

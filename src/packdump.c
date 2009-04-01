@@ -52,7 +52,7 @@ static void pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
 
 /*
 
-=item C<void PackFile_ConstTable_dump>
+=item C<void PackFile_ConstTable_dump(PARROT_INTERP, const PackFile_ConstTable *self)>
 
 Dumps the constant table C<self>.
 
@@ -75,7 +75,8 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 
 /*
 
-=item C<static void PackFile_Constant_dump>
+=item C<static void PackFile_Constant_dump(PARROT_INTERP,
+const PackFile_ConstTable *ct, const PackFile_Constant *self)>
 
 Dumps the constant C<self>.
 
@@ -123,7 +124,7 @@ static const char *flag_bit_names[] =
 
 /*
 
-=item C<static void pobj_flag_dump>
+=item C<static void pobj_flag_dump(PARROT_INTERP, long flags)>
 
 Given a word of flags, generate a dump line of the whole word in hex,
 followed by individual bits.
@@ -373,7 +374,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
 /*
 
-=item C<void PackFile_Fixup_dump>
+=item C<void PackFile_Fixup_dump(PARROT_INTERP, const PackFile_FixupTable *ft)>
 
 Dumps the fix-up table C<ft>.
 
