@@ -34,6 +34,75 @@ These are the primary interface functions for working with socket objects.
 
 */
 
+
+/*
+ * Mapping between PIO_PF_* constants and system-specific PF_* constants.
+ *
+ * Uses -1 for unsupported protocols.
+ */
+
+static int pio_pf[PIO_PF_MAX+1] = {
+#    ifdef PF_LOCAL
+    PF_LOCAL,   /* PIO_PF_LOCAL */
+#    else
+    -1,         /* PIO_PF_LOCAL */
+#    endif
+#    ifdef PF_UNIX
+    PF_UNIX,    /* PIO_PF_UNIX */
+#    else
+    -1,         /* PIO_PF_UNIX */
+#    endif
+#    ifdef PF_INET
+    PF_INET,    /* PIO_PF_INET */
+#    else
+    -1,         /* PIO_PF_INET */
+#    endif
+#    ifdef PF_INET6
+    PF_INET6,   /* PIO_PF_INET6 */
+#    else
+    -1,         /* PIO_PF_INET6 */
+#    endif
+};
+
+/*
+ * Mapping between PIO_SOCK_* constants and system-specific SOCK_* constants.
+ * Uses -1 for unsupported socket types.
+ */
+
+static int pio_sock[PIO_SOCK_MAX+1] = {
+#    ifdef SOCK_PACKET
+    SOCK_PACKET,    /* PIO_SOCK_PACKET */
+#    else
+    -1,             /* PIO_SOCK_PACKET */
+#    endif
+#    ifdef SOCK_STREAM
+    SOCK_STREAM,    /* PIO_SOCK_STREAM */
+#    else
+    -1,             /* PIO_SOCK_STREAM */
+#    endif
+#    ifdef SOCK_DGRAM
+    SOCK_DGRAM,     /* PIO_SOCK_DGRAM */
+#    else
+    -1,             /* PIO_SOCK_DGRAM */
+#    endif
+#    ifdef SOCK_RAW
+    SOCK_RAW,       /* PIO_SOCK_RAW */
+#    else
+    -1,             /* PIO_SOCK_RAW */
+#    endif
+#    ifdef SOCK_RDM
+    SOCK_RDM,      /* PIO_SOCK_RDM */
+#    else
+    -1,            /* PIO_SOCK_RDM */
+#    endif
+#    ifdef SOCK_SEQPACKET
+    SOCK_SEQPACKET, /* PIO_SOCK_SEQPACKET */
+#    else
+    -1,             /* PIO_SOCK_SEQPACKET */
+#    endif
+};
+
+
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -90,6 +159,20 @@ Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC * socket), INTVAL fam,
 {
     ASSERT_ARGS(Parrot_io_socket)
     PMC *new_socket;
+
+    /* convert Parrot's family to system family */
+    if (fam < 0 || fam >= PIO_PF_MAX)
+        return -1;
+    fam = pio_pf[fam];
+    if (fam < 0)
+        return -1;
+
+    /* convert Parrot's socket type to system type */
+    if (type < 0 || type >= PIO_SOCK_MAX)
+        return -1;
+    type = pio_sock[type];
+    if (type < 0)
+        return -1;
 
     if (PMC_IS_NULL(socket))
         new_socket = Parrot_io_new_socket_pmc(interp,
