@@ -273,8 +273,8 @@ Parrot_cx_peek_task(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_cx_schedule_timer(PARROT_INTERP, STRING *type,
-FLOATVAL duration, FLOATVAL interval, INTVAL repeat, PMC *sub)>
+=item C<void Parrot_cx_schedule_timer(PARROT_INTERP, STRING *type, FLOATVAL
+duration, FLOATVAL interval, INTVAL repeat, PMC *sub)>
 
 Create a new timer event due at C<diff> from now, repeated at C<interval>
 and running the passed C<sub>.
@@ -341,7 +341,8 @@ Parrot_cx_schedule_repeat(PARROT_INTERP, ARGIN(PMC *task))
 
 /*
 
-=item C<void Parrot_cx_schedule_callback(PARROT_INTERP, PMC *user_data, char *ext_data)>
+=item C<void Parrot_cx_schedule_callback(PARROT_INTERP, PMC *user_data, char
+*ext_data)>
 
 Create a new callback event, with an argument for the call.
 
@@ -490,7 +491,8 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
 
 /*
 
-=item C<void Parrot_cx_delete_handler_local(PARROT_INTERP, STRING *handler_type)>
+=item C<void Parrot_cx_delete_handler_local(PARROT_INTERP, STRING
+*handler_type)>
 
 Remove the top task handler of a particular type from the context's list of
 handlers.
@@ -560,7 +562,8 @@ Parrot_cx_delete_handler_local(PARROT_INTERP, ARGIN(STRING *handler_type))
 
 /*
 
-=item C<INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP, STRING *handler_type)>
+=item C<INTVAL Parrot_cx_count_handlers_local(PARROT_INTERP, STRING
+*handler_type)>
 
 Count the number of active handlers of a particular type from the
 context's list of handlers.
@@ -650,7 +653,8 @@ Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
 
 /*
 
-=item C<void Parrot_cx_delete_handler_typed(PARROT_INTERP, STRING *handler_type)>
+=item C<void Parrot_cx_delete_handler_typed(PARROT_INTERP, STRING
+*handler_type)>
 
 Remove the top task handler of a particular type from the scheduler's list of
 handlers.
@@ -673,7 +677,8 @@ Parrot_cx_delete_handler_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
 
 /*
 
-=item C<INTVAL Parrot_cx_count_handlers_typed(PARROT_INTERP, STRING *handler_type)>
+=item C<INTVAL Parrot_cx_count_handlers_typed(PARROT_INTERP, STRING
+*handler_type)>
 
 Count the number of active handlers of a particular type (event, exception) in
 the concurrency scheduler.
@@ -709,7 +714,8 @@ scheduler.
 
 =over 4
 
-=item C<void Parrot_cx_send_message(PARROT_INTERP, STRING *messagetype, PMC *payload)>
+=item C<void Parrot_cx_send_message(PARROT_INTERP, STRING *messagetype, PMC
+*payload)>
 
 Send a message to a scheduler in a different interpreter/thread.
 
@@ -749,7 +755,8 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN_NULLOK(P
 
 /*
 
-=item C<void Parrot_cx_broadcast_message(PARROT_INTERP, STRING *messagetype, PMC *data)>
+=item C<void Parrot_cx_broadcast_message(PARROT_INTERP, STRING *messagetype, PMC
+*data)>
 
 Send a message to the schedulers in all interpreters/threads linked to this
 one.
@@ -981,7 +988,8 @@ opcode_t* to allow for changing the code flow.
 =over 4
 
 
-=item C<opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, opcode_t *next)>
+=item C<opcode_t * Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time,
+opcode_t *next)>
 
 Add a sleep timer to the scheduler. This function is called by the C<sleep>
 opcode.

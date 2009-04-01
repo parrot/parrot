@@ -208,7 +208,8 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 
 /*
 
-=item C<void trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)>
+=item C<void trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t
+hi_var_ptr)>
 
 Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
 Attempt to find pointers to PObjs or buffers, and mark them as "alive"

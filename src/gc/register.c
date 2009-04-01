@@ -294,8 +294,8 @@ clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
 
 /*
 
-=item C<static void init_context(PARROT_INTERP, Parrot_Context *ctx,
-const Parrot_Context *old)>
+=item C<static void init_context(PARROT_INTERP, Parrot_Context *ctx, const
+Parrot_Context *old)>
 
 Initializes a freshly allocated or recycled context.
 
@@ -339,7 +339,8 @@ init_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
 
 /*
 
-=item C<Parrot_Context * Parrot_push_context(PARROT_INTERP, const INTVAL *n_regs_used)>
+=item C<Parrot_Context * Parrot_push_context(PARROT_INTERP, const INTVAL
+*n_regs_used)>
 
 Creates and sets the current context to a new context, remembering the old
 context in C<caller_ctx>.  Suitable to use with C<Parrot_pop_context>.
@@ -406,8 +407,8 @@ Parrot_pop_context(PARROT_INTERP)
 
 /*
 
-=item C<Parrot_Context * Parrot_alloc_context(PARROT_INTERP,
-const INTVAL *number_regs_used, Parrot_Context *old)>
+=item C<Parrot_Context * Parrot_alloc_context(PARROT_INTERP, const INTVAL
+*number_regs_used, Parrot_Context *old)>
 
 Allocates and returns a new context.  Does not set this new context as the
 current context. Note that the register usage C<n_regs_used> is copied.  Use
@@ -507,7 +508,8 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
 
 /*
 
-=item C<Parrot_Context * Parrot_set_new_context(PARROT_INTERP, const INTVAL *number_regs_used)>
+=item C<Parrot_Context * Parrot_set_new_context(PARROT_INTERP, const INTVAL
+*number_regs_used)>
 
 Allocates and returns a new context as the current context.  Note that the
 register usage C<n_regs_used> is copied.
@@ -642,8 +644,8 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
 
 /*
 
-=item C<Parrot_Context * Parrot_context_ref_trace(PARROT_INTERP,
-Parrot_Context *ctx, const char *file, int line)>
+=item C<Parrot_Context * Parrot_context_ref_trace(PARROT_INTERP, Parrot_Context
+*ctx, const char *file, int line)>
 
 Helper function to trace references when CTX_LEAK_DEBUG is set.
 

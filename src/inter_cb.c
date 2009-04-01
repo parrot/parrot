@@ -58,7 +58,8 @@ static void verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 
 /*
 
-=item C<PMC* Parrot_make_cb>
+=item C<PMC* Parrot_make_cb(PARROT_INTERP, PMC* sub, PMC* user_data, STRING
+*cb_signature)>
 
 Create a callback function according to pdd16.
 
@@ -149,7 +150,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
 
 /*
 
-=item C<static void verify_CD>
+=item C<static void verify_CD(char *external_data, PMC *user_data)>
 
 Verify user_data PMC then continue with callback_CD
 
@@ -212,7 +213,8 @@ verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
 
 /*
 
-=item C<static void callback_CD>
+=item C<static void callback_CD(PARROT_INTERP, char *external_data, PMC
+*user_data)>
 
 Common callback function handler. See pdd16.
 
@@ -272,7 +274,8 @@ callback_CD(PARROT_INTERP, ARGIN(char *external_data), ARGMOD(PMC *user_data))
 
 /*
 
-=item C<void Parrot_run_callback>
+=item C<void Parrot_run_callback(PARROT_INTERP, PMC* user_data, char*
+external_data)>
 
 Run a callback function. The PMC* user_data holds all
 necessary items in its properties.
@@ -368,9 +371,9 @@ case_I:
 }
 /*
 
-=item C<void Parrot_callback_C>
+=item C<void Parrot_callback_C(char *external_data, PMC *user_data)>
 
-=item C<void Parrot_callback_D>
+=item C<void Parrot_callback_D(PMC *user_data, char *external_data)>
 
 NCI callback functions. See pdd16.
 

@@ -439,8 +439,8 @@ parrot_pic_opcode(PARROT_INTERP, INTVAL op)
 
 /*
 
-=item C<static int pass_int(PARROT_INTERP, PMC *sig, const char *src_base,
-const void **src, char *dest_base, void * const *dest)>
+=item C<static int pass_int(PARROT_INTERP, PMC *sig, const char *src_base, const
+void **src, char *dest_base, void * const *dest)>
 
 =cut
 
@@ -463,8 +463,8 @@ pass_int(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 
 /*
 
-=item C<static int pass_num(PARROT_INTERP, PMC *sig, const char *src_base,
-const void **src, char *dest_base, void * const *dest)>
+=item C<static int pass_num(PARROT_INTERP, PMC *sig, const char *src_base, const
+void **src, char *dest_base, void * const *dest)>
 
 =cut
 
@@ -487,8 +487,8 @@ pass_num(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 
 /*
 
-=item C<static int pass_str(PARROT_INTERP, PMC *sig, const char *src_base,
-const void **src, char *dest_base, void * const *dest)>
+=item C<static int pass_str(PARROT_INTERP, PMC *sig, const char *src_base, const
+void **src, char *dest_base, void * const *dest)>
 
 =cut
 
@@ -512,8 +512,8 @@ pass_str(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 
 /*
 
-=item C<static int pass_pmc(PARROT_INTERP, PMC *sig, const char *src_base,
-const void **src, char *dest_base, void * const *dest)>
+=item C<static int pass_pmc(PARROT_INTERP, PMC *sig, const char *src_base, const
+void **src, char *dest_base, void * const *dest)>
 
 =cut
 
@@ -620,8 +620,8 @@ pass_mixed(PARROT_INTERP, ARGIN(PMC *sig), ARGIN(const char *src_base),
 
 /*
 
-=item C<int parrot_pic_check_sig(PARROT_INTERP, PMC *sig1, PMC *sig2,
-int *type)>
+=item C<int parrot_pic_check_sig(PARROT_INTERP, PMC *sig1, PMC *sig2, int
+*type)>
 
 return argument count and type of the signature or -1 if not pic-able
 the type PARROT_ARG_CONSTANT stands for mixed types or constants
@@ -774,8 +774,8 @@ is_pic_param(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), opcode_t 
 
 /*
 
-=item C<static int is_pic_func(PARROT_INTERP, void **pc, Parrot_MIC *mic,
-int core_type)>
+=item C<static int is_pic_func(PARROT_INTERP, void **pc, Parrot_MIC *mic, int
+core_type)>
 
 =cut
 
@@ -849,8 +849,8 @@ is_pic_func(PARROT_INTERP, ARGIN(void **pc), ARGOUT(Parrot_MIC *mic), int core_t
 
 /*
 
-=item C<void parrot_PIC_prederef(PARROT_INTERP, opcode_t op, void **pc_pred,
-int core)>
+=item C<void parrot_PIC_prederef(PARROT_INTERP, opcode_t op, void **pc_pred, int
+core)>
 
 Define either the normal prederef function or the PIC stub, if PIC for
 this opcode function is available. Called from C<do_prederef>.

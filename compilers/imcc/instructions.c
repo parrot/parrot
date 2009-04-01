@@ -82,7 +82,8 @@ static const Emitter emitters[] = {
 
 /*
 
-=item C<Instruction * _mk_instruction>
+=item C<Instruction * _mk_instruction(const char *op, const char *fmt, int n,
+SymReg * const *r, int flags)>
 
 Creates a new instruction
 
@@ -126,7 +127,7 @@ static int w_special[1+4*3];
 
 /*
 
-=item C<void imcc_init_tables>
+=item C<void imcc_init_tables(PARROT_INTERP)>
 
 Initializes IMCC's table of opcodes, based on the list maintained
 by the Parrot interpreter. Stores the results in global variable
@@ -156,7 +157,7 @@ imcc_init_tables(PARROT_INTERP)
 
 /*
 
-=item C<int ins_writes2>
+=item C<int ins_writes2(const Instruction *ins, int t)>
 
 Returns TRUE if instruction ins writes to a register of type t
 
@@ -189,7 +190,7 @@ ins_writes2(ARGIN(const Instruction *ins), int t)
 
 /*
 
-=item C<int instruction_reads>
+=item C<int instruction_reads(const Instruction *ins, const SymReg *r)>
 
 next two functions are called very often, says gprof
 they should be fast
@@ -259,7 +260,7 @@ instruction_reads(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 
 /*
 
-=item C<int instruction_writes>
+=item C<int instruction_writes(const Instruction *ins, const SymReg *r)>
 
 Determines whether the instruction C<ins> writes to the SymReg C<r>.
 Returns 1 if it does, 0 if not.
@@ -344,7 +345,7 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
 
 /*
 
-=item C<int get_branch_regno>
+=item C<int get_branch_regno(const Instruction *ins)>
 
 Get the register number of an address which is a branch target
 
@@ -367,7 +368,7 @@ get_branch_regno(ARGIN(const Instruction *ins))
 
 /*
 
-=item C<SymReg * get_branch_reg>
+=item C<SymReg * get_branch_reg(const Instruction *ins)>
 
 Get the register corresponding to an address which is a branch target
 
@@ -393,7 +394,7 @@ get_branch_reg(ARGIN(const Instruction *ins))
 
 /*
 
-=item C<Instruction * _delete_ins>
+=item C<Instruction * _delete_ins(IMC_Unit *unit, Instruction *ins)>
 
 Delete instruction ins. It's up to the caller to actually free the memory
 of ins, if appropriate.
@@ -428,7 +429,7 @@ _delete_ins(ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 
 /*
 
-=item C<Instruction * delete_ins>
+=item C<Instruction * delete_ins(IMC_Unit *unit, Instruction *ins)>
 
 Delete instruction ins, and then free it.
 
@@ -454,7 +455,7 @@ delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
 
 /*
 
-=item C<void insert_ins>
+=item C<void insert_ins(IMC_Unit *unit, Instruction *ins, Instruction *tmp)>
 
 Insert Instruction C<tmp> in the execution flow after Instruction
 C<ins>.
@@ -501,7 +502,7 @@ insert_ins(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
 
 /*
 
-=item C<void prepend_ins>
+=item C<void prepend_ins(IMC_Unit *unit, Instruction *ins, Instruction *tmp)>
 
 Insert Instruction C<tmp> into the execution flow before
 Instruction C<ins>.
@@ -540,7 +541,8 @@ prepend_ins(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(Instruction *ins),
 
 /*
 
-=item C<void subst_ins>
+=item C<void subst_ins(IMC_Unit *unit, Instruction *ins, Instruction *tmp, int
+needs_freeing)>
 
 Substitute Instruction C<tmp> for Instruction C<ins>.
 Free C<ins> if C<needs_freeing> is true.
@@ -579,7 +581,8 @@ subst_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins),
 
 /*
 
-=item C<Instruction * move_ins>
+=item C<Instruction * move_ins(IMC_Unit *unit, Instruction *ins, Instruction
+*to)>
 
 Move instruction ins from its current position to the position
 following instruction to. Returns the instruction following the
@@ -602,7 +605,7 @@ move_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins), ARGMOD(Instruction *t
 
 /*
 
-=item C<Instruction * emitb>
+=item C<Instruction * emitb(PARROT_INTERP, IMC_Unit *unit, Instruction *i)>
 
 Emit a single instruction into the current unit buffer.
 
@@ -634,7 +637,7 @@ emitb(PARROT_INTERP, ARGMOD_NULLOK(IMC_Unit *unit), ARGIN_NULLOK(Instruction *i)
 
 /*
 
-=item C<void free_ins>
+=item C<void free_ins(Instruction *ins)>
 
 Free the Instruction structure ins.
 
@@ -653,7 +656,7 @@ free_ins(ARGMOD(Instruction *ins))
 
 /*
 
-=item C<int ins_print>
+=item C<int ins_print(PARROT_INTERP, PMC *io, const Instruction *ins)>
 
 Print details of instruction ins in file fd.
 
@@ -780,7 +783,7 @@ static char *output;
 
 /*
 
-=item C<static int e_file_open>
+=item C<static int e_file_open(PARROT_INTERP, void *param)>
 
 Prints a message to STDOUT.
 
@@ -809,7 +812,7 @@ e_file_open(PARROT_INTERP, ARGIN(void *param))
 
 /*
 
-=item C<static int e_file_close>
+=item C<static int e_file_close(PARROT_INTERP, void *param)>
 
 =cut
 
@@ -827,7 +830,8 @@ e_file_close(PARROT_INTERP, SHIM(void *param))
 
 /*
 
-=item C<static int e_file_emit>
+=item C<static int e_file_emit(PARROT_INTERP, void *param, const IMC_Unit *unit,
+const Instruction *ins)>
 
 =cut
 
@@ -856,7 +860,7 @@ e_file_emit(PARROT_INTERP,
 
 /*
 
-=item C<int emit_open>
+=item C<int emit_open(PARROT_INTERP, int type, void *param)>
 
 Opens the emitter function C<open> of the given C<type>. Passes
 the C<param> to the open function.
@@ -879,7 +883,7 @@ emit_open(PARROT_INTERP, int type, ARGIN_NULLOK(void *param))
 
 /*
 
-=item C<int emit_flush>
+=item C<int emit_flush(PARROT_INTERP, void *param, IMC_Unit *unit)>
 
 Flushes the emitter by emitting all the instructions in the current
 IMC_Unit C<unit>.
@@ -912,7 +916,7 @@ emit_flush(PARROT_INTERP, ARGIN_NULLOK(void *param), ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<int emit_close>
+=item C<int emit_close(PARROT_INTERP, void *param)>
 
 Closes the given emitter.
 

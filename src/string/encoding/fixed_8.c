@@ -261,8 +261,8 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *source_string),
 
 /*
 
-=item C<static void set_codepoint(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL codepoint)>
+=item C<static void set_codepoint(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL codepoint)>
 
 This is the same as set byte
 
@@ -280,7 +280,8 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static UINTVAL get_byte(PARROT_INTERP, const STRING *source_string, UINTVAL offset)>
+=item C<static UINTVAL get_byte(PARROT_INTERP, const STRING *source_string,
+UINTVAL offset)>
 
 Returns the byte in string C<src> at position C<offset>.
 
@@ -307,8 +308,8 @@ get_byte(PARROT_INTERP, ARGIN(const STRING *source_string), UINTVAL offset)
 
 /*
 
-=item C<static void set_byte(PARROT_INTERP, const STRING *source_string,
-UINTVAL offset, UINTVAL byte)>
+=item C<static void set_byte(PARROT_INTERP, const STRING *source_string, UINTVAL
+offset, UINTVAL byte)>
 
 Sets, in string C<src> at position C<offset>, the byte C<byte>.
 
@@ -358,8 +359,8 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * get_bytes(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL count)>
+=item C<static STRING * get_bytes(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL count)>
 
 Returns the bytes in string C<src> at position C<offset> and length C<count>.
 
@@ -390,8 +391,8 @@ get_bytes(PARROT_INTERP, ARGIN(STRING *source_string), UINTVAL offset, UINTVAL c
 
 /*
 
-=item C<static STRING * get_codepoints_inplace(PARROT_INTERP,
-STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
+=item C<static STRING * get_codepoints_inplace(PARROT_INTERP, STRING
+*source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
 
 Gets from string C<src> at position C<offset> C<count> codepoints and returns
 them in C<return_string>.  (Delegates to C<get_bytes>.)
@@ -443,8 +444,8 @@ get_bytes_inplace(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static void set_codepoints(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL count, STRING *new_codepoints)>
+=item C<static void set_codepoints(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL count, STRING *new_codepoints)>
 
 Delegate to set_bytes
 
@@ -462,8 +463,8 @@ set_codepoints(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static void set_bytes(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL count, STRING *new_bytes)>
+=item C<static void set_bytes(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL count, STRING *new_bytes)>
 
 Replaces in string C<src> at position C<offset> for C<count> bytes with the
 contents of string C<new_bytes>.
@@ -557,7 +558,8 @@ fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
 
 /*
 
-=item C<static void fixed8_set_next(PARROT_INTERP, String_iter *iter, UINTVAL c)>
+=item C<static void fixed8_set_next(PARROT_INTERP, String_iter *iter, UINTVAL
+c)>
 
 With the string iterator C<i>, appends the codepoint C<c> and advances to the
 next position in the string.
@@ -576,7 +578,8 @@ fixed8_set_next(PARROT_INTERP, ARGMOD(String_iter *iter), UINTVAL c)
 
 /*
 
-=item C<static void fixed8_set_position(PARROT_INTERP, String_iter *iter, UINTVAL pos)>
+=item C<static void fixed8_set_position(PARROT_INTERP, String_iter *iter,
+UINTVAL pos)>
 
 Moves the string iterator C<i> to the position C<n> in the string.
 
@@ -595,7 +598,8 @@ fixed8_set_position(SHIM_INTERP, ARGMOD(String_iter *iter), UINTVAL pos)
 
 /*
 
-=item C<static void iter_init(PARROT_INTERP, const STRING *src, String_iter *iter)>
+=item C<static void iter_init(PARROT_INTERP, const STRING *src, String_iter
+*iter)>
 
 Initializes for string C<src> the string iterator C<iter>.
 

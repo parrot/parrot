@@ -350,7 +350,8 @@ static void too_many(PARROT_INTERP,
 
 /*
 
-=item C<PMC* Parrot_pcc_build_sig_object_from_varargs>
+=item C<PMC* Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, PMC* obj,
+const char *sig, va_list args)>
 
 Take a varargs list, and convert it into a CallSignature PMC. The CallSignature
 stores the original short signature string, and an array of integer types to
@@ -467,7 +468,8 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC* obj),
 
 /*
 
-=item C<void Parrot_init_arg_nci>
+=item C<void Parrot_init_arg_nci(PARROT_INTERP, call_state *st, const char
+*sig)>
 
 Initializes the argument passing state C<call_state> for the given NCI
 signature.
@@ -497,7 +499,8 @@ Parrot_init_arg_nci(PARROT_INTERP, ARGOUT(call_state *st),
 
 /*
 
-=item C<void Parrot_init_ret_nci>
+=item C<void Parrot_init_ret_nci(PARROT_INTERP, call_state *st, const char
+*sig)>
 
 Initializes the return value, passing state C<call_state> for the given NCI
 signature.
@@ -535,7 +538,8 @@ Parrot_init_ret_nci(PARROT_INTERP, ARGOUT(call_state *st), ARGIN(const char *sig
 
 /*
 
-=item C<int Parrot_init_arg_indexes_and_sig_pmc>
+=item C<int Parrot_init_arg_indexes_and_sig_pmc(PARROT_INTERP, Parrot_Context
+*ctx, opcode_t *indexes, PMC *sig_pmc, call_state_item *sti)>
 
 Initializes argument transfer with given context registers, register indexes,
 and a signature PMC.
@@ -588,7 +592,8 @@ Parrot_init_arg_indexes_and_sig_pmc(PARROT_INTERP, ARGIN(Parrot_Context *ctx),
 
 /*
 
-=item C<int Parrot_init_arg_op>
+=item C<int Parrot_init_arg_op(PARROT_INTERP, Parrot_Context *ctx, opcode_t *pc,
+call_state_item *sti)>
 
 Initializes argument transfer with given context registers and opcode location
 of a C<get_*> or C<set_*> argument opcode.
@@ -618,7 +623,8 @@ Parrot_init_arg_op(PARROT_INTERP, ARGIN(Parrot_Context *ctx),
 
 /*
 
-=item C<int Parrot_init_arg_sig>
+=item C<int Parrot_init_arg_sig(PARROT_INTERP, Parrot_Context *ctx, const char
+*sig, void *ap, call_state_item *sti)>
 
 Initializes argument transfer with given code segment (holding the
 const_table), registers, function signature, and arguments.
@@ -657,7 +663,7 @@ Parrot_init_arg_sig(PARROT_INTERP, ARGIN(Parrot_Context *ctx),
 
 /*
 
-=item C<static void start_flatten>
+=item C<static void start_flatten(PARROT_INTERP, call_state *st, PMC *p_arg)>
 
 Marks the source state as flattening with the passed PMC being flattened and
 fetches the first arg from the flattened set.
@@ -701,7 +707,7 @@ start_flatten(PARROT_INTERP, ARGMOD(call_state *st), ARGIN(PMC *p_arg))
 
 /*
 
-=item C<static void next_arg_sig>
+=item C<static void next_arg_sig(PARROT_INTERP, call_state_item *sti)>
 
 Moves the call state to the next argument in the signature, calculating which
 type of argument/parameter to get next.  The index gets increased elsewhere.
@@ -746,7 +752,7 @@ next_arg_sig(PARROT_INTERP, ARGMOD(call_state_item *sti))
 
 /*
 
-=item C<static int fetch_arg_sig>
+=item C<static int fetch_arg_sig(PARROT_INTERP, call_state *st)>
 
 Fetches the next argument from the signature in the given call state.
 
@@ -804,7 +810,7 @@ fetch_arg_sig(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static int fetch_arg_op>
+=item C<static int fetch_arg_op(PARROT_INTERP, call_state *st)>
 
 Fetches an argument from the appropriate context.
 
@@ -869,7 +875,7 @@ fetch_arg_op(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<int Parrot_fetch_arg>
+=item C<int Parrot_fetch_arg(PARROT_INTERP, call_state *st)>
 
 Fetches an argument from the current call state object. Retrieves the
 next argument in the parameter list, or the next argument in a flattened
@@ -947,7 +953,7 @@ Parrot_fetch_arg(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<int Parrot_fetch_arg_nci>
+=item C<int Parrot_fetch_arg_nci(PARROT_INTERP, call_state *st)>
 
 Fetches the next argument from the call state and converts it to the proper
 data type for the call signature. If the next argument is a slurpy array,
@@ -991,7 +997,7 @@ Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void convert_arg_from_int>
+=item C<static void convert_arg_from_int(PARROT_INTERP, call_state *st)>
 
 Autoboxes an int into the expected container type.
 
@@ -1026,7 +1032,7 @@ convert_arg_from_int(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void convert_arg_from_num>
+=item C<static void convert_arg_from_num(PARROT_INTERP, call_state *st)>
 
 Autoboxes a num into the expected container type.
 
@@ -1062,7 +1068,7 @@ convert_arg_from_num(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void convert_arg_from_str>
+=item C<static void convert_arg_from_str(PARROT_INTERP, call_state *st)>
 
 Autoboxes a string primitive to the expected container type.
 
@@ -1097,7 +1103,7 @@ convert_arg_from_str(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void convert_arg_from_pmc>
+=item C<static void convert_arg_from_pmc(PARROT_INTERP, call_state *st)>
 
 Unboxes a PMC to the expected primitive type.
 
@@ -1127,7 +1133,8 @@ convert_arg_from_pmc(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void check_for_opt_flag>
+=item C<static void check_for_opt_flag(PARROT_INTERP, call_state *st, int
+has_arg)>
 
 Processes the next argument, if it has the optional flag set.
 Otherwise moves on.
@@ -1170,7 +1177,7 @@ check_for_opt_flag(PARROT_INTERP, ARGMOD(call_state *st), int has_arg)
 
 /*
 
-=item C<static void clone_key_arg>
+=item C<static void clone_key_arg(PARROT_INTERP, call_state *st)>
 
 Replaces any src registers by their values (done inside clone).  This needs a
 test for tailcalls too, but I think there is no syntax to pass a key to a
@@ -1209,7 +1216,7 @@ clone_key_arg(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void init_first_dest_named>
+=item C<static void init_first_dest_named(PARROT_INTERP, call_state *st)>
 
 Initializes dest calling state for the first named arg.
 
@@ -1274,7 +1281,7 @@ init_first_dest_named(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static int locate_named_named>
+=item C<static int locate_named_named(PARROT_INTERP, call_state *st)>
 
 Locates a destination argument name, returning 0 if not found.
 
@@ -1330,7 +1337,7 @@ locate_named_named(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void store_arg>
+=item C<static void store_arg(const call_state *st, INTVAL idx)>
 
 Stores the next argument in the destination register appropriately.
 
@@ -1363,7 +1370,7 @@ store_arg(ARGIN(const call_state *st), INTVAL idx)
 
 /*
 
-=item C<int Parrot_store_arg>
+=item C<int Parrot_store_arg(PARROT_INTERP, const call_state *st)>
 
 Stores the next function argument into the appropriate destination register.
 Calls C<store_arg> to do most of the work. Returns 0 if an attempt is made
@@ -1393,7 +1400,8 @@ Parrot_store_arg(SHIM_INTERP, ARGIN(const call_state *st))
 
 /*
 
-=item C<static void too_few>
+=item C<static void too_few(PARROT_INTERP, const call_state *st, const char
+*action)>
 
 Throws an exception if there are too few arguments passed.
 
@@ -1420,7 +1428,8 @@ too_few(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 
 /*
 
-=item C<static void too_many>
+=item C<static void too_many(PARROT_INTERP, const call_state *st, const char
+*action)>
 
 Throws an exception if there are too many arguments passed.
 
@@ -1447,7 +1456,7 @@ too_many(PARROT_INTERP, ARGIN(const call_state *st), ARGIN(const char *action))
 
 /*
 
-=item C<static void null_val>
+=item C<static void null_val(int sig, call_state *st)>
 
 Adds a null value to the appropriate register.
 
@@ -1472,7 +1481,7 @@ null_val(int sig, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void check_named>
+=item C<static void check_named(PARROT_INTERP, call_state *st)>
 
 Makes sure that all required named args are set and that all optional
 args and flags are set to null and false if not present.
@@ -1571,7 +1580,7 @@ check_named(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<static void init_call_stats>
+=item C<static void init_call_stats(call_state *st)>
 
 Sets the default values of the passed C<call_state>.
 
@@ -1596,7 +1605,8 @@ init_call_stats(ARGMOD(call_state *st))
 
 /*
 
-=item C<void Parrot_process_args>
+=item C<void Parrot_process_args(PARROT_INTERP, call_state *st, arg_pass_t
+param_or_result)>
 
 Gets args for the current function call and puts them into position.
 First it gets the positional non-slurpy parameters, then the positional
@@ -1800,7 +1810,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
 
 /*
 
-=item C<void Parrot_convert_arg>
+=item C<void Parrot_convert_arg(PARROT_INTERP, call_state *st)>
 
 Converts a source argument to the expected destination type.
 
@@ -1835,7 +1845,9 @@ Parrot_convert_arg(PARROT_INTERP, ARGMOD(call_state *st))
 
 /*
 
-=item C<void parrot_pass_args>
+=item C<void parrot_pass_args(PARROT_INTERP, Parrot_Context *src_ctx,
+Parrot_Context *dest_ctx, opcode_t *src_indexes, opcode_t *dest_indexes,
+arg_pass_t param_or_result)>
 
 Main argument passing routine.
 
@@ -1891,7 +1903,8 @@ parrot_pass_args(PARROT_INTERP,
 
 /*
 
-=item C<opcode_t * parrot_pass_args_fromc>
+=item C<opcode_t * parrot_pass_args_fromc(PARROT_INTERP, const char *sig,
+opcode_t *dest, Parrot_Context *old_ctxp, va_list ap)>
 
 Passes arguments from C code with given signature to a Parrot Sub.
 Prerequisites are like above.
@@ -1918,7 +1931,8 @@ parrot_pass_args_fromc(PARROT_INTERP, ARGIN(const char *sig),
 
 /*
 
-=item C<static int set_retval_util>
+=item C<static int set_retval_util(PARROT_INTERP, const char *sig,
+Parrot_Context *ctx, call_state *st)>
 
 Adds the current return parameter to the current context, and fetches
 the next return parameter from the call state object.
@@ -1954,7 +1968,7 @@ set_retval_util(PARROT_INTERP, ARGIN(const char *sig),
 
 /*
 
-=item C<void * set_retval>
+=item C<void * set_retval(PARROT_INTERP, int sig_ret, Parrot_Context *ctx)>
 
 Handles void and pointer (PMC *, STRING *) return values.  Returns a PMC,
 STRING, or NULL pointer as appropriate.
@@ -1991,7 +2005,7 @@ set_retval(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 
 /*
 
-=item C<INTVAL set_retval_i>
+=item C<INTVAL set_retval_i(PARROT_INTERP, int sig_ret, Parrot_Context *ctx)>
 
 Handles an INTVAL return value, returning its value if present and 0 otherwise.
 
@@ -2018,7 +2032,7 @@ set_retval_i(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 
 /*
 
-=item C<FLOATVAL set_retval_f>
+=item C<FLOATVAL set_retval_f(PARROT_INTERP, int sig_ret, Parrot_Context *ctx)>
 
 Handles a FLOATVAL return value, returning its value if present and 0.0
 otherwise.
@@ -2046,7 +2060,7 @@ set_retval_f(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 
 /*
 
-=item C<STRING* set_retval_s>
+=item C<STRING* set_retval_s(PARROT_INTERP, int sig_ret, Parrot_Context *ctx)>
 
 Handles a STRING return value, returning its pointer if present and NULL
 otherwise.
@@ -2076,7 +2090,7 @@ set_retval_s(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 
 /*
 
-=item C<PMC* set_retval_p>
+=item C<PMC* set_retval_p(PARROT_INTERP, int sig_ret, Parrot_Context *ctx)>
 
 Handles a PMC return value, returning the PMC pointer if present and NULL
 otherwise.
@@ -2106,7 +2120,9 @@ set_retval_p(PARROT_INTERP, int sig_ret, ARGIN(Parrot_Context *ctx))
 
 /*
 
-=item C<static void commit_last_arg>
+=item C<static void commit_last_arg(PARROT_INTERP, int index, int cur, opcode_t
+*n_regs_used, int seen_arrow, PMC * const *sigs, opcode_t **indexes,
+Parrot_Context *ctx, PMC *pmc, va_list *list)>
 
 Called by C<Parrot_PCCINVOKE> when it reaches the end of each arg in the arg
 signature.  See C<Parrot_PCCINVOKE> for signature syntax.
@@ -2171,7 +2187,8 @@ commit_last_arg(PARROT_INTERP, int index, int cur,
 
 /*
 
-=item C<static Parrot_Context * count_signature_elements>
+=item C<static Parrot_Context * count_signature_elements(PARROT_INTERP, const
+char *signature, PMC *args_sig, PMC *results_sig, int flag)>
 
 Counts the number of each type of register in a signature object. Returns
 the total number of parameter arguments, the total number of result
@@ -2281,7 +2298,9 @@ count_signature_elements(PARROT_INTERP, ARGIN(const char *signature),
 
 /*
 
-=item C<static void commit_last_arg_sig_object>
+=item C<static void commit_last_arg_sig_object(PARROT_INTERP, int index, int
+cur, opcode_t *n_regs_used, int seen_arrow, PMC * const *sigs, opcode_t
+**indexes, Parrot_Context *ctx, PMC *sig_obj)>
 
 Called by Parrot_pcc_invoke_from_sig_object when it reaches the end of each
 arg in the arg signature.  See C<Parrot_pcc_invoke_from_sig_object> for
@@ -2365,7 +2384,8 @@ commit_last_arg_sig_object(PARROT_INTERP, int index, int cur,
 
 /*
 
-=item C<static void set_context_sig_returns>
+=item C<static void set_context_sig_returns(PARROT_INTERP, Parrot_Context *ctx,
+opcode_t **indexes, const char *ret_x, PMC *result_list)>
 
 Sets the subroutine return arguments in the context C<ctx>. Takes a C string
 for the return signature C<ret_x> and a list of return parameters C<result_list>.
@@ -2433,7 +2453,8 @@ set_context_sig_returns(PARROT_INTERP,
 
 /*
 
-=item C<static void set_context_sig_returns_varargs>
+=item C<static void set_context_sig_returns_varargs(PARROT_INTERP,
+Parrot_Context *ctx, opcode_t **indexes, const char *ret_x, va_list returns)>
 
 Sets the subroutine return arguments in the context C<ctx>. Takes a C string
 for the return signature C<ret_x> and a varargs list of return parameters C<returns>.
@@ -2497,7 +2518,9 @@ set_context_sig_returns_varargs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
 
 /*
 
-=item C<static const char * set_context_sig_params>
+=item C<static const char * set_context_sig_params(PARROT_INTERP, const char
+*signature, INTVAL *n_regs_used, PMC **sigs, opcode_t **indexes, Parrot_Context
+*ctx, PMC *sig_obj)>
 
 Sets the subroutine arguments in the C<ctx> context, according to the
 signature string C<signature>. Currently this function is only called
@@ -2605,7 +2628,8 @@ set_context_sig_params(PARROT_INTERP, ARGIN(const char *signature),
 
 /*
 
-=item C<void Parrot_pcc_invoke_sub_from_c_args>
+=item C<void Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, PMC *sub_obj,
+const char *sig, ...)>
 
 Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
 to invoke is passed as an argument rather than looked up by name. The signature
@@ -2632,7 +2656,8 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
 /*
 
-=item C<void Parrot_PCCINVOKE>
+=item C<void Parrot_PCCINVOKE(PARROT_INTERP, PMC* pmc, STRING *method_name,
+const char *signature, ...)>
 
 C<pmc> is the invocant.
 
@@ -2859,7 +2884,8 @@ Parrot_PCCINVOKE(PARROT_INTERP, ARGIN(PMC* pmc), ARGMOD(STRING *method_name),
 
 /*
 
-=item C<void Parrot_pcc_invoke_method_from_c_args>
+=item C<void Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, PMC* pmc,
+STRING *method_name, const char *signature, ...)>
 
 Makes a method call given the name of the method and the arguments as a
 C variadic argument list. C<pmc> is the invocant, C<method_name> is the
@@ -2901,7 +2927,8 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
 
 /*
 
-=item C<void Parrot_pcc_invoke_from_sig_object>
+=item C<void Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, PMC *sub_obj, PMC
+*sig_obj)>
 
 Follows the same conventions as C<Parrot_PCCINVOKE>, but the subroutine object
 to invoke is passed as an argument rather than looked up by name, and the

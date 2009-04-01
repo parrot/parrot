@@ -224,7 +224,8 @@ static void vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static unsigned int* ig_get_word>
+=item C<static unsigned int* ig_get_word(int i, int j, int N, unsigned int
+*graph, int *bit_ofs)>
 
 =cut
 
@@ -244,7 +245,7 @@ ig_get_word(int i, int j, int N, ARGIN(unsigned int *graph),
 
 /*
 
-=item C<static void ig_set>
+=item C<static void ig_set(int i, int j, int N, unsigned int *graph)>
 
 =cut
 
@@ -261,7 +262,7 @@ ig_set(int i, int j, int N, ARGIN(unsigned int *graph))
 
 /*
 
-=item C<unsigned int ig_test>
+=item C<unsigned int ig_test(int i, int j, int N, unsigned int *graph)>
 
 =cut
 
@@ -278,7 +279,7 @@ ig_test(int i, int j, int N, ARGIN(unsigned int *graph))
 
 /*
 
-=item C<static unsigned int* ig_allocate>
+=item C<static unsigned int* ig_allocate(int N)>
 
 =cut
 
@@ -299,7 +300,7 @@ ig_allocate(int N)
 
 /*
 
-=item C<void imc_reg_alloc>
+=item C<void imc_reg_alloc(PARROT_INTERP, IMC_Unit *unit)>
 
 imc_reg_alloc is the main loop of the allocation algorithm. It operates
 on a single compilation unit at a time.
@@ -406,7 +407,7 @@ imc_reg_alloc(PARROT_INTERP, ARGIN_NULLOK(IMC_Unit *unit))
 
 /*
 
-=item C<void free_reglist>
+=item C<void free_reglist(IMC_Unit *unit)>
 
 =cut
 
@@ -438,7 +439,7 @@ free_reglist(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<void graph_coloring_reg_alloc>
+=item C<void graph_coloring_reg_alloc(PARROT_INTERP, IMC_Unit *unit)>
 
 =cut
 
@@ -456,7 +457,7 @@ graph_coloring_reg_alloc(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void make_stat>
+=item C<static void make_stat(IMC_Unit *unit, int *sets, int *cols)>
 
 some statistics about register usage
 printed with --verbose --verbose
@@ -511,7 +512,7 @@ make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *c
 
 /*
 
-=item C<static void imc_stat_init>
+=item C<static void imc_stat_init(IMC_Unit *unit)>
 
 registes usage of .pir
 
@@ -537,7 +538,7 @@ imc_stat_init(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void print_stat>
+=item C<static void print_stat(PARROT_INTERP, IMC_Unit *unit)>
 
 and final
 
@@ -585,7 +586,7 @@ print_stat(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int reg_sort_f>
+=item C<static int reg_sort_f(const void *a, const void *b)>
 
 sort list by line  nr
 
@@ -611,7 +612,7 @@ reg_sort_f(ARGIN(const void *a), ARGIN(const void *b))
 
 /*
 
-=item C<static void sort_reglist>
+=item C<static void sort_reglist(IMC_Unit *unit)>
 
 =cut
 
@@ -626,7 +627,7 @@ sort_reglist(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void build_reglist>
+=item C<static void build_reglist(NULLOK_INTERP, IMC_Unit *unit)>
 
 make a linear list of IDENTs and VARs, set n_symbols
 TODO
@@ -696,7 +697,7 @@ build_reglist(NULLOK_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void rebuild_reglist>
+=item C<static void rebuild_reglist(IMC_Unit *unit)>
 
 Exclude all already allocated registers (< first_avail)
 from reglist. This reduced the size of the interference graph
@@ -744,7 +745,7 @@ rebuild_reglist(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void build_interference_graph>
+=item C<static void build_interference_graph(PARROT_INTERP, IMC_Unit *unit)>
 
 Creates the interference graph between the variables.
 
@@ -799,7 +800,7 @@ build_interference_graph(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void compute_du_chain>
+=item C<static void compute_du_chain(IMC_Unit *unit)>
 
 Compute a DU-chain for each symbolic in a compilation unit
 
@@ -838,7 +839,7 @@ compute_du_chain(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void compute_one_du_chain>
+=item C<static void compute_one_du_chain(SymReg *r, IMC_Unit *unit)>
 
 =cut
 
@@ -883,7 +884,8 @@ compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<static int interferes>
+=item C<static int interferes(PARROT_INTERP, const IMC_Unit *unit, const SymReg
+*r0, const SymReg *r1)>
 
 See if r0's chain interferes with r1.
 
@@ -977,7 +979,7 @@ interferes(PARROT_INTERP, ARGIN(const IMC_Unit *unit),
 
 /*
 
-=item C<static int ig_find_color>
+=item C<static int ig_find_color(const IMC_Unit *unit, const char *avail)>
 
 find available color for register #x in available colors
 
@@ -1000,7 +1002,7 @@ ig_find_color(ARGIN(const IMC_Unit *unit), ARGIN(const char *avail))
 
 /*
 
-=item C<static int try_allocate>
+=item C<static int try_allocate(PARROT_INTERP, IMC_Unit *unit)>
 
 Color the graph, assigning registers to each symbol:
 
@@ -1076,7 +1078,8 @@ try_allocate(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<static void map_colors>
+=item C<static void map_colors(const IMC_Unit* unit, int x, unsigned int *graph,
+char *avail, int typ, int already_allocated)>
 
 map_colors: calculates what colors can be assigned to the x-th symbol.
 
@@ -1107,7 +1110,7 @@ map_colors(ARGIN(const IMC_Unit* unit), int x, ARGIN(unsigned int *graph),
 
 /*
 
-=item C<static int first_avail>
+=item C<static int first_avail(const IMC_Unit *unit, int reg_set, Set **avail)>
 
 find first available register of the given reg_set
 
@@ -1152,7 +1155,7 @@ first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail)
 
 /*
 
-=item C<static void allocate_uniq>
+=item C<static void allocate_uniq(PARROT_INTERP, IMC_Unit *unit, int usage)>
 
 allocate lexicals or non-volatile in ascending order
 
@@ -1215,7 +1218,7 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
 
 /*
 
-=item C<static void vanilla_reg_alloc>
+=item C<static void vanilla_reg_alloc(PARROT_INTERP, IMC_Unit *unit)>
 
 =cut
 
@@ -1267,7 +1270,7 @@ vanilla_reg_alloc(SHIM_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void allocate_lexicals>
+=item C<static void allocate_lexicals(PARROT_INTERP, IMC_Unit *unit)>
 
 =cut
 
@@ -1283,7 +1286,7 @@ allocate_lexicals(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static void allocate_non_volatile>
+=item C<static void allocate_non_volatile(PARROT_INTERP, IMC_Unit *unit)>
 
 =cut
 

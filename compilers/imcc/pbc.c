@@ -301,7 +301,7 @@ static int old_blocks(PARROT_INTERP)
 
 /*
 
-=item C<static void imcc_globals_destroy>
+=item C<static void imcc_globals_destroy(PARROT_INTERP, int ex, void *param)>
 
 Frees memory allocated for IMCC globals for one particular compilation unit.
 
@@ -337,7 +337,7 @@ imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
 
 /*
 
-=item C<static int add_const_table>
+=item C<static int add_const_table(PARROT_INTERP)>
 
 Adds an empty item to constant table, returning its position.
 
@@ -373,7 +373,7 @@ add_const_table(PARROT_INTERP)
 
 /*
 
-=item C<static int add_const_table_pmc>
+=item C<static int add_const_table_pmc(PARROT_INTERP, PMC *pmc)>
 
 Adds a PMC to the const table, returning its position.
 
@@ -396,7 +396,7 @@ add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 
 /*
 
-=item C<static int add_const_table_key>
+=item C<static int add_const_table_key(PARROT_INTERP, PMC *key)>
 
 Adds a key to the const table, returning its position.
 
@@ -419,7 +419,7 @@ add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<int e_pbc_open>
+=item C<int e_pbc_open(PARROT_INTERP, void *param)>
 
 Opens a compilation unit to emit PBC.
 
@@ -485,7 +485,7 @@ e_pbc_open(PARROT_INTERP, SHIM(void *param))
 
 /*
 
-=item C<static int old_blocks>
+=item C<static int old_blocks(PARROT_INTERP)>
 
 Gets the size/line of bytecode in ops at this point.
 
@@ -511,7 +511,7 @@ old_blocks(PARROT_INTERP)
 
 /*
 
-=item C<opcode_t * make_jit_info>
+=item C<opcode_t * make_jit_info(PARROT_INTERP, const IMC_Unit *unit)>
 
 Creates JIT information for this compilation unit.
 
@@ -560,7 +560,7 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<static void make_new_sub>
+=item C<static void make_new_sub(PARROT_INTERP, IMC_Unit *unit)>
 
 Allocates a new globals->cs->subs structure.
 
@@ -592,7 +592,7 @@ make_new_sub(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<static int get_old_size>
+=item C<static int get_old_size(PARROT_INTERP, int *ins_line)>
 
 Get the size/line of bytecode in ops to this point.
 
@@ -623,7 +623,7 @@ get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
 
 /*
 
-=item C<static void store_sub_size>
+=item C<static void store_sub_size(PARROT_INTERP, size_t size, size_t ins_line)>
 
 Sets the given size and line parameters for the current compilation unit.
 
@@ -642,7 +642,8 @@ store_sub_size(PARROT_INTERP, size_t size, size_t ins_line)
 
 /*
 
-=item C<static void store_fixup>
+=item C<static void store_fixup(PARROT_INTERP, const SymReg *r, int pc, int
+offset)>
 
 Stores fixup information for the given register, program counter, and offset.
 
@@ -674,7 +675,7 @@ store_fixup(PARROT_INTERP, ARGIN(const SymReg *r), int pc, int offset)
 
 /*
 
-=item C<static void store_key_const>
+=item C<static void store_key_const(PARROT_INTERP, const char *str, int idx)>
 
 Stores a constant key for the current compilation unit.
 
@@ -693,7 +694,8 @@ store_key_const(PARROT_INTERP, ARGIN(const char *str), int idx)
 
 /*
 
-=item C<static size_t get_codesize>
+=item C<static size_t get_codesize(PARROT_INTERP, const IMC_Unit *unit, size_t
+*src_lines)>
 
 Stores globals for later fixup, returning the code size in number of ops.
 
@@ -757,7 +759,8 @@ get_codesize(PARROT_INTERP, ARGIN(const IMC_Unit *unit), ARGOUT(size_t *src_line
 
 /*
 
-=item C<static subs_t * find_global_label>
+=item C<static subs_t * find_global_label(PARROT_INTERP, const char *name, const
+subs_t *sym, int *pc)>
 
 Finds a global label, returning the symreg (and setting the (absolute) pc
 through the out parameter).
@@ -818,7 +821,7 @@ find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
 
 /*
 
-=item C<static void fixup_globals>
+=item C<static void fixup_globals(PARROT_INTERP)>
 
 Fixes global information -- particularly locations of global symbols.
 
@@ -927,7 +930,7 @@ fixup_globals(PARROT_INTERP)
 
 /*
 
-=item C<STRING * IMCC_string_from_reg>
+=item C<STRING * IMCC_string_from_reg(PARROT_INTERP, const SymReg *r)>
 
 Creates and returns a constant STRING, given a stringish SymReg.
 
@@ -1022,7 +1025,7 @@ IMCC_string_from__STRINGC(PARROT_INTERP, ARGIN(const char *buf))
 
 /*
 
-=item C<static int add_const_str>
+=item C<static int add_const_str(PARROT_INTERP, const SymReg *r)>
 
 Adds a constant string to constant_table.
 
@@ -1047,7 +1050,7 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<static int add_const_num>
+=item C<static int add_const_num(PARROT_INTERP, const char *buf)>
 
 Adds a constant num to constant_table.
 
@@ -1072,7 +1075,7 @@ add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
 
 /*
 
-=item C<static PMC* mk_multi_sig>
+=item C<static PMC* mk_multi_sig(PARROT_INTERP, const SymReg *r)>
 
 Creates and returns a multi-signature PMC given a SymReg.
 
@@ -1135,7 +1138,8 @@ typedef void (*decl_func_t)(Interp *, PMC *, STRING *, INTVAL);
 
 /*
 
-=item C<static PMC* create_lexinfo>
+=item C<static PMC* create_lexinfo(PARROT_INTERP, IMC_Unit *unit, PMC *sub_pmc,
+int need_lex)>
 
 Creates and returns a new LexInfo PMC for all lexicals in the given sub in the
 current compilation unit.
@@ -1209,7 +1213,7 @@ create_lexinfo(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(PMC *sub_pmc),
 
 /*
 
-=item C<static PMC* find_outer>
+=item C<static PMC* find_outer(PARROT_INTERP, const IMC_Unit *unit)>
 
 Returns any :outer sub for the current compilation unit.
 
@@ -1270,7 +1274,8 @@ find_outer(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<static int add_const_pmc_sub>
+=item C<static int add_const_pmc_sub(PARROT_INTERP, SymReg *r, size_t offs,
+size_t end)>
 
 Adds a constant Sub in the current compilation unit, denoted by the offset and
 end positions.
@@ -1501,7 +1506,8 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
 
 /*
 
-=item C<static int add_const_key>
+=item C<static int add_const_key(PARROT_INTERP, const opcode_t *key, int size,
+const char *s_key)>
 
 Adds a constant key to constant_table.
 
@@ -1550,7 +1556,7 @@ add_const_key(PARROT_INTERP, ARGIN(const opcode_t *key), int size, ARGIN(const c
 
 /*
 
-=item C<static const char * slice_deb>
+=item C<static const char * slice_deb(int bits)>
 
 Returns debugging information for the indicated slice type.
 
@@ -1586,7 +1592,7 @@ slice_deb(int bits)
 
 /*
 
-=item C<static opcode_t build_key>
+=item C<static opcode_t build_key(PARROT_INTERP, SymReg *key_reg)>
 
 Builds a Key PMC from the given SymReg.
 
@@ -1718,7 +1724,7 @@ build_key(PARROT_INTERP, ARGIN(SymReg *key_reg))
 
 /*
 
-=item C<INTVAL IMCC_int_from_reg>
+=item C<INTVAL IMCC_int_from_reg(PARROT_INTERP, const SymReg *r)>
 
 Creates and returns an INTEGER given an integer-like SymReg.
 
@@ -1763,7 +1769,7 @@ IMCC_int_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
 
 /*
 
-=item C<static void make_pmc_const>
+=item C<static void make_pmc_const(PARROT_INTERP, SymReg *r)>
 
 Creates a constant PMC, given a SymReg.
 
@@ -1797,7 +1803,7 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
 
 /*
 
-=item C<static void add_1_const>
+=item C<static void add_1_const(PARROT_INTERP, SymReg *r)>
 
 Adds a constant SymReg to the constant table, depending on its type.
 
@@ -1854,7 +1860,7 @@ add_1_const(PARROT_INTERP, ARGMOD(SymReg *r))
 
 /*
 
-=item C<static void constant_folding>
+=item C<static void constant_folding(PARROT_INTERP, const IMC_Unit *unit)>
 
 Stores a constant's idx for later reuse.
 
@@ -1912,7 +1918,7 @@ constant_folding(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<int e_pbc_new_sub>
+=item C<int e_pbc_new_sub(PARROT_INTERP, void *param, IMC_Unit *unit)>
 
 Starts a new PBC emitting of a compilation unit, if the given compilation unit
 has any instructions.
@@ -1936,7 +1942,7 @@ e_pbc_new_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<int e_pbc_end_sub>
+=item C<int e_pbc_end_sub(PARROT_INTERP, void *param, IMC_Unit *unit)>
 
 Finishes the PBC emitting of a given compilation unit.
 
@@ -1991,7 +1997,8 @@ e_pbc_end_sub(PARROT_INTERP, SHIM(void *param), ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<static void verify_signature>
+=item C<static void verify_signature(PARROT_INTERP, const Instruction *ins,
+opcode_t *pc)>
 
 Checks if any get_ argument contains constants and fills in type bits for
 argument types and constants, if missing.
@@ -2069,7 +2076,8 @@ verify_signature(PARROT_INTERP, ARGIN(const Instruction *ins), ARGIN(opcode_t *p
 
 /*
 
-=item C<int e_pbc_emit>
+=item C<int e_pbc_emit(PARROT_INTERP, void *param, const IMC_Unit *unit, const
+Instruction *ins)>
 
 Starts to emit code for one instruction.
 
@@ -2345,7 +2353,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
 /*
 
-=item C<int e_pbc_close>
+=item C<int e_pbc_close(PARROT_INTERP, void *param)>
 
 Closes this PMC unit.
 

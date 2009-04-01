@@ -241,8 +241,8 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<void trace_op_dump(PARROT_INTERP, const opcode_t *code_start,
-const opcode_t *pc)>
+=item C<void trace_op_dump(PARROT_INTERP, const opcode_t *code_start, const
+opcode_t *pc)>
 
 Prints the PC, OP and ARGS. Used by C<trace_op()>.
 
@@ -477,8 +477,8 @@ done:
 
 /*
 
-=item C<void trace_op(PARROT_INTERP, const opcode_t *code_start,
-const opcode_t *code_end, const opcode_t *pc)>
+=item C<void trace_op(PARROT_INTERP, const opcode_t *code_start, const opcode_t
+*code_end, const opcode_t *pc)>
 
 Prints the PC, OP and ARGS. Used by C<runops_trace()>. With bounds
 checking.

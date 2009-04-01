@@ -115,8 +115,8 @@ Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
 
 /*
 
-=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PMC *pmc, INTVAL which,
-INTVAL sec, INTVAL usec)>
+=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PMC *pmc, INTVAL which, INTVAL sec,
+INTVAL usec)>
 
 Polls C<*pmc> for the events in C<which> every C<sec> seconds + C<usec>
 microseconds.
@@ -139,8 +139,8 @@ Parrot_io_poll(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL which, INTVAL sec, INTVAL
 
 /*
 
-=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC * socket, INTVAL fam,
-INTVAL type, INTVAL proto)>
+=item C<INTVAL Parrot_io_socket(PARROT_INTERP, PMC * socket, INTVAL fam, INTVAL
+type, INTVAL proto)>
 
 Creates and returns a socket using the specified address family, socket type,
 and protocol number. Check the returned PMC with a boolean test to see whether

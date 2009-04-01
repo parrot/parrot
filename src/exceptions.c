@@ -62,7 +62,8 @@ static opcode_t * pass_exception_args(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_ex_build_exception>
+=item C<PMC * Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity, long
+error, STRING *msg)>
 
 Constructs a new exception object from the passed in arguments.
 
@@ -88,7 +89,7 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
 
 /*
 
-=item C<void die_from_exception>
+=item C<void die_from_exception(PARROT_INTERP, PMC *exception)>
 
 Print a stack trace for C<exception>, a message if there is one, and then exit.
 
@@ -155,7 +156,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
 
 /*
 
-=item C<void Parrot_ex_add_c_handler>
+=item C<void Parrot_ex_add_c_handler(PARROT_INTERP, Parrot_runloop *jp)>
 
 Adds a new exception handler (defined in C) to the concurrency scheduler. Since
 the exception handler is C code, it stores a runloop jump point to the start of
@@ -179,7 +180,8 @@ Parrot_ex_add_c_handler(PARROT_INTERP, ARGIN(Parrot_runloop *jp))
 
 /*
 
-=item C<opcode_t * Parrot_ex_throw_from_op>
+=item C<opcode_t * Parrot_ex_throw_from_op(PARROT_INTERP, PMC *exception, void
+*dest)>
 
 Runs the exception handler.
 
@@ -268,7 +270,7 @@ build_exception_from_args(PARROT_INTERP, int ex_type,
 
 /*
 
-=item C<void Parrot_ex_throw_from_c>
+=item C<void Parrot_ex_throw_from_c(PARROT_INTERP, PMC *exception)>
 
 Throws an exception object.
 
@@ -341,7 +343,8 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
 /*
 
-=item C<opcode_t * Parrot_ex_throw_from_op_args>
+=item C<opcode_t * Parrot_ex_throw_from_op_args(PARROT_INTERP, void *dest, int
+ex_type, const char *format, ...)>
 
 Throws an exception from an opcode, with an error message constructed
 from a format string and arguments.
@@ -372,7 +375,8 @@ Parrot_ex_throw_from_op_args(PARROT_INTERP, ARGIN_NULLOK(void *dest),
 
 /*
 
-=item C<void Parrot_ex_throw_from_c_args>
+=item C<void Parrot_ex_throw_from_c_args(PARROT_INTERP, void *ret_addr, int
+exitcode, const char *format, ...)>
 
 Throws an exception, with an error message constructed from a format string and
 arguments. C<ret_addr> is the address from which to resume, if some handler
@@ -405,7 +409,7 @@ Parrot_ex_throw_from_c_args(PARROT_INTERP, SHIM(void *ret_addr),
 
 /*
 
-=item C<opcode_t * Parrot_ex_rethrow_from_op>
+=item C<opcode_t * Parrot_ex_rethrow_from_op(PARROT_INTERP, PMC *exception)>
 
 Rethrow the exception.
 
@@ -430,7 +434,7 @@ Parrot_ex_rethrow_from_op(PARROT_INTERP, ARGIN(PMC *exception))
 
 /*
 
-=item C<void Parrot_ex_rethrow_from_c>
+=item C<void Parrot_ex_rethrow_from_c(PARROT_INTERP, PMC *exception)>
 
 Return back to runloop, assumes exception is still in todo (see RT #45915) and
 that this is called from within a handler setup with C<new_c_exception>.
@@ -452,7 +456,7 @@ Parrot_ex_rethrow_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 
 /*
 
-=item C<void Parrot_ex_mark_unhandled>
+=item C<void Parrot_ex_mark_unhandled(PARROT_INTERP, PMC *exception)>
 
 Mark an exception as unhandled, as part of rethrowing it.
 
@@ -470,7 +474,7 @@ Parrot_ex_mark_unhandled(PARROT_INTERP, ARGIN(PMC *exception))
 
 /*
 
-=item C<size_t Parrot_ex_calc_handler_offset>
+=item C<size_t Parrot_ex_calc_handler_offset(PARROT_INTERP)>
 
 Retrieve an exception from the concurrency scheduler, prepare a call to the
 handler, and return the offset to the handler so it can become the next op in
@@ -506,7 +510,8 @@ Parrot_ex_calc_handler_offset(PARROT_INTERP)
 
 =over 4
 
-=item C<void Parrot_assert>
+=item C<PARROT_DOES_NOT_RETURN_WHEN_FALSE void Parrot_assert(INTVAL condition,
+const char *condition_string, const char *file, unsigned int line)>
 
 A better version of assert() that gives a backtrace.
 
@@ -527,7 +532,8 @@ Parrot_assert(INTVAL condition, ARGIN(const char *condition_string),
 
 /*
 
-=item C<void Parrot_confess>
+=item C<void Parrot_confess(const char *cond, const char *file, unsigned int
+line)>
 
 Prints a backtrace and message for a failed assertion.
 
@@ -548,7 +554,7 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 
 /*
 
-=item C<void Parrot_print_backtrace>
+=item C<void Parrot_print_backtrace(void)>
 
 Displays the primrose path to disaster, (the stack frames leading up to the
 abort).  Used by C<Parrot_confess>.
@@ -612,7 +618,7 @@ Parrot_print_backtrace(void)
 
 /*
 
-=item C<void exit_fatal>
+=item C<void exit_fatal(int exitcode, const char *format, ...)>
 
 Signal a fatal error condition.  This should only be used with dire errors that
 cannot throw an exception (because no interpreter is available, or the nature
@@ -656,7 +662,8 @@ exit_fatal(int exitcode, ARGIN(const char *format), ...)
 
 /*
 
-=item C<void do_panic>
+=item C<void do_panic(NULLOK_INTERP, const char *message, const char *file,
+unsigned int line)>
 
 Panic handler.
 

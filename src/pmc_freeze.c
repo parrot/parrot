@@ -463,8 +463,8 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 
 =over 4
 
-=item C<static void str_append(PARROT_INTERP, STRING *s, const void *b,
-size_t len)>
+=item C<static void str_append(PARROT_INTERP, STRING *s, const void *b, size_t
+len)>
 
 Appends C<len> bytes from buffer C<*b> to string C<*s>.
 
@@ -542,8 +542,8 @@ push_ascii_number(PARROT_INTERP, ARGIN(const IMAGE_IO *io), FLOATVAL v)
 
 /*
 
-=item C<static void push_ascii_string(PARROT_INTERP, IMAGE_IO *io,
-const STRING *s)>
+=item C<static void push_ascii_string(PARROT_INTERP, IMAGE_IO *io, const STRING
+*s)>
 
 Pushes an ASCII version of the string C<*s> onto the end of the C<*io>
 "stream".
@@ -1144,8 +1144,8 @@ todo_list_init(PARROT_INTERP, ARGOUT(visit_info *info))
 
 /*
 
-=item C<static void freeze_pmc(PARROT_INTERP, PMC *pmc, visit_info *info,
-int seen, UINTVAL id)>
+=item C<static void freeze_pmc(PARROT_INTERP, PMC *pmc, visit_info *info, int
+seen, UINTVAL id)>
 
 Freeze PMC, setting type, seen, and "same-as-last" indicators as
 appropriate.
@@ -1193,8 +1193,8 @@ freeze_pmc(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGIN(visit_info *info),
 
 /*
 
-=item C<static int thaw_pmc(PARROT_INTERP, visit_info *info, UINTVAL *id,
-INTVAL *type)>
+=item C<static int thaw_pmc(PARROT_INTERP, visit_info *info, UINTVAL *id, INTVAL
+*type)>
 
 Freeze and thaw a PMC (id).
 
@@ -1255,8 +1255,8 @@ thaw_pmc(PARROT_INTERP, ARGMOD(visit_info *info),
 
 /*
 
-=item C<static void do_action(PARROT_INTERP, PMC *pmc, visit_info *info,
-int seen, UINTVAL id)>
+=item C<static void do_action(PARROT_INTERP, PMC *pmc, visit_info *info, int
+seen, UINTVAL id)>
 
 Called from C<visit_next_for_GC()> and C<visit_todo_list()> to perform
 the action specified in C<< info->what >>.
@@ -1467,7 +1467,8 @@ id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 
 /*
 
-=item C<static void add_pmc_next_for_GC(PARROT_INTERP, PMC *pmc, visit_info *info)>
+=item C<static void add_pmc_next_for_GC(PARROT_INTERP, PMC *pmc, visit_info
+*info)>
 
 Remembers the PMC for later processing.
 
@@ -1487,8 +1488,8 @@ add_pmc_next_for_GC(SHIM_INTERP, ARGIN(PMC *pmc), ARGOUT(visit_info *info))
 
 /*
 
-=item C<static int next_for_GC_seen(PARROT_INTERP, PMC *pmc,
-visit_info *info, UINTVAL *id)>
+=item C<static int next_for_GC_seen(PARROT_INTERP, PMC *pmc, visit_info *info,
+UINTVAL *id)>
 
 Remembers next child to visit via the C<next_for_GC pointer> generate a
 unique ID per PMC and freeze the ID (not the PMC address) so thaw the
@@ -1534,7 +1535,8 @@ skip:
 
 /*
 
-=item C<static void add_pmc_todo_list(PARROT_INTERP, PMC *pmc, visit_info *info)>
+=item C<static void add_pmc_todo_list(PARROT_INTERP, PMC *pmc, visit_info
+*info)>
 
 Remembers the PMC to be processed later.
 
@@ -1589,7 +1591,8 @@ todo_list_seen(PARROT_INTERP, ARGIN(PMC *pmc), ARGMOD(visit_info *info),
 
 /*
 
-=item C<static void visit_next_for_GC(PARROT_INTERP, PMC* pmc, visit_info* info)>
+=item C<static void visit_next_for_GC(PARROT_INTERP, PMC* pmc, visit_info*
+info)>
 
 C<visit_child> callbacks:
 
@@ -1652,7 +1655,8 @@ visit_todo_list(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info* info))
 
 /*
 
-=item C<static void visit_todo_list_thaw(PARROT_INTERP, PMC* old, visit_info* info)>
+=item C<static void visit_todo_list_thaw(PARROT_INTERP, PMC* old, visit_info*
+info)>
 
 Callback for thaw - action first.
 
@@ -1701,8 +1705,8 @@ visit_loop_next_for_GC(PARROT_INTERP, ARGIN(PMC *current),
 
 /*
 
-=item C<static void visit_loop_todo_list(PARROT_INTERP, PMC *current,
-visit_info *info)>
+=item C<static void visit_loop_todo_list(PARROT_INTERP, PMC *current, visit_info
+*info)>
 
 The thaw loop.
 
@@ -1809,7 +1813,8 @@ create_image(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(visit_info *info))
 
 /*
 
-=item C<static PMC* run_thaw(PARROT_INTERP, STRING* image, visit_enum_type what)>
+=item C<static PMC* run_thaw(PARROT_INTERP, STRING* image, visit_enum_type
+what)>
 
 Performs thawing. C<what> indicates what to be thawed.
 

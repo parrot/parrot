@@ -150,7 +150,8 @@ new_pmc_pool(PARROT_INTERP)
 
 /*
 
-=item C<Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)>
+=item C<Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP, size_t
+actual_buffer_size)>
 
 Creates a new pool for buffer-like structures. This is called from
 C<get_bufferlike_pool()>, and should probably not be called directly.
@@ -241,7 +242,8 @@ new_string_pool(PARROT_INTERP, INTVAL constant)
 
 /*
 
-=item C<Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)>
+=item C<Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t
+buffer_size)>
 
 Makes and return a bufferlike header pool for objects of a given size. If a
 pool for objects of that size already exists, no new pool will be created and
@@ -626,8 +628,8 @@ free_pool(ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static int sweep_cb_buf(PARROT_INTERP, Small_Object_Pool *pool,
-int flag, void *arg)>
+=item C<static int sweep_cb_buf(PARROT_INTERP, Small_Object_Pool *pool, int
+flag, void *arg)>
 
 Performs a final garbage collection sweep, then frees the pool. Calls
 C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
@@ -663,8 +665,8 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
 
 /*
 
-=item C<static int sweep_cb_pmc(PARROT_INTERP, Small_Object_Pool *pool,
-int flag, void *arg)>
+=item C<static int sweep_cb_pmc(PARROT_INTERP, Small_Object_Pool *pool, int
+flag, void *arg)>
 
 Performs a garbage collection sweep of the given pmc pool, then frees it. Calls
 C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
@@ -773,7 +775,8 @@ fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
 
 /*
 
-=item C<void Parrot_merge_header_pools(Interp *dest_interp, Interp *source_interp)>
+=item C<void Parrot_merge_header_pools(Interp *dest_interp, Interp
+*source_interp)>
 
 Merges the header pools of C<source_interp> into those of C<dest_interp>.
 (Used to deal with shared objects left after interpreter destruction.)

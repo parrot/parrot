@@ -165,8 +165,8 @@ Parrot_runops_fromc(PARROT_INTERP, ARGIN(PMC *sub))
 
 /*
 
-=item C<static Parrot_Context * runops_args(PARROT_INTERP, PMC *sub,
-PMC *obj, STRING *meth, const char *sig, va_list ap)>
+=item C<static Parrot_Context * runops_args(PARROT_INTERP, PMC *sub, PMC *obj,
+STRING *meth, const char *sig, va_list ap)>
 
 Calls the PMC subroutine C<sub> with optional name C<meth>. If PMC object
 C<obj> is provided, the call is treated as a method call on that object.
@@ -259,8 +259,8 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
 
 /*
 
-=item C<void * Parrot_run_meth_fromc(PARROT_INTERP, PMC *sub, PMC *obj,
-STRING *meth)>
+=item C<void * Parrot_run_meth_fromc(PARROT_INTERP, PMC *sub, PMC *obj, STRING
+*meth)>
 
 Run a method sub from C. The function arguments are
 already setup according to Parrot calling conventions, the C<sub> argument
@@ -298,8 +298,8 @@ Parrot_run_meth_fromc(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj), SH
 
 /*
 
-=item C<PMC * Parrot_runops_fromc_args(PARROT_INTERP, PMC *sub,
-const char *sig, ...)>
+=item C<PMC * Parrot_runops_fromc_args(PARROT_INTERP, PMC *sub, const char *sig,
+...)>
 
 Run parrot ops, called from C code, function arguments are passed as
 C<va_args> according to the signature. The C<sub> argument is an
@@ -330,8 +330,8 @@ Parrot_runops_fromc_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN(const char *sig),
 
 /*
 
-=item C<void * Parrot_runops_fromc_args_event(PARROT_INTERP, PMC *sub,
-const char *sig, ...)>
+=item C<void * Parrot_runops_fromc_args_event(PARROT_INTERP, PMC *sub, const
+char *sig, ...)>
 
 Run code from within event handlers. This variant deals with some reentrency
 issues. It also should do sanity checks, if e.g. the handler subroutine
@@ -377,8 +377,8 @@ Parrot_runops_fromc_args_event(PARROT_INTERP, ARGIN(PMC *sub),
 
 /*
 
-=item C<INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP, PMC *sub,
-const char *sig, ...)>
+=item C<INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP, PMC *sub, const char
+*sig, ...)>
 
 Called from C code, runs a Parrot subroutine C<sub>. The subroutine has
 function signature C<sig> and a C variadic argument list. Returns an
@@ -409,8 +409,8 @@ Parrot_runops_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub),
 
 /*
 
-=item C<FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP, PMC *sub,
-const char *sig, ...)>
+=item C<FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP, PMC *sub, const
+char *sig, ...)>
 
 Called from C code, runs a Parrot subroutine C<sub>. The subroutine has
 function signature C<sig> and a C variadic argument list. Returns a
@@ -474,8 +474,8 @@ Parrot_run_meth_fromc_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj
 
 /*
 
-=item C<INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP, PMC *sub,
-PMC *obj, STRING *meth, const char *sig, ...)>
+=item C<INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP, PMC *sub, PMC
+*obj, STRING *meth, const char *sig, ...)>
 
 Called from C code, runs a Parrot subroutine C<sub> as a method on object
 C<obj>. The subroutine has function signature C<sig> and a C variadic argument
@@ -506,8 +506,8 @@ Parrot_run_meth_fromc_args_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC
 
 /*
 
-=item C<FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP, PMC *sub,
-PMC *obj, STRING *meth, const char *sig, ...)>
+=item C<FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP, PMC *sub, PMC
+*obj, STRING *meth, const char *sig, ...)>
 
 Called from C code, runs a Parrot subroutine C<sub> as a method on object
 C<obj>. The subroutine has function signature C<sig> and a C variadic argument
@@ -538,8 +538,8 @@ Parrot_run_meth_fromc_args_retf(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC
 
 /*
 
-=item C<void * Parrot_runops_fromc_arglist(PARROT_INTERP, PMC *sub,
-const char *sig, va_list args)>
+=item C<void * Parrot_runops_fromc_arglist(PARROT_INTERP, PMC *sub, const char
+*sig, va_list args)>
 
 Called from C code, runs a Parrot subroutine C<sub>.
 The subroutine has function signature C<sig> and a C C<va_list>
@@ -567,8 +567,8 @@ Parrot_runops_fromc_arglist(PARROT_INTERP, ARGIN(PMC *sub),
 
 /*
 
-=item C<INTVAL Parrot_runops_fromc_arglist_reti(PARROT_INTERP, PMC *sub,
-const char *sig, va_list args)>
+=item C<INTVAL Parrot_runops_fromc_arglist_reti(PARROT_INTERP, PMC *sub, const
+char *sig, va_list args)>
 
 Called from C code, runs a Parrot subroutine C<sub>.
 The subroutine has function signature C<sig> and a C C<va_list>
@@ -595,8 +595,8 @@ Parrot_runops_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub),
 
 /*
 
-=item C<FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP, PMC *sub,
-const char *sig, va_list args)>
+=item C<FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP, PMC *sub, const
+char *sig, va_list args)>
 
 Called from C code, runs a Parrot subroutine C<sub>.
 The subroutine has function signature C<sig> and a C C<va_list>
@@ -623,8 +623,8 @@ Parrot_runops_fromc_arglist_retf(PARROT_INTERP, ARGIN(PMC *sub),
 
 /*
 
-=item C<void* Parrot_run_meth_fromc_arglist(PARROT_INTERP, PMC *sub,
-PMC *obj, STRING *meth, const char *sig, va_list args)>
+=item C<void* Parrot_run_meth_fromc_arglist(PARROT_INTERP, PMC *sub, PMC *obj,
+STRING *meth, const char *sig, va_list args)>
 
 Calls the subroutine C<sub> as a method on object C<obj>. The method to be
 called is named C<meth>, has the function signature C<sig> and arguments
@@ -653,8 +653,8 @@ Parrot_run_meth_fromc_arglist(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *
 
 /*
 
-=item C<INTVAL Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, PMC *sub,
-PMC *obj, STRING *meth, const char *sig, va_list args)>
+=item C<INTVAL Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, PMC *sub, PMC
+*obj, STRING *meth, const char *sig, va_list args)>
 
 Calls the subroutine C<sub> as a method on object C<obj>. The method to be
 called is named C<meth>, has the function signature C<sig> and arguments
@@ -683,8 +683,8 @@ Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(
 
 /*
 
-=item C<FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, PMC *sub,
-PMC *obj, STRING *meth, const char *sig, va_list args)>
+=item C<FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP, PMC *sub, PMC
+*obj, STRING *meth, const char *sig, va_list args)>
 
 Calls the subroutine C<sub> as a method on object C<obj>. The method to be
 called is named C<meth>, has the function signature C<sig> and arguments

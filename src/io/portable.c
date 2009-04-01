@@ -117,8 +117,8 @@ Parrot_io_init_portable(PARROT_INTERP)
 
 /*
 
-=item C<PMC * Parrot_io_open_portable(PARROT_INTERP, PMC *filehandle,
-STRING *path, INTVAL flags)>
+=item C<PMC * Parrot_io_open_portable(PARROT_INTERP, PMC *filehandle, STRING
+*path, INTVAL flags)>
 
 Opens a new FileHandle PMC from a given STRING path with the provided modes.
 
@@ -284,7 +284,8 @@ io_is_tty_portable(PIOHANDLE fptr)
 
 /*
 
-=item C<size_t Parrot_io_peek_portable(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_peek_portable(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Retrieves the next character in the stream without modifying the stream.
 
@@ -357,8 +358,8 @@ Parrot_io_flush_portable(SHIM_INTERP, SHIM(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_portable(PARROT_INTERP, PMC *filehandle,
-STRING **buf)>
+=item C<size_t Parrot_io_read_portable(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Reads from the given filehandle into the provided STRING, returning the number
 of bytes read.
@@ -392,7 +393,8 @@ Parrot_io_read_portable(PARROT_INTERP, SHIM(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_write_portable(PARROT_INTERP, PMC *filehandle, STRING *s)>
+=item C<size_t Parrot_io_write_portable(PARROT_INTERP, PMC *filehandle, STRING
+*s)>
 
 Writes the given STRING to the provided IO PMC.
 

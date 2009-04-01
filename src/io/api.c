@@ -91,7 +91,8 @@ Parrot_io_new_pmc(PARROT_INTERP, INTVAL flags)
 
 /*
 
-=item C<PMC * Parrot_io_open(PARROT_INTERP, PMC *pmc, STRING *path, STRING *mode)>
+=item C<PMC * Parrot_io_open(PARROT_INTERP, PMC *pmc, STRING *path, STRING
+*mode)>
 
 Return an open filehandle for a given string path and flags. Defaults to
 creating a new FileHandle PMC. If a PMC object is passed in, it uses that
@@ -124,7 +125,8 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
 
 /*
 
-=item C<PMC * Parrot_io_fdopen(PARROT_INTERP, PMC *pmc, PIOHANDLE fd, STRING *sflags)>
+=item C<PMC * Parrot_io_fdopen(PARROT_INTERP, PMC *pmc, PIOHANDLE fd, STRING
+*sflags)>
 
 Creates and returns a C<FileHandle> PMC for a given set of flags on an
 existing, open file descriptor.
@@ -285,7 +287,8 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<INTVAL Parrot_io_write(PARROT_INTERP, PMC *pmc, const void *buffer, size_t length)>
+=item C<INTVAL Parrot_io_write(PARROT_INTERP, PMC *pmc, const void *buffer,
+size_t length)>
 
 Writes C<len> bytes from C<*buffer> to C<*pmc>.
 
@@ -317,7 +320,8 @@ Parrot_io_write(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const void *buffer), size
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek(PARROT_INTERP, PMC *pmc, PIOOFF_T offset, INTVAL w)>
+=item C<PIOOFF_T Parrot_io_seek(PARROT_INTERP, PMC *pmc, PIOOFF_T offset, INTVAL
+w)>
 
 Moves the read/write position of C<*pmc> to offset C<bytes> from the
 position indicated by C<w>. Typically C<w> will be C<0> for the start of

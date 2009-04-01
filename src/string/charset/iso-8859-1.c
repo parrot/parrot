@@ -181,8 +181,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets C<replace_count> graphemes in STRING C<source_string> starting at offset C<offset>.
 Gets the replacement graphemes from STRING C<insert_string>.
@@ -562,8 +562,8 @@ validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
-const STRING *source_string, UINTVAL offset)>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*source_string, UINTVAL offset)>
 
 =cut
 
@@ -588,8 +588,8 @@ is_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -616,8 +616,8 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -713,7 +713,8 @@ Parrot_charset_iso_8859_1_init(PARROT_INTERP)
 
 /*
 
-=item C<STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src, STRING *dest)>
+=item C<STRING * charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, STRING *src,
+STRING *dest)>
 
 Converts STRING C<src> in ISO-8859-1 to ASCII STRING C<dest>.
 

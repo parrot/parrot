@@ -239,7 +239,8 @@ to_encoding(PARROT_INTERP, ARGIN(STRING *src), ARGMOD(STRING *dest))
 
 /*
 
-=item C<static UINTVAL get_codepoint(PARROT_INTERP, const STRING *src, UINTVAL offset)>
+=item C<static UINTVAL get_codepoint(PARROT_INTERP, const STRING *src, UINTVAL
+offset)>
 
 Returns the codepoint in string C<src> at position C<offset>.
 
@@ -262,7 +263,8 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static void set_codepoint(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL codepoint)>
+=item C<static void set_codepoint(PARROT_INTERP, STRING *src, UINTVAL offset,
+UINTVAL codepoint)>
 
 Sets, in string C<src> at position C<offset>, the codepoint C<codepoint>.
 
@@ -286,7 +288,8 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
 
 /*
 
-=item C<static UINTVAL get_byte(PARROT_INTERP, const STRING *src, UINTVAL offset)>
+=item C<static UINTVAL get_byte(PARROT_INTERP, const STRING *src, UINTVAL
+offset)>
 
 Returns the byte in string C<src> at position C<offset>.
 
@@ -303,7 +306,8 @@ get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
 
 /*
 
-=item C<static void set_byte(PARROT_INTERP, const STRING *src, UINTVAL offset, UINTVAL byte)>
+=item C<static void set_byte(PARROT_INTERP, const STRING *src, UINTVAL offset,
+UINTVAL byte)>
 
 Sets, in string C<src> at position C<offset>, the byte C<byte>.
 
@@ -320,7 +324,8 @@ set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
 
 /*
 
-=item C<static STRING * get_codepoints(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count)>
+=item C<static STRING * get_codepoints(PARROT_INTERP, STRING *src, UINTVAL
+offset, UINTVAL count)>
 
 Returns the codepoints in string C<src> at position C<offset> and length
 C<count>.
@@ -359,7 +364,8 @@ get_codepoints(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL count)
 
 /*
 
-=item C<static STRING * get_bytes(PARROT_INTERP, STRING *src, UINTVAL offset, UINTVAL count)>
+=item C<static STRING * get_bytes(PARROT_INTERP, STRING *src, UINTVAL offset,
+UINTVAL count)>
 
 Returns the bytes in string C<src> at position C<offset> and length C<count>.
 
@@ -401,8 +407,8 @@ get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static STRING * get_bytes_inplace(PARROT_INTERP, STRING *src,
-UINTVAL offset, UINTVAL count, STRING *return_string)>
+=item C<static STRING * get_bytes_inplace(PARROT_INTERP, STRING *src, UINTVAL
+offset, UINTVAL count, STRING *return_string)>
 
 Gets from string C<src> at position C<offset> C<count> bytes and returns them
 in C<return_string>.
@@ -423,8 +429,8 @@ get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void set_codepoints(PARROT_INTERP, STRING *src,
-UINTVAL offset, UINTVAL count, STRING *new_codepoints)>
+=item C<static void set_codepoints(PARROT_INTERP, STRING *src, UINTVAL offset,
+UINTVAL count, STRING *new_codepoints)>
 
 Replaces in string C<src> at position C<offset> for C<count> codepoints with
 the contents of string C<new_codepoints>.
@@ -443,8 +449,8 @@ set_codepoints(PARROT_INTERP, SHIM(STRING *src),
 
 /*
 
-=item C<static void set_bytes(PARROT_INTERP, STRING *src,
-UINTVAL offset, UINTVAL count, STRING *new_bytes)>
+=item C<static void set_bytes(PARROT_INTERP, STRING *src, UINTVAL offset,
+UINTVAL count, STRING *new_bytes)>
 
 Replaces in string C<src> at position C<offset> for C<count> bytes with the
 contents of string C<new_bytes>.
@@ -549,7 +555,8 @@ ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 
 /*
 
-=item C<static void ucs2_encode_and_advance(PARROT_INTERP, String_iter *i, UINTVAL c)>
+=item C<static void ucs2_encode_and_advance(PARROT_INTERP, String_iter *i,
+UINTVAL c)>
 
 With the string iterator C<i>, appends the codepoint C<c> and advances to the
 next position in the string.
@@ -591,7 +598,8 @@ ucs2_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 
 /*
 
-=item C<static void iter_init(PARROT_INTERP, const STRING *src, String_iter *iter)>
+=item C<static void iter_init(PARROT_INTERP, const STRING *src, String_iter
+*iter)>
 
 Initializes for string C<src> the string iterator C<iter>.
 

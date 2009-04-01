@@ -131,8 +131,8 @@ static Memory_Pool * new_memory_pool(
 
 /*
 
-=item C<static void alloc_new_block(PARROT_INTERP, size_t size,
-Memory_Pool *pool, const char *why)>
+=item C<static void alloc_new_block(PARROT_INTERP, size_t size, Memory_Pool
+*pool, const char *why)>
 
 Allocate a new memory block. We allocate either the requested size or the
 default size, whichever is larger. Add the new block to the given memory
@@ -191,7 +191,8 @@ alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
 
 /*
 
-=item C<static void * mem_allocate(PARROT_INTERP, size_t size, Memory_Pool *pool)>
+=item C<static void * mem_allocate(PARROT_INTERP, size_t size, Memory_Pool
+*pool)>
 
 Allocates memory for headers.
 
@@ -795,7 +796,8 @@ Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
 
 /*
 
-=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)>
+=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t
+newsize)>
 
 Reallocate the STRING's buffer memory to the given size. The allocated
 buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
@@ -891,7 +893,8 @@ Parrot_allocate(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
 
 /*
 
-=item C<void Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)>
+=item C<void Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t
+size)>
 
 Like above, except the C<size> will be rounded up and the address of
 the buffer will have the same alignment as a pointer returned by
@@ -965,7 +968,8 @@ Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
 
 /*
 
-=item C<static Memory_Pool * new_memory_pool(size_t min_block, compact_f compact)>
+=item C<static Memory_Pool * new_memory_pool(size_t min_block, compact_f
+compact)>
 
 Allocate a new C<Memory_Pool> structures, and set some initial values.
 return a pointer to the new pool.
@@ -1104,7 +1108,8 @@ merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 
 /*
 
-=item C<void Parrot_merge_memory_pools(Interp *dest_interp, Interp *source_interp)>
+=item C<void Parrot_merge_memory_pools(Interp *dest_interp, Interp
+*source_interp)>
 
 Merge the memory pools of two interpreter structures. Merge the general
 memory pool and the constant string pools from C<source_interp> into

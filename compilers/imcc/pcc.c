@@ -150,7 +150,8 @@ static void unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 
 /*
 
-=item C<static Instruction * insINS>
+=item C<static Instruction * insINS(PARROT_INTERP, IMC_Unit *unit, Instruction
+*ins, const char *name, SymReg **regs, int n)>
 
 Utility instruction routine. Creates and inserts an instruction
 into the current block in one call.
@@ -175,7 +176,7 @@ insINS(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
 /*
 
-=item C<SymReg* get_pasm_reg>
+=item C<SymReg* get_pasm_reg(PARROT_INTERP, const char *name)>
 
 get or create the SymReg
 
@@ -199,7 +200,7 @@ get_pasm_reg(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg* get_const>
+=item C<SymReg* get_const(PARROT_INTERP, const char *name, int type)>
 
 get or create a constant
 
@@ -223,7 +224,9 @@ get_const(PARROT_INTERP, ARGIN(const char *name), int type)
 
 /*
 
-=item C<static Instruction* pcc_get_args>
+=item C<static Instruction* pcc_get_args(PARROT_INTERP, IMC_Unit *unit,
+Instruction *ins, const char *op_name, int n, SymReg * const *args, const int
+*arg_flags)>
 
 set arguments or return values
 get params or results
@@ -337,7 +340,7 @@ pcc_get_args(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins),
 
 /*
 
-=item C<static void unshift_self>
+=item C<static void unshift_self(SymReg *sub, SymReg *obj)>
 
 prepend the object to args or self to params
 
@@ -368,7 +371,7 @@ unshift_self(ARGIN(SymReg *sub), ARGIN(SymReg *obj))
 
 /*
 
-=item C<void expand_pcc_sub>
+=item C<void expand_pcc_sub(PARROT_INTERP, IMC_Unit *unit, Instruction *ins)>
 
 Expand a PCC (Parrot Calling Convention) subroutine
 by generating the appropriate prologue and epilogue
@@ -448,7 +451,8 @@ expand_pcc_sub(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Instruction *ins))
 
 /*
 
-=item C<void expand_pcc_sub_ret>
+=item C<void expand_pcc_sub_ret(PARROT_INTERP, IMC_Unit *unit, Instruction
+*ins)>
 
 Expand a PCC sub return directive into its PASM instructions
 
@@ -492,7 +496,8 @@ typedef struct move_info_t {
 
 /*
 
-=item C<static int pcc_reg_mov>
+=item C<static int pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s,
+void *vinfo)>
 
 =cut
 
@@ -562,7 +567,8 @@ pcc_reg_mov(PARROT_INTERP, unsigned char d, unsigned char s, ARGMOD(void *vinfo)
 
 /*
 
-=item C<static Instruction * move_regs>
+=item C<static Instruction * move_regs(PARROT_INTERP, IMC_Unit *unit,
+Instruction *ins, size_t n, SymReg **dest, SymReg **src)>
 
 =cut
 
@@ -618,7 +624,8 @@ done:
 
 /*
 
-=item C<static int recursive_tail_call>
+=item C<static int recursive_tail_call(PARROT_INTERP, IMC_Unit *unit,
+Instruction *ins, SymReg *sub)>
 
 convert a recursive tailcall into a loop
 
@@ -682,7 +689,8 @@ recursive_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit),
 
 /*
 
-=item C<static void insert_tail_call>
+=item C<static void insert_tail_call(PARROT_INTERP, IMC_Unit *unit, Instruction
+*ins, SymReg *sub, SymReg *meth)>
 
 =cut
 
@@ -712,7 +720,8 @@ insert_tail_call(PARROT_INTERP, ARGIN(IMC_Unit *unit), ARGMOD(Instruction *ins),
 
 /*
 
-=item C<void expand_pcc_sub_call>
+=item C<void expand_pcc_sub_call(PARROT_INTERP, IMC_Unit *unit, Instruction
+*ins)>
 
 Expand a PCC subroutine call (IMC) into its PASM instructions
 This is the nuts and bolts of pdd03 routine call style

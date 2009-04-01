@@ -1,7 +1,7 @@
 /* io_unix.h
  *  Copyright (C) 2001-2003, Parrot Foundation.
  *  SVN Info
- *     $Id: io_unix.h 36833 2009-02-17 20:09:26Z allison $
+ *     $Id$
  *  Overview:
  *      Parrot IO subsystem
  *  Data Structure and Algorithms:

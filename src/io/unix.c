@@ -128,8 +128,8 @@ Parrot_io_init_unix(PARROT_INTERP)
 
 /*
 
-=item C<PMC * Parrot_io_open_unix(PARROT_INTERP, PMC *filehandle,
-STRING *path, INTVAL flags)>
+=item C<PMC * Parrot_io_open_unix(PARROT_INTERP, PMC *filehandle, STRING *path,
+INTVAL flags)>
 
 Opens a string C<path>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 flag values.
@@ -286,8 +286,8 @@ Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
 
 /*
 
-=item C<PMC * Parrot_io_fdopen_unix(PARROT_INTERP, PMC *filehandle,
-PIOHANDLE fd, INTVAL flags)>
+=item C<PMC * Parrot_io_fdopen_unix(PARROT_INTERP, PMC *filehandle, PIOHANDLE
+fd, INTVAL flags)>
 
 Returns a new C<FileHandle> PMC with the file descriptor passed in.
 
@@ -451,7 +451,8 @@ Parrot_io_flush_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_read_unix(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -545,8 +546,8 @@ Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PMC *filehandle,
-PIOOFF_T offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek_unix(PARROT_INTERP, PMC *filehandle, PIOOFF_T
+offset, INTVAL whence)>
 
 Hard seek.
 
@@ -617,8 +618,8 @@ Parrot_io_tell_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<PMC * Parrot_io_open_pipe_unix(PARROT_INTERP, PMC *filehandle,
-STRING *command, int flags)>
+=item C<PMC * Parrot_io_open_pipe_unix(PARROT_INTERP, PMC *filehandle, STRING
+*command, int flags)>
 
 Very limited C<exec> for now.
 
@@ -729,7 +730,8 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_peek_unix(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_peek_unix(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Retrieve the next character in the stream without modifying the stream. Not
 implemented on this platform.

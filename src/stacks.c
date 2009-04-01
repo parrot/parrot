@@ -58,7 +58,8 @@ stack_system_init(SHIM_INTERP)
 
 /*
 
-=item C<Stack_Chunk_t * cst_new_stack_chunk(PARROT_INTERP, const Stack_Chunk_t *chunk)>
+=item C<Stack_Chunk_t * cst_new_stack_chunk(PARROT_INTERP, const Stack_Chunk_t
+*chunk)>
 
 Get a new chunk either from the freelist or allocate one.
 
@@ -192,7 +193,8 @@ stack_height(SHIM_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 
 /*
 
-=item C<Stack_Entry_t * stack_entry(PARROT_INTERP, Stack_Chunk_t *stack, INTVAL depth)>
+=item C<Stack_Entry_t * stack_entry(PARROT_INTERP, Stack_Chunk_t *stack, INTVAL
+depth)>
 
 If C<< depth >= 0 >>, return the entry at that depth from the top of the
 stack, with 0 being the top entry. If C<depth < 0>, then return the
@@ -234,7 +236,8 @@ stack_entry(SHIM_INTERP, ARGIN(Stack_Chunk_t *stack), INTVAL depth)
 
 /*
 
-=item C<Stack_Entry_t* stack_prepare_push(PARROT_INTERP, Stack_Chunk_t **stack_p)>
+=item C<Stack_Entry_t* stack_prepare_push(PARROT_INTERP, Stack_Chunk_t
+**stack_p)>
 
 Return a pointer, where new entries go for push.
 
@@ -260,8 +263,8 @@ stack_prepare_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 
 /*
 
-=item C<void stack_push(PARROT_INTERP, Stack_Chunk_t **stack_p,
-void *thing, Stack_entry_type type, Stack_cleanup_method cleanup)>
+=item C<void stack_push(PARROT_INTERP, Stack_Chunk_t **stack_p, void *thing,
+Stack_entry_type type, Stack_cleanup_method cleanup)>
 
 Push something on the generic stack.
 
@@ -308,7 +311,8 @@ stack_push(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
 
 /*
 
-=item C<Stack_Entry_t* stack_prepare_pop(PARROT_INTERP, Stack_Chunk_t **stack_p)>
+=item C<Stack_Entry_t* stack_prepare_pop(PARROT_INTERP, Stack_Chunk_t
+**stack_p)>
 
 Return a pointer, where new entries are popped off.
 
@@ -337,8 +341,8 @@ stack_prepare_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p))
 
 /*
 
-=item C<void * stack_pop(PARROT_INTERP, Stack_Chunk_t **stack_p,
-void *where, Stack_entry_type type)>
+=item C<void * stack_pop(PARROT_INTERP, Stack_Chunk_t **stack_p, void *where,
+Stack_entry_type type)>
 
 Pop off an entry and return a pointer to the contents.
 
@@ -473,7 +477,8 @@ get_entry_type(ARGIN(const Stack_Entry_t *entry))
 
 /*
 
-=item C<void Parrot_dump_dynamic_environment(PARROT_INTERP, Stack_Chunk_t *dynamic_env)>
+=item C<void Parrot_dump_dynamic_environment(PARROT_INTERP, Stack_Chunk_t
+*dynamic_env)>
 
 Print a representation of the dynamic stack to the standard error (using
 C<Parrot_io_eprintf>).  This is used only temporarily for debugging.

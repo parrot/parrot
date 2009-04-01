@@ -225,8 +225,8 @@ static UINTVAL validate(PARROT_INTERP, ARGIN(STRING *src))
 
 /*
 
-=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets C<replace_count> graphemes in STRING C<source_string> starting at offset
 C<offset>.  Gets the graphemes to be replaced from STRING C<insert_string>.
@@ -269,8 +269,8 @@ get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static STRING * get_graphemes_inplace(PARROT_INTERP,
-STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
+=item C<static STRING * get_graphemes_inplace(PARROT_INTERP, STRING
+*source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
 
 Gets C<count> graphemes in place from STRING C<source_string> starting at
 offset C<offset>. Puts them into STRING C<dest_string>.
@@ -688,7 +688,8 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)>
+=item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING
+*rhs)>
 
 Compares two STRINGs, C<lhs> and C<rhs>. Returns -1 if C<lhs> < C<rhs>. Returns
 0 if C<lhs> = C<rhs>. Returns 1 if C<lhs> > C<rhs>.
@@ -733,8 +734,8 @@ compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *source_string,
-STRING *search_string, UINTVAL offset)>
+=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *source_string, STRING
+*search_string, UINTVAL offset)>
 
 Finds the last index of substring C<search_string> in STRING C<source_string>,
 starting from C<offset>. Not implemented.
@@ -880,8 +881,8 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
 
 /*
 
-=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
-const STRING *source_string, UINTVAL offset)>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*source_string, UINTVAL offset)>
 
 =cut
 
@@ -908,8 +909,8 @@ is_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -949,8 +950,8 @@ find_cclass(PARROT_INTERP, INTVAL flags,
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -1026,7 +1027,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static size_t compute_hash(PARROT_INTERP, const STRING *src, size_t seed)>
+=item C<static size_t compute_hash(PARROT_INTERP, const STRING *src, size_t
+seed)>
 
 Computes the hash of the given STRING C<src> with starting seed value C<seed>.
 

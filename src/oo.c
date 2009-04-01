@@ -322,8 +322,8 @@ Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
 
 /*
 
-=item C<PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP,
-PMC *classobj, STRING *name)>
+=item C<PMC * Parrot_oo_find_vtable_override_for_class(PARROT_INTERP, PMC
+*classobj, STRING *name)>
 
 Lookup a vtable override in a specific class object.
 
@@ -544,7 +544,8 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
 
 /*
 
-=item C<INTVAL Parrot_oo_register_type(PARROT_INTERP, PMC *name, PMC *_namespace)>
+=item C<INTVAL Parrot_oo_register_type(PARROT_INTERP, PMC *name, PMC
+*_namespace)>
 
 This function registers a type in the global registry, first checking if it
 already exists. The global type registry will go away eventually, but this
@@ -779,8 +780,8 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class))
 
 /*
 
-=item C<PMC * Parrot_find_method_direct(PARROT_INTERP, PMC *_class,
-STRING *method_name)>
+=item C<PMC * Parrot_find_method_direct(PARROT_INTERP, PMC *_class, STRING
+*method_name)>
 
 Find a method PMC for a named method, given the class PMC, current
 interpreter, and name of the method. Don't use a possible method cache.
@@ -811,8 +812,8 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
 
 /*
 
-=item C<PMC * Parrot_find_method_with_cache(PARROT_INTERP, PMC *_class,
-STRING *method_name)>
+=item C<PMC * Parrot_find_method_with_cache(PARROT_INTERP, PMC *_class, STRING
+*method_name)>
 
 Find a method PMC for a named method, given the class PMC, current
 interp, and name of the method.
@@ -951,8 +952,8 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
 
 /*
 
-=item C<static PMC * find_method_direct_1(PARROT_INTERP, PMC *_class,
-STRING *method_name)>
+=item C<static PMC * find_method_direct_1(PARROT_INTERP, PMC *_class, STRING
+*method_name)>
 
 =cut
 
@@ -1151,8 +1152,8 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
 /*
 
-=item C<void Parrot_ComposeRole(PARROT_INTERP, PMC *role, PMC *exclude,
-int got_exclude, PMC *alias, int got_alias, PMC *methods_hash, PMC *roles_list)>
+=item C<void Parrot_ComposeRole(PARROT_INTERP, PMC *role, PMC *exclude, int
+got_exclude, PMC *alias, int got_alias, PMC *methods_hash, PMC *roles_list)>
 
 Used by the Class and Object PMCs internally to compose a role into either of
 them. The C<role> parameter is the role that we are composing into the class

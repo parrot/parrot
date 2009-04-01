@@ -133,7 +133,7 @@ static void usage(ARGMOD(FILE *fp))
 
 /*
 
-=item C<static void usage>
+=item C<static void usage(FILE *fp)>
 
 Outputs usage error message.
 
@@ -152,7 +152,7 @@ usage(ARGMOD(FILE *fp))
 
 /*
 
-=item C<static void help_debug>
+=item C<static void help_debug(void)>
 
 Print out list of debugging flag values.
 
@@ -197,7 +197,7 @@ help_debug(void)
 
 /*
 
-=item C<static void help>
+=item C<static void help(void)>
 
 Print out "help" list of options.
 
@@ -255,7 +255,7 @@ help(void)
 
 /*
 
-=item C<static void Parrot_version>
+=item C<static void Parrot_version(PARROT_INTERP)>
 
 Print out parrot version number.
 
@@ -323,7 +323,7 @@ static struct longopt_opt_decl options[] = {
 
 /*
 
-=item C<static int is_all_hex_digits>
+=item C<static int is_all_hex_digits(const char *s)>
 
 Tests all characters in a string are hexadecimal digits.
 Returns 1 if true, 0 as soon as a non-hex found
@@ -346,7 +346,7 @@ is_all_hex_digits(ARGIN(const char *s))
 
 /*
 
-=item C<const char * parseflags>
+=item C<const char * parseflags(PARROT_INTERP, int *argc, char **argv[])>
 
 Parse Parrot's command line for options and set appropriate flags.
 
@@ -570,7 +570,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
 
 /*
 
-=item C<static void do_pre_process>
+=item C<static void do_pre_process(PARROT_INTERP)>
 
 Pre-processor step.  Turn parser's output codes into Parrot instructions.
 
@@ -692,7 +692,8 @@ do_pre_process(PARROT_INTERP)
 
 /*
 
-=item C<static void imcc_get_optimization_description>
+=item C<static void imcc_get_optimization_description(const PARROT_INTERP, int
+opt_level, char *opt_desc)>
 
 Create list (opt_desc[]) describing optimisation flags.
 
@@ -729,7 +730,7 @@ imcc_get_optimization_description(const PARROT_INTERP, int opt_level, ARGMOD(cha
 
 /*
 
-=item C<void imcc_initialize>
+=item C<void imcc_initialize(PARROT_INTERP)>
 
 Initialise interpreter and set optimisation level.
 
@@ -764,7 +765,8 @@ imcc_initialize(PARROT_INTERP)
 
 /*
 
-=item C<static void imcc_run_pbc>
+=item C<static void imcc_run_pbc(PARROT_INTERP, int obj_file, const char
+*output_file, int argc, char **argv)>
 
 Write out or run Parrot bytecode.
 
@@ -800,7 +802,7 @@ imcc_run_pbc(PARROT_INTERP, int obj_file, ARGIN_NULLOK(const char *output_file),
 
 /*
 
-=item C<static void imcc_write_pbc>
+=item C<static void imcc_write_pbc(PARROT_INTERP, const char *output_file)>
 
 Output packed bytecode file.
 
@@ -839,7 +841,8 @@ imcc_write_pbc(PARROT_INTERP, ARGIN(const char *output_file))
 
 /*
 
-=item C<static void determine_input_file_type>
+=item C<static void determine_input_file_type(PARROT_INTERP, const char * const
+sourcefile)>
 
 Read in the source and determine whether it's Parrot bytecode or PASM
 
@@ -883,7 +886,8 @@ determine_input_file_type(PARROT_INTERP, ARGIN(const char * const sourcefile))
 
 /*
 
-=item C<static void determine_output_file_type>
+=item C<static void determine_output_file_type(PARROT_INTERP, int *obj_file,
+const char *output_file)>
 
 Decide what kind of file we are to output.
 
@@ -918,7 +922,8 @@ determine_output_file_type(PARROT_INTERP,
 
 /*
 
-=item C<static void compile_to_bytecode>
+=item C<static void compile_to_bytecode(PARROT_INTERP, const char * const
+sourcefile, const char * const output_file)>
 
 Compile source code into bytecode (or die trying).
 
@@ -997,7 +1002,8 @@ compile_to_bytecode(PARROT_INTERP,
 
 /*
 
-=item C<int imcc_run>
+=item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char
+**argv)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)

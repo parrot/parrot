@@ -90,8 +90,8 @@ print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 
 =over 4
 
-=item C<INTVAL Parrot_warn(PARROT_INTERP, INTVAL warnclass,
-const char *message, ...)>
+=item C<INTVAL Parrot_warn(PARROT_INTERP, INTVAL warnclass, const char *message,
+...)>
 
 The Parrot C string warning/error reporter.
 

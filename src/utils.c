@@ -561,8 +561,8 @@ tm_to_array(PARROT_INTERP, ARGIN(const struct tm *tm))
 
 /*
 
-=item C<INTVAL Parrot_byte_index(PARROT_INTERP, const STRING *base,
-const STRING *search, UINTVAL start_offset)>
+=item C<INTVAL Parrot_byte_index(PARROT_INTERP, const STRING *base, const STRING
+*search, UINTVAL start_offset)>
 
 Looks for the location of a substring within a longer string.  Takes
 pointers to the strings and the offset within the string at which
@@ -610,8 +610,8 @@ Parrot_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
 
 /*
 
-=item C<INTVAL Parrot_byte_rindex(PARROT_INTERP, const STRING *base,
-const STRING *search, UINTVAL start_offset)>
+=item C<INTVAL Parrot_byte_rindex(PARROT_INTERP, const STRING *base, const
+STRING *search, UINTVAL start_offset)>
 
 Substring search (like Parrot_byte_index), but works backwards,
 from the rightmost end of the string.
@@ -650,7 +650,8 @@ Parrot_byte_rindex(SHIM_INTERP, ARGIN(const STRING *base),
 
 /*
 
-=item C<static void rec_climb_back_and_mark(int node_index, parrot_prm_context* c)>
+=item C<static void rec_climb_back_and_mark(int node_index, parrot_prm_context*
+c)>
 
 Recursive function, used by Parrot_register_move to
 climb back the graph of register moves operations.
@@ -740,9 +741,9 @@ process_cycle_without_exit(int node_index, ARGIN(parrot_prm_context* c))
 
 /*
 
-=item C<void Parrot_register_move(PARROT_INTERP, int n_regs,
-unsigned char *dest_regs, unsigned char *src_regs, unsigned char temp_reg,
-reg_move_func mov, reg_move_func mov_alt, void *info)>
+=item C<void Parrot_register_move(PARROT_INTERP, int n_regs, unsigned char
+*dest_regs, unsigned char *src_regs, unsigned char temp_reg, reg_move_func mov,
+reg_move_func mov_alt, void *info)>
 
 Move C<n_regs> from the given register list C<src_regs> to C<dest_regs>.
 

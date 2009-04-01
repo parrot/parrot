@@ -155,7 +155,7 @@ static int STRING_compare(PARROT_INTERP,
 
 /*
 
-=item C<static size_t key_hash_STRING>
+=item C<static size_t key_hash_STRING(PARROT_INTERP, STRING *s, size_t seed)>
 
 Returns the hashed value of the key C<value>.  See also string.c.
 
@@ -179,7 +179,8 @@ key_hash_STRING(PARROT_INTERP, ARGMOD(STRING *s), SHIM(size_t seed))
 
 /*
 
-=item C<static int STRING_compare>
+=item C<static int STRING_compare(PARROT_INTERP, const void *search_key, const
+void *bucket_key)>
 
 Compares the two strings, returning 0 if they are identical.
 
@@ -211,7 +212,7 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
 
 /*
 
-=item C<static int pointer_compare>
+=item C<static int pointer_compare(PARROT_INTERP, const void *a, const void *b)>
 
 Compares the two pointers, returning 0 if they are identical
 
@@ -231,7 +232,8 @@ pointer_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const voi
 
 /*
 
-=item C<static size_t key_hash_pointer>
+=item C<static size_t key_hash_pointer(PARROT_INTERP, const void *value, size_t
+seed)>
 
 Returns a hashvalue for a pointer.
 
@@ -251,7 +253,8 @@ key_hash_pointer(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<static size_t key_hash_cstring>
+=item C<static size_t key_hash_cstring(PARROT_INTERP, const void *value, size_t
+seed)>
 
 Creates and returns a hash value from a string.
 
@@ -284,7 +287,7 @@ key_hash_cstring(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<static int cstring_compare>
+=item C<static int cstring_compare(PARROT_INTERP, const char *a, const char *b)>
 
 Compares two C strings for equality, returning -1, 0, and 1 if the first string
 is less than, equal to, or greater than the second, respectively.
@@ -305,7 +308,7 @@ cstring_compare(SHIM_INTERP, ARGIN(const char *a), ARGIN(const char *b))
 
 /*
 
-=item C<size_t key_hash_int>
+=item C<size_t key_hash_int(PARROT_INTERP, const void *value, size_t seed)>
 
 Returns a hashed value for an integer key (passed as a void pointer, sadly).
 
@@ -325,7 +328,7 @@ key_hash_int(SHIM_INTERP, ARGIN(const void *value), size_t seed)
 
 /*
 
-=item C<int int_compare>
+=item C<int int_compare(PARROT_INTERP, const void *a, const void *b)>
 
 Compares two integers for equality, returning -1, 0, and 1 if the first is less
 than, equal to, or greater than the second, respectively.  Uses void pointers
@@ -347,7 +350,7 @@ int_compare(SHIM_INTERP, ARGIN_NULLOK(const void *a), ARGIN_NULLOK(const void *b
 
 /*
 
-=item C<void parrot_dump_hash>
+=item C<void parrot_dump_hash(PARROT_INTERP, const Hash *hash)>
 
 Prints out the hash in human-readable form, at least once someone implements
 this.
@@ -367,7 +370,7 @@ parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
 
 /*
 
-=item C<void parrot_mark_hash>
+=item C<void parrot_mark_hash(PARROT_INTERP, Hash *hash)>
 
 Marks the hash and its contents as live.  Assumes that key and value are non
 null in all buckets.
@@ -407,7 +410,7 @@ parrot_mark_hash(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static void parrot_mark_hash_keys>
+=item C<static void parrot_mark_hash_keys(PARROT_INTERP, Hash *hash)>
 
 Marks the hash and only its keys as live.
 
@@ -443,7 +446,7 @@ parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static void parrot_mark_hash_values>
+=item C<static void parrot_mark_hash_values(PARROT_INTERP, Hash *hash)>
 
 Marks the hash and only its values as live.
 
@@ -479,7 +482,7 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static void parrot_mark_hash_both>
+=item C<static void parrot_mark_hash_both(PARROT_INTERP, Hash *hash)>
 
 Marks the hash and both its keys and values as live.
 
@@ -518,7 +521,7 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 
 /*
 
-=item C<static void hash_thaw>
+=item C<static void hash_thaw(PARROT_INTERP, Hash *hash, visit_info *info)>
 
 Visits the contents of a hash during freeze/thaw.
 
@@ -588,7 +591,8 @@ hash_thaw(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(visit_info *info))
 
 /*
 
-=item C<static void hash_freeze>
+=item C<static void hash_freeze(PARROT_INTERP, const Hash * const hash,
+visit_info *info)>
 
 Freezes hash into a string.
 
@@ -642,7 +646,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *in
 
 /*
 
-=item C<void parrot_hash_visit>
+=item C<void parrot_hash_visit(PARROT_INTERP, Hash *hash, void *pinfo)>
 
 Freezes or thaws a hash as specified.  Takes an interpreter, a pointer to the
 hash, and a pointer to the structure identifying what to do and the location of
@@ -677,7 +681,7 @@ parrot_hash_visit(PARROT_INTERP, ARGMOD(Hash *hash), ARGMOD(void *pinfo))
 
 /*
 
-=item C<static void expand_hash>
+=item C<static void expand_hash(PARROT_INTERP, Hash *hash)>
 
 Expands a hash when necessary.
 
@@ -808,7 +812,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
 
 /*
 
-=item C<Hash* parrot_new_hash>
+=item C<Hash* parrot_new_hash(PARROT_INTERP)>
 
 Creates a new Parrot STRING hash in C<hptr>.
 
@@ -832,7 +836,7 @@ parrot_new_hash(PARROT_INTERP)
 
 /*
 
-=item C<void parrot_new_pmc_hash>
+=item C<void parrot_new_pmc_hash(PARROT_INTERP, PMC *container)>
 
 Creates a new Parrot STRING hash in C<container>.
 
@@ -852,7 +856,7 @@ parrot_new_pmc_hash(PARROT_INTERP, ARGOUT(PMC *container))
 
 /*
 
-=item C<Hash* parrot_new_cstring_hash>
+=item C<Hash* parrot_new_cstring_hash(PARROT_INTERP)>
 
 Creates a new C string hash in C<hptr>.
 
@@ -876,7 +880,7 @@ parrot_new_cstring_hash(PARROT_INTERP)
 
 /*
 
-=item C<Hash * parrot_new_pointer_hash>
+=item C<Hash * parrot_new_pointer_hash(PARROT_INTERP)>
 
 Create and return a new hash with void * keys and values.
 
@@ -900,7 +904,7 @@ parrot_new_pointer_hash(PARROT_INTERP)
 
 /*
 
-=item C<Hash* parrot_new_intval_hash>
+=item C<Hash* parrot_new_intval_hash(PARROT_INTERP)>
 
 Creates and returns new Hash PMC with INTVAL keys and values. C<flags> can be
 C<PObj_constant_FLAG> or 0.
@@ -926,7 +930,8 @@ parrot_new_intval_hash(PARROT_INTERP)
 
 /*
 
-=item C<Hash * parrot_create_hash>
+=item C<Hash * parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type,
+Hash_key_type hkey_type, hash_comp_fn compare, hash_hash_key_fn keyhash)>
 
 Creates and initializes a hash.  Function pointers determine its behaviors.
 The container passed in is the address of the hash PMC that is using it.  The
@@ -993,7 +998,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 
 /*
 
-=item C<void parrot_hash_destroy>
+=item C<void parrot_hash_destroy(PARROT_INTERP, Hash *hash)>
 
 Frees the memory allocated to the specified hash and its bucket store.  Used by
 Parrot_chash_destroy.
@@ -1014,7 +1019,7 @@ parrot_hash_destroy(SHIM_INTERP, ARGMOD(Hash *hash))
 
 /*
 
-=item C<void parrot_chash_destroy>
+=item C<void parrot_chash_destroy(PARROT_INTERP, Hash *hash)>
 
 Deletes the specified hash by freeing the memory allocated to all the key-value
 pairs, and finally the hash itself.
@@ -1044,7 +1049,8 @@ parrot_chash_destroy(PARROT_INTERP, ARGMOD(Hash *hash))
 
 /*
 
-=item C<void parrot_chash_destroy_values>
+=item C<void parrot_chash_destroy_values(PARROT_INTERP, Hash *hash, value_free
+func)>
 
 Deletes the specified hash by freeing the memory allocated to all the key-value
 pairs, calling the provided callback to free the values, and finally the hash
@@ -1078,7 +1084,7 @@ parrot_chash_destroy_values(PARROT_INTERP, ARGMOD(Hash *hash),
 
 /*
 
-=item C<INTVAL parrot_hash_size>
+=item C<INTVAL parrot_hash_size(PARROT_INTERP, const Hash *hash)>
 
 Returns the number of used entries in the hash.
 
@@ -1100,7 +1106,7 @@ parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
 
 /*
 
-=item C<void * parrot_hash_get_idx>
+=item C<void * parrot_hash_get_idx(PARROT_INTERP, const Hash *hash, PMC *key)>
 
 Finds the next index into the hash's internal storage for the given Key.  Used
 by iterators.  Ugly.
@@ -1166,7 +1172,8 @@ parrot_hash_get_idx(PARROT_INTERP, ARGIN(const Hash *hash), ARGMOD(PMC *key))
 
 /*
 
-=item C<HashBucket * parrot_hash_get_bucket>
+=item C<HashBucket * parrot_hash_get_bucket(PARROT_INTERP, const Hash *hash,
+const void *key)>
 
 Returns the bucket for C<key>, if found, and NULL otherwise.
 
@@ -1199,7 +1206,7 @@ parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void 
 
 /*
 
-=item C<void * parrot_hash_get>
+=item C<void * parrot_hash_get(PARROT_INTERP, Hash *hash, const void *key)>
 
 Returns the value keyed by C<key>, or C<NULL> if no bucket is found.
 
@@ -1221,7 +1228,7 @@ parrot_hash_get(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(const void *key))
 
 /*
 
-=item C<INTVAL parrot_hash_exists>
+=item C<INTVAL parrot_hash_exists(PARROT_INTERP, Hash *hash, void *key)>
 
 Returns whether the key exists in the hash.
 
@@ -1242,7 +1249,8 @@ parrot_hash_exists(PARROT_INTERP, ARGIN(Hash *hash), ARGIN(void *key))
 
 /*
 
-=item C<HashBucket* parrot_hash_put>
+=item C<HashBucket* parrot_hash_put(PARROT_INTERP, Hash *hash, void *key, void
+*value)>
 
 Puts the key and value into the hash. Note that C<key> is B<not> copied.
 
@@ -1302,7 +1310,7 @@ parrot_hash_put(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key), ARGIN_NULLO
 
 /*
 
-=item C<void parrot_hash_delete>
+=item C<void parrot_hash_delete(PARROT_INTERP, Hash *hash, void *key)>
 
 Deletes the key from the hash.
 
@@ -1342,7 +1350,7 @@ parrot_hash_delete(PARROT_INTERP, ARGMOD(Hash *hash), ARGIN(void *key))
 
 /*
 
-=item C<void parrot_hash_clone>
+=item C<void parrot_hash_clone(PARROT_INTERP, const Hash *hash, Hash *dest)>
 
 Clones C<hash> to C<dest>.
 

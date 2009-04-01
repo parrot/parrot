@@ -38,7 +38,7 @@ An implementation of sets -- used for tracking register usage.
 
 /*
 
-=item C<Set* set_make>
+=item C<Set* set_make(unsigned int length)>
 
 Creates a new Set object.
 
@@ -63,7 +63,7 @@ set_make(unsigned int length)
 
 /*
 
-=item C<Set* set_make_full>
+=item C<Set* set_make_full(unsigned int length)>
 
 Creates a new Set object of C<length> items, setting them all to full.
 
@@ -89,7 +89,7 @@ set_make_full(unsigned int length)
 
 /*
 
-=item C<void set_free>
+=item C<void set_free(Set *s)>
 
 Frees the given Set and its allocated memory.
 
@@ -110,7 +110,7 @@ set_free(ARGMOD(Set *s))
 
 /*
 
-=item C<void set_clear>
+=item C<void set_clear(Set *s)>
 
 Clears all bits in the Set.
 
@@ -128,7 +128,7 @@ set_clear(ARGMOD(Set *s))
 
 /*
 
-=item C<Set* set_copy>
+=item C<Set* set_copy(const Set *s)>
 
 Copies the set C<s>, returning a new set pointer.
 
@@ -151,7 +151,7 @@ set_copy(ARGIN(const Set *s))
 
 /*
 
-=item C<int set_equal>
+=item C<int set_equal(const Set *s1, const Set *s2)>
 
 Compares two sets for equality; sets are equal if they contain the same
 elements.
@@ -190,7 +190,7 @@ set_equal(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<void set_add>
+=item C<void set_add(Set *s, unsigned int element)>
 
 Adds to set C<s> the element C<element>.
 
@@ -217,7 +217,7 @@ set_add(ARGMOD(Set *s), unsigned int element)
 
 /*
 
-=item C<unsigned int set_first_zero>
+=item C<unsigned int set_first_zero(const Set *s)>
 
 Sets the first unused item in the set.
 
@@ -255,7 +255,7 @@ set_first_zero(ARGIN(const Set *s))
 
 /*
 
-=item C<int set_contains>
+=item C<int set_contains(const Set *s, unsigned int element)>
 
 Checks whether the specified element is present in the specified Set argument.
 Returns 1 if it is, 0 otherwise.
@@ -286,7 +286,7 @@ set_contains(ARGIN(const Set *s), unsigned int element)
 
 /*
 
-=item C<Set * set_union>
+=item C<Set * set_union(const Set *s1, const Set *s2)>
 
 Computes the union of the two Set arguments, returning it as a new Set.
 
@@ -318,7 +318,7 @@ set_union(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<Set * set_intersec>
+=item C<Set * set_intersec(const Set *s1, const Set *s2)>
 
 Creates a new Set object that is the intersection of the Set arguments (defined
 through the binary C<and> operator.)
@@ -351,7 +351,7 @@ set_intersec(ARGIN(const Set *s1), ARGIN(const Set *s2))
 
 /*
 
-=item C<void set_intersec_inplace>
+=item C<void set_intersec_inplace(Set *s1, const Set *s2)>
 
 Performs a set intersection in place -- the first Set argument changes to
 contain the result.

@@ -110,7 +110,8 @@ static void store_sub_in_multi(PARROT_INTERP,
 
 /*
 
-=item C<static PMC * internal_ns_keyed>
+=item C<static PMC * internal_ns_keyed(PARROT_INTERP, PMC *base_ns, PMC
+*pmc_key, int flags)>
 
 internal_ns_keyed: Internal function to do keyed namespace lookup relative to a
 given namespace PMC.  Understands String, Key, and array PMCs containing
@@ -166,7 +167,8 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
 
 /*
 
-=item C<static PMC * internal_ns_keyed_str>
+=item C<static PMC * internal_ns_keyed_str(PARROT_INTERP, PMC *base_ns, STRING
+*key, int flags)>
 
 Internal function to do keyed namespace lookup relative to a given namespace
 PMC.  Understands STRINGs.
@@ -192,7 +194,8 @@ internal_ns_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
 
 /*
 
-=item C<static PMC * internal_ns_keyed_key>
+=item C<static PMC * internal_ns_keyed_key(PARROT_INTERP, PMC *ns, PMC *key, int
+flags)>
 
 Internal function to do keyed namespace lookup relative to a given namespace
 PMC.  Understands Key PMCs.  Used from C<internal_ns_keyed>.
@@ -228,7 +231,8 @@ internal_ns_keyed_key(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(PMC *key), int flags)
 
 /*
 
-=item C<static PMC * internal_ns_maybe_create>
+=item C<static PMC * internal_ns_maybe_create(PARROT_INTERP, PMC *ns, STRING
+*key, int flags)>
 
 Given the a namespace PMC, a STRING containing a name, and flags from
 C<internal_ns_keyed> or C<internal_ns_keyed_str>, creates and returns a new
@@ -266,7 +270,8 @@ internal_ns_maybe_create(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(STRING *key), int 
 
 /*
 
-=item C<PMC * Parrot_get_namespace_keyed>
+=item C<PMC * Parrot_get_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC
+*pmc_key)>
 
 Find the namespace relative to the namespace C<base_ns> with the key
 C<pmc_key>, which may be a String, a Key, or an array of strings.  Return
@@ -288,7 +293,8 @@ Parrot_get_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN_NULLOK(PMC 
 
 /*
 
-=item C<PMC * Parrot_get_namespace_keyed_str>
+=item C<PMC * Parrot_get_namespace_keyed_str(PARROT_INTERP, PMC *base_ns, STRING
+*str_key)>
 
 Find the namespace relative to the namespace C<base_ns> with the string key
 C<str_key>.  Return the namespace, or NULL if not found.
@@ -310,7 +316,8 @@ Parrot_get_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
 
 /*
 
-=item C<PMC * Parrot_make_namespace_keyed>
+=item C<PMC * Parrot_make_namespace_keyed(PARROT_INTERP, PMC *base_ns, PMC
+*pmc_key)>
 
 Find, or create if necessary, the namespace relative to the namespace
 C<base_ns> with the key C<pmc_key>, which may be a String, a Key, or an
@@ -333,7 +340,8 @@ Parrot_make_namespace_keyed(PARROT_INTERP, ARGIN(PMC *base_ns),
 
 /*
 
-=item C<PMC * Parrot_make_namespace_keyed_str>
+=item C<PMC * Parrot_make_namespace_keyed_str(PARROT_INTERP, PMC *base_ns,
+STRING *str_key)>
 
 Find, or create if necessary, the namespace relative to the namespace
 C<base_ns> with the string key C<str_key>.  Return the namespace.  Errors
@@ -357,7 +365,7 @@ Parrot_make_namespace_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
 
 /*
 
-=item C<PMC * Parrot_make_namespace_autobase>
+=item C<PMC * Parrot_make_namespace_autobase(PARROT_INTERP, PMC *key)>
 
 Find, or create if necessary, a namespace with the key C<key>, which may be a
 String, a Key, or an array of strings. If it is a String, then the lookup is
@@ -386,7 +394,7 @@ Parrot_make_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_get_namespace_autobase>
+=item C<PMC * Parrot_get_namespace_autobase(PARROT_INTERP, PMC *key)>
 
 Find a namespace with the key C<key>, which may be a String, a Key, or an
 array of strings. If it is a String, then the lookup is relative to the
@@ -415,7 +423,7 @@ Parrot_get_namespace_autobase(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_ns_get_name>
+=item C<PMC * Parrot_ns_get_name(PARROT_INTERP, PMC *_namespace)>
 
 Retrieve an array of names from a namespace object.
 
@@ -437,7 +445,7 @@ Parrot_ns_get_name(PARROT_INTERP, ARGIN(PMC *_namespace))
 
 /*
 
-=item C<PMC * Parrot_get_global>
+=item C<PMC * Parrot_get_global(PARROT_INTERP, PMC *ns, STRING *globalname)>
 
 Parrot_get_global allows a null namespace without throwing an exception; it
 simply returns PMCNULL in that case.
@@ -482,7 +490,8 @@ Parrot_get_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *glo
 
 /*
 
-=item C<void Parrot_set_global>
+=item C<void Parrot_set_global(PARROT_INTERP, PMC *ns, STRING *globalname, PMC
+*val)>
 
 Set the global named C<globalname> in the namespace C<ns> to the value C<val>.
 
@@ -502,7 +511,7 @@ Parrot_set_global(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
 /*
 
-=item C<PMC * Parrot_find_global_n>
+=item C<PMC * Parrot_find_global_n(PARROT_INTERP, PMC *ns, STRING *globalname)>
 
 Search the namespace PMC C<ns> for an object with name C<globalname>.
 Return the object, or NULL if not found.
@@ -546,7 +555,7 @@ Parrot_find_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns), ARGIN_NULLOK(STRING *
 
 /*
 
-=item C<PMC * Parrot_find_global_cur>
+=item C<PMC * Parrot_find_global_cur(PARROT_INTERP, STRING *globalname)>
 
 Finds and returns the data time named C<globalname> in the current namespace.
 
@@ -567,7 +576,8 @@ Parrot_find_global_cur(PARROT_INTERP, ARGIN_NULLOK(STRING *globalname))
 
 /*
 
-=item C<PMC * Parrot_find_global_k>
+=item C<PMC * Parrot_find_global_k(PARROT_INTERP, PMC *pmc_key, STRING
+*globalname)>
 
 Search the namespace designated by C<pmc_key>, which may be a key PMC,
 an array of namespace name strings, or a string PMC, for an object
@@ -596,7 +606,8 @@ Parrot_find_global_k(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc_key), ARGIN(STRING *gl
 
 /*
 
-=item C<PMC * Parrot_find_global_s>
+=item C<PMC * Parrot_find_global_s(PARROT_INTERP, STRING *str_key, STRING
+*globalname)>
 
 Search the namespace designated by C<str_key>, or the HLL root if
 C<str_key> is NULL, for an object with name C<globalname>.  Return the
@@ -626,7 +637,8 @@ Parrot_find_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
 
 /*
 
-=item C<void Parrot_store_global_n>
+=item C<void Parrot_store_global_n(PARROT_INTERP, PMC *ns, STRING *globalname,
+PMC *val)>
 
 Store the PMC C<val> into the namespace PMC C<ns> with name C<globalname>.
 
@@ -653,7 +665,8 @@ Parrot_store_global_n(PARROT_INTERP, ARGIN_NULLOK(PMC *ns),
 
 /*
 
-=item C<void Parrot_store_global_s>
+=item C<void Parrot_store_global_s(PARROT_INTERP, STRING *str_key, STRING
+*globalname, PMC *val)>
 
 Store the PMC C<val> into the namespace designated by C<str_key>, or
 the HLL root if C<str_key> is NULL, with the name C<globalname>.
@@ -681,7 +694,8 @@ Parrot_store_global_s(PARROT_INTERP, ARGIN_NULLOK(STRING *str_key),
 
 /*
 
-=item C<PMC * Parrot_find_global_op>
+=item C<PMC * Parrot_find_global_op(PARROT_INTERP, PMC *ns, STRING *globalname,
+void *next)>
 
 If the global exists in the given namespace PMC, return it.  If not, return
 PMCNULL.
@@ -714,7 +728,7 @@ Parrot_find_global_op(PARROT_INTERP, ARGIN(PMC *ns),
 
 /*
 
-=item C<PMC * Parrot_find_name_op>
+=item C<PMC * Parrot_find_name_op(PARROT_INTERP, STRING *name, void *next)>
 
 RT #46171 - THIS IS BROKEN - it doesn't walk up the scopes yet
 
@@ -758,7 +772,7 @@ Parrot_find_name_op(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
 
 /*
 
-=item C<static PMC * get_namespace_pmc>
+=item C<static PMC * get_namespace_pmc(PARROT_INTERP, PMC *sub_pmc)>
 
 Return the namespace PMC associated with the PMC C<sub>. If C<sub> is NULL,
 return the Associated HLL namespace PMC instead.
@@ -794,7 +808,7 @@ get_namespace_pmc(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 /*
 
-=item C<static void store_sub_in_multi>
+=item C<static void store_sub_in_multi(PARROT_INTERP, PMC *sub_pmc, PMC *ns)>
 
 Adds the sub C<sub> into a mulisub of the same name in the namespace C<ns>.
 If no multisub by that name currently exists, we create one.
@@ -829,7 +843,7 @@ store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 
 /*
 
-=item C<void Parrot_store_sub_in_namespace>
+=item C<void Parrot_store_sub_in_namespace(PARROT_INTERP, PMC *sub_pmc)>
 
 Adds the PMC C<sub> into the current namespace. Adds the sub to a multi of the
 same name if it's defined as a multi.

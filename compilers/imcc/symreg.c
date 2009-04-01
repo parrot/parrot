@@ -176,7 +176,8 @@ pop_namespace(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<static SymReg * _get_sym_typed(const SymHash *hsh, const char *name, int t)>
+=item C<static SymReg * _get_sym_typed(const SymHash *hsh, const char *name, int
+t)>
 
 Gets a symbol from the hash, with the given C<name> of the specific type C<t>.
 
@@ -641,8 +642,8 @@ mk_ident_ur(PARROT_INTERP, ARGIN(const char *name), int t)
 
 /*
 
-=item C<static SymReg * mk_pmc_const_2(PARROT_INTERP, IMC_Unit *unit,
-SymReg *left, SymReg *rhs)>
+=item C<static SymReg * mk_pmc_const_2(PARROT_INTERP, IMC_Unit *unit, SymReg
+*left, SymReg *rhs)>
 
 Makes a constant PMC and inserts instructions to access it.
 
@@ -699,8 +700,8 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
 
 /*
 
-=item C<SymReg * mk_const_ident(PARROT_INTERP, const char *name, int t,
-SymReg *val, int global)>
+=item C<SymReg * mk_const_ident(PARROT_INTERP, const char *name, int t, SymReg
+*val, int global)>
 
 Makes a new identifier constant with value val.
 
@@ -894,8 +895,8 @@ add_ns(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * _mk_address(PARROT_INTERP, SymHash *hsh, const char *name,
-int uniq)>
+=item C<SymReg * _mk_address(PARROT_INTERP, SymHash *hsh, const char *name, int
+uniq)>
 
 Makes a new address (internal use only).
 
@@ -1426,8 +1427,8 @@ get_sym(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<SymReg * _find_sym(PARROT_INTERP, const Namespace *nspace,
-const SymHash *hsh, const char *name)>
+=item C<SymReg * _find_sym(PARROT_INTERP, const Namespace *nspace, const SymHash
+*hsh, const char *name)>
 
 Find a symbol hash or ghash (internal use only);
 

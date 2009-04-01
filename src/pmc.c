@@ -127,7 +127,8 @@ pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<PMC * pmc_reuse(PARROT_INTERP, PMC *pmc, INTVAL new_type, UINTVAL flags)>
+=item C<PMC * pmc_reuse(PARROT_INTERP, PMC *pmc, INTVAL new_type, UINTVAL
+flags)>
 
 Reuse an existing PMC, turning it into an empty PMC of the new type. Any
 required internal structure will be put in place (such as the extension area)
@@ -220,7 +221,8 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 
 /*
 
-=item C<static PMC * get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)>
+=item C<static PMC * get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL
+flags)>
 
 Gets a new PMC header.
 
@@ -470,8 +472,8 @@ temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<static void pmc_free_to_pool(PARROT_INTERP, PMC *pmc,
-Small_Object_Pool *pool)>
+=item C<static void pmc_free_to_pool(PARROT_INTERP, PMC *pmc, Small_Object_Pool
+*pool)>
 
 =cut
 

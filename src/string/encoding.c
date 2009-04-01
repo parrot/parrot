@@ -103,7 +103,8 @@ Parrot_new_encoding(SHIM_INTERP)
 
 /*
 
-=item C<const ENCODING * Parrot_find_encoding(PARROT_INTERP, const char *encodingname)>
+=item C<const ENCODING * Parrot_find_encoding(PARROT_INTERP, const char
+*encodingname)>
 
 Finds an encoding with the name C<encodingname>. Returns the encoding
 if it is successfully found, returns NULL otherwise.
@@ -130,7 +131,8 @@ Parrot_find_encoding(SHIM_INTERP, ARGIN(const char *encodingname))
 
 /*
 
-=item C<const ENCODING * Parrot_load_encoding(PARROT_INTERP, const char *encodingname)>
+=item C<const ENCODING * Parrot_load_encoding(PARROT_INTERP, const char
+*encodingname)>
 
 Loads an encoding. Currently throws an exception because we cannot load
 encodings. See RT #58186.
@@ -161,7 +163,8 @@ Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
 
 /*
 
-=item C<INTVAL Parrot_encoding_number(PARROT_INTERP, const STRING *encodingname)>
+=item C<INTVAL Parrot_encoding_number(PARROT_INTERP, const STRING
+*encodingname)>
 
 Return the number of the encoding or -1 if not found.
 
@@ -237,7 +240,8 @@ Parrot_encoding_name(SHIM_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<const ENCODING* Parrot_get_encoding(PARROT_INTERP, INTVAL number_of_encoding)>
+=item C<const ENCODING* Parrot_get_encoding(PARROT_INTERP, INTVAL
+number_of_encoding)>
 
 Returns the encoding given by the INTVAL index C<number_of_encoding>.
 
@@ -260,7 +264,8 @@ Parrot_get_encoding(SHIM_INTERP, INTVAL number_of_encoding)
 
 /*
 
-=item C<const char * Parrot_encoding_c_name(PARROT_INTERP, INTVAL number_of_encoding)>
+=item C<const char * Parrot_encoding_c_name(PARROT_INTERP, INTVAL
+number_of_encoding)>
 
 Returns the NULL-terminated C string representation of the encodings name
 given by the C<number_of_encoding>.
@@ -393,8 +398,8 @@ Parrot_register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
 
 /*
 
-=item C<INTVAL Parrot_make_default_encoding(PARROT_INTERP,
-const char *encodingname, ENCODING *encoding)>
+=item C<INTVAL Parrot_make_default_encoding(PARROT_INTERP, const char
+*encodingname, ENCODING *encoding)>
 
 Sets the default encoding to C<encoding> with name C<encodingname>.
 

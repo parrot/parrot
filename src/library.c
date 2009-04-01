@@ -401,7 +401,8 @@ path_finalize(PARROT_INTERP, ARGMOD(STRING *path))
 
 /*
 
-=item C<static STRING* path_guarantee_trailing_separator(PARROT_INTERP, STRING *path)>
+=item C<static STRING* path_guarantee_trailing_separator(PARROT_INTERP, STRING
+*path)>
 
 unary path argument. the path string will have a
 trailing path-separator appended if it is not
@@ -429,7 +430,8 @@ path_guarantee_trailing_separator(PARROT_INTERP, ARGMOD(STRING *path))
 
 /*
 
-=item C<static STRING* path_append(PARROT_INTERP, STRING *l_path, STRING *r_path)>
+=item C<static STRING* path_append(PARROT_INTERP, STRING *l_path, STRING
+*r_path)>
 
 binary path arguments, the left arg is modified.
 a trailing separator is guaranteed for the left
@@ -453,7 +455,8 @@ path_append(PARROT_INTERP, ARGMOD(STRING *l_path), ARGMOD(STRING *r_path))
 
 /*
 
-=item C<static STRING* path_concat(PARROT_INTERP, STRING *l_path, STRING *r_path)>
+=item C<static STRING* path_concat(PARROT_INTERP, STRING *l_path, STRING
+*r_path)>
 
 binary path arguments. A new string is created
 that is the concatenation of the two path components
@@ -591,8 +594,8 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
 /*
 
-=item C<void Parrot_add_library_path(PARROT_INTERP, STRING *path,
-enum_lib_paths which)>
+=item C<void Parrot_add_library_path(PARROT_INTERP, STRING *path, enum_lib_paths
+which)>
 
 Add a path to the library searchpath of the given type.
 
@@ -616,8 +619,8 @@ Parrot_add_library_path(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_add_library_path_from_cstring(PARROT_INTERP,
-const char *path, enum_lib_paths which)>
+=item C<void Parrot_add_library_path_from_cstring(PARROT_INTERP, const char
+*path, enum_lib_paths which)>
 
 Add a path to the library searchpath of the given type (passing in a C string).
 
@@ -845,8 +848,8 @@ Parrot_get_runtime_path(PARROT_INTERP)
 
 /*
 
-=item C<STRING * parrot_split_path_ext(PARROT_INTERP, STRING *in,
-STRING **wo_ext, STRING **ext)>
+=item C<STRING * parrot_split_path_ext(PARROT_INTERP, STRING *in, STRING
+**wo_ext, STRING **ext)>
 
 Split the pathstring C<in> into <path><filestem><ext>. Return the
 C<filestem> of the pathstring. Set C<wo_ext> to the part without

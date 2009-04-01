@@ -27,7 +27,7 @@ The base vtable calling functions.
 
 /*
 
-=item C<PMC * key_new>
+=item C<PMC * key_new(PARROT_INTERP)>
 
 Returns a new C<Key> PMC.
 
@@ -48,7 +48,7 @@ key_new(PARROT_INTERP)
 
 /*
 
-=item C<PMC * key_new_integer>
+=item C<PMC * key_new_integer(PARROT_INTERP, INTVAL value)>
 
 Returns a new integer C<Key> PMC with value C<value>.
 
@@ -74,7 +74,7 @@ key_new_integer(PARROT_INTERP, INTVAL value)
 
 /*
 
-=item C<PMC * key_new_number>
+=item C<PMC * key_new_number(PARROT_INTERP, FLOATVAL value)>
 
 Returns a new number C<Key> PMC with value C<value>.
 
@@ -100,7 +100,7 @@ key_new_number(PARROT_INTERP, FLOATVAL value)
 
 /*
 
-=item C<PMC * key_new_string>
+=item C<PMC * key_new_string(PARROT_INTERP, STRING *value)>
 
 Returns a new string C<Key> PMC with value C<value>.
 
@@ -126,7 +126,7 @@ key_new_string(PARROT_INTERP, ARGIN(STRING *value))
 
 /*
 
-=item C<PMC * key_new_cstring>
+=item C<PMC * key_new_cstring(PARROT_INTERP, const char *value)>
 
 Returns a new string C<Key> PMC with value C<value> converted to a
 C<STRING>.
@@ -148,7 +148,7 @@ key_new_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *value))
 
 /*
 
-=item C<PMC * key_new_pmc>
+=item C<PMC * key_new_pmc(PARROT_INTERP, PMC *value)>
 
 Returns a new PMC C<Key> PMC with value C<value>.
 
@@ -172,7 +172,7 @@ key_new_pmc(PARROT_INTERP, ARGIN(PMC *value))
 
 /*
 
-=item C<void key_set_integer>
+=item C<void key_set_integer(PARROT_INTERP, PMC *key, INTVAL value)>
 
 Set the integer C<value> in C<key>.
 
@@ -195,7 +195,8 @@ key_set_integer(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value)
 
 /*
 
-=item C<void key_set_register>
+=item C<void key_set_register(PARROT_INTERP, PMC *key, INTVAL value, INTVAL
+flag)>
 
 Set the register C<value> in C<key>.
 
@@ -218,7 +219,7 @@ key_set_register(PARROT_INTERP, ARGMOD(PMC *key), INTVAL value, INTVAL flag)
 
 /*
 
-=item C<void key_set_number>
+=item C<void key_set_number(PARROT_INTERP, PMC *key, FLOATVAL value)>
 
 Set the number C<value> in C<key>.
 
@@ -241,7 +242,7 @@ key_set_number(PARROT_INTERP, ARGMOD(PMC *key), FLOATVAL value)
 
 /*
 
-=item C<void key_set_string>
+=item C<void key_set_string(PARROT_INTERP, PMC *key, STRING *value)>
 
 Set the string C<value> in C<key>.
 
@@ -264,7 +265,7 @@ key_set_string(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(STRING *value))
 
 /*
 
-=item C<void key_set_pmc>
+=item C<void key_set_pmc(PARROT_INTERP, PMC *key, PMC *value)>
 
 Set the PMC C<value> in C<key>.
 
@@ -290,7 +291,7 @@ key_set_pmc(PARROT_INTERP, ARGMOD(PMC *key), ARGIN(PMC *value))
 
 /*
 
-=item C<INTVAL key_type>
+=item C<INTVAL key_type(PARROT_INTERP, const PMC *key)>
 
 Returns the type of C<key>.
 
@@ -310,7 +311,7 @@ key_type(SHIM_INTERP, ARGIN(const PMC *key))
 
 /*
 
-=item C<INTVAL key_integer>
+=item C<INTVAL key_integer(PARROT_INTERP, PMC *key)>
 
 Translates a key value into an integer.
 Takes an interpreter name and pointer to a key.
@@ -386,7 +387,7 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<FLOATVAL key_number>
+=item C<FLOATVAL key_number(PARROT_INTERP, PMC *key)>
 
 Translates a key value into a number.
 Takes an interpreter name and pointer to a key.
@@ -432,7 +433,7 @@ key_number(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<STRING * key_string>
+=item C<STRING * key_string(PARROT_INTERP, PMC *key)>
 
 Translates a key value into a string.  Takes an interpreter name and pointer to
 a key.  Returns a string value corresponding to the key.
@@ -500,7 +501,7 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * key_pmc>
+=item C<PMC * key_pmc(PARROT_INTERP, PMC *key)>
 
 These functions return the integer/number/string/PMC values of C<key> if
 possible. Otherwise they throw exceptions.
@@ -530,7 +531,7 @@ key_pmc(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * key_next>
+=item C<PMC * key_next(PARROT_INTERP, PMC *key)>
 
 Returns the next key if C<key> is in a sequence of linked keys.
 
@@ -559,7 +560,7 @@ key_next(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * key_append>
+=item C<PMC * key_append(PARROT_INTERP, PMC *key1, PMC *key2)>
 
 Appends C<key2> to C<key1>.
 
@@ -597,7 +598,7 @@ key_append(PARROT_INTERP, ARGMOD(PMC *key1), ARGIN(PMC *key2))
 
 /*
 
-=item C<void key_mark>
+=item C<void key_mark(PARROT_INTERP, PMC *key)>
 
 Marks C<key> as live.
 
@@ -637,7 +638,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<STRING * key_set_to_string>
+=item C<STRING * key_set_to_string(PARROT_INTERP, PMC *key)>
 
 Translates a series of key values into strings, quoted or bracketed if
 appropriate.  Takes an interpreter name and pointer to a key.  Returns a

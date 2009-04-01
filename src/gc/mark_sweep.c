@@ -525,7 +525,8 @@ pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
 
 /*
 
-=item C<INTVAL contained_in_pool(const Small_Object_Pool *pool, const void *ptr)>
+=item C<INTVAL contained_in_pool(const Small_Object_Pool *pool, const void
+*ptr)>
 
 Returns whether the given C<*ptr> points to a location in C<pool>.
 
@@ -680,7 +681,8 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
 /*
 
-=item C<static void more_traceable_objects(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void more_traceable_objects(PARROT_INTERP, Small_Object_Pool
+*pool)>
 
 We're out of traceable objects. First we try a GC run to free some up. If
 that doesn't work, allocate a new arena.
@@ -714,7 +716,8 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ms_add_free_pmc_ext(PARROT_INTERP, Small_Object_Pool *pool, void *to_add)>
+=item C<static void gc_ms_add_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
+*pool, void *to_add)>
 
 Add a freed PMC_EXT structure to the free list in the PMC_EXT pool. Objects
 on the free list can be reused later.
@@ -737,7 +740,8 @@ gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void 
 
 /*
 
-=item C<static void gc_ms_add_free_object(PARROT_INTERP, Small_Object_Pool *pool, void *to_add)>
+=item C<static void gc_ms_add_free_object(PARROT_INTERP, Small_Object_Pool
+*pool, void *to_add)>
 
 Add an unused object back to the pool's free list for later reuse. Set
 the PObj flags to indicate that the item is free.
@@ -761,7 +765,8 @@ gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *
 
 /*
 
-=item C<static void * gc_ms_get_free_object(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void * gc_ms_get_free_object(PARROT_INTERP, Small_Object_Pool
+*pool)>
 
 Free object allocator for the MS garbage collector system. If there are no
 free objects, call C<gc_ms_add_free_object> to either free them up with a
@@ -800,7 +805,8 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void * gc_ms_get_free_pmc_ext(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void * gc_ms_get_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
+*pool)>
 
 Get a new PMC_EXT structure from the free pool and return it.
 
@@ -835,7 +841,8 @@ gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag, void *arg)>
+=item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
+void *arg)>
 
 Sweeps the given pool for the MS collector. This function also ends
 the profiling timer, if profiling is enabled. Returns the total number
@@ -1053,8 +1060,8 @@ Parrot_add_to_free_list(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_append_arena_in_pool(PARROT_INTERP,
-Small_Object_Pool *pool, Small_Object_Arena *new_arena, size_t size)>
+=item C<void Parrot_append_arena_in_pool(PARROT_INTERP, Small_Object_Pool *pool,
+Small_Object_Arena *new_arena, size_t size)>
 
 Insert the new arena into the pool's structure. Arenas are stored in a
 linked list, so add the new arena to the list. Set information in the
@@ -1146,7 +1153,8 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<Small_Object_Pool * new_small_object_pool(size_t object_size, size_t objects_per_alloc)>
+=item C<Small_Object_Pool * new_small_object_pool(size_t object_size, size_t
+objects_per_alloc)>
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
 Initializes the pool structure based on the size of objects in the
@@ -1247,8 +1255,8 @@ Parrot_gc_ms_init(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_small_object_pool_merge(PARROT_INTERP,
-Small_Object_Pool *dest, Small_Object_Pool *source)>
+=item C<void Parrot_small_object_pool_merge(PARROT_INTERP, Small_Object_Pool
+*dest, Small_Object_Pool *source)>
 
 Merge pool C<source> into pool C<dest>. Combines the free lists directly,
 moves all arenas to the new pool, and remove the old pool. To merge, the

@@ -386,8 +386,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_poll_unix(PARROT_INTERP, PMC *socket, int which,
-int sec, int usec)>
+=item C<INTVAL Parrot_io_poll_unix(PARROT_INTERP, PMC *socket, int which, int
+sec, int usec)>
 
 Utility function for polling a single IO stream with a timeout.
 
@@ -439,8 +439,8 @@ AGAIN:
 
 /*
 
-=item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr,
-const char* host, int port)>
+=item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr, const char*
+host, int port)>
 
 =cut
 

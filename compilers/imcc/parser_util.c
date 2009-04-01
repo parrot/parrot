@@ -129,7 +129,8 @@ static INTVAL       eval_nr  = 0;
 
 =over 4
 
-=item C<Instruction * iNEW>
+=item C<Instruction * iNEW(PARROT_INTERP, IMC_Unit *unit, SymReg *r0, char
+*type, SymReg *init, int emit)>
 
  * P = new type, [init]
  * PASM like:
@@ -182,7 +183,8 @@ iNEW(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg *r0),
 
 /*
 
-=item C<void op_fullname>
+=item C<void op_fullname(char *dest, const char *name, SymReg * const *args, int
+narg, int keyvec)>
 
 Lookup the full opcode given the short name
 
@@ -265,7 +267,8 @@ op_fullname(ARGOUT(char *dest), ARGIN(const char *name),
 
 /*
 
-=item C<int check_op>
+=item C<int check_op(PARROT_INTERP, char *fullname, const char *name, SymReg *
+const * r, int narg, int keyvec)>
 
 Return opcode value for op name
 
@@ -286,7 +289,7 @@ check_op(PARROT_INTERP, ARGOUT(char *fullname), ARGIN(const char *name),
 
 /*
 
-=item C<int is_op>
+=item C<int is_op(PARROT_INTERP, const char *name)>
 
 Is instruction a parrot opcode?
 
@@ -305,7 +308,8 @@ is_op(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<static Instruction * var_arg_ins>
+=item C<static Instruction * var_arg_ins(PARROT_INTERP, IMC_Unit *unit, const
+char *name, SymReg **r, int n, int emit)>
 
 TODO: Needs to be documented!!!
 
@@ -348,7 +352,8 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
 /*
 
-=item C<Instruction * INS>
+=item C<Instruction * INS(PARROT_INTERP, IMC_Unit *unit, const char *name, const
+char *fmt, SymReg **r, int n, int keyvec, int emit)>
 
 Makes an instruction.
 
@@ -570,7 +575,7 @@ extern void* yy_scan_string(const char *);
 
 /*
 
-=item C<int do_yylex_init>
+=item C<int do_yylex_init(PARROT_INTERP, yyscan_t* yyscanner)>
 
 TODO: Needs to be documented!!!
 
@@ -594,7 +599,8 @@ do_yylex_init(PARROT_INTERP, ARGOUT(yyscan_t* yyscanner))
 
 /*
 
-=item C<PMC * imcc_compile>
+=item C<PMC * imcc_compile(PARROT_INTERP, const char *s, int pasm_file, STRING
+**error_message)>
 
 Compile a pasm or imcc string
 
@@ -738,7 +744,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
 
 /*
 
-=item C<PMC * imcc_compile_pasm>
+=item C<PMC * imcc_compile_pasm(PARROT_INTERP, const char *s)>
 
 TODO: Needs to be documented!!!
 
@@ -761,7 +767,7 @@ imcc_compile_pasm(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<PMC * imcc_compile_pir>
+=item C<PMC * imcc_compile_pir(PARROT_INTERP, const char *s)>
 
 TODO: Needs to be documented!!!
 
@@ -784,7 +790,8 @@ imcc_compile_pir(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<PMC * IMCC_compile_pir_s>
+=item C<PMC * IMCC_compile_pir_s(PARROT_INTERP, const char *s, STRING
+**error_message)>
 
 TODO: Needs to be documented!!!
 
@@ -804,7 +811,8 @@ IMCC_compile_pir_s(PARROT_INTERP, ARGIN(const char *s),
 
 /*
 
-=item C<PMC * IMCC_compile_pasm_s>
+=item C<PMC * IMCC_compile_pasm_s(PARROT_INTERP, const char *s, STRING
+**error_message)>
 
 TODO: Needs to be documented!!!
 
@@ -824,7 +832,7 @@ IMCC_compile_pasm_s(PARROT_INTERP, ARGIN(const char *s),
 
 /*
 
-=item C<PMC * imcc_compile_pasm_ex>
+=item C<PMC * imcc_compile_pasm_ex(PARROT_INTERP, const char *s)>
 
 TODO: Needs to be documented!!!
 
@@ -851,7 +859,7 @@ imcc_compile_pasm_ex(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<PMC * imcc_compile_pir_ex>
+=item C<PMC * imcc_compile_pir_ex(PARROT_INTERP, const char *s)>
 
 TODO: Needs to be documented!!!
 
@@ -877,7 +885,8 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<static void * imcc_compile_file>
+=item C<static void * imcc_compile_file(PARROT_INTERP, const char *fullname,
+STRING **error_message)>
 
 Compile a file by filename (can be either PASM or IMCC code)
 
@@ -989,7 +998,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
 
 /*
 
-=item C<void * IMCC_compile_file>
+=item C<void * IMCC_compile_file(PARROT_INTERP, const char *s)>
 
 TODO: Needs to be documented!!!
 
@@ -1011,7 +1020,8 @@ IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<void * IMCC_compile_file_s>
+=item C<void * IMCC_compile_file_s(PARROT_INTERP, const char *s, STRING
+**error_message)>
 
 TODO: Needs to be documented!!!
 
@@ -1030,7 +1040,7 @@ IMCC_compile_file_s(PARROT_INTERP, ARGIN(const char *s),
 
 /*
 
-=item C<void register_compilers>
+=item C<void register_compilers(PARROT_INTERP)>
 
 Register additional compilers with the interpreter
 
@@ -1054,7 +1064,8 @@ register_compilers(PARROT_INTERP)
 
 /*
 
-=item C<static int change_op>
+=item C<static int change_op(PARROT_INTERP, IMC_Unit *unit, SymReg **r, int num,
+int emit)>
 
 TODO: Needs to be documented!!!
 
@@ -1105,7 +1116,8 @@ change_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(SymReg **r), int num, in
 
 /*
 
-=item C<int try_find_op>
+=item C<int try_find_op(PARROT_INTERP, IMC_Unit *unit, const char *name, SymReg
+**r, int n, int keyvec, int emit)>
 
 Try to find valid op doing the same operation e.g.
 
@@ -1198,7 +1210,7 @@ try_find_op(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
 
 /*
 
-=item C<static const char * try_rev_cmp>
+=item C<static const char * try_rev_cmp(const char *name, SymReg **r)>
 
 TODO: Needs to be documented!!!
 
@@ -1247,7 +1259,8 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 
 /*
 
-=item C<int imcc_vfprintf>
+=item C<int imcc_vfprintf(PARROT_INTERP, PMC *io, const char *format, va_list
+ap)>
 
 Formats a given series of arguments per a given format string and prints it to
 the given Parrot IO PMC.
@@ -1267,7 +1280,7 @@ imcc_vfprintf(PARROT_INTERP, ARGIN(PMC *io), ARGIN(const char *format), va_list 
 
 /*
 
-=item C<void imcc_init>
+=item C<void imcc_init(PARROT_INTERP)>
 
 TODO: Needs to be documented!!!
 
@@ -1289,7 +1302,7 @@ imcc_init(PARROT_INTERP)
 
 /*
 
-=item C<static void imcc_destroy_macro_values>
+=item C<static void imcc_destroy_macro_values(void *value)>
 
 A callback for parrot_chash_destroy_values() to free all macro-allocated memory.
 
@@ -1319,7 +1332,7 @@ imcc_destroy_macro_values(ARGMOD(void *value))
 
 /*
 
-=item C<void imcc_destroy>
+=item C<void imcc_destroy(PARROT_INTERP)>
 
 TODO: Needs to be documented!!!
 

@@ -33,7 +33,8 @@ representation.
 
 /*
 
-=item C<size_t Parrot_io_read_utf8(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_read_utf8(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Read a string from a filehandle in UTF-8 format and convert it to a Parrot
 string.

@@ -202,8 +202,8 @@ ascii_get_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets the graphemes for C<source_string>, starting at C<offset>. Replace
 C<replace_count> graphemes with those from STRING C<insert_string>.
@@ -224,8 +224,8 @@ set_graphemes(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<STRING * ascii_get_graphemes_inplace(PARROT_INTERP,
-STRING *source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
+=item C<STRING * ascii_get_graphemes_inplace(PARROT_INTERP, STRING
+*source_string, UINTVAL offset, UINTVAL count, STRING *dest_string)>
 
 Retrieves the graphemes in place for ascii STRING C<source_string>,
 starting at C<offset>. Retrieves C<count> graphemes and puts them
@@ -530,7 +530,8 @@ titlecase_first(SHIM_INTERP, ARGMOD(STRING *source_string))
 
 /*
 
-=item C<INTVAL ascii_compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)>
+=item C<INTVAL ascii_compare(PARROT_INTERP, const STRING *lhs, const STRING
+*rhs)>
 
 Compares two strings as ASCII strings. If STRING C<lhs> > C<rhs>, returns
 1. If C<lhs> == C<rhs> returns 0. If STRING C<lhs> < C<rhs>, returns  -1.
@@ -625,8 +626,8 @@ mixed_cs_index(PARROT_INTERP, ARGIN(STRING *src), ARGIN(STRING *search),
 
 /*
 
-=item C<INTVAL ascii_cs_index(PARROT_INTERP, STRING *source_string,
-STRING *search_string, UINTVAL offset)>
+=item C<INTVAL ascii_cs_index(PARROT_INTERP, STRING *source_string, STRING
+*search_string, UINTVAL offset)>
 
 Searches for the first instance of STRING C<search> in STRING C<src>.
 returns the position where the substring is found if it is indeed found.
@@ -655,8 +656,8 @@ ascii_cs_index(PARROT_INTERP, ARGIN(STRING *source_string),
 
 /*
 
-=item C<INTVAL ascii_cs_rindex(PARROT_INTERP, STRING *source_string,
-STRING *search_string, UINTVAL offset)>
+=item C<INTVAL ascii_cs_rindex(PARROT_INTERP, STRING *source_string, STRING
+*search_string, UINTVAL offset)>
 
 Searches for the last instance of STRING C<search_string> in STRING
 C<source_string>. Starts searching at C<offset>.
@@ -735,8 +736,8 @@ string_from_codepoint(PARROT_INTERP, UINTVAL codepoint)
 
 /*
 
-=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
-const STRING *source_string, UINTVAL offset)>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*source_string, UINTVAL offset)>
 
 =cut
 
@@ -762,8 +763,8 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *source_string), UINTV
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -790,8 +791,8 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -817,7 +818,8 @@ find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
 
 /*
 
-=item C<size_t ascii_compute_hash(PARROT_INTERP, const STRING *source_string, size_t seed)>
+=item C<size_t ascii_compute_hash(PARROT_INTERP, const STRING *source_string,
+size_t seed)>
 
 Computes the hash of STRING C<source_string> starting with seed value
 C<seed>.
@@ -894,7 +896,8 @@ Parrot_charset_ascii_init(PARROT_INTERP)
 
 /*
 
-=item C<STRING * charset_cvt_ascii_to_binary(PARROT_INTERP, STRING *src, STRING *dest)>
+=item C<STRING * charset_cvt_ascii_to_binary(PARROT_INTERP, STRING *src, STRING
+*dest)>
 
 Converts an ASCII STRING C<src> to a binary STRING C<dest>.
 

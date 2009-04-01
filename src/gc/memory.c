@@ -113,7 +113,8 @@ mem_sys_allocate_zeroed(size_t size)
 
 /*
 
-=item C<void * mem__internal_allocate_zeroed(size_t size, const char *file, int line)>
+=item C<void * mem__internal_allocate_zeroed(size_t size, const char *file, int
+line)>
 
 Uses C<calloc> to allocate system memory.  Guaranteed to succeed, Panics
 otherwise. If C<DETAIL_MEMORY_DEBUG> macro is defined, prints
@@ -216,8 +217,8 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
 
 /*
 
-=item C<void * mem__internal_realloc(void *from, size_t size,
-const char *file, int line)>
+=item C<void * mem__internal_realloc(void *from, size_t size, const char *file,
+int line)>
 
 Resizes a chunk of system memory.  Unlike C<realloc>, it can handle a
 NULL pointer, in which case a new memory block is allocated for the
@@ -254,8 +255,8 @@ mem__internal_realloc(ARGFREE(void *from), size_t size,
 
 /*
 
-=item C<void * mem__internal_realloc_zeroed(void *from, size_t size,
-size_t old_size, const char *file, int line)>
+=item C<void * mem__internal_realloc_zeroed(void *from, size_t size, size_t
+old_size, const char *file, int line)>
 
 Reallocates a given buffer of size C<old_size> to C<size>. If the new size
 is larger then the old size, the difference is filled with zeros. Contains

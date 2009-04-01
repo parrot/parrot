@@ -70,8 +70,8 @@ string_set_data_directory(PARROT_INTERP, ARGIN(const char *dir))
 
 /*
 
-=item C<Parrot_UInt4 string_unescape_one(PARROT_INTERP, UINTVAL *offset,
-STRING *string)>
+=item C<Parrot_UInt4 string_unescape_one(PARROT_INTERP, UINTVAL *offset, STRING
+*string)>
 
 Unescape a single character. We assume that we're at the start of a
 sequence, right after the \.

@@ -193,7 +193,7 @@ static int used_once(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int pre_optimize>
+=item C<int pre_optimize(PARROT_INTERP, IMC_Unit *unit)>
 
 Handles optimizations occuring before the construction of the CFG.
 
@@ -219,7 +219,7 @@ pre_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int cfg_optimize>
+=item C<int cfg_optimize(PARROT_INTERP, IMC_Unit *unit)>
 
 Handles optimizations occuring during the construction of the CFG.
 Returns TRUE if any optimization was performed. Otherwise, returns
@@ -255,7 +255,7 @@ cfg_optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<int optimize>
+=item C<int optimize(PARROT_INTERP, IMC_Unit *unit)>
 
 =cut
 
@@ -277,7 +277,7 @@ optimize(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<const char * get_neg_op>
+=item C<const char * get_neg_op(const char *op, int *n)>
 
 Get negated form of operator. If no negated form is known, return NULL.
 
@@ -317,7 +317,7 @@ get_neg_op(ARGIN(const char *op), ARGOUT(int *n))
  */
 /*
 
-=item C<static int if_branch>
+=item C<static int if_branch(PARROT_INTERP, IMC_Unit *unit)>
 
 Convert if/branch/label constructs of the form:
 
@@ -387,7 +387,7 @@ if_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int strength_reduce>
+=item C<static int strength_reduce(PARROT_INTERP, IMC_Unit *unit)>
 
 strength_reduce ... rewrites e.g add Ix, Ix, y => add Ix, y
 
@@ -633,7 +633,7 @@ strength_reduce(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int constant_propagation>
+=item C<static int constant_propagation(PARROT_INTERP, IMC_Unit *unit)>
 
 Does conservative constant propagation.
 This code will not propagate constants past labels or saves,
@@ -740,7 +740,8 @@ next_constant:;
 
 /*
 
-=item C<Instruction * IMCC_subst_constants_umix>
+=item C<Instruction * IMCC_subst_constants_umix(PARROT_INTERP, IMC_Unit *unit,
+const char *name, SymReg **r, int n)>
 
 rewrite e.g. add_n_ic => add_n_nc
 
@@ -781,7 +782,8 @@ IMCC_subst_constants_umix(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const cha
 
 /*
 
-=item C<static int eval_ins>
+=item C<static int eval_ins(PARROT_INTERP, const char *op, size_t ops, SymReg
+**r)>
 
 Run one parrot instruction, registers are filled with the
 according constants. If an exception occurs, return -1, aborting
@@ -860,7 +862,8 @@ eval_ins(PARROT_INTERP, ARGIN(const char *op), size_t ops, ARGIN(SymReg **r))
 
 /*
 
-=item C<Instruction * IMCC_subst_constants>
+=item C<Instruction * IMCC_subst_constants(PARROT_INTERP, IMC_Unit *unit, const
+char *name, SymReg **r, int n, int *ok)>
 
 rewrite e.g. add_n_nc_nc => set_n_nc
              abs_i_ic    => set_i_ic
@@ -1069,7 +1072,7 @@ IMCC_subst_constants(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *na
 
 /*
 
-=item C<static int branch_branch>
+=item C<static int branch_branch(PARROT_INTERP, IMC_Unit *unit)>
 
 if I0 goto L1  => if IO goto L2
 ...
@@ -1125,7 +1128,7 @@ branch_branch(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int branch_reorg>
+=item C<static int branch_reorg(PARROT_INTERP, IMC_Unit *unit)>
 
 branch L2  => ...
 L1:           branch L4
@@ -1218,7 +1221,8 @@ branch_reorg(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int branch_cond_loop_swap>
+=item C<static int branch_cond_loop_swap(PARROT_INTERP, IMC_Unit *unit,
+Instruction *branch, Instruction *start, Instruction *cond)>
 
 =cut
 
@@ -1296,7 +1300,7 @@ branch_cond_loop_swap(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction 
 
 /*
 
-=item C<static int branch_cond_loop>
+=item C<static int branch_cond_loop(PARROT_INTERP, IMC_Unit *unit)>
 
 start:           => start:
 if cond goto end    if cond goto end
@@ -1377,7 +1381,7 @@ branch_cond_loop(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int unused_label>
+=item C<static int unused_label(PARROT_INTERP, IMC_Unit *unit)>
 
 Removes unused labels.
 
@@ -1454,7 +1458,7 @@ unused_label(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static int dead_code_remove>
+=item C<static int dead_code_remove(PARROT_INTERP, IMC_Unit *unit)>
 
 =cut
 
@@ -1536,7 +1540,7 @@ dead_code_remove(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 /* optimizations with CFG & life info built */
 /*
 
-=item C<static int used_once>
+=item C<static int used_once(PARROT_INTERP, IMC_Unit *unit)>
 
 =cut
 

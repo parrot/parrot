@@ -33,7 +33,8 @@ NCI function setup, compiler registration, C<interpinfo>, and C<sysinfo> opcodes
 
 /*
 
-=item C<void register_nci_method>
+=item C<void register_nci_method(PARROT_INTERP, const int type, void *func,
+const char *name, const char *proto)>
 
 Create an entry in the C<nci_method_table> for the given NCI method of PMC
 class C<type>.
@@ -65,7 +66,8 @@ register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
 
 /*
 
-=item C<void register_raw_nci_method_in_ns>
+=item C<void register_raw_nci_method_in_ns(PARROT_INTERP, const int type, void
+*func, const char *name)>
 
 Create an entry in the C<nci_method_table> for the given raw NCI method
 of PMC class C<type>.
@@ -94,7 +96,8 @@ register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
 
 /*
 
-=item C<void Parrot_mark_method_writes>
+=item C<void Parrot_mark_method_writes(PARROT_INTERP, int type, const char
+*name)>
 
 Mark the method C<name> on PMC type C<type> as one that modifies the PMC.
 
@@ -117,7 +120,8 @@ Parrot_mark_method_writes(PARROT_INTERP, int type, ARGIN(const char *name))
 
 /*
 
-=item C<void Parrot_compreg>
+=item C<void Parrot_compreg(PARROT_INTERP, STRING *type, Parrot_compiler_func_t
+func)>
 
 Register a parser/compiler function.
 
@@ -152,7 +156,8 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
 
 /*
 
-=item C<void * Parrot_compile_file>
+=item C<void * Parrot_compile_file(PARROT_INTERP, const char *fullname, STRING
+**error)>
 
 Compile code file.
 
@@ -190,7 +195,7 @@ extern struct mallinfo mallinfo(void);
 
 /*
 
-=item C<INTVAL interpinfo>
+=item C<INTVAL interpinfo(PARROT_INTERP, INTVAL what)>
 
 C<what> specifies the type of information you want about the
 interpreter.
@@ -279,7 +284,7 @@ interpinfo(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<PMC* interpinfo_p>
+=item C<PMC* interpinfo_p(PARROT_INTERP, INTVAL what)>
 
 C<what> specifies the type of information you want about the
 interpreter.
@@ -318,7 +323,7 @@ interpinfo_p(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<STRING* interpinfo_s>
+=item C<STRING* interpinfo_s(PARROT_INTERP, INTVAL what)>
 
 Takes an interpreter name and an information type as arguments.
 Returns corresponding information strings about the interpreter:
@@ -386,7 +391,7 @@ interpinfo_s(PARROT_INTERP, INTVAL what)
 
 /*
 
-=item C<INTVAL sysinfo_i>
+=item C<INTVAL sysinfo_i(PARROT_INTERP, INTVAL info_wanted)>
 
 Returns the system info.
 
@@ -427,7 +432,7 @@ sysinfo_i(SHIM_INTERP, INTVAL info_wanted)
 
 /*
 
-=item C<STRING * sysinfo_s>
+=item C<STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)>
 
 Returns the system info string.
 

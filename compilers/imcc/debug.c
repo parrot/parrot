@@ -79,7 +79,8 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fatal_standalone(PARROT_INTERP, int code, const char *fmt, ...)>
+=item C<void IMCC_fatal_standalone(PARROT_INTERP, int code, const char *fmt,
+...)>
 
 Prints an error message from IMCC and exits Parrot. This is not a
 recoverable exception but a forced exit.
@@ -104,7 +105,8 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fataly_standalone(PARROT_INTERP, int code, const char *fmt, ...)>
+=item C<void IMCC_fataly_standalone(PARROT_INTERP, int code, const char *fmt,
+...)>
 
 Prints an error message and exits Parrot. This is not a recoverable
 error.
@@ -575,7 +577,6 @@ dump_dominators(ARGIN(const IMC_Unit *unit))
 /*
 
 =item C<void dump_dominance_frontiers(const IMC_Unit *unit)>
-
 
 Dumps the list of dominance frontiers for the current IMC_Unit C<unit>.
 

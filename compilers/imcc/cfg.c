@@ -206,8 +206,8 @@ static void sort_loops(PARROT_INTERP, ARGIN(IMC_Unit *unit))
 
 /*
 
-=item C<static int check_invoke_type(PARROT_INTERP, const IMC_Unit *unit,
-const Instruction *ins)>
+=item C<static int check_invoke_type(PARROT_INTERP, const IMC_Unit *unit, const
+Instruction *ins)>
 
 Given an invoke-type instruction, returns the type of the invocation.
 
@@ -359,8 +359,8 @@ find_basic_blocks(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int first)
 
 /*
 
-=item C<static void bb_check_set_addr(PARROT_INTERP, IMC_Unit *unit,
-Basic_block *bb, const SymReg *label)>
+=item C<static void bb_check_set_addr(PARROT_INTERP, IMC_Unit *unit, Basic_block
+*bb, const SymReg *label)>
 
 Looks for a C<set_addr> op in the current unit referring to the given label.
 
@@ -538,8 +538,8 @@ invok:
 
 /*
 
-=item C<static void bb_findadd_edge(PARROT_INTERP, IMC_Unit *unit,
-Basic_block *from, const SymReg *label)>
+=item C<static void bb_findadd_edge(PARROT_INTERP, IMC_Unit *unit, Basic_block
+*from, const SymReg *label)>
 
 Finds the placement of the given label and links its containing block to the
 given basic block.
@@ -580,7 +580,8 @@ bb_findadd_edge(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(Basic_block *from),
 
 /*
 
-=item C<int blocks_are_connected(const Basic_block *from, const Basic_block *to)>
+=item C<int blocks_are_connected(const Basic_block *from, const Basic_block
+*to)>
 
 Returns true or false whether the given blocks are linked.
 
@@ -610,7 +611,8 @@ blocks_are_connected(ARGIN(const Basic_block *from),
 
 /*
 
-=item C<static void bb_add_edge(IMC_Unit *unit, Basic_block *from, Basic_block *to)>
+=item C<static void bb_add_edge(IMC_Unit *unit, Basic_block *from, Basic_block
+*to)>
 
 Adds an edge between the two given blocks.
 
@@ -1647,8 +1649,7 @@ clear_basic_blocks(ARGMOD(IMC_Unit *unit))
 
 /*
 
-=item C<static Basic_block* make_basic_block(IMC_Unit *unit,
-Instruction *ins)>
+=item C<static Basic_block* make_basic_block(IMC_Unit *unit, Instruction *ins)>
 
 Creates, initializes, and returns a new Basic_block.
 

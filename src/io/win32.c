@@ -190,8 +190,8 @@ Parrot_io_getblksize_win32(SHIM(PIOHANDLE fd))
 
 /*
 
-=item C<PMC * Parrot_io_open_win32(PARROT_INTERP, PMC *filehandle,
-STRING *path, INTVAL flags)>
+=item C<PMC * Parrot_io_open_win32(PARROT_INTERP, PMC *filehandle, STRING *path,
+INTVAL flags)>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
@@ -255,8 +255,8 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<PMC * Parrot_io_fdopen_win32(PARROT_INTERP, PMC *filehandle,
-PIOHANDLE fd, INTVAL flags)>
+=item C<PMC * Parrot_io_fdopen_win32(PARROT_INTERP, PMC *filehandle, PIOHANDLE
+fd, INTVAL flags)>
 
 Returns a new C<PMC> with C<fd> as its file descriptor.
 
@@ -384,7 +384,8 @@ Parrot_io_flush_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_read_win32(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -472,8 +473,8 @@ Parrot_io_write_win32(PARROT_INTERP,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_win32(PARROT_INTERP, PMC *filehandle,
-PIOOFF_T off, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek_win32(PARROT_INTERP, PMC *filehandle, PIOOFF_T
+off, INTVAL whence)>
 
 Hard seek.
 
@@ -531,7 +532,8 @@ Parrot_io_tell_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_peek_win32(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_peek_win32(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Retrieve the next character in the stream without modifying the stream. Not
 implemented for this platform.
@@ -552,8 +554,8 @@ Parrot_io_peek_win32(PARROT_INTERP,
 
 /*
 
-=item C<PMC * Parrot_io_open_pipe_win32(PARROT_INTERP, PMC *filehandle,
-STRING *command, int flags)>
+=item C<PMC * Parrot_io_open_pipe_win32(PARROT_INTERP, PMC *filehandle, STRING
+*command, int flags)>
 
 Open a pipe. Not implemented for this platform.
 

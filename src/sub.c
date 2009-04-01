@@ -487,7 +487,8 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
 
 /*
 
-=item C<STRING* Parrot_Context_infostr(PARROT_INTERP, const Parrot_Context *ctx)>
+=item C<STRING* Parrot_Context_infostr(PARROT_INTERP, const Parrot_Context
+*ctx)>
 
 Formats context information for display.  Takes a context pointer and
 returns a pointer to the text.  Used in debug.c and warnings.c
@@ -524,7 +525,8 @@ Parrot_Context_infostr(PARROT_INTERP, ARGIN(const Parrot_Context *ctx))
 
 /*
 
-=item C<PMC* Parrot_find_pad(PARROT_INTERP, STRING *lex_name, const Parrot_Context *ctx)>
+=item C<PMC* Parrot_find_pad(PARROT_INTERP, STRING *lex_name, const
+Parrot_Context *ctx)>
 
 Locate the LexPad containing the given name. Return NULL on failure.
 
@@ -667,8 +669,8 @@ parrot_new_closure(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 /*
 
-=item C<void Parrot_continuation_check(PARROT_INTERP, const PMC *pmc,
-const Parrot_cont *cc)>
+=item C<void Parrot_continuation_check(PARROT_INTERP, const PMC *pmc, const
+Parrot_cont *cc)>
 
 Verifies that the provided continuation is sane.
 
@@ -732,7 +734,8 @@ Parrot_continuation_rewind_environment(PARROT_INTERP, SHIM(PMC *pmc),
 
 /*
 
-=item C<Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC *subclass)>
+=item C<Parrot_sub * Parrot_get_sub_pmc_from_subclass(PARROT_INTERP, PMC
+*subclass)>
 
 Gets a Parrot_sub structure from something that isn't a Sub PMC, but rather a
 subclass.

@@ -706,8 +706,8 @@ pbc_merge_pic_index(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
 /*
 
-=item C<static void pbc_merge_ctpointers(PARROT_INTERP,
-pbc_merge_input **inputs, int num_inputs, PackFile_ByteCode *bc)>
+=item C<static void pbc_merge_ctpointers(PARROT_INTERP, pbc_merge_input
+**inputs, int num_inputs, PackFile_ByteCode *bc)>
 
 This function corrects the pointers into the constants table found in the
 bytecode.
@@ -791,8 +791,8 @@ pbc_merge_ctpointers(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
 /*
 
-=item C<static PackFile* pbc_merge_begin(PARROT_INTERP,
-pbc_merge_input **inputs, int num_inputs)>
+=item C<static PackFile* pbc_merge_begin(PARROT_INTERP, pbc_merge_input
+**inputs, int num_inputs)>
 
 This is the function that drives PBC merging process.
 
@@ -834,8 +834,8 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
 
 /*
 
-=item C<static void pbc_merge_write(PARROT_INTERP, PackFile *pf,
-const char *filename)>
+=item C<static void pbc_merge_write(PARROT_INTERP, PackFile *pf, const char
+*filename)>
 
 This functions writes out the merged packfile.
 

@@ -340,8 +340,8 @@ Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)
 
 /*
 
-=item C<void Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
-INTVAL core_type, INTVAL hll_type)>
+=item C<void Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
+core_type, INTVAL hll_type)>
 
 Register a type mapping of C<< core_type => hll_type >> for the given HLL.
 
@@ -385,7 +385,8 @@ Parrot_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
 
 /*
 
-=item C<INTVAL Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)>
+=item C<INTVAL Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL
+core_type)>
 
 Get an equivalent HLL type number for the language C<hll_id>.  If the given HLL
 doesn't remap the given type, or if C<hll_id> is the special value

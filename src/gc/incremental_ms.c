@@ -504,8 +504,8 @@ typedef struct Gc_ims_private {
 
 /*
 
-=item C<static void gc_ims_add_free_object(PARROT_INTERP,
-Small_Object_Pool *pool, void *to_add)>
+=item C<static void gc_ims_add_free_object(PARROT_INTERP, Small_Object_Pool
+*pool, void *to_add)>
 
 Add object C<to_add> to the free_list in the given pool.
 C<pool->num_free_objects> has to be updated by the caller.
@@ -532,7 +532,8 @@ gc_ims_add_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), ARGOUT(vo
 
 /*
 
-=item C<static void * gc_ims_get_free_object(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void * gc_ims_get_free_object(PARROT_INTERP, Small_Object_Pool
+*pool)>
 
 Get a new object off the free_list in the given pool.
 
@@ -575,7 +576,8 @@ gc_ims_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void gc_ims_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void gc_ims_alloc_objects(PARROT_INTERP, Small_Object_Pool
+*pool)>
 
 Allocate new objects for the given pool.
 
@@ -754,7 +756,8 @@ parrot_gc_ims_mark(PARROT_INTERP)
 
 /*
 
-=item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag, void *arg)>
+=item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
+void *arg)>
 
 Callback to sweep a header pool (see Parrot_forall_header_pools).
 

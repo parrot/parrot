@@ -244,7 +244,8 @@ static opcode_t fetch_op_mixed_le(ARGIN(const unsigned char *b))
 
 /*
 
-=item C<static void cvt_num12_num8>
+=item C<static void cvt_num12_num8(unsigned char *dest, const unsigned char
+*src)>
 
 Converts i386 LE 12-byte long double to IEEE 754 8-byte double.
 
@@ -331,7 +332,8 @@ nul:
 
 /*
 
-=item C<static void cvt_num16_num12>
+=item C<static void cvt_num16_num12(unsigned char *dest, const unsigned char
+*src)>
 
 Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double .
 See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
@@ -390,7 +392,8 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num12_num16>
+=item C<static void cvt_num12_num16(unsigned char *dest, const unsigned char
+*src)>
 
 Converts i386 LE 12-byte long double to IEEE 754 LE 16-byte long double.
 
@@ -452,7 +455,8 @@ cvt_num12_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 #endif
 /*
 
-=item C<static void cvt_num16_num8>
+=item C<static void cvt_num16_num8(unsigned char *dest, const unsigned char
+*src)>
 
 Converts IEEE 754 16-byte long double to IEEE 754 8 byte double.
 
@@ -558,7 +562,8 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num8_num16>
+=item C<static void cvt_num8_num16(unsigned char *dest, const unsigned char
+*src)>
 
 Converts IEEE 754 8-byte double to IEEE 754 16 byte long double.
 
@@ -585,7 +590,8 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num8_num12>
+=item C<static void cvt_num8_num12(unsigned char *dest, const unsigned char
+*src)>
 
 Converts i386 8-byte double to i386 12 byte long double.
 
@@ -612,7 +618,8 @@ cvt_num8_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num8_num12_be>
+=item C<static void cvt_num8_num12_be(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a big-endian IEEE 754 8-byte double to i386 LE 12-byte long double.
 
@@ -636,7 +643,8 @@ cvt_num8_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num8_num16_le>
+=item C<static void cvt_num8_num16_le(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a little-endian IEEE 754 8-byte double to big-endian 16-byte long double.
 
@@ -660,7 +668,8 @@ cvt_num8_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num12_num16_le>
+=item C<static void cvt_num12_num16_le(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a little-endian 12-byte double to big-endian 16-byte long double.
 
@@ -684,7 +693,8 @@ cvt_num12_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num12_num8_le>
+=item C<static void cvt_num12_num8_le(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a little-endian 12-byte i386 long double into a big-endian IEEE 754 8-byte double.
 
@@ -709,7 +719,8 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num16_num8_le>
+=item C<static void cvt_num16_num8_le(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a little-endian IEEE 754 intel 16-byte long double into a
 big-endian IEEE 754 8-byte double.
@@ -735,7 +746,8 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num16_num8_be>
+=item C<static void cvt_num16_num8_be(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a big-endian IEEE 754 16-byte long double into a IEEE 754 8-byte double.
 
@@ -759,7 +771,8 @@ cvt_num16_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num16_num12_be>
+=item C<static void cvt_num16_num12_be(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a big-endian IEEE 754 16-byte long double into a 12-byte i386 long double.
 
@@ -783,7 +796,8 @@ cvt_num16_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static void cvt_num8_num16_be>
+=item C<static void cvt_num8_num16_be(unsigned char *dest, const unsigned char
+*src)>
 
 Converts a big-endian IEEE 754 8-byte double to little-endian IEEE 754 16 byte
 long double.
@@ -809,7 +823,7 @@ cvt_num8_num16_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 /*
 
-=item C<static opcode_t fetch_op_mixed_le>
+=item C<static opcode_t fetch_op_mixed_le(const unsigned char *b)>
 
 opcode fetch helper function
 
@@ -849,7 +863,7 @@ fetch_op_mixed_le(ARGIN(const unsigned char *b))
 
 /*
 
-=item C<static opcode_t fetch_op_mixed_be>
+=item C<static opcode_t fetch_op_mixed_be(const unsigned char *b)>
 
 Fetch an opcode and convert to BE. Determines size of opcode from
 C<OPCODE_T_SIZE> macro, and proceeds accordingly.
@@ -887,7 +901,7 @@ fetch_op_mixed_be(ARGIN(const unsigned char *b))
 
 /*
 
-=item C<static opcode_t fetch_op_be_4>
+=item C<static opcode_t fetch_op_be_4(const unsigned char *b)>
 
 Fetches a 4-byte big-endian opcode.
 
@@ -922,7 +936,7 @@ fetch_op_be_4(ARGIN(const unsigned char *b))
 
 /*
 
-=item C<static opcode_t fetch_op_be_8>
+=item C<static opcode_t fetch_op_be_8(const unsigned char *b)>
 
 Fetches an 8-byte big-endian opcode.
 
@@ -953,7 +967,7 @@ fetch_op_be_8(ARGIN(const unsigned char *b))
 
 /*
 
-=item C<static opcode_t fetch_op_le_4>
+=item C<static opcode_t fetch_op_le_4(const unsigned char *b)>
 
 Fetches a 4-byte little-endian opcode
 
@@ -989,7 +1003,7 @@ fetch_op_le_4(ARGIN(const unsigned char *b))
 
 /*
 
-=item C<static opcode_t fetch_op_le_8>
+=item C<static opcode_t fetch_op_le_8(const unsigned char *b)>
 
 Fetches an 8-byte little-endian opcode
 
@@ -1020,7 +1034,7 @@ fetch_op_le_8(ARGIN(const unsigned char *b))
 
 /*
 
-=item C<opcode_t PF_fetch_opcode>
+=item C<opcode_t PF_fetch_opcode(const PackFile *pf, const opcode_t **stream)>
 
 Fetches an C<opcode_t> from the stream, converting byteorder if needed.
 
@@ -1048,7 +1062,7 @@ PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream
 
 /*
 
-=item C<opcode_t* PF_store_opcode>
+=item C<opcode_t* PF_store_opcode(opcode_t *cursor, opcode_t val)>
 
 Stores an C<opcode_t> to stream as-is.
 
@@ -1068,7 +1082,7 @@ PF_store_opcode(ARGOUT(opcode_t *cursor), opcode_t val)
 
 /*
 
-=item C<size_t PF_size_opcode>
+=item C<size_t PF_size_opcode(void)>
 
 Returns the size of an item in C<opcode_t> units. The size of C<opcode_t>
 is 1 I<per definition>.
@@ -1087,7 +1101,7 @@ PF_size_opcode(void)
 
 /*
 
-=item C<INTVAL PF_fetch_integer>
+=item C<INTVAL PF_fetch_integer(PackFile *pf, const opcode_t **stream)>
 
 Fetches an C<INTVAL> from the stream, converting byteorder if needed.
 
@@ -1126,7 +1140,7 @@ PF_fetch_integer(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 
 /*
 
-=item C<opcode_t* PF_store_integer>
+=item C<opcode_t* PF_store_integer(opcode_t *cursor, INTVAL val)>
 
 Stores an C<INTVAL> to stream as is.
 
@@ -1146,7 +1160,7 @@ PF_store_integer(ARGOUT(opcode_t *cursor), INTVAL val)
 
 /*
 
-=item C<size_t PF_size_integer>
+=item C<size_t PF_size_integer(void)>
 
 Returns stored size of C<INTVAL> in C<opcode_t> units.
 
@@ -1164,7 +1178,7 @@ PF_size_integer(void)
 
 /*
 
-=item C<FLOATVAL PF_fetch_number>
+=item C<FLOATVAL PF_fetch_number(PackFile *pf, const opcode_t **stream)>
 
 Fetches a C<FLOATVAL> from the stream, converting byteorder if needed.
 Then advances the stream pointer by the packfile float size.
@@ -1226,7 +1240,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 
 /*
 
-=item C<opcode_t* PF_store_number>
+=item C<opcode_t* PF_store_number(opcode_t *cursor, const FLOATVAL *val)>
 
 Writes a C<FLOATVAL> to the opcode stream as-is.
 
@@ -1249,7 +1263,7 @@ PF_store_number(ARGOUT(opcode_t *cursor), ARGIN(const FLOATVAL *val))
 
 /*
 
-=item C<size_t PF_size_number>
+=item C<size_t PF_size_number(void)>
 
 Returns stored size of FLOATVAL in C<opcode_t> units.
 
@@ -1267,7 +1281,8 @@ PF_size_number(void)
 
 /*
 
-=item C<STRING * PF_fetch_string>
+=item C<STRING * PF_fetch_string(PARROT_INTERP, PackFile *pf, const opcode_t
+**cursor)>
 
 Fetches a C<STRING> from bytecode and return a new C<STRING>.
 
@@ -1329,7 +1344,7 @@ PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t 
 
 /*
 
-=item C<opcode_t* PF_store_string>
+=item C<opcode_t* PF_store_string(opcode_t *cursor, const STRING *s)>
 
 Writes a C<STRING> to the opcode stream.
 
@@ -1386,7 +1401,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
 
 /*
 
-=item C<size_t PF_size_string>
+=item C<size_t PF_size_string(const STRING *s)>
 
 Reports stored size of C<STRING> in C<opcode_t> units.
 
@@ -1411,7 +1426,7 @@ PF_size_string(ARGIN(const STRING *s))
 
 /*
 
-=item C<char * PF_fetch_cstring>
+=item C<char * PF_fetch_cstring(PackFile *pf, const opcode_t **cursor)>
 
 Fetches a cstring from bytecode and returns an allocated copy
 
@@ -1444,7 +1459,7 @@ PF_fetch_cstring(ARGIN(PackFile *pf), ARGIN(const opcode_t **cursor))
 
 /*
 
-=item C<opcode_t* PF_store_cstring>
+=item C<opcode_t* PF_store_cstring(opcode_t *cursor, const char *s)>
 
 Writes a C<NULL>-terminated string to the stream.
 
@@ -1464,7 +1479,7 @@ PF_store_cstring(ARGOUT(opcode_t *cursor), ARGIN(const char *s))
 
 /*
 
-=item C<size_t PF_size_cstring>
+=item C<size_t PF_size_cstring(const char *s)>
 
 Returns store size of a C-string in C<opcode_t> units.
 
@@ -1486,7 +1501,7 @@ PF_size_cstring(ARGIN(const char *s))
 
 /*
 
-=item C<void PackFile_assign_transforms>
+=item C<void PackFile_assign_transforms(PackFile *pf)>
 
 Assigns transform functions to the vtable.
 

@@ -71,7 +71,8 @@ Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 
 /*
 
-=item C<STRING * Parrot_vsprintf_c(PARROT_INTERP, const char *pat, va_list args)>
+=item C<STRING * Parrot_vsprintf_c(PARROT_INTERP, const char *pat, va_list
+args)>
 
 C string version of C<Parrot_vsprintf_s()>.
 
@@ -95,8 +96,8 @@ Parrot_vsprintf_c(PARROT_INTERP, ARGIN(const char *pat), va_list args)
 
 /*
 
-=item C<void Parrot_vsnprintf(PARROT_INTERP, char *targ,
-size_t len, const char *pat, va_list args)>
+=item C<void Parrot_vsnprintf(PARROT_INTERP, char *targ, size_t len, const char
+*pat, va_list args)>
 
 Similar to C<Parrot_vsprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
@@ -188,8 +189,8 @@ Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
 
 /*
 
-=item C<void Parrot_snprintf(PARROT_INTERP, char *targ, size_t len,
-const char *pat, ...)>
+=item C<void Parrot_snprintf(PARROT_INTERP, char *targ, size_t len, const char
+*pat, ...)>
 
 Similar to C<Parrot_sprintf()> but with an option to specify the length
 (C<len>) of the returned C string.
@@ -239,8 +240,8 @@ Parrot_psprintf(PARROT_INTERP, ARGIN(STRING *pat), ARGOUT(PMC *ary))
 
 /*
 
-=item C<int Parrot_secret_snprintf(char *buffer, const size_t len,
-const char *format, ...)>
+=item C<int Parrot_secret_snprintf(char *buffer, const size_t len, const char
+*format, ...)>
 
 A simulation of C<snprintf> for systems that do not support it.
 

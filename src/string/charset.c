@@ -140,7 +140,8 @@ Parrot_charsets_encodings_deinit(SHIM_INTERP)
 
 /*
 
-=item C<const CHARSET * Parrot_find_charset(PARROT_INTERP, const char *charsetname)>
+=item C<const CHARSET * Parrot_find_charset(PARROT_INTERP, const char
+*charsetname)>
 
 Searches through the list of charsets for the charset given by C<charsetname>.
 Returns the charset if it is found, NULL otherwise.
@@ -267,7 +268,8 @@ Parrot_charset_name(SHIM_INTERP, INTVAL number_of_charset)
 
 /*
 
-=item C<const CHARSET * Parrot_get_charset(PARROT_INTERP, INTVAL number_of_charset)>
+=item C<const CHARSET * Parrot_get_charset(PARROT_INTERP, INTVAL
+number_of_charset)>
 
 Returns the charset given by the INTVAL index C<number_of_charset>.
 
@@ -289,7 +291,8 @@ Parrot_get_charset(SHIM_INTERP, INTVAL number_of_charset)
 
 /*
 
-=item C<const char * Parrot_charset_c_name(PARROT_INTERP, INTVAL number_of_charset)>
+=item C<const char * Parrot_charset_c_name(PARROT_INTERP, INTVAL
+number_of_charset)>
 
 Returns a NULL-terminated C string with the name of the charset given by
 INTVAL index C<number_of_charset>.
@@ -505,8 +508,8 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
 
 /*
 
-=item C<INTVAL Parrot_make_default_charset(PARROT_INTERP,
-const char *charsetname, CHARSET *charset)>
+=item C<INTVAL Parrot_make_default_charset(PARROT_INTERP, const char
+*charsetname, CHARSET *charset)>
 
 Sets the current default charset to C<charset> with name C<charsetname>.
 
@@ -546,8 +549,8 @@ Parrot_default_charset(SHIM_INTERP)
 
 /*
 
-=item C<charset_converter_t Parrot_find_charset_converter(PARROT_INTERP,
-const CHARSET *lhs, const CHARSET *rhs)>
+=item C<charset_converter_t Parrot_find_charset_converter(PARROT_INTERP, const
+CHARSET *lhs, const CHARSET *rhs)>
 
 Finds a converter from charset C<lhs> to charset C<rhs>.
 
@@ -583,8 +586,8 @@ Parrot_find_charset_converter(SHIM_INTERP,
 
 /*
 
-=item C<void Parrot_register_charset_converter(PARROT_INTERP,
-const CHARSET *lhs, CHARSET *rhs, charset_converter_t func)>
+=item C<void Parrot_register_charset_converter(PARROT_INTERP, const CHARSET
+*lhs, CHARSET *rhs, charset_converter_t func)>
 
 Registers a converter C<func> from charset C<lhs> to C<rhs>.
 

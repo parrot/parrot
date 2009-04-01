@@ -263,7 +263,8 @@ new_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<void Parrot_gc_free_pmc(PARROT_INTERP, Small_Object_Pool *pool, PObj *p)>
+=item C<void Parrot_gc_free_pmc(PARROT_INTERP, Small_Object_Pool *pool, PObj
+*p)>
 
 Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
 method if one is available. If the PMC uses a PMC_EXT structure, that is freed
@@ -335,7 +336,8 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
 
 /*
 
-=item C<void Parrot_gc_free_sysmem(PARROT_INTERP, Small_Object_Pool *pool, PObj *b)>
+=item C<void Parrot_gc_free_sysmem(PARROT_INTERP, Small_Object_Pool *pool, PObj
+*b)>
 
 If the PMC uses memory allocated directly from the system, this function
 frees that memory.
@@ -359,7 +361,8 @@ Parrot_gc_free_sysmem(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<void Parrot_gc_free_buffer_malloc(PARROT_INTERP, Small_Object_Pool *pool, PObj *b)>
+=item C<void Parrot_gc_free_buffer_malloc(PARROT_INTERP, Small_Object_Pool
+*pool, PObj *b)>
 
 Frees the given buffer, returning the storage space to the operating system
 and removing it from Parrot's memory management system. If the buffer is COW,
@@ -394,7 +397,8 @@ Parrot_gc_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<void Parrot_gc_free_buffer(PARROT_INTERP, Small_Object_Pool *pool, PObj *b)>
+=item C<void Parrot_gc_free_buffer(PARROT_INTERP, Small_Object_Pool *pool, PObj
+*b)>
 
 Frees a buffer, returning it to the memory pool for Parrot to possibly
 reuse later.

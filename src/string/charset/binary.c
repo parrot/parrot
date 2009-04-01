@@ -154,8 +154,8 @@ static UINTVAL validate(SHIM_INTERP, SHIM(STRING *source_string));
 
 /*
 
-=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string,
-UINTVAL offset, UINTVAL replace_count, STRING *insert_string)>
+=item C<static void set_graphemes(PARROT_INTERP, STRING *source_string, UINTVAL
+offset, UINTVAL replace_count, STRING *insert_string)>
 
 Sets the graphemes for STRING C<source_string>, starting at offset
 C<offset>. Replaces C<replace_count> graphemes from STRING
@@ -348,7 +348,8 @@ titlecase_first(PARROT_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING *rhs)>
+=item C<static INTVAL compare(PARROT_INTERP, const STRING *lhs, const STRING
+*rhs)>
 
 Compare the two buffers, first by size, then with memcmp.
 
@@ -370,8 +371,8 @@ compare(SHIM_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 
 /*
 
-=item C<static INTVAL cs_index(PARROT_INTERP, STRING *source_string,
-STRING *search_string, UINTVAL offset)>
+=item C<static INTVAL cs_index(PARROT_INTERP, STRING *source_string, STRING
+*search_string, UINTVAL offset)>
 
 Returns -1. It makes no sense to try and search for a substring in
 raw binary data.
@@ -390,8 +391,8 @@ cs_index(SHIM_INTERP, SHIM(STRING *source_string),
 
 /*
 
-=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *source_string,
-STRING *search_string, UINTVAL offset)>
+=item C<static INTVAL cs_rindex(PARROT_INTERP, STRING *source_string, STRING
+*search_string, UINTVAL offset)>
 
 Returns -1. It makes no sense to search for the last substring match
 in raw binary data.
@@ -428,8 +429,8 @@ validate(SHIM_INTERP, SHIM(STRING *source_string))
 
 /*
 
-=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags,
-const STRING *source_string, UINTVAL offset)>
+=item C<static INTVAL is_cclass(PARROT_INTERP, INTVAL flags, const STRING
+*source_string, UINTVAL offset)>
 
 =cut
 
@@ -445,8 +446,8 @@ is_cclass(SHIM_INTERP, SHIM(INTVAL flags), SHIM(const STRING *source_string),
 
 /*
 
-=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 
@@ -462,8 +463,8 @@ find_cclass(SHIM_INTERP, SHIM(INTVAL flags),
 
 /*
 
-=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags,
-STRING *source_string, UINTVAL offset, UINTVAL count)>
+=item C<static INTVAL find_not_cclass(PARROT_INTERP, INTVAL flags, STRING
+*source_string, UINTVAL offset, UINTVAL count)>
 
 =cut
 

@@ -134,8 +134,8 @@ Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
 
 /*
 
-=item C<void Parrot_io_set_os_handle(PARROT_INTERP, PMC *filehandle,
-PIOHANDLE file_descriptor)>
+=item C<void Parrot_io_set_os_handle(PARROT_INTERP, PMC *filehandle, PIOHANDLE
+file_descriptor)>
 
 Sets the C<os_handle> attribute of the FileHandle object, which stores the
 low-level filehandle for the OS.
@@ -237,7 +237,8 @@ Parrot_io_get_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_file_size(PARROT_INTERP, PMC *filehandle, PIOOFF_T file_size)>
+=item C<void Parrot_io_set_file_size(PARROT_INTERP, PMC *filehandle, PIOOFF_T
+file_size)>
 
 Set the C<file_size> attribute of the FileHandle object, which stores the
 current file size.
@@ -287,8 +288,8 @@ Parrot_io_get_file_size(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_buffer_start(PARROT_INTERP, PMC *filehandle,
-unsigned char *new_start)>
+=item C<void Parrot_io_set_buffer_start(PARROT_INTERP, PMC *filehandle, unsigned
+char *new_start)>
 
 Set the C<buffer_start> attribute of the FileHandle object, which stores
 the position of the start of the buffer.
@@ -312,7 +313,8 @@ Parrot_io_set_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle),
 
 /*
 
-=item C<unsigned char * Parrot_io_get_buffer_start(PARROT_INTERP, PMC *filehandle)>
+=item C<unsigned char * Parrot_io_get_buffer_start(PARROT_INTERP, PMC
+*filehandle)>
 
 Get the C<buffer_start> attribute of the FileHandle object, which stores
 the position of the start of the buffer.
@@ -337,7 +339,8 @@ Parrot_io_get_buffer_start(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<unsigned char * Parrot_io_get_buffer_next(PARROT_INTERP, PMC *filehandle)>
+=item C<unsigned char * Parrot_io_get_buffer_next(PARROT_INTERP, PMC
+*filehandle)>
 
 Get the C<buffer_next> attribute of the FileHandle object, which stores
 the current position within the buffer.
@@ -362,8 +365,8 @@ Parrot_io_get_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_buffer_next(PARROT_INTERP, PMC *filehandle,
-unsigned char *new_next)>
+=item C<void Parrot_io_set_buffer_next(PARROT_INTERP, PMC *filehandle, unsigned
+char *new_next)>
 
 Set the C<buffer_next> attribute of the FileHandle object, which stores
 the current position within the buffer.
@@ -387,7 +390,8 @@ Parrot_io_set_buffer_next(SHIM_INTERP, ARGIN(PMC *filehandle),
 
 /*
 
-=item C<unsigned char * Parrot_io_get_buffer_end(PARROT_INTERP, PMC *filehandle)>
+=item C<unsigned char * Parrot_io_get_buffer_end(PARROT_INTERP, PMC
+*filehandle)>
 
 Get the C<buffer_end> attribute of the FileHandle object, which stores
 the position of the end of the buffer.
@@ -412,8 +416,8 @@ Parrot_io_get_buffer_end(SHIM_INTERP, ARGIN_NULLOK(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_buffer_end(PARROT_INTERP, PMC *filehandle,
-unsigned char *new_end)>
+=item C<void Parrot_io_set_buffer_end(PARROT_INTERP, PMC *filehandle, unsigned
+char *new_end)>
 
 Set the C<buffer_end> attribute of the FileHandle object, which stores
 the position of the end of the buffer.
@@ -461,7 +465,8 @@ Parrot_io_get_buffer_flags(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_buffer_flags(PARROT_INTERP, PMC *filehandle, INTVAL new_flags)>
+=item C<void Parrot_io_set_buffer_flags(PARROT_INTERP, PMC *filehandle, INTVAL
+new_flags)>
 
 Set the C<buffer_flags> attribute of the FileHandle object, which stores
 a collection of flags specific to the buffer.
@@ -508,7 +513,8 @@ Parrot_io_get_buffer_size(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_buffer_size(PARROT_INTERP, PMC *filehandle, size_t new_size)>
+=item C<void Parrot_io_set_buffer_size(PARROT_INTERP, PMC *filehandle, size_t
+new_size)>
 
 Set the C<buffer_size> attribute of the FileHandle object, which stores
 the size of the buffer (in bytes).
@@ -582,7 +588,8 @@ Parrot_io_get_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_get_last_file_position(PARROT_INTERP, PMC *filehandle)>
+=item C<PIOOFF_T Parrot_io_get_last_file_position(PARROT_INTERP, PMC
+*filehandle)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores
 the current file position of the filehandle.
@@ -606,7 +613,8 @@ Parrot_io_get_last_file_position(SHIM_INTERP, ARGIN(PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_file_position(PARROT_INTERP, PMC *filehandle, PIOOFF_T file_pos)>
+=item C<void Parrot_io_set_file_position(PARROT_INTERP, PMC *filehandle,
+PIOOFF_T file_pos)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores the
 current file position of the filehandle. Also set the C<last_pos> attribute to
@@ -633,7 +641,8 @@ Parrot_io_set_file_position(SHIM_INTERP, ARGIN(PMC *filehandle), PIOOFF_T file_p
 
 /*
 
-=item C<INTVAL Parrot_io_is_encoding(PARROT_INTERP, PMC *filehandle, STRING *value)>
+=item C<INTVAL Parrot_io_is_encoding(PARROT_INTERP, PMC *filehandle, STRING
+*value)>
 
 Check whether the encoding attribute of the filehandle matches a passed in
 string.

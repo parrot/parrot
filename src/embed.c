@@ -377,8 +377,8 @@ Parrot_setwarnings(PARROT_INTERP, Parrot_warnclass wc)
 
 /*
 
-=item C<PackFile * Parrot_pbc_read(PARROT_INTERP, const char *fullname,
-const int debug)>
+=item C<PackFile * Parrot_pbc_read(PARROT_INTERP, const char *fullname, const
+int debug)>
 
 Read in a bytecode, unpack it into a C<PackFile> structure, and do fixups.
 
@@ -1015,7 +1015,8 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
 
 /*
 
-=item C<opcode_t * Parrot_debug(PARROT_INTERP, Parrot_Interp debugger, opcode_t * pc)>
+=item C<opcode_t * Parrot_debug(PARROT_INTERP, Parrot_Interp debugger, opcode_t
+* pc)>
 
 Runs the interpreter's bytecode in debugging mode.
 

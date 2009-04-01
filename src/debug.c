@@ -801,7 +801,8 @@ parse_int(ARGIN(const char *str), ARGOUT(int *intP))
 
 /*
 
-=item C<static const char * parse_string(PARROT_INTERP, const char *str, STRING **strP)>
+=item C<static const char * parse_string(PARROT_INTERP, const char *str, STRING
+**strP)>
 
 Parse a double-quoted string out of a C string and return a pointer to
 just after the string. The parsed string is converted to a Parrot
@@ -850,7 +851,8 @@ parse_string(PARROT_INTERP, ARGIN(const char *str), ARGOUT(STRING **strP))
 
 /*
 
-=item C<static const char* parse_key(PARROT_INTERP, const char *str, PMC **keyP)>
+=item C<static const char* parse_key(PARROT_INTERP, const char *str, PMC
+**keyP)>
 
 Parse an aggregate key out of a string and return a pointer to just
 after the key. Currently only string and integer keys are allowed.
@@ -1947,7 +1949,8 @@ PDB_continue(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
 /*
 
-=item C<PDB_breakpoint_t * PDB_find_breakpoint(PARROT_INTERP, const char *command)>
+=item C<PDB_breakpoint_t * PDB_find_breakpoint(PARROT_INTERP, const char
+*command)>
 
 Find breakpoint number N; returns C<NULL> if the breakpoint doesn't
 exist or if no breakpoint was specified.
@@ -2161,7 +2164,8 @@ PDB_program_end(PARROT_INTERP)
 
 /*
 
-=item C<char PDB_check_condition(PARROT_INTERP, const PDB_condition_t *condition)>
+=item C<char PDB_check_condition(PARROT_INTERP, const PDB_condition_t
+*condition)>
 
 Returns true if the condition was met.
 
@@ -2493,9 +2497,9 @@ PDB_unescape(ARGMOD(char *string))
 
 /*
 
-=item C<size_t PDB_disassemble_op(PARROT_INTERP, char *dest, size_t space,
-const op_info_t *info, const opcode_t *op, PDB_file_t *file,
-const opcode_t *code_start, int full_name)>
+=item C<size_t PDB_disassemble_op(PARROT_INTERP, char *dest, size_t space, const
+op_info_t *info, const opcode_t *op, PDB_file_t *file, const opcode_t
+*code_start, int full_name)>
 
 Disassembles C<op>.
 

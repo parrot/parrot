@@ -264,7 +264,8 @@ Parrot_io_fill_readbuf(PARROT_INTERP, ARGMOD(PMC *filehandle))
 
 /*
 
-=item C<size_t Parrot_io_read_buffer(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_read_buffer(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 The buffer layer's C<Read> function.
 
@@ -394,7 +395,8 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_peek_buffer(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_peek_buffer(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 Retrieve the next character in the buffer without modifying the stream.
 
@@ -452,7 +454,8 @@ Parrot_io_peek_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
 /*
 
-=item C<size_t Parrot_io_readline_buffer(PARROT_INTERP, PMC *filehandle, STRING **buf)>
+=item C<size_t Parrot_io_readline_buffer(PARROT_INTERP, PMC *filehandle, STRING
+**buf)>
 
 This is called from C<Parrot_io_read_buffer()> to do line buffered reading if
 that is what is required.
@@ -555,7 +558,8 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
 
 /*
 
-=item C<size_t Parrot_io_write_buffer(PARROT_INTERP, PMC *filehandle, STRING *s)>
+=item C<size_t Parrot_io_write_buffer(PARROT_INTERP, PMC *filehandle, STRING
+*s)>
 
 The buffer layer's C<Write> function.
 
@@ -673,8 +677,8 @@ Parrot_io_write_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGIN(STRING *s))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP, PMC *filehandle,
-PIOOFF_T offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_seek_buffer(PARROT_INTERP, PMC *filehandle, PIOOFF_T
+offset, INTVAL whence)>
 
 The buffer layer's C<Seek> function.
 

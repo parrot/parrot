@@ -229,7 +229,7 @@ typedef struct io_thread_msg {
 
 =over 4
 
-=item C<static void sig_handler>
+=item C<static void sig_handler(int signum)>
 
 Handle signal C<signum>.
 
@@ -257,7 +257,7 @@ sig_handler(int signum)
 
 /*
 
-=item C<static void Parrot_sigaction>
+=item C<static void Parrot_sigaction(int sig, void (*handler(int)))>
 
 Signal handlers are common to all threads, signal block masks are
 specific, so we install one handler then block that signal and unblock
@@ -294,7 +294,7 @@ Parrot_sigaction(int sig, ARGIN(void (*handler)(int)))
 
 /*
 
-=item C<static void Parrot_unblock_signal>
+=item C<static void Parrot_unblock_signal(int sig)>
 
 unblock a signal
 
@@ -320,7 +320,7 @@ Parrot_unblock_signal(int sig)
 
 /*
 
-=item C<void Parrot_init_signals>
+=item C<void Parrot_init_signals(void)>
 
 Set up actions to handle signals.
 Only SIGHUP handled at the moment.
@@ -350,7 +350,7 @@ Parrot_init_signals(void)
 
 =over 4
 
-=item C<static void init_events_first>
+=item C<static void init_events_first(PARROT_INTERP)>
 
 Init event system for first interpreter.
 
@@ -410,7 +410,7 @@ init_events_first(PARROT_INTERP)
 
 /*
 
-=item C<static void init_events_all>
+=item C<static void init_events_all(PARROT_INTERP)>
 
 Init events for all interpreters.
 
@@ -430,7 +430,7 @@ init_events_all(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_init_events>
+=item C<void Parrot_init_events(PARROT_INTERP)>
 
 Initialize the event system.
 
@@ -459,7 +459,7 @@ Parrot_init_events(PARROT_INTERP)
 
 =over 4
 
-=item C<void Parrot_schedule_event>
+=item C<void Parrot_schedule_event(PARROT_INTERP, parrot_event* ev)>
 
 Create queue entry and insert event into task queue.
 
@@ -497,7 +497,7 @@ Parrot_schedule_event(PARROT_INTERP, ARGMOD(parrot_event* ev))
 
 /*
 
-=item C<static void schedule_signal_event>
+=item C<static void schedule_signal_event(int signum)>
 
 create and schedule a signal event
 
@@ -525,7 +525,8 @@ schedule_signal_event(int signum)
 
 /*
 
-=item C<void Parrot_new_timer_event>
+=item C<void Parrot_new_timer_event(PARROT_INTERP, PMC *timer, FLOATVAL diff,
+FLOATVAL interval, int repeat, PMC *sub, parrot_event_type_enum typ)>
 
 Create a new timer event due at C<diff> from now, repeated at C<interval>
 and running the passed C<sub>.
@@ -559,7 +560,7 @@ Parrot_new_timer_event(PARROT_INTERP, ARGIN_NULLOK(PMC *timer), FLOATVAL diff,
 
 /*
 
-=item C<void Parrot_new_cb_event>
+=item C<void Parrot_new_cb_event(PARROT_INTERP, PMC *cbi, char *ext)>
 
 Prepare and schedule a callback event.
 
@@ -586,7 +587,7 @@ Parrot_new_cb_event(PARROT_INTERP, ARGIN(PMC *cbi), ARGIN(char *ext))
 
 /*
 
-=item C<void Parrot_del_timer_event>
+=item C<void Parrot_del_timer_event(PARROT_INTERP, const PMC *timer)>
 
 Deactivate the timer identified by C<timer>.
 
@@ -621,7 +622,7 @@ Parrot_del_timer_event(PARROT_INTERP, ARGIN(const PMC *timer))
 
 /*
 
-=item C<void Parrot_new_terminate_event>
+=item C<void Parrot_new_terminate_event(PARROT_INTERP)>
 
 Create a terminate event, interpreter will leave the run-loop when this
 event arrives.
@@ -642,7 +643,7 @@ Parrot_new_terminate_event(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_new_suspend_for_gc_event>
+=item C<void Parrot_new_suspend_for_gc_event(PARROT_INTERP)>
 
 Create a suspend-for-GC event, interpreter will wait on a condition
 variable for GC to finish when the event arrives.
@@ -671,7 +672,7 @@ Parrot_new_suspend_for_gc_event(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_kill_event_loop>
+=item C<void Parrot_kill_event_loop(PARROT_INTERP)>
 
 Schedule event-loop terminate event. This shuts down the event thread.
 
@@ -691,7 +692,8 @@ Parrot_kill_event_loop(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_schedule_interp_qentry>
+=item C<void Parrot_schedule_interp_qentry(PARROT_INTERP, struct QUEUE_ENTRY
+*entry)>
 
 Put a queue entry into the interpreters task queue and enable event
 checking for the interpreter.
@@ -732,7 +734,7 @@ Parrot_schedule_interp_qentry(PARROT_INTERP, ARGIN(struct QUEUE_ENTRY *entry))
 
 /*
 
-=item C<void Parrot_schedule_broadcast_qentry>
+=item C<void Parrot_schedule_broadcast_qentry(struct QUEUE_ENTRY *entry)>
 
 Broadcast an event.
 
@@ -812,7 +814,7 @@ Parrot_schedule_broadcast_qentry(ARGIN(struct QUEUE_ENTRY *entry))
 
 /*
 
-=item C<static void store_io_event>
+=item C<static void store_io_event(pending_io_events *ios, parrot_event *ev)>
 
 Stores an event in the event stack.  Allocates memory if necessary.
 
@@ -837,7 +839,7 @@ store_io_event(ARGMOD(pending_io_events *ios), ARGIN(parrot_event *ev))
 
 /*
 
-=item C<static void io_thread_ready_rd>
+=item C<static void io_thread_ready_rd(pending_io_events *ios, int ready_rd)>
 
 Takes a list of pending i/o events and a file descriptor.
 If the fd is ready to read, the event is removed from the
@@ -873,7 +875,7 @@ io_thread_ready_rd(ARGMOD(pending_io_events *ios), int ready_rd)
 
 /*
 
-=item C<static void* io_thread>
+=item C<static void* io_thread(void *data)>
 
 The IO thread uses select/poll to handle IO events and signals.
 
@@ -1005,7 +1007,7 @@ io_thread(SHIM(void *data))
 
 /*
 
-=item C<static void stop_io_thread>
+=item C<static void stop_io_thread(void)>
 
 Tell the IO thread to stop.
 
@@ -1031,7 +1033,8 @@ stop_io_thread(void)
 
 /*
 
-=item C<void Parrot_event_add_io_event>
+=item C<void Parrot_event_add_io_event(PARROT_INTERP, PMC *pio, PMC *sub, PMC
+*data, INTVAL which)>
 
 Create new i/o event.
 
@@ -1077,7 +1080,7 @@ Parrot_event_add_io_event(PARROT_INTERP,
 
 =over 4
 
-=item C<static QUEUE_ENTRY* dup_entry>
+=item C<static QUEUE_ENTRY* dup_entry(const QUEUE_ENTRY *entry)>
 
 Duplicate queue entry.
 
@@ -1103,7 +1106,8 @@ dup_entry(ARGIN(const QUEUE_ENTRY *entry))
 
 /*
 
-=item C<static QUEUE_ENTRY* dup_entry_interval>
+=item C<static QUEUE_ENTRY* dup_entry_interval(QUEUE_ENTRY *entry, FLOATVAL
+now)>
 
 Duplicate timed entry and add interval to C<abs_time>.
 
@@ -1127,7 +1131,7 @@ dup_entry_interval(ARGIN(QUEUE_ENTRY *entry), FLOATVAL now)
 
 /*
 
-=item C<static int process_events>
+=item C<static int process_events(QUEUE *event_q)>
 
 Do something, when an event arrived caller has locked the mutex returns
 0 if event thread terminates.
@@ -1210,7 +1214,7 @@ process_events(ARGMOD(QUEUE *event_q))
 
 /*
 
-=item C<static void* event_thread>
+=item C<static void* event_thread(void *data)>
 
 The event thread is started by the first interpreter. It handles all
 events for all interpreters.
@@ -1283,7 +1287,7 @@ event_thread(ARGMOD(void *data))
 
 =over 4
 
-=item C<static opcode_t * wait_for_wakeup>
+=item C<static opcode_t * wait_for_wakeup(PARROT_INTERP, opcode_t *next)>
 
 Sleep on the event queue condition. If an event arrives, the event
 is processed. Terminate the loop if sleeping is finished.
@@ -1331,7 +1335,8 @@ wait_for_wakeup(PARROT_INTERP, ARGIN_NULLOK(opcode_t *next))
 
 /*
 
-=item C<opcode_t * Parrot_sleep_on_event>
+=item C<opcode_t * Parrot_sleep_on_event(PARROT_INTERP, FLOATVAL t, opcode_t
+*next)>
 
 Go to sleep. This is called from the C<sleep> opcode.
 
@@ -1374,7 +1379,7 @@ Parrot_sleep_on_event(PARROT_INTERP, FLOATVAL t, ARGIN_NULLOK(opcode_t *next))
 
 =over 4
 
-=item C<opcode_t * Parrot_do_check_events>
+=item C<opcode_t * Parrot_do_check_events(PARROT_INTERP, opcode_t *next)>
 
 Explicitly C<sync> called by the check_event opcode from run loops.
 
@@ -1397,7 +1402,8 @@ Parrot_do_check_events(PARROT_INTERP, ARGIN_NULLOK(opcode_t *next))
 
 /*
 
-=item C<static void event_to_exception>
+=item C<static void event_to_exception(PARROT_INTERP, const parrot_event*
+event)>
 
 Convert event to exception and throw it.
 
@@ -1435,7 +1441,8 @@ event_to_exception(PARROT_INTERP, ARGIN(const parrot_event* event))
 
 /*
 
-=item C<static opcode_t * do_event>
+=item C<static opcode_t * do_event(PARROT_INTERP, parrot_event* event, opcode_t
+*next)>
 
 Run user code or such.  The C<event> argument is freed after execution.
 
@@ -1497,7 +1504,8 @@ do_event(PARROT_INTERP, ARGIN(parrot_event* event), ARGIN_NULLOK(opcode_t *next)
 
 /*
 
-=item C<opcode_t * Parrot_do_handle_events>
+=item C<opcode_t * Parrot_do_handle_events(PARROT_INTERP, int restore, opcode_t
+*next)>
 
 Called by the C<check_event__> opcode from run loops or from above. When
 called from the C<check_events__> opcode, we have to restore the

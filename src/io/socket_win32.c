@@ -61,8 +61,8 @@ static void get_sockaddr_in(PARROT_INTERP,
 
 /*
 
-=item C<INTVAL Parrot_io_socket_win32(PARROT_INTERP, PMC * s, int fam,
-int type, int proto)>
+=item C<INTVAL Parrot_io_socket_win32(PARROT_INTERP, PMC * s, int fam, int type,
+int proto)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -332,8 +332,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_poll_win32(PARROT_INTERP, PMC *socket, int which,
-int sec, int usec)>
+=item C<INTVAL Parrot_io_poll_win32(PARROT_INTERP, PMC *socket, int which, int
+sec, int usec)>
 
 Utility function for polling a single IO stream with a timeout.
 
@@ -385,8 +385,8 @@ AGAIN:
 
 /*
 
-=item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr,
-const char* host, int port)>
+=item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr, const char*
+host, int port)>
 
 =cut
 
