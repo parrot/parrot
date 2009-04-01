@@ -19,6 +19,8 @@ the network layer won't exist.
 
 =cut
 
+.include 'socket.pasm'
+
 .sub example :main
     .local pmc sock
     .local pmc address
@@ -29,7 +31,7 @@ the network layer won't exist.
     # create the socket handle
     print "Creating socket.\n"
     sock = new 'Socket'
-    sock.'socket'(2, 1, 0)
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
     unless sock goto ERR
 
     # Pack a sockaddr_in structure with IP and port

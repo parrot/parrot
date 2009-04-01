@@ -114,7 +114,7 @@ Parrot_io_sockaddr_in(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port)
 #  if PARROT_NET_DEVEL
 
 /*
- * Mappping between PIO_PF_* constants and system-specific PF_* constants.
+ * Mapping between PIO_PF_* constants and system-specific PF_* constants.
  *
  * Uses -1 for unsupported protocols.
  */
@@ -143,6 +143,44 @@ static int pio_pf[PIO_PF_MAX+1] = {
 };
 
 /*
+ * Mapping between PIO_SOCK_* constants and system-specific SOCK_* constants.
+ * Uses -1 for unsupported socket types.
+ */
+
+static int pio_sock[PIO_SOCK_MAX+1] = {
+#    ifdef SOCK_PACKET
+    SOCK_PACKET,    /* PIO_SOCK_PACKET */
+#    else
+    -1,             /* PIO_SOCK_PACKET */
+#    endif
+#    ifdef SOCK_STREAM
+    SOCK_STREAM,    /* PIO_SOCK_STREAM */
+#    else
+    -1,             /* PIO_SOCK_STREAM */
+#    endif
+#    ifdef SOCK_DGRAM
+    SOCK_DGRAM,     /* PIO_SOCK_DGRAM */
+#    else
+    -1,             /* PIO_SOCK_DGRAM */
+#    endif
+#    ifdef SOCK_RAW
+    SOCK_RAW,       /* PIO_SOCK_RAW */
+#    else
+    -1,             /* PIO_SOCK_RAW */
+#    endif
+#    ifdef SOCK_RDM
+    SOCK_RDM,      /* PIO_SOCK_RDM */
+#    else
+    -1,            /* PIO_SOCK_RDM */
+#    endif
+#    ifdef SOCK_SEQPACKET
+    SOCK_SEQPACKET, /* PIO_SOCK_SEQPACKET */
+#    else
+    -1,             /* PIO_SOCK_SEQPACKET */
+#    endif
+};
+
+/*
 
 =item C<INTVAL Parrot_io_socket_unix(PARROT_INTERP, PMC *s, int fam, int type,
 int proto)>
@@ -166,6 +204,13 @@ Parrot_io_socket_unix(PARROT_INTERP, ARGIN(PMC *s), int fam, int type, int proto
         return -1;
     fam = pio_pf[fam];
     if (fam < 0)
+        return -1;
+
+    /* convert Parrot's socket type to system type */
+    if (type < 0 || type >= PIO_SOCK_MAX)
+        return -1;
+    type = pio_sock[type];
+    if (type < 0)
         return -1;
 
     sock = socket(fam, type, proto);

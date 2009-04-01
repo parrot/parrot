@@ -922,12 +922,13 @@ typedef enum {
 } Socket_Protocol_Family;
 
 typedef enum {
+    PIO_SOCK_PACKET     = 0,
     PIO_SOCK_STREAM     = 1,
     PIO_SOCK_DGRAM      = 2,
     PIO_SOCK_RAW        = 3,
     PIO_SOCK_RDM        = 4,
     PIO_SOCK_SEQPACKET  = 5,
-    PIO_SOCK_PACKET     = 10,
+    PIO_SOCK_MAX        = 6 /* last element */
 } Socket_Socket_Type;
 
 typedef enum {
