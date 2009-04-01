@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2006-2007, Parrot Foundation.
+Copyright (C) 2006-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -165,7 +165,8 @@ Parrot_jit_init(PARROT_INTERP);
 
 /*
 
-=item C<static opcode_t * pic_test_func>
+=item C<static opcode_t * pic_test_func(PARROT_INTERP, INTVAL *sig_bits,
+void **args)>
 
 Determines whether the given subroutine C<sub> can be JIT'd. Counts the
 number of registers used by the sub, and returns C<0> if more registers
@@ -193,7 +194,7 @@ pic_test_func(PARROT_INTERP, SHIM(INTVAL *sig_bits), ARGOUT(void **args))
 
 /*
 
-=item C<static int jit_can_compile_sub>
+=item C<static int jit_can_compile_sub(PARROT_INTERP, PMC *sub_pmc)>
 
 Determines whether the given subroutine C<sub> can be JIT'd. Counts the
 number of registers used by the sub, and returns C<0> if more registers
@@ -241,7 +242,8 @@ jit_can_compile_sub(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 /*
 
-=item C<static int args_match_params>
+=item C<static int args_match_params(PARROT_INTERP, PMC *sig_args,
+const PackFile_ByteCode *seg, const opcode_t *start)>
 
 Returns C<1> if the passed arguments match the subroutine's parameter list.
 Returns C<0> otherwise.
@@ -291,7 +293,7 @@ args_match_params(PARROT_INTERP, ARGIN(PMC *sig_args), ARGIN(const PackFile_Byte
 
 /*
 
-=item C<static int returns_match_results>
+=item C<static int returns_match_results(PARROT_INTERP, PMC *sig_ret, PMC *sig_result)>
 
 Returns 1 if the return values match the returned results. Returns C<0>
 otherwise.
@@ -330,7 +332,7 @@ returns_match_results(PARROT_INTERP, ARGIN(PMC *sig_ret), ARGIN(PMC *sig_result)
 
 /*
 
-=item C<static int call_is_safe>
+=item C<static int call_is_safe(PARROT_INTERP, PMC *sub_pmc, opcode_t **set_args)>
 
 Returns C<1> if the passed arguments match the subroutine's parameter list.
 Returns C<0> otherwise.
@@ -383,7 +385,8 @@ call_is_safe(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGMOD(opcode_t **set_args))
 
 /*
 
-=item C<static int ops_jittable>
+=item C<static int ops_jittable(PARROT_INTERP, PMC *sub, PMC *sig_results,
+const PackFile_ByteCode *seg, opcode_t *pc, const opcode_t *end, int *flags)>
 
 Returns 1 if the return values match the returned results. Returns C<0>
 otherwise.
@@ -460,7 +463,8 @@ op_is_ok:
 
 /*
 
-=item C<int parrot_pic_is_safe_to_jit>
+=item C<int parrot_pic_is_safe_to_jit(PARROT_INTERP, PMC *sub_pmc,
+PMC *sig_args, PMC *sig_results, int *flags)>
 
 =cut
 
@@ -524,7 +528,7 @@ parrot_pic_is_safe_to_jit(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *sig_arg
 
 /*
 
-=item C<funcptr_t parrot_pic_JIT_sub>
+=item C<funcptr_t parrot_pic_JIT_sub(PARROT_INTERP, PMC *sub_pmc, int flags)>
 
 =cut
 

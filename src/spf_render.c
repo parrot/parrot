@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -115,7 +115,8 @@ static STRING* str_append_w_flags(PARROT_INTERP,
 
 /*
 
-=item C<static STRING * handle_flags>
+=item C<static STRING * handle_flags(PARROT_INTERP, const SpfInfo *info,
+STRING *str, INTVAL is_int_type, STRING* prefix)>
 
 Handles C<+>, C<->, C<0>, C<#>, space, width, and prec.
 
@@ -219,7 +220,8 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGMOD(STRING *str),
 
 /*
 
-=item C<static STRING* str_append_w_flags>
+=item C<static STRING* str_append_w_flags(PARROT_INTERP, STRING *dest,
+const SpfInfo *info, STRING *src, STRING *prefix)>
 
 Used by Parrot_sprintf_format.  Prepends supplied prefix for numeric
 values. (e.g. 0x for hex.)
@@ -243,7 +245,7 @@ str_append_w_flags(PARROT_INTERP, ARGOUT(STRING *dest), ARGIN(const SpfInfo *inf
 
 /*
 
-=item C<static void gen_sprintf_call>
+=item C<static void gen_sprintf_call(char *out, SpfInfo *info, int thingy)>
 
 Turn the info structure back into an sprintf format. Far from being
 pointless, this is used to call C<snprintf()> when we're confronted with
@@ -307,7 +309,8 @@ gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
 
 /*
 
-=item C<STRING * Parrot_sprintf_format>
+=item C<STRING * Parrot_sprintf_format(PARROT_INTERP, STRING *pat,
+SPRINTF_OBJ *obj)>
 
 This is the engine that does all the formatting.
 

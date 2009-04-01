@@ -117,7 +117,6 @@ __DATA__
 
 # unchecked
 
-compilers/imcc/debug.c
 compilers/imcc/instructions.c
 compilers/imcc/main.c
 compilers/imcc/optimizer.c
@@ -126,8 +125,6 @@ compilers/imcc/pbc.c
 compilers/imcc/pcc.c
 compilers/imcc/reg_alloc.c
 compilers/imcc/sets.c
-compilers/imcc/symreg.c
-compilers/pirc/src/bcgen.c
 compilers/pirc/src/pircapi.c
 compilers/pirc/src/pircompiler.c
 compilers/pirc/src/piremit.c
@@ -196,24 +193,12 @@ src/list.c
 src/malloc-trace.c
 src/nci_test.c
 src/oo.c
-src/packdump.c
 src/packfile.c
 src/packfile/pf_items.c
-src/packout.c
-src/parrot_debugger.c
-src/pbc_disassemble.c
-src/pbc_dump.c
-src/pbc_merge.c
-src/pic.c
-src/pic_jit.c
-src/pmc.c
-src/pmc_freeze.c
-src/spf_render.c
-src/spf_vtable.c
 src/thread.c
-src/utils.c
 
 # Needs docs written. Boilerplate in place.
+compilers/imcc/symreg.c
 src/datatypes.c
 src/debug.c
 src/gc/generational_ms.c
@@ -222,12 +207,19 @@ src/io/socket_api.c
 src/io/socket_unix.c
 src/io/socket_win32.c
 src/multidispatch.c
+src/parrot_debugger.c
+src/pic.c
+src/pic_jit.c
+src/pmc.c
 src/string/charset/ascii.c
 src/string/charset/binary.c
 src/string/charset/iso-8859-1.c
 src/string/charset/unicode.c
 src/tsq.c
+src/utils.c
 
+# headerizer returns malformed signatures
+compilers/pirc/src/bcgen.c
 
 # Local Variables:
 #   mode: cperl

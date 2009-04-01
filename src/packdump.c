@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 $Id$
@@ -52,7 +52,7 @@ static void pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
 
 /*
 
-=item C<void PackFile_ConstTable_dump>
+=item C<void PackFile_ConstTable_dump(PARROT_INTERP, const PackFile_ConstTable *self)>
 
 Dumps the constant table C<self>.
 
@@ -75,7 +75,8 @@ PackFile_ConstTable_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *self))
 
 /*
 
-=item C<static void PackFile_Constant_dump>
+=item C<static void PackFile_Constant_dump(PARROT_INTERP,
+const PackFile_ConstTable *ct, const PackFile_Constant *self)>
 
 Dumps the constant C<self>.
 
@@ -121,9 +122,17 @@ static const char *flag_bit_names[] =
     "is_object"
 };
 
-/* Given a word of flags, generate a dump line of the whole word in hex,
- * followed by individual bits.
- */
+/*
+
+=item C<static void pobj_flag_dump(PARROT_INTERP, long flags)>
+
+Given a word of flags, generate a dump line of the whole word in hex,
+followed by individual bits.
+
+=cut
+
+*/
+
 static void
 pobj_flag_dump(PARROT_INTERP, ARGIN_NULLOK(long flags))
 {
@@ -365,7 +374,7 @@ PackFile_Constant_dump(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
 
 /*
 
-=item C<void PackFile_Fixup_dump>
+=item C<void PackFile_Fixup_dump(PARROT_INTERP, const PackFile_FixupTable *ft)>
 
 Dumps the fix-up table C<ft>.
 

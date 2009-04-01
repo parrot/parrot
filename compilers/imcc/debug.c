@@ -30,7 +30,7 @@ handle info/error/warning messages from imcc
 
 /*
 
-=item C<void IMCC_fatal>
+=item C<void IMCC_fatal(PARROT_INTERP, int code, const char *fmt, ...)>
 
 Prints out a fatal error message from IMCC and throws an
 IMCC_FATAL_EXCEPTION.
@@ -55,7 +55,7 @@ IMCC_fatal(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fataly>
+=item C<void IMCC_fataly(PARROT_INTERP, int code, const char *fmt, ...)>
 
 Throws an IMCC_FATALY_EXCEPTION.
 
@@ -79,7 +79,7 @@ IMCC_fataly(PARROT_INTERP, SHIM(int code), ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fatal_standalone>
+=item C<void IMCC_fatal_standalone(PARROT_INTERP, int code, const char *fmt, ...)>
 
 Prints an error message from IMCC and exits Parrot. This is not a
 recoverable exception but a forced exit.
@@ -104,7 +104,7 @@ IMCC_fatal_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_fataly_standalone>
+=item C<void IMCC_fataly_standalone(PARROT_INTERP, int code, const char *fmt, ...)>
 
 Prints an error message and exits Parrot. This is not a recoverable
 error.
@@ -132,7 +132,7 @@ IMCC_fataly_standalone(PARROT_INTERP, int code, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_warning>
+=item C<void IMCC_warning(PARROT_INTERP, const char *fmt, ...)>
 
 Prints a warning message, but does not throw an exception and does not
 cause Parrot to exit.
@@ -157,7 +157,7 @@ IMCC_warning(PARROT_INTERP, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_info>
+=item C<void IMCC_info(PARROT_INTERP, int level, const char *fmt, ...)>
 
 Prints some information, if the level of the information is higher
 then IMCC's verbose mode.
@@ -183,7 +183,7 @@ IMCC_info(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void IMCC_debug>
+=item C<void IMCC_debug(PARROT_INTERP, int level, const char *fmt, ...)>
 
 Prints a debug message, if IMCC's debug mode is turned on.
 
@@ -207,7 +207,7 @@ IMCC_debug(PARROT_INTERP, int level, ARGIN(const char *fmt), ...)
 
 /*
 
-=item C<void dump_instructions>
+=item C<void dump_instructions(PARROT_INTERP, const IMC_Unit *unit)>
 
 Dumps the current instruction status of IMCC
 
@@ -252,7 +252,7 @@ dump_instructions(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_cfg>
+=item C<void dump_cfg(const IMC_Unit *unit)>
 
 Dumps the current IMCC config data.
 
@@ -292,7 +292,7 @@ dump_cfg(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_loops>
+=item C<void dump_loops(const IMC_Unit *unit)>
 
 Dumps the current loops in the IMC_Unit C<unit>.
 
@@ -339,7 +339,7 @@ dump_loops(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_labels>
+=item C<void dump_labels(const IMC_Unit *unit)>
 
 Dumps the list of labels in IMC_Unit C<unit>.
 
@@ -373,7 +373,7 @@ dump_labels(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_symreg>
+=item C<void dump_symreg(const IMC_Unit *unit)>
 
 Dumps a list of the symbolic registers in IMC_Unit C<unit>
 
@@ -421,7 +421,7 @@ dump_symreg(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_liveness_status>
+=item C<void dump_liveness_status(const IMC_Unit *unit)>
 
 Dumps the list of registers in the current IMC_Unit that need to be
 allocated.
@@ -451,7 +451,7 @@ dump_liveness_status(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_liveness_status_var>
+=item C<void dump_liveness_status_var(const IMC_Unit *unit, const SymReg* r)>
 
 Dumps the state of SymReg C<r> in IMC_Unit C<unit>.
 
@@ -500,7 +500,7 @@ dump_liveness_status_var(ARGIN(const IMC_Unit *unit), ARGIN(const SymReg* r))
 
 /*
 
-=item C<void dump_interference_graph>
+=item C<void dump_interference_graph(const IMC_Unit *unit)>
 
 Dumps the interference graph for the current IMC_Unit C<unit>
 
@@ -540,7 +540,7 @@ dump_interference_graph(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_dominators>
+=item C<void dump_dominators(const IMC_Unit *unit)>
 
 Dumps the current list of dominators for the current IMC_Unit C<unit>.
 
@@ -574,7 +574,7 @@ dump_dominators(ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void dump_dominance_frontiers>
+=item C<void dump_dominance_frontiers(const IMC_Unit *unit)>
 
 
 Dumps the list of dominance frontiers for the current IMC_Unit C<unit>.

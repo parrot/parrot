@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 History:
@@ -240,9 +240,7 @@ main(int argc, char *argv[])
 
 /*
 
-=item C<static void PDB_add_exception_handler(Parrot_Interp)>
-
-Adds a default exception handler to PDB.
+=item C<static void PDB_run_code(PARROT_INTERP, int argc, char *argv[])>
 
 =cut
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2003, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -219,8 +219,7 @@ static struct longopt_opt_decl opt_options[] = {
 
 /*
 
-=item C<int
-main(int argc, char **argv)>
+=item C<int main(int argc, const char **argv)>
 
 The run loop. Process the command-line arguments and dump accordingly.
 
