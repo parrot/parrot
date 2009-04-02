@@ -217,7 +217,7 @@ codepoint value.  Returns -1 if an error occurs in conversion.
     UChar32    codepoint;
     UErrorCode err       = U_ZERO_ERROR;
     char       *cstr     = Parrot_str_to_cstring(INTERP, name);
-    codepoint = u_charFromName(U_UNICODE_CHAR_NAME, cstr, &err);
+    codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
     Parrot_str_free_cstring(cstr);
     if (U_SUCCESS(err)) {
         RETURN(INTVAL codepoint);
