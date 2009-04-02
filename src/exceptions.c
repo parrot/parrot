@@ -237,6 +237,15 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
     return address;
 }
 
+/*
+
+=item C<static opcode_t * pass_exception_args(PARROT_INTERP, const char *sig,
+opcode_t *dest, Parrot_Context * old_ctx, ...)>
+
+=cut
+
+*/
+
 PARROT_CAN_RETURN_NULL
 static opcode_t *
 pass_exception_args(PARROT_INTERP, ARGIN(const char *sig),
@@ -252,6 +261,15 @@ pass_exception_args(PARROT_INTERP, ARGIN(const char *sig),
 
     return next;
 }
+
+/*
+
+=item C<static PMC * build_exception_from_args(PARROT_INTERP, int ex_type, const
+char *format, va_list arglist)>
+
+=cut
+
+*/
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
