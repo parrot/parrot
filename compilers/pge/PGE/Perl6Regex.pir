@@ -984,11 +984,20 @@ Extract an enumerated character list.
     ##   get escaped character
     $S0 = substr target, pos, 1
     ##   handle metas such as \n, \t, \r, etc.
-    $I0 = index 'nrtfae0', $S0
+    $I0 = index 'nrtfae0xco', $S0
     if $I0 == -1 goto enum_addchar
+    if $I0 >= 7 goto enum_xco
     $S0 = substr "\n\r\t\f\a\e\0", $I0, 1
+    goto enum_addchar
+  enum_xco:
+    $I0 = pos - 1
+    $P0 = 'p6escapes'(mob, 'pos'=>$I0)
+    $S0 = $P0.'ast'()
+    pos = $P0.'to'()
+    goto enum_addchar_1
   enum_addchar:
     inc pos
+  enum_addchar_1:
     if isrange goto enum_addrange
     charlist .= $S0
     goto enum_loop
