@@ -859,7 +859,7 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
     ASSERT_ARGS(imcc_compile_pir_ex)
     STRING *error_message;
     PMC *sub;
-    
+
     /* We need to clear the current_results from the current context. This is
      * in order to prevent any RetContinuations that get promoted to full
      * Continuations (this happens when something is the target of a :outer)
