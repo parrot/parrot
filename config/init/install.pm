@@ -90,7 +90,6 @@ sub runstep {
     $conf->data->set(
         prefix         => $prefix,
         exec_prefix    => $eprefix,
-        bin_dir        => $bindir,           # deprecated
         bindir         => $bindir,
         sbindir        => $sbindir,
         libexecdir     => $libexecdir,
@@ -99,9 +98,7 @@ sub runstep {
         sharedstatedir => $sharedstatedir,
         localstatedir  => $localstatedir,
         libdir         => $libdir,
-        lib_dir        => $libdir,           # deprecated
         includedir     => $includedir,
-        include_dir    => $includedir,       # deprecated
         oldincludedir  => $oldincludedir,
         infodir        => $infodir,
         mandir         => $mandir,

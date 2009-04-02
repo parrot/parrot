@@ -490,8 +490,8 @@ PARROT_ARGS   :=
 
 ## configuration settings
 VERSION       := @versiondir@
-BIN_DIR       := @bin_dir@
-LIB_DIR       := @lib_dir@$(VERSION)
+BIN_DIR       := @bindir@
+LIB_DIR       := @libdir@$(VERSION)
 DOC_DIR       := @doc_dir@$(VERSION)
 MANDIR        := @mandir@$(VERSION)
 
