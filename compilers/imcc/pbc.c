@@ -795,6 +795,15 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
     return NULL;
 }
 
+/*
+
+=item C<static subs_t * find_sub_by_subid(PARROT_INTERP, const char *lookup,
+const subs_t *sym, int *pc)>
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static subs_t *
@@ -980,6 +989,14 @@ IMCC_string_from_reg(PARROT_INTERP, ARGIN(const SymReg *r))
     /* unquoted bare name - ASCII only don't unescape it */
     return string_make(interp, buf, strlen(buf), "ascii", PObj_constant_FLAG);
 }
+
+/*
+
+=item C<STRING * IMCC_string_from__STRINGC(PARROT_INTERP, const char *buf)>
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
