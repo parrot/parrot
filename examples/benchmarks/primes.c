@@ -28,8 +28,7 @@ of primes and the last one found.
 
 /*
 
-=item C<int
-main(int argc, char *argv[])>
+=item C<int main(int argc, char *argv[])>
 
 Main function to run the example.
 

@@ -60,8 +60,7 @@ static void version(void);
 
 /*
 
-=item C<int
-main(int argc, char *argv[])>
+=item C<int main(int argc, char *argv[])>
 
 Loads the file and runs the code.
 
@@ -99,8 +98,7 @@ main(int argc, char *argv[])
 
 /*
 
-=item C<char *
-parseflags(PARROT_INTERP, int *argc, char **argv[])>
+=item C<static char * parseflags(PARROT_INTERP, int *argc, char **argv[])>
 
 Parses the command-line.
 
@@ -200,8 +198,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
 
 /*
 
-=item C<static void
-usage(void)>
+=item C<static void usage(void)>
 
 Returns the user help.
 
@@ -244,8 +241,7 @@ usage(void)
 
 /*
 
-=item C<static void
-version(void)>
+=item C<static void version(void)>
 
 Returns the version information.
 

@@ -45,8 +45,7 @@ PMC* japh_compiler(PARROT_INTERP, const char *s);
 
 /*
 
-=item C<void
-Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)>
+=item C<void Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)>
 
 loadlib calls the load and init hooks
 we use init to register the compiler
@@ -68,8 +67,7 @@ Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)
 
 /*
 
-=item C<static int
-unescape(char *string)>
+=item C<static int unescape(char *string)>
 
 =cut
 
@@ -100,8 +98,8 @@ unescape(char *string)
 
 /*
 
-=item C<static int
-add_const_str(PARROT_INTERP, PackFile_ConstTable *consts, char *str)>
+=item C<static int add_const_str(PARROT_INTERP, PackFile_ConstTable *consts,
+char *str)>
 
 add constant string to constant_table
 
