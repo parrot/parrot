@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 67;
+use Parrot::Test tests => 68;
 use Parrot::Config;
 
 =head1 NAME
@@ -1555,6 +1555,38 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_string null check' );
 .end
 CODE
 ok
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'use of :init sub pointed to by a :outer in compreg' );
+.sub 'comptest'
+    $S0 = <<'PIR'
+.sub 'MAIN'
+    say 'MAIN'
+    .return ()
+.end
+.namespace ['XYZ']
+.sub 'BEGIN' :init
+    say 'XYZ::BEGIN'
+    .return ()
+.end
+.sub 'foo' :outer('BEGIN')
+    say 'XYZ::foo'
+    .return ()
+.end
+PIR
+    $P0 = compreg 'PIR'
+    say "got compiler"
+    $P1 = $P0($S0)
+    say "compiled"
+    $P1()
+    say "lived"
+.end
+CODE
+got compiler
+XYZ::BEGIN
+compiled
+MAIN
+lived
 OUTPUT
 
 # Local Variables:
