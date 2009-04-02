@@ -1,6 +1,6 @@
 /*
- * $Id$
  * Copyright (C) 2004-2006, Parrot Foundation.
+ * $Id$
  */
 
 /*
@@ -30,8 +30,8 @@ more control over the behavior.
 
 /*
 
-=item C<static const char *
-scan_paths(const char *filename, const char *libpath)>
+=item C<static const char * scan_paths(const char *filename, const char
+*libpath)>
 
 Simple routine to walk a colon separated list of directories in a string
 and check for a file in each one, returning the first match.
@@ -71,8 +71,7 @@ scan_paths(const char *filename, const char *libpath)
 
 /*
 
-=item C<static const char *
-get_lib(const char *filename)>
+=item C<static const char * get_lib(const char *filename)>
 
 Try to expand a filename input into a full file system path following
 the behavior described in dyld(1). First looks for the file in
@@ -109,8 +108,7 @@ get_lib(const char *filename)
 
 /*
 
-=item C<void *
-Parrot_dlopen(const char *filename)>
+=item C<void * Parrot_dlopen(const char *filename)>
 
 =cut
 
@@ -173,8 +171,7 @@ Parrot_dlopen(const char *filename)
 
 /*
 
-=item C<const char *
-Parrot_dlerror(void)>
+=item C<const char * Parrot_dlerror(void)>
 
 =cut
 
@@ -189,8 +186,7 @@ Parrot_dlerror(void)
 
 /*
 
-=item C<void *
-Parrot_dlsym(void *handle, const char *symbol)>
+=item C<void * Parrot_dlsym(void *handle, const char *symbol)>
 
 =cut
 
@@ -244,8 +240,7 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 /*
 
-=item C<int
-Parrot_dlclose(void *handle)>
+=item C<int Parrot_dlclose(void *handle)>
 
 =cut
 

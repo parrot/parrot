@@ -29,8 +29,7 @@ Dynlib stuff
 
 /*
 
-=item C<void *
-Parrot_dlopen(const char *filename)>
+=item C<void * Parrot_dlopen(const char *filename)>
 
 =cut
 
@@ -48,8 +47,7 @@ Parrot_dlopen(const char *filename)
 
 /*
 
-=item C<const char *
-Parrot_dlerror(void)>
+=item C<const char * Parrot_dlerror(void)>
 
 =cut
 
@@ -67,8 +65,7 @@ Parrot_dlerror(void)
 
 /*
 
-=item C<void *
-Parrot_dlsym(void *handle, const char *symbol)>
+=item C<void * Parrot_dlsym(void *handle, const char *symbol)>
 
 =cut
 
@@ -86,8 +83,7 @@ Parrot_dlsym(void *handle, const char *symbol)
 
 /*
 
-=item C<int
-Parrot_dlclose(void *handle)>
+=item C<int Parrot_dlclose(void *handle)>
 
 =cut
 

@@ -86,8 +86,7 @@ typedef struct _memalign_marker_t {
 
 /*
 
-=item C<void *
-Parrot_memalign(size_t align, size_t size)>
+=item C<void * Parrot_memalign(size_t align, size_t size)>
 
 =cut
 
@@ -169,8 +168,7 @@ Parrot_memalign(size_t align, size_t size)
 
 /*
 
-=item C<void
-Parrot_free_memalign(void *p)>
+=item C<void Parrot_free_memalign(void *p)>
 
 =cut
 

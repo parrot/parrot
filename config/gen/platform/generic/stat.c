@@ -24,8 +24,7 @@ File stat stuff
 
 /*
 
-=item C<PMC *
-Parrot_stat_file(PARROT_INTERP, STRING *filename)>
+=item C<PMC * Parrot_stat_file(PARROT_INTERP, STRING *filename)>
 
 =cut
 
@@ -39,8 +38,8 @@ Parrot_stat_file(PARROT_INTERP, STRING *filename)
 
 /*
 
-=item C<PMC *
-Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)>
+=item C<PMC * Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL
+thing)>
 
 =cut
 
@@ -54,8 +53,8 @@ Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)
 
 /*
 
-=item C<static INTVAL
-stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)>
+=item C<static INTVAL stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL
+thing, int status)>
 
 =cut
 
@@ -139,8 +138,8 @@ stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
 
 /*
 
-=item C<INTVAL
-Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)>
+=item C<INTVAL Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL
+thing)>
 
 =cut
 
@@ -162,8 +161,8 @@ Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 
 /*
 
-=item C<INTVAL
-Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)>
+=item C<INTVAL Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL
+thing)>
 
 =cut
 
@@ -182,8 +181,8 @@ Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)
 
 /*
 
-=item C<FLOATVAL
-Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename, INTVAL thing)>
+=item C<FLOATVAL Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename,
+INTVAL thing)>
 
 =cut
 
@@ -197,8 +196,8 @@ Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename, INTVAL thing)
 
 /*
 
-=item C<STRING *
-Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL thing)>
+=item C<STRING * Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL
+thing)>
 
 =cut
 

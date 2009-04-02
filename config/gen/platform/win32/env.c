@@ -81,8 +81,7 @@ Parrot_setenv(const char *name, const char *value)
 
 /*
 
-=item C<char *
-Parrot_getenv(ARGIN(const char *name), NOTNULL(int *free_it))>
+=item C<char * Parrot_getenv(const char *name, int *free_it)>
 
 Gets the environment variable C<name>, if it exists. Returns status in
 C<free_it>. C<free_it> must be a non-null pointer to an integer to receive the

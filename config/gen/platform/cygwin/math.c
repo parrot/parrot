@@ -1,6 +1,6 @@
 /*
+ * Copyright (C) 2006-2009, Parrot Foundation.
  * $Id$
- * Copyright (C) 2006-2007, Parrot Foundation.
  */
 
 /*
@@ -64,8 +64,7 @@ Parrot_signbit(double x)
 #if NUMVAL_SIZE == 12 && DOUBLE_SIZE == 3 * INT_SIZE && PARROT_LITTLE_ENDIAN
 /*
 
-=item C<int
-Parrot_signbit_l(long double x)>
+=item C<int Parrot_signbit_l(long double x)>
 
 Same as Parrot_signbit for long double.
 

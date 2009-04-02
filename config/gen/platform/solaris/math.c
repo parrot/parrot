@@ -61,8 +61,7 @@ Parrot_signbit(double x)
 #if NUMVAL_SIZE == 12 && DOUBLE_SIZE == 3 * INT_SIZE && PARROT_LITTLE_ENDIAN
 /*
 
-=item C<int
-Parrot_signbit_l(long double x)>
+=item C<int Parrot_signbit_l(long double x)>
 
 =cut
 

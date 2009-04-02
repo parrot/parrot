@@ -26,8 +26,7 @@ Environment manipulation stuff
 
 /*
 
-=item C<void
-Parrot_setenv(const char *name, const char *value)>
+=item C<void Parrot_setenv(const char *name, const char *value)>
 
 =cut
 
@@ -60,8 +59,7 @@ Parrot_setenv(const char *name, const char *value)
 
 /*
 
-=item C<void
-Parrot_unsetenv(const char *name)>
+=item C<void Parrot_unsetenv(const char *name)>
 
 =cut
 
@@ -79,8 +77,7 @@ Parrot_unsetenv(const char *name)
 
 /*
 
-=item C<char *
-Parrot_getenv(const char *name, int *free_it)>
+=item C<char * Parrot_getenv(const char *name, int *free_it)>
 
 =cut
 

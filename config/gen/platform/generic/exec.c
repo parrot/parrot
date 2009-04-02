@@ -26,8 +26,7 @@ system() stuff
 
 /*
 
-=item C<INTVAL
-Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
+=item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
 Spawn off a subprocess and wait for the damn thing to complete,
 returning the return value of the process
@@ -71,8 +70,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 
 /*
 
-=item C<INTVAL
-Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
+=item C<INTVAL Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
 
 =cut
 
@@ -130,8 +128,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 
 /*
 
-=item C<void
-Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)>
+=item C<void Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)>
 
 =cut
 

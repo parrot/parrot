@@ -24,8 +24,7 @@ RT#48264
 #ifdef PARROT_HAS_EXEC_PROTECT
 /*
 
-=item C<void *
-mem_alloc_executable(size_t size)>
+=item C<void * mem_alloc_executable(size_t size)>
 
 Allocate executable memory
 Round up to page size because the whole page will be marked as executable
@@ -50,8 +49,7 @@ mem_alloc_executable(size_t size)
 
 /*
 
-=item C<void
-mem_free_executable(void *p)>
+=item C<void mem_free_executable(void *p)>
 
 =cut
 
@@ -65,8 +63,7 @@ mem_free_executable(void *p)
 
 /*
 
-=item C<void *
-mem_realloc_executable(void* oldp, size_t newsize)>
+=item C<void * mem_realloc_executable(void* oldp, size_t newsize)>
 
 Reallocate executable memory
 Round up to page size because the whole page will be marked as executable

@@ -24,8 +24,7 @@ File stat stuff
 
 /*
 
-=item C<PMC *
-Parrot_stat_file(PARROT_INTERP, STRING *filename)>
+=item C<PMC * Parrot_stat_file(PARROT_INTERP, STRING *filename)>
 
 Stat a file. On Win32 this is not yet implemented, so we return a
 C<NULL> PMC, not C<PMCNULL>.
@@ -42,8 +41,8 @@ Parrot_stat_file(PARROT_INTERP, STRING *filename)
 
 /*
 
-=item C<PMC *
-Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)>
+=item C<PMC * Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL
+thing)>
 
 Return stat info on a file as a PMC. Not implemented on Win32, so we
 return C<NULL>, not C<PMCNULL>.
@@ -60,8 +59,8 @@ Parrot_stat_info_pmc(PARROT_INTERP, STRING *filename, INTVAL thing)
 
 /*
 
-=item C<static INTVAL
-stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)>
+=item C<static INTVAL stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL
+thing, int status)>
 
 Stats the file, and returns the information specified by C<thing>. C<thing> can
 be one of: C<STAT_EXISTS>, C<STAT_FILESIZE>, C<STAT_ISDIR>, C<STAT_ISDEV>,
@@ -159,8 +158,8 @@ stat_common(PARROT_INTERP, struct stat *statbuf, INTVAL thing, int status)
 
 /*
 
-=item C<INTVAL
-Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)>
+=item C<INTVAL Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL
+thing)>
 
 Returns the stat field given by C<thing> of file C<file>.
 
@@ -184,8 +183,8 @@ Parrot_stat_info_intval(PARROT_INTERP, STRING *file, INTVAL thing)
 
 /*
 
-=item C<INTVAL
-Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)>
+=item C<INTVAL Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL
+thing)>
 
 Returns the fstat field given by C<thing> from file identifier C<file>.
 
@@ -206,8 +205,8 @@ Parrot_fstat_info_intval(PARROT_INTERP, INTVAL file, INTVAL thing)
 
 /*
 
-=item C<FLOATVAL
-Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename, INTVAL thing)>
+=item C<FLOATVAL Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename,
+INTVAL thing)>
 
 Currently returns C<-1.0> and has no side effects.
 
@@ -223,8 +222,8 @@ Parrot_stat_info_floatval(PARROT_INTERP, STRING *filename, INTVAL thing)
 
 /*
 
-=item C<STRING *
-Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL thing)>
+=item C<STRING * Parrot_stat_info_string(PARROT_INTERP, STRING *filename, INTVAL
+thing)>
 
 Not implemented. Returns C<NULL>.
 

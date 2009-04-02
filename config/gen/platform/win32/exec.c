@@ -25,8 +25,7 @@ Functions for dealing with child processes and Execs.
 
 /*
 
-=item C<INTVAL
-Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
+=item C<INTVAL Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)>
 
 Spawn the subprocess specified in C<command>.
 Waits for the process to complete, and then
@@ -78,8 +77,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 
 /*
 
-=item C<INTVAL
-Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
+=item C<INTVAL Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)>
 
 Spawns a subprocess with the arguments provided in the C<cmdargs> PMC array.
 The first array element should be the name of the process to spawn,
@@ -151,8 +149,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
 
 /*
 
-=item C<void
-Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)>
+=item C<void Parrot_Exec_OS_Command(PARROT_INTERP, STRING *command)>
 
 Exits parrot and passes control to the specified process. Does not return. Raises an exception
 if the exec fails.
