@@ -1,5 +1,5 @@
 #! parrot
-# Copyright (C) 2006-2007, Parrot Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -174,9 +174,9 @@ CODE
     $P0 = _config()
     $I0 = $P0['has_icu']
     if $I0 goto has_icu
-    skip(3, 'ICU unavailable')
+    skip(4, 'ICU unavailable')
     .return ()
-    
+
   has_icu:
     code = new ['CodeString']
     $I0 = code.'charname_to_ord'('LATIN CAPITAL LETTER C')
