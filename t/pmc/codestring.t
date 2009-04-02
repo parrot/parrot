@@ -19,7 +19,7 @@ Tests the CodeString class directly.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(20)
+    plan(24)
 
     create_codestring()
     calls_to_unique()
@@ -31,6 +31,7 @@ Tests the CodeString class directly.
     output_global_unique_num()
     namespace_keys()
     first_char_repl_regression()
+    ord_from_name()
 .end
 
 .sub create_codestring
@@ -165,6 +166,27 @@ CODE
     code = new ['CodeString']
     code.'emit'('new', 'n'=>$P0)
     is(code, "new\n", "regression on first char repl bug looks fine")
+.end
+
+.sub 'ord_from_name'
+    .local pmc code
+    load_bytecode 'config.pbc'
+    $P0 = _config()
+    $I0 = $P0['has_icu']
+    if $I0 goto has_icu
+    skip(3, 'ICU unavailable')
+    .return ()
+    
+  has_icu:
+    code = new ['CodeString']
+    $I0 = code.'charname_to_ord'('LATIN CAPITAL LETTER C')
+    is($I0, 0x0043, "LATIN CAPITAL LETTER C")
+    $I0 = code.'charname_to_ord'('MUSIC FLAT SIGN')
+    is($I0, 0x266d, "MUSIC FLAT SIGN")
+    $I0 = code.'charname_to_ord'('RECYCLING SYMBOL FOR TYPE-1 PLASTICS')
+    is($I0, 0x2673, "RECYCLING SYMBOL FOR TYPE-1 PLASTICS")
+    $I0 = code.'charname_to_ord'('<no such symbol>')
+    is($I0, -1, '<no such symbol>')
 .end
 
 # Local Variables:

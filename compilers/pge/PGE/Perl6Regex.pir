@@ -145,6 +145,120 @@ the corresponding parse tree.
     .return (match)
 .end
 
+=item C<p6escapes>
+
+Parse and calculate various Perl 6 string escapes, such as \n, \r,
+\x, \o, and \c.  For the latter escapes, also handle the bracketed
+forms and other special forms.
+
+Note that this function is used directly by PCT::Grammar and Rakudo,
+and someday may be refactored to a different location.
+
+=cut
+
+.sub 'p6escapes'
+    .param pmc mob
+    .param pmc adverbs         :slurpy :named
+    .local string target, backchar, literal
+    .local int pos, lastpos
+    $P0 = get_hll_global ['PGE'], '$!MATCH'
+    (mob, pos, target) = $P0.'new'(mob, adverbs :flat :named)
+    lastpos = length target
+    if pos >= lastpos goto fail
+    $S0 = substr target, pos, 1
+    inc pos
+    if $S0 != "\\" goto fail
+    if pos >= lastpos goto fail
+    backchar = substr target, pos, 1
+    inc pos
+    backchar = downcase backchar
+    $I0 = index "\\0abefnrtxco", backchar
+    if $I0 < 0 goto fail
+    if $I0 >= 9 goto scan_xco
+    literal = substr "\\\0\a\b\e\f\n\r\t", $I0, 1
+    goto succeed
+  scan_xco:
+    ##  Handle \x, \c, and \o escapes.  Start by converting
+    ##  backchar into the appropriate radix, then loop through
+    ##  the characters that follow to compute the decimal value
+    ##  of codepoints, and concatenate the codepoints into a
+    ##  literal.
+    .local int base, decnum, isbracketed
+    base = index '        o c     x', backchar
+    literal = ''
+    $S0 = substr target, pos, 1
+    isbracketed = iseq $S0, '['
+    pos += isbracketed
+    ##  Handle the case of \cC (control escape).
+    if base != 10 goto scan_xco_char
+    if isbracketed goto scan_xco_char
+    $I0 = is_cclass .CCLASS_NUMERIC, $S0, 0
+    if $I0 goto scan_xco_char
+    ##  xor the 64 bit
+    $I0 = ord $S0
+    bxor $I0, 64
+    literal = chr $I0
+    inc pos
+    goto succeed
+  scan_xco_char:
+    decnum = 0
+    if base != 10 goto scan_xco_char_digits
+    unless isbracketed goto scan_xco_char_digits
+    $I0 = is_cclass .CCLASS_NUMERIC, target, pos
+    if $I0 goto scan_xco_char_digits
+    ##  look up character by name
+    .local int namepos
+    namepos = index target, ']', pos
+    if namepos < 0 goto err_missing_bracket
+    $I0 = index target, ',', pos
+    if $I0 < 0 goto have_namepos
+    if namepos < $I0 goto have_namepos
+    namepos = $I0
+  have_namepos:
+    $I0 = namepos - pos
+    $S0 = substr target, pos, $I0
+    $P0 = new 'CodeString'
+    decnum = $P0.'charname_to_ord'($S0)
+    if decnum < 0 goto err_unicode_name
+    pos = namepos
+    goto scan_xco_char_end
+  scan_xco_char_digits:
+    $S0 = substr target, pos, 1
+    $I0 = index "0123456789abcdef0123456789ABCDEF", $S0
+    if $I0 < 0 goto scan_xco_char_end
+    $I0 %= 16
+    if $I0 >= base goto scan_xco_char_end
+    decnum *= base
+    decnum += $I0
+    inc pos
+    goto scan_xco_char_digits
+  scan_xco_char_end:
+    $S1 = chr decnum
+    concat literal, $S1
+    $S0 = substr target, pos, 1
+    unless isbracketed goto scan_xco_end
+    if $S0 == ']' goto scan_xco_end
+    if $S0 == '' goto err_missing_bracket
+    if $S0 != ',' goto err_digit
+    inc pos
+    goto scan_xco_char
+  scan_xco_end:
+    pos += isbracketed
+  succeed:
+    mob.'!make'(literal)
+    mob.'to'(pos)
+  fail:
+    .return (mob)
+
+  err_unicode_name:
+    'parse_error'(mob, pos, "Unrecognized character name")
+  err_missing_bracket:
+    'parse_error'(mob, pos, "Missing close bracket for \\x[...], \\o[...], or \\c[...]")
+  err_digit:
+    'parse_error'(mob, pos, "Invalid digit in \\x[...], \\o[...], or \\c[...]")
+.end
+
+
 =item C<onload()>
 
 Initializes the Perl6Regex parser and other data structures
@@ -362,39 +476,50 @@ Parses terms beginning with backslash.
     .param pmc adverbs         :slurpy :named
 
     .local string target
-    .local int pos, lastpos
+    .local int pos, lastpos, isnegated
     $P0 = getattribute mob, '$.target'
     target = $P0
     $P0 = getattribute mob, '$.pos'
     pos = $P0
     lastpos = length target
+    isnegated = 0
 
-    .local string initchar
-    initchar = substr target, pos, 1
-    $I0 = is_cclass .CCLASS_WORD, initchar, 0
-    if $I0 goto term_metachar
-  quoted_metachar:
+    .local string backchar, charlist
+    ##  get whatever follows the backslash
+    backchar = substr target, pos, 1
+    charlist = backchar
     inc pos
-    mob = mob.'new'(mob, 'grammar'=>'PGE::Exp::Literal')
-    mob.'!make'(initchar)
-    mob.'to'(pos)
-    .return (mob)
 
-  term_metachar:
-    .local int isnegated
-    isnegated = is_cclass .CCLASS_UPPERCASE, initchar, 0
-    ## $S0 = downcase     FIXME: RT# 48108
-            $I0 = ord initchar
+    ##  if it's not a word character, it's a quoted metachar
+    $I0 = is_cclass .CCLASS_WORD, backchar, 0
+    unless $I0 goto term_literal
+
+    ##  if it's a word character, it may be negated
+    isnegated = is_cclass .CCLASS_UPPERCASE, backchar, 0
+    ##  $S0 = downcase charlist   FIXME: RT #48108
+            $I0 = ord backchar
             $S0 = chr $I0
-            $S0 = downcase $S0
-    if $S0 == 'x' goto scan_xdo
-    if $S0 == 'o' goto scan_xdo
+            backchar = downcase $S0
+
+    ##  if it's \x, \c, or \o, parse as string escape
+    $I0 = index 'xco', backchar
+    if $I0 < 0 goto meta_esclist
+  meta_xco:
+    $I0 = pos - 2
+    $P0 = 'p6escapes'(mob, 'pos' => $I0)
+    unless $P0 goto err_xcoparse
+    pos = $P0.'to'()
+    charlist = $P0.'ast'()
+    unless isnegated goto term_literal
+    $I0 = length charlist
+    if $I0 > 1 goto err_negated_brackets
+    goto term_charlist
+
+  meta_esclist:
     $P0 = get_global '%esclist'
-    $I0 = exists $P0[$S0]
-    if $I0 == 0 goto err_reserved_metachar
-    inc pos
-    .local string charlist
-    charlist = $P0[$S0]
+    $I0 = exists $P0[backchar]
+    unless $I0 goto err_reserved_metachar
+    charlist = $P0[backchar]
     if isnegated goto term_charlist
     $I0 = length charlist
     if $I0 > 1 goto term_charlist
@@ -412,48 +537,13 @@ Parses terms beginning with backslash.
     mob.'to'(pos)
     .return (mob)
 
-  scan_xdo:
-    inc pos
-    .local int base, decnum, isbracketed
-    charlist = ''
-    base = index '        o d     x', $S0
-    decnum = 0
-    $S0 = substr target, pos, 1
-    isbracketed = iseq $S0, '['
-    pos += isbracketed
-  scan_xdo_char_loop:
-    $S0 = substr target, pos, 1
-    $I0 = index '0123456789abcdef', $S0
-    if $I0 < 0 goto scan_xdo_char_end
-    if $I0 >= base goto scan_xdo_char_end
-    decnum *= base
-    decnum += $I0
-    inc pos
-    goto scan_xdo_char_loop
-  scan_xdo_char_end:
-    $S1 = chr decnum
-    concat charlist, $S1
-    unless isbracketed goto scan_xdo_end
-    if $S0 == ']' goto scan_xdo_end
-    if $S0 == '' goto err_missing_bracket
-    if $S0 != ',' goto err_bracketed
-    if isnegated goto err_negated_brackets
-    inc pos
-    decnum = 0
-    goto scan_xdo_char_loop
-  scan_xdo_end:
-    pos += isbracketed
-    if isnegated goto term_charlist
-    goto term_literal
-
+  err_xcoparse:
+    parse_error(mob, pos, 'Unable to parse \x, \c, or \o value')
+  err_negated_brackets:
+    pos = mob.'from'()
+    parse_error(mob, pos, 'Cannot use comma in \\X[...] or \\O[...]')
   err_reserved_metachar:
     parse_error(mob, pos, 'Alphanumeric metacharacters are reserved')
-  err_missing_bracket:
-    parse_error(mob, pos, 'Missing close bracket for \\x[...] or \\o[...]')
-  err_bracketed:
-    parse_error(mob, pos, 'Invalid digit in \\x[...] or \\o[...]')
-  err_negated_brackets:
-    parse_error(mob, pos, 'Cannot use comma in \\X[...] or \\O[...]')
 .end
 
 

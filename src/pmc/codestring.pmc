@@ -32,6 +32,10 @@ C<emit> method.
 
 #include "parrot/parrot.h"
 
+#if PARROT_HAS_ICU
+#  include <unicode/uchar.h>
+#endif
+
 pmclass CodeString extends String provides string {
 
 /*
@@ -196,6 +200,33 @@ prefixed with 'unicode:'.
     }
 
     RETURN(STRING *escaped_str);
+  }
+
+/*
+
+=item C<charname_to_ord(string name)>
+
+Converts the Unicode character name given by C<name> to its
+codepoint value.  Returns -1 if an error occurs in conversion.
+
+*/
+
+
+  METHOD charname_to_ord(STRING *name) {
+#if PARROT_HAS_ICU
+    UChar32    codepoint;
+    UErrorCode err       = U_ZERO_ERROR;
+    char       *cstr     = Parrot_str_to_cstring(INTERP, name);
+    codepoint = u_charFromName(U_UNICODE_CHAR_NAME, cstr, &err);
+    Parrot_str_free_cstring(cstr);
+    if (U_SUCCESS(err)) {
+        RETURN(INTVAL codepoint);
+    }
+    RETURN(INTVAL -1);
+#else
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
+#endif
   }
 
 /*
