@@ -47,12 +47,12 @@ ex:
 # utils
 .sub 'load_libs'
     # load the necessary libraries
-    load_bytecode "library/SDL/App.pir"
-    load_bytecode "library/SDL/Rect.pir"
-    load_bytecode "library/SDL/Color.pir"
-    load_bytecode "library/SDL/EventHandler.pir"
-    load_bytecode "library/SDL/Event.pir"
-    load_bytecode "library/Getopt/Obj.pir"
+    load_bytecode "SDL/App.pir"
+    load_bytecode "SDL/Rect.pir"
+    load_bytecode "SDL/Color.pir"
+    load_bytecode "SDL/EventHandler.pir"
+    load_bytecode "SDL/Event.pir"
+    load_bytecode "Getopt/Obj.pir"
 .end
 
 # cmd line processing
