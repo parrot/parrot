@@ -266,7 +266,8 @@ sub generate_documentation_signature {
         my $chunk = shift @doc_chunks;
         if (length(join(' ', @line, $chunk)) <= $line_len) {
             push @line, $chunk;
-        } else {
+        }
+        else {
             $split_decl .= join(' ', @line) . "\n";
             @line=($chunk);
         }
