@@ -42,7 +42,7 @@ An SDL::StopWatch object has the following methods:
     .return()
 
   create_class:
-    load_bytecode "library/SDL/LCD.pir"
+    load_bytecode "SDL/LCD.pir"
     class = get_class 'SDL::LCD'
     class = subclass class, 'SDL::StopWatch'
     addattribute $P0, 'time'

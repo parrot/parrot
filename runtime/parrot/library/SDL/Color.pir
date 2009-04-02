@@ -7,7 +7,7 @@ SDL::Color - Parrot class representing colors in Parrot SDL
 
 =head1 SYNOPSIS
 
-    load_bytecode 'library/SDL/Color.pir'
+    load_bytecode 'SDL/Color.pir'
 
     # create a new SDL::Color object
     .local pmc color

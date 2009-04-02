@@ -8,7 +8,7 @@ SDL::Image - Parrot class representing images in Parrot SDL
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/SDL/Image.pir'
+    load_bytecode 'SDL/Image.pir'
 
     # create a new SDL::Image object
     .local pmc image
