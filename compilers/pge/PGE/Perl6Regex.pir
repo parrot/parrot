@@ -202,6 +202,10 @@ and someday may be refactored to a different location.
     goto succeed
   scan_xco_char:
     decnum = 0
+    # inside brackets, skip leading ws
+    unless isbracketed goto scan_xco_char_ws
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+  scan_xco_char_ws:
     if base != 10 goto scan_xco_char_digits
     unless isbracketed goto scan_xco_char_digits
     $I0 = is_cclass .CCLASS_NUMERIC, target, pos
@@ -251,7 +255,8 @@ and someday may be refactored to a different location.
     .return (mob)
 
   err_unicode_name:
-    'parse_error'(mob, pos, "Unrecognized character name")
+    $S0 = concat "Unrecognized character name ", $S0
+    'parse_error'(mob, pos, $S0)
   err_missing_bracket:
     'parse_error'(mob, pos, "Missing close bracket for \\x[...], \\o[...], or \\c[...]")
   err_digit:
