@@ -110,7 +110,6 @@ compilers/pirc/src/pirsymbol.c
 config/gen/platform/ansi/dl.c
 config/gen/platform/ansi/exec.c
 config/gen/platform/ansi/time.c
-config/gen/platform/cygwin/math.c
 config/gen/platform/darwin/dl.c
 config/gen/platform/darwin/memalign.c
 config/gen/platform/generic/dl.c
@@ -119,7 +118,6 @@ config/gen/platform/generic/exec.c
 config/gen/platform/generic/math.c
 config/gen/platform/generic/memalign.c
 config/gen/platform/generic/memexec.c
-config/gen/platform/generic/signal.c
 config/gen/platform/generic/stat.c
 config/gen/platform/generic/time.c
 config/gen/platform/netbsd/math.c
@@ -127,13 +125,7 @@ config/gen/platform/openbsd/math.c
 config/gen/platform/openbsd/memexec.c
 config/gen/platform/solaris/math.c
 config/gen/platform/solaris/time.c
-config/gen/platform/win32/env.c
-config/gen/platform/win32/exec.c
-config/gen/platform/win32/stat.c
-examples/benchmarks/primes.c
-examples/benchmarks/primes2.c
 examples/c/nanoparrot.c
-examples/c/test_main.c
 examples/compilers/japhc.c
 examples/embed/lorito.c
 src/atomic/gcc_x86.c
