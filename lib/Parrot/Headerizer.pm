@@ -275,7 +275,7 @@ sub generate_documentation_signature {
     if (@line) {
         $split_decl .= join(' ', @line) . "\n";
     }
-    
+
     $split_decl =~ s/\n$//;
 
     return $split_decl;
