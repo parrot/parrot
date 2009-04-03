@@ -258,7 +258,7 @@ open $FH, '>', $filename
 print $FH "Hello, World!\n\n";
 close $FH;
 $out = `$parrot $langdir/markdown/markdown.pbc $filename`;
-ok($out eq "<p>Hello, World!</p>\n\n", "check markdown");
+ok($out eq "<p>Hello, World!</p>\n", "check markdown");
 unlink($filename);
 }
 
@@ -311,6 +311,24 @@ print $FH "<?php echo \"Hello, World!\\n\"; ?>";
 close $FH;
 $out = `$parrot $langdir/pipp/pipp.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pipp");
+unlink($filename);
+}
+
+SKIP:
+{
+skip("porcupine", 1) unless (-d "$langdir/porcupine");
+$filename = 'test.pas';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH <<'CODE';
+program hello;
+begin
+    writeln('Hello, world!');
+end.
+CODE
+close $FH;
+$out = `$parrot $langdir/porcupine/porcupine.pbc $filename`;
+ok($out eq "Hello, world!\n", "check porcupine");
 unlink($filename);
 }
 

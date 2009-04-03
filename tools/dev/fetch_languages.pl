@@ -218,6 +218,12 @@ my @hlls = (
     },
 
     {
+        name       => 'porcupine',
+        scm        => 'SVN',
+        repository => 'http://porcupinepascal.googlecode.com/svn/trunk'
+    },
+
+    {
         name       => 'primitivearc',
         scm        => 'GIT',
         repository => 'git://github.com/stefano/primitivearc.git'
