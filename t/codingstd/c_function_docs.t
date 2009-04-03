@@ -103,7 +103,6 @@ compilers/pirc/src/pircompiler.c
 compilers/pirc/src/piremit.c
 compilers/pirc/src/pirerr.c
 compilers/pirc/src/pirmacro.c
-compilers/pirc/src/pirop.c
 compilers/pirc/src/pirpcc.c
 compilers/pirc/src/pirregalloc.c
 compilers/pirc/src/pirsymbol.c

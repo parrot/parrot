@@ -144,6 +144,9 @@ sub extract_function_declarations {
     # If it's got a semicolon, it's not a function header
     @funcs = grep !/;/, @funcs;
 
+    # remove any remaining }'s
+    @funcs = grep {! /^}/} @funcs;
+
     chomp @funcs;
 
     return @funcs;
