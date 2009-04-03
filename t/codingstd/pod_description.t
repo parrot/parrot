@@ -48,7 +48,7 @@ my $empty_description_files = join( "\n", sort @empty_description);
 my $nempty_description      = scalar( @empty_description );
 
 TODO: {
-    local $TODO = 'not everything has a DESCRIPTION';
+    local $TODO = 'POD requirements in flux: TT #292';
 
 is(
     $empty_description_files,
