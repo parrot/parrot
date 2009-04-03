@@ -480,6 +480,15 @@ static int sub_pragma(PARROT_INTERP,
 #define PAD_16_B(size) ((size) % 16 ? 16 - (size) % 16 : 0)
 
 #if TRACE_PACKFILE
+
+/*
+
+=item C<void Parrot_trace_eprintf(const char *s, ...)>
+
+=cut
+
+*/
+
 void
 Parrot_trace_eprintf(ARGIN(const char *s), ...)
 {
