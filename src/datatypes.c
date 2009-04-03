@@ -85,6 +85,9 @@ Parrot_get_datatype_name(PARROT_INTERP, INTVAL type)
 
 =item C<FLOATVAL floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num)>
 
+Only used to generate Infinity and NaN constants in our corresponding
+header file.
+
 =cut
 
 */

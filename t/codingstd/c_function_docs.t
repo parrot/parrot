@@ -128,7 +128,6 @@ examples/c/nanoparrot.c
 examples/compilers/japhc.c
 examples/embed/lorito.c
 src/atomic/gcc_x86.c
-src/datatypes.c
 src/debug.c
 src/exceptions.c
 src/exec.c
