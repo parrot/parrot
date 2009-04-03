@@ -664,6 +664,8 @@ static void set_lexical(PARROT_INTERP,
 
 /*
 
+=over 4
+
 =item C<static Instruction * MK_I(PARROT_INTERP, IMC_Unit *unit, const char
 *fmt, int n, ...)>
 
@@ -5369,6 +5371,11 @@ int yyerror(void *yyscanner, PARROT_INTERP, const char *s)
     return 0;
 }
 
+/*
+
+=back
+
+ */
 /*
  * Local variables:
  *   c-file-style: "parrot"
