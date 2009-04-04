@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 30;
+use Test::More tests => 31;
 
 =head1 NAME
 
@@ -159,10 +159,10 @@ skip("EcmaScript", 1) unless (-d "$langdir/ecmascript");
 $filename = 'test.js';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "print(\"Hello World from JS\\n\");";
+print $FH "print(\"Hello World from JS\");";
 close $FH;
 $out = `$parrot $langdir/ecmascript/js.pbc $filename`;
-ok($out eq "Hello World from JS\n\n", "check ecmascript");
+ok($out eq "Hello World from JS\n", "check ecmascript");
 unlink($filename);
 }
 
@@ -351,10 +351,10 @@ skip("Punie", 1) unless (-d "$langdir/punie");
 $filename = 'test.p1';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "print \"Hello, World!\\n\";\n";
+print $FH "print \"Hello, World!\";\n";
 close $FH;
 $out = `$parrot $langdir/punie/punie.pbc $filename`;
-ok($out eq "Hello, World!\n", "check punie");
+ok($out eq "Hello, World!", "check punie");
 unlink($filename);
 }
 
