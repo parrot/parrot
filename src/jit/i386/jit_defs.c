@@ -824,7 +824,7 @@ Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info,
                    PARROT_INTERP)
 {
     /* we have to get the code pointer, which might change
-     * due too intersegment branches
+     * due to intersegment branches
      */
 
     /* get interpreter
