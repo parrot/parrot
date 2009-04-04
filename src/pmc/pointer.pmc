@@ -83,7 +83,7 @@ Returns the pointer value.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE void *get_pointer() {
         return PMC_data(SELF);
     }
 
