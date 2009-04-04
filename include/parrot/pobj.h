@@ -128,10 +128,6 @@ struct parrot_string_t {
     const struct _charset  *charset;
 };
 
-
-/* put data into the PMC_EXT structure */
-#define PMC_DATA_IN_EXT 0
-
 /* note that cache and flags are isomorphic with Buffer and PObj */
 struct PMC {
     UnionVal        cache;
@@ -144,9 +140,6 @@ struct PMC {
 struct _Sync;   /* forward decl */
 
 typedef struct PMC_EXT {
-#if PMC_DATA_IN_EXT
-    DPOINTER *data;
-#endif /* PMC_DATA_IN_EXT */
     PMC *_metadata;      /* properties */
     /*
      * PMC access synchronization for shared PMCs
@@ -178,18 +171,11 @@ typedef struct PMC_EXT {
 #else
 #  define PMC_ext_checked(pmc)             (PARROT_ASSERT((pmc)->pmc_ext), (pmc)->pmc_ext)
 #endif /* NDEBUG */
-#if PMC_DATA_IN_EXT
-#  define PMC_data(pmc)                   PMC_ext_checked(pmc)->data
-#  define PMC_data_typed(pmc, type) (type)PMC_ext_checked(pmc)->data
-#  define PMC_data0(pmc)      ((pmc)->pmc_ext ? pmc->pmc_ext->data : 0)
-#  define PMC_data0_typed(pmc, type) (type)((pmc)->pmc_ext ? pmc->pmc_ext->data : 0)
-#else
-#  define PMC_data(pmc)                   (pmc)->data
-#  define PMC_data_typed(pmc, type) (type)(pmc)->data
+#define PMC_data(pmc)                   (pmc)->data
+#define PMC_data_typed(pmc, type) (type)(pmc)->data
 /* do not allow PMC_data2 as lvalue */
-#  define PMC_data0(pmc)            (1 ? (pmc)->data : 0)
-#  define PMC_data0_typed(pmc)      (type)(1 ? (pmc)->data : 0)
-#endif /* PMC_DATA_IN_EXT */
+#define PMC_data0(pmc)            (1 ? (pmc)->data : 0)
+#define PMC_data0_typed(pmc)      (type)(1 ? (pmc)->data : 0)
 #define PMC_metadata(pmc)     PMC_ext_checked(pmc)->_metadata
 #define PMC_next_for_GC(pmc)  PMC_ext_checked(pmc)->_next_for_GC
 #define PMC_sync(pmc)         PMC_ext_checked(pmc)->_synchronize

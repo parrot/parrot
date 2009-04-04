@@ -200,9 +200,7 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
         if (has_ext)
             Parrot_gc_free_pmc_ext(interp, pmc);
 
-#if ! PMC_DATA_IN_EXT
         PMC_data(pmc) = NULL;
-#endif
         new_flags = 0;
     }
 

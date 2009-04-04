@@ -11,7 +11,6 @@ $Id$
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_fixedintegerarray.h"
-#include "pmc/pmc_unmanagedstruct.h"
 #include "jit.h"
 #include "jit_emit.h"
 
