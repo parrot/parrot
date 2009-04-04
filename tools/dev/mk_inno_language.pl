@@ -60,7 +60,8 @@ my $pbc = <*.pbc>
         ? qq{Source: ".\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
 my $lib = <library/*.pbc>
-        ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang\\library"; Flags:}
+#        ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang\\library"; Flags:}
+        ? qq{Source: ".\\library\\*.pbc"; DestDir: "{app}\\lib\\parrot\\library\\$lang"; Flags:}
         : '; no .pbc lib';
 my $pmc = <src/pmc/*.dll>
         ? qq{Source: ".\\src\\pmc\\*.dll"; DestDir: "{app}\\lib\\parrot\\dynext"; Flags:}
