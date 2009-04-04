@@ -75,6 +75,20 @@ Creates and returns a clone of the pointer.
 
 /*
 
+=item C<void *get_pointer()>
+
+Returns the pointer value.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return PMC_data(SELF);
+    }
+
+/*
+
 =item C<INTVAL get_integer()>
 
 Returns the pointer value as an integer.
