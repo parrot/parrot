@@ -101,7 +101,7 @@ static STRING
 
 }
 
-/* Albeit the Hash PMC doesn't use PMC_data, it needs the next_for_GC pointer
+/* Needs ext struct for the next_for_GC pointer
  * We would get recursive marking of a deeply nested HoHoH...
  */
 pmclass Hash need_ext provides hash {
