@@ -62,6 +62,12 @@ my @hlls = (
     },
 
     {
+        name       => 'cardinal',
+        scm        => 'SVN',
+        repository => 'https://svn.parrot.org/languages/cardinal/trunk'
+    },
+
+    {
         name       => 'chitchat',
         scm        => 'SVN',
         repository => 'https://svn.parrot.org/languages/chitchat/trunk'
