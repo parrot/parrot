@@ -3,11 +3,11 @@ DESCRIPTION="Parrot Virtual Machine"
 HOMEPAGE="http://www.parrot.org/"
 SRC_URI="ftp://ftp.parrot.org/pub/parrot/releases/devel/${PV}/${PN}-${PV}.tar.gz"
 LICENSE="Artistic2"
-DIFF_EXCLUDES="MANIFEST.* parrot.pc myconfig config_lib.pasm Makefile TAGS"
+DIFF_EXCLUDES="parrot.pc myconfig config_lib.pasm Makefile TAGS"
 DLLVER=$(echo $PV|sed -e's,\.,_,g')
 cygwin2=
 DOCDIR="/usr/share/doc"
-PKG_NAMES="${PN} lib${PN}1 ${PN}-devel ${PN}-docs"
+PKG_NAMES="${PN} ${PN}-devel ${PN}-docs"
 PKG_HINTS="${PKG_NAMES}"
 
 parrot_exists_check() {
@@ -32,20 +32,23 @@ src_compile() {
   test -e Configure.pl || lndirs
   test -e config_lib.pasm && make realclean
 
-  perl Configure.pl --prefix=/usr --optimize --mandir=/usr/share/man 
+  perl Configure.pl --prefix=/usr --optimize --mandir=/usr/share/man
   # only cygwin-1.5 -Ddoc_dir=/usr/share/doc/${P} needs to be patched for cygwin. 
   if [ -z "$cygwin2" ]; then
     sed -e"s,/usr/share/doc/parrot/${PV}\",/usr/share/doc/${P}\"," -i config_lib.pasm
   fi
 
-  cygmake all installable
-  cygmake -C editor
-  cygmake docs html
+  cygmake all 
+  cygmake installable
+  cygmake -C editor all
+  cygmake docs
+  cygmake html
 
   cat >>myconfig <<EOF
   Locally applied patches:
 TT #253 r37202 opengl detection
 TT #280 r37214 bignum.pmc compiler warnings
+custom library.c patch to allow library/*.pbc
 EOF
 }
 
@@ -99,7 +102,8 @@ src_install () {
   pod2man docs/running.pod > $man1/parrot.1
   pod2man src/parrot_debugger.c > $man1/parrot_debugger.1
   pod2man src/pbc_disassemble.c > $man1/pbc_disassemble.1
-  pod2man src/pbc_info.c > $man1/pbc_info.1
+  pod2man src/pbc_dump.c > $man1/pbc_dump.1
+  pod2man tools/build/parrot_config_c.pl > $man1/parrot_config.1
   pod2man src/pbc_merge.c > $man1/pbc_merge.1
   pod2man tools/dev/pbc_to_exe.pir > $man1/pbc_to_exe.1
 
@@ -113,8 +117,8 @@ src_install () {
       rm $f
     fi
   done
-  cd ${B}
 
+  cd ${B}
   cp -r docs/html $D/usr/share/doc/parrot/${PV}/html/
   #insinto /usr/share/doc/parrot/${PV}/docs/html
   #doins docs/html
@@ -122,7 +126,6 @@ src_install () {
 
 # parrot
 PKG_CONTENTS[0]=" \
---exclude=usr/bin/cygparrot${DLLVER}.dll \
 --exclude=usr/include \
 --exclude=usr/share/doc/parrot/${PV}/languages \
 --exclude=usr/share/doc/parrot/DEPRECATED.pod \
@@ -142,12 +145,8 @@ usr/lib/parrot/${PV}/include/interpinfo.pasm \
 usr/lib/parrot/${PV}/include/config.fpmc \
 "
 
-# libparrot1
-PKG_CONTENTS[1]=" \
-usr/bin/cygparrot${DLLVER}.dll"
-
 # parrot-devel
-PKG_CONTENTS[2]=" \
+PKG_CONTENTS[1]=" \
 --exclude=usr/lib/parrot/${PV}/dynext \
 --exclude=usr/lib/parrot/${PV}/languages \
 --exclude=usr/lib/parrot/${PV}/library \
@@ -163,8 +162,8 @@ usr/lib \
 usr/share/doc/parrot/DEPRECATED.pod \
 usr/share/doc/parrot/${PV}/PBC_COMPAT \
 usr/share/doc/parrot/${PV}/pod/project \
-usr/src/parrot/${PV}"
+"
 
 # parrot-docs
-PKG_CONTENTS[3]=" \
+PKG_CONTENTS[2]=" \
 usr/share/doc/parrot/${PV}/html"

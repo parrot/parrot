@@ -1,5 +1,5 @@
 sdesc: "Parrot Virtual Machine development headers and libraries"
 ldesc: "Libraries and headers needed for development against Parrot"
 category: Libs
-requires: parrot readline libncurses-devel libicu-devel libgmp-devel libgdbm-devel perl pcre-devel
+requires: parrot perl readline libncurses-devel libicu-devel libgmp-devel libgdbm-devel perl pcre-devel
 external-source: parrot

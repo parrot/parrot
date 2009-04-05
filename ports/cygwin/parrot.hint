@@ -3,4 +3,4 @@ ldesc: "Parrot is a virtual machine designed to efficiently compile and
 execute bytecode for interpreted languages. Parrot is a target for Perl 6 
 and a lot of other languages"
 category: Interpreters
-requires: cygwin libparrot1 w32api opengl
+requires: cygwin libgcc1 w32api opengl libreadline6 libintl8 libicu38 libgmp3 libgdbm4

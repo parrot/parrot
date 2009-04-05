@@ -1,0 +1,510 @@
+--- origsrc/parrot-1.0.0/MANIFEST.generated	2009-03-17 07:08:41.000000000 +0000
++++ src/parrot-1.0.0/MANIFEST.generated	2009-04-05 16:12:23.546875000 +0000
+@@ -7,6 +7,8 @@ blib/lib/libparrot.a                    
+ blib/lib/libparrot.dylib                          [main]lib
+ blib/lib/libparrot.so.1.0.0                       [main]lib
+ blib/lib/libparrot.so                             [main]lib
++cygparrot1_0_0.dll                                [main]bin
++libparrot.dll.a                                   [main]lib
+ compilers/json/JSON/grammar.pbc                   [json]
+ compilers/json/JSON.pbc                           [json]
+ compilers/json/JSON/pge2pir.pbc                   [json]
+@@ -46,6 +48,8 @@ include/parrot/platform.h               
+ include/parrot/platform_interface.h               [main]include
+ include/parrot/platform_limits.h                  [devel]include
+ include/parrot/vtable.h                           [main]include
++install_config.o                                  [devel]src
++install_config.obj                                [devel]src
+ install_config.fpmc                               [main]lib
+ installable_parrot_config.exe                     [main]bin
+ installable_parrot_config                         [main]bin
+@@ -57,8 +61,6 @@ installable_pbc_disassemble.exe         
+ installable_pbc_disassemble                       [main]bin
+ installable_pbc_dump.exe                          [main]bin
+ installable_pbc_dump                              [main]bin
+-installable_pbc_info.exe                          [main]bin
+-installable_pbc_info                              [main]bin
+ installable_pbc_merge.exe                         [main]bin
+ installable_pbc_merge                             [main]bin
+ installable_pbc_to_exe.exe                        [main]bin
+@@ -73,8 +75,6 @@ pbc_disassemble.exe                     
+ pbc_disassemble                                   [main]bin
+ pbc_dump.exe                                      [main]bin
+ pbc_dump                                          [main]bin
+-pbc_info.exe                                      [main]bin
+-pbc_info                                          [main]bin
+ pbc_merge.exe                                     [main]bin
+ pbc_merge                                         [main]bin
+ pbc_to_exe.exe                                    [main]bin
+@@ -147,11 +147,16 @@ runtime/parrot/include/warnings.pasm    
+ runtime/parrot/library/CGI/QueryHash.pbc          [main]
+ runtime/parrot/library/config.pbc                 [main]
+ runtime/parrot/library/config.pir                 [main]
++runtime/parrot/library/Config/JSON.pbc            [main]
++runtime/parrot/library/Crow.pbc                   [main]
+ runtime/parrot/library/Data/Dumper/Base.pbc       [main]
+ runtime/parrot/library/Data/Dumper/Default.pbc    [main]
+ runtime/parrot/library/Data/Dumper.pbc            [main]
++runtime/parrot/library/Data/Replace.pbc           [main]
++runtime/parrot/library/Digest/MD5.pbc             [main]
+ runtime/parrot/library/dumper.pbc                 [main]
+ runtime/parrot/library/Getopt/Obj.pbc             [main]
++runtime/parrot/library/libpcre.pbc                [main]
+ runtime/parrot/library/Math/Random/mt19937ar.pbc  [main]
+ runtime/parrot/library/Math/Rand.pbc              [main]
+ runtime/parrot/library/MIME/Base64.pbc            [main]
+@@ -177,7 +182,9 @@ runtime/parrot/library/PGE.pbc          
+ runtime/parrot/library/PGE/Perl6Grammar.pbc       [main]
+ runtime/parrot/library/PGE/Text.pbc               [main]
+ runtime/parrot/library/PGE/Util.pbc               [main]
++runtime/parrot/library/postgres.pbc               [main]
+ runtime/parrot/library/Protoobject.pbc            [main]
++runtime/parrot/library/STM.pbc                    [main]
+ runtime/parrot/library/Stream/Base.pbc            [main]
+ runtime/parrot/library/Stream/Combiner.pbc        [main]
+ runtime/parrot/library/Stream/Coroutine.pbc       [main]
+@@ -187,12 +194,24 @@ runtime/parrot/library/Stream/ParrotIO.p
+ runtime/parrot/library/Stream/Replay.pbc          [main]
+ runtime/parrot/library/Stream/Sub.pbc             [main]
+ runtime/parrot/library/Stream/Writer.pbc          [main]
++runtime/parrot/library/Test/Builder/Output.pbc    [main]
++runtime/parrot/library/Test/Builder/Test.pbc      [main]
++runtime/parrot/library/Test/Builder/Tester.pbc    [main]
++runtime/parrot/library/Test/Builder/TestPlan.pbc  [main]
++runtime/parrot/library/Test/Builder.pbc           [main]
++runtime/parrot/library/Test/Class.pbc             [main]
++runtime/parrot/library/Test/More.pbc              [main]
++runtime/parrot/library/Tcl/Glob.pbc               [main]
++runtime/parrot/library/uuid.pbc                   [main]
++runtime/parrot/library/yaml_dumper.pbc            [main]
++runtime/parrot/library/YAML/Parser/Syck.pbc       [main]
+ runtime/parrot/library/TGE.pbc                    [tge]
+ src/call_list.txt                                 [devel]src
+ src/glut_callbacks.c                              []
+ src/jit_emit.h                                    []
+-src/nci.c                                         []
++src/nci.c                                         [devel]src
+ src/null_config.c                                 []
++src/null_config.o                                 [devel]src
+ src/ops/core_ops_cgp.c                            []
+ src/ops/core_ops_switch.c                         []
+ src/parrot_config.c                               []
+@@ -226,5 +245,6 @@ src/pmc/string.dump                     
+ src/pmc/sub.dump                                  [devel]src
+ src/pmc/undef.dump                                [devel]src
+ src/string_private_cstring.h                      []
+-tools/build/dynpmc.pl                             []
+-vtable.dump                                       [devel]src
++tools/build/dynpmc.pl                             [devel]
++tools/build/dynoplibs.pl                          [devel]
++vtable.dump                                       [devel]
+--- origsrc/parrot-1.0.0/config/gen/makefiles/dynoplibs_pl.in	2009-03-08 20:32:48.000000000 +0000
++++ src/parrot-1.0.0/config/gen/makefiles/dynoplibs_pl.in	2009-04-03 17:03:48.015625000 +0000
+@@ -30,6 +30,7 @@ our $PERL = q[@perl@];
+ our $LOAD_EXT = q[@load_ext@];
+ our $O = q[@o@];
+ our $CFLAGS = q[@ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@];
++our $installed = "@build_dir@" ne "@prefix@";
+ 
+ our $LIBPARROT = q[];
+ #IF(parrot_is_shared):$LIBPARROT = q[@libparrot_ldflags@];
+@@ -38,10 +39,17 @@ our $LIBPARROT = q[];
+ our $PATHQUOTE = $^O eq 'MSWin32' ? q["] : q[];
+ 
+ # OPS2C Config
++our $installed = "@build_dir@" ne "@prefix@";
++our $toolsbuild = $installed ? "@lib_dir@@versiondir@@slash@tools@slash@build@slash@"
++                             : "@build_dir@@slash@tools@slash@build@slash@";
++our $PMC2C = "$PERL $PATHQUOTE" . $toolsbuild . q[pmc2c.pl] . $PATHQUOTE;
++our $incdir = $installed ? "@include_dir@@versiondir@"
++                         : "@build_dir@@slash@include";
++our $perllib = $installed ? "@lib_dir@/@versiondir@/tools/lib" : q[@build_dir@@slash@lib];
+ our $OPS2C = "$PERL -I $PATHQUOTE" .
+-             q[@build_dir@@slash@lib] .
++             $perllib .
+              "$PATHQUOTE $PATHQUOTE" .
+-             q[@build_dir@@slash@tools@slash@build@slash@ops2c.pl] .
++             $toolsbuild . 'ops2c.pl' .
+              $PATHQUOTE;
+ our %cores = (
+     C       => q[],
+@@ -57,8 +65,9 @@ sub compile_cmd {
+     return
+         "$CC " .
+         "@cc_o_out@" . $target . " " .
+-        "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
+-        "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
++        "-I" . $PATHQUOTE . $incdir . $PATHQUOTE . " " .
++        "-I" . $PATHQUOTE . $incdir . ($installed ? '@slash@pmc' : '@slash@src@slash@pmc') .
++          $PATHQUOTE . " " .
+         "$CFLAGS " .
+         $source;
+ };
+--- origsrc/parrot-1.0.0/config/gen/makefiles/dynpmc_pl.in	2009-03-08 20:32:48.000000000 +0000
++++ src/parrot-1.0.0/config/gen/makefiles/dynpmc_pl.in	2009-04-03 17:02:45.640625000 +0000
+@@ -18,6 +18,7 @@ use warnings;
+ use FindBin;
+ use lib "$FindBin::Bin/../..";
+ use lib "$FindBin::Bin/../../lib";
++use lib "@lib_dir@/@versiondir@/tools/lib";
+ 
+ use File::Copy qw(copy);
+ use Storable;
+@@ -42,7 +43,12 @@ our $LIBPARROT = q[];
+ our $PATHQUOTE = $^O eq 'MSWin32' ? q["] : q[];
+ 
+ # PMC2C Config
+-our $PMC2C = "$PERL $PATHQUOTE" . q[@build_dir@@slash@tools@slash@build@slash@pmc2c.pl] . $PATHQUOTE;
++our $installed = "@build_dir@" ne "@prefix@";
++our $toolsbuild = $installed ? "@lib_dir@@versiondir@@slash@tools@slash@build@slash@"
++                             : "@build_dir@@slash@tools@slash@build@slash@";
++our $PMC2C = "$PERL $PATHQUOTE" . $toolsbuild . q[pmc2c.pl] . $PATHQUOTE;
++our $incdir = $installed ? "@include_dir@@versiondir@"
++                         : "@build_dir@@slash@include";
+ 
+ # Actual commands
+ sub compile_cmd {
+@@ -61,8 +67,9 @@ sub compile_cmd {
+     return
+         "$CC " .
+         '@cc_o_out@' . $target . " " .
+-        "-I" . $PATHQUOTE . '@build_dir@@slash@include' . $PATHQUOTE . " " .
+-        "-I" . $PATHQUOTE . '@build_dir@@slash@src@slash@pmc' . $PATHQUOTE . " " .
++        "-I" . $PATHQUOTE . $incdir . $PATHQUOTE . " " .
++        "-I" . $PATHQUOTE . $incdir . ($installed ? '@slash@pmc' : '@slash@src@slash@pmc') .
++          $PATHQUOTE . " " .
+         $dynpmc_include . " " .
+         "$CFLAGS " .
+         $source;
+@@ -88,10 +95,10 @@ sub partial_link_cmd {
+ 
+         # Also note that we may need to look in the Parrot blib directory.
+         if ($CC =~ /gcc/i) {
+-            $liblist .= qq{ -Wl,-L "@build_dir@/blib/lib"};
++            $liblist .= $installed ? qq{ -Wl,-L "@lib_dir@"} : qq{ -Wl,-L "@build_dir@/blib/lib"};
+         }
+         else {
+-            $liblist .= qq{ /LIBPATH:"@build_dir@/blib/lib"};
++            $liblist .= $installed ? qq{ /LIBPATH:"@lib_dir@"} : qq{ /LIBPATH:"@build_dir@/blib/lib"};
+         }
+     }
+     else {
+--- origsrc/parrot-1.0.0/config/init/install.pm	2009-03-07 19:53:39.000000000 +0000
++++ src/parrot-1.0.0/config/init/install.pm	2009-04-03 17:50:56.984375000 +0000
+@@ -85,7 +85,7 @@ sub runstep {
+     my $mandir = assign_dir( $conf, 'mandir', $prefix, '/man' );
+ 
+     #  --srcdir=DIR           source code files PREFIX/src]
+-    my $srcdir = assign_dir( $conf, 'srcdir', $prefix, '/src' );
++    my $srcdir = assign_dir( $conf, 'srcdir', $prefix, "/lib$versiondir/src" );
+ 
+     $conf->data->set(
+         prefix         => $prefix,
+--- origsrc/parrot-1.0.0/runtime/parrot/library/OpenGL.pir	2009-03-12 05:45:58.000000000 +0000
++++ src/parrot-1.0.0/runtime/parrot/library/OpenGL.pir	2009-04-01 16:46:51.728625000 +0000
+@@ -108,6 +108,7 @@ the known different filenames for each l
+     libnames = new 'ResizableStringArray'
+     push libnames, 'libGL'
+     push libnames, 'opengl32'
++    push libnames, '/usr/bin/cygGL-1.dll'
+     push libnames, '/System/Library/Frameworks/OpenGL.framework/OpenGL'
+     libgl = _load_lib_with_fallbacks('GL', libnames)
+     set_global '_libgl', libgl
+@@ -115,6 +116,7 @@ the known different filenames for each l
+     libnames = new 'ResizableStringArray'
+     push libnames, 'libGLU'
+     push libnames, 'glu32'
++    push libnames, '/usr/bin/cygGLU-1.dll'
+     push libnames, '/System/Library/Frameworks/OpenGL.framework/OpenGL'
+     libglu = _load_lib_with_fallbacks('GLU', libnames)
+     set_global '_libglu', libglu
+@@ -122,6 +124,7 @@ the known different filenames for each l
+     libnames = new 'ResizableStringArray'
+     push libnames, 'libglut'
+     push libnames, 'glut32'
++    push libnames, '/usr/bin/cygglut-3.dll'
+     push libnames, '/System/Library/Frameworks/GLUT.framework/GLUT'
+     libglut = _load_lib_with_fallbacks('GLUT', libnames)
+     set_global '_libglut', libglut
+--- origsrc/parrot-1.0.0/src/library.c	2009-03-08 21:11:36.000000000 +0000
++++ src/parrot-1.0.0/src/library.c	2009-03-31 17:14:56.213000000 +0000
+@@ -189,6 +189,7 @@ parrot_init_library_paths(PARROT_INTERP)
+         versionlib = VTABLE_get_string_keyed_str(interp, config_hash, libkey);
+         entry = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
+         versionlib = Parrot_str_append(interp, versionlib, entry);
++        VTABLE_push_string(interp, paths, versionlib);
+         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/include/"), 0);
+         VTABLE_push_string(interp, paths, entry);
+     }
+@@ -205,6 +206,7 @@ parrot_init_library_paths(PARROT_INTERP)
+     entry = CONST_STRING(interp, "./");
+     VTABLE_push_string(interp, paths, entry);
+     if (!STRING_IS_NULL(versionlib)) {
++        VTABLE_push_string(interp, paths, versionlib);
+         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/library/"), 0);
+         VTABLE_push_string(interp, paths, entry);
+     }
+--- origsrc/parrot-1.0.0/t/native_pbc/header.t	2009-03-13 07:04:51.000000000 +0000
++++ src/parrot-1.0.0/t/native_pbc/header.t	2009-03-24 16:11:28.239125000 +0000
+@@ -6,7 +6,9 @@ use strict;
+ use warnings;
+ use lib qw( . lib ../lib ../../lib );
+ use Test::More;
+-use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
++
++#use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
++use Parrot::Test tests => 9;
+ 
+ use File::Temp;
+ use Parrot::Config;
+--- origsrc/parrot-1.0.0/t/native_pbc/integer.t	2009-03-16 18:13:23.000000000 +0000
++++ src/parrot-1.0.0/t/native_pbc/integer.t	2009-03-24 16:11:28.239125000 +0000
+@@ -9,8 +9,8 @@ use Test::More;
+ use Parrot::Config;
+ use Parrot::BuildUtil;
+ 
+-use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+-#use Parrot::Test tests => 7;
++#use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
++use Parrot::Test tests => 7;
+ 
+ =head1 NAME
+ 
+--- origsrc/parrot-1.0.0/t/native_pbc/number.t	2009-03-16 18:13:23.000000000 +0000
++++ src/parrot-1.0.0/t/native_pbc/number.t	2009-03-24 16:11:28.239125000 +0000
+@@ -9,8 +9,8 @@ use Test::More;
+ use Parrot::Config;
+ use Parrot::BuildUtil;
+ 
+-use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+-#use Parrot::Test tests => 7;
++#use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
++use Parrot::Test tests => 7;
+ 
+ =head1 NAME
+ 
+--- origsrc/parrot-1.0.0/t/native_pbc/string.t	2009-03-13 20:56:39.000000000 +0000
++++ src/parrot-1.0.0/t/native_pbc/string.t	2009-03-24 16:11:28.239125000 +0000
+@@ -9,8 +9,8 @@ use Test::More;
+ use Parrot::Config;
+ use Parrot::BuildUtil;
+ 
+-use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
+-#use Parrot::Test tests => 6;
++#use Parrot::Test skip_all => 'pending robust testing strategy, TT #357';
++use Parrot::Test tests => 6;
+ 
+ =head1 NAME
+ 
+--- origsrc/parrot-1.0.0/tools/dev/install_dev_files.pl	2009-02-23 21:33:23.000000000 +0000
++++ src/parrot-1.0.0/tools/dev/install_dev_files.pl	2009-04-03 17:31:42.718750000 +0000
+@@ -73,7 +73,6 @@ my %options = (
+     includedir  => '/usr/include',   # parrot/ subdir added below
+     docdir      => '/usr/share/doc', # parrot/ subdir added below
+     datadir     => '/usr/share/',    # parrot/ subdir added below
+-    srcdir      => '/usr/src/',      # parrot/ subdir added below
+     'dry-run'   => 0,
+ );
+ 
+@@ -88,6 +87,7 @@ foreach (@ARGV) {
+ }
+ 
+ my $parrotdir = $options{versiondir};
++$options{srcdir} = '/usr/lib' . $parrotdir . '/src/' unless $options{srcdir};
+ 
+ # We'll report multiple occurrences of the same file
+ my %seen;
+@@ -135,7 +135,7 @@ while (<>) {
+     }
+     elsif ( $meta{src} ) {
+         $dest =~ s/^src//; # strip off leading src/ dir
+-        $dest = File::Spec->catdir( $options{srcdir}, $parrotdir, $dest );
++        $dest = File::Spec->catdir( $options{srcdir}, $dest );
+     }
+     elsif ( $meta{doc} ) {
+         $dest =~ s/^docs/pod/; # docs dir are actually raw Pod
+@@ -151,6 +151,9 @@ while (<>) {
+     elsif ( /^VERSION/ ) {
+         $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
+     }
++    elsif ( /^(vtable|call_list)/ ) {
++        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
++    }
+     elsif ( /^compilers/ ) {
+         $dest =~ s/^compilers/languages/;
+         $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
+--- origsrc/parrot-1.0.0/tools/dev/install_files.pl	2009-03-10 23:35:20.000000000 +0000
++++ src/parrot-1.0.0/tools/dev/install_files.pl	2009-04-05 16:04:40.093750000 +0000
+@@ -217,7 +217,7 @@ while (<>) {
+         # as it is typically done with automake installed packages.  If there
+         # is a use case to make this configurable we'll add a seperate
+         # --pkgconfigdir option.
+-        $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $parrotdir, $dest );
++        $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $dest );
+     }
+     elsif ( /^compilers/ ) {
+         $dest =~ s/^compilers/languages/;
+--- origsrc/parrot-1.0.0/tools/dev/pbc_to_exe.pir	2009-02-17 20:03:48.000000000 +0000
++++ src/parrot-1.0.0/tools/dev/pbc_to_exe.pir	2009-04-04 15:31:46.750000000 +0000
+@@ -26,8 +26,9 @@ Warning! With --install there must be no
+     .local string exefile
+     .local string out
+     .local int    closeresult
++    .local int    installed
+ 
+-    (infile, cfile, objfile, exefile) = 'handle_args'(argv)
++    (infile, cfile, objfile, exefile, installed) = 'handle_args'(argv)
+     unless infile > '' goto err_infile
+ 
+     .local string codestring
+@@ -83,8 +84,18 @@ MAIN
+     closeresult = outfh.'close'()
+     unless closeresult == 0 goto err_close
+ 
+-    'compile_file'(cfile, objfile)
+-    'link_file'(objfile, exefile)
++    $P0 = new 'ResizablePMCArray'
++    $P0[0] = cfile
++    $P0[1] = objfile
++    $P0[2] = installed
++    $S0 = sprintf "  compile_file(\"%s\", \"%s\", %d):", $P0
++    say $S0
++    'compile_file'(cfile, objfile, installed)
++  
++    $P0[1] = exefile
++    $S0 = sprintf "  link_file(\"%s\", \"%s\", %d):", $P0
++    say $S0
++    'link_file'(objfile, exefile, installed)
+     .return ()
+ 
+   err_infile:
+@@ -98,6 +109,8 @@ MAIN
+ 
+ .sub 'handle_args'
+     .param pmc argv
++    .local int installed
++    installed = 0
+ 
+     .local pmc args
+     args   = argv
+@@ -120,11 +133,19 @@ MAIN
+ 
+   proper_install:
+     .local string cfile, objfile, obj, exefile, exe
++    .local string prefix, build_dir
+ 
+     $P0    = '_config'()
+     obj    = $P0['o']
+     exe    = $P0['exe']
++    prefix = $P0['prefix']
++    build_dir = $P0['build_dir']
++    if prefix == build_dir goto lab_installed
++    installed = 1
++  lab_installed:
+ 
++  print "  installed="  
++  say installed  
+     .local int infile_len
+     infile_len  = length infile
+     infile_len -= 3
+@@ -138,15 +159,23 @@ MAIN
+     exefile    .= objfile
+     exefile    .= exe
+     objfile    .= obj
+-    .return(infile, cfile, objfile, exefile)
++    .return(infile, cfile, objfile, exefile, installed)
+ 
+   proper_args:
+     .local string infile, cfile, objfile, obj, exefile, exe
++    .local string prefix, build_dir
+ 
+     $P0    = '_config'()
+     obj    = $P0['o']
+     exe    = $P0['exe']
++    prefix = $P0['prefix']
++    build_dir = $P0['build_dir']
++    if prefix == build_dir goto lab_installed1
++    installed = 1
++  lab_installed1:
+ 
++  print "  installed="  
++  say installed  
+     $P0    = shift args
+     infile = shift args
+ 
+@@ -167,7 +196,7 @@ MAIN
+     # remove .c for executable
+ 
+     # TODO this should complain about results/returns mismatch
+-    .return(infile, cfile, objfile, exefile)
++    .return(infile, cfile, objfile, exefile, installed)
+ .end
+ 
+ .sub 'generate_code'
+@@ -223,7 +252,7 @@ MAIN
+ .sub 'compile_file'
+     .param string cfile
+     .param string objfile
+-    .param int install :optional
++    .param int installed
+ 
+     $P0 = '_config'()
+     .local string cc, ccflags, cc_o_out, osname, build_dir, slash
+@@ -237,6 +266,16 @@ MAIN
+     .local string includedir, pathquote
+     includedir = concat build_dir, slash
+     includedir = concat includedir, 'include'
++
++    unless installed goto inc_notinstalled
++    .local string include_dir, versiondir
++    include_dir = $P0['include_dir']
++    versiondir  = $P0['versiondir']
++    includedir  = concat include_dir, versiondir
++
++  inc_notinstalled:
++  print "  includedir="
++  say includedir
+     pathquote  = ''
+     unless osname == 'MSWin32' goto not_windows
+     pathquote  = '"'
+@@ -272,7 +311,7 @@ MAIN
+ .sub 'link_file'
+     .param string objfile
+     .param string exefile
+-    .param int install :optional
++    .param int installed
+ 
+     $P0 = '_config'()
+     .local string cc, link, link_dynamic, linkflags, ld_out, libparrot, libs, o
+@@ -293,16 +332,29 @@ MAIN
+ 
+     .local string config, pathquote, exeprefix
+     exeprefix = substr exefile, 0, 12
++    if installed goto config_installed
++    # special build_time paths
+     config     = concat build_dir, slash
+     config    .= 'src'
+     config    .= slash
++    goto check_installable
++  config_installed:
++    .local string lib_dir, versiondir
++    lib_dir    = $P0['lib_dir']
++    versiondir = $P0['versiondir']
++    config     = concat lib_dir, versiondir
++    config    .= slash
++    config    .= 'src'
++    config    .= slash
++    goto config_install
++  check_installable:
+     if exeprefix == 'installable_' goto config_install
+     config    .= 'parrot_config'
+     goto config_cont
+- config_install:
++  config_install:
+     config    .= 'install_config'
+     rpath     = $P0['rpath_lib']
+- config_cont:
++  config_cont:
+     config    .= o
+     pathquote  = ''
+     unless osname == 'MSWin32' goto not_windows

@@ -1,4 +1,0 @@
-sdesc: "The cygparrot dll"
-category: Libs
-external-source: parrot
-requires: libreadline6 libintl8 libicu38 libgmp3 libgdbm4 crypt libgcc1
