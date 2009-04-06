@@ -4,6 +4,7 @@ PortSystem              1.0
 
 name			parrot
 version			1.0.0
+revision		1
 categories		lang devel
 maintainers		bfulgham coleda.com:will
 description		Open source virtual machine (for Perl6 et al.)
@@ -12,7 +13,8 @@ long_description	\
         execute bytecode for dynamic languages. Parrot currently hosts a \
         variety of language implementations in various stages of completion, \
         including Tcl, Javascript, Ruby, Lua, Scheme, PHP, Python, Perl 6, \
-        and a .NET bytecode translator.
+        and a .NET bytecode translator. This package includes the development \
+        tools required to build languages on top of parrot. 
 
 platforms		darwin
 homepage		http://www.parrot.org/
@@ -29,7 +31,7 @@ configure.cmd		perl Configure.pl
 configure.pre_args	--prefix=${prefix}/lib/parrot
 configure.args		--optimize
 
-destroot.target         install
+destroot.target         install-dev
 
 build.type		gnu
 build.target
