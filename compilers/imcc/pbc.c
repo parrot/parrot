@@ -610,7 +610,7 @@ get_old_size(PARROT_INTERP, ARGOUT(int *ins_line))
     *ins_line   = 0;
 
     if (IMCC_INFO(interp)->globals->cs && interp->code->base.data) {
-        subs_t *s;
+        const subs_t *s;
         for (s = IMCC_INFO(interp)->globals->cs->subs; s; s = s->prev) {
             size      += s->size;
             *ins_line += s->ins_line;
