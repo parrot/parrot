@@ -39,12 +39,10 @@ tools/dev/opsrenumber.pl - Renumber F<src/ops/ops.num>.
 
 This program should be used when adding or removing opcodes.
 
-This program will behave differently depending on whether Parrot has reached
-major version 1 or not.  In the current period (major version 0), all the
-opcodes except the first seven are potentially deletable and the opcodes'
-order may be rearranged.  Once a production version of Parrot has been
-released, all then existing opcodes and their numbers will be deemed
-immutable, though new opcodes may be added at the end of the list.
+All opcodes except the first seven are potentially deletable and the opcodes'
+order may be rearranged.  However, in and after Parrot 1.0.0, deletion of
+opcodes should be a rare event.  New opcodes should be added at the end of the
+list.
 
 =head1 SEE ALSO
 
