@@ -43,7 +43,7 @@ my %sig_table = (
         as_proto => "void *",
         other_decl => "PMC * const final_destination = pmc_new(interp, enum_class_UnManagedStruct);",
         sig_char => "P",
-        ret_assign => "PMC_data(final_destination) = return_data;    set_nci_P(interp, &st, final_destination);",
+        ret_assign => "VTABLE_set_pointer(interp, final_destination, return_data);    set_nci_P(interp, &st, final_destination);",
     },
     i => { as_proto => "int",    sig_char => "I" },
     l => { as_proto => "long",   sig_char => "I" },
@@ -477,7 +477,7 @@ HEADER
 
     push @{$put_pointer_ref}, <<"PUT_POINTER";
         temp_pmc = pmc_new(interp, enum_class_UnManagedStruct);
-        PMC_data(temp_pmc) = (void *)$value;
+        VTABLE_set_pointer(interp, temp_pmc, (void *)$value);
         VTABLE_set_pmc_keyed_str(interp, HashPointer, CONST_STRING(interp, "$key"), temp_pmc);
 PUT_POINTER
 
@@ -569,7 +569,7 @@ $put_pointer
     b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
 
     if (b && b->vtable->base_type == enum_class_UnManagedStruct)
-        return F2DPTR(PMC_data(b));
+        return F2DPTR(VTABLE_get_pointer(interp, b));
 
     /*
       These three lines have been added to aid debugging. I want to be able to

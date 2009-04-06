@@ -1405,7 +1405,7 @@ op dlvar(out PMC, invar PMC, in STR) {
         /* At this point we have the symbol's address. We just need to build
            a PMC with it so we can get and set the value */
         $1 = pmc_new(interp, enum_class_UnManagedStruct);
-        PMC_data($1) = p;
+        VTABLE_set_pointer(interp, $1, p);
     }
     Parrot_str_free_cstring(name);
 }

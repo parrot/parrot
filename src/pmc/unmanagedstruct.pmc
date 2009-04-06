@@ -63,7 +63,7 @@ char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)
     offs  = (size_t) VTABLE_get_integer_keyed_int(interp,
         PMC_pmc_val(pmc), ix + 2);
 
-    return ((char *)PMC_data(pmc)) + offs;
+    return ((char *)VTABLE_get_pointer(interp, pmc)) + offs;
 }
 
 /*
@@ -183,16 +183,16 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
         }
 
         if (init->vtable->base_type == enum_class_UnManagedStruct) {
-            /* now point PMC_data of this struct to the real data */
+            /* now point ptr to the real data */
             if (*type == enum_type_struct_ptr) {
                 /* that is either a pointer */
                 PARROT_ASSERT((PTR2INTVAL(p) & (PARROT_PTR_ALIGNMENT - 1)) == 0);
-                PMC_data(init) = *(void**)p;
+                VTABLE_set_pointer(interp, init, *(void**)p);
             }
 
             /* or just an offset for nested structs */
             else
-                PMC_data(init) = p;
+                VTABLE_set_pointer(interp, init, p);
         }
         else if (init->vtable->base_type == enum_class_ManagedStruct
              && *type                    == enum_type_struct_ptr) {
@@ -201,7 +201,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
              * outer struct, the inner is at PMC_data(init) */
 
             PARROT_ASSERT((PTR2INTVAL(p) & (PARROT_PTR_ALIGNMENT - 1)) == 0);
-            *(void **)p = PMC_data(init);
+            *(void **)p = VTABLE_get_pointer(interp, init);
         }
 
         return char_offset_key(interp, init, next, type);
@@ -411,8 +411,7 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
                     "no initializer available for nested struct");
             }
 
-            /* assign the pointer */
-            PMC_data(ret) = *(void**)p;
+            VTABLE_set_pointer(interp, ret, *(void**)p);
 
             return ret;
         default:
@@ -657,6 +656,7 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
 }
 
 pmclass UnManagedStruct need_ext no_ro {
+    ATTR void *ptr;  /* whatever this UnManagedStruct isn't managing */
 
 /*
 
@@ -675,6 +675,10 @@ Initializes the C<struct> with a default value of C<NULL>.
 */
 
     VTABLE void init() {
+        Parrot_UnManagedStruct_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_UnManagedStruct_attributes);
+        PMC_data(SELF) = attrs;
+        attrs->ptr = NULL;
         PMC_pmc_val(SELF) = NULL;
     }
 
@@ -707,7 +711,27 @@ The offset.
 */
 
     VTABLE void init_pmc(PMC *value) {
+        SELF.init();
         SELF.set_pmc(value);
+    }
+
+/*
+
+=item C<PMC *clone()>
+
+Return a clone of this PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *clone() {
+        PMC *clone = pmc_new(INTERP, enum_class_UnManagedStruct);
+        mem_sys_memmove(PMC_data(clone), PMC_data(SELF),
+                sizeof (Parrot_UnManagedStruct_attributes));
+        PMC_pmc_val(clone) = VTABLE_clone(INTERP, PMC_pmc_val(SELF));
+        PMC_int_val(clone) = PMC_int_val(SELF);
+        return clone;
     }
 
 /*
@@ -753,7 +777,7 @@ Returns whether the two C<struct>s are equivalent.
 
     VTABLE INTVAL is_equal(PMC *value) {
         return (SELF->vtable   == value->vtable
-        &&      PMC_data(SELF) == PMC_data(value));
+        &&      SELF.get_pointer() == VTABLE_get_pointer(interp, value));
     }
 
 /*
@@ -767,7 +791,7 @@ Returns whether the C<struct> is defined.
 */
 
     VTABLE INTVAL defined() {
-        return PMC_data(SELF) != NULL;
+        return SELF.get_pointer() != NULL;
     }
 
 /*
@@ -937,7 +961,7 @@ Returns the pointer to the actual C C<struct>.
 */
 
     VTABLE void *get_pointer() {
-        return PMC_data(SELF);
+        return PARROT_UNMANAGEDSTRUCT(SELF)->ptr;
     }
 
 /*
@@ -951,7 +975,7 @@ Set the pointer to the actual C C<struct>.
 */
 
     VTABLE void set_pointer(void *value) {
-        PMC_data(SELF) = value;
+        PARROT_UNMANAGEDSTRUCT(SELF)->ptr = value;
     }
 
 /*

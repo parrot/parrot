@@ -11,6 +11,7 @@ $Id$
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_fixedintegerarray.h"
+#include "pmc/pmc_unmanagedstruct.h"
 #include "jit.h"
 #include "jit_emit.h"
 
@@ -2394,9 +2395,11 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 8);
 
             /* eax = PMC, get return value into edx */
-            /* stuff return value into pmc->data */
-            /* mov %edx, (data) %eax */
-            emitm_movl_r_m(interp, pc, emit_EDX, emit_EAX, 0, 1, offsetof(struct PMC, data));
+            /* mov data(%eax), %eax
+               mov %edx, ptr(%eax) */
+            emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC, data));
+            emitm_movl_r_m(interp, pc, emit_EDX, emit_EAX, 0, 1,
+                           offsetof(struct Parrot_UnManagedStruct_attributes, ptr));
 
             /* reset EBP(4) */
             emitm_lea_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, st_offset);
