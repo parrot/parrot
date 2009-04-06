@@ -348,7 +348,9 @@ IMCC_O_FILES := \
 # these are private to the PIRC subsystem
 PIRC_O_FILES := \
     $(PIRC_DIR)/bcgen$(O) \
-    $(PIRC_DIR)/pircapi$(O)
+    $(PIRC_DIR)/pircapi$(O) \
+    $(PIRC_DIR)/pirerr$(O) \
+    $(PIRC_DIR)/pirop$(O)
 
 # generated list of header files
 GENERAL_H_FILES   := $(NONGEN_HEADERS) $(GEN_HEADERS) @TEMP_cg_h@

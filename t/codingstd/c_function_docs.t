@@ -101,7 +101,6 @@ compilers/pirc/src/bcgen.c
 compilers/pirc/src/pircapi.c
 compilers/pirc/src/pircompiler.c
 compilers/pirc/src/piremit.c
-compilers/pirc/src/pirerr.c
 compilers/pirc/src/pirmacro.c
 compilers/pirc/src/pirpcc.c
 compilers/pirc/src/pirregalloc.c

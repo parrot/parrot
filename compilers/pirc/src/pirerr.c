@@ -11,6 +11,11 @@
 #include "pirlexer.h"
 #include "pirerr.h"
 
+/* HEADERIZER HFILE: compilers/pirc/src/pirerr.h */
+
+/* HEADERIZER BEGIN: static */
+
+
 /*
 
 =head1 FUNCTIONS
@@ -18,8 +23,7 @@
 =over 4
 
 
-=item C<void
-panic(lexer_state * lexer, char const * const message)>
+=item C<void panic(lexer_state * lexer, char const * const message, ...)>
 
 Function to emit a final last cry that something's wrong and exit.
 
@@ -27,7 +31,9 @@ Function to emit a final last cry that something's wrong and exit.
 
 */
 void
-panic(lexer_state * lexer, char const * const message, ...) {
+panic(ARGIN(lexer_state * lexer), ARGIN(char const * const message), ...)
+{
+    ASSERT_ARGS(panic)
     va_list arg_ptr;
     fprintf(stderr, "Fatal: ");
     va_start(arg_ptr, message);
@@ -40,8 +46,8 @@ panic(lexer_state * lexer, char const * const message, ...) {
 
 /*
 
-=item C<int
-yypirerror(yyscan_t yyscanner, lexer_state * const lexer, char const * const message, ...)>
+=item C<int yypirerror(yyscan_t yyscanner, lexer_state * const lexer, char const
+* const message, ...)>
 
 Default parse error handling routine, that is invoked when the bison-generated
 parser finds a syntax error.
@@ -51,9 +57,10 @@ parser finds a syntax error.
 */
 PARROT_IGNORABLE_RESULT
 int
-yypirerror(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer),
-        NOTNULL(char const * const message), ...)
+yypirerror(yyscan_t yyscanner, ARGIN(lexer_state * const lexer),
+        ARGIN(char const * const message), ...)
 {
+    ASSERT_ARGS(yypirerror)
     char const * const current_token = yypirget_text(yyscanner);
     va_list arg_ptr;
 
@@ -74,6 +81,8 @@ yypirerror(yyscan_t yyscanner, NOTNULL(lexer_state * const lexer),
 
     return 0;
 }
+
+/* HEADERIZER END: static */
 
 /*
 
