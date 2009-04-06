@@ -12,6 +12,12 @@
 #include "pirlexer.h"
 #include "pircapi.h"
 
+/* HEADERIZER HFILE: compilers/pirc/src/pircapi.h */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+
 /*
 
 =head1 DESCRIPTION
@@ -36,8 +42,7 @@ static INTVAL       eval_nr  = 0;
 
 /*
 
-=item C<FILE *
-open_file(char const * const filename, char const * const mode)>
+=item C<FILE * open_file(char const * const filename, char const * const mode)>
 
 Function to open the file given by C<filename>, in the mode given by C<mode>
 Microsoft visual studio provides a "safer" variant of fopen(); this
@@ -46,8 +51,12 @@ function hides the selection of the appropriate variant.
 =cut
 
 */
+
+PARROT_CAN_RETURN_NULL
 FILE *
-open_file(char const * const filename, char const * const mode) {
+open_file(ARGIN(char const * const filename), ARGIN(char const * const mode))
+{
+    ASSERT_ARGS(open_file)
     FILE *fp = NULL;
 
 #ifdef _MSC_VER
@@ -58,8 +67,12 @@ open_file(char const * const filename, char const * const mode) {
     return fp;
 }
 
-
 /*
+
+=item C<void parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const
+filename, int flags, int thr_id, unsigned macro_size, char * const outputfile)>
+
+=cut
 
 This will be the proper declaration after testing for thread-safety:
 
@@ -71,9 +84,12 @@ void parse_file(int flexdebug, FILE *infile, char * const filename, int flags,
 
 
 void
-parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const filename, int flags,
-           int thr_id, unsigned macro_size, char * const outputfile)
+parse_file(PARROT_INTERP, int flexdebug, ARGIN(FILE *infile),
+           ARGIN(char * const filename), int flags,
+           int thr_id, unsigned macro_size,
+           ARGMOD_NULLOK(char * const outputfile))
 {
+    ASSERT_ARGS(parse_file)
     yyscan_t     yyscanner;
     lexer_state *lexer     = NULL;
 
@@ -152,11 +168,18 @@ parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const filename, in
 
 /*
 
+=item C<void parse_string(PARROT_INTERP, char *pirstring, int flags, int
+pasminput, unsigned macro_size)>
+
 Parse a PIR string.
+
+=cut
 
 */
 void
-parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsigned macro_size) {
+parse_string(PARROT_INTERP, ARGIN(char *pirstring), int flags, int pasminput,
+    unsigned macro_size)
+{
     yyscan_t            yyscanner;
     lexer_state        *lexer = NULL;
     char                name[64];
@@ -231,15 +254,26 @@ parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsigned 
 
 }
 
+/*
 
+=item C<PackFile_ByteCode * pirc_compile_file(PARROT_INTERP, const char
+*filename, STRING **error_message)>
 
-PARROT_CANNOT_RETURN_NULL
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
 PackFile_ByteCode *
-pirc_compile_file(PARROT_INTERP, const char *filename, STRING **error_message) {
+pirc_compile_file(SHIM_INTERP, SHIM(const char *filename),
+    SHIM(STRING **error_message))
+{
+    ASSERT_ARGS(pirc_compile_file)
     return NULL;
 }
 
 
+/* HEADERIZER END: static */
 
 
 /*

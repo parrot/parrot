@@ -8,16 +8,55 @@
 
 #include <stdio.h>
 
-FILE * open_file(char const * const filename, char const * const mode);
+/* HEADERIZER BEGIN: compilers/pirc/src/pircapi.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void parse_string(PARROT_INTERP, char *pirstring, int flags, int pasminput, unsigned macro_size);
+PARROT_CAN_RETURN_NULL
+FILE * open_file(
+    ARGIN(char const * const filename),
+    ARGIN(char const * const mode))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
-void parse_file(PARROT_INTERP, int flexdebug, FILE *infile, char * const filename, int flags,
-                int thr_id, unsigned macro_size, char * const outputfile);
+void parse_file(PARROT_INTERP,
+    int flexdebug,
+    ARGIN(FILE *infile),
+    ARGIN(char * const filename),
+    int flags,
+    int thr_id,
+    unsigned macro_size,
+    ARGMOD_NULLOK(char * const outputfile))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* const outputfile);
 
+void parse_string(PARROT_INTERP,
+    ARGIN(char *pirstring),
+    int flags,
+    int pasminput,
+    unsigned macro_size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
+PARROT_CAN_RETURN_NULL
+PackFile_ByteCode * pirc_compile_file(SHIM_INTERP,
+    SHIM(const char *filename),
+    SHIM(STRING **error_message));
 
-PackFile_ByteCode *pirc_compile_file(PARROT_INTERP, const char *filename, STRING **error_message);
+#define ASSERT_ARGS_open_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(filename) \
+    || PARROT_ASSERT_ARG(mode)
+#define ASSERT_ARGS_parse_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(infile) \
+    || PARROT_ASSERT_ARG(filename)
+#define ASSERT_ARGS_parse_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pirstring)
+#define ASSERT_ARGS_pirc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/pirc/src/pircapi.c */
 
 #endif /* PARROT_PIR_PIRCAPI_H_GUARD */
 
