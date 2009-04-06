@@ -78,6 +78,167 @@ typedef struct sub_info {
 
 } sub_info;
 
+struct lexer_state;
+struct _IMC_Unit;
+
+/* HEADERIZER BEGIN: compilers/pirc/src/bcgen.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+void add_annotation(
+    ARGIN(bytecode * const bc),
+    opcode_t offset,
+    opcode_t key,
+    opcode_t type,
+    opcode_t value)
+        __attribute__nonnull__(1);
+
+int add_key_const(ARGIN(bytecode * const bc), ARGIN(PMC *key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int add_num_const(ARGIN(bytecode * const bc), double f)
+        __attribute__nonnull__(1);
+
+int add_pmc_const(ARGIN(bytecode * const bc), ARGIN(PMC * pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int add_string_const(
+    ARGIN(bytecode * const bc),
+    ARGIN(char const * const str),
+    ARGIN(char const * charset))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+int add_sub_pmc(
+    ARGIN(bytecode * const bc),
+    ARGIN(sub_info * const info),
+    int needlex,
+    int subpragmas,
+    ARGIN(struct lexer_state * const lexer))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(5);
+
+void create_annotations_segment(
+    ARGIN(bytecode * const bc),
+    ARGIN(char const * const name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void create_codesegment(ARGIN(bytecode * const bc), int codesize)
+        __attribute__nonnull__(1);
+
+void create_debugsegment(
+    ARGIN(bytecode * const bc),
+    size_t size,
+    ARGIN(char const * const file))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+void destroy_bytecode(ARGMOD(bytecode * bc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* bc);
+
+void emit_debug_info(ARGIN(bytecode * const bc), int sourceline)
+        __attribute__nonnull__(1);
+
+PARROT_IGNORABLE_RESULT
+opcode_t emit_int_arg(ARGIN(bytecode * const bc), int intval)
+        __attribute__nonnull__(1);
+
+PARROT_IGNORABLE_RESULT
+opcode_t emit_opcode(ARGIN(bytecode * const bc), opcode_t op)
+        __attribute__nonnull__(1);
+
+FLOATVAL get_num_const(ARGIN(bytecode * const bc), unsigned index)
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+PMC * get_pmc_const(ARGIN(bytecode * const bc), unsigned index)
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+STRING * get_string_const(ARGIN(bytecode * const bc), unsigned index)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t * make_jit_info(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+bytecode * new_bytecode(PARROT_INTERP, ARGIN(char const * const filename))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+int store_key_bytecode(ARGIN(bytecode * const bc), ARGIN(opcode_t * key))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void write_pbc_file(
+    ARGIN(bytecode * const bc),
+    ARGIN(char const * const filename))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_add_annotation __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_add_key_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_add_num_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_add_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_add_string_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(str) \
+    || PARROT_ASSERT_ARG(charset)
+#define ASSERT_ARGS_add_sub_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(info) \
+    || PARROT_ASSERT_ARG(lexer)
+#define ASSERT_ARGS_create_annotations_segment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_create_codesegment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_create_debugsegment __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(file)
+#define ASSERT_ARGS_destroy_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_emit_debug_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_emit_int_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_emit_opcode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_get_num_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_get_pmc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_get_string_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_make_jit_info __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(unit)
+#define ASSERT_ARGS_new_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filename)
+#define ASSERT_ARGS_store_key_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(key)
+#define ASSERT_ARGS_write_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(filename)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: compilers/pirc/src/bcgen.c */
+
 bytecode *new_bytecode(Interp *interp, char const * const filename);
 
 void destroy_bytecode(bytecode * bc);

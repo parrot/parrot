@@ -15,6 +15,85 @@
 
 #include "bcgen.h" /* XXX future maybe parrot/bcgen.h */
 
+/* HEADERIZER HFILE: compilers/pirc/src/bcgen.h */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+static STRING * add_string_const_from_cstring(
+    ARGIN(bytecode * const bc),
+    ARGIN(char const * const str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void check_requested_constant(
+    ARGIN(bytecode * const bc),
+    unsigned index,
+    int expectedtype)
+        __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+static PMC * create_lexinfo(
+    ARGIN(bytecode * const bc),
+    ARGIN(PMC * sub),
+    ARGIN_NULLOK(lexical * const lexicals),
+    int needlex)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+static PMC * create_sub_pmc(
+    ARGIN(bytecode * const bc),
+    int iscoroutine,
+    ARGIN_NULLOK(char const * const instanceof))
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static PMC * find_outer_sub(
+    ARGIN(bytecode * const bc),
+    ARGIN_NULLOK(char const * const outername),
+    ARGIN(struct lexer_state * const lexer))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_CAN_RETURN_NULL
+static PMC * generate_multi_signature(
+    ARGIN(bytecode * const bc),
+    ARGIN_NULLOK(multi_type * const types),
+    unsigned type_count)
+        __attribute__nonnull__(1);
+
+PARROT_CAN_RETURN_NULL
+static PMC * get_namespace_pmc(
+    ARGIN(bytecode * const bc),
+    ARGIN_NULLOK(multi_type * const ns))
+        __attribute__nonnull__(1);
+
+static int new_pbc_const(ARGIN(bytecode * const bc))
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_add_string_const_from_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(str)
+#define ASSERT_ARGS_check_requested_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_create_lexinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(sub)
+#define ASSERT_ARGS_create_sub_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_find_outer_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc) \
+    || PARROT_ASSERT_ARG(lexer)
+#define ASSERT_ARGS_generate_multi_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_get_namespace_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+#define ASSERT_ARGS_new_pbc_const __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(bc)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /* XXX Fix the build for now; #including parrot/interpreter.h that
    defines this doesn't seem to help. */
@@ -84,11 +163,6 @@ struct bytecode {
 };
 
 
-static int new_pbc_const(bytecode * const bc);
-
-static STRING *add_string_const_from_cstring(bytecode * const bc, char const * const str);
-
-
 /*
 
 =head1 FUNCTIONS
@@ -102,8 +176,7 @@ static STRING *add_string_const_from_cstring(bytecode * const bc, char const * c
 
 /*
 
-=item C<static int
-new_pbc_const(bytecode * const bc)>
+=item C<static int new_pbc_const(bytecode * const bc)>
 
 Add a new constant to the constant table.
 
@@ -114,7 +187,9 @@ is resized each time a constant is added.
 
 */
 static int
-new_pbc_const(bytecode * const bc) {
+new_pbc_const(ARGIN(bytecode * const bc))
+{
+    ASSERT_ARGS(new_pbc_const)
     Interp            *interp;
     size_t             oldcount;
     size_t             newcount;
@@ -145,8 +220,7 @@ new_pbc_const(bytecode * const bc) {
 
 /*
 
-=item C<int
-add_pmc_const(bytecode * const bc, PMC * pmc)>
+=item C<int add_pmc_const(bytecode * const bc, PMC * pmc)>
 
 Add the PMC constant C<pmc> to the constant table. This
 function returns the index in the constant table where C<pmc>
@@ -156,7 +230,9 @@ is stored.
 
 */
 int
-add_pmc_const(bytecode * const bc, PMC * pmc) {
+add_pmc_const(ARGIN(bytecode * const bc), ARGIN(PMC * pmc))
+{
+    ASSERT_ARGS(add_pmc_const)
     int index                   = new_pbc_const(bc);
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
     constant->type              = PFC_PMC;
@@ -167,8 +243,8 @@ add_pmc_const(bytecode * const bc, PMC * pmc) {
 
 /*
 
-=item C<int
-add_string_const(bytecode * const bc, char const * const str, char const * charset)>
+=item C<int add_string_const(bytecode * const bc, char const * const str, char
+const * charset)>
 
 Add the string constant C<str> to the constant table. This function
 returns the index in the constant table where C<str> is stored.
@@ -181,7 +257,10 @@ XXX what to do with "encoding"?
 
 */
 int
-add_string_const(bytecode * const bc, char const * const str, char const * charset) {
+add_string_const(ARGIN(bytecode * const bc), ARGIN(char const * const str),
+    ARGIN(char const * charset))
+{
+    ASSERT_ARGS(add_string_const)
     STRING *parrotstr = string_make(bc->interp, str, strlen(str), charset, PObj_constant_FLAG);
     int index         = 0;
     int count         = bc->interp->code->const_table->const_count;
@@ -222,7 +301,7 @@ add_string_const(bytecode * const bc, char const * const str, char const * chars
 /*
 
 =item c<int
-add_num_const(bytecode * const bc, double f)>
+add_num_const(ARGIN(bytecode * const bc), double f)>
 
 XXX should f be a FLOATVAL?
 
@@ -233,7 +312,9 @@ table where C<f> is stored is returned.
 
 */
 int
-add_num_const(bytecode * const bc, double f) {
+add_num_const(ARGIN(bytecode * const bc), double f)
+{
+    ASSERT_ARGS(add_num_const)
     int index                   = new_pbc_const(bc);
     PackFile_Constant *constant = bc->interp->code->const_table->constants[index];
     constant->type              = PFC_NUMBER;
@@ -247,8 +328,7 @@ add_num_const(bytecode * const bc, double f) {
 
 /*
 
-=item C<int
-add_key_const(bytecode * const bc, PMC *key)>
+=item C<int add_key_const(bytecode * const bc, PMC *key)>
 
 Add a key constant to the constants list. The index where C<key> is
 stored in the constants table is returned.
@@ -257,7 +337,9 @@ stored in the constants table is returned.
 
 */
 int
-add_key_const(bytecode * const bc, PMC *key) {
+add_key_const(ARGIN(bytecode * const bc), ARGIN(PMC *key))
+{
+    ASSERT_ARGS(add_key_const)
     PackFile_Constant *constant;
     int count  = bc->interp->code->const_table->const_count;
     int index  = 0;
@@ -293,8 +375,8 @@ add_key_const(bytecode * const bc, PMC *key) {
 
 /*
 
-=item C<static void
-check_requested_constant(bytecode * const bc, unsigned index, int expectedtype)>
+=item C<static void check_requested_constant(bytecode * const bc, unsigned
+index, int expectedtype)>
 
 Perform a sanity check on a requested constant. The constant at index C<index>
 is requested; this function checks whether the index is valid. Then, if so, the
@@ -305,7 +387,9 @@ of: PFC_PMC, PFC_NUMBER, PFC_STRING.
 
 */
 static void
-check_requested_constant(bytecode * const bc, unsigned index, int expectedtype) {
+check_requested_constant(ARGIN(bytecode * const bc), unsigned index, int expectedtype)
+{
+    ASSERT_ARGS(check_requested_constant)
     /* make sure the requested PMC exists. */
     PARROT_ASSERT(index < bc->interp->code->const_table->const_count);
     /* make sure the requested constant is a PMC */
@@ -314,24 +398,25 @@ check_requested_constant(bytecode * const bc, unsigned index, int expectedtype) 
 
 /*
 
-=item C<PMC *
-get_pmc_const(bytecode * const bc, unsigned index)>
+=item C<PMC * get_pmc_const(bytecode * const bc, unsigned index)>
 
 Get the PMC constant at index C<index> in the PBC constant table.
 
 =cut
 
 */
+PARROT_CANNOT_RETURN_NULL
 PMC *
-get_pmc_const(bytecode * const bc, unsigned index) {
+get_pmc_const(ARGIN(bytecode * const bc), unsigned index)
+{
+    ASSERT_ARGS(get_pmc_const)
     check_requested_constant(bc, index, PFC_PMC);
     return bc->interp->code->const_table->constants[index]->u.key;
 }
 
 /*
 
-=item C<FLOATVAL
-get_num_const(bytecode * const bc, unsigned index)>
+=item C<FLOATVAL get_num_const(bytecode * const bc, unsigned index)>
 
 Get the FLOATVAL constant at index C<index> in the PBC constant table.
 
@@ -339,31 +424,34 @@ Get the FLOATVAL constant at index C<index> in the PBC constant table.
 
 */
 FLOATVAL
-get_num_const(bytecode * const bc, unsigned index) {
+get_num_const(ARGIN(bytecode * const bc), unsigned index)
+{
+    ASSERT_ARGS(get_num_const)
     check_requested_constant(bc, index, PFC_NUMBER);
     return bc->interp->code->const_table->constants[index]->u.number;
 }
 
 /*
 
-=item C<STRING *
-get_string_const(bytecode * const bc, unsigned index)>
+=item C<STRING * get_string_const(bytecode * const bc, unsigned index)>
 
 Get the STRING constant at index C<index> in the PBC constant table.
 
 =cut
 
 */
+PARROT_CANNOT_RETURN_NULL
 STRING *
-get_string_const(bytecode * const bc, unsigned index) {
+get_string_const(ARGIN(bytecode * const bc), unsigned index)
+{
+    ASSERT_ARGS(get_string_const)
     check_requested_constant(bc, index, PFC_STRING);
     return bc->interp->code->const_table->constants[index]->u.string;
 }
 
 /*
 
-=item C<bytecode *
-new_bytecode(Interp *interp, char const * const filename)>
+=item C<bytecode * new_bytecode(PARROT_INTERP, char const * const filename)>
 
 Create a new bytecode struct, representing the bytecode for file C<filename>.
 The bytecode struct contains a PackFile, which is initialized and
@@ -374,8 +462,11 @@ PMC in the bytecode's constant table.
 =cut
 
 */
+PARROT_CANNOT_RETURN_NULL
 bytecode *
-new_bytecode(Interp *interp, char const * const filename) {
+new_bytecode(PARROT_INTERP, ARGIN(char const * const filename))
+{
+    ASSERT_ARGS(new_bytecode)
     PMC      *self;
     bytecode *bc = (bytecode *)mem_sys_allocate(sizeof (bytecode));
 
@@ -405,8 +496,7 @@ new_bytecode(Interp *interp, char const * const filename) {
 
 /*
 
-=item C<void
-create_codesegment(bytecode * const bc, int codesize)>
+=item C<void create_codesegment(bytecode * const bc, int codesize)>
 
 Create a code segment of size C<codesize>. C<bc>'s C<opcursor> attribute
 is initialized; this is the pointer used to write opcodes and operands
@@ -416,7 +506,9 @@ into the code segment.
 
 */
 void
-create_codesegment(bytecode * const bc, int codesize) {
+create_codesegment(ARGIN(bytecode * const bc), int codesize)
+{
+    ASSERT_ARGS(create_codesegment)
     /* allocate enough space. */
     bc->interp->code->base.data = (opcode_t *)mem_sys_realloc(bc->interp->code->base.data,
                                                               codesize * sizeof (opcode_t));
@@ -429,8 +521,8 @@ create_codesegment(bytecode * const bc, int codesize) {
 
 /*
 
-=item C<void
-create_debugsegment(bytecode * const bc, size_t size, char const * const file)>
+=item C<void create_debugsegment(bytecode * const bc, size_t size, char const *
+const file)>
 
 Create a debug segment of size C<size>.
 
@@ -438,7 +530,9 @@ Create a debug segment of size C<size>.
 
 */
 void
-create_debugsegment(bytecode * const bc, size_t size, char const * const file) {
+create_debugsegment(ARGIN(bytecode * const bc), size_t size, ARGIN(char const * const file))
+{
+    ASSERT_ARGS(create_debugsegment)
     /* create a new debug segment; Parrot_new_debug_seg() automatically stores
      * away any currently existing debug segment.
      */
@@ -449,8 +543,7 @@ create_debugsegment(bytecode * const bc, size_t size, char const * const file) {
 
 /*
 
-=item C<void
-emit_debug_info(bytecode * const bc, int sourceline)>
+=item C<void emit_debug_info(bytecode * const bc, int sourceline)>
 
 Emit the C<sourceline> number in the debug segment.
 
@@ -458,15 +551,17 @@ Emit the C<sourceline> number in the debug segment.
 
 */
 void
-emit_debug_info(bytecode * const bc, int sourceline) {
+emit_debug_info(ARGIN(bytecode * const bc), int sourceline)
+{
+    ASSERT_ARGS(emit_debug_info)
     bc->debug_seg->base.data[bc->instr_counter++] = sourceline;
 }
 
 
 /*
 
-=item C<void
-create_annotations_segment(bytecode * const bc, char const * const name)>
+=item C<void create_annotations_segment(bytecode * const bc, char const * const
+name)>
 
 Create an annotations segment, and an initial annotations group.
 
@@ -474,7 +569,9 @@ Create an annotations segment, and an initial annotations group.
 
 */
 void
-create_annotations_segment(bytecode * const bc, char const * const name) {
+create_annotations_segment(ARGIN(bytecode * const bc), ARGIN(char const * const name))
+{
+    ASSERT_ARGS(create_annotations_segment)
     char *segment_name = (char *)mem_sys_allocate((strlen(name) + 5) * sizeof (char));
     sprintf(segment_name, "%s_ANN", name);
 
@@ -507,8 +604,8 @@ static int packfile_annotation_types[10] = {
 
 /*
 
-=item C<void
-add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type, opcode_t value)>
+=item C<void add_annotation(bytecode * const bc, opcode_t offset, opcode_t key,
+opcode_t type, opcode_t value)>
 
 Add an annotation for the bytecode at C<offset>, having a key C<key>,
 of type C<type> and a value passed in C<value>.
@@ -517,7 +614,10 @@ of type C<type> and a value passed in C<value>.
 
 */
 void
-add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type, opcode_t value) {
+add_annotation(ARGIN(bytecode * const bc), opcode_t offset, opcode_t key,
+    opcode_t type, opcode_t value)
+{
+    ASSERT_ARGS(add_annotation)
     /* look up the type */
     int annotation_type = packfile_annotation_types[type];
     if (annotation_type == -1) {/* this is no good */
@@ -534,8 +634,7 @@ add_annotation(bytecode * const bc, opcode_t offset, opcode_t key, opcode_t type
 
 /*
 
-=item C<void
-destroy_bytecode(bytecode * bc)>
+=item C<void destroy_bytecode(bytecode * bc)>
 
 Destructor for bytecode struct; frees all memory.
 
@@ -543,7 +642,9 @@ Destructor for bytecode struct; frees all memory.
 
 */
 void
-destroy_bytecode(bytecode * bc) {
+destroy_bytecode(ARGMOD(bytecode * bc))
+{
+    ASSERT_ARGS(destroy_bytecode)
     /* XXX should we do this? Not Parrot? */
     mem_sys_free(bc->interp->code->base.data);
     mem_sys_free(bc);
@@ -552,8 +653,7 @@ destroy_bytecode(bytecode * bc) {
 
 /*
 
-=item C<opcode_t
-emit_opcode(bytecode * const bc, opcode_t op)>
+=item C<opcode_t emit_opcode(bytecode * const bc, opcode_t op)>
 
 Write the opcode C<op> into the bytecode stream. The bytecode
 offset where the instruction is written is returned.
@@ -563,7 +663,9 @@ offset where the instruction is written is returned.
 */
 PARROT_IGNORABLE_RESULT
 opcode_t
-emit_opcode(bytecode * const bc, opcode_t op) {
+emit_opcode(ARGIN(bytecode * const bc), opcode_t op)
+{
+    ASSERT_ARGS(emit_opcode)
     *bc->opcursor = op;
 #if DEBUGBC
     fprintf(stderr, "\n[%d]", op);
@@ -574,8 +676,7 @@ emit_opcode(bytecode * const bc, opcode_t op) {
 
 /*
 
-=item C<opcode_t
-emit_int_arg(bytecode * const bc, int intval)>
+=item C<opcode_t emit_int_arg(bytecode * const bc, int intval)>
 
 Write an integer argument into the bytecode stream. The offset
 in bytecode where the instruction is written is returned.
@@ -585,7 +686,9 @@ in bytecode where the instruction is written is returned.
 */
 PARROT_IGNORABLE_RESULT
 opcode_t
-emit_int_arg(bytecode * const bc, int intval) {
+emit_int_arg(ARGIN(bytecode * const bc), int intval)
+{
+    ASSERT_ARGS(emit_int_arg)
     *bc->opcursor = intval;
 #if DEBUGBC
     fprintf(stderr, "{%d}", intval);
@@ -596,8 +699,7 @@ emit_int_arg(bytecode * const bc, int intval) {
 
 /*
 
-=item C<int
-store_key_bytecode(bytecode * const bc, opcode_t * key)>
+=item C<int store_key_bytecode(bytecode * const bc, opcode_t * key)>
 
 Store the bytecode for a key. The bytecode was emitted in an
 array, passed in C<key>. The bytecode is I<unpacked> into the
@@ -609,7 +711,9 @@ in the constants table is returned.
 
 */
 int
-store_key_bytecode(bytecode * const bc, opcode_t * key) {
+store_key_bytecode(ARGIN(bytecode * const bc), ARGIN(opcode_t * key))
+{
+    ASSERT_ARGS(store_key_bytecode)
     PackFile_Constant   *pfc;
     const opcode_t      *rc;
     int                  index;
@@ -640,8 +744,8 @@ store_key_bytecode(bytecode * const bc, opcode_t * key) {
 
 /*
 
-=item C<static STRING *
-add_string_const_from_cstring(bytecode * const bc, char const * const str)>
+=item C<static STRING * add_string_const_from_cstring(bytecode * const bc, char
+const * const str)>
 
 Utility function to add a C-string to the constants table. Before adding
 it to the constants table, the C-string is converted to a Parrot STRING
@@ -652,8 +756,11 @@ but you want the STRING representing the string instead.
 =cut
 
 */
+PARROT_CANNOT_RETURN_NULL
 static STRING *
-add_string_const_from_cstring(bytecode * const bc, char const * const str) {
+add_string_const_from_cstring(ARGIN(bytecode * const bc), ARGIN(char const * const str))
+{
+    ASSERT_ARGS(add_string_const_from_cstring)
     int index = add_string_const(bc, str, "ascii");
     return bc->interp->code->const_table->constants[index]->u.string;
 }
@@ -661,8 +768,8 @@ add_string_const_from_cstring(bytecode * const bc, char const * const str) {
 
 /*
 
-=item C<PMC *
-generate_multi_signature(bytecode * const bc)>
+=item C<static PMC * generate_multi_signature(bytecode * const bc, multi_type *
+const types, unsigned type_count)>
 
 Generate a PMC for the multi signature, based on the types defined in C<multi_types>
 C<type_count> indicates the number of types in the list.
@@ -670,8 +777,12 @@ C<type_count> indicates the number of types in the list.
 =cut
 
 */
+PARROT_CAN_RETURN_NULL
 static PMC *
-generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned type_count) {
+generate_multi_signature(ARGIN(bytecode * const bc),
+    ARGIN_NULLOK(multi_type * const types), unsigned type_count)
+{
+    ASSERT_ARGS(generate_multi_signature)
     unsigned     i;
     multi_type *iter;
     PMC        *multi_signature;
@@ -728,8 +839,8 @@ generate_multi_signature(bytecode * const bc, multi_type * const types, unsigned
 
 /*
 
-=item C<static PMC *
-create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int needlex)>
+=item C<static PMC * create_lexinfo(bytecode * const bc, PMC * sub, lexical *
+const lexicals, int needlex)>
 
 Create a lexinfo PMC for the sub C<sub>. If there are no lexicals,
 but the C<:lex> flag was specified, or the sub has an C<:outer> flag,
@@ -738,8 +849,12 @@ then a lexinfo is created after all. The created lexinfo is returned.
 =cut
 
 */
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int needlex) {
+create_lexinfo(ARGIN(bytecode * const bc), ARGIN(PMC * sub),
+    ARGIN_NULLOK(lexical * const lexicals), int needlex)
+{
+    ASSERT_ARGS(create_lexinfo)
     lexical      * lexiter     = lexicals;
     INTVAL   const lex_info_id = Parrot_get_ctx_HLL_type(bc->interp, enum_class_LexInfo);
     STRING * const method      = string_from_literal(bc->interp, "declare_lex_preg");
@@ -777,8 +892,8 @@ create_lexinfo(bytecode * const bc, PMC * sub, lexical * const lexicals, int nee
 
 /*
 
-=item C<static PMC *
-find_outer_sub(bytecode * const bc, char const * const outername)>
+=item C<static PMC * find_outer_sub(bytecode * const bc, char const * const
+outername, struct lexer_state * const lexer)>
 
 Find the outer sub that has name C<outername>. If not found, NULL is returned.
 
@@ -788,9 +903,12 @@ XXX This should be fixed, to make bcgen.c a complete independent module.
 =cut
 
 */
+PARROT_CAN_RETURN_NULL
 static PMC *
-find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_state * const lexer)
+find_outer_sub(ARGIN(bytecode * const bc), ARGIN_NULLOK(char const * const outername),
+    ARGIN(struct lexer_state * const lexer))
 {
+    ASSERT_ARGS(find_outer_sub)
     PMC          *current;
     Parrot_sub   *sub;
     STRING       *cur_name;
@@ -852,8 +970,8 @@ find_outer_sub(bytecode * const bc, char const * const outername, struct lexer_s
 
 /*
 
-=item C<static PMC *
-get_namespace_pmc(bytecode * const bc, multi_type * const ns)>
+=item C<static PMC * get_namespace_pmc(bytecode * const bc, multi_type * const
+ns)>
 
 Get a PMC representing the namespace for a sub. The namespace information
 is passed in C<ns>.
@@ -861,8 +979,11 @@ is passed in C<ns>.
 =cut
 
 */
+PARROT_CAN_RETURN_NULL
 static PMC *
-get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
+get_namespace_pmc(ARGIN(bytecode * const bc), ARGIN_NULLOK(multi_type * const ns))
+{
+    ASSERT_ARGS(get_namespace_pmc)
     if (ns == NULL)
         return NULL;
 
@@ -883,8 +1004,8 @@ get_namespace_pmc(bytecode * const bc, multi_type * const ns) {
 
 /*
 
-=item C<static PMC *
-create_sub_pmc(bytecode * const bc, char const * const instanceof)>
+=item C<static PMC * create_sub_pmc(bytecode * const bc, int iscoroutine, char
+const * const instanceof)>
 
 Create a Sub PMC. If C<instanceof> is not NULL, it indicates the name
 of a class to be used. If it's NULL, and C<iscoroutine> is true, a Coroutine
@@ -895,8 +1016,12 @@ then that mapped class is created.
 =cut
 
 */
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-create_sub_pmc(bytecode * const bc, int iscoroutine, char const * const instanceof) {
+create_sub_pmc(ARGIN(bytecode * const bc), int iscoroutine,
+    ARGIN_NULLOK(char const * const instanceof))
+{
+    ASSERT_ARGS(create_sub_pmc)
     INTVAL type;
 
     /* Do we have to create an instance of a specific type for this sub? */
@@ -939,8 +1064,9 @@ create_sub_pmc(bytecode * const bc, int iscoroutine, char const * const instance
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
-make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
+make_jit_info(PARROT_INTERP, ARGIN(const struct _IMC_Unit *unit))
 {
+    ASSERT_ARGS(make_jit_info)
     const size_t old  = old_blocks(interp);
     const size_t size = unit->n_basic_blocks + old;
 
@@ -978,8 +1104,8 @@ make_jit_info(PARROT_INTERP, ARGIN(const IMC_Unit *unit))
 
 /*
 
-=item C<void
-add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas)>
+=item C<int add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex,
+int subpragmas, struct lexer_state * const lexer)>
 
 Add a sub PMC to the constant table. This function initializes the sub PMC.
 The index where the PMC is stored in the constant table is returned.
@@ -991,9 +1117,10 @@ The C<subpragmas> parameter encode flags such as C<:immediate> etc.
 
 */
 int
-add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subpragmas,
-            struct lexer_state * const lexer)
+add_sub_pmc(ARGIN(bytecode * const bc), ARGIN(sub_info * const info), int needlex, int subpragmas,
+            ARGIN(struct lexer_state * const lexer))
 {
+    ASSERT_ARGS(add_sub_pmc)
     PMC                   *sub_pmc;        /* the "Sub" pmc, or a variant, such as "Coroutine" */
     Parrot_sub            *sub;
     int                    subconst_index; /* index in const table for the sub pmc */
@@ -1082,8 +1209,7 @@ add_sub_pmc(bytecode * const bc, sub_info * const info, int needlex, int subprag
 
 /*
 
-=item C<void
-write_pbc_file(bytecode * const bc, char const * const filename)>
+=item C<void write_pbc_file(bytecode * const bc, char const * const filename)>
 
 Write the generated bytecode (stored somewhere in a packfile)
 to the file C<filename>.
@@ -1092,7 +1218,9 @@ to the file C<filename>.
 
 */
 void
-write_pbc_file(bytecode * const bc, char const * const filename) {
+write_pbc_file(ARGIN(bytecode * const bc), ARGIN(char const * const filename))
+{
+    ASSERT_ARGS(write_pbc_file)
     size_t    size;
     opcode_t *packed;
     FILE     *fp;
