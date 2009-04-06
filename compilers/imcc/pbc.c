@@ -386,9 +386,10 @@ add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(add_const_table_pmc)
     const int newitem = add_const_table(interp);
+    PackFile_Constant * const constant = interp->code->const_table->constants[newitem];
 
-    interp->code->const_table->constants[newitem]->type  = PFC_PMC;
-    interp->code->const_table->constants[newitem]->u.key = pmc;
+    constant->type  = PFC_PMC;
+    constant->u.key = pmc;
 
     return newitem;
 }
@@ -409,9 +410,10 @@ add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(add_const_table_key)
     const int newitem = add_const_table(interp);
+    PackFile_Constant * const constant = interp->code->const_table->constants[newitem];
 
-    interp->code->const_table->constants[newitem]->type  = PFC_KEY;
-    interp->code->const_table->constants[newitem]->u.key = key;
+    constant->type  = PFC_KEY;
+    constant->u.key = key;
 
     return newitem;
 }
@@ -1054,9 +1056,11 @@ add_const_str(PARROT_INTERP, ARGIN(const SymReg *r))
     ASSERT_ARGS(add_const_str)
     const int      k = add_const_table(interp);
     STRING * const s = IMCC_string_from_reg(interp, r);
+    PackFile_Constant * const constant = interp->code->const_table->constants[k];
 
-    interp->code->const_table->constants[k]->type     = PFC_STRING;
-    interp->code->const_table->constants[k]->u.string = s;
+    constant->type     = PFC_STRING;
+    constant->u.string = s;
+
 
     return k;
 }
@@ -1124,8 +1128,8 @@ mk_multi_sig(PARROT_INTERP, ARGIN(const SymReg *r))
         r = pcc_sub->multi[i];
 
         if (r->set == 'S') {
-            STRING *type_name = ct->constants[r->color]->u.string;
-            INTVAL  type_num  = pmc_type(interp, type_name);
+            STRING * const type_name = ct->constants[r->color]->u.string;
+            const INTVAL type_num    = pmc_type(interp, type_name);
 
             if (type_num == enum_type_undef) {
                 sig_pmc = pmc_new(interp, enum_class_String);
@@ -1795,7 +1799,7 @@ static void
 make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
 {
     ASSERT_ARGS(make_pmc_const)
-    PMC    *_class = interp->vtables[r->pmc_type]->pmc_class;
+    PMC    * const _class = interp->vtables[r->pmc_type]->pmc_class;
     STRING *s;
     PMC    *p;
 
