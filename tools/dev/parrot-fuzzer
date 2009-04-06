@@ -378,7 +378,18 @@ class ArgGenerator:
 
 class PMCTypeGenerator:
     pmc_list = []
-    pmc_blacklist = []
+    pmc_blacklist = [
+            'Packfile',
+            'PackfileAnnotation',
+            'PackfileAnnotationKeys',
+            'PackfileAnnotations',
+            'PackfileConstantTable',
+            'PackfileDirectory',
+            'PackfileFixupEntry',
+            'PackfileFixupTable',
+            'PackfileRawSegment',
+            'PackfileSegment',
+            ]
 
     def populatePMCList(self, parrot_root):
         pmc_pm = parrot_root + "/lib/Parrot/PMC.pm"
@@ -389,6 +400,7 @@ class PMCTypeGenerator:
                 line = re.sub(' =>.*\n', '', line)
                 if line not in self.pmc_blacklist:
                     self.pmc_list.append(line)
+
 
     def getPMCType(self):
         return random.choice(self.pmc_list)
