@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use lib qw ( lib );
 use base qw( Parrot::Ops2pm::Base );
-#use Parrot::OpsFile;
 
 =head1 NAME
 
