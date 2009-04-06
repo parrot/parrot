@@ -83,10 +83,10 @@ pointer is an input only, an output only, or is modified.
 Input pointers are pointers which are read, but the data they point to is
 not changed. The data after the function call is the same as the data you
 had before it. If you specify a parameter is an input parameter, and the
-function tries to modify it's contents anyway, you'll get a warning. Also,
+function tries to modify its contents anyway, you'll get a warning. Also,
 if you pass in an uninitialized pointer, the compiler will throw a warning.
 
-Output pointers are pointers that are passed into a function, it's existing
+Output pointers are pointers that are passed into a function, its existing
 contents are ignored, and new contents are created for it. It's called an
 output because the data in the pointed-to structure are populated inside
 the function and passed back out to the caller. If you have a pointer that
