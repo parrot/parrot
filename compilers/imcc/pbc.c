@@ -316,8 +316,8 @@ imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
     code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
 
     while (cs) {
-        subs_t         *s       = cs->subs;
-        code_segment_t *prev_cs = cs->prev;
+        subs_t         *s              = cs->subs;
+        code_segment_t * const prev_cs = cs->prev;
 
         while (s) {
             subs_t * const prev_s = s->prev;
@@ -385,7 +385,7 @@ static int
 add_const_table_pmc(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(add_const_table_pmc)
-    int newitem = add_const_table(interp);
+    const int newitem = add_const_table(interp);
 
     interp->code->const_table->constants[newitem]->type  = PFC_PMC;
     interp->code->const_table->constants[newitem]->u.key = pmc;
@@ -408,7 +408,7 @@ static int
 add_const_table_key(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(add_const_table_key)
-    int newitem = add_const_table(interp);
+    const int newitem = add_const_table(interp);
 
     interp->code->const_table->constants[newitem]->type  = PFC_KEY;
     interp->code->const_table->constants[newitem]->u.key = key;
@@ -431,7 +431,7 @@ int
 e_pbc_open(PARROT_INTERP, SHIM(void *param))
 {
     ASSERT_ARGS(e_pbc_open)
-    code_segment_t *cs = mem_allocate_zeroed_typed(code_segment_t);
+    code_segment_t * const cs = mem_allocate_zeroed_typed(code_segment_t);
 
     if (!IMCC_INFO(interp)->globals)
         IMCC_INFO(interp)->globals = mem_allocate_zeroed_typed(imcc_globals);
@@ -781,7 +781,7 @@ find_global_label(PARROT_INTERP, ARGIN(const char *name),
     *pc = 0;
 
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
-        SymReg * const r = s->unit->instructions->symregs[0];
+        const SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if names and namespaces are matching - ok */
         if (r && r->name && (strcmp(r->name, name) == 0)
@@ -817,7 +817,7 @@ find_sub_by_subid(PARROT_INTERP, ARGIN(const char *lookup),
     *pc = 0;
 
     for (s = IMCC_INFO(interp)->globals->cs->first; s; s = s->next) {
-        SymReg * const r = s->unit->instructions->symregs[0];
+        const SymReg * const r = s->unit->instructions->symregs[0];
 
         /* if subid matches - ok */
         if (r && (r->subid && (strcmp(r->subid, lookup) == 0)))
@@ -854,7 +854,7 @@ fixup_globals(PARROT_INTERP)
 
             for (fixup = hsh->data[i]; fixup; fixup = fixup->next) {
                 int pc, pmc_const;
-                int addr = jumppc + fixup->color;
+                const int addr = jumppc + fixup->color;
                 int subid_lookup = 0;
                 subs_t *s1;
 
@@ -894,11 +894,11 @@ fixup_globals(PARROT_INTERP)
                     }
                 }
                 if (!s1) {
-                    int op, col;
+                    int col;
                     SymReg * const nam = mk_const(interp, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
-                    op = interp->op_lib->op_code("find_sub_not_null_p_sc", 1);
+                    const int op = interp->op_lib->op_code("find_sub_not_null_p_sc", 1);
                     PARROT_ASSERT(op);
 
                     interp->code->base.data[addr] = op;
