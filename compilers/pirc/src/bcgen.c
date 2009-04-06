@@ -300,8 +300,7 @@ add_string_const(ARGIN(bytecode * const bc), ARGIN(char const * const str),
 
 /*
 
-=item c<int
-add_num_const(ARGIN(bytecode * const bc), double f)>
+=item C<int add_num_const(bytecode * const bc, double f)>
 
 XXX should f be a FLOATVAL?
 
@@ -1060,6 +1059,14 @@ create_sub_pmc(ARGIN(bytecode * const bc), int iscoroutine,
 
 
 #if 0
+
+/*
+
+=item C<opcode_t * make_jit_info(PARROT_INTERP, const struct _IMC_Unit *unit)>
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
