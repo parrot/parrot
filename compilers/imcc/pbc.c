@@ -894,7 +894,6 @@ fixup_globals(PARROT_INTERP)
                     }
                 }
                 if (!s1) {
-                    int col;
                     SymReg * const nam = mk_const(interp, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
@@ -903,17 +902,15 @@ fixup_globals(PARROT_INTERP)
 
                     interp->code->base.data[addr] = op;
 
-                    if (nam->color >= 0)
-                        col = nam->color;
-                    else
-                        col = nam->color = add_const_str(interp, nam);
+                    if (nam->color < 0)
+                        nam->color = add_const_str(interp, nam);
 
-                    interp->code->base.data[addr+2] = col;
+                    interp->code->base.data[addr+2] = nam->color;
 
                     IMCC_debug(interp, DEBUG_PBC_FIXUP,
                             "fixup const PMC"
                             " find_name sub '%s' const nr: %d\n",
-                            fixup->name, col);
+                            fixup->name, nam->color);
                     continue;
                 }
 
