@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 =head1 Branching Instructions
@@ -17,8 +17,8 @@ patches for other revision control systems.
 
 To create a branch, use the C<svn copy> command.
 
-  $ svn copy https://svn.perl.org/parrot/trunk \
-         https://svn.perl.org/parrot/branches/<yourbranchname> \
+  $ svn copy https://svn.parrot.org/parrot/trunk \
+         https://svn.parrot.org/parrot/branches/<yourbranchname> \
          -m "Created branch for <purpose of branch>."
 
 Record the revision number of the branch (in a text file or otherwise), you
@@ -29,7 +29,7 @@ into trunk:
 
 Check out your branch for working:
 
-  $ svn co https://svn.perl.org/parrot/branches/<yourbranchname>
+  $ svn co https://svn.parrot.org/parrot/branches/<yourbranchname>
 
 =head2 Maintaining a Branch
 
@@ -50,7 +50,7 @@ option, pass it the revision number of the last synchronization, and then
 C<HEAD> (a short-cut for the current highest revision), which tells it to grab
 all changes committed between those two revision numbers.
 
-    $ svn merge -r30235:HEAD https://svn.perl.org/parrot/trunk/
+    $ svn merge -r30235:HEAD https://svn.parrot.org/parrot/trunk/
 
 Check for conflicts in the merged code:
 
@@ -120,7 +120,7 @@ In the C<-r> option pass the revision number where the branch was created, and
 C<HEAD> to tell it to grab all changes committed in the branch from the time
 you created the branch to the most recent change.
 
-  svn merge -r30235:HEAD https://svn.perl.org/parrot/branches/<yourbranchname>/
+  svn merge -r30235:HEAD https://svn.parrot.org/parrot/branches/<yourbranchname>/
 
 (If you didn't keep the revision number when you created the branch, you can
 find it by clever detective work in C<svn log>.  It's easier just to keep it in
@@ -134,7 +134,7 @@ C<svn commit>. Use a meaningful commit message something like:
 
 Delete your branch from the repository:
 
-  svn delete https://svn.perl.org/parrot/branches/<yourbranchname> \
+  svn delete https://svn.parrot.org/parrot/branches/<yourbranchname> \
           -m "Removed <describe branch> from the repository."
 
 =head2 Announcing a Merge
