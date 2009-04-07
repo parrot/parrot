@@ -32,9 +32,7 @@ a newline to the end of what is printed.
 
 .sub 'say'
     .param pmc list            :slurpy
-    'print'(list :flat)
-    print "\n"
-    .return (1)
+    .tailcall 'print'(list :flat, "\n")
 .end
 
 
