@@ -81,6 +81,32 @@ op find_lex(out PMC, in STR) {
     $1 = result;
 }
 
+########################################
+
+=item B<find_caller_lex>(out PMC, in STR)
+
+Like find_lex above, but searches through callers' lexical
+scopes (scanning up the dynamic chain) instead of the current
+lexical scope.  Note that the I<current> lexical scope is not
+included in the search (use C<find_lex> above for that).
+
+=cut
+
+op find_caller_lex(out PMC, in STR) {
+    STRING         * const lex_name = $2;
+    Parrot_Context * ctx            = CONTEXT(interp);
+    PMC            * result         = PMCNULL;
+
+    for (ctx = ctx->caller_ctx; ctx && PMC_IS_NULL(result); ctx = ctx->caller_ctx) {
+        PMC * const lex_pad = Parrot_find_pad(interp, lex_name, ctx);
+        if (!PMC_IS_NULL(lex_pad)) {
+            result = VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
+        }
+        if (!result) result = PMCNULL;
+    }
+    $1 = result;
+}
+
 =back
 
 =cut
