@@ -46,11 +46,11 @@ char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)
     size_t offs, n;
     ix *= 3;
 
-    if (!PMC_pmc_val(pmc))
+    if (!PARROT_UNMANAGEDSTRUCT(pmc)->init)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Missing struct initializer");
 
-    n = (size_t)VTABLE_elements(interp, PMC_pmc_val(pmc));
+    n = (size_t)VTABLE_elements(interp, PARROT_UNMANAGEDSTRUCT(pmc)->init);
 
     if ((size_t)ix >= n)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
@@ -58,10 +58,10 @@ char_offset_int(PARROT_INTERP, PMC *pmc, INTVAL ix, int *type)
 
     /* use structure init */
     *type = (int) VTABLE_get_integer_keyed_int(interp,
-        PMC_pmc_val(pmc), ix);
+        PARROT_UNMANAGEDSTRUCT(pmc)->init, ix);
 
     offs  = (size_t) VTABLE_get_integer_keyed_int(interp,
-        PMC_pmc_val(pmc), ix + 2);
+        PARROT_UNMANAGEDSTRUCT(pmc)->init, ix + 2);
 
     return ((char *)VTABLE_get_pointer(interp, pmc)) + offs;
 }
@@ -83,12 +83,12 @@ key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)
 {
     int ix = 0;
 
-    if (!PMC_pmc_val(pmc))
+    if (!PARROT_UNMANAGEDSTRUCT(pmc)->init)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
             "Missing struct initializer");
 
     if (PObj_get_FLAGS(key) & KEY_string_FLAG) {
-        PMC * const types = PMC_pmc_val(pmc);
+        PMC * const types = PARROT_UNMANAGEDSTRUCT(pmc)->init;
 
         if (types->vtable->base_type == enum_class_OrderedHash) {
             Hash       * const hash = (Hash *)VTABLE_get_pointer(interp, types);
@@ -150,7 +150,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
     else
         count = 1;
 
-    init = PMC_pmc_val(pmc);
+    init = PARROT_UNMANAGEDSTRUCT(pmc)->init;
     max  = (size_t)VTABLE_get_integer_keyed_int(interp, init, ix + 1);
 
 #ifdef STRUCT_DEBUG
@@ -373,7 +373,9 @@ Returns the element of type C<type> starting at C<*p> as a PMC.
 static PMC*
 ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
 {
-    PMC *ret = NULL, *init, *ptr;
+    PMC *ret  = NULL;
+    PMC *init = PARROT_UNMANAGEDSTRUCT(pmc)->init;
+    PMC *ptr  = VTABLE_get_pmc_keyed_int(interp, init, idx * 3);
 
     switch (type) {
         case enum_type_func_ptr:
@@ -381,9 +383,6 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
             ret  = *(PMC**) p;
 
             /* now check if initializer has a signature attached */
-            init = PMC_pmc_val(pmc);
-            ptr  = VTABLE_get_pmc_keyed_int(interp, init, idx*3);
-
             if (ptr->pmc_ext && PMC_metadata(ptr)) {
                 STRING *signature_str = CONST_STRING(interp, "_signature");
                 PMC *sig = VTABLE_getprop(interp, ptr, signature_str);
@@ -398,8 +397,6 @@ ret_pmc(PARROT_INTERP, PMC *pmc, char *p, int type, INTVAL idx)
             return ret;
         case enum_type_struct_ptr:
             /* check the metadata for an initializer */
-            init = PMC_pmc_val(pmc);
-            ptr  = VTABLE_get_pmc_keyed_int(interp, init, idx * 3);
 
             /* grab the struct from the metadata */
             if (ptr->pmc_ext && PMC_metadata(ptr)) {
@@ -544,7 +541,7 @@ calc_align(PARROT_INTERP, PMC *pmc, PMC *type_pmc,
         /* a nested structs alignment is the biggest item in it
          * so go through that struct and check */
         nested = VTABLE_getprop(interp, type_pmc, CONST_STRING(interp, "_struct"));
-        nested_init = PMC_pmc_val(nested);
+        nested_init = PARROT_UNMANAGEDSTRUCT(nested)->init;
     }
     if (type == enum_type_struct) {
         INTVAL i, n    = (size_t)VTABLE_elements(interp, nested_init);
@@ -656,7 +653,9 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
 }
 
 pmclass UnManagedStruct need_ext no_ro {
-    ATTR void *ptr;  /* whatever this UnManagedStruct isn't managing */
+    ATTR void   *ptr;   /* the struct that this UnManagedStruct isn't managing */
+    ATTR INTVAL  size;  /* the size of the struct */
+    ATTR PMC    *init;  /* the initializer used with this UnManagedStruct */
 
 /*
 
@@ -678,8 +677,6 @@ Initializes the C<struct> with a default value of C<NULL>.
         Parrot_UnManagedStruct_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_UnManagedStruct_attributes);
         PMC_data(SELF) = attrs;
-        attrs->ptr = NULL;
-        PMC_pmc_val(SELF) = NULL;
     }
 
 /*
@@ -729,8 +726,8 @@ Return a clone of this PMC.
         PMC *clone = pmc_new(INTERP, enum_class_UnManagedStruct);
         mem_sys_memmove(PMC_data(clone), PMC_data(SELF),
                 sizeof (Parrot_UnManagedStruct_attributes));
-        PMC_pmc_val(clone) = VTABLE_clone(INTERP, PMC_pmc_val(SELF));
-        PMC_int_val(clone) = PMC_int_val(SELF);
+        PARROT_UNMANAGEDSTRUCT(clone)->init =
+            VTABLE_clone(INTERP, PARROT_UNMANAGEDSTRUCT(SELF)->init);
         return clone;
     }
 
@@ -745,7 +742,7 @@ Sets C<*value> (see C<init_pmc()> and calculates the offsets.
 */
 
     VTABLE void set_pmc(PMC *value) {
-        PMC_pmc_val(SELF) = value;
+        PARROT_UNMANAGEDSTRUCT(SELF)->init = value;
         PObj_custom_mark_SET(SELF);
         calc_offsets(INTERP, SELF, value, 0);
     }
@@ -761,8 +758,8 @@ Marks the C<struct> as live.
 */
 
     VTABLE void mark() {
-        if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+        if (PARROT_UNMANAGEDSTRUCT(SELF)->init)
+            pobject_lives(INTERP, (PObj *)PARROT_UNMANAGEDSTRUCT(SELF)->init);
     }
 
 /*
@@ -805,7 +802,7 @@ Returns the size of the C<struct>.
 */
 
     VTABLE INTVAL get_integer() {
-        return PMC_int_val(SELF);
+        return PARROT_UNMANAGEDSTRUCT(SELF)->size;
     }
 
 /*
@@ -819,7 +816,7 @@ Sets the size of the C<struct>.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
-        PMC_int_val(SELF) = size;
+        PARROT_UNMANAGEDSTRUCT(SELF)->size = size;
     }
 
 /*

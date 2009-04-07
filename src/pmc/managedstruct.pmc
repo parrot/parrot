@@ -38,8 +38,6 @@ Initializes an empty struct.
         Parrot_ManagedStruct_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_ManagedStruct_attributes);
         PObj_active_destroy_SET(SELF);
-        PMC_pmc_val(SELF) = NULL;
-        PMC_int_val(SELF) = 0;
         PMC_data(SELF) = attrs;
 
     }
@@ -88,18 +86,18 @@ Destroys the struct, freeing the allocated memory.
     VTABLE void set_integer_native(INTVAL value) {
         if (PARROT_MANAGEDSTRUCT(SELF)->ptr && !value) {
             mem_sys_free(PARROT_MANAGEDSTRUCT(SELF)->ptr);
-            PARROT_MANAGEDSTRUCT(SELF)->ptr    = NULL;
-            PMC_int_val(SELF) = 0;
+            PARROT_MANAGEDSTRUCT(SELF)->ptr  = NULL;
+            PARROT_MANAGEDSTRUCT(SELF)->size = 0;
         }
         else if (value && !PARROT_MANAGEDSTRUCT(SELF)->ptr) {
-            PARROT_MANAGEDSTRUCT(SELF)->ptr    = mem_sys_allocate_zeroed((size_t)value);
-            PMC_int_val(SELF) = value;
+            PARROT_MANAGEDSTRUCT(SELF)->ptr  = mem_sys_allocate_zeroed((size_t)value);
+            PARROT_MANAGEDSTRUCT(SELF)->size = value;
         }
         else if (value && PARROT_MANAGEDSTRUCT(SELF)->ptr) {
-            if (PMC_int_val(SELF) != value) {
+            if (PARROT_MANAGEDSTRUCT(SELF)->size != value) {
                 PARROT_MANAGEDSTRUCT(SELF)->ptr =
                     mem_sys_realloc(PARROT_MANAGEDSTRUCT(SELF)->ptr, (size_t)value);
-                PMC_int_val(SELF) = value;
+                PARROT_MANAGEDSTRUCT(SELF)->size = value;
             }
         }
 
@@ -121,11 +119,12 @@ how to clone I<that> data.
 
     VTABLE PMC *clone() {
         PMC *dest = pmc_new_init(interp, SELF->vtable->base_type,
-            PMC_pmc_val(SELF));
+            PARROT_MANAGEDSTRUCT(SELF)->init);
 
         if (PARROT_MANAGEDSTRUCT(SELF)->ptr)
             memmove(PARROT_MANAGEDSTRUCT(dest)->ptr,
-                    PARROT_MANAGEDSTRUCT(SELF)->ptr, PMC_int_val(SELF));
+                    PARROT_MANAGEDSTRUCT(SELF)->ptr,
+                    PARROT_MANAGEDSTRUCT(SELF)->size);
 
         return dest;
     }
