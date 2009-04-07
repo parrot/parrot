@@ -4,7 +4,7 @@ $Id$
 
 =head1 NAME
 
-src/inter_create.c - Parrot Interpreter Creation and Destruction
+src/interp/inter_create.c - Parrot Interpreter Creation and Destruction
 
 =head1 DESCRIPTION
 
