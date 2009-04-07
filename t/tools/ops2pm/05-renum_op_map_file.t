@@ -124,9 +124,9 @@ ok(-d $samplesdir, "Able to locate samples directory");
         $major_version,
     );
     is($lastcode, q{bxors_s_s_sc},
-        "Stage 1:  Got expected last opcode");
+        "Stage 4:  Got expected last opcode");
     is($lastnumber, 177,
-        "Stage 1:  Got expected last opcode number");
+        "Stage 4:  Got expected last opcode number");
 
     ##### Test post-Parrot 1.0 case
     $major_version = 1;
@@ -146,9 +146,9 @@ ok(-d $samplesdir, "Able to locate samples directory");
         $major_version,
     );
     is($lastcode, q{bxor_i_ic_ic},
-        "Stage 2:  Got expected last opcode");
+        "Stage 5:  Got expected last opcode");
     is($lastnumber, 189,
-        "Stage 2:  Got expected last opcode number");
+        "Stage 5:  Got expected last opcode number");
 
     ##### Stage 6:  Add some opcodes and regenerate ops.num #####
 
