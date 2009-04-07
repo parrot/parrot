@@ -287,7 +287,7 @@ the sub.
     outerpir = find_caller_lex '$CODE'
     outerpir .= subpir
     outerpir .= innerpir
-    
+
     set_global '$?NAMESPACE', outerns
     set_global '$?HLL', outerhll
 .end

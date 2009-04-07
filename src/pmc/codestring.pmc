@@ -153,7 +153,7 @@ assumes that the first line is line number zero.
     }
     RETURN(INTVAL line);
 }
-        
+
 
 /*
 
