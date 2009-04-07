@@ -159,12 +159,7 @@ with a few features and see how it feels--the best option is to
 download the most recent point release for your system. Point releases
 are usually packaged up for easy download and install for various
 platforms, including Windows, Debian, and Redhat. Point releases are
-also available from CPAN. The sure way to get the most recent release is at
-U<http://search.cpan.org/dist/parrot/> (or search for "parrot" in
-"Distributions"). If you want something a little more cutting edge than
-the packaged release, a new snapshot of the subversion repository is
-created every eight hours. The most recent snapshot is always available
-at U<http://cvs.perl.org/snapshots/parrot/parrot-latest.tar.gz>.
+avaliable from U<http://www.parrot.org/download>.
 
 If you plan to get involved in development, you'll want to check out
 the source from the subversion repository directly. Anyone can get
