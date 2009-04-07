@@ -19,7 +19,7 @@ Tests the CodeString class directly.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(24)
+    plan(38)
 
     create_codestring()
     calls_to_unique()
@@ -32,6 +32,7 @@ Tests the CodeString class directly.
     namespace_keys()
     first_char_repl_regression()
     ord_from_name()
+    lineof_tests()
 .end
 
 .sub create_codestring
@@ -188,6 +189,40 @@ CODE
     $I0 = code.'charname_to_ord'('<no such symbol>')
     is($I0, -1, '<no such symbol>')
 .end
+
+.sub 'lineof_tests'
+    $P0 = new 'CodeString'
+    $P0 = "0123\n5678\r0123\r\n678\n"
+    $I0 = $P0.'lineof'(0)
+    is($I0, 0, "lineof - beginning of string")
+    $I0 = $P0.'lineof'(1)
+    is($I0, 0, "lineof - char on first line")
+    $I0 = $P0.'lineof'(4)
+    is($I0, 0, "lineof - immediately before nl")
+    $I0 = $P0.'lineof'(5)
+    is($I0, 1, "lineof - immediately after nl")
+    $I0 = $P0.'lineof'(8)
+    is($I0, 1, "lineof - char before cr")
+    $I0 = $P0.'lineof'(9)
+    is($I0, 1, "lineof - immediately before cr")
+    $I0 = $P0.'lineof'(10)
+    is($I0, 2, "lineof - immediately after cr")
+    $I0 = $P0.'lineof'(11)
+    is($I0, 2, "lineof - char after cr")
+    $I0 = $P0.'lineof'(13)
+    is($I0, 2, "lineof - char before crnl")
+    $I0 = $P0.'lineof'(14)
+    is($I0, 2, "lineof - immediately before crnl")
+    $I0 = $P0.'lineof'(15)
+    is($I0, 3, "lineof - middle of crnl")
+    $I0 = $P0.'lineof'(16)
+    is($I0, 3, "lineof - immediately after crnl")
+    $I0 = $P0.'lineof'(19)
+    is($I0, 3, "lineof - immediately before final nl")
+    $I0 = $P0.'lineof'(20)
+    is($I0, 4, "lineof - immediately after final nl")
+.end
+
 
 # Local Variables:
 #   mode: pir
