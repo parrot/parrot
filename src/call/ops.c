@@ -815,7 +815,7 @@ really_destroy_runloop_jump_points(ARGIN_NULLOK(Parrot_runloop *jump_point))
 
 =head1 SEE ALSO
 
-F<include/parrot/interpreter.h>, F<src/interpreter.c>.
+F<include/parrot/interpreter.h>, F<src/interp/interpreter.c>.
 
 =cut
 

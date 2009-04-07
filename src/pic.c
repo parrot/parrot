@@ -972,8 +972,8 @@ Leopold Toetsch with many hints from Ken Fox.
 
 =head1 SEE ALSO
 
-F<src/multidispatch.c>, F<src/object.c>, F<src/interpreter.c>, F<ops/core_ops_cgp.c>,
-F<include/parrot/pic.h>, F<ops/pic.ops>
+L<src/multidispatch.c>, L<src/object.c>, L<src/interp/interpreter.c>,
+L<ops/core_ops_cgp.c>, L<include/parrot/pic.h>, L<ops/pic.ops>
 
 =cut
 

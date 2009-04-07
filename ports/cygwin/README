@@ -1375,7 +1375,7 @@ Files included in the =parrot-docs= package:
  /usr/share/doc/parrot/1.0.0/html/src/inter_cb.c.html
  /usr/share/doc/parrot/1.0.0/html/src/inter_create.c.html
  /usr/share/doc/parrot/1.0.0/html/src/inter_misc.c.html
- /usr/share/doc/parrot/1.0.0/html/src/interpreter.c.html
+ /usr/share/doc/parrot/1.0.0/html/src/interp/interpreter.c.html
  /usr/share/doc/parrot/1.0.0/html/src/io/api.c.html
  /usr/share/doc/parrot/1.0.0/html/src/io/buffer.c.html
  /usr/share/doc/parrot/1.0.0/html/src/io/core.c.html

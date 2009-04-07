@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -280,7 +280,7 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
         at src/runops_cores.c:184
     No locals.
     #5  0xb7c67acf in runops_int (interp=0x804e008, offset=0)
-        at src/interpreter.c:816
+        at src/interp/interpreter.c:816
             pc = (opcode_t * const) 0x8239730
             lo_var_ptr = 134537224
             core = (opcode_t *(*)(Parrot_Interp, 

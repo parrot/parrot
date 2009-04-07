@@ -1,10 +1,10 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
 
-src/interpreter.c - Parrot Interpreter
+src/interp/interpreter.c - Parrot Interpreter
 
 =head1 DESCRIPTION
 
@@ -37,17 +37,17 @@ have the same number of elements because there is a one-to-one mapping.
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"
-#include "runops_cores.h"
+#include "../runops_cores.h"
 #if JIT_CAPABLE
 #  include "parrot/exec.h"
-#  include "jit.h"
+#  include "../jit.h"
 #endif
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 #include "parrot/dynext.h"
-#include "pmc/pmc_parrotlibrary.h"
+#include "../pmc/pmc_parrotlibrary.h"
 
 
 /* HEADERIZER HFILE: none */

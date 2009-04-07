@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -480,7 +480,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 =head1 SEE ALSO
 
-F<include/parrot/interpreter.h>, F<src/interpreter.c>.
+L<include/parrot/interpreter.h>, L<src/interp/interpreter.c>.
 
 =cut
 
