@@ -65,6 +65,13 @@ used.  This option is passed directly to the parrot exectuable.  Other runcores
 include C<--CGP-core>, C<--fast-core>, C<--computed-goto-core>, C<--jit-core>,
 C<--switched-core> and C<--profile>.
 
+=item C<--ignore_blacklist>
+
+Some PMCs and opcodes are known to cause false positives or results of limited
+value.  These are blacklisted by default.  Using C<--ignore_blacklist> causes
+the fuzzer to use all available PMCs and opcodes, even those known to behave
+badly during testing.
+
 =item C<--instructions=10>
 
 Generate this number of instructions during test run.  The default is 3.  Note
@@ -99,28 +106,32 @@ class ParrotFuzzer(Application):
                 help="Generate this many instructions per test run (default: 3)",
                 type="int",
                 default="3")
+        options.add_option("--ignore_blacklist",
+                help="Use opcodes and PMCs known to cause bad or questionable results (default: use blacklists)",
+                action="store_true",
+                default=False)
         return options
 
 
     def setupProject(self):
         parrot_root  = self.options.parrot_root
         runcore      = self.options.runcore
-        instructions = self.options.instructions
         parrot       = locateProgram(parrot_root + "/parrot")
         process      = ParrotProcess(self.project, [parrot, runcore, "<fuzzy.pir>"])
-        pirgen       = PirGenerator(self.project, parrot_root, instructions)
+        pirgen       = PirGenerator(self.project, self.options)
         WatchProcess(process)
         WatchStdout(process)
 
 class PirGenerator(ProjectAgent, WriteCode):
 
-    def __init__(self, project, parrot_root, instructions):
-        self.parrot_root       = parrot_root
+    def __init__(self, project, options):
+        self.parrot_root       = options.parrot_root
+        self.instruction_count = options.instructions
+        self.ignore_blacklist  = options.ignore_blacklist
         self.opfunc_gen        = OpfuncGenerator()
-        self.arg_gen           = ArgGenerator(parrot_root)
-        self.instruction_count = instructions
+        self.arg_gen           = ArgGenerator(self.parrot_root, self.ignore_blacklist)
 
-        self.opfunc_gen.populateOpfuncList(parrot_root)
+        self.opfunc_gen.populateOpfuncList(self.parrot_root, self.ignore_blacklist)
 
         ProjectAgent.__init__(self, project, "pir_source")
         WriteCode.__init__(self)
@@ -245,9 +256,9 @@ class ArgGenerator:
     arg_counts = {}
     args       = {}
 
-    def __init__(self, parrot_root):
+    def __init__(self, parrot_root, ignore_blacklist):
         self.pmc_gen = PMCTypeGenerator()
-        self.pmc_gen.populatePMCList(parrot_root)
+        self.pmc_gen.populatePMCList(parrot_root, ignore_blacklist)
 
     def setArgCount(self, arg_type, count):
         self.arg_counts[arg_type] = count
@@ -391,16 +402,15 @@ class PMCTypeGenerator:
             'PackfileSegment',
             ]
 
-    def populatePMCList(self, parrot_root):
+    def populatePMCList(self, parrot_root, ignore_blacklist):
         pmc_pm = parrot_root + "/lib/Parrot/PMC.pm"
         pmc_f  = open(pmc_pm, 'r')
         for line in pmc_f:
             if re.search('\t[a-zA-Z]+ => [0-9]+,', line):
                 line = re.sub('\t',      '', line)
                 line = re.sub(' =>.*\n', '', line)
-                if line not in self.pmc_blacklist:
+                if ignore_blacklist or line not in self.pmc_blacklist:
                     self.pmc_list.append(line)
-
 
     def getPMCType(self):
         return random.choice(self.pmc_list)
@@ -454,7 +464,7 @@ class OpfuncGenerator:
             'yield',
             ]
 
-    def populateOpfuncList(self, parrot_root):
+    def populateOpfuncList(self, parrot_root, ignore_blacklist):
         ops_h = parrot_root + "/src/ops/core_ops.c"
         ops_f = open(ops_h, 'r')
         #This is a moderately fragile hack that relies on the specific
@@ -479,7 +489,7 @@ class OpfuncGenerator:
 
                 #XXX: don't know how to handle these args
                 if (not re.search('(pc|k|ki|kc|kic)', sig)):
-                    if short_name not in self.opfunc_blacklist:
+                    if ignore_blacklist or short_name not in self.opfunc_blacklist:
                         self.opfunc_list.append([short_name, sig])
                 #        print "accepted "+long_name+"("+sig+")"
                 #else:
