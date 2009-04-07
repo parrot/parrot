@@ -62,8 +62,8 @@ is set or implied.
     issrcmatch = isa src, ['PGE';'Match']
     if issrcmatch goto target_from_src
     .local pmc target
-    target = new 'String'
-    target = src
+    target = new 'CodeString'
+    assign target, src
     pos = 0
     iscont = 1
     $P0 = self.'HOW'()
