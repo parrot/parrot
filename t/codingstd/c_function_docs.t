@@ -129,7 +129,6 @@ examples/embed/lorito.c
 src/atomic/gcc_x86.c
 src/debug.c
 src/exceptions.c
-src/exec.c
 src/gc/res_lea.c
 src/io/io_string.c
 src/io/socket_api.c

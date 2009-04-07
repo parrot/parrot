@@ -144,8 +144,8 @@ Parrot_exec(PARROT_INTERP, ARGIN(opcode_t *pc),
 
 /*
 
-=item C<static void add_data_member(Parrot_exec_objfile_t *obj,
-const void *src, size_t len)>
+=item C<static void add_data_member(Parrot_exec_objfile_t *obj, const void *src,
+size_t len)>
 
 Adds a member to the data section, storing the size of it at
 C<< obj->data_size[N] >>.
@@ -224,8 +224,8 @@ exec_init(ARGIN(Parrot_exec_objfile_t *obj))
 
 /*
 
-=item C<int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj,
-const char *symbol, int stype)>
+=item C<int Parrot_exec_add_symbol(Parrot_exec_objfile_t *obj, const char
+*symbol, int stype)>
 
 Adds a symbol to the object file.
 
@@ -318,8 +318,8 @@ Parrot_exec_add_text_rellocation_func(ARGIN(Parrot_exec_objfile_t *obj),
 
 /*
 
-=item C<void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj,
-char *nptr, int type, const char *symbol, int disp)>
+=item C<void Parrot_exec_add_text_rellocation(Parrot_exec_objfile_t *obj, char
+*nptr, int type, const char *symbol, int disp)>
 
 Adds a text rellocation to the object file.
 
@@ -367,8 +367,8 @@ Parrot_exec_add_text_rellocation(ARGIN(Parrot_exec_objfile_t *obj), ARGIN(char *
 
 /*
 
-=item C<static int symbol_list_find(const Parrot_exec_objfile_t *obj,
-const char *symbol)>
+=item C<static int symbol_list_find(const Parrot_exec_objfile_t *obj, const char
+*symbol)>
 
 Returns the index of C<symbol> in the symbol list. Returns -1 if it is
 not in the list.
