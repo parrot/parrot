@@ -174,7 +174,7 @@ sub extract_function_declarations_and_update_source {
         my $heading = $headerizer->generate_documentation_signature($decl);
 
         $text =~ s/=item C<[^>]*\b$name\b[^>]*>\n+/$heading\n\n/sm or
-            warn "$name has no POD\n";
+            warn "$cfile_name: $name has no POD\n";
     }
     open( my $fhout, '>', $cfile_name ) or die "Can't create $cfile_name: $!";
     print {$fhout} $text;
