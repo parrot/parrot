@@ -96,7 +96,6 @@ ok(-d $samplesdir, "Able to locate samples directory");
         $numoutput,
         $major_version,
     );
-    ($lastcode, $lastnumber) = get_last_opcode($numoutput);
     is($lastcode, q{pic_callr___pc},
         "Stage 3:  Got expected last opcode");
     is($lastnumber, 189,
@@ -163,7 +162,6 @@ ok(-d $samplesdir, "Able to locate samples directory");
         $numoutput,
         $major_version,
     );
-    ($lastcode, $lastnumber) = get_last_opcode($numoutput);
     is($lastcode, q{pic_callr___pc},
         "Stage 6:  Got expected last opcode:  additions permitted");
     is($lastnumber, 194,
