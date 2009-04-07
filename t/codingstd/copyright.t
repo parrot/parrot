@@ -107,19 +107,19 @@ TODO:
         "Please update to read something like:",
         $suggested_version
         );
-
-    ok( !scalar(@duplicate_copyright_files), 'Duplicate Copyright statements' )
-        or diag(
-        join
-            $/ => "Duplicate copyright statement found in "
-            . scalar @duplicate_copyright_files
-            . " files:",
-        @duplicate_copyright_files,
-        "Please get copyright assigned to Parrot Foundation",
-        "and remove alternate notice; Or remove duplicated",
-        "notice for Parrot Foundation."
-        );
 }
+
+ok( !scalar(@duplicate_copyright_files), 'Duplicate Copyright statements' )
+    or diag(
+    join
+        $/ => "Duplicate copyright statement found in "
+        . scalar @duplicate_copyright_files
+        . " files:",
+    @duplicate_copyright_files,
+    "Please get copyright assigned to Parrot Foundation",
+    "and remove alternate notice; Or remove duplicated",
+    "notice for Parrot Foundation."
+    );
 
 # Local Variables:
 #   mode: cperl
