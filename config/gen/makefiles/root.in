@@ -2302,7 +2302,6 @@ HEADERIZER_O_FILES := \
     $(O_FILES) \
     src/packdump$(O) \
     src/pbc_merge$(O) \
-    src/exec$(O) \
     $(PIRC_O_FILES)
 
 headerizer : $(SRC_DIR)/core_pmcs.c
