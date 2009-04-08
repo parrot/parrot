@@ -41,9 +41,11 @@ PIR or an Eval PMC (bytecode).
     .local pmc newself
     newself = new ['POST';'Compiler']
 
-    .local pmc innerpir
+    .local pmc innerpir, line
     innerpir = new 'CodeString'
     .lex '$CODE', innerpir
+    line = box 0
+    .lex '$LINE', line
 
     ##  if the root node isn't a Sub, wrap it
     $I0 = isa post, ['POST';'Sub']
@@ -68,12 +70,22 @@ Return generated PIR for C<node> and all of its children.
 
 .sub 'pir_children' :method
     .param pmc node
+    .local pmc line
+    line = find_caller_lex '$LINE'
+    .lex '$LINE', line
+
     .local pmc iter
     iter = node.'iterator'()
   iter_loop:
     unless iter goto iter_end
-    .local pmc cpost
+    .local pmc cpost, pos, source
     cpost = shift iter
+    pos = cpost['pos']
+    if null pos goto done_subline
+    source = cpost['source']
+    line = source.'lineof'(pos)
+    inc line
+  done_subline:
     $P0 = self.'pir'(cpost)
     goto iter_loop
   iter_end:
@@ -156,8 +168,14 @@ Return pir for an operation node.
     goto pirop_emit
 
   pirop_emit:
-    .local pmc subpir
-    subpir = find_caller_lex '$SUBPIR'
+    .local pmc subpir, subline, line
+    subpir  = find_caller_lex '$SUBPIR'
+    subline = find_caller_lex '$SUBLINE'
+    line    = find_caller_lex '$LINE'
+    if subline == line goto done_line
+    subpir.'emit'('.annotate "line", %0', line)
+    assign subline, line
+  done_line:
     subpir.'emit'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
 .end
 
@@ -188,9 +206,11 @@ the sub.
 .sub 'pir' :method :multi(_, ['POST';'Sub'])
     .param pmc node
 
-    .local pmc innerpir, subpir
+    .local pmc subpir, subline, innerpir
     subpir = new 'CodeString'
     .lex '$SUBPIR', subpir
+    subline = box -1
+    .lex '$SUBLINE', subline
     innerpir = new 'CodeString'
     .lex '$CODE', innerpir
 

@@ -197,10 +197,27 @@ a C<Match> object and obtains source/position information from that.
 
 .sub 'node' :method
     .param pmc node
-     ## Do nothing for now.  When we're in a better position to
-     ## handle source line information (RT #43269 and others)
-     ## we'll figure out what to do here.
-    .return ()
+
+    if null node goto done
+    $I0 = isa node, ['PGE';'Match']
+    if $I0 goto node_match
+    $I0 = isa node, ['PCT';'Node']
+    if $I0 goto node_pct
+    $S0 = typeof node
+    $S0 = concat "Don't know how to save info from node of type ", $S0
+    die $S0
+  node_match:
+    .local pmc source, pos
+    source = getattribute node, '$.target'
+    pos    = node.'from'()
+    goto node_done
+  node_pct:
+    source = node['source']
+    pos    = node['pos']
+  node_done:
+    self['source'] = source
+    self['pos']    = pos
+  done:
 .end
 
 
