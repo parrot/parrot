@@ -127,7 +127,7 @@ for binary or other non-text data. However, this is an uncommon usage of
 them, and for most such data there will likely be a PMC type that is better
 suited to store and manipulate it. Parrot strings are designed to be very
 flexible and powerful, to account for all the complexity of human-readable
-(and computer-representable) text data. 
+(and computer-representable) text data.
 
 The final data type is the PMC, a complex and flexible data type. PMCs are,
 in the world of Parrot, similar to what classes and objects are in
@@ -165,7 +165,7 @@ quotes:
 
   $S0 = "This string is \n on two lines"
   $S0 = 'This is a \n one-line string with a slash in it'
-  
+
 Here's a quick listing of the escape sequences supported by double-quoted
 strings:
 
@@ -180,7 +180,7 @@ strings:
   \t          A tab
   \n          A newline
   \v          A vertical tab
-  \f          
+  \f
   \r
   \e
   \\          A backslash
@@ -274,7 +274,7 @@ a register can be used for a named variable can be used for as well.
 
 X<types;variable (PIR)>
 X<variables;types (PIR)>
-The valid types are C<int>, C<num>, C<string>, and C<pmc> N<Also, you can 
+The valid types are C<int>, C<num>, C<string>, and C<pmc> N<Also, you can
 use any predefined PMC class name like C<BigNum> or C<LexPad>. We'll talk
 about classes and PMC object types in a little bit.>. It should come
 as no surprise that these are the same as Parrot's four built-in register
@@ -317,12 +317,14 @@ takes more time to execute during the compilation phase. Here's an example
 of where a register could be reused:
 
 =begin PIR
+
   .sub main
     $S0 = "hello "
     print $S0
     $S1 = "world!"
     print $S1
   .end
+
 =end PIR
 
 We'll talk about subroutines in more detail in the next chapter. For now,
@@ -348,12 +350,14 @@ the second allocation. Notice that this code with only one register performs
 identically to the previous example:
 
 =begin PIR
+
   .sub main
     $S0 = "hello "
     print $S0
     $S0 = "world!"
     print $S0
   .end
+
 =end PIR
 
 In some situations it can be helpful to turn the allocator off and avoid
@@ -410,7 +414,7 @@ opcode:
   $P1 = new 'Number'        # The boxed form of num
   $P1 = box 3.14
   $P2 = new 'String'        # The boxed form of string
-  $P2 = "This is a string!" 
+  $P2 = "This is a string!"
 
 The PMC classes C<Integer>, C<Number>, and C<String> are thin overlays on
 the primative types they represent. However, these PMC types have the benefit
@@ -569,9 +573,11 @@ example for the simplest syntax for a PIR compilation unit. It starts with
 the C<.sub> directive and ends with the C<.end> directive:
 
 =begin PIR
+
   .sub main
       print "Hello, Polly.\n"
   .end
+
 =end PIR
 
 Again, we don't need to name the subroutine C<main>, it's just a common
@@ -581,6 +587,7 @@ is normally executed first but you can flag any compilation unit as the
 first one to execute with the C<:main> marker.
 
 =begin PIR
+
   .sub first
       print "Polly want a cracker?\n"
   .end
@@ -588,6 +595,7 @@ first one to execute with the C<:main> marker.
   .sub second :main
       print "Hello, Polly.\n"
   .end
+
 =end PIR
 
 This code prints out "Hello, Polly." but not "Polly want a cracker?".
@@ -596,6 +604,7 @@ executed first. The function C<first>, which doesn't have this flag
 is never executed. However, if we change around this example a little:
 
 =begin PIR
+
   .sub first :main
       print "Polly want a cracker?\n"
   .end
@@ -603,6 +612,7 @@ is never executed. However, if we change around this example a little:
   .sub second
       print "Hello, Polly.\n"
   .end
+
 =end PIR
 
 The output now is "Polly want a cracker?". Execution in PIR starts
@@ -638,6 +648,7 @@ The most basic branching instruction is the unconditional branch:
 C<goto>.
 
 =begin PIR
+
   .sub _main
       goto L1
       print "never printed"
@@ -645,6 +656,7 @@ C<goto>.
       print "after branch\n"
       end
   .end
+
 =end PIR
 
 The first C<print> statement never runs because the C<goto> always
@@ -653,6 +665,7 @@ skips over it to the label C<L1>.
 The conditional branches combine C<if> or C<unless> with C<goto>.
 
 =begin PIR
+
   .sub _main
       $I0 = 42
       if $I0 goto L1
@@ -660,6 +673,7 @@ The conditional branches combine C<if> or C<unless> with C<goto>.
   L1: print "after branch\n"
       end
   .end
+
 =end PIR
 
 X<if (conditional);instruction (PIR)>
@@ -675,6 +689,7 @@ C<E<gt>=>) can combine with C<if ...  goto>. These branch when the
 comparison is true:
 
 =begin PIR
+
   .sub _main
       $I0 = 42
       $I1 = 43
@@ -684,6 +699,7 @@ comparison is true:
       print "after branch\n"
       end
   .end
+
 =end PIR
 
 This example compares C<$I0> to C<$I1> and branches to the label C<L1>
@@ -699,6 +715,7 @@ PIR has no special loop constructs. A combination of conditional and
 unconditional branches handle iteration:
 
 =begin PIR
+
   .sub _main
       $I0 = 1               # product
       $I1 = 5               # counter
@@ -712,6 +729,7 @@ unconditional branches handle iteration:
       print "\n"
       end
   .end
+
 =end PIR
 
 X<do-while style loop;(PIR)>
@@ -727,6 +745,7 @@ For a I<while>-style loop with the condition test at the start, use a
 conditional branch together with an unconditional branch:
 
 =begin PIR
+
   .sub _main
       $I0 = 1               # product
       $I1 = 5               # counter
@@ -742,6 +761,7 @@ conditional branch together with an unconditional branch:
       print "\n"
       end
   .end
+
 =end PIR
 
 This example tests the counter C<$I1> at the start of the loop. At the
@@ -780,7 +800,7 @@ predefined types. As we have seen briefly, and as we will see in more depth
 later, PMCs have a standard interface called the VTABLE interface. VTABLEs
 are a standard list of functions that all PMCs implement N<or, PMCs can
 choose not to implement each interface explicitly and instead let Parrot
-call the default implementations>. 
+call the default implementations>.
 
 VTABLEs are very strict: There are a fixed number with fixed names and
 fixed argument lists. You can't just create any random VTABLE interface that
@@ -903,12 +923,14 @@ echo program that reads in characters from the user and echos them to
 standard output:
 
 =begin PIR
+
   .sub main
     loop_top:
       $S0 = read 10
       print $S0
       goto loop_top
   .end
+
 =end PIR
 
 =head2 Filehandles
@@ -973,6 +995,7 @@ Let's see a little example of a program that reads in data from a file, and
 prints it to STDOUT.
 
 =begin PIR
+
   .sub main
     $P0 = getstdout
     $P1 = open "myfile.txt", "r"
@@ -982,13 +1005,14 @@ prints it to STDOUT.
       if $P1 goto loop_top
     close $P1
   .end
+
 =end PIR
 
 This example shows that treating a filehandle PMC like a boolean value
 returns whether or not we have reached the end of the file. A true return
 value means there is more file to read. A false return value means we are at
 the end. In addition to this behavior, Filehandle PMCs have a number of methods
-that can be used to perform various operations. 
+that can be used to perform various operations.
 
 =over 4
 
@@ -1001,9 +1025,9 @@ is used.
 
   $P0 = new 'Filehandle'
   $P0.'open'("myfile.txt", "r")
-  
+
   $P0 = open "myfile.txt", "r"   # Same!
-  
+
 The C<open> opcode internally creates a new filehandle PMC and calls the
 C<'open'()> method on it. So even though the above two code snippets act in
 an identical way, the later one is a little more concise to write. The caveat
@@ -1019,9 +1043,9 @@ Returns a boolean value whether the filehandle is a TTY terminal
 Closes the filehandle. Can be reopened with C<.'open'> later.
 
   $P0.'close'()
-  
+
   close $P0   # Same
-  
+
 The C<close> opcode calls the C<'close'()> method on the Filehandle PMC
 internally, so these two calls are equivalent.
 
@@ -1034,7 +1058,7 @@ Returns true if the filehandle is closed, false if it is opened.
 Reads C<length> bytes from the filehandle.
 
   $S0 = read $P0, 10
-  
+
   $P0.'read'(10)
 
 The two calls are equivalent, and the C<read> opcode calls the C<'read'()>
@@ -1065,10 +1089,10 @@ Prints the given value to the filehandle. The C<print> opcode uses the
 C<'print'()> method internally.
 
   print "Hello"
-  
+
   $P0 = getstdout
   print $P0, "Hello!"    # Same
-  
+
   $P0.'print'("Hello!")  # Same
 
 =item C<$P0.'puts'(STRING to_print)>

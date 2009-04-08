@@ -227,6 +227,7 @@ type:
 
   exchange I1, I0   # set register I1 to what I0 contains
                     # and set register I0 to what I1 contains
+
 =end PASM
 
 As we mentioned before, string and PMC registers are slightly
@@ -1136,6 +1137,7 @@ PMC in the final string result.
   join S0, "__", P0
   print S0              # prints "hi__0__1__0__parrot"
   end
+
 =end PASM
 
 This example builds a C<Array> in C<P0> with the values C<"hi">,
@@ -3153,7 +3155,7 @@ an object has a particular method. Both return a true or false value.
 =head2 Complete Example
 
 Z<CHP-5-SECT-12.6>
- 
+
 =begin PASM TODO
 
     newclass P1, "Foo"
