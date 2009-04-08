@@ -406,6 +406,10 @@ Creates and returns a clone of the subroutine.
         if (sub->name != NULL)
             sub->name = Parrot_str_copy(INTERP, sub->name);
 
+        /* Be sure not to share arg_info. */
+        if (dest_sub->arg_info)
+            dest_sub->arg_info = NULL;
+
         if (sub->ctx)
             Parrot_context_ref(INTERP, sub->ctx);
         if (sub->outer_ctx)
