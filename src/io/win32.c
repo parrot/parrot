@@ -148,13 +148,13 @@ Parrot_io_init_win32(PARROT_INTERP)
         _PIO_STDOUT(interp) = Parrot_io_fdopen_win32(interp, PMCNULL, h, PIO_F_WRITE);
     }
     else {
-        _PIO_STDIN(interp) = PMCNULL;
+        _PIO_STDOUT(interp) = PMCNULL;
     }
     if ((h = GetStdHandle(STD_ERROR_HANDLE)) != INVALID_HANDLE_VALUE) {
         _PIO_STDERR(interp) = Parrot_io_fdopen_win32(interp, PMCNULL, h, PIO_F_WRITE);
     }
     else {
-        _PIO_STDIN(interp) = PMCNULL;
+        _PIO_STDERR(interp) = PMCNULL;
     }
 #  if PARROT_NET_DEVEL
     /* Start Winsock
