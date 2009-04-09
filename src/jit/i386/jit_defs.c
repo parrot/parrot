@@ -2116,10 +2116,13 @@ calc_signature_needs(const char *sig, int *strings)
  * The generate function for a specific signature looks quite similar to
  * an optimized compile of src/nci.c:pcf_x_yy(). In case of any troubles
  * just compare the disassembly.
+ *
+ * If a non-NULL sizeptr is passed, the integer it points to will be written
+ * with the size of the allocated execmem buffer.
  */
 
 void *
-Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
+Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *sizeptr)
 {
     Parrot_jit_info_t jit_info;
     char     *pc;
@@ -2453,6 +2456,8 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     PARROT_ASSERT(pc - jit_info.arena.start <= JIT_ALLOC_SIZE);
     /* could shrink arena.start here to used size */
     PObj_active_destroy_SET(pmc_nci);
+    if (sizeptr)
+        *sizeptr = JIT_ALLOC_SIZE;
     return (void *)D2FPTR(jit_info.arena.start);
 }
 

@@ -195,8 +195,10 @@ sub print_head {
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_managedstruct.h"
 #include "pmc/pmc_nci.h"
 #include "nci.str"
+#include "jit.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
@@ -554,11 +556,22 @@ $put_pointer
         return F2DPTR(VTABLE_get_pointer(interp, b));
     }
     else {
-        void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature);
+        int jit_size;
+        void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature, &jit_size);
         if (result) {
+            struct jit_buffer_private_data *priv;
             *jitted = 1;
             temp_pmc = pmc_new(interp, enum_class_ManagedStruct);
             VTABLE_set_pointer(interp, temp_pmc, (void *)result);
+#ifdef PARROT_HAS_EXEC_PROTECT
+            priv = (struct jit_buffer_private_data *)
+                mem_sys_allocate(sizeof(struct jit_buffer_private_data));
+            priv->size = jit_size;
+            SETATTR_ManagedStruct_custom_free_func(interp, temp_pmc, Parrot_jit_free_buffer);
+            SETATTR_ManagedStruct_custom_free_priv(interp, temp_pmc, priv);
+            SETATTR_ManagedStruct_custom_clone_func(interp, temp_pmc, Parrot_jit_clone_buffer);
+            SETATTR_ManagedStruct_custom_clone_priv(interp, temp_pmc, priv);
+#endif /* PARROT_HAS_EXEC_PROTECT */
             VTABLE_set_pmc_keyed_str(interp, HashPointer, jit_key_name, temp_pmc);
             return result;
         }

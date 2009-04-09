@@ -22,6 +22,9 @@ Memory protection stuff
 */
 
 #ifdef PARROT_HAS_EXEC_PROTECT
+
+#  define PARROT_EXEC_PERMS PROT_READ|PROT_WRITE|PROT_EXEC
+
 /*
 
 =item C<void * mem_alloc_executable(size_t size)>
@@ -39,9 +42,15 @@ mem_alloc_executable(size_t size)
     void *p;
     size_t pagesize = sysconf(_SC_PAGESIZE);
     size = (size + pagesize - 1) & ~(pagesize-1);
+#  ifdef WIN32
     if (posix_memalign(&p, pagesize, size))
         return NULL;
-    mprotect(p, size, PROT_READ|PROT_WRITE|PROT_EXEC);
+    mprotect(p, size, PARROT_EXEC_PERMS);
+#  else /* !WIN32 */
+    p = mmap(NULL, size, PARROT_EXEC_PERMS, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+    if (!p)
+        return NULL;
+#  endif /* WIN32 */
     return p;
 }
 
@@ -58,7 +67,11 @@ Free a buffer allocated with mem_alloc_executable().
 void
 mem_free_executable(void *p, size_t size)
 {
+#  ifdef WIN32
     free(p);
+#  else /* !WIN32 */
+    munmap(p, size);
+#  endif /* WIN32 */
 }
 
 /*
@@ -80,6 +93,7 @@ mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)
     void *newp;
     size_t pagesize = sysconf(_SC_PAGESIZE);
     size_t roundup;
+#  ifdef WIN32
     temp = realloc(oldp, newsize);
     if (temp == NULL)
         return NULL;
@@ -88,10 +102,13 @@ mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)
     if (posix_memalign(&newp, pagesize, roundup))
         newp = NULL;
     if (newp) {
-        mprotect(newp, roundup, PROT_READ|PROT_WRITE|PROT_EXEC);
+        mprotect(newp, roundup, PARROT_EXEC_PERMS);
         memcpy(newp, temp, newsize);
     }
     free(temp);
+#  else /* !WIN32 */
+    temp = mremap(oldp, oldsize, newsize, PARROT_EXEC_PERMS);
+#  endif /* WIN32 */
     return newp;
 }
 #endif
