@@ -1149,16 +1149,20 @@ The C<==> operation.
 
 */
 
-    MULTI INTVAL is_equal(BigInt value) {
-        PMC * const temp = pmc_new(INTERP, enum_class_BigInt);
-        VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
-        return Parrot_BigInt_multi_is_equal_BigInt(INTERP, temp, value);
-    }
+    VTABLE INTVAL is_equal(PMC *value) {
+        PMC *temp;
 
-
-    MULTI INTVAL is_equal(DEFAULT value) {
-        return (VTABLE_get_integer(INTERP, SELF)
-            ==  VTABLE_get_integer(INTERP, value));
+        switch (value->vtable->base_type) {
+            case enum_class_BigInt:
+                temp = pmc_new(INTERP, enum_class_BigInt);
+                VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
+                return Parrot_BigInt_multi_is_equal_BigInt(INTERP, temp, value);
+                break;
+            default:
+                return (VTABLE_get_integer(INTERP, SELF)
+                    ==  VTABLE_get_integer(INTERP, value));
+                break;
+        }
     }
 
 
