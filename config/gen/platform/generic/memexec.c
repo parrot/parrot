@@ -29,8 +29,11 @@ Memory protection stuff
 
 =item C<void * mem_alloc_executable(size_t size)>
 
-Allocate executable memory
-Round up to page size because the whole page will be marked as executable
+Allocates executable memory.
+Rounds up to page size because the whole page will be marked as executable.
+
+Note, memory allocated with this interface *must* be freed with
+mem_free_executable, as it may have been mmapped rather than malloced.
 
 =cut
 
@@ -70,6 +73,8 @@ mem_free_executable(void *p, size_t size)
 #  ifdef WIN32
     free(p);
 #  else /* !WIN32 */
+    size_t pagesize = sysconf(_SC_PAGESIZE);
+    size = (size + pagesize - 1) & ~(pagesize-1);
     munmap(p, size);
 #  endif /* WIN32 */
 }
@@ -78,8 +83,8 @@ mem_free_executable(void *p, size_t size)
 
 =item C<void * mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)>
 
-Reallocate executable memory
-Round up to page size because the whole page will be marked as executable
+Reallocate executable memory.
+Rounds up to page size because the whole page will be marked as executable.
 The intermediate temp is required because we don't know the old size
 
 =cut
@@ -89,11 +94,11 @@ The intermediate temp is required because we don't know the old size
 void *
 mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)
 {
-    void *temp;
     void *newp;
     size_t pagesize = sysconf(_SC_PAGESIZE);
-    size_t roundup;
 #  ifdef WIN32
+    void *temp;
+    size_t roundup;
     temp = realloc(oldp, newsize);
     if (temp == NULL)
         return NULL;
@@ -107,11 +112,13 @@ mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)
     }
     free(temp);
 #  else /* !WIN32 */
-    temp = mremap(oldp, oldsize, newsize, PARROT_EXEC_PERMS);
+    oldsize = (oldsize + pagesize - 1) & ~(pagesize-1);
+    newsize = (newsize + pagesize - 1) & ~(pagesize-1);
+    newp = mremap(oldp, oldsize, newsize, PARROT_EXEC_PERMS);
 #  endif /* WIN32 */
     return newp;
 }
-#endif
+#endif /* PARROT_HAS_EXEC_PROTECT */
 
 /*
 
