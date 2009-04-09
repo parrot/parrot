@@ -2317,10 +2317,25 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
         sig++;
     }
 
-    emitm_addl_i_r(pc, 16, emit_ESP);
-    /* get the pmc from stack - movl 12(%ebp), %eax */
+    /* prepare to call VTABLE_get_pointer, set up args */
+    /* interpreter - movl 8(%ebp), %eax */
+    emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
+
+    /* pmc - movl 12(%ebp), %eax */
     emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 12);
-    emitm_callm(pc, emit_EAX, emit_None, emit_None, 0);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
+
+    /* get the get_pointer() pointer from the pmc's vtable */
+    emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(PMC, vtable));
+    emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(VTABLE, get_pointer));
+
+    /* call get_pointer(), result goes into eax */
+    emitm_callr(pc, emit_EAX);
+    emitm_addl_i_r(pc, 16, emit_ESP);
+
+    /* call the resulting function pointer */
+    emitm_callr(pc, emit_EAX);
     emitm_subl_i_r(pc, 16, emit_ESP);
 
     /* SAVE OFF EAX */
