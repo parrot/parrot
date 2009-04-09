@@ -2289,7 +2289,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             case '2':
             case '3':
             case '4':
-                mem_free_executable(jit_info.native_ptr);
+                mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
                 return NULL;
                 break;
                 /* This might be right. Or not... */
@@ -2306,7 +2306,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                  * oops unknown signature:
                  * cleanup and try nci.c
                  */
-                mem_free_executable(jit_info.native_ptr);
+                mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
                 return NULL;
         }
         args_offset +=4;
@@ -2435,7 +2435,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
              * oops unknown signature:
              * cleanup and try nci.c
              */
-            mem_free_executable(jit_info.native_ptr);
+            mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
             return NULL;
     }
 

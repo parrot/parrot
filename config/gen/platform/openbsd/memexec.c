@@ -49,21 +49,23 @@ mem_alloc_executable(size_t size)
 
 /*
 
-=item C<void mem_free_executable(void *p)>
+=item C<void mem_free_executable(void *p, size_t size)>
+
+Free a buffer allocated with mem_alloc_executable().
 
 =cut
 
 */
 
 void
-mem_free_executable(void *p)
+mem_free_executable(void *p, size_t size)
 {
     free(p);
 }
 
 /*
 
-=item C<void * mem_realloc_executable(void* oldp, size_t newsize)>
+=item C<void * mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)>
 
 Reallocate executable memory
 Round up to page size because the whole page will be marked as executable
@@ -73,7 +75,7 @@ Round up to page size because the whole page will be marked as executable
 */
 
 void *
-mem_realloc_executable(void* oldp, size_t newsize)
+mem_realloc_executable(void* oldp, size_t oldsize, size_t newsize)
 {
     size_t pagesize = sysconf(_SC_PAGESIZE);
     size_t roundup = (newsize + pagesize - 1) & ~(pagesize-1);

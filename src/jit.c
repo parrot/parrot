@@ -1257,7 +1257,7 @@ Parrot_destroy_jit(void *ptr)
     }
     /* arena stuff */
     mem_sys_free(jit_info->arena.op_map);
-    mem_free_executable(jit_info->arena.start);
+    mem_free_executable(jit_info->arena.start, jit_info->arena.size);
     fixup = jit_info->arena.fixups;
     while (fixup) {
         next_f = fixup->next;
@@ -1525,7 +1525,7 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
                 Parrot_jit_extend_arena(jit_info);
 #else
                 new_arena = (char *)mem_realloc_executable(jit_info->arena.start,
-                        (size_t)jit_info->arena.size * 2);
+                        jit_info->arena.size, (size_t)jit_info->arena.size * 2);
                 jit_info->arena.size *= 2;
                 jit_info->native_ptr  = new_arena +
                     (jit_info->native_ptr - jit_info->arena.start);
