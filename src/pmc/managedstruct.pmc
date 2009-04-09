@@ -21,8 +21,21 @@ C<struct> values that Parrot is responsible for disposing of.
 
 #include "parrot/parrot.h"
 
+typedef void (*custom_free_func_t)(PARROT_INTERP, void *ptr, void *priv);
+typedef PMC * (*custom_clone_func_t)(PARROT_INTERP, PMC *ptr, void *priv);
 
 pmclass ManagedStruct extends UnManagedStruct need_ext {
+    /* if custom_free_func and ptr (inherited from UnManagedStruct) are both set,
+     * custom_free_func is called before the normal destroy() function does any
+     * work.
+     */
+    ATTR void *custom_free_func;
+    ATTR void *custom_free_priv;
+    /* if custom_clone_func is set, it will be called *instead* of the normal
+     * clone() function logic.
+     */
+    ATTR void *custom_clone_func;
+    ATTR void *custom_clone_priv;
 
 /*
 
@@ -63,13 +76,24 @@ Initializes the struct with C<*value>.
 
 Destroys the struct, freeing the allocated memory.
 
+If the "custom_free_func" attribute is set, it is called to free the pointer.
+Otherwise, mem_sys_free() is used.
+
 =cut
 
 */
 
     VTABLE void destroy() {
-        if (PARROT_MANAGEDSTRUCT(SELF)->ptr)
-            mem_sys_free(PARROT_MANAGEDSTRUCT(SELF)->ptr);
+        void *ptr = PARROT_MANAGEDSTRUCT(SELF)->ptr;
+        if (ptr) {
+            custom_free_func_t free_func =
+                (custom_free_func_t)PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;
+            if (free_func) {
+                void *free_data = PARROT_MANAGEDSTRUCT(SELF)->custom_free_priv;
+                free_func(interp, ptr, free_data);
+            } else
+                mem_sys_free(ptr);
+        }
         mem_sys_free(PMC_data(SELF));
     }
 
@@ -109,16 +133,25 @@ Destroys the struct, freeing the allocated memory.
 
 =item C<PMC * clone()>
 
-Creates a clone of this PMC; clones any unmanaged memory it holds too.  Note
-that the latter is only a shallow copy, as there's no general way of knowing
-how to clone I<that> data.
+Creates a clone of this PMC; clones any unmanaged memory it holds too.
+
+If the "custom_clone_func" attribute is set, it is called to clone the PMC.
+Otherwise, a basic (shallow copy) clone is performed, as there's no general way
+of knowing how to make a deep copy of the pointer contents.
 
 =cut
 
 */
 
     VTABLE PMC *clone() {
-        PMC *dest = pmc_new_init(interp, SELF->vtable->base_type,
+        custom_clone_func_t clone_func =
+            (custom_clone_func_t)PARROT_MANAGEDSTRUCT(SELF)->custom_clone_func;
+        PMC *dest;
+        if (clone_func) {
+            void *clone_data = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_priv;
+            return clone_func(interp, SELF, clone_data);
+        }
+        dest = pmc_new_init(interp, SELF->vtable->base_type,
             PARROT_MANAGEDSTRUCT(SELF)->init);
 
         if (PARROT_MANAGEDSTRUCT(SELF)->ptr)
