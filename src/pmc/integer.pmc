@@ -135,7 +135,8 @@ Class method to construct an Integer from the string representation C<rep>.
             ? constant_pmc_new(INTERP, type)
             : pmc_new(INTERP, type);
 
-        /* RT #46623 bigint overflow */
+        /* Parrot_str_to_int catches overflow automatically, so we don't need to
+           worry about it here. */
         VTABLE_set_integer_native(INTERP, res, Parrot_str_to_int(INTERP, rep));
         return res;
     }
