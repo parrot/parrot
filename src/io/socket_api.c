@@ -110,7 +110,15 @@ INTVAL
 Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
 {
     ASSERT_ARGS(Parrot_io_socket_is_closed)
-    return 0;
+#ifdef PIO_OS_WIN32
+    return (PARROT_SOCKET(SELF)->os_handle == (PIOHANDLE)INVALID_HANDLE_VALUE);
+#endif
+#ifdef PIO_OS_UNIX
+    return (PARROT_SOCKET(SELF)->os_handle == (PIOHANDLE)-1);
+#endif
+#ifdef PIO_OS_STDIO
+    return (PARROT_SOCKET(SELF)->os_handle == (PIOHANDLE)NULL);
+#endif
 }
 
 /*
