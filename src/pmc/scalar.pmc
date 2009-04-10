@@ -132,7 +132,7 @@ according to the type of C<*value>.
             SELF.set_string_native(v);
             return;
         }
-        pmc_reuse(INTERP, SELF, enum_class_Ref, 0);
+        pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
         SELF.set_pmc(value);
     }
 
