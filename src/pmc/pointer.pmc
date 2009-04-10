@@ -37,9 +37,24 @@ Initializes the pointer.
 */
 
     VTABLE void init() {
-        PObj_custom_mark_SET(SELF);
+        PObj_custom_mark_destroy_SETALL(SELF);
         PMC_data(SELF) = mem_allocate_zeroed_typed(Parrot_Pointer_attributes);
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroy the Pointer and free associated memory
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        mem_sys_free(PARROT_POINTER(SELF));
+    }
+
 
 /*
 
