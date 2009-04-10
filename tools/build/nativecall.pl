@@ -353,8 +353,11 @@ sub make_arg {
     };
     /V/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
+        push @{$temps_ref},          "void *v_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "(void**)&PARROT_POINTER(t_$temp_num)->pointer";
+        push @{$extra_preamble_ref}, "v_$temp_num = VTABLE_get_pointer(interp, t_$temp_num);";
+        push @{$extra_postamble_ref}, "VTABLE_set_pointer(interp, t_$temp_num, v_$temp_num);";
+        return "&v_$temp_num";
     };
     /[ilIscfdNS]/ && do {
         my $ret_type = $sig_table{$_}{return_type};

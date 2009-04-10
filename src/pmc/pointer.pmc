@@ -93,6 +93,20 @@ Creates and returns a clone of the pointer.
 
 /*
 
+=item C<void set_pointer(void *)>
+
+Sets the pointer value.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void *ptr) {
+        PARROT_POINTER(SELF)->pointer = ptr;
+    }
+
+/*
+
 =item C<void *get_pointer()>
 
 Returns the pointer value.
