@@ -56,7 +56,6 @@ typedef Buffer PObj;
 #define PObj_bufstart(pmc)    (pmc)->cache._b._bufstart
 #define PObj_buflen(pmc)      (pmc)->cache._b._buflen
 #define PMC_struct_val(pmc)   (pmc)->cache._ptrs._struct_val
-#define PMC_pmc_val(pmc)      (pmc)->cache._ptrs._pmc_val
 #define PMC_int_val(pmc)      (pmc)->cache._i._int_val
 #define PMC_str_val(pmc)      (pmc)->cache._string_val
 

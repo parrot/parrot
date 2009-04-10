@@ -416,7 +416,6 @@ key_number(PARROT_INTERP, ARGIN(PMC *key))
         return REG_NUM(interp, int_key);
     case KEY_pmc_FLAG:
         return VTABLE_get_number(interp, key);
-                                                 /*  PMC_pmc_val(key)); */
     case KEY_pmc_FLAG | KEY_register_FLAG:
         {
         PMC *reg;
@@ -470,7 +469,6 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
                 s = Parrot_str_new_COW(interp, s);
             return s;
         }
-                                               /*   PMC_pmc_val(key)); */
         case KEY_pmc_FLAG | KEY_register_FLAG:
         {
             PMC *reg;
@@ -524,7 +522,7 @@ key_pmc(PARROT_INTERP, ARGIN(PMC *key))
         GETATTR_Key_int_key(interp, key, int_key);
         return REG_PMC(interp, int_key);
     default:
-        return key; /* PMC_pmc_val(key); */
+        return key;
     }
 }
 
