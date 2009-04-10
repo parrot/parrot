@@ -197,6 +197,7 @@ sub print_head {
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_managedstruct.h"
 #include "pmc/pmc_nci.h"
+#include "pmc/pmc_pointer.h"
 #include "nci.str"
 #include "jit.h"
 
@@ -353,7 +354,7 @@ sub make_arg {
     /V/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "(void**)&PMC_data(t_$temp_num)";
+        return "(void**)&PARROT_POINTER(t_$temp_num)->pointer";
     };
     /[ilIscfdNS]/ && do {
         my $ret_type = $sig_table{$_}{return_type};
