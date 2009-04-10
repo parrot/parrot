@@ -690,8 +690,6 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
 
         gc_flag_CLEAR(is_special_PMC, _class);
 
-        PMC_struct_val(_class) = (void *)0xdeadbeef;
-
         PObj_is_PMC_shared_CLEAR(_class);
 
         interp->vtables[type]->pmc_class = _class;

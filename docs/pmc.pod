@@ -18,15 +18,6 @@ During PMC recycling the B<UnionVal> data members are B<not> cleared.
 B<PMC_data> or B<pmc_ext> is set to NULL. The flags are set to their default
 value, especially the private flags are 0.
 
-=head2 UnionVal usage
-
-There are no special rules, where to store what: use whatever fits best. If
-your PMC points to a B<STRING *>, hang it off the B<PMC_str_val()>, if it's an
-B<INTVAL>, place it in B<PMC_int_val()>. If you need to store two items, try to
-use union members that have distinct storage like B<PObj_bustart()> /
-B<PObj_buf_len()> or B<PMC_struct_val()> / B<PMC_pmc_val()> in parallel with
-B<PMC_num_val()>.
-
 =head2 PMC_data()
 
 If your PMC contains other PMCs that possibly would allow the creation of

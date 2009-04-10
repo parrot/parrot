@@ -623,7 +623,6 @@ static void pcf_$funcname(PARROT_INTERP, PMC *self) {
     $ret_type (*pointer)();
     $ret_type return_data;
 
-    pointer = PMC_struct_val(self);
     return_data = ($ret_type)(*pointer)($params);
     $ret_reg  = return_data;
     REG_INT(interp, 0) = $stack_returns;

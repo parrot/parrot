@@ -21,6 +21,7 @@ Opcode helper functions that don't really fit elsewhere.
 */
 
 #include "parrot/parrot.h"
+#include "pmc/pmc_nci.h"
 
 typedef unsigned short _rand_buf[3];
 
@@ -906,7 +907,7 @@ COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
         return VTABLE_cmp(interp, (PMC *)a, (PMC *)b);
 
     if (cmp->vtable->base_type == enum_class_NCI) {
-        const sort_func_t f = (sort_func_t)D2FPTR(PMC_struct_val(cmp));
+        const sort_func_t f = (sort_func_t)D2FPTR(PARROT_NCI(cmp)->func);
         return f(interp, a, b);
     }
 
