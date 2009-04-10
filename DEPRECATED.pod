@@ -46,10 +46,6 @@ L<https://trac.parrot.org/parrot/ticket/187>
 
 L<https://trac.parrot.org/parrot/ticket/189>
 
-=item ref [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/190>
-
 =item moved to dynpmc [eligible in 1.1]
 
 AddrRegistry, CodeString, Env, Eval, File, OS, PCCMETHOD_Test, StringHandle,
