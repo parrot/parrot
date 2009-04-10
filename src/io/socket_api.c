@@ -21,6 +21,7 @@ These are the primary interface functions for working with socket objects.
 #include "parrot/parrot.h"
 #include "io_private.h"
 #include "api.str"
+#include "../pmc/pmc_socket.h"
 
 #include <stdarg.h>
 
@@ -111,13 +112,13 @@ Parrot_io_socket_is_closed(ARGMOD(PMC *socket))
 {
     ASSERT_ARGS(Parrot_io_socket_is_closed)
 #ifdef PIO_OS_WIN32
-    return (PARROT_SOCKET(SELF)->os_handle == (PIOHANDLE)INVALID_HANDLE_VALUE);
+    return (PARROT_SOCKET(socket)->os_handle == (PIOHANDLE)INVALID_HANDLE_VALUE);
 #endif
 #ifdef PIO_OS_UNIX
-    return (PARROT_SOCKET(SELF)->os_handle == (PIOHANDLE)-1);
+    return (PARROT_SOCKET(socket)->os_handle == (PIOHANDLE)-1);
 #endif
 #ifdef PIO_OS_STDIO
-    return (PARROT_SOCKET(SELF)->os_handle == (PIOHANDLE)NULL);
+    return (PARROT_SOCKET(socket)->os_handle == (PIOHANDLE)NULL);
 #endif
 }
 

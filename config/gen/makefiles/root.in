@@ -841,6 +841,7 @@ $(SRC_DIR)/scheduler$(O) : $(SRC_DIR)/scheduler.str   \
                            $(SRC_DIR)/pmc/timer.c     \
                            $(INC_DIR)/pbcversion.h
 
+$(IO_DIR)/socket_api$(O) : $(SRC_DIR)/pmc/socket.c
 $(IO_DIR)/socket_unix$(O) : $(INC_DIR)/pbcversion.h   \
                             $(SRC_DIR)/pmc/socket.c
 $(IO_DIR)/socket_win32$(O) : $(INC_DIR)/pbcversion.h   \
