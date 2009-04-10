@@ -272,21 +272,12 @@ clear_regs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx))
     }
 
     if (Interp_debug_TEST(interp, PARROT_REG_DEBUG_FLAG)) {
-        /* depending on -D40 we set int, num to garbage different garbage
-         * RT #46179 remove this code for parrot 1.0 */
+        /* depending on -D40 we set int and num to be identifiable garbage values */
         for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
             CTX_REG_INT(ctx, i) = -999;
         }
         for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
             CTX_REG_NUM(ctx, i) = -99.9;
-        }
-    }
-    else {
-        for (i = 0; i < ctx->n_regs_used[REGNO_INT]; i++) {
-            CTX_REG_INT(ctx, i) = -888;
-        }
-        for (i = 0; i < ctx->n_regs_used[REGNO_NUM]; i++) {
-            CTX_REG_NUM(ctx, i) = -88.8;
         }
     }
 }
