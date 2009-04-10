@@ -10,6 +10,7 @@
 
 #include "parrot/interpreter.h"
 #include "../../../src/pmc/pmc_sub.h"
+#include "../../../src/pmc/pmc_namespace.h"
 
 /* #include "parrot/embed.h" */
 
@@ -988,8 +989,9 @@ get_namespace_pmc(ARGIN(bytecode * const bc), ARGIN_NULLOK(multi_type * const ns
 
     switch (ns->entry_type) {
         case MULTI_TYPE_IDENT: {
-            PMC *namespace_pmc         = constant_pmc_new(bc->interp, enum_class_String);
-            PMC_str_val(namespace_pmc) = add_string_const_from_cstring(bc, ns->entry.ident);
+            PMC *namespace_pmc = constant_pmc_new(bc->interp, enum_class_String);
+            PARROT_NAMESPACE(namespace_pmc)->name = 
+                add_string_const_from_cstring(bc, ns->entry.ident);
             break;
         }
         case MULTI_TYPE_KEYED:
