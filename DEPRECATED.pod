@@ -102,12 +102,6 @@ L<https://trac.parrot.org/parrot/ticket/451>
 
 =over 4
 
-=item PMC union struct [eligible in 1.1]
-
-This will be removed once all core PMCs have been updated.
-
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=48014>
-
 =item :anon and :vtable named parameters to add_method [eligible in 1.1]
 
 If you want to override a vtable method/function when building a Class, then

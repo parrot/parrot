@@ -7,8 +7,9 @@ New in 1.1.0
   + Removed ops: gcd, exec, classname, need_finalize, runinterp, substr_r
   + Removed dynamic op: mul 
   + Removed .HLL_map directive; use interp's .hll_map() instead
-  + Removed PMCs: slice, bound_nci
+  + Removed PMCs: slice, bound_nci, ref
   + Removed Configure.pl option: --pmc
+  + Removed PMC union struct
 
 New in 1.0.0
 - Documentation
