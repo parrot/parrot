@@ -880,7 +880,7 @@ jit_get_params_pc(Parrot_jit_info_t *jit_info, PARROT_INTERP)
 {
     PMC    *sig_pmc  = CONTEXT(interp)->constants[CUR_OPCODE[1]]->u.key;
     INTVAL *sig_bits = PMC_data_typed(sig_pmc, INTVAL *);
-    INTVAL  n        = PMC_int_val(sig_pmc);
+    INTVAL  n        = VTABLE_get_integer(interp, sig_pmc);
     INTVAL  i;
 
     jit_info->n_args = n;

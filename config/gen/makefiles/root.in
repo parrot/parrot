@@ -1060,7 +1060,7 @@ $(SRC_DIR)/exec_dep$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h
 $(SRC_DIR)/exec_cpu$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h
 
 $(SRC_DIR)/jit_defs$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ $(SRC_DIR)/jit_emit.h \
-	$(SRC_DIR)/pmc/pmc_fixedintegerarray.h $(SRC_DIR)/pmc/pmc_unmanagedstruct.h
+	$(SRC_DIR)/pmc/pmc_fixedintegerarray.h $(SRC_DIR)/pmc/pmc_unmanagedstruct.h $(SRC_DIR)/pmc/pmc_pointer.h
 
 $(INC_DIR)/extend_vtable.h $(SRC_DIR)/extend_vtable.c $(SRC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl

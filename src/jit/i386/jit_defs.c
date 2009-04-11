@@ -12,6 +12,7 @@ $Id$
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_unmanagedstruct.h"
+#include "pmc/pmc_pointer.h"
 #include "jit.h"
 #include "jit_emit.h"
 
@@ -2294,13 +2295,6 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             case '4':
                 mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
                 return NULL;
-                break;
-                /* This might be right. Or not... */
-                /* we need the offset of PMC_int_val */
-                emitm_call_cfunc(pc, get_nci_P);
-                emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
-                              (size_t) &PMC_int_val((PMC *) 0));
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,

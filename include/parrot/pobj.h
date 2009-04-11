@@ -55,7 +55,6 @@ typedef Buffer PObj;
 
 #define PObj_bufstart(pmc)    (pmc)->cache._b._bufstart
 #define PObj_buflen(pmc)      (pmc)->cache._b._buflen
-#define PMC_int_val(pmc)      (pmc)->cache._i._int_val
 
 /* See src/gc/resources.c. the basic idea is that buffer memory is
    set up as follows:
