@@ -175,7 +175,6 @@ typedef struct PMC_EXT {
 #define PMC_metadata(pmc)     PMC_ext_checked(pmc)->_metadata
 #define PMC_next_for_GC(pmc)  PMC_ext_checked(pmc)->_next_for_GC
 #define PMC_sync(pmc)         PMC_ext_checked(pmc)->_synchronize
-#define PMC_union(pmc)        (pmc)->cache
 
 #define POBJ_FLAG(n) ((UINTVAL)1 << (n))
 /* PObj flags */

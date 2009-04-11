@@ -138,23 +138,6 @@ according to the type of C<*value>.
 
 /*
 
-=item C<PMC *clone()>
-
-Creates and returns a clone of the scalar.
-
-=cut
-
-*/
-
-    VTABLE PMC *clone() {
-        PMC * const dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof (UnionVal));
-        return dest;
-    }
-
-
-/*
-
 =back
 
 =head1 Mathematical Methods
