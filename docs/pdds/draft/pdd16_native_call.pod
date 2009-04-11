@@ -99,18 +99,15 @@ type which Parrot does I<no> management of.
 
 =item 2
 
-A pointer to a short, taken from an P register of an int-like PMC. On return
-from NCI, the PMC_int_val will hold the new value.
+A pointer to a short, taken from an P register of an int-like PMC.
 
 =item 3
 
-A pointer to an int, taken from an P register of an int-like PMC. On return
-from NCI, the PMC_int_val will hold the new value.
+A pointer to an int, taken from an P register of an int-like PMC.
 
 =item 4
 
-A pointer to a long, taken from an P register of an int-like PMC. On return
-from NCI, the PMC_int_val will hold the new value.
+A pointer to a long, taken from an P register of an int-like PMC.
 
 =item t
 
