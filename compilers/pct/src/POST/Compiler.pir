@@ -23,9 +23,6 @@ PIR or an Eval PMC (bytecode).
     $P1 = split ' ', 'pir evalpmc'
     cproto.'stages'($P1)
 
-    $P0 = new 'ResizablePMCArray'
-    set_global '@!subcode', $P0
-
     $P0 = new 'String'
     set_global '$?HLL', $P0
     null $P0
@@ -86,7 +83,7 @@ Return generated PIR for C<node> and all of its children.
     line = source.'lineof'(pos)
     inc line
   done_subline:
-    $P0 = self.'pir'(cpost)
+    self.'pir'(cpost)
     goto iter_loop
   iter_end:
 .end
