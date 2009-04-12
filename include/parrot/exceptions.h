@@ -222,6 +222,10 @@ void do_panic(
     unsigned int line);
 
 void Parrot_print_backtrace(void);
+void print_hll_info_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_exit_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(format)
 #define ASSERT_ARGS_Parrot_assert __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -263,6 +267,9 @@ void Parrot_print_backtrace(void);
     || PARROT_ASSERT_ARG(exception)
 #define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_print_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_print_hll_info_from_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(exception)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
 
