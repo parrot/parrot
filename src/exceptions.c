@@ -90,52 +90,6 @@ Parrot_ex_build_exception(PARROT_INTERP, INTVAL severity,
 
 /*
 
-=item C<void print_hll_info_from_exception(PARROT_INTERP, PMC *exception)>
-
-Print hll line number for C<exception>, if present.
-
-=cut
-
-*/
-
-void
-print_hll_info_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
-{
-    PMC * list;
-    PMC * line;
-    PMC * iter;
-    const STRING * const bt = CONST_STRING(interp, "backtrace");
-    STRING * message     = VTABLE_get_string(interp, exception);
-    if (STRING_IS_NULL(message) || Parrot_str_equal(interp, message, CONST_STRING(interp, ""))) {
-        const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
-        if (severity < EXCEPT_error) {
-            message = CONST_STRING(interp, "warning");
-        }
-        else {
-            message = CONST_STRING(interp, "died");
-        }
-    }
-    Parrot_PCCINVOKE(interp, exception, bt, "->P", &list);
-    iter = VTABLE_get_iter(interp, list);
-    while (VTABLE_get_bool(interp, iter)) {
-        const PMC * const frame = VTABLE_shift_pmc(interp, iter);
-        const PMC * const annotations = VTABLE_get_pmc_keyed_str(interp, frame, CONST_STRING(interp, "annotations"));
-        line = VTABLE_get_pmc_keyed_str(interp, annotations, CONST_STRING(interp, "line"));
-        if (!PMC_IS_NULL(line)) {
-            break;
-        }
-    }
-    Parrot_io_eprintf(interp, "%Ss", message);
-        fflush(stderr);
-    if (!PMC_IS_NULL(line)) {
-        Parrot_io_eprintf(interp, " at line %d", VTABLE_get_integer(interp, line));
-    }
-    Parrot_io_eprintf(interp, "\n");
-    return;
-}
-
-/*
-
 =item C<void die_from_exception(PARROT_INTERP, PMC *exception)>
 
 Print a stack trace for C<exception>, a message if there is one, and then exit.
@@ -166,7 +120,8 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, ""))) {
-        print_hll_info_from_exception(interp, exception);
+        Parrot_io_eprintf(interp, "%S\n", message);
+
         /* caution against output swap (with PDB_backtrace) */
         fflush(stderr);
         PDB_backtrace(interp);
@@ -176,7 +131,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         exit_status = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
     }
     else {
-        print_hll_info_from_exception(interp, exception);
+        Parrot_io_eprintf(interp, "No exception handler and no message\n");
         /* caution against output swap (with PDB_backtrace) */
         fflush(stderr);
         PDB_backtrace(interp);
@@ -248,10 +203,16 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
     opcode_t   *address;
     PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
     if (PMC_IS_NULL(handler)) {
+        STRING * const message     = VTABLE_get_string(interp, exception);
         const INTVAL   severity    = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
         if (severity < EXCEPT_error) {
-            print_hll_info_from_exception(interp, exception);
             PMC * const resume = VTABLE_get_attr_str(interp, exception, CONST_STRING(interp, "resume"));
+            if (Parrot_str_not_equal(interp, message, CONST_STRING(interp, ""))) {
+                Parrot_io_eprintf(interp, "%S\n", message);
+            }
+            else {
+                Parrot_io_eprintf(interp, "%S\n", CONST_STRING(interp, "Warning"));
+            }
 
             /* caution against output swap (with PDB_backtrace) */
             fflush(stderr);

@@ -269,7 +269,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" )
 _handler:
     end
 CODE
-/died/
+/No exception handler and no message/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" );
@@ -278,7 +278,7 @@ pasm_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler, no message" )
     print "not reached\n"
     end
 CODE
-/died/
+/No exception handler and no message/
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "2 exception handlers" );
@@ -387,7 +387,7 @@ _handler:
     print "caught it\n"
     end
 CODE
-/died/
+/No exception handler and no message/
 OUT
 
 pasm_output_is( <<'CODE', '', "exit exception" );
@@ -499,7 +499,7 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', "pushaction - throw in main" );
 .end
 CODE
 /^main
-died/
+No exception handler/
 OUTPUT
 
 # exception handlers are still run in an inferior runloop, which messes up
@@ -531,7 +531,7 @@ h:
 CODE
 /^main
 at_exit, flag = 1
-died/
+No exception handler/
 OUTPUT
 
 $ENV{TEST_PROG_ARGS} ||= '';
