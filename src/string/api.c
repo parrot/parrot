@@ -2047,7 +2047,7 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
             if (isdigit((unsigned char)c)) {
                 const INTVAL nextval = c - '0';
                 in_number = 1;
-                if(i < max_safe || (i == max_safe && nextval <= last_dig))
+                if (i < max_safe || (i == max_safe && nextval <= last_dig))
                     i = i * 10 + nextval;
                 else
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,

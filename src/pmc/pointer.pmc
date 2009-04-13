@@ -71,7 +71,7 @@ Marks the pointer as live.
             (void (*)(Interp *, void *))D2FPTR(PARROT_POINTER(SELF)->mark_function);
         void * data = PARROT_POINTER(SELF)->pointer;
         if (data && mark_function)
-            (*mark_function)(INTERP,data);
+            (*mark_function)(INTERP, data);
     }
 
 /*
