@@ -1158,7 +1158,7 @@ This is used by the Parrot disassembler.
 
 PARROT_EXPORT
 void
-Parrot_disassemble(PARROT_INTERP, const char *outfile, Parrot_disassemble_options options)
+Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_options options)
 {
     PDB_line_t *line;
     PDB_t      *pdb             = mem_allocate_zeroed_typed(PDB_t);

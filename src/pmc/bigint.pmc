@@ -606,6 +606,7 @@ BigInt object.
 
 */
     VTABLE PMC *instantiate(PMC *sig) {
+        UNUSED(sig)
         return PMCNULL;
 
         /* TODO -- actually build this thing */
@@ -852,6 +853,7 @@ Decrements the integer.
     }
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'add' for %Ss",
@@ -885,6 +887,7 @@ Decrements the integer.
     }
 
     VTABLE void i_add_float(FLOATVAL value) {
+        UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_add_float' for FLOATVAL");
@@ -912,6 +915,7 @@ Decrements the integer.
     }
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'subtract' for %Ss",
@@ -948,6 +952,7 @@ Decrements the integer.
     }
 
     VTABLE void i_subtract_float(FLOATVAL value) {
+        UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_subtract_float' for FLOATVAL");
@@ -969,6 +974,7 @@ Decrements the integer.
     }
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
          Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'multiply' for %Ss",
@@ -1000,6 +1006,7 @@ Decrements the integer.
     }
 
     VTABLE void i_multiply_float(FLOATVAL value) {
+        UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_multiply_float' for FLOATVAL");
@@ -1055,6 +1062,7 @@ Decrements the integer.
     }
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'divide' for %Ss",
@@ -1103,6 +1111,7 @@ Decrements the integer.
     }
 
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'floor_divide' for %Ss",
@@ -1159,6 +1168,7 @@ Decrements the integer.
     }
 
     MULTI PMC *modulus(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'modulus' for %Ss",
@@ -1296,6 +1306,7 @@ Inplace shift left.
         return dest;
     }
     MULTI PMC *bitwise_shl(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'bitwise_shl' for %Ss",
@@ -1377,6 +1388,7 @@ Inplace shift left.
     }
 
     MULTI PMC *bitwise_shr(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'bitwise_shr' for %Ss",

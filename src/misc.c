@@ -252,7 +252,8 @@ A simulation of C<snprintf> for systems that do not support it.
 
 PARROT_EXPORT
 int
-Parrot_secret_snprintf(ARGOUT(char *buffer), const size_t len, ARGIN(const char *format), ...)
+Parrot_secret_snprintf(ARGOUT(char *buffer), SHIM(const size_t len),
+        ARGIN(const char *format), ...)
 {
     ASSERT_ARGS(Parrot_secret_snprintf)
     int retval;

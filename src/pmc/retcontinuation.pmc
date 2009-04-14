@@ -92,6 +92,7 @@ Transfers control to the calling context, and frees the current context.
         Parrot_Context    *from_ctx   = cc->from_ctx;
         PackFile_ByteCode * const seg = cc->seg;
         opcode_t          *next       = cc->address;
+        UNUSED(in_next)
 
         Parrot_continuation_check(interp, SELF, cc);
         Parrot_continuation_rewind_environment(interp, SELF, cc);

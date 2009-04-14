@@ -32,12 +32,18 @@ sub pre_method_gen {
                 type        => Parrot::Pmc2c::Method::VTABLE,
             }
         );
-
         my $ret = return_statement($method);
-        $new_default_method->body( Parrot::Pmc2c::Emitter->text(<<"EOC") );
-    cant_do_method(interp, pmc, "$vt_method_name");
-    $ret
-EOC
+
+        # take care to mark the parameters as unused
+        # to avoid compiler warnings
+        my $body;
+        foreach my $param (split /,\s*/, $method->parameters) {
+            $param =~ s/.*\b(\w+)/$1/;
+            $body .= "    UNUSED($param)\n";
+        }
+        $body .= qq{    cant_do_method(interp, pmc, "$vt_method_name");\n};
+
+        $new_default_method->body( Parrot::Pmc2c::Emitter->text($body));
         $self->add_method($new_default_method);
     }
     return 1;

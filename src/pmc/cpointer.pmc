@@ -182,6 +182,8 @@ Returns the string signature.
 
     VTABLE STRING *get_string_keyed_str(STRING *key) {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        UNUSED(key)
+
         return data->sig;
     }
 
@@ -197,6 +199,8 @@ Sets the string signature.
 
     VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
+        UNUSED(key)
+
         data->sig = value;
     }
 

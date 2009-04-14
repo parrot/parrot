@@ -487,6 +487,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
     VTABLE void thawfinish(visit_info *info) {
         PMC *key = SELF;
+        UNUSED(info)
 
         while (1) {
             PMC *next;

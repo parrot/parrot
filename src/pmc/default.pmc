@@ -59,6 +59,7 @@ all unimplemented messages.
 
 */
 
+PARROT_DOES_NOT_RETURN
 static void
 cant_do_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, const char *methname)
 {
@@ -890,6 +891,7 @@ Reports whether the PMC "does" the C<role>.
 */
 
     INTVAL does_pmc(PMC *role) {
+        UNUSED(role)
         /* No C-level roles yet. */
         return 0;
     }
@@ -1021,10 +1023,12 @@ the string name passed in.
 
 */
     VTABLE PMC *get_attr_keyed(PMC *key, STRING *name) {
+        UNUSED(key)
         return VTABLE_get_attr_str(INTERP, SELF, name);
     }
 
     VTABLE void set_attr_keyed(PMC *key, STRING *name, PMC *value) {
+        UNUSED(key)
         VTABLE_set_attr_str(INTERP, SELF, name, value);
     }
 
@@ -1039,6 +1043,7 @@ Add class C<parent> to the list of our parents.
 */
 
     VTABLE void add_parent(PMC *parent) {
+        UNUSED(parent)
         if (!PObj_is_class_TEST(SELF))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Only classes can be subclassed");
@@ -1097,6 +1102,7 @@ Does nothing.
 */
 
     VTABLE void freeze(visit_info *info) {
+        UNUSED(info)
         /* default - no action */
     }
 
@@ -1136,6 +1142,7 @@ Does nothing.
 */
 
     VTABLE void thawfinish(visit_info *info) {
+        UNUSED(info)
         /* default - no action */
     }
 
