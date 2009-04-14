@@ -194,7 +194,7 @@ I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 X<bors opcode (PASM)>
 
-  bor R<DEST>, R<VAL>, R<VAL>
+  bors R<DEST>, R<VAL>, R<VAL>
 
 Bitwise OR on two strings. If only one R<VAL>, bitwise OR on R<DEST>
 and R<VAL>.
