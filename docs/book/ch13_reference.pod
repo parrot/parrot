@@ -512,17 +512,6 @@ R<DEST>.
 
 I<Arguments: SR, S or SR, S, S or P, P, S or P, P, P>
 
-=head3 conv_*
-
-  conv_i1     R<DEST>, R<VAL>
-  conv_i1_ovf R<DEST>, R<VAL>
-
-Convert value to integer or number of given type C<i1>, C<i2>, C<i4>, C<i8>,
-C<u1>, C<u2>, C<u4>, C<r4>, C<r8>. C<i> corresponds to a signed integer,
-C<u> to an unsigned integer and C<r> to a float; the number indicates the
-size (in bytes) of the type. The variants with C<_ovf> throw an exception
-if the conversion would overflow.
-
 =head3 cos
 
 X<cos opcode (PASM)>
