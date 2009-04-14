@@ -2087,6 +2087,16 @@ I<Arguments: P, I>
 
 See also: C<newinterp>.
 
+=head3 say
+
+X<say opcode (PASM)>
+
+  say R<VAL>
+
+Print a value to C<stdout> with a trailing newline.
+
+I<Arguments: I or N or S or P>
+
 =head3 sec
 
 X<sec opcode (PASM)>
@@ -2239,6 +2249,18 @@ I<Arguments: P, S, P>
 
 See also: C<getprop> and C<delprop>.
 
+=head3 setstd*
+
+X<setstderr opcode (PASM)>
+X<setstdout opcode (PASM)>
+
+  setstderr R<DEST>
+  setstdout R<DEST>
+
+Set a ParrotIO object for the given standard handle.
+
+I<Arguments: P>
+
 =head3 shift
 
 X<shift opcode (PASM)>
@@ -2350,6 +2372,123 @@ X<sprintf opcode (PASM)>
 Format arguments in an aggregate PMC, using format string R<FORMAT>.
 
 I<Arguments: SR, S, P or P, P, P>
+
+=head3 stat
+
+X<stat opcode (PASM)>
+
+  stat R<DEST>, R<VAL>, R<VAL>
+
+Stat the VAL1 file and return stat element VAL2, as listed in
+A<CHP-13-TABLE-2>Table 13-2.
+
+I<Arguments: IR, S, I or IR, I, I>
+
+=begin table picture Stat arguments
+
+Z<CHP-13-TABLE-2>
+
+=headrow
+
+=row
+
+=cell Flag
+
+=cell Flagname
+
+=cell Returns
+
+=bodyrows
+
+=row
+
+=cell C<0>
+
+=cell EXISTS
+
+=cell Does the file exist?
+
+=row
+
+=cell C<1>
+
+=cell FILESIZE
+
+=cell Size of file, in bytes
+
+=row
+
+=cell C<2>
+
+=cell ISDIR
+
+=cell Is the file a directory?
+
+=row
+
+=cell C<3>
+
+=cell ISDEV
+
+=cell Is the file a device?
+
+=row
+
+=cell C<4>
+
+=cell CREATETIME
+
+=cell Time file was created
+
+=row
+
+=cell C<5>
+
+=cell ACCESSTIME
+
+=cell Time file was last accessed
+
+=row
+
+=cell C<6>
+
+=cell MODIFYTIME
+
+=cell Time file data was changed
+
+=row
+
+=cell C<7>
+
+=cell CHANGETIME
+
+=cell Time file metadata was changed
+
+=row
+
+=cell C<8>
+
+=cell BACKUPTIME
+
+=cell Time of last backup
+
+=row
+
+=cell C<9>
+
+=cell UID
+
+=cell ID of file owner
+
+=row
+
+=cell C<10>
+
+=cell GID
+
+=cell ID of file group
+
+=end table
 
 =head3 store_global
 
