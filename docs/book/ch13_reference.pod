@@ -1241,7 +1241,7 @@ X<interpinfo opcode (PASM)>
 
 Return information about the interpreter. An integer flag selects
 which information to return, as listed in
-A<CHP-10-TABLE-1>Table 11-1.
+A<CHP-13-TABLE-1>Table 13-1.
 
 =begin table picture Interpinfo flags
 
@@ -2550,11 +2550,11 @@ X<stringinfo opcode (PASM)>
   stringinfo R<DEST>, R<STRING>, R<FLAG>
 
 Return information about a string. An integer flag selects which
-information to return, as listed in A<CHP-10-TABLE-2>Table 11-2.
+information to return, as listed in A<CHP-13-TABLE-3>Table 13-3.
 
 =begin table picture Stringinfo arguments
 
-Z<CHP-13-TABLE-2>
+Z<CHP-13-TABLE-3>
 
 =headrow
 
@@ -3507,13 +3507,13 @@ Parrot to immediately execute a bytecode file piped in on C<stdin>.
 
 Turn on debugging output. The C<-d> switch takes an optional argument,
 which is a hex value of debug bits. The individual bits are shown in
-A<CHP-10-TABLE-3>Table 11-3. When R<hexbits> isn't specified,
+A<CHP-13-TABLE-4>Table 13-4. When R<hexbits> isn't specified,
 the default debugging level is 0001. If R<hexbits> is separated
 from the C<-d> switch by whitespace, it has to start with a number.
 
 =begin table picture Debug bits
 
-Z<CHP-13-TABLE-3>
+Z<CHP-13-TABLE-4>
 
 =headrow
 
@@ -3645,14 +3645,14 @@ Print the program version to C<stdout> and exit.
 =item -Ox
 
 Turn on optimizations. The flags currently implemented are shown in
-A<CHP-10-TABLE-4>Table 11-4.
+A<CHP-13-TABLE-5>Table 13-5.
 
 X<Parrot;optimizations>
 X<optimizations (Parrot)>
 
 =begin table picture Optimizations
 
-Z<CHP-13-TABLE-4>
+Z<CHP-13-TABLE-5>
 
 =headrow
 
