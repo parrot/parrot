@@ -436,7 +436,7 @@ work similarly to more versatile bottom-up parsers such as Lex or Yacc, but
 are optimized for use with expressions and equations. The "things" in an
 equation are split into two subtypes: I<terms> and I<operators>. Operators
 themselves are split into a number of types including prefix (C<-a>),
-postfix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumix
+postfix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumfix
 (C<a[b]>), and list (C<1, 2, 3>). Each operator gets its own precedence
 number that specifies how closely it binds to the terms. In the example above,
 the expression is parsed
@@ -546,7 +546,7 @@ of the method.
 =head2 Actions and NQP
 
 Protofunction signatures aren't the only way to apply functions to rules
-matched by the parser. In fact, they might be the most primative because
+matched by the parser. In fact, they might be the most primitive because
 they use PIR code to implement the operator logic. Another way has been made
 available, by programming function actions in a language that's almost, but
 Not Quite Perl (NQP).
@@ -566,7 +566,7 @@ The C<$> sigil is used for scalars, C<@> is used for arrays, and C<%> is
 used for hashes N<Perl 6 aficionados will know that this isn't entirely
 true, but an in-depth look at Perl 6's context awareness is another topic
 for another book>. A "scalar" is really any single value, and can
-interchangably be given a string value, or an integer value, or an object.
+interchangeably be given a string value, or an integer value, or an object.
 In NQP we can write things like this:
 
  $scalar := "This is a string"

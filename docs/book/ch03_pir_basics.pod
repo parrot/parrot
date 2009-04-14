@@ -344,7 +344,7 @@ the two registers in the example above, C<$S0> and C<$S1> are used exclusively
 of one another. C<$S0> is assigned a value in line 2, and is read in line 3,
 but is never accessed after that. So, Parrot determines that its lifespan
 ends at line 3. The register C<$S1> is used first on line 4, and is accessed
-again on line 5. Sinec these two do not overlap, Parrot's compiler can
+again on line 5. Since these two do not overlap, Parrot's compiler can
 determine that it can use only one register for both operations. This saves
 the second allocation. Notice that this code with only one register performs
 identically to the previous example:
@@ -401,11 +401,11 @@ C<new>:
 PIR is a dynamic language, and that dynamicism is readily displayed in
 the way PMC values are handled. Primitive registers like strings,
 numbers, and integers perform a special action called I<autoboxing>
-when they are assigned to a PMC. Autoboxing is when a primative scalar
+when they are assigned to a PMC. Autoboxing is when a primitive scalar
 type is automatically converted to a PMC object type. There are PMC
 classes for String, Number, and Integer which can be quickly converted
 to and from primitive int, number, and string types. Notice that the
-primative types are in lower-case, while the PMC classes are
+primitive types are in lower-case, while the PMC classes are
 capitalized. If you want to box a value explicitly, you can use the C<box>
 opcode:
 
@@ -417,7 +417,7 @@ opcode:
   $P2 = "This is a string!"
 
 The PMC classes C<Integer>, C<Number>, and C<String> are thin overlays on
-the primative types they represent. However, these PMC types have the benefit
+the primitive types they represent. However, these PMC types have the benefit
 of the X<PMC;VTABLE Interface> VTABLE interface. VTABLEs are a standard
 API that all PMCs conform to for performing standard operations. These PMC
 types also have special custom methods available for performing various
@@ -845,7 +845,7 @@ and methods with that PMC type. Subclassed PMC types act like their PMC
 base types, by sharing the same VTABLE methods and underlying data types.
 However, the subclass can define additional methods and attribute data
 storage. If necessary new VTABLE interfaces can be defined in PIR and old
-VTABLE methods can be overriden using PIR. We'll talk about defining
+VTABLE methods can be overridden using PIR. We'll talk about defining
 methods and VTABLE interface overrides in the next chapter.
 
 Creating a new subclass of an existing PMC class is done using the

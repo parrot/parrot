@@ -24,7 +24,7 @@ compiler toolkit, and run the standard test suite.
 
 Once you've compiled Parrot, you can run your first small script. Create
 a test file in the main F<parrot> directory called F<fjord.pasm>. C<.pasm>
-files are written in primative Parrot Assembly Language (PASM) which is a
+files are written in primitive Parrot Assembly Language (PASM) which is a
 low-level programming interface to Parrot.
 
 =begin PASM
@@ -159,7 +159,7 @@ with a few features and see how it feels--the best option is to
 download the most recent point release for your system. Point releases
 are usually packaged up for easy download and install for various
 platforms, including Windows, Debian, and Redhat. Point releases are
-avaliable from U<http://www.parrot.org/download>.
+available from U<http://www.parrot.org/download>.
 
 If you plan to get involved in development, you'll want to check out
 the source from the subversion repository directly. Anyone can get

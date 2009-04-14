@@ -2487,7 +2487,7 @@ X<subclass opcode (PASM)>
   subclass R<DEST>, R<CLASS>
   subclass R<DEST>, R<CLASS>, R<NAME>
 
-Create a sublass of R<CLASS>. Without R<NAME> an anonymous subclass is
+Create a subclass of R<CLASS>. Without R<NAME> an anonymous subclass is
 created.
 
 I<Arguments: P, S or P, P or P, S, S or P, P, S>

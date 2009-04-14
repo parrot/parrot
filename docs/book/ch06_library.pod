@@ -28,7 +28,7 @@ and how they are used.
 Libraries are precompiled code files that can be loaded into Parrot. There
 are ways to load a library into Parrot, each with a slightly different
 mechanism. The C<.loadlib> PIR directive causes the library file to be loaded
-at compile-time. The C<load_lib> obcode causes the library to be loaded
+at compile-time. The C<load_lib> opcode causes the library to be loaded
 dynamically at runtime.
 
 =head1 General Parrot Libraries

@@ -712,7 +712,7 @@ X<Namespaces>
 X<.namespace>
 Namespaces provide a mechanism where names can be reused. This may not
 sound like much, but in large complicated systems, or systems with
-many included libraries, it can be very handy. Each namespace get's its
+many included libraries, it can be very handy. Each namespace gets its
 own area for function names and global variables. This way you can have
 multiple functions named C<create> or C<new> or C<convert>, for
 instance, without having to use I<Multi-Method Dispatch> (MMD) which we

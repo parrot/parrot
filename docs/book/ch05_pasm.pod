@@ -330,7 +330,7 @@ method).
 
 Z<CHP-5-SECT-2.2.3>
 
-X<Auboboxing>
+X<Autoboxing>
 As we've seen in the previous chapters about PIR, we can convert between
 primitive string, integer, and number types and PMCs. PIR used the C<=>
 operator to make these conversions. PASM doesn't have any symbolic operators
