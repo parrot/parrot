@@ -1135,7 +1135,7 @@ Does nothing.
 
 */
 
-    void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(visit_info *info) {
         /* default - no action */
     }
 

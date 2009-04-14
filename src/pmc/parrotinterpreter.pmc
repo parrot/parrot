@@ -698,7 +698,7 @@ Finish thawing.
         }
     }
 
-    void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(visit_info *info) {
         PMC * const new_info = PMC_args(SELF);
         const INTVAL  m      = VTABLE_elements(INTERP, new_info);
         INTVAL  i;
