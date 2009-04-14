@@ -2319,7 +2319,7 @@ Sleep for the given number of seconds.
 
 I<Arguments: I or N>
 
-=head3 spanw
+=head3 spawnw
 
 X<spawnw opcode (PASM)>
 
