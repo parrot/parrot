@@ -504,11 +504,10 @@ sub print_tail {
 void *
 build_call_func(PARROT_INTERP,
 #if defined(CAN_BUILD_CALL_FRAMES)
-PMC *pmc_nci,
+PMC *pmc_nci, NOTNULL(STRING *signature), NOTNULL(int *jitted))
 #else
-SHIM(PMC *pmc_nci),
+SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
 #endif
-NOTNULL(STRING *signature), NOTNULL(int *jitted))
 {
     char       *c;
     STRING     *ns, *message;
