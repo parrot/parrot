@@ -2,7 +2,7 @@
 
 =head1 Parrot Assembly Language
 
-Z<CHP-5>
+Z<CHP-9>
 
 X<Parrot Assembly Language;;(see PASM)>
 X<PASM (Parrot assembly language)>
@@ -34,7 +34,7 @@ around, and it's good to be familiar with it.
 
 =head2 Basics
 
-Z<CHP-5-SECT-2>
+Z<CHP-9-SECT-2>
 
 X<PASM (Parrot assembly language);overview>
 PASM has a simple syntax that will be familiar to people who have experience
@@ -115,7 +115,7 @@ which is the same in PIR:
 
 =head3 Constants
 
-Z<CHP-5-SECT-2.1>
+Z<CHP-9-SECT-2.1>
 
 X<PASM (Parrot assembly language);constants>
 Integer constants are signed integers.N<The size of integers is
@@ -163,7 +163,7 @@ C<\r> (return), C<\f> (form feed), C<\\> (literal slash), C<\">
 
 =head3 Working with Registers
 
-Z<CHP-5-SECT-2.2>
+Z<CHP-9-SECT-2.2>
 
 X<PASM (Parrot assembly language);registers>
 X<registers;Parrot;;(see PASM, registers)>
@@ -204,7 +204,7 @@ penalties) yourself.
 
 =head4 Register assignment
 
-Z<CHP-5-SECT-2.2.1>
+Z<CHP-9-SECT-2.2.1>
 
 X<PASM (Parrot assembly language);registers;assignment>
 The most basic operation on registers is assignment using the C<set>
@@ -293,7 +293,7 @@ this chapter.>
 
 =head4 PMC object types
 
-Z<CHP-5-SECT-2.2.2>
+Z<CHP-9-SECT-2.2.2>
 
 X<PMCs (Polymorphic Containers);object types>
 Internally, PMC types are represented by positive integers, and
@@ -328,7 +328,7 @@ method).
 
 =head4 Autoboxing
 
-Z<CHP-5-SECT-2.2.3>
+Z<CHP-9-SECT-2.2.3>
 
 X<Autoboxing>
 As we've seen in the previous chapters about PIR, we can convert between
@@ -365,7 +365,7 @@ behaviors when you try to assign a primitive value to them.
 
 =head3 Math Operations
 
-Z<CHP-5-SECT-2.3>
+Z<CHP-9-SECT-2.3>
 
 X<PASM (Parrot assembly language);math operations>
 PASM has a full set of math instructions. These work with integers,
@@ -428,7 +428,7 @@ Opcodes" in Chapter 11.
 
 =head4 Unary math opcodes
 
-Z<CHP-5-SECT-2.3.1>
+Z<CHP-9-SECT-2.3.1>
 
 The unary opcodes have either a destination argument and a source
 argument, or a single argument as destination and source. Some of the
@@ -446,7 +446,7 @@ most common unary math opcodes are C<inc> (increment), C<dec>
 
 =head4 Binary math opcodes
 
-Z<CHP-5-SECT-2.3.2>
+Z<CHP-9-SECT-2.3.2>
 
 X<PASM (Parrot assembly language);math operations;binary>
 Binary opcodes have two source arguments and a destination argument.
@@ -471,7 +471,7 @@ multiple).
 
 =head4 Floating-point operations
 
-Z<CHP-5-SECT-2.3.3>
+Z<CHP-9-SECT-2.3.3>
 
 X<PASM (Parrot assembly language);math operations;floating-point>
 Although most of the math operations work with both floating-point
@@ -510,7 +510,7 @@ variant that implements C's C<atan2()>:
 
 =head3 Working with Strings
 
-Z<CHP-5-SECT-2.4>
+Z<CHP-9-SECT-2.4>
 
 X<PASM (Parrot assembly language);string operations>
 String operations work with string registers and with PMCs that implement a
@@ -519,7 +519,7 @@ arguments to be String PMCs.
 
 =head4 Concatenating strings
 
-Z<CHP-5-SECT-2.4.1>
+Z<CHP-9-SECT-2.4.1>
 
 X<PASM (Parrot assembly language);string operations;concatenation>
 Use the C<concat>X<concat opcode (PASM)> opcode to concatenate
@@ -569,7 +569,7 @@ the result in C<P2>.
 
 =head4 Repeating strings
 
-Z<CHP-5-SECT-2.4.2>
+Z<CHP-9-SECT-2.4.2>
 
 X<PASM (Parrot assembly language);string operations;repeating strings>
 The C<repeat>X<repeat opcode (PASM)> opcode repeats a string a certain
@@ -590,7 +590,7 @@ five times and stores a pointer to it in C<S1>.
 
 =head4 Length of a string
 
-Z<CHP-5-SECT-2.4.3>
+Z<CHP-9-SECT-2.4.3>
 
 X<PASM (Parrot assembly language);string operations;length>
 The C<length>X<length opcode (PASM)> opcode returns the length of a
@@ -611,7 +611,7 @@ C<length> doesn't have an equivalent for PMC strings.
 
 =head4 Substrings
 
-Z<CHP-5-SECT-2.4.4>
+Z<CHP-9-SECT-2.4.4>
 
 X<PASM (Parrot assembly language);string operations;substrings>
 The simplest version of the C<substr>X<substr opcode (PASM)> opcode
@@ -678,7 +678,7 @@ The PMC versions of C<substr> are not yet implemented.
 
 =head4 Chopping strings
 
-Z<CHP-5-SECT-2.4.5>
+Z<CHP-9-SECT-2.4.5>
 
 X<PASM (Parrot assembly language);string operations;chopping strings>
 The C<chopn>X<chopn opcode (PASM)> opcode removes characters from the
@@ -725,7 +725,7 @@ untouched:
 
 =head4 Copying strings
 
-Z<CHP-5-SECT-2.4.6>
+Z<CHP-9-SECT-2.4.6>
 
 X<PASM (Parrot assembly language);string operations;copying>
 The C<clone>X<clone opcode (PASM)> opcode makes a deep copy of a
@@ -757,7 +757,7 @@ memory location on assignment.
 
 =head4 Converting characters
 
-Z<CHP-5-SECT-2.4.7>
+Z<CHP-9-SECT-2.4.7>
 
 X<PASM (Parrot assembly language);string operations;converting strings>
 The C<chr>X<chr opcode (PASM)> opcode takes an integer value and
@@ -794,7 +794,7 @@ the last character.
 
 =head4 Formatting strings
 
-Z<CHP-5-SECT-2.4.8>
+Z<CHP-9-SECT-2.4.8>
 
 X<PASM (Parrot assembly language);string operations;formatting
 strings> The C<sprintf>X<sprintf opcode (PASM)> opcode generates a
@@ -816,11 +816,11 @@ but with some extensions for Parrot data types. Each format field in
 the string starts with a C<%>
 X<% (percent sign);% format strings for sprintf opcode (PASM)> and
 ends with a character specifying the output format. The output format
-characters are listed in Table 5-1.
+characters are listed in Table 9-1.
 
 =begin table picture Format characters
 
-Z<CHP-5-TABLE-1>
+Z<CHP-9-TABLE-1>
 
 =headrow
 
@@ -934,11 +934,11 @@ whichever fits best.
 
 Each format field can be specified with several options: R<flags>,
 R<width>, R<precision>, and R<size>. The format flags are listed in
-Table 5-2.
+Table 9-2.
 
 =begin table picture Format flags
 
-Z<CHP-5-TABLE-2>
+Z<CHP-9-TABLE-2>
 
 =headrow
 
@@ -989,11 +989,11 @@ If either R<width> or R<precision> is an asterisk (C<*>), it takes its
 value from the next argument in the PMC.
 
 The R<size> modifier defines the type of the argument the field takes.
-The flags are listed in Table 5-3.
+The flags are listed in Table 9-3.
 
 =begin table picture Size flags
 
-Z<CHP-5-TABLE-3>
+Z<CHP-9-TABLE-3>
 
 =headrow
 
@@ -1084,7 +1084,7 @@ examples of format strings.
 
 =head4 Testing for substrings
 
-Z<CHP-5-SECT-2.4.9>
+Z<CHP-9-SECT-2.4.9>
 
 X<PASM (Parrot assembly language);string operations;testing for substrings>
 The C<index>X<index opcode (PASM)> opcode searches for a substring
@@ -1168,7 +1168,7 @@ its length is zero.
 
 =head3 Logical and Bitwise Operations
 
-Z<CHP-5-SECT-2.6>
+Z<CHP-9-SECT-2.6>
 
 X<PASM (Parrot assembly language);bitwise operations>
 X<PASM (Parrot assembly language);logical operations>
@@ -1284,7 +1284,7 @@ specified number of bits:
 
 =head2 Working with PMCs
 
-Z<CHP-5-SECT-3>
+Z<CHP-9-SECT-3>
 
 In most of the examples we've shown so far, X<PMCs (Polymorphic
 Containers);working with> PMCs just duplicate the functionality of
@@ -1294,7 +1294,7 @@ each with its own set of operations.
 
 =head3 Aggregates
 
-Z<CHP-5-SECT-3.1>
+Z<CHP-9-SECT-3.1>
 
 PMCs can define complex types that hold multiple values. These are
 commonly called "X<PMCs (Polymorphic Containers);aggregate>
@@ -1310,7 +1310,7 @@ described here.
 
 =head4 Arrays
 
-Z<CHP-5-SECT-3.1.1>
+Z<CHP-9-SECT-3.1.1>
 
 X<PMCs (Polymorphic Containers);arrays>
 The C<Array>X<Array PMC> PMC is an ordered aggregate with
@@ -1359,7 +1359,7 @@ C<pop>, C<shift>, and C<unshift> (you'll find them in
 
 =head4 Hashes
 
-Z<CHP-5-SECT-3.1.2>
+Z<CHP-9-SECT-3.1.2>
 
 X<PMCs (Polymorphic Containers);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate with
@@ -1395,7 +1395,7 @@ with hashes: it removes a key/value pair.
 
 =head4 Iterators
 
-Z<CHP-5-SECT-3.1.3>
+Z<CHP-9-SECT-3.1.3>
 
 Iterators extract values from an aggregate PMC. You create an iterator
 by creating a new C<Iterator> PMC, and passing the array to C<new> as
@@ -1461,7 +1461,7 @@ since they don't define any order for their keys.
 
 =head4 Data structures
 
-Z<CHP-5-SECT-3.1.4>
+Z<CHP-9-SECT-3.1.4>
 
 X<PMCs (Polymorphic Containers);data structures>
 Arrays and hashes can hold any data type, including other aggregates.
@@ -1499,7 +1499,7 @@ or string values.
 
 =head3 PMC Assignment
 
-Z<CHP-5-SECT-3.2>
+Z<CHP-9-SECT-3.2>
 
 We mentioned before that C<set> on two X<PMCs (Polymorphic
 Containers);assignment> PMCs simply aliases them both to the same object,
@@ -1535,7 +1535,7 @@ or reuse the source object (as with C<set>).
 
 =head3 Properties
 
-Z<CHP-5-SECT-3.3>
+Z<CHP-9-SECT-3.3>
 
 X<PMCs (Polymorphic Containers);properties>
 PMCs can have additional values attached to them as "properties" of
@@ -1597,7 +1597,7 @@ C<prophash>X<prophash opcode (PASM)>.
 
 =head2 Flow Control
 
-Z<CHP-5-SECT-4>
+Z<CHP-9-SECT-4>
 
 X<PASM (Parrot assembly language);flow control>
 Although it has many advanced features, at heart PASM is an assembly
@@ -1652,7 +1652,7 @@ chance of crashing the interpreter.
 
 =head3 Conditional Branches
 
-Z<CHP-5-SECT-4.1>
+Z<CHP-9-SECT-4.1>
 
 X<PASM (Parrot assembly language);conditional branches>
 X<conditional branches in PASM>
@@ -1740,7 +1740,7 @@ actually the same object (have the same address):
 
 =head3 Iteration
 
-Z<CHP-5-SECT-4.2>
+Z<CHP-9-SECT-4.2>
 
 X<iteration;in PASM>
 X<PASM (Parrot assembly language);iteration>
@@ -1811,7 +1811,7 @@ loop.
 
 =head2 Lexicals and Globals
 
-Z<CHP-5-SECT-6>
+Z<CHP-9-SECT-6>
 
 So far, we've been treating Parrot registers like the variables of a
 high-level language. This is fine, as far as it goes, but it isn't the
@@ -1831,7 +1831,7 @@ their values.
 
 =head3 Globals
 
-Z<CHP-5-SECT-6.1>
+Z<CHP-9-SECT-6.1>
 
 X<PASM (Parrot assembly language);global variables>
 Global variables are stored in a C<Hash>, so every variable name
@@ -1903,7 +1903,7 @@ aren't finished yet.
 
 =head3 Lexicals
 
-Z<CHP-5-SECT-6.2>
+Z<CHP-9-SECT-6.2>
 
 X<PASM (Parrot assembly language);lexical variables>
 Lexical variables are stored in a lexical scratchpad. There's one pad
@@ -1912,7 +1912,7 @@ elements can be stored either by name or by numeric index.
 
 =head4 Basic instructions
 
-Z<CHP-5-SECT-6.2.1>
+Z<CHP-9-SECT-6.2.1>
 
 To store a lexical variable in the current scope pad, use C<store_lex>.
 Likewise, use C<find_lex> to retrieve a variable from the current pad.
@@ -1932,7 +1932,7 @@ Likewise, use C<find_lex> to retrieve a variable from the current pad.
 
 =head2 Subroutines
 
-Z<CHP-5-SECT-7>
+Z<CHP-9-SECT-7>
 
 X<subroutines>
 Subroutines and methods are the basic building blocks of larger
@@ -1978,7 +1978,7 @@ opcode (PASM)> opcode:
 
 =head3 Calling Conventions
 
-Z<CHP-5-SECT-7.1>
+Z<CHP-9-SECT-7.1>
 
 X<registers;usage for subroutine calls>
 X<subroutines;register usage>
@@ -1994,7 +1994,7 @@ agree on all the answers.
 
 =head4 Parrot calling conventions
 
-Z<CHP-5-SECT-7.1.2>
+Z<CHP-9-SECT-7.1.2>
 
 Internal subroutines can use whatever calling convention serves them
 best. Externally visible subroutines and methods need stricter rules.
@@ -2019,7 +2019,7 @@ X<Continuation Passing Style (CPS)>
 
 =head3 Native Call Interface
 
-Z<CHP-5-SECT-7.2>
+Z<CHP-9-SECT-7.2>
 
 X<subroutines;calling conventions;NCI>
 A special version of the Parrot calling conventions are used by the
@@ -2059,11 +2059,11 @@ argument) with a known function signature (fourth argument). The
 function signature is a string where the first character is the return
 value and the rest of the parameters are the function parameters. The
 characters used in X<NCI (Native Call Interface);function signatures>
-NCI function signatures are listed in Table 5-5.
+NCI function signatures are listed in Table 9-5.
 
 =begin table picture Function signature letters
 
-Z<CHP-5-TABLE-5>
+Z<CHP-9-TABLE-5>
 
 =headrow
 
@@ -2196,7 +2196,7 @@ F<docs/pdds/pdd16_native_call.pod> and F<docs/pmc/struct.pod>.
 
 =head3 Coroutines
 
-Z<CHP-5-SECT-7.4>
+Z<CHP-9-SECT-7.4>
 
 As we mentioned in the previous chapter, coroutines are
 X<subroutines;coroutines> subroutines that
@@ -2277,7 +2277,7 @@ coroutines have their own register frame stacks.
 
 =head3 Continuations
 
-Z<CHP-5-SECT-7.5>
+Z<CHP-9-SECT-7.5>
 
 X<continuations>
 X<subroutines;continuations>
@@ -2315,7 +2315,7 @@ This prints:
 
 =head3 Evaluating a Code String
 
-Z<CHP-5-SECT-7.6>
+Z<CHP-9-SECT-7.6>
 
 X<code strings, evaluating>
 This isn't really a subroutine operation, but it does produce a code
@@ -2369,7 +2369,7 @@ compiler in a shared library.
 
 =head2 Exceptions and Exception Handlers
 
-Z<CHP-5-SECT-8>
+Z<CHP-9-SECT-8>
 
 X<exceptions>
 X<exception handlers>
@@ -2463,7 +2463,7 @@ idea to combine the two.
 
 =head2 Events
 
-Z<CHP-5-SECT-9>
+Z<CHP-9-SECT-9>
 
 An event is a notification that something has happened: a timer
 expired, an IO operation finished, a thread sent a message to
@@ -2483,7 +2483,7 @@ design is subject to change.
 
 =head3 Timers
 
-Z<CHP-5-SECT-9.1>
+Z<CHP-9-SECT-9.1>
 
 C<Timer> objects are the replacement for Perl 5's C<alarm> handlers.
 They are also a significant improvement. Timers can fire once or
@@ -2494,7 +2494,7 @@ please consult the documentation for examples.
 
 =head3 Signals
 
-Z<CHP-5-SECT-9.2>
+Z<CHP-9-SECT-9.2>
 
 Signal handling is related to events. When Parrot gets a signal it
 needs to handle from the OS, it converts that signal into an event and
@@ -2532,7 +2532,7 @@ handler, so this example won't work on other platforms.>
 
 =head2 Threads
 
-Z<CHP-5-SECT-10>
+Z<CHP-9-SECT-10>
 
 Threads allow multiple pieces of code to run in parallel. This is
 useful when you have multiple physical CPUs to share the load of
@@ -2703,7 +2703,7 @@ of opcodes.
 
 =head2 Loading Bytecode
 
-Z<CHP-5-SECT-11>
+Z<CHP-9-SECT-11>
 
 In addition to running Parrot bytecode on the command-line, you can
 also load pre-compiled bytecode directly into your PASM source file.
@@ -2790,7 +2790,7 @@ before C<load_bytecode> returns, so the final output is:
 
 =head2 Classes and Objects
 
-Z<CHP-5-SECT-12>
+Z<CHP-9-SECT-12>
 
 This section revolves around one complete example that defines a
 class, instantiates objects, and uses them. The whole example is
@@ -2798,7 +2798,7 @@ included at the end of the section.
 
 =head3 Class declaration
 
-Z<CHP-5-SECT-12.1>
+Z<CHP-9-SECT-12.1>
 
 X<classes;in PASM>
 The C<newclass>X<newclass opcode (PASM)> opcode defines a new class.
@@ -2829,7 +2829,7 @@ method named "__init" and calls it if it exists.
 
 =head3 Attributes
 
-Z<CHP-5-SECT-12.2>
+Z<CHP-9-SECT-12.2>
 
 X<attributes;in PASM>
 X<classes;attributes>
@@ -2916,7 +2916,7 @@ again after you modify its value:
 
 =head3 Methods
 
-Z<CHP-5-SECT-12.3>
+Z<CHP-9-SECT-12.3>
 
 X<methods;in PASM>
 X<classes;methods>
@@ -2981,7 +2981,7 @@ to you.
 
 =head4 Overriding vtable functions
 
-Z<CHP-5-SECT-12.3.1>
+Z<CHP-9-SECT-12.3.1>
 
 Every object inherits a default set of I<vtable> functions from the
 C<ParrotObject> PMC, but you can also override them with your own
@@ -3060,7 +3060,7 @@ whenever an integer or string value is retrieved from a C<Foo> object:
 
 =head3 Inheritance
 
-Z<CHP-5-SECT-12.4>
+Z<CHP-9-SECT-12.4>
 
 X<inheritance;in PASM>
 X<classes;inheritance>
@@ -3137,7 +3137,7 @@ the class:
 
 =head3 Additional Object Opcodes
 
-Z<CHP-5-SECT-12.5>
+Z<CHP-9-SECT-12.5>
 
 The C<isa> and C<can> opcodes are also useful when working with
 objects. C<isa>X<isa opcode (PASM)> checks whether an object belongs to or
@@ -3154,7 +3154,7 @@ an object has a particular method. Both return a true or false value.
 
 =head3 Complete Example
 
-Z<CHP-5-SECT-12.6>
+Z<CHP-9-SECT-12.6>
 
 =begin PASM
 
