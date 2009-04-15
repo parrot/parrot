@@ -153,10 +153,10 @@ newline or semicolon after an end keyword."
     "ManagedStruct" "MultiSub" "NCI" "NameSpace" "Null"
     "OS" "Object" "OrderedHash" "PMCProxy" "ParrotClass"
     "ParrotIO" "ParrotInterpreter" "ParrotLibrary" "ParrotObject"
-    "ParrotRunningThread" "ParrotThread" "Pointer" "Random" "Ref"
+    "ParrotRunningThread" "ParrotThread" "Pointer" "Random"
     "ResizableBooleanArray" "ResizableFloatArray" "ResizableIntegerArray"
     "ResizablePMCArray" "ResizableStringArray" "RetContinuation"
-    "Role" "Scalar" "SharedRef" "String" "Sub" "Super"
+    "Role" "Scalar" "String" "Sub" "Super"
     "Timer" "UnManagedStruct" "Undef" "VtableCache"))
 
 (defvar pir-ops

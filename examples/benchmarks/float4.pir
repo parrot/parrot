@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 float4.pir - Benchmark different ways of filling a float4 struct

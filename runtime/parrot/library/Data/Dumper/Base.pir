@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Data::Dumper::Base - style baseclass

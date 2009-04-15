@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# $Id$
 #
 # fasta.pir N         (N = 2500000 for shootout)
 # by Joshua Isom

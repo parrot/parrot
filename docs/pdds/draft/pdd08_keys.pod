@@ -47,8 +47,8 @@ string, number or PMC.
 For this reason the following structure was produced.  Individual keys (e.g. a
 single C<Integer> or C<String>) are stored in a C<Key> PMC.  The type of the
 key is encoded in the private flags of the PMC as specified below.   The value
-of the C<Key> PMC is stored in the PMC's cache (i.e. C<PMC_pmc_val(key)>,
-C<PMC_int_val(key)>).
+of the C<Key> PMC is stored in the PMC's data structure internally and can be
+accessed using the appropriate get_* VTABLE functions.
 
 For example, indexing the multidimensional array C<@foo[$a,12;"hi"]>
 produces three PMCs; one with a PMC type, one with an integer type
@@ -79,8 +79,8 @@ scheme (from includes/parrot/key.h):
 
 
 The C<KEY_register_FLAG> is used to indicate that value if the key is in a
-register.  In this case, C<PMC_int_val(key)> contains the number of a register
-of the appropriate type that contains the value.
+register.  In this case, the Key PMC's data contains the integer number of the
+appropriate register in the current context.
 
 Parrot must also have a way to combine multiple keys into a key that can be
 treated as a single unit.  This is done by forming a singly linked list such

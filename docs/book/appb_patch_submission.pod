@@ -54,7 +54,7 @@ Next, when you're making changes, take some extra time to consider how
 your patch affects the rest of the system. If your patch adds a new
 file, patch the main F<MANIFEST> file to include it. If you add a new
 feature, make sure to write tests for it. If you fix a bug, add a test
-to prove that it's fixed. See A<CHP-9-SECT-13>"Writing Tests" in Chapter
+to prove that it's fixed. See "Writing Tests" in Chapter
 9 for more on writing tests for Parrot. Tests are very important for
 Parrot development, and writing good tests is a valuable skill for
 developers to have. Before you submit a patch always recompile the

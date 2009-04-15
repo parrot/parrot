@@ -1,3 +1,5 @@
+# $Id$
+
 .include "errors.pasm"
 .sub _main
     .local string x

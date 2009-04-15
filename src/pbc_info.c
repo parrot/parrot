@@ -62,7 +62,7 @@ the directory using PackFile_map_segments() and iter().
 */
 
 int
-main(int argc, char *argv[])
+main(SHIM(int argc), char *argv[])
 {
     PackFile *pf;
     Interp *interp;

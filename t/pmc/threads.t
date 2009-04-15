@@ -46,7 +46,7 @@ if ( $^O eq "cygwin" ) {
     }
 }
 if ( $platforms{$^O} ) {
-    plan tests => 15;
+    plan tests => 14;
 }
 else {
     plan skip_all => "No threading yet or test not enabled for '$^O'";
@@ -286,42 +286,6 @@ loop:
 CODE
 500500
 500500
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "share a PMC" );
-.sub main :main
-    .local pmc foo
-    foo = get_global "_foo"
-    .local pmc to_share
-    to_share = new ['Integer']
-    .local pmc shared_ref
-    shared_ref = new ['SharedRef'], to_share
-    shared_ref = 20
-    .local pmc thread
-    thread = new ['ParrotThread']
-    thread.'run_clone'(foo, shared_ref)
-
-    sleep 0.1 # to let the thread run
-
-    .local pmc result
-    thread.'join'()
-    print "done\n"
-    print shared_ref
-    print "\n"
-.end
-
-.sub _foo
-    .param pmc shared_ref
-    print "thread\n"
-    print shared_ref
-    print "\n"
-    inc shared_ref
-.end
-CODE
-thread
-20
-done
-21
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUT', "sub name lookup in new thread" );

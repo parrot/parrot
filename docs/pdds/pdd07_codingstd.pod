@@ -133,7 +133,7 @@ Cuddled C<else>s are forbidden: i.e. avoid  C<} else {> .
 C macro parameters must be parenthesized in macro bodies, to allow expressions
 passed as arguments; e.g.:
 
-  #define PMC_pmc_val(pmc)      (pmc)->obj.u._ptrs._pmc_val
+    #define POBJ_FLAG(n) ((UINTVAL)1 << (n))
 
 =back
 

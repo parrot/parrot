@@ -1,21 +1,14 @@
 =pod
 
-=head1 Parrot Reference
+=head1 Instruction Reference
 
 Z<CHP-13>
 
-This chapter contains a condensed list of PASM opcodes, PIR directives
-and instructions, and Parrot command-line options, sorted alphabetically
-for easy reference. Any PASM opcode is valid in PIR code, so if you're
-looking up PIR syntax you should check A<CHP-10-SECT-1>"PASM Opcodes",
-A<CHP-10-SECT-2>"PIR Directives", and A<CHP-10-SECT-3>"PIR
-Instructions".
+This chapter contains a condensed reference to the Parrot virtual
+machine's native instruction set, generally called opcodes. All opcodes
+are valid in both PIR and PASM, and correspond to the bytecode
+instructions.
 
-=head2 PASM Opcodes
-
-Z<CHP-13-SECT-1>
-
-X<PASM (Parrot assembly language);opcodes, quick reference>
 For complete details on each opcode and the latest changes, read the
 documentation in F<docs/ops/>, or look at all the C<.ops> files in the
 F<ops/> directory.
@@ -194,7 +187,7 @@ I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 X<bors opcode (PASM)>
 
-  bor R<DEST>, R<VAL>, R<VAL>
+  bors R<DEST>, R<VAL>, R<VAL>
 
 Bitwise OR on two strings. If only one R<VAL>, bitwise OR on R<DEST>
 and R<VAL>.
@@ -511,17 +504,6 @@ Concatenate two strings. If only one R<VAL>, concatenate R<VAL> onto
 R<DEST>.
 
 I<Arguments: SR, S or SR, S, S or P, P, S or P, P, P>
-
-=head3 conv_*
-
-  conv_i1     R<DEST>, R<VAL>
-  conv_i1_ovf R<DEST>, R<VAL>
-
-Convert value to integer or number of given type C<i1>, C<i2>, C<i4>, C<i8>,
-C<u1>, C<u2>, C<u4>, C<r4>, C<r8>. C<i> corresponds to a signed integer,
-C<u> to an unsigned integer and C<r> to a float; the number indicates the
-size (in bytes) of the type. The variants with C<_ovf> throw an exception
-if the conversion would overflow.
 
 =head3 cos
 
@@ -1241,7 +1223,7 @@ X<interpinfo opcode (PASM)>
 
 Return information about the interpreter. An integer flag selects
 which information to return, as listed in
-A<CHP-10-TABLE-1>Table 11-1.
+Table 13-1.
 
 =begin table picture Interpinfo flags
 
@@ -2087,6 +2069,16 @@ I<Arguments: P, I>
 
 See also: C<newinterp>.
 
+=head3 say
+
+X<say opcode (PASM)>
+
+  say R<VAL>
+
+Print a value to C<stdout> with a trailing newline.
+
+I<Arguments: I or N or S or P>
+
 =head3 sec
 
 X<sec opcode (PASM)>
@@ -2239,6 +2231,18 @@ I<Arguments: P, S, P>
 
 See also: C<getprop> and C<delprop>.
 
+=head3 setstd*
+
+X<setstderr opcode (PASM)>
+X<setstdout opcode (PASM)>
+
+  setstderr R<DEST>
+  setstdout R<DEST>
+
+Set a ParrotIO object for the given standard handle.
+
+I<Arguments: P>
+
 =head3 shift
 
 X<shift opcode (PASM)>
@@ -2319,7 +2323,7 @@ Sleep for the given number of seconds.
 
 I<Arguments: I or N>
 
-=head3 spanw
+=head3 spawnw
 
 X<spawnw opcode (PASM)>
 
@@ -2350,6 +2354,123 @@ X<sprintf opcode (PASM)>
 Format arguments in an aggregate PMC, using format string R<FORMAT>.
 
 I<Arguments: SR, S, P or P, P, P>
+
+=head3 stat
+
+X<stat opcode (PASM)>
+
+  stat R<DEST>, R<VAL>, R<VAL>
+
+Stat the VAL1 file and return stat element VAL2, as listed in
+Table 13-2.
+
+I<Arguments: IR, S, I or IR, I, I>
+
+=begin table picture Stat arguments
+
+Z<CHP-13-TABLE-2>
+
+=headrow
+
+=row
+
+=cell Flag
+
+=cell Flagname
+
+=cell Returns
+
+=bodyrows
+
+=row
+
+=cell C<0>
+
+=cell EXISTS
+
+=cell Does the file exist?
+
+=row
+
+=cell C<1>
+
+=cell FILESIZE
+
+=cell Size of file, in bytes
+
+=row
+
+=cell C<2>
+
+=cell ISDIR
+
+=cell Is the file a directory?
+
+=row
+
+=cell C<3>
+
+=cell ISDEV
+
+=cell Is the file a device?
+
+=row
+
+=cell C<4>
+
+=cell CREATETIME
+
+=cell Time file was created
+
+=row
+
+=cell C<5>
+
+=cell ACCESSTIME
+
+=cell Time file was last accessed
+
+=row
+
+=cell C<6>
+
+=cell MODIFYTIME
+
+=cell Time file data was changed
+
+=row
+
+=cell C<7>
+
+=cell CHANGETIME
+
+=cell Time file metadata was changed
+
+=row
+
+=cell C<8>
+
+=cell BACKUPTIME
+
+=cell Time of last backup
+
+=row
+
+=cell C<9>
+
+=cell UID
+
+=cell ID of file owner
+
+=row
+
+=cell C<10>
+
+=cell GID
+
+=cell ID of file group
+
+=end table
 
 =head3 store_global
 
@@ -2411,11 +2532,11 @@ X<stringinfo opcode (PASM)>
   stringinfo R<DEST>, R<STRING>, R<FLAG>
 
 Return information about a string. An integer flag selects which
-information to return, as listed in A<CHP-10-TABLE-2>Table 11-2.
+information to return, as listed in Table 13-3.
 
 =begin table picture Stringinfo arguments
 
-Z<CHP-13-TABLE-2>
+Z<CHP-13-TABLE-3>
 
 =headrow
 
@@ -2487,7 +2608,7 @@ X<subclass opcode (PASM)>
   subclass R<DEST>, R<CLASS>
   subclass R<DEST>, R<CLASS>, R<NAME>
 
-Create a sublass of R<CLASS>. Without R<NAME> an anonymous subclass is
+Create a subclass of R<CLASS>. Without R<NAME> an anonymous subclass is
 created.
 
 I<Arguments: P, S or P, P or P, S, S or P, P, S>
@@ -2810,826 +2931,6 @@ return a false value.
 
 I<Arguments: IR, I, I or P, P, P>
 
-=head2 PIR Directives
-
-Z<CHP-13-SECT-2>
-
-X<PIR (Parrot intermediate representation);quick reference;directives>
-This is a summary of PIR directives. Directives are preprocessed by the
-Parrot interpreter. Since PIR and PASM run on the same interpreter, many
-of the directives listed here are also valid in PASM code.
-
-
-=head3 .arg
-
-X<.arg directive>
-
-  .arg R<VAL>
-
-pass a value to a subroutine according to PCC.
-
-=head3 .const
-
-X<.const directive>
-
-  .const R<TYPE>R<NAME> = R<VALUE>
-
-Define a named constant.
-
-=head3 .macro_const
-
-X<.macro_const directive>
-
-  .macro_const R<NAME>R<VALUE>
-
-Define a named macro that expands to a given value. Macros are called
-as directives, i.e. .R<NAME> (PASM code only).
-
-=head3 .emit
-
-X<.emit directive>
-
-  .emit
-
-Define a compilation unit of PASM code. Always paired with C<.eom>.
-
-=head3 .end
-
-X<.end directive>
-
-  .end
-
-End a compilation unit. Always paired with C<.sub>.
-
-=head3 .endm
-
-X<.endm directive>
-
-  .endm
-
-End a macro definition. Always paired with C<.macro>.
-
-=head3 .eom
-
-X<.eom directive>
-
-  .eom
-
-End a compilation unit of PASM code. Always paired with C<.emit>.
-
-=head3 .flatten_arg
-
-X<.flatten_arg directive>
-
-  .flatten_arg R<PArray>
-
-Flatten the passed array PMC and provide args for PCC calls.
-
-=head3 .globalconst
-
-X<.globalconst directive>
-
-  .globalconst R<TYPE>R<NAME> = R<VALUE>
-
-Define a named, file visible constant.
-
-=head3 .include
-
-X<.include directive>
-
-  .include " R<FILENAME> "
-
-Include the contents of an external file by inserting it in place.
-
-=head3 .invocant
-
-X<.invocant directive>
-
-  .invocant R<OBJ>
-
-Set the invocant for a method call.
-
-=head3 .local
-
-X<.local directive>
-
-  .local R<TYPE>R<NAME>
-
-Define a local named variable.
-
-=head3 .macro
-
-X<.macro directive>
-
-  .macro R<NAME> (R<PARAMS>)
-
-Define a named macro with a list of parameters. The macro is called as
-.R<NAME>(R<arg1>,R<arg2>,...).  Always paired with C<.endm>.
-
-=head3 .meth_call
-
-X<.meth_call directive>
-
-  .meth_call R<SUB>
-  .meth_call R<SUB>, R<RETCONT>
-
-Create a method call.
-
-=head3 .namespace
-
-X<.namespace directive>
-
-  .namespace R< [ "namespace" ] >
-
-Define a namespace.
-
-=head3 .nci_call
-
-X<.nci_call directive>
-
-  .nci_call R<SUB>
-
-Create an NCI call.
-
-=head3 .param
-
-X<.param directive>
-
-  .param R<DEST>
-  .param R<TYPE>R<NAME>
-
-Define a subroutine parameter.
-
-=head3 .begin_call
-
-X<.begin_call directive>
-
-Start a call sequence. Always paired with C<.end_call>
-
-=head3 .begin_return
-
-X<.begin_return directive>
-
-Start a return sequence. Always paired with C<.end_return>
-
-=head3 .begin_yield
-
-X<.begin_yield directive>
-
-Start a return of a coroutine sequence. Always paired with C<.end_yield>
-
-=head3 .call
-
-X<.call directive>
-
-  .call R<SUB>
-  .call R<SUB>, R<RETCONT>
-
-Create a subroutine call.
-
-=head3 .pcc_sub
-
-X<.pcc_sub directive>
-
-  .pcc_sub R<_LABEL>
-
-Create a symbol entry for subroutine at the _LABEL. This directive is
-for PASM code only.
-
-=head3 .result
-
-X<.result directive>
-
-  .result R<DEST>
-
-Get a return value according to PCC.
-
-=head3 .return
-
-X<.return directive>
-
-  .return R<VAL>
-
-Return a value to the calling subroutine according to PCC.
-
-=head3 .sub
-
-X<.sub directive>
-
-  .sub R<NAME>
-
-Define a compilation unit. Always paired with C<.end>. Names begin
-with "C<_>" by convention.
-
-=head3 .sym
-
-X<.sym directive>
-
-  .sym R<TYPE> R<NAME>
-
-Same as C<.local>.
-
-=head2 PIR Instructions
-
-Z<CHP-13-SECT-3>
-
-X<PIR (Parrot intermediate representation);quick reference;instructions>
-This section is a quick reference to PIR instructions. For more details
-and the latest changes, see F<imcc/docs/syntax.pod> or dive into the
-source code in F<imcc/imcc.l> and F<imcc/imcc.y>.
-
-=head3 =
-
-X<= (equal sign);= (assignment);instruction (PIR)>
-
-  R<DEST> = R<VAL>
-
-Assign a value to a particular register, temporary register, or named
-variable.
-
-=head3 +, +=
-
-X<+ (plus sign);+ (addition);instruction (PIR)>
-X<+ (plus sign);+= (addition assignment);instruction (PIR)>
-
-  R<DEST> = R<VAL> + R<VAL>
-  R<DEST> += R<VAL>
-
-Add two numbers or PMCs.
-
-=head3 -, -=
-
-X<- (hyphen);- (subtraction);instruction (PIR)>
-X<- (hyphen);-= (subtraction assignment);instruction (PIR)>
-X<- (hyphen);- (negation);instruction (PIR)>
-
-  R<DEST> = R<VAL1> - R<VAL2>
-  R<DEST> -= R<VAL1>
-  R<DEST> = - R<VAL>
-
-Subtract R<VAL1> from R<VAL2>. The unary "C<->" negates a number.
-
-=head3 *, *=
-
-X<* (asterisk);* (multiplication);instruction (PIR)>
-X<* (asterisk);*= (multiplication assignment);instruction (PIR)>
-
-  R<DEST> = R<VAL> * R<VAL>
-  R<DEST> *= R<VAL>
-
-Multiply two numbers or PMCs.
-
-=head3 /, /=
-
-X</ (slash);/ (division);instruction (PIR)>
-X</ (slash);/= (division assignment);instruction (PIR)>
-
-  R<DEST> = R<VAL1> / R<VAL2>
-  R<DEST> /= R<VAL1>
-
-Divide R<VAL1> by R<VAL2>.
-
-=head3 **
-
-X<* (asterisk);** (exponentiation);instruction (PIR)>
-
-  R<DEST> = R<VAL1> ** R<VAL2>
-
-Raise R<VAL1> to the power of R<VAL2>.
-
-=head3 %, %=
-
-X<% (percent sign);% (modulus);instruction (PIR)>
-X<% (percent sign);%= (modulus assignment);instruction (PIR)>
-
-  R<DEST> = R<VAL1> % R<VAL2>
-  R<DEST> %= R<VAL1>
-
-Divide R<VAL1> by R<VAL2> and return the (C<mod>) remainder.
-
-=head3 ., .=
-
-X<. (dot);. (concatenation) instruction (PIR)>
-X<. (dot);.= (concatenation assignment) instruction (PIR)>
-
-  R<DEST> = R<VAL> . R<VAL>
-  R<DEST> .= R<VAL>
-
-Concatenate two strings. The concat operator must be surrounded by
-whitespace.
-
-=head3 E<lt>
-
-X<E<lt> (left angle bracket);E<lt> (less than);instruction (PIR)>
-
-  if R<VAL1> E<lt> R<VAL2> goto R<LABEL>
-
-Conditionally branch to a label if R<VAL1> is less than R<VAL2>.
-
-=head3 E<lt>=
-
-X<E<lt> (left angle bracket);E<lt>= (less than or equal);instruction (PIR)>
-
-  if R<VAL1> E<lt>= R<VAL2> goto R<LABEL>
-
-Conditionally branch to a label if R<VAL1> is less than or equal to
-R<VAL2>.
-
-=head3 E<gt>
-
-X<E<gt> (right angle bracket);E<gt> (greater than);instruction (PIR)>
-
-  if R<VAL1> E<gt> R<VAL2> goto R<LABEL>
-
-Conditionally branch to a label if R<VAL1> is greater than R<VAL2>.
-
-=head3 E<gt>=
-
-X<E<gt> (right angle bracket);E<gt>= (greater than or equal);instruction (PIR)>
-
-  if R<VAL1> E<gt>= R<VAL2> goto R<LABEL>
-
-Conditionally branch to a label if R<VAL1> is greater than or equal to
-R<VAL2>.
-
-=head3 ==
-
-X<= (equal sign);== (equality);instruction (PIR)>
-
-  if R<VAL1> == R<VAL2> goto R<LABEL>
-
-Conditionally branch to a label if R<VAL1> is equal to R<VAL2>.
-
-=head3 !=
-
-X<! (bang);!= (not equal);instruction (PIR)>
-
-  if R<VAL1> != R<VAL2> goto R<LABEL>
-
-Conditionally branch to a label if R<VAL1> is not equal to R<VAL2>.
-
-=head3 &&
-
-X<& (ampersand);&& (logical AND);instruction (PIR)>
-
-  R<DEST> = R<VAL1> && R<VAL2>
-
-Logical AND. Return R<VAL1> if it's false, otherwise return R<VAL2>.
-
-=head3 ||
-
-X<| (pipe);|| (logical OR);instruction (PIR)>
-
-  R<DEST> = R<VAL1> || R<VAL2>
-
-Logical OR. Return R<VAL1> if it's true, otherwise return R<VAL2>.
-
-=head3 ~~
-
-X<~ (tilde);~~ (logical XOR) instruction (PIR)>
-
-  R<DEST> = R<VAL1> ~~ R<VAL2>
-
-Logical XOR. If R<VAL1> is true and R<VAL2> is false, return R<VAL1>.
-If R<VAL1> is false and R<VAL2> is true, return R<VAL2>. Otherwise,
-return a false value.
-
-=head3 !
-
-X<! (bang);! (not);instruction (PIR)>
-
-  R<DEST> = ! R<VAL>
-
-Logical NOT. Return a true value if R<VAL> is false.
-
-=head3 &, &=
-
-X<& (ampersand);& (bitwise AND) instruction (PIR)>
-X<& (ampersand);&= (bitwise AND assignment) instruction (PIR)>
-
-  R<DEST> = R<VAL> & R<VAL>
-  R<DEST> &= R<VAL>
-
-Bitwise AND on two values.
-
-=head3 |, |=
-
-X<| (pipe);| (bitwise AND) instruction (PIR)>
-X<| (pipe);|= (bitwise AND assignment) instruction (PIR)>
-
-  R<DEST> = R<VAL> | R<VAL>
-  R<DEST> |= R<VAL>
-
-Bitwise OR on two values.
-
-=head3 ~, ~=
-
-X<~ (tilde);~ (bitwise XOR) instruction (PIR)>
-X<~ (tilde);~= (bitwise XOR assignment) instruction (PIR)>
-
-  R<DEST> = R<VAL> ~ R<VAL>
-  R<DEST> ~= R<VAL>
-  R<DEST> = ~ R<VAL>
-
-Bitwise XOR on two values. The unary form is a bitwise NOT on a value.
-
-=head3 E<lt>E<lt>, E<lt>E<lt>=
-
-X<E<lt> (left angle bracket);E<lt>E<lt> (bitwise left shift);instruction (PIR)>
-X<E<lt> (left angle bracket);E<lt>E<lt>= (bitwise left shift assignment);instruction (PIR)>
-
-  R<DEST> = R<VAL1> E<lt>E<lt> R<VAL2>
-  R<DEST> E<lt>E<lt>= R<VAL2>
-
-Bitwise shift R<VAL1> left by R<VAL2> number of bits.
-
-=head3 E<gt>E<gt>, E<gt>E<gt>=
-
-X<E<gt> (right angle bracket);E<gt>E<gt> (bitwise right shift);instruction (PIR)>
-X<E<gt> (right angle bracket);E<gt>E<gt>= (bitwise right shift assignment);instruction (PIR)>
-
-  R<DEST> = R<VAL1> E<gt>E<gt> R<VAL2>
-  R<DEST> E<gt>E<gt>= R<VAL2>
-
-Bitwise shift R<VAL1> right by R<VAL2> number of bits.
-
-=head3 E<gt>E<gt>E<gt>, E<gt>E<gt>E<gt>=
-
-X<E<gt> (right angle bracket);E<gt>E<gt>E<gt> (logical right shift) instruction (PIR)>
-X<E<gt> (right angle bracket);E<gt>E<gt>E<gt>= (logical right shift assignment) instruction (PIR)>
-
-  R<DEST> = R<VAL1> E<gt>E<gt>E<gt> R<VAL2>
-  R<DEST> E<gt>E<gt>E<gt>= R<VAL2>
-
-Logically shift R<VAL1> right by R<VAL2> number of bits.
-
-=head3 [  ]
-
-X<[] (brackets);indexed access to PMC (PIR)>
-
-  R<DEST> = R<PMC> [ R<KEY> ]
-  R<PMC> [ R<KEY> ] = R<VAL>
-
-Indexed access to a PMC and indexed assignment to a PMC.
-
-  DEST = STRING [ OFFSET ]
-  STRING [ OFFSET ]  = VAL
-
-Access a one-character substring on a string, starting at a particular
-offset, or assign to that substring.
-
-=head3 call
-
-X<call instruction (PIR)>
-
-  call R<NAME>
-
-Call the named subroutine (a C<.sub> label).
-
-=head3 global
-
-X<global instruction (PIR)>
-
-  R<DEST> = global R<NAME>
-  global R<NAME> = R<VAL>
-
-Access a global variable for read or write.
-
-=head3 goto
-
-X<goto command (PIR)>
-
-  goto R<NAME>
-
-Jump to the named identifier (label or subroutine name).
-
-=head3 if
-
-X<if (conditional);instruction (PIR)>
-
-  if R<EXPR> goto R<NAME>
-
-If the value or expression evaluates as true, jump to the named
-identifier.
-
-=head3 unless
-
-X<unless (conditional);instruction (PIR)>
-
-  unless R<VAL> goto R<NAME>
-
-Unless the value evaluates as true, jump to the named identifier.
-
-
-=head2 Parrot Command-Line Options
-
-Z<CHP-13-SECT-4>
-
-X<command-line options (Parrot)>
-X<Parrot;command-line options>
-X<running.pod file>
-Since Parrot is both an assembler and a bytecode interpreter, it
-has options to control both behaviors. Some options may have changed
-by the time you read this, especially options related to debugging and
-optimization. The document F<imcc/docs/running.pod> should
-have the latest details. Or just run F<parrot --help>.
-
-=head3 General Usage
-
-Z<CHP-13-SECT-4.1>
-
-  parrot [options] file [arguments]
-
-The R<file> is either an F<.pir> or F<.pasm> source file or a
-Parrot bytecode file. Parrot creates an C<Array> object to hold the
-command-line R<arguments> and stores it in C<P5> on program start.
-
-=head3 Assembler Options
-
-Z<CHP-13-SECT-4.2>
-
-=over 4
-
-=item -a, --pasm
-
-X<Parrot;assembler options>
-Assume PASM input on C<stdin>. When Parrot runs a source file with a
-F<.pasm> extension, it parses the file as pure PASM code. This switch
-turns on PASM parsing (instead of the default PIR parsing) when a
-source file is read from C<stdin>.
-
-=item -c,--pbc
-
-Assume PBC file on C<stdin>. When Parrot runs a bytecode file with a
-F<.pbc> extension, it immediately executes the file. This option tells
-Parrot to immediately execute a bytecode file piped in on C<stdin>.
-
-=item -d,--debug [R<hexbits>]
-
-Turn on debugging output. The C<-d> switch takes an optional argument,
-which is a hex value of debug bits. The individual bits are shown in
-A<CHP-10-TABLE-3>Table 11-3. When R<hexbits> isn't specified,
-the default debugging level is 0001. If R<hexbits> is separated
-from the C<-d> switch by whitespace, it has to start with a number.
-
-=begin table picture Debug bits
-
-Z<CHP-13-TABLE-3>
-
-=headrow
-
-=row
-
-=cell Description
-
-=cell Debug bit
-
-=bodyrows
-
-=row
-
-=cell DEBUG_PARROT
-
-=cell 0001
-
-=row
-
-=cell DEBUG_LEXER
-
-=cell 0002
-
-=row
-
-=cell DEBUG_PARSER
-
-=cell 0004
-
-=row
-
-=cell DEBUG_IMC
-
-=cell 0008
-
-=row
-
-=cell DEBUG_CFG
-
-=cell 0010
-
-=row
-
-=cell DEBUG_OPT1
-
-=cell 0020
-
-=row
-
-=cell DEBUG_OPT2
-
-=cell 0040
-
-=row
-
-=cell DEBUG_PBC
-
-=cell 1000
-
-=row
-
-=cell DEBUG_PBC_CONST
-
-=cell 2000
-
-=row
-
-=cell DEBUG_PBC_FIXUP
-
-=cell 4000
-
-=end table
-
-X<Parrot;debugging bits>
-X<debugging bits (Parrot)>
-To produce a huge output on C<stderr>, turn on all the debugging bits:
-
-  $ parrot -d 0ffff ...
-
-
-=item --help-debug
-
-Show debug option bits.
-
-=item -h,--help
-
-Print a short summary of options to C<stdout> and exit.
-
-=item -o R<outputfile>
-
-Act like an assembler. With this switch Parrot won't run code unless
-it's combined with the C<-r> switch. If the name of R<outputfile> ends
-with a F<.pbc> extension, Parrot writes a Parrot bytecode file. If
-R<outputfile> ends with a F<.pasm> extension, Parrot writes a PASM
-source file, even if the input file was also PASM. This can be handy
-to check various optimizations when you run Parrot with the C<-Op>
-switch.
-
-If the extension is F<.o> or equivalent, Parrot generates an object
-file from the JITed program code, which can be used to create a
-standalone executable program. This isn't available on all platforms
-yet; see F<PLATFORMS> for which platforms support this.
-
-=item -r,--run-pbc
-
-Immediately execute bytecode. This is the default unless C<-o> is
-present. The combination of C<-r> C<-o> C<output.pbc> writes a
-bytecode file and executes the generated PBC.
-
-=item -v,--verbose
-
-One C<-v> switch (C<imcc> C<-v>) shows which files are worked on and
-prints a summary of register usage and optimization statistics. Two
-C<-v> switches (C<imcc> C<-v> C<-v>) also prints a line for each
-individual processing step.
-
-=item -y,--yydebug
-
-Turn on C<yydebug> for F<yacc>/F<bison>.
-
-=item -E,--pre-process-only
-
-Show output of macro expansions and quit.
-
-=item -V,--version
-
-Print the program version to C<stdout> and exit.
-
-=item -Ox
-
-Turn on optimizations. The flags currently implemented are shown in
-A<CHP-10-TABLE-4>Table 11-4.
-
-X<Parrot;optimizations>
-X<optimizations (Parrot)>
-
-=begin table picture Optimizations
-
-Z<CHP-13-TABLE-4>
-
-=headrow
-
-=row
-
-=cell Flag
-
-=cell Meaning
-
-=bodyrows
-
-=row
-
-=cell C<-O0>
-
-=cell No optimization (default).
-
-=row
-
-=cell C<-O1>
-
-=cell Optimizations without life info (e.g. branches and constants).
-
-=row
-
-=cell C<-O2>
-
-=cell Optimizations with life info.
-
-=row
-
-=cell C<-Oc>
-
-=cell Optimize function call sequence.
-
-=row
-
-=cell C<-Op>
-
-=cell Rearrange PASM registers with the most-used first.
-
-=end table
-
-=back
-
-=head3 Bytecode Interpreter Options
-
-Z<CHP-13-SECT-4.3>
-
-X<Parrot;bytecode interpreter options>
-X<bytecode interpreter options (Parrot)>
-X<computed goto core>
-X<fast core>
-The interpreter options are mainly for selecting which run-time core to
-use for interpreting bytecode. The current default is the I<computed
-goto core> if it's available. Otherwise the I<fast core> is used.
-
-=over 4
-
-=item --bounds-checks
-
-Activate bounds checking. This also runs with the I<slow core> as a
-side effect.
-
-=item --fast-core
-
-Run with the I<fast core>.
-
-=item --computed-goto-core
-
-Run the I<computed goto core> (CGoto).
-
-=item --jit-core
-
-Run with the I<JIT core> if available.
-
-=item -p,--profile
-
-Activate profiling. This prints a summary of opcode usage and
-execution times after the program stops. It also runs within the
-I<slow core>.
-
-=item --CGP-core
-
-Run with the I<CGoto-Prederefed> core.
-
-=item --switched-core
-
-Run with the I<Switched core>.
-
-=item -t,--trace
-
-Trace execution. This also turns on the I<slow core>.
-
-=item -w,--warnings
-
-Turn on warnings.
-
-=item -G,--no-gc
-
-Turn off GC. This is for debugging only.
-
-=item -.,--wait
-
-Wait for a keypress before running.
-
-=item --leak-test,--destroy-at-end
-
-Cleanup up allocated memory when the final interpreter is destroyed.
-C<Parrot> destroys created interpreters (e.g. threads) on exit  but
-doesn't normally free all memory for the last terminating interpreter,
-since the operating system will do this anyway. This can create false
-positives when C<Parrot> is run with a memory leak detector. To prevent
-this, use this option.
-
-=back
 
 =cut
 

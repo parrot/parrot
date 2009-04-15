@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Builder::Test - base class for all Test::Builder test objects

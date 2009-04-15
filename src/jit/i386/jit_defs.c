@@ -12,6 +12,7 @@ $Id$
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_unmanagedstruct.h"
+#include "pmc/pmc_pointer.h"
 #include "jit.h"
 #include "jit_emit.h"
 
@@ -2116,10 +2117,13 @@ calc_signature_needs(const char *sig, int *strings)
  * The generate function for a specific signature looks quite similar to
  * an optimized compile of src/nci.c:pcf_x_yy(). In case of any troubles
  * just compare the disassembly.
+ *
+ * If a non-NULL sizeptr is passed, the integer it points to will be written
+ * with the size of the allocated execmem buffer.
  */
 
 void *
-Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
+Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *sizeptr)
 {
     Parrot_jit_info_t jit_info;
     char     *pc;
@@ -2263,8 +2267,11 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                 break;
             case 'V':
                 emitm_call_cfunc(pc, get_nci_P);
-                emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(struct PMC, data));
-                /* emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, 0); */
+                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
+                /* Call the get_pointer VTABLE on the Pointer PMC to get the returned pointer */
+                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(PMC, vtable));
+                emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(VTABLE, get_pointer));
+                emitm_callr(pc, emit_EAX);
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
@@ -2289,15 +2296,8 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
             case '2':
             case '3':
             case '4':
-                mem_free_executable(jit_info.native_ptr);
+                mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
                 return NULL;
-                break;
-                /* This might be right. Or not... */
-                /* we need the offset of PMC_int_val */
-                emitm_call_cfunc(pc, get_nci_P);
-                emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
-                              (size_t) &PMC_int_val((PMC *) 0));
-                emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
@@ -2306,7 +2306,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
                  * oops unknown signature:
                  * cleanup and try nci.c
                  */
-                mem_free_executable(jit_info.native_ptr);
+                mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
                 return NULL;
         }
         args_offset +=4;
@@ -2314,10 +2314,25 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
         sig++;
     }
 
-    emitm_addl_i_r(pc, 16, emit_ESP);
-    /* get the pmc from stack - movl 12(%ebp), %eax */
+    /* prepare to call VTABLE_get_pointer, set up args */
+    /* interpreter - movl 8(%ebp), %eax */
+    emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 8);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 0);
+
+    /* pmc - movl 12(%ebp), %eax */
     emitm_movl_m_r(interp, pc, emit_EAX, emit_EBP, 0, 1, 12);
-    emitm_callm(pc, emit_EAX, emit_None, emit_None, 0);
+    emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, temp_calls_offset + 4);
+
+    /* get the get_pointer() pointer from the pmc's vtable */
+    emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(PMC, vtable));
+    emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1, offsetof(VTABLE, get_pointer));
+
+    /* call get_pointer(), result goes into eax */
+    emitm_callr(pc, emit_EAX);
+    emitm_addl_i_r(pc, 16, emit_ESP);
+
+    /* call the resulting function pointer */
+    emitm_callr(pc, emit_EAX);
     emitm_subl_i_r(pc, 16, emit_ESP);
 
     /* SAVE OFF EAX */
@@ -2435,7 +2450,7 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
              * oops unknown signature:
              * cleanup and try nci.c
              */
-            mem_free_executable(jit_info.native_ptr);
+            mem_free_executable(jit_info.native_ptr, JIT_ALLOC_SIZE);
             return NULL;
     }
 
@@ -2453,6 +2468,8 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature)
     PARROT_ASSERT(pc - jit_info.arena.start <= JIT_ALLOC_SIZE);
     /* could shrink arena.start here to used size */
     PObj_active_destroy_SET(pmc_nci);
+    if (sizeptr)
+        *sizeptr = JIT_ALLOC_SIZE;
     return (void *)D2FPTR(jit_info.arena.start);
 }
 

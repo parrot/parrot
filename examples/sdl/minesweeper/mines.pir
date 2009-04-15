@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 mines.pir - a minesweeper clone for parrot (with parrot's SDL bindings)

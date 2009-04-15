@@ -1879,7 +1879,7 @@ int count_regs(PARROT_INTERP, char *sig, char *sig_start);
 size_t calc_signature_needs(const char *sig, int *strings);
 
 void * Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci,
-    STRING *signature);
+    STRING *signature, int *sizeptr);
 
 /*
  * register usage

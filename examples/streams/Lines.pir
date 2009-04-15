@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Lines Example
 
 This example demonstrates what C<Stream::Lines> does.

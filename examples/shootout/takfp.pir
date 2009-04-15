@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# $Id$
 #
 # ./parrot -R cgp takfp.pir N         (N = 10 for shootout)
 # by Joshua Isom

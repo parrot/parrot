@@ -135,7 +135,8 @@ Class method to construct an Integer from the string representation C<rep>.
             ? constant_pmc_new(INTERP, type)
             : pmc_new(INTERP, type);
 
-        /* RT #46623 bigint overflow */
+        /* Parrot_str_to_int catches overflow automatically, so we don't need to
+           worry about it here. */
         VTABLE_set_integer_native(INTERP, res, Parrot_str_to_int(INTERP, rep));
         return res;
     }
@@ -425,25 +426,31 @@ Adds C<value> to C<SELF> inplace.
 
 */
 
-    MULTI void i_add(Integer value) {
-        STATICSELF.i_add_int(VTABLE_get_integer(INTERP, value));
+    VTABLE void i_add(PMC *value) {
+        const INTVAL type = value->vtable->base_type;
+
+        switch (type) {
+            case enum_class_Integer:
+                STATICSELF.i_add_int(VTABLE_get_integer(INTERP, value));
+                break;
+
+            case enum_class_Complex:
+                pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+                VTABLE_set_number_native(INTERP, SELF,
+                        SELF.get_integer() + VTABLE_get_number(INTERP, value));
+                break;
+
+            default:
+                VTABLE_set_number_native(INTERP, SELF,
+                        SELF.get_integer() + VTABLE_get_number(INTERP, value));
+                break;
+        }
     }
-
-
-    MULTI void i_add(Complex value) {
-        const INTVAL a = SELF.get_integer();
-
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
-        VTABLE_set_number_native(INTERP, SELF,
-                SELF.get_integer() + VTABLE_get_number(INTERP, value));
-    }
-
 
     MULTI void i_add(DEFAULT value) {
         VTABLE_set_number_native(INTERP, SELF,
                 SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
-
 
     VTABLE void i_add_int(INTVAL b) {
         const INTVAL a = SELF.get_integer();
@@ -1149,16 +1156,20 @@ The C<==> operation.
 
 */
 
-    MULTI INTVAL is_equal(BigInt value) {
-        PMC * const temp = pmc_new(INTERP, enum_class_BigInt);
-        VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
-        return Parrot_BigInt_multi_is_equal_BigInt(INTERP, temp, value);
-    }
+    VTABLE INTVAL is_equal(PMC *value) {
+        PMC *temp;
 
-
-    MULTI INTVAL is_equal(DEFAULT value) {
-        return (VTABLE_get_integer(INTERP, SELF)
-            ==  VTABLE_get_integer(INTERP, value));
+        switch (value->vtable->base_type) {
+            case enum_class_BigInt:
+                temp = pmc_new(INTERP, enum_class_BigInt);
+                VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
+                return Parrot_BigInt_multi_is_equal_BigInt(INTERP, temp, value);
+                break;
+            default:
+                return (VTABLE_get_integer(INTERP, SELF)
+                    ==  VTABLE_get_integer(INTERP, value));
+                break;
+        }
     }
 
 

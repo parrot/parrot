@@ -1,4 +1,5 @@
 #!./parrot
+# $Id$
 #
 # ./parrot -R jit nsieve.pir N  (N = 9 for shootout)
 # by Leopold Toetsch

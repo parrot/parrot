@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Write Example
 
 This example shows the usage of C<Stream::Write>.

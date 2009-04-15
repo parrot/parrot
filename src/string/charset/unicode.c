@@ -746,7 +746,7 @@ starting from C<offset>. Not implemented.
 
 static INTVAL
 cs_rindex(PARROT_INTERP, SHIM(STRING *source_string),
-        SHIM(STRING *search_string), UINTVAL offset)
+        SHIM(STRING *search_string), SHIM(UINTVAL offset))
 {
     ASSERT_ARGS(cs_rindex)
     /* TODO: RT #59696 Implement this. */

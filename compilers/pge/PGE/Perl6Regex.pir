@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Perl6Regex - compiler and parser for Perl 6 regex

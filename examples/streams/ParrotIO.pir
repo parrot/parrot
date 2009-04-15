@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Filehandle Object Example
 
 This small example shows the usage of C<Stream::ParrotIO>.

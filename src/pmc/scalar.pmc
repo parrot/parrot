@@ -132,26 +132,9 @@ according to the type of C<*value>.
             SELF.set_string_native(v);
             return;
         }
-        pmc_reuse(INTERP, SELF, enum_class_Ref, 0);
+        pmc_reuse(INTERP, SELF, value->vtable->base_type, 0);
         SELF.set_pmc(value);
     }
-
-/*
-
-=item C<PMC *clone()>
-
-Creates and returns a clone of the scalar.
-
-=cut
-
-*/
-
-    VTABLE PMC *clone() {
-        PMC * const dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        memcpy(&PMC_union(dest), &PMC_union(SELF), sizeof (UnionVal));
-        return dest;
-    }
-
 
 /*
 
@@ -1218,11 +1201,12 @@ Returns whether the PMC is equal to C<*value>.
 
 */
 
+/*
     MULTI INTVAL is_equal(PMC *value) {
         return (SELF->vtable         == value->vtable
-            &&  PMC_struct_val(SELF) == PMC_struct_val(value)
             &&  PMC_data(SELF)       == PMC_data(value));
     }
+*/
 
 /*
 

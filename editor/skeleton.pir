@@ -1,3 +1,5 @@
+# $Id$
+
 .sub main :main
 .end
 

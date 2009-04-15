@@ -195,8 +195,11 @@ sub print_head {
 #include "parrot/parrot.h"
 #include "parrot/hash.h"
 #include "parrot/oplib/ops.h"
+#include "pmc/pmc_managedstruct.h"
 #include "pmc/pmc_nci.h"
+#include "pmc/pmc_pointer.h"
 #include "nci.str"
+#include "jit.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
@@ -346,12 +349,15 @@ sub make_arg {
     /p/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "PMC_data(t_$temp_num)";
+        return "VTABLE_get_pointer(interp, t_$temp_num)";
     };
     /V/ && do {
         push @{$temps_ref},          "PMC *t_$temp_num;";
+        push @{$temps_ref},          "void *v_$temp_num;";
         push @{$extra_preamble_ref}, "t_$temp_num = GET_NCI_P($reg_num);";
-        return "(void**)&PMC_data(t_$temp_num)";
+        push @{$extra_preamble_ref}, "v_$temp_num = VTABLE_get_pointer(interp, t_$temp_num);";
+        push @{$extra_postamble_ref}, "VTABLE_set_pointer(interp, t_$temp_num, v_$temp_num);";
+        return "&v_$temp_num";
     };
     /[ilIscfdNS]/ && do {
         my $ret_type = $sig_table{$_}{return_type};
@@ -498,11 +504,10 @@ sub print_tail {
 void *
 build_call_func(PARROT_INTERP,
 #if defined(CAN_BUILD_CALL_FRAMES)
-PMC *pmc_nci,
+PMC *pmc_nci, NOTNULL(STRING *signature), NOTNULL(int *jitted))
 #else
-SHIM(PMC *pmc_nci),
+SHIM(PMC *pmc_nci), NOTNULL(STRING *signature), SHIM(int *jitted))
 #endif
-NOTNULL(STRING *signature), NOTNULL(int *jitted))
 {
     char       *c;
     STRING     *ns, *message;
@@ -554,11 +559,22 @@ $put_pointer
         return F2DPTR(VTABLE_get_pointer(interp, b));
     }
     else {
-        void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature);
+        int jit_size;
+        void * const result = Parrot_jit_build_call_func(interp, pmc_nci, signature, &jit_size);
         if (result) {
+            struct jit_buffer_private_data *priv;
             *jitted = 1;
             temp_pmc = pmc_new(interp, enum_class_ManagedStruct);
             VTABLE_set_pointer(interp, temp_pmc, (void *)result);
+#ifdef PARROT_HAS_EXEC_PROTECT
+            priv = (struct jit_buffer_private_data *)
+                mem_sys_allocate(sizeof(struct jit_buffer_private_data));
+            priv->size = jit_size;
+            SETATTR_ManagedStruct_custom_free_func(interp, temp_pmc, Parrot_jit_free_buffer);
+            SETATTR_ManagedStruct_custom_free_priv(interp, temp_pmc, priv);
+            SETATTR_ManagedStruct_custom_clone_func(interp, temp_pmc, Parrot_jit_clone_buffer);
+            SETATTR_ManagedStruct_custom_clone_priv(interp, temp_pmc, priv);
+#endif /* PARROT_HAS_EXEC_PROTECT */
             VTABLE_set_pmc_keyed_str(interp, HashPointer, jit_key_name, temp_pmc);
             return result;
         }
@@ -606,7 +622,6 @@ static void pcf_$funcname(PARROT_INTERP, PMC *self) {
     $ret_type (*pointer)();
     $ret_type return_data;
 
-    pointer = PMC_struct_val(self);
     return_data = ($ret_type)(*pointer)($params);
     $ret_reg  = return_data;
     REG_INT(interp, 0) = $stack_returns;

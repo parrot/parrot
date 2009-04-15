@@ -46,6 +46,7 @@ Overrides the default to do nothing.
     }
 
     VTABLE INTVAL does(STRING *what) {
+        UNUSED(what)
         /* XXX maybe a hack to get TGE running again */
         return 0;
     }

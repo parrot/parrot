@@ -854,7 +854,7 @@ in C<return_string>.
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
+        SHIM(UINTVAL offset), SHIM(UINTVAL count), SHIM(STRING *return_string))
 {
     ASSERT_ARGS(get_bytes_inplace)
     UNIMPL;
@@ -874,7 +874,7 @@ the contents of string C<new_codepoints>.
 
 static void
 set_codepoints(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *new_codepoints))
+        SHIM(UINTVAL offset), SHIM(UINTVAL count), SHIM(STRING *new_codepoints))
 {
     ASSERT_ARGS(set_codepoints)
     UNIMPL;
@@ -894,7 +894,7 @@ contents of string C<new_bytes>.
 
 static void
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))
+        SHIM(UINTVAL offset), SHIM(UINTVAL count), SHIM(STRING *new_bytes))
 {
     ASSERT_ARGS(set_bytes)
     UNIMPL;

@@ -179,6 +179,8 @@ static int
 recursion_limit(PARROT_INTERP, PMC *self, int l)
 {
     const int ret           = interp->recursion_limit;
+    UNUSED(self)
+
     interp->recursion_limit = l;
     return ret;
 }
@@ -698,10 +700,11 @@ Finish thawing.
         }
     }
 
-    void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(visit_info *info) {
         PMC * const new_info = PMC_args(SELF);
         const INTVAL  m      = VTABLE_elements(INTERP, new_info);
         INTVAL  i;
+        UNUSED(info)
 
         PMC_args(SELF) = NULL;
 

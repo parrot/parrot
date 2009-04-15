@@ -10,14 +10,6 @@ src/pmc/namespace.pmc - NameSpace PMC
 
 These are the vtable functions for the namespace PMC.
 
-=head2 Data
-
-  PMC_struct_val       ... the hash, bucket->value is a
-                           var/sub, a namespace, or a FixedPMCarray
-                           of 2 PMCs (namespace, sub/var) slots
-  PMC_pmc_val          ... parent namespace
-  PMC_data             ... Namespace information struct (name, class/role)
-
 =head2 Functions
 
 =over 4
@@ -140,6 +132,7 @@ pmclass NameSpace extends Hash provides hash need_ext no_ro {
                             * goes away when the methods are sucked in by a
                             * class. */
     ATTR PMC    *vtable;   /* A Hash of vtable subs, keyed on the vtable index */
+    ATTR PMC    *parent;   /* This NameSpace's parent NameSpace */
 
 /*
 
@@ -153,7 +146,6 @@ Initialize a C<NameSpace> PMC.
 
     VTABLE void init() {
         SUPER();
-        PMC_pmc_val(SELF) = NULL;  /* parent */
         PMC_data(SELF)    =
                 mem_allocate_zeroed_typed(Parrot_NameSpace_attributes);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
@@ -175,8 +167,8 @@ Marks the namespace as live.
     VTABLE void mark() {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         SUPER();
-        if (PMC_pmc_val(SELF))
-            pobject_lives(INTERP, (PObj *)PMC_pmc_val(SELF));
+        if (nsinfo->parent)
+            pobject_lives(INTERP, (PObj *)nsinfo->parent);
         if (nsinfo->name)
             pobject_lives(INTERP, (PObj *)nsinfo->name);
         if (nsinfo->_class)
@@ -331,8 +323,8 @@ really a public API.
         if (val_is_NS) {
             /* TODO - this hack needs to go */
             Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(value);
-            PMC_pmc_val(value)       = SELF;  /* set parent */
-            nsinfo->name             = key;   /* and name */
+            nsinfo->parent = SELF;  /* set parent */
+            nsinfo->name   = key;   /* and name */
 
             if (new_tuple) {
                 VTABLE_set_pmc_keyed_int(INTERP, new_tuple, NS_slot_ns, value);
@@ -651,7 +643,7 @@ Returns the name of the namespace as an array of strings.
         while (ns) {
             Parrot_NameSpace_attributes *nsinfo = PARROT_NAMESPACE(ns);
             VTABLE_unshift_string(INTERP, ar, nsinfo->name);
-            ns = PMC_pmc_val(ns);
+            ns = nsinfo->parent;
             elements++;
         }
 
@@ -932,7 +924,7 @@ Return the parent NameSpace or PMCNULL, if none.
 */
 
     METHOD get_parent() {
-        PMC *parent = PMC_pmc_val(SELF) ? PMC_pmc_val(SELF) : PMCNULL;
+        PMC *parent = PARROT_NAMESPACE(SELF)->parent ? PARROT_NAMESPACE(SELF)->parent : PMCNULL;
         RETURN(PMC *parent);
     }
 

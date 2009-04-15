@@ -36,12 +36,24 @@ sub pre_method_gen {
             }
         );
 
-        # don't return anything, ever
-        my $output = <<"EOC";
+        # take care to mark the parameters as unused
+        # to avoid compiler warnings
+        my $body = <<"EOC";
+    UNUSED(interp)
+    UNUSED(pmc)
+EOC
+
+        foreach my $param (split /,\s*/, $method->parameters) {
+            $param =~ s/.*\b(\w+)/$1/;
+            $body .= "    UNUSED($param)\n";
+        }
+        $body .= <<"EOC";
+
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NULL_REG_ACCESS,
         "Null PMC access in $vt_method_name()");
 EOC
-        $new_default_method->body( Parrot::Pmc2c::Emitter->text($output) );
+
+        $new_default_method->body( Parrot::Pmc2c::Emitter->text($body) );
         $self->add_method($new_default_method);
     }
     return 1;

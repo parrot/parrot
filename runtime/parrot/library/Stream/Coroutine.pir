@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Stream::Base - Stream library base class

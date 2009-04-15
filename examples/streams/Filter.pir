@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Filter Example
 
 This example shows the usage of C<Stream::Filter>.

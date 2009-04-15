@@ -1,3 +1,5 @@
+# $Id$
+
 =head1
 
 C<sprintf> is a function common to most programmers as part of the C

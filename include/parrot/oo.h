@@ -25,10 +25,7 @@ typedef enum {
 } PARROT_CLASS_DATA_ENUM;
 
 
-/* Objects, classes and PMCarrays all use the same data scheme:
- * PMC_data() holds a malloced array, PMC_int_val() is the size of it
- * this simplifies the GC mark phase a lot
- *
+/*
  * The active destroy flag is necessary to free the malloced array.
  */
 #define SLOTTYPE PMC*
@@ -38,13 +35,6 @@ typedef enum {
         GC_WRITE_BARRIER(interp, (o), ((PMC **)(x))[y], (z)); \
         ((PMC **)(x))[(y)] = (z); \
     } while (0)
-#define set_attrib_flags(x) do { \
-        PObj_active_destroy_SET(x); \
-    } while (0)
-#define set_attrib_array_size(o, y) do { \
-    PMC_data(o) = mem_sys_allocate_zeroed((sizeof (PMC *)*(y))); \
-    PMC_int_val(o) = (y); \
-} while (0)
 
 /*
  * class macros

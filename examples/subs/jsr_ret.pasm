@@ -45,3 +45,8 @@ SUB_2:      print "Entered subroutine SUB_2.\n"
             print "Returning from subroutine SUB_2.\n"
             ret
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

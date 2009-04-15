@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 PGE::Dumper - various methods for displaying PGE structures

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Title
 
 PGE::Hs - Match and display PGE rules as Haskell expressions

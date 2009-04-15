@@ -202,7 +202,7 @@ BEGIN {
         source => {
             c   => { file_exts => ['c'] },
             pmc => { file_exts => ['pmc'] },
-            pir => { file_exts => ['pir', 't'] },
+            pir => { file_exts => ['pir', 'pasm', 't'] },
             ops => { file_exts => ['ops'] },
             lex => {
                 file_exts   => ['l'],
@@ -589,7 +589,8 @@ sub is_pir {
     return 0 unless -f $filename;
 
     # .pir files should always be tested
-    return 1 if $filename =~ /\.pir$/;
+    return 1 if $filename =~ /\.(?:pir|pasm)$/;
+    return 1 if $filename =~ /_(?:pir|pasm)\.in$/;
 
     # test files (.t) files might need testing.
     # ignore everything else.

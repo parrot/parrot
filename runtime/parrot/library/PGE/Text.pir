@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 PGE::Text - rules for extracting delimited text sequences from strings

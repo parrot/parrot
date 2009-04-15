@@ -1,3 +1,5 @@
+# $Id$
+
 # the substr JaPH
     set S0, "Hacker\n"
     set S1, "Parrot "
@@ -10,5 +12,11 @@
     set I3, 3
     bsr I3
     end
-	print S3
+    print S3
     ret
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

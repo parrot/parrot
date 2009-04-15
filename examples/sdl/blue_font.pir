@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 blue_font.pir - draw a friendly message to the screen

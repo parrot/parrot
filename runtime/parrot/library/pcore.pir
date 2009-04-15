@@ -1,3 +1,4 @@
+# $Id$
 # create/export some useful but rarely used methods
 
 # TODO podify & beautify & doc

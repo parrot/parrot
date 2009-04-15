@@ -1,3 +1,5 @@
+# $Id$
+
 .sub __library_data_dumper_onload :load
     .local pmc yd_class
     yd_class = get_class "YAML::Dumper"

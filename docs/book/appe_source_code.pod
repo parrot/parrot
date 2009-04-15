@@ -1,0 +1,67 @@
+=pod
+
+=head3 Use the source
+
+X<Parrot;source code>
+The second step to participating in Parrot development is to get a
+copy of the source code. If you just want to try it out--experiment
+with a few features and see how it feels--the best option is to
+download the most recent point release for your system. Point releases
+are usually packaged up for easy download and install for various
+platforms, including Windows, Debian, and Redhat. Point releases are
+available from U<http://www.parrot.org/download>.
+
+If you plan to get involved in development, you'll want to check out
+the source from the subversion repository directly. Anyone can get
+anonymous access to read the files and download a working copy to
+explore and test. For commit access, volunteers need a
+U<https://trac.parrot.org> username, and need to be approved by a
+Metacommitter. To download the most recent version from SVN, type this
+command into your terminal N<This is for Linux users, on Mac or
+Windows systems, follow the instructions from your SVN client>:
+
+  svn co https://svn.parrot.org/parrot/trunk parrot
+
+There's also a web interface for viewing files in the repository at
+U<http://svn.parrot.org/parrot/>. 
+
+The repository is large and complex, so it's worth taking a little bit
+of time to explore. The code changes constantly, but most files and
+functions have informative descriptions to help keep track of things.
+
+The most important top-level directory is F<docs/>.  The content isn't
+always up to date, but it is a good place to start. F<parrot.pod>
+provides a quick overview of what's in each documentation file. If you're
+a capable writer and know a thing or two about how Parrot works, the
+documentation is a great place to start contributing. This book that
+you're reading right now was created in F<docs/book/> by ordinary
+contributors. Most other documentation files found here are parsed and
+converted to HTML for display at U<http://www.parrot.org>.
+
+There are a number of existing language implementations for Parrot:
+Perl 6, Python ("Pynie"), Ruby ("Cardinal"), PHP ("Pipp"), Lisp, Lua,
+Tcl ("partcl"), WMLScript, Forth, Scheme, Befunge, BASIC, and many
+others. These language compilers are in various stages of partial
+completion. The page L<https://trac.parrot.org/parrot/wiki/Languages>
+provides meta information on these languages and where to find them.
+If you have a language you're particularly interested to see implemented
+on Parrot, you can see how far along the effort is, or you can start the
+work to implement it yourself. We'll talk more about creating new
+compilers in Chapter 10: High-Level Languages, if you're interested.
+
+The F<lib/> directory contains Perl 5 classes currently used in
+developing, building, and testing Parrot. The F<src/pmc/> directory
+contains the C source code for Parrot classes (PMCs, which you'll read
+more about in Chapter 11).
+
+Most Parrot development happens in F<src/> for the C source code, and
+F<include/parrot/> for the C development header files.
+
+Libraries for use by programs running on Parrot are found in F<runtime/>.
+
+The F<examples/> directory contains some example Parrot PIR and Assembly
+code, as well as benchmarks. More discussions about these topics will be
+found in Chapter 3, Chapter 5, and Chapter 7
+respectively.
+
+=cut

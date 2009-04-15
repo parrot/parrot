@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Class - Parrot extension for objecty testing of modules

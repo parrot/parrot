@@ -1,6 +1,6 @@
 =pod
 
-=head0 Parrot Assembly Language
+=head1 Parrot Assembly Language
 
 Z<CHP-5>
 
@@ -32,7 +32,7 @@ a disassembler program. PIR code is basically just a thin wrapper over
 PASM, and you can write PASM code seamlessly in PIR files. It's always
 around, and it's good to be familiar with it.
 
-=head1 Basics
+=head2 Basics
 
 Z<CHP-5-SECT-2>
 
@@ -94,12 +94,12 @@ a C<=cut> marker signals the end of a POD block.
 
 =begin PASM
 
-=head1
+  =head2
 
   This is POD documentation, and is treated like a
   comment. The PASM interpreter ignores this.
 
-=cut
+  =cut
 
 =end PASM
 
@@ -113,7 +113,7 @@ which is the same in PIR:
 
 =end PASM
 
-=head2 Constants
+=head3 Constants
 
 Z<CHP-5-SECT-2.1>
 
@@ -161,7 +161,7 @@ C<\r> (return), C<\f> (form feed), C<\\> (literal slash), C<\">
 
 =end PASM
 
-=head2 Working with Registers
+=head3 Working with Registers
 
 Z<CHP-5-SECT-2.2>
 
@@ -202,7 +202,7 @@ use either form, but we still recommend using the C<$> form so you don't
 have to worry about register allocations (and associated performance
 penalties) yourself.
 
-=head3 Register assignment
+=head4 Register assignment
 
 Z<CHP-5-SECT-2.2.1>
 
@@ -227,6 +227,7 @@ type:
 
   exchange I1, I0   # set register I1 to what I0 contains
                     # and set register I0 to what I1 contains
+
 =end PASM
 
 As we mentioned before, string and PMC registers are slightly
@@ -287,10 +288,10 @@ C<P0> is assigned to C<P1>:
 it copies the pointer, so C<P1> and C<P0> are both aliases to the same
 PMC. Then, assigning the string "Zaphod" to C<P0> changes the
 underlying PMC, so printing C<P1> or C<P0> prints "Zaphod".N<Contrast
-this with C<assign> in A<-CHP-5-SECT-3.2>"PMC Assignment" later in
+this with C<assign> in "PMC Assignment" later in
 this chapter.>
 
-=head3 PMC object types
+=head4 PMC object types
 
 Z<CHP-5-SECT-2.2.2>
 
@@ -325,11 +326,11 @@ default functionality, but mainly throws exceptions when the default
 variant of a method is called (meaning the subclass didn't define the
 method).
 
-=head3 Autoboxing
+=head4 Autoboxing
 
 Z<CHP-5-SECT-2.2.3>
 
-X<Auboboxing>
+X<Autoboxing>
 As we've seen in the previous chapters about PIR, we can convert between
 primitive string, integer, and number types and PMCs. PIR used the C<=>
 operator to make these conversions. PASM doesn't have any symbolic operators
@@ -362,7 +363,7 @@ to C<Integer>. This behavior only works for the wrapper PMC types for the
 primitive values string, int, and num. Other PMC classes will have different
 behaviors when you try to assign a primitive value to them.
 
-=head2 Math Operations
+=head3 Math Operations
 
 Z<CHP-5-SECT-2.3>
 
@@ -422,10 +423,10 @@ determined by the PMC.  A class implementing imaginary number
 operations might return an imaginary number, for example.
 
 We won't list every math opcode here, but we'll list some of the most
-common ones. You can get a complete list in A<CHP-11-SECT-1>"PASM
+common ones. You can get a complete list in "PASM
 Opcodes" in Chapter 11.
 
-=head3 Unary math opcodes
+=head4 Unary math opcodes
 
 Z<CHP-5-SECT-2.3.1>
 
@@ -443,7 +444,7 @@ most common unary math opcodes are C<inc> (increment), C<dec>
 
 =end PASM
 
-=head3 Binary math opcodes
+=head4 Binary math opcodes
 
 Z<CHP-5-SECT-2.3.2>
 
@@ -468,7 +469,7 @@ multiple).
 
 =end PASM
 
-=head3 Floating-point operations
+=head4 Floating-point operations
 
 Z<CHP-5-SECT-2.3.3>
 
@@ -507,7 +508,7 @@ variant that implements C's C<atan2()>:
 
 =end PASM
 
-=head2 Working with Strings
+=head3 Working with Strings
 
 Z<CHP-5-SECT-2.4>
 
@@ -516,7 +517,7 @@ String operations work with string registers and with PMCs that implement a
 string class. String operations on PMC registers require all their string
 arguments to be String PMCs.
 
-=head3 Concatenating strings
+=head4 Concatenating strings
 
 Z<CHP-5-SECT-2.4.1>
 
@@ -566,7 +567,7 @@ separate registers for source and destination:
 Here, C<concat> concatenates the strings in C<P0> and C<P1> and stores
 the result in C<P2>.
 
-=head3 Repeating strings
+=head4 Repeating strings
 
 Z<CHP-5-SECT-2.4.2>
 
@@ -587,7 +588,7 @@ number of times:
 In this example, C<repeat> generates a new string with "x" repeated
 five times and stores a pointer to it in C<S1>.
 
-=head3 Length of a string
+=head4 Length of a string
 
 Z<CHP-5-SECT-2.4.3>
 
@@ -608,7 +609,7 @@ for multibyte encoded strings:
 
 C<length> doesn't have an equivalent for PMC strings.
 
-=head3 Substrings
+=head4 Substrings
 
 Z<CHP-5-SECT-2.4.4>
 
@@ -675,7 +676,7 @@ returning the removed substring.
 
 The PMC versions of C<substr> are not yet implemented.
 
-=head3 Chopping strings
+=head4 Chopping strings
 
 Z<CHP-5-SECT-2.4.5>
 
@@ -722,7 +723,7 @@ untouched:
 
 =end PASM
 
-=head3 Copying strings
+=head4 Copying strings
 
 Z<CHP-5-SECT-2.4.6>
 
@@ -754,7 +755,7 @@ created when the copy is assigned a new value. Cloning is rarely
 needed with ordinary string registers since they always create a new
 memory location on assignment.
 
-=head3 Converting characters
+=head4 Converting characters
 
 Z<CHP-5-SECT-2.4.7>
 
@@ -791,7 +792,7 @@ the last character.
 
 =end PASM
 
-=head3 Formatting strings
+=head4 Formatting strings
 
 Z<CHP-5-SECT-2.4.8>
 
@@ -815,7 +816,7 @@ but with some extensions for Parrot data types. Each format field in
 the string starts with a C<%>
 X<% (percent sign);% format strings for sprintf opcode (PASM)> and
 ends with a character specifying the output format. The output format
-characters are listed in A<CHP-5-TABLE-1>Table 5-1.
+characters are listed in Table 5-1.
 
 =begin table picture Format characters
 
@@ -933,7 +934,7 @@ whichever fits best.
 
 Each format field can be specified with several options: R<flags>,
 R<width>, R<precision>, and R<size>. The format flags are listed in
-A<CHP-5-TABLE-2>Table 5-2.
+Table 5-2.
 
 =begin table picture Format flags
 
@@ -988,7 +989,7 @@ If either R<width> or R<precision> is an asterisk (C<*>), it takes its
 value from the next argument in the PMC.
 
 The R<size> modifier defines the type of the argument the field takes.
-The flags are listed in A<CHP-5-TABLE-3>Table 5-3.
+The flags are listed in Table 5-3.
 
 =begin table picture Size flags
 
@@ -1081,7 +1082,7 @@ a minimum of two whole digits and a maximum of three decimal places
 The test files F<t/op/string.t> and F<t/src/sprintf.t> have many more
 examples of format strings.
 
-=head3 Testing for substrings
+=head4 Testing for substrings
 
 Z<CHP-5-SECT-2.4.9>
 
@@ -1119,7 +1120,7 @@ This finds the second "eb" in "Beeblebrox" instead of the first,
 because the search skips the first three characters in the
 string.
 
-=head3 Joining strings
+=head4 Joining strings
 
 The C<join> opcode joins the elements of an array PMC into a single
 string. The second argument separates the individual elements of the
@@ -1136,13 +1137,14 @@ PMC in the final string result.
   join S0, "__", P0
   print S0              # prints "hi__0__1__0__parrot"
   end
+
 =end PASM
 
 This example builds a C<Array> in C<P0> with the values C<"hi">,
 C<0>, C<1>, C<0>, and C<"parrot">. It then joins those values (separated
 by the string C<"__">) into a single string, and stores it in C<S0>.
 
-=head3 Splitting strings
+=head4 Splitting strings
 
 Splitting a string yields a new array containing the resulting
 substrings of the original string.
@@ -1164,7 +1166,7 @@ third elements of the array. For now, the split pattern (the second
 argument to the opcode) is ignored except for a test to make sure that
 its length is zero.
 
-=head2 Logical and Bitwise Operations
+=head3 Logical and Bitwise Operations
 
 Z<CHP-5-SECT-2.6>
 
@@ -1280,7 +1282,7 @@ specified number of bits:
 
 =end PASM
 
-=head1 Working with PMCs
+=head2 Working with PMCs
 
 Z<CHP-5-SECT-3>
 
@@ -1290,7 +1292,7 @@ integers, numbers, and strings. They wouldn't be terribly useful if
 that's all they did, though. PMCs offer several advanced features,
 each with its own set of operations.
 
-=head2 Aggregates
+=head3 Aggregates
 
 Z<CHP-5-SECT-3.1>
 
@@ -1306,7 +1308,7 @@ aggregates already in operation are arrays and hashes. Any aggregate
 defined for any language could take advantage of the features
 described here.
 
-=head3 Arrays
+=head4 Arrays
 
 Z<CHP-5-SECT-3.1.1>
 
@@ -1353,9 +1355,9 @@ elements stored in the array.
 
 Some other useful instructions for working with arrays are C<push>,
 C<pop>, C<shift>, and C<unshift> (you'll find them in
-A<CHP-11-SECT-1>"PASM Opcodes" in Chapter 11).
+"PASM Opcodes" in Chapter 11).
 
-=head3 Hashes
+=head4 Hashes
 
 Z<CHP-5-SECT-3.1.2>
 
@@ -1391,7 +1393,7 @@ itself is true or false, only that the key has been set:
 The C<delete>X<delete opcode (PASM)> opcode is also useful for working
 with hashes: it removes a key/value pair.
 
-=head3 Iterators
+=head4 Iterators
 
 Z<CHP-5-SECT-3.1.3>
 
@@ -1457,7 +1459,7 @@ since they don't define any order for their keys.
 
 =end PASM
 
-=head3 Data structures
+=head4 Data structures
 
 Z<CHP-5-SECT-3.1.4>
 
@@ -1495,7 +1497,7 @@ within the hash. You can also set a value using a complex key:
 The individual keys are integers or strings, or registers with integer
 or string values.
 
-=head2 PMC Assignment
+=head3 PMC Assignment
 
 Z<CHP-5-SECT-3.2>
 
@@ -1531,7 +1533,7 @@ register for C<assign> must have an existing object of the right type
 in it, since C<assign> doesn't create a new object (as with C<clone>)
 or reuse the source object (as with C<set>).
 
-=head2 Properties
+=head3 Properties
 
 Z<CHP-5-SECT-3.3>
 
@@ -1593,7 +1595,7 @@ C<prophash>X<prophash opcode (PASM)>.
 
 =end PASM
 
-=head1 Flow Control
+=head2 Flow Control
 
 Z<CHP-5-SECT-4>
 
@@ -1648,7 +1650,7 @@ first run loop) stops the interpreter. Without the C<end> statement,
 execution just falls off the end of the bytecode segment, with a good
 chance of crashing the interpreter.
 
-=head2 Conditional Branches
+=head3 Conditional Branches
 
 Z<CHP-5-SECT-4.1>
 
@@ -1736,7 +1738,7 @@ actually the same object (have the same address):
 
 =end PASM
 
-=head2 Iteration
+=head3 Iteration
 
 Z<CHP-5-SECT-4.2>
 
@@ -1807,7 +1809,7 @@ complex than it needs to be just to count to 10, but it nicely shows
 the major components of a
 loop.
 
-=head1 Lexicals and Globals
+=head2 Lexicals and Globals
 
 Z<CHP-5-SECT-6>
 
@@ -1827,7 +1829,7 @@ values. PASM provides instructions for storing and retrieving
 variables from these structures so the PASM opcodes can operate on
 their values.
 
-=head2 Globals
+=head3 Globals
 
 Z<CHP-5-SECT-6.1>
 
@@ -1899,7 +1901,7 @@ Eventually the global opcodes will have variants that take a PMC to
 specify the namespace, but the design and implementation of these
 aren't finished yet.
 
-=head2 Lexicals
+=head3 Lexicals
 
 Z<CHP-5-SECT-6.2>
 
@@ -1908,7 +1910,7 @@ Lexical variables are stored in a lexical scratchpad. There's one pad
 for each lexical scope. Every pad has both a hash and an array, so
 elements can be stored either by name or by numeric index.
 
-=head3 Basic instructions
+=head4 Basic instructions
 
 Z<CHP-5-SECT-6.2.1>
 
@@ -1928,7 +1930,7 @@ Likewise, use C<find_lex> to retrieve a variable from the current pad.
 
 =end PASM
 
-=head1 Subroutines
+=head2 Subroutines
 
 Z<CHP-5-SECT-7>
 
@@ -1974,7 +1976,7 @@ opcode (PASM)> opcode:
 
 =end PASM
 
-=head2 Calling Conventions
+=head3 Calling Conventions
 
 Z<CHP-5-SECT-7.1>
 
@@ -1990,7 +1992,7 @@ possible. You've seen how many ways Parrot has of storing values. The
 critical point is that the caller and the called subroutine have to
 agree on all the answers.
 
-=head3 Parrot calling conventions
+=head4 Parrot calling conventions
 
 Z<CHP-5-SECT-7.1.2>
 
@@ -2015,7 +2017,7 @@ as Continuation Passing Style (CPS).
 X<CPS (Continuation Passing Style)>
 X<Continuation Passing Style (CPS)>
 
-=head2 Native Call Interface
+=head3 Native Call Interface
 
 Z<CHP-5-SECT-7.2>
 
@@ -2026,7 +2028,7 @@ subroutines with a known prototype in shared libraries. This is not
 really portable across all libraries, but it's worth a short example.
 This is a simplified version of the first test in F<t/pmc/nci.t>:
 
-=begin PASM TODO
+=begin PASM
 
     loadlib P1, "libnci"          # get library object for a shared lib
     print "loaded\n"
@@ -2041,7 +2043,7 @@ This is a simplified version of the first test in F<t/pmc/nci.t>:
   nok_1:
     #...
 
-=end PASM TODO
+=end PASM
 
 This example shows two new instructions: C<loadlib> and C<dlfunc>. The
 C<loadlib>X<loadlib opcode (PASM)> opcode obtains a handle for a shared
@@ -2057,7 +2059,7 @@ argument) with a known function signature (fourth argument). The
 function signature is a string where the first character is the return
 value and the rest of the parameters are the function parameters. The
 characters used in X<NCI (Native Call Interface);function signatures>
-NCI function signatures are listed in A<CHP-5-TABLE-5>Table 5-5.
+NCI function signatures are listed in Table 5-5.
 
 =begin table picture Function signature letters
 
@@ -2192,7 +2194,7 @@ Z<CHP-5-TABLE-5>
 For more information on callback functions, read the documentation in
 F<docs/pdds/pdd16_native_call.pod> and F<docs/pmc/struct.pod>.
 
-=head2 Coroutines
+=head3 Coroutines
 
 Z<CHP-5-SECT-7.4>
 
@@ -2205,11 +2207,11 @@ left.
 X<coroutines>
 In PASM, coroutines are subroutine-like objects:
 
-=begin PASM TODO
+=begin PASM
 
   newsub P0, .Coroutine, _co_entry
 
-=end PASM TODO
+=end PASM
 
 The C<Coroutine> object has its own user stack, register frame stacks,
 control stack, and pad stack. The pad stack is inherited from the
@@ -2219,7 +2221,7 @@ it returns to the caller and restores the caller's context (basically
 swapping all stacks). The next time the coroutine is invoked, it
 continues to execute from the point at which it previously returned:
 
-=begin PASM TODO
+=begin PASM
 
     new_pad 0                # push a new lexical pad on stack
     new P0, "Int"            # save one variable in it
@@ -2251,7 +2253,7 @@ continues to execute from the point at which it previously returned:
     print "again "
     branch _cor              # next invocation of the coroutine
 
-=end PASM TODO
+=end PASM
 
 This prints out the result:
 
@@ -2273,7 +2275,7 @@ C<saveall> but it could have only stored the registers the coroutine
 actually used. Saving off the registers like this works because
 coroutines have their own register frame stacks.
 
-=head2 Continuations
+=head3 Continuations
 
 Z<CHP-5-SECT-7.5>
 
@@ -2283,7 +2285,7 @@ A continuation is a subroutine that gets a complete copy of the
 caller's context, including its own copy of the call stack. Invoking a
 continuation starts or restarts it at the entry point:
 
-=begin PASM XXX
+=begin PASM
 
     new P1, "Int"
     set P1, 5
@@ -2300,7 +2302,7 @@ continuation starts or restarts it at the entry point:
     print "done\n"
     end
 
-=end PASM XXX
+=end PASM
 
 This prints:
 
@@ -2311,7 +2313,7 @@ This prints:
   in cont 1
   done
 
-=head2 Evaluating a Code String
+=head3 Evaluating a Code String
 
 Z<CHP-5-SECT-7.6>
 
@@ -2339,7 +2341,7 @@ compiled.
 This example places a bytecode segment object into the destination
 register C<P0> and then invokes it with C<invoke>:
 
-=begin PASM TODO
+=begin PASM
 
   compreg P1, "PASM1"                # get compiler
   set S1, "in eval\n"
@@ -2348,7 +2350,7 @@ register C<P0> and then invokes it with C<invoke>:
   print "back again\n"
   end
 
-=end PASM TODO
+=end PASM
 
 You can register a compiler or assembler for any language inside the
 Parrot core and use it to compile and invoke code from that language.
@@ -2365,7 +2367,7 @@ object C<P10> as a compiler for the language "MyLanguage". See
 F<examples/compilers> and F<examples/japh/japh16.pasm> for an external
 compiler in a shared library.
 
-=head1 Exceptions and Exception Handlers
+=head2 Exceptions and Exception Handlers
 
 Z<CHP-5-SECT-8>
 
@@ -2391,7 +2393,7 @@ opcode. The system calls the installed exception handler only when an
 exception is thrown (perhaps because of code that does division by
 zero or attempts to retrieve a global that wasn't stored.)
 
-=begin PASM TODO
+=begin PASM
 
     newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # push handler on control stack
@@ -2404,7 +2406,7 @@ zero or attempts to retrieve a global that wasn't stored.)
     is_null P10, not_found      # test P10
     #...
 
-=end PASM TODO
+=end PASM
 
 This example creates a new exception handler subroutine with the
 C<newsub> opcode and installs it on the control stack with the
@@ -2459,7 +2461,7 @@ Since the return addresses of C<bsr> subroutine calls and exception
 handlers are both pushed onto the control stack, it's generally a bad
 idea to combine the two.
 
-=head1 Events
+=head2 Events
 
 Z<CHP-5-SECT-9>
 
@@ -2479,7 +2481,7 @@ of code or a user-defined event handler subroutine.
 Events are still experimental in Parrot, so the implementation and
 design is subject to change.
 
-=head2 Timers
+=head3 Timers
 
 Z<CHP-5-SECT-9.1>
 
@@ -2490,7 +2492,7 @@ of a timer is limited by the OS Parrot runs on, but it is always more
 fine-grained then a whole second. The final syntax isn't yet fixed, so
 please consult the documentation for examples.
 
-=head2 Signals
+=head3 Signals
 
 Z<CHP-5-SECT-9.2>
 
@@ -2499,7 +2501,7 @@ needs to handle from the OS, it converts that signal into an event and
 broadcasts it to all running threads. Each thread independently
 decides if it's interested in this signal and, if so, how to respond to it.
 
-=begin PASM TODO
+=begin PASM
 
     newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # establish signal handler
@@ -2517,7 +2519,7 @@ decides if it's interested in this signal and, if so, how to respond to it.
   nok:
     end
 
-=end PASM TODO
+=end PASM
 
 This example creates a signal handler and pushes it on to the control
 stack. It then prompts the user to send a C<SIGINT> from the shell
@@ -2528,7 +2530,7 @@ SIGINT, the signal handler catches it, prints out "caught SIGINT" and
 ends.N<Currently, only Linux installs a C<SIGINT> C<sigaction>
 handler, so this example won't work on other platforms.>
 
-=head1 Threads
+=head2 Threads
 
 Z<CHP-5-SECT-10>
 
@@ -2562,7 +2564,7 @@ threads. This is only a simple example to illustrate threads, not a typical
 usage of threads (no-one really wants to spawn two threads just to print out a
 simple string).
 
-=begin PASM TODO
+=begin PASM
 
     get_global P5, "_th1"              # locate thread function
     new P2, "ParrotThread"              # create a new thread
@@ -2605,13 +2607,13 @@ simple string).
     if S0, w2                           # the other thread will run
     invoke P1                           # done with string
 
-=end PASM TODO
+=end PASM
 
 This example creates a C<ParrotThread> object and calls its C<thread3>
 method, passing three arguments: a PMC for the C<_th1> subroutine in
 C<P5>, a string argument in C<P6>, and a C<TQueue> object in C<P7>
 containing a single integer. Remember from the earlier section
-A<CHP-5-SECT-7.1.3>"Parrot calling conventions" that registers 5-15
+"Parrot calling conventions" that registers 5-15
 hold the arguments for a subroutine or method call and C<I3> stores
 the number of arguments. The thread object is passed in C<P2>.
 
@@ -2669,7 +2671,7 @@ method belongs to the C<ParrotThread> class. When it's called on a
 C<ParrotThread> object, the calling code waits until the thread
 terminates.
 
-=begin PASM TODO
+=begin PASM
 
     new P2, "ParrotThread"      # create a new thread
     set I5, P2                  # get thread ID
@@ -2678,12 +2680,12 @@ terminates.
     invoke                      # ...and join (wait for) the thread
     set P16, P5                 # the return result of the thread
 
-=end PASM TODO
+=end PASM
 
 C<kill> and C<detach> are interpreter methods, so you have to grab the
 current interpreter object before you can look up the method object.
 
-=begin PASM TODO
+=begin PASM
 
     set I5, P2                  # get thread ID of thread P2
     getinterp P3                # get this interpreter object
@@ -2693,13 +2695,13 @@ current interpreter object before you can look up the method object.
     find_method P0, P3, "detach"
     invoke                      # detach thread with ID I5
 
-=end PASM TODO
+=end PASM
 
 By the time you read this, some of these combinations of statements
 and much of the threading syntax above may be reduced to a simpler set
 of opcodes.
 
-=head1 Loading Bytecode
+=head2 Loading Bytecode
 
 Z<CHP-5-SECT-11>
 
@@ -2709,14 +2711,14 @@ The C<load_bytecode>X<load_bytecode opcode (PASM)> opcode takes a single
 argument: the name of the bytecode file to load. So, if you create a
 file named F<file.pasm> containing a single subroutine:
 
-=begin PASM TODO
+=begin PASM
 
   # file.pasm
   .sub _sub2:               # .sub stores a global sub
      print "in sub2\n"
      invoke P1
 
-=end PASM TODO
+=end PASM
 
 and compile it to bytecode using the C<-o> command-line switch:
 
@@ -2725,7 +2727,7 @@ and compile it to bytecode using the C<-o> command-line switch:
 You can then load the compiled bytecode into F<main.pasm> and directly
 call the subroutine defined in F<file.pasm>:
 
-=begin PASM TODO
+=begin PASM
 
   # main.pasm
   main:
@@ -2734,12 +2736,12 @@ call the subroutine defined in F<file.pasm>:
     invokecc
     end
 
-=end PASM TODO
+=end PASM
 
 The C<load_bytecode> opcode also works with source files, as long as
 Parrot has a compiler registered for that type of file:
 
-=begin PASM TODO
+=begin PASM
 
   # main2.pasm
   main:
@@ -2748,14 +2750,14 @@ Parrot has a compiler registered for that type of file:
     invokecc
     end
 
-=end PASM TODO
+=end PASM
 
 Subroutines marked with C<:load> run as soon as they're loaded (before
 C<load_bytecode> returns), rather than waiting to be called. A
 subroutine marked with C<:main> will always run first, no matter what
 name you give it or where you define it in the file.
 
-=begin PASM TODO
+=begin PASM
 
   # file3.pasm
   .sub :load                    # mark the sub as to be run
@@ -2773,7 +2775,7 @@ name you give it or where you define it in the file.
     print "back\n"
     end
 
-=end PASM TODO
+=end PASM
 
 This example uses both C<:load> and C<:main>. Because the C<main>
 subroutine is defined with C<:main> it will execute first even though
@@ -2786,7 +2788,7 @@ before C<load_bytecode> returns, so the final output is:
   file3
   back
 
-=head1 Classes and Objects
+=head2 Classes and Objects
 
 Z<CHP-5-SECT-12>
 
@@ -2794,7 +2796,7 @@ This section revolves around one complete example that defines a
 class, instantiates objects, and uses them. The whole example is
 included at the end of the section.
 
-=head2 Class declaration
+=head3 Class declaration
 
 Z<CHP-5-SECT-12.1>
 
@@ -2815,17 +2817,17 @@ To instantiate a new object of a particular class, you first look up
 the integer value for the class type with the C<find_type> opcode,
 then create an object of that type with the C<new> opcode:
 
-=begin PASM TODO
+=begin PASM
 
     find_type I1, "Foo"
     new P3I I1
 
-=end PASM TODO
+=end PASM
 
 The C<new> opcode also checks to see if the class defines a
 method named "__init" and calls it if it exists.
 
-=head2 Attributes
+=head3 Attributes
 
 Z<CHP-5-SECT-12.2>
 
@@ -2846,13 +2848,13 @@ from the C<__init> method looks up the position of the first
 attribute, creates a C<Int> PMC, and stores it as the first
 attribute:
 
-=begin PASM TODO
+=begin PASM
 
     classoffset I0, P2, "Foo"     # first "Foo" attribute of object P2
     new P6, "Int"                 # create storage for the attribute
     setattribute P2, I0, P6       # store the first attribute
 
-=end PASM TODO
+=end PASM
 
 The C<classoffset> opcodeX<classoffset opcode (PASM)> takes a PMC
 containing an object and the name of its class, and returns an integer
@@ -2862,13 +2864,13 @@ object's attribute slots. This example initializes the first
 attribute. The second attribute would be at C<I0 + 1>, the third
 attribute at C<I0 + 2>, etc:
 
-=begin PASM TODO
+=begin PASM
 
     inc I0
     setattribute P2, I0, P7       # store next attribute
     #...
 
-=end PASM TODO
+=end PASM
 
 There is also support for named parameters with fully qualified
 parameter names (although this is a little bit slower than getting
@@ -2885,12 +2887,12 @@ You use the same integer index to retrieve the value of an attribute.
 The C<getattribute>X<getattribute opcode (PASM)> opcode takes an object and
 an index as arguments and returns the attribute PMC at that position:
 
-=begin PASM TODO
+=begin PASM
 
     classoffset I0, P2, "Foo"         # first "Foo" attribute of object P2
     getattribute P10, P2, I0          # indexed get of attribute
 
-=end PASM TODO
+=end PASM
 
 or
 
@@ -2905,14 +2907,14 @@ C<getattribute> and then assign to the returned PMC. Because PMC
 registers are only pointers to values, you don't need to store the PMC
 again after you modify its value:
 
-=begin PASM TODO
+=begin PASM
 
     getattribute P10, P2, I0
     set P10, I5
 
-=end PASM TODO
+=end PASM
 
-=head2 Methods
+=head3 Methods
 
 Z<CHP-5-SECT-12.3>
 
@@ -2923,7 +2925,7 @@ Methods in PASM are just subroutines installed in the namespace of the
 class. You define a method with the C<.pcc_sub> directive before the
 label:
 
-=begin PASM TODO
+=begin PASM
 
   .pcc_sub _half:                 # I5 = self."_half"()
     classoffset I0, P2, "Foo"
@@ -2932,7 +2934,7 @@ label:
     div I5, 2
     invoke P1
 
-=end PASM TODO
+=end PASM
 
 This routine returns half of the value of the first attribute of the
 object. Method calls use the Parrot calling conventions so they always
@@ -2959,7 +2961,7 @@ adds one bit of magic, though. If you pass the name of the method in
 C<S0>, C<callmethodcc> looks up that method name in the invocant
 object and stores the method object in C<P0> for you:
 
-=begin PASM TODO
+=begin PASM
 
     set S0, "_half"             # set method name
     set P2, P3                  # the object
@@ -2967,7 +2969,7 @@ object and stores the method object in C<P0> for you:
     print I5                    # result of method call
     print "\n"
 
-=end PASM TODO
+=end PASM
 
 The C<callmethodcc> opcode also generates a return continuation and
 stores it in C<P1>. The C<callmethod> opcode doesn't generate a return
@@ -2977,7 +2979,7 @@ registers you want to keep after a method call. Whether you store
 individual registers, register frames, or half register frames is up
 to you.
 
-=head3 Overriding vtable functions
+=head4 Overriding vtable functions
 
 Z<CHP-5-SECT-12.3.1>
 
@@ -2988,7 +2990,7 @@ double underscore "__". The following code defines a method named
 C<__init> in the C<Foo> class that initializes the first attribute of
 the object with an integer:
 
-=begin PASM TODO
+=begin PASM
 
   .sub __init:
     classoffset I0, P2, "Foo"     # lookup first attribute position
@@ -2996,19 +2998,19 @@ the object with an integer:
     setattribute P2, I0, P6       # store the first attribute
     invoke P1                     # return
 
-=end PASM TODO
+=end PASM
 
 Ordinary methods have to be called explicitly, but the vtable
 functions are called implicitly in many different contexts. Parrot
 saves and restores registers for you in these calls. The C<__init>
 method is called whenever a new object is constructed:
 
-=begin PASM TODO
+=begin PASM
 
     find_type I1, "Foo"
     new P3, I1          # call __init if it exists
 
-=end PASM TODO
+=end PASM
 
 A few other vtable functions in the complete code example for this
 section are C<__set_integer_native>, C<__add>, C<__get_integer>,
@@ -3025,7 +3027,7 @@ is a C<Foo> object and the source register is a native integer:
 The C<add> opcode calls Foo's C<__add> vtable function when it adds
 two C<Foo> objects:
 
-=begin PASM TODO
+=begin PASM
 
     new P4, I1          # same with P4
     set P4, 12
@@ -3033,7 +3035,7 @@ two C<Foo> objects:
 
     add P5, P3, P4      # __add method
 
-=end PASM TODO
+=end PASM
 
 The C<inc> opcode calls Foo's C<__increment> vtable function when it
 increments a C<Foo> object:
@@ -3056,7 +3058,7 @@ whenever an integer or string value is retrieved from a C<Foo> object:
 =end PASM
 
 
-=head2 Inheritance
+=head3 Inheritance
 
 Z<CHP-5-SECT-12.4>
 
@@ -3089,7 +3091,7 @@ the namespace of the subclass. The following code overrides Bar's
 C<__increment> method so it decrements the value instead of
 incrementing it:
 
-=begin PASM TODO
+=begin PASM
 
   .namespace [ "Bar" ]
 
@@ -3099,7 +3101,7 @@ incrementing it:
     dec P10                       # the evil line
     invoke P1
 
-=end PASM TODO
+=end PASM
 
 Notice that the attribute inherited from C<Foo> can only be looked up
 with the C<Foo> class name, not the C<Bar> class name. This preserves
@@ -3108,17 +3110,17 @@ inherited attributes.
 
 Object creation for subclasses is the same as for ordinary classes:
 
-=begin PASM TODO
+=begin PASM
 
     find_type I1, "Bar"
     new P5, I1
 
-=end PASM TODO
+=end PASM
 
 Calls to inherited methods are just like calls to methods defined in
 the class:
 
-=begin PASM TODO
+=begin PASM
 
     set P5, 42                  # inherited __set_integer_native
     inc P5                      # overridden __increment
@@ -3131,9 +3133,9 @@ the class:
     print I5
     print "\n"
 
-=end PASM TODO
+=end PASM
 
-=head2 Additional Object Opcodes
+=head3 Additional Object Opcodes
 
 Z<CHP-5-SECT-12.5>
 
@@ -3150,11 +3152,11 @@ an object has a particular method. Both return a true or false value.
 
 =end PASM
 
-=head2 Complete Example
+=head3 Complete Example
 
 Z<CHP-5-SECT-12.6>
- 
-=begin PASM TODO
+
+=begin PASM
 
     newclass P1, "Foo"
     addattribute P1, "$.i"                # Foo.i
@@ -3269,7 +3271,7 @@ Z<CHP-5-SECT-12.6>
     dec P10                       # the evil line
     invoke P1
 
-=end PASM TODO
+=end PASM
 
 This example prints out:
 

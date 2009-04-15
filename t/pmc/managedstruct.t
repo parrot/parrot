@@ -81,7 +81,7 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
     push $P2, 0
     new $P0, ['ManagedStruct'], $P2
     set $I0, $P0
-    $I1 = ge $I0, 2
+    $I1 = isge $I0, 2
     ok($I1, "ManagedStruct size is at least 2")
 
     set $P0[0;0], 1

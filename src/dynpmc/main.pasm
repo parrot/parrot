@@ -12,7 +12,7 @@
 _main:
 	loadlib P1, "subproxy"
 
-        # set up which Sub should eventually be called 
+        # set up which Sub should eventually be called
 	new P3, 'Key'
 	set P3, "src/dynpmc/ext.pir"	# file - FIXME path handling
 	new P4, 'Key'
@@ -27,3 +27,9 @@ _main:
 	invokecc P0
 	print "back\n"
 end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

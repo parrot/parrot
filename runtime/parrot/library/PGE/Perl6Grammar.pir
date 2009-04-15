@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Perl6Grammar - compiler for Perl 6 grammars

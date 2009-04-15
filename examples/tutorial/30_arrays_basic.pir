@@ -1,3 +1,5 @@
+# $Id$
+
 =head1
 
 PMC registers can contain instances of array or hash data types, or

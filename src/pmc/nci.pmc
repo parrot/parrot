@@ -171,6 +171,10 @@ Sets the specified function pointer and signature (C<*key>).
         PObj_flag_SET(private2, SELF);
     }
 
+    VTABLE void *get_pointer() {
+        return PARROT_NCI(SELF)->orig_func;
+    }
+
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         int                             jitted = 0;
@@ -260,7 +264,7 @@ Creates and returns a clone of the NCI.
         nci_info_ret->pcc_params_signature  = nci_info_self->pcc_params_signature;
         nci_info_ret->arity                 = nci_info_self->arity;
         nci_info_ret->jitted                = nci_info_self->jitted;
-        PObj_get_FLAGS(ret)    |= (PObj_get_FLAGS(SELF) & 0x7);
+        PObj_get_FLAGS(ret)                |= (PObj_get_FLAGS(SELF) & 0x7);
 
         return ret;
     }
@@ -312,13 +316,8 @@ shifted down.
 
             nci_jit_sub_t jit_func = (nci_jit_sub_t) D2FPTR(nci_info->func);
 
-            /* TT #365 - Some i386 jit code depends on this.  If t/pmc/nci.t
-             * passes without it, the next line is safe to remove. */
-            PMC_struct_val(SELF) = nci_info->orig_func;
-
             /* Parrot_eprintf(interp, "JITTED %S\n", nci_info->signature); */
-            jit_func(INTERP, SELF,
-                (char *) nci_info->pcc_params_signature->strstart);
+            jit_func(INTERP, SELF, (char *) nci_info->pcc_params_signature->strstart);
         }
         else {
             if (PObj_flag_TEST(private2, SELF)) {

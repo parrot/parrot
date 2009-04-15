@@ -1,4 +1,5 @@
 #!./parrot
+# $Id$
 #
 # Ack by Leopold Toetsch
 # Fib and Tak by Joshua Isom

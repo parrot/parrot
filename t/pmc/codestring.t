@@ -186,8 +186,8 @@ CODE
     is($I0, 0x266d, "MUSIC FLAT SIGN")
     $I0 = code.'charname_to_ord'('RECYCLING SYMBOL FOR TYPE-1 PLASTICS')
     is($I0, 0x2673, "RECYCLING SYMBOL FOR TYPE-1 PLASTICS")
-    $I0 = code.'charname_to_ord'('<no such symbol>')
-    is($I0, -1, '<no such symbol>')
+    $I0 = code.'charname_to_ord'('no such symbol')
+    is($I0, -1, 'no such symbol')
 .end
 
 .sub 'lineof_tests'

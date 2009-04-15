@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Loops
 
 PIR has no built-in looping structures such as C<for>, C<while>,

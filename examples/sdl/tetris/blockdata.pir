@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 blockdata.pir - a tetris block data class

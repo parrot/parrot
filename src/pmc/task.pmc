@@ -520,7 +520,7 @@ Called after the task has been thawed.
 
 */
 
-    void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(visit_info *info) {
         Parrot_Task_attributes * core_struct = PARROT_TASK(SELF);
 
         UNUSED(core_struct); /* TODO: Rebuild the task index. */

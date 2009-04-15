@@ -1,3 +1,5 @@
+# $Id$
+
 .namespace ['Pg']
 .sub __postgres_init :load
 

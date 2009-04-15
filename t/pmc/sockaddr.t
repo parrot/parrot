@@ -12,7 +12,7 @@ t/pmc/sockaddr.t - test the Sockaddr PMC
 
 =head1 DESCRIPTION
 
-Tests the SharedRef PMC.
+Test the Sockaddr PMC.
 
 =cut
 

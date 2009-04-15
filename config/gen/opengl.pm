@@ -1006,7 +1006,7 @@ $reg_funcs
 /* Make sure that interp and sub are sane before running callback sub */
 /* XXXX: Should this do the moral equivalent of PANIC? */
 int
-is_safe(PARROT_INTERP, PMC *sub)
+is_safe(SHIM_INTERP, PMC *sub)
 {
     /* XXXX: Verify that interp still exists */
 

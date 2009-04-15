@@ -35,6 +35,7 @@ RT #46641: PMCs extending Hash should probably register themselves.
 */
 
 static PMC *get_integer_pmc(PARROT_INTERP, INTVAL base_type) {
+    UNUSED(base_type)
     return pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Integer));
 }
 
@@ -52,6 +53,7 @@ RT #46641: PMCs extending Hash should probably register themselves.
 */
 
 static PMC *get_number_pmc(PARROT_INTERP, INTVAL base_type) {
+    UNUSED(base_type)
     return pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_Float));
 }
 
@@ -68,6 +70,7 @@ RT #46641: PMCs extending Hash should probably register themselves.
 */
 
 static PMC *get_string_pmc(PARROT_INTERP, INTVAL base_type) {
+    UNUSED(base_type)
     return pmc_new(interp, Parrot_get_ctx_HLL_type(interp, enum_class_String));
 }
 
@@ -1040,7 +1043,7 @@ Return a new iterator for the slice PMC C<key>
     VTABLE PMC *slice(PMC *key, INTVAL f) {
         if (f == 0) {
             PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-            PMC_struct_val(iter) = key;
+            PARROT_ITERATOR(iter)->key = key;
             return iter;
         }
 

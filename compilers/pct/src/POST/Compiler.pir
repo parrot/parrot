@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 POST::Compiler - Compiler for POST trees
@@ -23,9 +25,6 @@ PIR or an Eval PMC (bytecode).
     $P1 = split ' ', 'pir evalpmc'
     cproto.'stages'($P1)
 
-    $P0 = new 'ResizablePMCArray'
-    set_global '@!subcode', $P0
-
     $P0 = new 'String'
     set_global '$?HLL', $P0
     null $P0
@@ -41,11 +40,11 @@ PIR or an Eval PMC (bytecode).
     .local pmc newself
     newself = new ['POST';'Compiler']
 
-    ##  start with empty code
-    .local pmc subcode, code
-    subcode = get_global '@!subcode'
-    code = new 'CodeString'
-    push subcode, code
+    .local pmc innerpir, line
+    innerpir = new 'CodeString'
+    .lex '$CODE', innerpir
+    line = box 0
+    .lex '$LINE', line
 
     ##  if the root node isn't a Sub, wrap it
     $I0 = isa post, ['POST';'Sub']
@@ -58,8 +57,7 @@ PIR or an Eval PMC (bytecode).
     newself.'pir'(post)
 
     ##  and return whatever code was generated
-    $P0 = pop subcode
-    .return ($P0)
+    .return (innerpir)
 .end
 
 
@@ -71,18 +69,25 @@ Return generated PIR for C<node> and all of its children.
 
 .sub 'pir_children' :method
     .param pmc node
-    .local pmc code, iter
-    code = new 'CodeString'
+    .local pmc line
+    line = find_caller_lex '$LINE'
+    .lex '$LINE', line
+
+    .local pmc iter
     iter = node.'iterator'()
   iter_loop:
     unless iter goto iter_end
-    .local pmc cpost
+    .local pmc cpost, pos, source
     cpost = shift iter
-    $P0 = self.'pir'(cpost)
-    code .= $P0
+    pos = cpost['pos']
+    if null pos goto done_subline
+    source = cpost['source']
+    line = source.'lineof'(pos)
+    inc line
+  done_subline:
+    self.'pir'(cpost)
     goto iter_loop
   iter_end:
-    .return (code)
 .end
 
 
@@ -162,10 +167,15 @@ Return pir for an operation node.
     goto pirop_emit
 
   pirop_emit:
-    .local pmc code
-    code = new 'CodeString'
-    code.'emit'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
-    .return (code)
+    .local pmc subpir, subline, line
+    subpir  = find_caller_lex '$SUBPIR'
+    subline = find_caller_lex '$SUBLINE'
+    line    = find_caller_lex '$LINE'
+    if subline == line goto done_line
+    subpir.'emit'('.annotate "line", %0', line)
+    assign subline, line
+  done_line:
+    subpir.'emit'(fmt, arglist :flat, 'r'=>result, 'n'=>name, 'i'=>invocant, 't'=>result)
 .end
 
 
@@ -177,12 +187,10 @@ Generate a label.
 
 .sub 'pir' :method :multi(_, ['POST';'Label'])
     .param pmc node
-    .local string code, value
+    .local pmc subpir, value
     value = node.'result'()
-    code = '  '
-    code .= value
-    code .= ":\n"
-    .return (code)
+    subpir = find_caller_lex '$SUBPIR'
+    subpir.'emit'('  %0:', value)
 .end
 
 
@@ -197,13 +205,13 @@ the sub.
 .sub 'pir' :method :multi(_, ['POST';'Sub'])
     .param pmc node
 
-    .local pmc subcode
-    subcode = get_global '@!subcode'
-    $P0 = new 'CodeString'
-    push subcode, $P0
-
-    .local pmc code
-    code = new 'CodeString'
+    .local pmc subpir, subline, innerpir
+    subpir = new 'CodeString'
+    .lex '$SUBPIR', subpir
+    subline = box -1
+    .lex '$SUBLINE', subline
+    innerpir = new 'CodeString'
+    .lex '$CODE', innerpir
 
     .local string name, pirflags
     name = node.'name'()
@@ -233,7 +241,7 @@ the sub.
     if null outerpost goto pirflags_done
     unless outerpost goto pirflags_done
     outername = outerpost.'subid'()
-    $S0 = code.'escape'(outername)
+    $S0 = subpir.'escape'(outername)
     pirflags = concat pirflags, ' :outer('
     concat pirflags, $S0
     concat pirflags, ')'
@@ -255,7 +263,7 @@ the sub.
     ns = $P0
   have_ns:
     set_global '$?NAMESPACE', ns
-    nskey = code.'key'(ns)
+    nskey = subpir.'key'(ns)
 
   subpir_start:
     $P0 = node.'compiler'()
@@ -266,17 +274,17 @@ the sub.
     $P0 = new 'Hash'
   have_compiler_args:
     $P0 = self.'hll_pir'(node, 'name'=>name, 'namespace'=>ns, 'pirflags'=>pirflags, $P0 :named :flat)
-    code .= $P0
+    subpir .= $P0
     goto subpir_done
 
   subpir_post:
     unless hll goto subpir_ns
-    $P0 = code.'escape'(hll)
-    code.'emit'("\n.HLL %0", $P0)
+    $P0 = subpir.'escape'(hll)
+    subpir.'emit'("\n.HLL %0", $P0)
   subpir_ns:
-    code.'emit'("\n.namespace %0", nskey)
-    $S0 = code.'escape'(name)
-    code.'emit'(".sub %0 %1", $S0, pirflags)
+    subpir.'emit'("\n.namespace %0", nskey)
+    $S0 = subpir.'escape'(name)
+    subpir.'emit'(".sub %0 %1", $S0, pirflags)
     .local pmc paramlist
     paramlist = node['paramlist']
     if null paramlist goto paramlist_done
@@ -286,25 +294,21 @@ the sub.
     unless iter goto paramlist_done
     $P0 = shift iter
     if null $P0 goto param_loop
-    code .= $P0
+    subpir .= $P0
     goto param_loop
   paramlist_done:
 
-    $P0 = self.'pir_children'(node)
-    code .= $P0
-    code.'emit'(".end\n\n")
+    self.'pir_children'(node)
+    subpir.'emit'(".end\n\n")
 
   subpir_done:
-    $P0 = pop subcode
-    code .= $P0
-    $P0 = subcode[-1]
-    $P0 .= code
+    .local pmc outerpir
+    outerpir = find_caller_lex '$CODE'
+    outerpir .= subpir
+    outerpir .= innerpir
 
     set_global '$?NAMESPACE', outerns
     set_global '$?HLL', outerhll
-
-    code = new 'CodeString'
-    .return (code)
 .end
 
 

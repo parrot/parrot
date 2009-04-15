@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Builder::TestPlan - class representing the current Test::Builder test plan

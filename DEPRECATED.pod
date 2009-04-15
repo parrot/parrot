@@ -46,10 +46,6 @@ L<https://trac.parrot.org/parrot/ticket/187>
 
 L<https://trac.parrot.org/parrot/ticket/189>
 
-=item ref [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/190>
-
 =item moved to dynpmc [eligible in 1.1]
 
 AddrRegistry, CodeString, Env, Eval, File, OS, PCCMETHOD_Test, StringHandle,
@@ -105,12 +101,6 @@ L<https://trac.parrot.org/parrot/ticket/451>
 =head1 Class Features
 
 =over 4
-
-=item PMC union struct [eligible in 1.1]
-
-This will be removed once all core PMCs have been updated.
-
-L<http://rt.perl.org/rt3/Ticket/Display.html?id=48014>
 
 =item :anon and :vtable named parameters to add_method [eligible in 1.1]
 

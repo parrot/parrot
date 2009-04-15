@@ -308,7 +308,7 @@ static void dbg_list(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
     PDB_list(pdb->debugee, cmd);
 }
 
-static void dbg_listbreakpoints(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
+static void dbg_listbreakpoints(PDB_t * pdb, SHIM(const char * cmd)) /* HEADERIZER SKIP */
 {
     TRACEDEB_MSG("dbg_list");
 

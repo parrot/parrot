@@ -1,4 +1,5 @@
 #!./parrot
+# $Id$
 # The Computer Language Shootout
 # http://shootout.alioth.debian.org/
 #

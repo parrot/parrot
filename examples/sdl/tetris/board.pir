@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 board.pir - a tetris board class.

@@ -108,6 +108,7 @@ PARROT_EXPORT void   nci_vp(Opaque*);
 PARROT_EXPORT char * nci_ttt(char *, char *);
 PARROT_EXPORT void   nci_vfff(float, float, float);
 PARROT_EXPORT void   nci_vV(const char **);
+PARROT_EXPORT void   nci_vVVV(const char **, const char **, const char **);
 
 /* Declarations for callback tests */
 
@@ -1168,6 +1169,25 @@ PARROT_EXPORT void
 nci_vV(const char **ptr)
 {
   *ptr = "Hello bright new world\n";
+}
+
+/*
+
+=item C<PARROT_EXPORT float
+nci_fff(float l1, float l2)>
+
+Returns the result of C<l1> / C<l2>.
+
+=cut
+
+*/
+
+PARROT_EXPORT void
+nci_vVVV(const char **ptr1, const char **ptr2, const char **ptr3)
+{
+  *ptr1 = "Hello bright new world!\n";
+  *ptr2 = "It is a beautiful day!\n";
+  *ptr3 = "Go suck a lemon.\n";
 }
 
 #ifdef TEST

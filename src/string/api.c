@@ -2025,7 +2025,7 @@ rounding towards zero.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_str_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
+Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_int)
     if (s == NULL)
@@ -2033,6 +2033,8 @@ Parrot_str_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
     {
         const char         *start     = s->strstart;
         const char * const  end       = start + s->bufused;
+        const INTVAL        max_safe  = PARROT_INTVAL_MAX / 10;
+        const INTVAL        last_dig  = PARROT_INTVAL_MAX % 10;
         int                 sign      = 1;
         INTVAL              in_number = 0;
         INTVAL              i         = 0;
@@ -2043,8 +2045,13 @@ Parrot_str_to_int(SHIM_INTERP, ARGIN_NULLOK(const STRING *s))
             const unsigned char c = *start;
 
             if (isdigit((unsigned char)c)) {
+                const INTVAL nextval = c - '0';
                 in_number = 1;
-                i         = i * 10 + (c - '0');
+                if (i < max_safe || (i == max_safe && nextval <= last_dig))
+                    i = i * 10 + nextval;
+                else
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
+                        "Integer value of String '%S' too big", s);
             }
             else if (!in_number) {
                 /* we've not yet seen any digits */

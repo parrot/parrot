@@ -1,4 +1,5 @@
 #!./parrot
+# $Id$
 #
 # ./parrot -R jit nsieve-bits-2.pir N  (N = 9 for shootout)
 # by Leopold Toetsch

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Classes
 
 If we combine the ideas of namespaces, subroutines, and global variables,

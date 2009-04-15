@@ -1,3 +1,5 @@
+# $Id$
+
 .pcc_sub :load __ncurses_init:
 loadlib P1, 'libform'
 dlfunc P2, P1, 'new_field', 'piiiiii'
@@ -649,3 +651,9 @@ store_global 'ncurses::mcprint', P2
 dlfunc P2, P1, 'has_key', 'ii'
 store_global 'ncurses::has_key', P2
 returncc
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

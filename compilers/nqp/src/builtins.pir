@@ -1,3 +1,5 @@
+# $Id$
+
 .namespace []
 
 =over 4

@@ -1,3 +1,5 @@
+# $Id$
+
 .sub main :main
 	load_bytecode "PGE.pbc"
 	.local pmc p6rule_compile, rulesub, match, variants, variants_p5, iub, iter, matches, capt

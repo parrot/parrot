@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Simple Variables
 
 PIR has two kinds of variables. The most simple kind are Parrot

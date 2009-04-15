@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Logical Operations
 
 The logical operations are short-circuiting, so if the first argument to an

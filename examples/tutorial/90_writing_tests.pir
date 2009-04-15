@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Writing Tests
 
 This example demonstrates writing tests using the PIR version of Test::More.

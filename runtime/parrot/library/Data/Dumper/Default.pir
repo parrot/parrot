@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Data::Dumper::Default - The default output module of Data::Dumper.

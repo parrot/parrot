@@ -18,8 +18,6 @@ use Parrot::Pmc2c::UtilFunctions 'filename';
 use Parrot::Pmc2c::PCCMETHOD ();
 use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::Null ();
-use Parrot::Pmc2c::PMC::Ref ();
-use Parrot::Pmc2c::PMC::SharedRef ();
 use Parrot::Pmc2c::PMC::Object ();
 
 $SIG{'__WARN__'} = sub { use Carp; warn $_[0]; Carp::confess; };

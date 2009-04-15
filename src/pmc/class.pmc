@@ -1605,8 +1605,9 @@ Called after the class has been thawed.
 
 */
 
-    void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(visit_info *info) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        UNUSED(info)
 
         /* Recalculate full MRO from thawed parents */
         _class->all_parents         = Parrot_ComputeMRO_C3(interp, SELF);

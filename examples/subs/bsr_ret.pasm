@@ -21,14 +21,14 @@ F<docs/pdds/pdd03_calling_conventions.pod>
 =cut
 
 MAIN:	print "Main\n"
-	bsr TESTSUB 
+	bsr TESTSUB
 	print "Main: Return from TestSub\n"
 END:	end
 
 
 TESTSUB:
 	print "TestSub\n"
-	bsr NESTSUB	
+	bsr NESTSUB
 	print "TestSub: Ret from NestSub\n"
 	ret
 
@@ -36,3 +36,8 @@ NESTSUB:
 	print "NestSub\n"
 	ret
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

@@ -538,7 +538,6 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
                     "Unrecognized class name PMC type");
             break;
     }
-    return 0;
 }
 
 

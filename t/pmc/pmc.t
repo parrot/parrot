@@ -49,9 +49,7 @@ OUTPUT
 my $checkTypes;
 my %types_we_cant_test
     = map { $_ => 1; } (    # These require initializers.
-    qw(Null Iterator Enumerate Ref SharedRef
-        ParrotObject ParrotThread
-        BigInt LexInfo LexPad Object),
+    qw(Null Iterator Enumerate ParrotObject ParrotThread BigInt LexInfo LexPad Object),
 
     # Instances of these appear to have other types.
     qw(PMCProxy Class) );

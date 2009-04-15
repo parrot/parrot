@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Test::Builder::Output - manages output for Test::Builder

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 triangle.pir - Initialize GLUT and render a simple OpenGL animation

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 boarddata.pir - a tetris board data class

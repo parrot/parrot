@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 iterators
 
 An iterator is a type of PMC that helps with looping operations

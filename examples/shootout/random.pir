@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# $Id$
 #
 # random.pir N         (N = 900000 for shootout)
 # by Joshua Isom

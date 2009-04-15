@@ -389,6 +389,7 @@ v    fff
 
 # Testing Pointer PMC use
 v    V
+v    VVV
 
 # Testing SQLite
 i    tV

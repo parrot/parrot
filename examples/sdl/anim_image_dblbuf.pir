@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 anim_image_dblbuf.pir - animate an image in a doublebuffered Parrot SDL window

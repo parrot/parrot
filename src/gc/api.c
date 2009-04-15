@@ -293,7 +293,6 @@ Parrot_gc_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
 
     pmc->pmc_ext     = (PMC_EXT *)0xdeadbeef;
     pmc->vtable      = (VTABLE  *)0xdeadbeef;
-    PMC_pmc_val(pmc) = (PMC     *)0xdeadbeef;
 
 #endif
 

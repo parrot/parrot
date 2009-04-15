@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Leaf - a sample leaf node for Language::AttributeGrammar

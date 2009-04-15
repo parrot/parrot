@@ -144,7 +144,6 @@ Swaps the "context".
             Parrot_Context *ctx;
             PMC *ccont;
 
-            /* RT#46699 factor out common code with Sub.invoke and inherit it */
             ccont = INTERP->current_cont;
 
             if (ccont == NEED_CONTINUATION)

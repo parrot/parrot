@@ -256,6 +256,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
     UChar * const s = (UChar*) src->strstart;
     return s[offset];
 #else
+    UNUSED(offset)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
@@ -280,7 +281,9 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
     UChar * const s = (UChar*) src->strstart;
     s[offset] = codepoint;
 #else
-    UNUSED(src);
+    UNUSED(src)
+    UNUSED(offset)
+    UNUSED(codepoint)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
@@ -298,7 +301,7 @@ Returns the byte in string C<src> at position C<offset>.
 */
 
 static UINTVAL
-get_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset)
+get_byte(PARROT_INTERP, SHIM(const STRING *src), SHIM(UINTVAL offset))
 {
     ASSERT_ARGS(get_byte)
     UNIMPL;
@@ -316,7 +319,8 @@ Sets, in string C<src> at position C<offset>, the byte C<byte>.
 */
 
 static void
-set_byte(PARROT_INTERP, SHIM(const STRING *src), UINTVAL offset, UINTVAL byte)
+set_byte(PARROT_INTERP, SHIM(const STRING *src), SHIM(UINTVAL offset),
+        SHIM(UINTVAL byte))
 {
     ASSERT_ARGS(set_byte)
     UNIMPL;
@@ -376,7 +380,8 @@ Returns the bytes in string C<src> at position C<offset> and length C<count>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-get_bytes(PARROT_INTERP, SHIM(STRING *src), UINTVAL offset, UINTVAL count)
+get_bytes(PARROT_INTERP, SHIM(STRING *src), SHIM(UINTVAL offset),
+        SHIM(UINTVAL count))
 {
     ASSERT_ARGS(get_bytes)
     UNIMPL;
@@ -399,7 +404,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_codepoints_inplace(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *dest_string))
+        SHIM(UINTVAL offset), SHIM(UINTVAL count), SHIM(STRING *dest_string))
 {
     ASSERT_ARGS(get_codepoints_inplace)
     UNIMPL;
@@ -421,7 +426,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
 get_bytes_inplace(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *return_string))
+        SHIM(UINTVAL offset), SHIM(UINTVAL count), SHIM(STRING *return_string))
 {
     ASSERT_ARGS(get_bytes_inplace)
     UNIMPL;
@@ -441,7 +446,7 @@ the contents of string C<new_codepoints>.
 
 static void
 set_codepoints(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *new_codepoints))
+        SHIM(UINTVAL offset), SHIM(UINTVAL count), SHIM(STRING *new_codepoints))
 {
     ASSERT_ARGS(set_codepoints)
     UNIMPL;
@@ -461,7 +466,7 @@ contents of string C<new_bytes>.
 
 static void
 set_bytes(PARROT_INTERP, SHIM(STRING *src),
-        UINTVAL offset, UINTVAL count, SHIM(STRING *new_bytes))
+        SHIM(UINTVAL offset), SHIM(UINTVAL count), SHIM(STRING *new_bytes))
 {
     ASSERT_ARGS(set_bytes)
     UNIMPL;

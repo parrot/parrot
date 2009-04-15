@@ -20,6 +20,8 @@ lexicals at runtime.
 */
 
 pmclass DynLexPad dynpmc provides lexpad need_ext {
+    ATTR Hash *hash;
+    ATTR PMC  *init; /* the PMC used to initialize this DynLexPad */
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -38,16 +40,20 @@ lexinfo.
 */
     void init_pmc(PMC* lexinfo) {
         Hash *hash;
+
+        Parrot_DynLexPad_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_DynLexPad_attributes);
+        PMC_data(SELF) = attrs;
+
         if (VTABLE_elements(interp, lexinfo)) {
-            PMC_pmc_val(SELF) =
-                pmc_new_init(interp, enum_class_LexPad, lexinfo);
+            attrs->init = pmc_new_init(interp, enum_class_LexPad, lexinfo);
         }
         else
-            PMC_pmc_val(SELF) = NULL;
+            attrs->init = NULL;
 
-        hash                 = parrot_new_hash(INTERP);
-        PMC_struct_val(SELF) = hash;
-        hash->container      = SELF;
+        hash             = parrot_new_hash(INTERP);
+        attrs->hash      = hash;
+        hash->container  = SELF;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -61,7 +67,7 @@ Initialize the LexPad PMC and remember the associate context.
 
 */
     void set_pointer(void* ctx) {
-        PMC *std_pad = PMC_pmc_val(SELF);
+        PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
         if (std_pad)
             VTABLE_set_pointer(interp, std_pad, ctx);
     }
@@ -76,7 +82,7 @@ Returns the number of elements in the hash.
 
 */
     INTVAL elements() {
-        return parrot_hash_size(interp, (Hash*) PMC_struct_val(SELF));
+        return parrot_hash_size(interp, PARROT_DYNLEXPAD(SELF)->hash);
     }
 
 /*
@@ -98,9 +104,9 @@ Returns whether a lexical C<name> exists in the hash.
 
     INTVAL exists_keyed_str(STRING* name) {
         PMC *std_pad;
-        if (parrot_hash_exists(interp, (Hash*) PMC_struct_val(SELF), name))
+        if (parrot_hash_exists(interp, PARROT_DYNLEXPAD(SELF)->hash, name))
             return 1;
-        std_pad = PMC_pmc_val(SELF);
+        std_pad = PARROT_DYNLEXPAD(SELF)->init;
         if (std_pad)
             return VTABLE_exists_keyed_str(interp, std_pad, name);
         return 0;
@@ -120,10 +126,10 @@ lexical doesn't exist.
 */
     PMC* get_pmc_keyed_str(STRING* name) {
         HashBucket *b = parrot_hash_get_bucket(interp,
-            (Hash *)PMC_struct_val(SELF), name);
+            PARROT_DYNLEXPAD(SELF)->hash, name);
 
         if (!b) {
-            PMC *std_pad = PMC_pmc_val(SELF);
+            PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
 
             if (std_pad)
                 return VTABLE_get_pmc_keyed_str(interp, std_pad, name);
@@ -159,12 +165,12 @@ doesn't exist, it is created.
     }
 
     void set_pmc_keyed_str(STRING* name, PMC* value) {
-        PMC *std_pad = PMC_pmc_val(SELF);
+        PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
 
         if (std_pad && VTABLE_exists_keyed_str(interp, std_pad, name))
             VTABLE_set_pmc_keyed_str(interp, std_pad, name, value);
 
-        parrot_hash_put(interp, (Hash *)PMC_struct_val(SELF), name, value);
+        parrot_hash_put(interp, PARROT_DYNLEXPAD(SELF)->hash, name, value);
     }
 
 /*
@@ -178,10 +184,11 @@ Return the LexInfo PMC, if any or a Null PMC.
 */
 
     VTABLE void destroy() {
-        if (PMC_struct_val(SELF)) {
-            parrot_hash_destroy(interp, (Hash*) PMC_struct_val(SELF));
-            PMC_struct_val(SELF) = NULL;
+        if (PARROT_DYNLEXPAD(SELF)->hash) {
+            parrot_hash_destroy(interp, PARROT_DYNLEXPAD(SELF)->hash);
+            PARROT_DYNLEXPAD(SELF)->hash = NULL;
         }
+        mem_sys_free(PMC_data(SELF));
     }
 /*
 
@@ -194,13 +201,12 @@ Marks the lexpad hash as live.
 */
 
     VTABLE void mark() {
-        PMC *std_pad = PMC_pmc_val(SELF);
+        PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
         if (std_pad)
             pobject_lives(interp, (PObj *)std_pad);
-        if (PMC_struct_val(SELF))
-            parrot_mark_hash(interp, (Hash *)PMC_struct_val(SELF));
+        if (PARROT_DYNLEXPAD(SELF)->hash)
+            parrot_mark_hash(interp, PARROT_DYNLEXPAD(SELF)->hash);
     }
-
 
 
 }

@@ -1,6 +1,6 @@
 =pod
 
-=head1 PMCs
+=head1 Dynamic C-level Objects
 
 Z<CHP-11>
 
@@ -35,7 +35,7 @@ executable. However, Parrot's build process makes use of a special PMC compiler
 program that converts PMCs defined in a special C-like script to ordinary
 C code. The PMC compiler adds all the necessary boiler plate code and installs
 the PMC type into Parrot for use. The PMC script is like a macro superset
-N<although the functionality is a litte bit more involved then is available
+N<although the functionality is a little bit more involved then is available
 in the normal C preprocessor> over the C language. All valid C is valid in
 PMC scripts, but there are also a few additions that help to make common tasks
 a little easier.

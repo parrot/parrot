@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Subroutines in a Namespace
 
 Subroutines created in one namespace can be accessed from another

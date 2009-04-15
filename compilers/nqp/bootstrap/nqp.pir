@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 nqp.pir - A nqp compiler.

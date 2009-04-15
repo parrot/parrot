@@ -38,7 +38,7 @@ as we are just having one timer.
 */
 
 void
-start_sys_timer_ms(void *handle, int ms)
+start_sys_timer_ms(SHIM(void *handle), int ms)
 {
     struct itimerval its;
     memset(&its, 0, sizeof (its));

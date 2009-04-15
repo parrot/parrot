@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Hashes
 
 Hashes, also known in some places as "dictionaries" or "associative arrays"

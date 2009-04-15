@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Range
 
 Based on the Range object described in S03:

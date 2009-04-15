@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 String Operations
 
 Some operations aren't mathematical at all. Concatenation is an example

@@ -1,4 +1,5 @@
 #!./parrot -R jit
+# $Id$
 #
 # random.pasm N         (N = 900000 for shootout)
 # by Joshua Isom
@@ -45,3 +46,8 @@ gen_random:
     div N3, .IM
     ret
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

@@ -1,6 +1,6 @@
 =pod
 
-=head1 Opcodes
+=head1 Dynamic Opcodes
 
 Z<CHP-12>
 
@@ -218,7 +218,7 @@ Parrot ships with a small number of example dynops libraries in the file
 L<src/dynoplibs/>. These are small libraries of mostly nonsensical but
 demonstrative opcodes that can be used as an example to follow.
 
-Dynops can be writte in a C<.ops> file like the normal built-in ops are.
+Dynops can be written in a C<.ops> file like the normal built-in ops are.
 The ops file should use C<#include "parrot/extend.h"> in addition to any
 other libraries the ops need. They can be compiled into C using the opcode
 compiler, then compiled into a shared library using a normal C compiler. Once

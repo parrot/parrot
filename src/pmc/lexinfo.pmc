@@ -66,7 +66,6 @@ subroutine.
         Parrot_LexInfo_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_LexInfo_attributes);
         PARROT_ASSERT(PObj_constant_TEST(SELF));
-        PMC_pmc_val(SELF) = sub;
 
         hash = parrot_create_hash(INTERP,
             (PARROT_DATA_TYPE)enum_hash_int,

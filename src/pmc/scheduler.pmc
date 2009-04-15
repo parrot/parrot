@@ -370,7 +370,7 @@ Finishes thawing the scheduler.
 
 */
 
-    void thawfinish(visit_info *info) {
+    VTABLE void thawfinish(visit_info *info) {
         Parrot_cx_refresh_task_list(INTERP, SELF);
     }
 

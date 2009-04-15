@@ -215,8 +215,9 @@ help(void)
     "  Options:\n"
     "    -h --help\n"
     "    -V --version\n"
-    "    -I add path to include search\n"
-    "    -L add path to library search\n"
+    "    -I --include add path to include search\n"
+    "    -L --library add path to library search\n"
+    "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
     "    -R --runcore CORE\n"
     "    --bounds-checks|--slow-core\n"
@@ -296,11 +297,12 @@ static struct longopt_opt_decl options[] = {
     { 'D', 'D', OPTION_optional_FLAG, { "--parrot-debug" } },
     { 'E', 'E', (OPTION_flags)0, { "--pre-process-only" } },
     { 'G', 'G', (OPTION_flags)0, { "--no-gc" } },
-    { 'I', 'I', OPTION_required_FLAG, { NULL } },
-    { 'L', 'L', OPTION_required_FLAG, { NULL } },
+    { 'I', 'I', OPTION_required_FLAG, { "--include" } },
+    { 'L', 'L', OPTION_required_FLAG, { "--library" } },
     { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
     { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
     { 'V', 'V', (OPTION_flags)0, { "--version" } },
+    { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
     { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
                                  { "--leak-test", "--destroy-at-end" } },
     { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
@@ -538,6 +540,10 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
             case 'L':
                 Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_LIBRARY);
+                break;
+            case 'X':
+                Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
+                    PARROT_LIB_PATH_DYNEXT);
                 break;
             default:
                 Parrot_ex_throw_from_c_args(interp, NULL, 1,

@@ -234,6 +234,7 @@ destination to continue execution.
         Parrot_Context   *from_ctx     = CONTEXT(interp);
         Parrot_Context   *to_ctx       = cc->to_ctx;
         opcode_t         *pc           = cc->address;
+        UNUSED(next)
 
         Parrot_continuation_check(interp, SELF, cc);
         Parrot_continuation_rewind_environment(interp, SELF, cc);

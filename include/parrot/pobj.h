@@ -55,10 +55,6 @@ typedef Buffer PObj;
 
 #define PObj_bufstart(pmc)    (pmc)->cache._b._bufstart
 #define PObj_buflen(pmc)      (pmc)->cache._b._buflen
-#define PMC_struct_val(pmc)   (pmc)->cache._ptrs._struct_val
-#define PMC_pmc_val(pmc)      (pmc)->cache._ptrs._pmc_val
-#define PMC_int_val(pmc)      (pmc)->cache._i._int_val
-#define PMC_str_val(pmc)      (pmc)->cache._string_val
 
 /* See src/gc/resources.c. the basic idea is that buffer memory is
    set up as follows:
@@ -179,7 +175,6 @@ typedef struct PMC_EXT {
 #define PMC_metadata(pmc)     PMC_ext_checked(pmc)->_metadata
 #define PMC_next_for_GC(pmc)  PMC_ext_checked(pmc)->_next_for_GC
 #define PMC_sync(pmc)         PMC_ext_checked(pmc)->_synchronize
-#define PMC_union(pmc)        (pmc)->cache
 
 #define POBJ_FLAG(n) ((UINTVAL)1 << (n))
 /* PObj flags */

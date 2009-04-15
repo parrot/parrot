@@ -1,4 +1,6 @@
 #../../parrot -t5 test.pir
+# $Id$
+
 .sub 'main'
 load_bytecode 'SQLite3'
 

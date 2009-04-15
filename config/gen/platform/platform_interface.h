@@ -40,12 +40,12 @@ void Parrot_free_memalign(void *);
 
 #ifdef PARROT_HAS_EXEC_PROTECT
 void *mem_alloc_executable(size_t);
-void mem_free_executable(void *);
-void *mem_realloc_executable(void *, size_t);
+void mem_free_executable(void *, size_t);
+void *mem_realloc_executable(void *, size_t, size_t);
 #else
 #  define mem_alloc_executable mem_sys_allocate
-#  define mem_free_executable mem_sys_free
-#  define mem_realloc_executable mem_sys_realloc
+#  define mem_free_executable(a, b) mem_sys_free(a)
+#  define mem_realloc_executable(a, b, c) mem_sys_realloc((a), (c))
 #endif
 
 void* Parrot_memcpy_aligned(void*, void*, size_t);
