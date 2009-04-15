@@ -4,7 +4,7 @@
  */
 
 /*
-** interp_guts.h
+** runcore_guts.h
 */
 
 #ifndef PARROT_INTERP_GUTS_H_GUARD

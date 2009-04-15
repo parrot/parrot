@@ -4,11 +4,11 @@ $Id$
 
 =head1 NAME
 
-src/interp/interpreter.c - Parrot Interpreter
+src/runcore/main.c - main functions for Parrot runcores
 
 =head1 DESCRIPTION
 
-The interpreter API handles running the operations.
+The runcore API handles running the operations.
 
 The predereferenced code chunk is pre-initialized with the opcode
 function pointers, addresses, or opnumbers of the C<prederef__>
@@ -33,7 +33,7 @@ have the same number of elements because there is a one-to-one mapping.
 */
 
 #include "parrot/parrot.h"
-#include "interp_guts.h"
+#include "runcore_guts.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"

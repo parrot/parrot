@@ -1274,8 +1274,6 @@ src/hll.c                                                   []
 src/interp/inter_cb.c                                       []
 src/interp/inter_create.c                                   []
 src/interp/inter_misc.c                                     []
-src/interp/interp_guts.h                                    []
-src/interp/interpreter.c                                    []
 src/io/api.c                                                []
 src/io/buffer.c                                             []
 src/io/core.c                                               []
@@ -1452,6 +1450,8 @@ src/pmc/timer.pmc                                           [devel]src
 src/pmc/undef.pmc                                           [devel]src
 src/pmc/unmanagedstruct.pmc                                 [devel]src
 src/pmc_freeze.c                                            []
+src/runcore/main.c                                          []
+src/runcore/runcore_guts.h                                  []
 src/runops_cores.c                                          []
 src/runops_cores.h                                          []
 src/scheduler.c                                             []

@@ -28,7 +28,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "parrot/debugger.h"
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_key.h"
-#include "interp/interp_guts.h"
+#include "runcore/runcore_guts.h"
 #include "trace.h"
 #include "debug.str"
 #include "pmc/pmc_continuation.h"

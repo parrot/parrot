@@ -413,7 +413,6 @@ INTERP_O_FILES := \
     $(SRC_DIR)/interp/inter_cb$(O)  \
     $(SRC_DIR)/interp/inter_create$(O)  \
     $(SRC_DIR)/interp/inter_misc$(O)  \
-    $(SRC_DIR)/interp/interpreter$(O)  \
     $(SRC_DIR)/call/ops$(O)  \
     $(SRC_DIR)/key$(O) \
     $(SRC_DIR)/library$(O) \
@@ -430,6 +429,7 @@ INTERP_O_FILES := \
     $(SRC_DIR)/platform$(O) \
     $(SRC_DIR)/pmc_freeze$(O) \
     $(SRC_DIR)/pmc$(O) \
+    $(SRC_DIR)/runcore/main$(O)  \
     $(SRC_DIR)/runops_cores$(O) \
     $(SRC_DIR)/scheduler$(O) \
     $(SRC_DIR)/spf_render$(O) \
@@ -1121,7 +1121,7 @@ $(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h \
 $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
 	$(SRC_DIR)/pmc/pmc_sub.h
 
-$(SRC_DIR)/interp/interpreter$(O) : $(SRC_DIR)/interp/interpreter.c $(GENERAL_H_FILES) \
+$(SRC_DIR)/runcore/main$(O) : $(SRC_DIR)/runcore/main.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
