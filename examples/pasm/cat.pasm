@@ -13,7 +13,7 @@ examples/pasm/cat.pasm - cat-like utility
 
 Simple C<cat>-like utility to test PIO read/write. Does not use STDIO.
 
-Echoes what you type once you hit return. 
+Echoes what you type once you hit return.
 
 You'll have to Ctl-C to exit.
 

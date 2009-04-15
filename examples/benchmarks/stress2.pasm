@@ -41,11 +41,11 @@ loop1:	new P2, 'Integer'
 
 =head1 SEE ALSO
 
-F<examples/benchmarks/stress.pasm>, 
-F<examples/benchmarks/stress.pl>, 
-F<examples/benchmarks/stress1.pasm>, 
-F<examples/benchmarks/stress1.pl>, 
-F<examples/benchmarks/stress2.pl>, 
+F<examples/benchmarks/stress.pasm>,
+F<examples/benchmarks/stress.pl>,
+F<examples/benchmarks/stress1.pasm>,
+F<examples/benchmarks/stress1.pl>,
+F<examples/benchmarks/stress2.pl>,
 F<examples/benchmarks/stress3.pasm>.
 
 =cut

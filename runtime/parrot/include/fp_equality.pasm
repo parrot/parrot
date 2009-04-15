@@ -8,7 +8,7 @@ fp_equality.pasm - floating point equivalency macros
 =head1 DESCRIPTION
 
 This file provides two PIR macros to determine if a pair of floating point numbers are equivalent.
-The same macros are also provided for PASM. 
+The same macros are also provided for PASM.
 
 =cut
 
