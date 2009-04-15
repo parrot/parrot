@@ -1,0 +1,227 @@
+=pod
+
+=head1 Directive Reference
+
+Z<CHP-13-SECT-2>
+
+X<PIR (Parrot intermediate representation);quick reference;directives>
+This is a summary of PIR directives. Directives are preprocessed by the
+Parrot interpreter. Since PIR and PASM run on the same interpreter, many
+of the directives listed here are also valid in PASM code.
+
+
+=head3 .arg
+
+X<.arg directive>
+
+  .arg R<VAL>
+
+pass a value to a subroutine according to PCC.
+
+=head3 .const
+
+X<.const directive>
+
+  .const R<TYPE>R<NAME> = R<VALUE>
+
+Define a named constant.
+
+=head3 .macro_const
+
+X<.macro_const directive>
+
+  .macro_const R<NAME>R<VALUE>
+
+Define a named macro that expands to a given value. Macros are called
+as directives, i.e. .R<NAME> (PASM code only).
+
+=head3 .emit
+
+X<.emit directive>
+
+  .emit
+
+Define a compilation unit of PASM code. Always paired with C<.eom>.
+
+=head3 .end
+
+X<.end directive>
+
+  .end
+
+End a compilation unit. Always paired with C<.sub>.
+
+=head3 .endm
+
+X<.endm directive>
+
+  .endm
+
+End a macro definition. Always paired with C<.macro>.
+
+=head3 .eom
+
+X<.eom directive>
+
+  .eom
+
+End a compilation unit of PASM code. Always paired with C<.emit>.
+
+=head3 .flatten_arg
+
+X<.flatten_arg directive>
+
+  .flatten_arg R<PArray>
+
+Flatten the passed array PMC and provide args for PCC calls.
+
+=head3 .globalconst
+
+X<.globalconst directive>
+
+  .globalconst R<TYPE>R<NAME> = R<VALUE>
+
+Define a named, file visible constant.
+
+=head3 .include
+
+X<.include directive>
+
+  .include " R<FILENAME> "
+
+Include the contents of an external file by inserting it in place.
+
+=head3 .invocant
+
+X<.invocant directive>
+
+  .invocant R<OBJ>
+
+Set the invocant for a method call.
+
+=head3 .local
+
+X<.local directive>
+
+  .local R<TYPE>R<NAME>
+
+Define a local named variable.
+
+=head3 .macro
+
+X<.macro directive>
+
+  .macro R<NAME> (R<PARAMS>)
+
+Define a named macro with a list of parameters. The macro is called as
+.R<NAME>(R<arg1>,R<arg2>,...).  Always paired with C<.endm>.
+
+=head3 .meth_call
+
+X<.meth_call directive>
+
+  .meth_call R<SUB>
+  .meth_call R<SUB>, R<RETCONT>
+
+Create a method call.
+
+=head3 .namespace
+
+X<.namespace directive>
+
+  .namespace R< [ "namespace" ] >
+
+Define a namespace.
+
+=head3 .nci_call
+
+X<.nci_call directive>
+
+  .nci_call R<SUB>
+
+Create an NCI call.
+
+=head3 .param
+
+X<.param directive>
+
+  .param R<DEST>
+  .param R<TYPE>R<NAME>
+
+Define a subroutine parameter.
+
+=head3 .begin_call
+
+X<.begin_call directive>
+
+Start a call sequence. Always paired with C<.end_call>
+
+=head3 .begin_return
+
+X<.begin_return directive>
+
+Start a return sequence. Always paired with C<.end_return>
+
+=head3 .begin_yield
+
+X<.begin_yield directive>
+
+Start a return of a coroutine sequence. Always paired with C<.end_yield>
+
+=head3 .call
+
+X<.call directive>
+
+  .call R<SUB>
+  .call R<SUB>, R<RETCONT>
+
+Create a subroutine call.
+
+=head3 .pcc_sub
+
+X<.pcc_sub directive>
+
+  .pcc_sub R<_LABEL>
+
+Create a symbol entry for subroutine at the _LABEL. This directive is
+for PASM code only.
+
+=head3 .result
+
+X<.result directive>
+
+  .result R<DEST>
+
+Get a return value according to PCC.
+
+=head3 .return
+
+X<.return directive>
+
+  .return R<VAL>
+
+Return a value to the calling subroutine according to PCC.
+
+=head3 .sub
+
+X<.sub directive>
+
+  .sub R<NAME>
+
+Define a compilation unit. Always paired with C<.end>. Names begin
+with "C<_>" by convention.
+
+=head3 .sym
+
+X<.sym directive>
+
+  .sym R<TYPE> R<NAME>
+
+Same as C<.local>.
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:
