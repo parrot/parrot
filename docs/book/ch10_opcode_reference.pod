@@ -1,21 +1,14 @@
 =pod
 
-=head1 Parrot Reference
+=head1 Instruction Reference
 
 Z<CHP-13>
 
-This chapter contains a condensed list of PASM opcodes, PIR directives
-and instructions, and Parrot command-line options, sorted alphabetically
-for easy reference. Any PASM opcode is valid in PIR code, so if you're
-looking up PIR syntax you should check A<CHP-10-SECT-1>"PASM Opcodes",
-A<CHP-10-SECT-2>"PIR Directives", and A<CHP-10-SECT-3>"PIR
-Instructions".
+This chapter contains a condensed reference to the Parrot virtual
+machine's native instruction set, generally called opcodes. All opcodes
+are valid in both PIR and PASM, and correspond to the bytecode
+instructions.
 
-=head2 PASM Opcodes
-
-Z<CHP-13-SECT-1>
-
-X<PASM (Parrot assembly language);opcodes, quick reference>
 For complete details on each opcode and the latest changes, read the
 documentation in F<docs/ops/>, or look at all the C<.ops> files in the
 F<ops/> directory.
@@ -1230,7 +1223,7 @@ X<interpinfo opcode (PASM)>
 
 Return information about the interpreter. An integer flag selects
 which information to return, as listed in
-A<CHP-13-TABLE-1>Table 13-1.
+Table 13-1.
 
 =begin table picture Interpinfo flags
 
@@ -2369,7 +2362,7 @@ X<stat opcode (PASM)>
   stat R<DEST>, R<VAL>, R<VAL>
 
 Stat the VAL1 file and return stat element VAL2, as listed in
-A<CHP-13-TABLE-2>Table 13-2.
+Table 13-2.
 
 I<Arguments: IR, S, I or IR, I, I>
 
@@ -2539,7 +2532,7 @@ X<stringinfo opcode (PASM)>
   stringinfo R<DEST>, R<STRING>, R<FLAG>
 
 Return information about a string. An integer flag selects which
-information to return, as listed in A<CHP-13-TABLE-3>Table 13-3.
+information to return, as listed in Table 13-3.
 
 =begin table picture Stringinfo arguments
 
