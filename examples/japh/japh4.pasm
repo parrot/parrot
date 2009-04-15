@@ -1,3 +1,5 @@
+# $Id$
+
 newclass P1, "Japh"
 new P2, "Japh"
 print P2

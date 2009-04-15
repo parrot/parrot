@@ -1,3 +1,5 @@
+# $Id$
+
 .pcc_sub __postgres_init :load
 
 loadlib $P1, 'libpq'

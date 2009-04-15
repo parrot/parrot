@@ -1,3 +1,5 @@
+# $Id$
+
 	newclass P0, "Japh"
 	new P0, "Japh"
 	set I0, 0

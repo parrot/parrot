@@ -1,3 +1,5 @@
+# $Id$
+
 # the substr JaPH
     set S0, "Hacker\n"
     set S1, "Parrot "

@@ -1,3 +1,5 @@
+# $Id$
+
 .pcc_sub :load __ncurses_init:
 loadlib P1, 'libform'
 dlfunc P2, P1, 'new_field', 'piiiiii'

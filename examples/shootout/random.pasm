@@ -1,4 +1,5 @@
 #!./parrot -R jit
+# $Id$
 #
 # random.pasm N         (N = 900000 for shootout)
 # by Joshua Isom
