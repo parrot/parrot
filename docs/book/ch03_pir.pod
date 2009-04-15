@@ -939,11 +939,11 @@ not a good idea to rely on it now.
 =head3 Named Parameters
 
 Parameters that are passed in a strict order like we've seen above are
-called '''positional arguments'''. Positional arguments are
+called I<positional arguments>. Positional arguments are
 differentiated from one another by their position in the function call.
 Putting positional arguments in a different order will produce different
 effects, or may cause errors. Parrot supports a second type of parameter,
-a '''named parameter'''. Instead of passing parameters by their position
+a I<named parameter>. Instead of passing parameters by their position
 in the string, parameters are passed by name and can be in any order.
 Here's an example:
 
@@ -1004,7 +1004,7 @@ this to provide a default value:
   .param string name :optional
   .param int has_name :opt_flag
   if has_name goto we_have_a_name
-    name = "Default value"
+      name = "Default value"
   we_have_a_name:
 
 Optional parameters can be positional or named parameters. When using them
@@ -1628,7 +1628,7 @@ variable that does. Here's an example:
 
   .local string methname = "Foo"
   object.methname()               # Same as object."Foo"()
-  object."Foo"()                  # Same 
+  object."Foo"()                  # Same
 
 The invocant can be a variable or register, and the method name can be
 a literal string, string variable, or method object PMC.
@@ -2041,13 +2041,13 @@ to construct richer and higher-level object systems.
 
 =head2 PMCs as Classes
 
-PMCs aren't exactly "classes" in the way that this term is normally used.
-They are polymorphic data items that can be one of a large variety of
-predefined types. As we have seen briefly, and as we will see in more depth
-later, PMCs have a standard interface called the VTABLE interface. VTABLEs
-are a standard list of functions that all PMCs implement N<or, PMCs can
-choose not to implement each interface explicitly and instead let Parrot
-call the default implementations>.
+PMCs aren't exactly "classes" in the way that this term is normally used in
+object-oriented programming languages. They are polymorphic data items that
+can be one of a large variety of predefined types. As we have seen briefly,
+and as we will see in more depth later, PMCs have a standard interface called
+the VTABLE interface. VTABLEs are a standard list of functions that all PMCs
+implement N<or, PMCs can choose not to implement each interface explicitly and
+instead let Parrot call the default implementations>.
 
 VTABLEs are very strict: There are a fixed number with fixed names and
 fixed argument lists. You can't just create any random VTABLE interface that

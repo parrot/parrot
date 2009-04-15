@@ -160,7 +160,7 @@ How to submit a patch to Parrot.
 
 
 =back
-  
+
 =cut
 
 # Local variables:
