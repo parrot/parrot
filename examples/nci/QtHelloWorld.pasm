@@ -61,3 +61,9 @@ F<src/call_list.txt> and rebuilding Parrot.
 F<examples/nci/PQt.C>, F<docs/pdds/pdd03_calling_conventions.pod>.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

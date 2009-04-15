@@ -190,3 +190,8 @@ store_global 'PostgreSQL::PQenv2encoding', $P2
 .end_return
 .end
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

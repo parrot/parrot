@@ -22,3 +22,9 @@
 .macro_const IPPROTO_IPV6   41 # IP6 header
 .macro_const IPPROTO_RAW   255 # raw IP packet
 .macro_const IPPROTO_MAX   256
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

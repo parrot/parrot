@@ -10,7 +10,7 @@
     end
 .namespace ["Japh"]
 .pcc_sub :vtable set_string_keyed:
-	get_params "0,0,0", P5, I5, S5
+    get_params "0,0,0", P5, I5, S5
     print S5
     if I5, sp
     print "\n"
@@ -19,3 +19,8 @@ sp:
     print " "
     returncc
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

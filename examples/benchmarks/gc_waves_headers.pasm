@@ -113,3 +113,9 @@ F<examples/benchmarks/gc_waves_sizeable_data.pasm>,
 F<examples/benchmarks/gc_waves_sizeable_headers.pasm>.
 
 =cut
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

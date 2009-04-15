@@ -43,3 +43,8 @@ F<docs/pdds/pdd03_calling_conventions.pod>
     # Call the return continuation
     returncc
 
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

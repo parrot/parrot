@@ -65,3 +65,9 @@ loop:
     set P10, 20
     setattribute P2, ".j", P10
     returncc
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:

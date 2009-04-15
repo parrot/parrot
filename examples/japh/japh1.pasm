@@ -20,3 +20,9 @@ x:
 	set S1, "Just another "
 	set_returns "0", S1
 	returncc
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
