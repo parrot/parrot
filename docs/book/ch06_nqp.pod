@@ -1,0 +1,169 @@
+=pod
+
+=head1 Grammar Actions
+
+Protofunction signatures aren't the only way to apply functions to rules
+matched by the parser. In fact, they might be the most primitive because
+they use PIR code to implement the operator logic. Another way has been made
+available, by programming function actions in a language that's almost, but
+Not Quite Perl (NQP).
+
+NQP is a small language that's implemented as a subset of Perl 6 syntax and
+semantics. It's represents almost the smallest subset of the Perl 6 language
+necessary to implement the logic of a parser, although some developers have
+complained enough to get a few extra syntactic features added in above the
+bare minimum. NQP also happens to be a Perl 6 subset that's not entirely
+dissimilar from Perl 5, so Perl 5 programmers should not be too lost when
+writing NQP.
+
+=head2 NQP Basics
+
+Like Perl, NQP uses sigils to differentiate different types of variables.
+The C<$> sigil is used for scalars, C<@> is used for arrays, and C<%> is
+used for hashes N<Perl 6 aficionados will know that this isn't entirely
+true, but an in-depth look at Perl 6's context awareness is another topic
+for another book>. A "scalar" is really any single value, and can
+interchangeably be given a string value, or an integer value, or an object.
+In NQP we can write things like this:
+
+ $scalar := "This is a string"
+ $x      := 123
+ $pi     := 3.1415      # rounding
+
+Wait a minute, what's that weird C<:=> symbol? Why don't we just use the
+plain old vanilla C<=> sign? The problem is that I<NQP doesn't have it>.
+Remember how we mentioned that NQP was a minimal subset or Perl 6? The
+C<:=> operator is the I<bind> operator, that makes one value an alias
+C<C programmers and the like may call it a "reference"> for another. In
+most cases you can ignore the distinction between the two, but be warned
+that it's not a regular variable assignment.
+
+With hashes and arrays, it might be tempting to do a list assignment like
+we've all grown familiar with in Perl 5 and other dynamic languages:
+
+ @small_integers := (1, 2, 3, 4);                        # WRONG!
+ %leading_ladies := ("Leia" => "Starwars",
+                    "Trillian" => "Hitchhikers Guide"); # WRONG!
+
+Here's another little gotcha, NQP doesn't have list or hash context! If
+it's necessary to initialize a whole list at once, you can write:
+
+ @small_integers[0] := 1;
+ @small_integers[1] := 2;
+ # ... And so on, and so forth ...
+
+It's also possible to assign a list in I<scalar context> as follows:
+
+ $array_but_a_scalar := (1, 2, 3, 4)
+
+Remember how we said NQP was a bare-bones subset of Perl 6? If NQP had too
+many features, people would use it instead of Perl 6!
+
+=head3 Calling Actions From Rules
+
+When talking about grammar rules, we discussed the funny little C<{*}>
+symbol that calls an action. The action in question is an NQP method
+with the same name as the rule that calls it. NQP rules can be called
+with two different function signatures:
+
+ method name ($/) { ... }
+
+And with a key:
+
+ method name($/, $key) { ... }
+
+Here's an example that shows how the keys are used:
+
+ rule cavepeople {
+      'Fred'  {*}    #= Caveman
+    | 'Wilma' {*}    #= Cavewoman
+    | 'Dino'  {*}    #= Dinosaur
+ }
+
+And here is the rule that tells us the result:
+
+ method cavepeople($/, $key) {
+    if($key eq 'Caveman') {
+        say "We've found a caveman!";
+    } elsif($key eq 'Cavewoman') {
+        say "We've found a cavewoman!";
+    } elsif($key eq 'Dinosaur') {
+        say "A dinosaur isn't a caveperson at all!";
+    }
+ }
+
+The key is just a string that contains whatever text is on the line after
+the C<#=> symbol. If we don't have a C<#=> we don't use a C<$key> in our
+method.
+
+=head3 The Match Object C<$/>
+
+The match object C<$/> may have a funny-looking name, but it's a data
+structure that's all business. It's both a hash and an array. Plus,
+since it's a special variable it also gets a special shortcut syntax
+that can be used to save a few keystrokes:
+
+ $/('Match_item')   is the same as  $<Match_item>
+ $/[0]              is the same as  $[0]
+
+In the match object, each item in the hash is named after one of the items
+that we matched in the rule. So, if we have a file with input "C<X + 5>"
+and a rule:
+
+ rule introductions {
+    <variable> <operator> <number>
+ }
+
+Our match object is going to look like this: C<$/ = ("variable" => "x",
+"operator" => "+", "number" => "5")>
+
+If we have multiple values with the same name, or items with quantifiers
+C<*> or C<+> on it, those members of the match object may be arrays. So,
+if we have the input "A A A B B", and the following rule:
+
+ rule letters {
+    <vowel>* <consonant>*
+ }
+
+The match object will look like this (in Perl 5 syntax):
+
+ $/ = ("vowel" => ["A", "A", "A"], "consonant" => ["B", "B"])
+
+We can get the number of matches in each group by casting it to a scalar
+using the C<$( )> operator:
+
+ $($<vowel>) == 3
+
+=head3 Inline PIR
+
+Now that we know what the match object is, we can talk about the inline
+PIR functionality. In a PGE rule, we can use the C<{{ }}> double curly
+brackets to go into inline-PIR mode. Inside these brackets arbitrary
+PIR code can be executed to affect the operation of the parser. We can
+access the variable C<$/> directly in the grammar without having to
+jump into NQP, and actually examine and affect the values in it.
+
+=head3 PAST Nodes
+
+The job of NQP is to make abstract syntax trees, and the PCT implementation
+of syntax trees is implemented in the PAST class. There are many different
+types of objects in the PAST class, each of which represents a
+particular program construct. These constructs are relatively common and
+simple, but there are powerful levels of configuration that allow complicated
+programming structures to be represented.
+
+=head3 Making Trees
+
+Every action has the ability to create a PAST node that represents that
+action N<and additional PAST nodes, that are children of that node>. Calling
+the C<make> command on that node adds it into the growing PAST tree that
+PCT maintains. Once the C<TOP> rule matches successfully and returns,
+PCT takes that tree and starts the process of optimizing it and converting
+it into PIR and PBC code for execution.
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:
