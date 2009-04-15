@@ -285,6 +285,9 @@ sub prepare_real_ops {
         if ( $n != $el->{CODE} ) {
             die "op $opname: number mismatch: ops.num $n vs. core.ops $el->{CODE}";
         }
+        if ( $seq != $el->{CODE} ) {
+            die "op $opname: sequence mismatch: ops.num $seq vs. core.ops $el->{CODE}";
+        }
         push @{ $real_ops->{OPS} }, $el;
         ++$seq;
     }
