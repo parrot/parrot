@@ -1,6 +1,6 @@
 =pod
 
-=head1 Opcodes
+=head1 Dynamic Opcodes
 
 Z<CHP-12>
 
