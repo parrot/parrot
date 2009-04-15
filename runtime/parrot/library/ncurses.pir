@@ -1,3 +1,5 @@
+# $Id$
+
 .sub __ncurses_init :load
 
 loadlib $P1, 'libform'

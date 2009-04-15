@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 library/Getopt/Obj.pir - parse long and short command line options

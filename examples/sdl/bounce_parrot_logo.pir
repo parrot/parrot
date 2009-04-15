@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 bounce_parrot_logo.pir - bounce a Parrot logo with the SDL Parrot bindings

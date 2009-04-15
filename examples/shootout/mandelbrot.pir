@@ -1,4 +1,6 @@
 #!./parrot
+# $Id$
+
 =head1 NAME
 
 examples/shootout/mandelbrot.pir - Print the Mandelbrot set

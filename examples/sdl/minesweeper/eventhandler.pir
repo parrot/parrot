@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 eventhandler.pir - a minesweeper event handler

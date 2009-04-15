@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Include Example
 
 This example demonstrates how to include another stream inside a stream.

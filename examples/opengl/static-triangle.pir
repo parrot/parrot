@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 static-triangle.pir - Minimal OpenGL/GLUT setup and render for NCI tests

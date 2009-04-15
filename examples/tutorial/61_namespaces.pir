@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Namespaces
 
 Subroutines all have a unique name, which is how the software recognizes

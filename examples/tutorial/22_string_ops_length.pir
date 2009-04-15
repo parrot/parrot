@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 String Operations (continued)
 
 To find the length of a string in PIR, use the length opcode. It works on

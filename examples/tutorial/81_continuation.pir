@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Continuations
 
 Continuations are tricky and amazing things. Parrot uses continuations for

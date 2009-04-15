@@ -1,3 +1,5 @@
+# $Id$
+
 .sub _main :main
     .local pmc stream
 

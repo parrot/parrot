@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 PCT::HLLCompiler - base class for compiler objects

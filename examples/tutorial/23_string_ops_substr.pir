@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 String Operations (continued)
 
 We can pick apart a string and pull substrings out of it using the

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 app.pir - a tetris application object

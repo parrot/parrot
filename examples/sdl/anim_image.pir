@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 anim_image.pir - animate an image in a Parrot SDL window

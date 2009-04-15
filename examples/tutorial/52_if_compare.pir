@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Comparison Branching
 
 A simple C<goto> is the most simple version of flow control, but its

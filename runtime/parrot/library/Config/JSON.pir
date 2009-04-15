@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Config::JSON
 
 Provides a simple wrapper to read and write JSON config files.

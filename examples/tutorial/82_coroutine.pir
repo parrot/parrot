@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Coroutines
 
 Coroutines are like special subroutines that use C<.yield> instead of

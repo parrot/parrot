@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 defined
 
 The C<defined> opcode tells you if the contents of a PMC is defined or not.

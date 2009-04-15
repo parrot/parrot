@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 move_parrot_logo.pir - move a Parrot logo with the SDL Parrot bindings

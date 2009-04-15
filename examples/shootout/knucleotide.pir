@@ -1,3 +1,4 @@
+# $Id$
 
 .sub main :main
 	.local pmc stdin

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 PGE::Match - implementation of PGE match objects

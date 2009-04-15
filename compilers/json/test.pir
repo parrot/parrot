@@ -1,4 +1,6 @@
 #!../../parrot
+# $Id$
+
 .sub main :main
   .param pmc argv
 

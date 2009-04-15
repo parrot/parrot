@@ -1,3 +1,5 @@
+# $Id$
+
 #
 # dump all namespaces and the contents recursively
 #

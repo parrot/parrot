@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 raw_pixels.pir - paint the screen blue, pixel by pixel

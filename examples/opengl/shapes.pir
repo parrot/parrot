@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 shapes.pir - Exercise basic OpenGL 1.1/GLUT 3 APIs by drawing animated shapes

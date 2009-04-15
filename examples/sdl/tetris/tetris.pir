@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 tetris.pir - a second tetris for parrot (with parrot's SDL bindings)

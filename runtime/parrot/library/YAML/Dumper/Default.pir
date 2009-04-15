@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 YAML::Dumper::Default - The default output module of YAML::Dumper.

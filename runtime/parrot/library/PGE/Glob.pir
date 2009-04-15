@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Glob - Parse and compile glob notation expressions.

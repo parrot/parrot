@@ -1,4 +1,5 @@
 #!./parrot
+# $Id$
 # OUTPUT="Ack(3, 9) = 4093\n"
 #
 # ./parrot -Oc -R cgp-jit

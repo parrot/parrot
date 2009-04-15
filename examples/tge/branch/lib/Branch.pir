@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 Branch - a sample branch node for Language::AttributeGrammar

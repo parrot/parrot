@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 String Operations (continued)
 
 PIR has a string repeat opcode, that concatenates a string with

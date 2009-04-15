@@ -1,3 +1,4 @@
+# $Id$
 # used by examples/shootout/random.pir and others
 # by Joshua Isom
 

@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 PCT::Node - base class for PAST and POST nodes

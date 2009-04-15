@@ -1,3 +1,5 @@
+# $Id$
+
 .sub greet
 	.param pmc    name
 

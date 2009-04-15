@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Named Variables
 
 The other kind of variables in PIR are named variables.

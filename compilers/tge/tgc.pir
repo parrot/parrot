@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 tgc.pir - The TGE rules compiler

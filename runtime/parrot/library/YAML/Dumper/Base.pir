@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 YAML::Dumper::Base - style baseclass

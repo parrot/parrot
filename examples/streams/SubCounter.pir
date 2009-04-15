@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 Counter Example
 
 This example shows the usage of C<Stream::Sub>.

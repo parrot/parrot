@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# $Id$
 #
 # pidigits N  (N = 1000 for shootout)
 #

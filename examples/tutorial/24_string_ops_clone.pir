@@ -1,3 +1,5 @@
+# $Id$
+
 =head1
 
 This code example illustrates cloning with PMC strings. Simple copying

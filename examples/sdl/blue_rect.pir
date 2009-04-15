@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 blue_rect.pir - draw a blue rectangle with the SDL Parrot bindings

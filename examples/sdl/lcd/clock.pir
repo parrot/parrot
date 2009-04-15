@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 clock.pir - LCD clock

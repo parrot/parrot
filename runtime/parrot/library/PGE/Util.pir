@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 PGE/Util.pir - useful rules for working with PGE grammars

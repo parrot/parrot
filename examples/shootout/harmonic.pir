@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 NAME
 
 examples/shootout/harmonic.pir - Partial sum of Harmonic series

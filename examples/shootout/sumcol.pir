@@ -1,4 +1,5 @@
 #!./parrot
+# $Id$
 #
 # ./parrot -R jit sumcol.pir < sum8M
 # by Joshua Isom

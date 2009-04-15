@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 Protoobject.pir - PIR implementation for creating protoobjects

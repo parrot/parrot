@@ -1,3 +1,5 @@
+# $Id$
+
 =head1 TITLE
 
 block.pir - a tetris block class
