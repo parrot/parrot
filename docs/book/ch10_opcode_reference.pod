@@ -2,7 +2,7 @@
 
 =head1 Instruction Reference
 
-Z<CHP-13>
+Z<CHP-10>
 
 This chapter contains a condensed reference to the Parrot virtual
 machine's native instruction set, generally called opcodes. All opcodes
@@ -1223,11 +1223,11 @@ X<interpinfo opcode (PASM)>
 
 Return information about the interpreter. An integer flag selects
 which information to return, as listed in
-Table 13-1.
+Table 10-1.
 
 =begin table picture Interpinfo flags
 
-Z<CHP-13-TABLE-1>
+Z<CHP-10-TABLE-1>
 
 =headrow
 
@@ -2362,13 +2362,13 @@ X<stat opcode (PASM)>
   stat R<DEST>, R<VAL>, R<VAL>
 
 Stat the VAL1 file and return stat element VAL2, as listed in
-Table 13-2.
+Table 10-2.
 
 I<Arguments: IR, S, I or IR, I, I>
 
 =begin table picture Stat arguments
 
-Z<CHP-13-TABLE-2>
+Z<CHP-10-TABLE-2>
 
 =headrow
 
@@ -2532,11 +2532,11 @@ X<stringinfo opcode (PASM)>
   stringinfo R<DEST>, R<STRING>, R<FLAG>
 
 Return information about a string. An integer flag selects which
-information to return, as listed in Table 13-3.
+information to return, as listed in Table 10-3.
 
 =begin table picture Stringinfo arguments
 
-Z<CHP-13-TABLE-3>
+Z<CHP-10-TABLE-3>
 
 =headrow
 
