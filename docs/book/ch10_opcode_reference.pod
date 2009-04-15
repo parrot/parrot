@@ -11,2932 +11,2932 @@ looking up PIR syntax you should check A<CHP-10-SECT-1>"PASM Opcodes",
 A<CHP-10-SECT-2>"PIR Directives", and A<CHP-10-SECT-3>"PIR
 Instructions".
 
-=head2 pasm opcodes
+=head2 PASM Opcodes
 
-z<chp-13-sect-1>
+Z<CHP-13-SECT-1>
 
-x<pasm (parrot assembly language);opcodes, quick reference>
-for complete details on each opcode and the latest changes, read the
-documentation in f<docs/ops/>, or look at all the c<.ops> files in the
-f<ops/> directory.
+X<PASM (Parrot assembly language);opcodes, quick reference>
+For complete details on each opcode and the latest changes, read the
+documentation in F<docs/ops/>, or look at all the C<.ops> files in the
+F<ops/> directory.
 
-we've followed a few conventions. c<dest> is always the register where
-the result of the operation is stored. sometimes the original value of
-c<dest> is one of the source values. c<val> indicates that the actual
+We've followed a few conventions. C<DEST> is always the register where
+the result of the operation is stored. Sometimes the original value of
+C<DEST> is one of the source values. C<VAL> indicates that the actual
 value might be a literal integer, float, or string, or a register
-containing an integer, float, string, or pmc. see the f<.ops> files
+containing an integer, float, string, or PMC. See the F<.ops> files
 for the combinations allowed with a particular operation.
 
 =head3 abs
 
-x<abs opcode (pasm)>
+X<abs opcode (PASM)>
 
-  abs r<dest>
-  abs r<dest>, r<val>
+  abs R<DEST>
+  abs R<DEST>, R<VAL>
 
-return the absolute value of a number. if r<val> is left out, r<dest>
+Return the absolute value of a number. If R<VAL> is left out, R<DEST>
 gets the absolute value of itself.
 
-i<arguments: ir or nr or ir, i or ir, n or nr, i or nr, n>
+I<Arguments: IR or NR or IR, I or IR, N or NR, I or NR, N>
 
 =head3 acos
 
-x<acos opcode (pasm)>
+X<acos opcode (PASM)>
 
-  acos r<dest>, r<val>
+  acos R<DEST>, R<VAL>
 
-the arc cosine of r<val> in radians.
+The arc cosine of R<VAL> in radians.
 
-i<arguments: nr, n or nr, i>
+I<Arguments: NR, N or NR, I>
 
 =head3 add
 
-x<add opcode (pasm)>
+X<add opcode (PASM)>
 
-  add r<dest>, r<val>
-  add r<dest>, r<val>, r<val>
+  add R<DEST>, R<VAL>
+  add R<DEST>, R<VAL>, R<VAL>
 
-add two values and return the sum. if only one r<val>, add r<val> to
-r<dest>.
+Add two values and return the sum. If only one R<VAL>, add R<VAL> to
+R<DEST>.
 
-i<arguments: ir, i or nr, i or nr, n or p, i or p, n or p, p or ir, i, i
-or nr, n, i or nr, n, n or p, p, i or p, p, n or p, p, p>
+I<Arguments: IR, I or NR, I or NR, N or P, I or P, N or P, P or IR, I, I
+or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 addattribute
 
-x<addattribute opcode (pasm)>
+X<addattribute opcode (PASM)>
 
-  addattribute r<class>, r<attr>
+  addattribute R<CLASS>, R<ATTR>
 
-add the attribute name r<attr> to class r<class>.
+Add the attribute name R<ATTR> to class R<CLASS>.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
 =head3 addparent
 
-x<addparent opcode (pasm)>
+X<addparent opcode (PASM)>
 
-  addparent r<class1>, r<class2>
+  addparent R<CLASS1>, R<CLASS2>
 
-add class r<class2> to the list of parent classes for r<class1>.
+Add class R<CLASS2> to the list of parent classes for R<CLASS1>.
 
-i<arguments: p, p>
+I<Arguments: P, P>
 
 =head3 and
 
-x<and opcode (pasm)>
+X<and opcode (PASM)>
 
-  and r<dest>, r<val1>, r<val2>
+  and R<DEST>, R<VAL1>, R<VAL2>
 
-logical and. return r<val1> if it's false; otherwise, return r<val2>.
+Logical AND. Return R<VAL1> if it's false; otherwise, return R<VAL2>.
 
-i<arguments: ir, i, i or p, p, p>
+I<Arguments: IR, I, I or P, P, P>
 
 =head3 asec
 
-x<asec opcode (pasm)>
+X<asec opcode (PASM)>
 
-  asec r<dest>, r<val>
+  asec R<DEST>, R<VAL>
 
-the arc secant of r<val> in radians.
+The arc secant of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 asin
 
-x<asin opcode (pasm)>
+X<asin opcode (PASM)>
 
-  asin r<dest>, r<val>
+  asin R<DEST>, R<VAL>
 
-the arc sine of r<val> in radians.
+The arc sine of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 assign
 
-x<assign opcode (pasm)>
+X<assign opcode (PASM)>
 
-  assign r<dest>, r<val>
+  assign R<DEST>, R<VAL>
 
-assign a value to a pmc.
+Assign a value to a PMC.
 
-i<arguments: sr, s or p, i or p, n or p, s or p, p>
+I<Arguments: SR, S or P, I or P, N or P, S or P, P>
 
 =head3 atan
 
-x<atan opcode (pasm)>
+X<atan opcode (PASM)>
 
-  atan r<dest>, r<val>
-  atan r<dest>, r<val1>, r<val2>
+  atan R<DEST>, R<VAL>
+  atan R<DEST>, R<VAL1>, R<VAL2>
 
-the arc tangent of r<val1> / r<val2> in radians (sign significant). if
-r<val2> is omitted, then just the arc tangent of r<val>.
+The arc tangent of R<VAL1> / R<VAL2> in radians (sign significant). If
+R<VAL2> is omitted, then just the arc tangent of R<VAL>.
 
-i<arguments: nr, i or nr, n or nr, i, i or nr, i, n or nr, n, i or nr,
-n, n>
+I<Arguments: NR, I or NR, N or NR, I, I or NR, I, N or NR, N, I or NR,
+N, N>
 
 =head3 band
 
-x<band opcode (pasm)>
+X<band opcode (PASM)>
 
-  band r<dest>, r<val>
-  band r<dest>, r<val>, r<val>
+  band R<DEST>, R<VAL>
+  band R<DEST>, R<VAL>, R<VAL>
 
-bitwise and on two values. if only one r<val>, bitwise and on r<dest>
-and r<val>.
+Bitwise AND on two values. If only one R<VAL>, bitwise AND on R<DEST>
+and R<VAL>.
 
-i<arguments: ir, i or p, i or p, p or ir, i, i or p, p, i or p, p, p>
+I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 bands
 
-x<bands opcode (pasm)>
+X<bands opcode (PASM)>
 
-  bands r<dest>, r<val>
-  bands r<dest>, r<val>, r<val>
+  bands R<DEST>, R<VAL>
+  bands R<DEST>, R<VAL>, R<VAL>
 
-bitwise and on two strings. if only one r<val>, bitwise and on r<dest>
-and r<val>.
+Bitwise AND on two strings. If only one R<VAL>, bitwise AND on R<DEST>
+and R<VAL>.
 
-i<arguments: sr, s or p, s or p, p or sr, s, s or p, p, s or p, p, p>
+I<Arguments: SR, S or P, S or P, P or SR, S, S or P, P, S or P, P, P>
 
 =head3 bnot
 
-x<bnot opcode (pasm)>
+X<bnot opcode (PASM)>
 
-  bnot r<dest>, r<val>
+  bnot R<DEST>, R<VAL>
 
-bitwise not on r<val>.
+Bitwise NOT on R<VAL>.
 
-i<arguments: ir, i or p, p>
+I<Arguments: IR, I or P, P>
 
 =head3 bnots
 
-x<bnots opcode (pasm)>
+X<bnots opcode (PASM)>
 
-  bnots r<dest>, r<val>
+  bnots R<DEST>, R<VAL>
 
-bitwise not on string r<val>.
+Bitwise NOT on string R<VAL>.
 
-i<arguments: sr, s or p, p>
+I<Arguments: SR, S or P, P>
 
 =head3 bor
 
-x<bor opcode (pasm)>
+X<bor opcode (PASM)>
 
-  bor r<dest>, r<val>, r<val>
+  bor R<DEST>, R<VAL>, R<VAL>
 
-bitwise or on two values. if only one r<val>, bitwise or on r<dest>
-and r<val>.
+Bitwise OR on two values. If only one R<VAL>, bitwise OR on R<DEST>
+and R<VAL>.
 
-i<arguments: ir, i or p, i or p, p or ir, i, i or p, p, i or p, p, p>
+I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 bors
 
-x<bors opcode (pasm)>
+X<bors opcode (PASM)>
 
-  bors r<dest>, r<val>, r<val>
+  bors R<DEST>, R<VAL>, R<VAL>
 
-bitwise or on two strings. if only one r<val>, bitwise or on r<dest>
-and r<val>.
+Bitwise OR on two strings. If only one R<VAL>, bitwise OR on R<DEST>
+and R<VAL>.
 
-i<arguments: sr, s or p, s or p, p or sr, s, s or p, p, s or p, p, p>
+I<Arguments: SR, S or P, S or P, P or SR, S, S or P, P, S or P, P, P>
 
 =head3 bounds
 
-x<bounds opcode (pasm)>
+X<bounds opcode (PASM)>
 
-  bounds r<int>
+  bounds R<INT>
 
-toggle bytecode bounds checking in the interpreter (0 for off, any other
+Toggle bytecode bounds checking in the interpreter (0 for off, any other
 value for on).
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 branch
 
-x<branch opcode (pasm)>
+X<branch opcode (PASM)>
 
-  branch r<label>
+  branch R<LABEL>
 
-branch to a label. the label is calculated as a relative offset.
+Branch to a label. The label is calculated as a relative offset.
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 branch_cs
 
-x<branch_cs opcode (pasm)>
+X<branch_cs opcode (PASM)>
 
-  branch_cs r<fixup_entry>
+  branch_cs R<FIXUP_ENTRY>
 
-intersegment branch to the location of the given fixup table entry.
+Intersegment branch to the location of the given fixup table entry.
 
-i<arguments: s>
+I<Arguments: S>
 
 =head3 bsr
 
-x<bsr opcode (pasm)>
+X<bsr opcode (PASM)>
 
-  bsr r<label>
+  bsr R<LABEL>
 
-branch to a label, like c<branch>, but also push the current location
-onto the call stack so c<ret> can return to it.
+Branch to a label, like C<branch>, but also push the current location
+onto the call stack so C<ret> can return to it.
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 bxor
 
-x<bxor opcode (pasm)>
+X<bxor opcode (PASM)>
 
-  bxor r<dest>, r<val>
-  bxor r<dest>, r<val>, r<val>
+  bxor R<DEST>, R<VAL>
+  bxor R<DEST>, R<VAL>, R<VAL>
 
-bitwise xor on two values. if only one r<val>, bitwise xor on r<dest>
-and r<val>.
+Bitwise XOR on two values. If only one R<VAL>, bitwise XOR on R<DEST>
+and R<VAL>.
 
-i<arguments: ir, i or p, i or p, p or ir, i, i or p, p, i or p, p, p>
+I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 bxors
 
-x<bxors opcode (pasm)>
+X<bxors opcode (PASM)>
 
-  bxors r<dest>, r<val>
-  bxors r<dest>, r<val>, r<val>
+  bxors R<DEST>, R<VAL>
+  bxors R<DEST>, R<VAL>, R<VAL>
 
-bitwise xor on two strings. if only one r<val>, bitwise xor on r<dest>
-and r<val>.
+Bitwise XOR on two strings. If only one R<VAL>, bitwise XOR on R<DEST>
+and R<VAL>.
 
-i<arguments: sr, s or p, s or p, p or sr, s, s or p, p, s or p, p, p>
+I<Arguments: SR, S or P, S or P, P or SR, S, S or P, P, S or P, P, P>
 
 =head3 callmethod
 
-x<callmethod opcode (pasm)>
+X<callmethod opcode (PASM)>
 
   callmethod
-  callmethod r<methodname>
+  callmethod R<METHODNAME>
 
-call the method named r<methodname> on the object stored in c<p2>
-according to the parrot calling conventions. if no method name, pull the
-name from c<s0>.
+Call the method named R<METHODNAME> on the object stored in C<P2>
+according to the Parrot Calling Conventions. If no method name, pull the
+name from C<S0>.
 
-i<arguments: s>
+I<Arguments: S>
 
 =head3 callmethodcc
 
-x<callmethodcc opcode (pasm)>
+X<callmethodcc opcode (PASM)>
 
   callmethodcc
-  callmethodcc r<methodname>
+  callmethodcc R<METHODNAME>
 
-call the method named r<methodname> on the object stored in c<p2>
-according to the parrot calling conventions. if no method name, pull the
-name from c<s0>. also create a return continuation and store it in
-c<p1>.
+Call the method named R<METHODNAME> on the object stored in C<P2>
+according to the Parrot Calling Conventions. If no method name, pull the
+name from C<S0>. Also create a return continuation and store it in
+C<P1>.
 
-i<arguments: s>
+I<Arguments: S>
 
 =head3 can
 
-x<can opcode (pasm)>
+X<can opcode (PASM)>
 
-  can r<dest>, r<object>, r<methodname>
+  can R<DEST>, R<OBJECT>, R<METHODNAME>
 
-return a true value if r<object> i<can> do the r<methodname> method,
+Return a true value if R<OBJECT> I<can> do the R<METHODNAME> method,
 otherwise return a false value.
 
-i<arguments: ir, p, s>
+I<Arguments: IR, P, S>
 
 =head3 ceil
 
-x<ceil opcode (pasm)>
+X<ceil opcode (PASM)>
 
-  ceil r<dest>
-  ceil r<dest>, r<val>
+  ceil R<DEST>
+  ceil R<DEST>, R<VAL>
 
-set r<dest> to the smallest integral value less than or equal to r<val>
+Set R<DEST> to the smallest integral value less than or equal to R<VAL>
 (if present) or itself (if not).
 
-i<arguments: nr or ir, n or nr, n>
+I<Arguments: NR or IR, N or NR, N>
 
 =head3 checkevents
 
-x<checkevents opcode (pasm)>
+X<checkevents opcode (PASM)>
 
   checkevents
 
-check the interpreter's task queue for unhandled events and run the associated
+Check the interpreter's task queue for unhandled events and run the associated
 event handlers.
 
 =head3 chopn
 
-x<chopn opcode (pasm)>
+X<chopn opcode (PASM)>
 
-  chopn r<dest>, r<val1>
-  chopn r<dest>, r<val1>, r<val2>
+  chopn R<DEST>, R<VAL1>
+  chopn R<DEST>, R<VAL1>, R<VAL2>
 
-remove r<val2> number of characters from string r<val1>. if no
-r<val2>, remove r<val> number of characters from string r<dest>.
+Remove R<VAL2> number of characters from string R<VAL1>. If no
+R<VAL2>, remove R<VAL> number of characters from string R<DEST>.
 
-i<arguments: sr, i or sr, s, i>
+I<Arguments: SR, I or SR, S, I>
 
 =head3 chr
 
-x<chr opcode (pasm)>
+X<chr opcode (PASM)>
 
-  chr r<dest>, r<int>
+  chr R<DEST>, R<INT>
 
-return the character represented by the given number.
+Return the character represented by the given number.
 
-i<arguments: sr, i>
+I<Arguments: SR, I>
 
 =head3 class
 
-x<class opcode (pasm)>
+X<class opcode (PASM)>
 
-  class r<class>, r<object>
+  class R<CLASS>, R<OBJECT>
 
-return the r<class> of the given r<object>.
+Return the R<CLASS> of the given R<OBJECT>.
 
-i<arguments: p, p>
+I<Arguments: P, P>
 
 =head3 clear_eh
 
-x<clear_eh>
+X<clear_eh>
 
   clear_eh
 
-clear the most recent exception handler.
+Clear the most recent exception handler.
 
-see also: c<set_eh>, c<throw>.
+See also: C<set_eh>, C<throw>.
 
-=head3 clearx
+=head3 clearX
 
-x<cleari opcode (pasm)>
-x<clearn opcode (pasm)>
-x<clearp opcode (pasm)>
-x<clears opcode (pasm)>
+X<cleari opcode (PASM)>
+X<clearn opcode (PASM)>
+X<clearp opcode (PASM)>
+X<clears opcode (PASM)>
 
   cleari
   clearn
   clearp
   clears
 
-clear all registers of the given type ("i" = integer, "n" = float, "p"
-= pmc, "s" = string). integer and float registers clear to zero; string
-and pmc registers clear to null.
+Clear all registers of the given type ("i" = integer, "n" = float, "p"
+= PMC, "s" = string). Integer and float registers clear to zero; string
+and PMC registers clear to NULL.
 
 =head3 clone
 
-x<clone opcode (pasm)>
+X<clone opcode (PASM)>
 
-  clone r<dest>, r<val>
+  clone R<DEST>, R<VAL>
 
-clone (deep copy) a string or pmc and return the result.
+Clone (deep copy) a string or PMC and return the result.
 
-i<arguments: sr, s or p, p>
+I<Arguments: SR, S or P, P>
 
 =head3 close
 
-x<close opcode (pasm)>
+X<close opcode (PASM)>
 
-  close r<dest>
+  close R<DEST>
 
-close the filehandle in the given register.
+Close the filehandle in the given register.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 cmod
 
-x<cmod opcode (pasm)>
+X<cmod opcode (PASM)>
 
-  cmod r<dest>, r<val1>, r<val2>
+  cmod R<DEST>, R<VAL1>, R<VAL2>
 
-c's built-in mod operator.
+C's built-in mod operator.
 
-see also c<mod>.
+See also C<mod>.
 
-i<arguments: ir, i, i or nr, n, n or p, p, i or p, p, n or p, p, p>
+I<Arguments: IR, I, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 cmp
 
-x<cmp (comparison);opcode (pasm)>
+X<cmp (comparison);opcode (PASM)>
 
-  cmp r<dest>, r<val1>, r<val2>
+  cmp R<DEST>, R<VAL1>, R<VAL2>
 
-set r<dest> to 1 if r<val1> is greater then r<val2>, to -1 if it's less then
-r<val2> or to zero if both are equal. if r<val1> and r<val2> are both pmcs,
-then the type of comparison depends on r<val1>.
+Set R<DEST> to 1 if R<VAL1> is greater then R<VAL2>, to -1 if it's less then
+R<VAL2> or to zero if both are equal. If R<VAL1> and R<VAL2> are both PMCs,
+then the type of comparison depends on R<VAL1>.
 
-i<arguments: ir, i, i or ir, n, n or ir, s, s or ir, p, i or ir, p, n
-ir, p, s or ir, p, p>
+I<Arguments: IR, I, I or IR, N, N or IR, S, S or IR, P, I or IR, P, N
+IR, P, S or IR, P, P>
 
 =head3 cmp_num
 
-x<cmp_num opcode (pasm)>
+X<cmp_num opcode (PASM)>
 
-  cmp_num r<dest>, r<val1>, r<val2>
+  cmp_num R<DEST>, R<VAL1>, R<VAL2>
 
-like c<cmp>, but forces numeric comparison.
+Like C<cmp>, but forces numeric comparison.
 
-i<arguments: ir, p, p>
+I<Arguments: IR, P, P>
 
 =head3 cmp_str
 
-x<cmp_str opcode (pasm)>
+X<cmp_str opcode (PASM)>
 
-  cmp_str r<dest>, r<val1>, r<val2>
+  cmp_str R<DEST>, R<VAL1>, R<VAL2>
 
-like c<cmp>, but forces string comparison.
+Like C<cmp>, but forces string comparison.
 
-i<arguments: ir, p, p>
+I<Arguments: IR, P, P>
 
 =head3 collect
 
-x<collect opcode (pasm)>
+X<collect opcode (PASM)>
 
   collect
 
-trigger a garbage collection (gc) run.
+Trigger a garbage collection (GC) run.
 
 =head3 collectoff
 
-x<collectoff opcode (pasm)>
+X<collectoff opcode (PASM)>
 
   collectoff
 
-disable garbage collection runs (nestable).
+Disable garbage collection runs (nestable).
 
 =head3 collecton
 
-x<collecton opcode (pasm)>
+X<collecton opcode (PASM)>
 
   collecton
 
-re-enable garbage collection runs.
+Re-enable garbage collection runs.
 
 =head3 compile
 
-x<compile opcode (pasm)>
+X<compile opcode (PASM)>
 
-  compile r<dest>, r<compiler>, r<source>
+  compile R<DEST>, R<COMPILER>, R<SOURCE>
 
-compile a string of source code with a given compiler pmc and store
+Compile a string of source code with a given compiler PMC and store
 the result.
 
-i<arguments: p, p, s>
+I<Arguments: P, P, S>
 
 =head3 compreg
 
-x<compreg opcode (pasm)>
+X<compreg opcode (PASM)>
 
-  compreg r<dest>, r<type>
+  compreg R<DEST>, R<TYPE>
 
-return a compiler pmc for a particular type of source code.
+Return a compiler PMC for a particular type of source code.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
-  compreg r<type>, r<sub>
+  compreg R<TYPE>, R<SUB>
 
-register r<sub> as a compiler for language r<type>.
+Register R<SUB> as a compiler for language R<TYPE>.
 
-i<arguments: s, p>
+I<Arguments: S, P>
 
 =head3 concat
 
-x<concat opcode (pasm)>
+X<concat opcode (PASM)>
 
-  concat r<dest>, r<val>
-  concat r<dest>, r<val>, r<val>
+  concat R<DEST>, R<VAL>
+  concat R<DEST>, R<VAL>, R<VAL>
 
-concatenate two strings. if only one r<val>, concatenate r<val> onto
-r<dest>.
+Concatenate two strings. If only one R<VAL>, concatenate R<VAL> onto
+R<DEST>.
 
-i<arguments: sr, s or sr, s, s or p, p, s or p, p, p>
+I<Arguments: SR, S or SR, S, S or P, P, S or P, P, P>
 
 =head3 cos
 
-x<cos opcode (pasm)>
+X<cos opcode (PASM)>
 
-  cos r<dest>, r<val>
+  cos R<DEST>, R<VAL>
 
-the cosine of r<val> in radians.
+The cosine of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 cosh
 
-x<cosh opcode (pasm)>
+X<cosh opcode (PASM)>
 
-  cosh r<dest>, r<val>
+  cosh R<DEST>, R<VAL>
 
-the hyperbolic cosine of r<val> in radians.
+The hyperbolic cosine of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 debug
 
-x<debug opcode (pasm)>
+X<debug opcode (PASM)>
 
-  debug r<flag>
+  debug R<FLAG>
 
-toggle debugging in the interpreter (0 for off, any other value for on).
+Toggle debugging in the interpreter (0 for off, any other value for on).
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 dec
 
-x<dec opcode (pasm)>
+X<dec opcode (PASM)>
 
-  dec r<dest>
+  dec R<DEST>
 
-decrement a value by 1.
+Decrement a value by 1.
 
-i<arguments: i or n or p>
+I<Arguments: I or N or P>
 
 =head3 decodelocaltime
 
-x<decodelocaltime opcode (pasm)>
+X<decodelocaltime opcode (PASM)>
 
-  decodelocaltime r<dest>, r<val>
+  decodelocaltime R<DEST>, R<VAL>
 
-set r<dest> to a new array which represents the decoded time of the
+Set R<DEST> to a new array which represents the decoded time of the
 given epoch-seconds value shifted to local time.
 
-i<arguments: p, i>
+I<Arguments: P, I>
 
 =head3 decodetime
 
-x<decodetime opcode (pasm)>
+X<decodetime opcode (PASM)>
 
-  decodetime r<dest>, r<val>
+  decodetime R<DEST>, R<VAL>
 
-set r<dest> to a new array which represents the decoded time of the
+Set R<DEST> to a new array which represents the decoded time of the
 given epoch-seconds value.
 
-i<arguments: p, i>
+I<Arguments: P, I>
 
 =head3 defined
 
-x<defined opcode (pasm)>
+X<defined opcode (PASM)>
 
-  defined r<dest>, r<pmc>
-  defined r<dest>, r<pmc>[r<key>]
+  defined R<DEST>, R<PMC>
+  defined R<DEST>, R<PMC>[R<KEY>]
 
-test a keyed pmc value for definedness. if no r<key>, test a pmc for
+Test a keyed PMC value for definedness. If no R<KEY>, test a PMC for
 definedness.
 
-i<arguments: ir, p>
+I<Arguments: IR, P>
 
 =head3 delete
 
-x<delete opcode (pasm)>
+X<delete opcode (PASM)>
 
-  delete r<dest>[r<key>]
+  delete R<DEST>[R<KEY>]
 
-delete a keyed value from an aggregate pmc.
+Delete a keyed value from an aggregate PMC.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 delprop
 
-x<delprop opcode (pasm)>
+X<delprop opcode (PASM)>
 
-  delprop r<pmc>, r<name>
+  delprop R<PMC>, R<NAME>
 
-delete a named property from a pmc.
+Delete a named property from a PMC.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
-see also: c<setprop> and c<getprop>.
+See also: C<setprop> and C<getprop>.
 
 =head3 deref
 
-x<deref opcode (pasm)>
+X<deref opcode (PASM)>
 
-  deref r<dest>, r<ref>
+  deref R<DEST>, R<REF>
 
-set r<dest> to the pmc that r<ref> refers to.
+Set R<DEST> to the PMC that R<REF> refers to.
 
-i<arguments: p, p>
+I<Arguments: P, P>
 
 =head3 die_hard
 
-x<die_hard opcode (pasm)>
+X<die_hard opcode (PASM)>
 
-  die_hard r<level>, r<error>
+  die_hard R<LEVEL>, R<ERROR>
 
-die at a given level of severity, and with the given error code.
+Die at a given level of severity, and with the given error code.
 
-i<arguments: i, i>
+I<Arguments: I, I>
 
-see also: c<exit>.
+See also: C<exit>.
 
 =head3 div
 
-x<div opcode (pasm)>
+X<div opcode (PASM)>
 
-  div r<dest>, r<val>
-  div r<dest>, r<val1>, r<val2>
+  div R<DEST>, R<VAL>
+  div R<DEST>, R<VAL1>, R<VAL2>
 
-divide r<val1> by r<val2>. if r<val2> is left out, divide r<dest> by
-r<val>.
+Divide R<VAL1> by R<VAL2>. If R<VAL2> is left out, divide R<DEST> by
+R<VAL>.
 
-i<arguments: ir, i or nr, i or nr, n or p, i or p, n or p, p or ir, i, i
-or nr, n, i or nr, n, n or p, p, i or p, p, n or p, p, p>
+I<Arguments: IR, I or NR, I or NR, N or P, I or P, N or P, P or IR, I, I
+or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 dlfunc
 
-x<dlfunc opcode (pasm)>
+X<dlfunc opcode (PASM)>
 
-  dlfunc r<dest>, r<library>, r<symbol>, r<signature>
+  dlfunc R<DEST>, R<LIBRARY>, R<SYMBOL>, R<SIGNATURE>
 
-look up a symbol in a dynamic link library pmc and create a subroutine
-pmc for that symbol with the given signature.
+Look up a symbol in a dynamic link library PMC and create a subroutine
+PMC for that symbol with the given signature.
 
-i<arguments: p, p, s, s>
+I<Arguments: P, P, S, S>
 
 =head3 dlvar
 
-x<dlvar opcode (pasm)>
+X<dlvar opcode (PASM)>
 
-  dlvar r<dest>, r<library>, r<symbol>
+  dlvar R<DEST>, R<LIBRARY>, R<SYMBOL>
 
-look up a symbol in a dynamic link library pmc and create a
-pmc for that symbol.
+Look up a symbol in a dynamic link library PMC and create a
+PMC for that symbol.
 
-i<arguments: p, p, s>
+I<Arguments: P, P, S>
 
 =head3 does
 
-x<does opcode (pasm)>
+X<does opcode (PASM)>
 
-  does r<dest>, r<object>, r<val>
+  does R<DEST>, R<OBJECT>, R<VAL>
 
-return a true value if r<object> i<does> provide the interface r<val>,
+Return a true value if R<OBJECT> I<does> provide the interface R<VAL>,
 otherwise return a false value.
 
-i<arguments: i, p, s>
+I<Arguments: I, P, S>
 
 =head3 downcase
 
-x<downcase opcode (pasm)>
+X<downcase opcode (PASM)>
 
-  downcase r<dest>
-  downcase r<dest>, r<val>
+  downcase R<DEST>
+  downcase R<DEST>, R<VAL>
 
-create a copy of the string in r<val> with all characters converted to
-lower case, and store it in r<dest>. if r<val> is omitted, convert and
-replace the string in r<dest>.
+Create a copy of the string in R<VAL> with all characters converted to
+lower case, and store it in R<DEST>. If R<VAL> is omitted, convert and
+replace the string in R<DEST>.
 
-i<arguments: s or s, s>
+I<Arguments: S or S, S>
 
-see also: c<upcase>, c<titlecase>.
+See also: C<upcase>, C<titlecase>.
 
 =head3 end
 
-x<end opcode (pasm)>
+X<end opcode (PASM)>
 
   end
 
-end execution within the current code segment or halt the interpreter
+End execution within the current code segment or halt the interpreter
 if in the main code segment.
 
 =head3 enternative
 
-x<enternative opcode (pasm)>
+X<enternative opcode (PASM)>
 
   enternative
 
-run the c<run_native> c function.
+Run the C<run_native> C function.
 
 =head3 eq
 
-x<eq opcode (pasm)>
+X<eq opcode (PASM)>
 
-  eq r<val>, r<val>, r<label>
+  eq R<VAL>, R<VAL>, R<LABEL>
 
-jump to a label if the two values are equal.
+Jump to a label if the two values are equal.
 
-i<arguments: i, i, ic or n, n, ic or s, s, ic or p, i, ic or p, n, ic
-or p, s, ic or p, p, ic>
+I<Arguments: I, I, IC or N, N, IC or S, S, IC or P, I, IC or P, N, IC
+or P, S, IC or P, P, IC>
 
 =head3 eq_addr
 
-x<eq_addr opcode (pasm)>
+X<eq_addr opcode (PASM)>
 
-  eq_addr r<val1>, r<val2>, r<label>
+  eq_addr R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> and r<val2> point to the same string or pmc.
-note that this op compares the addresses of the two strings or pmcs,
+Jump to a label if R<VAL1> and R<VAL2> point to the same string or PMC.
+Note that this op compares the addresses of the two strings or PMCs,
 not simply their values.
 
-i<arguments: s, s, ic or p, p, ic>
+I<Arguments: S, S, IC or P, P, IC>
 
 =head3 eq_num
 
-x<eq_num opcode (pasm)>
+X<eq_num opcode (PASM)>
 
-  eq_num r<val>, r<val>, r<label>
+  eq_num R<VAL>, R<VAL>, R<LABEL>
 
-jump to a label if the two values are numerically equal.
+Jump to a label if the two values are numerically equal.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 eq_str
 
-x<eq_str opcode (pasm)>
+X<eq_str opcode (PASM)>
 
-  eq_str r<val>, r<val>, r<label>
+  eq_str R<VAL>, R<VAL>, R<LABEL>
 
-jump to a label if the two strings are equal.
+Jump to a label if the two strings are equal.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 err
 
-x<err opcode (pasm)>
+X<err opcode (PASM)>
 
-  err r<dest>
-  err r<dest>, r<code>
+  err R<DEST>
+  err R<DEST>, R<CODE>
 
-return the system error code to an integer destination or the system
-error message to a string destination. the two-argument version returns
+Return the system error code to an integer destination or the system
+error message to a string destination. The two-argument version returns
 the system error message for a given code.
 
-i<arguments: ir or sr or sr, i>
+I<Arguments: IR or SR or SR, I>
 
 =head3 errorsoff
 
-x<errorsoff opcode (pasm)>
+X<errorsoff opcode (PASM)>
 
-  errorsoff r<val>
+  errorsoff R<VAL>
 
-turn off errors of type r<val>.
+Turn off errors of type R<VAL>.
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 errorson
 
-x<errorson opcode (pasm)>
+X<errorson opcode (PASM)>
 
-  errorson r<val>
+  errorson R<VAL>
 
-turn on errors of type r<val>.
+Turn on errors of type R<VAL>.
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 exchange
 
-x<exchange opcode (pasm)>
+X<exchange opcode (PASM)>
 
-  exchange r<reg>, r<reg>
+  exchange R<REG>, R<REG>
 
-exchange the contents of two registers.
+Exchange the contents of two registers.
 
-i<arguments: ir, ir or nr, nr or sr, sr or p, p>
+I<Arguments: IR, IR or NR, NR or SR, SR or P, P>
 
 =head3 exists
 
-x<exists opcode (pasm)>
+X<exists opcode (PASM)>
 
-  exists r<dest>, r<pmc>[r<key>]
+  exists R<DEST>, R<PMC>[R<KEY>]
 
-test a pmc key for existence.
+Test a PMC key for existence.
 
-i<arguments: ir, p>
+I<Arguments: IR, P>
 
 =head3 exit
 
-x<exit opcode (pasm)>
+X<exit opcode (PASM)>
 
-  exit r<status>
+  exit R<STATUS>
 
-exit the interpreter with a given r<status>. (for extended exit status,
-throw an exception with severity c<except_exit>.)
+Exit the interpreter with a given R<STATUS>. (For extended exit status,
+throw an exception with severity C<EXCEPT_exit>.)
 
-i<arguments: i>
+I<Arguments: I>
 
-see also: c<throw>, c<die_hard>.
+See also: C<throw>, C<die_hard>.
 
 =head3 exp
 
-x<exp opcode (pasm)>
+X<exp opcode (PASM)>
 
-  exp r<dest>, r<val>
+  exp R<DEST>, R<VAL>
 
-base of the natural logarithm, i<e>, to the power of r<val>.
+Base of the natural logarithm, I<e>, to the power of R<VAL>.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 exsec
 
-x<exsec opcode (pasm)>
+X<exsec opcode (PASM)>
 
-  exsec r<dest>, r<val>
+  exsec R<DEST>, R<VAL>
 
-the exsecant of r<val> in radians.
+The exsecant of R<VAL> in radians.
 
-i<arguments: nr, n>
+I<Arguments: NR, N>
 
 =head3 fact
 
-x<fact opcode (pasm)>
+X<fact opcode (PASM)>
 
-  fact r<dest>, r<int>
+  fact R<DEST>, R<INT>
 
-return the factorial of r<int>.
+Return the factorial of R<INT>.
 
-i<arguments: ir, i or nr, i>
+I<Arguments: IR, I or NR, I>
 
 =head3 fdopen
 
-x<fdopen opcode (pasm)>
+X<fdopen opcode (PASM)>
 
-  fdopen r<dest>, r<int>, r<mode>
+  fdopen R<DEST>, R<INT>, R<MODE>
 
-get a parrotio object for handle r<int> with open mode r<mode>.
+Get a ParrotIO object for handle R<INT> with open mode R<MODE>.
 
-i<arguments: p, i, s>
+I<Arguments: P, I, S>
 
 =head3 find_chartype
 
-x<find_chartype opcode (pasm)>
+X<find_chartype opcode (PASM)>
 
-  find_chartype r<dest>, r<name>
+  find_chartype R<DEST>, R<NAME>
 
-find the chartype named r<name> and return its number in r<dest>.
+Find the chartype named R<NAME> and return its number in R<DEST>.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
 =head3 find_encoding
 
-x<strings;encoding>
-x<find_encoding opcode (pasm)>
+X<strings;encoding>
+X<find_encoding opcode (PASM)>
 
-  find_encoding r<dest>, r<name>
+  find_encoding R<DEST>, R<NAME>
 
-find the encoding named r<name> and return its number in r<dest>.
+Find the encoding named R<NAME> and return its number in R<DEST>.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
 =head3 find_global
 
-x<find_global opcode (pasm)>
+X<find_global opcode (PASM)>
 
-  find_global r<dest>, r<name>
+  find_global R<DEST>, R<NAME>
 
-return a global variable with the given name.
+Return a global variable with the given name.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
-  find_global r<dest>, r<namespace>, r<name>
+  find_global R<DEST>, R<NAMESPACE>, R<NAME>
 
-return a global variable with the given name from the given namespace.
+Return a global variable with the given name from the given namespace.
 
-i<arguments: p, s, s or p, p, s>
+I<Arguments: P, S, S or P, P, S>
 
-see also: c<store_global>.
+See also: C<store_global>.
 
 =head3 find_lex
 
-x<find_lex opcode (pasm)>
+X<find_lex opcode (PASM)>
 
-  find_lex r<dest>, r<name>
-  find_lex r<dest>, r<depth>, r<name>
-  find_lex r<dest>, r<depth>, r<position>
+  find_lex R<DEST>, R<NAME>
+  find_lex R<DEST>, R<DEPTH>, R<NAME>
+  find_lex R<DEST>, R<DEPTH>, R<POSITION>
 
-return the lexical variable of the given name from a lexical
-scratchpad. if r<depth> is provided, only return a variable from the
-scratchpad at that depth. a find by position returns the variable at a
+Return the lexical variable of the given name from a lexical
+scratchpad. If R<DEPTH> is provided, only return a variable from the
+scratchpad at that depth. A find by position returns the variable at a
 particular position in the scratchpad.
 
-i<arguments: p, s or p, i, s or p, i, i>
+I<Arguments: P, S or P, I, S or P, I, I>
 
-see also: c<store_lex>.
+See also: C<store_lex>.
 
 =head3 find_method
 
-x<find_method opcode (pasm)>
+X<find_method opcode (PASM)>
 
-  find_method r<dest>, r<pmc>, r<name>
+  find_method R<DEST>, R<PMC>, R<NAME>
 
-look up a method by name in a pmc's vtable. return a method pmc.
+Look up a method by name in a PMC's vtable. Return a method PMC.
 
-i<arguments: p, p, s>
+I<Arguments: P, P, S>
 
 =head3 find_type
 
-x<find_type opcode (pasm)>
+X<find_type opcode (PASM)>
 
-  find_type r<dest>, r<name>
+  find_type R<DEST>, R<NAME>
 
-find the integer identifier for a pmc type or native parrot datatype by name.
+Find the integer identifier for a PMC type or native Parrot datatype by name.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
-see also: c<typeof>.
+See also: C<typeof>.
 
 =head3 findclass
 
-x<findclass opcode (pasm)>
+X<findclass opcode (PASM)>
 
-  findclass r<dest>, r<name>
+  findclass R<DEST>, R<NAME>
 
-return 1 if the class r<name> exists, and 0 otherwise.
+Return 1 if the class R<NAME> exists, and 0 otherwise.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
-see also: c<typeof>.
+See also: C<typeof>.
 
 =head3 floor
 
-x<floor opcode (pasm)>
+X<floor opcode (PASM)>
 
-  floor r<dest>
-  floor r<dest>, r<val>
+  floor R<DEST>
+  floor R<DEST>, R<VAL>
 
-return the largest integral value less than or equal to r<val> (if
+Return the largest integral value less than or equal to R<VAL> (if
 present) or itself (if not).
 
-i<arguments: nr or ir, n or nr, n>
+I<Arguments: NR or IR, N or NR, N>
 
 =head3 foldup
 
-x<foldup opcode (pasm)>
+X<foldup opcode (PASM)>
 
-  foldup r<dest>
-  foldup r<dest>, r<skip>
+  foldup R<DEST>
+  foldup R<DEST>, R<SKIP>
 
-return a new array holding all passed subroutine parameters. r<skip>
+Return a new array holding all passed subroutine parameters. R<SKIP>
 defines an optional offset.
 
-i<arguments: p or p, i>
+I<Arguments: P or P, I>
 
 =head3 freeze
 
-x<freeze opcode (pasm)>
+X<freeze opcode (PASM)>
 
-  freeze r<dest>, r<val>
+  freeze R<DEST>, R<VAL>
 
-create a frozen image r<dest> from pmc r<val>.
+Create a frozen image R<DEST> from PMC R<VAL>.
 
-i<arguments: sr, p>
+I<Arguments: SR, P>
 
-see also: c<thaw>.
+See also: C<thaw>.
 
 =head3 gc_debug
 
-x<gc_debug opcode (pasm)>
+X<gc_debug opcode (PASM)>
 
-  gc_debug r<int>
+  gc_debug R<INT>
 
-toggle garbage collection debugging in the interpreter (0 for off, any
+Toggle garbage collection debugging in the interpreter (0 for off, any
 other value for on).
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 gcd
 
-x<gcd opcode (pasm)>
+X<gcd opcode (PASM)>
 
-  gcd r<dest>, r<val>, r<val>
+  gcd R<DEST>, R<VAL>, R<VAL>
 
-return the greatest common divisor of two values.
+Return the greatest common divisor of two values.
 
-i<arguments: ir, i, i or ir, n, n>
+I<Arguments: IR, I, I or IR, N, N>
 
 =head3 ge
 
-x<ge (greater than or equal);opcode (pasm)>
+X<ge (greater than or equal);opcode (PASM)>
 
-  ge r<val1>, r<val2>, r<label>
+  ge R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is greater than or equal to r<val2>.
+Jump to a label if R<VAL1> is greater than or equal to R<VAL2>.
 
-i<arguments: i, i, ic or n, n, ic or s, s, ic or p, i, ic or p, n, ic
-or p, s, ic or p, p, ic>
+I<Arguments: I, I, IC or N, N, IC or S, S, IC or P, I, IC or P, N, IC
+or P, S, IC or P, P, IC>
 
 =head3 ge_num
 
-x<ge_num opcode (pasm)>
+X<ge_num opcode (PASM)>
 
-  ge_num r<val1>, r<val2>, r<label>
+  ge_num R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is numerically greater than or equal to r<val2>.
+Jump to a label if R<VAL1> is numerically greater than or equal to R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 ge_str
 
-x<ge_str opcode (pasm)>
+X<ge_str opcode (PASM)>
 
-  ge_str r<val1>, r<val2>, r<label>
+  ge_str R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is stringwise greater than or equal to r<val2>.
+Jump to a label if R<VAL1> is stringwise greater than or equal to R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 get_addr
 
-x<get_addr opcode (pasm)>
+X<get_addr opcode (PASM)>
 
-  get_addr r<dest>, r<sub>
+  get_addr R<DEST>, R<SUB>
 
-get the absolute address of a subroutine pmc.
+Get the absolute address of a subroutine PMC.
 
-i<arguments: ir, p>
+I<Arguments: IR, P>
 
-see also: c<set_addr>.
+See also: C<set_addr>.
 
 =head3 getattribute
 
-x<getattribute opcode (pasm)>
+X<getattribute opcode (PASM)>
 
-  getattribute r<dest>, r<object>, r<offs>
+  getattribute R<DEST>, R<OBJECT>, R<OFFS>
 
-get a reference to attribute number r<offs> from object r<object>.
+Get a reference to attribute number R<OFFS> from object R<OBJECT>.
 
-i<arguments: p, p, i>
+I<Arguments: P, P, I>
 
-see also: c<setattribute>, c<classoffset>.
+See also: C<setattribute>, C<classoffset>.
 
 =head3 get_class
 
-x<get_class opcode (pasm)>
+X<get_class opcode (PASM)>
 
-  get_class r<dest>, r<name>
+  get_class R<DEST>, R<NAME>
 
-return the class pmc of the given name.
+Return the class PMC of the given name.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
 =head3 getfile
 
-x<getfile opcode (pasm)>
+X<getfile opcode (PASM)>
 
-  getfile r<dest>
+  getfile R<DEST>
 
-return the name of the current file.
+Return the name of the current file.
 
-i<arguments: sr>
+I<Arguments: SR>
 
 =head3 getinterp
 
-x<getinterp opcode (pasm)>
+X<getinterp opcode (PASM)>
 
-  getinterp r<dest>
+  getinterp R<DEST>
 
-get a pmc representing the current interpreter.
+Get a PMC representing the current interpreter.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 getline
 
-x<getline opcode (pasm)>
+X<getline opcode (PASM)>
 
-  getline r<dest>
+  getline R<DEST>
 
-return the current line number.
+Return the current line number.
 
-i<arguments: ir>
+I<Arguments: IR>
 
 =head3 getpackage
 
-x<getpackage opcode (pasm)>
+X<getpackage opcode (PASM)>
 
-  getpackage r<dest>
+  getpackage R<DEST>
 
-return the current package name.
+Return the current package name.
 
-i<arguments: sr>
+I<Arguments: SR>
 
 =head3 getprop
 
-x<getprop opcode (pasm)>
+X<getprop opcode (PASM)>
 
-  getprop r<dest>, r<name>, r<pmc>
+  getprop R<DEST>, R<NAME>, R<PMC>
 
-return the value of a named property on a pmc.
+Return the value of a named property on a PMC.
 
-i<arguments: p, s, p>
+I<Arguments: P, S, P>
 
-see also: c<setprop> and c<prophash>.
+See also: C<setprop> and C<prophash>.
 
 =head3 getstd*
 
-x<getstderr opcode (pasm)>
-x<getstdin opcode (pasm)>
-x<getstdout opcode (pasm)>
+X<getstderr opcode (PASM)>
+X<getstdin opcode (PASM)>
+X<getstdout opcode (PASM)>
 
-  getstderr r<dest>
-  getstdin r<dest>
-  getstdout r<dest>
+  getstderr R<DEST>
+  getstdin R<DEST>
+  getstdout R<DEST>
 
-get a parrotio object for the given standard handle.
+Get a ParrotIO object for the given standard handle.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 gmtime
 
-x<gmtime opcode (pasm)>
+X<gmtime opcode (PASM)>
 
-  gmtime r<dest>, r<val>
+  gmtime R<DEST>, R<VAL>
 
-take the integer, which represents gmt epoch-seconds, and turn it into a
+Take the integer, which represents GMT epoch-seconds, and turn it into a
 formatted string.
 
-i<arguments: sr, i>
+I<Arguments: SR, I>
 
-see also: c<localtime>.
+See also: C<localtime>.
 
 =head3 gt
 
-x<gt opcode (pasm)>
+X<gt opcode (PASM)>
 
-  gt r<val1>, r<val2>, r<label>
+  gt R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is greater than r<val2>.
+Jump to a label if R<VAL1> is greater than R<VAL2>.
 
-i<arguments: i, i, ic or n, n, ic or s, s, ic or p, i, ic or p, n, ic or
-p, s, ic or p, p, ic>
+I<Arguments: I, I, IC or N, N, IC or S, S, IC or P, I, IC or P, N, IC or
+P, S, IC or P, P, IC>
 
 =head3 gt_num
 
-x<gt_num opcode (pasm)>
+X<gt_num opcode (PASM)>
 
-  gt_num r<val1>, r<val2>, r<label>
+  gt_num R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is numerically greater than r<val2>.
+Jump to a label if R<VAL1> is numerically greater than R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 gt_str
 
-x<gt_str opcode (pasm)>
+X<gt_str opcode (PASM)>
 
-  gt_str r<val1>, r<val2>, r<label>
+  gt_str R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is stringwise greater than r<val2>.
+Jump to a label if R<VAL1> is stringwise greater than R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 hav
 
-x<hav opcode (pasm)>
+X<hav opcode (PASM)>
 
-  hav r<dest>, r<val>
+  hav R<DEST>, R<VAL>
 
-the haversine of r<val> in radians.
+The haversine of R<VAL> in radians.
 
-i<arguments: nr, n>
+I<Arguments: NR, N>
 
 =head3 if
 
-x<if (conditional);opcode (pasm)>
+X<if (conditional);opcode (PASM)>
 
-  if r<condition>, r<label>
+  if R<CONDITION>, R<LABEL>
 
-jump to a label if the condition is a true value.
+Jump to a label if the condition is a true value.
 
-i<arguments: i, ic or n, ic or s, ic or p, ic>
+I<Arguments: I, IC or N, IC or S, IC or P, IC>
 
 =head3 inc
 
-x<inc opcode (pasm)>
+X<inc opcode (PASM)>
 
-  inc r<dest>
+  inc R<DEST>
 
-increment a value by one.
+Increment a value by one.
 
-i<arguments: ir or nr or p>
+I<Arguments: IR or NR or P>
 
 =head3 index
 
-x<index opcode (pasm)>
+X<index opcode (PASM)>
 
-  index r<dest>, r<string>, r<search>
-  index r<dest>, r<string>, r<search>, r<pos>
+  index R<DEST>, R<STRING>, R<SEARCH>
+  index R<DEST>, R<STRING>, R<SEARCH>, R<POS>
 
-return the position of the first occurrence of the string r<search> in
-the string r<string>, starting at the position r<pos>. if the starting
+Return the position of the first occurrence of the string R<SEARCH> in
+the string R<STRING>, starting at the position R<POS>. If the starting
 position is unspecified, start at the beginning of the string.
 
-i<arguments: ir, s, s or ir, s, s, i>
+I<Arguments: IR, S, S or IR, S, S, I>
 
 =head3 interpinfo
 
-x<interpinfo opcode (pasm)>
+X<interpinfo opcode (PASM)>
 
-  interpinfo r<dest>, r<flag>
+  interpinfo R<DEST>, R<FLAG>
 
-return information about the interpreter. an integer flag selects
+Return information about the interpreter. An integer flag selects
 which information to return, as listed in
-a<chp-13-table-1>table 13-1.
+A<CHP-13-TABLE-1>Table 13-1.
 
-=begin table picture interpinfo flags
+=begin table picture Interpinfo flags
 
-z<chp-13-table-1>
+Z<CHP-13-TABLE-1>
 
 =headrow
 
 =row
 
-=cell flag
+=cell Flag
 
-=cell returns
+=cell Returns
 
 =bodyrows
 
 =row
 
-=cell c<1>
+=cell C<1>
 
-=cell allocated memory, in bytes.
-
-=row
-
-=cell c<2>
-
-=cell number of gc mark runs performed.
+=cell Allocated memory, in bytes.
 
 =row
 
-=cell c<3>
+=cell C<2>
 
-=cell number of gc runs performed.
-
-=row
-
-=cell c<4>
-
-=cell number of active pmcs.
+=cell Number of GC mark runs performed.
 
 =row
 
-=cell c<5>
+=cell C<3>
 
-=cell number of active buffers.
-
-=row
-
-=cell c<6>
-
-=cell number of allocated pmcs.
+=cell Number of GC runs performed.
 
 =row
 
-=cell c<7>
+=cell C<4>
 
-=cell number of allocated buffers.
-
-=row
-
-=cell c<8>
-
-=cell number of new pmc or buffer headers allocated since last mark run.
+=cell Number of active PMCs.
 
 =row
 
-=cell c<9>
+=cell C<5>
 
-=cell number of memory blocks allocated since last gc run.
+=cell Number of active buffers.
 
 =row
 
-=cell c<10>
+=cell C<6>
 
-=cell amount of memory copied during gc runs, in bytes.
+=cell Number of allocated PMCs.
+
+=row
+
+=cell C<7>
+
+=cell Number of allocated buffers.
+
+=row
+
+=cell C<8>
+
+=cell Number of new PMC or buffer headers allocated since last mark run.
+
+=row
+
+=cell C<9>
+
+=cell Number of memory blocks allocated since last GC run.
+
+=row
+
+=cell C<10>
+
+=cell Amount of memory copied during GC runs, in bytes.
 
 =end table
 
-i<arguments: ir, i>
+I<Arguments: IR, I>
 
 =head3 invoke
 
-x<invoke opcode (pasm)>
+X<invoke opcode (PASM)>
 
   invoke
-  invoke r<sub>
+  invoke R<SUB>
 
-call a subroutine, coroutine, or continuation stored in a pmc. if no
-pmc register is specified, it calls the subroutine in c<p0> and uses
-the standard calling conventions.  otherwise, no calling convention is
-defined. also c<yield> from a coroutine.
+Call a subroutine, coroutine, or continuation stored in a PMC. If no
+PMC register is specified, it calls the subroutine in C<P0> and uses
+the standard calling conventions.  Otherwise, no calling convention is
+defined. Also C<yield> from a coroutine.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 invokecc
 
-x<invokecc opcode (pasm)>
+X<invokecc opcode (PASM)>
 
   invokecc
-  invokecc r<sub>
+  invokecc R<SUB>
 
-call a subroutine like c<invoke>, but also generate a return
-continuation in c<p1>.
+Call a subroutine like C<invoke>, but also generate a return
+continuation in C<P1>.
 
-i<arguments: p>
+I<Arguments: P>
 
-see also: c<updatecc>.
+See also: C<updatecc>.
 
 =head3 isa
 
-x<isa opcode (pasm)>
+X<isa opcode (PASM)>
 
-  isa r<dest>, r<object>, r<class>
+  isa R<DEST>, R<OBJECT>, R<CLASS>
 
-return a true value if r<object> i<isa> member of class r<class>, or of
+Return a true value if R<OBJECT> I<isa> member of class R<CLASS>, or of
 one of its subclasses, otherwise return a false value.
 
-i<arguments: ir, p, s>
+I<Arguments: IR, P, S>
 
 =head3 isnull
 
-x<isnull opcode (pasm)>
+X<isnull opcode (PASM)>
 
-  isnull r<val>, r<label>
+  isnull R<VAL>, R<LABEL>
 
-jump to r<label> if the given pmc is a null pmc.
+Jump to R<LABEL> if the given PMC is a NULL PMC.
 
-i<arguments: p, ic>
+I<Arguments: P, IC>
 
 =head3 join
 
-x<join opcode (pasm)>
+X<join opcode (PASM)>
 
-  join r<dest>, r<delim>, r<array>
+  join R<DEST>, R<DELIM>, R<ARRAY>
 
-create a new string by joining all elements from array with the given
+Create a new string by joining all elements from array with the given
 delimiter.
 
-i<arguments: sr, s, p>
+I<Arguments: SR, S, P>
 
 =head3 jsr
 
-x<jsr opcode (pasm)>
+X<jsr opcode (PASM)>
 
-  jsr r<address>
+  jsr R<ADDRESS>
 
-jump to an address, like c<jump>, but also push the current location
-onto the call stack so c<ret> can return to it.
+Jump to an address, like C<jump>, but also push the current location
+onto the call stack so C<ret> can return to it.
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 jump
 
-x<jump opcode (pasm)>
+X<jump opcode (PASM)>
 
-  jump r<address>
+  jump R<ADDRESS>
 
-jump to a specified absolute address.
+Jump to a specified absolute address.
 
-i<arguments: i>
+I<Arguments: I>
 
-see also: c<set_addr>.
+See also: C<set_addr>.
 
 =head3 lcm
 
-x<lcm opcode (pasm)>
+X<lcm opcode (PASM)>
 
-  lcm r<dest>, r<val>, r<val>
+  lcm R<DEST>, R<VAL>, R<VAL>
 
-return the least common multiple of two values.
+Return the least common multiple of two values.
 
-i<arguments: ir, i, i or nr, i, i>
+I<Arguments: IR, I, I or NR, I, I>
 
 =head3 le
 
-x<le (less than or equal);opcode (pasm)>
+X<le (less than or equal);opcode (PASM)>
 
-  le r<val1>, r<val2>, r<label>
+  le R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is less than or equal to r<val2>.
+Jump to a label if R<VAL1> is less than or equal to R<VAL2>.
 
-i<arguments: i, i, ic or n, n, ic or s, s, ic or p, i, ic or p, n, ic or
-p, s, ic or p, p, ic>
+I<Arguments: I, I, IC or N, N, IC or S, S, IC or P, I, IC or P, N, IC or
+P, S, IC or P, P, IC>
 
 =head3 le_num
 
-x<le_num opcode (pasm)>
+X<le_num opcode (PASM)>
 
-  le_num r<val1>, r<val2>, r<label>
+  le_num R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is numerically less than or equal to r<val2>.
+Jump to a label if R<VAL1> is numerically less than or equal to R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 le_str
 
-x<le_str opcode (pasm)>
+X<le_str opcode (PASM)>
 
-  le_str r<val1>, r<val2>, r<label>
+  le_str R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is stringwise less than or equal to r<val2>.
+Jump to a label if R<VAL1> is stringwise less than or equal to R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 length
 
-x<length opcode (pasm)>
+X<length opcode (PASM)>
 
-  length r<dest>, r<string>
+  length R<DEST>, R<STRING>
 
-return the character length of a string.
+Return the character length of a string.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
 =head3 ln
 
-x<ln opcode (pasm)>
+X<ln opcode (PASM)>
 
-  ln r<dest>, r<val>
+  ln R<DEST>, R<VAL>
 
-the natural logarithm of r<val>.
+The natural logarithm of R<VAL>.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 load_bytecode
 
-x<load_bytecode>
+X<load_bytecode>
 
-  load_bytecode r<file>
+  load_bytecode R<FILE>
 
-load parrot bytecode from a file.
+Load Parrot bytecode from a file.
 
-i<arguments: s>
+I<Arguments: S>
 
 =head3 loadlib
 
-x<loadlib opcode (pasm)>
+X<loadlib opcode (PASM)>
 
-  loadlib r<dest>, r<library>
+  loadlib R<DEST>, R<LIBRARY>
 
-load a dynamic link library by name and store it in a pmc.
+Load a dynamic link library by name and store it in a PMC.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
-see also: c<dlfunc>.
+See also: C<dlfunc>.
 
 =head3 localtime
 
-x<localtime opcode (pasm)>
+X<localtime opcode (PASM)>
 
-  localtime r<dest>, r<val>
+  localtime R<DEST>, R<VAL>
 
-take the integer, which represents gmt epoch-seconds, and turn it into a
+Take the integer, which represents GMT epoch-seconds, and turn it into a
 formatted string after adjusting to localtime.
 
-i<arguments: sr, i>
+I<Arguments: SR, I>
 
-see also: c<gmtime>.
+See also: C<gmtime>.
 
 =head3 log10
 
-x<log10 opcode (pasm)>
+X<log10 opcode (PASM)>
 
-  log10 r<dest>, r<val>
+  log10 R<DEST>, R<VAL>
 
-the base 10 logarithm of r<val>.
+The base 10 logarithm of R<VAL>.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 log2
 
-x<log2 opcode (pasm)>
+X<log2 opcode (PASM)>
 
-  log2 r<dest>, r<val>
+  log2 R<DEST>, R<VAL>
 
-the base 2 logarithm of r<val>.
+The base 2 logarithm of R<VAL>.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 lsr
 
-x<lsr opcode (pasm)>
+X<lsr opcode (PASM)>
 
-  lsr r<dest>, r<bits>
-  lsr r<dest>, r<val>, r<bits>
+  lsr R<DEST>, R<BITS>
+  lsr R<DEST>, R<VAL>, R<BITS>
 
-logically shift a value right by a given number of bits.
+Logically shift a value right by a given number of bits.
 
-i<arguments: ir, i or ir, i, i>
+I<Arguments: IR, I or IR, I, I>
 
 =head3 lt
 
-x<lt (less than);opcode (pasm)>
+X<lt (less than);opcode (PASM)>
 
-  lt r<val1>, r<val2>, r<label>
+  lt R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is less than r<val2>.
+Jump to a label if R<VAL1> is less than R<VAL2>.
 
-i<arguments: i, i, ic or n, n, ic or s, s, ic or p, i, ic or p, n, ic or
-p, s, ic or p, p, ic>
+I<Arguments: I, I, IC or N, N, IC or S, S, IC or P, I, IC or P, N, IC or
+P, S, IC or P, P, IC>
 
 =head3 lt_num
 
-x<lt_num opcode (pasm)>
+X<lt_num opcode (PASM)>
 
-  lt_num r<val1>, r<val2>, r<label>
+  lt_num R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is numerically less than r<val2>.
+Jump to a label if R<VAL1> is numerically less than R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 lt_str
 
-x<lt_str opcode (pasm)>
+X<lt_str opcode (PASM)>
 
-  lt_str r<val1>, r<val2>, r<label>
+  lt_str R<VAL1>, R<VAL2>, R<LABEL>
 
-jump to a label if r<val1> is stringwise less than r<val2>.
+Jump to a label if R<VAL1> is stringwise less than R<VAL2>.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 mod
 
-x<mod opcode (pasm)>
+X<mod opcode (PASM)>
 
-  mod r<dest>, r<val>
-  mod r<dest>, r<val1>, r<val2>
+  mod R<DEST>, R<VAL>
+  mod R<DEST>, R<VAL1>, R<VAL2>
 
-divide r<val1> by r<val2> and return the remainder. if r<val2> is omitted,
-divide r<dest> by r<val>.  the operation is defined as:
+Divide R<VAL1> by R<VAL2> and return the remainder. If R<VAL2> is omitted,
+divide R<DEST> by R<VAL>.  The operation is defined as:
 
   x mod y = x - y * floor(x / y)
 
-i<arguments: p, i or ir, i, i or nr, n, n or p, p, i or p, p, n>
+I<Arguments: P, I or IR, I, I or NR, N, N or P, P, I or P, P, N>
 
-see also: c<cmod>.
+See also: C<cmod>.
 
 =head3 mul
 
-x<mul opcode (pasm)>
+X<mul opcode (PASM)>
 
-  mul r<dest>, r<val>
-  mul r<dest>, r<val>, r<val>
+  mul R<DEST>, R<VAL>
+  mul R<DEST>, R<VAL>, R<VAL>
 
-multiply two values and return the result. if only one r<val>,
-multiply r<dest> by r<val>.
+Multiply two values and return the result. If only one R<VAL>,
+multiply R<DEST> by R<VAL>.
 
-i<arguments: ir, i or nr, i or nr, n or p, i or p, n or p, p or ir, i,
-i or nr, n, i or nr, n, n or p, p, i or p, p, n or p, p, p>
+I<Arguments: IR, I or NR, I or NR, N or P, I or P, N or P, P or IR, I,
+I or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 ne
 
-x<ne (not equal);opcode (pasm)>
+X<ne (not equal);opcode (PASM)>
 
-  ne r<val>, r<val>, r<label>
+  ne R<VAL>, R<VAL>, R<LABEL>
 
-jump to a label if the two values are not equal.
+Jump to a label if the two values are not equal.
 
-i<arguments: i, i, ic or n, n, ic or s, s, ic or p, i, ic or p, n, ic or
-p, s, ic or p, p, ic>
+I<Arguments: I, I, IC or N, N, IC or S, S, IC or P, I, IC or P, N, IC or
+P, S, IC or P, P, IC>
 
 =head3 ne_addr
 
-x<ne_addr opcode (pasm)>
+X<ne_addr opcode (PASM)>
 
-  ne_addr r<val>, r<val>, r<label>
+  ne_addr R<VAL>, R<VAL>, R<LABEL>
 
-jump to a label if r<val1> and r<val2> do not point to the same string
-or pmc.
+Jump to a label if R<VAL1> and R<VAL2> do not point to the same string
+or PMC.
 
-i<arguments: s, s, ic or p, p, ic>
+I<Arguments: S, S, IC or P, P, IC>
 
 =head3 ne_num
 
-x<ne_num opcode (pasm)>
+X<ne_num opcode (PASM)>
 
-  ne_num r<val>, r<val>, r<label>
+  ne_num R<VAL>, R<VAL>, R<LABEL>
 
-jump to a label if the two values are numerically different.
+Jump to a label if the two values are numerically different.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 ne_str
 
-x<ne_str opcode (pasm)>
+X<ne_str opcode (PASM)>
 
-  ne_str r<val>, r<val>, r<label>
+  ne_str R<VAL>, R<VAL>, R<LABEL>
 
-jump to a label if the two strings are not equal.
+Jump to a label if the two strings are not equal.
 
-i<arguments: p, p, ic>
+I<Arguments: P, P, IC>
 
 =head3 needs_destroy
 
-x<needs_destroy opcode (pasm)>
+X<needs_destroy opcode (PASM)>
 
-  needs_destroy r<pmc>
+  needs_destroy R<PMC>
 
-mark the pmc as requiring timely destruction.
+Mark the PMC as requiring timely destruction.
 
-i<arguments: p>
+I<Arguments: P>
 
-see also: c<sweep>.
+See also: C<sweep>.
 
 =head3 neg
 
-x<neg opcode (pasm)>
+X<neg opcode (PASM)>
 
-  neg r<dest>
-  neg r<dest>, r<val>
+  neg R<DEST>
+  neg R<DEST>, R<VAL>
 
-return the negative of a number. if there is no r<val>, r<dest> is the
+Return the negative of a number. If there is no R<VAL>, R<DEST> is the
 negative of itself.
 
-i<arguments: ir or nr or p or ir, i or nr, n or p, p>
+I<Arguments: IR or NR or P or IR, I or NR, N or P, P>
 
 =head3 new
 
-x<new opcode (pasm)>
+X<new opcode (PASM)>
 
-  new r<dest>, r<type>
-  new r<dest>, r<type>, r<initialize>
-  new r<dest>, r<type>, r<initialize>, r<props>
+  new R<DEST>, R<TYPE>
+  new R<DEST>, R<TYPE>, R<INITIALIZE>
+  new R<DEST>, R<TYPE>, R<INITIALIZE>, R<PROPS>
 
-create a new pmc of type r<type>. r<initialize> is an array pmc
-containing initialization data for the new pmc. r<props> is a property hash.
+Create a new PMC of type R<TYPE>. R<INITIALIZE> is an array PMC
+containing initialization data for the new PMC. R<PROPS> is a property hash.
 
-i<arguments: p, i or p, i, p or p, i, p, p>
+I<Arguments: P, I or P, I, P or P, I, P, P>
 
-  new r<dest>
-  new r<dest>, r<length>
-  new r<dest>, r<length>, r<encoding>
-  new r<dest>, r<length>, r<encoding>, r<type>
+  new R<DEST>
+  new R<DEST>, R<LENGTH>
+  new R<DEST>, R<LENGTH>, R<ENCODING>
+  new R<DEST>, R<LENGTH>, R<ENCODING>, R<TYPE>
 
-allocate a new empty string with a given r<length>, r<encoding>, and
-r<type>.
+Allocate a new empty string with a given R<LENGTH>, R<ENCODING>, and
+R<TYPE>.
 
-i<arguments: sr or sr, i or sr, i, i or sr, i, i, i>
+I<Arguments: SR or SR, I or SR, I, I or SR, I, I, I>
 
 =head3 new_callback
 
-x<new_callback opcode (pasm)>
+X<new_callback opcode (PASM)>
 
-  new_callback r<dest>, r<sub>, r<data>, r<sig>
+  new_callback R<DEST>, R<SUB>, R<DATA>, R<SIG>
 
-create a callback stub r<dest> for a pasm subroutine r<sub> with user
-data r<data> and function signature r<sig>.
+Create a callback stub R<DEST> for a PASM subroutine R<SUB> with user
+data R<DATA> and function signature R<SIG>.
 
-i<arguments: p, p, p, s>
+I<Arguments: P, P, P, S>
 
 =head3 new_pad
 
-x<new_pad opcode (pasm)>
+X<new_pad opcode (PASM)>
 
-  new_pad r<depth>
-  new_pad r<dest>, r<depth>
+  new_pad R<DEPTH>
+  new_pad R<DEST>, R<DEPTH>
 
-create a new lexical scratchpad. if a destination pmc is provided,
-store the pad in the pmc, otherwise push it onto the pad stack.
-r<depth> specifies the static nesting depth for the pad (lower static
+Create a new lexical scratchpad. If a destination PMC is provided,
+store the pad in the PMC, otherwise push it onto the pad stack.
+R<DEPTH> specifies the static nesting depth for the pad (lower static
 depths are copied from the current static nesting).
 
-i<arguments: i or p, i>
+I<Arguments: I or P, I>
 
 =head3 newclass
 
-x<newclass opcode (pasm)>
+X<newclass opcode (PASM)>
 
-  newclass r<dest>, r<name>
+  newclass R<DEST>, R<NAME>
 
-create a new class with the given name.
+Create a new class with the given name.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
 =head3 newsub
 
-x<newsub opcode (pasm)>
+X<newsub opcode (PASM)>
 
-  newsub r<dest>, r<class>, r<label>
+  newsub R<DEST>, R<CLASS>, R<LABEL>
 
-generate a new subroutine object of the given r<class>, located at the
-given r<label>, and store the object in the destination pmc.
+Generate a new subroutine object of the given R<CLASS>, located at the
+given R<LABEL>, and store the object in the destination PMC.
 
-i<arguments: p, i, ic>
+I<Arguments: P, I, IC>
 
-  newsub r<class>, r<retclass>, r<label>, r<retaddr>
+  newsub R<CLASS>, R<RETCLASS>, R<LABEL>, R<RETADDR>
 
-generate a new subroutine object of the given r<class>, located at the
-given r<label>, and store the object in c<p0>. also generate a return
-continuation of class r<retclass> with the return address r<retaddr> and
-store it in c<p1>.
+Generate a new subroutine object of the given R<CLASS>, located at the
+given R<LABEL>, and store the object in C<P0>. Also generate a return
+continuation of class R<RETCLASS> with the return address R<RETADDR> and
+store it in C<P1>.
 
-i<arguments: i, i, ic, ic>
+I<Arguments: I, I, IC, IC>
 
 =head3 noop
 
-x<noop opcode (pasm)>
+X<noop opcode (PASM)>
 
   noop
 
-do nothing.
+Do nothing.
 
 =head3 not
 
-x<not opcode (pasm)>
+X<not opcode (PASM)>
 
-  not r<dest>, r<val>
+  not R<DEST>, R<VAL>
 
-logical not. true if r<val> is false.
+Logical NOT. True if R<VAL> is false.
 
-i<arguments: ir, i or p, p>
+I<Arguments: IR, I or P, P>
 
 =head3 null
 
-x<null opcode (pasm)>
+X<null opcode (PASM)>
 
-  null r<dest>
+  null R<DEST>
 
-set r<dest> (which must be a register) to 0, 0.0 or a null pointer,
+Set R<DEST> (which must be a register) to 0, 0.0 or a NULL pointer,
 depending on its type.
 
-i<arguments: ir or nr or sr or p>
+I<Arguments: IR or NR or SR or P>
 
 =head3 open
 
-x<open opcode (pasm)>
+X<open opcode (PASM)>
 
-  open r<dest>, r<filename>
-  open r<dest>, r<filename>, r<mode>
+  open R<DEST>, R<FILENAME>
+  open R<DEST>, R<FILENAME>, R<MODE>
 
-open a file in the specified mode ("r", "w", etc.) and return
-a filehandle. without the mode it defaults to read/write.
+Open a file in the specified mode ("r", "w", etc.) and return
+a filehandle. Without the mode it defaults to read/write.
 
-i<arguments: p, s, s or p, s>
+I<Arguments: P, S, S or P, S>
 
 =head3 or
 
-x<or opcode (pasm)>
+X<or opcode (PASM)>
 
-  or r<dest>, r<val1>, r<val2>
+  or R<DEST>, R<VAL1>, R<VAL2>
 
-logical or. return r<val1> if it's true; otherwise, return r<val2>.
+Logical OR. Return R<VAL1> if it's true; otherwise, return R<VAL2>.
 
-i<arguments: ir, i, i or p, p, p>
+I<Arguments: IR, I, I or P, P, P>
 
 =head3 ord
 
-x<ord opcode (pasm)>
+X<ord opcode (PASM)>
 
-  ord r<dest>, r<string>
-  ord r<dest>, r<string>, r<pos>
+  ord R<DEST>, R<STRING>
+  ord R<DEST>, R<STRING>, R<POS>
 
-return the character at position r<pos> in r<string>. if r<pos> isn't
+Return the character at position R<POS> in R<STRING>. If R<POS> isn't
 specified, return the 0th character.
 
-i<arguments: ir, s or ir, s, i>
+I<Arguments: IR, S or IR, S, I>
 
 =head3 peek
 
-x<peek opcode (pasm)>
+X<peek opcode (PASM)>
 
-  peek r<dest>
-  peek r<dest>, r<pio>
+  peek R<DEST>
+  peek R<DEST>, R<PIO>
 
-read the next byte from the given parrotio object or from c<stdin> but
+Read the next byte from the given ParrotIO object or from C<stdin> but
 don't remove it.
 
-i<arguments: sr or sr, p>
+I<Arguments: SR or SR, P>
 
 =head3 peek_pad
 
-x<peek_pad opcode (pasm)>
+X<peek_pad opcode (PASM)>
 
-  peek_pad r<dest>
+  peek_pad R<DEST>
 
-store the current lexical scope pad in a pmc.
+Store the current lexical scope pad in a PMC.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 pin
 
-x<pin opcode (pasm)>
+X<pin opcode (PASM)>
 
-  pin r<dest>
+  pin R<DEST>
 
-make the string in r<dest> immobile. this prevents the garbage collector
+Make the string in R<DEST> immobile. This prevents the garbage collector
 from moving it to a different location in memory (which it otherwise may
 choose to do).
 
-i<arguments: sr>
+I<Arguments: SR>
 
-see also: c<unpin>.
+See also: C<unpin>.
 
 =head3 pop
 
-x<pop opcode (pasm)>
+X<pop opcode (PASM)>
 
-  pop r<dest>, r<pmc>
+  pop R<DEST>, R<PMC>
 
-pop the last entry off an aggregate pmc and return it.
+Pop the last entry off an aggregate PMC and return it.
 
-i<arguments: ir, p or nr, p or sr, p or p, p>
+I<Arguments: IR, P or NR, P or SR, P or P, P>
 
 =head3 pop_pad
 
-x<pop_pad opcode (pasm)>
+X<pop_pad opcode (PASM)>
 
   pop_pad
 
-pop the current lexical scope pad off the lexical scope stack.
+Pop the current lexical scope pad off the lexical scope stack.
 
-see also: c<peek_pad>.
+See also: C<peek_pad>.
 
-=head3 popx
+=head3 popX
 
-x<popi opcode (pasm)>
-x<popn opcode (pasm)>
-x<popp opcode (pasm)>
-x<pops opcode (pasm)>
+X<popi opcode (PASM)>
+X<popn opcode (PASM)>
+X<popp opcode (PASM)>
+X<pops opcode (PASM)>
 
   popi
   popn
   popp
   pops
 
-restore all the registers of one type from the stack ("i" = integer,
-"n" = float, "p" = pmc, "s" = string).
+Restore all the registers of one type from the stack ("i" = integer,
+"n" = float, "p" = PMC, "s" = string).
 
   popbottomi
   popbottomn
   popbottomp
   popbottoms
 
-restore registers in the range 0..15.
+Restore registers in the range 0..15.
 
   poptopi
   poptopn
   poptopp
   poptops
 
-restore registers in the range 16..31.
+Restore registers in the range 16..31.
 
-see also: c<push>r<x>.
+See also: C<push>R<X>.
 
 =head3 pow
 
-x<pow opcode (pasm)>
+X<pow opcode (PASM)>
 
-  pow r<dest>, r<val1>, r<val2>
+  pow R<DEST>, R<VAL1>, R<VAL2>
 
-return r<val1> raised to the power of r<val2>.
+Return R<VAL1> raised to the power of R<VAL2>.
 
-i<arguments: nr, i, i or nr, i, n or nr, n, i or nr, n, n>
+I<Arguments: NR, I, I or NR, I, N or NR, N, I or NR, N, N>
 
 =head3 print
 
-x<print opcode (pasm)>
+X<print opcode (PASM)>
 
-  print r<val>
-  print r<io>, r<val>
+  print R<VAL>
+  print R<IO>, R<VAL>
 
-print a value to an i/o object or file descriptor. if no r<io> is
+Print a value to an I/O object or file descriptor. If no R<IO> is
 given, print the value to standard output.
 
-i<arguments: i or n or s or p or p, i or p, n or p, s or p, p>
+I<Arguments: I or N or S or P or P, I or P, N or P, S or P, P>
 
 =head3 printerr
 
-x<printerr opcode (pasm)>
+X<printerr opcode (PASM)>
 
-  printerr r<val>
+  printerr R<VAL>
 
-print a value to c<stderr>.
+Print a value to C<stderr>.
 
-i<arguments: i or n or s or p>
+I<Arguments: I or N or S or P>
 
 =head3 profile
 
-x<profile opcode (pasm)>
+X<profile opcode (PASM)>
 
-  profile r<int>
+  profile R<INT>
 
-toggle profiling in the interpreter (0 for off, any other value for on).
+Toggle profiling in the interpreter (0 for off, any other value for on).
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 prophash
 
-x<prophash opcode (pasm)>
+X<prophash opcode (PASM)>
 
-  prophash r<dest>, r<pmc>
+  prophash R<DEST>, R<PMC>
 
-return a hash containing all the properties from a pmc.
+Return a hash containing all the properties from a PMC.
 
-i<arguments: p, p>
+I<Arguments: P, P>
 
-see also: c<getprop>.
+See also: C<getprop>.
 
 =head3 push
 
-x<push opcode (pasm)>
+X<push opcode (PASM)>
 
-  push r<pmc>, r<val>
+  push R<PMC>, R<VAL>
 
-push a value onto the end of an aggregate pmc.
+Push a value onto the end of an aggregate PMC.
 
-i<arguments: p, i or p, n or p, s or p, p>
+I<Arguments: P, I or P, N or P, S or P, P>
 
 =head3 push_pad
 
-x<push_pad opcode (pasm)>
+X<push_pad opcode (PASM)>
 
-  push_pad r<pad>
+  push_pad R<PAD>
 
-push a scratchpad stored in a pmc onto the lexical scope stack.
+Push a scratchpad stored in a PMC onto the lexical scope stack.
 
-i<arguments: p>
+I<Arguments: P>
 
-=head3 pushx
+=head3 pushX
 
-x<pushi opcode (pasm)>
-x<pushn opcode (pasm)>
-x<pushp opcode (pasm)>
-x<pushs opcode (pasm)>
+X<pushi opcode (PASM)>
+X<pushn opcode (PASM)>
+X<pushp opcode (PASM)>
+X<pushs opcode (PASM)>
 
   pushi
   pushn
   pushp
   pushs
 
-save all the registers of one type to the stack ("i" = integer, "n" =
-float, "p" = pmc, "s" = string). restore with c<pop>r<x>.
+Save all the registers of one type to the stack ("i" = integer, "n" =
+float, "p" = PMC, "s" = string). Restore with C<pop>R<X>.
 
   pushbottomi
   pushbottomn
   pushbottomp
   pushbottoms
 
-push registers 0..15.
+Push registers 0..15.
 
   pushtopi
   pushtopn
   pushtopp
   pushtops
 
-push registers 16..31.
+Push registers 16..31.
 
 =head3 read
 
-x<read opcode (pasm)>
+X<read opcode (PASM)>
 
-  read r<dest>, r<bytes>
-  read r<dest>, r<io>, r<bytes>
+  read R<DEST>, R<BYTES>
+  read R<DEST>, R<IO>, R<BYTES>
 
-read the specified number of bytes from a parrot i/o object. read from
-c<stdin> if no r<io> is provided.
+Read the specified number of bytes from a Parrot I/O object. Read from
+C<stdin> if no R<IO> is provided.
 
-i<arguments: sr, i or sr, p, i>
+I<Arguments: SR, I or SR, P, I>
 
 =head3 readline
 
-x<readline opcode (pasm)>
+X<readline opcode (PASM)>
 
-  readline r<dest>, r<io>
+  readline R<DEST>, R<IO>
 
-read a line from a parrot i/o object.
+Read a line from a Parrot I/O object.
 
-i<arguments: sr, p>
+I<Arguments: SR, P>
 
 =head3 register
 
-x<register opcode (pasm)>
+X<register opcode (PASM)>
 
-  register r<pmc>
+  register R<PMC>
 
-register the given pmc in the interpreter's root set, so that it's
+Register the given PMC in the interpreter's root set, so that it's
 visible during the mark phase.
 
-i<arguments: p>
+I<Arguments: P>
 
-see also: c<unregister>.
+See also: C<unregister>.
 
 =head3 removeparent
 
-x<removeparent opcode (pasm)>
+X<removeparent opcode (PASM)>
 
-  removeparent r<class1>, r<class2>
+  removeparent R<CLASS1>, R<CLASS2>
 
-remove r<class2> from class c<class1>'s list of parents.
+Remove R<CLASS2> from class C<CLASS1>'s list of parents.
 
-i<arguments: p, p>
+I<Arguments: P, P>
 
 =head3 repeat
 
-x<repeat opcode (pasm)>
+X<repeat opcode (PASM)>
 
-  repeat r<dest>, r<val>, r<repeat>
+  repeat R<DEST>, R<VAL>, R<REPEAT>
 
-repeat a string r<repeat> number of times.
+Repeat a string R<REPEAT> number of times.
 
-i<arguments: sr, s, i or p, p, i or p, p, p>
+I<Arguments: SR, S, I or P, P, I or P, P, P>
 
 =head3 restoretop
 
-x<restoretop opcode (pasm)>
+X<restoretop opcode (PASM)>
 
   restoretop
 
-restore registers 16..31. does a c<pop>r<x> for every type.
+Restore registers 16..31. Does a C<pop>R<X> for every type.
 
-see also: c<savetop>.
+See also: C<savetop>.
 
 =head3 ret
 
-x<ret opcode (pasm)>
+X<ret opcode (PASM)>
 
   ret
 
-pop a location off the top of the call stack, and go there.
-often used with c<bsr> and c<jsr>.
+Pop a location off the top of the call stack, and go there.
+Often used with C<bsr> and C<jsr>.
 
 =head3 rethrow
 
-x<rethrow opcode (pasm)>
+X<rethrow opcode (PASM)>
 
-  rethrow r<exception>
+  rethrow R<EXCEPTION>
 
-rethrow an exception. only valid inside an exception handler.
+Rethrow an exception. Only valid inside an exception handler.
 
-i<arguments: p>
+I<Arguments: P>
 
-see also: c<throw>
+See also: C<throw>
 
 =head3 runinterp
 
-x<runinterp opcode (pasm)>
+X<runinterp opcode (PASM)>
 
-  runinterp r<interpreter>, r<offset>
+  runinterp R<INTERPRETER>, R<OFFSET>
 
-use an interpreter stored in pmc to run code starting at a given
+Use an interpreter stored in PMC to run code starting at a given
 offset.
 
-i<arguments: p, i>
+I<Arguments: P, I>
 
-see also: c<newinterp>.
+See also: C<newinterp>.
 
 =head3 say
 
-x<say opcode (pasm)>
+X<say opcode (PASM)>
 
-  say r<val>
+  say R<VAL>
 
-print a value to c<stdout> with a trailing newline.
+Print a value to C<stdout> with a trailing newline.
 
-i<arguments: i or n or s or p>
+I<Arguments: I or N or S or P>
 
 =head3 sec
 
-x<sec opcode (pasm)>
+X<sec opcode (PASM)>
 
-  sec r<dest>, r<val>
+  sec R<DEST>, R<VAL>
 
-the secant of r<val> in radians.
+The secant of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 sech
 
-x<sech opcode (pasm)>
+X<sech opcode (PASM)>
 
-  sech r<dest>, r<val>
+  sech R<DEST>, R<VAL>
 
-the hyperbolic secant of r<val> in radians.
+The hyperbolic secant of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 seek
 
-x<seek opcode (pasm)>
+X<seek opcode (PASM)>
 
-  seek r<dest>, r<io>, r<offset>, r<startflag>
-  seek r<dest>, r<io>, r<upper32>, r<lower32>, r<startflag>
+  seek R<DEST>, R<IO>, R<OFFSET>, R<STARTFLAG>
+  seek R<DEST>, R<IO>, R<UPPER32>, R<LOWER32>, R<STARTFLAG>
 
-set the file position of a parrot i/o object to a given offset from a
-starting position (startflag: 0 is the beginning of the file, 1 is
-current the position, 2 is the end of the file).  r<dest> is the
+Set the file position of a Parrot I/O object to a given offset from a
+starting position (STARTFLAG: 0 is the beginning of the file, 1 is
+current the position, 2 is the end of the file).  R<DEST> is the
 success or failure of the seek.
 
-64-bit c<seek> combines r<upper32> and r<lower32> to get one 64-bit
-r<offset>.
+64-bit C<seek> combines R<UPPER32> and R<LOWER32> to get one 64-bit
+R<OFFSET>.
 
-i<arguments: p, i, i or p, i, i, i>
+I<Arguments: P, I, I or P, I, I, I>
 
 =head3 set
 
-x<set opcode (pasm)>
+X<set opcode (PASM)>
 
-  set r<dest>, r<val>
+  set R<DEST>, R<VAL>
 
-set a register to a value.
+Set a register to a value.
 
-i<arguments: ir, i or ir, n or ir, s or ir, p or nr, i or nr, n or nr,
-s or nr, p or sr, i or sr, n or sr, s or sr, p or p, i or p, n or p, s
-or p, p>
+I<Arguments: IR, I or IR, N or IR, S or IR, P or NR, I or NR, N or NR,
+S or NR, P or SR, I or SR, N or SR, S or SR, P or P, I or P, N or P, S
+or P, P>
 
-  set r<dest[key]>, r<val>
+  set R<DEST[KEY]>, R<VAL>
 
-a keyed set operation on a pmc.
+A keyed set operation on a PMC.
 
-i<arguments: p, i or p, n or p, s or p, p>
+I<Arguments: P, I or P, N or P, S or P, P>
 
-  set r<dest>, r<pmc[key]>
+  set R<DEST>, R<PMC[KEY]>
 
-a keyed get operation on a pmc.
+A keyed get operation on a PMC.
 
-i<arguments: i, p or n, p or s, p or p, p>
+I<Arguments: I, P or N, P or S, P or P, P>
 
-=head3 setx_ind
+=head3 setX_ind
 
-x<seti_ind opcode (pasm)>
-x<setn_ind opcode (pasm)>
-x<sets_ind opcode (pasm)>
-x<setp_ind opcode (pasm)>
+X<seti_ind opcode (PASM)>
+X<setn_ind opcode (PASM)>
+X<sets_ind opcode (PASM)>
+X<setp_ind opcode (PASM)>
 
-  seti_ind r<reg>, r<val>
-  setn_ind r<reg>, r<val>
-  sets_ind r<reg>, r<val>
-  setp_ind r<reg>, r<val>
+  seti_ind R<REG>, R<VAL>
+  setn_ind R<REG>, R<VAL>
+  sets_ind R<REG>, R<VAL>
+  setp_ind R<REG>, R<VAL>
 
-set register number r<reg> of the specified type to r<val>. bypasses
+Set register number R<REG> of the specified type to R<VAL>. Bypasses
 the register allocator, so use with care.
 
-i<arguments: i, i or i, s or i, n or i, p>
+I<Arguments: I, I or I, S or I, N or I, P>
 
 =head3 set_addr
 
-x<set_addr opcode (pasm)>
+X<set_addr opcode (PASM)>
 
-  set_addr r<dest>, r<label>
+  set_addr R<DEST>, R<LABEL>
 
-return the current address plus the offset to r<label>. often used to
-calculate absolute addresses for c<jump> or c<jsr>.
+Return the current address plus the offset to R<LABEL>. Often used to
+calculate absolute addresses for C<jump> or C<jsr>.
 
-i<arguments: ir, ic>
+I<Arguments: IR, IC>
 
-  set_addr r<sub>, r<label>
+  set_addr R<SUB>, R<LABEL>
 
-set the subroutine address pointing to the given label.
+Set the subroutine address pointing to the given label.
 
-i<arguments: p, i>
+I<Arguments: P, I>
 
 =head3 set_chartype
 
-x<set_chartype opcode (pasm)>
+X<set_chartype opcode (PASM)>
 
-  set_chartype r<string>, r<chartype>
+  set_chartype R<STRING>, R<CHARTYPE>
 
-set the chartype of a string.
+Set the chartype of a string.
 
-i<arguments: s, i>
+I<Arguments: S, I>
 
 =head3 set_eh
 
-x<set_eh opcode (pasm)>
+X<set_eh opcode (PASM)>
 
-  set_eh r<handler>
+  set_eh R<HANDLER>
 
-push an exception handler on the control stack.
+Push an exception handler on the control stack.
 
-i<arguments: p>
+I<Arguments: P>
 
-see also: c<clear_eh>, c<throw>.
+See also: C<clear_eh>, C<throw>.
 
 =head3 set_encoding
 
-x<set_encoding opcode (pasm)>
-x<strings;encoding>
+X<set_encoding opcode (PASM)>
+X<strings;encoding>
 
-  set_encoding r<string>, r<encoding>
+  set_encoding R<STRING>, R<ENCODING>
 
-set the encoding of a string.
+Set the encoding of a string.
 
-i<arguments: s, i>
+I<Arguments: S, I>
 
 =head3 setattribute
 
-x<setattribute opcode (pasm)>
+X<setattribute opcode (PASM)>
 
-  setattribute r<object>, r<offset>, r<attribute>
+  setattribute R<OBJECT>, R<OFFSET>, R<ATTRIBUTE>
 
-set the given attribute at r<offset> for object r<object>.
+Set the given attribute at R<OFFSET> for object R<OBJECT>.
 
-i<arguments: p, i, p>
+I<Arguments: P, I, P>
 
-see also: c<getattribute>, c<classoffset>.
+See also: C<getattribute>, C<classoffset>.
 
 =head3 setprop
 
-x<setprop opcode (pasm)>
+X<setprop opcode (PASM)>
 
-  setprop r<pmc>, r<name>, r<value>
+  setprop R<PMC>, R<NAME>, R<VALUE>
 
-set the value of a named property on a pmc.
+Set the value of a named property on a PMC.
 
-i<arguments: p, s, p>
+I<Arguments: P, S, P>
 
-see also: c<getprop> and c<delprop>.
+See also: C<getprop> and C<delprop>.
 
 =head3 setstd*
 
-x<setstderr opcode (pasm)>
-x<setstdout opcode (pasm)>
+X<setstderr opcode (PASM)>
+X<setstdout opcode (PASM)>
 
-  setstderr r<dest>
-  setstdout r<dest>
+  setstderr R<DEST>
+  setstdout R<DEST>
 
-set a parrotio object for the given standard handle.
+Set a ParrotIO object for the given standard handle.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 shift
 
-x<shift opcode (pasm)>
+X<shift opcode (PASM)>
 
-  shift r<dest>, r<pmc>
+  shift R<DEST>, R<PMC>
 
-shift a value off the front of an aggregate pmc.
+Shift a value off the front of an aggregate PMC.
 
-i<arguments: ir, p or nr, p or sr, p or p, p>
+I<Arguments: IR, P or NR, P or SR, P or P, P>
 
 =head3 shl
 
-x<shl opcode (pasm)>
+X<shl opcode (PASM)>
 
-  shl r<dest>, r<val>, r<bits>
+  shl R<DEST>, R<VAL>, R<BITS>
 
-bitwise shift a value left by a given number of bits.
+Bitwise shift a value left by a given number of bits.
 
-i<arguments: ir, i or p, i or p, p or ir, i, i or p, p, i or p, p, p>
+I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 shr
 
-x<shr opcode (pasm)>
+X<shr opcode (PASM)>
 
-  shr r<dest>, r<val>, r<bits>
+  shr R<DEST>, R<VAL>, R<BITS>
 
-bitwise shift a value right by a given number of bits.
+Bitwise shift a value right by a given number of bits.
 
-i<arguments: ir, i or p, i or p, p or ir, i, i or p, p, i or p, p, p>
+I<Arguments: IR, I or P, I or P, P or IR, I, I or P, P, I or P, P, P>
 
 =head3 sin
 
-x<sin opcode (pasm)>
+X<sin opcode (PASM)>
 
-  sin r<dest>, r<val>
+  sin R<DEST>, R<VAL>
 
-the sine of r<val> in radians.
+The sine of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 singleton
 
-x<singleton opcode (pasm)>
+X<singleton opcode (PASM)>
 
-  singleton r<dest>
+  singleton R<DEST>
 
-take the given object and put it into its own singleton class.
+Take the given object and put it into its own singleton class.
 
-i<arguments: p>
+I<Arguments: P>
 
 =head3 sinh
 
-x<sinh opcode (pasm)>
+X<sinh opcode (PASM)>
 
-  sinh r<dest>, r<val>
+  sinh R<DEST>, R<VAL>
 
-the hyperbolic sine of r<val> in radians.
+The hyperbolic sine of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 sizeof
 
-x<sizeof opcode (pasm)>
+X<sizeof opcode (PASM)>
 
-  sizeof r<dest>, r<type>
+  sizeof R<DEST>, R<TYPE>
 
-set r<dest> to the size in bytes of the given natural type.
+Set R<DEST> to the size in bytes of the given natural type.
 
-i<arguments: ir, i>
+I<Arguments: IR, I>
 
 =head3 sleep
 
-x<sleep opcode (pasm)>
+X<sleep opcode (PASM)>
 
-  sleep r<seconds>
+  sleep R<SECONDS>
 
-sleep for the given number of seconds.
+Sleep for the given number of seconds.
 
-i<arguments: i or n>
+I<Arguments: I or N>
 
 =head3 spawnw
 
-x<spawnw opcode (pasm)>
+X<spawnw opcode (PASM)>
 
-  spawnw r<dest>, r<command>
+  spawnw R<DEST>, R<COMMAND>
 
-spawn a subprocess to run the given r<command>, wait for it to finish,
+Spawn a subprocess to run the given R<COMMAND>, wait for it to finish,
 and return the result.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
 =head3 splice
 
-x<splice opcode (pasm)>
+X<splice opcode (PASM)>
 
-  splice r<dest>, r<replace>, r<offset>, r<count>
+  splice R<DEST>, R<REPLACE>, R<OFFSET>, R<COUNT>
 
-starting at r<offset>, replace r<count> number of values in the
-destination pmc with values provided in the r<replace> pmc.
+Starting at R<OFFSET>, replace R<COUNT> number of values in the
+destination PMC with values provided in the R<REPLACE> PMC.
 
-i<arguments: p, p, i, i>
+I<Arguments: P, P, I, I>
 
 =head3 sprintf
 
-x<sprintf opcode (pasm)>
+X<sprintf opcode (PASM)>
 
-  sprintf r<dest>, r<format>, r<args>
+  sprintf R<DEST>, R<FORMAT>, R<ARGS>
 
-format arguments in an aggregate pmc, using format string r<format>.
+Format arguments in an aggregate PMC, using format string R<FORMAT>.
 
-i<arguments: sr, s, p or p, p, p>
+I<Arguments: SR, S, P or P, P, P>
 
 =head3 stat
 
-x<stat opcode (pasm)>
+X<stat opcode (PASM)>
 
-  stat r<dest>, r<val>, r<val>
+  stat R<DEST>, R<VAL>, R<VAL>
 
-stat the val1 file and return stat element val2, as listed in
-a<chp-13-table-2>table 13-2.
+Stat the VAL1 file and return stat element VAL2, as listed in
+A<CHP-13-TABLE-2>Table 13-2.
 
-i<arguments: ir, s, i or ir, i, i>
+I<Arguments: IR, S, I or IR, I, I>
 
-=begin table picture stat arguments
+=begin table picture Stat arguments
 
-z<chp-13-table-2>
+Z<CHP-13-TABLE-2>
 
 =headrow
 
 =row
 
-=cell flag
+=cell Flag
 
-=cell flagname
+=cell Flagname
 
-=cell returns
+=cell Returns
 
 =bodyrows
 
 =row
 
-=cell c<0>
+=cell C<0>
 
-=cell exists
+=cell EXISTS
 
-=cell does the file exist?
-
-=row
-
-=cell c<1>
-
-=cell filesize
-
-=cell size of file, in bytes
+=cell Does the file exist?
 
 =row
 
-=cell c<2>
+=cell C<1>
 
-=cell isdir
+=cell FILESIZE
 
-=cell is the file a directory?
-
-=row
-
-=cell c<3>
-
-=cell isdev
-
-=cell is the file a device?
+=cell Size of file, in bytes
 
 =row
 
-=cell c<4>
+=cell C<2>
 
-=cell createtime
+=cell ISDIR
 
-=cell time file was created
-
-=row
-
-=cell c<5>
-
-=cell accesstime
-
-=cell time file was last accessed
+=cell Is the file a directory?
 
 =row
 
-=cell c<6>
+=cell C<3>
 
-=cell modifytime
+=cell ISDEV
 
-=cell time file data was changed
-
-=row
-
-=cell c<7>
-
-=cell changetime
-
-=cell time file metadata was changed
+=cell Is the file a device?
 
 =row
 
-=cell c<8>
+=cell C<4>
 
-=cell backuptime
+=cell CREATETIME
 
-=cell time of last backup
-
-=row
-
-=cell c<9>
-
-=cell uid
-
-=cell id of file owner
+=cell Time file was created
 
 =row
 
-=cell c<10>
+=cell C<5>
 
-=cell gid
+=cell ACCESSTIME
 
-=cell id of file group
+=cell Time file was last accessed
+
+=row
+
+=cell C<6>
+
+=cell MODIFYTIME
+
+=cell Time file data was changed
+
+=row
+
+=cell C<7>
+
+=cell CHANGETIME
+
+=cell Time file metadata was changed
+
+=row
+
+=cell C<8>
+
+=cell BACKUPTIME
+
+=cell Time of last backup
+
+=row
+
+=cell C<9>
+
+=cell UID
+
+=cell ID of file owner
+
+=row
+
+=cell C<10>
+
+=cell GID
+
+=cell ID of file group
 
 =end table
 
 =head3 store_global
 
-x<store_global opcode (pasm)>
+X<store_global opcode (PASM)>
 
-  store_global r<name>, r<object>
-  store_global r<name>, r<namespace>, r<object>
+  store_global R<NAME>, R<OBJECT>
+  store_global R<NAME>, R<NAMESPACE>, R<OBJECT>
 
-store a global variable as a named symbol.
+Store a global variable as a named symbol.
 
-i<arguments: s, p or s, s, p or p, s, p>
+I<Arguments: S, P or S, S, P or P, S, P>
 
-see also: c<find_global>.
+See also: C<find_global>.
 
 =head3 store_lex
 
-x<store_lex opcode (pasm)>
+X<store_lex opcode (PASM)>
 
-  store_lex r<name>, r<object>
-  store_lex r<depth>, r<name>, r<object>
-  store_lex r<depth>, r<position>, r<object>
+  store_lex R<NAME>, R<OBJECT>
+  store_lex R<DEPTH>, R<NAME>, R<OBJECT>
+  store_lex R<DEPTH>, R<POSITION>, R<OBJECT>
 
-store an object as a lexical variable with a given name. if the symbol
+Store an object as a lexical variable with a given name. If the symbol
 doesn't exist, it will be created in the lexical scratchpad at the
 specified depth (a negative depth counts back from the current scope).
-if r<depth> isn't provided, the symbol must already exist. if a
+If R<DEPTH> isn't provided, the symbol must already exist. If a
 position is provided instead of a name, the symbol will be stored at
 the given position in the scratchpad.
 
-i<arguments: s, p or i, i, p or i, s, p>
+I<Arguments: S, P or I, I, P or I, S, P>
 
-see also: c<find_lex>.
+See also: C<find_lex>.
 
 =head3 string_chartype
 
-x<string_chartype opcode (pasm)>
+X<string_chartype opcode (PASM)>
 
-  string_chartype r<dest>, r<string>
+  string_chartype R<DEST>, R<STRING>
 
-return the chartype of the string.
+Return the chartype of the string.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
 =head3 string_encoding
 
-x<string_encoding opcode (pasm)>
-x<strings;encoding>
+X<string_encoding opcode (PASM)>
+X<strings;encoding>
 
-  string_encoding r<dest>, r<string>
+  string_encoding R<DEST>, R<STRING>
 
-return the encoding of the string.
+Return the encoding of the string.
 
-i<arguments: ir, s>
+I<Arguments: IR, S>
 
 =head3 stringinfo
 
-x<stringinfo opcode (pasm)>
+X<stringinfo opcode (PASM)>
 
-  stringinfo r<dest>, r<string>, r<flag>
+  stringinfo R<DEST>, R<STRING>, R<FLAG>
 
-return information about a string. an integer flag selects which
-information to return, as listed in a<chp-13-table-3>table 13-3.
+Return information about a string. An integer flag selects which
+information to return, as listed in A<CHP-13-TABLE-3>Table 13-3.
 
-=begin table picture stringinfo arguments
+=begin table picture Stringinfo arguments
 
-z<chp-13-table-3>
+Z<CHP-13-TABLE-3>
 
 =headrow
 
 =row
 
-=cell flag
+=cell Flag
 
-=cell returns
+=cell Returns
 
 =bodyrows
 
 =row
 
-=cell c<1>
+=cell C<1>
 
-=cell location of string buffer header.
-
-=row
-
-=cell c<2>
-
-=cell location of start of string memory.
+=cell Location of string buffer header.
 
 =row
 
-=cell c<3>
+=cell C<2>
 
-=cell allocated length, in bytes.
-
-=row
-
-=cell c<4>
-
-=cell string flags.
+=cell Location of start of string memory.
 
 =row
 
-=cell c<5>
+=cell C<3>
 
-=cell length of string buffer currently used, in bytes.
+=cell Allocated length, in bytes.
 
 =row
 
-=cell c<6>
+=cell C<4>
 
-=cell string length, in characters.
+=cell String flags.
+
+=row
+
+=cell C<5>
+
+=cell Length of string buffer currently used, in bytes.
+
+=row
+
+=cell C<6>
+
+=cell String length, in characters.
 
 =end table
 
-i<arguments: ir, s, i>
+I<Arguments: IR, S, I>
 
 =head3 sub
 
-x<sub opcode (pasm)>
+X<sub opcode (PASM)>
 
-  sub r<dest>, r<val>
-  sub r<dest>, r<val1>, r<val2>
+  sub R<DEST>, R<VAL>
+  sub R<DEST>, R<VAL1>, R<VAL2>
 
-subtract r<val2> from r<val1>. if no r<val2>, subtract r<val> from
-r<dest>.
+Subtract R<VAL2> from R<VAL1>. If no R<VAL2>, subtract R<VAL> from
+R<DEST>.
 
-i<arguments: ir, i or nr, i or nr, n or p, i or p, n or p, p or ir, i,
-i or nr, n, i or nr, n, n or p, p, i or p, p, n or p, p, p>
+I<Arguments: IR, I or NR, I or NR, N or P, I or P, N or P, P or IR, I,
+I or NR, N, I or NR, N, N or P, P, I or P, P, N or P, P, P>
 
 =head3 subclass
 
-x<subclass opcode (pasm)>
+X<subclass opcode (PASM)>
 
-  subclass r<dest>, r<class>
-  subclass r<dest>, r<class>, r<name>
+  subclass R<DEST>, R<CLASS>
+  subclass R<DEST>, R<CLASS>, R<NAME>
 
-create a subclass of r<class>. without r<name> an anonymous subclass is
+Create a subclass of R<CLASS>. Without R<NAME> an anonymous subclass is
 created.
 
-i<arguments: p, s or p, p or p, s, s or p, p, s>
+I<Arguments: P, S or P, P or P, S, S or P, P, S>
 
 =head3 substr
 
-x<substr opcode (pasm)>
+X<substr opcode (PASM)>
 
-  substr r<dest>, r<string>, r<offset>
-  substr r<dest>, r<string>, r<offset>, r<length>
+  substr R<DEST>, R<STRING>, R<OFFSET>
+  substr R<DEST>, R<STRING>, R<OFFSET>, R<LENGTH>
 
-return a substring of r<string>, beginning at r<offset> and with length
-r<length>.
+Return a substring of R<STRING>, beginning at R<OFFSET> and with length
+R<LENGTH>.
 
-i<arguments: sr, s, i or sr, s, i, i or sr, p, i, i>
+I<Arguments: SR, S, I or SR, S, I, I or SR, P, I, I>
 
-  substr r<dest>, r<string>, r<offset>, r<length>, r<replace>
+  substr R<DEST>, R<STRING>, R<OFFSET>, R<LENGTH>, R<REPLACE>
 
-if r<replace> is given, use it to replace the returned substring in
-r<string>.
+If R<REPLACE> is given, use it to replace the returned substring in
+R<STRING>.
 
-i<arguments: sr, s, i, i, s>
+I<Arguments: SR, S, I, I, S>
 
-  substr r<dest>, r<offset>, r<length>, r<replace>
+  substr R<DEST>, R<OFFSET>, R<LENGTH>, R<REPLACE>
 
-if r<string> is omitted, operate on the string in r<dest>.
+If R<STRING> is omitted, operate on the string in R<DEST>.
 
-i<arguments: sr, i, i, s>
+I<Arguments: SR, I, I, S>
 
 
 =head3 substr_r
 
-x<substr_r opcode (pasm)>
+X<substr_r opcode (PASM)>
 
-  substr_r r<dest>, r<string>, r<offset>, r<length>
+  substr_r R<DEST>, R<STRING>, R<OFFSET>, R<LENGTH>
 
-acts like c<substr>, but reuses the destination string instead of
-creating a new string. deprecated.
+Acts like C<substr>, but reuses the destination string instead of
+creating a new string. Deprecated.
 
-i<arguments: sr, s, i, i>
+I<Arguments: SR, S, I, I>
 
 =head3 sweep
 
-x<sweep opcode (pasm)>
+X<sweep opcode (PASM)>
 
-  sweep r<lazy>
+  sweep R<LAZY>
 
-trigger a gc mark run. if r<lazy> is set to 1, only objects that need timely
+Trigger a GC mark run. If R<LAZY> is set to 1, only objects that need timely
 destruction may be destroyed.
 
-i<arguments: ic>
+I<Arguments: IC>
 
 =head3 sweepoff
 
-x<sweepoff opcode (pasm)>
+X<sweepoff opcode (PASM)>
 
   sweepoff
 
-disable gc mark runs (nestable).
+Disable GC mark runs (nestable).
 
 =head3 sweepon
 
-x<sweepon opcode (pasm)>
+X<sweepon opcode (PASM)>
 
   sweepon
 
-re-enable gc mark runs.
+Re-enable GC mark runs.
 
 =head3 sysinfo
 
-x<sysinfo opcode (pasm)>
+X<sysinfo opcode (PASM)>
 
-  sysinfo r<dest>, r<item>
+  sysinfo R<DEST>, R<ITEM>
 
-return os-specific details given by c<item>.
+Return OS-specific details given by C<ITEM>.
 
-i<arguments: ir, i or sr, i>
+I<Arguments: IR, I or SR, I>
 
 =head3 tan
 
-x<tan opcode (pasm)>
+X<tan opcode (PASM)>
 
-  tan r<dest>, r<val>
+  tan R<DEST>, R<VAL>
 
-the tangent of r<val> in radians.
+The tangent of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 tanh
 
-x<tanh opcode (pasm)>
+X<tanh opcode (PASM)>
 
-  tanh r<dest>, r<val>
+  tanh R<DEST>, R<VAL>
 
-the hyperbolic tangent of r<val> in radians.
+The hyperbolic tangent of R<VAL> in radians.
 
-i<arguments: nr, i or nr, n>
+I<Arguments: NR, I or NR, N>
 
 =head3 tell
 
-x<tell opcode (pasm)>
+X<tell opcode (PASM)>
 
-  tell r<dest>, r<pio>
-  tell r<upper32>, r<lower32>, r<pio>
+  tell R<DEST>, R<PIO>
+  tell R<UPPER32>, R<LOWER32>, R<PIO>
 
-return the file position of the given parrotio object.
+Return the file position of the given ParrotIO object.
 
-i<arguments: ir, p or ir, i, p>
+I<Arguments: IR, P or IR, I, P>
 
-see also: c<seek>.
+See also: C<seek>.
 
 =head3 thaw
 
-x<thaw opcode (pasm)>
+X<thaw opcode (PASM)>
 
-  thaw r<dest>, r<str>
+  thaw R<DEST>, R<STR>
 
-create a new pmc representing the frozen image.
+Create a new PMC representing the frozen image.
 
-i<arguments: p, s>
+I<Arguments: P, S>
 
-see also: c<freeze>.
+See also: C<freeze>.
 
 =head3 throw
 
-x<throw opcode (pasm)>
+X<throw opcode (PASM)>
 
-  throw r<exception>
+  throw R<EXCEPTION>
 
-throw an exception.
+Throw an exception.
 
-i<arguments: p>
+I<Arguments: P>
 
-see also: c<rethrow>, c<set_eh>, c<clear_eh>
+See also: C<rethrow>, C<set_eh>, C<clear_eh>
 
 =head3 time
 
-x<time opcode (pasm)>
+X<time opcode (PASM)>
 
-  time r<dest>
+  time R<DEST>
 
-return the current system time.
+Return the current system time.
 
-i<arguments: ir or nr>
+I<Arguments: IR or NR>
 
 =head3 titlecase
 
-x<titlecase opcode (pasm)>
+X<titlecase opcode (PASM)>
 
-  titlecase r<dest>
-  titlecase r<dest>, r<val>
+  titlecase R<DEST>
+  titlecase R<DEST>, R<VAL>
 
-create a copy of the string in r<val> with all characters converted to
-title case, and store it in r<dest>. if r<val> is omitted, convert and
-replace the string in r<dest>.
+Create a copy of the string in R<VAL> with all characters converted to
+title case, and store it in R<DEST>. If R<VAL> is omitted, convert and
+replace the string in R<DEST>.
 
-i<arguments: sr or sr, s>
+I<Arguments: SR or SR, S>
 
-see also: c<upcase>, c<downcase>.
+See also: C<upcase>, C<downcase>.
 
 =head3 trace
 
-x<trace opcode (pasm)>
+X<trace opcode (PASM)>
 
-  trace r<int>
+  trace R<INT>
 
-toggle tracing in the interpreter (0 for off, any other value for on).
+Toggle tracing in the interpreter (0 for off, any other value for on).
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 transcode
 
-x<transcode opcode (pasm)>
+X<transcode opcode (PASM)>
 
-  transcode r<dest>, r<encoding>
-  transcode r<dest>, r<source>, r<encoding>
-  transcode r<dest>, r<source>, r<encoding>, r<chartype>
+  transcode R<DEST>, R<ENCODING>
+  transcode R<DEST>, R<SOURCE>, R<ENCODING>
+  transcode R<DEST>, R<SOURCE>, R<ENCODING>, R<CHARTYPE>
 
-transcode a string to the given r<chartype> and r<encoding>. if
-r<chartype> is omitted, it is assumed to be the same as the original.
+Transcode a string to the given R<CHARTYPE> and R<ENCODING>. If
+R<CHARTYPE> is omitted, it is assumed to be the same as the original.
 
-i<arguments: sr, i or sr, s, i or sr, s, i, i>
+I<Arguments: SR, I or SR, S, I or SR, S, I, I>
 
 =head3 typeof
 
-x<typeof opcode (pasm)>
+X<typeof opcode (PASM)>
 
-  typeof r<dest>, r<val>
-  typeof r<dest>, r<pmc[key]>
+  typeof R<DEST>, R<VAL>
+  typeof R<DEST>, R<PMC[KEY]>
 
-return the type of a pmc or parrot data type, either its class name (to a
+Return the type of a PMC or Parrot data type, either its class name (to a
 string destination) or integer identifier (to an integer destination).
 
-i<arguments: ir, p or sr, i or sr, p>
+I<Arguments: IR, P or SR, I or SR, P>
 
 =head3 unless
 
-x<unless (conditional);opcode (pasm)>
+X<unless (conditional);opcode (PASM)>
 
-  unless r<condition>, r<label>
+  unless R<CONDITION>, R<LABEL>
 
-jump to a label unless the condition is a true value.
+Jump to a label unless the condition is a true value.
 
-i<arguments: i, ic or n, ic or s, ic or p, ic>
+I<Arguments: I, IC or N, IC or S, IC or P, IC>
 
 =head3 unpin
 
-x<unpin opcode (pasm)>
+X<unpin opcode (PASM)>
 
-  unpin r<dest>
+  unpin R<DEST>
 
-make the string in r<dest> movable again. this is the default, so
-c<unpin> is a no-op unless the string has been pinned with c<pin>.
+Make the string in R<DEST> movable again. This is the default, so
+C<unpin> is a no-op unless the string has been pinned with C<pin>.
 
-see also: c<pin>.
+See also: C<pin>.
 
-i<arguments: sr>
+I<Arguments: SR>
 
 =head3 unregister
 
-x<unregister opcode (pasm)>
+X<unregister opcode (PASM)>
 
-  unregister r<pmc>
+  unregister R<PMC>
 
-remove one reference to pmc from the root set registry.
+Remove one reference to PMC from the root set registry.
 
-i<arguments: p>
+I<Arguments: P>
 
-see also: c<register>.
+See also: C<register>.
 
 =head3 unshift
 
-x<unshift opcode (pasm)>
+X<unshift opcode (PASM)>
 
-  unshift r<dest>, r<val>
+  unshift R<DEST>, R<VAL>
 
-unshift a value onto the front of an aggregate pmc.
+Unshift a value onto the front of an aggregate PMC.
 
-i<arguments: p, i or p, n or p, s or p, p>
+I<Arguments: P, I or P, N or P, S or P, P>
 
 =head3 upcase
 
-x<upcase opcode (pasm)>
+X<upcase opcode (PASM)>
 
-  upcase r<dest>
-  upcase r<dest>, r<val>
+  upcase R<DEST>
+  upcase R<DEST>, R<VAL>
 
-create a copy of the string in r<val> with all characters converted to
-upper case, and store it in r<dest>. if r<val> is omitted, convert and
-replace the string in r<dest>.
+Create a copy of the string in R<VAL> with all characters converted to
+upper case, and store it in R<DEST>. If R<VAL> is omitted, convert and
+replace the string in R<DEST>.
 
-i<arguments: sr or sr, s>
+I<Arguments: SR or SR, S>
 
-see also: c<downcase>, c<titlecase>.
+See also: C<downcase>, C<titlecase>.
 
 =head3 updatecc
 
-x<updatecc>
+X<updatecc>
 
   updatecc
 
-update the state of a return continuation stored in c<p1>. used when
+Update the state of a return continuation stored in C<P1>. Used when
 context information changes after the return continuation is created
 but before it's invoked.
 
-see also: c<invokecc>.
+See also: C<invokecc>.
 
-i<arguments: ir, i>
+I<Arguments: IR, I>
 
 =head3 vers
 
-x<vers opcode (pasm)>
+X<vers opcode (PASM)>
 
-  vers r<dest>, r<val>
+  vers R<DEST>, R<VAL>
 
-the versine of r<val> in radians.
+The versine of R<VAL> in radians.
 
-i<arguments: nr, n>
+I<Arguments: NR, N>
 
 =head3 warningsoff
 
-x<warningsoff opcode (pasm)>
+X<warningsoff opcode (PASM)>
 
-  warningsoff r<category>
+  warningsoff R<CATEGORY>
 
-turn off a particular category of warnings by category number. turning
+Turn off a particular category of warnings by category number. Turning
 off one category will not affect the status of other warnings
-categories. see c<warningson> for the list of categories.
+categories. See C<warningson> for the list of categories.
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 warningson
 
-x<warningson opcode (pasm)>
+X<warningson opcode (PASM)>
 
-  warningson r<category>
+  warningson R<CATEGORY>
 
-turn on a particular category of warnings by category number. the
-default is all warnings off. turning on one category will not turn off
-other categories. combine category numbers with a bitwise or to turn on
-more than one at a time. if you include f<warnings.pasm>, the category
+Turn on a particular category of warnings by category number. The
+default is all warnings off. Turning on one category will not turn off
+other categories. Combine category numbers with a bitwise OR to turn on
+more than one at a time. If you include F<warnings.pasm>, the category
 numbers are available by name as:
 
-  .parrot_warnings_all_flag
-  .parrot_warnings_undef_flag
-  .parrot_warnings_io_flag
-  .parrot_warnings_platform_flag
+  .PARROT_WARNINGS_ALL_FLAG
+  .PARROT_WARNINGS_UNDEF_FLAG
+  .PARROT_WARNINGS_IO_FLAG
+  .PARROT_WARNINGS_PLATFORM_FLAG
 
-i<arguments: i>
+I<Arguments: I>
 
 =head3 xor
 
-x<xor opcode (pasm)>
+X<xor opcode (PASM)>
 
-  xor r<dest>, r<val1>, r<val2>
+  xor R<DEST>, R<VAL1>, R<VAL2>
 
-logical xor. if r<val1> is true and r<val2> is false, return r<val1>.
-if r<val1> is false and r<val2> is true, return r<val2>. otherwise,
+Logical XOR. If R<VAL1> is true and R<VAL2> is false, return R<VAL1>.
+If R<VAL1> is false and R<VAL2> is true, return R<VAL2>. Otherwise,
 return a false value.
 
-i<arguments: ir, i, i or p, p, p>
+I<Arguments: IR, I, I or P, P, P>
 
 
 =cut
