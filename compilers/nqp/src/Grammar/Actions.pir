@@ -538,7 +538,9 @@
 
 
 ##    method methodop($/, $key) {
-##        my $past := $($<arglist>);
+##        my $past := $key eq 'null' 
+##                        ?? PAST::Op.new
+##                        !! $<arglist>.ast;
 ##        $past.name(~$<ident>);
 ##        $past.pasttype('callmethod');
 ##        $past.node($/);
@@ -548,8 +550,14 @@
     .param pmc match
     .param string key
     .local pmc past
+    unless key == 'null' goto arglist
+    $P0 = get_hll_global ['PAST'], 'Op'
+    past = $P0.'new'()
+    goto have_past
+  arglist:
     $P0 = match['arglist']
     past = $P0.'ast'()
+  have_past:
     $S0 = match['ident']
     past.'name'($S0)
     past.'pasttype'('callmethod')

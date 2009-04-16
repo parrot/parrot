@@ -2,11 +2,14 @@
 
 # method ops (just method calls for now)
 
-plan(2);
+plan(3);
 
 class Foo {
   method blarg() {
     'ok 1 # method calls work';
+  }
+  method blargless() {
+    'ok 3 # argument-less method calls work'
   }
 }
 
@@ -24,3 +27,4 @@ my $foo := Foo.new();
 
 say($foo.blarg());
 say(blarg());
+say($foo.blargless);
