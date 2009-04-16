@@ -363,7 +363,6 @@ all: @lclang@$(EXE)
 
 # the compiler .pbc
 @lclang@.pbc: Makefile $(PARROT) $(SOURCES) $(BUILTINS_PIR)
-	$(PERL) -e "" > src/gen_setting.pir
 	$(PARROT) $(PARROT_ARGS) -o @lclang@.pbc @lclang@.pir
 
 src/gen_grammar.pir: $(PARROT) $(PERL6GRAMMAR) src/pct/grammar.pg src/pct/grammar-oper.pg
