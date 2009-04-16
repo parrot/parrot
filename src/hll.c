@@ -121,8 +121,8 @@ new_hll_entry(PARROT_INTERP, ARGIN_NULLOK(STRING *entry_name))
 
 =item C<void Parrot_init_HLL(PARROT_INTERP)>
 
-Initialises the HLL_info and HLL_namespace fields.  Takes an interpreter and
-calls C<Parrot_register_HLL> to register name within Parrot core.
+Initialises the HLL_info and HLL_namespace fields of the interpreter structure.
+Registers the default HLL namespace "parrot".
 
 =cut
 
@@ -144,11 +144,13 @@ Parrot_init_HLL(PARROT_INTERP)
 
 =item C<INTVAL Parrot_register_HLL(PARROT_INTERP, STRING *hll_name)>
 
-Return the HLL id if C<hll_name> is already registered in the interpreter.
+Register the HLL with the given STRING name C<hll_name> in the interpreter.
 
-Otherwise register the HLL C<hll_name> within the interpreter.
-Creates a root namespace for the HLL named C<hll_name>.
-Returns a type ID for this HLL or 0 on error.
+If the HLL has already been registered, the ID of the HLL is returned.
+Otherwise the HLL is registered, a corresponding HLL namespace is created,
+and the HLL ID is returned.
+
+If there is an error, C<-1> is returned.
 
 =cut
 
@@ -212,9 +214,9 @@ Parrot_register_HLL(PARROT_INTERP, ARGIN(STRING *hll_name))
 =item C<INTVAL Parrot_register_HLL_lib(PARROT_INTERP, STRING *hll_lib)>
 
 Register an HLL library.
-Takes an interpreter name and a pointer to a library name.
-If the name matches one already registered, return the list position.
-Otherwise, add the entry to the list and return 0.
+Takes a pointer to a library name STRING to add. If the name has already
+been registered the list position of the library in the HLL Info list is
+returned. Otherwise, the library is added to the list and 0 is returned.
 
 =cut
 
@@ -266,7 +268,9 @@ Parrot_register_HLL_lib(PARROT_INTERP, ARGIN(STRING *hll_lib))
 
 =item C<INTVAL Parrot_get_HLL_id(PARROT_INTERP, STRING *hll_name)>
 
-Return the ID of the given HLL name or -1 on error. C<parrot> has ID 0.
+Returns the ID number of the HLL with the given name. The default HLL namespace
+C<parrot> has an ID number of 0. On error, or if an HLL with the given name
+does not exist, returns -1.
 
 =cut
 
@@ -300,10 +304,9 @@ Parrot_get_HLL_id(PARROT_INTERP, ARGIN_NULLOK(STRING *hll_name))
 
 =item C<STRING * Parrot_get_HLL_name(PARROT_INTERP, INTVAL id)>
 
-Returns the corresponding PMC's name.
-Takes an interpreter name and an id.
-If the id is out of range, or the PMC name is NULL,
-returns NULL.
+Returns the STRING name of the HLL with the given C<id> number. If the id
+is out of range or does not exist, the NULL value is returned instead. Note
+that some HLLs are anonymous and so might also return NULL.
 
 =cut
 
@@ -436,8 +439,8 @@ Parrot_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 
 =item C<INTVAL Parrot_get_ctx_HLL_type(PARROT_INTERP, INTVAL core_type)>
 
-Return an equivalent PMC type number according to the current HLL setings in
-the context.  If no type is registered, returns C<core_type>.
+Return an equivalent PMC type number according to the HLL settings in
+the current context.  If no type is registered, returns C<core_type>.
 
 =cut
 
