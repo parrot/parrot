@@ -538,7 +538,7 @@
 
 
 ##    method methodop($/, $key) {
-##        my $past := $key eq 'null' 
+##        my $past := $key eq 'null'
 ##                        ?? PAST::Op.new
 ##                        !! $<arglist>.ast;
 ##        $past.name(~$<ident>);
