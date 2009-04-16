@@ -8,9 +8,9 @@ The first step before you start playing with Parrot
 
 The simplest way to install Parrot is with pre-compiled binaries for
 your operating system or distribution. Packages are available for many
-packaging systems, including Debian, Fedora, Mandriva, FreeBSD, Cygwin,
-and MacPorts. A current list of available packages is maintained at
-U<http://www.parrot.org/download>. A binary installer for Windows is
+packaging systems, including Debian, Ubuntu, Fedora, Mandriva, FreeBSD,
+Cygwin, and MacPorts. A current list of available packages is maintained
+at U<http://www.parrot.org/download>. A binary installer for Windows is
 also available at U<http://parrotwin32.sourceforge.net/>.
 
 If packages aren't available on your system, you can download the latest
@@ -126,6 +126,18 @@ Parrot Assembly Language (PASM) is a low-level language native to the
 Parrot virtual machine. It serves as a plain-English representation of
 Parrot's bytecode format.
 
+=item Chapter 10, I<Instruction Reference>
+
+The standard instruction set for the Parrot virtual machine.
+
+=item Chapter 11, I<Directive Reference>
+
+Out-of-band directives used within PIR/PASM code.
+
+=item Chapter 13, I<Operator Reference>
+
+Operator syntax in PIR code.
+
 =item Appendix A, I<Glossary>
 
 A quick reference to common Parrot terms.
@@ -134,27 +146,15 @@ A quick reference to common Parrot terms.
 
 Further details on running Parrot.
 
-=item Appendix C, I<Instruction Reference>
-
-The standard instruction set for the Parrot virtual machine.
-
-=item Appendix D, I<Directive Reference>
-
-Out-of-band directives used within PIR/PASM code.
-
-=item Appendix E, I<Operator Reference>
-
-Operator syntax in PIR code.
-
-=item Appendix F, I<Build Options>
+=item Appendix C, I<Build Options>
 
 Dependencies and additional options for building Parrot from source.
 
-=item Appendix G, I<Source Code>
+=item Appendix D, I<Source Code>
 
 Navigating the Parrot source tree.
 
-=item Appendix H, I<Patch Submission>
+=item Appendix E, I<Patch Submission>
 
 How to submit a patch to Parrot.
 
