@@ -2218,13 +2218,6 @@ release : MANIFEST MANIFEST.generated
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
 
-rpms : release
-	mkdir -p rpmbuild/SOURCES rpmbuild/SPEC rpmbuild/BUILD rpmbuild/RPMS rpmbuild/SRPMS
-	cp parrot-$(VERSION).tar.gz rpmbuild/SOURCES
-	cp parrot.spec rpmbuild/SPEC
-	echo '%_topdir '`pwd`'/rpmbuild' > .rpmmacros
-	HOME=`pwd`; rpmbuild -ba parrot.spec
-
 win32-inno-installer : world installable
 	$(PERL) tools/dev/mk_inno.pl
 	$(INNO_SETUP) parrot.iss
