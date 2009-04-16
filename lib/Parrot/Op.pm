@@ -437,20 +437,3 @@ Author: Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
 =cut
 
 1;
-
-__END__
-
-=begin TODO
-
-=head1 LICENSE
-
-This program is free software. It is subject to the same
-license as Parrot itself.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2001-2008, Parrot Foundation.
-
-=end TODO
-
-=cut
