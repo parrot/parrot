@@ -853,6 +853,8 @@ Don't include author information in individual files. Author information
 can be added to the CREDITS file. (Languages are an exception to this rule,
 and may follow whatever convention they choose.)
 
+Don't include Pod sections for License or Copyright in individual files.
+
 =item Per-section comments
 
 If there is a collection of functions, structures or whatever which are
