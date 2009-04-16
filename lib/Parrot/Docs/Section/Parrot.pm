@@ -80,7 +80,9 @@ sub new {
         $self->new_group(
             'Implementing Languages on Parrot',
             '',
-            $self->new_item( 'Compiler Tools', 'docs/book/ch09_pct.pod'),
+            $self->new_item( 'Parrot Compiler Tools', 'docs/book/ch04_compiler_tools.pod'),
+            $self->new_item( 'Parrot Grammar Engine', 'docs/book/ch05_pge.pod'),
+            $self->new_item( 'Not Quite Perl', 'docs/book/ch06_nqp.pod'),
             $self->new_item( 'Compiler FAQ', 'docs/compiler_faq.pod'),
         ),
         $self->new_group(
