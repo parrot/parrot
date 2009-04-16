@@ -553,7 +553,7 @@ sub read_parrot_config {
     }
     %config;
 }
-    
+
 __@lclang@.pir__
 =head1 TITLE
 
@@ -862,7 +862,8 @@ if ($list_file) {
         $fn =~ s{/}{$slash}g;
         if ( -r $fn ) {
             push @files, $fn;
-        } else {
+        }
+        else {
             warn "Missing test file: $fn\n";
         }
     }
@@ -903,11 +904,13 @@ sub all_in {
             my $currfile = File::Spec->catfile( $start, $file );
             if ( -d $currfile ) {
                 push( @hits, all_in( $currfile ) );
-            } else {
+            }
+            else {
                 push( @hits, $currfile ) if $currfile =~ /\.t$/;
             }
         }
-    } else {
+    }
+    else {
         warn "$start: $!\n";
     }
 
