@@ -1221,7 +1221,7 @@ $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
 $(IO_DIR)/filehandle$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
-	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_continuation.h
+	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(OPS_DIR)/pic.ops : $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
 
@@ -1237,7 +1237,8 @@ $(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	$(SRC_DIR)/pmc/pmc_continuation.h
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
 
-$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
+$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c \
+	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c
 
