@@ -1,4 +1,7 @@
 #! parrot
+# Copyright (C) 2009, Parrot Foundation.
+# $Id$
+
 # Common functions for various Packfile* PMCs tests.
 # Return test filename
 # Currently parrot doesn't support system independent PBCs. So, cross your
@@ -53,9 +56,7 @@
 
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
 # vim: expandtab shiftwidth=4 ft=pir:
-
