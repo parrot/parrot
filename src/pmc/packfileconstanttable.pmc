@@ -109,8 +109,8 @@ Set pointer to underlying PackFile_ConstTable
     VTABLE void set_pointer(void * pointer) {
         Parrot_PackfileConstantTable_attributes * attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
-        const PackFile_ConstTable const * table =
-                (const PackFile_ConstTable const *)(pointer);
+        const PackFile_ConstTable * const table =
+                (const PackFile_ConstTable *)(pointer);
         const PackFile_Constant * val;
         opcode_t i;
 

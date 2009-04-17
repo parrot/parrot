@@ -101,8 +101,8 @@ Initialize PackfileRawSegment from PackFile_Segment
 */
 
     VTABLE void set_pointer(void * pointer) {
-        const PackFile_Segment const * pfseg =
-                (const PackFile_Segment const *)pointer;
+        const PackFile_Segment * const pfseg =
+                (const PackFile_Segment *)pointer;
         PMC * opcodes = PARROT_PACKFILERAWSEGMENT(SELF)->opcodes;
         size_t i;
 
