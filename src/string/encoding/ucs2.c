@@ -551,8 +551,9 @@ Moves the string iterator C<i> to the next UCS-2 codepoint.
 static UINTVAL
 ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
-#if PARROT_HAS_ICU
     ASSERT_ARGS(ucs2_decode_and_advance)
+
+#if PARROT_HAS_ICU
     UChar * const s = (UChar*) i->str->strstart;
     size_t pos = i->bytepos / sizeof (UChar);
 
@@ -586,8 +587,9 @@ next position in the string.
 static void
 ucs2_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
-#if PARROT_HAS_ICU
     ASSERT_ARGS(ucs2_encode_and_advance)
+
+#if PARROT_HAS_ICU
     UChar * const s = (UChar*) i->str->strstart;
     UINTVAL pos = i->bytepos / sizeof (UChar);
     s[pos++] = (UChar)c;
@@ -614,8 +616,9 @@ Moves the string iterator C<i> to the position C<n> in the string.
 static void
 ucs2_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 {
-#if PARROT_HAS_ICU
     ASSERT_ARGS(ucs2_set_position)
+
+#if PARROT_HAS_ICU
     i->charpos = n;
     i->bytepos = n * sizeof (UChar);
 #else
