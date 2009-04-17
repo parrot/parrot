@@ -1,18 +1,10 @@
-#!perl
+#! parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 3;
-use Parrot::Config;
 
 =head1 NAME
 
 t/pmc/packfilefixupentry.t - test the PackfileFixupEntry PMC
-
 
 =head1 SYNOPSIS
 
@@ -27,95 +19,67 @@ Tests the PackfileFixupEntry PMC.
 # Having some known data would be helpful, here.  For now, just make sure
 # the values returned seem sane.
 
-# common setup code for later tests
+.include 't/pmc/testlib/packfile_common.pir'
 
-my $get_uuid_pbc = <<'EOF';
-
-.sub _pbc
-    .include "stat.pasm"
-    .include "interpinfo.pasm"
-    .local pmc pf, pio
-    pf   = new ['Packfile']
-    $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    $S0 .= "/runtime/parrot/library/uuid.pbc"
-    $I0  = stat $S0, .STAT_FILESIZE
-    pio  = open $S0, 'r'
-    $S0  = read pio, $I0
-    close pio
-    pf   = $S0
-    .return(pf)
+.sub 'main' :main
+.include 'test_more.pir'
+    plan(3)
+    test_sanity()
+    test_sanity_entry()
+    test_methods()
 .end
-EOF
+
 
 
 # sanity check we start with a PackfileFixupTable
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'sanity1' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable
+.sub 'test_sanity'
+    .local pmc pf, pftable
     .local string name
     pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[1]
-    name    = typeof pftable
-    say name
+    pftable = _get_fixup_table(pf)
+    isa_ok(pftable, 'PackfileFixupTable')
 .end
-CODE
-PackfileFixupTable
-OUT
 
 
 # sanity check we end up with a PackfileFixupTable
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'sanity2' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable, pfentry
+.sub 'test_sanity_entry'
+    .local pmc pf, pftable, pfentry
     .local string name
     pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[1]
+    pftable = _get_fixup_table(pf)
     pfentry = pftable[0]
-    name    = typeof pfentry
-    say name
+    isa_ok(pfentry, 'PackfileFixupEntry')
 .end
-CODE
-PackfileFixupEntry
-OUT
 
 
 # PackfileFixupEntry methods .get_string(), .get_integer(), .get_type()
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'sanity' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable, pfentry
+.sub 'test_methods'
+    .local pmc pf, pftable, pfentry
     .local int size, this, data
     .local string name, label
     pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[1]
+    pftable = _get_fixup_table(pf)
     size    = elements pftable
     this    = 0
-    LOOP:
+  loop:
     pfentry = pftable[this]
     name    = typeof pfentry
-    eq name, "PackfileFixupEntry", NEXT
-    print "PackfileFixupTable["
-    print this
-    print "] returned an object of type: "
-    say name
-    goto DONE
-    NEXT:
+    eq name, "PackfileFixupEntry", next
+    $S0 = "PackfileFixupTable["
+    $S1 = this
+    $S0 = concat $S1
+    $S0 = concat "] returned an object of type: "
+    $S0 = concat name
+    ok(0, $S0)
+    .return ()
+  next:
     this = this + 1
-    ge this, size, DONE
-    goto LOOP
-    gt size, 0, DONE
-    DONE:
-    say 'done.'
+    ge this, size, done
+    goto loop
+    gt size, 0, done
+  done:
+    ok(1, "Got entries")
 .end
-CODE
-done.
-OUT
-
 
 # Local Variables:
 #   mode: cperl

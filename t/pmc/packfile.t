@@ -1,13 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2006-2008, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 6;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -24,96 +17,115 @@ Tests the Packfile PMC.
 
 =cut
 
+.include 't/pmc/testlib/packfile_common.pir'
+
+.sub main :main
+.include 'test_more.pir'
+
+    plan(34)
+    'test_new'()
+    'test_get_string'()
+    'test_set_string'()
+    'test_get_integer'()
+    'test_set_integer'()
+    'test_get_directory'()
+    'test_load'()
+    'test_pack_fresh_packfile'()
+    'test_pack'()
+    # This test will crash on many platforms. See TT#545.
+    #'test_synonyms'()
+.end
+
 
 # Packfile constructor
-
-pir_output_is( <<'CODE', <<'OUT', 'new' );
-.sub 'test' :main
+.sub 'test_new'
     .local pmc pf
     pf = new ['Packfile']
     $I0 = defined pf
-    say $I0
+    ok($I0, 'new')
+    _check_header(pf)
 .end
-CODE
-1
-OUT
 
 
 # Packfile.get_integer_keyed_str
-
-pir_output_is( <<'CODE', <<'OUT', 'get_integer_keyed_str' );
-.sub 'test' :main
+.sub 'test_get_string'
     .local pmc pf
     pf = new ['Packfile']
-    $S0 = 'version_major'
-    $I0 = pf[$S0]
-    say $I0
+    $S0 = pf["uuid"]
+    ok(1, 'get_string(uuid)')
+    
+    # Requesting unknown key should throw exception
+    push_eh unknown_key
+    $S0 = pf["foo"]
+    ok(0, "get_string_keyed_int return unknown key")
+    .return ()
+
+  unknown_key:
+    pop_eh
+    ok(1, "get_string_keyed_int handle unknown key properly")
+    .return ()
 .end
-CODE
-1
-OUT
 
-
-# Packfile.get_directory
-
-pir_output_is( <<'CODE', <<'OUT', 'get_directory' );
-.sub 'test' :main
+# Packfile.get_integer_keyed_str
+.sub 'test_set_string'
     .local pmc pf
     pf = new ['Packfile']
-    $P1 = pf.'get_directory'()
-    $S0 = typeof $P1
-    say $S0
+    pf["uuid"] = "fe9ab64082e0f6bbbd7b1e8264127908"
+    ok(1, 'set_string(uuid)')
+
+    # Special check for 0
+    $S0 = "\0"
+    $I0 = length $S0
+    is($I0, 1, "Length is 1")
+    pf["uuid"] = $S0
+    $S1 = pf["uuid"]
+    $I1 = length $S1
+    is($I1, 1, "Fetched length is 1")
+    
+    # Requesting unknown key should throw exception
+    push_eh unknown_key
+    pf["foo"] = "fe9ab64082e0f6bbbd7b1e8264127908"
+    ok(0, "set_string_keyed_int set unknown key")
+    .return ()
+
+  unknown_key:
+    pop_eh
+    ok(1, "set_string_keyed_int handle unknown key properly")
+    .return ()
 .end
-CODE
-PackfileDirectory
-OUT
 
 
-# common setup code for later tests
-
-my $get_uuid_pbc = <<'EOF';
-
-.sub _pbc
-    .include "stat.pasm"
-    .include "interpinfo.pasm"
-    .local pmc pf, pio
-    pf   = new ['Packfile']
-    $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    $S0 .= "/runtime/parrot/library/uuid.pbc"
-    $I0  = stat $S0, .STAT_FILESIZE
-    pio  = open $S0, 'r'
-    $S0  = read pio, $I0
-    close pio
-    pf   = $S0
-    .return(pf)
-.end
-EOF
 
 
 # Packfile.set_string_native, Packfile.get_integer_keyed_str
-pir_output_is( <<'CODE' . $get_uuid_pbc, $PConfig{VERSION}, 'set_string_native' );
-.sub 'test' :main
+.sub 'test_get_integer'
     .local pmc pf
-    pf   = _pbc()
-    $S0  = "version_major"
-    $I0  = pf[$S0]
-    $S0  = "version_minor"
-    $I1  = pf[$S0]
-    $S0  = "version_patch"
-    $I2  = pf[$S0]
-    print $I0
-    print "."
-    print $I1
-    print "."
-    print $I2
+    pf  = _pbc()
+    $I0 = pf["version_major"]
+    ok(1, "get_integer_keyed_str(version_major)")
+
+    $I1 = pf["version_minor"]
+    ok(1, "get_integer_keyed_str(version_minor)")
+
+    $I2 = pf["version_patch"]
+    ok(1, "get_integer_keyed_str(version_patch)")
+
+    # Requesting unknown key should throw exception
+    push_eh unknown_key
+    $I3 = pf["foo"]
+    ok(0, "get_integer_keyed_str return unknown key")
+    .return ()
+
+  unknown_key:
+    pop_eh
+    ok(1, "get_integer_keyed_str handle unknown key properly")
+    .return ()
+
 .end
-CODE
 
 
 # Packfile.set_integer_keyed_str
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'set_integer_keyed_str' );
-.sub 'test' :main
+.sub 'test_set_integer'
     .local pmc pf
     pf  = _pbc()
     $S1 = 'version_major'
@@ -122,38 +134,177 @@ pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'set_integer_keyed_str' );
     inc $I1
     pf[$S1] = $I1
     $I2 = pf[$S1]
-    eq $I0, $I1, OUT1
-    print "not "
-    OUT1:
-    say "equal"
-    eq $I1, $I2, OUT2
-    print "not "
-    OUT2:
-    say "equal"
+    $I3 = cmp $I0, $I2
+    $I3 = cmp $I3, 0
+    ok($I3, 'set_integer_keyed_str version bumped')
 .end
-CODE
-not equal
-equal
-OUT
+
+# Packfile.get_directory
+.sub 'test_get_directory'
+    .local pmc pf
+    pf = new ['Packfile']
+    $P0 = pf.'get_directory'()
+    isa_ok($P0, 'PackfileDirectory')
+.end
 
 
 # PackfileSegment.pack (via subclass PackfileDirectory)
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'set_integer_keyed_str' );
-.sub 'test' :main
+.sub 'test_get_directory'
     .local pmc pf, pfdir
     pf    = _pbc()
     pfdir = pf.'get_directory'()
     $S0   = pfdir.'pack'()
     $I0   = length $S0
-    eq $I0, 0, OUT1
-    print "not "
-    OUT1:
-    say "equal"
+    $I1 = cmp $I0, 0
+    ok($I1, 'get_directory')
 .end
-CODE
-not equal
-OUT
+
+
+# Packfile.set_string_native
+# Check that packfile was loaded properly and set various attributes
+.sub 'test_load'
+    .local pmc pf
+    pf = _pbc()
+
+    _check_header(pf)
+.end
+
+# Helper sub to check fields in Packfile header
+.sub '_check_header'
+    .param pmc pf
+    
+    # wordsize always greater than 0
+    $I0 = pf["wordsize"]
+    ok($I0, "Wordsize set")
+
+    # We are living in post-1.0 era.
+    $I0 = pf["version_major"]
+    ok($I0, "version_major set")
+
+    $I0 = pf["bytecode_major"]
+    ok($I0, "bytecode_major set")
+.end
+
+# Create very simple Packfile and pack it
+.sub 'test_pack_fresh_packfile'
+    .local pmc pf, pfdir
+    pf = new 'Packfile'
+    pfdir = pf.'get_directory'()
+    #$P0 = new 'PackfileConstantTable'
+    #$P0[0] = 42.0
+    $P0 = new 'PackfileFixupTable'
+    $P1 = new 'PackfileFixupEntry'
+    $P1 = 42
+    $P1.'set_type'(1)
+    $P1 = "The fixup"
+    $P0[0] = $P1
+    pfdir["FIXUP_t/pmc/packfile.t"] = $P0
+
+    $P1 = new 'PackfileRawSegment'
+    pfdir["BYTECODE_t/pmc/packfile.t"] = $P1
+
+    $P2 = new 'PackfileConstantTable'
+    $P2[0] = 42.0
+    $P2[1] = "42"
+    $P3 = new 'Integer'
+    $P3 = 42
+    $P2[2] = $P3
+    $P4 = new 'Key'
+    $P4 = 42
+    $P2[3] = $P4
+    pfdir["CONSTANTS_t/pmc/packfile.t"] = $P2
+
+    # Set uuid_type
+    pf['uuid_type'] = 1
+    $S0 = pf
+    
+    # Pack it
+    ok(1, "PackFile packed")
+
+    #$P1 = open "/tmp/1.pbc", "w"
+    #$P1.'puts'($S0)
+    #close $P1
+
+    pf = new 'Packfile'
+    pf = $S0
+    ok(1, "PackFile unpacked after pack")
+
+    $I0 = pf['uuid_type']
+    is($I0, 1, "uuid_type preserved")
+
+    # Check that FixupTable contains our Entry.
+    $P0 = _get_fixup_table(pf)
+    $I1 = elements $P0
+    is($I1, 1, "FixupTable contains one element")
+    $P1 = $P0[0]
+    isa_ok($P1, "PackfileFixupEntry")
+    $I0 = $P1
+    is($I0, 42, "FixupEntry offset preserved")
+    $S0 = $P1
+    is($S0, "The fixup", "FixupEntry name preserved")
+
+    # Check unpacked ConstTable
+    $P0 = _find_segment_by_type(pf, "PackfileConstantTable")
+    $I0 = defined $P0
+    ok($I0, "ConstantTable unpacked")
+    $I0 = elements $P0
+    is($I0, 4, "    and contains 4 elements")
+    $N0 = $P0[0]
+    is($N0, 42.0, "    first is number")
+    $S0 = $P0[1]
+    is($S0, "42", "    second is string")
+    $P1 = $P0[2]
+    isa_ok($P1, "Integer")
+    $I0 = $P1
+    is($I0, 42, "    with proper value")
+    $P1 = $P0[3]
+    isa_ok($P1, "Key")
+.end
+
+# Packfile.pack.
+# Check that unpack-pack produce correct result.
+.sub 'test_pack'
+    .local string filename, first
+    $S0 = '_filename'()
+    $P0 = open $S0, 'r'
+
+    first = $P0.'readall'()
+
+    .local pmc packfile
+    packfile = new 'Packfile'
+    packfile = first
+
+    # Packed file should be exactly the same as loaded
+    .local string second
+    # Pack
+    second = packfile
+    
+    $I0 = cmp first, second
+    $I0 = not $I0
+    todo($I0, 'pack produced same result twice')
+.end
+
+# Test pack/set_string unpack/get_string equivalency
+.sub 'test_synonyms'
+    .local pmc pf
+    pf = '_pbc'()
+
+    $S0 = pf
+    $S1 = pf.'pack'()
+    $I0 = cmp $S0, $S1
+    is($I0, 0, "pack and get_string are synonyms")
+
+    # Unpack data in two ways
+    $P0 = new ['Packfile']
+    $P0 = $S0
+    $P1 = new ['Packfile']
+    $P1.'unpack'($S0)
+
+    $S0 = $P0
+    $S1 = $P1
+    $I0 = cmp $S0, $S1
+    is($I0, 0, "unpack and set_string are synonyms")
+.end
 
 
 # Local Variables:
@@ -161,4 +312,4 @@ OUT
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:

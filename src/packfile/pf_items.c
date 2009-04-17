@@ -1473,8 +1473,14 @@ opcode_t*
 PF_store_cstring(ARGOUT(opcode_t *cursor), ARGIN(const char *s))
 {
     ASSERT_ARGS(PF_store_cstring)
+    /*
+     * This is not very efficient for filling padding with zeros.
+     * But it's more efficient than calculate strlen twice.
+     */
+    size_t store_size = PF_size_cstring(s);
+    memset((char *) cursor, 0, store_size * sizeof (opcode_t));
     strcpy((char *) cursor, s);
-    return cursor + PF_size_cstring(s);
+    return cursor + store_size;
 }
 
 /*

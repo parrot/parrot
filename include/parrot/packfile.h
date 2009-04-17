@@ -173,17 +173,21 @@ typedef struct PackFile_funcs {
     PackFile_Segment_dump_func_t        dump;
 } PackFile_funcs;
 
-typedef enum {
-    PF_DIR_SEG,
-    PF_UNKNOWN_SEG,
-    PF_FIXUP_SEG,
-    PF_CONST_SEG,
-    PF_BYTEC_SEG,
-    PF_DEBUG_SEG,
-    PF_ANNOTATIONS_SEG,
+/* &gen_from_enum(packfile_segments.pasm) */
 
-    PF_MAX_SEG
+typedef enum {
+    PF_DIR_SEG          = 0,
+    PF_UNKNOWN_SEG      = 1,
+    PF_FIXUP_SEG        = 2,
+    PF_CONST_SEG        = 3,
+    PF_BYTEC_SEG        = 4,
+    PF_DEBUG_SEG        = 5,
+    PF_ANNOTATIONS_SEG  = 6,
+
+    PF_MAX_SEG          = 7
 } pack_file_types;
+
+/* &end_gen */
 
 #define PF_DIR_FORMAT 1
 
@@ -229,12 +233,18 @@ typedef struct PackFile_FixupTable {
     PackFile_ByteCode           *code;   /* where this segment belongs to */
 } PackFile_FixupTable;
 
-#define PFC_NONE    '\0'
+
+
+/* &gen_from_def(packfile_constants.pasm) */
+
 /* no ascii chars use numbers: for n, s, k, p */
-#define PFC_NUMBER  '\156'
-#define PFC_STRING  '\163'
-#define PFC_KEY     '\153'
-#define PFC_PMC     '\160'
+#define PFC_NONE    0x0
+#define PFC_NUMBER  0x6E
+#define PFC_STRING  0x73
+#define PFC_PMC     0x70
+#define PFC_KEY     0x6B
+
+/* &end_gen */
 
 enum PF_VARTYPE {                  /* s. also imcc/symreg.h */
     PF_VT_START_SLICE = 1 << 10,   /* x .. y slice range */
@@ -276,11 +286,14 @@ typedef struct PackFile_Debug {
     PackFile_ByteCode      *code;   /* where this segment belongs to */
 } PackFile_Debug;
 
+/* &gen_from_def(packfile_annotation_key_type.pasm) */
 
 /* Key types for annotation segment. */
 #define PF_ANNOTATION_KEY_TYPE_INT 0
 #define PF_ANNOTATION_KEY_TYPE_STR 1
 #define PF_ANNOTATION_KEY_TYPE_NUM 2
+
+/* &end_gen */
 
 typedef struct PackFile_Annotations_Key {
     opcode_t name;

@@ -16,6 +16,8 @@ See packfile.pmc for the toplevel Packfile interface, see packfilesegment.pmc
 for the list of common methods every packfile segment pmc must implement; see
 PDD13 for the design spec.
 
+To works properly PackfileAnnotations has to be added to PackfileDirectory with
+PackfileConstantTable. Otherwise PackfileAnnotationKey can't be created.
 
 =head2 Methods
 
@@ -26,9 +28,74 @@ PDD13 for the design spec.
 */
 
 #include "parrot/parrot.h"
+#include "pmc_packfileannotation.h"
 
 pmclass PackfileAnnotations extends PackfileSegment {
+    /* RPA of Annotation */
+    ATTR PMC *annotations;
 
+    /* AnnotationKeys */
+    ATTR PMC *keys;
+
+/*
+
+=item C<void init()>
+
+Initialize PackfileAnnotations.
+
+=cut
+
+*/
+    VTABLE void init() {
+        Parrot_PackfileAnnotations_attributes * attrs =
+                mem_allocate_zeroed_typed(Parrot_PackfileAnnotations_attributes);
+
+        attrs->annotations = pmc_new(interp, enum_class_ResizablePMCArray);
+        attrs->keys        = pmc_new(interp, enum_class_PackfileAnnotationKeys);
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+        PMC_data(SELF) = attrs;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_PackfileAnnotations_attributes * attrs =
+                PARROT_PACKFILEANNOTATIONS(SELF);
+
+        if (attrs->annotations)
+            pobject_lives(interp, (PObj *)attrs->annotations);
+        if (attrs->keys)
+            pobject_lives(interp, (PObj *)attrs->keys);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC and frees all allocated memory.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        Parrot_PackfileAnnotations_attributes * attrs =
+                PARROT_PACKFILEANNOTATIONS(SELF);
+
+        if (attrs) {
+            mem_sys_free(attrs);
+            PMC_data(SELF) = NULL;
+        }
+    }
 
 /*
 
@@ -40,8 +107,9 @@ contained within this object.
 =cut
 
 */
-    PMC *get_key_list() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    METHOD get_key_list() {
+        PMC * keys = PARROT_PACKFILEANNOTATIONS(SELF)->keys;
+        RETURN(PMC* keys);
     }
 
 
@@ -55,7 +123,8 @@ Get the number of elements in the array.
 
 */
     VTABLE INTVAL elements() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        return VTABLE_elements(interp,
+                PARROT_PACKFILEANNOTATIONS(SELF)->annotations);
     }
 
 
@@ -69,7 +138,8 @@ Fetch an annotation PMC from the array.
 
 */
     VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        return VTABLE_get_pmc_keyed_int(interp,
+                PARROT_PACKFILEANNOTATIONS(SELF)->annotations, index);
     }
 
 
@@ -98,10 +168,128 @@ thrown unless all of the following criteria are met:
 
 */
     VTABLE void set_pmc_keyed_int(INTVAL index, PMC *annotation)  {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        PMC * annotations = PARROT_PACKFILEANNOTATIONS(SELF)->annotations;
+
+        /* TODO: add checks desribed above */
+        VTABLE_set_pmc_keyed_int(interp, annotations, index, annotation);
     }
 
+/*
 
+=item C<void set_directory()>
+
+Handle setting of ownership.
+
+Find PackfileConstantTable in PackfileDirectory and pass it to
+PackfileAnnotationKeys.
+
+=cut
+
+*/
+
+    METHOD set_directory(PMC *directory) {
+        Parrot_PackfileAnnotations_attributes *attrs =
+                PARROT_PACKFILEANNOTATIONS(SELF);
+        STRING *name;
+        PMC    *segment;
+
+        PMC *iter = VTABLE_get_iter(interp, directory);
+        while (VTABLE_get_bool(interp, iter)) {
+            name = VTABLE_shift_string(interp, iter);
+            segment = VTABLE_get_pmc_keyed_str(interp, directory, name);
+            if (VTABLE_isa(interp, segment,
+                    Parrot_str_new_constant(interp, "PackfileConstantTable"))) {
+                Parrot_PCCINVOKE(interp, attrs->keys,
+                        Parrot_str_new_constant(interp, "set_constant_table"),
+                        "P->", segment);
+                break;
+            }
+        }
+    }
+
+/*
+
+=item C<void set_pointer(void *ptr)>
+
+Initialize PackfileAnnotations from PackFile_Annotations*.
+
+=cut
+
+*/
+    VTABLE void set_pointer(void *pointer) {
+        PackFile_Annotations * a = (PackFile_Annotations*)pointer;
+        Parrot_PackfileAnnotations_attributes *attrs =
+                PARROT_PACKFILEANNOTATIONS(SELF);
+        opcode_t  i;
+        PMC      *annotation;
+        Parrot_PackfileAnnotation_attributes *annotation_attrs;
+
+        /* Initialize Keys */
+        VTABLE_set_pointer(interp, attrs->keys, a);
+
+        /* Copy annotations to own array */
+        VTABLE_set_integer_native(interp, attrs->annotations, a->num_entries);
+        for (i = 0; i < a->num_entries; ++i) {
+            annotation = pmc_new(interp, enum_class_PackfileAnnotation);
+
+            /* Poke directly to annotation attributes. */
+            annotation_attrs         = PARROT_PACKFILEANNOTATION(annotation);
+            annotation_attrs->value  = a->entries[i]->value;
+            annotation_attrs->key_id = a->entries[i]->key;
+            annotation_attrs->offset = a->entries[i]->bytecode_offset;
+
+            VTABLE_set_pmc_keyed_int(interp, attrs->annotations, i, annotation);
+        }
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Create PackFile_Annotations* from self.
+
+=cut
+
+*/
+    VTABLE void *get_pointer() {
+        Parrot_PackfileAnnotations_attributes *attrs =
+                PARROT_PACKFILEANNOTATIONS(SELF);
+        PackFile_Annotations *res = mem_allocate_zeroed_typed(PackFile_Annotations);
+        PMC                  *entity;
+        Parrot_PackfileAnnotation_attributes *entity_attrs;
+        INTVAL                i, num;
+        INTVAL                key_type;
+
+        res->base.type = PF_ANNOTATIONS_SEG;
+
+        /* Copy keys */
+        num = VTABLE_elements(interp, attrs->keys);
+        res->num_keys = num;
+        res->keys = mem_allocate_n_typed(num, PackFile_Annotations_Key*);
+        for (i = 0; i < num; ++i) {
+            res->keys[i] = mem_allocate_typed(PackFile_Annotations_Key);
+            Parrot_PCCINVOKE(interp, attrs->keys,
+                    Parrot_str_new_constant(interp, "get_name_constant"),
+                    "I->I", i, &res->keys[i]->name);
+            res->keys[i]->type = VTABLE_get_integer_keyed_int(interp, attrs->keys, i);
+        }
+
+        /* Copy entities */
+        num = VTABLE_elements(interp, attrs->annotations);
+        res->num_entries = num;
+        res->entries = mem_allocate_n_typed(num, PackFile_Annotations_Entry*);
+        for (i = 0; i < num; ++i) {
+            res->entries[i]         = mem_allocate_zeroed_typed(PackFile_Annotations_Entry);
+            entity                  = VTABLE_get_pmc_keyed_int(interp, attrs->annotations, i);
+            entity_attrs            = PARROT_PACKFILEANNOTATION(entity);
+
+            res->entries[i]->bytecode_offset    = entity_attrs->offset;
+            res->entries[i]->value              = entity_attrs->value;
+            res->entries[i]->key                = entity_attrs->key_id;
+        }
+
+        return res;
+    }
 }
 /*
 

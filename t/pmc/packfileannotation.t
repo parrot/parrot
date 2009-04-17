@@ -1,12 +1,5 @@
-#!perl
+#!parrot
 # Copyright (C) 2006-2009, Parrot Foundation.
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -23,16 +16,26 @@ Tests the PackfileAnnotation PMC.
 
 =cut
 
-
-# Packfile constructor
-
-pir_output_is( <<'CODE', <<'OUT', 'new' );
+# PackfileAnnotation constructor
 .sub 'test' :main
-    .local pmc pf
-    pf = new ['PackfileAnnotation']
-    $I0 = defined pf
-    say $I0
+.include 'test_more.pir'
+    .local pmc pa
+
+    plan(4)
+
+    pa = new ['PackfileAnnotation']
+    $I0 = defined pa
+    ok($I0, 'PackfileAnnotation created')
+
+    pa = 42
+    pa.'set_key_id'(1)
+    pa.'set_offset'(115200)
+
+    $I0 = pa
+    is($I0, 42, 'Value stored and fetched')
+    $I0 = pa.'get_key_id'()
+    is($I0, 1,  'KeyId stored and fetched')
+    $I0 = pa.'get_offset'()
+    is($I0, 115200, 'Offset stored and fetched')
+
 .end
-CODE
-1
-OUT

@@ -22,7 +22,47 @@ PackfileAnnotations segment of the .pbc file.  See PDD13 for a design spec.
 #include "parrot/parrot.h"
 
 pmclass PackfileAnnotation {
+    ATTR INTVAL value;
+    ATTR INTVAL offset;
+    ATTR INTVAL key_id;
 
+/*
+
+=item C<init>
+
+Create empty PackfileAnnotation.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+        Parrot_PackfileAnnotation_attributes * attrs =
+                mem_allocate_zeroed_typed(Parrot_PackfileAnnotation_attributes);
+
+        PObj_active_destroy_SET(SELF);
+        PMC_data(SELF) = attrs;
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC and frees all allocated memory.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        Parrot_PackfileAnnotation_attributes * attrs =
+                PARROT_PACKFILEANNOTATION(SELF);
+
+        if (attrs) {
+            mem_sys_free(attrs);
+            PMC_data(SELF) = NULL;
+        }
+    }
 
 /*
 
@@ -33,8 +73,9 @@ Fetch the offset into the bytecode of the instruction that is being annotated.
 =cut
 
 */
-    INTVAL get_offset() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    METHOD get_offset() {
+        INTVAL offset = PARROT_PACKFILEANNOTATION(SELF)->offset;
+        RETURN(INTVAL offset);
     }
 
 
@@ -47,8 +88,8 @@ Set the offset into the bytecode of the instruction that is being annotated.
 =cut
 
 */
-    void set_offset(INTVAL offset) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    METHOD set_offset(INTVAL offset) {
+        PARROT_PACKFILEANNOTATION(SELF)->offset = offset;
     }
 
 
@@ -61,22 +102,23 @@ Fetch the ID of the key of the annotation.
 =cut
 
 */
-    INTVAL get_key_id() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    METHOD get_key_id() {
+        INTVAL key_id = PARROT_PACKFILEANNOTATION(SELF)->key_id;
+        RETURN(INTVAL key_id);
     }
 
 
 /*
 
-=item C<void set_key_id(INTVAL offset)>
+=item C<void set_key_id(INTVAL key_id)>
 
 Set the ID of the key of the annotation.
 
 =cut
 
 */
-    void set_key_id(INTVAL offset) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    METHOD set_key_id(INTVAL key_id) {
+        PARROT_PACKFILEANNOTATION(SELF)->key_id = key_id;
     }
 
 
@@ -90,21 +132,21 @@ Fetch the value of the annotation.
 
 */
     VTABLE INTVAL get_integer() {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+        return PARROT_PACKFILEANNOTATION(SELF)->value;
     }
 
 
 /*
 
-=item C<void set_integer(INTVAL offset)>
+=item C<void set_integer(INTVAL value)>
 
 Set the value of the annotation.
 
 =cut
 
 */
-    VTABLE void set_integer(INTVAL offset) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, "Not implemented yet.");
+    VTABLE void set_integer_native(INTVAL value) {
+        PARROT_PACKFILEANNOTATION(SELF)->value = value;
     }
 
 }
