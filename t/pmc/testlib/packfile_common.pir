@@ -46,7 +46,7 @@
 
 .sub '_get_fixup_table'
     .param pmc pf
-    
+
     .tailcall '_find_segment_by_type'(pf, "PackfileFixupTable")
 .end
 
