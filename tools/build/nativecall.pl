@@ -586,7 +586,9 @@ $put_pointer
 
     b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
 
-    if (b && b->vtable->base_type == enum_class_UnManagedStruct)
+    PARROT_ASSERT(PMC_IS_NULL(b) || b->vtable);
+
+    if ((!PMC_IS_NULL(b)) && b->vtable->base_type == enum_class_UnManagedStruct)
         return F2DPTR(VTABLE_get_pointer(interp, b));
 
     /*
