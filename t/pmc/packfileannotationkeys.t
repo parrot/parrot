@@ -80,10 +80,6 @@ Tests the PackfileAnnotationKeys PMC.
     $I0 = length $S0
     ok($I0, "Packfile with annotations packed")
 
-    $P0 = open '/tmp/2.pbc', 'w'
-    $P0.'puts'($S0)
-    close $P0
-
     pf = $S0
     annotations = _find_segment_by_type(pf, 'PackfileAnnotations')
     $I0 = defined annotations
