@@ -56,8 +56,8 @@ static STRING * get_bytes(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes_inplace(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *return_string))
         __attribute__nonnull__(1);
 
@@ -103,8 +103,8 @@ static void set_byte(PARROT_INTERP,
 
 static void set_bytes(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *new_bytes))
         __attribute__nonnull__(1);
 
@@ -117,8 +117,8 @@ static void set_codepoint(PARROT_INTERP,
 
 static void set_codepoints(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *new_codepoints))
         __attribute__nonnull__(1);
 

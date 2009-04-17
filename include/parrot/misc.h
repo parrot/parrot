@@ -147,7 +147,7 @@ STRING * Parrot_psprintf(PARROT_INTERP,
 PARROT_EXPORT
 int Parrot_secret_snprintf(
     ARGOUT(char *buffer),
-    const size_t len,
+    NULLOK(const size_t len),
     ARGIN(const char *format),
     ...)
         __attribute__nonnull__(1)

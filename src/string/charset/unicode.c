@@ -47,7 +47,7 @@ static size_t compute_hash(PARROT_INTERP,
 static INTVAL cs_rindex(PARROT_INTERP,
     SHIM(STRING *source_string),
     SHIM(STRING *search_string),
-    UINTVAL offset)
+    SHIM(UINTVAL offset))
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL

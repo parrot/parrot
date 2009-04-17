@@ -51,23 +51,23 @@ static UINTVAL codepoints(PARROT_INTERP, ARGIN(STRING *src))
 
 static UINTVAL get_byte(PARROT_INTERP,
     SHIM(const STRING *src),
-    UINTVAL offset)
+    SHIM(UINTVAL offset))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes_inplace(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *return_string))
         __attribute__nonnull__(1);
 
@@ -90,8 +90,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_codepoints_inplace(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *dest_string))
         __attribute__nonnull__(1);
 
@@ -105,14 +105,14 @@ static void iter_init(PARROT_INTERP,
 
 static void set_byte(PARROT_INTERP,
     SHIM(const STRING *src),
-    UINTVAL offset,
-    UINTVAL byte)
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL byte))
         __attribute__nonnull__(1);
 
 static void set_bytes(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *new_bytes))
         __attribute__nonnull__(1);
 
@@ -125,8 +125,8 @@ static void set_codepoint(PARROT_INTERP,
 
 static void set_codepoints(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *new_codepoints))
         __attribute__nonnull__(1);
 
