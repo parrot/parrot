@@ -41,7 +41,7 @@ static void save_struct(FILE *fp, void *sp, size_t size);
  * but instead has them as enums, so add some workarounds for it.
  */
 #if !defined(R_PPC_ADDR16_HI) && !defined(R_PPC_ADDR16_LO) && \
-	defined(__NetBSD__)
+	(defined(__NetBSD__) || defined(__OpenBSD__))
 # define	R_PPC_ADDR16_HI RELOC_16_HI
 # define	R_PPC_ADDR16_LO RELOC_16_LO
 #endif
