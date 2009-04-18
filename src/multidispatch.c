@@ -154,16 +154,6 @@ static int Parrot_mmd_maybe_candidate(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static void Parrot_mmd_search_classes(PARROT_INTERP,
-    ARGIN(STRING *meth),
-    ARGIN(PMC *arg_tuple),
-    ARGIN(PMC *cl),
-    INTVAL start_at_parent)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC* Parrot_mmd_search_scopes(PARROT_INTERP, ARGIN(STRING *meth))
@@ -233,11 +223,6 @@ static PMC * Parrot_mmd_sort_candidates(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_mmd_maybe_candidate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc) \
-    || PARROT_ASSERT_ARG(cl)
-#define ASSERT_ARGS_Parrot_mmd_search_classes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(meth) \
-    || PARROT_ASSERT_ARG(arg_tuple) \
     || PARROT_ASSERT_ARG(cl)
 #define ASSERT_ARGS_Parrot_mmd_search_scopes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -543,65 +528,6 @@ Parrot_mmd_arg_tuple_func(PARROT_INTERP)
 
 
     return arg_tuple;
-}
-
-
-/*
-
-=item C<static void Parrot_mmd_search_classes(PARROT_INTERP, STRING *meth, PMC
-*arg_tuple, PMC *cl, INTVAL start_at_parent)>
-
-Search all the classes in all MultiSubs of the candidates C<cl> and return
-a list of all candidates. C<start_at_parent> is 0 to start at the class itself
-or 1 to search from the first parent class.
-
-=cut
-
-*/
-
-static void
-Parrot_mmd_search_classes(PARROT_INTERP, ARGIN(STRING *meth),
-        ARGIN(PMC *arg_tuple), ARGIN(PMC *cl), INTVAL start_at_parent)
-{
-    ASSERT_ARGS(Parrot_mmd_search_classes)
-    INTVAL type1;
-
-    /* get the class of the first argument */
-    if (!VTABLE_elements(interp, arg_tuple))
-        return;
-
-    type1 = VTABLE_get_integer_keyed_int(interp, arg_tuple, 0);
-
-    if (type1 < 0) {
-        return;
-        /* RT #45947 create some class namespace */
-    }
-    else {
-        PMC * const  mro = interp->vtables[type1]->mro;
-        const INTVAL n   = VTABLE_elements(interp, mro);
-        INTVAL       i;
-
-        for (i = start_at_parent; i < n; ++i) {
-            PMC * const _class = VTABLE_get_pmc_keyed_int(interp, mro, i);
-            PMC *ns, *methodobj;
-
-            if (PObj_is_class_TEST(_class))
-                ns = Parrot_oo_get_namespace(interp, _class);
-            else
-                ns = VTABLE_get_namespace(interp, _class);
-
-            methodobj = VTABLE_get_pmc_keyed_str(interp, ns, meth);
-
-            if (!PMC_IS_NULL(methodobj)) {
-                /*
-                 * RT #45949 pass current n so that only candidates from this
-                 *     mro are used?
-                 */
-                if (Parrot_mmd_maybe_candidate(interp, methodobj, cl))
-                    break;
-            }
-        }
-    }
 }
 
 
