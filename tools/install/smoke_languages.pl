@@ -364,7 +364,7 @@ skip("Pynie", 1) unless (-d "$langdir/pynie");
 $filename = 'test.py';
 open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
-print $FH "print 'Hello, World!'\n";
+print $FH "print('Hello, World!')\n";
 close $FH;
 $out = `$parrot $langdir/pynie/pynie.pbc $filename`;
 ok($out eq "Hello, World!\n", "check pynie");
