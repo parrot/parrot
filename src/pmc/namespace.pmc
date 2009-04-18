@@ -145,7 +145,6 @@ Initialize a C<NameSpace> PMC.
 */
 
     VTABLE void init() {
-        SUPER();
         PMC_data(SELF)    =
                 mem_allocate_zeroed_typed(Parrot_NameSpace_attributes);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
@@ -189,7 +188,8 @@ Frees the namespace info struct.
 
 */
     VTABLE void destroy() {
-        mem_sys_free(PARROT_NAMESPACE(SELF));
+        /* Call Hash.destroy. It will free all memory. */
+        SUPER();
     }
 
 /*
