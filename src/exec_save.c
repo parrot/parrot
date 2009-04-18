@@ -31,23 +31,23 @@ static void save_short(FILE *fp, short s);
 static void save_struct(FILE *fp, void *sp, size_t size);
 
 #if defined(PARROT_PPC)
-#if !defined(R_PPC_ADDR16_HI) && !defined(R_PPC_ADDR16_LO) && \
-	defined(R_PPC_16_HI) && defined(R_PPC_16_LO)
-# define	R_PPC_ADDR16_HI	R_PPC_16_HI
-# define	R_PPC_ADDR16_LO	R_PPC_16_LO
-#endif
-/*
- * NetBSD/powerpc 3.x doesn't define these constants,
- * but instead has them as enums, so add some workarounds for it.
- */
-#if !defined(R_PPC_ADDR16_HI) && !defined(R_PPC_ADDR16_LO) && \
-	(defined(__NetBSD__) || defined(__OpenBSD__))
-# define	R_PPC_ADDR16_HI RELOC_16_HI
-# define	R_PPC_ADDR16_LO RELOC_16_LO
-#endif
-#if !defined(R_PPC_REL24) && defined(__NetBSD__)
-# define	R_PPC_REL24	RELOC_REL24
-#endif
+#  if !defined(R_PPC_ADDR16_HI) && !defined(R_PPC_ADDR16_LO) && \
+       defined(R_PPC_16_HI) && defined(R_PPC_16_LO)
+#    define	R_PPC_ADDR16_HI	R_PPC_16_HI
+#    define	R_PPC_ADDR16_LO	R_PPC_16_LO
+#  endif
+   /*
+    * NetBSD/powerpc 3.x and OpenBSD/powerpc doesn't define these constants,
+    * but instead has them as enums, so add some workarounds for those.
+    */
+#  if !defined(R_PPC_ADDR16_HI) && !defined(R_PPC_ADDR16_LO) && \
+       (defined(__NetBSD__) || defined(__OpenBSD__))
+#    define	R_PPC_ADDR16_HI RELOC_16_HI
+#    define	R_PPC_ADDR16_LO RELOC_16_LO
+#  endif
+#  if !defined(R_PPC_REL24) && (defined(__NetBSD__) || defined(__OpenBSD__))
+#    define	R_PPC_REL24	RELOC_REL24
+#  endif
 #endif /* PARROT_PPC */
 
 #ifdef EXEC_A_OUT
