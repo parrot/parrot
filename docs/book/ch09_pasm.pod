@@ -6,31 +6,57 @@ Z<CHP-9>
 
 X<Parrot Assembly Language;;(see PASM)>
 X<PASM (Parrot assembly language)>
-Parrot assembly (PASM) is an assembly language written for Parrot's
-virtual CPU. Basic register operations or branches in PASM generally
-translate into a single CPU instruction. N<This means the JIT run time
-has a performance of up to one PASM instruction per processor cycle.>
-On the other hand, because it's designed to implement dynamic
-high-level languages, it has support for many advanced features such as
-lexical and global variables, objects, garbage collection,
-continuations, coroutines, and much more. PASM is very similar in
-many respects to PIR which we've already discussed, and in almost all
-cases PIR should be used instead of using PASM directly. However, all
-PASM syntax is also valid PIR syntax, so it's helpful to have an
-understanding of the underlying operations in PASM.
+We've seen some of the common ways for programming Parrot in earlier
+chapters: PIR is the intermediate language that's used most often for
+implementing routines in Parrot, NQP is used for writing grammar actions
+for high-level language compilers, PGE is used for specifying grammar
+rules, and various high-level languages that target Parrot are used for
+most other programming tasks. These options, though many and versatile,
+are not the only ways to interface with Parrot.
 
-X<.pasm files> A file with a F<.pasm> extension is treated as pure PASM
-code by Parrot, as is any file run with the C<-a> command-line option.
-This mode is mainly used for running pure PASM tests from the test suite,
-and is not likely to be useful for most developers.
+In regular assemblers, assembly language mnemonics share a one-to-one
+correspondence with the underlying machine code words that they
+represent. A simple assembler (and, for that matter, a simple disassembler)
+could be implemented as a meer lookup table. PIR does not have this kind
+of direct correspondance to PBC. A number of PIR features, especially the
+various directives, typically translate into a number of individual
+operations. Register names, such as C<$P7> don't indicate the actual
+storage location of the register in PIR either. The register allocator
+will intelligently move and rearrange registers to conserve memory, so
+the numbers you use to specify registers in PIR will be mapped to
+different numbers when compiled into PBC.
 
-Some people may ask why we have PASM at all, especially with PIR which
-has much nicer syntax. The answer is that PASM, like all assembly languages
-has a one-to-one correspondence with the underlying Parrot Bytecode (PBC).
-This makes it easy to translate from PBC to human-readable PASM code in
-a disassembler program. PIR code is basically just a thin wrapper over
-PASM, and you can write PASM code seamlessly in PIR files. It's always
-around, and it's good to be familiar with it.
+Because PIR and PBC can't be directly translated to one another, and
+because it can be difficult to disassemble low-level PBC back into the
+higher-level composite statements of PIR, especially after optimization,
+another tool is needed. That tool is PASM.
+
+PASM, the Parrot Assembly Language, is the lowest-level interface to
+Parrot. PASM instruction mnemonics do share a one-to-one correspondence
+to the underlying PBC opcodes, and for this reason is used by the Parrot
+disassembler instead of PIR. PASM is missing some of the features of
+PIR: Most directives, symbolic operators, C<if> and C<unless> compound
+statements, automatic register allocation, and a few other bits of
+syntactic sugar are missing from PASM. Because of these ommisions, it is
+strongly recommended that most developers do not use PASM to write any
+large amount of code. Use PIR if you need to, or a higher-level language
+if you can.
+
+=head2 PASM Files
+
+X<.pasm files>
+The Parrot compilers, IMCC and PIRC, differentiate between PIR and PASM
+code files based on the file extension. A file with a F<.pasm> extension
+is treated as pure PASM code by Parrot, as is any file run with the C<-a>
+command-line option.
+
+Early in the Parrot project's history, PIR was treated as a pure superset
+of PASM. All PASM was valid PIR, but PIR added a few extra features that
+the programmers found to be nice. However, this situation has changed and
+PIR is no longer a strict superset of PASM. For this reason, PASM and
+PIR code need to be kept in files with separate extensions. As we mentioned
+before, C<.pasm> files are always treated as containing only PASM, while
+C<.pir> files are used for PIR code, by convention.
 
 =head2 Basics
 
@@ -39,10 +65,10 @@ Z<CHP-9-SECT-2>
 X<PASM (Parrot assembly language);overview>
 PASM has a simple syntax that will be familiar to people who have experience
 programming other assembly languages. Each statement stands on its own line
-and there is no end-of-line delimiter like is used in many other languages.
-Statements begin with a Parrot instruction, commonly referred to
-as an "opcode"N<More accurately, it should probably be referred to as a
-"mnemonic">. The arguments follow, separated by commas:
+and there is no end-of-line delimiter. Statements begin with a Parrot
+instruction, commonly referred to as an "opcode"N<More accurately, it should
+probably be referred to as a "mnemonic">. The arguments follow, separated by
+commas:
 
   [label] opcode dest, source, source ...
 
@@ -68,9 +94,10 @@ A label names a line of code so other instructions can refer to it.
 Label names consist of letters, numbers, and underscores, exactly the
 same syntax as is used for labels in PIR. Simple labels are often all
 capital letters to make them stand out from the rest of the source code
-more clearly. A label definition is simply the name of the label
-followed by a colon. It can be on its own line N<In fact, we recommend
-that it be on its own line, for readability.>:
+more clearly. This is just a common convention and is not a rule. A label
+can be in front of a line of code, or it can be on it's own line. Keeping
+labels separate is usually recommended for readability, but again this is
+just a suggestion and not a rule.
 
 =begin PASM
 
@@ -78,8 +105,6 @@ that it be on its own line, for readability.>:
       print "Norwegian Blue\n"
 
 =end PASM
-
-or before a statement on the same line:
 
 =begin PASM
 
@@ -108,8 +133,8 @@ which is the same in PIR:
 
 =begin PASM
 
-  LABEL:                        # This is a comment for a label
-    print "Norwegian Blue\n"    # Print a color
+  LABEL:                        # This is a comment
+    print "Norwegian Blue\n"    # Print a color name
 
 =end PASM
 
@@ -118,9 +143,14 @@ which is the same in PIR:
 Z<CHP-9-SECT-2.1>
 
 X<PASM (Parrot assembly language);constants>
-Integer constants are signed integers.N<The size of integers is
-defined when Parrot is configured. It's typically 32 bits on 32-bit
-machines (a range of -2G<31> to +2G<31>-1) and twice that size on
+We've already seen constants in PIR, and for the most part the syntax
+is the same in PASM. We will give a brief refresher here, but see the
+chapter on PIR for a more in-depth discussion of constants and datatypes.
+
+Integer constants in Parrot are signed integers.N<The sizes of integers
+and all other data values like floats are defined when Parrot is
+configured and built. Integers are typically 32 bits wide on 32-bit
+computers (a range of -2G<31> to +2G<31>-1) and twice that size on
 64-bit processors.> Decimal integer constants can have a positive (C<+>) or
 negative (C<->) sign in front. Binary integers are preceded by C<0b>
 or C<0B>, and hexadecimal integers are preceded by C<0x> or C<0X>:
@@ -173,34 +203,46 @@ sets: integers, floating-point numbers, strings, and Parrot objects
 the register set type and the number of the register. Register numbers
 are non-negative (zero and positive numbers), and do not have a
 pre-defined upper limit N<At least not a restrictive limit. Parrot
-registers are stored internally as an array, and the register number is
-an index to that array. If you call C<N2000> you are implicitly creating
-a register array with 2000 entries. This can carry a performance
-penalty>. For example:
+registers are stored internally as an array. More registers means a larger
+allocated array, which can bring penalties on some systems>. For example:
 
   I0   integer register #0
   N11  number or floating point register #11
   S2   string register #2
   P33  PMC register #33
 
-Integer and number registers hold values, while string and PMC
-registers contain pointers to allocated memory for a string header or
-a Parrot object.
+We see the immediate difference here that PASM registers do not have the
+C<$> dollar sign in front of them like PIR registers do. The syntactical
+difference indicates that there is an underlying semantic difference:
+In PIR, register numbers are just suggestions and registers are automatically
+allocated; In PASM, register numbers are literal offsets into the register
+array, and registers are not automatically managed. Let's take a look at a
+simple PIR function:
 
-In Chapter 3 we mentioned that a register name was a dollar-sign followed
-by a type identifier and then a number. Now we're naming registers with
-only a letter and number, not a dollar sign. Why the difference? The
-dollar sign indicates to Parrot that the register names are not literal,
-and that the register allocator should assign the identifier to a
-physical memory location. Without the dollar sign, the register number
-is an actual offset into the register array. C<N2000> is going to point
-to the two thousandth register, while C<$N2000> can point to any
-memory location that the register allocator determines to be free. Since
-PIR attempts to protect the programmer from some of the darkest details,
-Parrot requires that registers in PIR use the C<$> form. In PASM you can
-use either form, but we still recommend using the C<$> form so you don't
-have to worry about register allocations (and associated performance
-penalties) yourself.
+=begin PIR
+
+  .sub 'foo'
+      $I33 = 1;
+  .return
+
+=end PIR
+
+This function allocates only one register. The register allocator counts that
+there is only one register needed, and converts C<$I33> to C<I0> internally.
+Now, let's look at a similar PASM subroutine:
+
+=begin PASM
+
+  foo:
+      I33 = 1
+
+=end PASM
+
+This function, which looks to perform the same simple operation actually is
+a little different. This small snippet of code actually allocates 33
+registers, even though only one of them is needed. It's up to the programmer
+to keep track of memory usage and not allocate more registers then are
+needed.
 
 =head4 Register assignment
 
@@ -219,7 +261,6 @@ opcode:
 
 =end PASM
 
-PASM uses registers where a high-level language would use variables.
 The C<exchange> opcode swaps the contents of two registers of the same
 type:
 
@@ -230,80 +271,63 @@ type:
 
 =end PASM
 
-As we mentioned before, string and PMC registers are slightly
-different because they hold a pointer instead of directly holding a
-value. Assigning one string register to another:
-
-=begin PASM
-
-  set S0, "Ford"
-  set S1, S0
-  set S0, "Zaphod"
-  print S1                # prints "Ford"
-  end
-
-=end PASM
-
-doesn't make a copy of the string; it makes a copy of the pointer.
-N<Strings in Parrot use Copy-On-Write (COW) optimizations. When we
-call C<set S1, S0> we copy the pointer only, so both registers point
-to the same string memory. We don't actually make a copy of the string
-until one of two registers is modified.> Just after C<set> C<S1>, C<S0>,
-both C<S0> and C<S1> point to the same string. But assigning a constant
-string to a string register allocates a new string. When "Zaphod" is
-assigned to C<S0>, the pointer changes to point to the location of the
-new string, leaving the old string untouched. So strings act like simple
-values on the user level, even though they're implemented as pointers.
-
-Unlike strings, assignment to a PMC doesn't automatically create a new
-object; it only calls the PMC's VTABLE method for assignment N<and depending
-on implementation the VTABLE assignment operation might not actually
-assign anything. For now though, we can assume most VTABLE interfaces
-do what they say they do.>. So, rewriting the same example using a PMC
-has a completely different result:
+PMC registers contain references to PMC structures internally. So, the set
+opcode doesn't copy the entire PMC, it only copies the reference to the
+PMC data.
 
 =begin PASM
 
   new P0, "String"
   set P0, "Ford"
   set P1, P0
-  set P0, "Zaphod"
+  set P1, "Zaphod"
+  print P0                # prints "Zaphod"
   print P1                # prints "Zaphod"
   end
 
 =end PASM
 
-The C<new> opcode creates an instance of the C<.String> class. The
-class's vtable methods define how the PMC in C<P0> operates.  The
-first C<set> statement calls C<P0>'s vtable method
-C<set_string_native>, which assigns the string "Ford" to the PMC. When
-C<P0> is assigned to C<P1>:
+In this example, both C<P0> and C<P1> are both references to the same
+internal data structure, so when we set C<P1> to the string literal
+C<"Zaphod">, it overwrites the previous value C<"Ford">. Now, both C<P0>
+and C<P1> point to the String PMC C<"Zaphod">, even though it appears that
+we only set one of those two registers to that value.
+
+Strings in Parrot are also stored as references to internal data structures
+like PMCs. However, strings use Copy-On-Write (COW) optimizations. When we
+call C<set S1, S0> we copy the pointer only, so both registers point
+to the same string memory. We don't actually make a copy of the string
+until one of two registers is modified. Here's the same example using
+string registers instead of PMC registers:
 
 =begin PASM
 
-  set P1, P0
+  set S0, "Ford"
+  set S1, S0
+  set S1, "Zaphod"
+  print S0                # prints "Ford"
+  print S1                # prints "Zaphod"
+  end
 
 =end PASM
 
-it copies the pointer, so C<P1> and C<P0> are both aliases to the same
-PMC. Then, assigning the string "Zaphod" to C<P0> changes the
-underlying PMC, so printing C<P1> or C<P0> prints "Zaphod".N<Contrast
-this with C<assign> in "PMC Assignment" later in
-this chapter.>
+Some developers have suggested that PMCs should also use COW semantics to
+help optimize copy operations like this. However, it hasn't been implemented
+yet. One day in the future, Parrot might change this, but it hasn't changed
+yet.
 
 =head4 PMC object types
 
 Z<CHP-9-SECT-2.2.2>
 
 X<PMCs (Polymorphic Containers);object types>
-Internally, PMC types are represented by positive integers, and
-built-in types by negative integers. PASM provides two opcodes to deal
-with types. Use C<typeof> to look up the name of a type from its
-integer value or to look up the named type of a PMC. Use C<find_type>
-to look up the integer value of a named type.
+Every PMC has a distinct type that determines it's behavior through the
+vtable interface. Vtables, as we have mentioned previously, are arrays
+of function pointers to implement various operations and behaviors.
 
-When the source argument is a PMC and the destination is a string
-register, C<typeof> returns the name of the type:
+The C<typeof> opcode can be used to determine the type of a PMC. When
+the source argument is a PMC and the destination is a string register,
+C<typeof> returns the name of the type:
 
 =begin PASM
 
@@ -315,16 +339,8 @@ register, C<typeof> returns the name of the type:
 
 =end PASM
 
-In this example, C<typeof> returns the type name "String".
-
-X<PMCs (Polymorphic Containers);inheritance>
-X<Parrot;classes;inheritance>
-X<inheritance;with PMCs>
-All Parrot classes inherit from the class C<default>. The
-C<default>X<default PMC> class provides some
-default functionality, but mainly throws exceptions when the default
-variant of a method is called (meaning the subclass didn't define the
-method).
+Using C<typeof> with a PMC output parameter instead, it returns the Class
+PMC for that type.
 
 =head4 Autoboxing
 
@@ -333,14 +349,14 @@ Z<CHP-9-SECT-2.2.3>
 X<Autoboxing>
 As we've seen in the previous chapters about PIR, we can convert between
 primitive string, integer, and number types and PMCs. PIR used the C<=>
-operator to make these conversions. PASM doesn't have any symbolic operators
-so we have to use the underlying opcodes directly. In this case, the C<set>
-opcode is used to perform data copying and data conversions automatically.
+operator to make these conversions. PASM uses the C<set> opcode to do the
+same thing. C<set> will perform the type conversions for us automatically,
+in a process called I<autoboxing>.
 
 Assigning a primitive data type to a PMC of a String, Integer, or Float type
 converts that PMC to the new type. So, assigning a string to a Number PMC
 converts it into a String PMC. Assigning an integer value converts it to a
-C<Integer>, and assigning C<undef> morphs it to C<Undef>:
+C<Integer>, and assigning C<undef> converts it to an C<Undef> PMC:
 
 =begin PASM
 
@@ -362,6 +378,20 @@ value 42 (replacing the old string value C<"Ford">), it changes type
 to C<Integer>. This behavior only works for the wrapper PMC types for the
 primitive values string, int, and num. Other PMC classes will have different
 behaviors when you try to assign a primitive value to them.
+
+We can also use the C<box> opcode to explicitly convert an integer, a float,
+or a string into an appropriate PMC type.
+
+=begin PASM
+
+  box P0, 3
+  typeof S0, P0         # P0 is an "Integer"
+  box P1, "hello"
+  typeof S0, P1         # P1 is a "String"
+  box P2, 3.14
+  typeof S0, P2         # P2 is a "Number"
+
+=end PASM
 
 =head3 Math Operations
 
