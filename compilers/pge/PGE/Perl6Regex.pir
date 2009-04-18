@@ -715,8 +715,8 @@ combinations.
     #save the matched in the mob as sep
     mob['sep'] = repetition_controller
 
-    #force the match to be 0..Inf
-    mob['min'] = 0
+    #force the match to be 1..Inf
+    mob['min'] = 1
     mob['max'] = PGE_INF
 
     #move position to after the matched
