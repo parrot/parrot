@@ -28,8 +28,6 @@ These are the vtable functions for the Hash PMC.
 
 Lookup the PMC type which is used for storing native integers.
 
-RT #46641: PMCs extending Hash should probably register themselves.
-
 =cut
 
 */
@@ -46,8 +44,6 @@ static PMC *get_integer_pmc(PARROT_INTERP, INTVAL base_type) {
 
 Lookup the PMC type which is used for floating point numbers.
 
-RT #46641: PMCs extending Hash should probably register themselves.
-
 =cut
 
 */
@@ -62,8 +58,6 @@ static PMC *get_number_pmc(PARROT_INTERP, INTVAL base_type) {
 =item C<static PMC *get_string_pmc(PARROT_INTERP, INTVAL base_type )>
 
 Lookup the PMC type which is used for storing strings.
-
-RT #46641: PMCs extending Hash should probably register themselves.
 
 =cut
 
