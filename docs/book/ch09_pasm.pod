@@ -17,7 +17,7 @@ are not the only ways to interface with Parrot.
 In regular assemblers, assembly language mnemonics share a one-to-one
 correspondence with the underlying machine code words that they
 represent. A simple assembler (and, for that matter, a simple disassembler)
-could be implemented as a meer lookup table. PIR does not have this kind
+could be implemented as a mere lookup table. PIR does not have this kind
 of direct correspondance to PBC. A number of PIR features, especially the
 various directives, typically translate into a number of individual
 operations. Register names, such as C<$P7> don't indicate the actual
@@ -37,7 +37,7 @@ to the underlying PBC opcodes, and for this reason is used by the Parrot
 disassembler instead of PIR. PASM is missing some of the features of
 PIR: Most directives, symbolic operators, C<if> and C<unless> compound
 statements, automatic register allocation, and a few other bits of
-syntactic sugar are missing from PASM. Because of these ommisions, it is
+syntactic sugar are missing from PASM. Because of these omissions, it is
 strongly recommended that most developers do not use PASM to write any
 large amount of code. Use PIR if you need to, or a higher-level language
 if you can.
@@ -321,7 +321,7 @@ yet.
 Z<CHP-9-SECT-2.2.2>
 
 X<PMCs (Polymorphic Containers);object types>
-Every PMC has a distinct type that determines it's behavior through the
+Every PMC has a distinct type that determines its behavior through the
 vtable interface. Vtables, as we have mentioned previously, are arrays
 of function pointers to implement various operations and behaviors.
 
