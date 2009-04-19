@@ -75,7 +75,7 @@ it should be.  No, I'm not proud of it, but it works for now.
     $P0 = obj.'list'()
     'padre_item'($P0, name)
 
-.end 
+.end
 
 
 .sub 'padre_item' :multi(['ResizablePMCArray'])
