@@ -2,14 +2,30 @@
 
 New in 1.1.0
 - Core
-  + Added op: load_language
+  + Added op: load_language, find_caller_lex
+  + socket IO are back as PMC
+  + refactor some PMC: Hash, ManagedStruct
+- Compiler
+  + PGE
+    - Allow \x, \c, and \o in enumerated character classes (incl ranges)
+    - Add initial greedy-only version of ** <exp> quantifier
+  + PCT
+    - Add HLL source line bytecode annotations
 - Deprecations
   + Removed ops: gcd, exec, classname, need_finalize, runinterp, substr_r
-  + Removed dynamic op: mul 
+  + Removed dynamic op: mul
   + Removed .HLL_map directive; use interp's .hll_map() instead
   + Removed PMCs: slice, bound_nci, ref
   + Removed Configure.pl option: --pmc
   + Removed PMC union struct
+- Documentation
+  + Book
+    - Reorganization and many improvements & additions
+- Tools
+  + Add a parrot-fuzzer
+- Miscellaneous
+  + Improve Debian/Ubuntu package
+
 
 New in 1.0.0
 - Documentation
