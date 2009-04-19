@@ -63,8 +63,8 @@ my @hlls = (
 
     {
         name       => 'cardinal',
-        scm        => 'SVN',
-        repository => 'https://svn.parrot.org/languages/cardinal/trunk'
+        scm        => 'GIT',
+        repository => 'git://github.com/cardinal/cardinal.git'
     },
 
     {
