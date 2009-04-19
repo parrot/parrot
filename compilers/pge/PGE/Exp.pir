@@ -528,7 +528,6 @@ tree as a PIR code object that can be compiled.
     seplabel = code.'unique'('R')
     nextlabel = concat label, '_sep'
   outer_quant_1:
-    
 
     if backtrack == PGE_BACKTRACK_EAGER goto bt_eager
     if backtrack == PGE_BACKTRACK_NONE goto bt_none
