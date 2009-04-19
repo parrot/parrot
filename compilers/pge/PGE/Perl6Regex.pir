@@ -607,10 +607,11 @@ combinations.
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Quant')
     lastpos = length target
 
-    .local int min, max, suffixpos
+    .local int min, max, suffixpos, sepws
     .local string suffix
     min = 1
     max = 1
+    sepws = is_cclass .CCLASS_WHITESPACE, target, pos
     suffixpos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
 
     if key == '**' goto quant_suffix
@@ -657,6 +658,8 @@ combinations.
   quant:
     if key != '**' goto quant_set
   quant_closure:
+    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
+    sepws |= $I0
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     .local int isconst
     isconst = is_cclass .CCLASS_NUMERIC, target, pos
@@ -711,6 +714,20 @@ combinations.
     #update pos to after the matched
     pos = repetition_controller.'to'()
     repetition_controller = repetition_controller['expr']
+
+    # if there's surrounding ws, then add WS nodes
+    unless sepws goto sepws_done
+    $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Concat')
+    $P0.'to'(pos)
+    $P1 = mob.'new'(mob, 'grammar'=>'PGE::Exp::WS')
+    $P1.'to'(pos)
+    push $P0, $P1
+    push $P0, repetition_controller
+    $P1 = mob.'new'(mob, 'grammar'=>'PGE::Exp::WS')
+    $P1.'to'(pos)
+    push $P0, $P1
+    repetition_controller = $P0
+  sepws_done:
 
     #save the matched in the mob as sep
     mob['sep'] = repetition_controller
