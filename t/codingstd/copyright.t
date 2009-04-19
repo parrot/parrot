@@ -109,7 +109,6 @@ TODO:
         "Please update to read something like:",
         $suggested_version
         );
-}
 
 # Certain files contain the string 'Copyright (c)' more than once
 # because they contain heredocs for generated files, correctly cite the
@@ -167,6 +166,7 @@ ok( !scalar(@non_permitted_duplicate_copyright_files),
     "and remove alternate notice; or remove duplicated",
     "notice for Parrot Foundation."
     );
+}
 
 # Local Variables:
 #   mode: cperl
