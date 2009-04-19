@@ -43,7 +43,7 @@ packfile-c.pod: ../src/packfile.c
 clean:
 	$(RM_F) packfile-c.pod $(POD)
 
-html:
+html: all
 	$(PERL) -I../lib ../tools/docs/write_docs.pl --silent --version=$(VERSION)
 
 html-clean:
