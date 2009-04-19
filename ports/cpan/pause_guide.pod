@@ -4,24 +4,19 @@
 
 In the Parrot distribution, all modules should be owned by the PARROTRE
 user in PAUSE. This allows a group of maintainers to manage permissions
-and metadata on the Parrot modules. In the Parrot project, every active
-a release manager will also be made a member of the PARROTRE group.
-Current members are: ARANDAL, BDFOY, CHROMATIC, COKE, JESSE, JONATHAN,
-MDIEP, PARTICLE, PMIC. 
+and metadata on the Parrot modules. You don't have to be a release
+manager to be part of the PARROTRE group, you only need a PAUSE ID and
+experience in mainatining CPAN modules. Current members are: ARANDAL,
+BDFOY, CHROMATIC, COKE, JESSE, JONATHAN, MDIEP, PARTICLE, PMIC. (At the
+moment, the only way to edit the list of members in the group is to
+write to modules@perl.org and wait for a PAUSE admin to update the list,
+so it needs to happen well in advance of the release date.)
 
 Membership in the PARROTRE group isn't required for uploading Parrot
 distributions to PAUSE. What is required for making a release is that
 your individual PAUSE ID be granted co-maintainer permissions on all
 PARROTRE modules. Members of the PARROTRE group have access to grant
-this permission.
-
-Generally the project manager will add your name to PARROTRE group when
-you first sign up to take a Parrot release rotation, but it's worth
-checking with the project manager several weeks ahead of your first
-release to make sure.  (At the moment, the only way to edit the list of
-members in the group is to write to modules@perl.org and wait for a
-PAUSE admin to update the list, so it needs to happen well in advance of
-the release date.)
+this permission. 
 
 =head1 The PAUSE process
 
