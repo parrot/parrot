@@ -202,4 +202,9 @@ a**:?2..4		baaabbb		y	two "a" characters (non-greedy)
 a**!2..4		baaabbb		y	three "a" characters (explicit greed)
 a**:!2..4		baaabbb		y	three "a" characters (explicit greed)
 
-
+^\w+ ** ','$		foo,bar,baz	y	** with a term
+^\w+ **? ',' ....$	foo,bar,baz	y	**? with a term
+^\w+ **[','\s*]$	foo, bar, baz	y	**? with term + ws
+:sigspace ^\w+ ** ',' $	foo, bar ,baz	y	**? under :sigspace
+:sigspace ^\w+**',' $	foo, bar ,baz	n	**? under :sigspace w/o ws
+:sigspace ^\w+**',' $	foo,bar,baz	y	**? under :sigspace w/o ws
