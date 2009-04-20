@@ -11,6 +11,7 @@ New in 1.1.0
     - Add initial greedy-only version of ** <exp> quantifier
   + PCT
     - Add HLL source line bytecode annotations
+    - Add another dumper format to assist syntax highlighters
 - Deprecations
   + Removed ops: gcd, exec, classname, need_finalize, runinterp, substr_r
   + Removed dynamic op: mul
