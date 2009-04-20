@@ -38,7 +38,7 @@ sub runstep {
 
     my $cmd = $conf->data->get_p5('scriptdirexp') . q{/perldoc};
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
-    my($stdout, $stderr, $retval) = 
+    my($stdout, $stderr, $retval) =
 	capture_output("$cmd -u perldoc > $filename");
     my($content) = $retval ? undef : $stderr;
 
@@ -70,7 +70,7 @@ E_NOTE
         if ( $new_perldoc ) {
             $TEMP_pod_build .= <<"END"
 ops$slash$pod: ..${slash}src${slash}ops${slash}$ops
-\t\$(PERLDOC) -u ..${slash}src${slash}ops${slash}$ops > ops${slash}$pod 
+\t\$(PERLDOC) -u ..${slash}src${slash}ops${slash}$ops > ops${slash}$pod
 \t\$(CHMOD) 0644 ops${slash}$pod
 
 END

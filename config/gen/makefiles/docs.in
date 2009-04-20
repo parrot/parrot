@@ -37,7 +37,7 @@ doc-prep:
 	$(MKPATH) ops
 
 packfile-c.pod: ../src/packfile.c
-#IF(new_perldoc):	$(PERLDOC) -u ../src/packfile.c > packfile-c.pod 
+#IF(new_perldoc):	$(PERLDOC) -u ../src/packfile.c > packfile-c.pod
 #ELSE:	$(PERLDOC) -u ../src/packfile.c > packfile-c.pod
 
 clean:

@@ -26,7 +26,7 @@ math stuff
  */
 
 #include <math.h>
-#ifdef _IEEE_ 
+#ifdef _IEEE_
 
 _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
 
