@@ -44,7 +44,7 @@ Sort this array, optionally using the provided cmp_func
 */
 
     METHOD sort(PMC *cmp_func :optional) {
-        const UINTVAL n = (UINTVAL) PMC_size(SELF);
+        const INTVAL n = SELF.elements();
 
         if (n > 1)
            Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
