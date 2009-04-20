@@ -39,7 +39,7 @@ sub runstep {
     my $cmd = $conf->data->get_p5('scriptdirexp') . q{/perldoc};
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
     my($stdout, $stderr, $retval) =
-	capture_output("$cmd -u perldoc > $filename");
+        capture_output("$cmd -u perldoc > $filename");
     my($content) = $retval ? undef : $stderr;
 
     return 1 unless defined( $self->_initial_content_check($conf, $content) );
