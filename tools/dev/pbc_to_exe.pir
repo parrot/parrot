@@ -352,16 +352,16 @@ MAIN
 
   embed_manifest:
     # MSVC app manifest exists, embed it
-    .local string embed_manifest
-    embed_manifest  = 'mt.exe -nologo -manifest '
-    embed_manifest .= manifest_file_name
-    embed_manifest .= ' -outputresource:'
-    embed_manifest .= exefile
-    embed_manifest .= ';1'
+    .local string embed_manifest_str
+    embed_manifest_str  = 'mt.exe -nologo -manifest '
+    embed_manifest_str .= manifest_file_name
+    embed_manifest_str .= ' -outputresource:'
+    embed_manifest_str .= exefile
+    embed_manifest_str .= ';1'
 
-    say embed_manifest
+    say embed_manifest_str
     .local int embed_manifest_status
-    embed_manifest_status = spawnw embed_manifest
+    embed_manifest_status = spawnw embed_manifest_str
     unless embed_manifest_status goto linked
     die 'manifest embedding failed'
 
