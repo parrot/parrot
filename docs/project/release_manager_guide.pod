@@ -53,8 +53,6 @@ Increment the version number in the following files:
 F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
 F<README>.
 
-Note: C<Source0> in F<parrot.spec> might have to be adapted as well.
-
 Also update the version number, date, and your name in the
 the file: F<docs/parrothist.pod>.
 
