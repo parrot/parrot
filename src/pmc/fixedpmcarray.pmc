@@ -47,7 +47,7 @@ Sort this array, optionally using the provided cmp_func
         const INTVAL n = SELF.elements();
 
         if (n > 1)
-           Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
+           Parrot_quicksort(interp, (void **)SELF.get_pointer(), n, cmp_func);
     }
 
 /*
@@ -140,6 +140,20 @@ fixed sized array).
 
     VTABLE INTVAL elements() {
         return PMC_size(SELF);
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Get pointer to stored data. Used in sort method.
+
+=cut
+
+*/
+
+    VTABLE void * get_pointer() {
+        return PMC_array(SELF);
     }
 
 /*
