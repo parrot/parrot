@@ -1356,7 +1356,6 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
 
 .sub _main
     .local pmc stream
-    .local pmc temp
 
     load_bytecode "library/Stream/Base.pir"
     load_bytecode "library/Stream/Sub.pir"
