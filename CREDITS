@@ -289,6 +289,11 @@ U: grunblatt
 N: Danny Werner
 D: Test for literals
 
+N: Daniel Arbelo Arrocha
+U: darbelo
+D: OpenBSD fixes and testing
+E: dany.arbelo@gmail.com
+
 N: Dave Woldrich
 D: Win32 build fixes
 E: dave@woldrich.com
@@ -382,6 +387,11 @@ D: with subroutines: Jako.
 D: The human version of indent.
 E: gregor@focusresearch.com
 S: Sunnyvale, CA
+
+N: Havard Eidnes
+U: he
+D: NetBSD and OpenBSD fixes
+E: he@NetBSD.org
 
 N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
@@ -582,6 +592,10 @@ E: luke@luqui.org
 U: luqui
 D: Many fixes
 
+U: LylePerl
+D: Win32 and CGI testing
+W: http://perl.bristolbath.org/blog/lyle/
+
 N: Marcelo Serra Castilhos
 E: mhelix@terra.com.br
 D: Bug fix
@@ -749,9 +763,6 @@ D: The Second Perl 6 Summarizer after Bryan C. Warnock
 E: pdcawley@bofh.org.uk
 W: http://www.bofh.org.uk:8080/
 
-U: rg
-D: fixes to pod2html generator
-
 N: Reini Urban
 U: rurban
 E: rurban@cpan.org
@@ -782,6 +793,11 @@ D: Author of Amber; bug fixes and tests
 
 N: Roland Illing
 D: Building Parrot with pkgsrc
+
+N: Rolf Grossmann
+U: rg
+D: pod2html fixes, floating point fixes, platform testing, cage cleaning
+E: rg@progtech.net
 
 N: Ron Blaschke
 U: rblasch
@@ -914,6 +930,7 @@ N: Uri Guttman
 D: Lot of general Parrot design hints
 
 N: Vasily Chekalkin
+U: bacek
 E: bacek@bacek.com
 D: Core and Rakudo patches
 
