@@ -255,7 +255,7 @@ opcode:
 =begin PASM
 
   set I0, 42        # set integer register #0 to the integer value 42
-  set N3, 3.14159   # set number register #3 to an approximation of E<#x3C0>
+  set N3, 3.14159   # set number register #3 to an approximation of pi
   set I1, I0        # set register I1 to what I0 contains
   set I2, N3        # truncate the floating point number to an integer
 
