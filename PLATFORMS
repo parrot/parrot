@@ -44,6 +44,7 @@ linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
 linux-x86_64-gcc4.3.2         8   Y    -    -     Y   Y   Y    Y     ?  20081118
 linux-x86_64-gcc4.3.3         8   Y    -    -     Y   Y   Y    Y     ?  20090419
 netbsd3.1-ppc-gcc-3.3.3       B   Y    Y    ?     Y   Y   Y    Y     ?  20090419
+netbsd4.0-arm-gcc-4.1.2           Y    -    ?     Y   Y   Y    Y     ?  20090421
 netbsd4.0-i386-gcc-4.1.2          Y    Y    ?     Y   Y   Y    Y     ?  20090419
 netbsd4.0-ppc-gcc-4.1.2       B   Y    Y    ?     Y   Y   Y    Y     ?  20090419
 netbsd4.0-x86_64-gcc-4.1.2    8   Y    -    ?     Y   Y   Y    Y     ?  20090419
