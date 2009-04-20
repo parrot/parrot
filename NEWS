@@ -12,6 +12,7 @@ New in 1.1.0
   + PCT
     - Add HLL source line bytecode annotations
     - Add another dumper format to assist syntax highlighters
+    - Revise mk_language_shell.pl to updated create_language.pl
 - Deprecations
   + Removed ops: gcd, exec, classname, need_finalize, runinterp, substr_r
   + Removed dynamic op: mul
