@@ -45,6 +45,8 @@ my %known_exceptions = map {
         ( File::Spec->catdir( $cwd, $_ ) ) => 1,
     } qw(
         examples/pir/quine_ord.pir
+        examples/streams/FileLines.pir
+        examples/streams/ParrotIO.pir
     );
 
 my @files = grep { ! $known_exceptions{$_} }
