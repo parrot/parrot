@@ -33,12 +33,9 @@ declared.
 my $DIST = Parrot::Distribution->new;
 my $headerizer = Parrot::Headerizer->new;
 
-my $prefix_path = $PConfig{build_dir} . $PConfig{slash};
-$prefix_path =~ s/\\/\\\\/g; # escape \ when Windows path
-
 # can't handle .ops or .pmc files yet
 my @files = grep {/\.(c|h)$/ } @ARGV ? @ARGV :
-    map {s/^$prefix_path//; $_} map {$_->path} $DIST->get_c_language_files();
+    map {s/^$PConfig{build_dir}\///; $_} map {s/\\/\//g; $_} map {$_->path} $DIST->get_c_language_files();
 
 plan tests => scalar @files;
 
