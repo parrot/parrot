@@ -981,6 +981,7 @@ include/parrot/pobj.h                                       [main]include
 include/parrot/register.h                                   [main]include
 include/parrot/resources.h                                  [main]include
 include/parrot/runcore_api.h                                [main]include
+include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
 include/parrot/scheduler_private.h                          [main]include
 include/parrot/settings.h                                   [main]include
@@ -1453,6 +1454,7 @@ src/pmc/unmanagedstruct.pmc                                 [devel]src
 src/pmc_freeze.c                                            []
 src/runcore/main.c                                          []
 src/runcore/cores.c                                         []
+src/runcore/trace.c                                         []
 src/scheduler.c                                             []
 src/spf_render.c                                            []
 src/spf_vtable.c                                            []
@@ -1482,8 +1484,6 @@ src/string/primitives.c                                     []
 src/string/unicode.h                                        []
 src/sub.c                                                   []
 src/thread.c                                                []
-src/trace.c                                                 []
-src/trace.h                                                 []
 src/tsq.c                                                   []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
