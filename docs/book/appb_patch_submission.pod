@@ -131,3 +131,8 @@ With the attached file F<list_chunk_initialize.patch>:
        Parrot_unblock_GC_sweep(interpreter);
 
 =cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

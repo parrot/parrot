@@ -316,7 +316,7 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
+#IF(parrot_is_shared):LIBPARROT     := @inst_libparrot_ldflags@
 #ELSE:LIBPARROT     :=
 
 OPS2C           := $(PERL) $(LIB_DIR)/tools/build/ops2c.pl
@@ -409,7 +409,7 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
+#IF(parrot_is_shared):LIBPARROT     := @inst_libparrot_ldflags@
 #ELSE:LIBPARROT     :=
 
 PMC2C_INCLUDES  := --include $(SRC_DIR) --include $(SRC_DIR)/pmc

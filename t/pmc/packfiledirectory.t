@@ -1,13 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 6;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -24,170 +17,125 @@ Tests the PackfileDirectory PMC.
 
 =cut
 
+.include 't/pmc/testlib/packfile_common.pir'
+
+.sub 'main' :main
+.include 'test_more.pir'
+    plan(21)
+
+    'test_create'()
+    'test_typeof'()
+    'test_elements'()
+    'test_get_iter'()
+    'test_set_pmc_keyed_str'()
+.end
+
+# Test creation of fresh directory
+.sub 'test_create'
+    .local pmc dir, seg
+    dir = new 'PackfileDirectory'
+    isa_ok(dir, 'PackfileDirectory')
+
+    seg = new 'PackfileRawSegment'
+    # We should set owner
+    $P0 = seg.'get_directory'()
+    $I0 = defined $P0
+    $I0 = not $I0
+    ok($I0, "Owner of fresh segment unknown")
+
+    dir['RAWSEGMENT'] = seg
+
+    # We should set owner
+    $P0 = seg.'get_directory'()
+    $I0 = defined $P0
+    ok($I0, "Owner of segment set correctly")
+.end
 
 # PackfileDirectory.typeof
-
-pir_output_is( <<'CODE', <<'OUT', 'get_directory' );
-.sub 'test' :main
+.sub 'test_typeof'
     .local pmc pf
     pf = new ['Packfile']
     $P1 = pf.'get_directory'()
-    $S0 = typeof $P1
-    say $S0
+    isa_ok($P1, 'PackfileDirectory', 'PackfileDirectory.get_directory')
 .end
-CODE
-PackfileDirectory
-OUT
-
-
-# common setup code for later tests
-
-my $get_uuid_pbc = <<'EOF';
-
-.sub _pbc
-    .include "stat.pasm"
-    .include "interpinfo.pasm"
-    .local pmc pf, pio
-    pf   = new ['Packfile']
-    $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    $S0 .= "/runtime/parrot/library/uuid.pbc"
-    $I0  = stat $S0, .STAT_FILESIZE
-    pio  = open $S0, 'r'
-    $S0  = read pio, $I0
-    close pio
-    pf   = $S0
-    .return(pf)
-.end
-EOF
-
 
 # PackfileDirectory.elements
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.elements' );
-.sub 'test' :main
+.sub 'test_elements'
     .local pmc pf, pfdir
     pf    = _pbc()
     pfdir = pf.'get_directory'()
     $I0   = elements pfdir
-    say $I0
+    is($I0, 5, 'PackfileDirectory.elements')
 .end
-CODE
-5
-OUT
 
 
-# PackfileDirectory.get_pmc_keyed_int
+# PackfileDirectory.get_iter
+.sub 'test_get_iter'
+    .local pmc pf, pfdir, it, expected
+    .local string name
 
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.get_pmc_keyed_int' );
-.sub 'test' :main
-    .local pmc pf, pfdir
+    # expected contains all expected segment "prefixes" with count
+    expected = new 'Hash'
+    expected["BYTECODE"] = 2
+    expected["FIXUP"]    = 1
+    expected["CONSTANT"] = 1
+    expected["PIC"]      = 1
+
     pf    = _pbc()
     pfdir = pf.'get_directory'()
     $I0   = elements pfdir
-    $I1   = 0
-    LOOP:
-    $P0   = pfdir[$I1]
-    $I2   = defined $P0
-    eq $I2, 0, ERROR
-    inc $I1
-    eq $I0, $I1, DONE
-    goto LOOP
-    DONE:
-    say "done"
-    .return()
-    ERROR:
-    say "error"
+    it    = iter pfdir
+  loop:
+    unless it goto done
+    name = shift it
+
+    # Get prefix
+    $P0 = split '_', name
+    $S0 = shift $P0
+    $I0 = expected[$S0]
+    ok($I0, $S0)
+    # Decrease expectation count
+    dec $I0
+    expected[$S0] = $I0
+
+    $P1 = pfdir[name]
+    isa_ok($P1, 'PackfileSegment')
+    $P2 = $P1.'get_directory'()
+    $I0 = defined $P2
+    ok($I0, "Loaded Segment has proper directory")
+    goto loop
+  done:
+    .return ()
 .end
-CODE
-done
-OUT
 
-
-# PackfileDirectory.get_string_keyed_int
-my $EXPECTED = <<EXPECTED;
-BYTECODE_runtime/parrot/library/uuid.pir
-FIXUP_runtime/parrot/library/uuid.pir
-CONSTANT_runtime/parrot/library/uuid.pir
-PIC_idx_runtime/parrot/library/uuid.pir
-BYTECODE_runtime/parrot/library/uuid.pir_DB
-EXPECTED
-
-$EXPECTED =~ s/\//\\/g
-  if $^O eq 'MSWin32';
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, $EXPECTED, 'PackfileDirectory.get_string_keyed_int' );
-.sub 'test' :main
-    .local pmc pf, pfdir
+## PackfileDirectory.set_pmc_keyed_str
+.sub 'test_set_pmc_keyed_str'
+    .local pmc pf, pfdir, seg
     pf    = _pbc()
     pfdir = pf.'get_directory'()
-    $I0   = elements pfdir
-    $I1   = 0
-    LOOP:
-    $S0   = pfdir[$I1]
-    say $S0
-    inc $I1
-    eq $I0, $I1, DONE
-    goto LOOP
-    DONE:
-    .return()
-.end
-CODE
+    seg   = new [ 'PackfileRawSegment' ]
 
+    # Adding segment with same name replaces old one
+    $I0 = elements pfdir
+    $P0 = iter pfdir
+    $S0 = shift $P0
+    pfdir[$S0] = seg
+    $I1   = elements pfdir
+    is($I0, $I1, "Segment with old name was added")
+    goto done
 
-# PackfileDirectory.get_pmc_keyed_str
+    # Add segment with new name
+  add_new:
+    seg = new [ 'PackfileRawSegment' ]
+    $S0 = 'BYTECODE_foo'
+    pfdir[$S0] = seg
+    $I1   = elements pfdir
+    inc $I0
+    is($I0, $I1, "New segment added")
 
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'PackfileDirectory.get_pmc_keyed_str' );
-.sub 'test' :main
-    .local pmc pf, pfdir
-    pf    = _pbc()
-    pfdir = pf.'get_directory'()
-    $I0   = elements pfdir
-    $I1   = 0
-    LOOP:
-    $P0 = pfdir[$I1]
-    $S1 = pfdir[$I1]
-    $P1 = pfdir[$S1]
-    $S0 = typeof $P0
-    $S1 = typeof $P1
-    eq $S0, $S1, GOOD
-    goto ERROR
-    GOOD:
-    inc $I1
-    eq $I0, $I1, DONE
-    goto LOOP
-    DONE:
-    say 'good'
-    .return()
-    ERROR:
-    say 'mismatch'
-.end
-CODE
-good
-OUT
-
-
-# PackfileDirectory.set_pmc_keyed_str
-my $EXPECTED_foo = $EXPECTED . "BYTECODE_foo\n";
-pir_output_is( <<'CODE' . $get_uuid_pbc, $EXPECTED_foo, 'PackfileDirectory.set_pmc_keyed_str' );
-.sub 'test' :main
-    .local pmc pf, pfdir
-    pf    = _pbc()
-    pfdir = pf.'get_directory'()
-    $P0   = new [ 'PackfileRawSegment' ]
-    $S0   = 'BYTECODE_foo'
-    pfdir[$S0] = $P0
-    $I0   = elements pfdir
-    $I1   = 0
-    LOOP:
-    $S0   = pfdir[$I1]
-    say $S0
-    inc $I1
-    eq $I0, $I1, DONE
-    goto LOOP
-    DONE:
+  done:
     .return()
 .end
-CODE
 
 # Local Variables:
 #   mode: cperl

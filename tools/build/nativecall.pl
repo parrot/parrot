@@ -554,7 +554,9 @@ $put_pointer
     jit_key_name = Parrot_str_concat(interp, jit_key_name, signature, 0);
     b            = VTABLE_get_pmc_keyed_str(interp, HashPointer, jit_key_name);
 
-    if (b && b->vtable->base_type == enum_class_ManagedStruct) {
+    PARROT_ASSERT(PMC_IS_NULL(b) || b->vtable);
+
+    if ((!PMC_IS_NULL(b)) && b->vtable->base_type == enum_class_ManagedStruct) {
         *jitted = 1;
         return F2DPTR(VTABLE_get_pointer(interp, b));
     }
@@ -584,7 +586,9 @@ $put_pointer
 
     b = VTABLE_get_pmc_keyed_str(interp, HashPointer, signature);
 
-    if (b && b->vtable->base_type == enum_class_UnManagedStruct)
+    PARROT_ASSERT(PMC_IS_NULL(b) || b->vtable);
+
+    if ((!PMC_IS_NULL(b)) && b->vtable->base_type == enum_class_UnManagedStruct)
         return F2DPTR(VTABLE_get_pointer(interp, b));
 
     /*

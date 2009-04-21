@@ -1,5 +1,5 @@
 Name:           parrot
-Version:        1.0.0
+Version:        1.1.0
 Release:        1%{dist}
 Summary:        Parrot Virtual Machine
 License:        Artistic 2.0
@@ -48,12 +48,6 @@ Parrot Virtual Machine development headers and libraries.
     tools/dev/install_files.pl
 
 %build
-if test "%{_vendor}" = "suse"
-then
-    LIBS='-lncurses -lm'
-else
-    LIBS='-lcurses -lm'
-fi
 
 %ifarch i386 x86_64
 %{__perl} Configure.pl \
@@ -68,7 +62,7 @@ fi
     --parrot_is_shared \
     --lex=/usr/bin/flex \
     --yacc=/usr/bin/yacc \
-    --libs="$LIBS"
+    --libs="-lcurses -lm"
 %else
 # PowerPC
 %{__perl} Configure.pl \
@@ -150,6 +144,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*
 
 %changelog
+* Tue Apr 21 2009 Francois Perrad <francois.perrad@gadz.org> 1.1.0
+- updated to 1.1.0
+
 * Tue Mar 17 2009 Allison Randal <allison@parrot.org> 1.0.0
 - updated to 1.0.0
 

@@ -1,13 +1,6 @@
-#!perl
+#!parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 3;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -27,98 +20,46 @@ Tests the PackfileFixupTable PMC.
 # Having some known data would be helpful, here.  For now, just make sure
 # the values returned have the right types.
 
+.include 't/pmc/testlib/packfile_common.pir'
+.sub 'main' :main
+.include 'test_more.pir'
+    plan(3)
 
-# common setup code for later tests
-
-my $get_uuid_pbc = <<'EOF';
-
-.sub _pbc
-    .include "stat.pasm"
-    .include "interpinfo.pasm"
-    .local pmc pf, pio
-    pf   = new ['Packfile']
-    $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    $S0 .= "/runtime/parrot/library/uuid.pbc"
-    $I0  = stat $S0, .STAT_FILESIZE
-    pio  = open $S0, 'r'
-    $S0  = read pio, $I0
-    close pio
-    pf   = $S0
-    .return(pf)
+    test_unpack()
 .end
-EOF
 
-
-# sanity check we have a PackfileFixupTable
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'sanity' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable
+# Check unpackging FixupTable
+.sub 'test_unpack'
+    .local pmc pf, pfdir, pftable, pfentry
+    .local int size, this, data
     .local string name
     pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[1]
-    name    = typeof pftable
-    say name
-.end
-CODE
-PackfileFixupTable
-OUT
+    pftable = _get_fixup_table(pf)
+    isa_ok(pftable, 'PackfileFixupTable')
 
-
-# PackfileFixupTable.elements
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'elements' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable
-    .local int size
-    pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[1]
     size    = elements pftable
-    gt size, 0, DONE
-    say 'not '
-    DONE:
-    say 'greater'
-.end
-CODE
-greater
-OUT
+    ok(size, "Got some elements")
 
-
-# PackfileFixupTable.get_pmc_keyed_int
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'get_pmc_keyed_int' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable, pfentry
-    .local int size, this
-    .local string type
-    pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[1]
-    size    = elements pftable
     this    = 0
-    LOOP:
+  loop:
     pfentry = pftable[this]
-    type    = typeof pfentry
-    eq type, "PackfileFixupEntry", NEXT
-    print "PackfileFixupTable["
-    print this
-    print "] returned an object of type: "
-    say type
-    goto DONE
-    NEXT:
+    name    = typeof pfentry
+    eq name, "PackfileFixupEntry", next
+    $S0 = "PackfileFixupTable["
+    $S1 = this
+    $S0 = concat $S1
+    $S0 = concat "] returned an object of type: "
+    $S0 = concat name
+    ok(0, $S0)
+    .return ()
+  next:
     this = this + 1
-    ge this, size, DONE
-    goto LOOP
-    gt size, 0, DONE
-    DONE:
-    say 'done.'
+    ge this, size, done
+    goto loop
+    gt size, 0, done
+  done:
+    ok(1, "All elements of Table are Entries")
 .end
-CODE
-done.
-OUT
-
 
 # Local Variables:
 #   mode: cperl

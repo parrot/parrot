@@ -607,10 +607,11 @@ combinations.
     (mob, pos, target) = mob.'new'(mob, 'grammar'=>'PGE::Exp::Quant')
     lastpos = length target
 
-    .local int min, max, suffixpos
+    .local int min, max, suffixpos, sepws
     .local string suffix
     min = 1
     max = 1
+    sepws = is_cclass .CCLASS_WHITESPACE, target, pos
     suffixpos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
 
     if key == '**' goto quant_suffix
@@ -657,12 +658,14 @@ combinations.
   quant:
     if key != '**' goto quant_set
   quant_closure:
+    $I0 = is_cclass .CCLASS_WHITESPACE, target, pos
+    sepws |= $I0
     pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
     .local int isconst
     isconst = is_cclass .CCLASS_NUMERIC, target, pos
     if isconst goto brace_skip
     $S0 = substr target, pos, 1
-    if $S0 != "{" goto err_closure
+    if $S0 != "{" goto parse_repetition_controller
     inc pos
   brace_skip:
     $I1 = find_not_cclass .CCLASS_NUMERIC, target, pos, lastpos
@@ -700,6 +703,45 @@ combinations.
   end:
     .return (mob)
 
+  parse_repetition_controller:
+    .local pmc regex, repetition_controller
+    mob.'to'(pos)
+    regex = get_global 'regex'
+    #parse everything down to concatenation precedence
+    repetition_controller = regex(mob, 'tighter'=>'infix:')
+    unless repetition_controller goto err_repetition_controller
+
+    #update pos to after the matched
+    pos = repetition_controller.'to'()
+    repetition_controller = repetition_controller['expr']
+
+    # if there's surrounding ws, then add WS nodes
+    unless sepws goto sepws_done
+    $P0 = mob.'new'(mob, 'grammar'=>'PGE::Exp::Concat')
+    $P0.'to'(pos)
+    $P1 = mob.'new'(mob, 'grammar'=>'PGE::Exp::WS')
+    $P1.'to'(pos)
+    push $P0, $P1
+    push $P0, repetition_controller
+    $P1 = mob.'new'(mob, 'grammar'=>'PGE::Exp::WS')
+    $P1.'to'(pos)
+    push $P0, $P1
+    repetition_controller = $P0
+  sepws_done:
+
+    #save the matched in the mob as sep
+    mob['sep'] = repetition_controller
+
+    #force the match to be 1..Inf
+    mob['min'] = 1
+    mob['max'] = PGE_INF
+
+    #move position to after the matched
+    mob.'to'(pos)
+    .return (mob)
+
+  err_repetition_controller:
+    'parse_error'(mob, pos, "Error in repetition controller")
   err_closure:
     'parse_error'(mob, pos, "Error in closure quantifier")
 .end
@@ -1390,7 +1432,7 @@ Parse a modifier.
     self['backtrack'] = PGE_BACKTRACK_NONE
   backtrack_done:
 
-    .local pmc exp0
+    .local pmc exp0, sep
     .local int isarray
     isarray = pad['isarray']
     pad['isarray'] = 1
@@ -1400,6 +1442,11 @@ Parse a modifier.
     exp0['isquant'] = 1
     exp0 = exp0.'perl6exp'(pad)
     self[0] = exp0
+    sep = self['sep']
+    if null sep goto sep_done
+    sep = sep.'perl6exp'(pad)
+    self['sep'] = sep
+  sep_done:
     pad['isarray'] = isarray
     .return (self)
   err_parse_quant:

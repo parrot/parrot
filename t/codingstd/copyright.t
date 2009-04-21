@@ -4,7 +4,8 @@
 
 use strict;
 use warnings;
-
+use Cwd;
+use File::Spec ();
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Distribution;
 use Test::More tests => 3;
@@ -41,9 +42,10 @@ my @make_files = $DIST->get_make_language_files();
 my @all_files  = ( @c_files, @perl_files, @make_files );
 
 my @files = @ARGV ? <@ARGV> : @all_files;
-my ( @no_copyright_files,
-     @bad_format_copyright_files,
-     @duplicate_copyright_files
+my (
+    @no_copyright_files,
+    @bad_format_copyright_files,
+    @duplicate_copyright_files,
 );
 
 my $copyright_simple =
@@ -72,7 +74,7 @@ foreach my $file (@files) {
     }
     # ... and then see if any other copyright notices exist.
     elsif ($buf =~ $copyright_simple) {
-        push @duplicate_copyright_files, $path; 
+        push @duplicate_copyright_files, $path;
     }
 }
 
@@ -107,19 +109,64 @@ TODO:
         "Please update to read something like:",
         $suggested_version
         );
-}
 
-ok( !scalar(@duplicate_copyright_files), 'Duplicate Copyright statements' )
+# Certain files contain the string 'Copyright (c)' more than once
+# because they contain heredocs for generated files, correctly cite the
+# copyright information for non-Parrot code, etc.  We shall exclude them
+# from our test for duplicate copyright statements.
+
+my @permitted_duplicate_copyright_files = (
+    {
+        file    => 'examples/c/test_main.c',
+        reason  => 'sample code',
+    },
+    {
+        file    => 'Configure.pl',
+        reason  => 'cite automake copyright statement',
+    },
+    {
+        file    => 'config/gen/opengl.pm',
+        reason  => 'heredoc text for generated file',
+    },
+    {
+        file    => 'lib/Parrot/Configure/Messages.pm',
+        reason  => 'heredoc for print_introduction()',
+    },
+    {
+        file    => 't/tools/dev/searchops/samples.pm',
+        reason  => 'sample code used in testing',
+    },
+    {
+        file    => 'tools/build/nativecall.pl',
+        reason  => 'heredoc text for generated file',
+    },
+    {
+        file    => 'tools/build/vtable_extend.pl',
+        reason  => 'heredoc text for generated file',
+    },
+);
+my $cwd = cwd();
+my %permitted_duplicate_copyright_files =
+    map { ( File::Spec->catfile( $cwd, $_->{file} ) ) => 1 }
+        @permitted_duplicate_copyright_files;
+
+my @non_permitted_duplicate_copyright_files =
+    grep { ! $permitted_duplicate_copyright_files{ $_ } }
+        @duplicate_copyright_files;
+
+ok( !scalar(@non_permitted_duplicate_copyright_files),
+    'Duplicate Copyright statements' )
     or diag(
     join
         $/ => "Duplicate copyright statement found in "
-        . scalar @duplicate_copyright_files
+        . scalar @non_permitted_duplicate_copyright_files
         . " files:",
-    @duplicate_copyright_files,
+    @non_permitted_duplicate_copyright_files,
     "Please get copyright assigned to Parrot Foundation",
-    "and remove alternate notice; Or remove duplicated",
+    "and remove alternate notice; or remove duplicated",
     "notice for Parrot Foundation."
     );
+}
 
 # Local Variables:
 #   mode: cperl

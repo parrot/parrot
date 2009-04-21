@@ -31,7 +31,7 @@ running compilers from a command line.
     $P0 = split ' ', 'parse past post pir evalpmc'
     setattribute self, '@stages', $P0
 
-    $P0 = split ' ', 'e=s help|h target=s trace|t=s encoding=s output|o=s combine version|v'
+    $P0 = split ' ', 'e=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v'
     setattribute self, '@cmdoptions', $P0
 
     $P1 = box <<'    USAGE'
@@ -582,7 +582,7 @@ specifies the encoding to use for the input (e.g., "utf8").
     if null $P0 goto interactive_loop
     unless target goto interactive_loop
     if target == 'pir' goto target_pir
-    '_dumper'($P0, target)
+    self.'dumper'($P0, target, adverbs :flat :named)
     goto interactive_loop
   target_pir:
     say $P0
@@ -690,7 +690,7 @@ options are passed to the evaluator.
     $P0 = self.'eval'(code, args :flat, adverbs :flat :named)
     if target == '' goto end
     if target == 'pir' goto end
-    '_dumper'($P0, target)
+    self.'dumper'($P0, target, adverbs :flat :named)
   end:
     .return ($P0)
 
@@ -843,6 +843,28 @@ based on double-colon separators.
     .param string name
     $P0 = split '::', name
     .return ($P0)
+.end
+
+=item dumper(obj, name, options)
+
+Dump C<obj> with C<name> according to C<options>.
+
+=cut
+
+.sub 'dumper' :method
+    .param pmc obj
+    .param string name
+    .param pmc options         :slurpy :named
+
+    $S0 = options['dumper']
+    if $S0 goto load_dumper
+    .tailcall '_dumper'(obj, name)
+
+  load_dumper:
+    load_bytecode 'PCT/Dumper.pbc'
+    downcase $S0
+    $P0 = get_hll_global ['PCT';'Dumper'], $S0
+    .tailcall $P0(obj, name)
 .end
 
 

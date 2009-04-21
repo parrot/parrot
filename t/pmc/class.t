@@ -218,7 +218,7 @@ Tests the Class PMC.
 
 # L<PDD15/Class PMC API/=item add_method>
 .sub 'add_method'
-    .local pmc class, attribs, meth_to_add, test_attr_val, obj_inst
+    .local pmc class, attribs, test_attr_val, obj_inst
     .local int test_val
     class = new ['Class']
 

@@ -14,19 +14,18 @@ Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
                                 CGoto JIT EXEC   Thr Sig
 --------------------------------------------------------------------------------
 cygwin1.5.25-x86-gcc3.4.4     4   Y    Y    -     -   -   Y    Y     Y  20090315
-darwin8.11.1-x86-gcc4.0.1    ??   ?    ?    ?     ?   ?   Y    Y/1*2 ?  20081216
-freebsd-x86-gcc-3.4.6             Y    ?    ?     ?   ?   Y    Y     ?  20080519
-linux-x86-gcc4.1.2                Y    Y    ?     Y   Y   Y    Y     ?  20080617
+darwin8.11.1-x86-gcc4.0.1    ??   ?    N    ?     ?   ?   Y    Y*3   Y  20090420
+linux-x86-gcc4.1.2                Y    Y    ?     Y   Y   Y    Y     ?  20090419
 linux-x86-gcc4.1.3                Y    Y    ?     Y   Y   Y    Y     ?  20080414
 linux-x86-gcc4.2.3                Y    Y    ?     Y   Y   Y    Y     ?  20080715
 linux-x86-gcc4.2.4                Y    Y    ?     Y   Y   Y    Y     ?  20081023
 linux-x86-gcc4.3.2                Y    Y    ?     Y   Y   Y    Y     ?  20081030
 linux-x86-llvm-gcc-4.2            Y    Y    ?     ?   ?   Y    Y     ?  20080801
-sol10-sparc-cc_5.9           B4*2 Y    -    -     Y   Y   Y    Y     ?  20080510
-sol10-sparc-cc_5.9           B8   Y    -    -     Y   Y   Y    Y/3*1 ?  20090217
-sol10-sparc-gcc_4.0.2        B4*2 Y    -    -     Y   Y   Y    Y/1   ?  20080510
+sol10-sparc-cc_5.9           B4   Y    -    -     Y   Y   Y    Y     ?  20090419
+sol10-sparc-cc_5.9           B8   Y    -    -     Y   Y   Y    Y     ?  20090419
+sol10-sparc-gcc_4.0.2        B4   Y    -    -     Y   Y   Y    Y/1   ?  20080510
 sol10-sparc-gcc_4.0.2        B8   Y    -    -     Y   Y   Y    Y/2   ?  20080518
-win32-x86-mingw_gcc3.4.5          Y    Y    -     -   -   Y    Y     Y  20090217
+win32-x86-mingw_gcc3.4.5          Y    Y    -     -   -   Y    Y     Y  20090421
 win32-x86-msvc_9.0                -    Y    -     Y   -   Y    Y     ?  20090317
 
 
@@ -37,11 +36,21 @@ Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
 --------------------------------------------------------------------------------
 aix5.3-power-gcc4.2          B8   -    -    -             Y    ?     ?  20080510
 cygwin1.7.0-x86-gcc4.3.2      4   Y    Y    -     -   -   Y    Y     Y  20090315
-freebsd-x86-gcc-3.4.6             Y    ?    ?     ?   ?   Y    Y     ?  20080519
+freebsd-x86-gcc-4.2.1         4   Y    Y    Y     ?   ?   Y    Y     Y  20090415
+freebsd-amd64-gcc-4.2.1       8   Y    -    -     ?   ?   Y    Y     Y  20090419
 linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519
 linux-s390x-gcc4.1.2         B4   ?    -    -     Y   Y   Y    Y/2   ?  20080908
 linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
 linux-x86_64-gcc4.3.2         8   Y    -    -     Y   Y   Y    Y     ?  20081118
+linux-x86_64-gcc4.3.3         8   Y    -    -     Y   Y   Y    Y     ?  20090419
+netbsd3.1-ppc-gcc-3.3.3       B   Y    Y    ?     Y   Y   Y    Y     ?  20090419
+netbsd4.0-arm-gcc-4.1.2           Y    -    ?     Y   Y   Y    Y     ?  20090421
+netbsd4.0-i386-gcc-4.1.2          Y    Y    ?     Y   Y   Y    Y     ?  20090419
+netbsd4.0-ppc-gcc-4.1.2       B   Y    Y    ?     Y   Y   Y    Y     ?  20090419
+netbsd4.0-x86_64-gcc-4.1.2    8   Y    -    ?     Y   Y   Y    Y     ?  20090419
+netbsd5.0-i386-gcc-4.1.3          Y    Y    ?     Y   Y   Y    Y     ?  20090419
+netbsd5.0-sparc64-gcc-4.1.3  B8   Y    -    -     Y   Y   Y    Y     ?  20090421
+netbsd5.0-x86_64-gcc-4.1.3    8   Y    -    -     Y   Y   Y    Y     ?  20090419
 opensolaris-x86-gcc_4.0.3     4   Y    Y    ?     ?   ?   Y    Y/2   ?  20080325
 sol8-sparc-cc                B    -    -    -     -   -   -    Y     ?  20090317
 sol8-sparc-gcc_4.1.0         B    -    -    -     -   -   -    Y/42  ?  20090317
@@ -77,9 +86,9 @@ YYYYMMDD  The date tested.
 
 Remarks:
 *1 gcc and cc defaults to 32bits on solaris, for 64bit use
-   --ccflags='-m64 -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -D_TS_ERRNO'
-   --ldflags='-m64'
+   --ccflags='-m64' --ldflags='-m64' --linkflags='-m64'
 *2 http://rt.perl.org/rt3/Ticket/Display.html?id=60926
+*3 failures in 'make examples_tests' (part of 'make fulltest')
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):

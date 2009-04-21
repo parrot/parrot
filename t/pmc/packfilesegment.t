@@ -1,13 +1,6 @@
-#!perl
+#!parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 1;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -24,46 +17,13 @@ Tests the PackfileSegment PMC.
 
 =cut
 
-
-# common setup code for later tests
-
-my $get_uuid_pbc = <<'EOF';
-
-.sub _pbc
-    .include "stat.pasm"
-    .include "interpinfo.pasm"
-    .local pmc pf, pio
-    pf   = new ['Packfile']
-    $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    $S0 .= "/runtime/parrot/library/uuid.pbc"
-    $I0  = stat $S0, .STAT_FILESIZE
-    pio  = open $S0, 'r'
-    $S0  = read pio, $I0
-    close pio
-    pf   = $S0
-    .return(pf)
-.end
-EOF
-
-
-# PackfileSegment.pack (via subclass PackfileDirectory)
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'set_integer_keyed_str' );
 .sub 'test' :main
-    .local pmc pf, pfdir
-    pf    = _pbc()
-    pfdir = pf.'get_directory'()
-    $S0   = pfdir.'pack'()
-    $I0   = length $S0
-    eq $I0, 0, OUT1
-    print "not "
-    OUT1:
-    say "equal"
-.end
-CODE
-not equal
-OUT
+.include 'test_more.pir'
+    plan(1)
 
+    $P0 = new 'PackfileSegment'
+    isa_ok($P0, 'PackfileSegment')
+.end
 
 # Local Variables:
 #   mode: cperl

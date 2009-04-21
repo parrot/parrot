@@ -10,12 +10,12 @@ existing virtual machines such as the JVM or CLR, with notable advances
 including a register-based system rather than stack-based, and employing
 continuations as the core means of flow control.
 
-The name "Parrot" started with an April Fools' Day joke in 2001. Simon
-Cozens published an article titled "Programming Parrot", with a
-fictional interview between Guido van Rossum and Larry Wall detailing
-their plans to merge Python and Perl into a new language called Parrot
-(U<http://www.perl.com/pub/a/2001/04/01/parrot.htm>), inspired by Monty
-Python's Parrot sketch.
+The name "Parrot" was inspired by Monty Python's Parrot sketch. It
+started with an April Fools' Day joke in 2001. Simon Cozens published an
+article titled "Programming Parrot", with a fictional interview between
+Guido van Rossum and Larry Wall detailing their plans to merge Python
+and Perl into a new language called Parrot
+(U<http://www.perl.com/pub/a/2001/04/01/parrot.htm>). 
 
 =head2 Parrot Resources
 
@@ -36,7 +36,7 @@ X<mailing lists>
 
 The primary mailing list for Parrot is I<parrot-dev@lists.parrot.org>.
 If you're interested in getting involved in development, you may also
-want to follow I<parrot-commits> and I<parrot-tickets> lists.
+want to follow the I<parrot-commits> and I<parrot-tickets> lists.
 Information on all the Parrot mailing lists and subscription forms for
 each is available at U<http://lists.parrot.org/mailman/listinfo>.
 
@@ -51,7 +51,7 @@ X<IRC channel (#parrot)>
 
 Parrot developers and users congregate on IRC at C<#parrot> on the
 U<irc://irc.parrot.org> server. It's a good place to get real-time
-answers to questions, or just to see how things are progressing.
+answers to questions or see how things are progressing.
 
 =head3 Issue Tracking & Wiki
 
@@ -65,7 +65,7 @@ in project development, a source code browser, and the project roadmap.
 
 =head2 Parrot Development
 
-X<development cycles;Parrot>
+X<development cycles>
 
 First released in September 2001, Parrot hit 1.0 in March 2009. The
 Parrot project makes releases on the third Tuesday of each month. Two
@@ -93,6 +93,8 @@ interests.
 
 =item Architect
 
+X<architect role>
+
 The architect has primary responsibility for setting the overall
 direction of the project, facilitating team communication, and
 explaining and evaluating architectural issues. The architect makes
@@ -105,6 +107,8 @@ architect.
 
 =item Release Managers
 
+X<release manager role>
+
 Release managers have responsibility for executing a product release
 according to the release schedule. Parrot has multiple release managers
 who rotate the responsibility for each monthly release. The release
@@ -113,15 +117,18 @@ project architect.
 
 =item Metacommitter
 
+X<metacommitter role>
+
 Metacommitters manage commit access to the Parrot repository. Once a
 contributor is selected for commit access, a metacommitter performs the
 necessary magic to give the new committer access to the SVN repository
 and the bugtracker. The architect is a metacommitter, but other team
-members may also hold this role.
+members also hold this role.
 
 =item Committer
 
-X<Committers>
+X<committer role>
+
 Contributors who submit numerous, high-quality patches may be considered
 to become a committer. Committers have commit access to the full Parrot
 repository, but often specialize on particular parts of the project.
@@ -131,27 +138,39 @@ requesting it.
 
 =item Core Developer
 
+X<core developer role>
+
 Core developers develop and maintain core subsystems such as the I/O
 subsystem, the exceptions system, or the concurrency scheduler.
 
 =item Compiler Developer
+
+X<compiler developer role>
 
 Compiler developers develop and maintain one or more Parrot front-end
 compilers such as IMCC, PIRC, PGE and TGE.
 
 =item High-Level Language Developer
 
+X<HLL developer role>
+
 Developers who work on any of the high-level languages that target
-Parrot such as TCL, Lua or Perl 6, are high-level language developers.
-Some of these language projects are located in the Parrot repository,
-although most are maintained in separate locations.
+ParrotE<mdash>such as Lua, Perl, PHP, Python, Ruby, or TclE<mdash>are
+high-level language developers. Some example languages are located in
+the Parrot repository, but most are hosted independently. A full list of
+languages is maintained at
+U<https://trac.parrot.org/parrot/wiki/Languages>.
 
 =item Build Manager
+
+X<build manager role>
 
 Build managers maintain and extend configuration and build subsystems.
 They review smoke reports and attempt to extend platform support.
 
 =item Tester
+
+X<tester role>
 
 Developing, maintaining, and extending test suite coverage and testing
 tool are the key tasks for the testers. Testers are also
@@ -160,6 +179,8 @@ components on targeted platforms.
 
 =item Patch Monsters
 
+X<patch monster role>
+
 Hackers and developers submit patches to Parrot every day, and it takes
 a keen eye and a steady hand to review and apply them all. Patch
 monsters, as they are affectionately known, are in charge of checking
@@ -167,6 +188,8 @@ patches for conformance with coding standards and desirability of
 features.
 
 =item Cage Cleaners
+
+X<cage cleaner role>
 
 The cage cleaners ensure that coding standards are followed, that
 documentation is complete and accurate, that all tests are functioning
@@ -179,6 +202,8 @@ internals.
 
 =item General Contributor
 
+X<contributor role>
+
 Contributors are volunteers who write code or documentation patches,
 take part in email or online conversations, or contribute to the project
 in other important ways. All volunteer contributions are appreciated.
@@ -186,6 +211,8 @@ in other important ways. All volunteer contributions are appreciated.
 =back
 
 =head2 Licensing
+
+X<license>
 
 The intellectual property for Parrot is held by the Parrot Foundation, a
 non-profit organization formed to support the Parrot development

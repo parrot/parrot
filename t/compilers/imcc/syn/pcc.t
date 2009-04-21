@@ -258,7 +258,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', ".set_arg :flat" );
 .sub _main
-    .local pmc x, y, z, ar, ar2, s
+    .local pmc x, y, z, ar, ar2
     x = new 'String'
     x = "first\n"
     y = new 'String'

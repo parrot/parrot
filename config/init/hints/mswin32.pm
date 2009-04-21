@@ -37,6 +37,12 @@ sub runstep {
         $conf->data->set( build_dir => Win32::GetShortPathName($build_dir) );
     }
 
+    my $bindir = $conf->data->get('bindir');
+
+    if ( $bindir =~ /\s/ ) {
+        $conf->data->set( bindir => Win32::GetShortPathName($bindir) );
+    }
+
     if ($is_msvc) {
         my $msvcversion = $conf->data->get('msvcversion');
 
@@ -240,6 +246,7 @@ sub runstep {
             ld_load_flags       => '-shared ',
             ld_share_flags      => '-shared ',
             libparrot_ldflags   => "\"$build_dir\\libparrot.dll\"",
+            inst_libparrot_ldflags => "\"$bindir\\libparrot.dll\"",
             ncilib_link_extra   => 'src/libnci_test.def',
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',

@@ -805,8 +805,6 @@ keys are:
 
 =item uuid_type
 
-=item uuid_length
-
 =back
 
 =item * C<get_string_keyed_str> (v-table)
@@ -877,26 +875,14 @@ be thrown.
 
 =head4 PackfileDirectory.pmc (isa PackfileSegment)
 
-This PMC represents a directory segment. Essentially it is an array of
-PackfileSegment PMCs. When indexed using an integer key, it gets the segment
-at that position in the segments table. When indexed using a string key, it
-looks for a segment of that name. It implements the following methods:
+This PMC represents a directory segment. Essentially it is an hash of
+PackfileSegment PMCs. It implements the following methods:
 
 =over 4
 
 =item * C<elements> (v-table)
 
 Gets the number of segments listed in the directory.
-
-=item * C<get_pmc_keyed_int> (v-table)
-
-Gets a PackfileSegment PMC or an appropriate subclass of it representing the
-segment at the specified index in the directory segment.
-
-=item * C<get_string_keyed_int> (v-table)
-
-Gets a string containing the name of the segment at the specified index in the
-directory segment.
 
 =item * C<get_pmc_keyed_str> (v-table)
 
@@ -916,15 +902,31 @@ Removes the PackfileSegment PMC from the directory which has the name
 specified by the key.  This is the only way to remove a segment from the
 directory.
 
+=item * C<get_iter> (v-table)
+
+Returns iterator for existing keys.
+
 =back
 
-=head4 RawSegment.pmc (isa PackfileSegment)
+=head4 PackfileRawSegment.pmc (isa PackfileSegment)
 
 This PMC presents a segment of a packfile as an array of integers. This is the
 lowest possible level of access to a segment, and covers both the default and
 bytecode segment types. It implements the following methods:
 
 =over 4
+
+=item * C<get_type>
+
+Get type of PackfileRawSegment.
+
+=item * C<set_type>
+
+Set type of PackfileRawSegment.
+
+=item * C<get_iter>
+
+Returns iterator for Segment.
 
 =item * C<get_integer_keyed_int> (v-table)
 
@@ -957,6 +959,10 @@ grow automatically.
 The PMC implements the following methods:
 
 =over 4
+
+=item * C<get_iter>
+
+Returns iterator for stored Constants.
 
 =item * C<elements> (v-table)
 
@@ -1029,6 +1035,10 @@ the table is represented by a PackfileFixupEntry PMC. It implements the
 following methods:
 
 =over 4
+
+=item * C<get_iter>
+
+Returns iterator for stored fixup entries.
 
 =item * C<elements> (v-table)
 
@@ -1134,6 +1144,10 @@ This PMC represents the table of keys and the type of value that is stored
 against that key. It implements the following methods:
 
 =over 4
+
+=item * C<elements> (v-table)
+
+Get the number of stored Keys.
 
 =item * C<get_string_keyed_int> (v-table)
 

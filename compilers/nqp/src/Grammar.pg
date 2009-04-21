@@ -261,16 +261,17 @@ token postfix {
 
 token methodop {
     '.' <ident>
-    '(' <arglist>
-    [ <.ws> ')' || <panic: "Missing ')'"> ]
-    {*}                                                    #= methodop
+    [ 
+    | '(' ~ ')' <arglist> {*}                              #= arglist
+    | {*}                                                  #= null
+    ]
 }
 
 token postcircumfix {
     | '(' <arglist> ')' {*}                                #= ( )
     | '[' <EXPR> <.ws> ']' {*}                             #= [ ]
     | '{' <EXPR> <.ws> '}' {*}                             #= { }
-    | '<' <string_literal: '>' > '>' {*}                     #= < >
+    | '<' <string_literal: '>' > '>' {*}                   #= < >
 }
 
 rule arglist {

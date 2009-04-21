@@ -1,13 +1,6 @@
-#!perl
+#!parrot
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 3;
-use Parrot::Config;
 
 =head1 NAME
 
@@ -29,113 +22,141 @@ Tests the PackfileConstantTable PMC.
 # fetches for the found types don't crash.
 
 
-# common setup code for later tests
+.include 't/pmc/testlib/packfile_common.pir'
 
-my $get_uuid_pbc = <<'EOF';
+.sub 'main' :main
+.include 'test_more.pir'
+.include 'packfile_constants.pasm'
+    'plan'(10)
 
-.sub _pbc
-    .include "stat.pasm"
-    .include "interpinfo.pasm"
-    .local pmc pf, pio
-    pf   = new ['Packfile']
-    $S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    $S0 .= "/runtime/parrot/library/uuid.pbc"
-    $I0  = stat $S0, .STAT_FILESIZE
-    pio  = open $S0, 'r'
-    $S0  = read pio, $I0
-    close pio
-    pf   = $S0
-    .return(pf)
+    'test_sanity'()
+    'test_elements'()
+    'test_get'()
+    'test_set'()
 .end
-EOF
+
 
 
 # sanity check we have a PackfileConstantTable
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'sanity' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable
+.sub 'test_sanity'
+    .local pmc pbc, pftable
     .local string name
-    pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[2]
-    name    = typeof pftable
-    say name
+    pbc     = _pbc()
+    pftable = _get_consttable(pbc)
+    isa_ok(pftable, "PackfileConstantTable")
 .end
-CODE
-PackfileConstantTable
-OUT
 
 
 # PackfileConstantTable.elements
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'elements' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable
+.sub 'test_elements'
+    .local pmc pf, pftable
     .local int size
     pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[2]
+    pftable = _get_consttable(pf)
     size    = elements pftable
-    gt size, 0, DONE
-    say 'not '
-    DONE:
-    say 'greater'
+    ok(size, "PackfileConstantTable.elements returns non-zero")
 .end
-CODE
-greater
-OUT
 
 
 # PackfileConstantTable.get_type and PackfileConstantTable.get_*_keyed_int
-
-pir_output_is( <<'CODE' . $get_uuid_pbc, <<'OUT', 'get_type, get_*_keyed_int', todo=> 'See TT #385.' );
-.sub 'test' :main
-    .local pmc pf, pfdir, pftable
+.sub 'test_get'
+    .local pmc pf, pftable
     .local int size, this, type
     pf      = _pbc()
-    pfdir   = pf.'get_directory'()
-    pftable = pfdir[2]
+    pftable = _get_consttable(pf)
     size    = elements pftable
     this    = 0
-    LOOP:
+  loop:
     type = pftable.'get_type'(this)
-    eq type, 0x00, NEXT
-    eq type, 0x6E, CONST_NUM
-    eq type, 0x73, CONST_STR
-    eq type, 0x70, CONST_PMC
-    eq type, 0x6B, CONST_KEY
-    goto BAD
-    CONST_NUM:
+    eq type, .PFC_NONE, next
+    eq type, .PFC_NUMBER, const_num
+    eq type, .PFC_STRING, const_str
+    eq type, .PFC_PMC, const_pmc
+    eq type, .PFC_KEY, const_key
+    goto bad
+  const_num:
     $N0 = pftable[this]
-    goto NEXT
-    CONST_STR:
+    goto next
+  const_str:
     $S0 = pftable[this]
-    goto NEXT
-    CONST_PMC:
+    goto next
+  const_pmc:
     $P0 = pftable[this]
-    goto NEXT
-    CONST_KEY:
+    goto next
+  const_key:
     $P0 = pftable[this]
     $S0 = typeof $P0
-    eq $S0, 'Key', NEXT
-    print 'constant Key with wrong type: '
-    say $S0
-    goto BAD
-    NEXT:
-    this = this + 1
-    ge this, size, DONE
-    goto LOOP
-    gt size, 0, DONE
-    BAD:
-    say 'unknown constant type found!'
-    DONE:
-    say 'done.'
-.end
-CODE
-done.
-OUT
+    eq $S0, 'Key', next
+    $S0 = concat 'constant Key with wrong type: ', $S0
+    ok(0, $S0)
+    .return()
 
+  next:
+    this = this + 1
+    ge this, size, done
+    goto loop
+    gt size, 0, done
+
+  done:
+    ok(1, 'PackfileConstantTable.get_*_int works')
+    .return()
+  bad:
+    ok(0, 'Unknown constant type')
+    .return()
+.end
+
+# Test setting constants into PackfileConstantTable
+.sub 'test_set'
+    .local pmc ct
+    .local int size
+    ct = new ['PackfileConstantTable']
+
+    # Initial PackfileConstantTable is empty
+    size = elements ct
+    is(size, 0, "Empty PackfileConstantTable created")
+
+    # Set first string
+    ct[0] = "string"
+    $I0 = elements ct
+    is($I0, 1, "String element added")
+    
+    ct[1] = 1.0
+    $I0 = elements ct
+    is($I0, 2, "Number elements added")
+
+    $P0 = new 'Integer'
+    $P0 = 42
+    ct[2] = $P0
+    $I0 = elements ct
+    is($I0, 3, "PMC elements added")
+
+    # Check types of created constants
+    $I0 = ct.'get_type'(0)
+    is($I0, .PFC_STRING, "First element is string")
+    $I0 = ct.'get_type'(1)
+    is($I0, .PFC_NUMBER, "Second element is number")
+    $I0 = ct.'get_type'(2)
+    is($I0, .PFC_PMC, "Third element is PMC")
+
+.end
+
+
+.sub '_get_consttable'
+    .param pmc pf
+    .local pmc dir, it
+    dir = pf.'get_directory'()
+    it = iter dir
+  loop:
+    unless it goto done
+    $S0 = shift it
+    $P0 = dir[$S0]
+    $I0 = isa $P0, 'PackfileConstantTable'
+    unless $I0 goto loop
+    .return ($P0)
+  done:
+    die "Can't find ConstantTable in Packfile!"
+    .return ()
+.end
 
 # Local Variables:
 #   mode: cperl

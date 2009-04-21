@@ -853,6 +853,8 @@ Don't include author information in individual files. Author information
 can be added to the CREDITS file. (Languages are an exception to this rule,
 and may follow whatever convention they choose.)
 
+Don't include Pod sections for License or Copyright in individual files.
+
 =item Per-section comments
 
 If there is a collection of functions, structures or whatever which are
@@ -923,6 +925,21 @@ branch, e.g.
         /* we're in baz mode: self-destruct */
         ....
     }
+
+=item Copyright notice
+
+The first line of every file (or the second line if the first line is a
+I<shebang> line such as C<#!/usr/bin/perl>) should be a copyright notice, in
+the comment style appropriate to the file type. It should list the first year
+the file was created and the last year the file was modified.  (This isn't
+necessarily the current year, the file might not have been modified this
+year.)
+
+    /* Copyright (C) 2001-2008, Parrot Foundation. */
+
+For files that were newly added this year, just list the current year.
+
+    /* Copyright (C) 2009, Parrot Foundation. */
 
 =back
 

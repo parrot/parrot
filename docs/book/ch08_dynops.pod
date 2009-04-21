@@ -35,7 +35,7 @@ is, some opcodes appear to have multiple argument formats. This is just an
 illusion, however. Parrot opcodes are not polymorphic, although certain
 features enable it to appear that way. Different argument list formats
 are detected during parsing and translated into separate, and unique,
-opcode names. 
+opcode names.
 
 =head3 Opcode Multiple Dispatch
 

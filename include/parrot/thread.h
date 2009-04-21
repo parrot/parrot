@@ -205,7 +205,7 @@ PMC* pt_thread_join(NOTNULL(Parrot_Interp parent), UINTVAL tid)
         __attribute__nonnull__(1);
 
 void pt_thread_kill(UINTVAL tid);
-void pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s);
+void pt_thread_prepare_for_run(Parrot_Interp d, NULLOK(Parrot_Interp s));
 int pt_thread_run(PARROT_INTERP,
     ARGOUT(PMC *dest_interp),
     ARGIN(PMC *sub),

@@ -21,7 +21,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(118)
+    plan(121)
 
     resize_tests()
     negative_array_size()
@@ -47,6 +47,7 @@ out-of-bounds test. Checks INT and PMC keys.
     iterate_subclass_of_rpa()
     method_forms_of_unshift_etc()
     sort_with_broken_cmp()
+    addr_tests()
 .end
 
 
@@ -894,6 +895,23 @@ end:
     $I0 = 1
     .return ($I0)
 .end
+
+.sub 'addr_tests'
+    $P0 = new 'ResizablePMCArray'
+    $I0 = get_addr $P0
+    $P1 = new 'ResizablePMCArray'
+    $I1 = get_addr $P1
+
+    $I2 = $I0 != 0
+    ok($I2, 'ResizablePMCArray address is not zero')
+    $I2 = $I0 != $I1
+    ok($I2, 'Two empty RPAs do not have same address')
+
+    push $P0, 3
+    $I1 = get_addr $P0
+    is($I0, $I1, 'Adding element to RPA keeps same addr')
+.end
+
 
 # don't forget to change the test plan
 

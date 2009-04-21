@@ -26,8 +26,11 @@ math stuff
  */
 
 #include <math.h>
+#ifdef _IEEE_
 
 _LIB_VERSION_TYPE _LIB_VERSION = _IEEE_;
+
+#endif
 
 #if DOUBLE_SIZE == 2 * INT_SIZE
 /*

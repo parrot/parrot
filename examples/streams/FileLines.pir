@@ -1,5 +1,3 @@
-# $Id$
-
 =head1 Advanced Lines Example
 
 This is an advanced example.

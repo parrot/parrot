@@ -672,24 +672,25 @@ will be used in lieu of this one.)
     .param pmc topic
     .local pmc topichow, topicwhat, parrotclass
 
+    $P0 = self.'HOW'()
+    parrotclass = $P0.'get_parrotclass'(self)
+
+    $S0 = parrotclass
+    if $S0 == 'Perl6Object' goto accept_anyway
+
+    $I0 = isa topic, 'Junction'
+    if $I0 goto normal_check
+
+    if $S0 == 'Any' goto accept_anyway
+
+  normal_check:
+    $I0 = can topic, 'HOW'
+    unless $I0 goto end
     topichow = topic.'HOW'()
     topicwhat = topic.'WHAT'()
-    parrotclass = topichow.'get_parrotclass'(self)
     $I0 = isa topicwhat, parrotclass
     if $I0 goto end
     $I0 = does topic, parrotclass
-    if $I0 goto end
-
-    # Here comes some special handling for Perl 6, that really shouldn't be in
-    # here; we'll figure out a way to let Perl 6 provide it's own ACCEPTS that
-    # does this or, better make it so we don't need to do this. The purpose is
-    # to make Any accept stuff that doesn't actually inherit from it, aside
-    # from Junction, and to make Perl6Object accept anything.
-    $S0 = parrotclass
-    if $S0 == 'Perl6Object' goto accept_anyway
-    if $S0 != 'Any' goto end
-    $S0 = topicwhat
-    if $S0 != 'Junction' goto accept_anyway
     goto end
 
   accept_anyway:

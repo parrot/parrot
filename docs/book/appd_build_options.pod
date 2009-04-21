@@ -86,3 +86,8 @@ To get the Perl packages for Parrot, you can use the commands:
   sudo cpan Perl::Critic Perl::Critic::Bangs Test::Perl::Critic
 
 =cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

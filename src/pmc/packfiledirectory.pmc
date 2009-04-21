@@ -28,7 +28,157 @@ PDD13 for the design spec.
 #include "parrot/parrot.h"
 
 pmclass PackfileDirectory extends PackfileSegment {
+    /* Directory is a hash of Segments */
+    ATTR PMC *hash;
 
+/*
+
+=item C<void init()>
+
+Initialize PackfileDirectory.
+
+=cut
+
+*/
+    VTABLE void init() {
+        Parrot_PackfileDirectory_attributes * attrs =
+                mem_allocate_zeroed_typed(Parrot_PackfileDirectory_attributes);
+
+        attrs->hash = pmc_new(interp, enum_class_Hash);
+
+        PObj_custom_mark_destroy_SETALL(SELF);
+        PMC_data(SELF) = attrs;
+    }
+
+/*
+
+=item C<void mark()>
+
+Marks the object as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() {
+        Parrot_PackfileDirectory_attributes * attrs =
+                PARROT_PACKFILEDIRECTORY(SELF);
+
+        if (attrs->hash)
+            pobject_lives(interp, (PObj *)attrs->hash);
+    }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the PMC and frees all allocated memory.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        Parrot_PackfileDirectory_attributes * attrs =
+                PARROT_PACKFILEDIRECTORY(SELF);
+
+        if (attrs) {
+            mem_sys_free(attrs);
+            PMC_data(SELF) = NULL;
+        }
+    }
+
+
+/*
+
+=item C<void set_pointer(void *ptr)>
+
+Initialize PackfileDirectory from PackFile_Directory.
+
+=cut
+
+*/
+
+    VTABLE void set_pointer(void *ptr) {
+        const PackFile_Directory * const pfd = (const PackFile_Directory *)ptr;
+        PackFile_Segment *pfseg;
+        PMC              *segment;
+        int              pmc_type;
+        unsigned int     i;
+        STRING           *name;
+        PMC              *hash = PARROT_PACKFILEDIRECTORY(SELF)->hash;
+
+        SUPER(ptr);
+
+        /* Iterate over elements and create corresponded PMCs */
+        for (i=0; i < pfd->num_segments; ++i) {
+            pfseg = pfd->segments[i];
+
+            switch (pfseg->type) {
+                case PF_DIR_SEG:
+                    pmc_type = enum_class_PackfileDirectory;
+                    break;
+                case PF_FIXUP_SEG:
+                    pmc_type = enum_class_PackfileFixupTable;
+                    break;
+                case PF_CONST_SEG:
+                    pmc_type = enum_class_PackfileConstantTable;
+                    break;
+                case PF_ANNOTATIONS_SEG:
+                    pmc_type = enum_class_PackfileAnnotations;
+                    break;
+                case PF_BYTEC_SEG:
+                case PF_UNKNOWN_SEG:
+                case PF_DEBUG_SEG:
+                default:
+                    pmc_type = enum_class_PackfileRawSegment;
+                    break;
+            }
+
+            segment = pmc_new(interp, pmc_type);
+            name    = Parrot_str_new(interp, pfseg->name, strlen(pfseg->name));
+            VTABLE_set_pmc_keyed_str(interp, SELF, name, segment);
+
+            /* Initialize internal PMC structure */
+            VTABLE_set_pointer(interp, segment, pfseg);
+
+        }
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Creates PackFile for given directory.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        Parrot_PackfileDirectory_attributes * attrs =
+                PARROT_PACKFILEDIRECTORY(SELF);
+        PackFile           * pf = PackFile_new(interp, 0); /* dummy PackFile... */
+        PackFile_Directory * pfdir = &pf->directory;
+        PackFile_Segment   * pfseg;
+        PMC                * seg;
+        PMC                * iter;
+        STRING             * name;
+        STRING             * res;
+
+        /* Create Segments. Add to Directory with transfering ownership */
+        iter = VTABLE_get_iter(interp, attrs->hash);
+        while (VTABLE_get_bool(interp, iter)) {
+            name  = VTABLE_shift_string(interp, iter);
+            seg   = VTABLE_get_pmc_keyed_str(interp, attrs->hash, name);
+            pfseg = (PackFile_Segment*)VTABLE_get_pointer(interp, seg);
+            pfseg->pf   = pf;
+            pfseg->name = strdup(Parrot_string_cstring(interp, name));
+            PackFile_add_segment(interp, pfdir, pfseg);
+        }
+
+        return pf;
+    }
 
 /*
 
@@ -40,75 +190,23 @@ Get the number of elements in the array.
 
 */
     VTABLE INTVAL elements() {
-        PackFile_Directory *pfd = PMC_data_typed(SELF, PackFile_Directory *);
-        return pfd->num_segments;
+        return VTABLE_elements(interp, PARROT_PACKFILEDIRECTORY(SELF)->hash);
     }
 
 
 /*
 
-=item C<PMC *get_pmc_keyed_int(INTVAL index)>
+=item C<PMC *get_iter()>
 
-Fetch a segment PMC from the array.
-
-=cut
-
-*/
-    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
-        const PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
-        PackFile_Segment *pfseg;
-        PMC              *rv;
-        int              pmc_type;
-
-        if (index < 0 || index >= (INTVAL)pfd->num_segments)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "PackfileDirectory: index out of bounds!");
-
-        pfseg = pfd->segments[index];
-
-        switch (pfseg->type) {
-            case PF_DIR_SEG:
-                pmc_type = enum_class_PackfileDirectory;
-                break;
-            case PF_FIXUP_SEG:
-                pmc_type = enum_class_PackfileFixupTable;
-                break;
-            case PF_CONST_SEG:
-                pmc_type = enum_class_PackfileConstantTable;
-                break;
-            case PF_BYTEC_SEG:
-            case PF_UNKNOWN_SEG:
-            case PF_DEBUG_SEG:
-            default:
-                pmc_type = enum_class_PackfileRawSegment;
-                break;
-        }
-
-        rv           = pmc_new(interp, pmc_type);
-        PMC_data(rv) = pfseg;
-        return rv;
-    }
-
-
-/*
-
-=item C<STRING *get_string_keyed_int(INTVAL index)>
-
-Fetch a string containing the name of the specified segment PMC.
+Return a new iterator for the directory.
 
 =cut
 
 */
-    VTABLE STRING *get_string_keyed_int(INTVAL index)  {
-        const PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
-        const PackFile_Segment *pfseg;
-        if (index < 0 || index >= (INTVAL)pfd->num_segments)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        "PackfileDirectory: index out of bounds!");
-        pfseg = pfd->segments[index];
-        return Parrot_str_new_constant(interp, pfseg->name);
-    }
 
+    VTABLE PMC *get_iter() {
+        return VTABLE_get_iter(interp, PARROT_PACKFILEDIRECTORY(SELF)->hash);
+    }
 
 /*
 
@@ -120,16 +218,8 @@ Search the array for a segment with the given name, and return it if it exists.
 
 */
     VTABLE PMC *get_pmc_keyed_str(STRING *name)  {
-        const PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
-        const int total = pfd->num_segments;
-        int i;
-        for (i = 0; i < total; i++) {
-            const PackFile_Segment * const pfseg = pfd->segments[i];
-            if (!Parrot_str_compare(interp, name, Parrot_str_new_constant(interp, pfseg->name)))
-                return VTABLE_get_pmc_keyed_int(interp, SELF, i);
-        }
-        /* the specified segment name wasn't found. */
-        return PMCNULL;
+        return VTABLE_get_pmc_keyed_str(interp,
+                PARROT_PACKFILEDIRECTORY(SELF)->hash, name);
     }
 
 
@@ -137,15 +227,15 @@ Search the array for a segment with the given name, and return it if it exists.
 
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
-Fetch a keyed string value from the packfiledirectory object.  Dispatches to
-get_pmc_keyed_str.
+Fetch a keyed string value from the packfiledirectory object.
 
 =cut
 
 */
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        STRING * const s = VTABLE_get_string(INTERP, key);
-        return SELF.get_pmc_keyed_str(s);
+        STRING *s_key = VTABLE_get_string(interp, key);
+        return VTABLE_get_pmc_keyed_str(interp,
+                PARROT_PACKFILEDIRECTORY(SELF)->hash, s_key);
     }
 
 
@@ -158,29 +248,27 @@ name already existed, it will be replaced with the new segment.
 
 =cut
 
+TODO: check type
+
 */
     VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment)  {
-        PackFile_Directory * const pfd = PMC_data_typed(SELF, PackFile_Directory *);
-        PackFile_Segment *add_seg = PMC_data_typed(segment, PackFile_Segment *);
-
-        const int total = pfd->num_segments;
-        int       i;
-
-        for (i = 0; i < total; i++) {
-            const PackFile_Segment * const pfseg = pfd->segments[i];
-
-            if (!Parrot_str_compare(interp, name,
-                    Parrot_str_new_constant(interp, pfseg->name))) {
-                    add_seg->pf = pfd->base.pf;
-                    pfd->segments[i] = add_seg;
-                return;
-            }
-        }
-
-        add_seg->name = Parrot_str_to_cstring(interp, name);
-        add_seg->pf = pfd->base.pf;
-        PackFile_add_segment(interp, pfd, add_seg);
+        Parrot_PCCINVOKE(interp, segment,
+            Parrot_str_new_constant(interp, "set_directory"),
+            "P->", SELF);
+        VTABLE_set_pmc_keyed_str(interp,
+            PARROT_PACKFILEDIRECTORY(SELF)->hash, name, segment);
     }
+
+/*
+
+=item C<PMC *set_pmc_keyed(PMC *key)>
+
+Add a segment with the given name to the directory.  Dispatches to
+set_pmc_keyed_str.
+
+=cut
+
+*/
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *segment)  {
         STRING *s_key = VTABLE_get_string(interp, key);

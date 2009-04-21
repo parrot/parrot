@@ -466,8 +466,9 @@ tree as a PIR code object that can be compiled.
 
 .sub 'reduce' :method
     .param pmc next
-    .local pmc exp0
+    .local pmc exp0, sep
     exp0 = self[0]
+    sep = self['sep']
 
     .local int backtrack, min, max
     backtrack = self['backtrack']
@@ -489,6 +490,10 @@ tree as a PIR code object that can be compiled.
   reduce_exp0:
     exp0 = exp0.'reduce'(next)
     self[0] = exp0
+    if null sep goto reduce_exp0_1
+    sep = sep.'reduce'(next)
+    self['sep'] = sep
+  reduce_exp0_1:
     .return (self)
 .end
 
@@ -497,10 +502,12 @@ tree as a PIR code object that can be compiled.
     .param string label
     .param string next
 
-    .local pmc exp
-    .local string explabel, replabel
+    .local pmc exp, sep
+    .local string explabel, seplabel, replabel, nextlabel
     exp = self[0]
+    sep = self['sep']
 
+    unless null sep goto outer_quant
     $I0 = can exp, 'pir_quant'
     if $I0 == 0 goto outer_quant
     $I0 = exp.'pir_quant'(code, label, next, self)
@@ -515,7 +522,12 @@ tree as a PIR code object that can be compiled.
     backtrack = self['backtrack']
 
     explabel = code.'unique'('R')
+    nextlabel = explabel
     replabel = concat label, '_repeat'
+    if null sep goto outer_quant_1
+    seplabel = code.'unique'('R')
+    nextlabel = concat label, '_sep'
+  outer_quant_1:
 
     if backtrack == PGE_BACKTRACK_EAGER goto bt_eager
     if backtrack == PGE_BACKTRACK_NONE goto bt_none
@@ -528,7 +540,7 @@ tree as a PIR code object that can be compiled.
     if $I0 != 0 goto bt_greedy_none
     $I0 = self['max']
     if $I0 != PGE_INF goto bt_greedy_none
-    code.'emit'(<<"        CODE", replabel, explabel, args :flat :named)
+    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant 0..Inf greedy
         %0:
           push ustack, pos
@@ -548,7 +560,7 @@ tree as a PIR code object that can be compiled.
     if $I0 != 0 goto bt_greedy_none
     $I0 = self['max']
     if $I0 != PGE_INF goto bt_greedy_none
-    code.'emit'(<<"        CODE", replabel, explabel, args :flat :named)
+    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant 0..Inf none
           local_branch cstack, %0
           if cutmark != %c goto fail
@@ -568,7 +580,7 @@ tree as a PIR code object that can be compiled.
 
   bt_greedy_none:
     ##   handle greedy or none
-    code.'emit'(<<"        CODE", replabel, explabel, args :flat :named)
+    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant %Q greedy/none
           push gpad, 0
           local_branch cstack, %0
@@ -603,7 +615,7 @@ tree as a PIR code object that can be compiled.
 
   bt_eager:
     ##   handle eager backtracking
-    code.'emit'(<<"        CODE", replabel, explabel, args :flat :named)
+    code.'emit'(<<"        CODE", replabel, nextlabel, args :flat :named)
         %L:  # quant %Q eager
           push gpad, 0
           local_branch cstack, %0
@@ -627,6 +639,14 @@ tree as a PIR code object that can be compiled.
         CODE
 
   end:
+    if null sep goto sep_done
+    code.'emit'(<<"        CODE", nextlabel, explabel, seplabel)
+        %0:
+          if rep == 1 goto %1
+          goto %2
+        CODE
+    sep.'pir'(code, seplabel, explabel)
+  sep_done:
     exp.'pir'(code, explabel, replabel)
     .return ()
 .end

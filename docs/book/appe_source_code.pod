@@ -65,3 +65,8 @@ found in Chapter 3, Chapter 5, and Chapter 7
 respectively.
 
 =cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

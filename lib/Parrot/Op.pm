@@ -438,19 +438,9 @@ Author: Gregor N. Purdy E<lt>gregor@focusresearch.comE<gt>
 
 1;
 
-__END__
-
-=begin TODO
-
-=head1 LICENSE
-
-This program is free software. It is subject to the same
-license as Parrot itself.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2001-2008, Parrot Foundation.
-
-=end TODO
-
-=cut
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

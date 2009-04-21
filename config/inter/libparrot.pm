@@ -128,6 +128,14 @@ sub runstep {
         );
     }
 
+    unless ( defined( $conf->data->get('inst_libparrot_ldflags') ) ) {
+        $conf->data->set(inst_libparrot_ldflags =>
+        '-L'
+        . $conf->data->get('libdir')
+        . ' -lparrot'
+        );
+    }
+
     $self->set_result( $parrot_is_shared ? 'yes' : 'no' );
 
     return 1;

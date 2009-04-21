@@ -15,7 +15,11 @@ patterns for matching text.
 
 =head2 Grammars
 
-A grammar is a collection of rules, in much the same way that a class is a collection of methods.N<In fact, a grammar is just a special kind of class and a rule is just a special kind of method.> Each rule defines a pattern for matching one piece of text. The basic matching syntax for rules is likely to be somewhat familiar to anyone who has worked with regular expressions.
+A grammar is a collection of rules, in much the same way that a class is a
+collection of methods.N<In fact, a grammar is just a special kind of class
+and a rule is just a special kind of method.> Each rule defines a pattern for
+matching one piece of text. The basic matching syntax for rules is likely to
+be somewhat familiar to anyone who has worked with regular expressions.
 
   rule id { \d+ }
 
@@ -28,33 +32,46 @@ And a grammar holds a group of rules that work together:
   grammar Contacts;
 
   rule name { 'John' | 'Bob ' | 'Fred' }
-  
+
   rule id   { \d+ }
 
   rule record { <id> <name> }
 
   ...
 
-
 =head3 Rules and Tokens
 
-There are two different kinds of rules, each declared with a different keyword: C<rule> or C<token>. A C<rule> does smart whitespace matching between the various pieces of the pattern. So, the C<record> rule above would match "6355 John" or "6355      John" but not "6355John".
+There are two different kinds of rules, each declared with a different keyword:
+C<rule> or C<token>. A C<rule> does smart whitespace matching between the
+various pieces of the pattern. So, the C<record> rule above would match
+"6355 John" or "6355      John" but not "6355John".
 
-A C<token> only matches whitespace if you specifically request it. To get the same effect with a token, you'd have to add a C<\s> pattern to the rule:
+A C<token> only matches whitespace if you specifically request it. To get the
+same effect with a token, you'd have to add a C<\s> pattern to the rule:
 
   token record { <id> \s+ <name> }
 
 =head3 The Start Rule
 
-A recursive descent parser is a top-down parser. This means it starts at the highest-level rule and works its way down through individual rules to match an entire string or file. In PGE, this top-level rule is called C<TOP> by convention.N<The top-level rule can be called anything, but some of the compiler tools expect it to be called C<TOP>.>
+A recursive descent parser is a top-down parser. This means it starts at the
+highest-level rule and works its way down through individual rules to match
+an entire string or file. In PGE, this top-level rule is called C<TOP> by
+convention.N<In "real" Perl 6, the top-level rule can be called anything.
+However, some of the PCT compiler tools expect it to be called C<TOP>.
+Compilers written with PCT should just use the name C<TOP> for all top-level
+tokens.>
 
   rule TOP { <record> }
 
-This rule matches a single record in a string or file. Once the parser has matched the entire string or file passed to the start rule, the parse is considered successful and a raw parse tree is returned.
+This rule matches a single record in a string or file. Once the parser has
+matched the entire string or file passed to the start rule, the parse is
+considered successful and a raw parse tree is returned.
 
 =head3 Testing a Grammar
 
-You might want to try out the examples in this chapter as you read along. To compile a simple example, save it to a file called F<Contacts.pg>:
+You might want to try out the examples in this chapter as you read along.
+To compile the following simple example, save it to a file called
+F<Contacts.pg>:
 
   grammar Contacts is PGE::Grammar;
   rule  TOP    { <record> }
@@ -66,11 +83,14 @@ Then compile the grammar with the following command:
 
   $ parrot Perl6Grammar.pbc --output=Contacts.pir Contacts.pg
 
-The path to F<parrot> and to the F<Perl6Grammar.pbc> file will vary on different systems. If you compiled Parrot from source, it will be:
+The path to F<parrot> and to the F<Perl6Grammar.pbc> file will vary on
+different systems. If you compiled Parrot from source, it will be:
 
-  $ ./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc --output=Contacts.pir Contacts.pg
+  $ ./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc \
+        --output=Contacts.pir Contacts.pg
 
-Next, create a small PIR script to run your grammar. You can save it as F<grammar_test.pir>.
+Next, create a small PIR script to run your grammar. You can save it as
+F<grammar_test.pir>.
 
   .sub main :main
       load_bytecode 'PGE.pbc'        # load some required modules
@@ -89,11 +109,12 @@ Next, create a small PIR script to run your grammar. You can save it as F<gramma
       _dumper(match, "match")
   .end
 
-When you run the test script:
+Now, you can run the test script with this command:
 
   $ parrot grammar_test.pir
 
-It will print out a text representation of the raw parse tree stored in the C<match> variable:
+It will print out a text representation of the raw parse tree stored in the
+C<match> variable:
 
   "match" => PMC 'Contacts' => "3 John" @ 0 {
       <record> => PMC 'Contacts' => "3 John" @ 0 {
@@ -102,7 +123,11 @@ It will print out a text representation of the raw parse tree stored in the C<ma
       }
   }
 
-Each rule in the grammar corresponds to a node in the tree. This output shows that the top-level match variable contains one child named "record", that "record" contains two children named "id" and "name", and that "id" contains the number 3, and "name" contains the string "John". Exactly what we would expect from our simple grammar.
+Each rule in the grammar corresponds to a node in the tree. This output shows
+that the top-level match variable contains one child named "record", that
+"record" contains two children named "id" and "name", and that "id" contains
+the number 3, and "name" contains the string "John". Exactly what we would
+expect from our simple grammar.
 
 =head2 Rule Syntax
 
@@ -116,25 +141,24 @@ bracketing characters, and assertions.
 
 =head3 Metacharacters
 
-The C<.> matches any single character, even a newline character.
-The C<^> and C<$> metacharacters are zero-width
-matches on the beginning and end of a string. They each have doubled
-alternates C<^^> and C<$$> that match at the beginning and end of
-every line within a string.
+The C<.> matches any single character, even a newline character. The C<^> and
+C<$> metacharacters are zero-width matches on the beginning and end of a
+string. They each have doubled alternates C<^^> and C<$$> that match at the
+beginning and end of every line within a string.
 
 The C<|>, C<&>, C<\>, C<#>, and C<:=> metacharacters are all syntax
 structure elements. The C<|> is an alternation between two options. The
 C<&> matches two patterns simultaneously (the patterns must be the same
 length). The C<\> turns literal characters into metacharacters (the
-escape sequences). The
-C<#> marks a comment to the end of the line. You can start a comment at
-any point on any line in a rule. The C<:=> binds a hypothetical variable to
-the result of a subrule or grouped pattern. Hypotheticals are covered
-in L<Hypothetical Variables> later in this chapter.
+escape sequences). The C<#> marks a comment to the end of the line. You can
+start a comment at any point on any line in a rule. The C<:=> binds a
+hypothetical variable to the result of a subrule or grouped pattern.
+Hypotheticals are covered in L<Hypothetical Variables> later in this chapter.
 
 The metacharacters C<()>, C<[]>, C<{}> and C<E<lt>E<gt>> are bracketing
 pairs. The pairs always have to be balanced within the rule, unless they
-are literal characters (escaped with a C<\>). The C<()> and C<[]> pairs group patterns to match as a single atom. They're often used to
+are literal characters (escaped with a C<\>). The C<()> and C<[]> pairs
+group patterns to match as a single atom. They're often used to
 capture a result, mark the boundaries of an alternation, or mark a group
 of patterns with a quantifier. Parentheses C<()> are
 capturing and square brackets C<[]> are non-capturing. The C<{}>
@@ -150,64 +174,64 @@ Table 7-2 summarizes the basic set of metacharacters.
 
 Z<CHP-7-TABLE-2>
 
-=headrow 
+=headrow
 
-=row 
+=row
 
 =cell Symbol
 
 =cell Meaning
 
-=bodyrows 
+=bodyrows
 
-=row 
+=row
 
 =cell C<.>
 
 =cell Match any single character, including a newline.
 X<. (dot);. match single character (rules)>
 
-=row 
+=row
 
 =cell C<^>
 
 =cell Match the beginning of a string.
 X<^ (caret);^ beginning of string (rules)>
 
-=row 
+=row
 
 =cell C<$>
 
 =cell Match the end of a string.
 X<$ (dollar sign);$ end of string (rules)>
 
-=row 
+=row
 
 =cell C<^^>
 
 =cell Match the beginning of a line.
 X<^ (caret);^^ beginning of line (rules)>
 
-=row 
+=row
 
 =cell C<$$>
 
 =cell Match the end of a line.
 X<$ (dollar sign);$$ end of line (rules)>
 
-=row 
+=row
 
 =cell C<|>
 
 =cell Match alternate patterns (OR).
 
-=row 
+=row
 
 =cell C<&>
 
 =cell Match multiple patterns (AND).
 
-=row 
+=row
 
 =cell C<\>
 
@@ -216,38 +240,38 @@ literal character to get a metacharacter.
 X<\ (backslash);\ escape sequences (rules)>
 X<\ (backslash);\ to escape metacharacters (rules)>
 
-=row 
+=row
 
 =cell C<#>
 
 =cell Mark a comment (to the end of the line).
 
-=row 
+=row
 
 =cell C<:=>
 
 =cell Bind the result of a match to a hypothetical variable.
 X<: (colon);:= (binding);in rules>
 
-=row 
+=row
 
 =cell C<(...)>
 
 =cell Group patterns and capture the result.
 
-=row 
+=row
 
 =cell C<[...]>
 
 =cell Group patterns without capturing.
 
-=row 
+=row
 
 =cell C<{...}>
 
 =cell Execute a closure (Perl 6 code) within a rule.
 
-=row 
+=row
 
 =cell C<E<lt>...E<gt>>
 
@@ -270,204 +294,204 @@ tab, or C<\x[...]> for a character specified by a hexadecimal number.
 Some represent limited character classes, like C<\d> for digits or C<\w>
 for word characters. Some represent zero-width positions in a match,
 like C<\b> for a word boundary. With all the escape sequences that use
-brackets, C<()>, C<{}>, and C<E<lt>E<gt>> work in place of C<[]>. 
+brackets, C<()>, C<{}>, and C<E<lt>E<gt>> work in place of C<[]>.
 
 X<variable interpolation in rules>
 X<rules;variable interpolation>
 Note that since an ordinary variable now interpolates as a literal
 string by default, the C<\Q> escape sequence is rarely needed.
 
-A<CHP-7-TABLE-3>Table 7-3 shows the escape sequences for rules. 
+A<CHP-7-TABLE-3>Table 7-3 shows the escape sequences for rules.
 
 =begin table picture Escape sequences
 
 Z<CHP-7-TABLE-3>
 
-=headrow 
+=headrow
 
-=row 
+=row
 
 =cell Escape
 
 =cell Meaning
 
-=bodyrows 
+=bodyrows
 
-=row 
+=row
 
 =cell C<\0[...]>
 
 =cell Match a character given in octal (brackets optional).
 
-=row 
+=row
 
 =cell C<\b>
 
 =cell Match a word boundary.
 
-=row 
+=row
 
 =cell C<\B>
 
 =cell Match when not on a word boundary.
 
-=row 
+=row
 
 =cell C<\c[...]>
 
 =cell Match a named character or control character.
 
-=row 
+=row
 
 =cell C<\C[...]>
 
 =cell Match any character except the bracketed named or control character.
 
-=row 
+=row
 
 =cell C<\d>
 
 =cell Match a digit.
 
-=row 
+=row
 
 =cell C<\D>
 
 =cell Match a non-digit.
 
-=row 
+=row
 
 =cell C<\e>
 
 =cell Match an escape character.
 
-=row 
+=row
 
 =cell C<\E>
 
 =cell Match anything but an escape character.
 
-=row 
+=row
 
 =cell C<\f>
 
 =cell Match the form feed character.
 
-=row 
+=row
 
 =cell C<\F>
 
 =cell Match anything but a form feed.
 
-=row 
+=row
 
 =cell C<\n>
 
 =cell Match a (logical) newline.
 
-=row 
+=row
 
 =cell C<\N>
 
 =cell Match anything but a (logical) newline.
 
-=row 
+=row
 
 =cell C<\h>
 
 =cell Match horizontal whitespace.
 
-=row 
+=row
 
 =cell C<\H>
 
 =cell Match anything but horizontal whitespace.
 
-=row 
+=row
 
 =cell C<\L[...]>
 
 =cell Everything within the brackets is lowercase.
 
-=row 
+=row
 
 =cell C<\Q[...]>
 
 =cell All metacharacters within the brackets match as literal characters.
 
-=row 
+=row
 
 =cell C<\r>
 
 =cell Match a return.
 
-=row 
+=row
 
 =cell C<\R>
 
 =cell Match anything but a return.
 
-=row 
+=row
 
 =cell C<\s>
 
 =cell Match any whitespace character.
 
-=row 
+=row
 
 =cell C<\S>
 
 =cell Match anything but whitespace.
 
-=row 
+=row
 
 =cell C<\t>
 
 =cell Match a tab.
 
-=row 
+=row
 
 =cell C<\T>
 
 =cell Match anything but a tab.
 
-=row 
+=row
 
 =cell C<\U[...]>
 
 =cell Everything within the brackets is uppercase.
 
-=row 
+=row
 
 =cell C<\v>
 
 =cell Match vertical whitespace.
 
-=row 
+=row
 
 =cell C<\V>
 
 =cell Match anything but vertical whitespace.
 
-=row 
+=row
 
 =cell C<\w>
 
 =cell Match a word character (Unicode alphanumeric plus "_").
 
-=row 
+=row
 
 =cell C<\W>
 
 =cell Match anything but a word character.
 
-=row 
+=row
 
 =cell C<\x[...]>
 
 =cell Match a character given in hexadecimal (brackets optional).
 
-=row 
+=row
 
 =cell C<\X[...]>
 
@@ -475,7 +499,6 @@ Z<CHP-7-TABLE-3>
 optional).
 
 =end table
-
 
 =head3 Quantifiers
 
@@ -498,16 +521,16 @@ Each quantifier has a minimal alternate form, marked with a trailing
 C<?>, that matches the shortest possible sequence first.
 
 
-A<CHP-7-TABLE-4>Table 7-4 shows the built-in 
+A<CHP-7-TABLE-4>Table 7-4 shows the built-in
 X<quantifiers, rules> X<rules;quantifiers> quantifiers.
 
 =begin table picture Quantifiers
 
 Z<CHP-7-TABLE-4>
 
-=headrow 
+=headrow
 
-=row 
+=row
 
 =cell Maximal
 
@@ -515,9 +538,9 @@ Z<CHP-7-TABLE-4>
 
 =cell Meaning
 
-=bodyrows 
+=bodyrows
 
-=row 
+=row
 
 =cell C<*>
 
@@ -525,7 +548,7 @@ Z<CHP-7-TABLE-4>
 
 =cell Match 0 or more times.
 
-=row 
+=row
 
 =cell C<+>
 
@@ -533,7 +556,7 @@ Z<CHP-7-TABLE-4>
 
 =cell Match 1 or more times.
 
-=row 
+=row
 
 =cell C<?>
 
@@ -541,7 +564,7 @@ Z<CHP-7-TABLE-4>
 
 =cell Match 0 or 1 times.
 
-=row 
+=row
 
 =cell C<E<lt>>R<n>C<E<gt>>
 
@@ -549,7 +572,7 @@ Z<CHP-7-TABLE-4>
 
 =cell Match exactly R<n> times.
 
-=row 
+=row
 
 =cell C<E<lt>>R<n>C<..>R<m>C<E<gt>>
 
@@ -557,7 +580,7 @@ Z<CHP-7-TABLE-4>
 
 =cell Match at least R<n> and no more than R<m> times.
 
-=row 
+=row
 
 =cell C<E<lt>>R<n>C<...E<gt>>
 
@@ -576,7 +599,7 @@ X<assertions, rules>
 X<rules;assertions>
 In general, an assertion simply states that some condition or state is
 true and the match fails when that assertion is false. Many different
-constructs with many different purposes use assertion syntax. 
+constructs with many different purposes use assertion syntax.
 
 X<variable interpolation in rules>
 X<rules;variable interpolation>
@@ -620,97 +643,97 @@ A<CHP-7-TABLE-5>Table 7-5 shows the syntax for assertions.
 
 Z<CHP-7-TABLE-5>
 
-=headrow 
+=headrow
 
-=row 
+=row
 
 =cell Syntax
 
 =cell Meaning
 
-=bodyrows 
+=bodyrows
 
-=row 
+=row
 
 =cell C<E<lt>...E<gt>>
 
 =cell Generic assertion delimiter.
 
-=row 
+=row
 
 =cell C<E<lt>!...E<gt>>
 
 =cell Negate any assertion.
 
-=row 
+=row
 
 =cell C<E<lt>>R<name>C<E<gt>>
 
 =cell Match a named rule or character class.
 
-=row 
+=row
 
 =cell C<E<lt>[...]E<gt>>
 
 =cell Match an enumerated character class.
 
-=row 
+=row
 
 =cell C<E<lt>-...E<gt>>
 
 =cell Complement a character class (named or enumerated).
 
-=row 
+=row
 
 =cell C<E<lt>"..."E<gt>>
 
 =cell Match a literal string (interpolated at match time).
 
-=row 
+=row
 
 =cell C<E<lt>'...'E<gt>>
 
 =cell Match a literal string (not interpolated).
 
-=row 
+=row
 
 =cell C<E<lt>(...)E<gt>>
 
 =cell Boolean assertion. Execute a closure and match if it returns a true
 result.
 
-=row 
+=row
 
 =cell C<E<lt>$scalarE<gt>>
 
 =cell Match an anonymous rule.
 
-=row 
+=row
 
 =cell C<E<lt>@arrayE<gt>>
 
 =cell Match a series of anonymous rules as alternates.
 
-=row 
+=row
 
 =cell C<E<lt>%hashE<gt>>
 
 =cell Match a key from the hash, then its value (which is an anonymous
 rule).
 
-=row 
+=row
 
 =cell C<E<lt>E<amp>sub()E<gt>>
 
 =cell Match an anonymous rule returned by a sub.
 
-=row 
+=row
 
 =cell C<E<lt>{>R<code>C<}E<gt>>
 
 =cell Match an anonymous rule returned by a closure.
 
-=row 
+=row
 
 =cell C<E<lt>.E<gt>>
 
@@ -755,7 +778,7 @@ entire rule.
 The C<:R<N>x> modifier matches the rule a counted number of times. If
 the modifier expects more matches than the string has, the match fails.
 It has an alternate form C<:x(R<N>)> that can take a variable in place
-of the number. 
+of the number.
 
 The C<:once> modifier on a rule only allows it to match once. The rule
 will not match again until the you call the C<.reset> method on the rule
@@ -790,9 +813,9 @@ A<CHP-7-TABLE-6>Table 7-6 shows the current list of modifiers.
 
 Z<CHP-7-TABLE-6>
 
-=headrow 
+=headrow
 
-=row 
+=row
 
 =cell Short
 
@@ -800,9 +823,9 @@ Z<CHP-7-TABLE-6>
 
 =cell Meaning
 
-=bodyrows 
+=bodyrows
 
-=row 
+=row
 
 =cell C<:i>
 
@@ -810,15 +833,15 @@ Z<CHP-7-TABLE-6>
 
 =cell Case-insensitive match.
 
-=row 
+=row
 
 =cell C<:I>
 
-=cell 
+=cell
 
 =cell Case-sensitive match (on by default).
 
-=row 
+=row
 
 =cell C<:c>
 
@@ -826,7 +849,7 @@ Z<CHP-7-TABLE-6>
 
 =cell Continue where the previous match on the string left off.
 
-=row 
+=row
 
 =cell C<:w>
 
@@ -835,39 +858,39 @@ Z<CHP-7-TABLE-6>
 =cell Literal whitespace in the pattern matches as C<\s+>
 or C<\s*>.
 
-=row 
+=row
 
 =cell C<:W>
 
-=cell 
+=cell
 
 =cell Turn off intelligent whitespace matching (return to default).
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell :R<N>C<x>/C<:x(>R<N>C<)>
 
 =cell Match the pattern R<N> times.
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell C<:>R<N>C<th>/C<:nth(>R<N>C<)>
 
 =cell Match the R<N>th occurrence of a pattern.
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell C<:once>
 
 =cell Only match the pattern once.
 
-=row 
+=row
 
 =cell C<:g>
 
@@ -876,7 +899,7 @@ or C<\s*>.
 =cell Match the pattern as many times as possible, but only possibilities
 that don't overlap.
 
-=row 
+=row
 
 =cell C<:e>
 
@@ -885,41 +908,41 @@ that don't overlap.
 =cell Match every possible occurrence of a pattern, even overlapping
 possibilities.
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell C<:u0>
 
 =cell . is a byte.
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell C<:u1>
 
 =cell . is a Unicode codepoint.
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell C<:u2>
 
 =cell . is a Unicode grapheme.
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell C<:u3>
 
 =cell . is language dependent.
 
-=row 
+=row
 
-=cell 
+=cell
 
 =cell C<:p5>
 

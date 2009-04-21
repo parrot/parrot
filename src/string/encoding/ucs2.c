@@ -21,6 +21,16 @@ UCS-2 encoding with the help of the ICU library.
 #include "parrot/parrot.h"
 #include "../unicode.h"
 
+#if !PARROT_HAS_ICU
+PARROT_DOES_NOT_RETURN
+static void no_ICU_lib(PARROT_INTERP) /* HEADERIZER SKIP */
+{
+    Parrot_ex_throw_from_c_args(interp, NULL,
+        EXCEPTION_LIBRARY_ERROR,
+        "no ICU lib loaded");
+}
+#endif
+
 /* HEADERIZER HFILE: src/string/encoding/ucs2.h */
 
 /* HEADERIZER BEGIN: static */
@@ -41,23 +51,23 @@ static UINTVAL codepoints(PARROT_INTERP, ARGIN(STRING *src))
 
 static UINTVAL get_byte(PARROT_INTERP,
     SHIM(const STRING *src),
-    UINTVAL offset)
+    SHIM(UINTVAL offset))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count)
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count))
         __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_bytes_inplace(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *return_string))
         __attribute__nonnull__(1);
 
@@ -80,8 +90,8 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * get_codepoints_inplace(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *dest_string))
         __attribute__nonnull__(1);
 
@@ -95,14 +105,14 @@ static void iter_init(PARROT_INTERP,
 
 static void set_byte(PARROT_INTERP,
     SHIM(const STRING *src),
-    UINTVAL offset,
-    UINTVAL byte)
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL byte))
         __attribute__nonnull__(1);
 
 static void set_bytes(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *new_bytes))
         __attribute__nonnull__(1);
 
@@ -115,8 +125,8 @@ static void set_codepoint(PARROT_INTERP,
 
 static void set_codepoints(PARROT_INTERP,
     SHIM(STRING *src),
-    UINTVAL offset,
-    UINTVAL count,
+    SHIM(UINTVAL offset),
+    SHIM(UINTVAL count),
     SHIM(STRING *new_codepoints))
         __attribute__nonnull__(1);
 
@@ -257,8 +267,7 @@ get_codepoint(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset)
     return s[offset];
 #else
     UNUSED(offset)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    no_ICU_lib(interp);
 #endif
 }
 
@@ -284,8 +293,7 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
     UNUSED(src)
     UNUSED(offset)
     UNUSED(codepoint)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    no_ICU_lib(interp);
 #endif
 }
 
@@ -508,8 +516,7 @@ codepoints(PARROT_INTERP, ARGIN(STRING *src))
 #if PARROT_HAS_ICU
     return src->bufused / sizeof (UChar);
 #else
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    no_ICU_lib(interp);
 #endif
 }
 
@@ -541,11 +548,12 @@ Moves the string iterator C<i> to the next UCS-2 codepoint.
 
 */
 
-#if PARROT_HAS_ICU
 static UINTVAL
 ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
 {
     ASSERT_ARGS(ucs2_decode_and_advance)
+
+#if PARROT_HAS_ICU
     UChar * const s = (UChar*) i->str->strstart;
     size_t pos = i->bytepos / sizeof (UChar);
 
@@ -556,6 +564,12 @@ ucs2_decode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i))
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);
     return c;
+#else
+    /* This function must never be called if compiled without ICU.
+     * See TT #557
+     */
+    PARROT_ASSERT(0);
+#endif
 }
 
 /*
@@ -574,11 +588,19 @@ static void
 ucs2_encode_and_advance(PARROT_INTERP, ARGMOD(String_iter *i), UINTVAL c)
 {
     ASSERT_ARGS(ucs2_encode_and_advance)
+
+#if PARROT_HAS_ICU
     UChar * const s = (UChar*) i->str->strstart;
     UINTVAL pos = i->bytepos / sizeof (UChar);
     s[pos++] = (UChar)c;
     i->charpos++;
     i->bytepos = pos * sizeof (UChar);
+#else
+    /* This function must never be called if compiled without ICU.
+     * See TT #557
+     */
+    PARROT_ASSERT(0);
+#endif
 }
 
 /*
@@ -595,11 +617,18 @@ static void
 ucs2_set_position(SHIM_INTERP, ARGMOD(String_iter *i), UINTVAL n)
 {
     ASSERT_ARGS(ucs2_set_position)
+
+#if PARROT_HAS_ICU
     i->charpos = n;
     i->bytepos = n * sizeof (UChar);
+#else
+    /* This function must never be called if compiled without ICU.
+     * See TT #557
+     */
+    PARROT_ASSERT(0);
+#endif
 }
 
-#endif
 
 /*
 
@@ -624,8 +653,7 @@ iter_init(PARROT_INTERP, ARGIN(const STRING *src), ARGOUT(String_iter *iter))
     iter->set_and_advance = ucs2_encode_and_advance;
     iter->set_position    = ucs2_set_position;
 #else
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    no_ICU_lib(interp);
 #endif
 }
 

@@ -2,47 +2,73 @@
 
 =head1 Parrot Assembly Language
 
-Z<CHP-5>
+Z<CHP-9>
 
 X<Parrot Assembly Language;;(see PASM)>
 X<PASM (Parrot assembly language)>
-Parrot assembly (PASM) is an assembly language written for Parrot's
-virtual CPU. Basic register operations or branches in PASM generally
-translate into a single CPU instruction. N<This means the JIT run time
-has a performance of up to one PASM instruction per processor cycle.>
-On the other hand, because it's designed to implement dynamic
-high-level languages, it has support for many advanced features such as
-lexical and global variables, objects, garbage collection,
-continuations, coroutines, and much more. PASM is very similar in
-many respects to PIR which we've already discussed, and in almost all
-cases PIR should be used instead of using PASM directly. However, all
-PASM syntax is also valid PIR syntax, so it's helpful to have an
-understanding of the underlying operations in PASM.
+We've seen some of the common ways for programming Parrot in earlier
+chapters: PIR is the intermediate language that's used most often for
+implementing routines in Parrot, NQP is used for writing grammar actions
+for high-level language compilers, PGE is used for specifying grammar
+rules, and various high-level languages that target Parrot are used for
+most other programming tasks. These options, though many and versatile,
+are not the only ways to interface with Parrot.
 
-X<.pasm files> A file with a F<.pasm> extension is treated as pure PASM
-code by Parrot, as is any file run with the C<-a> command-line option.
-This mode is mainly used for running pure PASM tests from the test suite,
-and is not likely to be useful for most developers.
+In regular assemblers, assembly language mnemonics share a one-to-one
+correspondence with the underlying machine code words that they
+represent. A simple assembler (and, for that matter, a simple disassembler)
+could be implemented as a mere lookup table. PIR does not have this kind
+of direct correspondance to PBC. A number of PIR features, especially the
+various directives, typically translate into a number of individual
+operations. Register names, such as C<$P7> don't indicate the actual
+storage location of the register in PIR either. The register allocator
+will intelligently move and rearrange registers to conserve memory, so
+the numbers you use to specify registers in PIR will be mapped to
+different numbers when compiled into PBC.
 
-Some people may ask why we have PASM at all, especially with PIR which
-has much nicer syntax. The answer is that PASM, like all assembly languages
-has a one-to-one correspondence with the underlying Parrot Bytecode (PBC).
-This makes it easy to translate from PBC to human-readable PASM code in
-a disassembler program. PIR code is basically just a thin wrapper over
-PASM, and you can write PASM code seamlessly in PIR files. It's always
-around, and it's good to be familiar with it.
+Because PIR and PBC can't be directly translated to one another, and
+because it can be difficult to disassemble low-level PBC back into the
+higher-level composite statements of PIR, especially after optimization,
+another tool is needed. That tool is PASM.
+
+PASM, the Parrot Assembly Language, is the lowest-level interface to
+Parrot. PASM instruction mnemonics do share a one-to-one correspondence
+to the underlying PBC opcodes, and for this reason is used by the Parrot
+disassembler instead of PIR. PASM is missing some of the features of
+PIR: Most directives, symbolic operators, C<if> and C<unless> compound
+statements, automatic register allocation, and a few other bits of
+syntactic sugar are missing from PASM. Because of these omissions, it is
+strongly recommended that most developers do not use PASM to write any
+large amount of code. Use PIR if you need to, or a higher-level language
+if you can.
+
+=head2 PASM Files
+
+X<.pasm files>
+The Parrot compilers, IMCC and PIRC, differentiate between PIR and PASM
+code files based on the file extension. A file with a F<.pasm> extension
+is treated as pure PASM code by Parrot, as is any file run with the C<-a>
+command-line option.
+
+Early in the Parrot project's history, PIR was treated as a pure superset
+of PASM. All PASM was valid PIR, but PIR added a few extra features that
+the programmers found to be nice. However, this situation has changed and
+PIR is no longer a strict superset of PASM. For this reason, PASM and
+PIR code need to be kept in files with separate extensions. As we mentioned
+before, C<.pasm> files are always treated as containing only PASM, while
+C<.pir> files are used for PIR code, by convention.
 
 =head2 Basics
 
-Z<CHP-5-SECT-2>
+Z<CHP-9-SECT-2>
 
 X<PASM (Parrot assembly language);overview>
 PASM has a simple syntax that will be familiar to people who have experience
 programming other assembly languages. Each statement stands on its own line
-and there is no end-of-line delimiter like is used in many other languages.
-Statements begin with a Parrot instruction, commonly referred to
-as an "opcode"N<More accurately, it should probably be referred to as a
-"mnemonic">. The arguments follow, separated by commas:
+and there is no end-of-line delimiter. Statements begin with a Parrot
+instruction, commonly referred to as an "opcode"N<More accurately, it should
+probably be referred to as a "mnemonic">. The arguments follow, separated by
+commas:
 
   [label] opcode dest, source, source ...
 
@@ -68,9 +94,10 @@ A label names a line of code so other instructions can refer to it.
 Label names consist of letters, numbers, and underscores, exactly the
 same syntax as is used for labels in PIR. Simple labels are often all
 capital letters to make them stand out from the rest of the source code
-more clearly. A label definition is simply the name of the label
-followed by a colon. It can be on its own line N<In fact, we recommend
-that it be on its own line, for readability.>:
+more clearly. This is just a common convention and is not a rule. A label
+can be in front of a line of code, or it can be on it's own line. Keeping
+labels separate is usually recommended for readability, but again this is
+just a suggestion and not a rule.
 
 =begin PASM
 
@@ -78,8 +105,6 @@ that it be on its own line, for readability.>:
       print "Norwegian Blue\n"
 
 =end PASM
-
-or before a statement on the same line:
 
 =begin PASM
 
@@ -101,6 +126,8 @@ a C<=cut> marker signals the end of a POD block.
 
   =cut
 
+  end
+
 =end PASM
 
 Besides POD, there are also ordinary 1-line comments using the # sign,
@@ -108,19 +135,24 @@ which is the same in PIR:
 
 =begin PASM
 
-  LABEL:                        # This is a comment for a label
-    print "Norwegian Blue\n"    # Print a color
+  LABEL:                        # This is a comment
+    print "Norwegian Blue\n"    # Print a color name
 
 =end PASM
 
 =head3 Constants
 
-Z<CHP-5-SECT-2.1>
+Z<CHP-9-SECT-2.1>
 
 X<PASM (Parrot assembly language);constants>
-Integer constants are signed integers.N<The size of integers is
-defined when Parrot is configured. It's typically 32 bits on 32-bit
-machines (a range of -2G<31> to +2G<31>-1) and twice that size on
+We've already seen constants in PIR, and for the most part the syntax
+is the same in PASM. We will give a brief refresher here, but see the
+chapter on PIR for a more in-depth discussion of constants and datatypes.
+
+Integer constants in Parrot are signed integers.N<The sizes of integers
+and all other data values like floats are defined when Parrot is
+configured and built. Integers are typically 32 bits wide on 32-bit
+computers (a range of -2G<31> to +2G<31>-1) and twice that size on
 64-bit processors.> Decimal integer constants can have a positive (C<+>) or
 negative (C<->) sign in front. Binary integers are preceded by C<0b>
 or C<0B>, and hexadecimal integers are preceded by C<0x> or C<0X>:
@@ -163,7 +195,7 @@ C<\r> (return), C<\f> (form feed), C<\\> (literal slash), C<\">
 
 =head3 Working with Registers
 
-Z<CHP-5-SECT-2.2>
+Z<CHP-9-SECT-2.2>
 
 X<PASM (Parrot assembly language);registers>
 X<registers;Parrot;;(see PASM, registers)>
@@ -173,38 +205,51 @@ sets: integers, floating-point numbers, strings, and Parrot objects
 the register set type and the number of the register. Register numbers
 are non-negative (zero and positive numbers), and do not have a
 pre-defined upper limit N<At least not a restrictive limit. Parrot
-registers are stored internally as an array, and the register number is
-an index to that array. If you call C<N2000> you are implicitly creating
-a register array with 2000 entries. This can carry a performance
-penalty>. For example:
+registers are stored internally as an array. More registers means a larger
+allocated array, which can bring penalties on some systems>. For example:
 
   I0   integer register #0
   N11  number or floating point register #11
   S2   string register #2
   P33  PMC register #33
 
-Integer and number registers hold values, while string and PMC
-registers contain pointers to allocated memory for a string header or
-a Parrot object.
+We see the immediate difference here that PASM registers do not have the
+C<$> dollar sign in front of them like PIR registers do. The syntactical
+difference indicates that there is an underlying semantic difference:
+In PIR, register numbers are just suggestions and registers are automatically
+allocated; In PASM, register numbers are literal offsets into the register
+array, and registers are not automatically managed. Let's take a look at a
+simple PIR function:
 
-In Chapter 3 we mentioned that a register name was a dollar-sign followed
-by a type identifier and then a number. Now we're naming registers with
-only a letter and number, not a dollar sign. Why the difference? The
-dollar sign indicates to Parrot that the register names are not literal,
-and that the register allocator should assign the identifier to a
-physical memory location. Without the dollar sign, the register number
-is an actual offset into the register array. C<N2000> is going to point
-to the two thousandth register, while C<$N2000> can point to any
-memory location that the register allocator determines to be free. Since
-PIR attempts to protect the programmer from some of the darkest details,
-Parrot requires that registers in PIR use the C<$> form. In PASM you can
-use either form, but we still recommend using the C<$> form so you don't
-have to worry about register allocations (and associated performance
-penalties) yourself.
+=begin PIR
+
+  .sub 'foo'
+      $I33 = 1
+  .end
+
+=end PIR
+
+This function allocates only one register. The register allocator counts that
+there is only one register needed, and converts C<$I33> to C<I0> internally.
+Now, let's look at a similar PASM subroutine:
+
+=begin PASM
+
+  foo:
+      set I33, 1
+  end
+
+=end PASM
+
+This function, which looks to perform the same simple operation actually is
+a little different. This small snippet of code actually allocates 33
+registers, even though only one of them is needed. It's up to the programmer
+to keep track of memory usage and not allocate more registers then are
+needed.
 
 =head4 Register assignment
 
-Z<CHP-5-SECT-2.2.1>
+Z<CHP-9-SECT-2.2.1>
 
 X<PASM (Parrot assembly language);registers;assignment>
 The most basic operation on registers is assignment using the C<set>
@@ -213,13 +258,12 @@ opcode:
 =begin PASM
 
   set I0, 42        # set integer register #0 to the integer value 42
-  set N3, 3.14159   # set number register #3 to an approximation of E<#x3C0>
+  set N3, 3.14159   # set number register #3 to an approximation of pi
   set I1, I0        # set register I1 to what I0 contains
   set I2, N3        # truncate the floating point number to an integer
 
 =end PASM
 
-PASM uses registers where a high-level language would use variables.
 The C<exchange> opcode swaps the contents of two registers of the same
 type:
 
@@ -230,80 +274,63 @@ type:
 
 =end PASM
 
-As we mentioned before, string and PMC registers are slightly
-different because they hold a pointer instead of directly holding a
-value. Assigning one string register to another:
-
-=begin PASM
-
-  set S0, "Ford"
-  set S1, S0
-  set S0, "Zaphod"
-  print S1                # prints "Ford"
-  end
-
-=end PASM
-
-doesn't make a copy of the string; it makes a copy of the pointer.
-N<Strings in Parrot use Copy-On-Write (COW) optimizations. When we
-call C<set S1, S0> we copy the pointer only, so both registers point
-to the same string memory. We don't actually make a copy of the string
-until one of two registers is modified.> Just after C<set> C<S1>, C<S0>,
-both C<S0> and C<S1> point to the same string. But assigning a constant
-string to a string register allocates a new string. When "Zaphod" is
-assigned to C<S0>, the pointer changes to point to the location of the
-new string, leaving the old string untouched. So strings act like simple
-values on the user level, even though they're implemented as pointers.
-
-Unlike strings, assignment to a PMC doesn't automatically create a new
-object; it only calls the PMC's VTABLE method for assignment N<and depending
-on implementation the VTABLE assignment operation might not actually
-assign anything. For now though, we can assume most VTABLE interfaces
-do what they say they do.>. So, rewriting the same example using a PMC
-has a completely different result:
+PMC registers contain references to PMC structures internally. So, the set
+opcode doesn't copy the entire PMC, it only copies the reference to the
+PMC data.
 
 =begin PASM
 
   new P0, "String"
   set P0, "Ford"
   set P1, P0
-  set P0, "Zaphod"
+  set P1, "Zaphod"
+  print P0                # prints "Zaphod"
   print P1                # prints "Zaphod"
   end
 
 =end PASM
 
-The C<new> opcode creates an instance of the C<.String> class. The
-class's vtable methods define how the PMC in C<P0> operates.  The
-first C<set> statement calls C<P0>'s vtable method
-C<set_string_native>, which assigns the string "Ford" to the PMC. When
-C<P0> is assigned to C<P1>:
+In this example, both C<P0> and C<P1> are both references to the same
+internal data structure, so when we set C<P1> to the string literal
+C<"Zaphod">, it overwrites the previous value C<"Ford">. Now, both C<P0>
+and C<P1> point to the String PMC C<"Zaphod">, even though it appears that
+we only set one of those two registers to that value.
+
+Strings in Parrot are also stored as references to internal data structures
+like PMCs. However, strings use Copy-On-Write (COW) optimizations. When we
+call C<set S1, S0> we copy the pointer only, so both registers point
+to the same string memory. We don't actually make a copy of the string
+until one of two registers is modified. Here's the same example using
+string registers instead of PMC registers:
 
 =begin PASM
 
-  set P1, P0
+  set S0, "Ford"
+  set S1, S0
+  set S1, "Zaphod"
+  print S0                # prints "Ford"
+  print S1                # prints "Zaphod"
+  end
 
 =end PASM
 
-it copies the pointer, so C<P1> and C<P0> are both aliases to the same
-PMC. Then, assigning the string "Zaphod" to C<P0> changes the
-underlying PMC, so printing C<P1> or C<P0> prints "Zaphod".N<Contrast
-this with C<assign> in "PMC Assignment" later in
-this chapter.>
+Some developers have suggested that PMCs should also use COW semantics to
+help optimize copy operations like this. However, it hasn't been implemented
+yet. One day in the future, Parrot might change this, but it hasn't changed
+yet.
 
 =head4 PMC object types
 
-Z<CHP-5-SECT-2.2.2>
+Z<CHP-9-SECT-2.2.2>
 
 X<PMCs (Polymorphic Containers);object types>
-Internally, PMC types are represented by positive integers, and
-built-in types by negative integers. PASM provides two opcodes to deal
-with types. Use C<typeof> to look up the name of a type from its
-integer value or to look up the named type of a PMC. Use C<find_type>
-to look up the integer value of a named type.
+Every PMC has a distinct type that determines its behavior through the
+vtable interface. Vtables, as we have mentioned previously, are arrays
+of function pointers to implement various operations and behaviors.
 
-When the source argument is a PMC and the destination is a string
-register, C<typeof> returns the name of the type:
+The C<typeof> opcode can be used to determine the type of a PMC. When
+the source argument is a PMC and the destination is a string register,
+C<typeof> returns the name of the type:
 
 =begin PASM
 
@@ -315,32 +342,24 @@ register, C<typeof> returns the name of the type:
 
 =end PASM
 
-In this example, C<typeof> returns the type name "String".
-
-X<PMCs (Polymorphic Containers);inheritance>
-X<Parrot;classes;inheritance>
-X<inheritance;with PMCs>
-All Parrot classes inherit from the class C<default>. The
-C<default>X<default PMC> class provides some
-default functionality, but mainly throws exceptions when the default
-variant of a method is called (meaning the subclass didn't define the
-method).
+Using C<typeof> with a PMC output parameter instead, it returns the Class
+PMC for that type.
 
 =head4 Autoboxing
 
-Z<CHP-5-SECT-2.2.3>
+Z<CHP-9-SECT-2.2.3>
 
 X<Autoboxing>
 As we've seen in the previous chapters about PIR, we can convert between
 primitive string, integer, and number types and PMCs. PIR used the C<=>
-operator to make these conversions. PASM doesn't have any symbolic operators
-so we have to use the underlying opcodes directly. In this case, the C<set>
-opcode is used to perform data copying and data conversions automatically.
+operator to make these conversions. PASM uses the C<set> opcode to do the
+same thing. C<set> will perform the type conversions for us automatically,
+in a process called I<autoboxing>.
 
 Assigning a primitive data type to a PMC of a String, Integer, or Float type
 converts that PMC to the new type. So, assigning a string to a Number PMC
 converts it into a String PMC. Assigning an integer value converts it to a
-C<Integer>, and assigning C<undef> morphs it to C<Undef>:
+C<Integer>, and assigning C<undef> converts it to an C<Undef> PMC:
 
 =begin PASM
 
@@ -363,9 +382,23 @@ to C<Integer>. This behavior only works for the wrapper PMC types for the
 primitive values string, int, and num. Other PMC classes will have different
 behaviors when you try to assign a primitive value to them.
 
+We can also use the C<box> opcode to explicitly convert an integer, a float,
+or a string into an appropriate PMC type.
+
+=begin PASM
+
+  box P0, 3
+  typeof S0, P0         # P0 is an "Integer"
+  box P1, "hello"
+  typeof S0, P1         # P1 is a "String"
+  box P2, 3.14
+  typeof S0, P2         # P2 is a "Number"
+
+=end PASM
+
 =head3 Math Operations
 
-Z<CHP-5-SECT-2.3>
+Z<CHP-9-SECT-2.3>
 
 X<PASM (Parrot assembly language);math operations>
 PASM has a full set of math instructions. These work with integers,
@@ -428,7 +461,7 @@ Opcodes" in Chapter 11.
 
 =head4 Unary math opcodes
 
-Z<CHP-5-SECT-2.3.1>
+Z<CHP-9-SECT-2.3.1>
 
 The unary opcodes have either a destination argument and a source
 argument, or a single argument as destination and source. Some of the
@@ -446,7 +479,7 @@ most common unary math opcodes are C<inc> (increment), C<dec>
 
 =head4 Binary math opcodes
 
-Z<CHP-5-SECT-2.3.2>
+Z<CHP-9-SECT-2.3.2>
 
 X<PASM (Parrot assembly language);math operations;binary>
 Binary opcodes have two source arguments and a destination argument.
@@ -471,7 +504,7 @@ multiple).
 
 =head4 Floating-point operations
 
-Z<CHP-5-SECT-2.3.3>
+Z<CHP-9-SECT-2.3.3>
 
 X<PASM (Parrot assembly language);math operations;floating-point>
 Although most of the math operations work with both floating-point
@@ -510,7 +543,7 @@ variant that implements C's C<atan2()>:
 
 =head3 Working with Strings
 
-Z<CHP-5-SECT-2.4>
+Z<CHP-9-SECT-2.4>
 
 X<PASM (Parrot assembly language);string operations>
 String operations work with string registers and with PMCs that implement a
@@ -519,7 +552,7 @@ arguments to be String PMCs.
 
 =head4 Concatenating strings
 
-Z<CHP-5-SECT-2.4.1>
+Z<CHP-9-SECT-2.4.1>
 
 X<PASM (Parrot assembly language);string operations;concatenation>
 Use the C<concat>X<concat opcode (PASM)> opcode to concatenate
@@ -569,7 +602,7 @@ the result in C<P2>.
 
 =head4 Repeating strings
 
-Z<CHP-5-SECT-2.4.2>
+Z<CHP-9-SECT-2.4.2>
 
 X<PASM (Parrot assembly language);string operations;repeating strings>
 The C<repeat>X<repeat opcode (PASM)> opcode repeats a string a certain
@@ -590,7 +623,7 @@ five times and stores a pointer to it in C<S1>.
 
 =head4 Length of a string
 
-Z<CHP-5-SECT-2.4.3>
+Z<CHP-9-SECT-2.4.3>
 
 X<PASM (Parrot assembly language);string operations;length>
 The C<length>X<length opcode (PASM)> opcode returns the length of a
@@ -611,7 +644,7 @@ C<length> doesn't have an equivalent for PMC strings.
 
 =head4 Substrings
 
-Z<CHP-5-SECT-2.4.4>
+Z<CHP-9-SECT-2.4.4>
 
 X<PASM (Parrot assembly language);string operations;substrings>
 The simplest version of the C<substr>X<substr opcode (PASM)> opcode
@@ -678,7 +711,7 @@ The PMC versions of C<substr> are not yet implemented.
 
 =head4 Chopping strings
 
-Z<CHP-5-SECT-2.4.5>
+Z<CHP-9-SECT-2.4.5>
 
 X<PASM (Parrot assembly language);string operations;chopping strings>
 The C<chopn>X<chopn opcode (PASM)> opcode removes characters from the
@@ -725,7 +758,7 @@ untouched:
 
 =head4 Copying strings
 
-Z<CHP-5-SECT-2.4.6>
+Z<CHP-9-SECT-2.4.6>
 
 X<PASM (Parrot assembly language);string operations;copying>
 The C<clone>X<clone opcode (PASM)> opcode makes a deep copy of a
@@ -757,7 +790,7 @@ memory location on assignment.
 
 =head4 Converting characters
 
-Z<CHP-5-SECT-2.4.7>
+Z<CHP-9-SECT-2.4.7>
 
 X<PASM (Parrot assembly language);string operations;converting strings>
 The C<chr>X<chr opcode (PASM)> opcode takes an integer value and
@@ -794,7 +827,7 @@ the last character.
 
 =head4 Formatting strings
 
-Z<CHP-5-SECT-2.4.8>
+Z<CHP-9-SECT-2.4.8>
 
 X<PASM (Parrot assembly language);string operations;formatting
 strings> The C<sprintf>X<sprintf opcode (PASM)> opcode generates a
@@ -816,11 +849,11 @@ but with some extensions for Parrot data types. Each format field in
 the string starts with a C<%>
 X<% (percent sign);% format strings for sprintf opcode (PASM)> and
 ends with a character specifying the output format. The output format
-characters are listed in Table 5-1.
+characters are listed in Table 9-1.
 
 =begin table picture Format characters
 
-Z<CHP-5-TABLE-1>
+Z<CHP-9-TABLE-1>
 
 =headrow
 
@@ -934,11 +967,11 @@ whichever fits best.
 
 Each format field can be specified with several options: R<flags>,
 R<width>, R<precision>, and R<size>. The format flags are listed in
-Table 5-2.
+Table 9-2.
 
 =begin table picture Format flags
 
-Z<CHP-5-TABLE-2>
+Z<CHP-9-TABLE-2>
 
 =headrow
 
@@ -989,11 +1022,11 @@ If either R<width> or R<precision> is an asterisk (C<*>), it takes its
 value from the next argument in the PMC.
 
 The R<size> modifier defines the type of the argument the field takes.
-The flags are listed in Table 5-3.
+The flags are listed in Table 9-3.
 
 =begin table picture Size flags
 
-Z<CHP-5-TABLE-3>
+Z<CHP-9-TABLE-3>
 
 =headrow
 
@@ -1084,7 +1117,7 @@ examples of format strings.
 
 =head4 Testing for substrings
 
-Z<CHP-5-SECT-2.4.9>
+Z<CHP-9-SECT-2.4.9>
 
 X<PASM (Parrot assembly language);string operations;testing for substrings>
 The C<index>X<index opcode (PASM)> opcode searches for a substring
@@ -1168,7 +1201,7 @@ its length is zero.
 
 =head3 Logical and Bitwise Operations
 
-Z<CHP-5-SECT-2.6>
+Z<CHP-9-SECT-2.6>
 
 X<PASM (Parrot assembly language);bitwise operations>
 X<PASM (Parrot assembly language);logical operations>
@@ -1284,7 +1317,7 @@ specified number of bits:
 
 =head2 Working with PMCs
 
-Z<CHP-5-SECT-3>
+Z<CHP-9-SECT-3>
 
 In most of the examples we've shown so far, X<PMCs (Polymorphic
 Containers);working with> PMCs just duplicate the functionality of
@@ -1294,7 +1327,7 @@ each with its own set of operations.
 
 =head3 Aggregates
 
-Z<CHP-5-SECT-3.1>
+Z<CHP-9-SECT-3.1>
 
 PMCs can define complex types that hold multiple values. These are
 commonly called "X<PMCs (Polymorphic Containers);aggregate>
@@ -1310,7 +1343,7 @@ described here.
 
 =head4 Arrays
 
-Z<CHP-5-SECT-3.1.1>
+Z<CHP-9-SECT-3.1.1>
 
 X<PMCs (Polymorphic Containers);arrays>
 The C<Array>X<Array PMC> PMC is an ordered aggregate with
@@ -1359,7 +1392,7 @@ C<pop>, C<shift>, and C<unshift> (you'll find them in
 
 =head4 Hashes
 
-Z<CHP-5-SECT-3.1.2>
+Z<CHP-9-SECT-3.1.2>
 
 X<PMCs (Polymorphic Containers);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate with
@@ -1395,7 +1428,7 @@ with hashes: it removes a key/value pair.
 
 =head4 Iterators
 
-Z<CHP-5-SECT-3.1.3>
+Z<CHP-9-SECT-3.1.3>
 
 Iterators extract values from an aggregate PMC. You create an iterator
 by creating a new C<Iterator> PMC, and passing the array to C<new> as
@@ -1461,7 +1494,7 @@ since they don't define any order for their keys.
 
 =head4 Data structures
 
-Z<CHP-5-SECT-3.1.4>
+Z<CHP-9-SECT-3.1.4>
 
 X<PMCs (Polymorphic Containers);data structures>
 Arrays and hashes can hold any data type, including other aggregates.
@@ -1499,7 +1532,7 @@ or string values.
 
 =head3 PMC Assignment
 
-Z<CHP-5-SECT-3.2>
+Z<CHP-9-SECT-3.2>
 
 We mentioned before that C<set> on two X<PMCs (Polymorphic
 Containers);assignment> PMCs simply aliases them both to the same object,
@@ -1535,7 +1568,7 @@ or reuse the source object (as with C<set>).
 
 =head3 Properties
 
-Z<CHP-5-SECT-3.3>
+Z<CHP-9-SECT-3.3>
 
 X<PMCs (Polymorphic Containers);properties>
 PMCs can have additional values attached to them as "properties" of
@@ -1597,7 +1630,7 @@ C<prophash>X<prophash opcode (PASM)>.
 
 =head2 Flow Control
 
-Z<CHP-5-SECT-4>
+Z<CHP-9-SECT-4>
 
 X<PASM (Parrot assembly language);flow control>
 Although it has many advanced features, at heart PASM is an assembly
@@ -1652,7 +1685,7 @@ chance of crashing the interpreter.
 
 =head3 Conditional Branches
 
-Z<CHP-5-SECT-4.1>
+Z<CHP-9-SECT-4.1>
 
 X<PASM (Parrot assembly language);conditional branches>
 X<conditional branches in PASM>
@@ -1740,7 +1773,7 @@ actually the same object (have the same address):
 
 =head3 Iteration
 
-Z<CHP-5-SECT-4.2>
+Z<CHP-9-SECT-4.2>
 
 X<iteration;in PASM>
 X<PASM (Parrot assembly language);iteration>
@@ -1811,7 +1844,7 @@ loop.
 
 =head2 Lexicals and Globals
 
-Z<CHP-5-SECT-6>
+Z<CHP-9-SECT-6>
 
 So far, we've been treating Parrot registers like the variables of a
 high-level language. This is fine, as far as it goes, but it isn't the
@@ -1831,7 +1864,7 @@ their values.
 
 =head3 Globals
 
-Z<CHP-5-SECT-6.1>
+Z<CHP-9-SECT-6.1>
 
 X<PASM (Parrot assembly language);global variables>
 Global variables are stored in a C<Hash>, so every variable name
@@ -1903,7 +1936,7 @@ aren't finished yet.
 
 =head3 Lexicals
 
-Z<CHP-5-SECT-6.2>
+Z<CHP-9-SECT-6.2>
 
 X<PASM (Parrot assembly language);lexical variables>
 Lexical variables are stored in a lexical scratchpad. There's one pad
@@ -1912,7 +1945,7 @@ elements can be stored either by name or by numeric index.
 
 =head4 Basic instructions
 
-Z<CHP-5-SECT-6.2.1>
+Z<CHP-9-SECT-6.2.1>
 
 To store a lexical variable in the current scope pad, use C<store_lex>.
 Likewise, use C<find_lex> to retrieve a variable from the current pad.
@@ -1932,7 +1965,7 @@ Likewise, use C<find_lex> to retrieve a variable from the current pad.
 
 =head2 Subroutines
 
-Z<CHP-5-SECT-7>
+Z<CHP-9-SECT-7>
 
 X<subroutines>
 Subroutines and methods are the basic building blocks of larger
@@ -1978,7 +2011,7 @@ opcode (PASM)> opcode:
 
 =head3 Calling Conventions
 
-Z<CHP-5-SECT-7.1>
+Z<CHP-9-SECT-7.1>
 
 X<registers;usage for subroutine calls>
 X<subroutines;register usage>
@@ -1994,7 +2027,7 @@ agree on all the answers.
 
 =head4 Parrot calling conventions
 
-Z<CHP-5-SECT-7.1.2>
+Z<CHP-9-SECT-7.1.2>
 
 Internal subroutines can use whatever calling convention serves them
 best. Externally visible subroutines and methods need stricter rules.
@@ -2019,7 +2052,7 @@ X<Continuation Passing Style (CPS)>
 
 =head3 Native Call Interface
 
-Z<CHP-5-SECT-7.2>
+Z<CHP-9-SECT-7.2>
 
 X<subroutines;calling conventions;NCI>
 A special version of the Parrot calling conventions are used by the
@@ -2030,17 +2063,18 @@ This is a simplified version of the first test in F<t/pmc/nci.t>:
 
 =begin PASM
 
-    loadlib P1, "libnci"          # get library object for a shared lib
+    loadlib P1, "libnci_test"     # get library object for a shared lib
     print "loaded\n"
     dlfunc P0, P1, "nci_dd", "dd" # obtain the function object
     print "dlfunced\n"
     set I0, 1                     # prototype used - unchecked
-    set N5, 4.0                   # first argument
-    invoke                        # call nci_dd
+    set_args "0", 4.0             # set the argument
+    get_results "0", N5           # prepare to store the return value
+    invokecc P0                   # call nci_dd
     ne N5, 8.0, nok_1             # the test functions returns 2*arg
     print "ok 1\n"
     end
-  nok_1:
+    nok_1:
     #...
 
 =end PASM
@@ -2059,11 +2093,11 @@ argument) with a known function signature (fourth argument). The
 function signature is a string where the first character is the return
 value and the rest of the parameters are the function parameters. The
 characters used in X<NCI (Native Call Interface);function signatures>
-NCI function signatures are listed in Table 5-5.
+NCI function signatures are listed in Table 9-5.
 
 =begin table picture Function signature letters
 
-Z<CHP-5-TABLE-5>
+Z<CHP-9-TABLE-5>
 
 =headrow
 
@@ -2196,7 +2230,7 @@ F<docs/pdds/pdd16_native_call.pod> and F<docs/pmc/struct.pod>.
 
 =head3 Coroutines
 
-Z<CHP-5-SECT-7.4>
+Z<CHP-9-SECT-7.4>
 
 As we mentioned in the previous chapter, coroutines are
 X<subroutines;coroutines> subroutines that
@@ -2277,7 +2311,7 @@ coroutines have their own register frame stacks.
 
 =head3 Continuations
 
-Z<CHP-5-SECT-7.5>
+Z<CHP-9-SECT-7.5>
 
 X<continuations>
 X<subroutines;continuations>
@@ -2315,7 +2349,7 @@ This prints:
 
 =head3 Evaluating a Code String
 
-Z<CHP-5-SECT-7.6>
+Z<CHP-9-SECT-7.6>
 
 X<code strings, evaluating>
 This isn't really a subroutine operation, but it does produce a code
@@ -2369,7 +2403,7 @@ compiler in a shared library.
 
 =head2 Exceptions and Exception Handlers
 
-Z<CHP-5-SECT-8>
+Z<CHP-9-SECT-8>
 
 X<exceptions>
 X<exception handlers>
@@ -2463,7 +2497,7 @@ idea to combine the two.
 
 =head2 Events
 
-Z<CHP-5-SECT-9>
+Z<CHP-9-SECT-9>
 
 An event is a notification that something has happened: a timer
 expired, an IO operation finished, a thread sent a message to
@@ -2483,7 +2517,7 @@ design is subject to change.
 
 =head3 Timers
 
-Z<CHP-5-SECT-9.1>
+Z<CHP-9-SECT-9.1>
 
 C<Timer> objects are the replacement for Perl 5's C<alarm> handlers.
 They are also a significant improvement. Timers can fire once or
@@ -2494,7 +2528,7 @@ please consult the documentation for examples.
 
 =head3 Signals
 
-Z<CHP-5-SECT-9.2>
+Z<CHP-9-SECT-9.2>
 
 Signal handling is related to events. When Parrot gets a signal it
 needs to handle from the OS, it converts that signal into an event and
@@ -2532,7 +2566,7 @@ handler, so this example won't work on other platforms.>
 
 =head2 Threads
 
-Z<CHP-5-SECT-10>
+Z<CHP-9-SECT-10>
 
 Threads allow multiple pieces of code to run in parallel. This is
 useful when you have multiple physical CPUs to share the load of
@@ -2703,7 +2737,7 @@ of opcodes.
 
 =head2 Loading Bytecode
 
-Z<CHP-5-SECT-11>
+Z<CHP-9-SECT-11>
 
 In addition to running Parrot bytecode on the command-line, you can
 also load pre-compiled bytecode directly into your PASM source file.
@@ -2790,7 +2824,7 @@ before C<load_bytecode> returns, so the final output is:
 
 =head2 Classes and Objects
 
-Z<CHP-5-SECT-12>
+Z<CHP-9-SECT-12>
 
 This section revolves around one complete example that defines a
 class, instantiates objects, and uses them. The whole example is
@@ -2798,7 +2832,7 @@ included at the end of the section.
 
 =head3 Class declaration
 
-Z<CHP-5-SECT-12.1>
+Z<CHP-9-SECT-12.1>
 
 X<classes;in PASM>
 The C<newclass>X<newclass opcode (PASM)> opcode defines a new class.
@@ -2829,7 +2863,7 @@ method named "__init" and calls it if it exists.
 
 =head3 Attributes
 
-Z<CHP-5-SECT-12.2>
+Z<CHP-9-SECT-12.2>
 
 X<attributes;in PASM>
 X<classes;attributes>
@@ -2916,7 +2950,7 @@ again after you modify its value:
 
 =head3 Methods
 
-Z<CHP-5-SECT-12.3>
+Z<CHP-9-SECT-12.3>
 
 X<methods;in PASM>
 X<classes;methods>
@@ -2981,7 +3015,7 @@ to you.
 
 =head4 Overriding vtable functions
 
-Z<CHP-5-SECT-12.3.1>
+Z<CHP-9-SECT-12.3.1>
 
 Every object inherits a default set of I<vtable> functions from the
 C<ParrotObject> PMC, but you can also override them with your own
@@ -3060,7 +3094,7 @@ whenever an integer or string value is retrieved from a C<Foo> object:
 
 =head3 Inheritance
 
-Z<CHP-5-SECT-12.4>
+Z<CHP-9-SECT-12.4>
 
 X<inheritance;in PASM>
 X<classes;inheritance>
@@ -3137,7 +3171,7 @@ the class:
 
 =head3 Additional Object Opcodes
 
-Z<CHP-5-SECT-12.5>
+Z<CHP-9-SECT-12.5>
 
 The C<isa> and C<can> opcodes are also useful when working with
 objects. C<isa>X<isa opcode (PASM)> checks whether an object belongs to or
@@ -3154,7 +3188,7 @@ an object has a particular method. Both return a true or false value.
 
 =head3 Complete Example
 
-Z<CHP-5-SECT-12.6>
+Z<CHP-9-SECT-12.6>
 
 =begin PASM
 

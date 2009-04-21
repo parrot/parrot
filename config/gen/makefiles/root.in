@@ -1221,7 +1221,7 @@ $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
 $(IO_DIR)/filehandle$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
-	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_continuation.h
+	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(OPS_DIR)/pic.ops : $(SRC_DIR)/pmc/pmc_fixedintegerarray.h
 
@@ -1237,7 +1237,8 @@ $(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	$(SRC_DIR)/pmc/pmc_continuation.h
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
 
-$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c
+$(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c \
+	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(INC_DIR)/oplib/core_ops_switch.h : $(OPS_DIR)/core_ops_switch.c
 
@@ -1466,10 +1467,16 @@ test_pbc_annotation_persistence : test_prep
 
 # Run test cases with a single call of t/harness. Users have to look at only
 # one report. The default set of tests to run is contained in t/harness,
-# make any edits there.
+# make any edits there. Some tests are run in a separate harness only because
+# integrating them in a single run is difficult.
+
 # Normal test package
-test : test_prep test_pbc_annotation_persistence
+test : test_prep test_pbc_annotation_persistence nqp_test
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
+
+# Test the NQP compiler
+nqp_test : test_prep
+	$(MAKE) compilers/nqp test
 
 # run the test suite, create a TAP archive and send it off to smolder
 smolder_test : test_prep
@@ -2216,13 +2223,6 @@ release : MANIFEST MANIFEST.generated
     tar -zcv -T - -f parrot-$(VERSION).tar.gz
 	mv MANIFEST.real MANIFEST
 	rm parrot-$(VERSION)
-
-rpms : release
-	mkdir -p rpmbuild/SOURCES rpmbuild/SPEC rpmbuild/BUILD rpmbuild/RPMS rpmbuild/SRPMS
-	cp parrot-$(VERSION).tar.gz rpmbuild/SOURCES
-	cp parrot.spec rpmbuild/SPEC
-	echo '%_topdir '`pwd`'/rpmbuild' > .rpmmacros
-	HOME=`pwd`; rpmbuild -ba parrot.spec
 
 win32-inno-installer : world installable
 	$(PERL) tools/dev/mk_inno.pl
