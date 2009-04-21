@@ -348,18 +348,6 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 /*
 
-=item C<void* get_pointer()>
-
-=cut
-
-*/
-
-    VTABLE void* get_pointer() {
-        return PMC_array(SELF);
-    }
-
-/*
-
 =item C<void push_float(FLOATVAL value)>
 
 =item C<void push_integer(INTVAL value)>

@@ -745,7 +745,8 @@ inline op set_addr(invar PMC, invar LABEL) {
 }
 
 inline op get_addr(out INT, invar PMC) {
-    $1 = (INTVAL)($2);
+    void *ptr = VTABLE_get_pointer(interp, $2);
+    $1        = (INTVAL)ptr;
 }
 
 =back
