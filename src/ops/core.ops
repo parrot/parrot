@@ -5,7 +5,7 @@
 
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
-#include "../runcore/runcore_guts.h"
+#include "parrot/runcore_api.h"
 #include "../pmc/pmc_continuation.h"
 #include "../pmc/pmc_parrotlibrary.h"
 
