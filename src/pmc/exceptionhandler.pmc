@@ -79,31 +79,6 @@ Mark any active exception handler data as live.
             pobject_lives(interp, (PObj *)core_struct->handled_types_except);
     }
 
-    /*
-     * can't reuse Continuation's destroy yet -
-     * RT #46703 fix ref_count handling for exception_handlers first
-     *
-     * An ExceptionHandler is kind of a limited Continuation
-     * (can only call 'up the stack').  Therefore we probably don't
-     * have to convert all RetContinuations to real Continuations
-     */
-
-    VTABLE void destroy() {
-        Parrot_cont                        * const cc          = (Parrot_cont *)PMC_cont(SELF);
-        Parrot_ExceptionHandler_attributes * const core_struct =
-            PARROT_EXCEPTIONHANDLER(SELF);
-
-        if (cc) {
-            mem_sys_free(cc);
-            PMC_cont(SELF) = NULL;
-        }
-
-        if (core_struct) {
-            mem_sys_free(core_struct);
-            PMC_data(SELF) = NULL;
-        }
-    }
-
     VTABLE PMC *clone() {
         PMC * const result = SUPER();
         PObj_custom_mark_CLEAR(result);
