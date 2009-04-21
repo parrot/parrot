@@ -27,6 +27,7 @@ New in 1.1.0
   + Add a parrot-fuzzer
 - Miscellaneous
   + Improve Debian/Ubuntu package
+  + various bugfixes, code cleanups, and coding standard fixes
 
 
 New in 1.0.0
