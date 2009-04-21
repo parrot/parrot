@@ -1,9 +1,9 @@
 {
-    "release.version"  : "1.0.0",
-    "release.name"     : "Haru Tatsu",
+    "release.version"  : "1.1.0",
+    "release.name"     : "Half-moon Conure",
     "release.day"      : "Tuesday",
-    "release.date"     : "17 March 2009",
-    "release.nextdate" : "21 April 2009",
+    "release.date"     : "21 April 2009",
+    "release.nextdate" : "19 May 2009",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,13 +11,13 @@
     "web.repository"   : "https://svn.parrot.org/parrot/trunk/",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "18 Mar 2009",
+    "bugday.date"      : "16 May 2009",
 
     "wiki.root"        : "https://trac.parrot.org/parrot/wiki/",
-    "wiki.bugday"      : "bug_day_2009_04_18",
+    "wiki.bugday"      : "bug_day_2009_05_16",
 
     "cpan.search"      : "http://search.cpan.org/dist/parrot",
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/1.0.0/",
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/1.1.0/",
     "subversion.root"  : "http://subversion.tigris.org/",
     "svk.root"         : "http://svk.bestpractical.com/"
 }

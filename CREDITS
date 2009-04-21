@@ -353,6 +353,7 @@ D: a patch to remove slash_exec from config
 D: language Lua
 D: language WMLScript (PIR translator)
 D: Pipp
+D: Release manager for 1.1.0
 
 N: Garrett Rooney
 D: Fix typo in PARROT_BIGENDIAN case
