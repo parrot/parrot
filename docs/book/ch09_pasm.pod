@@ -126,6 +126,8 @@ a C<=cut> marker signals the end of a POD block.
 
   =cut
 
+  end
+
 =end PASM
 
 Besides POD, there are also ordinary 1-line comments using the # sign,
@@ -222,8 +224,8 @@ simple PIR function:
 =begin PIR
 
   .sub 'foo'
-      $I33 = 1;
-  .return
+      $I33 = 1
+  .end
 
 =end PIR
 
@@ -234,7 +236,8 @@ Now, let's look at a similar PASM subroutine:
 =begin PASM
 
   foo:
-      I33 = 1
+      set I33, 1
+  end
 
 =end PASM
 
@@ -2060,17 +2063,18 @@ This is a simplified version of the first test in F<t/pmc/nci.t>:
 
 =begin PASM
 
-    loadlib P1, "libnci"          # get library object for a shared lib
+    loadlib P1, "libnci_test"     # get library object for a shared lib
     print "loaded\n"
     dlfunc P0, P1, "nci_dd", "dd" # obtain the function object
     print "dlfunced\n"
     set I0, 1                     # prototype used - unchecked
-    set N5, 4.0                   # first argument
-    invoke                        # call nci_dd
+    set_args "0", 4.0             # set the argument
+    get_results "0", N5           # prepare to store the return value
+    invokecc P0                   # call nci_dd
     ne N5, 8.0, nok_1             # the test functions returns 2*arg
     print "ok 1\n"
     end
-  nok_1:
+    nok_1:
     #...
 
 =end PASM
