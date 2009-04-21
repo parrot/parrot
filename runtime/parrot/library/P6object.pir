@@ -674,12 +674,16 @@ will be used in lieu of this one.)
 
     $P0 = self.'HOW'()
     parrotclass = $P0.'get_parrotclass'(self)
+
     $S0 = parrotclass
     if $S0 == 'Perl6Object' goto accept_anyway
-    if $S0 == 'Junction' goto normal_check
-    if $S0 == 'Any' goto accept_anyway
-  normal_check:
 
+    $I0 = isa topic, 'Junction'
+    if $I0 goto normal_check
+
+    if $S0 == 'Any' goto accept_anyway
+
+  normal_check:
     $I0 = can topic, 'HOW'
     unless $I0 goto end
     topichow = topic.'HOW'()
