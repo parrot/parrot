@@ -182,11 +182,11 @@ sub _handle_asm {
     my $sjit = "$arg->{jitbase}/$arg->{cpuarch}/$arg->{jitarchname}.s";
     my $asm = "$arg->{jitbase}/$arg->{cpuarch}/asm.s";
     if ( -e $sjit ) {
-        copy_if_diff( $sjit, "src/asmfun.s" );
+        copy_if_diff( $sjit, "src/asmfun.S" );
         $arg->{conf}->data->set( asmfun_o => 'src/asmfun$(O)' );
     }
     elsif ( -e $asm ) {
-        copy_if_diff( $asm, "src/asmfun.s" );
+        copy_if_diff( $asm, "src/asmfun.S" );
         $arg->{conf}->data->set( asmfun_o => 'src/asmfun$(O)' );
     }
     else {

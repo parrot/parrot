@@ -523,7 +523,7 @@ MAKE := @make_c@
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .s .pmc .dump $(O) .str .pir .pbc
+.SUFFIXES : .c .S .s .pmc .dump $(O) .str .pir .pbc
 
 # Passing an empty argument in @ARGV to cc_flags.pl to indicate where extra -Is
 # (etc) should go. Otherwise it will insert them after the first space, which
@@ -536,6 +536,8 @@ MAKE := @make_c@
 # XXX probably should detect assembler, but right now this is only used on Sparc
 
 .s$(O) : # suffix rule (limited support)
+	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+.S$(O) : # suffix rule (limited support)
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 # XXX These obviously require parrot: had trouble adding parrot as a dependency
