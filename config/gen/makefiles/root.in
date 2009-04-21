@@ -430,7 +430,7 @@ INTERP_O_FILES := \
     $(SRC_DIR)/pmc_freeze$(O) \
     $(SRC_DIR)/pmc$(O) \
     $(SRC_DIR)/runcore/main$(O)  \
-    $(SRC_DIR)/runops_cores$(O) \
+    $(SRC_DIR)/runcore/cores$(O) \
     $(SRC_DIR)/scheduler$(O) \
     $(SRC_DIR)/spf_render$(O) \
     $(SRC_DIR)/spf_vtable$(O) \
@@ -1175,7 +1175,7 @@ $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
-$(SRC_DIR)/runops_cores$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/trace.h
 
 $(SRC_DIR)/stacks$(O) : $(GENERAL_H_FILES)
 

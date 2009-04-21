@@ -1,9 +1,9 @@
 /* trace.h
- *  Copyright (C) 2001-2007, Parrot Foundation.
+ *  Copyright (C) 2001-2009, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
- *     Tracing support for runops_cores.c.
+ *     Tracing support for src/runops/cores.c.
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:

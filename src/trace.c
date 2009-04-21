@@ -8,7 +8,8 @@ src/trace.c - Tracing
 
 =head1 DESCRIPTION
 
-Tracing support for the C<runops_slow_core()> function in F<src/runops_cores.c>.
+Tracing support for the C<runops_slow_core()> function in
+F<src/runcore/cores.c>.
 
 This is turned on with Parrot's C<-t> option.
 

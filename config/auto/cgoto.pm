@@ -64,7 +64,7 @@ sub _evaluate_cgoto {
 
 $(OPS_DIR)/core_ops_cg$(O): $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_cg.c
 $(OPS_DIR)/core_ops_cgp$(O): $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_cgp.c
-$(SRC_DIR)/runops_cores.c: $(INC_DIR)/oplib/core_ops_cgp.h
+$(SRC_DIR)/runcore/cores.c: $(INC_DIR)/oplib/core_ops_cgp.h $(SRC_DIR)/trace.h
 
 $(INC_DIR)/oplib/core_ops_cg.h: $(OPS_DIR)/core_ops_cg.c
 
