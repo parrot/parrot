@@ -185,12 +185,12 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
                 "Parrot VM: Can't modify a constant\n");
     }
 
-    /* Do we have an extension area? */
-    has_ext = (PObj_is_PMC_EXT_TEST(pmc) && pmc->pmc_ext);
-
     /* Does the old PMC need any resources freed? */
     if (PObj_active_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
+
+    /* Do we have an extension area? */
+    has_ext = (PObj_is_PMC_EXT_TEST(pmc) && pmc->pmc_ext);
 
     /* Do we need one? */
     if (new_vtable->flags & VTABLE_PMC_NEEDS_EXT) {
