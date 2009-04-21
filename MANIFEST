@@ -1453,7 +1453,6 @@ src/pmc/unmanagedstruct.pmc                                 [devel]src
 src/pmc_freeze.c                                            []
 src/runcore/main.c                                          []
 src/runops_cores.c                                          []
-src/runops_cores.h                                          []
 src/scheduler.c                                             []
 src/spf_render.c                                            []
 src/spf_vtable.c                                            []

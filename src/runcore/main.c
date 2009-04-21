@@ -37,7 +37,6 @@ have the same number of elements because there is a one-to-one mapping.
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"
-#include "../runops_cores.h"
 #if JIT_CAPABLE
 #  include "parrot/exec.h"
 #  include "../jit.h"
