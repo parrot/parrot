@@ -47,7 +47,7 @@ Sort this array, optionally using the provided cmp_func
         const INTVAL n = SELF.elements();
 
         if (n > 1)
-           Parrot_quicksort(interp, (void **)PMC_array(SELF), n, cmp_func);
+           Parrot_quicksort(interp, (void **)SELF.get_pointer(), n, cmp_func);
     }
 
 /*
@@ -208,6 +208,18 @@ RT #46673 implement freeze/thaw and use that instead.
         res = Parrot_str_append(INTERP, res, CONST_STRING(INTERP, ")"));
 
         return res;
+    }
+
+/*
+
+=item C<void* get_pointer()>
+
+=cut
+
+*/
+
+    VTABLE void* get_pointer() {
+        return PMC_array(SELF);
     }
 
 /*
