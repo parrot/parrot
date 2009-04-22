@@ -266,6 +266,11 @@ the sub.
     nskey = subpir.'key'(ns)
 
   subpir_start:
+    $P0 = node['loadinit']
+    if null $P0 goto loadinit_done
+    self.'pir'($P0)
+  loadinit_done:
+
     $P0 = node.'compiler'()
     unless $P0 goto subpir_post
   subpir_compiler:

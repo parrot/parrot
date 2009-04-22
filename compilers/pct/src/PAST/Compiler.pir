@@ -924,7 +924,7 @@ Return the POST representation of a C<PAST::Block>.
     lipast = node.'loadinit'()
     lipost = self.'as_post'(lipast, 'rtype'=>'v')
     lisub.'push'(lipost)
-    bpost.'unshift'(lisub)
+    bpost['loadinit'] = lisub
   loadinit_done:
 
     ##  restore previous outer scope and symtable
