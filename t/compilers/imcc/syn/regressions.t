@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 9;
+use Parrot::Test tests => 10;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -125,6 +125,22 @@ pir_error_output_like( <<'CODE', <<'OUT', ':: not allowed in identifiers (RT #48
 CODE
 /syntax error/
 OUT
+
+TODO: {
+  local $TODO = "TT #575";
+
+pir_output_is( <<'CODE', <<'OUT', 'unicode lexical identifiers (TT #575)');
+ .sub main :main
+    $P0 = box 'hello world'
+    .lex unicode:"$\u03b2\u03bf\u03bf", $P0
+
+    $P1 = find_lex unicode:"$\u03b2\u03bf\u03bf"
+    say $P1
+ .end
+CODE
+hello world
+OUT
+}
 
 # Local Variables:
 #   mode: cperl
