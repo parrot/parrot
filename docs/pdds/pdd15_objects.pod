@@ -1458,6 +1458,13 @@ Instance Variables map to what we call attributes
 =head2 Attachments
 
   docs/pdds/pdd15_object_metamodel.png
+  
+=begin html
+
+<img src="pdd15_object_metamodel.png">
+
+=end html
+
 
 =head2 Footnotes
 

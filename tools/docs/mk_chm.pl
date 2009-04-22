@@ -31,6 +31,7 @@ use Parrot::Docs::Section::Parrot;
 
 copy('docs/resources/parrot.css', 'docs/html/parrot.css');
 copy('docs/resources/parrot_logo.png', 'docs/html/parrot_logo.png');
+copy('docs/pdds/pdd15_object_metamodel.png', 'docs/html/docs/pdds/pdd15_object_metamodel.png');
 find(\&alter_html, 'docs/html');
 
 sub alter_html {
