@@ -1905,7 +1905,7 @@ PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
     TRACE_PRINTF_ALIGN(("-S ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
                         offs, self->pf->src, cursor));
     offs += PAD_16_B(offs);
-    cursor = (const opcode_t *)((const char *)(self->pf->src) + offs);
+    cursor = self->pf->src + offs/(sizeof (opcode_t));
     TRACE_PRINTF_ALIGN(("+S ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
                         offs, self->pf->src, cursor));
     return cursor;
@@ -2099,7 +2099,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
     TRACE_PRINTF_ALIGN(("-ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
                       offs, pf->src, cursor));
     offs += PAD_16_B(offs);
-    cursor = (const opcode_t *)((const char *)(pf->src) + offs);
+    cursor = pf->src + offs/(sizeof (opcode_t));
     TRACE_PRINTF_ALIGN(("+ALIGN_16: offset=0x%x src=0x%x cursor=0x%x\n",
                       offs, pf->src, cursor));
 
