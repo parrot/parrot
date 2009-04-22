@@ -5,7 +5,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2008, Parrot Foundation.
+ * Copyright (C) 2002-2009, Parrot Foundation.
  *
  * Grammar of the PIR language parser.
  *
@@ -227,11 +227,12 @@ static SymReg * mk_sub_address_u(PARROT_INTERP, ARGIN(const char *name))
 
 static void set_lexical(PARROT_INTERP,
     ARGMOD(SymReg *r),
-    ARGIN(const char *name))
+    ARGMOD(SymReg *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*r);
+        FUNC_MODIFIES(*r)
+        FUNC_MODIFIES(*name);
 
 #define ASSERT_ARGS_add_pcc_named_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -836,29 +837,29 @@ begin_return_or_yield(PARROT_INTERP, int yield)
 
 /*
 
-=item C<static void set_lexical(PARROT_INTERP, SymReg *r, const char *name)>
+=item C<static void set_lexical(PARROT_INTERP, SymReg *r, SymReg *name)>
 
 =cut
 
 */
 
 static void
-set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGIN(const char *name))
+set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *name))
 {
     ASSERT_ARGS(set_lexical)
-    SymReg * const n = mk_const(interp, name, 'S');
 
     r->usage |= U_LEXICAL;
 
-    if (n == r->reg)
+    if (name == r->reg)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
-            "register %s already declared as lexical %s", r->name, n->name);
+            "register %s already declared as lexical %s", r->name, name->name);
 
     /* chain all names in r->reg */
-    n->reg = r->reg;
-    r->reg = n;
+    name->reg = r->reg;
+    r->reg = name;
     r->use_count++;
 }
+
 
 /*
 
@@ -1245,7 +1246,8 @@ pasm_inst:                     { clear_state(interp); }
    | LEXICAL STRINGC COMMA REG
          {
            SymReg *r = mk_pasm_reg(interp, $4);
-           set_lexical(interp, r, $2);
+           SymReg *n = mk_const(interp, $2, 'S');
+           set_lexical(interp, r, n);
            $$ = 0;
            mem_sys_free($2);
            mem_sys_free($4);
@@ -1866,7 +1868,13 @@ labeled_inst:
          }
    | LEXICAL STRINGC COMMA target
          {
-           set_lexical(interp, $4, $2); $$ = 0;
+           SymReg *n = mk_const(interp, $2, 'S');
+           set_lexical(interp, $4, n); $$ = 0;
+         }
+   | LEXICAL USTRINGC COMMA target
+         {
+           SymReg *n = mk_const(interp, $2, 'U');
+           set_lexical(interp, $4, n); $$ = 0;
          }
    | CONST { pesky_global__is_def=1; } type IDENTIFIER '=' const
          {

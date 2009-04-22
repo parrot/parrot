@@ -126,9 +126,6 @@ CODE
 /syntax error/
 OUT
 
-TODO: {
-  local $TODO = "TT #575";
-
 pir_output_is( <<'CODE', <<'OUT', 'unicode lexical identifiers (TT #575)');
  .sub main :main
     $P0 = box 'hello world'
@@ -140,7 +137,6 @@ pir_output_is( <<'CODE', <<'OUT', 'unicode lexical identifiers (TT #575)');
 CODE
 hello world
 OUT
-}
 
 # Local Variables:
 #   mode: cperl
