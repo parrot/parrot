@@ -497,7 +497,7 @@ VAR_SCOPE native_func_t run_native;
 typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
                                        const char * program);
 
-/* HEADERIZER BEGIN: src/inter_create.c */
+/* HEADERIZER BEGIN: src/interp/inter_create.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -519,9 +519,9 @@ void Parrot_really_destroy(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/inter_create.c */
+/* HEADERIZER END: src/interp/inter_create.c */
 
-/* HEADERIZER BEGIN: src/inter_cb.c */
+/* HEADERIZER BEGIN: src/interp/inter_cb.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -574,9 +574,9 @@ void Parrot_run_callback(PARROT_INTERP,
     || PARROT_ASSERT_ARG(user_data) \
     || PARROT_ASSERT_ARG(external_data)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/inter_cb.c */
+/* HEADERIZER END: src/interp/inter_cb.c */
 
-/* HEADERIZER BEGIN: src/inter_misc.c */
+/* HEADERIZER BEGIN: src/interp/inter_misc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -678,7 +678,7 @@ STRING * sysinfo_s(PARROT_INTERP, INTVAL info_wanted)
 #define ASSERT_ARGS_sysinfo_s __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/inter_misc.c */
+/* HEADERIZER END: src/interp/inter_misc.c */
 
 
 /* interpreter.c */

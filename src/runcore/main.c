@@ -1,14 +1,14 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
 
-src/interpreter.c - Parrot Interpreter
+src/runcore/main.c - main functions for Parrot runcores
 
 =head1 DESCRIPTION
 
-The interpreter API handles running the operations.
+The runcore API handles running the operations.
 
 The predereferenced code chunk is pre-initialized with the opcode
 function pointers, addresses, or opnumbers of the C<prederef__>
@@ -33,21 +33,20 @@ have the same number of elements because there is a one-to-one mapping.
 */
 
 #include "parrot/parrot.h"
-#include "interp_guts.h"
+#include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
 #include "parrot/oplib/core_ops_switch.h"
 #include "parrot/oplib/ops.h"
-#include "runops_cores.h"
 #if JIT_CAPABLE
 #  include "parrot/exec.h"
-#  include "jit.h"
+#  include "../jit.h"
 #endif
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"
 #  include "parrot/oplib/core_ops_cgp.h"
 #endif
 #include "parrot/dynext.h"
-#include "pmc/pmc_parrotlibrary.h"
+#include "../pmc/pmc_parrotlibrary.h"
 
 
 /* HEADERIZER HFILE: none */
@@ -1378,8 +1377,8 @@ enable_event_checking(PARROT_INTERP)
 
 =head1 SEE ALSO
 
-F<include/parrot/interpreter.h>, F<src/inter_cb.c>, F<src/inter_create.c>,
- F<src/inter_misc.c>, F<src/call/ops.c>.
+F<include/parrot/interpreter.h>, F<src/interp/inter_cb.c>,
+F<src/interp/inter_create.c>, F<src/interp/inter_misc.c>, F<src/call/ops.c>.
 
 =cut
 

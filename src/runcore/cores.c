@@ -238,16 +238,15 @@ next opcode, or examine and manipulate data from the executing program.
 
 */
 
-#include "runops_cores.h"
+#include "parrot/runcore_api.h"
 #include "parrot/embed.h"
-#include "trace.h"
-#include "interp_guts.h"
+#include "parrot/runcore_trace.h"
 
 #ifdef HAVE_COMPUTED_GOTO
 #  include "parrot/oplib/core_ops_cg.h"
 #endif
 
-/* HEADERIZER HFILE: src/runops_cores.h */
+/* HEADERIZER HFILE: include/parrot/runcore_api.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

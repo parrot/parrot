@@ -981,6 +981,8 @@ include/parrot/pmc_freeze.h                                 [main]include
 include/parrot/pobj.h                                       [main]include
 include/parrot/register.h                                   [main]include
 include/parrot/resources.h                                  [main]include
+include/parrot/runcore_api.h                                [main]include
+include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
 include/parrot/scheduler_private.h                          [main]include
 include/parrot/settings.h                                   [main]include
@@ -1271,11 +1273,9 @@ src/global.c                                                []
 src/global_setup.c                                          []
 src/hash.c                                                  []
 src/hll.c                                                   []
-src/inter_cb.c                                              []
-src/inter_create.c                                          []
-src/inter_misc.c                                            []
-src/interp_guts.h                                           []
-src/interpreter.c                                           []
+src/interp/inter_cb.c                                       []
+src/interp/inter_create.c                                   []
+src/interp/inter_misc.c                                     []
 src/io/api.c                                                []
 src/io/buffer.c                                             []
 src/io/core.c                                               []
@@ -1452,8 +1452,9 @@ src/pmc/timer.pmc                                           [devel]src
 src/pmc/undef.pmc                                           [devel]src
 src/pmc/unmanagedstruct.pmc                                 [devel]src
 src/pmc_freeze.c                                            []
-src/runops_cores.c                                          []
-src/runops_cores.h                                          []
+src/runcore/main.c                                          []
+src/runcore/cores.c                                         []
+src/runcore/trace.c                                         []
 src/scheduler.c                                             []
 src/spf_render.c                                            []
 src/spf_vtable.c                                            []
@@ -1483,8 +1484,6 @@ src/string/primitives.c                                     []
 src/string/unicode.h                                        []
 src/sub.c                                                   []
 src/thread.c                                                []
-src/trace.c                                                 []
-src/trace.h                                                 []
 src/tsq.c                                                   []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src

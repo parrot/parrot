@@ -1,10 +1,10 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
 
-src/inter_misc.c - Parrot Interpreter miscellaneous functions
+src/interp/inter_misc.c - Parrot Interpreter miscellaneous functions
 
 =head1 DESCRIPTION
 
@@ -151,7 +151,7 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
     VTABLE_set_pmc_keyed_str(interp, hash, type, nci);
 
     /* build native call interface for the C sub in "func" */
-    VTABLE_set_pointer_keyed_str(interp, nci, sc, (void*)func);
+    VTABLE_set_pointer_keyed_str(interp, nci, sc, (void *)func);
 }
 
 /*

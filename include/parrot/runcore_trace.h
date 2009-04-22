@@ -1,9 +1,9 @@
-/* trace.h
- *  Copyright (C) 2001-2007, Parrot Foundation.
+/* runcore_trace.h
+ *  Copyright (C) 2001-2009, Parrot Foundation.
  *  SVN Info
  *     $Id$
  *  Overview:
- *     Tracing support for runops_cores.c.
+ *     Tracing runcore.
  *  Data Structure and Algorithms:
  *  History:
  *  Notes:
@@ -15,7 +15,7 @@
 
 #include "parrot/parrot.h"
 
-/* HEADERIZER BEGIN: src/trace.c */
+/* HEADERIZER BEGIN: src/runcore/trace.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 int trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
@@ -54,7 +54,7 @@ void trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 #define ASSERT_ARGS_trace_pmc_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/trace.c */
+/* HEADERIZER END: src/runcore/trace.c */
 
 #endif /* PARROT_TRACE_H_GUARD */
 

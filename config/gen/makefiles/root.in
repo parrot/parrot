@@ -410,10 +410,9 @@ INTERP_O_FILES := \
     $(SRC_DIR)/hash$(O) \
     $(SRC_DIR)/hll$(O) \
     $(SRC_DIR)/call/pcc$(O)  \
-    $(SRC_DIR)/inter_cb$(O)  \
-    $(SRC_DIR)/inter_create$(O)  \
-    $(SRC_DIR)/inter_misc$(O)  \
-    $(SRC_DIR)/interpreter$(O)  \
+    $(SRC_DIR)/interp/inter_cb$(O)  \
+    $(SRC_DIR)/interp/inter_create$(O)  \
+    $(SRC_DIR)/interp/inter_misc$(O)  \
     $(SRC_DIR)/call/ops$(O)  \
     $(SRC_DIR)/key$(O) \
     $(SRC_DIR)/library$(O) \
@@ -430,7 +429,8 @@ INTERP_O_FILES := \
     $(SRC_DIR)/platform$(O) \
     $(SRC_DIR)/pmc_freeze$(O) \
     $(SRC_DIR)/pmc$(O) \
-    $(SRC_DIR)/runops_cores$(O) \
+    $(SRC_DIR)/runcore/main$(O)  \
+    $(SRC_DIR)/runcore/cores$(O) \
     $(SRC_DIR)/scheduler$(O) \
     $(SRC_DIR)/spf_render$(O) \
     $(SRC_DIR)/spf_vtable$(O) \
@@ -438,7 +438,7 @@ INTERP_O_FILES := \
     $(SRC_DIR)/string/primitives$(O) \
     $(SRC_DIR)/sub$(O) \
     $(SRC_DIR)/thread$(O) \
-    $(SRC_DIR)/trace$(O) \
+    $(SRC_DIR)/runcore/trace$(O) \
     $(SRC_DIR)/tsq$(O) \
     $(SRC_DIR)/utils$(O) \
     $(SRC_DIR)/vtables$(O) \
@@ -594,9 +594,9 @@ STR_FILES := \
     $(SRC_DIR)/global_setup.str \
     $(SRC_DIR)/hll.str \
     $(SRC_DIR)/call/pcc.str \
-    $(SRC_DIR)/inter_cb.str \
-    $(SRC_DIR)/inter_create.str \
-    $(SRC_DIR)/inter_misc.str \
+    $(SRC_DIR)/interp/inter_cb.str \
+    $(SRC_DIR)/interp/inter_create.str \
+    $(SRC_DIR)/interp/inter_misc.str \
     $(SRC_DIR)/io/api.str \
     $(SRC_DIR)/key.str \
     $(SRC_DIR)/library.str \
@@ -1095,7 +1095,7 @@ $(SRC_DIR)/platform$(O) : $(GENERAL_H_FILES)
 #IF(platform_asm):
 $(SRC_DIR)/core_pmcs$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/trace$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
+$(SRC_DIR)/runcore/trace$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/debug$(O) : $(GENERAL_H_FILES) $(INC_DIR)/debugger.h \
     $(SRC_DIR)/debug.str $(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h
@@ -1123,21 +1123,21 @@ $(SRC_DIR)/thread$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h \
 $(SRC_DIR)/extend$(O) : $(GENERAL_H_FILES) $(INC_DIR)/extend.h \
 	$(SRC_DIR)/pmc/pmc_sub.h
 
-$(SRC_DIR)/interpreter$(O) : $(SRC_DIR)/interpreter.c $(GENERAL_H_FILES) \
+$(SRC_DIR)/runcore/main$(O) : $(SRC_DIR)/runcore/main.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
 
 $(SRC_DIR)/call/pcc$(O) : $(SRC_DIR)/call/pcc.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/call/pcc.str $(SRC_DIR)/pmc/pmc_fixedintegerarray.h \
 	$(SRC_DIR)/pmc/pmc_key.h $(SRC_DIR)/pmc/pmc_continuation.h
 
-$(SRC_DIR)/inter_cb$(O) : $(SRC_DIR)/inter_cb.c $(GENERAL_H_FILES) \
-    $(SRC_DIR)/inter_cb.str
+$(SRC_DIR)/interp/inter_cb$(O) : $(SRC_DIR)/interp/inter_cb.c \
+	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_cb.str
 
-$(SRC_DIR)/inter_misc$(O) : $(SRC_DIR)/inter_misc.c $(GENERAL_H_FILES) \
-    $(SRC_DIR)/inter_misc.str
+$(SRC_DIR)/interp/inter_misc$(O) : $(SRC_DIR)/interp/inter_misc.c \
+	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_misc.str
 
-$(SRC_DIR)/inter_create$(O) : $(SRC_DIR)/inter_create.c $(GENERAL_H_FILES) \
-    $(SRC_DIR)/inter_create.str
+$(SRC_DIR)/interp/inter_create$(O) : $(SRC_DIR)/interp/inter_create.c \
+	$(GENERAL_H_FILES) $(SRC_DIR)/interp/inter_create.str
 
 $(SRC_DIR)/call/ops$(O) : $(SRC_DIR)/call/ops.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/pmc/pmc_continuation.h
@@ -1177,7 +1177,7 @@ $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
-$(SRC_DIR)/runops_cores$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/stacks$(O) : $(GENERAL_H_FILES)
 
@@ -1681,10 +1681,9 @@ prog-clean :
     install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
-    $(SRC_DIR)/string/private_cstring.h \
-    "$(SRC_DIR)/*.str" "$(SRC_DIR)/io/*.str" "$(SRC_DIR)/pmc/*.str" \
-    "$(SRC_DIR)/call/*.str" "src/pmc/*.c" "src/pmc/pmc_*.h" "src/pmc/*.dump" \
-    vtable.dump "*.def" "*.lib" "*.exp"
+    $(STR_FILES) \
+    $(SRC_DIR)/string/private_cstring.h "src/pmc/*.c" "src/pmc/pmc_*.h" \
+    "src/pmc/*.dump" vtable.dump "*.def" "*.lib" "*.exp"
 
 archclean: dynoplibs-clean dynpmc-clean dynext-clean
 	$(RM_F) \

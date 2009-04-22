@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -277,14 +277,14 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
         at src/ops/set.ops:159
     No locals.
     #4  0xb7c9da32 in runops_slow_core (interp=0x804e008, pc=0x825d470)
-        at src/runops_cores.c:184
+        at src/runcore/cores.c:184
     No locals.
     #5  0xb7c67acf in runops_int (interp=0x804e008, offset=0)
-        at src/interpreter.c:816
+        at src/interp/interpreter.c:816
             pc = (opcode_t * const) 0x8239730
             lo_var_ptr = 134537224
             core = (opcode_t *(*)(Parrot_Interp, 
-        opcode_t *)) 0xb7c9d940 <runops_slow_core at src/runops_cores.c:169>
+        opcode_t *)) 0xb7c9d940 <runops_slow_core at src/runcore/cores.c:169>
     #6  0xb7c6854e in runops (interp=0x804e008, offs=0) at src/call/ops.c:100
             offset = 0
             old_runloop_id = 0

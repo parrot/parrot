@@ -19,7 +19,7 @@ $core = q{
 
 #include "parrot/dynext.h"
 #include "parrot/embed.h"
-#include "../interp_guts.h"
+#include "../interp/interp_guts.h"
 
 VERSION = PARROT_VERSION;
 

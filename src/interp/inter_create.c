@@ -1,10 +1,10 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
 
-src/inter_create.c - Parrot Interpreter Creation and Destruction
+src/interp/inter_create.c - Parrot Interpreter Creation and Destruction
 
 =head1 DESCRIPTION
 
@@ -480,7 +480,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 =head1 SEE ALSO
 
-F<include/parrot/interpreter.h>, F<src/interpreter.c>.
+L<include/parrot/interpreter.h>, L<src/interp/interpreter.c>.
 
 =cut
 
