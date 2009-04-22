@@ -200,13 +200,13 @@ Z<CHP-9-SECT-2.2>
 X<PASM (Parrot assembly language);registers>
 X<registers;Parrot;;(see PASM, registers)>
 Parrot is a register-based virtual machine. It has 4 typed register
-sets: integers, floating-point numbers, strings, and Parrot objects
-(called PMCs). Register names consist of a capital letter indicating
-the register set type and the number of the register. Register numbers
-are non-negative (zero and positive numbers), and do not have a
-pre-defined upper limit N<At least not a restrictive limit. Parrot
-registers are stored internally as an array. More registers means a larger
-allocated array, which can bring penalties on some systems>. For example:
+sets: integers, floating-point numbers, strings, and polymorphic container
+objects called PMCs. Register names consist of a capital letter indicating
+the register set type and the number of the register. Register numbers are
+non-negative (zero and positive numbers), and do not have a pre-defined
+upper limit N<At least not a restrictive limit. Parrot registers are stored
+internally as an array. More registers means a larger allocated array, which
+can bring penalties on some systems>. For example:
 
   I0   integer register #0
   N11  number or floating point register #11
@@ -243,9 +243,11 @@ Now, let's look at a similar PASM subroutine:
 
 This function, which looks to perform the same simple operation actually is
 a little different. This small snippet of code actually allocates 33
-registers, even though only one of them is needed. It's up to the programmer
-to keep track of memory usage and not allocate more registers then are
-needed.
+registers, even though only one of them is needed N<The number 33 here was not
+a random choice. To save on initial allocations Parrot automatically allocates
+space for 32 registers of each type in each context. This might not always be
+the case, but for now it is.>. In PASM mode it's up to the programmer to keep
+track of memory usage and not allocate more registers then are needed.
 
 =head4 Register assignment
 
@@ -264,8 +266,9 @@ opcode:
 
 =end PASM
 
-The C<exchange> opcode swaps the contents of two registers of the same
-type:
+In PIR code the set opcode is represented by the C<=> symbol to perform the
+assignment. The C<exchange> opcode swaps the contents of two registers of the
+same type:
 
 =begin PASM
 
@@ -276,7 +279,7 @@ type:
 
 PMC registers contain references to PMC structures internally. So, the set
 opcode doesn't copy the entire PMC, it only copies the reference to the
-PMC data.
+PMC data. Here's an example that shows a side effect of this operation:
 
 =begin PASM
 
@@ -298,10 +301,10 @@ we only set one of those two registers to that value.
 
 Strings in Parrot are also stored as references to internal data structures
 like PMCs. However, strings use Copy-On-Write (COW) optimizations. When we
-call C<set S1, S0> we copy the pointer only, so both registers point
-to the same string memory. We don't actually make a copy of the string
-until one of two registers is modified. Here's the same example using
-string registers instead of PMC registers:
+call C<set S1, S0> we copy the pointer only, so both registers point to the
+same string memory. We don't actually make a copy of the string until one of
+two registers is modified. Here's the same example using string registers
+instead of PMC registers, which demonstrate how strings use COW:
 
 =begin PASM
 
@@ -314,10 +317,16 @@ string registers instead of PMC registers:
 
 =end PASM
 
-Some developers have suggested that PMCs should also use COW semantics to
-help optimize copy operations like this. However, it hasn't been implemented
-yet. One day in the future, Parrot might change this, but it hasn't changed
-yet.
+Here, we can clearly see the opposite result from how PMCs were handled in
+the previous example. Modifying one of the two registers causes a new string
+to be created, preserving the old value in C<S0> and assigning the new value
+to the new string in C<S1>. The benefits here are that we don't have to worry
+about stray references causing side effects in our code, and we don't waste
+time copying a string until it's actually time to make a copy. Some
+developers have suggested that PMCs should also use COW semantics to help
+optimize copy operations in PMCs too. However, the PMC system in Parrot isn't
+yet mature enough to support these kinds of semantics. One day in the future,
+Parrot might change this, but it hasn't changed yet.
 
 =head4 PMC object types
 
@@ -325,8 +334,12 @@ Z<CHP-9-SECT-2.2.2>
 
 X<PMCs (Polymorphic Containers);object types>
 Every PMC has a distinct type that determines its behavior through the
-vtable interface. Vtables, as we have mentioned previously, are arrays
-of function pointers to implement various operations and behaviors.
+vtable interface. In the chapter on PIR, we've seen a number of these vtable
+functions already, and seen how they implement the behaviors found inside
+the various opcodes. The vtable interface is standard, and all PMCs implement
+the exact same set of vtables. We've seen some of the vtables and their uses,
+and more of them will be discussed in this chapter and later in the various
+reference chapters.
 
 The C<typeof> opcode can be used to determine the type of a PMC. When
 the source argument is a PMC and the destination is a string register,
@@ -408,8 +421,9 @@ three-argument forms:
 
 =begin PASM
 
-  add I0, I1              # I0 += I1
   add I10, I11, I2        # I10 = I11 + I2
+  add I0, I1              # I0 += I1
+  add I0, I0, I1          # Same!
 
 =end PASM
 
@@ -449,15 +463,15 @@ take an integer, floating-point, or PMC final argument:
 =end PASM
 
 X<PMCs (Polymorphic Containers);operations on>
-Operations on a PMC are implemented by the vtable method of the
-destination (in the two-argument form) or the left source argument (in
-the three argument form). The result of an operation is entirely
-determined by the PMC.  A class implementing imaginary number
-operations might return an imaginary number, for example.
+Operations on a PMC are implemented by the vtable method of the destination
+(in the two-argument form) or the left source argument (in the three argument
+form). The result of an operation is entirely determined by the behavior of
+the PMCs vtable. For some types of PMC the results may be very idiosyncratic
+and not intuitive, so it's important to familiarize yourself with the behavior
+of the particular PMC before you start performing a lot of operations on it.
 
-We won't list every math opcode here, but we'll list some of the most
-common ones. You can get a complete list in "PASM
-Opcodes" in Chapter 11.
+We won't list every math opcode here, but we'll list some of the most common
+ones. You can get a complete list in "PASM Opcodes" in Chapter 11.
 
 =head4 Unary math opcodes
 
@@ -482,17 +496,17 @@ most common unary math opcodes are C<inc> (increment), C<dec>
 Z<CHP-9-SECT-2.3.2>
 
 X<PASM (Parrot assembly language);math operations;binary>
-Binary opcodes have two source arguments and a destination argument.
-As we mentioned before, most binary math opcodes have a two-argument
-form in which the first argument is both a source and the destination.
-Parrot provides C<add>X<add opcode (PASM)> (addition),
+Binary opcodes have two source arguments and a destination argument, and we
+saw examples of these types above. As we mentioned before, most binary math
+opcodes have a two-argument form in which the first argument is both a source
+and the destination. Parrot provides C<add>X<add opcode (PASM)> (addition),
 C<sub>X<sub opcode (PASM)> (subtraction), C<mul>X<mul opcode (PASM)>
 (multiplication), C<div>X<div opcode (PASM)> (division), and C<pow>X<pow
 opcode (PASM)> (exponent) opcodes, as well as two different modulus
-operations. C<mod>X<mod opcode (PASM)> is Parrot's implementation of
-modulus, and C<cmod>X<cmod opcode (PASM)> is the C<%> operator from
-the C library. It also provides C<gcd>X<gcd opcode (PASM)> (greatest
-common divisor) and C<lcm>X<lcm opcode (PASM)> (least common
+operations. C<mod>X<mod opcode (PASM)> is Parrot's implementation of modulus,
+and C<cmod>X<cmod opcode (PASM)> performs an operation equivalent the C<%>
+operator from the C programming language. It also provides C<gcd>X<gcd opcode
+(PASM)> (greatest common divisor) and C<lcm>X<lcm opcode (PASM)> (least common
 multiple).
 
 =begin PASM
@@ -507,18 +521,16 @@ multiple).
 Z<CHP-9-SECT-2.3.3>
 
 X<PASM (Parrot assembly language);math operations;floating-point>
-Although most of the math operations work with both floating-point
-numbers and integers, a few require floating-point destination
-registers. Among these are C<ln> (natural log), C<log2> (log base 2),
-C<log10> (log base 10), and C<exp> (I<e>G<x>), as well as a full set
-of trigonometric opcodes such as C<sin> (sine), C<cos> (cosine),
-C<tan> (tangent), C<sec> (secant), C<cosh> (hyperbolic cosine),
-C<tanh> (hyperbolic tangent), C<sech> (hyperbolic secant), C<asin>
-(arc sine), C<acos> (arc cosine), C<atan> (arc tangent), C<asec> (arc
-secant), C<exsec> (exsecant), C<hav> (haversine), and C<vers>
-(versine). All angle arguments for the
-X<trigonometric functions (PASM)> trigonometric functions are in
-radians:
+Although most of the math operations work with both floating-point numbers
+and integers, a few require floating-point destination registers. Among these
+are C<ln> (natural log), C<log2> (log base 2), C<log10> (log base 10), and
+C<exp> (I<e>G<x>), as well as a full set of trigonometric opcodes such as
+C<sin> (sine), C<cos> (cosine), C<tan> (tangent), C<sec> (secant), C<cosh>
+(hyperbolic cosine), C<tanh> (hyperbolic tangent), C<sech> (hyperbolic secant),
+C<asin> (arc sine), C<acos> (arc cosine), C<atan> (arc tangent), C<asec> (arc
+secant), C<exsec> (exsecant), C<hav> (haversine), and C<vers> (versine). All
+angle arguments for the X<trigonometric functions (PASM)> trigonometric
+functions are in radians:
 
 =begin PASM
 
@@ -527,13 +539,13 @@ radians:
 
 =end PASM
 
-The majority of the floating-point operations have a single source
-argument and a single destination argument. Even though the
-destination must be a floating-point register, the source can be
-either an integer or floating-point number.
+The majority of the floating-point operations have a single source argument
+and a single destination argument. Even though the destination must be a
+floating-point register, the source can be either an integer or floating-point
+number.
 
-The C<atan>X<atan opcode (PASM)> opcode also has a three-argument
-variant that implements C's C<atan2()>:
+The C<atan>X<atan opcode (PASM)> opcode also has a three-argument variant that
+implements C's C<atan2()>:
 
 =begin PASM
 
@@ -574,10 +586,10 @@ is a source and a destination in the two-argument form:
 
 =end PASM
 
-The first C<concat> concatenates the string "cd" onto the string "ab"
-in C<S0>. It generates a new string "abcd" and changes C<S0> to point
-to the new string. The second C<concat> concatenates "xy" onto the
-string "abcd" in C<S0> and stores the new string in C<S1>.
+The first C<concat> concatenates the string "cd" onto the string "ab" in
+C<S0>. It generates a new string "abcd" and changes C<S0> to point to the
+new string. The second C<concat> concatenates "xy" onto the string "abcd"
+in C<S0> and stores the new string in C<S1>.
 
 X<PMCs (Polymorphic Containers);concatenation>
 For PMC registers, C<concat> has only a three-argument form with
@@ -756,15 +768,24 @@ untouched:
 
 =end PASM
 
-=head4 Copying strings
+=head4 Copying and Cloning
 
 Z<CHP-9-SECT-2.4.6>
 
-X<PASM (Parrot assembly language);string operations;copying>
-The C<clone>X<clone opcode (PASM)> opcode makes a deep copy of a
-string or PMC. Instead of just copying the pointer, as normal
-assignment would, it recursively copies the string or object
-underneath.
+X<PASM (Parrot assembly language);string operations;copying> The C<clone>
+X<clone opcode (PASM)> opcode makes a deep copy of a string or PMC. Earlier
+in this chapter we saw that PMC and String values used with the C<set> opcode
+didn't create a copy of the underlying data structure, it only created
+a copy of the reference to that structure. With strings, this doesn't cause
+a problem because strings use Copy On Write (COW) semantics to automatically
+create a copy of the string when one reference is modified. However, as we
+saw, PMCs don't have this same behavior and so making a change to one PMC
+reference would modify the data that all the other references to that same
+PMC pointed to.
+
+Instead of just copying the pointer like C<set> would do, we can use the
+C<clone> opcode to create a I<deep copy> of the PMC, not just a I<shallow
+copy> of the reference.
 
 =begin PASM
 
@@ -772,6 +793,7 @@ underneath.
   set P0, "Ford"
   clone P1, P0
   set P0, "Zaphod"
+  print P0        # prints "Zaphod"
   print P1        # prints "Ford"
   end
 
@@ -779,36 +801,35 @@ underneath.
 
 This example creates an identical, independent clone of the PMC in
 C<P0> and puts a pointer to it in C<P1>. Later changes to C<P0> have
-no effect on C<P1>.
+no effect on the PMC referenced in C<P1>.
 
-With simple strings, the copy created by C<clone>, as well as the
-results from C<substr>, are copy-on-write (COW). These are rather
-cheap in terms of memory usage because the new memory location is only
-created when the copy is assigned a new value. Cloning is rarely
-needed with ordinary string registers since they always create a new
-memory location on assignment.
+With simple strings, the copes created by C<clone> are COW exactly the same
+as the copy created by C<set>, so there is no difference between these two
+opcodes for strings. By convention, C<set> is used with strings more often
+then C<clone>, but there is no rule about this.
 
 =head4 Converting characters
 
 Z<CHP-9-SECT-2.4.7>
 
 X<PASM (Parrot assembly language);string operations;converting strings>
-The C<chr>X<chr opcode (PASM)> opcode takes an integer value and
-returns the corresponding character as a one-character string, while
-the C<ord>X<ord opcode (PASM)> opcode takes a single character string
-and returns the integer that represents that character in the string's
-encoding:
+The C<chr>X<chr opcode (PASM)> opcode takes an integer value and returns the
+corresponding character in the ASCII character set as a one-character string,
+while the C<ord>X<ord opcode (PASM)> opcode takes a single character string
+and returns the integer value of the character at the first position in the
+string. Notice that the integer value of the character will differ depending
+on the current encoding of the string:
 
 =begin PASM
 
   chr S0, 65                # S0 is "A"
-  ord I0, S0                # I0 is 65
+  ord I0, S0                # I0 is 65, if S0 is ASCII or UTF-8
 
 =end PASM
 
-C<ord> has a three-argument variant that takes a character offset to
-select a single character from a multicharacter string. The offset
-must be within the length of the string:
+C<ord> has a three-argument variant that takes a character offset to select
+a single character from a multicharacter string. The offset must be within
+the length of the string:
 
 =begin PASM
 
@@ -829,13 +850,12 @@ the last character.
 
 Z<CHP-9-SECT-2.4.8>
 
-X<PASM (Parrot assembly language);string operations;formatting
-strings> The C<sprintf>X<sprintf opcode (PASM)> opcode generates a
-formatted string from a series of values. It takes three arguments:
-the destination register, a string specifying the format, and an
-ordered aggregate PMC (like a C<Array>) containing the values to
-be formatted. The format string and the destination register can be
-either strings or PMCs:
+X<PASM (Parrot assembly language);string operations;formatting strings>
+The C<sprintf>X<sprintf opcode (PASM)> opcode generates a formatted string
+from a series of values. It takes three arguments: the destination register,
+a string specifying the format, and an ordered aggregate PMC (like an
+C<Array> PMC) containing the values to be formatted. The format string and
+the destination register can be either strings or PMCs:
 
 =begin PASM
 
@@ -869,7 +889,7 @@ Z<CHP-9-TABLE-1>
 
 =cell C<%c>
 
-=cell A character.
+=cell A single character.
 
 =row
 
@@ -948,8 +968,7 @@ lowercase "e").
 
 =cell C<%g>
 
-=cell The same as either C<%e> or C<%f>,
-whichever fits best.
+=cell The same as either C<%e> or C<%f>, whichever fits best.
 
 =row
 
@@ -1042,7 +1061,7 @@ Z<CHP-9-TABLE-3>
 
 =cell C<h>
 
-=cell short or float
+=cell short integer or single-precision float
 
 =row
 
@@ -1060,13 +1079,13 @@ Z<CHP-9-TABLE-3>
 
 =cell C<v>
 
-=cell INTVAL or FLOATVAL
+=cell Parrot INTVAL or FLOATVAL
 
 =row
 
 =cell C<O>
 
-=cell opcode_t
+=cell opcode_t pointer
 
 =row
 
@@ -1078,7 +1097,7 @@ Z<CHP-9-TABLE-3>
 
 =cell C<S>
 
-=cell string
+=cell String
 
 =end table
 
@@ -1320,10 +1339,10 @@ specified number of bits:
 Z<CHP-9-SECT-3>
 
 In most of the examples we've shown so far, X<PMCs (Polymorphic
-Containers);working with> PMCs just duplicate the functionality of
-integers, numbers, and strings. They wouldn't be terribly useful if
-that's all they did, though. PMCs offer several advanced features,
-each with its own set of operations.
+Containers);working with> PMCs just duplicate the functionality of integers,
+numbers, and strings. They wouldn't be terribly useful if that's all they did,
+though. PMCs offer several advanced features that we will look at in the next
+few sections.
 
 =head3 Aggregates
 
@@ -1336,19 +1355,25 @@ aggregates is keyed access. Elements within an aggregate PMC can be
 stored and retrieved by a numeric or string key. PASM also offers a
 full set of operations for manipulating aggregate data types.
 
-Since PASM is intended to implement Perl, the two most fully featured
-aggregates already in operation are arrays and hashes. Any aggregate
-defined for any language could take advantage of the features
-described here.
+Two of the most basic aggregate types are arrays and hashes. The primary
+difference between these two is that arrays are indexed using integer keys,
+and hashes are indexed with string keys. The term "hash" in this context is
+derived from the data type in Perl 5 of the same name. Other programming
+languages might refer to the same concept using different terms such as
+"dictionary" or "hash table" or "associative array".
+
+Arrays and hashes are not the only types of aggregates available, although
+they are the most simple demonstrations of using integer and strings as
+keys in an aggregate, respectively.
 
 =head4 Arrays
 
 Z<CHP-9-SECT-3.1.1>
 
 X<PMCs (Polymorphic Containers);arrays>
-The C<Array>X<Array PMC> PMC is an ordered aggregate with
-zero-based integer keys. The syntax for X<keyed access to PMCs> keyed access to a
-PMC puts the key in square brackets after the register name:
+The C<Array>X<Array PMC> PMC is an ordered aggregate with zero-based integer
+keys. The syntax for X<keyed access to PMCs> keyed access to a PMC puts the
+key in square brackets after the register name:
 
 =begin PASM
 
@@ -1370,13 +1395,26 @@ array types may require the length to be set explicitly.> And if you
 assign the C<Array> to an integer, you get the length of the
 array.
 
-By the time you read this, the syntax for getting and setting the
-length of an array may have changed. The change would separate array
-allocation (how much storage the array provides) from the actual
-element count. The currently proposed syntax uses C<set> to set or
-retrieve the allocated size of an array, and an C<elements>
-X<elements opcode (PASM)> opcode to retrieve the count of
-elements stored in the array.
+We mention "other array types" above, not as a vague suggestion that there may
+be other types of arrays eventually, but as an indication that we actually
+have several types of array PMCs in Parrot's core. Parrot comes with
+C<FixedPMCArray>, C<ResizablePMCArray>, C<FixedIntegerArray>,
+C<ResizableIntegerArray>, C<FixedFloatArray>, C<ResizableFloatArray>,
+C<FixedStringArray>, C<ResizableStringArray>, C<FixedBooleanArray>,
+and C<ResizableBooleanArray> types. These various types of arrays use
+various packing methods to create higher memory efficiency for their contents
+then using a single generic array type would be able to. The trade-off for
+higher memory efficiency is that these array PMCs can only hold a single type
+of data.
+
+The array PMC types that start with "Fixed" have a fixed size and do not
+automatically extend themselves if you attempt to add data to a higher index
+then the array contains. The "Resizable" variants will automatically extend
+themselves as more data are added, but the cost is in algorithmic complexity
+of checking array bounds and reallocating array memory.
+
+To retrieve the number of items currently in an array, you can use the
+C<elements> opcode.
 
 =begin PASM
 
@@ -1395,8 +1433,8 @@ C<pop>, C<shift>, and C<unshift> (you'll find them in
 Z<CHP-9-SECT-3.1.2>
 
 X<PMCs (Polymorphic Containers);hashes>
-The C<Hash>X<Hash PMC> PMC is an unordered aggregate with
-string keys:
+The C<Hash>X<Hash PMC> PMC is an unordered aggregate which uses string keys
+to identify elements within it.
 
 =begin PASM
 
@@ -1430,22 +1468,35 @@ with hashes: it removes a key/value pair.
 
 Z<CHP-9-SECT-3.1.3>
 
-Iterators extract values from an aggregate PMC. You create an iterator
-by creating a new C<Iterator> PMC, and passing the array to C<new> as
-an additional parameter:
+Iterators extract values from an aggregate PMC one at a time and without
+extracting duplicates. Iterators are most useful in loops where an action
+needs to be performed on every element in an aggregate. You create an
+iterator by creating a new C<Iterator> PMC, and passing the aggregate PMC
+to C<new> as an additional parameter:
 
 =begin PASM
 
-      new P1, "Iterator", P2
+  new P1, "Iterator", P2
+
+=end PASM
+
+Alternatively, you can use the C<iter> opcode to do the same thing:
+
+=begin PASM
+
+  iter P1, P2     # Same!
 
 =end PASM
 
 The include file F<iterator.pasm> defines some constants for working
 with iterators. The C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END>
 constants are used to select whether an array iterator starts from the
-beginning or end of the array. The C<shift> opcode extracts values
-from the array. An iterator PMC is true as long as it still has values
-to be retrieved (tested by C<unless> below).
+beginning or end of the array. Since Hash PMCs are unordered, these two
+constants do not have any affect on Hash iterators.
+
+A value can be extracted from the iterator using the C<shift> opcode.
+Evaluating the iterator PMC as a boolean returns whether the iterator has
+reached the end of the aggregate or not.
 
 =begin PASM
 
@@ -1467,9 +1518,10 @@ to be retrieved (tested by C<unless> below).
 
 =end PASM
 
-Hash iterators work similarly to array iterators, but they extract
-keys. With hashes it's only meaningful to iterate in one direction,
-since they don't define any order for their keys.
+Hash iterators work similarly to array iterators, but they extract keys
+only. With the key, you can find it's value from the original hash PMC.
+With hashes it's only meaningful to iterate in one direction since they
+don't define any order for their keys.
 
 =begin PASM
 
@@ -1573,9 +1625,8 @@ Z<CHP-9-SECT-3.3>
 X<PMCs (Polymorphic Containers);properties>
 PMCs can have additional values attached to them as "properties" of
 the PMC. What these properties do is entirely up to the language being
-implemented. Perl 6 uses them to store extra information about a
-variable: whether it's a constant, if it should always be interpreted
-as a true value, etc.
+implemented. Most usually properties are used to hold extra metadata about
+the PMC that is used by the high-level language (HLL).
 
 The C<setprop>X<setprop opcode (PASM)> opcode sets the value of a
 named property on a PMC. It takes three arguments: the PMC to be set
@@ -1583,7 +1634,9 @@ with a property, the name of the property, and a PMC containing the
 value of the property. The C<getprop>X<getprop opcode (PASM)> opcode
 returns the value of a property. It also takes three arguments: the
 PMC to store the property's value, the name of the property, and the
-PMC from which the property value is to be retrieved:
+PMC from which the property value is to be retrieved. Internally a PMCs
+properties are stored in a Hash structure, where the name of the property
+is stored in a special properties Hash.
 
 =begin PASM
 
@@ -1602,9 +1655,9 @@ PMC from which the property value is to be retrieved:
 This example creates a C<String> object in C<P0>, and a C<Int>
 object with the value 1 in C<P1>. C<setprop> sets a property named
 "constant" on the object in C<P0> and gives the property the value in
-C<P1>.N<The "constant" property is ignored by PASM, but is significant
-to the Perl 6 code running on top of it.> C<getprop> retrieves the
-value of the property "constant" on C<P0> and stores it in C<P3>.
+C<P1>.N<The "constant" property is ignored by PASM, but may be significant
+to the HLL that set it.> C<getprop> retrieves the value of the property
+"constant" on C<P0> and stores it in C<P3>.
 
 Properties are kept in a separate hash for each PMC. Property values
 are always PMCs, but only references to the actual PMCs. Trying to
