@@ -537,8 +537,8 @@ MAKE := @make_c@
 
 .s$(O) : # suffix rule (limited support)
 	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
-.S$(O) : # suffix rule (limited support)
-	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
+#UNLESS(win32).S$(O) : # suffix rule (limited support)
+#UNLESS(win32)	@$(PERL) tools/dev/cc_flags.pl $(CUR_DIR)/CFLAGS $(CC) "" $(CFLAGS) -I$(@D) @cc_o_out@$@ -c $<
 
 # XXX These obviously require parrot: had trouble adding parrot as a dependency
 # here, though. Ignored on Mac OS X, at least.
