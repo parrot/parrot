@@ -83,7 +83,7 @@ opcode_t *runops_slow_core(PARROT_INTERP, opcode_t *);
 
 opcode_t *runops_profile_core(PARROT_INTERP, opcode_t *);
 
-#endif /* PARROT_RUNOPS_CORES_H_GUARD */
+#endif /* PARROT_RUNCORE_API_H_GUARD */
 
 
 /*
