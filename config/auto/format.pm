@@ -82,8 +82,8 @@ sub _set_intvalmaxmin {
     elsif ( ( $iv eq "long long" ) || ( $iv eq "long long int" ) ) {
         # The assumption is that a compiler that have the long long type
         # also provides his limit macros.
-        $ivmax = 'LLONG_MIN';
-        $ivmin = 'LLONG_MAX';
+        $ivmin = 'LLONG_MIN';
+        $ivmax = 'LLONG_MAX';
     }
     else {
         die qq{Configure.pl:  Can't find limits for type '$iv'\n};
