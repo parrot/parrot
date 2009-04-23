@@ -123,9 +123,16 @@ const struct _data_types data_types[] = {
 };
 #endif /* INSIDE_GLOBAL_SETUP */
 
-#define PARROT_FLOATVAL_INF_POSITIVE  floatval_divide_by_zero(interp, 1.0)
-#define PARROT_FLOATVAL_INF_NEGATIVE  floatval_divide_by_zero(interp, -1.0)
-#define PARROT_FLOATVAL_NAN_QUIET     floatval_divide_by_zero(interp, 0.0)
+#if defined(__NetBSD__) && defined(__alpha__)
+#  include <math.h>
+#  define PARROT_FLOATVAL_INF_POSITIVE	INFINITY
+#  define PARROT_FLOATVAL_INF_NEGATIVE	-INFINITY
+#  define PARROT_FLOATVAL_NAN_QUIET	NAN
+#else
+#  define PARROT_FLOATVAL_INF_POSITIVE  floatval_divide_by_zero(interp, 1.0)
+#  define PARROT_FLOATVAL_INF_NEGATIVE  floatval_divide_by_zero(interp, -1.0)
+#  define PARROT_FLOATVAL_NAN_QUIET     floatval_divide_by_zero(interp, 0.0)
+#endif
 
 #define PARROT_CSTRING_INF_POSITIVE    "Inf"
 #define PARROT_CSTRING_INF_NEGATIVE    "-Inf"
