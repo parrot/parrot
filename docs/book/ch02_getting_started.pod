@@ -43,39 +43,39 @@ configuration script.
 =head2 Running Parrot
 
 Once you've installed Parrot, you can run your first small script. Create
-a test file called F<fjord.pasm>. C<.pasm>
+a test file called F<news.pasm>. C<.pasm>
 files are written in Parrot Assembly Language (PASM) which is a
 low-level language native to the Parrot virtual machine.
 
 =begin PASM
 
-  print "He's pining for the fjords.\n"
+  print "Here is the news for Parrots.\n"
   end
 
 =end PASM
 
 Now run this file with:
 
-  $ parrot fjord.pasm
+  $ parrot news.pasm
 
 which will print:
 
-  He's pining for the fjords.
+  Here is the news for Parrots.
 
 =head2 Running a Language on Parrot
 
 Next, try out one of Parrot's high-level languages. Create a test file
-called F<hello.nqp>:
+called F<more_news.nqp>:
 
-  say "Hello, World!"
+  say "No parrots were involved in an accident on the M1 today..."
 
 Then run it as:
 
-  $ nqp hello.nqp
+  $ nqp more_news.nqp
 
 which will print:
 
-  Hello, World!
+  No parrots were involved in an accident on the M1 today...
 
 =head2 What Next?
 
@@ -108,7 +108,7 @@ NQP (Not Quite Perl) is a lightweight language loosely inspired by the
 Perl 6 specification. NQP is part of the compiler tools and is an
 integral part of building language implementations on Parrot.
 
-=item Chapter 7, I<Dynamic C-Level Objects>
+=item Chapter 7, I<Dynamic PMCs>
 
 Parrot allows dynamic extensions to Parrot's core data types. These are
 commonly used in more advanced language implementations. This chapter
