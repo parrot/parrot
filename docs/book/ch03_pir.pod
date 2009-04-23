@@ -6,111 +6,155 @@ Z<CHP-3>
 
 X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR (Parrot intermediate representation)>
-The Parrot intermediate representation (PIR) is the primary way to program
-Parrot directly. It used to be an overlay on top of the far more primitive
-Parrot assembly language (PASM). However, PIR and PASM have since diverged
-semantically in a number of places and no longer are directly related to
-one another. PIR has many high-level features that will be familiar to
-programmers, such as basic operator syntax. However, it's still very
-low-level, and is closely tied to the underlying virtual machine. In fact,
-the Parrot developers specifically want to keep in that way for a
-number of reasons. PASM, the Parrot assembly language, is discussed in more
-detail in Chapter 5.
+Parrot Intermediate Representation (PIR) is a low-level language native
+to the virtual machine. It is commonly used to write libraries for
+Parrot, for generated compilers, and as the target form when compiling
+high-level language syntax for Parrot. At a fundamendal level, PIR is an
+assembly language, but it has some higher-level features such as basic
+operator syntax, syntactic sugar for subroutine and method calls,
+automatic register allocation, and more friendly conditional
+syntax.N<Parrot also has a more pure native assembly language, see
+Chapter 9 for more details.> Even so, PIR is more rigid and "close to
+the machine" then some higher-level languages like C. X<.pir files>
+Files containing PIR code use the F<.pir> extension.
 
-X<.pir files>
-As a convention, files containing pure PIR code generally
-have a F<.pir> extension. PASM files typically end with F<.pasm>. Compiled
-Parrot Bytecode (PBC) files have a F<.pbc> extension. We'll talk more
-about PBC and PASM in later chapters.
 
-X<PIR (Parrot intermediate representation);documentation>
-PIR is well documented, both in traditional documentation and in
-instructional code examples. The project documentation in F<docs/> are good
-sources for information about the current syntax, semantics, and
-implementation.  The test suite in F<t/compilers/imcc/> shows examples
-of proper working code. In fact, the test suite is the definitive PIR
-resource, because it shows how PIR I<actually works>, even when the
-documentation may be out of date.
+=head2 Basics
 
-=head2 Statements
+PIR has a relatively simple syntax. Each line is either a comment, a
+label, a statement, or a directive. Each statement or directive stands
+on its own line, and no symbol is used to mark the end of the line.
+Empty whitespace lines are ignored.
+
+=head3 Comments
+
+A comment is marked with the C<#> symbol, and continues until the end of
+the line. Comments can stand alone on a line or follow a statement or
+directive.
+
+    # This is a regular comment. The PIR
+    # interpreter ignores this.
+
+PIR also treats inline documentation in Pod format as a comment. An
+equals sign as the first character of a line marks the start of a Pod
+block, and a C<=cut> marker signals the end of a Pod block.
+
+  =head2
+
+  This is Pod documentation, and is treated like a
+  comment. The PIR interpreter ignores this.
+
+  =cut
+
+=head2 Labels
+
+Z<CHP-3-SECT-4>
+
+X<PIR (Parrot intermediate representation);labels>
+X<labels (PIR)>
+A label names a line of code so other statements can refer to it.
+Labels consist of letters, numbers, and underscores. Simple labels are
+often all capital letters to make them stand out from the rest of the
+source code more clearly. A label can be in front of a line of code, or
+it can be on its own line. Keeping labels on separate lines generally
+improves readability.
+
+  LABEL:
+      print "'Allo, 'allo, 'allo.\n"
+
+Labels are most often used for control flow.
+
+=head3 Statements
 
 Z<CHP-3-SECT-1>
 
 X<statements (PIR)>
 X<PIR (Parrot intermediate representation);statements>
-The syntax of statements in PIR is much more flexible then is commonly
-found in assembly languages, but is more rigid and "close to the machine"
-then some higher-level languages like C are. PIR has a very close
-relationship with the Parrot assembly language, PASM. PASM instructions,
-with some small changes and caveats, are valid PIR instructions. PIR does
-add some extra syntactic options to help improve readability and
-programmability, however. The statement delimiter for both PIR and PASM is
-a newline C<\n>. Each statement has to be on its own line N<This isn't
-entirely true when you consider things like macros and heredocs, but we'll
-tackle those issues when we come to them.>, but empty whitespace lines
-between statements are okay. Statements may also start with a label, for
-use with jumps and branches. Comments are marked by a hash sign (C<#>),
-and continue until the end of the line. POD blocks may be used for
-multi-line documentation. We'll talk about all these issues in more detail
-as we go.
+A statement is either an opcode or syntactic sugar for one or more
+opcode. An opcode is a direct call to a native instruction in
+the virtual machine, and consists of an instruction name followed
+by zero or more arguments.
 
-To help with readability, PIR has some high-level constructs, including
-symbol operators:
+  print "Norwegian Blue\n"
 
-  $I1 = 5                       # set $I1, 5
+To aid in readability, PIR also provides some higher-level constructs,
+including symbol operators.
 
-named variables:
+  $I1 = 2 + 5
 
-  .param int count
-  count = 5
+Under the hood, these special statement forms are just syntactic sugar
+for regular opcodes. The C<+> symbol corresponds to the C<add> opcode,
+the C<-> symbol to the C<sub> opcode, and so on.
 
-and complex statements built from multiple keywords and symbol
-operators:
+  add $I1, 2, 5
 
-  if $I1 <= 5 goto LABEL        # le $I1, 5, LABEL
+=head3 Directives
 
-We will get into all of these in more detail as we go. Notice that PIR
-does not, and will not, have high-level looping structures like C<while>
-or C<for> loops. PIR has some support for basic C<if> branching constructs,
-but will not support more complicated C<if>/C<then>/C<else> branch
-structures. Because of these omissions PIR can become a little bit messy
-and unwieldy for large programs. Luckily, there are a large group of
-high-level languages (HLL) that can be used to program Parrot instead. PIR
-is used primarily to write the compilers and libraries for these languages,
-while those languages can be used for writing larger and more complicated
-programs.
+Directives all start with a C<.> period, and are handled specially by
+the parser. Some directives specify actions that should be taken at
+compile-time. Some directives represent complex operations that require
+the generation of multiple instructions.
 
-=head2 Directives
+  .local string hello
 
-PIR has a number of directives, instructions which are handle specially by
-the parser to perform operations. Some directives specify actions that should
-be taken at compile-time. Some directives represent complex operations
-that require the generation of multiple PIR or PASM instructions. PIR also
-has a macro facility to create user-defined directives that are replaced
-at compile-time with the specified PIR code.
+PIR also has a macro facility to create user-defined directives.
 
-Directives all start with a C<.> period. They take a variety of different
-forms, depending on what they are, what they do, and what arguments they
-take. We'll talk more about the various directives and about PIR macros in
-this and in later chapters.
+=head3 Literals
 
-=head2 Variables and Constants
+Integers and floating point numbers are numeric literals, and can be
+positive or negative.
 
-Z<CHP-3-SECT-2>
+  $I0 = 42       # positive
+  $I1 = -1       # negative
 
-=head2 Parrot Registers
+Integer literals can also be binary, octal, or hexadecimal.
 
-Z<CHP-3-SECT-2.1>
+  $I3 = 0b01010  # binary
+  $I3 = 0o78     # octal
+  $I2 = 0xA5     # hexadecimal
+
+Floating point number literals have a decimal point, and can also use
+scientific notation.
+
+  $N0 = 3.14
+  $N2 = -1.2e+4
+
+X<strings;in PIR>
+String literals are enclosed in single or double-quotes.N<See L<Strings>
+later in this chapter for more details on the difference between single
+and double quoted strings.>
+
+  $S0 = "This is a valid literal string"
+  $S1 = 'This is also a valid literal string'
+
+=head3 Variables
+
+PIR variables can store 4 different kinds of valuesE<mdash>integers,
+numbers (floating point), strings, and objects. The simplest way to work
+with these values is using register variables. The name of a register
+variable always starts with a dollar sign, followed by a single
+character that shows whether it is an integer (C<I>), number (C<N>),
+string (C<S>), or object (C<P>),N<Objects are marked with a C<P> for
+"I<P>olymorphic container".> and a unique number.
+
+  $S0 = "Who's a pretty boy, then?\n"
+  print $S0
+
+PIR also has named variables, which are declared with the C<.local>
+directive, passing it a type and a name. The valid types for
+named variables are the same 4 basic kinds of values: C<int>, C<num>,
+C<string>, and C<pmc>.N<Again, for "I<P>olyI<M>orphic I<C>ontainer".>
+Once a named variable is declared, it can be used just like a register
+variable.
+
+  .local string hello
+  set hello, "'Allo, 'allo, 'allo.\n"
+  print hello
 
 PIR code has a variety of ways to store values while you work with
 them. Actually, the only place to store values is in a Parrot register,
 but there are multiple ways to work with these registers. Register names
 in PIR always start with a dollar sign, followed by a single
-character that shows whether it is an integer (I), numeric (N), string
-(S), or PMC (P) register, and then the number of the register:
-
-  $S0 = "Hello, Polly.\n"
-  print $S0
 
 Integer (I) and Number (N) registers use platform-dependent sizes and
 limitations N<There are a few exceptions to this, we use platform-dependent
@@ -135,29 +179,8 @@ object-oriented languages. PMCs are the basis for complex data structures
 and object-oriented behavior in Parrot. We'll discuss them in more detail
 in this and in later chapters.
 
-=head2 Constants
 
-X<constants (PIR)>
-X<PIR (Parrot intermediate representation);constants>
-X<strings;in PIR>
-As we've just seen, Parrot has four primary data types: integers,
-floating-point numbers, strings, and PMCs. Integers and floating-point
-numbers can be specified in the code with numeric constants in a variety
-of formats:
-
-  $I0 = 42       # Integers are regular numeric constants
-  $I1 = -1       # They can be negative or positive
-  $I2 = 0xA5     # They can also be hexadecimal
-  $I3 = 0b01010  # ...or binary
-
-  $N0 = 3.14     # Numbers can have a decimal point
-  $N1 = 4        # ...or they don't
-  $N2 = -1.2e+4  # Numbers can also use scientific notation.
-
-String literals are enclosed in single or double-quotes:
-
-  $S0 = "This is a valid literal string"
-  $S1 = 'This is also a valid literal string'
+=head2 Strings
 
 Strings in double-quotes accept all sorts of escape sequences using
 backslashes. Strings in single-quotes only allow escapes for nested
@@ -186,16 +209,17 @@ strings:
   \\          A backslash
   \"          A quote
 
-Or, if you need more flexibility, you can use a I<heredoc> string literal:
+Or, if you need more flexibility, you can use a heredoc string literal.
+The string starts on the line after the C<E<lt>E<lt>> operator, and ends
+on the line before the terminator, which is defined by the text in
+quotes after the C<E<lt>E<lt>>. The terminator must appear on its own
+line, must appear at the beginning of the line, and may not have any
+trailing whitespace.
 
   $S2 = << "End_Token"
 
   This is a multi-line string literal. Notice that
-  it doesn't use quotation marks. The string continues
-  until the ending token (the thing in quotes next to
-  the << above) is found. The terminator must appear on
-  its own line, must appear at the beginning of the
-  line, and may not have any trailing whitespace.
+  it doesn't use quotation marks.
 
   End_Token
 
@@ -274,12 +298,10 @@ a register can be used for a named variable can be used for as well.
 
 X<types;variable (PIR)>
 X<variables;types (PIR)>
-The valid types are C<int>, C<num>, C<string>, and C<pmc> N<Also, you can
-use any predefined PMC class name like C<BigNum> or C<LexPad>. We'll talk
-about classes and PMC object types in a little bit.>. It should come
-as no surprise that these are the same as Parrot's four built-in register
-types. Named variables are valid from the point of their definition to
-the end of the current subroutine.
+The valid types are C<int>, C<num>, C<string>, and C<pmc> 
+It should come as no surprise that these are the same as Parrot's four
+built-in register types. Named variables are valid from the point of
+their definition to the end of the current subroutine.
 
 The name of a variable must be a valid PIR identifier. It can contain
 letters, digits and underscores but the first character has to be a
@@ -292,6 +314,14 @@ lexical analysis and parsing. You should push the limits at your own risk.
 
 =head2 Register Allocator
 
+PIR does not have this kind
+of direct correspondance to PBC. A number of PIR features, especially the
+various directives, typically translate into a number of individual
+operations. Register names, such as C<$P7> don't indicate the actual
+storage location of the register in PIR either. The register allocator
+will intelligently move and rearrange registers to conserve memory, so
+the numbers you use to specify registers in PIR will be mapped to
+different numbers when compiled into PBC.
 Now's a decent time to talk about Parrot's register allocator N<it's also
 sometimes humorously referred to as the "register alligator", due to an
 oft-repeated typo and the fact that the algorithm will bite you if you get
@@ -542,34 +572,18 @@ types and their autoboxed PMC equivalents:
   $I2 = $P2      # Intify. 3
   $N2 = $P2      # De-box. $N2 = 3.14
 
-=head2 Labels
-
-Z<CHP-3-SECT-4>
-
-X<PIR (Parrot intermediate representation);labels>
-X<labels (PIR)>
-Any line in PIR can start with a label definition like C<LABEL:>,
-but label definitions can also stand alone on their own line. Labels are
-like flags or markers that the program can jump to or return to at different
-times. Labels and jump operations (which we will discuss a little bit
-later) are one of the primary methods to change control flow in PIR, so
-it is well worth understanding.
-
-Labels are most often used in branching instructions, which are used
-to implement high level control structures by our high-level language
-compilers.
 
 =head2 Compilation Units
 
 Z<CHP-3-SECT-4.1>
 
-X<PIR (Parrot intermediate representation);compilation units>
-X<compilation units (PIR)>
-Compilation units in PIR are roughly equivalent to the subroutines or
+X<PIR (Parrot intermediate representation);subroutine>
+X<subroutine (PIR)>
+Subroutines in PIR are roughly equivalent to the subroutines or
 methods of a high-level language. Though they will be explained in
 more detail later, we introduce them here because all code in a PIR
-source file must be defined in a compilation unit. We've already seen an
-example for the simplest syntax for a PIR compilation unit. It starts with
+source file must be defined in a subroutine. We've already seen an
+example for the simplest syntax for a PIR subroutine. It starts with
 the C<.sub> directive and ends with the C<.end> directive:
 
 =begin PIR
@@ -581,9 +595,9 @@ the C<.sub> directive and ends with the C<.end> directive:
 =end PIR
 
 Again, we don't need to name the subroutine C<main>, it's just a common
-convention. This example defines a compilation unit named C<main> that
-prints a string C<"Hello, Polly.">. The first compilation unit in a file
-is normally executed first but you can flag any compilation unit as the
+convention. This example defines a subroutine named C<main> that
+prints a string C<"Hello, Polly.">. The first subroutine in a file
+is normally executed first but you can flag any subroutine as the
 first one to execute with the C<:main> marker.
 
 =begin PIR
@@ -620,7 +634,7 @@ at the C<:main> function and continues until the end of that function
 only. If you want to do more stuff if your program, you will need to
 call other functions explicitly.
 
-Chapter 4 goes into much more detail about compilation units
+Chapter 4 goes into much more detail about subroutines
 and their uses.
 
 =head2 Flow Control
@@ -642,6 +656,12 @@ accommodated is to simply give them the most simple and fundamental
 building blocks to work with. Language agnosticism is an important
 design goal in Parrot, and creates a very flexible and powerful
 development environment for our language developers.
+
+Notice that PIR
+does not, and will not, have high-level looping structures like C<while>
+or C<for> loops. PIR has some support for basic C<if> branching constructs,
+but will not support more complicated C<if>/C<then>/C<else> branch
+structures.
 
 X<goto instruction (PIR)>
 The most basic branching instruction is the unconditional branch:
@@ -781,6 +801,7 @@ Fortunately, libraries of macros have been developed that can implement
 more familiar syntax for many of these control structures. We will discuss
 these libraries in more detail in "PIR Standard Library".
 
+=head2 Macros
 
 =head2 Subroutines
 
@@ -886,7 +907,7 @@ The C<.return> directive allows the subroutine to return control flow
 to the calling subroutine, and optionally returns result output values.
 
 Here's a complete code example that implements the factorial algorithm.
-The subroutine C<fact> is a separate compilation unit, assembled and
+The subroutine C<fact> is a separate subroutine, assembled and
 processed after the C<main> function.  Parrot resolves global symbols
 like the C<fact> label between different units.
 
@@ -1407,13 +1428,13 @@ find the proper environment information about the given variables.
 
 Z<CHP-4-SECT-1.1>
 
-The term "compilation unit" is one that's been bandied about throughout the
-chapter and it's worth some amount of explanation here. A compilation unit
+The term "subroutine" is one that's been bandied about throughout the
+chapter and it's worth some amount of explanation here. A subroutine
 is a section of code that forms a single unit. In some instances the term
 can be used to describe an entire file. In most other cases, it's used to
 describe a single subroutine. Our earlier example which created a C<'fact'>
 subroutine for calculating factorials could be considered to have used two
-separate compilation units: The C<main> subroutine and the C<fact> subroutine.
+separate subroutine: The C<main> subroutine and the C<fact> subroutine.
 Here is a way to rewrite that algorithm using only a single subroutine instead:
 
 =begin PIR
@@ -1446,7 +1467,7 @@ result from C<$I0>. This is different from how subroutines are normally
 invoked in PIR.
 
 Another disadvantage of this approach is that C<main> and C<fact> share the
-same compilation unit, so they're parsed and processed as one piece of code.
+same subroutine, so they're parsed and processed as one piece of code.
 They share registers. They would also share LexInfo and LexPad PMCs, if any
 were needed by C<main>. The C<fact> routine is also not easily usable from
 outside the c<main> subroutine, so other parts of your code won't have access
@@ -2500,7 +2521,7 @@ the compiled bytecode, PMCs cannot be used.
   .annotation 'line', 42
   .annotation 'compiletime', 0.3456
 
-Annotations exist, or are "in force" throughout the entire compilation unit,
+Annotations exist, or are "in force" throughout the entire subroutine,
 or until they are redefined. Creating a new annotation with the same name as
 an old one overwrites it with the new value. The current hash of annotations
 can be retrieved with the C<annotations> opcode:
