@@ -91,7 +91,7 @@ So we do a bit of cheating here, and load it during class initialization.
 
 */
 
-    void class_init() {
+    VTABLE void class_init() {
         if (pass) {
 #ifdef WIN32
             /* RT #46393: What if libgdbm.so cannot be loaded */
