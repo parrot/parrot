@@ -1,0 +1,2 @@
+pmclass Foo provides scalar need_ext {
+}
