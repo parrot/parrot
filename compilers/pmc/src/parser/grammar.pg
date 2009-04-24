@@ -130,8 +130,9 @@ rule parrot_c_arguments {
 rule adverb {
     [
     | ':optional' <named>?
-    | ':slurpy' <named>?
     | ':opt_flag'
+    | ':slurpy' <named>?
+    | <named>
     ]
 }
 
