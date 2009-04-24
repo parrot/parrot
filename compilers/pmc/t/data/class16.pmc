@@ -1,0 +1,4 @@
+pmclass Foo {
+    METHOD inspect(STRING *what :optional, int has_what :opt_flag) {
+    }
+}

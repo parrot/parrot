@@ -68,7 +68,7 @@ rule vtable {
 }
 
 rule method {
-    'METHOD' <identifier> '(' <c_arguments> ')' <c_body>
+    'METHOD' <identifier> '(' <parrot_c_arguments> ')' <c_body>
     {*}
 }
 
@@ -100,6 +100,22 @@ rule c_argument {
 
 rule c_arguments {
     [ <c_argument> [ ',' <c_argument> ]* ]*
+}
+
+# c_arguments with parrot's adverbs
+rule parrot_c_argument {
+    <c_argument> <adverb>?
+}
+
+rule parrot_c_arguments {
+    [ <parrot_c_argument> [ ',' <parrot_c_argument> ]* ]*
+}
+
+rule adverb {
+    [
+    | ':optional'
+    | ':opt_flag'
+    ]
 }
 
 token identifier {
