@@ -49,6 +49,7 @@ rule traits {
     | 'no_init'
     | 'singleton'
     | 'dynpmc'
+    | 'no_ro'
     ]
 }
 
