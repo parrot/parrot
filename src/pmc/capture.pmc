@@ -210,7 +210,7 @@ Unshift a value onto the array component of the Capture.
         VTABLE_push_integer(INTERP, PARROT_CAPTURE(SELF)->array, value);
     }
 
-    void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) {
         CAPTURE_array_CREATE(INTERP, SELF);
         VTABLE_push_pmc(INTERP, PARROT_CAPTURE(SELF)->array, value);
     }
@@ -230,7 +230,7 @@ Unshift a value onto the array component of the Capture.
         VTABLE_unshift_integer(INTERP, PARROT_CAPTURE(SELF)->array, value);
     }
 
-    void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) {
         CAPTURE_array_CREATE(INTERP, SELF);
         VTABLE_unshift_pmc(INTERP, PARROT_CAPTURE(SELF)->array, value);
     }
