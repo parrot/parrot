@@ -40,8 +40,10 @@ rule pmc {
 
 rule traits {
     [
-    | 'extends' <identifier>
-    | 'provides' <identifier>
+    | 'extends'     <identifier>
+    | 'provides'    <identifier>
+    | 'group'       <identifier>
+    | 'lib'         <identifier>
     | 'need_ext'
     | 'abstract'
     | 'no_init'

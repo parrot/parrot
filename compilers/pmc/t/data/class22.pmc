@@ -1,0 +1,6 @@
+pmclass MD2
+    dynpmc
+    need_ext
+    group digest_group
+    lib crypto {
+}
