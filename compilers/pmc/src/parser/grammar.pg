@@ -52,7 +52,13 @@ rule attribute {
 
 # Body of PMC class. 
 rule body {
-    [ <vtable> | <method> | <multi> ]* 
+    [ <class_init> | <vtable> | <method> | <multi> ]* 
+    {*}
+}
+
+# PMC can have class_init function.
+rule class_init {
+    'void' 'class_init' '(' ')' <c_body>
     {*}
 }
 
