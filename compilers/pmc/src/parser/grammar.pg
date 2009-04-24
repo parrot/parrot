@@ -46,6 +46,7 @@ rule traits {
     | 'abstract'
     | 'no_init'
     | 'singleton'
+    | 'dynpmc'
     ]
 }
 
