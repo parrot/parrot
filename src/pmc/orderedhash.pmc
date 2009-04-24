@@ -346,7 +346,7 @@ The created key = "\1idx".
 
 */
 
-    void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) {
         const INTVAL n = SELF.elements();
         SELF.set_pmc_keyed_int(n, value);
     }
