@@ -709,7 +709,7 @@ annotation. If not, returns a Hash of all of them.
 
 */
 
-    METHOD PMC *annotations(STRING *name :optional, INTVAL have_name :opt_flag) {
+    METHOD annotations(STRING *name :optional, INTVAL have_name :opt_flag) {
         PMC *resume;
         PMC *result = PMCNULL;
 
@@ -746,7 +746,7 @@ sub, or for the point of the call a level deeper for the rest.
 
 */
 
-    METHOD PMC *backtrace() {
+    METHOD backtrace() {
         PMC *result = pmc_new(interp, enum_class_ResizablePMCArray);
         PMC *resume;
 
