@@ -1,0 +1,2 @@
+pmclass Env singleton provides hash {
+}

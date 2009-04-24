@@ -45,6 +45,7 @@ rule traits {
     | 'need_ext'
     | 'abstract'
     | 'no_init'
+    | 'singleton'
     ]
 }
 

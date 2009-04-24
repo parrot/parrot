@@ -5,7 +5,7 @@
 .include 'test_more.pir'
 load_bytecode 'compilers/pmc/pmc.pbc'
     .local int total
-    total = 20
+    total = 21
 
     plan(total)
     test_parse(total)
