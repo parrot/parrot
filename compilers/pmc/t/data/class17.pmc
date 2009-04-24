@@ -1,0 +1,8 @@
+pmclass Foo {
+    METHOD add_method(STRING *name, PMC *sub,
+                              int vtable     :optional :named("vtable"),
+                              int has_vtable :opt_flag,
+                              int anon       :optional :named("anon"),
+                              int has_anon   :opt_flag) {
+    }
+}

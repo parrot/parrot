@@ -1,0 +1,4 @@
+pmclass Foo {
+    METHOD new(PMC *args :slurpy :named) {
+    }
+}

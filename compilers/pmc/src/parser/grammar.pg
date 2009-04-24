@@ -113,9 +113,14 @@ rule parrot_c_arguments {
 
 rule adverb {
     [
-    | ':optional'
+    | ':optional' <named>?
+    | ':slurpy' <named>?
     | ':opt_flag'
     ]
+}
+
+rule named {
+    ':named' [ '("' <identifier> '")' ]?
 }
 
 token identifier {
