@@ -372,7 +372,7 @@ the array.
 
 */
 
-    void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) {
         STRING *strvalue = VTABLE_get_string(INTERP, value);
         SELF.push_string(strvalue);
     }
@@ -484,7 +484,7 @@ the array.
 
 */
 
-    void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) {
         STRING *strvalue = VTABLE_get_string(INTERP, value);
         SELF.unshift_string(strvalue);
     }
@@ -592,7 +592,7 @@ everything via the VTABLE api.
 
 */
 
-    void splice(PMC *value, INTVAL offset, INTVAL count) {
+    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) {
 
         INTVAL length, elems, shift, i;
 
@@ -652,12 +652,12 @@ end of the array.
 
 */
 
-    METHOD PMC* shift() {
+    METHOD shift() {
         PMC *value = SELF.shift_pmc();
         RETURN(PMC *value);
     }
 
-    METHOD PMC* pop() {
+    METHOD pop() {
         PMC *value = SELF.pop_pmc();
         RETURN(PMC *value);
     }
