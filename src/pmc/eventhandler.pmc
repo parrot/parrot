@@ -172,7 +172,7 @@ Sets the C<type> attribute of this event handler to the passed-in string.
 
 */
 
-    void set_string(STRING *type) {
+    VTABLE void set_string(STRING *type) {
         Parrot_EventHandler_attributes *e = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
 
         if (e)
