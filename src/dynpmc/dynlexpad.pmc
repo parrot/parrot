@@ -38,7 +38,7 @@ lexinfo.
 =cut
 
 */
-    void init_pmc(PMC* lexinfo) {
+    VTABLE void init_pmc(PMC* lexinfo) {
         Hash *hash;
 
         Parrot_DynLexPad_attributes *attrs =
@@ -66,7 +66,7 @@ Initialize the LexPad PMC and remember the associate context.
 =cut
 
 */
-    void set_pointer(void* ctx) {
+    VTABLE void set_pointer(void* ctx) {
         PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
         if (std_pad)
             VTABLE_set_pointer(interp, std_pad, ctx);
@@ -81,7 +81,7 @@ Returns the number of elements in the hash.
 =cut
 
 */
-    INTVAL elements() {
+    VTABLE INTVAL elements() {
         return parrot_hash_size(interp, PARROT_DYNLEXPAD(SELF)->hash);
     }
 
@@ -97,12 +97,12 @@ Returns whether a lexical C<name> exists in the hash.
 
 */
 
-    INTVAL exists_keyed(PMC* name) {
+    VTABLE INTVAL exists_keyed(PMC* name) {
         STRING *s = VTABLE_get_string(interp, name);
         return SELF.exists_keyed_str(s);
     }
 
-    INTVAL exists_keyed_str(STRING* name) {
+    VTABLE INTVAL exists_keyed_str(STRING* name) {
         PMC *std_pad;
         if (parrot_hash_exists(interp, PARROT_DYNLEXPAD(SELF)->hash, name))
             return 1;
@@ -124,7 +124,7 @@ lexical doesn't exist.
 =cut
 
 */
-    PMC* get_pmc_keyed_str(STRING* name) {
+    VTABLE PMC* get_pmc_keyed_str(STRING* name) {
         HashBucket *b = parrot_hash_get_bucket(interp,
             PARROT_DYNLEXPAD(SELF)->hash, name);
 
@@ -140,7 +140,7 @@ lexical doesn't exist.
         return (PMC *)b->value;
     }
 
-    PMC* get_pmc_keyed(PMC* name) {
+    VTABLE PMC* get_pmc_keyed(PMC* name) {
         STRING *s = VTABLE_get_string(interp, name);
         return SELF.get_pmc_keyed_str(s);
     }
@@ -159,12 +159,12 @@ doesn't exist, it is created.
 
 */
 
-    void set_pmc_keyed(PMC* name, PMC* value) {
+    VTABLE void set_pmc_keyed(PMC* name, PMC* value) {
         STRING *s = VTABLE_get_string(interp, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 
-    void set_pmc_keyed_str(STRING* name, PMC* value) {
+    VTABLE void set_pmc_keyed_str(STRING* name, PMC* value) {
         PMC *std_pad = PARROT_DYNLEXPAD(SELF)->init;
 
         if (std_pad && VTABLE_exists_keyed_str(interp, std_pad, name))
