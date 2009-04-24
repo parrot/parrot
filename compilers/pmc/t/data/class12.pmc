@@ -1,0 +1,22 @@
+pmclass Foo {
+
+    MULTI PMC *add(Integer value, PMC *dest) {
+        const INTVAL a = SELF.get_integer();
+        const INTVAL b = VTABLE_get_integer(INTERP, value);
+        const INTVAL c = a + b;
+
+        if ((c^a) >= 0 || (c^b) >= 0) {
+            dest = pmc_new(INTERP, VTABLE_type(interp, SELF));
+
+            /* need this for e.g. Undef PMC */
+            VTABLE_set_integer_native(INTERP, dest, c);
+            return dest;
+        }
+        else {
+            PMC * temp;
+            maybe_throw_overflow_error(interp);
+            temp = VTABLE_get_bignum(interp, SELF);
+            return VTABLE_add(interp, temp, value, dest);
+        }
+    }
+}

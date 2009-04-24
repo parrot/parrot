@@ -1,0 +1,6 @@
+Simple todo list for PMC compiler.
+
+1. Implement parsing PMC.
+2. Implement emiting C code.
+3. ...
+4. Profit!

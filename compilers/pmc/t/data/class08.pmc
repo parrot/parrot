@@ -1,0 +1,93 @@
+/*
+Copyright (C) 2003-2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/integer.pmc - Integer PMC class
+
+=head1 DESCRIPTION
+
+C<Integer> provides an integer for languages that want a value-restricted
+integer type without going to an I register.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+#include "pmc_bigint.h"
+
+static void
+maybe_throw_overflow_error(PARROT_INTERP)
+{
+    /* check to see what the behavior is. If the interpreter is set
+       to throw an exception on overflow. If so, throw the exception,
+       otherwise, chill out it's no big deal. */
+    if (PARROT_ERRORS_test(interp, PARROT_ERRORS_OVERFLOW_FLAG))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
+            "Integer overflow");
+}
+
+static PMC*
+upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
+{
+    /* Do an in-place upgrade to a Bignum of SELF and return a pointer
+       to it (which is probably redundant, but whatever). */
+    const INTVAL a = VTABLE_get_integer(interp, self);
+    pmc_reuse(interp, self, enum_class_BigInt, 0);
+    VTABLE_set_integer_native(interp, self, a);
+    return self;
+}
+
+pmclass Integer extends scalar provides integer provides scalar {
+
+/*
+=item C<PMC instantiate(PMC *sig)>
+
+Create a new Integer with arguments passed according to pdd03.
+
+=item C<void init()>
+
+Initializes the integer with a default value of C<0>.
+
+=item C<void destroy()>
+
+Destroys this PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *instantiate(PMC *sig) {
+        PMC            * const ret    = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        const opcode_t * const arg_op = interp->current_args;
+        INTVAL                 init   = 0;
+
+        if (VTABLE_elements(interp, sig) == 2) {
+            switch (VTABLE_get_integer_keyed_int(INTERP, sig, 1)) {
+                case PARROT_ARG_I:
+                    init = REG_INT(interp, arg_op[3]);
+                    break;
+                case PARROT_ARG_IC:
+                    init = arg_op[3];
+                    break;
+                default:
+                    Parrot_ex_throw_from_c_args(INTERP, NULL,
+                            EXCEPTION_SYNTAX_ERROR,
+                            "Integer.instantiate: unhandled initializer");
+                    break;
+            }
+        }
+
+        VTABLE_set_integer_native(INTERP, ret, init);
+        return ret;
+    }
+
+}
+

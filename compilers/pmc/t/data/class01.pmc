@@ -1,0 +1,2 @@
+pmclass Foo extends scalar {
+}

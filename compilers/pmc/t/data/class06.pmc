@@ -1,0 +1,12 @@
+pmclass Foo extends scalar provides scalar {
+/*
+=item C<foo>
+
+=cut
+
+*/
+    METHOD foo (void) {
+        if {
+        }
+    }
+}

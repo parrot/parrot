@@ -1,0 +1,16 @@
+pmclass foo {
+    ATTR int    int_attribute;
+    ATTR PMC*   pmc_attribute;
+
+/*
+=item foo
+
+=cut
+*/
+    VTABLE void foo() {
+        /* some foo */
+        if (1) {
+            fprintf(stdout, "Hello");
+        }
+    }
+}

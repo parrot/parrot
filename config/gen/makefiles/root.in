@@ -152,6 +152,7 @@ GEN_MAKEFILES := \
     compilers/pct/Makefile \
     compilers/pge/Makefile \
     compilers/tge/Makefile \
+    compilers/pmc/Makefile \
     editor/Makefile \
     ext/Makefile \
     src/dynoplibs/Makefile
@@ -1392,6 +1393,7 @@ compilers.dummy : $(PARROT) $(GEN_LIBRARY)
 	$(MAKE) compilers/tge
 	$(MAKE) compilers/nqp
 	$(MAKE) compilers/json
+	$(MAKE) compilers/pmc
 
 compilers-clean :
 	$(MAKE) compilers/pct clean
@@ -1400,6 +1402,7 @@ compilers-clean :
 	$(MAKE) compilers/nqp clean
 	$(MAKE) compilers/json clean
 	$(MAKE) compilers/pirc clean
+	$(MAKE) compilers/pmc clean
 
 ###############################################################################
 #

@@ -1,0 +1,111 @@
+# Copyright (C) 2009, Parrot Foundation.
+# $Id$
+
+
+=begin overview
+
+This is PMC grammar.
+
+(ATM) PMC consists of
+1. Some pure C header.
+2. PMC class definition.
+3. Optional ATTRibutes.
+4. Mix of VTABLE and METHODS.
+
+=end overview
+
+grammar PMC::Grammar is PCT::Grammar;
+
+token TOP {
+    #<c_header>
+    <pmc>
+    [ $ || <panic: 'Syntax error'> ]
+    {*}
+}
+
+rule c_header {
+#  .* way too gready...
+#    [.*] [<!before 'pmclass'> ]
+    {*}
+}
+
+# pmc action will store "header" and "footer"
+rule pmc {
+    'pmclass' <identifier> <traits>* '{'
+        <attribute>*
+        <body>
+    '}'
+    {*}
+}
+
+rule traits {
+    [
+    | 'extends' <identifier>
+    | 'provides' <identifier>
+    ]
+}
+
+rule attribute {
+    'ATTR' <c_type> <identifier> ';'
+}
+
+# Body of PMC class. 
+rule body {
+    [ <vtable> | <method> | <multi> ]* 
+    {*}
+}
+
+rule vtable {
+    'VTABLE' <c_signature> <c_body>
+    {*}
+}
+
+rule method {
+    'METHOD' <identifier> '(' <c_arguments> ')' <c_body>
+    {*}
+}
+
+rule multi {
+    'MULTI' <c_signature> <c_body>
+    {*}
+}
+
+# Nested list of something
+rule c_body {
+    '{' [ <-[{}]> | <c_body> ]* '}'
+    {*}
+}
+
+# It's really bad signature
+rule c_signature {
+    <c_type> <identifier> '(' <c_arguments> ')'
+}
+
+# Very-very simplified C type. E.g. "void", "PMC *", etc
+rule c_type {
+    <identifier> '*'?
+}
+
+# Very-very simplified named? function param.
+rule c_argument {
+    <c_type> <identifier>?
+}
+
+rule c_arguments {
+    [ <c_argument> [ ',' <c_argument> ]* ]*
+}
+
+token identifier {
+    <.ident>
+}
+
+## ws token handles whitespaces and C /* */ comments
+token ws {
+  [
+  | '//' \N* \n
+  | '/*' .*? '*/'
+  | \s+
+  ]*
+}
+
+

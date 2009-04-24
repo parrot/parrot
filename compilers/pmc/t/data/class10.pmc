@@ -1,0 +1,4 @@
+pmclass foo {
+    ATTR int    int_attribute;
+    ATTR PMC*   pmc_attribute;
+}

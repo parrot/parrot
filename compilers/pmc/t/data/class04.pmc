@@ -1,0 +1,4 @@
+pmclass Foo extends scalar provides scalar {
+    METHOD foo (void) {
+    }
+}

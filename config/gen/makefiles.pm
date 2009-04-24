@@ -48,6 +48,8 @@ sub _init {
             { SOURCE => 'config/gen/makefiles/tge.in' },
         'compilers/json/Makefile'    =>
             { SOURCE => 'config/gen/makefiles/json.in' },
+        'compilers/pmc/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/pmc.in' },
         'compilers/pirc/Makefile'    =>
             { SOURCE => 'config/gen/makefiles/pirc.in' },
         'src/dynpmc/Makefile'        =>
