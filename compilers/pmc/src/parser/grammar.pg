@@ -43,6 +43,8 @@ rule traits {
     | 'extends' <identifier>
     | 'provides' <identifier>
     | 'need_ext'
+    | 'abstract'
+    | 'no_init'
     ]
 }
 
