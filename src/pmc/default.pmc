@@ -538,23 +538,6 @@ C<get_string_keyed()> with it.
 
 /*
 
-=item C<INTVAL elements_keyed_int(INTVAL key)>
-
-Converts C<key> to a PMC key and returns the result of calling
-C<elements_keyed()> with it.
-
-=cut
-
-*/
-
-    INTVAL elements_keyed_int(INTVAL key) {
-        PMC *const r_key = INT2KEY(INTERP, key);
-        return SELF.elements_keyed(r_key);
-    }
-
-
-/*
-
 =item C<PMC *get_pmc_keyed_int(INTVAL key)>
 
 Converts C<key> to a PMC key and returns the result of calling
@@ -683,22 +666,6 @@ and C<value>.
     VTABLE void set_string_keyed_int(INTVAL key, STRING *string) {
         PMC *const r_key = INT2KEY(INTERP, key);
         SELF.set_string_keyed(r_key, string);
-    }
-
-/*
-
-=item C<void set_bool_keyed_int(INTVAL key, INTVAL value)>
-
-Converts C<key> to a PMC key and calls C<set_bool_keyed()> with it
-and C<value>.
-
-=cut
-
-*/
-
-    void set_bool_keyed_int(INTVAL key, INTVAL value) {
-        PMC *const r_key = INT2KEY(INTERP, key);
-        SELF.set_bool_keyed(r_key, value);
     }
 
 /*
@@ -890,7 +857,7 @@ Reports whether the PMC "does" the C<role>.
 
 */
 
-    INTVAL does_pmc(PMC *role) {
+    VTABLE INTVAL does_pmc(PMC *role) {
         UNUSED(role)
         /* No C-level roles yet. */
         return 0;
@@ -945,7 +912,7 @@ Provides introspection of a specific piece of information about the PMC.
 
 */
 
-    PMC *inspect_str(STRING *name) {
+    VTABLE PMC *inspect_str(STRING *name) {
         if (Parrot_str_equal(interp, name, CONST_STRING(interp, "flags"))) {
             PMC *found = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, found,
@@ -970,7 +937,7 @@ inspect_str.
 =cut
 
 */
-    PMC *inspect() {
+    VTABLE PMC *inspect() {
         PMC    *metadata           = pmc_new(interp, enum_class_Hash);
         STRING * const flags_str   = CONST_STRING(interp, "flags");
 
