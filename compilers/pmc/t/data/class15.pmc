@@ -1,0 +1,4 @@
+pmclass BigInt {
+    ATTR struct BIGINT * bi; /*bigint val*/
+
+}
