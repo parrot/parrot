@@ -666,7 +666,7 @@ Returns the full set of meta-data about the sub.
 
 */
 
-    PMC *inspect()
+    VTABLE PMC *inspect()
     {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
@@ -738,7 +738,7 @@ The number of optional named arguments
 
 */
 
-    PMC *inspect_str(STRING *what)
+    VTABLE PMC *inspect_str(STRING *what)
     {
         Parrot_sub *sub;
         INTVAL count_found = -1;
