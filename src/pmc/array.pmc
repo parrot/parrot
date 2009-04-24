@@ -785,7 +785,7 @@ the array.
 
 */
 
-    void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) {
         const INTVAL nextix = SELF.elements();
         SELF.set_pmc_keyed_int(nextix, value);
     }
@@ -854,7 +854,7 @@ of the array.
 
 */
 
-    void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) {
         list_unshift(INTERP, (List *)PMC_data(SELF), value, enum_type_PMC);
     }
 
@@ -992,7 +992,7 @@ C<offset>.
 
 */
 
-    void splice(PMC *value, INTVAL offset, INTVAL count) {
+    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) {
         if (SELF->vtable->base_type != value->vtable->base_type)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Type mismatch in splice");
