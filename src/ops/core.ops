@@ -733,7 +733,7 @@ Sets $1 to the absolute address of the Sub PMC $2.
 =cut
 
 inline op set_addr(out INT, inconst LABEL) {
-    $1 = PTR2OPCODE_T(CUR_OPCODE + $2);
+    $1 = PTR2INTVAL(CUR_OPCODE + $2);
 }
 
 inline op set_addr(invar PMC, inconst LABEL) {

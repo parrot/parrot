@@ -154,20 +154,6 @@ typedef struct parrot_interp_t Interp;
 #define PTR2INTVAL(p)    INTVAL2PTR(INTVAL, (p))
 #define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL, (p))
 
-/* Use similar macros for casting between pointers and opcode_t.
-   (We can't assume that sizeof (opcode_t) == sizeof (intval).
-*/
-#if (OPCODE_T_SIZE == PTR_SIZE)
-#  define OPCODE_T2PTR(any, d)    (any)(d)
-#else
-#  if PTR_SIZE == LONG_SIZE
-#    define OPCODE_T2PTR(any, d)    (any)(unsigned long)(d)
-#  else
-#    define OPCODE_T2PTR(any, d)    (any)(unsigned int)(d)
-#  endif /* PTR_SIZE == LONG_SIZE */
-#endif /* OPCODE_T_SIZE == PTR_SIZE */
-#define PTR2OPCODE_T(p)    OPCODE_T2PTR(opcode_t, (p))
-
 /*
  * some compilers don't like lvalue casts, so macroize them
  *
