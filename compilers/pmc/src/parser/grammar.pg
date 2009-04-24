@@ -61,7 +61,6 @@ rule attribute {
 rule body {
     [ <class_init> | <vtable> | <method> | <multi> ]* 
     {*}
-    || <.panic: "Unexpected PMC content">
 }
 
 # PMC can have class_init function.
@@ -76,9 +75,11 @@ rule vtable {
 }
 
 rule method {
-    'METHOD' || <identifier> '(' <parrot_c_arguments> ')' <c_body>
+    'METHOD' [
+        [ <identifier> '(' <parrot_c_arguments> ')' <c_body> ]
+        | <.panic: "Unexpected METHOD content">
+    ]
     {*}
-    || <.panic: "Malformed METHOD definition">
 }
 
 rule multi {
