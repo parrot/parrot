@@ -175,7 +175,7 @@ Sets this pair to hold the value of another.
 
 */
 
-    void set_pmc(PMC *pair) {
+    VTABLE void set_pmc(PMC *pair) {
         if (pair->vtable->base_type == SELF->vtable->base_type) {
             Parrot_Pair_attributes * const from = PARROT_PAIR(SELF);
             Parrot_Pair_attributes * const to   = PARROT_PAIR(SELF);
