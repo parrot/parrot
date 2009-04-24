@@ -24,7 +24,7 @@ Sub PMCs with the same short name, but different long names.
 
 pmclass MultiSub extends ResizablePMCArray need_ext provides array {
 
-    void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) {
         STRING * const _sub = CONST_STRING(interp, "Sub");
         STRING * const _nci = CONST_STRING(interp, "NCI");
 
@@ -99,7 +99,7 @@ pmclass MultiSub extends ResizablePMCArray need_ext provides array {
        (N, I, S, P). It should sort the argument list according to closeness
        to this input argument list and return an iterator over that list. */
 
-    METHOD PMC *get_iter(PMC *args) {
+    METHOD get_iter(PMC *args) {
         STRING * const _array  = CONST_STRING(interp, "Array");
         STRING * const _string = CONST_STRING(interp, "String");
 
