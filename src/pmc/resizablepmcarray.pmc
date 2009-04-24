@@ -385,7 +385,7 @@ the array.
         return;
     }
 
-    void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) {
 
         INTVAL size = PMC_size(SELF);
         SELF.set_integer_native(size + 1);
@@ -538,7 +538,7 @@ the array.
         return;
     }
 
-    void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) {
 
         INTVAL  size = PMC_size(SELF);
         PMC   **data;
@@ -714,7 +714,7 @@ everything via the VTABLE api.
 
 */
 
-    void splice(PMC *value, INTVAL offset, INTVAL count) {
+    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) {
 
         const INTVAL length = VTABLE_elements(INTERP, SELF);
         const INTVAL elems  = VTABLE_elements(INTERP, value);
@@ -768,12 +768,12 @@ end of the array.
 
 */
 
-    METHOD PMC* shift() {
+    METHOD shift() {
         PMC *value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
-    METHOD PMC* pop() {
+    METHOD pop() {
         PMC *value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
