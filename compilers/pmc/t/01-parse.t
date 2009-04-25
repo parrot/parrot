@@ -31,7 +31,7 @@ load_bytecode 'compilers/pmc/pmc.pbc'
     .local pmc compiler
     compiler = compreg 'PMC'
     push_eh fail
-    compiler.'parse'($S0)
+    compiler.'parse'($S0, 'target'=>'parse')
     pop_eh
     ok(1, file)
     .return ()
