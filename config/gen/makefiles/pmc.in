@@ -18,6 +18,7 @@ SOURCES := \
   pmc.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
+  src/nodes.pir \
   src/builtins.pir
 
 # the default target

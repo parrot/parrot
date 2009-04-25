@@ -16,6 +16,16 @@ So, POST and PIR nodes are useless.
 
 =back
 
+Implemented (fsvo) PAST nodes.
+
+=over 4
+
+=item C<PAST::PMC>
+
+PMC class by it self. Contains C<@traits>, C<@parents>, C<@vtable> methods and C<@method>s.
+
+=back
+
 =head1 AUTHORS
 
 Vasily "bacek" Chekalkin is creator of initial version.

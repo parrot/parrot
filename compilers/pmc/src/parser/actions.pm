@@ -8,10 +8,17 @@ method TOP($/) {
     make $( $<pmc> );
 }
 
-method pmc($/) {
-    #say("pmc");
-    my $pmc := PAST::Block.new( :blocktype('declaration'), :node($/) );
-    make $pmc;
+method pmc($/, $key) {
+    our $?PMC;
+
+    if $key eq 'begin' {
+        $?PMC := PMC::Class.new(
+            :name(~$<identifier>)
+        );
+    }
+    else {
+        make $?PMC;
+    }
 }
 
 method c_header($/) {
@@ -21,14 +28,45 @@ method c_header($/) {
     make $past;
 }
 
-method pmc_class($/) {
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
-    make $past;
+method traits($/, $key) {
+    our $?PMC;
+    
+    #say("traits " ~$/);
+    if $key eq 'extends' {
+        $?PMC.parents().push(~$<identifier>);
+    }
+    elsif $key eq 'provides' {
+    }
+    elsif $key eq 'group' {
+    }
+    elsif $key eq 'lib' {
+    }
+    else {
+        $?PMC.trait(~$/, 1);
+    }
+}
+
+method body_part($/, $key) {
+    our $?PMC;
+
+    my $m := $/{$key}.ast;
+    if $key eq 'vtable' {
+        $?PMC.add_vtable($m.name, $m);
+    }
+    elsif $key eq 'method' {
+    }
 }
 
 method vtable($/) {
-    #say('VABLE ' ~$<c_signature>);
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    #say('VABLE ' ~$<c_signature><identifier>);
+    my $past := PAST::Block.new( 
+        :name(~$<c_signature><identifier>),
+        :blocktype('method'),
+        :node($/),
+        PAST::Op.new(
+            :inline(~$<c_body>)
+        )
+    );
     make $past;
 }
 
@@ -40,12 +78,6 @@ method method($/) {
 
 method multi($/) {
     #say('MULTI ' ~$<identifier>);
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
-    make $past;
-}
-
-method body($/) {
-    #say("body");
     my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
     make $past;
 }
