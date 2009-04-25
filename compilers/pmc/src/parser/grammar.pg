@@ -31,25 +31,27 @@ rule c_header {
 
 # pmc action will store "header" and "footer"
 rule pmc {
-    'pmclass' <identifier> <traits>* '{'
+    pmclass <identifier> 
+    {*}                                     #= begin
+    <traits>* '{'
         <attribute>*
         <body>
     '}'
-    {*}
+    {*}                                     #= end
 }
 
 rule traits {
     [
-    | 'extends'     <identifier>
-    | 'provides'    <identifier>
-    | 'group'       <identifier>
-    | 'lib'         <identifier>
-    | 'need_ext'
-    | 'abstract'
-    | 'no_init'
-    | 'singleton'
-    | 'dynpmc'
-    | 'no_ro'
+    | 'extends'     <identifier>            {*} #= extends
+    | 'provides'    <identifier>            {*} #= provides
+    | 'group'       <identifier>            {*} #= group
+    | 'lib'         <identifier>            {*} #= lib
+    | 'need_ext'                            {*} #= need_ext
+    | 'abstract'                            {*} #= abstract
+    | 'no_init'                             {*} #= no_init
+    | 'singleton'                           {*} #= singleton
+    | 'dynpmc'                              {*} #= dynpmc
+    | 'no_ro'                               {*} #= no_ro
     ]
 }
 
@@ -59,8 +61,14 @@ rule attribute {
 
 # Body of PMC class. 
 rule body {
-    [ <class_init> | <vtable> | <method> | <multi> ]* 
-    {*}
+    <body_part>*
+}
+
+rule body_part {
+    | <class_init>  {*} #= class_init
+    | <vtable>      {*} #= vtable
+    | <method>      {*} #= method
+    | <multi>       {*} #= multi
 }
 
 # PMC can have class_init function.
@@ -69,21 +77,21 @@ rule class_init {
     {*}
 }
 
-rule vtable {
-    'VTABLE' || <c_signature> <c_body>
-    {*}
-}
-
 rule method {
-    'METHOD' [
+    'METHOD' :: [
         [ <identifier> '(' <parrot_c_arguments> ')' <c_body> ]
         | <.panic: "Unexpected METHOD content">
     ]
     {*}
 }
 
+rule vtable {
+    'VTABLE' :: <c_signature> <c_body>
+    {*}
+}
+
 rule multi {
-    'MULTI' <c_signature> <c_body>
+    'MULTI' :: <c_signature> <c_body>
     {*}
 }
 
@@ -141,7 +149,7 @@ rule named {
 }
 
 token identifier {
-    <.ident>
+    <.ident> 
 }
 
 ## ws token handles whitespaces and C /* */ comments
