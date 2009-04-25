@@ -172,7 +172,7 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
             IGLOBALS_DYN_LIBS);
 
     /* remember path/file in props */
-    set_cstring_prop(interp, lib_pmc, "_filename", path);  /* XXX */
+    set_cstring_prop(interp, lib_pmc, "_filename", path);
     set_cstring_prop(interp, lib_pmc, "_type", type);
 
     if (lib_name)
@@ -183,7 +183,7 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
 
 /*
 
-=item C<static PMC* is_loaded(PARROT_INTERP, STRING *path)>
+=item C<static PMC* is_loaded(PAROT_INTERP, STRING *path)>
 
 Check if a C<ParrotLibrary> PMC with the filename path exists.
 If it does, return it. Otherwise, return NULL.
@@ -423,9 +423,6 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     if (!load_func)
         type = CONST_STRING(interp, "NCI");
     else {
-        /* we could set a private flag in the PMC header too
-         * but currently only ops files have struct_val set */
-
         if (((Parrot_ParrotLibrary_attributes *)PMC_data(lib_pmc))->oplib_init)
             type = CONST_STRING(interp, "Ops");
         else
