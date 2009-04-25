@@ -255,7 +255,7 @@ Appends C<*value> to the key.
 
 */
 
-    void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) {
         if (value->vtable->base_type != enum_class_Key)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
@@ -426,7 +426,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         (info->visit_pmc_now)(INTERP, attrs->next_key, info);
     }
 
-    void freeze(visit_info *info) {
+    VTABLE void freeze(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
 
         /* write flags */
@@ -457,7 +457,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    void thaw(visit_info *info) {
+    VTABLE void thaw(visit_info *info) {
         IMAGE_IO * const io = info->image_io;
         const INTVAL flags  = VTABLE_shift_integer(INTERP, io) & KEY_type_FLAGS;
 
