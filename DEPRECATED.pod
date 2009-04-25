@@ -209,6 +209,14 @@ This function will be removed.  parrot_new_hash should be used in its place.
 
 L<https://trac.parrot.org/parrot/ticket/494>
 
+=item Parrot_get_namespace_autobase [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/155>
+
+=item Parrot_find_global_k [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/156>
+
 =back
 
 =head1 Compiler tools
