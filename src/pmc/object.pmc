@@ -583,7 +583,7 @@ Invokes the object (if this vtable function is overridden).
 
 */
 
-    opcode_t * invoke(void *next) {
+    VTABLE opcode_t * invoke(void *next) {
         Parrot_Object_attributes * const obj    = PARROT_OBJECT(pmc);
         Parrot_Class_attributes  * const _class = PARROT_CLASS(obj->_class);
 
