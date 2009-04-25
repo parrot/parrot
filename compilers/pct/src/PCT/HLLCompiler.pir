@@ -459,7 +459,7 @@ resulting ast.
     .return (ast)
 
   err_past:
-    pop_eh
+    #pop_eh
     $S0 = typeof source
     .tailcall self.'panic'('Unable to obtain PAST from ', $S0)
 .end
