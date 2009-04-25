@@ -9,9 +9,9 @@
  */
 
 pmclass ROTest dynpmc provides scalar extends Integer {
-    void set_integer_native(INTVAL value) :read {
+    VTABLE void set_integer_native(INTVAL value) :read {
     }
-    INTVAL get_integer() :write {
+    VTABLE INTVAL get_integer() :write {
         return 42;
     }
 

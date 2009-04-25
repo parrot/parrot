@@ -576,7 +576,7 @@ Returns the PMC value for the element at C<*key>.
         return iter;
     }
 
-    PMC *slice(PMC *key) {
+    VTABLE PMC *slice(PMC *key) {
         return PMCNULL;
     }
 

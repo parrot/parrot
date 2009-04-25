@@ -389,7 +389,7 @@ inspect_str.
 =cut
 
 */
-    PMC *inspect()
+    VTABLE PMC *inspect()
     {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */

@@ -533,36 +533,6 @@ arguments. The class is attached to the current HLL namespace.
 
 /*
 
-=item C<PMC *subclass(PMC *name)>
-
-Creates a subclass, optionally with a given C<name>.
-
-=cut
-
-*/
-
-    PMC *subclass(PMC *name) {
-        PMC *child_class;
-
-        /* Create a new class. Set the classname, if we have one. */
-        if (PMC_IS_NULL(name)) {
-            child_class = pmc_new(interp, enum_class_Class);
-        }
-        else {
-            PMC * const naming_hash = pmc_new(interp, enum_class_Hash);
-
-            VTABLE_set_pmc_keyed_str(interp, naming_hash, CONST_STRING(interp, "name"), name);
-            child_class = pmc_new_init(interp, enum_class_Class, naming_hash);
-        }
-
-        /* Make the new class a subclass of the current class */
-        VTABLE_add_parent(interp, child_class, SELF);
-
-        return child_class;
-    }
-
-/*
-
 =item C<void destroy()>
 
 Frees the memory associated with the class's underlying struct.
@@ -1357,7 +1327,7 @@ Returns whether the class does the role with the given C<*role_name>.
 =cut
 
 */
-    INTVAL does(STRING *role_name) {
+    VTABLE INTVAL does(STRING *role_name) {
         Parrot_Class_attributes * const _class    = PARROT_CLASS(SELF);
         PMC          * const role_list = _class->roles;
         INTVAL i, count;
@@ -1398,7 +1368,7 @@ Returns whether the class does the given C<*role>.
 =cut
 
 */
-    INTVAL does_pmc(PMC *role) {
+    VTABLE INTVAL does_pmc(PMC *role) {
         Parrot_Class_attributes * const _class    = PARROT_CLASS(SELF);
         PMC * const role_list          = _class->roles;
         INTVAL i, role_count, count;

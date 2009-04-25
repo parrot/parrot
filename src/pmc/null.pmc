@@ -36,7 +36,6 @@ Overrides the default to do nothing.
     VTABLE void init() {
     }
 
-    PARROT_CAN_RETURN_NULL
     VTABLE void *get_pointer() {
         return PMCNULL;
     }

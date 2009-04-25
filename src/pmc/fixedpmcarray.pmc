@@ -705,7 +705,7 @@ of this array.
 
 */
 
-    void splice(PMC *value, INTVAL offset, INTVAL count) {
+    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) {
         if (count + offset > PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 _("FixedPMCArray: index out of bounds!"));

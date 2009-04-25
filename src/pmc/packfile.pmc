@@ -421,7 +421,7 @@ Return raw serialized PBC file data. Synonym for get_string.
 
 */
 
-    METHOD STRING *pack() {
+    METHOD pack() {
         STRING * ret = SELF.get_string();
         RETURN(STRING * ret);
     }
@@ -437,7 +437,7 @@ Synonym for set_string.
 
 */
 
-    METHOD void unpack(STRING *str) {
+    METHOD unpack(STRING *str) {
         SELF.set_string_native(str);
     }
 

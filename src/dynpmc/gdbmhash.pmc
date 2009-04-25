@@ -91,7 +91,7 @@ So we do a bit of cheating here, and load it during class initialization.
 
 */
 
-    void class_init() {
+    VTABLE void class_init() {
         if (pass) {
 #ifdef WIN32
             /* RT #46393: What if libgdbm.so cannot be loaded */
@@ -116,11 +116,11 @@ So we do a bit of cheating here, and load it during class initialization.
         mem_sys_free(PMC_data(SELF));
     }
 
-    void* get_pointer() {
+    VTABLE void* get_pointer() {
         return PMC_dbfh(SELF);
     }
 
-    void set_pointer(void* p) {
+    VTABLE void set_pointer(void* p) {
         PMC_dbfh(SELF) = (GDBM_FILE)p;
     }
 
@@ -134,7 +134,7 @@ Open a or create a new dbm file.
 
 */
 
-    void set_string_native(STRING* value) {
+    VTABLE void set_string_native(STRING* value) {
         char * const c_db_name = Parrot_str_to_cstring(interp, value);
         GDBM_FILE dbf          = gdbm_open(c_db_name, 0, GDBM_NEWDB, 0666, 0);
 
@@ -206,7 +206,7 @@ Returns true if the hash size is not zero.
 
 */
 
-    void set_string_keyed(PMC* key, STRING* value) {
+    VTABLE void set_string_keyed(PMC* key, STRING* value) {
         STRING* keystr;
         GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm, val_gdbm;
@@ -235,7 +235,7 @@ Returns the string value for the element at C<*key>.
 
 */
 
-    STRING* get_string_keyed(PMC *key) {
+    VTABLE STRING* get_string_keyed(PMC *key) {
         STRING *keystr, *val;
         GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm, val_gdbm;
@@ -269,7 +269,7 @@ Convert C<value> to a string and set the string for the C<key>.
 
 */
 
-    void set_pmc_keyed(PMC* key, PMC* value) {
+    VTABLE void set_pmc_keyed(PMC* key, PMC* value) {
         STRING *temp;
 
         temp = VTABLE_get_string(interp, value);
@@ -286,7 +286,7 @@ Returns the PMC value for the element at C<*key>.
 
 */
 
-    PMC* get_pmc_keyed(PMC* key) {
+    VTABLE PMC* get_pmc_keyed(PMC* key) {
         STRING * ret_string = SELF.get_string_keyed(key);
         PMC *ret_pmc = pmc_new(interp, enum_class_String);
 
@@ -305,7 +305,7 @@ Convert C<value> to a string and set the string for the C<key>.
 
 */
 
-    void set_integer_keyed(PMC* key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC* key, INTVAL value) {
         PMC *temp;
 
         temp = pmc_new(interp, enum_class_String);
@@ -324,7 +324,7 @@ Convert C<value> to a string and set the string for the C<key>.
 
 */
 
-    void set_number_keyed(PMC* key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC* key, FLOATVAL value) {
         PMC *temp;
 
         temp = pmc_new(interp, enum_class_String);
@@ -342,7 +342,7 @@ Returns whether a key C<*key> exists in the hash.
 
 */
 
-    INTVAL exists_keyed(PMC* key) {
+    VTABLE INTVAL exists_keyed(PMC* key) {
         STRING* keystr;
         GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm;
@@ -367,7 +367,7 @@ Deletes the element associated with C<*key>.
 
 */
 
-    void delete_keyed(PMC* key) {
+    VTABLE void delete_keyed(PMC* key) {
         STRING* keystr;
         GDBM_FILE dbf = PMC_dbfh(SELF);
         datum key_gdbm;

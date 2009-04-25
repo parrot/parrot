@@ -655,7 +655,7 @@ Replace the string at C<key> with the chr of C<value>.
         return string_ord(INTERP, s, key_integer(INTERP, key));
     }
 
-    void set_string_keyed(PMC *key, STRING * const value) {
+    VTABLE void set_string_keyed(PMC *key, STRING * const value) {
         STRING * const s   = SELF.get_string();
         const INTVAL   len = Parrot_str_byte_length(INTERP, value);
         Parrot_str_replace(INTERP, s, key_integer(INTERP, key), len, value, NULL);
