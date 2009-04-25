@@ -2,5 +2,27 @@
 
 =head1 PMC - experimental PMC compiler written in PCT
 
+=head2 PAST nodes.
+
+PMC compiler uses own subset of PAST nodes. Reasons are
+
+=over 4
+
+=item We don't target parrot by it self.
+
+So, POST and PIR nodes are useless.
+
+=item I'm too dumb
+
+=back
+
+=head1 AUTHORS
+
+Vasily "bacek" Chekalkin is creator of initial version.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2009, Parrot Foundation.
+
 =cut
 
