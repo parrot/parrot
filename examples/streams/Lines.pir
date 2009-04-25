@@ -18,8 +18,8 @@ Creates a stream and pipes it through a Stream::Lines stream.
     .local pmc stream
     .local pmc lines
 
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Lines.pir"
+    load_bytecode "Stream/Sub.pir"
+    load_bytecode "Stream/Lines.pir"
 
     # create a text stream
     stream = new "Stream::Sub"
