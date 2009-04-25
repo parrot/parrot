@@ -204,9 +204,9 @@ The following documents might be useful to learn more:
 This directory contains the Parrot Compiler Toolkit Tutorial, describing the
 implementation of a simple yet non-trivial language.
 
-=item * L<docs/past_building_blocks.pod>
+=item * L<docs/pct/past_building_blocks.pod>
 
-=item * L<docs/pdds/pdd26_past.pod>
+=item * L<docs/pdds/pdd26_ast.pod>
 
 =item * L<docs/pdds/pdd19_pir.pod>
 
