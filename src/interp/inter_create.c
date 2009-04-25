@@ -424,8 +424,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     /* deinit op_lib */
     (void) PARROT_CORE_OPLIB_INIT(0);
 
-    stack_destroy(interp->dynamic_env);
-
     destroy_context(interp);
     destroy_runloop_jump_points(interp);
 

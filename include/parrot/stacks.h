@@ -94,9 +94,6 @@ void * pop_dest(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void stack_destroy(SHIM(Stack_Chunk_t *top));
-
-PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 Stack_Entry_t * stack_entry(SHIM_INTERP,
@@ -189,7 +186,6 @@ Stack_entry_type get_entry_type(ARGIN(const Stack_Entry_t *entry))
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pop_dest __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_stack_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_stack_entry __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(stack)
 #define ASSERT_ARGS_stack_height __attribute__unused__ int _ASSERT_ARGS_CHECK = \
