@@ -528,7 +528,7 @@ Returns whether the class does the role with the given C<*rolename>.
 =cut
 
 */
-    INTVAL does(STRING *role_name)
+    VTABLE INTVAL does(STRING *role_name)
     {
         Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
@@ -555,7 +555,7 @@ Returns whether the class does the givne C<*role>.
 =cut
 
 */
-    INTVAL does_pmc(PMC *role)
+    VTABLE INTVAL does_pmc(PMC *role)
     {
         Parrot_Role_attributes * const this_role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
