@@ -135,7 +135,10 @@ sub find_attrs {
 
         # name
         \s*
-        (\w+)
+        (
+            \w+
+          | \(\*\w*\)\(.*?\)
+        )
 
         # modifiers
         \s*

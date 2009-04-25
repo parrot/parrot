@@ -29,12 +29,12 @@ pmclass ManagedStruct extends UnManagedStruct need_ext {
      * custom_free_func is called before the normal destroy() function does any
      * work.
      */
-    ATTR void *custom_free_func;
+    ATTR void (*custom_free_func)(PARROT_INTERP, void *, void *);
     ATTR void *custom_free_priv;
     /* if custom_clone_func is set, it will be called *instead* of the normal
      * clone() function logic.
      */
-    ATTR void *custom_clone_func;
+    ATTR PMC * (*custom_clone_func)(PARROT_INTERP, PMC *ptr, void *priv);
     ATTR void *custom_clone_priv;
 
 /*
@@ -86,8 +86,7 @@ Otherwise, mem_sys_free() is used.
     VTABLE void destroy() {
         void *ptr = PARROT_MANAGEDSTRUCT(SELF)->ptr;
         if (ptr) {
-            custom_free_func_t free_func =
-                (custom_free_func_t)PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;
+            custom_free_func_t free_func = PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;
             if (free_func) {
                 void *free_data = PARROT_MANAGEDSTRUCT(SELF)->custom_free_priv;
                 free_func(interp, ptr, free_data);
@@ -144,8 +143,7 @@ of knowing how to make a deep copy of the pointer contents.
 */
 
     VTABLE PMC *clone() {
-        custom_clone_func_t clone_func =
-            (custom_clone_func_t)PARROT_MANAGEDSTRUCT(SELF)->custom_clone_func;
+        custom_clone_func_t clone_func = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_func;
         PMC *dest;
         if (clone_func) {
             void *clone_data = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_priv;

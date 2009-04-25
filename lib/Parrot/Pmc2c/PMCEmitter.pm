@@ -498,8 +498,12 @@ EOC
     my $attributes = $self->attributes;
     foreach my $attribute ( @$attributes ) {
         my $attrtype       = $attribute->{type};
+        my $attrname       = $attribute->{name};
         my $typeid = ':'; # Unhandled
-        if ($attrtype eq "INTVAL") {
+        if($attrname =~ m/\(*(\w+)\)\(.*?\)/) {
+            $attrname = $1;
+        }
+        elsif ($attrtype eq "INTVAL") {
             $typeid = 'I';
         }
         elsif ($attrtype eq "FLOATVAL") {
@@ -513,7 +517,7 @@ EOC
         }
 
         $cout .= $typeid;
-        $cout .= $attribute->name;
+        $cout .= $attrname;
         $cout .= ' ';
     }
 

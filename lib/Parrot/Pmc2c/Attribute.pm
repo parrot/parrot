@@ -99,6 +99,13 @@ sub generate_accessor {
     my $pmcname        = $pmc->{name};
     my $attrtype       = $self->{type};
     my $attrname       = $self->{name};
+    my $isfuncptr      = 0;
+    my $origtype       = $attrtype;
+    if($attrname =~ m/\(\*(\w*)\)\((.*?)\)/) {
+        $isfuncptr = 1;
+        $origtype = $attrtype . " (*)(" . $2 . ")";
+        $attrname = $1;
+    }
 
     # Store regexes used to check some types to avoid repetitions
     my $isptrtostring = qr/STRING\s*\*$/;
@@ -113,7 +120,14 @@ sub generate_accessor {
         if (PObj_is_object_TEST(pmc)) { \\
 EOA
 
-    if ($attrtype eq "INTVAL") {
+    if ($isfuncptr == 1) {
+        $decl .= <<"EOA";
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$origtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
+EOA
+    }
+    elsif ($attrtype eq "INTVAL") {
         $decl .= <<"EOA";
             PMC *attr_value = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
@@ -161,7 +175,14 @@ EOA
         if (PObj_is_object_TEST(pmc)) { \\
 EOA
 
-    if ($attrtype eq "INTVAL") {
+    if ($isfuncptr == 1) {
+        $decl .= <<"EOA";
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$origtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
+EOA
+    }
+    elsif ($attrtype eq "INTVAL") {
         $decl .= <<"EOA";
             PMC *attr_value = pmc_new(interp, enum_class_Integer); \\
             VTABLE_set_integer_native(interp, attr_value, value); \\
