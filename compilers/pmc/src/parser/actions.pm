@@ -13,10 +13,12 @@ method pmc($/, $key) {
 
     if $key eq 'begin' {
         $?PMC := PMC::Class.new(
-            :name(~$<identifier>)
+            :name(~$<identifier>),
+            :node($/)
         );
     }
     else {
+        # Set c_header and c_coda
         make $?PMC;
     }
 }
@@ -49,11 +51,13 @@ method traits($/, $key) {
 method body_part($/, $key) {
     our $?PMC;
 
+    #say("body_part: " ~$key);
     my $m := $/{$key}.ast;
     if $key eq 'vtable' {
         $?PMC.add_vtable($m.name, $m);
     }
     elsif $key eq 'method' {
+        $?PMC.add_method($m.name, $m);
     }
 }
 
@@ -72,7 +76,14 @@ method vtable($/) {
 
 method method($/) {
     #say('METHOD ' ~$<identifier>);
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := PAST::Block.new(
+        :name(~$<identifier>),
+        :blocktype('declaration'),
+        :node($/),
+        PAST::Op.new(
+            :inline(~$<c_body>)
+        )
+    );
     make $past;
 }
 

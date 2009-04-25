@@ -121,6 +121,31 @@ Add VTABLE method to PMC.
     .param pmc method
 
     $P0 = self.'attr'('vtables', 0, 0)
+    $I0 = exists $P0[name]
+    unless $I0 goto add_method
+    $S0 = concat "Duplicate VTABLE method: ", name
+    die $S0
+  add_method:
+    $P0[name] = method
+    .return ()
+.end
+
+=item C<add_method>
+
+Add METHOD to PMC.
+
+=cut
+
+.sub 'add_method' :method
+    .param string name
+    .param pmc method
+
+    $P0 = self.'attr'('methods', 0, 0)
+    $I0 = exists $P0[name]
+    unless $I0 goto add_method
+    $S0 = concat "Duplicate METHOD: ", name
+    die $S0
+  add_method:
     $P0[name] = method
     .return ()
 .end
