@@ -15,7 +15,6 @@ use lib 'lib';
 
 use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
-use Math::BigInt ();
 use Getopt::Long ();
 use IO::File ();
 
@@ -69,13 +68,12 @@ sub get_length {
 }
 
 sub hash_val {
-    my $h = Math::BigInt->new('+0');
+    my $h = 0;
     my $s = shift;
     for ( my $i = 0 ; $i < length($s) ; ++$i ) {
+        $h &= 0x03ffffff;
         $h += $h << 5;
-        $h &= 0xffffffff;
-        $h += ord substr( $s, $i, 1 );
-        $h &= 0xffffffff;
+        $h ^= ord substr( $s, $i, 1 );
     }
     return sprintf( "0x%x", $h );
 }
