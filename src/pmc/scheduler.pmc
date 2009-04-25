@@ -116,7 +116,7 @@ current maximum, and a birthtime of the current time.
 
 */
 
-    void push_pmc(PMC *task) {
+    VTABLE void push_pmc(PMC *task) {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         STRING                  *task_id_str;
         INTVAL                   new_tid;
