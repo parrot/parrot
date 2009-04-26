@@ -19,7 +19,7 @@ SOURCES := \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
   src/nodes.pir \
-  src/compiler.pir \
+  src/gen_compiler.pir \
   src/builtins.pir
 
 # the default target
@@ -36,6 +36,10 @@ src/parser/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 src/parser/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/parser/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
+
+src/gen_compiler.pir: $(NQP) $(PCT) src/compiler.pm
+	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_compiler.pir \
+	    --target=pir src/compiler.pm
 
 
 # This is a listing of all targets, that are meant to be called by users
@@ -66,7 +70,9 @@ testclean:
 
 CLEANUPS := \
   pmc.pbc \
-  src/parser/grammar.pir
+  src/parser/gen_grammar.pir \
+  src/parser/gen_actions.pir \
+  src/gen_compiler.pir
 
 
 clean:

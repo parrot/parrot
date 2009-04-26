@@ -3,13 +3,32 @@
 
 .namespace [ 'PMC';'Compiler' ]
 
+.sub '__onload' :load :init
+    load_bytecode 'PGE.pbc'
+    load_bytecode 'PCT.pbc'
+    load_bytecode 'compilers/nqp/nqp.pbc'
+
+    .local pmc p6meta
+    p6meta = new 'P6metaclass'
+
+    p6meta.'new_class'('PMC::Compiler', 'parent'=>'PCT::HLLCompiler')
+
+    # Register grammar and action
+    $P0 = new [ 'PMC';'Compiler' ]
+    $P0.'language'('PMC')
+    $P0.'parsegrammar'('PMC::Grammar')
+    $P0.'parseactions'('PMC::Grammar::Actions')
+
+.end
+
+
 .sub 'main' :main
     .param pmc args
     $P0 = compreg 'PMC'
     .tailcall $P0.'command_line'(args, 'encoding'=>'utf8', 'transcode'=>'ascii')
 .end
 
-.include 'src/compiler.pir'
+.include 'src/gen_compiler.pir'
 .include 'src/nodes.pir'
 .include 'src/parser/gen_grammar.pir'
 .include 'src/parser/gen_actions.pir'
