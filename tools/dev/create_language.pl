@@ -877,7 +877,7 @@ my @tfiles = map { all_in($_) } sort @files;
 
 if (eval { require TAP::Harness; 1 }) {
     my %harness_options = (
-        exec      => ['./perl6'],
+        exec      => ['./@lclang@'],
         verbosity => 0+$Test::Harness::verbose,
         jobs      => $jobs || 1,
     );
