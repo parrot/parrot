@@ -743,8 +743,15 @@
 .sub 'noun' :method
     .param pmc match
     .param pmc key
+
     $P0 = match[key]
+    if key == 'self' goto make_self
     $P1 = $P0.'ast'()
+    match.'!make'($P1)
+    .return()
+  make_self:
+    $P9 = get_hll_global ['PAST'], 'Op'
+    $P1 = $P9.'new'('inline'=>'    %r = self', 'pasttype'=>'inline', 'node'=>$P0)
     match.'!make'($P1)
 .end
 
