@@ -1,4 +1,5 @@
 #../../parrot -t5 test.pir
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 .sub 'main'

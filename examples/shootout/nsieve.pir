@@ -1,4 +1,5 @@
 #!./parrot
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 #
 # ./parrot -R jit nsieve.pir N  (N = 9 for shootout)

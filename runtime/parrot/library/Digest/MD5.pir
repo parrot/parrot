@@ -1,3 +1,4 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # Parrot MD5 library; Nick Glencross <nickg@glencros.demon.co.uk>

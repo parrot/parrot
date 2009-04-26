@@ -1,4 +1,5 @@
 #!./parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # ./parrot -R jit fannkuch.pir N         (N = 9 for shootout)

@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # random.pir N         (N = 900000 for shootout)

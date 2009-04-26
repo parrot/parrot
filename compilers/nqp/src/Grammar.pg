@@ -1,4 +1,4 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 
@@ -261,7 +261,7 @@ token postfix {
 
 token methodop {
     '.' <ident>
-    [ 
+    [
     | '(' ~ ')' <arglist> {*}                              #= arglist
     | {*}                                                  #= null
     ]

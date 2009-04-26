@@ -1,3 +1,4 @@
+# Copyright (C) 2009, Parrot Foundation.
 # $Id$
 # demonstrate Tcl/Tk GUI using NCI
 
