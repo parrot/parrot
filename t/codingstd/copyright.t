@@ -145,6 +145,10 @@ my @permitted_duplicate_copyright_files = (
         file    => 'tools/build/vtable_extend.pl',
         reason  => 'heredoc text for generated file',
     },
+    {
+        file    => 'examples/pir/quine_ord.pir',
+        reason  => 'quine',
+    },
 );
 my $cwd = cwd();
 my %permitted_duplicate_copyright_files =
