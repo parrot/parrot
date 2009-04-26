@@ -1,9 +1,11 @@
 #!parrot
 
+.include 'compilers/pmc/t/common.pir'
 
 .sub 'main' :main
 .include 'test_more.pir'
 load_bytecode 'compilers/pmc/pmc.pbc'
+
     .local int total
     total = 24
 
@@ -23,30 +25,6 @@ load_bytecode 'compilers/pmc/pmc.pbc'
     inc i
     unless i >= total goto loop
 
-.end
-
-.sub 'test_parse_one'
-    .param string file
-    $S0 = _slurp(file)
-    .local pmc compiler
-    compiler = compreg 'PMC'
-    push_eh fail
-    compiler.'parse'($S0, 'target'=>'parse')
-    pop_eh
-    ok(1, file)
-    .return ()
-  fail:
-    pop_eh
-    ok(0, file)
-.end
-
-.sub '_slurp'
-    .param string file
-    .local pmc pio
-    pio  = open file
-    $S0  = pio.'readall'()
-    close pio
-    .return ($S0)
 .end
 
 # Don't forget to update plan!
