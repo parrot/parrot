@@ -245,7 +245,7 @@ sub _set_intvalmaxmin {
         $ivmax = 'LLONG_MAX';
     }
     else {
-        die qq{Configure.pl:  Can't find limits for type '$iv'\n};
+        die qq{Configure.pl:  Cannot find limits for type '$iv'\n};
     }
 
     $conf->data->set( intvalmin   => $ivmin );
@@ -270,7 +270,7 @@ sub _set_floatvalmaxmin {
         $nvmax = 'LDBL_MAX';
     }
     else {
-        die qq{Configure.pl:  Can't find limits for type '$nv'\n};
+        die qq{Configure.pl:  Cannot find limits for type '$nv'\n};
     }
 
     $conf->data->set( floatvalmin => $nvmin );
