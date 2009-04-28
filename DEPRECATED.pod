@@ -293,7 +293,8 @@ L<https://trac.parrot.org/parrot/ticket/463>
 =item C< $(...) > syntax  [eligible in 1.5]
 
 The C< $(...) > syntax for obtaining a result object from a Match
-object will no longer work.  The new syntax is yet to be determined.
+object will no longer work.  The new syntax is to invoke the 
+C<.ast> method on the Match object.
 
 L<https://trac.parrot.org/parrot/ticket/459>
 
