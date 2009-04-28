@@ -591,6 +591,8 @@ Multimethod helper to return the parrotclass for C<x>.
     x = get_hll_namespace $P0
   x_ns:
     if null x goto done
+    $I0 = isa x, 'P6protoobject'
+    if $I0 goto x_p6object
     parrotclass = get_class x
   done:
     .return (parrotclass)
