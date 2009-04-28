@@ -61,7 +61,7 @@ sub runstep {
 
         # if we want pbc_to_exe to work, need to let some versions of the
         # compiler use more memory than they normally would
-        $ccflags .= " -Zm1000 " if $msvcversion < 13;
+        $ccflags .= " -Zm1500 " if $msvcversion < 13;
 
         my $ccwarn = '';
         # disable certain very noisy warnings
