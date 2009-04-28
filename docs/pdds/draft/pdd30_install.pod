@@ -44,22 +44,22 @@ configure script.
 
 The main Parrot executable.
 
-=item F</usr/lib/parrot/<version>/library/>
+=item F</usr/lib/parrot/E<lt>versionE<gt>/library/>
 
 Parrot runtime libraries, corresponds to F<runtime/parrot/library/> in the
 repository.
 
-=item F</usr/lib/parrot/<version>/include/>
+=item F</usr/lib/parrot/E<lt>versionE<gt>/include/>
 
 Parrot runtime include files (not C include files), corresponds to
 F<runtime/parrot/include/> in the repository.
 
-=item F</usr/lib/parrot/<version>/dynext/>
+=item F</usr/lib/parrot/E<lt>versionE<gt>/dynext/>
 
 Parrot dynamic extension files (for C<loadlib>), corresponds to
 F<runtime/parrot/dynext/> in the repository.
 
-=item F</usr/lib/parrot/<version>/languages/>
+=item F</usr/lib/parrot/E<lt>versionE<gt>/languages/>
 
 Parrot language modules, corresponds to F<languages/> in the repository.
 
@@ -78,7 +78,7 @@ their "real" counterpart, but should provide a build option to do so (so, the
 default installed executable for Python on Parrot should be F<pynie> or
 F<parrot-python> but not F<python>).
 
-=item F</usr/lib/parrot/<version>/languages/*>
+=item F</usr/lib/parrot/E<lt>versionE<gt>/languages/*>
 
 The languages directories may have subdirectories, including F<library> for
 their own set of libraries, and F<dynpmc> for dynamic pmcs.
@@ -86,14 +86,14 @@ their own set of libraries, and F<dynpmc> for dynamic pmcs.
 It is recommended that languages follow a standard pattern in installing their
 libraries so a bytecode compiled version of a module in the C<mylang> HLL
 named C<['Foo';'Bar']> is stored in
-F<usr/lib/parrot/<version>/languages/<mylang>/library/Foo/Bar.pbc>
+F<usr/lib/parrot/E<lt>versionE<gt>/languages/E<lt>mylang>/library/Foo/Bar.pbc>
 
-=item F</usr/lib/parrot/<version>/tools/>
+=item F</usr/lib/parrot/E<lt>versionE<gt>/tools/>
 
 Parrot tools that don't belong in the bin/ directory and don't belong in the
 runtime, corresponds to F<tools/dev/> and/or F<tools/build> in the repository.
 
-=item F</usr/share/doc/parrot/<version/>
+=item F</usr/share/doc/parrot/E<lt>versionE<gt>/>
 
 Parrot documentation files, generally raw Pod, but possibly also formatted
 HTML. May have subdirectories F<pod/>, F<html/>, etc.
@@ -125,7 +125,7 @@ Building core Parrot depends on Perl (including perldoc, which may be a
 separate package), libgdm and libreadline.
 
 Building a language depends on a series of Parrot build tools, installed in
-F</usr/lib/parrot/<version/tools>. These tools will generally not be included
+F</usr/lib/parrot/E<lt>version/tools>. These tools will generally not be included
 in the default C<parrot> package on most systems, languages will require a
 C<parrot-dev> package to be installed before they can be built.
 
