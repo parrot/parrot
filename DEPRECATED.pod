@@ -221,19 +221,6 @@ L<https://trac.parrot.org/parrot/ticket/156>
 
 =head1 Compiler tools
 
-=head2 P6object
-
-=over 4
-
-=item P6protoobject stringification [eligible in 1.1]
-
-Stringification of protoobjects will return the full name of the type
-and parentheses, per Synopsis 12.
-
-L<https://trac.parrot.org/parrot/ticket/168>
-
-=back
-
 =head2 Parrot Grammar Engine
 
 =over 4
