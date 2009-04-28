@@ -151,7 +151,7 @@ Testing Perl 6 objects.
     is_same($P0, jklproto, 'return from .new_class =:= Foo::JKL')
     $P0 = get_hll_global 'Foo::JKL'
     isa_nok($P0, 'P6protoobject', '["Foo::JKL"]')
-    jklobj = p6obj_tests(jklproto, 'Foo::JKL', 'shortname'=>'JKL', 'isa'=>'P6object', 'can'=>'foo')
+    jklobj = p6obj_tests(jklproto, 'Foo::JKL', 'isa'=>'P6object', 'can'=>'foo')
 
     ##  add a method to a class
     $P0 = get_hll_global ['ABC'], 'foo'
@@ -200,6 +200,8 @@ The available options include:
     classname = hash_default(options, 'classname', class)
     shortname = hash_default(options, 'shortname', classname)
     typename =  hash_default(options, 'typename',  classname)
+
+    shortname = concat shortname, '()'
 
     .local string msg
 

@@ -604,7 +604,7 @@ Multimethod helper to return the parrotclass for C<x>.
 
 =item get_string()  (vtable method)
 
-Returns the "shortname" of the protoobject's class.
+Returns the "shortname" of the protoobject's class and parens.
 
 =cut
 
@@ -612,8 +612,10 @@ Returns the "shortname" of the protoobject's class.
 
 .sub 'VTABLE_get_string' :method :vtable('get_string')
     $P0 = self.'HOW'()
-    $P1 = getattribute $P0, 'shortname'
-    .return ($P1)
+    $P1 = getattribute $P0, 'longname'
+    $S0 = $P1
+    $S0 = concat $S0, '()'
+    .return ($S0)
 .end
 
 =item defined()  (vtable method)
