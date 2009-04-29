@@ -324,7 +324,9 @@ can have their milestone unset.
 =item 13.
 
 Add the version to Trac so new bug reports can be filed against your
-buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>
+buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>.
+
+Make the latest released version the default version for new reports.
 
 Remove any sufficiently old versions listed there.
 
