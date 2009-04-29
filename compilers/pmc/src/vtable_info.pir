@@ -9,7 +9,7 @@ Holds information about single VTable method.
 
 .namespace ['PMC';'VTableInfo']
 
-.sub '' :load
+.sub '' :load :init
     .local pmc p6meta
 
     p6meta = new 'P6metaclass'
