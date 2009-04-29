@@ -71,6 +71,7 @@ method vtable($/) {
             :inline(~$<c_body>)
         )
     );
+    $past<parameters> := join(', ', $<c_signature><c_arguments><c_argument>);
     make $past;
 }
 

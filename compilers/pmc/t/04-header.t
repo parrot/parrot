@@ -19,7 +19,7 @@ load_bytecode 'compilers/pmc/pmc.pbc'
 
     filename = 'compilers/pmc/t/data/class07.pmc'
     $S0 = _slurp(filename)
-    check_one_header(filename, $S0, "'Parrot_Integer_instantiate'", "VTable method generated")
+    check_one_header(filename, $S0, "'PMC* Parrot_Integer_instantiate(PARROT_INTERP, PMC *sig, PMC* init)'", "VTable method generated")
 
 .end
 
@@ -40,6 +40,7 @@ load_bytecode 'compilers/pmc/pmc.pbc'
     emitter = new $P1
     emitter.'set_filename'(name)
     $S0 = emitter.'generate_h_file'($P0)
+    #say $S0
     like($S0, pattern, message)
 .end
 

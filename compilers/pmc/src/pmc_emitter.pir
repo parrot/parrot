@@ -93,8 +93,8 @@ Generate C declarations for vtable functions
     push $P1, '_'
     push $P1, vtable_name
     push $P1, '(PARROT_INTERP, '
-    #$S0 = entry.'parameters'()
-    #push $P1, $S0
+    $S0 = entry['parameters']
+    push $P1, $S0
     push $P1, ");\n"
 
     $S0 = join '', $P1

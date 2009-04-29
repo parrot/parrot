@@ -1,6 +1,6 @@
 pmclass Integer extends scalar provides integer provides scalar {
 
-    VTABLE PMC *instantiate(PMC *sig) {
+    VTABLE PMC *instantiate(PMC *sig, PMC* init) {
     }
 
 }
