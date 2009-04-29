@@ -1,9 +1,9 @@
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
 
-# Main PMC compiler.
+# Main PMC Emitter.
 
-class PMC::Compiler;
+class PMC::Emitter;
 
 
 # Generate .h file for pmc.

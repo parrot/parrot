@@ -20,7 +20,7 @@ SOURCES := \
   src/vtable_info.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
-  src/gen_compiler.pir \
+  src/gen_emitter.pir \
   src/gen_vtable_info.pir \
   src/builtins.pir
 
@@ -39,9 +39,9 @@ src/parser/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/parser/gen_actions.pir \
 	    --target=pir src/parser/actions.pm
 
-src/gen_compiler.pir: $(NQP) $(PCT) src/compiler.pm
-	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_compiler.pir \
-	    --target=pir src/compiler.pm
+src/gen_emitter.pir: $(NQP) $(PCT) src/emitter.pm
+	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_emitter.pir \
+	    --target=pir src/emitter.pm
 
 src/gen_vtable_info.pir: $(NQP) $(PCT) src/vtable_info.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_vtable_info.pir \
@@ -78,7 +78,7 @@ CLEANUPS := \
   pmc.pbc \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
-  src/gen_compiler.pir \
+  src/gen_emitter.pir \
   src/gen_vtable_info.pir
 
 
