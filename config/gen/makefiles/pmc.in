@@ -16,10 +16,12 @@ all: pmc.pbc
 
 SOURCES := \
   pmc.pir \
+  src/nodes.pir \
+  src/vtable_info.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
-  src/nodes.pir \
   src/gen_compiler.pir \
+  src/gen_vtable_info.pir \
   src/builtins.pir
 
 # the default target
@@ -40,6 +42,10 @@ src/parser/gen_actions.pir: $(NQP) $(PCT) src/parser/actions.pm
 src/gen_compiler.pir: $(NQP) $(PCT) src/compiler.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_compiler.pir \
 	    --target=pir src/compiler.pm
+
+src/gen_vtable_info.pir: $(NQP) $(PCT) src/vtable_info.pm
+	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_vtable_info.pir \
+	    --target=pir src/vtable_info.pm
 
 
 # This is a listing of all targets, that are meant to be called by users
@@ -72,7 +78,8 @@ CLEANUPS := \
   pmc.pbc \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
-  src/gen_compiler.pir
+  src/gen_compiler.pir \
+  src/gen_vtable_info.pir
 
 
 clean:
