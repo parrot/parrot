@@ -5,14 +5,17 @@
 
 class PMC::Emitter;
 
-
 # Generate .h file for pmc.
-method generate_h_file() {
+method generate_h_file($past) {
     my $res;
 
-    #my $self; PIR q< store_lex "$self", self >;
     my $filename := self.filename();
     $res := dont_edit($filename);
+
+    # Get emitter for (specific) PMC.
+    my $pmc_emitter := get_pmc_emitter($past.name());
+    # And generate header.
+    $res := $res ~ $pmc_emitter.generate_h_file($past);
 
     $res := $res ~ c_code_coda();
 
@@ -26,6 +29,30 @@ method filename() {
 
 method set_filename($name) {
     our $?filename := $name;
+}
+
+
+# Get (specific) PMC emitter
+# Try to create specific emitter. In case of failure create generic one.
+sub get_pmc_emitter($name) {
+PIR q< 
+    find_lex $P0, '$name'
+    $S0 = $P0
+    $P1 = new 'ResizableStringArray'
+    push $P1, 'PMC'
+    push $P1, 'Emitter'
+    push $P1, $S0
+    push_eh not_found
+    %r = new $P1
+    pop_eh
+    goto done
+
+  not_found:
+    pop_eh
+    $P1 = split '::', 'PMC::Emitter::PMC'
+    %r = new $P1
+  done:
+>;
 }
 
 # Generate don't edit warning

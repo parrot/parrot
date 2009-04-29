@@ -30,7 +30,9 @@
 
 .include 'src/nodes.pir'
 .include 'src/vtable_info.pir'
-.include 'src/gen_compiler.pir'
+.include 'src/pmc_emitter.pir'
+
+.include 'src/gen_emitter.pir'
 .include 'src/gen_vtable_info.pir'
 .include 'src/parser/gen_grammar.pir'
 .include 'src/parser/gen_actions.pir'
