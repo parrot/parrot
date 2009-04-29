@@ -9,9 +9,8 @@ Variour helper builtins.
 .namespace []
 
 .sub 'uc'
-    .param pmc arg
-    $S0 = arg
-    $S0 = upcase $S0
+    .param string arg
+    $S0 = upcase arg
     .return ($S0)
 .end
 
