@@ -9,15 +9,19 @@ class PMC::Emitter;
 method generate_h_file($past) {
     my $res;
 
+    my $name     := $past.name();
     my $filename := self.filename();
-    $res := dont_edit($filename);
-
+    
     # Get emitter for (specific) PMC.
-    my $pmc_emitter := get_pmc_emitter($past.name());
-    # And generate header.
-    $res := $res ~ $pmc_emitter.generate_h_file($past);
+    my $pmc_emitter := get_pmc_emitter($name);
 
-    $res := $res ~ c_code_coda();
+    $res :=  
+            # Generate header.
+              dont_edit($filename)
+            # PMC functions
+            ~ $pmc_emitter.generate_h_file($past);
+            # C code
+            ~ c_code_coda();
 
     $res;
 }
