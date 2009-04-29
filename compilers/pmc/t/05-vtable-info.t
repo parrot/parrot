@@ -6,13 +6,20 @@
 .include 'test_more.pir'
     load_bytecode 'compilers/pmc/pmc.pbc'
 
-    plan(1)
+    plan(2)
 
     $P0 = get_hll_global ["PMC"; "VTableInfo"], 'vtable_list'
     $P1 = $P0()
 
     $I0 = elements $P1
-    ok($I0, "We've got some vtables")
+    ok($I0, "We've got some vtables in list")
+    
+    $P0 = get_hll_global ["PMC"; "VTableInfo"], 'vtable_hash'
+    $P1 = $P0()
+
+    $I0 = elements $P1
+    say $I0
+    ok($I0, "We've got some vtables in hash")
 .end
 
 

@@ -29,7 +29,7 @@ class PMC::VTableInfo;
 
 # Ordered list of VTable methods
 our @?VTABLES := build_vtable_list();
-our %?VTABLES;
+our %?VTABLES := build_vtable_hash();
 
 HEADER
 
@@ -53,9 +53,25 @@ print "\n    \@res;\n}\n";
 
 print <<'FOOTER';
 
+# Generate hash from list
+sub build_vtable_hash() {
+    my %res;
+    our @?VTABLES;
+    for (@?VTABLES) {
+        my $name    := $_.name;
+        %res{$name} := $_;
+    }
+    %res;
+}
+
 sub vtable_list() {
     our @?VTABLES;
     @?VTABLES;
+}
+
+sub vtable_hash() {
+    our %?VTABLES;
+    %?VTABLES;
 }
 
 # Local Variables:
