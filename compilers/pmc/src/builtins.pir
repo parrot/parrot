@@ -14,6 +14,14 @@ Variour helper builtins.
     .return ($S0)
 .end
 
+.sub 'join'
+    .param string joiner
+    .param pmc args
+
+    $S0 = join joiner, args
+    .return ($S0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
