@@ -71,7 +71,7 @@ Get/Set name.
 
 .sub 'name' :method
     .param string name      :optional
-    .param int    has_name
+    .param int    has_name  :opt_flag
     .tailcall self.'attr'('name', name, has_name)
 .end
 
@@ -83,7 +83,7 @@ Get/Set ret_type of method.
 
 .sub 'ret_type' :method
     .param string type      :optional
-    .param int    has_type
+    .param int    has_type  :opt_flag
     .tailcall self.'attr'('ret_type', type, has_type)
 .end
 
@@ -94,8 +94,8 @@ Get/Set "C" parameters.
 =cut
 
 .sub 'parameters' :method
-    .param string parameters    :optional
-    .param int    has_parameters
+    .param string parameters        :optional
+    .param int    has_parameters    :opt_flag
     .tailcall self.'attr'('parameters', parameters, has_parameters)
 .end
 
@@ -107,7 +107,7 @@ Get/set that vtable method updates PMC.
 
 .sub 'is_write' :method
     .param int is_write     :optional
-    .param int has_is_write
+    .param int has_is_write :opt_flag
     .tailcall self.'attr'('is_write', is_write, has_is_write)
 .end
 
