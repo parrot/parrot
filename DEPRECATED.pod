@@ -217,6 +217,10 @@ L<https://trac.parrot.org/parrot/ticket/155>
 
 L<https://trac.parrot.org/parrot/ticket/156>
 
+=item Parrot_MMD_method_name [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/625>
+
 =back
 
 =head1 Compiler tools
