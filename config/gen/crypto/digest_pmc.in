@@ -33,7 +33,7 @@ pmclass @TEMP_md_name@
 =cut
 
 */
-    void init() {
+    VTABLE void init() {
 @TEMP_md_guard@
         @TEMP_md_ctx@ *c    = mem_allocate_zeroed_typed(@TEMP_md_ctx@);
         PMC_data(SELF) = c;
@@ -51,7 +51,7 @@ pmclass @TEMP_md_name@
 =cut
 
 */
-    void destroy() {
+    VTABLE void destroy() {
 @TEMP_md_guard@
         @TEMP_md_ctx@ *c = PMC_data_typed(SELF, @TEMP_md_ctx@ *);
         if (c) {
@@ -68,7 +68,7 @@ pmclass @TEMP_md_name@
 =cut
 
 */
-    PMC* clone() {
+    VTABLE PMC* clone() {
 @TEMP_md_guard@
         PMC     *retval  = pmc_new_noinit(INTERP, SELF->vtable->base_type);
         @TEMP_md_ctx@ *c       = mem_allocate_zeroed_typed(@TEMP_md_ctx@);
