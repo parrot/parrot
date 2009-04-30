@@ -618,9 +618,9 @@ $(SRC_DIR)/string/private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --all
 
 # classes PMC build utils and rules
-PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
-PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
-PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable
+PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump @no_lines_flag@
+PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c @no_lines_flag@
+PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
 
 .pmc.dump : # suffix rule (limited support)
 	$(PMC2CD) $<
@@ -995,7 +995,7 @@ $(IMCC_DIR)/main$(O) : $(IMCC_DIR)/main.c $(GENERAL_H_FILES) $(IMCC_H_FILES)
 
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS_DIR)/ops.num $(OPS_DIR)/ops.skip
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl $(OPS_FILES)
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl @no_lines_flag@ $(OPS_FILES)
 
 ###############################################################################
 #
@@ -1237,7 +1237,7 @@ $(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
 	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm \
 	$(SRC_DIR)/pmc/pmc_continuation.h
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core @no_lines_flag@
 
 $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c \
 	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
@@ -1248,7 +1248,7 @@ $(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
 	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm \
 	lib/Parrot/OpTrans/CPrederef.pm
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core @no_lines_flag@
 
 @TEMP_cg_c@
 

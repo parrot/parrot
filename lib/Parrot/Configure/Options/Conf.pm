@@ -79,6 +79,8 @@ Compile Options:
    --lex=(lexer)        Use the given lexical analyzer generator
    --make=(make tool)   Use the given make utility
    --yacc=(parser)      Use the given parser generator
+   
+   --no-line-directives Disable creation of C #line directives
 
    --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
 

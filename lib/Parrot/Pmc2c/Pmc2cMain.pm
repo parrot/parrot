@@ -20,6 +20,10 @@ use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::Null ();
 use Parrot::Pmc2c::PMC::Object ();
 
+# put the options in a package var so it can be accessed from
+# Parrot::Pmc2c::Emitter.
+our $OPTIONS;
+
 $SIG{'__WARN__'} = sub { use Carp; warn $_[0]; Carp::confess; };
 
 =head1 NAME
@@ -94,6 +98,8 @@ sub new {
             $allargsref->{opt}{$opt} = 0;
         }
     }
+    
+    $OPTIONS = $allargsref->{opt};
 
     return bless( $allargsref, $class );
 }
