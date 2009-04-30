@@ -1,103 +1,130 @@
-=head1 TITLE
+=head1 Title
 
 docs/pmc.pod - PMC (PMC Makers Compendium)
 
 =head1 PMC Structure Items Access
 
-Don't use PMC structure items directly, always use the macros, which are
-defined in F<include/parrot/pobj.h>.
+Ideally, there should be minimal direct access to a PMC's internals.  In order
+to enforce encapsulation, most interaction with a PMC should be performed
+through VTABLE function calls, which allow code to remain robust as PMC
+internals are changed.  
+
+When it is not possible or practical to use VTABLE functions (for instance when
+implementing PMC internals), ATTRs should be used.  ATTRs are declared after
+the C<pmclass> line in a .pmc file.  For a given pmc ("Foo"), an ATTR ("bar")
+can be accessed either directly: C<< PARROT_FOO(pmc)->bar >> or via a
+SETATTR/GETATTR accessor macro: C<GETATTR_Foo_bar(INTERP, x)>.  Note that
+inside a PMC's source file, these can be shortened to C<GET_ATTR_bar(INTERP, x)>.
 
 =head1 PMC Storage
 
-The PMC structure contains two places of data storage: the B<union UnionVal>
-and the B<PMC_data> pointer.
+PMCs can store data in two places.  8 bits can be stored in the PMC's flags.
+These are accessed via PObj_private0_FLAG, PObj_private1_FLAG, etc, although
+these flags should be #define'd on a per-PMC basis to have more meaningful
+names.  If a PMC needs more than 8 bits of storage, it should declare ATTRs of
+the appropriate type.  Storage for ATTRs hangs off of C<PMC_data()>.  See
+src/pmc/exporter.pmc for example code that does this.
 
-=head2 Storage memory washing
+The PMC UnionVal is an obsolete storage area which was previously used to
+provide a limited amount of storage.  The use of this storage encouraged poor
+encapsulation and hidden dependencies between PMCs.  Any new code should not
+use the UnionVal, which will eventually be removed from Parrot.
 
-During PMC recycling the B<UnionVal> data members are B<not> cleared.
-B<PMC_data> or B<pmc_ext> is set to NULL. The flags are set to their default
-value, especially the private flags are 0.
+=head2 PMC_EXT
 
-=head2 PMC_data()
+C<PMC_EXT> is a member of the PMC struct which contains two currently used
+pointers.  PMCs which need C<PMC_EXT> should have C<need_ext> in their
+C<pmclass> declaration.  A PMC should declare C<need_ext> for either of the
+reasons listed below.
 
-If your PMC contains other PMCs that possibly would allow the creation of
-self-referential or arbitrary deeply nested containers, you have to allocate
-the B<PMC_EXT> structure by specifying the B<need_ext> flag on the B<pmclass>
-definition line. The B<PMC_data()> pointer is currently located in the
-B<PMC_EXT> structure too. Using B<PMC_data()> therefore adds one more
-indirection to access these data.
+Note that the C<_synchronize> member of the C<PMC_EXT> struct is obsolete and
+due to be removed.
+
+=over 4
+
+=item * The PMC needs metadata.
+
+The C<_metadata> member of C<PMC_EXT> is used to store attributes.  If your PMC
+will use attributes (not to be confused with ATTRs), your PMC should declare
+C<need_ext>.  Note that if code attempts to add an attribute to a PMC which
+doesn't have a C<PMC_EXT>, a C<PMC_EXT> with the appropriate C<_metadata> will
+be added dynamically.  In this case, C<need_ext> is a way of telling Parrot to
+take care of this when the PMC is initialized.
+
+=item * The PMC is an aggregate which holds GCable objects.
+
+If the PMC is an aggregate which can contain other GCable object, it needs to
+declare C<need_ext>.  GCable objects include other PMCs and Parrot STRINGs.
+Unlike attribute metadata, all PMCs which contain GCable objects need to
+declare C<need_ext>.
+
+=back
+
+=head2 ATTRs and C<PMC_data()>
+
+If your PMC needs to store more data than will fit into the 8 bits of the PMC
+flags, it should declare ATTRs of the appropriate type.  The pmc2c code will
+generate a struct containing all ATTRs, including those inherited via
+C<extends> declarations.  This struct will be named in the form
+C<Parrot_x_attributes>, where C<x> is the name of your PMC, e.g.
+C<Parrot_FixedIntegerArray_attributes>.  When creating a PMC that has one or
+more ATTRs, the C<Parrot_x_attributes> struct must be allocated and assigned to
+C<PMC_data> in the PMC's C<init()> and C<init_pmc()> VTABLE functions (if used)
+and it must be destroyed in the C<destroy()> VTABLE function.  PMCs with ATTRs
+also need to indicate that they need active destruction by calling
+C<PObj_active_destroy_SET()> or C<PObj_custom_mark_destroy_SETALL()>.
+
+If your PMC only needs to store a single pointer, it can use C<PMC_data> directly.
+Note that this may make maintaining your PMC difficult, should more data ever
+need to be stored.
 
 =head1 PMC flags
 
-Each PMC has 8 private flags B<PObj_private0_FLAG> -  B<PObj_private7_FLAG>,
-which can be used for storing 8 bits.
+Each PMC has 8 private flags named B<PObj_private0_FLAG> through
+B<PObj_private7_FLAG>.  These may be used for storing 8 bits of PMC-specific
+information.  See C<include/parrot/key.h> and C<src/pmc/key.pmc> for examples.
 
 =head1 PMCs and GC
-
-=head2 Overview
 
 The GC system doesn't make any assumptions about your PMC's layout. Whenever a
 PMC is found in the root set, B<pobject_lives()> is called with that PMC.  The
 PMC is responsible to mark all contained or referenced active Parrot objects
-(Buffers or other PMCs).
+(Buffers, STRINGs or other PMCs) when its C<mark()> VTABLE function is called.
+
+=head2 PMCs and System Resources
+
+Whenever a PMC B<malloc()>s memory or opens a file or a database connection, it
+has to take care of freeing or closing these resources.  This is done by
+implementing the appropriate VTABLE functions (C<mark()> and C<destroy()>) and
+setting the appropriate PObj flags.  The commonly used flags are described
+below.
 
 =head2 GC related flags
 
 =over 4
 
-=item PObj_is_buffer_ptr_FLAG
-
-B<PMC_data> points to a B<PObj> object.  This PMC gets marked
-automatically.
-
-=item PObj_is_buffer_of_PMCs_ptr_FLAG
-
-B<PMC_data> points to a buffer holding an array of B<PObj*>s.
-
 =item PObj_custom_mark_FLAG
 
-If your PMC refers to any Parrot objects and above standard flags don't cover
-this usage, a custom B<mark> vtable has to be implemented, which has to call
-B<pobject_lives()> for all contained B<PObj>s.
-
-=back
-
-=head1 PMCs and System Resources
-
-Whenever a PMC B<malloc()>s system memory or opens a file or a database
-connection, it has to take care of freeing or closing these system resources.
-
-=head2 Flags for PMC destruction
-
-=over 4
+If your PMC contains any other B<PObj>s (STRINGs, PMCs, etc), your PMC must
+implement the B<mark()> VTABLE function and set this flag.  The B<mark()>
+VTABLE function must call B<pobject_lives()> on all B<PObj>s which your PMC
+contains.
 
 =item PObj_active_destroy_FLAG
 
-The PMC's B<destroy> vtable is called, when this PMC is found to be dead during
-GC.
+If your PMC allocates any memory or opens any resources during its lifetime, it
+must set B<PObj_active_destroy> and implement the B<destroy()> VTABLE function to
+free those resources.
 
 =item PObj_needs_early_gc_FLAG
 
-Set this flag too, if the PMC needs timely destruction, e.g. to close a file
-handle at the end of a block scope, if the PMC isn't alive any more.
+Set this flag if your PMC needs timely destruction, e.g. to close a file handle
+at the end of a block scope if the PMC isn't alive any more.
 
 =back
 
-=head1 SEE ALSO
+=head1 See also
 
 F<include/parrot/pobj.h>, F<src/gc/api.c>, F<docs/pdds/pdd02_vtables.pod>
 
-=head1 AUTHOR
-
-Leopold Toetsch C<lt@toetsch.at>
-
-=head1 VERSION
-
-=over 4
-
-=item 0.1
-
-2004.06.14 - Initial
-
-=back
 
