@@ -1,0 +1,3 @@
+pmclass Integer {
+    VTABLE void increment() { }
+}
