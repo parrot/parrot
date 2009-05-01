@@ -75,12 +75,12 @@ method vtable($/) {
     my $past := PAST::Block.new( 
         :name(~$<c_signature><identifier>),
         :blocktype('method'),
-        :node($/),
-        PAST::Op.new(
-            :inline(~$<c_body>)
-        )
+        :returns(~$<c_signature><c_type>),
+        :node($/)
     );
-    $past<parameters> := join(', ', $<c_signature><c_arguments><c_argument>);
+    $past<parameters> := $<c_signature><c_arguments>.ast;
+    #say(~$<c_body>);
+    $past.push($<c_body>.ast());
     make $past;
 }
 
@@ -105,7 +105,28 @@ method multi($/) {
 
 method c_body($/) {
     #say("c_body: " ~ $/);
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := PAST::Op.new(
+        :node($/),
+        :inline(~$/)
+    );
+    make $past;
+}
+
+method c_arguments($/) {
+    #say("c_arguments");
+    my $past := PAST::Op.new();
+    for $<c_argument> {
+        $past.push($_.ast);
+    }
+    make $past;
+}
+
+method c_argument($/) {
+    #say("c_argument");
+    my $past := PAST::Var.new(
+        :name(~$<identifier>[0]),
+        :returns(~$<c_type>)
+    );
     make $past;
 }
 

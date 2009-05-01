@@ -120,10 +120,12 @@ rule c_type {
 # Very-very simplified named? function param.
 rule c_argument {
     <c_type> <identifier>?
+    {*}
 }
 
 rule c_arguments {
     [ <c_argument> [ ',' <c_argument> ]* ]*
+    {*}
 }
 
 # c_arguments with parrot's adverbs
