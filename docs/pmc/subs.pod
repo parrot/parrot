@@ -68,9 +68,9 @@ Subs are created by IMCC (the PIR compiler) via the B<.sub> directive.  Unless
 the C<:anon> pragma is included, they are stored in the constant table
 associated with the bytecode and can be fetched with the B<get_hll_global> and
 B<get_root_global> opcodes.  Within the PIR source, they can also be put in
-registers with a C<.const .Sub> declaration:
+registers with a C<.const 'Sub'> declaration:
 
-    .const .Sub rsub = 'random_sub'
+    .const 'Sub' rsub = 'random_sub'
 
 This uses C<find_sub_not_null> under the hood to look up the sub named
 "random_sub".
