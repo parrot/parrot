@@ -183,7 +183,7 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
 
 /*
 
-=item C<static PMC* is_loaded(PAROT_INTERP, STRING *path)>
+=item C<static PMC* is_loaded(PARROT_INTERP, STRING *path)>
 
 Check if a C<ParrotLibrary> PMC with the filename path exists.
 If it does, return it. Otherwise, return NULL.
