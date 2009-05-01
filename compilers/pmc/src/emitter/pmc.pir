@@ -104,6 +104,75 @@ Generate C declarations for vtable functions
     .return (res)
 .end
 
+=item C<generate_c_file>
+
+Generate C file for PMC.
+
+=cut
+
+.sub 'generate_c_file' :method
+    .param pmc past
+    .local string res
+
+    .local string guard
+    .local string name
+
+    name = past.'name'()
+    $S0 = 'uc'(name)
+
+    $S0 = self.'generate_c_file_functions'(past)
+    concat res, $S0
+    
+    .return (res)
+.end
+
+=item C<generate_c_file_functions>
+
+Generate C declarations for vtable functions
+
+=cut
+
+.sub 'generate_c_file_functions' :method
+    .param pmc past
+    .local string res
+    .local pmc vtable_info, vtable_hash
+    .local pmc vtables, it, entry, class_init
+    .local string pmc_name, vtable_name
+
+    .local pmc res_builder
+
+    pmc_name = past.'name'()
+
+    $P0 = get_hll_global ['PMC'; 'VTableInfo'], 'vtable_hash'
+    vtable_hash = $P0()
+    
+    vtables = self.'!vtables'(past)
+
+    it = iter vtables
+  loop:
+    unless it goto done
+    res_builder = new 'ResizableStringArray'
+    vtable_name = shift it
+    entry = vtables[vtable_name]
+    vtable_info = vtable_hash[vtable_name]
+
+    # Generate 2 methods. One for read, one for write.
+    $S0 = self.'!generate_signature'(pmc_name, entry, 0 :named('ro'))
+    push res_builder, $S0
+    $S0 = self.'!generate_body'(entry)
+    push res_builder, $S0
+
+    $S0 = join '', res_builder
+    concat res, $S0
+
+    goto loop
+
+  done:
+    .return (res)
+.end
+
+
+
 =item C<!generate_signature>
 
 Generate full signature of vtable.
@@ -149,6 +218,47 @@ Generate full signature of vtable.
     $S0 = join '', res
     .return ($S0)
 .end
+
+=item C<!generate_body>
+
+Generate C function body from PAST.
+
+=cut
+
+.sub '!generate_body' :method
+    .param pmc entry
+    
+    .local pmc res
+    res = new 'ResizableStringArray'
+    $P0 = entry.'iterator'()
+  loop:
+    unless $P0 goto done
+    $P1 = shift $P0
+    #print 'P1 '
+    #say $P1
+    $S0 = self.'!generate_body_part'($P1)
+    push res, $S0
+    goto loop
+  done:
+
+    $S0 = join '', res
+    .return ($S0)
+.end
+
+=item C<!generate_body_part>
+
+Multi-methods for generating C body.
+
+TODO: Parse c_body properly and implement all other functions.
+
+=cut
+
+.sub '!generate_body_part' :method :multi(_, ['PAST';'Op'])
+    .param pmc past
+    $S0 = past['inline']
+    .return ($S0)
+.end
+
 
 .sub '!class_init' :method
     .param pmc past

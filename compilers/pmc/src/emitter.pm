@@ -19,7 +19,28 @@ method generate_h_file($past) {
             # Generate header.
               dont_edit($filename)
             # PMC functions
-            ~ $pmc_emitter.generate_h_file($past);
+            ~ $pmc_emitter.generate_h_file($past)
+            # C code
+            ~ c_code_coda();
+
+    $res;
+}
+
+# Generate .c file for pmc.
+method generate_c_file($past) {
+    my $res;
+
+    my $name     := $past.name();
+    my $filename := self.filename();
+    
+    # Get emitter for (specific) PMC.
+    my $pmc_emitter := get_pmc_emitter($name);
+
+    $res :=  
+            # Generate header.
+              dont_edit($filename)
+            # PMC functions
+            ~ $pmc_emitter.generate_c_file($past)
             # C code
             ~ c_code_coda();
 
@@ -69,7 +90,7 @@ sub dont_edit($filename) {
     ~" *\n"
     ~" * Any changes made here will be lost!\n"
     ~" *\n"
-    ~" */\n";
+    ~" */\n\n";
 }
 
 #=item C<c_code_coda()>
@@ -80,7 +101,8 @@ sub dont_edit($filename) {
 #
 #=cut
 sub c_code_coda() {
-     "/*\n"
+     "\n\n"
+    ~"/*\n"
     ~" * Local variables:\n"
     ~" *   c-file-style: parrot\n"
     ~" * End:\n"
