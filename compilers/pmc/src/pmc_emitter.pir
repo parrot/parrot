@@ -74,15 +74,9 @@ Generate C declarations for vtable functions
     $P0 = get_hll_global ['PMC'; 'VTableInfo'], 'vtable_hash'
     vtable_hash = $P0()
     
-    class_init = self.'!class_init'(past)
-    $I0 = elements class_init
-    unless $I0 == 1 goto vtables_loop
-
     concat res, "void Parrot_"
     concat res, pmc_name
     concat res, "_class_init(PARROT_INTERP, int, int);\n" 
-
-  vtables_loop:  
 
     vtables = self.'!vtables'(past)
 
