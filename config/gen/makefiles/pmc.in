@@ -18,7 +18,7 @@ SOURCES := \
   pmc.pir \
   src/nodes.pir \
   src/vtable_info.pir \
-  src/pmc_emitter.pir \
+  src/emitter/pmc.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
   src/gen_emitter.pir \
