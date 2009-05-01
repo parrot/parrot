@@ -98,7 +98,7 @@ sub new {
             $allargsref->{opt}{$opt} = 0;
         }
     }
-    
+
     $OPTIONS = $allargsref->{opt};
 
     return bless( $allargsref, $class );
