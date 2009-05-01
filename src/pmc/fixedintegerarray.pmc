@@ -184,9 +184,13 @@ Creates and returns a copy of the array.
                 : pmc_new(INTERP, SELF->vtable->base_type);
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
+
         if (int_array) {
             INTVAL      *dest_int_array;
-            const INTVAL size = SELF.elements();
+            INTVAL       size;
+
+            GET_ATTR_size(INTERP, SELF, size);
+
             dest_int_array = mem_allocate_n_typed(size, INTVAL);
             SET_ATTR_size(INTERP, dest, size);
             SET_ATTR_int_array(INTERP, dest, dest_int_array);
@@ -209,7 +213,8 @@ fixed sized array).
 
 */
     VTABLE INTVAL get_bool() {
-        const INTVAL size = SELF.get_integer();
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
         return (INTVAL)(size != 0);
     }
 
@@ -222,7 +227,10 @@ fixed sized array).
 */
 
     VTABLE INTVAL elements() {
-        return SELF.get_integer();
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+
+        return size;
     }
 
 /*
@@ -236,7 +244,9 @@ Returns the number of elements in the array.
 */
 
     VTABLE INTVAL get_integer() {
-        return PARROT_FIXEDINTEGERARRAY(SELF)->size;
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
+        return size;
     }
 
 
@@ -252,8 +262,11 @@ Returns the integer value of the element at index C<key>.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         INTVAL *int_array;
+        INTVAL  size;
 
-        if (key < 0 || key >= SELF.elements())
+        GET_ATTR_size(INTERP, SELF, size);
+
+        if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedIntegerArray: index out of bounds!");
 
@@ -335,8 +348,10 @@ Returns the Parrot string representation C<key>.
 
     VTABLE STRING *get_repr() {
         STRING *res    = CONST_STRING(INTERP, "[ ");
-        const INTVAL n = SELF.get_integer();
+        INTVAL  n;
         INTVAL  j;
+
+        GET_ATTR_size(INTERP, SELF, n);
 
         for (j = 0; j < n; ++j) {
             PMC * const val = SELF.get_pmc_keyed_int(j);
@@ -411,7 +426,11 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) {
         INTVAL *int_array;
-        if (SELF.elements() || size < 1)
+        INTVAL  cur_size;
+
+        GET_ATTR_size(INTERP, SELF, cur_size);
+
+        if (cur_size || size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedIntegerArray: Can't resize!");
 
@@ -434,8 +453,11 @@ Sets the integer value of the element at index C<key> to C<value>.
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         INTVAL *int_array;
+        INTVAL  size;
 
-        if (key < 0 || key >= SELF.elements())
+        GET_ATTR_size(INTERP, SELF, size);
+
+        if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "FixedIntegerArray: index out of bounds!");
 
@@ -553,7 +575,12 @@ Sets the string value of the element at index C<key> to C<value>.
 
     METHOD sort(PMC *cmp_func) {
         INTVAL *int_array;
-        UINTVAL n = (UINTVAL)SELF.elements();
+        UINTVAL n;
+        INTVAL  size;
+
+        GET_ATTR_size(INTERP, SELF, size);
+
+        n = (UINTVAL)size;
 
         if (n > 1) {
             GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -572,17 +599,20 @@ Return a new Iterator for this PMC.
 */
 
     VTABLE PMC *get_iter() {
-        STRING     *name     = CONST_STRING(interp, "set_key");
-        PMC * const iter     = pmc_new_init(INTERP, enum_class_Iterator, SELF);
-        PMC * const key      = pmc_new(INTERP, enum_class_Key);
+        STRING     *name = CONST_STRING(interp, "set_key");
+        PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
+        PMC * const key  = pmc_new(INTERP, enum_class_Key);
+        INTVAL      size;
 
         Parrot_PCCINVOKE(interp, iter, name, "P->", key);
         PObj_get_FLAGS(key) |= KEY_integer_FLAG;
 
-        if (SELF.get_integer() == 0)
-            VTABLE_set_integer_native(INTERP, key, -1);
-        else
+        GET_ATTR_size(INTERP, SELF, size);
+
+        if (size)
             VTABLE_set_integer_native(INTERP, key, 0);
+        else
+            VTABLE_set_integer_native(INTERP, key, -1);
 
         return iter;
     }
@@ -618,7 +648,7 @@ Used to unarchive the array.
 
         SUPER(info);
 
-        n  = SELF.get_integer();
+        GET_ATTR_size(INTERP, SELF, n);
         VTABLE_push_integer(INTERP, io, n);
         GET_ATTR_int_array(INTERP, SELF, int_array);
 
