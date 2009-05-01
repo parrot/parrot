@@ -42,19 +42,19 @@ PMC class by it self.
 
     # Initialize various attributes
     $P3 = new 'ResizableStringArray'
-    res.'attr'('parents', $P3, $I0)
+    res.'attr'('parents', $P3, 1)
 
     $P4 = new 'Hash'
-    res.'attr'('class_init', $P4, 0)
+    res.'attr'('class_init', $P4, 1)
 
     $P5 = new 'Hash'
-    res.'attr'('vtables', $P5, $I0)
+    res.'attr'('vtables', $P5, 1)
 
     $P6 = new 'Hash'
-    res.'attr'('methods', $P6, $I0)
+    res.'attr'('methods', $P6, 1)
 
     $P7 = new 'ResizableStringArray'
-    res.'attr'('provides', $P7, $I0)
+    res.'attr'('provides', $P7, 1)
 
     .return (res)
 .end
