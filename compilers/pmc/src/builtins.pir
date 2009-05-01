@@ -18,7 +18,9 @@ Variour helper builtins.
     .param string joiner
     .param pmc args
 
+    unless args goto done
     $S0 = join joiner, args
+  done:
     .return ($S0)
 .end
 
