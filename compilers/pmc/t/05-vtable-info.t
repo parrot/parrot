@@ -1,4 +1,4 @@
-#!parrot
+#! ../../parrot
 
 # Test that vtables initialised properly.
 

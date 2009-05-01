@@ -1,10 +1,10 @@
-#!parrot
+#! ../../parrot
 
-.include 'compilers/pmc/t/common.pir'
+.include 't/common.pir'
 
 .sub 'main' :main
 .include 'test_more.pir'
-load_bytecode 'compilers/pmc/pmc.pbc'
+load_bytecode 'pmc.pbc'
 
     .local int total
     total = 0
@@ -21,8 +21,8 @@ load_bytecode 'compilers/pmc/pmc.pbc'
     if i >= total goto done
     $P0 = new 'ResizablePMCArray'
     push $P0, i
-    $S0 = sprintf "./compilers/pmc/t/data/class%02d.pmc", $P0
-    $S1 = sprintf "./compilers/pmc/t/data/class%02d.past", $P0
+    $S0 = sprintf "t/data/class%02d.pmc", $P0
+    $S1 = sprintf "t/data/class%02d.past", $P0
     test_past_one($S0, $S1)
     inc i
     goto loop

@@ -1,10 +1,10 @@
-#!parrot
+#! ../../parrot
 
-.include 'compilers/pmc/t/common.pir'
+.include 't/common.pir'
 
 .sub 'main' :main
 .include 'test_more.pir'
-load_bytecode 'compilers/pmc/pmc.pbc'
+load_bytecode 'pmc.pbc'
 
     .local int total
     total = 25
@@ -20,7 +20,7 @@ load_bytecode 'compilers/pmc/pmc.pbc'
   loop:
     $P0 = new 'ResizablePMCArray'
     push $P0, i
-    $S0 = sprintf "./compilers/pmc/t/data/class%02d.pmc", $P0
+    $S0 = sprintf "t/data/class%02d.pmc", $P0
     test_parse_one($S0)
     inc i
     unless i >= total goto loop

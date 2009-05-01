@@ -1,16 +1,16 @@
-#!parrot
+#! ../../parrot
 
-.include 'compilers/pmc/t/common.pir'
+.include 't/common.pir'
 
 .sub 'main' :main
 .include 'test_more.pir'
-load_bytecode 'compilers/pmc/pmc.pbc'
+load_bytecode 'pmc.pbc'
     .local int total
     .local pmc os, all_files, pmc_files, dynpmc_files, it
 
     all_files    = new ['ResizablePMCArray']
-    pmc_files    = get_pmcs_from_dir('src/pmc/')
-    dynpmc_files = get_pmcs_from_dir('src/dynpmc/')
+    pmc_files    = get_pmcs_from_dir('../../src/pmc/')
+    dynpmc_files = get_pmcs_from_dir('../../src/dynpmc/')
 
     #prepend the arrays to all_files
     splice all_files, pmc_files, 0, 0
