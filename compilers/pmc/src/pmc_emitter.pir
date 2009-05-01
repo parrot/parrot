@@ -66,7 +66,7 @@ Generate C declarations for vtable functions
     .param pmc past
     .local string res
     .local pmc vtable_info, vtable_hash
-    .local pmc vtables, it, entry
+    .local pmc vtables, it, entry, class_init
     .local string pmc_name, vtable_name
 
     pmc_name = past.'name'()
@@ -74,6 +74,16 @@ Generate C declarations for vtable functions
     $P0 = get_hll_global ['PMC'; 'VTableInfo'], 'vtable_hash'
     vtable_hash = $P0()
     
+    class_init = self.'!class_init'(past)
+    $I0 = elements class_init
+    unless $I0 == 1 goto vtables_loop
+
+    concat res, "void Parrot_"
+    concat res, pmc_name
+    concat res, "_class_init(PARROT_INTERP, int, int);\n" 
+
+  vtables_loop:  
+
     vtables = self.'!vtables'(past)
 
     it = iter vtables
@@ -104,6 +114,11 @@ Generate C declarations for vtable functions
 
   done:
     .return (res)
+.end
+
+.sub '!class_init' :method
+    .param pmc past
+    .tailcall past.'class_init'()
 .end
 
 .sub '!vtables' :method

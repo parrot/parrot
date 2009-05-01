@@ -45,13 +45,16 @@ PMC class by it self.
     res.'attr'('parents', $P3, $I0)
 
     $P4 = new 'Hash'
-    res.'attr'('vtables', $P4, $I0)
+    res.'attr'('class_init', $P4, 0)
 
     $P5 = new 'Hash'
-    res.'attr'('methods', $P5, $I0)
+    res.'attr'('vtables', $P5, $I0)
 
-    $P6 = new 'ResizableStringArray'
-    res.'attr'('provides', $P6, $I0)
+    $P6 = new 'Hash'
+    res.'attr'('methods', $P6, $I0)
+
+    $P7 = new 'ResizableStringArray'
+    res.'attr'('provides', $P7, $I0)
 
     .return (res)
 .end
@@ -64,6 +67,16 @@ Get PMC parents.
 
 .sub 'parents' :method
     .tailcall self.'attr'('parents',0,0)
+.end
+
+=item C<class_init>
+
+Get PMC vtable class_init, if any.
+
+=cut
+
+.sub 'class_init' :method
+    .tailcall self.'attr'('class_init',0,0)
 .end
 
 =item C<vtables>
@@ -110,6 +123,28 @@ Set boolean trait
     .tailcall self.'attr'(name, value, has_value)
 .end
 
+=item C<add_class_init>
+
+Add a class_init function to PMC.
+
+=cut
+
+.sub 'add_class_init' :method
+    .param pmc method
+
+    .local string name
+    name = 'class_init'
+
+    $P0 = self.'attr'('class_init', 0, 0)
+    $I0 = exists $P0[name]
+    unless $I0 goto add_method
+    $S0 = "Duplicate class_init function: "
+    die $S0
+  add_method:
+    $P0[name] = method
+    .return ()
+.end
+
 =item C<add_vtable>
 
 Add VTABLE method to PMC.
@@ -149,6 +184,7 @@ Add METHOD to PMC.
     $P0[name] = method
     .return ()
 .end
+
 
 =head1 COPYRIGHT
 

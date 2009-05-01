@@ -53,12 +53,21 @@ method body_part($/, $key) {
 
     #say("body_part: " ~$key);
     my $m := $/{$key}.ast;
-    if $key eq 'vtable' {
+    if $key eq 'class_init' {
+        $?PMC.add_class_init($m);
+    }
+    elsif $key eq 'vtable' {
         $?PMC.add_vtable($m.name, $m);
     }
     elsif $key eq 'method' {
         $?PMC.add_method($m.name, $m);
     }
+}
+
+method class_init($/) {
+    #say('class_init ' ~$<identifier>);
+    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    make $past;
 }
 
 method vtable($/) {

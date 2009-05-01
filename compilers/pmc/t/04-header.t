@@ -40,7 +40,7 @@ load_bytecode 'compilers/pmc/pmc.pbc'
     emitter = new $P1
     emitter.'set_filename'(name)
     $S0 = emitter.'generate_h_file'($P0)
-    #say $S0
+    say $S0
     like($S0, pattern, message)
 .end
 
