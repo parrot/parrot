@@ -103,7 +103,7 @@ rule c_body {
 
 # It's really bad signature
 rule c_signature {
-    <c_type> <identifier> '(' <c_arguments>? ')'
+    <c_type> <identifier> '(' <c_arguments> ')'
 }
 
 # Very-very simplified C type. E.g. "void", "PMC *", etc
