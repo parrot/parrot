@@ -75,16 +75,16 @@ Get/Set name.
     .tailcall self.'attr'('name', name, has_name)
 .end
 
-=item ret_type
+=item returns
 
 Get/Set ret_type of method.
 
 =cut
 
-.sub 'ret_type' :method
+.sub 'returns' :method
     .param string type      :optional
     .param int    has_type  :opt_flag
-    .tailcall self.'attr'('ret_type', type, has_type)
+    .tailcall self.'attr'('returns', type, has_type)
 .end
 
 =item parameters
