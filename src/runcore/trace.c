@@ -27,7 +27,7 @@ src/test_main.c
 #include "parrot/oplib/ops.h"
 #include "../pmc/pmc_sub.h"
 
-/* HEADERIZER HFILE: src/trace.h */
+/* HEADERIZER HFILE: include/parrot/runcore_trace.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
