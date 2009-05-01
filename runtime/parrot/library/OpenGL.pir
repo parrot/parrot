@@ -30,7 +30,7 @@ F<examples/opengl/triangle.pir>.
     .local pmc call_toolkit_init
     call_toolkit_init = get_global ['NCI'], 'call_toolkit_init'
 
-    .const .Sub glutInit = 'glutInit'
+    .const 'Sub' glutInit = 'glutInit'
     argv = call_toolkit_init(glutInit, argv)
 
     # Set display mode, create GLUT window, save window handle
@@ -44,9 +44,9 @@ F<examples/opengl/triangle.pir>.
     set_global 'glut_window', window
 
     # Set up GLUT callbacks
-    .const .Sub draw     = 'draw'
-    .const .Sub idle     = 'idle'
-    .const .Sub keyboard = 'keyboard'
+    .const 'Sub' draw     = 'draw'
+    .const 'Sub' idle     = 'idle'
+    .const 'Sub' keyboard = 'keyboard'
     glutDisplayFunc (draw)
     glutIdleFunc    (idle)
     glutKeyboardFunc(keyboard)
