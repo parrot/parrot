@@ -57,6 +57,64 @@ method generate_h_file_functions() {
     join('', @res_builder);
 }
 
+#=item C<generate_c_file>
+#
+#Generate C file for PMC.
+#
+#=cut
+method generate_c_file() {
+    my $res := 
+          self.generate_c_file_functions()
+        ~ self.generate_class_init();
+}
+
+
+#=item C<generate_c_file_functions>
+#
+#Generate C declarations for vtable functions
+#
+#=cut
+
+method generate_c_file_functions() {
+    my $past    := self.past;
+    my %vtables := self.vtables;
+
+    my @res;
+    for %vtables {
+        my $entry := %vtables{$_};
+        @res.push(self.generate_signature($entry, ""));
+        @res.push(PMC::Emitter::C::emit($entry));
+    }
+
+    join('', @res);
+}
+
+
+#=item C<!generate_class_init>
+#
+#Generating class_init function
+#
+#=cut
+
+method generate_class_init() {
+    my @res;
+    @res.push(
+          "PARROT_EXPORT void Parrot_" 
+        ~ self.name
+        ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
+
+    my $past := self.past;
+    if ($past<class_init>) {
+        @res.push("/* class_init */\n");
+        @res.push(PMC::Emitter::C::emit($past<class_init>));
+    }
+
+    @res.push("\n}\n");
+    join('', @res);
+}
+
+
+
 method vtables() {
     self.past.vtables;
 }

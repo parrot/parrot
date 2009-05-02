@@ -40,7 +40,7 @@ method generate_c_file($past) {
             # Generate header.
               dont_edit($filename)
             # PMC functions
-            ~ $pmc_emitter.generate_c_file($past)
+            ~ $pmc_emitter.generate_c_file()
             # C code
             ~ c_code_coda();
 

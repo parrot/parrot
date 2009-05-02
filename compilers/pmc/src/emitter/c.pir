@@ -21,7 +21,7 @@ Generate C function body from PAST.
 
 =cut
 
-.sub 'emit' :method
+.sub 'emit'
     .param pmc entry
     
     .local pmc res
@@ -32,7 +32,7 @@ Generate C function body from PAST.
     $P1 = shift $P0
     #print 'P1 '
     #say $P1
-    $S0 = self.'!generate_body_part'($P1)
+    $S0 = '!generate_body_part'($P1)
     push res, $S0
     goto loop
   done:
@@ -49,7 +49,7 @@ TODO: Parse c_body properly and implement all other functions.
 
 =cut
 
-.sub '!generate_body_part' :method :multi(_, ['PAST';'Op'])
+.sub '!generate_body_part' :multi(['PAST';'Op'])
     .param pmc past
     $S0 = past['inline']
     .return ($S0)
