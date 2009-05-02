@@ -4,112 +4,6 @@
 # $Id$
 ################################################################################
 
-=head1 TITLE
-
-tools/dev/install_files.pl - Copy files to their correct locations
-
-=head1 SYNOPSIS
-
-    % perl tools/dev/install_files.pl [options]
-
-=head1 DESCRIPTION
-
-Use a detailed MANIFEST to install a set of files.
-
-=head2 Options
-
-=over 4
-
-=item C<buildprefix>
-
-The build prefix. Defaults to ''.
-
-=item C<prefix>
-
-The install prefix. Defaults to '/usr'.
-
-=item C<exec_prefix>
-
-The exec prefix. Defaults to '/usr'.
-
-=item C<bindir>
-
-The executables directory. Defaults to '/usr/bin'.
-
-=item C<libdir>
-
-The library directory. Defaults to '/usr/lib'.
-
-=item C<includedir>
-
-The header directory. Defaults to '/usr/include'.
-
-=back
-
-=head2 MANIFEST Format
-
-The format of the MANIFEST (currently MANIFEST and MANIFEST.generated
-are used) is:
-
-    source_path <whitespace> [package]meta1,meta2,...
-
-or you may optionally specify a different destination path:
-
-    source_path <whitespace> [package]meta1,meta2,... <whitespace> destination
-
-Additionally, there may be a * in front of the whole line to designate
-a generated file:
-
-    source_path <whitespace> *[package]meta1,meta2,... <whitespace> destination
-
-The square brackets around C<package> are literal. C<package> gives
-the name of the RPM that the given file will be installed for, and is
-only used by this script to skip files that are not members of any
-package.
-
-The various meta flags recognized are:
-
-=over 4
-
-=item C<doc>
-
-Tag this file with %doc in the RPM, and omit the leading path (because
-rpm will put it into a directory of its choosing)
-
-=item C<include>
-
-Write this file to the location given by the C<--includedir> option
-
-=item C<lib>
-
-Write this file to the location given by the C<--libdir> option
-
-=item C<bin>
-
-Write this file to the location given by the C<--bindir> option
-
-=back
-
-The optional C<destination> field provides a general way to change
-where a file will be written to. It will be applied before any
-metadata tags.
-
-Example: if this line is in the MANIFEST.generated file
-
-  languages/snorkfest/snork-compile        [main]bin
-
-and the --bindir=/usr/parroty/bin, then the generated
-parrot-<VERSION>-1.<arch>.rpm file will contain the file
-/usr/parroty/bin/snork-compile.
-
-=head1 SEE ALSO
-
-F<tools/dev/mk_manifests.pl>
-
-=cut
-
-################################################################################
-
 use strict;
 use warnings;
 use File::Basename qw(dirname basename);
@@ -132,12 +26,12 @@ my %options = (
 );
 
 my @manifests;
-foreach (@ARGV) {
-    if (/^--([^=]+)=(.*)/) {
+foreach my $arg (@ARGV) {
+    if ( $arg =~ m/^--([^=]+)=(.*)/ ) {
         $options{$1} = $2;
     }
     else {
-        push @manifests, $_;
+        push @manifests, $arg;
     }
 }
 
@@ -247,16 +141,15 @@ unless ( $options{'dry-run'} ) {
                 unshift @dirs, $dir;
                 $dir = dirname($dir);
             }
-            foreach (@dirs) {
-                mkdir( $_, 0777 ) or die "mkdir $_: $!\n";
+            foreach my $d (@dirs) {
+                mkdir( $d, 0777 ) or die "mkdir $d: $!\n";
             }
         }
     }
 }
-# TT #347
-# 1. skip build_dir-only binaries for @installable_exe
-for (@installable_exe) {
-    my ( $i, $dest ) = @$_;
+
+for my $iref (@installable_exe) {
+    my ( $i, $dest ) = @{ $iref };
     my ($file) = $i =~ /installable_(.+)$/;
     next unless $file;
     my @f = map { $_ ? $_->[0] : '' } @files;
@@ -267,23 +160,23 @@ for (@installable_exe) {
         }
     }
 }
-# 2. for every .exe check if there's an installable. Fail if not
-foreach my $f (@files ) {
-    next unless $_;
-    my ( $f, $dest ) = @$_;
+# for every .exe check if there's an installable. Fail if not
+foreach my $fref (@files ) {
+    next unless $fref;
+    my ( $src, $dest ) = @{ $fref };
     my $i;
     # This logic will fail on non-win32 if the generated files are really
     # generated as with rt #40817. We don't have [main]bin here.
-    $i = "installable_$f" if $f =~ /\.exe$/;
+    $i = "installable_$src" if $src =~ /\.exe$/;
     next unless $i;
     unless (map {$_->[0] =~ /^$i$/} @installable_exe) {
         die "$i is missing in MANIFEST or MANIFEST.generated\n";
     }
 }
 print("Installing ...\n");
-foreach ( @files, @installable_exe ) {
-    next unless $_;
-    my ( $src, $dest ) = @$_;
+foreach my $fref ( @files, @installable_exe ) {
+    next unless $fref;
+    my ( $src, $dest ) = @{ $fref };
     $dest = $options{destdir} . $dest;
     if ( $options{'dry-run'} ) {
         print "$src -> $dest\n";
@@ -298,6 +191,112 @@ foreach ( @files, @installable_exe ) {
     my $mode = ( stat($src) )[2];
     chmod $mode, $dest;
 }
+
+################################################################################
+
+=head1 TITLE
+
+tools/dev/install_files.pl - Copy files to their correct locations
+
+=head1 SYNOPSIS
+
+    % perl tools/dev/install_files.pl [options]
+
+=head1 DESCRIPTION
+
+Use a detailed MANIFEST to install a set of files.
+
+=head2 Options
+
+=over 4
+
+=item C<buildprefix>
+
+The build prefix. Defaults to ''.
+
+=item C<prefix>
+
+The install prefix. Defaults to '/usr'.
+
+=item C<exec_prefix>
+
+The exec prefix. Defaults to '/usr'.
+
+=item C<bindir>
+
+The executables directory. Defaults to '/usr/bin'.
+
+=item C<libdir>
+
+The library directory. Defaults to '/usr/lib'.
+
+=item C<includedir>
+
+The header directory. Defaults to '/usr/include'.
+
+=back
+
+=head2 MANIFEST Format
+
+The format of the MANIFEST (currently MANIFEST and MANIFEST.generated
+are used) is:
+
+    source_path <whitespace> [package]meta1,meta2,...
+
+or you may optionally specify a different destination path:
+
+    source_path <whitespace> [package]meta1,meta2,... <whitespace> destination
+
+Additionally, there may be a * in front of the whole line to designate
+a generated file:
+
+    source_path <whitespace> *[package]meta1,meta2,... <whitespace> destination
+
+The square brackets around C<package> are literal. C<package> gives
+the name of the RPM that the given file will be installed for, and is
+only used by this script to skip files that are not members of any
+package.
+
+The various meta flags recognized are:
+
+=over 4
+
+=item C<doc>
+
+Tag this file with %doc in the RPM, and omit the leading path (because
+rpm will put it into a directory of its choosing)
+
+=item C<include>
+
+Write this file to the location given by the C<--includedir> option
+
+=item C<lib>
+
+Write this file to the location given by the C<--libdir> option
+
+=item C<bin>
+
+Write this file to the location given by the C<--bindir> option
+
+=back
+
+The optional C<destination> field provides a general way to change
+where a file will be written to. It will be applied before any
+metadata tags.
+
+Example: if this line is in the MANIFEST.generated file
+
+  languages/snorkfest/snork-compile        [main]bin
+
+and the --bindir=/usr/parroty/bin, then the generated
+parrot-<VERSION>-1.<arch>.rpm file will contain the file
+/usr/parroty/bin/snork-compile.
+
+=head1 SEE ALSO
+
+F<tools/dev/mk_manifests.pl>
+
+=cut
 
 # Local Variables:
 #   mode: cperl

@@ -69,8 +69,6 @@ lib/Parrot/OpLib/core.pm                          [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm                [devel]lib
 lib/Parrot/PMC.pm                                 [devel]lib
 parrot.pc                                         [main]pkgconfig
-pirc.exe                                          [main]bin
-pirc                                              [main]bin
 runtime/parrot/dynext/digest_group.bundle         [library]
 runtime/parrot/dynext/digest_group.dll            [library]
 runtime/parrot/dynext/digest_group.dylib          [library]
