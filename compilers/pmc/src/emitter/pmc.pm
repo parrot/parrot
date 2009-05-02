@@ -103,6 +103,8 @@ method generate_class_init() {
         ~ self.name
         ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
 
+    # PUT VTABLE GENERTION HERE
+
     my $past := self.past;
     if ($past<class_init>) {
         @res.push("/* class_init */\n");
