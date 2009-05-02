@@ -6,18 +6,14 @@
 # Setup some commands
 PERL          := @perl@
 RM_F          := @rm_f@
-PARROT        := ../../parrot@exe@
-TOOL_DIR      := ../..
-CC            := @cc@
 CP            := @cp@
-BUILD         := $(PERL) @build_dir@/tools/build/dynpmc.pl
-O             := @o@
-EXE           := @exe@
+PARROT        := ../../parrot@exe@
 BUILD_DIR     := @build_dir@
 RECONFIGURE   := $(PERL) @build_dir@/tools/dev/reconfigure.pl
 
-LIBPARROT     := @libparrot@
-
+CC            := @cc@
+O             := @o@
+EXE           := @exe@
 CC_INC        := -I../../include
 C_LIBS        := @libs@
 CC_SHARED     := @cc_shared@
