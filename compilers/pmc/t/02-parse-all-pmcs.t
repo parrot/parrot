@@ -3,8 +3,9 @@
 .include 't/common.pir'
 
 .sub 'main' :main
-.include 'test_more.pir'
-load_bytecode 'pmc.pbc'
+    .include 'test_more.pir'
+    load_bytecode 'pmc.pbc'
+
     .local int total
     .local pmc os, all_files, pmc_files, dynpmc_files, it
 
@@ -65,7 +66,8 @@ load_bytecode 'pmc.pbc'
   iter_start:
     unless it goto iter_done
     $S0 = shift it
-    test_parse_one($S0)
+    $S1 = test_parse_one($S0)
+    is($S1, '', $S0)
     goto iter_start
   iter_done:
 

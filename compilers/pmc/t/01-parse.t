@@ -3,8 +3,9 @@
 .include 't/common.pir'
 
 .sub 'main' :main
-.include 'test_more.pir'
-load_bytecode 'pmc.pbc'
+
+    .include 'test_more.pir'
+    load_bytecode 'pmc.pbc'
 
     .local int total
     total = 25
@@ -21,7 +22,8 @@ load_bytecode 'pmc.pbc'
     $P0 = new 'ResizablePMCArray'
     push $P0, i
     $S0 = sprintf "t/data/class%02d.pmc", $P0
-    test_parse_one($S0)
+    $S1 = test_parse_one($S0)
+    is($S1, '', $S0)
     inc i
     unless i >= total goto loop
 

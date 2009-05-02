@@ -10,11 +10,18 @@
     push_eh fail
     compiler.'parse'($S0, 'target'=>'parse')
     pop_eh
-    ok(1, file)
-    .return ()
+    .return ('')
+
   fail:
+    .local pmc ex
+    .local string ex_type, ex_msg, ret_val
+    .get_results(ex)
     pop_eh
-    ok(0, file)
+    ex_type = typeof ex
+    ex_msg = ex
+    ret_val = concat ex_type, ': '
+    ret_val = concat ret_val, ex_msg
+    .return (ret_val)
 .end
 
 .sub '_slurp'
