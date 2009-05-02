@@ -3,6 +3,10 @@
 
 =head1 Generic PMC emitter
 
+This is PIR part of PMC emitter.
+
+TODO figure out how to implement it in NQP.
+
 =cut
 
 .namespace ['PMC';'Emitter';'PMC']
@@ -12,49 +16,43 @@
 
     p6meta = new 'P6metaclass'
 
-    p6meta.'new_class'('PMC::Emitter::PMC')
+    p6meta.'new_class'('PMC::Emitter::PMC', 'parent'=>'Capture')
 
 .end
 
-=item C<generate_h_file>
-
-Generate part of header file.
-
-=cut
-
-# "Template Method". Just override generate_h_file_functions in derived
-# classes.
-
-.sub 'generate_h_file' :method
+.sub 'new' :method
     .param pmc past
-    .local string res
 
-    .local string guard
-    .local string name
+    .local pmc res
+    $P0 = self.'HOW'()
+    $P0 = getattribute $P0, 'parrotclass'
+    res = new $P0
 
-    name = past.'name'()
-    $S0 = 'uc'(name)
-
-    guard = 'PARROT_PMC_'
-    concat guard, $S0
-    concat guard, '_H_GUARD'
-
-    res = '#ifndef '
-    concat res, guard
-    concat res, "\n"
-    concat res, '#define '
-    concat res, guard
-    concat res, "\n"
-
-    $S0 = self.'generate_h_file_functions'(past)
-    concat res, $S0
-    
-    concat res, '#endif /* '
-    concat res, guard
-    concat res, " */ \n"
+    res['past'] = past
+    $S0 = past.'name'()
+    res['name'] = $S0
+    $S0 = 'uc'($S0)
+    res['ucname'] = $S0
 
     .return (res)
 .end
+
+.sub 'past' :method
+    $P0 = self['past']
+    .return ($P0)
+.end
+
+.sub 'name' :method
+    $S0 = self['name']
+    .return ($S0)
+.end
+
+.sub 'ucname' :method
+    $S0 = self['ucname']
+    .return ($S0)
+.end
+
+
 
 =item C<generate_h_file_functions>
 
@@ -63,7 +61,7 @@ Generate C declarations for vtable functions
 =cut
 
 .sub 'generate_h_file_functions' :method
-    .param pmc past
+    .local pmc past
     .local string res
     .local pmc vtable_info, vtable_hash
     .local pmc vtables, it, entry, class_init
@@ -71,6 +69,7 @@ Generate C declarations for vtable functions
 
     .local pmc res_builder
 
+    past = self.'past'()
     pmc_name = past.'name'()
 
     $P0 = get_hll_global ['PMC'; 'VTableInfo'], 'vtable_hash'

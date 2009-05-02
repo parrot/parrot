@@ -13,13 +13,13 @@ method generate_h_file($past) {
     my $filename := self.filename();
     
     # Get emitter for (specific) PMC.
-    my $pmc_emitter := get_pmc_emitter($name);
+    my $pmc_emitter := get_pmc_emitter($name, $past);
 
     $res :=  
             # Generate header.
               dont_edit($filename)
             # PMC functions
-            ~ $pmc_emitter.generate_h_file($past)
+            ~ $pmc_emitter.generate_h_file()
             # C code
             ~ c_code_coda();
 
@@ -34,7 +34,7 @@ method generate_c_file($past) {
     my $filename := self.filename();
     
     # Get emitter for (specific) PMC.
-    my $pmc_emitter := get_pmc_emitter($name);
+    my $pmc_emitter := get_pmc_emitter($name, $past);
 
     $res :=  
             # Generate header.
@@ -59,24 +59,21 @@ method set_filename($name) {
 
 # Get (specific) PMC emitter
 # Try to create specific emitter. In case of failure create generic one.
-sub get_pmc_emitter($name) {
+sub get_pmc_emitter($name, $past) {
 PIR q< 
     find_lex $P0, '$name'
     $S0 = $P0
-    $P1 = new 'ResizableStringArray'
-    push $P1, 'PMC'
-    push $P1, 'Emitter'
-    push $P1, $S0
-    push_eh not_found
-    %r = new $P1
-    pop_eh
-    goto done
+
+    .local pmc ctor
+    ctor = get_hll_global ['PMC';'Emitter';'PMC'], $S0
+    $I0 = defined ctor
+    if $I0 goto done
 
   not_found:
-    pop_eh
-    $P1 = split '::', 'PMC::Emitter::PMC'
-    %r = new $P1
+    ctor = get_hll_global ['PMC';'Emitter'], 'PMC'
   done:
+    find_lex $P1, '$past'
+    %r = ctor.'new'($P1)
 >;
 }
 
