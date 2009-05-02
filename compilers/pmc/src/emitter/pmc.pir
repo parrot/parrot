@@ -117,10 +117,10 @@ Generate C file for PMC.
     .local string guard
     .local string name
 
-    name = past.'name'()
-    $S0 = 'uc'(name)
-
     $S0 = self.'generate_c_file_functions'(past)
+    concat res, $S0
+    
+    $S0 = self.'!generate_class_init'(past)
     concat res, $S0
     
     .return (res)
@@ -172,7 +172,6 @@ Generate C declarations for vtable functions
 .end
 
 
-
 =item C<!generate_signature>
 
 Generate full signature of vtable.
@@ -215,6 +214,48 @@ Generate full signature of vtable.
   param_done:
 
     push res, ")"
+    $S0 = join '', res
+    .return ($S0)
+.end
+
+
+=item C<!generate_class_init>
+
+Generating class_init function
+
+=cut
+
+.sub '!generate_class_init' :method
+    .param pmc past
+    
+    .local string pmc_name
+    pmc_name = past.'name'()
+
+    .local pmc res
+
+    res = new 'ResizableStringArray'
+    push res, 'PARROT_EXPORT void '
+    push res, ' Parrot_'
+    push res, pmc_name
+    push res, '_class_init'
+    push res, '(PARROT_INTERP, int entry, int pass) '
+
+    push res, "\n{\n"
+
+    # Put generating of vtables here.
+
+    $P0 = past['class_init']
+    $I0 = defined $P0
+    unless $I0 goto no_init
+
+    push res, "/* class_init */\n"
+    $S0 = self.'!generate_body'($P0)
+    push res, $S0
+  no_init:
+
+    push res, "\n}\n"
+    
+
     $S0 = join '', res
     .return ($S0)
 .end

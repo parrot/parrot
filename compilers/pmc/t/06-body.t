@@ -8,7 +8,7 @@
 load_bytecode 'pmc.pbc'
     .local int total
 
-    plan(3)
+    plan(4)
 
     .local string filename
 
@@ -19,6 +19,8 @@ load_bytecode 'pmc.pbc'
     check_one_file(filename, $S0, "'PMC * Parrot_Integer_instantiate(PARROT_INTERP, PMC *sig)'", "VTable method generated")
     check_one_file(filename, $S0, "'Integer.instantiate: unhandled initializer'", "VTable body generated")
 
+    $S0 = _slurp('t/data/class14.pmc')
+    check_one_file(filename, $S0, "'/* class_init_code; called for side effects */'", "class_init body preserved")
 .end
 
 # Check genrated header.
@@ -38,7 +40,7 @@ load_bytecode 'pmc.pbc'
     emitter = new $P1
     emitter.'set_filename'(name)
     $S0 = emitter.'generate_c_file'($P0)
-    #say $S0
+    say $S0
     like($S0, pattern, message)
 .end
 

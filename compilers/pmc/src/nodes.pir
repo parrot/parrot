@@ -44,9 +44,6 @@ PMC class by it self.
     $P3 = new 'ResizableStringArray'
     res.'attr'('parents', $P3, 1)
 
-    $P4 = new 'Hash'
-    res.'attr'('class_init', $P4, 1)
-
     $P5 = new 'Hash'
     res.'attr'('vtables', $P5, 1)
 
@@ -135,13 +132,12 @@ Add a class_init function to PMC.
     .local string name
     name = 'class_init'
 
-    $P0 = self.'attr'('class_init', 0, 0)
-    $I0 = exists $P0[name]
+    $I0 = exists self['class_init']
     unless $I0 goto add_method
     $S0 = "Duplicate class_init function: "
     die $S0
   add_method:
-    $P0[name] = method
+    self['class_init'] = method
     .return ()
 .end
 

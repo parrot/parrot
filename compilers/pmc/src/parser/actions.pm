@@ -66,7 +66,12 @@ method body_part($/, $key) {
 
 method class_init($/) {
     #say('class_init ' ~$<identifier>);
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := PAST::Block.new( 
+        :blocktype('method'),
+        :returns('void'),
+        :node($/),
+        $<c_body>.ast
+    );
     make $past;
 }
 
@@ -76,11 +81,11 @@ method vtable($/) {
         :name(~$<c_signature><identifier>),
         :blocktype('method'),
         :returns(~$<c_signature><c_type>),
-        :node($/)
+        :node($/),
+
+        $<c_body>.ast
     );
     $past<parameters> := $<c_signature><c_arguments>.ast;
-    #say(~$<c_body>);
-    $past.push($<c_body>.ast());
     make $past;
 }
 
@@ -89,11 +94,12 @@ method method($/) {
     my $past := PAST::Block.new(
         :name(~$<identifier>),
         :blocktype('declaration'),
+        :returns('void'),           # PCC METHODS returns void
         :node($/),
-        PAST::Op.new(
-            :inline(~$<c_body>)
-        )
+
+        $<c_body>.ast
     );
+    #$past<parameters> := $<c_signature><c_arguments>.ast;
     make $past;
 }
 
