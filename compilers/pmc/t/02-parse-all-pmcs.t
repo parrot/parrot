@@ -17,6 +17,20 @@
     splice all_files, pmc_files, 0, 0
     splice all_files, dynpmc_files, 0, 0
 
+    #temporary code to speed up the test suite
+    #only test the 10 smallest PMCs in src/pmc
+    all_files = new ['ResizablePMCArray']
+    push all_files, '../../src/pmc/null.pmc'
+    push all_files, '../../src/pmc/pccmethod_test.pmc'
+    push all_files, '../../src/pmc/random.pmc'
+    push all_files, '../../src/pmc/boolean.pmc'
+    push all_files, '../../src/pmc/sockaddr.pmc'
+    push all_files, '../../src/pmc/packfileannotation.pmc'
+    push all_files, '../../src/pmc/parrotrunningthread.pmc'
+    push all_files, '../../src/pmc/parrotlibrary.pmc'
+    push all_files, '../../src/pmc/packfilesegment.pmc'
+    push all_files, '../../src/pmc/pointer.pmc'
+
     total = elements all_files
     all_files.'sort'()
 
