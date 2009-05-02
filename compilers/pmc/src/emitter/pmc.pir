@@ -54,54 +54,6 @@ TODO figure out how to implement it in NQP.
 
 
 
-=item C<generate_h_file_functions>
-
-Generate C declarations for vtable functions
-
-=cut
-
-.sub 'generate_h_file_functions' :method
-    .local pmc past
-    .local string res
-    .local pmc vtable_info, vtable_hash
-    .local pmc vtables, it, entry, class_init
-    .local string pmc_name, vtable_name
-
-    .local pmc res_builder
-
-    past = self.'past'()
-    pmc_name = past.'name'()
-
-    $P0 = get_hll_global ['PMC'; 'VTableInfo'], 'vtable_hash'
-    vtable_hash = $P0()
-    
-    concat res, "void Parrot_"
-    concat res, pmc_name
-    concat res, "_class_init(PARROT_INTERP, int, int);\n" 
-
-    vtables = self.'!vtables'(past)
-
-    it = iter vtables
-  loop:
-    unless it goto done
-    res_builder = new 'ResizableStringArray'
-    vtable_name = shift it
-    entry = vtables[vtable_name]
-    vtable_info = vtable_hash[vtable_name]
-
-    # Generate 2 methods. One for read, one for write.
-    $S0 = self.'!generate_signature'(pmc_name, entry, 0 :named('ro'))
-    push res_builder, $S0
-    push res_builder, ";\n"
-
-    $S0 = join '', res_builder
-    concat res, $S0
-
-    goto loop
-
-  done:
-    .return (res)
-.end
 
 =item C<generate_c_file>
 
@@ -271,6 +223,7 @@ Generating class_init function
     .param pmc past
     .tailcall past.'vtables'()
 .end
+
 
 # Local Variables:
 #   mode: pir
