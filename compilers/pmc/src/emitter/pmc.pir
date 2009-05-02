@@ -159,7 +159,8 @@ Generate C declarations for vtable functions
     # Generate 2 methods. One for read, one for write.
     $S0 = self.'!generate_signature'(pmc_name, entry, 0 :named('ro'))
     push res_builder, $S0
-    $S0 = self.'!generate_body'(entry)
+    $P0 = new ['PMC';'Emitter';'C']
+    $S0 = $P0.'emit'(entry)
     push res_builder, $S0
 
     $S0 = join '', res_builder
@@ -249,7 +250,8 @@ Generating class_init function
     unless $I0 goto no_init
 
     push res, "/* class_init */\n"
-    $S0 = self.'!generate_body'($P0)
+    $P1 = new ['PMC';'Emitter';'C']
+    $S0 = $P1.'emit'($P0)
     push res, $S0
   no_init:
 
@@ -257,46 +259,6 @@ Generating class_init function
     
 
     $S0 = join '', res
-    .return ($S0)
-.end
-
-=item C<!generate_body>
-
-Generate C function body from PAST.
-
-=cut
-
-.sub '!generate_body' :method
-    .param pmc entry
-    
-    .local pmc res
-    res = new 'ResizableStringArray'
-    $P0 = entry.'iterator'()
-  loop:
-    unless $P0 goto done
-    $P1 = shift $P0
-    #print 'P1 '
-    #say $P1
-    $S0 = self.'!generate_body_part'($P1)
-    push res, $S0
-    goto loop
-  done:
-
-    $S0 = join '', res
-    .return ($S0)
-.end
-
-=item C<!generate_body_part>
-
-Multi-methods for generating C body.
-
-TODO: Parse c_body properly and implement all other functions.
-
-=cut
-
-.sub '!generate_body_part' :method :multi(_, ['PAST';'Op'])
-    .param pmc past
-    $S0 = past['inline']
     .return ($S0)
 .end
 

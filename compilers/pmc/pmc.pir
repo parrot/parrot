@@ -31,6 +31,7 @@
 .include 'src/nodes.pir'
 .include 'src/vtable_info.pir'
 .include 'src/emitter/pmc.pir'
+.include 'src/emitter/c.pir'
 
 .include 'src/gen_emitter.pir'
 .include 'src/gen_vtable_info.pir'
