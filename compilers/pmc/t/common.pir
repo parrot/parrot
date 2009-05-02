@@ -24,6 +24,22 @@
     .return (ret_val)
 .end
 
+
+.sub get_emitter_and_capture
+    .param string name
+    .param string source
+    .param string target
+
+    .local pmc compiler, emitter, capture
+    compiler = compreg 'PMC'
+    capture = compiler.'compile'(source, 'target'=> target)
+
+    emitter = new ['PMC'; 'Emitter']
+    emitter.'set_filename'(name)
+    .return (emitter, capture)
+.end
+
+
 .sub '_slurp'
     .param string file
     .local pmc pio

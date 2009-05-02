@@ -31,15 +31,9 @@ load_bytecode 'pmc.pbc'
     .param string pattern
     .param string message
 
-    .local pmc compiler
-    compiler = compreg 'PMC'
-    $P0 = compiler.'compile'(source, 'target'=>'past')
-
-    .local pmc emitter
-    $P1 = split '::', 'PMC::Emitter'
-    emitter = new $P1
-    emitter.'set_filename'(name)
-    $S0 = emitter.'generate_c_file'($P0)
+    .local pmc emitter, capture
+    (emitter, capture) = get_emitter_and_capture(name, source, 'past')
+    $S0 = emitter.'generate_c_file'(capture)
     say $S0
     like($S0, pattern, message)
 .end
