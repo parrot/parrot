@@ -8,8 +8,8 @@
     works.  It is sorted by name and formatted to allow easy
     grepping and beautification by scripts.
     The fields are: name (N), email (E), web-address (W),
-    description (D), subversion username (U) and snail-mail
-    address (S).
+    description (D), main username (U), alias usernames (A)
+    and snail-mail address (S).
 
         Thanks,
 
@@ -945,6 +945,7 @@ D: Win32, IO fixes
 
 N: Will "Coke" Coleda
 U: coke
+A: wcoleda
 E: will@coleda.com
 D: Tcl language (partcl), APL, website, various languages/ upkeep, misc.
 
