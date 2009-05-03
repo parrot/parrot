@@ -2069,6 +2069,7 @@ SPLINTFLAGS_OVERLY_NOISY := \
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 SPLINTFLAGS_TEST := \
+    +partial \
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
@@ -2077,21 +2078,8 @@ splint : $(PARROT)
 
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
-	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-    compilers/imcc/cfg.c \
-    compilers/imcc/debug.c \
-    compilers/imcc/imc.c \
-    compilers/imcc/imclexer.c \
-    compilers/imcc/imcparser.c \
-    compilers/imcc/instructions.c \
-    compilers/imcc/main.c \
-    compilers/imcc/optimizer.c \
-    compilers/imcc/parser_util.c \
-    compilers/imcc/pbc.c \
-    compilers/imcc/pcc.c \
-    compilers/imcc/reg_alloc.c \
-    compilers/imcc/sets.c \
-    compilers/imcc/symreg.c \
+	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	src/string/*.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
