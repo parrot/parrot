@@ -97,13 +97,13 @@ check_set_std_props(PARROT_INTERP, PMC *pmc, STRING *key, PMC *value)
     if (!ro)
         ro = string_make(interp, "_ro", 3, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG);
-    if (!Parrot_str_compare(interp, key, ro)) {
+    if (Parrot_str_equal(interp, key, ro)) {
 #else
 
     /*
-     * s2 in Parrot_str_compare is freed here
+     * s2 in Parrot_str_equal is freed here
      */
-    if (!Parrot_str_compare(interp, key, CONST_STRING(interp, "_ro"))) {
+    if (Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
 #endif
         /* pmc should set/clear readonly */
         const INTVAL on = VTABLE_get_bool(interp, value);
@@ -182,7 +182,7 @@ looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 static PMC*
 check_get_std_props(PARROT_INTERP, PMC *self, STRING *key) {
     if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-        &&!Parrot_str_compare(interp, key, CONST_STRING(interp, "_ro"))) {
+       && Parrot_str_equal(interp, key, CONST_STRING(interp, "_ro"))) {
         PMC * const ret_val  = pmc_new(interp, enum_class_Integer);
         VTABLE_set_integer_native(interp, ret_val, 1);
         return ret_val;
