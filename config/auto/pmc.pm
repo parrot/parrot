@@ -162,7 +162,7 @@ PMC: for my $pmc_file ( split( /\s+/, $pmc_list ) ) {
             unless defined $name;
     }
 
-    my @names = $self->order_pmcs_by_hierarchy( \%parents );
+    my @names = ('default', $self->order_pmcs_by_hierarchy( \%parents ));
 
     $conf->data->set(
         pmc                  => $pmc_list,

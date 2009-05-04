@@ -264,7 +264,7 @@ does_isa(PARROT_INTERP, const STRING *method, const STRING *what)
     } while (1);
 }
 
-pmclass default abstract no_init {
+pmclass default abstract {
 
 /*
 

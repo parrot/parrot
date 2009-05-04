@@ -61,8 +61,7 @@ enum {
 END_H
 
     my @pmcs = split( / /, $conf->data->get('pmc_names') );
-    print {$OUT} "    enum_class_default,\n";
-    my $i = 1;
+    my $i = 0;
     foreach (@pmcs) {
         print {$OUT} "    enum_class_$_,\t/*  $i */\n";
         $i++;
