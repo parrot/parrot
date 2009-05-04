@@ -345,6 +345,7 @@ D: Debian packaging
 S: Chemnitz, Germany
 
 N: François Perrad
+A: Francois Perrad
 E: francois.perrad@gadz.org
 W: http://fperrad.googlepages.com/home
 U: fperrad
@@ -679,6 +680,7 @@ D: Patch reducing code duplication
 N: Mitchell N Charity
 
 N: Moritz A Lenz
+A: Moritz Lenz
 E: moritz@faui2k3.org
 U: moritz
 D: Test infrastructure for languages/perl6/ and Perl 6 in general
