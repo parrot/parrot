@@ -130,7 +130,8 @@ The same point applies for ops and dynops.
 
 =end for
 
-Parrot allows language developers to extend Parrot's core instruction set -- again to suit the needs of advanced languages.
+Parrot allows language developers to extend Parrot's core instruction set --
+again to suit the needs of advanced languages.
 
 =item Chapter 9, I<Parrot Assembly Language>
 

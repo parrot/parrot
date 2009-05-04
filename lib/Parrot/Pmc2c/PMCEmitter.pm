@@ -589,7 +589,7 @@ EOC
     if ( $self->is_dynamic ) {
         $cout .= <<"EOC";
         vt->base_type    = entry;
-        vt->whoami       = string_make(interp, "$classname", @{[length($classname)]}, 
+        vt->whoami       = string_make(interp, "$classname", @{[length($classname)]},
                                        "ascii", PObj_constant_FLAG|PObj_external_FLAG);
         vt->provides_str = Parrot_str_append(interp, vt->provides_str,
             string_make(interp, " $provides", @{[length($provides) + 1]}, "ascii",
@@ -769,7 +769,7 @@ sub update_vtable_func {
         if (exists $self->{has_method}{$name}) {
             $vtable_updates .= "    vt->$name = Parrot_${classname}_${name};\n";
         }
-    }   
+    }
 
     $cout .= <<"EOC";
 
@@ -789,7 +789,7 @@ EOC
         foreach my $vt_method ( @{ $self->$k->vtable->names} ) {
 
             next unless ($self->$k->implements_vtable($vt_method));
-            
+
             $vtable_updates .= "    vt->$vt_method = Parrot_${classname}_${k}_${vt_method};\n";
         }
 
@@ -852,7 +852,7 @@ EOC
                 $get_extra_vtable .= "    Parrot_${parent_name}_${k}_update_vtable(vt);\n";
             }
         }
-    
+
         $cout .= <<"EOC";
 PARROT_EXPORT
 VTABLE* Parrot_${classname}_${k}_get_vtable(PARROT_INTERP) {
