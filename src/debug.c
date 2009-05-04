@@ -587,9 +587,7 @@ static const DebuggerCmd *
 get_cmd(ARGIN_NULLOK(const char **cmd))
 {
     ASSERT_ARGS(get_cmd)
-    if (cmd == NULL || *cmd == NULL)
-        return NULL;
-    else {
+    if (cmd && *cmd) {
         const char * const start = skip_whitespace(*cmd);
         const char *next = start;
         char c;
@@ -626,9 +624,8 @@ get_cmd(ARGIN_NULLOK(const char **cmd))
             *cmd = skip_whitespace(next);
             return DebCmdList[found].cmd;
         }
-        else
-            return NULL;
     }
+    return NULL;
 }
 
 /*
@@ -1331,7 +1328,6 @@ int
 PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
 {
     ASSERT_ARGS(PDB_run_command)
-    unsigned long c;
     PDB_t        * const pdb = interp->pdb;
     const DebuggerCmd *cmd;
 
