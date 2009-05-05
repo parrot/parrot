@@ -303,7 +303,7 @@ gen_sprintf_call(ARGOUT(char *out), ARGMOD(SpfInfo *info), int thingy)
     }
 
     out[i++] = (char)thingy;
-    out[i]   = 0;
+    out[i]   = '\0';
 }
 
 
