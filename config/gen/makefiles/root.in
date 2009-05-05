@@ -2068,10 +2068,16 @@ SPLINTFLAGS_OVERLY_NOISY := \
 
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
-SPLINTFLAGS_TEST := \
-    +partial \
-    -memchecks \
-    -iso-reserved-internal \
+
+
+# We're only checking part of the codebase, and don't try to track memory leaks
+SPLINTFLAGS_TEST = +partial -memchecks
+
+# Don't complain about the str*() functions being reserved by the standard
+SPLINTFLAGS_TEST += -iso-reserved-internal
+
+# Don't complain about using pointers and ints as booleans
+SPLINTFLAGS_TEST += -pred-bool
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
@@ -2081,7 +2087,7 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-	src/d*.c \
+	src/s*.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
