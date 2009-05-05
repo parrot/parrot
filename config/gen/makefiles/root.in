@@ -2286,10 +2286,10 @@ perlcritic:
 cagecritic:
 	perlcritic -1 --profile tools/util/perlcritic-cage.conf $(CRITIC_FILES)
 
-# This target will eventually create all the headers automatically.  If you are
-# having problems with linkage in Win32 (or elsewhere), because something is
-# not PARROT_EXPORT but should be, then put PARROT_EXPORT in the C file and run "make
-# headerizer".  The .h file will get updated.
+# This target will eventually create all the headers automatically.  If you
+# are having problems with linkage in Win32 (or elsewhere), because something
+# is not PARROT_EXPORT but should be, then put PARROT_EXPORT in the C file and
+# run "make headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES := \
     $(O_FILES) \
