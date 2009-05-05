@@ -1100,14 +1100,14 @@ PMC*
 Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 {
     ASSERT_ARGS(Parrot_ComputeMRO_C3)
+
+    PMC *merge_list        = PMCNULL;
+    PMC *immediate_parents = VTABLE_inspect_str(interp, _class, CONST_STRING(interp, "parents"));
     PMC *result;
-    PMC *merge_list = PMCNULL;
-    PMC *immediate_parents;
-    int i, parent_count;
+
+    int  i, parent_count;
 
     /* Now get immediate parents list. */
-    Parrot_PCCINVOKE(interp, _class, CONST_STRING(interp, "parents"),
-        "->P", &immediate_parents);
 
     if (!immediate_parents)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
