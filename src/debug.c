@@ -2756,7 +2756,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
         static const char regs[] = "ISPN";
 
         for (j = 0; j < n_values; j++) {
-            unsigned int idx = 0;
+            size_t idx = 0;
             const int sig_value = VTABLE_get_integer_keyed_int(interp, sig, j);
 
             /* Print the register name, e.g. P37. */
