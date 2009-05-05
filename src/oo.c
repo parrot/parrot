@@ -1101,7 +1101,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 {
     ASSERT_ARGS(Parrot_ComputeMRO_C3)
     PMC *result;
-    PMC * const merge_list = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC *merge_list = PMCNULL;
     PMC *immediate_parents;
     int i, parent_count;
 
@@ -1130,6 +1130,10 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
         if (PMC_IS_NULL(lin))
             return PMCNULL;
+
+        /* instantiated lazily */
+        if (PMC_IS_NULL(merge_list))
+            merge_list = pmc_new(interp, enum_class_ResizablePMCArray);
 
         VTABLE_push_pmc(interp, merge_list, lin);
     }
