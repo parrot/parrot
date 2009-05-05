@@ -416,11 +416,11 @@ calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
         return _class->all_parents;
 
     if (num_parents == 1) {
-            const STRING *ap         = CONST_STRING(interp, "all_parents");
-            PMC          *parent     = VTABLE_get_pmc_keyed_int(interp,
-                                            _class->parents, 0);
-            PMC          *parent_mro = VTABLE_inspect_str(interp, parent, ap);
-            PMC          *mro        = VTABLE_clone(interp, parent_mro);
+            STRING *ap         = CONST_STRING(interp, "all_parents");
+            PMC    *parent     = VTABLE_get_pmc_keyed_int(interp,
+                                    _class->parents, 0);
+            PMC    *parent_mro = VTABLE_inspect_str(interp, parent, ap);
+            PMC    *mro        = VTABLE_clone(interp, parent_mro);
             VTABLE_unshift_pmc(interp, mro, SELF);
             return mro;
     }
