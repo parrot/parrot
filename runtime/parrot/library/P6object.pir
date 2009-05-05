@@ -154,7 +154,7 @@ Return a true value if the invocant 'isa' C<x>.
 
 =cut
 
-.sub 'isa' :method
+.sub 'isa' :method :multi(_,_, _)
     .param pmc obj
     .param pmc x
 
@@ -182,19 +182,34 @@ Return a true value if the invocant 'can' C<x>.
 
 =item add_parent(parentclass [, 'to'=>parrotclass])
 
+Deprecated; use add_parent(class, parentclass)
+
 =cut
 
-.sub 'add_parent' :method
+.sub 'add_parent' :method :multi(_,_)
     .param pmc parentclass
     .param pmc options         :slurpy :named
 
-    parentclass = self.'get_parrotclass'(parentclass)
     $P0 = options['to']
     unless null $P0 goto have_to
     $P0 = self
   have_to:
+    .tailcall self.'add_parent'($P0, parentclass)
+.end
+
+
+=item add_parent(class, parentclass)
+
+=cut
+
+.sub 'add_parent' :method :multi(_,_,_)
+    .param pmc obj
+    .param pmc parentclass
+    
+    parentclass = self.'get_parrotclass'(parentclass)
+    
     .local pmc parrotclass
-    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass = self.'get_parrotclass'(obj)
     if null parrotclass goto end
 
     ##  if parrotclass isa parentclass, we're done
@@ -237,9 +252,11 @@ Return a true value if the invocant 'can' C<x>.
 
 Add C<method> with C<name> to C<parrotclass>.
 
+DEPRECATED. Use add_method(class, name, method)
+
 =cut
 
-.sub 'add_method' :method
+.sub 'add_method' :method :multi(_,_,_)
     .param string name
     .param pmc method
     .param pmc options         :slurpy :named
@@ -248,15 +265,49 @@ Add C<method> with C<name> to C<parrotclass>.
     unless null $P0 goto have_to
     $P0 = self
   have_to:
+    .tailcall self.'add_method'($P0, name, method)
+.end
+
+
+=item add_method(class, name, method)
+
+Add C<method> with C<name> to C<class>.
+
+=cut
+
+
+.sub 'add_method' :method :multi(_,_,_,_)
+    .param pmc obj
+    .param string name
+    .param pmc method
+    
     .local pmc parrotclass
-    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass = self.'get_parrotclass'(obj)
     parrotclass.'add_method'(name, method)
+.end
+
+
+=item add_attribute(class, name)
+
+Add C<method> with C<name> to C<class>.
+
+=cut
+
+.sub 'add_attribute' :method
+    .param pmc obj
+    .param string name
+    .param pmc options         :slurpy :named
+    .local pmc parrotclass
+    parrotclass = self.'get_parrotclass'(obj)
+    parrotclass.'add_attribute'(name)
 .end
 
 
 =item add_role(role, [, 'to'=>parrotclass])
 
 Add C<role> to C<parrotclass>.
+
+DEPRECATED. Use compose_role(class, role)
 
 =cut
 
@@ -268,8 +319,22 @@ Add C<role> to C<parrotclass>.
     unless null $P0 goto have_to
     $P0 = self
   have_to:
+    .tailcall self.'compose_role'($P0, role)
+.end
+
+
+=item compose_role(class, role)
+
+Add C<role> to C<class>.
+
+=cut
+
+.sub 'compose_role' :method
+    .param pmc obj
+    .param pmc role
+    
     .local pmc parrotclass
-    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass = self.'get_parrotclass'(obj)
     parrotclass.'add_role'(role)
 .end
 

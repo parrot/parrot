@@ -36,7 +36,7 @@ Testing Perl 6 objects.
     goto load_success
 
   load_fail:
-    ok(0, "load_bytecode 'P6object.pir' failed -- skipping tests")
+    ok(0, "load_bytecode 'P6object.pbc' failed -- skipping tests")
     .return ()
 
   load_success:
