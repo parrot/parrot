@@ -127,8 +127,12 @@ explains the differences between the quoting types.>
 
 PIR variables can store four different kinds of valuesE<mdash>integers, numbers
 (floating point), strings, and objects. The simplest way to work with these
-values is through register variables. Register variables always start with a dollar sign (C<$>) and a single character which specifies the type of the register:
-integer (C<I>), number (C<N>), string (C<S>), or PMC (C<P>).  Registers have numbers as well; the "first" string register is C<$S0>N<Register numbers may or may not correspond to the register used internally; Parrot's compiler remaps registers as appropriate.>
+values is through register variables. Register variables always start with a
+dollar sign (C<$>) and a single character which specifies the type of the
+register: integer (C<I>), number (C<N>), string (C<S>), or PMC (C<P>).
+Registers have numbers as well; the "first" string register is C<$S0>.
+N<Register numbers may or may not correspond to the register used internally;
+Parrot's compiler remaps registers as appropriate.>
 
   $S0 = "Who's a pretty boy, then?"
   say $S0
