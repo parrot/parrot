@@ -109,7 +109,8 @@ void Parrot_destroy_header_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
-int Parrot_forall_header_pools(PARROT_INTERP,
+int /*@alt void@*/
+Parrot_forall_header_pools(PARROT_INTERP,
     int flag,
     ARGIN_NULLOK(void *arg),
     NOTNULL(pool_iter_fn func))

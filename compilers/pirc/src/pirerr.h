@@ -19,7 +19,8 @@ void panic(
         __attribute__nonnull__(2);
 
 PARROT_IGNORABLE_RESULT
-int yypirerror(
+int /*@alt void@*/
+yypirerror(
     yyscan_t yyscanner,
     ARGIN(lexer_state * const lexer),
     ARGIN(char const * const message),

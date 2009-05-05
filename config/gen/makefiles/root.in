@@ -2070,6 +2070,7 @@ SPLINTFLAGS_OVERLY_NOISY := \
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 SPLINTFLAGS_TEST := \
     +partial \
+    -memchecks \
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
@@ -2079,7 +2080,7 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-	src/string/*.c \
+	src/d*.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage

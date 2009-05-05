@@ -12,7 +12,8 @@
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_IGNORABLE_RESULT
-int get_opinfo(ARGIN(lexer_state * const lexer))
+int /*@alt void@*/
+get_opinfo(ARGIN(lexer_state * const lexer))
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_get_opinfo __attribute__unused__ int _ASSERT_ARGS_CHECK = \

@@ -333,7 +333,9 @@ char PDB_program_end(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
-int PDB_run_command(PARROT_INTERP, ARGIN(const char *command))
+int /*@alt void@*/
+PDB_run_command(PARROT_INTERP,
+    ARGIN(const char *command))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
