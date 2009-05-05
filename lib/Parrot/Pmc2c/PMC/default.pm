@@ -59,7 +59,7 @@ sub get_vtable_func {
 
     my $cout = "";
 
-    my $vtable_decl = $self->vtable_decl("temp_vtable", '""');
+    my $vtable_decl = $self->vtable_decl("temp_vtable", 'enum_class_default');
 
     $cout .= <<"EOC";
 
