@@ -57,7 +57,9 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-INTVAL Parrot_warn(PARROT_INTERP,
+PARROT_IGNORABLE_RESULT
+INTVAL /*@alt void@*/
+Parrot_warn(PARROT_INTERP,
     INTVAL warnclass,
     ARGIN(const char *message),
     ...)
