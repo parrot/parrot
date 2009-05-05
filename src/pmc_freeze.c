@@ -35,11 +35,11 @@ C<STRING> with a vtable.
 #include "pmc_freeze.str"
 
 /* default.pmc thawing of properties */
-PARROT_EXPORT void
+void
 Parrot_default_thaw(PARROT_INTERP, PMC *pmc, visit_info *info);
 
 /* XXX This should be in a header file. */
-PARROT_EXPORT void
+void
 Parrot_default_thawfinish(PARROT_INTERP, PMC *pmc, visit_info *info);
 
 
