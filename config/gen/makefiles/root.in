@@ -2071,6 +2071,7 @@ SPLINTFLAGS_OVERLY_NOISY := \
 SPLINTFLAGS_TEST := \
     +partial \
     -memchecks \
+    -iso-reserved-internal \
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
