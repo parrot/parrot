@@ -1003,7 +1003,7 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 {
     ASSERT_ARGS(C3_merge)
     PMC      *accepted   = PMCNULL;
-    PMC      *result     = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC      *result     = PMCNULL;
     const int list_count = VTABLE_elements(interp, merge_list);
     int       cand_count = 0;
     int       i;
