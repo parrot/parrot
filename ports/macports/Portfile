@@ -46,6 +46,13 @@ post-destroot {
 	set bindir	${destroot}${prefix}/bin
 	set docdir      ${destroot}${prefix}/share/doc/${name}
 
+        # It would be nice if the install linked properly, but for
+        # now, update the link information manually post install to
+        # use the install dir instead of the build dir.
+ 
+        set old_path "${workpath}/parrot-${version}/blib/lib/libparrot.dylib"
+        set new_path "${prefix}/lib/parrot/lib/libparrot.${version}.dylib"
+
         set executables {
             parrot parrot_config parrot_debugger
             pbc_disassemble pbc_info pbc_merge pbc_to_exe pbc_dump
@@ -53,13 +60,22 @@ post-destroot {
 
         foreach exe $executables { 
             # fixup the library path
-            set old_path "${workpath}/parrot-${version}/blib/lib/libparrot.dylib"
-            set new_path "${prefix}/lib/parrot/lib/libparrot.${version}.dylib"
 	    system "cd ${prefix}/lib/parrot/bin && \
                 install_name_tool -change \"$old_path\" \"$new_path\" ${exe}"
 
             # install into the common area.
             system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/${exe}"
         }
+
+        set dynamic_extensions {
+           digest_group libglutcb rational dynlexpad libnci_test subproxy
+        } 
+
+        foreach lib $dynamic_extensions {
+            # fixup the library path
+	    system "cd ${prefix}/lib/parrot/lib/${version}/dynext && \
+                install_name_tool -change \"$old_path\" \"$new_path\" ${lib}.bundle"
+        }
+
 	xinstall -m 755 -d ${docdir}
 }
