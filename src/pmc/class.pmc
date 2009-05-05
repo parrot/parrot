@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -402,6 +402,30 @@ make_class_name(PARROT_INTERP, PMC *SELF)
 
     /* Otherwise, copy the stored string name of the class. */
     return _class->name;
+}
+
+/* calculates the C3 method resolution order for this class --
+ * working hard *not* to recalculate MRO when unnecessary */
+static PMC *
+calculate_mro(PARROT_INTERP, PMC *SELF, INTVAL num_parents)
+{
+    Parrot_Class_attributes  * const _class = PARROT_CLASS(SELF);
+
+    /* SELF is already on the all_parents */
+    if (num_parents == 0)
+        return _class->all_parents;
+
+    if (num_parents == 1) {
+            const STRING *ap         = CONST_STRING(interp, "all_parents");
+            PMC          *parent     = VTABLE_get_pmc_keyed_int(interp,
+                                            _class->parents, 0);
+            PMC          *parent_mro = VTABLE_inspect_str(interp, parent, ap);
+            PMC          *mro        = VTABLE_clone(interp, parent_mro);
+            VTABLE_unshift_pmc(interp, mro, SELF);
+            return mro;
+    }
+
+    return Parrot_ComputeMRO_C3(interp, SELF);
 }
 
 /*
@@ -812,7 +836,7 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* Add to the lists of our immediate parents and all parents. */
         VTABLE_push_pmc(interp, _class->parents, parent);
-        _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+        _class->all_parents = calculate_mro(interp, SELF, parent_count + 1);
 
         /* Anonymous classes have no entry in the vtable array */
         if (!CLASS_is_anon_TEST(SELF))
@@ -871,9 +895,9 @@ if the class has been instantiated.
             VTABLE_set_pmc_keyed_int(interp, _class->parents,
                 index, current_parent);
         }
-        VTABLE_pop_pmc(interp, _class->parents);
 
-        _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+        VTABLE_pop_pmc(interp, _class->parents);
+        _class->all_parents = calculate_mro(interp, SELF, parent_count - 1);
 
         /* Anonymous classes have no entry in the vtable array */
         if (!CLASS_is_anon_TEST(SELF))
@@ -988,19 +1012,23 @@ Array of Class PMCs representing the direct parents of this class.
                 "Unknown introspection value '%S'", what);
 
         /* return found value */
-        if (PMC_IS_NULL(found)) { return PMCNULL; }
+        if (PMC_IS_NULL(found))
+            return PMCNULL;
+
         if (found->vtable->base_type == enum_class_Hash) {
             /* for Hash return values, create and return a shallow
              * clone because the VTABLE_clone does a deep clone */
-            PMC * const hash = pmc_new(interp, enum_class_Hash);
-            PMC * const iter = VTABLE_get_iter(interp, found);
+            PMC * const hash  = pmc_new(interp, enum_class_Hash);
+            PMC * const iter  = VTABLE_get_iter(interp, found);
             while (VTABLE_get_bool(interp, iter)) {
-                STRING * key = VTABLE_shift_string(interp, iter);
-                PMC * value  = VTABLE_get_pmc_keyed_str(interp, found, key);
+                STRING *key   = VTABLE_shift_string(interp, iter);
+                PMC    *value = VTABLE_get_pmc_keyed_str(interp, found, key);
                 VTABLE_set_pmc_keyed_str(interp, hash, key, value);
             }
+
             return hash;
         }
+
         return VTABLE_clone(interp, found);
     }
 
@@ -1125,7 +1153,7 @@ Creates a new PMC object of the type of the class and calls init().
 */
 
     VTABLE PMC *instantiate(PMC *init) {
-        Parrot_Class_attributes  * const _class    = PARROT_CLASS(SELF);
+        Parrot_Class_attributes  * const _class = PARROT_CLASS(SELF);
 
         Parrot_Object_attributes *obj_guts;
         PMC                      *object;
@@ -1133,10 +1161,12 @@ Creates a new PMC object of the type of the class and calls init().
         /* If we've not been instantiated before... */
         if (!_class->instantiated) {
             /* Check that we have all methods listed in resolve list. */
-            const int resolve_count = VTABLE_elements(interp, _class->resolve_method);
-            const INTVAL cur_hll    = CONTEXT(interp)->current_HLL;
-            INTVAL    mro_length;
-            int       i;
+            const int resolve_count  = VTABLE_elements(interp,
+                                                       _class->resolve_method);
+            const INTVAL cur_hll     = CONTEXT(interp)->current_HLL;
+            const INTVAL num_parents = VTABLE_elements(interp, _class->parents);
+            INTVAL       mro_length;
+            int          i;
 
             /* don't use HLL mappings for internal-only data */
             CONTEXT(interp)->current_HLL = 0;
@@ -1152,7 +1182,7 @@ Creates a new PMC object of the type of the class and calls init().
 
             /* Build full parents list.
              * RT #46101 Need pluggable MRO, for now always do C3. */
-            _class->all_parents = Parrot_ComputeMRO_C3(interp, SELF);
+             _class->all_parents = calculate_mro(interp, SELF, num_parents);
 
             if (!CLASS_is_anon_TEST(SELF))
                 interp->vtables[VTABLE_type(interp, SELF)]->mro = _class->all_parents;
