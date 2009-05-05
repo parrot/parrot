@@ -24,6 +24,15 @@ Press Esc key to exit the program.
 
 use Xlib;
 
+# Event types
+constant KeyPress      =  2;
+constant ButtonPress   =  4;
+constant ButtonRelease =  5;
+constant MotionNotify  =  6;
+constant Expose        = 12;
+constant DestroyNotify = 17;
+constant ClientMessage = 33;
+
 say 'Hello';
 
 say 'Display: ', Xlib::DisplayName();
@@ -55,64 +64,68 @@ my $pressed = 0;
 my @listline;
 my @line;
 
-while ($type != 17) {
+while $type != DestroyNotify {
     $display.NextEvent($event);
     $type = $event.type();
-    if ($type == 4) {
-        my $x = $event.x();
-        my $y = $event.y();
-        $window.DrawPoint($x, $y);
-        $lastx = $x;
-        $lasty = $y;
-        $pressed = 1;
-    }
-    if ($type == 5) {
-        my @newline = @line;
-        @listline.push(\@newline);
-        @line = ();
-        $pressed = 0;
-    }
-    if ($type == 6 && $pressed) {
-        my $x = $event.x();
-        my $y = $event.y();
-        if (($x != $lastx) || ($y != $lasty)) {
-            $window.DrawLine($lastx, $lasty, $x, $y);
+    given $type {
+        when ButtonPress {
+            my $x = $event.x();
+            my $y = $event.y();
+            $window.DrawPoint($x, $y);
             $lastx = $x;
             $lasty = $y;
-            @line.push($x, $y);
+            $pressed = 1;
         }
-    }
-    if ($type == 12) {
-        #say 'Exposed. Lines: ', +@listline;
-        for @listline -> $l {
-            #say 'Points ', $l.elems;
-            if ($l.elems  > 0) {
-                my $lx = $l[0];
-                my $ly = $l[1]; 
-                #say $lx, ' ', $ly;
-                $window.DrawPoint($lx, $ly);
-
-                loop (my $i = 2; $i < $l.elems ; $i += 2) {
-                    my $x = $l[$i];
-                    my $y = $l[$i+1]; 
-                    $window.DrawLine($lx, $ly, $x, $y);
-                    $lx = $x;
-                    $ly = $y;
-                    #say $lx, ' ', $ly;
+        when ButtonRelease {
+            my @newline = @line;
+            @listline.push(\@newline);
+            @line = ();
+            $pressed = 0;
+        }
+        when MotionNotify {
+            if $pressed {
+                my $x = $event.x();
+                my $y = $event.y();
+                if $x != $lastx || $y != $lasty {
+                    $window.DrawLine($lastx, $lasty, $x, $y);
+                    $lastx = $x;
+                    $lasty = $y;
+                    @line.push($x, $y);
                 }
             }
         }
-    }
-    if ($type == 2) {
-        my $code = $event.keycode();
-        if ($code == $code_escape) {
+        when Expose {
+            #say 'Exposed. Lines: ', +@listline;
+            for @listline -> $l {
+                #say 'Points ', $l.elems;
+                if $l.elems  > 0 {
+                    my $lx = $l[0];
+                    my $ly = $l[1]; 
+                    #say $lx, ' ', $ly;
+                    $window.DrawPoint($lx, $ly);
+
+                    loop (my $i = 2; $i < $l.elems ; $i += 2) {
+                        my $x = $l[$i];
+                        my $y = $l[$i+1];
+                        $window.DrawLine($lx, $ly, $x, $y);
+                        $lx = $x;
+                        $ly = $y;
+                        #say $lx, ' ', $ly;
+                    }
+                }
+            }
+        }
+        when KeyPress {
+            my $code = $event.keycode();
+            if ($code == $code_escape) {
+                $window.Unmap();
+                $window.Destroy();
+            }
+        }
+        when ClientMessage {
             $window.Unmap();
             $window.Destroy();
         }
-    }
-    if ($type == 33) {
-        $window.Unmap();
-        $window.Destroy();
     }
 }
 
