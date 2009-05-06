@@ -706,14 +706,19 @@ Adds the given sub PMC as a method with the given name.
 */
     VTABLE void add_method(STRING *name, PMC *sub) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        PMC                     * const method =
+                 VTABLE_get_pmc_keyed_str(interp, _class->methods, name);
 
         /* If we have already added a method with this name... */
-        if (VTABLE_exists_keyed_str(interp, _class->methods, name))
-            /* RT #46095 Need to handle multi methods here. */
+        if (!PMC_IS_NULL(method)) {
+            if (method == sub)
+                return;
+
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "A method named '%S' already exists in class '%S'. "
                 "It may have been supplied by a role.",
                 name, VTABLE_get_string(interp, SELF));
+        }
 
         /* Enter it into the table. */
         VTABLE_set_pmc_keyed_str(interp, _class->methods, name, sub);
@@ -749,17 +754,25 @@ Adds the given sub PMC as a vtable override with the given name.
 */
     VTABLE void add_vtable_override(STRING *name, PMC *sub) {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        PMC                     * const vtable =
+            VTABLE_get_pmc_keyed_str(interp, _class->vtable_overrides, name);
 
         /* If we have already added a vtable override with this name... */
-        if (VTABLE_exists_keyed_str(interp, _class->vtable_overrides, name))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        if (!PMC_IS_NULL(vtable)) {
+            if (vtable == sub)
+                return;
+
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_INVALID_OPERATION,
                 "A vtable override named '%S' already exists in class '%S'. "
                 "It may have been supplied by a role.",
                 name, VTABLE_get_string(interp, SELF));
+        }
 
         /* Check that the name is actually valid as a vtable override */
         if (Parrot_get_vtable_index(interp, name) == -1)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                EXCEPTION_METHOD_NOT_FOUND,
                 "'%S' is not a valid vtable function name.", name);
 
         /* Add it to vtable methods list. */
