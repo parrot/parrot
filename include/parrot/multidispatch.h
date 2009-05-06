@@ -45,9 +45,9 @@ typedef struct _MMD_table {
 } MMD_table;
 
 typedef struct _multi_func_list {
-        const char *multi_name;
-        const char *short_sig;
-        const char *full_sig;
+        const STRING *multi_name;
+        const STRING *short_sig;
+        const STRING *full_sig;
         funcptr_t func_ptr;
 } multi_func_list;
 

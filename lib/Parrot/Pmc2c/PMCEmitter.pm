@@ -472,6 +472,15 @@ ENDOFCODE
     return $cout;
 }
 
+sub gen_multi_name
+{
+    my ($name, $cache) = @_;
+
+    return $cache->{$name} if exists $cache->{$name};
+    my $count              = keys %$cache;
+    return $cache->{$name} = "mfl_$count";
+}
+
 =item C<init_func()>
 
 Returns the C code for the PMC's initialization method, or an empty
@@ -481,19 +490,40 @@ string if the PMC has a C<no_init> flag.
 
 sub init_func {
     my ($self) = @_;
-    return "" if $self->no_init;
+    return '' if $self->no_init;
 
-    my $cout      = "";
-    my $classname = $self->name;
-
+    my $cout        = '';
+    my $classname   = $self->name;
     my $enum_name   = $self->is_dynamic ? -1 : "enum_class_$classname";
-
     my $multi_funcs = $self->find_multi_functions();
-    my $multi_list = join( ",\n        ",
-        map { '{ "'. $_->[0] .  '", ' . "\n          " .
-                '"'. $_->[1] .  '", ' . "\n          " .
-                '"'. $_->[2] .  '", ' . "\n          " .
-                '(funcptr_t) ' . $_->[3] . ' }' } @$multi_funcs );
+
+    my @multi_list;
+    my %strings_seen;
+    my $multi_strings = '';
+    my $cache         = {};
+
+    for my $multi (@$multi_funcs) {
+        my ($name, $ssig, $fsig, $func) = @$multi;
+        my ($name_str, $ssig_str, $fsig_str)     =
+            map { gen_multi_name($_, $cache) } ($name, $ssig, $fsig);
+
+        for my $s ([$name, $name_str], [$ssig, $ssig_str], [$fsig,$fsig_str]) {
+            my ($raw_string, $name) = @$s;
+            next if $strings_seen{$name}++;
+            $multi_strings .=  "        STRING *$name = "
+                           . qq|CONST_STRING_GEN(interp, "$raw_string");\n|;
+        }
+
+        push @multi_list, <<END_MULTI_LIST;
+        { $name_str,
+          $ssig_str,
+          $fsig_str,
+          (funcptr_t) $func }
+END_MULTI_LIST
+
+    }
+
+    my $multi_list = join( ",\n", @multi_list);
 
     my @isa = grep { $_ ne 'default' } @{ $self->parents };
 
@@ -550,7 +580,7 @@ EOC
 
     my $const = ( $self->{flags}{dynpmc} ) ? " " : " const ";
     if ( @$multi_funcs ) {
-        $cout .= <<"EOC";
+        $cout .= $multi_strings . <<"EOC";
 
    $const multi_func_list _temp_multi_func_list[] = {
         $multi_list
