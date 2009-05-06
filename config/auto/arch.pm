@@ -41,6 +41,9 @@ sub runstep {
     my $archname = $conf->data->get('archname');
     my ( $cpuarch, $osname ) = split( /-/, $archname );
 
+    # This was added to convert IA64.ARCHREV_0 on HP-UX, TT #645
+    $archname =~ s|\.|_|g;
+
     if ($verbose) {
         print "determining operating system and cpu architecture\n";
         print "archname: <$archname>\n";
