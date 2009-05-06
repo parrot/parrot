@@ -323,7 +323,6 @@ sub _handle_verbose_step_option {
         }
     }
     else {
-    	die $verbose_step_str;
         die q{Argument to verbose-step option must be comma-delimited string of valid configuration steps};
     }
     return %verbose_steps;
