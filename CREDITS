@@ -291,7 +291,8 @@ D: Test for literals
 
 N: Daniel Arbelo Arrocha
 U: darbelo
-D: OpenBSD fixes and testing
+A: arbelo
+D: OpenBSD fixes and testing, gsoc2009-decnum-dynpmcs
 E: dany.arbelo@gmail.com
 
 N: Dave Woldrich
