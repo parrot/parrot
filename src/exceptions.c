@@ -331,12 +331,14 @@ void
 Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_throw_from_c)
-    PMC * const handler = Parrot_cx_find_handler_local(interp, exception);
-    RunProfile * const profile      = interp->profile;
+
     Parrot_runloop    *return_point = interp->current_runloop;
-    if (PMC_IS_NULL(handler)) {
+    RunProfile * const profile      = interp->profile;
+    PMC        * const handler      =
+                             Parrot_cx_find_handler_local(interp, exception);
+
+    if (PMC_IS_NULL(handler))
         die_from_exception(interp, exception);
-    }
 
     /* If profiling, remember end time of lastop and generate entry for
      * exception. */
@@ -350,8 +352,10 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     }
 
     if (Interp_debug_TEST(interp, PARROT_BACKTRACE_DEBUG_FLAG)) {
-        STRING * const msg = VTABLE_get_string(interp, exception);
-        int exitcode       = VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "exit_code"));
+        STRING * const exit_code = CONST_STRING(interp, "exit_code");
+        STRING * const msg       = VTABLE_get_string(interp, exception);
+        int            exitcode  = VTABLE_get_integer_keyed_str(interp,
+                                        exception, exit_code);
 
         Parrot_io_eprintf(interp,
             "Parrot_ex_throw_from_c (severity:%d error:%d): %Ss\n",
@@ -370,7 +374,7 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
     Parrot_runops_fromc_args(interp, handler, "vP", exception);
 
     /* After handling a C exception, you don't want to resume at the point
-     * where the C exception was thrown, you want to resume the next outer
+     * where the C exception was thrown.  You want to resume the next outer
      * runloop.  */
     longjmp(return_point->resume, 1);
 }
