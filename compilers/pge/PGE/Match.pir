@@ -241,6 +241,18 @@ Returns the portion of the target string matched by this object.
 .end
 
 
+=item C<orig()>
+
+Return the original item being matched.
+
+=cut
+
+.sub 'orig' :method
+    $P0 = getattribute self, '$!target'
+    .return ($P0)
+.end
+
+
 =item C<item()>
 
 Returns the scalar value of this match -- the "result object"
