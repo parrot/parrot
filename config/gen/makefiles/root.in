@@ -1925,11 +1925,11 @@ SPLINT := splint
 # kept in there after completion.
 SPLINT_TMP := $(TMP)/splint
 
-# Splint flags: http:////splint.org//manual//html//appB.html
+# Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
 # looking for "declundef", except that it's "decl-undef" in the docs.
-SPLINTFLAGS  := \
+SPLINTFLAGS = \
     +standard \
     -hints \
     \
@@ -1974,6 +1974,7 @@ SPLINTFLAGS  := \
     +macro-stmt \
     +macro-unrecog \
     +match-fields \
+    -memchecks \
     +null \
     +nullptrarith \
     +nullret \
@@ -2071,13 +2072,13 @@ SPLINTFLAGS_OVERLY_NOISY := \
 
 
 # We're only checking part of the codebase, and don't try to track memory leaks
-SPLINTFLAGS_TEST = +partial -memchecks
+SPLINTFLAGS_TEST := +partial -memchecks
 
 # Don't complain about the str*() functions being reserved by the standard
-SPLINTFLAGS_TEST += -iso-reserved-internal
+SPLINTFLAGS_TEST := $(SPLINTFLAGS_TEST) -iso-reserved-internal
 
 # Don't complain about using pointers and ints as booleans
-SPLINTFLAGS_TEST += -pred-bool
+SPLINTFLAGS_TEST := $(SPLINTFLAGS_TEST) -pred-bool
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
@@ -2087,6 +2088,7 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	+partial \
 	src/s*.c \
     | grep -v 'Source code error generation point'
 
