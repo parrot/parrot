@@ -65,7 +65,7 @@ sub check_pdd_formatting {
         if (
             ( length( $lines[$i] ) > 78 )
             and
-            ( $lines[$i] !~ m/(^(?:L?<)?http|\$Id:\s+)/ )
+            ( $lines[$i] !~ m/^(?:F|L)<|<http|\$Id:\s+/ )
         ) {
             push @toolong, ($i + 1);
         }
