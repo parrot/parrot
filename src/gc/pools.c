@@ -76,7 +76,8 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #  define STRING_HEADERS_PER_ALLOC 10240 / sizeof (STRING)
 #endif /* GC_IS_MALLOC */
 
-#  define CONSTANT_PMC_HEADERS_PER_ALLOC 64
+#define CONSTANT_PMC_HEADERS_PER_ALLOC 64
+#define GET_SIZED_POOL_IDX(x) ((x) / sizeof (void *))
 
 /*
 
@@ -261,8 +262,7 @@ get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
     ASSERT_ARGS(get_bufferlike_pool)
     Small_Object_Pool **sized_pools = interp->arena_base->sized_header_pools;
     const UINTVAL       num_old     = interp->arena_base->num_sized;
-    const UINTVAL       idx         =
-                            (buffer_size - sizeof (Buffer)) / sizeof (void *);
+    const UINTVAL       idx         = GET_SIZED_POOL_IDX(buffer_size);
 
     /* Expands the array of sized resource pools, if necessary */
     if (num_old <= idx) {
