@@ -12,10 +12,10 @@ PCT      		:= $(BUILD_DIR)/runtime/parrot/library/PCT.pbc
 PARROT_LIBRARY 	:= @build_dir@/runtime/parrot/library
 PGE_LIBRARY    	:= @build_dir@/runtime/parrot/library/PGE
 
-all: pmc.pbc
+all: pmcc.pbc
 
 SOURCES := \
-  pmc.pir \
+  pmcc.pir \
   src/nodes.pir \
   src/vtable_info.pir \
   src/emitter/gen_pmc.pir \
@@ -27,10 +27,10 @@ SOURCES := \
   src/builtins.pir
 
 # the default target
-pmc.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
+pmcc.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) $(PGE_LIBRARY)/Perl6Grammar.pir \
 	    --output=src/parser/gen_grammar.pir src/parser/grammar.pg
-	$(PARROT) -o pmc.pbc pmc.pir
+	$(PARROT) -o pmcc.pbc pmcc.pir
 
 src/parser/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \

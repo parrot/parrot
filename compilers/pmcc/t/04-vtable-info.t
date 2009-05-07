@@ -3,8 +3,8 @@
 # Test that vtables initialised properly.
 
 .sub 'main' :main
-.include 'test_more.pir'
-    load_bytecode 'compilers/pmc/pmc.pbc'
+    .include 'test_more.pir'
+    load_bytecode 'pmcc.pbc'
 
     plan(2)
 

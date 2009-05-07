@@ -5,7 +5,7 @@
 .sub 'main' :main
 
     .include 'test_more.pir'
-    load_bytecode 'pmc.pbc'
+    load_bytecode 'pmcc.pbc'
 
     .local int total
     total = 25

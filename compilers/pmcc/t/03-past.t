@@ -3,8 +3,8 @@
 .include 't/common.pir'
 
 .sub 'main' :main
-.include 'test_more.pir'
-load_bytecode 'pmc.pbc'
+    .include 'test_more.pir'
+    load_bytecode 'pmcc.pbc'
 
     .local int total
     total = 0
