@@ -129,8 +129,10 @@ EOH
         $h->emit("${export}void    Parrot_${name}_class_init(PARROT_INTERP, int, int);\n");
     }
 
-    $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(VTABLE*);\n");
-    $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(VTABLE*);\n");
+    if ($name ne 'default') {
+        $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(VTABLE*);\n");
+        $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(VTABLE*);\n");
+    }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
 
