@@ -196,7 +196,7 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     if (new_vtable->flags & VTABLE_PMC_NEEDS_EXT) {
         /* If we need an ext area, go allocate one */
         if (!has_ext)
-            add_pmc_ext(interp, pmc);
+            Parrot_gc_add_pmc_ext(interp, pmc);
 
         new_flags = PObj_is_PMC_EXT_FLAG;
     }

@@ -1380,7 +1380,7 @@ Sets this PMC as shared and read-only.
         VTABLE_setprop(INTERP, ret, CONST_STRING(INTERP, "_ro"), _true);
 
         /* now share; we add a PMC_EXT so we can identify the owning interp */
-        add_pmc_sync(INTERP, ret);
+        Parrot_gc_add_pmc_sync(INTERP, ret);
         PObj_is_PMC_shared_SET(ret);
 
         /* XXX FIXME workaround lack of metadata sharing*/

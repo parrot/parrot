@@ -83,7 +83,7 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
         pmc->pmc_ext = new_pmc_ext(interp);
 
         if (flags & PObj_is_PMC_shared_FLAG)
-            add_pmc_sync(interp, pmc);
+            Parrot_gc_add_pmc_sync(interp, pmc);
     }
     else
         pmc->pmc_ext = NULL;
@@ -156,7 +156,7 @@ Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<void add_pmc_sync(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_gc_add_pmc_sync(PARROT_INTERP, PMC *pmc)>
 
 Adds a C<Sync*> structure to the given C<PMC>. Initializes the PMC's owner
 field and the synchronization mutext. Does not check to ensure the C<Sync *> is
@@ -167,9 +167,9 @@ non-null.
 */
 
 void
-add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(add_pmc_sync)
+    ASSERT_ARGS(Parrot_gc_add_pmc_sync)
     if (!PObj_is_PMC_EXT_TEST(pmc))
         Parrot_gc_add_pmc_ext(interp, pmc);
 

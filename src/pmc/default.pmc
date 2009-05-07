@@ -414,7 +414,7 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
 
     VTABLE PMC *getprops() {
         if (!SELF->pmc_ext)
-            add_pmc_ext(INTERP, SELF);
+            Parrot_gc_add_pmc_ext(INTERP, SELF);
 
         if (!PMC_metadata(SELF)) {
             if (has_pending_std_props(SELF))
@@ -1087,7 +1087,7 @@ Initializes the PMC during unarchiving.
         /* default - initialize the PMC */
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             if (!SELF->pmc_ext)
-                add_pmc_ext(INTERP, SELF);
+                Parrot_gc_add_pmc_ext(INTERP, SELF);
 
             info->thaw_ptr  = &PMC_metadata(SELF);
             info->container = SELF;
