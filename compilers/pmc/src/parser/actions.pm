@@ -48,6 +48,11 @@ method traits($/, $key) {
     }
 }
 
+method attribute($/) {
+    our $?PMC;
+    $?PMC.add_attr(~$/<identifier>, ~$/<c_type>);
+}
+
 method body_part($/, $key) {
     our $?PMC;
 

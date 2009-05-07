@@ -56,7 +56,7 @@ rule traits {
 }
 
 rule attribute {
-    'ATTR' <c_type> <identifier> ';'
+    'ATTR' <c_type> <identifier> ';' {*}
 }
 
 # Body of PMC class. 

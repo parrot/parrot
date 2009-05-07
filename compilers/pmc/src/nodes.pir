@@ -41,17 +41,20 @@ PMC class by it self.
     res.'init'(children :flat, adverbs :flat :named)
 
     # Initialize various attributes
-    $P3 = new 'ResizableStringArray'
-    res.'attr'('parents', $P3, 1)
+    $P1 = new 'ResizableStringArray'
+    res.'attr'('parents', $P1, 1)
 
-    $P5 = new 'Hash'
-    res.'attr'('vtables', $P5, 1)
+    $P1 = new 'Hash'
+    res.'attr'('vtables', $P1, 1)
 
-    $P6 = new 'Hash'
-    res.'attr'('methods', $P6, 1)
+    $P1 = new 'Hash'
+    res.'attr'('methods', $P1, 1)
 
-    $P7 = new 'ResizableStringArray'
-    res.'attr'('provides', $P7, 1)
+    $P1 = new 'Hash'
+    res.'attr'('attrs', $P1, 1)
+
+    $P1 = new 'ResizableStringArray'
+    res.'attr'('provides', $P1, 1)
 
     .return (res)
 .end
@@ -181,6 +184,25 @@ Add METHOD to PMC.
     .return ()
 .end
 
+=item C<add_attr>
+
+Add an ATTR to PMC.
+
+=cut
+
+.sub 'add_attr' :method
+    .param string name
+    .param string type
+
+    $P0 = self.'attr'('attrs', 0, 0)
+    $I0 = exists $P0[name]
+    unless $I0 goto add_method
+    $S0 = concat "Duplicate ATTR: ", name
+    die $S0
+  add_method:
+    $P0[name] = type
+    .return ()
+.end
 
 =head1 COPYRIGHT
 
