@@ -1207,7 +1207,7 @@ $(SRC_DIR)/warnings$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/misc$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/utils$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/utils$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_nci.h
 
 $(SRC_DIR)/spf_render$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_render.str
 
