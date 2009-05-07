@@ -226,6 +226,9 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 =item C<void * new_bufferlike_header(PARROT_INTERP, size_t size)>
 
 Returns a new buffer-like header from the appropriate sized pool.
+A "bufferlike object" is an object that is considered to be isomorphic to the
+PObj, so it will participate in normal GC. At the moment these are only used
+to create ListChunk objects in src/list.c.
 
 =cut
 
