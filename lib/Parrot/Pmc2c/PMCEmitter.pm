@@ -123,7 +123,11 @@ EOH
     $h->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
 
     # Emit available functions for work with vtables.
-    my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT ';
+    my $export = 'PARROT_EXPORT ';
+    if ($self->is_dynamic) {
+        $export = 'PARROT_DYNEXT_EXPORT ';
+        $h->emit("${export}void    Parrot_${name}_class_init(PARROT_INTERP, int, int);\n");
+    }
 
     $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(VTABLE*);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(VTABLE*);\n");
