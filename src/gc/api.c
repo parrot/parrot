@@ -173,7 +173,10 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_gc_add_pmc_sync)
     if (!PObj_is_PMC_EXT_TEST(pmc))
         Parrot_gc_add_pmc_ext(interp, pmc);
-    PMC_sync(pmc)        = mem_allocate_typed(Sync);
+    /* Would like to be able to do this, instead of allocating directly from
+       the OS. Causes a segfault that hasn't been figured out yet. */
+    /* PMC_sync(pmc) = (Sync *)new_bufferlike_header(interp, sizeof(Sync)); */
+    PMC_sync(pmc) = mem_allocate_typed(Sync);
     if(!PMC_sync(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: PMC allocation failed!\n");
@@ -318,8 +321,10 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
     Small_Object_Pool * const ext_pool   = arena_base->pmc_ext_pool;
 
     if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
+        /* Small_Object_Pool * pool = get_bufferlike_pool(interp, sizeof(Sync)); */
         MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
         mem_internal_free(PMC_sync(p));
+        /* pool->add_free_object(interp, pool, PMC_sync(p)); */
         PMC_sync(p) = NULL;
     }
 

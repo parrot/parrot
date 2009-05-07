@@ -817,7 +817,7 @@ Parrot_merge_header_pools(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_inte
         if (i >= dest_arena->num_sized
         || !dest_arena->sized_header_pools[i]) {
             Small_Object_Pool *ignored = get_bufferlike_pool(dest_interp,
-                    i * sizeof (void *) + sizeof (Buffer));
+                    i * sizeof (void *));
             UNUSED(ignored);
             PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
