@@ -34,15 +34,6 @@ C<STRING> with a vtable.
 #include "parrot/parrot.h"
 #include "pmc_freeze.str"
 
-/* default.pmc thawing of properties */
-void
-Parrot_default_thaw(PARROT_INTERP, PMC *pmc, visit_info *info);
-
-/* XXX This should be in a header file. */
-void
-Parrot_default_thawfinish(PARROT_INTERP, PMC *pmc, visit_info *info);
-
-
 /* HEADERIZER HFILE: include/parrot/pmc_freeze.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -1364,7 +1355,7 @@ do_thaw(PARROT_INTERP, ARGIN_NULLOK(PMC* pmc), ARGIN(visit_info *info))
     }
     if (pos) {
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
-            Parrot_default_thaw(interp, pmc, info);
+            interp->vtables[enum_class_default]->thaw(interp, pmc, info);
             return;
         }
         /* else maybe VTABLE_thaw ... but there is no other extra stuff */
@@ -1750,7 +1741,7 @@ again:
         if (thawing) {
             if (current == info->thaw_result)
                 finished_first = 1;
-            if (current->vtable->thawfinish != Parrot_default_thawfinish)
+            if (current->vtable->thawfinish != interp->vtables[enum_class_default]->thawfinish)
                 list_unshift(interp, finish_list, current, enum_type_PMC);
         }
     }
