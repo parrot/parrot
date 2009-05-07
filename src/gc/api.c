@@ -188,7 +188,7 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 /*
 
-=item C<STRING * new_string_header(PARROT_INTERP, UINTVAL flags)>
+=item C<STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)>
 
 Returns a new C<STRING> header from the string pool or the constant string
 pool. Sets default flags on the string object: C<PObj_is_string_FLAG>,
@@ -202,9 +202,9 @@ field of the string buffer to C<NULL>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-new_string_header(PARROT_INTERP, UINTVAL flags)
+Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 {
-    ASSERT_ARGS(new_string_header)
+    ASSERT_ARGS(Parrot_gc_new_string_header)
     STRING * const string = (STRING *)get_free_buffer(interp,
         (flags & PObj_constant_FLAG)
             ? interp->arena_base->constant_string_header_pool

@@ -299,7 +299,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         return Parrot_io_readline_buffer(interp, filehandle, buf);
 
     if (*buf == NULL) {
-        *buf = new_string_header(interp, 0);
+        *buf = Parrot_gc_new_string_header(interp, 0);
         (*buf)->bufused = len = 2048;
     }
 
@@ -478,7 +478,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     STRING *s;
 
     if (*buf == NULL) {
-        *buf = new_string_header(interp, 0);
+        *buf = Parrot_gc_new_string_header(interp, 0);
     }
     s = *buf;
     s->strlen = 0;

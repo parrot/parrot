@@ -65,11 +65,6 @@ PARROT_WARN_UNUSED_RESULT
 void * new_bufferlike_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-STRING * new_string_header(PARROT_INTERP, UINTVAL flags)
-        __attribute__nonnull__(1);
-
 void Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
@@ -123,6 +118,11 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_profile_end(PARROT_INTERP, int what)
         __attribute__nonnull__(1);
 
@@ -132,8 +132,6 @@ void Parrot_gc_profile_start(PARROT_INTERP)
 #define ASSERT_ARGS_new_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_do_gc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -159,6 +157,8 @@ void Parrot_gc_profile_start(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_ms_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_profile_end __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

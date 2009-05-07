@@ -128,7 +128,8 @@ Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
     STRING *d;
 
     if (PObj_constant_TEST(s)) {
-        d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
+        d = Parrot_gc_new_string_header(interp,
+            PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
         PObj_COW_SET(s);
         STRUCT_COPY(d, s);
         /* we can't move the memory, because constants aren't
@@ -139,7 +140,7 @@ Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
         PObj_external_SET(d);
     }
     else {
-        d = new_string_header(interp, PObj_get_FLAGS(s));
+        d = Parrot_gc_new_string_header(interp, PObj_get_FLAGS(s));
         PObj_COW_SET(s);
         STRUCT_COPY(d, s);
         PObj_sysmem_CLEAR(d);
@@ -382,7 +383,7 @@ Parrot_str_new_noinit(PARROT_INTERP,
     parrot_string_representation_t representation, UINTVAL capacity)
 {
     ASSERT_ARGS(Parrot_str_new_noinit)
-    STRING * const s = new_string_header(interp, 0);
+    STRING * const s = Parrot_gc_new_string_header(interp, 0);
 
     /* TODO adapt string creation functions */
     if (representation != enum_stringrep_one)
@@ -568,7 +569,7 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
         /* upgrade to utf16 */
         Parrot_utf16_encoding_ptr->to_encoding(interp, a, NULL);
         b = Parrot_utf16_encoding_ptr->to_encoding(interp, b,
-                new_string_header(interp, 0));
+                Parrot_gc_new_string_header(interp, 0));
 
         /* result could be mixed ucs2 / utf16 */
         if (b->encoding == Parrot_utf16_encoding_ptr)
@@ -761,7 +762,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 {
     ASSERT_ARGS(Parrot_str_new_init)
     DECL_CONST_CAST;
-    STRING * const s = new_string_header(interp, flags);
+    STRING * const s = Parrot_gc_new_string_header(interp, flags);
     s->encoding      = encoding;
     s->charset       = charset;
 
@@ -1267,7 +1268,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
     if (!cs) {
         Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
         rep = Parrot_utf16_encoding_ptr->to_encoding(interp, rep,
-                new_string_header(interp, 0));
+                Parrot_gc_new_string_header(interp, 0));
     }
     else {
         src->charset  = cs;
