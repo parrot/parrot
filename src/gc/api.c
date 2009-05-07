@@ -138,7 +138,7 @@ Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
     pmc->pmc_ext = new_pmc_ext(interp);
     if(!pmc->pmc_ext)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
-            "Parrot VM: PMC allocation failed!\n");
+            "Parrot VM: PMC_EXT allocation failed!\n");
     PObj_is_PMC_EXT_SET(pmc);
 
 #ifdef PARROT_GC_IMS
@@ -179,7 +179,7 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
     PMC_sync(pmc) = mem_allocate_typed(Sync);
     if(!PMC_sync(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
-            "Parrot VM: PMC allocation failed!\n");
+            "Parrot VM: PMC Sync allocation failed!\n");
 
     PMC_sync(pmc)->owner = interp;
     MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
@@ -209,6 +209,9 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
         (flags & PObj_constant_FLAG)
             ? interp->arena_base->constant_string_header_pool
             : interp->arena_base->string_header_pool);
+    if(!string)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+            "Parrot VM: STRING allocation failed!\n");
 
     string->strstart        = NULL;
     PObj_get_FLAGS(string) |=
