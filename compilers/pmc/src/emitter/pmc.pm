@@ -25,6 +25,8 @@ method generate_h_file() {
 
         self.generate_h_file_functions(),
 
+        self.generate_attr_struct(),
+
         "\n",
         '#endif /* ', $guard, " */ \n"
     )
@@ -55,6 +57,35 @@ method generate_h_file_functions() {
     };
 
     join('', @res_builder);
+}
+
+#=item C<generate_attr_struct>
+#
+#Generate a C declaration for the ATTR wrapper struct 
+#
+#=cut
+
+method generate_attr_struct() {
+    my $past := self.past;
+
+    my $struct_start;
+    my $struct_body;
+    my $struct_end;
+
+    $struct_start := 
+        "\n/* " ~ self.name ~ " PMC's underlying struct. */\n" ~
+        "typedef struct Parrot_" ~ self.name ~ "_attributes {\n";
+
+    my @attrs := self.attrs;    
+    my @struct_members;
+
+    for @attrs {
+        @struct_members.push("    " ~ $_<type> ~ " " ~ $_<name> ~ ";\n");
+    }
+
+    $struct_end := "} Parrot_" ~ self.name ~ "_attributes;\n";
+
+    return $struct_start ~ join('', @struct_members) ~ $struct_end;
 }
 
 #=item C<generate_c_file>
@@ -115,7 +146,9 @@ method generate_class_init() {
     join('', @res);
 }
 
-
+method attrs() {
+    self.past.attrs;
+}
 
 method vtables() {
     self.past.vtables;

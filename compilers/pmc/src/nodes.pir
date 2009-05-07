@@ -50,7 +50,7 @@ PMC class by it self.
     $P1 = new 'Hash'
     res.'attr'('methods', $P1, 1)
 
-    $P1 = new 'Hash'
+    $P1 = new 'ResizablePMCArray'
     res.'attr'('attrs', $P1, 1)
 
     $P1 = new 'ResizableStringArray'
@@ -107,6 +107,16 @@ Get PMC provided interfaces.
 
 .sub 'provides' :method
     .tailcall self.'attr'('provides',0,0)
+.end
+
+=item C<attrs>
+
+Get PMC ATTRs.
+
+=cut
+
+.sub 'attrs' :method
+    .tailcall self.'attr'('attrs',0,0)
 .end
 
 
@@ -194,13 +204,25 @@ Add an ATTR to PMC.
     .param string name
     .param string type
 
-    $P0 = self.'attr'('attrs', 0, 0)
-    $I0 = exists $P0[name]
-    unless $I0 goto add_method
+    .local pmc it, attrs, attr
+
+    attrs = self.'attr'('attrs', 0, 0)
+    it = iter attrs
+  iter_start:
+    unless it goto add_method
+    $P0 = shift it
+    $S0 = $P0['name']
+    $I0 = cmp $S0, name
+    if $I0 goto iter_start
+
     $S0 = concat "Duplicate ATTR: ", name
     die $S0
+
   add_method:
-    $P0[name] = type
+    attr = new 'Hash'
+    attr['type'] = type
+    attr['name'] = name
+    push attrs, attr
     .return ()
 .end
 
