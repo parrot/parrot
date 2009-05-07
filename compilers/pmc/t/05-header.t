@@ -8,7 +8,7 @@
 load_bytecode 'pmc.pbc'
     .local int total
 
-    plan(3)
+    plan(5)
 
     .local string filename
     filename = 't/data/class00.pmc'
@@ -20,6 +20,24 @@ load_bytecode 'pmc.pbc'
     filename = 't/data/class07.pmc'
     $S0 = _slurp(filename)
     check_one_header(filename, $S0, "'PMC * Parrot_Integer_instantiate(PARROT_INTERP, PMC *sig, PMC* init)'", "VTable method generated")
+
+    .local string attr_struct
+    filename = 't/data/class10.pmc'
+    $S0 = _slurp(filename)
+    attr_struct = <<'STRUCT'
+typedef struct Parrot_foo_attributes {
+\s*int\s+int_attribute[;]
+\s*PMC\*\s+pmc_attribute[;]
+} Parrot_foo_attributes[;]
+STRUCT
+    attr_struct = "attributes"
+    check_one_header(filename, $S0, attr_struct, "ATTR struct generated")
+
+    .local string attr_macro
+    attr_macro = '#define\sPARROT_FOO\(o\)\s\(\(Parrot_foo_attributes\s\*\)\sPMC_data\(o\)\)'
+    filename = "t/data/class10.pmc"
+    $S0 = _slurp(filename)
+    check_one_header(filename, $S0, attr_macro, "ATTR macro generated")
 
 .end
 

@@ -23,11 +23,12 @@ method generate_h_file() {
         '#ifndef ' ~ $guard ~ "\n",
         '#define ' ~ $guard ~ "\n\n",
 
-        self.generate_h_file_functions(),
+        self.generate_h_file_functions(), "\n",
 
-        self.generate_attr_struct(),
+        self.generate_attr_struct(), "\n",
 
-        "\n",
+        self.generate_casting_macro(), "\n",
+
         '#endif /* ', $guard, " */ \n"
     )
     );
@@ -66,7 +67,6 @@ method generate_h_file_functions() {
 #=cut
 
 method generate_attr_struct() {
-    my $past := self.past;
 
     my $struct_start;
     my $struct_body;
@@ -86,6 +86,18 @@ method generate_attr_struct() {
     $struct_end := "} Parrot_" ~ self.name ~ "_attributes;\n";
 
     return $struct_start ~ join('', @struct_members) ~ $struct_end;
+}
+
+#=item C<generate_casting_macro>
+#
+#Generate a #define to simplify ATTR access
+#
+#=cut
+
+method generate_casting_macro() {
+
+    return 
+        "#define PARROT_" ~ self.ucname ~ "(o) ((Parrot_" ~ self.name ~ "_attributes *) PMC_data(o))\n";
 }
 
 #=item C<generate_c_file>
