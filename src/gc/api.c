@@ -223,28 +223,6 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<Buffer * new_buffer_header(PARROT_INTERP)>
-
-Creates and returns a new C<Buffer> from the buffer header pool.  Calls
-C<get_free_buffer> to do all the work.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-Buffer *
-new_buffer_header(PARROT_INTERP)
-{
-    ASSERT_ARGS(new_buffer_header)
-    return (Buffer *)get_free_buffer(interp,
-            interp->arena_base->buffer_header_pool);
-}
-
-
-/*
-
 =item C<void * new_bufferlike_header(PARROT_INTERP, size_t size)>
 
 Returns a new buffer-like header from the appropriate sized pool.
