@@ -870,7 +870,7 @@ inline op throw(invar PMC) :flow {
     opcode_t *dest;
     opcode_t *const ret    = expr NEXT();
     PMC            *resume = new_ret_continuation_pmc(interp, ret);
-    if(PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+    if (PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal, 1, NULL);
     /*
      * We might return here after handling the exception, so mark the
@@ -885,7 +885,7 @@ inline op throw(invar PMC) :flow {
 inline op throw(invar PMC, invar PMC) :flow {
     opcode_t * dest;
     PMC * except = $1;
-    if(PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+    if (PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
         except = Parrot_ex_build_exception(interp, EXCEPT_fatal, 1, NULL);
     dest = Parrot_ex_throw_from_op(interp, $1,
                                 VTABLE_get_pointer(interp, $2));
@@ -894,7 +894,7 @@ inline op throw(invar PMC, invar PMC) :flow {
 
 inline op rethrow(invar PMC) :flow {
     opcode_t * dest;
-    if(PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_Exception) {
+    if (PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_Exception) {
         opcode_t * const ret = expr NEXT();
         PMC * except = Parrot_ex_build_exception(interp, EXCEPT_fatal, 1, NULL);
         dest = Parrot_ex_throw_from_op(interp, except, ret);
