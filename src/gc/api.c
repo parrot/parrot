@@ -175,7 +175,7 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
         Parrot_gc_add_pmc_ext(interp, pmc);
     /* Would like to be able to do this, instead of allocating directly from
        the OS. Causes a segfault that hasn't been figured out yet. */
-    /* PMC_sync(pmc) = (Sync *)new_bufferlike_header(interp, sizeof(Sync)); */
+    /* PMC_sync(pmc) = (Sync *)Parrot_gc_new_bufferlike_header(interp, sizeof(Sync)); */
     PMC_sync(pmc) = mem_allocate_typed(Sync);
     if(!PMC_sync(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
@@ -234,9 +234,9 @@ Returns a new buffer-like header from the appropriate sized pool.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void *
-new_bufferlike_header(PARROT_INTERP, size_t size)
+Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
 {
-    ASSERT_ARGS(new_bufferlike_header)
+    ASSERT_ARGS(Parrot_gc_new_bufferlike_header)
     Small_Object_Pool * const pool = get_bufferlike_pool(interp, size);
 
     return get_free_buffer(interp, pool);
