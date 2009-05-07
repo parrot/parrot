@@ -464,8 +464,6 @@ opcode_t *
 Parrot_ex_rethrow_from_op(PARROT_INTERP, ARGIN(PMC *exception))
 {
     ASSERT_ARGS(Parrot_ex_rethrow_from_op)
-    if (exception->vtable->base_type != enum_class_Exception)
-        PANIC(interp, "Illegal rethrow");
 
     Parrot_ex_mark_unhandled(interp, exception);
 

@@ -866,27 +866,41 @@ inline op pop_eh() {
 }
 
 inline op throw(invar PMC) :flow {
+    PMC * except = $1;
     opcode_t *dest;
     opcode_t *const ret    = expr NEXT();
     PMC            *resume = new_ret_continuation_pmc(interp, ret);
+    if(PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+        except = Parrot_ex_build_exception(interp, EXCEPT_fatal, 1, NULL);
     /*
      * We might return here after handling the exception, so mark the
      * current context appropriately.
      */
     Parrot_context_ref(interp, CONTEXT(interp));
-    VTABLE_set_attr_str(interp, $1, Parrot_str_new_constant(interp, "resume"), resume);
-    dest = Parrot_ex_throw_from_op(interp, $1, ret);
+    VTABLE_set_attr_str(interp, except, Parrot_str_new_constant(interp, "resume"), resume);
+    dest = Parrot_ex_throw_from_op(interp, except, ret);
     goto ADDRESS(dest);
 }
 
 inline op throw(invar PMC, invar PMC) :flow {
-    opcode_t * const dest = Parrot_ex_throw_from_op(interp, $1,
+    opcode_t * dest;
+    PMC * except = $1;
+    if(PMC_IS_NULL(except) || except->vtable->base_type != enum_class_Exception)
+        except = Parrot_ex_build_exception(interp, EXCEPT_fatal, 1, NULL);
+    dest = Parrot_ex_throw_from_op(interp, $1,
                                 VTABLE_get_pointer(interp, $2));
     goto ADDRESS(dest);
 }
 
 inline op rethrow(invar PMC) :flow {
-    opcode_t * const dest = Parrot_ex_rethrow_from_op(interp, $1);
+    opcode_t * dest;
+    if(PMC_IS_NULL($1) || $1->vtable->base_type != enum_class_Exception) {
+        opcode_t * const ret = expr NEXT();
+        PMC * except = Parrot_ex_build_exception(interp, EXCEPT_fatal, 1, NULL);
+        dest = Parrot_ex_throw_from_op(interp, except, ret);
+        goto ADDRESS(dest);
+    }
+    dest = Parrot_ex_rethrow_from_op(interp, $1);
     goto ADDRESS(dest);
 }
 
