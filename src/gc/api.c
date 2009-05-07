@@ -115,8 +115,6 @@ new_pmc_ext(PARROT_INTERP)
 {
     ASSERT_ARGS(new_pmc_ext)
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
-    /* XXX: Should we check here to ensure the PMC_EXT is non-null
-            like we do in C<new_pmc>? */
     return (PMC_EXT *)pool->get_free_object(interp, pool);
 }
 
@@ -138,6 +136,9 @@ Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_add_pmc_ext)
     pmc->pmc_ext = new_pmc_ext(interp);
+    if(!pmc->pmc_ext)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+            "Parrot VM: PMC allocation failed!\n");
     PObj_is_PMC_EXT_SET(pmc);
 
 #ifdef PARROT_GC_IMS
@@ -172,12 +173,12 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_gc_add_pmc_sync)
     if (!PObj_is_PMC_EXT_TEST(pmc))
         Parrot_gc_add_pmc_ext(interp, pmc);
-
-    /* XXX: Should we test the Sync * for non-null? should we allocate these
-            from a bufferlike pool instead of directly from the system? */
     PMC_sync(pmc)        = mem_allocate_typed(Sync);
-    PMC_sync(pmc)->owner = interp;
+    if(!PMC_sync(pmc))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+            "Parrot VM: PMC allocation failed!\n");
 
+    PMC_sync(pmc)->owner = interp;
     MUTEX_INIT(PMC_sync(pmc)->pmc_lock);
 }
 
