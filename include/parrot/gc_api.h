@@ -55,11 +55,6 @@
 /* HEADERIZER BEGIN: src/gc/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
-
 void add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -75,11 +70,6 @@ PARROT_WARN_UNUSED_RESULT
 void * new_bufferlike_header(PARROT_INTERP, size_t size)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-PMC * new_pmc_header(PARROT_INTERP, UINTVAL flags)
-        __attribute__nonnull__(1);
-
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * new_string_header(PARROT_INTERP, UINTVAL flags)
@@ -87,6 +77,11 @@ STRING * new_string_header(PARROT_INTERP, UINTVAL flags)
 
 void Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
+
+void Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 void Parrot_gc_free_buffer(SHIM_INTERP,
     ARGMOD(Small_Object_Pool *pool),
@@ -123,15 +118,17 @@ void Parrot_gc_free_sysmem(SHIM_INTERP,
 void Parrot_gc_ms_run_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_profile_end(PARROT_INTERP, int what)
         __attribute__nonnull__(1);
 
 void Parrot_gc_profile_start(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_add_pmc_sync __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
@@ -139,12 +136,13 @@ void Parrot_gc_profile_start(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_bufferlike_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_do_gc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_Parrot_gc_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(b)
@@ -159,6 +157,8 @@ void Parrot_gc_profile_start(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_free_sysmem __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_Parrot_gc_ms_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_profile_end __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

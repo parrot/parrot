@@ -52,7 +52,7 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 
 /*
 
-=item C<PMC * new_pmc_header(PARROT_INTERP, UINTVAL flags)>
+=item C<PMC * Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)>
 
 Gets a new PMC header from the PMC pool's free list. Guaranteed to return a
 valid PMC object or else Parrot will panic. Sets the necessary flags for the
@@ -65,9 +65,9 @@ objects and initializes the PMC data pointer to C<NULL>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-new_pmc_header(PARROT_INTERP, UINTVAL flags)
+Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
 {
-    ASSERT_ARGS(new_pmc_header)
+    ASSERT_ARGS(Parrot_gc_new_pmc_header)
     Small_Object_Pool * const pool = flags & PObj_constant_FLAG
             ? interp->arena_base->constant_pmc_pool
             : interp->arena_base->pmc_pool;
@@ -123,7 +123,7 @@ new_pmc_ext(PARROT_INTERP)
 
 /*
 
-=item C<void add_pmc_ext(PARROT_INTERP, PMC *pmc)>
+=item C<void Parrot_gc_add_pmc_ext(PARROT_INTERP, PMC *pmc)>
 
 Obtains a new C<PMC_EXT> structure, and attaches it to the given C<PMC>.
 Sets the necessary flags associated with the PMC_EXT structure. Ensures
@@ -134,9 +134,9 @@ that the PMC_EXT structure is marked as "alive" by the GC.
 */
 
 void
-add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
+Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
-    ASSERT_ARGS(add_pmc_ext)
+    ASSERT_ARGS(Parrot_gc_add_pmc_ext)
     pmc->pmc_ext = new_pmc_ext(interp);
     PObj_is_PMC_EXT_SET(pmc);
 
@@ -171,7 +171,7 @@ add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(add_pmc_sync)
     if (!PObj_is_PMC_EXT_TEST(pmc))
-        add_pmc_ext(interp, pmc);
+        Parrot_gc_add_pmc_ext(interp, pmc);
 
     /* XXX: Should we test the Sync * for non-null? should we allocate these
             from a bufferlike pool instead of directly from the system? */

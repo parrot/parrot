@@ -265,7 +265,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 
         /* LOCK */
         if (!pmc) {
-            pmc            = new_pmc_header(interp, PObj_constant_FLAG);
+            pmc = Parrot_gc_new_pmc_header(interp, PObj_constant_FLAG);
             PARROT_ASSERT(pmc);
 
             pmc->vtable    = vtable;
@@ -303,7 +303,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
             flags |= PObj_is_PMC_shared_FLAG;
     }
 
-    pmc            = new_pmc_header(interp, flags);
+    pmc            = Parrot_gc_new_pmc_header(interp, flags);
     pmc->vtable    = vtable;
 
 #if GC_VERBOSE

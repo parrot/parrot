@@ -978,7 +978,7 @@ pmc_add_ext(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(pmc_add_ext)
     if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
-        add_pmc_ext(interp, pmc);
+        Parrot_gc_add_pmc_ext(interp, pmc);
 }
 
 /*
