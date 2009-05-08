@@ -21,7 +21,7 @@
 typedef struct Stack_Entry {
     UnionVal entry;
     Stack_entry_type  entry_type;
-    void (*cleanup)(PARROT_INTERP, struct Stack_Entry *);
+    void (*cleanup)(PARROT_INTERP, ARGIN(struct Stack_Entry *));
 } Stack_Entry_t;
 
 struct Small_Object_Pool; /* forward decl */
