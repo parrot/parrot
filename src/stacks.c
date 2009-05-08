@@ -373,8 +373,6 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
     /* recycle this chunk to the free list if it's otherwise unreferenced */
     if (cur_chunk->refcount <= 0) {
         Small_Object_Pool * const pool = cur_chunk->pool;
-
-        pool->gc_object(interp, pool, (PObj *)cur_chunk);
         pool->add_free_object(interp, pool, (PObj *)cur_chunk);
     }
 
