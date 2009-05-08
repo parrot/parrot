@@ -1984,11 +1984,16 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
     -pred-bool-others \
     -boolops \
 
+# Report qualifier mismatches only if dangerous
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +relax-quals
+
 # Pointer arithmetic is OK, but watch for null pointers
 SPLINTFLAGS := $(SPLINTFLAGS) \
     -ptr-arith \
     +nullptrarith \
-    +ptr-negate
+    +ptr-negate \
+    -zero-ptr
 
 # Symbol definitions
 SPLINTFLAGS := $(SPLINTFLAGS) \
@@ -2057,7 +2062,7 @@ splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	+partial -memchecks \
-	src/s*.c \
+	src/p*.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
