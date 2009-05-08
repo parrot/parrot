@@ -36,6 +36,7 @@ Platform                     B8    Runloops      Feature Comp Test Inst YYYYMMDD
 --------------------------------------------------------------------------------
 aix5.3-power-gcc4.2          B8   -    -    -             Y    ?     ?  20080510
 cygwin1.7.0-x86-gcc4.3.2      4   Y    Y    -     -   -   Y    Y     Y  20090315
+dragonfly2.2.0-i386-gcc-4.1.2 4   Y    Y    -     Y   Y   Y    Y     ?  20090427
 freebsd-x86-gcc-4.2.1         4   Y    Y    Y     ?   ?   Y    Y     Y  20090415
 freebsd-amd64-gcc-4.2.1       8   Y    -    -     ?   ?   Y    Y     Y  20090419
 linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519

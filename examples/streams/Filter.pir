@@ -23,8 +23,8 @@ Creates a counter stream that generates numbers from 0 to 9.
     .local pmc stream
     .local pmc filter
 
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Filter.pir"
+    load_bytecode "Stream/Sub.pir"
+    load_bytecode "Stream/Filter.pir"
 
     # create the counter stream
     stream = new "Stream::Sub"

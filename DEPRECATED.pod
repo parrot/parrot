@@ -209,22 +209,21 @@ This function will be removed.  parrot_new_hash should be used in its place.
 
 L<https://trac.parrot.org/parrot/ticket/494>
 
+=item Parrot_get_namespace_autobase [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/155>
+
+=item Parrot_find_global_k [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/156>
+
+=item Parrot_MMD_method_name [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/625>
+
 =back
 
 =head1 Compiler tools
-
-=head2 P6object
-
-=over 4
-
-=item P6protoobject stringification [eligible in 1.1]
-
-Stringification of protoobjects will return the full name of the type
-and parentheses, per Synopsis 12.
-
-L<https://trac.parrot.org/parrot/ticket/168>
-
-=back
 
 =head2 Parrot Grammar Engine
 
@@ -285,7 +284,8 @@ L<https://trac.parrot.org/parrot/ticket/463>
 =item C< $(...) > syntax  [eligible in 1.5]
 
 The C< $(...) > syntax for obtaining a result object from a Match
-object will no longer work.  The new syntax is yet to be determined.
+object will no longer work.  The new syntax is to invoke the 
+C<.ast> method on the Match object.
 
 L<https://trac.parrot.org/parrot/ticket/459>
 

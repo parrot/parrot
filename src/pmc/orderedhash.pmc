@@ -629,9 +629,10 @@ preserve key/value order.
                 {
                     Hash     * const hash = (Hash *)SELF.get_pointer();
                     IMAGE_IO * const io   = info->image_io;
+                    const UINTVAL entries = hash->entries;
                     UINTVAL i;
 
-                    for (i = 0; i <= hash->entries; i++) {
+                    for (i = 0; i < entries; i++) {
                         HashBucket * const b   = hash->bs + i;
 
                         if (b) {

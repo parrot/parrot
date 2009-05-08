@@ -183,6 +183,13 @@ sub extract_function_declarations_and_update_source {
     return @func_declarations;
 }
 
+=head2 function_components_from_declaration( $file, $proto )
+
+Takes a declaration of a function and returns an ad-hoc hashref of
+properties for use elsewhere.
+
+=cut
+
 sub function_components_from_declaration {
     my $file  = shift;
     my $proto = shift;
@@ -226,6 +233,7 @@ sub function_components_from_declaration {
             or die "Bad args in $proto";
     }
 
+    my $is_ignorable = 0;
     my $is_static = 0;
     $is_static = $2 if $return_type =~ s/^((static)\s+)?//i;
 
@@ -236,6 +244,9 @@ sub function_components_from_declaration {
         $macros{$macro} = 1;
         if ( not $valid_macros{$macro} ) {
             squawk( $file, $name, "Invalid macro $macro" );
+        }
+        if ( $macro eq 'PARROT_IGNORABLE_RESULT' ) {
+            $is_ignorable = 1;
         }
     }
     if ( $return_type =~ /\*/ ) {
@@ -250,14 +261,15 @@ sub function_components_from_declaration {
     }
 
     return {
-        file        => $file,
-        name        => $name,
-        args        => \@args,
-        macros      => \@macros,
-        is_static   => $is_static,
-        is_inline   => $parrot_inline,
-        is_api      => $parrot_api,
-        return_type => $return_type,
+        file         => $file,
+        name         => $name,
+        args         => \@args,
+        macros       => \@macros,
+        is_static    => $is_static,
+        is_inline    => $parrot_inline,
+        is_api       => $parrot_api,
+        is_ignorable => $is_ignorable,
+        return_type  => $return_type,
     };
 }
 
@@ -332,7 +344,13 @@ sub make_function_decls {
     foreach my $func (@funcs) {
         my $multiline = 0;
 
-        my $decl = sprintf( "%s %s(", $func->{return_type}, $func->{name} );
+        my $return = $func->{return_type};
+        my $alt_void = ' ';
+        if ( $func->{is_ignorable} && ($return ne 'void') && ($return !~ /\*/) ) {
+            $alt_void = " /*\@alt void@*/\n";
+        }
+
+        my $decl = sprintf( "%s%s%s(", $return, $alt_void, $func->{name} );
         $decl = "static $decl" if $func->{is_static};
 
         my @args    = @{ $func->{args} };

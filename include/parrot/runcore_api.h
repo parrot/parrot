@@ -14,7 +14,7 @@
 
 #  define DO_OP(PC, INTERP) ((PC) = (((INTERP)->op_func_table)[*(PC)])((PC), (INTERP)))
 
-/* HEADERIZER BEGIN: src/runops_cores.c */
+/* HEADERIZER BEGIN: src/runcore/cores.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
@@ -71,9 +71,8 @@ opcode_t * runops_slow_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 #define ASSERT_ARGS_runops_slow_core __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pc)
-
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/runops_cores.c */
+/* HEADERIZER END: src/runcore/cores.c */
 
 opcode_t *runops_fast_core(PARROT_INTERP, opcode_t *);
 

@@ -1,4 +1,5 @@
 #!parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 # Reads from stdin a file in the format made by fasta.pir
 # ./parrot -R jit

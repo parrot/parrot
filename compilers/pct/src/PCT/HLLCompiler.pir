@@ -1,3 +1,4 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -801,7 +802,8 @@ Generic method for compilers invoked from a shell command line.
 
   save_output:
     if null result goto end
-    unless result goto end
+    $I0 = defined result
+    unless $I0 goto end
     .local string target
     target = adverbs['target']
     target = downcase target

@@ -770,9 +770,7 @@ sub, or for the point of the call a level deeper for the rest.
                 VTABLE_set_pmc_keyed_str(interp, frame, CONST_STRING(interp, "sub"), sub_pmc);
 
                 /* Look up any annotations and put them in the hash. */
-                if (!PMC_IS_NULL(sub_pmc)
-                &&  sub_pmc->vtable->base_type == enum_class_Sub) {
-
+                if (!PMC_IS_NULL(sub_pmc)) {
                     PMC_get_sub(interp, sub_pmc, sub);
 
                     if (sub->seg->annotations) {

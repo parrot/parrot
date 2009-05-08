@@ -41,6 +41,12 @@ static STRING * clone_string_into(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+static void * dlopen_string(PARROT_INTERP, ARGIN(STRING *path))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 static STRING * get_path(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *lib),
     ARGOUT(void **handle),
@@ -97,6 +103,9 @@ static void store_lib_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(d) \
     || PARROT_ASSERT_ARG(s) \
     || PARROT_ASSERT_ARG(value)
+#define ASSERT_ARGS_dlopen_string __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_get_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(handle) \
@@ -172,7 +181,7 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
             IGLOBALS_DYN_LIBS);
 
     /* remember path/file in props */
-    set_cstring_prop(interp, lib_pmc, "_filename", path);  /* XXX */
+    set_cstring_prop(interp, lib_pmc, "_filename", path);
     set_cstring_prop(interp, lib_pmc, "_type", type);
 
     if (lib_name)
@@ -204,6 +213,29 @@ is_loaded(PARROT_INTERP, ARGIN(STRING *path))
     if (!VTABLE_exists_keyed_str(interp, dyn_libs, path))
         return PMCNULL;
     return VTABLE_get_pmc_keyed_str(interp, dyn_libs, path);
+}
+
+/*
+
+=item C<static void * dlopen_string(PARROT_INTERP, STRING *path)>
+
+Call Parrot_dlopen with the Parrot String argument converted to C string.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static void *
+dlopen_string(PARROT_INTERP, ARGIN(STRING *path))
+{
+    ASSERT_ARGS(dlopen_string)
+
+    char *pathstr = Parrot_str_to_cstring(interp, path);
+    void *handle = Parrot_dlopen(pathstr);
+    Parrot_str_free_cstring(pathstr);
+    return handle;
 }
 
 /*
@@ -259,7 +291,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
             path = Parrot_locate_runtime_file_str(interp, full_name,
                     PARROT_RUNTIME_FT_DYNEXT);
             if (path) {
-                *handle = Parrot_dlopen(path->strstart);
+                *handle = dlopen_string(interp, path);
                 if (*handle) {
                     return path;
                 }
@@ -274,7 +306,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
              * File with extension and prefix was not found,
              * so try file.extension w/o prefix
              */
-            *handle = Parrot_dlopen(full_name->strstart);
+            *handle = dlopen_string(interp, full_name);
             if (*handle) {
                 return full_name;
             }
@@ -289,7 +321,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
     full_name = Parrot_locate_runtime_file_str(interp, lib,
             PARROT_RUNTIME_FT_DYNEXT);
     if (full_name) {
-        *handle = Parrot_dlopen((char *)full_name->strstart);
+        *handle = dlopen_string(interp, full_name);
         if (*handle) {
             return full_name;
         }
@@ -300,7 +332,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
      */
 #ifdef WIN32
     if (!STRING_IS_EMPTY(lib) && memcmp(lib->strstart, "lib", 3) == 0) {
-        *handle = Parrot_dlopen((char*)lib->strstart + 3);
+        *handle = Parrot_dlopen((char *)lib->strstart + 3);
         if (*handle) {
             path = Parrot_str_substr(interp, lib, 3, lib->strlen - 3, NULL, 0);
             return path;
@@ -314,7 +346,7 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
         path = Parrot_str_append(interp, CONST_STRING(interp, "cyg"),
             Parrot_str_substr(interp, lib, 3, lib->strlen - 3, NULL, 0));
 
-        *handle           = Parrot_dlopen(path->strstart);
+        *handle = dlopen_string(interp, path);
 
         if (*handle)
             return path;
@@ -423,9 +455,6 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle),
     if (!load_func)
         type = CONST_STRING(interp, "NCI");
     else {
-        /* we could set a private flag in the PMC header too
-         * but currently only ops files have struct_val set */
-
         if (((Parrot_ParrotLibrary_attributes *)PMC_data(lib_pmc))->oplib_init)
             type = CONST_STRING(interp, "Ops");
         else

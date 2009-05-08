@@ -1332,14 +1332,31 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
     ASSERT_ARGS(Parrot_mmd_add_multi_list_from_c_args)
     INTVAL i;
     for (i = 0; i < elements; ++i) {
+        funcptr_t func_ptr  = mmd_info[i].func_ptr;
+
+        STRING   *sub_name  = mmd_info[i].multi_name;
+        STRING   *long_sig  = mmd_info[i].full_sig;
+        STRING   *short_sig = mmd_info[i].short_sig;
+        PMC      *type_list = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
+        STRING   *ns_name   = VTABLE_get_string_keyed_int(interp, type_list, 0);
+
+    /* Create an NCI sub for the C function */
+        PMC    *sub_obj       = constant_pmc_new(interp, enum_class_NCI);
+        PMC    *multi_sig     = mmd_build_type_tuple_from_long_sig(interp,
+                                long_sig);
+
 #ifdef PARROT_HAS_ALIGNED_FUNCPTR
-        PARROT_ASSERT((PTR2UINTVAL(mmd_info[i].func_ptr) & 3) == 0);
+        PARROT_ASSERT((PTR2UINTVAL(func_ptr) & 3) == 0);
 #endif
-        Parrot_mmd_add_multi_from_c_args(interp,
-                mmd_info[i].multi_name,
-                mmd_info[i].short_sig,
-                mmd_info[i].full_sig,
-                mmd_info[i].func_ptr);
+
+        VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig,
+                                     F2DPTR(func_ptr));
+
+        /* Attach a type tuple array to the NCI sub for multi dispatch */
+        SETATTR_NCI_multi_sig(interp, sub_obj, multi_sig);
+
+        mmd_add_multi_to_namespace(interp, ns_name, sub_name, sub_obj);
+        mmd_add_multi_global(interp, sub_name, sub_obj);
     }
 }
 

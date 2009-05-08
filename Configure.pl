@@ -297,6 +297,11 @@ needed to use inet_aton for systems that lack inet_pton:
 
   --define=inet_aton
 
+=item C<--no-line-directives>
+
+Disables the creation of C #line directives when generating C from PMCs and
+ops. Useful when debugging internals.
+
 =back
 
 =head2 Parrot Options

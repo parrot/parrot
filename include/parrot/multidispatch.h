@@ -45,9 +45,12 @@ typedef struct _MMD_table {
 } MMD_table;
 
 typedef struct _multi_func_list {
-        const char *multi_name;
-        const char *short_sig;
-        const char *full_sig;
+/* TT #646
+ * This STRING ideally must be const but actually can't.
+ */
+        STRING *multi_name;
+        STRING *short_sig;
+        STRING *full_sig;
         funcptr_t func_ptr;
 } multi_func_list;
 

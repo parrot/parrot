@@ -1,4 +1,5 @@
 #!./parrot -R jit
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # random.pasm N         (N = 900000 for shootout)

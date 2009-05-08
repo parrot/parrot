@@ -160,7 +160,11 @@ INTVAL Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-INTVAL Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
+INTVAL /*@alt void@*/
+Parrot_io_eprintf(
+    NULLOK(PARROT_INTERP),
+    ARGIN(const char *s),
+    ...)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT

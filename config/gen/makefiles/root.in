@@ -619,9 +619,9 @@ $(SRC_DIR)/string/private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --all
 
 # classes PMC build utils and rules
-PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
-PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c
-PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable
+PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump @no_lines_flag@
+PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c @no_lines_flag@
+PMC2CV := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
 
 .pmc.dump : # suffix rule (limited support)
 	$(PMC2CD) $<
@@ -996,7 +996,7 @@ $(IMCC_DIR)/main$(O) : $(IMCC_DIR)/main.c $(GENERAL_H_FILES) $(IMCC_H_FILES)
 
 $(INC_DIR)/oplib/ops.h lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
     lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(OPS_DIR)/ops.num $(OPS_DIR)/ops.skip
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl $(OPS_FILES)
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl @no_lines_flag@ $(OPS_FILES)
 
 ###############################################################################
 #
@@ -1208,7 +1208,7 @@ $(SRC_DIR)/warnings$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/misc$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/utils$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/utils$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_nci.h
 
 $(SRC_DIR)/spf_render$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_render.str
 
@@ -1238,7 +1238,7 @@ $(OPS_DIR)/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
 	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm \
 	$(SRC_DIR)/pmc/pmc_continuation.h
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core @no_lines_flag@
 
 $(OPS_DIR)/core_ops_switch$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops_switch.c \
 	$(SRC_DIR)/pmc/pmc_parrotlibrary.h
@@ -1249,7 +1249,7 @@ $(OPS_DIR)/core_ops_switch.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
 	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
 	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/CSwitch.pm \
 	lib/Parrot/OpTrans/CPrederef.pm
-	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl CSwitch --core @no_lines_flag@
 
 @TEMP_cg_c@
 
@@ -1928,11 +1928,11 @@ SPLINT := splint
 # kept in there after completion.
 SPLINT_TMP := $(TMP)/splint
 
-# Splint flags: http:////splint.org//manual//html//appB.html
+# Splint flags: http://splint.org/manual/html/appB.html
 # The dashes in the names don't make any difference to Splint, but I've
 # made them match how they are in the manual.  Otherwise, you might be
 # looking for "declundef", except that it's "decl-undef" in the docs.
-SPLINTFLAGS  := \
+SPLINTFLAGS = \
     +standard \
     -hints \
     \
@@ -1947,16 +1947,60 @@ SPLINTFLAGS  := \
     +posix-strict-lib \
     -skip-posix-headers \
     \
+    +ansi89-limits \
+    \
     -show-summary \
     +show-scan \
-    +time-dist \
-    \
-    +memchecks \
-    \
-    -ansi-reserved \
+    +time-dist
+
+# Watch for naming conflicts, but don't complain about str*() functions
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +ansi-reserved \
     +ansi-reserved-internal \
-    +bool-compare \
+    -iso-reserved \
+    -iso-reserved-internal
+
+# Memory safety checks
+SPLINTFLAGS := $(SPLINTFLAGS) \
     +bufferoverflow \
+    +bufferoverflowhigh \
+
+# Macro safety checks
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +macro-assign \
+    +macro-empty \
+    +macro-parens \
+    +macro-redef \
+    +macro-stmt \
+    +macro-unrecog \
+
+# Watch for unsafe comparisons
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +bool-compare \
+    +ptr-compare \
+    +real-compare \
+    +unsigned-compare
+
+# But allow us some slop in boolean comparisons
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    -pred-bool-int \
+    -pred-bool-ptr \
+    -pred-bool-others \
+    -boolops \
+
+# Pointer arithmetic is OK, but watch for null pointers
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    -ptr-arith \
+    +nullptrarith \
+    +ptr-negate
+
+# Check on consistency of defs
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +incon-defs \
+    +incon-defs-lib \
+
+# The rest of the flags to be organized.
+SPLINTFLAGS := $(SPLINTFLAGS) \
     +char-index \
     +cpp-names \
     +decl-undef \
@@ -1967,43 +2011,16 @@ SPLINTFLAGS  := \
     +format-code \
     +format-type \
     +ignore-signs \
-    +incon-defs \
-    +incon-defs-lib \
-    -iso-reserved \
-    +macro-assign \
-    +macro-empty \
-    +macro-parens \
-    +macro-redef \
-    +macro-stmt \
-    +macro-unrecog \
     +match-fields \
     +null \
-    +nullptrarith \
     +nullret \
-    -pred-bool-int \
-    -pred-bool-ptr \
-    -pred-bool-others \
-    +ptr-compare \
-    +ptr-negate \
     +strict-destroy \
     \
     +use-released \
     +strict-use-released \
-
-# I'd like the +ignore-signs to go away, but we have too many
-# cross-signedness comparisons.
-
-# Andy is working on making a decent splint target.  He's currently
-# (2/29/08) dropping all the flags that he's been working with
-# and going with the +weak settings, just to get the most egregious
-# problems uncovered.  Then, he'll be gradually adding stricter and
-# stricter settings.  The SPLINTFLAGS_OVERLY_NOISY list below represents
-# his noisy-based work at the time he reverted to weak mode.
-SPLINTFLAGS_OVERLY_NOISY := \
     -abstract \
     +aliasunique \
     +assignexpose \
-    -boolops \
     -casebreak \
     -castfcnptr \
     -charint \
@@ -2015,8 +2032,6 @@ SPLINTFLAGS_OVERLY_NOISY := \
     -globs \
     +imptype \
     -initallelements \
-    -isoreserved \
-    -isoreservedinternal \
     +longintegral \
     +matchanyintegral \
     +nestedextern \
@@ -2024,7 +2039,6 @@ SPLINTFLAGS_OVERLY_NOISY := \
     -paramuse \
     +ptrnegate \
     +readonlystrings \
-    -realcompare \
     -redef \
     -retvalint \
     -retvalother \
@@ -2039,7 +2053,6 @@ SPLINTFLAGS_OVERLY_NOISY := \
     -compdestroy \
     -compmempass \
     -globstate \
-    -modobserver \
     -mustfreefresh \
     -mustfreeonly \
     -nullstate \
@@ -2055,6 +2068,7 @@ SPLINTFLAGS_OVERLY_NOISY := \
     -temptrans \
     -unqualifiedtrans \
 
+
 # Other options we'd like to add back
 # +paramuse: As soon as we get SHIM()s in the ops
 # -includedepth 8 : Let's investigate why we do so many includes.
@@ -2062,16 +2076,15 @@ SPLINTFLAGS_OVERLY_NOISY := \
 #  values of the arrays
 # +casebreak: Auto-generated ops have way too case fallthrus right now
 # +noeffect: Right now the UNUSED(macro) trips +noeffect
-# +realcompare: Make sure we're not doing comparisons on equality on real
-#  numbers
 # +fcnuse: We have many functions that are defined but not used, but they
 #  should get hidden or ifdeffed
 # +redef, +redecl: Ops currently have tons of redefinitions
-# +boolops
 
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
-SPLINTFLAGS_TEST := \
+
+# Don't complain about using pointers and ints as booleans
+SPLINTFLAGS_TEST := $(SPLINTFLAGS_TEST) -pred-bool
 
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
@@ -2080,21 +2093,9 @@ splint : $(PARROT)
 
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
-	splint $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-    compilers/imcc/cfg.c \
-    compilers/imcc/debug.c \
-    compilers/imcc/imc.c \
-    compilers/imcc/imclexer.c \
-    compilers/imcc/imcparser.c \
-    compilers/imcc/instructions.c \
-    compilers/imcc/main.c \
-    compilers/imcc/optimizer.c \
-    compilers/imcc/parser_util.c \
-    compilers/imcc/pbc.c \
-    compilers/imcc/pcc.c \
-    compilers/imcc/reg_alloc.c \
-    compilers/imcc/sets.c \
-    compilers/imcc/symreg.c \
+	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	+partial -memchecks \
+	src/s*.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
@@ -2301,10 +2302,10 @@ perlcritic:
 cagecritic:
 	perlcritic -1 --profile tools/util/perlcritic-cage.conf $(CRITIC_FILES)
 
-# This target will eventually create all the headers automatically.  If you are
-# having problems with linkage in Win32 (or elsewhere), because something is
-# not PARROT_EXPORT but should be, then put PARROT_EXPORT in the C file and run "make
-# headerizer".  The .h file will get updated.
+# This target will eventually create all the headers automatically.  If you
+# are having problems with linkage in Win32 (or elsewhere), because something
+# is not PARROT_EXPORT but should be, then put PARROT_EXPORT in the C file and
+# run "make headerizer".  The .h file will get updated.
 
 HEADERIZER_O_FILES := \
     $(O_FILES) \

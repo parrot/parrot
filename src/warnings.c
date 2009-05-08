@@ -104,6 +104,7 @@ C<message, ..> can be a C<Parrot_vsprintf_c()> format with arguments.
 */
 
 PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             ARGIN(const char *message), ...)

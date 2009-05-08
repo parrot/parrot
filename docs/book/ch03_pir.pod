@@ -6,38 +6,39 @@ Z<CHP-3>
 
 X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR (Parrot intermediate representation)>
-Parrot Intermediate Representation (PIR) is a low-level language native
-to the virtual machine. It is commonly used to write libraries for
-Parrot, for generated compilers, and as the target form when compiling
-high-level language syntax for Parrot. At a fundamendal level, PIR is an
-assembly language, but it has some higher-level features such as basic
-operator syntax, syntactic sugar for subroutine and method calls,
-automatic register allocation, and more friendly conditional
-syntax.N<Parrot also has a more pure native assembly language, see
-Chapter 9 for more details.> Even so, PIR is more rigid and "close to
-the machine" then some higher-level languages like C. X<.pir files>
-Files containing PIR code use the F<.pir> extension.
 
+Parrot Intermediate Representation (PIR) is Parrot's native low-level
+language.N<Parrot has a pure native assembly language called PASM, described in
+Chapter 9.> PIR is fundamentally an assembly language, but it has some
+higher-level features such as operator syntax, syntactic sugar for subroutine
+and method calls, automatic register allocation, and more friendly conditional
+syntax.  PIR is commonly used to write Parrot libraries -- including some of
+PCT's compilers -- and is the target form when compiling high-level languages
+to Parrot.
+
+Even so, PIR is more rigid and "close to the machine" then some higher-level
+languages like C. X<.pir files> Files containing PIR code use the F<.pir>
+extension.
 
 =head2 Basics
 
-PIR has a relatively simple syntax. Each line is either a comment, a
-label, a statement, or a directive. Each statement or directive stands
-on its own line, and no symbol is used to mark the end of the line.
-Empty whitespace lines are ignored.
+PIR has a relatively simple syntax. Every line is a comment, a label, a
+statement, or a directive. Each statement or directive stands on its own line.
+There is no end-of-line symbol (such as a semicolon in other languages).
 
 =head3 Comments
 
-A comment is marked with the C<#> symbol, and continues until the end of
-the line. Comments can stand alone on a line or follow a statement or
-directive.
+X<PIR comments>
+A comment begins with the C<#> symbol, and continues until the end of the line.
+Comments can stand alone on a line or follow a statement or directive.
 
     # This is a regular comment. The PIR
     # interpreter ignores this.
 
+X<PIR POD>
 PIR also treats inline documentation in Pod format as a comment. An
 equals sign as the first character of a line marks the start of a Pod
-block, and a C<=cut> marker signals the end of a Pod block.
+block.  A C<=cut> marker signals the end of a Pod block.
 
   =head2
 
@@ -50,19 +51,17 @@ block, and a C<=cut> marker signals the end of a Pod block.
 
 Z<CHP-3-SECT-4>
 
-X<PIR (Parrot intermediate representation);labels>
-X<labels (PIR)>
-A label names a line of code so other statements can refer to it.
-Labels consist of letters, numbers, and underscores. Simple labels are
-often all capital letters to make them stand out from the rest of the
-source code more clearly. A label can be in front of a line of code, or
-it can be on its own line. Keeping labels on separate lines generally
-improves readability.
+X<PIR (Parrot intermediate representation);labels> X<labels (PIR)> A label
+attaches to a line of code so other statements can refer to it.  Labels can
+contain letters, numbers, and underscores. By convention, labels use all
+capital letters to stand out from the rest of the source code. A label can be
+precede a line of code, though outdenting labels on separate lines improves
+readability:
 
-  LABEL:
-      print "'Allo, 'allo, 'allo.\n"
+  GREET:
+      say "'Allo, 'allo, 'allo."
 
-Labels are most often used for control flow.
+Labels are vital to control flow.
 
 =head3 Statements
 
@@ -70,30 +69,28 @@ Z<CHP-3-SECT-1>
 
 X<statements (PIR)>
 X<PIR (Parrot intermediate representation);statements>
-A statement is either an opcode or syntactic sugar for one or more
-opcode. An opcode is a direct call to a native instruction in
-the virtual machine, and consists of an instruction name followed
-by zero or more arguments.
+A statement is either an opcode or syntactic sugar for one or more opcodes. An
+opcode is a native instruction for the virtual machine; it consists of the name
+of the instruction followed by zero or more arguments.
 
-  print "Norwegian Blue\n"
+  say "Norwegian Blue"
 
-To aid in readability, PIR also provides some higher-level constructs,
-including symbol operators.
+PIR also provides higher-level constructs, including symbol operators:
 
   $I1 = 2 + 5
 
-Under the hood, these special statement forms are just syntactic sugar
-for regular opcodes. The C<+> symbol corresponds to the C<add> opcode,
-the C<-> symbol to the C<sub> opcode, and so on.
+Under the hood, these special statement forms are just syntactic sugar for
+regular opcodes. The C<+> symbol corresponds to the C<add> opcode, the C<->
+symbol to the C<sub> opcode, and so on.  The previous example is equivalent to:
 
   add $I1, 2, 5
 
 =head3 Directives
 
-Directives all start with a C<.> period, and are handled specially by
-the parser. Some directives specify actions that should be taken at
-compile-time. Some directives represent complex operations that require
-the generation of multiple instructions.
+Directives begin with a period (C<.>); Parrot's parser handles them specially.
+the parser. Some directives specify actions that occur at compile time. Other
+directives represent complex operations that require the generation of multiple
+instructions.  The C<.local> directive declares a typed register.
 
   .local string hello
 
@@ -101,84 +98,72 @@ PIR also has a macro facility to create user-defined directives.
 
 =head3 Literals
 
-Integers and floating point numbers are numeric literals, and can be
-positive or negative.
+Integers and floating point numbers are numeric literals. They can be positive
+or negative.
 
   $I0 = 42       # positive
   $I1 = -1       # negative
 
-Integer literals can also be binary, octal, or hexadecimal.
+Integer literals can also be binary, octal, or hexadecimal:
 
   $I3 = 0b01010  # binary
   $I3 = 0o78     # octal
   $I2 = 0xA5     # hexadecimal
 
-Floating point number literals have a decimal point, and can also use
-scientific notation.
+Floating point number literals have a decimal point, and can use scientific
+notation:
 
   $N0 = 3.14
   $N2 = -1.2e+4
 
 X<strings;in PIR>
-String literals are enclosed in single or double-quotes.N<See L<Strings>
-later in this chapter for more details on the difference between single
-and double quoted strings.>
+String literals are enclosed in single or double-quotes.N<L<Strings>
+explains the differences between the quoting types.>
 
   $S0 = "This is a valid literal string"
   $S1 = 'This is also a valid literal string'
 
 =head3 Variables
 
-PIR variables can store 4 different kinds of valuesE<mdash>integers,
-numbers (floating point), strings, and objects. The simplest way to work
-with these values is using register variables. The name of a register
-variable always starts with a dollar sign, followed by a single
-character that shows whether it is an integer (C<I>), number (C<N>),
-string (C<S>), or object (C<P>),N<Objects are marked with a C<P> for
-"I<P>olymorphic container".> and a unique number.
+PIR variables can store four different kinds of valuesE<mdash>integers, numbers
+(floating point), strings, and objects. The simplest way to work with these
+values is through register variables. Register variables always start with a
+dollar sign (C<$>) and a single character which specifies the type of the
+register: integer (C<I>), number (C<N>), string (C<S>), or PMC (C<P>).
+Registers have numbers as well; the "first" string register is C<$S0>.
+N<Register numbers may or may not correspond to the register used internally;
+Parrot's compiler remaps registers as appropriate.>
 
-  $S0 = "Who's a pretty boy, then?\n"
-  print $S0
+  $S0 = "Who's a pretty boy, then?"
+  say $S0
 
-PIR also has named variables, which are declared with the C<.local>
-directive, passing it a type and a name. The valid types for
-named variables are the same 4 basic kinds of values: C<int>, C<num>,
-C<string>, and C<pmc>.N<Again, for "I<P>olyI<M>orphic I<C>ontainer".>
-Once a named variable is declared, it can be used just like a register
-variable.
+PIR also has named variables, which are declared with the C<.local> directive.
+As with registers, there are four valid types for named variables: C<int>,
+C<num>, C<string>, and C<pmc>.N<Again, for "I<P>olyI<M>orphic I<C>ontainer".>
+After declaring a named variable, you can use the name anywhere you would use a
+register:
 
   .local string hello
-  set hello, "'Allo, 'allo, 'allo.\n"
-  print hello
+  set hello, "'Allo, 'allo, 'allo."
+  say hello
 
-PIR code has a variety of ways to store values while you work with
-them. Actually, the only place to store values is in a Parrot register,
-but there are multiple ways to work with these registers. Register names
-in PIR always start with a dollar sign, followed by a single
+Integer (C<I>) and Number (C<N>) registers use platform-dependent sizes and
+limitationsN<There are a few exceptions to this; Parrot smooths out some of the
+bumps and inconsistencies so that PIR code behaves the same way on all
+supported platforms>. Internally, Parrot treats both I and N registers as
+signed quantities internally for the purposes of arithmetic. Parrot's floating
+point values and operations all comply with the IEEE 754 standard.
 
-Integer (I) and Number (N) registers use platform-dependent sizes and
-limitations N<There are a few exceptions to this, we use platform-dependent
-behavior when the platforms behave sanely. Parrot will smooth out some of
-the bumps and inconsistencies so that behavior of PIR code will be the same
-on all platforms that Parrot supports>. Both I and N registers are treated
-as signed quantities internally for the purposes of arithmetic. Parrot's
-floating point values and operations are all IEEE 754 compliant.
+Strings (S) are buffers of variable-sized data. The most common use of S
+registers and variables is to store textual data. S registers I<may> also be
+buffers for binary or other non-textual data, though this is rareN<In general,
+a custom PMC is mroe useful>.  Parrot strings are flexible and powerful, to
+account for all the complexity of human-readable (and computer-representable)
+textual data.
 
-Strings (S) are buffers of data with a consistent formatting but a variable
-size. By far the most common use of S registers and variables is for storing
-text data. S registers may also be used in some circumstances as buffers
-for binary or other non-text data. However, this is an uncommon usage of
-them, and for most such data there will likely be a PMC type that is better
-suited to store and manipulate it. Parrot strings are designed to be very
-flexible and powerful, to account for all the complexity of human-readable
-(and computer-representable) text data.
-
-The final data type is the PMC, a complex and flexible data type. PMCs are,
-in the world of Parrot, similar to what classes and objects are in
-object-oriented languages. PMCs are the basis for complex data structures
-and object-oriented behavior in Parrot. We'll discuss them in more detail
-in this and in later chapters.
-
+The final data type is the PMC. PMC resemble classes and objects are in
+object-oriented languages. They are the basis for complex data structures and
+object-oriented behavior in Parrot.
 
 =head2 Strings
 
@@ -189,8 +174,7 @@ quotes:
   $S0 = "This string is \n on two lines"
   $S0 = 'This is a \n one-line string with a slash in it'
 
-Here's a quick listing of the escape sequences supported by double-quoted
-strings:
+Parrot supports several escape sequences in double-quoted strings:
 
   \xhh        1..2 hex digits
   \ooo        1..3 oct digits
@@ -209,12 +193,11 @@ strings:
   \\          A backslash
   \"          A quote
 
-Or, if you need more flexibility, you can use a heredoc string literal.
-The string starts on the line after the C<E<lt>E<lt>> operator, and ends
-on the line before the terminator, which is defined by the text in
-quotes after the C<E<lt>E<lt>>. The terminator must appear on its own
-line, must appear at the beginning of the line, and may not have any
-trailing whitespace.
+If you need more flexibility in defining a string, use a X<heredoc string
+literal>.  The C<E<lt>E<lt>> operator starts a heredoc.  The string terminator
+immediately follows.  All text until the terminator is part of the heredoc.
+The terminator must appear on its own line, must appear at the beginning of the
+line, and may not have any trailing whitespace.
 
   $S2 = << "End_Token"
 
@@ -225,53 +208,45 @@ trailing whitespace.
 
 =head3 Strings: Encodings and Charsets
 
-Strings are complicated. We showed three different ways to specify string
-literals in PIR code, but that wasn't the entire story. It used to be that
-all a computer system needed was to support the ASCII charset, a mapping of
-128 bit patterns to symbols and English-language characters. This was
-sufficient so long as all computer users could read and write English, and
-were satisfied with a small handful of punctuation symbols that were commonly
-used in English-speaking countries. However, this is a woefully insufficient
-system to use when we are talking about software portability between countries
-and continents and languages. Now we need to worry about several character
-encodings and charsets in order to make sense out of all the string data
-in the world.
+X<charset>
+Strings are complicated; string declarations aren't the whole story.  In olden
+times, strings only needed to support the ASCII character set (or charset), a
+mapping of 128 bit patterns to symbols and English-language characters. This
+worked as long as everyone using a computer read and wrote English and used a
+small handful of punctuation symbols.
 
-Parrot has a very flexible system for handling and manipulating strings.
-Every string is associated with an encoding and a character set (charset).
-The default for Parrot is 8-bit ASCII, which is simple to use and is almost
-universally supported. However, support is built in to have other formats as
-well.
+In other words, it was woefully insufficient for international uses, polyglots, and more.
 
-Double-quoted string constants, like the ones we've seen above, can have an
-optional prefix specifying the charset or both the encoding and charset of the
-string. Parrot will maintain these values internally, and will automatically
-convert strings when necessary to preserve the information. String prefixes
-are specified as C<encoding:charset:> at the front of the string. Here are some
-examples:
+A modern string system must manage several character encodings and charsets in
+order to make sense out of all the string data in the world.  Parrot does this.
+Every string has an associated encoding and an associated character set.  The
+default charset is 8-bit ASCII, which is simple to use and is almost
+universally supported.
+
+Double-quoted string constants can have an optional prefix specifying the the
+string's encoding and charsetN<As you might suspect, single-quoted strings do
+not support this.>. Parrot will maintain these values internally, and will
+automatically convert strings when necessary to preserve the information.
+String prefixes are specified as C<encoding:charset:> at the front of the
+string. Here are some examples:
 
   $S0 = utf8:unicode:"Hello UTF8 Unicode World!"
   $S1 = utf16:unicode:"Hello UTF16 Unicode World!"
   $S2 = ascii:"This is 8-bit ASCII"
-  $S3 = binary:"This is treated as raw unformatted binary"
+  $S3 = binary:"This is raw, unformatted binary data"
 
-The C<binary:> charset treats the string as a buffer of raw unformatted
-binary data. It isn't really a "string" per se because binary data isn't
-treated as if it contains any readable characters. These kinds of strings
-are useful for library routines that return large amounts of binary data
-that doesn't easily fit into any other primitive data type.
+The C<binary:> charset treats the string as a buffer of raw unformatted binary
+data. It isn't really a string per se, because binary data contains no readable
+characters.  As mentioned earlier, this exists to support libraries which
+manipulate binary data that doesn't easily fit into any other primitive data
+type.
 
-Notice that only double-quoted strings can have encoding and charset prefixes
-like this. Single-quoted strings do not support them.
-
-When two types of strings are combined together in some way, such as through
-concatenation, they must both use the same character set an encoding.
-Parrot will automatically upgrade one or both of the strings to use the next
-highest compatible format, if they aren't equal. ASCII strings will
-automatically upgrade to UTF-8 strings if needed, and UTF-8 will upgrade
-to UTF-16. Handling and maintaining these data and conversions all happens
-automatically inside Parrot, and you the programmer don't need to worry
-about the details.
+When Parrot combines two strings (such as through concatenation), they must
+both use the same character set and encoding.  Parrot will automatically
+upgrade one or both of the strings to use the next highest compatible format as
+necessary. ASCII strings will automatically upgrade to UTF-8 strings if needed,
+and UTF-8 will upgrade to UTF-16. All of these conversions happen inside
+Parrot; you the programmer don't need to worry about the details.
 
 =head2 Named Variables
 
@@ -279,6 +254,13 @@ Z<CHP-3-SECT-2.3>
 
 X<named variables (PIR)>
 X<PIR (Parrot intermediate representation);named variables>
+
+=for author
+
+The declaration section earlier alludes to this.
+
+=end for
+
 Calling a value "$S0" isn't very descriptive, and usually it's a lot
 nicer to be able to refer to values using a helpful name. For this
 reason Parrot allows registers to be given temporary variable names to
@@ -288,121 +270,38 @@ with fancier names>. They're declared with the C<.local> statement
 which requires a variable type and a name:
 
   .local string hello
-  set hello, "Hello, Polly.\n"
-  print hello
+  set hello, "Hello, Polly."
+  say hello
 
-This snippet defines a string variable named C<hello>, assigns it the
-value "Hello, Polly.\n", and then prints the value. Under the hood these
-named variables are just normal registers of course, so any operation that
-a register can be used for a named variable can be used for as well.
+This snippet defines a string variable named C<hello>, assigns it the value
+"Hello, Polly.", and then prints the value. Under the hood these named
+variables are just normal registers of course, so any operation that a register
+can be used for a named variable can be used for as well.
 
 X<types;variable (PIR)>
 X<variables;types (PIR)>
-The valid types are C<int>, C<num>, C<string>, and C<pmc> 
+The valid types are C<int>, C<num>, C<string>, and C<pmc>
 It should come as no surprise that these are the same as Parrot's four
 built-in register types. Named variables are valid from the point of
 their definition to the end of the current subroutine.
 
-The name of a variable must be a valid PIR identifier. It can contain
-letters, digits and underscores but the first character has to be a
-letter or an underscore. There is no limit to the length of an identifier,
-especially since the automatic code generators in use with the various
-high-level languages on parrot tend to generate very long identifier
-names in some situations. Of course, huge identifier names could
-cause all sorts of memory allocation problems or inefficiencies during
-lexical analysis and parsing. You should push the limits at your own risk.
+The name of a variable must be a valid PIR identifier. It can contain letters,
+digits and underscores but the first character has to be a letter or an
+underscore. There is no limit to the length of an identifier, other than good
+taste.
 
-=head2 Register Allocator
-
-PIR does not have this kind
-of direct correspondance to PBC. A number of PIR features, especially the
-various directives, typically translate into a number of individual
-operations. Register names, such as C<$P7> don't indicate the actual
-storage location of the register in PIR either. The register allocator
-will intelligently move and rearrange registers to conserve memory, so
-the numbers you use to specify registers in PIR will be mapped to
-different numbers when compiled into PBC.
-Now's a decent time to talk about Parrot's register allocator N<it's also
-sometimes humorously referred to as the "register alligator", due to an
-oft-repeated typo and the fact that the algorithm will bite you if you get
-too close to it>. When you use a register like C<$P5>, you aren't necessarily
-talking about the fifth register in memory. This is important since you can
-use a register named $P10000000 without forcing Parrot to allocate an array
-of ten million registers. Instead Parrot's compiler front-end uses an
-allocation algorithm which turns each individual register referenced in the
-PIR source code into a reference to an actual memory storage location. Here
-is a short example of how registers might be mapped:
-
-  $I20 = 5       # First register, I0
-  $I10000 = 6    # Second register, I1
-  $I13 = 7       # Third register, I2
-
-The allocator can also serve as a type of optimization. It performs a
-lifetime analysis on the registers to determine when they are being used and
-when they are not. When a register stops being used for one thing, it can
-be reused later for a different purpose. Register reuse helps to keep
-Parrot's memory requirements lower, because fewer unique registers need to
-be allocated. However, the downside of the register allocator is that it
-takes more time to execute during the compilation phase. Here's an example
-of where a register could be reused:
-
-=begin PIR
-
-  .sub main
-    $S0 = "hello "
-    print $S0
-    $S1 = "world!"
-    print $S1
-  .end
-
-=end PIR
-
-We'll talk about subroutines in more detail in the next chapter. For now,
-we can dissect this little bit of code to see what is happening. The C<.sub>
-and C<.end> directives demarcate the beginning and end of a subroutine
-called C<main>. This convention should be familiar to C and C++ programmers,
-although it's not required that the first subroutine N<or any subroutine
-for that matter> be named "main". In this code sequence, we assign the
-string C<"hello "> to the register C<$S0> and use the C<print> opcode to
-display it to the terminal. Then, we assign a second string C<"world!"> to
-a second register C<$S1>, and then C<print> that to the terminal as well.
-The resulting output of this small program is, of course, the well-worn
-salutation C<hello world!>.
-
-Parrot's compiler and register allocator are smart enough to realize that
-the two registers in the example above, C<$S0> and C<$S1> are used exclusively
-of one another. C<$S0> is assigned a value in line 2, and is read in line 3,
-but is never accessed after that. So, Parrot determines that its lifespan
-ends at line 3. The register C<$S1> is used first on line 4, and is accessed
-again on line 5. Since these two do not overlap, Parrot's compiler can
-determine that it can use only one register for both operations. This saves
-the second allocation. Notice that this code with only one register performs
-identically to the previous example:
-
-=begin PIR
-
-  .sub main
-    $S0 = "hello "
-    print $S0
-    $S0 = "world!"
-    print $S0
-  .end
-
-=end PIR
-
-In some situations it can be helpful to turn the allocator off and avoid
-expensive optimizations. Such situations are subroutines where there are a
-small fixed number of registers used, when variables are used throughout the
-subroutine and should never be reused, or when some kind of pointer reference
-needs to be made to the register N<this happens in some NCI calls that take
-pointers and return values>. To turn off the register allocator for certain
-variables, you can use the C<:unique_reg> modifier:
+As mentioned earlier, Parrot's internal compiler may remap named registers and
+symbolic registers to actual registers as necessary.  This happens
+transparently, and for the most part you never need to know about it.  There's
+one exception: when you know something outside of Parrot must refer to a
+specific register exactlyN<For example, when an NCI call takes a pointer to a
+register and returns a value through the pointer.>.  Use the C<:unique_reg>
+modifier on a variable declaration to prevent potential register allocation
+changes:
 
   .local pmc MyUniquePMC :unique_reg
 
-Notice that C<:unique_reg> shouldn't affect the behavior of Parrot, but
-instead only changes the way registers are allocated. It's a trade off between
-using more memory in exchange for less time spent optimizing the subroutine.
+This attribute C<:unique_reg> will not affect the behavior of Parrot otherwise.
 
 =head2 PMC variables
 
@@ -413,31 +312,27 @@ number, or string register or variable, but you have to instantiate a
 new PMC object into a type before you use it. The C<new> instruction creates
 a new PMC of the specified type:
 
-  $P0 = new 'PerlString'     # This is how the Perl people do it
-  $P0 = "Hello, Polly.\n"
-  print $P0
+  $P0 = new 'String'
+  $P0 = "Hello, Polly."
+  say $P0
 
-This example creates a C<PerlString> object, stores it in the PMC
-register C<$P0>, assigns the value "Hello, Polly.\n" to it, and prints
-it.  With named variables the type passed to the C<.local> directive is
-either the generic C<pmc> or a type compatible with the type passed to
-C<new>:
+This example creates a C<String> object, stores it in the PMC register C<$P0>,
+assigns it the value "Hello, Polly.", and prints it.  The type provided to the
+C<.local> directive is either the generic C<pmc> or a type compatible with the
+type passed to C<new>:
 
-  .local PerlString hello    # or .local pmc hello
-  hello = new 'PerlString'
-  hello = "Hello, Polly.\n"
-  print hello
+  .local String hello    # or .local pmc hello
+  hello = new 'String'
+  hello = "Hello, Polly."
+  say hello
 
-PIR is a dynamic language, and that dynamicism is readily displayed in
-the way PMC values are handled. Primitive registers like strings,
-numbers, and integers perform a special action called I<autoboxing>
-when they are assigned to a PMC. Autoboxing is when a primitive scalar
-type is automatically converted to a PMC object type. There are PMC
-classes for String, Number, and Integer which can be quickly converted
-to and from primitive int, number, and string types. Notice that the
-primitive types are in lower-case, while the PMC classes are
-capitalized. If you want to box a value explicitly, you can use the C<box>
-opcode:
+PIR is a dynamic language; that dynamicism is evident in how Parrot handles PMC
+values. Primitive registers like strings, numbers, and integers perform a
+special action called X<autoboxing> when assigned to a PMC. Autoboxing is the
+process of converting a primitive type to a PMC object.  PMC classes exist for
+String, Number, and Integer; notice that the primitive types are in lower-case,
+while the PMC classes are capitalized. If you want to box a value explicitly,
+use the C<box> opcode:
 
   $P0 = new 'Integer'       # The boxed form of int
   $P0 = box 42
@@ -446,16 +341,12 @@ opcode:
   $P2 = new 'String'        # The boxed form of string
   $P2 = "This is a string!"
 
-The PMC classes C<Integer>, C<Number>, and C<String> are thin overlays on
-the primitive types they represent. However, these PMC types have the benefit
-of the X<PMC;VTABLE Interface> VTABLE interface. VTABLEs are a standard
-API that all PMCs conform to for performing standard operations. These PMC
-types also have special custom methods available for performing various
-operations, they may be passed as PMCs to subroutines that only expect
-PMC arguments, and they can be subclassed by a user-defined type. We'll
-discuss all these complicated topics later in this chapter and in the next
-chapter. We will discuss PMC and all the details of their implementation and
-interactions in Chapter 11.
+The PMC classes C<Integer>, C<Number>, and C<String> are thin overlays on the
+primitive types they represent. These PMC types have the benefit of the
+X<PMC;VTABLE Interface> VTABLE interface. VTABLEs are a standard API that all
+PMCs conform to for performing standard operations. These PMC types support
+custom methods to perform various operations, may be passed to subroutines that
+expect PMC arguments, and can be subclassed by a user-defined type.
 
 =head2 Named Constants
 
@@ -463,57 +354,59 @@ Z<CHP-3-SECT-2.5>
 
 X<PIR (Parrot intermediate representation);named constants>
 X<named constants (PIR)>
-The C<.const> directive declares a named constant. It's very similar
-to C<.local>, and requires a type and a name. The value of a constant
-must be assigned in the declaration statement. As with named
-variables, named constants are visible only within the compilation
-unit where they're declared. This example declares a named string
+
+The C<.const> directive declares a named constant. It resembles C<.local>; it
+requires a type and a name. It also requires the assignment of a constant
+value.  As with named variables, named constants are visibl only within the
+compilation unit where they're declared. This example declares a named string
 constant C<hello> and prints the value:
 
-  .const string hello = "Hello, Polly.\n"
-  print hello
+  .const string hello = "Hello, Polly."
+  say hello
 
 Named constants may be used in all the same places as literal constants,
 but have to be declared beforehand:
 
-  .const int the_answer = 42        # integer constant
-  .const string mouse = "Mouse"     # string constant
-  .const num pi = 3.14159           # floating point constant
+  .const int    the_answer = 42        # integer constant
+  .const string mouse      = "Mouse"   # string constant
+  .const num    pi         = 3.14159   # floating point constant
 
 In addition to normal local constants, you can also specify a global constant
 which is accessible from everywhere in the current code file:
 
   .globalconst int days = 365
 
-Currently there is no way to specify a PMC constant in PIR source code,
-although a way to do so may be added in later versions of Parrot.
+Currently there is no way to specify a PMC constant in PIR source code.
+
+=for author
+
+Why declare constants?
+
+=end for
 
 =head2 Symbol Operators
 
 Z<CHP-3-SECT-3>
 
 X<symbol operators in PIR>
-PIR has many other symbol operators: arithmetic, concatenation,
-comparison, bitwise, and logical. All PIR operators are translated
-into one or more Parrot opcodes internally, but the details of this
-translation stay safely hidden from the programmer. Consider this
-example snippet:
+
+=for author
+
+An earlier section described this already too.
+
+=end for
+
+PIR has many other symbolic operators: arithmetic, concatenation, comparison,
+bitwise, and logical. All PIR operators are translated into one or more Parrot
+opcodes internally, but the details of this translation stay safely hidden from
+the programmer. Consider this example snippet:
 
   .local int sum
   sum = $I42 + 5
-  print sum
-  print "\n"
+  say sum
 
-The statement C<sum = $I42 + 5> translates to the equivalent statement
-C<add sum, $I42, 5>. This in turn will be translated to an equivalent
-PASM instruction which will be similar to C<add I0, I1, 5>. Notice that
-in the PASM instruction the register names do not have the C<$> symbol in
-front of them, and they've already been optimized into smaller numbers by
-the register allocator. The exact translation from PIR statement to PASM
-instruction isn't too important N<Unless you're hacking on the Parrot
-compiler!>, so we don't have to worry about it for now. We will talk more
-about PASM, its syntax and its instruction set in X<CHP-5> Chapter 5.
-Here are examples of some PIR symbolic operations:
+The statement C<sum = $I42 + 5> translates to the equivalent statement C<add
+sum, $I42, 5>.  PIR symbolic operations are:
 
   $I0 = $I1 + 5      # Addition
   $N0 = $N1 - 7      # Subtraction
@@ -530,14 +423,12 @@ A complete list of PIR operators is available in Chapter 13.
 
 =head2 C<=> and Type Conversion
 
-We've mostly glossed over the behavior of the C<=> operator, although it's
-a very powerful and important operator in PIR. In it's most simple form,
-C<=> stores a value into one of the Parrot registers. We've seen cases where
-it can be used to assign a string value to a C<string> register, or an integer
-value to an C<int> register, or a floating point value into a C<number>
-register, etc. However, the C<=> operator can be used to assign any type
-of value into any type of register, and Parrot will handle the conversion
-for you automatically:
+The C<=> operator is very powerful.  Its simplest form stores a value into one
+of the Parrot registers. It can assign a string value to a C<string> register,
+an integer value to an C<int> register, a floating point value into a C<number>
+register, etc. However, the C<=> operator can assign I<any> type of value into
+I<any> type of register; Parrot will handle the conversion for you
+automatically:
 
   $I0 = 5     # Integer. 5
   $S0 = $I0   # Stringify. "5"
@@ -550,19 +441,19 @@ sense when the value to convert is a number.
   $S0 = "parrot"
   $I0 = $S0        # 0
 
-We've also seen an example earlier where a string literal was set into a
-PMC register that had a type C<String>. This works for all the primitive
-types and their autoboxed PMC equivalents:
+An earlier example showed a string literal assigned to a PMC register of type
+C<String>. This works for all the primitive types and their autoboxed PMC
+equivalents:
 
   $P0 = new 'Integer'
   $P0 = 5
   $S0 = $P0      # Stringify. "5"
   $N0 = $P0      # Numify. 5.0
-  $I0 = $P0      # De-box. $I0 = 5
+  $I0 = $P0      # Unbox. $I0 = 5
 
   $P1 = new 'String'
   $P1 = "5 birds"
-  $S1 = $P1      # De-box. $S1 = "5 birds"
+  $S1 = $P1      # Unbox. $S1 = "5 birds"
   $I1 = $P1      # Intify. 5
   $N1 = $P1      # Numify. 5.0
 
@@ -570,72 +461,65 @@ types and their autoboxed PMC equivalents:
   $P2 = 3.14
   $S2 = $P2      # Stringify. "3.14"
   $I2 = $P2      # Intify. 3
-  $N2 = $P2      # De-box. $N2 = 3.14
-
+  $N2 = $P2      # Unbox. $N2 = 3.14
 
 =head2 Compilation Units
 
 Z<CHP-3-SECT-4.1>
 
-X<PIR (Parrot intermediate representation);subroutine>
-X<subroutine (PIR)>
-Subroutines in PIR are roughly equivalent to the subroutines or
-methods of a high-level language. Though they will be explained in
-more detail later, we introduce them here because all code in a PIR
-source file must be defined in a subroutine. We've already seen an
-example for the simplest syntax for a PIR subroutine. It starts with
-the C<.sub> directive and ends with the C<.end> directive:
+X<PIR (Parrot intermediate representation);subroutine> X<subroutine (PIR)>
+Subroutines in PIR are roughly equivalent to the subroutines or methods of a
+high-level language.  All code in a PIR source file must occur within a
+subroutine.  The simplest syntax for a PIR subroutine starts with the C<.sub>
+directive and ends with the C<.end> directiveN<The name C<main> is only a
+convention.>:
 
 =begin PIR
 
-  .sub main
-      print "Hello, Polly.\n"
+  .sub 'main'
+      say "Hello, Polly."
   .end
 
 =end PIR
 
-Again, we don't need to name the subroutine C<main>, it's just a common
-convention. This example defines a subroutine named C<main> that
-prints a string C<"Hello, Polly.">. The first subroutine in a file
-is normally executed first but you can flag any subroutine as the
-first one to execute with the C<:main> marker.
+This example defines a subroutine named C<main> that prints a string C<"Hello,
+Polly.">. Parrot will normally execute the first subroutine it encounters in
+the first file it runs, but you can flag any subroutine as the first one to
+execute with the C<:main> marker:
 
 =begin PIR
 
-  .sub first
-      print "Polly want a cracker?\n"
+  .sub 'first'
+      say "Polly want a cracker?"
   .end
 
-  .sub second :main
-      print "Hello, Polly.\n"
+  .sub 'second' :main
+      say "Hello, Polly."
   .end
 
 =end PIR
 
-This code prints out "Hello, Polly." but not "Polly want a cracker?".
-This is because the function C<second> has the C<:main> flag, so it is
-executed first. The function C<first>, which doesn't have this flag
-is never executed. However, if we change around this example a little:
+This code prints out "Hello, Polly." but not "Polly want a cracker?".  Though
+the C<first> function appears first in the source code, C<second> has the
+C<:main> flag and gets called.  C<first> is never called.  Revising that
+program produces different results:
 
 =begin PIR
 
-  .sub first :main
-      print "Polly want a cracker?\n"
+  .sub 'first' :main
+      say "Polly want a cracker?"
   .end
 
-  .sub second
-      print "Hello, Polly.\n"
+  .sub 'second'
+      say "Hello, Polly."
   .end
 
 =end PIR
 
-The output now is "Polly want a cracker?". Execution in PIR starts
-at the C<:main> function and continues until the end of that function
-only. If you want to do more stuff if your program, you will need to
-call other functions explicitly.
-
-Chapter 4 goes into much more detail about subroutines
-and their uses.
+The output now is "Polly want a cracker?". Execution in PIR starts at the
+C<:main> function and continues until that function ends.  To perform other
+operations, you must call other functions explicitly.  Chapter 4 describes
+subroutines and their uses.
 
 =head2 Flow Control
 
@@ -643,66 +527,60 @@ Z<CHP-3-SECT-5>
 
 X<PIR (Parrot intermediate representation);flow control>
 X<flow control;in PIR>
-Flow control in PIR is done entirely with conditional and unconditional
-branches to labels. This may seem simplistic and primitive, but
-remember that PIR is a thin overlay on the assembly language of a
-virtual processor, and is intended to be a simple target for the compilers
-of various. high-level languages. High level control structures are invariably linked
-to the language in which they are used, so any attempt by Parrot to
-provide these structures would work well for some languages but would
-require all sorts of messy translation in others. The only way to make
-sure all languages and their control structures can be equally
-accommodated is to simply give them the most simple and fundamental
-building blocks to work with. Language agnosticism is an important
-design goal in Parrot, and creates a very flexible and powerful
-development environment for our language developers.
 
-Notice that PIR
-does not, and will not, have high-level looping structures like C<while>
-or C<for> loops. PIR has some support for basic C<if> branching constructs,
-but will not support more complicated C<if>/C<then>/C<else> branch
-structures.
+Flow control in PIR occurs entirely with conditional and unconditional branches
+to labels. This may seem simplistic and primitive, but here PIR shows its roots
+as a thin overlay on the assembly language of a virtual processor.  PIR does
+not support high-level looping structures such as C<while> or C<for> loops. PIR
+has some support for basic C<if> branching constructs, but does not support
+more complicated C<if>/C<then>/C<else> branch structures.  
+
+The control structures of high-level languages hew tightly to the semantics of
+those languages; Parrot provides the minimal feature set necessary to implement
+any semantic of an HLL without dictating how that HLL may implement its
+features.  Language agnosticism is an important design goal in Parrot, and
+creates a very flexible and powerful development environment for language
+developers.
 
 X<goto instruction (PIR)>
-The most basic branching instruction is the unconditional branch:
-C<goto>.
+The most basic branching instruction is the unconditional branch, C<goto>:
 
 =begin PIR
 
-  .sub _main
+  .sub 'main'
       goto L1
-      print "never printed"
+      say "never printed"
+
   L1:
-      print "after branch\n"
+      say "after branch"
       end
   .end
 
 =end PIR
 
-The first C<print> statement never runs because the C<goto> always
-skips over it to the label C<L1>.
+The first C<say> statement never runs because the C<goto> always skips over it
+to the label C<L1>.
 
 The conditional branches combine C<if> or C<unless> with C<goto>.
 
 =begin PIR
 
-  .sub _main
+  .sub 'main'
       $I0 = 42
       if $I0 goto L1
-      print "never printed"
-  L1: print "after branch\n"
+      say "never printed"
+  L1:
+      say "after branch"
       end
   .end
 
 =end PIR
 
-X<if (conditional);instruction (PIR)>
-X<unless (conditional);instruction (PIR)>
-In this example, the C<goto> branches to the label C<L1> only if the
-value stored in C<$I0> is true. The C<unless> statement is quite
-similar, but branches when the tested value is false. An undefined
-value, 0, or an empty string are all false values. Any other values
-are considered to be true values.
+X<if (conditional);instruction (PIR)> X<unless (conditional);instruction (PIR)>
+In this example, the C<goto> branches to the label C<L1> only if the value
+stored in C<$I0> is true. The C<unless> statement is similar, but it branches
+when the tested value is false. An undefined value, 0, or an empty string are
+all false values. Any other values are true.
 
 The comparison operators (C<E<lt>>, C<E<lt>=>, C<==>, C<!=>, C<E<gt>>,
 C<E<gt>=>) can combine with C<if ...  goto>. These branch when the
@@ -710,24 +588,24 @@ comparison is true:
 
 =begin PIR
 
-  .sub _main
+  .sub 'main'
       $I0 = 42
       $I1 = 43
       if $I0 < $I1 goto L1
-      print "never printed"
+      say "never printed"
   L1:
-      print "after branch\n"
+      say "after branch"
       end
   .end
 
 =end PIR
 
-This example compares C<$I0> to C<$I1> and branches to the label C<L1>
-if C<$I0> is less than C<$I1>. The C<if $I0 E<lt> $I1 goto L1>
-statement translates directly to the PASM C<lt> branch operation.
+This example compares C<$I0> to C<$I1> and branches to the label C<L1> if
+C<$I0> is less than C<$I1>. The C<if $I0 E<lt> $I1 goto L1> statement
+translates directly to the C<lt> branch operation.
 
-The rest of the comparison operators are summarized in
-"PIR Instructions" in Chapter 11.
+Chapter 11's "PIR Instructions" section summarizes the other comparison
+operators.
 
 X<loops;PIR>
 X<PIR (Parrot intermediate representation);loop constructs>
@@ -736,7 +614,7 @@ unconditional branches handle iteration:
 
 =begin PIR
 
-  .sub _main
+  .sub 'main'
       $I0 = 1               # product
       $I1 = 5               # counter
 
@@ -745,8 +623,7 @@ unconditional branches handle iteration:
       dec $I1
       if $I1 > 0 goto REDO  # end of loop
 
-      print $I0
-      print "\n"
+      say $I0
       end
   .end
 

@@ -1,4 +1,5 @@
 #!./parrot
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 # OUTPUT="Ack(3, 9) = 4093\n"
 #

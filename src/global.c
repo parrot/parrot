@@ -130,7 +130,7 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
     PMC *ns = base_ns;
     INTVAL i, n;
 
-    if (pmc_key->vtable->base_type == enum_class_String) {
+    if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
         STRING *str_key = VTABLE_get_string(interp, pmc_key);
         return internal_ns_keyed_str(interp, base_ns, str_key, flags);
     }

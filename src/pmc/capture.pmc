@@ -546,9 +546,12 @@ Mark the array.
         /* XXX:  This workaround is for when we get here as
                  part of a subclass of Capture */
         if (PObj_is_object_TEST(SELF)) {
-            STRING *classname = CONST_STRING(INTERP, "Capture");
-            PMC    *classobj  = Parrot_oo_get_class_str(INTERP, classname);
             STRING *attribute = CONST_STRING(interp, "proxy");
+            PMC    *classobj;
+            PMC *ns = INTERP->root_namespace;
+            ns = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
+            ns = Parrot_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
+            classobj  = Parrot_oo_get_class(INTERP, ns);
             capt              = VTABLE_get_attr_keyed(interp, SELF, classobj, attribute);
         }
 

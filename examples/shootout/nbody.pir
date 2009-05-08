@@ -1,4 +1,5 @@
 #!./parrot
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 # The Computer Language Shootout
 # http://shootout.alioth.debian.org/

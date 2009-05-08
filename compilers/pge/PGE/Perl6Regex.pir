@@ -1,3 +1,4 @@
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -158,6 +159,24 @@ and someday may be refactored to a different location.
 
 =cut
 
+.sub 'trim'
+    .param string s
+    .local int rpos, lpos
+    rpos = length s
+    lpos = find_not_cclass .CCLASS_WHITESPACE, s, 0, rpos
+  rtrim_loop:
+    unless rpos > lpos goto rtrim_done
+    dec rpos
+    $I0 = is_cclass .CCLASS_WHITESPACE, s, rpos
+    if $I0 goto rtrim_loop
+  rtrim_done:
+    inc rpos
+    $I0 = rpos - lpos
+    $S0 = substr s, lpos, $I0
+    .return ($S0)
+.end
+
+
 .sub 'p6escapes'
     .param pmc mob
     .param pmc adverbs         :slurpy :named
@@ -223,6 +242,7 @@ and someday may be refactored to a different location.
   have_namepos:
     $I0 = namepos - pos
     $S0 = substr target, pos, $I0
+    $S0 = 'trim'($S0)
     $P0 = new 'CodeString'
     decnum = $P0.'charname_to_ord'($S0)
     if decnum < 0 goto err_unicode_name
@@ -241,8 +261,9 @@ and someday may be refactored to a different location.
   scan_xco_char_end:
     $S1 = chr decnum
     concat literal, $S1
-    $S0 = substr target, pos, 1
     unless isbracketed goto scan_xco_end
+    pos = find_not_cclass .CCLASS_WHITESPACE, target, pos, lastpos
+    $S0 = substr target, pos, 1
     if $S0 == ']' goto scan_xco_end
     if $S0 == '' goto err_missing_bracket
     if $S0 != ',' goto err_digit
@@ -1338,6 +1359,7 @@ Parse a modifier.
     keypos += 3
     $I0 -= keypos
     actionkey = substr target, keypos, $I0
+    actionkey = 'trim'(actionkey)
     mob['actionkey'] = actionkey
   end:
     mob.'to'(pos)

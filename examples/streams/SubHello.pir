@@ -17,7 +17,7 @@ Creates a C<Stream::Sub> and dumps it.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode "Stream/Sub.pir"
 
     stream = new "Stream::Sub"
 

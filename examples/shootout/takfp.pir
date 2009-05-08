@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # ./parrot -R cgp takfp.pir N         (N = 10 for shootout)

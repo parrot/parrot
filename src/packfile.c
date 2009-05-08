@@ -4818,7 +4818,6 @@ void
 Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(STRING *file_str))
 {
     ASSERT_ARGS(Parrot_load_bytecode)
-    char           *filename;
     STRING         *wo_ext, *ext, *pbc, *path;
     PMC            *is_loaded_hash;
     enum_runtime_ft file_type;

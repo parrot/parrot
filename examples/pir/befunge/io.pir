@@ -1,3 +1,4 @@
+# Copyright (C) 2002-2009, Parrot Foundation.
 # $Id$
 
 # ** string mode

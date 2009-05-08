@@ -97,6 +97,10 @@ sub runstep {
 
     $conf->cc_clean();
 
+    _set_intvalmaxmin($conf);
+
+    _set_floatvalmaxmin($conf);
+
     return 1;
 }
 
@@ -218,6 +222,59 @@ sub _set_hugefloatval {
             hugefloatvalsize => $conf->data->get('doublesize')
         );
     }
+}
+
+sub _set_intvalmaxmin {
+    my $conf = shift;
+    my $ivmin;
+    my $ivmax;
+    my $iv = $conf->data->get(qw(iv));
+
+    if ( $iv eq "int" ) {
+        $ivmin = 'INT_MIN';
+        $ivmax = 'INT_MAX';
+    }
+    elsif ( ( $iv eq "long" ) || ( $iv eq "long int" ) ) {
+        $ivmin = 'LONG_MIN';
+        $ivmax = 'LONG_MAX';
+    }
+    elsif ( ( $iv eq "long long" ) || ( $iv eq "long long int" ) ) {
+        # The assumption is that a compiler that have the long long type
+        # also provides his limit macros.
+        $ivmin = 'LLONG_MIN';
+        $ivmax = 'LLONG_MAX';
+    }
+    else {
+        die qq{Configure.pl:  Cannot find limits for type '$iv'\n};
+    }
+
+    $conf->data->set( intvalmin   => $ivmin );
+    $conf->data->set( intvalmax   => $ivmax );
+}
+
+sub _set_floatvalmaxmin {
+    my $conf = shift;
+    my $nvmin;
+    my $nvmax;
+    my $nv = $conf->data->get(qw(nv));
+
+    if ( $nv eq "double" ) {
+        $nvmin = 'DBL_MIN';
+        $nvmax = 'DBL_MAX';
+    }
+    elsif ( $nv eq "long double" ) {
+
+        # Stay way from long double for now (it may be 64 or 80 bits)
+        # die "long double not supported at this time, use double.";
+        $nvmin = 'LDBL_MIN';
+        $nvmax = 'LDBL_MAX';
+    }
+    else {
+        die qq{Configure.pl:  Cannot find limits for type '$nv'\n};
+    }
+
+    $conf->data->set( floatvalmin => $nvmin );
+    $conf->data->set( floatvalmax => $nvmax );
 }
 
 1;

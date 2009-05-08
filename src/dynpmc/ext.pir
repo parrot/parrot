@@ -1,3 +1,4 @@
+# Copyright (C) 2003-2009, Parrot Foundation.
 # $Id$
 
 .sub _ext_main

@@ -52,6 +52,7 @@ our @shared_valid_options = qw{
     maintainer
     mandir
     nomanicheck
+    no-line-directives
     oldincludedir
     opcode
     ops

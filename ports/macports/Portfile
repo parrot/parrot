@@ -3,8 +3,7 @@
 PortSystem              1.0
 
 name			parrot
-version			1.0.0
-revision		1
+version			1.1.0
 categories		lang devel
 maintainers		bfulgham coleda.com:will
 description		Open source virtual machine (for Perl6 et al.)
@@ -18,11 +17,13 @@ long_description	\
 
 platforms		darwin
 homepage		http://www.parrot.org/
-master_sites		ftp://ftp.parrot.org/pub/parrot/releases/stable/${version}/
+set release_type	devel ;# parrot nomenclature, not macport
+master_sites		ftp://ftp.parrot.org/pub/parrot/releases/${release_type}/${version}/
 
-checksums		md5 649ce1fb7c0edaf89dc1cd52ff267b1a \
-			sha1 9e028f5fff38a332c13ad4389652a016d7a824f7 \
-			rmd160 46f60accd33f16cc910f4ea03840badc358d22c7
+checksums           md5     bf31fd2313b105ba356921318efd3993 \
+                    sha1    5f18ddf92f588135a741e52618fbc456ba56cf34 \
+                    rmd160  a329c698442ec73412ac886da59f188c0ff1e080
+
 
 depends_build		bin:perl:perl5
 depends_lib		port:gmp port:icu
@@ -45,6 +46,13 @@ post-destroot {
 	set bindir	${destroot}${prefix}/bin
 	set docdir      ${destroot}${prefix}/share/doc/${name}
 
+        # It would be nice if the install linked properly, but for
+        # now, update the link information manually post install to
+        # use the install dir instead of the build dir.
+ 
+        set old_path "${workpath}/parrot-${version}/blib/lib/libparrot.dylib"
+        set new_path "${prefix}/lib/parrot/lib/libparrot.${version}.dylib"
+
         set executables {
             parrot parrot_config parrot_debugger
             pbc_disassemble pbc_info pbc_merge pbc_to_exe pbc_dump
@@ -52,13 +60,22 @@ post-destroot {
 
         foreach exe $executables { 
             # fixup the library path
-            set old_path "${workpath}/parrot-${version}/blib/lib/libparrot.dylib"
-            set new_path "${prefix}/lib/parrot/lib/libparrot.${version}.dylib"
 	    system "cd ${prefix}/lib/parrot/bin && \
                 install_name_tool -change \"$old_path\" \"$new_path\" ${exe}"
 
             # install into the common area.
             system "cd ${bindir} && ln -sf ${prefix}/lib/parrot/bin/${exe}"
         }
+
+        set dynamic_extensions {
+           digest_group libglutcb rational dynlexpad libnci_test subproxy
+        } 
+
+        foreach lib $dynamic_extensions {
+            # fixup the library path
+	    system "cd ${prefix}/lib/parrot/lib/${version}/dynext && \
+                install_name_tool -change \"$old_path\" \"$new_path\" ${lib}.bundle"
+        }
+
 	xinstall -m 755 -d ${docdir}
 }

@@ -106,9 +106,6 @@ Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
     return make_interpreter(parent, PARROT_NO_FLAGS);
 }
 
-extern void Parrot_initialize_core_pmcs(PARROT_INTERP);
-
-
 /*
 
 =item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>

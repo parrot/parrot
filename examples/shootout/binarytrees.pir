@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # binarytrees.pir N         (N = 16 for shootout)

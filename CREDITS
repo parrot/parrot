@@ -8,8 +8,8 @@
     works.  It is sorted by name and formatted to allow easy
     grepping and beautification by scripts.
     The fields are: name (N), email (E), web-address (W),
-    description (D), subversion username (U) and snail-mail
-    address (S).
+    description (D), main username (U), alias usernames (A)
+    and snail-mail address (S).
 
         Thanks,
 
@@ -229,6 +229,7 @@ N: Christoph Otto a.k.a. cotto
 U: cotto
 D: Patch for key flags in pdd08
 D: Range check in Env PMC
+A: christoph_googleacct@mksig.org
 D: Pipp
 E: christoph@mksig.org
 
@@ -291,7 +292,8 @@ D: Test for literals
 
 N: Daniel Arbelo Arrocha
 U: darbelo
-D: OpenBSD fixes and testing
+A: arbelo
+D: OpenBSD fixes and testing, gsoc2009-decnum-dynpmcs
 E: dany.arbelo@gmail.com
 
 N: Dave Woldrich
@@ -345,6 +347,7 @@ D: Debian packaging
 S: Chemnitz, Germany
 
 N: François Perrad
+A: Francois Perrad
 E: francois.perrad@gadz.org
 W: http://fperrad.googlepages.com/home
 U: fperrad
@@ -679,6 +682,7 @@ D: Patch reducing code duplication
 N: Mitchell N Charity
 
 N: Moritz A Lenz
+A: Moritz Lenz
 E: moritz@faui2k3.org
 U: moritz
 D: Test infrastructure for languages/perl6/ and Perl 6 in general
@@ -945,6 +949,7 @@ D: Win32, IO fixes
 
 N: Will "Coke" Coleda
 U: coke
+A: wcoleda
 E: will@coleda.com
 D: Tcl language (partcl), APL, website, various languages/ upkeep, misc.
 

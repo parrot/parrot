@@ -2,61 +2,64 @@
 
 =head1 Getting Started
 
-The first step before you start playing with Parrot 
+Before you can use Parrot, you have to get it running on your machine.
 
 =head2 Installing Parrot
 
-The simplest way to install Parrot is with pre-compiled binaries for
-your operating system or distribution. Packages are available for many
-packaging systems, including Debian, Ubuntu, Fedora, Mandriva, FreeBSD,
-Cygwin, and MacPorts. A current list of available packages is maintained
-at U<http://www.parrot.org/download>. A binary installer for Windows is
-also available at U<http://parrotwin32.sourceforge.net/>.
+The simplest way to install Parrot is to use a pre-compiled binary for your
+operating system or distribution. Packages are available for many packaging
+systems, including Debian, Ubuntu, Fedora, Mandriva, FreeBSD, Cygwin, and
+MacPorts. The Parrot website lists all known packages at
+U<http://www.parrot.org/download>. A binary installer for Windows is also
+available at U<http://parrotwin32.sourceforge.net/>.
 
-If packages aren't available on your system, you can download the latest
-supported release from U<http://www.parrot.org/release/supported>.
+If packages aren't available on your system, download the latest supported
+release from U<http://www.parrot.org/release/supported>.
 
-To build Parrot you'll need a C compiler and a make utility. Generally,
-you'll use F<gcc> and F<make>, but many different versions of these
-tools are supported on different operation systems. Perl is also needed
-for parts of the configuration and build process.
+You need a C compiler and a make utility to build Parrot from source code --
+usually C<gcc> and C<make>, but Parrot can build with standard compiler
+toolchains on different operating systems.  Perl 5.8 is also a prerequiste for
+configuring and building Parrot.
 
-The following command-line instructions build the core virtual machine
-and compiler toolkit, and run the standard test suite.
+If you have these dependencies installed, build the core virtual machine and
+compiler toolkit and run the standard test suite with the commands:
 
-  $ perl Configure.pl
-  $ make
-  $ make test
-  $ make install
+  $ B<perl Configure.pl>
+  $ B<make>
+  $ B<make test>
 
-If you're developing a language on Parrot, you'll also want to install
-the Parrot developer tools:
+By default, Parrot installs to directories F<bin/>, C<lib/>, et cetera under
+the prefix F</usr/local>.  If you have privileges to write to these
+directories, install Parrot with:
 
-  $ make install-dev
+  $ B<make install>
 
-By default, Parrot is installed in F</usr/local>, but you can
-specify a different location with the C<--prefix> flag to the
-configuration script.
+To install Parrot beneath a different prefix, use the C<--prefix> option to
+C<Configure.pl>:
 
-  $ perl Configure.pl --prefix=/home/me/parrot
+    $ B<perl Configure.pl --prefix=/home/me/parrot>
+
+If you intend to I<develop> -- not just I<use> -- a language on Parrot, install
+the Parrot developer tools as well:
+
+  $ B<make install-dev>
 
 =head2 Running Parrot
 
-Once you've installed Parrot, you can run your first small script. Create
-a test file called F<news.pasm>. C<.pasm>
-files are written in Parrot Assembly Language (PASM) which is a
+Once you've installed Parrot, run it.  Create a test file called F<news.pasm>.
+C<.pasm> files contain Parrot Assembly Language (PASM) instructions; this is a
 low-level language native to the Parrot virtual machine.
 
 =begin PASM
 
-  print "Here is the news for Parrots.\n"
+  say "Here is the news for Parrots."
   end
 
 =end PASM
 
 Now run this file with:
 
-  $ parrot news.pasm
+  $ B<parrot news.pasm>
 
 which will print:
 
@@ -79,85 +82,101 @@ which will print:
 
 =head2 What Next?
 
-This book provides details on the components of Parrot relevant to
-various development tasks. You may pick and choose chapters based on
-your area of interest:
+This book describes Parrot in terms of tasks it supports.  You may pick and
+choose chapters based on your area of interest:
 
 =over 4
 
 =item Chapter 3, I<Parrot Intermediate Representation>
 
-Parrot Intermediate Representation (PIR) is a mid-level language native
-to the Parrot virtual machine. It's commonly used for writing extensions
-and tools for Parrot.
+Parrot Intermediate Representation (PIR) is a mid-level language native to the
+Parrot virtual machine s commonly used for writing extensions and tools for
+Parrot.
 
 =item Chapter 4, I<Compiler Tools>
 
 The Parrot Compiler Toolkit (PCT) provides a common infrastructure and
-set of utilities for implementing languages on Parrot.
+utilities for implementing languages on Parrot.
 
 =item Chapter 5, I<Grammar Engine>
 
-The Parrot Grammar Engine (PGE) is a next-generation regular expression
-engine and recursive descent parser. PGE is part of the compiler tools,
-and the first step to implementing a language on Parrot.
+The Parrot Grammar Engine (PGE) is a powerful regular expression engine and
+recursive descent parser. PGE is part of the compiler tools; understanding PGE
+is essential to implementing a language on Parrot.
 
 =item Chapter 6, I<Grammar Actions>
 
-NQP (Not Quite Perl) is a lightweight language loosely inspired by the
-Perl 6 specification. NQP is part of the compiler tools and is an
-integral part of building language implementations on Parrot.
+NQP (Not Quite Perl) is a lightweight language loosely inspired by Perl 6. NQP
+is part of the compiler tools used for transforming a Parrot-hosted language
+into instructions for Parrot to execute.
 
 =item Chapter 7, I<Dynamic PMCs>
 
-Parrot allows dynamic extensions to Parrot's core data types. These are
-commonly used in more advanced language implementations. This chapter
-covers the details of writing and building these object extensions.
+=for author
+
+This chapter suggests the need for a chapter on core PMCs.  Alternately, this
+chapter could cover PMCs in general and dynpmcs as a special case of PMCs.
+
+=end for
+
+Parrot allows language developers to extend Parrot's core data types to suit
+the needs of advanced languages.
 
 =item Chapter 8, I<Dynamic Opcodes>
 
-Parrot allows dynamic extensions to the core instruction set. These are
-commonly used in more advanced language implementations. This chapter
-covers the details of writing and building these opcode extensions.
+=for author
+
+The same point applies for ops and dynops.
+
+=end for
+
+Parrot allows language developers to extend Parrot's core instruction set --
+again to suit the needs of advanced languages.
 
 =item Chapter 9, I<Parrot Assembly Language>
 
-Parrot Assembly Language (PASM) is a low-level language native to the
-Parrot virtual machine. It serves as a plain-English representation of
-Parrot's bytecode format.
+Parrot Assembly Language (PASM) is a low-level language native to the Parrot
+virtual machine. It serves as a source code representation of Parrot's bytecode
+format.
 
 =item Chapter 10, I<Instruction Reference>
 
-The standard instruction set for the Parrot virtual machine.
+Parrot's standard instruction set provides powerful behavior for primitive
+operations, control flow, object orientation, exception handling, and more.
 
 =item Chapter 11, I<Directive Reference>
 
-Out-of-band directives used within PIR/PASM code.
+Parrot supports directives used within PIR and PASM code to change the behavior
+of code and to control what happens in bytecode.
 
 =item Chapter 13, I<Operator Reference>
 
-Operator syntax in PIR code.
+PIR provides several higher-level operators as a convenience to programmers and
+code generators.
 
 =item Appendix A, I<Glossary>
 
-A quick reference to common Parrot terms.
+Parrot and its environment have common jargon.
 
 =item Appendix B, I<Command-Line Options>
 
-Further details on running Parrot.
+Parrot supports several flags to control execution modes, debugging, library
+loading, and more.
 
 =item Appendix C, I<Build Options>
 
-Dependencies and additional options for building Parrot from source.
+Parrot's configuration process gives administrators and developers tremendous
+control over the build system.
 
 =item Appendix D, I<Source Code>
 
-Navigating the Parrot source tree.
+Parrot's source code is organized along logical lines -- logical, once you know
+the layout.
 
 =item Appendix E, I<Patch Submission>
 
-How to submit a patch to Parrot.
-
+Parrot depends on the combined efforts of numerous volunteers.  Your
+contributions are very welcome.
 
 =back
 

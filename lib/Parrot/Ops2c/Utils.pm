@@ -133,7 +133,7 @@ sub new {
     my $sym_export =
         $flagref->{dynamic}
         ? 'PARROT_DYNEXT_EXPORT'
-        : 'PARROT_EXPORT';
+        : '';
 
     my $ops;
     if ( $flagref->{core} ) {

@@ -1785,38 +1785,47 @@ It is called by the ManagedStruct PMC's clone() function.
 PMC *
 Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv)
 {
-    struct jit_buffer_private_data *jit = (struct jit_buffer_private_data*)priv;
     PMC *rv = pmc_new(interp, pmc->vtable->base_type);
-    void *tmp, *freepriv, *clonepriv;
 
     VTABLE_init(interp, rv);
     /* copy the attributes */
-    GETATTR_ManagedStruct_custom_free_func(interp, pmc, tmp);
-    SETATTR_ManagedStruct_custom_free_func(interp, rv , tmp);
-    GETATTR_ManagedStruct_custom_clone_func(interp, pmc, tmp);
-    SETATTR_ManagedStruct_custom_clone_func(interp, rv , tmp);
-    GETATTR_ManagedStruct_custom_free_priv(interp , pmc, freepriv);
-    GETATTR_ManagedStruct_custom_clone_priv(interp, pmc, clonepriv);
-    if (freepriv) {
-        tmp = mem_sys_allocate(sizeof (struct jit_buffer_private_data));
-        memcpy(tmp, freepriv, sizeof (struct jit_buffer_private_data));
-        SETATTR_ManagedStruct_custom_free_priv(interp, rv , tmp);
-        if (clonepriv == freepriv) {
-            /* clonepriv is a copy of freepriv, make it a copy in the clone too. */
-            SETATTR_ManagedStruct_custom_clone_priv(interp, rv , tmp);
-            clonepriv = NULL; /* disable the clonepriv copying below */
-        }
+    {
+        void (*tmpfreefunc)(PARROT_INTERP, void*, void*);
+        GETATTR_ManagedStruct_custom_free_func(interp, pmc, tmpfreefunc);
+        SETATTR_ManagedStruct_custom_free_func(interp, rv , tmpfreefunc);
     }
-    if (clonepriv) {
-        tmp = mem_sys_allocate(sizeof (struct jit_buffer_private_data));
-        memcpy(tmp, clonepriv, sizeof (struct jit_buffer_private_data));
-        SETATTR_ManagedStruct_custom_clone_priv(interp, rv , tmp);
+    {
+        PMC* (*tmpclonefunc)(PARROT_INTERP, PMC*, void*);
+        GETATTR_ManagedStruct_custom_clone_func(interp, pmc, tmpclonefunc);
+        SETATTR_ManagedStruct_custom_clone_func(interp, rv , tmpclonefunc);
+    }
+
+    {
+        void *freepriv, *clonepriv;
+        GETATTR_ManagedStruct_custom_free_priv(interp , pmc, freepriv);
+        GETATTR_ManagedStruct_custom_clone_priv(interp, pmc, clonepriv);
+        if (freepriv) {
+            void *tmp = mem_sys_allocate(sizeof (struct jit_buffer_private_data));
+            memcpy(tmp, freepriv, sizeof (struct jit_buffer_private_data));
+            SETATTR_ManagedStruct_custom_free_priv(interp, rv , tmp);
+            if (clonepriv == freepriv) {
+                /* clonepriv is a copy of freepriv, make it a copy in the clone too. */
+                SETATTR_ManagedStruct_custom_clone_priv(interp, rv , tmp);
+                clonepriv = NULL; /* disable the clonepriv copying below */
+            }
+        }
+        if (clonepriv) {
+            void *tmp = mem_sys_allocate(sizeof (struct jit_buffer_private_data));
+            memcpy(tmp, clonepriv, sizeof (struct jit_buffer_private_data));
+            SETATTR_ManagedStruct_custom_clone_priv(interp, rv , tmp);
+        }
     }
 
     /* copy the execmem buffer */
     if (PARROT_MANAGEDSTRUCT(pmc)->ptr) {
-        void *newptr, *ptr = PARROT_MANAGEDSTRUCT(pmc)->ptr;
-        newptr = mem_alloc_executable(jit->size);
+        struct jit_buffer_private_data *jit = (struct jit_buffer_private_data*)priv;
+        void *ptr = PARROT_MANAGEDSTRUCT(pmc)->ptr;
+        void *newptr = mem_alloc_executable(jit->size);
         memcpy(newptr, ptr, jit->size);
         PARROT_MANAGEDSTRUCT(rv)->ptr = newptr;
     }

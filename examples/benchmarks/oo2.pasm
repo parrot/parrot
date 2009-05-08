@@ -1,3 +1,4 @@
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 # all timings Athlon 800, gcc 2.95.2

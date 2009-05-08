@@ -227,7 +227,11 @@ sub create_makefile {
     $config{'win32_libparrot_copy'} = $^O eq 'MSWin32' ? 'copy $(BUILD_DIR)\libparrot.dll .' : '';
     $maketext =~ s/@(\w+)@/$config{$1}/g;
     if ($^O eq 'MSWin32') {
+        # use backslashes.
         $maketext =~ s{/}{\\}g;
+        # wildcards (for clean rules) need an additional backslash, see Rakudo RT #65006
+        $maketext =~ s{\\\*}{\\\\*}g;
+        # use forward slashes again for HTTP URLs
         $maketext =~ s{http:\S+}{ do {my $t = $&; $t =~ s'\\'/'g; $t} }eg;
     }
 
@@ -873,7 +877,7 @@ my @tfiles = map { all_in($_) } sort @files;
 
 if (eval { require TAP::Harness; 1 }) {
     my %harness_options = (
-        exec      => ['./perl6'],
+        exec      => ['./@lclang@'],
         verbosity => 0+$Test::Harness::verbose,
         jobs      => $jobs || 1,
     );

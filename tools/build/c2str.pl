@@ -15,7 +15,6 @@ use lib 'lib';
 
 use Fcntl qw( :DEFAULT :flock );
 use Text::Balanced qw(extract_delimited);
-use Math::BigInt ();
 use Getopt::Long ();
 use IO::File ();
 
@@ -68,26 +67,14 @@ sub get_length {
     return length $s;
 }
 
-sub hash_val {
-    my $h = Math::BigInt->new('+0');
-    my $s = shift;
-    for ( my $i = 0 ; $i < length($s) ; ++$i ) {
-        $h += $h << 5;
-        $h &= 0xffffffff;
-        $h += ord substr( $s, $i, 1 );
-        $h &= 0xffffffff;
-    }
-    return sprintf( "0x%x", $h );
-}
-
 sub read_all {
     $ALL->seek(0, 0);
     while (<$ALL>) {
 
         # len hashval "string"
-        if (/(\d+)\s+(0x[\da-hA-H]+)\s+"(.*)"/) {
-            push @all_strings, [ $1, $2, $3 ];
-            $known_strings{$3} = @all_strings;
+        if (/(\d+)\s+"(.*)"/) {
+            push @all_strings, [ $1, $2 ];
+            $known_strings{$2} = @all_strings;
         }
     }
     return;
@@ -180,14 +167,13 @@ HEADER
         }
 
         my $len               = get_length($str);
-        my $hashval           = hash_val($str);
-        push @all_strings, [ $len, $hashval, $str ];
+        push @all_strings, [ $len, $str ];
 
         $n                    = @all_strings;
         $known_strings{$str}  = $n;
         $this_file_seen{"$const_string:$str"} = $line;
         print "#define _${const_string}_$line $n\n";
-        print $ALL qq!$len\t$hashval\t"$str"\n!;
+        print $ALL qq!$len\t"$str"\n!;
     }
     close($IN);
     return;
@@ -215,14 +201,13 @@ sub create_c_include {
 
 static const struct _cstrings {
     UINTVAL len;
-    Parrot_UInt4 hash_val;
     const char *string;
 } parrot_cstrings[] = {
-    { 0, 0, "" },
+    { 0, "" },
 HEADER
     my @all;
     for my $s (@all_strings) {
-        push @all, qq!    {$s->[0], $s->[1], "$s->[2]"}!;
+        push @all, qq!    {$s->[0], "$s->[1]"}!;
     }
     print $OUT join( ",\n", @all );
     print $OUT <<HEADER;

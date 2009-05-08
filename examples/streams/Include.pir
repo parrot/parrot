@@ -17,7 +17,7 @@ Creates a counter stream and dumps it.
 .sub _main
     .local pmc stream
 
-    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode "Stream/Sub.pir"
 
     stream = new "Stream::Sub"
 

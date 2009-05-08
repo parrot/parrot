@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 #
 # pidigits N  (N = 1000 for shootout)

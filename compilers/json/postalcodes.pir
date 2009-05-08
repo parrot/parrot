@@ -17,6 +17,8 @@ places with that code from around the world.
 
 =cut
 
+.include 'socket.pasm'
+
 .sub _main :main
     .param pmc argv
 
@@ -27,19 +29,19 @@ places with that code from around the world.
 
     postal = argv[1]
 
-    .local pmc sock
-    .local string address, buf, json_result
+    .local pmc sock, address
+    .local string buf, json_result
     json_result = ''
     .local int ret
     .local int len
 
     # create the socket handle
-    socket sock, 2, 1, 0
-    unless sock goto ERR
+    sock = new 'Socket'
+    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
 
     # Pack a sockaddr_in structure with IP and port
-    sockaddr address, 80, 'ws.geonames.org'
-    connect ret, sock, address
+    address = sock.'sockaddr'('ws.geonames.org', 80)
+    ret = sock.'connect'(address)
 
     .local string url
     url = 'http://ws.geonames.org/postalCodeSearchJSON?maxRows=10&postalcode='
@@ -47,12 +49,12 @@ places with that code from around the world.
 
     $S0 = 'GET '
     $S0 .= url
-    $S0 .= " HTTP/1.0\nUser-agent: Parrot\n\n"
-    send ret, sock, $S0
-    poll ret, sock, 1, 5, 0
+    $S0 .= " HTTP/1.0\r\nUser-agent: Parrot\r\n\r\n"
+    ret = sock.'send'($S0)
 MORE:
-    recv ret, sock, buf
-    if ret < 0 goto END
+    buf = sock.'recv'()
+    ret = length buf
+    if ret <= 0 goto END
     json_result .= buf
     goto MORE
 ERR:
@@ -103,6 +105,7 @@ END:
 
 bad_args:
     say "Usage: postcalcodes.pir <postal>"
+    .return()
 
 bad_code:
     say $P3

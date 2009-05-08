@@ -1003,7 +1003,7 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 {
     ASSERT_ARGS(C3_merge)
     PMC      *accepted   = PMCNULL;
-    PMC      *result     = pmc_new(interp, enum_class_ResizablePMCArray);
+    PMC      *result     = PMCNULL;
     const int list_count = VTABLE_elements(interp, merge_list);
     int       cand_count = 0;
     int       i;
@@ -1100,14 +1100,14 @@ PMC*
 Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 {
     ASSERT_ARGS(Parrot_ComputeMRO_C3)
+
+    PMC *merge_list        = PMCNULL;
+    PMC *immediate_parents = VTABLE_inspect_str(interp, _class, CONST_STRING(interp, "parents"));
     PMC *result;
-    PMC * const merge_list = pmc_new(interp, enum_class_ResizablePMCArray);
-    PMC *immediate_parents;
-    int i, parent_count;
+
+    int  i, parent_count;
 
     /* Now get immediate parents list. */
-    Parrot_PCCINVOKE(interp, _class, CONST_STRING(interp, "parents"),
-        "->P", &immediate_parents);
 
     if (!immediate_parents)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
@@ -1130,6 +1130,10 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
         if (PMC_IS_NULL(lin))
             return PMCNULL;
+
+        /* instantiated lazily */
+        if (PMC_IS_NULL(merge_list))
+            merge_list = pmc_new(interp, enum_class_ResizablePMCArray);
 
         VTABLE_push_pmc(interp, merge_list, lin);
     }

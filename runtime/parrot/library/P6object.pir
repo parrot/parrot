@@ -154,7 +154,7 @@ Return a true value if the invocant 'isa' C<x>.
 
 =cut
 
-.sub 'isa' :method
+.sub 'isa' :method :multi(_,_, _)
     .param pmc obj
     .param pmc x
 
@@ -182,19 +182,34 @@ Return a true value if the invocant 'can' C<x>.
 
 =item add_parent(parentclass [, 'to'=>parrotclass])
 
+Deprecated; use add_parent(class, parentclass)
+
 =cut
 
-.sub 'add_parent' :method
+.sub 'add_parent' :method :multi(_,_)
     .param pmc parentclass
     .param pmc options         :slurpy :named
 
-    parentclass = self.'get_parrotclass'(parentclass)
     $P0 = options['to']
     unless null $P0 goto have_to
     $P0 = self
   have_to:
+    .tailcall self.'add_parent'($P0, parentclass)
+.end
+
+
+=item add_parent(class, parentclass)
+
+=cut
+
+.sub 'add_parent' :method :multi(_,_,_)
+    .param pmc obj
+    .param pmc parentclass
+
+    parentclass = self.'get_parrotclass'(parentclass)
+
     .local pmc parrotclass
-    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass = self.'get_parrotclass'(obj)
     if null parrotclass goto end
 
     ##  if parrotclass isa parentclass, we're done
@@ -221,11 +236,18 @@ Return a true value if the invocant 'can' C<x>.
   method_loop:
     unless methoditer goto mro_loop
     $S0 = shift methoditer
-    push_eh method_next
+    $P0 = parrotclassns[$S0]
+    if null $P0 goto add_method
+    $I0 = isa $P0, 'MultiSub'
+    unless $I0 goto method_loop
+  add_method:
     $P0 = methods[$S0]
+    $I0 = isa $P0, 'NCI'
+    if $I0 goto method_loop
+    push_eh err
     parrotclassns.'add_sub'($S0, $P0)
-  method_next:
     pop_eh
+  err:
     goto method_loop
   mro_end:
 
@@ -237,9 +259,11 @@ Return a true value if the invocant 'can' C<x>.
 
 Add C<method> with C<name> to C<parrotclass>.
 
+DEPRECATED. Use add_method(class, name, method)
+
 =cut
 
-.sub 'add_method' :method
+.sub 'add_method' :method :multi(_,_,_)
     .param string name
     .param pmc method
     .param pmc options         :slurpy :named
@@ -248,15 +272,49 @@ Add C<method> with C<name> to C<parrotclass>.
     unless null $P0 goto have_to
     $P0 = self
   have_to:
+    .tailcall self.'add_method'($P0, name, method)
+.end
+
+
+=item add_method(class, name, method)
+
+Add C<method> with C<name> to C<class>.
+
+=cut
+
+
+.sub 'add_method' :method :multi(_,_,_,_)
+    .param pmc obj
+    .param string name
+    .param pmc method
+
     .local pmc parrotclass
-    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass = self.'get_parrotclass'(obj)
     parrotclass.'add_method'(name, method)
+.end
+
+
+=item add_attribute(class, name)
+
+Add C<method> with C<name> to C<class>.
+
+=cut
+
+.sub 'add_attribute' :method
+    .param pmc obj
+    .param string name
+    .param pmc options         :slurpy :named
+    .local pmc parrotclass
+    parrotclass = self.'get_parrotclass'(obj)
+    parrotclass.'add_attribute'(name)
 .end
 
 
 =item add_role(role, [, 'to'=>parrotclass])
 
 Add C<role> to C<parrotclass>.
+
+DEPRECATED. Use compose_role(class, role)
 
 =cut
 
@@ -268,8 +326,22 @@ Add C<role> to C<parrotclass>.
     unless null $P0 goto have_to
     $P0 = self
   have_to:
+    .tailcall self.'compose_role'($P0, role)
+.end
+
+
+=item compose_role(class, role)
+
+Add C<role> to C<class>.
+
+=cut
+
+.sub 'compose_role' :method
+    .param pmc obj
+    .param pmc role
+
     .local pmc parrotclass
-    parrotclass = self.'get_parrotclass'($P0)
+    parrotclass = self.'get_parrotclass'(obj)
     parrotclass.'add_role'(role)
 .end
 
@@ -591,6 +663,8 @@ Multimethod helper to return the parrotclass for C<x>.
     x = get_hll_namespace $P0
   x_ns:
     if null x goto done
+    $I0 = isa x, 'P6protoobject'
+    if $I0 goto x_p6object
     parrotclass = get_class x
   done:
     .return (parrotclass)
@@ -604,7 +678,7 @@ Multimethod helper to return the parrotclass for C<x>.
 
 =item get_string()  (vtable method)
 
-Returns the "shortname" of the protoobject's class.
+Returns the "shortname" of the protoobject's class and parens.
 
 =cut
 
@@ -612,8 +686,10 @@ Returns the "shortname" of the protoobject's class.
 
 .sub 'VTABLE_get_string' :method :vtable('get_string')
     $P0 = self.'HOW'()
-    $P1 = getattribute $P0, 'shortname'
-    .return ($P1)
+    $P1 = getattribute $P0, 'longname'
+    $S0 = $P1
+    $S0 = concat $S0, '()'
+    .return ($S0)
 .end
 
 =item defined()  (vtable method)

@@ -30,6 +30,9 @@ don't apply.
 #include "parrot/parrot.h"
 #include "pmc/pmc_key.h"
 
+/* the number of entries above which it's faster to hash the hashval instead of
+ * looping over the used HashBuckets directly */
+#define SMALL_HASH_SIZE  4
 #define INITIAL_BUCKETS 16
 
 /* HEADERIZER HFILE: include/parrot/hash.h */
@@ -1188,13 +1191,35 @@ HashBucket *
 parrot_hash_get_bucket(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 {
     ASSERT_ARGS(parrot_hash_get_bucket)
-    if (hash->entries > 0) {
+
+    if (hash->entries <= 0)
+        return NULL;
+
+    /* a very fast search for very small hashes */
+    if (hash->entries <= SMALL_HASH_SIZE) {
+        const UINTVAL  entries = hash->entries;
+        UINTVAL        i;
+
+        for (i = 0; i < entries; i++) {
+            HashBucket *bucket = hash->bs + i;
+
+            /* the hash->compare cost is too high for this fast path */
+            if (bucket->key && bucket->key == key)
+                return bucket;
+        }
+    }
+
+    /* if the fast search didn't work, try the normal hashing search */
+    {
         const UINTVAL hashval = (hash->hash_val)(interp, key, hash->seed);
         HashBucket   *bucket  = hash->bi[hashval & hash->mask];
 
         while (bucket) {
-            /* store hash_val or not */
-            if ((hash->compare)(interp, key, bucket->key) == 0)
+            /* key equality is always a match, so it's worth checking */
+            if (bucket->key == key
+
+            /* ... but the slower comparison is more accurate */
+            || ((hash->compare)(interp, key, bucket->key) == 0))
                 return bucket;
             bucket = bucket->next;
         }

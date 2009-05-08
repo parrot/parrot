@@ -1,3 +1,4 @@
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 # Set up a PAST data structure that represents a sub and run it.

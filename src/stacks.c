@@ -147,24 +147,6 @@ mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
 
 /*
 
-=item C<void stack_destroy(Stack_Chunk_t *top)>
-
-stack_destroy() doesn't need to do anything, since GC does it all.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-stack_destroy(SHIM(Stack_Chunk_t *top))
-{
-    ASSERT_ARGS(stack_destroy)
-    /* GC does it all */
-}
-
-/*
-
 =item C<size_t stack_height(PARROT_INTERP, const Stack_Chunk_t *chunk)>
 
 Returns the height of the stack. The maximum "depth" is height - 1.

@@ -1584,8 +1584,8 @@ void Parrot_emit_jump_to_eax(Parrot_jit_info_t *jit_info, PARROT_INTERP);
 
 #  include "parrot/oplib/ops.h"
 
-EXTERN INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
-EXTERN void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
+INTVAL Parrot_FixedIntegerArray_get_integer_keyed_int(Interp*, PMC*, INTVAL);
+void Parrot_FixedIntegerArray_set_integer_keyed_int(Interp*, PMC*, INTVAL, INTVAL);
 
 char * jit_set_i_p_ki(Parrot_jit_info_t *jit_info, PARROT_INTERP,
     size_t offset);

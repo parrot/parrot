@@ -411,7 +411,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
                 }
             }
         }
-        return (INTVAL)Parrot_default_get_integer(interp, pmc);
+        return interp->vtables[enum_class_default]->get_integer(interp, pmc);
     }
 
 /*
@@ -614,7 +614,7 @@ Invokes the object (if this vtable function is overridden).
             }
         }
 
-        return (opcode_t *)Parrot_default_invoke(interp, pmc, next);
+        return (opcode_t *)interp->vtables[enum_class_default]->invoke(interp, pmc, next);
     }
 
 /*

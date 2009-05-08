@@ -131,6 +131,7 @@ sub send_archive_to_smolder {
             password     => $SMOLDER_CONFIG{password},
             tags         => $tags,
             report_file  => $report_file,
+            revision     => $PConfig{revision},
         ]
     );
 
@@ -191,7 +192,6 @@ sub collect_test_environment_data {
         'Optimize'     => ($PConfig{optimize} || 'none'),
         'Perl Version' => (sprintf('%vd', $^V) . " $PConfig{archname}"),
         'Platform'     => $PConfig{osname},
-        'SVN Revision' => $PConfig{revision},
         'Version'      => $PConfig{VERSION},
         'Submitter'    => $ENV{"SMOLDER_SUBMITTER"} || "$me\@$domain"
     );

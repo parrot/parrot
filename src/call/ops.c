@@ -201,9 +201,10 @@ runops_args(PARROT_INTERP, ARGIN(PMC *sub), ARGIN_NULLOK(PMC *obj),
     const char *sig_p;
     Parrot_Context * const old_ctx = CONTEXT(interp);
 
-    interp->current_cont  = new_ret_continuation_pmc(interp, NULL);
+    interp->current_cont   = new_ret_continuation_pmc(interp, NULL);
     interp->current_object = obj;
-    dest = VTABLE_invoke(interp, sub, NULL);
+    dest                   = VTABLE_invoke(interp, sub, NULL);
+
     if (!dest)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PARROT_USAGE_ERROR,
             "Subroutine returned a NULL address");

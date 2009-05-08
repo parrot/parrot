@@ -288,6 +288,12 @@ my @hlls = (
         scm        => 'GIT',
         repository => 'git://github.com/fperrad/wmlscript.git'
     },
+
+    {
+        name       => 'xml',
+        scm        => 'GIT',
+        repository => 'git://github.com/fperrad/xml.git'
+    },
 );
 
 foreach (@hlls) {

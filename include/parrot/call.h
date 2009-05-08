@@ -403,7 +403,8 @@ void* Parrot_run_meth_fromc_arglist(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
+FLOATVAL /*@alt void@*/
+Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN_NULLOK(PMC *obj),
     ARGIN(STRING *meth),
@@ -417,7 +418,8 @@ FLOATVAL Parrot_run_meth_fromc_arglist_retf(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
-INTVAL Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
+INTVAL /*@alt void@*/
+Parrot_run_meth_fromc_arglist_reti(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN_NULLOK(PMC *obj),
     ARGIN(STRING *meth),
@@ -444,7 +446,8 @@ void* Parrot_run_meth_fromc_args(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
+FLOATVAL /*@alt void@*/
+Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN_NULLOK(PMC *obj),
     ARGIN(STRING *meth),
@@ -457,7 +460,8 @@ FLOATVAL Parrot_run_meth_fromc_args_retf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-INTVAL Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
+INTVAL /*@alt void@*/
+Parrot_run_meth_fromc_args_reti(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN_NULLOK(PMC *obj),
     ARGIN(STRING *meth),
@@ -488,7 +492,8 @@ void * Parrot_runops_fromc_arglist(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP,
+FLOATVAL /*@alt void@*/
+Parrot_runops_fromc_arglist_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN(const char *sig),
     va_list args)
@@ -498,7 +503,8 @@ FLOATVAL Parrot_runops_fromc_arglist_retf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-INTVAL Parrot_runops_fromc_arglist_reti(PARROT_INTERP,
+INTVAL /*@alt void@*/
+Parrot_runops_fromc_arglist_reti(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN(const char *sig),
     va_list args)
@@ -530,7 +536,8 @@ void * Parrot_runops_fromc_args_event(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP,
+FLOATVAL /*@alt void@*/
+Parrot_runops_fromc_args_retf(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN(const char *sig),
     ...)
@@ -540,7 +547,8 @@ FLOATVAL Parrot_runops_fromc_args_retf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
-INTVAL Parrot_runops_fromc_args_reti(PARROT_INTERP,
+INTVAL /*@alt void@*/
+Parrot_runops_fromc_args_reti(PARROT_INTERP,
     ARGIN(PMC *sub),
     ARGIN(const char *sig),
     ...)

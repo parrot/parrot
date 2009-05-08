@@ -164,6 +164,10 @@ Make sure everything works:
  $ make world docs html 2>&1 | tee make_world_docs_html.log
  $ make fulltest        2>&1 | tee make_fulltest.log
 
+Verify that the version is correct and doesn't contain the suffix C<devel>:
+
+ $ ./parrot -V
+
 =item 7.
 
 Tag the release as "RELEASE_a_b_c", where a.b.c is the version number.
@@ -225,6 +229,8 @@ Update the website. You will need an account on L<http://www.parrot.org>.
 
 =item a
 
+At this step, the "editor" privilege is needed, "poster" is not enough.
+
 Add a new page for the release announcement with "Create content" -> "Story".
 There's some additional stuff needed at the top of the page; use one of the
 old announcements as a guide.
@@ -251,6 +257,8 @@ Under "Publishing options" make sure "Published" and "Promoted to front page"
 are checked.
 
 =item e
+
+At this step, the "admin" privilege is needed.
 
 Under "Administer" -> "Site building" -> "URL Redirects", change the URL for
 "release/current" to the FTP directory for the new release (for example,
@@ -316,7 +324,9 @@ can have their milestone unset.
 =item 13.
 
 Add the version to Trac so new bug reports can be filed against your
-buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>
+buggy code. L<https://trac.parrot.org/parrot/admin/ticket/versions>.
+
+Make the latest released version the default version for new reports.
 
 Remove any sufficiently old versions listed there.
 

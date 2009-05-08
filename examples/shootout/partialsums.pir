@@ -1,4 +1,5 @@
 #!./parrot -R cgp
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 #
 # partialsums N  (N = 2500000 for shootout)

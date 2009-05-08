@@ -1,3 +1,4 @@
+# Copyright (C) 2005-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -237,6 +238,18 @@ Returns the portion of the target string matched by this object.
 
 .sub 'text' :method
     .tailcall self.'Str'()
+.end
+
+
+=item C<orig()>
+
+Return the original item being matched.
+
+=cut
+
+.sub 'orig' :method
+    $P0 = getattribute self, '$!target'
+    .return ($P0)
 .end
 
 

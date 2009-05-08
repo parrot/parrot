@@ -728,7 +728,7 @@ Multiply C<value> with C<SELF> inplace.
 
 
     MULTI void i_multiply(BigInt value) {
-        Parrot_BigInt_multiply_int(INTERP, value, SELF.get_integer(), SELF);
+        interp->vtables[enum_class_BigInt]->multiply_int(INTERP, value, SELF.get_integer(), SELF);
     }
 
 
@@ -1157,13 +1157,16 @@ The C<==> operation.
 */
 
     VTABLE INTVAL is_equal(PMC *value) {
+        INTVAL retval;
         PMC *temp;
 
         switch (value->vtable->base_type) {
             case enum_class_BigInt:
                 temp = pmc_new(INTERP, enum_class_BigInt);
                 VTABLE_set_integer_native(INTERP, temp, SELF.get_integer());
-                return Parrot_BigInt_multi_is_equal_BigInt(INTERP, temp, value);
+                Parrot_mmd_multi_dispatch_from_c_args(interp,
+                    "is_equal", "PP->I", temp, value, &retval);
+                return retval;
                 break;
             default:
                 return (VTABLE_get_integer(INTERP, SELF)

@@ -145,11 +145,13 @@ void emit_debug_info(ARGIN(bytecode * const bc), int sourceline)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
-opcode_t emit_int_arg(ARGIN(bytecode * const bc), int intval)
+opcode_t /*@alt void@*/
+emit_int_arg(ARGIN(bytecode * const bc), int intval)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
-opcode_t emit_opcode(ARGIN(bytecode * const bc), opcode_t op)
+opcode_t /*@alt void@*/
+emit_opcode(ARGIN(bytecode * const bc), opcode_t op)
         __attribute__nonnull__(1);
 
 FLOATVAL get_num_const(ARGIN(bytecode * const bc), unsigned index)

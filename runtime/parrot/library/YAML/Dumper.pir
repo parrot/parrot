@@ -1,3 +1,4 @@
+# Copyright (C) 2008-2009, Parrot Foundation.
 # $Id$
 
 .sub __library_data_dumper_onload :load

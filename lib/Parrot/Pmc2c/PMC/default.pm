@@ -49,6 +49,34 @@ sub pre_method_gen {
     return 1;
 }
 
+sub update_vtable_func {
+    "";
+}
+
+# Really build default vtable.
+sub get_vtable_func {
+    my ($self) = @_;
+
+    my $cout = "";
+
+    my $vtable_decl = $self->vtable_decl("temp_vtable", 'enum_class_default');
+
+    $cout .= <<"EOC";
+
+PARROT_EXPORT VTABLE* Parrot_default_get_vtable(PARROT_INTERP) {
+
+    static const char attr_defs [] = "";
+
+$vtable_decl
+
+    return Parrot_clone_vtable(interp, &temp_vtable);
+}
+
+EOC
+
+    $cout;
+}
+
 1;
 
 # Local Variables:
