@@ -138,6 +138,9 @@ static int trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 #define POOL_MAX_BYTES                         65536 * 128
 
+/* Set when walking the system stack */
+int CONSERVATIVE_POINTER_CHASING = 0;
+
 /*
 
 =item C<void Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)>

@@ -45,9 +45,6 @@ static PMC_EXT * new_pmc_ext(PARROT_INTERP)
 
 #if ! DISABLE_GC_DEBUG
 
-/* Set when walking the system stack */
-int CONSERVATIVE_POINTER_CHASING = 0;
-
 #endif
 
 /*
