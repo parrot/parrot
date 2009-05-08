@@ -33,6 +33,12 @@ static void free_pool(ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pool);
 
+static void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
+    SHIM(Small_Object_Pool *pool),
+    ARGMOD(PObj *b))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*b);
+
 static int sweep_cb_buf(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     SHIM(int flag),
@@ -55,6 +61,8 @@ static int sweep_cb_pmc(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_Parrot_gc_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool) \
@@ -208,6 +216,43 @@ new_buffer_pool(PARROT_INTERP)
 
     return pool;
 }
+
+/*
+
+=item C<static void Parrot_gc_free_buffer_malloc(PARROT_INTERP,
+Small_Object_Pool *pool, PObj *b)>
+
+Frees the given buffer, returning the storage space to the operating system
+and removing it from Parrot's memory management system. If the buffer is COW,
+The buffer is not freed if the reference count is greater then 1.
+
+=cut
+
+*/
+
+static void
+Parrot_gc_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
+        ARGMOD(PObj *b))
+{
+    ASSERT_ARGS(Parrot_gc_free_buffer_malloc)
+    /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
+     * external */
+    PObj_buflen(b) = 0;
+
+    if (!PObj_bufstart(b) || PObj_is_external_or_free_TESTALL(b))
+        return;
+
+    if (PObj_COW_TEST(b)) {
+        INTVAL * const refcount = PObj_bufrefcountptr(b);
+
+        if (--(*refcount) == 0) {
+            mem_sys_free(refcount); /* the actual bufstart */
+        }
+    }
+    else
+        mem_sys_free(PObj_bufrefcountptr(b));
+}
+
 
 
 /*
