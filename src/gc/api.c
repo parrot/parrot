@@ -223,7 +223,7 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 
 /*
 
-=item C<void * new_bufferlike_header(PARROT_INTERP, size_t size)>
+=item C<void * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)>
 
 Returns a new buffer-like header from the appropriate sized pool.
 A "bufferlike object" is an object that is considered to be isomorphic to the
@@ -243,6 +243,23 @@ Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
     Small_Object_Pool * const pool = get_bufferlike_pool(interp, size);
 
     return get_free_buffer(interp, pool);
+}
+
+/*
+
+=item C<void Parrot_gc_free_bufferlike_header(PARROT_INTERP, PObj *obj, size_t
+size)>
+
+=cut
+
+*/
+
+void
+Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(PObj *obj),
+    size_t size)
+{
+    Small_Object_Pool * const pool = get_bufferlike_pool(interp, size);
+    pool->add_free_object(interp, pool, obj);
 }
 
 

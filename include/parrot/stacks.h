@@ -29,7 +29,6 @@ struct Small_Object_Pool; /* forward decl */
 typedef struct Stack_Chunk {
     UnionVal            cache;
     Parrot_UInt         flags;
-    struct Small_Object_Pool  *pool;
     const char         *name;
     struct Stack_Chunk *prev;
     Parrot_UInt         refcount;

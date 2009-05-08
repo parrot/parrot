@@ -82,6 +82,13 @@ void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*b);
 
+void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
+    ARGMOD(PObj *obj),
+    size_t size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*obj);
+
 void Parrot_gc_free_pmc(PARROT_INTERP,
     SHIM(Small_Object_Pool *pool),
     ARGMOD(PObj *p))
@@ -137,6 +144,10 @@ void Parrot_gc_profile_start(PARROT_INTERP)
     || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_Parrot_gc_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_Parrot_gc_free_bufferlike_header \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(obj)
 #define ASSERT_ARGS_Parrot_gc_free_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(p)
