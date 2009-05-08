@@ -616,7 +616,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *in
     size_t           i;
 
     for (i = 0; i < hash->entries; i++) {
-        HashBucket *b = hash->bs+i;
+        HashBucket * const b = hash->bs+i;
 
         switch (hash->key_type) {
             case Hash_key_type_STRING:
