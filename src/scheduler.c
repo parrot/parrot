@@ -1008,7 +1008,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
 #if PARROT_HAS_THREADS
     Parrot_cond condition;
     Parrot_mutex lock;
-    FLOATVAL timer_end = time + Parrot_floatval_time();
+    const FLOATVAL timer_end = time + Parrot_floatval_time();
     struct timespec time_struct;
 
     /* Tell the scheduler runloop to wake, this is a good time to process
@@ -1029,7 +1029,7 @@ Parrot_cx_schedule_sleep(PARROT_INTERP, FLOATVAL time, ARGIN_NULLOK(opcode_t *ne
     /* A more primitive, platform-specific, non-threaded form of sleep. */
     if (time > 1000) {
         /* prevent integer overflow when converting to microseconds */
-        int seconds = floor(time);
+        const int seconds = floor(time);
         Parrot_sleep(seconds);
         time -= seconds;
     }
