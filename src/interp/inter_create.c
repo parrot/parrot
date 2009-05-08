@@ -151,7 +151,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->recursion_limit = RECURSION_LIMIT;
 
     /* Must initialize flags here so the GC_DEBUG stuff is available before
-     * mem_setup_allocator() is called. */
+     * Parrot_gc_initialize() is called. */
     interp->flags = flags;
 
     /* PANIC will fail until this is done */
@@ -168,7 +168,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     }
 
     /* Set up the memory allocation system */
-    mem_setup_allocator(interp, (void*)&stacktop);
+    Parrot_gc_initialize(interp, (void*)&stacktop);
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 

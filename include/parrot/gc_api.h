@@ -55,9 +55,6 @@
 /* HEADERIZER BEGIN: src/gc/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
-        __attribute__nonnull__(1);
-
 void Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -80,6 +77,9 @@ void Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*p);
 
+void Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 void * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
@@ -95,8 +95,6 @@ PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_gc_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
@@ -110,6 +108,8 @@ STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 #define ASSERT_ARGS_Parrot_gc_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(p)
+#define ASSERT_ARGS_Parrot_gc_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_new_bufferlike_header \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

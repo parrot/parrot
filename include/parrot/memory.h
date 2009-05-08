@@ -111,7 +111,7 @@ void * mem__internal_realloc_zeroed(
     int line)
         __attribute__nonnull__(4);
 
-void mem_setup_allocator(PARROT_INTERP, ARGIN(void *stacktop))
+void Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -130,7 +130,7 @@ void mem_setup_allocator(PARROT_INTERP, ARGIN(void *stacktop))
        PARROT_ASSERT_ARG(file)
 #define ASSERT_ARGS_mem__internal_realloc_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(file)
-#define ASSERT_ARGS_mem_setup_allocator __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_gc_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(stacktop)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

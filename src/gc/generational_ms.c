@@ -120,7 +120,7 @@ typedef struct Gc_gms_private {
     UINTVAL current_gen_no;             /* the nursery generation number */
 } Gc_gms_private;
 
-/* HEADERIZER HFILE: include/parrot/gc_api.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

@@ -332,7 +332,7 @@ a sleep opcode.
 #include "parrot/gc_api.h"
 #include "parrot/gc_mark_sweep.h"
 
-/* HEADERIZER HFILE: include/parrot/gc_api.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

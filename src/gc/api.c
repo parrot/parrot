@@ -49,6 +49,45 @@ static PMC_EXT * new_pmc_ext(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_gc_initialize(PARROT_INTERP, void *stacktop)>
+
+Initializes the memory allocator and the garbage collection subsystem.
+Calls the initialization function associated with each collector, which
+is determined at compile time.
+
+The "stacktop" parameter is required; it provides an upper bound for
+stack scanning during a garbage collection run.
+
+=cut
+
+*/
+
+void
+Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+{
+    ASSERT_ARGS(Parrot_gc_initialize)
+    interp->arena_base = mem_allocate_zeroed_typed(Arenas);
+    interp->arena_base->sized_header_pools = NULL;
+
+    interp->lo_var_ptr = stacktop;
+
+#if PARROT_GC_MS
+    Parrot_gc_ms_init(interp);
+#endif
+#if PARROT_GC_IMS
+    Parrot_gc_ims_init(interp);
+#endif
+#if PARROT_GC_GMS
+    Parrot_gc_gms_init(interp);
+#endif
+
+    Parrot_initialize_memory_pools(interp);
+    Parrot_initialize_header_pools(interp);
+}
+
+
+/*
+
 =item C<PMC * Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)>
 
 Gets a new PMC header from the PMC pool's free list. Guaranteed to return a
