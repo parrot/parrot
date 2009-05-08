@@ -64,7 +64,7 @@ EOC
 
 sub _generate_default_method {
     my ($self, $pmc, $method, $stub_func) = @_;
-        
+
     my $clone = $method->clone(
          {
              parent_name => $self->name,
