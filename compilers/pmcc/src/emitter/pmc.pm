@@ -29,6 +29,8 @@ method generate_h_file() {
 
         self.generate_casting_macro(), "\n",
 
+        self.generate_attr_accessors(), "\n",
+
         '#endif /* ', $guard, " */ \n"
     )
     );
@@ -100,6 +102,46 @@ method generate_casting_macro() {
         "#define PARROT_" ~ self.ucname ~ "(o) ((Parrot_" ~ self.name ~ "_attributes *) PMC_data(o))\n";
 }
 
+
+#=item C<generate_attr_accessors>
+#
+#Generate a macros to manipulate ATTRs
+#
+#=cut
+
+method generate_attr_accessors() {
+
+    my @attrs := self.attrs;    
+    my @accessors;
+
+    for @attrs {
+        @accessors.push( self.generate_get_accessor($_<type>,$_<name>) );
+        #@accessors.push( self.generate_set_accessor($_<type>,$_<name>);
+    }
+
+    return join("\n", @accessors);
+}
+
+
+method generate_get_accessor($type, $attr_name) {
+
+    my $macro_start := 
+"#define GETATTR_" ~ self.name ~ "_" ~ $attr_name ~ "(interp, pmc, dest) \\
+do { \\
+    if (PObj_is_object_TEST(pmc)) { \\\n";
+
+    #XXX: Put code to generate the accessor body here.
+
+    my $macro_end :=
+"    } \\
+    else \\
+        (dest) = ((Parrot_" ~ self.name ~ "_attributes *)PMC_data(pmc))->" ~ $attr_name ~ "; \\
+} while (0);\n";
+
+    return $macro_start ~ $macro_end;
+}
+
+
 #=item C<generate_c_file>
 #
 #Generate C file for PMC.
@@ -156,6 +198,13 @@ method generate_class_init() {
 
     @res.push("\n}\n");
     join('', @res);
+}
+
+method dumper($x) {
+    PIR q<
+        load_bytecode "dumper.pbc"
+    >;
+    _dumper($x);
 }
 
 method attrs() {
