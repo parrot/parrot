@@ -43,7 +43,6 @@ Initializes the continuation.
         PMC_data(SELF) = attrs;
 
         PMC_cont(SELF) = new_ret_continuation(INTERP);
-        PMC_data(SELF) = attrs;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -64,11 +63,10 @@ Initializes the continuation.
 
 =item C<PMC *clone>
 
-Return a new Continuation PMC with the context of SELF. Note: the
-returned object is not a RetContinuation and creating a real
-Continuation invalidates all RetContinuation all the way up the call
-chain that is, these can't be recycled, they get persistent until
-the GC gets at them.
+Return a new Continuation PMC with the context of SELF. Note: the returned
+object is not a RetContinuation and creating a real Continuation invalidates
+all RetContinuation all the way up the call chain.  That is, these can't be
+recycled; they persist until the GC gets at them.
 
 =cut
 
@@ -81,7 +79,7 @@ the GC gets at them.
 
 =item C<opcode_t *invoke(void *next)>
 
-Transfers control to the calling context, and frees the current context.
+Transfers control to the calling context and frees the current context.
 
 =cut
 
@@ -98,7 +96,6 @@ Transfers control to the calling context, and frees the current context.
         Parrot_continuation_rewind_environment(interp, SELF, cc);
         Parrot_free_context(INTERP, from_ctx, 1);
 
-#ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
         VTABLE_destroy(interp, SELF);
         {
@@ -111,7 +108,6 @@ Transfers control to the calling context, and frees the current context.
             pool->add_free_object(interp, pool, (PObj *)SELF);
             pool->num_free_objects++;
         }
-#else
         cc->from_ctx = NULL;
 
         /*
@@ -119,15 +115,14 @@ Transfers control to the calling context, and frees the current context.
          * NULLify it or turn off the custom_mark bit
          */
         cc->to_ctx = NULL;
-#endif
 
         if (INTERP->code != seg)
             Parrot_switch_to_cs(INTERP, seg, 1);
 
         return next;
     }
-
 }
+
 
 /*
 
