@@ -31,7 +31,7 @@ foreach my $branch (@branches) {
     my $creator = $oldest->first_child('author')->xml_text;
 
     my (%authors,%components);
-    my $merge_log = 'N/A';
+    my $merge_log;
     foreach my $entry ($t->root->children('logentry')) {
             $authors{$entry->first_child('author')->xml_text}++;
             my $msg = $entry->first_child('msg')->xml_text;
@@ -49,6 +49,7 @@ foreach my $branch (@branches) {
                     }
             }
     }
+    $merge_log //= 'N/A';
 
     my $revisions =  'r' .$oldest->atts->{revision} . ':' .
         $newest->atts->{revision};
