@@ -383,14 +383,18 @@ op peek(out STR) :base_io {
   STRING ** const s = &$1;
 
   *s = NULL;
-  Parrot_io_peek(interp, _PIO_STDIN(interp), s);
+  if(Parrot_io_peek(interp, _PIO_STDIN(interp), s) < 0) {
+    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+  }
 }
 
 op peek(out STR, invar PMC) :base_io {
   STRING ** const s = &$1;
 
   *s = NULL;
-  Parrot_io_peek(interp, $2, s);
+  if(Parrot_io_peek(interp, $2, s) < 0) {
+    $1 = Parrot_str_new_noinit(interp, enum_stringrep_one, 0);
+  }
 }
 
 ##########################################
