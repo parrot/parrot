@@ -184,7 +184,9 @@ void Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
-INTVAL Parrot_io_fprintf(PARROT_INTERP,
+PARROT_IGNORABLE_RESULT
+INTVAL /*@alt void@*/
+Parrot_io_fprintf(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     ARGIN(const char *s),
     ...)
@@ -201,6 +203,7 @@ PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -214,6 +217,7 @@ INTVAL Parrot_io_is_tty(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_make_offset(INTVAL offset);
 
 PARROT_EXPORT
@@ -233,6 +237,7 @@ PMC * Parrot_io_open(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_io_peek(PARROT_INTERP,
     ARGMOD(PMC *pmc),
     ARGOUT(STRING **buffer))
@@ -243,7 +248,11 @@ INTVAL Parrot_io_peek(PARROT_INTERP,
         FUNC_MODIFIES(*buffer);
 
 PARROT_EXPORT
-INTVAL Parrot_io_printf(PARROT_INTERP, ARGIN(const char *s), ...)
+PARROT_IGNORABLE_RESULT
+INTVAL /*@alt void@*/
+Parrot_io_printf(PARROT_INTERP,
+    ARGIN(const char *s),
+    ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -296,6 +305,7 @@ PMC * Parrot_io_STDERR(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_io_stdhandle(PARROT_INTERP,
     INTVAL fileno,
@@ -332,7 +342,10 @@ INTVAL Parrot_io_write(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pmc);
 
+PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_make_offset32(INTVAL hi, INTVAL lo);
+
+PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
