@@ -296,63 +296,7 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
     p->pmc_ext = NULL;
 }
 
-/*
 
-=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
-
-Records the end time of the GC mark run part C<what> run when profiling is
-enabled. Also record start time of next part.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_end(PARROT_INTERP, int what)
-{
-    ASSERT_ARGS(Parrot_gc_profile_end)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
-        RunProfile * const profile = interp->profile;
-        const FLOATVAL     now     = Parrot_floatval_time();
-
-        profile->data[what].numcalls++;
-        profile->data[what].time += now - profile->gc_time;
-
-        /*
-         * we've recorded the time of a GC piece from
-         * gc_time until now, so add this to the start of the
-         * currently executing opcode, which hasn't run this
-         * interval.
-         */
-        profile->starttime += now - profile->gc_time;
-
-        /* prepare start for next step */
-        profile->gc_time    = now;
-    }
-}
-
-/*
-
-=item C<void Parrot_gc_ms_run_init(PARROT_INTERP)>
-
-Prepares the collector for a mark & sweep GC run. This is the
-initializer function for the MS garbage collector.
-
-=cut
-
-*/
-
-void
-Parrot_gc_ms_run_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_ms_run_init)
-    Arenas * const arena_base       = interp->arena_base;
-
-    arena_base->gc_trace_ptr        = NULL;
-    arena_base->gc_mark_start       = NULL;
-    arena_base->num_early_PMCs_seen = 0;
-    arena_base->num_extended_PMCs   = 0;
-}
 
 
 /*

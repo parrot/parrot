@@ -368,6 +368,30 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 /*
 
+=item C<void Parrot_gc_ms_run_init(PARROT_INTERP)>
+
+Prepares the collector for a mark & sweep GC run. This is the
+initializer function for the MS garbage collector.
+
+=cut
+
+*/
+
+void
+Parrot_gc_ms_run_init(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_ms_run_init)
+    Arenas * const arena_base       = interp->arena_base;
+
+    arena_base->gc_trace_ptr        = NULL;
+    arena_base->gc_mark_start       = NULL;
+    arena_base->num_early_PMCs_seen = 0;
+    arena_base->num_extended_PMCs   = 0;
+}
+
+
+/*
+
 =item C<void Parrot_gc_ms_free_pmc(PARROT_INTERP, Small_Object_Pool *pool, PObj
 *p)>
 

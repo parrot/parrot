@@ -201,6 +201,9 @@ void Parrot_gc_ms_init(PARROT_INTERP)
 void Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
+void Parrot_gc_ms_run_init(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -250,6 +253,8 @@ void Parrot_small_object_pool_merge(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_ms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_ms_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_ms_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

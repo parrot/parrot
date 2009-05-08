@@ -1150,6 +1150,42 @@ Parrot_gc_profile_start(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
+
+Records the end time of the GC mark run part C<what> run when profiling is
+enabled. Also record start time of next part.
+
+=cut
+
+*/
+
+void
+Parrot_gc_profile_end(PARROT_INTERP, int what)
+{
+    ASSERT_ARGS(Parrot_gc_profile_end)
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
+        RunProfile * const profile = interp->profile;
+        const FLOATVAL     now     = Parrot_floatval_time();
+
+        profile->data[what].numcalls++;
+        profile->data[what].time += now - profile->gc_time;
+
+        /*
+         * we've recorded the time of a GC piece from
+         * gc_time until now, so add this to the start of the
+         * currently executing opcode, which hasn't run this
+         * interval.
+         */
+        profile->starttime += now - profile->gc_time;
+
+        /* prepare start for next step */
+        profile->gc_time    = now;
+    }
+}
+
+
+/*
+
 =back
 
 =head1 SEE ALSO
