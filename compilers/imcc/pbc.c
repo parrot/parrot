@@ -1084,8 +1084,10 @@ add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
     const int      k = add_const_table(interp);
     STRING * const s = Parrot_str_new(interp, buf, 0);
 
-    interp->code->const_table->constants[k]->type     = PFC_NUMBER;
-    interp->code->const_table->constants[k]->u.number = Parrot_str_to_num(interp, s);
+    PackFile_Constant * const constant = interp->code->const_table->constants[k];
+
+    constant->type     = PFC_NUMBER;
+    constant->u.number = Parrot_str_to_num(interp, s);
 
     return k;
 }
