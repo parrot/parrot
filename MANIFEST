@@ -951,7 +951,6 @@ include/parrot/exit.h                                       [main]include
 include/parrot/extend.h                                     [main]include
 include/parrot/gc_api.h                                     [main]include
 include/parrot/gc_mark_sweep.h                              [main]include
-include/parrot/gc_pools.h                                   [main]include
 include/parrot/global.h                                     [main]include
 include/parrot/global_setup.h                               [main]include
 include/parrot/hash.h                                       [main]include
