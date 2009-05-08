@@ -119,15 +119,7 @@ Class initialization. Creates the required memory pools.
 */
 
     void class_init() {
-        /* class_init_code; called for side effects */
-        Small_Object_Pool *List_chunks =
-            get_bufferlike_pool(INTERP, sizeof (List_chunk));
-        Small_Object_Pool *Lists       =
-            get_bufferlike_pool(INTERP, sizeof (List));
 
-        /* XXX until there's a function to allocate a pool in an arena */
-        UNUSED(List_chunks);
-        UNUSED(Lists);
     }
 
 /*
