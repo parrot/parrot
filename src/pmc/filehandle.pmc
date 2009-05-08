@@ -509,7 +509,7 @@ Print the string to the filehandle.
 #if ! DISABLE_GC_DEBUG
         /* trigger GC for debug - but not during tests */
         if (0 && GC_DEBUG(interp))
-            Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+            Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
         if (Parrot_io_is_encoding(interp, SELF, CONST_STRING(interp, "utf8")))

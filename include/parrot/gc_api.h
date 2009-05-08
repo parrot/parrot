@@ -55,7 +55,7 @@
 /* HEADERIZER BEGIN: src/gc/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)
+void Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 void Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -95,7 +95,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_Parrot_do_gc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_gc_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

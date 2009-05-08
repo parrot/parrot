@@ -301,7 +301,7 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
 
 /*
 
-=item C<void Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)>
+=item C<void Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
 
 Calls the configured garbage collector to find and reclaim unused
 headers.
@@ -311,9 +311,9 @@ headers.
 */
 
 void
-Parrot_do_gc_run(PARROT_INTERP, UINTVAL flags)
+Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
-    ASSERT_ARGS(Parrot_do_gc_run)
+    ASSERT_ARGS(Parrot_gc_mark_and_sweep)
     interp->arena_base->do_gc_mark(interp, flags);
     parrot_gc_context(interp);
 }

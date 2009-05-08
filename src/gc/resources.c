@@ -249,7 +249,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
          */
         if (!interp->arena_base->gc_mark_block_level
         &&   interp->arena_base->mem_allocs_since_last_collect) {
-            Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+            Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #if !PARROT_GC_IMS
             /* Compact the pool if allowed and worthwhile */
             if (pool->compact) {

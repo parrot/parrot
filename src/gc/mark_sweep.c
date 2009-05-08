@@ -765,14 +765,14 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         Small_Object_Arena * const arena = pool->last_Arena;
         if (arena) {
             if (arena->used == arena->total_objects)
-                Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+                Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
             if (pool->num_free_objects <= pool->replenish_level)
                 pool->skip = 1;
         }
     }
 
-    /* requires that num_free_objects be updated in Parrot_do_gc_run. If gc
+    /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep. If gc
      * is disabled, then we must check the free list directly. */
     if (!pool->free_list)
         (*pool->alloc_objects) (interp, pool);

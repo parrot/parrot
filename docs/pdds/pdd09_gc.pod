@@ -380,7 +380,7 @@ order to complete an entire run of an incremental collector.
 For a concurrent collector, calls to this function may activate a concurrent
 collection thread or, if such a thread is already running, do nothing at all.
 
-The C<do_gc_mark> function is called from the C<Parrot_do_gc_run> function,
+The C<do_gc_mark> function is called from the C<Parrot_gc_mark_and_sweep> function,
 and should not usually be called directly.
 
 C<flags> is one of:
