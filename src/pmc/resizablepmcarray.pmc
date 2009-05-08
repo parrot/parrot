@@ -278,14 +278,17 @@ If key is a slice, do a splice as set that item.
     }
 
     VTABLE void delete_keyed(PMC *key) {
-        INTVAL  i;
-        INTVAL  idx  = key_integer(INTERP, key);
-        INTVAL  n    = PMC_size(SELF);
-        PMC   **data = PMC_array(SELF);
+        const INTVAL idx  = key_integer(INTERP, key);
+        SELF.delete_keyed_int(idx);
+    }
 
-        for (i = idx; i < n - 1; ++i) {
+    VTABLE void delete_keyed_int(INTVAL idx) {
+        PMC   **data = PMC_array(SELF);
+        INTVAL  n    = PMC_size(SELF);
+        INTVAL  i;
+
+        for (i = idx; i < n - 1; ++i)
             data[i] = data[i + 1];
-        }
 
         PMC_size(SELF)--;
     }
