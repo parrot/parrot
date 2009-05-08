@@ -277,7 +277,13 @@ chain.
 */
 
     VTABLE PMC *shift_pmc() {
-        return key_next(INTERP, SELF);
+        PMC *next_key;
+
+        if (!SELF->pmc_ext)
+            return NULL;
+
+        GET_ATTR_next_key(INTERP, SELF, next_key);
+        return next_key;
     }
 
 /*

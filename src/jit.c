@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -372,7 +372,7 @@ set_register_usage(PARROT_INTERP,
                     if (n < NUM_REGISTERS && !ru[typ].reg_count[n]++)
                         ru[typ].reg_dir[n] |= PARROT_ARGDIR_IN;
                 }
-                key = key_next(interp, key);
+                key = VTABLE_shift_pmc(interp, key);
             }
         }
     }

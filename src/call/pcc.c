@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 Parrot Calling Conventions
@@ -1199,7 +1199,7 @@ clone_key_arg(PARROT_INTERP, ARGMOD(call_state *st))
     if (key->vtable->base_type != enum_class_Key)
         return;
 
-    for (; key; key=key_next(interp, key)) {
+    for (; key; key = VTABLE_shift_pmc(interp, key)) {
         /* register keys have to be cloned */
         if (PObj_get_FLAGS(key) & KEY_register_FLAG) {
             Parrot_Context temp_ctx;

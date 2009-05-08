@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -222,7 +222,7 @@ internal_ns_keyed_key(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(PMC *key), int flags)
         }
 
         ns  = sub_ns;
-        key = key_next(interp, key);
+        key = VTABLE_shift_pmc(interp, key);
     }
 
     return ns;

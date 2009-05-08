@@ -548,9 +548,8 @@ key_next(PARROT_INTERP, ARGIN(PMC *key))
         GETATTR_Key_next_key(interp, key, next_key);
         return next_key;
     }
-    else {
-        return NULL;
-    }
+
+    return NULL;
 }
 
 

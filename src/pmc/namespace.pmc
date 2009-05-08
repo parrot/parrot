@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2008, Parrot Foundation.
+Copyright (C) 2005-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -354,7 +354,7 @@ really a public API.
         if (key->vtable->base_type == enum_class_Key) {
             while (1) {
                 STRING * const part = VTABLE_get_string(INTERP, key);
-                key  = key_next(INTERP, key);
+                key                 = VTABLE_shift_pmc(INTERP, key);
 
                 if (!key) {
                     Parrot_set_global(INTERP, ns, part, value);
@@ -407,7 +407,7 @@ really a public API.
 
         if (key->vtable->base_type == enum_class_Key) {
             STRING * const part = VTABLE_get_string(INTERP, key);
-            key  = key_next(INTERP, key);
+            key                 = VTABLE_shift_pmc(INTERP, key);
 
             if (!key)
                 return VTABLE_get_pmc_keyed_str(INTERP, ns, part);
@@ -476,7 +476,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                 /* this loop (and function) could use a rewrite for clarity */
                 while (1) {
                     STRING * const part = VTABLE_get_string(INTERP, key);
-                    key  = key_next(INTERP, key);
+                    key                 = VTABLE_shift_pmc(INTERP, key);
 
                     if (!key)
                         return VTABLE_get_pointer_keyed_str(INTERP, ns, part);

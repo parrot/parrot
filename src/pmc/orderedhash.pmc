@@ -113,7 +113,7 @@ Marks the OrderedHash as live.
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
             PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = key_next(INTERP, key);
+            PMC * const next = VTABLE_shift_pmc(INTERP, key);
 
             if (!next)
                 return item;
@@ -161,7 +161,7 @@ Marks the OrderedHash as live.
     VTABLE STRING *get_string_keyed(PMC *key) {
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
             PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = key_next(INTERP, key);
+            PMC * const next = VTABLE_shift_pmc(INTERP, key);
 
             if (!next)
                 return VTABLE_get_string(INTERP, item);
@@ -210,7 +210,7 @@ Returns the integer value associated with C<key>.
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
             PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = key_next(INTERP, key);
+            PMC * const next = VTABLE_shift_pmc(INTERP, key);
 
             if (!next)
                 return VTABLE_get_integer(INTERP, item);
@@ -259,7 +259,7 @@ Returns the floating-point value for the element at C<key>.
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
             PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
-            PMC * const next = key_next(INTERP, key);
+            PMC * const next = VTABLE_shift_pmc(INTERP, key);
 
             if (!next)
                 return VTABLE_get_number(INTERP, item);
@@ -417,7 +417,7 @@ The created key = "\1idx".
                 return 0;
 
             item = (PMC *)b->value;
-            next = key_next(INTERP, key);
+            next = VTABLE_shift_pmc(INTERP, key);
 
             if (!next)
                 return 1;
@@ -469,7 +469,7 @@ The created key = "\1idx".
                 return 0;
 
             item = (PMC *)b->value;
-            next = key_next(INTERP, key);
+            next = VTABLE_shift_pmc(INTERP, key);
 
             if (!next)
                 return VTABLE_defined(INTERP, item);
