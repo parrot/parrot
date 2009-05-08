@@ -27,8 +27,8 @@
     push all_files, '../../src/pmc/sockaddr.pmc'
     push all_files, '../../src/pmc/packfileannotation.pmc'
     push all_files, '../../src/pmc/parrotrunningthread.pmc'
-    push all_files, '../../src/pmc/parrotlibrary.pmc'
-    push all_files, '../../src/pmc/packfilesegment.pmc'
+    push all_files, '../../src/pmc/managedstruct.pmc'
+    push all_files, '../../src/pmc/task.pmc'
     push all_files, '../../src/pmc/pointer.pmc'
 
     total = elements all_files
