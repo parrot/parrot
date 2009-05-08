@@ -877,6 +877,42 @@ Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
         memcpy(mem, oldmem, copysize);
 }
 
+/*
+
+=item C<void Parrot_destroy_memory_pools(PARROT_INTERP)>
+
+Destroys the memory pool and the constant string pool. Loop through both
+pools and destroy all memory blocks contained in them. Once all the
+blocks are freed, free the pools themselves.
+
+=cut
+
+*/
+
+void
+Parrot_destroy_memory_pools(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_destroy_memory_pools)
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        Memory_Pool * const pool = i ?
+                interp->arena_base->constant_string_pool :
+                interp->arena_base->memory_pool;
+        Memory_Block *cur_block;
+
+        cur_block = pool->top_block;
+
+        while (cur_block) {
+            Memory_Block * const next_block = cur_block->prev;
+            mem_internal_free(cur_block);
+            cur_block = next_block;
+        }
+
+        mem_internal_free(pool);
+    }
+}
+
 
 /*
 

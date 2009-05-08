@@ -46,6 +46,121 @@ typedef enum {
 
 typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
 
+typedef struct Memory_Block {
+    size_t free;
+    size_t size;
+    struct Memory_Block *prev;
+    struct Memory_Block *next;
+    char *start;
+    char *top;
+} Memory_Block;
+
+typedef struct Memory_Pool {
+    Memory_Block *top_block;
+    void (*compact)(PARROT_INTERP, struct Memory_Pool *);
+    size_t minimum_block_size;
+    size_t total_allocated; /* total bytes allocated to this pool */
+    size_t guaranteed_reclaimable;     /* bytes that can definitely be reclaimed*/
+    size_t possibly_reclaimable;     /* bytes that can possibly be reclaimed
+                                      * (above plus COW-freed bytes) */
+    FLOATVAL reclaim_factor; /* minimum percentage we will reclaim */
+} Memory_Pool;
+
+
+
+typedef struct Arenas {
+    Memory_Pool *memory_pool;
+    Memory_Pool *constant_string_pool;
+    struct Small_Object_Pool *string_header_pool;
+    struct Small_Object_Pool *pmc_pool;
+    struct Small_Object_Pool *pmc_ext_pool;
+    struct Small_Object_Pool *constant_pmc_pool;
+    struct Small_Object_Pool *buffer_header_pool;
+    struct Small_Object_Pool *constant_string_header_pool;
+    struct Small_Object_Pool **sized_header_pools;
+    size_t num_sized;
+    /*
+     * function slots that each subsystem must provide
+     */
+    void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
+    void (*finalize_gc_system) (PARROT_INTERP);
+    void (*init_pool)(PARROT_INTERP, struct Small_Object_Pool *);
+    /*
+     * statistics for GC
+     */
+    size_t  gc_mark_runs;       /* Number of times we've done a mark run*/
+    size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
+    size_t  gc_collect_runs;    /* Number of times we've done a memory
+                                   compaction */
+    size_t  mem_allocs_since_last_collect;      /* The number of memory
+                                                 * allocations from the
+                                                 * system since the last
+                                                 * compaction run */
+    size_t  header_allocs_since_last_collect;   /* The number of header
+                                                 * blocks allocated from
+                                                 * the system since the last
+                                                 * GC run */
+    size_t  memory_allocated;     /* The total amount of
+                                   * allocatable memory
+                                   * allocated. Doesn't count
+                                   * memory for headers or
+                                   * internal structures or
+                                   * anything */
+    UINTVAL memory_collected;     /* Total amount of memory copied
+                                     during collection */
+    UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
+    UINTVAL num_early_PMCs_seen;  /* how many such PMCs has GC seen */
+    UINTVAL num_extended_PMCs;    /* active PMCs having pmc_ext */
+    PMC* gc_mark_start;           /* first PMC marked during a GC run */
+    PMC* gc_mark_ptr;             /* last PMC marked during a GC run */
+    PMC* gc_trace_ptr;            /* last PMC trace_children was called on */
+    int lazy_gc;                  /* flag that indicates whether we should stop
+                                     when we've seen all impatient PMCs */
+    /*
+     * GC blocking
+     */
+    UINTVAL gc_mark_block_level;  /* How many outstanding GC block
+                                     requests are there? */
+    UINTVAL gc_sweep_block_level; /* How many outstanding GC block
+                                     requests are there? */
+    /*
+     * private data for the GC subsystem
+     */
+    void *  gc_private;           /* gc subsystem data */
+} Arenas;
+
+/* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
+
+typedef enum {
+    TOTAL_MEM_ALLOC = 1,
+    GC_MARK_RUNS,
+    GC_COLLECT_RUNS,
+    ACTIVE_PMCS,
+    ACTIVE_BUFFERS,
+    TOTAL_PMCS,
+    TOTAL_BUFFERS,
+    HEADER_ALLOCS_SINCE_COLLECT,
+    MEM_ALLOCS_SINCE_COLLECT,
+    TOTAL_COPIED,
+    IMPATIENT_PMCS,
+    GC_LAZY_MARK_RUNS,
+    EXTENDED_PMCS,
+    CURRENT_RUNCORE,
+
+    /* interpinfo_p constants */
+    CURRENT_SUB,
+    CURRENT_CONT,
+    CURRENT_OBJECT,
+    CURRENT_LEXPAD,
+
+    /* interpinfo_s constants */
+    EXECUTABLE_FULLNAME,
+    EXECUTABLE_BASENAME,
+    RUNTIME_PREFIX
+} Interpinfo_enum;
+
+/* &end_gen */
+
 
 /* Macros for recursively blocking and unblocking GC mark */
 #define Parrot_block_GC_mark(interp) \
@@ -97,6 +212,9 @@ void Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
         FUNC_MODIFIES(*str);
 
 void Parrot_destroy_header_pools(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_destroy_memory_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -185,6 +303,8 @@ void Parrot_reallocate_string(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(str)
 #define ASSERT_ARGS_Parrot_destroy_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_destroy_memory_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \

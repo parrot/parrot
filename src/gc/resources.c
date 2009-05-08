@@ -19,7 +19,8 @@ Functions to manage non-PObj memory, including strings and buffers.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/resources.h"
+#include "gc_private.h"
+
 
 #define RECLAMATION_FACTOR 0.20
 #define WE_WANT_EVER_GROWING_ALLOCATIONS 0
@@ -32,7 +33,7 @@ Functions to manage non-PObj memory, including strings and buffers.
 
 typedef void (*compact_f) (Interp *, Memory_Pool *);
 
-/* HEADERIZER HFILE: include/parrot/resources.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -704,41 +705,6 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
     alloc_new_block(interp, POOL_SIZE, arena_base->constant_string_pool, "init");
 }
 
-/*
-
-=item C<void Parrot_destroy_memory_pools(PARROT_INTERP)>
-
-Destroys the memory pool and the constant string pool. Loop through both
-pools and destroy all memory blocks contained in them. Once all the
-blocks are freed, free the pools themselves.
-
-=cut
-
-*/
-
-void
-Parrot_destroy_memory_pools(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_destroy_memory_pools)
-    int i;
-
-    for (i = 0; i < 2; i++) {
-        Memory_Pool * const pool = i ?
-                interp->arena_base->constant_string_pool :
-                interp->arena_base->memory_pool;
-        Memory_Block *cur_block;
-
-        cur_block = pool->top_block;
-
-        while (cur_block) {
-            Memory_Block * const next_block = cur_block->prev;
-            mem_internal_free(cur_block);
-            cur_block = next_block;
-        }
-
-        mem_internal_free(pool);
-    }
-}
 
 /*
 
