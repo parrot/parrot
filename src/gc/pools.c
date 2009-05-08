@@ -173,7 +173,7 @@ new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
     Small_Object_Pool * const pool =
             new_small_object_pool(buffer_size, num_headers);
 
-    pool->gc_object = Parrot_gc_free_sysmem;
+    pool->gc_object = NULL;
     pool->mem_pool  = interp->arena_base->memory_pool;
     (interp->arena_base->init_pool)(interp, pool);
     return pool;

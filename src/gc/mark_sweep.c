@@ -445,7 +445,8 @@ Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
                     }
                 }
 
-                gc_object(interp, pool, b);
+                if(gc_object)
+                    gc_object(interp, pool, b);
 
                 pool->add_free_object(interp, pool, b);
             }
