@@ -820,7 +820,7 @@ Adds the supplied PMC to the list of parents for the class.
             STRING * const current_name = VTABLE_get_string(interp, current_parent);
 
             /* throw an exception if we already have this parent */
-            if (Parrot_str_equal(interp, current_name, parent_name))
+            if (current_parent == parent)
                 Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "The class '%S' already has a parent class '%S'. "

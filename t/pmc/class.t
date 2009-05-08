@@ -17,7 +17,7 @@ Tests the Class PMC.
 =cut
 
 
-.const int TESTS = 62 
+.const int TESTS = 63 
 
 
 .sub 'main' :main
@@ -45,6 +45,7 @@ Tests the Class PMC.
      'isa'()
      'does'()
      'more does'()
+     'anon_inherit'()
 .end
 
 
@@ -592,6 +593,14 @@ t_class_meth:
     is($I0, 1, 'does Red')
 .end
 
+.sub 'anon_inherit'
+    $P0 = new 'Class'
+    $P1 = new 'Class'
+    $P2 = new 'Class'
+    addparent $P2, $P0
+    addparent $P2, $P1
+    ok(1, 'inheritance of two different anonymous classes works')
+.end
 
 # Local Variables:
 #   mode: pir
