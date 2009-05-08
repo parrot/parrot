@@ -4,8 +4,6 @@
 # $Id$
 
 use 5.008;
-use strict;
-use warnings;
 
 use WWW::Mechanize;
 use Getopt::Std;
