@@ -296,55 +296,6 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
     p->pmc_ext = NULL;
 }
 
-
-/*
-
-=item C<void Parrot_gc_free_buffer(PARROT_INTERP, Small_Object_Pool *pool, PObj
-*b)>
-
-Frees a buffer, returning it to the memory pool for Parrot to possibly
-reuse later.
-
-=cut
-
-*/
-
-void
-Parrot_gc_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
-{
-    ASSERT_ARGS(Parrot_gc_free_buffer)
-    Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
-
-    /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
-     * shouldn't happen */
-    if (mem_pool) {
-        if (!PObj_COW_TEST(b))
-            mem_pool->guaranteed_reclaimable += PObj_buflen(b);
-
-         mem_pool->possibly_reclaimable += PObj_buflen(b);
-    }
-
-    PObj_buflen(b)        = 0;
-}
-
-/*
-
-=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
-
-Records the start time of a GC mark run when profiling is enabled.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_start(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_profile_start)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
-        interp->profile->gc_time = Parrot_floatval_time();
-}
-
 /*
 
 =item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>

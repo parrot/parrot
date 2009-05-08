@@ -59,6 +59,9 @@ void Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
 void Parrot_destroy_memory_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_gc_profile_start(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_go_collect(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -100,6 +103,8 @@ void Parrot_reallocate_string(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(str)
 #define ASSERT_ARGS_Parrot_destroy_memory_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_profile_start __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_go_collect __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)

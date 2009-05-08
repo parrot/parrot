@@ -68,14 +68,6 @@ void Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-void Parrot_gc_free_buffer(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    ARGMOD(PObj *b))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool)
-        FUNC_MODIFIES(*b);
-
 void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
     ARGMOD(PObj *obj),
     size_t size)
@@ -109,9 +101,6 @@ STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 void Parrot_gc_profile_end(PARROT_INTERP, int what)
         __attribute__nonnull__(1);
 
-void Parrot_gc_profile_start(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 #define ASSERT_ARGS_Parrot_do_gc_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -120,9 +109,6 @@ void Parrot_gc_profile_start(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_add_pmc_sync __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
-#define ASSERT_ARGS_Parrot_gc_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_Parrot_gc_free_bufferlike_header \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -140,8 +126,6 @@ void Parrot_gc_profile_start(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_gc_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_profile_end __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_gc_profile_start __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */

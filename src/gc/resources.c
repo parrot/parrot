@@ -1132,6 +1132,24 @@ Parrot_merge_memory_pools(ARGIN(Interp *dest_interp), ARGIN(Interp *source_inter
 
 /*
 
+=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
+
+Records the start time of a GC mark run when profiling is enabled.
+
+=cut
+
+*/
+
+void
+Parrot_gc_profile_start(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_profile_start)
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
+        interp->profile->gc_time = Parrot_floatval_time();
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

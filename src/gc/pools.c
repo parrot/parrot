@@ -33,6 +33,14 @@ static void free_pool(ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*pool);
 
+static void Parrot_gc_free_buffer(SHIM_INTERP,
+    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(PObj *b))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*b);
+
 static void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
     SHIM(Small_Object_Pool *pool),
     ARGMOD(PObj *b))
@@ -61,6 +69,9 @@ static int sweep_cb_pmc(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_Parrot_gc_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_Parrot_gc_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -253,6 +264,35 @@ Parrot_gc_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         mem_sys_free(PObj_bufrefcountptr(b));
 }
 
+/*
+
+=item C<static void Parrot_gc_free_buffer(PARROT_INTERP, Small_Object_Pool
+*pool, PObj *b)>
+
+Frees a buffer, returning it to the memory pool for Parrot to possibly
+reuse later.
+
+=cut
+
+*/
+
+static void
+Parrot_gc_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
+{
+    ASSERT_ARGS(Parrot_gc_free_buffer)
+    Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
+
+    /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
+     * shouldn't happen */
+    if (mem_pool) {
+        if (!PObj_COW_TEST(b))
+            mem_pool->guaranteed_reclaimable += PObj_buflen(b);
+
+         mem_pool->possibly_reclaimable += PObj_buflen(b);
+    }
+
+    PObj_buflen(b)        = 0;
+}
 
 
 /*
