@@ -89,23 +89,10 @@ void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
 
-void Parrot_gc_free_pmc(PARROT_INTERP,
-    SHIM(Small_Object_Pool *pool),
-    ARGMOD(PObj *p))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*p);
-
 void Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*p);
-
-void Parrot_gc_free_sysmem(SHIM_INTERP,
-    SHIM(Small_Object_Pool *pool),
-    ARGMOD(PObj *b))
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*b);
 
 void Parrot_gc_ms_run_init(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -148,14 +135,9 @@ void Parrot_gc_profile_start(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(obj)
-#define ASSERT_ARGS_Parrot_gc_free_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(p)
 #define ASSERT_ARGS_Parrot_gc_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(p)
-#define ASSERT_ARGS_Parrot_gc_free_sysmem __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_Parrot_gc_ms_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_new_bufferlike_header \

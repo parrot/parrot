@@ -262,47 +262,6 @@ Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(PObj *obj),
     pool->add_free_object(interp, pool, obj);
 }
 
-
-/*
-
-=item C<void Parrot_gc_free_pmc(PARROT_INTERP, Small_Object_Pool *pool, PObj
-*p)>
-
-Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
-method if one is available. If the PMC uses a PMC_EXT structure, that is freed
-as well.
-
-=cut
-
-*/
-
-void
-Parrot_gc_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
-        ARGMOD(PObj *p))
-{
-    ASSERT_ARGS(Parrot_gc_free_pmc)
-    PMC    * const pmc        = (PMC *)p;
-    Arenas * const arena_base = interp->arena_base;
-
-    /* TODO collect objects with finalizers */
-    if (PObj_needs_early_gc_TEST(p))
-        --arena_base->num_early_gc_PMCs;
-
-    if (PObj_active_destroy_TEST(p))
-        VTABLE_destroy(interp, pmc);
-
-    if (PObj_is_PMC_EXT_TEST(p))
-         Parrot_gc_free_pmc_ext(interp, pmc);
-
-#ifndef NDEBUG
-
-    pmc->pmc_ext     = (PMC_EXT *)0xdeadbeef;
-    pmc->vtable      = (VTABLE  *)0xdeadbeef;
-
-#endif
-
-}
-
 /*
 
 =item C<void Parrot_gc_free_pmc_ext(PARROT_INTERP, PMC *p)>
