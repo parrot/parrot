@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -202,7 +202,7 @@ Returns a textual representation of the iterator.
     VTABLE STRING *get_string() {
         PMC *key;
         GET_ATTR_key(INTERP, SELF, key);
-        return Parrot_str_from_int(INTERP, key_integer(INTERP, key));
+        return Parrot_str_from_int(INTERP, VTABLE_get_integer(INTERP, key));
     }
 
 /*

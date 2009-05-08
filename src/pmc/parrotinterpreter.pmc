@@ -444,7 +444,7 @@ Introspection interface. C<key> can be:
         nextkey = key_next(INTERP, key);
 
         if (nextkey)
-            level = key_integer(interp, nextkey);
+            level = VTABLE_get_integer(interp, nextkey);
         else if (outer)
             level = 1;
 

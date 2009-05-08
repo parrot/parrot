@@ -563,7 +563,7 @@ Removes the element at C<*key>.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        INTVAL    idx  = key_integer(INTERP, key);
+        INTVAL    idx  = VTABLE_get_integer(INTERP, key);
         STRING  **str_array;
         UINTVAL   size, i;
 

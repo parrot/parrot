@@ -278,7 +278,7 @@ If key is a slice, do a splice as set that item.
     }
 
     VTABLE void delete_keyed(PMC *key) {
-        const INTVAL idx  = key_integer(INTERP, key);
+        const INTVAL idx  = VTABLE_get_integer(INTERP, key);
         SELF.delete_keyed_int(idx);
     }
 
@@ -318,7 +318,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        INTVAL ix = key_integer(INTERP, key);
+        INTVAL ix = VTABLE_get_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -338,7 +338,7 @@ Returns the integer value of the element at index C<key>.
         if (!key)
             return 0;
 
-        ix      = key_integer(INTERP, key);
+        ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
 
         if (!nextkey)
@@ -386,7 +386,7 @@ Returns the float value of the element at index C<key>.
         if (!key)
             return (FLOATVAL)0;
 
-        ix      = key_integer(INTERP, key);
+        ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
 
         if (!nextkey)
@@ -433,7 +433,7 @@ Returns the string value of the element at index C<key>.
         if (!key)
             return 0;
 
-        ix      = key_integer(INTERP, key);
+        ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
 
         if (!nextkey)
@@ -480,7 +480,7 @@ Returns the PMC value of the element at index C<key>.
         if (!key)
             return 0;
 
-        ix      = key_integer(INTERP, key);
+        ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
 
         if (!nextkey)
@@ -556,7 +556,7 @@ Sets the integer value of the PMC at element C<key> to C<value>.
         if (!key)
             return;
 
-        ix      = key_integer(INTERP, key);
+        ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
 
         if (!nextkey) {
@@ -607,7 +607,7 @@ Sets the numeric value of the PMC at element C<key> to C<value>.
         if (!key)
             return;
 
-        ix      = key_integer(INTERP, key);
+        ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
 
         if (!nextkey) {
@@ -658,7 +658,7 @@ Sets the string value of the PMC at element C<key> to C<value>.
         if (!key)
             return;
 
-        ix      = key_integer(INTERP, key);
+        ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
 
         if (!nextkey) {
@@ -709,7 +709,7 @@ Sets the PMC at index C<key> to C<value>.
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         PMC *box;
 
-        const INTVAL ix      = key_integer(INTERP, key);
+        const INTVAL ix      = VTABLE_get_integer(INTERP, key);
         PMC * const  nextkey = key_next(INTERP, key);
 
         if (!nextkey) {
@@ -1040,7 +1040,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
     VTABLE INTVAL defined_keyed(PMC *key) {
         PMC *box;
 
-        const INTVAL ix      = key_integer(INTERP, key);
+        const INTVAL ix      = VTABLE_get_integer(INTERP, key);
         PMC * const  nextkey = key_next(INTERP, key);
 
         if (!nextkey)
@@ -1087,7 +1087,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
     VTABLE INTVAL exists_keyed(PMC *key) {
         PMC *box;
 
-        const INTVAL ix      = key_integer(INTERP, key);
+        const INTVAL ix      = VTABLE_get_integer(INTERP, key);
         PMC * const  nextkey = key_next(INTERP, key);
 
         if (!nextkey)
@@ -1126,7 +1126,7 @@ Removes the element at C<*key>.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        const INTVAL ix = key_integer(INTERP, key);
+        const INTVAL ix = VTABLE_get_integer(INTERP, key);
         list_splice(INTERP, (List *)PMC_data(pmc), NULL, ix, 1);
     }
 

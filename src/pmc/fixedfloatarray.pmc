@@ -195,7 +195,7 @@ Returns the integer value of the element at index C<*key>.
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
         /* simple int keys only */
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_integer_keyed_int(k);
     }
 
@@ -234,7 +234,7 @@ Returns the floating-point value of the element at index C<*key>.
 */
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_number_keyed_int(k);
     }
 
@@ -264,7 +264,7 @@ Returns the Parrot string value of the element at index C<*key>.
 */
 
     VTABLE STRING *get_string_keyed(PMC *key) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_string_keyed_int(k);
     }
 
@@ -298,7 +298,7 @@ Returns the PMC value of the element at index C<*key>.
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_pmc_keyed_int(k);
     }
 
@@ -350,7 +350,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 */
 
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_integer_keyed_int(k, value);
     }
 
@@ -390,7 +390,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_number_keyed_int(k, value);
     }
 
@@ -425,7 +425,7 @@ C<value>.
 */
 
     VTABLE void set_string_keyed(PMC *key, STRING *value) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_string_keyed_int(k, value);
     }
 
@@ -456,7 +456,7 @@ C<value>.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_pmc_keyed_int(k, value);
     }
 
