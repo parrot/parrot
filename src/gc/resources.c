@@ -811,7 +811,7 @@ Parrot_gc_profile_end(PARROT_INTERP, int what)
 
 =head1 SEE ALSO
 
-F<include/parrot/resources.h>, F<src/gc/memory.c>.
+F<src/gc/memory.c>.
 
 =head1 HISTORY
 

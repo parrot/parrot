@@ -27,7 +27,6 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "parrot/compiler.h"
 #include "parrot/string_funcs.h"
 #include "private_cstring.h"
-#include "parrot/resources.h"
 
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \

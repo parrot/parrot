@@ -288,7 +288,7 @@ Parrot_destroy_memory_pools(PARROT_INTERP)
 
 =head1 SEE ALSO
 
-F<config/auto/gc.pl>, F<src/malloc.c>, F<include/parrot/resources.h>.
+F<config/auto/gc.pl>, F<src/malloc.c>
 
 =cut
 

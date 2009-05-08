@@ -980,7 +980,6 @@ include/parrot/pmc.h                                        [main]include
 include/parrot/pmc_freeze.h                                 [main]include
 include/parrot/pobj.h                                       [main]include
 include/parrot/register.h                                   [main]include
-include/parrot/resources.h                                  [main]include
 include/parrot/runcore_api.h                                [main]include
 include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include
