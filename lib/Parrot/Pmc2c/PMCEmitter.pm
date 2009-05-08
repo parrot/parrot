@@ -827,28 +827,29 @@ $vtable_updates
 
 EOC
 
-    my %extra_vt;
-    $extra_vt{ro} = $self->{ro} if $self->{ro};
-
-    for my $k (keys %extra_vt) {
-
-        my $vtable_updates = '';
-        foreach my $vt_method ( @{ $self->$k->vtable->names} ) {
-
-            next unless ($self->$k->implements_vtable($vt_method));
-
-            $vtable_updates .= "    vt->$vt_method = Parrot_${classname}_${k}_${vt_method};\n";
+    # Generate RO vtable for implemented non-updating methods
+    $vtable_updates = '';
+    foreach my $name ( @{ $self->vtable->names} ) {
+        next unless exists $self->{has_method}{$name};
+        if ($self->vtable_method_does_write($name)) {
+            # If we override constantness status of vtable
+            if (!$self->vtable->attrs($name)->{write}) {
+                $vtable_updates .= "    vt->$name = Parrot_${classname}_ro_${name};\n";
+            }
         }
+        else {
+            $vtable_updates .= "    vt->$name = Parrot_${classname}_${name};\n";
+        }
+    }
 
-        $cout .= <<"EOC";
+    $cout .= <<"EOC";
 
-PARROT_EXPORT VTABLE *Parrot_${classname}_${k}_update_vtable(VTABLE *vt) {
+PARROT_EXPORT VTABLE *Parrot_${classname}_ro_update_vtable(VTABLE *vt) {
 $vtable_updates
     return vt;
 }
 
 EOC
-    }
 
     $cout;
 }
@@ -885,31 +886,25 @@ $get_vtable
 
 EOC
 
-    my %extra_vt;
-    $extra_vt{ro} = $self->{ro} if $self->{ro};
-
-    for my $k (keys %extra_vt) {
-        my $get_extra_vtable = '';
-        foreach my $parent_name ( reverse ($self->name, @{ $self->parents }) ) {
-            if ($parent_name eq 'default') {
-                $get_extra_vtable .= "    vt = Parrot_default_get_vtable(interp);\n";
-            }
-            else {
-                $get_extra_vtable .= "    Parrot_${parent_name}_update_vtable(vt);\n";
-                $get_extra_vtable .= "    Parrot_${parent_name}_${k}_update_vtable(vt);\n";
-            }
+    my $get_extra_vtable = '';
+    foreach my $parent_name ( reverse ($self->name, @{ $self->parents }) ) {
+        if ($parent_name eq 'default') {
+            $get_extra_vtable .= "    vt = Parrot_default_ro_get_vtable(interp);\n";
         }
+        else {
+            $get_extra_vtable .= "    Parrot_${parent_name}_ro_update_vtable(vt);\n";
+        }
+    }
 
-        $cout .= <<"EOC";
+    $cout .= <<"EOC";
 PARROT_EXPORT
-VTABLE* Parrot_${classname}_${k}_get_vtable(PARROT_INTERP) {
+VTABLE* Parrot_${classname}_ro_get_vtable(PARROT_INTERP) {
     VTABLE *vt;
 $get_extra_vtable
     return vt;
 }
 
 EOC
-    }
 
     $cout;
 }
