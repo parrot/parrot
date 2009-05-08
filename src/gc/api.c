@@ -586,6 +586,297 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
     return 0;
 }
 
+/*
+
+=item C<void Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t
+size)>
+
+Like above, except the C<size> will be rounded up and the address of
+the buffer will have the same alignment as a pointer returned by
+malloc(3) suitable to hold e.g. a C<FLOATVAL> array.
+
+=cut
+
+*/
+
+void
+Parrot_allocate_aligned(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
+{
+    ASSERT_ARGS(Parrot_allocate_aligned)
+    size_t new_size;
+    char *mem;
+
+    PObj_buflen(buffer) = 0;
+    PObj_bufstart(buffer) = NULL;
+    new_size = aligned_size(buffer, size);
+    mem = (char *)mem_allocate(interp, new_size,
+        interp->arena_base->memory_pool);
+    mem = aligned_mem(buffer, mem);
+    PObj_bufstart(buffer) = mem;
+    if (PObj_is_COWable_TEST(buffer))
+        new_size -= sizeof (void*);
+    PObj_buflen(buffer) = new_size;
+}
+
+/*
+
+=item C<void Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)>
+
+Allocate the STRING's buffer memory to the given size. The allocated
+buffer maybe slightly bigger than the given C<size>. This function
+sets also C<< str->strstart >> to the new buffer location, C<< str->bufused >>
+is B<not> changed.
+
+=cut
+
+*/
+
+void
+Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
+{
+    ASSERT_ARGS(Parrot_allocate_string)
+    size_t       new_size;
+    Memory_Pool *pool;
+    char        *mem;
+
+    PObj_buflen(str)   = 0;
+    PObj_bufstart(str) = NULL;
+
+    /* there's no sense in allocating zero memory, when the overhead of
+     * allocating a string is one pointer; this can fill the pools in an
+     * uncompactable way.  See RT #42320.
+     */
+    if (size == 0)
+        return;
+
+    pool     = PObj_constant_TEST(str)
+                ? interp->arena_base->constant_string_pool
+                : interp->arena_base->memory_pool;
+
+    new_size = aligned_string_size(size);
+    mem      = (char *)mem_allocate(interp, new_size, pool);
+    mem     += sizeof (void*);
+
+    PObj_bufstart(str) = str->strstart = mem;
+    PObj_buflen(str)   = new_size - sizeof (void*);
+}
+
+/*
+
+=item C<void Parrot_go_collect(PARROT_INTERP)>
+
+Scan the string pools and compact them. This does not perform a GC mark or
+sweep run, and does not check whether string buffers are still alive.
+Redirects to C<compact_pool>.
+
+=cut
+
+*/
+
+void
+Parrot_go_collect(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_go_collect)
+    compact_pool(interp, interp->arena_base->memory_pool);
+}
+
+/*
+
+=item C<int Parrot_in_memory_pool(PARROT_INTERP, void *bufstart)>
+
+Determines if the given C<bufstart> pointer points to a location inside the
+memory pool. Returns 1 if the pointer is in the memory pool, 0 otherwise.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+int
+Parrot_in_memory_pool(PARROT_INTERP, ARGIN(void *bufstart))
+{
+    ASSERT_ARGS(Parrot_in_memory_pool)
+    Memory_Pool * const pool = interp->arena_base->memory_pool;
+    Memory_Block * cur_block = pool->top_block;
+
+    while (cur_block) {
+        if ((char *)bufstart >= cur_block->start &&
+            (char *) bufstart < cur_block->start + cur_block->size) {
+            return 1;
+        }
+        cur_block = cur_block->prev;
+    }
+    return 0;
+}
+
+/*
+
+=item C<void Parrot_merge_memory_pools(Interp *dest_interp, Interp
+*source_interp)>
+
+Merge the memory pools of two interpreter structures. Merge the general
+memory pool and the constant string pools from C<source_interp> into
+C<dest_interp>.
+
+=cut
+
+*/
+
+void
+Parrot_merge_memory_pools(ARGIN(Interp *dest_interp), ARGIN(Interp *source_interp))
+{
+    ASSERT_ARGS(Parrot_merge_memory_pools)
+    merge_pools(dest_interp->arena_base->constant_string_pool,
+                source_interp->arena_base->constant_string_pool);
+
+    merge_pools(dest_interp->arena_base->memory_pool,
+                source_interp->arena_base->memory_pool);
+}
+
+/*
+
+=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)>
+
+Reallocate the Buffer's buffer memory to the given size. The
+allocated buffer will not shrink. If the buffer was allocated with
+L<Parrot_allocate_aligned> the new buffer will also be aligned. As with
+all reallocation, the new buffer might have moved and the additional
+memory is not cleared.
+
+=cut
+
+*/
+
+void
+Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
+{
+    ASSERT_ARGS(Parrot_reallocate)
+    size_t copysize;
+    char  *mem;
+    Memory_Pool * const pool = interp->arena_base->memory_pool;
+    size_t new_size, needed, old_size;
+
+    /*
+     * we don't shrink buffers
+     */
+    if (newsize <= PObj_buflen(buffer))
+        return;
+
+    /*
+     * same as below but barely used and tested - only 3 list related
+     * tests do use true reallocation
+     *
+     * list.c, which does _reallocate, has 2 reallocations
+     * normally, which play ping pong with buffers.
+     * The normal case is therefore always to allocate a new block
+     */
+    new_size = aligned_size(buffer, newsize);
+    old_size = aligned_size(buffer, PObj_buflen(buffer));
+    needed   = new_size - old_size;
+
+    if ((pool->top_block->free >= needed)
+    &&  (pool->top_block->top  == (char *)PObj_bufstart(buffer) + old_size)) {
+        pool->top_block->free -= needed;
+        pool->top_block->top  += needed;
+        PObj_buflen(buffer) = newsize;
+        return;
+    }
+
+    copysize = PObj_buflen(buffer);
+
+    if (!PObj_COW_TEST(buffer))
+        pool->guaranteed_reclaimable += copysize;
+
+    pool->possibly_reclaimable += copysize;
+    mem                         = (char *)mem_allocate(interp, new_size, pool);
+    mem                         = aligned_mem(buffer, mem);
+
+    /* We shouldn't ever have a 0 from size, but we do. If we can track down
+     * those bugs, this can be removed which would make things cheaper */
+    if (copysize)
+        memcpy(mem, PObj_bufstart(buffer), copysize);
+
+    PObj_bufstart(buffer) = mem;
+
+    if (PObj_is_COWable_TEST(buffer))
+        new_size -= sizeof (void *);
+
+    PObj_buflen(buffer) = new_size;
+}
+
+
+/*
+
+=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t
+newsize)>
+
+Reallocate the STRING's buffer memory to the given size. The allocated
+buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
+new buffer location, C<str-E<gt>bufused> is B<not> changed.
+
+=cut
+
+*/
+
+void
+Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
+{
+    ASSERT_ARGS(Parrot_reallocate_string)
+    size_t copysize;
+    char *mem, *oldmem;
+    size_t new_size, needed, old_size;
+
+    Memory_Pool * const pool =
+        PObj_constant_TEST(str)
+            ? interp->arena_base->constant_string_pool
+            : interp->arena_base->memory_pool;
+
+    /* if the requested size is smaller then buflen, we are done */
+    if (newsize <= PObj_buflen(str))
+        return;
+
+    /*
+     * first check, if we can reallocate:
+     * - if the passed strings buffer is the last string in the pool and
+     * - if there is enough size, we can just move the pool's top pointer
+     */
+    new_size = aligned_string_size(newsize);
+    old_size = aligned_string_size(PObj_buflen(str));
+    needed   = new_size - old_size;
+
+    if (pool->top_block->free >= needed
+    &&  pool->top_block->top  == (char *)PObj_bufstart(str) + old_size) {
+        pool->top_block->free -= needed;
+        pool->top_block->top  += needed;
+        PObj_buflen(str) = new_size - sizeof (void*);
+        return;
+    }
+
+    PARROT_ASSERT(str->bufused <= newsize);
+
+    /* only copy used memory, not total string buffer */
+    copysize = str->bufused;
+
+    if (!PObj_COW_TEST(str))
+        pool->guaranteed_reclaimable += PObj_buflen(str);
+
+    pool->possibly_reclaimable += PObj_buflen(str);
+
+    mem = (char *)mem_allocate(interp, new_size, pool);
+    mem += sizeof (void *);
+
+    /* copy mem from strstart, *not* bufstart */
+    oldmem             = str->strstart;
+    PObj_bufstart(str) = (void *)mem;
+    str->strstart      = mem;
+    PObj_buflen(str)   = new_size - sizeof (void*);
+
+    /* We shouldn't ever have a 0 from size, but we do. If we can track down
+     * those bugs, this can be removed which would make things cheaper */
+    if (copysize)
+        memcpy(mem, oldmem, copysize);
+}
+
 
 /*
 

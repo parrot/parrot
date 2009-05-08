@@ -15,7 +15,6 @@ Handles pool creation for PMC headers.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/gc_pools.h"
 #include "gc_private.h"
 
 /* HEADERIZER HFILE: src/gc/gc_private.h */
