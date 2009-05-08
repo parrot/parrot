@@ -33,13 +33,47 @@ F<docs/memory_internals.pod>.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void fix_pmc_syncs(
+    ARGMOD(Interp *dest_interp),
+    ARGIN(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest_interp);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC_EXT * new_pmc_ext(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static int sweep_cb_buf(PARROT_INTERP,
+    ARGMOD(Small_Object_Pool *pool),
+    SHIM(int flag),
+    ARGIN(void *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*pool);
+
+static int sweep_cb_pmc(PARROT_INTERP,
+    ARGMOD(Small_Object_Pool *pool),
+    SHIM(int flag),
+    SHIM(void *arg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pool);
+
+#define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest_interp) \
+    || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_new_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_sweep_cb_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -353,6 +387,205 @@ Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     interp->arena_base->do_gc_mark(interp, flags);
     parrot_gc_context(interp);
 }
+
+/*
+
+=item C<void Parrot_merge_header_pools(Interp *dest_interp, Interp
+*source_interp)>
+
+Merges the header pools of C<source_interp> into those of C<dest_interp>.
+(Used to deal with shared objects left after interpreter destruction.)
+
+=cut
+
+*/
+
+void
+Parrot_merge_header_pools(ARGMOD(Interp *dest_interp), ARGIN(Interp *source_interp))
+{
+    ASSERT_ARGS(Parrot_merge_header_pools)
+
+    Arenas * const dest_arena   = dest_interp->arena_base;
+    Arenas * const source_arena = source_interp->arena_base;
+    UINTVAL        i;
+
+    /* heavily borrowed from forall_header_pools */
+    fix_pmc_syncs(dest_interp, source_arena->constant_pmc_pool);
+    Parrot_small_object_pool_merge(dest_interp, dest_arena->constant_pmc_pool,
+            source_arena->constant_pmc_pool);
+
+    fix_pmc_syncs(dest_interp, source_arena->pmc_pool);
+    Parrot_small_object_pool_merge(dest_interp, dest_arena->pmc_pool,
+            source_arena->pmc_pool);
+
+    Parrot_small_object_pool_merge(dest_interp,
+            dest_arena->constant_string_header_pool,
+            source_arena->constant_string_header_pool);
+
+    Parrot_small_object_pool_merge(dest_interp,
+            dest_arena->pmc_ext_pool, source_arena->pmc_ext_pool);
+
+    for (i = 0; i < source_arena->num_sized; ++i) {
+        if (!source_arena->sized_header_pools[i])
+            continue;
+
+        if (i >= dest_arena->num_sized
+        || !dest_arena->sized_header_pools[i]) {
+            Small_Object_Pool *ignored = get_bufferlike_pool(dest_interp,
+                    i * sizeof (void *));
+            UNUSED(ignored);
+            PARROT_ASSERT(dest_arena->sized_header_pools[i]);
+        }
+
+        Parrot_small_object_pool_merge(dest_interp,
+            dest_arena->sized_header_pools[i],
+            source_arena->sized_header_pools[i]);
+    }
+}
+
+/*
+
+=item C<static void fix_pmc_syncs(Interp *dest_interp, Small_Object_Pool *pool)>
+
+Walks through the given arena, looking for all live and shared PMCs,
+transferring their sync values to the destination interpreter.
+
+=cut
+
+*/
+
+static void
+fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
+{
+    ASSERT_ARGS(fix_pmc_syncs)
+    Small_Object_Arena *cur_arena;
+    const UINTVAL       object_size = pool->object_size;
+
+    for (cur_arena = pool->last_Arena; cur_arena; cur_arena = cur_arena->prev) {
+        PMC   *p = (PMC *)((char*)cur_arena->start_objects + GC_HEADER_SIZE);
+        size_t i;
+
+        for (i = 0; i < cur_arena->used; i++) {
+            if (!PObj_on_free_list_TEST(p) && PObj_is_PMC_TEST(p)) {
+                if (PObj_is_PMC_shared_TEST(p))
+                    PMC_sync(p)->owner = dest_interp;
+                else
+                    Parrot_ex_throw_from_c_args(dest_interp, NULL,
+                        EXCEPTION_INTERP_ERROR,
+                        "Unshared PMC still alive after interpreter"
+                        "destruction. address=%p, base_type=%d\n",
+                        p, p->vtable->base_type);
+            }
+
+            p = (PMC *)((char *)p + object_size);
+        }
+    }
+}
+
+/*
+
+=item C<void Parrot_destroy_header_pools(PARROT_INTERP)>
+
+Performs a garbage collection sweep on all pools, then frees them.  Calls
+C<Parrot_forall_header_pools> to loop over all the pools, passing
+C<sweep_cb_pmc> and C<sweep_cb_buf> callback routines. Frees the array of sized
+header pointers in the C<Arenas> structure too.
+
+=cut
+
+*/
+
+void
+Parrot_destroy_header_pools(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_destroy_header_pools)
+    INTVAL pass;
+
+    /* const/non const COW strings life in different pools
+     * so in first pass
+     * COW refcount is done, in 2. refcounting
+     * in 3rd freeing
+     */
+#ifdef GC_IS_MALLOC
+    const INTVAL start = 0;
+#else
+    const INTVAL start = 2;
+#endif
+
+    Parrot_forall_header_pools(interp, POOL_PMC, NULL, sweep_cb_pmc);
+    Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
+            sweep_cb_pmc);
+
+    for (pass = start; pass <= 2; pass++) {
+        Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
+                (void *)pass, sweep_cb_buf);
+    }
+
+    free_pool(interp->arena_base->pmc_ext_pool);
+    interp->arena_base->pmc_ext_pool = NULL;
+
+    mem_internal_free(interp->arena_base->sized_header_pools);
+    interp->arena_base->sized_header_pools = NULL;
+}
+
+/*
+
+=item C<static int sweep_cb_pmc(PARROT_INTERP, Small_Object_Pool *pool, int
+flag, void *arg)>
+
+Performs a garbage collection sweep of the given pmc pool, then frees it. Calls
+C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
+all its arenas. Always returns C<0>.
+
+=cut
+
+*/
+
+static int
+sweep_cb_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
+        SHIM(int flag), SHIM(void *arg))
+{
+    Parrot_gc_sweep(interp, pool);
+    free_pool(pool);
+    return 0;
+}
+
+/*
+
+=item C<static int sweep_cb_buf(PARROT_INTERP, Small_Object_Pool *pool, int
+flag, void *arg)>
+
+Performs a final garbage collection sweep, then frees the pool. Calls
+C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
+all its arenas.
+
+=cut
+
+*/
+
+static int
+sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
+        ARGIN(void *arg))
+{
+#ifdef GC_IS_MALLOC
+    const int pass = (int)(INTVAL)arg;
+
+    if (pass == 0)
+        clear_cow(interp, pool, 1);
+    else if (pass == 1)
+        used_cow(interp, pool, 1);
+    else
+#endif
+
+    {
+        UNUSED(arg);
+        Parrot_gc_sweep(interp, pool);
+        free_pool(pool);
+    }
+
+    return 0;
+}
+
 
 /*
 

@@ -18,6 +18,35 @@
 #include "parrot/gc_mark_sweep.h"
 #include "parrot/parrot.h"
 
+/*
+ * we need an alignment that is the same as malloc(3) have for
+ * allocating Buffer items like FLOATVAL (double)
+ * This should be either a config hint or tested
+ */
+#ifdef MALLOC_ALIGNMENT
+#  define BUFFER_ALIGNMENT MALLOC_ALIGNMENT
+#else
+/* or (2 * sizeof (size_t)) */
+#  define BUFFER_ALIGNMENT 8
+#endif
+
+#define BUFFER_ALIGN_1 (BUFFER_ALIGNMENT - 1)
+#define BUFFER_ALIGN_MASK ~BUFFER_ALIGN_1
+
+#define WORD_ALIGN_1 (sizeof (void *) - 1)
+#define WORD_ALIGN_MASK ~WORD_ALIGN_1
+
+/* pool iteration */
+typedef enum {
+    POOL_PMC    = 0x01,
+    POOL_BUFFER = 0x02,
+    POOL_CONST  = 0x04,
+    POOL_ALL    = 0x07
+} pool_iter_enum;
+
+typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
+
+
 /* Macros for recursively blocking and unblocking GC mark */
 #define Parrot_block_GC_mark(interp) \
         { \
@@ -55,6 +84,9 @@
 /* HEADERIZER BEGIN: src/gc/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+void Parrot_destroy_header_pools(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -77,6 +109,10 @@ void Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*p);
 
+void Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void Parrot_gc_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
@@ -95,6 +131,15 @@ PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
+void Parrot_merge_header_pools(
+    ARGMOD(Interp *dest_interp),
+    ARGIN(Interp *source_interp))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest_interp);
+
+#define ASSERT_ARGS_Parrot_destroy_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
@@ -108,6 +153,9 @@ STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 #define ASSERT_ARGS_Parrot_gc_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(p)
+#define ASSERT_ARGS_Parrot_gc_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(stacktop)
 #define ASSERT_ARGS_Parrot_gc_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_new_bufferlike_header \
@@ -117,6 +165,9 @@ STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_merge_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest_interp) \
+    || PARROT_ASSERT_ARG(source_interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
