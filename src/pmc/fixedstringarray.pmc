@@ -129,7 +129,7 @@ Marks the array as live.
 
             for (i = 0; i < size; i++) {
                 if (str_array[i])
-                    pobject_lives(INTERP, (PObj *) str_array[i]);
+                    Parrot_gc_mark_PObj_alive(INTERP, (PObj *) str_array[i]);
             }
         }
     }

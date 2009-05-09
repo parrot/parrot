@@ -87,10 +87,10 @@ Marks the hash as live.
         Parrot_Pair_attributes * const pair = PARROT_PAIR(SELF);
 
         if (pair->key)
-            pobject_lives(INTERP, (PObj *)pair->key);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)pair->key);
 
         if (pair->value)
-            pobject_lives(INTERP, (PObj *)pair->value);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)pair->value);
     }
 
 /*

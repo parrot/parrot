@@ -438,7 +438,7 @@ parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
                     hash, (int)entries);
 
             PARROT_ASSERT(bucket->key);
-            pobject_lives(interp, (PObj *)bucket->key);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
             bucket = bucket->next;
         }
@@ -474,7 +474,7 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
                         hash, (int)entries);
 
             PARROT_ASSERT(bucket->value);
-            pobject_lives(interp, (PObj *)bucket->value);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
             bucket = bucket->next;
         }
@@ -510,10 +510,10 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
                         hash, (int)entries);
 
             PARROT_ASSERT(bucket->key);
-            pobject_lives(interp, (PObj *)bucket->key);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
             PARROT_ASSERT(bucket->value);
-            pobject_lives(interp, (PObj *)bucket->value);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
             bucket = bucket->next;
         }

@@ -189,9 +189,9 @@ Mark any referenced strings and PMCs.
             Parrot_Object_attributes * const obj = PARROT_OBJECT(SELF);
 
             if (obj->_class)
-                pobject_lives(interp, (PObj*)obj->_class);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)obj->_class);
             if (obj->attrib_store)
-                pobject_lives(interp, (PObj*)obj->attrib_store);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)obj->attrib_store);
         }
     }
 
@@ -812,7 +812,7 @@ Used to mark a PMC as read-only shared.
         VTABLE_set_integer_native(INTERP, _true, 1);
         VTABLE_setprop(INTERP, ret, CONST_STRING(interp, "_ro"), _true);
         SELF->vtable->pmc_class = master->vtables[type_num]->pmc_class;
-        add_pmc_sync(INTERP, ret);
+        Parrot_gc_add_pmc_sync(INTERP, ret);
         PObj_is_PMC_shared_SET(ret);
 
         data = PARROT_CLASS(classobj)->parents;

@@ -950,8 +950,6 @@ include/parrot/exec.h                                       [main]include
 include/parrot/exit.h                                       [main]include
 include/parrot/extend.h                                     [main]include
 include/parrot/gc_api.h                                     [main]include
-include/parrot/gc_mark_sweep.h                              [main]include
-include/parrot/gc_pools.h                                   [main]include
 include/parrot/global.h                                     [main]include
 include/parrot/global_setup.h                               [main]include
 include/parrot/hash.h                                       [main]include
@@ -981,7 +979,6 @@ include/parrot/pmc.h                                        [main]include
 include/parrot/pmc_freeze.h                                 [main]include
 include/parrot/pobj.h                                       [main]include
 include/parrot/register.h                                   [main]include
-include/parrot/resources.h                                  [main]include
 include/parrot/runcore_api.h                                [main]include
 include/parrot/runcore_trace.h                              [main]include
 include/parrot/scheduler.h                                  [main]include

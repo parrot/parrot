@@ -299,7 +299,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
         return Parrot_io_readline_buffer(interp, filehandle, buf);
 
     if (*buf == NULL) {
-        *buf = new_string_header(interp, 0);
+        *buf = Parrot_gc_new_string_header(interp, 0);
         (*buf)->bufused = len = 2048;
     }
 
@@ -307,7 +307,7 @@ Parrot_io_read_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle),
     len = s->bufused;
 
     if (!s->strstart)
-        Parrot_allocate_string(interp, s, len);
+        Parrot_gc_allocate_string_storage(interp, s, len);
 
     out_buf = (unsigned char *)s->strstart;
 
@@ -478,7 +478,7 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     STRING *s;
 
     if (*buf == NULL) {
-        *buf = new_string_header(interp, 0);
+        *buf = Parrot_gc_new_string_header(interp, 0);
     }
     s = *buf;
     s->strlen = 0;
@@ -514,10 +514,10 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
             len = buffer_end - buf_start;
             if (s->bufused < l) {
                 if (s->strstart) {
-                    Parrot_reallocate_string(interp, s, l);
+                    Parrot_gc_reallocate_string_storage(interp, s, l);
                 }
                 else {
-                    Parrot_allocate_string(interp, s, l);
+                    Parrot_gc_allocate_string_storage(interp, s, l);
                 }
             }
             out_buf = (unsigned char*)s->strstart + s->strlen;
@@ -533,10 +533,10 @@ Parrot_io_readline_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle), ARGOUT(STRING 
     }
     if (s->bufused < l) {
         if (s->strstart) {
-            Parrot_reallocate_string(interp, s, l);
+            Parrot_gc_reallocate_string_storage(interp, s, l);
         }
         else {
-            Parrot_allocate_string(interp, s, l);
+            Parrot_gc_allocate_string_storage(interp, s, l);
         }
     }
     out_buf = (unsigned char*)s->strstart + s->strlen;

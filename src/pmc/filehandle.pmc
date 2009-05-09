@@ -124,11 +124,11 @@ Mark active filehandle data as live.
     VTABLE void mark() {
         Parrot_FileHandle_attributes * const data_struct = PARROT_FILEHANDLE(SELF);
         if (data_struct->mode)
-            pobject_lives(interp, (PObj *)data_struct->mode);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->mode);
         if (data_struct->filename)
-            pobject_lives(interp, (PObj *)data_struct->filename);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->filename);
         if (data_struct->encoding)
-            pobject_lives(interp, (PObj *)data_struct->encoding);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->encoding);
     }
 
 /*
@@ -509,7 +509,7 @@ Print the string to the filehandle.
 #if ! DISABLE_GC_DEBUG
         /* trigger GC for debug - but not during tests */
         if (0 && GC_DEBUG(interp))
-            Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+            Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
         if (Parrot_io_is_encoding(interp, SELF, CONST_STRING(interp, "utf8")))

@@ -133,13 +133,13 @@ Marks this PMC and any of its contents as live.
 
         if (e) {
             if (e->type)
-                pobject_lives(INTERP, (PObj *)e->type);
+                Parrot_gc_mark_PObj_alive(INTERP, (PObj *)e->type);
 
             if (! PMC_IS_NULL(e->interp))
-                pobject_lives(INTERP, (PObj *)e->interp);
+                Parrot_gc_mark_PObj_alive(INTERP, (PObj *)e->interp);
 
             if (! PMC_IS_NULL(e->code))
-                pobject_lives(INTERP, (PObj *)e->code);
+                Parrot_gc_mark_PObj_alive(INTERP, (PObj *)e->code);
         }
     }
 

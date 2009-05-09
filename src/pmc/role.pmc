@@ -273,15 +273,15 @@ Mark referenced strings and PMCs in the structure as live.
         Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
 
         if (role->name)
-            pobject_lives(interp, (PObj *)role->name);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)role->name);
         if (role->_namespace)
-            pobject_lives(interp, (PObj *)role->_namespace);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)role->_namespace);
         if (role->roles)
-            pobject_lives(interp, (PObj *)role->roles);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)role->roles);
         if (role->methods)
-            pobject_lives(interp, (PObj *)role->methods);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)role->methods);
         if (role->attrib_metadata)
-            pobject_lives(interp, (PObj *)role->attrib_metadata);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)role->attrib_metadata);
     }
 
 /*

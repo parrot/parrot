@@ -470,23 +470,23 @@ Marks the sub as live.
             return;
 
         if (sub->name)
-            pobject_lives(INTERP, (PObj *) sub->name);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->name);
         if (sub->method_name)
-            pobject_lives(INTERP, (PObj *) sub->method_name);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->method_name);
         if (sub->ns_entry_name)
-            pobject_lives(INTERP, (PObj *) sub->ns_entry_name);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->ns_entry_name);
         if (!PMC_IS_NULL(sub->namespace_name))
-            pobject_lives(INTERP, (PObj *) sub->namespace_name);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->namespace_name);
         if (!PMC_IS_NULL(sub->multi_signature))
-            pobject_lives(INTERP, (PObj *) sub->multi_signature);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->multi_signature);
         if (!PMC_IS_NULL(sub->lex_info))
-            pobject_lives(INTERP, (PObj *) sub->lex_info);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->lex_info);
         if (!PMC_IS_NULL(sub->outer_sub))
-            pobject_lives(INTERP, (PObj *) sub->outer_sub);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->outer_sub);
         if (!PMC_IS_NULL(sub->eval_pmc))
-            pobject_lives(INTERP, (PObj *) sub->eval_pmc);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->eval_pmc);
         if (sub->subid)
-            pobject_lives(INTERP, (PObj *) sub->subid);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *) sub->subid);
         if (sub->ctx)
             mark_context(interp, sub->ctx);
         if (sub->outer_ctx)

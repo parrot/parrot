@@ -24,12 +24,9 @@ typedef struct Stack_Entry {
     void (*cleanup)(PARROT_INTERP, ARGIN(struct Stack_Entry *));
 } Stack_Entry_t;
 
-struct Small_Object_Pool; /* forward decl */
-
 typedef struct Stack_Chunk {
     UnionVal            cache;
     Parrot_UInt         flags;
-    struct Small_Object_Pool  *pool;
     const char         *name;
     struct Stack_Chunk *prev;
     Parrot_UInt         refcount;

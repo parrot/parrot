@@ -145,11 +145,11 @@ Marks the current idx/key and the aggregate as live.
         PMC *key;
         GET_ATTR_key(INTERP, SELF, key);
         if (key)
-             pobject_lives(INTERP, (PObj *)key);
+             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)key);
 
         /* the aggregate */
         if (SELF.get_pmc() != PMCNULL)
-             pobject_lives(INTERP, (PObj *)SELF.get_pmc());
+             Parrot_gc_mark_PObj_alive(INTERP, (PObj *)SELF.get_pmc());
     }
 
 /*

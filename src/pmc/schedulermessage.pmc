@@ -216,7 +216,7 @@ Mark any referenced strings and PMCs.
                 PARROT_SCHEDULERMESSAGE(SELF);
 
             if (core_struct->data)
-                pobject_lives(interp, (PObj*)core_struct->data);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)core_struct->data);
         }
     }
 

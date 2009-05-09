@@ -67,9 +67,9 @@ Marks the OrderedHash as live.
             while (b) {
 
                 if (b->key) {
-                    pobject_lives(interp, (PObj *)b->key);
+                    Parrot_gc_mark_PObj_alive(interp, (PObj *)b->key);
                     if (b->value)
-                        pobject_lives(interp, (PObj *)b->value);
+                        Parrot_gc_mark_PObj_alive(interp, (PObj *)b->value);
                 }
 
                 b = b->next;

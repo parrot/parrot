@@ -151,7 +151,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     interp->recursion_limit = RECURSION_LIMIT;
 
     /* Must initialize flags here so the GC_DEBUG stuff is available before
-     * mem_setup_allocator() is called. */
+     * Parrot_gc_initialize() is called. */
     interp->flags = flags;
 
     /* PANIC will fail until this is done */
@@ -168,7 +168,7 @@ make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     }
 
     /* Set up the memory allocation system */
-    mem_setup_allocator(interp, (void*)&stacktop);
+    Parrot_gc_initialize(interp, (void*)&stacktop);
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 
@@ -334,8 +334,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      * Need to turn off GC blocking, else things stay alive and IO
      * handles aren't closed
      */
-    interp->arena_base->gc_mark_block_level  = 0;
-    interp->arena_base->gc_sweep_block_level = 0;
+    Parrot_gc_completely_unblock(interp);
 
     if (Interp_trace_TEST(interp, ~0)) {
         Parrot_io_eprintf(interp, "FileHandle objects (like stdout and stderr)"
@@ -348,7 +347,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->thread_data)
         interp->thread_data->state |= THREAD_STATE_SUSPENDED_GC;
 
-    Parrot_do_gc_run(interp, GC_finish_FLAG);
+    Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
 
     /*
      * that doesn't get rid of constant PMCs like these in vtable->data
@@ -384,12 +383,11 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->parent_interpreter
     &&  interp->thread_data
     && (interp->thread_data->state & THREAD_STATE_JOINED)) {
-        Parrot_merge_header_pools(interp->parent_interpreter, interp);
-        Parrot_merge_memory_pools(interp->parent_interpreter, interp);
+        Parrot_gc_merge_header_pools(interp->parent_interpreter, interp);
+        Parrot_gc_merge_header_pools(interp->parent_interpreter, interp);
     }
 
-    if (interp->arena_base->finalize_gc_system)
-        interp->arena_base->finalize_gc_system(interp);
+    Parrot_gc_finalize(interp);
 
     /* MMD cache */
     Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);
@@ -398,10 +396,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     Parrot_destroy_constants(interp);
 
     /* buffer headers, PMCs */
-    Parrot_destroy_header_pools(interp);
+    Parrot_gc_destroy_header_pools(interp);
 
     /* memory pools in resources */
-    Parrot_destroy_memory_pools(interp);
+    Parrot_gc_destroy_memory_pools(interp);
 
     /* mem subsystem is dead now */
     mem_sys_free(interp->arena_base);

@@ -86,11 +86,11 @@ Marks the object as live.
                 PARROT_PACKFILEANNOTATIONKEYS(SELF);
 
         if (attrs->const_table)
-            pobject_lives(interp, (PObj *)attrs->const_table);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->const_table);
         if (attrs->names)
-            pobject_lives(interp, (PObj *)attrs->names);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->names);
         if (attrs->types)
-            pobject_lives(interp, (PObj *)attrs->types);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->types);
     }
 
 /*

@@ -67,7 +67,7 @@ Marks the object as live.
                 PARROT_PACKFILESEGMENT(SELF);
 
         if (attrs->directory)
-            pobject_lives(interp, (PObj *)attrs->directory);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->directory);
     }
 
 /*

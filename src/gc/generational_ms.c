@@ -112,7 +112,6 @@ A chained list of headers used e.g. for the IGP list.
 
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
-#include "parrot/gc_mark_sweep.h"
 
 #if PARROT_GC_GMS
 
@@ -120,7 +119,7 @@ typedef struct Gc_gms_private {
     UINTVAL current_gen_no;             /* the nursery generation number */
 } Gc_gms_private;
 
-/* HEADERIZER HFILE: include/parrot/gc_api.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -744,7 +743,7 @@ gc_gms_more_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     if (pool->skip)
         pool->skip = 0;
     else if (pool->last_Arena) {
-        Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
         if (pool->num_free_objects <= pool->replenish_level)
             pool->skip = 1;
     }
@@ -1452,9 +1451,9 @@ gc_gms_setto_black(PARROT_INTERP, ARGMOD(Gc_gms_hdr *h), int priority)
 
 /*
 
-=item C<void parrot_gc_gms_pobject_lives(PARROT_INTERP, PObj *obj)>
+=item C<void parrot_gc_gms_Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>
 
-Set the object live - called by the pobject_lives macro
+Set the object live - called by the Parrot_gc_mark_PObj_alive macro
 
 =cut
 
@@ -1462,9 +1461,9 @@ Set the object live - called by the pobject_lives macro
 
 PARROT_EXPORT
 void
-parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+parrot_gc_gms_Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
 {
-    ASSERT_ARGS(parrot_gc_gms_pobject_lives)
+    ASSERT_ARGS(parrot_gc_gms_Parrot_gc_mark_PObj_alive)
     Gc_gms_hdr *h;
     int priority;
 
@@ -1545,7 +1544,7 @@ trace_igp_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
         const Gc_gms_hdr **p;
         for (p = s->store; p < s->ptr; ++p) {
             Gc_gms_hdr * const h = *p;
-            pobject_lives(interp, GMSH_to_PObj(h));
+            Parrot_gc_mark_PObj_alive(interp, GMSH_to_PObj(h));
         }
     }
     return 0;
@@ -1598,7 +1597,7 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
                 arena_base->num_early_gc_PMCs) {
             return 1;
         }
-        /* TODO propagate flag in pobject_lives */
+        /* TODO propagate flag in Parrot_gc_mark_PObj_alive */
         arena_base->gc_trace_ptr = current;
         if (!PObj_needs_early_gc_TEST(current))
             PObj_high_priority_gc_CLEAR(current);
@@ -1815,7 +1814,7 @@ gc_gms_end_cycle(PARROT_INTERP)
 
 =item C<static void parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)>
 
-Interface to C<Parrot_do_gc_run>. C<flags> is one of:
+Interface to C<Parrot_gc_mark_and_sweep>. C<flags> is one of:
 
   GC_lazy_FLAG   ... timely destruction
   GC_finish_FLAG ... run a final sweep to destruct objects at

@@ -121,7 +121,7 @@ mark_subs(PARROT_INTERP, PMC *self)
             PMC      *sub = ct->constants[ci]->u.key;
 
             if (!PMC_IS_NULL(sub))
-                pobject_lives(interp, (PObj *)sub);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)sub);
         }
     }
 }

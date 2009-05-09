@@ -51,12 +51,6 @@ static void add_pmc_todo_list(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void cleanup_next_for_GC(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-static void cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
-        __attribute__nonnull__(1);
-
 static void create_image(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGMOD(visit_info *info))
@@ -301,10 +295,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_add_pmc_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
-#define ASSERT_ARGS_cleanup_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_cleanup_next_for_GC_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_create_image __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
@@ -482,7 +472,7 @@ str_append(PARROT_INTERP, ARGMOD(STRING *s), ARGIN(const void *b), size_t len)
         size_t new_size = (size_t) (PObj_buflen(s) * 1.5);
         if (new_size < PObj_buflen(s) - need_free + 512)
             new_size = PObj_buflen(s) - need_free + 512;
-        Parrot_reallocate_string(interp, s, new_size);
+        Parrot_gc_reallocate_string_storage(interp, s, new_size);
         PARROT_ASSERT(PObj_buflen(s) - used - len >= 15);
     }
     mem_sys_memcopy((void *)((ptrcast_t)s->strstart + used), b, len);
@@ -730,11 +720,11 @@ op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
         size_t new_size = (size_t) (PObj_buflen(s) * 1.5);
         if (new_size < PObj_buflen(s) - need_free + 512)
             new_size = PObj_buflen(s) - need_free + 512;
-        Parrot_reallocate_string(interp, s, new_size);
+        Parrot_gc_reallocate_string_storage(interp, s, new_size);
         PARROT_ASSERT(PObj_buflen(s) - used - len >= 15);
     }
 #ifndef DISABLE_GC_DEBUG
-    Parrot_go_collect(interp);
+    Parrot_gc_compact_memory_pool(interp);
 #endif
 }
 
@@ -969,55 +959,7 @@ pmc_add_ext(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(pmc_add_ext)
     if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
-        add_pmc_ext(interp, pmc);
-}
-
-/*
-
-=item C<static void cleanup_next_for_GC_pool(Small_Object_Pool *pool)>
-
-Sets all the C<next_for_GC> pointers to C<NULL>.
-
-=cut
-
-*/
-
-static void
-cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(cleanup_next_for_GC_pool)
-    Small_Object_Arena *arena;
-
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        PMC *p = (PMC *)arena->start_objects;
-        UINTVAL i;
-
-        for (i = 0; i < arena->used; i++) {
-            if (!PObj_on_free_list_TEST(p)) {
-                if (p->pmc_ext)
-                    PMC_next_for_GC(p) = PMCNULL;
-            }
-            p++;
-        }
-    }
-}
-
-/*
-
-=item C<static void cleanup_next_for_GC(PARROT_INTERP)>
-
-Cleans up the C<next_for_GC> pointers.
-
-=cut
-
-*/
-
-static void
-cleanup_next_for_GC(PARROT_INTERP)
-{
-    ASSERT_ARGS(cleanup_next_for_GC)
-    cleanup_next_for_GC_pool(interp->arena_base->pmc_pool);
-    cleanup_next_for_GC_pool(interp->arena_base->constant_pmc_pool);
+        Parrot_gc_add_pmc_ext(interp, pmc);
 }
 
 /*
@@ -1423,37 +1365,7 @@ If not found, throw an exception.
 static UINTVAL
 id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    ASSERT_ARGS(id_from_pmc)
-    UINTVAL id = 1;     /* first PMC in first arena */
-    Small_Object_Arena *arena;
-    Small_Object_Pool *pool;
-
-    pmc = (PMC*)PObj_to_ARENA(pmc);
-    pool = interp->arena_base->pmc_pool;
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
-        if (ptr_diff >= 0 && ptr_diff <
-                (ptrdiff_t)(arena->used * pool->object_size)) {
-            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
-            id += ptr_diff / pool->object_size;
-            return id << 2;
-        }
-        id += arena->total_objects;
-    }
-
-    pool = interp->arena_base->constant_pmc_pool;
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
-        if (ptr_diff >= 0 && ptr_diff <
-                (ptrdiff_t)(arena->used * pool->object_size)) {
-            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
-            id += ptr_diff / pool->object_size;
-            return id << 2;
-        }
-        id += arena->total_objects;
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "Couldn't find PMC in arenas");
+    return Parrot_gc_get_pmc_index(interp, pmc) << 2;
 }
 
 /*
@@ -1846,7 +1758,7 @@ run_thaw(PARROT_INTERP, ARGIN(STRING* image), visit_enum_type what)
      * collected under us.
      */
     if (1 || (Parrot_str_byte_length(interp, image) > THAW_BLOCK_GC_SIZE)) {
-        Parrot_do_gc_run(interp, 1);
+        Parrot_gc_mark_and_sweep(interp, 1);
         Parrot_block_GC_mark(interp);
         Parrot_block_GC_sweep(interp);
         gc_block = 1;
@@ -1908,7 +1820,7 @@ Parrot_freeze_at_destruct(PARROT_INTERP, ARGIN(PMC* pmc))
     visit_info info;
 
     Parrot_block_GC_mark(interp);
-    cleanup_next_for_GC(interp);
+    Parrot_gc_cleanup_next_for_GC(interp);
     info.what = VISIT_FREEZE_AT_DESTRUCT;
     info.mark_ptr = pmc;
     info.thaw_ptr = NULL;
