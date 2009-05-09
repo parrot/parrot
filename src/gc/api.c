@@ -200,6 +200,7 @@ routine.
 void
 Parrot_gc_finalize(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_finalize)
     if (interp->arena_base->finalize_gc_system)
         interp->arena_base->finalize_gc_system(interp);
 }
@@ -297,7 +298,7 @@ Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_gc_add_pmc_ext)
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
     pmc->pmc_ext = (PMC_EXT *)pool->get_free_object(interp, pool);
-    if(!pmc->pmc_ext)
+    if (!pmc->pmc_ext)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: PMC_EXT allocation failed!\n");
     PObj_is_PMC_EXT_SET(pmc);
@@ -366,7 +367,7 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (!PObj_is_PMC_EXT_TEST(pmc))
         Parrot_gc_add_pmc_ext(interp, pmc);
     PMC_sync(pmc) = mem_allocate_typed(Sync);
-    if(!PMC_sync(pmc))
+    if (!PMC_sync(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: PMC Sync allocation failed!\n");
 
@@ -397,7 +398,7 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
         (flags & PObj_constant_FLAG)
             ? interp->arena_base->constant_string_header_pool
             : interp->arena_base->string_header_pool);
-    if(!string)
+    if (!string)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: STRING allocation failed!\n");
 
@@ -421,7 +422,7 @@ Adds the given STRING to the free list for later reuse.
 void
 Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
 {
-    ASSERT_ARGS(Parrot_gc_free_string_header);
+    ASSERT_ARGS(Parrot_gc_free_string_header)
     if (!PObj_constant_TEST(s)) {
         Small_Object_Pool * const pool = interp->arena_base->string_header_pool;
         pool->add_free_object(interp, pool, s);
@@ -469,7 +470,7 @@ void
 Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(PObj *obj),
     size_t size)
 {
-    ASSERT_ARGS(Parrot_gc_free_bufferlike_header);
+    ASSERT_ARGS(Parrot_gc_free_bufferlike_header)
     Small_Object_Pool * const pool = get_bufferlike_pool(interp, size);
     pool->add_free_object(interp, pool, obj);
 }
@@ -1014,6 +1015,7 @@ contained in one of this interpreters PMC pools.
 int
 Parrot_gc_ptr_is_pmc(PARROT_INTERP, ARGIN(void *ptr))
 {
+    ASSERT_ARGS(Parrot_gc_ptr_is_pmc)
     return contained_in_pool(interp->arena_base->pmc_pool, ptr) ||
            contained_in_pool(interp->arena_base->constant_pmc_pool, ptr);
 }
@@ -1127,6 +1129,7 @@ Returns the number of actively used sized buffers.
 int
 Parrot_gc_active_sized_buffers(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_active_sized_buffers)
     int j, ret = 0;
     const Arenas * const arena_base = interp->arena_base;
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
@@ -1152,6 +1155,7 @@ Returns the total number of sized buffers that we are managing.
 int
 Parrot_gc_total_sized_buffers(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_total_sized_buffers)
     int j, ret = 0;
     const Arenas * const arena_base = interp->arena_base;
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
@@ -1176,6 +1180,7 @@ Return the number of actively used PMCs.
 int
 Parrot_gc_active_pmcs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_active_pmcs)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->pmc_pool->total_objects -
            arena_base->pmc_pool->num_free_objects;
@@ -1194,6 +1199,7 @@ Return the total number of PMCs that we are managing.
 int
 Parrot_gc_total_pmcs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_total_pmcs)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->pmc_pool->total_objects;
 }
@@ -1241,6 +1247,7 @@ Returns the number of extended PMCs.
 size_t
 Parrot_gc_count_mark_runs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_count_mark_runs)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_mark_runs;
 }
@@ -1248,6 +1255,7 @@ Parrot_gc_count_mark_runs(PARROT_INTERP)
 size_t
 Parrot_gc_count_collect_runs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_count_collect_runs)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_collect_runs;
 }
@@ -1255,6 +1263,7 @@ Parrot_gc_count_collect_runs(PARROT_INTERP)
 size_t
 Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_count_lazy_mark_runs)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_lazy_mark_runs;;
 }
@@ -1262,6 +1271,7 @@ Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
 size_t
 Parrot_gc_total_memory_allocated(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_total_memory_allocated)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->memory_allocated;
 }
@@ -1269,6 +1279,7 @@ Parrot_gc_total_memory_allocated(PARROT_INTERP)
 size_t
 Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_headers_alloc_since_last_collect)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->header_allocs_since_last_collect;
 }
@@ -1276,6 +1287,7 @@ Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
 size_t
 Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_mem_alloc_since_last_collect)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->mem_allocs_since_last_collect;
 }
@@ -1283,6 +1295,7 @@ Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
 UINTVAL
 Parrot_gc_total_copied(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_total_copied)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->memory_collected;
 }
@@ -1290,6 +1303,7 @@ Parrot_gc_total_copied(PARROT_INTERP)
 UINTVAL
 Parrot_gc_impatient_pmcs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_impatient_pmcs)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->num_early_gc_PMCs;
 }
@@ -1297,6 +1311,7 @@ Parrot_gc_impatient_pmcs(PARROT_INTERP)
 UINTVAL
 Parrot_gc_extended_pmcs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_extended_pmcs)
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->num_extended_PMCs;
 }
@@ -1340,6 +1355,7 @@ PARROT_EXPORT
 void
 Parrot_block_GC_mark(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_block_GC_mark)
     interp->arena_base->gc_mark_block_level++;
     Parrot_shared_gc_block(interp);
 }
@@ -1348,6 +1364,7 @@ PARROT_EXPORT
 void
 Parrot_unblock_GC_mark(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_unblock_GC_mark)
     if (interp->arena_base->gc_mark_block_level) {
         interp->arena_base->gc_mark_block_level--;
         Parrot_shared_gc_unblock(interp);
@@ -1358,6 +1375,7 @@ PARROT_EXPORT
 void
 Parrot_block_GC_sweep(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_block_GC_sweep)
     interp->arena_base->gc_sweep_block_level++;
 }
 
@@ -1365,6 +1383,7 @@ PARROT_EXPORT
 void
 Parrot_unblock_GC_sweep(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_unblock_GC_sweep)
     if (interp->arena_base->gc_sweep_block_level)
         interp->arena_base->gc_sweep_block_level--;
 }
@@ -1373,6 +1392,7 @@ PARROT_EXPORT
 unsigned int
 Parrot_is_blocked_GC_mark(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_is_blocked_GC_mark)
     return interp->arena_base->gc_mark_block_level;
 }
 
@@ -1380,12 +1400,14 @@ PARROT_EXPORT
 unsigned int
 Parrot_is_blocked_GC_sweep(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_is_blocked_GC_sweep)
     return interp->arena_base->gc_sweep_block_level;
 }
 
 void
 Parrot_gc_completely_unblock(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_gc_completely_unblock)
     interp->arena_base->gc_mark_block_level  = 0;
     interp->arena_base->gc_sweep_block_level = 0;
 }
@@ -1403,6 +1425,7 @@ Mark a PMC as needing timely destruction
 void
 Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
+    ASSERT_ARGS(Parrot_gc_pmc_needs_early_collection)
     PObj_needs_early_gc_SET(pmc);
     ++interp->arena_base->num_early_gc_PMCs;
 }

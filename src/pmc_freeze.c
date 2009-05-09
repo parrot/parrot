@@ -1365,6 +1365,7 @@ If not found, throw an exception.
 static UINTVAL
 id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
+    ASSERT_ARGS(id_from_pmc)
     return Parrot_gc_get_pmc_index(interp, pmc) << 2;
 }
 

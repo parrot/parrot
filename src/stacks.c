@@ -75,7 +75,7 @@ cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 {
     ASSERT_ARGS(cst_new_stack_chunk)
     Stack_Chunk_t * const new_chunk =
-        (Stack_Chunk_t *)Parrot_gc_new_bufferlike_header(interp, sizeof(Stack_Chunk_t));
+        (Stack_Chunk_t *)Parrot_gc_new_bufferlike_header(interp, sizeof (Stack_Chunk_t));
 
     PObj_bufstart(new_chunk) = NULL;
     PObj_buflen(new_chunk)   = 0;
@@ -104,7 +104,7 @@ new_stack(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(new_stack)
     Stack_Chunk_t * const chunk =
-        (Stack_Chunk_t *)Parrot_gc_new_bufferlike_header(interp, sizeof(Stack_Chunk_t));
+        (Stack_Chunk_t *)Parrot_gc_new_bufferlike_header(interp, sizeof (Stack_Chunk_t));
 
     chunk->prev = chunk;        /* mark the top of the stack */
     chunk->name = name;

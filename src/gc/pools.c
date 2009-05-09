@@ -60,6 +60,10 @@ static void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
 
 /*
 
+=head2 Buffer Header Functions for small-object lookup table
+
+=over 4
+
 =item C<void Parrot_merge_memory_pools(Interp *dest_interp, Interp
 *source_interp)>
 
@@ -83,10 +87,6 @@ Parrot_merge_memory_pools(ARGIN(Interp *dest_interp), ARGIN(Interp *source_inter
 }
 
 /*
-
-=head2 Buffer Header Functions for small-object lookup table
-
-=over 4
 
 =item C<void * get_free_buffer(PARROT_INTERP, Small_Object_Pool *pool)>
 
