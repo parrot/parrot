@@ -100,8 +100,6 @@ Transfers control to the calling context, and frees the current context.
 
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
-        VTABLE_destroy(interp, SELF);
-        Parrot_gc_free_pmc_ext(interp, SELF);
         Parrot_gc_free_pmc_header(interp, SELF);
 #else
         cc->from_ctx = NULL;
