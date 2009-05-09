@@ -33,6 +33,9 @@ F<docs/memory_internals.pod>.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
+        __attribute__nonnull__(1);
+
 static void fix_pmc_syncs(
     ARGMOD(Interp *dest_interp),
     ARGIN(Small_Object_Pool *pool))
@@ -62,6 +65,8 @@ static int sweep_cb_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+#define ASSERT_ARGS_cleanup_next_for_GC_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest_interp) \
     || PARROT_ASSERT_ARG(pool)
@@ -80,6 +85,71 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #if ! DISABLE_GC_DEBUG
 
 #endif
+
+/*
+
+=item C<void pobject_lives(PARROT_INTERP, PObj *obj)>
+
+Marks the PObj as "alive" for the Garbage Collector. Takes a pointer to a PObj,
+and performs necessary marking to ensure the PMC and its direct children nodes
+are marked alive. Implementation is generally dependant on the particular
+garbage collector in use.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+{
+    ASSERT_ARGS(pobject_lives)
+#if PARROT_GC_GMS
+    do {
+        if (!PObj_live_TEST(obj) && \
+                PObj_to_GMSH(obj)->gen->gen_no >= interp->gc_generation) \
+            parrot_gc_gms_pobject_lives(interp, obj); \
+    } while (0);
+#else /* not PARROT_GC_GMS */
+
+    /* if object is live or on free list return */
+    if (PObj_is_live_or_free_TESTALL(obj))
+        return;
+
+#  if ! DISABLE_GC_DEBUG
+#    if GC_VERBOSE
+    if (CONSERVATIVE_POINTER_CHASING)
+        fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
+                PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
+
+#    endif
+#  endif
+    /* mark it live */
+    PObj_live_SET(obj);
+
+    /* if object is a PMC and contains buffers or PMCs, then attach the PMC
+     * to the chained mark list. */
+    if (PObj_is_PMC_TEST(obj)) {
+        PMC * const p = (PMC *)obj;
+
+        if (PObj_is_special_PMC_TEST(obj))
+            mark_special(interp, p);
+
+#  ifndef NDEBUG
+        else if (p->pmc_ext && PMC_metadata(p))
+            fprintf(stderr, "GC: error obj %p (%s) has properties\n",
+                    (void *)p, (char*)p->vtable->whoami->strstart);
+#  endif
+    }
+#  if GC_VERBOSE
+    /* buffer GC_DEBUG stuff */
+    if (GC_DEBUG(interp) && PObj_report_TEST(obj))
+        fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
+                obj, PObj_bufstart((Buffer *)obj));
+#  endif
+#endif  /* PARROT_GC_GMS */
+}
+
 
 /*
 
@@ -913,6 +983,68 @@ Parrot_destroy_memory_pools(PARROT_INTERP)
     }
 }
 
+/*
+
+=item C<void Parrot_gc_cleanup_next_for_GC(PARROT_INTERP)>
+
+Cleans up the C<next_for_GC> pointers.
+
+=cut
+
+*/
+
+void
+Parrot_gc_cleanup_next_for_GC(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_cleanup_next_for_GC)
+    cleanup_next_for_GC_pool(interp->arena_base->pmc_pool);
+    cleanup_next_for_GC_pool(interp->arena_base->constant_pmc_pool);
+}
+
+/*
+
+=item C<static void cleanup_next_for_GC_pool(Small_Object_Pool *pool)>
+
+Sets all the C<next_for_GC> pointers to C<NULL>.
+
+=cut
+
+*/
+
+static void
+cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
+{
+    ASSERT_ARGS(cleanup_next_for_GC_pool)
+    Small_Object_Arena *arena;
+
+    for (arena = pool->last_Arena; arena; arena = arena->prev) {
+        PMC *p = (PMC *)arena->start_objects;
+        UINTVAL i;
+
+        for (i = 0; i < arena->used; i++) {
+            if (!PObj_on_free_list_TEST(p)) {
+                if (p->pmc_ext)
+                    PMC_next_for_GC(p) = PMCNULL;
+            }
+            p++;
+        }
+    }
+}
+
+/*
+
+=item C<int Parrot_gc_ptr_is_pmc(PARROT_INTERP, void *ptr)>
+
+=cut
+
+*/
+
+int
+Parrot_gc_ptr_is_pmc(PARROT_INTERP, ARGIN(void *ptr))
+{
+    return contained_in_pool(interp->arena_base->pmc_pool, ptr) ||
+           contained_in_pool(interp->arena_base->constant_pmc_pool, ptr);
+}
 
 /*
 

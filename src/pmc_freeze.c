@@ -60,12 +60,6 @@ static void add_pmc_todo_list(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
-static void cleanup_next_for_GC(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-static void cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
-        __attribute__nonnull__(1);
-
 static void create_image(PARROT_INTERP,
     ARGIN_NULLOK(PMC *pmc),
     ARGMOD(visit_info *info))
@@ -310,10 +304,6 @@ static void visit_todo_list_thaw(PARROT_INTERP,
 #define ASSERT_ARGS_add_pmc_todo_list __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
-#define ASSERT_ARGS_cleanup_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_cleanup_next_for_GC_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_create_image __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(info)
@@ -979,54 +969,6 @@ pmc_add_ext(PARROT_INTERP, ARGIN(PMC *pmc))
     ASSERT_ARGS(pmc_add_ext)
     if (pmc->vtable->flags & VTABLE_PMC_NEEDS_EXT)
         Parrot_gc_add_pmc_ext(interp, pmc);
-}
-
-/*
-
-=item C<static void cleanup_next_for_GC_pool(Small_Object_Pool *pool)>
-
-Sets all the C<next_for_GC> pointers to C<NULL>.
-
-=cut
-
-*/
-
-static void
-cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(cleanup_next_for_GC_pool)
-    Small_Object_Arena *arena;
-
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        PMC *p = (PMC *)arena->start_objects;
-        UINTVAL i;
-
-        for (i = 0; i < arena->used; i++) {
-            if (!PObj_on_free_list_TEST(p)) {
-                if (p->pmc_ext)
-                    PMC_next_for_GC(p) = PMCNULL;
-            }
-            p++;
-        }
-    }
-}
-
-/*
-
-=item C<static void cleanup_next_for_GC(PARROT_INTERP)>
-
-Cleans up the C<next_for_GC> pointers.
-
-=cut
-
-*/
-
-static void
-cleanup_next_for_GC(PARROT_INTERP)
-{
-    ASSERT_ARGS(cleanup_next_for_GC)
-    cleanup_next_for_GC_pool(interp->arena_base->pmc_pool);
-    cleanup_next_for_GC_pool(interp->arena_base->constant_pmc_pool);
 }
 
 /*
@@ -1917,7 +1859,7 @@ Parrot_freeze_at_destruct(PARROT_INTERP, ARGIN(PMC* pmc))
     visit_info info;
 
     Parrot_block_GC_mark(interp);
-    cleanup_next_for_GC(interp);
+    Parrot_gc_cleanup_next_for_GC(interp);
     info.what = VISIT_FREEZE_AT_DESTRUCT;
     info.mark_ptr = pmc;
     info.thaw_ptr = NULL;

@@ -186,7 +186,7 @@ verify_CD(ARGIN(char *external_data), ARGMOD(PMC *user_data))
             continue;
         interp = interpreter_array[i];
         if (interp)
-            if (contained_in_pool(interp->arena_base->pmc_pool, user_data))
+            if (Parrot_gc_ptr_is_pmc(interp, user_data))
                 break;
     }
     UNLOCK(interpreter_array_mutex);

@@ -199,6 +199,12 @@ typedef enum {
 /* HEADERIZER BEGIN: src/gc/api.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_EXPORT
+void pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*obj);
+
 void Parrot_allocate_aligned(PARROT_INTERP,
     ARGOUT(Buffer *buffer),
     size_t size)
@@ -226,6 +232,9 @@ void Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
+
+void Parrot_gc_cleanup_next_for_GC(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 void Parrot_gc_free_bufferlike_header(PARROT_INTERP,
     ARGMOD(PObj *obj),
@@ -260,6 +269,10 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
+
+int Parrot_gc_ptr_is_pmc(PARROT_INTERP, ARGIN(void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void Parrot_go_collect(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -296,6 +309,9 @@ void Parrot_reallocate_string(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
+#define ASSERT_ARGS_pobject_lives __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(obj)
 #define ASSERT_ARGS_Parrot_allocate_aligned __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(buffer)
@@ -312,6 +328,8 @@ void Parrot_reallocate_string(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_add_pmc_sync __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_Parrot_gc_cleanup_next_for_GC __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_free_bufferlike_header \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -331,6 +349,9 @@ void Parrot_reallocate_string(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_new_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_ptr_is_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ptr)
 #define ASSERT_ARGS_Parrot_go_collect __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_in_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
