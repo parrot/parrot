@@ -242,10 +242,7 @@ void
 Parrot_str_free(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_free)
-    if (!PObj_constant_TEST(s)) {
-        Small_Object_Pool * const pool = interp->arena_base->string_header_pool;
-        pool->add_free_object(interp, pool, s);
-    }
+    Parrot_gc_free_string_header(interp, s);
 }
 
 /*

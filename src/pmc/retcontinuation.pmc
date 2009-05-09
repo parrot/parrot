@@ -101,16 +101,8 @@ Transfers control to the calling context, and frees the current context.
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
         VTABLE_destroy(interp, SELF);
-        {
-            Arenas            *arena_base = interp->arena_base;
-            Small_Object_Pool *pool       = arena_base->pmc_pool;
-            Small_Object_Pool *ext_pool   = arena_base->pmc_ext_pool;
-            ext_pool->add_free_object(interp, ext_pool,
-                    (PObj *)SELF->pmc_ext);
-            PObj_flags_SETTO((PObj *)SELF, PObj_on_free_list_FLAG);
-            pool->add_free_object(interp, pool, (PObj *)SELF);
-            pool->num_free_objects++;
-        }
+        Parrot_gc_free_pmc_ext(interp, SELF);
+        Parrot_gc_free_pmc_header(interp, SELF);
 #else
         cc->from_ctx = NULL;
 

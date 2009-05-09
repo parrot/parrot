@@ -386,6 +386,11 @@ void Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+void Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*s);
+
 int Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -478,6 +483,9 @@ void Parrot_reallocate(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
+#define ASSERT_ARGS_Parrot_gc_free_string_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_Parrot_gc_get_pmc_index __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)

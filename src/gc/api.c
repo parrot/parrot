@@ -261,6 +261,23 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     pool->num_free_objects++;
 }
 
+/*
+
+=item C<void Parrot_gc_free_string_header(PARROT_INTERP, STRING *s)>
+
+=cut
+
+*/
+
+void
+Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
+{
+    ASSERT_ARGS(Parrot_gc_free_string_header);
+    if (!PObj_constant_TEST(s)) {
+        Small_Object_Pool * const pool = interp->arena_base->string_header_pool;
+        pool->add_free_object(interp, pool, s);
+    }
+}
 
 /*
 
