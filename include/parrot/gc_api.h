@@ -43,6 +43,8 @@ typedef enum {
     POOL_ALL    = 0x07
 } pool_iter_enum;
 
+struct Small_Object_Pool;
+
 typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
 
 typedef struct Memory_Block {
@@ -133,8 +135,6 @@ typedef struct Small_Object_Arena {
     struct Small_Object_Arena *next;
     void                      *start_objects;
 } Small_Object_Arena;
-
-struct Small_Object_Pool;
 
 typedef enum {
     GC_TRACE_FULL,
@@ -381,6 +381,11 @@ void Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*p);
 
+void Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
+
 int Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -470,6 +475,9 @@ void Parrot_reallocate(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(p)
+#define ASSERT_ARGS_Parrot_gc_free_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_Parrot_gc_get_pmc_index __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)

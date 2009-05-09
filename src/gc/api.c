@@ -235,6 +235,32 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
     return pmc;
 }
 
+/*
+
+=item C<void Parrot_gc_free_pmc_header(PARROT_INTERP, PMC *pmc)>
+
+=cut
+
+*/
+
+void
+Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    ASSERT_ARGS(Parrot_gc_free_pmc_header)
+    Small_Object_Pool * const pool = (PObj_constant_TEST(pmc)) ?
+        interp->arena_base->constant_pmc_pool : interp->arena_base->pmc_pool;
+
+    if (PObj_active_destroy_TEST(pmc))
+        VTABLE_destroy(interp, pmc);
+
+    if (PObj_is_PMC_EXT_TEST(pmc))
+        Parrot_gc_free_pmc_ext(interp, pmc);
+
+    PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
+    pool->add_free_object(interp, pool, (PObj *)pmc);
+    pool->num_free_objects++;
+}
+
 
 /*
 
