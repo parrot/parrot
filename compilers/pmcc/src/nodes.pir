@@ -172,6 +172,7 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
 
     .local pmc it, attr
     .local string type, name
+    .local int is_fp
 
     attrs = thaw $S0
     it = iter attrs
@@ -179,9 +180,10 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
   iter_loop:
     unless it goto iter_done
     attr = shift it
-    name = attr['name']
-    type = attr['type']
-    self.'add_attr'(name, type)
+    name  = attr['name']
+    type  = attr['type']
+    is_fp = attr['is_fp']
+    self.'add_attr'(name, type, is_fp)
     goto iter_loop
 
   iter_done:
