@@ -333,6 +333,9 @@ void Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
 
+int Parrot_gc_active_sized_buffers(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -440,6 +443,9 @@ void Parrot_gc_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
+int Parrot_gc_total_sized_buffers(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_reallocate(PARROT_INTERP,
     ARGMOD(Buffer *buffer),
     size_t newsize)
@@ -450,6 +456,9 @@ void Parrot_reallocate(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_mark_PObj_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_Parrot_gc_active_sized_buffers \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_add_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
@@ -514,6 +523,8 @@ void Parrot_reallocate(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(str)
+#define ASSERT_ARGS_Parrot_gc_total_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_reallocate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(buffer)

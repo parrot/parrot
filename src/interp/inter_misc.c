@@ -236,26 +236,13 @@ interpinfo(PARROT_INTERP, INTVAL what)
                 arena_base->pmc_pool->num_free_objects;
             break;
         case ACTIVE_BUFFERS:
-            ret = 0;
-            for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                Small_Object_Pool * const header_pool =
-                    arena_base->sized_header_pools[j];
-                if (header_pool)
-                    ret += header_pool->total_objects -
-                        header_pool->num_free_objects;
-            }
+            ret = Parrot_gc_active_sized_buffers(interp);
             break;
         case TOTAL_PMCS:
             ret = arena_base->pmc_pool->total_objects;
             break;
         case TOTAL_BUFFERS:
-            ret = 0;
-            for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                Small_Object_Pool * const header_pool =
-                    arena_base->sized_header_pools[j];
-                if (header_pool)
-                    ret += header_pool->total_objects;
-            }
+            ret = Parrot_gc_total_sized_buffers(interp);
             break;
         case HEADER_ALLOCS_SINCE_COLLECT:
             ret = arena_base->header_allocs_since_last_collect;

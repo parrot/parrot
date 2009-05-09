@@ -1117,6 +1117,51 @@ Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
 
 /*
 
+=item C<int Parrot_gc_active_sized_buffers(PARROT_INTERP)>
+
+=cut
+
+*/
+
+int
+Parrot_gc_active_sized_buffers(PARROT_INTERP)
+{
+    int j, ret = 0;
+    Arenas * const arena_base = interp->arena_base;
+    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+        Small_Object_Pool * const header_pool =
+            arena_base->sized_header_pools[j];
+        if (header_pool)
+            ret += header_pool->total_objects -
+                header_pool->num_free_objects;
+    }
+    return ret;
+}
+
+/*
+
+=item C<int Parrot_gc_total_sized_buffers(PARROT_INTERP)>
+
+=cut
+
+*/
+
+int
+Parrot_gc_total_sized_buffers(PARROT_INTERP)
+{
+    int j, ret = 0;
+    Arenas * const arena_base = interp->arena_base;
+    for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
+        Small_Object_Pool * const header_pool =
+            arena_base->sized_header_pools[j];
+        if (header_pool)
+            ret += header_pool->total_objects;
+    }
+    return ret;
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO
