@@ -8,11 +8,9 @@ Generate a report to help developers determine status of repository branches.
 
 =cut
 
-## Modern::Perl (doesn't pass perlcritic)
-use 5.010_000;
+use v5.10.0;
 use strict;
 use warnings;
-use feature();
 
 use XML::Twig;
 use Perl6::Form;
