@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
+#ifdef WIN32
+#include <windows.h>
+#endif
 
 int
 main(int argc, char *argv[])
