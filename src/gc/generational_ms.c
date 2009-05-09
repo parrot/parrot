@@ -1452,9 +1452,9 @@ gc_gms_setto_black(PARROT_INTERP, ARGMOD(Gc_gms_hdr *h), int priority)
 
 /*
 
-=item C<void parrot_gc_gms_pobject_lives(PARROT_INTERP, PObj *obj)>
+=item C<void parrot_gc_gms_Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>
 
-Set the object live - called by the pobject_lives macro
+Set the object live - called by the Parrot_gc_mark_PObj_alive macro
 
 =cut
 
@@ -1462,9 +1462,9 @@ Set the object live - called by the pobject_lives macro
 
 PARROT_EXPORT
 void
-parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+parrot_gc_gms_Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
 {
-    ASSERT_ARGS(parrot_gc_gms_pobject_lives)
+    ASSERT_ARGS(parrot_gc_gms_Parrot_gc_mark_PObj_alive)
     Gc_gms_hdr *h;
     int priority;
 
@@ -1545,7 +1545,7 @@ trace_igp_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
         const Gc_gms_hdr **p;
         for (p = s->store; p < s->ptr; ++p) {
             Gc_gms_hdr * const h = *p;
-            pobject_lives(interp, GMSH_to_PObj(h));
+            Parrot_gc_mark_PObj_alive(interp, GMSH_to_PObj(h));
         }
     }
     return 0;
@@ -1598,7 +1598,7 @@ trace_children_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(
                 arena_base->num_early_gc_PMCs) {
             return 1;
         }
-        /* TODO propagate flag in pobject_lives */
+        /* TODO propagate flag in Parrot_gc_mark_PObj_alive */
         arena_base->gc_trace_ptr = current;
         if (!PObj_needs_early_gc_TEST(current))
             PObj_high_priority_gc_CLEAR(current);

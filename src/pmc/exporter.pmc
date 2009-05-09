@@ -153,11 +153,11 @@ Mark referenced strings and PMCs in the structure as live.
         Parrot_Exporter_attributes *exp = PARROT_EXPORTER(SELF);
 
         if (exp->ns_src)
-            pobject_lives(interp, (PObj *)exp->ns_src);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)exp->ns_src);
         if (exp->ns_dest)
-            pobject_lives(interp, (PObj *)exp->ns_dest);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)exp->ns_dest);
         if (exp->globals)
-            pobject_lives(interp, (PObj *)exp->globals);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)exp->globals);
     }
 
 

@@ -596,31 +596,31 @@ Marks any referenced strings and PMCs in the structure as live.
     VTABLE void mark() {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         if (_class->name)
-            pobject_lives(interp, (PObj *)_class->name);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->name);
         if (_class->fullname)
-            pobject_lives(interp, (PObj *)_class->fullname);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->fullname);
         if (_class->_namespace)
-            pobject_lives(interp, (PObj *)_class->_namespace);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->_namespace);
         if (_class->parents)
-            pobject_lives(interp, (PObj *)_class->parents);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->parents);
         if (_class->all_parents)
-            pobject_lives(interp, (PObj *)_class->all_parents);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->all_parents);
         if (_class->roles)
-            pobject_lives(interp, (PObj *)_class->roles);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->roles);
         if (_class->methods)
-            pobject_lives(interp, (PObj *)_class->methods);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->methods);
         if (_class->vtable_overrides)
-            pobject_lives(interp, (PObj *)_class->vtable_overrides);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->vtable_overrides);
         if (_class->parent_overrides)
-            pobject_lives(interp, (PObj *)_class->parent_overrides);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->parent_overrides);
         if (_class->attrib_metadata)
-            pobject_lives(interp, (PObj *)_class->attrib_metadata);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->attrib_metadata);
         if (_class->attrib_index)
-            pobject_lives(interp, (PObj *)_class->attrib_index);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->attrib_index);
         if (_class->attrib_cache)
-            pobject_lives(interp, (PObj *)_class->attrib_cache);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->attrib_cache);
         if (_class->resolve_method)
-            pobject_lives(interp, (PObj *)_class->resolve_method);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_class->resolve_method);
     }
 
 

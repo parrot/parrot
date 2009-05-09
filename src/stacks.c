@@ -131,7 +131,7 @@ mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
     for (; ; chunk = chunk->prev) {
         Stack_Entry_t  *entry;
 
-        pobject_lives(interp, (PObj *)chunk);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)chunk);
 
         if (chunk == chunk->prev)
             break;
@@ -139,7 +139,7 @@ mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
         entry = STACK_DATAP(chunk);
 
         if (entry->entry_type == STACK_ENTRY_PMC && UVal_pmc(entry->entry))
-            pobject_lives(interp, (PObj *)UVal_pmc(entry->entry));
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)UVal_pmc(entry->entry));
     }
 }
 

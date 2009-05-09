@@ -800,7 +800,7 @@ Mark the array.
 
         for (i = PMC_size(SELF) - 1; i >= 0; --i)
             if (data[i])
-                pobject_lives(interp, (PObj *)data[i]);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)data[i]);
     }
 
 

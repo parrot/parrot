@@ -759,7 +759,7 @@ Marks the C<struct> as live.
 
     VTABLE void mark() {
         if (PARROT_UNMANAGEDSTRUCT(SELF)->init)
-            pobject_lives(INTERP, (PObj *)PARROT_UNMANAGEDSTRUCT(SELF)->init);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)PARROT_UNMANAGEDSTRUCT(SELF)->init);
     }
 
 /*

@@ -115,9 +115,9 @@ Marks the Packfile as alive.
         Parrot_Packfile_attributes * attrs = PARROT_PACKFILE(SELF);
 
         if (attrs->uuid)
-            pobject_lives(INTERP, (PObj *)attrs->uuid);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)attrs->uuid);
         if (attrs->directory)
-            pobject_lives(INTERP, (PObj *)attrs->directory);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)attrs->directory);
     }
 /*
 

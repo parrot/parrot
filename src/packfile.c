@@ -802,7 +802,7 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         if (constants[i]->type == PFC_PMC) {
             PMC * const pmc = constants[i]->u.key;
             if (pmc)
-                pobject_lives(interp, (PObj *)pmc);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)pmc);
         }
     }
 }

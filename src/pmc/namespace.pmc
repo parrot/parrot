@@ -167,15 +167,15 @@ Marks the namespace as live.
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         SUPER();
         if (nsinfo->parent)
-            pobject_lives(INTERP, (PObj *)nsinfo->parent);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->parent);
         if (nsinfo->name)
-            pobject_lives(INTERP, (PObj *)nsinfo->name);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->name);
         if (nsinfo->_class)
-            pobject_lives(INTERP, (PObj *)nsinfo->_class);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->_class);
         if (nsinfo->vtable)
-            pobject_lives(INTERP, (PObj *)nsinfo->vtable);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->vtable);
         if (nsinfo->methods)
-            pobject_lives(INTERP, (PObj *)nsinfo->methods);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->methods);
     }
 
 /*

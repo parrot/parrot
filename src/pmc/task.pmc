@@ -395,9 +395,9 @@ Mark any referenced strings and PMCs.
             Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
             if (core_struct->codeblock)
-                pobject_lives(interp, (PObj*)core_struct->codeblock);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)core_struct->codeblock);
             if (core_struct->data)
-                pobject_lives(interp, (PObj*)core_struct->data);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)core_struct->data);
         }
     }
 

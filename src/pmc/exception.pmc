@@ -152,15 +152,15 @@ Mark any active exception data as live.
     VTABLE void mark() {
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         if (core_struct->message)
-            pobject_lives(interp, (PObj *)core_struct->message);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->message);
         if (core_struct->payload)
-            pobject_lives(interp, (PObj *)core_struct->payload);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->payload);
         if (core_struct->resume)
-            pobject_lives(interp, (PObj *)core_struct->resume);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->resume);
         if (core_struct->backtrace)
-            pobject_lives(interp, (PObj *)core_struct->backtrace);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->backtrace);
         if (core_struct->handler_iter)
-            pobject_lives(interp, (PObj *)core_struct->handler_iter);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handler_iter);
     }
 
 /*

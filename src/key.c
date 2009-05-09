@@ -615,7 +615,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 
     if (flags == KEY_string_FLAG) {
         GETATTR_Key_str_key(interp, key, str_key);
-        pobject_lives(interp, (PObj *)str_key);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)str_key);
     }
 
     /*
@@ -629,7 +629,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
     /* if iteration hasn't started, above flag isn't set yet */
     GETATTR_Key_next_key(interp, key, next_key);
     if (next_key && (void *)next_key != (void *)INITBucketIndex)
-        pobject_lives(interp, (PObj *)next_key);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
 
 }
 

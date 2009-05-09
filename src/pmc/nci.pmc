@@ -210,9 +210,9 @@ Mark any referenced strings and PMCs.
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
             if (nci_info->signature)
-                pobject_lives(interp, (PObj*)nci_info->signature);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->signature);
             if (nci_info->pcc_params_signature)
-                pobject_lives(interp, (PObj*)nci_info->pcc_params_signature);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->pcc_params_signature);
         }
     }
 

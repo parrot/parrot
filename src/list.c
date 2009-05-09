@@ -1540,7 +1540,7 @@ list_mark(PARROT_INTERP, ARGMOD(List *list))
     List_chunk *chunk;
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
-        pobject_lives(interp, (PObj *)chunk);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)chunk);
         if (list->item_type == enum_type_PMC ||
                 list->item_type == enum_type_STRING) {
             if (!(chunk->flags & sparse)) {
@@ -1549,14 +1549,14 @@ list_mark(PARROT_INTERP, ARGMOD(List *list))
 
                 for (i = 0; i < chunk->items; i++, ++p) {
                     if (*p)
-                        pobject_lives(interp, *p);
+                        Parrot_gc_mark_PObj_alive(interp, *p);
                 }
             }
 
         }
     }
 
-    pobject_lives(interp, (PObj *)list);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)list);
 }
 
 /*

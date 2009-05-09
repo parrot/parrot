@@ -88,7 +88,7 @@ static int sweep_cb_pmc(PARROT_INTERP,
 
 /*
 
-=item C<void pobject_lives(PARROT_INTERP, PObj *obj)>
+=item C<void Parrot_gc_mark_PObj_alive(PARROT_INTERP, PObj *obj)>
 
 Marks the PObj as "alive" for the Garbage Collector. Takes a pointer to a PObj,
 and performs necessary marking to ensure the PMC and its direct children nodes
@@ -101,14 +101,14 @@ garbage collector in use.
 
 PARROT_EXPORT
 void
-pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
 {
-    ASSERT_ARGS(pobject_lives)
+    ASSERT_ARGS(Parrot_gc_mark_PObj_alive)
 #if PARROT_GC_GMS
     do {
         if (!PObj_live_TEST(obj) && \
                 PObj_to_GMSH(obj)->gen->gen_no >= interp->gc_generation) \
-            parrot_gc_gms_pobject_lives(interp, obj); \
+            parrot_gc_gms_Parrot_gc_mark_PObj_alive(interp, obj); \
     } while (0);
 #else /* not PARROT_GC_GMS */
 

@@ -80,15 +80,15 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 
     obj = (PObj *)ctx->current_sub;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->current_object;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->current_cont;
     if (obj && !PObj_live_TEST(obj))
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     if (ctx->caller_ctx)
         mark_context(interp, ctx->caller_ctx);
@@ -98,15 +98,15 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 
     obj = (PObj *)ctx->current_namespace;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->lex_pad;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->handlers;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
 
     if (!ctx->n_regs_used)
@@ -115,7 +115,7 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
         obj = (PObj *)CTX_REG_PMC(ctx, i);
         if (obj)
-            pobject_lives(interp, obj);
+            Parrot_gc_mark_PObj_alive(interp, obj);
     }
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
@@ -125,7 +125,7 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
              * yet tracked down */
             PObj_flag_CLEAR(is_PMC, obj);
             PObj_is_string_SET(obj);
-            pobject_lives(interp, obj);
+            Parrot_gc_mark_PObj_alive(interp, obj);
         }
     }
 }

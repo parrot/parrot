@@ -570,7 +570,7 @@ within C<src/gc/api.c:Parrot_gc_free_pmc>.
 =item PObj_custom_mark_FLAG
 
 The C<mark> vtable slot will be called during the GC mark phase. The mark
-function must call C<pobject_lives> for all non-NULL objects (Buffers and
+function must call C<Parrot_gc_mark_PObj_alive> for all non-NULL objects (Buffers and
 PMCs) that PMC refers to. This flag is typically tested and the custom mark
 VTABLE method called from C<src/gc/api.c:mark_special>.
 

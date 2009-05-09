@@ -178,7 +178,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
         /* keep the scheduler and its kids alive for Task-like PMCs to destroy
          * themselves; run a sweep to collect them */
         if (interp->scheduler) {
-            pobject_lives(interp, (PObj *)interp->scheduler);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
             VTABLE_mark(interp, interp->scheduler);
             Parrot_gc_sweep(interp, interp->arena_base->pmc_pool);
         }
@@ -295,12 +295,12 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     }
 
     /* mark it as used  */
-    pobject_lives(interp, (PObj *)interp->iglobals);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->iglobals);
 
     /* mark the current continuation */
     obj = (PObj *)interp->current_cont;
     if (obj && obj != (PObj *)NEED_CONTINUATION)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     /* mark the current context. */
     ctx = CONTEXT(interp);
@@ -321,11 +321,11 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     mark_vtables(interp);
 
     /* mark the root_namespace */
-    pobject_lives(interp, (PObj *)interp->root_namespace);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->root_namespace);
 
     /* mark the concurrency scheduler */
     if (interp->scheduler)
-        pobject_lives(interp, (PObj *)interp->scheduler);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
 
     /* s. packfile.c */
     mark_const_subs(interp);
@@ -334,11 +334,11 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     mark_object_cache(interp);
 
     /* Now mark the class hash */
-    pobject_lives(interp, (PObj *)interp->class_hash);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->class_hash);
 
     /* Mark the registry */
     PARROT_ASSERT(interp->gc_registry);
-    pobject_lives(interp, (PObj *)interp->gc_registry);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->gc_registry);
 
     /* Mark the MMD cache. */
     if (interp->op_mmd_cache)
@@ -995,7 +995,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 
         /* mark properties */
         if (PMC_metadata(current))
-            pobject_lives(interp, (PObj *)PMC_metadata(current));
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)PMC_metadata(current));
 
          if (PObj_custom_mark_TEST(current)) {
             PARROT_ASSERT(!PObj_on_free_list_TEST(current));

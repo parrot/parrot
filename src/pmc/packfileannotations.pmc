@@ -72,9 +72,9 @@ Marks the object as live.
                 PARROT_PACKFILEANNOTATIONS(SELF);
 
         if (attrs->annotations)
-            pobject_lives(interp, (PObj *)attrs->annotations);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->annotations);
         if (attrs->keys)
-            pobject_lives(interp, (PObj *)attrs->keys);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->keys);
     }
 
 /*

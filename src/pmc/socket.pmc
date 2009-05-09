@@ -82,10 +82,10 @@ Mark active filehandle data as live.
 
         if (data) {
             if (data->local)
-                pobject_lives(interp, (PObj *)data->local);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)data->local);
 
             if (data->remote)
-                pobject_lives(interp, (PObj *)data->remote);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)data->remote);
         }
     }
 /*

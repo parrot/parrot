@@ -200,7 +200,7 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+void Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
@@ -309,7 +309,7 @@ void Parrot_reallocate_string(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
-#define ASSERT_ARGS_pobject_lives __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_gc_mark_PObj_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(obj)
 #define ASSERT_ARGS_Parrot_allocate_aligned __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -381,7 +381,7 @@ void Parrot_gc_gms_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void parrot_gc_gms_pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
+void parrot_gc_gms_Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
@@ -410,7 +410,7 @@ void parrot_gc_gms_wb_key(PARROT_INTERP,
 
 #define ASSERT_ARGS_Parrot_gc_gms_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_parrot_gc_gms_pobject_lives __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_parrot_gc_gms_Parrot_gc_mark_PObj_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(obj)
 #define ASSERT_ARGS_parrot_gc_gms_wb __attribute__unused__ int _ASSERT_ARGS_CHECK = \

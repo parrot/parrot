@@ -1133,10 +1133,10 @@ Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
     IMS_DEBUG((stderr, "%d agg %p mark %p\n",
                 ((Gc_ims_private *)interp->arena_base->
                 gc_private)->state, agg, _new));
-    pobject_lives(interp, (PObj*)_new);
+    Parrot_gc_mark_PObj_alive(interp, (PObj*)_new);
 #else
     PObj_get_FLAGS(agg) &= ~ (PObj_live_FLAG|PObj_custom_GC_FLAG);
-    pobject_lives(interp, (PObj*)agg);
+    Parrot_gc_mark_PObj_alive(interp, (PObj*)agg);
 #endif
 }
 

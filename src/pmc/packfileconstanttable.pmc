@@ -69,9 +69,9 @@ Marks the object as live.
                 PARROT_PACKFILECONSTANTTABLE(SELF);
 
         if (attrs->constants)
-            pobject_lives(interp, (PObj *)attrs->constants);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->constants);
         if (attrs->types)
-            pobject_lives(interp, (PObj *)attrs->types);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->types);
     }
 
 /*

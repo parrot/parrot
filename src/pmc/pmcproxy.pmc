@@ -229,29 +229,29 @@ Mark any referenced strings and PMCs in the structure as live.
         Parrot_Class_attributes * const _pmc = PARROT_CLASS(SELF);
 
         if (_pmc->name)
-            pobject_lives(interp, (PObj *)_pmc->name);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->name);
         if (_pmc->_namespace)
-            pobject_lives(interp, (PObj *)_pmc->_namespace);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->_namespace);
         if (_pmc->parents)
-            pobject_lives(interp, (PObj *)_pmc->parents);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->parents);
         if (_pmc->all_parents)
-            pobject_lives(interp, (PObj *)_pmc->all_parents);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->all_parents);
         if (_pmc->roles)
-            pobject_lives(interp, (PObj *)_pmc->roles);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->roles);
         if (_pmc->methods)
-            pobject_lives(interp, (PObj *)_pmc->methods);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->methods);
         if (_pmc->vtable_overrides)
-            pobject_lives(interp, (PObj *)_pmc->vtable_overrides);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->vtable_overrides);
         if (_pmc->parent_overrides)
-            pobject_lives(interp, (PObj *)_pmc->parent_overrides);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->parent_overrides);
         if (_pmc->attrib_metadata)
-            pobject_lives(interp, (PObj *)_pmc->attrib_metadata);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->attrib_metadata);
         if (_pmc->attrib_index)
-            pobject_lives(interp, (PObj *)_pmc->attrib_index);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->attrib_index);
         if (_pmc->attrib_cache)
-            pobject_lives(interp, (PObj *)_pmc->attrib_cache);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->attrib_cache);
         if (_pmc->resolve_method)
-            pobject_lives(interp, (PObj *)_pmc->resolve_method);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)_pmc->resolve_method);
     }
 
 /*

@@ -189,9 +189,9 @@ Mark any referenced strings and PMCs.
             Parrot_Object_attributes * const obj = PARROT_OBJECT(SELF);
 
             if (obj->_class)
-                pobject_lives(interp, (PObj*)obj->_class);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)obj->_class);
             if (obj->attrib_store)
-                pobject_lives(interp, (PObj*)obj->attrib_store);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)obj->attrib_store);
         }
     }
 
