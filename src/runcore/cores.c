@@ -398,7 +398,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
     trace_op(interp, code_start, code_end, pc);
     while (pc) {
-        int runs;
+        size_t runs;
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
