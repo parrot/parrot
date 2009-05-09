@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -137,6 +137,24 @@ pir_output_is( <<'CODE', <<'OUT', 'unicode lexical identifiers (TT #575)');
 CODE
 hello world
 OUT
+
+TODO: {
+  local $TODO = 'TT #654';
+pir_output_is( <<'CODE', <<'OUT', 'unicode named identifiers (TT #654)');
+ .sub 'main' :main
+    'foo'(1 :named(unicode:"\x{e4}"))
+ .end
+
+ # Perl 6:  sub foo(:$ä) { say "ok $ä"; }
+ .sub 'foo'
+    .param int x :named(unicode:"\x{e4}")
+    print "ok "
+    say x
+ .end
+CODE
+1
+OUT
+}
 
 # Local Variables:
 #   mode: cperl
