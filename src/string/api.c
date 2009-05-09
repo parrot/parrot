@@ -581,7 +581,7 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
 
     /* make sure A's big enough for both  */
     if (total_length > a_capacity)
-        Parrot_reallocate_string(interp, a, total_length << 1);
+        Parrot_gc_reallocate_string_storage(interp, a, total_length << 1);
 
     /* A is now ready to receive the contents of B */
 
@@ -823,7 +823,7 @@ Parrot_str_resize(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
     Parrot_str_write_COW(interp, s);
 
     /* Don't check buflen, if we are here, we already checked. */
-    Parrot_reallocate_string(interp,
+    Parrot_gc_reallocate_string_storage(interp,
         s, PObj_buflen(s) + string_max_bytes(interp, s, addlen));
     return s;
 }
@@ -2328,7 +2328,7 @@ Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
     memory = PObj_bufstart(s);
 
     /* Reallocate it the same size
-     * NOTE can't use Parrot_reallocate_string because of the LEA
+     * NOTE can't use Parrot_gc_reallocate_string_storage because of the LEA
      * allocator, where this is a noop for the same size
      *
      * We have to block GC here, as we have a pointer to bufstart
@@ -2456,7 +2456,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
             if (i >= charlen - 2) {
                 /* resize - still len codepoints to go */
                 charlen += len * 2 + 16;
-                Parrot_reallocate_string(interp, result, charlen);
+                Parrot_gc_reallocate_string_storage(interp, result, charlen);
                 /* start can change */
                 dp = (unsigned char *)result->strstart;
             }

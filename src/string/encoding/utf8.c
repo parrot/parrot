@@ -596,7 +596,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
         p = (unsigned char *)mem_sys_allocate(src_len);
     }
     else {
-        Parrot_reallocate_string(interp, dest, src_len);
+        Parrot_gc_reallocate_string_storage(interp, dest, src_len);
         p = (unsigned char *)dest->strstart;
     }
     if (src->charset == Parrot_ascii_charset_ptr) {
@@ -619,7 +619,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
                     p = (unsigned char *)mem_sys_realloc(p, dest_len);
                 else {
                     result->bufused = dest_pos;
-                    Parrot_reallocate_string(interp, dest, dest_len);
+                    Parrot_gc_reallocate_string_storage(interp, dest, dest_len);
                     p = (unsigned char *)dest->strstart;
                 }
             }
@@ -631,7 +631,7 @@ to_encoding(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
         result->bufused = dest_pos;
     }
     if (in_place) {
-        Parrot_reallocate_string(interp, src, src->bufused);
+        Parrot_gc_reallocate_string_storage(interp, src, src->bufused);
         memcpy(src->strstart, p, src->bufused);
         mem_sys_free(p);
     }

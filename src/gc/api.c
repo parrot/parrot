@@ -1027,6 +1027,53 @@ Parrot_gc_ptr_is_pmc(PARROT_INTERP, ARGIN(void *ptr))
 
 /*
 
+=item C<int Parrot_gc_get_pmc_index(PARROT_INTERP, PMC* pmc)>
+
+Gets the index of the PMC in the pool. The first PMC in the first pool is 1,
+the second is 2, etc.
+
+=cut
+
+*/
+
+int
+Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
+{
+    ASSERT_ARGS(Parrot_gc_get_pmc_index)
+    UINTVAL id = 1;     /* first PMC in first arena */
+    Small_Object_Arena *arena;
+    Small_Object_Pool *pool;
+
+    pmc = (PMC*)PObj_to_ARENA(pmc);
+    pool = interp->arena_base->pmc_pool;
+    for (arena = pool->last_Arena; arena; arena = arena->prev) {
+        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
+        if (ptr_diff >= 0 && ptr_diff <
+                (ptrdiff_t)(arena->used * pool->object_size)) {
+            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
+            id += ptr_diff / pool->object_size;
+            return id;
+        }
+        id += arena->total_objects;
+    }
+
+    pool = interp->arena_base->constant_pmc_pool;
+    for (arena = pool->last_Arena; arena; arena = arena->prev) {
+        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
+        if (ptr_diff >= 0 && ptr_diff <
+                (ptrdiff_t)(arena->used * pool->object_size)) {
+            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
+            id += ptr_diff / pool->object_size;
+            return id;
+        }
+        id += arena->total_objects;
+    }
+
+    Parrot_ex_throw_from_c_args(interp, NULL, 1, "Couldn't find PMC in arenas");
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

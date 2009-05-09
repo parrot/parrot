@@ -385,7 +385,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     &&  interp->thread_data
     && (interp->thread_data->state & THREAD_STATE_JOINED)) {
         Parrot_gc_merge_header_pools(interp->parent_interpreter, interp);
-        Parrot_gc_merge_memory_pools(interp->parent_interpreter, interp);
+        Parrot_gc_merge_header_pools(interp->parent_interpreter, interp);
     }
 
     if (interp->arena_base->finalize_gc_system)

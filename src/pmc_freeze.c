@@ -1374,37 +1374,7 @@ If not found, throw an exception.
 static UINTVAL
 id_from_pmc(PARROT_INTERP, ARGIN(PMC* pmc))
 {
-    ASSERT_ARGS(id_from_pmc)
-    UINTVAL id = 1;     /* first PMC in first arena */
-    Small_Object_Arena *arena;
-    Small_Object_Pool *pool;
-
-    pmc = (PMC*)PObj_to_ARENA(pmc);
-    pool = interp->arena_base->pmc_pool;
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
-        if (ptr_diff >= 0 && ptr_diff <
-                (ptrdiff_t)(arena->used * pool->object_size)) {
-            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
-            id += ptr_diff / pool->object_size;
-            return id << 2;
-        }
-        id += arena->total_objects;
-    }
-
-    pool = interp->arena_base->constant_pmc_pool;
-    for (arena = pool->last_Arena; arena; arena = arena->prev) {
-        const ptrdiff_t ptr_diff = (ptrdiff_t)pmc - (ptrdiff_t)arena->start_objects;
-        if (ptr_diff >= 0 && ptr_diff <
-                (ptrdiff_t)(arena->used * pool->object_size)) {
-            PARROT_ASSERT(ptr_diff % pool->object_size == 0);
-            id += ptr_diff / pool->object_size;
-            return id << 2;
-        }
-        id += arena->total_objects;
-    }
-
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "Couldn't find PMC in arenas");
+    return Parrot_gc_get_pmc_index(interp, pmc) << 2;
 }
 
 /*
