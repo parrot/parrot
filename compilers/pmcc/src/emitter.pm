@@ -11,11 +11,11 @@ method generate_h_file($past) {
 
     my $name     := $past.name();
     my $filename := self.filename();
-    
+
     # Get emitter for (specific) PMC.
     my $pmc_emitter := get_pmc_emitter($name, $past);
 
-    $res :=  
+    $res :=
             # Generate header.
               dont_edit($filename)
             # PMC functions
@@ -32,11 +32,11 @@ method generate_c_file($past) {
 
     my $name     := $past.name();
     my $filename := self.filename();
-    
+
     # Get emitter for (specific) PMC.
     my $pmc_emitter := get_pmc_emitter($name, $past);
 
-    $res :=  
+    $res :=
             # Generate header.
               dont_edit($filename)
             # PMC functions
@@ -60,7 +60,7 @@ method set_filename($name) {
 # Get (specific) PMC emitter
 # Try to create specific emitter. In case of failure create generic one.
 sub get_pmc_emitter($name, $past) {
-PIR q< 
+PIR q<
     find_lex $P0, '$name'
     $S0 = $P0
 

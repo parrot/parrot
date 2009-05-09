@@ -20,6 +20,7 @@ method pmc($/, $key) {
     else {
         # Set c_header and c_coda
         make $?PMC;
+        $?PMC.serialize_attrs();
     }
 }
 
@@ -36,6 +37,7 @@ method traits($/, $key) {
     #say("traits " ~$/);
     if $key eq 'extends' {
         $?PMC.parents().push(~$<identifier>);
+        $?PMC.unserialize_attrs(~$<identifier>);
     }
     elsif $key eq 'provides' {
     }
@@ -54,7 +56,6 @@ method attribute_type($/, $key) {
     my $type;
     my $accessor_type;
 
-
     if $key eq 'simple_attr' {
         $type := ~$/<simple_attr><simple_attr_type>;
         $name := ~$/<simple_attr><identifier>;
@@ -63,7 +64,6 @@ method attribute_type($/, $key) {
         $type := ~$/<pointer_attr><pointer_attr_type>;
         $name := ~$/<pointer_attr><identifier>;
     }
-    $type.replace(' ','');
     $?PMC.add_attr($name, $type);
 }
 

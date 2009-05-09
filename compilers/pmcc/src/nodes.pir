@@ -119,6 +119,81 @@ Get PMC ATTRs.
     .tailcall self.'attr'('attrs',0,0)
 .end
 
+=item C<serialize_attrs>
+
+store PMC ATTRs in a file.
+
+=cut
+
+.include 'library/JSON.pir'
+
+.sub 'serialize_attrs' :method
+
+    .local string filename, pmcname
+    .local pmc attrs, fh
+
+    pmcname = self.'name'()
+    attrs = self.'attrs'()
+    $S0 = freeze attrs
+
+    filename = concat pmcname, ".dump"
+    fh = open filename, "w"
+    print fh, $S0
+    close fh
+    .return ()
+
+.end
+
+=item C<unserialize_attrs>
+
+unserialize a PMC's frozen ATTRs and add them to this PMC.
+
+=cut
+
+.include 'except_types.pasm'
+
+.sub 'unserialize_attrs' :method
+
+    .param string pmcname
+
+    .local string filename
+    .local pmc attrs, fh, eh
+
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    set_addr eh, no_dump
+
+    filename = concat pmcname, ".dump"
+    push_eh eh
+    fh = open filename
+    pop_eh
+    $S0 = fh.'readall'()
+    close fh
+
+    .local pmc it, attr
+    .local string type, name
+
+    attrs = thaw $S0
+    it = iter attrs
+
+  iter_loop:
+    unless it goto iter_done
+    attr = shift it
+    name = attr['name']
+    type = attr['type']
+    self.'add_attr'(name, type)
+    goto iter_loop
+
+  iter_done:
+    .return ()
+
+  no_dump:
+    printerr "WARNING: couldn't read .dump for "
+    printerr pmcname
+    printerr ".pmc\n"
+    .return ()
+.end
+
 
 =item C<set_trait>
 

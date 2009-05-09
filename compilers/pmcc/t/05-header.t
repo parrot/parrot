@@ -8,7 +8,7 @@
     load_bytecode 'pmcc.pbc'
     .local int total
 
-    plan(5)
+    plan(6)
 
     .local string filename
     filename = 't/data/class00.pmc'
@@ -38,6 +38,19 @@ STRUCT
     filename = "t/data/class10.pmc"
     $S0 = _slurp(filename)
     check_one_header(filename, $S0, attr_macro, "ATTR macro generated")
+
+    #make sure the dump for Parent is generated
+    .local pmc emitter, capture
+    filename = 't/data/Parent.pmc'
+    $S0 = _slurp(filename)
+    (emitter, capture) = get_emitter_and_capture(filename, $S0, 'past')
+    emitter.'generate_h_file'(capture)
+
+    #test that parent ATTRs are included in children, and in the right order
+    filename = 't/data/Child.pmc'
+    $S0 = _slurp(filename)
+    attr_struct = 'parent_1\;.*parent_2\;.*parent_3\;.*child_1\;.*child_2\;.*child_3\;'
+    check_one_header(filename, $S0, attr_struct, "parent/child ATTR ordering")
 
 .end
 

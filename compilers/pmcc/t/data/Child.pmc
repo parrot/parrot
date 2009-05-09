@@ -1,0 +1,5 @@
+pmclass Child extends Parent{
+    ATTR INTVAL   child_1;
+    ATTR FLOATVAL child_2;
+    ATTR STRING*  child_3;
+}

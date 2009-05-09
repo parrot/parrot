@@ -138,16 +138,19 @@ do { \\
 
     my $macro_body;
 
-    if $type eq 'INTVAL' {
+    my $canonical_type := ~$type;
+    $canonical_type.replace(' ','');
+
+    if $canonical_type eq 'INTVAL' {
         $macro_body := self.intval_getter_body($attr_name);
     }
-    elsif $type eq 'FLOATVAL' {
+    elsif $canonical_type eq 'FLOATVAL' {
         $macro_body := self.floatval_getter_body($attr_name);
     }
-    elsif $type eq 'STRING*' {
+    elsif $canonical_type eq 'STRING*' {
         $macro_body := self.strptr_getter_body($attr_name);
     }
-    elsif $type eq 'PMC*' {
+    elsif $canonical_type eq 'PMC*' {
         $macro_body := self.pmcptr_getter_body($attr_name);
     }
     else {
@@ -205,16 +208,19 @@ do { \\
 
     my $macro_body;
 
-    if $type eq 'INTVAL' {
+    my $canonical_type := ~$type;
+    $canonical_type.replace(' ','');
+
+    if $canonical_type eq 'INTVAL' {
         $macro_body := self.intval_setter_body($attr_name);
     }
-    elsif $type eq 'FLOATVAL' {
+    elsif $canonical_type eq 'FLOATVAL' {
         $macro_body := self.floatval_setter_body($attr_name);
     }
-    elsif $type eq 'STRING*' {
+    elsif $canonical_type eq 'STRING*' {
         $macro_body := self.strptr_setter_body($attr_name);
     }
-    elsif $type eq 'PMC*' {
+    elsif $canonical_type eq 'PMC*' {
         $macro_body := self.pmcptr_setter_body($attr_name);
     }
     else {

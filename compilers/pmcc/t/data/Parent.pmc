@@ -1,0 +1,5 @@
+pmclass Parent {
+    ATTR FLOATVAL parent_1;
+    ATTR INTVAL   parent_2;
+    ATTR STRING*  parent_3;
+}
