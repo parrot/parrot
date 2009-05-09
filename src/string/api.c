@@ -2091,11 +2091,9 @@ FLOATVAL
 Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_num)
-    FLOATVAL    f = 0.0;
+    FLOATVAL    f;
     char       *cstr;
     const char *p;
-
-    DECL_CONST_CAST;
 
     /*
      * XXX C99 atof interprets 0x prefix

@@ -43,7 +43,6 @@ Initializes the continuation.
         PMC_data(SELF) = attrs;
 
         PMC_cont(SELF) = new_ret_continuation(INTERP);
-        PMC_data(SELF) = attrs;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -64,11 +63,10 @@ Initializes the continuation.
 
 =item C<PMC *clone>
 
-Return a new Continuation PMC with the context of SELF. Note: the
-returned object is not a RetContinuation and creating a real
-Continuation invalidates all RetContinuation all the way up the call
-chain that is, these can't be recycled, they get persistent until
-the GC gets at them.
+Return a new Continuation PMC with the context of SELF. Note: the returned
+object is not a RetContinuation and creating a real Continuation invalidates
+all RetContinuation all the way up the call chain.  That is, these can't be
+recycled; they persist until the GC gets at them.
 
 =cut
 
@@ -81,7 +79,7 @@ the GC gets at them.
 
 =item C<opcode_t *invoke(void *next)>
 
-Transfers control to the calling context, and frees the current context.
+Transfers control to the calling context and frees the current context.
 
 =cut
 
@@ -101,14 +99,6 @@ Transfers control to the calling context, and frees the current context.
 #ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
         Parrot_gc_free_pmc_header(interp, SELF);
-#else
-        cc->from_ctx = NULL;
-
-        /*
-         * the to_ctx is marked in Continuation.mark
-         * NULLify it or turn off the custom_mark bit
-         */
-        cc->to_ctx = NULL;
 #endif
 
         if (INTERP->code != seg)
@@ -116,8 +106,8 @@ Transfers control to the calling context, and frees the current context.
 
         return next;
     }
-
 }
+
 
 /*
 

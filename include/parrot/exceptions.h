@@ -283,11 +283,11 @@ void Parrot_print_backtrace(void);
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
 #  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
 
-#  ifdef _MSC_VER
-#    define ASSERT_ARGS(a)
-#  else
+#  ifdef __GNUC__
 #    define ASSERT_ARGS(a) ASSERT_ARGS_ ## a ;
-#  endif /* _MSC_VER */
+#  else
+#    define ASSERT_ARGS(a)
+#  endif /* __GNUC__ */
 
 #endif /* NDEBUG */
 

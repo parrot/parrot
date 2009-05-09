@@ -93,9 +93,35 @@ trace_system_areas(PARROT_INTERP)
 
 #elif defined(__ia64__)
 
-        /* On IA64 systems, we use the function getcontext() to get the current
-           processor context. This function is located in <ucontext.h>, included
-           above. */
+
+#  if defined(__hpux)
+        ucontext_t ucp;
+        void *current_regstore_top;
+
+        getcontext(&ucp);
+        _Asm_flushrs();
+
+#    if defined(_LP64)
+        current_regstore_top = (void*)(uint64_t)_Asm_mov_from_ar(_AREG_BSP);
+#    else
+        current_regstore_top = (void*)(uint32_t)_Asm_mov_from_ar(_AREG_BSP);
+#    endif
+
+        size_t base = 0;
+        struct pst_vm_status buf;
+        int i = 0;
+
+        while (pstat_getprocvm(&buf, sizeof (buf), 0, i++) == 1) {
+            if (buf.pst_type == PS_RSESTACK) {
+                base = (size_t)buf.pst_vaddr;
+                break;
+            }
+        }
+
+#  else /* !__hpux */
+        /* On IA64 Linux systems, we use the function getcontext() to get the
+           current processor context. This function is located in <ucontext.h>,
+           included above. */
         struct ucontext ucp;
         void *current_regstore_top;
 
@@ -110,9 +136,14 @@ trace_system_areas(PARROT_INTERP)
            is separate from the normal system stack. The register backing
            stack starts at memory address 0x80000FFF80000000 and ends at
            current_regstore_top. */
-        trace_mem_block(interp, 0x80000fff80000000,
+        size_t base = 0x80000fff80000000;
+
+#  endif /* __hpux */
+
+        trace_mem_block(interp, base,
                 (size_t)current_regstore_top);
-#else
+
+#else /* !__ia64__ */
 
 #  ifdef PARROT_HAS_HEADER_SETJMP
         /* A jump buffer that is used to store the current processor context.
@@ -130,7 +161,7 @@ trace_system_areas(PARROT_INTERP)
         setjmp(env);
 #  endif
 
-#endif
+#endif /* __ia64__ */
     }
 
     /* With the processor context accounted for above, we can trace the

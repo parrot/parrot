@@ -400,6 +400,10 @@ E: he@NetBSD.org
 N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
 
+N: Igor Rafael Sanchez-Puls
+D: extending test_file_coverage to test PMC coverage
+E: quevlar@ymail.com
+
 N: Ibotty
 D: parrotbench ruby benchmarks
 

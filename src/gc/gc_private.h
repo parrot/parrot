@@ -29,7 +29,12 @@ extern int CONSERVATIVE_POINTER_CHASING;
 extern void *flush_reg_store(void);
 #  define BACKING_STORE_BASE 0x80000fff80000000
 
-#endif
+#  ifdef __hpux
+#    include <sys/pstat.h>
+#    include <ia64/sys/inline.h>
+#  endif /* __hpux */
+
+#endif /* __ia64__ */
 
 /* We're using this here to add an additional pointer to a PObj without
    having to actually add an entire pointer to every PObj-alike structure

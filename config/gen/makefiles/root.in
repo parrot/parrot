@@ -1948,14 +1948,13 @@ SPLINTFLAGS = \
     \
     -show-summary \
     +show-scan \
-    +time-dist
-
-# Watch for naming conflicts, but don't complain about str*() functions
-SPLINTFLAGS := $(SPLINTFLAGS) \
+    +time-dist \
+    \
     +ansi-reserved \
     +ansi-reserved-internal \
     -iso-reserved \
-    -iso-reserved-internal
+    -iso-reserved-internal \
+    -include-nest 10
 
 # Memory safety checks
 SPLINTFLAGS := $(SPLINTFLAGS) \
@@ -1985,90 +1984,64 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
     -pred-bool-others \
     -boolops \
 
+# Report qualifier mismatches only if dangerous
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +relax-quals
+
 # Pointer arithmetic is OK, but watch for null pointers
 SPLINTFLAGS := $(SPLINTFLAGS) \
     -ptr-arith \
     +nullptrarith \
-    +ptr-negate
+    +ptr-negate \
+    -zero-ptr
 
-# Check on consistency of defs
+# Symbol definitions
 SPLINTFLAGS := $(SPLINTFLAGS) \
+    +decl-undef \
     +incon-defs \
     +incon-defs-lib \
 
-# The rest of the flags to be organized.
+# Check for conflicts with C++ compilers
 SPLINTFLAGS := $(SPLINTFLAGS) \
-    +char-index \
     +cpp-names \
-    +decl-undef \
-    +duplicate-case \
-    +enum-members \
-    +eval-order \
-    +eval-order-uncon \
+
+# Format codes
+SPLINTFLAGS := $(SPLINTFLAGS) \
     +format-code \
     +format-type \
+
+# Problems with evaluation and control structions
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +controlnestdepth 15 \
+    +duplicate-case \
+    +eval-order \
+    +eval-order-uncon \
+
+# Types and stuff
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +enum-members \
     +ignore-signs \
-    +match-fields \
-    +null \
-    +nullret \
-    +strict-destroy \
-    \
-    +use-released \
-    +strict-use-released \
-    -abstract \
+
+# TODO: Miscellaneous other flags
+SPLINTFLAGS := $(SPLINTFLAGS) \
     +aliasunique \
     +assignexpose \
-    -casebreak \
-    -castfcnptr \
-    -charint \
     +continuecomment \
-    +controlnestdepth 15 \
-    -exportlocal \
-    -fcnuse \
     +fielduse \
-    -globs \
-    +imptype \
-    -initallelements \
     +longintegral \
     +matchanyintegral \
+    +match-fields \
     +nestedextern \
-    -noeffect \
-    -paramuse \
-    +ptrnegate \
+    +null \
+    +nullret \
+    +paramuse \
     +readonlystrings \
-    -redef \
-    -retvalint \
-    -retvalother \
     +shadow \
-    -shiftimplementation \
-    -shiftnegative \
-    -showsourceloc \
-    -type \
-    \
-    -branchstate \
-    -compdef \
-    -compdestroy \
-    -compmempass \
-    -globstate \
-    -mustfreefresh \
-    -mustfreeonly \
-    -nullstate \
-    -redecl \
-    -retalias \
-    \
-    -immediatetrans \
-    -kepttrans \
-    -observertrans \
-    -onlytrans \
-    -readonlytrans \
-    -statictrans \
-    -temptrans \
-    -unqualifiedtrans \
-
+    +strict-destroy \
+    +strict-use-released \
+    +use-released \
 
 # Other options we'd like to add back
-# +paramuse: As soon as we get SHIM()s in the ops
-# -includedepth 8 : Let's investigate why we do so many includes.
 # +initallelements : Right now, the *.ops files don't initialize all
 #  values of the arrays
 # +casebreak: Auto-generated ops have way too case fallthrus right now
@@ -2080,9 +2053,6 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 
-# Don't complain about using pointers and ints as booleans
-SPLINTFLAGS_TEST := $(SPLINTFLAGS_TEST) -pred-bool
-
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
@@ -2092,7 +2062,7 @@ splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	+partial -memchecks \
-	src/s*.c \
+	src/p*.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage

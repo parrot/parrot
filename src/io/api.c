@@ -46,6 +46,7 @@ Get the current standard IO object and optionally set a new one.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, ARGIN_NULLOK(PMC *newhandle))
@@ -203,6 +204,7 @@ Test whether a filehandle is closed.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
@@ -378,6 +380,7 @@ the platform-specific implementation of 'peek'.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 {
@@ -476,6 +479,7 @@ Writes a C string format with varargs to C<*pmc>.
 */
 
 PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 {
@@ -503,6 +507,7 @@ Writes a C string format with varargs to C<stdout>.
 */
 
 PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_io_printf(PARROT_INTERP, ARGIN(const char *s), ...)
 {
@@ -692,6 +697,7 @@ Returns C<offset>.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_make_offset(INTVAL offset)
 {
@@ -710,6 +716,7 @@ This allows 64-bit seeks with only 32-bit C<INTVALS>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_make_offset32(INTVAL hi, INTVAL lo)
 {
@@ -727,6 +734,7 @@ Returns the return value of the C<get_integer> vtable method on C<*pmc>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PIOOFF_T
 Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
 {

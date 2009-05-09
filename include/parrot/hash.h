@@ -81,8 +81,7 @@ typedef void (*value_free)(void *);
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
-        __attribute__nonnull__(2);
+void parrot_dump_hash(SHIM_INTERP, SHIM(const Hash *hash));
 
 PARROT_EXPORT
 void parrot_hash_clone(PARROT_INTERP,
@@ -160,8 +159,7 @@ HashBucket* parrot_hash_put(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
-INTVAL parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
-        __attribute__nonnull__(1)
+INTVAL parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -242,8 +240,7 @@ Hash * parrot_create_hash(PARROT_INTERP,
         __attribute__nonnull__(4)
         __attribute__nonnull__(5);
 
-#define ASSERT_ARGS_parrot_dump_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(hash)
+#define ASSERT_ARGS_parrot_dump_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_parrot_hash_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(hash) \
@@ -275,8 +272,7 @@ Hash * parrot_create_hash(PARROT_INTERP,
     || PARROT_ASSERT_ARG(hash) \
     || PARROT_ASSERT_ARG(key)
 #define ASSERT_ARGS_parrot_hash_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(hash)
+       PARROT_ASSERT_ARG(hash)
 #define ASSERT_ARGS_parrot_hash_visit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(hash) \
