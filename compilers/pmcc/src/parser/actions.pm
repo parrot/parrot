@@ -32,7 +32,7 @@ method c_header($/) {
 
 method traits($/, $key) {
     our $?PMC;
-    
+
     #say("traits " ~$/);
     if $key eq 'extends' {
         $?PMC.parents().push(~$<identifier>);
@@ -48,10 +48,25 @@ method traits($/, $key) {
     }
 }
 
-method attribute($/) {
+method attribute_type($/, $key) {
     our $?PMC;
-    $?PMC.add_attr(~$/<identifier>, ~$/<c_type>);
+    my $name;
+    my $type;
+    my $accessor_type;
+
+
+    if $key eq 'simple_attr' {
+        $type := ~$/<simple_attr><simple_attr_type>;
+        $name := ~$/<simple_attr><identifier>;
+    }
+    elsif $key eq 'pointer_attr' {
+        $type := ~$/<pointer_attr><pointer_attr_type>;
+        $name := ~$/<pointer_attr><identifier>;
+    }
+    $type.replace(' ','');
+    $?PMC.add_attr($name, $type);
 }
+
 
 method body_part($/, $key) {
     our $?PMC;
@@ -71,7 +86,7 @@ method body_part($/, $key) {
 
 method class_init($/) {
     #say('class_init ' ~$<identifier>);
-    my $past := PAST::Block.new( 
+    my $past := PAST::Block.new(
         :blocktype('method'),
         :returns('void'),
         :node($/),
@@ -82,7 +97,7 @@ method class_init($/) {
 
 method vtable($/) {
     #say('VABLE ' ~$<c_signature><identifier>);
-    my $past := PAST::Block.new( 
+    my $past := PAST::Block.new(
         :name(~$<c_signature><identifier>),
         :blocktype('method'),
         :returns(~$<c_signature><c_type>),

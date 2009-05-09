@@ -4,9 +4,9 @@
 class PMC::Emitter::PMC;
 
 # =item C<generate_h_file>
-# 
+#
 # Generate part of header file.
-# 
+#
 # =cut
 
 # "Template Method". Just override generate_h_file_functions in derived
@@ -17,7 +17,7 @@ method generate_h_file() {
     my $name := self.name;
 
     my $guard := 'PARROT_PMC_' ~ self.ucname ~ '_H_GUARD';
-    
+
     # "join" is way too simple...
     my $res := join('', (
         '#ifndef ' ~ $guard ~ "\n",
@@ -39,15 +39,15 @@ method generate_h_file() {
 }
 
 # =item C<generate_h_file_functions>
-# 
+#
 # Generate C declarations for vtable functions
-# 
+#
 # =cut
 
 method generate_h_file_functions() {
     my $past := self.past;
     my %vtables := PMC::VTableInfo::vtable_hash();
-    
+
     my @res_builder;
 
     @res_builder.push("void Parrot_" ~ self.name ~ "_class_init(PARROT_INTERP, int, int);\n");
@@ -64,7 +64,7 @@ method generate_h_file_functions() {
 
 #=item C<generate_attr_struct>
 #
-#Generate a C declaration for the ATTR wrapper struct 
+#Generate a C declaration for the ATTR wrapper struct
 #
 #=cut
 
@@ -74,11 +74,11 @@ method generate_attr_struct() {
     my $struct_body;
     my $struct_end;
 
-    $struct_start := 
+    $struct_start :=
         "\n/* " ~ self.name ~ " PMC's underlying struct. */\n" ~
         "typedef struct Parrot_" ~ self.name ~ "_attributes {\n";
 
-    my @attrs := self.attrs;    
+    my @attrs := self.attrs;
     my @struct_members;
 
     for @attrs {
@@ -98,7 +98,7 @@ method generate_attr_struct() {
 
 method generate_casting_macro() {
 
-    return 
+    return
         "#define PARROT_" ~ self.ucname ~ "(o) ((Parrot_" ~ self.name ~ "_attributes *) PMC_data(o))\n";
 }
 
@@ -111,34 +111,161 @@ method generate_casting_macro() {
 
 method generate_attr_accessors() {
 
-    my @attrs := self.attrs;    
+    my @attrs := self.attrs;
     my @accessors;
 
     for @attrs {
+        @accessors.push( self.generate_accessor_comment(self.name, $_<name>) );
         @accessors.push( self.generate_get_accessor($_<type>,$_<name>) );
-        #@accessors.push( self.generate_set_accessor($_<type>,$_<name>);
+        @accessors.push( self.generate_set_accessor($_<type>,$_<name>) );
     }
 
     return join("\n", @accessors);
 }
 
+method generate_accessor_comment( $pmcname, $attrname ) {
+    return
+        "\n/* Generated macro accessors for the '"~ $attrname ~
+        "' attribute of the "~ $pmcname ~ " PMC. */\n";
+}
 
 method generate_get_accessor($type, $attr_name) {
 
-    my $macro_start := 
+    my $macro_start :=
 "#define GETATTR_" ~ self.name ~ "_" ~ $attr_name ~ "(interp, pmc, dest) \\
 do { \\
     if (PObj_is_object_TEST(pmc)) { \\\n";
 
-    #XXX: Put code to generate the accessor body here.
+    my $macro_body;
 
-    my $macro_end :=
-"    } \\
+    if $type eq 'INTVAL' {
+        $macro_body := self.intval_getter_body($attr_name);
+    }
+    elsif $type eq 'FLOATVAL' {
+        $macro_body := self.floatval_getter_body($attr_name);
+    }
+    elsif $type eq 'STRING*' {
+        $macro_body := self.strptr_getter_body($attr_name);
+    }
+    elsif $type eq 'PMC*' {
+        $macro_body := self.pmcptr_getter_body($attr_name);
+    }
+    else {
+        $macro_body := self.default_getter_body($type);
+    }
+
+    my $macro_end := "
+    } \\
     else \\
         (dest) = ((Parrot_" ~ self.name ~ "_attributes *)PMC_data(pmc))->" ~ $attr_name ~ "; \\
 } while (0);\n";
 
-    return $macro_start ~ $macro_end;
+    return $macro_start ~ $macro_body ~ $macro_end;
+}
+
+method intval_getter_body($name) {
+    return
+'        PMC *attr_value = VTABLE_get_attr_str(interp, \\
+            pmc, Parrot_str_new_constant(interp, "'~ $name ~'")); \\
+        (dest) = (PMC_IS_NULL(attr_value) ? (INTVAL) 0: VTABLE_get_integer(interp, attr_value)); \\';
+}
+
+method floatval_getter_body($name) {
+    return
+'        PMC *attr_value = VTABLE_get_attr_str(interp, \\
+            pmc, Parrot_str_new_constant(interp, "'~ $name ~'")); \\
+        (dest) = (PMC_IS_NULL(attr_value) ? (FLOATVAL) 0.0: VTABLE_get_number(interp, attr_value)); \\';
+}
+
+method strptr_getter_body($name) {
+    return
+'        PMC *attr_value = VTABLE_get_attr_str(interp, \\
+            pmc, Parrot_str_new_constant(interp, "'~ $name ~'")); \\
+        (dest) = (PMC_IS_NULL(attr_value) ? (STRING *) NULL: VTABLE_get_string(interp, attr_value)); \\';
+}
+
+method pmcptr_getter_body($name) {
+    return
+'        (dest) = VTABLE_get_attr_str(interp, \\
+             pmc, Parrot_str_new_constant(interp, "'~ $name ~'")); \\';
+}
+
+method default_getter_body($type) {
+    return
+"        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+            \"Attributes of type '"~ $type ~ "' cannot be subclassed from a high-level PMC.\"); \\";
+}
+
+method generate_set_accessor($type, $attr_name) {
+
+    my $macro_start :=
+"#define SETATTR_"~ self.name ~"_"~ $attr_name ~"(interp, pmc, value) \\
+do { \\
+    if (PObj_is_object_TEST(pmc)) { \\\n";
+
+    my $macro_body;
+
+    if $type eq 'INTVAL' {
+        $macro_body := self.intval_setter_body($attr_name);
+    }
+    elsif $type eq 'FLOATVAL' {
+        $macro_body := self.floatval_setter_body($attr_name);
+    }
+    elsif $type eq 'STRING*' {
+        $macro_body := self.strptr_setter_body($attr_name);
+    }
+    elsif $type eq 'PMC*' {
+        $macro_body := self.pmcptr_setter_body($attr_name);
+    }
+    else {
+        $macro_body := self.default_setter_body($type);
+    }
+
+    my $macro_end := "
+    } \\
+    else \\
+        ((Parrot_"~ self.name ~"_attributes *)PMC_data(pmc))->"~ $attr_name ~" = (value); \\
+} while (0);\n";
+
+    return $macro_start ~ $macro_body ~ $macro_end;
+}
+
+
+method intval_setter_body($name) {
+    return
+"        PMC *attr_value = pmc_new(interp, enum_class_Integer); \\
+        VTABLE_set_integer_native(interp, attr_value, value); \\
+        VTABLE_set_attr_str(interp, pmc, \\
+            Parrot_str_new_constant(interp, \""~ $name ~"\"), attr_value); \\";
+}
+
+method floatval_setter_body($name) {
+    return
+"        PMC *attr_value = pmc_new(interp, enum_class_Float); \\
+        VTABLE_set_number_native(interp, attr_value, value); \\
+        VTABLE_set_attr_str(interp, pmc, \\
+            Parrot_str_new_constant(interp, \""~ $name ~"\"), attr_value); \\";
+}
+
+method strptr_setter_body($name) {
+    return
+"        PMC *attr_value = pmc_new(interp, enum_class_String); \\
+        VTABLE_set_string_native(interp, attr_value, value); \\
+        VTABLE_set_attr_str(interp, pmc, \\
+            Parrot_str_new_constant(interp, \""~ $name ~"\"), attr_value); \\";
+}
+
+method pmcptr_setter_body($name) {
+    return
+"         VTABLE_set_attr_str(interp, pmc, \\
+             Parrot_str_new_constant(interp, \""~ $name ~"\"), value); \\";
+}
+
+method default_setter_body($type) {
+    return
+"         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+              \"Attributes of type '"~ $type ~"' cannot be \" \\
+              \"subclassed from a high-level PMC.\"); \\";
 }
 
 
@@ -148,7 +275,7 @@ do { \\
 #
 #=cut
 method generate_c_file() {
-    my $res := 
+    my $res :=
           self.generate_c_file_functions()
         ~ self.generate_class_init();
 }
@@ -184,7 +311,7 @@ method generate_c_file_functions() {
 method generate_class_init() {
     my @res;
     @res.push(
-          "PARROT_EXPORT void Parrot_" 
+          "PARROT_EXPORT void Parrot_"
         ~ self.name
         ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
 

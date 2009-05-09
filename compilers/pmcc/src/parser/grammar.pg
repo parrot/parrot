@@ -31,7 +31,7 @@ rule c_header {
 
 # pmc action will store "header" and "footer"
 rule pmc {
-    pmclass <identifier> 
+    pmclass <identifier>
     {*}                                     #= begin
     <traits>* '{'
         <attribute>*
@@ -56,10 +56,37 @@ rule traits {
 }
 
 rule attribute {
-    'ATTR' <c_type> <identifier> ';' {*}
+    'ATTR' <attribute_type>
 }
 
-# Body of PMC class. 
+rule attribute_type {
+    [ <simple_attr>   {*}  #= simple_attr
+    | <pointer_attr>  {*}  #= pointer_attr
+    ]
+}
+
+rule simple_attr {
+    <simple_attr_type> <identifier> ';'
+}
+
+regex simple_attr_type {
+    [ 'U'? 'INTVAL'
+    | 'FLOATVAL'
+    | 'STRING'
+    | 'struct'?  <identifier>
+    | 'unsigned'? 'char'
+    ]
+}
+
+rule pointer_attr {
+    <pointer_attr_type> <identifier> ';'
+}
+
+rule pointer_attr_type {
+    <simple_attr_type>  '*'+
+}
+
+# Body of PMC class.
 rule body {
     <body_part>*
 }
@@ -151,7 +178,7 @@ rule named {
 }
 
 token identifier {
-    <.ident> 
+    <.ident>
 }
 
 ## ws token handles whitespaces and C /* */ comments
