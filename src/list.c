@@ -367,7 +367,7 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     chunk->n_items  = 0;
     chunk->next     = NULL;
     chunk->prev     = NULL;
-    Parrot_allocate_aligned(interp, (Buffer *)chunk, size);
+    Parrot_gc_allocate_aligned(interp, (Buffer *)chunk, size);
     memset(PObj_bufstart((Buffer*)chunk), 0, size);
 
     /* see also src/hash.c */

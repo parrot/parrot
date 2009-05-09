@@ -360,7 +360,7 @@ compose(PARROT_INTERP, ARGIN(STRING *src))
 
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interp, dest, dest->bufused);
+        Parrot_gc_reallocate_string_storage(interp, dest, dest->bufused);
         dest_len = unorm_normalize((UChar *)src->strstart, src_len,
                 UNORM_DEFAULT,      /* default is NFC */
                 0,                  /* options 0 default - no specific
@@ -464,7 +464,7 @@ upcase(PARROT_INTERP, ARGIN(STRING *src))
             &err);
 
     if (needed > dest_len) {
-        Parrot_reallocate_string(interp, src, needed * sizeof (UChar));
+        Parrot_gc_reallocate_string_storage(interp, src, needed * sizeof (UChar));
         dest_len = needed;
     }
 
@@ -539,7 +539,7 @@ u_strToLower(UChar *dest, int32_t destCapacity,
 
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interp, src, src->bufused);
+        Parrot_gc_reallocate_string_storage(interp, src, src->bufused);
         dest_len = u_strToLower((UChar *)src->strstart, dest_len,
                 (UChar *)src->strstart, src_len,
                 NULL,       /* locale = default */
@@ -607,7 +607,7 @@ u_strToTitle(UChar *dest, int32_t destCapacity,
 
     if (!U_SUCCESS(err)) {
         err = U_ZERO_ERROR;
-        Parrot_reallocate_string(interp, src, src->bufused);
+        Parrot_gc_reallocate_string_storage(interp, src, src->bufused);
         dest_len = u_strToTitle((UChar *)src->strstart, dest_len,
                 (UChar *)src->strstart, src_len,
                 NULL, NULL,

@@ -268,7 +268,7 @@ to_ascii(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
     const UINTVAL len = src->strlen;
 
     if (dest) {
-        Parrot_reallocate_string(interp, dest, len);
+        Parrot_gc_reallocate_string_storage(interp, dest, len);
     }
     else {
         /* the string can't grow - replace inplace */
@@ -308,7 +308,7 @@ to_unicode(PARROT_INTERP, ARGMOD(STRING *src), ARGMOD_NULLOK(STRING *dest))
     if (dest) {
         dest->charset = Parrot_unicode_charset_ptr;
         dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
-        Parrot_reallocate_string(interp, dest, src->strlen);
+        Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
         return dest;
     }
     else {
@@ -913,7 +913,7 @@ charset_cvt_ascii_to_binary(PARROT_INTERP, ARGIN(STRING *src), ARGIN_NULLOK(STRI
     if (dest) {
         UINTVAL offs;
 
-        Parrot_reallocate_string(interp, dest, src->strlen);
+        Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
         for (offs = 0; offs < src->strlen; ++offs) {
@@ -946,7 +946,7 @@ charset_cvt_ascii_to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src),
     if (dest) {
         UINTVAL offs;
 
-        Parrot_reallocate_string(interp, dest, src->strlen);
+        Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
         for (offs = 0; offs < src->strlen; ++offs) {

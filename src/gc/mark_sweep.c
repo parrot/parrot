@@ -197,7 +197,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     Parrot_gc_ms_run_init(interp);
 
     /* compact STRING pools to collect free headers and allocated buffers */
-    Parrot_go_collect(interp);
+    Parrot_gc_compact_memory_pool(interp);
 
     /* Now go trace the PMCs */
     if (trace_active_PMCs(interp, (flags & GC_trace_stack_FLAG)

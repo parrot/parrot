@@ -60,6 +60,30 @@ static void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
 
 /*
 
+=item C<void Parrot_merge_memory_pools(Interp *dest_interp, Interp
+*source_interp)>
+
+Merge the memory pools of two interpreter structures. Merge the general
+memory pool and the constant string pools from C<source_interp> into
+C<dest_interp>.
+
+=cut
+
+*/
+
+void
+Parrot_merge_memory_pools(ARGIN(Interp *dest_interp), ARGIN(Interp *source_interp))
+{
+    ASSERT_ARGS(Parrot_merge_memory_pools)
+    merge_pools(dest_interp->arena_base->constant_string_pool,
+                source_interp->arena_base->constant_string_pool);
+
+    merge_pools(dest_interp->arena_base->memory_pool,
+                source_interp->arena_base->memory_pool);
+}
+
+/*
+
 =head2 Buffer Header Functions for small-object lookup table
 
 =over 4

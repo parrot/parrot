@@ -33,7 +33,7 @@ handle "external" strings.
 
 /*
 
-=item C<void Parrot_go_collect(PARROT_INTERP)>
+=item C<void Parrot_gc_compact_memory_pool(PARROT_INTERP)>
 
 Does nothing other than increment the interpreter's C<gc_collect_runs>
 count.
@@ -43,7 +43,7 @@ count.
 */
 
 void
-Parrot_go_collect(PARROT_INTERP)
+Parrot_gc_compact_memory_pool(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_go_collect)
     if (interp->arena_base->gc_sweep_block_level) {
@@ -134,7 +134,7 @@ Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)
     Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(buffer)) {
-        Parrot_allocate_aligned(interp, buffer, newsize);
+        Parrot_gc_allocate_aligned(interp, buffer, newsize);
         /* The previous version zeroed the memory here, but I'm not
            sure why. */
         memset(PObj_bufstart(buffer), 0, newsize);
@@ -164,7 +164,8 @@ See the comments and diagram in resources.c.
 
 This was never called anyway, so it isn't implemented here.
 
-=item C<void Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)>
+=item C<void Parrot_gc_allocate_aligned(PARROT_INTERP, Buffer *buffer,
+size_t size)>
 
 Like above, except the address of the buffer is guaranteed to be
 suitably aligned for holding anything contained in UnionVal
@@ -175,7 +176,7 @@ suitably aligned for holding anything contained in UnionVal
 */
 
 void
-Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
+Parrot_gc_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 {
     ASSERT_ARGS(parrot_allocate_aligned)
     Buffer_alloc_unit *p;
@@ -187,7 +188,7 @@ Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 
 /*
 
-=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)>
+=item C<void Parrot_gc_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t newsize)>
 
 Reallocates the string buffer in C<*str> and returns it. C<newsize> is the
 number of bytes memory required.
@@ -197,13 +198,13 @@ number of bytes memory required.
 */
 
 void
-Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)
+Parrot_gc_reallocate_string_storage(PARROT_INTERP, STRING *str, size_t newsize)
 {
     ASSERT_ARGS(parrot_reallocate_string)
     Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(str)) {
-        Parrot_allocate_string(interp, str, newsize);
+        Parrot_gc_allocate_string_storage(interp, str, newsize);
     }
     else if (newsize) {
         p = (Buffer_alloc_unit *) xrealloc(PObj_bufallocstart(str),
@@ -215,7 +216,7 @@ Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t newsize)
 
 /*
 
-=item C<void Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)>
+=item C<void Parrot_gc_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size)>
 
 Allocates the string buffer in C<*str> and returns it. C<size> is the
 number bytes of memory required.
@@ -225,9 +226,9 @@ number bytes of memory required.
 */
 
 void
-Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)
+Parrot_gc_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size)
 {
-    ASSERT_ARGS(parrot_allocate_string)
+    ASSERT_ARGS(Parrot_gc_allocate_string_storage)
     Buffer_alloc_unit *p;
     p = (Buffer_alloc_unit *) xcalloc(Buffer_alloc_offset + size, 1);
     p->ref_count = 0;
@@ -268,7 +269,7 @@ Parrot_merge_memory_pools(Interp *dest, Interp *source)
 
 /*
 
-=item C<void Parrot_destroy_memory_pools(PARROT_INTERP)>
+=item C<void Parrot_gc_destroy_memory_pools(PARROT_INTERP)>
 
 Does nothing.
 
@@ -277,7 +278,7 @@ Does nothing.
 */
 
 void
-Parrot_destroy_memory_pools(PARROT_INTERP)
+Parrot_gc_destroy_memory_pools(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_destroy_memory_pools)
 }

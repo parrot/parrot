@@ -347,6 +347,12 @@ Parrot_forall_header_pools(PARROT_INTERP,
 void Parrot_initialize_header_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_merge_memory_pools(
+    ARGIN(Interp *dest_interp),
+    ARGIN(Interp *source_interp))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_get_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -382,6 +388,9 @@ void Parrot_initialize_header_pools(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_initialize_header_pools \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_merge_memory_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(dest_interp) \
+    || PARROT_ASSERT_ARG(source_interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/pools.c */
 

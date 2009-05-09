@@ -384,8 +384,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     if (interp->parent_interpreter
     &&  interp->thread_data
     && (interp->thread_data->state & THREAD_STATE_JOINED)) {
-        Parrot_merge_header_pools(interp->parent_interpreter, interp);
-        Parrot_merge_memory_pools(interp->parent_interpreter, interp);
+        Parrot_gc_merge_header_pools(interp->parent_interpreter, interp);
+        Parrot_gc_merge_memory_pools(interp->parent_interpreter, interp);
     }
 
     if (interp->arena_base->finalize_gc_system)
@@ -398,10 +398,10 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
     Parrot_destroy_constants(interp);
 
     /* buffer headers, PMCs */
-    Parrot_destroy_header_pools(interp);
+    Parrot_gc_destroy_header_pools(interp);
 
     /* memory pools in resources */
-    Parrot_destroy_memory_pools(interp);
+    Parrot_gc_destroy_memory_pools(interp);
 
     /* mem subsystem is dead now */
     mem_sys_free(interp->arena_base);

@@ -126,7 +126,7 @@ Parrot_io_make_string(PARROT_INTERP, ARGMOD(STRING **buf), size_t len)
     else {
         STRING *s = *buf;
         if (s->bufused < len)
-            Parrot_reallocate_string(interp, s, len);
+            Parrot_gc_reallocate_string_storage(interp, s, len);
         return s;
     }
 }

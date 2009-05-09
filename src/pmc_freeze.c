@@ -481,7 +481,7 @@ str_append(PARROT_INTERP, ARGMOD(STRING *s), ARGIN(const void *b), size_t len)
         size_t new_size = (size_t) (PObj_buflen(s) * 1.5);
         if (new_size < PObj_buflen(s) - need_free + 512)
             new_size = PObj_buflen(s) - need_free + 512;
-        Parrot_reallocate_string(interp, s, new_size);
+        Parrot_gc_reallocate_string_storage(interp, s, new_size);
         PARROT_ASSERT(PObj_buflen(s) - used - len >= 15);
     }
     mem_sys_memcopy((void *)((ptrcast_t)s->strstart + used), b, len);
@@ -729,11 +729,11 @@ op_check_size(PARROT_INTERP, ARGIN(STRING *s), size_t len)
         size_t new_size = (size_t) (PObj_buflen(s) * 1.5);
         if (new_size < PObj_buflen(s) - need_free + 512)
             new_size = PObj_buflen(s) - need_free + 512;
-        Parrot_reallocate_string(interp, s, new_size);
+        Parrot_gc_reallocate_string_storage(interp, s, new_size);
         PARROT_ASSERT(PObj_buflen(s) - used - len >= 15);
     }
 #ifndef DISABLE_GC_DEBUG
-    Parrot_go_collect(interp);
+    Parrot_gc_compact_memory_pool(interp);
 #endif
 }
 

@@ -88,7 +88,7 @@ Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
          * also be sure not to allocate from the constant pool
          */
         PObj_flags_CLEARALL(&for_alloc);
-        Parrot_allocate_string(interp, &for_alloc, PObj_buflen(s));
+        Parrot_gc_allocate_string_storage(interp, &for_alloc, PObj_buflen(s));
 
         /* now copy memory over */
         mem_sys_memcopy(for_alloc.strstart, s->strstart, s->bufused);
@@ -147,7 +147,7 @@ Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
         /* XXX FIXME hack to avoid cross-interpreter issue until it
          * is fixed correctly. */
         if (n_interpreters > 1 && PObj_is_movable_TESTALL(s) &&
-                !Parrot_in_memory_pool(interp, PObj_bufstart(s))) {
+                !Parrot_gc_ptr_in_memory_pool(interp, PObj_bufstart(s))) {
             Parrot_str_write_COW(interp, d);
             Parrot_io_eprintf(interp, "cross-interpreter copy of "
                                      "relocatable string '%Ss' into tid %d\n",
@@ -392,7 +392,7 @@ Parrot_str_new_noinit(PARROT_INTERP,
     s->charset  = PARROT_DEFAULT_CHARSET;
     s->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, s);
 
-    Parrot_allocate_string(interp, s,
+    Parrot_gc_allocate_string_storage(interp, s,
         (size_t)string_max_bytes(interp, s, capacity));
 
     return s;
@@ -786,7 +786,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         return s;
     }
 
-    Parrot_allocate_string(interp, s, len);
+    Parrot_gc_allocate_string_storage(interp, s, len);
 
     if (buffer) {
         mem_sys_memcopy(s->strstart, buffer, len);
@@ -2334,7 +2334,7 @@ Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
      * We have to block GC here, as we have a pointer to bufstart
      */
     Parrot_block_GC_sweep(interp);
-    Parrot_allocate_string(interp, s, size);
+    Parrot_gc_allocate_string_storage(interp, s, size);
     Parrot_unblock_GC_sweep(interp);
     mem_sys_memcopy(PObj_bufstart(s), memory, size);
 

@@ -1258,7 +1258,7 @@ Trigger a garbage collection.
 =cut
 
 op collect() {
-    Parrot_go_collect(interp);
+    Parrot_gc_compact_memory_pool(interp);
 }
 
 =item B<sweepoff>()
