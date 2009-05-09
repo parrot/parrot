@@ -74,12 +74,16 @@ method generate_attr_struct() {
     my $struct_body;
     my $struct_end;
 
+    my @attrs := self.attrs;
+    my @struct_members;
+
+    if +@attrs == 0 {
+        return "";
+    }
+
     $struct_start :=
         "\n/* " ~ self.name ~ " PMC's underlying struct. */\n" ~
         "typedef struct Parrot_" ~ self.name ~ "_attributes {\n";
-
-    my @attrs := self.attrs;
-    my @struct_members;
 
     for @attrs {
         if $_<is_fp> {
@@ -103,6 +107,12 @@ method generate_attr_struct() {
 
 method generate_casting_macro() {
 
+    my @attrs := self.attrs;
+
+    if +@attrs == 0 {
+        return "";
+    }
+
     return
         "#define PARROT_" ~ self.ucname ~ "(o) ((Parrot_" ~ self.name ~ "_attributes *) PMC_data(o))\n";
 }
@@ -118,6 +128,10 @@ method generate_attr_accessors() {
 
     my @attrs := self.attrs;
     my @accessors;
+
+    if +@attrs == 0 {
+        return "";
+    }
 
     for @attrs {
         @accessors.push( self.generate_accessor_comment(self.name, $_<name>) );
