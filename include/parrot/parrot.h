@@ -283,7 +283,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/pmc.h"
 #include "parrot/events.h"
 #include "parrot/gc_api.h"
-#include "parrot/gc_mark_sweep.h"
 #include "parrot/string_funcs.h"
 #include "parrot/misc.h"
 #include "parrot/sub.h"

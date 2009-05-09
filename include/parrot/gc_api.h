@@ -15,7 +15,6 @@
  * Please note: these objects might be bogus */
 #define GC_VERBOSE 0
 
-#include "parrot/gc_mark_sweep.h"
 #include "parrot/parrot.h"
 
 /*
