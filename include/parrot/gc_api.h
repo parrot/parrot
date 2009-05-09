@@ -44,6 +44,7 @@ typedef enum {
 } pool_iter_enum;
 
 struct Small_Object_Pool;
+struct Small_Object_Arena;
 
 typedef int (*pool_iter_fn)(PARROT_INTERP, struct Small_Object_Pool *, int, void*);
 
@@ -128,14 +129,6 @@ typedef struct Arenas {
     void *  gc_private;           /* gc subsystem data */
 } Arenas;
 
-typedef struct Small_Object_Arena {
-    size_t                     used;
-    size_t                     total_objects;
-    struct Small_Object_Arena *prev;
-    struct Small_Object_Arena *next;
-    void                      *start_objects;
-} Small_Object_Arena;
-
 typedef enum {
     GC_TRACE_FULL,
     GC_TRACE_ROOT_ONLY,
@@ -146,101 +139,6 @@ typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool 
 typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
 typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Small_Object_Pool *);
 typedef void (*gc_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, PObj *);
-
-#if PARROT_GC_GMS
-/*
- * all objects have this header in front of the actual
- * object pointer. The prev/next pointers chain all existing
- * objects for one pool (sizeclass) together.
- *
- * XXX this could lead to unaligned FLOATVALs in the adjacent PMC
- *     if that's true either insert a dummy or reorder PMC members
- *     ??? How is that possible?
- */
-typedef struct _gc_gms_hdr {
-    struct _gc_gms_hdr *prev;
-    struct _gc_gms_hdr *next;
-    struct _gc_gms_gen *gen;
-    void *gc_dummy_align;       /* see above */
-} Gc_gms_hdr;
-
-#  define PObj_to_GMSH(o) (((Gc_gms_hdr*)(o))-1)
-#  define GMSH_to_PObj(p) ((PObj*) ((p)+1))
-
-/* the structure uses 2 ptrs itself */
-#  define GC_GMS_STORE_SIZE (64-2)
-
-typedef struct _gc_gms_hdr_store {
-    struct _gc_gms_hdr_store *next;
-    Gc_gms_hdr **ptr;                           /* insert location */
-    Gc_gms_hdr * (store[GC_GMS_STORE_SIZE]);    /* array of hdr pointers */
-} Gc_gms_hdr_store;
-
-typedef struct _gc_gms_hdr_list {
-    Gc_gms_hdr_store *first;
-    Gc_gms_hdr_store *last;
-} Gc_gms_hdr_list;
-
-
-/*
- * all objects belong to one generation
- */
-typedef struct _gc_gms_gen {
-    UINTVAL gen_no;                     /* generation number */
-    UINTVAL timely_destruct_obj_sofar;  /* sum up to this generation */
-    UINTVAL black_color;                /* live color of this generation */
-    struct _gc_gms_hdr *first;          /* first header in this generation */
-    struct _gc_gms_hdr *last;           /* last header in this generation */
-    struct _gc_gms_hdr *fin;            /* need destruction/finalization */
-    struct Small_Object_Pool *pool;     /* where this generation belongs to */
-    Gc_gms_hdr_list igp;                /* IGPs for this generation */
-    UINTVAL n_possibly_dead;            /* overwritten count */
-    UINTVAL n_objects;                  /* live objects count */
-    struct _gc_gms_gen *prev;
-    struct _gc_gms_gen *next;
-} Gc_gms_gen;
-
-#endif /* PARROT_GC_GMS */
-
-/* Tracked resource pool */
-typedef struct Small_Object_Pool {
-    Small_Object_Arena *last_Arena;
-    /* Size in bytes of an individual pool item. This size may include
-     * a GC-system specific GC header.
-     * See the macros below.
-     */
-    size_t object_size;
-    size_t objects_per_alloc;
-    size_t total_objects;
-    size_t num_free_objects;    /* number of resources in the free pool */
-    int skip;
-    size_t replenish_level;
-    void *free_list;
-    /* adds a free object to the pool's free list  */
-    add_free_object_fn_type     add_free_object;
-    get_free_object_fn_type     get_free_object;
-    alloc_objects_fn_type       alloc_objects;
-    alloc_objects_fn_type       more_objects;
-    gc_object_fn_type           gc_object;
-    /* gets and removes a free object from the pool's free list */
-    /* allocates more objects */
-    struct Memory_Pool *mem_pool;
-    size_t start_arena_memory;
-    size_t end_arena_memory;
-    const char *name;
-#if PARROT_GC_GMS
-    struct _gc_gms_hdr marker;          /* limit of list */
-    struct _gc_gms_hdr *black;          /* alive */
-    struct _gc_gms_hdr *black_fin;      /* alive, needs destruction */
-    struct _gc_gms_hdr *gray;           /* to be scanned */
-    struct _gc_gms_hdr *white;          /* unprocessed */
-    struct _gc_gms_hdr *white_fin;      /* unprocesse, needs destruction */
-
-    struct _gc_gms_gen *first_gen;      /* linked list of generations */
-    struct _gc_gms_gen *last_gen;
-
-#endif
-} Small_Object_Pool;
 
 /*
  * macros used in arena scan code to convert from object pointers
@@ -332,6 +230,9 @@ void Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*obj);
+
+int Parrot_gc_active_pmcs(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 int Parrot_gc_active_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -443,6 +344,9 @@ void Parrot_gc_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
+int Parrot_gc_total_pmcs(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 int Parrot_gc_total_sized_buffers(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -456,6 +360,8 @@ void Parrot_reallocate(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_mark_PObj_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(obj)
+#define ASSERT_ARGS_Parrot_gc_active_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_active_sized_buffers \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -523,6 +429,8 @@ void Parrot_reallocate(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(str)
+#define ASSERT_ARGS_Parrot_gc_total_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_total_sized_buffers __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_reallocate __attribute__unused__ int _ASSERT_ARGS_CHECK = \

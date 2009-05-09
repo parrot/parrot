@@ -1127,7 +1127,7 @@ int
 Parrot_gc_active_sized_buffers(PARROT_INTERP)
 {
     int j, ret = 0;
-    Arenas * const arena_base = interp->arena_base;
+    const Arenas * const arena_base = interp->arena_base;
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
         Small_Object_Pool * const header_pool =
             arena_base->sized_header_pools[j];
@@ -1150,7 +1150,7 @@ int
 Parrot_gc_total_sized_buffers(PARROT_INTERP)
 {
     int j, ret = 0;
-    Arenas * const arena_base = interp->arena_base;
+    const Arenas * const arena_base = interp->arena_base;
     for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
         Small_Object_Pool * const header_pool =
             arena_base->sized_header_pools[j];
@@ -1159,6 +1159,38 @@ Parrot_gc_total_sized_buffers(PARROT_INTERP)
     }
     return ret;
 }
+
+/*
+
+=item C<int Parrot_gc_active_pmcs(PARROT_INTERP)>
+
+=cut
+
+*/
+
+int
+Parrot_gc_active_pmcs(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->pmc_pool->total_objects -
+           arena_base->pmc_pool->num_free_objects;
+}
+
+/*
+
+=item C<int Parrot_gc_total_pmcs(PARROT_INTERP)>
+
+=cut
+
+*/
+
+int
+Parrot_gc_total_pmcs(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->pmc_pool->total_objects;
+}
+
 
 /*
 

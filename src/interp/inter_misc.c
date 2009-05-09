@@ -232,14 +232,13 @@ interpinfo(PARROT_INTERP, INTVAL what)
             ret = arena_base->gc_collect_runs;
             break;
         case ACTIVE_PMCS:
-            ret = arena_base->pmc_pool->total_objects -
-                arena_base->pmc_pool->num_free_objects;
+            ret = Parrot_gc_active_pmcs(interp);
             break;
         case ACTIVE_BUFFERS:
             ret = Parrot_gc_active_sized_buffers(interp);
             break;
         case TOTAL_PMCS:
-            ret = arena_base->pmc_pool->total_objects;
+            ret = Parrot_gc_total_pmcs(interp);
             break;
         case TOTAL_BUFFERS:
             ret = Parrot_gc_total_sized_buffers(interp);
