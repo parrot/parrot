@@ -23,6 +23,35 @@ Generate C function body from PAST.
 
 .sub 'emit'
     .param pmc entry
+    .tailcall '!generate_children_body_part'(entry)
+.end
+
+=item C<!generate_body_part>
+
+Multi-methods for generating C body.
+
+TODO: Parse c_body properly and implement all other functions.
+
+=cut
+
+.sub '!generate_body_part' :multi(['PAST';'Op'])
+    .param pmc past
+    $S0 = past['inline']
+    .return ($S0)
+.end
+
+.sub '!generate_body_part' :multi(['PAST';'Stmts'])
+    .param pmc past
+    .local string res
+    res = "{\n"
+    $S0 = '!generate_children_body_part'(past)
+    concat res, $S0
+    concat res, "}\n"
+    .return (res)
+.end
+
+.sub '!generate_children_body_part'
+    .param pmc entry
     
     .local pmc res
     res = new 'ResizableStringArray'
@@ -38,20 +67,6 @@ Generate C function body from PAST.
   done:
 
     $S0 = join '', res
-    .return ($S0)
-.end
-
-=item C<!generate_body_part>
-
-Multi-methods for generating C body.
-
-TODO: Parse c_body properly and implement all other functions.
-
-=cut
-
-.sub '!generate_body_part' :multi(['PAST';'Op'])
-    .param pmc past
-    $S0 = past['inline']
     .return ($S0)
 .end
 
