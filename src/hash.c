@@ -364,10 +364,9 @@ this.
 
 PARROT_EXPORT
 void
-parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
+parrot_dump_hash(SHIM_INTERP, SHIM(const Hash *hash))
 {
     ASSERT_ARGS(parrot_dump_hash)
-    UNUSED(hash);
 }
 
 
@@ -1099,7 +1098,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
+parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_size)
 
