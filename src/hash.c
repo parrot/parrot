@@ -460,7 +460,7 @@ static void
 parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_values)
-    UINTVAL entries = hash->entries;
+    const UINTVAL entries = hash->entries;
     UINTVAL found   = 0;
     INTVAL  i;
 
@@ -469,7 +469,7 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
         while (bucket) {
             if (++found > entries)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "Detected hash corruption at hash %p entries %d",
                         hash, (int)entries);
 
@@ -496,7 +496,7 @@ static void
 parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_both)
-    UINTVAL entries = hash->entries;
+    const UINTVAL entries = hash->entries;
     UINTVAL found   = 0;
     INTVAL  i;
 
