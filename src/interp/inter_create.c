@@ -334,8 +334,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
      * Need to turn off GC blocking, else things stay alive and IO
      * handles aren't closed
      */
-    interp->arena_base->gc_mark_block_level  = 0;
-    interp->arena_base->gc_sweep_block_level = 0;
+    Parrot_gc_completely_unblock(interp);
 
     if (Interp_trace_TEST(interp, ~0)) {
         Parrot_io_eprintf(interp, "FileHandle objects (like stdout and stderr)"
@@ -388,8 +387,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         Parrot_gc_merge_header_pools(interp->parent_interpreter, interp);
     }
 
-    if (interp->arena_base->finalize_gc_system)
-        interp->arena_base->finalize_gc_system(interp);
+    Parrot_gc_finalize(interp);
 
     /* MMD cache */
     Parrot_mmd_cache_destroy(interp, interp->op_mmd_cache);

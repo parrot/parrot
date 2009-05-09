@@ -1199,6 +1199,18 @@ Parrot_gc_total_pmcs(PARROT_INTERP)
 
 =item C<int Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)>
 
+=item C<int Parrot_gc_total_memory_allocated(PARROT_INTERP)>
+
+=item C<int Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)>
+
+=item C<int Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)>
+
+=item C<int Parrot_gc_total_copied(PARROT_INTERP)>
+
+=item C<int Parrot_gc_impatient_pmcs(PARROT_INTERP)>
+
+=item C<int Parrot_gc_extended_pmcs(PARROT_INTERP)>
+
 =cut
 
 */
@@ -1222,6 +1234,152 @@ Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_lazy_mark_runs;;
+}
+
+int
+Parrot_gc_total_memory_allocated(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->memory_allocated;
+}
+
+int
+Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->header_allocs_since_last_collect;
+}
+
+int
+Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->mem_allocs_since_last_collect;
+}
+
+int
+Parrot_gc_total_copied(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->memory_collected;
+}
+
+int
+Parrot_gc_impatient_pmcs(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->num_early_gc_PMCs;
+}
+
+int
+Parrot_gc_extended_pmcs(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->num_extended_PMCs;
+}
+
+/*
+
+=item C<void Parrot_block_GC_mark(PARROT_INTERP)>
+
+=item C<void Parrot_unblock_GC_mark(PARROT_INTERP)>
+
+=item C<void Parrot_block_GC_sweep(PARROT_INTERP)>
+
+=item C<void Parrot_unblock_GC_sweep(PARROT_INTERP)>
+
+=item C<int Parrot_is_blocked_GC_mark(PARROT_INTERP)>
+
+=item C<int Parrot_is_blocked_GC_sweep(PARROT_INTERP)>
+
+=item C<void Parrot_gc_completely_unblock(PARROT_INTERP)>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_block_GC_mark(PARROT_INTERP)
+{
+    interp->arena_base->gc_mark_block_level++;
+    Parrot_shared_gc_block(interp);
+}
+
+PARROT_EXPORT
+void
+Parrot_unblock_GC_mark(PARROT_INTERP)
+{
+    if (interp->arena_base->gc_mark_block_level) {
+        interp->arena_base->gc_mark_block_level--;
+        Parrot_shared_gc_unblock(interp);
+    }
+}
+
+PARROT_EXPORT
+void
+Parrot_block_GC_sweep(PARROT_INTERP)
+{
+    interp->arena_base->gc_sweep_block_level++;
+}
+
+PARROT_EXPORT
+void
+Parrot_unblock_GC_sweep(PARROT_INTERP)
+{
+    if (interp->arena_base->gc_sweep_block_level)
+        interp->arena_base->gc_sweep_block_level--;
+}
+
+PARROT_EXPORT
+int
+Parrot_is_blocked_GC_mark(PARROT_INTERP)
+{
+    interp->arena_base->gc_mark_block_level;
+}
+
+PARROT_EXPORT
+int
+Parrot_is_blocked_GC_sweep(PARROT_INTERP)
+{
+    interp->arena_base->gc_sweep_block_level;
+}
+
+void
+Parrot_gc_completely_unblock(PARROT_INTERP)
+{
+    interp->arena_base->gc_mark_block_level  = 0;
+    interp->arena_base->gc_sweep_block_level = 0;
+}
+
+/*
+
+=item C<void Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)>
+
+=cut
+
+*/
+
+void
+Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    PObj_needs_early_gc_SET(pmc);
+    ++interp->arena_base->num_early_gc_PMCs;
+}
+
+/*
+
+=item C<void Parrot_gc_finalize(PARROT_INTERP)>
+
+=cut
+
+*/
+
+void
+Parrot_gc_finalize(PARROT_INTERP)
+{
+    if (interp->arena_base->finalize_gc_system)
+        interp->arena_base->finalize_gc_system(interp);
 }
 
 /*

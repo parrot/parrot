@@ -211,7 +211,6 @@ interpinfo(PARROT_INTERP, INTVAL what)
     ASSERT_ARGS(interpinfo)
     INTVAL ret = 0;
     int j;
-    Arenas *arena_base = interp->arena_base;
 
     switch (what) {
         case TOTAL_MEM_ALLOC:
@@ -220,7 +219,7 @@ interpinfo(PARROT_INTERP, INTVAL what)
             interp->memory_allocated = mallinfo().uordblks;
 #  endif
 #endif
-            ret = arena_base->memory_allocated;
+            ret = Parrot_gc_total_memory_allocated(interp);
             break;
         case GC_MARK_RUNS:
             ret = Parrot_gc_count_mark_runs(interp);
@@ -244,19 +243,19 @@ interpinfo(PARROT_INTERP, INTVAL what)
             ret = Parrot_gc_total_sized_buffers(interp);
             break;
         case HEADER_ALLOCS_SINCE_COLLECT:
-            ret = arena_base->header_allocs_since_last_collect;
+            ret = Parrot_gc_headers_alloc_since_last_collect(interp);
             break;
         case MEM_ALLOCS_SINCE_COLLECT:
-            ret = arena_base->mem_allocs_since_last_collect;
+            ret = Parrot_gc_mem_alloc_since_last_collect(interp);
             break;
         case TOTAL_COPIED:
-            ret = arena_base->memory_collected;
+            ret = Parrot_gc_total_copied(interp);
             break;
         case IMPATIENT_PMCS:
-            ret = arena_base->num_early_gc_PMCs;
+            ret = Parrot_gc_impatient_pmcs(interp);
             break;
         case EXTENDED_PMCS:
-            ret = arena_base->num_extended_PMCs;
+            ret = Parrot_gc_extended_pmcs(interp);
             break;
         case CURRENT_RUNCORE:
             ret = interp->run_core;

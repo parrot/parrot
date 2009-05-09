@@ -594,7 +594,7 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
 
     /* allocate a new chunk_list buffer, if old one has moved or is too small */
     len = list->n_chunks;
-    if (list->collect_runs != interp->arena_base->gc_collect_runs ||
+    if (list->collect_runs != Parrot_gc_count_collect_runs(interp) ||
             len > chunk_list_size(list)) {
         /* round up to reasonable size */
         len = 1 << (ld(len) + 1);
@@ -605,7 +605,7 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container, 0, list);
         }
-        list->collect_runs = interp->arena_base->gc_collect_runs;
+        list->collect_runs = Parrot_gc_count_collect_runs(interp);
     }
 
     /* reset type, actual state of chunks will show, what we really have */
@@ -937,7 +937,7 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
     UINTVAL i;
 
 #ifndef GC_IS_MALLOC
-    if (list->collect_runs != interp->arena_base->gc_collect_runs)
+    if (list->collect_runs != Parrot_gc_count_collect_runs(interp))
         rebuild_chunk_list(interp, list);
 #endif
 #ifdef SLOW_AND_BORING

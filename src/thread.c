@@ -1260,7 +1260,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
 {
     ASSERT_ARGS(pt_suspend_self_for_gc)
     PARROT_ASSERT(interp);
-    PARROT_ASSERT(!interp->arena_base->gc_mark_block_level);
+    PARROT_ASSERT(!Parrot_is_blocked_GC_mark(interp));
     DEBUG_ONLY(fprintf(stderr, "%p: suspend_self_for_gc\n", interp));
     /* since we are modifying our own state, we need to lock
      * the interpreter_array_mutex.
