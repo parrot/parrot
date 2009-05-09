@@ -282,20 +282,19 @@ Parrot_str_init(PARROT_INTERP)
         interp->hash_seed = Parrot_uint_rand(0);
     }
 
-    /* Set up the cstring cache, then load the basic encodings and charsets */
-    if (!interp->parent_interpreter) {
-        const_cstring_hash = parrot_new_cstring_hash(interp);
-        interp->const_cstring_hash  = const_cstring_hash;
-        Parrot_charsets_encodings_init(interp);
-    }
     /* initialize the constant string table */
-    else {
+    if (interp->parent_interpreter) {
         interp->const_cstring_table =
             interp->parent_interpreter->const_cstring_table;
         interp->const_cstring_hash  =
             interp->parent_interpreter->const_cstring_hash;
         return;
     }
+
+    /* Set up the cstring cache, then load the basic encodings and charsets */
+    const_cstring_hash          = parrot_new_cstring_hash(interp);
+    interp->const_cstring_hash  = const_cstring_hash;
+    Parrot_charsets_encodings_init(interp);
 
     interp->const_cstring_table =
         mem_allocate_n_zeroed_typed(n_parrot_cstrings, STRING *);

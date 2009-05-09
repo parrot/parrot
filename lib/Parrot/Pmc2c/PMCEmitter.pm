@@ -80,6 +80,8 @@ sub generate_c_file {
 
     $c->emit( $self->preamble );
 
+    $c->emit( $self->hdecls );
+    $c->emit( $self->{ro}->hdecls ) if ( $self->{ro} );
     $self->gen_methods;
 
     my $ro = $self->ro;
@@ -107,23 +109,38 @@ Generates the C header file code for the PMC.
 sub generate_h_file {
     my ($self)  = @_;
     my $h       = $self->{emitter};
-    my $name    = uc $self->name;
+    my $uc_name = uc $self->name;
+    my $name    = $self->name;
 
     $h->emit( dont_edit( $self->filename ) );
     $h->emit(<<"EOH");
 
-#ifndef PARROT_PMC_${name}_H_GUARD
-#define PARROT_PMC_${name}_H_GUARD
+#ifndef PARROT_PMC_${uc_name}_H_GUARD
+#define PARROT_PMC_${uc_name}_H_GUARD
 
 EOH
 
     $h->emit("#define PARROT_IN_EXTENSION\n") if ( $self->is_dynamic );
-    $h->emit( $self->hdecls );
-    $h->emit( $self->{ro}->hdecls ) if ( $self->{ro} );
+
+    # Emit available functions for work with vtables.
+    my $export = 'PARROT_EXPORT ';
+    if ($self->is_dynamic) {
+        $export = 'PARROT_DYNEXT_EXPORT ';
+        $h->emit("${export}void    Parrot_${name}_class_init(PARROT_INTERP, int, int);\n");
+    }
+
+    if ($name ne 'default') {
+        $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(VTABLE*);\n");
+        $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(VTABLE*);\n");
+    }
+    $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
+    $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
+
+
     $self->gen_attributes;
     $h->emit(<<"EOH");
 
-#endif /* PARROT_PMC_${name}_H_GUARD */
+#endif /* PARROT_PMC_${uc_name}_H_GUARD */
 
 EOH
     $h->emit( c_code_coda() );

@@ -354,11 +354,10 @@ Queries this object's class to find the method with the given name.
             /* If it's from this universe or the class doesn't inherit from
              * anything outside of it... */
             if (all_in_universe || VTABLE_isa(interp, cur_class, CONST_STRING(interp, "Class"))) {
-                if (VTABLE_exists_keyed_str(interp, class_info->methods, name)) {
-                    /* Found it! */
-                    method = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
+                method = VTABLE_get_pmc_keyed_str(interp, class_info->methods, name);
+                /* Found it! */
+                if (!PMC_IS_NULL(method))
                     break;
-                }
             }
             else {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, -1,
@@ -411,7 +410,7 @@ Invoke the PIR-defined vtable override, or call the default get_integer.
                 }
             }
         }
-        return (INTVAL)Parrot_default_get_integer(interp, pmc);
+        return interp->vtables[enum_class_default]->get_integer(interp, pmc);
     }
 
 /*
@@ -614,7 +613,7 @@ Invokes the object (if this vtable function is overridden).
             }
         }
 
-        return (opcode_t *)Parrot_default_invoke(interp, pmc, next);
+        return (opcode_t *)interp->vtables[enum_class_default]->invoke(interp, pmc, next);
     }
 
 /*

@@ -78,7 +78,7 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
             dest = pmc_new(interp, enum_class_BigInt);
 
         VTABLE_set_integer_native(interp, dest, base);
-        Parrot_BigInt_bitwise_shl_int(interp, dest, shift_amount, dest);
+        interp->vtables[enum_class_BigInt]->bitwise_shl_int(interp, dest, shift_amount, dest);
     }
 
     return dest;

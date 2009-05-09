@@ -37,6 +37,16 @@ C<emit> method.
 #endif
 
 pmclass CodeString extends String provides string {
+    ATTR INTVAL last_line_number; /* most recent line number seen   */
+    ATTR INTVAL last_pos;         /* most recent byte position seen */
+
+    VTABLE void init() {
+        Parrot_CodeString_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_CodeString_attributes);
+        attrs->str_val = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
+        PMC_data(SELF) = attrs;
+        PObj_custom_mark_destroy_SETALL(SELF);
+    }
 
 /*
 
@@ -131,26 +141,52 @@ A newline is automatically added to the end of the fmt.
 
 =item lineof(INTVAL pos)
 
-Return the line number of the line at offset C<pos>.  This code
-assumes that the first line is line number zero.
+Return the line number of the line at offset C<pos>.  This code assumes that
+the first line is line number zero.
 
 */
 
   METHOD lineof(INTVAL pos) {
-    STRING *str  = SELF.get_string();
-    INTVAL line  = 0;
-    INTVAL ipos  = 0;
+    STRING *str            = SELF.get_string();
+    INTVAL line            = 0;
+    INTVAL ipos            = 0;
+    INTVAL seen_first_line = 0;
     INTVAL jpos;
+    INTVAL last_pos;
+
+    GET_ATTR_last_pos(INTERP, SELF, last_pos);
+
+    /* the previous line number for this position is the same */
+    if (last_pos == pos) {
+        GET_ATTR_last_line_number(INTERP, SELF, line);
+        RETURN(INTVAL line);
+    }
+
+    /* start from the previous max line number and position */
+    if (last_pos < pos) {
+        GET_ATTR_last_line_number(INTERP, SELF, line);
+        ipos = last_pos;
+    }
 
     jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline, str, ipos, pos);
+
     while (jpos < pos) {
         line++;
+
         ipos = jpos + 1;
+
         /* treat \r\n as a single line separator */
-        ipos += (string_ord(INTERP, str, jpos) == 13
-                 && string_ord(INTERP, str, jpos+1) == 10);
+        ipos += (string_ord(INTERP, str, jpos)     == 13
+             &&  string_ord(INTERP, str, jpos + 1) == 10);
         jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline, str, ipos, pos);
     }
+
+    /* cache this position and line number for next time */
+    if (pos > last_pos) {
+        SET_ATTR_last_pos(INTERP, SELF, jpos);
+        SET_ATTR_last_line_number(INTERP, SELF, line);
+    }
+
     RETURN(INTVAL line);
 }
 

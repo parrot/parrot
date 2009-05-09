@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -108,7 +108,7 @@ key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key)
         ix /= 3;
     }
     else
-        ix = key_integer(interp, key);
+        ix = VTABLE_get_integer(interp, key);
 
     return ix;
 }
@@ -146,7 +146,7 @@ char_offset_key(PARROT_INTERP, PMC *pmc, PMC *key, int *type)
         return p;
 
     if (PObj_get_FLAGS(next) & KEY_integer_FLAG)
-        count = key_integer(interp, next);
+        count = VTABLE_get_integer(interp, next);
     else
         count = 1;
 

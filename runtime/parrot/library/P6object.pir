@@ -205,9 +205,9 @@ Deprecated; use add_parent(class, parentclass)
 .sub 'add_parent' :method :multi(_,_,_)
     .param pmc obj
     .param pmc parentclass
-    
+
     parentclass = self.'get_parrotclass'(parentclass)
-    
+
     .local pmc parrotclass
     parrotclass = self.'get_parrotclass'(obj)
     if null parrotclass goto end
@@ -287,7 +287,7 @@ Add C<method> with C<name> to C<class>.
     .param pmc obj
     .param string name
     .param pmc method
-    
+
     .local pmc parrotclass
     parrotclass = self.'get_parrotclass'(obj)
     parrotclass.'add_method'(name, method)
@@ -339,7 +339,7 @@ Add C<role> to C<class>.
 .sub 'compose_role' :method
     .param pmc obj
     .param pmc role
-    
+
     .local pmc parrotclass
     parrotclass = self.'get_parrotclass'(obj)
     parrotclass.'add_role'(role)

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -112,7 +112,7 @@ Marks the OrderedHash as live.
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
             PMC * const next = key_next(INTERP, key);
 
             if (!next)
@@ -160,7 +160,7 @@ Marks the OrderedHash as live.
 
     VTABLE STRING *get_string_keyed(PMC *key) {
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
             PMC * const next = key_next(INTERP, key);
 
             if (!next)
@@ -209,7 +209,7 @@ Returns the integer value associated with C<key>.
     VTABLE INTVAL get_integer_keyed(PMC *key) {
 
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
             PMC * const next = key_next(INTERP, key);
 
             if (!next)
@@ -258,7 +258,7 @@ Returns the floating-point value for the element at C<key>.
 
     VTABLE FLOATVAL get_number_keyed(PMC *key) {
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
-            PMC * const item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+            PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
             PMC * const next = key_next(INTERP, key);
 
             if (!next)
@@ -402,7 +402,7 @@ The created key = "\1idx".
             PMC        *item, *next;
             HashBucket *b;
             Hash       * const h   = (Hash *)SELF.get_pointer();
-            INTVAL             idx = key_integer(INTERP, key);
+            INTVAL             idx = VTABLE_get_integer(INTERP, key);
             const INTVAL       n   = h->entries;
 
             if (idx < 0)
@@ -450,7 +450,7 @@ The created key = "\1idx".
     VTABLE INTVAL defined_keyed(PMC *key) {
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
             Hash * const h   = (Hash *)SELF.get_pointer();
-            INTVAL       idx = key_integer(INTERP, key);
+            INTVAL       idx = VTABLE_get_integer(INTERP, key);
             const INTVAL n   = h->entries;
 
             HashBucket *b;
@@ -518,12 +518,12 @@ Deletes the key C<*key> from the hash.
 
         if (PObj_get_FLAGS(key) & KEY_integer_FLAG) {
             if (next) {
-                PMC * const item = SELF.get_pmc_keyed_int(key_integer(INTERP, key));
+                PMC * const item = SELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
                 VTABLE_delete_keyed(INTERP, item, next);
                 return;
             }
 
-            SELF.delete_keyed_int(key_integer(INTERP, key));
+            SELF.delete_keyed_int(VTABLE_get_integer(INTERP, key));
         }
         else {
             if (next) {

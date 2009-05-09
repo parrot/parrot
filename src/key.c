@@ -331,8 +331,7 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
     STRING  *str_key;
     FLOATVAL num_key;
 
-    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
-        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         case KEY_hash_iterator_FLAGS:
 
         case KEY_integer_FLAG:
@@ -378,7 +377,6 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
         case KEY_inf_slice_FLAG:
         default:
             break;
-        }
     }
 
     return VTABLE_get_integer(interp, key);

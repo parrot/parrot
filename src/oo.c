@@ -366,13 +366,14 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_oo_find_vtable_override)
     Parrot_Class_attributes * const _class = PARROT_CLASS(classobj);
+    PMC                            *result =
+        VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
 
-    if (VTABLE_exists_keyed_str(interp, _class->parent_overrides, name))
-        return VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
+    if (!PMC_IS_NULL(result))
+        return result;
     else {
         /* Walk and search for the vtable method. */
         const INTVAL num_classes = VTABLE_elements(interp, _class->all_parents);
-        PMC         *result      = PMCNULL;
         INTVAL       i;
 
         for (i = 0; i < num_classes; i++) {
