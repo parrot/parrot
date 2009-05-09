@@ -139,10 +139,12 @@ method multi($/) {
 
 method c_body($/) {
     #say("c_body: " ~ $/);
-    my $past := PAST::Op.new(
+    my $past := PAST::Stmts.new(
         :node($/),
-        :inline(~$/)
     );
+    for $<c_body_statement> {
+        $past.push($_.ast);
+    }
     make $past;
 }
 
@@ -161,6 +163,43 @@ method c_argument($/) {
         :name(~$<identifier>[0]),
         :returns(~$<c_type>)
     );
+    make $past;
+}
+
+method c_body_statement($/, $key) {
+    my $past;
+    #say("body " ~ $key);
+    if ($key eq 'characters') {
+        $past := PAST::Op.new(
+            :node($/),
+            :inline(~$/)
+        );
+    }
+    elsif ($key eq 'macro') {
+        $past := $<c_body_macro>.ast;
+    }
+    elsif ($key eq 'body') {
+        $past := $<c_body>.ast;
+    }
+    else {
+        $/.panic("Unknown key " ~ $key);
+    }
+    
+    make $past;
+}
+
+method c_body_macro($/, $key) {
+    my $past;
+    $past := PAST::Op.new(
+        :name(~$<identifier>),
+        :pasttype('call'),
+        :node($/)
+    );
+
+    $past<macro> := 1;
+    $past<self>  := $key eq 'self';
+    $past<super> := $key eq 'super';
+
     make $past;
 }
 

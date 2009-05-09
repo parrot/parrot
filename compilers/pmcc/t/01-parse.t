@@ -8,7 +8,7 @@
     load_bytecode 'pmcc.pbc'
 
     .local int total
-    total = 25
+    total = 27
 
     plan(total)
     test_parse(total)

@@ -132,8 +132,23 @@ rule multi {
 
 # Nested list of something
 rule c_body {
-    '{' [ <-[{}]> | <c_body> ]* '}'
-    {*}
+    '{' <c_body_statement>* '}' {*}
+}
+
+rule c_body_statement {
+    | <c_body_macro> {*}        #= macro
+    | <-[{}]>+ {*}              #= characters
+    | <c_body> {*}              #= body
+}
+
+# Various macros for VTABLE body
+rule c_body_macro {
+    | 'SELF.' :: <identifier> '(' <-[()]>* ')' {*}    #= SELF
+    | 'SUPER' :: '(' <-[()]>* ')' {*}                 #= SUPER
+}
+
+rule c_parameters {
+    
 }
 
 # It's really bad signature

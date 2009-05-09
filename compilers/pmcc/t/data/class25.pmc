@@ -1,0 +1,7 @@
+pmclass Integer {
+    VTABLE void increment() {
+        if (1) {
+            SUPER();
+        }
+    }
+}
