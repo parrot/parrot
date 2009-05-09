@@ -82,7 +82,12 @@ method generate_attr_struct() {
     my @struct_members;
 
     for @attrs {
-        @struct_members.push("    " ~ $_<type> ~ " " ~ $_<name> ~ ";\n");
+        if $_<is_fp> {
+            @struct_members.push("    " ~ $_<type> ~";\n");
+        }
+        else {
+            @struct_members.push("    " ~ $_<type> ~ " " ~ $_<name> ~ ";\n");
+        }
     }
 
     $struct_end := "} Parrot_" ~ self.name ~ "_attributes;\n";
@@ -116,8 +121,8 @@ method generate_attr_accessors() {
 
     for @attrs {
         @accessors.push( self.generate_accessor_comment(self.name, $_<name>) );
-        @accessors.push( self.generate_get_accessor($_<type>,$_<name>) );
-        @accessors.push( self.generate_set_accessor($_<type>,$_<name>) );
+        @accessors.push( self.generate_get_accessor($_<type>, $_<name>) );
+        @accessors.push( self.generate_set_accessor($_<type>, $_<name>) );
     }
 
     return join("\n", @accessors);

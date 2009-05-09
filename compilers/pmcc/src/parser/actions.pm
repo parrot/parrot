@@ -54,17 +54,25 @@ method attribute_type($/, $key) {
     our $?PMC;
     my $name;
     my $type;
+    my $is_fp;
     my $accessor_type;
 
     if $key eq 'simple_attr' {
-        $type := ~$/<simple_attr><simple_attr_type>;
-        $name := ~$/<simple_attr><identifier>;
+        $type  := ~$/<simple_attr><simple_attr_type>;
+        $name  := ~$/<simple_attr><identifier>;
+        $is_fp := 0;
     }
     elsif $key eq 'pointer_attr' {
-        $type := ~$/<pointer_attr><pointer_attr_type>;
-        $name := ~$/<pointer_attr><identifier>;
+        $type  := ~$/<pointer_attr><pointer_attr_type>;
+        $name  := ~$/<pointer_attr><identifier>;
+        $is_fp := 0;
     }
-    $?PMC.add_attr($name, $type);
+    elsif $key eq 'func_pointer_attr' {
+        $type  := ~$/<func_pointer_attr>;
+        $name  := ~$/<func_pointer_attr><identifier>;
+        $is_fp := 1;
+    }
+    $?PMC.add_attr($name, $type, $is_fp);
 }
 
 

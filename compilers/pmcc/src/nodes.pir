@@ -278,6 +278,7 @@ Add an ATTR to PMC.
 .sub 'add_attr' :method
     .param string name
     .param string type
+    .param int is_fp
 
     .local pmc it, attrs, attr
 
@@ -297,6 +298,7 @@ Add an ATTR to PMC.
     attr = new 'Hash'
     attr['type'] = type
     attr['name'] = name
+    attr['is_fp'] = is_fp
     push attrs, attr
     .return ()
 .end
