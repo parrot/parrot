@@ -239,6 +239,8 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
 
 =item C<void Parrot_gc_free_pmc_header(PARROT_INTERP, PMC *pmc)>
 
+Adds the given PMC to the free list for later reuse.
+
 =cut
 
 */
@@ -264,6 +266,8 @@ Parrot_gc_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 /*
 
 =item C<void Parrot_gc_free_string_header(PARROT_INTERP, STRING *s)>
+
+Adds the given STRING to the free list for later reuse.
 
 =cut
 
@@ -703,8 +707,8 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
 
 /*
 
-=item C<void Parrot_gc_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t
-size)>
+=item C<void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP, Buffer
+*buffer, size_t size)>
 
 Allocates a chunk of memory of at least size C<size> for the given Buffer.
 buffer is guaranteed to be properly aligned for things like C<FLOATVALS>,
@@ -715,9 +719,10 @@ so the size may be rounded up or down to guarantee that this alignment holds.
 */
 
 void
-Parrot_gc_allocate_aligned(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
+Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
+    ARGOUT(Buffer *buffer), size_t size)
 {
-    ASSERT_ARGS(Parrot_gc_allocate_aligned)
+    ASSERT_ARGS(Parrot_gc_allocate_buffer_storage_aligned)
     size_t new_size;
     char *mem;
 
@@ -748,7 +753,8 @@ is B<not> changed.
 */
 
 void
-Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
+Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str),
+    size_t size)
 {
     ASSERT_ARGS(Parrot_gc_allocate_string_storage)
     size_t       new_size;
@@ -779,7 +785,8 @@ Parrot_gc_allocate_string_storage(PARROT_INTERP, ARGOUT(STRING *str), size_t siz
 
 /*
 
-=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)>
+=item C<void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Buffer *buffer,
+size_t newsize)>
 
 Reallocate the Buffer's buffer memory to the given size. The
 allocated buffer will not shrink. If the buffer was allocated with
@@ -792,9 +799,10 @@ memory is not cleared.
 */
 
 void
-Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
+Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, ARGMOD(Buffer *buffer),
+    size_t newsize)
 {
-    ASSERT_ARGS(Parrot_reallocate)
+    ASSERT_ARGS(Parrot_gc_reallocate_buffer_storage)
     size_t copysize;
     char  *mem;
     Memory_Pool * const pool = interp->arena_base->memory_pool;
@@ -847,7 +855,6 @@ Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
 
     PObj_buflen(buffer) = new_size;
 }
-
 
 /*
 
@@ -911,7 +918,8 @@ new buffer location, C<str-E<gt>bufused> is B<not> changed.
 */
 
 void
-Parrot_gc_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
+Parrot_gc_reallocate_string_storage(PARROT_INTERP, ARGMOD(STRING *str),
+    size_t newsize)
 {
     ASSERT_ARGS(Parrot_gc_reallocate_string_storage)
     size_t copysize;
@@ -1009,7 +1017,8 @@ Parrot_gc_destroy_memory_pools(PARROT_INTERP)
 
 =item C<void Parrot_gc_cleanup_next_for_GC(PARROT_INTERP)>
 
-Cleans up the C<next_for_GC> pointers.
+Cleans up the C<next_for_GC> pointers. Sets all of them in the PMC and Constant
+PMC pools to NULL.
 
 =cut
 
@@ -1056,6 +1065,9 @@ cleanup_next_for_GC_pool(ARGIN(Small_Object_Pool *pool))
 /*
 
 =item C<int Parrot_gc_ptr_is_pmc(PARROT_INTERP, void *ptr)>
+
+Determines if a given pointer is a PMC or not. It is a PMC if it is properly
+contained in one of this interpreters PMC pools.
 
 =cut
 
@@ -1119,6 +1131,8 @@ Parrot_gc_get_pmc_index(PARROT_INTERP, ARGIN(PMC* pmc))
 
 =item C<int Parrot_gc_active_sized_buffers(PARROT_INTERP)>
 
+Returns the number of actively used sized buffers.
+
 =cut
 
 */
@@ -1142,6 +1156,8 @@ Parrot_gc_active_sized_buffers(PARROT_INTERP)
 
 =item C<int Parrot_gc_total_sized_buffers(PARROT_INTERP)>
 
+Returns the total number of sized buffers that we are managing.
+
 =cut
 
 */
@@ -1164,6 +1180,8 @@ Parrot_gc_total_sized_buffers(PARROT_INTERP)
 
 =item C<int Parrot_gc_active_pmcs(PARROT_INTERP)>
 
+Return the number of actively used PMCs.
+
 =cut
 
 */
@@ -1180,6 +1198,8 @@ Parrot_gc_active_pmcs(PARROT_INTERP)
 
 =item C<int Parrot_gc_total_pmcs(PARROT_INTERP)>
 
+Return the total number of PMCs that we are managing.
+
 =cut
 
 */
@@ -1193,85 +1213,101 @@ Parrot_gc_total_pmcs(PARROT_INTERP)
 
 /*
 
-=item C<int Parrot_gc_count_mark_runs(PARROT_INTERP)>
+=item C<size_t Parrot_gc_count_mark_runs(PARROT_INTERP)>
 
-=item C<int Parrot_gc_count_collect_runs(PARROT_INTERP)>
+Return the number of mark runs the GC has performed.
 
-=item C<int Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)>
+=item C<size_t Parrot_gc_count_collect_runs(PARROT_INTERP)>
 
-=item C<int Parrot_gc_total_memory_allocated(PARROT_INTERP)>
+Return the number of collect runs the GC has performed.
 
-=item C<int Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)>
+=item C<size_t Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)>
 
-=item C<int Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)>
+Return the number of lazy mark runs the GC has performed.
 
-=item C<int Parrot_gc_total_copied(PARROT_INTERP)>
+=item C<size_t Parrot_gc_total_memory_allocated(PARROT_INTERP)>
 
-=item C<int Parrot_gc_impatient_pmcs(PARROT_INTERP)>
+Return the total number of memory allocations made by the GC.
 
-=item C<int Parrot_gc_extended_pmcs(PARROT_INTERP)>
+=item C<size_t Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)>
+
+Return the number of new headers allocated since the last collection run.
+
+=item C<size_t Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)>
+
+Return the number of memory allocations made since the last collection run.
+
+=item C<UINTVAL Parrot_gc_total_copied(PARROT_INTERP)>
+
+=item C<UINTVAL Parrot_gc_impatient_pmcs(PARROT_INTERP)>
+
+Returns the number of PMCs that are marked as needing timely destruction.
+
+=item C<UINTVAL Parrot_gc_extended_pmcs(PARROT_INTERP)>
+
+Returns the number of extended PMCs.
 
 =cut
 
 */
 
-int
+size_t
 Parrot_gc_count_mark_runs(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_mark_runs;
 }
 
-int
+size_t
 Parrot_gc_count_collect_runs(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_collect_runs;
 }
 
-int
+size_t
 Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_lazy_mark_runs;;
 }
 
-int
+size_t
 Parrot_gc_total_memory_allocated(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->memory_allocated;
 }
 
-int
+size_t
 Parrot_gc_headers_alloc_since_last_collect(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->header_allocs_since_last_collect;
 }
 
-int
+size_t
 Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->mem_allocs_since_last_collect;
 }
 
-int
+UINTVAL
 Parrot_gc_total_copied(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->memory_collected;
 }
 
-int
+UINTVAL
 Parrot_gc_impatient_pmcs(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->num_early_gc_PMCs;
 }
 
-int
+UINTVAL
 Parrot_gc_extended_pmcs(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
@@ -1282,17 +1318,32 @@ Parrot_gc_extended_pmcs(PARROT_INTERP)
 
 =item C<void Parrot_block_GC_mark(PARROT_INTERP)>
 
+Blocks the GC from performing it's mark phase.
+
 =item C<void Parrot_unblock_GC_mark(PARROT_INTERP)>
+
+Unblocks the GC mark.
 
 =item C<void Parrot_block_GC_sweep(PARROT_INTERP)>
 
+Blocks the GC from performing it's sweep phase.
+
 =item C<void Parrot_unblock_GC_sweep(PARROT_INTERP)>
 
-=item C<int Parrot_is_blocked_GC_mark(PARROT_INTERP)>
+Unblocks GC sweep.
 
-=item C<int Parrot_is_blocked_GC_sweep(PARROT_INTERP)>
+=item C<unsigned int Parrot_is_blocked_GC_mark(PARROT_INTERP)>
+
+Determines if the GC mark is currently blocked.
+
+=item C<unsigned int Parrot_is_blocked_GC_sweep(PARROT_INTERP)>
+
+Determines if the GC sweep is currently blocked.
 
 =item C<void Parrot_gc_completely_unblock(PARROT_INTERP)>
+
+Completely unblock the GC mark and sweep. This is only used at interpreter
+destruction, using it anywhere else will cause problems.
 
 =cut
 
@@ -1332,17 +1383,17 @@ Parrot_unblock_GC_sweep(PARROT_INTERP)
 }
 
 PARROT_EXPORT
-int
+unsigned int
 Parrot_is_blocked_GC_mark(PARROT_INTERP)
 {
-    interp->arena_base->gc_mark_block_level;
+    return interp->arena_base->gc_mark_block_level;
 }
 
 PARROT_EXPORT
-int
+unsigned int
 Parrot_is_blocked_GC_sweep(PARROT_INTERP)
 {
-    interp->arena_base->gc_sweep_block_level;
+    return interp->arena_base->gc_sweep_block_level;
 }
 
 void
@@ -1355,6 +1406,8 @@ Parrot_gc_completely_unblock(PARROT_INTERP)
 /*
 
 =item C<void Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)>
+
+Mark a PMC as needing timely destruction
 
 =cut
 
@@ -1370,6 +1423,9 @@ Parrot_gc_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 /*
 
 =item C<void Parrot_gc_finalize(PARROT_INTERP)>
+
+Finalize the GC system, if the current GC core has defined a finalization
+routine.
 
 =cut
 

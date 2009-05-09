@@ -117,7 +117,7 @@ xrealloc(void *p, size_t size)
 
 /*
 
-=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)>
+=item C<void Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Buffer *buffer, size_t newsize)>
 
 COWable objects (strings or Buffers) use an INTVAL before C<bufstart> for
 refcounting in GC.
@@ -127,14 +127,14 @@ refcounting in GC.
 */
 
 void
-Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)
+Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Buffer *buffer, size_t newsize)
 {
     ASSERT_ARGS(parrot_reallocate)
     const size_t oldlen = PObj_buflen(buffer);
     Buffer_alloc_unit *p;
 
     if (!PObj_bufstart(buffer)) {
-        Parrot_gc_allocate_aligned(interp, buffer, newsize);
+        Parrot_gc_allocate_buffer_storage_aligned(interp, buffer, newsize);
         /* The previous version zeroed the memory here, but I'm not
            sure why. */
         memset(PObj_bufstart(buffer), 0, newsize);
@@ -164,7 +164,7 @@ See the comments and diagram in resources.c.
 
 This was never called anyway, so it isn't implemented here.
 
-=item C<void Parrot_gc_allocate_aligned(PARROT_INTERP, Buffer *buffer,
+=item C<void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP, Buffer *buffer,
 size_t size)>
 
 Like above, except the address of the buffer is guaranteed to be
@@ -176,7 +176,7 @@ suitably aligned for holding anything contained in UnionVal
 */
 
 void
-Parrot_gc_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
+Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP, Buffer *buffer, size_t size)
 {
     ASSERT_ARGS(parrot_allocate_aligned)
     Buffer_alloc_unit *p;

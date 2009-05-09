@@ -367,7 +367,7 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     chunk->n_items  = 0;
     chunk->next     = NULL;
     chunk->prev     = NULL;
-    Parrot_gc_allocate_aligned(interp, (Buffer *)chunk, size);
+    Parrot_gc_allocate_buffer_storage_aligned(interp, (Buffer *)chunk, size);
     memset(PObj_bufstart((Buffer*)chunk), 0, size);
 
     /* see also src/hash.c */
@@ -489,7 +489,7 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
              * but: if bigger, split them in a next pass
              * TODO test the logic that solves the above problem */
             if (prev->items + chunk->items > MAX_ITEMS) {
-                Parrot_reallocate(interp, (Buffer *)prev,
+                Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)prev,
                         MAX_ITEMS * list->item_size);
                 if (list->container) {
                     GC_WRITE_BARRIER(interp, list->container, 0, prev);
@@ -509,7 +509,7 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
                 prev->items = MAX_ITEMS;
             }
             else {
-                Parrot_reallocate(interp, (Buffer *)prev,
+                Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)prev,
                         (prev->items + chunk->items) * list->item_size);
                 if (list->container) {
                     GC_WRITE_BARRIER(interp, list->container, 0, prev);
@@ -600,7 +600,7 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
         len = 1 << (ld(len) + 1);
         if (len < 4)
             len = 4;
-        Parrot_reallocate(interp, (Buffer *)list,
+        Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)list,
                 len * sizeof (List_chunk *));
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container, 0, list);
@@ -1057,7 +1057,7 @@ split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVA
     /* allocate space at idx */
     if (chunk->items <= MAX_ITEMS) {
         /* it fits, just allocate */
-        Parrot_reallocate(interp, (Buffer *)chunk,
+        Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)chunk,
                 chunk->items * list->item_size);
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container, 0, chunk);
@@ -1074,7 +1074,7 @@ split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVA
         const INTVAL n1 = chunk->items - n2 - n3;
 
         chunk->items = n2;
-        Parrot_reallocate(interp, (Buffer *)chunk,
+        Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)chunk,
                 chunk->items * list->item_size);
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container, 0, chunk);
