@@ -1197,6 +1197,8 @@ Parrot_gc_total_pmcs(PARROT_INTERP)
 
 =item C<int Parrot_gc_count_collect_runs(PARROT_INTERP)>
 
+=item C<int Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)>
+
 =cut
 
 */
@@ -1213,6 +1215,13 @@ Parrot_gc_count_collect_runs(PARROT_INTERP)
 {
     const Arenas * const arena_base = interp->arena_base;
     return arena_base->gc_collect_runs;
+}
+
+int
+Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
+{
+    const Arenas * const arena_base = interp->arena_base;
+    return arena_base->gc_lazy_mark_runs;;
 }
 
 /*

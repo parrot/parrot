@@ -270,6 +270,9 @@ void Parrot_gc_compact_memory_pool(PARROT_INTERP)
 int Parrot_gc_count_collect_runs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+int Parrot_gc_count_lazy_mark_runs(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 int Parrot_gc_count_mark_runs(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -389,6 +392,9 @@ void Parrot_reallocate(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_gc_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_count_collect_runs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_gc_count_lazy_mark_runs \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_gc_count_mark_runs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
