@@ -20,7 +20,7 @@
     check_one_file(filename, $S0, "'Integer.instantiate: unhandled initializer'", "VTable body generated")
 
     $S0 = _slurp('t/data/class14.pmc')
-    check_one_file(filename, $S0, "'/* class_init_code; called for side effects */'", "class_init body preserved")
+    check_one_file(filename, $S0, "'Small_Object_Pool *List_chunks'", "class_init body almost preserved")
 .end
 
 # Check genrated header.
