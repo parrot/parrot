@@ -197,9 +197,9 @@ method c_body_macro($/, $key) {
         :node($/)
     );
 
-    $past<macro> := 1;
-    $past<self>  := $key eq 'self';
-    $past<super> := $key eq 'super';
+    $past<is_macro> := 1;
+    $past<is_self>  := $key eq 'SELF';
+    $past<is_super> := $key eq 'SUPER';
 
     make $past;
 }
