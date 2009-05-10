@@ -408,6 +408,18 @@ method generate_signature($entry, $prefix) {
     join('', @res);
 }
 
+method past() {
+    self<past>;
+}
+
+method name() {
+    self<name>;
+}
+
+method ucname() {
+    self<ucname>;
+}
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

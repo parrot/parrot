@@ -37,22 +37,6 @@ TODO figure out how to implement it in NQP.
     .return (res)
 .end
 
-.sub 'past' :method
-    $P0 = self['past']
-    .return ($P0)
-.end
-
-.sub 'name' :method
-    $S0 = self['name']
-    .return ($S0)
-.end
-
-.sub 'ucname' :method
-    $S0 = self['ucname']
-    .return ($S0)
-.end
-
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
