@@ -1,8 +1,8 @@
 pmclass Integer {
     VTABLE void increment() {
+        SELF.decrement();
         if (1) {
             SELF.add_int(2);
         }
-        SELF.dec_int(1);
     }
 }

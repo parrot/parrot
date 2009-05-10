@@ -18,8 +18,10 @@ SOURCES := \
   pmcc.pir \
   src/nodes.pir \
   src/vtable_info.pir \
+  src/emitter/pmc.pir \
   src/emitter/gen_pmc.pir \
   src/emitter/c.pir \
+  src/emitter/gen_c.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
   src/gen_emitter.pir \
@@ -45,6 +47,10 @@ src/emitter/gen_pmc.pir: $(NQP) $(PCT) src/emitter/pmc.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/emitter/gen_pmc.pir \
 	    --target=pir src/emitter/pmc.pm
 
+src/emitter/gen_c.pir: $(NQP) $(PCT) src/emitter/c.pm
+	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/emitter/gen_c.pir \
+	    --target=pir src/emitter/c.pm
+
 src/gen_emitter.pir: $(NQP) $(PCT) src/emitter.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_emitter.pir \
 	    --target=pir src/emitter.pm
@@ -59,7 +65,7 @@ help:
 	@echo ""
 	@echo "Following targets are available for the user:"
 	@echo ""
-	@echo "  all:               nqp.pbc"
+	@echo "  all:               pmcc.pbc"
 	@echo "                     This is the default."
 	@echo "Testing:"
 	@echo "  test:              Run the test suite."
@@ -86,6 +92,7 @@ CLEANUPS := \
   src/parser/gen_actions.pir \
   src/gen_emitter.pir \
   src/emitter/gen_pmc.pir \
+  src/emitter/gen_c.pir \
   src/gen_vtable_info.pir
 
 

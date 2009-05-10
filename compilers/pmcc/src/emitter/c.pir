@@ -21,9 +21,9 @@ Generate C function body from PAST.
 
 =cut
 
-.sub 'emit'
+.sub 'emit' :method
     .param pmc entry
-    .tailcall '!generate_children_body_part'(entry, entry)
+    .tailcall self.'!generate_children_body_part'(entry, entry)
 .end
 
 =item C<!generate_body_part>
@@ -34,25 +34,24 @@ TODO: Parse c_body properly and implement all other functions.
 
 =cut
 
-.sub '!generate_body_part' :multi(_, ['PAST';'Op'])
+.sub '!generate_body_part' :method :multi(_, _, ['PAST';'Op'])
     .param pmc pmclass
     .param pmc past
-    $S0 = past['inline']
-    .return ($S0)
+    .tailcall self.'rewrite_op'(pmclass, past)
 .end
 
-.sub '!generate_body_part' :multi(_, ['PAST';'Stmts'])
+.sub '!generate_body_part' :method :multi(_, _, ['PAST';'Stmts'])
     .param pmc pmclass
     .param pmc past
     .local string res
     res = "{\n"
-    $S0 = '!generate_children_body_part'(pmclass, past)
+    $S0 = self.'!generate_children_body_part'(pmclass, past)
     concat res, $S0
     concat res, "}\n"
     .return (res)
 .end
 
-.sub '!generate_children_body_part'
+.sub '!generate_children_body_part' :method
     .param pmc pmclass
     .param pmc entry
     
@@ -64,7 +63,7 @@ TODO: Parse c_body properly and implement all other functions.
     $P1 = shift $P0
     #print 'P1 '
     #say $P1
-    $S0 = '!generate_body_part'(pmclass, $P1)
+    $S0 = self.'!generate_body_part'(pmclass, $P1)
     push res, $S0
     goto loop
   done:

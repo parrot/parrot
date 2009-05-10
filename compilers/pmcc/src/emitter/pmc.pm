@@ -320,7 +320,7 @@ method generate_c_file_functions() {
     for %vtables {
         my $entry := %vtables{$_};
         @res.push(self.generate_signature($entry, ""));
-        @res.push(PMC::Emitter::C::emit($entry));
+        @res.push(PMC::Emitter::C.new.emit($entry));
     }
 
     join('', @res);
@@ -345,7 +345,7 @@ method generate_class_init() {
     my $past := self.past;
     if ($past<class_init>) {
         @res.push("/* class_init */\n");
-        @res.push(PMC::Emitter::C::emit($past<class_init>));
+        @res.push(PMC::Emitter::C.new().emit($past<class_init>));
     }
 
     @res.push("\n}\n");
