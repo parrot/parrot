@@ -22,6 +22,7 @@ SOURCES := \
   src/emitter/gen_pmc.pir \
   src/emitter/c.pir \
   src/emitter/gen_c.pir \
+  src/emitter/pmc/default.pir \
   src/emitter/pmc/gen_default.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
