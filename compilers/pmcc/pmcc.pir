@@ -4,9 +4,7 @@
 .namespace [ 'PMC';'Compiler' ]
 
 .sub '__onload' :load :init
-    load_bytecode 'PGE.pbc'
     load_bytecode 'PCT.pbc'
-    load_bytecode 'compilers/nqp/nqp.pbc'
 
     .local pmc p6meta
     p6meta = new 'P6metaclass'
