@@ -18,8 +18,10 @@ method pmc($/, $key) {
         );
     }
     else {
-        # Set c_header and c_coda
+        # TODO Set c_header and c_coda
         make $?PMC;
+        # FIXME We shouldn't call this during parsing.
+        # It belongs to high-level command-line tool.
         $?PMC.serialize_attrs();
     }
 }
