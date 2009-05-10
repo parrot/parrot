@@ -22,7 +22,6 @@ method rewrite_op($pmclass, $past) {
 method rewrite_macro($pmclass, $past) {
     my $res;
     if $past<is_self> {
-        # FIXME. We should able to handle multiply arguments.
         $res := "Parrot_" ~ $pmclass.name ~ "_" ~ $past.name
                 ~ '(' ~ full_arguments($past) ~')';
     }
