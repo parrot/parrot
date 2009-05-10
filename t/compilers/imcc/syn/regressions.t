@@ -138,8 +138,6 @@ CODE
 hello world
 OUT
 
-TODO: {
-  local $TODO = 'TT #654';
 pir_output_is( <<'CODE', <<'OUT', 'unicode named identifiers (TT #654)');
  .sub 'main' :main
     'foo'(1 :named(unicode:"\x{e4}"))
@@ -152,9 +150,8 @@ pir_output_is( <<'CODE', <<'OUT', 'unicode named identifiers (TT #654)');
     say x
  .end
 CODE
-1
+ok 1
 OUT
-}
 
 # Local Variables:
 #   mode: cperl

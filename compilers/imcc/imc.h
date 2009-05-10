@@ -27,20 +27,18 @@
 
 /* For people without unistd.h to compile Flex lexer
  * unistd.h probably isn't required on most if any
- * platforms anyway.
- */
+ * platforms anyway.  */
 #ifndef PARROT_HAS_HEADER_UNISTD
 #  define YY_NO_UNISTD_H 1
 #endif
 
 #define IMCC_MAX_FIX_REGS PARROT_MAX_ARGS
 #if IMCC_MAX_FIX_REGS > 16
- #  error: flags wont fit
+#  error: flags wont fit
 #endif
 
-/* IMCC reserves this character for internally generated labels
- * and identifiers that won't collide with high level compiler generated names.
- */
+/* IMCC reserves this character for internally generated labels and identifiers
+ * that won't collide with high level compiler generated names.  */
 #define IMCC_INTERNAL_CHAR '@'
 
 typedef struct _IMC_Unit IMC_Unit;
@@ -594,7 +592,7 @@ typedef struct _imc_info_t {
     /* some values that were global... */
     SymReg               *cur_call;
     SymReg               *cur_obj;
-    const char           *adv_named_id;
+    SymReg               *adv_named_id;
 
     /* Lex globals */
     char                 *heredoc_end;
