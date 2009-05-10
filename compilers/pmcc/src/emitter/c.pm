@@ -22,8 +22,7 @@ method rewrite_op($pmclass, $past) {
 method rewrite_macro($pmclass, $past) {
     my $res;
     if $past<is_self> {
-        $res := "Parrot_" ~ $pmclass.name ~ "_" ~ $past.name
-                ~ '(' ~ full_arguments($past) ~')';
+        $res := "VTABLE_" ~ $past.name ~ '(' ~ arguments($past) ~')';
     }
 
     $res;
@@ -32,6 +31,12 @@ method rewrite_macro($pmclass, $past) {
 sub full_arguments($past) {
     my @tmp;
     @tmp.push('interp, pmc');
+    @tmp.push(arguments($past));
+    join(', ', @tmp);
+}
+
+sub arguments($past) {
+    my @tmp;
     for @($past) {
         @tmp.push($_.value);
     }

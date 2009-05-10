@@ -8,7 +8,7 @@
     load_bytecode 'pmcc.pbc'
     .local int total
 
-    plan(8)
+    plan(7)
 
     .local string filename
 
@@ -24,10 +24,9 @@
 
     filename = 't/data/class26.pmc'
     $S0 = _slurp('t/data/class26.pmc')
-    check_one_file(filename, $S0, "'Parrot_Integer_decrement'", "SELF.decrement was rewriten")
-    check_one_file(filename, $S0, "'Parrot_Integer_decrement(interp, pmc)'", "SELF.decrement was rewriten with params")
-    check_one_file(filename, $S0, "'Parrot_Integer_add_int'", "SELF.add_int was rewriten")
-    check_one_file(filename, $S0, "'Parrot_Integer_add_int(interp, pmc, 2)'", "SELF.add_int was rewriten with params")
+    check_one_file(filename, $S0, "'VTABLE_decrement'", "SELF.decrement was rewriten")
+    check_one_file(filename, $S0, "'VTABLE_add_int'", "SELF.add_int was rewriten")
+    check_one_file(filename, $S0, "'VTABLE_add_int(2)'", "SELF.add_int was rewriten with params")
 .end
 
 
