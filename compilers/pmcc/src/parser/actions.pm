@@ -172,6 +172,7 @@ method c_body_statement($/, $key) {
     if ($key eq 'characters') {
         $past := PAST::Op.new(
             :node($/),
+            :pasttype('inline'),
             :inline(~$/)
         );
     }
