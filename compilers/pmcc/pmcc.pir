@@ -36,6 +36,7 @@
 .include 'src/gen_emitter.pir'
 .include 'src/emitter/gen_pmc.pir'
 .include 'src/emitter/gen_c.pir'
+.include 'src/emitter/pmc/gen_default.pir'
 .include 'src/gen_vtable_info.pir'
 .include 'src/parser/gen_grammar.pir'
 .include 'src/parser/gen_actions.pir'
