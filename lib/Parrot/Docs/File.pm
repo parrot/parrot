@@ -409,8 +409,6 @@ sub short_description {
             $desc =~ s/\s+$//os;
 
             # Remove any POD.
-            # RT#43683 - Decide whether we want to do this or convert
-            # to HTML in the documentation item.
             $desc =~ s/[CFL]<([^>]+)>/$1/osg;
 
             return $desc;
