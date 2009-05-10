@@ -2,7 +2,9 @@ pmclass Integer {
     VTABLE void increment() {
         SELF.decrement();
         if (1) {
+            SELF.eat_kittens(42, kitten);
             SELF.add_int(2);
+            SELF.eat_kitten(kitten);
         }
     }
 }

@@ -201,7 +201,20 @@ method c_body_macro($/, $key) {
     $past<is_self>  := $key eq 'SELF';
     $past<is_super> := $key eq 'SUPER';
 
+    #say("PARAMS " ~ $<c_parameters>);
+    for $<c_parameters> {
+        $past.push($_.ast);
+    }
+
     make $past;
+}
+
+method c_parameters($/) {
+    #say("c_parameters " ~ $/);
+    make PAST::Val.new(
+        :node($/),
+        :value(~$/)
+    );
 }
 
 # Local Variables:

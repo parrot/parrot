@@ -137,18 +137,22 @@ rule c_body {
 
 rule c_body_statement {
     | <c_body_macro> {*}        #= macro
-    | <-[{}]>+ {*}              #= characters
+    | <-[{}]>  {*}              #= characters
     | <c_body> {*}              #= body
 }
 
 # Various macros for VTABLE body
 rule c_body_macro {
-    | 'SELF.' :: <identifier> '(' <-[()]>* ')' {*}    #= SELF
-    | 'SUPER' :: '(' <-[()]>* ')' {*}                 #= SUPER
+    | 'SELF.' :: [ <identifier> '(' <c_parameters>? ')' || <.panic: "Syntax error in SELF macro"> ]
+      {*} #= SELF
+    | 'SUPER' :: '(' <c_parameters> ')'
+      {*} #= SUPER
 }
 
+# We don't parse parameters. We are PMC, not C99 compiler (yet).
+# FIXME Instead of "<-[()]>" it should be something meaningful.
 rule c_parameters {
-    
+    <-[()]>+ {*}
 }
 
 # It's really bad signature
