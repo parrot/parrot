@@ -327,20 +327,29 @@ method generate_c_file_functions() {
 }
 
 
-#=item C<!generate_class_init>
-#
-#Generating class_init function
-#
-#=cut
+=item C<generate_class_init>
 
+Generate functions related to class_init
+
+=cut
 method generate_class_init() {
+      self.update_vtable_func()
+    ~ self.get_vtable_func()
+    ~ self.class_init_func()
+}
+
+=item C<class_init_func>
+
+Generating class_init function
+
+=cut
+
+method class_init_func() {
     my @res;
     @res.push(
           "PARROT_EXPORT void Parrot_"
         ~ self.name
         ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
-
-    # PUT VTABLE GENERTION HERE
 
     my $past := self.past;
     if ($past<class_init>) {
@@ -350,6 +359,24 @@ method generate_class_init() {
 
     @res.push("\n}\n");
     join('', @res);
+}
+
+=item C<get_vtable_func>
+
+Generate C-code for get_vtable_func
+
+=cut
+method get_vtable_func() {
+    "";
+}
+
+=item C<update_vtable_func>
+
+Generate C-code for update_vtable_func
+
+=cut
+method update_vtable_func() {
+    "";
 }
 
 method dumper($x) {
