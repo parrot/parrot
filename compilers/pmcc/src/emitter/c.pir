@@ -22,8 +22,9 @@ Generate C function body from PAST.
 =cut
 
 .sub 'emit' :method
+    .param pmc pmclass
     .param pmc entry
-    .tailcall self.'!generate_children_body_part'(entry, entry)
+    .tailcall self.'!generate_children_body_part'(pmclass, entry)
 .end
 
 =item C<!generate_body_part>
