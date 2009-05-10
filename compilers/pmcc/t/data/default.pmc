@@ -1,0 +1,130 @@
+/*
+Copyright (C) 2001-2008, Parrot Foundation.
+$Id$
+
+=head1 NAME
+
+src/pmc/default.pmc - Abstract root class
+
+=head1 DESCRIPTION
+
+These are the vtable functions for the default PMC class.
+
+All methods which are not defined here get a default implementation
+generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
+
+#include "parrot/parrot.h"
+
+#define INT2KEY(i, k) key_new_integer((i), (k))
+
+/* undef 'interface' to keep MSVC happy */
+#undef interface
+
+/*
+
+=item C<static STRING *caller(PARROT_INTERP, PMC *pmc)>
+
+Returns a C string for the name of C<*pmc>.
+
+=cut
+
+*/
+
+static STRING *
+caller(PARROT_INTERP, PMC *pmc /*NULLOK*/)
+{
+    STRING * const null_str = CONST_STRING(interp, "(null)");
+
+    return pmc && pmc->vtable && pmc->vtable->whoami
+                ? VTABLE_name(interp, pmc) : null_str;
+}
+
+pmclass default abstract {
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<void init()>
+
+Does nothing.
+
+=cut
+
+*/
+
+    VTABLE void init() {
+    }
+
+/*
+
+=item C<void init_pmc(PMC *initializer)>
+
+With a null C<initializer>, calls C<init()>, else throws an exception.
+
+=cut
+
+*/
+
+    VTABLE void init_pmc(PMC *initializer) {
+        if (PMC_IS_NULL(initializer))
+            SELF.init();
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
+                "init_pmc() not implemented in class '%Ss'",
+                caller(interp, pmc));
+    }
+
+/*
+
+=item C<PMC *instantiate(PMC *init)>
+
+Default fallback. Creates a new PMC of the type of the class SELF and
+calls init().
+
+=cut
+
+*/
+
+    VTABLE PMC *instantiate(PMC *init) {
+        const INTVAL type = VTABLE_type(INTERP, SELF);
+
+        /* Ensure no looping, as pmc_new calls the instantiate vtable entry for
+         * classes. */
+        if (PObj_is_class_TEST(SELF))
+            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "All high-level classes should override instantiate");
+
+        if (!PMC_IS_NULL(init))
+            return pmc_new_init(INTERP, type, init);
+
+        return pmc_new(INTERP, type);
+    }
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
