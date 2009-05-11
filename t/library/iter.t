@@ -32,7 +32,7 @@
 
   T1:
     push_eh err_load_bytecode
-    $S0 = 'Iter.pir'
+    $S0 = 'Iter.pbc'
     load_bytecode $S0
     pop_eh
     $S1 = 'loaded '
