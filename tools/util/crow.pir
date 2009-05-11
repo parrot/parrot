@@ -23,7 +23,7 @@ module, L<runtime/parrot/library/Crow.pir>.
 .sub 'main' :main
     .param pmc    args
 
-    load_bytecode 'Crow.pir' # TODO s/pir/pbc/
+    load_bytecode 'Crow.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
@@ -73,7 +73,7 @@ module, L<runtime/parrot/library/Crow.pir>.
 .sub 'get_json'
     .param string filename
 
-    load_bytecode 'Config/JSON.pir'
+    load_bytecode 'Config/JSON.pbc'
 
      .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
