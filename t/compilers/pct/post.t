@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -13,7 +13,7 @@ foreach my $name (qw(Op Ops Sub Label)) {
     my $code   = <<'CODE'
 .sub _main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     .local pmc node2
 CODE
@@ -50,7 +50,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Op node in visual format' );
 .sub _main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     node = new ['POST';'Op']
     node.'pirop'('add')
@@ -70,7 +70,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'dump POST::Label node in visual format' );
 .sub _main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     node = new ['POST';'Label']
     node.'name'('labeler')
