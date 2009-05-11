@@ -1,12 +1,6 @@
-#! perl
+#! parrot
 # Copyright (C) 2006-2007, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 8;
 
 =head1 NAME
 
@@ -22,8 +16,10 @@ Tests automatically generated read-only PMC support.
 
 =cut
 
-my $library = <<'CODE';
+.namespace []
+
 .include "except_types.pasm"
+
 .sub make_readonly
     .param pmc arg
     .local pmc one
@@ -39,10 +35,23 @@ my $library = <<'CODE';
     zero = 0
     setprop arg, '_ro', zero
 .end
-CODE
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only is not writable" );
 .sub main :main
+    .include 'test_more.pir'
+
+    plan(12)
+
+    integer_set_read_only_is_not_writable() # 1 test
+    integer_set_read_only_can_be_read()     # 6 tests
+    integer_stays_integer()                 # 1 test
+    integer_add()                           # 1 test
+    complex_i_add()                         # 1 test
+    resizablepmcarray_non_recursive_part()  # 1 test
+    objects()                               # 1 test
+#    resizablepmcarray_recursive()           #
+.end
+
+.sub integer_set_read_only_is_not_writable
     .local pmc foo, eh
 
     foo = new ['Integer']
@@ -56,20 +65,17 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only is not wr
     push_eh eh
     foo = 43
     pop_eh
-    print "no exception caught"
+    ok( 0, "integer_set_read_only_is_not_writable" )
     end
 
 eh_label:
+    .local string message
     .get_results($P0)
-    say "RO exception caught"
-    end
+    message = $P0['message']
+    is( message, "set_integer_native() in read-only instance of 'Integer'", "integer_set_read_only_is_not_writable" )
 .end
-CODE
-RO exception caught
-OUTPUT
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only can be read" );
-.sub main :main
+.sub integer_set_read_only_can_be_read
     .local pmc foo
     .local pmc tmp
 
@@ -77,39 +83,24 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer set read-only can be re
     foo = 42
 
     make_readonly(foo)
-    print foo
-    print "\n"
+    is(foo, 42, 'foo initialised to 42 is readable after make_readonly')
     $I0 = foo
+    is($I0, 42, 'foo copied to int correctly')
     $S0 = foo
-    print $I0
-    print "\n"
-    print $S0
-    print "\n"
+    is($S0, 42, 'foo copied to string correctly')
 
     tmp = new ['Integer']
     add tmp, foo, foo
-    print tmp
-    print "\n"
+    is(tmp, 84, 'foo can be added to foo correctly and stored elsewhere')
 
     $P0 = foo
     add foo, foo, foo
-    print foo
-    print "\n"
+    is(foo, 84, 'foo can be added to foo correctly and stored to foo')
 
-    print $P0
-    print "\n"
+    is($P0, 42, 'copied foo retains its value')
 .end
-CODE
-42
-42
-42
-84
-84
-42
-OUTPUT
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer stays Integer" );
-.sub main :main
+.sub integer_stays_integer
     .local pmc foo
 
     foo = new ['Integer']
@@ -117,14 +108,10 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer stays Integer" );
 
     make_readonly(foo)
     typeof $S0, foo
-    say $S0
+    is($S0, 'Integer', 'integer_stays_integer')
 .end
-CODE
-Integer
-OUTPUT
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer add" );
-.sub main :main
+.sub integer_add
     .local pmc foo, eh
 
     foo = new ['Integer']
@@ -139,20 +126,16 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Integer add" );
     foo += 16
     pop_eh
 
-    say "no exception caught"
-    end
+    ok(0, 'integer_add')
 
 eh_label:
+    .local string message
     .get_results($P0)
-    say "RO exception caught"
-    end
+    message = $P0['message']
+    is( message, "i_add_int() in read-only instance of 'Integer'", 'integer_add' )
 .end
-CODE
-RO exception caught
-OUTPUT
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
-.sub main :main
+.sub complex_i_add
     .local pmc foo, eh
 
     foo = new ['Complex']
@@ -167,20 +150,17 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Complex i_add" );
     push_eh eh
     add foo, 4
     pop_eh
-    say "no exception caught"
-    end
+    ok( 0, 'complex_i_add')
 
 eh_label:
+    .local string message
     .get_results($P0)
-    say "RO exception caught"
-    end
-.end
-CODE
-RO exception caught
-OUTPUT
+    message = $P0['message']
+    is( message, "i_add_int() in read-only instance of 'Complex'", 'complex_i_add' )
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursive part)" );
-.sub main :main
+.end
+
+.sub resizablepmcarray_non_recursive_part
     .local pmc foo, three, four, eh
 
     foo = new ['ResizablePMCArray']
@@ -202,20 +182,17 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray (non-recursiv
     push_eh eh
     foo[0] = four
     pop_eh
-    say "no exception caught"
-    end
+
+    ok(0, 'resizablepmcarray_non_recursive_part')
 
 eh_label:
+    .local string message
     .get_results($P0)
-    say "RO exception caught"
-    end
+    message = $P0['message']
+    is( message, "set_pmc_keyed_int() in read-only instance of 'ResizablePMCArray'", 'resizablepmcarray_non_recursive_part' )
 .end
-CODE
-RO exception caught
-OUTPUT
 
-pir_output_is( $library . <<'CODE', <<'OUTPUT', "Objects" );
-.sub main :main
+.sub objects
     .local pmc fooclass, foo, eh, i
 
     i = new ['Integer']
@@ -237,23 +214,20 @@ pir_output_is( $library . <<'CODE', <<'OUTPUT', "Objects" );
     setattribute foo, 'bar', i
     pop_eh
 
-    say "no exception caught"
-    end
+    ok( 0, 'objects')
 
 eh_label:
+    .local string message
     .get_results($P0)
-    say "RO exception caught"
-    end
+    message = $P0['message']
+    is( message, "set_attr_str() in read-only instance of 'Foo'", 'objects' )
 .end
-CODE
-RO exception caught
-OUTPUT
 
-# RT #46821: should this work?
-{
-    local $TODO = 1;
-    pir_output_unlike( $library . <<'CODE', <<'OUTPUT', "ResizablePMCArray -- Recursive" );
-.sub main :main
+=pod
+
+RT #46821: should this work? 
+
+.sub resizablepmcarray_recursive
     .local pmc foo
     .local pmc three
     .local pmc tmp
@@ -276,14 +250,12 @@ OUTPUT
     tmp = foo[0]
     print tmp
 .end
-CODE
-/NOT OKAY/
-OUTPUT
-}
+
+=cut
+
 
 # Local Variables:
-#   mode: cperl
-#   cperl-indent-level: 4
+#   mode: pir
 #   fill-column: 100
 # End:
-# vim: expandtab shiftwidth=4:
+# vim: expandtab shiftwidth=4 ft=pir:
