@@ -91,6 +91,12 @@ sub _analyze_sandbox {
             ($revision) = $line =~ /(\d+)/;
         }
     }
+    if( !$revision && (-d '.git') ) {
+        my $git_log = qx/git log -100 2>$nul/;
+        if(defined($git_log) && $git_log =~ /git-svn-id: \S+\@(\d+)\s/) {
+            $revision = $1;
+        }
+    }
     return $revision;
 }
 
