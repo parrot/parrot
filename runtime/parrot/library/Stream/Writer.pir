@@ -2,7 +2,7 @@
 
 =head1 TITLE
 
-Stream::Writer - a PIR sub as target for a Stream
+Stream;Writer - a PIR sub as target for a Stream
 
 =head1 VERSION
 
@@ -11,7 +11,7 @@ version 0.1
 =head1 SYNOPSIS
 
     # create the stream
-    new stream, "Stream::Writer"
+    new stream, ['Stream'; 'Writer']
 
     # set the source sub
     .const 'Sub' temp = "_reader"
@@ -31,16 +31,16 @@ version 0.1
 =cut
 
 .include "interpinfo.pasm"
-.namespace ["Stream::Writer"]
+.namespace ['Stream'; 'Writer']
 
 .sub __onload :load
-    $P0 = get_class "Stream::Writer"
+    $P0 = get_class ['Stream'; 'Writer']
     unless null $P0 goto END
 
-    load_bytecode "library/Stream/Base.pir"
+    load_bytecode 'Stream/Base.pbc'
 
-    get_class $P0, "Stream::Base"
-    subclass $P1, $P0, "Stream::Writer"
+    get_class $P0, ['Stream'; 'Base']
+    subclass $P1, $P0, ['Stream'; 'Writer']
 
     addattribute $P1, "writer"
     addattribute $P1, "status"
@@ -64,7 +64,7 @@ END:
     source()
 
     # close the source
-    source = get_hll_global ['Stream::Base'], 'close'
+    source = get_hll_global ['Stream'; 'Base'], 'close'
     self."setSource"()
 
     # mark it as closed
@@ -198,7 +198,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

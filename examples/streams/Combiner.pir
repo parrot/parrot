@@ -31,23 +31,23 @@ Creates the 3 Stream objects and dumps the combined stream.
     .local pmc text
     .local pmc combined
 
-    load_bytecode "library/Stream/Base.pbc"
-    load_bytecode "library/Stream/Combiner.pbc"
-    load_bytecode "library/Stream/Sub.pbc"
+    load_bytecode 'Stream/Base.pbc'
+    load_bytecode 'Stream/Combiner.pbc'
+    load_bytecode 'Stream/Sub.pbc'
 
     # create the counter stream
-    counter = new "Stream::Sub"
+    counter = new ['Stream'; 'Sub']
     .const 'Sub' temp = "_counter"
     assign counter, temp
 
     # create the text stream
-    text = new "Stream::Sub"
+    text = new ['Stream'; 'Sub']
     # set its source
     .const 'Sub' temp = "_text"
     assign text, temp
 
     # create a combiner stream
-    combined = new "Stream::Combiner"
+    combined = new ['Stream'; 'Combiner']
     # add the streams
     assign combined, counter
     assign combined, text
@@ -133,7 +133,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

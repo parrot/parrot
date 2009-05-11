@@ -19,10 +19,10 @@ PMC to the stream with the C<assign> op.
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/ParrotIO.pir"
+    load_bytecode 'Stream/ParrotIO.pbc'
 
     # create the ParrotIO stream
-    stream = new "Stream::ParrotIO"
+    stream = new ['Stream'; 'ParrotIO']
 
     # open this file
     stream."open"( "examples/streams/ParrotIO.pir", 'r' )
@@ -44,7 +44,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

@@ -38,26 +38,26 @@ stream for it. Then it combines the stream with a stream providing line numbers.
     name = argv[1]
 NO_NAME:
 
-    load_bytecode "library/Stream/ParrotIO.pir"
-    load_bytecode "library/Stream/Lines.pir"
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Combiner.pir"
+    load_bytecode 'Stream/ParrotIO.pbc'
+    load_bytecode 'Stream/Lines.pbc'
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Combiner.pbc'
 
     # create a file stream
-    file = new "Stream::ParrotIO"
+    file = new ['Stream'; 'ParrotIO']
     file."open"( name, 'r' )
 
     # process it one line per read
-    lines = new "Stream::Lines"
+    lines = new ['Stream'; 'Lines']
     assign lines, file
 
     # endless counter
-    counter = new "Stream::Sub"
+    counter = new ['Stream'; 'Sub']
     .const 'Sub' temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines
-    combiner = new "Stream::Combiner"
+    combiner = new ['Stream'; 'Combiner']
     assign combiner, counter
     assign combiner, lines
 
@@ -101,7 +101,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

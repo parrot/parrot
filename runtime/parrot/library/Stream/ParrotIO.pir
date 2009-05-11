@@ -2,7 +2,7 @@
 
 =head1 TITLE
 
-Stream::ParrotIO - a ParrotIO PMC as source for a Stream
+Stream;ParrotIO - a ParrotIO PMC as source for a Stream
 
 =head1 VERSION
 
@@ -27,19 +27,19 @@ TDB
     .local pmc base
     .local pmc io
 
-    $P0 = get_class 'Stream::ParrotIO'
+    $P0 = get_class ['Stream'; 'ParrotIO']
     unless null $P0 goto END
 
-    load_bytecode "library/Stream/Base.pir"
+    load_bytecode 'Stream/Base.pbc'
 
-    get_class base, "Stream::Base"
-    subclass io, base, "Stream::ParrotIO"
+    get_class base, ['Stream'; 'Base']
+    subclass io, base, ['Stream'; 'ParrotIO']
 
     addattribute io, "blocksize"
 END:
 .end
 
-.namespace ["Stream::ParrotIO"]
+.namespace ['Stream'; 'ParrotIO']
 
 .sub init :vtable :method
     self."blockSize"( 50 )
@@ -119,7 +119,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

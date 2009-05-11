@@ -2,7 +2,7 @@
 
 =head1 TITLE
 
-Stream::Base - Stream library base class
+Stream;Base - Stream library base class
 
 =head1 VERSION
 
@@ -22,13 +22,13 @@ TBD
 
 =cut
 
-.namespace ["Stream::Base"]
+.namespace ['Stream'; 'Base']
 
 .sub onload :load :anon
-    $P0 = get_class 'Stream::Base'
+    $P0 = get_class ['Stream'; 'Base']
     unless null $P0 goto END
 
-    newclass $P0, "Stream::Base"
+    newclass $P0, ['Stream'; 'Base']
     addattribute $P0, 'source'
     addattribute $P0, 'includes'
     addattribute $P0, 'buffer'
@@ -39,7 +39,7 @@ END:
     .local pmc close
 
     # call our own close
-    close = get_hll_global ['Stream::Base'], 'close'
+    close = get_hll_global ['Stream'; 'Base'], 'close'
     close(self)
 .end
 
@@ -134,7 +134,7 @@ Returns the currently set source.
 
     .return(ret)
 ERROR:
-    print "Stream::Base::source(): parameters passed\n"
+    print "Stream;Base.source(): parameters passed\n"
     end
 .end
 
@@ -348,7 +348,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

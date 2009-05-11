@@ -30,14 +30,14 @@ for my $a (@streams) {
     #
     # 1..8
     #
-    pir_output_is( <<"CODE", <<"OUT", "load and create a Stream::$a" );
+    pir_output_is( <<"CODE", <<"OUT", "load and create a Stream;$a" );
 
 .sub _main
     print "loading '$a'...\\n"
-    load_bytecode "library/Stream/$a.pir"
+    load_bytecode 'Stream/$a.pbc'
     print "loaded\\n"
 
-    \$P0 = new "Stream::$a"
+    \$P0 = new ['Stream'; '$a']
 
     \$S0 = typeof \$P0
     print "class name: '"
@@ -48,7 +48,7 @@ for my $a (@streams) {
 CODE
 loading '$a'...
 loaded
-class name: 'Stream::$a'
+class name: 'Stream;$a'
 done
 OUT
 
@@ -57,14 +57,14 @@ OUT
 #
 # 9
 #
-pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
+pir_output_is( <<'CODE', <<'OUT', "Stream;Sub" );
 
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode 'Stream/Sub.pbc'
 
-    stream = new "Stream::Sub"
+    stream = new ['Stream'; 'Sub']
 
     # set the stream's source sub   #'
     .const 'Sub' temp = "_hello"
@@ -108,15 +108,15 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::read_bytes" );
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Replay.pir"
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Replay.pbc'
 
-    $P0 = new "Stream::Sub"
+    $P0 = new ['Stream'; 'Sub']
     # set the stream's source sub      #'
     .const 'Sub' temp = "_hello"
     assign $P0, temp
 
-    stream = new "Stream::Replay"
+    stream = new ['Stream'; 'Replay']
     assign stream, $P0
 
     $S0 = stream."read_bytes"( 3 )
@@ -185,23 +185,23 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Combiner" );
     .local pmc text
     .local pmc combined
 
-    load_bytecode "library/Stream/Base.pir"
-    load_bytecode "library/Stream/Combiner.pir"
-    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode 'Stream/Base.pbc'
+    load_bytecode 'Stream/Combiner.pbc'
+    load_bytecode 'Stream/Sub.pbc'
 
     # create the counter stream
-    counter = new "Stream::Sub"
+    counter = new ['Stream'; 'Sub']
     .const 'Sub' ct = "_counter"
     assign counter, ct
 
     # create the text stream
-    text = new "Stream::Sub"
+    text = new ['Stream'; 'Sub']
     # set its source
     .const 'Sub' src = "_text"
     assign text, src
 
     # create a combiner stream
-    combined = new "Stream::Combiner"
+    combined = new ['Stream'; 'Combiner']
     # add the streams
     assign combined, counter
     assign combined, text
@@ -271,11 +271,11 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Coroutine" );
 .sub _main
     .local pmc stream
 
-    load_bytecode "library/Stream/Base.pir"
-    load_bytecode "library/Stream/Coroutine.pir"
+    load_bytecode 'Stream/Base.pbc'
+    load_bytecode 'Stream/Coroutine.pbc'
 
     # create the coroutine stream
-    stream = new "Stream::Coroutine"
+    stream = new ['Stream'; 'Coroutine']
 
     # set the stream's source coroutine #'
     .const 'Sub' temp = "_coro"
@@ -343,26 +343,26 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
 
     name = "t/library/perlhist.txt"
 
-    load_bytecode "library/Stream/ParrotIO.pir"
-    load_bytecode "library/Stream/Lines.pir"
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Combiner.pir"
+    load_bytecode 'Stream/ParrotIO.pbc'
+    load_bytecode 'Stream/Lines.pbc'
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Combiner.pbc'
 
     # create a file stream
-    file = new "Stream::ParrotIO"
+    file = new ['Stream'; 'ParrotIO']
     file."open"( name, 'r' )
 
     # process it one line per read
-    lines = new "Stream::Lines"
+    lines = new ['Stream'; 'Lines']
     assign lines, file
 
     # endless counter
-    counter = new "Stream::Sub"
+    counter = new ['Stream'; 'Sub']
     .const 'Sub' temp = "_counter"
     assign counter, temp
 
     # combine the counter and the file's lines   #'
-    combiner = new "Stream::Combiner"
+    combiner = new ['Stream'; 'Combiner']
     assign combiner, counter
     assign combiner, lines
 
@@ -704,17 +704,17 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Filter" );
     .local pmc stream
     .local pmc filter
 
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Filter.pir"
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Filter.pbc'
 
     # create the counter stream
-    stream = new "Stream::Sub"
+    stream = new ['Stream'; 'Sub']
     # assign its source
     .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # create the filter stream
-    filter = new "Stream::Filter"
+    filter = new ['Stream'; 'Filter']
     # assign its source
     assign filter, stream
     # set the filter sub
@@ -789,9 +789,9 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::include" );
 .sub _main
     .local pmc stream
 
-    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode 'Stream/Sub.pbc'
 
-    stream = new "Stream::Sub"
+    stream = new ['Stream'; 'Sub']
 
     .const 'Sub' temp = "_counter"
     assign stream, temp
@@ -821,7 +821,7 @@ LOOP:
     if i != 4 goto SKIP
     .local pmc temp
 
-    temp = new "Stream::Sub"
+    temp = new ['Stream'; 'Sub']
 
     .const 'Sub' func = "_included"
     assign temp, func
@@ -840,7 +840,7 @@ SKIP:
     self."write"( "hello" )
 
     # create another stream
-    temp = new "Stream::Sub"
+    temp = new ['Stream'; 'Sub']
     .const 'Sub' func = "_counter2"
     assign temp, func
 
@@ -895,17 +895,17 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Lines" );
     .local pmc stream
     .local pmc lines
 
-    load_bytecode "library/Stream/Sub.pir"
-    load_bytecode "library/Stream/Lines.pir"
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Lines.pbc'
 
     # create a text stream
-    stream = new "Stream::Sub"
+    stream = new ['Stream'; 'Sub']
     # set the source
     .const 'Sub' temp = "_text"
     assign stream, temp
 
     # create a lines stream
-    lines = new "Stream::Lines"
+    lines = new ['Stream'; 'Lines']
     # set the source
     assign lines, stream
 
@@ -942,10 +942,10 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::ParrotIO" );
     .local pmc stream
     .local pmc temp
 
-    load_bytecode "library/Stream/ParrotIO.pir"
+    load_bytecode 'Stream/ParrotIO.pbc'
 
     # create the ParrotIO stream
-    stream = new "Stream::ParrotIO"
+    stream = new ['Stream'; 'ParrotIO']
 
     # open this file
     stream."open"( "t/library/perlhist.txt", 'r' )
@@ -1256,10 +1256,10 @@ SKIP:
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Writer.pir"
-    load_bytecode "library/Stream/Replay.pir"
+    load_bytecode 'Stream/Writer.pbc'
+    load_bytecode 'Stream/Replay.pbc'
 
-    stream = new "Stream::Writer"
+    stream = new ['Stream'; 'Writer']
     P0 = global "_reader"
     assign stream, P0
 
@@ -1285,7 +1285,7 @@ SKIP:
     .local pmc stream3
     .local string str
 
-    stream1 = new "Stream::Replay"
+    stream1 = new ['Stream'; 'Replay']
     assign stream1, self
 
     print "reader start\n"
@@ -1357,10 +1357,10 @@ pir_output_is( <<'CODE', <<'OUT', "Stream::Sub" );
 .sub _main
     .local pmc stream
 
-    load_bytecode "library/Stream/Base.pir"
-    load_bytecode "library/Stream/Sub.pir"
+    load_bytecode 'Stream/Base.pbc'
+    load_bytecode 'Stream/Sub.pbc'
 
-    stream = new "Stream::Sub"
+    stream = new ['Stream'; 'Sub']
 
     .const 'Sub' temp = "_counter"
     assign stream, temp
@@ -1418,9 +1418,9 @@ SKIP:
 .sub _main :main
     .local pmc stream
 
-    load_bytecode "library/Stream/Writer.pir"
+    load_bytecode 'Stream/Writer.pbc'
 
-    stream = new "Stream::Writer"
+    stream = new ['Stream'; 'Writer']
 
     # set the stream's source sub
     .const 'Sub' temp = "_reader"

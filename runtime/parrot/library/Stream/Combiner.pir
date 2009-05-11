@@ -2,7 +2,7 @@
 
 =head1 TITLE
 
-Stream::Combiner - combines different streams to a single stream.
+Stream;Combiner - combines different streams to a single stream.
 
 =head1 VERSION
 
@@ -29,13 +29,13 @@ TBD
     .local pmc base
     .local pmc comb
 
-    $P0 = get_class 'Stream::Combiner'
+    $P0 = get_class ['Stream'; 'Combiner']
     unless null $P0 goto END
 
-    load_bytecode "library/Stream/Base.pir"
+    load_bytecode 'Stream/Base.pbc'
 
-    get_class base, "Stream::Base"
-    subclass comb, base, "Stream::Combiner"
+    get_class base, ['Stream'; 'Base']
+    subclass comb, base, ['Stream'; 'Combiner']
 
     addattribute comb, "combiner"
 END:
@@ -52,7 +52,7 @@ END:
 
 .include "iterator.pasm"
 
-.namespace ["Stream::Combiner"]
+.namespace ['Stream'; 'Combiner']
 
 .sub init :vtable :method
 
@@ -204,7 +204,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 
