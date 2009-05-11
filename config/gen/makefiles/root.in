@@ -262,6 +262,7 @@ GEN_LIBRARY := \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
+    $(LIBRARY_DIR)/pcore.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
     $(LIBRARY_DIR)/Parrot/Coroutine.pbc \
     $(LIBRARY_DIR)/Parrot/Exception.pbc \
