@@ -7,7 +7,7 @@ Test::Builder - Parrot extension for building test modules
 =head1 SYNOPSIS
 
     # load this library
-    load_bytecode 'library/Test/Builder.pbc'
+    load_bytecode 'Test/Builder.pbc'
 
     # create a new Test::Builder object
     .local pmc test
@@ -48,9 +48,9 @@ This class defines the following methods:
 .namespace [ 'Test'; 'Builder' ]
 
 .sub '_initialize' :load
-    load_bytecode 'library/Test/Builder/Test.pbc'
-    load_bytecode 'library/Test/Builder/Output.pbc'
-    load_bytecode 'library/Test/Builder/TestPlan.pbc'
+    load_bytecode 'Test/Builder/Test.pbc'
+    load_bytecode 'Test/Builder/Output.pbc'
+    load_bytecode 'Test/Builder/TestPlan.pbc'
 
     .local pmc tb_class
 

@@ -8,7 +8,7 @@ TCPStream
 =head1 SYNOPSIS
 
   .sub main :main
-      load_bytecode 'library/tcpstream.pir'
+      load_bytecode 'tcpstream.pir'
 
       .local pmc stream
       stream = new 'TCPStream'

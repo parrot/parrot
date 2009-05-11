@@ -29,8 +29,8 @@ keyboard handling has been removed.
     .param pmc argv
 
     # Load OpenGL libary and a helper library for calling glutInit
-    load_bytecode 'library/OpenGL.pbc'
-    load_bytecode 'library/NCI/call_toolkit_init.pbc'
+    load_bytecode 'OpenGL.pbc'
+    load_bytecode 'NCI/call_toolkit_init.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
     .local pmc import_gl

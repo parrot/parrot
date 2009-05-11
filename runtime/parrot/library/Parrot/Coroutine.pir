@@ -9,7 +9,7 @@ Parrot::Coroutine - A pure PIR implementation of coroutines
 =head1 SYNOPSIS
 
     .sub onload :load
-        load_bytecode 'Parrot/Coroutine.pir'
+        load_bytecode 'Parrot/Coroutine.pbc'
     .end
 
     ## Recursive coroutine to enumerate tree elements.  Each element that is

@@ -25,7 +25,7 @@ This module provides the default output style of C<Data::Dumper>.
     goto END
 
   create_ddb:
-    load_bytecode "library/Data/Dumper/Base.pir"
+    load_bytecode 'Data/Dumper/Base.pbc'
     get_class $P0, "Data::Dumper::Base"
     subclass $P0, $P0, "Data::Dumper::Default"
 END:
