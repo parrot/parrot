@@ -1,7 +1,7 @@
 #! parrot
 
 .sub 'init_test_builder_tester'
-    load_bytecode 'runtime/parrot/library/Test/Builder/Tester.pir'
+    load_bytecode 'Test/Builder/Tester.pbc'
 
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
@@ -23,7 +23,7 @@
 .end
 
 .sub 'init_test_class'
-    load_bytecode 'runtime/parrot/library/Test/Class.pir'
+    load_bytecode 'Test/Class.pbc'
 .end
 
 .sub 'main' :main
