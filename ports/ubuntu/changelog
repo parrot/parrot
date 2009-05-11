@@ -1,27 +1,31 @@
-parrot (1.0.0-1ubuntu1~ppa8~intrepid1) intrepid; urgency=low
-  * New upstream release
+parrot (1.0.0-1ubuntu1~ppa9~karmic1) karmic; urgency=low
+  * Resynchronize with Debian unstable.
   * Bumped Standards-Version to 3.8.0
 
- -- Allison Randal <allison@parrot.org>  Thu, 19 Mar 2009 01:56:39 -0700
+ -- Allison Randal <allison@parrot.org>  Sun, 10 May 2009 20:39:20 -0700
 
 parrot (1.0.0-1) unstable; urgency=low
   * New upstream release
   * debian/control.in:
     - Updated Description of all packages.
     - Bumped Standards-Version to 3.8.1
-  * debian/rules:
     - Add new packages parrot-minimal and parrot-devel
+  * debian/rules:
     - Integrate Ubuntu packaging changes to automatically generate
       debian/control.
     - Re-order dh_installdeb in binary-arch to run after dh_makeshlibs and
       shlibdeps so that the library gets installed properly (patch from David
       Nusinow)
-  * parrot.install.in, parrot-doc.install.in, libparrot-dev.install.in
-    - Added template files, replace parrot.install, parrot-doc.install, and
-      libparrot-dev.install
+    - Move manpage generation to new packages. Rename parrot-debugger.1 to
+      parrot_debugger.1 to match executable name. Generate parrot_config
+      manpage from .pir source files (patch from David Nusinow)
+  * parrot.install.in, parrot-doc.install.in, libparrot.install.in,
+    libparrot-dev.install.in
+    - Added template files, replace parrot.install, parrot-doc.install, 
+      libparrot.install, and libparrot-dev.install
   * parrot-minimal.install.in, parrot-devel.install.in
     - Added template files for new packages
-  * parrot-doc.docs
+  * parrot-doc.docs, libparrot-dev.dirs
     - Removed
   * libparrot.postinst
     - Added so ldconfig gets called properly by dh_makeshlibs (patch from
@@ -31,7 +35,7 @@ parrot (1.0.0-1) unstable; urgency=low
       distribution.
     - Removed copyright info for files no longer in distribution.
 
- -- Allison Randal <allison@parrot.org>  Wed, 18 Mar 2009 23:50:41 -0700
+ -- Allison Randal <allison@parrot.org>  Wed, 25 Mar 2009 00:45:40 -0500
 
 parrot (0.9.0-1ubuntu1) intrepid; urgency=low
 
