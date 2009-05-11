@@ -27,10 +27,10 @@ ver. 8, in the B<'Return values from matches'> section
 my $PRE = <<PRE;
 .sub 'main' :main
     load_bytecode "PGE.pbc"
-    load_bytecode "dumper.pir"
-    load_bytecode "PGE/Dumper.pir"
-    load_bytecode "PGE/Glob.pir"
-    load_bytecode "PGE/Text.pir"
+    load_bytecode "dumper.pbc"
+    load_bytecode "PGE/Dumper.pbc"
+    load_bytecode "PGE/Glob.pbc"
+    load_bytecode "PGE/Text.pbc"
     .local string target, pattern
     .local pmc perl6regex, rulesub, pir, exp, match
     perl6regex = compreg 'PGE::Perl6Regex'

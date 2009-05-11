@@ -30,7 +30,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::Bar::baz'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE';'Util'], 'split'
@@ -53,7 +53,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo::'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE';'Util'], 'split'
@@ -74,7 +74,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, '::Foo'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE';'Util'], 'split'
@@ -96,7 +96,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:+/, 'Foo'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE';'Util'], 'split'
@@ -117,7 +117,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE';'Util'], 'split'
@@ -140,7 +140,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /\\:/, 'Foo::Bar::Baz', 2" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE';'Util'], 'split'
@@ -162,7 +162,7 @@ pir_output_is( <<'CODE', <<'OUT', "split /(a)(b)/, 'abracadabra'" );
 
 .sub main :main
   load_bytecode 'PGE.pbc'
-  load_bytecode 'PGE/Util.pir'
+  load_bytecode 'PGE/Util.pbc'
 
   .local pmc split, p6rule, regex
   split  = get_global ['PGE';'Util'], 'split'

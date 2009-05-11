@@ -16,7 +16,7 @@ Test some simple grammars.
 =cut
 
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Perl6Grammar.pbc'
     .include "iglobals.pasm"
@@ -120,7 +120,7 @@ EOF_SIMPLE_GRAMMAR
     .param pmc    targets
     .param string description
 
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
     .local pmc    test
                   test = new [ 'Test'; 'Builder' ]
 
