@@ -3,7 +3,7 @@
 # $Id$
 
 .sub _main :main
-   load_bytecode 'Test/Builder/Tester.pir'
+   load_bytecode 'Test/Builder/Tester.pbc'
 
    .local pmc tb_args
    tb_args = new 'Hash'

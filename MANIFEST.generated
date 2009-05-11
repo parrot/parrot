@@ -175,6 +175,7 @@ runtime/parrot/library/Stream/ParrotIO.pbc        [main]
 runtime/parrot/library/Stream/Replay.pbc          [main]
 runtime/parrot/library/Stream/Sub.pbc             [main]
 runtime/parrot/library/Stream/Writer.pbc          [main]
+runtime/parrot/library/TclLibrary.pbc             [main]
 runtime/parrot/library/TGE.pbc                    [tge]
 src/call_list.txt                                 [devel]src
 src/glut_callbacks.c                              []

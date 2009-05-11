@@ -28,7 +28,7 @@ t/library/tcl_lib.t - test parrot to external Tcl connection
 
     plan(TESTS)
 
-    load_bytecode 'TclLibrary.pir' # TBD pbc
+    load_bytecode 'TclLibrary.pbc' # TBD pbc
     'ok'(1, 'loaded TclLibrary')
 
     goto skip_all    # this is TEMPORARY untill the case of missing libtcl is fixed
