@@ -690,7 +690,7 @@ sub json_dump_is {
 
 .sub test :main
     load_bytecode 'compilers/json/JSON.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
 
     .local pmc JSON, result
     JSON = compreg "JSON"
