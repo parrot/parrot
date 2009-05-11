@@ -18,7 +18,7 @@ Tests the Range class.
 
 .sub main :main
     .include 'test_more.pir'
-    load_bytecode 'Range.pir'
+    load_bytecode 'Range.pbc'
 
     plan(78)
 
