@@ -21,7 +21,7 @@ Tests the Class PMC.
 
 
 .sub 'main' :main
-     load_bytecode 'Test/More.pir'
+     load_bytecode 'Test/More.pbc'
      .local pmc exporter, test_ns
      test_ns = get_namespace [ 'Test'; 'More' ]
      exporter = new ['Exporter']
