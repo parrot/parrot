@@ -30,7 +30,7 @@ PIR implementation of Perl 5's Data::Dumper module to dump YAML format.
 .sub __library_yaml_dumper_print_usage
     say "# usage:"
     say ".sub main"
-    say "    load_bytecode 'YAML/Dumper.pir'"
+    say "    load_bytecode 'YAML/Dumper.pbc'"
     say ''
     say "    .local pmc foo, yaml_dumper"
     say "    foo         = new 'ResizablePMCArray'"
@@ -153,13 +153,13 @@ Returns the global dumper instance used by the non object interface.
     goto TYPE_OK
 
   load_yd_pir:
-    load_bytecode "YAML/Dumper.pir"
+    load_bytecode "YAML/Dumper.pbc"
     get_class yd_class, "YAML::Dumper"
     if null yd_class goto no_class
     goto TYPE_OK
 
   no_class:
-    print "fatal error: failure while loading YAML/Dumper.pir\n"
+    print "fatal error: failure while loading YAML/Dumper.pbc\n"
     end
 TYPE_OK:
 
