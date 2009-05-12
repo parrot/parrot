@@ -272,6 +272,9 @@ U: cgrawls
 D: imcc optimizer and register allocator patches and tests
 E: cgrawls@gmail.com
 
+U: cxreg
+D: copyright test cleanup
+
 N: Damian Miles Knopp
 U: dmknopp
 E: dmknopp@loyola.edu

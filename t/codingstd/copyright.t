@@ -51,7 +51,7 @@ my (
 my $copyright_simple =
     qr/Copyright \(C\) \d{4}/i;
 my $copyright_parrot =
-    qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.$/m;
+    qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.$/;
 
 foreach my $file (@files) {
 
@@ -69,7 +69,7 @@ foreach my $file (@files) {
 
     # is the copyright text correct?
     # If so, remove it...
-    if ( ! ($buf =~ s/$copyright_parrot//) ) {
+    if ( ! ($buf =~ s/$copyright_parrot//m) ) {
         push @bad_format_copyright_files, $path;
     }
     # ... and then see if any other copyright notices exist.
