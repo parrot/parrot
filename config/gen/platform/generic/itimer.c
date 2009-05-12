@@ -1,6 +1,6 @@
 /*
  * $Id$
- * Copyright (C) 2004-2006, Parrot Foundation.
+ * Copyright (C) 2004-2009, Parrot Foundation.
  */
 
 /*
@@ -98,7 +98,7 @@ The returned handle is passed to the other timer functions.
 void *
 new_sys_timer_ms(void)
 {
-    return 0;
+    return NULL;
 }
 
 #else
