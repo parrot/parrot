@@ -841,20 +841,22 @@ $(SRC_DIR)/parrot_config$(O) : $(SRC_DIR)/parrot_config.c
 
 $(SRC_DIR)/install_config$(O) : $(SRC_DIR)/install_config.c
 
-$(SRC_DIR)/null_config$(O) : $(SRC_DIR)/null_config.c
+$(SRC_DIR)/null_config$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/null_config.c
 
-$(SRC_DIR)/oo$(O) : $(SRC_DIR)/pmc/class.c $(INC_DIR)/pbcversion.h
+$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/class.c $(INC_DIR)/pbcversion.h
 
-$(SRC_DIR)/scheduler$(O) : $(SRC_DIR)/scheduler.str   \
+$(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h \
+                           $(SRC_DIR)/scheduler.str   \
                            $(SRC_DIR)/pmc/scheduler.c \
                            $(SRC_DIR)/pmc/task.c      \
                            $(SRC_DIR)/pmc/timer.c     \
                            $(INC_DIR)/pbcversion.h
 
-$(IO_DIR)/socket_api$(O) : $(SRC_DIR)/pmc/socket.c
-$(IO_DIR)/socket_unix$(O) : $(INC_DIR)/pbcversion.h   \
+$(IO_DIR)/core$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
+$(IO_DIR)/socket_api$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
+$(IO_DIR)/socket_unix$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
                             $(SRC_DIR)/pmc/socket.c
-$(IO_DIR)/socket_win32$(O) : $(INC_DIR)/pbcversion.h   \
+$(IO_DIR)/socket_win32$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
                             $(SRC_DIR)/pmc/socket.c
 
 lib_deps_object : $(O_FILES)
@@ -941,7 +943,7 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 #
 # Parrot Dump
 #
-$(SRC_DIR)/packdump$(O) : $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h
+$(SRC_DIR)/packdump$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h
 
 $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -949,7 +951,7 @@ $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
     $(SRC_DIR)/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(SRC_DIR)/pbc_dump$(O) : $(GEN_HEADERS)
+$(SRC_DIR)/pbc_dump$(O) : $(INC_DIR)/parrot.h $(GEN_HEADERS)
 
 $(INSTALLABLEPDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -966,7 +968,7 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(SRC_DIR)/pbc_info$(O) : $(GEN_HEADERS)
+$(SRC_DIR)/pbc_info$(O) : $(INC_DIR)/parrot.h $(GEN_HEADERS)
 
 $(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1040,6 +1042,12 @@ examples/pasm/hello$(EXE): examples/pasm/hello$(O)
 #
 ###############################################################################
 
+$(SRC_DIR)/byteorder$(O) : $(INC_DIR)/parrot.h
+
+$(SRC_DIR)/datatypes$(O) : $(INC_DIR)/parrot.h
+
+$(SRC_DIR)/extend_vtable$(O) : $(INC_DIR)/parrot.h
+
 $(SRC_DIR)/global_setup$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global_setup.str
 
 $(SRC_DIR)/global$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global.str \
@@ -1055,7 +1063,7 @@ $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h $(SRC_DIR)/pmc/pmc_sub.h
+$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_managedstruct.h
 
 $(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/debug.str
 
@@ -1228,7 +1236,7 @@ $(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c $(GENERAL_H_FILES)
 $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/pmc/pmc_sub.h
 
-$(IO_DIR)/filehandle$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
+$(IO_DIR)/filehandle$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
 	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_parrotlibrary.h
@@ -1359,10 +1367,10 @@ htmlhelp-clean :
 dynpmc : dynpmc.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynpmc.dummy : $(PARROT)
+dynpmc.dummy : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
 	$(MAKE) src/dynpmc
 
-dynpmc-test :
+dynpmc-test : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
 	$(MAKE) src/dynpmc test
 
 dynpmc-clean :
@@ -1377,10 +1385,10 @@ dynpmc-clean :
 dynoplibs : dynoplibs.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynoplibs.dummy : $(PARROT)
+dynoplibs.dummy : $(PARROT) $(INC_DIR)/dynext.h
 	$(MAKE) src/dynoplibs
 
-dynoplibs-test :
+dynoplibs-test : $(PARROT) $(INC_DIR)/dynext.h
 	$(MAKE) src/dynoplibs test
 
 dynoplibs-clean :
