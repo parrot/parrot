@@ -78,6 +78,15 @@ F<src/ops/experimental.ops> - only the C<trap> opcode remains
 
 L<https://trac.parrot.org/parrot/ticket/450>
 
+=item get_addr and set_addr [eligible in 1.4]
+
+L<https://trac.parrot.org/parrot/ticket/218>
+
+These opcodes are being repurposed. They will always return a unique memory
+address of the PMC. Uses of get_addr and set_addr that would set label values
+for Sub, Exception, and related PMC types will instead be handled by
+get_label and set_label.
+
 =back
 
 =head1 Bytecode
