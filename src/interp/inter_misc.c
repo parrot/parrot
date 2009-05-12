@@ -205,12 +205,12 @@ interpreter.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 interpinfo(PARROT_INTERP, INTVAL what)
 {
     ASSERT_ARGS(interpinfo)
-    INTVAL ret = 0;
-    int j;
+    INTVAL ret;
 
     switch (what) {
         case TOTAL_MEM_ALLOC:
