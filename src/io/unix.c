@@ -641,6 +641,8 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 #  ifdef PARROT_HAS_HEADER_UNISTD
     int pid, err, fds[2];
 
+    Parrot_io_eprintf(interp, "open pipe: '%Ss' - %i\n", command, flags);
+
     err = pipe(fds);
     if (err < 0) {
         return NULL;
@@ -695,6 +697,13 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
                 exit(EXIT_SUCCESS);
         }
 
+        /*******************************************************
+         *     THIS IS A QUICK TEST IMPLEMENTATION
+         * Thus the ifdef'ed out code is not deleted yet
+         * TT #661
+         *******************************************************
+         */
+        #if 0
         /* XXX ugly hack to be able to pass some arguments
          *     split cmd at blanks */
         orig_cmd = cmd = Parrot_str_to_cstring(interp, command);
@@ -710,6 +719,16 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         Parrot_str_free_cstring(c); /* done with C string */
         execv(cmd, argv);       /* XXX use execvp ? */
+        #else
+
+        orig_cmd = cmd = Parrot_str_to_cstring(interp, command);
+        argv [0] = "/bin/sh";
+        argv [1] = "-c";
+        argv [2] = cmd;
+        argv [3] = NULL;
+        execv(argv [0], argv);
+
+        #endif
 
         /* Will never reach this unless exec fails. */
         Parrot_str_free_cstring(orig_cmd);
