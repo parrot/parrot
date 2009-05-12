@@ -58,10 +58,8 @@ foreach my $path (@files) {
 
         my $escaped_decl = $headerizer->generate_documentation_signature($function_decl);
 
-        my $decl_rx = qr/^\Q$escaped_decl\E$(.*?)^=cut/sm;
-
         my $missing = '';
-        if ( $buf =~ m/$decl_rx/) {
+        if ( $buf =~ m/^\Q$escaped_decl\E$(.*?)^=cut/sm ) {
             my $docs = $1;
             $docs =~ s/\s//g;
             if ($docs eq '') {
