@@ -672,8 +672,19 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     /* Child - exec process */
     if (pid == 0) {
+        /* See above comments */
+        #if 0
         char *argv[10], *p, *c, *cmd, *orig_cmd;
         int   n;
+        #else
+        char * argv[10], *orig_cmd;
+
+        /* C strings for the execv call defined that way to avoid
+         * const problems without copying them.
+         */
+        static char auxarg0 [] = "/bin/sh";
+        static char auxarg1 [] = "-c";
+        #endif
 
         if (flags & PIO_F_WRITE) {
             /* the other end is writing - we read from the pipe */
@@ -697,7 +708,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         /*******************************************************
          *     THIS IS A QUICK TEST IMPLEMENTATION
-         * Thus the ifdef'ed out code is not deleted yet
+         * Thus the if'ed out code is not deleted yet
          * TT #661
          *******************************************************
          */
@@ -719,10 +730,10 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         execv(cmd, argv);       /* XXX use execvp ? */
         #else
 
-        orig_cmd = cmd = Parrot_str_to_cstring(interp, command);
-        argv [0] = "/bin/sh";
-        argv [1] = "-c";
-        argv [2] = cmd;
+        orig_cmd = Parrot_str_to_cstring(interp, command);
+        argv [0] = auxarg0;
+        argv [1] = auxarg1;
+        argv [2] = orig_cmd;
         argv [3] = NULL;
         execv(argv [0], argv);
 
