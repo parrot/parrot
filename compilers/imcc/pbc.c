@@ -313,25 +313,29 @@ static void
 imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
 {
     ASSERT_ARGS(imcc_globals_destroy)
-    code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
 
-    while (cs) {
-        subs_t         *s              = cs->subs;
-        code_segment_t * const prev_cs = cs->prev;
+    /* This is an allowed condition? See TT #629 */
+    if (IMCC_INFO(interp)->globals) {
+        code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
 
-        while (s) {
-            subs_t * const prev_s = s->prev;
-            clear_sym_hash(&s->fixup);
-            mem_sys_free(s);
-            s      = prev_s;
+        while (cs) {
+            subs_t         *s              = cs->subs;
+            code_segment_t * const prev_cs = cs->prev;
+
+            while (s) {
+                subs_t * const prev_s = s->prev;
+                clear_sym_hash(&s->fixup);
+                mem_sys_free(s);
+                s = prev_s;
+            }
+
+            clear_sym_hash(&cs->key_consts);
+            mem_sys_free(cs);
+            cs = prev_cs;
         }
-
-        clear_sym_hash(&cs->key_consts);
-        mem_sys_free(cs);
-        cs      = prev_cs;
+        IMCC_INFO(interp)->globals->cs = NULL;
     }
 
-    IMCC_INFO(interp)->globals->cs = NULL;
 }
 
 
