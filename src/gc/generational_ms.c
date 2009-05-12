@@ -877,6 +877,8 @@ gc_gms_init_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 =item C<static Gc_gms_gen * gc_gms_find_gen(PARROT_INTERP, const Gc_gms_hdr *h,
 UINTVAL gen_no)>
 
+Finds the generation associated with the given header and generation number.
+
 =cut
 
 */
@@ -913,6 +915,8 @@ gc_gms_find_gen(PARROT_INTERP, ARGIN(const Gc_gms_hdr *h), UINTVAL gen_no)
 
 =item C<static void gc_gms_promote(PARROT_INTERP, Gc_gms_hdr *h, UINTVAL
 gen_no)>
+
+Promote the header to the specified generation.
 
 =cut
 
@@ -961,6 +965,8 @@ gc_gms_promote(PARROT_INTERP, ARGIN(Gc_gms_hdr *h), UINTVAL gen_no)
 =item C<static void gc_gms_store_hdr_list(PARROT_INTERP, Gc_gms_hdr_list *l,
 Gc_gms_hdr *h)>
 
+Store the header into the header list.
+
 =cut
 
 */
@@ -993,6 +999,8 @@ gc_gms_store_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l), ARGIN(Gc_gms_hd
 
 =item C<static void gc_gms_clear_hdr_list(PARROT_INTERP, Gc_gms_hdr_list *l)>
 
+Clear the header list and free it's memory to the OS.
+
 =cut
 
 */
@@ -1014,6 +1022,8 @@ gc_gms_clear_hdr_list(PARROT_INTERP, ARGMOD(Gc_gms_hdr_list *l))
 
 =item C<static void gc_gms_store_igp(PARROT_INTERP, Gc_gms_hdr *h)>
 
+Add the header to the inter-generational pointer list of it's generation.
+
 =cut
 
 */
@@ -1031,6 +1041,8 @@ gc_gms_store_igp(PARROT_INTERP, ARGIN(Gc_gms_hdr *h))
 /*
 
 =item C<static void gc_gms_clear_igp(PARROT_INTERP, Gc_gms_gen *gen)>
+
+Clear the inter-generational pointer list of the given generation.
 
 =cut
 
@@ -1122,6 +1134,8 @@ typedef struct Gc_gms_plan {
 =item C<static void gc_gms_merge_gen(PARROT_INTERP, Small_Object_Pool *pool, int
 flag, Gc_gms_plan *plan)>
 
+Merge black pointers to the previous generation, and update the free list.
+
 =cut
 
 */
@@ -1155,6 +1169,8 @@ gc_gms_merge_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 
 =item C<static void gc_gms_use_gen(PARROT_INTERP, Small_Object_Pool *pool, int
 flag, const Gc_gms_plan *plan)>
+
+Specify what generation to use by default.
 
 =cut
 
@@ -1191,6 +1207,8 @@ gc_gms_use_gen(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 =item C<static int set_gen_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
 void *arg)>
 
+Set the generation to use, merging if necessary.
+
 =cut
 
 */
@@ -1212,6 +1230,9 @@ set_gen_cb(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, ARGIN(void *
 /*
 
 =item C<static void gc_gms_set_gen(PARROT_INTERP)>
+
+Setup the generations, deciding what to do based on the plan and moving
+headers around as necessary.
 
 =cut
 
@@ -1484,6 +1505,8 @@ parrot_gc_gms_Parrot_gc_mark_PObj_alive(PARROT_INTERP, ARGMOD(PObj *obj))
 =item C<static int init_mark_cb(PARROT_INTERP, Small_Object_Pool *pool, int
 flag, void *arg)>
 
+Initialization callback, initialize all the pointers.
+
 =cut
 
 */
@@ -1527,6 +1550,9 @@ gc_gms_init_mark(PARROT_INTERP)
 
 =item C<static int trace_igp_cb(PARROT_INTERP, Small_Object_Pool *pool, int
 flag, void *arg)>
+
+Trace through the IGP of the pool to find alive items that are pointing
+to items in other generations.
 
 =cut
 
@@ -1576,6 +1602,8 @@ gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 
 =item C<static int trace_children_cb(PARROT_INTERP, Small_Object_Pool *pool, int
 flag, void *arg)>
+
+Trace through child objects
 
 =cut
 
@@ -1683,6 +1711,8 @@ sweep_cb_pmc(PARROT_INTERP, ARGIN(Small_Object_Pool *pool), int flag, SHIM(void 
 =item C<static int sweep_cb_buf(PARROT_INTERP, Small_Object_Pool *pool, int
 flag, void *arg)>
 
+Sweep the buffer pool, freeing things that are dead.
+
 =cut
 
 */
@@ -1768,6 +1798,8 @@ gc_gms_sweep(PARROT_INTERP)
 =item C<static int end_cycle_cb(PARROT_INTERP, Small_Object_Pool *pool, int
 flag, void *arg)>
 
+Reset the pointers in the pool at the end of the cycle.
+
 =cut
 
 */
@@ -1792,6 +1824,8 @@ end_cycle_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, SHIM(void
 /*
 
 =item C<static void gc_gms_end_cycle(PARROT_INTERP)>
+
+End the cycle, resetting pointers in all pools.
 
 =cut
 
@@ -1870,6 +1904,8 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
 
 =item C<static void gms_debug_verify(PARROT_INTERP, Small_Object_Pool *pool,
 const char *action)>
+
+Debug function, check that everything is right.
 
 =cut
 
