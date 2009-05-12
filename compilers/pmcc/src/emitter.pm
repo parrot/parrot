@@ -62,18 +62,20 @@ method set_filename($name) {
 sub get_pmc_emitter($name, $past) {
 PIR q<
     find_lex $P0, '$name'
+    find_lex $P1, '$past'
     $S0 = $P0
 
     .local pmc ctor
     ctor = get_hll_global ['PMC';'Emitter';'PMC'], $S0
-    $I0 = defined ctor
-    if $I0 goto done
+    push_eh not_found
+    %r = ctor.'new'($P1)
+    goto done
 
   not_found:
+    pop_eh
     ctor = get_hll_global ['PMC';'Emitter'], 'PMC'
-  done:
-    find_lex $P1, '$past'
     %r = ctor.'new'($P1)
+  done:
 >;
 }
 
