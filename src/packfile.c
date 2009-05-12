@@ -2769,13 +2769,11 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     Parrot_io_printf(interp, "\n  mappings => [\n");
     for (i = 0; i < debug->num_mappings; i++) {
-        char * const filename = Parrot_str_to_cstring(interp,
-            PF_CONST(debug->code, debug->mappings[i]->filename)->u.string);;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
                    debug->mappings[i]->offset);
-        Parrot_io_printf(interp, "        FILENAME => %s\n", filename);
-        Parrot_str_free_cstring(filename);
+        Parrot_io_printf(interp, "        FILENAME => %Ss\n",
+                PF_CONST(debug->code, debug->mappings[i]->filename)->u.string);
         Parrot_io_printf(interp, "    ],\n");
     }
 
