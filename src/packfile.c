@@ -4341,17 +4341,15 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");
     for (i = 0; i < self->num_keys; i++) {
-        char * const key_name = Parrot_str_to_cstring(interp,
-                PF_CONST(self->code, self->keys[i]->name)->u.string);
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
-        Parrot_io_printf(interp, "        NAME => %s\n", key_name);
+        Parrot_io_printf(interp, "        NAME => %Ss\n",
+                PF_CONST(self->code, self->keys[i]->name)->u.string);
         Parrot_io_printf(interp, "        TYPE => %s\n",
                 self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_INT ? "integer" :
                 self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_STR ? "string" :
                 self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_NUM ? "number" :
                 "PMC");
         Parrot_io_printf(interp, "    ],\n");
-        Parrot_str_free_cstring(key_name);
     }
 
     Parrot_io_printf(interp, "  ],\n");
