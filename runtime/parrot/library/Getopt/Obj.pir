@@ -352,7 +352,7 @@ finish:
     .return(return)
 .end
 
-=item C<__push_string(STRING format)>
+=item C<push_string(STRING format)>
 
 A vtable method, invoked by e.g. C<push getopts, "foo|f=s">.  The format is as such.
 
