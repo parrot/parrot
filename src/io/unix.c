@@ -641,8 +641,6 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 #  ifdef PARROT_HAS_HEADER_UNISTD
     int pid, err, fds[2];
 
-    Parrot_io_eprintf(interp, "open pipe: '%Ss' - %i\n", command, flags);
-
     err = pipe(fds);
     if (err < 0) {
         return NULL;
