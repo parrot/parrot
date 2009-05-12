@@ -8,8 +8,8 @@ X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR (Parrot intermediate representation)>
 
 Parrot Intermediate Representation (PIR) is Parrot's native low-level
-language.N<Parrot has a pure native assembly language called PASM, described in
-Chapter 9.> PIR is fundamentally an assembly language, but it has some
+languageN<Parrot has a pure native assembly language called PASM, described in
+Chapter 9.>. PIR is fundamentally an assembly language, but it has some
 higher-level features such as operator syntax, syntactic sugar for subroutine
 and method calls, automatic register allocation, and more friendly conditional
 syntax.  PIR is commonly used to write Parrot libraries -- including some of
@@ -579,8 +579,10 @@ The conditional branches combine C<if> or C<unless> with C<goto>.
 X<if (conditional);instruction (PIR)> X<unless (conditional);instruction (PIR)>
 In this example, the C<goto> branches to the label C<L1> only if the value
 stored in C<$I0> is true. The C<unless> statement is similar, but it branches
-when the tested value is false. An undefined value, 0, or an empty string are
-all false values. Any other values are true.
+when the tested value is false.  You can use PMC and STRING registers with
+C<if> and C<unless>.  The op will call the C<get_bool> vtable entry on any PMC
+so used and will convert the STRING to a boolean value.  An undefined value, 0,
+or an empty string are all false values. All other values are true.
 
 The comparison operators (C<E<lt>>, C<E<lt>=>, C<==>, C<!=>, C<E<gt>>,
 C<E<gt>=>) can combine with C<if ...  goto>. These branch when the
@@ -630,20 +632,19 @@ unconditional branches handle iteration:
 =end PIR
 
 X<do-while style loop;(PIR)>
-This example calculates the factorial C<5!>. Each time through the
-loop it multiplies C<$I0> by the current value of the counter C<$I1>,
-decrements the counter, and then branches to the start of the loop.
-The loop ends when C<$I1> counts down to 0 so that the C<if> doesn't
-branch to C<REDO>. This is a I<do while>-style loop with the condition
-test at the end, so the code always runs the first time through.
+This example calculates the factorial C<5!>. Each time through the loop it
+multiplies C<$I0> by the current value of the counter C<$I1>, decrements the
+counter, and branches to the start of the loop.  The loop ends when C<$I1>
+counts down to 0. This is a I<do while>-style loop with the condition test at
+the end, so the code always runs the first time through.
 
 X<while-style loop (PIR)>
 For a I<while>-style loop with the condition test at the start, use a
-conditional branch together with an unconditional branch:
+conditional branch with an unconditional branch:
 
 =begin PIR
 
-  .sub _main
+  .sub 'main'
       $I0 = 1               # product
       $I1 = 5               # counter
 
@@ -654,8 +655,7 @@ conditional branch together with an unconditional branch:
       goto REDO
   LAST:                     # end of loop
 
-      print $I0
-      print "\n"
+      say $I0
       end
   .end
 
@@ -668,17 +668,21 @@ C<$I1> reaches 0 and the C<if> branches to the C<LAST> label. If the
 counter isn't a positive number before the loop, the loop never
 executes.
 
-Any high-level flow control construct can be built from conditional
-and unconditional branches, because this is the way almost all computer
-hardware operates at the lowest-level, so all modern programming
-languages use branching constructs to implement their most complex
-flow control devices.
+You can build any high-level flow control construct from conditional and
+unconditional branches; the lowest level of computer hardware works this way.
+All modern programming languages use branching constructs to implement their
+most complex flow control devices.
 
-Fortunately, libraries of macros have been developed that can implement
-more familiar syntax for many of these control structures. We will discuss
-these libraries in more detail in "PIR Standard Library".
+That doesn't make complex code easier to write in PIR.  Fortunately, a series
+of macros exist to simplify flow control.
 
 =head2 Macros
+
+=for author
+
+Needs supplementing; needs moving.
+
+=end for
 
 =head2 Subroutines
 
@@ -686,25 +690,19 @@ Z<CHP-4>
 
 X<PIR (Parrot intermediate representation);subroutines>
 X<subroutines;in PIR>
-Code reuse has become a cornerstone of modern software engineering.
-Common tasks are routinely packaged as libraries for later reuse
-by other developers. The most basic building block of code reuse is
-the "function" or "subroutine". A calculation like "the factorial of
-a number", for example, may be used several times in a large program.
-Subroutines allow this kind of functionality to be abstracted into a
-single stand-alone unit for reuse. PIR is a subroutine-based language
-in that all code in PIR must exist in a subroutine. Execution starts,
-as we have seen, in the C<:main> subroutine, and others can be called
-to perform the tasks of a program. From subroutines we can construct
-more elaborate chunks of code reusability methods and objects. In
-this chapter we will talk about how subroutines work in PIR, and how
-they can be used by developers to create programs for Parrot.
+The most basic building block of code reuse in PIR is the subroutine. A large
+program may perform a calculation like "the factorial of a number" several
+times.  Subroutines abstract this behavior into a single, named, stand-alone
+unit. PIR is a subroutine-based language in that all code in PIR must exist in
+a subroutine. Execution starts in the C<:main> subroutine, which itself can
+call other subroutines.  Subroutines can fit together into more elaborate
+chunks of code reusability such as methods and objects.
 
-Parrot supports multiple high-level languages, and each language uses
-a different syntax for defining and calling subroutines. The goal of
-PIR is not to be a high-level language in itself, but to provide the
-basic tools that other languages can use to implement them. PIR's
-syntax for subroutines may seem very primitive for this reason.
+Parrot supports multiple high-level languages.  Each language uses a different
+syntax for defining and calling subroutines. The goal of PIR is not to be a
+high-level language in itself, but to provide the basic tools that other
+languages can use to implement them. PIR's subroutine syntax may seem very
+primitive for this reason.
 
 =head2 Parrot Calling Conventions
 
@@ -712,18 +710,16 @@ Z<CHP-4-SECT-1>
 
 X<PIR (Parrot intermediate representation);subroutines;Parrot calling conventions>
 X<subroutines;Parrot calling conventions;in PIR>
-The way that Parrot calls a subroutine--by passing arguments, altering
-control flow, and returning results--is called the "Parrot Calling
-Conventions", or PCC. The details of PCC are generally hidden from the
-programmer, being partially implemented in C and being partially
-implemented in PASM. PIR has several constructs to gloss over these
-details, and the average programmer will not need to worry about them.
-PCC uses the Continuation Passing Style X<Continuation Passing Style
-(CPS)>X<CPS (Continuation Passing Style)> (CPS) to pass control to
-subroutines and back again. Again, the details of this can be largely
-ignored for developers who don't need it, but the power of this approach
-can be harnessed by those who do. We'll talk more about PCC and CPS in
-this and in later chapters as well.
+
+The way that Parrot calls a subroutine -- passing arguments, altering control
+flow, and returning results -- is the "Parrot Calling Conventions" (PCC).
+Parrot generally hides the details of PCC from the programmer.  PIR has several
+constructs to gloss over these details, and the average programmer will not
+need to worry about them.  PCC uses the Continuation Passing Style
+X<Continuation Passing Style (CPS)>X<CPS (Continuation Passing Style)> (CPS) to
+pass control to subroutines and back again. Again, the details are irrelevant
+for most uses, but the power is available to anyone who wants to take advantage
+of it.
 
 =head3 Subroutine Calls
 
@@ -734,22 +730,19 @@ C<fact> with two arguments and assigns the result to C<$I0>:
 
   $I0 = 'fact'(count, product)
 
-This simple statement hides a great deal of complexity. It generates a
-subroutine PMC object, creates a continuation PMC object to return
-control flow after the subroutine, passes the arguments, looks up the
-subroutine by name (and by signature if it's been overloaded), it calls
-the subroutine, and finally it assigns the results of the call to the
-given register variables. This is quite a lot of work for a single
-statement, and that's ignoring the computational logic that the
-subroutine itself implements.
+This simple statement hides much complexity. It generates a subroutine PMC
+object, creates a continuation PMC object to represent the control flow up to
+this point, passes the arguments, looks up the subroutine by name (and by
+signature, if necessary)), calls the subroutine, and assigns the results of the
+call to the appropriate integer register. This is all in addition to the
+computation the subroutine itself performs.
 
 =head3 Expanded Subroutine Syntax
 
-The single line subroutine call is incredibly convenient, but it isn't
-always flexible enough. So PIR also has a more verbose call syntax
-that is still more convenient than manual calls. This example pulls
-the subroutine C<fact> out of the global symbol table into a PMC
-register and calls it:
+The single line subroutine call is incredibly convenient, but it isn't always
+flexible enough. PIR also has a more verbose call syntax that is still more
+convenient than manual calls. This example looks up the subroutine C<fact> out
+in the global symbol table and calls it:
 
   find_global $P1, "fact"
 
@@ -762,20 +755,18 @@ register and calls it:
 
 X<.arg directive>
 X<.result directive>
-The whole chunk of code from C<.begin_call> to C<.end_call> acts as a
-single unit. The C<.arg> directive sets up and passes arguments to
-the call. The C<.call> directive calls the subroutine, returns control
-flow after the subroutine has completed. The C<.result> directive
-retrieves returned values from the call.
+The whole chunk of code from C<.begin_call> to C<.end_call> acts as a single
+unit. The C<.arg> directive sets up and passes arguments to the call. The
+C<.call> directive calls the subroutine and identifies the point at which to
+return control flow after the subroutine has completed. The C<.result>
+directive retrieves returned values from the call.
 
 =head3 Subroutine Declarations
 
-X<.param directive>
-In addition to syntax for subroutine calls, PIR provides syntax for
-subroutine definitions. Subroutines are defined with the C<.sub>
-directive, and end with the C<.end> directive. We've already seen
-this syntax in our earlier examples. The C<.param> defines input
-parameters and creates local named variables for them:
+X<.param directive> In addition to syntax for subroutine calls, PIR provides
+syntax for subroutine definitions: the C<.sub> and C<.end> directives shown in
+earlier examples.  The C<.param> directive defines input parameters and creates
+local named variables for them (similar to C<.local>):
 
   .param int c
 
@@ -783,28 +774,27 @@ X<.return directive>
 The C<.return> directive allows the subroutine to return control flow
 to the calling subroutine, and optionally returns result output values.
 
-Here's a complete code example that implements the factorial algorithm.
-The subroutine C<fact> is a separate subroutine, assembled and
-processed after the C<main> function.  Parrot resolves global symbols
-like the C<fact> label between different units.
+Here's a complete code example that implements the factorial algorithm.  The
+subroutine C<fact> is a separate subroutine, assembled and processed after the
+C<main> function.  Parrot resolves global symbols like the C<fact> label
+between different units.
 
 =begin PIR
 
   # factorial.pir
-  .sub main
+  .sub 'main' :main
      .local int count
      .local int product
-     count = 5
+     count   = 5
      product = 1
 
      $I0 = 'fact'(count, product)
 
-     print $I0
-     print "\n"
+     say $I0
      end
   .end
 
-  .sub fact
+  .sub 'fact'
      .param int c
      .param int p
 
@@ -819,31 +809,31 @@ like the C<fact> label between different units.
 
 =end PIR
 
-This example defines two local named variables, C<count> and
-C<product>, and assigns them the values 1 and 5. It calls the C<fact>
-subroutine passing the two variables as arguments. In the call, the
-two arguments are assigned to consecutive integer registers, because
-they're stored in typed integer variables. The C<fact> subroutine
-uses C<.param> and the C<.return> directives for retrieving parameters
-and returning results. The final printed result is 120.
+This example defines two local named variables, C<count> and C<product>, and
+assigns them the values 1 and 5. It calls the C<fact> subroutine with both
+variables as arguments.  The C<fact> subroutine uses C<.param> to retrieve
+these parameters and C<.return> to return the result.  The final printed result
+is 120.
 
-Execution of the program starts at the C<:main> subroutine or, if no
-subroutines are declared with C<:main> at the first subroutine in the file.
-If multiple subroutines are declared with C<:main>, the last of them is
-treated as the starting point. Eventually, declaring multiple subroutines
-with C<:main> might cause a syntax error or some other bad behavior, so it's
-not a good idea to rely on it now.
+As usual, execution of the program starts at the C<:main> subroutine.
 
-=head3 Named Parameters
+=head3 Named Arguments
 
-Parameters that are passed in a strict order like we've seen above are
-called I<positional arguments>. Positional arguments are
-differentiated from one another by their position in the function call.
-Putting positional arguments in a different order will produce different
-effects, or may cause errors. Parrot supports a second type of parameter,
-a I<named parameter>. Instead of passing parameters by their position
-in the string, parameters are passed by name and can be in any order.
-Here's an example:
+=for author
+
+We have to get our terms straight here.  Which are "arguments" (passed in) and
+which are "parameters" (processed from within).
+
+=end for
+
+X<positional arguments>
+X<named arguments>
+Parameters passed only by their order are I<positional arguments>. The only
+differentiator between positional arguments is their positions in the function
+call.  Putting positional arguments in a different order will produce different
+effects, or may cause errors. Parrot also supports I<named parameters>. Instead
+of passing parameters by their position in the string, parameters are passed by
+name and can be in any order.  Here's an example:
 
 =begin PIR
 
@@ -853,62 +843,59 @@ Here's an example:
     $S0 = "Hello " . call
     $S1 = "You are " . yrs
     $S1 = $S1 . " years old"
-    print $S0
-    print $S1
+    say $S0
+    say $S1
  .end
 
- .sub main :main
+ .sub 'main' :main
     'MySub'("age" => 42, "name" => "Bob")
  .end
 
 =end PIR
 
-In the example above, we could have easily reversed the order too:
+You can also pass these pairs in the opposite order:
 
 =begin PIR
 
- .sub main :main
+ .sub 'main' :main
     'MySub'("name" => "Bob", "age" => 42)    # Same!
  .end
 
 =end PIR
 
-Named arguments can be a big help because you don't have to worry about
-the exact order of variables, especially as argument lists get very long.
+Named arguments can be a big help because you don't have to worry about the
+exact order of variables, especially as argument lists get very long.
 
-=head3 Optional Parameters
+=head3 Optional Arguments
 
-Sometimes there are parameters to a function that don't always need to be
-passed, or values for a parameter which should be given a default value
-if a different value hasn't been explicitly provided. Parrot provides
-a mechanism for allowing optional parameters to be specified, so an
-error won't be raised if the parameter isn't provided. Parrot also
-provides a flag value that can be tested to determine if an optional
-parameter has been provided or not, so a default value can be supplied.
+X<optional arguments>
+Some functions have arguments with appropriate default values, so that callers
+don't always have to pass them.  Parrot provides a mechanism to identify
+optional argument.  Parrot also provides a flag value to determine if the
+caller has passed in an optional argument.
 
-Optional parameters are actually treated like two parameters: The value
-that may or may not be passed, and the flag value to determine if it
-has been or not. Here's an example declaration of an optional parameter:
+Optional parameters appear in PIR as if they're actually I<two> parameters:
+the value and its flag:
 
-  .param string name :optional
-  .param int has_name :opt_flag
+  .param string name     :optional
+  .param int    has_name :opt_flag
 
-The C<:optional> flag specifies that the given parameter is optional and
-does not necessarily need to be provided. The C<:opt_flag> specifies that
-an integer parameter contains a boolean flag. This flag is true if the
-value was passed, and false otherwise. This means we can use logic like
-this to provide a default value:
+The C<:optional> flag specifies that the given parameter is optional.  The
+C<:opt_flag> specifies an integer which parameter contains a boolean flag; this
+flag is true if the value was passed, and false otherwise. To provide a default
+value for an optional parameter, you can write:
 
-  .param string name :optional
-  .param int has_name :opt_flag
-  if has_name goto we_have_a_name
-      name = "Default value"
+    .param string name     :optional
+    .param int    has_name :opt_flag
+
+    if has_name goto we_have_a_name
+    name = "Default value"
   we_have_a_name:
 
-Optional parameters can be positional or named parameters. When using them
-with positional parameters, they must appear at the end of the list of
-positional parameters. Also, the C<:opt_flag> parameter must always appear
-directly after the C<:optional> parameter.
+Optional parameters can be positional or named parameters. When using them with
+positional parameters, they must appear at the end of the list of positional
+parameters. Also, the C<:opt_flag> parameter must always appear directly after
+the C<:optional> parameter.
 
   .sub 'Foo'
     .param int optvalue :optional
@@ -927,38 +914,37 @@ directly after the C<:optional> parameter.
     .param int hasvalue :opt_flag   # WRONG!
     ...
 
-Optional parameters can also be mixed with named parameters:
+You may mix optional parameters with named parameters:
 
   .sub 'MySub'
-    .param int value :named("answer") :optional
+    .param int value     :named("answer") :optional
     .param int has_value :opt_flag
     ...
 
-This could be called in two ways:
+You can call this function in two ways:
 
   'MySub'("answer" => 42)  # with a value
   'MySub'()                # without
 
 =head3 Sub PMCs
 
-Subroutines are a PMC type in Parrot, and references to them can be stored
-in PMC registers and manipulated like other PMC types. You can get a subroutine
-in the current namespace with the C<get_global> opcode:
+Subroutines are a PMC type in Parrot. You can store them in PMC registers and
+manipulate them just as you do the other PMC types.  Look up a subroutine in
+the current namespace with the C<get_global> opcode:
 
   $P0 = get_global "MySubName"
 
-Or, if you want to find a subroutine from a different namespace, you need
-to first select the namespace PMC and then pass that to C<get_global>:
+To find a subroutine in a different namespace, first look up the appropriate
+the namespace PMC, then use that with C<get_global>:
 
   $P0 = get_namespace "MyNamespace"
   $P1 = get_global $P0, "MySubName"
 
-With a Sub PMC, there are lots of things you can do. You can obviously invoke
-it:
+You can obviously invoke a Sub PMC:
 
   $P0(1, 2, 3)
 
-You can get its name or I<change> its name:
+You can get or even I<change> its name:
 
   $S0 = $P0               # Get the current name
   $P0 = "MyNewSubName"    # Set a new name
@@ -989,74 +975,84 @@ The number of optional named parameters to the Sub
 
 =item * pos_slurpy
 
-Returns 1 if the sub has a slurpy parameter to eat up extra positional args
+Returns true if the sub has a slurpy parameter to eat up extra positional args
 
 =item * named_slurpy
 
-Returns 1 if the sub has a slurpy parameter to eat up extra named args
+Returns true if the sub has a slurpy parameter to eat up extra named args
 
 =back
 
-Instead of getting the whole inspection hash, you can look for individual
-data items that you want:
+Instead of getting the whole inspection hash, you ask about individual pieces
+of metadata:
 
   $I0 = inspect $P0, "pos_required"
 
-If you want to get the total number of defined parameters to the Sub, you can
-call the C<arity> method:
+To discover to get the total number of defined parameters to the Sub, call the
+C<arity> method:
 
   $I0 = $P0.'arity'()
 
-To get the namespace PMC that the Sub was defined into, you can call the
+To fetch the namespace PMC that the Sub was defined into, call the
 C<get_namespace> method:
 
   $P1 = $P0.'get_namespace'()
 
-Subroutine PMCs are very useful things, and we will show more of their uses
-throughout this chapter.
-
 =head2 The Commandline
 
 Programs written in Parrot have access to arguments passed on the command
-line like any other program would.
+line like any other program would:
 
-  .sub MyMain :main
+  .sub 'MyMain' :main
     .param pmc all_args :slurpy
     ...
   .end
 
+=for author
+
+Please verify and expand.
+
+=end for
+
+The C<all_args> PMC is a ResizableStringArray PMC, which means you can loop
+over the results, access them individually, or even modify them.
 
 =head2 Continuation Passing Style
 
-Continuations are snapshots, a frozen image of the current execution
-state of the VM. Once we have a continuation we can invoke it to
-return to the point where the continuation was first created. It's
-like a magical timewarp that allows the developer to arbitrarily move
-control flow back to any previous point in the program N<there's actually
-no magic involved, just a lot of interesting ideas and involved code>.
+X<continuations>
+X<continuation passing style>
+X<CPS>
+Continuations are snapshots of control flow: frozen images of the current
+execution state of the VM. Once you have a continuation, you can invoke it to
+return to the point where the continuation was first created. It's like a
+magical timewarp that allows the developer to arbitrarily move control flow
+back to any previous point in the program.
 
-Continuations are not a new concept, they've been boggling the minds
-of Lisp and Scheme programmers for many years. However, despite all
-their power and flexibility they haven't been well-utilized in most
-modern programming languages or in their underlying libraries and
-virtual machines. Parrot aims to change that: In Parrot, almost every
-control flow manipulation including all subroutine, method, and
-coroutine calls, are performed using continuations. This mechanism
-is mostly hidden from developers who build applications on top of
-Parrot. The power and flexibility is available if people want to use
-it, but it's hidden behind more familiar constructs if not.
+Continuations are not a new concept; they've boggled the minds of new Lisp and
+Scheme programmers for many years.  Despite their power and heritage, they're
+not visible to most other modern programming languages or their runtimes.
+Parrot aims to change that: it performs almost all control flow through the use
+of continuations.  PIR and PCT hide most of this complexity from developers,
+but the full power of continuations is available.
 
-Doing all sorts of flow control using continuations is called
-X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
+When Parrot invokes a function, it creates a continuation representing the
+current point in the program.  It passes this continuation as an invisible
+parameter to the function call.  When that function returns, it invokes the
+continuation -- in effect, it performs a goto to the point of creation of that
+continuation.  If you have a continuation, you can invoke it to return to its
+point of creation any time you want.
+
+This type of flow control -- invoking continuations instead of performing bare
+jumps -- is X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
 CPS allows parrot to offer all sorts of neat features, such as tail-call
 optimizations and lexical subroutines.
 
 =head3 Tailcalls
 
-In many cases, a subroutine will set up and call another subroutine,
-and then return the result of the second call directly. This is called
-a X<tailcall> tailcall, and is an important opportunity for optimization.
-Here's a contrived example in pseudocode:
+In many cases, a subroutine will set up and call another subroutine, and then
+return the result of the second call directly. This is a X<tailcall> tailcall,
+and is an important opportunity for optimization.  Here's a contrived example
+in pseudocode:
 
   call add_two(5)
 
@@ -1065,37 +1061,38 @@ Here's a contrived example in pseudocode:
     return add_one(value)
 
 In this example, the subroutine C<add_two> makes two calls to c<add_one>. The
-second call to C<add_one> is used as the return value. C<add_one> is called
-and its result is immediately returned to the caller of C<add_two>, it is
-never stored in a local register or variable in C<add_two>, it's immediately
-returned. We can optimize this situation if we realize that the second call to
-C<add_one> is returning to the same place that C<add_two> is, and therefore
-can utilize the same return continuation as C<add_two> uses. The two
-subroutine calls can share a return continuation, instead of having to create
-a new continuation for each call.
+second call to C<add_one> is the return value. C<add_one> gets called; its
+result gets returned to the caller of C<add_two>.  Nothing in C<add_two> uses
+that return value directly.
+
+A simple optimization is available for this type of code.  The second call to
+C<add_one> can return to the same place that C<add_two> returns; therefore,
+it's perfectly safe and correct to use the same return continuation that
+C<add_two> uses. The two subroutine calls can share a return continuation,
+instead of having to create a new continuation for each call.
 
 X<.tailcall directive>
-In PIR code, we use the C<.tailcall> directive to make a tailcall like this,
-instead of the C<.return> directive. C<.tailcall> performs this optimization
-by reusing the return continuation of the parent function to make the
-tailcall. In PIR, we can write this example:
+
+PIR provides the C<.tailcall> directive to identify similar situations.  Use it
+in place of the C<.return> directive. C<.tailcall> performs this optimization
+by reusing the return continuation of the parent function to make the tailcall:
 
 =begin PIR
 
-  .sub main :main
+  .sub 'main' :main
       .local int value
       value = add_two(5)
       say value
   .end
 
-  .sub add_two
+  .sub 'add_two'
       .param int value
       .local int val2
       val2 = add_one(value)
       .tailcall add_one(val2)
   .end
 
-  .sub add_one
+  .sub 'add_one'
       .param int a
       .local int b
       b = a + 1
@@ -1108,17 +1105,16 @@ This example above will print out the correct value "7".
 
 =head3 Creating and Using Continuations
 
-Most often continuations are used implicitly by the other control-flow
-operations in Parrot. However, they can also be created and used explicitly
-when required. Continuations are like any other PMC, and can be created
-using the C<new> keyword:
+While Parrot's use of continuations and CPS is invisible to most code, you can
+create and use them explicitly if you like.  Continuations are like any other
+PMC; create one with the C<new> opcode:
 
   $P0 = new 'Continuation'
 
-The new continuation starts off in an undefined state. Attempting to invoke
-a new continuation after it's first been created will raise an exception. To
-prepare the continuation for use, a destination label must be assigned to it
-with the C<set_addr> opcode:
+The new continuation starts off in an undefined state. If you attempt to invoke
+a new continuation without initializing it, Parrot will raise an exception.  To
+prepare the continuation for use, assign it a destination label with the
+C<set_addr> opcode:
 
     $P0 = new 'Continuation'
     set_addr $P0, my_label
@@ -1126,16 +1122,15 @@ with the C<set_addr> opcode:
   my_label:
     ...
 
-To jump to the continuation's stored label and return the context to the
-state it was in when the continuation was created, use the C<invoke> opcode
-or the C<()> notation:
+To jump to the continuation's stored label and return the context to the state
+it was in I<at the point of its creation>, invoke the continuation:
 
   invoke $P0  # Explicit using "invoke" opcode
   $P0()       # Same, but nicer syntax
 
-Notice that even though you can use the subroutine notation C<$P0()> to
-invoke the continuation, it doesn't make any sense to try and pass arguments
-to it or to try and return values from it:
+Even though you can use the subroutine notation C<$P0()> to invoke the
+continuation, it doesn't make any sense to pass arguments or obtain return
+values:
 
   $P0 = new 'Continuation'
   set_addr $P0, my_label
@@ -1147,15 +1142,13 @@ to it or to try and return values from it:
 =head2 Lexical Subroutines
 
 X<Lexical Subroutines>
-As we've mentioned above, Parrot offers support for lexical subroutines.
-What this means is that we can define a subroutine by name inside a
-larger subroutine, and our "inner" subroutine is only visible and callable
-from the "outer" outer. The "inner" subroutine inherits all the lexical
-variables from the outer subroutine, but is able to define its
-own lexical variables that cannot be seen or modified by the outer subroutine.
-This is important because PIR doesn't have anything corresponding to blocks
-or nested scopes like some other languages have. Lexical subroutines play
-the role of nested scopes when they are needed.
+
+Parrot offers support for lexical subroutines.  You can define a subroutine by
+name inside a larger subroutine, where the inner subroutine is only visible and
+callable from the outer. The inner subroutine inherits all the lexical
+variables from the outer subroutine, but can itself define its own lexical
+variables that the outer subroutine cannot access.   PIR lacks the concept of
+blocks or nested lexical scopes; this is how it performs the same function.
 
 If the subroutine is lexical, you can get its C<:outer> with the C<get_outer>
 method on the Sub PMC:
@@ -1169,31 +1162,25 @@ set the outer sub:
 
 =head3 Scope and HLLs
 
-Let us diverge for a minute and start looking forward at the idea of X<High
-Level Languages;HLL> High Level Languages (HLLs) such as Perl, Python, and
-Ruby. All of these languages allow nested scopes, or blocks within blocks
-that can have their own lexical variables. Let's look back at the C
-programming language, where this kind of construct is not uncommon:
+As mentioned previously, X<High Level Languages;HLL> High Level Languages such
+as Perl, Python, and Ruby allow nested scopes, or blocks within blocks that can
+have their own lexical variables.  Even this construct is common in the C
+programming language:
 
   {
       int x = 0;
       int y = 1;
       {
           int z = 2;
-          // x, y, and z are all visible here
+          /* x, y, and z are all visible here */
       }
-      // only x and y are visible here
+
+      /* only x and y are visible here */
   }
 
-The code above illustrates this idea perfectly without having to get into a
-detailed and convoluted example: In the inner block, we define the variable
-C<z> which is only visible inside that block. The outer block has no
-knowledge of C<z> at all. However, the inner block does have access to the
-variables C<x> and C<y>. This is an example of nested scopes where the
-visibility of different data items can change in a single subroutine. As
-we've discussed above, Parrot doesn't have any direct analog for this
-situation: If we tried to write the code above directly, we would end up
-with this PIR code:
+In the inner block, all three varaibles are visible.  The variable C<z> is only
+visible inside that block. The outer block has no knowledge of C<z>.  A very
+direct, naI<iuml>ve translation of this code to PIR might be:
 
   .param int x
   .param int y
@@ -1203,18 +1190,18 @@ with this PIR code:
   z = 2
   ...
 
-This PIR code is similar, but the handling of the variable C<z> is
-different: C<z> is visible throughout the entire current subroutine, where it
-is not visible throughout the entire C function. To help approximate this
-effect, PIR supplies lexical subroutines to create nested lexical scopes.
+This PIR code is similar, but the handling of the variable C<z> is different:
+C<z> is visible throughout the entire current subroutine, where it is not
+visible throughout the entire C function. To help approximate this effect, PIR
+supplies lexical subroutines to create nested lexical scopes.
 
 =head3 PIR Scoping
 
-In PIR, there is only one structure that supports scoping like this: the
-subroutine N<and objects that inherit from subroutines, such as methods,
-coroutines, and multisubs, which we will discuss later>. There are no blocks
-in PIR that have their own scope besides subroutines. Fortunately, we can use
-these lexical subroutines to simulate this behavior that HLLs require:
+Only one PIR structure supports scoping like this: the subroutineN<... and
+objects that inherit from subroutines, such as methods, coroutines, and
+multisubs>. There are no blocks in PIR that have their own scope besides
+subroutines. Fortunately, we can use these lexical subroutines to simulate this
+behavior that HLLs require:
 
 =begin PIR
 
@@ -1316,7 +1303,7 @@ Here is a way to rewrite that algorithm using only a single subroutine instead:
 
 =begin PIR
 
-  .sub main
+  .sub 'main'
       $I1 = 5           # counter
       bsr fact
       say $I0
@@ -1539,7 +1526,7 @@ they are a part of, and they must use the C<:method> flag.
 
   .namespace [ "MyClass"]
 
-  .sub "MyMethod" :method
+  .sub 'MyMethod' :method
     ...
 
 Inside the method, the invocant object can be accessed using the C<self>
@@ -1551,12 +1538,12 @@ object:
 
 =begin PIR
 
-  .sub "MyMethod" :method
+  .sub 'MyMethod' :method
     $S0 = self                    # Already defined as "self"
     say $S0
   .end
 
-  .sub "MyMethod2" :method
+  .sub 'MyMethod2' :method
     .param pmc item :invocant     # "self" is now called "item"
     $S0 = item
     say $S0
@@ -1570,7 +1557,7 @@ first method:
 
 =begin PIR
 
-  .sub main
+  .sub 'main'
     .local pmc class
     .local pmc obj
     newclass class, "Foo"       # create a new Foo class
@@ -1582,13 +1569,13 @@ first method:
 
   .namespace [ "Foo" ]          # start namespace "Foo"
 
-  .sub meth :method             # define Foo::meth global
+  .sub 'meth' :method             # define Foo::meth global
      print "in meth\n"
      $S0 = "other_meth"         # method names can be in a register too
      self.$S0()                 # self is the invocant
   .end
 
-  .sub other_meth :method       # define another method
+  .sub 'other_meth' :method       # define another method
      print "in other_meth\n"    # as above Parrot provides a return
   .end                          # statement
 
@@ -1783,14 +1770,14 @@ It is basically the same as a C<.return> in this regard.
 
 Here is a quick example of a simple coroutine:
 
-  .sub MyCoro
+  .sub 'MyCoro'
     .yield(1)
     .yield(2)
     .yield(3)
     .return(4)
   .end
 
-  .sub main :main
+  .sub 'main' :main
     $I0 = MyCoro()    # 1
     $I0 = MyCoro()    # 2
     $I0 = MyCoro()    # 3
@@ -1811,14 +1798,14 @@ directive, and when the coroutine is called again it picks up where it last
 left off. Coroutines also handle parameters in a way that might not be
 intuitive. Here's an example of this:
 
-  .sub StoredConstant
+  .sub 'StoredConstant'
     .param int x
     .yield(x)
     .yield(x)
     .yield(x)
   .end
 
-  .sub main :main
+  .sub 'main' :main
     $I0 = StoredConstant(5)       # $I0 = 5
     $I0 = StoredConstant(6)       # $I0 = 5
     $I0 = StoredConstant(7)       # $I0 = 5
@@ -1885,7 +1872,7 @@ multi signature is specified in the C<:multi> directive:
     .return(x + y)
   .end
 
-  .sub Start :main
+  .sub 'Start' :main
     $I0 = Add(1, 2)      # 3
     $N0 = Add(3.14, 2.0) # 5.14
     $S0 = Add("a", "b")  # ERROR! No (S, S) variant!
@@ -2069,7 +2056,7 @@ standard output:
 
 =begin PIR
 
-  .sub main
+  .sub 'main'
     loop_top:
       $S0 = read 10
       print $S0
@@ -2141,7 +2128,7 @@ prints it to STDOUT.
 
 =begin PIR
 
-  .sub main
+  .sub 'main'
     $P0 = getstdout
     $P1 = open "myfile.txt", "r"
     loop_top:
