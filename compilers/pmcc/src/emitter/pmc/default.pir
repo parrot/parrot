@@ -6,7 +6,9 @@ Register PMC::Emitter::PMC::default as child of PMC::Emitter::PMC
 
 =cut
 
-.sub '' :anon :load :init
+.namespace ['PMC';'Emitter';'PMC';'default']
+
+.sub '' :load :init :anon
     ##   create the classes
     .local pmc p6meta
     p6meta = new 'P6metaclass'
