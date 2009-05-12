@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 13;
+use Parrot::Test tests => 14;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -177,6 +177,13 @@ OUT
 
 }
 
+pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT#629');
+.sub 'foo' :immediate
+  die 'no'
+.end
+CODE
+/no\ncurrent inst.*:2\)$/
+OUT
 
 # Local Variables:
 #   mode: cperl
