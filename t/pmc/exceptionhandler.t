@@ -16,8 +16,8 @@ Tests the ExceptionHandler PMC.
 
 =cut
 
-.include 'include/except_severity.pasm'
-.include 'include/except_types.pasm'
+.include 'except_severity.pasm'
+.include 'except_types.pasm'
 
 .sub main :main
     .include 'test_more.pir'

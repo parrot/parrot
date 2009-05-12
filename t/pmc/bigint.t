@@ -96,7 +96,7 @@ CODE
 OUT
 
 pasm_output_is( <<"CODE", <<'OUT', "set int, get double" );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['BigInt']
      set P0, 999999
      set N1, P0

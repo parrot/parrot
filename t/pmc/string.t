@@ -131,7 +131,7 @@ Tests the C<String> PMC.
 .end
 
 # Macro to ease testing of floating point comparisons
-# borrowed from fp_eq in include/fp_equality.pasm
+# borrowed from fp_eq in fp_equality.pasm
 .macro fp_eq_ok (  J, K, L )
     set $N10, .J
     set $N11, .K
@@ -146,7 +146,7 @@ Tests the C<String> PMC.
 .endm
 
 .sub setting_numbers
-        .include 'include/fp_equality.pasm'
+        .include 'fp_equality.pasm'
         new $P0, ['String']
         set $P0, "1"
         set $N0, $P0

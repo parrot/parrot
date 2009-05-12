@@ -193,7 +193,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableFloatArray']
      new P1, ['Key']
 
@@ -229,7 +229,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableFloatArray']
      set P0, 1
 
@@ -275,7 +275,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'basic push' );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableFloatArray']
      push P0, 1.0
      push P0, 2.0
@@ -302,7 +302,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'push many values' );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableFloatArray']
      set I0, 0
 L1:  set N0, I0
@@ -321,7 +321,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'basic pop' );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableFloatArray']
      set P0[0], 1.0
      set P0[1], 2.0
@@ -348,7 +348,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'pop many values' );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableFloatArray']
      set I0, 0
 L1:  set N0, I0
@@ -376,7 +376,7 @@ ok
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', 'push/pop' );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableFloatArray']
      push P0, 1.0
      push P0, 2.0
