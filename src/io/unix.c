@@ -673,10 +673,10 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
     /* Child - exec process */
     if (pid == 0) {
         /* See above comments */
-        #if 0
+#    if 0
         char *argv[10], *p, *c, *cmd, *orig_cmd;
         int   n;
-        #else
+#    else
         char * argv[10], *orig_cmd;
 
         /* C strings for the execv call defined that way to avoid
@@ -684,7 +684,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
          */
         static char auxarg0 [] = "/bin/sh";
         static char auxarg1 [] = "-c";
-        #endif
+#    endif
 
         if (flags & PIO_F_WRITE) {
             /* the other end is writing - we read from the pipe */
@@ -712,7 +712,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
          * TT #661
          *******************************************************
          */
-        #if 0
+#    if 0
         /* XXX ugly hack to be able to pass some arguments
          *     split cmd at blanks */
         orig_cmd = cmd = Parrot_str_to_cstring(interp, command);
@@ -728,7 +728,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         Parrot_str_free_cstring(c); /* done with C string */
         execv(cmd, argv);       /* XXX use execvp ? */
-        #else
+#    else
 
         orig_cmd = Parrot_str_to_cstring(interp, command);
         argv [0] = auxarg0;
@@ -737,7 +737,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         argv [3] = NULL;
         execv(argv [0], argv);
 
-        #endif
+#    endif
 
         /* Will never reach this unless exec fails. */
         Parrot_str_free_cstring(orig_cmd);
