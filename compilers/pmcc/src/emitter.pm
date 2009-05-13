@@ -47,6 +47,19 @@ method generate_c_file($past) {
     $res;
 }
 
+# Generate the ontents of a .dump file for self.
+method generate_dump($past) {
+    my $res;
+
+    my $name     := $past.name();
+    my $filename := self.filename();
+
+    # Get emitter for (specific) PMC.
+    my $pmc_emitter := get_pmc_emitter($name, $past);
+
+    $pmc_emitter.generate_dump();
+}
+
 method filename() {
     our $?filename;
     $?filename;

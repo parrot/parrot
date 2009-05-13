@@ -20,9 +20,6 @@ method pmc($/, $key) {
     else {
         # TODO Set c_header and c_coda
         make $?PMC;
-        # FIXME We shouldn't call this during parsing.
-        # It belongs to high-level command-line tool.
-        $?PMC.serialize_attrs();
     }
 }
 
@@ -39,7 +36,7 @@ method traits($/, $key) {
     #say("traits " ~$/);
     if $key eq 'extends' {
         $?PMC.parents().push(~$<identifier>);
-        $?PMC.unserialize_attrs(~$<identifier>);
+        $?PMC.unfreeze_pmc_attrs(~$<identifier>);
     }
     elsif $key eq 'provides' {
     }

@@ -293,12 +293,37 @@ method default_setter_body($type) {
               \"subclassed from a high-level PMC.\"); \\";
 }
 
+#=item C<generate_dump_file>
+#
+#Generate the contents of a dump file for this PMC, which will contain any
+#information that's needed for determining inheritance.
+#
+#=cut
+
+method generate_dump() {
+    my $res := self.freeze_attrs();
+}
+
+method freeze_attrs() {
+    my $frozen;
+
+    #IWBNI nqp exposed freeze directly, but this is works too
+PIR q<
+    $P0 = self.'attrs'()
+    $S0 = freeze $P0
+    $P0 = find_lex '$frozen'
+    $P0 = $S0
+>;
+    return $frozen;
+}
+
 
 #=item C<generate_c_file>
 #
 #Generate C file for PMC.
 #
 #=cut
+
 method generate_c_file() {
     my $res :=
           self.generate_c_file_functions()

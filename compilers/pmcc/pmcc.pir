@@ -17,6 +17,58 @@
     $P0.'parsegrammar'('PMC::Grammar')
     $P0.'parseactions'('PMC::Grammar::Actions')
 
+    #these stages aren't currently used
+    $P0.'removestage'('post')
+    $P0.'removestage'('pir')
+    $P0.'removestage'('evalpmc')
+
+    #add an extra stage to generate the c, h and dump files
+    $P0.'addstage'('generate_files', 'after'=>'past')
+
+    $P1 = split ' ', 'e=s pmc_path|p=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v'
+    setattribute $P0, '@cmdoptions', $P1
+
+.end
+
+
+.sub 'generate_files' :method
+    .param pmc past
+    .param pmc adverbs :slurpy :named
+
+    .local pmc pmc_filename
+    pmc_filename = get_hll_global ['PMC';'Compiler'], '$filename'
+
+    .local string base_filename, dump_filename, c_filename, h_filename
+    .local string dump_contents, c_contents, h_contents
+    base_filename = pmc_filename.'replace'('.pmc', '')
+
+    dump_filename = concat base_filename, '.dump'
+    c_filename    = concat base_filename, '.c'
+    h_filename    = concat base_filename, '.h'
+
+    #XXX: do something interesting here
+
+
+.end
+
+.sub 'evalfiles' :method
+    .param pmc files
+    .param pmc args      :slurpy
+    .param pmc adverbs   :slurpy :named
+
+    .local string filename
+
+    $S0 = adverbs['pmc_path']
+    $P0 = split ',', $S0
+    set_hll_global ['PMC';'Compiler'], '@pmc_path', $P0
+
+    #TODO: DTRT if files is an array of filenames, although this isn't an expected use case
+    $P0 = clone files
+    set_hll_global ['PMC';'Compiler'], '$filename', $P0
+
+    .local pmc super_evalfiles
+    super_evalfiles = get_hll_global ['PCT';'HLLCompiler'], 'evalfiles'
+    .tailcall self.super_evalfiles(files, args, adverbs)
 .end
 
 

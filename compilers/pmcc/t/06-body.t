@@ -12,6 +12,10 @@
 
     .local string filename
 
+    $P0 = new ['ResizableStringArray']
+    $P0 = split ',', 't/data'
+    set_hll_global ['PMC';'Compiler'], '@pmc_path', $P0
+
     filename = 't/data/class08.pmc'
     $S0 = _slurp(filename)
     
@@ -41,7 +45,7 @@
     .local pmc emitter, capture
     (emitter, capture) = get_emitter_and_capture(name, source, 'past')
     $S0 = emitter.'generate_c_file'(capture)
-    say $S0
+    #say $S0
     like($S0, pattern, message)
 .end
 

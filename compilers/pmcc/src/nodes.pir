@@ -119,58 +119,58 @@ Get PMC ATTRs.
     .tailcall self.'attr'('attrs',0,0)
 .end
 
-=item C<serialize_attrs>
 
-store PMC ATTRs in a file.
-
-=cut
-
-.include 'library/JSON.pir'
-
-.sub 'serialize_attrs' :method
-
-    .local string filename, pmcname
-    .local pmc attrs, fh
-
-    pmcname = self.'name'()
-    attrs = self.'attrs'()
-    $S0 = freeze attrs
-
-    filename = concat pmcname, ".dump"
-    fh = open filename, "w"
-    print fh, $S0
-    close fh
-    .return ()
-
-.end
-
-=item C<unserialize_attrs>
+=item C<unfreeze_attrs>
 
 unserialize a PMC's frozen ATTRs and add them to this PMC.
 
 =cut
 
-.include 'except_types.pasm'
-
-.sub 'unserialize_attrs' :method
+.sub 'unfreeze_pmc_attrs' :method
 
     .param string pmcname
 
-    .local string filename
-    .local pmc attrs, fh, eh
+    .local pmc pmc_path, attrs, fh, it, filename
+    .local string dumpname
 
-    eh = new ['ExceptionHandler']
-    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
-    set_addr eh, no_dump
+    #search through all dirs in @pmc_path, looking for a file
+    #named lc(pmcname) ~".dump"
 
-    filename = concat pmcname, ".dump"
-    push_eh eh
-    fh = open filename
+    pmc_path = get_hll_global ['PMC';'Compiler'], '@pmc_path'
+    dumpname = pmcname
+    dumpname = downcase dumpname
+    dumpname = concat dumpname,  '.dump'
+    #print "looking for "
+    #say dumpname
+
+    fh = new ['FileHandle']
+    it = iter pmc_path
+
+  path_loop:  
+    unless it goto dump_not_found
+    filename = shift it
+    concat filename, "/"
+    concat filename, dumpname
+    push_eh iter_next
+    #print "trying to open "
+    #print filename
+    #print " ..."
+    fh.'open'(filename)
+    goto dump_found
+
+  iter_next:
     pop_eh
+    #say "failed"
+    goto path_loop
+
+  dump_found:
+    pop_eh
+    #say "succeeded"
+
     $S0 = fh.'readall'()
     close fh
 
-    .local pmc it, attr
+    .local pmc attr
     .local string type, name
     .local int is_fp
 
@@ -189,7 +189,7 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
   iter_done:
     .return ()
 
-  no_dump:
+  dump_not_found:
     printerr "WARNING: couldn't read .dump for "
     printerr pmcname
     printerr ".pmc\n"

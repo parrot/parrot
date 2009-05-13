@@ -10,6 +10,10 @@
 
     plan(6)
 
+    $P0 = new ['ResizableStringArray']
+    $P0 = split ',', 't/data'
+    set_hll_global ['PMC';'Compiler'], '@pmc_path', $P0
+
     .local string filename
     filename = 't/data/class00.pmc'
     $S0 = _slurp(filename)
@@ -39,15 +43,28 @@ STRUCT
     $S0 = _slurp(filename)
     check_one_header(filename, $S0, attr_macro, "ATTR macro generated")
 
-    #make sure the dump for Parent is generated
+    #generate the dump for Parent
     .local pmc emitter, capture
-    filename = 't/data/Parent.pmc'
+    filename = 't/data/parent.pmc'
+
+    $P0 = new ['String']
+    $P0 = filename
+    set_hll_global ['PMC';'Compiler'], '$filename', $P0
+
     $S0 = _slurp(filename)
     (emitter, capture) = get_emitter_and_capture(filename, $S0, 'past')
-    emitter.'generate_h_file'(capture)
+    $S0 = emitter.'generate_dump'(capture)
+    filename = 't/data/parent.dump'
+    $P0 = open filename, "w"
+    print $P0, $S0
+    close $P0
 
     #test that parent ATTRs are included in children, and in the right order
-    filename = 't/data/Child.pmc'
+    filename = 't/data/child.pmc'
+
+    $P0 = new ['String']
+    $P0 = filename
+    set_hll_global ['PMC';'Compiler'], '$filename', $P0
     $S0 = _slurp(filename)
     attr_struct = 'parent_1\;.*parent_2\;.*parent_3\;.*child_1\;.*child_2\;.*child_3\;'
     check_one_header(filename, $S0, attr_struct, "parent/child ATTR ordering")
@@ -65,7 +82,7 @@ STRUCT
     .local pmc emitter, capture
     (emitter, capture) = get_emitter_and_capture(name, source, 'past')
     $S0 = emitter.'generate_h_file'(capture)
-    say $S0
+    #say $S0
     like($S0, pattern, message)
 .end
 
