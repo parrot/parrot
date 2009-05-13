@@ -11,7 +11,7 @@ src/io/api.c - Parrot I/O API
 The Parrot I/O subsystem provides the core I/O functionality for all parts of
 Parrot. This file implements the public interface to the I/O subsystem. Common
 utility functions that aren't part of the public interface are defined in
-F<src/io/common.c> and utility functions for a specific platform are in
+F<src/io/core.c> and utility functions for a specific platform are in
 F<src/io/unix.c>, F<src/io/win32.c>, or F<src/io/portable.c>. The platform is
 selected in F<include/parrot/io.h>, based on #defines from the configuration
 process.
