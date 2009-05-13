@@ -44,7 +44,7 @@
 
     .local pmc emitter, capture
     (emitter, capture) = get_emitter_and_capture(name, source, 'past')
-    $S0 = emitter.'generate_c_file'(capture)
+    $S0 = emitter.'generate_c_code'(capture)
     #say $S0
     like($S0, pattern, message)
 .end

@@ -5,8 +5,8 @@
 
 class PMC::Emitter;
 
-# Generate .h file for pmc.
-method generate_h_file($past) {
+# Generate the .h file's contents for this pmc.
+method generate_header($past) {
     my $res;
 
     my $name     := $past.name();
@@ -19,15 +19,15 @@ method generate_h_file($past) {
             # Generate header.
               dont_edit($filename)
             # PMC functions
-            ~ $pmc_emitter.generate_h_file()
+            ~ $pmc_emitter.generate_header()
             # C code
             ~ c_code_coda();
 
     $res;
 }
 
-# Generate .c file for pmc.
-method generate_c_file($past) {
+# Generate the .c file's contents for this pmc.
+method generate_c_code($past) {
     my $res;
 
     my $name     := $past.name();
@@ -40,14 +40,14 @@ method generate_c_file($past) {
             # Generate header.
               dont_edit($filename)
             # PMC functions
-            ~ $pmc_emitter.generate_c_file()
+            ~ $pmc_emitter.generate_c_code()
             # C code
             ~ c_code_coda();
 
     $res;
 }
 
-# Generate the ontents of a .dump file for self.
+# Generate the contents of a .dump file for this pmc.
 method generate_dump($past) {
     my $res;
 

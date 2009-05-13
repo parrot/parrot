@@ -14,7 +14,7 @@
     .local string generated
     $S0 = _slurp('t/data/default.pmc')
     (emitter, capture) = get_emitter_and_capture('t/data/default.pmc', $S0, 'past')
-    generated = emitter.'generate_c_file'(capture)
+    generated = emitter.'generate_c_code'(capture)
 
     say generated
 

@@ -81,7 +81,7 @@ STRUCT
 
     .local pmc emitter, capture
     (emitter, capture) = get_emitter_and_capture(name, source, 'past')
-    $S0 = emitter.'generate_h_file'(capture)
+    $S0 = emitter.'generate_header'(capture)
     #say $S0
     like($S0, pattern, message)
 .end

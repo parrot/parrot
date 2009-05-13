@@ -3,16 +3,16 @@
 
 class PMC::Emitter::PMC;
 
-# =item C<generate_h_file>
+# =item C<generate_header>
 #
 # Generate part of header file.
 #
 # =cut
 
-# "Template Method". Just override generate_h_file_functions in derived
+# "Template Method". Just override generate_header_functions in derived
 # classes.
 
-method generate_h_file() {
+method generate_header() {
     my $past := self.past;
     my $name := self.name;
 
@@ -23,7 +23,7 @@ method generate_h_file() {
         '#ifndef ' ~ $guard ~ "\n",
         '#define ' ~ $guard ~ "\n\n",
 
-        self.generate_h_file_functions(), "\n",
+        self.generate_header_functions(), "\n",
 
         self.generate_attr_struct(), "\n",
 
@@ -38,13 +38,13 @@ method generate_h_file() {
     $res
 }
 
-# =item C<generate_h_file_functions>
+# =item C<generate_header_functions>
 #
 # Generate C declarations for vtable functions
 #
 # =cut
 
-method generate_h_file_functions() {
+method generate_header_functions() {
     my $past := self.past;
     my %vtables := PMC::VTableInfo::vtable_hash();
 
@@ -318,27 +318,27 @@ PIR q<
 }
 
 
-#=item C<generate_c_file>
+#=item C<generate_c_code>
 #
-#Generate C file for PMC.
+#Generate C file's contents for this PMC.
 #
 #=cut
 
-method generate_c_file() {
+method generate_c_code() {
     self.pre_method_gen();
     my $res :=
-          self.generate_c_file_functions()
+          self.generate_c_functions()
         ~ self.generate_class_init();
 }
 
 
-#=item C<generate_c_file_functions>
+#=item C<generate_c_functions>
 #
 #Generate C declarations for vtable functions
 #
 #=cut
 
-method generate_c_file_functions() {
+method generate_c_functions() {
     my $past    := self.past;
     my %vtables := self.vtables;
     my $emitter := PMC::Emitter::C.new;
