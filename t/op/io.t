@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 3;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -88,6 +88,42 @@ failed:
 CODE
 /This is Parrot.*/
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'open pipe for writing' );
+.include 'iglobals.pasm'
+
+.sub testreadpipe :main
+  .local pmc interp
+  interp = getinterp
+  .local pmc conf
+  conf = interp[.IGLOBALS_CONFIG_HASH]
+  .local string command
+  command = conf['build_dir']
+  .local string aux
+  aux = conf['slash']
+  command .= aux
+  .local string filename
+  filename .= command
+  filename .= 'examples/pasm/cat.pasm'
+  aux = conf['test_prog']
+  command .= aux
+  aux = conf['exe']
+  command .= aux
+  command .= ' '
+  command .= filename
+
+  .local pmc pipe
+  pipe = open command, 'wp'
+  unless pipe goto failed
+  pipe.'puts'("Hello, pipe!\n")
+  .return()
+failed:
+  say 'FAILED'
+.end
+CODE
+Hello, pipe!
+OUTPUT
+
 }
 
 # Local Variables:

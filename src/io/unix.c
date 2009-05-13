@@ -654,8 +654,8 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         else
             io = filehandle;
 
-        Parrot_io_set_flags(interp, filehandle,
-                (Parrot_io_get_flags(interp, filehandle) & PIO_F_PIPE));
+        Parrot_io_set_flags(interp, io,
+                (Parrot_io_get_flags(interp, io) & (~PIO_F_PIPE)));
 
         if (flags & PIO_F_READ) {
             /* close this writer's end of pipe */
@@ -689,7 +689,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         if (flags & PIO_F_WRITE) {
             /* the other end is writing - we read from the pipe */
             close(STDIN_FILENO);
-            close(fds[1]);
+            /*close(fds[1]);*/
 
             if (Parrot_dup(fds[0]) != STDIN_FILENO)
                 exit(EXIT_SUCCESS);
