@@ -892,6 +892,9 @@ typedef INTVAL (*sort_func_t)(PARROT_INTERP, void *, void *);
 
 =item C<static INTVAL COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp)>
 
+General PMC comparison function. Takes two PMCs. Returns 0 if they are equal,
+returns 1 if C<a> is bigger, and returns -1 if C<b> is bigger.
+
 =cut
 
 */
@@ -917,6 +920,8 @@ COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b), ARGIN(PMC *cmp))
 /*
 
 =item C<void Parrot_quicksort(PARROT_INTERP, void **data, UINTVAL n, PMC *cmp)>
+
+Perform a quicksort on a PMC array.
 
 =cut
 

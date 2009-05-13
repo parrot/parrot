@@ -213,7 +213,9 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 =item C<static PMC * get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL
 flags)>
 
-Gets a new PMC header.
+Gets a new PMC header of the given integer type. Initialize the pmc if
+necessary. In the case of singleton PMC types, get the existing singleton
+instead of allocating a new one.
 
 =cut
 
@@ -483,6 +485,11 @@ temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<static void pmc_free(PARROT_INTERP, PMC *pmc)>
 
+Free the given PMC. This function does not call the custom destroy VTABLE if
+one is specified for PMCs of that type (should it?).
+
+TT #663: As of r38727, this function is not called from anywhere
+
 =cut
 
 */
@@ -498,6 +505,9 @@ pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 /*
 
 =item C<INTVAL get_new_vtable_index(PARROT_INTERP)>
+
+Get a new unique identifier number and allocate a new vtable structure for a
+new PMC type.
 
 =cut
 
