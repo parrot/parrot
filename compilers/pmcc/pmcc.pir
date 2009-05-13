@@ -38,8 +38,9 @@
     .param pmc args      :slurpy
     .param pmc adverbs   :slurpy :named
 
-    .local pmc it, files_clone, pmc_paths, file_path
+    .local pmc it, files_clone, pmc_paths, file_path, pmc_name
 
+    pmc_name = new ['String']
     #TODO: DTRT if files is an array of filenames, although this isn't an expected use case
     files_clone = clone files
     set_hll_global ['PMC';'Emitter'], '$?filename', files_clone
@@ -51,11 +52,16 @@
     $S0 = files
     $P1 = split '/', $S0
     $I0 = $P1
+    dec $I0
+    pmc_name = $P1[$I0]
     delete $P1[$I0]
     $S0 = join '/', $P1
     unshift pmc_paths, $S0
 
+    pmc_name.'replace'('.pmc','')
+
     set_hll_global ['PMC';'Emitter'], '@?pmc_path', pmc_paths
+    set_hll_global ['PMC';'Emitter'], '$?pmc_name', pmc_name
 
     .local pmc super_evalfiles
     super_evalfiles = get_hll_global ['PCT';'HLLCompiler'], 'evalfiles'
@@ -67,25 +73,38 @@
     .param pmc past
     .param pmc adverbs :slurpy :named
 
+    .local string pmc_dir, pmc_name
     .local pmc pmc_filename, emitter
     pmc_filename = get_hll_global ['PMC';'Emitter'], '$?filename'
+    $P0          = get_hll_global ['PMC';'Emitter'], '$?pmc_name'
+    pmc_name = $P0
 
-    .local string base_filename, dump_filename, c_filename, header_filename
+    pmc_dir = pmc_filename
+    $P1 = split '/', pmc_dir
+    $I0 = $P1
+    delete $P1[$I0]
+    pmc_dir = join '/', $P1
+
+    .local string dump_filename, c_filename, header_filename
     .local string dump_contents, c_contents, header_contents
-    pmc_filename.'replace'('.pmc', '')
-    base_filename = pmc_filename 
 
-    emitter  = new ['PMC';'Emitter']
+    emitter = new ['PMC';'Emitter']
 
-    c_filename = concat base_filename, '.c'
+    c_filename = concat pmc_dir, '/'
+    c_filename = concat c_filename, pmc_name
+    c_filename = concat c_filename, '.c'
     c_contents = emitter.'generate_c_code'(past)
     write_file(c_filename, c_contents)
 
-    header_filename = concat base_filename, '.h'
+    header_filename = concat pmc_dir, '/pmc_'
+    header_filename = concat header_filename, pmc_name
+    header_filename = concat header_filename, '.h'
     header_contents = emitter.'generate_header'(past)
     write_file(header_filename, header_contents)
 
-    dump_filename = concat base_filename, '.dump'
+    dump_filename = concat pmc_dir, '/'
+    dump_filename = concat dump_filename, pmc_name
+    dump_filename = concat dump_filename, '.dump'
     dump_contents = emitter.'generate_dump'(past)
     write_file(dump_filename, dump_contents)
 
@@ -114,7 +133,7 @@
     msg = ex
     print "ERROR: couldn't open "
     print name
-    print " for reading: "
+    print " for writing: "
     say ex
     .return ()
 
