@@ -2065,8 +2065,8 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
 #endif
             else {
                 fprintf(stderr, "directory_unpack failed: invalid wordsize %d\n",
-                        pf->header->wordsize);
-                return 0;
+                        (int)pf->header->wordsize);
+                return NULL;
             }
             TRACE_PRINTF_VAL(("Segment offset: new pos 0x%x "
                               "(src=0x%x cursor=0x%x).\n",
@@ -2122,7 +2122,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         if (!pos) {
             fprintf(stderr, "PackFile_unpack segment '%s' failed\n",
                     dir->segments[i]->name);
-            return 0;
+            return NULL;
         }
         else {
             TRACE_PRINTF_VAL(("PackFile_Segment_unpack ok. pos=0x%x\n", pos));
