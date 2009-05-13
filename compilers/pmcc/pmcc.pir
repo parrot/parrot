@@ -70,7 +70,7 @@
 
     .local pmc super_evalfiles
     super_evalfiles = get_hll_global ['PCT';'HLLCompiler'], 'evalfiles'
-    .tailcall self.'evalfiles'(files, args, adverbs)
+    .tailcall self.super_evalfiles(files, args, adverbs)
 .end
 
 
