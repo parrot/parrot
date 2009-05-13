@@ -30,6 +30,19 @@ Variour helper builtins.
     .return ($I0)
 .end
 
+.sub 'exists'
+    .param pmc where
+    .param pmc what
+    $I0 = exists where[what]
+    .return ($I0)
+.end
+
+.sub 'clone'
+    .param pmc what
+    $P0 = clone what
+    .return ($P0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
