@@ -1976,6 +1976,11 @@ SPLINTFLAGS = \
 SPLINTFLAGS := $(SPLINTFLAGS) \
     +bufferoverflow \
     +bufferoverflowhigh \
+    +read-only-strings \
+    +read-only-trans \
+    +strict-destroy \
+    +strict-use-released \
+    +use-released \
 
 # Macro safety checks
 SPLINTFLAGS := $(SPLINTFLAGS) \
@@ -2035,8 +2040,12 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
 
 # Types and stuff
 SPLINTFLAGS := $(SPLINTFLAGS) \
+    +char-index \
+    +char-int \
     +enum-members \
     +ignore-signs \
+    +long-integral \
+    +match-any-integral \
 
 # TODO: Miscellaneous other flags
 SPLINTFLAGS := $(SPLINTFLAGS) \
@@ -2044,18 +2053,12 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
     +assignexpose \
     +continuecomment \
     +fielduse \
-    +longintegral \
-    +matchanyintegral \
     +match-fields \
     +nestedextern \
     +null \
     +nullret \
     +paramuse \
-    +readonlystrings \
     +shadow \
-    +strict-destroy \
-    +strict-use-released \
-    +use-released \
 
 # Other options we'd like to add back
 # +initallelements : Right now, the *.ops files don't initialize all
@@ -2078,7 +2081,7 @@ splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	+partial -memchecks \
-	src/p*.c \
+	src/packfile.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
