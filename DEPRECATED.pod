@@ -230,6 +230,10 @@ L<https://trac.parrot.org/parrot/ticket/156>
 
 L<https://trac.parrot.org/parrot/ticket/625>
 
+=item pobject_lives [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/664>
+
 =back
 
 =head1 Compiler tools

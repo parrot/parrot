@@ -456,6 +456,11 @@ int Parrot_gc_total_sized_buffers(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/api.c */
 
+/* DEPRECATED. pobject_lives is being renamed to Parrot_gc_mark_PObj_alive.
+   this macro is provided for compatibility until version 1.4 or later when
+   it can be removed per the deprecation policy. See TT #664 for details */
+#define pobject_lives Parrot_gc_mark_PObj_alive
+
 /* write barrier */
 #if PARROT_GC_MS
 #  define GC_WRITE_BARRIER(interp, agg, old, _new) do { } while (0)
