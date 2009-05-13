@@ -78,7 +78,7 @@ F<src/ops/experimental.ops> - only the C<trap> opcode remains
 
 L<https://trac.parrot.org/parrot/ticket/450>
 
-=item get_addr and set_addr [eligible in 1.4]
+=item get_addr and set_addr [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/218>
 
