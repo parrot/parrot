@@ -24,6 +24,12 @@ Variour helper builtins.
     .return ($S0)
 .end
 
+.sub 'defined'
+    .param pmc thing
+    $I0 = defined thing
+    .return ($I0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
