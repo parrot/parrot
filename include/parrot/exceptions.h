@@ -291,6 +291,11 @@ void Parrot_print_backtrace(void);
 
 #endif /* NDEBUG */
 
+#ifdef S_SPLINT_S
+#  define PARROT_ASSERT(x)
+#  define PARROT_ASSERT_ARG(x)
+#  define ASSERT_ARGS(a)
+#endif
 
 #endif /* PARROT_EXCEPTIONS_H_GUARD */
 
