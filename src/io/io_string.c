@@ -95,6 +95,8 @@ ParrotIOLayer pio_string_layer = {
 
 =item C<ParrotIOLayer * PIO_string_register_layer(void)>
 
+Get  a pointer to the C<pio_string_layer> structure.
+
 =cut
 
 */
@@ -111,6 +113,8 @@ PIO_string_register_layer(void)
 
 =item C<static size_t PIO_string_read(PARROT_INTERP, ParrotIOLayer *l,
 ParrotIO *io, STRING **buf)>
+
+Read a string from layer C<l> and store it in the specified buffer.
 
 =cut
 
@@ -131,6 +135,8 @@ PIO_string_read(SHIM_INTERP, ARGMOD(ParrotIOLayer *l), SHIM(ParrotIO *io), ARGOU
 /*
 
 =item C<static size_t PIO_string_write(PARROT_INTERP, ParrotIOLayer *l, ParrotIO *io, STRING *s)>
+
+Write the string C<s> to the layer C<l>.
 
 =cut
 

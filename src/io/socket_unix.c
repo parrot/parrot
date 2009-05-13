@@ -442,6 +442,9 @@ AGAIN:
 =item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr, const char*
 host, int port)>
 
+Get a new C<sockaddr_in> structure for the given PMC to connect to the
+specified host and port.
+
 =cut
 
 */
