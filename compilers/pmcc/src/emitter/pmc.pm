@@ -325,6 +325,7 @@ PIR q<
 #=cut
 
 method generate_c_file() {
+    self.pre_method_gen();
     my $res :=
           self.generate_c_file_functions()
         ~ self.generate_class_init();
@@ -340,12 +341,13 @@ method generate_c_file() {
 method generate_c_file_functions() {
     my $past    := self.past;
     my %vtables := self.vtables;
-
+    my $emitter := PMC::Emitter::C.new;
     my @res;
     for %vtables {
         my $entry := %vtables{$_};
         @res.push(self.generate_signature($entry, ""));
-        @res.push(PMC::Emitter::C.new.emit($past, $entry));
+        @res.push($emitter.emit($past, $entry));
+        @res.push("\n");
     }
 
     join('', @res);
@@ -431,6 +433,14 @@ method generate_signature($entry, $prefix) {
     @res.push(')');
 
     join('', @res);
+}
+
+=item C<pre_method_gen>
+
+Method for generating PMC-specific VTABLE functions. E.g. C<default> and C<null> implementations.
+
+=cut
+method pre_method_gen() {
 }
 
 method past() {
