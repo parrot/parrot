@@ -53,7 +53,6 @@
     $I0 = $P1
     delete $P1[$I0]
     $S0 = join '/', $P1
-    say $S0
     unshift pmc_paths, $S0
 
     set_hll_global ['PMC';'Emitter'], '@?pmc_path', pmc_paths
