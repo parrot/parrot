@@ -404,10 +404,11 @@ sub find_multi_functions {
 
     foreach my $method ( @{ $self->methods } ) {
         next unless $method->is_multi;
-        my $short_sig = $method->{MULTI_short_sig};
-        my $full_sig = $pmcname . "," . $method->{MULTI_full_sig};
+        my $short_sig    = $method->{MULTI_short_sig};
+        my $full_sig     = $pmcname . "," . $method->{MULTI_full_sig};
         my $functionname = 'Parrot_' . $pmcname . '_' . $method->name;
-        push @multi_names, [ $method->symbol, $short_sig, $full_sig, $functionname ];
+        push @multi_names, [ $method->symbol, $short_sig, $full_sig,
+                             $pmcname, $functionname ];
     }
     return ( \@multi_names );
 }
@@ -520,11 +521,14 @@ sub init_func {
     my $cache         = {};
 
     for my $multi (@$multi_funcs) {
-        my ($name, $ssig, $fsig, $func) = @$multi;
-        my ($name_str, $ssig_str, $fsig_str)     =
-            map { gen_multi_name($_, $cache) } ($name, $ssig, $fsig);
+        my ($name, $ssig, $fsig, $ns, $func) = @$multi;
+        my ($name_str, $ssig_str, $fsig_str, $ns_name)     =
+            map { gen_multi_name($_, $cache) } ($name, $ssig, $fsig, $ns);
 
-        for my $s ([$name, $name_str], [$ssig, $ssig_str], [$fsig,$fsig_str]) {
+        for my $s ([$name, $name_str],
+                   [$ssig, $ssig_str],
+                   [$fsig, $fsig_str],
+                   [$ns,   $ns_name ]) {
             my ($raw_string, $name) = @$s;
             next if $strings_seen{$name}++;
             $multi_strings .=  "        STRING *$name = "
@@ -535,6 +539,7 @@ sub init_func {
         { $name_str,
           $ssig_str,
           $fsig_str,
+          $ns_name,
           (funcptr_t) $func }
 END_MULTI_LIST
 

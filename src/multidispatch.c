@@ -1344,8 +1344,7 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         STRING   *sub_name  = mmd_info[i].multi_name;
         STRING   *long_sig  = mmd_info[i].full_sig;
         STRING   *short_sig = mmd_info[i].short_sig;
-        PMC      *type_list = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
-        STRING   *ns_name   = VTABLE_get_string_keyed_int(interp, type_list, 0);
+        STRING   *ns_name   = mmd_info[i].ns_name;
 
     /* Create an NCI sub for the C function */
         PMC    *sub_obj       = constant_pmc_new(interp, enum_class_NCI);
