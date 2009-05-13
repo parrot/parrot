@@ -1038,7 +1038,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
             header->uuid_size);
 
         /* NULL terminate */
-        header->uuid_data[header->uuid_size] = 0;
+        header->uuid_data[header->uuid_size] = '\0';
     }
     else
         /* Don't know this UUID type. */
@@ -2731,7 +2731,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
     /* find seg e.g. CODE_DB => CODE and attach it */
     code_name              = str_dup(debug->base.name);
     str_len                = strlen(code_name);
-    code_name[str_len - 3] = 0;
+    code_name[str_len - 3] = '\0';
     code                   = (PackFile_ByteCode *)PackFile_find_segment(interp,
                                 self->dir, code_name, 0);
 
