@@ -483,10 +483,9 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
-void PackFile_Annotations_add_group(PARROT_INTERP,
+void PackFile_Annotations_add_group(SHIM_INTERP,
     ARGMOD(PackFile_Annotations *self),
     opcode_t offset)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
@@ -853,8 +852,7 @@ void Parrot_trace_eprintf(ARGIN(const char *s), ...)
     || PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_PackFile_Annotations_add_group \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(self)
+       PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_PackFile_Annotations_new __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pf)

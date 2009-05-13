@@ -4301,7 +4301,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     /* Need to associate this segment with the applicable code segment. */
     code_name              = str_dup(self->base.name);
     str_len                = strlen(code_name);
-    code_name[str_len - 4] = 0;
+    code_name[str_len - 4] = '\0';
     code                   = (PackFile_ByteCode *)PackFile_find_segment(interp,
                                 self->base.dir, code_name, 0);
 
@@ -4401,7 +4401,7 @@ the new annotations group starts.
 */
 PARROT_EXPORT
 void
-PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
+PackFile_Annotations_add_group(SHIM_INTERP, ARGMOD(PackFile_Annotations *self),
         opcode_t offset)
 {
     ASSERT_ARGS(PackFile_Annotations_add_group)
