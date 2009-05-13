@@ -144,6 +144,7 @@ static opcode_t * directory_pack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*cursor);
 
+PARROT_WARN_UNUSED_RESULT
 static size_t directory_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
@@ -617,7 +618,7 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
     DECL_CONST_CAST;
     Parrot_sub *sub;
     int         todo    = 0;
-    int         pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
+    const int   pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
                                                   & ~SUB_FLAG_IS_OUTER;
     PMC_get_sub(interp, PARROT_const_cast(PMC *, sub_pmc), sub);
     if (!pragmas && !Sub_comp_INIT_TEST(sub))
@@ -2243,6 +2244,7 @@ C<default_packed_size()>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static size_t
 directory_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 {
