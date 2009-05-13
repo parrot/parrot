@@ -89,6 +89,11 @@ CODE
 /This is Parrot.*/
 OUTPUT
 
+}
+
+TODO: {
+local $TODO = 'Testing';
+
 pir_output_is( <<'CODE', <<'OUTPUT', 'open pipe for writing' );
 .include 'iglobals.pasm'
 
@@ -116,6 +121,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'open pipe for writing' );
   pipe = open command, 'wp'
   unless pipe goto failed
   pipe.'puts'("Hello, pipe!\n")
+  close pipe
   .return()
 failed:
   say 'FAILED'
