@@ -535,6 +535,9 @@ Parrot_mmd_arg_tuple_func(PARROT_INTERP)
 
 =item C<static INTVAL distance_cmp(PARROT_INTERP, INTVAL a, INTVAL b)>
 
+Compare distance values C<a> and C<b>. Return 1 if C<a> is larger, -1 if
+C<b> is.
+
 =cut
 
 */
@@ -793,6 +796,10 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 
 =item C<static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, PMC
 *sub_pmc)>
+
+Get the cached multisig of the given sub, if one exists. The cached signature
+might be in different formats, so put it into a type tuple like is expected
+by the rest of the MMD system.
 
 =cut
 

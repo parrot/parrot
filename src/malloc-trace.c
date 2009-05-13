@@ -52,8 +52,9 @@ RT#48264
 
 /*
 
-=item C<static void
-open_log_file()>
+=item C<static void open_log_file()>
+
+Open a logfile for storing debugging information.
 
 =cut
 
@@ -98,8 +99,9 @@ open_log_file()
 
 /*
 
-=item C<static void
-malloc_trace_destructor(void)>
+=item C<static void malloc_trace_destructor(void)>
+
+Print out a final timestamp and message to the log file.
 
 =cut
 
@@ -131,8 +133,9 @@ malloc_trace_destructor(void)
 
 /*
 
-=item C<static void
-malloc_segv_handler(int i, struct sigcontext_struct sc)>
+=item C<static void malloc_segv_handler(int i, struct sigcontext_struct sc)>
+
+Catch a segfault signal, print an error message, and end the logfile.
 
 =cut
 
@@ -151,8 +154,9 @@ malloc_segv_handler(int i, struct sigcontext_struct sc)
 
 /*
 
-=item C<static void
-malloc_record(int code, size_t size, void *ptr, void *ptr2)>
+=item C<static void malloc_record(int code, size_t size, void *ptr, void *ptr2)>
+
+Record information about the allocation into the logfile.
 
 =cut
 
@@ -197,6 +201,9 @@ void* _real_malloc(size_t bytes);
 
 =item C<void* malloc(size_t bytes)>
 
+Allocate memory with the specified size in bytes. Record information about it
+in the logfile.
+
 =cut
 
 */
@@ -221,6 +228,8 @@ void _real_free(void* mem);
 
 =item C<void free(void* mem)>
 
+Record information about the free in the logfile, and free the memory.
+
 =cut
 
 */
@@ -237,6 +246,8 @@ void* _real_realloc(void* mem, size_t bytes);
 /*
 
 =item C<void* realloc(void* mem, size_t bytes)>
+
+Resize the allocated memory buffer to the new size.
 
 =cut
 
@@ -257,6 +268,9 @@ void* _real_memalign(size_t alignment, size_t bytes);
 /*
 
 =item C<void* memalign(size_t alignment, size_t bytes)>
+
+Return an allocated memory buffer that's of at least the given size in bytes
+and is aligned along the given boundary.
 
 =cut
 
@@ -282,6 +296,8 @@ void* _real_calloc(size_t n, size_t elem_size);
 
 =item C<void* calloc(size_t n, size_t elem_size)>
 
+Allocate memory of the given size, initializing the memory to the given value.
+
 =cut
 
 */
@@ -305,6 +321,8 @@ void _real_cfree(void *mem);
 /*
 
 =item C<void cfree(void *mem)>
+
+free the given buffer, recording information about it in the log.
 
 =cut
 

@@ -485,6 +485,8 @@ static int sub_pragma(PARROT_INTERP,
 
 =item C<void Parrot_trace_eprintf(const char *s, ...)>
 
+Print out an error message. Passes arguments directly to C<vfprintf>.
+
 =cut
 
 */
