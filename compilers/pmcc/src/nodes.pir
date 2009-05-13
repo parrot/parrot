@@ -136,7 +136,7 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
     #search through all dirs in @pmc_path, looking for a file
     #named lc(pmcname) ~".dump"
 
-    pmc_path = get_hll_global ['PMC';'Compiler'], '@pmc_path'
+    pmc_path = get_hll_global ['PMC';'Emitter'], '@?pmc_path'
     dumpname = pmcname
     dumpname = downcase dumpname
     dumpname = concat dumpname,  '.dump'

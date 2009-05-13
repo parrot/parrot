@@ -36,7 +36,7 @@
     .param pmc adverbs :slurpy :named
 
     .local pmc pmc_filename
-    pmc_filename = get_hll_global ['PMC';'Compiler'], '$filename'
+    pmc_filename = get_hll_global ['PMC';'Emitter'], '$?filename'
 
     .local string base_filename, dump_filename, c_filename, h_filename
     .local string dump_contents, c_contents, h_contents
@@ -49,7 +49,9 @@
     #XXX: do something interesting here
 
 
+    .return (past)
 .end
+
 
 .sub 'evalfiles' :method
     .param pmc files
@@ -60,15 +62,15 @@
 
     $S0 = adverbs['pmc_path']
     $P0 = split ',', $S0
-    set_hll_global ['PMC';'Compiler'], '@pmc_path', $P0
+    set_hll_global ['PMC';'Emitter'], '@?pmc_path', $P0
 
     #TODO: DTRT if files is an array of filenames, although this isn't an expected use case
     $P0 = clone files
-    set_hll_global ['PMC';'Compiler'], '$filename', $P0
+    set_hll_global ['PMC';'Emitter'], '$?filename', $P0
 
     .local pmc super_evalfiles
     super_evalfiles = get_hll_global ['PCT';'HLLCompiler'], 'evalfiles'
-    .tailcall self.super_evalfiles(files, args, adverbs)
+    .tailcall self.'evalfiles'(files, args, adverbs)
 .end
 
 

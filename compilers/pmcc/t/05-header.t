@@ -12,7 +12,7 @@
 
     $P0 = new ['ResizableStringArray']
     $P0 = split ',', 't/data'
-    set_hll_global ['PMC';'Compiler'], '@pmc_path', $P0
+    set_hll_global ['PMC';'Emitter'], '@?pmc_path', $P0
 
     .local string filename
     filename = 't/data/class00.pmc'
@@ -49,7 +49,7 @@ STRUCT
 
     $P0 = new ['String']
     $P0 = filename
-    set_hll_global ['PMC';'Compiler'], '$filename', $P0
+    set_hll_global ['PMC';'Emitter'], '$?filename', $P0
 
     $S0 = _slurp(filename)
     (emitter, capture) = get_emitter_and_capture(filename, $S0, 'past')
@@ -64,7 +64,7 @@ STRUCT
 
     $P0 = new ['String']
     $P0 = filename
-    set_hll_global ['PMC';'Compiler'], '$filename', $P0
+    set_hll_global ['PMC';'Emitter'], '$?filename', $P0
     $S0 = _slurp(filename)
     attr_struct = 'parent_1\;.*parent_2\;.*parent_3\;.*child_1\;.*child_2\;.*child_3\;'
     check_one_header(filename, $S0, attr_struct, "parent/child ATTR ordering")

@@ -14,7 +14,7 @@
 
     $P0 = new ['ResizableStringArray']
     $P0 = split ',', 't/data'
-    set_hll_global ['PMC';'Compiler'], '@pmc_path', $P0
+    set_hll_global ['PMC';'Emitter'], '@?pmc_path', $P0
 
     filename = 't/data/class08.pmc'
     $S0 = _slurp(filename)
