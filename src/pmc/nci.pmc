@@ -178,13 +178,19 @@ Sets the specified function pointer and signature (C<*key>).
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         int                             jitted = 0;
-        char                     * const key_c = Parrot_str_to_cstring(INTERP, key);
 
         /* Store the original function and signature. */
         SET_ATTR_orig_func(INTERP, SELF, func);
-        nci_info->signature  = string_make(interp, key_c, strlen(key_c),
+
+        /* ensure that the STRING signature is constant */
+        if (!PObj_constant_TEST(key)) {
+            char * const key_c = Parrot_str_to_cstring(INTERP, key);
+            key                = string_make(interp, key_c, strlen(key_c),
                                     NULL, PObj_constant_FLAG);
-        Parrot_str_free_cstring(key_c);
+            Parrot_str_free_cstring(key_c);
+        }
+
+        nci_info->signature  = key;
         pcc_params(INTERP, key, nci_info);
 
         /* Arity is length of that string minus one (the return type). */
