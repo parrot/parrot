@@ -98,12 +98,14 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
 
 pmclass NCI need_ext {
     ATTR STRING    *signature;              /* The signature. */
-    ATTR void      *func;                   /* Function pointer to what we'll call. */
-    ATTR void      *orig_func;              /* Function pointer used to create func*/
+    ATTR void      *func;                   /* Function pointer to call. */
+    ATTR void      *orig_func;              /* Function pointer
+                                             * used to create func */
     ATTR STRING    *pcc_params_signature;   /* The signature. */
+    ATTR STRING    *long_signature;         /* The full signature. */
+    ATTR PMC       *multi_sig;              /* type tuple array (?) */
     ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
     ATTR INTVAL     jitted;                 /* Is this a jitted NCI stub. */
-    ATTR PMC       *multi_sig;              /* type tuple array (?) */
 
 /*
 
