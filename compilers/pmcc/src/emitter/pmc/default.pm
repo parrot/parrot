@@ -24,11 +24,11 @@ method pre_method_gen() {
         if !exists(%vtables, $_.name) {
             my $entry := PAST::Block.new(
                 :name($_.name),
+                :returns($_.returns),
             );
             # FIXME Ugly hack
             $entry<parameters> := PAST::Op.new(
                 PAST::Val.new(
-                    :returns(''),
                     :name($_<parameters>)
                 )
             );
