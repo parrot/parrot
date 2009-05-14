@@ -2633,19 +2633,8 @@ pf_debug_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
 {
     ASSERT_ARGS(pf_debug_packed_size)
     PackFile_Debug * const debug = (PackFile_Debug *)self;
-    int                    size = 0;
-    int i;
 
-    /* Size of mappings count. */
-    size += 1;
-
-    /* Size of entries in mappings list. */
-    for (i = 0; i < debug->num_mappings; i++) {
-        /* Bytecode offset and filename */
-        size += 2;
-    }
-
-    return size;
+    return (debug->num_mappings*2) + 1;
 }
 
 
