@@ -410,7 +410,6 @@ Parrot_io_poll_unix(SHIM_INTERP, ARGMOD(PMC *socket), int which, int sec,
     int usec)
 {
     ASSERT_ARGS(Parrot_io_poll_unix)
-    int n;
     fd_set r, w, e;
     struct timeval t;
     Parrot_Socket_attributes * io = PARROT_SOCKET(socket);
@@ -424,6 +423,7 @@ Parrot_io_poll_unix(SHIM_INTERP, ARGMOD(PMC *socket), int which, int sec,
     if (which & 4) FD_SET(io->os_handle, &e);
 AGAIN:
     if ((select(io->os_handle+1, &r, &w, &e, &t)) >= 0) {
+        int n;
         n = (FD_ISSET(io->os_handle, &r) ? 1 : 0);
         n |= (FD_ISSET(io->os_handle, &w) ? 2 : 0);
         n |= (FD_ISSET(io->os_handle, &e) ? 4 : 0);
