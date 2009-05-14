@@ -905,16 +905,29 @@
 
 
 ##    method quote($/, $key) {
-##        make PAST::Val.new( :node($/), :value(~($<string_literal>)) );
+##        if $key eq 'PIR' {
+##            make PAST::Op.new( :node($/), :inline(~($[0])) );
+##        }
+##        else {
+##            make PAST::Val.new( :node($/), :value(~($<string_literal>)) );
+##        }
 ##    }
 .sub 'quote' :method
     .param pmc match
     .param pmc key             :optional
     .local string value
+    unless key == 'PIR' goto quote_string
+  quote_pir:
+    $S0 = match[0]
+    $P0 = get_hll_global ['PAST'], 'Op'
+    $P1 = $P0.'new'('node'=>match, 'inline'=>$S0)
+    goto end
+  quote_string:
     $P0 = match['string_literal']
     value = $P0.'ast'()
     $P0 = get_hll_global ['PAST'], 'Val'
     $P1 = $P0.'new'('node'=>match, 'value'=>value)
+  end:
     match.'!make'($P1)
 .end
 

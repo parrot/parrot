@@ -338,11 +338,12 @@ token value {
 }
 
 token quote {
-    [ \'  <string_literal: '\''> \'
-    | '"' <string_literal: '"'> '"'
-    | 'q' <.ws> '<' <string_literal: '>'> '>'
+    [ \'  <string_literal: '\''> \' {*}                    #= string
+    | '"' <string_literal: '"'> '"' {*}                    #= string
+    | 'q' <.ws> '<' <string_literal: '>'> '>' {*}          #= string
+    | 'Q' <.ws> ':PIR' <.ws>
+        [:ratchet(0) '{{' (.*?) '}}' | '{' (.*?) '}' ] {*} #= PIR
     ]
-    {*}
 }
 
 
