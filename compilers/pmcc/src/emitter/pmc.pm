@@ -327,7 +327,8 @@ PIR q<
 method generate_c_code() {
     self.pre_method_gen();
     my $res :=
-          self.generate_c_functions()
+          self.past<c_header> ~ "\n\n"
+        ~ self.generate_c_functions()
         ~ self.generate_class_init();
 }
 
