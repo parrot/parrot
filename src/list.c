@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2002-2008, Parrot Foundation.
+Copyright (C) 2002-2009, Parrot Foundation.
 License:  Artistic 2.0, see README and LICENSE for details
 $Id$
 
@@ -396,11 +396,11 @@ rebuild_chunk_ptrs(ARGMOD(List *list), int cut)
 {
     ASSERT_ARGS(rebuild_chunk_ptrs)
     List_chunk *chunk, *prev;
-    UINTVAL len = 0, start = list->start;
-    UINTVAL cap;
+    UINTVAL start = list->start;
+    UINTVAL len = 0;
+    UINTVAL cap = 0;
 
-    cap = 0;
-    for (prev = 0, chunk = list->first; chunk; chunk = chunk->next) {
+    for (prev = NULL, chunk = list->first; chunk; chunk = chunk->next) {
         /* skip empty chunks, first is empty, when all items get skipped due
          * to list->start */
         if (chunk->items == start) {
@@ -424,10 +424,10 @@ rebuild_chunk_ptrs(ARGMOD(List *list), int cut)
         cap += chunk->items;
     }
     if (list->last)
-        list->last->next = 0;
+        list->last->next = NULL;
     list->cap = cap;
     if (list->first)
-        list->first->prev = 0;
+        list->first->prev = NULL;
     list->n_chunks = len;
 }
 
@@ -497,11 +497,11 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
                 mem_sys_memmove(
                         (char *) PObj_bufstart(&prev->data) +
                         prev->items * list->item_size,
-                        (char *) PObj_bufstart(&chunk->data),
+                        (const char *) PObj_bufstart(&chunk->data),
                         (MAX_ITEMS - prev->items) * list->item_size);
                 mem_sys_memmove(
                         (char *) PObj_bufstart(&chunk->data),
-                        (char *) PObj_bufstart(&chunk->data) +
+                        (const char *) PObj_bufstart(&chunk->data) +
                         (MAX_ITEMS - prev->items) * list->item_size,
                         (chunk->items - (MAX_ITEMS - prev->items))
                                                         * list->item_size);
@@ -517,7 +517,7 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
                 mem_sys_memmove(
                         (char *) PObj_bufstart(&prev->data) +
                         prev->items * list->item_size,
-                        (char *) PObj_bufstart(&chunk->data),
+                        (const char *) PObj_bufstart(&chunk->data),
                         chunk->items * list->item_size);
                 prev->items += chunk->items;
                 chunk->items = 0;
@@ -1476,9 +1476,9 @@ list_clone(PARROT_INTERP, ARGIN(const List *other))
     l = list_new(interp, other->item_type);
     STRUCT_COPY(l, other);
     PObj_buflen(&l->chunk_list) = 0;
-    PObj_bufstart(&l->chunk_list) = 0;
+    PObj_bufstart(&l->chunk_list) = NULL;
 
-    for (chunk = other->first, prev = 0; chunk; chunk = chunk->next) {
+    for (chunk = other->first, prev = NULL; chunk; chunk = chunk->next) {
         List_chunk * const new_chunk = allocate_chunk(interp, l,
                 chunk->items, PObj_buflen(&chunk->data));
         new_chunk->flags = chunk->flags;
@@ -1649,7 +1649,7 @@ list_set_length(PARROT_INTERP, ARGMOD(List *list), INTVAL len)
                 }
             }
 
-            list_append(interp, list, 0, list->item_type, idx);
+            list_append(interp, list, NULL, list->item_type, idx);
         }
         else {
             rebuild_chunk_ptrs(list, 1);
@@ -1892,7 +1892,7 @@ list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
     if (idx < list->cap - chunk->items) {
         list->cap -= chunk->items;
         chunk = list->last = chunk->prev;
-        chunk->next = 0;
+        chunk->next = NULL;
         if (list->n_chunks <= 2)
             list->first = list->last;
         rebuild_chunk_list(interp, list);
