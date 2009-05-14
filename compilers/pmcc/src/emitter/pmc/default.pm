@@ -60,22 +60,39 @@ C<Parrot_default_ro_get_vtable> functions.
 =cut
 
 method get_vtable_func() {
-    my %vtables := self.vtables;
-    my $past := self.past;
 
     my @res;
     @res.push('
 PARROT_EXPORT VTABLE* Parrot_default_get_vtable(PARROT_INTERP) {
 
     static const char attr_defs [] = "";
-'
+
+    const VTABLE temp_vtable = {
+        NULL,       /* namespace */
+        enum_class_default, /* base_type */
+        NULL,       /* whoami */
+        0, /* flags */
+        NULL,       /* provides_str */
+        NULL,       /* isa_hash */
+        NULL,       /* class */
+        NULL,       /* mro */
+        NULL,       /* attribute_defs */
+        NULL,       /* ro_variant_vtable */
+        '
     );
 
-#    for @vtables {
+    # For default we have all vtable functions. So, just iterate over all @vtables
+    my @vtables := PMC::VTableInfo::vtable_list();
+    my @tmp;
+    for @vtables {
 #        say("vtable " ~ $_.name ~ ' ' ~ $past<vtables>{$_.name});
-#    }
+        @tmp.push('Parrot_default_' ~ $_.name); 
+    }
+    @res.push(join(",\n        ", @tmp));
 
     @res.push('
+    };
+
     return Parrot_clone_vtable(interp, &temp_vtable);
 }
 '
