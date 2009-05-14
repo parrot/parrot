@@ -59,19 +59,22 @@ foreach my $branch (@branches) {
     }
     else {
         my @counts;
-        foreach my $author (sort keys %authors) {
+        foreach my $author (sort {$authors{$b} <=> $authors{$a}} keys %authors) {
             push @counts, "$author [$authors{$author}]";
         }
         $author_txt = join (', ', @counts);
     }
-    my $components = join (', ', sort keys %components);
+    my $components = join (', ', sort {lc $a cmp lc $b} keys %components);
     my $number_commits = scalar $t->root->children('logentry');
     my $initial_log = $oldest->first_child('msg')->xml_text;
     $initial_log =~ s/\s+$//;
     $initial_log =~ s/^\s+//;
+    $merge_log =~ s/\n/ /g;
+    $initial_log =~ s/\n/ /g;
 
-    my @lines = split /\n/, form
-'======================================================================',
+
+    print form
+'+====================================================================+',
 '|        branch: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
                   $branch,
 '|     revisions: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
@@ -88,21 +91,15 @@ foreach my $branch (@branches) {
                   $components,
 '|  # of commits: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
                   $number_commits,
-'|   initial log: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<:} |',
+{bullet => 'initial log:'},
+'|   initial log: {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
                   $initial_log,
-'|                {:<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
-                  $initial_log,
-'|last merge log: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<:} |',
-                  $merge_log,
-'|                {:<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
+{bullet => 'last merge log:'},
+'|last merge log: {[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[} |',
                   $merge_log;
-
-    # There is no doubt a way to achieve this effect with just the form.
-    @lines = grep {! /^\|\s+\|/} @lines;
-    say join("\n", @lines);
 }
 
-say '=' x 70;
+say '+', '=' x 68, '+';
 
 __END__
 
