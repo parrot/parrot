@@ -16,6 +16,9 @@ method pmc($/, $key) {
             :name(~$<identifier>),
             :node($/)
         );
+
+        # Save c_header.
+        $?PMC<c_header> := substr($/.orig, 0, $/.from);
     }
     else {
         # TODO Set c_header and c_coda
