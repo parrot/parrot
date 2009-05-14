@@ -43,6 +43,14 @@ Variour helper builtins.
     .return ($P0)
 .end
 
+.sub 'substr'
+    .param string orig
+    .param int    from
+    .param int    len
+    $S0 = substr orig, from, len
+    .return ($S0)
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
