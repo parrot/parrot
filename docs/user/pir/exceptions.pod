@@ -10,8 +10,8 @@ If you're going to be using exceptions, you probably want to start by
 including two pasm files that define constants for exception type and
 severity.
 
-    .include 'include/except_types.pasm'
-    .include 'include/except_severity.pasm'
+    .include 'except_types.pasm'
+    .include 'except_severity.pasm'
 
 You create exceptions just like you create any other object, with
 C<new>.
@@ -38,8 +38,8 @@ Put all together, it looks like this:
 
 =head3 Throw Example
 
-    .include 'include/except_types.pasm'
-    .include 'include/except_severity.pasm'
+    .include 'except_types.pasm'
+    .include 'except_severity.pasm'
     .local pmc ex
     ex = new 'Exception'
     ex = "Everything is horrible, dood."
@@ -90,7 +90,7 @@ an appropriate log message before exiting.
 
 =begin PIR
 
-    .include 'include/except_severity.pasm'
+    .include 'except_severity.pasm'
 
     .sub 'dostuff'
         .local pmc eh

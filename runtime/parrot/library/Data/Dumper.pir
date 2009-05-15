@@ -9,7 +9,7 @@
     goto END
 
   load_library:
-        load_bytecode "Data/Dumper/Default.pir"
+        load_bytecode "Data/Dumper/Default.pbc"
         newclass $P0, "Data::Dumper"
 END:
     .return ()

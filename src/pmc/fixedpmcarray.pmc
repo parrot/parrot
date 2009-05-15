@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -23,8 +23,6 @@ never be set for user arrays.
 =cut
 
 */
-
-#include "parrot/parrot.h"
 
 #define PMC_size(x)  ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x) ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->pmc_array
@@ -338,7 +336,7 @@ Returns the PMC value of the element at index C<*key>.
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        const INTVAL k        = key_integer(INTERP, key);
+        const INTVAL k        = VTABLE_get_integer(INTERP, key);
         PMC   * const nextkey = key_next(INTERP, key);
         PMC   *box;
 
@@ -474,7 +472,7 @@ C<value>.
 */
 
     VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
-        const INTVAL k        = key_integer(INTERP, key);
+        const INTVAL k        = VTABLE_get_integer(INTERP, key);
         PMC   * const nextkey = key_next(INTERP, key);
 
         if (nextkey == NULL) {
@@ -563,7 +561,7 @@ Sets the PMC at index C<key> to C<value>.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
-        const INTVAL k = key_integer(INTERP, key);
+        const INTVAL k = VTABLE_get_integer(INTERP, key);
         PMC   *nextkey = key_next(INTERP, key);
 
         if (!nextkey) {
@@ -685,7 +683,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) {
-        const INTVAL ix = key_integer(INTERP, key);
+        const INTVAL ix = VTABLE_get_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
 
@@ -800,7 +798,7 @@ Mark the array.
 
         for (i = PMC_size(SELF) - 1; i >= 0; --i)
             if (data[i])
-                pobject_lives(interp, (PObj *)data[i]);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)data[i]);
     }
 
 

@@ -30,7 +30,7 @@ pir_output_is( <<'CODE', <<'OUT', "bracketed" );
     .local pmc bracketed
 
     load_bytecode 'PGE.pbc'
-    load_bytecode 'PGE/Text.pir'
+    load_bytecode 'PGE/Text.pbc'
 
     bracketed = get_global ['PGE';'Text'], "bracketed"
 

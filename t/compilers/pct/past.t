@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -14,7 +14,7 @@ foreach my $name (qw(Node Val Var Op Block Stmts)) {
     my $code   = <<'CODE'
 .sub _main :main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     .local pmc node2
 CODE
@@ -51,7 +51,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Val node in visual format' );
 .sub _main :main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     node = new ['PAST';'Val']
     node.'value'(1)
@@ -78,7 +78,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Var node in visual format' );
 .sub _main :main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     node = new ['PAST';'Var']
     node.'scope'('foo')
@@ -98,7 +98,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Op node in visual format' );
 .sub _main :main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     node = new ['PAST';'Op']
     node.'pasttype'('pirop')
@@ -120,7 +120,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'dump PAST::Block node in visual format' );
 .sub _main :main
     load_bytecode 'PCT.pbc'
-    load_bytecode 'library/dumper.pbc'
+    load_bytecode 'dumper.pbc'
     .local pmc node
     node = new ['PAST';'Block']
     node.'blocktype'('declaration')

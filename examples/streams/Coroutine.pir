@@ -26,11 +26,11 @@ Creates a coroutine stream and dumps it.
     .local pmc stream
     .local pmc temp
 
-    load_bytecode "library/Stream/Base.pbc"
-    load_bytecode "library/Stream/Coroutine.pbc"
+    load_bytecode "Stream/Base.pbc"
+    load_bytecode "Stream/Coroutine.pbc"
 
     # create the coroutine stream
-    stream = new "Stream::Coroutine"
+    stream = new ['Stream'; 'Coroutine']
 
     # set the stream's source coroutine
     # A .Sub is a coroutine when there is a yield?
@@ -84,7 +84,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

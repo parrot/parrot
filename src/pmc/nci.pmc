@@ -18,8 +18,6 @@ The vtable functions for the native C call functions.
 
 */
 
-#include "parrot/parrot.h"
-
 typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 typedef INTVAL (*nci_jit_sub_t)(PARROT_INTERP, PMC *, char *);
 
@@ -98,12 +96,14 @@ void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_in
 
 pmclass NCI need_ext {
     ATTR STRING    *signature;              /* The signature. */
-    ATTR void      *func;                   /* Function pointer to what we'll call. */
-    ATTR void      *orig_func;              /* Function pointer used to create func*/
+    ATTR void      *func;                   /* Function pointer to call. */
+    ATTR void      *orig_func;              /* Function pointer
+                                             * used to create func */
     ATTR STRING    *pcc_params_signature;   /* The signature. */
+    ATTR STRING    *long_signature;         /* The full signature. */
+    ATTR PMC       *multi_sig;              /* type tuple array (?) */
     ATTR INTVAL     arity;                  /* Cached arity of the NCI. */
     ATTR INTVAL     jitted;                 /* Is this a jitted NCI stub. */
-    ATTR PMC       *multi_sig;              /* type tuple array (?) */
 
 /*
 
@@ -178,13 +178,19 @@ Sets the specified function pointer and signature (C<*key>).
     VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         int                             jitted = 0;
-        char                     * const key_c = Parrot_str_to_cstring(INTERP, key);
 
         /* Store the original function and signature. */
         SET_ATTR_orig_func(INTERP, SELF, func);
-        nci_info->signature  = string_make(interp, key_c, strlen(key_c),
+
+        /* ensure that the STRING signature is constant */
+        if (!PObj_constant_TEST(key)) {
+            char * const key_c = Parrot_str_to_cstring(INTERP, key);
+            key                = string_make(interp, key_c, strlen(key_c),
                                     NULL, PObj_constant_FLAG);
-        Parrot_str_free_cstring(key_c);
+            Parrot_str_free_cstring(key_c);
+        }
+
+        nci_info->signature  = key;
         pcc_params(INTERP, key, nci_info);
 
         /* Arity is length of that string minus one (the return type). */
@@ -210,9 +216,9 @@ Mark any referenced strings and PMCs.
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
             if (nci_info->signature)
-                pobject_lives(interp, (PObj*)nci_info->signature);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->signature);
             if (nci_info->pcc_params_signature)
-                pobject_lives(interp, (PObj*)nci_info->pcc_params_signature);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)nci_info->pcc_params_signature);
         }
     }
 

@@ -2,32 +2,30 @@
 
 =head1 Grammar Engine
 
-X<Parrot Grammar Engine> 
-X<PGE (Parrot Grammar Engine)> 
+X<Parrot Grammar Engine>
+X<PGE (Parrot Grammar Engine)>
 The Parrot Grammar Engine (PGE) is a parser generator, one of the key
-components of the Parrot Compiler Toolkit. It reads grammar files
-written in the PGE rules format, and generates parser modules for the
-syntax specified by those rules. PGE rules provide the full power of
-recursive descent parsing and operator precedence parsing, but are
-comfortably useful even if you don't know anything about parsing theory.
-In the usual case, all you'll ever need to know is that rules are
-patterns for matching text.
+components of the Parrot Compiler Toolkit. It reads grammar files written in
+the PGE rules format and generates parser modules.  PGE rules provide the full
+power of recursive descent parsing and operator precedence parsing, but are
+usable even if you don't know exactly what that means.  All you'll need to know
+to start is that rules are patterns for matching text.
 
 =head2 Grammars
 
 A grammar is a collection of rules, in much the same way that a class is a
-collection of methods.N<In fact, a grammar is just a special kind of class
-and a rule is just a special kind of method.> Each rule defines a pattern for
-matching one piece of text. The basic matching syntax for rules is likely to
-be somewhat familiar to anyone who has worked with regular expressions.
+collection of methods.N<A grammar is a special kind of class and a rule is a
+special kind of method.> Each rule defines a pattern for matching one unit of
+text. The basic matching syntax for rules is familiar to anyone who has worked
+with regular expressions:
 
   rule id { \d+ }
 
-Larger rules are composed from smaller rules:
+Smaller rules can combine into larger rules:
 
   rule record { <id> <name> <phone> }
 
-And a grammar holds a group of rules that work together:
+A grammar contains a group of rules that work together:
 
   grammar Contacts;
 
@@ -41,56 +39,67 @@ And a grammar holds a group of rules that work together:
 
 =head3 Rules and Tokens
 
-There are two different kinds of rules, each declared with a different keyword:
-C<rule> or C<token>. A C<rule> does smart whitespace matching between the
-various pieces of the pattern. So, the C<record> rule above would match
-"6355 John" or "6355      John" but not "6355John".
+X<rule>
+X<token>
+There are two different kinds of rules: C<rule> or C<token>. A C<rule> performs
+smart whitespace matching between the various pieces of the pattern. The
+C<record> rule given previously would match "6355 John" or "6355      John" but
+not "6355John".
 
-A C<token> only matches whitespace if you specifically request it. To get the
-same effect with a token, you'd have to add a C<\s> pattern to the rule:
+A C<token> matches whitespace only if you specifically request it. To get the
+same effect with a token, add the C<\s> (match a space character) and C<+>
+(match the preceding atom -- the space character, in this case -- one or more
+times) pattern to the rule:
 
   token record { <id> \s+ <name> }
 
 =head3 The Start Rule
 
-A recursive descent parser is a top-down parser. This means it starts at the
-highest-level rule and works its way down through individual rules to match
-an entire string or file. In PGE, this top-level rule is called C<TOP> by
-convention.N<In "real" Perl 6, the top-level rule can be called anything.
-However, some of the PCT compiler tools expect it to be called C<TOP>.
-Compilers written with PCT should just use the name C<TOP> for all top-level
-tokens.>
+X<top>
+X<top-down parser>
+A recursive descent parser is a top-down parser. It starts at the highest-level
+rule and works its way down through individual rules to match an entire string
+or file. PGE convention calls this top-level rule C<TOP>N<Perl 6 allows any
+name for the top-level rule, but PCT expects a rule called C<TOP>.>.
 
   rule TOP { <record> }
 
 This rule matches a single record in a string or file. Once the parser has
-matched the entire string or file passed to the start rule, the parse is
-considered successful and a raw parse tree is returned.
+succeeded in matching the entire string or file passed to the start rule, it
+returns a parse tree.
 
 =head3 Testing a Grammar
 
-You might want to try out the examples in this chapter as you read along.
-To compile the following simple example, save it to a file called
-F<Contacts.pg>:
+Save this example to a file called F<Contacts.pg>:
 
   grammar Contacts is PGE::Grammar;
+
   rule  TOP    { <record> }
   rule  record { <id> <name> }
   token name   { 'John' | 'Bob ' | 'Fred' }
   token id     { \d+ }
 
-Then compile the grammar with the following command:
+Then compile the grammar:
 
-  $ parrot Perl6Grammar.pbc --output=Contacts.pir Contacts.pg
+  $ B<parrot Perl6Grammar.pbc --output=Contacts.pir Contacts.pg>
+
+=for author
+
+Assume an installed Parrot for all examples?  Anyone working from the source
+tree should be able to mangle paths appropriately.
+
+=end for
 
 The path to F<parrot> and to the F<Perl6Grammar.pbc> file will vary on
 different systems. If you compiled Parrot from source, it will be:
 
-  $ ./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc \
-        --output=Contacts.pir Contacts.pg
+  $ B<./parrot runtime/parrot/library/PGE/Perl6Grammar.pbc \>
+        B<--output=Contacts.pir Contacts.pg>
 
-Next, create a small PIR script to run your grammar. You can save it as
-F<grammar_test.pir>.
+Next, create a small PIR script to run your grammar. Save it as
+F<grammar_test.pir>:
+
+=begin PIR
 
   .sub main :main
       load_bytecode 'PGE.pbc'        # load some required modules
@@ -100,18 +109,21 @@ F<grammar_test.pir>.
       load_bytecode 'Contacts.pir'   # load your grammar
 
       .local string source
-      .local pmc top, grammar, match
+      source  = "3 John"
 
-      source = "3 John"
-      top = get_hll_global ['Contacts'], 'TOP'
+      .local pmc top, grammar, match
+      top     = get_hll_global ['Contacts'], 'TOP'
       grammar = get_class 'Contacts'
-      match = top(source, 'grammar' => grammar)
+      match   = top(source, 'grammar' => grammar)
+
       _dumper(match, "match")
   .end
 
-Now, you can run the test script with this command:
+=end PIR
 
-  $ parrot grammar_test.pir
+Run the test script:
+
+  $ B<parrot grammar_test.pir>
 
 It will print out a text representation of the raw parse tree stored in the
 C<match> variable:
@@ -123,52 +135,48 @@ C<match> variable:
       }
   }
 
-Each rule in the grammar corresponds to a node in the tree. This output shows
-that the top-level match variable contains one child named "record", that
-"record" contains two children named "id" and "name", and that "id" contains
-the number 3, and "name" contains the string "John". Exactly what we would
-expect from our simple grammar.
+Each node in the tree corresponds to a rule in the grammar.  The top-level
+match variable contains one child named C<record>, which contains two children
+named C<id> and C<name>.  C<id> contains the number 3, and C<name> contains the
+string "John". This is exactly what the simple grammar should have matched.
 
 =head2 Rule Syntax
 
-Every language has a set of basic components (words or parts of words)
-and syntax conventions for combining them. The "words" in rules are
-literal characters or symbols, some X<metacharacters> metacharacters
-(or metasymbols),  and X<rules;escape sequences>X<escape sequences,
-rules> escape sequences, while the combining syntax includes other
-metacharacters, X<quantifiers, rules> X<rules;quantifiers> quantifiers,
-bracketing characters, and assertions.
+Every language has a set of basic components (words or parts of words) and
+syntax conventions for combining them. The "words" in rules are literal
+characters or symbols, some X<metacharacters> metacharacters (or metasymbols),
+and X<rules;escape sequences>X<escape sequences, rules> escape sequences, while
+the combining syntax includes other metacharacters, X<quantifiers, rules>
+X<rules;quantifiers> quantifiers, bracketing characters, and assertions.
 
 =head3 Metacharacters
 
-The C<.> matches any single character, even a newline character. The C<^> and
-C<$> metacharacters are zero-width matches on the beginning and end of a
-string. They each have doubled alternates C<^^> and C<$$> that match at the
-beginning and end of every line within a string.
+The C<.> metacharacter matches any single character, even a newline character.
+The C<^> and C<$> metacharacters are zero-width matches which represent the
+beginning and end of a string. They each have doubled alternates C<^^> and
+C<$$> that match at the beginning and end of every (newline-delimited) line
+within a string.
 
-The C<|>, C<&>, C<\>, C<#>, and C<:=> metacharacters are all syntax
-structure elements. The C<|> is an alternation between two options. The
-C<&> matches two patterns simultaneously (the patterns must be the same
-length). The C<\> turns literal characters into metacharacters (the
-escape sequences). The C<#> marks a comment to the end of the line. You can
-start a comment at any point on any line in a rule. The C<:=> binds a
-hypothetical variable to the result of a subrule or grouped pattern.
-Hypotheticals are covered in L<Hypothetical Variables> later in this chapter.
+The C<|>, C<&>, C<\>, C<#>, and C<:=> metacharacters are all syntax structure
+elements. C<|> alternates between two options. C<&> matches two patterns
+simultaneously (the patterns must be the same length). C<\> turns literal
+characters into metacharacters (producing escape sequences). C<#> starts a
+comment which proceeds until the end of the line. You can start a comment at
+any point on any line in a rule. C<:=> binds a hypothetical variable to the
+result of a subrule or grouped pattern (see L<Hypothetical Variables>).
 
-The metacharacters C<()>, C<[]>, C<{}> and C<E<lt>E<gt>> are bracketing
-pairs. The pairs always have to be balanced within the rule, unless they
-are literal characters (escaped with a C<\>). The C<()> and C<[]> pairs
-group patterns to match as a single atom. They're often used to
-capture a result, mark the boundaries of an alternation, or mark a group
-of patterns with a quantifier. Parentheses C<()> are
-capturing and square brackets C<[]> are non-capturing. The C<{}>
-brackets define a section of code (a closure) within a rule. These
-closures are always a successful zero-width match. The C<E<lt>...E<gt>> brackets
-mark assertions, which handle a variety of constructs including
-character classes and user-defined quantifiers. Assertions are covered
-in L<Assertions> later in this chapter.
+The metacharacters C<()>, C<[]>, C<{}> and C<E<lt>E<gt>> are bracketing pairs.
+Bracketing pairs must always be balanced within the rule; to use a literal
+character, escape it with a C<\>.  The C<()> and C<[]> pairs group patterns as
+a single atom. They often capture a result, mark the boundaries of an
+alternation, or mark a group of patterns with a quantifier. Parentheses C<()>
+capture, but square brackets C<[]> do not. The C<{}> brackets define a section
+of code (a closure) within a rule. These closures are always a successful
+zero-width match. The C<E<lt>...E<gt>> brackets mark assertions, which handle a
+variety of constructs including character classes and user-defined quantifiers
+(see L<Assertions>).
 
-Table 7-2 summarizes the basic set of metacharacters.
+Table 7-2 summarizes the basic metacharacters.
 
 =begin table picture Metacharacters
 
@@ -209,14 +217,14 @@ X<$ (dollar sign);$ end of string (rules)>
 
 =cell C<^^>
 
-=cell Match the beginning of a line.
+=cell Match the beginning of a line within the string.
 X<^ (caret);^^ beginning of line (rules)>
 
 =row
 
 =cell C<$$>
 
-=cell Match the end of a line.
+=cell Match the end of a line within the string.
 X<$ (dollar sign);$$ end of line (rules)>
 
 =row
@@ -279,7 +287,6 @@ X<: (colon);:= (binding);in rules>
 
 =end table
 
-
 =head3 Escape Sequences
 
 Z<CHP-7-SECT-2.2>
@@ -287,19 +294,21 @@ Z<CHP-7-SECT-2.2>
 X<escape sequences, rules>
 X<rules;escape sequences>
 X<\ (backslash);\ escape sequences (rules)>
-The escape sequences are literal characters acting as metacharacters,
-marked with the C<\> escape. Some escape sequences represent single
-characters that are difficult to represent literally, like C<\t> for
-tab, or C<\x[...]> for a character specified by a hexadecimal number.
-Some represent limited character classes, like C<\d> for digits or C<\w>
-for word characters. Some represent zero-width positions in a match,
-like C<\b> for a word boundary. With all the escape sequences that use
-brackets, C<()>, C<{}>, and C<E<lt>E<gt>> work in place of C<[]>.
+
+Escape sequences are literal characters acting as metacharacters.  A preceding
+backslash (C<\>) identifies them as escapes. Some escape sequences represent
+single characters that are difficult to represent literally, such as C<\t> for
+tab, or C<\x[...]> to specify a character by its hexadecimal number.  Some
+represent limited character classes, such as C<\d> for digits or C<\w> for word
+characters. Some represent zero-width positions in a match, such as C<\b> for a
+word boundary.
 
 X<variable interpolation in rules>
 X<rules;variable interpolation>
-Note that since an ordinary variable now interpolates as a literal
-string by default, the C<\Q> escape sequence is rarely needed.
+If you've used Perl 5 regexps, you may remember the C<\Q> escape sequence which
+treats everything until the following C<\E> sequence as literal text,
+containing no escape sequences.  Because ordinary variables now interpolate as
+literal strings by default, the C<\Q> escape sequence is rarely needed.
 
 A<CHP-7-TABLE-3>Table 7-3 shows the escape sequences for rules.
 
@@ -477,7 +486,8 @@ Z<CHP-7-TABLE-3>
 
 =cell C<\w>
 
-=cell Match a word character (Unicode alphanumeric plus "_").
+=cell Match a word character (Unicode alphanumeric characters plus the
+underscore C<_>).
 
 =row
 
@@ -505,21 +515,21 @@ optional).
 Z<CHP-7-SECT-2.3>
 
 Quantifiers specify the number of times an atom (a single character,
-metacharacter, escape sequence, grouped pattern, assertion, etc) will
-match.
+metacharacter, escape sequence, grouped pattern, assertion, etc) will match.
 
 X<. (dot);.. (range);quantifier (rules)>
 X<. (dot);... (infinite range);quantifier (rules)>
-The numeric quantifiers use assertion syntax. A single number
-(C<E<lt>3E<gt>>) requires exactly that many matches. A numeric range
-quantifier (C<E<lt>3C<..>5E<gt>>) succeeds if the number of matches is
-between the minimum and maximum numbers. A range with three trailing
-dots (C<E<lt>2...E<gt>>) is shorthand for C<E<lt>R<n>..InfE<gt>> and
-matches as many times as possible.
+The numeric quantifiers use assertion syntax. A single number (C<E<lt>3E<gt>>)
+requires exactly that many matches. A numeric range quantifier
+(C<E<lt>3C<..>5E<gt>>) succeeds if the number of matches is between the minimum
+and maximum numbers, inclusive. A range with three trailing dots
+(C<E<lt>2...E<gt>>) is shorthand for C<E<lt>R<n>..InfE<gt>>; it matches as many
+times as possible.
 
-Each quantifier has a minimal alternate form, marked with a trailing
-C<?>, that matches the shortest possible sequence first.
-
+Each quantifier has a minimal alternate form -- marked with a trailing C<?> --
+which matches the shortest possible sequence first.  That is, given the string
+C<aaaaaa>, C<aE<lt>3C<..>5E<gt>> will match C<aaaaa> and C<aE<lt>3C<..>5E<gt>?>
+will match C<aaa>.
 
 A<CHP-7-TABLE-4>Table 7-4 shows the built-in
 X<quantifiers, rules> X<rules;quantifiers> quantifiers.
@@ -590,54 +600,53 @@ Z<CHP-7-TABLE-4>
 
 =end table
 
-
 =head3 Assertions
 
 Z<CHP-7-SECT-2.4>
 
 X<assertions, rules>
 X<rules;assertions>
-In general, an assertion simply states that some condition or state is
-true and the match fails when that assertion is false. Many different
-constructs with many different purposes use assertion syntax.
+An assertion states that some condition or state is true. The match fails when
+that assertion is false.
 
 X<variable interpolation in rules>
 X<rules;variable interpolation>
+
 Assertions match named and anonymous rules, arrays or hashes containing
-anonymous rules, and subroutines or closures that return anonymous
-rules. You have to enclose a variable in assertion delimiters to get it
-to interpolate as an anonymous rule or rules. A bare scalar in a pattern
+anonymous rules, and subroutines or closures that return anonymous rules.
+
+To interpolate a variable in assertion rules, enclose it in assertion
+delimiters.
+A bare scalar in a pattern
 interpolates as a literal string, while a scalar variable in assertion
 brackets interpolates as an anonymous rule. A bare array in a pattern
 matches as a series of alternate literal strings, while an array in
 assertion brackets interpolates as a series of alternate anonymous
-rules. In the simplest case, a bare hash in a pattern matches a word
-(C<\w+>) and tries to find that word as one of its keys.N<The effect is
-much as if it matched the keys as a series of alternates, but you're
-guaranteed to match the longest possible key, instead of just the first
-one it hits in random order.>, while a hash in assertion brackets does
-the same, but then also matches the associated value as an anonymous
-rule.
+rules.
+
+A bare hash in a pattern matches a word (C<\w+>) if and only if that word is
+one of its keysN<The effect is similar to matching the keys as a series of
+alternates, but it prefers to match the longest possible key, instead of the
+first potential match.>, while a hash in assertion brackets also matches the
+associated value as an anonymous rule.
 
 X<fail keyword>
-A bare closure in a pattern always matches (unless it calls C<fail>),
-but a closure in assertion brackets C<E<lt>{...}E<gt>> must return an
-anonymous rule, which is immediately matched.
+A bare closure in a pattern always matches (unless it calls C<fail>), but a
+closure in assertion brackets C<E<lt>{...}E<gt>> must return an anonymous rule
+to match.
 
-An assertion with parentheses C<E<lt>(...)E<gt>> is similar to a bare
-closure in a pattern in that it allows you to include straight Perl code
-within a rule. The difference is that C<E<lt>(...)E<gt>> evaluates the
-return value of the closure in boolean context. The match succeeds if
-the return value is true and fails if the return value is false.
+An assertion with parentheses C<E<lt>(...)E<gt>> resembles a bare closure in a
+pattern in that it allows you to include Perl code within a rule.
+C<E<lt>(...)E<gt>> evaluates the return value of the closure in boolean
+context. The match succeeds or fails based on that return value.
 
-Assertions match character classes, both named and enumerated. A named
-rule character class is often more accurate than an enumerated character
-class. For example, C<E<lt>[a-zA-Z]E<gt>> is commonly used to match
-alphabetic characters, but generally what's really needed is the
-built-in rule C<E<lt>alphaE<gt>> which matches the full set of Unicode
-alphabetic characters.
+Assertions match character classes, both named and enumerated. A named rule
+character class is often more accurate than an enumerated character class. The
+common C<E<lt>[a-zA-Z]E<gt>> idiom matches ASCII alphabetic characters, but the
+more comprehensive built-in rule C<E<lt>alphaE<gt>> matches the full set of
+Unicode alphabetic characters.
 
-A<CHP-7-TABLE-5>Table 7-5 shows the syntax for assertions.
+A<CHP-7-TABLE-5>Table 7-5 shows the syntax of assertions.
 
 =begin table picture Assertions
 
@@ -718,8 +727,7 @@ result.
 
 =cell C<E<lt>%hashE<gt>>
 
-=cell Match a key from the hash, then its value (which is an anonymous
-rule).
+=cell Match a key from the hash, then its value (as an anonymous rule).
 
 =row
 
@@ -741,73 +749,65 @@ rule).
 
 =end table
 
-
 =head3 Modifiers
 
 Z<CHP-7-SECT-2.5>
 
 X<modifiers>
 X<: (colon);: modifier delimiter in rules>
-Modifiers alter the meaning of the pattern syntax. The standard
-position for modifiers is at the beginning of the rule, right after
-the C<m>, C<s>, or C<rx>, or after the name in a named rule. Modifiers
-cannot attach to the outside of a bare C</.../>. For example:
+Modifiers alter the meaning of a pattern. The standard position for modifiers
+is at the beginning of the rule, right after the C<m>, C<s>, or C<rx>, or after
+the name in a named rule. Modifiers cannot attach to the outside of a bare
+C</.../>. For example:
 
   m:i/marvin/ # case insensitive
   rule names :i { marvin | ford | arthur }
 
-The single-character modifiers can be grouped, but the others must be
-separated by a colon:
+You may group single-character modifiers, but you must separate longer
+modifiers by colons:
 
   m:wig/ zaphod /                        # OK
   m:words:ignorecase:globally / zaphod / # OK
   m:wordsignorecaseglobally / zaphod /   # Not OK
 
-Most of the modifiers can also go inside the rule, attached to the
-rule delimiters or to grouping delimiters. Internal modifiers are
-lexically scoped to their enclosing delimiters, so you get a temporary
-alteration of the pattern:
+Most modifiers can also appear inside the rule when attached to rule or
+grouping delimiters. Internal modifiers are lexically scoped to their enclosing
+delimiters, so can alter subpatterns:
 
   m/:w I saw [:i zaphod] / # only 'zaphod' is case insensitive
 
-The repetition modifiers (C<:R<N>x>, C<:R<N>th>, C<:once>,
-C<:globally>, and C<:exhaustive>) and the continue modifier (C<:cont>)
-can't be lexically scoped, because they alter the return value of the
-entire rule.
+The repetition modifiers (C<:R<N>x>, C<:R<N>th>, C<:once>, C<:globally>, and
+C<:exhaustive>) and the continue modifier (C<:cont>) alter the return value of
+the rule as a whole, so you cannot use them lexically inside a rule.
 
-The C<:R<N>x> modifier matches the rule a counted number of times. If
-the modifier expects more matches than the string has, the match fails.
-It has an alternate form C<:x(R<N>)> that can take a variable in place
-of the number.
+The C<:R<N>x> modifier matches the rule a specific number of times. If the
+modifier expects more matches than the string has, the match fails.  Its
+alternate form (C<:x(R<N>)>) can take a variable in place of the number.
 
-The C<:once> modifier on a rule only allows it to match once. The rule
-will not match again until the you call the C<.reset> method on the rule
-object.
+The C<:once> modifier on a rule only allows it to match once. The rule will not
+match again until the you call the C<.reset> method on the rule object.
 
-The C<:globally> modifier matches as many times as possible. The
-C<:exhaustive> modifier also matches as many times as possible, but in
-as many different ways as possible.
+The C<:globally> modifier matches as many times as possible. The C<:exhaustive>
+modifier also matches as many times as possible, in as many different ways as
+possible.
 
-The C<:R<N>th> modifier preserves one result from a particular counted
-match. If the rule matches fewer times than the modifier expects, the
-match fails. It has several alternate forms. One form--C<:th(R<N>)>--can
-take a variable in place of the number. The other forms--C<:R<N>st>,
-C<:R<N>nd>, and C<:R<N>rd>--are for cases where it's more natural to
-write C<:1st>, C<:2nd>, C<:3rd> than it is to write C<:1th>, C<:2th>,
-C<:3th>. Either way is valid, so pick the one that's most comfortable
-for you.
+The C<:R<N>th> modifier preserves one result from a particular counted match.
+If the rule matches fewer times than the modifier expects, the match fails. It
+has several alternate forms. One form, C<:th(R<N>)>, takes a variable in place
+of the number. The other forms -- C<:R<N>st>, C<:R<N>nd>, and C<:R<N>rd> --
+allow you to write more naturally C<:1st>, C<:2nd>, C<:3rd>.  The other way is
+valid as well; choose whichever is most comfortable.
 
-By default, rules ignore literal whitespace within the pattern.  The
-C<:w> modifier makes rules sensitive to literal whitespace, but in an
-intelligent way. Any cluster of literal whitespace acts like an explicit
-C<\s+> when it separates two identifiers and C<\s*> everywhere else.
+By default, rules ignore literal whitespace within the pattern.  The C<:w>
+modifier makes rules sensitive to literal whitespace, but in an intelligent
+way. Any cluster of literal whitespace acts like an explicit C<\s+> when it
+separates two identifiers and C<\s*> everywhere else.
 
-There are no modifiers to alter whether the matched string is treated as
-a single line or multiple lines. That's why the "beginning of string"
-and "end of string" metasymbols have "beginning of line" and "end of
-line" counterparts.
+I<No> modifiers exist to treat the matched string as a single line or multiple
+lines.  Instead, use the "beginning of string" and "end of string" or
+"beginning of line" and "end of line" metacharacters.
 
-A<CHP-7-TABLE-6>Table 7-6 shows the current list of modifiers.
+A<CHP-7-TABLE-6>Table 7-6 lists the available modifiers.
 
 =begin table picture Modifiers
 
@@ -888,7 +888,7 @@ or C<\s*>.
 
 =cell C<:once>
 
-=cell Only match the pattern once.
+=cell Match the pattern once and only once.
 
 =row
 
@@ -896,8 +896,8 @@ or C<\s*>.
 
 =cell C<:globally>
 
-=cell Match the pattern as many times as possible, but only possibilities
-that don't overlap.
+=cell Match the pattern as many times as possible without overlapping
+possibilities.
 
 =row
 
@@ -905,7 +905,7 @@ that don't overlap.
 
 =cell C<:exhaustive>
 
-=cell Match every possible occurrence of a pattern, even overlapping
+=cell Match every possible occurrence of a pattern, including overlapping
 possibilities.
 
 =row
@@ -950,94 +950,93 @@ possibilities.
 
 =end table
 
-
 =head3 Built-in Rules
 
 Z<CHP-7-SECT-3>
 
 X<rules;built-in>
-A number of named rules are provided by default, including a complete
-set of X<POSIX-style classes> POSIX-style classes, and X<Unicode
-property classes> Unicode property classes. The list isn't fully
-defined yet, but A<CHP-7-TABLE-7>Table 7-7 shows a few you're
-likely to see.
+PGE provides several named rules, including a complete set of X<POSIX-style
+classes> POSIX-style classes, and X<Unicode property classes> Unicode property
+classes. The list isn't fully defined yet, but A<CHP-7-TABLE-7>Table 7-7 shows
+a few you're likely to see.
 
-The C<E<lt>nullE<gt>> rule matches a zero-width string (so it's always
-true) and C<E<lt>priorE<gt>> matches whatever the most recent successful
-rule matched. These replace the two behaviors of 
-X</ (slash);// invalid null pattern>
-X<invalid null pattern //> the Perl 5 null pattern C<//>,
-which is no longer valid syntax for rules. 
+The C<E<lt>nullE<gt>> rule matches a zero-width string (it always matches) and
+C<E<lt>priorE<gt>> matches whatever the most recent successful rule matched.
+These replace the two behaviors of X</ (slash);// invalid null pattern>
+X<invalid null pattern //> the Perl 5 null pattern C<//>, which is no longer
+valid syntax for rules.
 
 =begin table picture Built-in rules
 
 Z<CHP-7-TABLE-7>
 
-=headrow 
+=headrow
 
-=row 
+=row
 
 =cell Rule
 
 =cell Meaning
 
-=bodyrows 
+=bodyrows
 
-=row 
+=row
 
 =cell C<E<lt>alphaE<gt>>
 
 =cell Match a Unicode alphabetic character.
 
-=row 
+=row
 
 =cell C<E<lt>digitE<gt>>
 
 =cell Match a Unicode digit.
 
-=row 
+=row
 
 =cell C<E<lt>spE<gt>>
 
 =cell Match a single space character (the same as C<\s>).
 
-=row 
+=row
 
 =cell C<E<lt>wsE<gt>>
 
 =cell Match any whitespace (the same as C<\s+>).
 
-=row 
+=row
 
 =cell C<E<lt>nullE<gt>>
 
 =cell Match the null string.
 
-=row 
+=row
 
 =cell C<E<lt>priorE<gt>>
 
 =cell Match the same thing as the previous match.
 
-=row 
+=row
 
 =cell C<E<lt>before ...E<gt>>
 
-=cell Zero-width lookahead. Assert that you're I<before> a pattern.
+=cell Zero-width lookahead. Assert that the current position I<precedes> a
+pattern.
 
-=row 
+=row
 
 =cell C<E<lt>after ...E<gt>>
 
-=cell Zero-width lookbehind. Assert that you're I<after> a pattern.
+=cell Zero-width lookbehind. Assert that the current position I<follows> a
+pattern.
 
-=row 
+=row
 
 =cell C<E<lt>prop ...E<gt>>
 
 =cell Match any character with the named property.
 
-=row 
+=row
 
 =cell C<E<lt>replace(...)E<gt>>
 
@@ -1046,122 +1045,129 @@ given string (under consideration).
 
 =end table
 
-
 =head3 Backtracking Control
 
 Z<CHP-7-SECT-4>
 
 X<backtracking controls>
-X<fail keyword> 
-Backtracking is triggered whenever part of the pattern fails to match.
-You can also explicitly trigger backtracking by calling the C<fail>
-function within a closure. A<CHP-7-TABLE-8>Table 7-8 shows some
-metacharacters and built-in rules relevant to backtracking.
+X<fail keyword>
+Whenever part of the pattern fails to match, PGE performs backtracking --
+backing up to the previous point at which the match could succeed and trying
+again.  You can explicitly trigger backtracking by calling the C<fail> function
+within a closure. A<CHP-7-TABLE-8>Table 7-8 displays metacharacters and
+built-in rules relevant to backtracking.
+
+=for author
+
+This could use an example.
+
+=end for
 
 =begin table picture Backtracking controls
 
 Z<CHP-7-TABLE-8>
 
-=headrow 
+=headrow
 
-=row 
+=row
 
 =cell Operator
 
 =cell Meaning
 
-=bodyrows 
+=bodyrows
 
-=row 
+=row
 
 =cell C<:>
 
-=cell Don't retry the previous atom, fail to the next
-earlier atom.
+=cell Don't retry the previous atom.  Instead, fail to the next earlier atom.
 X<: (colon);: fail to atom before last (rules)>
 X<backtracking controls;: fail to atom before last>
 
-=row 
+=row
 
 =cell C<::>
 
-=cell Don't backtrack over this point, fail out of the closest
+=cell Don't backtrack over this point. Instead fail out of the closest
 enclosing group (C<(...)>, C<[...]>, or the rule delimiters).
 X<: (colon);:: fail out of group (rules)>
 X<backtracking controls;: fail out of group>
 
-=row 
+=row
 
 =cell C<:::>
 
-=cell Don't backtrack over this point, fail out of the
-current rule or subrule.
+=cell Don't backtrack over this point.  Instead, fail out of the current rule
+or subrule.
 X<: (colon);::: fail out of rule (rules)>
 X<backtracking controls;: fail out of rule>
 
-=row 
+=row
 
 =cell C<E<lt>commitE<gt>>
 
-=cell Don't backtrack over this point, fail out of the
-entire match (even from within a subrule).
+=cell Don't backtrack over this point. Instead, fail out of the entire match
+(even from within a subrule).
 
-=row 
+=row
 
 =cell C<E<lt>cutE<gt>>
 
-=cell Like C<E<lt>commitE<gt>>, but also cuts the string matched. The
-current matching position at this point becomes the new beginning of
-the string.
+=cell Like C<E<lt>commitE<gt>>, but also cuts the string matched. The current
+matching position at this point becomes the new beginning of the string.
 
 =end table
 
-
 =head3 Calling Actions
 
-Once the parser has matched the entire input N<a
-source code file, or a line of input at the terminal in interactive
-mode> the parse is considered successful and the generated AST is
-delivered to the code generator for conversion into PIR.
+Once the parser has matched the entire input N<a source code file, or a line of
+input at the terminal in interactive mode> the parse has succeeded.  The
+generated AST is now available to the code generator for conversion into PIR.
 
+=for author
 
-We haven't covered actions yet, but it's still important now to talk
-about how we will call them when we are ready. We call an action
-by inserting the C<{*}> token into the rule. When the C<{*}> rule is
-encountered, PGE calls the associated action method with the current
-match object as an argument. Let's take our C<persons_name> rule
-from above, and sprinkle liberally with action calls:
+Please review.  The forward declaration is awkward here, but a little bit of
+explanation might ameliorate this.
+
+=end for
+
+This AST gets built up by actions -- code snippets attached to rules and
+tokens.  To call an action, insert the C<{*}> token into the rule. When PGE
+encounters C<{*}>, it will call the associated action method with the current
+match object as an argument.
+
+The best way to demonstrate this is by example.  Sprinkle the C<persons_name>
+rule liberally with action calls:
 
  rule persons_name {
     {*} <first_name> {*} <last_name> {*}
  }
 
-The first call to the action method contains an empty match object
-because the parser hasn't had a chance to match anything yet. The
-second call contains only the first name of the match. The third and
-final call contains both the matched first and last name. Notice that
-if the match fails halfway through, we still call the actions where
-we succeeded, but do not call the actions after the failure. So, if
-we try to match the string "Leia", the action is called before the
-name and after the first name. When the rule tries to match the last
-name, it fails because no last name is provided, and the third action
-method call is never made.
+The first call to the action method contains an empty match object because the
+parser hasn't matched anything yet.  The second call contains only the first
+name of the match. The third and final call contains both the matched first and
+last name.
+
+If the match fails halfway through, PGE will still call the actions that have
+succeeded; it will not call the actions after the failure.  If you try to match
+the string "Leia", PGE will call the first two action methods.  When the rule
+tries to match the last name, it fails, and PGE will not call the third action
+method.
 
 =head3 Alternations and Keys
 
-In addition to sub-rules, groups, and quantifiers, we also are able to
-take alternations between options that are either-or. The vertical bar
-token "|" can be used to distinguish between options where only one
-may match, Here's an example:
+In addition to sub-rules, groups, and quantifiers, you can also express
+either-or alternations between options. The vertical bar token (C<|>)
+distinguishes between options where only one may match:
 
  rule hero {
     ['Luke' | 'Leia'] 'Skywalker'
  }
 
-This rule will match either "Luke Skywalker" or "Leia Skywalker" but
-won't match "Luke Leia Skywalker" N<or anything else, for that matter>.
-With things like alternations, if we want to call an action method it's
-helpful to distinguish which combination we matched:
+This rule will match either "Luke Skywalker" or "Leia Skywalker" but won't
+match "Luke Leia Skywalker"N<nor anything else.>.  Given alternations and
+action methods, it's often important to distinguish which alternation matched:
 
  rule hero {
     [
@@ -1171,19 +1177,15 @@ helpful to distinguish which combination we matched:
     'Skywalker'
  }
 
-This is the same rule, except now it passes two arguments to its
-action method: the match object and the name of the person who
-got matched.
+This is the same rule, except now it passes two arguments to its action method:
+the match object and the name of the person who matched.
 
 =head3 Warning: Left Recursion
 
-Getting into all the nitty-gritty theory behind parsers is well beyond
-the scope of this book. However, there is one potential pitfall that
-developers should be made aware of that is not immediately obvious.
-Like functions in ordinary procedural or functional languages, the
-methods in the PGE parser grammar can call themselves recursively.
-Consider the following rules derived in part from the grammar for the
-C programming language:
+If you've worked with parsers before, you may have seen this coming.  If not,
+don't fear.  Like functions in ordinary procedural or functional languages, the
+methods in the PGE parser grammar can call themselves recursively.  Consider
+some rules derived in part from the grammar for the C programming language:
 
  rule if_statement {
     'if' <condition> '{' <statement>* '}' <else_block>?
@@ -1197,49 +1199,47 @@ C programming language:
     'else' '{' <statements>* '}'
  }
 
-Notice that an C<if_statement> can contain a list of C<statement>s, and
-that each statement may itself be an C<if_statement>? This is called
-I<recursion> X<Recursion>, and is part of where the "Recursive Descent"
-algorithm gets its name from.
+An C<if_statement> can contain a list of C<statement>s, and that each statement
+may itself be an C<if_statement>.  This is I<recursion> X<Recursion>; it's one
+of the reasons PGE is a "Recursive descent" parser.
 
-Now, let's look at a more direct example of a comma-separated list of
-integer digits to form an array. We can define this recursively as
-follows:
+Consider the more direct example of a comma-separated list of integer digits
+which form a list.  A recursive definition might be:
 
  rule list {
      <list> ',' <digit> | <digit>
  }
 
-The intention is that if there is only one digit, we match the second
-option in the alternation, and if there are more digits we can match
-them recursively in the first alternation. However, take a close look
-at the insidious result. The recursive descent parser enters the C<list>
-rule. It's first option is to enter the list rule again, so it does.
-Recursive descent is a depth-first algorithm, and it will continue to
-descent down a particular path until it finds a successful match or a
-match failure. In this case, it matches C<list> and then it matches
-C<list> again, then it matches C<list> again, and so on and so forth.
-What we have created is an infinite loop pattern called I<left recursion>.
+If there is only one digit, the second option in the alternation matches.  If
+there are multiple digits, recursion will match them through the first
+alternation.
 
-Left recursion is caused when the left-most item of the left-most
-alternation is a recursion. The rule above can be easily resolved
-by writing:
+That's the intention.  The results are insidious.
+
+The recursive descent parser enters the C<list> rule. Its first option is to
+enter the list rule again, so it does.  Recursive descent is a X<depth-first
+algorithm> depth-first algorithm; PGE will continue to descend down a
+particular path until it finds a successful match or a match failure. In this
+case, it matches C<list>, then it matches C<list> again, then it matches
+C<list> again, and so on.  This rule forms an infinite loop -- a pattern called
+X<left recursion> I<left recursion>.  The problem is that the left-most item of
+the left-most alternation is itself a recursion.
+
+The rule above does not recurse infinitely when rewritten as:
 
  rule list {
     <digit> | <list> ',' <digit>
  }
 
-Or even
+... or even:
 
  rule list {
     <digit> ',' <list> | <digit>
  }
 
-Both of these two options make sure the left-most item in our rule is not
-a recursion, therefore preventing left recursion.
+Both options ensure that the left-most item in the rule is recursive.
 
-Here is a more tricky example where the left recursion is hidden from
-view:
+Left recursion may be trickier.  It's not immediately obvious in this grammar:
 
  rule term {
     <expression> '*' <term> | <digit>
@@ -1249,84 +1249,85 @@ view:
     <term> '+' <expression> | <term>
  }
 
-This is a very limited subset of mathematical equations that we might like
-to write, and even in this small subset we have this same problem: To
-match a C<term>, the parser first tries to match an C<expression>, which
-in turn matches a C<term> and then an C<expression> ...
+Even this common, limited subset of mathematical equations has the same
+problem.  To match a C<term>, the parser first tries to match an C<expression>,
+which in turn matches a C<term> and then an C<expression> ....
 
-Left recursion is not the only problem you can run into with a recursive
-descent grammar, but it's one that's likely going to come up relatively
-often for new language designers, and one that is not always likely to
-generate useful error messages.
+Again, the solution is simple.  Rewrite at least one of the rules so that the
+first condition it tries to match is not itself a recursive situation.
 
 =head3 Operator Precedence Parser
 
-Places where there are lots of little tokens in a statement, and where
-there are lots of possible options that a top-down parser will have to
-attempt can become relatively inefficient using PCT's recursive descent
-parser. Specifically, mathematical expressions are very open-ended and
-have forms that are difficult to anticipate. Consider the expression:
+Recursive descent parsing can be inefficient where statements have lots of
+little tokens and many possible options to match.  For example, mathematical
+expressions are very open-ended, with many valid forms which are difficult to
+anticipate.  Consider the expression:
 
  a + b * c + d
 
-The recursive descent parser is going to have to recognize through
-significant trial and error how this statement should be parsed. For tasks
-like this, recursive descent parsers are not ideal, although a type of
-bottom-up parser called an I<operator precedence>
-X<Parser, Operator precedence> parser is. Operator precedence parsers
-work similarly to more versatile bottom-up parsers such as Lex or Yacc, but
-are optimized for use with expressions and equations. The "things" in an
-equation are split into two subtypes: I<terms> and I<operators>. Operators
-themselves are split into a number of types including prefix (C<-a>),
-postfix (C<i++>), infix (C<x + y>), circumfix (C<[z]>), postcircumfix
-(C<a[b]>), and list (C<1, 2, 3>). Each operator gets its own precedence
-number that specifies how closely it binds to the terms. In the example above,
-the expression is parsed
+A recursive descent parser will undergo significant trial and error to parse
+this statement.  Recursive descent parsing is not ideal for these situations.
+Instead, a type of bottom-up parser called an I<operator precedence> X<Parser,
+Operator precedence> parser is much better.
+
+=for author
+
+Is this a categorization of all opps or just PGE's opp?
+
+=end for
+
+Operator precedence parsers work similarly to more versatile bottom-up parsers
+such as Lex or Yacc, but are optimized for use with expressions and equations.
+Equations have two subtypes, I<terms> and I<operators>. Operators themselves
+have several subtypes, including prefix (C<-a>), postfix (C<i++>), infix (C<x +
+y>), circumfix (C<[z]>), postcircumfix (C<a[b]>), and list (C<1, 2, 3>). Each
+operator gets its own precedence number that specifies how closely it binds to
+the terms. The previous example should parse as:
 
  a + (b * c) + d
 
-This is because the C<*> operator has a higher precedence and therefore binds
-more tightly then the C<+> operator.
+... because the C<*> operator has a higher precedence -- binding more tightly
+to its terms -- than the C<+> operator.
 
-To switch from the top-down recursive descent parser to the bottom-up
-operator precedence parser, a rule must be defined that is an C<optable>
-X<Parser, optable>:
+Within a grammar, switch from the top-down recursive descent parser to the
+bottom-up operator precedence parser with an C<optable> X<Parser, optable>
+rule:
 
  rule expression is optable { ... }
 
-The C<...> ellipses aren't an editorial shortcut, it's the Perl 6 operator
-that is used to define a function signature. The C<...> indicates that
-this is just a signature and that the actual guts of it will be filled in
-somewhere else. In this case, that "somewhere else" is in the definition of
-the optable role.
+The C<...> ellipsis isn't an editorial shortcut, it's the Perl 6 operator to to
+define a function signature. The C<...> indicates that this is just a
+signature; the actual implementation is elsewhere.  In this case, that location
+in the definition of the optable.
 
 =head3 Protofunction Definitions
 
-Protofunctions are used to define operators in the optable in the same way that
-rules and tokens are used throughout the rest of the grammar. A proto is a way
-of saying that the rule is overridable dynamically, and that it might be defined
-somewhere else. In this case, PCT takes information from the proto declaration
-and fills in the details for us. On another note, this also means that the HLL
-itself can modify its own grammar at run time, by overriding the proto
-definitions for its operator table. Some languages call this process "operator
-overloading".
+X<Protofunctions>
 
-A proto is defined like this, taking some of our grammar rules above:
+Protofunctions define operators in the optable in the same way that rules and
+tokens make up the grammar. A proto declares a rule, defined elsewhere, which
+other code may override dynamically.  In this case, PCT takes information from
+the proto declaration and fills in the details. The "dynamic overriding"
+implies that a high-level language itself itself can modify its own grammar at
+run time, by overriding the proto definitions for its operator table. Some
+languages call this process X<operator overloading> I<operator overloading>.
+
+A proto definition resembles:
 
  'proto' <proto_name> [ 'is' <property> ] '{' '...' '}'
 
-The name of the operator, listed as C<< <proto_name> >> above, contains both a
-location part and an identifier part. The location is one of the places where
-the operator can be located, such as infix, postfix, prefix, circumfix, and
-postcircumfix. The name of the operator is the symbol used for the operator in
-any of the quotes that Perl 6 understands:
+The name of the operator, noted as C<< <proto_name> >>, contains both a
+location part and an identifier part. The location is the type of the operator,
+such as infix, postfix, prefix, circumfix, and postcircumfix. The name of the
+operator is the symbol used for the operator in any of the quotes that Perl 6
+understands:
 
  proto infix:<+>                  # a + b
  proto postfix:'--'               # i--
  proto circumfix:«<>»             # <x>
 
-The C<is> X<Parser, is> keyword defines a property of the rule. Some examples of
-this are:
+The C<is> X<Parser, is> keyword defines a property of the rule. Examples
+include:
 
  is precedence(1)     # Specifies an exact precedence
  is equiv('+')        # Has the same precedence as the "+" operator
@@ -1338,13 +1339,21 @@ this are:
  is parsed(&myRule)   # The token is parsed and identified using the rule
                       # "myRule" from the top-down parser
 
-Protofunction definitions are function signatures which can be overridden via
-multimethod dispatch. This means functions can be written I<with the same name>
-as the rule to implement the behavior of the operator:
+=for author
+
+Please review.
+
+=end for
+
+Protofunction definitions are function signatures; you can override them with
+multimethod dispatch. This means that you can write functions I<with the same
+name> as the rule to implement the behavior of the operator.  Here's a proto:
 
  rule infix:"+" { ... }
 
-And in a PIR file for built-in functions:
+... and its corresponding PIR rule:
+
+=begin PIR
 
  .sub 'infix:+'
     .param pmc a
@@ -1354,37 +1363,39 @@ And in a PIR file for built-in functions:
     .return(c)
  .end
 
-The question to ask then is "Why have an C<is subname()> property, if all
-operators can be defined as subroutines?" The answer is that using the
-C<is subname()> property allows PCT to call a subroutine of a different
-name then the operator. This is a good idea if there is already a built-in
-function in the language that duplicates the functionality of the operator.
-There is no sense duplicating functionality, is there?
+=end PIR
+
+You may ask "Why have an C<is subname()> property, if you can define all
+operators as subroutines?" Using the C<is subname()> property allows PCT to
+call a subroutine of a different name then the operator.  This is a good idea
+if there is already a built-in function in the language that duplicates the
+functionality of the operator.  There is no sense in duplicating behavior.
 
 The great thing about protos being overloadable is that you can specify
 different functions to call with different signatures:
 
+=begin PIR
+
  .sub 'infix:+' :multi('Integer', 'Integer')
-    ...
+    #...
  .end
 
  .sub 'infix:+' :multi('CLispRatio', 'Number')
-    ...
+    #...
  .end
 
  .sub 'infix:+' :multi('Perl6Double', 'PythonInteger')
-    ...
+    #...
  .end
 
-This list can be a bit intimidating, and it's hard to imagine that it would
-be necessary to write up a new function to handle addition between
-every conceivable pair of operands. Fortunately for us all, this isn't the
-case because all these data types have those VTABLE interfaces that we can
-use. For most data types Parrot already has basic arithmetic operations
-built in, and it's only necessary to override for those data types with
-special needs. This example was only a demonstration of the flexibility
-of the method.
+=end PIR
 
+This list can be a bit intimidating, and it's hard to imagine that it would be
+necessary to write up a new function to handle addition between every
+conceivable pair of operands. Fortunately, this is rarely the case in Parrot,
+because all these data types support common the VTABLE interface. For most data
+types Parrot already has basic arithmetic operations built in, and it's only
+necessary to override for those data types with special needs.
 
 =head3 Hypothetical Variables
 
@@ -1393,75 +1404,87 @@ Z<CHP-7-SECT-5>
 X<variables;hypothetical>
 X<hypothetical variables>
 X<rules;captures>
-Hypothetical variables are a powerful way of building up data structures
-from within a match. Ordinary captures with C<()> store the result of
-the captures in C<$1>, C<$2>, etc. The values stored in these variables
-will be kept if the match is successful, but thrown away if the match
-fails (hence the term "hypothetical"). The numbered capture variables
-are accessible outside the match, but only within the immediate
+Hypothetical variables are a powerful way of building up data structures from
+within a match. Ordinary captures with C<()> store the result of the captures
+in C<$1>, C<$2>, etc. PGE stores values in these variables if the match is
+successful, but throws them away if the match fails.  The numbered capture
+variables are accessible outside the match, but only within the immediate
 surrounding lexical scope:
 
   "Zaphod Beeblebrox" ~~ m:w/ (\w+) (\w+) /;
-  
+
   print $1; # prints Zaphod
 
-You can also capture into any user-defined variable with the binding
-operator C<:=>. These variables must already be defined in the lexical
-scope surrounding the rule:
+You can also capture into any user-defined variable with the binding operator
+C<:=> -- I<if> you have declared these variables in a lexical scope enclosing
+the rule:
 
   my $person;
   "Zaphod's just this guy." ~~ / ^ $person := (\w+) /;
   print $person; # prints Zaphod
 
-Repeated matches can be captured into an array:
+You may capture repeated matches into an array:
 
   my @words;
   "feefifofum" ~~ / @words := (f<-[f]>+)* /;
   # @words contains ("fee", "fi", "fo", "fum")
 
-Pairs of repeated matches can be captured into a hash:
+You may capture pairs of repeated matches into a hash:
 
   my %customers;
   $records ~~ m:w/ %customers := [ E<lt>idE<gt> = E<lt>nameE<gt> \n]* /;
 
-If you don't need the captured value outside the rule, use a C<$?>
-variable instead. These are only directly accessible within the rule:
+If you don't need the captured value outside the rule, use a C<$?> variable
+instead. These are only directly accessible within the rule:
 
   "Zaphod saw Zaphod" ~~ m:w/ $?name := (\w+) \w+ $?name/;
 
-A match of a named rule stores the result in a C<$?> variable with the
-same name as the rule. These variables are also accessible only within
-the rule:
+A match of a named rule stores the result in a C<$?> variable with the same
+name as the rule. These variables are also accessible only within the rule:
 
   "Zaphod saw Zaphod" ~~ m:w/ E<lt>nameE<gt> \w+ $?name /;
 
+=for author
 
-When a rule matches a sequence of input tokens, an associated method
-in NQP is called to convert that match into an AST node. This node
-is then inserted into the I<parse tree>.
+This next paragraph feels out of place; is there more?
+
+=end for
+
+When a rule matches a sequence of input tokens, PCT calls an associated method
+within NQP to convert that match into an AST node, which it inserts into the
+I<parse tree>.
 
 =head3 Basic Rules
 
-Let's start off with a simple rule:
+Consider the simple example rule:
 
  rule persons_name {
     <first_name> <last_name>
  }
 
-We also define the two name tokens as:
+... and two example tokens:
 
  token first_name { <alpha>+ }
- token last_name { <alpha>+ }
+ token last_name  { <alpha>+ }
 
-The special token C<< <alpha> >> is a built-in construct that only
-accepts upper case and lower case letters. The "+" after the
-C<< <alpha> >> tag is a short way of saying "one or more". Our rule
-C<persons_name> would match something like C<Darth Vader> N<Actually,
-it matches a lot of things that aren't people's names>but wouldn't
-match something like C<C 3P0>. Notice that the rule above would match
-C<Jar Jar Binks>, but not the way you would expect: It would match the
-first "Jar" as C<< <first_name> >> and the second "Jar" as
-C<< <last_name> >> and wouldn't match "Binks" at all.
+The special token C<< <alpha> >> is a built-in construct that only accepts
+upper case and lower case letters. The C<+> after the C<< <alpha> >> tag is a
+short way of saying "one or more". The rule will match names like C<Darth
+Vader>N<It also matches many strings that I<aren't> real names>, but won't
+match something like C<C 3P0>.
+
+This rule I<will> match C<Jar Jar Binks>, but not as you might expect: way you
+would expect: It would match the first "Jar" as C<< <first_name> >>, the second
+"Jar" as C<< <last_name> >>, and ignore "Binks"N<You should ignore the whole
+thing.>.
+
+=for author
+
+The rest seems vestigial.  An example like this should precede the rest of the
+chapter.  There are forward references, but it's a decent overview for people
+who haven't used similar systems before -- if you avoid going out in the weeds.
+
+=end for
 
 this example shows another new construct, the square brackets. Square
 brackets are ways to group things together. The star at the end means

@@ -221,7 +221,7 @@ to_iso_8859_1(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
     ENCODING_ITER_INIT(interp, src, &iter);
     src_len = src->strlen;
     if (dest) {
-        Parrot_reallocate_string(interp, dest, src_len);
+        Parrot_gc_reallocate_string_storage(interp, dest, src_len);
         dest->strlen  = src_len;
     }
     else {
@@ -263,7 +263,7 @@ to_unicode(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
 
         dest->charset = Parrot_unicode_charset_ptr;
         dest->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, dest);
-        Parrot_reallocate_string(interp, dest, src->strlen);
+        Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
         ENCODING_ITER_INIT(interp, dest, &iter);
         for (offs = 0; offs < src->strlen; ++offs) {
             const UINTVAL c = ENCODING_GET_BYTE(interp, src, offs);
@@ -272,7 +272,7 @@ to_unicode(PARROT_INTERP, ARGIN(STRING *src), ARGMOD_NULLOK(STRING *dest))
                 UINTVAL need = (UINTVAL)((src->strlen - offs) * 1.5);
                 if (need < 16)
                     need = 16;
-                Parrot_reallocate_string(interp, dest,
+                Parrot_gc_reallocate_string_storage(interp, dest,
                         PObj_buflen(dest) + need);
             }
             iter.set_and_advance(interp, &iter, c);
@@ -731,7 +731,7 @@ charset_cvt_iso_8859_1_to_ascii(PARROT_INTERP, ARGIN(STRING *src),
     ASSERT_ARGS(charset_cvt_iso_8859_1_to_ascii)
     UINTVAL offs;
     if (dest) {
-        Parrot_reallocate_string(interp, dest, src->strlen);
+        Parrot_gc_reallocate_string_storage(interp, dest, src->strlen);
         dest->bufused = src->bufused;
         dest->strlen  = src->strlen;
     }

@@ -66,7 +66,7 @@ the output to the correct output file.
     .local pmc pgc
 
     pgc = compreg 'PGE::Perl6Grammar'
-    pgc.'command_line'(args, 'target'=>'PIR', 'combine'=>1)
+    pgc.'command_line'(args, 'target'=>'PIR', 'combine'=>1, 'transcode'=>'iso-8859-1')
     .return ()
 .end
 
@@ -101,7 +101,8 @@ the output to the correct output file.
       | '"' (<-["]>*:) '"'
       | '(' (<-[)]>*:) ')'
       | '<' (<-[>]>*:) '>'
-      | '«' (<-[»]>*:) '»'
+      | \xc2\xab (.*?) \xc2\xbb
+      | \xab (<-[\xbb]>*:) \xbb
       | (\S+)
       ]
       END_ARG_RULE

@@ -7,7 +7,7 @@ HTTP;Daemon - A Simple HTTPD Server
 
 =head1 SYNOPSIS
 
-  load_bytecode "HTTP/Daemon.pir"
+  load_bytecode "HTTP/Daemon.pbc"
   opts = new 'Hash'
   opts['LocalPort'] = 1234
   opts['LocalAddr'] = 'localhost'

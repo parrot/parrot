@@ -18,7 +18,6 @@ Implements the core concurrency scheduler.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
 pmclass Scheduler need_ext {
@@ -267,15 +266,15 @@ Marks any referenced strings and PMCs as live.
             Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
             if (core_struct->task_list)
-                pobject_lives(interp, (PObj *)core_struct->task_list);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->task_list);
             if (core_struct->task_index)
-                pobject_lives(interp, (PObj *)core_struct->task_index);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->task_index);
             if (core_struct->wait_index)
-                pobject_lives(interp, (PObj *)core_struct->wait_index);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->wait_index);
             if (core_struct->handlers)
-                pobject_lives(interp, (PObj *)core_struct->handlers);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handlers);
             if (core_struct->messages)
-                pobject_lives(interp, (PObj *)core_struct->messages);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->messages);
         }
     }
 

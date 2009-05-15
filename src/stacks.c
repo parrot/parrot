@@ -74,13 +74,12 @@ Stack_Chunk_t *
 cst_new_stack_chunk(PARROT_INTERP, ARGIN(const Stack_Chunk_t *chunk))
 {
     ASSERT_ARGS(cst_new_stack_chunk)
-    Small_Object_Pool * const pool = chunk->pool;
-    Stack_Chunk_t * const new_chunk = (Stack_Chunk_t *)pool->get_free_object(interp, pool);
+    Stack_Chunk_t * const new_chunk =
+        (Stack_Chunk_t *)Parrot_gc_new_bufferlike_header(interp, sizeof (Stack_Chunk_t));
 
     PObj_bufstart(new_chunk) = NULL;
     PObj_buflen(new_chunk)   = 0;
 
-    new_chunk->pool          = chunk->pool;
     new_chunk->name          = chunk->name;
 
     return new_chunk;
@@ -104,12 +103,11 @@ Stack_Chunk_t *
 new_stack(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(new_stack)
-    Small_Object_Pool * const pool = get_bufferlike_pool(interp, sizeof (Stack_Chunk_t));
-    Stack_Chunk_t     * const chunk = (Stack_Chunk_t *)(pool->get_free_object)(interp, pool);
+    Stack_Chunk_t * const chunk =
+        (Stack_Chunk_t *)Parrot_gc_new_bufferlike_header(interp, sizeof (Stack_Chunk_t));
 
     chunk->prev = chunk;        /* mark the top of the stack */
     chunk->name = name;
-    chunk->pool = pool;         /* cache the pool pointer, for ease */
 
     return chunk;
 }
@@ -133,7 +131,7 @@ mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
     for (; ; chunk = chunk->prev) {
         Stack_Entry_t  *entry;
 
-        pobject_lives(interp, (PObj *)chunk);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)chunk);
 
         if (chunk == chunk->prev)
             break;
@@ -141,7 +139,7 @@ mark_stack(PARROT_INTERP, ARGMOD(Stack_Chunk_t *chunk))
         entry = STACK_DATAP(chunk);
 
         if (entry->entry_type == STACK_ENTRY_PMC && UVal_pmc(entry->entry))
-            pobject_lives(interp, (PObj *)UVal_pmc(entry->entry));
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)UVal_pmc(entry->entry));
     }
 }
 
@@ -371,12 +369,8 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
     }
 
     /* recycle this chunk to the free list if it's otherwise unreferenced */
-    if (cur_chunk->refcount <= 0) {
-        Small_Object_Pool * const pool = cur_chunk->pool;
-
-        pool->gc_object(interp, pool, (PObj *)cur_chunk);
-        pool->add_free_object(interp, pool, (PObj *)cur_chunk);
-    }
+    if (cur_chunk->refcount <= 0)
+        Parrot_gc_free_bufferlike_header(interp, (PObj *)cur_chunk, sizeof (Stack_Chunk_t));
 
     return where;
 }

@@ -535,6 +535,9 @@ Parrot_mmd_arg_tuple_func(PARROT_INTERP)
 
 =item C<static INTVAL distance_cmp(PARROT_INTERP, INTVAL a, INTVAL b)>
 
+Compare distance values C<a> and C<b>. Return 1 if C<a> is larger, -1 if
+C<b> is.
+
 =cut
 
 */
@@ -794,6 +797,10 @@ mmd_cvt_to_types(PARROT_INTERP, ARGIN(PMC *multi_sig))
 =item C<static PMC * Parrot_mmd_get_cached_multi_sig(PARROT_INTERP, PMC
 *sub_pmc)>
 
+Get the cached multisig of the given sub, if one exists. The cached signature
+might be in different formats, so put it into a type tuple like the rest of the
+MMD system expects.
+
 =cut
 
 */
@@ -850,6 +857,13 @@ mmd_distance(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *arg_tuple))
     /* has to be a builtin multi method */
     if (pmc->vtable->base_type == enum_class_NCI) {
         GETATTR_NCI_multi_sig(interp, pmc, multi_sig);
+        if (PMC_IS_NULL(multi_sig)) {
+            STRING *long_sig;
+
+            GETATTR_NCI_long_signature(interp, pmc, long_sig);
+            multi_sig = mmd_build_type_tuple_from_long_sig(interp, long_sig);
+            SETATTR_NCI_multi_sig(interp, pmc, multi_sig);
+        }
     }
     else {
         /* not a multi; no distance */
@@ -1337,13 +1351,10 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         STRING   *sub_name  = mmd_info[i].multi_name;
         STRING   *long_sig  = mmd_info[i].full_sig;
         STRING   *short_sig = mmd_info[i].short_sig;
-        PMC      *type_list = Parrot_str_split(interp, CONST_STRING(interp, ","), long_sig);
-        STRING   *ns_name   = VTABLE_get_string_keyed_int(interp, type_list, 0);
+        STRING   *ns_name   = mmd_info[i].ns_name;
 
-    /* Create an NCI sub for the C function */
+        /* Create an NCI sub for the C function */
         PMC    *sub_obj       = constant_pmc_new(interp, enum_class_NCI);
-        PMC    *multi_sig     = mmd_build_type_tuple_from_long_sig(interp,
-                                long_sig);
 
 #ifdef PARROT_HAS_ALIGNED_FUNCPTR
         PARROT_ASSERT((PTR2UINTVAL(func_ptr) & 3) == 0);
@@ -1353,7 +1364,7 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
                                      F2DPTR(func_ptr));
 
         /* Attach a type tuple array to the NCI sub for multi dispatch */
-        SETATTR_NCI_multi_sig(interp, sub_obj, multi_sig);
+        SETATTR_NCI_long_signature(interp, sub_obj, long_sig);
 
         mmd_add_multi_to_namespace(interp, ns_name, sub_name, sub_obj);
         mmd_add_multi_global(interp, sub_name, sub_obj);

@@ -1540,8 +1540,6 @@ Parrot_PMC_newclass(PARROT_INTERP, Parrot_PMC classtype)
 {
     ASSERT_ARGS(Parrot_PMC_newclass)
     Parrot_PMC result;
-    Parrot_PMC hllns;
-    INTVAL hll;
     PARROT_CALLIN_START(interp);
 
     result = pmc_new_init(interp, enum_class_Class, classtype);

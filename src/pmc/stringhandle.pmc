@@ -19,7 +19,6 @@ than an external file. Commonly used as a mock FileHandle for testing.
 
 */
 
-#include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
 pmclass StringHandle need_ext {
@@ -95,13 +94,13 @@ Mark active stringhandle data as live.
     VTABLE void mark() {
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(SELF);
         if (data_struct->stringhandle)
-            pobject_lives(interp, (PObj *)data_struct->stringhandle);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->stringhandle);
         if (data_struct->mode)
-            pobject_lives(interp, (PObj *)data_struct->mode);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->mode);
         if (data_struct->encoding)
-            pobject_lives(interp, (PObj *)data_struct->encoding);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->encoding);
         if (data_struct->filename)
-            pobject_lives(interp, (PObj *)data_struct->filename);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)data_struct->filename);
     }
 
 /*

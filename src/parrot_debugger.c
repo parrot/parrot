@@ -242,6 +242,8 @@ main(int argc, char *argv[])
 
 =item C<static void PDB_run_code(PARROT_INTERP, int argc, char *argv[])>
 
+Run the code, catching exceptions if they are left unhandled.
+
 =cut
 
 */

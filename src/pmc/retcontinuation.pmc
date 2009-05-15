@@ -21,9 +21,7 @@ after invocation.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
-
 
 pmclass RetContinuation extends Continuation need_ext {
 
@@ -43,7 +41,6 @@ Initializes the continuation.
         PMC_data(SELF) = attrs;
 
         PMC_cont(SELF) = new_ret_continuation(INTERP);
-        PMC_data(SELF) = attrs;
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -64,11 +61,10 @@ Initializes the continuation.
 
 =item C<PMC *clone>
 
-Return a new Continuation PMC with the context of SELF. Note: the
-returned object is not a RetContinuation and creating a real
-Continuation invalidates all RetContinuation all the way up the call
-chain that is, these can't be recycled, they get persistent until
-the GC gets at them.
+Return a new Continuation PMC with the context of SELF. Note: the returned
+object is not a RetContinuation and creating a real Continuation invalidates
+all RetContinuation all the way up the call chain.  That is, these can't be
+recycled; they persist until the GC gets at them.
 
 =cut
 
@@ -81,7 +77,7 @@ the GC gets at them.
 
 =item C<opcode_t *invoke(void *next)>
 
-Transfers control to the calling context, and frees the current context.
+Transfers control to the calling context and frees the current context.
 
 =cut
 
@@ -98,36 +94,19 @@ Transfers control to the calling context, and frees the current context.
         Parrot_continuation_rewind_environment(interp, SELF, cc);
         Parrot_free_context(INTERP, from_ctx, 1);
 
-#ifdef NDEBUG
         /* the continuation is dead - delete and destroy it */
-        VTABLE_destroy(interp, SELF);
-        {
-            Arenas            *arena_base = interp->arena_base;
-            Small_Object_Pool *pool       = arena_base->pmc_pool;
-            Small_Object_Pool *ext_pool   = arena_base->pmc_ext_pool;
-            ext_pool->add_free_object(interp, ext_pool,
-                    (PObj *)SELF->pmc_ext);
-            PObj_flags_SETTO((PObj *)SELF, PObj_on_free_list_FLAG);
-            pool->add_free_object(interp, pool, (PObj *)SELF);
-            pool->num_free_objects++;
-        }
-#else
-        cc->from_ctx = NULL;
-
-        /*
-         * the to_ctx is marked in Continuation.mark
-         * NULLify it or turn off the custom_mark bit
-         */
-        cc->to_ctx = NULL;
-#endif
+        /* This line causes a failure in t/pmc/packfiledirectory.t. No idea
+           what the relationship is between this line of code and that test
+           failure. Will look into it later */
+        /* Parrot_gc_free_pmc_header(interp, SELF); */
 
         if (INTERP->code != seg)
             Parrot_switch_to_cs(INTERP, seg, 1);
 
         return next;
     }
-
 }
+
 
 /*
 

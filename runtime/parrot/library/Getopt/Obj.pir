@@ -11,7 +11,7 @@ library/Getopt/Obj.pir - parse long and short command line options
 
     .local string prog_name
     prog_name = shift argv
-    load_bytecode "Getopt/Obj.pir"
+    load_bytecode "Getopt/Obj.pbc"
     .local pmc getopts
     getopts = new "Getopt::Obj"
     getopts."notOptStop"(1)
@@ -352,7 +352,7 @@ finish:
     .return(return)
 .end
 
-=item C<__push_string(STRING format)>
+=item C<push_string(STRING format)>
 
 A vtable method, invoked by e.g. C<push getopts, "foo|f=s">.  The format is as such.
 

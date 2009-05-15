@@ -23,17 +23,17 @@ Creates a counter stream that generates numbers from 0 to 9.
     .local pmc stream
     .local pmc filter
 
-    load_bytecode "Stream/Sub.pir"
-    load_bytecode "Stream/Filter.pir"
+    load_bytecode 'Stream/Sub.pbc'
+    load_bytecode 'Stream/Filter.pbc'
 
     # create the counter stream
-    stream = new "Stream::Sub"
+    stream = new ['Stream'; 'Sub']
     # assign its source
     .const 'Sub' temp = "_counter"
     assign stream, temp
 
     # create the filter stream
-    filter = new "Stream::Filter"
+    filter = new ['Stream'; 'Filter']
     # assign its source
     assign filter, stream
     # set the filter sub
@@ -109,7 +109,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

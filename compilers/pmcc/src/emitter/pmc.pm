@@ -378,6 +378,7 @@ method class_init_func() {
           "PARROT_EXPORT void Parrot_"
         ~ self.name
         ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
+    @res.push( self.generate_attr_defs() );
 
     my $past := self.past;
     if ($past<class_init>) {
@@ -388,6 +389,13 @@ method class_init_func() {
     @res.push("\n}\n");
     join('', @res);
 }
+
+=item C<generate_attr_defs>
+
+Generate a string representing the definition of this PMC's ATTRs.
+
+=cut
+
 
 =item C<get_vtable_func>
 

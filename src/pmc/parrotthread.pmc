@@ -36,7 +36,6 @@ and these methods:
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/embed.h"
 
 #define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp

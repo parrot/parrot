@@ -272,6 +272,9 @@ U: cgrawls
 D: imcc optimizer and register allocator patches and tests
 E: cgrawls@gmail.com
 
+U: cxreg
+D: copyright test cleanup
+
 N: Damian Miles Knopp
 U: dmknopp
 E: dmknopp@loyola.edu
@@ -399,6 +402,10 @@ E: he@NetBSD.org
 
 N: H.Merijn Brand
 D: HP-UX fixes and smoke tests
+
+N: Igor Rafael Sanchez-Puls
+D: extending test_file_coverage to test PMC coverage
+E: quevlar@ymail.com
 
 N: Ibotty
 D: parrotbench ruby benchmarks

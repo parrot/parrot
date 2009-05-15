@@ -19,7 +19,8 @@ Functions to manage non-PObj memory, including strings and buffers.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/resources.h"
+#include "gc_private.h"
+
 
 #define RECLAMATION_FACTOR 0.20
 #define WE_WANT_EVER_GROWING_ALLOCATIONS 0
@@ -32,25 +33,10 @@ Functions to manage non-PObj memory, including strings and buffers.
 
 typedef void (*compact_f) (Interp *, Memory_Pool *);
 
-/* HEADERIZER HFILE: include/parrot/resources.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static char * aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_PURE_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-static size_t aligned_size(ARGIN(const Buffer *buffer), size_t len)
-        __attribute__nonnull__(1);
-
-PARROT_CONST_FUNCTION
-PARROT_WARN_UNUSED_RESULT
-static size_t aligned_string_size(size_t len);
 
 static void alloc_new_block(PARROT_INTERP,
     size_t size,
@@ -67,31 +53,9 @@ static const char* buffer_location(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
 static void debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
-
-PARROT_MALLOC
-PARROT_CANNOT_RETURN_NULL
-static void * mem_allocate(PARROT_INTERP,
-    size_t size,
-    ARGMOD(Memory_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool);
-
-static void merge_pools(
-    ARGMOD(Memory_Pool *dest),
-    ARGMOD(Memory_Pool *source))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest)
-        FUNC_MODIFIES(*source);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
@@ -99,12 +63,6 @@ static Memory_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact));
 
-#define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(buffer) \
-    || PARROT_ASSERT_ARG(mem)
-#define ASSERT_ARGS_aligned_size __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(buffer)
-#define ASSERT_ARGS_aligned_string_size __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_alloc_new_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool) \
@@ -112,18 +70,9 @@ static Memory_Pool * new_memory_pool(
 #define ASSERT_ARGS_buffer_location __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_compact_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_debug_print_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_mem_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_merge_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(source)
 #define ASSERT_ARGS_new_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -191,8 +140,7 @@ alloc_new_block(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool),
 
 /*
 
-=item C<static void * mem_allocate(PARROT_INTERP, size_t size, Memory_Pool
-*pool)>
+=item C<void * mem_allocate(PARROT_INTERP, size_t size, Memory_Pool *pool)>
 
 Allocates memory for headers.
 
@@ -229,7 +177,7 @@ Buffer memory layout:
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void *
+void *
 mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
 {
     ASSERT_ARGS(mem_allocate)
@@ -249,7 +197,7 @@ mem_allocate(PARROT_INTERP, size_t size, ARGMOD(Memory_Pool *pool))
          */
         if (!interp->arena_base->gc_mark_block_level
         &&   interp->arena_base->mem_allocs_since_last_collect) {
-            Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+            Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #if !PARROT_GC_IMS
             /* Compact the pool if allowed and worthwhile */
             if (pool->compact) {
@@ -353,7 +301,7 @@ debug_print_buf(PARROT_INTERP, ARGIN(const PObj *b))
 
 =over 4
 
-=item C<static void compact_pool(PARROT_INTERP, Memory_Pool *pool)>
+=item C<void compact_pool(PARROT_INTERP, Memory_Pool *pool)>
 
 Compact the string buffer pool. Does not perform a GC scan, or mark items
 as being alive in any way.
@@ -362,7 +310,7 @@ as being alive in any way.
 
 */
 
-static void
+void
 compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 {
     ASSERT_ARGS(compact_pool)
@@ -590,26 +538,7 @@ compact_pool(PARROT_INTERP, ARGMOD(Memory_Pool *pool))
 
 /*
 
-=item C<void Parrot_go_collect(PARROT_INTERP)>
-
-Scan the string pools and compact them. This does not perform a GC mark or
-sweep run, and does not check whether string buffers are still alive.
-Redirects to C<compact_pool>.
-
-=cut
-
-*/
-
-void
-Parrot_go_collect(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_go_collect)
-    compact_pool(interp, interp->arena_base->memory_pool);
-}
-
-/*
-
-=item C<static size_t aligned_size(const Buffer *buffer, size_t len)>
+=item C<size_t aligned_size(const Buffer *buffer, size_t len)>
 
 Determines the size of Buffer C<buffer> which has nominal length C<len>.
 The actual size in RAM of the Buffer might be different because of
@@ -621,7 +550,7 @@ alignment issues.
 
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-static size_t
+size_t
 aligned_size(ARGIN(const Buffer *buffer), size_t len)
 {
     ASSERT_ARGS(aligned_size)
@@ -636,7 +565,7 @@ aligned_size(ARGIN(const Buffer *buffer), size_t len)
 
 /*
 
-=item C<static char * aligned_mem(const Buffer *buffer, char *mem)>
+=item C<char * aligned_mem(const Buffer *buffer, char *mem)>
 
 Returns a pointer to the aligned allocated storage for Buffer C<buffer>,
 which might not be the same as the pointer to C<buffeR> because of
@@ -648,7 +577,7 @@ memory alignment.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static char *
+char *
 aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
 {
     ASSERT_ARGS(aligned_mem)
@@ -665,7 +594,7 @@ aligned_mem(ARGIN(const Buffer *buffer), ARGIN(char *mem))
 
 /*
 
-=item C<static size_t aligned_string_size(size_t len)>
+=item C<size_t aligned_string_size(size_t len)>
 
 Determines the size of a string of length C<len> in RAM, accounting for
 alignment.
@@ -677,7 +606,7 @@ alignment.
 /* XXX Looks like we can lose buffer here */
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-static size_t
+size_t
 aligned_string_size(size_t len)
 {
     ASSERT_ARGS(aligned_string_size)
@@ -688,185 +617,12 @@ aligned_string_size(size_t len)
 
 /*
 
-=item C<int Parrot_in_memory_pool(PARROT_INTERP, void *bufstart)>
-
-Determines if the given C<bufstart> pointer points to a location inside the
-memory pool. Returns 1 if the pointer is in the memory pool, 0 otherwise.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-int
-Parrot_in_memory_pool(PARROT_INTERP, ARGIN(void *bufstart))
-{
-    ASSERT_ARGS(Parrot_in_memory_pool)
-    Memory_Pool * const pool = interp->arena_base->memory_pool;
-    Memory_Block * cur_block = pool->top_block;
-
-    while (cur_block) {
-        if ((char *)bufstart >= cur_block->start &&
-            (char *) bufstart < cur_block->start + cur_block->size) {
-            return 1;
-        }
-        cur_block = cur_block->prev;
-    }
-    return 0;
-}
-
-
-/*
-
 =back
 
 =head2 Parrot Re/Allocate Code
 
 =over 4
 
-=item C<void Parrot_reallocate(PARROT_INTERP, Buffer *buffer, size_t newsize)>
-
-Reallocate the Buffer's buffer memory to the given size. The
-allocated buffer will not shrink. If the buffer was allocated with
-L<Parrot_allocate_aligned> the new buffer will also be aligned. As with
-all reallocation, the new buffer might have moved and the additional
-memory is not cleared.
-
-=cut
-
-*/
-
-void
-Parrot_reallocate(PARROT_INTERP, ARGMOD(Buffer *buffer), size_t newsize)
-{
-    ASSERT_ARGS(Parrot_reallocate)
-    size_t copysize;
-    char  *mem;
-    Memory_Pool * const pool = interp->arena_base->memory_pool;
-    size_t new_size, needed, old_size;
-
-    /*
-     * we don't shrink buffers
-     */
-    if (newsize <= PObj_buflen(buffer))
-        return;
-
-    /*
-     * same as below but barely used and tested - only 3 list related
-     * tests do use true reallocation
-     *
-     * list.c, which does _reallocate, has 2 reallocations
-     * normally, which play ping pong with buffers.
-     * The normal case is therefore always to allocate a new block
-     */
-    new_size = aligned_size(buffer, newsize);
-    old_size = aligned_size(buffer, PObj_buflen(buffer));
-    needed   = new_size - old_size;
-
-    if ((pool->top_block->free >= needed)
-    &&  (pool->top_block->top  == (char *)PObj_bufstart(buffer) + old_size)) {
-        pool->top_block->free -= needed;
-        pool->top_block->top  += needed;
-        PObj_buflen(buffer) = newsize;
-        return;
-    }
-
-    copysize = PObj_buflen(buffer);
-
-    if (!PObj_COW_TEST(buffer))
-        pool->guaranteed_reclaimable += copysize;
-
-    pool->possibly_reclaimable += copysize;
-    mem                         = (char *)mem_allocate(interp, new_size, pool);
-    mem                         = aligned_mem(buffer, mem);
-
-    /* We shouldn't ever have a 0 from size, but we do. If we can track down
-     * those bugs, this can be removed which would make things cheaper */
-    if (copysize)
-        memcpy(mem, PObj_bufstart(buffer), copysize);
-
-    PObj_bufstart(buffer) = mem;
-
-    if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof (void *);
-
-    PObj_buflen(buffer) = new_size;
-}
-
-
-/*
-
-=item C<void Parrot_reallocate_string(PARROT_INTERP, STRING *str, size_t
-newsize)>
-
-Reallocate the STRING's buffer memory to the given size. The allocated
-buffer will not shrink. This function sets also C<str-E<gt>strstart> to the
-new buffer location, C<str-E<gt>bufused> is B<not> changed.
-
-=cut
-
-*/
-
-void
-Parrot_reallocate_string(PARROT_INTERP, ARGMOD(STRING *str), size_t newsize)
-{
-    ASSERT_ARGS(Parrot_reallocate_string)
-    size_t copysize;
-    char *mem, *oldmem;
-    size_t new_size, needed, old_size;
-
-    Memory_Pool * const pool =
-        PObj_constant_TEST(str)
-            ? interp->arena_base->constant_string_pool
-            : interp->arena_base->memory_pool;
-
-    /* if the requested size is smaller then buflen, we are done */
-    if (newsize <= PObj_buflen(str))
-        return;
-
-    /*
-     * first check, if we can reallocate:
-     * - if the passed strings buffer is the last string in the pool and
-     * - if there is enough size, we can just move the pool's top pointer
-     */
-    new_size = aligned_string_size(newsize);
-    old_size = aligned_string_size(PObj_buflen(str));
-    needed   = new_size - old_size;
-
-    if (pool->top_block->free >= needed
-    &&  pool->top_block->top  == (char *)PObj_bufstart(str) + old_size) {
-        pool->top_block->free -= needed;
-        pool->top_block->top  += needed;
-        PObj_buflen(str) = new_size - sizeof (void*);
-        return;
-    }
-
-    PARROT_ASSERT(str->bufused <= newsize);
-
-    /* only copy used memory, not total string buffer */
-    copysize = str->bufused;
-
-    if (!PObj_COW_TEST(str))
-        pool->guaranteed_reclaimable += PObj_buflen(str);
-
-    pool->possibly_reclaimable += PObj_buflen(str);
-
-    mem = (char *)mem_allocate(interp, new_size, pool);
-    mem += sizeof (void *);
-
-    /* copy mem from strstart, *not* bufstart */
-    oldmem             = str->strstart;
-    PObj_bufstart(str) = (void *)mem;
-    str->strstart      = mem;
-    PObj_buflen(str)   = new_size - sizeof (void*);
-
-    /* We shouldn't ever have a 0 from size, but we do. If we can track down
-     * those bugs, this can be removed which would make things cheaper */
-    if (copysize)
-        memcpy(mem, oldmem, copysize);
-}
-
-/*
 
 =item C<void Parrot_allocate(PARROT_INTERP, Buffer *buffer, size_t size)>
 
@@ -888,82 +644,6 @@ Parrot_allocate(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
     PObj_bufstart(buffer) = mem_allocate(interp, size,
             interp->arena_base->memory_pool);
     PObj_buflen(buffer) = size;
-}
-
-
-/*
-
-=item C<void Parrot_allocate_aligned(PARROT_INTERP, Buffer *buffer, size_t
-size)>
-
-Like above, except the C<size> will be rounded up and the address of
-the buffer will have the same alignment as a pointer returned by
-malloc(3) suitable to hold e.g. a C<FLOATVAL> array.
-
-=cut
-
-*/
-
-void
-Parrot_allocate_aligned(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
-{
-    ASSERT_ARGS(Parrot_allocate_aligned)
-    size_t new_size;
-    char *mem;
-
-    PObj_buflen(buffer) = 0;
-    PObj_bufstart(buffer) = NULL;
-    new_size = aligned_size(buffer, size);
-    mem = (char *)mem_allocate(interp, new_size,
-        interp->arena_base->memory_pool);
-    mem = aligned_mem(buffer, mem);
-    PObj_bufstart(buffer) = mem;
-    if (PObj_is_COWable_TEST(buffer))
-        new_size -= sizeof (void*);
-    PObj_buflen(buffer) = new_size;
-}
-
-/*
-
-=item C<void Parrot_allocate_string(PARROT_INTERP, STRING *str, size_t size)>
-
-Allocate the STRING's buffer memory to the given size. The allocated
-buffer maybe slightly bigger than the given C<size>. This function
-sets also C<< str->strstart >> to the new buffer location, C<< str->bufused >>
-is B<not> changed.
-
-=cut
-
-*/
-
-void
-Parrot_allocate_string(PARROT_INTERP, ARGOUT(STRING *str), size_t size)
-{
-    ASSERT_ARGS(Parrot_allocate_string)
-    size_t       new_size;
-    Memory_Pool *pool;
-    char        *mem;
-
-    PObj_buflen(str)   = 0;
-    PObj_bufstart(str) = NULL;
-
-    /* there's no sense in allocating zero memory, when the overhead of
-     * allocating a string is one pointer; this can fill the pools in an
-     * uncompactable way.  See RT #42320.
-     */
-    if (size == 0)
-        return;
-
-    pool     = PObj_constant_TEST(str)
-                ? interp->arena_base->constant_string_pool
-                : interp->arena_base->memory_pool;
-
-    new_size = aligned_string_size(size);
-    mem      = (char *)mem_allocate(interp, new_size, pool);
-    mem     += sizeof (void*);
-
-    PObj_bufstart(str) = str->strstart = mem;
-    PObj_buflen(str)   = new_size - sizeof (void*);
 }
 
 /*
@@ -1025,45 +705,10 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
     alloc_new_block(interp, POOL_SIZE, arena_base->constant_string_pool, "init");
 }
 
-/*
-
-=item C<void Parrot_destroy_memory_pools(PARROT_INTERP)>
-
-Destroys the memory pool and the constant string pool. Loop through both
-pools and destroy all memory blocks contained in them. Once all the
-blocks are freed, free the pools themselves.
-
-=cut
-
-*/
-
-void
-Parrot_destroy_memory_pools(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_destroy_memory_pools)
-    int i;
-
-    for (i = 0; i < 2; i++) {
-        Memory_Pool * const pool = i ?
-                interp->arena_base->constant_string_pool :
-                interp->arena_base->memory_pool;
-        Memory_Block *cur_block;
-
-        cur_block = pool->top_block;
-
-        while (cur_block) {
-            Memory_Block * const next_block = cur_block->prev;
-            mem_internal_free(cur_block);
-            cur_block = next_block;
-        }
-
-        mem_internal_free(pool);
-    }
-}
 
 /*
 
-=item C<static void merge_pools(Memory_Pool *dest, Memory_Pool *source)>
+=item C<void merge_pools(Memory_Pool *dest, Memory_Pool *source)>
 
 Merge two memory pools together. Do this by moving all memory blocks
 from the C<*source> pool into the C<*dest> pool. The C<source> pool
@@ -1073,7 +718,7 @@ is emptied, but is not destroyed here.
 
 */
 
-static void
+void
 merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 {
     ASSERT_ARGS(merge_pools)
@@ -1108,27 +753,57 @@ merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
 
 /*
 
-=item C<void Parrot_merge_memory_pools(Interp *dest_interp, Interp
-*source_interp)>
+=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
 
-Merge the memory pools of two interpreter structures. Merge the general
-memory pool and the constant string pools from C<source_interp> into
-C<dest_interp>.
+Records the start time of a GC mark run when profiling is enabled.
 
 =cut
 
 */
 
 void
-Parrot_merge_memory_pools(ARGIN(Interp *dest_interp), ARGIN(Interp *source_interp))
+Parrot_gc_profile_start(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_merge_memory_pools)
-    merge_pools(dest_interp->arena_base->constant_string_pool,
-                source_interp->arena_base->constant_string_pool);
-
-    merge_pools(dest_interp->arena_base->memory_pool,
-                source_interp->arena_base->memory_pool);
+    ASSERT_ARGS(Parrot_gc_profile_start)
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
+        interp->profile->gc_time = Parrot_floatval_time();
 }
+
+/*
+
+=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
+
+Records the end time of the GC mark run part C<what> run when profiling is
+enabled. Also record start time of next part.
+
+=cut
+
+*/
+
+void
+Parrot_gc_profile_end(PARROT_INTERP, int what)
+{
+    ASSERT_ARGS(Parrot_gc_profile_end)
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
+        RunProfile * const profile = interp->profile;
+        const FLOATVAL     now     = Parrot_floatval_time();
+
+        profile->data[what].numcalls++;
+        profile->data[what].time += now - profile->gc_time;
+
+        /*
+         * we've recorded the time of a GC piece from
+         * gc_time until now, so add this to the start of the
+         * currently executing opcode, which hasn't run this
+         * interval.
+         */
+        profile->starttime += now - profile->gc_time;
+
+        /* prepare start for next step */
+        profile->gc_time    = now;
+    }
+}
+
 
 /*
 
@@ -1136,7 +811,7 @@ Parrot_merge_memory_pools(ARGIN(Interp *dest_interp), ARGIN(Interp *source_inter
 
 =head1 SEE ALSO
 
-F<include/parrot/resources.h>, F<src/gc/memory.c>.
+F<src/gc/memory.c>.
 
 =head1 HISTORY
 

@@ -61,7 +61,7 @@ SKIP: {
     include_paths = lib_paths[2]
     unshift include_paths, '$pcre_libpath'
 
-    load_bytecode "pcre.pir"
+    load_bytecode 'pcre.pbc'
     .local pmc func
     .local pmc lib
 

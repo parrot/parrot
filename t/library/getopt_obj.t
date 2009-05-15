@@ -35,7 +35,7 @@ pir_output_is( <<'CODE', <<'OUT', 'basic long options' );
         push argv, '--bax=3'
         push argv, '--baz'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -94,7 +94,7 @@ pir_output_is( <<'CODE', <<'OUT', "basic short options" );
         push argv, '-Abc'
         push argv, '-c'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -140,7 +140,7 @@ pir_output_is( <<'CODE', <<'OUT', "simple array" );
         push argv, '-Iinca'
         push argv, '-Iincb'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -174,7 +174,7 @@ pir_output_is( <<'CODE', <<'OUT', "mixing long and short with array" );
         push argv, '-Iinca'
         push argv, '--include=incb'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -210,7 +210,7 @@ pir_output_is( <<'CODE', <<'OUT', "hash" );
         push argv, '--define=bax=baz'
         push argv, '-Dfoobar'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -250,7 +250,7 @@ pir_output_is( <<'CODE', <<'OUT', "bundling short options" );
         argv = new 'ResizablePMCArray'
         push argv, '-abc'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -293,7 +293,7 @@ pir_output_is( <<'CODE', <<'OUT', "ignored options" );
         push argv, '--ignore'
         push argv, '--foo'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
         getopts."notOptStop"(1)
@@ -328,7 +328,7 @@ pir_output_is( <<'CODE', <<'OUT', "double dash stop" );
         push argv, '--'
         push argv, '--bar'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -371,7 +371,7 @@ pir_output_is( <<'CODE', <<'OUT', "notOptStop" );
         push argv, 'foo'
         push argv, '--bar'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
         getopts."notOptStop"(1)
@@ -420,7 +420,7 @@ pir_output_is( <<'CODE', <<'OUT', "optarg" );
         push argv, '-f'
         push argv, '-bbar'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
         getopts."notOptStop"(1)
@@ -474,7 +474,7 @@ pir_output_is( <<'CODE', <<'OUT', "pass through" );
         push argv, '--bar'
         push argv, 'bar'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -522,7 +522,7 @@ pir_output_is( <<'CODE', <<'OUT', "lone dash" );
         push argv, '-'
         push argv, '--bar'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -574,7 +574,7 @@ pir_output_is( <<'CODE', <<'OUT', "push interface" );
         push argv, '--define=bax=baz'
         push argv, '-Dfoobar'
 
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
 
@@ -657,7 +657,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "missing spec" );
         .local pmc argv
         argv = new 'ResizablePMCArray'
         push argv, '--foo=file'
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
         $P1 = getopts."get_options"(argv)
@@ -681,7 +681,7 @@ pir_error_output_like( <<'CODE', <<'OUT', "missing argument" );
         argv = new 'ResizablePMCArray'
         push argv, '--foo=file'
         push argv, '--bar'
-        load_bytecode "Getopt/Obj.pir"
+        load_bytecode "Getopt/Obj.pbc"
         .local pmc getopts
         getopts = new "Getopt::Obj"
         push getopts, 'foo=s'

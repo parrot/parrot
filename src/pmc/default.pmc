@@ -21,8 +21,6 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 */
 
-#include "parrot/parrot.h"
-
 #define INT2KEY(i, k) key_new_integer((i), (k))
 
 /* undef 'interface' to keep MSVC happy */
@@ -65,6 +63,28 @@ cant_do_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, const char *methname)
 {
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
             "%s() not implemented in class '%Ss'", methname,
+            caller(interp, pmc));
+}
+
+
+/*
+
+=item C<static void cant_do_write_method(PARROT_INTERP, PMC *pmc,
+                                   const char *methname)>
+
+Throws an exception "$methname() on read-only instance of '$class'", used by
+all updating messages on read-only instances.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+cant_do_write_method(PARROT_INTERP, PMC *pmc /*NULLOK*/, const char *methname)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_WRITE_TO_CONSTCLASS,
+            "%s() in read-only instance of '%Ss'", methname,
             caller(interp, pmc));
 }
 
@@ -209,7 +229,7 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
     PMC *prop;
 
     if (!self->pmc_ext)
-        add_pmc_ext(interp, self);
+        Parrot_gc_add_pmc_ext(interp, self);
 
     PMC_metadata(self) = prop = pmc_new(interp, enum_class_Hash);
     GC_WRITE_BARRIER(interp, self, NULL, prop);
@@ -414,7 +434,7 @@ Returns the PMC's properties or the NULL PMC if no properties exist.
 
     VTABLE PMC *getprops() {
         if (!SELF->pmc_ext)
-            add_pmc_ext(INTERP, SELF);
+            Parrot_gc_add_pmc_ext(INTERP, SELF);
 
         if (!PMC_metadata(SELF)) {
             if (has_pending_std_props(SELF))
@@ -1087,7 +1107,7 @@ Initializes the PMC during unarchiving.
         /* default - initialize the PMC */
         if (info->extra_flags == EXTRA_IS_PROP_HASH) {
             if (!SELF->pmc_ext)
-                add_pmc_ext(INTERP, SELF);
+                Parrot_gc_add_pmc_ext(INTERP, SELF);
 
             info->thaw_ptr  = &PMC_metadata(SELF);
             info->container = SELF;

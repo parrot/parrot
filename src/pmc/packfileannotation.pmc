@@ -19,8 +19,6 @@ PackfileAnnotations segment of the .pbc file.  See PDD13 for a design spec.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass PackfileAnnotation {
     ATTR INTVAL value;
     ATTR INTVAL offset;

@@ -126,7 +126,7 @@ Parrot_IOData_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
      */
     for (i = 0; i < 3; i++) {
         if (table[i]) {
-            pobject_lives(interp, (PObj *)table[i]);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)table[i]);
         }
     }
 }

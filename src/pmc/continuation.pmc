@@ -21,7 +21,6 @@ more information.
 */
 
 
-#include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "pmc_sub.h"
 

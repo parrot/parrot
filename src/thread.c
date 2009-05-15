@@ -352,7 +352,7 @@ pt_shared_fixup(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (is_ro)
         pmc->vtable = pmc->vtable->ro_variant_vtable;
 
-    add_pmc_sync(interp, pmc);
+    Parrot_gc_add_pmc_sync(interp, pmc);
 
     PObj_is_PMC_shared_SET(pmc);
 
@@ -1260,7 +1260,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
 {
     ASSERT_ARGS(pt_suspend_self_for_gc)
     PARROT_ASSERT(interp);
-    PARROT_ASSERT(!interp->arena_base->gc_mark_block_level);
+    PARROT_ASSERT(!Parrot_is_blocked_GC_mark(interp));
     DEBUG_ONLY(fprintf(stderr, "%p: suspend_self_for_gc\n", interp));
     /* since we are modifying our own state, we need to lock
      * the interpreter_array_mutex.
@@ -1288,7 +1288,7 @@ pt_suspend_self_for_gc(PARROT_INTERP)
     /* mark and sweep our world -- later callbacks will keep
      * it sync'd
      */
-    Parrot_gc_ms_run(interp, GC_trace_stack_FLAG);
+    Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
     PARROT_ASSERT(!(interp->thread_data->state & THREAD_STATE_SUSPENDED_GC));
 }

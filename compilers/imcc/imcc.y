@@ -44,7 +44,7 @@
 
 static void add_pcc_named_arg(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(const char *name),
+    ARGIN(SymReg *name),
     ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -64,7 +64,7 @@ static void add_pcc_named_arg_var(PARROT_INTERP,
 
 static void add_pcc_named_param(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(const char *name),
+    ARGIN(SymReg *name),
     ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -74,7 +74,7 @@ static void add_pcc_named_param(PARROT_INTERP,
 
 static void add_pcc_named_result(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(const char *name),
+    ARGIN(SymReg *name),
     ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -84,7 +84,7 @@ static void add_pcc_named_result(PARROT_INTERP,
 
 static void add_pcc_named_return(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(const char *name),
+    ARGIN(SymReg *name),
     ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -92,7 +92,11 @@ static void add_pcc_named_return(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*cur_call);
 
-static void adv_named_set(PARROT_INTERP, ARGIN(char *name))
+static void adv_named_set(PARROT_INTERP, ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void adv_named_set_u(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -260,6 +264,9 @@ static void set_lexical(PARROT_INTERP,
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_adv_named_set __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_adv_named_set_u __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_begin_return_or_yield __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -863,23 +870,22 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *name))
 
 /*
 
-=item C<static void add_pcc_named_arg(PARROT_INTERP, SymReg *cur_call, const
-char *name, SymReg *value)>
+=item C<static void add_pcc_named_arg(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
+add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call),
+        ARGIN(SymReg *name),
         ARGIN(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_arg)
-    SymReg * const r = mk_const(interp, name, 'S');
+    name->type  |= VT_NAMED;
 
-    r->type  |= VT_NAMED;
-
-    add_pcc_arg(cur_call, r);
+    add_pcc_arg(cur_call, name);
     add_pcc_arg(cur_call, value);
 }
 
@@ -904,85 +910,99 @@ add_pcc_named_arg_var(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, const
-char *name, SymReg *value)>
+=item C<static void add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
+add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call),
+        ARGIN(SymReg *name),
         ARGIN(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_result)
-    SymReg * const r = mk_const(interp, name, 'S');
-    r->type         |= VT_NAMED;
+    name->type         |= VT_NAMED;
 
-    add_pcc_result(cur_call, r);
+    add_pcc_result(cur_call, name);
     add_pcc_result(cur_call, value);
 }
 
 /*
 
-=item C<static void add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, const
-char *name, SymReg *value)>
+=item C<static void add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
+add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call),
+        ARGIN(SymReg *name),
         ARGIN(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_param)
-    SymReg * const r = mk_const(interp, name, 'S');
-    r->type         |= VT_NAMED;
+    name->type         |= VT_NAMED;
 
-    add_pcc_arg(cur_call, r);
+    add_pcc_arg(cur_call, name);
     add_pcc_arg(cur_call, value);
 }
 
 /*
 
-=item C<static void add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, const
-char *name, SymReg *value)>
+=item C<static void add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call), ARGIN(const char *name),
+add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call),
+        ARGIN(SymReg *name),
         ARGIN(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_return)
-    SymReg * const r = mk_const(interp, name, 'S');
-    r->type         |= VT_NAMED;
+    name->type         |= VT_NAMED;
 
-    add_pcc_result(cur_call, r);
+    add_pcc_result(cur_call, name);
     add_pcc_result(cur_call, value);
 }
 
 /*
 
-=item C<static void adv_named_set(PARROT_INTERP, char *name)>
+=item C<static void adv_named_set(PARROT_INTERP, const char *name)>
+
+Sets the name of the current named argument.
+
+C<adv_named_set_u> is the Unicode version of this function.
 
 =cut
 
 */
 
-/* XXX Can name be consted? */
 static void
-adv_named_set(PARROT_INTERP, ARGIN(char *name))
+adv_named_set(PARROT_INTERP, ARGIN(const char *name))
 {
     ASSERT_ARGS(adv_named_set)
-    if (IMCC_INFO(interp)->adv_named_id) {
+    if (IMCC_INFO(interp)->adv_named_id)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "Named parameter with more than one name.\n");
-    }
-    IMCC_INFO(interp)->adv_named_id = name;
+
+    IMCC_INFO(interp)->adv_named_id = mk_const(interp, name, 'S');
+}
+
+static void
+adv_named_set_u(PARROT_INTERP, ARGIN(const char *name))
+{
+    ASSERT_ARGS(adv_named_set_u)
+    if (IMCC_INFO(interp)->adv_named_id)
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "Named parameter with more than one name.\n");
+
+    IMCC_INFO(interp)->adv_named_id = mk_const(interp, name, 'U');
 }
 
 /*
@@ -1644,12 +1664,13 @@ paramtype_list:
    ;
 
 paramtype:
-     ADV_SLURPY                { $$ = VT_FLAT;   }
-   | ADV_OPTIONAL              { $$ = VT_OPTIONAL; }
-   | ADV_OPT_FLAG              { $$ = VT_OPT_FLAG; }
-   | ADV_NAMED                 { $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')' { adv_named_set(interp, $3); $$ = 0; }
-   | UNIQUE_REG                { $$ = VT_UNIQUE_REG; }
+     ADV_SLURPY                 { $$ = VT_FLAT;   }
+   | ADV_OPTIONAL               { $$ = VT_OPTIONAL; }
+   | ADV_OPT_FLAG               { $$ = VT_OPT_FLAG; }
+   | ADV_NAMED                  { $$ = VT_NAMED; }
+   | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; }
+   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; }
+   | UNIQUE_REG                 { $$ = VT_UNIQUE_REG; }
    ;
 
 
@@ -1738,7 +1759,8 @@ var_returns:
          }
    | STRINGC ADV_ARROW var
          {
-           add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, $1, $3);
+            SymReg *name = mk_const(interp, $1, 'S');
+            add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, name, $3);
          }
    | var_returns COMMA arg
          {
@@ -1752,7 +1774,8 @@ var_returns:
          }
    | var_returns COMMA STRINGC ADV_ARROW var
          {
-           add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, $3, $5);
+           SymReg *name = mk_const(interp, $3, 'S');
+           add_pcc_named_return(interp, IMCC_INFO(interp)->sr_return, name, $5);
          }
    ;
 
@@ -2130,7 +2153,8 @@ arglist:
    | arglist COMMA STRINGC ADV_ARROW var
          {
            $$ = 0;
-           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $3, $5);
+           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,
+                mk_const(interp, $3, 'S'), $5);
            mem_sys_free($3);
          }
    | var ADV_ARROW var
@@ -2141,7 +2165,8 @@ arglist:
    | STRINGC ADV_ARROW var
          {
            $$ = 0;
-           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, $1, $3);
+           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,
+                mk_const(interp, $1, 'S'), $3);
            mem_sys_free($1);
          }
    ;
@@ -2160,7 +2185,8 @@ argtype:
    | ADV_NAMED                 { $$ = VT_NAMED; }
 
    /* don't free $3 here; adv_named_set uses the pointer directly */
-   | ADV_NAMED '(' STRINGC ')' { adv_named_set(interp, $3); $$ = 0; }
+   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; }
+   | ADV_NAMED '(' STRINGC  ')' { adv_named_set(interp, $3);   $$ = 0; }
    ;
 
 result:
@@ -2180,8 +2206,9 @@ targetlist:
          }
    | targetlist COMMA STRINGC ADV_ARROW target
          {
-           add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $3, $5);
-           mem_sys_free($3);
+            add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call,
+            mk_const(interp, $3, 'S'), $5);
+            mem_sys_free($3);
          }
    | result
          {
@@ -2195,7 +2222,7 @@ targetlist:
          }
    | STRINGC ADV_ARROW target
          {
-           add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, $1, $3);
+           add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, mk_const(interp, $1, 'S'), $3);
            mem_sys_free($1);
          }
    | /* empty */                { $$ = 0; }

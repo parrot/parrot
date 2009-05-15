@@ -18,8 +18,8 @@ F<examples/opengl/triangle.pir>.
     .param pmc argv
 
     # Load OpenGL libary and a helper library for calling glutInit
-    load_bytecode 'library/OpenGL.pbc'
-    load_bytecode 'library/NCI/call_toolkit_init.pbc'
+    load_bytecode 'OpenGL.pbc'
+    load_bytecode 'NCI/call_toolkit_init.pbc'
 
     # Import all OpenGL/GLU/GLUT functions
     .local pmc import_gl
@@ -80,9 +80,6 @@ include:
 
 .namespace ['OpenGL']
 
-.include 'library/OpenGL_funcs.pir'
-
-
 =item _opengl_init()
 
 At module load time, calls the other initialization routines in the proper
@@ -91,6 +88,7 @@ order.
 =cut
 
 .sub _opengl_init :load
+    load_bytecode 'OpenGL_funcs.pbc'
     _load_opengl_libs()
     _wrap_all_opengl_entry_points()
 .end

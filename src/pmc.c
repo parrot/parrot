@@ -41,15 +41,6 @@ static void pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-static void pmc_free_to_pool(PARROT_INTERP,
-    ARGMOD(PMC *pmc),
-    ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pmc)
-        FUNC_MODIFIES(*pool);
-
 #define ASSERT_ARGS_create_class_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_get_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -57,10 +48,6 @@ static void pmc_free_to_pool(PARROT_INTERP,
 #define ASSERT_ARGS_pmc_free __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
-#define ASSERT_ARGS_pmc_free_to_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc) \
-    || PARROT_ASSERT_ARG(pool)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -196,7 +183,7 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
     if (new_vtable->flags & VTABLE_PMC_NEEDS_EXT) {
         /* If we need an ext area, go allocate one */
         if (!has_ext)
-            add_pmc_ext(interp, pmc);
+            Parrot_gc_add_pmc_ext(interp, pmc);
 
         new_flags = PObj_is_PMC_EXT_FLAG;
     }
@@ -226,7 +213,9 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 =item C<static PMC * get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL
 flags)>
 
-Gets a new PMC header.
+Gets a new PMC header of the given integer type. Initialize the pmc if
+necessary. In the case of singleton PMC types, get the existing singleton
+instead of allocating a new one.
 
 =cut
 
@@ -265,7 +254,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 
         /* LOCK */
         if (!pmc) {
-            pmc            = new_pmc_header(interp, PObj_constant_FLAG);
+            pmc = Parrot_gc_new_pmc_header(interp, PObj_constant_FLAG);
             PARROT_ASSERT(pmc);
 
             pmc->vtable    = vtable;
@@ -303,7 +292,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
             flags |= PObj_is_PMC_shared_FLAG;
     }
 
-    pmc            = new_pmc_header(interp, flags);
+    pmc            = Parrot_gc_new_pmc_header(interp, flags);
     pmc->vtable    = vtable;
 
 #if GC_VERBOSE
@@ -474,31 +463,6 @@ temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 /*
 
-=item C<static void pmc_free_to_pool(PARROT_INTERP, PMC *pmc, Small_Object_Pool
-*pool)>
-
-=cut
-
-*/
-
-static void
-pmc_free_to_pool(PARROT_INTERP, ARGMOD(PMC *pmc),
-    ARGMOD(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(pmc_free_to_pool)
-    if (PObj_active_destroy_TEST(pmc))
-        VTABLE_destroy(interp, pmc);
-
-    if (PObj_is_PMC_EXT_TEST(pmc))
-        Parrot_gc_free_pmc_ext(interp, pmc);
-
-    PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
-    pool->add_free_object(interp, pool, (PObj *)pmc);
-    pool->num_free_objects++;
-}
-
-/*
-
 =item C<void temporary_pmc_free(PARROT_INTERP, PMC *pmc)>
 
 Frees a new temporary PMC created by C<temporary_pmc_new()>.  Do not call this
@@ -514,13 +478,17 @@ void
 temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(temporary_pmc_free)
-    Small_Object_Pool *pool = interp->arena_base->constant_pmc_pool;
-    pmc_free_to_pool(interp, pmc, pool);
+    Parrot_gc_free_pmc_header(interp, pmc);
 }
 
 /*
 
 =item C<static void pmc_free(PARROT_INTERP, PMC *pmc)>
+
+Free the given PMC. This function does not call the custom destroy VTABLE if
+one is specified for PMCs of that type (should it?).
+
+TT #663: As of r38727, this function is not called from anywhere
 
 =cut
 
@@ -530,14 +498,16 @@ static void
 pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(pmc_free)
-    Small_Object_Pool *pool = interp->arena_base->pmc_pool;
-    pmc_free_to_pool(interp, pmc, pool);
+    Parrot_gc_free_pmc_header(interp, pmc);
 
 }
 
 /*
 
 =item C<INTVAL get_new_vtable_index(PARROT_INTERP)>
+
+Get a new unique identifier number and allocate a new vtable structure for a
+new PMC type.
 
 =cut
 

@@ -654,8 +654,8 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         else
             io = filehandle;
 
-        Parrot_io_set_flags(interp, filehandle,
-                (Parrot_io_get_flags(interp, filehandle) & PIO_F_PIPE));
+        Parrot_io_set_flags(interp, io,
+                (Parrot_io_get_flags(interp, io) & (~PIO_F_PIPE)));
 
         if (flags & PIO_F_READ) {
             /* close this writer's end of pipe */
@@ -672,13 +672,24 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
     /* Child - exec process */
     if (pid == 0) {
+        /* See above comments */
+#    if 0
         char *argv[10], *p, *c, *cmd, *orig_cmd;
         int   n;
+#    else
+        char * argv[10], *orig_cmd;
+
+        /* C strings for the execv call defined that way to avoid
+         * const problems without copying them.
+         */
+        static char auxarg0 [] = "/bin/sh";
+        static char auxarg1 [] = "-c";
+#    endif
 
         if (flags & PIO_F_WRITE) {
             /* the other end is writing - we read from the pipe */
             close(STDIN_FILENO);
-            close(fds[1]);
+            /*close(fds[1]);*/
 
             if (Parrot_dup(fds[0]) != STDIN_FILENO)
                 exit(EXIT_SUCCESS);
@@ -695,6 +706,13 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
                 exit(EXIT_SUCCESS);
         }
 
+        /*******************************************************
+         *     THIS IS A QUICK TEST IMPLEMENTATION
+         * Thus the if'ed out code is not deleted yet
+         * TT #661
+         *******************************************************
+         */
+#    if 0
         /* XXX ugly hack to be able to pass some arguments
          *     split cmd at blanks */
         orig_cmd = cmd = Parrot_str_to_cstring(interp, command);
@@ -710,6 +728,16 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
 
         Parrot_str_free_cstring(c); /* done with C string */
         execv(cmd, argv);       /* XXX use execvp ? */
+#    else
+
+        orig_cmd = Parrot_str_to_cstring(interp, command);
+        argv [0] = auxarg0;
+        argv [1] = auxarg1;
+        argv [2] = orig_cmd;
+        argv [3] = NULL;
+        execv(argv [0], argv);
+
+#    endif
 
         /* Will never reach this unless exec fails. */
         Parrot_str_free_cstring(orig_cmd);

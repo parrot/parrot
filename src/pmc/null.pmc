@@ -19,8 +19,6 @@ really slowing down the bytecode execution.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass Null singleton {
 
 /*

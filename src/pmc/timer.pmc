@@ -55,7 +55,6 @@ initializer.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
 pmclass Timer extends Task provides event need_ext {

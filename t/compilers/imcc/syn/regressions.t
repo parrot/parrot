@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 14;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -136,6 +136,53 @@ pir_output_is( <<'CODE', <<'OUT', 'unicode lexical identifiers (TT #575)');
  .end
 CODE
 hello world
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'unicode named identifiers (TT #654)');
+ .sub 'main' :main
+    'foo'(1 :named(unicode:"\x{e4}"))
+ .end
+
+ # Perl 6:  sub foo(:$ä) { say "ok $ä"; }
+ .sub 'foo'
+    .param int x :named(unicode:"\x{e4}")
+    print "ok "
+    say x
+ .end
+CODE
+ok 1
+OUT
+
+my $register = "9" x 4096;
+pir_output_is( <<"CODE", <<'OUT', 'long register numbers in PIR (RT #41788)');
+.sub main
+      \$P$register = new 'Integer'
+      \$P$register = 3
+  say \$P$register
+.end
+CODE
+3
+OUT
+
+TODO: {
+    local $TODO = "works in PIR, not PASM";
+
+pasm_output_is( <<"CODE", <<'OUT', 'long register numbers in PASM (RT #41788)');
+      new P$register, 'Integer'
+      assign P$register, 3
+  say P$register
+CODE
+3
+OUT
+
+}
+
+pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT#629');
+.sub 'foo' :immediate
+  die 'no'
+.end
+CODE
+/no\ncurrent inst.*:2\)$/
 OUT
 
 # Local Variables:

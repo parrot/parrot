@@ -26,7 +26,7 @@ Tests the Float PMC.
 
 
 pasm_output_is( <<"CODE", <<OUTPUT, "basic assignment" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
 
     set P0, 0.001
@@ -79,7 +79,7 @@ ok 7
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "add number to self" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 0.001
     add P0, P0, P0
@@ -93,7 +93,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "sub number from self" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, -1000.2
     sub P0, P0, P0
@@ -107,7 +107,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "multiply number by self" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 123.4
     mul P0, P0, P0
@@ -121,7 +121,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<OUTPUT, "divide number by self" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 1829354.988
     div P0, P0, P0
@@ -266,7 +266,7 @@ CODE
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: addition" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 0.001
     add P0, 1
@@ -287,7 +287,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: subtraction" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 103.45
     sub P0, 77
@@ -308,7 +308,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: multiplication" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 0.001
     mul P0, 10000
@@ -336,7 +336,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic integer arithmetic: division" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 1e8
     div P0, 10000
@@ -357,7 +357,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: addition" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 0.001
     add P0, 1.2
@@ -378,7 +378,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: subtraction" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 103.45
     sub P0, 3.46
@@ -399,7 +399,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: multiplication" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 0.001
     mul P0, 123.5
@@ -427,7 +427,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Basic numeric arithmetic: division" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 1e8
     div P0, 0.5
@@ -448,7 +448,7 @@ ok 2
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Increment & decrement" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 0.5
     inc P0
@@ -483,7 +483,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Neg" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 0.5
     neg P0
@@ -599,7 +599,7 @@ CODE
 OUTPUT
 
 pasm_output_is( << "CODE", << 'OUTPUT', "Abs" );
-    .include 'include/fp_equality.pasm'
+    .include 'fp_equality.pasm'
     new P0, ['Float']
     set P0, 1.0
     abs P0

@@ -364,10 +364,9 @@ this.
 
 PARROT_EXPORT
 void
-parrot_dump_hash(SHIM_INTERP, ARGIN(const Hash *hash))
+parrot_dump_hash(SHIM_INTERP, SHIM(const Hash *hash))
 {
     ASSERT_ARGS(parrot_dump_hash)
-    UNUSED(hash);
 }
 
 
@@ -439,7 +438,7 @@ parrot_mark_hash_keys(PARROT_INTERP, ARGIN(Hash *hash))
                     hash, (int)entries);
 
             PARROT_ASSERT(bucket->key);
-            pobject_lives(interp, (PObj *)bucket->key);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
             bucket = bucket->next;
         }
@@ -461,7 +460,7 @@ static void
 parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_values)
-    UINTVAL entries = hash->entries;
+    const UINTVAL entries = hash->entries;
     UINTVAL found   = 0;
     INTVAL  i;
 
@@ -470,12 +469,12 @@ parrot_mark_hash_values(PARROT_INTERP, ARGIN(Hash *hash))
 
         while (bucket) {
             if (++found > entries)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
                         "Detected hash corruption at hash %p entries %d",
                         hash, (int)entries);
 
             PARROT_ASSERT(bucket->value);
-            pobject_lives(interp, (PObj *)bucket->value);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
             bucket = bucket->next;
         }
@@ -497,7 +496,7 @@ static void
 parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
 {
     ASSERT_ARGS(parrot_mark_hash_both)
-    UINTVAL entries = hash->entries;
+    const UINTVAL entries = hash->entries;
     UINTVAL found   = 0;
     INTVAL  i;
 
@@ -511,10 +510,10 @@ parrot_mark_hash_both(PARROT_INTERP, ARGIN(Hash *hash))
                         hash, (int)entries);
 
             PARROT_ASSERT(bucket->key);
-            pobject_lives(interp, (PObj *)bucket->key);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->key);
 
             PARROT_ASSERT(bucket->value);
-            pobject_lives(interp, (PObj *)bucket->value);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)bucket->value);
 
             bucket = bucket->next;
         }
@@ -616,7 +615,7 @@ hash_freeze(PARROT_INTERP, ARGIN(const Hash * const hash), ARGMOD(visit_info *in
     size_t           i;
 
     for (i = 0; i < hash->entries; i++) {
-        HashBucket *b = hash->bs+i;
+        HashBucket * const b = hash->bs+i;
 
         switch (hash->key_type) {
             case Hash_key_type_STRING:
@@ -1099,7 +1098,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 INTVAL
-parrot_hash_size(PARROT_INTERP, ARGIN(const Hash *hash))
+parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_size)
 

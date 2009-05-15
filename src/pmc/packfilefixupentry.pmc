@@ -19,8 +19,6 @@ PackfileFixupTable segment of the .pbc file.  See PDD13 for a design spec.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass PackfileFixupEntry {
     ATTR INTVAL     type;
     ATTR STRING     *name;
@@ -61,7 +59,7 @@ Marks the object as live.
                 PARROT_PACKFILEFIXUPENTRY(SELF);
 
         if (attrs->name)
-            pobject_lives(interp, (PObj *)attrs->name);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->name);
     }
 
 /*

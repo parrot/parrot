@@ -20,8 +20,6 @@ The actual pointer is in C<PMC_data>.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass Pointer need_ext {
     ATTR void * mark_function;
     ATTR void * pointer;

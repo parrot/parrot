@@ -87,10 +87,10 @@ Marks the hash as live.
         Parrot_Pair_attributes * const pair = PARROT_PAIR(SELF);
 
         if (pair->key)
-            pobject_lives(INTERP, (PObj *)pair->key);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)pair->key);
 
         if (pair->value)
-            pobject_lives(INTERP, (PObj *)pair->value);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)pair->value);
     }
 
 /*
@@ -248,7 +248,6 @@ Used to unarchive the Pair.
     VTABLE void visit(visit_info *info) {
         PMC               **pos;
         Parrot_Pair_attributes * const pair     = PARROT_PAIR(SELF);
-        IMAGE_IO    * const io       = info->image_io;
         DPOINTER   ** const temp_pos = (DPOINTER **)pair->key;
         info->thaw_ptr               = (PMC **)temp_pos;
         (info->visit_pmc_now)(INTERP, (PMC *)temp_pos, info);

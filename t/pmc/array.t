@@ -226,7 +226,7 @@ CODE
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['Array']
      set P0, 4
      new P1, ['Key']
@@ -275,7 +275,7 @@ ok 4
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['Array']
      set P0, 1024
 

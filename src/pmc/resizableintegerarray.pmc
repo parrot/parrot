@@ -20,9 +20,6 @@ conversions.
 
 */
 
-#include "parrot/parrot.h"
-
-
 pmclass ResizableIntegerArray extends FixedIntegerArray need_ext provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs to be resized */
 

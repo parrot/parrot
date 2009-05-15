@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 2;
+use Parrot::Test tests => 4;
 
 =head1 NAME
 
@@ -50,6 +50,87 @@ finish:
 CODE
 Catched
 OUTPUT
+
+TODO: {
+local $TODO = 'Testing' unless $^O =~ /linux|darwin/;
+
+pir_output_like( <<'CODE', <<'OUTPUT', 'open pipe for reading' );
+.include 'iglobals.pasm'
+
+.sub testreadpipe :main
+  .local pmc interp
+  interp = getinterp
+  .local pmc conf
+  conf = interp[.IGLOBALS_CONFIG_HASH]
+  .local string command
+  command = conf['build_dir']
+  .local string aux
+  aux = conf['slash']
+  command .= aux
+  aux = conf['test_prog']
+  command .= aux
+  aux = conf['exe']
+  command .= aux
+  command .= ' -V'
+
+  .local pmc pipe
+  pipe = open command, 'rp'
+  unless pipe goto failed
+  .local string line
+nextline:
+  line = readline pipe
+  print line
+  if pipe goto nextline
+  .return()
+failed:
+  say 'FAILED'
+.end
+CODE
+/This is Parrot.*/
+OUTPUT
+
+}
+
+TODO: {
+local $TODO = 'Testing';
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'open pipe for writing' );
+.include 'iglobals.pasm'
+
+.sub testreadpipe :main
+  .local pmc interp
+  interp = getinterp
+  .local pmc conf
+  conf = interp[.IGLOBALS_CONFIG_HASH]
+  .local string command
+  command = conf['build_dir']
+  .local string aux
+  aux = conf['slash']
+  command .= aux
+  .local string filename
+  filename .= command
+  filename .= 'examples/pasm/cat.pasm'
+  aux = conf['test_prog']
+  command .= aux
+  aux = conf['exe']
+  command .= aux
+  command .= ' '
+  command .= filename
+
+  .local pmc pipe
+  pipe = open command, 'wp'
+  unless pipe goto failed
+  pipe.'puts'("Hello, pipe!\n")
+  close pipe
+  .return()
+failed:
+  say 'FAILED'
+.end
+CODE
+Hello, pipe!
+OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl

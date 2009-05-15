@@ -20,10 +20,9 @@ mark/sweep garbage collectors use this code.
 */
 
 #include "parrot/parrot.h"
-#include "parrot/gc_mark_sweep.h"
 #include "gc_private.h"
 
-/* HEADERIZER HFILE: include/parrot/gc_mark_sweep.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -71,10 +70,6 @@ static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 static void more_traceable_objects(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
@@ -113,9 +108,6 @@ static int trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(obj)
 #define ASSERT_ARGS_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
@@ -137,6 +129,9 @@ static int trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 #define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
 
 #define POOL_MAX_BYTES                         65536 * 128
+
+/* Set when walking the system stack */
+int CONSERVATIVE_POINTER_CHASING = 0;
 
 /*
 
@@ -182,7 +177,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
         /* keep the scheduler and its kids alive for Task-like PMCs to destroy
          * themselves; run a sweep to collect them */
         if (interp->scheduler) {
-            pobject_lives(interp, (PObj *)interp->scheduler);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
             VTABLE_mark(interp, interp->scheduler);
             Parrot_gc_sweep(interp, interp->arena_base->pmc_pool);
         }
@@ -202,7 +197,7 @@ Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
     Parrot_gc_ms_run_init(interp);
 
     /* compact STRING pools to collect free headers and allocated buffers */
-    Parrot_go_collect(interp);
+    Parrot_gc_compact_memory_pool(interp);
 
     /* Now go trace the PMCs */
     if (trace_active_PMCs(interp, (flags & GC_trace_stack_FLAG)
@@ -299,12 +294,12 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     }
 
     /* mark it as used  */
-    pobject_lives(interp, (PObj *)interp->iglobals);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->iglobals);
 
     /* mark the current continuation */
     obj = (PObj *)interp->current_cont;
     if (obj && obj != (PObj *)NEED_CONTINUATION)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     /* mark the current context. */
     ctx = CONTEXT(interp);
@@ -325,11 +320,11 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     mark_vtables(interp);
 
     /* mark the root_namespace */
-    pobject_lives(interp, (PObj *)interp->root_namespace);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->root_namespace);
 
     /* mark the concurrency scheduler */
     if (interp->scheduler)
-        pobject_lives(interp, (PObj *)interp->scheduler);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
 
     /* s. packfile.c */
     mark_const_subs(interp);
@@ -338,11 +333,11 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     mark_object_cache(interp);
 
     /* Now mark the class hash */
-    pobject_lives(interp, (PObj *)interp->class_hash);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->class_hash);
 
     /* Mark the registry */
     PARROT_ASSERT(interp->gc_registry);
-    pobject_lives(interp, (PObj *)interp->gc_registry);
+    Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->gc_registry);
 
     /* Mark the MMD cache. */
     if (interp->op_mmd_cache)
@@ -366,6 +361,69 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     return 1;
 }
 
+/*
+
+=item C<void Parrot_gc_ms_run_init(PARROT_INTERP)>
+
+Prepares the collector for a mark & sweep GC run. This is the
+initializer function for the MS garbage collector.
+
+=cut
+
+*/
+
+void
+Parrot_gc_ms_run_init(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_ms_run_init)
+    Arenas * const arena_base       = interp->arena_base;
+
+    arena_base->gc_trace_ptr        = NULL;
+    arena_base->gc_mark_start       = NULL;
+    arena_base->num_early_PMCs_seen = 0;
+    arena_base->num_extended_PMCs   = 0;
+}
+
+
+/*
+
+=item C<void Parrot_gc_ms_free_pmc(PARROT_INTERP, Small_Object_Pool *pool, PObj
+*p)>
+
+Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
+method if one is available. If the PMC uses a PMC_EXT structure, that is freed
+as well.
+
+=cut
+
+*/
+
+void
+Parrot_gc_ms_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
+        ARGMOD(PObj *p))
+{
+    ASSERT_ARGS(Parrot_gc_ms_free_pmc)
+    PMC    * const pmc        = (PMC *)p;
+    Arenas * const arena_base = interp->arena_base;
+
+    /* TODO collect objects with finalizers */
+    if (PObj_needs_early_gc_TEST(p))
+        --arena_base->num_early_gc_PMCs;
+
+    if (PObj_active_destroy_TEST(p))
+        VTABLE_destroy(interp, pmc);
+
+    if (PObj_is_PMC_EXT_TEST(p))
+         Parrot_gc_free_pmc_ext(interp, pmc);
+
+#ifndef NDEBUG
+
+    pmc->pmc_ext     = (PMC_EXT *)0xdeadbeef;
+    pmc->vtable      = (VTABLE  *)0xdeadbeef;
+
+#endif
+
+}
 
 /*
 
@@ -445,7 +503,8 @@ Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
                     }
                 }
 
-                gc_object(interp, pool, b);
+                if (gc_object)
+                    gc_object(interp, pool, b);
 
                 pool->add_free_object(interp, pool, b);
             }
@@ -459,69 +518,6 @@ next:
 
 
 
-/*
-
-=item C<void pobject_lives(PARROT_INTERP, PObj *obj)>
-
-Marks the PObj as "alive" for the Garbage Collector. Takes a pointer to a PObj,
-and performs necessary marking to ensure the PMC and its direct children nodes
-are marked alive. Implementation is generally dependant on the particular
-garbage collector in use.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-pobject_lives(PARROT_INTERP, ARGMOD(PObj *obj))
-{
-    ASSERT_ARGS(pobject_lives)
-#if PARROT_GC_GMS
-    do {
-        if (!PObj_live_TEST(obj) && \
-                PObj_to_GMSH(obj)->gen->gen_no >= interp->gc_generation) \
-            parrot_gc_gms_pobject_lives(interp, obj); \
-    } while (0);
-#else /* not PARROT_GC_GMS */
-
-    /* if object is live or on free list return */
-    if (PObj_is_live_or_free_TESTALL(obj))
-        return;
-
-#  if ! DISABLE_GC_DEBUG
-#    if GC_VERBOSE
-    if (CONSERVATIVE_POINTER_CHASING)
-        fprintf(stderr, "GC Warning! Unanchored %s %p found in system areas \n",
-                PObj_is_PMC_TEST(obj) ? "PMC" : "Buffer", obj);
-
-#    endif
-#  endif
-    /* mark it live */
-    PObj_live_SET(obj);
-
-    /* if object is a PMC and contains buffers or PMCs, then attach the PMC
-     * to the chained mark list. */
-    if (PObj_is_PMC_TEST(obj)) {
-        PMC * const p = (PMC *)obj;
-
-        if (PObj_is_special_PMC_TEST(obj))
-            mark_special(interp, p);
-
-#  ifndef NDEBUG
-        else if (p->pmc_ext && PMC_metadata(p))
-            fprintf(stderr, "GC: error obj %p (%s) has properties\n",
-                    (void *)p, (char*)p->vtable->whoami->strstart);
-#  endif
-    }
-#  if GC_VERBOSE
-    /* buffer GC_DEBUG stuff */
-    if (GC_DEBUG(interp) && PObj_report_TEST(obj))
-        fprintf(stderr, "GC: buffer %p pointing to %p marked live\n",
-                obj, PObj_bufstart((Buffer *)obj));
-#  endif
-#endif  /* PARROT_GC_GMS */
-}
 
 /*
 
@@ -586,7 +582,7 @@ Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
 
 /*
 
-=item C<static void mark_special(PARROT_INTERP, PMC *obj)>
+=item C<void mark_special(PARROT_INTERP, PMC *obj)>
 
 Marks the children of a special PMC. Handles the marking necessary
 for shared PMCs, and ensures timely marking of high-priority PMCs.
@@ -597,7 +593,7 @@ collection.
 
 */
 
-static void
+void
 mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 {
     ASSERT_ARGS(mark_special)
@@ -701,14 +697,14 @@ more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         Small_Object_Arena * const arena = pool->last_Arena;
         if (arena) {
             if (arena->used == arena->total_objects)
-                Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+                Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
             if (pool->num_free_objects <= pool->replenish_level)
                 pool->skip = 1;
         }
     }
 
-    /* requires that num_free_objects be updated in Parrot_do_gc_run. If gc
+    /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep. If gc
      * is disabled, then we must check the free list directly. */
     if (!pool->free_list)
         (*pool->alloc_objects) (interp, pool);
@@ -998,7 +994,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 
         /* mark properties */
         if (PMC_metadata(current))
-            pobject_lives(interp, (PObj *)PMC_metadata(current));
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)PMC_metadata(current));
 
          if (PObj_custom_mark_TEST(current)) {
             PARROT_ASSERT(!PObj_on_free_list_TEST(current));

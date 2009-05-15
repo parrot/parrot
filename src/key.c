@@ -331,8 +331,7 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
     STRING  *str_key;
     FLOATVAL num_key;
 
-    if (VTABLE_isa(interp, key, CONST_STRING(interp, "Key"))) {
-        switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
+    switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         case KEY_hash_iterator_FLAGS:
 
         case KEY_integer_FLAG:
@@ -378,7 +377,6 @@ key_integer(PARROT_INTERP, ARGIN(PMC *key))
         case KEY_inf_slice_FLAG:
         default:
             break;
-        }
     }
 
     return VTABLE_get_integer(interp, key);
@@ -550,9 +548,8 @@ key_next(PARROT_INTERP, ARGIN(PMC *key))
         GETATTR_Key_next_key(interp, key, next_key);
         return next_key;
     }
-    else {
-        return NULL;
-    }
+
+    return NULL;
 }
 
 
@@ -615,7 +612,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 
     if (flags == KEY_string_FLAG) {
         GETATTR_Key_str_key(interp, key, str_key);
-        pobject_lives(interp, (PObj *)str_key);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)str_key);
     }
 
     /*
@@ -629,7 +626,7 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
     /* if iteration hasn't started, above flag isn't set yet */
     GETATTR_Key_next_key(interp, key, next_key);
     if (next_key && (void *)next_key != (void *)INITBucketIndex)
-        pobject_lives(interp, (PObj *)next_key);
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
 
 }
 

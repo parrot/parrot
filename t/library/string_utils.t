@@ -15,7 +15,7 @@ t/library/string_utils.t  -- Tests for String/Utils.pbc
 .const string TESTS = '29'
 
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
 
     .local pmc test       # the test harness object.
                test = new [ 'Test'; 'Builder' ]

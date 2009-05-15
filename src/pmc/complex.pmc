@@ -22,8 +22,6 @@ but those starting with => are the ones used
 
 */
 
-#include "parrot/parrot.h"
-
 /*
 
 =item C<static void

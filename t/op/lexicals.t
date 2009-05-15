@@ -118,7 +118,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'api parsing' );
     $P0 = find_lex 'a'
     print "ok\n"
 .include 'interpinfo.pasm'
-    load_bytecode "pcore.pir"      # TODO autoload/preload
+    load_bytecode 'pcore.pbc'      # TODO autoload/preload
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1.'get_lexinfo'()
     $P2 = $P1.'get_lexenv'()

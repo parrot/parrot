@@ -51,6 +51,7 @@ typedef struct _multi_func_list {
         STRING *multi_name;
         STRING *short_sig;
         STRING *full_sig;
+        STRING *ns_name;
         funcptr_t func_ptr;
 } multi_func_list;
 

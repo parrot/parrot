@@ -90,9 +90,9 @@ sub optable_output_is {
     my ( $test, $output, $msg, %opt ) = @_;
     my ($pir) = <<'CODE';
 .sub main :main
-    load_bytecode 'compilers/pge/PGE.pir'
-    load_bytecode 'dumper.pir'
-    load_bytecode 'PGE/Dumper.pir'
+    load_bytecode 'compilers/pge/PGE.pbc'
+    load_bytecode 'dumper.pbc'
+    load_bytecode 'PGE/Dumper.pbc'
 
     .local pmc optable
     $P0 = get_hll_global ['PGE'], 'OPTable'

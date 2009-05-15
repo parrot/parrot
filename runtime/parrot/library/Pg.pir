@@ -44,7 +44,7 @@ by 'Pg', 'Pg;Conn', and 'Pg;Result' classes.
 
 .sub __load :load
     .local pmc cl
-    load_bytecode "postgres.pir"         # TODO .pbc
+    load_bytecode 'postgres.pbc'
     cl = newclass 'Pg'       # Pg connection constructor
 
     # XXX the hasa 'con' is suboptimal

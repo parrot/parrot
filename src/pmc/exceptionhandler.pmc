@@ -20,7 +20,6 @@ exception object's C<_P5> attribute.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 
 pmclass ExceptionHandler extends Continuation need_ext {
@@ -74,9 +73,9 @@ Mark any active exception handler data as live.
         Parrot_ExceptionHandler_attributes * const core_struct =
             PARROT_EXCEPTIONHANDLER(SELF);
         if (core_struct->handled_types)
-            pobject_lives(interp, (PObj *)core_struct->handled_types);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handled_types);
         if (core_struct->handled_types_except)
-            pobject_lives(interp, (PObj *)core_struct->handled_types_except);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)core_struct->handled_types_except);
     }
 
     VTABLE PMC *clone() {

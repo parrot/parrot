@@ -7,7 +7,7 @@ pcre.pir - user interface to Perl-Compatible Regular Expression library
 
 =head1 SYNOPSIS
 
-    load_bytecode 'library/pcre.pir'
+    load_bytecode 'pcre.pbc'
     lib = pcre_init()
 
     func = get_hll_global ['PCRE'], 'compile'
@@ -81,7 +81,7 @@ LIB_CYGWIN:
 LIB_LOADED:
     set_hll_global ['PCRE'], 'lib', libpcre
 
-    load_bytecode 'library/libpcre.pir'
+    load_bytecode 'libpcre.pbc'
 
     # pcre *pcre_compile(const char *pattern, int options,
     #            const char **errptr, int *erroffset,

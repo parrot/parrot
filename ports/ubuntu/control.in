@@ -1,14 +1,14 @@
 Source: parrot
-Section: universe/interpreters
+Section: interpreters
 Priority: optional
 Maintainer: Ubuntu MOTU Developers <ubuntu-motu@lists.ubuntu.com>
 XSBC-Original-Maintainer: Debian Parrot Maintainers <pkg-parrot-devel@lists.alioth.debian.org>
 Build-Depends: debhelper (>= 5.0.0), perl, perl-doc, libgdbm-dev, libreadline-dev
-Standards-Version: 3.8.0
+Standards-Version: 3.8.1
 
 Package: parrot
 Architecture: any
-Depends: parrot-minimal (= ${binary:Version})
+Depends: ${shlibs:Depends}, parrot-minimal (= ${binary:Version})
 Suggests: parrot-doc
 Provides: parrot-test, parrot-data-dumper
 Description: A virtual machine for dynamic languages
@@ -19,6 +19,8 @@ Description: A virtual machine for dynamic languages
 Package: parrot-minimal
 Architecture: any
 Depends: ${shlibs:Depends}
+Conflicts: parrot ( << 1.0.0 )
+Replaces: parrot ( << 1.0.0 )
 Description: A minimal install of the Parrot VM
  This package contains the core Parrot virtual machine. It's all that you need
  to get up and running in the average use case, and is sufficient to run most
@@ -26,17 +28,15 @@ Description: A minimal install of the Parrot VM
 
 Package: libparrot@SOVERSION@
 Architecture: any
-Section: universe/libs
+Section: libs
 Depends: ${shlibs:Depends}
-Provides: libparrot
-Conflicts: libparrot
 Description: Parrot shared library
  This package contains the Parrot shared library, used by the Parrot virtual
  machine and by programs that embed Parrot.
  
 Package: libparrot-dev
 Architecture: any
-Section: universe/devel
+Section: libdevel
 Depends: libparrot@SOVERSION@ (= ${binary:Version}), parrot
 Description: Parrot shared library development files
  This package contains header files and a static library, needed to develop
@@ -44,7 +44,7 @@ Description: Parrot shared library development files
 
 Package: parrot-doc
 Architecture: all
-Section: universe/doc
+Section: doc
 Suggests: perl-doc
 Description: Parrot documentation
  Parrot manual pages and raw Pod documentation. If you are developing a
@@ -53,9 +53,11 @@ Description: Parrot documentation
 
 Package: parrot-devel
 Architecture: any
-Section: universe/devel
-Depends: parrot, perl
+Section: devel
+Depends: ${shlibs:Depends}, parrot, libparrot-dev, perl
 Provides: parrot-pge, parrot-tge, parrot-pct, parrot-nqp
+Conflicts: parrot ( << 1.0.0 ), libparrot-dev ( << 1.0.0 )
+Replaces: parrot ( << 1.0.0 ), libparrot-dev ( << 1.0.0 )
 Description: Parrot development tools
  This package contains development tools for the Parrot virtual machine. It is
  essential for developing language implementations to run on Parrot, but not

@@ -268,12 +268,12 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
 
     typedef struct sprintf_obj SPRINTF_OBJ;
 
-    typedef STRING *(*sprintf_getchar_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef HUGEINTVAL(*sprintf_getint_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef UHUGEINTVAL(*sprintf_getuint_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef HUGEFLOATVAL(*sprintf_getfloat_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef STRING *(*sprintf_getstring_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
-    typedef void *(*sprintf_getptr_t) (PARROT_INTERP, INTVAL, SPRINTF_OBJ *);
+    typedef STRING *(*sprintf_getchar_t)       (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef HUGEINTVAL(*sprintf_getint_t)      (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef UHUGEINTVAL(*sprintf_getuint_t)    (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef HUGEFLOATVAL(*sprintf_getfloat_t)  (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef STRING *(*sprintf_getstring_t)     (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
+    typedef void *(*sprintf_getptr_t)          (PARROT_INTERP, INTVAL, ARGIN(SPRINTF_OBJ *));
 
     struct sprintf_obj {
         void *data;

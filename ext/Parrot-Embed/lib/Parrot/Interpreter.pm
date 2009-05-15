@@ -1,5 +1,5 @@
 package Parrot::Interpreter;
-
+# Copyright (C) 2006-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -119,13 +119,6 @@ Patches welcome.
 
 Please report any bugs or feature requests to the Parrot Porters mailing list.
 Someday there may be a CPAN version of this code.  Who knows?
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (C) 2006-2008, Parrot Foundation / chromatic.
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Parrot itself.
 
 =cut
 

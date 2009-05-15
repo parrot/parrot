@@ -580,6 +580,7 @@ void Parrot_run_callback(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL interpinfo(PARROT_INTERP, INTVAL what)
         __attribute__nonnull__(1);
 

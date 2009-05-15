@@ -18,7 +18,6 @@ Implements a message passed between concurrency schedulers.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
 pmclass SchedulerMessage need_ext {
@@ -216,7 +215,7 @@ Mark any referenced strings and PMCs.
                 PARROT_SCHEDULERMESSAGE(SELF);
 
             if (core_struct->data)
-                pobject_lives(interp, (PObj*)core_struct->data);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)core_struct->data);
         }
     }
 

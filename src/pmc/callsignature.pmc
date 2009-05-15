@@ -19,8 +19,6 @@ information for a multiple dispatch call.
 
 */
 
-#include "parrot/parrot.h"
-
 #define CAPTURE_DATA_SIZE   2
 #define CAPTURE_array_CREATE(i, obj) \
     if (!PARROT_CAPTURE(obj)->array) \
@@ -191,15 +189,15 @@ Mark any referenced strings and PMCs.
         if (attrs) {
 
             if (attrs->array)
-                pobject_lives(interp, (PObj*)attrs->array);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->array);
             if (attrs->hash)
-                pobject_lives(interp, (PObj*)attrs->hash);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->hash);
             if (attrs->returns)
-                pobject_lives(interp, (PObj*)attrs->returns);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->returns);
             if (attrs->type_tuple)
-                pobject_lives(interp, (PObj*)attrs->type_tuple);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->type_tuple);
             if (attrs->short_sig)
-                pobject_lives(interp, (PObj*)attrs->short_sig);
+                Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->short_sig);
         }
 
         if (!data)
@@ -207,7 +205,7 @@ Mark any referenced strings and PMCs.
 
         for (i = attrs->data_size - 1; i >= 0; --i)
             if (data[i])
-                pobject_lives(interp, (PObj *)data[i]);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)data[i]);
     }
 
 

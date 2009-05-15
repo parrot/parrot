@@ -24,8 +24,6 @@ PDD13 for the design spec.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass PackfileFixupTable extends PackfileSegment {
     /* RPA of entries */
     ATTR PMC *entries;
@@ -65,7 +63,7 @@ Marks the object as live.
                 PARROT_PACKFILEFIXUPTABLE(SELF);
 
         if (attrs->entries)
-            pobject_lives(interp, (PObj *)attrs->entries);
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->entries);
     }
 
 /*

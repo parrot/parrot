@@ -388,6 +388,8 @@ AGAIN:
 =item C<static void get_sockaddr_in(PARROT_INTERP, PMC * sockaddr, const char*
 host, int port)>
 
+Get a C<sockaddr_in> structure to connect to the given host.
+
 =cut
 
 */
@@ -427,6 +429,8 @@ get_sockaddr_in(PARROT_INTERP, ARGIN(PMC * sockaddr), ARGIN(const char* host),
 /*
 
 =item C<PMC * Parrot_io_sockaddr_in(PARROT_INTERP, STRING *addr, INTVAL port)>
+
+Create a new Sockaddr PMC to connect to the given address and port.
 
 =cut
 

@@ -31,6 +31,8 @@ These are the primary interface functions for working with socket objects.
 
 =item C<INTVAL Parrot_io_socket_is_closed(PMC *socket)>
 
+Returns 1 if the socket is closed, 0 if it is open.
+
 =cut
 
 */

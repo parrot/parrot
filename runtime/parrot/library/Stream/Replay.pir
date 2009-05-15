@@ -2,7 +2,7 @@
 
 =head1 TITLE
 
-Stream::Replay - replayable Stream
+Stream;Replay - replayable Stream
 
 =head1 VERSION
 
@@ -10,9 +10,9 @@ version 0.1
 
 =head1 SYNOPSIS
 
-    load_bytecode "library/Stream/Replay.pir"
+    load_bytecode 'Stream/Replay.pbc'
 
-    $P0 = new "Stream::Replay"
+    $P0 = new ['Stream'; 'Replay']
     assign $P0, other_stream
 
     # .. read from $P0 ..
@@ -34,22 +34,22 @@ By using C<clone>, you can read data from a stream as often as you want.
 
 =cut
 
-.namespace ["Stream::Replay"]
+.namespace ['Stream'; 'Replay']
 
 .sub onload :load :anon
-    $P0 = get_class 'Stream::Replay'
+    $P0 = get_class ['Stream'; 'Replay']
     unless null $P0 goto END
 
-    load_bytecode "library/Stream/Base.pir"
+    load_bytecode 'Stream/Base.pbc'
 
-    # Stream::Replay
-    get_class $P0, "Stream::Base"
-    subclass $P0, $P0, "Stream::Replay"
+    # Stream;Replay
+    get_class $P0, ['Stream'; 'Base']
+    subclass $P0, $P0, ['Stream'; 'Replay']
     addattribute $P0, "replay_buffer"
     addattribute $P0, "pos"
 
-    # Stream::Replay::Buffer
-    newclass $P0, "Stream::Replay::Buffer"
+    # Stream;Replay;Buffer
+    newclass $P0, ['Stream'; 'Replay'; 'Buffer']
     addattribute $P0, "strings"
     addattribute $P0, "clones"
 END:
@@ -78,7 +78,7 @@ END:
     .param pmc val
     .local pmc buffer
 
-    isa $I0, val, "Stream::Replay"
+    isa $I0, val, ['Stream'; 'Replay']
     unless $I0 goto NOTA
 
     # get the buffer
@@ -102,7 +102,7 @@ END:
     val = val."source"()
     goto ASSIGN
 NOTA:
-    buffer = new "Stream::Replay::Buffer"
+    buffer = new ['Stream'; 'Replay'; 'Buffer']
     setattribute self, 'replay_buffer', buffer
 ASSIGN:
     self."setSource"( val )
@@ -142,7 +142,7 @@ END:
     .local pmc ret
     .local pmc temp
 
-    ret = new "Stream::Replay"
+    ret = new ['Stream'; 'Replay']
 
     assign ret, self
 
@@ -155,7 +155,7 @@ END:
 .end
 
 
-.namespace ["Stream::Replay::Buffer"]
+.namespace ['Stream'; 'Replay'; 'Buffer']
 
 .sub init :vtable :method
     .local pmc temp
@@ -251,7 +251,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

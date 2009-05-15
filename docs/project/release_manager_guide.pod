@@ -15,8 +15,10 @@ announce the tasks to the Parrot mailing list.  Make sure everyone knows what
 they've committed to accomplish in time for the release.
 
 A couple of weeks in advance: Ask people to run C<make fulltest> and
-report (and hopefully fix!) any problems they find. Also check in with
+report (and hopefully fix!) any problems they find. Check in with
 language project leads for release blockers, to allow time to fix them.
+Also ask people to review the tickets targeted for the upcoming release
+L<https://trac.parrot.org/parrot/roadmap>.
 
 A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether

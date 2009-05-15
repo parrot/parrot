@@ -27,7 +27,6 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "parrot/compiler.h"
 #include "parrot/string_funcs.h"
 #include "private_cstring.h"
-#include "parrot/resources.h"
 
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \
@@ -89,7 +88,7 @@ Parrot_str_write_COW(PARROT_INTERP, ARGMOD(STRING *s))
          * also be sure not to allocate from the constant pool
          */
         PObj_flags_CLEARALL(&for_alloc);
-        Parrot_allocate_string(interp, &for_alloc, PObj_buflen(s));
+        Parrot_gc_allocate_string_storage(interp, &for_alloc, PObj_buflen(s));
 
         /* now copy memory over */
         mem_sys_memcopy(for_alloc.strstart, s->strstart, s->bufused);
@@ -128,7 +127,8 @@ Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
     STRING *d;
 
     if (PObj_constant_TEST(s)) {
-        d = new_string_header(interp, PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
+        d = Parrot_gc_new_string_header(interp,
+            PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
         PObj_COW_SET(s);
         STRUCT_COPY(d, s);
         /* we can't move the memory, because constants aren't
@@ -139,7 +139,7 @@ Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
         PObj_external_SET(d);
     }
     else {
-        d = new_string_header(interp, PObj_get_FLAGS(s));
+        d = Parrot_gc_new_string_header(interp, PObj_get_FLAGS(s));
         PObj_COW_SET(s);
         STRUCT_COPY(d, s);
         PObj_sysmem_CLEAR(d);
@@ -147,7 +147,7 @@ Parrot_str_new_COW(PARROT_INTERP, ARGMOD(STRING *s))
         /* XXX FIXME hack to avoid cross-interpreter issue until it
          * is fixed correctly. */
         if (n_interpreters > 1 && PObj_is_movable_TESTALL(s) &&
-                !Parrot_in_memory_pool(interp, PObj_bufstart(s))) {
+                !Parrot_gc_ptr_in_memory_pool(interp, PObj_bufstart(s))) {
             Parrot_str_write_COW(interp, d);
             Parrot_io_eprintf(interp, "cross-interpreter copy of "
                                      "relocatable string '%Ss' into tid %d\n",
@@ -242,10 +242,7 @@ void
 Parrot_str_free(PARROT_INTERP, ARGIN(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_free)
-    if (!PObj_constant_TEST(s)) {
-        Small_Object_Pool * const pool = interp->arena_base->string_header_pool;
-        pool->add_free_object(interp, pool, s);
-    }
+    Parrot_gc_free_string_header(interp, s);
 }
 
 /*
@@ -285,20 +282,19 @@ Parrot_str_init(PARROT_INTERP)
         interp->hash_seed = Parrot_uint_rand(0);
     }
 
-    /* Set up the cstring cache, then load the basic encodings and charsets */
-    if (!interp->parent_interpreter) {
-        const_cstring_hash = parrot_new_cstring_hash(interp);
-        interp->const_cstring_hash  = const_cstring_hash;
-        Parrot_charsets_encodings_init(interp);
-    }
     /* initialize the constant string table */
-    else {
+    if (interp->parent_interpreter) {
         interp->const_cstring_table =
             interp->parent_interpreter->const_cstring_table;
         interp->const_cstring_hash  =
             interp->parent_interpreter->const_cstring_hash;
         return;
     }
+
+    /* Set up the cstring cache, then load the basic encodings and charsets */
+    const_cstring_hash          = parrot_new_cstring_hash(interp);
+    interp->const_cstring_hash  = const_cstring_hash;
+    Parrot_charsets_encodings_init(interp);
 
     interp->const_cstring_table =
         mem_allocate_n_zeroed_typed(n_parrot_cstrings, STRING *);
@@ -382,7 +378,7 @@ Parrot_str_new_noinit(PARROT_INTERP,
     parrot_string_representation_t representation, UINTVAL capacity)
 {
     ASSERT_ARGS(Parrot_str_new_noinit)
-    STRING * const s = new_string_header(interp, 0);
+    STRING * const s = Parrot_gc_new_string_header(interp, 0);
 
     /* TODO adapt string creation functions */
     if (representation != enum_stringrep_one)
@@ -392,7 +388,7 @@ Parrot_str_new_noinit(PARROT_INTERP,
     s->charset  = PARROT_DEFAULT_CHARSET;
     s->encoding = CHARSET_GET_PREFERRED_ENCODING(interp, s);
 
-    Parrot_allocate_string(interp, s,
+    Parrot_gc_allocate_string_storage(interp, s,
         (size_t)string_max_bytes(interp, s, capacity));
 
     return s;
@@ -568,7 +564,7 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
         /* upgrade to utf16 */
         Parrot_utf16_encoding_ptr->to_encoding(interp, a, NULL);
         b = Parrot_utf16_encoding_ptr->to_encoding(interp, b,
-                new_string_header(interp, 0));
+                Parrot_gc_new_string_header(interp, 0));
 
         /* result could be mixed ucs2 / utf16 */
         if (b->encoding == Parrot_utf16_encoding_ptr)
@@ -581,7 +577,7 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
 
     /* make sure A's big enough for both  */
     if (total_length > a_capacity)
-        Parrot_reallocate_string(interp, a, total_length << 1);
+        Parrot_gc_reallocate_string_storage(interp, a, total_length << 1);
 
     /* A is now ready to receive the contents of B */
 
@@ -761,7 +757,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
 {
     ASSERT_ARGS(Parrot_str_new_init)
     DECL_CONST_CAST;
-    STRING * const s = new_string_header(interp, flags);
+    STRING * const s = Parrot_gc_new_string_header(interp, flags);
     s->encoding      = encoding;
     s->charset       = charset;
 
@@ -786,7 +782,7 @@ Parrot_str_new_init(PARROT_INTERP, ARGIN_NULLOK(const char *buffer), UINTVAL len
         return s;
     }
 
-    Parrot_allocate_string(interp, s, len);
+    Parrot_gc_allocate_string_storage(interp, s, len);
 
     if (buffer) {
         mem_sys_memcopy(s->strstart, buffer, len);
@@ -823,7 +819,7 @@ Parrot_str_resize(PARROT_INTERP, ARGMOD(STRING *s), UINTVAL addlen)
     Parrot_str_write_COW(interp, s);
 
     /* Don't check buflen, if we are here, we already checked. */
-    Parrot_reallocate_string(interp,
+    Parrot_gc_reallocate_string_storage(interp,
         s, PObj_buflen(s) + string_max_bytes(interp, s, addlen));
     return s;
 }
@@ -1267,7 +1263,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(STRING *src),
     if (!cs) {
         Parrot_utf16_encoding_ptr->to_encoding(interp, src, NULL);
         rep = Parrot_utf16_encoding_ptr->to_encoding(interp, rep,
-                new_string_header(interp, 0));
+                Parrot_gc_new_string_header(interp, 0));
     }
     else {
         src->charset  = cs;
@@ -1612,7 +1608,7 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, minlen, enum_stringrep_one);
@@ -1765,7 +1761,7 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, maxlen, enum_stringrep_one);
@@ -1841,7 +1837,7 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, maxlen, enum_stringrep_one);
@@ -1920,7 +1916,7 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s),
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
     if (interp && GC_DEBUG(interp))
-        Parrot_do_gc_run(interp, GC_trace_stack_FLAG);
+        Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
     make_writable(interp, &res, len, enum_stringrep_one);
@@ -2095,11 +2091,9 @@ FLOATVAL
 Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_num)
-    FLOATVAL    f = 0.0;
+    FLOATVAL    f;
     char       *cstr;
     const char *p;
-
-    DECL_CONST_CAST;
 
     /*
      * XXX C99 atof interprets 0x prefix
@@ -2328,13 +2322,13 @@ Parrot_str_unpin(PARROT_INTERP, ARGMOD(STRING *s))
     memory = PObj_bufstart(s);
 
     /* Reallocate it the same size
-     * NOTE can't use Parrot_reallocate_string because of the LEA
+     * NOTE can't use Parrot_gc_reallocate_string_storage because of the LEA
      * allocator, where this is a noop for the same size
      *
      * We have to block GC here, as we have a pointer to bufstart
      */
     Parrot_block_GC_sweep(interp);
-    Parrot_allocate_string(interp, s, size);
+    Parrot_gc_allocate_string_storage(interp, s, size);
     Parrot_unblock_GC_sweep(interp);
     mem_sys_memcopy(PObj_bufstart(s), memory, size);
 
@@ -2456,7 +2450,7 @@ Parrot_str_escape_truncate(PARROT_INTERP,
             if (i >= charlen - 2) {
                 /* resize - still len codepoints to go */
                 charlen += len * 2 + 16;
-                Parrot_reallocate_string(interp, result, charlen);
+                Parrot_gc_reallocate_string_storage(interp, result, charlen);
                 /* start can change */
                 dp = (unsigned char *)result->strstart;
             }

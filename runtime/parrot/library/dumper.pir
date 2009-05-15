@@ -30,7 +30,7 @@ version 0.10
 .sub __library_dumper_print_usage
     say "# usage:"
     say ".sub main"
-    say "    load_bytecode 'Data/Dumper.pir'"
+    say "    load_bytecode 'Data/Dumper.pbc'"
     say ''
     say "    .local pmc foo, dumper"
     say "    foo    = new 'ResizablePMCArray'"
@@ -153,13 +153,13 @@ Returns the global dumper instance used by the non object interface.
     goto TYPE_OK
 
   load_dd_pir:
-    load_bytecode "Data/Dumper.pir"
+    load_bytecode "Data/Dumper.pbc"
     get_class dd_class, "Data::Dumper"
     if null dd_class goto no_class
     goto TYPE_OK
 
   no_class:
-    print "fatal error: failure while loading Data/Dumper.pir\n"
+    print "fatal error: failure while loading Data/Dumper.pbc\n"
     end
 TYPE_OK:
 

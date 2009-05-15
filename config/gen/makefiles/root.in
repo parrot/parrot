@@ -253,6 +253,7 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/dumper.pbc \
     $(LIBRARY_DIR)/yaml_dumper.pbc \
     $(LIBRARY_DIR)/Getopt/Obj.pbc \
+    $(LIBRARY_DIR)/Iter.pbc \
     $(LIBRARY_DIR)/JSON.pbc \
     $(LIBRARY_DIR)/Math/Random/mt19937ar.pbc \
     $(LIBRARY_DIR)/Math/Rand.pbc \
@@ -260,8 +261,10 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/NCI/call_toolkit_init.pbc \
     $(LIBRARY_DIR)/ncurses.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL.pbc \
+#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
+    $(LIBRARY_DIR)/pcore.pbc \
     $(LIBRARY_DIR)/pcre.pbc \
     $(LIBRARY_DIR)/Parrot/Coroutine.pbc \
     $(LIBRARY_DIR)/Parrot/Exception.pbc \
@@ -271,6 +274,7 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/PGE/Text.pbc \
     $(LIBRARY_DIR)/PGE/Util.pbc \
     $(LIBRARY_DIR)/Protoobject.pbc \
+    $(LIBRARY_DIR)/Range.pbc \
     $(LIBRARY_DIR)/Stream/Base.pbc \
     $(LIBRARY_DIR)/Stream/Combiner.pbc \
     $(LIBRARY_DIR)/Stream/Coroutine.pbc \
@@ -289,7 +293,11 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/Test/Class.pbc \
     $(LIBRARY_DIR)/Test/More.pbc \
     $(LIBRARY_DIR)/Tcl/Glob.pbc \
+    $(LIBRARY_DIR)/TclLibrary.pbc \
     $(LIBRARY_DIR)/uuid.pbc \
+    $(LIBRARY_DIR)/YAML/Dumper/Base.pbc \
+    $(LIBRARY_DIR)/YAML/Dumper/Default.pbc \
+    $(LIBRARY_DIR)/YAML/Dumper.pbc \
     $(LIBRARY_DIR)/YAML/Parser/Syck.pbc \
     $(LIBRARY_DIR)/STM.pbc \
     $(LIBRARY_DIR)/libpcre.pbc \
@@ -834,20 +842,22 @@ $(SRC_DIR)/parrot_config$(O) : $(SRC_DIR)/parrot_config.c
 
 $(SRC_DIR)/install_config$(O) : $(SRC_DIR)/install_config.c
 
-$(SRC_DIR)/null_config$(O) : $(SRC_DIR)/null_config.c
+$(SRC_DIR)/null_config$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/null_config.c
 
-$(SRC_DIR)/oo$(O) : $(SRC_DIR)/pmc/class.c $(INC_DIR)/pbcversion.h
+$(SRC_DIR)/oo$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/class.c $(INC_DIR)/pbcversion.h
 
-$(SRC_DIR)/scheduler$(O) : $(SRC_DIR)/scheduler.str   \
+$(SRC_DIR)/scheduler$(O) : $(INC_DIR)/parrot.h \
+                           $(SRC_DIR)/scheduler.str   \
                            $(SRC_DIR)/pmc/scheduler.c \
                            $(SRC_DIR)/pmc/task.c      \
                            $(SRC_DIR)/pmc/timer.c     \
                            $(INC_DIR)/pbcversion.h
 
-$(IO_DIR)/socket_api$(O) : $(SRC_DIR)/pmc/socket.c
-$(IO_DIR)/socket_unix$(O) : $(INC_DIR)/pbcversion.h   \
+$(IO_DIR)/core$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
+$(IO_DIR)/socket_api$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/socket.c
+$(IO_DIR)/socket_unix$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
                             $(SRC_DIR)/pmc/socket.c
-$(IO_DIR)/socket_win32$(O) : $(INC_DIR)/pbcversion.h   \
+$(IO_DIR)/socket_win32$(O) : $(INC_DIR)/parrot.h $(INC_DIR)/pbcversion.h   \
                             $(SRC_DIR)/pmc/socket.c
 
 lib_deps_object : $(O_FILES)
@@ -934,7 +944,7 @@ $(INSTALLABLEDIS) : $(SRC_DIR)/pbc_disassemble$(O) $(LIBPARROT)
 #
 # Parrot Dump
 #
-$(SRC_DIR)/packdump$(O) : $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h
+$(SRC_DIR)/packdump$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_key.h
 
 $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -942,7 +952,7 @@ $(PDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
     $(SRC_DIR)/packdump$(O) @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(SRC_DIR)/pbc_dump$(O) : $(GEN_HEADERS)
+$(SRC_DIR)/pbc_dump$(O) : $(INC_DIR)/parrot.h $(GEN_HEADERS)
 
 $(INSTALLABLEPDUMP) : $(SRC_DIR)/pbc_dump$(O) $(SRC_DIR)/packdump$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -959,7 +969,7 @@ $(PINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
     @rpath_blib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
-$(SRC_DIR)/pbc_info$(O) : $(GEN_HEADERS)
+$(SRC_DIR)/pbc_info$(O) : $(INC_DIR)/parrot.h $(GEN_HEADERS)
 
 $(INSTALLABLEPINFO) : $(SRC_DIR)/pbc_info$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
@@ -1033,6 +1043,12 @@ examples/pasm/hello$(EXE): examples/pasm/hello$(O)
 #
 ###############################################################################
 
+$(SRC_DIR)/byteorder$(O) : $(INC_DIR)/parrot.h
+
+$(SRC_DIR)/datatypes$(O) : $(INC_DIR)/parrot.h
+
+$(SRC_DIR)/extend_vtable$(O) : $(INC_DIR)/parrot.h
+
 $(SRC_DIR)/global_setup$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global_setup.str
 
 $(SRC_DIR)/global$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/global.str \
@@ -1048,7 +1064,7 @@ $(SRC_DIR)/list$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/library$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h $(SRC_DIR)/pmc/pmc_sub.h
+$(SRC_DIR)/jit$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/jit_emit.h $(SRC_DIR)/pmc/pmc_sub.h $(SRC_DIR)/pmc/pmc_managedstruct.h
 
 $(SRC_DIR)/jit_debug$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/debug.str
 
@@ -1221,7 +1237,7 @@ $(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c $(GENERAL_H_FILES)
 $(SRC_DIR)/pbc_merge$(O) : $(SRC_DIR)/pbc_merge.c $(GENERAL_H_FILES) \
 	$(SRC_DIR)/pmc/pmc_sub.h
 
-$(IO_DIR)/filehandle$(O) : $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
+$(IO_DIR)/filehandle$(O) : $(INC_DIR)/parrot.h $(SRC_DIR)/pmc/pmc_filehandle.h $(SRC_DIR)/io/io_private.h
 
 $(OPS_DIR)/core_ops$(O) : $(GENERAL_H_FILES) $(OPS_DIR)/core_ops.c \
 	$(SRC_DIR)/pmc/pmc_continuation.h $(SRC_DIR)/pmc/pmc_parrotlibrary.h
@@ -1352,10 +1368,10 @@ htmlhelp-clean :
 dynpmc : dynpmc.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynpmc.dummy : $(PARROT)
+dynpmc.dummy : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
 	$(MAKE) src/dynpmc
 
-dynpmc-test :
+dynpmc-test : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
 	$(MAKE) src/dynpmc test
 
 dynpmc-clean :
@@ -1370,10 +1386,10 @@ dynpmc-clean :
 dynoplibs : dynoplibs.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynoplibs.dummy : $(PARROT)
+dynoplibs.dummy : $(PARROT) $(INC_DIR)/dynext.h
 	$(MAKE) src/dynoplibs
 
-dynoplibs-test :
+dynoplibs-test : $(PARROT) $(INC_DIR)/dynext.h
 	$(MAKE) src/dynoplibs test
 
 dynoplibs-clean :
@@ -1948,22 +1964,27 @@ SPLINTFLAGS = \
     -skip-posix-headers \
     \
     +ansi89-limits \
+    +num-struct-fields 255 \
     \
     -show-summary \
     +show-scan \
-    +time-dist
-
-# Watch for naming conflicts, but don't complain about str*() functions
-SPLINTFLAGS := $(SPLINTFLAGS) \
+    +time-dist \
+    \
     +ansi-reserved \
     +ansi-reserved-internal \
     -iso-reserved \
-    -iso-reserved-internal
+    -iso-reserved-internal \
+    -include-nest 10
 
 # Memory safety checks
 SPLINTFLAGS := $(SPLINTFLAGS) \
     +bufferoverflow \
     +bufferoverflowhigh \
+    +read-only-strings \
+    +read-only-trans \
+    +strict-destroy \
+    +strict-use-released \
+    +use-released \
 
 # Macro safety checks
 SPLINTFLAGS := $(SPLINTFLAGS) \
@@ -1988,90 +2009,62 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
     -pred-bool-others \
     -boolops \
 
+# Report qualifier mismatches only if dangerous
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +relax-quals
+
 # Pointer arithmetic is OK, but watch for null pointers
 SPLINTFLAGS := $(SPLINTFLAGS) \
     -ptr-arith \
     +nullptrarith \
-    +ptr-negate
+    +ptr-negate \
+    -zero-ptr
 
-# Check on consistency of defs
+# Symbol definitions
 SPLINTFLAGS := $(SPLINTFLAGS) \
+    +decl-undef \
     +incon-defs \
     +incon-defs-lib \
 
-# The rest of the flags to be organized.
+# Check for conflicts with C++ compilers
 SPLINTFLAGS := $(SPLINTFLAGS) \
-    +char-index \
     +cpp-names \
-    +decl-undef \
-    +duplicate-case \
-    +enum-members \
-    +eval-order \
-    +eval-order-uncon \
+
+# Format codes
+SPLINTFLAGS := $(SPLINTFLAGS) \
     +format-code \
     +format-type \
+
+# Problems with evaluation and control structions
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +controlnestdepth 15 \
+    +duplicate-case \
+    +eval-order \
+    +eval-order-uncon \
+
+# Types and stuff
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    +char-index \
+    +char-int \
+    +enum-members \
     +ignore-signs \
-    +match-fields \
-    +null \
-    +nullret \
-    +strict-destroy \
-    \
-    +use-released \
-    +strict-use-released \
-    -abstract \
+    +long-integral \
+    +match-any-integral \
+
+# TODO: Miscellaneous other flags
+SPLINTFLAGS := $(SPLINTFLAGS) \
     +aliasunique \
     +assignexpose \
-    -casebreak \
-    -castfcnptr \
-    -charint \
     +continuecomment \
-    +controlnestdepth 15 \
-    -exportlocal \
-    -fcnuse \
     +fielduse \
-    -globs \
-    +imptype \
-    -initallelements \
-    +longintegral \
-    +matchanyintegral \
+    +match-fields \
     +nestedextern \
-    -noeffect \
-    -paramuse \
-    +ptrnegate \
-    +readonlystrings \
-    -redef \
-    -retvalint \
-    -retvalother \
+    +null \
+    +nullret \
+    +paramuse \
     +shadow \
-    -shiftimplementation \
-    -shiftnegative \
-    -showsourceloc \
-    -type \
-    \
-    -branchstate \
-    -compdef \
-    -compdestroy \
-    -compmempass \
-    -globstate \
-    -mustfreefresh \
-    -mustfreeonly \
-    -nullstate \
-    -redecl \
-    -retalias \
-    \
-    -immediatetrans \
-    -kepttrans \
-    -observertrans \
-    -onlytrans \
-    -readonlytrans \
-    -statictrans \
-    -temptrans \
-    -unqualifiedtrans \
-
 
 # Other options we'd like to add back
-# +paramuse: As soon as we get SHIM()s in the ops
-# -includedepth 8 : Let's investigate why we do so many includes.
 # +initallelements : Right now, the *.ops files don't initialize all
 #  values of the arrays
 # +casebreak: Auto-generated ops have way too case fallthrus right now
@@ -2083,19 +2076,17 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 
-# Don't complain about using pointers and ints as booleans
-SPLINTFLAGS_TEST := $(SPLINTFLAGS_TEST) -pred-bool
-
 splint : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
 	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
 
+# Test a single file with limited splint options to ease cleanup -petdance
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
 	+partial -memchecks \
-	src/s*.c \
+	src/packfile.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage

@@ -20,8 +20,6 @@ This is a singleton (monadic) class - only one instance exists.
 
 */
 
-#include "parrot/parrot.h"
-
 static PMC *Rand_PMC;
 
 pmclass Random singleton {

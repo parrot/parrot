@@ -386,7 +386,7 @@ Call a Parrot subroutine that returns an float using the supplied signature.
 
 Returns the class corresponding to the supplied namespace.
 
-=item C<Parrot_PMC Parrot_Class_instantiate(PARROT_INTERP, Parrot_PMC the_class Parrot_PMC arg)>
+=item C<Parrot_PMC VTABLE_instantiate(PARROT_INTERP, Parrot_PMC the_class Parrot_PMC arg)>
 
 Instantiates a new object of class C<the_class>, which can be obtained from
 C<Parrot_oo_get_class()>.  Passes an optional PMC argument C<arg> to the

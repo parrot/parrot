@@ -19,9 +19,6 @@ Sub PMCs with the same short name, but different long names.
 
 */
 
-#include "parrot/parrot.h"
-
-
 pmclass MultiSub extends ResizablePMCArray need_ext provides array {
 
     VTABLE void push_pmc(PMC *value) {

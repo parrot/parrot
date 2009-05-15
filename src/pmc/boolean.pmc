@@ -21,8 +21,6 @@ it doesn't morph to other types. Only its value is changed.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass Boolean extends Integer provides boolean provides scalar {
 
 /*

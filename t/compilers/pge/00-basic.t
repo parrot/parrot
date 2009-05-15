@@ -16,7 +16,7 @@ Test the basic testing library.
 =cut
 
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
 
     .local pmc test
 

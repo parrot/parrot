@@ -177,7 +177,7 @@ ok 1
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableIntegerArray']
      new P1, ['Key']
 
@@ -213,7 +213,7 @@ ok 3
 OUTPUT
 
 pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'include/fp_equality.pasm'
+     .include 'fp_equality.pasm'
      new P0, ['ResizableIntegerArray']
      set P0, 1
 

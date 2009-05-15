@@ -330,9 +330,9 @@ a sleep opcode.
 
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
-#include "parrot/gc_mark_sweep.h"
+#include "gc_private.h"
 
-/* HEADERIZER HFILE: include/parrot/gc_api.h */
+/* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -1011,7 +1011,7 @@ parrot_gc_ims_run_increment(PARROT_INTERP)
 
 =item C<static void parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)>
 
-Interface to C<Parrot_do_gc_run>. C<flags> is one of:
+Interface to C<Parrot_gc_mark_and_sweep>. C<flags> is one of:
 
   GC_lazy_FLAG   ... timely destruction
   GC_finish_FLAG ... run until live bits are clear
@@ -1132,10 +1132,10 @@ Parrot_gc_ims_wb(PARROT_INTERP, ARGMOD(PMC *agg), ARGMOD(PMC *_new))
     IMS_DEBUG((stderr, "%d agg %p mark %p\n",
                 ((Gc_ims_private *)interp->arena_base->
                 gc_private)->state, agg, _new));
-    pobject_lives(interp, (PObj*)_new);
+    Parrot_gc_mark_PObj_alive(interp, (PObj*)_new);
 #else
     PObj_get_FLAGS(agg) &= ~ (PObj_live_FLAG|PObj_custom_GC_FLAG);
-    pobject_lives(interp, (PObj*)agg);
+    Parrot_gc_mark_PObj_alive(interp, (PObj*)agg);
 #endif
 }
 

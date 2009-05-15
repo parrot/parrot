@@ -144,6 +144,7 @@ static opcode_t * directory_pack(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*cursor);
 
+PARROT_WARN_UNUSED_RESULT
 static size_t directory_packed_size(PARROT_INTERP,
     ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
@@ -485,6 +486,8 @@ static int sub_pragma(PARROT_INTERP,
 
 =item C<void Parrot_trace_eprintf(const char *s, ...)>
 
+Print out an error message. Passes arguments directly to C<vfprintf>.
+
 =cut
 
 */
@@ -615,7 +618,7 @@ sub_pragma(PARROT_INTERP, pbc_action_enum_t action, ARGIN(const PMC *sub_pmc))
     DECL_CONST_CAST;
     Parrot_sub *sub;
     int         todo    = 0;
-    int         pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
+    const int   pragmas = PObj_get_FLAGS(sub_pmc) &  SUB_FLAG_PF_MASK
                                                   & ~SUB_FLAG_IS_OUTER;
     PMC_get_sub(interp, PARROT_const_cast(PMC *, sub_pmc), sub);
     if (!pragmas && !Sub_comp_INIT_TEST(sub))
@@ -802,7 +805,7 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
         if (constants[i]->type == PFC_PMC) {
             PMC * const pmc = constants[i]->u.key;
             if (pmc)
-                pobject_lives(interp, (PObj *)pmc);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)pmc);
         }
     }
 }
@@ -1035,7 +1038,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
             header->uuid_size);
 
         /* NULL terminate */
-        header->uuid_data[header->uuid_size] = 0;
+        header->uuid_data[header->uuid_size] = '\0';
     }
     else
         /* Don't know this UUID type. */
@@ -1134,7 +1137,7 @@ PackFile_map_segments(PARROT_INTERP, ARGIN(const PackFile_Directory *dir),
 
 /*
 
-=item C<INTVAL PackFile_add_segment(PARROT_INTERP, PackFile_Directory *dir,
+=item C<void PackFile_add_segment(PARROT_INTERP, PackFile_Directory *dir,
 PackFile_Segment *seg)>
 
 Adds the Segment C<seg> to the directory C<dir>.  The PackFile becomes the
@@ -1145,7 +1148,7 @@ owner of the segment; it gets destroyed when the PackFile does.
 */
 
 PARROT_EXPORT
-INTVAL
+void
 PackFile_add_segment(SHIM_INTERP, ARGMOD(PackFile_Directory *dir),
         ARGIN(PackFile_Segment *seg))
 {
@@ -1155,7 +1158,7 @@ PackFile_add_segment(SHIM_INTERP, ARGMOD(PackFile_Directory *dir),
     dir->num_segments++;
     seg->dir = dir;
 
-    return 0;
+    return;
 }
 
 
@@ -1404,8 +1407,8 @@ PackFile_new_dummy(PARROT_INTERP, ARGIN(const char *name))
 
 /*
 
-=item C<INTVAL PackFile_funcs_register(PARROT_INTERP, PackFile *pf, UINTVAL
-type, const PackFile_funcs funcs)>
+=item C<void PackFile_funcs_register(PARROT_INTERP, PackFile *pf, UINTVAL type,
+const PackFile_funcs funcs)>
 
 Registers the C<pack>/C<unpack>/... functions for a packfile type.
 
@@ -1414,14 +1417,13 @@ Registers the C<pack>/C<unpack>/... functions for a packfile type.
 */
 
 PARROT_EXPORT
-INTVAL
+void
 PackFile_funcs_register(SHIM_INTERP, ARGOUT(PackFile *pf), UINTVAL type,
                         const PackFile_funcs funcs)
 {
     ASSERT_ARGS(PackFile_funcs_register)
     /* TODO dynamic registering */
     pf->PackFuncs[type] = funcs;
-    return 1;
 }
 
 
@@ -2063,8 +2065,8 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
 #endif
             else {
                 fprintf(stderr, "directory_unpack failed: invalid wordsize %d\n",
-                        pf->header->wordsize);
-                return 0;
+                        (int)pf->header->wordsize);
+                return NULL;
             }
             TRACE_PRINTF_VAL(("Segment offset: new pos 0x%x "
                               "(src=0x%x cursor=0x%x).\n",
@@ -2120,7 +2122,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         if (!pos) {
             fprintf(stderr, "PackFile_unpack segment '%s' failed\n",
                     dir->segments[i]->name);
-            return 0;
+            return NULL;
         }
         else {
             TRACE_PRINTF_VAL(("PackFile_Segment_unpack ok. pos=0x%x\n", pos));
@@ -2241,6 +2243,7 @@ C<default_packed_size()>.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 static size_t
 directory_packed_size(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 {
@@ -2630,19 +2633,8 @@ pf_debug_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *self))
 {
     ASSERT_ARGS(pf_debug_packed_size)
     PackFile_Debug * const debug = (PackFile_Debug *)self;
-    int                    size = 0;
-    int i;
 
-    /* Size of mappings count. */
-    size += 1;
-
-    /* Size of entries in mappings list. */
-    for (i = 0; i < debug->num_mappings; i++) {
-        /* Bytecode offset and filename */
-        size += 2;
-    }
-
-    return size;
+    return (debug->num_mappings*2) + 1;
 }
 
 
@@ -2728,7 +2720,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
     /* find seg e.g. CODE_DB => CODE and attach it */
     code_name              = str_dup(debug->base.name);
     str_len                = strlen(code_name);
-    code_name[str_len - 3] = 0;
+    code_name[str_len - 3] = '\0';
     code                   = (PackFile_ByteCode *)PackFile_find_segment(interp,
                                 self->dir, code_name, 0);
 
@@ -2769,13 +2761,11 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     Parrot_io_printf(interp, "\n  mappings => [\n");
     for (i = 0; i < debug->num_mappings; i++) {
-        char * const filename = Parrot_str_to_cstring(interp,
-            PF_CONST(debug->code, debug->mappings[i]->filename)->u.string);;
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        OFFSET => %d,\n",
                    debug->mappings[i]->offset);
-        Parrot_io_printf(interp, "        FILENAME => %s\n", filename);
-        Parrot_str_free_cstring(filename);
+        Parrot_io_printf(interp, "        FILENAME => %Ss\n",
+                PF_CONST(debug->code, debug->mappings[i]->filename)->u.string);
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -4107,14 +4097,14 @@ C<add>.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PackFile_Segment *
-PackFile_Annotations_new(PARROT_INTERP, ARGIN(struct PackFile *pf),
+PackFile_Annotations_new(SHIM_INTERP, SHIM(struct PackFile *pf),
         SHIM(const char *name), SHIM(int add))
 {
     ASSERT_ARGS(PackFile_Annotations_new)
 
     /* Allocate annotations structure; create it all zeroed, and we will
      * allocate memory for each of the arrays on demand. */
-    PackFile_Annotations *seg = mem_allocate_zeroed_typed(PackFile_Annotations);
+    PackFile_Annotations * const seg = mem_allocate_zeroed_typed(PackFile_Annotations);
     return (PackFile_Segment *) seg;
 }
 
@@ -4172,11 +4162,12 @@ segment.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 size_t
-PackFile_Annotations_packed_size(PARROT_INTERP, ARGIN(PackFile_Segment *seg))
+PackFile_Annotations_packed_size(SHIM_INTERP, ARGIN(PackFile_Segment *seg))
 {
     ASSERT_ARGS(PackFile_Annotations_packed_size)
-    PackFile_Annotations *self = (PackFile_Annotations *)seg;
+    const PackFile_Annotations * const self = (PackFile_Annotations *)seg;
     return 3                      /* Counts. */
          + self->num_keys    * 2  /* Keys. */
          + self->num_groups  * 2  /* Groups. */
@@ -4195,6 +4186,7 @@ Packs this segment into bytecode.
 
 */
 
+PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
 PackFile_Annotations_pack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
@@ -4301,7 +4293,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     /* Need to associate this segment with the applicable code segment. */
     code_name              = str_dup(self->base.name);
     str_len                = strlen(code_name);
-    code_name[str_len - 4] = 0;
+    code_name[str_len - 4] = '\0';
     code                   = (PackFile_ByteCode *)PackFile_find_segment(interp,
                                 self->base.dir, code_name, 0);
 
@@ -4343,17 +4335,15 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");
     for (i = 0; i < self->num_keys; i++) {
-        char * const key_name = Parrot_str_to_cstring(interp,
-                PF_CONST(self->code, self->keys[i]->name)->u.string);
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
-        Parrot_io_printf(interp, "        NAME => %s\n", key_name);
+        Parrot_io_printf(interp, "        NAME => %Ss\n",
+                PF_CONST(self->code, self->keys[i]->name)->u.string);
         Parrot_io_printf(interp, "        TYPE => %s\n",
                 self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_INT ? "integer" :
                 self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_STR ? "string" :
                 self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_NUM ? "number" :
                 "PMC");
         Parrot_io_printf(interp, "    ],\n");
-        Parrot_str_free_cstring(key_name);
     }
 
     Parrot_io_printf(interp, "  ],\n");
@@ -4403,7 +4393,7 @@ the new annotations group starts.
 */
 PARROT_EXPORT
 void
-PackFile_Annotations_add_group(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
+PackFile_Annotations_add_group(SHIM_INTERP, ARGMOD(PackFile_Annotations *self),
         opcode_t offset)
 {
     ASSERT_ARGS(PackFile_Annotations_add_group)
@@ -4791,13 +4781,13 @@ PackFile_append_pbc(PARROT_INTERP, ARGIN_NULLOK(const char *filename))
     ASSERT_ARGS(PackFile_append_pbc)
     PackFile * const pf = Parrot_pbc_read(interp, filename, 0);
 
-    if (!pf)
-        return NULL;
+    if (pf) {
+        PackFile_add_segment(interp, &interp->initial_pf->directory,
+                &pf->directory.base);
 
-    PackFile_add_segment(interp, &interp->initial_pf->directory,
-            &pf->directory.base);
+        do_sub_pragmas(interp, pf->cur_cs, PBC_LOADED, NULL);
+    }
 
-    do_sub_pragmas(interp, pf->cur_cs, PBC_LOADED, NULL);
     return pf;
 }
 

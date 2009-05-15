@@ -6,7 +6,7 @@
 
 .sub main :main
     loadlib $P1, 'pair'
-    load_bytecode 'library/Test/More.pir'
+    load_bytecode 'Test/More.pbc'
 
     .local pmc plan, is, ok
     plan = get_hll_global [ 'Test'; 'More' ], 'plan'

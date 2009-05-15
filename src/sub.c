@@ -80,15 +80,15 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 
     obj = (PObj *)ctx->current_sub;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->current_object;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->current_cont;
     if (obj && !PObj_live_TEST(obj))
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     if (ctx->caller_ctx)
         mark_context(interp, ctx->caller_ctx);
@@ -98,15 +98,15 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
 
     obj = (PObj *)ctx->current_namespace;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->lex_pad;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
     obj = (PObj *)ctx->handlers;
     if (obj)
-        pobject_lives(interp, obj);
+        Parrot_gc_mark_PObj_alive(interp, obj);
 
 
     if (!ctx->n_regs_used)
@@ -115,7 +115,7 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
     for (i = 0; i < ctx->n_regs_used[REGNO_PMC]; ++i) {
         obj = (PObj *)CTX_REG_PMC(ctx, i);
         if (obj)
-            pobject_lives(interp, obj);
+            Parrot_gc_mark_PObj_alive(interp, obj);
     }
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
@@ -125,7 +125,7 @@ mark_context(PARROT_INTERP, ARGMOD(Parrot_Context* ctx))
              * yet tracked down */
             PObj_flag_CLEAR(is_PMC, obj);
             PObj_is_string_SET(obj);
-            pobject_lives(interp, obj);
+            Parrot_gc_mark_PObj_alive(interp, obj);
         }
     }
 }
@@ -351,7 +351,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
         }
         else {
             PMC    *ns_array;
-            STRING *j = CONST_STRING(interp, ";");
+            STRING * const semicolon = CONST_STRING(interp, ";");
             STRING *res;
 
             /*
@@ -384,7 +384,7 @@ Parrot_full_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC* sub_pmc))
             if (sub->name)
                 VTABLE_push_string(interp, ns_array, sub->name);
 
-            res = Parrot_str_join(interp, j, ns_array);
+            res = Parrot_str_join(interp, semicolon, ns_array);
             Parrot_unblock_GC_mark(interp);
             return res;
         }
@@ -412,7 +412,6 @@ Parrot_Context_get_info(PARROT_INTERP, ARGIN(const Parrot_Context *ctx),
 {
     ASSERT_ARGS(Parrot_Context_get_info)
     Parrot_sub *sub;
-    DECL_CONST_CAST;
 
     /* set file/line/pc defaults */
     info->file     = CONST_STRING(interp, "(unknown file)");
@@ -512,7 +511,6 @@ Parrot_Context_infostr(PARROT_INTERP, ARGIN(const Parrot_Context *ctx))
 
     Parrot_block_GC_mark(interp);
     if (Parrot_Context_get_info(interp, ctx, &info)) {
-        DECL_CONST_CAST;
 
         res = Parrot_sprintf_c(interp,
             "%s '%Ss' pc %d (%Ss:%d)", msg,

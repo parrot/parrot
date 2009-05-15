@@ -28,7 +28,6 @@ unrelated thread.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/embed.h"
 
 #define PMC_tid(x) ((Parrot_ParrotRunningThread_attributes *)PMC_data(x))->tid

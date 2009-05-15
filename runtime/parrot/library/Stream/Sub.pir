@@ -2,7 +2,7 @@
 
 =head1 TITLE
 
-Stream::Sub - a PIR sub as source for a Stream
+Stream;Sub - a PIR sub as source for a Stream
 
 =head1 VERSION
 
@@ -11,7 +11,7 @@ version 0.1
 =head1 SYNOPSIS
 
     # create the stream
-    new stream, "Stream::Sub"
+    new stream, ['Stream'; Sub']
 
     # set the source sub
     .const 'Sub' temp = "_test"
@@ -25,7 +25,7 @@ version 0.1
 
 =head1 DESCRIPTION
 
-Like every stream, Stream::Sub as has a C<read> method.
+Like every stream, Stream;Sub as has a C<read> method.
 The benefit is that this stream also has a C<write> method, though it
 can not be called from arbitrary locations.
 
@@ -58,19 +58,19 @@ The stream will be disconnected automatically if the provided sub returns.
     .local pmc base
     .local pmc sub
 
-    $P0 = get_class "Stream::Sub"
+    $P0 = get_class ['Stream'; 'Sub']
     unless null $P0 goto END
 
-    load_bytecode "library/Stream/Base.pir"
+    load_bytecode 'Stream/Base.pbc'
 
-    get_class base, "Stream::Base"
-    subclass sub, base, "Stream::Sub"
+    get_class base, ['Stream'; 'Base']
+    subclass sub, base, ['Stream'; 'Sub']
 
     addattribute sub, "write_cont"
 END:
 .end
 
-.namespace ["Stream::Sub"]
+.namespace ['Stream'; 'Sub']
 
 =head1 METHODS
 
@@ -152,7 +152,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 
 =cut
 

@@ -313,25 +313,29 @@ static void
 imcc_globals_destroy(PARROT_INTERP, SHIM(int ex), SHIM(void *param))
 {
     ASSERT_ARGS(imcc_globals_destroy)
-    code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
 
-    while (cs) {
-        subs_t         *s              = cs->subs;
-        code_segment_t * const prev_cs = cs->prev;
+    /* This is an allowed condition? See TT #629 */
+    if (IMCC_INFO(interp)->globals) {
+        code_segment_t *cs = IMCC_INFO(interp)->globals->cs;
 
-        while (s) {
-            subs_t * const prev_s = s->prev;
-            clear_sym_hash(&s->fixup);
-            mem_sys_free(s);
-            s      = prev_s;
+        while (cs) {
+            subs_t         *s              = cs->subs;
+            code_segment_t * const prev_cs = cs->prev;
+
+            while (s) {
+                subs_t * const prev_s = s->prev;
+                clear_sym_hash(&s->fixup);
+                mem_sys_free(s);
+                s = prev_s;
+            }
+
+            clear_sym_hash(&cs->key_consts);
+            mem_sys_free(cs);
+            cs = prev_cs;
         }
-
-        clear_sym_hash(&cs->key_consts);
-        mem_sys_free(cs);
-        cs      = prev_cs;
+        IMCC_INFO(interp)->globals->cs = NULL;
     }
 
-    IMCC_INFO(interp)->globals->cs = NULL;
 }
 
 
@@ -1084,8 +1088,10 @@ add_const_num(PARROT_INTERP, ARGIN_NULLOK(const char *buf))
     const int      k = add_const_table(interp);
     STRING * const s = Parrot_str_new(interp, buf, 0);
 
-    interp->code->const_table->constants[k]->type     = PFC_NUMBER;
-    interp->code->const_table->constants[k]->u.number = Parrot_str_to_num(interp, s);
+    PackFile_Constant * const constant = interp->code->const_table->constants[k];
+
+    constant->type     = PFC_NUMBER;
+    constant->u.number = Parrot_str_to_num(interp, s);
 
     return k;
 }

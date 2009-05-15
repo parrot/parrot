@@ -55,7 +55,7 @@ Description of the test.
 .const string TESTS = 'no_plan'
 
 .sub main :main
-    load_bytecode 'Test/Builder.pir'
+    load_bytecode 'Test/Builder.pbc'
     load_bytecode 'PGE.pbc'
     load_bytecode 'PGE/Dumper.pbc'
     load_bytecode 'String/Utils.pbc'

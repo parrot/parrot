@@ -2149,7 +2149,7 @@ out:
 
 .sub nc_start
     .local pmc stdscr
-    load_bytecode "library/ncurses.pasm"
+    load_bytecode 'ncurses.pbc'
     stdscr = _init_curses()
     .return(stdscr)
 .end

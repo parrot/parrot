@@ -357,11 +357,10 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     ASSERT_ARGS(runops_trace_core)
 
     static size_t  gc_mark_runs, gc_collect_runs;
-    Arenas * const arena_base = interp->arena_base;
     Interp        *debugger;
 
-    gc_mark_runs    = arena_base->gc_mark_runs;
-    gc_collect_runs = arena_base->gc_collect_runs;
+    gc_mark_runs    = Parrot_gc_count_mark_runs(interp);
+    gc_collect_runs = Parrot_gc_count_collect_runs(interp);
     if (interp->pdb) {
         debugger = interp->pdb->debugger;
         PARROT_ASSERT(debugger);
@@ -399,6 +398,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
     trace_op(interp, code_start, code_end, pc);
     while (pc) {
+        size_t runs;
         if (pc < code_start || pc >= code_end)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
@@ -408,13 +408,15 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         DO_OP(pc, interp);
         trace_op(interp, code_start, code_end, pc);
 
-        if (gc_mark_runs != arena_base->gc_mark_runs) {
-            gc_mark_runs  = arena_base->gc_mark_runs;
+        runs = Parrot_gc_count_mark_runs(interp);
+        if (gc_mark_runs != runs) {
+            gc_mark_runs  = runs;
             Parrot_io_eprintf(debugger, "       GC mark\n");
         }
 
-        if (gc_collect_runs != arena_base->gc_collect_runs) {
-            gc_collect_runs  = arena_base->gc_collect_runs;
+        runs = Parrot_gc_count_collect_runs(interp);
+        if (gc_collect_runs != runs) {
+            gc_collect_runs  = runs;
             Parrot_io_eprintf(debugger, "       GC collect\n");
         }
     }
@@ -487,7 +489,7 @@ runops_gc_debug_core(PARROT_INTERP, ARGIN(opcode_t *pc))
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "attempt to access code outside of current code segment");
 
-        Parrot_do_gc_run(interp, 0);
+        Parrot_gc_mark_and_sweep(interp, 0);
         CONTEXT(interp)->current_pc = pc;
 
         DO_OP(pc, interp);
@@ -579,7 +581,7 @@ runops_debugger_core(PARROT_INTERP, ARGIN(opcode_t *pc))
                     "attempt to access code outside of current code segment");
 
         if (interp->pdb->state & PDB_GCDEBUG)
-            Parrot_do_gc_run(interp, 0);
+            Parrot_gc_mark_and_sweep(interp, 0);
 
         if (interp->pdb->state & PDB_TRACING) {
             trace_op(interp,

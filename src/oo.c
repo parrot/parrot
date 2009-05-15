@@ -366,13 +366,14 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_oo_find_vtable_override)
     Parrot_Class_attributes * const _class = PARROT_CLASS(classobj);
+    PMC                            *result =
+        VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
 
-    if (VTABLE_exists_keyed_str(interp, _class->parent_overrides, name))
-        return VTABLE_get_pmc_keyed_str(interp, _class->parent_overrides, name);
+    if (!PMC_IS_NULL(result))
+        return result;
     else {
         /* Walk and search for the vtable method. */
         const INTVAL num_classes = VTABLE_elements(interp, _class->all_parents);
-        PMC         *result      = PMCNULL;
         INTVAL       i;
 
         for (i = 0; i < num_classes; i++) {
@@ -623,7 +624,7 @@ mark_object_cache(PARROT_INTERP)
         for (entry = 0; entry < TBL_SIZE; ++entry) {
             Meth_cache_entry *e = mc->idx[type][entry];
             while (e) {
-                pobject_lives(interp, (PObj *)e->pmc);
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)e->pmc);
                 e = e->next;
             }
         }
@@ -654,6 +655,9 @@ init_object_cache(PARROT_INTERP)
 
 =item C<void destroy_object_cache(PARROT_INTERP)>
 
+Destroy the object cache. Loop over all caches and invalidate them. Then
+free the caches back to the OS.
+
 =cut
 
 */
@@ -679,6 +683,9 @@ destroy_object_cache(PARROT_INTERP)
 /*
 
 =item C<static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)>
+
+Invalidate the cache of the specified type. Free each entry and then free
+the entire cache.
 
 =cut
 
@@ -715,6 +722,9 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
 /*
 
 =item C<static void invalidate_all_caches(PARROT_INTERP)>
+
+Invalidate all caches by looping over each cache and calling
+C<invalidate_type_caches> on them.
 
 =cut
 
@@ -900,6 +910,8 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 =item C<static void debug_trace_find_meth(PARROT_INTERP, const PMC *_class,
 const STRING *name, const PMC *sub)>
 
+Print some information about the search for a sub.
+
 =cut
 
 */
@@ -954,6 +966,8 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
 =item C<static PMC * find_method_direct_1(PARROT_INTERP, PMC *_class, STRING
 *method_name)>
 
+Find the method with the given name in the specified class.
+
 =cut
 
 */
@@ -991,6 +1005,8 @@ find_method_direct_1(PARROT_INTERP, ARGIN(PMC *_class),
 /*
 
 =item C<static PMC* C3_merge(PARROT_INTERP, PMC *merge_list)>
+
+Merge together the MRO of the items in the list.
 
 =cut
 

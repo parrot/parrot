@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2008, Parrot Foundation.
+Copyright (C) 2005-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -18,7 +18,6 @@ These are the vtable functions for the namespace PMC.
 
 */
 
-#include "parrot/parrot.h"
 #include "pmc_sub.h"
 
 static void add_to_class(
@@ -167,15 +166,15 @@ Marks the namespace as live.
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         SUPER();
         if (nsinfo->parent)
-            pobject_lives(INTERP, (PObj *)nsinfo->parent);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->parent);
         if (nsinfo->name)
-            pobject_lives(INTERP, (PObj *)nsinfo->name);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->name);
         if (nsinfo->_class)
-            pobject_lives(INTERP, (PObj *)nsinfo->_class);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->_class);
         if (nsinfo->vtable)
-            pobject_lives(INTERP, (PObj *)nsinfo->vtable);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->vtable);
         if (nsinfo->methods)
-            pobject_lives(INTERP, (PObj *)nsinfo->methods);
+            Parrot_gc_mark_PObj_alive(INTERP, (PObj *)nsinfo->methods);
     }
 
 /*
@@ -354,7 +353,7 @@ really a public API.
         if (key->vtable->base_type == enum_class_Key) {
             while (1) {
                 STRING * const part = VTABLE_get_string(INTERP, key);
-                key  = key_next(INTERP, key);
+                key                 = VTABLE_shift_pmc(INTERP, key);
 
                 if (!key) {
                     Parrot_set_global(INTERP, ns, part, value);
@@ -407,7 +406,7 @@ really a public API.
 
         if (key->vtable->base_type == enum_class_Key) {
             STRING * const part = VTABLE_get_string(INTERP, key);
-            key  = key_next(INTERP, key);
+            key                 = VTABLE_shift_pmc(INTERP, key);
 
             if (!key)
                 return VTABLE_get_pmc_keyed_str(INTERP, ns, part);
@@ -476,7 +475,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                 /* this loop (and function) could use a rewrite for clarity */
                 while (1) {
                     STRING * const part = VTABLE_get_string(INTERP, key);
-                    key  = key_next(INTERP, key);
+                    key                 = VTABLE_shift_pmc(INTERP, key);
 
                     if (!key)
                         return VTABLE_get_pointer_keyed_str(INTERP, ns, part);

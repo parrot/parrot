@@ -205,13 +205,12 @@ interpreter.
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
 interpinfo(PARROT_INTERP, INTVAL what)
 {
     ASSERT_ARGS(interpinfo)
-    INTVAL ret = 0;
-    int j;
-    Arenas *arena_base = interp->arena_base;
+    INTVAL ret;
 
     switch (what) {
         case TOTAL_MEM_ALLOC:
@@ -220,57 +219,43 @@ interpinfo(PARROT_INTERP, INTVAL what)
             interp->memory_allocated = mallinfo().uordblks;
 #  endif
 #endif
-            ret = arena_base->memory_allocated;
+            ret = Parrot_gc_total_memory_allocated(interp);
             break;
         case GC_MARK_RUNS:
-            ret = arena_base->gc_mark_runs;
+            ret = Parrot_gc_count_mark_runs(interp);
             break;
         case GC_LAZY_MARK_RUNS:
-            ret = arena_base->gc_lazy_mark_runs;
+            ret = Parrot_gc_count_lazy_mark_runs(interp);
             break;
         case GC_COLLECT_RUNS:
-            ret = arena_base->gc_collect_runs;
+            ret = Parrot_gc_count_collect_runs(interp);
             break;
         case ACTIVE_PMCS:
-            ret = arena_base->pmc_pool->total_objects -
-                arena_base->pmc_pool->num_free_objects;
+            ret = Parrot_gc_active_pmcs(interp);
             break;
         case ACTIVE_BUFFERS:
-            ret = 0;
-            for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                Small_Object_Pool * const header_pool =
-                    arena_base->sized_header_pools[j];
-                if (header_pool)
-                    ret += header_pool->total_objects -
-                        header_pool->num_free_objects;
-            }
+            ret = Parrot_gc_active_sized_buffers(interp);
             break;
         case TOTAL_PMCS:
-            ret = arena_base->pmc_pool->total_objects;
+            ret = Parrot_gc_total_pmcs(interp);
             break;
         case TOTAL_BUFFERS:
-            ret = 0;
-            for (j = 0; j < (INTVAL)arena_base->num_sized; j++) {
-                Small_Object_Pool * const header_pool =
-                    arena_base->sized_header_pools[j];
-                if (header_pool)
-                    ret += header_pool->total_objects;
-            }
+            ret = Parrot_gc_total_sized_buffers(interp);
             break;
         case HEADER_ALLOCS_SINCE_COLLECT:
-            ret = arena_base->header_allocs_since_last_collect;
+            ret = Parrot_gc_headers_alloc_since_last_collect(interp);
             break;
         case MEM_ALLOCS_SINCE_COLLECT:
-            ret = arena_base->mem_allocs_since_last_collect;
+            ret = Parrot_gc_mem_alloc_since_last_collect(interp);
             break;
         case TOTAL_COPIED:
-            ret = arena_base->memory_collected;
+            ret = Parrot_gc_total_copied(interp);
             break;
         case IMPATIENT_PMCS:
-            ret = arena_base->num_early_gc_PMCs;
+            ret = Parrot_gc_impatient_pmcs(interp);
             break;
         case EXTENDED_PMCS:
-            ret = arena_base->num_extended_PMCs;
+            ret = Parrot_gc_extended_pmcs(interp);
             break;
         case CURRENT_RUNCORE:
             ret = interp->run_core;
