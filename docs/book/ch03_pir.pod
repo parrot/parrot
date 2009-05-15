@@ -237,32 +237,35 @@ same subroutine.
 The most basic operation on a variable is assignment using the C<=>
 operator:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
   $I0 = 42        # set integer variable to the value 42
   $N3 = 3.14159   # set number variable to an approximation of pi
   $I1 = $I0       # set $I1 to the value of $I0
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<exchange> opcode swaps the contents of two variables of the same
 type. The following example sets C<$I0> to the value of C<$I1>, and sets
 C<$I1> to the value of C<$I0>. 
 
-=begin PIR
+=begin PIR_FRAGMENT
 
   exchange $I0, $I1
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<null> opcode sets an integer or number variable to a zero value,
 and undefines a string or object.
+
+=begin PIR_FRAGMENT
 
   null $I0  # 0
   null $N0  # 0.0
   null $S0  # NULL
   null $P0  # PMCNULL
 
+=end PIR_FRAGMENT
 
 =head2 Working with Numbers
 
@@ -271,12 +274,12 @@ PIR has an extensive set of math instructions that work with integers,
 floating-point numbers, and numeric PMCs. Many of the math instructions
 have two- and three-argument forms:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
   $I10 = $I11 + $I2
   $I0 += $I1
 
-=end PIR
+=end PIR_FRAGMENT
 
 The three-argument form of C<+> stores the sum
 of the two arguments in the result variable. The two-argument form
@@ -288,12 +291,12 @@ must be compatible with the type of the result.
 Generally, "compatible" means that the result and arguments have to
 be the same type, but there are a few exceptions:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
   $P0 = $P1 - 2
   $P0 = $P1 - 1.5
 
-=end PIR
+=end PIR_FRAGMENT
 
 If the result is an integer type, like C<$I0>, the arguments must be
 integer variables or constants. A
@@ -302,16 +305,16 @@ floating-point arguments, but many math instructions also allow the final
 argument to be an integer. Instructions with a PMC result may
 accept an integer, floating-point, or PMC final argument:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  mul P0, P1             # P0 *= P1
-  mul P0, I1
-  mul P0, N1
-  mul P0, P1, P2         # P0 = P1 * P2
-  mul P0, P1, I2
-  mul P0, P1, N2
+  mul $P0, $P1             # $P0 *= $P1
+  mul $P0, $I1
+  mul $P0, $N1
+  mul $P0, $P1, $P2        # $P0 = $P1 * $P2
+  mul $P0, $P1, $I2
+  mul $P0, $P1, $N2
 
-=end PIR
+=end PIR_FRAGMENT
 
 
 
@@ -328,13 +331,13 @@ most common unary math opcodes are C<inc> (increment), C<dec>
 (decrement), C<abs> (absolute value), C<neg> (negate), and C<fact>
 (factorial):
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  abs N0, -5.0  # the absolute value of -5.0 is 5.0
-  fact I1, 5    # the factorial of 5 is 120
-  inc I1        # 120 incremented by 1 is 121
+  abs $N0, -5.0  # the absolute value of -5.0 is 5.0
+  fact $I1, 5    # the factorial of 5 is 120
+  inc $I1        # 120 incremented by 1 is 121
 
-=end PIR
+=end PIR_FRAGMENT
 
 =head4 Binary math opcodes
 
@@ -354,12 +357,12 @@ operator from the C programming language. It also provides C<gcd>X<gcd opcode
 (PIR)> (greatest common divisor) and C<lcm>X<lcm opcode (PIR)> (least common
 multiple).
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  div I0, 12, 5   # I0 = 12 / 5
-  mod I0, 12, 5   # I0 = 12 % 5
+  div $I0, 12, 5   # $I0 = 12 / 5
+  mod $I0, 12, 5   # $I0 = 12 % 5
 
-=end PIR
+=end PIR_FRAGMENT
 
 =head4 Floating-point operations
 
@@ -377,12 +380,12 @@ secant), C<exsec> (exsecant), C<hav> (haversine), and C<vers> (versine). All
 angle arguments for the X<trigonometric functions (PIR)> trigonometric
 functions are in radians:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  sin N1, N0
-  exp N1, 2
+  sin $N1, $N0
+  exp $N1, 2
 
-=end PIR
+=end PIR_FRAGMENT
 
 The majority of the floating-point operations have a single source argument
 and a single destination argument. Even though the destination must be a
@@ -392,11 +395,11 @@ number.
 The C<atan>X<atan opcode (PIR)> opcode also has a three-argument variant that
 implements C's C<atan2()>:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  atan N0, 1, 1
+  atan $N0, 1, 1
 
-=end PIR
+=end PIR_FRAGMENT
 
 
 
@@ -492,19 +495,18 @@ strings. With string register or string constant arguments, C<concat>
 has both a two-argument and a three-argument form. The first argument
 is a source and a destination in the two-argument form:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S0, "ab"
-  concat S0, "cd"     # S0 has "cd" appended
-  print S0            # prints "abcd"
+  set $S0, "ab"
+  concat $S0, "cd"     # S0 has "cd" appended
+  print $S0            # prints "abcd"
   print "\n"
 
-  concat S1, S0, "xy" # S1 is the string S0 with "xy" appended
-  print S1            # prints "abcdxy"
+  concat $S1, $S0, "xy" # S1 is the string S0 with "xy" appended
+  print $S1            # prints "abcdxy"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 The first C<concat> concatenates the string "cd" onto the string "ab" in
 C<S0>. It generates a new string "abcd" and changes C<S0> to point to the
@@ -515,22 +517,21 @@ X<PMCs (Polymorphic Containers);concatenation>
 For PMC registers, C<concat> has only a three-argument form with
 separate registers for source and destination:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "String"
-  new P1, "String"
-  new P2, "String"
-  set P0, "ab"
-  set P1, "cd"
-  concat P2, P0, P1
-  print P2            # prints abcd
+  new $P0, "String"
+  new $P1, "String"
+  new $P2, "String"
+  set $P0, "ab"
+  set $P1, "cd"
+  concat $P2, $P0, $P1
+  print $P2            # prints abcd
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
-Here, C<concat> concatenates the strings in C<P0> and C<P1> and stores
-the result in C<P2>.
+Here, C<concat> concatenates the strings in C<$P0> and C<$P1> and stores
+the result in C<$P2>.
 
 =head4 Repeating strings
 
@@ -540,15 +541,14 @@ X<PIR (Parrot assembly language);string operations;repeating strings>
 The C<repeat>X<repeat opcode (PIR)> opcode repeats a string a certain
 number of times:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S0, "x"
-  repeat S1, S0, 5  # S1 = S0 x 5
-  print S1          # prints "xxxxx"
+  set $S0, "x"
+  repeat $S1, $S0, 5  # $S1 = $S0 x 5
+  print $S1          # prints "xxxxx"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 In this example, C<repeat> generates a new string with "x" repeated
 five times and stores a pointer to it in C<S1>.
@@ -562,15 +562,14 @@ The C<length>X<length opcode (PIR)> opcode returns the length of a
 string in characters. This won't be the same as the length in bytes
 for multibyte encoded strings:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S0, "abcd"
-  length I0, S0                # the length is 4
-  print I0
+  set $S0, "abcd"
+  length $I0, $S0                # the length is 4
+  print $I0
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 C<length> doesn't have an equivalent for PMC strings.
 
@@ -585,11 +584,11 @@ position, and a length. It returns a substring of the original string,
 starting from the offset position (0 is the first character) and
 spanning the length:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  substr S0, "abcde", 1, 2        # S0 is "bc"
+  substr $S0, "abcde", 1, 2        # $S0 is "bc"
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example extracts a two-character string from "abcde" at a
 one-character offset from the beginning of the string (starting with
@@ -604,17 +603,16 @@ C<substr> also has a five-argument form, where the fifth argument is a
 string to replace the substring. This modifies the second argument and
 returns the removed substring in the destination register.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S1, "abcde"
-  substr S0, S1, 1, 2, "XYZ"
-  print S0                        # prints "bc"
+  set $S1, "abcde"
+  substr $S0, $S1, 1, 2, "XYZ"
+  print $S0                        # prints "bc"
   print "\n"
-  print S1                        # prints "aXYZde"
+  print $S1                        # prints "aXYZde"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This replaces the substring "bc" in C<S1> with the string "XYZ", and
 returns "bc" in C<S0>.
@@ -629,15 +627,15 @@ When you don't need to capture the replaced string, there's an
 optimized version of C<substr> that just does a replace without
 returning the removed substring.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S1, "abcde"
-  substr S1, 1, 2, "XYZ"
-  print S1                        # prints "aXYZde"
+  set $S1, "abcde"
+  substr $S1, 1, 2, "XYZ"
+  print $S1                        # prints "aXYZde"
   print "\n"
   end
 
-=end PIR
+=end PIR_FRAGMENT
 
 The PMC versions of C<substr> are not yet implemented.
 
@@ -650,43 +648,40 @@ The C<chopn>X<chopn opcode (PIR)> opcode removes characters from the
 end of a string. It takes two arguments: the string to modify and the
 count of characters to remove.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S0, "abcde"
-  chopn S0, 2
-  print S0         # prints "abc"
+  set $S0, "abcde"
+  chopn $S0, 2
+  print $S0         # prints "abc"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example removes two characters from the end of C<S0>. If the
 count is negative, that many characters are kept in the string:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S0, "abcde"
-  chopn S0, -2
-  print S0         # prints "ab"
+  set $S0, "abcde"
+  chopn $S0, -2
+  print $S0         # prints "ab"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This keeps the first two characters in C<S0> and removes the rest.
 C<chopn> also has a three-argument version that stores the chopped
 string in a separate destination register, leaving the original string
 untouched:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set S0, "abcde"
-  chopn S1, S0, 1
-  print S1         # prints "abcd"
+  set $S0, "abcde"
+  chopn $S1, $S0, 1
+  print $S1         # prints "abcd"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 =head4 Copying and Cloning
 
@@ -707,17 +702,16 @@ Instead of just copying the pointer like C<set> would do, we can use the
 C<clone> opcode to create a I<deep copy> of the PMC, not just a I<shallow
 copy> of the reference.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "String"
-  set P0, "Ford"
-  clone P1, P0
-  set P0, "Zaphod"
-  print P0        # prints "Zaphod"
-  print P1        # prints "Ford"
-  end
+  new $P0, "String"
+  set $P0, "Ford"
+  clone $P1, $P0
+  set $P0, "Zaphod"
+  print $P0        # prints "Zaphod"
+  print $P1        # prints "Ford"
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example creates an identical, independent clone of the PMC in
 C<P0> and puts a pointer to it in C<P1>. Later changes to C<P0> have
@@ -740,31 +734,31 @@ and returns the integer value of the character at the first position in the
 string. Notice that the integer value of the character will differ depending
 on the current encoding of the string:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  chr S0, 65                # S0 is "A"
-  ord I0, S0                # I0 is 65, if S0 is ASCII or UTF-8
+  chr $S0, 65                # $S0 is "A"
+  ord $I0, $S0               # $I0 is 65, if $S0 is ASCII or UTF-8
 
-=end PIR
+=end PIR_FRAGMENT
 
 C<ord> has a three-argument variant that takes a character offset to select
 a single character from a multicharacter string. The offset must be within
 the length of the string:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  ord I0, "ABC", 2        # I0 is 67
+  ord $I0, "ABC", 2        # $I0 is 67
 
-=end PIR
+=end PIR_FRAGMENT
 
 A negative offset counts backward from the end of the string, so -1 is
 the last character.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  ord I0, "ABC", -1        # I0 is 67
+  ord $I0, "ABC", -1        # $I0 is 67
 
-=end PIR
+=end PIR_FRAGMENT
 
 =head4 Formatting strings
 
@@ -777,12 +771,12 @@ a string specifying the format, and an ordered aggregate PMC (like an
 C<Array> PMC) containing the values to be formatted. The format string and
 the destination register can be either strings or PMCs:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  sprintf S0, S1, P2
-  sprintf P0, P1, P2
+  sprintf $S0, $S1, $P2
+  sprintf $P0, $P1, $P2
 
-=end PIR
+=end PIR_FRAGMENT
 
 The format string is similar to the one for C's C<sprintf> function,
 but with some extensions for Parrot data types. Each format field in
@@ -1026,21 +1020,20 @@ specified R<size>.
 
 Here's a short illustration of string formats:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P2, "Array"
-  new P0, "Int"
-  set P0, 42
-  push P2, P0
-  new P1, "Num"
-  set P1, 10
-  push P2, P1
-  sprintf S0, "int %#Px num %+2.3Pf\n", P2
-  print S0     # prints "int 0x2a num +10.000"
+  new $P2, "Array"
+  new $P0, "Int"
+  set $P0, 42
+  push $P2, $P0
+  new $P1, "Num"
+  set $P1, 10
+  push $P2, $P1
+  sprintf $S0, "int %#Px num %+2.3Pf\n", $P2
+  print $S0     # prints "int 0x2a num +10.000"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 The first eight lines create a C<Array> with two elements: a
 C<Int> and a C<Num>. The format string of the C<sprintf> has
@@ -1064,29 +1057,27 @@ within a string. If it finds the substring, it returns the position
 where the substring was found as a character offset from the beginning
 of the string. If it fails to find the substring, it returns -1:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  index I0, "Beeblebrox", "eb"
-  print I0                       # prints 2
+  index $I0, "Beeblebrox", "eb"
+  print $I0                       # prints 2
   print "\n"
-  index I0, "Beeblebrox", "Ford"
-  print I0                       # prints -1
+  index $I0, "Beeblebrox", "Ford"
+  print $I0                       # prints -1
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 C<index> also has a four-argument version, where the fourth argument
 defines an offset position for starting the search:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  index I0, "Beeblebrox", "eb", 3
-  print I0                         # prints 5
+  index $I0, "Beeblebrox", "eb", 3
+  print $I0                         # prints 5
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This finds the second "eb" in "Beeblebrox" instead of the first,
 because the search skips the first three characters in the
@@ -1098,19 +1089,18 @@ The C<join> opcode joins the elements of an array PMC into a single
 string. The second argument separates the individual elements of the
 PMC in the final string result.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "Array"
-  push P0, "hi"
-  push P0, 0
-  push P0, 1
-  push P0, 0
-  push P0, "parrot"
-  join S0, "__", P0
-  print S0              # prints "hi__0__1__0__parrot"
-  end
+  new $P0, "Array"
+  push $P0, "hi"
+  push $P0, 0
+  push $P0, 1
+  push $P0, 0
+  push $P0, "parrot"
+  join $S0, "__", $P0
+  print $S0              # prints "hi__0__1__0__parrot"
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example builds a C<Array> in C<P0> with the values C<"hi">,
 C<0>, C<1>, C<0>, and C<"parrot">. It then joins those values (separated
@@ -1121,16 +1111,15 @@ by the string C<"__">) into a single string, and stores it in C<S0>.
 Splitting a string yields a new array containing the resulting
 substrings of the original string.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  split P0, "", "abc"
-  set P1, P0[0]
-  print P1              # 'a'
-  set P1, P0[2]
-  print P1              # 'c'
-  end
+  split $P0, "", "abc"
+  set $P1, $P0[0]
+  print $P1              # 'a'
+  set $P1, $P0[2]
+  print $P1              # 'c'
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example splits the string "abc" into individual characters and
 stores them in an array in C<P0>. It then prints out the first and
@@ -1156,24 +1145,24 @@ nonzero value.
 The C<and>X<and opcode (PIR)> opcode returns the second argument if
 it's false and the third argument otherwise:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  and I0, 0, 1  # returns 0
-  and I0, 1, 2  # returns 2
+  and $I0, 0, 1  # returns 0
+  and $I0, 1, 2  # returns 2
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<or>X<or opcode (PIR)> opcode returns the second argument if
 it's true and the third argument otherwise:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  or I0, 1, 0  # returns 1
-  or I0, 0, 2  # returns 2
+  or $I0, 1, 0  # returns 1
+  or $I0, 0, 2  # returns 2
 
-  or P0, P1, P2
+  or $P0, $P1, $P2
 
-=end PIR
+=end PIR_FRAGMENT
 
 Both C<and> and C<or> are short-circuiting. If they can determine what
 value to return from the second argument, they'll never evaluate the
@@ -1185,25 +1174,25 @@ it is the only true value, returns the third argument if it is the
 only true value, and returns false if both values are true or both are
 false:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  xor I0, 1, 0  # returns 1
-  xor I0, 0, 1  # returns 1
-  xor I0, 1, 1  # returns 0
-  xor I0, 0, 0  # returns 0
+  xor $I0, 1, 0  # returns 1
+  xor $I0, 0, 1  # returns 1
+  xor $I0, 1, 1  # returns 0
+  xor $I0, 0, 0  # returns 0
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<not>X<not opcode (PIR)> opcode returns a true value when the
 second argument is false, and a false value if the second argument is
 true:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  not I0, I1
-  not P0, P1
+  not $I0, $I1
+  not $P0, $P1
 
-=end PIR
+=end PIR_FRAGMENT
 
 The X<bitwise;opcodes (PIR)> bitwise opcodes operate on their values
 a single bit at a time. C<band>X<band opcode (PIR)>,
@@ -1214,14 +1203,14 @@ registers. They also have two-argument forms where the destination is
 also a source.  C<bnot>X<bnot opcode (PIR)> is the logical NOT of
 each bit in a single source argument.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  bnot I0, I1
-  band P0, P1
-  bor I0, I1, I2
-  bxor P0, P1, I2
+  bnot $I0, $I1
+  band $P0, $P1
+  bor $I0, $I1, $I2
+  bxor $P0, $P1, $I2
 
-=end PIR
+=end PIR_FRAGMENT
 
 X<bitwise;string opcodes>
 The bitwise opcodes also have string variants for AND, OR, and XOR:
@@ -1230,14 +1219,14 @@ C<bxors>X<bxors opcode (PIR)>. These take string register or PMC
 string source arguments and perform the logical operation on each byte
 of the strings to produce the final string.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  bors S0, S1
-  bands P0, P1
-  bors S0, S1, S2
-  bxors P0, P1, S2
+  bors $S0, $S1
+  bands $P0, $P1
+  bors $S0, $S1, $S2
+  bxors $P0, $P1, $S2
 
-=end PIR
+=end PIR_FRAGMENT
 
 The bitwise string opcodes only have meaningful results when they're
 used with simple ASCII strings because the bitwise operation is done
@@ -1246,13 +1235,13 @@ per byte.
 The logical and arithmetic shift operations shift their values by a
 specified number of bits:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  shl  I0, I1, I2        # shift I1 left by count I2 giving I0
-  shr  I0, I1, I2        # arithmetic shift right
-  lsr  P0, P1, P2        # logical shift right
+  shl  $I0, $I1, $I2        # shift I1 left by count I2 giving I0
+  shr  $I0, $I1, $I2        # arithmetic shift right
+  lsr  $P0, $P1, $P2        # logical shift right
 
-=end PIR
+=end PIR_FRAGMENT
 
 =head3 Encodings and Charsets
 
@@ -1270,10 +1259,14 @@ automatically convert strings when necessary to preserve the information.
 String prefixes are specified as C<encoding:charset:> at the front of the
 string. Here are some examples:
 
+=begin PIR_FRAGMENT
+
   $S0 = utf8:unicode:"Hello UTF8 Unicode World!"
   $S1 = utf16:unicode:"Hello UTF16 Unicode World!"
   $S2 = ascii:"This is 8-bit ASCII"
   $S3 = binary:"This is raw, unformatted binary data"
+
+=end PIR_FRAGMENT
 
 The C<binary:> charset treats the string as a buffer of raw unformatted binary
 data. It isn't really a string per se, because binary data contains no readable
@@ -1341,15 +1334,14 @@ The C<typeof> opcode can be used to determine the type of a PMC. When
 the source argument is a PMC and the destination is a string register,
 C<typeof> returns the name of the type:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "String"
-  typeof S0, P0               # S0 is "String"
-  print S0
+  new $P0, "String"
+  typeof $S0, $P0               # $S0 is "String"
+  print $S0
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 Using C<typeof> with a PMC output parameter instead, it returns the Class
 PMC for that type.
@@ -1369,17 +1361,25 @@ number, or string register or variable, but you have to instantiate a
 new PMC object into a type before you use it. The C<new> instruction creates
 a new PMC of the specified type:
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'String'
   $P0 = "That's a bollard and not a parrot."
   print $P0
 
+=end PIR_FRAGMENT
+
 This example creates a C<String> object, stores it in the PMC register variable C<$P0>,
 assigns it the value "Hello, Polly.", and prints it:
 
-  .local String hello    # or .local pmc hello
+=end PIR_FRAGMENT
+
+  .local pmc hello    # or .local pmc hello
   hello = new 'String'
   hello = "Hello, Polly."
   print hello
+
+=end PIR_FRAGMENT
 
 PIR is a dynamic language; that dynamicism is evident in how Parrot handles PMC
 values. Primitive registers like strings, numbers, and integers perform a
@@ -1389,12 +1389,16 @@ String, Number, and Integer; notice that the primitive types are in lower-case,
 while the PMC classes are capitalized. If you want to box a value explicitly,
 use the C<box> opcode:
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'Integer'       # The boxed form of int
   $P0 = box 42
   $P1 = new 'Number'        # The boxed form of num
   $P1 = box 3.14
   $P2 = new 'String'        # The boxed form of string
   $P2 = "This is a string!"
+
+=end PIR_FRAGMENT
 
 The PMC classes C<Integer>, C<Number>, and C<String> are thin overlays on the
 primitive types they represent. These PMC types have the benefit of the
@@ -1433,20 +1437,19 @@ converts that PMC to the new type. So, assigning a string to a Number PMC
 converts it into a String PMC. Assigning an integer value converts it to a
 C<Integer>, and assigning C<undef> converts it to an C<Undef> PMC:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "String"
-  set P0, "Ford\n"
-  print P0           # prints "Ford\n"
-  set P0, 42
-  print P0           # prints 42
+  new $P0, "String"
+  set $P0, "Ford\n"
+  print $P0           # prints "Ford\n"
+  set $P0, 42
+  print $P0           # prints 42
   print "\n"
-  typeof S0, P0
-  print S0           # prints "Integer"
+  typeof $S0, $P0
+  print $S0           # prints "Integer"
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 C<P0> starts as a C<String>, but when C<set> assigns it an integer
 value 42 (replacing the old string value C<"Ford">), it changes type
@@ -1457,16 +1460,16 @@ behaviors when you try to assign a primitive value to them.
 We can also use the C<box> opcode to explicitly convert an integer, a float,
 or a string into an appropriate PMC type.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  box P0, 3
-  typeof S0, P0         # P0 is an "Integer"
-  box P1, "hello"
-  typeof S0, P1         # P1 is a "String"
-  box P2, 3.14
-  typeof S0, P2         # P2 is a "Number"
+  box $P0, 3
+  typeof $S0, $P0         # $P0 is an "Integer"
+  box $P1, "hello"
+  typeof $S0, $P1         # $P1 is a "String"
+  box $P2, 3.14
+  typeof $S0, $P2         # $P2 is a "Number"
 
-=end PIR
+=end PIR_FRAGMENT
 
 
 =head3 Aggregates
@@ -1500,16 +1503,16 @@ The C<Array>X<Array PMC> PMC is an ordered aggregate with zero-based integer
 keys. The syntax for X<keyed access to PMCs> keyed access to a PMC puts the
 key in square brackets after the register name:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "Array"     # obtain a new array object
-  set P0, 2           # set its length
-  set P0[0], 10       # set first element to 10
-  set P0[1], I31      # set second element to I31
-  set I0, P0[0]       # get the first element
-  set I1, P0          # get array length
+  new $P0, "Array"     # obtain a new array object
+  set $P0, 2           # set its length
+  set $P0[0], 10       # set first element to 10
+  set $P0[1], $I31     # set second element to $I31
+  set $I0, $P0[0]      # get the first element
+  set $I1, $P0         # get array length
 
-=end PIR
+=end PIR_FRAGMENT
 
 A key on the destination register of a C<set> operation sets a value
 for that key in the aggregate. A key on the source register of a
@@ -1541,13 +1544,13 @@ of checking array bounds and reallocating array memory.
 To retrieve the number of items currently in an array, you can use the
 C<elements> opcode.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set P0, 100         # allocate store for 100 elements
-  set I0, P0          # obtain current allocation size
-  elements I0, P0     # get element count
+  set $P0, 100         # allocate store for 100 elements
+  set $I0, $P0          # obtain current allocation size
+  elements $I0, $P0     # get element count
 
-=end PIR
+=end PIR_FRAGMENT
 
 Some other useful instructions for working with arrays are C<push>,
 C<pop>, C<shift>, and C<unshift> (you'll find them in
@@ -1561,30 +1564,29 @@ X<PMCs (Polymorphic Containers);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate which uses string keys
 to identify elements within it.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P1, "Hash"      # generate a new hash object
-  set P1["key"], 10   # set key and value
-  set I0, P1["key"]   # obtain value for key
-  set I1, P1          # number of entries in hash
+  new $P1, "Hash"      # generate a new hash object
+  set $P1["key"], 10   # set key and value
+  set $I0, $P1["key"]   # obtain value for key
+  set $I1, $P1          # number of entries in hash
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<exists>X<exists opcode (PIR)> opcode tests whether a keyed
 value exists in an aggregate. It returns 1 if it finds the key in the
 aggregate, and returns 0 if it doesn't. It doesn't care if the value
 itself is true or false, only that the key has been set:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "Hash"
-  set P0["key"], 0
-  exists I0, P0["key"] # does a value exist at "key"
-  print I0             # prints 1
+  new $P0, "Hash"
+  set $P0["key"], 0
+  exists $I0, $P0["key"] # does a value exist at "key"
+  print $I0             # prints 1
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<delete>X<delete opcode (PIR)> opcode is also useful for working
 with hashes: it removes a key/value pair.
@@ -1599,19 +1601,19 @@ needs to be performed on every element in an aggregate. You create an
 iterator by creating a new C<Iterator> PMC, and passing the aggregate PMC
 to C<new> as an additional parameter:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P1, "Iterator", P2
+  new $P1, "Iterator", $P2
 
-=end PIR
+=end PIR_FRAGMENT
 
 Alternatively, you can use the C<iter> opcode to do the same thing:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  iter P1, P2     # Same!
+  iter $P1, $P2     # Same!
 
-=end PIR
+=end PIR_FRAGMENT
 
 The include file F<iterator.pasm> defines some constants for working
 with iterators. The C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END>
@@ -1623,51 +1625,51 @@ A value can be extracted from the iterator using the C<shift> opcode.
 Evaluating the iterator PMC as a boolean returns whether the iterator has
 reached the end of the aggregate or not.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
   .include "iterator.pasm"
-      new P2, "Array"
-      push P2, "a"
-      push P2, "b"
-      push P2, "c"
-      new P1, "Iterator", P2
-      set P1, .ITERATE_FROM_START
+      new $P2, "Array"
+      push $P2, "a"
+      push $P2, "b"
+      push $P2, "c"
+      new $P1, "Iterator", $P2
+      set $P1, .ITERATE_FROM_START
 
   iter_loop:
-      unless P1, iter_end
-      shift P5, P1
-      print P5                        # prints "a", "b", "c"
+      unless $P1, iter_end
+      shift $P5, $P1
+      print $P5                        # prints "a", "b", "c"
       branch iter_loop
   iter_end:
-      end
+      # ...
 
-=end PIR
+=end PIR_FRAGMENT
 
 Hash iterators work similarly to array iterators, but they extract keys
 only. With the key, you can find it's value from the original hash PMC.
 With hashes it's only meaningful to iterate in one direction since they
 don't define any order for their keys.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
   .include "iterator.pasm"
-      new P2, "Hash"
-      set P2["a"], 10
-      set P2["b"], 20
-      set P2["c"], 30
-      new P1, "Iterator", P2
-      set P1, .ITERATE_FROM_START_KEYS
+      new $P2, "Hash"
+      set $P2["a"], 10
+      set $P2["b"], 20
+      set $P2["c"], 30
+      new $P1, "Iterator", $P2
+      set $P1, .ITERATE_FROM_START_KEYS
 
   iter_loop:
-      unless P1, iter_end
-      shift S5, P1                    # one of the keys "a", "b", "c"
-      set I9, P2[S5]
-      print I9                        # prints e.g. 20, 10, 30
+      unless $P1, iter_end
+      shift $S5, $P1                    # one of the keys "a", "b", "c"
+      set $I9, $P2[$S5]
+      print $I9                        # prints e.g. 20, 10, 30
       branch iter_loop
   iter_end:
-      end
+      # ...
 
-=end PIR
+=end PIR_FRAGMENT
 
 =head4 Data structures
 
@@ -1680,29 +1682,28 @@ operation, so PIR provides a way to do it in a single instruction.
 Complex keys specify a series of nested data structures, with each
 individual key separated by a semicolon:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "Hash"
-  new P1, "Array"
-  set P1[2], 42
-  set P0["answer"], P1
-  set I1, 2
-  set I0, P0["answer";I1]        # $i = %hash{"answer"}[2]
-  print I0
+  new $P0, "Hash"
+  new $P1, "Array"
+  set $P1[2], 42
+  set $P0["answer"], $P1
+  set $I1, 2
+  set $I0, $P0["answer";$I1]        # $i = %hash{"answer"}[2]
+  print $I0
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example builds up a data structure of a hash containing an array.
 The complex key C<P0["answer";I1]> retrieves an element of the array
 within the hash. You can also set a value using a complex key:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  set P0["answer";0], 5   # %hash{"answer"}[0] = 5
+  set $P0["answer";0], 5   # %hash{"answer"}[0] = 5
 
-=end PIR
+=end PIR_FRAGMENT
 
 The individual keys are integers or strings, or registers with integer
 or string values.
@@ -1717,23 +1718,22 @@ and that C<clone> creates a complete duplicate object. But if you just
 want to assign the value of one PMC to another PMC, you need the
 C<assign>X<assign opcode (PIR)> opcode:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "Int"
-  new P1, "Int"
-  set P0, 42
-  set P2, P0
-  assign P1, P0     # note: P1 has to exist already
-  inc P0
-  print P0          # prints 43
+  new $P0, "Int"
+  new $P1, "Int"
+  set $P0, 42
+  set $P2, $P0
+  assign $P1, $P0     # note: $P1 has to exist already
+  inc $P0
+  print $P0          # prints 43
   print "\n"
-  print P1          # prints 42
+  print $P1          # prints 42
   print "\n"
-  print P2          # prints 43
+  print $P2          # prints 43
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example creates two C<Int> PMCs: C<P0> and C<P1>. It gives
 C<P0> a value of 42. It then uses C<set> to give the same value to
@@ -1763,19 +1763,18 @@ PMC from which the property value is to be retrieved. Internally a PMCs
 properties are stored in a Hash structure, where the name of the property
 is stored in a special properties Hash.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "String"
-  set P0, "Zaphod"
-  new P1, "Int"
-  set P1, 1
-  setprop P0, "constant", P1        # set a property on P0
-  getprop P3, "constant", P0        # retrieve a property on P0
-  print P3                          # prints 1
+  new $P0, "String"
+  set $P0, "Zaphod"
+  new $P1, "Int"
+  set $P1, 1
+  setprop $P0, "constant", $P1       # set a property on $P0
+  getprop $P3, "constant", $P0       # retrieve a property on $P0
+  print $P3                          # prints 1
   print "\n"
-  end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example creates a C<String> object in C<P0>, and a C<Int>
 object with the value 1 in C<P1>. C<setprop> sets a property named
@@ -1791,20 +1790,20 @@ C<Undef>.
 
 C<delprop>X<delprop opcode (PIR)> deletes a property from a PMC.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  delprop P1, "constant"  # delete property
+  delprop $P1, "constant"  # delete property
 
-=end PIR
+=end PIR_FRAGMENT
 
 You can also return a complete hash of all properties on a PMC with
 C<prophash>X<prophash opcode (PIR)>.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  prophash P0, P1         # set P0 to the property hash of P1
+  prophash $P0, $P1         # set $P0 to the property hash of $P1
 
-=end PIR
+=end PIR_FRAGMENT
 
 
 =head2 VTABLE Interfaces
@@ -1821,20 +1820,30 @@ register, etc. However, the C<=> operator can assign I<any> type of value into
 I<any> type of register; Parrot will handle the conversion for you
 automatically:
 
+=begin PIR_FRAGMENT
+
   $I0 = 5     # Integer. 5
   $S0 = $I0   # Stringify. "5"
   $N0 = $S0   # Numify. 5.0
   $I0 = $N0   # Intify. 5
 
+=end PIR_FRAGMENT
+
 Notice that conversions between the numeric formats and strings only makes
 sense when the value to convert is a number.
+
+=begin PIR_FRAGMENT
 
   $S0 = "parrot"
   $I0 = $S0        # 0
 
+=end PIR_FRAGMENT
+
 An earlier example showed a string literal assigned to a PMC register of type
 C<String>. This works for all the primitive types and their autoboxed PMC
 equivalents:
+
+=begin PIR_FRAGMENT
 
   $P0 = new 'Integer'
   $P0 = 5
@@ -1853,6 +1862,8 @@ equivalents:
   $S2 = $P2      # Stringify. "3.14"
   $I2 = $P2      # Intify. 3
   $N2 = $P2      # Unbox. $N2 = 3.14
+
+=end PIR_FRAGMENT
 
 =head2 Control Structures
 
@@ -2014,15 +2025,14 @@ offset. You can also branch on a literal integer value, but there's
 rarely any need to do so. The simplest branch instruction is
 C<branch>:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
     branch L1                # branch 4
     print "skipped\n"
   L1:
     print "after branch\n"
-    end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example unconditionally branches to the location of the label
 C<L1>, skipping over the first C<print> statement.
@@ -2031,17 +2041,16 @@ Jump instructions transfer control to an absolute address. The C<jump>
 opcode doesn't calculate an address from a label, so it's used
 together with C<set_addr>:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    set_addr I0, L1
-    jump I0
+    set_addr $I0, L1
+    jump $I0
     print "skipped\n"
     end
   L1:
     print "after jump\n"
-    end
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<set_addr>X<set_addr opcode (PIR)> opcode takes a label or an
 integer offset and returns an absolute address.
@@ -2067,11 +2076,11 @@ based on the truth of a single value or the comparison of two values.
 The following example has C<if>X<if (conditional);opcode (PIR)> and
 C<unless>X<unless (conditional);opcode (PIR)> conditional branches:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    set I0, 0
-    if I0, TRUE
-    unless I0, FALSE
+    set $I0, 0
+    if $I0, TRUE
+    unless $I0, FALSE
     print "skipped\n"
     end
   TRUE:
@@ -2079,9 +2088,8 @@ C<unless>X<unless (conditional);opcode (PIR)> conditional branches:
     end
   FALSE:
     print "the value was false\n"
-    end
 
-=end PIR
+=end PIR_FRAGMENT
 
 C<if> branches if its first argument is a true value, and C<unless>
 branches if its first argument is a false value. In this case, the
@@ -2098,18 +2106,17 @@ equal), and C<ge>X<ge (greater than or equal);opcode (PIR)> (when
 greater than or equal). The two compared arguments must be the same
 register type:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    set I0, 4
-    set I1, 4
-    eq I0, I1, EQUAL
+    set $I0, 4
+    set $I1, 4
+    eq $I0, $I1, EQUAL
     print "skipped\n"
     end
   EQUAL:
     print "the two values are equal\n"
-    end
 
-=end PIR
+=end PIR_FRAGMENT
 
 This compares two integers, C<I0> and C<I1>, and branches if they're
 equal. Strings of different character sets or encodings are converted
@@ -2125,21 +2132,21 @@ the other operand. If you need to force a numeric or string comparison
 on two PMCs, use the alternate comparison opcodes that end in the
 C<_num> and C<_str> suffixes.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  eq_str P0, P1, label     # always a string compare
-  gt_num P0, P1, label     # always numerically
+  eq_str $P0, $P1, label     # always a string compare
+  gt_num $P0, $P1, label     # always numerically
 
-=end PIR
+=end PIR_FRAGMENT
 
 Finally, the C<eq_addr> opcode branches if two PMCs or strings are
 actually the same object (have the same address):
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  eq_addr P0, P1, same_pmcs_found
+  eq_addr $P0, $P1, same_pmcs_found
 
-=end PIR
+=end PIR_FRAGMENT
 
 =head3 Iteration
 
@@ -2152,18 +2159,17 @@ from a combination of conditional and unconditional branches. A
 I<do-while>X<do-while style loop;(PIR)> style loop can be constructed
 with a single conditional branch:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    set I0, 0
-    set I1, 10
+    set $I0, 0
+    set $I1, 10
   REDO:
-    inc I0
-    print I0
+    inc $I0
+    print $I0
     print "\n"
-    lt I0, I1, REDO
-    end
+    lt $I0, $I1, REDO
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example prints out the numbers 1 to 10. The first time through,
 it executes all statements up to the C<lt> statement.  If the
@@ -2174,28 +2180,28 @@ again. The loop ends when the condition evaluates as false.
 Conditional and unconditional branches can build up quite complex
 looping constructs, as follows:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
     # loop ($i=1; $i<=10; $i++) {
     #    print "$i\n";
     # }
   loop_init:
-    set I0, 1
+    set $I0, 1
     branch loop_test
   loop_body:
-    print I0
+    print $I0
     print "\n"
     branch loop_continue
   loop_test:
-    le I0, 10, loop_body
+    le $I0, 10, loop_body
     branch out
   loop_continue:
-    inc I0
+    inc $I0
     branch loop_test
   out:
-    end
+    # ... 
 
-=end PIR
+=end PIR_FRAGMENT
 
 X<loops;PIR>
 X<PIR (Parrot assembly language);loops>
@@ -2535,10 +2541,14 @@ You can call this function in two ways:
 Programs written in Parrot have access to arguments passed on the command
 line:
 
+=begin PIR
+
   .sub 'MyMain' :main
     .param pmc all_args :slurpy
-    ...
+    # ...
   .end
+
+=end PIR
 
 =for author
 
@@ -2557,24 +2567,23 @@ A continuation is a subroutine that captures a complete copy of the
 caller's context. Invoking a
 continuation starts or restarts it at the entry point:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    new P1, "Int"
-    set P1, 5
+    new $P1, "Integer"
+    set $P1, 5
 
-    newsub P0, .Continuation, _con
+    newsub $P0, 'Continuation', _con
   _con:
     print "in cont "
-    print P1
+    print $P1
     print "\n"
-    dec P1
-    unless P1, done
-    invoke                        # P0
+    dec $P1
+    unless $P1, done
+    invoke                        # $P0
   done:
     print "done\n"
-    end
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 This prints:
 
@@ -2594,28 +2603,42 @@ back to any previous point in the program.
 
 Continuations are like any other PMC; you can create one with the C<new> opcode:
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'Continuation'
+
+=end PIR_FRAGMENT
 
 The new continuation starts off in an undefined state. If you attempt to invoke
 a new continuation without initializing it, Parrot will throw an exception.  To
 prepare the continuation for use, assign it a destination label with the
 C<set_addr> opcode:
 
+=begin PIR_FRAGMENT
+
     $P0 = new 'Continuation'
     set_addr $P0, my_label
 
   my_label:
-    ...
+    # ...
+
+=end PIR_FRAGMENT
 
 To jump to the continuation's stored label and return the context to the state
 it was in I<at the point of its creation>, invoke the continuation:
 
+=begin PIR_FRAGMENT_INVALID
+
   invoke $P0  # Explicit using "invoke" opcode
   $P0()       # Same, but nicer syntax
+
+=end PIR_FRAGMENT_INVALID
 
 Even though you can use the subroutine notation C<$P0()> to invoke the
 continuation, it doesn't make any sense to pass arguments or obtain return
 values:
+
+=begin PIR_FRAGMENT
 
   $P0 = new 'Continuation'
   set_addr $P0, my_label
@@ -2624,6 +2647,7 @@ values:
 
   $P1 = $P0()    # WRONG!
 
+=end PIR_FRAGMENT
 
 
 =head4 Continuation Passing Style
@@ -2711,23 +2735,23 @@ subroutines with a known prototype in shared libraries. This is not
 really portable across all libraries, but it's worth a short example.
 This is a simplified version of the first test in F<t/pmc/nci.t>:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    loadlib P1, "libnci_test"     # get library object for a shared lib
+    loadlib $P1, "libnci_test"      # get library object for a shared lib
     print "loaded\n"
-    dlfunc P0, P1, "nci_dd", "dd" # obtain the function object
+    dlfunc $P0, $P1, "nci_dd", "dd" # obtain the function object
     print "dlfunced\n"
-    set I0, 1                     # prototype used - unchecked
-    set_args "0", 4.0             # set the argument
-    get_results "0", N5           # prepare to store the return value
-    invokecc P0                   # call nci_dd
-    ne N5, 8.0, nok_1             # the test functions returns 2*arg
+    set $I0, 1                      # prototype used - unchecked
+    set_args "0", 4.0               # set the argument
+    get_results "0", $N5            # prepare to store the return value
+    invokecc $P0                    # call nci_dd
+    ne $N5, 8.0, nok_1              # the test functions returns 2*arg
     print "ok 1\n"
     end
     nok_1:
     #...
 
-=end PIR
+=end PIR_FRAGMENT
 
 This example shows two new instructions: C<loadlib> and C<dlfunc>. The
 C<loadlib>X<loadlib opcode (PIR)> opcode obtains a handle for a shared
@@ -2894,11 +2918,11 @@ left.
 X<coroutines>
 In PIR, coroutines are subroutine-like objects:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   newsub P0, .Coroutine, _co_entry
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 The C<Coroutine> object has its own user stack, register frame stacks,
 control stack, and pad stack. The pad stack is inherited from the
@@ -2908,7 +2932,7 @@ it returns to the caller and restores the caller's context (basically
 swapping all stacks). The next time the coroutine is invoked, it
 continues to execute from the point at which it previously returned:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
     new_pad 0                # push a new lexical pad on stack
     new P0, "Int"            # save one variable in it
@@ -2940,7 +2964,7 @@ continues to execute from the point at which it previously returned:
     print "again "
     branch _cor              # next invocation of the coroutine
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 This prints out the result:
 
@@ -3231,11 +3255,11 @@ object> bytecode segment object.
 The first step is to get an assembler or compiler for the target
 language:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  compreg P1, "PIR"
+  compreg $P1, "PIR"
 
-=end PIR
+=end PIR_FRAGMENT
 
 Within the Parrot interpreter there are currently three registered
 languages: C<PASM>, C<PIR>, and C<PASM1>. The first two are for parrot
@@ -3247,7 +3271,7 @@ compiled.
 This example places a bytecode segment object into the destination
 register C<P0> and then invokes it with C<invoke>:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   compreg P1, "PASM1"                # get compiler
   set S1, "in eval\n"
@@ -3256,17 +3280,17 @@ register C<P0> and then invokes it with C<invoke>:
   print "back again\n"
   end
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 You can register a compiler or assembler for any language inside the
 Parrot core and use it to compile and invoke code from that language.
 These compilers may be written in PIR or reside in shared libraries.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  compreg "MyLanguage", P10
+  compreg "MyLanguage", $P10
 
-=end PIR
+=end PIR_FRAGMENT
 
 In this example the C<compreg> opcode registers the subroutine-like
 object C<P10> as a compiler for the language "MyLanguage". See
@@ -3302,7 +3326,7 @@ Global variables are stored in a C<Hash>, so every variable name
 must be unique.  PIR has two opcodes for globals, C<set_global> and
 C<get_global>:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   new P10, "Int"
   set P10, 42
@@ -3312,7 +3336,7 @@ C<get_global>:
   print P0                        # prints 42
   end
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 The first two statements create a C<Int> in the PMC register
 C<P10> and give it the value 42. In the third statement,
@@ -3324,11 +3348,11 @@ printed.
 The C<set_global> opcode only stores a reference to the object. If
 we add an increment statement:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  inc P10
+  inc $P10
 
-=end PIR
+=end PIR_FRAGMENT
 
 after the C<set_global> it increments the stored global, printing 43.
 If that's not what you want, you can C<clone> the PMC before you store
@@ -3336,12 +3360,12 @@ it. Leaving the global variable as an alias does have advantages,
 though. If you retrieve a stored global into a register and modify it
 as follows:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   get_global P0, "varname"
   inc P0
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 the value of the stored global is directly modified, so you don't need
 to call C<set_global> again.
@@ -3354,12 +3378,12 @@ hierarchical namespaces for separating packages (classes and modules
 in Perl 6). Use C<set_rootglobal> and
 C<get_root_global> add an argument to select a nested namespace:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   set_root_global ["Foo"], "var", P0 # store P0 as var in the Foo namespace
   get_root_global P1, ["Foo"], "var"  # get Foo::var
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 Eventually the global opcodes will have variants that take a PMC to
 specify the namespace, but the design and implementation of these
@@ -3379,18 +3403,17 @@ Z<CHP-9-SECT-6.2.1>
 To store a lexical variable in the current scope pad, use C<store_lex>.
 Likewise, use C<find_lex> to retrieve a variable from the current pad.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P0, "Int"            # create a variable
-  set P0, 10               # assign value to it
-  store_lex "foo", P0      # store the var with the variable name "foo"
+  new $P0, "Int"            # create a variable
+  set $P0, 10               # assign value to it
+  store_lex "foo", $P0      # store the var with the variable name "foo"
   # ...
-  find_lex P1, "foo"       # get the var "foo" into P1
-  print P1
-  print "\n"               # prints 10
-  end
+  find_lex $P1, "foo"       # get the var "foo" into P1
+  print $P1
+  print "\n"                # prints 10
 
-=end PIR
+=end PIR_FRAGMENT
 
 As we have seen above, we can declare a new subroutine to be a nested inner
 subroutine of an existing outer subroutine using the C<:outer> flag. The
@@ -3675,22 +3698,22 @@ register for the class PMC. All classes (and objects) inherit from the
 C<ParrotClass> PMCX<ParrotClass PMC>, which is the core of the Parrot
 object system.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    newclass P1, "Foo"
+    newclass $P1, "Foo"
 
-=end PIR
+=end PIR_FRAGMENT
 
 To instantiate a new object of a particular class, you first look up
 the integer value for the class type with the C<find_type> opcode,
 then create an object of that type with the C<new> opcode:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
     find_type I1, "Foo"
     new P3I I1
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 The C<new> opcode also checks to see if the class defines a
 method named "__init" and calls it if it exists.
@@ -3705,24 +3728,24 @@ The C<addattribute> opcode creates a slot in the class for an
 attribute (sometimes known as an I<instance variable>) and associates
 it with a name:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    addattribute P1, ".i"                # Foo.i
+    addattribute $P1, ".i"                # Foo.i
 
-=end PIR
+=end PIR_FRAGMENT
 
 This chunk of code
 from the C<__init> method looks up the position of the first
 attribute, creates a C<Int> PMC, and stores it as the first
 attribute:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    classoffset I0, P2, "Foo"     # first "Foo" attribute of object P2
-    new P6, "Int"                 # create storage for the attribute
-    setattribute P2, I0, P6       # store the first attribute
+    classoffset $I0, $P2, "Foo"    # first "Foo" attribute of object P2
+    new $P6, "Int"                 # create storage for the attribute
+    setattribute $P2, $I0, $P6     # store the first attribute
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 The C<classoffset> opcodeX<classoffset opcode (PIR)> takes a PMC
 containing an object and the name of its class, and returns an integer
@@ -3732,55 +3755,55 @@ object's attribute slots. This example initializes the first
 attribute. The second attribute would be at C<I0 + 1>, the third
 attribute at C<I0 + 2>, etc:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    inc I0
-    setattribute P2, I0, P7       # store next attribute
+    inc $I0
+    setattribute $P2, $I0, $P7       # store next attribute
     #...
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 There is also support for named parameters with fully qualified
 parameter names (although this is a little bit slower than getting
 the class offset once and accessing several attributes by index):
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    new P6, "Int"
-    setattribute P2, "Foo\x0.i", P6   # store the attribute
+    new $P6, "Int"
+    setattribute $P2, "Foo\x0.i", $P6   # store the attribute
 
-=end PIR
+=end PIR_FRAGMENT
 
 You use the same integer index to retrieve the value of an attribute.
 The C<getattribute>X<getattribute opcode (PIR)> opcode takes an object and
 an index as arguments and returns the attribute PMC at that position:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    classoffset I0, P2, "Foo"         # first "Foo" attribute of object P2
-    getattribute P10, P2, I0          # indexed get of attribute
+    classoffset $I0, $P2, "Foo"         # first "Foo" attribute of object P2
+    getattribute $P10, $P2, $I0         # indexed get of attribute
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 or
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    getattribute P10, P2, "Foo\x0.i"  # named get
+    getattribute $P10, $P2, "Foo\x0.i"  # named get
 
-=end PIR
+=end PIR_FRAGMENT
 
 To set the value of an attribute PMC, first retrieve it with
 C<getattribute> and then assign to the returned PMC. Because PMC
 registers are only pointers to values, you don't need to store the PMC
 again after you modify its value:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    getattribute P10, P2, I0
-    set P10, I5
+    getattribute $P10, $P2, $I0
+    set $P10, $I5
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 =head3 Methods
 
@@ -3793,7 +3816,7 @@ Methods in PIR are just subroutines installed in the namespace of the
 class. You define a method with the C<.pcc_sub> directive before the
 label:
 
-=begin PIR
+=begin PIR_INVALID_FRAGMENT
 
   .pcc_sub _half:                 # I5 = self."_half"()
     classoffset I0, P2, "Foo"
@@ -3802,7 +3825,7 @@ label:
     div I5, 2
     invoke P1
 
-=end PIR
+=end PIR_INVALID_FRAGMENT
 
 This routine returns half of the value of the first attribute of the
 object. Method calls use the Parrot calling conventions so they always
@@ -3829,15 +3852,15 @@ adds one bit of magic, though. If you pass the name of the method in
 C<S0>, C<callmethodcc> looks up that method name in the invocant
 object and stores the method object in C<P0> for you:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    set S0, "_half"             # set method name
-    set P2, P3                  # the object
+    set $S0, "_half"             # set method name
+    set $P2, $P3                  # the object
     callmethodcc                # create return continuation, call
-    print I5                    # result of method call
+    print $I5                    # result of method call
     print "\n"
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 The C<callmethodcc> opcode also generates a return continuation and
 stores it in C<P1>. The C<callmethod> opcode doesn't generate a return
@@ -3858,7 +3881,7 @@ double underscore "__". The following code defines a method named
 C<__init> in the C<Foo> class that initializes the first attribute of
 the object with an integer:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   .sub __init:
     classoffset I0, P2, "Foo"     # lookup first attribute position
@@ -3866,19 +3889,19 @@ the object with an integer:
     setattribute P2, I0, P6       # store the first attribute
     invoke P1                     # return
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 Ordinary methods have to be called explicitly, but the vtable
 functions are called implicitly in many different contexts. Parrot
 saves and restores registers for you in these calls. The C<__init>
 method is called whenever a new object is constructed:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
     find_type I1, "Foo"
     new P3, I1          # call __init if it exists
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 A few other vtable functions in the complete code example for this
 section are C<__set_integer_native>, C<__add>, C<__get_integer>,
@@ -3886,44 +3909,44 @@ C<__get_string>, and C<__increment>. The C<set> opcode calls Foo's
 C<__set_integer_native> vtable function when its destination register
 is a C<Foo> object and the source register is a native integer:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    set P3, 30          # call __set_integer_native method
+    set $P3, 30          # call __set_integer_native method
 
-=end PIR
+=end PIR_FRAGMENT
 
 The C<add> opcode calls Foo's C<__add> vtable function when it adds
 two C<Foo> objects:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    new P4, I1          # same with P4
-    set P4, 12
-    new P5, I1          # create a new store for add
+    new $P4, $I1          # same with P4
+    set $P4, $12
+    new $P5, $I1          # create a new store for add
 
-    add P5, P3, P4      # __add method
+    add $P5, $P3, $P4      # __add method
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 The C<inc> opcode calls Foo's C<__increment> vtable function when it
 increments a C<Foo> object:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    inc P3              # __increment
+    inc $P3              # __increment
 
-=end PIR
+=end PIR_FRAGMENT
 
 Foo's C<__get_integer> and C<__get_string> vtable functions are called
 whenever an integer or string value is retrieved from a C<Foo> object:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    set I10, P5         # __get_integer
+    set $I10, $P5         # __get_integer
     #...
-    print P5            # calls __get_string, prints 'fortytwo'
+    print $P5            # calls __get_string, prints 'fortytwo'
 
-=end PIR
+=end PIR_FRAGMENT
 
 
 =head3 Inheritance
@@ -3937,29 +3960,29 @@ inherits methods and attributes from another class. It takes 3
 arguments: the destination register for the new class, a register
 containing the parent class, and the name of the new class:
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-    subclass P3, P1, "Bar"
+    subclass $P3, $P1, "Bar"
 
-=end PIR
+=end PIR_FRAGMENT
 
 X<multiple inheritance; in PIR>
 For multiple inheritance, the C<addparent>X<addparent opcode (PIR)>
 opcode adds additional parents to a subclass.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  newclass P4, "Baz"
-  addparent P3, P4
+  newclass $P4, "Baz"
+  addparent $P3, $P4
 
-=end PIR
+=end PIR_FRAGMENT
 
 To override an inherited method, define a method with the same name in
 the namespace of the subclass. The following code overrides Bar's
 C<__increment> method so it decrements the value instead of
 incrementing it:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   .namespace [ "Bar" ]
 
@@ -3969,7 +3992,7 @@ incrementing it:
     dec P10                       # the evil line
     invoke P1
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 Notice that the attribute inherited from C<Foo> can only be looked up
 with the C<Foo> class name, not the C<Bar> class name. This preserves
@@ -3978,30 +4001,30 @@ inherited attributes.
 
 Object creation for subclasses is the same as for ordinary classes:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    find_type I1, "Bar"
-    new P5, I1
+    find_type $I1, "Bar"
+    new $P5, $I1
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 Calls to inherited methods are just like calls to methods defined in
 the class:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    set P5, 42                  # inherited __set_integer_native
-    inc P5                      # overridden __increment
-    print P5                    # prints 41 as Bar's __increment decrements
+    set $P5, 42                  # inherited __set_integer_native
+    inc $P5                      # overridden __increment
+    print $P5                    # prints 41 as Bar's __increment decrements
     print "\n"
 
-    set S0, "_half"             # set method name
-    set P2, P5                  # the object
-    callmethodcc                # create return continuation, call
-    print I5
+    set $S0, "_half"             # set method name
+    set $P2, $P5                 # the object
+    callmethodcc                 # create return continuation, call
+    print $I5
     print "\n"
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 =head3 Additional Object Opcodes
 
@@ -4012,13 +4035,13 @@ objects. C<isa> checks whether an object belongs to or
 inherits from a particular class. C<can> checks whether
 an object has a particular method. Both return a true or false value.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
     $I0 = isa $P3, "Foo"           # 1
     $I0 = isa $P3, "Bar"           # 1
     $I0 = can $P3, "add"         # 1
 
-=end PIR
+=end PIR_FRAGMENT
 
 
 It may seem more appropriate for a discussion of PIR's support for classes
@@ -4121,7 +4144,7 @@ object:
 
 (See TT #483)
 
-=begin PIR
+=begin PIR_INVALID
 
   .sub "MyMethod" :method
     $S0 = self                    # Already defined as "self"
@@ -4134,7 +4157,7 @@ object:
     say $S0
   .end
 
-=end PIR
+=end PIR_INVALID
 
 This example defines two methods in the C<Foo> class. It calls one
 from the main body of the subroutine and the other from within the
@@ -4619,7 +4642,7 @@ opcode. The system calls the installed exception handler only when an
 exception is thrown (perhaps because of code that does division by
 zero or attempts to retrieve a global that wasn't stored.)
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
     newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # push handler on control stack
@@ -4632,7 +4655,7 @@ zero or attempts to retrieve a global that wasn't stored.)
     is_null P10, not_found      # test P10
     #...
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 This example creates a new exception handler subroutine with the
 C<newsub> opcode and installs it on the control stack with the
@@ -4674,13 +4697,13 @@ execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
 resumable.
 
-=begin PIR
+=begin PIR_FRAGMENT
 
-  new P10, 'Exception'    # create new Exception object
-  set P10, 'I die'        # set message attribute
-  throw P10               # throw it
+  new $P10, 'Exception'    # create new Exception object
+  set $P10, 'I die'        # set message attribute
+  throw $P10               # throw it
 
-=end PIR
+=end PIR_FRAGMENT
 
 Exceptions are designed to work with the Parrot calling conventions.
 Since the return addresses of C<bsr> subroutine calls and exception
@@ -4877,7 +4900,7 @@ needs to handle from the OS, it converts that signal into an event and
 broadcasts it to all running threads. Each thread independently
 decides if it's interested in this signal and, if so, how to respond to it.
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
     newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # establish signal handler
@@ -4895,7 +4918,7 @@ decides if it's interested in this signal and, if so, how to respond to it.
   nok:
     end
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 This example creates a signal handler and pushes it on to the control
 stack. It then prompts the user to send a C<SIGINT> from the shell
@@ -4940,7 +4963,7 @@ threads. This is only a simple example to illustrate threads, not a typical
 usage of threads (no-one really wants to spawn two threads just to print out a
 simple string).
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
     get_global P5, "_th1"              # locate thread function
     new P2, "ParrotThread"              # create a new thread
@@ -4983,7 +5006,7 @@ simple string).
     if S0, w2                           # the other thread will run
     invoke P1                           # done with string
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 This example creates a C<ParrotThread> object and calls its C<thread3>
 method, passing three arguments: a PMC for the C<_th1> subroutine in
@@ -5047,31 +5070,31 @@ method belongs to the C<ParrotThread> class. When it's called on a
 C<ParrotThread> object, the calling code waits until the thread
 terminates.
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    new P2, "ParrotThread"      # create a new thread
-    set I5, P2                  # get thread ID
+    new $P2, "ParrotThread"       # create a new thread
+    set $I5, $P2                  # get thread ID
 
-    find_method P0, P2, "join"  # get the join method...
-    invoke                      # ...and join (wait for) the thread
-    set P16, P5                 # the return result of the thread
+    find_method $P0, $P2, "join"  # get the join method...
+    invoke                        # ...and join (wait for) the thread
+    set $P16, $P5                 # the return result of the thread
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 C<kill> and C<detach> are interpreter methods, so you have to grab the
 current interpreter object before you can look up the method object.
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-    set I5, P2                  # get thread ID of thread P2
-    getinterp P3                # get this interpreter object
-    find_method P0, P3, "kill"  # get kill method
-    invoke                      # kill thread with ID I5
+    set $I5, $P2                  # get thread ID of thread P2
+    getinterp $P3                 # get this interpreter object
+    find_method $P0, $P3, "kill"  # get kill method
+    invoke                        # kill thread with ID I5
 
-    find_method P0, P3, "detach"
+    find_method $P0, $P3, "detach"
     invoke                      # detach thread with ID I5
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 By the time you read this, some of these combinations of statements
 and much of the threading syntax above may be reduced to a simpler set
@@ -5087,14 +5110,14 @@ The C<load_bytecode>X<load_bytecode opcode (PIR)> opcode takes a single
 argument: the name of the bytecode file to load. So, if you create a
 file named F<file.pasm> containing a single subroutine:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
   # file.pasm
   .sub _sub2:               # .sub stores a global sub
      print "in sub2\n"
      invoke P1
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 and compile it to bytecode using the C<-o> command-line switch:
 
@@ -5103,47 +5126,47 @@ and compile it to bytecode using the C<-o> command-line switch:
 You can then load the compiled bytecode into F<main.pasm> and directly
 call the subroutine defined in F<file.pasm>:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-  # main.pasm
+  # main.pir
   main:
     load_bytecode "file.pbc"    # compiled file.pasm
-    get_global P0, "_sub2"
+    get_global $P0, "_sub2"
     invokecc
     end
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 The C<load_bytecode> opcode also works with source files, as long as
 Parrot has a compiler registered for that type of file:
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-  # main2.pasm
+  # main2.pir
   main:
     load_bytecode "file.pasm"  # PIR source code
-    set_global P0, "_sub2"
+    set_global $P0, "_sub2"
     invokecc
     end
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 Subroutines marked with C<:load> run as soon as they're loaded (before
 C<load_bytecode> returns), rather than waiting to be called. A
 subroutine marked with C<:main> will always run first, no matter what
 name you give it or where you define it in the file.
 
-=begin PIR
+=begin PIR_FRAGMENT_INVALID
 
-  # file3.pasm
+  # file3.pir
   .sub :load                    # mark the sub as to be run
     print "file3\n"
-    invoke P1                   # return
+    invoke $P1                   # return
 
   # main3.pasm
   first:                        # first is never invoked
     print "never\n"
-    invoke P1
+    invoke $P1
 
   .sub :main                    # because _main is marked as the
     print "main\n"              # MAIN entry of program execution
@@ -5151,7 +5174,7 @@ name you give it or where you define it in the file.
     print "back\n"
     end
 
-=end PIR
+=end PIR_FRAGMENT_INVALID
 
 This example uses both C<:load> and C<:main>. Because the C<main>
 subroutine is defined with C<:main> it will execute first even though
