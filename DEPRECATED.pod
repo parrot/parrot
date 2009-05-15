@@ -38,10 +38,6 @@ L<https://trac.parrot.org/parrot/ticket/490>
 
 =over 4
 
-=item pointer [eligible in 1.1]
-
-L<https://trac.parrot.org/parrot/ticket/187>
-
 =item random [eligible in 1.1]
 
 L<https://trac.parrot.org/parrot/ticket/189>
