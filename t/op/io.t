@@ -52,7 +52,7 @@ Catched
 OUTPUT
 
 TODO: {
-local $TODO = 'Testing' unless $^O =~ /linux/;
+local $TODO = 'Testing' unless $^O =~ /linux|darwin/;
 
 pir_output_like( <<'CODE', <<'OUTPUT', 'open pipe for reading' );
 .include 'iglobals.pasm'
