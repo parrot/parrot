@@ -6,57 +6,34 @@ Z<CHP-9>
 
 X<Parrot Assembly Language;;(see PASM)>
 X<PASM (Parrot assembly language)>
-We've seen some of the common ways for programming Parrot in earlier
-chapters: PIR is the intermediate language that's used most often for
-implementing routines in Parrot, NQP is used for writing grammar actions
-for high-level language compilers, PGE is used for specifying grammar
-rules, and various high-level languages that target Parrot are used for
-most other programming tasks. These options, though many and versatile,
-are not the only ways to interface with Parrot.
+PIR is the intermediate language that's used most often for implementing
+libraries in Parrot, NQP is used for writing grammar actions for
+high-level language compilers, PGE is used for specifying grammar rules,
+and various high-level languages that target Parrot are used for most
+other programming tasks. These options, though many and versatile, are
+not the only ways to interface with Parrot.
 
-In regular assemblers, assembly language mnemonics share a one-to-one
-correspondence with the underlying machine code words that they
-represent. A simple assembler (and, for that matter, a simple disassembler)
-could be implemented as a mere lookup table. PIR does not have this kind
-of direct correspondance to PBC. A number of PIR features, especially the
-various directives, typically translate into a number of individual
-operations. Register names, such as C<$P7> don't indicate the actual
-storage location of the register in PIR either. The register allocator
-will intelligently move and rearrange registers to conserve memory, so
-the numbers you use to specify registers in PIR will be mapped to
-different numbers when compiled into PBC.
+Like PIR, Parrot Assembly Language (PASM) is a low-level language native
+to the virtual machine. PASM is a pure assembly language, with none of
+the syntactic sugar that makes PIR friendly for library development.
 
-Because PIR and PBC can't be directly translated to one another, and
-because it can be difficult to disassemble low-level PBC back into the
-higher-level composite statements of PIR, especially after optimization,
-another tool is needed. That tool is PASM.
+Its primary purpose is to act as a plain English reprepresention of the
+bytecode format. In regular assemblers, assembly language mnemonics
+share a one-to-one correspondence with the underlying machine code words
+that they represent. A simple assembler (and, for that matter, a simple
+disassembler) could be implemented as a mere lookup table.  PASM
+instructions share a one-to-one correspondence to the underlying
+bytecode instructions, and for this reason PASM is used by the Parrot
+disassembler instead of PIR.
 
-PASM, the Parrot Assembly Language, is the lowest-level interface to
-Parrot. PASM instruction mnemonics do share a one-to-one correspondence
-to the underlying PBC opcodes, and for this reason is used by the Parrot
-disassembler instead of PIR. PASM is missing some of the features of
-PIR: Most directives, symbolic operators, C<if> and C<unless> compound
-statements, automatic register allocation, and a few other bits of
-syntactic sugar are missing from PASM. Because of these omissions, it is
-strongly recommended that most developers do not use PASM to write any
-large amount of code. Use PIR if you need to, or a higher-level language
-if you can.
+PASM is used as a debugging tool more often than it is used to write
+extensive libraries of code. PIR or a higher-level language are
+recommended for most development tasks.
 
-=head2 PASM Files
-
-X<.pasm files>
-The Parrot compilers, IMCC and PIRC, differentiate between PIR and PASM
-code files based on the file extension. A file with a F<.pasm> extension
-is treated as pure PASM code by Parrot, as is any file run with the C<-a>
-command-line option.
-
-Early in the Parrot project's history, PIR was treated as a pure superset
-of PASM. All PASM was valid PIR, but PIR added a few extra features that
-the programmers found to be nice. However, this situation has changed and
-PIR is no longer a strict superset of PASM. For this reason, PASM and
-PIR code need to be kept in files with separate extensions. As we mentioned
-before, C<.pasm> files are always treated as containing only PASM, while
-C<.pir> files are used for PIR code, by convention.
+X<.pasm extension>
+PASM files use the F<.pasm> file extension. Parrot also has a C<-a>
+command-line option to tell it to treat a file as PASM code even if it
+doesn't have a F<.pasm> extension.
 
 =head2 Basics
 
