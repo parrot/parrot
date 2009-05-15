@@ -688,6 +688,9 @@ options are passed to the evaluator.
     close ifh
     goto iter_loop
   iter_end:
+    $S0 = join ' ', files
+    $P1 = box $S0
+    .lex '$?FILES', $P1
     $P0 = self.'eval'(code, args :flat, adverbs :flat :named)
     if target == '' goto end
     if target == 'pir' goto end
