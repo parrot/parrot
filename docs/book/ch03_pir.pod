@@ -5,7 +5,7 @@
 Z<CHP-3>
 
 X<Parrot Intermediate Representation;;(see PIR)>
-X<PIR (Parrot intermediate representation)>
+X<PIR>
 
 Parrot Intermediate Representation (PIR) is Parrot's native low-level
 language.N<Parrot also has a pure native assembly language called PASM,
@@ -14,17 +14,17 @@ it has some higher-level features such as operator syntax, syntactic
 sugar for subroutine and method calls, automatic register allocation,
 and more friendly conditional syntax.  PIR is commonly used to write
 Parrot libraries -- including some of Parrot's compilers -- and is the
-target form when compiling high-level languages to Parrot.
+target form when compiling high-level languages to Parrot.  Even so, PIR
+is more rigid and "close to the machine" then some higher-level
+languages like C. X<.pir files> Files containing PIR code use the
+F<.pir> extension.
 
-Even so, PIR is more rigid and "close to the machine" then some higher-level
-languages like C. X<.pir files> Files containing PIR code use the F<.pir>
-extension.
-
-=head2 Basics
+=head2 Basic Syntax
 
 PIR has a relatively simple syntax. Every line is a comment, a label, a
-statement, or a directive. Each statement or directive stands on its own line.
-There is no end-of-line symbol (such as a semicolon in other languages).
+statement, or a directive. There is no end-of-line symbol (such as a
+semicolon in C), the end of the line is the end of the statement or
+directive.
 
 =head3 Comments
 
@@ -56,11 +56,16 @@ X<PIR (Parrot intermediate representation);labels> X<labels (PIR)> A label
 attaches a name to a line of code so other statements can refer to it.
 Labels can contain letters, numbers, and underscores. By convention,
 labels use all capital letters to stand out from the rest of the source
-code. A label can be precede a line of code, though outdenting labels on
-separate lines improves readability:
+code. It's fine to put a label on the same line as a statement or
+directive:
+
+    GREET: print "'Allo, 'allo, 'allo."
+
+Readability is improved by putting labels on separate lines, outdented
+to stand apart from the ordiary code flow:
 
   GREET:
-      say "'Allo, 'allo, 'allo."
+    print "'Allo, 'allo, 'allo."
 
 =head3 Statements
 
@@ -72,7 +77,7 @@ A statement is either an opcode or syntactic sugar for one or more opcodes. An
 opcode is a native instruction for the virtual machine; it consists of the name
 of the instruction followed by zero or more arguments.
 
-  say "Norwegian Blue"
+  print "Norwegian Blue"
 
 PIR also provides higher-level constructs, including symbol operators:
 
@@ -93,8 +98,6 @@ operations that require the generation of multiple instructions.  The
 C<.local> directive, for example, declares a named variable.
 
   .local string hello
-
-PIR also has a macro facility to create user-defined directives.
 
 =head3 Literals
 
@@ -131,68 +134,149 @@ called PMCs, for "I<P>olyI<M>orphic I<C>ontainer".
 
 The simplest kind of variable is a register variable. The name of a
 register variable always starts with a dollar sign (C<$>), followed by a
-single character which specifies the type of the registerE<mdash>integer
+single character which specifies the type of the variableE<mdash>integer
 (C<I>), number (C<N>), string (C<S>), or PMC (C<P>)E<mdash>, and end
-with a unique number. N<The number of a register variable usually does
-not correspond to the register used internally; Parrot's compiler remaps
-registers as appropriate.> Register variables don't have to be
-predeclared:
+with a unique number. Register variables don't need to be predeclared:
 
   $S0 = "Who's a pretty boy, then?"
-  say $S0
+  print $S0
 
 PIR also has named variables, which are declared with the C<.local>
-directive.  As with register variables, there are four valid types for
-named variables: C<int>, C<num>, C<string>, and C<pmc>.  Named variables
-have to be declared, but otherwise behave exactly the same as register
-variables.
+directive. As with register variables, there are four valid types:
+C<int>, C<num>, C<string>, and C<pmc>. Named variables have to be
+declared, but otherwise behave exactly the same as register variables.
 
   .local string hello
   hello "'Allo, 'allo, 'allo."
-  say hello
+  print hello
 
+=head3 Constants
 
 X<PIR (Parrot intermediate representation);constants>
 X<constants (PIR)>
 
-The C<.const> directive declares a named constant. Named constants are similar to named variables, but their values are set in the declaration and can never be changed. Like C<.local>, C<.const> takes a type and a name. It also requires a literal argument to set the value of the constant.
+The C<.const> directive declares a named constant. Named constants are
+similar to named variables, but their values are set in the declaration
+and can never be changed. Like C<.local>, C<.const> takes a type and a
+name. It also requires a literal argument to set the value of the
+constant.
 
   .const int    frog = 4                       # integer constant
   .const string name = "Superintendent Parrot" # string constant
   .const num    pi   = 3.14159                 # floating point constant
 
-Named constants may be used in all the same places as literals,
-but have to be declared beforehand. The following example declares a named string constant C<hello> and prints the value:
+Named constants may be used in all the same places as literals, but have
+to be declared beforehand. The following example declares a named string
+constant C<hello> and prints the value:
 
   .const string hello = "Hello, Polly."
-  say hello
+  print hello
 
+=head3 Control Structures
 
-=head3 Control Flow
+Rather than providing a pre-packaged set of control structures like
+C<if> and C<while>, PIR gives you the building blocks to construct your
+own.N<PIR has many advanced features, but at heart it B<is> an assembly
+language.> The most basic of these building blocks is C<goto>, which
+jumps to a named label.N<This is not your father's C<goto>. It can only
+jump inside a subroutine, and only to a named label.> In the following
+code example, the C<print> statement will run immediately after the
+C<goto> statement:
 
+    goto GREET
+    # ... some skipped code ...
+
+  GREET:
+    print "'Allo, 'allo, 'allo."
+
+Variations on the basic C<goto> check whether a particular condition is
+true or false before jumping:
+
+  if $I0 > 5 goto GREET
+
+All of the traditional control structures can be constructed from PIR's
+control building blocks.
 
 =head3 Subroutines
 
-A PIR subroutine starts with the C<.sub> directive and ends with the C<.end> directive. Parameter declarations use the C<.param> directive, and look a lot like named variable declarations. The following example declares a subroutined named C<greeting>, that takes a single string parameter named C<hello>:
+A PIR subroutine starts with the C<.sub> directive and ends with the
+C<.end> directive. Parameter declarations use the C<.param> directive,
+and look a lot like named variable declarations. The following example
+declares a subroutined named C<greeting>, that takes a single string
+parameter named C<hello>:
 
   .sub greeting
       .param string hello
-      say hello
+      print hello
   .end
+
+=head3 That's All Folks
+
+You now know everything you need to know about PIR. Everything else you
+read or learn about PIR will use one of these fundamental language
+structures. The rest is vocabulary.
+
+=head2 Working with Variables
+
+We call the simple C<$I0>-style variables "register variables" for a
+specific reason: Parrot is a register-based virtual machine. It has 4
+typed register sets: integers, floating-point numbers, strings, and
+objects. When you're working with register variables or named variables,
+you're actually working directly with register storage locations in the
+virtual machine.
+
+If you've ever worked with an assembly language before, you may
+immediately jump to the conclusion that C<$I0> is the zeroth integer
+register, but Parrot is a bit smarter than that. The number of a
+register variable usually does not correspond to the register used
+internally; Parrot's compiler maps registers as appropriate for speed
+and memory considerations. The only guarantee Parrot gives you is that
+you'll always get the same storage location when you use C<$I0> in the
+same subroutine.
+
+The most basic operation on a variable is assignment using the C<=>
+operator:
+
+=begin PIR
+
+  $I0 = 42        # set integer variable to the value 42
+  $N3 = 3.14159   # set number variable to an approximation of pi
+  $I1 = $I0       # set $I1 to the value of $I0
+
+=end PIR
+
+The C<exchange> opcode swaps the contents of two variables of the same
+type. The following example sets C<$I0> to the value of C<$I1>, and sets
+C<$I1> to the value of C<$I0>. 
+
+=begin PIR
+
+  exchange $I0, $I1
+
+=end PIR
+
+The C<null> opcode sets an integer or number variable to a zero value,
+and undefines a string or object.
+
+  null $I0  # 0
+  null $N0  # 0.0
+  null $S0  # NULL
+  null $P0  # PMCNULL
+
 
 =head2 Working with Numbers
 
-X<PASM (Parrot assembly language);math operations>
-PIR has a full set of math instructions. These work with integers,
-floating-point numbers, and numeric PMCs. Most of the major math instructions have two- and
-three-argument forms:
+X<PIR (Parrot assembly language);math operations>
+PIR has an extensive set of math instructions that work with integers,
+floating-point numbers, and numeric PMCs. Many of the math instructions
+have two- and three-argument forms:
 
 =begin PIR
 
   $I10 = $I11 + $I2
   $I0 += $I1
 
-=end PASM
+=end PIR
 
 The three-argument form of C<+> stores the sum
 of the two arguments in the result variable. The two-argument form
@@ -204,12 +288,12 @@ must be compatible with the type of the result.
 Generally, "compatible" means that the result and arguments have to
 be the same type, but there are a few exceptions:
 
-=begin PASM
+=begin PIR
 
   $P0 = $P1 - 2
   $P0 = $P1 - 1.5
 
-=end PASM
+=end PIR
 
 If the result is an integer type, like C<$I0>, the arguments must be integer variables or constants. A
 floating-point result, like C<$N0>, usually requires
@@ -217,7 +301,7 @@ floating-point arguments, but many math instructions also allow the final
 argument to be an integer. Instructions with a PMC result may
 accept an integer, floating-point, or PMC final argument:
 
-=begin PASM
+=begin PIR
 
   mul P0, P1             # P0 *= P1
   mul P0, I1
@@ -226,12 +310,12 @@ accept an integer, floating-point, or PMC final argument:
   mul P0, P1, I2
   mul P0, P1, N2
 
-=end PASM
+=end PIR
 
 
 
 We won't list every math opcode here, but we'll list some of the most common
-ones. You can get a complete list in "PASM Opcodes" in Chapter 11.
+ones. You can get a complete list in "PIR Opcodes" in Chapter 11.
 
 =head4 Unary math opcodes
 
@@ -243,44 +327,44 @@ most common unary math opcodes are C<inc> (increment), C<dec>
 (decrement), C<abs> (absolute value), C<neg> (negate), and C<fact>
 (factorial):
 
-=begin PASM
+=begin PIR
 
   abs N0, -5.0  # the absolute value of -5.0 is 5.0
   fact I1, 5    # the factorial of 5 is 120
   inc I1        # 120 incremented by 1 is 121
 
-=end PASM
+=end PIR
 
 =head4 Binary math opcodes
 
 Z<CHP-9-SECT-2.3.2>
 
-X<PASM (Parrot assembly language);math operations;binary>
+X<PIR (Parrot assembly language);math operations;binary>
 Binary opcodes have two source arguments and a destination argument, and we
 saw examples of these types above. As we mentioned before, most binary math
 opcodes have a two-argument form in which the first argument is both a source
-and the destination. Parrot provides C<add>X<add opcode (PASM)> (addition),
-C<sub>X<sub opcode (PASM)> (subtraction), C<mul>X<mul opcode (PASM)>
-(multiplication), C<div>X<div opcode (PASM)> (division), and C<pow>X<pow
-opcode (PASM)> (exponent) opcodes, as well as two different modulus
-operations. C<mod>X<mod opcode (PASM)> is Parrot's implementation of modulus,
-and C<cmod>X<cmod opcode (PASM)> performs an operation equivalent the C<%>
+and the destination. Parrot provides C<add>X<add opcode (PIR)> (addition),
+C<sub>X<sub opcode (PIR)> (subtraction), C<mul>X<mul opcode (PIR)>
+(multiplication), C<div>X<div opcode (PIR)> (division), and C<pow>X<pow
+opcode (PIR)> (exponent) opcodes, as well as two different modulus
+operations. C<mod>X<mod opcode (PIR)> is Parrot's implementation of modulus,
+and C<cmod>X<cmod opcode (PIR)> performs an operation equivalent the C<%>
 operator from the C programming language. It also provides C<gcd>X<gcd opcode
-(PASM)> (greatest common divisor) and C<lcm>X<lcm opcode (PASM)> (least common
+(PIR)> (greatest common divisor) and C<lcm>X<lcm opcode (PIR)> (least common
 multiple).
 
-=begin PASM
+=begin PIR
 
   div I0, 12, 5   # I0 = 12 / 5
   mod I0, 12, 5   # I0 = 12 % 5
 
-=end PASM
+=end PIR
 
 =head4 Floating-point operations
 
 Z<CHP-9-SECT-2.3.3>
 
-X<PASM (Parrot assembly language);math operations;floating-point>
+X<PIR (Parrot assembly language);math operations;floating-point>
 Although most of the math operations work with both floating-point numbers
 and integers, a few require floating-point destination registers. Among these
 are C<ln> (natural log), C<log2> (log base 2), C<log10> (log base 10), and
@@ -289,29 +373,29 @@ C<sin> (sine), C<cos> (cosine), C<tan> (tangent), C<sec> (secant), C<cosh>
 (hyperbolic cosine), C<tanh> (hyperbolic tangent), C<sech> (hyperbolic secant),
 C<asin> (arc sine), C<acos> (arc cosine), C<atan> (arc tangent), C<asec> (arc
 secant), C<exsec> (exsecant), C<hav> (haversine), and C<vers> (versine). All
-angle arguments for the X<trigonometric functions (PASM)> trigonometric
+angle arguments for the X<trigonometric functions (PIR)> trigonometric
 functions are in radians:
 
-=begin PASM
+=begin PIR
 
   sin N1, N0
   exp N1, 2
 
-=end PASM
+=end PIR
 
 The majority of the floating-point operations have a single source argument
 and a single destination argument. Even though the destination must be a
 floating-point register, the source can be either an integer or floating-point
 number.
 
-The C<atan>X<atan opcode (PASM)> opcode also has a three-argument variant that
+The C<atan>X<atan opcode (PIR)> opcode also has a three-argument variant that
 implements C's C<atan2()>:
 
-=begin PASM
+=begin PIR
 
   atan N0, 1, 1
 
-=end PASM
+=end PIR
 
 
 
@@ -357,6 +441,34 @@ line, and may not have any trailing whitespace.
 
   End_Token
 
+=head3 Assignment
+
+Strings in Parrot are also stored as references to internal data structures
+like PMCs. However, strings use Copy-On-Write (COW) optimizations. When we
+call C<set S1, S0> we copy the pointer only, so both registers point to the
+same string memory. We don't actually make a copy of the string until one of
+two registers is modified. Here's the same example using string registers
+instead of PMC registers, which demonstrate how strings use COW:
+
+=begin PASM
+
+  set S0, "Ford"
+  set S1, S0
+  set S1, "Zaphod"
+  print S0                # prints "Ford"
+  print S1                # prints "Zaphod"
+  end
+
+=end PASM
+
+Here, we can clearly see the opposite result from how PMCs were handled in
+the previous example. Modifying one of the two registers causes a new string
+to be created, preserving the old value in C<S0> and assigning the new value
+to the new string in C<S1>. The benefits here are that we don't have to worry
+about stray references causing side effects in our code, and we don't waste
+time copying a string until it's actually time to make a copy.
+
+
 Strings are buffers of variable-sized data. The most common use of string
 registers and variables is to store textual data. String registers I<may> also be
 buffers for binary or other non-textual data, though this is rareN<In general,
@@ -364,7 +476,7 @@ a custom PMC is more useful>.  Parrot strings are flexible and powerful, to
 account for all the complexity of human-readable (and computer-representable)
 textual data.
 
-X<PASM (Parrot assembly language);string operations>
+X<PIR (Parrot assembly language);string operations>
 String operations work with string registers and string-like PMCs. String operations on PMC registers require all their string
 arguments to be String PMCs.
 
@@ -372,13 +484,13 @@ arguments to be String PMCs.
 
 Z<CHP-9-SECT-2.4.1>
 
-X<PASM (Parrot assembly language);string operations;concatenation>
-Use the C<concat>X<concat opcode (PASM)> opcode to concatenate
+X<PIR (Parrot assembly language);string operations;concatenation>
+Use the C<concat>X<concat opcode (PIR)> opcode to concatenate
 strings. With string register or string constant arguments, C<concat>
 has both a two-argument and a three-argument form. The first argument
 is a source and a destination in the two-argument form:
 
-=begin PASM
+=begin PIR
 
   set S0, "ab"
   concat S0, "cd"     # S0 has "cd" appended
@@ -390,7 +502,7 @@ is a source and a destination in the two-argument form:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 The first C<concat> concatenates the string "cd" onto the string "ab" in
 C<S0>. It generates a new string "abcd" and changes C<S0> to point to the
@@ -401,7 +513,7 @@ X<PMCs (Polymorphic Containers);concatenation>
 For PMC registers, C<concat> has only a three-argument form with
 separate registers for source and destination:
 
-=begin PASM
+=begin PIR
 
   new P0, "String"
   new P1, "String"
@@ -413,7 +525,7 @@ separate registers for source and destination:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 Here, C<concat> concatenates the strings in C<P0> and C<P1> and stores
 the result in C<P2>.
@@ -422,11 +534,11 @@ the result in C<P2>.
 
 Z<CHP-9-SECT-2.4.2>
 
-X<PASM (Parrot assembly language);string operations;repeating strings>
-The C<repeat>X<repeat opcode (PASM)> opcode repeats a string a certain
+X<PIR (Parrot assembly language);string operations;repeating strings>
+The C<repeat>X<repeat opcode (PIR)> opcode repeats a string a certain
 number of times:
 
-=begin PASM
+=begin PIR
 
   set S0, "x"
   repeat S1, S0, 5  # S1 = S0 x 5
@@ -434,7 +546,7 @@ number of times:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 In this example, C<repeat> generates a new string with "x" repeated
 five times and stores a pointer to it in C<S1>.
@@ -443,12 +555,12 @@ five times and stores a pointer to it in C<S1>.
 
 Z<CHP-9-SECT-2.4.3>
 
-X<PASM (Parrot assembly language);string operations;length>
-The C<length>X<length opcode (PASM)> opcode returns the length of a
+X<PIR (Parrot assembly language);string operations;length>
+The C<length>X<length opcode (PIR)> opcode returns the length of a
 string in characters. This won't be the same as the length in bytes
 for multibyte encoded strings:
 
-=begin PASM
+=begin PIR
 
   set S0, "abcd"
   length I0, S0                # the length is 4
@@ -456,7 +568,7 @@ for multibyte encoded strings:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 C<length> doesn't have an equivalent for PMC strings.
 
@@ -464,18 +576,18 @@ C<length> doesn't have an equivalent for PMC strings.
 
 Z<CHP-9-SECT-2.4.4>
 
-X<PASM (Parrot assembly language);string operations;substrings>
-The simplest version of the C<substr>X<substr opcode (PASM)> opcode
+X<PIR (Parrot assembly language);string operations;substrings>
+The simplest version of the C<substr>X<substr opcode (PIR)> opcode
 takes four arguments: a destination register, a string, an offset
 position, and a length. It returns a substring of the original string,
 starting from the offset position (0 is the first character) and
 spanning the length:
 
-=begin PASM
+=begin PIR
 
   substr S0, "abcde", 1, 2        # S0 is "bc"
 
-=end PASM
+=end PIR
 
 This example extracts a two-character string from "abcde" at a
 one-character offset from the beginning of the string (starting with
@@ -490,7 +602,7 @@ C<substr> also has a five-argument form, where the fifth argument is a
 string to replace the substring. This modifies the second argument and
 returns the removed substring in the destination register.
 
-=begin PASM
+=begin PIR
 
   set S1, "abcde"
   substr S0, S1, 1, 2, "XYZ"
@@ -500,7 +612,7 @@ returns the removed substring in the destination register.
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 This replaces the substring "bc" in C<S1> with the string "XYZ", and
 returns "bc" in C<S0>.
@@ -515,7 +627,7 @@ When you don't need to capture the replaced string, there's an
 optimized version of C<substr> that just does a replace without
 returning the removed substring.
 
-=begin PASM
+=begin PIR
 
   set S1, "abcde"
   substr S1, 1, 2, "XYZ"
@@ -523,7 +635,7 @@ returning the removed substring.
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 The PMC versions of C<substr> are not yet implemented.
 
@@ -531,12 +643,12 @@ The PMC versions of C<substr> are not yet implemented.
 
 Z<CHP-9-SECT-2.4.5>
 
-X<PASM (Parrot assembly language);string operations;chopping strings>
-The C<chopn>X<chopn opcode (PASM)> opcode removes characters from the
+X<PIR (Parrot assembly language);string operations;chopping strings>
+The C<chopn>X<chopn opcode (PIR)> opcode removes characters from the
 end of a string. It takes two arguments: the string to modify and the
 count of characters to remove.
 
-=begin PASM
+=begin PIR
 
   set S0, "abcde"
   chopn S0, 2
@@ -544,12 +656,12 @@ count of characters to remove.
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 This example removes two characters from the end of C<S0>. If the
 count is negative, that many characters are kept in the string:
 
-=begin PASM
+=begin PIR
 
   set S0, "abcde"
   chopn S0, -2
@@ -557,14 +669,14 @@ count is negative, that many characters are kept in the string:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 This keeps the first two characters in C<S0> and removes the rest.
 C<chopn> also has a three-argument version that stores the chopped
 string in a separate destination register, leaving the original string
 untouched:
 
-=begin PASM
+=begin PIR
 
   set S0, "abcde"
   chopn S1, S0, 1
@@ -572,14 +684,14 @@ untouched:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 =head4 Copying and Cloning
 
 Z<CHP-9-SECT-2.4.6>
 
-X<PASM (Parrot assembly language);string operations;copying> The C<clone>
-X<clone opcode (PASM)> opcode makes a deep copy of a string or PMC. Earlier
+X<PIR (Parrot assembly language);string operations;copying> The C<clone>
+X<clone opcode (PIR)> opcode makes a deep copy of a string or PMC. Earlier
 in this chapter we saw that PMC and String values used with the C<set> opcode
 didn't create a copy of the underlying data structure, it only created
 a copy of the reference to that structure. With strings, this doesn't cause
@@ -593,7 +705,7 @@ Instead of just copying the pointer like C<set> would do, we can use the
 C<clone> opcode to create a I<deep copy> of the PMC, not just a I<shallow
 copy> of the reference.
 
-=begin PASM
+=begin PIR
 
   new P0, "String"
   set P0, "Ford"
@@ -603,7 +715,7 @@ copy> of the reference.
   print P1        # prints "Ford"
   end
 
-=end PASM
+=end PIR
 
 This example creates an identical, independent clone of the PMC in
 C<P0> and puts a pointer to it in C<P1>. Later changes to C<P0> have
@@ -618,62 +730,62 @@ then C<clone>, but there is no rule about this.
 
 Z<CHP-9-SECT-2.4.7>
 
-X<PASM (Parrot assembly language);string operations;converting strings>
-The C<chr>X<chr opcode (PASM)> opcode takes an integer value and returns the
+X<PIR (Parrot assembly language);string operations;converting strings>
+The C<chr>X<chr opcode (PIR)> opcode takes an integer value and returns the
 corresponding character in the ASCII character set as a one-character string,
-while the C<ord>X<ord opcode (PASM)> opcode takes a single character string
+while the C<ord>X<ord opcode (PIR)> opcode takes a single character string
 and returns the integer value of the character at the first position in the
 string. Notice that the integer value of the character will differ depending
 on the current encoding of the string:
 
-=begin PASM
+=begin PIR
 
   chr S0, 65                # S0 is "A"
   ord I0, S0                # I0 is 65, if S0 is ASCII or UTF-8
 
-=end PASM
+=end PIR
 
 C<ord> has a three-argument variant that takes a character offset to select
 a single character from a multicharacter string. The offset must be within
 the length of the string:
 
-=begin PASM
+=begin PIR
 
   ord I0, "ABC", 2        # I0 is 67
 
-=end PASM
+=end PIR
 
 A negative offset counts backward from the end of the string, so -1 is
 the last character.
 
-=begin PASM
+=begin PIR
 
   ord I0, "ABC", -1        # I0 is 67
 
-=end PASM
+=end PIR
 
 =head4 Formatting strings
 
 Z<CHP-9-SECT-2.4.8>
 
-X<PASM (Parrot assembly language);string operations;formatting strings>
-The C<sprintf>X<sprintf opcode (PASM)> opcode generates a formatted string
+X<PIR (Parrot assembly language);string operations;formatting strings>
+The C<sprintf>X<sprintf opcode (PIR)> opcode generates a formatted string
 from a series of values. It takes three arguments: the destination register,
 a string specifying the format, and an ordered aggregate PMC (like an
 C<Array> PMC) containing the values to be formatted. The format string and
 the destination register can be either strings or PMCs:
 
-=begin PASM
+=begin PIR
 
   sprintf S0, S1, P2
   sprintf P0, P1, P2
 
-=end PASM
+=end PIR
 
 The format string is similar to the one for C's C<sprintf> function,
 but with some extensions for Parrot data types. Each format field in
 the string starts with a C<%>
-X<% (percent sign);% format strings for sprintf opcode (PASM)> and
+X<% (percent sign);% format strings for sprintf opcode (PIR)> and
 ends with a character specifying the output format. The output format
 characters are listed in Table 9-1.
 
@@ -912,7 +1024,7 @@ specified R<size>.
 
 Here's a short illustration of string formats:
 
-=begin PASM
+=begin PIR
 
   new P2, "Array"
   new P0, "Int"
@@ -926,7 +1038,7 @@ Here's a short illustration of string formats:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 The first eight lines create a C<Array> with two elements: a
 C<Int> and a C<Num>. The format string of the C<sprintf> has
@@ -944,13 +1056,13 @@ examples of format strings.
 
 Z<CHP-9-SECT-2.4.9>
 
-X<PASM (Parrot assembly language);string operations;testing for substrings>
-The C<index>X<index opcode (PASM)> opcode searches for a substring
+X<PIR (Parrot assembly language);string operations;testing for substrings>
+The C<index>X<index opcode (PIR)> opcode searches for a substring
 within a string. If it finds the substring, it returns the position
 where the substring was found as a character offset from the beginning
 of the string. If it fails to find the substring, it returns -1:
 
-=begin PASM
+=begin PIR
 
   index I0, "Beeblebrox", "eb"
   print I0                       # prints 2
@@ -960,19 +1072,19 @@ of the string. If it fails to find the substring, it returns -1:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 C<index> also has a four-argument version, where the fourth argument
 defines an offset position for starting the search:
 
-=begin PASM
+=begin PIR
 
   index I0, "Beeblebrox", "eb", 3
   print I0                         # prints 5
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 This finds the second "eb" in "Beeblebrox" instead of the first,
 because the search skips the first three characters in the
@@ -984,7 +1096,7 @@ The C<join> opcode joins the elements of an array PMC into a single
 string. The second argument separates the individual elements of the
 PMC in the final string result.
 
-=begin PASM
+=begin PIR
 
   new P0, "Array"
   push P0, "hi"
@@ -996,7 +1108,7 @@ PMC in the final string result.
   print S0              # prints "hi__0__1__0__parrot"
   end
 
-=end PASM
+=end PIR
 
 This example builds a C<Array> in C<P0> with the values C<"hi">,
 C<0>, C<1>, C<0>, and C<"parrot">. It then joins those values (separated
@@ -1007,7 +1119,7 @@ by the string C<"__">) into a single string, and stores it in C<S0>.
 Splitting a string yields a new array containing the resulting
 substrings of the original string.
 
-=begin PASM
+=begin PIR
 
   split P0, "", "abc"
   set P1, P0[0]
@@ -1016,7 +1128,7 @@ substrings of the original string.
   print P1              # 'c'
   end
 
-=end PASM
+=end PIR
 
 This example splits the string "abc" into individual characters and
 stores them in an array in C<P0>. It then prints out the first and
@@ -1028,102 +1140,102 @@ its length is zero.
 
 Z<CHP-9-SECT-2.6>
 
-X<PASM (Parrot assembly language);bitwise operations>
-X<PASM (Parrot assembly language);logical operations>
+X<PIR (Parrot assembly language);bitwise operations>
+X<PIR (Parrot assembly language);logical operations>
 The X<logical opcodes> logical opcodes evaluate the truth of their
 arguments. They're often used to make decisions on control flow.
 Logical operations are implemented for integers and PMCs. Numeric
 values are false if they're 0, and true otherwise. Strings are false
 if they're the empty string or a single character "0", and true
 otherwise. PMCs are true when their
-C<get_bool>X<get_bool vtable method (PASM)> vtable method returns a
+C<get_bool>X<get_bool vtable method (PIR)> vtable method returns a
 nonzero value.
 
-The C<and>X<and opcode (PASM)> opcode returns the second argument if
+The C<and>X<and opcode (PIR)> opcode returns the second argument if
 it's false and the third argument otherwise:
 
-=begin PASM
+=begin PIR
 
   and I0, 0, 1  # returns 0
   and I0, 1, 2  # returns 2
 
-=end PASM
+=end PIR
 
-The C<or>X<or opcode (PASM)> opcode returns the second argument if
+The C<or>X<or opcode (PIR)> opcode returns the second argument if
 it's true and the third argument otherwise:
 
-=begin PASM
+=begin PIR
 
   or I0, 1, 0  # returns 1
   or I0, 0, 2  # returns 2
 
   or P0, P1, P2
 
-=end PASM
+=end PIR
 
 Both C<and> and C<or> are short-circuiting. If they can determine what
 value to return from the second argument, they'll never evaluate the
 third.  This is significant only for PMCs, as they might have side
 effects on evaluation.
 
-The C<xor>X<xor opcode (PASM)> opcode returns the second argument if
+The C<xor>X<xor opcode (PIR)> opcode returns the second argument if
 it is the only true value, returns the third argument if it is the
 only true value, and returns false if both values are true or both are
 false:
 
-=begin PASM
+=begin PIR
 
   xor I0, 1, 0  # returns 1
   xor I0, 0, 1  # returns 1
   xor I0, 1, 1  # returns 0
   xor I0, 0, 0  # returns 0
 
-=end PASM
+=end PIR
 
-The C<not>X<not opcode (PASM)> opcode returns a true value when the
+The C<not>X<not opcode (PIR)> opcode returns a true value when the
 second argument is false, and a false value if the second argument is
 true:
 
-=begin PASM
+=begin PIR
 
   not I0, I1
   not P0, P1
 
-=end PASM
+=end PIR
 
-The X<bitwise;opcodes (PASM)> bitwise opcodes operate on their values
-a single bit at a time. C<band>X<band opcode (PASM)>,
-C<bor>X<bor opcode (PASM)>, and C<bxor>X<bxor opcode (PASM)> return a
+The X<bitwise;opcodes (PIR)> bitwise opcodes operate on their values
+a single bit at a time. C<band>X<band opcode (PIR)>,
+C<bor>X<bor opcode (PIR)>, and C<bxor>X<bxor opcode (PIR)> return a
 value that is the logical AND, OR, or XOR of each bit in the source
 arguments. They each take a destination register and two source
 registers. They also have two-argument forms where the destination is
-also a source.  C<bnot>X<bnot opcode (PASM)> is the logical NOT of
+also a source.  C<bnot>X<bnot opcode (PIR)> is the logical NOT of
 each bit in a single source argument.
 
-=begin PASM
+=begin PIR
 
   bnot I0, I1
   band P0, P1
   bor I0, I1, I2
   bxor P0, P1, I2
 
-=end PASM
+=end PIR
 
 X<bitwise;string opcodes>
 The bitwise opcodes also have string variants for AND, OR, and XOR:
-C<bors>X<bors opcode (PASM)>, C<bands>X<bands opcode (PASM)>, and
-C<bxors>X<bxors opcode (PASM)>. These take string register or PMC
+C<bors>X<bors opcode (PIR)>, C<bands>X<bands opcode (PIR)>, and
+C<bxors>X<bxors opcode (PIR)>. These take string register or PMC
 string source arguments and perform the logical operation on each byte
 of the strings to produce the final string.
 
-=begin PASM
+=begin PIR
 
   bors S0, S1
   bands P0, P1
   bors S0, S1, S2
   bxors P0, P1, S2
 
-=end PASM
+=end PIR
 
 The bitwise string opcodes only have meaningful results when they're
 used with simple ASCII strings because the bitwise operation is done
@@ -1132,13 +1244,13 @@ per byte.
 The logical and arithmetic shift operations shift their values by a
 specified number of bits:
 
-=begin PASM
+=begin PIR
 
   shl  I0, I1, I2        # shift I1 left by count I2 giving I0
   shr  I0, I1, I2        # arithmetic shift right
   lsr  P0, P1, P2        # logical shift right
 
-=end PASM
+=end PIR
 
 =head3 Encodings and Charsets
 
@@ -1184,6 +1296,30 @@ Operations on a PMC are implemented by vtable functions. The result of an operat
 the PMCs vtable. Since PMCs define their own behavior for these vtable functions, it's important to familiarize yourself with the behavior
 of the particular PMC before you start performing a lot of operations on it.
 
+=head3 Assignment
+
+PMC registers contain references to PMC structures internally. So, the set
+opcode doesn't copy the entire PMC, it only copies the reference to the
+PMC data. Here's an example that shows a side effect of this operation:
+
+=begin PASM
+
+  new P0, "String"
+  set P0, "Ford"
+  set P1, P0
+  set P1, "Zaphod"
+  print P0                # prints "Zaphod"
+  print P1                # prints "Zaphod"
+  end
+
+=end PASM
+
+In this example, both C<P0> and C<P1> are both references to the same
+internal data structure, so when we set C<P1> to the string literal
+C<"Zaphod">, it overwrites the previous value C<"Ford">. Now, both C<P0>
+and C<P1> point to the String PMC C<"Zaphod">, even though it appears that
+we only set one of those two registers to that value.
+
 =head4 PMC object types
 
 Z<CHP-9-SECT-2.2.2>
@@ -1201,7 +1337,7 @@ The C<typeof> opcode can be used to determine the type of a PMC. When
 the source argument is a PMC and the destination is a string register,
 C<typeof> returns the name of the type:
 
-=begin PASM
+=begin PIR
 
   new P0, "String"
   typeof S0, P0               # S0 is "String"
@@ -1209,7 +1345,7 @@ C<typeof> returns the name of the type:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 Using C<typeof> with a PMC output parameter instead, it returns the Class
 PMC for that type.
@@ -1231,7 +1367,7 @@ a new PMC of the specified type:
 
   $P0 = new 'String'
   $P0 = "That's a bollard and not a parrot."
-  say $P0
+  print $P0
 
 This example creates a C<String> object, stores it in the PMC register variable C<$P0>,
 assigns it the value "Hello, Polly.", and prints it:
@@ -1239,7 +1375,7 @@ assigns it the value "Hello, Polly.", and prints it:
   .local String hello    # or .local pmc hello
   hello = new 'String'
   hello = "Hello, Polly."
-  say hello
+  print hello
 
 PIR is a dynamic language; that dynamicism is evident in how Parrot handles PMC
 values. Primitive registers like strings, numbers, and integers perform a
@@ -1284,7 +1420,7 @@ Z<CHP-9-SECT-2.2.3>
 
 As we've seen in the previous chapters about PIR, we can convert between
 primitive string, integer, and number types and PMCs. PIR used the C<=>
-operator to make these conversions. PASM uses the C<set> opcode to do the
+operator to make these conversions. PIR uses the C<set> opcode to do the
 same thing. C<set> will perform the type conversions for us automatically,
 in a process called I<autoboxing>.
 
@@ -1293,7 +1429,7 @@ converts that PMC to the new type. So, assigning a string to a Number PMC
 converts it into a String PMC. Assigning an integer value converts it to a
 C<Integer>, and assigning C<undef> converts it to an C<Undef> PMC:
 
-=begin PASM
+=begin PIR
 
   new P0, "String"
   set P0, "Ford\n"
@@ -1306,7 +1442,7 @@ C<Integer>, and assigning C<undef> converts it to an C<Undef> PMC:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 C<P0> starts as a C<String>, but when C<set> assigns it an integer
 value 42 (replacing the old string value C<"Ford">), it changes type
@@ -1317,7 +1453,7 @@ behaviors when you try to assign a primitive value to them.
 We can also use the C<box> opcode to explicitly convert an integer, a float,
 or a string into an appropriate PMC type.
 
-=begin PASM
+=begin PIR
 
   box P0, 3
   typeof S0, P0         # P0 is an "Integer"
@@ -1326,7 +1462,7 @@ or a string into an appropriate PMC type.
   box P2, 3.14
   typeof S0, P2         # P2 is a "Number"
 
-=end PASM
+=end PIR
 
 
 =head3 Aggregates
@@ -1337,7 +1473,7 @@ PMCs can define complex types that hold multiple values. These are
 commonly called "X<PMCs (Polymorphic Containers);aggregate>
 X<aggregate PMCs> aggregates." The most important feature added for
 aggregates is keyed access. Elements within an aggregate PMC can be
-stored and retrieved by a numeric or string key. PASM also offers a
+stored and retrieved by a numeric or string key. PIR also offers a
 full set of operations for manipulating aggregate data types.
 
 Two of the most basic aggregate types are arrays and hashes. The primary
@@ -1360,7 +1496,7 @@ The C<Array>X<Array PMC> PMC is an ordered aggregate with zero-based integer
 keys. The syntax for X<keyed access to PMCs> keyed access to a PMC puts the
 key in square brackets after the register name:
 
-=begin PASM
+=begin PIR
 
   new P0, "Array"     # obtain a new array object
   set P0, 2           # set its length
@@ -1369,7 +1505,7 @@ key in square brackets after the register name:
   set I0, P0[0]       # get the first element
   set I1, P0          # get array length
 
-=end PASM
+=end PIR
 
 A key on the destination register of a C<set> operation sets a value
 for that key in the aggregate. A key on the source register of a
@@ -1401,17 +1537,17 @@ of checking array bounds and reallocating array memory.
 To retrieve the number of items currently in an array, you can use the
 C<elements> opcode.
 
-=begin PASM
+=begin PIR
 
   set P0, 100         # allocate store for 100 elements
   set I0, P0          # obtain current allocation size
   elements I0, P0     # get element count
 
-=end PASM
+=end PIR
 
 Some other useful instructions for working with arrays are C<push>,
 C<pop>, C<shift>, and C<unshift> (you'll find them in
-"PASM Opcodes" in Chapter 11).
+"PIR Opcodes" in Chapter 11).
 
 =head4 Hashes
 
@@ -1421,21 +1557,21 @@ X<PMCs (Polymorphic Containers);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate which uses string keys
 to identify elements within it.
 
-=begin PASM
+=begin PIR
 
   new P1, "Hash"      # generate a new hash object
   set P1["key"], 10   # set key and value
   set I0, P1["key"]   # obtain value for key
   set I1, P1          # number of entries in hash
 
-=end PASM
+=end PIR
 
-The C<exists>X<exists opcode (PASM)> opcode tests whether a keyed
+The C<exists>X<exists opcode (PIR)> opcode tests whether a keyed
 value exists in an aggregate. It returns 1 if it finds the key in the
 aggregate, and returns 0 if it doesn't. It doesn't care if the value
 itself is true or false, only that the key has been set:
 
-=begin PASM
+=begin PIR
 
   new P0, "Hash"
   set P0["key"], 0
@@ -1444,9 +1580,9 @@ itself is true or false, only that the key has been set:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
-The C<delete>X<delete opcode (PASM)> opcode is also useful for working
+The C<delete>X<delete opcode (PIR)> opcode is also useful for working
 with hashes: it removes a key/value pair.
 
 =head4 Iterators
@@ -1459,19 +1595,19 @@ needs to be performed on every element in an aggregate. You create an
 iterator by creating a new C<Iterator> PMC, and passing the aggregate PMC
 to C<new> as an additional parameter:
 
-=begin PASM
+=begin PIR
 
   new P1, "Iterator", P2
 
-=end PASM
+=end PIR
 
 Alternatively, you can use the C<iter> opcode to do the same thing:
 
-=begin PASM
+=begin PIR
 
   iter P1, P2     # Same!
 
-=end PASM
+=end PIR
 
 The include file F<iterator.pasm> defines some constants for working
 with iterators. The C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END>
@@ -1483,7 +1619,7 @@ A value can be extracted from the iterator using the C<shift> opcode.
 Evaluating the iterator PMC as a boolean returns whether the iterator has
 reached the end of the aggregate or not.
 
-=begin PASM
+=begin PIR
 
   .include "iterator.pasm"
       new P2, "Array"
@@ -1501,14 +1637,14 @@ reached the end of the aggregate or not.
   iter_end:
       end
 
-=end PASM
+=end PIR
 
 Hash iterators work similarly to array iterators, but they extract keys
 only. With the key, you can find it's value from the original hash PMC.
 With hashes it's only meaningful to iterate in one direction since they
 don't define any order for their keys.
 
-=begin PASM
+=begin PIR
 
   .include "iterator.pasm"
       new P2, "Hash"
@@ -1527,7 +1663,7 @@ don't define any order for their keys.
   iter_end:
       end
 
-=end PASM
+=end PIR
 
 =head4 Data structures
 
@@ -1536,11 +1672,11 @@ Z<CHP-9-SECT-3.1.4>
 X<PMCs (Polymorphic Containers);data structures>
 Arrays and hashes can hold any data type, including other aggregates.
 Accessing elements deep within nested data structures is a common
-operation, so PASM provides a way to do it in a single instruction.
+operation, so PIR provides a way to do it in a single instruction.
 Complex keys specify a series of nested data structures, with each
 individual key separated by a semicolon:
 
-=begin PASM
+=begin PIR
 
   new P0, "Hash"
   new P1, "Array"
@@ -1552,17 +1688,17 @@ individual key separated by a semicolon:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 This example builds up a data structure of a hash containing an array.
 The complex key C<P0["answer";I1]> retrieves an element of the array
 within the hash. You can also set a value using a complex key:
 
-=begin PASM
+=begin PIR
 
   set P0["answer";0], 5   # %hash{"answer"}[0] = 5
 
-=end PASM
+=end PIR
 
 The individual keys are integers or strings, or registers with integer
 or string values.
@@ -1575,9 +1711,9 @@ We mentioned before that C<set> on two X<PMCs (Polymorphic
 Containers);assignment> PMCs simply aliases them both to the same object,
 and that C<clone> creates a complete duplicate object. But if you just
 want to assign the value of one PMC to another PMC, you need the
-C<assign>X<assign opcode (PASM)> opcode:
+C<assign>X<assign opcode (PIR)> opcode:
 
-=begin PASM
+=begin PIR
 
   new P0, "Int"
   new P1, "Int"
@@ -1593,7 +1729,7 @@ C<assign>X<assign opcode (PASM)> opcode:
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 This example creates two C<Int> PMCs: C<P0> and C<P1>. It gives
 C<P0> a value of 42. It then uses C<set> to give the same value to
@@ -1613,17 +1749,17 @@ the PMC. What these properties do is entirely up to the language being
 implemented. Most usually properties are used to hold extra metadata about
 the PMC that is used by the high-level language (HLL).
 
-The C<setprop>X<setprop opcode (PASM)> opcode sets the value of a
+The C<setprop>X<setprop opcode (PIR)> opcode sets the value of a
 named property on a PMC. It takes three arguments: the PMC to be set
 with a property, the name of the property, and a PMC containing the
-value of the property. The C<getprop>X<getprop opcode (PASM)> opcode
+value of the property. The C<getprop>X<getprop opcode (PIR)> opcode
 returns the value of a property. It also takes three arguments: the
 PMC to store the property's value, the name of the property, and the
 PMC from which the property value is to be retrieved. Internally a PMCs
 properties are stored in a Hash structure, where the name of the property
 is stored in a special properties Hash.
 
-=begin PASM
+=begin PIR
 
   new P0, "String"
   set P0, "Zaphod"
@@ -1635,12 +1771,12 @@ is stored in a special properties Hash.
   print "\n"
   end
 
-=end PASM
+=end PIR
 
 This example creates a C<String> object in C<P0>, and a C<Int>
 object with the value 1 in C<P1>. C<setprop> sets a property named
 "constant" on the object in C<P0> and gives the property the value in
-C<P1>.N<The "constant" property is ignored by PASM, but may be significant
+C<P1>.N<The "constant" property is ignored by PIR, but may be significant
 to the HLL that set it.> C<getprop> retrieves the value of the property
 "constant" on C<P0> and stores it in C<P3>.
 
@@ -1649,22 +1785,22 @@ are always PMCs, but only references to the actual PMCs. Trying to
 fetch the value of a property that doesn't exist returns a
 C<Undef>.
 
-C<delprop>X<delprop opcode (PASM)> deletes a property from a PMC.
+C<delprop>X<delprop opcode (PIR)> deletes a property from a PMC.
 
-=begin PASM
+=begin PIR
 
   delprop P1, "constant"  # delete property
 
-=end PASM
+=end PIR
 
 You can also return a complete hash of all properties on a PMC with
-C<prophash>X<prophash opcode (PASM)>.
+C<prophash>X<prophash opcode (PIR)>.
 
-=begin PASM
+=begin PIR
 
   prophash P0, P1         # set P0 to the property hash of P1
 
-=end PASM
+=end PIR
 
 
 =head2 VTABLE Interfaces
@@ -1714,7 +1850,7 @@ equivalents:
   $I2 = $P2      # Intify. 3
   $N2 = $P2      # Unbox. $N2 = 3.14
 
-=head2 Control Flow
+=head2 Control Structures
 
 Z<CHP-3-SECT-5>
 
@@ -1742,16 +1878,16 @@ The most basic branching instruction is the unconditional branch, C<goto>:
 
   .sub 'main'
       goto L1
-      say "never printed"
+      print "never printed"
 
   L1:
-      say "after branch"
+      print "after branch"
       end
   .end
 
 =end PIR
 
-The first C<say> statement never runs because the C<goto> always skips over it
+The first C<print> statement never runs because the C<goto> always skips over it
 to the label C<L1>.
 
 The conditional branches combine C<if> or C<unless> with C<goto>.
@@ -1866,9 +2002,6 @@ unconditional branches; the lowest level of computer hardware works this way.
 All modern programming languages use branching constructs to implement their
 most complex flow control devices.
 
-Although it has many advanced features, at heart PASM is an assembly
-language. All flow control in PASM--as in most assembly languages--is
-done with branches and jumps.
 
 Branch instructions transfer control to a relative offset from the
 current instruction. The rightmost argument to every branch opcode is
@@ -1877,7 +2010,7 @@ offset. You can also branch on a literal integer value, but there's
 rarely any need to do so. The simplest branch instruction is
 C<branch>:
 
-=begin PASM
+=begin PIR
 
     branch L1                # branch 4
     print "skipped\n"
@@ -1885,7 +2018,7 @@ C<branch>:
     print "after branch\n"
     end
 
-=end PASM
+=end PIR
 
 This example unconditionally branches to the location of the label
 C<L1>, skipping over the first C<print> statement.
@@ -1894,7 +2027,7 @@ Jump instructions transfer control to an absolute address. The C<jump>
 opcode doesn't calculate an address from a label, so it's used
 together with C<set_addr>:
 
-=begin PASM
+=begin PIR
 
     set_addr I0, L1
     jump I0
@@ -1904,12 +2037,12 @@ together with C<set_addr>:
     print "after jump\n"
     end
 
-=end PASM
+=end PIR
 
-The C<set_addr>X<set_addr opcode (PASM)> opcode takes a label or an
+The C<set_addr>X<set_addr opcode (PIR)> opcode takes a label or an
 integer offset and returns an absolute address.
 
-You've probably noticed the C<end>X<end opcode (PASM)> opcode as the
+You've probably noticed the C<end>X<end opcode (PIR)> opcode as the
 last statement in many examples above. This terminates the execution
 of the current run loop. Terminating the main bytecode segment (the
 first run loop) stops the interpreter. Without the C<end> statement,
@@ -1920,17 +2053,17 @@ chance of crashing the interpreter.
 
 Z<CHP-9-SECT-4.1>
 
-X<PASM (Parrot assembly language);conditional branches>
-X<conditional branches in PASM>
+X<PIR (Parrot assembly language);conditional branches>
+X<conditional branches in PIR>
 Unconditional jumps and branches aren't really enough for flow
 control. What you need to implement the control structures of
 high-level languages is the ability to select different actions based
-on a set of conditions. PASM has opcodes that conditionally branch
+on a set of conditions. PIR has opcodes that conditionally branch
 based on the truth of a single value or the comparison of two values.
-The following example has C<if>X<if (conditional);opcode (PASM)> and
-C<unless>X<unless (conditional);opcode (PASM)> conditional branches:
+The following example has C<if>X<if (conditional);opcode (PIR)> and
+C<unless>X<unless (conditional);opcode (PIR)> conditional branches:
 
-=begin PASM
+=begin PIR
 
     set I0, 0
     if I0, TRUE
@@ -1944,7 +2077,7 @@ C<unless>X<unless (conditional);opcode (PASM)> conditional branches:
     print "the value was false\n"
     end
 
-=end PASM
+=end PIR
 
 C<if> branches if its first argument is a true value, and C<unless>
 branches if its first argument is a false value. In this case, the
@@ -1952,16 +2085,16 @@ C<if> doesn't branch because C<I0> is false, but the C<unless> does
 branch.
 The comparison branching opcodes compare two values and branch if the
 stated relation holds true. These are
-C<eq>X<eq (equal);opcode (PASM)> (branch when equal),
-C<ne>X<ne (not equal);opcode (PASM)> (when not equal),
-C<lt>X<lt (less than);opcode (PASM)> (when less than),
-C<gt>X<gt (greater than);opcode (PASM)> (when greater than),
-C<le>X<le (less than or equal);opcode (PASM)> (when less than or
-equal), and C<ge>X<ge (greater than or equal);opcode (PASM)> (when
+C<eq>X<eq (equal);opcode (PIR)> (branch when equal),
+C<ne>X<ne (not equal);opcode (PIR)> (when not equal),
+C<lt>X<lt (less than);opcode (PIR)> (when less than),
+C<gt>X<gt (greater than);opcode (PIR)> (when greater than),
+C<le>X<le (less than or equal);opcode (PIR)> (when less than or
+equal), and C<ge>X<ge (greater than or equal);opcode (PIR)> (when
 greater than or equal). The two compared arguments must be the same
 register type:
 
-=begin PASM
+=begin PIR
 
     set I0, 4
     set I1, 4
@@ -1972,7 +2105,7 @@ register type:
     print "the two values are equal\n"
     end
 
-=end PASM
+=end PIR
 
 This compares two integers, C<I0> and C<I1>, and branches if they're
 equal. Strings of different character sets or encodings are converted
@@ -1988,34 +2121,34 @@ the other operand. If you need to force a numeric or string comparison
 on two PMCs, use the alternate comparison opcodes that end in the
 C<_num> and C<_str> suffixes.
 
-=begin PASM
+=begin PIR
 
   eq_str P0, P1, label     # always a string compare
   gt_num P0, P1, label     # always numerically
 
-=end PASM
+=end PIR
 
 Finally, the C<eq_addr> opcode branches if two PMCs or strings are
 actually the same object (have the same address):
 
-=begin PASM
+=begin PIR
 
   eq_addr P0, P1, same_pmcs_found
 
-=end PASM
+=end PIR
 
 =head3 Iteration
 
 Z<CHP-9-SECT-4.2>
 
-X<iteration;in PASM>
-X<PASM (Parrot assembly language);iteration>
-PASM doesn't define high-level loop constructs. These are built up
+X<iteration;in PIR>
+X<PIR (Parrot assembly language);iteration>
+PIR doesn't define high-level loop constructs. These are built up
 from a combination of conditional and unconditional branches. A
-I<do-while>X<do-while style loop;(PASM)> style loop can be constructed
+I<do-while>X<do-while style loop;(PIR)> style loop can be constructed
 with a single conditional branch:
 
-=begin PASM
+=begin PIR
 
     set I0, 0
     set I1, 10
@@ -2026,7 +2159,7 @@ with a single conditional branch:
     lt I0, I1, REDO
     end
 
-=end PASM
+=end PIR
 
 This example prints out the numbers 1 to 10. The first time through,
 it executes all statements up to the C<lt> statement.  If the
@@ -2037,7 +2170,7 @@ again. The loop ends when the condition evaluates as false.
 Conditional and unconditional branches can build up quite complex
 looping constructs, as follows:
 
-=begin PASM
+=begin PIR
 
     # loop ($i=1; $i<=10; $i++) {
     #    print "$i\n";
@@ -2058,10 +2191,10 @@ looping constructs, as follows:
   out:
     end
 
-=end PASM
+=end PIR
 
-X<loops;PASM>
-X<PASM (Parrot assembly language);loops>
+X<loops;PIR>
+X<PIR (Parrot assembly language);loops>
 This example emulates a X<counter-controlled loop> counter-controlled
 loop like Perl 6's C<loop> keyword or C's C<for>. The first time
 through the loop it sets the initial value of the counter in
@@ -2167,10 +2300,10 @@ The C<.sub> directive defines globally accessible subroutine
 objects.
 
 Subroutine objects of all kinds can be called with the
-C<invoke>X<invoke opcode (PASM)> opcode. There is also an C<invoke>
+C<invoke>X<invoke opcode (PIR)> opcode. There is also an C<invoke>
 C<PR<x>> instruction for calling objects held in a different register.
 
-The C<invokecc>X<invokecc opcode (PASM)> opcode is like C<invoke>, but it
+The C<invokecc>X<invokecc opcode (PIR)> opcode is like C<invoke>, but it
 also creates and stores a new return continuation. When the
 called subroutine invokes this return continuation, it returns control
 to the instruction after the function call. This kind of call is known
@@ -2420,7 +2553,7 @@ A continuation is a subroutine that captures a complete copy of the
 caller's context. Invoking a
 continuation starts or restarts it at the entry point:
 
-=begin PASM
+=begin PIR
 
     new P1, "Int"
     set P1, 5
@@ -2437,7 +2570,7 @@ continuation starts or restarts it at the entry point:
     print "done\n"
     end
 
-=end PASM
+=end PIR
 
 This prints:
 
@@ -2572,7 +2705,7 @@ subroutines with a known prototype in shared libraries. This is not
 really portable across all libraries, but it's worth a short example.
 This is a simplified version of the first test in F<t/pmc/nci.t>:
 
-=begin PASM
+=begin PIR
 
     loadlib P1, "libnci_test"     # get library object for a shared lib
     print "loaded\n"
@@ -2588,17 +2721,17 @@ This is a simplified version of the first test in F<t/pmc/nci.t>:
     nok_1:
     #...
 
-=end PASM
+=end PIR
 
 This example shows two new instructions: C<loadlib> and C<dlfunc>. The
-C<loadlib>X<loadlib opcode (PASM)> opcode obtains a handle for a shared
+C<loadlib>X<loadlib opcode (PIR)> opcode obtains a handle for a shared
 library. It searches for the shared library in the current directory,
 in F<runtime/parrot/dynext>, and in a few other configured
 directories. It also tries to load the provided filename unaltered and
 with appended extensions like C<.so> or C<.dll>. Which extensions it
 tries depends on the OS Parrot is running on.
 
-The C<dlfunc>X<dlfunc opcode (PASM)> opcode gets a function object from a
+The C<dlfunc>X<dlfunc opcode (PIR)> opcode gets a function object from a
 previously loaded library (second argument) of a specified name (third
 argument) with a known function signature (fourth argument). The
 function signature is a string where the first character is the return
@@ -2753,13 +2886,13 @@ up where they left off the next time they're called, as if they never
 left.
 
 X<coroutines>
-In PASM, coroutines are subroutine-like objects:
+In PIR, coroutines are subroutine-like objects:
 
-=begin PASM
+=begin PIR
 
   newsub P0, .Coroutine, _co_entry
 
-=end PASM
+=end PIR
 
 The C<Coroutine> object has its own user stack, register frame stacks,
 control stack, and pad stack. The pad stack is inherited from the
@@ -2769,7 +2902,7 @@ it returns to the caller and restores the caller's context (basically
 swapping all stacks). The next time the coroutine is invoked, it
 continues to execute from the point at which it previously returned:
 
-=begin PASM
+=begin PIR
 
     new_pad 0                # push a new lexical pad on stack
     new P0, "Int"            # save one variable in it
@@ -2801,7 +2934,7 @@ continues to execute from the point at which it previously returned:
     print "again "
     branch _cor              # next invocation of the coroutine
 
-=end PASM
+=end PIR
 
 This prints out the result:
 
@@ -2810,7 +2943,7 @@ This prints out the result:
   again in cor 11
   done
 
-X<invoke opcode (PASM);coroutines and>
+X<invoke opcode (PIR);coroutines and>
 The C<invoke> inside the coroutine is commonly referred to as
 I<yield>. The coroutine never ends. When it reaches the bottom, it
 branches back up to C<_cor> and executes until it hits C<invoke>
@@ -3092,11 +3225,11 @@ object> bytecode segment object.
 The first step is to get an assembler or compiler for the target
 language:
 
-=begin PASM
+=begin PIR
 
-  compreg P1, "PASM"
+  compreg P1, "PIR"
 
-=end PASM
+=end PIR
 
 Within the Parrot interpreter there are currently three registered
 languages: C<PASM>, C<PIR>, and C<PASM1>. The first two are for parrot
@@ -3108,7 +3241,7 @@ compiled.
 This example places a bytecode segment object into the destination
 register C<P0> and then invokes it with C<invoke>:
 
-=begin PASM
+=begin PIR
 
   compreg P1, "PASM1"                # get compiler
   set S1, "in eval\n"
@@ -3117,17 +3250,17 @@ register C<P0> and then invokes it with C<invoke>:
   print "back again\n"
   end
 
-=end PASM
+=end PIR
 
 You can register a compiler or assembler for any language inside the
 Parrot core and use it to compile and invoke code from that language.
-These compilers may be written in PASM or reside in shared libraries.
+These compilers may be written in PIR or reside in shared libraries.
 
-=begin PASM
+=begin PIR
 
   compreg "MyLanguage", P10
 
-=end PASM
+=end PIR
 
 In this example the C<compreg> opcode registers the subroutine-like
 object C<P10> as a compiler for the language "MyLanguage". See
@@ -3150,20 +3283,20 @@ to shuffle the data into and out of registers.
 
 Parrot provides structures for storing both global and lexically
 scoped named variables. Lexical and global variables must be PMC
-values. PASM provides instructions for storing and retrieving
-variables from these structures so the PASM opcodes can operate on
+values. PIR provides instructions for storing and retrieving
+variables from these structures so the PIR opcodes can operate on
 their values.
 
 =head3 Globals
 
 Z<CHP-9-SECT-6.1>
 
-X<PASM (Parrot assembly language);global variables>
+X<PIR (Parrot assembly language);global variables>
 Global variables are stored in a C<Hash>, so every variable name
-must be unique.  PASM has two opcodes for globals, C<set_global> and
+must be unique.  PIR has two opcodes for globals, C<set_global> and
 C<get_global>:
 
-=begin PASM
+=begin PIR
 
   new P10, "Int"
   set P10, 42
@@ -3173,7 +3306,7 @@ C<get_global>:
   print P0                        # prints 42
   end
 
-=end PASM
+=end PIR
 
 The first two statements create a C<Int> in the PMC register
 C<P10> and give it the value 42. In the third statement,
@@ -3185,11 +3318,11 @@ printed.
 The C<set_global> opcode only stores a reference to the object. If
 we add an increment statement:
 
-=begin PASM
+=begin PIR
 
   inc P10
 
-=end PASM
+=end PIR
 
 after the C<set_global> it increments the stored global, printing 43.
 If that's not what you want, you can C<clone> the PMC before you store
@@ -3197,12 +3330,12 @@ it. Leaving the global variable as an alias does have advantages,
 though. If you retrieve a stored global into a register and modify it
 as follows:
 
-=begin PASM
+=begin PIR
 
   get_global P0, "varname"
   inc P0
 
-=end PASM
+=end PIR
 
 the value of the stored global is directly modified, so you don't need
 to call C<set_global> again.
@@ -3215,12 +3348,12 @@ hierarchical namespaces for separating packages (classes and modules
 in Perl 6). Use C<set_rootglobal> and
 C<get_root_global> add an argument to select a nested namespace:
 
-=begin PASM
+=begin PIR
 
   set_root_global ["Foo"], "var", P0 # store P0 as var in the Foo namespace
   get_root_global P1, ["Foo"], "var"  # get Foo::var
 
-=end PASM
+=end PIR
 
 Eventually the global opcodes will have variants that take a PMC to
 specify the namespace, but the design and implementation of these
@@ -3228,7 +3361,7 @@ aren't finished yet.
 
 =head3 Lexicals
 
-X<PASM (Parrot assembly language);lexical variables>
+X<PIR (Parrot assembly language);lexical variables>
 Lexical variables are stored in a lexical scratchpad. There's one pad
 for each lexical scope. Every pad has both a hash and an array, so
 elements can be stored either by name or by numeric index.
@@ -3240,7 +3373,7 @@ Z<CHP-9-SECT-6.2.1>
 To store a lexical variable in the current scope pad, use C<store_lex>.
 Likewise, use C<find_lex> to retrieve a variable from the current pad.
 
-=begin PASM
+=begin PIR
 
   new P0, "Int"            # create a variable
   set P0, 10               # assign value to it
@@ -3251,7 +3384,7 @@ Likewise, use C<find_lex> to retrieve a variable from the current pad.
   print "\n"               # prints 10
   end
 
-=end PASM
+=end PIR
 
 As we have seen above, we can declare a new subroutine to be a nested inner
 subroutine of an existing outer subroutine using the C<:outer> flag. The
@@ -3529,29 +3662,29 @@ included at the end of the section.
 
 Z<CHP-9-SECT-12.1>
 
-X<classes;in PASM>
-The C<newclass>X<newclass opcode (PASM)> opcode defines a new class.
+X<classes;in PIR>
+The C<newclass>X<newclass opcode (PIR)> opcode defines a new class.
 It takes two arguments, the name of the class and the destination
 register for the class PMC. All classes (and objects) inherit from the
 C<ParrotClass> PMCX<ParrotClass PMC>, which is the core of the Parrot
 object system.
 
-=begin PASM
+=begin PIR
 
     newclass P1, "Foo"
 
-=end PASM
+=end PIR
 
 To instantiate a new object of a particular class, you first look up
 the integer value for the class type with the C<find_type> opcode,
 then create an object of that type with the C<new> opcode:
 
-=begin PASM
+=begin PIR
 
     find_type I1, "Foo"
     new P3I I1
 
-=end PASM
+=end PIR
 
 The C<new> opcode also checks to see if the class defines a
 method named "__init" and calls it if it exists.
@@ -3560,32 +3693,32 @@ method named "__init" and calls it if it exists.
 
 Z<CHP-9-SECT-12.2>
 
-X<attributes;in PASM>
+X<attributes;in PIR>
 X<classes;attributes>
 The C<addattribute> opcode creates a slot in the class for an
 attribute (sometimes known as an I<instance variable>) and associates
 it with a name:
 
-=begin PASM
+=begin PIR
 
     addattribute P1, ".i"                # Foo.i
 
-=end PASM
+=end PIR
 
 This chunk of code
 from the C<__init> method looks up the position of the first
 attribute, creates a C<Int> PMC, and stores it as the first
 attribute:
 
-=begin PASM
+=begin PIR
 
     classoffset I0, P2, "Foo"     # first "Foo" attribute of object P2
     new P6, "Int"                 # create storage for the attribute
     setattribute P2, I0, P6       # store the first attribute
 
-=end PASM
+=end PIR
 
-The C<classoffset> opcodeX<classoffset opcode (PASM)> takes a PMC
+The C<classoffset> opcodeX<classoffset opcode (PIR)> takes a PMC
 containing an object and the name of its class, and returns an integer
 index for the position of the first attribute. The C<setattribute>
 opcode uses the integer index to store a PMC value in one of the
@@ -3593,68 +3726,68 @@ object's attribute slots. This example initializes the first
 attribute. The second attribute would be at C<I0 + 1>, the third
 attribute at C<I0 + 2>, etc:
 
-=begin PASM
+=begin PIR
 
     inc I0
     setattribute P2, I0, P7       # store next attribute
     #...
 
-=end PASM
+=end PIR
 
 There is also support for named parameters with fully qualified
 parameter names (although this is a little bit slower than getting
 the class offset once and accessing several attributes by index):
 
-=begin PASM
+=begin PIR
 
     new P6, "Int"
     setattribute P2, "Foo\x0.i", P6   # store the attribute
 
-=end PASM
+=end PIR
 
 You use the same integer index to retrieve the value of an attribute.
-The C<getattribute>X<getattribute opcode (PASM)> opcode takes an object and
+The C<getattribute>X<getattribute opcode (PIR)> opcode takes an object and
 an index as arguments and returns the attribute PMC at that position:
 
-=begin PASM
+=begin PIR
 
     classoffset I0, P2, "Foo"         # first "Foo" attribute of object P2
     getattribute P10, P2, I0          # indexed get of attribute
 
-=end PASM
+=end PIR
 
 or
 
-=begin PASM
+=begin PIR
 
     getattribute P10, P2, "Foo\x0.i"  # named get
 
-=end PASM
+=end PIR
 
 To set the value of an attribute PMC, first retrieve it with
 C<getattribute> and then assign to the returned PMC. Because PMC
 registers are only pointers to values, you don't need to store the PMC
 again after you modify its value:
 
-=begin PASM
+=begin PIR
 
     getattribute P10, P2, I0
     set P10, I5
 
-=end PASM
+=end PIR
 
 =head3 Methods
 
 Z<CHP-9-SECT-12.3>
 
-X<methods;in PASM>
+X<methods;in PIR>
 X<classes;methods>
 X<classes;namespaces>
-Methods in PASM are just subroutines installed in the namespace of the
+Methods in PIR are just subroutines installed in the namespace of the
 class. You define a method with the C<.pcc_sub> directive before the
 label:
 
-=begin PASM
+=begin PIR
 
   .pcc_sub _half:                 # I5 = self."_half"()
     classoffset I0, P2, "Foo"
@@ -3663,7 +3796,7 @@ label:
     div I5, 2
     invoke P1
 
-=end PASM
+=end PIR
 
 This routine returns half of the value of the first attribute of the
 object. Method calls use the Parrot calling conventions so they always
@@ -3674,23 +3807,23 @@ The C<.pcc_sub> directive automatically stores the subroutine as a
 global in the current namespace. The C<.namespace> directive sets the
 current namespace:
 
-=begin PASM
+=begin PIR
 
   .namespace [ "Foo" ]
 
-=end PASM
+=end PIR
 
 If the namespace is explicitly set to an empty string or key, then the
 subroutine is stored in the outermost namespace.
 
-The C<callmethodcc>X<callmethodcc opcode (PASM)> opcode makes a method
+The C<callmethodcc>X<callmethodcc opcode (PIR)> opcode makes a method
 call. It follows the Parrot calling conventions, so it expects to
 find the invocant object in C<P2>, the method object in C<P0>, etc. It
 adds one bit of magic, though. If you pass the name of the method in
 C<S0>, C<callmethodcc> looks up that method name in the invocant
 object and stores the method object in C<P0> for you:
 
-=begin PASM
+=begin PIR
 
     set S0, "_half"             # set method name
     set P2, P3                  # the object
@@ -3698,7 +3831,7 @@ object and stores the method object in C<P0> for you:
     print I5                    # result of method call
     print "\n"
 
-=end PASM
+=end PIR
 
 The C<callmethodcc> opcode also generates a return continuation and
 stores it in C<P1>. The C<callmethod> opcode doesn't generate a return
@@ -3719,7 +3852,7 @@ double underscore "__". The following code defines a method named
 C<__init> in the C<Foo> class that initializes the first attribute of
 the object with an integer:
 
-=begin PASM
+=begin PIR
 
   .sub __init:
     classoffset I0, P2, "Foo"     # lookup first attribute position
@@ -3727,19 +3860,19 @@ the object with an integer:
     setattribute P2, I0, P6       # store the first attribute
     invoke P1                     # return
 
-=end PASM
+=end PIR
 
 Ordinary methods have to be called explicitly, but the vtable
 functions are called implicitly in many different contexts. Parrot
 saves and restores registers for you in these calls. The C<__init>
 method is called whenever a new object is constructed:
 
-=begin PASM
+=begin PIR
 
     find_type I1, "Foo"
     new P3, I1          # call __init if it exists
 
-=end PASM
+=end PIR
 
 A few other vtable functions in the complete code example for this
 section are C<__set_integer_native>, C<__add>, C<__get_integer>,
@@ -3747,16 +3880,16 @@ C<__get_string>, and C<__increment>. The C<set> opcode calls Foo's
 C<__set_integer_native> vtable function when its destination register
 is a C<Foo> object and the source register is a native integer:
 
-=begin PASM
+=begin PIR
 
     set P3, 30          # call __set_integer_native method
 
-=end PASM
+=end PIR
 
 The C<add> opcode calls Foo's C<__add> vtable function when it adds
 two C<Foo> objects:
 
-=begin PASM
+=begin PIR
 
     new P4, I1          # same with P4
     set P4, 12
@@ -3764,63 +3897,63 @@ two C<Foo> objects:
 
     add P5, P3, P4      # __add method
 
-=end PASM
+=end PIR
 
 The C<inc> opcode calls Foo's C<__increment> vtable function when it
 increments a C<Foo> object:
 
-=begin PASM
+=begin PIR
 
     inc P3              # __increment
 
-=end PASM
+=end PIR
 
 Foo's C<__get_integer> and C<__get_string> vtable functions are called
 whenever an integer or string value is retrieved from a C<Foo> object:
 
-=begin PASM
+=begin PIR
 
     set I10, P5         # __get_integer
     #...
     print P5            # calls __get_string, prints 'fortytwo'
 
-=end PASM
+=end PIR
 
 
 =head3 Inheritance
 
 Z<CHP-9-SECT-12.4>
 
-X<inheritance;in PASM>
+X<inheritance;in PIR>
 X<classes;inheritance>
-The C<subclass>X<subclass opcode (PASM)> opcode creates a new class that
+The C<subclass>X<subclass opcode (PIR)> opcode creates a new class that
 inherits methods and attributes from another class. It takes 3
 arguments: the destination register for the new class, a register
 containing the parent class, and the name of the new class:
 
-=begin PASM
+=begin PIR
 
     subclass P3, P1, "Bar"
 
-=end PASM
+=end PIR
 
-X<multiple inheritance; in PASM>
-For multiple inheritance, the C<addparent>X<addparent opcode (PASM)>
+X<multiple inheritance; in PIR>
+For multiple inheritance, the C<addparent>X<addparent opcode (PIR)>
 opcode adds additional parents to a subclass.
 
-=begin PASM
+=begin PIR
 
   newclass P4, "Baz"
   addparent P3, P4
 
-=end PASM
+=end PIR
 
 To override an inherited method, define a method with the same name in
 the namespace of the subclass. The following code overrides Bar's
 C<__increment> method so it decrements the value instead of
 incrementing it:
 
-=begin PASM
+=begin PIR
 
   .namespace [ "Bar" ]
 
@@ -3830,7 +3963,7 @@ incrementing it:
     dec P10                       # the evil line
     invoke P1
 
-=end PASM
+=end PIR
 
 Notice that the attribute inherited from C<Foo> can only be looked up
 with the C<Foo> class name, not the C<Bar> class name. This preserves
@@ -3839,17 +3972,17 @@ inherited attributes.
 
 Object creation for subclasses is the same as for ordinary classes:
 
-=begin PASM
+=begin PIR
 
     find_type I1, "Bar"
     new P5, I1
 
-=end PASM
+=end PIR
 
 Calls to inherited methods are just like calls to methods defined in
 the class:
 
-=begin PASM
+=begin PIR
 
     set P5, 42                  # inherited __set_integer_native
     inc P5                      # overridden __increment
@@ -3862,7 +3995,7 @@ the class:
     print I5
     print "\n"
 
-=end PASM
+=end PIR
 
 =head3 Additional Object Opcodes
 
@@ -3873,13 +4006,13 @@ objects. C<isa> checks whether an object belongs to or
 inherits from a particular class. C<can> checks whether
 an object has a particular method. Both return a true or false value.
 
-=begin PASM
+=begin PIR
 
     $I0 = isa $P3, "Foo"           # 1
     $I0 = isa $P3, "Bar"           # 1
     $I0 = can $P3, "add"         # 1
 
-=end PASM
+=end PIR
 
 
 It may seem more appropriate for a discussion of PIR's support for classes
@@ -4475,12 +4608,12 @@ it is.
 Exception handlers are derived from continuations. They are ordinary
 subroutines that follow the Parrot calling conventions, but are never
 explicitly called from within user code. User code pushes an exception
-handler onto the control stack with the C<set_eh>X<set_eh opcode (PASM)>
+handler onto the control stack with the C<set_eh>X<set_eh opcode (PIR)>
 opcode. The system calls the installed exception handler only when an
 exception is thrown (perhaps because of code that does division by
 zero or attempts to retrieve a global that wasn't stored.)
 
-=begin PASM
+=begin PIR
 
     newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # push handler on control stack
@@ -4493,7 +4626,7 @@ zero or attempts to retrieve a global that wasn't stored.)
     is_null P10, not_found      # test P10
     #...
 
-=end PASM
+=end PIR
 
 This example creates a new exception handler subroutine with the
 C<newsub> opcode and installs it on the control stack with the
@@ -4510,7 +4643,7 @@ The first exception handler in the control stack sees every exception
 thrown. The handler has to examine the exception object and decide
 whether it can handle it (or discard it) or whether it should
 C<rethrow> the exception to pass it along to an exception handler
-deeper in the stack. The C<rethrow>X<rethrow opcode (PASM)> opcode is only
+deeper in the stack. The C<rethrow>X<rethrow opcode (PIR)> opcode is only
 valid in exception handlers. It pushes the exception object back onto
 the control stack so Parrot knows to search for the next exception
 handler in the stack. The process continues until some exception
@@ -4535,13 +4668,13 @@ execution at the opcode immediately after the one that threw the
 exception. Other exceptions at the run-loop level are also generally
 resumable.
 
-=begin PASM
+=begin PIR
 
   new P10, 'Exception'    # create new Exception object
   set P10, 'I die'        # set message attribute
   throw P10               # throw it
 
-=end PASM
+=end PIR
 
 Exceptions are designed to work with the Parrot calling conventions.
 Since the return addresses of C<bsr> subroutine calls and exception
@@ -4737,7 +4870,7 @@ needs to handle from the OS, it converts that signal into an event and
 broadcasts it to all running threads. Each thread independently
 decides if it's interested in this signal and, if so, how to respond to it.
 
-=begin PASM
+=begin PIR
 
     newsub P20, .ExceptionHandler, _handler
     set_eh P20                  # establish signal handler
@@ -4755,7 +4888,7 @@ decides if it's interested in this signal and, if so, how to respond to it.
   nok:
     end
 
-=end PASM
+=end PIR
 
 This example creates a signal handler and pushes it on to the control
 stack. It then prompts the user to send a C<SIGINT> from the shell
@@ -4800,7 +4933,7 @@ threads. This is only a simple example to illustrate threads, not a typical
 usage of threads (no-one really wants to spawn two threads just to print out a
 simple string).
 
-=begin PASM
+=begin PIR
 
     get_global P5, "_th1"              # locate thread function
     new P2, "ParrotThread"              # create a new thread
@@ -4843,7 +4976,7 @@ simple string).
     if S0, w2                           # the other thread will run
     invoke P1                           # done with string
 
-=end PASM
+=end PIR
 
 This example creates a C<ParrotThread> object and calls its C<thread3>
 method, passing three arguments: a PMC for the C<_th1> subroutine in
@@ -4907,7 +5040,7 @@ method belongs to the C<ParrotThread> class. When it's called on a
 C<ParrotThread> object, the calling code waits until the thread
 terminates.
 
-=begin PASM
+=begin PIR
 
     new P2, "ParrotThread"      # create a new thread
     set I5, P2                  # get thread ID
@@ -4916,12 +5049,12 @@ terminates.
     invoke                      # ...and join (wait for) the thread
     set P16, P5                 # the return result of the thread
 
-=end PASM
+=end PIR
 
 C<kill> and C<detach> are interpreter methods, so you have to grab the
 current interpreter object before you can look up the method object.
 
-=begin PASM
+=begin PIR
 
     set I5, P2                  # get thread ID of thread P2
     getinterp P3                # get this interpreter object
@@ -4931,7 +5064,7 @@ current interpreter object before you can look up the method object.
     find_method P0, P3, "detach"
     invoke                      # detach thread with ID I5
 
-=end PASM
+=end PIR
 
 By the time you read this, some of these combinations of statements
 and much of the threading syntax above may be reduced to a simpler set
@@ -4942,19 +5075,19 @@ of opcodes.
 Z<CHP-9-SECT-11>
 
 In addition to running Parrot bytecode on the command-line, you can
-also load pre-compiled bytecode directly into your PASM source file.
-The C<load_bytecode>X<load_bytecode opcode (PASM)> opcode takes a single
+also load pre-compiled bytecode directly into your PIR source file.
+The C<load_bytecode>X<load_bytecode opcode (PIR)> opcode takes a single
 argument: the name of the bytecode file to load. So, if you create a
 file named F<file.pasm> containing a single subroutine:
 
-=begin PASM
+=begin PIR
 
   # file.pasm
   .sub _sub2:               # .sub stores a global sub
      print "in sub2\n"
      invoke P1
 
-=end PASM
+=end PIR
 
 and compile it to bytecode using the C<-o> command-line switch:
 
@@ -4963,7 +5096,7 @@ and compile it to bytecode using the C<-o> command-line switch:
 You can then load the compiled bytecode into F<main.pasm> and directly
 call the subroutine defined in F<file.pasm>:
 
-=begin PASM
+=begin PIR
 
   # main.pasm
   main:
@@ -4972,28 +5105,28 @@ call the subroutine defined in F<file.pasm>:
     invokecc
     end
 
-=end PASM
+=end PIR
 
 The C<load_bytecode> opcode also works with source files, as long as
 Parrot has a compiler registered for that type of file:
 
-=begin PASM
+=begin PIR
 
   # main2.pasm
   main:
-    load_bytecode "file.pasm"  # PASM source code
+    load_bytecode "file.pasm"  # PIR source code
     set_global P0, "_sub2"
     invokecc
     end
 
-=end PASM
+=end PIR
 
 Subroutines marked with C<:load> run as soon as they're loaded (before
 C<load_bytecode> returns), rather than waiting to be called. A
 subroutine marked with C<:main> will always run first, no matter what
 name you give it or where you define it in the file.
 
-=begin PASM
+=begin PIR
 
   # file3.pasm
   .sub :load                    # mark the sub as to be run
@@ -5011,12 +5144,12 @@ name you give it or where you define it in the file.
     print "back\n"
     end
 
-=end PASM
+=end PIR
 
 This example uses both C<:load> and C<:main>. Because the C<main>
 subroutine is defined with C<:main> it will execute first even though
 another subroutine comes before it in the file. C<main> prints a
-line, loads the PASM source file, and then prints another line.
+line, loads the PIR source file, and then prints another line.
 Because C<_entry> in F<file3.pasm> is marked with C<:load> it runs
 before C<load_bytecode> returns, so the final output is:
 
