@@ -33,6 +33,13 @@ foreach my $file ( @files ) {
 sub compile_ok {
     my $snippet = shift;
 
+    # If it's a PIR fragment, wrap it in a sub.
+    if ($snippet->{type} eq "PIR" && $snippet->{modifier} =~ /FRAGMENT/) {
+        $snippet->{code} = ".sub 'testing'\n" .
+            $snippet->{code} .  "\n.end";
+    }
+
+    # Generate a temp file we can compile.
     my ($fh,$tempfile) = tempfile(
         SUFFIX => '.' . lc $snippet->{type},
         UNLINK => 1
@@ -40,14 +47,18 @@ sub compile_ok {
     print {$fh} $snippet->{code};
     close $fh;
 
+    # Send the output to /dev/null; similar to perl5's -c
     my $cmd = File::Spec->curdir() . $PConfig{slash} .
               $PConfig{test_prog} . " -o " . File::Spec->devnull() . " " .
               $tempfile;
 
-    my $description = $snippet->{file} . ':' .$snippet->{line};
+    my $description = join (':', map {$snippet->{$_}}
+        qw(file line type modifier));
 
     TODO: {
-        local $TODO = $snippet->{todo} if $snippet->{todo};
+        # conditionally TODO the file.
+        local $TODO = "invalid code" if $snippet->{modifier} =~
+            /TODO|INVALID/;
         is(system($cmd), 0 , $description);
     }
 
@@ -78,12 +89,12 @@ sub get_samples {
                 $code .= $line;
             }
         }
-        elsif ( $line =~ /^=begin ((PIR|PASM)( .*)?)$/ ) {
+        elsif ( $line =~ /^=begin ((PIR|PASM)(_(.*))?)$/ ) {
             $in_code = 1;
             $snippet->{file} = $file;
             $snippet->{line} = $.;
             $snippet->{type} = $2;
-            $snippet->{todo} = $3;
+            $snippet->{modifier} = defined($4) ? $4 : '';
             $target = $1; 
         }
     }
@@ -92,6 +103,8 @@ sub get_samples {
     # should end with =end.
     return @snippets;
 }
+
+__END__
 
 =head1 NAME
 
@@ -110,6 +123,46 @@ t/examples/pod.t - Compile examples found in POD
 Tests the syntax for any embedded PIR in POD, for all files in the
 repository that contain POD.  Any invalid examples are reported in the
 test output.
+
+To test a snippet of parrot code, wrap it in C<=begin> and C<=end> blocks
+like:
+
+ =begin PASM
+
+   set I0, 0
+
+ =end PASM
+
+C<PASM> and C<PIR> are both valid target languages.
+
+Additionally, you can add the following modifiers (prepending with an 
+underscore).
+
+=over 4
+
+=item * FRAGMENT
+
+For PIR, wraps the code in a C<.sub> block to
+
+=item * TODO
+
+=item * INVALID
+
+Either of these will force the test to be marked TODO.
+
+=back
+
+For example, this PIR fragment uses an old, invalid opcode and needs
+to be updated:
+
+ =begin PIR_FRAGMENT_INVALID
+   
+    find_type $I1, 'Integer'
+
+ =end PIR_FRAGMENT_INVALID
+
+As show, you can "stack" the modifiers. Take care to make the begin and
+and end POD targets identical. Always begin with the target language.
 
 =cut
 
