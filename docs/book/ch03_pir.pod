@@ -8,13 +8,13 @@ X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR (Parrot intermediate representation)>
 
 Parrot Intermediate Representation (PIR) is Parrot's native low-level
-languageN<Parrot has a pure native assembly language called PASM, described in
-Chapter 9.>. PIR is fundamentally an assembly language, but it has some
-higher-level features such as operator syntax, syntactic sugar for subroutine
-and method calls, automatic register allocation, and more friendly conditional
-syntax.  PIR is commonly used to write Parrot libraries -- including some of
-Parrot's compilers -- and is the target form when compiling high-level languages
-to Parrot.
+language.N<Parrot also has a pure native assembly language called PASM,
+described in Chapter 9.> PIR is fundamentally an assembly language, but
+it has some higher-level features such as operator syntax, syntactic
+sugar for subroutine and method calls, automatic register allocation,
+and more friendly conditional syntax.  PIR is commonly used to write
+Parrot libraries -- including some of Parrot's compilers -- and is the
+target form when compiling high-level languages to Parrot.
 
 Even so, PIR is more rigid and "close to the machine" then some higher-level
 languages like C. X<.pir files> Files containing PIR code use the F<.pir>
