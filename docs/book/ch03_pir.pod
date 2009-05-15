@@ -139,15 +139,14 @@ or negative.
 
 =end PIR_FRAGMENT
 
-Integer literals can also be binary, octal, or hexadecimal:
+Integer literals can also be binary or hexadecimal:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
   $I3 = 0b01010  # binary
-  $I3 = 0o78     # octal
   $I2 = 0xA5     # hexadecimal
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
 Floating point number literals have a decimal point, and can use scientific
 notation:
@@ -194,13 +193,13 @@ directive. As with register variables, there are four valid types:
 C<int>, C<num>, C<string>, and C<pmc>. Named variables have to be
 declared, but otherwise behave exactly the same as register variables.
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
   .local string hello
-  hello "'Allo, 'allo, 'allo."
+  hello = "'Allo, 'allo, 'allo."
   print hello
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
 =head3 Constants
 
@@ -705,7 +704,6 @@ returning the removed substring.
   substr $S1, 1, 2, "XYZ"
   print $S1                        # prints "aXYZde"
   print "\n"
-  end
 
 =end PIR_FRAGMENT
 
@@ -1969,7 +1967,6 @@ The most basic branching instruction is the unconditional branch, C<goto>:
 
   L1:
       print "after branch"
-      end
   .end
 
 =end PIR
@@ -1987,7 +1984,6 @@ The conditional branches combine C<if> or C<unless> with C<goto>.
       say "never printed"
   L1:
       say "after branch"
-      end
   .end
 
 =end PIR
@@ -2013,7 +2009,6 @@ comparison is true:
       say "never printed"
   L1:
       say "after branch"
-      end
   .end
 
 =end PIR
@@ -2042,7 +2037,6 @@ unconditional branches handle iteration:
       if $I1 > 0 goto REDO  # end of loop
 
       say $I0
-      end
   .end
 
 =end PIR
@@ -2072,7 +2066,6 @@ conditional branch with an unconditional branch:
   LAST:                     # end of loop
 
       say $I0
-      end
   .end
 
 =end PIR
@@ -2471,7 +2464,6 @@ between different units.
      $I0 = 'fact'(count, product)
 
      say $I0
-     end
   .end
 
   .sub 'fact'
@@ -3350,7 +3342,6 @@ register C<P0> and then invokes it with C<invoke>:
   compile P0, P1, "print S1"
   invoke                             # eval code P0
   print "back again\n"
-  end
 
 =end PIR_FRAGMENT_INVALID
 
@@ -3406,7 +3397,6 @@ C<get_global>:
   # ...
   get_global P0, "$foo"
   print P0                        # prints 42
-  end
 
 =end PIR_FRAGMENT_INVALID
 
@@ -3926,10 +3916,10 @@ object and stores the method object in C<P0> for you:
 
 =begin PIR_FRAGMENT_INVALID
 
-    set $S0, "_half"             # set method name
-    set $P2, $P3                  # the object
+    set $S0, "_half"            # set method name
+    set $P2, $P3                # the object
     callmethodcc                # create return continuation, call
-    print $I5                    # result of method call
+    print $I5                   # result of method call
     print "\n"
 
 =end PIR_FRAGMENT_INVALID
@@ -3996,7 +3986,7 @@ two C<Foo> objects:
     set $P4, $12
     new $P5, $I1          # create a new store for add
 
-    add $P5, $P3, $P4      # __add method
+    add $P5, $P3, $P4     # __add method
 
 =end PIR_FRAGMENT_INVALID
 
@@ -4109,8 +4099,8 @@ an object has a particular method. Both return a true or false value.
 
 =begin PIR_FRAGMENT
 
-    $I0 = isa $P3, "Foo"           # 1
-    $I0 = isa $P3, "Bar"           # 1
+    $I0 = isa $P3, "Foo"         # 1
+    $I0 = isa $P3, "Bar"         # 1
     $I0 = can $P3, "add"         # 1
 
 =end PIR_FRAGMENT
@@ -4244,7 +4234,6 @@ first method:
     new obj, "Foo"              # instantiate a Foo object
     obj."meth"()                # call obj."meth" which is actually
     print "done\n"              # in the "Foo" namespace
-    end
   .end
 
   .namespace [ "Foo" ]          # start namespace "Foo"
@@ -5205,7 +5194,6 @@ call the subroutine defined in F<file.pasm>:
     load_bytecode "file.pbc"    # compiled file.pasm
     get_global $P0, "_sub2"
     invokecc
-    end
 
 =end PIR_FRAGMENT_INVALID
 
@@ -5219,7 +5207,6 @@ Parrot has a compiler registered for that type of file:
     load_bytecode "file.pasm"  # PIR source code
     set_global $P0, "_sub2"
     invokecc
-    end
 
 =end PIR_FRAGMENT_INVALID
 
@@ -5244,7 +5231,6 @@ name you give it or where you define it in the file.
     print "main\n"              # MAIN entry of program execution
     load_bytecode "file3.pasm"
     print "back\n"
-    end
 
 =end PIR_FRAGMENT_INVALID
 
