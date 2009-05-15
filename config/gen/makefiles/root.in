@@ -750,7 +750,6 @@ help :
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
-	@echo "  rpms:              Create RPMs."
 	@echo "  win32-inno-installer:  Create MSWin32 setup."
 	@echo ""
 	@echo "Examples:"
