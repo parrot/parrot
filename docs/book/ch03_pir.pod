@@ -48,7 +48,7 @@ block.  A C<=cut> marker signals the end of a Pod block.
 
   =cut
 
-=head2 Labels
+=head3 Labels
 
 Z<CHP-3-SECT-4>
 
@@ -240,7 +240,7 @@ a custom PMC is more useful>.  Parrot strings are flexible and powerful, to
 account for all the complexity of human-readable (and computer-representable)
 textual data.
 
-=head3 Strings: Encodings and Charsets
+=head3 Encodings and Charsets
 
 X<charset>
 A modern string system must manage several character encodings and charsets in
@@ -321,6 +321,26 @@ PMCs conform to for performing standard operations. These PMC types support
 custom methods to perform various operations, may be passed to subroutines that
 expect PMC arguments, and can be subclassed by a user-defined type.
 
+
+PMCs are are polymorphic data items that
+can be one of a large variety of predefined types. As we have seen briefly,
+and as we will see in more depth later, PMCs have a standard interface called
+the VTABLE interface. VTABLEs are a standard list of functions that all PMCs
+implement N<or, PMCs can choose not to implement each interface explicitly and
+instead let Parrot call the default implementations>.
+
+VTABLEs are very strict: There are a fixed number with fixed names and
+fixed argument lists. You can't just create any random VTABLE interface that
+you want to create, you can only make use of the ones that Parrot supplies
+and expects. To circumvent this limitation, PMCs may have METHODS in
+addition to VTABLEs. METHODs are arbitrary code functions that can be
+written in C, may have any name, and may implement any behavior.
+
+=head2 VTABLE Interfaces
+
+Internally, all operations on PMCs are performed by calling various VTABLE
+interfaces.
+
 =head3 Type Conversion
 
 The C<=> operator is very powerful.  Its simplest form stores a value into one
@@ -363,14 +383,14 @@ equivalents:
   $I2 = $P2      # Intify. 3
   $N2 = $P2      # Unbox. $N2 = 3.14
 
-=head2 Flow Control
+=head2 Control Flow
 
 Z<CHP-3-SECT-5>
 
-X<PIR (Parrot intermediate representation);flow control>
-X<flow control;in PIR>
+X<PIR (Parrot intermediate representation);control flow>
+X<control flow;in PIR>
 
-Flow control in PIR occurs entirely with conditional and unconditional branches
+Control flow in PIR occurs entirely with conditional and unconditional branches
 to labels. This may seem simplistic and primitive, but here PIR shows its roots
 as a thin overlay on the assembly language of a virtual processor.  PIR does
 not support high-level looping structures such as C<while> or C<for> loops. PIR
@@ -630,8 +650,6 @@ signature, if necessary)), calls the subroutine, and assigns the results of the
 call to the appropriate integer register. This is all in addition to the
 computation the subroutine itself performs.
 
-=head3 Expanded Subroutine Syntax
-
 The single line subroutine call is incredibly convenient, but it isn't always
 flexible enough. PIR also has a more verbose call syntax that is still more
 convenient than manual calls. This example looks up the subroutine C<fact> out
@@ -710,7 +728,9 @@ is 120.
 
 As usual, execution of the program starts at the C<:main> subroutine.
 
-=head3 Named Arguments
+=head3 Parameters and Arguments
+
+=head4 Named Parameters
 
 =for author
 
@@ -759,7 +779,7 @@ You can also pass these pairs in the opposite order:
 Named arguments can be a big help because you don't have to worry about the
 exact order of variables, especially as argument lists get very long.
 
-=head3 Optional Arguments
+=head4 Optional Parameters
 
 X<optional arguments>
 Some functions have arguments with appropriate default values, so that callers
@@ -818,6 +838,334 @@ You can call this function in two ways:
 
   'MySub'("answer" => 42)  # with a value
   'MySub'()                # without
+
+=head4 Commandline Arguments
+
+Programs written in Parrot have access to arguments passed on the command
+line:
+
+  .sub 'MyMain' :main
+    .param pmc all_args :slurpy
+    ...
+  .end
+
+=for author
+
+Please verify and expand.
+
+=end for
+
+The C<all_args> PMC is a ResizableStringArray PMC, which means you can loop
+over the results, access them individually, or even modify them.
+
+=head3 Continuations
+
+X<continuations>
+
+Continuations are a kind of subroutine that take a snapshots of control flow. They are frozen images of the current
+execution state of the VM. Once you have a continuation, you can invoke it to
+return to the point where the continuation was first created. It's like a
+magical timewarp that allows the developer to arbitrarily move control flow
+back to any previous point in the program.
+
+Continuations are like any other PMC; you can create one with the C<new> opcode:
+
+  $P0 = new 'Continuation'
+
+The new continuation starts off in an undefined state. If you attempt to invoke
+a new continuation without initializing it, Parrot will throw an exception.  To
+prepare the continuation for use, assign it a destination label with the
+C<set_addr> opcode:
+
+    $P0 = new 'Continuation'
+    set_addr $P0, my_label
+
+  my_label:
+    ...
+
+To jump to the continuation's stored label and return the context to the state
+it was in I<at the point of its creation>, invoke the continuation:
+
+  invoke $P0  # Explicit using "invoke" opcode
+  $P0()       # Same, but nicer syntax
+
+Even though you can use the subroutine notation C<$P0()> to invoke the
+continuation, it doesn't make any sense to pass arguments or obtain return
+values:
+
+  $P0 = new 'Continuation'
+  set_addr $P0, my_label
+
+  $P0(1, 2)      # WRONG!
+
+  $P1 = $P0()    # WRONG!
+
+
+
+=head4 Continuation Passing Style
+
+X<continuation passing style>
+X<CPS>
+
+Parrot uses continuations internally for control flow. When Parrot invokes a function, it creates a continuation representing the
+current point in the program.  It passes this continuation as an invisible
+parameter to the function call.  When that function returns, it invokes the
+continuation -- in effect, it performs a goto to the point of creation of that
+continuation.  If you have a continuation, you can invoke it to return to its
+point of creation any time you want.
+
+This type of flow control -- invoking continuations instead of performing bare
+jumps -- is X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
+
+
+
+=head4 Tailcalls
+
+In many cases, a subroutine will set up and call another subroutine, and then
+return the result of the second call directly. This is a X<tailcall> tailcall,
+and is an important opportunity for optimization.  Here's a contrived example
+in pseudocode:
+
+  call add_two(5)
+
+  subroutine add_two(value)
+    value = add_one(value)
+    return add_one(value)
+
+In this example, the subroutine C<add_two> makes two calls to c<add_one>. The
+second call to C<add_one> is the return value. C<add_one> gets called; its
+result gets returned to the caller of C<add_two>.  Nothing in C<add_two> uses
+that return value directly.
+
+A simple optimization is available for this type of code.  The second call to
+C<add_one> can return to the same place that C<add_two> returns; therefore,
+it's perfectly safe and correct to use the same return continuation that
+C<add_two> uses. The two subroutine calls can share a return continuation,
+instead of having to create a new continuation for each call.
+
+X<.tailcall directive>
+
+PIR provides the C<.tailcall> directive to identify similar situations.  Use it
+in place of the C<.return> directive. C<.tailcall> performs this optimization
+by reusing the return continuation of the parent function to make the tailcall:
+
+=begin PIR
+
+  .sub 'main' :main
+      .local int value
+      value = add_two(5)
+      say value
+  .end
+
+  .sub 'add_two'
+      .param int value
+      .local int val2
+      val2 = add_one(value)
+      .tailcall add_one(val2)
+  .end
+
+  .sub 'add_one'
+      .param int a
+      .local int b
+      b = a + 1
+      .return (b)
+  .end
+
+=end PIR
+
+This example above will print out the correct value "7".
+
+
+
+
+=head3 Coroutines
+
+X<PIR;Coroutines>
+X<Coroutines>
+We've mentioned coroutines several times before, and we're finally going
+to explain what they are. Coroutines are similar to subroutines except
+that they have an internal notion of I<state> N<And the cool new name!>.
+Coroutines, in addition to performing a normal C<.return> to return
+control flow back to the caller and destroy the lexical environment of
+the subroutine, may also perform a C<.yield> operation. C<.yield> returns
+a value to the caller like C<.return> can, but it does not destroy the
+lexical state of the coroutine. The next time the coroutine is called, it
+continues execution from the point of the last C<.yield>, not at the
+beginning of the coroutine.
+
+In a Coroutine, when we continue from a C<.yield>, the entire lexical
+environment is the same as it was when C<.yield> was called. This
+means that the parameter values don't change, even if we call the
+coroutine with different arguments later.
+
+Coroutines are defined like any ordinary subroutine. They do not require
+any special flag or any special syntax to mark them as being a
+coroutine. However, what sets them apart is the use of the C<.yield>
+directive. C<.yield> plays several roles:
+
+=over 4
+
+=item * Identifies coroutines
+
+When Parrot sees a yield, it knows to create a Coroutine PMC object
+instead of a Sub PMC.
+
+=item * Creates a continuation
+
+Continuations, as we have already seen, allow us to continue
+execution at the point of the continuation later. It's like a snapshot of
+the current execution environment. C<.yield> creates a continuation in
+the coroutine and stores the continuation object in the coroutine object
+or later resuming from the point of the C<.yield>.
+
+=item * Returns a value
+
+C<.yield> can return a value N<or many values, or no values> to the caller.
+It is basically the same as a C<.return> in this regard.
+
+=back
+
+Here is a quick example of a simple coroutine:
+
+  .sub 'MyCoro'
+    .yield(1)
+    .yield(2)
+    .yield(3)
+    .return(4)
+  .end
+
+  .sub 'main' :main
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+  .end
+
+This is obviously a contrived example, but it demonstrates how the coroutine
+stores it's state. The coroutine stores it's state when we reach a C<.yield>
+directive, and when the coroutine is called again it picks up where it last
+left off. Coroutines also handle parameters in a way that might not be
+intuitive. Here's an example of this:
+
+  .sub 'StoredConstant'
+    .param int x
+    .yield(x)
+    .yield(x)
+    .yield(x)
+  .end
+
+  .sub 'main' :main
+    $I0 = StoredConstant(5)       # $I0 = 5
+    $I0 = StoredConstant(6)       # $I0 = 5
+    $I0 = StoredConstant(7)       # $I0 = 5
+    $I0 = StoredConstant(8)       # $I0 = 8
+  .end
+
+Notice how even though we are calling the C<StoredConstant> coroutine with
+different arguments each time, the value of parameter C<x> doesn't change
+until the coroutine's state resets after the last C<.yield>. Remember that
+a continuation takes a snapshot of the current state, and the C<.yield>
+directive takes a continuation. The next time we call the coroutine, it
+invokes the continuation internally, and returns us to the exact same place in
+the exact same condition as we were when we called the C<.yield>. In order
+to reset the coroutine and enable it to take a new parameter, we must either
+execute a C<.return> directive or reach the end of the coroutine.
+
+=head3 Multiple Dispatch
+
+Multiple dispatch is when there are multiple subroutines in a single
+namespace with the same name. These functions must differ, however, in
+their parameter list, or "signature". All subs with the same name get
+put into a single PMC called a MultiSub. The MultiSub is like a list
+of subroutines. When the multisub is invoked, the MultiSub PMC object
+searches through the list of subroutines and searches for the one with
+the closest matching signature. The best match is the sub that gets
+invoked.
+
+MultiSubs are subroutines with the C<:multi> flag applied to them.
+MultiSubs (also called "Multis") must all differ from one another in
+the number and/or type of arguments passed to the function. Having
+two multisubs with the same function signature could result in a
+parsing error, or the later function could overwrite the former one
+in the multi.
+
+Multisubs are defined like this:
+
+  .sub 'MyMulti' :multi
+      # does whatever a MyMulti does
+  .end
+
+Multis belong to a specific namespace. Functions in different namespaces
+with the same name do not conflict with each other N<this is one of the
+reasons for having multisubs in the first place!>. It's only when
+multiple functions in a single namespace need to have the same name that
+a multi is used.
+
+Multisubs take a special designator called a I<multi signature>. The multi
+signature tells Parrot what particular combination of input parameters the
+multi accepts. Each multi will have a different signature, and Parrot will
+be able to dispatch to each one depending on the arguments passed. The
+multi signature is specified in the C<:multi> directive:
+
+  .sub 'Add' :multi(I, I)
+    .param int x
+    .param int y
+    .return(x + y)
+  .end
+
+  .sub 'Add' :multi(N, N)
+    .param num x
+    .param num y
+    .return(x + y)
+  .end
+
+  .sub 'Start' :main
+    $I0 = Add(1, 2)      # 3
+    $N0 = Add(3.14, 2.0) # 5.14
+    $S0 = Add("a", "b")  # ERROR! No (S, S) variant!
+  .end
+
+Multis can take I, N, S, and P types, but they can also use C<_> (underscore)
+to denote a wildcard, and a string that can be the name of a particular PMC
+type:
+
+  .sub 'Add' :multi(I, I)  # Two integers
+    ...
+
+  .sub 'Add' :multi(I, 'Float')  # An integer and Float PMC
+    ...
+
+                           # Two Integer PMCs
+  .sub 'Add' :multi('Integer', _)
+    ...
+
+When we call a multi PMC, Parrot will try to take the most specific
+best-match variant, and will fall back to more general variants if a perfect
+best-match cannot be found. So if we call C<'Add'(1, 2)>, Parrot will dispatch
+to the C<(I, I)> variant. If we call C<'Add'(1, "hi")>, Parrot will match the
+C<(I, _)> variant, since the string in the second argument doesn't match C<I>
+or C<'Float'>. Parrot can also choose to automatically promote one of the I,
+N, or S values to an Integer, Float, or String PMC.
+
+To make the decision about which multi variant to call, Parrot takes a
+I<Manhattan Distance> between the two. Parrot calculates the I<distance>
+between the multi signatures and the argument signature. Every difference
+counts as one step. A difference can be an autobox from a primitive type
+to a PMC, or the conversion from one primitive type to another, or the
+matching of an argument to a C<_> wildcard. After Parrot calculates the
+distance to each variant, it calls the function with the lowest distance.
+Notice that it's possible to define a variant that is impossible to call:
+for every potential combination of arguments there is a better match. This
+isn't necessarily a common occurrence, but it's something to watch out for
+in systems with a lot of multis and a limited number of data types in use.
 
 =head3 Sub PMCs
 
@@ -891,148 +1239,11 @@ C<get_namespace> method:
 
   $P1 = $P0.'get_namespace'()
 
-=head2 The Commandline
 
-Programs written in Parrot have access to arguments passed on the command
-line like any other program would:
 
-  .sub 'MyMain' :main
-    .param pmc all_args :slurpy
-    ...
-  .end
 
-=for author
 
-Please verify and expand.
-
-=end for
-
-The C<all_args> PMC is a ResizableStringArray PMC, which means you can loop
-over the results, access them individually, or even modify them.
-
-=head2 Continuation Passing Style
-
-X<continuations>
-X<continuation passing style>
-X<CPS>
-Continuations are snapshots of control flow: frozen images of the current
-execution state of the VM. Once you have a continuation, you can invoke it to
-return to the point where the continuation was first created. It's like a
-magical timewarp that allows the developer to arbitrarily move control flow
-back to any previous point in the program.
-
-Continuations are not a new concept; they've boggled the minds of new Lisp and
-Scheme programmers for many years.  Despite their power and heritage, they're
-not visible to most other modern programming languages or their runtimes.
-Parrot aims to change that: it performs almost all control flow through the use
-of continuations.  PIR and PCT hide most of this complexity from developers,
-but the full power of continuations is available.
-
-When Parrot invokes a function, it creates a continuation representing the
-current point in the program.  It passes this continuation as an invisible
-parameter to the function call.  When that function returns, it invokes the
-continuation -- in effect, it performs a goto to the point of creation of that
-continuation.  If you have a continuation, you can invoke it to return to its
-point of creation any time you want.
-
-This type of flow control -- invoking continuations instead of performing bare
-jumps -- is X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
-CPS allows parrot to offer all sorts of neat features, such as tail-call
-optimizations and lexical subroutines.
-
-=head3 Tailcalls
-
-In many cases, a subroutine will set up and call another subroutine, and then
-return the result of the second call directly. This is a X<tailcall> tailcall,
-and is an important opportunity for optimization.  Here's a contrived example
-in pseudocode:
-
-  call add_two(5)
-
-  subroutine add_two(value)
-    value = add_one(value)
-    return add_one(value)
-
-In this example, the subroutine C<add_two> makes two calls to c<add_one>. The
-second call to C<add_one> is the return value. C<add_one> gets called; its
-result gets returned to the caller of C<add_two>.  Nothing in C<add_two> uses
-that return value directly.
-
-A simple optimization is available for this type of code.  The second call to
-C<add_one> can return to the same place that C<add_two> returns; therefore,
-it's perfectly safe and correct to use the same return continuation that
-C<add_two> uses. The two subroutine calls can share a return continuation,
-instead of having to create a new continuation for each call.
-
-X<.tailcall directive>
-
-PIR provides the C<.tailcall> directive to identify similar situations.  Use it
-in place of the C<.return> directive. C<.tailcall> performs this optimization
-by reusing the return continuation of the parent function to make the tailcall:
-
-=begin PIR
-
-  .sub 'main' :main
-      .local int value
-      value = add_two(5)
-      say value
-  .end
-
-  .sub 'add_two'
-      .param int value
-      .local int val2
-      val2 = add_one(value)
-      .tailcall add_one(val2)
-  .end
-
-  .sub 'add_one'
-      .param int a
-      .local int b
-      b = a + 1
-      .return (b)
-  .end
-
-=end PIR
-
-This example above will print out the correct value "7".
-
-=head3 Creating and Using Continuations
-
-While Parrot's use of continuations and CPS is invisible to most code, you can
-create and use them explicitly if you like.  Continuations are like any other
-PMC; create one with the C<new> opcode:
-
-  $P0 = new 'Continuation'
-
-The new continuation starts off in an undefined state. If you attempt to invoke
-a new continuation without initializing it, Parrot will raise an exception.  To
-prepare the continuation for use, assign it a destination label with the
-C<set_addr> opcode:
-
-    $P0 = new 'Continuation'
-    set_addr $P0, my_label
-
-  my_label:
-    ...
-
-To jump to the continuation's stored label and return the context to the state
-it was in I<at the point of its creation>, invoke the continuation:
-
-  invoke $P0  # Explicit using "invoke" opcode
-  $P0()       # Same, but nicer syntax
-
-Even though you can use the subroutine notation C<$P0()> to invoke the
-continuation, it doesn't make any sense to pass arguments or obtain return
-values:
-
-  $P0 = new 'Continuation'
-  set_addr $P0, my_label
-
-  $P0(1, 2)      # WRONG!
-
-  $P1 = $P0()    # WRONG!
-
-=head3 Lexical Variables
+=head2 Lexical Variables
 
 As we have seen above, we can declare a new subroutine to be a nested inner
 subroutine of an existing outer subroutine using the C<:outer> flag. The
@@ -1181,43 +1392,7 @@ sure to interact with the C<LexPad> PMC that's storing the data. If the value
 isn't properly stored in the LexPad, then they won't be available in nested
 inner subroutines, or available from C<:outer> subroutines either.
 
-=head2 Namespaces, Methods, and VTABLES
-
-Z<CHP-4-SECT-2>
-
-X<PIR (Parrot intermediate representation);methods>
-X<methods;in PIR>
-X<classes;methods>
-X<. (dot);. (method call);instruction (PIR)>
-PIR provides syntax to simplify writing methods and method calls for
-object-oriented programming. We've seen some method calls in the examples
-above, especially when we were talking about the interfaces to certain PMC
-types. We've also seen a little bit of information about classes and objects
-in the previous chapter. PIR allows you to define your own classes, and with
-those classes you can define method interfaces to them. Method calls follow
-the same Parrot calling conventions that we have seen above, including all the
-various parameter configurations, lexical scoping, and other aspects we have
-already talked about.
-
-Classes can be defined in two ways: in C and compiled to machine code, and
-in PIR. The former is how the built-in PMC types are defined, like
-C<ResizablePMCArray>, or C<Integer>. These PMC types are either built with
-Parrot at compile time, or are compiled into a shared library called a
-I<dynpmc> and loaded into Parrot at runtime. We will talk about writing PMCs
-in C, and dealing with dynpmcs in chapter 11.
-
-The second type of class can be defined in PIR at runtime. We saw some
-examples of this in the last chapter using the C<newclass> and C<subclass>
-opcodes. We also talked about class attribute values. Now, we're going to talk
-about associating subroutines with these classes, and they're called
-I<methods>. Methods are just like other normal subroutines with two major
-changes: they are marked with the C<:method> flag, and they exist in a
-I<namespace>. Before we can talk about methods, we need to discuss
-namespaces first.
-
-=head3 Namespaces
-
-Z<CHP-4-SECT-2.1>
+=head2 Namespaces
 
 X<Namespaces>
 X<.namespace>
@@ -1336,202 +1511,6 @@ as interesting as these. We'll talk about Namespaces throughout the rest
 of this chapter.
 
 
-
-
-=head2 Coroutines
-
-X<PIR;Coroutines>
-X<Coroutines>
-We've mentioned coroutines several times before, and we're finally going
-to explain what they are. Coroutines are similar to subroutines except
-that they have an internal notion of I<state> N<And the cool new name!>.
-Coroutines, in addition to performing a normal C<.return> to return
-control flow back to the caller and destroy the lexical environment of
-the subroutine, may also perform a C<.yield> operation. C<.yield> returns
-a value to the caller like C<.return> can, but it does not destroy the
-lexical state of the coroutine. The next time the coroutine is called, it
-continues execution from the point of the last C<.yield>, not at the
-beginning of the coroutine.
-
-In a Coroutine, when we continue from a C<.yield>, the entire lexical
-environment is the same as it was when C<.yield> was called. This
-means that the parameter values don't change, even if we call the
-coroutine with different arguments later.
-
-=head3 Defining Coroutines
-
-Coroutines are defined like any ordinary subroutine. They do not require
-any special flag or any special syntax to mark them as being a
-coroutine. However, what sets them apart is the use of the C<.yield>
-directive. C<.yield> plays several roles:
-
-=over 4
-
-=item * Identifies coroutines
-
-When Parrot sees a yield, it knows to create a Coroutine PMC object
-instead of a Sub PMC.
-
-=item * Creates a continuation
-
-Continuations, as we have already seen, allow us to continue
-execution at the point of the continuation later. It's like a snapshot of
-the current execution environment. C<.yield> creates a continuation in
-the coroutine and stores the continuation object in the coroutine object
-or later resuming from the point of the C<.yield>.
-
-=item * Returns a value
-
-C<.yield> can return a value N<or many values, or no values> to the caller.
-It is basically the same as a C<.return> in this regard.
-
-=back
-
-Here is a quick example of a simple coroutine:
-
-  .sub 'MyCoro'
-    .yield(1)
-    .yield(2)
-    .yield(3)
-    .return(4)
-  .end
-
-  .sub 'main' :main
-    $I0 = MyCoro()    # 1
-    $I0 = MyCoro()    # 2
-    $I0 = MyCoro()    # 3
-    $I0 = MyCoro()    # 4
-    $I0 = MyCoro()    # 1
-    $I0 = MyCoro()    # 2
-    $I0 = MyCoro()    # 3
-    $I0 = MyCoro()    # 4
-    $I0 = MyCoro()    # 1
-    $I0 = MyCoro()    # 2
-    $I0 = MyCoro()    # 3
-    $I0 = MyCoro()    # 4
-  .end
-
-This is obviously a contrived example, but it demonstrates how the coroutine
-stores it's state. The coroutine stores it's state when we reach a C<.yield>
-directive, and when the coroutine is called again it picks up where it last
-left off. Coroutines also handle parameters in a way that might not be
-intuitive. Here's an example of this:
-
-  .sub 'StoredConstant'
-    .param int x
-    .yield(x)
-    .yield(x)
-    .yield(x)
-  .end
-
-  .sub 'main' :main
-    $I0 = StoredConstant(5)       # $I0 = 5
-    $I0 = StoredConstant(6)       # $I0 = 5
-    $I0 = StoredConstant(7)       # $I0 = 5
-    $I0 = StoredConstant(8)       # $I0 = 8
-  .end
-
-Notice how even though we are calling the C<StoredConstant> coroutine with
-different arguments each time, the value of parameter C<x> doesn't change
-until the coroutine's state resets after the last C<.yield>. Remember that
-a continuation takes a snapshot of the current state, and the C<.yield>
-directive takes a continuation. The next time we call the coroutine, it
-invokes the continuation internally, and returns us to the exact same place in
-the exact same condition as we were when we called the C<.yield>. In order
-to reset the coroutine and enable it to take a new parameter, we must either
-execute a C<.return> directive or reach the end of the coroutine.
-
-=head2 Multiple Dispatch
-
-Multiple dispatch is when there are multiple subroutines in a single
-namespace with the same name. These functions must differ, however, in
-their parameter list, or "signature". All subs with the same name get
-put into a single PMC called a MultiSub. The MultiSub is like a list
-of subroutines. When the multisub is invoked, the MultiSub PMC object
-searches through the list of subroutines and searches for the one with
-the closest matching signature. The best match is the sub that gets
-invoked.
-
-=head3 Defining MultiSubs
-
-MultiSubs are subroutines with the C<:multi> flag applied to them.
-MultiSubs (also called "Multis") must all differ from one another in
-the number and/or type of arguments passed to the function. Having
-two multisubs with the same function signature could result in a
-parsing error, or the later function could overwrite the former one
-in the multi.
-
-Multisubs are defined like this:
-
-  .sub 'MyMulti' :multi
-      # does whatever a MyMulti does
-  .end
-
-Multis belong to a specific namespace. Functions in different namespaces
-with the same name do not conflict with each other N<this is one of the
-reasons for having multisubs in the first place!>. It's only when
-multiple functions in a single namespace need to have the same name that
-a multi is used.
-
-Multisubs take a special designator called a I<multi signature>. The multi
-signature tells Parrot what particular combination of input parameters the
-multi accepts. Each multi will have a different signature, and Parrot will
-be able to dispatch to each one depending on the arguments passed. The
-multi signature is specified in the C<:multi> directive:
-
-  .sub 'Add' :multi(I, I)
-    .param int x
-    .param int y
-    .return(x + y)
-  .end
-
-  .sub 'Add' :multi(N, N)
-    .param num x
-    .param num y
-    .return(x + y)
-  .end
-
-  .sub 'Start' :main
-    $I0 = Add(1, 2)      # 3
-    $N0 = Add(3.14, 2.0) # 5.14
-    $S0 = Add("a", "b")  # ERROR! No (S, S) variant!
-  .end
-
-Multis can take I, N, S, and P types, but they can also use C<_> (underscore)
-to denote a wildcard, and a string that can be the name of a particular PMC
-type:
-
-  .sub 'Add' :multi(I, I)  # Two integers
-    ...
-
-  .sub 'Add' :multi(I, 'Float')  # An integer and Float PMC
-    ...
-
-                           # Two Integer PMCs
-  .sub 'Add' :multi('Integer', _)
-    ...
-
-When we call a multi PMC, Parrot will try to take the most specific
-best-match variant, and will fall back to more general variants if a perfect
-best-match cannot be found. So if we call C<'Add'(1, 2)>, Parrot will dispatch
-to the C<(I, I)> variant. If we call C<'Add'(1, "hi")>, Parrot will match the
-C<(I, _)> variant, since the string in the second argument doesn't match C<I>
-or C<'Float'>. Parrot can also choose to automatically promote one of the I,
-N, or S values to an Integer, Float, or String PMC.
-
-To make the decision about which multi variant to call, Parrot takes a
-I<Manhattan Distance> between the two. Parrot calculates the I<distance>
-between the multi signatures and the argument signature. Every difference
-counts as one step. A difference can be an autobox from a primitive type
-to a PMC, or the conversion from one primitive type to another, or the
-matching of an argument to a C<_> wildcard. After Parrot calculates the
-distance to each variant, it calls the function with the lowest distance.
-Notice that it's possible to define a variant that is impossible to call:
-for every potential combination of arguments there is a better match. This
-isn't necessarily a common occurrence, but it's something to watch out for
-in systems with a lot of multis and a limited number of data types in use.
-
-
 =head2 Classes and Objects
 
 It may seem more appropriate for a discussion of PIR's support for classes
@@ -1543,87 +1522,8 @@ all the features that most modern OO languages have. What PIR does have is
 support for some of the basic structures and abilities, the necessary subset
 to construct richer and higher-level object systems.
 
-=head2 PMCs as Classes
 
-PMCs aren't exactly "classes" in the way that this term is normally used in
-object-oriented programming languages. They are polymorphic data items that
-can be one of a large variety of predefined types. As we have seen briefly,
-and as we will see in more depth later, PMCs have a standard interface called
-the VTABLE interface. VTABLEs are a standard list of functions that all PMCs
-implement N<or, PMCs can choose not to implement each interface explicitly and
-instead let Parrot call the default implementations>.
-
-VTABLEs are very strict: There are a fixed number with fixed names and
-fixed argument lists. You can't just create any random VTABLE interface that
-you want to create, you can only make use of the ones that Parrot supplies
-and expects. To circumvent this limitation, PMCs may have METHODS in
-addition to VTABLEs. METHODs are arbitrary code functions that can be
-written in C, may have any name, and may implement any behavior.
-
-=head2 VTABLE Interfaces
-
-Internally, all operations on PMCs are performed by calling various VTABLE
-interfaces.
-
-
-
-=head2 Class and Object PMCs
-
-The details about various PMC classes are managed by the Class PMC. Class PMCs
-contain information about the class, available methods, the inheritance
-hierarchy of the class, and various other details. Classes can be created
-with the C<newclass> opcode:
-
-  $P0 = newclass "MyClass"
-
-Once we have created the class PMC, we can instantiate objects of that class
-using the C<new> opcode. The C<new> opcode takes either the class name or the
-Class PMC as an argument:
-
-  $P1 = new $P0        # $P0 is the Class PMC
-  $P2 = new "MyClass"  # Same
-
-The C<new> opcode can create two different types of PMC. The first type are
-the built-in core PMC classes. The built-in PMCs are written in C and cannot
-be extended from PIR without subclassing. However, you can also create
-user-defined PMC types in PIR. User-defined PMCs use the Object PMC type for
-instantiation. Object PMCs are used for all user-defined type and keep track
-of the methods and VTABLE override definitions. We're going to talk about
-methods and VTABLE overrides in the next chapter.
-
-=head2 Subclassing PMCs
-
-Existing built-in PMC types can be subclassed to associate additional data
-and methods with that PMC type. Subclassed PMC types act like their PMC
-base types, by sharing the same VTABLE methods and underlying data types.
-However, the subclass can define additional methods and attribute data
-storage. If necessary new VTABLE interfaces can be defined in PIR and old
-VTABLE methods can be overridden using PIR. We'll talk about defining
-methods and VTABLE interface overrides in the next chapter.
-
-Creating a new subclass of an existing PMC class is done using the
-C<subclass> keyword:
-
-  # create an anonymous subclass
-  $P0 = subclass 'ResizablePMCArray'
-
-  # create a subclass named "MyArray"
-  $P0 = subclass 'ResizablePMCArray', 'MyArray'
-
-This returns a C<Class> PMC which can be used to create and modify the
-class by adding attributes or creating objects of that class. You can also
-use the new class PMC to create additional subclasses:
-
-  $P0 = subclass 'ResizablePMCArray', 'MyArray'
-  $P1 = subclass $P0, 'MyOtherArray'
-
-Once you have created these classes, you can create them like normal with
-the C<new> keyword:
-
-  $P0 = new 'MyArray'
-  $P1 = new 'MyOtherArray'
-
-=head2 Attributes
+=head3 Attributes
 
 Classes and subclasses can be given attributes N<in addition to methods,
 which we will talk about in the next chapter> which are named data fields.
@@ -1651,7 +1551,26 @@ Those values added as attributes don't need to be strings, even though
 both of the ones in the example are. They can be integers, numbers
 or PMCs too.
 
-=head3 Calling Methods
+=head3 Methods
+
+PIR provides syntax to simplify writing methods and method calls for
+object-oriented programming. We've seen some method calls in the examples
+above, especially when we were talking about the interfaces to certain PMC
+types. We've also seen a little bit of information about classes and objects
+in the previous chapter. PIR allows you to define your own classes, and with
+those classes you can define method interfaces to them. Method calls follow
+the same Parrot calling conventions that we have seen above, including all the
+various parameter configurations, lexical scoping, and other aspects we have
+already talked about.
+
+The second type of class can be defined in PIR at runtime. We saw some
+examples of this in the last chapter using the C<newclass> and C<subclass>
+opcodes. We also talked about class attribute values. Now, we're going to talk
+about associating subroutines with these classes, and they're called
+I<methods>. Methods are just like other normal subroutines with two major
+changes: they are marked with the C<:method> flag, and they exist in a
+I<namespace>. Before we can talk about methods, we need to discuss
+namespaces first.
 
 Z<CHP-4-SECT-2.2>
 
@@ -1753,6 +1672,65 @@ return values just like a single line subroutine call:
 
   (res1, res2) = obj."method"(arg1, arg2)
 
+
+=head3 Introspection
+
+The details about various PMC classes are managed by the Class PMC. Class PMCs
+contain information about the class, available methods, the inheritance
+hierarchy of the class, and various other details. Classes can be created
+with the C<newclass> opcode:
+
+  $P0 = newclass "MyClass"
+
+Once we have created the class PMC, we can instantiate objects of that class
+using the C<new> opcode. The C<new> opcode takes either the class name or the
+Class PMC as an argument:
+
+  $P1 = new $P0        # $P0 is the Class PMC
+  $P2 = new "MyClass"  # Same
+
+The C<new> opcode can create two different types of PMC. The first type are
+the built-in core PMC classes. The built-in PMCs are written in C and cannot
+be extended from PIR without subclassing. However, you can also create
+user-defined PMC types in PIR. User-defined PMCs use the Object PMC type for
+instantiation. Object PMCs are used for all user-defined type and keep track
+of the methods and VTABLE override definitions. We're going to talk about
+methods and VTABLE overrides in the next chapter.
+
+=head2 Subclassing PMCs
+
+Existing built-in PMC types can be subclassed to associate additional data
+and methods with that PMC type. Subclassed PMC types act like their PMC
+base types, by sharing the same VTABLE methods and underlying data types.
+However, the subclass can define additional methods and attribute data
+storage. If necessary new VTABLE interfaces can be defined in PIR and old
+VTABLE methods can be overridden using PIR. We'll talk about defining
+methods and VTABLE interface overrides in the next chapter.
+
+Creating a new subclass of an existing PMC class is done using the
+C<subclass> keyword:
+
+  # create an anonymous subclass
+  $P0 = subclass 'ResizablePMCArray'
+
+  # create a subclass named "MyArray"
+  $P0 = subclass 'ResizablePMCArray', 'MyArray'
+
+This returns a C<Class> PMC which can be used to create and modify the
+class by adding attributes or creating objects of that class. You can also
+use the new class PMC to create additional subclasses:
+
+  $P0 = subclass 'ResizablePMCArray', 'MyArray'
+  $P1 = subclass $P0, 'MyOtherArray'
+
+Once you have created these classes, you can create them like normal with
+the C<new> keyword:
+
+  $P0 = new 'MyArray'
+  $P1 = new 'MyOtherArray'
+
+
+
 =head3 Vtable Overrides
 
 PMCs all subscribe to a common interface of functions called X<VTABLE>
@@ -1760,9 +1738,7 @@ VTABLEs. Every PMC implements the same set of these interfaces, which
 perform very specific low-level tasks on the PMC. The term VTABLE was
 originally a shortened form of the name "virtual function table",
 although that name isn't used any more by the developers, or in any of
-the documentation N<In fact, if you say "virtual function table" to
-one of the developers, they probably won't know what you are talking
-about>. The virtual functions in the VTABLE, called X<VTABLE
+the documentation. The virtual functions in the VTABLE, called X<VTABLE
 interfaces> VTABLE interfaces, are similar to ordinary functions and
 methods in many respects. VTABLE interfaces are occasionally called
 "VTABLE functions", or "VTABLE methods" or even "VTABLE entries" in
@@ -1840,7 +1816,7 @@ the PMC on which the VTABLE interface is invoked, just like in a method
 declaration.
 
 
-=head2 Roles
+=head3 Roles
 
 As we've seen above and in the previous chapter, Class PMCs and NameSpace
 PMCs work to keep classes and methods together in a logical way. There is
@@ -1879,18 +1855,11 @@ Roles are very useful for ensuring that related classes all implement a common
 interface.  
 
 
-=head2 Input and Output
+=head2 Filehandles
 
 Like almost everything else in Parrot, input and output are handled by PMCs.
-Using the C<print> opcode or the C<say> opcode like we've already seen in
-some examples does this internally without your knowledge. However, we can
-do it explicitly too. First we'll talk about basic I/O, and then we will talk
-about using PMC-based filehandles for more advanced operations.
 
-=head2 Basic I/O Opcodes
-
-We've seen C<print> and C<say>. These are carry-over artifacts from Perl, when
-Parrot was simply the VM backend to the Perl 6 language. C<print> prints
+We've seen C<print> and C<say>. C<print> prints
 the given string argument, or the stringified form of the argument, if it's
 not a string, to standard output. C<say> does the same thing but also appends
 a trailing newline to it. Another opcode worth mentioning is the C<printerr>
@@ -1913,8 +1882,6 @@ standard output:
   .end
 
 =end PIR
-
-=head2 Filehandles
 
 The ops we have seen so far are useful if all your I/O operations are limited
 to the standard streams. However, there are plenty of other places where
@@ -2210,7 +2177,7 @@ if you want:
   my_handler:
     ...
 
-=head3 Rethrowing and Exception Propagation
+=head3 Rethrowing Exceptions
 
 Exception handlers are nested and are stored in a stack. This is because not
 all handlers are intended to handle all exceptions. If a handler cannot deal
