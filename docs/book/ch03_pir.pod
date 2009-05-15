@@ -295,7 +295,8 @@ be the same type, but there are a few exceptions:
 
 =end PIR
 
-If the result is an integer type, like C<$I0>, the arguments must be integer variables or constants. A
+If the result is an integer type, like C<$I0>, the arguments must be
+integer variables or constants. A
 floating-point result, like C<$N0>, usually requires
 floating-point arguments, but many math instructions also allow the final
 argument to be an integer. Instructions with a PMC result may
@@ -477,7 +478,8 @@ account for all the complexity of human-readable (and computer-representable)
 textual data.
 
 X<PIR (Parrot assembly language);string operations>
-String operations work with string registers and string-like PMCs. String operations on PMC registers require all their string
+String operations work with string registers and string-like PMCs.
+String operations on PMC registers require all their string
 arguments to be String PMCs.
 
 =head4 Concatenating strings
@@ -1292,8 +1294,10 @@ Polymorphic Containers (PMCs) are the basis for complex data types and
 object-oriented behavior in Parrot. In PIR, any variable that isn't a
 low-level integer, number, or string is a PMC
 
-Operations on a PMC are implemented by vtable functions. The result of an operation is entirely determined by the behavior of
-the PMCs vtable. Since PMCs define their own behavior for these vtable functions, it's important to familiarize yourself with the behavior
+Operations on a PMC are implemented by vtable functions. The result of
+an operation is entirely determined by the behavior of
+the PMCs vtable. Since PMCs define their own behavior for these vtable
+functions, it's important to familiarize yourself with the behavior
 of the particular PMC before you start performing a lot of operations on it.
 
 =head3 Assignment
@@ -2581,7 +2585,8 @@ This prints:
   in cont 1
   done
 
-Continuations are a kind of subroutine that take a snapshots of control flow. They are frozen images of the current
+Continuations are a kind of subroutine that take a snapshots of control
+flow. They are frozen images of the current
 execution state of the VM. Once you have a continuation, you can invoke it to
 return to the point where the continuation was first created. It's like a
 magical timewarp that allows the developer to arbitrarily move control flow
@@ -2626,7 +2631,8 @@ values:
 X<continuation passing style>
 X<CPS>
 
-Parrot uses continuations internally for control flow. When Parrot invokes a function, it creates a continuation representing the
+Parrot uses continuations internally for control flow. When Parrot
+invokes a function, it creates a continuation representing the
 current point in the program.  It passes this continuation as an invisible
 parameter to the function call.  When that function returns, it invokes the
 continuation -- in effect, it performs a goto to the point of creation of that
@@ -4779,7 +4785,8 @@ if you want:
 Exception handlers are nested and are stored in a stack. This is because not
 all handlers are intended to handle all exceptions. If a handler cannot deal
 with a particular exception, it can C<rethrow> the exception to the next outer handler
-handler. If none of the set handlers can handle the exception, the exception is a fatal error and Parrot will exit.
+handler. If none of the set handlers can handle the exception, the
+exception is a fatal error and Parrot will exit.
 
 =head2 Annotations
 
