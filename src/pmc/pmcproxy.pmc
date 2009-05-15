@@ -51,7 +51,6 @@ NOTE: No doubt we will need other things later; this is a start.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/oo_private.h"
 
 /*

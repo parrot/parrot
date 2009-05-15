@@ -22,8 +22,6 @@ C<File> is a singleton class which provides access to File functions.
 #  include <direct.h>
 #endif
 
-#include "parrot/parrot.h"
-
 /* RT#46681 apparently, strerror_r is thread-safe and should be used instead.*/
 
 static PMC *File_PMC;

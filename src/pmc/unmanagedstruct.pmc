@@ -22,7 +22,6 @@ bounds access will very likely segfault.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/compiler.h"
 
 static INTVAL key_2_idx(PARROT_INTERP, PMC *pmc, PMC *key);

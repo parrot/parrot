@@ -19,8 +19,6 @@ stores Parrot strings.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass FixedStringArray need_ext provides array {
     ATTR STRING **str_array; /* where the STRINGs are stored */
     ATTR UINTVAL  size;      /* element count */

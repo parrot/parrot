@@ -21,9 +21,7 @@ after invocation.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
-
 
 pmclass RetContinuation extends Continuation need_ext {
 

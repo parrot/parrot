@@ -18,7 +18,6 @@ The FileHandle PMC performs I/O operations on a source or destination file.
 
 */
 
-#include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
 #ifdef PARROT_HAS_READLINE

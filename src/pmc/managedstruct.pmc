@@ -19,8 +19,6 @@ C<struct> values that Parrot is responsible for disposing of.
 
 */
 
-#include "parrot/parrot.h"
-
 typedef void (*custom_free_func_t)(PARROT_INTERP, void *ptr, void *priv);
 typedef PMC * (*custom_clone_func_t)(PARROT_INTERP, PMC *ptr, void *priv);
 

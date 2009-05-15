@@ -19,8 +19,6 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass FixedFloatArray need_ext provides array {
     ATTR INTVAL    size;
     ATTR FLOATVAL *float_array;

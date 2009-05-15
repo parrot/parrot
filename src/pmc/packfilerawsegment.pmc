@@ -24,8 +24,6 @@ PDD13 for the design spec.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass PackfileRawSegment extends PackfileSegment {
     /* ResizableIntegerArray of opcodes */
     ATTR PMC    *opcodes;

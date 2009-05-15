@@ -18,8 +18,6 @@ These are the vtable functions for the Array base class.
 
 */
 
-#include "parrot/parrot.h"
-
 /*
 
 =item C<static PMC *undef(PARROT_INTERP)>

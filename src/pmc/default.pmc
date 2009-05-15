@@ -21,8 +21,6 @@ generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.
 
 */
 
-#include "parrot/parrot.h"
-
 #define INT2KEY(i, k) key_new_integer((i), (k))
 
 /* undef 'interface' to keep MSVC happy */

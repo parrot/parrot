@@ -20,8 +20,6 @@ functions in F<src/string.c>.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass String extends scalar provides string provides scalar {
     ATTR STRING * str_val;
 

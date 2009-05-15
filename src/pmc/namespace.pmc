@@ -18,7 +18,6 @@ These are the vtable functions for the namespace PMC.
 
 */
 
-#include "parrot/parrot.h"
 #include "pmc_sub.h"
 
 static void add_to_class(

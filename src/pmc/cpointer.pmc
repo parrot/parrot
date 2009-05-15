@@ -46,8 +46,6 @@ These are the vtable functions for the CPointer class.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass CPointer need_ext {
     ATTR void   *pointer; /* The stored pointer. */
     ATTR STRING *sig;     /* A string signature for the pointer. */

@@ -18,7 +18,6 @@ Implements the core concurrency scheduler.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
 pmclass Scheduler need_ext {

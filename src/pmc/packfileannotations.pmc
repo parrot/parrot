@@ -27,7 +27,6 @@ PackfileConstantTable. Otherwise PackfileAnnotationKey can't be created.
 
 */
 
-#include "parrot/parrot.h"
 #include "pmc_packfileannotation.h"
 
 pmclass PackfileAnnotations extends PackfileSegment {

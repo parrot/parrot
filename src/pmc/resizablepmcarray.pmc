@@ -19,8 +19,6 @@ It puts things into Integer, Float, or String PMCs as appropriate.
 
 */
 
-#include "parrot/parrot.h"
-
 #define PMC_size(x)      ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x)     ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->pmc_array
 #define PMC_threshold(x) ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->resize_threshold

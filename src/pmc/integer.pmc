@@ -19,8 +19,6 @@ integer type without going to an I register.
 
 */
 
-#include "parrot/parrot.h"
-
 #include "pmc_bigint.h"
 
 static void

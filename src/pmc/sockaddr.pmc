@@ -21,8 +21,6 @@ These are the vtable functions for the Sockaddr class.
 
 */
 
-#include "parrot/parrot.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

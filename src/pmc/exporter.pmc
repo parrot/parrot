@@ -78,8 +78,6 @@ A Null PMC is allocated during initialization.
 
 */
 
-#include "parrot/parrot.h"
-
 /*
 
 =back

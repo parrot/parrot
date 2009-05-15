@@ -61,8 +61,6 @@ The C<new> can alternatively be written as:
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass Iterator no_ro {
     ATTR PMC *aggregate; /* the aggregate which this Iterator iterates */
     ATTR PMC *key;       /* the Key used by this Iterator */

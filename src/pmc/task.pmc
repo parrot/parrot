@@ -18,7 +18,6 @@ Implements the basic task behavior for the concurrency scheduler.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/scheduler_private.h"
 
 pmclass Task need_ext {

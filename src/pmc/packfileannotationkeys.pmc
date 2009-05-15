@@ -24,8 +24,6 @@ PDD13 for the design spec.
 
 */
 
-#include "parrot/parrot.h"
-
 /*
 Fetch PackfileConstantTable from PackfileAnnotationKeys.
 Throw exception if table wasn't initilized.

@@ -18,9 +18,7 @@ These are the vtable functions for the scalar base PMC class
 
 */
 
-#include "parrot/parrot.h"
 #include "pmc_bigint.h"
-
 
 static PMC *
 bitwise_left_shift_internal(PARROT_INTERP, PMC *self,

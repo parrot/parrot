@@ -24,8 +24,6 @@ never be set for user arrays.
 
 */
 
-#include "parrot/parrot.h"
-
 #define PMC_size(x)  ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x) ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->pmc_array
 

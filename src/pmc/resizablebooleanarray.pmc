@@ -20,9 +20,6 @@ C<ResizableBooleanArray PMC> extends the C<FixedBooleanArray PMC>.
 
 */
 
-#include "parrot/parrot.h"
-
-
 #define BITS_PER_CHAR 8
 /* MIN_ALLOC is 8 * BITS_PER_CHAR */
 #define MIN_ALLOC 64

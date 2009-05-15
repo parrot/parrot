@@ -22,8 +22,6 @@ C<BigInt> provides arbitrary precision integer mathematic functions.
 
 */
 
-#include "parrot/parrot.h"
-
 /* TODO split that out into a separate file */
 
 #ifdef S_SPLINT_S

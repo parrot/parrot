@@ -19,7 +19,6 @@ than an external file. Commonly used as a mock FileHandle for testing.
 
 */
 
-#include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
 pmclass StringHandle need_ext {

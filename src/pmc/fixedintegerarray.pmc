@@ -19,8 +19,6 @@ INTVALs.  It uses Integer PMCs for all of the conversions.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass FixedIntegerArray need_ext provides array {
     ATTR INTVAL   size;  /* number of INTVALs stored in this array */
     ATTR INTVAL * int_array; /* INTVALs are stored here */

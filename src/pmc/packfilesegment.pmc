@@ -23,8 +23,6 @@ spec.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass PackfileSegment {
     /*
     Directory which owns this segment. Required for correct pack/unpack

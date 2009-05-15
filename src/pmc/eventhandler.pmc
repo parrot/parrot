@@ -19,8 +19,6 @@ Event.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass EventHandler extends Sub need_ext {
 
     ATTR STRING *type;          /* the type of the event to handle */

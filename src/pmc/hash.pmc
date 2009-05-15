@@ -18,7 +18,6 @@ These are the vtable functions for the Hash PMC.
 
 */
 
-#include "parrot/parrot.h"
 #include "pmc_iterator.h"
 #include "pmc_key.h"
 

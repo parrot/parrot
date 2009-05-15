@@ -18,7 +18,6 @@ The Socket PMC performs network I/O operations.
 
 */
 
-#include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
 pmclass Socket extends FileHandle need_ext {

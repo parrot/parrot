@@ -18,7 +18,6 @@ These are the vtable functions for the Sub (subroutine) base class
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/oplib/ops.h"
 #include "sub.str"
 

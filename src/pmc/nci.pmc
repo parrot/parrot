@@ -18,8 +18,6 @@ The vtable functions for the native C call functions.
 
 */
 
-#include "parrot/parrot.h"
-
 typedef INTVAL (*nci_sub_t)(PARROT_INTERP, PMC *);
 typedef INTVAL (*nci_jit_sub_t)(PARROT_INTERP, PMC *, char *);
 

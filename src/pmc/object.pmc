@@ -18,7 +18,6 @@ Implements an instance of a class.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/oo_private.h"
 #include "pmc_class.h"
 

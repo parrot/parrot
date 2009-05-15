@@ -25,7 +25,6 @@ These are the vtable functions for the ParrotInterpreter base class
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/embed.h"
 #include "parrot/dynext.h"
 #include "parrot/io.h"

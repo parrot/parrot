@@ -21,8 +21,6 @@ PMC.
 
 */
 
-#include "parrot/parrot.h"
-
 #define BITS_PER_CHAR 8
 
 pmclass FixedBooleanArray need_ext provides array {

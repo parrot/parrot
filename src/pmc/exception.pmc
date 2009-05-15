@@ -49,7 +49,6 @@ These arguments can be retrieved with the C<get_results> opcode.
 
 */
 
-#include "parrot/parrot.h"
 #include "parrot/exceptions.h"
 #include "pmc_sub.h"
 

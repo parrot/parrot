@@ -18,9 +18,6 @@ These are the vtable functions for the Capture PMC.
 
 */
 
-#include "parrot/parrot.h"
-
-
 #define CAPTURE_DATA_SIZE   2
 #define CAPTURE_array_CREATE(i, obj) \
     if (!PARROT_CAPTURE(obj)->array) \

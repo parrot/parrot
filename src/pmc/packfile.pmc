@@ -19,7 +19,6 @@ the top level parser and serializer for *.pbc files.
 
 */
 
-#include "parrot/parrot.h"
 #include "pmc_packfiledirectory.h"
 
 /*

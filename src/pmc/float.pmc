@@ -18,8 +18,6 @@ C<Float> extends C<scalar> to provide floating-point number operations.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass Float extends scalar provides float provides scalar {
     ATTR FLOATVAL fv;
 

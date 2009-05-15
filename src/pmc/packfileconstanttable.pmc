@@ -24,8 +24,6 @@ PDD13 for the design spec.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass PackfileConstantTable extends PackfileSegment {
     /* ResizablePMCArray for storing constants */
     ATTR PMC *constants;

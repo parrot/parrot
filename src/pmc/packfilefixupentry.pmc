@@ -19,8 +19,6 @@ PackfileFixupTable segment of the .pbc file.  See PDD13 for a design spec.
 
 */
 
-#include "parrot/parrot.h"
-
 pmclass PackfileFixupEntry {
     ATTR INTVAL     type;
     ATTR STRING     *name;

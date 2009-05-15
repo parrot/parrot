@@ -28,8 +28,6 @@ a ParrotLibrary PMC.
 
 */
 
-#include "parrot/parrot.h"
-
 #define PMC_dlhandle(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->dl_handle
 #define PMC_oplib_init(x) ((Parrot_ParrotLibrary_attributes*)PMC_data(x))->oplib_init
 

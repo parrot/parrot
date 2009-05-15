@@ -19,7 +19,6 @@ evaluation and execution.
 
 */
 
-#include "parrot/parrot.h"
 #include "pmc_sub.h"
 
 static void

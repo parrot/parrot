@@ -90,7 +90,6 @@ An empty ResizablePMCArray PMC is allocated during initialization.
 */
 
 #define PARROT_IN_OBJECTS_C /* To get the vtable.h imports we want. */
-#include "parrot/parrot.h"
 #include "parrot/oo_private.h"
 #include "pmc_object.h"
 #include "pmc_namespace.h"

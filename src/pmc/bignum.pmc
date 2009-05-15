@@ -131,8 +131,6 @@ Make auto-upgrading/downgrading work.
 
 */
 
-#include "parrot/parrot.h"
-
 #ifdef S_SPLINT_S
 #  undef PARROT_HAS_GMP /* splint barfs on the gmp.h header */
 #endif /* S_SPLINT_S */
