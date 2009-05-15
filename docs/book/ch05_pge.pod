@@ -99,6 +99,8 @@ different systems. If you compiled Parrot from source, it will be:
 Next, create a small PIR script to run your grammar. Save it as
 F<grammar_test.pir>:
 
+=begin PIR
+
   .sub main :main
       load_bytecode 'PGE.pbc'        # load some required modules
       load_bytecode 'dumper.pbc'
@@ -116,6 +118,8 @@ F<grammar_test.pir>:
 
       _dumper(match, "match")
   .end
+
+=end PIR
 
 Run the test script:
 
@@ -1349,6 +1353,8 @@ name> as the rule to implement the behavior of the operator.  Here's a proto:
 
 ... and its corresponding PIR rule:
 
+=begin PIR
+
  .sub 'infix:+'
     .param pmc a
     .param pmc b
@@ -1356,6 +1362,8 @@ name> as the rule to implement the behavior of the operator.  Here's a proto:
     c = a + b
     .return(c)
  .end
+
+=end PIR
 
 You may ask "Why have an C<is subname()> property, if you can define all
 operators as subroutines?" Using the C<is subname()> property allows PCT to
@@ -1366,17 +1374,21 @@ functionality of the operator.  There is no sense in duplicating behavior.
 The great thing about protos being overloadable is that you can specify
 different functions to call with different signatures:
 
+=begin PIR
+
  .sub 'infix:+' :multi('Integer', 'Integer')
-    ...
+    #...
  .end
 
  .sub 'infix:+' :multi('CLispRatio', 'Number')
-    ...
+    #...
  .end
 
  .sub 'infix:+' :multi('Perl6Double', 'PythonInteger')
-    ...
+    #...
  .end
+
+=end PIR
 
 This list can be a bit intimidating, and it's hard to imagine that it would be
 necessary to write up a new function to handle addition between every

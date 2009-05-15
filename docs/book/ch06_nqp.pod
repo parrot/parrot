@@ -67,11 +67,15 @@ variadic argument list:
 
 Which calls the PIR function:
 
+=begin PIR
+
  .namespace []
  .sub 'create_new_array'
      .param pmc elems :slurpy
      .return(elems)
  .end
+
+=end PIR
 
 Remember how we said NQP was a bare-bones subset of Perl 6? It really doesn't
 have a lot of features that programmers might expect. In this chapter we will
