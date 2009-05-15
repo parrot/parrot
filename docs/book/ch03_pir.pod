@@ -33,8 +33,12 @@ X<comments (PIR)>
 A comment begins with the C<#> symbol, and continues until the end of the line.
 Comments can stand alone on a line or follow a statement or directive.
 
+=begin PIR
+
     # This is a regular comment. The PIR
     # interpreter ignores this.
+
+=end PIR
 
 X<Pod documentation>
 PIR also treats inline documentation in Pod format as a comment. An
@@ -59,13 +63,21 @@ labels use all capital letters to stand out from the rest of the source
 code. It's fine to put a label on the same line as a statement or
 directive:
 
+=begin PIR_FRAGMENT
+
     GREET: print "'Allo, 'allo, 'allo."
+
+=end PIR_FRAGMENT
 
 Readability is improved by putting labels on separate lines, outdented
 to stand apart from the ordiary code flow:
 
+=begin PIR_FRAGMENT
+
   GREET:
     print "'Allo, 'allo, 'allo."
+
+=end PIR_FRAGMENT
 
 =head3 Statements
 
@@ -77,17 +89,29 @@ A statement is either an opcode or syntactic sugar for one or more opcodes. An
 opcode is a native instruction for the virtual machine; it consists of the name
 of the instruction followed by zero or more arguments.
 
+=begin PIR_FRAGMENT
+
   print "Norwegian Blue"
+
+=end PIR_FRAGMENT
 
 PIR also provides higher-level constructs, including symbol operators:
 
+=begin PIR_FRAGMENT
+
   $I1 = 2 + 5
+
+=end PIR_FRAGMENT
 
 Under the hood, these special statement forms are just syntactic sugar for
 regular opcodes. The C<+> symbol corresponds to the C<add> opcode, the C<->
 symbol to the C<sub> opcode, and so on. The previous example is equivalent to:
 
+=begin PIR_FRAGMENT
+
   add $I1, 2, 5
+
+=end PIR_FRAGMENT
 
 =head3 Directives
 
@@ -97,34 +121,54 @@ that occur at compile time. Other directives represent complex
 operations that require the generation of multiple instructions.  The
 C<.local> directive, for example, declares a named variable.
 
+=begin PIR_FRAGMENT
+
   .local string hello
+
+=end PIR_FRAGMENT
 
 =head3 Literals
 
 Integers and floating point numbers are numeric literals. They can be positive
 or negative.
 
+=begin PIR_FRAGMENT
+
   $I0 = 42       # positive
   $I1 = -1       # negative
 
+=end PIR_FRAGMENT
+
 Integer literals can also be binary, octal, or hexadecimal:
+
+=begin PIR_FRAGMENT_INVALID
 
   $I3 = 0b01010  # binary
   $I3 = 0o78     # octal
   $I2 = 0xA5     # hexadecimal
 
+=end PIR_FRAGMENT_INVALID
+
 Floating point number literals have a decimal point, and can use scientific
 notation:
 
+=begin PIR_FRAGMENT
+
   $N0 = 3.14
   $N2 = -1.2e+4
+
+=end PIR_FRAGMENT
 
 X<strings;in PIR>
 String literals are enclosed in single or double-quotes.N<L<Strings>
 explains the differences between the quoting types.>
 
+=begin PIR_FRAGMENT
+
   $S0 = "This is a valid literal string"
   $S1 = 'This is also a valid literal string'
+
+=end PIR_FRAGMENT
 
 =head3 Variables
 
@@ -138,17 +182,25 @@ single character which specifies the type of the variableE<mdash>integer
 (C<I>), number (C<N>), string (C<S>), or PMC (C<P>)E<mdash>, and end
 with a unique number. Register variables don't need to be predeclared:
 
+=begin PIR_FRAGMENT
+
   $S0 = "Who's a pretty boy, then?"
   print $S0
+
+=end PIR_FRAGMENT
 
 PIR also has named variables, which are declared with the C<.local>
 directive. As with register variables, there are four valid types:
 C<int>, C<num>, C<string>, and C<pmc>. Named variables have to be
 declared, but otherwise behave exactly the same as register variables.
 
+=begin PIR_FRAGMENT_INVALID
+
   .local string hello
   hello "'Allo, 'allo, 'allo."
   print hello
+
+=end PIR_FRAGMENT_INVALID
 
 =head3 Constants
 
@@ -161,16 +213,24 @@ and can never be changed. Like C<.local>, C<.const> takes a type and a
 name. It also requires a literal argument to set the value of the
 constant.
 
+=begin PIR_FRAGMENT
+
   .const int    frog = 4                       # integer constant
   .const string name = "Superintendent Parrot" # string constant
   .const num    pi   = 3.14159                 # floating point constant
+
+=end PIR_FRAGMENT
 
 Named constants may be used in all the same places as literals, but have
 to be declared beforehand. The following example declares a named string
 constant C<hello> and prints the value:
 
+=begin PIR_FRAGMENT
+
   .const string hello = "Hello, Polly."
   print hello
+
+=end PIR_FRAGMENT
 
 =head3 Control Structures
 
@@ -183,16 +243,24 @@ jump inside a subroutine, and only to a named label.> In the following
 code example, the C<print> statement will run immediately after the
 C<goto> statement:
 
+=begin PIR_FRAGMENT
+
     goto GREET
     # ... some skipped code ...
 
   GREET:
     print "'Allo, 'allo, 'allo."
 
+=end PIR_FRAGMENT
+
 Variations on the basic C<goto> check whether a particular condition is
 true or false before jumping:
 
+=begin PIR_FRAGMENT
+
   if $I0 > 5 goto GREET
+
+=end PIR_FRAGMENT
 
 All of the traditional control structures can be constructed from PIR's
 control building blocks.
@@ -205,10 +273,14 @@ and look a lot like named variable declarations. The following example
 declares a subroutined named C<greeting>, that takes a single string
 parameter named C<hello>:
 
+=begin PIR
+
   .sub greeting
       .param string hello
       print hello
   .end
+
+=end PIR
 
 =head3 That's All Folks
 
