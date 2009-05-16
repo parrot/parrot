@@ -623,31 +623,6 @@ aligned_string_size(size_t len)
 
 =over 4
 
-
-=item C<void Parrot_allocate(PARROT_INTERP, Buffer *buffer, size_t size)>
-
-Allocate buffer memory for the given Buffer pointer. The C<size>
-has to be a multiple of the word size.
-C<PObj_buflen> will be set to exactly the given C<size>.
-
-=cut
-
-*/
-
-void
-Parrot_allocate(PARROT_INTERP, ARGOUT(Buffer *buffer), size_t size)
-{
-    ASSERT_ARGS(Parrot_allocate)
-    PObj_buflen(buffer) = 0;
-    PObj_bufstart(buffer) = NULL;
-    PARROT_ASSERT((size & WORD_ALIGN_1) == 0);
-    PObj_bufstart(buffer) = mem_allocate(interp, size,
-            interp->arena_base->memory_pool);
-    PObj_buflen(buffer) = size;
-}
-
-/*
-
 =item C<static Memory_Pool * new_memory_pool(size_t min_block, compact_f
 compact)>
 
@@ -679,7 +654,7 @@ new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 
 /*
 
-=item C<void Parrot_initialize_memory_pools(PARROT_INTERP)>
+=item C<void initialize_memory_pools(PARROT_INTERP)>
 
 Initialize the managed memory pools. Parrot maintains two C<Memory_Pool>
 structures, the general memory pool and the constant string pool. Create
@@ -691,9 +666,9 @@ for both.
 */
 
 void
-Parrot_initialize_memory_pools(PARROT_INTERP)
+initialize_memory_pools(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_initialize_memory_pools)
+    ASSERT_ARGS(initialize_memory_pools)
     Arenas * const arena_base = interp->arena_base;
 
     arena_base->memory_pool   = new_memory_pool(POOL_SIZE, &compact_pool);
@@ -750,60 +725,6 @@ merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
     source->possibly_reclaimable   = 0;
     source->guaranteed_reclaimable = 0;
 }
-
-/*
-
-=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
-
-Records the start time of a GC mark run when profiling is enabled.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_start(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_profile_start)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
-        interp->profile->gc_time = Parrot_floatval_time();
-}
-
-/*
-
-=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
-
-Records the end time of the GC mark run part C<what> run when profiling is
-enabled. Also record start time of next part.
-
-=cut
-
-*/
-
-void
-Parrot_gc_profile_end(PARROT_INTERP, int what)
-{
-    ASSERT_ARGS(Parrot_gc_profile_end)
-    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
-        RunProfile * const profile = interp->profile;
-        const FLOATVAL     now     = Parrot_floatval_time();
-
-        profile->data[what].numcalls++;
-        profile->data[what].time += now - profile->gc_time;
-
-        /*
-         * we've recorded the time of a GC piece from
-         * gc_time until now, so add this to the start of the
-         * currently executing opcode, which hasn't run this
-         * interval.
-         */
-        profile->starttime += now - profile->gc_time;
-
-        /* prepare start for next step */
-        profile->gc_time    = now;
-    }
-}
-
 
 /*
 

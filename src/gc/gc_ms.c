@@ -284,8 +284,8 @@ gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 /*
 
-=item C<static int gc_ms_sweep_cb(PARROT_INTERP, Small_Object_Pool *pool,
-int flag, void *arg)>
+=item C<static int gc_ms_sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int
+flag, void *arg)>
 
 Sweeps the given pool for the MS collector. This function also ends
 the profiling timer, if profiling is enabled. Returns the total number

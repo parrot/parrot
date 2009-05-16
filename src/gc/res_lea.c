@@ -155,7 +155,8 @@ Parrot_gc_reallocate_buffer_storage(PARROT_INTERP, Buffer *buffer, size_t newsiz
 
 /*
 
-=item C<void Parrot_allocate(PARROT_INTERP, Buffer *buffer, size_t size)>
+=item C<void Parrot_gc_allocate_buffer_storage_aligned(PARROT_INTERP,
+Buffer *buffer, size_t size)>
 
 Allocate buffer memory for the given Buffer pointer. The C<size>
 has to be a multiple of the word size.
@@ -238,7 +239,7 @@ Parrot_gc_allocate_string_storage(PARROT_INTERP, STRING *str, size_t size)
 
 /*
 
-=item C<void Parrot_initialize_memory_pools(PARROT_INTERP)>
+=item C<void initialize_memory_pools(PARROT_INTERP)>
 
 Does nothing.
 
@@ -247,7 +248,7 @@ Does nothing.
 */
 
 void
-Parrot_initialize_memory_pools(PARROT_INTERP)
+initialize_memory_pools(PARROT_INTERP)
 {
     ASSERT_ARGS(parrot_initialize_memory_pools)
 }

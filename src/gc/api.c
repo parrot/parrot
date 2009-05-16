@@ -182,7 +182,7 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
     Parrot_gc_gms_init(interp);
 #endif
 
-    Parrot_initialize_memory_pools(interp);
+    initialize_memory_pools(interp);
     initialize_header_pools(interp);
 }
 
