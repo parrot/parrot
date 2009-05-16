@@ -453,12 +453,12 @@ PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
 const char *
-Parrot_get_vtable_name(PARROT_INTERP, INTVAL idx)
+Parrot_get_vtable_name(SHIM_INTERP, INTVAL idx)
 {
     ASSERT_ARGS(Parrot_get_vtable_name)
 
-    INTVAL low               = PARROT_VTABLE_LOW;
-    INTVAL high              = NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW;
+    const INTVAL low  = PARROT_VTABLE_LOW;
+    const INTVAL high = NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW;
 
     PARROT_ASSERT(idx > 0);
 
@@ -1117,14 +1117,14 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 {
     ASSERT_ARGS(Parrot_ComputeMRO_C3)
 
-    PMC *merge_list        = PMCNULL;
-    PMC *immediate_parents = VTABLE_inspect_str(interp, _class, CONST_STRING(interp, "parents"));
+    PMC * const immediate_parents = VTABLE_inspect_str(interp, _class, CONST_STRING(interp, "parents"));
+    PMC *merge_list;
     PMC *result;
 
-    int  i, parent_count;
+    INTVAL i;
+    INTVAL parent_count;
 
     /* Now get immediate parents list. */
-
     if (!immediate_parents)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
             "Failed to get parents list from class!");
@@ -1140,6 +1140,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
     /* Otherwise, need to do merge. For that, need linearizations of all of
      * our parents added to the merge list. */
+    merge_list = PMCNULL;
     for (i = 0; i < parent_count; i++) {
         PMC * const lin = Parrot_ComputeMRO_C3(interp,
             VTABLE_get_pmc_keyed_int(interp, immediate_parents, i));

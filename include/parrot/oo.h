@@ -96,8 +96,7 @@ INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-const char * Parrot_get_vtable_name(PARROT_INTERP, INTVAL idx)
-        __attribute__nonnull__(1);
+const char * Parrot_get_vtable_name(SHIM_INTERP, INTVAL idx);
 
 PARROT_EXPORT
 void Parrot_invalidate_method_cache(PARROT_INTERP,
@@ -197,8 +196,7 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_get_vtable_index __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name)
-#define ASSERT_ARGS_Parrot_get_vtable_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_get_vtable_name __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_invalidate_method_cache \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
