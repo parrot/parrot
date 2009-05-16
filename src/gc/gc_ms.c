@@ -193,12 +193,12 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         if (interp->scheduler) {
             Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
             VTABLE_mark(interp, interp->scheduler);
-            Parrot_gc_sweep(interp, interp->arena_base->pmc_pool);
+            Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
         }
 
         /* now sweep everything that's left */
-        Parrot_gc_sweep(interp, interp->arena_base->pmc_pool);
-        Parrot_gc_sweep(interp, interp->arena_base->constant_pmc_pool);
+        Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
+        Parrot_gc_sweep_pool(interp, interp->arena_base->constant_pmc_pool);
 
         return;
     }
@@ -271,7 +271,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
     ASSERT_ARGS(sweep_cb)
     int * const total_free = (int *) arg;
 
-    Parrot_gc_sweep(interp, pool);
+    Parrot_gc_sweep_pool(interp, pool);
 
     if (interp->profile && (flag & POOL_PMC))
         Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);

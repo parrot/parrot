@@ -884,7 +884,7 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
 flag, void *arg)>
 
 Performs a garbage collection sweep of the given pmc pool, then frees it. Calls
-C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
+C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and
 all its arenas. Always returns C<0>.
 
 =cut
@@ -895,7 +895,7 @@ static int
 sweep_cb_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
         SHIM(int flag), SHIM(void *arg))
 {
-    Parrot_gc_sweep(interp, pool);
+    Parrot_gc_sweep_pool(interp, pool);
     free_pool(pool);
     return 0;
 }
@@ -906,7 +906,7 @@ sweep_cb_pmc(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool),
 flag, void *arg)>
 
 Performs a final garbage collection sweep, then frees the pool. Calls
-C<Parrot_gc_sweep> to perform the sweep, and C<free_pool> to free the pool and
+C<Parrot_gc_sweep_pool> to perform the sweep, and C<free_pool> to free the pool and
 all its arenas.
 
 =cut
@@ -929,7 +929,7 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
 
     {
         UNUSED(arg);
-        Parrot_gc_sweep(interp, pool);
+        Parrot_gc_sweep_pool(interp, pool);
         free_pool(pool);
     }
 

@@ -191,7 +191,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 /*
 
-=item C<void Parrot_gc_sweep(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<void Parrot_gc_sweep_pool(PARROT_INTERP, Small_Object_Pool *pool)>
 
 Puts any buffers/PMCs that are now unused onto the pool's free list. If
 C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoids buffers that
@@ -202,9 +202,9 @@ are immune from collection (i.e. constant).
 */
 
 void
-Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
-    ASSERT_ARGS(Parrot_gc_sweep)
+    ASSERT_ARGS(Parrot_gc_sweep_pool)
     UINTVAL total_used        = 0;
     const UINTVAL object_size = pool->object_size;
 

@@ -349,7 +349,7 @@ void Parrot_gc_clear_live_bits(PARROT_INTERP,
 void Parrot_gc_run_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+void Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
@@ -386,7 +386,7 @@ int trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_Parrot_gc_run_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_gc_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_Parrot_gc_sweep_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_Parrot_gc_trace_children __attribute__unused__ int _ASSERT_ARGS_CHECK = \

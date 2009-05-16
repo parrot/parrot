@@ -771,7 +771,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag, ARGIN(void *a
     ASSERT_ARGS(sweep_cb)
     int * const n_obj = (int *)arg;
 
-    Parrot_gc_sweep(interp, pool);
+    Parrot_gc_sweep_pool(interp, pool);
 
     if (interp->profile && (flag & POOL_PMC))
         Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);
@@ -1042,7 +1042,7 @@ parrot_gc_ims_run(PARROT_INTERP, UINTVAL flags)
         if (g_ims->state >= GC_IMS_RE_INIT || g_ims->state < GC_IMS_FINISHED)
             Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
 
-        Parrot_gc_sweep(interp, interp->arena_base->pmc_pool);
+        Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
         g_ims->state = GC_IMS_DEAD;
 
         return;
