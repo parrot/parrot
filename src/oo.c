@@ -371,6 +371,8 @@ Parrot_oo_find_vtable_override(PARROT_INTERP,
 
     if (!PMC_IS_NULL(result))
         return result;
+    else if (VTABLE_exists_keyed_str(interp, _class->parent_overrides, name))
+        return PMCNULL;
     else {
         /* Walk and search for the vtable method. */
         const INTVAL num_classes = VTABLE_elements(interp, _class->all_parents);
