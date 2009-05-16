@@ -38,10 +38,14 @@ See L<docs/pdd26_ast.pod>.
 
 Without any attributes, a PAST::Block translates to the following:
 
+=begin PIR
+
  .namespace []
  .sub "_block10"
      .return ()
  .end
+
+=end PIR
 
 =head2 Typical use
 
@@ -91,6 +95,8 @@ for creating functions.
 The block is invoked immediately. When the :blocktype attribute is set to this
 value, the generated PIR becomes:
 
+=begin PIR
+
  .namespace []
  .sub "anon"
      get_global $P11, "_block10"
@@ -102,6 +108,8 @@ value, the generated PIR becomes:
  .sub "_block10"
      .return ()
  .end
+
+=end PIR
 
 The sub C<anon> is the I<main> function, which is the entry point of the
 whole program. It looks for the sub that we declared, creates a new closure
@@ -118,10 +126,13 @@ value of this attribute. Example:
 
 translates to:
 
+=begin PIR
+
  .sub "foo"
      .return ()
  .end
 
+=end PIR
 =head2 Symbol tables
 
 As a block defines a new scope, a PAST::Block object has a symbol table,
@@ -197,7 +208,11 @@ a statement, including a PAST node as simple as PAST::Val.
 
 results in:
 
+=begin PIR_FRAGMENT
+
  find_lex $P10, "foo"
+
+=end PIR_FRAGMENT
 
 =head2 Typical use
 
@@ -226,7 +241,11 @@ Available values:
 When the C<:scope> attribute is set to C<lexical>, then the identifier
 specified in the C<:name> attribute is handled as a lexical:
 
+=begin PIR_FRAGMENT
+
  find_lex $P10, "foo"
+
+=end PIR_FRAGMENT
 
 =item 'package'
 
@@ -237,8 +256,12 @@ C<get_global> and C<set_global> ops.
 
 Defines the variable as a parameter (but is stored as a lexical).
 
+=begin PIR_FRAGMENT
+
  .param pmc param_10
  .lex "foo", param_10
+
+=end PIR_FRAGMENT
 
 =item 'keyed'
 
@@ -248,9 +271,13 @@ Defines the variable as a parameter (but is stored as a lexical).
 
 results in:
 
+=begin PIR_FRAGMENT
+
  get_global $P10, "foo"    # get index, a package-scoped variable "foo"
  get_global $P11, "bar"    # get aggregate, a package-scoped variable "bar"
  set $P12, $P11[$P10]      # get the contents at bar[foo]
+
+=end PIR_FRAGMENT
 
 =item 'attribute'
 
@@ -266,8 +293,12 @@ meaning the current invocant.
 
 translates to:
 
+=begin PIR_FRAGMENT_INVALID
+
  get_global $P10, "foo"
  get_attribute $P11, $P10, "bar"
+
+=end PIR_FRAGMENT_INVALID
 
 Note: currently, no child nodes are evaluated, so you can only get
 attributes on C<self> for now.
@@ -279,7 +310,11 @@ attributes on C<self> for now.
 If this flag is set, the variable represented by this PAST::Var node is
 declared at this point. This flag is cleared by default.
 
+=begin PIR_FRAGMENT
+
  .lex "foo", $P10
+
+=end PIR_FRAGMENT
 
 =head3 C<:viviself>
 
@@ -307,8 +342,12 @@ more details.
 
 results in:
 
+=begin PIR_FRAGMENT
+
  new $P10, "Integer"
  assign $P10, 42
+
+=end PIR_FRAGMENT
 
 =head2 Typical use
 
@@ -397,7 +436,11 @@ to false.
 
 results in:
 
+=begin PIR_FRAGMENT
+
  "foo"()
+
+=end PIR_FRAGMENT
 
 while
 
@@ -406,8 +449,12 @@ while
 
 generates:
 
+=begin PIR_FRAGMENT
+
  get_global $P10, "foo"
  $P10()
+
+=end PIR_FRAGMENT
 
 Children of a :pasttype('call') node are evaluated and passed as arguments.
 If the node does not receive a C<:name> attribute, then the first child
@@ -423,10 +470,12 @@ is evaluated as the subroutine to be invoked.
 
 generates:
 
+=begin PIR_FRAGMENT
+
  get_global $P10, "foo"
  $P10."bar"()
 
-
+=end PIR_FRAGMENT
 
 =item C<bind>
 
@@ -439,13 +488,21 @@ represented by the second child.
 
 results in:
 
+=begin PIR_FRAGMENT
+
  new $P10, "Integer"       # code for evaluating $rhs
  assign $P10, 42
  set_global "foo", $P10    # code for the :pasttype('bind') op
 
+=end PIR_FRAGMENT
+
 when the scope is set to C<lexical>, the last line becomes:
 
+=begin PIR_FRAGMENT
+
  store_lex "foo", $P10
+
+=end PIR_FRAGMENT
 
 =back
 
@@ -464,9 +521,12 @@ Example:
 
 is transformed to:
 
+=begin PIR_FRAGMENT
+
  find_lex $P10, "foo" # generated for $var
  $P11 = $P10          # inline '%r = %0'
 
+=end PIR_FRAGMENT
 
 =head1 TIPS AND TRICKS
 

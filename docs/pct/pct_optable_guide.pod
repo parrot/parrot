@@ -152,12 +152,16 @@ generate a C<call> instruction to a subroutine with the same name, that is,
 C<infix:+>. Therefore, you need to write a subroutine for each operator
 you define. The subroutine for the C<infix:+> operator could look like this:
 
+=begin PIR_INVALID
+
  .sub 'infix:+'
     .param pmc a      # left operand
     .param pmc b      # right operand
     n_add $P0, a, b   # create a new PMC object with the value a+b
     .return ($P0)
  .end
+
+=end PIR_INVALID
 
 Whenever an expression such as C<42 + 1> is parsed, this will result in a
 call to C<infix:+> with the operands C<42> and C<1>. The C<infix:+> sub
