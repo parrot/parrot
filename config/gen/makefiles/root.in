@@ -2047,24 +2047,16 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
     +long-integral \
     +match-any-integral \
 
-# TODO: Miscellaneous other flags
+# Miscellaneous other flags
 SPLINTFLAGS := $(SPLINTFLAGS) \
-    +aliasunique \
-    +assignexpose \
-    +continuecomment \
-    +fielduse \
-    +match-fields \
-    +nestedextern \
     +null \
     +nullret \
-    +paramuse \
     +shadow \
 
 # Other options we'd like to add back
 # +initallelements : Right now, the *.ops files don't initialize all
 #  values of the arrays
 # +casebreak: Auto-generated ops have way too case fallthrus right now
-# +noeffect: Right now the UNUSED(macro) trips +noeffect
 # +fcnuse: We have many functions that are defined but not used, but they
 #  should get hidden or ifdeffed
 # +redef, +redecl: Ops currently have tons of redefinitions
