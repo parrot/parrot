@@ -42,6 +42,10 @@ static void gc_ms_alloc_objects(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+static void gc_ms_finalize(PARROT_INTERP, ARGIN(Arenas * const arena_base))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static void * gc_ms_get_free_object(PARROT_INTERP,
@@ -94,6 +98,9 @@ static int gc_ms_trace_active_PMCs(PARROT_INTERP,
 #define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(arena_base)
 #define ASSERT_ARGS_gc_ms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool)
@@ -168,44 +175,19 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
     ASSERT_ARGS(gc_ms_mark_and_sweep)
     Arenas * const arena_base = interp->arena_base;
-
-    /* XXX these should go into the interpreter */
-    int total_free     = 0;
+    int total_free = 0;
 
     if (arena_base->gc_mark_block_level)
         return;
 
     if (interp->pdb && interp->pdb->debugger) {
-        /*
-         * if the other interpreter did a GC mark run, it can set
-         * live bits of shared objects, but these aren't reset, because
-         * they are in a different arena. When now such a PMC points to
-         * other non-shared object, these wouldn't be marked and hence
-         * collected.
-         */
+        /* The debugger could have performed a mark. Make sure everything is
+           marked dead here, so that when we sweep it all gets collected */
         Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
     }
 
-    /*
-     * the sync sweep is always at the end, so that
-     * the live bits are cleared
-     */
     if (flags & GC_finish_FLAG) {
-        Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
-        Parrot_gc_clear_live_bits(interp, arena_base->constant_pmc_pool);
-
-        /* keep the scheduler and its kids alive for Task-like PMCs to destroy
-         * themselves; run a sweep to collect them */
-        if (interp->scheduler) {
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
-            VTABLE_mark(interp, interp->scheduler);
-            Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
-        }
-
-        /* now sweep everything that's left */
-        Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
-        Parrot_gc_sweep_pool(interp, interp->arena_base->constant_pmc_pool);
-
+        gc_ms_finalize(interp, arena_base);
         return;
     }
 
@@ -219,30 +201,23 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     /* compact STRING pools to collect free headers and allocated buffers */
     Parrot_gc_compact_memory_pool(interp);
 
-    /* Now go trace the PMCs */
+    /* Now go trace the PMCs. returning true means we did a complete trace.
+       false means it was a lazy trace. */
     if (gc_ms_trace_active_PMCs(interp, (flags & GC_trace_stack_FLAG)
-        ? GC_TRACE_FULL
-        : GC_TRACE_ROOT_ONLY)) {
-        int ignored;
+        ? GC_TRACE_FULL : GC_TRACE_ROOT_ONLY)) {
 
         arena_base->gc_trace_ptr = NULL;
         arena_base->gc_mark_ptr  = NULL;
 
-        /* mark is now finished */
-        pt_gc_stop_mark(interp);
-
-        /* Now put unused PMCs and Buffers on the free list */
-        ignored = header_pools_iterate_callback(interp, POOL_BUFFER | POOL_PMC,
+        /* We've done the mark, now do the sweep. Pass the sweep callback
+           function to the PMC pool and all the sized pools. */
+        header_pools_iterate_callback(interp, POOL_BUFFER | POOL_PMC,
             (void*)&total_free, gc_ms_sweep_cb);
-        UNUSED(ignored);
 
         if (interp->profile)
             Parrot_gc_profile_end(interp, PARROT_PROF_GC_cb);
     }
     else {
-        pt_gc_stop_mark(interp); /* XXX */
-
-        /* successful lazy mark run count */
         ++arena_base->gc_lazy_mark_runs;
 
         Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
@@ -250,12 +225,44 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
             Parrot_gc_profile_end(interp, PARROT_PROF_GC_p2);
     }
 
+    pt_gc_stop_mark(interp);
+
     /* Note it */
     arena_base->gc_mark_runs++;
     --arena_base->gc_mark_block_level;
 
     return;
 }
+
+/*
+
+=item C<static void gc_ms_finalize(PARROT_INTERP, Arenas * const arena_base)>
+
+Perform the finalization run, freeing all PMCs.
+
+=cut
+
+*/
+
+static void
+gc_ms_finalize(PARROT_INTERP, ARGIN(Arenas * const arena_base))
+{
+    Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
+    Parrot_gc_clear_live_bits(interp, arena_base->constant_pmc_pool);
+
+    /* keep the scheduler and its kids alive for Task-like PMCs to destroy
+     * themselves; run a sweep to collect them */
+    if (interp->scheduler) {
+        Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
+        VTABLE_mark(interp, interp->scheduler);
+        Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
+    }
+
+    /* now sweep everything that's left */
+    Parrot_gc_sweep_pool(interp, interp->arena_base->pmc_pool);
+    Parrot_gc_sweep_pool(interp, interp->arena_base->constant_pmc_pool);
+}
+
 
 /*
 
