@@ -368,8 +368,8 @@
 
 static void add_pcc_named_arg(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg  *name),
-    ARGIN(SymReg  *value))
+    ARGIN(SymReg *name),
+    ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -378,8 +378,8 @@ static void add_pcc_named_arg(PARROT_INTERP,
 
 static void add_pcc_named_arg_var(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg  *name),
-    ARGIN(SymReg  *value))
+    ARGIN(SymReg *name),
+    ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -388,8 +388,8 @@ static void add_pcc_named_arg_var(PARROT_INTERP,
 
 static void add_pcc_named_param(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg  *name),
-    ARGIN(SymReg  *value))
+    ARGIN(SymReg *name),
+    ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -398,8 +398,8 @@ static void add_pcc_named_param(PARROT_INTERP,
 
 static void add_pcc_named_result(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg  *name),
-    ARGIN(SymReg  *value))
+    ARGIN(SymReg *name),
+    ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -408,8 +408,8 @@ static void add_pcc_named_result(PARROT_INTERP,
 
 static void add_pcc_named_return(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg  *name),
-    ARGIN(SymReg  *value))
+    ARGIN(SymReg *name),
+    ARGIN(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -1194,8 +1194,8 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *name))
 
 /*
 
-=item C<static void add_pcc_named_arg(PARROT_INTERP, SymReg *cur_call, const
-char *name, SymReg *value)>
+=item C<static void add_pcc_named_arg(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
@@ -1234,8 +1234,8 @@ add_pcc_named_arg_var(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, const
-char *name, SymReg *value)>
+=item C<static void add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
@@ -1255,7 +1255,7 @@ add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, SymReg 
+=item C<static void add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, SymReg
 *name, SymReg *value)>
 
 =cut
@@ -1276,8 +1276,8 @@ add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, const
-char *name, SymReg *value)>
+=item C<static void add_pcc_named_return(PARROT_INTERP, SymReg *cur_call, SymReg
+*name, SymReg *value)>
 
 =cut
 
@@ -1297,7 +1297,7 @@ add_pcc_named_return(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void adv_named_set(PARROT_INTERP, char *name)>
+=item C<static void adv_named_set(PARROT_INTERP, const char *name)>
 
 Sets the name of the current named argument.
 
