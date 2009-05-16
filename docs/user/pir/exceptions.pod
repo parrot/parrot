@@ -10,42 +10,35 @@ If you're going to be using exceptions, you probably want to start by
 including two pasm files that define constants for exception type and
 severity.
 
-    .include 'except_types.pasm'
-    .include 'except_severity.pasm'
-
 You create exceptions just like you create any other object, with
 C<new>.
-
-    .local pmc ex
-    ex = new 'Exception'
 
 You usually want to at least set a descriptive message about what went
 wrong.
 
-    ex = "Everything is horrible, dood."
-
 You also usually want to set a severity and sometimes a type.  You can
 find these in L<runtime/parrot/include/except_severity.pasm>.
 
-    ex['severity'] = .EXCEPT_DOOMED
-    ex['type'] = .CONTROL_ERROR
-
 You actually throw the exception by using the C<throw> op.
-
-    throw ex
 
 Put all together, it looks like this:
 
-=head3 Throw Example
+=begin PIR_FRAGMENT
 
     .include 'except_types.pasm'
     .include 'except_severity.pasm'
+
     .local pmc ex
     ex = new 'Exception'
+
     ex = "Everything is horrible, dood."
+
     ex['severity'] = .EXCEPT_DOOMED
     ex['type'] = .CONTROL_ERROR
+
     throw ex
+
+=end PIR_FRAGMENT
 
 =head2 Catching exceptions
 
@@ -59,26 +52,34 @@ handling.
 You create exception handlers just like you create any other object, with
 C<new>.
 
+=begin PIR_FRAGMENT
+
     .local pmc eh
     eh = new 'ExceptionHandler'
+
+=end PIR_FRAGMENT
 
 You set the target of the exception handler (the code that will be
 invoked) with the C<set_attr> opcode.  Usually this will be a label.
 You manipulate the exception handler stack with the C<push_eh> and
 C<pop_eh> opcodes.  This is a fairly standard use of exception handlers:
 
+=begin PIR_FRAGMENT
+
     .local pmc eh
     eh = new 'ExceptionHandler'
     set_addr eh, handler
     push_eh eh
-    ... # code that might throw an exception
+      # code that might throw an exception
     pop_eh
     .return (1) # Success!
   handler:
     .local pmc ex
     .get_results (ex)
-    ... # code that prints a warning, logs an error, whatever
+      # code that prints a warning, logs an error, whatever
     .return (0) # Failure!
+
+=end PIR_FRAGMENT
 
 Sometimes you want to be more specific in what you catch.  You can set
 filters on the exception handler based on exception type and severity.
