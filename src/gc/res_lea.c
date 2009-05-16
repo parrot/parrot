@@ -254,7 +254,7 @@ Parrot_initialize_memory_pools(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_merge_memory_pools(Interp *dest, Interp *source)>
+=item C<void Parrot_gc_merge_memory_pools(Interp *dest, Interp *source)>
 
 Does nothing.
 
@@ -262,7 +262,7 @@ Does nothing.
 
 */
 void
-Parrot_merge_memory_pools(Interp *dest, Interp *source)
+Parrot_gc_merge_memory_pools(Interp *dest, Interp *source)
 {
     ASSERT_ARGS(parrot_merge_memory_pools)
 }

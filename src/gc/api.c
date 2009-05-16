@@ -183,7 +183,7 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(void *stacktop))
 #endif
 
     Parrot_initialize_memory_pools(interp);
-    Parrot_initialize_header_pools(interp);
+    initialize_header_pools(interp);
 }
 
 /*
@@ -761,18 +761,18 @@ Parrot_gc_merge_header_pools(ARGMOD(Interp *dest_interp),
 
     /* heavily borrowed from forall_header_pools */
     fix_pmc_syncs(dest_interp, source_arena->constant_pmc_pool);
-    Parrot_small_object_pool_merge(dest_interp, dest_arena->constant_pmc_pool,
+    Parrot_gc_merge_buffer_pools(dest_interp, dest_arena->constant_pmc_pool,
             source_arena->constant_pmc_pool);
 
     fix_pmc_syncs(dest_interp, source_arena->pmc_pool);
-    Parrot_small_object_pool_merge(dest_interp, dest_arena->pmc_pool,
+    Parrot_gc_merge_buffer_pools(dest_interp, dest_arena->pmc_pool,
             source_arena->pmc_pool);
 
-    Parrot_small_object_pool_merge(dest_interp,
+    Parrot_gc_merge_buffer_pools(dest_interp,
             dest_arena->constant_string_header_pool,
             source_arena->constant_string_header_pool);
 
-    Parrot_small_object_pool_merge(dest_interp,
+    Parrot_gc_merge_buffer_pools(dest_interp,
             dest_arena->pmc_ext_pool, source_arena->pmc_ext_pool);
 
     for (i = 0; i < source_arena->num_sized; ++i) {
@@ -787,7 +787,7 @@ Parrot_gc_merge_header_pools(ARGMOD(Interp *dest_interp),
             PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
 
-        Parrot_small_object_pool_merge(dest_interp,
+        Parrot_gc_merge_buffer_pools(dest_interp,
             dest_arena->sized_header_pools[i],
             source_arena->sized_header_pools[i]);
     }
@@ -837,7 +837,7 @@ fix_pmc_syncs(ARGMOD(Interp *dest_interp), ARGIN(Small_Object_Pool *pool))
 =item C<void Parrot_gc_destroy_header_pools(PARROT_INTERP)>
 
 Performs a garbage collection sweep on all pools, then frees them.  Calls
-C<Parrot_forall_header_pools> to loop over all the pools, passing
+C<header_pools_iterate_callback> to loop over all the pools, passing
 C<sweep_cb_pmc> and C<sweep_cb_buf> callback routines. Frees the array of sized
 header pointers in the C<Arenas> structure too.
 
@@ -862,12 +862,12 @@ Parrot_gc_destroy_header_pools(PARROT_INTERP)
     const INTVAL start = 2;
 #endif
 
-    Parrot_forall_header_pools(interp, POOL_PMC, NULL, sweep_cb_pmc);
-    Parrot_forall_header_pools(interp, POOL_PMC | POOL_CONST, NULL,
+    header_pools_iterate_callback(interp, POOL_PMC, NULL, sweep_cb_pmc);
+    header_pools_iterate_callback(interp, POOL_PMC | POOL_CONST, NULL,
             sweep_cb_pmc);
 
     for (pass = start; pass <= 2; pass++) {
-        Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_CONST,
+        header_pools_iterate_callback(interp, POOL_BUFFER | POOL_CONST,
                 (void *)pass, sweep_cb_buf);
     }
 

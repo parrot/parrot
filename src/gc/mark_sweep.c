@@ -314,33 +314,6 @@ contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
     return 0;
 }
 
-/*
-
-=item C<int Parrot_is_const_pmc(PARROT_INTERP, const PMC *pmc)>
-
-Returns whether C<*pmc> is a constant PMC. The given pointer is a constant
-PMC if it points into the constant PMC pool.
-
-=cut
-
-*/
-
-int
-Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_is_const_pmc)
-    Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
-    const               int   c    = contained_in_pool(pool, pmc);
-
-    /* some paranoia first. */
-    /* I wonder if it would save any machine cycles to write
-       !(PObj_constant_TEST(pmc) ^ c)
-       instead. */
-    PARROT_ASSERT(!!PObj_constant_TEST(pmc) == !!c);
-
-    return c;
-}
-
 
 /*
 
@@ -592,6 +565,7 @@ arenas structure, such as the number of objects allocated in it.
 =cut
 
 */
+
 void
 Parrot_append_arena_in_pool(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),

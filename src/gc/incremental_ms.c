@@ -759,7 +759,7 @@ parrot_gc_ims_mark(PARROT_INTERP)
 =item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
 void *arg)>
 
-Callback to sweep a header pool (see Parrot_forall_header_pools).
+Callback to sweep a header pool (see header_pools_iterate_callback).
 
 =cut
 
@@ -820,7 +820,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 
     /* now sweep all */
     n_objects = 0;
-    ignored   = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
+    ignored   = header_pools_iterate_callback(interp, POOL_BUFFER | POOL_PMC,
             (void*)&n_objects, sweep_cb);
     UNUSED(ignored);
 
@@ -838,7 +838,7 @@ parrot_gc_ims_sweep(PARROT_INTERP)
 =item C<static int collect_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
 void *arg)>
 
-Callback to collect a header pool (see Parrot_forall_header_pools).
+Callback to collect a header pool (see header_pools_iterate_callback).
 
 =cut
 
@@ -911,7 +911,7 @@ parrot_gc_ims_collect(PARROT_INTERP, int check_only)
 
     g_ims = (Gc_ims_private *)arena_base->gc_private;
 
-    ret   = Parrot_forall_header_pools(interp, POOL_BUFFER,
+    ret   = header_pools_iterate_callback(interp, POOL_BUFFER,
             (void *)(long)check_only, collect_cb);
 
     if (ret)

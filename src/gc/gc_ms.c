@@ -71,11 +71,7 @@ static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
-static int gc_ms_trace_active_PMCs(PARROT_INTERP,
-    Parrot_gc_trace_type trace)
-        __attribute__nonnull__(1);
-
-static int sweep_cb(PARROT_INTERP,
+static int gc_ms_sweep_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     int flag,
     ARGMOD(void *arg))
@@ -84,6 +80,10 @@ static int sweep_cb(PARROT_INTERP,
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*arg);
+
+static int gc_ms_trace_active_PMCs(PARROT_INTERP,
+    Parrot_gc_trace_type trace)
+        __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
@@ -107,12 +107,12 @@ static int sweep_cb(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_gc_ms_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_gc_ms_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(arg)
+#define ASSERT_ARGS_gc_ms_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -232,8 +232,8 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         pt_gc_stop_mark(interp);
 
         /* Now put unused PMCs and Buffers on the free list */
-        ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
-            (void*)&total_free, sweep_cb);
+        ignored = header_pools_iterate_callback(interp, POOL_BUFFER | POOL_PMC,
+            (void*)&total_free, gc_ms_sweep_cb);
         UNUSED(ignored);
 
         if (interp->profile)
@@ -284,8 +284,8 @@ gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 /*
 
-=item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
-void *arg)>
+=item C<static int gc_ms_sweep_cb(PARROT_INTERP, Small_Object_Pool *pool,
+int flag, void *arg)>
 
 Sweeps the given pool for the MS collector. This function also ends
 the profiling timer, if profiling is enabled. Returns the total number
@@ -296,10 +296,10 @@ of objects freed.
 */
 
 static int
-sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
+gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
     ARGMOD(void *arg))
 {
-    ASSERT_ARGS(sweep_cb)
+    ASSERT_ARGS(gc_ms_sweep_cb)
     int * const total_free = (int *) arg;
 
     Parrot_gc_sweep_pool(interp, pool);
@@ -388,7 +388,8 @@ the PObj flags to indicate that the item is free.
 */
 
 static void
-gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
+gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool),
+    ARGIN(void *to_add))
 {
     ASSERT_ARGS(gc_ms_add_free_object)
     PObj *object           = (PObj *)to_add;
@@ -497,7 +498,7 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 =over 4
 
-=item C<void gc_pmc_ext_pool_init(Small_Object_Pool *pool)>
+=item C<void gc_ms_pmc_ext_pool_init(Small_Object_Pool *pool)>
 
 Initialize the PMC_EXT pool functions. This is done separately from other
 pools.
@@ -507,9 +508,9 @@ pools.
 */
 
 void
-gc_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
+gc_ms_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
 {
-    ASSERT_ARGS(gc_pmc_ext_pool_init)
+    ASSERT_ARGS(gc_ms_pmc_ext_pool_init)
     pool->add_free_object = gc_ms_add_free_pmc_ext;
     pool->get_free_object = gc_ms_get_free_pmc_ext;
     pool->alloc_objects   = gc_ms_alloc_objects;
