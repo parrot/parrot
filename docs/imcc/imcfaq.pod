@@ -137,10 +137,14 @@ some sort of static opcode metadata.
 The basic block of execution of an IMC program is the subroutine. Subs can be
 simple, with no arguments or returns. Line comments are allowed in IMC using #.
 
+=begin PIR
+
 	# Hello world
 	.sub main :main
 	  print "Hello world.\n"
 	.end
+
+=end PIR
 
 =head2 Tutorial
 
@@ -207,10 +211,14 @@ the second character, and one or more digits for the rest.
 
 Example:
 
+=begin PIR_FRAGMENT
+
 	$S1 = "hiya"
 	$S2 = $S1 . "mel"
 	$I1 = 1 + 2
 	$I2 = $I1 * 3
+
+=end PIR_FRAGMENT
 
 This example uses symbolic STRING and INTVAL registers as temporaries. This is
 the typical sort of code that compilers generate from the syntax tree.
@@ -225,6 +233,8 @@ B<num>, B<string> or B<pmc>).
 
 Example:
 
+=begin PIR
+
 	.sub _main :main
 	   .local int i
 	   .local num n
@@ -232,11 +242,14 @@ Example:
 	   n = 5.003
 	.end
 
+=end PIR
 
 =head2 How do I declare global or package variables in PIR?
 
 You can't. You can explicitly create global variables at runtime, however,
 but it only works for PMC types, like so:
+
+=begin PIR
 
 	.sub _main :main
 	   .local pmc i
@@ -244,12 +257,13 @@ but it only works for PMC types, like so:
 	   i = new 'Integer'
 	   i = 123
 	   # Create the global
-	   global "i" = i
+	   set_global "i", i
 
 	   # Refer to the global
-	   j = global "i"
+	   j = get_global "i"
 	.end
 
+=end PIR
 
 Happy Hacking.
 
