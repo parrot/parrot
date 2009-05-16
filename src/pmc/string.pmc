@@ -34,9 +34,8 @@ Initializes the string.
 */
 
     VTABLE void init() {
-
         Parrot_String_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_String_attributes);
+            mem_allocate_typed(Parrot_String_attributes);
 
         attrs->str_val = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
         PMC_data(SELF) = attrs;

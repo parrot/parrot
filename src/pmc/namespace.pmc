@@ -148,7 +148,6 @@ Initialize a C<NameSpace> PMC.
                 mem_allocate_zeroed_typed(Parrot_NameSpace_attributes);
         PARROT_NAMESPACE(SELF)->vtable = PMCNULL;
         PARROT_NAMESPACE(SELF)->_class = PMCNULL;
-        PARROT_NAMESPACE(SELF)->_class = PMCNULL;
         SELF.set_pointer(parrot_new_hash(INTERP));
         PObj_custom_mark_destroy_SETALL(SELF);
     }

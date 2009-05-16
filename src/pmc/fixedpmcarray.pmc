@@ -373,7 +373,7 @@ array.
             return;
 
         PMC_size(SELF) = size;
-        data           = mem_allocate_n_zeroed_typed(size, PMC *);
+        data           = mem_allocate_n_typed(size, PMC *);
 
         for (i = 0; i < size; i++)
             data[i] = PMCNULL;
