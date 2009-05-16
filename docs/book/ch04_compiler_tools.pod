@@ -5,13 +5,13 @@
 Z<CHP-9>
 
 So far we've talked a lot about low-level Parrot programming with
-PIR and PASM. However, the true power of Parrot is its ability to
-host programs written in high level languages such as Perl 6,
-Python, Ruby, Tcl, and PHP. In order to write code in these languages
-developers need there to be compilers that convert from the language
-into PIR or PASM (or even directly convert to Parrot Bytecode).
-People who have worked on compilers before may be anticipating us
-to use terms like "Lex and Yacc" here, but we promise that we won't.
+PIR. However, the true power of Parrot is its ability to host programs
+written in high level languages such as Perl 6, Python, Ruby, Tcl,
+and PHP. In order to write code in these languages developers need
+there to be compilers that convert from the language into PIR or PASM
+(or even directly convert to Parrot Bytecode). People who have worked
+on compilers before may be anticipating us to use terms like "Lex and
+Yacc" here, but we promise that we won't.
 
 Instead of traditional lexical analyzers and parser-generators that
 have been the mainstay of compiler designers for decades, Parrot
@@ -21,42 +21,50 @@ programming language called I<Not Quite Perl>X<Not Quite Perl> (NQP)
 and an implementation of the Perl 6 Grammar Engine X<Perl 6 Grammar
 Engine> (PGE) to build compilers for Parrot. Instead of using
 traditional low-level languages to write compilers, we can use a
-modern dynamic language like Perl 6 to write it instead. On a more
-interesting note, this means that the Perl 6 compiler is itself
-being written in Perl 6, a mind-boggling process known as
+modern dynamic language like Perl 6 to write them instead. As a note
+of interest this means that the Perl 6 compiler on Parrot is itself
+being written in Perl 6. This is a mind-boggling process known as
 C<bootstrapping>.
 
-The language-neutrality of the interpreter is partially a design
-decision for modularity. Keeping the implementation independent of the
-syntax makes the codebase cleaner and easier to maintain.
-Modular design also benefits future language designers, not just
-designers of current languages. Instead of targeting I<lex>/I<yacc> and
-reimplementing low-level features such as garbage collection and dynamic
-data types, designers can leave the details to Parrot and focus on the
-high-level features of their language: syntax, libraries, capabilities.
-Parrot does all the necessary bookkeeping, exposing a rich interface with
-capabilities that few languages can make full use of.
+The language-neutrality of the interpreter was a conscious design
+decision. In the early days of Parrot development, the Parrot and Perl 6
+projects were closely intertwined, and it would have been easy for the
+two to overlap and intermingle throughout. However, by keeping the two
+projects separate and encapsulated, the codebase became cleaner and
+more managable, and the door was opened to support a whole host of
+other dynamic languages equally well. This modular design also benefits
+future language designers, not just designers of current languages.
+Instead of targeting I<lex>/I<yacc> and having to reimplement low-level
+features such as garbage collection and dynamic data types, designers can
+leave the details to Parrot and focus on the high-level features of their
+language instead: syntax, libraries, capabilities. Parrot implements all
+the necessary infrastructure and exposes a rich interface that all
+languages are free to make use of. In fact, since Parrot aims to support
+a wide variety of languages it provides more features then any one of
+them would need.
 
-A robust exceptions system, a capability to compile into
-platform-independent bytecode, and a clean extension and embedding
-mechanism would be just some of the necessary and standard features.
-
-Since Parrot would support the features of the major dynamic languages
-and wasn't biased to a particular syntax, it could run all these
-languages with little additional effort.
+For the benefit of it's high-level languages, Parrot supports a number
+of important features: A robust exceptions system, compilation into
+platform-independent bytecode, a clean extension and embedding
+interface, just-in-time compilation to machine code, native library
+interface mechanisms, garbage collection, support for objects and classes,
+and a robust concurrency model. Parrot provides all of these things and
+more that compiler designers can use immediately without having to
+develop their own versions of these from the ground up.
 
 Language interoperability is another core goal. Different languages are
 suited to different tasks, and picking which language to use in a large
-software project is a common planning problem.  There's never a perfect
-fit, at least not for all jobs. Developers find themselves settling for
-the language with the most advantages and the least noticeable
-disadvantages. The ability to easily combine multiple languages within a
-single project opens up the potential of using well-tested libraries
-from one language, taking advantage of clean problem-domain expression
-in a second, while binding it together in a third that elegantly
-captures the overall architecture. It's about using languages according
-to their inherent strengths, and mitigating the cost of their
-weaknesses.
+software project is a common planning problem. There's rarely a perfect
+fit, at least not for all parts of complex projects. Developers often find
+themselves settling for one language because it has the fewest
+disadvantages. Instead of forcing people to use one language for all parts
+like this, Parrot provides the ability to easily and seamlessly combine
+multiple languages within a single project. This opens up the potential
+of using well-tested libraries from one language, taking advantage of clean
+problem-domain expression in a second, while binding it together in a third
+that elegantly captures the overall architecture. It's about using
+languages according to their inherent strengths, and mitigating the costs
+of their weaknesses.
 
 =head2 PCT Overview
 
