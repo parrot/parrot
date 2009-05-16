@@ -107,7 +107,7 @@ Parrot_io_finish(PARROT_INTERP)
 
 =item C<void Parrot_IOData_mark(PARROT_INTERP, ParrotIOData *piodata)>
 
-Called from C<trace_active_PMCs()> to mark the IO data live.
+Called from C<Parrot_gc_trace_root()> to mark the IO data live.
 
 =cut
 
