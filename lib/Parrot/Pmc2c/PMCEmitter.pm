@@ -619,8 +619,8 @@ EOC
 
     my $flags = $self->vtable_flags;
     $cout .= <<"EOC";
-        Hash   * isa_hash;
-        VTABLE * vt        = Parrot_${classname}_get_vtable(interp);
+        Hash    *isa_hash  = NULL;
+        VTABLE  *vt        = Parrot_${classname}_get_vtable(interp);
         vt->base_type      = $enum_name;
         vt->flags          = $flags;
         vt->attribute_defs = attr_defs;
@@ -647,19 +647,25 @@ EOC
             string_make(interp, " $provides", @{[length($provides) + 1]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG));
 
-        /* set up isa hash */
-        isa_hash = parrot_new_hash(interp);
-        vt->isa_hash     = isa_hash;
 EOC
     }
     else {
         $cout .= <<"EOC";
         vt->whoami       = CONST_STRING_GEN(interp, "$classname");
         vt->provides_str = CONST_STRING_GEN(interp, "$provides");
+EOC
+    }
 
-        /* set up isa hash */
+    if (@isa) {
+        unshift @isa, $classname;
+        $cout .= <<"EOC";
+
         isa_hash         = parrot_new_hash(interp);
         vt->isa_hash     = isa_hash;
+EOC
+    } else {
+        $cout .= <<"EOC";
+        vt->isa_hash     = NULL;
 EOC
     }
 
@@ -683,7 +689,7 @@ EOC
         interp->vtables[entry] = vt;
 EOC
 
-    for my $isa ($classname, @isa) {
+    for my $isa (@isa) {
         $cout .= <<"EOC";
         parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING_GEN(interp, "$isa")), PMCNULL);
 EOC
@@ -729,7 +735,8 @@ EOC
 
 EOC
 
-    for my $isa ($classname, @isa) {
+    @isa = $classname unless @isa;
+    for my $isa (@isa) {
         $cout .= <<"EOC";
             VTABLE_push_string(interp, mro, CONST_STRING_GEN(interp, "$isa"));
 EOC
