@@ -344,31 +344,6 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         (*pool->alloc_objects) (interp, pool);
 }
 
-
-/*
-
-=item C<static void gc_ms_add_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
-*pool, void *to_add)>
-
-Add a freed PMC_EXT structure to the free list in the PMC_EXT pool. Objects
-on the free list can be reused later.
-
-=cut
-
-*/
-
-static void
-gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
-{
-    ASSERT_ARGS(gc_ms_add_free_pmc_ext)
-    PMC_EXT * const object = (PMC_EXT *)to_add;
-    object->_metadata      = NULL;
-
-    /* yes, this cast is a hack for now, but a pointer is a pointer */
-    object->_next_for_GC   = (PMC *)pool->free_list;
-    pool->free_list        = object;
-}
-
 /*
 
 =item C<static void gc_ms_add_free_object(PARROT_INTERP, Small_Object_Pool
@@ -432,42 +407,6 @@ gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
     return ptr;
 }
 
-
-/*
-
-=item C<static void * gc_ms_get_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
-*pool)>
-
-Get a new PMC_EXT structure from the free pool and return it.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void *
-gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(gc_ms_get_free_pmc_ext)
-    PMC_EXT *ptr;
-    PMC_EXT *free_list = (PMC_EXT *)pool->free_list;
-
-    /* if we don't have any objects */
-    if (!free_list) {
-        (*pool->more_objects)(interp, pool);
-        free_list = (PMC_EXT *)pool->free_list;
-    }
-
-    ptr               = free_list;
-    pool->free_list   = ptr->_next_for_GC;
-    ptr->_next_for_GC = NULL;
-
-    --pool->num_free_objects;
-
-    return ptr;
-}
-
 /*
 
 =item C<static void gc_ms_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)>
@@ -521,6 +460,12 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
+=back
+
+=header2 MS PMC_EXT Pool functions
+
+=over 4
+
 =item C<void gc_pmc_ext_pool_init(Small_Object_Pool *pool)>
 
 Initialize the PMC_EXT pool functions. This is done separately from other
@@ -541,3 +486,76 @@ gc_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
 }
 
 
+/*
+
+=item C<static void gc_ms_add_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
+*pool, void *to_add)>
+
+Add a freed PMC_EXT structure to the free list in the PMC_EXT pool. Objects
+on the free list can be reused later.
+
+=cut
+
+*/
+
+static void
+gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
+{
+    ASSERT_ARGS(gc_ms_add_free_pmc_ext)
+    PMC_EXT * const object = (PMC_EXT *)to_add;
+    object->_metadata      = NULL;
+
+    /* yes, this cast is a hack for now, but a pointer is a pointer */
+    object->_next_for_GC   = (PMC *)pool->free_list;
+    pool->free_list        = object;
+}
+
+/*
+
+=item C<static void * gc_ms_get_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
+*pool)>
+
+Get a new PMC_EXT structure from the free pool and return it.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static void *
+gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+{
+    ASSERT_ARGS(gc_ms_get_free_pmc_ext)
+    PMC_EXT *ptr;
+    PMC_EXT *free_list = (PMC_EXT *)pool->free_list;
+
+    /* if we don't have any objects */
+    if (!free_list) {
+        (*pool->more_objects)(interp, pool);
+        free_list = (PMC_EXT *)pool->free_list;
+    }
+
+    ptr               = free_list;
+    pool->free_list   = ptr->_next_for_GC;
+    ptr->_next_for_GC = NULL;
+
+    --pool->num_free_objects;
+
+    return ptr;
+}
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4:
+ */
