@@ -49,6 +49,17 @@ static UINTVAL codepoints(PARROT_INTERP, ARGIN(STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL find_cclass(PARROT_INTERP,
+    ARGIN(STRING *s),
+    ARGIN(const INTVAL *typetable),
+    INTVAL flags,
+    UINTVAL pos,
+    UINTVAL end)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static UINTVAL get_byte(PARROT_INTERP,
     SHIM(const STRING *src),
     SHIM(UINTVAL offset))
@@ -167,6 +178,10 @@ static void ucs2_set_position(SHIM_INTERP,
 #define ASSERT_ARGS_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s) \
+    || PARROT_ASSERT_ARG(typetable)
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -295,6 +310,27 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
     UNUSED(codepoint)
     no_ICU_lib(interp);
 #endif
+}
+
+/*
+
+=item C<static UINTVAL find_cclass(PARROT_INTERP, STRING *s, const INTVAL
+*typetable, INTVAL flags, UINTVAL pos, UINTVAL end)>
+
+Stub, the charset level handles this for unicode strings.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL
+find_cclass(PARROT_INTERP, ARGIN(STRING *s), ARGIN(const INTVAL *typetable),
+INTVAL flags, UINTVAL pos, UINTVAL end)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL,
+        EXCEPTION_UNIMPLEMENTED,
+        "No find_cclass support in unicode encoding plugins");
 }
 
 /*
@@ -691,7 +727,8 @@ Parrot_encoding_ucs2_init(PARROT_INTERP)
         become_encoding,
         codepoints,
         bytes,
-        iter_init
+        iter_init,
+        find_cclass
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "ucs2", return_encoding);

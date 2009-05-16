@@ -766,6 +766,9 @@ is_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *source_string), UINTV
 =item C<static INTVAL find_cclass(PARROT_INTERP, INTVAL flags, STRING
 *source_string, UINTVAL offset, UINTVAL count)>
 
+Find a character in the given character class.  Delegates to the find_cclass
+method of the encoding plugin.
+
 =cut
 
 */
@@ -780,13 +783,8 @@ find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(STRING *source_string),
     UINTVAL end = offset + count;
 
     end = source_string->strlen < end ? source_string->strlen : end;
-    for (; pos < end; ++pos) {
-        const UINTVAL codepoint = ENCODING_GET_CODEPOINT(interp, source_string, pos);
-        if ((Parrot_ascii_typetable[codepoint] & flags) != 0) {
-            return pos;
-        }
-    }
-    return end;
+    return ENCODING_FIND_CCLASS(interp, source_string, Parrot_ascii_typetable,
+            flags, pos, end);
 }
 
 /*
