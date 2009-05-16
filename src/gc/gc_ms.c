@@ -71,6 +71,10 @@ static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
+static int gc_ms_trace_active_PMCs(PARROT_INTERP,
+    Parrot_gc_trace_type trace)
+        __attribute__nonnull__(1);
+
 static int sweep_cb(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     int flag,
@@ -103,6 +107,8 @@ static int sweep_cb(PARROT_INTERP,
     || PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_gc_ms_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool) \
@@ -214,7 +220,7 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     Parrot_gc_compact_memory_pool(interp);
 
     /* Now go trace the PMCs */
-    if (trace_active_PMCs(interp, (flags & GC_trace_stack_FLAG)
+    if (gc_ms_trace_active_PMCs(interp, (flags & GC_trace_stack_FLAG)
         ? GC_TRACE_FULL
         : GC_TRACE_ROOT_ONLY)) {
         int ignored;
@@ -249,6 +255,31 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     --arena_base->gc_mark_block_level;
 
     return;
+}
+
+/*
+
+=item C<static int gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type
+trace)>
+
+Performs a full trace run and marks all the PMCs as active if they
+are. Returns whether the run completed, that is, whether it's safe
+to proceed with GC.
+
+=cut
+
+*/
+
+static int
+gc_ms_trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
+{
+    ASSERT_ARGS(gc_ms_trace_active_PMCs)
+    if (!Parrot_gc_trace_root(interp, trace))
+        return 0;
+
+    /* Okay, we've marked the whole root set, and should have a good-sized
+     * list of things to look at. Run through it */
+    return Parrot_gc_trace_children(interp, (size_t) -1);
 }
 
 /*

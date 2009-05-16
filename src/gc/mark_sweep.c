@@ -439,31 +439,6 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
 /*
 
-=item C<int trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)>
-
-Performs a full trace run and marks all the PMCs as active if they
-are. Returns whether the run completed, that is, whether it's safe
-to proceed with GC.
-
-=cut
-
-*/
-
-int
-trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
-{
-    ASSERT_ARGS(trace_active_PMCs)
-    if (!Parrot_gc_trace_root(interp, trace))
-        return 0;
-
-    /* Okay, we've marked the whole root set, and should have a good-sized
-     * list of things to look at. Run through it */
-    return Parrot_gc_trace_children(interp, (size_t) -1);
-}
-
-
-/*
-
 =item C<void Parrot_gc_clear_live_bits(PARROT_INTERP, const Small_Object_Pool
 *pool)>
 
