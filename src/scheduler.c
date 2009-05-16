@@ -406,7 +406,7 @@ Parrot_cx_delete_task(PARROT_INTERP, ARGIN(PMC *task))
         const INTVAL tid = VTABLE_get_integer(interp, task);
         VTABLE_delete_keyed_int(interp, interp->scheduler, tid);
     }
-    else if(interp->scheduler)
+    else if (interp->scheduler)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 }

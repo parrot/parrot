@@ -27,16 +27,6 @@ mark/sweep garbage collectors use this code.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void more_traceable_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
-#define ASSERT_ARGS_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /* Set when walking the system stack */

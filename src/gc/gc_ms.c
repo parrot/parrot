@@ -323,7 +323,7 @@ gc_ms_sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
 
 =back
 
-=header2 MS Pool Functions
+=head2 MS Pool Functions
 
 =over 4
 
@@ -501,7 +501,7 @@ gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 =back
 
-=header2 MS PMC_EXT Pool functions
+=head2 MS PMC_EXT Pool functions
 
 =over 4
 
