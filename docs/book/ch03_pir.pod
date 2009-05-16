@@ -705,14 +705,14 @@ C<.=> operation appends "xy" onto the string "abcd" in C<$S1>.
 
 The C<x> instruction repeats a string a specified number of times:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
   $S0 = "a"
   $S1 = $S0 x 5
   print $S1            # prints "aaaaa"
   print "\n"
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 In this example, C<x> generates a new string with "a" repeated five
 times and stores it in C<$S1>.
