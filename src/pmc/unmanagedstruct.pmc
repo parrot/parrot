@@ -707,9 +707,7 @@ The offset.
 */
 
     VTABLE void init_pmc(PMC *value) {
-        Parrot_UnManagedStruct_attributes *attrs =
-            mem_allocate_typed(Parrot_UnManagedStruct_attributes);
-        PMC_data(SELF) = attrs;
+        SELF.init();
         SELF.set_pmc(value);
     }
 
