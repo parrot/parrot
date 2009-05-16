@@ -97,13 +97,9 @@ END
 
 END
 
-    my %p5_keys = map { $_ => 1 } $conf->data->keys_p5();
-
     while (<$IN>) {
         if (/\@PCONFIG\@/) {
             for my $k ( sort { lc $a cmp lc $b || $a cmp $b } $conf->data->keys ) {
-                next if exists $p5_keys{$k};
-
                 my $v = $conf->data->get($k);
                 if ( defined $v ) {
                     my $type = ref $v;
