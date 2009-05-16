@@ -72,7 +72,7 @@ Returns true value upon success.
 sub renum_op_map_file {
     my $self = shift;
 
-    my $file = scalar(@_) ? shift : $self->{num_file};
+    my $file = $self->{num_file};
 
     # We open up the currently existing ops.num and file and read it
     # line-by-line.  That file is basically divided into two halves
