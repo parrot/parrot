@@ -396,6 +396,40 @@ Generate a string representing the definition of this PMC's ATTRs.
 
 =cut
 
+method generate_attr_defs() {
+
+    my @attrs := self.attrs;
+    
+    my $attr_defs := "";
+    for @attrs {
+
+        my $type := $_<type>;
+        my $name := $_<name>;
+
+        $type.replace(' ','');
+
+        if $type eq 'INTVAL' {
+            $attr_defs := $attr_defs ~ 'I' ~ $name ~ " ";
+        }
+        elsif $type eq 'FLOATVAL' {
+            $attr_defs := $attr_defs ~ 'F' ~ $name ~ " ";
+        }
+        #XXX: using the same thing for FLOATVAL and PMC* smells like a bug, but
+        #it's what pmc2c did.
+        elsif $type eq 'PMC*' {
+            $attr_defs := $attr_defs ~ 'F' ~ $name ~ " ";
+        }
+        elsif $type eq 'STRING*' {
+            $attr_defs := $attr_defs ~ 'S' ~ $name ~ " ";
+        }
+        else {
+            $attr_defs := $attr_defs ~ ':' ~ $name ~ " ";
+        }
+    }
+
+    '    static const char attr_defs [] = "' ~ $attr_defs ~ "\";\n";
+}
+
 
 =item C<get_vtable_func>
 
