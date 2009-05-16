@@ -736,6 +736,7 @@ EOC
 EOC
 
     @isa = $classname unless @isa;
+
     for my $isa (@isa) {
         $cout .= <<"EOC";
             VTABLE_push_string(interp, mro, CONST_STRING_GEN(interp, "$isa"));
@@ -760,8 +761,7 @@ EOC
 
         if ( exists $method->{PCCMETHOD} ) {
             $cout .= <<"EOC";
-        register_raw_nci_method_in_ns(interp, entry,
-            F2DPTR(Parrot_${classname}_${method_name}), "$symbol_name");
+        register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_${classname}_${method_name}), CONST_STRING_GEN(interp, "$symbol_name"));
 EOC
         }
         else {

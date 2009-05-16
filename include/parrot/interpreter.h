@@ -636,7 +636,7 @@ PARROT_EXPORT
 void register_raw_nci_method_in_ns(PARROT_INTERP,
     const int type,
     ARGIN(void *func),
-    ARGIN(const char *name))
+    ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);

@@ -79,19 +79,17 @@ of PMC class C<type>.
 PARROT_EXPORT
 void
 register_raw_nci_method_in_ns(PARROT_INTERP, const int type, ARGIN(void *func),
-        ARGIN(const char *name))
+        ARGIN(STRING *name))
 {
     ASSERT_ARGS(register_raw_nci_method_in_ns)
     PMC    * const method      = pmc_new(interp, enum_class_NCI);
-    STRING * const method_name = string_make(interp, name, strlen(name),
-        NULL, PObj_constant_FLAG|PObj_external_FLAG);
 
     /* setup call func */
     VTABLE_set_pointer(interp, method, func);
 
     /* insert it into namespace */
     VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
-            method_name, method);
+            name, method);
 }
 
 /*
