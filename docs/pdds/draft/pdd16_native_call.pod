@@ -235,11 +235,15 @@ Register the callback
 When the callback function is invoked by the external library, the function
 itself should look like:
 
+=begin PIR
+
   .sub _my_callback
     .param pmc my_data
     .param pmc library_data   # type depends on signature
     # Do something with the passed in data
   .end
+
+=end PIR
 
 Parrot itself handles all the nasty bits involved in collecting up the
 interpreter pointer, creating the wrapping PMCs, stuffing data various places,
@@ -249,6 +253,8 @@ and generally dealing with the bookkeeping.
 
 This section contains an example to register a callback function and have
 it call back into Parrot.
+
+=begin PIR
 
   .sub main
 
@@ -279,6 +285,8 @@ it call back into Parrot.
     .param pmc udata
     print "Foo callback\n"
   .end
+
+=end PIR
 
 The C code contains the function to be invoked through NCI. In the function
 C<sayhello> a function call is done to a Parrot subroutine. The C<sayhello>

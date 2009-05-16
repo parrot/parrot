@@ -274,13 +274,21 @@ the task list. If there are no tasks remaining in the task list, return null.
 
 =item add_handler
 
-    $P1.add_handler($P2)
+=begin PIR_FRAGMENT
+
+    $P1.'add_handler'($P2)
+
+=end PIR_FRAGMENT
 
 Add an event or exception handler to the scheduler's list of handlers.
 
 =item find_handler
 
-    $P1 = $P2.find_handler($P3)
+=begin PIR_FRAGMENT
+
+    $P1 = $P2.'find_handler'($P3)
+
+=end PIR_FRAGMENT
 
 Search for an event or exception handler $P1, in scheduler $P2, for the task
 $P3. Returns a null PMC if an appropriate handler is not found.
@@ -365,33 +373,49 @@ Set an attribute of the task.
 
 =item new
 
+=begin PIR_FRAGMENT
+
   $P1 = new 'Task'
+
+=end PIR_FRAGMENT
 
 Creates a new task. (The Scheduler PMC is never instantiated directly, it is
 only used by Parrot internals.)
 
 =item schedule
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'Task'
   # set attributes
   schedule $P0
+
+=end PIR_FRAGMENT
 
 Register a task with the concurrency scheduler. Details about the task are
 stored within the task PMC.
 
 =item join
 
+=begin PIR_FRAGMENT_INVALID
+
   $P0 = new 'Task'
   # ... schedule the task, etc.
   join $P0
+
+=end PIR_FRAGMENT_INVALID
 
 Wait for a particular task to complete.
 
 =item kill
 
+=begin PIR_FRAGMENT_INVALID
+
   $P0 = new 'Task'
   # ... schedule the task, etc.
   kill $P0
+
+=end PIR_FRAGMENT_INVALID
 
 Kill a task without waiting for it to complete.
 

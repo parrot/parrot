@@ -14,9 +14,11 @@ lexically scoped variables.
 
 =head2 Synopsis
 
+=begin PIR
+
     .sub 'foo'
         .lex "$a", $P0
-        $P1 = new Integer
+        $P1 = new 'Integer'
         $P1 = 13013
         store_lex "$a", $P1
         print $P0            # prints 13013
@@ -44,12 +46,13 @@ lexically scoped variables.
     .sub grault :lex         # without ":lex", Tcl subs have no lexicals
         $P0 = find_lex "x"   # FAILS
 
-        $P0 = new Integer    # really TclInteger
-        $P0 = 42
+        box $P0, 42          # really TclInteger
         store_lex "x", $P0   # creates lexical "x"
 
         $P0 = find_lex "x"   # SUCCEEDS
     .end
+
+=end PIR
 
 =head2 Description
 
@@ -125,7 +128,13 @@ In the above example, the definition of the Parrot subroutine implementing
 This is normally a static attribute of a Sub, but can be changed
 dynamically using the C<set_outer> method.
 
+=begin PIR
+
     .sub 'a' :outer('foo')
+       # ...
+    .end
+
+=end PIR
 
 The value of C<:outer> identifies a subroutine by its C<:subid>
 flag; subroutine definitions that do not have an explicit C<:subid>
@@ -142,9 +151,11 @@ environment to any subroutines that are lexically nested within
 the current sub.  This is normally done either when the outer
 sub is entered or just prior to invoking the inner sub.
 
+=begin PIR
+
     .sub 'a'
         .lex '$a', $P0
-        ...
+        # ...
         # capture current lexical environment for inner sub 'foo'
         .const 'Sub' $P0 = 'foo'
         capture_lex $P0
@@ -152,8 +163,12 @@ sub is entered or just prior to invoking the inner sub.
         'foo'()
     .end
 
+=end PIR
+
 The C<newclosure> opcode will clone a subroutine and then perform
 C<capture_lex> on the newly cloned sub.
+
+=begin PIR
 
     .sub 'a'
         .lex '$a', $P0
@@ -163,6 +178,8 @@ C<capture_lex> on the newly cloned sub.
         $P1 = newclosure $P0
         $P1()
     .end
+
+=end PIR
 
 =head4 Lexical Lookup Algorithm
 
@@ -256,18 +273,30 @@ Declare a lexical variable that is an alias for a PMC register.  The PIR
 compiler calls this method in response to a C<.lex STRING, PREG> directive.
 For example, given this preamble:
 
+=begin PIR_FRAGMENT
+
     .lex "$a", $P0
-    $P1 = new Integer
+    $P1 = new 'Integer'
+
+=end PIR_FRAGMENT
 
 These two opcodes have an identical effect:
+
+=begin PIR_FRAGMENT
 
     $P0 = $P1
     store_lex "$a", $P1
 
+=end PIR_FRAGMENT
+
 And these two opcodes also have an identical effect:
+
+=begin PIR_FRAGMENT
 
     $P1 = $P0
     $P1 = find_lex "$a"
+
+=end PIR_FRAGMENT
 
 =back
 
@@ -314,14 +343,22 @@ to use to get frame info.
 
 For example, to get the immediate caller's LexPad, use:
 
+=begin PIR_FRAGMENT
+
     $P0 = getinterp
     $P1 = $P0["lexpad"; 1]
 
+=end PIR_FRAGMENT
+
 To access a sub's C<:outer> subroutine, use the C<get_outer()> method:
+
+=begin PIR_FRAGMENT
 
     .include "interpinfo.pasm"
     interpinfo $P1, .INTERPINFO_CURRENT_SUB
     $P2 = $P1."get_outer"()
+
+=end PIR_FRAGMENT
 
 Here, C<$P1> contains information on the current subroutine. C<$P2> will
 contain C<$P1>'s outer subroutine.
@@ -329,20 +366,32 @@ contain C<$P1>'s outer subroutine.
 To get C<$P2>'s outer subroutine (if any), the same method can be used on
 C<$P2> itself:
 
+=begin PIR_FRAGMENT
+
     $P3 = $P2."get_outer"()
 
+=end PIR_FRAGMENT
 
 Using the C<interpinfo> instruction is one way to do it. Another way is this:
+
+=begin PIR_FRAGMENT
 
     $P0 = getinterp
     $P1 = $P0["outer"; "sub"]
     $P2 = $P0["outer"; "sub"; 2] # get the outer sub of the current's outer
                                  # subroutine
 
+=end PIR_FRAGMENT
+
+
 It is also possible to get the C<:outer> sub's LexPad, as above:
+
+=begin PIR_FRAGMENT
 
     $P0 = getinterp
     $P1 = $P0["outer"; "lexpad"]
+
+=end PIR_FRAGMENT
 
 See [1] for an example.
 

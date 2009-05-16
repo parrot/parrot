@@ -139,7 +139,11 @@ The untyped interface also has one method:
 
 =item C<get_name>
 
-    $P1 = $P2.get_name()
+=begin PIR_FRAGMENT
+
+    $P1 = $P2.'get_name'()
+
+=end PIR_FRAGMENT
 
 Gets the name of the namespace $P2 as an array of strings.  For example,
 if $P2 is a Perl 5 namespace "Some::Module", within the Perl 5 HLL, then
@@ -172,19 +176,31 @@ overwriting one type with another.
 
 =item C<add_namespace>
 
-    $P1.add_namespace($S2, $P3)
+=begin PIR_FRAGMENT
+
+    $P1.'add_namespace'($S2, $P3)
+
+=end PIR_FRAGMENT
 
 Store $P3 as a namespace under the namespace $P1, with the name of $S2.
 
 =item C<add_sub>
 
-    $P1.add_sub($S2, $P3)
+=begin PIR_FRAGMENT
+
+    $P1.'add_sub'($S2, $P3)
+
+=end PIR_FRAGMENT
 
 Store $P3 as a subroutine with the name of $S2 in the namespace $P1.
 
 =item C<add_var>
 
-    $P1.add_var($S2, $P3)
+=begin PIR_FRAGMENT
+
+    $P1.'add_var'($S2, $P3)
+
+=end PIR_FRAGMENT
 
 Store $P3 as a variable with the name of $S2 in the namespace $P1.
 
@@ -195,17 +211,25 @@ appropriate sigil.
 
 =item C<del_namespace>, C<del_sub>, C<del_var>
 
-    $P1.del_namespace($S2)
-    $P1.del_sub($S2)
-    $P1.del_var($S2)
+=begin PIR_FRAGMENT
+
+    $P1.'del_namespace'($S2)
+    $P1.'del_sub'($S2)
+    $P1.'del_var'($S2)
+
+=end PIR_FRAGMENT
 
 Delete the sub, namespace, or variable named $S2 from the namespace $P1.
 
 =item C<find_namespace>, C<find_sub>, C<find_var>
 
-    $P1 = $P2.find_namespace($S3)
-    $P1 = $P2.find_sub($S3)
-    $P1 = $P2.find_var($S3)
+=begin PIR_FRAGMENT
+
+    $P1 = $P2.'find_namespace'($S3)
+    $P1 = $P2.'find_sub'($S3)
+    $P1 = $P2.'find_var'($S3)
+
+=end PIR_FRAGMENT
 
 Find the sub, namespace, or variable named $S3 in the namespace $P2.
 
@@ -217,7 +241,11 @@ consider not exporting variables at all, but that's a style issue.)
 
 =item C<export_to>
 
-    $P1.export_to($P2, $P3)
+=begin PIR_FRAGMENT
+
+    $P1.'export_to'($P2, $P3)
+
+=end PIR_FRAGMENT
 
 Export items from the namespace $P1 into the namespace $P2.  The items to
 export are named in $P3, which may be an array of strings, a hash, or null.
@@ -266,7 +294,11 @@ base namespace PMC.  Maybe a standard method "expand_export_list()"?
 
 =item C<parse_name>
 
-    $P1 = $P2.parse_name($S3)
+=begin PIR_FRAGMENT
+
+    $P1 = $P2.'parse_name'($S3)
+
+=end PIR_FRAGMENT
 
 Parse the name in $S3 using the rules specific to the compiler $P2, and
 return an array of individual name elements.
@@ -278,7 +310,11 @@ C<['a','b','$c']>.
 
 =item C<get_namespace>
 
-    $P1 = $P2.get_namespace($P3)
+=begin PIR_FRAGMENT
+
+    $P1 = $P2.'get_namespace'($P3)
+
+=end PIR_FRAGMENT
 
 Ask the compiler $P2 to find its namespace which is named by the
 elements of the array in $P3.  If $P3 is a null PMC or an empty array,
@@ -298,7 +334,11 @@ interface if the language doesn't mangle namespace names.
 
 =item C<load_library>
 
-    $P1.load_library($P2, $P3)
+=begin PIR_FRAGMENT
+
+    $P1.'load_library'($P2, $P3)
+
+=end PIR_FRAGMENT
 
 Ask this compiler to load a library/module named by the elements of the array
 in $P2, with optional control information in $P3.
@@ -325,7 +365,11 @@ behavior about namespaces.
 
 =item C<get_namespace>
 
-    $P1 = $P2.get_namespace()
+=begin PIR_FRAGMENT
+
+    $P1 = $P2.'get_namespace'()
+
+=end PIR_FRAGMENT
 
 Retrieve the namespace $P1 where the subroutine $P2 was defined. (As
 opposed to the namespace(s) that it may have been exported to.)
@@ -344,39 +388,59 @@ true root namespace (identified by "root" in the name).
 
 =item C<set_namespace>
 
-    set_namespace [key], $P1
-    set_hll_namespace [key], $P1
-    set_root_namespace [key], $P1
+=begin PIR_FRAGMENT_INVALID
+
+    set_namespace ['key'], $P1
+    set_hll_namespace ['key'], $P1
+    set_root_namespace ['key'], $P1
+
+=end PIR_FRAGMENT_INVALID
 
 Add the namespace PMC $P1 under the name denoted by a multidimensional
 hash key.
 
+=begin PIR_FRAGMENT_INVALID
+
     set_namespace $P1, $P2
     set_hll_namespace $P1, $P2
     set_root_namespace $P1, $P2
+
+=end PIR_FRAGMENT_INVALID
 
 Add the namespace PMC $P2 under the name denoted by an array of name
 strings $P1.
 
 =item C<get_namespace>
 
+=begin PIR_FRAGMENT
+
     $P1 = get_namespace
     $P1 = get_hll_namespace
     $P1 = get_root_namespace
 
+=end PIR_FRAGMENT
+
 Retrieve the current namespace, the HLL root namespace, or the true
 root namespace and store it in $P1.
+
+=begin PIR_FRAGMENT_INVALID
 
     $P1 = get_namespace [key]
     $P1 = get_hll_namespace [key]
     $P1 = get_root_namespace [key]
 
+=end PIR_FRAGMENT_INVALID
+
 Retrieve the namespace denoted by a multidimensional hash key and
 store it in C<$P1>.
+
+=begin PIR_FRAGMENT
 
     $P1 = get_namespace $P2
     $P1 = get_hll_namespace $P2
     $P1 = get_root_namespace $P2
+
+=end PIR_FRAGMENT
 
 Retrieve the namespace denoted by the array of names $P2 and store it in
 C<$P1>.
@@ -385,74 +449,116 @@ Thus, to get the "Foo::Bar" namespace from the top-level of the HLL if
 the name was known at compile time, you could retrieve the namespace
 with a key:
 
+=begin PIR_FRAGMENT
+
   $P0 = get_hll_namespace ["Foo"; "Bar"]
+
+=end PIR_FRAGMENT
 
 If the name was not known at compile time, you would retrieve the
 namespace with an array instead:
 
+=begin PIR_FRAGMENT
+
   $P1 = split "::", "Foo::Bar"
   $P0 = get_hll_namespace $P1
 
+=end PIR_FRAGMENT
+
 =item C<make_namespace>
+
+=begin PIR_FRAGMENT_INVALID
 
     $P1 = make_namespace [key]
     $P1 = make_hll_namespace [key]
     $P1 = make_root_namespace [key]
 
+=end PIR_FRAGMENT_INVALID
+
 Create and retrieve the namespace denoted by a multidimensional hash key
 and store it in C<$P1>. If the namespace already exists, only retrieve
 it.
 
+=begin PIR_FRAGMENT_INVALID
+
     $P1 = make_namespace $P2
     $P1 = make_hll_namespace $P2
     $P1 = make_root_namespace $P2
+
+=end PIR_FRAGMENT_INVALID
 
 Create and retrieve the namespace denoted by the array of names $P2 and
 store it in C<$P1>. If the namespace already exists, only retrieve it.
 
 =item C<get_global>
 
+=begin PIR_FRAGMENT
+
     $P1 = get_global $S2
     $P1 = get_hll_global $S2
     $P1 = get_root_global $S2
 
+=end PIR_FRAGMENT
+
 Retrieve the symbol named $S2 in the current namespace, HLL root
 namespace, or true root namespace.
 
+=begin PIR_FRAGMENT
+
+    .local pmc key
     $P1 = get_global [key], $S2
     $P1 = get_hll_global [key], $S2
     $P1 = get_root_global [key], $S2
 
+=end PIR_FRAGMENT
+
 Retrieve the symbol named $S2 by a multidimensional hash key relative
 to the current namespace, HLL root namespace, or true root namespace.
+
+=begin PIR_FRAGMENT
 
     $P1 = get_global $P2, $S3
     $P1 = get_hll_global $P2, $S3
     $P1 = get_root_global $P2, $S3
+
+=end PIR_FRAGMENT
 
 Retrieve the symbol named $S3 by the array of names $P2 relative to the
 current namespace, HLL root namespace, or true root namespace.
 
 =item C<set_global>
 
+=begin PIR_FRAGMENT
+
     set_global $S1, $P2
     set_hll_global $S1, $P2
     set_root_global $S1, $P2
 
+=end PIR_FRAGMENT
+
 Store $P2 as the symbol named $S1 in the current namespace, HLL root
 namespace, or true root namespace.
 
+=begin PIR_FRAGMENT
+
+    .local pmc key
     set_global [key], $S1, $P2
     set_hll_global [key], $S1, $P2
     set_root_global [key], $S1, $P2
+
+=end PIR_FRAGMENT
 
 Store $P2 as the symbol named $S1 by a multidimensional hash key,
 relative to the current namespace, HLL root namespace, or true root
 namespace.  If the given namespace does not exist it is created.
 
+=begin PIR_FRAGMENT
+
     set_global $P1, $S2, $P3
     set_hll_global $P1, $S2, $P3
     set_root_global $P1, $S2, $P3
+
+=end PIR_FRAGMENT
 
 Store $P3 as the symbol named $S2 by the array of names $P1, relative to
 the current namespace, HLL root namespace, or true root namespace.  If
@@ -479,6 +585,8 @@ This Perl:
 
 should map roughly to this PIR:
 
+=begin PIR
+
   .HLL "Perl5"
   .loadlib "perl5_group"
   .namespace [ "Foo" ]
@@ -487,6 +595,8 @@ should map roughly to this PIR:
     $P0 = 5
     set_global "$x", $P0
   .end
+
+=end PIR
 
 In this case, the C<main> sub would be tied to Perl 5 by the C<.HLL>
 directive, so a Perl 5 namespace would be created.
@@ -503,6 +613,8 @@ The C<Foo::> namespace is created at run-time (without any optimizations).  In
 these cases, Parrot should create the namespace based on the HLL of the PIR
 subroutine that calls the store function.
 
+=begin PIR
+
   .HLL "Perl5"
   .loadlib "perl5_group"
   .sub main :main
@@ -511,7 +623,7 @@ subroutine that calls the store function.
     $P0 = "x"
     set_global "$a", $P0
     # ${"Foo::$a"} = 5;
-    $P1 = new PerlString
+    $P1 = new 'PerlString'
     $P1 = "Foo::"
     $P1 .= $P0
     $S0 = $P1
@@ -522,6 +634,8 @@ subroutine that calls the store function.
     $P3 = 5
     set_global $P2, $S0, $P3
   .end
+
+=end PIR
 
 In this case, C<set_global> should see that it was called from "main",
 which is in a Perl 5 namespace, so it will create the "Foo" namespace as
@@ -572,8 +686,10 @@ Perl:
 
 PIR:
 
+=begin PIR
+
   .sub main :main
-    $P0 = get_name "&foo"
+    $P0 = get_global "&foo"
     $P1 = get_namespace ["Foo"]
 
     # A smart perl6 compiler would emit this,
@@ -581,13 +697,15 @@ PIR:
     $P1["&bar"] = $P0
 
     # But a naive perl6 compiler would emit this:
-    $P1.add_sub("bar", $P0)
+    $P1.'add_sub'("bar", $P0)
 
   .end
 
   .sub foo
-    ...
+    #...
   .end
+
+=end PIR
 
 =head4 Cross-language Exportation
 
@@ -599,6 +717,8 @@ Perl 5:
 
 PIR (without error checking):
 
+=begin PIR
+
   .sub main :main
     .local pmc tcl
     .local pmc ns
@@ -608,12 +728,14 @@ PIR (without error checking):
     ns[0] = "Some"
     ns[1] = "Module"
     null $P0
-    tcl.load_library(ns, $P0)
-    $P0 = tcl.get_namespace(ns)
+    tcl.'load_library'(ns, $P0)
+    $P0 = tcl.'get_namespace'(ns)
     $P1 = get_namespace
-    $P0.export_to($P1, 'w*')
+    $P0.'export_to'($P1, 'w*')
     "write"("this is a tcl command")
   .end
+
+=end PIR
 
 =head2 Attachments
 

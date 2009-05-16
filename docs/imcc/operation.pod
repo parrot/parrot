@@ -68,7 +68,7 @@ of individual subroutines.
 This also means that you currently can't use the same global symbol (e.g.
 subroutine name) in different namespaces. The following creates invalid code:
 
-=begin PIR_INVALID
+=begin PIR
 
   .sub main
      #...
@@ -79,7 +79,7 @@ subroutine name) in different namespaces. The following creates invalid code:
      #...
   .end
 
-=end PIR_INVALID
+=end PIR
 
 Local labels in different I<compilation units> with the same name are
 allowed, though assembling the generated PASM doesn't work. However,

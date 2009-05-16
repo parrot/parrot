@@ -243,17 +243,26 @@ The following opcodes are used with the event system:
 
 =item new
 
+=begin PIR_FRAGMENT
+
   $P1 = new 'Event'
   $P1 = new 'EventHandler'
   $P1 = new 'EventHandler', $P2
+
+=end PIR_FRAGMENT
+
 
 Creates a new event or event handler.
 
 =item schedule
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'Event'
   # set attributes
   schedule $P0
+
+=end PIR_FRAGMENT
 
 Register an event with the concurrency scheduler. If the concurrency scheduler
 for this interpreter (thread/clustered instance) is linked to another
@@ -265,9 +274,13 @@ non-fatal, whether it's a timer, etc) are stored within the event PMC.
 
 =item addhandler
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'EventHandler'
   # set attributes
   addhandler $P0
+
+=end PIR_FRAGMENT
 
 Register an event handler with the concurrency scheduler. If the concurrency
 scheduler for this interpreter (thread/clustered instance) is linked to

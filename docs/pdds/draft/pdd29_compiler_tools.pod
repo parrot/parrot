@@ -31,6 +31,8 @@ This PDD specifies the Parrot Compiler Tools (PCT).
 
 Creating a PCT-based compiler can be done as follows:
 
+=begin PIR
+
  .sub 'onload' :anon :load :init
      load_bytecode 'PCT.pbc'
      $P0 = get_hll_global ['PCT'], 'HLLCompiler'
@@ -45,6 +47,8 @@ Creating a PCT-based compiler can be done as follows:
      $P0 = compreg 'Foo'
      $P1 = $P0.'command_line'(args)
  .end
+
+=end PIR
 
 {{ this is the most important part; is this enough? }}
 
@@ -303,19 +307,35 @@ compiler phases.
 
 =item language
 
-$P0.'language'('Foo')
+=begin PIR_FRAGMENT
+
+  $P0.'language'('Foo')
+
+=end PIR_FRAGMENT
 
 =item parsegrammar
 
-$P0.'parsegrammar'('Foo::Grammar')
+=begin PIR_FRAGMENT
+
+  $P0.'parsegrammar'('Foo::Grammar')
+
+=end PIR_FRAGMENT
 
 =item parseactions
 
-$P0.'parseactions('Foo::Grammar::Actions')
+=begin PIR_FRAGMENT
+
+  $P0.'parseactions'('Foo::Grammar::Actions')
+
+=end PIR_FRAGMENT
 
 =item commandline_prompt
 
-$P0.'commandline_prompt'($S0)
+=begin PIR_FRAGMENT
+
+  $P0.'commandline_prompt'($S0)
+
+=end PIR_FRAGMENT
 
 sets the string in C<$S0> as a commandline prompt on the compiler in C<$P0>.
 The prompt is the text that is shown on the commandline before a command is
@@ -323,7 +343,11 @@ entered when the compiler is started in interactive mode.
 
 =item commandline_banner
 
-$P0.'commandline_banner'($S0)
+=begin PIR_FRAGMENT
+
+  $P0.'commandline_banner'($S0)
+
+=end PIR_FRAGMENT
 
 sets the string in C<$S0> as a commandline banner on the compiler in C<$P0>.
 The banner is the first text that is shown when the compiler is started in

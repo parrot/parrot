@@ -89,16 +89,24 @@ A PIR label is accessible only in the subroutine where it's defined. A label
 name must be unique within a subroutine, but it can be reused in other
 subroutines.
 
+=begin PIR_FRAGMENT
+
   goto label1
-     ...
+     # ...
   label1:
+
+=end PIR_FRAGMENT
 
 =head4 Registers and Variables
 
 There are two ways of referencing Parrot's registers. The first is
 through named local variables declared with C<.local>.
 
+=begin PIR_FRAGMENT
+
   .local pmc foo
+
+=end PIR_FRAGMENT
 
 The type of a named variable can be C<int>, C<num>, C<string> or C<pmc>,
 corresponding to the types of registers. No other types are used.
@@ -140,33 +148,48 @@ trailing whitespace.
 
 Assignment of a heredoc:
 
+=begin PIR_FRAGMENT
+
   $S0 = <<"EOS"
   ...
- EOS
+EOS
+
+=end PIR_FRAGMENT
 
 A heredoc as an argument:
 
+=begin PIR_FRAGMENT
+
+  .local pmc function, arg
+  # ...
+
   function(<<"END_OF_HERE", arg)
   ...
- END_OF_HERE
-
-  .return(<<'EOS')
-  ...
- EOS
+END_OF_HERE
 
   .yield(<<'EOS')
   ...
- EOS
+EOS
+
+  .return(<<'EOS')
+  ...
+EOS
+
+=end PIR_FRAGMENT
 
 Although currently not possible, a future implementation of the PIR
 language will allow you to use multiple heredocs within a single
 statement or directive:
 
+=begin PIR_FRAGMENT_TODO
+
    function(<<'INPUT', <<'OUTPUT', 'some test')
    ...
- INPUT
+INPUT
    ...
- OUTPUT
+OUTPUT
+
+=end PIR_FRAGMENT_TODO
 
 =item charset:"string constant"
 
@@ -247,18 +270,30 @@ subroutine
 Declare a lexical variable that is an alias for a PMC register. For example,
 given this preamble:
 
+=begin PIR_FRAGMENT
+
     .lex '$a', $P0
     $P1 = new 'Integer'
 
+=end PIR_FRAGMENT
+
     These two opcodes have an identical effect:
+
+=begin PIR_FRAGMENT
 
     $P0 = $P1
     store_lex '$a', $P1
 
+=end PIR_FRAGMENT
+
     And these two opcodes also have an identical effect:
+
+=begin PIR_FRAGMENT
 
     $P1 = $P0
     $P1 = find_lex '$a'
+
+=end PIR_FRAGMENT
 
 =item .const <type> <identifier> = <const>
 
@@ -312,7 +347,11 @@ namespace's global pad.
 
 You can specify the root namespace by using empty brackets, such as:
 
+=begin PIR
+
     .namespace [ ]
+
+=end PIR
 
 The brackets are not optional, although the key inside them is.
 
@@ -349,9 +388,13 @@ should print the source file's name, not the name of the generated file.
 Makes an entry in the bytecode annotations table. This is used to store high
 level language debug information. Examples:
 
+=begin PIR_FRAGMENT
+
   .annotate "file", "aardvark.p6"
   .annotate "line", 5
   .annotate "column", 24
+
+=end PIR_FRAGMENT
 
 An annotation stays in effect until the next annotation with the same key or
 the end of the current compilation unit (that is, if you use a tool such as
@@ -362,13 +405,21 @@ One annotation covers many PIR instructions. If the result of compiling one
 line of HLL code is 15 lines of PIR, you only need to emit one annotation
 before the first of those 15 lines to set the line number.
 
+=begin PIR_FRAGMENT
+
   .annotate "line", 42
+
+=end PIR_FRAGMENT
 
 The key must always be a quoted string. The value may be an integer, a number
 or a quoted string. Note that integer values are stored most compactly; should
 you instead of the above annotate directive emit:
 
+=begin PIR_FRAGMENT
+
   .annotate "line", "42"
+
+=end PIR_FRAGMENT
 
 then instead "42" is stored as a string, taking up more space in the resulting
 bytecode file.
@@ -430,6 +481,8 @@ immediately (hence the :immediate flag). Instead of storing the sub
 'init' in the constants table, the value returned by 'init' is stored,
 which in this example is a FixedIntegerArrray.
 
+=begin PIR
+
     .sub main :main
       .const "Sub" initsub = "init"
     .end
@@ -443,6 +496,7 @@ which in this example is a FixedIntegerArrray.
       .return (array)
     .end
 
+=end PIR
 
 =item :postcomp
 
@@ -452,11 +506,17 @@ instruction from another file).
 
 As an example, suppose file C<main.pir> contains:
 
+=begin PIR
+
     .sub main
         load_bytecode 'foo.pir'
     .end
 
+=end PIR
+
 and the file C<foo.pir> contains:
+
+=begin PIR
 
     .sub foo :immediate
         print '42'
@@ -466,6 +526,8 @@ and the file C<foo.pir> contains:
         print '43'
     .end
 
+=end PIR
+
 Executing C<foo.pir> will run both C<foo> and C<bar>.  On the other hand,
 executing C<main.pir> will run only C<foo>.  If C<foo.pir> is compiled to
 bytecode, only C<foo> will be run, and loading C<foo.pbc> will not run either
@@ -473,8 +535,17 @@ C<foo> or C<bar>.
 
 =item :method
 
+=begin PIR
+
   .sub bar :method
+    # ...
+  .end
+
   .sub bar :method('foo')
+    # ...
+  .end
+
+=end PIR
 
 The marked C<.sub> is a method, added as a method in the class that
 corresponds to the current namespace, and not stored in the namespace.
@@ -485,8 +556,17 @@ that name instead of the C<.sub> name.
 
 =item :vtable
 
+=begin PIR
+
   .sub bar :vtable
+    # ...
+  .end
+   
   .sub bar :vtable('foo')
+    # ...
+  .end
+
+=end PIR
 
 The marked C<.sub> overrides a vtable function, and is not stored in the
 namespace. By default, it overrides a vtable function with the same name
@@ -619,12 +699,17 @@ is thrown, Parrot will execute the installed exception handler. In order to
 retrieve the thrown exception, use the C<.get_results> directive. This
 directive always takes one argument: an exception object.
 
+=begin PIR_FRAGMENT
+
    push_eh handler
-   ...
+   # ...
  handler:
    .local pmc exception
    .get_results (exception)
-   ...
+   # ...
+
+=end PIR_FRAGMENT
+
 
 This is syntactic sugar for the C<get_results> op, but any flags set on the
 targets will be handled automatically by the PIR compiler.
@@ -634,12 +719,17 @@ handler; only declarations (.lex, .local) may come first.
 To resume execution after handling the exception, just invoke the continuation
 stored in the exception.
 
-   ...
+=begin PIR_FRAGMENT
+
+   .local pmc exception, continuation
+   # ...
    .get_results(exception)
-   ...
+   # ...
    continuation = exception['resume']
    continuation()
-   ...
+   # ...
+
+=end PIR_FRAGMENT
 
 See L<PDD23|pdds/pdd23_exceptions.pod> for accessing the various attributes
 of the exception object.
@@ -739,11 +829,19 @@ Many opcodes can use this PIR syntactic sugar. The first argument for the
 opcode is placed before the C<=>, and all remaining arguments go after the
 opcode name. For example:
 
+=begin PIR_FRAGMENT
+
   new $P0, 'Type'
+
+=end PIR_FRAGMENT
 
 becomes:
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'Type'
+
+=end PIR_FRAGMENT
 
 Note that this only works for opcodes that have have a leading C<OUT>
 parameter. [this restriction unimplemented: RT #36283]
@@ -848,7 +946,11 @@ Closes a macro definition.
 
 =item * C<.macro_const> <identifier> (<literal>|<reg>)
 
+=begin PIR
+
  .macro_const   PI  3.14
+
+=end PIR
 
 The C<.macro_const> directive is a special type of macro; it allows the user
 to use a symbolic name for a constant value. Like C<.macro>, the substitution
@@ -868,9 +970,13 @@ that file.
 A macro expansion is a dot-prefixed identifier. For instance, if a macro
 was defined as shown below:
 
+=begin PIR
+
  .macro foo(bar)
- ...
+   # ...
  .endm
+
+=end PIR
 
 this macro can be expanded by writing C<.foo(42)>. The body of the macro
 will be inserted at the point where the macro expansion is written.
@@ -885,9 +991,13 @@ within a line of code.
 The parameter list for a macro is specified in parentheses after the name of
 the macro. Macro parameters are not typed.
 
+=begin PIR
+
  .macro foo(bar, baz, buz)
- ...
+   # ...
  .endm
+
+=end PIR
 
 The number of arguments in the call to a macro must match the number of
 parameters in the macro's parameter list. Macros do not perform multidispatch,
@@ -897,16 +1007,24 @@ Calling a macro with the wrong number of arguments gives the user an error.
 If a macro defines no parameter list, parentheses are optional on both the
 definition and the call.  This means that a macro defined as:
 
+=begin PIR
+
  .macro foo
- ...
+   # ...
  .endm
+
+=end PIR
 
 can be expanded by writing either C<.foo> or C<.foo()>. And a macro definition
 written as:
 
+=begin PIR
+
  .macro foo()
- ...
+   # ...
  .endm
+
+=end PIR
 
 can also be expanded by writing either C<.foo> or C<.foo()>.
 
@@ -922,6 +1040,8 @@ Heredoc arguments are not allowed when expanding a macro. The next
 implementation of PIR ("PIRC") will be able to handle this correctly.
 This means that, currently, when using IMCC, the following is not allowed:
 
+=begin PIR_TODO
+
    .macro foo(bar)
    ...
    .endm
@@ -930,12 +1050,15 @@ This means that, currently, when using IMCC, the following is not allowed:
  This is a heredoc
     string.
 
- EOS
+EOS
 
+=cut PIR_TODO
 
 Using braces, { }, allows you to span multiple lines for an argument.
 See runtime/parrot/include/hllmacros.pir for examples and possible usage.
 A simple example is this:
+
+=begin PIR
 
  .macro foo(a,b)
    .a
@@ -951,7 +1074,11 @@ A simple example is this:
         })
  .end
 
+=cut PIR
+
 This will expand the macro C<foo>, after which the input to the PIR parser is:
+
+=begin PIR
 
  .sub main
    print "1"
@@ -959,6 +1086,8 @@ This will expand the macro C<foo>, after which the input to the PIR parser is:
    print "3"
    print "4"
  .end
+
+=cut PIR
 
 which will result in the output:
 
@@ -971,12 +1100,15 @@ which will result in the output:
 Within the macro body, the user can declare a unique label identifier using
 the value of a macro parameter, like so:
 
+=begin PIR
+
   .macro foo(a)
-  ...
+    # ...
  .label $a:
-  ...
+    # ...
   .endm
 
+=cut PIR
 
 =head4 Unique local variables
 
@@ -985,40 +1117,52 @@ B<Note: this is not yet implemented in IMCC>.
 Within the macro body, the user can declare a local variable with a unique
 name.
 
+=begin PIR
+
   .macro foo()
-  ...
+    # ...
   .macro_local int b
-  ...
+    # ...
   .b = 42
   print .b # prints the value of the unique variable (42)
-  ...
+    # ...
   .endm
+
+=cut PIR
 
 The C<.macro_local> directive declares a local variable with a unique name in
 the macro. When the macro C<.foo()> is called, the resulting code that is
 given to the parser will read as follows:
 
+=begin PIR
+
   .sub main
     .local int local__foo__b__2
-    ...
+      # ...
     local__foo__b__2 = 42
     print local__foo__b__2
 
   .end
 
+=cut
+
 The user can also declare a local variable with a unique name set to the
 symbolic value of one of the macro parameters.
 
+=begin PIR
+
   .macro foo(b)
-  ...
+    # ...
   .macro_local int $b
-  ...
+    # ...
   .$b = 42
   print .$b # prints the value of the unique variable (42)
   print .b  # prints the value of parameter "b", which is
             # also the name of the variable.
-  ...
+  #  ...
   .endm
+
+=end PIR
 
 So, the special C<$> character indicates whether the symbol is interpreted as
 just the value of the parameter, or that the variable by that name is meant.
@@ -1026,6 +1170,8 @@ Obviously, the value of C<b> should be a string.
 
 The automatic name munging on C<.macro_local> variables allows for using
 multiple macros, like so:
+
+=begin PIR
 
   .macro foo(a)
   .macro_local int $a
@@ -1040,12 +1186,18 @@ multiple macros, like so:
     .bar("x")
   .end
 
+=end PIR
+
 This will result in code for the parser as follows:
+
+=begin PIR
 
   .sub main
     .local int local__foo__x__2
     .local int local__bar__x__4
   .end
+
+=end PIR
 
 Each expansion is associated with a unique number; for labels declared with
 C<.macro_label> and locals declared with C<.macro_local> expansions, this
@@ -1056,23 +1208,37 @@ label or local names.
 
 Defining a non-unique variable can still be done, using the normal syntax:
 
+=begin PIR
+
   .macro foo(b)
   .local int b
   .macro_local int $b
   .endm
 
+=end PIR
+
 When invoking the macro C<foo> as follows:
+
+=begin PIR_FRAGMENT
 
   .foo("x")
 
+=end PIR_FRAGMENT
+
 there will be two variables: C<b> and C<x>. When the macro is invoked twice:
+
+=begin PIR
 
   .sub main
     .foo("x")
     .foo("y")
   .end
 
+=begin PIR
+
 the resulting code that is given to the parser will read as follows:
+
+=begin PIR
 
   .sub main
     .local int b
@@ -1080,6 +1246,8 @@ the resulting code that is given to the parser will read as follows:
     .local int b
     .local int local__foo__y
   .end
+
+=end PIR
 
 Obviously, this will result in an error, as the variable C<b> is defined
 twice.  If you intend the macro to create unique variables names, use
@@ -1092,6 +1260,8 @@ C<.macro_local> instead of C<.local> to take advantage of the name munging.
 A simple subroutine, marked with C<:main>, indicating it's the entry point
 in the file. Other sub flags include C<:load>, C<:init>, etc.
 
+=begin PIR
+
     .sub sub_label :main
       .param int a
       .param int b
@@ -1103,10 +1273,14 @@ in the file. Other sub flags include C<:load>, C<:init>, etc.
 
     .end
 
+=end PIR
+
 =head3 Subroutine Call
 
 Invocation of a subroutine. In this case a continuation subroutine is
 created.
+
+=begin PIR_FRAGMENT
 
     .const "Sub" $P0 = "sub_label"
     $P1 = new 'Continuation'
@@ -1125,7 +1299,11 @@ created.
       .get_result r
     .end_call
 
+=end PIR_FRAGMENT
+
 =head3 NCI Call
+
+=begin PIR_FRAGMENT
 
     load_lib $P0, "libname"
     dlfunc $P1, $P0, "funcname", "signature"
@@ -1139,27 +1317,38 @@ created.
       .get_result r
     .end_call
 
+=end PIR_FRAGMENT
+
 =head3 Subroutine Call Syntactic Sugar
 
 Below there are three different ways to invoke the subroutine C<sub_label>.
 The first retrieves a single return value, the second retrieves 3 return
 values, whereas the last discards any return values.
 
+=begin PIR_FRAGMENT
+
   .local int r0, r1, r2
   r0 = sub_label($I0, $I1, $I2)
   (r0, r1, r2) = sub_label($I0, $I1, $I2)
   sub_label($I0, $I1, $I2)
+
+=end PIR_FRAGMENT
 
 This also works for NCI calls, as the subroutine PMC will be
 a NCI sub, and on invocation will do the Right Thing.
 
 Instead of the label a subroutine object can be used too:
 
+=begin PIR_FRAGMENT
+
    get_global $P0, "sub_label"
    $P0(args)
 
+=end PIR_FRAGMENT
 
 =head3 Methods
+
+=begin PIR
 
   .namespace [ "Foo" ]
 
@@ -1176,6 +1365,8 @@ Instead of the label a subroutine object can be used too:
     ...
   .end
 
+=end PIR
+
 The variable "self" automatically refers to the invocating object, if the
 subroutine declaration contains "method".
 
@@ -1183,6 +1374,8 @@ subroutine declaration contains "method".
 
 The syntax is very similar to subroutine calls. The call is done with
 C<.meth_call> which must immediately be preceded by the C<.invocant>:
+
+=begin PIR_FRAGMENT
 
    .local int x, y, z
    .local pmc class, obj
@@ -1198,6 +1391,9 @@ C<.meth_call> which must immediately be preceded by the C<.invocant>:
    .get_result r
    .end_call
    ...
+
+=end PIR_FRAGMENT
+
 
 The return continuation is optional. The method can be a string
 constant or a string variable.
