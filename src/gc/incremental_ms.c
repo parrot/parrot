@@ -697,7 +697,7 @@ parrot_gc_ims_reinit(PARROT_INTERP)
     Arenas * const  arena_base = interp->arena_base;
 
     arena_base->lazy_gc = 0;
-    Parrot_gc_ms_run_init(interp);
+    Parrot_gc_run_init(interp);
 
     /*
      * trace root set w/o system areas

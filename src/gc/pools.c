@@ -145,7 +145,7 @@ new_pmc_pool(PARROT_INTERP)
         new_small_object_pool(sizeof (PMC), num_headers);
 
     pmc_pool->mem_pool   = NULL;
-    pmc_pool->gc_object  = Parrot_gc_ms_free_pmc;
+    pmc_pool->gc_object  = Parrot_gc_free_pmc;
 
     (interp->arena_base->init_pool)(interp, pmc_pool);
     return pmc_pool;
