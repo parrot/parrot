@@ -22,6 +22,13 @@ Handles pool creation for PMC headers.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void gc_pool_free_pmc(PARROT_INTERP,
+    SHIM(Small_Object_Pool *pool),
+    ARGMOD(PObj *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*p);
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 static Small_Object_Pool * new_small_object_pool(
@@ -42,6 +49,9 @@ static void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*b);
 
+#define ASSERT_ARGS_gc_pool_free_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(p)
 #define ASSERT_ARGS_new_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_Parrot_gc_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
@@ -228,11 +238,52 @@ new_pmc_pool(PARROT_INTERP)
         new_small_object_pool(sizeof (PMC), num_headers);
 
     pmc_pool->mem_pool   = NULL;
-    pmc_pool->gc_object  = Parrot_gc_free_pmc;
+    pmc_pool->gc_object  = gc_pool_free_pmc;
 
     (interp->arena_base->init_pool)(interp, pmc_pool);
     return pmc_pool;
 }
+
+/*
+
+=item C<static void gc_pool_free_pmc(PARROT_INTERP, Small_Object_Pool *pool,
+PObj *p)>
+
+Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
+method if one is available. If the PMC uses a PMC_EXT structure, that is freed
+as well.
+
+=cut
+
+*/
+
+static void
+gc_pool_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
+        ARGMOD(PObj *p))
+{
+    ASSERT_ARGS(gc_pool_free_pmc)
+    PMC    * const pmc        = (PMC *)p;
+    Arenas * const arena_base = interp->arena_base;
+
+    /* TODO collect objects with finalizers */
+    if (PObj_needs_early_gc_TEST(p))
+        --arena_base->num_early_gc_PMCs;
+
+    if (PObj_active_destroy_TEST(p))
+        VTABLE_destroy(interp, pmc);
+
+    if (PObj_is_PMC_EXT_TEST(p))
+         Parrot_gc_free_pmc_ext(interp, pmc);
+
+#ifndef NDEBUG
+
+    pmc->pmc_ext     = (PMC_EXT *)0xdeadbeef;
+    pmc->vtable      = (VTABLE  *)0xdeadbeef;
+
+#endif
+
+}
+
 
 
 /*

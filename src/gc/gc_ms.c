@@ -311,8 +311,8 @@ gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
 
 /*
 
-=item C<static void more_traceable_objects(PARROT_INTERP, Small_Object_Pool
-*pool)>
+=item C<static void gc_ms_more_traceable_objects(PARROT_INTERP,
+Small_Object_Pool *pool)>
 
 We're out of traceable objects. First we try a GC run to free some up. If
 that doesn't work, allocate a new arena.
