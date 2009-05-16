@@ -663,7 +663,8 @@ EOC
         isa_hash         = parrot_new_hash(interp);
         vt->isa_hash     = isa_hash;
 EOC
-    } else {
+    }
+    else {
         $cout .= <<"EOC";
         vt->isa_hash     = NULL;
 EOC
