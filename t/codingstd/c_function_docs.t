@@ -86,8 +86,6 @@ foreach my $path (@files) {
 }
 
 __DATA__
-src/gc/gc_malloc.c
-src/gc/generational_ms.c
 compilers/imcc/instructions.c
 compilers/imcc/optimizer.c
 compilers/imcc/parser_util.c
@@ -126,6 +124,10 @@ examples/compilers/japhc.c
 examples/embed/lorito.c
 src/atomic/gcc_x86.c
 src/debug.c
+src/gc/gc_malloc.c
+src/gc/gc_ms.c
+src/gc/generational_ms.c
+src/gc/mark_sweep.c
 src/gc/res_lea.c
 src/io/io_string.c
 src/jit/amd64/jit_defs.c
