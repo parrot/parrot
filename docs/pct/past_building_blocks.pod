@@ -133,6 +133,7 @@ translates to:
  .end
 
 =end PIR
+
 =head2 Symbol tables
 
 As a block defines a new scope, a PAST::Block object has a symbol table,
