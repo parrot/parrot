@@ -1366,7 +1366,7 @@ htmlhelp-clean :
 dynpmc : dynpmc.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynpmc.dummy : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
+dynpmc.dummy : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h $(PMC2C_FILES)
 	$(MAKE) src/dynpmc
 
 dynpmc-test : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
