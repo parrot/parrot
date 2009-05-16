@@ -13,8 +13,14 @@ The platform byteorder is stored for C code in F<include/parrot/config.h>
 
 for parrot code in
 
-  $P0 = _config()
-  $P0["byteorder"]
+=begin PIR_FRAGMENT
+
+  $P0 = getinterp
+  .include 'iglobals.pasm'
+  $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+  $P2 = $P1["byteorder"]
+
+=end PIR_FRAGMENT
 
 or for perl code via
 

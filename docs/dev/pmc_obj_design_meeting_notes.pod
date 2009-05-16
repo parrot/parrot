@@ -188,11 +188,17 @@ completely different code behind the interface making it work).
 
 Dan used to often remark that sequences like the following were "very slow":
 
+=begin PIR_FRAGMENT_INVALID
+
  $P0 = getattribute obj, "foo"
  $P1 = getattribute obj, "bar"
  $P2 = getattribute obj, "baz"
 
+=end PIR_FRAGMENT_INVALID
+
 Instead, Dan suggested always using classoffset to obtain attributes:
+
+=begin PIR_FRAGMENT_INVALID
 
  $I0 = classoffset obj, "FooClass"
  $P0 = getattribute obj, $I0 # which attr is this?
@@ -200,6 +206,8 @@ Instead, Dan suggested always using classoffset to obtain attributes:
  $P0 = getattribute obj, $I0 # and that?
  inc $I0
  $P0 = getattribute obj, $I0
+
+=end PIR_FRAGMENT_INVALID
 
 Unfortunately, this doesn't seem to be very practical in many respects.  Can
 we at least get a declaration from the designers about the appropriate style
