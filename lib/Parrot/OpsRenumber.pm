@@ -17,16 +17,15 @@ Parrot::OpsRenumber - Methods holding functionality for F<tools/build/opsrenumbe
 
     $self = Parrot::OpsRenumber->new( {
         argv            => [ @ARGV ],
-        nolines         => $nolines_flag,
         moddir          => "lib/Parrot/OpLib",
         module          => "core.pm",
         inc_dir         => "include/parrot/oplib",
         inc_f           => "ops.h",
-        script          => "tools/build/opsrenumber.pl",
+        script          => "tools/dev/opsrenumber.pl",
     } );
 
     $self->prepare_ops();
-    $self->renum_op_map_file( $PConfig{MAJOR} );
+    $self->renum_op_map_file();
 
 =cut
 
@@ -72,7 +71,6 @@ Returns true value upon success.
 
 sub renum_op_map_file {
     my $self = shift;
-    my $major_version = shift;
 
     my $file = scalar(@_) ? shift : $self->{num_file};
 
@@ -123,7 +121,7 @@ sub renum_op_map_file {
     # Parrot::Ops2pm::Base.  prepare_ops(), in turn, works off
     # Parrot::OpsFile.
 
-    # So whether a particular opcode will appear in the *new* ops.num
+    # So whether a particular opcode will continue to appear in ops.num
     # depends entirely on whether or not it's found in
     # @{ $self->{ops}->{OPS} }.  If a particular opcode has been deleted or
     # gone missing from that array, then it won't appear in the new
