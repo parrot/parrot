@@ -247,7 +247,7 @@ EOM
 
 #define PARROT_VTABLE_LOW 9
 
-static /*@observer@*/ const char * const Parrot_vtable_slot_names[] = {
+static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
     "",   /* Pointer to namespace for this class */
     "",   /* 'type' value for MMD */
     "",   /* Name of class this vtable is for */
@@ -300,7 +300,7 @@ EOM
 /* &end_gen */
 
 #ifdef PARROT_IN_OBJECTS_C
-static /*@observer@*/ const char * const Parrot_mmd_func_names[] = {
+static PARROT_OBSERVER const char * const Parrot_mmd_func_names[] = {
 EOM
 
     for my $entry ( @{$vtable} ) {
