@@ -65,7 +65,7 @@ Initializes the struct with C<*value>.
 
     VTABLE void init_pmc(PMC *value) {
         SELF.init();
-        SUPER(value);
+        SELF.set_pmc(value);
     }
 
 /*
