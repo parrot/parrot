@@ -4,7 +4,6 @@
 
 Z<CHP-3>
 
-X<Parrot Intermediate Representation;;(see PIR)>
 X<PIR>
 
 Parrot Intermediate Representation (PIR) is Parrot's native low-level
@@ -338,12 +337,23 @@ and undefines a string or object.
 
 =end PIR_FRAGMENT
 
+=begin sidebar Parrot Assembly Language
+
+Parrot Assembly Language (PASM) is another low-level language native to
+the virtual machine. PASM is a pure assembly language, with none of the
+syntactic sugar that makes PIR friendly for library development.  PASM's
+primary purpose is to act as a plain English reprepresention of the
+bytecode format. It is typically used as a debugging tool, rather than
+for writing libraries. PIR or a higher-level language are recommended
+for most development tasks. PASM files use the F<.pasm> file extension.
+
+=end sidebar
+
 =head2 Working with Numbers
 
-X<PIR (Parrot assembly language);math operations>
-PIR has an extensive set of math instructions that work with integers,
-floating-point numbers, and numeric PMCs. Many of the math instructions
-have two- and three-argument forms:
+PIR has an extensive set of instructions that work with integers,
+floating-point numbers, and numeric PMCs. Many of these instructions
+have a variant that modifies the result in place:
 
 =begin PIR_FRAGMENT
 
@@ -352,130 +362,188 @@ have two- and three-argument forms:
 
 =end PIR_FRAGMENT
 
-The three-argument form of C<+> stores the sum
-of the two arguments in the result variable. The two-argument form
-adds the first variable to the second and stores the result back in
-the first variable.
+The first form of C<+> stores the sum of the two arguments in the result
+variable. The second variant, C<+=>, adds the single argument to the
+result variable and stores the sum back in the result variable.
 
-The arguments can be Parrot variables or constants, but they
-must be compatible with the type of the result.
-Generally, "compatible" means that the result and arguments have to
-be the same type, but there are a few exceptions:
-
-=begin PIR_FRAGMENT
-
-  $P0 = $P1 - 2
-  $P0 = $P1 - 1.5
-
-=end PIR_FRAGMENT
-
-If the result is an integer type, like C<$I0>, the arguments must be
-integer variables or constants. A
-floating-point result, like C<$N0>, usually requires
-floating-point arguments, but many math instructions also allow the final
-argument to be an integer. Instructions with a PMC result may
-accept an integer, floating-point, or PMC final argument:
+The arguments can be Parrot literals, variables, or constants.  If the
+result is an integer type, like C<$I0>, the arguments must also be
+integers. A number result, like C<$N0>, usually requires number
+arguments, but many numeric instructions also allow the final argument to
+be an integer. Instructions with a PMC result may accept an integer,
+floating-point, or PMC final argument:
 
 =begin PIR_FRAGMENT
 
-  mul $P0, $P1             # $P0 *= $P1
-  mul $P0, $I1
-  mul $P0, $N1
-  mul $P0, $P1, $P2        # $P0 = $P1 * $P2
-  mul $P0, $P1, $I2
-  mul $P0, $P1, $N2
+  $P0 = $P1 * $P2
+  $P0 = $P1 * $I2
+  $P0 = $P1 * $N2
+  $P0 *= $P1
+  $P0 *= $I1
+  $P0 *= $N1
 
 =end PIR_FRAGMENT
 
-
-
-We won't list every math opcode here, but we'll list some of the most common
+We won't list every numeric opcode here, but we'll list some of the most common
 ones. You can get a complete list in "PIR Opcodes" in Chapter 11.
 
-=head4 Unary math opcodes
+=head3 Unary numeric opcodes
 
-Z<CHP-9-SECT-2.3.1>
-
-The unary opcodes have either a destination argument and a source
-argument, or a single argument as destination and source. Some of the
-most common unary math opcodes are C<inc> (increment), C<dec>
-(decrement), C<abs> (absolute value), C<neg> (negate), and C<fact>
-(factorial):
+The unary opcodes have a single argument, and either return a result or
+modify the argument in place. Some of the most common unary numeric opcodes
+are C<inc> (increment), C<dec> (decrement), C<abs> (absolute value),
+C<neg> (negate), and C<fact> (factorial):
 
 =begin PIR_FRAGMENT
 
-  abs $N0, -5.0  # the absolute value of -5.0 is 5.0
-  fact $I1, 5    # the factorial of 5 is 120
-  inc $I1        # 120 incremented by 1 is 121
+  $N0 = abs -5.0  # the absolute value of -5.0 is 5.0
+  $I1 = fact  5   # the factorial of 5 is 120
+  inc $I1         # 120 incremented by 1 is 121
 
 =end PIR_FRAGMENT
 
-=head4 Binary math opcodes
+=head3 Binary numeric opcodes
 
-Z<CHP-9-SECT-2.3.2>
-
-X<PIR (Parrot assembly language);math operations;binary>
-Binary opcodes have two source arguments and a destination argument, and we
-saw examples of these types above. As we mentioned before, most binary math
-opcodes have a two-argument form in which the first argument is both a source
-and the destination. Parrot provides C<add>X<add opcode (PIR)> (addition),
-C<sub>X<sub opcode (PIR)> (subtraction), C<mul>X<mul opcode (PIR)>
-(multiplication), C<div>X<div opcode (PIR)> (division), and C<pow>X<pow
-opcode (PIR)> (exponent) opcodes, as well as two different modulus
-operations. C<mod>X<mod opcode (PIR)> is Parrot's implementation of modulus,
-and C<cmod>X<cmod opcode (PIR)> performs an operation equivalent the C<%>
-operator from the C programming language. It also provides C<gcd>X<gcd opcode
-(PIR)> (greatest common divisor) and C<lcm>X<lcm opcode (PIR)> (least common
+Binary opcodes have two arguments and a result.  Parrot provides
+addition (C<+> or C<add>), subtraction (C<-> or C<sub>), multiplication
+(C<*> or C<mul>), division (C</> or C<div>), modulus (C<%> or C<mod>),
+and exponent (C<pow>) opcodes, as well as C<gcd>X<gcd opcode (PIR)>
+(greatest common divisor) and C<lcm>X<lcm opcode (PIR)> (least common
 multiple).
 
 =begin PIR_FRAGMENT
 
-  div $I0, 12, 5   # $I0 = 12 / 5
-  mod $I0, 12, 5   # $I0 = 12 % 5
+  $I0 = 12 / 5
+  $I0 = 12 % 5
 
 =end PIR_FRAGMENT
 
-=head4 Floating-point operations
+=head3 Floating-point operations
 
-Z<CHP-9-SECT-2.3.3>
-
-X<PIR (Parrot assembly language);math operations;floating-point>
-Although most of the math operations work with both floating-point numbers
-and integers, a few require floating-point destination registers. Among these
-are C<ln> (natural log), C<log2> (log base 2), C<log10> (log base 10), and
-C<exp> (I<e>G<x>), as well as a full set of trigonometric opcodes such as
-C<sin> (sine), C<cos> (cosine), C<tan> (tangent), C<sec> (secant), C<cosh>
-(hyperbolic cosine), C<tanh> (hyperbolic tangent), C<sech> (hyperbolic secant),
-C<asin> (arc sine), C<acos> (arc cosine), C<atan> (arc tangent), C<asec> (arc
-secant), C<exsec> (exsecant), C<hav> (haversine), and C<vers> (versine). All
-angle arguments for the X<trigonometric functions (PIR)> trigonometric
-functions are in radians:
+Although most of the numeric operations work with both numbers and
+integers, a few require the result to be a number. Among these are C<ln>
+(natural log), C<log2> (log base 2), C<log10> (log base 10), and C<exp>
+(I<e>G<x>), as well as a full set of trigonometric opcodes such as
+C<sin> (sine), C<cos> (cosine), C<tan> (tangent), C<sec> (secant),
+C<cosh> (hyperbolic cosine), C<tanh> (hyperbolic tangent), C<sech>
+(hyperbolic secant), C<asin> (arc sine), C<acos> (arc cosine), C<atan>
+(arc tangent), C<asec> (arc secant), C<exsec> (exsecant), C<hav>
+(haversine), and C<vers> (versine). All angle arguments for the
+X<trigonometric functions (PIR)> trigonometric functions are in radians:
 
 =begin PIR_FRAGMENT
 
-  sin $N1, $N0
-  exp $N1, 2
+  $N0 = sin $N1
+  $N0 = exp 2
 
 =end PIR_FRAGMENT
 
-The majority of the floating-point operations have a single source argument
-and a single destination argument. Even though the destination must be a
-floating-point register, the source can be either an integer or floating-point
-number.
+The majority of the floating-point operations have a single argument and
+a single result. Even though the result must be a number, the source can
+be either an integer or number.
 
-The C<atan>X<atan opcode (PIR)> opcode also has a three-argument variant that
-implements C's C<atan2()>:
+=head3 Logical and Bitwise Operations
+
+The X<logical opcodes> logical opcodes evaluate the truth of their
+arguments. They're often used to make decisions on control flow.
+Logical operations are implemented for integers and numeric PMCs.
+Numeric values are false if they're 0, and true otherwise. Strings are
+false if they're the empty string or a single character "0", and true
+otherwise. PMCs are true when their C<get_bool>X<get_bool vtable method
+(PIR)> vtable method returns a nonzero value.
+
+The C<and>X<and opcode (PIR)> opcode returns the first argument if
+it's false and the second argument otherwise:
 
 =begin PIR_FRAGMENT
 
-  atan $N0, 1, 1
+  $I0 = and 0, 1  # returns 0
+  $I0 = and 1, 2  # returns 2
 
 =end PIR_FRAGMENT
 
+The C<or>X<or opcode (PIR)> opcode returns the first argument if
+it's true and the second argument otherwise:
 
+=begin PIR_FRAGMENT
+
+  $I0 = or 1, 0  # returns 1
+  $I0 = or 0, 2  # returns 2
+
+  $P0 = or $P1, $P2
+
+=end PIR_FRAGMENT
+
+Both C<and> and C<or> are short-circuiting. If they can determine what
+value to return from the first argument, they'll never evaluate the
+third.  This is significant only for PMCs, as they might have side
+effects on evaluation.
+
+The C<xor>X<xor opcode (PIR)> opcode returns the first argument if
+it is the only true value, returns the second argument if it is the
+only true value, and returns false if both values are true or both are
+false:
+
+=begin PIR_FRAGMENT
+
+  $I0 = xor 1, 0  # returns 1
+  $I0 = xor 0, 1  # returns 1
+  $I0 = xor 1, 1  # returns 0
+  $I0 = xor 0, 0  # returns 0
+
+=end PIR_FRAGMENT
+
+The C<not>X<not opcode (PIR)> opcode returns a true value when the
+argument is false, and a false value if the argument is
+true:
+
+=begin PIR_FRAGMENT
+
+  $I0 = not $I1
+  $P0 = not $P1
+
+=end PIR_FRAGMENT
+
+The X<bitwise;opcodes (PIR)> bitwise opcodes operate on their values a
+single bit at a time. C<band>X<band opcode (PIR)>, C<bor>X<bor opcode
+(PIR)>, and C<bxor>X<bxor opcode (PIR)> return a value that is the
+logical AND, OR, or XOR of each bit in the source arguments. They each
+take a two arguments. They also have a variant that modifies the result
+in place.  C<bnot>X<bnot opcode (PIR)> is the logical NOT of each bit in
+a single source argument.
+
+=begin PIR_FRAGMENT
+
+  $I0 = bnot $I1
+  $P0 = band $P1
+  $I0 = bor $I1, $I2
+  $P0 = bxor $P1, $I2
+
+=end PIR_FRAGMENT
+
+The logical and arithmetic shift operations shift their values by a
+specified number of bits:
+
+=begin PIR_FRAGMENT
+
+  $I0 = shl $I1, $I2        # shift $I1 left by count $I2
+  $I0 = shr $I1, $I2        # arithmetic shift right
+  $P0 = lsr $P1, $P2        # logical shift right
+
+=end PIR_FRAGMENT
 
 
 =head2 Working with Strings
+
+Parrot strings are buffers of variable-sized data. The most common use
+of strings is to store text data. Strings can also hold binary or
+other non-textual data, though this is rare.N<In general, a custom PMC is
+more useful.> Parrot strings are flexible and powerful, to handle the
+complexity of human-readable (and computer-representable) text data.
+String operations work with string literals, variables, and constants,
+and with string-like PMCs.
+
+=head3 Escape Sequences
 
 Strings in double-quotes accept all sorts of escape sequences using
 backslashes. Strings in single-quotes only allow escapes for nested
@@ -486,28 +554,123 @@ quotes:
 
 Parrot supports several escape sequences in double-quoted strings:
 
-  \xhh        1..2 hex digits
-  \ooo        1..3 oct digits
-  \cX         Control char X
-  \x{h..h}    1..8 hex digits
-  \uhhhh      4 hex digits
-  \Uhhhhhhhh  8 hex digits
-  \a          An ASCII alarm character
-  \b          An ASCII backspace character
-  \t          A tab
-  \n          A newline
-  \v          A vertical tab
-  \f
-  \r
-  \e
-  \\          A backslash
-  \"          A quote
+=begin table String Escapes
 
-If you need more flexibility in defining a string, use a X<heredoc string
-literal>.  The C<E<lt>E<lt>> operator starts a heredoc.  The string terminator
-immediately follows.  All text until the terminator is part of the heredoc.
-The terminator must appear on its own line, must appear at the beginning of the
-line, and may not have any trailing whitespace.
+=headrow
+
+=row
+
+=cell Escape
+
+=cell Meaning
+
+=bodyrows
+
+=row
+
+=cell C<\a>
+
+=cell An ASCII alarm character
+
+=row
+
+=cell C<\b>
+
+=cell An ASCII backspace character
+
+=row
+
+=cell C<\t>
+
+=cell A tab
+
+=row
+
+=cell C<\n>
+
+=cell A newline
+
+=row
+
+=cell C<\v>
+
+=cell A vertical tab
+
+=row
+
+=cell C<\f>
+
+=cell A form feed
+
+=row
+
+=cell C<\r>
+
+=cell A carriage return
+
+=row
+
+=cell C<\e>
+
+=cell An excape
+
+=row
+
+=cell C<\\>
+
+=cell A backslash
+
+=row
+
+=cell C<\">
+
+=cell A quote
+
+=row
+
+=cell C<\x>R<NN>
+
+=cell A character represented by 1-2 hexadecimal digits
+
+=row
+
+=cell C<\x{>R<NNNNNNNN>C<}>
+
+=cell A character represented by 1-8 hexadecimal digits
+
+=row
+
+=cell C<\o>R<NNN>
+
+=cell A character represented by 1-3 octal digits
+
+=row
+
+=cell C<\u>R<NNNN>
+
+=cell A character represented by 4 hexadecimal digits
+
+=row
+
+=cell C<\U>R<NNNNNNNN>
+
+=cell A character represented by 8 hexadecimal digits
+
+=row
+
+=cell C<\c>R<X>
+
+=cell A control character R<X>
+
+=end table
+
+=head3 Heredocs
+
+If you need more flexibility in defining a string, use a heredoc string
+literal. The C<E<lt>E<lt>> operator starts a heredoc.  The string
+terminator immediately follows. All text until the terminator is part
+of the string. The terminator must appear on its own line, must appear
+at the beginning of the line, and may not have any trailing whitespace.
 
   $S2 = << "End_Token"
 
@@ -516,127 +679,53 @@ line, and may not have any trailing whitespace.
 
   End_Token
 
-=head3 Assignment
+=head3 Concatenating strings
 
-Strings in Parrot are also stored as references to internal data structures
-like PMCs. However, strings use Copy-On-Write (COW) optimizations. When we
-call C<set S1, S0> we copy the pointer only, so both registers point to the
-same string memory. We don't actually make a copy of the string until one of
-two registers is modified. Here's the same example using string registers
-instead of PMC registers, which demonstrate how strings use COW:
-
-=begin PASM
-
-  set S0, "Ford"
-  set S1, S0
-  set S1, "Zaphod"
-  print S0                # prints "Ford"
-  print S1                # prints "Zaphod"
-  end
-
-=end PASM
-
-Here, we can clearly see the opposite result from how PMCs were handled in
-the previous example. Modifying one of the two registers causes a new string
-to be created, preserving the old value in C<S0> and assigning the new value
-to the new string in C<S1>. The benefits here are that we don't have to worry
-about stray references causing side effects in our code, and we don't waste
-time copying a string until it's actually time to make a copy.
-
-
-Strings are buffers of variable-sized data. The most common use of string
-registers and variables is to store textual data. String registers I<may> also be
-buffers for binary or other non-textual data, though this is rareN<In general,
-a custom PMC is more useful>.  Parrot strings are flexible and powerful, to
-account for all the complexity of human-readable (and computer-representable)
-textual data.
-
-X<PIR (Parrot assembly language);string operations>
-String operations work with string registers and string-like PMCs.
-String operations on PMC registers require all their string
-arguments to be String PMCs.
-
-=head4 Concatenating strings
-
-Z<CHP-9-SECT-2.4.1>
-
-X<PIR (Parrot assembly language);string operations;concatenation>
-Use the C<concat>X<concat opcode (PIR)> opcode to concatenate
-strings. With string register or string constant arguments, C<concat>
-has both a two-argument and a three-argument form. The first argument
-is a source and a destination in the two-argument form:
+Use the C<.> operator to concatenate strings. It has a C<.=> variant to
+modify the result in place.
 
 =begin PIR_FRAGMENT
 
-  set $S0, "ab"
-  concat $S0, "cd"     # S0 has "cd" appended
-  print $S0            # prints "abcd"
+  $S0 = "ab"
+  $S1 = $S0 . "cd"  # concatenates $S0 with "cd"
+  print $S1         # prints "abcd"
   print "\n"
 
-  concat $S1, $S0, "xy" # S1 is the string S0 with "xy" appended
-  print $S1            # prints "abcdxy"
+  $S1 .= "xy"       # appends "xy" to $S1
+  print $S1         # prints "abcdxy"
   print "\n"
 
 =end PIR_FRAGMENT
 
-The first C<concat> concatenates the string "cd" onto the string "ab" in
-C<S0>. It generates a new string "abcd" and changes C<S0> to point to the
-new string. The second C<concat> concatenates "xy" onto the string "abcd"
-in C<S0> and stores the new string in C<S1>.
+The first C<.> operation in the example above concatenates the string
+"cd" onto the string "ab" and stores the result in C<$S1>. The second
+C<.=> operation appends "xy" onto the string "abcd" in C<$S1>.
 
-X<PMCs (Polymorphic Containers);concatenation>
-For PMC registers, C<concat> has only a three-argument form with
-separate registers for source and destination:
+=head3 Repeating strings
+
+The C<x> instruction repeats a string a specified number of times:
 
 =begin PIR_FRAGMENT
 
-  new $P0, "String"
-  new $P1, "String"
-  new $P2, "String"
-  set $P0, "ab"
-  set $P1, "cd"
-  concat $P2, $P0, $P1
-  print $P2            # prints abcd
+  $S0 = "a"
+  $S1 = $S0 x 5
+  print $S1            # prints "aaaaa"
   print "\n"
 
 =end PIR_FRAGMENT
 
-Here, C<concat> concatenates the strings in C<$P0> and C<$P1> and stores
-the result in C<$P2>.
+In this example, C<x> generates a new string with "a" repeated five
+times and stores it in C<$S1>.
 
-=head4 Repeating strings
+=head3 Length of a string
 
-Z<CHP-9-SECT-2.4.2>
-
-X<PIR (Parrot assembly language);string operations;repeating strings>
-The C<repeat>X<repeat opcode (PIR)> opcode repeats a string a certain
-number of times:
+The C<length> opcode returns the length of a string in characters. This
+won't be the same as the length in bytes for multibyte encoded strings:
 
 =begin PIR_FRAGMENT
 
-  set $S0, "x"
-  repeat $S1, $S0, 5  # $S1 = $S0 x 5
-  print $S1          # prints "xxxxx"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-In this example, C<repeat> generates a new string with "x" repeated
-five times and stores a pointer to it in C<S1>.
-
-=head4 Length of a string
-
-Z<CHP-9-SECT-2.4.3>
-
-X<PIR (Parrot assembly language);string operations;length>
-The C<length>X<length opcode (PIR)> opcode returns the length of a
-string in characters. This won't be the same as the length in bytes
-for multibyte encoded strings:
-
-=begin PIR_FRAGMENT
-
-  set $S0, "abcd"
-  length $I0, $S0                # the length is 4
+  $S0 = "abcd"
+  $I0 = length $S0                # the length is 4
   print $I0
   print "\n"
 
@@ -644,40 +733,36 @@ for multibyte encoded strings:
 
 C<length> doesn't have an equivalent for PMC strings.
 
-=head4 Substrings
+=head3 Substrings
 
-Z<CHP-9-SECT-2.4.4>
-
-X<PIR (Parrot assembly language);string operations;substrings>
-The simplest version of the C<substr>X<substr opcode (PIR)> opcode
-takes four arguments: a destination register, a string, an offset
-position, and a length. It returns a substring of the original string,
-starting from the offset position (0 is the first character) and
-spanning the length:
+The simplest version of the C<substr>X<substr opcode> opcode takes
+three arguments: a source string, an offset position, and a length. It
+returns a substring of the original string, starting from the offset
+position (0 is the first character) and spanning the length:
 
 =begin PIR_FRAGMENT
 
-  substr $S0, "abcde", 1, 2        # $S0 is "bc"
+  $S0 = substr "abcde", 1, 2        # $S0 is "bc"
 
 =end PIR_FRAGMENT
 
 This example extracts a two-character string from "abcde" at a
 one-character offset from the beginning of the string (starting with
 the second character). It generates a new string, "bc", in the
-destination register C<S0>.
+destination register C<$S0>.
 
 When the offset position is negative, it counts backward from the end
 of the string. So an offset of -1 starts at the last character of the
 string.
 
-C<substr> also has a five-argument form, where the fifth argument is a
-string to replace the substring. This modifies the second argument and
-returns the removed substring in the destination register.
+C<substr> also has a four-argument form, where the fourth argument is a
+string to replace the substring. This variant modifies the source string
+and returns the removed substring.
 
 =begin PIR_FRAGMENT
 
-  set $S1, "abcde"
-  substr $S0, $S1, 1, 2, "XYZ"
+  $S1 = "abcde"
+  $S0 = substr $S1, 1, 2, "XYZ"
   print $S0                        # prints "bc"
   print "\n"
   print $S1                        # prints "aXYZde"
@@ -685,13 +770,13 @@ returns the removed substring in the destination register.
 
 =end PIR_FRAGMENT
 
-This replaces the substring "bc" in C<S1> with the string "XYZ", and
-returns "bc" in C<S0>.
+The example above replaces the substring "bc" in C<$S1> with the string
+"XYZ", and returns "bc" in C<$S0>.
 
 When the offset position in a replacing C<substr> is one character
 beyond the original string length, C<substr> appends the replacement
-string just like the C<concat> opcode. If the replacement string is an
-empty string, the characters are just removed from the original
+string just like the concatenation operator. If the replacement string
+is an empty string, the characters are just removed from the original
 string.
 
 When you don't need to capture the replaced string, there's an
@@ -700,124 +785,38 @@ returning the removed substring.
 
 =begin PIR_FRAGMENT
 
-  set $S1, "abcde"
-  substr $S1, 1, 2, "XYZ"
+  $S1 = "abcde"
+  $S1 = substr 1, 2, "XYZ"
   print $S1                        # prints "aXYZde"
   print "\n"
 
 =end PIR_FRAGMENT
 
-The PMC versions of C<substr> are not yet implemented.
 
-=head4 Chopping strings
+=head3 Converting characters
 
-Z<CHP-9-SECT-2.4.5>
-
-X<PIR (Parrot assembly language);string operations;chopping strings>
-The C<chopn>X<chopn opcode (PIR)> opcode removes characters from the
-end of a string. It takes two arguments: the string to modify and the
-count of characters to remove.
-
-=begin PIR_FRAGMENT
-
-  set $S0, "abcde"
-  chopn $S0, 2
-  print $S0         # prints "abc"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This example removes two characters from the end of C<S0>. If the
-count is negative, that many characters are kept in the string:
+The C<chr>X<chr opcode (PIR)> opcode takes an integer value and returns
+the corresponding character in the ASCII character set as a
+one-character string.  The C<ord>X<ord opcode (PIR)> opcode takes a
+single character string and returns the integer value of the character
+at the first position in the string. Notice that the integer value of
+the character will differ depending on the current encoding of the
+string:
 
 =begin PIR_FRAGMENT
 
-  set $S0, "abcde"
-  chopn $S0, -2
-  print $S0         # prints "ab"
-  print "\n"
+  $S0 = chr 65              # $S0 is "A"
+  $I0 = ord $S0             # $I0 is 65, if $S0 is ASCII or UTF-8
 
 =end PIR_FRAGMENT
 
-This keeps the first two characters in C<S0> and removes the rest.
-C<chopn> also has a three-argument version that stores the chopped
-string in a separate destination register, leaving the original string
-untouched:
-
-=begin PIR_FRAGMENT
-
-  set $S0, "abcde"
-  chopn $S1, $S0, 1
-  print $S1         # prints "abcd"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-=head4 Copying and Cloning
-
-Z<CHP-9-SECT-2.4.6>
-
-X<PIR (Parrot assembly language);string operations;copying> The C<clone>
-X<clone opcode (PIR)> opcode makes a deep copy of a string or PMC. Earlier
-in this chapter we saw that PMC and String values used with the C<set> opcode
-didn't create a copy of the underlying data structure, it only created
-a copy of the reference to that structure. With strings, this doesn't cause
-a problem because strings use Copy On Write (COW) semantics to automatically
-create a copy of the string when one reference is modified. However, as we
-saw, PMCs don't have this same behavior and so making a change to one PMC
-reference would modify the data that all the other references to that same
-PMC pointed to.
-
-Instead of just copying the pointer like C<set> would do, we can use the
-C<clone> opcode to create a I<deep copy> of the PMC, not just a I<shallow
-copy> of the reference.
-
-=begin PIR_FRAGMENT
-
-  new $P0, "String"
-  set $P0, "Ford"
-  clone $P1, $P0
-  set $P0, "Zaphod"
-  print $P0        # prints "Zaphod"
-  print $P1        # prints "Ford"
-
-=end PIR_FRAGMENT
-
-This example creates an identical, independent clone of the PMC in
-C<P0> and puts a pointer to it in C<P1>. Later changes to C<P0> have
-no effect on the PMC referenced in C<P1>.
-
-With simple strings, the copes created by C<clone> are COW exactly the same
-as the copy created by C<set>, so there is no difference between these two
-opcodes for strings. By convention, C<set> is used with strings more often
-then C<clone>, but there is no rule about this.
-
-=head4 Converting characters
-
-Z<CHP-9-SECT-2.4.7>
-
-X<PIR (Parrot assembly language);string operations;converting strings>
-The C<chr>X<chr opcode (PIR)> opcode takes an integer value and returns the
-corresponding character in the ASCII character set as a one-character string,
-while the C<ord>X<ord opcode (PIR)> opcode takes a single character string
-and returns the integer value of the character at the first position in the
-string. Notice that the integer value of the character will differ depending
-on the current encoding of the string:
-
-=begin PIR_FRAGMENT
-
-  chr $S0, 65                # $S0 is "A"
-  ord $I0, $S0               # $I0 is 65, if $S0 is ASCII or UTF-8
-
-=end PIR_FRAGMENT
-
-C<ord> has a three-argument variant that takes a character offset to select
+C<ord> has a two-argument variant that takes a character offset to select
 a single character from a multicharacter string. The offset must be within
 the length of the string:
 
 =begin PIR_FRAGMENT
 
-  ord $I0, "ABC", 2        # $I0 is 67
+  $I0 = ord "ABC", 2        # $I0 is 67
 
 =end PIR_FRAGMENT
 
@@ -826,38 +825,33 @@ the last character.
 
 =begin PIR_FRAGMENT
 
-  ord $I0, "ABC", -1        # $I0 is 67
+  $I0 = ord "ABC", -1       # $I0 is 67
 
 =end PIR_FRAGMENT
 
-=head4 Formatting strings
+=head3 Formatting strings
 
-Z<CHP-9-SECT-2.4.8>
-
-X<PIR (Parrot assembly language);string operations;formatting strings>
-The C<sprintf>X<sprintf opcode (PIR)> opcode generates a formatted string
-from a series of values. It takes three arguments: the destination register,
-a string specifying the format, and an ordered aggregate PMC (like an
-C<Array> PMC) containing the values to be formatted. The format string and
-the destination register can be either strings or PMCs:
+The C<sprintf>X<sprintf opcode (PIR)> opcode generates a formatted
+string from a series of values. It takes two arguments: a string
+specifying the format, and an array PMC (like an C<Array>) containing
+the values to be formatted. The format string and the result can be
+either strings or PMCs:
 
 =begin PIR_FRAGMENT
 
-  sprintf $S0, $S1, $P2
-  sprintf $P0, $P1, $P2
+  $S0 = sprintf $S1, $P2
+  $P0 = sprintf $P1, $P2
 
 =end PIR_FRAGMENT
 
-The format string is similar to the one for C's C<sprintf> function,
-but with some extensions for Parrot data types. Each format field in
-the string starts with a C<%>
-X<% (percent sign);% format strings for sprintf opcode (PIR)> and
-ends with a character specifying the output format. The output format
-characters are listed in Table 9-1.
+The format string is similar to C's C<sprintf> function, but with
+extensions for Parrot data types. Each format field in the string starts
+with a C<%> and ends with a character specifying the output format. The
+output format characters are listed in Table 3-2.
 
-=begin table picture Format characters
+=begin table Format characters
 
-Z<CHP-9-TABLE-1>
+Z<CHP-3-TABLE-2>
 
 =headrow
 
@@ -970,11 +964,11 @@ lowercase "e").
 
 Each format field can be specified with several options: R<flags>,
 R<width>, R<precision>, and R<size>. The format flags are listed in
-Table 9-2.
+Table 3-3.
 
-=begin table picture Format flags
+=begin table Format flags
 
-Z<CHP-9-TABLE-2>
+Z<CHP-3-TABLE-3>
 
 =headrow
 
@@ -1025,11 +1019,11 @@ If either R<width> or R<precision> is an asterisk (C<*>), it takes its
 value from the next argument in the PMC.
 
 The R<size> modifier defines the type of the argument the field takes.
-The flags are listed in Table 9-3.
+The flags are listed in Table 3-4.
 
-=begin table picture Size flags
+=begin table Size flags
 
-Z<CHP-9-TABLE-3>
+Z<CHP-3-TABLE-4>
 
 =headrow
 
@@ -1092,14 +1086,14 @@ Here's a short illustration of string formats:
 
 =begin PIR_FRAGMENT
 
-  new $P2, "Array"
-  new $P0, "Int"
-  set $P0, 42
+  $P2 = new "Array"
+  $P0 = new "Int"
+  $P0 = 42
   push $P2, $P0
-  new $P1, "Num"
-  set $P1, 10
+  $P1 = new "Num"
+  $P1 = 10
   push $P2, $P1
-  sprintf $S0, "int %#Px num %+2.3Pf\n", $P2
+  $S0 = sprintf "int %#Px num %+2.3Pf\n", $P2
   print $S0     # prints "int 0x2a num +10.000"
   print "\n"
 
@@ -1117,11 +1111,50 @@ a minimum of two whole digits and a maximum of three decimal places
 The test files F<t/op/string.t> and F<t/src/sprintf.t> have many more
 examples of format strings.
 
-=head4 Testing for substrings
+=head3 Joining strings
 
-Z<CHP-9-SECT-2.4.9>
+The C<join> opcode joins the elements of an array PMC into a single
+string. The first argument separates the individual elements of the
+PMC in the final string result.
 
-X<PIR (Parrot assembly language);string operations;testing for substrings>
+=begin PIR_FRAGMENT
+
+  $P0 = new "Array"
+  push $P0, "hi"
+  push $P0, 0
+  push $P0, 1
+  push $P0, 0
+  push $P0, "parrot"
+  $S0 = join "__", $P0
+  print $S0              # prints "hi__0__1__0__parrot"
+
+=end PIR_FRAGMENT
+
+This example builds a C<Array> in C<$P0> with the values C<"hi">,
+C<0>, C<1>, C<0>, and C<"parrot">. It then joins those values (separated
+by the string C<"__">) into a single string, and stores it in C<$S0>.
+
+=head3 Splitting strings
+
+Splitting a string yields a new array containing the resulting
+substrings of the original string.
+
+=begin PIR_FRAGMENT
+
+  $P0 = split "", "abc"
+  set $P1, $P0[0]
+  print $P1              # 'a'
+  set $P1, $P0[2]
+  print $P1              # 'c'
+
+=end PIR_FRAGMENT
+
+This example splits the string "abc" into individual characters and
+stores them in an array in C<$P0>. It then prints out the first and
+third elements of the array.
+
+=head3 Testing for substrings
+
 The C<index>X<index opcode (PIR)> opcode searches for a substring
 within a string. If it finds the substring, it returns the position
 where the substring was found as a character offset from the beginning
@@ -1129,21 +1162,21 @@ of the string. If it fails to find the substring, it returns -1:
 
 =begin PIR_FRAGMENT
 
-  index $I0, "Beeblebrox", "eb"
+  $I0 = index "Beeblebrox", "eb"
   print $I0                       # prints 2
   print "\n"
-  index $I0, "Beeblebrox", "Ford"
+  $I0 = index "Beeblebrox", "Ford"
   print $I0                       # prints -1
   print "\n"
 
 =end PIR_FRAGMENT
 
-C<index> also has a four-argument version, where the fourth argument
+C<index> also has a three-argument version, where the fourth argument
 defines an offset position for starting the search:
 
 =begin PIR_FRAGMENT
 
-  index $I0, "Beeblebrox", "eb", 3
+  $I0 = index "Beeblebrox", "eb", 3
   print $I0                         # prints 5
   print "\n"
 
@@ -1153,148 +1186,20 @@ This finds the second "eb" in "Beeblebrox" instead of the first,
 because the search skips the first three characters in the
 string.
 
-=head4 Joining strings
+=head3 Bitwise Operations
 
-The C<join> opcode joins the elements of an array PMC into a single
-string. The second argument separates the individual elements of the
-PMC in the final string result.
-
-=begin PIR_FRAGMENT
-
-  new $P0, "Array"
-  push $P0, "hi"
-  push $P0, 0
-  push $P0, 1
-  push $P0, 0
-  push $P0, "parrot"
-  join $S0, "__", $P0
-  print $S0              # prints "hi__0__1__0__parrot"
-
-=end PIR_FRAGMENT
-
-This example builds a C<Array> in C<P0> with the values C<"hi">,
-C<0>, C<1>, C<0>, and C<"parrot">. It then joins those values (separated
-by the string C<"__">) into a single string, and stores it in C<S0>.
-
-=head4 Splitting strings
-
-Splitting a string yields a new array containing the resulting
-substrings of the original string.
-
-=begin PIR_FRAGMENT
-
-  split $P0, "", "abc"
-  set $P1, $P0[0]
-  print $P1              # 'a'
-  set $P1, $P0[2]
-  print $P1              # 'c'
-
-=end PIR_FRAGMENT
-
-This example splits the string "abc" into individual characters and
-stores them in an array in C<P0>. It then prints out the first and
-third elements of the array. For now, the split pattern (the second
-argument to the opcode) is ignored except for a test to make sure that
-its length is zero.
-
-=head3 Logical and Bitwise Operations
-
-Z<CHP-9-SECT-2.6>
-
-X<PIR (Parrot assembly language);bitwise operations>
-X<PIR (Parrot assembly language);logical operations>
-The X<logical opcodes> logical opcodes evaluate the truth of their
-arguments. They're often used to make decisions on control flow.
-Logical operations are implemented for integers and PMCs. Numeric
-values are false if they're 0, and true otherwise. Strings are false
-if they're the empty string or a single character "0", and true
-otherwise. PMCs are true when their
-C<get_bool>X<get_bool vtable method (PIR)> vtable method returns a
-nonzero value.
-
-The C<and>X<and opcode (PIR)> opcode returns the second argument if
-it's false and the third argument otherwise:
-
-=begin PIR_FRAGMENT
-
-  and $I0, 0, 1  # returns 0
-  and $I0, 1, 2  # returns 2
-
-=end PIR_FRAGMENT
-
-The C<or>X<or opcode (PIR)> opcode returns the second argument if
-it's true and the third argument otherwise:
-
-=begin PIR_FRAGMENT
-
-  or $I0, 1, 0  # returns 1
-  or $I0, 0, 2  # returns 2
-
-  or $P0, $P1, $P2
-
-=end PIR_FRAGMENT
-
-Both C<and> and C<or> are short-circuiting. If they can determine what
-value to return from the second argument, they'll never evaluate the
-third.  This is significant only for PMCs, as they might have side
-effects on evaluation.
-
-The C<xor>X<xor opcode (PIR)> opcode returns the second argument if
-it is the only true value, returns the third argument if it is the
-only true value, and returns false if both values are true or both are
-false:
-
-=begin PIR_FRAGMENT
-
-  xor $I0, 1, 0  # returns 1
-  xor $I0, 0, 1  # returns 1
-  xor $I0, 1, 1  # returns 0
-  xor $I0, 0, 0  # returns 0
-
-=end PIR_FRAGMENT
-
-The C<not>X<not opcode (PIR)> opcode returns a true value when the
-second argument is false, and a false value if the second argument is
-true:
-
-=begin PIR_FRAGMENT
-
-  not $I0, $I1
-  not $P0, $P1
-
-=end PIR_FRAGMENT
-
-The X<bitwise;opcodes (PIR)> bitwise opcodes operate on their values
-a single bit at a time. C<band>X<band opcode (PIR)>,
-C<bor>X<bor opcode (PIR)>, and C<bxor>X<bxor opcode (PIR)> return a
-value that is the logical AND, OR, or XOR of each bit in the source
-arguments. They each take a destination register and two source
-registers. They also have two-argument forms where the destination is
-also a source.  C<bnot>X<bnot opcode (PIR)> is the logical NOT of
-each bit in a single source argument.
-
-=begin PIR_FRAGMENT
-
-  bnot $I0, $I1
-  band $P0, $P1
-  bor $I0, $I1, $I2
-  bxor $P0, $P1, $I2
-
-=end PIR_FRAGMENT
-
-X<bitwise;string opcodes>
 The bitwise opcodes also have string variants for AND, OR, and XOR:
 C<bors>X<bors opcode (PIR)>, C<bands>X<bands opcode (PIR)>, and
-C<bxors>X<bxors opcode (PIR)>. These take string register or PMC
-string source arguments and perform the logical operation on each byte
-of the strings to produce the final string.
+C<bxors>X<bxors opcode (PIR)>. These take string or string-like PMC
+arguments and perform the logical operation on each byte of the strings
+to produce the result string.
 
 =begin PIR_FRAGMENT
 
-  bors $S0, $S1
-  bands $P0, $P1
-  bors $S0, $S1, $S2
-  bxors $P0, $P1, $S2
+  $S0 = bors $S1
+  $P0 = bands $P1
+  $S0 = bors $S1, $S2
+  $P0 = bxors $P1, $S2
 
 =end PIR_FRAGMENT
 
@@ -1302,30 +1207,36 @@ The bitwise string opcodes only have meaningful results when they're
 used with simple ASCII strings because the bitwise operation is done
 per byte.
 
-The logical and arithmetic shift operations shift their values by a
-specified number of bits:
+=head3 Copy-On-Write
+
+Strings use copy-on-write (COW) optimizations. A call to C<$S1 = $S0>,
+doesn't immediately make a copy of C<$S0>, it only makes both variables
+point to the same string. Parrot doesn't make a copy of the string until
+one of two strings is modified.
 
 =begin PIR_FRAGMENT
 
-  shl  $I0, $I1, $I2        # shift I1 left by count I2 giving I0
-  shr  $I0, $I1, $I2        # arithmetic shift right
-  lsr  $P0, $P1, $P2        # logical shift right
+  $S0 = "Ford"
+  $S1 = $S0
+  $S1 = "Zaphod"
+  print $S0                # prints "Ford"
+  print $S1                # prints "Zaphod"
 
 =end PIR_FRAGMENT
 
+Modifying one of the two variables causes a new string to be created,
+preserving the old value in C<$S0> and assigning the new value to the
+new string in C<$S1>. The benefit here is avoiding the cost of copying a
+string until a copy is actually needed.
+
 =head3 Encodings and Charsets
 
-X<charset>
-A modern string system must manage several character encodings and charsets in
-order to make sense out of all the string data in the world.  Parrot does this.
-Every string has an associated encoding and an associated character set.  The
-default charset is 8-bit ASCII, which is simple to use and is almost
-universally supported.
-
-Double-quoted string constants can have an optional prefix specifying the the
-string's encoding and charsetN<As you might suspect, single-quoted strings do
-not support this.>. Parrot will maintain these values internally, and will
-automatically convert strings when necessary to preserve the information.
+Every string in Parrot has an associated encoding and character set. The
+default charset is 8-bit ASCII, which is almost universally supported.
+Double-quoted string constants can have an optional prefix specifying the
+string's encoding and charset.N<As you might suspect, single-quoted strings do
+not support this.> Parrot maintains these values internally, and 
+automatically converts strings when necessary to preserve the information.
 String prefixes are specified as C<encoding:charset:> at the front of the
 string. Here are some examples:
 
@@ -1338,98 +1249,26 @@ string. Here are some examples:
 
 =end PIR_FRAGMENT
 
-The C<binary:> charset treats the string as a buffer of raw unformatted binary
-data. It isn't really a string per se, because binary data contains no readable
-characters.  As mentioned earlier, this exists to support libraries which
-manipulate binary data that doesn't easily fit into any other primitive data
-type.
+The C<binary:> charset treats the string as a buffer of raw unformatted
+binary data. It isn't really a string per se, because binary data
+contains no readable characters. This exists to support libraries which
+manipulate binary data that doesn't easily fit into any other primitive
+data type.
 
-When Parrot combines two strings (such as through concatenation), they must
-both use the same character set and encoding.  Parrot will automatically
-upgrade one or both of the strings to use the next highest compatible format as
-necessary. ASCII strings will automatically upgrade to UTF-8 strings if needed,
-and UTF-8 will upgrade to UTF-16. All of these conversions happen inside
-Parrot; you the programmer don't need to worry about the details.
+When Parrot operates on two strings (as in concatenation), they must
+both use the same character set and encoding. Parrot automatically
+upgrades one or both of the strings to the next highest compatible
+format as necessary. ASCII strings will automatically upgrade to UTF-8
+strings if needed, and UTF-8 will upgrade to UTF-16.
 
 =head2 Working with PMCs
 
 Polymorphic Containers (PMCs) are the basis for complex data types and
 object-oriented behavior in Parrot. In PIR, any variable that isn't a
-low-level integer, number, or string is a PMC
-
-Operations on a PMC are implemented by vtable functions. The result of
-an operation is entirely determined by the behavior of
-the PMCs vtable. Since PMCs define their own behavior for these vtable
-functions, it's important to familiarize yourself with the behavior
-of the particular PMC before you start performing a lot of operations on it.
-
-=head3 Assignment
-
-PMC registers contain references to PMC structures internally. So, the set
-opcode doesn't copy the entire PMC, it only copies the reference to the
-PMC data. Here's an example that shows a side effect of this operation:
-
-=begin PASM
-
-  new P0, "String"
-  set P0, "Ford"
-  set P1, P0
-  set P1, "Zaphod"
-  print P0                # prints "Zaphod"
-  print P1                # prints "Zaphod"
-  end
-
-=end PASM
-
-In this example, both C<P0> and C<P1> are both references to the same
-internal data structure, so when we set C<P1> to the string literal
-C<"Zaphod">, it overwrites the previous value C<"Ford">. Now, both C<P0>
-and C<P1> point to the String PMC C<"Zaphod">, even though it appears that
-we only set one of those two registers to that value.
-
-=head4 PMC object types
-
-Z<CHP-9-SECT-2.2.2>
-
-X<PMCs (Polymorphic Containers);object types>
-Every PMC has a distinct type that determines its behavior through the
-vtable interface. In the chapter on PIR, we've seen a number of these vtable
-functions already, and seen how they implement the behaviors found inside
-the various opcodes. The vtable interface is standard, and all PMCs implement
-the exact same set of vtables. We've seen some of the vtables and their uses,
-and more of them will be discussed in this chapter and later in the various
-reference chapters.
-
-The C<typeof> opcode can be used to determine the type of a PMC. When
-the source argument is a PMC and the destination is a string register,
-C<typeof> returns the name of the type:
-
-=begin PIR_FRAGMENT
-
-  new $P0, "String"
-  typeof $S0, $P0               # $S0 is "String"
-  print $S0
-  print "\n"
-
-=end PIR_FRAGMENT
-
-Using C<typeof> with a PMC output parameter instead, it returns the Class
-PMC for that type.
-
-
-
-=head3 Scalars
-
-Parrot provides a set of
-
-In most of the examples we've shown so far, X<PMCs (Polymorphic
-Containers);working with> PMCs just duplicate the functionality of integers,
-numbers, and strings.
-
-PMCs act much like any integer, floating-point
-number, or string register or variable, but you have to instantiate a
-new PMC object into a type before you use it. The C<new> instruction creates
-a new PMC of the specified type:
+low-level integer, number, or string is a PMC. PMCs act much like any
+integer, number, or string variable, but you have to instantiate a new
+PMC object before you use it. The C<new> opcode creates a new PMC of the
+specified type.
 
 =begin PIR_FRAGMENT
 
@@ -1439,20 +1278,85 @@ a new PMC of the specified type:
 
 =end PIR_FRAGMENT
 
-This example creates a C<String> object, stores it in the PMC register variable C<$P0>,
-assigns it the value "Hello, Polly.", and prints it:
+This example creates a C<String> object, stores it in the PMC register
+variable C<$P0>, assigns it the value "That's a bollard and not a
+parrot.", and prints it.
 
-=end PIR_FRAGMENT
+=head3 Scalars
 
-  .local pmc hello    # or .local pmc hello
+In most of the examples we've shown so far, PMCs just duplicate the
+functionality of integers, numbers, and strings. Parrot provides a set
+of simple PMCs for this exact purpose.  C<Integer>, C<Number>, and
+C<String> are thin overlays on Parrot's low-level integers, numbers, and
+strings. 
+
+
+=begin PIR_FRAGMENT
+
+  .local pmc hello
   hello = new 'String'
   hello = "Hello, Polly."
   print hello
 
 =end PIR_FRAGMENT
 
-PIR is a dynamic language; that dynamicism is evident in how Parrot handles PMC
-values. Primitive registers like strings, numbers, and integers perform a
+=head3 Type Conversion
+
+The C<=> operator is very powerful. The common use is to store a string
+value to a string variable, an integer value in an integer variable, a
+floating point value into a number variable, and a PMC value in a PMC
+variable. But Parrot also handles conversions between the types for you
+automatically:
+
+=begin PIR_FRAGMENT
+
+  $I0 = 5     # Integer. 5
+  $S0 = $I0   # Stringify. "5"
+  $N0 = $S0   # Numify. 5.0
+  $I0 = $N0   # Intify. 5
+
+=end PIR_FRAGMENT
+
+Converting a string to a number only makes sense when the contents of
+the string are a number. Otherwise, Parrot will simply return a false
+value.
+
+=begin PIR_FRAGMENT
+
+  $S0 = "parrot"
+  $I0 = $S0        # 0
+
+=end PIR_FRAGMENT
+
+An earlier example showed a string literal assigned to a PMC register of type
+C<String>. This works for all the primitive types and their autoboxed PMC
+equivalents:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new 'Integer'
+  $P0 = 5
+  $S0 = $P0      # the string "5"
+  $N0 = $P0      # the number 5.0
+  $I0 = $P0      # the integer 5
+
+  $P1 = new 'String'
+  $P1 = "5 birds"
+  $S1 = $P1      # Unbox. $S1 = "5 birds"
+  $I1 = $P1      # Intify. 5
+  $N1 = $P1      # Numify. 5.0
+
+  $P2 = new 'Number'
+  $P2 = 3.14
+  $S2 = $P2      # Stringify. "3.14"
+  $I2 = $P2      # Intify. 3
+  $N2 = $P2      # Unbox. $N2 = 3.14
+
+=end PIR_FRAGMENT
+
+=head4 Boxing Operations
+
+Primitive registers like strings, numbers, and integers perform a
 special action called X<autoboxing> when assigned to a PMC. Autoboxing is the
 process of converting a primitive type to a PMC object.  PMC classes exist for
 String, Number, and Integer; notice that the primitive types are in lower-case,
@@ -1469,32 +1373,6 @@ use the C<box> opcode:
   $P2 = "This is a string!"
 
 =end PIR_FRAGMENT
-
-The PMC classes C<Integer>, C<Number>, and C<String> are thin overlays on the
-primitive types they represent. These PMC types have the benefit of the
-X<PMC;VTABLE Interface> VTABLE interface. VTABLEs are a standard API that all
-PMCs conform to for performing standard operations. These PMC types support
-custom methods to perform various operations, may be passed to subroutines that
-expect PMC arguments, and can be subclassed by a user-defined type.
-
-
-PMCs are are polymorphic data items that
-can be one of a large variety of predefined types. As we have seen briefly,
-and as we will see in more depth later, PMCs have a standard interface called
-the VTABLE interface. VTABLEs are a standard list of functions that all PMCs
-implement N<or, PMCs can choose not to implement each interface explicitly and
-instead let Parrot call the default implementations>.
-
-VTABLEs are very strict: There are a fixed number with fixed names and
-fixed argument lists. You can't just create any random VTABLE interface that
-you want to create, you can only make use of the ones that Parrot supplies
-and expects. To circumvent this limitation, PMCs may have METHODS in
-addition to VTABLEs. METHODs are arbitrary code functions that can be
-written in C, may have any name, and may implement any behavior.
-
-=head4 Boxing and Unboxing
-
-Z<CHP-9-SECT-2.2.3>
 
 As we've seen in the previous chapters about PIR, we can convert between
 primitive string, integer, and number types and PMCs. PIR used the C<=>
@@ -1663,8 +1541,6 @@ with hashes: it removes a key/value pair.
 
 =head4 Iterators
 
-Z<CHP-9-SECT-3.1.3>
-
 Iterators extract values from an aggregate PMC one at a time and without
 extracting duplicates. Iterators are most useful in loops where an action
 needs to be performed on every element in an aggregate. You create an
@@ -1741,7 +1617,7 @@ don't define any order for their keys.
 
 =end PIR_FRAGMENT
 
-=head4 Data structures
+=head4 Multi-level Keys
 
 Z<CHP-9-SECT-3.1.4>
 
@@ -1754,31 +1630,31 @@ individual key separated by a semicolon:
 
 =begin PIR_FRAGMENT
 
-  new $P0, "Hash"
-  new $P1, "Array"
-  set $P1[2], 42
-  set $P0["answer"], $P1
-  set $I1, 2
-  set $I0, $P0["answer";$I1]        # $i = %hash{"answer"}[2]
+  $P0 = new "Hash"
+  $P1 = new "Array"
+  $P1[2] = 42
+  $P0["answer"] = $P1
+  $I1 = 2
+  $I0 = $P0["answer";$I1]
   print $I0
   print "\n"
 
 =end PIR_FRAGMENT
 
 This example builds up a data structure of a hash containing an array.
-The complex key C<P0["answer";I1]> retrieves an element of the array
+The complex key C<$P0["answer";I1]> retrieves an element of the array
 within the hash. You can also set a value using a complex key:
 
 =begin PIR_FRAGMENT
 
-  set $P0["answer";0], 5   # %hash{"answer"}[0] = 5
+  $P0["answer";0] = 5
 
 =end PIR_FRAGMENT
 
 The individual keys are integers or strings, or registers with integer
 or string values.
 
-=head3 PMC Assignment
+=head3 Assignment
 
 Z<CHP-9-SECT-3.2>
 
@@ -1812,6 +1688,66 @@ incremented, C<P2> also changes, but C<P1> doesn't. The destination
 register for C<assign> must have an existing object of the right type
 in it, since C<assign> doesn't create a new object (as with C<clone>)
 or reuse the source object (as with C<set>).
+
+=head4 Assignment
+
+PMC registers contain references to PMC structures internally. So, the set
+opcode doesn't copy the entire PMC, it only copies the reference to the
+PMC data. Here's an example that shows a side effect of this operation:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $P0 = "Ford"
+  $P1 = $P0
+  $P1 = "Zaphod"
+  print $P0                # prints "Zaphod"
+  print $P1                # prints "Zaphod"
+
+=end PIR_FRAGMENT
+
+In this example, C<$P0> and C<$P1> are both references to the same
+internal data structure, so when we set C<$P1> to the string literal
+C<"Zaphod">, it overwrites the previous value C<"Ford">. Now, both C<$P0>
+and C<$P1> point to the String PMC C<"Zaphod">, even though it appears that
+we only set one of those two registers to that value.
+
+=head4 Copying and Cloning
+
+X<PIR (Parrot assembly language);string operations;copying> The C<clone>
+X<clone opcode (PIR)> opcode makes a deep copy of a string or PMC. Earlier
+in this chapter we saw that PMC and String values used with the C<set> opcode
+didn't create a copy of the underlying data structure, it only created
+a copy of the reference to that structure. With strings, this doesn't cause
+a problem because strings use Copy On Write (COW) semantics to automatically
+create a copy of the string when one reference is modified. However, as we
+saw, PMCs don't have this same behavior and so making a change to one PMC
+reference would modify the data that all the other references to that same
+PMC pointed to.
+
+Instead of just copying the pointer like C<set> would do, we can use the
+C<clone> opcode to create a I<deep copy> of the PMC, not just a I<shallow
+copy> of the reference.
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $P0 = "Ford"
+  $P1 = clone $P0
+  $P0 = "Zaphod"
+  print $P0        # prints "Zaphod"
+  print $P1        # prints "Ford"
+
+=end PIR_FRAGMENT
+
+This example creates an identical, independent clone of the PMC in
+C<P0> and puts a pointer to it in C<P1>. Later changes to C<P0> have
+no effect on the PMC referenced in C<P1>.
+
+With simple strings, the copes created by C<clone> are COW exactly the same
+as the copy created by C<set>, so there is no difference between these two
+opcodes for strings. By convention, C<set> is used with strings more often
+then C<clone>, but there is no rule about this.
 
 =head3 Properties
 
@@ -1881,59 +1817,65 @@ C<prophash>X<prophash opcode (PIR)>.
 Internally, all operations on PMCs are performed by calling various VTABLE
 interfaces.
 
-=head3 Type Conversion
+These PMC types have the benefit of the
+X<PMC;VTABLE Interface> VTABLE interface. VTABLEs are a standard API that all
+PMCs conform to for performing standard operations. These PMC types support
+custom methods to perform various operations, may be passed to subroutines that
+expect PMC arguments, and can be subclassed by a user-defined type.
 
-The C<=> operator is very powerful.  Its simplest form stores a value into one
-of the Parrot registers. It can assign a string value to a C<string> register,
-an integer value to an C<int> register, a floating point value into a C<number>
-register, etc. However, the C<=> operator can assign I<any> type of value into
-I<any> type of register; Parrot will handle the conversion for you
-automatically:
+
+PMCs are are polymorphic data items that
+can be one of a large variety of predefined types. As we have seen briefly,
+and as we will see in more depth later, PMCs have a standard interface called
+the VTABLE interface. VTABLEs are a standard list of functions that all PMCs
+implement N<or, PMCs can choose not to implement each interface explicitly and
+instead let Parrot call the default implementations>.
+
+VTABLEs are very strict: There are a fixed number with fixed names and
+fixed argument lists. You can't just create any random VTABLE interface that
+you want to create, you can only make use of the ones that Parrot supplies
+and expects. To circumvent this limitation, PMCs may have METHODS in
+addition to VTABLEs. METHODs are arbitrary code functions that can be
+written in C, may have any name, and may implement any behavior.
+
+Operations on a PMC are implemented by vtable functions. The result of
+an operation is entirely determined by the behavior of
+the PMCs vtable. Since PMCs define their own behavior for these vtable
+functions, it's important to familiarize yourself with the behavior
+of the particular PMC before you start performing a lot of operations on it.
+
+
+
+=head4 PMC object types
+
+Z<CHP-9-SECT-2.2.2>
+
+X<PMCs (Polymorphic Containers);object types>
+Every PMC has a distinct type that determines its behavior through the
+vtable interface. In the chapter on PIR, we've seen a number of these vtable
+functions already, and seen how they implement the behaviors found inside
+the various opcodes. The vtable interface is standard, and all PMCs implement
+the exact same set of vtables. We've seen some of the vtables and their uses,
+and more of them will be discussed in this chapter and later in the various
+reference chapters.
+
+The C<typeof> opcode can be used to determine the type of a PMC. When
+the source argument is a PMC and the destination is a string register,
+C<typeof> returns the name of the type:
 
 =begin PIR_FRAGMENT
 
-  $I0 = 5     # Integer. 5
-  $S0 = $I0   # Stringify. "5"
-  $N0 = $S0   # Numify. 5.0
-  $I0 = $N0   # Intify. 5
+  new $P0, "String"
+  typeof $S0, $P0               # $S0 is "String"
+  print $S0
+  print "\n"
 
 =end PIR_FRAGMENT
 
-Notice that conversions between the numeric formats and strings only makes
-sense when the value to convert is a number.
+Using C<typeof> with a PMC output parameter instead, it returns the Class
+PMC for that type.
 
-=begin PIR_FRAGMENT
 
-  $S0 = "parrot"
-  $I0 = $S0        # 0
-
-=end PIR_FRAGMENT
-
-An earlier example showed a string literal assigned to a PMC register of type
-C<String>. This works for all the primitive types and their autoboxed PMC
-equivalents:
-
-=begin PIR_FRAGMENT
-
-  $P0 = new 'Integer'
-  $P0 = 5
-  $S0 = $P0      # Stringify. "5"
-  $N0 = $P0      # Numify. 5.0
-  $I0 = $P0      # Unbox. $I0 = 5
-
-  $P1 = new 'String'
-  $P1 = "5 birds"
-  $S1 = $P1      # Unbox. $S1 = "5 birds"
-  $I1 = $P1      # Intify. 5
-  $N1 = $P1      # Numify. 5.0
-
-  $P2 = new 'Number'
-  $P2 = 3.14
-  $S2 = $P2      # Stringify. "3.14"
-  $I2 = $P2      # Intify. 3
-  $N2 = $P2      # Unbox. $N2 = 3.14
-
-=end PIR_FRAGMENT
 
 =head2 Control Structures
 
@@ -2833,7 +2775,7 @@ value and the rest of the parameters are the function parameters. The
 characters used in X<NCI (Native Call Interface);function signatures>
 NCI function signatures are listed in Table 9-5.
 
-=begin table picture Function signature letters
+=begin table Function signature letters
 
 Z<CHP-9-TABLE-5>
 
@@ -4324,6 +4266,7 @@ the C<new> keyword:
 
 
 =head3 Vtable Overrides
+
 
 PMCs all subscribe to a common interface of functions called X<VTABLE>
 VTABLEs. Every PMC implements the same set of these interfaces, which
