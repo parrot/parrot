@@ -161,7 +161,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     /* Walk the iodata */
     Parrot_IOData_mark(interp, interp->piodata);
 
-    if(trace == GC_TRACE_FULL)
+    if (trace == GC_TRACE_FULL)
         trace_system_areas(interp);
 
     /* quick check to see if we have already marked all impatient PMCs. If we
