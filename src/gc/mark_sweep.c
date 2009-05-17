@@ -8,8 +8,12 @@ src/gc/mark_sweep.c - Small Object Pools and general mark/sweep GC behavior
 
 =head1 DESCRIPTION
 
-Handles the accessing of small object pools (header pools).  All of the
-mark/sweep garbage collectors use this code.
+This file implements a number of routines related to the mark and sweep phases
+of the garbage collector system. The functions in this file attempt to perform
+various useful utilities without interfering with the operations of the
+particular GC core. Individual GC cores may choose to use these functions or
+to reimplement their functionality, hopefully without causing any problems
+throughout the rest of Parrot.
 
 =head2 Functions
 
@@ -36,8 +40,9 @@ int CONSERVATIVE_POINTER_CHASING = 0;
 
 =item C<void Parrot_gc_run_init(PARROT_INTERP)>
 
-Prepares the collector for a mark & sweep GC run. This is the
-initializer function for the MS garbage collector.
+Prepares the collector for a mark & sweep GC run. Initializes the various
+fields in the Arenas structure that need to be zeroed out prior to the
+mark phase.
 
 =cut
 
@@ -59,24 +64,25 @@ Parrot_gc_run_init(PARROT_INTERP)
 
 =item C<int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)>
 
-Traces the root set. Returns 0 if it's a lazy GC run and all objects
-that need timely destruction were found.
+Traces the root set with behavior that's dependent on the flags passed.
+Returns 0 if it's a lazy GC run and all objects that need timely destruction
+were found. Returns 1 otherwise.
 
-C<trace_stack> can have these values:
+The flag C<trace> can have these values:
 
 =over 4
 
-=item * GC_TRACE_FULL
-
-trace whole root set, including system areas
-
 =item * GC_TRACE_ROOT_ONLY
 
-trace normal roots, no system areas
+trace normal roots
 
 =item * GC_TRACE_SYSTEM_ONLY
 
 trace system areas only
+
+=item * GC_TRACE_FULL
+
+trace whole root set, including system areas.
 
 =back
 
@@ -110,7 +116,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
             = interp->iglobals;
     }
 
-    /* mark it as used  */
+    /* mark the list of iglobals */
     Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->iglobals);
 
     /* mark the current continuation */
@@ -125,15 +131,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     /* mark the dynamic environment. */
     mark_stack(interp, interp->dynamic_env);
 
-    /*
-     * mark vtable->data
-     *
-     * XXX these PMCs are constant and shouldn't get collected
-     * but t/library/dumper* fails w/o this marking.
-     *
-     * It seems that the Class PMC gets GCed - these should
-     * get created as constant PMCs.
-     */
+    /* mark the vtables: the data, Class PMCs, etc. */
     mark_vtables(interp);
 
     /* mark the root_namespace */
@@ -163,14 +161,15 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     /* Walk the iodata */
     Parrot_IOData_mark(interp, interp->piodata);
 
-    /* quick check if we can already bail out */
+    if(trace == GC_TRACE_FULL)
+        trace_system_areas(interp);
+
+    /* quick check to see if we have already marked all impatient PMCs. If we
+       have, return 0 and exit here. This will alert other parts of the GC
+       that if we are in a lazy run we can just stop it. */
     if (arena_base->lazy_gc
     &&  arena_base->num_early_PMCs_seen >= arena_base->num_early_gc_PMCs)
         return 0;
-
-    /* Find important stuff on the system stack */
-    if (trace == GC_TRACE_FULL)
-        trace_system_areas(interp);
 
     if (interp->profile)
         Parrot_gc_profile_end(interp, PARROT_PROF_GC_p1);
@@ -183,9 +182,9 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 
 =item C<void Parrot_gc_sweep_pool(PARROT_INTERP, Small_Object_Pool *pool)>
 
-Puts any buffers/PMCs that are now unused onto the pool's free list. If
-C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoids buffers that
-are immune from collection (i.e. constant).
+Puts any buffers/PMCs that are marked as "dead" or "black" onto the pool
+free list. If C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoids
+buffers that are immune from collection (i.e. constant).
 
 =cut
 
@@ -296,8 +295,8 @@ contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
             (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
 
         if (0 <= ptr_diff
-                && ptr_diff < (ptrdiff_t)(arena->used * pool->object_size)
-                && ptr_diff % pool->object_size == 0)
+              && ptr_diff < (ptrdiff_t)(arena->used * pool->object_size)
+              && ptr_diff % pool->object_size == 0)
             return 1;
     }
 
@@ -339,7 +338,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
     if (PObj_is_PMC_shared_TEST(obj)) {
         interp = PMC_sync(obj)->owner;
         PARROT_ASSERT(interp);
-        /* XXX FIXME hack */
+
         if (!interp->arena_base->gc_mark_ptr)
             interp->arena_base->gc_mark_ptr = obj;
     }
@@ -372,13 +371,11 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
          *     processed first.
          */
         if (hi_prio && tptr) {
-            if (PMC_next_for_GC(tptr) == tptr) {
+            if (PMC_next_for_GC(tptr) == tptr)
                 PMC_next_for_GC(obj) = obj;
-            }
-            else {
+            else
                 /* put it at the head of the list */
                 PMC_next_for_GC(obj) = PMC_next_for_GC(tptr);
-            }
 
             PMC_next_for_GC(tptr)    = (PMC*)obj;
         }
@@ -393,7 +390,6 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
     }
     if (PObj_custom_mark_TEST(obj)) {
         PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
-
         if (!PObj_constant_TEST(obj))
             VTABLE_mark(interp, obj);
     }
@@ -436,7 +432,9 @@ Parrot_gc_clear_live_bits(PARROT_INTERP, ARGIN(const Small_Object_Pool *pool))
 
 =item C<int Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)>
 
-Returns whether the tracing process has completed.
+Traces through the linked list formed by the C<next_for_GC> pointer.
+Returns 0 if this is a lazy GC run and we've found all impatient PMCs.
+Returns 1 if we've traced the entire list.
 
 =cut
 
@@ -512,7 +510,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 =item C<void Parrot_add_to_free_list(PARROT_INTERP, Small_Object_Pool *pool,
 Small_Object_Arena *arena)>
 
-Adds the objects in the newly allocated C<arena> to the free list.
+Adds the objects in the newly allocated C<arena> to the free list of the pool.
 
 =cut
 

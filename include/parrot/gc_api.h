@@ -70,9 +70,9 @@ typedef struct Memory_Pool {
 } Memory_Pool;
 
 typedef enum {
-    GC_TRACE_FULL,
-    GC_TRACE_ROOT_ONLY,
-    GC_TRACE_SYSTEM_ONLY
+    GC_TRACE_FULL        = 1,
+    GC_TRACE_ROOT_ONLY   = 2,
+    GC_TRACE_SYSTEM_ONLY = 3
 } Parrot_gc_trace_type;
 
 typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Small_Object_Pool *, void *);
