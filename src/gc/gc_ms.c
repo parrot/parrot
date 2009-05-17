@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2001-2009, Parrot Foundation.
-$Id: mark_sweep.c 38656 2009-05-09 21:58:21Z Infinoid $
+$Id$
 
 =head1 NAME
 
