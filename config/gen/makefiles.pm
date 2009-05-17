@@ -50,6 +50,8 @@ sub _init {
             { SOURCE => 'config/gen/makefiles/json.in' },
         'compilers/pmcc/Makefile'     =>
             { SOURCE => 'config/gen/makefiles/pmcc.in' },
+        'compilers/vtdumper/Makefile'     =>
+            { SOURCE => 'config/gen/makefiles/vtdumper.in' },
         'compilers/pirc/Makefile'    =>
             { SOURCE => 'config/gen/makefiles/pirc.in' },
         'src/dynpmc/Makefile'        =>

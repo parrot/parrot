@@ -1,0 +1,58 @@
+# Copyright (C) 2009, Parrot Foundation.
+# $Id$
+
+grammar VTable::Grammar is PCT::Grammar;
+
+token TOP {
+    <vtable_or_section>
+    [ $ || <panic: 'Syntax error'> ]
+    {*}
+}
+
+rule vtable_or_section {
+    [ <section> | <vtable_func> ]
+}
+
+rule section {
+    '[' <identifier> ']' <attribute>? 
+    {{ say "found a section" }}
+}
+
+rule attribute {
+    ':' <identifier>
+    {{ say "found an attribute" }}
+}
+
+
+rule vtable_func {
+    <type> <identifier> '(' <args> ')' <attribute>? 
+    {{ say "found a vtable function" }}
+}
+
+rule type {
+    [ 'struct' | 'union' ]? <identifier> '*'*
+    {{ say "found a type" }}
+}
+
+rule args {
+    [ <arg> [ ',' <args> ]
+    |
+    ]
+    {{ say "found args" }}
+}
+
+rule arg {
+    <type> <identifier>
+    {{ say "found an arg" }}
+}
+
+token identifier {
+    <.ident>
+}
+
+token ws {
+    [ '#' \N* \n
+    | \s+
+    ]*
+}
+    
