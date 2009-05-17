@@ -4,46 +4,44 @@
 grammar VTable::Grammar is PCT::Grammar;
 
 token TOP {
-    <vtable_or_section>
+    <sections>
     [ $ || <panic: 'Syntax error'> ]
     {*}
 }
 
+rule sections {
+    <vtable_or_section>*
+}
+
 rule vtable_or_section {
-    [ <section> | <vtable_func> ]
+    [ <vtable_func> | <section> ]
 }
 
 rule section {
-    '[' <identifier> ']' <attribute>? 
-    {{ say "found a section" }}
+    '[' <identifier> ']' <attribute>?                {*}
 }
 
 rule attribute {
     ':' <identifier>
-    {{ say "found an attribute" }}
 }
 
 
 rule vtable_func {
-    <type> <identifier> '(' <args> ')' <attribute>? 
-    {{ say "found a vtable function" }}
+    <type> <identifier> '(' <args> ')' <attribute>?  {*}
 }
 
 rule type {
-    [ 'struct' | 'union' ]? <identifier> '*'*
-    {{ say "found a type" }}
+    [ 'struct' | 'union' ]? <identifier> '*'?
 }
 
 rule args {
-    [ <arg> [ ',' <args> ]
+    [ <arg> [ ',' <args> ]?
     |
     ]
-    {{ say "found args" }}
 }
 
 rule arg {
     <type> <identifier>
-    {{ say "found an arg" }}
 }
 
 token identifier {
