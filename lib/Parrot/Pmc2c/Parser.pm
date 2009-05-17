@@ -159,7 +159,7 @@ sub find_attrs {
         @modifiers = split /\s/, $4;
         $comment = $5;
 
-        $lineno++;
+        $lineno += count_newlines($1);
 
         $pmc->add_attribute(Parrot::Pmc2c::Attribute->new(
             {
@@ -221,6 +221,7 @@ sub find_methods {
         }
 
         ( my $methodblock, $pmcbody ) = extract_balanced($pmcbody);
+        my $block_lines = count_newlines($methodblock);
 
         $methodblock = strip_outer_brackets($methodblock);
 
@@ -288,8 +289,13 @@ sub find_methods {
             $pmc->add_method($method);
         }
 
-        $lineno += count_newlines($methodblock);
+        $lineno += $block_lines;
     }
+
+    # include the remainder in the line count, minus the last one
+    # (the last one is included in the postamble directly)
+    chomp $pmcbody;
+    $lineno += count_newlines($pmcbody);
 
     return ($lineno, $class_init);
 }

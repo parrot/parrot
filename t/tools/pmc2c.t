@@ -28,7 +28,7 @@ use lib qw( . lib ../lib ../../lib );
 
 use Fatal qw{open close};
 use Test::More;
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 13;
 use Parrot::Config;
 
 my $pmc2c = join $PConfig{slash}, qw(. tools build pmc2c.pl);
@@ -189,6 +189,53 @@ END_PMC
 Parrot_a_init(PARROT_INTERP, PMC *pmc)
 {
 #line 4
+END_C
+
+# test attr/comment line numbering
+pmc2c_output_like( <<'END_PMC', <<'END_C', 'line+pod' );
+pmclass a {
+    ATTR int foo;
+
+    /* Comment comment comment.
+     * Blah blah blah.
+     */
+
+    VTABLE void init() {
+        Parrot_a_attributes * attrs =
+                mem_allocate_zeroed_typed(Parrot_a_attributes);
+
+        attrs->hash = pmc_new(interp, enum_class_Hash);
+
+        PMC_data(SELF) = attrs;
+    }
+}
+END_PMC
+static  void 
+Parrot_a_init(PARROT_INTERP, PMC *pmc)
+{
+#line 8
+END_C
+
+# test EOF/coda line numbering
+# Note: We can't test the whole thing, as the filename component varies
+pmc2c_output_like( <<'END_PMC', <<'END_C', 'line+pod' );
+pmclass a {
+    ATTR int foo;
+
+    /* Comment comment comment.
+     * Blah blah blah.
+     */
+
+    VTABLE void init() {
+        PMC_data(SELF) = NULL;
+    }
+
+}
+
+/* foo bar */
+END_PMC
+} /* Parrot_a_class_init */
+#line 11
 END_C
 
 # Local Variables:
