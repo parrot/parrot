@@ -259,7 +259,7 @@ TODO: check type
 
 /*
 
-=item C<PMC *set_pmc_keyed(PMC *key)>
+=item C<PMC *set_pmc_keyed(PMC *key, PMC *segment)>
 
 Add a segment with the given name to the directory.  Dispatches to
 set_pmc_keyed_str.
@@ -273,8 +273,25 @@ set_pmc_keyed_str.
         VTABLE_set_pmc_keyed_str(interp, SELF, s_key, segment);
     }
 
+/*
+
+=item C<PMC *delete_keyed(PMC *key)>
+
+Delete the specified segment from the directory.
+
+=cut
+
+*/
+
+    VTABLE void delete_keyed(PMC *key) {
+        STRING *s_key = VTABLE_get_string(interp, key);
+        VTABLE_delete_keyed(interp,
+            PARROT_PACKFILEDIRECTORY(SELF)->hash, key);
+    }
+
 
 }
+
 /*
 
 =back

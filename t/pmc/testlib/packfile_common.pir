@@ -19,9 +19,7 @@
     .include "interpinfo.pasm"
     .local pmc pf, pio
     pf   = new ['Packfile']
-    #$S0  = interpinfo .INTERPINFO_RUNTIME_PREFIX
-    #$S0 .= "/runtime/parrot/library/uuid.pbc"
-    $S0 = '_filename'()
+    $S0  = '_filename'()
     pio  = open $S0, 'r'
     $S0  = pio.'readall'()
     close pio
