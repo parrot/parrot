@@ -1079,10 +1079,10 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 
     /* Otherwise, remove what was accepted from the merge lists. */
     for (i = 0; i < list_count; i++) {
-        int j;
 
         PMC * const list       = VTABLE_get_pmc_keyed_int(interp, merge_list, i);
-        const int   list_count = VTABLE_elements(interp, list);
+        const INTVAL list_count = VTABLE_elements(interp, list);
+        INTVAL j;
 
         for (j = 0; j < list_count; j++) {
             if (VTABLE_get_pmc_keyed_int(interp, list, j) == accepted) {
@@ -1205,10 +1205,11 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
     PMC *roles_of_role;
     PMC *proposed_add_methods;
 
-    int i, roles_of_role_count;
+    INTVAL roles_of_role_count;
+    INTVAL i;
 
     /* Check we have not already composed the role; if so, just ignore it. */
-    int roles_count = VTABLE_elements(interp, roles_list);
+    INTVAL roles_count = VTABLE_elements(interp, roles_list);
 
     for (i = 0; i < roles_count; i++)
         if (VTABLE_get_pmc_keyed_int(interp, roles_list, i) == role)
@@ -1332,7 +1333,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
              * class already a multi-sub? */
             if (!PMC_IS_NULL(cur_entry) && VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub"))) {
                 /* Class already has a multi-sub; need to merge our methods into it. */
-                INTVAL num_subs = VTABLE_elements(interp, cur_method);
+                const INTVAL num_subs = VTABLE_elements(interp, cur_method);
                 INTVAL i;
                 for (i = 0; i < num_subs; i++)
                     VTABLE_push_pmc(interp, cur_entry, VTABLE_get_pmc_keyed_int(interp,
@@ -1367,7 +1368,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
         /* Only add if we don't already have it in the list. */
         PMC * const cur_role = VTABLE_get_pmc_keyed_int(interp,
                                     roles_of_role, i);
-        int j;
+        INTVAL j;
 
         for (j = 0; j < roles_count; j++) {
             if (VTABLE_get_pmc_keyed_int(interp, roles_list, j) == cur_role) {
