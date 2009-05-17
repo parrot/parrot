@@ -247,7 +247,7 @@ Perform the finalization run, freeing all PMCs.
 static void
 gc_ms_finalize(PARROT_INTERP, ARGIN(Arenas * const arena_base))
 {
-    ASSERT_ARGS(gc_ms_finalize);
+    ASSERT_ARGS(gc_ms_finalize)
     Parrot_gc_clear_live_bits(interp, arena_base->pmc_pool);
     Parrot_gc_clear_live_bits(interp, arena_base->constant_pmc_pool);
 
