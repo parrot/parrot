@@ -25,8 +25,8 @@ vtdumper.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
 	    --output=src/parser/gen_grammar.pir src/parser/grammar.pg
 	$(PARROT) -o vtdumper.pbc vtdumper.pir
 
-src/parser/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
-	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
+src/parser/gen_grammar.pir: src/parser/grammar.pg
+	$(PARROT) $(PARROT_ARGS) $(PGE_LIBRARY)/Perl6Grammar.pir \
 	    --output=src/parser/gen_grammar.pir \
 	    src/parser/grammar.pg
 
