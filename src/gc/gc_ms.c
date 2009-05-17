@@ -377,8 +377,8 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
         }
     }
 
-    /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep. If gc
-     * is disabled, then we must check the free list directly. */
+    /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
+       If gc is disabled, then we must check the free list directly. */
     if (!pool->free_list)
         (*pool->alloc_objects) (interp, pool);
 }
