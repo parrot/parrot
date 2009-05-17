@@ -867,9 +867,6 @@ lib_deps_source : $(GENERAL_H_FILES)
 
 lib_deps : lib_deps_object lib_deps_source
 
-check_source : $(GENERAL_H_FILES)
-	$(PERL) tools/dev/check_source_standards.pl all_source
-
 # XXX changes don't always propagate into libparrot
 # e.g. when I change debug:fataly to xfataly, nm still shows the old symbol
 # and parrot builds fine (except for the unproto warning
