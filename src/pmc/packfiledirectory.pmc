@@ -64,6 +64,8 @@ Marks the object as live.
 
         if (attrs->hash)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->hash);
+
+        SUPER();
     }
 
 /*
