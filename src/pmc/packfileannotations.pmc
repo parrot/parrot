@@ -74,6 +74,8 @@ Marks the object as live.
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->annotations);
         if (attrs->keys)
             Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->keys);
+
+        SUPER();
     }
 
 /*
