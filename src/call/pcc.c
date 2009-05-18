@@ -188,15 +188,13 @@ static void set_context_sig_returns_varargs(PARROT_INTERP,
     ARGMOD(Parrot_Context *ctx),
     ARGMOD(opcode_t **indexes),
     ARGIN(const char *ret_x),
-    ARGMOD(va_list returns))
+    va_list returns)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*ctx)
-        FUNC_MODIFIES(*indexes)
-        FUNC_MODIFIES(returns);
+        FUNC_MODIFIES(*indexes);
 
 static int set_retval_util(PARROT_INTERP,
     ARGIN(const char *sig),
@@ -310,8 +308,7 @@ static void too_many(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(ctx) \
     || PARROT_ASSERT_ARG(indexes) \
-    || PARROT_ASSERT_ARG(ret_x) \
-    || PARROT_ASSERT_ARG(returns)
+    || PARROT_ASSERT_ARG(ret_x)
 #define ASSERT_ARGS_set_retval_util __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(sig) \
@@ -2469,7 +2466,7 @@ function instead of the va_list itself.
 
 static void
 set_context_sig_returns_varargs(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
-    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), ARGMOD(va_list returns))
+    ARGMOD(opcode_t **indexes), ARGIN(const char *ret_x), va_list returns)
 {
     ASSERT_ARGS(set_context_sig_returns_varargs)
     unsigned int index = 0;
