@@ -372,6 +372,10 @@ Parrot_ex_throw_from_c(PARROT_INTERP, ARGIN(PMC *exception))
         PDB_backtrace(interp);
     }
 
+    /* Note the thrower.
+     * XXX TT#596 - pass in current context instead when we have context PMCs. */
+    VTABLE_set_attr_str(interp, exception, CONST_STRING(interp, "thrower"), CONTEXT(interp)->current_cont);
+
     /* it's a C exception handler */
     if (PObj_get_FLAGS(handler) & SUB_FLAG_C_HANDLER) {
         Parrot_runloop * const jump_point =
