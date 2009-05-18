@@ -177,7 +177,11 @@ OUT
 
 }
 
-pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT#629');
+TODO: {
+    local $TODO = 'Broken with CGP'
+        if $ENV{TEST_PROG_ARGS} =~ /--runcore=cgp/;
+
+pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
 .sub 'foo' :immediate
   die 'no'
 .end
@@ -185,6 +189,7 @@ CODE
 /no\ncurrent inst.*:2\)$/
 OUT
 
+}
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
