@@ -107,7 +107,6 @@ sub new {
             $self->new_item( 'Chapter 6 Not Quite Perl', 'docs/book/ch06_nqp.pod'),
             $self->new_item( 'Chapter 7 Dynamic C-level Objects', 'docs/book/ch07_dynpmcs.pod'),
             $self->new_item( 'Chapter 8 Dynamic Opcodes', 'docs/book/ch08_dynops.pod'),
-            $self->new_item( 'Chapter 9 Parrot Assembly Language', 'docs/book/ch09_pasm.pod'),
             $self->new_item( 'Chapter 10 Instruction Reference', 'docs/book/ch10_opcode_reference.pod'),
             $self->new_item( 'Chapter 11 Directive Reference', 'docs/book/ch11_directive_reference.pod'),
             $self->new_item( 'Chapter 12 PIR Operator Reference', 'docs/book/ch12_operator_reference.pod'),
