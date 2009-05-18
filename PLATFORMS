@@ -20,7 +20,7 @@ linux-x86-gcc4.1.3                Y    Y    ?     Y   Y   Y    Y     ?  20080414
 linux-x86-gcc4.2.3                Y    Y    ?     Y   Y   Y    Y     ?  20080715
 linux-x86-gcc4.2.4                Y    Y    ?     Y   Y   Y    Y     ?  20081023
 linux-x86-gcc4.3.2                Y    Y    ?     Y   Y   Y    Y     ?  20081030
-linux-x86-llvm-gcc-4.2            Y    Y    ?     ?   ?   Y    Y     ?  20080801
+linux-x86-llvm-gcc-4.2            Y    Y    ?     ?   ?   Y    Y     ?  20090514
 sol10-sparc-cc_5.9           B4   Y    -    -     Y   Y   Y    Y     ?  20090419
 sol10-sparc-cc_5.9           B8   Y    -    -     Y   Y   Y    Y     ?  20090419
 sol10-sparc-gcc_4.0.2        B4   Y    -    -     Y   Y   Y    Y/1   ?  20080510
