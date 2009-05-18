@@ -118,7 +118,7 @@ Return the MMD signature PMC, if any or a Null PMC.
     METHOD get_multisig() {
         PMC *sig;
         GET_ATTR_multi_sig(INTERP, SELF, sig);
-        if (sig == PMCNULL)
+        if (PMC_IS_NULL(sig))
             sig = PMCNULL;
         RETURN(PMC *sig);
     }
