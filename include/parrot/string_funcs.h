@@ -507,6 +507,7 @@ INTVAL string_ord(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), INTVAL idx)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 const char* string_primary_encoding_for_representation(PARROT_INTERP,
     parrot_string_representation_t representation)
         __attribute__nonnull__(1);

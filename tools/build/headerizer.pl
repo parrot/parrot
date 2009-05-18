@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 use strict;
@@ -81,6 +81,7 @@ my %valid_macros = map { ( $_, 1 ) } qw(
     PARROT_DOES_NOT_RETURN
     PARROT_DOES_NOT_RETURN_WHEN_FALSE
     PARROT_MALLOC
+    PARROT_OBSERVER
 );
 
 main();
@@ -323,9 +324,9 @@ sub asserts_from_args {
             else {
                 # try to isolate the variable's name;
                 # strip off everything before the final space or asterisk.
-                $var =~ s[.+[* ]([^* ]+)$][$1];
+                $var =~ s{.+[* ]([^* ]+)$}{$1};
                 # strip off a trailing "[]", if any.
-                $var =~ s/\[\]$//;
+                $var =~ s{\[\]$}{};
             }
             push( @asserts, "PARROT_ASSERT_ARG($var)" );
         }
