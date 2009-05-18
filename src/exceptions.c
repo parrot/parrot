@@ -227,8 +227,17 @@ Parrot_ex_throw_from_op(PARROT_INTERP, ARGIN(PMC *exception), ARGIN_NULLOK(void 
 
     address    = VTABLE_invoke(interp, handler, dest);
 
+    /* XXX This is an obvious hack. We need to identify here whether this is
+       an ExceptionHandler proper or a PIR-defined subclass. This conditional
+       monstrosity attempts to check whether this is an object of a PIR-defined
+       subclass. When we have garbage-collectable PMCs, we shouldn't need to do
+       this nonsense. See TT#154 for details */
+    if (handler->vtable->base_type == enum_class_Object) {
+        /* Don't know what to do here to make sure the exception parameter gets
+           passed properly. */
+    }
     /* Set up the continuation context of the handler in the interpreter. */
-    if (PMC_cont(handler)->current_results)
+    else if (PMC_cont(handler)->current_results)
         address = pass_exception_args(interp, "P", address,
                 CONTEXT(interp), exception);
 
