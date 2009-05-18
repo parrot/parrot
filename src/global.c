@@ -831,7 +831,7 @@ store_sub_in_multi(PARROT_INTERP, ARGIN(PMC *sub_pmc), ARGIN(PMC *ns))
 
     /* is there an existing MultiSub PMC? or do we need to create one? */
     if (PMC_IS_NULL(multisub)) {
-        multisub = pmc_new(interp, enum_class_MultiSub);
+        multisub = pmc_new(interp,  Parrot_get_ctx_HLL_type(interp, enum_class_MultiSub));
         /* we have to push the sub onto the MultiSub before we try to store
         it because storing requires information from the sub */
         VTABLE_push_pmc(interp, multisub, sub_pmc);
