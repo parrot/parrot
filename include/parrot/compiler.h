@@ -111,7 +111,7 @@
 /* UNUSED() is the old way we handled shim arguments Should still be
    used in cases where the argument should, at some point be used.
  */
-#define UNUSED(a) if (0) (void)(a);
+#define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
 
 #if PARROT_HAS_SAL
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull

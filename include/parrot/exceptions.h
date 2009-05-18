@@ -276,7 +276,7 @@ void Parrot_print_backtrace(void);
  * int _ASSERT_ARGS = PARROT_ASSERT_ARG(a) || PARROT_ASSERT_ARG(b) || ...
  */
 #ifdef NDEBUG
-#  define PARROT_ASSERT(x) ((void)0)
+#  define PARROT_ASSERT(x) /*@-noeffect@*/((void)0)/*@=noeffect@*/
 #  define PARROT_ASSERT_ARG(x) (0)
 #  define ASSERT_ARGS(a)
 #else
