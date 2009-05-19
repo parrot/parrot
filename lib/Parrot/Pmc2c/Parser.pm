@@ -15,6 +15,7 @@ use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
 use Text::Balanced 'extract_bracketed';
+use File::Basename qw(basename);
 
 =head1 NAME
 
@@ -65,6 +66,11 @@ sub parse_pmc {
     my ( $preamble, $pmcname, $flags, $parents, $pmcbody, $post, $chewed_lines ) =
         parse_top_level($code);
 
+    my $filebase = basename($filename);
+    $filebase =~ s/\.pmc$//;
+    # Note: this can be changed to a die() after the 1.4 release. (TT #665)
+    warn("PMC filename $filebase.pmc does not match pmclass name $pmcname!\n")
+        unless lc($filebase) eq lc($pmcname);
     my $pmc = Parrot::Pmc2c::PMC->create($pmcname);
     $pmc->preamble( Parrot::Pmc2c::Emitter->text( $preamble, $filename, 1 ) );
     $pmc->name($pmcname);

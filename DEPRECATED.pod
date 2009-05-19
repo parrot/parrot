@@ -332,8 +332,8 @@ L<https://trac.parrot.org/parrot/ticket/338>
 
 When foo.pmc contains a the line "pmclass bar", pmc2c generates a pmc_foo.h
 but tries to include pmc_bar.h.  This is a bug, but it's possible someone out
-there is using it.  After deprecation, this usage will result in an error
-message.
+there is using it.  This usage will result in a warning for now; after
+deprecation, this warning will be upgraded to an error.
 
 L<https://trac.parrot.org/parrot/ticket/665>
 
