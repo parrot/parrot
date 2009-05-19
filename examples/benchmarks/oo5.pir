@@ -23,7 +23,7 @@ loop:
     y = new 'Integer'
     assign y, $P5
     inc i
-    if i <= 500000 goto loop
+    if i <= 50000 goto loop
 
     $P2 = o."i"()
     print $P2

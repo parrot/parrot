@@ -23,7 +23,7 @@ of primes and the last one found. Use PMCs, not ints.
   i   = new 'Integer'
   i   = 0
   max = new 'Integer'
-  max = 5000
+  max = 500
   i6  = new 'Integer'
   i6  = 0
   i7  = new 'Integer'

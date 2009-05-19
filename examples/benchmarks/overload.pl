@@ -24,7 +24,7 @@ package main;
 my $a = Foo->new(7);
 my $b = Foo->new(6);
 my $r;
-for my $i ( 1 .. 500_000 ) { $r = $a * $b }
+for my $i ( 1 .. 50_000 ) { $r = $a * $b }
 print "$r\n";
 
 # Local Variables:

@@ -17,7 +17,7 @@
 loop:
    r = a * b
    inc i
-   if i <= 500000 goto loop
+   if i <= 50000 goto loop
    print r
    print "\n"
    end

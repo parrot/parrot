@@ -33,7 +33,7 @@ sub fibB {
 
 package main;
 
-my $N = shift || 28;
+my $N = shift || 24;
 
 my $b = B->new();
 

@@ -38,7 +38,7 @@ def main():
     l = 0
     i6 = 0
     i7 = 0
-    max = 5000
+    max = 500
 
     while 1:
 

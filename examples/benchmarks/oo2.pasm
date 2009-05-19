@@ -31,7 +31,7 @@
     addattribute P1, ".j"
 
     set I10, 0
-    set I11, 500000
+    set I11, 50000
 loop:
     new P3, "Foo"
     inc I10

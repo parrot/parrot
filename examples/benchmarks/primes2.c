@@ -37,7 +37,7 @@ Main function to run the example.
 int
 main(int argc, char *argv[])
 {
-        int i=0, max=10000;
+        int i=0, max=500;
         int i6 = 0;
         int i7;
 

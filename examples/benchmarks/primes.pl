@@ -21,7 +21,7 @@ use strict;
 use warnings;
 
 my $i1 = 1;
-my $i2 = 10000;
+my $i2 = 1000;
 my $i3;
 my $i4;
 my $i5;
