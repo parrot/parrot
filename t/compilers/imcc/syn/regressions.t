@@ -186,7 +186,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
   die 'no'
 .end
 CODE
-/no\ncurrent inst.*:2\)$/
+/no\ncurrent inst.*:[\d-]+\)$/
 OUT
 
 }
