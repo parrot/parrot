@@ -3,8 +3,9 @@
 New in 1.1.0
 - Core
   + Added op: load_language, find_caller_lex
-  + socket IO are back as PMC
-  + refactor some PMC: Hash, ManagedStruct
+  + Socket IO are back as PMC
+  + Refactor some PMC: Hash, ManagedStruct
+  + Refactor GC API
 - Compiler
   + PGE
     - Allow \x, \c, and \o in enumerated character classes (incl ranges)
