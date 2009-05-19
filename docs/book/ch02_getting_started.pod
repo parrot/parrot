@@ -133,12 +133,6 @@ The same point applies for ops and dynops.
 Parrot allows language developers to extend Parrot's core instruction set --
 again to suit the needs of advanced languages.
 
-=item Chapter 9, I<Parrot Assembly Language>
-
-Parrot Assembly Language (PASM) is a low-level language native to the Parrot
-virtual machine. It serves as a source code representation of Parrot's bytecode
-format.
-
 =item Chapter 10, I<Instruction Reference>
 
 Parrot's standard instruction set provides powerful behavior for primitive
