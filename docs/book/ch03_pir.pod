@@ -703,18 +703,18 @@ C<.=> operation appends "xy" onto the string "abcd" in C<$S1>.
 
 =head3 Repeating strings
 
-The C<x> instruction repeats a string a specified number of times:
+The C<repeat> opcode repeats a string a specified number of times:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
   $S0 = "a"
-  $S1 = $S0 x 5
+  $S1 = repeat $S0, 5
   print $S1            # prints "aaaaa"
   print "\n"
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
-In this example, C<x> generates a new string with "a" repeated five
+In this example, C<repeat> generates a new string with "a" repeated five
 times and stores it in C<$S1>.
 
 =head3 Length of a string
@@ -833,9 +833,9 @@ the last character.
 
 The C<sprintf>X<sprintf opcode (PIR)> opcode generates a formatted
 string from a series of values. It takes two arguments: a string
-specifying the format, and an array PMC (like an C<Array>) containing
-the values to be formatted. The format string and the result can be
-either strings or PMCs:
+specifying the format, and an array PMC containing the values to be
+formatted. The format string and the result can be either strings or
+PMCs:
 
 =begin PIR_FRAGMENT
 
@@ -1265,22 +1265,39 @@ strings if needed, and UTF-8 will upgrade to UTF-16.
 
 Polymorphic Containers (PMCs) are the basis for complex data types and
 object-oriented behavior in Parrot. In PIR, any variable that isn't a
-low-level integer, number, or string is a PMC. PMCs act much like any
-integer, number, or string variable, but you have to instantiate a new
-PMC object before you use it. The C<new> opcode creates a new PMC of the
-specified type.
+low-level integer, number, or string is a PMC. PMCs act much like 
+integer, number, or string variables, but you have to instantiate a new
+PMC object before you use it. The C<new> opcode creates a new PMC object
+of the specified type.
 
 =begin PIR_FRAGMENT
 
   $P0 = new 'String'
-  $P0 = "That's a bollard and not a parrot."
+  $P0 = "That's a bollard and not a parrot"
   print $P0
 
 =end PIR_FRAGMENT
 
 This example creates a C<String> object, stores it in the PMC register
 variable C<$P0>, assigns it the value "That's a bollard and not a
-parrot.", and prints it.
+parrot", and prints it.
+
+Every PMC has a type that indicates what data it can store and what
+behavior it supports. The C<typeof> opcode reports the type of a PMC.
+When the result is a string variable, C<typeof> returns the name of the
+type:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $S0 = typeof $P0               # $S0 is "String"
+  print $S0
+  print "\n"
+
+=end PIR_FRAGMENT
+
+When the result is a PMC variable, C<typeof> returns the C<Class> for
+that object type.
 
 =head3 Scalars
 
@@ -1290,171 +1307,140 @@ of simple PMCs for this exact purpose.  C<Integer>, C<Number>, and
 C<String> are thin overlays on Parrot's low-level integers, numbers, and
 strings. 
 
-
-=begin PIR_FRAGMENT
-
-  .local pmc hello
-  hello = new 'String'
-  hello = "Hello, Polly."
-  print hello
-
-=end PIR_FRAGMENT
-
-=head3 Type Conversion
-
-The C<=> operator is very powerful. The common use is to store a string
-value to a string variable, an integer value in an integer variable, a
-floating point value into a number variable, and a PMC value in a PMC
-variable. But Parrot also handles conversions between the types for you
-automatically:
-
-=begin PIR_FRAGMENT
-
-  $I0 = 5     # Integer. 5
-  $S0 = $I0   # Stringify. "5"
-  $N0 = $S0   # Numify. 5.0
-  $I0 = $N0   # Intify. 5
-
-=end PIR_FRAGMENT
-
-Converting a string to a number only makes sense when the contents of
-the string are a number. Otherwise, Parrot will simply return a false
-value.
-
-=begin PIR_FRAGMENT
-
-  $S0 = "parrot"
-  $I0 = $S0        # 0
-
-=end PIR_FRAGMENT
-
 An earlier example showed a string literal assigned to a PMC register of type
-C<String>. This works for all the primitive types and their autoboxed PMC
+C<String>. This works for all the low-level types and their PMC
 equivalents:
 
 =begin PIR_FRAGMENT
 
   $P0 = new 'Integer'
   $P0 = 5
-  $S0 = $P0      # the string "5"
-  $N0 = $P0      # the number 5.0
-  $I0 = $P0      # the integer 5
 
   $P1 = new 'String'
   $P1 = "5 birds"
-  $S1 = $P1      # Unbox. $S1 = "5 birds"
-  $I1 = $P1      # Intify. 5
-  $N1 = $P1      # Numify. 5.0
 
   $P2 = new 'Number'
   $P2 = 3.14
-  $S2 = $P2      # Stringify. "3.14"
-  $I2 = $P2      # Intify. 3
-  $N2 = $P2      # Unbox. $N2 = 3.14
 
 =end PIR_FRAGMENT
 
-=head4 Boxing Operations
-
-Primitive registers like strings, numbers, and integers perform a
-special action called X<autoboxing> when assigned to a PMC. Autoboxing is the
-process of converting a primitive type to a PMC object.  PMC classes exist for
-String, Number, and Integer; notice that the primitive types are in lower-case,
-while the PMC classes are capitalized. If you want to box a value explicitly,
-use the C<box> opcode:
+Like literals, low-level integer, number, or string variables can be
+directly assigned to a PMC. The PMC handles the conversion from the
+low-level type to its own internal storage.N<This kind of conversion of
+a simpler type to a more complex type is often called "boxing".>
 
 =begin PIR_FRAGMENT
 
-  $P0 = new 'Integer'       # The boxed form of int
-  $P0 = box 42
-  $P1 = new 'Number'        # The boxed form of num
-  $P1 = box 3.14
-  $P2 = new 'String'        # The boxed form of string
-  $P2 = "This is a string!"
+  $I0 = 5
+  $P0 = new 'Integer'
+  $P0 = $I0
+
+  $S1 = "5 birds"
+  $P1 = new 'String'
+  $P1 = $S0
+
+  $N2 = 3.14
+  $P2 = new 'Number'
+  $P2 = $N2
 
 =end PIR_FRAGMENT
 
-As we've seen in the previous chapters about PIR, we can convert between
-primitive string, integer, and number types and PMCs. PIR used the C<=>
-operator to make these conversions. PIR uses the C<set> opcode to do the
-same thing. C<set> will perform the type conversions for us automatically,
-in a process called I<autoboxing>.
-
-Assigning a primitive data type to a PMC of a String, Integer, or Float type
-converts that PMC to the new type. So, assigning a string to a Number PMC
-converts it into a String PMC. Assigning an integer value converts it to a
-C<Integer>, and assigning C<undef> converts it to an C<Undef> PMC:
+The C<box> opcode is a handy shortcut to create the appropriate PMC
+object from an integer, number, or string literal or variable.
 
 =begin PIR_FRAGMENT
 
-  new $P0, "String"
-  set $P0, "Ford\n"
-  print $P0           # prints "Ford\n"
-  set $P0, 42
-  print $P0           # prints 42
-  print "\n"
-  typeof $S0, $P0
-  print $S0           # prints "Integer"
-  print "\n"
+  $P0 = box 3       # $P0 is an "Integer"
+
+  $P1 = box "hello" # $P1 is a "String"
+
+  $P2 = box 3.14    # $P2 is a "Number"
 
 =end PIR_FRAGMENT
 
-C<P0> starts as a C<String>, but when C<set> assigns it an integer
-value 42 (replacing the old string value C<"Ford">), it changes type
-to C<Integer>. This behavior only works for the wrapper PMC types for the
-primitive values string, int, and num. Other PMC classes will have different
-behaviors when you try to assign a primitive value to them.
-
-We can also use the C<box> opcode to explicitly convert an integer, a float,
-or a string into an appropriate PMC type.
+In the reverse situation, when assigning a PMC to an integer, number, or
+string variable, the PMC also has the ability to convert its value to
+the low-level type.N<The reverse of "boxing" is "unboxing".>
 
 =begin PIR_FRAGMENT
 
-  box $P0, 3
-  typeof $S0, $P0         # $P0 is an "Integer"
-  box $P1, "hello"
-  typeof $S0, $P1         # $P1 is a "String"
-  box $P2, 3.14
-  typeof $S0, $P2         # $P2 is a "Number"
+  $P0 = box 5
+  $S0 = $P0           # the string "5"
+  $N0 = $P0           # the number 5.0
+  $I0 = $P0           # the integer 5
+
+  $P1 = box "5 birds"
+  $S1 = $P1           # the string "5 birds"
+  $I1 = $P1           # the integer 5
+  $N1 = $P1           # the number 5.0
+
+  $P2 = box 3.14
+  $S2 = $P2           # the string "3.14"
+  $I2 = $P2           # the integer 3
+  $N2 = $P2           # the number 3.14
 
 =end PIR_FRAGMENT
+
+This example creates C<Integer>, C<Number>, and C<String> PMCs, and
+shows the effect of assigning each one back to a low-level type.
+
+Converting a C<String> to an integer or number only makes sense when the
+contents of the string are a number. The C<String> PMC will attempt to
+extract a number from the beginning of the string, but otherwise will
+simply return a false value.
+
+=begin sidebar Type Conversions
+
+Parrot also handles conversions between the low-level types where
+possible. The following code example converts an integer to a string,
+then a string to a number, and finally a number to an integer.
+
+=begin PIR_FRAGMENT
+
+  $I0 = 5     # Integer. 5
+  $S0 = $I0   # the string "5"
+  $N0 = $S0   # the number 5.0
+  $I0 = $N0   # the integer 5
+
+=end PIR_FRAGMENT
+
+=end sidebar
 
 
 =head3 Aggregates
 
-Z<CHP-9-SECT-3.1>
+PMCs can define complex types that hold multiple values, commonly called
+aggregates. Two of the most basic aggregate types are ordered arrays and
+associative arrays. The primary difference between these is that ordered
+arrays are indexed using integer keys, and while associative arrays are
+indexed with string keys. 
 
-PMCs can define complex types that hold multiple values. These are
-commonly called "X<PMCs (Polymorphic Containers);aggregate>
-X<aggregate PMCs> aggregates." The most important feature added for
-aggregates is keyed access. Elements within an aggregate PMC can be
-stored and retrieved by a numeric or string key. PIR also offers a
-full set of operations for manipulating aggregate data types.
+The most important feature added for aggregates is keyed access.
+Elements within an aggregate PMC can be stored and retrieved by a
+numeric or string key.
 
-Two of the most basic aggregate types are arrays and hashes. The primary
-difference between these two is that arrays are indexed using integer keys,
-and hashes are indexed with string keys. The term "hash" in this context is
-derived from the data type in Perl 5 of the same name. Other programming
-languages might refer to the same concept using different terms such as
-"dictionary" or "hash table" or "associative array".
+PIR also offers a extensive set of operations for manipulating aggregate
+data types.
 
-Arrays and hashes are not the only types of aggregates available, although
-they are the most simple demonstrations of using integer and strings as
-keys in an aggregate, respectively.
+Ordered and associative arrays are not the only types of aggregates
+available, but they are a good demonstration of using integers and
+strings as keys in an aggregate.
 
-=head4 Arrays
+=head4 Ordered Arrays
 
-Z<CHP-9-SECT-3.1.1>
+Parrot provides several ordered array PMCs, differentiated by
+whether the array is intended to store booleans, integers, numbers,
+strings, or other PMCs, and whether the array should keep a fixed length
+or dynamically resize for the number of elements it stores.
 
-X<arrays>
-The C<Array>X<Array PMC> PMC is an ordered aggregate with zero-based integer
+The all of the ordered array PMCs have zero-based integer
 keys. The syntax for X<keyed access to PMCs> keyed access to a PMC puts the
 key in square brackets after the register name:
 
 =begin PIR_FRAGMENT
 
-  new $P0, "Array"     # obtain a new array object
-  set $P0, 2           # set its length
+  $P0 = new "Array"    # obtain a new array object
+  $P0 = 2              # set its length
   set $P0[0], 10       # set first element to 10
   set $P0[1], $I31     # set second element to $I31
   set $I0, $P0[0]      # get the first element
@@ -1504,10 +1490,13 @@ Some other useful instructions for working with arrays are C<push>,
 C<pop>, C<shift>, and C<unshift> (you'll find them in
 "PIR Opcodes" in Chapter 11).
 
-=head4 Hashes
+=head4 Associative Arrays
 
 Z<CHP-9-SECT-3.1.2>
 
+Other programming
+languages might refer to the same concept using different terms such as
+"dictionary" or "hash table" or "associative array".
 X<PMCs (Polymorphic Containers);hashes>
 The C<Hash>X<Hash PMC> PMC is an unordered aggregate which uses string keys
 to identify elements within it.
@@ -1844,36 +1833,14 @@ the PMCs vtable. Since PMCs define their own behavior for these vtable
 functions, it's important to familiarize yourself with the behavior
 of the particular PMC before you start performing a lot of operations on it.
 
-
-
-=head4 PMC object types
-
-Z<CHP-9-SECT-2.2.2>
-
-X<PMCs (Polymorphic Containers);object types>
-Every PMC has a distinct type that determines its behavior through the
-vtable interface. In the chapter on PIR, we've seen a number of these vtable
+In the chapter on PIR, we've seen a number of these vtable
 functions already, and seen how they implement the behaviors found inside
 the various opcodes. The vtable interface is standard, and all PMCs implement
 the exact same set of vtables. We've seen some of the vtables and their uses,
 and more of them will be discussed in this chapter and later in the various
 reference chapters.
 
-The C<typeof> opcode can be used to determine the type of a PMC. When
-the source argument is a PMC and the destination is a string register,
-C<typeof> returns the name of the type:
 
-=begin PIR_FRAGMENT
-
-  new $P0, "String"
-  typeof $S0, $P0               # $S0 is "String"
-  print $S0
-  print "\n"
-
-=end PIR_FRAGMENT
-
-Using C<typeof> with a PMC output parameter instead, it returns the Class
-PMC for that type.
 
 
 
