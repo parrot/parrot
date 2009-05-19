@@ -40,23 +40,28 @@ F<parrot_[version].orig.tar.gz> (note the "_" in place of dash).
 
 =item 3.
 
+Integrate any new change entries from F<ports/debian/changelog> into
+F<ports/ubuntu/changelog>, preserving chronological order.
+
 Copy the F<ports/debian/> directory from the Parrot source tree into the fresh
 tarball extract.
 
   cp -r <path/to/parrot/svn>/ports/debian ~/udeb/parrot/parrot-[version]/.
 
-Integrate any new change entries from F<ports/debian/changelog> into
-F<ports/ubuntu/changelog>, preserving chronological order. Copy the Ubuntu
-changelog file over the F<changelog> file in
-F<~/udeb/parrot/parrot-[version]/debian>.
+
+Then copy the unique Ubuntu files (F<changelog> and F<control.in>) from
+F<ports/ubuntu/> into the new F<debian/> directory.
+
+  cp <path/to/parrot/svn>/ports/ubuntu/* ~/udeb/parrot/parrot-[version]/debian/.
 
 =item 4.
 
-Update the F<changelog> file in F<~/udeb/parrot/parrot-[version]/debian/> to
-add an entry for the Ubuntu package. Copy the first line from the Debian
-changelog.  Add C<ubuntu#> after the Debian version to indicate the Ubuntu
-revision of the package, and for PPA uploads also add C<~ppa#>. Instead of the
-Debian branch ('unstable') use the target Ubuntu distribution ('intrepid').
+Add a new entry to the F<changelog> file in
+F<~/udeb/parrot/parrot-[version]/debian/> for the Ubuntu package. Copy
+the first line from the Debian changelog. Add C<ubuntu#> after the
+Debian version to indicate the Ubuntu revision of the package, and for
+PPA uploads also add C<~ppa#>. Instead of the Debian branch ('unstable')
+use the target Ubuntu distribution ('intrepid').
 
   parrot (0.5.1-1ubuntu1) intrepid; urgency=low
 
@@ -85,7 +90,8 @@ Build the source packages. From F<~/udeb/parrot/parrot_[version]/>, run:
 
 =item 7.
 
-Update Parrot's PPA with the new release (configured in ChrootSetup):
+Update Parrot's PPA with the new release (configured in ChrootSetup).
+From F<~/udeb/parrot/> run:
 
   $ dput parrot-ppa parrot_[version]_source.changes
 
