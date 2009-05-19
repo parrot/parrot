@@ -1766,7 +1766,7 @@ the ManagedStruct PMC as it is garbage collected.
 void
 Parrot_jit_free_buffer(PARROT_INTERP, void *ptr, void *priv)
 {
-    struct jit_buffer_private_data *jit = (struct jit_buffer_private_data*)priv;
+    const struct jit_buffer_private_data * const jit = (struct jit_buffer_private_data*)priv;
     mem_free_executable(ptr, jit->size);
     free(priv);
 }
@@ -1785,7 +1785,7 @@ It is called by the ManagedStruct PMC's clone() function.
 PMC *
 Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv)
 {
-    PMC *rv = pmc_new(interp, pmc->vtable->base_type);
+    PMC * const rv = pmc_new(interp, pmc->vtable->base_type);
 
     VTABLE_init(interp, rv);
     /* copy the attributes */
