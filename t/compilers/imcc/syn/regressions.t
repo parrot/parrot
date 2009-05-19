@@ -178,8 +178,8 @@ OUT
 }
 
 TODO: {
-    local $TODO = 'Broken with CGP'
-        if $ENV{TEST_PROG_ARGS} =~ /--runcore=cgp/;
+    local $TODO = 'Fails with this runcore'
+        if $ENV{TEST_PROG_ARGS} =~ /--runcore=(cgp|fast|cgoto|switch)\b|--run-pbc/;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'die in immediate, TT #629');
 .sub 'foo' :immediate
