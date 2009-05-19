@@ -1,7 +1,7 @@
-parrot (1.0.0-1ubuntu1~ppa9~karmic1) karmic; urgency=low
+parrot (1.0.0-1ubuntu1~ppa10~karmic1) karmic; urgency=low
   * Resynchronize with Debian unstable.
 
- -- Allison Randal <allison@parrot.org>  Sun, 10 May 2009 20:39:20 -0700
+ -- Allison Randal <allison@parrot.org>  Thu, 14 May 2009 17:25:13 -0700
 
 parrot (1.0.0-1) unstable; urgency=low
   * New upstream release
