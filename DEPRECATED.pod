@@ -324,6 +324,21 @@ L<https://trac.parrot.org/parrot/ticket/338>
 
 =back
 
+=head1 pmc2c syntax
+
+=over 4
+
+=item "pmclass" with name not matching file's basename [eligible in 1.5]
+
+When foo.pmc contains a the line "pmclass bar", pmc2c generates a pmc_foo.h
+but tries to include pmc_bar.h.  This is a bug, but it's possible someone out
+there is using it.  After deprecation, this usage will result in an error
+message.
+
+L<https://trac.parrot.org/parrot/ticket/665>
+
+=back
+
 =head1 Parrot library
 
 =over 4
