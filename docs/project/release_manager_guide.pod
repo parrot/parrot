@@ -52,8 +52,7 @@ Update files with version-specific information:
 =item a
 
 Increment the version number in the following files:
-F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
-F<README>.
+F<VERSION>, F<MANIFEST.generated>, F<META.yml>, F<README>.
 
 Also update the version number, date, and your name in the
 the file: F<docs/parrothist.pod>.
@@ -88,6 +87,10 @@ Enter the date of the Saturday before the next release.
 =item C<wiki.bugday>
 
 Update the date part of the link to the wiki page for the next bugday.
+
+=item C<ftp.path>
+
+The URL of the FTP directory where the Parrot tarball can be found.
 
 =back
 
