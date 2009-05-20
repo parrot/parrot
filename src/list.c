@@ -673,7 +673,6 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
         list->grow_policy = enum_grow_mixed;
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
-    return len;
 }
 
 /*
