@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -22,7 +22,7 @@ These are the vtable functions for the Sub (subroutine) base class
 #include "sub.str"
 
 static void
-print_sub_name(PARROT_INTERP, PMC *sub)
+print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
 {
     Interp * const tracer = (interp->pdb && interp->pdb->debugger) ?
         interp->pdb->debugger :
@@ -67,7 +67,7 @@ Initializes the subroutine.
      * see also the enum in include/parrot/sub.h
      */
     VTABLE void init() {
-        Parrot_Sub_attributes *attrs =
+        Parrot_Sub_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_Sub_attributes);
 
         attrs->sub     = new_sub(INTERP);
@@ -339,7 +339,7 @@ Invokes the subroutine.
                 PMC_get_sub(INTERP, outer_pmc, outer_sub);
 
                 if (!outer_sub->ctx) {
-                    Parrot_Context *dummy = Parrot_alloc_context(INTERP,
+                    Parrot_Context * const dummy = Parrot_alloc_context(INTERP,
                                                 outer_sub->n_regs_used, NULL);
                     dummy->current_sub    = outer_pmc;
 
@@ -395,7 +395,7 @@ Creates and returns a clone of the subroutine.
 
     VTABLE PMC *clone() {
         Parrot_sub *dest_sub;
-        Parrot_sub *sub = mem_allocate_typed(Parrot_sub);
+        Parrot_sub * const sub = mem_allocate_typed(Parrot_sub);
         PMC * const ret = pmc_new(INTERP, SELF->vtable->base_type);
 
         /* we have to mark it ourselves */
@@ -404,7 +404,7 @@ Creates and returns a clone of the subroutine.
         /* first set the sub struct, Parrot_str_copy may cause GC */
         SET_ATTR_sub(INTERP, ret, sub);
         PMC_get_sub(INTERP, SELF, dest_sub);
-        memcpy(sub, dest_sub, sizeof (Parrot_sub));
+        *sub = *dest_sub;
         if (sub->name != NULL)
             sub->name = Parrot_str_copy(INTERP, sub->name);
 
@@ -434,9 +434,11 @@ Set SELF to the data in other.
     }
 
     VTABLE void assign_pmc(PMC *other) {
-        Parrot_sub *my_sub, *other_sub;
         /* only handle the case where the other PMC is the same type */
         if (other->vtable->base_type == SELF->vtable->base_type) {
+            Parrot_sub *my_sub;
+            Parrot_sub *other_sub;
+
             /* copy the sub struct */
             PMC_get_sub(INTERP, SELF, my_sub);
             PMC_get_sub(INTERP, other, other_sub);
@@ -745,8 +747,7 @@ The number of optional named arguments
 
         PMC_get_sub(INTERP, SELF, sub);
         /* If the argument info hasn't been generated yet, generate it. */
-        if (sub->arg_info == NULL)
-        {
+        if (sub->arg_info == NULL) {
             /* Get pointer into the bytecode where this sub starts. */
             opcode_t *pc = sub->seg->base.data + sub->start_offs;
 
@@ -765,8 +766,7 @@ The number of optional named arguments
 
                 /* Iterate over the signature and compute argument counts. */
                 sig_length = VTABLE_elements(INTERP, sig);
-                for (i = 0; i < sig_length; i++)
-                {
+                for (i = 0; i < sig_length; i++) {
                     int sig_item = VTABLE_get_integer_keyed_int(INTERP, sig, i);;
                     if (PARROT_ARG_SLURPY_ARRAY_ISSET(sig_item)){
                         if (PARROT_ARG_NAME_ISSET(sig_item))
@@ -957,10 +957,10 @@ slurpy arguments).
     }
 
     METHOD arity() {
-        PMC *pos_required = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "pos_required"));
-        PMC *named_required = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "named_required"));
+        PMC * const pos_required   = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "pos_required"));
+        PMC * const named_required = VTABLE_inspect_str(interp, SELF, CONST_STRING(interp, "named_required"));
 
-        INTVAL arity = VTABLE_get_integer(INTERP, pos_required) +
+        const INTVAL arity = VTABLE_get_integer(INTERP, pos_required) +
             VTABLE_get_integer(INTERP, named_required);
 
         RETURN(INTVAL arity);
