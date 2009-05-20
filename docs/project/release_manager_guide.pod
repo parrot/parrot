@@ -18,7 +18,9 @@ A couple of weeks in advance: Ask people to run C<make fulltest> and
 report (and hopefully fix!) any problems they find. Check in with
 language project leads for release blockers, to allow time to fix them.
 Also ask people to review the tickets targeted for the upcoming release
-L<https://trac.parrot.org/parrot/roadmap>.
+L<https://trac.parrot.org/parrot/roadmap>. Make sure your ssh keys have
+been added to the FTP server, so you'll be able to ship the release (any
+previous release manager can help).
 
 A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether
@@ -245,7 +247,7 @@ front page.
 
 =item b
 
-Set the "News" category to "Releases".
+For the "News" category, select both "Releases" and "News".
 
 Add tags to the page for significant changes in this release (e.g. "rakudo" for
 significant Rakudo language updates, or "gc" for significant garbage collection
