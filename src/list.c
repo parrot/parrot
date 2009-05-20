@@ -257,7 +257,7 @@ static void list_set(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*list);
 
-static UINTVAL rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
+static void rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*list);
@@ -564,7 +564,7 @@ rebuild_fix_ends(ARGMOD(List *list))
 
 /*
 
-=item C<static UINTVAL rebuild_chunk_list(PARROT_INTERP, List *list)>
+=item C<static void rebuild_chunk_list(PARROT_INTERP, List *list)>
 
 Optimises C<list> when it's been modified in some way. Combines adjacent
 chunks if they are both sparse or irregular. Updates the grow policies
@@ -574,7 +574,7 @@ and computes list statistics.
 
 */
 
-static UINTVAL
+static void
 rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
 {
     ASSERT_ARGS(rebuild_chunk_list)
