@@ -91,8 +91,8 @@ OUTPUT
 
 }
 
-TODO: {
-local $TODO = 'Testing';
+SKIP: {
+skip('alpha quality feature', 1);
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'open pipe for writing' );
 .include 'iglobals.pasm'
