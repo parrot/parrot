@@ -59,7 +59,7 @@ const jit_arch_info arch_info = {
     jit_mov_mr_r,
     jit_mov_mx_x,
     Parrot_jit_dofixup,
-    (jit_arch_f)0,
+    (jit_arch_f)NULL,
     {
         /* JIT_CODE_FILE */
         {
@@ -354,7 +354,7 @@ jit_mov_r_mr(Interp *interp, Parrot_jit_info_t *jit_info,
 
 
 const jit_arch_info *
-Parrot_jit_init(Interp *interp)
+Parrot_jit_init(SHIM_INTERP)
 {
     return &arch_info;
 }
