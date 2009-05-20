@@ -145,12 +145,12 @@ the first line is line number zero.
 */
 
   METHOD lineof(INTVAL pos) {
-    STRING *str            = SELF.get_string();
-    INTVAL line            = 0;
-    INTVAL ipos            = 0;
-    INTVAL seen_first_line = 0;
-    INTVAL jpos;
-    INTVAL last_pos;
+    STRING *str             = NULL;
+    INTVAL  line            = 0;
+    INTVAL  ipos            = 0;
+    INTVAL  seen_first_line = 0;
+    INTVAL  jpos;
+    INTVAL  last_pos;
 
     GET_ATTR_last_pos(INTERP, SELF, last_pos);
 
@@ -166,6 +166,7 @@ the first line is line number zero.
         ipos = last_pos;
     }
 
+    str  = SELF.get_string();
     jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline, str, ipos, pos);
 
     while (jpos < pos) {
