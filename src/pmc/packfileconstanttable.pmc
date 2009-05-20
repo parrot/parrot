@@ -356,7 +356,7 @@ TODO: Add same for PMCs.
 
 */
     MULTI INTVAL get_or_create_constant(STRING *value) {
-        Parrot_PackfileConstantTable_attributes *attrs = 
+        Parrot_PackfileConstantTable_attributes *attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         INTVAL  num = VTABLE_elements(interp, attrs->types);
         INTVAL  i;
@@ -376,7 +376,7 @@ TODO: Add same for PMCs.
     }
 
     MULTI INTVAL get_or_create_constant(FLOATVAL value) {
-        Parrot_PackfileConstantTable_attributes *attrs = 
+        Parrot_PackfileConstantTable_attributes *attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         INTVAL   num = VTABLE_elements(interp, attrs->types);
         INTVAL   i;
