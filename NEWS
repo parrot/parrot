@@ -1,5 +1,28 @@
 # $Id$
 
+New in 1.2.0
+- Core
+  + Fixes for pir classes inheriting from core pmcs.
+  + Cleaned up headers and reorganized some sources into subsystem directories.
+  + Clean up PMCs so libparrot.so exports far fewer vtable/method symbols.
+  + Clean up the GC API.
+  + Several unicode identifier improvements in IMCC.
+- Deprecations
+  + Protoobject stringification is gone.
+- Documentation
+  + Rewrite several core documents.
+  + Many reworks, improvements & additions to the Parrot Book.
+  + Installation PDD is launched out of draft.
+- Tools
+  + Fixes for running the language shell generator outside the parrot tree.
+  + Several fixes for developing and building HLLs from an installed parrot.
+  + Configure.pl now has a --no-line-directives option to ease source level debugging.
+- Miscellaneous
+  + Portability updates for macports, netbsd, mingw32, hpux.
+  + Several (build time, runtime) performance improvements.
+  + Lots of updates to examples and tests.
+  + Various bugfixes, code cleanups, and coding standard fixes.
+
 New in 1.1.0
 - Core
   + Added op: load_language, find_caller_lex
