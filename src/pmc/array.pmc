@@ -46,7 +46,7 @@ exception if necessary.
 static PMC *retval(PARROT_INTERP, void *ret) {
     PMC *value;
 
-    if (ret == 0)
+    if (ret == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
             "Array index out of bounds!");
 
@@ -82,12 +82,12 @@ static PMC *Parrot_Array_set_pmc_ptr(PARROT_INTERP, List *list, INTVAL key) {
     void * const ret = list_get(interp, list, key, enum_type_PMC);
     PMC  *value;
 
-    if (ret == 0)
+    if (ret == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
             "Array index out of bounds!");
 
     /* assign into a sparse or not yet set value */
-    if (ret == (void *)-1 || *(PMC **)ret == 0) {
+    if (ret == (void *)-1 || *(PMC **)ret == NULL) {
         value = undef(interp);
         list_assign(interp, list, key, value, enum_type_PMC);
     }
@@ -263,7 +263,7 @@ Returns the number of elements in the array.
 */
 
     VTABLE INTVAL elements() {
-        return ((List *) PMC_data(SELF))->length;
+        return ((const List *) PMC_data(SELF))->length;
     }
 
 /*
@@ -277,7 +277,7 @@ Returns the number of elements in the array.
 */
 
     VTABLE FLOATVAL get_number() {
-        INTVAL e = SELF.elements();
+        const INTVAL e = SELF.elements();
         return (FLOATVAL)e;
     }
 
@@ -421,7 +421,7 @@ Returns the string value of the element at index C<key>.
         PMC   *nextkey, *box;
 
         if (!key)
-            return 0;
+            return NULL;
 
         ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);
@@ -468,7 +468,7 @@ Returns the PMC value of the element at index C<key>.
         PMC   *nextkey, *box;
 
         if (!key)
-            return 0;
+            return NULL;
 
         ix      = VTABLE_get_integer(INTERP, key);
         nextkey = key_next(INTERP, key);

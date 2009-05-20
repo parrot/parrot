@@ -67,7 +67,7 @@ ns_insert_sub_keyed_str(PARROT_INTERP, PMC *self, STRING *key, PMC *value)
     if (sub->vtable_index != -1) {
         /* Insert it in class, if there is a class */
         if (!PMC_IS_NULL(classobj) && PObj_is_class_TEST(classobj)) {
-            const char *vtable_key_c =
+            const char * const vtable_key_c =
                 Parrot_get_vtable_name(interp, sub->vtable_index);
             PARROT_ASSERT(vtable_key_c);
             vtable_key = Parrot_str_new(interp, vtable_key_c,
@@ -244,7 +244,7 @@ really a public API.
                               :value->vtable->base_type == enum_class_NameSpace;
 
         /* don't need this everywhere yet */
-        PMC *old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
+        PMC * const old = (PMC *)parrot_hash_get(INTERP, (Hash *)SELF.get_pointer(), key);
 
         /* If it's a sub... */
         if (!PMC_IS_NULL(value) && VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Sub"))) {
@@ -484,11 +484,9 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
                     if (PMC_IS_NULL(ns))
                         return PMCNULL;
                 }
-
-                return ns;
             }
             case enum_class_ResizableStringArray: {
-                INTVAL elements = VTABLE_elements(interp, key);
+                const INTVAL elements = VTABLE_elements(interp, key);
                 INTVAL i;
                 for (i = 0; i < elements; ++i)  {
                     STRING * const part = VTABLE_get_string_keyed_int(interp, key, i);
@@ -593,8 +591,6 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
     METHOD add_sub(STRING *name, PMC *sub) {
         STRING * const s_sub      = CONST_STRING(INTERP, "Sub");
         STRING * const s_multisub = CONST_STRING(INTERP, "MultiSub");
-        Parrot_sub    *real_sub;
-        INTVAL         vtable_idx = 0;
 
         if (!VTABLE_isa(INTERP, sub, s_sub)
         &&  !VTABLE_isa(INTERP, sub, s_multisub))

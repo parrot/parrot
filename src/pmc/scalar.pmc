@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -403,7 +403,7 @@ Divides C<SELF> by C<value> inplace.
 */
 
     MULTI PMC *divide(PMC *value, PMC *dest) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -438,7 +438,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     VTABLE void i_divide(PMC *value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -524,7 +524,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     VTABLE void i_floor_divide(PMC *value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -576,7 +576,7 @@ Calculates modulus inplace
 */
 
     MULTI PMC *modulus(PMC *value, PMC *dest) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -614,7 +614,7 @@ Calculates modulus inplace
     }
 
     VTABLE void i_modulus(PMC *value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
