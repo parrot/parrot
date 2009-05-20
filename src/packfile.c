@@ -802,10 +802,23 @@ mark_1_seg(PARROT_INTERP, ARGMOD(PackFile_ConstTable *ct))
     opcode_t i;
 
     for (i = 0; i < ct->const_count; i++) {
-        if (constants[i]->type == PFC_PMC) {
-            PMC * const pmc = constants[i]->u.key;
-            if (pmc)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)pmc);
+        PMC    * pmc;
+        STRING * string;
+        switch(constants[i]->type) {
+            case PFC_PMC:
+            case PFC_KEY:
+                pmc = constants[i]->u.key;
+                if (pmc)
+                    Parrot_gc_mark_PObj_alive(interp, (PObj *)pmc);
+                break;
+            case PFC_STRING:
+                string = constants[i]->u.string;
+                if(string)
+                    Parrot_gc_mark_PObj_alive(interp, (PObj *)string);
+                break;
+            default:
+                /* Do nothing. */
+                break;
         }
     }
 }
