@@ -344,6 +344,57 @@ Get the type of the specified constant.  Possible type IDs:
         RETURN(INTVAL rv);
     }
 
+/*
+
+=item C<INTVAL get_or_create_constant()>
+
+Get or create constant for passed value.
+
+=cut
+
+TODO: Add same for PMCs.
+
+*/
+    MULTI INTVAL get_or_create_constant(STRING *value) {
+        Parrot_PackfileConstantTable_attributes *attrs = 
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        INTVAL  num = VTABLE_elements(interp, attrs->types);
+        INTVAL  i;
+        STRING *str;
+        for (i=0; i < num; ++i) {
+            INTVAL type = VTABLE_get_integer_keyed_int(interp, attrs->types, i);
+            if (type != PFC_STRING)
+                continue;
+
+            str = VTABLE_get_string_keyed_int(interp, attrs->constants, i);
+            if (Parrot_str_equal(interp, value, str))
+                return i;
+        }
+        /* Constant not found. Add new one */
+        VTABLE_set_string_keyed_int(interp, SELF, i, value);
+        return i;
+    }
+
+    MULTI INTVAL get_or_create_constant(FLOATVAL value) {
+        Parrot_PackfileConstantTable_attributes *attrs = 
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        INTVAL   num = VTABLE_elements(interp, attrs->types);
+        INTVAL   i;
+        FLOATVAL val;
+        for (i=0; i < num; ++i) {
+            INTVAL type = VTABLE_get_integer_keyed_int(interp, attrs->types, i);
+            if (type != PFC_NUMBER)
+                continue;
+
+            val = VTABLE_get_number_keyed_int(interp, attrs->constants, i);
+            if (FLOAT_IS_ZERO(fabs(val - value)))
+                return i;
+        }
+        /* Constant not found. Add new one */
+        VTABLE_set_number_keyed_int(interp, SELF, i, value);
+        return i;
+    }
+
 
 }
 /*

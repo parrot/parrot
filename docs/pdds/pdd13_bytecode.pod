@@ -1094,21 +1094,18 @@ types. Specifying an invalid type will result in an exception.
 
 =head4 PackfileAnnotations.pmc (isa PackfileSegment)
 
-This PMC represents the bytecode annotations table. The key ID to key name and
-key type mappings are stored in a separate PackfileAnnotationKeys PMC. Each
-(offset, key, value) entry is represented by a PackfileAnnotation PMC. The
-following methods are implemented:
+This PMC represents the bytecode annotations table. The following methods are
+implemented:
 
 =over 4
-
-=item * C<PMC* get_key_list()>
-
-Returns a PackfileAnnotationKeys PMC containing the names and types of the
-annotation keys. Fetch and add to this to create a new annotation key.
 
 =item * C<elements> (v-table)
 
 Gets the number of annotations in the table.
+
+=item * C<get_iter> (v-table)
+
+Get iterator for stored annotations.
 
 =item * C<get_pmc_keyed_int> (v-table)
 
@@ -1132,44 +1129,7 @@ unless all of the following conditions are met:
 
 =item - The offset of the next entry, if it exists, is greater than this entry
 
-=item - The key ID references a valid annotation key
-
 =back
-
-=back
-
-=head4 PackfileAnnotationKeys.pmc
-
-This PMC represents the table of keys and the type of value that is stored
-against that key. It implements the following methods:
-
-=over 4
-
-=item * C<elements> (v-table)
-
-Get the number of stored Keys.
-
-=item * C<get_string_keyed_int> (v-table)
-
-Gets the name of the annotation key specified by the index. An exception will
-be thrown if the index is out of range.
-
-=item * C<set_string_keyed_int> (v-table)
-
-Sets the name of the annotation key specified by the index. If there is no key
-with that index currently, a key at that position in the table will be added.
-
-=item * C<get_integer_keyed_int> (v-table)
-
-Gets an integer representing the type of the value that is stored with the key
-at the specified index. An exception will be thrown if the index is out of
-range.
-
-=item * C<set_integer_keyed_int> (v-table)
-
-Sets the type of the value that is stored with the key at the specified index.
-If there is no key with that index currently, a key at that position in the
-table will be added.
 
 =back
 
@@ -1188,23 +1148,37 @@ Gets the offset into the bytecode of the instruction that is being annotated.
 
 Sets the offset into the bytecode of the instruction that is being annotated.
 
-=item * C<int get_key_id()>
+=item * C<int get_name()>
 
-Gets the ID of the key of the annotation.
+Gets the name of the annotation.
 
-=item * C<int set_key_id()>
+=item * C<int set_name()>
 
-Sets the ID of the key of the annotation.
+Sets the name of the annotation.
 
 =item * C<get_integer> (v-table)
 
-Gets the value of the annotation. This may be, depending upon the type of the
-annotation, an integer annotation or an index into the constants table.
+Gets the integer value of the annotation. 
 
 =item * C<set_integer> (v-table)
 
-Sets the value of the annotation. This may be, depending upon the type of the
-annotation, an integer annotation or an index into the constants table.
+Sets the integer value of the annotation. 
+
+=item * C<get_string> (v-table)
+
+Gets the string value of the annotation. 
+
+=item * C<set_string> (v-table)
+
+Sets the string value of the annotation. 
+
+=item * C<get_number> (v-table)
+
+Gets the number value of the annotation. 
+
+=item * C<set_number> (v-table)
+
+Sets the number value of the annotation. 
 
 =back
 

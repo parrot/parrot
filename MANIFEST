@@ -1412,7 +1412,6 @@ src/pmc/orderedhash.pmc                                     [devel]src
 src/pmc/os.pmc                                              [devel]src
 src/pmc/packfile.pmc                                        [devel]src
 src/pmc/packfileannotation.pmc                              [devel]src
-src/pmc/packfileannotationkeys.pmc                          [devel]src
 src/pmc/packfileannotations.pmc                             [devel]src
 src/pmc/packfileconstanttable.pmc                           [devel]src
 src/pmc/packfiledirectory.pmc                               [devel]src
@@ -1865,7 +1864,6 @@ t/pmc/orderedhash.t                                         [test]
 t/pmc/os.t                                                  [test]
 t/pmc/packfile.t                                            [test]
 t/pmc/packfileannotation.t                                  [test]
-t/pmc/packfileannotationkeys.t                              [test]
 t/pmc/packfileannotations.t                                 [test]
 t/pmc/packfileconstanttable.t                               [test]
 t/pmc/packfiledirectory.t                                   [test]
