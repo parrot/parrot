@@ -129,6 +129,7 @@ turned into a PMC of a singleton type.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_IGNORABLE_RESULT
 PMC *
 pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
           SHIM(UINTVAL flags))
