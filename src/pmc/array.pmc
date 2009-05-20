@@ -1006,7 +1006,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
         void * const ret =
             list_get(INTERP, (List *)PMC_data(pmc), key, enum_type_PMC);
 
-        if (ret == 0 || ret == (void *) -1)
+        if (ret == NULL || ret == (void *) -1)
             return 0;
 
         value = *(PMC **)ret;
@@ -1058,7 +1058,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         void * ret = list_get(INTERP,
             (List *)PMC_data(pmc), key, enum_type_PMC);
 
-        if (ret == 0 || ret == (void *)-1)
+        if (ret == NULL || ret == (void *)-1)
             return 0;
 
         return !PMC_IS_NULL(*(PMC **)ret);
@@ -1146,7 +1146,7 @@ The C<==> operation. Compares two array to hold equal elements.
             PMC * const item2 = VTABLE_get_pmc_keyed_int(INTERP, value, j);
 
             if (item1 != item2) {
-                INTVAL result = VTABLE_is_equal(INTERP, item1, item2);
+                const INTVAL result = VTABLE_is_equal(INTERP, item1, item2);
                 if (!result)
                     return 0;
             }
@@ -1173,7 +1173,7 @@ Return a new iterator for SELF.
 
     VTABLE PMC *slice(PMC *key, INTVAL f) {
         if (f == 0) {
-            STRING     *name = CONST_STRING(interp, "set_key");
+            STRING * const name = CONST_STRING(interp, "set_key");
             PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
             Parrot_PCCINVOKE(interp, iter, name, "P->", key);
             return iter;
@@ -1184,7 +1184,7 @@ Return a new iterator for SELF.
     }
 
     VTABLE PMC *get_iter() {
-        STRING     *name = CONST_STRING(interp, "set_key");
+        STRING * const name = CONST_STRING(interp, "set_key");
         PMC * const iter = pmc_new_init(INTERP, enum_class_Iterator, SELF);
         PMC * const key  = pmc_new(INTERP, enum_class_Key);
         Parrot_PCCINVOKE(interp, iter, name, "P->", key);
