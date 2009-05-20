@@ -41,7 +41,7 @@ Initializes the key.
 
     VTABLE void init() {
 
-        Parrot_Key_attributes *attrs =
+        Parrot_Key_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_Key_attributes);
 
         PMC_data(SELF) = attrs;
