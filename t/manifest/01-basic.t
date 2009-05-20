@@ -6,57 +6,62 @@
 use strict;
 use warnings;
 
-use Test::More;
-plan( skip_all => "\nRelevant only when working in checkout from repository" )
-    unless (-e 'DEVELOPING');
-plan( tests => 13 );
+use Test::More tests => 13;
 use Carp;
 use Cwd;
 use File::Temp qw( tempdir );
 use lib (qw| lib |);
-use_ok('Parrot::Manifest');
 
-my $script = $0;
-my $file   = q{MANIFEST};
-my $skip   = q{MANIFEST.SKIP};
+SKIP: {
+    skip
+        q{Relevant only when working in checkout from repository},
+        12
+        unless (-e 'DEVELOPING');
 
-my $mani = Parrot::Manifest->new( { script => $script, } );
-isa_ok( $mani, 'Parrot::Manifest' );
-
-ok( scalar( @{ $mani->{dirs} } ),
-    "Parrot::Manifest constructor used 'status' command to find at least 1 directory." );
-ok( scalar( @{ $mani->{versioned_files} } ),
-    "Parrot::Manifest constructor used 'status' command to find at least 1 versioned file." );
-
-my $manifest_lines_ref = $mani->prepare_manifest();
-is( ref($manifest_lines_ref), q{HASH}, "prepare_manifest() returned hash ref" );
-
-my $cwd = cwd();
-{
-    my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir
-        or croak "Unable to change to temporary directory for testing";
-    ok( !-f $file, "No $file yet in this directory" );
-    $mani->print_manifest($manifest_lines_ref);
-    ok( -f $file, "$file has been created in this directory" );
-    chdir $cwd
-        or croak "Unable to change back from temporary directory after testing";
-}
-
-my $print_str = $mani->prepare_manifest_skip();
-ok( $print_str, "prepare_manifest_skip() returned" );
-
-{
-    my $tdir = tempdir( CLEANUP => 1 );
-    chdir $tdir
-        or croak "Unable to change to temporary directory for testing";
-    ok( !-f $skip, "No $skip yet in tempdir" );
-    my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
-    ok( $need_for_skip,                         "No $skip in tempdir; it must be regenerated" );
-    ok( $mani->print_manifest_skip($print_str), "print_manifest_skip() returned true" );
-    ok( -f $skip,                               "$skip has been created in tempdir" );
-    chdir $cwd
-        or croak "Unable to change back from temporary directory after testing";
+    use_ok('Parrot::Manifest');
+    
+    my $script = $0;
+    my $file   = q{MANIFEST};
+    my $skip   = q{MANIFEST.SKIP};
+    
+    my $mani = Parrot::Manifest->new( { script => $script, } );
+    isa_ok( $mani, 'Parrot::Manifest' );
+    
+    ok( scalar( @{ $mani->{dirs} } ),
+        "Parrot::Manifest constructor used 'status' command to find at least 1 directory." );
+    ok( scalar( @{ $mani->{versioned_files} } ),
+        "Parrot::Manifest constructor used 'status' command to find at least 1 versioned file." );
+    
+    my $manifest_lines_ref = $mani->prepare_manifest();
+    is( ref($manifest_lines_ref), q{HASH}, "prepare_manifest() returned hash ref" );
+    
+    my $cwd = cwd();
+    {
+        my $tdir = tempdir( CLEANUP => 1 );
+        chdir $tdir
+            or croak "Unable to change to temporary directory for testing";
+        ok( !-f $file, "No $file yet in this directory" );
+        $mani->print_manifest($manifest_lines_ref);
+        ok( -f $file, "$file has been created in this directory" );
+        chdir $cwd
+            or croak "Unable to change back from temporary directory after testing";
+    }
+    
+    my $print_str = $mani->prepare_manifest_skip();
+    ok( $print_str, "prepare_manifest_skip() returned" );
+    
+    {
+        my $tdir = tempdir( CLEANUP => 1 );
+        chdir $tdir
+            or croak "Unable to change to temporary directory for testing";
+        ok( !-f $skip, "No $skip yet in tempdir" );
+        my $need_for_skip = $mani->determine_need_for_manifest_skip($print_str);
+        ok( $need_for_skip,                         "No $skip in tempdir; it must be regenerated" );
+        ok( $mani->print_manifest_skip($print_str), "print_manifest_skip() returned true" );
+        ok( -f $skip,                               "$skip has been created in tempdir" );
+        chdir $cwd
+            or croak "Unable to change back from temporary directory after testing";
+    }
 }
 
 pass("Completed all tests in $0");
