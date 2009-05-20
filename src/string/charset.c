@@ -35,9 +35,7 @@ CHARSET *Parrot_default_charset_ptr;
 CHARSET *Parrot_unicode_charset_ptr;
 CHARSET *Parrot_ascii_charset_ptr;
 
-/*
- * all registered charsets are collected in one global structure
- */
+/* all registered charsets are collected in one global structure */
 
 typedef struct To_converter {
     NOTNULL(CHARSET *to);
@@ -46,14 +44,14 @@ typedef struct To_converter {
 
 typedef struct One_charset {
     NOTNULL(CHARSET *charset);
-    STRING  *name;
-    int n_converters;
-    To_converter *to_converters;
+    STRING          *name;
+    To_converter    *to_converters;
+    int              n_converters;
 } One_charset;
 
 typedef struct All_charsets {
-    int n_charsets;
     One_charset *set;
+    int          n_charsets;
 } All_charsets;
 
 static All_charsets *all_charsets;
@@ -159,10 +157,10 @@ Parrot_find_charset(SHIM_INTERP, ARGIN(const char *charsetname))
     const int n = all_charsets->n_charsets;
 
     for (i = 0; i < n; ++i) {
-        if (STREQ(all_charsets->set[i].charset->name, charsetname)) {
+        if (STREQ(all_charsets->set[i].charset->name, charsetname))
             return all_charsets->set[i].charset;
-        }
     }
+
     return NULL;
 }
 
@@ -345,8 +343,9 @@ register_charset(ARGIN(const char *charsetname), ARGIN(CHARSET *charset))
     else
         all_charsets->set = (One_charset *)mem_sys_realloc(all_charsets->set,
                 (n + 1) * sizeof (One_charset));
+
     all_charsets->n_charsets++;
-    all_charsets->set[n].charset = charset;
+    all_charsets->set[n].charset      = charset;
     all_charsets->set[n].n_converters = 0;
 
     return 1;
@@ -435,29 +434,34 @@ Parrot_register_charset(SHIM_INTERP, ARGIN(const char *charsetname),
 {
     ASSERT_ARGS(Parrot_register_charset)
     if (!all_charsets) {
-        all_charsets = mem_allocate_typed(All_charsets);
+        all_charsets             = mem_allocate_typed(All_charsets);
+        all_charsets->set        = NULL;
         all_charsets->n_charsets = 0;
-        all_charsets->set = NULL;
     }
+
     if (STREQ("binary", charsetname)) {
         Parrot_binary_charset_ptr = charset;
         return register_charset(charsetname, charset);
     }
+
     if (STREQ("iso-8859-1", charsetname)) {
         Parrot_iso_8859_1_charset_ptr = charset;
         return register_charset(charsetname, charset);
     }
+
     if (STREQ("unicode", charsetname)) {
         Parrot_unicode_charset_ptr = charset;
         return register_charset(charsetname, charset);
     }
+
     if (STREQ("ascii", charsetname)) {
-        if (!Parrot_default_charset_ptr) {
+        if (!Parrot_default_charset_ptr)
             Parrot_default_charset_ptr = charset;
-        }
+
         Parrot_ascii_charset_ptr = charset;
         return register_charset(charsetname, charset);
     }
+
     return 0;
 }
 
@@ -479,8 +483,7 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
     ASSERT_ARGS(Parrot_charsets_encodings_init)
     /* the order is crucial here:
      * 1) encodings, default = fixed_8
-     * 2) charsets   default = ascii
-     */
+     * 2) charsets   default = ascii */
     Parrot_encoding_fixed_8_init(interp);
     Parrot_encoding_utf8_init(interp);
     Parrot_encoding_ucs2_init(interp);
@@ -492,14 +495,11 @@ Parrot_charsets_encodings_init(PARROT_INTERP)
     Parrot_charset_unicode_init(interp);
 
     /* Now that the plugins are registered, we can create STRING
-     * names for them.
-     */
+     * names for them.  */
     Parrot_str_internal_register_encoding_names(interp);
     Parrot_str_internal_register_charset_names(interp);
 
-    /*
-     * now install charset converters
-     */
+    /* now install charset converters */
     register_static_converters(interp);
 }
 
