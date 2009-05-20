@@ -23,75 +23,75 @@ typedef INTVAL (*nci_jit_sub_t)(PARROT_INTERP, PMC *, char *);
 
 void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info);
 void pcc_params(PARROT_INTERP, STRING *sig, Parrot_NCI_attributes * const nci_info) {
-        char   *sig_c      = Parrot_str_to_cstring(interp, sig);
-        size_t  sig_length = strlen(sig_c);
-        char   *param_sig  = mem_allocate_n_typed(sig_length, char);
-        size_t  j          = 0;
-        size_t  i;
+    size_t  sig_length = Parrot_str_byte_length(interp, sig);
+    char   *param_sig  = mem_allocate_n_typed(sig_length, char);
+    size_t  j          = 0;
+    size_t  i;
 
-        for (i = 1; i < sig_length; i++) {
-            switch (sig_c[i]) {
-                case '0':    /* null ptr or such - doesn't consume a reg */
-                    break;
-                case 'f':
-                case 'N':
-                case 'd':
-                    param_sig[j++] = 'N';
-                    break;
-                case 'I':   /* INTVAL */
-                case 'l':   /* long */
-                case 'i':   /* int */
-                case 's':   /* short */
-                case 'c':   /* char */
-                    param_sig[j++] = 'I';
-                    break;
-                case 'S':
-                case 't':   /* string, pass a cstring */
-                    param_sig[j++] = 'S';
-                    break;
-                case 'J':   /* interpreter */
-                    break;
-                case 'p':   /* push pmc->data */
-                case 'O':   /* push PMC * object in P2 */
-                case 'P':   /* push PMC * */
-                case 'V':   /* push PMC * */
-                    param_sig[j++] = 'P';
-                case 'v':
-                    break;
-                    /* I have no idea how to handle these */
-                case '2':
-                case '3':
-                case '4':
-                    param_sig[j++] = 'I';
-                    break;
-                case '@':
-                    param_sig[j++] = '@';
-                    break;
-                case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
-                case 'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
-                    param_sig[j++] = 'S';
-                    break;
-                default:
-                    Parrot_ex_throw_from_c_args(interp, NULL,
-                        EXCEPTION_JIT_ERROR,
-                        "Unknown param Signature %c\n", sig_c[i]);
-                    break;
-            }
+    for (i = 1; i < sig_length; i++) {
+        INTVAL c = Parrot_str_indexed(interp, sig, i);
+
+        switch (c) {
+            case (INTVAL)'0':    /* null ptr or such - doesn't consume a reg */
+                break;
+            case (INTVAL)'f':
+            case (INTVAL)'N':
+            case (INTVAL)'d':
+                param_sig[j++] = 'N';
+                break;
+            case (INTVAL)'I':   /* INTVAL */
+            case (INTVAL)'l':   /* long */
+            case (INTVAL)'i':   /* int */
+            case (INTVAL)'s':   /* short */
+            case (INTVAL)'c':   /* char */
+                param_sig[j++] = 'I';
+                break;
+            case (INTVAL)'S':
+            case (INTVAL)'t':   /* string, pass a cstring */
+                param_sig[j++] = 'S';
+                break;
+            case (INTVAL)'J':   /* interpreter */
+                break;
+            case (INTVAL)'p':   /* push pmc->data */
+            case (INTVAL)'O':   /* push PMC * object in P2 */
+            case (INTVAL)'P':   /* push PMC * */
+            case (INTVAL)'V':   /* push PMC * */
+                param_sig[j++] = 'P';
+            case (INTVAL)'v':
+                break;
+                /* I have no idea how to handle these */
+            case (INTVAL)'2':
+            case (INTVAL)'3':
+            case (INTVAL)'4':
+                param_sig[j++] = 'I';
+                break;
+            case (INTVAL)'@':
+                param_sig[j++] = '@';
+                break;
+            case (INTVAL)'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
+            case (INTVAL)'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
+                param_sig[j++] = 'S';
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_JIT_ERROR,
+                    "Unknown param Signature %c\n", (char)c);
+                break;
         }
-
-        PARROT_ASSERT(j <= sig_length);
-
-        /* use only the signature-significant part of the string buffer */
-        if (j) {
-            nci_info->pcc_params_signature = string_make(interp, param_sig, j,
-                NULL, PObj_constant_FLAG);
-        }
-        else
-            nci_info->pcc_params_signature = CONST_STRING(interp, "");
-
-        mem_sys_free(param_sig);
-        Parrot_str_free_cstring(sig_c);
     }
+
+    PARROT_ASSERT(j <= sig_length);
+
+    /* use only the signature-significant part of the string buffer */
+    if (j) {
+        nci_info->pcc_params_signature = string_make(interp, param_sig, j,
+            NULL, PObj_constant_FLAG);
+    }
+    else
+        nci_info->pcc_params_signature = CONST_STRING(interp, "");
+
+    mem_sys_free(param_sig);
+}
 
 
 pmclass NCI need_ext {
