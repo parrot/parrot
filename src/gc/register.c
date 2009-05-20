@@ -307,8 +307,8 @@ init_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
     ctx->outer_ctx         = NULL;
     ctx->current_cont      = NULL;
     ctx->current_object    = NULL;
-    ctx->current_HLL       = 0;
     ctx->handlers          = PMCNULL;
+    ctx->caller_ctx        = NULL;
 
     if (old) {
         /* some items should better be COW copied */
@@ -321,6 +321,16 @@ init_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx),
         ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;
+    }
+    else {
+        ctx->constants         = NULL;
+        ctx->warns             = 0;
+        ctx->errors            = 0;
+        ctx->trace_flags       = 0;
+        ctx->pred_offset       = 0;
+        ctx->current_HLL       = 0;
+        ctx->current_namespace = PMCNULL;
+        ctx->recursion_depth   = 0;
     }
 
     /* other stuff is set inside Sub.invoke */
@@ -430,13 +440,6 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     const size_t reg_alloc     = ROUND_ALLOC_SIZE(all_regs_size);
     const int    slot          = CALCULATE_SLOT_NUM(reg_alloc);
 
-    /* this gets attached to the context, which should free it */
-    INTVAL * const n_regs_used = mem_allocate_n_zeroed_typed(4, INTVAL);
-    n_regs_used[REGNO_INT]     = number_regs_used[REGNO_INT];
-    n_regs_used[REGNO_NUM]     = number_regs_used[REGNO_NUM];
-    n_regs_used[REGNO_STR]     = number_regs_used[REGNO_STR];
-    n_regs_used[REGNO_PMC]     = number_regs_used[REGNO_PMC];
-
     /*
      * If slot is beyond the end of the allocated list, extend the list to
      * allocate more slots.
@@ -470,8 +473,13 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     }
     else {
         const size_t to_alloc = reg_alloc + ALIGNED_CTX_SIZE;
-        ctx                   = (Parrot_Context *)mem_sys_allocate_zeroed(to_alloc);
+        ctx                   = (Parrot_Context *)mem_sys_allocate(to_alloc);
     }
+
+    ctx->n_regs_used[REGNO_INT] = number_regs_used[REGNO_INT];
+    ctx->n_regs_used[REGNO_NUM] = number_regs_used[REGNO_NUM];
+    ctx->n_regs_used[REGNO_STR] = number_regs_used[REGNO_STR];
+    ctx->n_regs_used[REGNO_PMC] = number_regs_used[REGNO_PMC];
 
 #if CTX_LEAK_DEBUG
     if (Interp_debug_TEST(interp, PARROT_CTX_DESTROY_DEBUG_FLAG)) {
@@ -479,8 +487,7 @@ Parrot_alloc_context(PARROT_INTERP, ARGIN(const INTVAL *number_regs_used),
     }
 #endif
 
-    ctx->regs_mem_size   = reg_alloc;
-    ctx->n_regs_used     = n_regs_used;
+    ctx->regs_mem_size = reg_alloc;
 
     /* regs start past the context */
     p   = (void *) ((char *)ctx + ALIGNED_CTX_SIZE);
@@ -590,10 +597,10 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
         if (ctx->outer_ctx)
             Parrot_free_context(interp, ctx->outer_ctx, 1);
 
-        if (ctx->n_regs_used) {
-            mem_sys_free(ctx->n_regs_used);
-            ctx->n_regs_used = NULL;
-        }
+        ctx->n_regs_used[REGNO_INT] = 0;
+        ctx->n_regs_used[REGNO_NUM] = 0;
+        ctx->n_regs_used[REGNO_STR] = 0;
+        ctx->n_regs_used[REGNO_PMC] = 0;
 
 #if CTX_LEAK_DEBUG_FULL
         /* for debugging, poison the freed context in case anything
