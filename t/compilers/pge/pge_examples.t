@@ -52,7 +52,8 @@ ok2
 OUT
 
 # 2
-pir_output_is( <<'CODE', <<'OUT', "parse FASTA" );
+my @todo = (($^O =~ /darwin/i) ? (todo => 'Darwin segfault -- TT #479') : ());
+pir_output_is( <<'CODE', <<'OUT', "parse FASTA", @todo );
 
 # Grok fasta files, which usually contain DNA, RNA or protein sequences.
 # http://en.wikipedia.org/wiki/FASTA_format
