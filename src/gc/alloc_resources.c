@@ -4,7 +4,8 @@ $Id$
 
 =head1 NAME
 
-src/gc/resources.c - Allocate and deallocate tracked resources
+src/gc/alloc_resources.c - Allocate and deallocate buffer resources such as
+STRINGS.
 
 =head1 DESCRIPTION
 
@@ -603,7 +604,6 @@ alignment.
 
 */
 
-/* XXX Looks like we can lose buffer here */
 PARROT_CONST_FUNCTION
 PARROT_WARN_UNUSED_RESULT
 size_t

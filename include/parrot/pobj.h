@@ -56,7 +56,7 @@ typedef Buffer PObj;
 #define PObj_bufstart(pmc)    (pmc)->cache._b._bufstart
 #define PObj_buflen(pmc)      (pmc)->cache._b._buflen
 
-/* See src/gc/resources.c. the basic idea is that buffer memory is
+/* See src/gc/alloc_resources.c. the basic idea is that buffer memory is
    set up as follows:
                     +-----------------+
                     |  ref_count   |f |    # GC header
@@ -70,11 +70,11 @@ there instead.)  The start of the memory region (as returned by malloc()
 is also suitably aligned for any use.  If, for example, malloc() returns
 objects aligned on 8-byte boundaries, and obj->bufstart is also aligned
 on 8-byte boundaries, then there should be 4 bytes of padding.  It is
-handled differently in the two files resources.c and res_lea.c.
-In resources.c, the buffer is carved out of a larger memory pool.  In
+handled differently in the two files alloc_resources.c and res_lea.c.
+In alloc_resources.c, the buffer is carved out of a larger memory pool.  In
 res_lea.c, each buffer is individually allocated.
 
-                     src/gc/resources.c:       src/gc/res_lea.c:
+               src/gc/alloc_resources.c:       src/gc/res_lea.c:
 
 ptr from malloc ->  +------------------+      +------------------+
                       [other blocks?]         | INTVAL ref_count |
@@ -97,7 +97,7 @@ typedef struct Buffer_alloc_unit {
 #  define PObj_bufallocstart(b)  ((char *)PObj_bufstart(b) - Buffer_alloc_offset)
 #  define PObj_bufrefcount(b)    (((Buffer_alloc_unit *)PObj_bufallocstart(b))->ref_count)
 #  define PObj_bufrefcountptr(b) (&PObj_bufrefcount(b))
-#else                     /* see src/gc/resources.c */
+#else                     /* see src/gc/alloc_resources.c */
 #  define Buffer_alloc_offset sizeof (INTVAL)
 #  define PObj_bufallocstart(b)  ((char *)PObj_bufstart(b) - Buffer_alloc_offset)
 #  define PObj_bufrefcount(b)    (*(INTVAL *)PObj_bufallocstart(b))

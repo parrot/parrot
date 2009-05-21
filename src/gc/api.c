@@ -43,6 +43,25 @@ static void fix_pmc_syncs(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest_interp);
 
+static void free_pool(ARGMOD(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pool);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static void * get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
+    ARGMOD(Small_Object_Pool *dest),
+    ARGMOD(Small_Object_Pool *source))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*dest)
+        FUNC_MODIFIES(*source);
+
 static int sweep_cb_buf(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     SHIM(int flag),
@@ -65,6 +84,15 @@ static int sweep_cb_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_fix_pmc_syncs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(dest_interp) \
     || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_get_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(pool)
+#define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(dest) \
+    || PARROT_ASSERT_ARG(source)
 #define ASSERT_ARGS_sweep_cb_buf __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pool) \
@@ -456,7 +484,7 @@ Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t size)
 
 /*
 
-=item C<void * get_free_buffer(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void * get_free_buffer(PARROT_INTERP, Small_Object_Pool *pool)>
 
 Gets a free object or buffer from the given C<pool> and returns it.  If the
 object is larger then a standard C<PObj> structure, all additional memory is
@@ -826,8 +854,8 @@ Parrot_gc_merge_header_pools(ARGMOD(Interp *dest_interp),
 
 /*
 
-=item C<void Parrot_gc_merge_buffer_pools(PARROT_INTERP, Small_Object_Pool
-*dest, Small_Object_Pool *source)>
+=item C<static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
+Small_Object_Pool *dest, Small_Object_Pool *source)>
 
 Merge pool C<source> into pool C<dest>. Combines the free lists directly,
 moves all arenas to the new pool, and remove the old pool. To merge, the
@@ -1033,7 +1061,7 @@ sweep_cb_buf(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), SHIM(int flag),
 
 /*
 
-=item C<void free_pool(Small_Object_Pool *pool)>
+=item C<static void free_pool(Small_Object_Pool *pool)>
 
 Frees a pool and all of its arenas. Loops through the list of arenas backwards
 and returns each to the memory manager. Then, frees the pool structure itself.

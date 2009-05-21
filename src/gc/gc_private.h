@@ -216,14 +216,9 @@ typedef struct Arenas {
 /* HEADERIZER BEGIN: src/gc/system.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
-        __attribute__nonnull__(1);
-
 void trace_system_areas(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_trace_mem_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_trace_system_areas __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -402,35 +397,9 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 /* HEADERIZER BEGIN: src/gc/pools.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void free_pool(ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*pool);
-
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-void * get_free_buffer(PARROT_INTERP, ARGIN(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-size_t get_max_buffer_address(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-size_t get_max_pmc_address(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-size_t get_min_buffer_address(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_WARN_UNUSED_RESULT
-size_t get_min_pmc_address(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_IGNORABLE_RESULT
@@ -445,68 +414,17 @@ header_pools_iterate_callback(PARROT_INTERP,
 void initialize_header_pools(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-int is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-int is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *dest),
-    ARGMOD(Small_Object_Pool *source))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*dest)
-        FUNC_MODIFIES(*source);
-
-void Parrot_gc_merge_memory_pools(
-    ARGIN(Interp *dest_interp),
-    ARGIN(Interp *source_interp))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_free_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool)
 #define ASSERT_ARGS_get_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_get_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_get_max_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_get_max_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_get_min_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_get_min_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_header_pools_iterate_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(func)
 #define ASSERT_ARGS_initialize_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_is_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ptr)
-#define ASSERT_ARGS_is_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(ptr)
-#define ASSERT_ARGS_Parrot_gc_merge_buffer_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(dest) \
-    || PARROT_ASSERT_ARG(source)
-#define ASSERT_ARGS_Parrot_gc_merge_memory_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(dest_interp) \
-    || PARROT_ASSERT_ARG(source_interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/pools.c */
 
-/* HEADERIZER BEGIN: src/gc/resources.c */
+/* HEADERIZER BEGIN: src/gc/alloc_resources.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CANNOT_RETURN_NULL
@@ -563,7 +481,7 @@ void merge_pools(ARGMOD(Memory_Pool *dest), ARGMOD(Memory_Pool *source))
        PARROT_ASSERT_ARG(dest) \
     || PARROT_ASSERT_ARG(source)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/gc/resources.c */
+/* HEADERIZER END: src/gc/alloc_resources.c */
 
 /* GC subsystem init functions */
 /* HEADERIZER BEGIN: src/gc/generational_ms.c */
