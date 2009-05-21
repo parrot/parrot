@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, Parrot Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation
 # $Id$
 
 =head1 NAME
@@ -389,7 +389,7 @@ sub short_description {
     my $desc;
     # For a short description, we take only the first paragraph of any
     # ABSTRACT.
-    ($desc = $paragraphs[0]) =~ s/\n/ /g; 
+    ($desc = $paragraphs[0]) =~ s/\n/ /g;
     $desc =~ s/\s+/ /sg;
     # We eliminate certain POD formatting characters.
     $desc =~ s/[CFL]<([^>]+)>/$1/sg;
