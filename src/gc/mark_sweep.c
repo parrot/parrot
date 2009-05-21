@@ -65,7 +65,7 @@ PARROT_CANNOT_RETURN_NULL
 static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
         __attribute__nonnull__(1);
 
-static void Parrot_gc_free_buffer(SHIM_INTERP,
+static void free_buffer(SHIM_INTERP,
     ARGMOD(Small_Object_Pool *pool),
     ARGMOD(PObj *b))
         __attribute__nonnull__(2)
@@ -73,7 +73,7 @@ static void Parrot_gc_free_buffer(SHIM_INTERP,
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*b);
 
-static void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
+static void free_buffer_malloc(SHIM_INTERP,
     SHIM(Small_Object_Pool *pool),
     ARGMOD(PObj *b))
         __attribute__nonnull__(3)
@@ -91,10 +91,10 @@ static void Parrot_gc_free_buffer_malloc(SHIM_INTERP,
 #define ASSERT_ARGS_new_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_Parrot_gc_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_Parrot_gc_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+#define ASSERT_ARGS_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(b)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -874,9 +874,9 @@ new_buffer_pool(PARROT_INTERP)
     Small_Object_Pool * const pool = get_bufferlike_pool(interp, sizeof (Buffer));
 
 #ifdef GC_IS_MALLOC
-    pool->gc_object = Parrot_gc_free_buffer_malloc;
+    pool->gc_object = free_buffer_malloc;
 #else
-    pool->gc_object = Parrot_gc_free_buffer;
+    pool->gc_object = free_buffer;
 #endif
 
     return pool;
@@ -884,7 +884,7 @@ new_buffer_pool(PARROT_INTERP)
 
 /*
 
-=item C<static void Parrot_gc_free_buffer_malloc(PARROT_INTERP,
+=item C<static void free_buffer_malloc(PARROT_INTERP,
 Small_Object_Pool *pool, PObj *b)>
 
 Frees the given buffer, returning the storage space to the operating system
@@ -896,10 +896,10 @@ The buffer is not freed if the reference count is greater then 1.
 */
 
 static void
-Parrot_gc_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
+free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
         ARGMOD(PObj *b))
 {
-    ASSERT_ARGS(Parrot_gc_free_buffer_malloc)
+    ASSERT_ARGS(free_buffer_malloc)
     /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
      * external */
     PObj_buflen(b) = 0;
@@ -920,7 +920,7 @@ Parrot_gc_free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<static void Parrot_gc_free_buffer(PARROT_INTERP, Small_Object_Pool
+=item C<static void free_buffer(PARROT_INTERP, Small_Object_Pool
 *pool, PObj *b)>
 
 Frees a buffer, returning it to the memory pool for Parrot to possibly
@@ -931,9 +931,9 @@ reuse later.
 */
 
 static void
-Parrot_gc_free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
+free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
 {
-    ASSERT_ARGS(Parrot_gc_free_buffer)
+    ASSERT_ARGS(free_buffer)
     Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
 
     /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
@@ -1177,7 +1177,6 @@ header_pools_iterate_callback(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
 
     return 0;
 }
-
 
 
 /*
