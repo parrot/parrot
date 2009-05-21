@@ -116,7 +116,7 @@ The subtype of this particular event
 
 The priority of the event
 
-=item 3
+=item 4
 
 A PMC containing any additional data associated with the event, which may be
 used by the event handler.
