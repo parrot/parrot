@@ -1954,20 +1954,43 @@ attribute.
     pop_eh
   scope_error:
     unless scope goto scope_error_1
-    scope = concat " '", scope
-    scope = concat scope, "'"
+    scope = concat " in '", scope
+    scope = concat scope, "' scope"
   scope_error_1:
     # Find the nearest named block
+    .local string blockname
+    blockname = ''
     .local pmc it
     $P0 = get_global '@?BLOCK'
     it = iter $P0
   scope_error_block_loop:
     unless it goto scope_error_2
     $P0 = shift it
-    $S0 = $P0.'name'()
-    unless $S0 goto scope_error_block_loop
+    blockname = $P0.'name'()
+    unless blockname goto scope_error_block_loop
   scope_error_2:
-    .tailcall self.'panic'("Scope", scope, " not found for PAST::Var '", name, "' in ", $S0)
+    if blockname goto have_blockname
+    blockname = '<anonymous>'
+  have_blockname:
+    # Find the source location, if available
+    .local string sourceline
+    .local pmc source, pos, files
+    sourceline = ''
+    source = node['source']
+    pos = node['pos']
+    if null source goto scope_error_3
+    files = find_caller_lex '$?FILES'
+    if null files goto scope_error_3
+    $S0 = files
+    sourceline = concat ' (', $S0
+    concat sourceline, ':'
+    $I0 = source.'lineof'(pos)
+    inc $I0
+    $S0 = $I0
+    concat sourceline, $S0
+    concat sourceline, ')'
+  scope_error_3:
+    .tailcall self.'panic'("Symbol '", name, "' not predeclared", scope, " in ", blockname, sourceline)
 .end
 
 
