@@ -346,13 +346,11 @@ Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
         if (close(file_descriptor) != 0)
             result = errno;
 
-        /* Pipes reuse the file_size attribute to store the child
-         * process pid.
-         * Wait for the child after closing the
+        /* Wait for the child after closing the
          * handle, to let it notice the closing and finish */
         if (flags & PIO_F_PIPE) {
             int status;
-            waitpid(Parrot_io_get_file_size(interp, filehandle), &status, 0);
+            waitpid(VTABLE_get_integer_keyed_int(interp, filehandle, 0), &status, 0);
         }
     }
     Parrot_io_set_os_handle(interp, filehandle, -1);
@@ -682,7 +680,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             io = filehandle;
 
         /* Save the pid of the child, we'll wait for it when closing */
-        Parrot_io_set_file_size(interp, io, pid);
+        VTABLE_set_integer_keyed_int(interp, io, 0, pid);
 
         if (f_read) {
             /* close this writer's end of pipe */
