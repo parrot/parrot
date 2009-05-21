@@ -197,7 +197,7 @@ the output to the correct output file.
   ns_optable:
     $P0 = ns['optable']
     if $P0 == '' goto iter_loop
-    initpir.'emit'("          optable = new ['PGE';'OPTable']")
+    initpir.'emit'("          optable = root_new ['parrot';'PGE';'OPTable']")
     $S0 = namespace
     $P1 = split '::', $S0
     $P1 = initpir.'key'($P1 :flat)
