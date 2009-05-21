@@ -33,6 +33,9 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 #ifdef PIO_OS_UNIX
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 /* HEADERIZER HFILE: include/parrot/io_unix.h */
 
 /* HEADERIZER BEGIN: static */
@@ -335,11 +338,22 @@ Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
     ASSERT_ARGS(Parrot_io_close_unix)
     INTVAL result = 0;
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+    int flags = Parrot_io_get_flags(interp, filehandle);
+
     /* BSD and Solaris need explicit fsync() */
     if (file_descriptor >= 0) {
         fsync(file_descriptor);
         if (close(file_descriptor) != 0)
             result = errno;
+
+        /* Pipes reuse the file_size attribute to store the child
+         * process pid.
+         * Wait for the child after closing the
+         * handle, to let it notice the closing and finish */
+        if (flags & PIO_F_PIPE) {
+            int status;
+            waitpid(Parrot_io_get_file_size(interp, filehandle), &status, 0);
+        }
     }
     Parrot_io_set_os_handle(interp, filehandle, -1);
     return result;
@@ -655,7 +669,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (pid < 0) {
         /* fork failed, cleaning up */
         close(fds[0]);
-	close(fds[1]);
+        close(fds[1]);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "fork failed: %s", strerror(errno));
     }
@@ -667,8 +681,8 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         else
             io = filehandle;
 
-        Parrot_io_set_flags(interp, io,
-                (Parrot_io_get_flags(interp, io) & (~PIO_F_PIPE)));
+        /* Save the pid of the child, we'll wait for it when closing */
+        Parrot_io_set_file_size(interp, io, pid);
 
         if (f_read) {
             /* close this writer's end of pipe */
@@ -703,7 +717,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
             /* XXX redirect stdout, stderr to pipe */
             close(STDOUT_FILENO);
             close(STDERR_FILENO);
-	    close(fds[0]);
+            close(fds[0]);
 
             if (Parrot_dup(fds[1]) != STDOUT_FILENO)
                 exit(EXIT_FAILURE);
@@ -718,7 +732,7 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         execv(argv [0], argv);
 
         /* Will never reach this unless exec fails.
-	   No need to clean up, we're just going to exit */
+         * No need to clean up, we're just going to exit */
         perror("execvp");
         exit(EXIT_FAILURE);
     }

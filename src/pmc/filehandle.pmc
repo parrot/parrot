@@ -38,7 +38,7 @@ pmclass FileHandle need_ext {
     ATTR STRING *mode;                /* The mode string used in open */
     ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
-    ATTR PIOOFF_T file_size;          /* Current file size            */
+    ATTR PIOOFF_T file_size;          /* Current file size - pipe pid */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
     ATTR PIOOFF_T last_pos;           /* Last file position           */
     ATTR size_t buffer_size;          /* Buffer size                  */
