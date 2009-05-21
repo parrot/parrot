@@ -411,7 +411,6 @@ INTERP_O_FILES := \
     $(SRC_DIR)/gc/generational_ms$(O) \
     $(SRC_DIR)/gc/incremental_ms$(O) \
     $(SRC_DIR)/gc/gc_ms$(O) \
-    $(SRC_DIR)/gc/pools$(O) \
     $(SRC_DIR)/gc/mark_sweep$(O) \
     $(SRC_DIR)/gc/system$(O) \
     $(SRC_DIR)/global$(O) \
@@ -1095,8 +1094,6 @@ $(SRC_DIR)/gc/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 $(SRC_DIR)/gc/generational_ms$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/incremental_ms$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/gc/pools$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/alloc_resources$(O) : $(GENERAL_H_FILES)
 

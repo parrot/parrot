@@ -313,6 +313,23 @@ INTVAL contained_in_pool(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
+        __attribute__nonnull__(1);
+
+PARROT_IGNORABLE_RESULT
+int /*@alt void@*/
+header_pools_iterate_callback(PARROT_INTERP,
+    int flag,
+    ARGIN_NULLOK(void *arg),
+    NOTNULL(pool_iter_fn func))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(4);
+
+void initialize_header_pools(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void mark_special(PARROT_INTERP, ARGIN(PMC *obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -364,6 +381,13 @@ int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
 #define ASSERT_ARGS_contained_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
     || PARROT_ASSERT_ARG(ptr)
+#define ASSERT_ARGS_get_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_header_pools_iterate_callback __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(func)
+#define ASSERT_ARGS_initialize_header_pools __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_mark_special __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(obj)
