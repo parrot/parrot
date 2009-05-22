@@ -33,8 +33,8 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 #ifdef PIO_OS_UNIX
 
-#include <sys/types.h>
-#include <sys/wait.h>
+#  include <sys/types.h>
+#  include <sys/wait.h>
 
 /* HEADERIZER HFILE: include/parrot/io_unix.h */
 

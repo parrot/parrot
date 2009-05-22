@@ -84,12 +84,15 @@ Initializes a newly created FileHandle object.
         data_struct->buffer_next   = NULL;
 
         /* Initialize the os_handle to the platform-specific value for closed. */
+
 #ifdef PIO_OS_WIN32
         data_struct->os_handle     = (PIOHANDLE)INVALID_HANDLE_VALUE;
 #endif
+
 #ifdef PIO_OS_UNIX
         data_struct->os_handle     = (PIOHANDLE)-1;
 #endif
+
 #ifdef PIO_OS_STDIO
         data_struct->os_handle     = (PIOHANDLE)NULL;
 #endif
@@ -179,7 +182,7 @@ For internal usage only, subject to change without notice.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
         INTVAL result;
-        switch(key) {
+        switch (key) {
             case 0:
                 GET_ATTR_process_id(INTERP, SELF, result);
                 break;
@@ -201,7 +204,7 @@ For internal usage only, subject to change without notice.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
-        switch(key) {
+        switch (key) {
             case 0:
                 SET_ATTR_process_id(INTERP, SELF, value);
                 break;
