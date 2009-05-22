@@ -395,8 +395,8 @@ Read a line from the filehandle and return it in a string.
 
 */
 
-#ifdef PARROT_HAS_READLINE
     METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
+#ifdef PARROT_HAS_READLINE
         STRING *string_result;
         char * const r = readline(got_prompt ? prompt->strstart : NULL);
 
@@ -410,9 +410,7 @@ Read a line from the filehandle and return it in a string.
         }
 
         RETURN(PMC *PMCNULL);
-    }
 #else
-    METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
         STRING *string_result;
         UINTVAL len;
 
@@ -437,8 +435,8 @@ Read a line from the filehandle and return it in a string.
         }
 
         RETURN(STRING *string_result);
-    }
 #endif
+    }
 
 /*
 
