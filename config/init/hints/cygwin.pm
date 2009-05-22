@@ -52,6 +52,8 @@ sub runstep {
         blib_dir            => '.',
         libparrot_ldflags   => '-L' . $build_dir . ' -lparrot',
         inst_libparrot_ldflags => '-L' . $bindir . ' -lparrot',
+        libparrot_linkflags   => '-L' . $build_dir . ' -lparrot',
+        inst_libparrot_linkflags => '-L' . $bindir . ' -lparrot',
     );
 
     # inet_aton needs to be defined on Cygwin.

@@ -510,7 +510,7 @@ LIBPARROT_STATIC    := @blib_dir@/@libparrot_static@
 LIBPARROT           := @libparrot@
 
 #IF(has_icu):ICU_SHARED  := @icu_shared@
-ALL_PARROT_LIBS     := @libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
+ALL_PARROT_LIBS     := @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR          := runtime/parrot/dynext

@@ -284,7 +284,7 @@ MAIN
     link_dynamic = $P0['link_dynamic']
     linkflags    = $P0['linkflags']
     ld_out       = $P0['ld_out']
-    libparrot    = $P0['libparrot_ldflags']
+    libparrot    = $P0['libparrot_linkflags']
     libs         = $P0['libs']
     o            = $P0['o']
     rpath        = $P0['rpath_blib']
