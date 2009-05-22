@@ -2006,12 +2006,21 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
 SPLINTFLAGS := $(SPLINTFLAGS) \
     +relax-quals
 
-# Pointer arithmetic is OK, but watch for null pointers
+# Memory checking
 SPLINTFLAGS := $(SPLINTFLAGS) \
-    -ptr-arith \
+    -must-free \
+    -mustfreefresh \
+    -mustfreeonly \
+    +null \
     +nullptrarith \
+    +nullret \
+    -ptr-arith \
     +ptr-negate \
-    -zero-ptr
+    -zero-ptr \
+
+# Transfer errors are too tough for us right now
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    -mem-trans
 
 # Symbol definitions
 SPLINTFLAGS := $(SPLINTFLAGS) \
@@ -2044,12 +2053,6 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
     +long-integral \
     +match-any-integral \
 
-# Miscellaneous other flags
-SPLINTFLAGS := $(SPLINTFLAGS) \
-    +null \
-    +nullret \
-    +shadow \
-
 # Other options we'd like to add back
 # +initallelements : Right now, the *.ops files don't initialize all
 #  values of the arrays
@@ -2070,8 +2073,8 @@ splint : $(PARROT)
 splint-andy :
 	$(MKPATH) $(SPLINT_TMP)
 	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-	+partial -memchecks \
-	src/string/*.c src/oo.c src/key.c \
+	+partial \
+	src/oo.c src/key.c \
     | grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
