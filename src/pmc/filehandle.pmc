@@ -31,6 +31,17 @@ extern "C" {
 #endif
 #endif
 
+#ifdef PIO_OS_WIN32
+#  define PIO_INVALID_HANDLE INVALID_HANDLE_VALUE
+#endif
+
+#ifdef PIO_OS_UNIX
+#  define PIO_INVALID_HANDLE -1
+#endif
+
+#ifdef PIO_OS_STDIO
+#  define PIO_INVALID_HANDLE NULL
+#endif
 
 pmclass FileHandle need_ext {
     ATTR INTVAL flags;                /* Filehandle flags             */
@@ -84,18 +95,7 @@ Initializes a newly created FileHandle object.
         data_struct->buffer_next   = NULL;
 
         /* Initialize the os_handle to the platform-specific value for closed. */
-
-#ifdef PIO_OS_WIN32
-        data_struct->os_handle     = (PIOHANDLE)INVALID_HANDLE_VALUE;
-#endif
-
-#ifdef PIO_OS_UNIX
-        data_struct->os_handle     = (PIOHANDLE)-1;
-#endif
-
-#ifdef PIO_OS_STDIO
-        data_struct->os_handle     = (PIOHANDLE)NULL;
-#endif
+        data_struct->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
 
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
@@ -395,9 +395,9 @@ Read a line from the filehandle and return it in a string.
 
 */
 
+#ifdef PARROT_HAS_READLINE
     METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
         STRING *string_result;
-#ifdef PARROT_HAS_READLINE
         char * const r = readline(got_prompt ? prompt->strstart : NULL);
 
         if (r) {
@@ -410,7 +410,10 @@ Read a line from the filehandle and return it in a string.
         }
 
         RETURN(PMC *PMCNULL);
+    }
 #else
+    METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
+        STRING *string_result;
         UINTVAL len;
 
         if (got_prompt)
@@ -434,8 +437,8 @@ Read a line from the filehandle and return it in a string.
         }
 
         RETURN(STRING *string_result);
-#endif
     }
+#endif
 
 /*
 
