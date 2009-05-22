@@ -396,8 +396,8 @@ Read a line from the filehandle and return it in a string.
 */
 
     METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
+        STRING *string_result = NULL;
 #ifdef PARROT_HAS_READLINE
-        STRING *string_result;
         char * const r = readline(got_prompt ? prompt->strstart : NULL);
 
         if (r) {
@@ -406,14 +406,8 @@ Read a line from the filehandle and return it in a string.
 
             string_result = Parrot_str_new(INTERP, r, 0);
             mem_sys_free(r);
-            RETURN(STRING *string_result);
         }
-
-        RETURN(PMC *PMCNULL);
 #else
-        STRING *string_result;
-        UINTVAL len;
-
         if (got_prompt)
             fprintf(stderr, "%s", prompt->strstart);
 
@@ -421,21 +415,22 @@ Read a line from the filehandle and return it in a string.
             Parrot_io_setlinebuf(INTERP, SELF);
 
         string_result = Parrot_io_reads(INTERP, SELF, 0);
-        if (!string_result)
-            RETURN(PMC *PMCNULL);
-        len = Parrot_str_byte_length(INTERP, string_result);
-        if (len < 1)
-            RETURN(PMC *PMCNULL);
-        while (len > 0 &&
-                (((char*)string_result->strstart)[len - 1] == '\n' ||
-                 ((char*)string_result->strstart)[len - 1] == '\r')) {
-            --len;
-            --string_result->strlen;
-            --string_result->bufused;
+        if (string_result) {
+            UINTVAL len = Parrot_str_byte_length(INTERP, string_result);
+            if (len < 1)
+                string_result = NULL;
+            else {
+                while (len > 0 &&
+                        (((char*)string_result->strstart)[len - 1] == '\n' ||
+                         ((char*)string_result->strstart)[len - 1] == '\r')) {
+                    --len;
+                    --string_result->strlen;
+                    --string_result->bufused;
+                }
+            }
         }
-
-        RETURN(STRING *string_result);
 #endif
+        RETURN(STRING *string_result);
     }
 
 /*
