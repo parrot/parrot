@@ -109,7 +109,7 @@ sub runstep {
 
         # If we are building shared, need to include dynamic libparrot.lib, otherwise
         # the static libparrot.lib.
-	# Unclear if it's needed both for ld and link.
+        # Unclear if it's needed both for ld and link.
         $conf->data->set( libparrot_ldflags   => "\"$build_dir\\libparrot.lib\"" );
         $conf->data->set( libparrot_linkflags   => "\"$build_dir\\libparrot.lib\"" );
 
