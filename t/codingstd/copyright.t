@@ -96,9 +96,6 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
     $suggested_version
     );
 
-TODO:
-{
-    local $TODO = "Waiting for full transition to Parrot Foundation";
     ok( !scalar(@bad_format_copyright_files), 'Copyright statement in the right format' )
         or diag(
         join
@@ -109,7 +106,6 @@ TODO:
         "Please update to read something like:",
         $suggested_version
         );
-}
 
 # Certain files contain the string 'Copyright (c)' more than once
 # because they contain heredocs for generated files, correctly cite the
