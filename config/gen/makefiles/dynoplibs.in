@@ -17,8 +17,7 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
-#ELSE:LIBPARROT     :=
+LIBPARROT     := @libparrot_ldflags@
 
 BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
 OPS2C           := $(PERL) -I$(BUILD_DIR)@slash@lib $(BUILD_TOOLS_DIR)@slash@ops2c.pl
