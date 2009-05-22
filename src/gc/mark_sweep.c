@@ -31,6 +31,20 @@ throughout the rest of Parrot.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void free_buffer(SHIM_INTERP,
+    ARGMOD(Small_Object_Pool *pool),
+    ARGMOD(PObj *b))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*pool)
+        FUNC_MODIFIES(*b);
+
+static void free_buffer_malloc(SHIM_INTERP,
+    SHIM(Small_Object_Pool *pool),
+    ARGMOD(PObj *b))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*b);
+
 static void free_pmc_in_pool(PARROT_INTERP,
     SHIM(Small_Object_Pool *pool),
     ARGMOD(PObj *p))
@@ -65,20 +79,11 @@ PARROT_CANNOT_RETURN_NULL
 static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
         __attribute__nonnull__(1);
 
-static void free_buffer(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    ARGMOD(PObj *b))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool)
-        FUNC_MODIFIES(*b);
-
-static void free_buffer_malloc(SHIM_INTERP,
-    SHIM(Small_Object_Pool *pool),
-    ARGMOD(PObj *b))
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*b);
-
+#define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(pool) \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
 #define ASSERT_ARGS_free_pmc_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(p)
@@ -91,11 +96,6 @@ static void free_buffer_malloc(SHIM_INTERP,
 #define ASSERT_ARGS_new_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(b)
-#define ASSERT_ARGS_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(b)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -884,8 +884,8 @@ new_buffer_pool(PARROT_INTERP)
 
 /*
 
-=item C<static void free_buffer_malloc(PARROT_INTERP,
-Small_Object_Pool *pool, PObj *b)>
+=item C<static void free_buffer_malloc(PARROT_INTERP, Small_Object_Pool *pool,
+PObj *b)>
 
 Frees the given buffer, returning the storage space to the operating system
 and removing it from Parrot's memory management system. If the buffer is COW,
@@ -920,8 +920,8 @@ free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
 
 /*
 
-=item C<static void free_buffer(PARROT_INTERP, Small_Object_Pool
-*pool, PObj *b)>
+=item C<static void free_buffer(PARROT_INTERP, Small_Object_Pool *pool, PObj
+*b)>
 
 Frees a buffer, returning it to the memory pool for Parrot to possibly
 reuse later.
