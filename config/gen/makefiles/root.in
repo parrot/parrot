@@ -1619,7 +1619,7 @@ examples_tests :
 
 # benchmark tests
 benchmark_tests : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(BENCHMARK_TEST_FILES)
+	$(PERL) t/harness $(BENCHMARK_TEST_FILES)
 
 # Running a benchmark
 mopsbench : test_prep
