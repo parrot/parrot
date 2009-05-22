@@ -14,7 +14,7 @@
 #define      PARROT_PMC_FREEZE_H_GUARD
 
 struct _visit_info;
-typedef void (*visit_f)(PARROT_INTERP, PMC*, struct _visit_info*);
+typedef void (*visit_f)(PARROT_INTERP, ARGIN_NULLOK(PMC*), ARGIN(struct _visit_info*));
 
 typedef enum {
     VISIT_FREEZE_NORMAL,
