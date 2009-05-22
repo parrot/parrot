@@ -667,7 +667,7 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
             case KEY_number_FLAG:
                 GETATTR_Key_int_key(interp, key, int_key);
                 value = Parrot_str_append(interp, value,
-                    Parrot_str_from_num(interp, int_key));
+                    Parrot_str_from_num(interp, (FLOATVAL)int_key));
                 break;
             case KEY_string_FLAG:
                 GETATTR_Key_str_key(interp, key, str_key);
