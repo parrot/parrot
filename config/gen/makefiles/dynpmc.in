@@ -24,7 +24,7 @@ BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
 BUILD_LIB_DIR   := $(BUILD_DIR)@slash@blib@slash@lib
 PMC2C           := $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
 INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
-#IF(!cygwin and cc==gcc):LINKARGS       := -Wl,-L $(BUILD_LIB_DIR) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
+#IF(!cygwin and cc==gcc):LINKARGS       := -Wl,-L$(BUILD_LIB_DIR) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 #ELSE:LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 
 PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
