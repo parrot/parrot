@@ -846,7 +846,7 @@ X<fdopen opcode (PASM)>
 
   fdopen R<DEST>, R<INT>, R<MODE>
 
-Get a ParrotIO object for handle R<INT> with open mode R<MODE>.
+Get a FileHandle object for handle R<INT> with open mode R<MODE>.
 
 I<Arguments: P, I, S>
 
@@ -1124,7 +1124,7 @@ X<getstdout opcode (PASM)>
   getstdin R<DEST>
   getstdout R<DEST>
 
-Get a ParrotIO object for the given standard handle.
+Get a FileHandle object for the given standard handle.
 
 I<Arguments: P>
 
@@ -1787,7 +1787,7 @@ X<peek opcode (PASM)>
   peek R<DEST>
   peek R<DEST>, R<PIO>
 
-Read the next byte from the given ParrotIO object or from C<stdin> but
+Read the next byte from the given FileHandle object or from C<stdin> but
 don't remove it.
 
 I<Arguments: SR or SR, P>
@@ -2235,11 +2235,13 @@ See also: C<getprop> and C<delprop>.
 
 X<setstderr opcode (PASM)>
 X<setstdout opcode (PASM)>
+X<setstdin  opcode (PASM)>
 
   setstderr R<DEST>
   setstdout R<DEST>
+  setstdin  R<DEST>
 
-Set a ParrotIO object for the given standard handle.
+Set a FileHandle object for the given standard handle.
 
 I<Arguments: P>
 
@@ -2714,7 +2716,7 @@ X<tell opcode (PASM)>
   tell R<DEST>, R<PIO>
   tell R<UPPER32>, R<LOWER32>, R<PIO>
 
-Return the file position of the given ParrotIO object.
+Return the file position of the given FileHandle object.
 
 I<Arguments: IR, P or IR, I, P>
 
