@@ -49,10 +49,13 @@ INTVAL Parrot_io_is_closed_win32(PARROT_INTERP, ARGIN(PMC *filehandle))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_io_open_pipe_win32(PARROT_INTERP,
-    SHIM(PMC *filehandle),
-    SHIM(STRING *command),
+    ARGMOD(PMC *filehandle),
+    ARGIN(STRING *command),
     int flags)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*filehandle);
 
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_io_open_win32(PARROT_INTERP,
@@ -112,7 +115,9 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(filehandle)
 #define ASSERT_ARGS_Parrot_io_open_pipe_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(filehandle) \
+    || PARROT_ASSERT_ARG(command)
 #define ASSERT_ARGS_Parrot_io_open_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(filehandle) \
