@@ -163,9 +163,10 @@ Free hash structure.
     }
 
     VTABLE void destroy() {
-        if (SELF.get_pointer()) {
-            parrot_hash_destroy(INTERP, (Hash *)SELF.get_pointer());
-        }
+        Hash *hash = (Hash *)SELF.get_pointer();
+        if (hash)
+            parrot_hash_destroy(INTERP, hash);
+
         mem_sys_free(PMC_data(SELF));
     }
 /*
