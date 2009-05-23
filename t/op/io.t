@@ -52,7 +52,7 @@ Catched
 OUTPUT
 
 TODO: {
-local $TODO = 'Unimplemented in this platform, TT #661' unless $^O =~ /linux|darwin/;
+local $TODO = 'Unimplemented in this platform, TT #661' unless $^O =~ /linux|darwin|MSWin32/;
 
 pir_output_like( <<'CODE', <<'OUTPUT', 'open pipe for reading' );
 .include 'iglobals.pasm'
@@ -88,6 +88,11 @@ failed:
 CODE
 /This is Parrot.*/
 OUTPUT
+
+}
+
+TODO: {
+local $TODO = 'Unimplemented in this platform, TT #661' unless $^O =~ /linux|darwin/;
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'open pipe for writing' );
 .include 'iglobals.pasm'
