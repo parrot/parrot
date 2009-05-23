@@ -2146,6 +2146,9 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
         interp->code->base.data       = (opcode_t *)
             mem_sys_realloc(interp->code->base.data, bytes);
 
+        /* reallocating this removes its mmaped-ness; needs encapsulation */
+        interp->code->base.pf->is_mmap_ped = 0;
+
         interp->code->pic_index->data = (opcode_t *)
             mem_sys_realloc(interp->code->pic_index->data, bytes / 2);
 
@@ -2157,7 +2160,7 @@ e_pbc_emit(PARROT_INTERP, SHIM(void *param), ARGIN(const IMC_Unit *unit),
 
         /* add debug if necessary */
         if (IMCC_INFO(interp)->optimizer_level == 0
-        || IMCC_INFO(interp)->optimizer_level  == OPT_PASM) {
+        ||  IMCC_INFO(interp)->optimizer_level == OPT_PASM) {
             const char * const sourcefile = unit->file;
 
             /* FIXME length and multiple subs */
