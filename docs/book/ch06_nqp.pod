@@ -2,37 +2,44 @@
 
 =head1 Grammar Actions
 
-Protofunction signatures aren't the only way to apply functions to rules
-matched by a parser.  They may be the most primitive way to do so, at least if
-you write them in PIR.  There's an easier way to write rules: in a language
-that's almost, but Not Quite Perl.
+The job of the grammar is to match input patterns from the source language.
+These patterns then need to get converted to nodes in the abstract syntax
+tree for manipulation in other stages of the compiler. We've already seen
+one example of a subroutine structure that takes a match and produces a
+tree node: Protofunctions. Protofunction signatures aren't the only way to
+apply functions to rules matched by a parser.  They are limited and are
+slightly primitive, but effective for handling operators.  There is an
+easier and more powerful way to write subroutines to convert match objects
+into parse tree nodes, using a language that's almost, but Not Quite Perl.
 
 X<NQP>
 X<Not Quite Perl>
-NQP (Not Quite Perl) is a small language which offers a subset of Perl 6's
-syntax and semantics. Though it originated as a bootstrapping tool for the
-Rakudo Perl 6 compiler, several other Parrot-based compilers use it.  It has
-become a permanent member of PCT.
+NQP (Not Quite Perl) is a small language which offers a limited subset of
+Perl 6's syntax and semantics. Though it originated as a bootstrapping tool
+for the Rakudo Perl 6 compiler, several other Parrot-based compilers use it
+as well.  It has become a permanent member of PCT, and therefore a permanent
+part of the Parrot code base. 
 
-NQP contains the smallest subset of the Perl 6 language necessary to implement
-parser transformations, plus a few syntactic convenience features. NQP's Perl 6
-subset shows its Perl 5 roots, so existing Perl 5 programmers should find much
-of it familiar.
+NQP represets almost the smallest subset of the Perl 6 language necessary to
+implement parser transformations, plus a few syntactic convenience features
+that developers have requested. NQP's Perl 6 subset shows its Perl 5 roots,
+so existing Perl 5 programmers should find much of it familiar and should be
+able to leverage their existing skills for writing compilers.
+
+In PGE, at the time of a match the grammar we can invoke an action using the
+special <code>{*}</code> symbol. In general, these action methods are
+written in NQP, although it is possible for them to be written in PIR N<In
+fact, this is how the NQP compiler itself is written>. We won't discuss the
+PIR case here because it's uncommon and needlessly difficult. NQP is the
+standard and preferred choice for this.
 
 =head2 NQP Basics
-
-=for author
-
-This section is odd; it starts by telling how NQP doesn't work instead of
-telling how it does.  Differences from Perl 5 may be more appropriate later.
-
-=end for
 
 X<sigils>
 X<scalar>
 Like all flavors and versions of Perl, NQP uses special prefix symbols called
 I<sigils> to distinguish variable types. The C<$> sigil represents scalars,
-C<@> arrays, and C<%> for hashes.  A scalar any single value which can
+C<@> arrays, and C<%> for hashes.  A scalar is any single value which can
 interchangeably contain given a string value, an integer value, or an object
 reference. Simple NQP assignments are:
 
@@ -42,39 +49,29 @@ reference. Simple NQP assignments are:
 
 X<bind operator>
 X<operators; binding>
-X<=:>
-This example shows the first divergence from familar Perl 5 syntax.  Why not
-use the plain C<=> sign for assignment? I<NQP doesn't have it>.  The C<:=>, or
-I<bind> operator, makes one value an alias for another. In most cases you can
-ignore the distinction between the two, but it's not quite the same as regular
-variable assignment.
+X<:=>
+The C<:=> I<bind> operator performs reference assignment in NQP. Reference
+assignment makes one variable into an alias for another. This means that
+the two variables are just different names for the same storage location,
+and changes to one will change both. It's important to remember that a bind
+is not a copy!
 
-=for author
+NQP has hashes and arrays just like other flavors of Perl and various
+dynamic languages. NQP does not have a notion of hash and array context,
+but otherwise it works the way you would expect. Arrays have the C<@> sigil,
+and hashes have the C<%> sigil. Here are some examples:
 
-What I<is> it then, and why is it here?
+  @ary[0] := 1;
+  @ary[1] := "foo";
+  ...
 
-=end for
+  %hsh{'bar'} := 2;
+  %hsh{'baz'} := "parrot";
+  ...
 
-Hash and array assignment is easy in Perl 5 and other languages, but it's
-different in NQP:
+There is also a nice shorthand way to index hashes, using angle brackets:
 
- @small_integers := (1, 2, 3, 4);                      # WRONG!
- %leading_ladies := ("Trillian" => "Hitchhikers Guide",
-                     "Leia"     => "Star Wars");       # WRONG!
-
-I<NQP doesn't have list or hash context!> To initialize a whole list at once,
-write:
-
- @small_integers[0] := 1;
- @small_integers[1] := 2;
- # ... And so on, and so forth ...
-
-=for author
-
-What does this I<mean>?  Also, the example and its description conflate "list"
-and "array", which is terribly confusing in Perl 5.
-
-=end for
+  %hsh<bar> := "parrot";
 
 It's also possible to assign a list in I<scalar context>:
 
