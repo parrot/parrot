@@ -163,7 +163,13 @@ destroy_context(PARROT_INTERP)
 
     while (context) {
         Parrot_Context * const prev = context->caller_ctx;
+
+        /* always collect the parentmost context in the parentmost interp*/
+        if (!prev && !interp->parent_interpreter)
+            context->ref_count = 1;
+
         Parrot_free_context(interp, context, 1);
+
         context = prev;
     }
 
@@ -569,6 +575,7 @@ Parrot_free_context(PARROT_INTERP, ARGMOD(Parrot_Context *ctx), int deref)
 #endif
         ctx->ref_count--;
     }
+
     if (ctx->ref_count <= 0) {
         void *ptr;
         int slot;
