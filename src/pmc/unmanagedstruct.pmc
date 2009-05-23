@@ -676,7 +676,23 @@ Initializes the C<struct> with a default value of C<NULL>.
         Parrot_UnManagedStruct_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_UnManagedStruct_attributes);
         PMC_data(SELF) = attrs;
+        PObj_active_destroy_SET(SELF);
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the subroutine.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
+    }
+
 
 /*
 
