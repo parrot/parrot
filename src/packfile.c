@@ -4200,36 +4200,39 @@ Packs this segment into bytecode.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
-PackFile_Annotations_pack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
+PackFile_Annotations_pack(SHIM_INTERP, ARGIN(PackFile_Segment *seg),
         ARGMOD(opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_Annotations_pack)
-    PackFile_Annotations *self = (PackFile_Annotations *)seg;
+    const PackFile_Annotations * const self = (PackFile_Annotations *)seg;
     INTVAL i;
 
     /* Write key count and any keys. */
     *cursor++ = self->num_keys;
 
     for (i = 0; i < self->num_keys; i++) {
-        *cursor++ = self->keys[i]->name;
-        *cursor++ = self->keys[i]->type;
+        const PackFile_Annotations_Key * const key = self->keys[i];
+        *cursor++ = key->name;
+        *cursor++ = key->type;
     }
 
     /* Write group count and any groups. */
     *cursor++ = self->num_groups;
 
     for (i = 0; i < self->num_groups; i++) {
-        *cursor++ = self->groups[i]->bytecode_offset;
-        *cursor++ = self->groups[i]->entries_offset;
+        const PackFile_Annotations_Group * const group = self->groups[i];
+        *cursor++ = group->bytecode_offset;
+        *cursor++ = group->entries_offset;
     }
 
     /* Write entry count and any entries. */
     *cursor++ = self->num_entries;
 
     for (i = 0; i < self->num_entries; i++) {
-        *cursor++ = self->entries[i]->bytecode_offset;
-        *cursor++ = self->entries[i]->key;
-        *cursor++ = self->entries[i]->value;
+        const PackFile_Annotations_Entry * const entry = self->entries[i];
+        *cursor++ = entry->bytecode_offset;
+        *cursor++ = entry->key;
+        *cursor++ = entry->value;
     }
 
     return cursor;
@@ -4270,11 +4273,12 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     self->keys     = mem_allocate_n_typed(self->num_keys, PackFile_Annotations_Key *);
 
     for (i = 0; i < self->num_keys; i++) {
-        self->keys[i]       = mem_allocate_typed(PackFile_Annotations_Key);
-        self->keys[i]->name = PF_fetch_opcode(seg->pf, &cursor);
-        self->keys[i]->type = PF_fetch_opcode(seg->pf, &cursor);
+        PackFile_Annotations_Key * const key =
+            self->keys[i] = mem_allocate_typed(PackFile_Annotations_Key);
+        key->name = PF_fetch_opcode(seg->pf, &cursor);
+        key->type = PF_fetch_opcode(seg->pf, &cursor);
         TRACE_PRINTF_VAL(("PackFile_Annotations_unpack: key[%d]/%d name=%s type=%d\n",
-              i, self->num_keys, self->keys[i]->name, self->keys[i]->type));
+              i, self->num_keys, key->name, key->type));
     }
 
     /* Unpack groups. */
@@ -4282,23 +4286,25 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     self->groups     = mem_allocate_n_typed(self->num_groups, PackFile_Annotations_Group *);
 
     for (i = 0; i < self->num_groups; i++) {
-        self->groups[i]                  = mem_allocate_typed(PackFile_Annotations_Group);
-        self->groups[i]->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
-        self->groups[i]->entries_offset  = PF_fetch_opcode(seg->pf, &cursor);
+        PackFile_Annotations_Group * const group =
+            self->groups[i] = mem_allocate_typed(PackFile_Annotations_Group);
+        group->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
+        group->entries_offset  = PF_fetch_opcode(seg->pf, &cursor);
         TRACE_PRINTF_VAL((
            "PackFile_Annotations_unpack: group[%d]/%d bytecode_offset=%d entries_offset=%d\n",
-           i, self->num_groups, self->groups[i]->bytecode_offset,
-           self->groups[i]->entries_offset));
+           i, self->num_groups, group->bytecode_offset,
+           group->entries_offset));
     }
 
     /* Unpack entries. */
     self->num_entries = PF_fetch_opcode(seg->pf, &cursor);
     self->entries     = mem_allocate_n_typed(self->num_entries, PackFile_Annotations_Entry *);
     for (i = 0; i < self->num_entries; i++) {
-        self->entries[i]                  = mem_allocate_typed(PackFile_Annotations_Entry);
-        self->entries[i]->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
-        self->entries[i]->key             = PF_fetch_opcode(seg->pf, &cursor);
-        self->entries[i]->value           = PF_fetch_opcode(seg->pf, &cursor);
+        PackFile_Annotations_Entry * const entry =
+            self->entries[i]   = mem_allocate_typed(PackFile_Annotations_Entry);
+        entry->bytecode_offset = PF_fetch_opcode(seg->pf, &cursor);
+        entry->key             = PF_fetch_opcode(seg->pf, &cursor);
+        entry->value           = PF_fetch_opcode(seg->pf, &cursor);
     }
 
     /* Need to associate this segment with the applicable code segment. */
@@ -4346,13 +4352,14 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     /* Dump keys. */
     Parrot_io_printf(interp, "\n  keys => [\n");
     for (i = 0; i < self->num_keys; i++) {
+        const PackFile_Annotations_Key * const key = self->keys[i];
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %Ss\n",
-                PF_CONST(self->code, self->keys[i]->name)->u.string);
+                PF_CONST(self->code, key->name)->u.string);
         Parrot_io_printf(interp, "        TYPE => %s\n",
-                self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_INT ? "integer" :
-                self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_STR ? "string" :
-                self->keys[i]->type == PF_ANNOTATION_KEY_TYPE_NUM ? "number" :
+                key->type == PF_ANNOTATION_KEY_TYPE_INT ? "integer" :
+                key->type == PF_ANNOTATION_KEY_TYPE_STR ? "string" :
+                key->type == PF_ANNOTATION_KEY_TYPE_NUM ? "number" :
                 "PMC");
         Parrot_io_printf(interp, "    ],\n");
     }
@@ -4362,11 +4369,12 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     /* Dump groups. */
     Parrot_io_printf(interp, "\n  groups => [\n");
     for (i = 0; i < self->num_groups; i++) {
+        const PackFile_Annotations_Group * const group = self->groups[i];
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
-                self->groups[i]->bytecode_offset);
+                group->bytecode_offset);
         Parrot_io_printf(interp, "        ENTRIES_OFFSET => %d\n",
-                self->groups[i]->entries_offset);
+                group->entries_offset);
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -4376,13 +4384,14 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     Parrot_io_printf(interp, "\n  entries => [\n");
 
     for (i = 0; i < self->num_entries; i++) {
+        const PackFile_Annotations_Entry * const entry = self->entries[i];
         Parrot_io_printf(interp, "    #%d\n    [\n", i);
         Parrot_io_printf(interp, "        BYTECODE_OFFSET => %d\n",
-                self->entries[i]->bytecode_offset);
+                entry->bytecode_offset);
         Parrot_io_printf(interp, "        KEY => %d\n",
-                self->entries[i]->key);
+                entry->key);
         Parrot_io_printf(interp, "        VALUE => %d\n",
-                self->entries[i]->value);
+                entry->value);
         Parrot_io_printf(interp, "    ],\n");
     }
 
@@ -4582,7 +4591,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
     if (key) {
         for (i = 0; i < self->num_keys; i++) {
-            STRING *test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
+            STRING * const test_key = PF_CONST(self->code, self->keys[i]->name)->u.string;
             if (Parrot_str_equal(interp, test_key, key)) {
                 key_id = i;
                 break;
@@ -4623,7 +4632,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 
         for (i = 0; i < self->num_keys; i++) {
             if (have_values[i]) {
-                STRING *key_name = PF_CONST(self->code, self->keys[i]->name)->u.string;
+                STRING * const key_name = PF_CONST(self->code, self->keys[i]->name)->u.string;
                 VTABLE_set_pmc_keyed_str(interp, result, key_name,
                         make_annotation_value_pmc(interp, self, self->keys[i]->type,
                                 latest_values[i]));
@@ -4676,10 +4685,10 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
         enum_runtime_ft file_type)
 {
     ASSERT_ARGS(compile_or_load_file)
-    char *filename = Parrot_str_to_cstring(interp, path);
+    char * const filename = Parrot_str_to_cstring(interp, path);
 
     if (file_type == PARROT_RUNTIME_FT_PBC) {
-        PackFile *pf = PackFile_append_pbc(interp, filename);
+        PackFile * const pf = PackFile_append_pbc(interp, filename);
         Parrot_str_free_cstring(filename);
 
         if (!pf)
