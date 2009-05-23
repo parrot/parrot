@@ -214,6 +214,9 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
         fprintf(stderr, "Parrot_io_open_win32: %s\n", spath);
     }
 #  endif
+    if (flags & PIO_F_PIPE)
+        return Parrot_io_open_pipe_win32(interp, filehandle, path, flags);
+
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         return NULL;
 
