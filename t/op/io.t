@@ -92,12 +92,12 @@ OUTPUT
 }
 
 TODO: {
-local $TODO = 'Unimplemented in this platform, TT #661' unless $^O =~ /linux|darwin/;
+local $TODO = 'Unimplemented in this platform, TT #661' unless $^O =~ /linux|darwin|MSWin32/;
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'open pipe for writing' );
 .include 'iglobals.pasm'
 
-.sub testreadpipe :main
+.sub testwritepipe :main
   .local pmc interp
   interp = getinterp
   .local pmc conf
