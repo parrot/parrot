@@ -23,6 +23,7 @@ from there.
 
 */
 
+#include "pmc_object.h"
 #define UNDEF_STRING_CLASS enum_class_String
 
 pmclass Undef no_ro {
@@ -39,8 +40,15 @@ appropriate type.
 */
 
     VTABLE void set_pmc(PMC *other) {
-        pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
-        VTABLE_set_pmc(INTERP, SELF, other);
+        if (!PObj_is_object_TEST(other)) {
+            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
+            VTABLE_set_pmc(INTERP, SELF, other);
+        }
+        else {
+            PMC * const class = PARROT_OBJECT(other)->_class;
+            pmc_reuse_by_class(INTERP, SELF, class, PObj_is_object_FLAG);
+            Parrot_oo_clone_object(interp, other, class, SELF);
+        }
     }
 
 /*
@@ -55,9 +63,6 @@ appropriate type.
 */
 
     VTABLE void assign_pmc(PMC *other) {
-        if (!PObj_is_object_TEST(other))
-            pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
-
         /* don't want to call set_pmc if we're assigning an Undef to an Undef */
         if (other->vtable->base_type != enum_class_Undef)
             VTABLE_set_pmc(INTERP, SELF, other);

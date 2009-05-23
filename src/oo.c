@@ -23,6 +23,7 @@ Handles class and object manipulation.
 #include "parrot/parrot.h"
 #include "parrot/oo_private.h"
 #include "pmc/pmc_class.h"
+#include "pmc/pmc_object.h"
 
 #include "oo.str"
 
@@ -248,6 +249,112 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
     return classobj;
 }
 
+/*
+
+=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC * pmc, PMC * class, PMC
+* dest)>
+
+Clone an Object PMC. If an existing PMC C<dest> is provided, reuse that
+PMC to store copies of the data. Otherwise, create a new PMC and populate
+that with the data.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
+    ARGMOD_NULLOK(PMC * class), ARGMOD_NULLOK(PMC * dest))
+{
+    ASSERT_ARGS(Parrot_oo_clone_object)
+    Parrot_Object_attributes * obj;
+    Parrot_Class_attributes  * _class;
+    int num_classes;
+    PMC * cloned;
+    Parrot_Object_attributes * cloned_guts;
+    INTVAL i, num_attrs;
+
+    if (!PMC_IS_NULL(dest)) {
+        PARROT_ASSERT(!PMC_IS_NULL(class));
+        PARROT_ASSERT(class->vtable->base_type == enum_class_Class);
+        obj = (Parrot_Object_attributes *)
+            Parrot_oo_new_object_attrs(interp, class);
+        cloned = dest;
+    }
+    else {
+        obj = PARROT_OBJECT(pmc);
+        cloned = pmc_new_noinit(interp, enum_class_Object);
+    }
+    _class = PARROT_CLASS(obj->_class);
+    PARROT_ASSERT(_class);
+    num_classes = VTABLE_elements(interp, _class->all_parents);
+
+    /* Set custom GC mark and destroy on the object. */
+    PObj_custom_mark_SET(cloned);
+    PObj_active_destroy_SET(cloned);
+
+    /* Flag that it is an object */
+    PObj_is_object_SET(cloned);
+
+    /* Now create the underlying structure, and clone attributes list.class. */
+    cloned_guts               = mem_allocate_zeroed_typed(Parrot_Object_attributes);
+    cloned_guts->_class       = obj->_class;
+    cloned_guts->attrib_store = VTABLE_clone(interp, obj->attrib_store);
+    PMC_data(cloned)          = cloned_guts;
+    num_attrs                 = VTABLE_elements(interp, cloned_guts->attrib_store);
+    for (i = 0; i < num_attrs; i++) {
+        PMC * const to_clone = VTABLE_get_pmc_keyed_int(interp, cloned_guts->attrib_store, i);
+        if (!PMC_IS_NULL(to_clone)) {
+            VTABLE_set_pmc_keyed_int(interp, cloned_guts->attrib_store, i,
+                    VTABLE_clone(interp, to_clone));
+        }
+    }
+
+    /* Some of the attributes may have been the PMCs providing storage for any
+     * PMCs we inherited from; also need to clone those. */
+    if (CLASS_has_alien_parents_TEST(obj->_class)) {
+        /* Locate any PMC parents. */
+        for (i = 0; i < num_classes; i++) {
+            PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
+            if (cur_class->vtable->base_type == enum_class_PMCProxy) {
+                /* Clone this PMC too. */
+                STRING * const proxy = CONST_STRING(interp, "proxy");
+                VTABLE_set_attr_keyed(interp, cloned, cur_class, proxy,
+                    VTABLE_clone(interp,
+                        VTABLE_get_attr_keyed(interp, cloned, cur_class, proxy)));
+            }
+        }
+    }
+
+    /* And we have ourselves a clone. */
+    return cloned;
+}
+
+/*
+
+=item C<void * Parrot_oo_new_object_attrs(PARROT_INTERP, PMC * class)>
+
+Create a new C<Parrot_Object_attributes> structure, which is the thing that
+holds data for an Object PMC. We need this for places where a new Object
+is being created without being instantiated by it's associated class, such
+as in C<Parrot_oo_clone_object>.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+void *
+Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class))
+{
+    ASSERT_ARGS(Parrot_oo_new_object_attrs)
+    Parrot_Object_attributes * const obj_guts =
+        mem_allocate_zeroed_typed(Parrot_Object_attributes);
+    obj_guts->_class       = class;
+    obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
+    return (void *)obj_guts;
+}
 
 /*
 
