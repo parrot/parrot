@@ -840,7 +840,7 @@ Used to unarchive the string.
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            SELF.set_string_native(VTABLE_shift_string(INTERP, io));
+            SET_ATTR_str_val(INTERP, SELF, VTABLE_shift_string(INTERP, io));
     }
 /*
 
