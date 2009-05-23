@@ -398,7 +398,7 @@ Read a line from the filehandle and return it in a string.
     METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
         STRING *string_result = NULL;
 #ifdef PARROT_HAS_READLINE
-        char * const r = readline(got_prompt ? prompt->strstart : NULL);
+    char * const r = readline(got_prompt ? prompt->strstart : NULL);
 
         if (r) {
             if (*r)
