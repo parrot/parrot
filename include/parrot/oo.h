@@ -134,11 +134,11 @@ void mark_object_cache(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_oo_clone_object(PARROT_INTERP,
     ARGIN(PMC * pmc),
-    ARGMOD_NULLOK(PMC * class),
+    ARGMOD_NULLOK(PMC * class_),
     ARGMOD_NULLOK(PMC * dest))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        FUNC_MODIFIES(* class)
+        FUNC_MODIFIES(* class_)
         FUNC_MODIFIES(* dest);
 
 void Parrot_oo_extract_methods_from_namespace(PARROT_INTERP,
@@ -172,7 +172,7 @@ PMC * Parrot_oo_get_namespace(SHIM_INTERP, ARGIN(const PMC *classobj))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-void * Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class))
+void * Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -250,7 +250,7 @@ INTVAL Parrot_oo_register_type(PARROT_INTERP,
        PARROT_ASSERT_ARG(classobj)
 #define ASSERT_ARGS_Parrot_oo_new_object_attrs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(class)
+    || PARROT_ASSERT_ARG(class_)
 #define ASSERT_ARGS_Parrot_oo_newclass_from_str __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(name)

@@ -45,9 +45,9 @@ appropriate type.
             VTABLE_set_pmc(INTERP, SELF, other);
         }
         else {
-            PMC * const class = PARROT_OBJECT(other)->_class;
-            pmc_reuse_by_class(INTERP, SELF, class, PObj_is_object_FLAG);
-            Parrot_oo_clone_object(interp, other, class, SELF);
+            PMC * const class_ = PARROT_OBJECT(other)->_class;
+            pmc_reuse_by_class(INTERP, SELF, class_, PObj_is_object_FLAG);
+            Parrot_oo_clone_object(interp, other, class_, SELF);
         }
     }
 

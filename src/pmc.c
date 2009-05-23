@@ -188,7 +188,7 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 
 /*
 
-=item C<PMC * pmc_reuse_by_class(PARROT_INTERP, PMC * pmc, PMC * class, UINTVAL
+=item C<PMC * pmc_reuse_by_class(PARROT_INTERP, PMC * pmc, PMC * class_, UINTVAL
 flags)>
 
 Reuse an existing PMC. Convert it to the type specified by the given Class
@@ -204,11 +204,11 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC *
-pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC * pmc), ARGIN(PMC * class),
+pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC * pmc), ARGIN(PMC * class_),
     UINTVAL flags)
 {
     ASSERT_ARGS(pmc_reuse_by_class)
-    const INTVAL new_type = PARROT_CLASS(class)->id;
+    const INTVAL new_type = PARROT_CLASS(class_)->id;
     VTABLE * const new_vtable = interp->vtables[new_type];
     INTVAL new_flags = flags;
 

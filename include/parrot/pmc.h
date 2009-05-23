@@ -89,7 +89,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC * pmc_reuse_by_class(PARROT_INTERP,
     ARGMOD(PMC * pmc),
-    ARGIN(PMC * class),
+    ARGIN(PMC * class_),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -150,7 +150,7 @@ PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 #define ASSERT_ARGS_pmc_reuse_by_class __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc) \
-    || PARROT_ASSERT_ARG(class)
+    || PARROT_ASSERT_ARG(class_)
 #define ASSERT_ARGS_pmc_type __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_pmc_type_p __attribute__unused__ int _ASSERT_ARGS_CHECK = \

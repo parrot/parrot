@@ -251,7 +251,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC * pmc, PMC * class, PMC
+=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC * pmc, PMC * class_, PMC
 * dest)>
 
 Clone an Object PMC. If an existing PMC C<dest> is provided, reuse that
@@ -265,7 +265,7 @@ that with the data.
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
-    ARGMOD_NULLOK(PMC * class), ARGMOD_NULLOK(PMC * dest))
+    ARGMOD_NULLOK(PMC * class_), ARGMOD_NULLOK(PMC * dest))
 {
     ASSERT_ARGS(Parrot_oo_clone_object)
     Parrot_Object_attributes * obj;
@@ -276,10 +276,10 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
     INTVAL i, num_attrs;
 
     if (!PMC_IS_NULL(dest)) {
-        PARROT_ASSERT(!PMC_IS_NULL(class));
-        PARROT_ASSERT(class->vtable->base_type == enum_class_Class);
+        PARROT_ASSERT(!PMC_IS_NULL(class_));
+        PARROT_ASSERT(class_->vtable->base_type == enum_class_Class);
         obj = (Parrot_Object_attributes *)
-            Parrot_oo_new_object_attrs(interp, class);
+            Parrot_oo_new_object_attrs(interp, class_);
         cloned = dest;
     }
     else {
@@ -333,7 +333,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
 
 /*
 
-=item C<void * Parrot_oo_new_object_attrs(PARROT_INTERP, PMC * class)>
+=item C<void * Parrot_oo_new_object_attrs(PARROT_INTERP, PMC * class_)>
 
 Create a new C<Parrot_Object_attributes> structure, which is the thing that
 holds data for an Object PMC. We need this for places where a new Object
@@ -346,12 +346,12 @@ as in C<Parrot_oo_clone_object>.
 
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class))
+Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
 {
     ASSERT_ARGS(Parrot_oo_new_object_attrs)
     Parrot_Object_attributes * const obj_guts =
         mem_allocate_zeroed_typed(Parrot_Object_attributes);
-    obj_guts->_class       = class;
+    obj_guts->_class       = class_;
     obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
     return (void *)obj_guts;
 }
