@@ -101,18 +101,16 @@ Initialize PackfileDirectory from PackFile_Directory.
 
     VTABLE void set_pointer(void *ptr) {
         const PackFile_Directory * const pfd = (const PackFile_Directory *)ptr;
-        PackFile_Segment *pfseg;
-        PMC              *segment;
-        int              pmc_type;
-        unsigned int     i;
-        STRING           *name;
-        PMC              *hash = PARROT_PACKFILEDIRECTORY(SELF)->hash;
+        size_t i;
 
         SUPER(ptr);
 
         /* Iterate over elements and create corresponded PMCs */
         for (i=0; i < pfd->num_segments; ++i) {
-            pfseg = pfd->segments[i];
+            PackFile_Segment * const pfseg = pfd->segments[i];
+            int     pmc_type;
+            PMC     *segment;
+            STRING  *name;
 
             switch (pfseg->type) {
                 case PF_DIR_SEG:
@@ -158,20 +156,16 @@ Creates PackFile for given directory.
     VTABLE void *get_pointer() {
         Parrot_PackfileDirectory_attributes * attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
-        PackFile           * pf = PackFile_new(interp, 0); /* dummy PackFile... */
-        PackFile_Directory * pfdir = &pf->directory;
-        PackFile_Segment   * pfseg;
-        PMC                * seg;
-        PMC                * iter;
-        STRING             * name;
-        STRING             * res;
+        PackFile           * const pf    = PackFile_new(interp, 0); /* dummy PackFile... */
+        PackFile_Directory * const pfdir = &pf->directory;
+        PMC                * const iter  = VTABLE_get_iter(interp, attrs->hash);
 
         /* Create Segments. Add to Directory with transfering ownership */
-        iter = VTABLE_get_iter(interp, attrs->hash);
         while (VTABLE_get_bool(interp, iter)) {
-            name  = VTABLE_shift_string(interp, iter);
-            seg   = VTABLE_get_pmc_keyed_str(interp, attrs->hash, name);
-            pfseg = (PackFile_Segment*)VTABLE_get_pointer(interp, seg);
+            STRING           * const name  = VTABLE_shift_string(interp, iter);
+            PMC              * const seg   = VTABLE_get_pmc_keyed_str(interp, attrs->hash, name);
+            PackFile_Segment * const pfseg = (PackFile_Segment *)VTABLE_get_pointer(interp, seg);
+
             pfseg->pf   = pf;
             pfseg->name = strdup(Parrot_string_cstring(interp, name));
             PackFile_add_segment(interp, pfdir, pfseg);
@@ -233,7 +227,7 @@ Fetch a keyed string value from the packfiledirectory object.
 
 */
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        STRING *s_key = VTABLE_get_string(interp, key);
+        STRING * const s_key = VTABLE_get_string(interp, key);
         return VTABLE_get_pmc_keyed_str(interp,
                 PARROT_PACKFILEDIRECTORY(SELF)->hash, s_key);
     }
@@ -271,7 +265,7 @@ set_pmc_keyed_str.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *segment)  {
-        STRING *s_key = VTABLE_get_string(interp, key);
+        STRING * const s_key = VTABLE_get_string(interp, key);
         VTABLE_set_pmc_keyed_str(interp, SELF, s_key, segment);
     }
 
@@ -286,7 +280,6 @@ Delete the specified segment from the directory.
 */
 
     VTABLE void delete_keyed(PMC *key) {
-        STRING *s_key = VTABLE_get_string(interp, key);
         VTABLE_delete_keyed(interp,
             PARROT_PACKFILEDIRECTORY(SELF)->hash, key);
     }
