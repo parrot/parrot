@@ -3,73 +3,94 @@
 =head1 Grammar Actions
 
 Protofunction signatures aren't the only way to apply functions to rules
-matched by the parser. In fact, they might be the most primitive because
-they use PIR code to implement the operator logic. Another way has been made
-available, by programming function actions in a language that's almost, but
-Not Quite Perl (NQP).
+matched by a parser.  They may be the most primitive way to do so, at least if
+you write them in PIR.  There's an easier way to write rules: in a language
+that's almost, but Not Quite Perl.
 
-NQP is a small language that's implemented as a subset of Perl 6 syntax and
-semantics. It was originally developed as a bootstrapping tool to help allow
-the Rakudo Perl 6 compiler to be written in Perl 6 itself. It has since been
-used to implement many other compilers on Parrot as well, and has become a
-permanent member of the Parrot Compiler Toolkit (PCT).
+X<NQP>
+X<Not Quite Perl>
+NQP (Not Quite Perl) is a small language which offers a subset of Perl 6's
+syntax and semantics. Though it originated as a bootstrapping tool for the
+Rakudo Perl 6 compiler, several other Parrot-based compilers use it.  It has
+become a permanent member of PCT.
 
-NQP represents almost the smallest subset of the Perl 6 language necessary
-to implement the logic of a parser, although some developers have complained
-enough to get a few extra syntactic features added in above the bare minimum.
-NQP also happens to be a Perl 6 subset that's not entirely dissimilar from
-Perl 5, so Perl 5 programmers should not be too lost when using it.
+NQP contains the smallest subset of the Perl 6 language necessary to implement
+parser transformations, plus a few syntactic convenience features. NQP's Perl 6
+subset shows its Perl 5 roots, so existing Perl 5 programmers should find much
+of it familiar.
 
 =head2 NQP Basics
 
+=for author
+
+This section is odd; it starts by telling how NQP doesn't work instead of
+telling how it does.  Differences from Perl 5 may be more appropriate later.
+
+=end for
+
+X<sigils>
+X<scalar>
 Like all flavors and versions of Perl, NQP uses special prefix symbols called
-I<sigils> to differentiate different types of variables. The C<$> sigil is used
-for scalars, C<@> is used for arrays, and C<%> is used for hashes N<Perl 6
-aficionados will know that this isn't entirely true, but an in-depth look at
-Perl 6's context awareness is another topic for another book>. A "scalar" is
-really any single value, and can interchangeably be given a string value, or an
-integer value, or an object reference. In NQP we can write things like this:
+I<sigils> to distinguish variable types. The C<$> sigil represents scalars,
+C<@> arrays, and C<%> for hashes.  A scalar any single value which can
+interchangeably contain given a string value, an integer value, or an object
+reference. Simple NQP assignments are:
 
  $scalar := "This is a string"
  $x      := 123
  $pi     := 3.1415      # rounding
 
-Wait a minute, what's that weird C<:=> symbol? Why don't we just use the
-plain old vanilla C<=> sign? The problem is that I<NQP doesn't have it>.
-Remember how we mentioned that NQP was a minimal subset or Perl 6? The
-C<:=> operator is the I<bind> operator, that makes one value an alias
-C<C programmers and the like may call it a "reference"> for another. In
-most cases you can ignore the distinction between the two, but be warned
-that it's not a regular variable assignment.
+X<bind operator>
+X<operators; binding>
+X<=:>
+This example shows the first divergence from familar Perl 5 syntax.  Why not
+use the plain C<=> sign for assignment? I<NQP doesn't have it>.  The C<:=>, or
+I<bind> operator, makes one value an alias for another. In most cases you can
+ignore the distinction between the two, but it's not quite the same as regular
+variable assignment.
 
-With hashes and arrays, it might be tempting to do a list assignment like
-we've all grown familiar with in Perl 5 and other dynamic languages:
+=for author
+
+What I<is> it then, and why is it here?
+
+=end for
+
+Hash and array assignment is easy in Perl 5 and other languages, but it's
+different in NQP:
 
  @small_integers := (1, 2, 3, 4);                      # WRONG!
  %leading_ladies := ("Trillian" => "Hitchhikers Guide",
-                    "Leia" => "Starwars");             # WRONG!
+                     "Leia"     => "Star Wars");       # WRONG!
 
-Here's another little gotcha, NQP doesn't have list or hash context! If
-it's necessary to initialize a whole list at once, you can write:
+I<NQP doesn't have list or hash context!> To initialize a whole list at once,
+write:
 
  @small_integers[0] := 1;
  @small_integers[1] := 2;
  # ... And so on, and so forth ...
 
-It's also possible to assign a list in I<scalar context> as follows:
+=for author
+
+What does this I<mean>?  Also, the example and its description conflate "list"
+and "array", which is terribly confusing in Perl 5.
+
+=end for
+
+It's also possible to assign a list in I<scalar context>:
 
  $array_but_a_scalar := (1, 2, 3, 4)
 
-Or, you could write a new function in PIR to create a new array from a
-variadic argument list:
+Or you could write a new function in PIR to create a new array from a variadic
+argument list:
 
  @my_array := create_new_array(1, 2, 3, 4)
 
-Which calls the PIR function:
+... which calls the PIR function:
 
 =begin PIR
 
  .namespace []
+
  .sub 'create_new_array'
      .param pmc elems :slurpy
      .return(elems)
@@ -77,24 +98,22 @@ Which calls the PIR function:
 
 =end PIR
 
-Remember how we said NQP was a bare-bones subset of Perl 6? It really doesn't
-have a lot of features that programmers might expect. In this chapter we will
-talk about some of the features and capabilities that it does have.
-
 =head3 Calling Actions From Rules
 
-When talking about grammar rules, we discussed the funny little C<{*}>
-symbol that calls an action. The action in question is an NQP method
-with the same name as the rule that calls it. NQP rules can be called
-with two different function signatures:
+=for editor
 
- method name ($/) { ... }
+Needs a link to that section.
 
-And with a key:
+=end for
 
+As mentioned in the chapter on grammar rules, the funny little C<{*}> symbol
+calls an action. The action in question is an NQP method with the same name as
+the rule that calls it. NQP rules can have two different signatures:
+
+ method name ($/)      { ... }
  method name($/, $key) { ... }
 
-Here's an example that shows how the keys are used:
+Where does the key come from?  Consider this grammar:
 
  rule cavepeople {
       'Fred'  {*}    #= Caveman
@@ -102,7 +121,7 @@ Here's an example that shows how the keys are used:
     | 'Dino'  {*}    #= Dinosaur
  }
 
-And here is the rule that tells us the result:
+The C<cavepeople> rule demonstrates the result:
 
  method cavepeople($/, $key) {
     if $key eq 'Caveman' {
@@ -114,75 +133,86 @@ And here is the rule that tells us the result:
     }
  }
 
-The key is just a string that contains whatever text is on the line after
-the C<#=> symbol. If we don't have a C<#=> we don't use a C<$key> in our
-method. If you attempt to use one without the other, the NQP compiler will
-die with error messages about mismatched argument/parameter numbers.
+The key is a string that contains whatever any text following the C<#=> symbol.
+Without a C<#=> following the rule invocation, there's no C<$key> to use in the
+method.  If you attempt to use one without the other, the NQP compiler will die
+with error messages about mismatched argument/parameter numbers.
 
 =head3 The Match Object C<$/>
 
-The match object C<$/> may have a funny-looking name, but it's a data
-structure that's all business. It's both a hash and an array. Plus,
-since it's a special variable it also gets a special shortcut syntax
-that can be used to save a few keystrokes:
+X<match object>
+X<$/>
+The match object C<$/> it's a data structure that's all business: it's both a
+hash and an array. Because it's a special variable used pervasively in PCT, it
+has a special shortcut syntax:
 
- $/{'Match_item'}   is the same as  $<Match_item>
- $/[0]              is the same as  $[0]
+ $/{'Match_item'}   is the same as $<Match_item>
+ $/[0]              is the same as $[0]
 
-In the match object, each item in the hash is named after one of the items
-that we matched in the rule. So, if we have a file with input "C<X + 5>"
-and a rule:
+Each key in the match object's hash is the name of a matched rule.  Given a
+file containing "C<X + 5>" and a rule:
 
  rule introductions {
     <variable> <operator> <number>
  }
 
-Our match object is going to look like this: C<$/ = ("variable" => "x",
-"operator" => "+", "number" => "5")>
+The resulting match object will contain the key/value pairs:
 
-If we have multiple values with the same name, or items with quantifiers
-C<*> or C<+> on it, those members of the match object may be arrays. So,
-if we have the input "A A A B B", and the following rule:
+ "variable" => "x"
+ "operator" => "+"
+ "number"   => "5"
+
+When the match contains multiple values with the same name, or when rules have
+quantifiers such as C<*> or C<+>, the values in the hash may be arrays.  Given
+the input "A A A B B" and the rule:
 
  rule letters {
     <vowel>* <consonant>*
  }
 
-The match object will look like this (in Perl 5 syntax):
+The match object will contain the pairs:
 
- $/ = ("vowel" => ["A", "A", "A"], "consonant" => ["B", "B"])
+ "vowel"     => ["A", "A", "A"]
+ "consonant" => ["B", "B"]
 
-We can get the number of matches in each group by casting it to a scalar
-using the C<$( )> operator:
+X<$( ) operator>
+
+Use the C<$( )> operator to count the number of matches in each group (by
+casting it to a scalar):
 
  $($<vowel>) == 3
 
 =head3 Inline PIR
 
-Now that we know what the match object is, we can talk about the inline
-PIR functionality. In a PGE rule, we can use the C<{{ }}> double curly
-brackets to go into inline-PIR mode. Inside these brackets arbitrary
-PIR code can be executed to affect the operation of the parser. We can
-access the variable C<$/> directly in the grammar without having to
-jump into NQP, and actually examine and affect the values in it.
+=for author
+
+Needs expansion.
+
+=end for
+
+X<{{ }}>
+X<double curly brackets>
+Sometimes NQP isn't quite flexible enough to handle transforms appropriately.
+In a PGE rule, the C<{{ }}> double curly brackets demarcate inline-PIR mode.
+PGE will execute any PIR code in those brackets. You can access C<$/> directly
+in the grammar without having to jump into NQP.
 
 =head3 PAST Nodes
 
-The job of NQP is to make abstract syntax trees, and the PCT implementation
-of syntax trees is implemented in the PAST class. There are many different
-types of objects in the PAST class, each of which represents a
-particular program construct. These constructs are relatively common and
-simple, but there are powerful levels of configuration that allow complicated
-programming structures to be represented.
+X<PAST>
+X<PAST nodes>
+NQP's job is to make abstract syntax trees.  These trees are all objects -- and
+as such, instances of PAST nodes.  Each PAST class represents a unique program
+construct.  These constructs are common and simple, but combine to represent
+complicated programming structures.
 
 =head3 Making Trees
 
-Every action has the ability to create a PAST node that represents that
-action N<and additional PAST nodes, that are children of that node>. Calling
-the C<make> command on that node adds it into the growing PAST tree that
-PCT maintains. Once the C<TOP> rule matches successfully and returns,
-PCT takes that tree and starts the process of optimizing it and converting
-it into PIR and PBC code for execution.
+Every action has the ability to create a PAST node that represents that action,
+as well as any children of that node. Calling C<make> on that node adds it into
+the growing PAST tree that PCT maintains. Once the C<TOP> rule matches
+successfully and returns, PCT optimizes and converts that tree into PIR and PBC
+for execution.
 
 =cut
 
