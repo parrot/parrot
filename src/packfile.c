@@ -4049,8 +4049,6 @@ PackFile_Constant_unpack_key(PARROT_INTERP, ARGIN(PackFile_ConstTable *constt),
         else
             head = tail = constant_pmc_new(interp, pmc_enum);
 
-        VTABLE_init(interp, tail);
-
         op = PF_fetch_opcode(pf, &cursor);
 
         switch (type) {
