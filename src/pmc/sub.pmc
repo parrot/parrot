@@ -394,18 +394,19 @@ Creates and returns a clone of the subroutine.
 */
 
     VTABLE PMC *clone() {
+        PMC        * const ret = pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_sub *dest_sub;
-        Parrot_sub * const sub = mem_allocate_typed(Parrot_sub);
-        PMC * const ret = pmc_new(INTERP, SELF->vtable->base_type);
+        Parrot_sub *sub;
 
         /* we have to mark it ourselves */
         PObj_custom_mark_destroy_SETALL(ret);
 
         /* first set the sub struct, Parrot_str_copy may cause GC */
-        SET_ATTR_sub(INTERP, ret, sub);
+        PMC_get_sub(INTERP, ret, sub);
         PMC_get_sub(INTERP, SELF, dest_sub);
         *sub = *dest_sub;
-        if (sub->name != NULL)
+
+        if (sub->name)
             sub->name = Parrot_str_copy(INTERP, sub->name);
 
         /* Be sure not to share arg_info. */
