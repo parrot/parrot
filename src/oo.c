@@ -1441,10 +1441,10 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             if (!PMC_IS_NULL(cur_entry) && VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub"))) {
                 /* Class already has a multi-sub; need to merge our methods into it. */
                 const INTVAL num_subs = VTABLE_elements(interp, cur_method);
-                INTVAL i;
-                for (i = 0; i < num_subs; i++)
+                INTVAL j;
+                for (j = 0; j < num_subs; j++)
                     VTABLE_push_pmc(interp, cur_entry, VTABLE_get_pmc_keyed_int(interp,
-                            cur_method, i));
+                            cur_method, j));
             }
             else {
                 /* It's not, and we didn't conflict so must be no entry. Just stick it in. */
