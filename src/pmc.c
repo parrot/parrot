@@ -537,16 +537,20 @@ constant_pmc_new_init(PARROT_INTERP, INTVAL base_type, ARGIN_NULLOK(PMC *init))
 
 =item C<PMC * temporary_pmc_new(PARROT_INTERP, INTVAL base_type)>
 
-Creates a new temporary PMC of type C<base_type>, the call C<init>.  B<You> are
-responsible for freeing this PMC when it goes out of scope with
-C<free_temporary_pmc()>.  B<Do not> store this PMC in any other PMCs, or allow
-it to be stored.  B<Do not> store any regular PMC in this PMC, or allow the
-storage of any regular PMC in this PMC.
+Creates a new temporary PMC of type C<base_type>, then call C<init>. Cannot
+be used to create PMC Objects which have been defined from PIR.
 
-If you don't know what this means means, or you can't tell if either case will
-happen as the result of any call you make on or with this PMC, B<DO NOT> use
-this function, lest you cause weird crashes and memory errors.  Use
-C<pmc_new()> instead.
+B<You> are responsible for freeing this PMC when it goes out of scope with
+C<free_temporary_pmc()>.  B<Do not> store this PMC in any other PMCs, or
+allow it to be stored.  B<Do not> store any regular PMC in this PMC, or
+allow the storage of any regular PMC in this PMC. Temporary PMCs do not
+participate in garbage collection, and mixing them with PMCs that are
+garbage-collected will cause bugs.
+
+If you don't know what this means means, or you can't tell if either case
+will happen as the result of any call you make on or with this PMC,
+B<DO NOT> use this function, lest you cause weird crashes and memory errors.
+Use C<pmc_new()> instead.
 
 (Why do these functions even exist?  Used judiciously, they can reduce GC
 pressure in hotspots tremendously.  If you haven't audited the code carefully
@@ -554,7 +558,8 @@ pressure in hotspots tremendously.  If you haven't audited the code carefully
 never B<ever> add C<PARROT_EXPORT> to either function.)
 
 =cut
-
+    if(PObj_active_destroy_TEST(pmc))
+        VTABLE_destroy(interp, pmc);=
 */
 
 PARROT_CANNOT_RETURN_NULL
@@ -571,10 +576,10 @@ temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
 
 =item C<void temporary_pmc_free(PARROT_INTERP, PMC *pmc)>
 
-Frees a new temporary PMC created by C<temporary_pmc_new()>.  Do not call this
-with any other type of PMC.  Do not forget to call this (or you'll leak PMCs).
-Read and I<understand> the warnings for C<temporary_pmc_new()> before you're
-tempted to use this.
+Frees a new temporary PMC created by C<temporary_pmc_new()>.  Do not call
+this with any other type of PMC.  Do not forget to call this (or you'll leak
+PMCs). Read and I<understand> the warnings for C<temporary_pmc_new()> before
+you're tempted to use this.
 
 =cut
 
