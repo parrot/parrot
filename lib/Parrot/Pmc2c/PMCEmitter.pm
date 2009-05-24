@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -22,15 +22,15 @@ C<Parrot::Pmc2c::PMCEmitter> is used by F<tools/build/pmc2c.pl> to generate C co
 package Parrot::Pmc2c::PMC;
 use strict;
 use warnings;
-use Parrot::Pmc2c::Emitter;
-use Parrot::Pmc2c::Method;
-use Parrot::Pmc2c::MethodEmitter;
+use Parrot::Pmc2c::Emitter ();
+use Parrot::Pmc2c::Method ();
+use Parrot::Pmc2c::MethodEmitter ();
 use Parrot::Pmc2c::UtilFunctions qw( dont_edit dynext_load_code c_code_coda );
 use Text::Balanced 'extract_bracketed';
-use Parrot::Pmc2c::PCCMETHOD;
-use Parrot::Pmc2c::MULTI;
-use Parrot::Pmc2c::PMC::RO;
-use Parrot::Pmc2c::PMC::ParrotClass;
+use Parrot::Pmc2c::PCCMETHOD ();
+use Parrot::Pmc2c::MULTI ();
+use Parrot::Pmc2c::PMC::RO ();
+use Parrot::Pmc2c::PMC::ParrotClass ();
 
 sub prep_for_emit {
     my ( $this, $pmc, $vtable_dump ) = @_;
@@ -372,21 +372,20 @@ sub gen_attributes {
     my ($self)     = @_;
     my $attributes = $self->attributes;
 
-    if ( @$attributes ) {
+    if ( @{$attributes} ) {
 
         Parrot::Pmc2c::Attribute::generate_start( $attributes->[0], $self );
 
-        foreach my $attribute ( @$attributes ) {
+        foreach my $attribute ( @{$attributes} ) {
             $attribute->generate_declaration($self);
         }
 
         Parrot::Pmc2c::Attribute::generate_end( $attributes->[0], $self );
 
-        foreach my $attribute ( @$attributes ) {
+        foreach my $attribute ( @{$attributes} ) {
             $attribute->generate_accessor($self);
         }
     }
-
 }
 
 =item C<find_multi_functions()>
@@ -620,7 +619,7 @@ EOC
     my $flags = $self->vtable_flags;
     $cout .= <<"EOC";
         Hash    *isa_hash  = NULL;
-        VTABLE  *vt        = Parrot_${classname}_get_vtable(interp);
+        VTABLE * const vt  = Parrot_${classname}_get_vtable(interp);
         vt->base_type      = $enum_name;
         vt->flags          = $flags;
         vt->attribute_defs = attr_defs;
@@ -709,8 +708,7 @@ EOC
 
         {
             /* Register this PMC as a HLL mapping */
-            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll")
-            );
+            const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "$hll"));
             if (pmc_id > 0) {
 EOC
         foreach my $maps ( sort keys %{ $self->{flags}{maps} } ) {
