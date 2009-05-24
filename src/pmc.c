@@ -42,11 +42,6 @@ static PMC * get_new_pmc_header(PARROT_INTERP,
     UINTVAL flags)
         __attribute__nonnull__(1);
 
-static void pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
-
 static INTVAL pmc_reuse_check_pmc_ext(PARROT_INTERP,
     ARGMOD(PMC * pmc),
     INTVAL newflags,
@@ -61,9 +56,6 @@ static INTVAL pmc_reuse_check_pmc_ext(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_get_new_pmc_header __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
-#define ASSERT_ARGS_pmc_free __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pmc)
 #define ASSERT_ARGS_pmc_reuse_check_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pmc)
@@ -593,27 +585,6 @@ temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(temporary_pmc_free)
     Parrot_gc_free_pmc_header(interp, pmc);
-}
-
-/*
-
-=item C<static void pmc_free(PARROT_INTERP, PMC *pmc)>
-
-Free the given PMC. This function does not call the custom destroy VTABLE if
-one is specified for PMCs of that type (should it?).
-
-TT #663: As of r38727, this function is not called from anywhere
-
-=cut
-
-*/
-
-static void
-pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
-{
-    ASSERT_ARGS(pmc_free)
-    Parrot_gc_free_pmc_header(interp, pmc);
-
 }
 
 /*
