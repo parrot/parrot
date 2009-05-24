@@ -1459,12 +1459,10 @@ BUILDTOOLS_TEST_FILES := \
     $(REVISIONUTILS_DIR)/*.t \
     $(HARNESS_DIR)/*.t
 MANIFEST_DIR := t/manifest
+INSTALL_TOOLS_DIR := t/tools/install
 MANIFEST_TEST_FILES := \
-    $(MANIFEST_DIR)/01-basic.t \
-    $(MANIFEST_DIR)/02-regenerate_file.t \
-    $(MANIFEST_DIR)/03-regenerate_skip.t \
-    $(MANIFEST_DIR)/04-alt_file.t \
-    $(MANIFEST_DIR)/05-alt_skip.t
+    $(MANIFEST_DIR)/*.t \
+    $(INSTALL_TOOLS_DIR)/*.t
 EXAMPLES_TEST_FILES := \
     t/examples/*.t
 CONFIGURE_TEST_FILES := \

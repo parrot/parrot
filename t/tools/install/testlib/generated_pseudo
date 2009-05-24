@@ -1,0 +1,9 @@
+# $Id$
+# See tools/dev/install_files.pl for documentation on the
+# format of this file.
+# Please re-sort this file after *EVERY* modification
+install_config.fpmc                               [main]lib
+parrot.pc                                         [main]pkgconfig
+# Local variables:
+#   mode: text
+# End:
