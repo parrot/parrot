@@ -93,6 +93,10 @@ address of the PMC. Uses of get_addr and set_addr that would set label values
 for Sub, Exception, and related PMC types will instead be handled by
 get_label and set_label.
 
+=item C<bsr>, C<jsr>, and C<ret> [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/702>
+
 =back
 
 =head1 Bytecode
@@ -231,6 +235,30 @@ L<https://trac.parrot.org/parrot/ticket/625>
 =item pobject_lives [eligible in 1.5]
 
 L<https://trac.parrot.org/parrot/ticket/664>
+
+=item functions in src/stack.c [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/702>
+Here is a list of functions in this file which are currently being exported:
+
+  stack_system_init
+  cst_new_stack_chunk
+  new_stack
+  mark_stack
+  stack_height
+  stack_entry
+  stack_prepare_push
+  stack_push
+  stack_prepare_pop
+  stack_pop
+  pop_dest
+  stack_peep
+  Parrot_dump_dynamic_environment
+  Parrot_push_action*
+  Parrot_push_mark*
+  Parrot_pop_mark*
+
+* = item may be kept but reimplemented.
 
 =back
 
