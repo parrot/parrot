@@ -270,7 +270,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
     ASSERT_ARGS(Parrot_oo_clone_object)
     Parrot_Object_attributes * obj;
     Parrot_Class_attributes  * _class;
-    int num_classes;
+    INTVAL num_classes;
     PMC * cloned;
     Parrot_Object_attributes * cloned_guts;
     INTVAL i, num_attrs;
@@ -414,7 +414,7 @@ Parrot_oo_newclass_from_str(PARROT_INTERP, ARGIN(STRING *name))
 {
     ASSERT_ARGS(Parrot_oo_newclass_from_str)
     PMC * const namearg  = pmc_new(interp, enum_class_String);
-    PMC        *namehash = pmc_new(interp, enum_class_Hash);
+    PMC * const namehash = pmc_new(interp, enum_class_Hash);
     PMC        *classobj;
 
     VTABLE_set_string_native(interp, namearg, name);
@@ -674,7 +674,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
 
     PMC * const classobj = VTABLE_get_class(interp, _namespace);
     if (!PMC_IS_NULL(classobj)) {
-        STRING *classname = VTABLE_get_string(interp, _namespace);
+        STRING * const classname = VTABLE_get_string(interp, _namespace);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Class %Ss already registered!\n",
                 Parrot_str_escape(interp, classname));
@@ -688,9 +688,9 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
     }
     {
         if (!typeid_exists) {
-            PMC    *classname_hash = interp->class_hash;
+            PMC * const classname_hash = interp->class_hash;
+            PMC * const item           = pmc_new(interp, enum_class_Integer);
             /* set entry in name->type hash */
-            PMC    *item     = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, item, type);
 
             VTABLE_set_pmc_keyed(interp, classname_hash, name, item);
@@ -983,7 +983,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
         mc->mc_size = type + 1;
     }
 
-    if (!mc->idx[type]) {
+    if (mc->idx[type] == NULL) {
         mc->idx[type] = (Meth_cache_entry **)mem_sys_allocate_zeroed(
             sizeof (Meth_cache_entry *) * TBL_SIZE);
     }
@@ -1045,7 +1045,7 @@ debug_trace_find_meth(PARROT_INTERP, ARGIN(const PMC *_class),
 
     if (PObj_is_class_TEST(_class)) {
         SLOTTYPE * const class_array    = PMC_data_typed(_class, SLOTTYPE *);
-        PMC *const       class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
+        PMC      * const class_name_pmc = get_attrib_num(class_array, PCD_CLASS_NAME);
         class_name                      = VTABLE_get_string(interp, class_name_pmc);
     }
     else
@@ -1364,7 +1364,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             if (VTABLE_exists_keyed_str(interp, methods_hash, method_name)) {
                 /* Conflicts with something already in the class, unless it's a
                  * multi-method. */
-                PMC *cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, method_name);
+                PMC * const cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, method_name);
                 if (PMC_IS_NULL(cur_entry) || !VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub")))
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
@@ -1397,7 +1397,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
             /* Is there a method with this name already in the class? If it's
              * not a multi-method, error. */
             if (VTABLE_exists_keyed_str(interp, methods_hash, alias_name)) {
-                PMC *cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, alias_name);
+                PMC * const cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, alias_name);
                 if (PMC_IS_NULL(cur_entry) || !VTABLE_isa(interp, cur_entry, CONST_STRING(interp, "MultiSub")))
                     /* Conflicts with something already in the class. */
                     Parrot_ex_throw_from_c_args(interp, NULL,
@@ -1434,7 +1434,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                                         proposed_add_methods, method_name);
 
         /* Add it to the methods of the class. */
-        PMC *cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, method_name);
+        PMC * const cur_entry = VTABLE_get_pmc_keyed_str(interp, methods_hash, method_name);
         if (VTABLE_isa(interp, cur_method, CONST_STRING(interp, "MultiSub"))) {
             /* The thing we're adding is a multi-sub, but is the thing in the
              * class already a multi-sub? */
