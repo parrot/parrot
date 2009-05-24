@@ -387,9 +387,17 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
         if (type > interp->n_vtable_max || type <= 0)
             return PMCNULL;
         else {
+            PMC * new_class;
+            PMC * new_ns;
             PMC * const type_num = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, type_num, type);
-            return pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            new_ns = ns;
+            new_class = pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            if (ns->vtable->base_type != enum_class_NameSpace) {
+                new_ns = Parrot_make_namespace_keyed_str(interp, hll_ns, name);
+            }
+            Parrot_PCCINVOKE(interp, new_ns, Parrot_str_new_constant(interp, "set_class"), "P->", new_class);
+            return new_class;
         }
     }
 
