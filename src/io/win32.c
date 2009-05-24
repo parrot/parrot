@@ -650,8 +650,7 @@ Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
     if (CreateProcess(NULL,
             cmd,
             NULL, NULL, TRUE, 0,
-            NULL, NULL, &start, &procinfo
-            ) == 0)
+            NULL, NULL, &start, &procinfo) == 0)
         goto fail;
     Parrot_str_free_cstring(cmd);
     cmd = NULL;
