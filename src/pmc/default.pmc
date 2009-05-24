@@ -895,7 +895,7 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
-       Hash   *isa_hash = SELF->vtable->isa_hash;
+       Hash   * const isa_hash = SELF->vtable->isa_hash;
        STRING *pmc_name;
 
         if (PMC_IS_NULL(lookup))
@@ -924,11 +924,11 @@ true (1) is returned; otherwise, false (0) is returned.
 
     VTABLE INTVAL isa(STRING *_class) {
         /* RT #46665 - walk mro */
-        if (!SELF->vtable->isa_hash)
+        Hash * const isa_hash = SELF->vtable->isa_hash;
+        if (!isa_hash)
             return Parrot_str_equal(interp, SELF->vtable->whoami, _class);
 
-        return parrot_hash_exists(INTERP, SELF->vtable->isa_hash,
-                    (void *)_class);
+        return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
     }
 
 /*
