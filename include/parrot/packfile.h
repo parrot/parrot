@@ -563,12 +563,11 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t * PackFile_ConstTable_unpack(PARROT_INTERP,
-    ARGOUT(PackFile_Segment *seg),
+    ARGIN(PackFile_Segment *seg),
     ARGIN(const opcode_t *cursor))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*seg);
+        __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void PackFile_destroy(PARROT_INTERP, ARGMOD_NULLOK(PackFile *pf))

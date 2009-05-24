@@ -3197,18 +3197,18 @@ Parrot_destroy_constants(PARROT_INTERP)
 
     for (i = 0; i <= hash->mask; ++i) {
         HashBucket *bucket = hash->bi[i];
+
         while (bucket) {
             PackFile_ConstTable * const table      =
                 (PackFile_ConstTable *)bucket->key;
             PackFile_Constant ** const orig_consts = table->constants;
             PackFile_Constant ** const consts      =
                 (PackFile_Constant **) bucket->value;
-            INTVAL const const_count               = table->const_count;
-            INTVAL i;
+            INTVAL j;
 
-            for (i = 0; i < const_count; ++i) {
-                if (consts[i] != orig_consts[i])
-                    mem_sys_free(consts[i]);
+            for (j = 0; j < table->const_count; ++j) {
+                if (consts[j] != orig_consts[j])
+                    mem_sys_free(consts[j]);
             }
 
             mem_sys_free(consts);
@@ -3683,7 +3683,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const opcode_t *
-PackFile_ConstTable_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *seg),
+PackFile_ConstTable_unpack(PARROT_INTERP, ARGIN(PackFile_Segment *seg),
         ARGIN(const opcode_t *cursor))
 {
     ASSERT_ARGS(PackFile_ConstTable_unpack)
