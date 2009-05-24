@@ -558,8 +558,7 @@ pressure in hotspots tremendously.  If you haven't audited the code carefully
 never B<ever> add C<PARROT_EXPORT> to either function.)
 
 =cut
-    if(PObj_active_destroy_TEST(pmc))
-        VTABLE_destroy(interp, pmc);=
+
 */
 
 PARROT_CANNOT_RETURN_NULL
@@ -571,6 +570,7 @@ temporary_pmc_new(PARROT_INTERP, INTVAL base_type)
     VTABLE_init(interp, pmc);
     return pmc;
 }
+
 
 /*
 
@@ -591,6 +591,7 @@ temporary_pmc_free(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(temporary_pmc_free)
     Parrot_gc_free_pmc_header(interp, pmc);
 }
+
 
 /*
 
