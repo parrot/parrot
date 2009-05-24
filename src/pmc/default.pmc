@@ -171,7 +171,7 @@ propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
 /*
 
 =item C<static INTVAL
-has_pending_std_props(PMC *self)>
+has_pending_std_props(ARGIN(const PMC *self))>
 
 Returns true if propagate_std_props() would create a non-empty prophash.
 
@@ -180,7 +180,7 @@ Returns true if propagate_std_props() would create a non-empty prophash.
 */
 
 static INTVAL
-has_pending_std_props(PMC *self) {
+has_pending_std_props(ARGIN(const PMC *self)) {
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
         return 1;
     else
