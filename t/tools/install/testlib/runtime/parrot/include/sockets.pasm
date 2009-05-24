@@ -1,4 +1,5 @@
 # $Id$
+# Copyright (C) 2001-2009, Parrot Foundation.
 
 
 # Local Variables:
