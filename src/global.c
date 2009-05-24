@@ -131,7 +131,7 @@ internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int f
     INTVAL i, n;
 
     if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
-        STRING *str_key = VTABLE_get_string(interp, pmc_key);
+        STRING * const str_key = VTABLE_get_string(interp, pmc_key);
         return internal_ns_keyed_str(interp, base_ns, str_key, flags);
     }
 
@@ -184,7 +184,7 @@ internal_ns_keyed_str(PARROT_INTERP, ARGIN(PMC *base_ns),
     ARGIN(STRING *key), int flags)
 {
     ASSERT_ARGS(internal_ns_keyed_str)
-    PMC *ns = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
+    PMC * const ns = VTABLE_get_pmc_keyed_str(interp, base_ns, key);
 
     if (!PMC_IS_NULL(ns) && VTABLE_isa(interp, ns, CONST_STRING(interp, "NameSpace")))
         return ns;
@@ -211,8 +211,8 @@ internal_ns_keyed_key(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(PMC *key), int flags)
 {
     ASSERT_ARGS(internal_ns_keyed_key)
     while (key) {
-        STRING *part   = VTABLE_get_string(interp, key);
-        PMC    *sub_ns = VTABLE_get_pmc_keyed_str(interp, ns, part);
+        STRING * const part = VTABLE_get_string(interp, key);
+        PMC    *sub_ns      = VTABLE_get_pmc_keyed_str(interp, ns, part);
 
         if (PMC_IS_NULL(sub_ns) || !VTABLE_isa(interp, sub_ns, CONST_STRING(interp, "NameSpace"))) {
             sub_ns = internal_ns_maybe_create(interp, ns, part, flags);
