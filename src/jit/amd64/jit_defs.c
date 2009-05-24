@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2009, Parrot Foundation.
 $Id$
 */
 
@@ -352,7 +352,8 @@ jit_mov_r_mr(Interp *interp, Parrot_jit_info_t *jit_info,
     emit_mov_r_mr(jit_info->native_ptr, dst_reg, base_reg, offs);
 }
 
-
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const jit_arch_info *
 Parrot_jit_init(SHIM_INTERP)
 {

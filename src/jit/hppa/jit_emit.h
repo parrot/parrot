@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2007, Parrot Foundation.
+ * Copyright (C) 2004-2009, Parrot Foundation.
  */
 
 /*
@@ -763,6 +763,9 @@ static const jit_arch_info arch_info = {
         }
     }
 };
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const jit_arch_info*
 Parrot_jit_init(PARROT_INTERP)
 {
