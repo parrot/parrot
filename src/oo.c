@@ -396,8 +396,7 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
             if (ns->vtable->base_type != enum_class_NameSpace) {
                 new_ns = Parrot_make_namespace_keyed_str(interp, hll_ns, name);
             }
-            Parrot_PCCINVOKE(interp,
-                    new_ns, Parrot_str_new_constant(interp, "set_class"), "P->", new_class);
+            Parrot_PCCINVOKE(interp, new_ns, CONST_STRING(interp, "set_class"), "P->", new_class);
             return new_class;
         }
     }
