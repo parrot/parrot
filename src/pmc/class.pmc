@@ -1779,19 +1779,9 @@ C<add_method> vtable method.
 =cut
 
 */
-    METHOD add_method(STRING *name, PMC *sub,
-                              int vtable     :optional :named("vtable"),
-                              int has_vtable :opt_flag,
-                              int anon       :optional :named("anon"),
-                              int has_anon   :opt_flag)
+    METHOD add_method(STRING *name, PMC *sub)
     {
-        /* If it's a vtable method... */
-        if (has_vtable && vtable)
-            VTABLE_add_vtable_override(interp, SELF, name, sub);
-
-        /* Provided it's not anonymous, add it to the methods list. */
-        if (!has_anon || !anon)
-            SELF.add_method(name, sub);
+        SELF.add_method(name, sub);
     }
 
 /*
