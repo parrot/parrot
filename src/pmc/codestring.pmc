@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2008, Parrot Foundation.
+Copyright (C) 2007-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -142,6 +142,8 @@ A newline is automatically added to the end of the fmt.
 Return the line number of the line at offset C<pos>.  This code assumes that
 the first line is line number zero.
 
+=cut
+
 */
 
   METHOD lineof(INTVAL pos) {
@@ -271,6 +273,8 @@ prefixed with 'unicode:'.
 Converts the Unicode character name given by C<name> to its
 codepoint value.  Returns -1 if an error occurs in conversion.
 
+=cut
+
 */
 
 
@@ -295,7 +299,7 @@ codepoint value.  Returns -1 if an error occurs in conversion.
 
 =item C<key( string name1 [, string name2, ...] )>
 
-Construct a PIR key using the strings passed as arguments.
+Constructs a PIR key using the strings passed as arguments.
 For example, C<key('Foo', 'Bar')> returns C<["Foo";"Bar"]>.
 
 =cut
