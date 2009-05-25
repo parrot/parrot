@@ -110,63 +110,6 @@ static void store_sub_in_multi(PARROT_INTERP,
 
 /*
 
-=item C<static PMC * internal_ns_keyed(PARROT_INTERP, PMC *base_ns, PMC
-*pmc_key, int flags)>
-
-internal_ns_keyed: Internal function to do keyed namespace lookup relative to a
-given namespace PMC.  Understands String, Key, and array PMCs containing
-strings.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC *
-internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int flags)
-{
-    ASSERT_ARGS(internal_ns_keyed)
-    PMC *ns = base_ns;
-    INTVAL i, n;
-
-    if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
-        STRING * const str_key = VTABLE_get_string(interp, pmc_key);
-        return internal_ns_keyed_str(interp, base_ns, str_key, flags);
-    }
-
-    else if (pmc_key->vtable->base_type == enum_class_Key)
-        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
-    else
-        n = VTABLE_elements(interp, pmc_key); /* array of strings */
-
-    for (i = 0; i < n; ++i) {
-        STRING *part;
-        PMC *sub_ns;
-
-        if (!pmc_key)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
-                "Passed a NULL pmc_key into VTABLE_get_string_keyed_int");
-
-        part   = VTABLE_get_string_keyed_int(interp, pmc_key, i);
-        sub_ns = VTABLE_get_pmc_keyed_str(interp, ns, part);
-
-        if (PMC_IS_NULL(sub_ns) || !VTABLE_isa(interp, sub_ns, CONST_STRING(interp, "NameSpace"))) {
-            sub_ns = internal_ns_maybe_create(interp, ns, part, flags);
-
-            if (PMC_IS_NULL(sub_ns))
-                return PMCNULL;
-        }
-
-        ns = sub_ns;
-    }
-
-    return ns;
-}
-
-
-/*
-
 =item C<static PMC * internal_ns_keyed_str(PARROT_INTERP, PMC *base_ns, STRING
 *key, int flags)>
 
@@ -228,6 +171,58 @@ internal_ns_keyed_key(PARROT_INTERP, ARGIN(PMC *ns), ARGIN(PMC *key), int flags)
     return ns;
 }
 
+/*
+
+=item C<static PMC * internal_ns_keyed(PARROT_INTERP, PMC *base_ns, PMC
+*pmc_key, int flags)>
+
+internal_ns_keyed: Internal function to do keyed namespace lookup relative to a
+given namespace PMC.  Understands String, Key, and array PMCs containing
+strings.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static PMC *
+internal_ns_keyed(PARROT_INTERP, ARGIN(PMC *base_ns), ARGIN(PMC *pmc_key), int flags)
+{
+    ASSERT_ARGS(internal_ns_keyed)
+
+    if (VTABLE_isa(interp, pmc_key, CONST_STRING(interp, "String"))) {
+        STRING * const str_key = VTABLE_get_string(interp, pmc_key);
+        return internal_ns_keyed_str(interp, base_ns, str_key, flags);
+    }
+    else if (pmc_key->vtable->base_type == enum_class_Key)
+        return internal_ns_keyed_key(interp, base_ns, pmc_key, flags);
+    else {
+        /* array of strings */
+        STRING * const isans = CONST_STRING(interp, "NameSpace");
+        const INTVAL n = VTABLE_elements(interp, pmc_key);
+        INTVAL i;
+        PMC *ns = base_ns;
+
+        for (i = 0; i < n; ++i) {
+            if (!pmc_key)
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                    "Passed a NULL pmc_key into VTABLE_get_string_keyed_int");
+            else {
+                STRING * const part = VTABLE_get_string_keyed_int(interp, pmc_key, i);
+                PMC *sub_ns = VTABLE_get_pmc_keyed_str(interp, ns, part);
+
+                if (PMC_IS_NULL(sub_ns) || !VTABLE_isa(interp, sub_ns, isans)) {
+                    sub_ns = internal_ns_maybe_create(interp, ns, part, flags);
+                    if (PMC_IS_NULL(sub_ns))
+                        return PMCNULL;
+                }
+                ns = sub_ns;
+            }
+        }
+        return ns;
+    }
+}
 
 /*
 
