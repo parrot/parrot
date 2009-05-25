@@ -15,6 +15,11 @@ use File::Spec ();
 use File::Temp qw( tempdir );
 use lib qw( lib );
 use Parrot::Config qw( %PConfig );
+use Parrot::Install qw(
+    install_files
+    create_directories
+    lines_to_files
+);
 use IO::CaptureOutput qw( capture );
 
 my $DEBUG = 0;
@@ -108,7 +113,8 @@ my $full_gen_pseudo = File::Spec->catfile( $cwd, $gen_pseudo );
         my $des = File::Spec->catfile( $builddir, $testfiles{$f}{start} );
         copy $src, $des or croak "Unable to copy $f for testing: $!";
     }
-    my $cmd = qq{$^X $full_installer --prefix=$prefixdir};
+    my $addlib = qq{$cwd/lib};
+    my $cmd = qq{$^X -I$addlib $full_installer --prefix=$prefixdir};
     $cmd .= qq{ --includedir=$includedir};
     $cmd .= qq{ --libdir=$libdir};
     $cmd .= qq{ --versiondir=$versiondir};
@@ -131,7 +137,6 @@ my $full_gen_pseudo = File::Spec->catfile( $cwd, $gen_pseudo );
     my $expected = scalar keys %testfiles;
     foreach my $f ( keys %testfiles ) {
         my $des = $testfiles{$f}{end};
-        print STDERR "wanted:  $des\n" if $DEBUG;
         $seen++ if -f $des;
     }
     is( $seen, $expected,

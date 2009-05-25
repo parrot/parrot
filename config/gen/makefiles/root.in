@@ -32,7 +32,7 @@ BIN_DIR         := @bindir@
 LIB_DIR         := @libdir@
 INCLUDE_DIR     := @includedir@
 DATA_DIR        := @datadir@
-DOC_DIR         := @doc_dir@
+DOC_DIR         := @docdir@
 VERSION_DIR     = @versiondir@
 
 

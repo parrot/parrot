@@ -1,197 +1,7 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-################################################################################
-
-use strict;
-use warnings;
-use File::Basename qw(dirname basename);
-use File::Copy;
-use File::Spec;
-
-# When run from the makefile, which is probably the only time this
-# script will ever be used, all of these defaults will get overridden.
-my %options = (
-    buildprefix => '',
-    prefix      => '/usr',
-    destdir     => '',
-    exec_prefix => '/usr',
-    bindir      => '/usr/bin',
-    libdir      => '/usr/lib',       # parrot/ subdir added below
-    includedir  => '/usr/include',   # parrot/ subdir added below
-    docdir      => '/usr/share/doc', # parrot/ subdir added below
-    version     => '',
-    'dry-run'   => 0,
-);
-
-my @manifests;
-foreach my $arg (@ARGV) {
-    if ( $arg =~ m/^--([^=]+)=(.*)/ ) {
-        $options{$1} = $2;
-    }
-    else {
-        push @manifests, $arg;
-    }
-}
-
-my $parrotdir = $options{versiondir};
-
-# We'll report multiple occurrences of the same file
-my %seen;
-
-my @files;
-my @installable_exe;
-my %directories;
-@ARGV = @manifests;
-while (<>) {
-    chomp;
-
-    s/\#.*//;    # Ignore comments
-    next if /^\s*$/;    # Skip blank lines
-
-    my ( $src, $meta, $dest ) = split( /\s+/, $_ );
-    $dest ||= $src;
-
-    if ( $seen{$src}++ ) {
-        print STDERR "$ARGV:$.: Duplicate entry $src\n";
-    }
-
-    # Parse out metadata
-    die "Malformed line in MANIFEST: $_" if not defined $meta;
-    my $generated = $meta =~ s/^\*//;
-    my ($package) = $meta =~ /^\[(.*?)\]/;
-    $meta =~ s/^\[(.*?)\]//;
-    next unless $package;    # Skip if this file belongs to no package
-
-    next unless $package =~ /main|library|pge/;
-
-    my %meta;
-    @meta{ split( /,/, $meta ) } = ();
-    $meta{$_} = 1 for ( keys %meta );          # Laziness
-
-    if ( /^runtime/ ) {
-         # have to catch this case early.
-        $dest =~ s/^runtime\/parrot\///;
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
-    }
-    elsif ( $meta{lib} ) {
-        if ( $dest =~ /^install_/ ) {
-            $dest =~ s/^install_//;            # parrot with different config
-            $dest = File::Spec->catdir( $options{libdir}, $parrotdir, 'include', $dest );
-        }
-        else {
-            # don't allow libraries to be installed into subdirs of libdir
-            $dest = File::Spec->catdir( $options{libdir}, basename($dest) );
-        }
-    }
-    elsif ( $meta{bin} ) {
-        my $copy = $dest;
-        $dest =~ s/^installable_//;            # parrot with different config
-        $dest = File::Spec->catdir( $options{bindir}, $dest );
-        # track bin here to check later below
-        # https://trac.parrot.org/parrot/ticket/434
-        if ( $copy =~ /^installable/ ) {
-            push @installable_exe, [ $src, $dest ];
-            next;
-        }
-    }
-    elsif ( $meta{include} ) {
-        $dest =~ s/^include//;
-        $dest = File::Spec->catdir( $options{includedir}, $parrotdir, $dest );
-    }
-    elsif ( $meta{doc} ) {
-        $dest =~ s/^docs\/resources/resources/; # resources go in the top level of docs
-        $dest =~ s/^docs/pod/; # other docs are actually raw Pod
-        $dest = File::Spec->catdir( $options{docdir}, $parrotdir, $dest );
-    }
-    elsif ( $meta{pkgconfig} ) {
-
-        # For the time being this is hardcoded as being installed under libdir
-        # as it is typically done with automake installed packages.  If there
-        # is a use case to make this configurable we'll add a seperate
-        # --pkgconfigdir option.
-        $dest = File::Spec->catdir( $options{libdir}, 'pkgconfig', $parrotdir, $dest );
-    }
-    elsif ( /^compilers/ ) {
-        $dest =~ s/^compilers/languages/;
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
-    }
-    else {
-        die "Unknown install location in MANIFEST: $_";
-    }
-
-    $dest = File::Spec->catdir( $options{buildprefix}, $dest )
-        if $options{buildprefix};
-
-    $directories{ dirname($dest) } = 1;
-    push( @files, [ $src => $dest ] );
-}
-continue {
-    close ARGV if eof;    # Reset line numbering for each input file
-}
-
-unless ( $options{'dry-run'} ) {
-    for my $dir ( map { $options{destdir} . $_ } keys %directories ) {
-        unless ( -d $dir ) {
-
-            # Make full path to the directory $dir
-            my @dirs;
-            while ( !-d $dir ) {    # Scan up to nearest existing ancestor
-                unshift @dirs, $dir;
-                $dir = dirname($dir);
-            }
-            foreach my $d (@dirs) {
-                mkdir( $d, 0777 ) or die "mkdir $d: $!\n";
-            }
-        }
-    }
-}
-
-for my $iref (@installable_exe) {
-    my ( $i, $dest ) = @{ $iref };
-    my ($file) = $i =~ /installable_(.+)$/;
-    next unless $file;
-    my @f = map { $_ ? $_->[0] : '' } @files;
-    if (grep(/^$file$/, @f)) {
-        if (-e $file) {
-            print "skipping $file, using installable_$file instead\n";
-            @files = map {$_ and $_->[0] !~ /^$file$/ ? $_ : undef} @files;
-        }
-    }
-}
-# for every .exe check if there's an installable. Fail if not
-foreach my $fref (@files ) {
-    next unless $fref;
-    my ( $src, $dest ) = @{ $fref };
-    my $i;
-    # This logic will fail on non-win32 if the generated files are really
-    # generated as with rt #40817. We don't have [main]bin here.
-    $i = "installable_$src" if $src =~ /\.exe$/;
-    next unless $i;
-    unless (map {$_->[0] =~ /^$i$/} @installable_exe) {
-        die "$i is missing in MANIFEST or MANIFEST.generated\n";
-    }
-}
-print("Installing ...\n");
-foreach my $fref ( @files, @installable_exe ) {
-    next unless $fref;
-    my ( $src, $dest ) = @{ $fref };
-    $dest = $options{destdir} . $dest;
-    if ( $options{'dry-run'} ) {
-        print "$src -> $dest\n";
-        next;
-    }
-    else {
-        next unless -e $src;
-        next if $^O eq 'cygwin' and -e "$src.exe"; # stat works, copy not
-        copy( $src, $dest ) or die "copy $src to $dest: $!\n";
-        print "$dest\n";
-    }
-    my $mode = ( stat($src) )[2];
-    chmod $mode, $dest;
-}
-
 ################################################################################
 
 =head1 TITLE
@@ -297,6 +107,163 @@ parrot-<VERSION>-1.<arch>.rpm file will contain the file
 F<tools/dev/mk_manifests.pl>
 
 =cut
+
+################################################################################
+
+use strict;
+use warnings;
+use File::Basename qw(basename);
+use lib qw( lib );
+use Parrot::Install qw(
+    install_files
+    create_directories
+    lines_to_files
+);
+
+# When run from the makefile, which is probably the only time this
+# script will ever be used, all of these defaults will get overridden.
+my %options = (
+    buildprefix => '',
+    prefix      => '/usr',
+    destdir     => '',
+    exec_prefix => '/usr',
+    bindir      => '/usr/bin',
+    libdir      => '/usr/lib',       # parrot/ subdir added below
+    includedir  => '/usr/include',   # parrot/ subdir added below
+    docdir      => '/usr/share/doc', # parrot/ subdir added below
+    versiondir  => '',
+    'dry-run'   => 0,
+    packages    => 'main|library|pge',
+);
+
+my @manifests;
+foreach (@ARGV) {
+    if (/^--([^=]+)=(.*)/) {
+        $options{$1} = $2;
+    }
+    else {
+        push @manifests, $_;
+    }
+}
+
+my $parrotdir = $options{versiondir};
+
+# Set up transforms on filenames
+my(@transformorder) = qw(lib bin include doc pkgconfig ^compilers);
+my(%metatransforms) = (
+    lib => {
+        ismeta => 1,
+        optiondir => 'lib',
+        transform => sub {
+            my($filehash) = @_;
+            local($_) = $filehash->{Dest};
+            if ( /^install_/ ) {
+                s/^install_//;     # parrot with different config
+                $filehash->{DestDirs} = [$parrotdir, 'include'];
+                $filehash->{Dest} = $_;
+            }
+            else {
+                # don't allow libraries to be installed into subdirs of libdir
+                $filehash->{Dest} = basename($_);
+            }
+            return($filehash);
+        },
+    },
+    bin => {
+        ismeta => 1,
+        optiondir => 'bin',
+        transform => sub {
+            my($filehash) = @_;
+            # parrot with different config
+            $filehash->{Installable} = $filehash->{Dest} =~ s/^installable_//;
+            return($filehash);
+        },
+        isbin => 1,
+    },
+    include => {
+        ismeta => 1,
+        optiondir => 'include',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s/^include//;
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    doc => {
+        ismeta => 1,
+        optiondir => 'doc',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s#^docs/resources#resources#; # resources go in the top level of docs
+            $filehash->{Dest} =~ s/^docs/pod/; # other docs are actually raw Pod
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    pkgconfig => {
+        ismeta => 1,
+        optiondir => 'lib',
+        transform => sub {
+            my($filehash) = @_;
+            # For the time being this is hardcoded as being installed under
+            # libdir as it is typically done with automake installed packages.
+            # If there is a use case to make this configurable we'll add a
+            # seperate --pkgconfigdir option.
+            $filehash->{DestDirs} = ['pkgconfig', $parrotdir];
+            return($filehash);
+        },
+    },
+    '^compilers' => {
+        optiondir => 'lib',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s/^compilers/languages/;
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+);
+
+my($filehashes, $directories) = lines_to_files(
+    \%metatransforms, \@transformorder, \@manifests, \%options, $parrotdir
+);
+
+unless ( $options{'dry-run'} ) {
+    create_directories($options{destdir}, $directories);
+}
+
+# TT #347
+# 1. skip build_dir-only binaries for files marked Installable
+my($filehash, @removes, $removes);
+foreach $filehash (grep { $_->{Installable} } @$filehashes) {
+    my( $src, $dest ) = map { $filehash->{$_} } qw(Source Dest);
+    my ($file) = $src =~ /installable_(.+)$/;
+    next unless $file;
+    if((grep { $_->{Source} =~ /^$file$/ } @$filehashes) and -e $file) {
+        print "skipping $file, using installable_$file instead\n";
+        push @removes, $file;
+    }
+}
+$removes = join '|', @removes;
+@$filehashes = grep { $_->{Source} !~ /^($removes)$/ } @$filehashes;
+
+# 2. for every .exe check if there's an installable. Fail if not
+my $i;
+foreach $filehash (grep { ! $_->{Installable} } @$filehashes ) {
+    my( $src, $dest ) = map { $filehash->{$_} } qw(Source Dest);
+    next unless $src =~ /\.exe$/;
+    # This logic will fail on non-win32 if the generated files are really
+    # generated as with rt #40817. We don't have [main]bin here.
+    $i = "installable_$src";
+    unless (map {$_->{Source} =~ /^$i$/} grep { $_->{Installable} } @$filehashes) {
+        die "$i is missing in MANIFEST or MANIFEST.generated\n";
+    }
+}
+
+install_files($options{destdir}, $options{'dry-run'}, $filehashes);
+
+print "Finished install_files.pl\n";
 
 # Local Variables:
 #   mode: cperl

@@ -8,7 +8,7 @@ PARROT_ARGS   :=
 VERSION       := @versiondir@
 BIN_DIR       := @bindir@
 LIB_DIR       := @libdir@$(VERSION)
-DOC_DIR       := @doc_dir@$(VERSION)
+DOC_DIR       := @docdir@$(VERSION)
 MANDIR        := @mandir@$(VERSION)
 
 # Set up extensions

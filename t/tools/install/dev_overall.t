@@ -123,7 +123,8 @@ my $full_gen_pseudo = File::Spec->catfile( $cwd, $gen_pseudo );
         my $des = File::Spec->catfile( $builddir, $testfiles{$f}{start} );
         copy $src, $des or croak "Unable to copy $f for testing: $!";
     }
-    my $cmd = qq{$^X $full_installer --prefix=$prefixdir};
+    my $addlib = qq{$cwd/lib};
+    my $cmd = qq{$^X -I$addlib $full_installer --prefix=$prefixdir};
     $cmd .= qq{ --includedir=$includedir};
     $cmd .= qq{ --libdir=$libdir};
     $cmd .= qq{ --versiondir=$versiondir};
