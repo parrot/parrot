@@ -360,9 +360,11 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     List_chunk *chunk;
 
     Parrot_block_GC_mark(interp);
-    /*Parrot_block_GC_sweep(interp); - why */
+    /* Parrot_block_GC_sweep(interp); - why */
+
     chunk = (List_chunk *)Parrot_gc_new_bufferlike_header(interp, sizeof (*chunk));
-    chunk->items = items;
+
+    chunk->items    = items;
     chunk->n_chunks = 0;
     chunk->n_items  = 0;
     chunk->next     = NULL;
@@ -380,12 +382,13 @@ allocate_chunk(PARROT_INTERP, ARGIN(List *list), UINTVAL items, UINTVAL size)
     return chunk;
 }
 
+
 /*
 
 =item C<static void rebuild_chunk_ptrs(List *list, int cut)>
 
 Rebuilds C<list> and updates/optimizes chunk usage. Deletes empty chunks,
-counts chunks and fixes C<prev> pointers.
+counts chunks, and fixes C<prev> pointers.
 
 =cut
 
@@ -411,31 +414,39 @@ rebuild_chunk_ptrs(ARGMOD(List *list), int cut)
             start = 0;
             continue;
         }
+
         len++;
-        start = 0;
+
+        start       = 0;
         chunk->prev = prev;
-        prev = chunk;
-        list->last = chunk;
+        prev        = chunk;
+        list->last  = chunk;
+
         if (cut && cap > list->start + list->length && chunk != list->first) {
             list->last = chunk->prev ? chunk->prev : list->first;
             len--;
             break;
         }
+
         cap += chunk->items;
     }
     if (list->last)
         list->last->next = NULL;
+
     list->cap = cap;
+
     if (list->first)
         list->first->prev = NULL;
+
     list->n_chunks = len;
 }
+
 
 /*
 
 =item C<static void rebuild_sparse(List *list)>
 
-Combines together adjacent sparse chunks in C<list>.
+Combines adjacent sparse chunks in C<list>.
 
 =cut
 
@@ -445,13 +456,13 @@ static void
 rebuild_sparse(ARGMOD(List *list))
 {
     ASSERT_ARGS(rebuild_sparse)
-    List_chunk *chunk = list->first;
-    List_chunk *prev = NULL;
-    int changes = 0;
+
+    List_chunk *chunk   = list->first;
+    List_chunk *prev    = NULL;
+    int         changes = 0;
 
     for (; chunk; chunk = chunk->next) {
-        if (prev && (prev->flags & sparse) &&
-                (chunk->flags & sparse)) {
+        if (prev && (prev->flags & sparse) && (chunk->flags & sparse)) {
             prev->items += chunk->items;
             chunk->items = 0;
             changes++;
@@ -459,15 +470,17 @@ rebuild_sparse(ARGMOD(List *list))
         }
         prev = chunk;
     }
+
     if (changes)
         rebuild_chunk_ptrs(list, 0);
 }
+
 
 /*
 
 =item C<static void rebuild_other(PARROT_INTERP, List *list)>
 
-Combines together adjacent irregular chunks in C<list>.
+Combines adjacent irregular chunks in C<list>.
 
 =cut
 
@@ -477,23 +490,24 @@ static void
 rebuild_other(PARROT_INTERP, ARGMOD(List *list))
 {
     ASSERT_ARGS(rebuild_other)
-    List_chunk *chunk = list->first;
-    List_chunk *prev = NULL;
-    int changes = 0;
+    List_chunk *chunk   = list->first;
+    List_chunk *prev    = NULL;
+    int         changes = 0;
 
     for (; chunk; chunk = chunk->next) {
         /* two adjacent irregular chunks */
-        if (prev && (prev->flags & no_power_2) &&
-                (chunk->flags & no_power_2)) {
+        if (prev && (prev->flags & no_power_2) && (chunk->flags & no_power_2)) {
             /* DONE don't make chunks bigger then MAX_ITEMS, no - make then
              * but: if bigger, split them in a next pass
              * TODO test the logic that solves the above problem */
             if (prev->items + chunk->items > MAX_ITEMS) {
                 Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)prev,
                         MAX_ITEMS * list->item_size);
+
                 if (list->container) {
                     GC_WRITE_BARRIER(interp, list->container, 0, prev);
                 }
+
                 mem_sys_memmove(
                         (char *) PObj_bufstart(&prev->data) +
                         prev->items * list->item_size,
@@ -506,7 +520,7 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
                         (chunk->items - (MAX_ITEMS - prev->items))
                                                         * list->item_size);
                 chunk->items = chunk->items - (MAX_ITEMS - prev->items);
-                prev->items = MAX_ITEMS;
+                prev->items  = MAX_ITEMS;
             }
             else {
                 Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)prev,
@@ -532,12 +546,13 @@ rebuild_other(PARROT_INTERP, ARGMOD(List *list))
         rebuild_chunk_ptrs(list, 0);
 }
 
+
 /*
 
 =item C<static void rebuild_fix_ends(List *list)>
 
-Resets some values in C<list> and the lists's first chunk.
-Called by C<rebuild_chunk_list()>.
+Resets some values in C<list> and the lists's first chunk.  Called by
+C<rebuild_chunk_list()>.
 
 =cut
 
@@ -550,25 +565,28 @@ rebuild_fix_ends(ARGMOD(List *list))
     List_chunk * const chunk = list->first;
 
     /* first is irregular, next is empty */
-    if (list->n_chunks <= 2 && (chunk->flags & no_power_2) &&
-            (!chunk->next || chunk->next->items == 0 ||
-                    list->start + list->length <= chunk->items)) {
-        chunk->flags = 0;
+    if (list->n_chunks <= 2 && (chunk->flags & no_power_2)
+    && (!chunk->next
+    ||   chunk->next->items == 0
+    ||   list->start + list->length <= chunk->items)) {
+
+        chunk->flags      = 0;
         list->grow_policy = enum_grow_unknown;
-        list->cap += PObj_buflen(&chunk->data) / list->item_size - chunk->items;
-        chunk->items = PObj_buflen(&chunk->data) / list->item_size;
+        list->cap        += PObj_buflen(&chunk->data) / list->item_size - chunk->items;
+        chunk->items      = PObj_buflen(&chunk->data) / list->item_size;
     }
+
     /* XXX - still needed? - if last is empty and last->prev not full then
      * delete last - combine small chunks if list is big */
 }
+
 
 /*
 
 =item C<static void rebuild_chunk_list(PARROT_INTERP, List *list)>
 
-Optimises C<list> when it's been modified in some way. Combines adjacent
-chunks if they are both sparse or irregular. Updates the grow policies
-and computes list statistics.
+Optimizes a modified C<list>: combines adjacent chunks if they are both sparse
+or irregular and updates the grow policies and computes list statistics.
 
 =cut
 
@@ -583,8 +601,10 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
+
     /* count chunks and fix prev pointers */
     rebuild_chunk_ptrs(list, 0);
+
     /* if not regular, check & optimize */
     if (list->grow_policy == enum_grow_mixed) {
         rebuild_sparse(list);
@@ -594,17 +614,21 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
 
     /* allocate a new chunk_list buffer, if old one has moved or is too small */
     len = list->n_chunks;
-    if (list->collect_runs != Parrot_gc_count_collect_runs(interp) ||
-            len > chunk_list_size(list)) {
+    if (list->collect_runs != Parrot_gc_count_collect_runs(interp)
+    ||  len > chunk_list_size(list)) {
         /* round up to reasonable size */
         len = 1 << (ld(len) + 1);
+
         if (len < 4)
             len = 4;
+
         Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)list,
                 len * sizeof (List_chunk *));
+
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container, 0, list);
         }
+
         list->collect_runs = Parrot_gc_count_collect_runs(interp);
     }
 
@@ -617,9 +641,9 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
         chunk_list_ptr(list, len) = chunk;
         len++;
 
-        /* look, what type of chunks we have this is always correct: */
+        /* look what type of chunks we have this is always correct: */
         chunk->n_chunks = 1;
-        chunk->n_items = chunk->items;
+        chunk->n_items  = chunk->items;
 
         /* sparse hole or irregular chunk */
         if (chunk->flags & (sparse | no_power_2)) {
@@ -634,24 +658,28 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
                 }
                 else
                     break;
-            first = chunk->next;
+            first             = chunk->next;
             list->grow_policy = enum_grow_mixed;
             continue;
         }
+
         /* clear flag, next chunks will tell what comes */
         chunk->flags = enum_grow_unknown;
+
         if (first && first != chunk) {
             /* constant chunk block */
             if (first->items == chunk->items) {
                 first->n_chunks++;
                 first->n_items += chunk->items;
                 first->flags = fixed_items;
+
                 /* TODO optimize for fixed but non MAX_ITEMS lists */
                 if (first->items == MAX_ITEMS)
                     list->grow_policy |= enum_grow_fixed;
                 else
                     list->grow_policy |= enum_grow_mixed;
             }
+
             /* growing chunk block could optimize small growing blocks, they
              * are probably not worth the effort. */
             else if (prev && (prev->items == chunk->items >> 1)) {
@@ -661,19 +689,22 @@ rebuild_chunk_list(PARROT_INTERP, ARGMOD(List *list))
                 list->grow_policy |= enum_grow_growing;
             }
             /* different growing scheme starts here */
-            else {
+            else
                 first = chunk;
-            }
         }
+
         prev = chunk;
     }
+
     /* if we have some mixture of grow_policies, then set it to _mixed */
-    if (list->grow_policy && list->grow_policy != enum_grow_growing &&
-            list->grow_policy != enum_grow_fixed)
+    if (list->grow_policy && list->grow_policy != enum_grow_growing
+    &&  list->grow_policy != enum_grow_fixed)
         list->grow_policy = enum_grow_mixed;
+
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
 }
+
 
 /*
 
@@ -694,10 +725,10 @@ static List_chunk *
 alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 {
     ASSERT_ARGS(alloc_next_size)
-    UINTVAL items, size;
     List_chunk *new_chunk;
-    const int much = idx - list->cap >= MIN_ITEMS;
-    int do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 10 * MAX_ITEMS;
+    UINTVAL     items, size;
+    const int   much      = idx - list->cap >= MIN_ITEMS;
+    int         do_sparse = (INTVAL)idx - (INTVAL)list->cap >= 10 * MAX_ITEMS;
 
     if (list->item_type == enum_type_sized) {
         do_sparse = 0;
@@ -715,7 +746,7 @@ alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
             items     = MAX_ITEMS;
 
             /* if we need more, the next allocation will allocate the rest */
-            size = items * list->item_size;
+            size              = items * list->item_size;
             list->grow_policy = enum_grow_fixed;
         }
         else {
@@ -725,7 +756,7 @@ alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 
             /* round down this function will then be called again, to add the
              * final real chunk, with the rest of the needed size */
-            items &= ~(MAX_ITEMS - 1);
+            items            &= ~(MAX_ITEMS - 1);
             list->grow_policy = enum_grow_mixed;
         }
     }
@@ -740,7 +771,7 @@ alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
         /* more then MIN_ITEMS, i.e. indexed access beyond length */
         if (much) {
             list->grow_policy = enum_grow_fixed;
-            items = MAX_ITEMS;
+            items             = MAX_ITEMS;
         }
         else {
             /* TODO make bigger for small items like char */
@@ -774,12 +805,16 @@ alloc_next_size(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
         }
         size = items * list->item_size;
     }
-    new_chunk = allocate_chunk(interp, list, items, size);
+
+    new_chunk  = allocate_chunk(interp, list, items, size);
     list->cap += items;
+
     if (do_sparse)
         new_chunk->flags |= sparse;
+
     return new_chunk;
 }
+
 
 /*
 
@@ -799,7 +834,7 @@ static List_chunk *
 add_chunk(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
 {
     ASSERT_ARGS(add_chunk)
-    List_chunk * const chunk = where ? list->last : list->first;
+    List_chunk * const chunk     = where ? list->last : list->first;
     List_chunk * const new_chunk = alloc_next_size(interp, list, where, idx);
 
     if (where) {                /* at end */
@@ -812,13 +847,17 @@ add_chunk(PARROT_INTERP, ARGMOD(List *list), int where, UINTVAL idx)
     }
     else {
         new_chunk->next = chunk;
-        list->first = new_chunk;
+        list->first     = new_chunk;
+
         if (!list->last)
             list->last = new_chunk;
     }
+
     rebuild_chunk_list(interp, list);
+
     return new_chunk;
 }
+
 
 /*
 
@@ -866,6 +905,7 @@ ld(UINTVAL x)
 #endif
     return m;
 }
+
 
 /*
 
@@ -918,9 +958,9 @@ there. They come from:
 
 - sparse hole: 3 (could be 2, code assumes access at either end now)
 
-There could be some optimizer, that, after detecting almost only indexed
-access after some time, does reorganize the array to be all C<MAX_ITEMS>
-sized, when this would improve performance.
+There could be some optimizer that, after detecting almost only indexed access
+after some time, reorganizes the array to be all C<MAX_ITEMS> sized when this
+would improve performance.
 
 =cut
 
@@ -973,11 +1013,12 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
         /* now look, if we can use the range of items in chunk_block: if idx
          * is beyond n_items, skip n_chunks */
         if (*idx >= chunk->n_items) {
-            i += chunk->n_chunks;
+            i    += chunk->n_chunks;
             *idx -= chunk->n_items;
             chunk = chunk_list_ptr(list, i);
             continue;
         }
+
         /* we are inside this range of items */
         if (chunk->flags & fixed_items) {
             /* all chunks are chunk->items big, a power of 2 */
@@ -988,7 +1029,7 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
 
 /*
  * Here is a small table, providing the basics of growing sized
- * addressing, for people like me, who's math lessons are +30 years
+ * addressing, for people like me, whose math lessons are +30 years
  * in the past ;-)
  * assuming MIN_ITEMS=4
  *
@@ -1004,7 +1045,7 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
         if (chunk->flags & grow_items) {
             /* the next chunks are growing from chunk->items ... last->items */
             const UINTVAL ld_first = ld(chunk->items);
-            const UINTVAL slot = ld(*idx + chunk->items) - ld_first;
+            const UINTVAL slot     = ld(*idx + chunk->items) - ld_first;
 
             /* we are in this growing area, so we are done */
             PARROT_ASSERT(slot < chunk->n_chunks);
@@ -1015,8 +1056,8 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
         if (chunk->flags & (sparse | no_power_2)) {
             /* these chunks hold exactly chunk->items */
             *idx -= chunk->items;
-            i++;
             chunk = chunk->next;
+            i++;
             continue;
         }
 
@@ -1029,6 +1070,7 @@ get_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(UINTVAL *idx))
         "Cannot find index %d in list %p of %d items using any method\n",
         *idx, list, list->cap);
 }
+
 
 /*
 
@@ -1058,9 +1100,11 @@ split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVA
         /* it fits, just allocate */
         Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)chunk,
                 chunk->items * list->item_size);
+
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container, 0, chunk);
         }
+
         chunk->flags |= no_power_2;
         chunk->flags &= ~sparse;
     }
@@ -1068,32 +1112,41 @@ split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVA
         /* split chunk->items: n3 = n*MAX_ITEMS after chunk n2 = MAX_ITEMS
          * chunk n1 = rest before */
         const INTVAL idx = ix;
-        const INTVAL n2 = MAX_ITEMS;
-        const INTVAL n3 = ((chunk->items - idx) / MAX_ITEMS) * MAX_ITEMS;
-        const INTVAL n1 = chunk->items - n2 - n3;
+        const INTVAL n2  = MAX_ITEMS;
+        const INTVAL n3  = ((chunk->items - idx) / MAX_ITEMS) * MAX_ITEMS;
+        const INTVAL n1  = chunk->items - n2 - n3;
 
-        chunk->items = n2;
+        chunk->items     = n2;
+
         Parrot_gc_reallocate_buffer_storage(interp, (Buffer *)chunk,
                 chunk->items * list->item_size);
+
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container, 0, chunk);
         }
+
         chunk->flags &= ~sparse;
+
         if (n3) {
             List_chunk * const new_chunk = allocate_chunk(interp, list, n3, list->item_size);
+
             new_chunk->flags |= sparse;
-            new_chunk->next = chunk->next;
+            new_chunk->next   = chunk->next;
+
             if (chunk->next)
                 chunk->next = new_chunk;
             else
                 list->last = new_chunk;
         }
+
         /* size before idx */
         if (n1 > 0) {
             /* insert a new sparse chunk before this one */
             List_chunk * const new_chunk = allocate_chunk(interp, list, n1, list->item_size);
+
             new_chunk->flags |= sparse;
-            new_chunk->next = chunk;
+            new_chunk->next   = chunk;
+
             if (chunk->prev)
                 chunk->prev->next = new_chunk;
             else
@@ -1103,6 +1156,7 @@ split_chunk(PARROT_INTERP, ARGMOD(List *list), ARGMOD(List_chunk *chunk), UINTVA
 
     rebuild_chunk_list(interp, list);
 }
+
 
 /*
 
@@ -1120,16 +1174,17 @@ list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
         INTVAL type, INTVAL idx)
 {
     ASSERT_ARGS(list_set)
-    const INTVAL oidx = idx;
-    List_chunk *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
+    List_chunk  *chunk = get_chunk(interp, list, (UINTVAL *)&idx);
+    const INTVAL oidx  = idx;
 
     PARROT_ASSERT(chunk);
+
     /* if this is a sparse chunk: split in possibly 2 sparse parts before and
      * after then make a real chunk, rebuild chunk list and set item */
     if (chunk->flags & sparse) {
         split_chunk(interp, list, chunk, idx);
         /* reget chunk and idx */
-        idx = oidx;
+        idx   = oidx;
         chunk = get_chunk(interp, list, (UINTVAL *)&idx);
         PARROT_ASSERT(chunk);
         PARROT_ASSERT(!(chunk->flags & sparse));
@@ -1160,7 +1215,7 @@ list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
         if (list->container) {
             GC_WRITE_BARRIER(interp, list->container,
                     ((PMC **) PObj_bufstart(&chunk->data))[idx],
-                    (PMC*)item);
+                    (PMC *)item);
         }
         ((PMC **) PObj_bufstart(&chunk->data))[idx] = (PMC *)item;
         break;
@@ -1172,6 +1227,7 @@ list_set(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item),
         break;
     }
 }
+
 
 /*
 
@@ -1226,6 +1282,7 @@ list_item(PARROT_INTERP, ARGMOD(List *list), int type, INTVAL idx)
     }
 }
 
+
 /*
 
 =item C<static void list_append(PARROT_INTERP, List *list, void *item, int type,
@@ -1244,11 +1301,14 @@ list_append(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int typ
     /* initially, list may be empty, also used by assign */
     while (idx >= list->cap)
         add_chunk(interp, list, enum_add_at_end, idx);
+
     list_set(interp, list, item, type, idx);
+
     /* invariant: prepare for next push */
     if (idx >= list->cap - 1)
         add_chunk(interp, list, enum_add_at_end, 0);
 }
+
 
 /*
 
@@ -1273,7 +1333,8 @@ List *
 list_new(PARROT_INTERP, PARROT_DATA_TYPE type)
 {
     ASSERT_ARGS(list_new)
-    List * const list = (List *)Parrot_gc_new_bufferlike_header(interp, sizeof (*list));
+    List * const list = (List *)Parrot_gc_new_bufferlike_header(interp,
+                             sizeof (*list));
 
     list->item_type = type;
     switch (type) {
@@ -1306,6 +1367,7 @@ list_new(PARROT_INTERP, PARROT_DATA_TYPE type)
 
     return list;
 }
+
 
 /*
 
@@ -1463,48 +1525,49 @@ List *
 list_clone(PARROT_INTERP, ARGIN(const List *other))
 {
     ASSERT_ARGS(list_clone)
-    List *l;
+    List       *l;
     List_chunk *chunk, *prev;
-    UINTVAL i;
-    PMC *op;
-    STRING *s;
+    UINTVAL     i;
 
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);
 
     l = list_new(interp, other->item_type);
+
     STRUCT_COPY(l, other);
-    PObj_buflen(&l->chunk_list) = 0;
+    PObj_buflen(&l->chunk_list)   = 0;
     PObj_bufstart(&l->chunk_list) = NULL;
 
     for (chunk = other->first, prev = NULL; chunk; chunk = chunk->next) {
         List_chunk * const new_chunk = allocate_chunk(interp, l,
                 chunk->items, PObj_buflen(&chunk->data));
+
         new_chunk->flags = chunk->flags;
+
         if (!prev)
-            l->first = new_chunk;
+            l->first   = new_chunk;
         else
             prev->next = new_chunk;
+
         prev = new_chunk;
 
         if (!(new_chunk->flags & sparse)) {
             switch (l->item_type) {
             case enum_type_PMC:
                 for (i = 0; i < chunk->items; i++) {
-                    op = ((PMC **) PObj_bufstart(&chunk->data))[i];
-                    if (op) {
+                    PMC * const op = ((PMC **) PObj_bufstart(&chunk->data))[i];
+
+                    if (op)
                         ((PMC **) PObj_bufstart(&new_chunk->data))[i] =
                             VTABLE_clone(interp, op);
-                    }
                 }
                 break;
             case enum_type_STRING:
                 for (i = 0; i < chunk->items; i++) {
-                    s = ((STRING **) PObj_bufstart(&chunk->data))[i];
-                    if (s) {
+                    STRING *s = ((STRING **) PObj_bufstart(&chunk->data))[i];
+                    if (s)
                         ((STRING **) PObj_bufstart(&new_chunk->data))[i] =
                                 Parrot_str_copy(interp, s);
-                    }
                 }
                 break;
             default:
@@ -1518,8 +1581,10 @@ list_clone(PARROT_INTERP, ARGIN(const List *other))
     rebuild_chunk_list(interp, l);
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
+
     return l;
 }
+
 
 /*
 
@@ -1540,8 +1605,9 @@ list_mark(PARROT_INTERP, ARGMOD(List *list))
 
     for (chunk = list->first; chunk; chunk = chunk->next) {
         Parrot_gc_mark_PObj_alive(interp, (PObj *)chunk);
-        if (list->item_type == enum_type_PMC ||
-                list->item_type == enum_type_STRING) {
+
+        if (list->item_type == enum_type_PMC
+        ||  list->item_type == enum_type_STRING) {
             if (!(chunk->flags & sparse)) {
                 PObj **p = ((PObj **) PObj_bufstart(&chunk->data));
                 UINTVAL i;
@@ -1557,6 +1623,7 @@ list_mark(PARROT_INTERP, ARGMOD(List *list))
 
     Parrot_gc_mark_PObj_alive(interp, (PObj *)list);
 }
+
 
 /*
 
@@ -1575,9 +1642,9 @@ void
 list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
 {
     ASSERT_ARGS(list_visit)
-    List_chunk *chunk;
+    List_chunk        *chunk;
     visit_info * const info = (visit_info*) pinfo;
-    UINTVAL idx;
+    UINTVAL            idx;
 
     const UINTVAL n = list_length(interp, list);
     PARROT_ASSERT(list->item_type == enum_type_PMC);
@@ -1588,7 +1655,7 @@ list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
             UINTVAL i;
             for (i = 0; i < chunk->items && idx < n; i++, idx++) {
                 PMC ** const pos = ((PMC **) PObj_bufstart(&chunk->data)) + i;
-                info->thaw_ptr = pos;
+                info->thaw_ptr   = pos;
                 (info->visit_pmc_now)(interp, *pos, info);
             }
         }
@@ -1597,6 +1664,7 @@ list_visit(PARROT_INTERP, ARGIN(List *list), ARGMOD(void *pinfo))
          */
     }
 }
+
 
 /*
 
@@ -1617,6 +1685,7 @@ list_length(SHIM_INTERP, ARGIN(const List *list))
     return list->length;
 }
 
+
 /*
 
 =item C<void list_set_length(PARROT_INTERP, List *list, INTVAL len)>
@@ -1632,15 +1701,16 @@ void
 list_set_length(PARROT_INTERP, ARGMOD(List *list), INTVAL len)
 {
     ASSERT_ARGS(list_set_length)
+
     if (len < 0)
         len += list->length;
+
     if (len >= 0) {
         const UINTVAL idx = list->start + (UINTVAL)len;
-        list->length = len;
+        list->length      = len;
+
         if (idx >= list->cap) {
-            /* assume user will fill it, so don't generate sparse
-             * chunks
-             */
+            /* assume user will fill it, so don't generate sparse chunks */
             if (!list->cap && idx > MAX_ITEMS) {
                 while (idx - MAX_ITEMS >= list->cap) {
                     add_chunk(interp, list, enum_add_at_end,
@@ -1650,12 +1720,13 @@ list_set_length(PARROT_INTERP, ARGMOD(List *list), INTVAL len)
 
             list_append(interp, list, NULL, list->item_type, idx);
         }
-        else {
+        else
             rebuild_chunk_ptrs(list, 1);
-        }
+
         rebuild_chunk_list(interp, list);
     }
 }
+
 
 /*
 
@@ -1676,46 +1747,54 @@ list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 
     PARROT_ASSERT(idx >= 0);
     idx += list->start;
+
     PARROT_ASSERT(n_items >= 0);
     if (n_items == 0)
         return;
+
     /* empty list */
     if (idx >= (INTVAL)list->cap) {
-        idx += n_items;
+        idx         += n_items;
         list->length = idx;
+
         while (idx >= (INTVAL)list->cap)
             add_chunk(interp, list, enum_add_at_end, idx);
+
         return;
     }
+
     list->length += n_items;
-    list->cap += n_items;
-    chunk = get_chunk(interp, list, (UINTVAL *)&idx);
+    list->cap    += n_items;
+    chunk         = get_chunk(interp, list, (UINTVAL *)&idx);
+
     /* the easy case: */
     if (chunk->flags & sparse)
         chunk->items += n_items;
     else {
         List_chunk *new_chunk;
-        INTVAL items;
+        INTVAL      items;
 
         /* 1. cut this chunk at idx */
         list->grow_policy = enum_grow_mixed;
-        /* allocate a sparse chunk, n_items big */
-        new_chunk = allocate_chunk(interp, list, n_items,
-                list->item_size);
-        new_chunk->flags |= sparse;
-        items = chunk->items - idx;
-        if (items) {
-            List_chunk *rest;
 
+        /* allocate a sparse chunk, n_items big */
+        new_chunk         = allocate_chunk(interp, list, n_items, list->item_size);
+        new_chunk->flags |= sparse;
+        items             = chunk->items - idx;
+
+        if (items) {
             /* allocate a small chunk, holding the rest of chunk beyond idx */
-            chunk->flags = no_power_2;
-            rest = allocate_chunk(interp, list, items,
-                    items * list->item_size);
-            rest->flags |= no_power_2;
+            List_chunk *rest = allocate_chunk(interp, list, items,
+                                     items * list->item_size);
+
+            chunk->flags     = no_power_2;
+            rest->flags     |= no_power_2;
+
             /* hang them together */
-            rest->next = chunk->next;
-            chunk->next = new_chunk;
+            rest->next      = chunk->next;
+            chunk->next     = new_chunk;
             new_chunk->next = rest;
+
             /* copy data over */
             mem_sys_memmove(
                     (char *)PObj_bufstart(&rest->data),
@@ -1724,12 +1803,15 @@ list_insert(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
         }
         else {
             new_chunk->next = chunk->next;
-            chunk->next = new_chunk;
+            chunk->next     = new_chunk;
         }
+
         chunk->items = idx;
     }
+
     rebuild_chunk_list(interp, list);
 }
+
 
 /*
 
@@ -1750,16 +1832,21 @@ list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
 
     PARROT_ASSERT(idx >= 0);
     PARROT_ASSERT(n_items >= 0);
+
     if (n_items == 0)
         return;
-    idx += list->start;
+
+    idx  += list->start;
     chunk = get_chunk(interp, list, (UINTVAL *)&idx);
+
     /* deleting beyond end? */
     if (idx + n_items > (INTVAL)list->length)
         n_items = list->length - idx;
-    list->length -= n_items;
-    list->cap -= n_items;
+
+    list->length     -= n_items;
+    list->cap        -= n_items;
     list->grow_policy = enum_grow_mixed;
+
     while (n_items > 0) {
         if (idx + n_items <= (INTVAL)chunk->items) {
             /* chunk is bigger then we want to delete */
@@ -1792,11 +1879,14 @@ list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
             chunk->items -= n_items;
             break;
         }
+
         if (idx == 0 && n_items >= (INTVAL)chunk->items) {
             /* delete this chunk */
             n_items -= chunk->items;
+
             /* rebuild_chunk_list will kill it because: */
             chunk->items = 0;
+
             if (!chunk->prev)
                 list->first = chunk->next;
         }
@@ -1804,15 +1894,19 @@ list_delete(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, INTVAL n_items)
             /* else shrink chunk, it starts at idx then */
             if (!(chunk->flags & sparse))
                 chunk->flags = no_power_2;
-            n_items -= chunk->items - idx;
+
+            n_items     -= chunk->items - idx;
             chunk->items = idx;
         }
-        idx = 0;
+
+        idx   = 0;
         chunk = chunk->next;
     }
+
     rebuild_chunk_ptrs(list, 1);
     rebuild_chunk_list(interp, list);
 }
+
 
 /*
 
@@ -1834,6 +1928,7 @@ list_push(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(void *item), int type)
     list_append(interp, list, item, type, idx);
 }
 
+
 /*
 
 =item C<void list_unshift(PARROT_INTERP, List *list, void *item, int type)>
@@ -1852,14 +1947,18 @@ list_unshift(PARROT_INTERP, ARGMOD(List *list), ARGIN(void *item), int type)
     List_chunk *chunk;
 
     if (list->start == 0) {
-        chunk = add_chunk(interp, list, enum_add_at_start, 0);
+        chunk       = add_chunk(interp, list, enum_add_at_start, 0);
         list->start = chunk->items;
     }
+
+    /* XXX This chunk is unused.  Why are we getting it? */
     else
-        chunk = list->first; /* XXX This chunk is unused.  Why are we getting it? */
+        chunk = list->first;
+
     list_set(interp, list, item, type, --list->start);
     list->length++;
 }
+
 
 /*
 
@@ -1877,28 +1976,32 @@ void *
 list_pop(PARROT_INTERP, ARGMOD(List *list), int type)
 {
     ASSERT_ARGS(list_pop)
-    UINTVAL idx;
-    void *ret;
     List_chunk *chunk = list->last;
+    UINTVAL     idx;
 
     if (list->length == 0)
         return NULL;
+
     idx = list->start + --list->length;
+
     if (list->length == 0)
         list->start = 0;
 
     /* shrink array if necessary */
     if (idx < list->cap - chunk->items) {
-        list->cap -= chunk->items;
-        chunk = list->last = chunk->prev;
+        list->cap  -= chunk->items;
+        chunk       = list->last = chunk->prev;
         chunk->next = NULL;
+
         if (list->n_chunks <= 2)
             list->first = list->last;
+
         rebuild_chunk_list(interp, list);
     }
-    ret = list_item(interp, list, type, idx);
-    return ret;
+
+    return list_item(interp, list, type, idx);
 }
+
 
 /*
 
@@ -1916,29 +2019,37 @@ void *
 list_shift(PARROT_INTERP, ARGMOD(List *list), int type)
 {
     ASSERT_ARGS(list_shift)
-    void *ret;
-    UINTVAL idx;
+    void       *ret;
     List_chunk *chunk = list->first;
+    UINTVAL     idx;
 
     if (list->length == 0)
         return NULL;
+
     idx = list->start;
+
     /* optimize push + shift on empty lists */
     if (--list->length == 0)
         list->start = 0;
     else
         list->start++;
+
     ret = list_item(interp, list, type, idx);
+
     if (list->start >= chunk->items) {
-        list->cap -= chunk->items;
-        chunk = list->first = chunk->next ? chunk->next : list->last;
+        list->cap  -= chunk->items;
+        chunk       = list->first = chunk->next ? chunk->next : list->last;
         list->start = 0;
+
         rebuild_chunk_list(interp, list);
+
         if (list->n_chunks == 1)
             list->last = list->first;
     }
+
     return ret;
 }
+
 
 /*
 
@@ -1966,10 +2077,10 @@ list_assign(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, ARGIN_NULLOK(void *it
         list_append(interp, list, item, type, list->start + idx);
         list->length = idx + 1;
     }
-    else {
+    else
         list_set(interp, list, item, type, list->start + idx);
-    }
 }
+
 
 /*
 
@@ -1990,15 +2101,17 @@ list_get(PARROT_INTERP, ARGMOD(List *list), INTVAL idx, int type)
     ASSERT_ARGS(list_get)
     const INTVAL length = list->length;
 
-    if (idx >= length || -idx > length) {
+    if (idx >= length || -idx > length)
         return NULL;
-    }
 
     if (idx < 0)
         idx += length;
+
     idx += list->start;
+
     return list_item(interp, list, type, idx);
 }
+
 
 /*
 
@@ -2020,9 +2133,9 @@ list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
 {
     ASSERT_ARGS(list_splice)
     const INTVAL value_length = value_list ? value_list->length : 0;
-    const INTVAL length = list->length;
-    const int type = list->item_type;
-    INTVAL i, j;
+    const INTVAL length       = list->length;
+    const int    type         = list->item_type;
+    INTVAL       i, j;
 
     if (value_list && type != value_list->item_type)
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
@@ -2056,29 +2169,33 @@ list_splice(PARROT_INTERP, ARGMOD(List *list), ARGIN_NULLOK(List *value_list),
             val = *(PMC **)val;
         else if (type == enum_type_STRING)
             val = *(STRING **)val;
+
         list_assign(interp, list, offset + i, val, type);
     }
+
     /* if we still have values in value_list, insert them */
     if (j < value_length) {
         /* make room for the remaining values */
         list_insert(interp, list, offset + i, value_length - j);
+
         for (; j < value_length; i++, j++) {
             void *val = list_get(interp, value_list, j, type);
 
-            /* XXX We don't know that val is non-NULL coming back from list_get. */
-            /* We need to check that we're not dereferencing NULL. */
+            /* XXX We don't know that val is non-NULL coming back from
+             * list_get; check that we're not dereferencing NULL. */
             if (type == enum_type_PMC)
                 val = *(PMC **)val;
             else if (type == enum_type_STRING)
                 val = *(STRING **)val;
+
             list_assign(interp, list, offset + i, val, type);
         }
     }
-    else {
-        /* else delete the rest */
+    /* else delete the rest */
+    else
         list_delete(interp, list, offset + i, count - i);
-    }
 }
+
 
 /*
 
