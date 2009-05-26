@@ -1226,7 +1226,8 @@ $(SRC_DIR)/spf_render$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_render.str
 
 $(SRC_DIR)/spf_vtable$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_vtable.str
 
-$(SRC_DIR)/string/encoding$(O) : $(SRC_DIR)/string/encoding.c $(GENERAL_H_FILES)
+$(SRC_DIR)/string/encoding$(O) : $(SRC_DIR)/string/encoding.c \
+	$(INC_DIR)/config.h $(GENERAL_H_FILES)
 
 $(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c $(GENERAL_H_FILES)
 
