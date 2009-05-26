@@ -459,8 +459,9 @@ Parrot_io_write_win32(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_io_write_win32)
     DWORD countwrote = 0;
+    DWORD err;
     void * const buffer = s->strstart;
-    size_t len = s->bufused;
+    DWORD len = (DWORD) s->bufused;
     PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
 
     /* do it by hand, Win32 hasn't any specific flag */
@@ -468,7 +469,6 @@ Parrot_io_write_win32(PARROT_INTERP,
         LARGE_INTEGER p;
         p.LowPart = 0;
         p.HighPart = 0;
-
         p.LowPart = SetFilePointer(os_handle, p.LowPart,
                                    &p.HighPart, FILE_END);
         if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
@@ -477,8 +477,26 @@ Parrot_io_write_win32(PARROT_INTERP,
         }
     }
 
-    if (WriteFile(os_handle, (LPCSTR) buffer, (DWORD) len, &countwrote, NULL))
+    if (WriteFile(os_handle, (LPCSTR) buffer, len, &countwrote, NULL))
         return countwrote;
+
+    /* Write may have failed because of small buffers,
+     * see TT #710 for example.
+     * Let's try writing in small chunks */
+    if ((err = GetLastError()) == ERROR_NOT_ENOUGH_MEMORY || err == ERROR_INVALID_USER_BUFFER) {
+        DWORD chunk = 4096; /* Arbitrarily choosen value */
+        if (len < chunk)
+            goto fail;
+        while (len > 0) {
+            if (chunk > len)
+                chunk = len;
+            if (WriteFile(os_handle, (LPCSTR) buffer, chunk, &countwrote, NULL) == 0 || countwrote != chunk)
+                goto fail;
+            len -= chunk;
+        }
+        return len;
+    }
+fail:
     /* FIXME: Set error flag */
     return (size_t)-1;
 }
