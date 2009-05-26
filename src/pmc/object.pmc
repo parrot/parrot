@@ -29,13 +29,17 @@ get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
     Parrot_Class_attributes * const _class  = PARROT_CLASS(self);
     const INTVAL                    cur_hll = CONTEXT(interp)->current_HLL;
     int                             num_classes, i;
+    INTVAL                          retval;
 
     CONTEXT(interp)->current_HLL = 0;
 
     /* First see if we can find it in the cache. */
-    if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
-        const INTVAL retval =
-            VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
+    retval                       = VTABLE_get_integer_keyed_str(interp,
+                                         _class->attrib_cache, name);
+
+    /* there's a semi-predicate problem with a retval of 0 */
+    if (retval
+    || VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
         CONTEXT(interp)->current_HLL = cur_hll;
         return retval;
     }
