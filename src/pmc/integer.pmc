@@ -90,9 +90,10 @@ Destroys this PMC.
 
 
     VTABLE void init() {
-        Parrot_Integer_attributes* const attrs =
-            mem_allocate_zeroed_typed(Parrot_Integer_attributes);
-        attrs->iv = 0;
+        Parrot_Integer_attributes * const attrs =
+            mem_allocate_typed(Parrot_Integer_attributes);
+
+        attrs->iv      = 0;
         PMC_data(SELF) = attrs;
         PObj_active_destroy_SET(SELF);
     }

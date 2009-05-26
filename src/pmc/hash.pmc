@@ -155,10 +155,11 @@ Free hash structure.
 */
 
     VTABLE void init() {
-        Parrot_Hash_attributes *attr =
-            mem_allocate_zeroed_typed(Parrot_Hash_attributes);
+        Parrot_Hash_attributes * const attr =
+            mem_allocate_typed(Parrot_Hash_attributes);
+
         PMC_data(SELF) = attr;
-        SELF.set_pointer(parrot_new_hash(INTERP));
+        attr->hash     = parrot_new_hash(INTERP);
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -219,10 +220,10 @@ Use C<ptr> as this PMC's Hash*.
         Hash *new_hash = (Hash *)ptr;
 
         PARROT_HASH(SELF)->hash = new_hash;
-        new_hash->container  = SELF;
-        if (old_hash != NULL) {
+        new_hash->container     = SELF;
+
+        if (old_hash)
             parrot_hash_destroy(INTERP, old_hash);
-        }
     }
 
 /*
