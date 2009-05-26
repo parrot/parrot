@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 43;
+use Parrot::Test tests => 42;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -821,27 +821,6 @@ CODE
 unicode
 utf8
 T\xf6tsch
-OUTPUT
-
-pir_output_is( <<'CODE', <<"OUTPUT", "string read/write handle", todo => "no stringhandle yet" );
-.sub main :main
-    .local pmc    pio
-    .local string greeting
-    .local string layer
-
-    pio = new ['StringHandle']
-    print pio, "Hello"
-    print pio, ", "
-    print pio, "world!"
-    print pio, "\n"
-
-    greeting = read pio, 1024
-
-    print greeting
-    print "\n"
-.end
-CODE
-Hello, world!
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "PIO.readall() - classmeth" );
