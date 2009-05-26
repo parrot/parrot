@@ -366,11 +366,11 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC* obj),
         ARGIN(const char *sig), va_list args)
 {
     ASSERT_ARGS(Parrot_pcc_build_sig_object_from_varargs)
-    PMC         *type_tuple    = PMCNULL;
-    PMC         *returns       = PMCNULL;
-    PMC         *call_object   = pmc_new(interp, enum_class_CallSignature);
-    STRING      *string_sig    = Parrot_str_new_constant(interp, sig);
-    const INTVAL sig_len       = Parrot_str_byte_length(interp, string_sig);
+    PMC         *type_tuple         = PMCNULL;
+    PMC         *returns            = PMCNULL;
+    PMC         * const call_object = pmc_new(interp, enum_class_CallSignature);
+    STRING      *string_sig         = Parrot_str_new_constant(interp, sig);
+    const INTVAL sig_len            = Parrot_str_byte_length(interp, string_sig);
     INTVAL       in_return_sig = 0;
     INTVAL       i;
 
@@ -969,7 +969,7 @@ Parrot_fetch_arg_nci(PARROT_INTERP, ARGMOD(call_state *st))
     next_arg_sig(interp, &st->dest);
 
     if (st->dest.sig & PARROT_ARG_SLURPY_ARRAY) {
-        PMC *slurped = pmc_new(interp,
+        PMC * const slurped = pmc_new(interp,
                 Parrot_get_ctx_HLL_type(interp, enum_class_ResizablePMCArray));
 
         PARROT_ASSERT((st->dest.sig & PARROT_ARG_TYPE_MASK) == PARROT_ARG_PMC);
@@ -1663,7 +1663,7 @@ Parrot_process_args(PARROT_INTERP, ARGMOD(call_state *st), arg_pass_t param_or_r
              * RT #54860 and others
              * Save current value while setting the optional
              */
-            UnionVal old_value = st->val;
+            const UnionVal old_value = st->val;
 
             while (dest->sig & PARROT_ARG_OPTIONAL) {
                 null_val(st->dest.sig, st);
@@ -2397,14 +2397,14 @@ set_context_sig_returns(PARROT_INTERP,
 {
     ASSERT_ARGS(set_context_sig_returns)
     const char   *x;
-    STRING       *empty_string = CONST_STRING(interp, "");
+    STRING       * const empty_string = CONST_STRING(interp, "");
     unsigned int  index        = 0;
     unsigned int  seen_arrow   = 1;
 
     /* result_accessors perform the arg accessor function,
      * assigning the corresponding registers to the result variables */
     for (x = ret_x; x && *x; x++) {
-        PMC *result_item = VTABLE_get_pmc_keyed_int(interp, result_list, index);
+        PMC * const result_item = VTABLE_get_pmc_keyed_int(interp, result_list, index);
         if (isupper((unsigned char)*x)) {
             switch (*x) {
                 case 'I':
