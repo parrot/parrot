@@ -190,7 +190,6 @@ Files included in the =parrot= package:
  /usr/lib/parrot/1.0.0/library/postgres.pasm
  /usr/lib/parrot/1.0.0/library/postgres.pir
  /usr/lib/parrot/1.0.0/library/random_lib.pir
- /usr/lib/parrot/1.0.0/library/tcpstream.pir
  /usr/lib/parrot/1.0.0/library/uuid.pir
  /usr/lib/parrot/1.0.0/library/yaml_dumper.pir
  /usr/share/doc/parrot-1.0.0/LICENSE
@@ -738,7 +737,6 @@ Files included in the =parrot-devel= package:
  /usr/lib/parrot/1.0.0/include/parrotlib.pbc
  /usr/lib/parrot/1.0.0/include/pmctypes.pasm
  /usr/lib/parrot/1.0.0/include/signal.pasm
- /usr/lib/parrot/1.0.0/include/sockets.pasm
  /usr/lib/parrot/1.0.0/include/stat.pasm
  /usr/lib/parrot/1.0.0/include/stdio.pasm
  /usr/lib/parrot/1.0.0/include/stringinfo.pasm
@@ -1330,7 +1328,6 @@ Files included in the =parrot-docs= package:
  /usr/share/doc/parrot/1.0.0/html/runtime/parrot/library/libpcre.pir.html
  /usr/share/doc/parrot/1.0.0/html/runtime/parrot/library/parrotlib.pir.html
  /usr/share/doc/parrot/1.0.0/html/runtime/parrot/library/pcre.pir.html
- /usr/share/doc/parrot/1.0.0/html/runtime/parrot/library/tcpstream.pir.html
  /usr/share/doc/parrot/1.0.0/html/runtime/parrot/library/uuid.pir.html
  /usr/share/doc/parrot/1.0.0/html/runtime/parrot/library/yaml_dumper.pir.html
  /usr/share/doc/parrot/1.0.0/html/scheme.html

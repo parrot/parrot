@@ -68,11 +68,6 @@ my $full_gen_pseudo = File::Spec->catfile( $cwd, $gen_pseudo );
             end     => File::Spec->catfile(
                         $includedir, $versiondir, 'parrot', 'charset.h' ),
         },
-        'runtime/parrot/include/sockets.pasm' => {
-            start   => File::Spec->catfile( qw| . runtime parrot include sockets.pasm | ),
-            end     => File::Spec->catfile(
-                        $libdir, $versiondir, 'include', 'sockets.pasm' ),
-        },
         'install_config.fpmc'                 => {
             start   => File::Spec->catfile( qw| . install_config.fpmc | ),
             end     => File::Spec->catfile(
