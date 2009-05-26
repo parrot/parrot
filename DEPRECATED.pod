@@ -97,6 +97,10 @@ get_label and set_label.
 
 L<https://trac.parrot.org/parrot/ticket/702>
 
+=item C<branch_cs> [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/470>
+
 =back
 
 =head1 Bytecode
