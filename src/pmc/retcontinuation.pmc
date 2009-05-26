@@ -36,11 +36,12 @@ Initializes the continuation.
 */
 
     VTABLE void init() {
-        Parrot_RetContinuation_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_RetContinuation_attributes);
-        PMC_data(SELF) = attrs;
+        Parrot_RetContinuation_attributes * const attrs =
+            mem_allocate_typed(Parrot_RetContinuation_attributes);
 
+        PMC_data(SELF) = attrs;
         PMC_cont(SELF) = new_ret_continuation(INTERP);
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
