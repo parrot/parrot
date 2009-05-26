@@ -130,8 +130,8 @@ EOH
     }
 
     if ($name ne 'default') {
-        $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(VTABLE*);\n");
-        $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(VTABLE*);\n");
+        $h->emit("${export}VTABLE* Parrot_${name}_update_vtable(ARGMOD(VTABLE*));\n");
+        $h->emit("${export}VTABLE* Parrot_${name}_ro_update_vtable(ARGMOD(VTABLE*));\n");
     }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
@@ -182,7 +182,7 @@ sub hdecls {
 
     $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT ';
 
-    $hout .= "${export}VTABLE* Parrot_${lc_name}_update_vtable(VTABLE*);\n"
+    $hout .= "${export}VTABLE* Parrot_${lc_name}_update_vtable(ARGMOD(VTABLE*));\n"
         unless $name eq 'default';
 
     $hout .= "${export}VTABLE* Parrot_${lc_name}_get_vtable(PARROT_INTERP);\n";
@@ -530,7 +530,7 @@ sub init_func {
                    [$ns,   $ns_name ]) {
             my ($raw_string, $name) = @$s;
             next if $strings_seen{$name}++;
-            $multi_strings .=  "        STRING *$name = "
+            $multi_strings .=  "        STRING * const $name = "
                            . qq|CONST_STRING_GEN(interp, "$raw_string");\n|;
         }
 
@@ -724,7 +724,7 @@ EOC
 
         $cout .= <<"EOC";
         {
-            PMC    *       mro = pmc_new(interp, enum_class_ResizableStringArray);
+            PMC    * const mro = pmc_new(interp, enum_class_ResizableStringArray);
             VTABLE * const vt  = interp->vtables[entry];
 
             vt->mro = mro;
@@ -855,7 +855,7 @@ EOC
 
     $cout .= <<"EOC";
 
-PARROT_EXPORT VTABLE *Parrot_${classname}_ro_update_vtable(VTABLE *vt) {
+PARROT_EXPORT VTABLE *Parrot_${classname}_ro_update_vtable(ARGMOD(VTABLE *vt)) {
 $vtable_updates
     return vt;
 }
@@ -889,6 +889,8 @@ sub get_vtable_func {
 
     $cout .= <<"EOC";
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 VTABLE* Parrot_${classname}_get_vtable(PARROT_INTERP) {
     VTABLE *vt;
 $get_vtable
@@ -909,6 +911,8 @@ EOC
 
     $cout .= <<"EOC";
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 VTABLE* Parrot_${classname}_ro_get_vtable(PARROT_INTERP) {
     VTABLE *vt;
 $get_extra_vtable
