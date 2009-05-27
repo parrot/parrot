@@ -19,10 +19,11 @@ Tests various PMCs with copy.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(3)
+    plan(4)
 
     test_basic()
     test_rt48467()
+    test_tonull()
 .end
 
 .sub 'test_basic'
@@ -61,6 +62,22 @@ Tests various PMCs with copy.
 
     ##   say '$x = ', $x;
     is( dest, 3.2, 'copy should make independent copies' )
+.end
+
+.sub 'test_tonull'
+    null $P1
+    $P2 = new 'Undef'
+    .local string msg
+    msg = 'failed'
+    push_eh catch
+    copy $P1, $P2
+    goto check
+catch:
+    .get_results($P3)
+    msg = $P3 ['message']
+check:
+    pop_eh
+    is( msg, 'Null PMC in copy', 'copy to null throws' )
 .end
 
 # Local Variables:
