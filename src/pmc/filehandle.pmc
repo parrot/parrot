@@ -43,12 +43,11 @@ extern "C" {
 #  define PIO_INVALID_HANDLE NULL
 #endif
 
-pmclass FileHandle need_ext {
+pmclass FileHandle extends Handle need_ext {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */
     ATTR STRING *mode;                /* The mode string used in open */
     ATTR STRING *encoding;            /* The encoding for read/write  */
-    ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
     ATTR INTVAL process_id;           /* Child process on pipes       */
     ATTR PIOOFF_T file_size;          /* Current file size            */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
