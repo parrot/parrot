@@ -1367,12 +1367,13 @@ X<namespace collisions>
 X<namespace pollution>
 
 Without a namespace (or in a program that eschews namespaces), all subroutines
-and global variables would live in one big bag, running the risk of I<namespace
-collisions> thanks to I<namespace pollution>. You couldn't tell which
-subroutine performed which operation when two task contexts use the same word
-to mean two different things.
+and global variables would live in one big bag, running the risk of
+I<namespace collisions> thanks to I<namespace pollution>. You couldn't tell
+which subroutine performed which operation when two task contexts use the same
+word to mean two different things.
 
-NameSpaces are very effective at hiding private information as well as gathering similar things together.
+NameSpaces are very effective at hiding private information as well as
+gathering similar things together.
 
 For example, the C<Math> namespace could store subroutines that manipulate
 numbers. The C<Images> namespace could store subroutines create and manipulate

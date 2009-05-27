@@ -490,7 +490,8 @@ Parrot_io_write_win32(PARROT_INTERP,
         while (len > 0) {
             if (chunk > len)
                 chunk = len;
-            if (WriteFile(os_handle, (LPCSTR) buffer, chunk, &countwrote, NULL) == 0 || countwrote != chunk)
+            if (WriteFile(os_handle, (LPCSTR) buffer, chunk, &countwrote, NULL) == 0 ||
+                    countwrote != chunk)
                 goto fail;
             len -= chunk;
         }
