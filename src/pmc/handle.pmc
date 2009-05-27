@@ -18,6 +18,7 @@ This is the base-class for all IO-related PMCs.
 
 */
 
+#include "parrot/parrot.h"
 #include "../src/io/io_private.h"
 
 pmclass Handle provides Handle need_ext {
@@ -35,10 +36,8 @@ pmclass Handle provides Handle need_ext {
     }
 
     VTABLE INTVAL does(STRING * role) {
-        /*
-        if (Parrot_str_equal(interp, role, Parrot_str_new(INTERP, "IO"))
+        if (Parrot_str_equal(interp, role, Parrot_str_new(INTERP, "IO", 2)))
             return 1;
-        */
         return 0;
     }
 }
