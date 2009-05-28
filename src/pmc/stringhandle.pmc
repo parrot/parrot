@@ -21,7 +21,7 @@ than an external file. Commonly used as a mock FileHandle for testing.
 
 #include "../src/io/io_private.h"
 
-pmclass StringHandle need_ext {
+pmclass StringHandle extends Handle need_ext {
     ATTR INTVAL  flags;               /* Filehandle flags             */
     ATTR STRING *stringhandle;        /* The string data              */
     ATTR STRING *mode;                /* The mode string used in open */
@@ -79,6 +79,20 @@ Create a copy of the stringhandle.
         data_struct->flags    = old_struct->flags;
 
         return copy;
+    }
+
+/*
+
+=item <INTVAL does(STRING * role)>
+
+=cut
+
+*/
+
+    VTABLE INTVAL does(STRING * role) {
+        if (Parrot_str_equal(INTERP, SELF, CONST_STRING(INTERP, "string")))
+            return 1;
+        return SUPER(role);
     }
 
 /*
@@ -238,13 +252,9 @@ Check if the StringHandle is open.
 */
 
     METHOD is_closed() {
-        STRING *stringhandle;
-        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
-
-        if (STRING_IS_NULL(stringhandle))
-            RETURN(INTVAL 1);
-
-        RETURN(INTVAL 0);
+        INTVAL status;
+        status = Parrot_io_is_closed(INTERP, SELF);
+        RETURN(INTVAL status);
     }
 
 /*

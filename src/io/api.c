@@ -27,6 +27,7 @@ is used in Parrot ops.
 #include "io_private.h"
 #include "api.str"
 #include "../pmc/pmc_filehandle.h"
+#include "../pmc/pmc_stringhandle.h"
 
 #include <stdarg.h>
 
@@ -204,7 +205,7 @@ INTVAL
 Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_close)
-    INTVAL result;
+    INTVAL result = 1;
 
     if (PMC_IS_NULL(pmc))
         return -1;
@@ -212,6 +213,9 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file"))) {
         result = Parrot_io_close_filehandle(interp, pmc);
         SETATTR_FileHandle_flags(interp, pmc, 0);
+    }
+    else if (VTABLE_does(interp, pmc, CONST_STRING(interp, "string"))) {
+        SETATTR_StringHandle_read_offset(interp, pmc, 0);
     }
 
     return result;
@@ -240,6 +244,11 @@ Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
         return 1;
     if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file")))
         result = Parrot_io_is_closed_filehandle(interp, pmc);
+    else if (VTABLE_does(interp, pmc, CONST_STRING(interp, "string"))) {
+        STRING *stringhandle;
+        GETATTR_StringHandle_stringhandle(interp, pmc, stringhandle);
+        result = STRING_IS_NULL(stringhandle);
+    }
 
     return result;
 }
