@@ -96,7 +96,8 @@ sub _evaluate_gcc {
         HAS_aligned_funcptr => 1
     );
     $conf->data->set( HAS_aligned_funcptr => 0 )
-        if $conf->data->get_p5('OSNAME') eq 'hpux';
+        if (  $conf->data->get_p5('OSNAME') eq 'hpux'
+           || $conf->data->get('archname') =~ /gnulp/); # lpia arch
     return 1;
 }
 
