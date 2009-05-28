@@ -2234,12 +2234,12 @@ See also: C<getprop> and C<delprop>.
 =head3 setstd*
 
 X<setstderr opcode (PASM)>
-X<setstdout opcode (PASM)>
 X<setstdin  opcode (PASM)>
+X<setstdout opcode (PASM)>
 
   setstderr R<DEST>
-  setstdout R<DEST>
   setstdin  R<DEST>
+  setstdout R<DEST>
 
 Set a FileHandle object for the given standard handle.
 

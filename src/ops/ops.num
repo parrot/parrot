@@ -1276,3 +1276,4 @@ find_name_p_s                  1251
 find_name_p_sc                 1252
 find_sub_not_null_p_s          1253
 find_sub_not_null_p_sc         1254
+setstdin_p                     1255
