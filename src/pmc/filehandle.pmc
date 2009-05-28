@@ -527,7 +527,7 @@ Flushes the filehandle.
 */
 
     METHOD flush() {
-        Parrot_io_flush_filehandle(interp, SELF);
+        Parrot_io_flush(INTERP, SELF);
     }
 
 /*

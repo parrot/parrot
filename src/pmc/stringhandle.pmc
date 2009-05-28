@@ -377,7 +377,7 @@ Clear the StringHandle by resetting it to a null value.
 */
 
     METHOD flush() {
-        SET_ATTR_stringhandle(INTERP, SELF, NULL);
+        Parrot_io_flush(INTERP, SELF);
     }
 
 /*

@@ -272,7 +272,10 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (PMC_IS_NULL(pmc))
         return;
 
-    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "flush"), "->");
+    if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file")))
+        Parrot_io_flush_filehandle(interp, pmc);
+    else if (VTABLE_does(interp, pmc, CONST_STRING(interp, "string")))
+        SETATTR_StringHandle_stringhandle(interp, pmc, NULL);
 }
 
 /*
