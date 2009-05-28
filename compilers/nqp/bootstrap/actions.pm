@@ -339,6 +339,8 @@ method routine_def($/) {
     my $params := $past[0];
     if $<declarator> eq 'method' {
         $past.blocktype('method');
+        unshift $past, PAST::Op.new('inline'=>'.lex "self", self',
+            'pasttype'=>'inline');
     }
     for $<signature>[0] {
         my $parameter := $($_<parameter>);
@@ -703,7 +705,12 @@ method arglist($/) {
 
 
 method noun($/, $key) {
-    make $($/{$key});
+    if $key eq 'self' {
+        make PAST::Var.new('name'=>'self', 'node'=>$/);
+    }
+    else {
+        make $($/{$key});
+    }
 }
 ##.sub 'noun' :method
 ##    .param pmc match
