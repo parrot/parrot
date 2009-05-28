@@ -358,6 +358,51 @@ Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
 
 /*
 
+=item C<static PMC *get_pmc_proxy(PARROT_INTERP, STRING *name)>
+
+Get the PMC proxy for a PMC with the name given, creating it if does not exist.
+If name is not an existing PMC, return PMCNULL.
+
+For internal use only.
+
+=cut
+
+*/
+
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC *
+get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
+{
+    const INTVAL type = pmc_type(interp, name);
+
+    /* Check if not a PMC or invalid type number */
+    if (type > interp->n_vtable_max || type <= 0)
+        return PMCNULL;
+    else {
+        /* Look for a proxy */
+        PMC * const pmc_hll_ns = interp->vtables[type]->_namespace;
+        PMC * const pmc_ns     =
+                Parrot_get_namespace_keyed_str(interp, pmc_hll_ns, name);
+        PMC *new_class         = PMC_IS_NULL(pmc_ns) ?
+                PMCNULL : VTABLE_get_class(interp, pmc_ns);
+        /* If Proxy not found, create it */
+        if (PMC_IS_NULL(new_class)) {
+            PMC *new_ns          = pmc_ns;
+            PMC * const type_num = pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, type_num, type);
+            new_class = pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            if (pmc_ns->vtable->base_type != enum_class_NameSpace)
+                new_ns = Parrot_make_namespace_keyed_str(interp, pmc_hll_ns, name);
+            Parrot_PCCINVOKE(interp, new_ns, CONST_STRING(interp, "set_class"), "P->", new_class);
+        }
+        return new_class;
+    }
+}
+
+/*
+
 =item C<PMC * Parrot_oo_get_class_str(PARROT_INTERP, STRING *name)>
 
 Lookup a class object from a builtin string.
@@ -373,35 +418,19 @@ PMC *
 Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
 {
     ASSERT_ARGS(Parrot_oo_get_class_str)
+
+    /* First check in current HLL namespace */
     PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
                            CONTEXT(interp)->current_HLL);
     PMC * const ns     = Parrot_get_namespace_keyed_str(interp, hll_ns, name);
     PMC * const _class = PMC_IS_NULL(ns)
                        ? PMCNULL : VTABLE_get_class(interp, ns);
 
-    /* Look up a low-level class and create a proxy */
-    if (PMC_IS_NULL(_class)) {
-        const INTVAL type = pmc_type(interp, name);
-
-        /* Reject invalid type numbers */
-        if (type > interp->n_vtable_max || type <= 0)
-            return PMCNULL;
-        else {
-            PMC * new_class;
-            PMC * new_ns;
-            PMC * const type_num = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, type_num, type);
-            new_ns = ns;
-            new_class = pmc_new_init(interp, enum_class_PMCProxy, type_num);
-            if (ns->vtable->base_type != enum_class_NameSpace) {
-                new_ns = Parrot_make_namespace_keyed_str(interp, hll_ns, name);
-            }
-            Parrot_PCCINVOKE(interp, new_ns, CONST_STRING(interp, "set_class"), "P->", new_class);
-            return new_class;
-        }
-    }
-
-    return _class;
+    /* If not found, check for a PMC */
+    if (PMC_IS_NULL(_class))
+        return get_pmc_proxy(interp, name);
+    else
+        return _class;
 }
 
 
