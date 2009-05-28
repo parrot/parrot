@@ -235,7 +235,7 @@ op say(in STR) :base_io {
   STRING * const s = $1;
   if (s && Parrot_str_byte_length(interp, s))
     Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-  Parrot_io_puts(interp, _PIO_STDOUT(interp), "\n");
+  Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
 }
 
 op say(invar PMC) :base_io {
@@ -251,7 +251,7 @@ op say(invar PMC) :base_io {
         STRING * const s = VTABLE_get_string(interp, p);
         if (s)
             Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-        Parrot_io_puts(interp, _PIO_STDOUT(interp), "\n");
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
     }
 }
 
