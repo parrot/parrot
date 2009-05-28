@@ -19,14 +19,16 @@ Tests OO features related to creating and using class proxies.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(9)
+    plan(10)
 
     typeof_a_low_level_object()
     typeof_a_high_level_object()
     typeof_a_class_object()
     proxy_as_parent_of_class()
     proxy_as_parent_of_class_with_new()
-
+    .local pmc proxy_no_invade
+    proxy_no_invade = get_root_global ['foo'], 'proxy_no_invade'
+    proxy_no_invade()
 .end
 
 .sub typeof_a_low_level_object
@@ -79,6 +81,22 @@ Tests OO features related to creating and using class proxies.
     $P2 = new ['Foo';'Bar']
     $S0 = typeof $P2
     is ($S0, 'Foo;Bar', 'object is typeof Foo;Bar')
+.end
+
+.HLL 'foo'
+
+.sub proxy_no_invade
+    .local pmc is
+    is = get_root_global ['parrot'], 'is'
+
+    $P0 = new 'Class'
+    $I0 = isa $P0, 'Sub'
+    $P1 = get_root_global ['foo'], 'Sub'
+    $I1 = 0
+    if null $P1 goto do_test
+    inc $I1
+do_test:
+    is($I1, 0, 'No proxy in current HLL namespace, TT #715')
 .end
 
 # Local Variables:
