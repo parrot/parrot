@@ -425,31 +425,25 @@ Adds C<value> to C<SELF> inplace.
 
 */
 
-    VTABLE void i_add(PMC *value) {
-        const INTVAL type = value->vtable->base_type;
-
-        switch (type) {
-            case enum_class_Integer:
-                STATICSELF.i_add_int(VTABLE_get_integer(INTERP, value));
-                break;
-
-            case enum_class_Complex:
-                pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
-                VTABLE_set_number_native(INTERP, SELF,
-                        SELF.get_integer() + VTABLE_get_number(INTERP, value));
-                break;
-
-            default:
-                VTABLE_set_number_native(INTERP, SELF,
-                        SELF.get_integer() + VTABLE_get_number(INTERP, value));
-                break;
-        }
+    MULTI void i_add(Integer value) {
+        STATICSELF.i_add_int(VTABLE_get_integer(INTERP, value));
     }
+
+
+    MULTI void i_add(Complex value) {
+        const INTVAL a = SELF.get_integer();
+
+        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        VTABLE_set_number_native(INTERP, SELF,
+                SELF.get_integer() + VTABLE_get_number(INTERP, value));
+    }
+
 
     MULTI void i_add(DEFAULT value) {
         VTABLE_set_number_native(INTERP, SELF,
                 SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
+
 
     VTABLE void i_add_int(INTVAL b) {
         const INTVAL a = SELF.get_integer();
