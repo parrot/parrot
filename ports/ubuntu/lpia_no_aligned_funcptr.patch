@@ -1,0 +1,12 @@
+Index: /trunk/config/auto/gcc.pm
+===================================================================
+--- /trunk/config/auto/gcc.pm (revision 37201)
++++ /trunk/config/auto/gcc.pm (revision 39212)
+@@ -97,5 +97,6 @@
+     );
+     $conf->data->set( HAS_aligned_funcptr => 0 )
+-        if $conf->data->get_p5('OSNAME') eq 'hpux';
++        if (  $conf->data->get_p5('OSNAME') eq 'hpux'
++           || $conf->data->get('archname') =~ /gnulp/); # lpia arch
+     return 1;
+ }
