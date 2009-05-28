@@ -123,6 +123,7 @@ static int gc_ms_trace_active_PMCs(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/* the percent of used Arena items at which to trace next time through */
 #define GC_DEBUG_REPLENISH_LEVEL_FACTOR        0.0
 #define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
 #define REPLENISH_LEVEL_FACTOR                 0.3
@@ -372,7 +373,7 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
             if (arena->used == arena->total_objects)
                 Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
-            if (pool->num_free_objects <= pool->replenish_level)
+            if (pool->num_free_objects > pool->replenish_level)
                 pool->skip = 1;
         }
     }
