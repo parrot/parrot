@@ -38,7 +38,8 @@ about the structure of the frozen bytecode.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void byte_code_destroy(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
+static void byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
@@ -335,7 +336,8 @@ static int sub_pragma(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_byte_code_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(self)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_byte_code_new __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_clone_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -2518,7 +2520,7 @@ Destroys the C<PackFile_ByteCode> segment C<self>.
 */
 
 static void
-byte_code_destroy(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
+byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 {
     ASSERT_ARGS(byte_code_destroy)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
