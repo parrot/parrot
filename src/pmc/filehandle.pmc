@@ -346,7 +346,7 @@ Test if the filehandle is closed.
 
     METHOD is_closed() {
         INTVAL status;
-        status = Parrot_io_is_closed_filehandle(interp, SELF);
+        status = Parrot_io_is_closed(interp, SELF);
         RETURN(INTVAL status);
     }
 

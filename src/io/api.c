@@ -119,6 +119,8 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
     INTVAL flags;
 
     if (PMC_IS_NULL(pmc))
+        /* TODO: We should look up the HLL mapped type, instead of always
+           using FileHandle here */
         new_filehandle = pmc_new(interp, enum_class_FileHandle);
     else {
         if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "file")))
@@ -207,8 +209,10 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (PMC_IS_NULL(pmc))
         return -1;
 
-    result = Parrot_io_close_filehandle(interp, pmc);
-    SETATTR_FileHandle_flags(interp, pmc, 0);
+    if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file"))) {
+        result = Parrot_io_close_filehandle(interp, pmc);
+        SETATTR_FileHandle_flags(interp, pmc, 0);
+    }
 
     return result;
 }
@@ -230,12 +234,13 @@ INTVAL
 Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_closed)
-    INTVAL result;
+    INTVAL result = 1;
 
     if (PMC_IS_NULL(pmc))
         return 1;
+    if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file")))
+        result = Parrot_io_is_closed_filehandle(interp, pmc);
 
-    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "is_closed"), "->I", &result);
     return result;
 }
 
