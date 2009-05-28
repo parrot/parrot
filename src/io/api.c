@@ -26,6 +26,7 @@ is used in Parrot ops.
 #include "parrot/parrot.h"
 #include "io_private.h"
 #include "api.str"
+#include "../pmc/pmc_filehandle.h"
 
 #include <stdarg.h>
 
@@ -114,17 +115,27 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         ARGIN(STRING *path), ARGIN_NULLOK(STRING *mode))
 {
     ASSERT_ARGS(Parrot_io_open)
-    PMC *new_filehandle;
+    PMC *new_filehandle, *filehandle;
+    INTVAL flags;
 
     if (PMC_IS_NULL(pmc))
         new_filehandle = pmc_new(interp, enum_class_FileHandle);
     else
         new_filehandle = pmc;
 
-    Parrot_PCCINVOKE(interp, new_filehandle, CONST_STRING(interp, "open"), "SS->P",
-            path, mode, &new_filehandle);
+    flags = Parrot_io_parse_open_flags(interp, mode);
+    filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
 
-    return new_filehandle;
+    if (PMC_IS_NULL(filehandle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Unable to open filehandle from path '%S'",
+            path);
+
+    SETATTR_FileHandle_flags(interp, new_filehandle, flags);
+    SETATTR_FileHandle_filename(interp, new_filehandle, path);
+    SETATTR_FileHandle_mode(interp, new_filehandle, mode);
+    Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
+    return filehandle;
 }
 
 /*
