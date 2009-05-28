@@ -5,7 +5,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 123;
+use Test::More tests => 122;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::init::defaults');
@@ -288,8 +288,6 @@ $gnucref->{__GNUC_MINOR__} = q{1};
         "gccversion defined as expected");
     is($conf->data->get( 'gccversion' ), q{3.1},
         "Got expected value for gccversion");
-    is($conf->data->get( 'HAS_aligned_funcptr' ), 0,
-        "Got expected value for HAS_aligned_funcptr");
     like($step->result(), qr/^yes/, "Got expected result");
 }
 
