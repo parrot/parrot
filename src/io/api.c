@@ -207,7 +207,8 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
     if (PMC_IS_NULL(pmc))
         return -1;
 
-    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "close"), "->I", &result);
+    result = Parrot_io_close_filehandle(interp, pmc);
+    SETATTR_FileHandle_flags(interp, pmc, 0);
 
     return result;
 }

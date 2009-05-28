@@ -330,8 +330,7 @@ Close the filehandle.
 
     METHOD close() {
         INTVAL status;
-        status = Parrot_io_close_filehandle(interp, SELF);
-        PARROT_FILEHANDLE(SELF)->flags = 0;
+        status = Parrot_io_close(INTERP, SELF);
         RETURN(INTVAL status);
     }
 
