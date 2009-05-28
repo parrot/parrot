@@ -120,8 +120,12 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
 
     if (PMC_IS_NULL(pmc))
         new_filehandle = pmc_new(interp, enum_class_FileHandle);
-    else
+    else {
+        if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "file")))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can only open a PMC that does 'file'");
         new_filehandle = pmc;
+    }
 
     flags = Parrot_io_parse_open_flags(interp, mode);
     filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
