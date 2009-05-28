@@ -59,6 +59,13 @@ static PMC * find_method_direct_1(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC * get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void invalidate_all_caches(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -79,6 +86,9 @@ static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(_class) \
     || PARROT_ASSERT_ARG(method_name)
+#define ASSERT_ARGS_get_pmc_proxy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_invalidate_all_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_invalidate_type_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -358,7 +368,7 @@ Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
 
 /*
 
-=item C<static PMC *get_pmc_proxy(PARROT_INTERP, STRING *name)>
+=item C<static PMC * get_pmc_proxy(PARROT_INTERP, STRING *name)>
 
 Get the PMC proxy for a PMC with the name given, creating it if does not exist.
 If name is not an existing PMC, return PMCNULL.
