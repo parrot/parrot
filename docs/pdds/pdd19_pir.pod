@@ -1052,7 +1052,7 @@ This means that, currently, when using IMCC, the following is not allowed:
 
 EOS
 
-=cut PIR_TODO
+=end PIR_TODO
 
 Using braces, { }, allows you to span multiple lines for an argument.
 See runtime/parrot/include/hllmacros.pir for examples and possible usage.
