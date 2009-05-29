@@ -659,6 +659,7 @@ Used to unarchive the array.
         Parrot_FixedIntegerArray_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_FixedIntegerArray_attributes);
         PMC_data(SELF) = attrs;
+        PObj_active_destroy_SET(SELF);
 
         if (info->extra_flags == EXTRA_IS_NULL) {
             IMAGE_IO * const io = info->image_io;
