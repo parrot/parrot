@@ -49,7 +49,7 @@ have the same number of elements because there is a one-to-one mapping.
 #include "../pmc/pmc_parrotlibrary.h"
 
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: include/parrot/runcore_api.h */
 /* XXX Needs to get done at the same time as the other interpreter files */
 
 /* HEADERIZER BEGIN: static */
@@ -1029,6 +1029,36 @@ Parrot_setup_event_func_ptrs(PARROT_INTERP)
             interp->evc_func_table[i] = (op_func_t)
                 D2FPTR(((void**)lib->op_func_table)[CORE_OPS_check_events__]);
     }
+}
+
+
+/*
+
+=item C<void Parrot_runcore_destroy(PARROT_INTERP)>
+
+Shuts down the runcores and deallocates any dynops memory.
+
+=cut
+
+*/
+
+void
+Parrot_runcore_destroy(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_runcore_destroy)
+    op_lib_t    *cg_lib;
+
+#ifdef HAVE_COMPUTED_GOTO
+    cg_lib = PARROT_CORE_CGP_OPLIB_INIT(1);
+    if (cg_lib->op_func_table)
+        mem_sys_free(cg_lib->op_func_table);
+    cg_lib->op_func_table = NULL;
+
+    cg_lib = PARROT_CORE_CG_OPLIB_INIT(1);
+    if (cg_lib->op_func_table)
+        mem_sys_free(cg_lib->op_func_table);
+    cg_lib->op_func_table = NULL;
+#endif
 }
 
 
