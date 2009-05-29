@@ -385,6 +385,8 @@ PARROT_WARN_UNUSED_RESULT
 static PMC *
 get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
 {
+    ASSERT_ARGS(get_pmc_proxy)
+
     const INTVAL type = pmc_type(interp, name);
 
     /* Check if not a PMC or invalid type number */

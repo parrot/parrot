@@ -55,6 +55,8 @@ Get debugger if available
 PARROT_CANNOT_RETURN_NULL
 Interp *
 debugger_or_interp(PARROT_INTERP) {
+    ASSERT_ARGS(debugger_or_interp)
+
     return interp->pdb && interp->pdb->debugger
             ? interp->pdb->debugger
             : interp;
