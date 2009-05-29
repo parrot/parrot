@@ -253,12 +253,12 @@ methods:
 
 =over 4
 
-=item* C<commandline_prompt>
+=item * C<commandline_prompt>
 
 The C<commandline_prompt> method allows you to specify a custom prompt to
 display to users in interactive mode.
 
-=item* C<commandline_banner>
+=item * C<commandline_banner>
 
 The C<commandline_banner> method allows you to specify a banner message that
 displays at the beginning of interactive mode.
