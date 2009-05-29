@@ -80,6 +80,9 @@ Return the LexInfo PMC, if any or a Null PMC.
     VTABLE void init_pmc(PMC *lexinfo) {
         Parrot_LexPad_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_LexPad_attributes);
+
+        PObj_active_destroy_SET(SELF);
+
         attrs->lexinfo = lexinfo;
         PMC_data(SELF) = attrs;
     }
