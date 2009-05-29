@@ -442,6 +442,17 @@ Like C<cmp>, but forces string comparison.
 
 I<Arguments: IR, P, P>
 
+=head3 cmp_pmc
+
+X<cmp_pmc opcode (PASM)>
+
+  cmp_pmc R<DEST>, R<VAL1>, R<VAL2>
+
+Like C<cmp>, but places a PMC in R<DEST>.  This opcode is useful for avoiding
+semipredicate problems in HLLs where two PMCs are not always comparable.
+
+I<Arguments: P, P, P>
+
 =head3 collect
 
 X<collect opcode (PASM)>

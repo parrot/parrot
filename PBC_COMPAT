@@ -27,6 +27,7 @@
 
 # please insert tab separated entries at the top of the list
 
+4.7	2009.05.29	cotto	add cmp_pmc opcode (also, addition of setstdin and root_new in previous commits)
 4.6	2009.05.18	bacek	removed PackfileAnnotationKeys PMC
 4.5	2009.04.10	cotto	removed Ref and SharedRef PMCs
 4.4	2009.04.07	pmichaud	find_caller_lex added

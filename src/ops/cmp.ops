@@ -614,7 +614,6 @@ These ops do comparisons and truth testing without doing flow control.
 
 =item B<cmp_num>(out INT, invar PMC, invar PMC)
 
-
 Sets $1 to -1 if $2 < $3, +1 if $2 > $3, and 0 otherwise.
 
 =cut
@@ -664,6 +663,18 @@ inline op cmp_str(out INT, invar PMC, invar PMC) :base_core {
 
 inline op cmp_num(out INT, invar PMC, invar PMC) :base_core {
   $1 = VTABLE_cmp_num(interp, $2, $3);
+}
+
+=item B<cmp_pmc>(out PMC, invar PMC, invar PMC)
+
+Does the same thing as the other cmp_* variants, but puts a PMC in $1.  This is
+useful for avoiding the semipredicate problem in HLLs where two aggregate PMCs
+are not always comparable.
+
+=cut
+
+inline op cmp_pmc(out PMC, invar PMC, invar PMC) :base_core {
+  $1 = VTABLE_cmp_pmc(interp, $2, $3);
 }
 
 ########################################
