@@ -33,8 +33,11 @@ Initializes the number to zero.
 
     VTABLE void init() {
         Parrot_Float_attributes * const fattr = mem_allocate_zeroed_typed(Parrot_Float_attributes);
-        fattr->fv = 0.0;
+
+        fattr->fv      = 0.0;
         PMC_data(SELF) = fattr;
+
+        PObj_active_destroy_SET(SELF);
     }
 /*
 
