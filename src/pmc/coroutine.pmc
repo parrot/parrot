@@ -82,35 +82,25 @@ Clone the coroutine.
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+
 /*
 
-=item C<void destroy()>
+=item C<PMC * clone()>
 
-Destroys the coroutine.
+Clones the coroutine.
 
 =cut
 
 */
 
-    VTABLE void destroy() {
-        Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
-        Parrot_sub                  *sub   = attrs->sub;
-
-        if (sub->ctx)
-            Parrot_free_context(interp, sub->ctx, 1);
-
-        SUPER();
-    }
-
     VTABLE PMC *clone() {
-        Parrot_coro * const coro_sub = mem_allocate_typed(Parrot_coro);
         PMC         * const ret      = pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_sub         *sub;
+        Parrot_sub         *coro_sub;
 
         PObj_custom_mark_destroy_SETALL(ret);
 
-        SET_ATTR_sub(INTERP, ret, (Parrot_sub *)coro_sub);
-
+        PMC_get_sub(INTERP, ret,  coro_sub);
         PMC_get_sub(INTERP, SELF, sub);
         memcpy(coro_sub, sub, sizeof (Parrot_coro));
 
@@ -132,7 +122,7 @@ Swaps the "context".
     VTABLE opcode_t *invoke(void *next) {
         PackFile_ByteCode  *wanted_seg;
         Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
-        Parrot_coro * const co = (Parrot_coro*)attrs->sub;
+        Parrot_coro * const co = (Parrot_coro *)attrs->sub;
         opcode_t    * dest     = co->address;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
