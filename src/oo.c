@@ -371,7 +371,10 @@ Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
 =item C<static PMC * get_pmc_proxy(PARROT_INTERP, STRING *name)>
 
 Get the PMC proxy for a PMC with the name given, creating it if does not exist.
-If name is not an existing PMC, return PMCNULL.
+If name is not an existing PMC, return PMCNULL.  This code assumes that
+all PMCProxy objects live in the 'parrot' HLL namespace -- if/when
+we allow PMC types to exist in other HLL namespaces, this code will
+need to be updated.
 
 For internal use only.
 
@@ -393,23 +396,19 @@ get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
     if (type > interp->n_vtable_max || type <= 0)
         return PMCNULL;
     else {
-        /* Look for a proxy */
-        PMC * const pmc_hll_ns = interp->vtables[type]->_namespace;
-        PMC * const pmc_ns     =
-                Parrot_get_namespace_keyed_str(interp, pmc_hll_ns, name);
-        PMC *new_class         = PMC_IS_NULL(pmc_ns) ?
-                PMCNULL : VTABLE_get_class(interp, pmc_ns);
-        /* If Proxy not found, create it */
-        if (PMC_IS_NULL(new_class)) {
-            PMC *new_ns          = pmc_ns;
+        PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot") );
+        PMC * const pmc_ns =
+            Parrot_make_namespace_keyed_str(interp, parrot_hll, name);
+        PMC * proxy = VTABLE_get_class(interp, pmc_ns);
+
+        /* Create proxy if not found */
+        if (PMC_IS_NULL(proxy)) {
             PMC * const type_num = pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, type_num, type);
-            new_class = pmc_new_init(interp, enum_class_PMCProxy, type_num);
-            if (pmc_ns->vtable->base_type != enum_class_NameSpace)
-                new_ns = Parrot_make_namespace_keyed_str(interp, pmc_hll_ns, name);
-            Parrot_PCCINVOKE(interp, new_ns, CONST_STRING(interp, "set_class"), "P->", new_class);
+            proxy = pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            Parrot_PCCINVOKE(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);
         }
-        return new_class;
+        return proxy;
     }
 }
 
