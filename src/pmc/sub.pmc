@@ -908,6 +908,15 @@ slurpy arguments).
         RETURN(PMC *lexinfo);
     }
 
+    METHOD get_subid() {
+        Parrot_sub *sub;
+        STRING     *subid;
+
+        PMC_get_sub(INTERP, SELF, sub);
+        subid = sub->subid ? sub->subid : CONST_STRING(interp, "");
+        RETURN(STRING *subid);
+    }
+
     METHOD get_outer() {
         Parrot_sub *sub;
         PMC        *outersub;
