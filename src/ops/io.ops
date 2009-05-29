@@ -90,7 +90,7 @@ inline op getstderr(out PMC) :base_io {
 
 #########################################
 
-=item B<setstdin>(invar PMC) 
+=item B<setstdin>(invar PMC)
 
 Sets the standard input for a bare C<read> op to go to the supplied PMC.
 Call C<getstdin> first if you care about retaining the previous PMC.

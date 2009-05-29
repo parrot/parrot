@@ -41,14 +41,14 @@ use Carp;
     })
 
 Creates a Parrot::Manifest object by asking C<svn status> for verbose output,
-and parsing the results.  
+and parsing the results.
 
 C<file> is the name of the file that the manifest will eventually be written
 to, and defaults to F<MANIFEST>.  C<skip> is the name of the file that will
 hold the list of files to be skipped, and defaults to F<MANIFEST.SKIP>.
 C<gitignore> contains the same information as F<MANIFEST.SKIP> in a different
 format.  It defaults to F<.gitignore>.  The C<script> parameter is the name of
-the program invoking Parrot::Manifest, for use in messages.  
+the program invoking Parrot::Manifest, for use in messages.
 
 =cut
 
@@ -108,7 +108,7 @@ sub new {
 
 Prepares the manifest from the read in by the C<new()> method, and returns a
 hash of the files.  The keys of the hash are the filenames, and the values are
-strings representing the package and a list of the meta flags.  
+strings representing the package and a list of the meta flags.
 
 =cut
 
@@ -139,13 +139,13 @@ If there's no manifest yet, we need one.
 =item *
 
 If there's a difference between what's already there and what's in the list,
-we need a new one. 
+we need a new one.
 
 =back
 
 If a new manifest is needed, the return value is C<1>; otherwise it is
 undefined.  The value passed in is the hash as returned from I<e.g.>,
-C<prepare_manifest()>.  
+C<prepare_manifest()>.
 
 =cut
 
@@ -172,7 +172,7 @@ sub determine_need_for_manifest {
     $mani->print_manifest($manifest_lines_ref) if $need_for_files;
 
 Writes the manifest to a file.  The example above does so only if an update is
-needed.  
+needed.
 
 =cut
 
@@ -213,7 +213,7 @@ END_HEADER
 
 # Gets the package and the meta flags for the given file.  This function does
 # it based on the directory the file is in.  If a particular file is needed,
-# then _get_special (below) provides that functionality.  
+# then _get_special (below) provides that functionality.
 sub _get_manifest_entry {
     my $file    = shift;
 
@@ -314,7 +314,7 @@ sub _get_current_files {
     $print_str = $mani->prepare_manifest_skip();
 
 Gets a list of the files that SVN ignores, and returns a string that can be
-put into F<MANIFEST.SKIP>.  
+put into F<MANIFEST.SKIP>.
 
 =cut
 
@@ -331,7 +331,7 @@ sub prepare_manifest_skip {
     $print_str = $mani->prepare_gitignore();
 
 Gets a list of the files that SVN ignores, and then writes it to the
-F<.gitignore> file.  
+F<.gitignore> file.
 
 =cut
 
@@ -390,7 +390,7 @@ sub determine_need_for_manifest_skip {
 
     $mani->print_manifest_skip($print_str) if $need_for_skip;
 
-Writes F<MANIFEST.SKIP> to a file.  The example above does so only if needed.  
+Writes F<MANIFEST.SKIP> to a file.  The example above does so only if needed.
 
 =cut
 
@@ -412,7 +412,7 @@ sub print_manifest_skip {
 
     $mani->print_gitignore($print_str) if $need_for_skip;
 
-Writes the F<.gitignore> file.  The example above does so only if needed.  
+Writes the F<.gitignore> file.  The example above does so only if needed.
 
 =cut
 

@@ -45,7 +45,7 @@ static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 /* HEADERIZER END: static */
 
 /*
- 
+
 =item C<Interp * debugger_or_interp(PARROT_INTERP)>
 
 Get debugger if available
