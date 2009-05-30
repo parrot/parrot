@@ -31,18 +31,6 @@ extern "C" {
 #endif
 #endif
 
-#ifdef PIO_OS_WIN32
-#  define PIO_INVALID_HANDLE INVALID_HANDLE_VALUE
-#endif
-
-#ifdef PIO_OS_UNIX
-#  define PIO_INVALID_HANDLE -1
-#endif
-
-#ifdef PIO_OS_STDIO
-#  define PIO_INVALID_HANDLE NULL
-#endif
-
 pmclass FileHandle extends Handle need_ext {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */

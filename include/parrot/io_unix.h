@@ -18,6 +18,8 @@
 typedef INTVAL PIOHANDLE;
 typedef off_t PIOOFF_T;
 
+#define PIO_INVALID_HANDLE -1
+
 /* HEADERIZER BEGIN: src/io/unix.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

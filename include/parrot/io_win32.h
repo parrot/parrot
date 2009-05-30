@@ -16,6 +16,8 @@
 typedef Parrot_WIN32_HANDLE PIOHANDLE;
 typedef Parrot_OFF_T PIOOFF_T;
 
+#define PIO_INVALID_HANDLE INVALID_HANDLE_VALUE
+
 /* HEADERIZER BEGIN: src/io/win32.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
