@@ -243,7 +243,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC*
 Parrot_pmc_try_reuse(PARROT_INTERP, ARGIN(PMC *self), ARGIN_NULLOK(PMC * value),
-    ARGIN(PMC *dest))
+    ARGIN_NULLOK(PMC *dest))
 {
     ASSERT_ARGS(Parrot_pmc_try_reuse)
     /* Can't reuse dest because we'll lost value */
