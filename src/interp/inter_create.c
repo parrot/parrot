@@ -20,6 +20,7 @@ Create or destroy a Parrot interpreter
 
 
 #include "parrot/parrot.h"
+#include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
 #include "inter_create.str"
@@ -444,7 +445,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
             mem_sys_free(interp->op_func_table);
 
             /* deinit op_lib */
-            Parrot_runcore_destroy();
+            Parrot_runcore_destroy(interp);
         }
 
         MUTEX_DESTROY(interpreter_array_mutex);
