@@ -976,11 +976,11 @@ sub gen_switch_vtable {
         next unless exists $multi_methods{$vt_method_name};
 
         my $multis = $multi_methods{$vt_method_name};
-        
-        # Gather "case :" 
+
+        # Gather "case :"
         my @cases = map { $self->generate_single_case($vt_method_name, $_) } @$multis;
         my $cases = join "\n", @cases;
-        
+
         my $body = <<"BODY";
     INTVAL type = VTABLE_type(INTERP, value);
     if (SELF.type() >= enum_class_core_max) /* For dynpmc fallback to MMD */
