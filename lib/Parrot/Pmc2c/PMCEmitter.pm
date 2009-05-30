@@ -333,7 +333,18 @@ sub proto {
     return $ret;
 }
 
+=item C<pre_method_gen>
+
+Generate switch-bases VTABLE for MULTI
+
+=cut
+
 sub pre_method_gen {
+    my ($self) = @_;
+
+    $self->gen_switch_vtable;
+
+    1;
 }
 
 =item C<gen_methods()>
@@ -407,7 +418,7 @@ sub find_multi_functions {
         my $full_sig     = $pmcname . "," . $method->{MULTI_full_sig};
         my $functionname = 'Parrot_' . $pmcname . '_' . $method->name;
         push @multi_names, [ $method->symbol, $short_sig, $full_sig,
-                             $pmcname, $functionname ];
+                             $pmcname, $functionname, $method ];
     }
     return ( \@multi_names );
 }
@@ -935,6 +946,130 @@ sub vtable {
     $self->{vtable} = $value if $value;
     return $self->{vtable};
 }
+
+=item C<gen_switch_vtable>
+
+Generate switch-bases VTABLE for MULTI
+
+=cut
+
+sub gen_switch_vtable {
+    my ($self) = @_;
+
+    # No cookies for DynPMC. At least not now.
+    return 1 if $self->is_dynamic;
+
+    # Convert list of multis to name->[(type,,ssig,fsig,ns,func)] hash.
+    my %multi_methods;
+    foreach (@{$self->find_multi_functions}) {
+        my ($name, $ssig, $fsig, $ns, $func, $method) = @$_;
+        my @sig = split ',', $fsig;
+        push @{ $multi_methods{ $name } }, [ $sig[1], $ssig, $fsig, $ns, $func, $method ];
+    }
+
+    # vtable methods
+    foreach my $method ( @{ $self->vtable->methods } ) {
+        my $vt_method_name = $method->name;
+        next if $vt_method_name eq 'class_init';
+
+        next if $self->implements_vtable($vt_method_name);
+        next unless exists $multi_methods{$vt_method_name};
+
+        my $multis = $multi_methods{$vt_method_name};
+        
+        # Gather "case :" 
+        my @cases = map { $self->generate_single_case($vt_method_name, $_) } @$multis;
+        my $cases = join "\n", @cases;
+        
+        my $body = <<"BODY";
+    INTVAL type = VTABLE_type(INTERP, value);
+    switch(type) {
+$cases
+    }
+BODY
+
+        my $vtable = $method->clone({
+                body => Parrot::Pmc2c::Emitter->text($body),
+            });
+        $self->add_method($vtable);
+    }
+
+    1;
+}
+
+# Generate signle case for switch VTABLE
+sub generate_single_case {
+    my ($self, $vt_method_name, $multi) = @_;
+
+    my ($type, $ssig, $fsig, $ns, $func, $impl) = @$multi;
+    my $case;
+
+    # Gather parameters names
+    my @parameters = map { s/\s*PMC\s*\*\s*//; $_ } split (',', $impl->parameters);
+    my $parameters = join ', ', @parameters;
+
+    if ($type eq 'DEFAULT' || $type eq 'PMC') {
+        # For default case we have to handle return manually.
+        my ($pcc_signature, $retval, $call_tail, $return)
+                = $self->gen_defaul_case_wrapping($ssig, @parameters);
+
+        $case = <<"CASE";
+        default:
+            if (type < enum_class_core_max)
+                return $func(INTERP, SELF, $parameters);
+            else {
+                $retval
+                Parrot_mmd_multi_dispatch_from_c_args(INTERP, "$vt_method_name", "$pcc_signature", SELF, $parameters$call_tail);
+                $return
+            }
+CASE
+    }
+    else {
+        $case = <<"CASE";
+        case enum_class_$type:
+            return $func(INTERP, SELF, $parameters);
+CASE
+    }
+
+    $case;
+}
+
+# Generate (pcc_signature, retval holder, pcc_call_tail, return statement)
+# for default case in switch.
+sub gen_defaul_case_wrapping {
+    my ($self, $ssig, @parameters) = @_;
+
+    my $letter = substr($ssig, 0, 1);
+    my $pcc_signature = "PP->" . $letter;
+    if ($letter eq 'I') {
+        return (
+            $pcc_signature,
+            "INTVAL retval;",
+            ', &retval',
+            'return retval;',
+        );
+    }
+    elsif ($letter eq 'P') {
+        return (
+            $pcc_signature,
+            '',
+            ", &$parameters[1]",
+            "return $parameters[1];",
+        );
+    }
+    elsif ($letter eq 'v') {
+        return (
+            $pcc_signature,
+            '',
+            '',
+            'return;',
+        );
+    }
+    else {
+        die "Can't handle signature $ssig!";
+    }
+}
+
 
 1;
 
