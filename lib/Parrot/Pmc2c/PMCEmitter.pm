@@ -963,7 +963,7 @@ sub gen_switch_vtable {
     my %multi_methods;
     foreach (@{$self->find_multi_functions}) {
         my ($name, $ssig, $fsig, $ns, $func, $method) = @$_;
-        my @sig = split ',', $fsig;
+        my @sig = split /,/, $fsig;
         push @{ $multi_methods{ $name } }, [ $sig[1], $ssig, $fsig, $ns, $func, $method ];
     }
 
@@ -1007,7 +1007,7 @@ sub generate_single_case {
     my $case;
 
     # Gather parameters names
-    my @parameters = map { s/\s*PMC\s*\*\s*//; $_ } split (',', $impl->parameters);
+    my @parameters = map { s/\s*PMC\s*\*\s*//; $_ } split (/,/, $impl->parameters);
     my $parameters = join ', ', @parameters;
 
     if ($type eq 'DEFAULT' || $type eq 'PMC') {
