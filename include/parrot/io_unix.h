@@ -85,6 +85,16 @@ size_t Parrot_io_peek_unix(PARROT_INTERP,
     SHIM(STRING **buf))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+INTVAL Parrot_io_pipe_unix(SHIM_INTERP,
+    ARGMOD(PIOHANDLE *reader),
+    ARGMOD(PIOHANDLE *writer))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*reader)
+        FUNC_MODIFIES(*writer);
+
 size_t Parrot_io_read_unix(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     ARGIN(STRING **buf))
@@ -143,6 +153,9 @@ size_t Parrot_io_write_unix(PARROT_INTERP,
     || PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_Parrot_io_peek_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_io_pipe_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(reader) \
+    || PARROT_ASSERT_ARG(writer)
 #define ASSERT_ARGS_Parrot_io_read_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(filehandle) \
@@ -287,6 +300,8 @@ INTVAL Parrot_io_socket_unix(PARROT_INTERP,
 
 #define PIO_POLL(interp, pmc, which, sec, usec) \
     Parrot_io_poll_unix((interp), (pmc), (which), (sec), (usec))
+#define PIO_PIPE(interp, reader, writer) \
+    Parrot_io_pipe_unix((interp), (reader), (writer))
 #define PIO_SOCKET(interp, socket, fam, type, proto) \
     Parrot_io_socket_unix((interp), (socket), (fam), (type), (proto))
 #define PIO_RECV(interp, pmc, buf) \

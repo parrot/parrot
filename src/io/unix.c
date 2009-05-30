@@ -35,6 +35,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 #  include <sys/types.h>
 #  include <sys/wait.h>
+#  include <unistd.h> /* for pipe() */
 
 /* HEADERIZER HFILE: include/parrot/io_unix.h */
 
@@ -784,6 +785,33 @@ Parrot_io_peek_unix(PARROT_INTERP,
         "peek() not implemented");
 }
 
+
+/*
+
+=item C<INTVAL Parrot_io_pipe_unix(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
+*writer)>
+
+Uses C<pipe()> to create a matched pair of pipe fds.  Returns 0 on success, -1
+on failure.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+INTVAL
+Parrot_io_pipe_unix(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
+{
+    ASSERT_ARGS(Parrot_io_pipe_unix)
+    int fds[2], rv;
+    rv = pipe(fds);
+    if (rv >= 0) {
+        *reader = fds[0];
+        *writer = fds[1];
+    }
+    return rv;
+}
 
 #endif /* PIO_OS_UNIX */
 

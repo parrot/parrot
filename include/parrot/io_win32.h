@@ -266,6 +266,8 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
 
 #define PIO_POLL(interp, pmc, which, sec, usec) \
     Parrot_io_poll_win32((interp), (pmc), (which), (sec), (usec))
+#define PIO_PIPE(interp, reader, writer) \
+    Parrot_io_pipe_win32((interp), (reader), (writer))
 #define PIO_SOCKET(interp, socket, fam, type, proto) \
     Parrot_io_socket_win32((interp), (socket), (fam), (type), (proto))
 #define PIO_RECV(interp, pmc, buf) \
