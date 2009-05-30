@@ -1485,7 +1485,10 @@ test_pbc_annotation_persistence : test_prep
 # integrating them in a single run is difficult.
 
 # Normal test package
-test : test_prep test_pbc_annotation_persistence nqp_test
+test : test_core nqp_test
+
+# Test Parrot core.
+test_core: test_prep test_pbc_annotation_persistence
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
 # Test the NQP compiler
