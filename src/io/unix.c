@@ -357,6 +357,24 @@ Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
     return result;
 }
 
+
+/*
+
+=item C<INTVAL Parrot_io_close_piohandle_unix(PARROT_INTERP, PIOHANDLE handle)>
+
+Closes the given file descriptor.  Returns 0 on success, -1 on error.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_io_close_piohandle_unix(SHIM_INTERP, PIOHANDLE handle)
+{
+    ASSERT_ARGS(Parrot_io_close_piohandle_unix)
+    return close(handle);
+}
+
 /*
 
 =item C<INTVAL Parrot_io_is_closed_unix(PARROT_INTERP, PMC *filehandle)>

@@ -251,6 +251,7 @@ INTVAL Parrot_io_socket_win32(PARROT_INTERP,
 #define PIO_OPEN_PIPE(interp, pmc, file, flags) \
     Parrot_io_open_pipe_win32((interp), (pmc), (file), (flags))
 #define PIO_CLOSE(interp, pmc) Parrot_io_close_win32((interp), (pmc))
+#define PIO_CLOSE_PIOHANDLE(interp, handle) Parrot_io_close_piohandle_win32((interp), (handle))
 #define PIO_IS_CLOSED(interp, pmc) Parrot_io_is_closed_win32((interp), (pmc))
 #define PIO_READ(interp, pmc, buf) Parrot_io_read_win32((interp), (pmc), (buf))
 #define PIO_WRITE(interp, pmc, str) Parrot_io_write_win32((interp), (pmc), (str))

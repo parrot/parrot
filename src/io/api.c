@@ -221,6 +221,27 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
     return result;
 }
 
+
+/*
+
+=item C<INTVAL Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)>
+
+Calls close() on the given PIOHANDLE.  This is the low level OS-specific close()
+function, intended to be called directly by PMC destroy() vtables.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+INTVAL
+Parrot_io_close_piohandle(PARROT_INTERP, PIOHANDLE handle)
+{
+    ASSERT_ARGS(Parrot_io_close_piohandle)
+    return PIO_CLOSE_PIOHANDLE(interp, handle);
+}
+
+
 /*
 
 =item C<INTVAL Parrot_io_is_closed(PARROT_INTERP, PMC *pmc)>
