@@ -459,7 +459,7 @@ name to be reused.
 =item :multi(type1, type2...)
 
 Engage in multiple dispatch with the listed types.
-See L<docs/pdds/pdd27_multi_dispatch.pod> for more information on the
+See F<docs/pdds/pdd27_multi_dispatch.pod> for more information on the
 multiple dispatch system.
 
 =item :immediate
@@ -561,7 +561,7 @@ that name instead of the C<.sub> name.
   .sub bar :vtable
     # ...
   .end
-   
+
   .sub bar :vtable('foo')
     # ...
   .end
@@ -644,7 +644,7 @@ that was specified with the C<.invocant> directive.
 Directive to make a call through the Native Calling Interface (NCI).
 The specified subroutine must be loaded using the <dlfunc> op that takes
 the library, function name and function signature as arguments.
-See L<docs/pdds/pdd16_native_call> for details.
+See F<docs/pdds/pdd16_native_call> for details.
 
 =item .set_return <var> [:<flag>]*
 
@@ -1074,7 +1074,7 @@ A simple example is this:
         })
  .end
 
-=cut PIR
+=end PIR
 
 This will expand the macro C<foo>, after which the input to the PIR parser is:
 
@@ -1087,7 +1087,7 @@ This will expand the macro C<foo>, after which the input to the PIR parser is:
    print "4"
  .end
 
-=cut PIR
+=end PIR
 
 which will result in the output:
 
@@ -1108,7 +1108,7 @@ the value of a macro parameter, like so:
     # ...
   .endm
 
-=cut PIR
+=end PIR
 
 =head4 Unique local variables
 
@@ -1128,7 +1128,7 @@ name.
     # ...
   .endm
 
-=cut PIR
+=end PIR
 
 The C<.macro_local> directive declares a local variable with a unique name in
 the macro. When the macro C<.foo()> is called, the resulting code that is
@@ -1144,7 +1144,7 @@ given to the parser will read as follows:
 
   .end
 
-=cut
+=end PIR
 
 The user can also declare a local variable with a unique name set to the
 symbolic value of one of the macro parameters.
@@ -1234,7 +1234,7 @@ there will be two variables: C<b> and C<x>. When the macro is invoked twice:
     .foo("y")
   .end
 
-=begin PIR
+=end PIR
 
 the resulting code that is given to the parser will read as follows:
 
