@@ -23,8 +23,8 @@ write-only.  Data written to the writer is readable from the reader.
 #include "pmc_pipehandle.h"
 
 pmclass Pipe {
-    ATTR PMC* reader;           /* Readable IO handle */
-    ATTR PMC* writer;           /* Writable IO handle */
+    ATTR PMC *r; /* Readable IO handle */
+    ATTR PMC *w; /* Writable IO handle */
 
 /*
 
@@ -38,24 +38,24 @@ Create a new pipe.
 
     VTABLE void init() {
         PIOHANDLE reader, writer;
-        Parrot_Pipe_attributes *data_struct =
+        Parrot_Pipe_attributes *attrs =
                 mem_allocate_zeroed_typed(Parrot_Pipe_attributes);
 
-        PMC_data(SELF)      = data_struct;
+        PMC_data(SELF)      = attrs;
         if(PIO_PIPE(interp, &reader, &writer) < 0) {
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                             "Cannot open pipe");
         }
-        data_struct->reader = pmc_new(interp, enum_class_PipeHandle);
-        data_struct->writer = pmc_new(interp, enum_class_PipeHandle);
-        if(!data_struct->reader || !data_struct->writer) {
+        attrs->r = pmc_new(interp, enum_class_PipeHandle);
+        attrs->w = pmc_new(interp, enum_class_PipeHandle);
+        if(!attrs->r || !attrs->w) {
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                             "Cannot create PipeHandle PMCs");
         }
-        PARROT_PIPEHANDLE(data_struct->reader)->os_handle = reader;
-        PARROT_PIPEHANDLE(data_struct->writer)->os_handle = writer;
-        PARROT_PIPEHANDLE(data_struct->reader)->reader = 1;
-        PARROT_PIPEHANDLE(data_struct->writer)->writer = 1;
+        PARROT_PIPEHANDLE(attrs->r)->os_handle = reader;
+        PARROT_PIPEHANDLE(attrs->w)->os_handle = writer;
+        PARROT_PIPEHANDLE(attrs->r)->reader = 1;
+        PARROT_PIPEHANDLE(attrs->w)->writer = 1;
 
         PObj_custom_mark_SET(SELF);
     }
@@ -77,8 +77,8 @@ are *not* cloned.
         Parrot_Pipe_attributes * const old_struct  = PARROT_PIPE(SELF);
         Parrot_Pipe_attributes * const data_struct = PARROT_PIPE(copy);
 
-        data_struct->reader = old_struct->reader;
-        data_struct->writer = old_struct->writer;
+        data_struct->r = old_struct->r;
+        data_struct->w = old_struct->w;
 
         return SELF;
     }
@@ -95,14 +95,14 @@ Mark active filehandle data as live.
 */
 
     VTABLE void mark() {
-        Parrot_Pipe_attributes * const data = PARROT_PIPE(SELF);
+        Parrot_Pipe_attributes * const attrs = PARROT_PIPE(SELF);
 
-        if (data) {
-            if (data->reader)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)data->reader);
+        if (attrs) {
+            if (attrs->r)
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->r);
 
-            if (data->writer)
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)data->writer);
+            if (attrs->w)
+                Parrot_gc_mark_PObj_alive(interp, (PObj *)attrs->w);
         }
     }
 
@@ -125,8 +125,10 @@ Return the read-only PipeHandle object.
 
 
     METHOD reader() {
-        Parrot_Pipe_attributes * const attr = PARROT_PIPE(SELF);
-        RETURN(PMC *attr->reader);
+        PMC *rv;
+        Parrot_Pipe_attributes * const attrs = PARROT_PIPE(SELF);
+        rv = attrs->r;
+        RETURN(PMC *rv);
     }
 
 /*
@@ -141,8 +143,10 @@ Return the write-only PipeHandle object.
 
 
     METHOD writer() {
-        Parrot_Pipe_attributes * const attr = PARROT_PIPE(SELF);
-        RETURN(PMC *attr->writer);
+        PMC *rv;
+        Parrot_Pipe_attributes * const attrs = PARROT_PIPE(SELF);
+        rv = attrs->w;
+        RETURN(PMC *rv);
     }
 
 /*
