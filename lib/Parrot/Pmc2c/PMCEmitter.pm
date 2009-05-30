@@ -983,7 +983,7 @@ sub gen_switch_vtable {
         
         my $body = <<"BODY";
     INTVAL type = VTABLE_type(INTERP, value);
-    if (SELF.type() > enum_class_core_max) /* For dynpmc fallback to MMD */
+    if (SELF.type() >= enum_class_core_max) /* For dynpmc fallback to MMD */
         type = enum_class_core_max;
     switch(type) {
 $cases
@@ -1042,10 +1042,9 @@ sub gen_defaul_case_wrapping {
     my ($self, $ssig, @parameters) = @_;
 
     my $letter = substr($ssig, 0, 1);
-    my $pcc_signature = "PP->" . $letter;
     if ($letter eq 'I') {
         return (
-            $pcc_signature,
+            "PP->" . $letter,
             "INTVAL retval;",
             ', &retval',
             'return retval;',
@@ -1053,7 +1052,7 @@ sub gen_defaul_case_wrapping {
     }
     elsif ($letter eq 'P') {
         return (
-            $pcc_signature,
+            'PPP->P',
             '',
             ", &$parameters[1]",
             "return $parameters[1];",
@@ -1061,7 +1060,7 @@ sub gen_defaul_case_wrapping {
     }
     elsif ($letter eq 'v') {
         return (
-            $pcc_signature,
+            'PP->',
             '',
             '',
             'return;',
