@@ -1133,8 +1133,12 @@ Decrement the BigNum by 1.0.
         bignum_add_bignum(INTERP, SELF, value, SELF);
     }
 
-    MULTI void i_add(FLOATVAL value) {
-        bignum_add_bignum_float(INTERP, SELF, value, SELF);
+    MULTI void i_add(Integer value) {
+        bignum_add_bignum_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
+    }
+
+    MULTI void i_add(Float value) {
+        bignum_add_bignum_float(INTERP, SELF, VTABLE_get_number(INTERP, value), SELF);
     }
 
     MULTI void i_add(DEFAULT value) {
@@ -1149,9 +1153,7 @@ Decrement the BigNum by 1.0.
     }
 
     VTABLE void i_add_float(FLOATVAL value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_add_float' for FLOATVAL");
+        bignum_add_bignum_float(INTERP, SELF, value, SELF);
     }
 
 /*
@@ -1203,8 +1205,12 @@ Decrement the BigNum by 1.0.
         bignum_sub_bignum(INTERP, SELF, value, SELF);
     }
 
-    MULTI void i_subtract(FLOATVAL value) {
-        bignum_sub_bignum_float(INTERP, SELF, value, SELF);
+    MULTI void i_subtract(Integer value) {
+        bignum_sub_bignum_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
+    }
+
+    MULTI void i_subtract(Float value) {
+        bignum_sub_bignum_float(INTERP, SELF, VTABLE_get_number(INTERP, value), SELF);
     }
 
     MULTI void i_subtract(DEFAULT value) {
@@ -1219,9 +1225,7 @@ Decrement the BigNum by 1.0.
     }
 
     VTABLE void i_subtract_float(FLOATVAL value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_subtract_float' for FLOATVAL");
+        bignum_sub_bignum_float(INTERP, SELF, value, SELF);
     }
 
 /*
@@ -1264,8 +1268,8 @@ Decrement the BigNum by 1.0.
         bignum_mul_bignum(INTERP, SELF, value, SELF);
     }
 
-    MULTI void i_multiply(FLOATVAL value) {
-        bignum_mul_bignum_float(INTERP, SELF, value, SELF);
+    MULTI void i_multiply(Float value) {
+        bignum_mul_bignum_float(INTERP, SELF, VTABLE_get_number(INTERP, value), SELF);
     }
 
     MULTI void i_multiply(Integer value) {
@@ -1284,9 +1288,7 @@ Decrement the BigNum by 1.0.
     }
 
     VTABLE void i_multiply_float(FLOATVAL value) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_multiply_float' for FLOATVAL");
+        bignum_mul_bignum_float(INTERP, SELF, value, SELF);
     }
 
 /*
@@ -1376,6 +1378,9 @@ Decrement the BigNum by 1.0.
     }
     MULTI void i_divide(Integer value) {
         bignum_div_bignum_int(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
+    }
+    MULTI void i_divide(Float value) {
+        bignum_div_bignum_float(INTERP, SELF, VTABLE_get_integer(interp, value), SELF);
     }
     MULTI void i_divide(DEFAULT value) {
          Parrot_ex_throw_from_c_args(INTERP, NULL,
