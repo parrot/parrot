@@ -295,6 +295,28 @@ Parrot_io_fdopen_win32(PARROT_INTERP, ARGMOD_NULLOK(PMC *filehandle),
 
 /*
 
+=item C<INTVAL Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)>
+
+Calls C<CloseHandle()> to close the given file descriptor.  Returns 0 on
+success, -1 on error.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)
+{
+    ASSERT_ARGS(Parrot_io_close_piohandle_win32)
+
+    if (handle == INVALID_HANDLE_VALUE)
+        return -1;
+
+    return CloseHandle(handle) ? 0 : -1;
+}
+
+/*
+
 =item C<INTVAL Parrot_io_close_win32(PARROT_INTERP, PMC *filehandle)>
 
 Calls C<CloseHandle()> to close C<*io>'s file descriptor.
@@ -702,6 +724,27 @@ fail:
         CloseHandle(procinfo.hProcess);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "pipe open error");
+}
+
+/*
+
+=item C<INTVAL Parrot_io_pipe_win32(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
+*writer)>
+
+Uses CreatePipe() to create a matched pair of pipe handles.  Returns 0 on
+success, -1 on failure.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+INTVAL
+Parrot_io_pipe_win32(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer))
+{
+    ASSERT_ARGS(Parrot_io_pipe_win32)
+    return CreatePipe(reader, writer, NULL, 0) ? 0 : -1;
 }
 
 #endif /* PIO_OS_WIN32 */

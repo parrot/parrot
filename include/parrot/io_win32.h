@@ -21,6 +21,9 @@ typedef Parrot_OFF_T PIOOFF_T;
 /* HEADERIZER BEGIN: src/io/win32.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+INTVAL Parrot_io_close_piohandle_win32(PARROT_INTERP, PIOHANDLE handle)
+        __attribute__nonnull__(1);
+
 INTVAL Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -74,6 +77,16 @@ size_t Parrot_io_peek_win32(PARROT_INTERP,
     SHIM(STRING **buf))
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+INTVAL Parrot_io_pipe_win32(SHIM_INTERP,
+    ARGMOD(PIOHANDLE *reader),
+    ARGMOD(PIOHANDLE *writer))
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*reader)
+        FUNC_MODIFIES(*writer);
+
 size_t Parrot_io_read_win32(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     ARGOUT(STRING **buf))
@@ -102,6 +115,9 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+#define ASSERT_ARGS_Parrot_io_close_piohandle_win32 \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_io_close_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(filehandle)
@@ -126,6 +142,9 @@ size_t Parrot_io_write_win32(PARROT_INTERP,
     || PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_Parrot_io_peek_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_io_pipe_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(reader) \
+    || PARROT_ASSERT_ARG(writer)
 #define ASSERT_ARGS_Parrot_io_read_win32 __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(filehandle) \
