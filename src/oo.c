@@ -396,7 +396,7 @@ get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
     if (type > interp->n_vtable_max || type <= 0)
         return PMCNULL;
     else {
-        PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot") );
+        PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot"));
         PMC * const pmc_ns =
             Parrot_make_namespace_keyed_str(interp, parrot_hll, name);
         PMC * proxy = VTABLE_get_class(interp, pmc_ns);
