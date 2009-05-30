@@ -43,36 +43,6 @@ upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
     return self;
 }
 
-/* Try to reuse dest PMC if possible */
-static PMC*
-reuse_or_new(PARROT_INTERP, PMC *self, PMC * value, PMC *dest)
-{
-    /* Can't reuse dest because we'll lost value */
-    if (dest == value)
-        return pmc_new(interp, VTABLE_type(interp, self));
-
-    /* Can't reuse Null */
-    if (PMC_IS_NULL(dest))
-        return pmc_new(interp, VTABLE_type(interp, self));
-
-    /* Can't reuse read-only variables */
-    if (dest->vtable->flags & VTABLE_IS_READONLY_FLAG)
-        return pmc_new(interp, VTABLE_type(interp, self));
-
-    /* It's safe in this case. Caller want to replace us anyway */
-    if (dest == self)
-        return dest;
-
-    /* Morph to Integer is required */
-    {
-        INTVAL type = VTABLE_type(interp, self);
-        if (dest->vtable->base_type != type)
-            pmc_reuse(interp, dest, type, 0);
-    }
-
-    return dest;
-}
-
 
 pmclass Integer extends scalar provides integer provides scalar {
     ATTR INTVAL iv; /* the value of this Integer */
@@ -378,7 +348,7 @@ Adds C<value> to the integer and returns the result in C<*dest>.
         const INTVAL c = a + b;
 
         if ((c^a) >= 0 || (c^b) >= 0) {
-            dest = reuse_or_new(INTERP, SELF, value, dest);
+            dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
             /* need this for e.g. Undef PMC */
             VTABLE_set_integer_native(INTERP, dest, c);
@@ -395,7 +365,7 @@ Adds C<value> to the integer and returns the result in C<*dest>.
 
     MULTI PMC *add(Complex value, PMC *dest) {
         const INTVAL a = SELF.get_integer();
-        dest           = reuse_or_new(INTERP, SELF, value, dest);
+        dest           = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
         VTABLE_set_number_native(INTERP, dest,
                 a + VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -415,7 +385,7 @@ Adds C<value> to the integer and returns the result in C<*dest>.
 
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = reuse_or_new(INTERP, SELF, value, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_integer() + VTABLE_get_number(INTERP, value));
@@ -428,7 +398,7 @@ Adds C<value> to the integer and returns the result in C<*dest>.
         const INTVAL c = a + b;
 
         if ((c^a) >= 0 || (c^b) >= 0) {
-            dest = reuse_or_new(INTERP, SELF, NULL, dest);
+            dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -517,7 +487,7 @@ C<get_integer> and C<set_integer_native> always.
         const INTVAL c = a - b;
 
         if ((c^a) >= 0 || (c^~b) >= 0) {
-            dest = reuse_or_new(INTERP, SELF, value, dest);
+            dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -533,7 +503,7 @@ C<get_integer> and C<set_integer_native> always.
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
         const INTVAL a = SELF.get_integer();
-        dest           = reuse_or_new(INTERP, SELF, value, dest);
+        dest           = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
         VTABLE_set_number_native(INTERP, dest,
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -553,7 +523,7 @@ C<get_integer> and C<set_integer_native> always.
 
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        dest = reuse_or_new(INTERP, SELF, value, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_integer() - VTABLE_get_number(INTERP, value));
@@ -576,7 +546,7 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
         const INTVAL c = a - b;
 
         if ((c^a) >= 0 || (c^~b) >= 0) {
-            dest = reuse_or_new(INTERP, SELF, NULL, dest);
+            dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -675,7 +645,7 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         const double cf = (double)a * (double)b;
 
         if ((double) c == cf) {
-            dest = reuse_or_new(INTERP, SELF, value, dest);
+            dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -706,7 +676,7 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
         const FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        dest                = reuse_or_new(INTERP, SELF, value, dest);
+        dest                = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
         VTABLE_set_number_native(INTERP, dest, SELF.get_number() * valf);
         return dest;
@@ -719,7 +689,7 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         const double cf = (double)a * (double)b;
 
         if ((double) c == cf) {
-            dest = reuse_or_new(INTERP, SELF, NULL, dest);
+            dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
             VTABLE_set_integer_native(INTERP, dest, c);
             return dest;
@@ -824,7 +794,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = reuse_or_new(INTERP, SELF, value, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
         VTABLE_set_number_native(INTERP, dest, SELF.get_number() / d);
         return dest;
     }
@@ -886,7 +856,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = reuse_or_new(INTERP, SELF, value, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
         f = floor(SELF.get_number() / d);
         VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
@@ -901,7 +871,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = reuse_or_new(INTERP, SELF, NULL, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
         f = floor(SELF.get_number() / value);
         VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
@@ -916,7 +886,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
-        dest = reuse_or_new(INTERP, SELF, NULL, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
         f = floor(SELF.get_number() / value);
         VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
@@ -1007,7 +977,7 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        dest = reuse_or_new(INTERP, SELF, value, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
 
         VTABLE_set_integer_native(INTERP, dest,
                 intval_mod(SELF.get_integer(), d));
@@ -1020,7 +990,7 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        dest = reuse_or_new(INTERP, SELF, NULL, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
         VTABLE_set_integer_native(INTERP, dest,
                 intval_mod(SELF.get_integer(), value));
@@ -1033,7 +1003,7 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        dest = reuse_or_new(INTERP, SELF, NULL, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
         VTABLE_set_integer_native(INTERP, dest,
                 intval_mod(SELF.get_integer(), (INTVAL)value));
@@ -1152,7 +1122,7 @@ RT #46631 Complex and BigInt rhs.
             }
         }
 
-        dest = reuse_or_new(INTERP, SELF, NULL, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
         VTABLE_set_integer_native(INTERP, dest, r);
         return dest;
@@ -1339,7 +1309,7 @@ Sets C<dest> to the absolute value of SELF.
         const INTVAL a = abs(SELF.get_integer());
 
         /* RT #46635 overflow for -maxint */
-        dest = reuse_or_new(INTERP, SELF, NULL, dest);
+        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
 
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
