@@ -20,7 +20,7 @@ The Socket PMC performs network I/O operations.
 
 #include "../src/io/io_private.h"
 
-pmclass Socket extends Handle need_ext {
+pmclass Socket extends Handle {
     ATTR PMC *local;           /* Local addr                   */
     ATTR PMC *remote;          /* Remote addr                  */
 
@@ -49,7 +49,7 @@ Initializes a newly created Socket object.
 
 =item C<PMC *clone()>
 
-Create a copy of the filehandle.
+Create a copy of the socket handle.
 
 =cut
 
@@ -85,7 +85,7 @@ Create a copy of the filehandle.
 
 =item C<void mark()>
 
-Mark active filehandle data as live.
+Mark active socket handle data as live.
 
 =cut
 

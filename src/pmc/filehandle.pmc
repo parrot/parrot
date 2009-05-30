@@ -31,7 +31,7 @@ extern "C" {
 #endif
 #endif
 
-pmclass FileHandle extends Handle need_ext {
+pmclass FileHandle extends Handle {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */
     ATTR STRING *mode;                /* The mode string used in open */
