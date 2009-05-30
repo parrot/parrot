@@ -362,19 +362,7 @@ Read the given number of bytes from the filehandle and return them in a string.
 
     METHOD read(INTVAL length) {
         STRING *string_result = NULL;
-        INTVAL  ignored;
-
-        if (Parrot_io_is_closed_filehandle(interp, SELF))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-
-        string_result = Parrot_io_make_string(interp, &string_result, length);
-        string_result->bufused = length;
-
-        if (Parrot_io_is_encoding(interp, SELF, CONST_STRING(interp, "utf8")))
-            ignored = Parrot_io_read_utf8(interp, SELF, &string_result);
-        else
-            ignored = Parrot_io_read_buffer(interp, SELF, &string_result);
+        string_result = Parrot_io_reads(INTERP, SELF, length);
 
         RETURN(STRING *string_result);
     }

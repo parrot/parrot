@@ -297,9 +297,49 @@ STRING *
 Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 {
     ASSERT_ARGS(Parrot_io_reads)
-    STRING *result;
-    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "read"), "I->S",
-            length, &result);
+    STRING *result = NULL;
+    if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file"))) {
+        INTVAL  ignored;
+
+        if (Parrot_io_is_closed_filehandle(interp, pmc))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed filehandle");
+
+        result = Parrot_io_make_string(interp, &result, length);
+        result->bufused = length;
+
+        if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
+            ignored = Parrot_io_read_utf8(interp, pmc, &result);
+        else
+            ignored = Parrot_io_read_buffer(interp, pmc, &result);
+    }
+    else if (VTABLE_does(interp, pmc, CONST_STRING(interp, "string"))) {
+        STRING *string_orig;
+        INTVAL offset;
+
+        GETATTR_StringHandle_stringhandle(interp, pmc, string_orig);
+        if (STRING_IS_NULL(string_orig))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed filehandle");
+
+        if (length == 0)
+            result = Parrot_str_copy(interp, string_orig);
+        else {
+            INTVAL orig_length, read_length;
+            read_length = length;
+            orig_length = Parrot_str_byte_length(interp, string_orig);
+
+            GETATTR_StringHandle_read_offset(interp, pmc, offset);
+
+            /* Only read to the end of the string data. */
+            if (offset + read_length > orig_length)
+                read_length = orig_length - offset;
+
+            result = Parrot_str_substr(interp, string_orig, offset,
+                    read_length, NULL, 0);
+            SETATTR_StringHandle_read_offset(interp, pmc, offset + read_length);
+        }
+    }
     return result;
 }
 

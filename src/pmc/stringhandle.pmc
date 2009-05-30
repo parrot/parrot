@@ -269,32 +269,7 @@ C<bytes> argument is currently ignored.
 */
 
     METHOD read(INTVAL length) {
-        STRING *string_result, *string_orig;
-        INTVAL offset;
-
-        GET_ATTR_stringhandle(INTERP, SELF, string_orig);
-        if (STRING_IS_NULL(string_orig))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-
-        if (length == 0)
-            string_result = Parrot_str_copy(INTERP, string_orig);
-        else {
-            INTVAL orig_length, read_length;
-            read_length = length;
-            orig_length = Parrot_str_byte_length(INTERP, string_orig);
-
-            GET_ATTR_read_offset(INTERP, SELF, offset);
-
-            /* Only read to the end of the string data. */
-            if (offset + read_length > orig_length)
-                read_length = orig_length - offset;
-
-            string_result = Parrot_str_substr(INTERP, string_orig, offset,
-                    read_length, NULL, 0);
-            SET_ATTR_read_offset(INTERP, SELF, offset + read_length);
-        }
-
+        STRING *string_result;
         RETURN(STRING *string_result);
     }
 
