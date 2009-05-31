@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 27;
 use Parrot::Config;
 
 =head1 NAME
@@ -434,23 +434,6 @@ AB
 AB
 OUTPUT
 }
-
-pasm_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode literals", todo => 'TT #24' );
-    set S0, unicode:"\u00ab"
-    length I0, S0
-    say I0
-    say S0
-    set S0, iso-8859-1:"\xab"
-    length I0, S0
-    say I0
-    say S0
-    end
-CODE
-1
-\xc2\xab
-1
-\xc2\xab
-OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys");
 .sub 'main'
