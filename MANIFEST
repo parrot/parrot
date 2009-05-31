@@ -1142,6 +1142,7 @@ runtime/parrot/include/README                               []doc
 runtime/parrot/include/fp_equality.pasm                     [library]
 runtime/parrot/include/hllmacros.pir                        [library]
 runtime/parrot/include/test_more.pir                        [library]
+runtime/parrot/languages/parrot/parrot.pir                  [library]
 runtime/parrot/library/CGI/QueryHash.pir                    [library]
 runtime/parrot/library/Config/JSON.pir                      [library]
 runtime/parrot/library/Crow.pir                             [library]
