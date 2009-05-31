@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Parrot::Config;
 
 =head1 NAME
@@ -451,6 +451,30 @@ CODE
 1
 \xc2\xab
 OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys");
+.sub 'main'
+    .local string str0, str1
+    str0 = unicode:"\u00ab"
+    str1 = iso-8859-1:"\xab"
+
+    .local pmc hash
+    hash = new 'Hash'
+    hash[str0] = 'hello'
+
+    $I0 = iseq str0, str1
+    say $I0
+
+    $S0 = hash[str0]
+    $S1 = hash[str1]
+    $I0 = iseq $S0, $S1
+    say $I0
+.end
+CODE
+1
+1
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
