@@ -22,9 +22,7 @@
   have_namelist:
     file = join '/', name
     file = concat file, '.pir'
-    push_eh fail
     load_bytecode file
-    pop_eh
     library = new 'Hash'
     library['name'] = name
     library['filename'] = file
