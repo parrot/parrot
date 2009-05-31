@@ -10,11 +10,16 @@
     c.'language'('parrot')
 .end
 
-.sub 'fetch-library' :method
-    .param pmc request
+.sub 'load_library' :method
+    .param pmc name
+    .param pmc extra :named :slurpy
     .local pmc name, library, inc_hash
     .local string file
-    name = request['name']
+    $I0 = does name, 'array'
+    if $I0 goto have_namelist
+    $S0 = name
+    name = split '::', $S0
+  have_namelist:
     file = join '/', name
     file = concat file, '.pir'
     push_eh fail
@@ -34,7 +39,7 @@
     .return (0)
 .end
 
-.sub 'export-symbols' :method
+.sub 'export' :method
     .param string list
     # This should accept a tag...
     .local pmc syms, i, ns, relns, exportns
@@ -69,7 +74,7 @@ Parrot-hosted languages
         .local pmc c
         load_language 'parrot'
         c = compreg 'parrot'
-        c.'export-symbols'('dance leap')
+        c.'export'('dance leap')
     .end
 
     .sub 'dance'
