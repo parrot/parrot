@@ -2142,6 +2142,15 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     FLOATVAL    f;
     char       *cstr;
     const char *p;
+    STRING     *tmp;
+
+    /* We can't use cstring for non cstring */
+    if (s->encoding->max_bytes_per_codepoint != 1) {
+        /* Avoid COW. We aren't going to share strings */
+        tmp = Parrot_str_repeat(interp, s, 1);
+        tmp = Parrot_ascii_charset_ptr->to_charset(interp, tmp, NULL);
+        return Parrot_str_to_num(interp, tmp);
+    }
 
     /*
      * XXX C99 atof interprets 0x prefix
