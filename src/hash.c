@@ -202,7 +202,7 @@ STRING_compare(PARROT_INTERP, ARGIN(const void *search_key), ARGIN_NULLOK(const 
     if (!s2)
         return 1;
 
-    if (s1->charset == s2->charset && s1->hashval != s2->hashval)
+    if (s1->hashval != s2->hashval)
         return 1;
 
     /* COWed strings */

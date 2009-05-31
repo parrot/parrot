@@ -462,7 +462,7 @@ hello
 hello
 OUTPUT
 
-pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys, full bucket", 'todo' => 'TT #24');
+pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys, full bucket" );
 .sub 'main'
     .local string str0, str1
     str0 = unicode:"infix:\u00b1"
@@ -483,13 +483,13 @@ pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys, full bucket", '
   fill_done:
 
     $I0 = iseq str0, str1
-    print "iseq str0, str1               => "
+    #print "iseq str0, str1               => "
     say $I0
 
     $S0 = hash[str0]
     $S1 = hash[str1]
     $I0 = iseq $S0, $S1
-    print "iseq hash[str0], hash[str1]   => "
+    #print "iseq hash[str0], hash[str1]   => "
     say $I0
     say $S0
     say $S1

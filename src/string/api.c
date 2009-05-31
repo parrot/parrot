@@ -2405,19 +2405,27 @@ size_t
 Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_hashval)
-    register size_t h;
-    const UINTVAL seed = interp->hash_seed;
+    String_iter iter;
+    UINTVAL     offs;
+    size_t      hashval = interp->hash_seed;
 
     if (!s)
-        return seed;
+        return hashval;
 
     /* ZZZZZ workaround for something not setting up encodings right */
     saneify_string(s);
 
-    h          = CHARSET_COMPUTE_HASH(interp, s, seed);
-    s->hashval = h;
+    ENCODING_ITER_INIT(interp, s, &iter);
 
-    return h;
+    for (offs = 0; offs < s->strlen; ++offs) {
+        const UINTVAL c = iter.get_and_advance(interp, &iter);
+        hashval += hashval << 5;
+        hashval += c;
+    }
+
+    s->hashval = hashval;
+
+    return hashval;
 }
 
 
