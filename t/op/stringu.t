@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Parrot::Config;
 
 =head1 NAME
@@ -452,11 +452,56 @@ pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys");
     $S1 = hash[str1]
     $I0 = iseq $S0, $S1
     say $I0
+    say $S0
+    say $S1
 .end
 CODE
 1
 1
+hello
+hello
 OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys, full bucket", 'todo' => 'TT #24');
+.sub 'main'
+    .local string str0, str1
+    str0 = unicode:"infix:\u00b1"
+    str1 = iso-8859-1:"infix:\xb1"
+
+    .local pmc hash
+    hash = new 'Hash'
+    hash[str0] = 'hello'
+
+    $I0 = 0
+  fill_loop:
+    unless $I0 < 200 goto fill_done
+    inc $I0
+    $S0 = $I0
+    $S0 = concat 'infix:', $S0
+    hash[$S0] = 'foo'
+    goto fill_loop
+  fill_done:
+
+    $I0 = iseq str0, str1
+    print "iseq str0, str1               => "
+    say $I0
+
+    $S0 = hash[str0]
+    $S1 = hash[str1]
+    $I0 = iseq $S0, $S1
+    print "iseq hash[str0], hash[str1]   => "
+    say $I0
+    say $S0
+    say $S1
+.end
+CODE
+1
+1
+hello
+hello
+OUTPUT
+
+
 
 
 # Local Variables:
