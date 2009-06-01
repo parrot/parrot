@@ -259,8 +259,11 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        SET_ATTR_str_val(INTERP, SELF,
-                Parrot_str_set(INTERP, SELF.get_string(), value));
+        if (!STRING_IS_NULL(value))
+            SET_ATTR_str_val(INTERP, SELF,
+                    Parrot_str_set(INTERP, SELF.get_string(), value));
+        else
+            SET_ATTR_str_val(INTERP, SELF, NULL);
     }
 
 /*
