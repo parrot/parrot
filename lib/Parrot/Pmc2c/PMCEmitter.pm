@@ -1009,27 +1009,33 @@ sub generate_single_case {
     # Gather parameters names
     my @parameters = map { s/\s*PMC\s*\*\s*//; $_ } split (/,/, $impl->parameters);
     my $parameters = join ', ', @parameters;
+    # ISO C forbids return with expression from void functions.
+    my $return = $impl->return_type =~ /^void\s*$/
+                    ? ''
+                    : 'return ';
 
     if ($type eq 'DEFAULT' || $type eq 'PMC') {
         # For default case we have to handle return manually.
-        my ($pcc_signature, $retval, $call_tail, $return)
+        my ($pcc_signature, $retval, $call_tail, $pcc_return)
                 = $self->gen_defaul_case_wrapping($ssig, @parameters);
 
         $case = <<"CASE";
         default:
             if (type < enum_class_core_max)
-                return $func(INTERP, SELF, $parameters);
+                $return$func(INTERP, SELF, $parameters);
             else {
                 $retval
                 Parrot_mmd_multi_dispatch_from_c_args(INTERP, "$vt_method_name", "$pcc_signature", SELF, $parameters$call_tail);
-                $return
+                $pcc_return
             }
+            break;
 CASE
     }
     else {
         $case = <<"CASE";
         case enum_class_$type:
-            return $func(INTERP, SELF, $parameters);
+            $return$func(INTERP, SELF, $parameters);
+            break;
 CASE
     }
 
