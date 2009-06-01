@@ -62,9 +62,8 @@ static PMC * find_method_direct_1(PARROT_INTERP,
 PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static PMC * get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)
+        __attribute__nonnull__(1);
 
 static void invalidate_all_caches(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -87,8 +86,7 @@ static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
     || PARROT_ASSERT_ARG(_class) \
     || PARROT_ASSERT_ARG(method_name)
 #define ASSERT_ARGS_get_pmc_proxy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(name)
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_invalidate_all_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_invalidate_type_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -246,14 +244,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         else
             type = pmc_type(interp, VTABLE_get_string(interp, key));
 
-        /* Reject invalid type numbers */
-        if (type > interp->n_vtable_max || type <= 0)
-            classobj = PMCNULL;
-        else {
-            PMC * const type_num = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, type_num, type);
-            classobj = pmc_new_init(interp, enum_class_PMCProxy, type_num);
-        }
+        classobj = get_pmc_proxy(interp, type);
     }
 
     return classobj;
@@ -368,10 +359,10 @@ Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
 
 /*
 
-=item C<static PMC * get_pmc_proxy(PARROT_INTERP, STRING *name)>
+=item C<static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)>
 
-Get the PMC proxy for a PMC with the name given, creating it if does not exist.
-If name is not an existing PMC, return PMCNULL.  This code assumes that
+Get the PMC proxy for a PMC with the given type, creating it if does not exist.
+If type is not a valid type, return PMCNULL.  This code assumes that
 all PMCProxy objects live in the 'parrot' HLL namespace -- if/when
 we allow PMC types to exist in other HLL namespaces, this code will
 need to be updated.
@@ -386,11 +377,9 @@ PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static PMC *
-get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
+get_pmc_proxy(PARROT_INTERP, ARGIN(INTVAL type))
 {
     ASSERT_ARGS(get_pmc_proxy)
-
-    const INTVAL type = pmc_type(interp, name);
 
     /* Check if not a PMC or invalid type number */
     if (type > interp->n_vtable_max || type <= 0)
@@ -398,7 +387,8 @@ get_pmc_proxy(PARROT_INTERP, ARGIN(STRING *name))
     else {
         PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot"));
         PMC * const pmc_ns =
-            Parrot_make_namespace_keyed_str(interp, parrot_hll, name);
+            Parrot_make_namespace_keyed_str(interp, parrot_hll, 
+                interp->vtables[type]->whoami);
         PMC * proxy = VTABLE_get_class(interp, pmc_ns);
 
         /* Create proxy if not found */
@@ -439,7 +429,7 @@ Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
 
     /* If not found, check for a PMC */
     if (PMC_IS_NULL(_class))
-        return get_pmc_proxy(interp, name);
+        return get_pmc_proxy(interp, pmc_type(interp, name));
     else
         return _class;
 }
