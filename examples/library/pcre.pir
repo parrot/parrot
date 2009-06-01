@@ -21,10 +21,6 @@ E<lt>jerry dot gay at gmail dot com<gt>
 
 =cut
 
-
-.include 'library/pcre.pir'
-
-
 .sub main :main
     .param pmc argv
 
@@ -35,6 +31,7 @@ E<lt>jerry dot gay at gmail dot com<gt>
     .local pmc func
     .local pmc lib
 
+    load_bytecode 'pcre.pbc'
     func= get_hll_global ['PCRE'], 'init'
     lib= func()
 
