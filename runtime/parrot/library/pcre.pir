@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 =head1 TITLE
@@ -194,7 +194,7 @@ Returns the match.
 .sub version
     .local pmc pcre_function
 
-    pcre_function= get_hll_global ['PCRE::NCI'], 'PCRE_version'
+    pcre_function = get_hll_global ['PCRE::NCI'], 'PCRE_version'
 
     .local string ver
 

@@ -35,11 +35,11 @@ See 'library/pcre.pir' for details on the user interface.
     ## allocate space in string for error message
     repeat error, " ", error_size
 
-    PCRE_NCI_compile= get_hll_global ['PCRE::NCI'], 'PCRE_compile'
+    PCRE_NCI_compile = get_hll_global ['PCRE::NCI'], 'PCRE_compile'
 
     .local pmc code
 
-    code= PCRE_NCI_compile( pat, options, error, errptr, NULL )
+    code = PCRE_NCI_compile( pat, options, error, errptr, NULL )
 
     .local int is_code_defined
     is_code_defined = defined code
@@ -66,18 +66,18 @@ RETURN:
 
     ## osize -- 1/(2/3) * 4 * 2
     .local int osize
-    osize= 12
+    osize = 12
 
     ## number of result pairs
     .local int num_result_pairs
-    num_result_pairs= 10
+    num_result_pairs = 10
 
     .local int ovector_length
-    ovector_length= osize * num_result_pairs
+    ovector_length = osize * num_result_pairs
 
     .local pmc ovector
-    ovector= new 'ManagedStruct'
-    ovector= ovector_length
+    ovector = new 'ManagedStruct'
+    ovector = ovector_length
 
     ## on 32 bit systems
     .local pmc PCRE_NCI_exec
@@ -85,7 +85,7 @@ RETURN:
 
     .local int ok
 
-    ok= PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
+    ok = PCRE_NCI_exec( regex, NULL, s, len, start, options, ovector, 10 )
 
     .return( ok, ovector )
 .end
