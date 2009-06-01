@@ -55,7 +55,12 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
 
     /* Store the result. */
     if (! overflow_p) {
-        dest = Parrot_pmc_try_reuse(interp, self, NULL, dest);
+        /* If SELF is the destination, we won't want to create a
+           new PMC, because then we won't have the result in SELF.
+           Only create a new PMC if we aren't saving the result
+           to SELF, or if they are both NULL */
+        if (dest != self || dest == NULL)
+            dest = pmc_new(interp, VTABLE_type(interp, self));
 
         VTABLE_set_integer_native(interp, dest, result);
     }
@@ -169,8 +174,7 @@ Adds C<value> to C<SELF> inplace.
     MULTI PMC *add(Complex value, PMC *dest) {
         const FLOATVAL a = SELF.get_number();
 
-        /* NB: value as second arg */
-        dest = Parrot_pmc_try_reuse(interp, value, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
         VTABLE_set_number_native(INTERP, dest,
                 a + VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -180,7 +184,7 @@ Adds C<value> to C<SELF> inplace.
     }
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() + VTABLE_get_number(INTERP, value));
@@ -188,7 +192,7 @@ Adds C<value> to C<SELF> inplace.
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() + (FLOATVAL)value);
@@ -196,7 +200,7 @@ Adds C<value> to C<SELF> inplace.
     }
 
     VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() + value);
@@ -253,7 +257,10 @@ Subtracts C<value> from C<SELF> inplace.
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
         const FLOATVAL a = SELF.get_number();
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
+        if (dest)
+            pmc_reuse(INTERP, dest, value->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
         VTABLE_set_number_native(INTERP, dest,
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -263,14 +270,14 @@ Subtracts C<value> from C<SELF> inplace.
     }
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() - VTABLE_get_number(INTERP, value));
         return dest;
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() - (FLOATVAL)value);
@@ -278,7 +285,7 @@ Subtracts C<value> from C<SELF> inplace.
     }
 
     VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() - value);
@@ -330,7 +337,7 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
     }
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
             SELF.get_number() * VTABLE_get_number(INTERP, value));
@@ -338,7 +345,7 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
     }
 
     VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
             SELF.get_number() * value);
@@ -346,7 +353,7 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
     }
 
     VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
             SELF.get_number() * value);
@@ -402,7 +409,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, SELF.get_number() / d);
         return dest;
@@ -413,7 +420,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, SELF.get_number() / value);
         return dest;
@@ -424,7 +431,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, SELF.get_number() / value);
         return dest;
@@ -485,7 +492,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         d    = floor(SELF.get_number() / d);
 
         VTABLE_set_integer_native(INTERP, dest, (INTVAL)d);
@@ -497,7 +504,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 floor(SELF.get_number() / value));
@@ -509,7 +516,7 @@ Divides C<SELF> by C<value> inplace.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 floor(SELF.get_number() / value));
@@ -575,7 +582,7 @@ Calculates modulus inplace
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 floatval_mod(SELF.get_number(), d));
@@ -587,7 +594,7 @@ Calculates modulus inplace
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 floatval_mod(SELF.get_number(), (FLOATVAL)value));
@@ -599,7 +606,7 @@ Calculates modulus inplace
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 floatval_mod(SELF.get_number(), value));
@@ -661,14 +668,14 @@ Calculates pow inplace
     MULTI PMC *pow(PMC *value, PMC *dest) {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest, pow(SELF.get_number(), d));
         return dest;
     }
 
     VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 pow(SELF.get_number(), (double)value));
@@ -677,7 +684,7 @@ Calculates pow inplace
     }
 
     VTABLE PMC *pow_float(FLOATVAL value, PMC *dest) {
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
                 pow(SELF.get_number(), value));
@@ -716,7 +723,7 @@ Set C<dest> to the negated value of C<SELF>.
     VTABLE PMC *neg(PMC *dest) {
         const INTVAL a = -SELF.get_integer();
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
@@ -753,7 +760,7 @@ Inplace bitwise or.
     VTABLE PMC *bitwise_or(PMC *value, PMC *dest) {
         const INTVAL result = SELF.get_integer() | VTABLE_get_integer(INTERP, value);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -763,7 +770,7 @@ Inplace bitwise or.
     VTABLE PMC *bitwise_or_int(INTVAL value, PMC *dest) {
         const INTVAL result = SELF.get_integer() | value;
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -804,7 +811,7 @@ Inplace bitwise and.
         const INTVAL result =
             SELF.get_integer() & VTABLE_get_integer(INTERP, value);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -813,7 +820,7 @@ Inplace bitwise and.
     VTABLE PMC *bitwise_and_int(INTVAL value, PMC *dest) {
         const INTVAL result = SELF.get_integer() & value;
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -853,7 +860,7 @@ Inplace bitwise and.
         const INTVAL result =
             SELF.get_integer() ^ VTABLE_get_integer(INTERP, value);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -862,7 +869,7 @@ Inplace bitwise and.
     VTABLE PMC *bitwise_xor_int(INTVAL value, PMC *dest) {
         const INTVAL result = SELF.get_integer() ^ value;
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -894,7 +901,7 @@ Returns in C<*dest> the bitwise negation of the scalar and C<value>.
     VTABLE PMC *bitwise_not(PMC *dest) {
         const INTVAL a = ~SELF.get_integer();
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, a);
         return dest;
@@ -967,7 +974,7 @@ Inplace shift right.
         const INTVAL result = (UINTVAL)SELF.get_integer() >>
             VTABLE_get_integer(INTERP, value);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -976,7 +983,7 @@ Inplace shift right.
     VTABLE PMC *bitwise_lsr_int(INTVAL value, PMC *dest) {
         const INTVAL result = (UINTVAL)SELF.get_integer() >> value;
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_integer_native(INTERP, dest, result);
         return dest;
@@ -1059,7 +1066,7 @@ Concatenate the string C<value> in place.
         STRING * const s = Parrot_str_concat(INTERP, SELF.get_string(),
             VTABLE_get_string(INTERP, value), 0);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_string_native(INTERP, dest, s);
         return dest;
@@ -1069,7 +1076,7 @@ Concatenate the string C<value> in place.
         STRING * const s = Parrot_str_concat(INTERP,
             SELF.get_string(), value, 0);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_string_native(INTERP, dest, s);
         return dest;
@@ -1108,7 +1115,7 @@ Repeat the string C<SELF> in place C<value> times.
         STRING * const s = SELF.get_string();
         const UINTVAL  n = (UINTVAL)VTABLE_get_integer(INTERP, value);
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_string_native(INTERP, dest,
             Parrot_str_repeat(INTERP, s, n));
@@ -1119,7 +1126,7 @@ Repeat the string C<SELF> in place C<value> times.
         STRING * const s = SELF.get_string();
         const UINTVAL  n = value;
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_string_native(INTERP, dest,
             Parrot_str_repeat(INTERP, s, n));
@@ -1291,7 +1298,7 @@ Returns the result of the logical C<XOR> of C<SELF> and C<*value>.
         else if (value_bool && ! my_bool)
             return value;
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, value, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         VTABLE_set_bool(INTERP, dest, 0);
         return dest;
     }
@@ -1312,7 +1319,7 @@ C<*value>.
     VTABLE PMC *logical_not(PMC *dest) {
         const INTVAL a = ! SELF.get_bool();
 
-        dest = Parrot_pmc_try_reuse(INTERP, SELF, NULL, dest);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_bool(INTERP, dest, a);
         return dest;
