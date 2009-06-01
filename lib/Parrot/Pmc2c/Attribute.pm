@@ -168,7 +168,7 @@ EOA
         } \\
         else \\
             (dest) = ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname; \\
-    } while (0);
+    } while (0)
 
 #define SETATTR_${pmcname}_${attrname}(interp, pmc, value) \\
     do { \\
@@ -225,7 +225,7 @@ EOA
         } \\
         else \\
             ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname = (value); \\
-    } while (0);
+    } while (0)
 
 EOA
 
