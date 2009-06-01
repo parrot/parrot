@@ -268,7 +268,7 @@ Parrot_pmc_try_reuse(PARROT_INTERP, ARGIN(PMC *self), ARGIN_NULLOK(PMC * value),
         if (type >= enum_class_core_max)
             /* We are not core PMC. Just clone self to preserve semantic of VTABLEs */
             dest = VTABLE_clone(interp, self);
-        else if (dest->vtable->base_type != type)
+        else
             pmc_reuse(interp, dest, type, 0);
     }
 
