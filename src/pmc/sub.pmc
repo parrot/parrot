@@ -435,10 +435,18 @@ Set SELF to the data in other.
             Parrot_sub *my_sub;
             Parrot_sub *other_sub;
 
-            /* copy the sub struct */
+            /* get rid of this context, if attached */
             PMC_get_sub(INTERP, SELF, my_sub);
+            if (my_sub->ctx)
+                Parrot_free_context(INTERP, my_sub->ctx, 1);
+
+            /* copy the sub struct */
             PMC_get_sub(INTERP, other, other_sub);
-            memcpy(my_sub, other_sub, sizeof (Parrot_sub));
+            memmove(my_sub, other_sub, sizeof (Parrot_sub));
+
+            /* attach to the new context, if it exists */
+            if (my_sub->ctx)
+                Parrot_context_ref(interp, my_sub->ctx);
 
             /* copy the name so it's a different string in memory */
             if (my_sub->name)
