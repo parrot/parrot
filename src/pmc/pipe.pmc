@@ -83,6 +83,21 @@ are *not* cloned.
         return SELF;
     }
 
+/*
+
+=item C<INTVAL does(STRING * role)>
+
+=cut
+
+*/
+
+    VTABLE INTVAL does(STRING * role) {
+        if (Parrot_str_equal(INTERP, role, CONST_STRING(INTERP, "pipe")))
+            return 1;
+        /* TODO: Pipe should does read or write also, depending on what
+           type of pipe it is */
+        return SUPER(role);
+    }
 
 /*
 

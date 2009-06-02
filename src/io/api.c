@@ -19,6 +19,10 @@ process.
 The C<FileHandle> PMC provides the class-based interface for filehandles that
 is used in Parrot ops.
 
+TODO: Where possible, extract some of the filehandle-related details into
+src/io/filehandle.c, and extract the stringhandle details into
+src/io/io_string.c.
+
 =cut
 
 */
@@ -118,30 +122,35 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
     ASSERT_ARGS(Parrot_io_open)
     PMC *new_filehandle, *filehandle;
     INTVAL flags;
-
-    if (PMC_IS_NULL(pmc))
+    if (PMC_IS_NULL(pmc)) {
         /* TODO: We should look up the HLL mapped type, instead of always
            using FileHandle here */
         new_filehandle = pmc_new(interp, enum_class_FileHandle);
-    else {
-        if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "file")))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Can only open a PMC that does 'file'");
-        new_filehandle = pmc;
+        PARROT_ASSERT(new_filehandle->vtable->base_type == enum_class_FileHandle);
     }
+    else
+        new_filehandle = pmc;
 
     flags = Parrot_io_parse_open_flags(interp, mode);
-    filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
-
-    if (PMC_IS_NULL(filehandle))
+    if (VTABLE_does(interp, new_filehandle, CONST_STRING(interp, "file"))) {
+        PARROT_ASSERT(new_filehandle->vtable->base_type == enum_class_FileHandle);
+        filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
+        if (PMC_IS_NULL(filehandle))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Unable to open filehandle from path '%S'", path);
+        PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
+        SETATTR_FileHandle_flags(interp, new_filehandle, flags);
+        SETATTR_FileHandle_filename(interp, new_filehandle, path);
+        SETATTR_FileHandle_mode(interp, new_filehandle, mode);
+        Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
+    }
+    else if (VTABLE_does(interp, new_filehandle, CONST_STRING(interp, "string"))) {
+        SETATTR_StringHandle_flags(interp, pmc, flags);
+        filehandle = pmc;
+    }
+    else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Unable to open filehandle from path '%S'",
-            path);
-
-    SETATTR_FileHandle_flags(interp, new_filehandle, flags);
-    SETATTR_FileHandle_filename(interp, new_filehandle, path);
-    SETATTR_FileHandle_mode(interp, new_filehandle, mode);
-    Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
+            "Attempt to open a PMC with unknown roles");
     return filehandle;
 }
 
@@ -319,6 +328,9 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 {
     ASSERT_ARGS(Parrot_io_reads)
     STRING *result = NULL;
+    if (PMC_IS_NULL(pmc) || !VTABLE_does(interp, pmc, CONST_STRING(interp, "read")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Attempt to read from null or invalid PMC");
     if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file"))) {
         INTVAL  ignored;
 
@@ -384,8 +396,39 @@ Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_readline)
     STRING *result;
-    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "readline"), "->S",
-            &result);
+    if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file"))) {
+        INTVAL flags;
+        if (Parrot_io_is_closed_filehandle(interp, pmc))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed filehandle");
+        GETATTR_FileHandle_flags(interp, pmc, flags);
+        if (!(flags & PIO_F_LINEBUF))
+            Parrot_io_setlinebuf(interp, pmc);
+
+        result = Parrot_io_reads(interp, pmc, 0);
+    }
+    else if (VTABLE_does(interp, pmc, CONST_STRING(interp, "string"))) {
+        INTVAL offset, newline_pos, read_length, orig_length;
+
+        GETATTR_StringHandle_stringhandle(interp, pmc, result);
+        if (STRING_IS_NULL(result))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Cannot read from a closed stringhandle");
+
+        orig_length = Parrot_str_byte_length(interp, result);
+        GETATTR_StringHandle_read_offset(interp, pmc, offset);
+        newline_pos = Parrot_str_find_index(interp, result, CONST_STRING(interp, "\n"), offset);
+
+        /* No newline found, read the rest of the string. */
+        if (newline_pos == -1)
+            read_length = orig_length - offset;
+        else
+            read_length = newline_pos - offset + 1; /* +1 to include the newline */
+
+        result = Parrot_str_substr(interp, result, offset,
+                read_length, NULL, 0);
+        SETATTR_StringHandle_read_offset(interp, pmc, newline_pos + 1);
+    }
     return result;
 }
 
@@ -441,7 +484,8 @@ PIOOFF_T
 Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
 {
     ASSERT_ARGS(Parrot_io_seek)
-    if (Parrot_io_is_closed(interp, pmc))
+    if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "file")) 
+     || Parrot_io_is_closed(interp, pmc))
         return -1;
 
     return Parrot_io_seek_buffer(interp, pmc, offset, w);
@@ -463,7 +507,8 @@ PIOOFF_T
 Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_tell)
-    if (Parrot_io_is_closed(interp, pmc))
+    if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "file")) 
+     || Parrot_io_is_closed(interp, pmc))
         return -1;
 
     return Parrot_io_get_file_position(interp, pmc);
@@ -487,7 +532,8 @@ INTVAL
 Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 {
     ASSERT_ARGS(Parrot_io_peek)
-    if (Parrot_io_is_closed(interp, pmc))
+    if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "file")) 
+     || Parrot_io_is_closed(interp, pmc))
         return -1;
 
     return Parrot_io_peek_buffer(interp, pmc, buffer);
@@ -510,19 +556,23 @@ INTVAL
 Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_eof)
-    INTVAL result;
+    INTVAL flags;
 
     /* io could be null here, but rather than return a negative error
      * we just fake EOF since eof test is usually in a boolean context.
      */
-    if (PMC_IS_NULL(pmc))
-            return 1;
+    if (PMC_IS_NULL(pmc)
+     || !VTABLE_does(interp, pmc, CONST_STRING(interp, "file")) 
+     || Parrot_io_is_closed(interp, pmc))
+        return 1;
+    if (Parrot_io_is_closed_filehandle(interp, pmc))
+        return 1;
 
-    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "eof"), "->I",
-            &result);
+    GETATTR_FileHandle_flags(interp, pmc, flags);
+    if (flags & PIO_F_EOF)
+        return 1;
 
-    return result;
-
+    return 0;
 }
 
 /*
@@ -564,9 +614,21 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
     if (PMC_IS_NULL(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Cannot write to null PMC");
+    if (STRING_IS_NULL(s))
+        return 0;
+    if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "write")))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Target PMC is not writable");
+    if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file"))) {
+        INTVAL flags;
+        GETATTR_FileHandle_flags(interp, pmc, flags);
 
-    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "puts"), "S->I",
-            s, &result);
+        if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
+            result = Parrot_io_write_utf8(interp, pmc, s);
+        else
+            result = Parrot_io_write_buffer(interp, pmc, s);
+    }
+
     return result;
 
 }

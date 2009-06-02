@@ -90,8 +90,17 @@ Create a copy of the stringhandle.
 */
 
     VTABLE INTVAL does(STRING * role) {
-        if (Parrot_str_equal(INTERP, SELF, CONST_STRING(INTERP, "string")))
+        Parrot_StringHandle_attributes * const attrs = PMC_data(SELF);
+        if (Parrot_str_equal(INTERP, role, CONST_STRING(INTERP, "string")))
             return 1;
+        if (attrs->flags != 0 && !STRING_IS_NULL(attrs->stringhandle)) {
+            if((attrs->flags & PIO_F_READ) && Parrot_str_equal(interp, role, CONST_STRING(INTERP, "read")))
+                return 1;
+            if((attrs->flags & PIO_F_WRITE) && Parrot_str_equal(interp, role, CONST_STRING(INTERP, "write")))
+                return 1;
+            if((attrs->flags & PIO_F_APPEND) && Parrot_str_equal(interp, role, CONST_STRING(INTERP, "append")))
+                return 1;
+        }
         return SUPER(role);
     }
 
@@ -206,8 +215,7 @@ stored for mocking.
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
-        flags = Parrot_io_parse_open_flags(interp, open_mode);
-        SET_ATTR_flags(INTERP, SELF, flags);
+        Parrot_io_open(INTERP, SELF, filename, open_mode);
 
         RETURN(PMC *SELF);
     }
@@ -270,6 +278,7 @@ C<bytes> argument is currently ignored.
 
     METHOD read(INTVAL length) {
         STRING *string_result;
+        string_result = Parrot_io_reads(INTERP, SELF, length);
         RETURN(STRING *string_result);
     }
 
@@ -286,27 +295,7 @@ responds to "\n" newlines.)
 
     METHOD readline() {
         STRING *string_result;
-        INTVAL offset, newline_pos, read_length, orig_length;
-
-        GET_ATTR_stringhandle(INTERP, SELF, string_result);
-        if (STRING_IS_NULL(string_result))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-
-        orig_length = Parrot_str_byte_length(INTERP, string_result);
-        GET_ATTR_read_offset(INTERP, SELF, offset);
-        newline_pos = Parrot_str_find_index(INTERP, string_result, CONST_STRING(INTERP, "\n"), offset);
-
-        /* No newline found, read the rest of the string. */
-        if (newline_pos == -1)
-            read_length = orig_length - offset;
-        else
-            read_length = newline_pos - offset + 1; /* +1 to include the newline */
-
-        string_result = Parrot_str_substr(INTERP, string_result, offset,
-                read_length, NULL, 0);
-        SET_ATTR_read_offset(INTERP, SELF, newline_pos + 1);
-
+        string_result = Parrot_io_readline(INTERP, SELF);
         RETURN(STRING *string_result);
     }
 
