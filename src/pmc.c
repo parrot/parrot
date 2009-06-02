@@ -227,56 +227,6 @@ pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC * pmc), ARGIN(PMC * class_),
 
 
 /*
-=item C<PMC* Parrot_pmc_try_reuse(PARROT_INTERP, PMC *self, PMC * value, PMC
-*dest)>
-
-Try to reuse dest PMC if possible. We are going to kill C<dest> anyway. So try
-to reuse it before.
-
-TODO Write nice POD about sideeffects here.
-
-=cut
-*/
-
-PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC*
-Parrot_pmc_try_reuse(PARROT_INTERP, ARGIN(PMC *self), ARGIN_NULLOK(PMC * value),
-    ARGIN_NULLOK(PMC *dest))
-{
-    ASSERT_ARGS(Parrot_pmc_try_reuse)
-    /* Can't reuse dest because we'll lost value */
-    if (dest == value)
-        return pmc_new(interp, VTABLE_type(interp, self));
-
-    /* Can't reuse Null */
-    if (PMC_IS_NULL(dest))
-        return pmc_new(interp, VTABLE_type(interp, self));
-
-    /* Can't reuse read-only variables */
-    if (dest->vtable->flags & VTABLE_IS_READONLY_FLAG)
-        return pmc_new(interp, VTABLE_type(interp, self));
-
-    /* It's safe in this case. Caller want to replace us anyway */
-    if (dest == self)
-        return dest;
-
-    /* Morph to self type is required */
-    {
-        INTVAL type = VTABLE_type(interp, self);
-        if (type >= enum_class_core_max)
-            /* We are not core PMC. Just clone self to preserve semantic of VTABLEs */
-            dest = VTABLE_clone(interp, self);
-        else
-            pmc_reuse(interp, dest, type, 0);
-    }
-
-    return dest;
-}
-
-
-/*
 
 =item C<static void check_pmc_reuse_flags(PARROT_INTERP, UINTVAL srcflags,
 UINTVAL destflags)>
