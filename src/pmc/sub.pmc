@@ -261,10 +261,8 @@ Invokes the subroutine.
 
         PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
-        /*
-         * plain subroutine call
-         * create new context, place it in interpreter
-         */
+        /* plain subroutine call
+         * create new context, place it in interpreter */
         context               = Parrot_set_new_context(INTERP, sub->n_regs_used);
         context->current_sub  = SELF;
         context->caller_ctx   = caller_ctx;
@@ -281,8 +279,7 @@ Invokes the subroutine.
 
         /* if this is an outer sub, then we need to set sub->ctx
          * to the new context (refcounted) and convert the
-         * retcontinuation to a normal continuation.
-         */
+         * retcontinuation to a normal continuation.  */
         if (PObj_get_FLAGS(SELF) & SUB_FLAG_IS_OUTER) {
             /* release any previously held context */
             if (sub->ctx)
@@ -363,7 +360,7 @@ Invokes the subroutine.
         if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL) {
             if (!(*pc == PARROT_OP_get_params_pc
             ||    (*pc    == PARROT_OP_push_eh_ic
-              &&    pc[2] == PARROT_OP_get_params_pc))) {
+            &&     pc[2] == PARROT_OP_get_params_pc))) {
 
                 /* TODO keep it or resize it */
                 --context->recursion_depth;
@@ -396,9 +393,17 @@ Creates and returns a clone of the subroutine.
         /* we have to mark it ourselves */
         PObj_custom_mark_destroy_SETALL(ret);
 
-        /* first set the sub struct, Parrot_str_copy may cause GC */
         PMC_get_sub(INTERP, ret, sub);
+
+        /* release any previously held contexts */
+        if (sub->ctx)
+            Parrot_free_context(INTERP, sub->ctx, 1);
+        if (sub->outer_ctx)
+            Parrot_free_context(INTERP, sub->outer_ctx, 1);
+
         PMC_get_sub(INTERP, SELF, dest_sub);
+
+        /* first set the sub struct, Parrot_str_copy may cause GC */
         *sub = *dest_sub;
 
         if (sub->name)
@@ -407,6 +412,7 @@ Creates and returns a clone of the subroutine.
         /* Be sure not to share arg_info. */
         dest_sub->arg_info = NULL;
 
+        /* mark any newly held contexts */
         if (sub->ctx)
             Parrot_context_ref(INTERP, sub->ctx);
         if (sub->outer_ctx)
