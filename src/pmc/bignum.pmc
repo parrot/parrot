@@ -1165,14 +1165,20 @@ Decrement the BigNum by 1.0.
 */
 
     MULTI PMC *subtract(BigNum value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_sub_bignum(INTERP, SELF, value, dest);
         return dest;
     }
 
     MULTI PMC *subtract(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_sub_bignum_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -1186,7 +1192,10 @@ Decrement the BigNum by 1.0.
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_sub_bignum_int(INTERP, SELF, value, dest);
         return dest;
@@ -1291,7 +1300,10 @@ Decrement the BigNum by 1.0.
 */
 
     VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_pow_bignum_int(INTERP, SELF, value, dest);
         return dest;
@@ -1316,7 +1328,10 @@ Decrement the BigNum by 1.0.
 
     MULTI PMC *divide(BigNum value, PMC *dest) {
         BIGNUM *bn;
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_div_bignum(INTERP, SELF, value, dest);
 #if 0
@@ -1332,7 +1347,10 @@ Decrement the BigNum by 1.0.
     }
 
     MULTI PMC *divide(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_div_bignum_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -1346,7 +1364,10 @@ Decrement the BigNum by 1.0.
     }
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_div_bignum_int(INTERP, SELF, value, dest);
         return dest;
@@ -1381,14 +1402,14 @@ Decrement the BigNum by 1.0.
 */
 
     MULTI PMC *floor_divide(BigNum value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_fdiv_bignum(INTERP, SELF, value, dest);
         return dest;
     }
 
     MULTI PMC *floor_divide(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_fdiv_bignum_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -1402,7 +1423,10 @@ Decrement the BigNum by 1.0.
     }
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        if (dest)
+            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
+        else
+            dest = pmc_new(INTERP, SELF->vtable->base_type);
 
         bignum_fdiv_bignum_int(INTERP, SELF, value, dest);
         return dest;

@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 24;
+use Parrot::Test tests => 23;
 
 # test for GMP
 use Parrot::Config;
@@ -637,32 +637,6 @@ Inf
 Inf
 -Inf
 -Inf
-OUTPUT
-
-# We should generate more tests for all possible combinations
-pir_output_is( <<'CODE', <<OUTPUT, "Original dest is untouched in 3-args arithmetic" );
-.sub 'test' :main
-    $P0 = new 'Integer'
-    $P0 = 40
-    $P1 = new 'Integer'
-    $P1 = 2
-    $P2 = new 'Integer'
-
-    $P99 = $P2
-    $P2 = add $P0, $P1
-    say $P2
-    say $P99
-
-    $P99 = $P2
-    $P2  = concat $P0, $P1
-    say $P2
-    say $P99
-.end
-CODE
-42
-0
-402
-42
 OUTPUT
 
 # Local Variables:
