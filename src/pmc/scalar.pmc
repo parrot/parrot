@@ -257,10 +257,7 @@ Subtracts C<value> from C<SELF> inplace.
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
         const FLOATVAL a = SELF.get_number();
-        if (dest)
-            pmc_reuse(INTERP, dest, value->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
         VTABLE_set_number_native(INTERP, dest,
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
