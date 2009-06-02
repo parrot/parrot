@@ -18,8 +18,6 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 
 =cut
 
-.include 'library/config.pir'
-
 .sub 'main' :main
     .param pmc    argv
     .local string infile
@@ -31,6 +29,7 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 
     .local string gcc
     .local int    is_gcc
+    load_bytecode 'config.pbc'
     $P0 = '_config'()
     gcc    = $P0['gccversion']
     $I0    = length gcc
