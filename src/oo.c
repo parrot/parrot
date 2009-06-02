@@ -387,7 +387,7 @@ get_pmc_proxy(PARROT_INTERP, ARGIN(INTVAL type))
     else {
         PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot"));
         PMC * const pmc_ns =
-            Parrot_make_namespace_keyed_str(interp, parrot_hll, 
+            Parrot_make_namespace_keyed_str(interp, parrot_hll,
                 interp->vtables[type]->whoami);
         PMC * proxy = VTABLE_get_class(interp, pmc_ns);
 
