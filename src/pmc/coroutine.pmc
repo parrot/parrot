@@ -8,7 +8,7 @@ src/pmc/coroutine.pmc - Co-Routine PMC
 
 =head1 DESCRIPTION
 
-C<Coroutine> extends C<Continuation> to provide a subroutine that can
+C<Coroutine> extends C<Sub> to provide a subroutine that can
 stop in the middle, and start back up later at the point at which it
 stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
