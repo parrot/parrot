@@ -76,9 +76,11 @@ Clone the coroutine.
 
     VTABLE void init() {
         Parrot_Coroutine_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_Coroutine_attributes);
-        attrs->sub = (Parrot_sub*)new_coroutine(INTERP);
+            mem_allocate_typed(Parrot_Coroutine_attributes);
+
+        attrs->sub     = (Parrot_sub *)new_coroutine(INTERP);
         PMC_data(SELF) = attrs;
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -252,17 +254,15 @@ Marks the coroutine as live.
 
     VTABLE void mark() {
         Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
-        Parrot_coro * const co = (Parrot_coro *)attrs->sub;
+        Parrot_coro * const          co    = (Parrot_coro *)attrs->sub;
 
+        /* co->ctx marked in SUPER(), so do not mark here */
         if (co) {
-            if (co->ctx)
-                mark_context(INTERP, co->ctx);
             if (co->dynamic_state)
                 mark_stack(INTERP, co->dynamic_state);
 
+            SUPER();
         }
-
-        SUPER();
     }
 }
 
