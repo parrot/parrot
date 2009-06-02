@@ -8,7 +8,10 @@ pcre.pir - user interface to Perl-Compatible Regular Expression library
 =head1 SYNOPSIS
 
     load_bytecode 'pcre.pbc'
-    lib = pcre_init()
+
+    .local pmc func, lib
+    func = get_hll_global ['PCRE'], 'init'
+    lib = func()
 
     func = get_hll_global ['PCRE'], 'compile'
     ( regex, error, errptr )= func( pat, options )
