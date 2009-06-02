@@ -33,10 +33,10 @@ match object or an array of match objects.
 
 =item
 
-The C<make> function and C< $(...) > are used to set and retrieve
+The C<make> function and C< .ast > are used to set and retrieve
 the I<result object> for a match.  Here, we use the result object
 to hold the ast representation of any given match.  So, in the
-code below, whenever you see an expression like C<< $($<foo>) >>,
+code below, whenever you see an expression like C<< $<foo>.ast >>,
 we're really saying "the ast of C<< <foo> >>".
 
 =back
@@ -48,7 +48,7 @@ class abc::Grammar::Actions;
 ##  The ast of the entire program is the ast of the
 ##  top-level <statement_list>.
 method TOP($/) {
-    make $($<statement_list>);
+    make $<statement_list>.ast;
 }
 
 
@@ -61,7 +61,7 @@ method TOP($/) {
 method statement_list($/) {
     my $past := PAST::Stmts.new( :node($/) );
     for $<statement> {
-        $past.push( $($_) );
+        $past.push( $_.ast );
     }
     make $past;
 }
@@ -71,7 +71,7 @@ method statement_list($/) {
 ##    In the parse grammar, we've set up $key to tell us the
 ##    name of whatever subrule was matched by this statement.
 ##    We can then use $key to quickly get the subrule's ast
-##    with $( $/{$key} ).
+##    with $/{$key}.ast .
 ##
 ##    bc(1) expression statements also have special semantics
 ##    which we handle here.  If a statement is an expression
@@ -81,7 +81,7 @@ method statement_list($/) {
 ##    Similarly, if the statement consists of a simple string, it's
 ##    displayed on the output.
 method statement($/, $key) {
-    my $past := $( $/{$key} );
+    my $past := $/{$key}.ast;
     if ($key eq 'expression' && ~$past.name() ne 'infix:=') {
         my $last := PAST::Var.new( :name('last'),
                                    :scope('package'),
@@ -109,12 +109,12 @@ method statement($/, $key) {
 ##    matches and set them as the children of a
 ##    PAST::Op node with a pasttype of 'if'.
 method if_statement($/) {
-    my $past := PAST::Op.new( $($<expression>),
-                              $( $<statement>[0] ),
+    my $past := PAST::Op.new( $<expression>.ast,
+                              $<statement>[0].ast,
                               :pasttype('if'),
                               :node( $/ ) );
     if ( $<statement>[1] ) {
-        $past.push( $( $<statement>[1] ) );
+        $past.push( $<statement>[1].ast );
     }
     make $past;
 }
@@ -124,8 +124,8 @@ method if_statement($/) {
 ##    This is basically the same as if_statement above, except
 ##    we use a pasttype of 'while'.
 method while_statement($/) {
-    make PAST::Op.new( $($<expression>),
-                       $($<statement>),
+    make PAST::Op.new( $<expression>.ast,
+                       $<statement>.ast,
                        :pasttype('while'),
                        :node($/) );
 }
@@ -140,13 +140,13 @@ method for_statement($/) {
     my $past := PAST::Stmts.new( :node($/) );
 
     #  add the initial "expr0;" node
-    $past.push( $( $<expression>[0] ) );
+    $past.push( $<expression>[0].ast );
 
     #  create the "{ body; expr2; }" part
-    my $body := PAST::Stmts.new( $($<statement>), $($<expression>[2]) );
+    my $body := PAST::Stmts.new( $<statement>.ast, $<expression>[2].ast );
 
     #  now create the "while (expr1) { body; expr2; }" part
-    $past.push( PAST::Op.new( $($<expression>[1]), $body, :pasttype('while')));
+    $past.push( PAST::Op.new( $<expression>[1].ast, $body, :pasttype('while')));
 
     make $past;
 }
@@ -156,7 +156,7 @@ method for_statement($/) {
 ##    A compound statement is just a list of statements, so we
 ##    return the ast of its embedded <statement_list>.
 method compound_statement($/) {
-    make $($<statement_list>);
+    make $<statement_list>.ast;
 }
 
 
@@ -182,7 +182,7 @@ method string($/) {
 ##    is invoked with the expression in $<expr> and a $key of 'end'.
 method expression($/, $key) {
     if ($key eq 'end') {
-        make $($<expr>);
+        make $<expr>.ast;
     }
     else {
         my $past := PAST::Op.new( :name($<type>),
@@ -192,7 +192,7 @@ method expression($/, $key) {
                                   :node($/)
                                 );
         for @($/) {
-            $past.push( $($_) );
+            $past.push( $_.ast );
         }
         make $past;
     }
@@ -203,7 +203,7 @@ method expression($/, $key) {
 ##    Like 'statement' above, the $key has been set to let us know
 ##    which term subrule was matched.
 method term($/, $key) {
-    make $( $/{$key} );
+    make $/{$key}.ast;
 }
 
 ##  float/integer:
@@ -246,7 +246,7 @@ method variable($/, $key) {
                               );
     }
     if ($key eq 'call') {
-        $past := PAST::Op.new( $($<expression>),
+        $past := PAST::Op.new( $<expression>.ast,
                                :name( ~$<name> ),
                                :pasttype('call'),
                                :node( $/ )
