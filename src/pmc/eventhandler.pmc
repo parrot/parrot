@@ -139,25 +139,8 @@ Marks this PMC and any of its contents as live.
             if (! PMC_IS_NULL(e->code))
                 Parrot_gc_mark_PObj_alive(INTERP, (PObj *)e->code);
         }
-    }
 
-/*
-
-=item C<void destroy()>
-
-Frees any memory held by this PMC.
-
-=cut
-
-*/
-
-    VTABLE void destroy() {
-        Parrot_EventHandler_attributes *e = PMC_data_typed(SELF, Parrot_EventHandler_attributes *);
-
-        if (e) {
-            mem_sys_free(e);
-            PMC_data(SELF) = NULL;
-        }
+        SUPER();
     }
 
 /*
