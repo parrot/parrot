@@ -204,6 +204,8 @@ standard_names:
     push libnames, 'tcl84'
     push libnames, 'libtcl8.5'
     push libnames, 'libtcl8.4'
+    push libnames, 'libtcl8.5.so'
+    push libnames, 'libtcl8.4.so'
 standard_names_e:
 
     .local pmc libtcl
