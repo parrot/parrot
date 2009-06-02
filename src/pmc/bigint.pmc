@@ -859,7 +859,7 @@ Decrements the integer.
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
-        dest pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_add_bigint_int(INTERP, SELF, value, dest);
         return dest;
