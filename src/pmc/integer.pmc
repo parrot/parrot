@@ -620,6 +620,7 @@ Divides C<SELF> by C<value> inplace.
         return dest;
     }
 
+    /* XXX Why we have this method instead of using default??? */
     MULTI void i_divide(BigInt value) {
         upgrade_self_to_bignum(INTERP, SELF);
         VTABLE_i_divide(INTERP, SELF, value);
@@ -658,59 +659,24 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *floor_divide(BigInt value, PMC *dest) {
-        PMC *temp;
-        maybe_throw_overflow_error(INTERP);
-        temp = VTABLE_get_bignum(INTERP, SELF);
-        return VTABLE_floor_divide(INTERP, temp, value, dest);
-    }
-
-
-    MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
-        FLOATVAL f;
-
-        if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                    "float division by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        f = floor(SELF.get_number() / d);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
+    MULTI PMC *floor_divide(PMC *value, PMC *dest) {
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_floor_divide(INTERP, dest, value);
         return dest;
     }
 
-
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
-        FLOATVAL f;
-
-        if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                    "float division by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        f = floor(SELF.get_number() / value);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
-
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_floor_divide_int(INTERP, dest, value);
         return dest;
     }
 
     VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
-        FLOATVAL f;
-
-        if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                    "float division by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        f = floor(SELF.get_number() / value);
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)f);
-
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_floor_divide_float(INTERP, dest, value);
         return dest;
     }
+
 
     MULTI void i_floor_divide(BigInt value) {
         upgrade_self_to_bignum(INTERP, SELF);
