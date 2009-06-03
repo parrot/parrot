@@ -302,7 +302,7 @@ I<const> to it. The I<type> must be C<int>, C<num>, C<string> or a string
 constant indicating the PMC type. This allows you to create PMC constants
 representing subroutines; the value of the constant in that case is the
 name of the subroutine. If the referred subroutine has an C<:immediate>
-flag and it returns a value, then that value is stored instead of the
+modifier and it returns a value, then that value is stored instead of the
 subroutine.
 
 C<.const> declarations representing subroutines can only be written
@@ -316,12 +316,12 @@ C<.globalconst> may only be used withing a C<.sub>.
 
 =item .sub
 
-  .sub <identifier> [:<flag> ...]
-  .sub <quoted string> [:<flag> ...]
+  .sub <identifier> [:<modifier> ...]
+  .sub <quoted string> [:<modifier> ...]
 
 Define a subroutine. All code in a PIR source file must be defined in a
-subroutine. See the section L<Subroutine flags> for available flags.
-Optional flags are a list of I<flag>, separated by  spaces.
+subroutine. See the section L<Subroutine modifiers> for available
+modifiers. Optional modifiers are a list separated by spaces.
 
 The name of the sub may be either a bare identifier or a quoted string
 constant. Bare identifiers must be valid PIR identifiers (see L<Identifiers>
@@ -426,7 +426,7 @@ bytecode file.
 
 =back
 
-=head4 Subroutine flags
+=head4 Subroutine modifiers
 
 =over 4
 
@@ -435,7 +435,7 @@ bytecode file.
 Define "main" entry point to start execution.  If multiple subroutines are
 marked as B<:main>, the B<last> marked subroutine is used.  Only the first
 file loaded or compiled counts; subs marked as B<:main> are ignored by the
-B<load_bytecode> op. If no B<:main> flag is specified at all, execution
+B<load_bytecode> op. If no B<:main> modifier is specified, execution
 starts at the first subroutine in the file.
 
 =item :load
@@ -477,7 +477,7 @@ file.
 {{ TODO: need a freeze/thaw reference }}.
 
 For instance, after compilation of the sub 'init', that sub is executed
-immediately (hence the :immediate flag). Instead of storing the sub
+immediately (hence the C<:immediate> modifier). Instead of storing the sub
 'init' in the constants table, the value returned by 'init' is stored,
 which in this example is a FixedIntegerArrray.
 
@@ -574,8 +574,8 @@ as the C<.sub> name.  To override a different vtable function, use
 C<:vtable('...')>. For example, to have a C<.sub> named I<ToString> also
 be the vtable function C<get_string>), use C<:vtable('get_string')>.
 
-When the B<:vtable> flag is set, the object PMC can be referred to with
-C<self>, as with the B<:method> flag.
+When the B<:vtable> modifier is set, the object PMC can be referred to with
+C<self>, as with the B<:method> modifier.
 
 =item :outer(subname)
 
@@ -599,9 +599,9 @@ C<Coroutine>, etc.
 =item :nsentry( <string_constant> )
 
 Specify the name by which the subroutine is stored in the namespace. The
-default name by which a subroutine is stored in the namespace (if this flag
-is missing), is the subroutine's name as given after the C<.sub> directive.
-This flag allows to override this.
+default name by which a subroutine is stored in the namespace (if this
+modifier is missing), is the subroutine's name as given after the
+C<.sub> directive.  This modifier allows to override this.
 
 =back
 
@@ -646,28 +646,28 @@ The specified subroutine must be loaded using the <dlfunc> op that takes
 the library, function name and function signature as arguments.
 See F<docs/pdds/pdd16_native_call> for details.
 
-=item .set_return <var> [:<flag>]*
+=item .set_return <var> [:<modifier>]*
 
 Between C<.begin_return> and C<.end_return>, specify one or
 more of the return value(s) of the current subroutine.  Available
-flags: C<:flat>, C<:named>.
+modifiers: C<:flat>, C<:named>.
 
-=item .set_yield <var> [:<flag>]*
+=item .set_yield <var> [:<modifier>]*
 
 Between C<.begin_yield> and C<.end_yield>, specify one or
 more of the yield value(s) of the current subroutine.  Available
-flags: C<:flat>, C<:named>.
+modifiers: C<:flat>, C<:named>.
 
-=item .set_arg <var> [:<flag>]*
+=item .set_arg <var> [:<modifier>]*
 
 Between C<.begin_call> and C<.call>, specify an argument to be
-passed.  Available flags: C<:flat>, C<:named>.
+passed.  Available modifiers: C<:flat>, C<:named>.
 
-=item .get_result <var> [:<flag>]*
+=item .get_result <var> [:<modifier>]*
 
 Between C<.call> and C<.end_call>, specify where one or more return
-value(s) should be stored.  Available flags:
-C<:slurpy>, C<:named>, C<:optional>, and C<:opt_flag>.
+value(s) should be stored.  Available modifiers: C<:slurpy>, C<:named>,
+C<:optional>, and C<:opt_flag>.
 
 =back
 
@@ -675,12 +675,12 @@ C<:slurpy>, C<:named>, C<:optional>, and C<:opt_flag>.
 
 =over 4
 
-=item .param <type> <identifier> [:<flag>]*
+=item .param <type> <identifier> [:<modifier>]*
 
 At the top of a subroutine, declare a local variable, in the manner
 of C<.local>, into which parameter(s) of the current subroutine should
-be stored. Available flags:
-C<:slurpy>, C<:named>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
+be stored. Available modifiers: C<:slurpy>, C<:named>, C<:optional>,
+C<:opt_flag> and C<:unique_reg>.
 
 =back
 
@@ -688,7 +688,7 @@ C<:slurpy>, C<:named>, C<:optional>, C<:opt_flag> and C<:unique_reg>.
 
 See L<PDD03|pdds/pdd03_calling_conventions.pod> for a description of
 the meaning of the flag bits C<SLURPY>, C<OPTIONAL>, C<OPT_FLAG>,
-and C<FLAT>, which correspond to the calling convention flags
+and C<FLAT>, which correspond to the calling convention modifiers
 C<:slurpy>, C<:optional>, C<:opt_flag>, and C<:flat>.
 
 
@@ -711,9 +711,9 @@ directive always takes one argument: an exception object.
 =end PIR_FRAGMENT
 
 
-This is syntactic sugar for the C<get_results> op, but any flags set on the
-targets will be handled automatically by the PIR compiler.
-The C<.get_results> directive must be the first instruction of the exception
+This is syntactic sugar for the C<get_results> op, but any modifiers set
+on the targets will be handled automatically by the PIR compiler.  The
+C<.get_results> directive must be the first instruction of the exception
 handler; only declarations (.lex, .local) may come first.
 
 To resume execution after handling the exception, just invoke the continuation
@@ -846,31 +846,31 @@ becomes:
 Note that this only works for opcodes that have have a leading C<OUT>
 parameter. [this restriction unimplemented: RT #36283]
 
-=item ([<var1> [:<flag1> ...], ...]) = <var2>([<arg1> [:<flag2> ...], ...])
+=item ([<var1> [:<modifier1> ...], ...]) = <var2>([<arg1> [:<modifier2> ...], ...])
 
 This is short for:
 
   .begin_call
-  .set_arg <arg1> <flag2>
+  .set_arg <arg1> <modifier2>
   ...
   .call <var2>
-  .get_result <var1> <flag1>
+  .get_result <var1> <modifier1>
   ...
   .end_call
 
-=item <var> = <var>([arg [:<flag> ...], ...])
+=item <var> = <var>([arg [:<modifier> ...], ...])
 
-=item <var>([arg [:<flag> ...], ...])
+=item <var>([arg [:<modifier> ...], ...])
 
-=item <var>."_method"([arg [:<flag> ...], ...])
+=item <var>."_method"([arg [:<modifier> ...], ...])
 
-=item <var>.<var>([arg [:<flag> ...], ...])
+=item <var>.<var>([arg [:<modifier> ...], ...])
 
 Function or method call. These notations are shorthand for a longer PCC
 function call. I<var> can denote a global subroutine, a local I<identifier> or
 a I<reg>.
 
-=item .return ([<var> [:<flag> ...], ...])
+=item .return ([<var> [:<modifier> ...], ...])
 
 Return from the current subroutine with zero or more values.
 
@@ -1258,7 +1258,7 @@ C<.macro_local> instead of C<.local> to take advantage of the name munging.
 =head3 Subroutine Definition
 
 A simple subroutine, marked with C<:main>, indicating it's the entry point
-in the file. Other sub flags include C<:load>, C<:init>, etc.
+in the file. Other sub modifiers include C<:load>, C<:init>, etc.
 
 =begin PIR
 
