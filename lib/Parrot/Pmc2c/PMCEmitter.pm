@@ -983,7 +983,7 @@ sub gen_switch_vtable {
 
         my $body = <<"BODY";
     INTVAL type = VTABLE_type(INTERP, value);
-    if (SELF.type() >= enum_class_core_max) /* For dynpmc fallback to MMD */
+    if (type >= enum_class_core_max) /* For dynpmc fallback to MMD */
         type = enum_class_core_max;
     switch(type) {
 $cases
