@@ -614,7 +614,7 @@ Multiply C<value> with C<SELF> inplace.
 
     MULTI void i_multiply(Complex value) {
         upgrade_self_to_complex(INTERP, SELF);
-        VTABLE_multiply(INTERP, value, SELF, SELF);
+        VTABLE_i_multiply(INTERP, SELF, value);
     }
 
 
