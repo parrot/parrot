@@ -312,7 +312,7 @@ current bytecode file.
 =item .globalconst <type> <identifier> = <const>
 
 As C<.const> above, but the defined constant is globally accessible.
-C<.globalconst> may only be used withing a C<.sub>.
+C<.globalconst> may only be used within a C<.sub>.
 
 =item .sub
 
