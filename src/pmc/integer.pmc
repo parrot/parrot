@@ -745,51 +745,23 @@ Calculates modulus in place.
 */
 
 
-    MULTI PMC *modulus(BigInt value, PMC *dest) {
-        PMC *temp;
-        maybe_throw_overflow_error(INTERP);
-        temp = VTABLE_get_bignum(INTERP, SELF);
-        return VTABLE_modulus(INTERP, temp, value, dest);
-    }
-
-
-    MULTI PMC *modulus(DEFAULT value, PMC *dest) {
-        const INTVAL d = VTABLE_get_integer(INTERP, value);
-
-        if (d == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                    "int modulus by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest,
-                intval_mod(SELF.get_integer(), d));
+    MULTI PMC *modulus(PMC *value, PMC *dest) {
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_modulus(INTERP, dest, value);
         return dest;
     }
 
 
     VTABLE PMC *modulus_int(INTVAL value, PMC *dest) {
-        if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                    "int modulus by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest,
-                intval_mod(SELF.get_integer(), value));
+        dest = VTABLE_clone(INTERP, SELF);
+        STATICSELF.i_modulus_int(value);
         return dest;
     }
 
 
     VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) {
-        if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                    "int modulus by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_integer_native(INTERP, dest,
-                intval_mod(SELF.get_integer(), (INTVAL)value));
+        dest = VTABLE_clone(INTERP, SELF);
+        STATICSELF.i_modulus_float(value);
         return dest;
     }
 
@@ -818,7 +790,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer() , value));
+                intval_mod(SELF.get_integer(), value));
     }
 
 
@@ -828,7 +800,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                intval_mod(SELF.get_integer() , (INTVAL)value));
+                intval_mod(SELF.get_integer(), (INTVAL)value));
     }
 
 
