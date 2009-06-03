@@ -340,76 +340,17 @@ Adds C<value> to the integer and returns the result in C<*dest>.
 =cut
 
 */
-
-    MULTI PMC *add(Integer value, PMC *dest) {
-        const INTVAL a = SELF.get_integer();
-        const INTVAL b = VTABLE_get_integer(INTERP, value);
-        const INTVAL c = a + b;
-
-        if ((c^a) >= 0 || (c^b) >= 0) {
-            dest = pmc_new(INTERP, VTABLE_type(interp, SELF));
-
-            /* need this for e.g. Undef PMC */
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
-        else {
-            PMC * temp;
-            maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
-            return VTABLE_add(interp, temp, value, dest);
-        }
-    }
-
-
-    MULTI PMC *add(Complex value, PMC *dest) {
-        const INTVAL a = SELF.get_integer();
-        dest           = pmc_new(INTERP, VTABLE_type(INTERP, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                a + VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                VTABLE_get_number_keyed_int(INTERP, value, 1));
-
+    MULTI PMC *add(DEFAULT *value, PMC *dest) {
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_add(INTERP, dest, value);
         return dest;
     }
 
-
-    MULTI PMC *add(BigInt value, PMC *dest) {
-        PMC *temp;
-        maybe_throw_overflow_error(interp);
-        temp = VTABLE_get_bignum(interp, SELF);
-        return VTABLE_add(interp, temp, value, dest);
-    }
-
-
-    MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(interp, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                SELF.get_integer() + VTABLE_get_number(INTERP, value));
+    VTABLE PMC *add_int(INTVAL value, PMC *dest) {
+        dest = VTABLE_clone(INTERP, SELF);
+        Integer.dest.i_add_int(value);
         return dest;
     }
-
-
-    VTABLE PMC *add_int(INTVAL b, PMC *dest) {
-        const INTVAL a = VTABLE_get_integer(INTERP, SELF);
-        const INTVAL c = a + b;
-
-        if ((c^a) >= 0 || (c^b) >= 0) {
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
-        else {
-            PMC *temp;
-            maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
-            return VTABLE_add_int(interp, temp, b, dest);
-        }
-    }
-
 
 /*
 
@@ -435,13 +376,19 @@ Adds C<value> to C<SELF> inplace.
 
         pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
-                SELF.get_integer() + VTABLE_get_number(INTERP, value));
+                a + VTABLE_get_number_keyed_int(INTERP, value, 0));
+        VTABLE_set_number_keyed_int(INTERP, SELF, 1,
+                VTABLE_get_number_keyed_int(INTERP, value, 1));
     }
 
+    MULTI void i_add(BigInt value) {
+        maybe_throw_overflow_error(interp);
+        upgrade_self_to_bignum(INTERP, SELF);
+        VTABLE_i_add(INTERP, SELF, value);
+    }
 
     MULTI void i_add(DEFAULT value) {
-        VTABLE_set_number_native(INTERP, SELF,
-                SELF.get_integer() + VTABLE_get_number(INTERP, value));
+        STATICSELF.i_add_float(VTABLE_get_number(INTERP, value));
     }
 
 
@@ -452,10 +399,9 @@ Adds C<value> to C<SELF> inplace.
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
         else {
-            PMC *temp;
             maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
-            VTABLE_i_add_int(interp, temp, b);
+            upgrade_self_to_bignum(INTERP, SELF);
+            VTABLE_i_add_int(INTERP, SELF, b);
         }
     }
 
@@ -480,55 +426,11 @@ C<get_integer> and C<set_integer_native> always.
 
 */
 
-    MULTI PMC *subtract(Integer value, PMC *dest) {
-        const INTVAL a = SELF.get_integer();
-        const INTVAL b = VTABLE_get_integer(INTERP, value);
-        const INTVAL c = a - b;
-
-        if ((c^a) >= 0 || (c^~b) >= 0) {
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
-        else {
-            PMC *temp;
-            maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
-            return VTABLE_subtract(interp, temp, value, dest);
-        }
-    }
-
-
-    MULTI PMC *subtract(Complex value, PMC *dest) {
-        const INTVAL a = SELF.get_integer();
-        dest           = pmc_new(INTERP, VTABLE_type(INTERP, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                a - VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                -VTABLE_get_number_keyed_int(INTERP, value, 1));
-
+    MULTI PMC *subtract(PMC *value, PMC *dest) {
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_subtract(INTERP, dest, value);
         return dest;
     }
-
-
-    MULTI PMC *subtract(BigInt value, PMC *dest) {
-        PMC *temp;
-        maybe_throw_overflow_error(interp);
-        temp = VTABLE_get_bignum(interp, SELF);
-        return VTABLE_subtract(interp, temp, value, dest);
-    }
-
-
-    MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                SELF.get_integer() - VTABLE_get_number(INTERP, value));
-        return dest;
-    }
-
 
 /*
 
@@ -541,21 +443,9 @@ Subtracts C<value> from the integer and returns the result in C<*dest>.
 */
 
     VTABLE PMC *subtract_int(INTVAL b, PMC *dest) {
-        const INTVAL a = SELF.get_integer();
-        const INTVAL c = a - b;
-
-        if ((c^a) >= 0 || (c^~b) >= 0) {
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
-        else {
-            PMC *temp;
-            maybe_throw_overflow_error(interp);
-            temp = VTABLE_get_bignum(interp, SELF);
-            return VTABLE_subtract_int(interp, temp, b, dest);
-        }
+        dest = VTABLE_clone(INTERP, SELF);
+        Integer.dest.i_subtract_int(b);
+        return dest;
     }
 
 
@@ -574,17 +464,7 @@ Subtracts C<value> from C<SELF> inplace.
 */
 
     MULTI void i_subtract(Integer value) {
-        const INTVAL a = SELF.get_integer();
-        const INTVAL b = VTABLE_get_integer(INTERP, value);
-        const INTVAL c = a - b;
-
-        if ((c^a) >= 0 || (c^~b) >= 0)
-            VTABLE_set_integer_native(INTERP, SELF, c);
-        else {
-            maybe_throw_overflow_error(interp);
-            SELF = upgrade_self_to_bignum(interp, SELF);
-            VTABLE_i_subtract(interp, SELF, value);
-        }
+        STATICSELF.i_subtract_int(VTABLE_get_integer(INTERP, value));
     }
 
 
@@ -598,10 +478,14 @@ Subtracts C<value> from C<SELF> inplace.
                 -VTABLE_get_number_keyed_int(INTERP, value, 1));
     }
 
+    MULTI void i_subtract(BigInt value) {
+        maybe_throw_overflow_error(interp);
+        upgrade_self_to_bignum(INTERP, SELF);
+        VTABLE_i_subtract(INTERP, SELF, value);
+    }
 
     MULTI void i_subtract(DEFAULT value) {
-        VTABLE_set_number_native(INTERP, SELF,
-                SELF.get_integer() - VTABLE_get_number(INTERP, value));
+        STATICSELF.i_subtract_float(VTABLE_get_number(INTERP, value));
     }
 
 
