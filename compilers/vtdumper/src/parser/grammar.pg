@@ -4,13 +4,15 @@
 grammar VTable::Grammar is PCT::Grammar;
 
 token TOP {
-    <sections>
+    <vtable_or_section>*
     [ $ || <panic: 'Syntax error'> ]
     {*}
 }
 
 rule sections {
+    {*}                    #= begin
     <vtable_or_section>*
+    {*}                    #= end
 }
 
 rule vtable_or_section {
@@ -18,7 +20,7 @@ rule vtable_or_section {
 }
 
 rule section {
-    '[' <identifier> ']' <attribute>?                {*}
+    '[' <identifier> ']' <attribute>*               {*}
 }
 
 rule attribute {
@@ -27,7 +29,7 @@ rule attribute {
 
 
 rule vtable_func {
-    <type> <identifier> '(' <args> ')' <attribute>?  {*}
+    <type> <identifier> '(' <args> ')' <attribute>*  {*}
 }
 
 rule type {
