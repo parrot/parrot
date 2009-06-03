@@ -523,68 +523,17 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
 
 */
 
-    MULTI PMC *multiply(Integer value, PMC *dest) {
-        const INTVAL a  = VTABLE_get_integer(INTERP, SELF);
-        const INTVAL b  = VTABLE_get_integer(INTERP, value);
-        const INTVAL c  = a * b;
-        const double cf = (double)a * (double)b;
-
-        if ((double) c == cf) {
-            dest = pmc_new(INTERP, VTABLE_type(interp, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
-        else {
-            PMC *temp;
-            maybe_throw_overflow_error(INTERP);
-            temp = VTABLE_get_bignum(INTERP, SELF);
-            return VTABLE_multiply(INTERP, temp, value, dest);
-        }
-    }
-
-
-    MULTI PMC *multiply(Complex value, PMC *dest) {
-        return VTABLE_multiply(INTERP, value, SELF, dest);
-    }
-
-
-    MULTI PMC *multiply(BigInt value, PMC *dest) {
-        return VTABLE_multiply_int(INTERP, value, SELF.get_integer(), dest);
-    }
-
-
-    MULTI PMC *multiply(String value, PMC *dest) {
-        return Parrot_Integer_multi_multiply_Integer_PMC(INTERP, SELF, value, dest);
-    }
-
-
-    MULTI PMC *multiply(DEFAULT value, PMC *dest) {
-        const FLOATVAL valf = VTABLE_get_number(INTERP, value);
-        dest                = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_number_native(INTERP, dest, SELF.get_number() * valf);
+    MULTI PMC *multiply(PMC *value, PMC *dest) {
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_multiply(INTERP, dest, value);
         return dest;
     }
 
 
     VTABLE PMC *multiply_int(INTVAL b, PMC *dest) {
-        const INTVAL a  = SELF.get_integer();
-        const INTVAL c  = a * b;
-        const double cf = (double)a * (double)b;
-
-        if ((double) c == cf) {
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-            VTABLE_set_integer_native(INTERP, dest, c);
-            return dest;
-        }
-        else {
-            PMC *temp;
-            maybe_throw_overflow_error(INTERP);
-            temp = VTABLE_get_bignum(INTERP, SELF);
-            return VTABLE_multiply_int(INTERP, temp, b, dest);
-        }
+        dest = VTABLE_clone(INTERP, SELF);
+        Integer.dest.i_multiply_int(b);
+        return dest;
     }
 
 /*
