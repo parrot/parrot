@@ -614,31 +614,16 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *divide(BigInt value, PMC *dest) {
-        PMC *temp;
-        maybe_throw_overflow_error(INTERP);
-        temp = VTABLE_get_bignum(INTERP, SELF);
-        return VTABLE_divide(INTERP, temp, value, dest);
-    }
-
-    MULTI PMC *divide(DEFAULT value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
-
-        if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                    "float division by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        VTABLE_set_number_native(INTERP, dest, SELF.get_number() / d);
+    MULTI PMC *divide(DEFAULT *value, PMC *dest) {
+        dest = VTABLE_clone(INTERP, SELF);
+        VTABLE_i_divide(INTERP, dest, value);
         return dest;
     }
-
 
     MULTI void i_divide(BigInt value) {
         upgrade_self_to_bignum(INTERP, SELF);
         VTABLE_i_divide(INTERP, SELF, value);
     }
-
 
     MULTI void i_divide(DEFAULT value) {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
