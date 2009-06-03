@@ -356,7 +356,7 @@ Adds C<value> to the integer and returns the result in C<*dest>.
 =cut
 
 */
-    MULTI PMC *add(DEFAULT *value, PMC *dest) {
+    MULTI PMC *add(DEFAULT value, PMC *dest) {
         dest = VTABLE_clone(INTERP, SELF);
         VTABLE_i_add(INTERP, dest, value);
         return dest;
@@ -435,7 +435,7 @@ C<get_integer> and C<set_integer_native> always.
 
 */
 
-    MULTI PMC *subtract(PMC *value, PMC *dest) {
+    MULTI PMC *subtract(DEFAULT value, PMC *dest) {
         dest = VTABLE_clone(INTERP, SELF);
         VTABLE_i_subtract(INTERP, dest, value);
         return dest;
@@ -614,7 +614,7 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *divide(DEFAULT *value, PMC *dest) {
+    MULTI PMC *divide(DEFAULT value, PMC *dest) {
         dest = VTABLE_clone(INTERP, SELF);
         VTABLE_i_divide(INTERP, dest, value);
         return dest;
@@ -659,7 +659,7 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *floor_divide(PMC *value, PMC *dest) {
+    MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
         dest = VTABLE_clone(INTERP, SELF);
         VTABLE_i_floor_divide(INTERP, dest, value);
         return dest;
@@ -745,7 +745,7 @@ Calculates modulus in place.
 */
 
 
-    MULTI PMC *modulus(PMC *value, PMC *dest) {
+    MULTI PMC *modulus(DEFAULT value, PMC *dest) {
         dest = VTABLE_clone(INTERP, SELF);
         VTABLE_i_modulus(INTERP, dest, value);
         return dest;
@@ -908,7 +908,7 @@ The C<==> operation.
         return VTABLE_is_equal(INTERP, value, SELF);
     }
 
-    MULTI INTVAL is_equal(DEFAULT *value) {
+    MULTI INTVAL is_equal(DEFAULT value) {
         return (VTABLE_get_integer(INTERP, SELF)
             ==  VTABLE_get_integer(INTERP, value));
     }
