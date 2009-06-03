@@ -351,7 +351,7 @@ Morphs the integer to a C<String> and sets the value from C<value>.
 
 =item C<PMC *add_int(INTVAL value, PMC *dest)>
 
-Adds C<value> to the integer and returns the result in C<*dest>.
+Adds C<value> to the integer. C<*dest> is unused.
 
 =cut
 
@@ -425,8 +425,7 @@ Adds C<value> to C<SELF> inplace.
 
 =item C<PMC *subtract(PMC *value, PMC *dest)>
 
-Subtracts C<*value> from the integer and returns the result in C<*dest>.  If
-C<dest> is NULL, a PMC of this type.
+Subtracts C<*value> from the integer. C<*dest> is unused.
 
 Please note: as C<SELF> or C<value> maybe be subclassed, we have to call
 C<get_integer> and C<set_integer_native> always.
@@ -445,7 +444,7 @@ C<get_integer> and C<set_integer_native> always.
 
 =item C<PMC *subtract_int(INTVAL value, PMC *dest)>
 
-Subtracts C<value> from the integer and returns the result in C<*dest>.
+Subtracts C<value> from the integer. C<*dest> is unused.
 
 =cut
 
@@ -517,7 +516,7 @@ Subtracts C<value> from C<SELF> inplace.
 
 =item C<PMC *multiply_int(INTVAL value, PMC *dest)>
 
-Multiplies the integer by C<*value> and returns the result in C<*dest>.
+Multiplies the integer by C<*value>. C<*dest> is unused.
 
 =cut
 
@@ -600,7 +599,7 @@ Multiply C<value> with C<SELF> inplace.
 
 =item C<PMC *divide_float(FLOATVAL value, PMC *dest)>
 
-Divides the number by C<value> and returns the result in C<*dest>.
+Divides the number by C<value>. C<*dest> is unused.
 
 =item C<void i_divide(PMC *value)>
 
@@ -645,7 +644,7 @@ Divides C<SELF> by C<value> inplace.
 
 =item C<PMC *floor_divide_float(FLOATVAL value, PMC *dest)>
 
-Divides the number by C<value> and returns the result in C<*dest>.
+Divides the number by C<value>. C<*dest> is unused.
 
 =item C<void i_floor_divide(PMC *value)>
 
@@ -729,8 +728,7 @@ Divides C<SELF> by C<value> inplace.
 
 =item C<PMC *modulus(FLOATVAL value, PMC *dest)>
 
-Calculates the value of corrected C<mod> C<value> and returns
-the result in C<dest>. See also ops/math.ops.
+Calculates the value of corrected C<mod> C<value>.  See also ops/math.ops.
 
 =item C<void i_modulus(PMC *value)>
 
