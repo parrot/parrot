@@ -36,9 +36,25 @@ static PMC*
 upgrade_self_to_bignum(PARROT_INTERP, PMC *self)
 {
     /* Do an in-place upgrade to a Bignum of SELF and return a pointer
-       to it (which is probably redundant, but whatever). */
+       to it (which is probably redundant, but whatever).
+       Maybe throw overflow instead.
+       */
     const INTVAL a = VTABLE_get_integer(interp, self);
+    maybe_throw_overflow_error(interp);
     pmc_reuse(interp, self, enum_class_BigInt, 0);
+    VTABLE_set_integer_native(interp, self, a);
+    return self;
+}
+
+static PMC*
+upgrade_self_to_complex(PARROT_INTERP, PMC *self)
+{
+    /* Do an in-place upgrade to a Complex of SELF and return a pointer
+       to it (which is probably redundant, but whatever).
+       */
+
+    const INTVAL a = VTABLE_get_integer(interp, self);
+    pmc_reuse(interp, self, enum_class_Complex, 0);
     VTABLE_set_integer_native(interp, self, a);
     return self;
 }
@@ -372,17 +388,11 @@ Adds C<value> to C<SELF> inplace.
 
 
     MULTI void i_add(Complex value) {
-        const INTVAL a = SELF.get_integer();
-
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
-        VTABLE_set_number_native(INTERP, SELF,
-                a + VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, SELF, 1,
-                VTABLE_get_number_keyed_int(INTERP, value, 1));
+        upgrade_self_to_complex(INTERP, SELF);
+        VTABLE_i_add(INTERP, SELF, value);
     }
 
     MULTI void i_add(BigInt value) {
-        maybe_throw_overflow_error(interp);
         upgrade_self_to_bignum(INTERP, SELF);
         VTABLE_i_add(INTERP, SELF, value);
     }
@@ -399,7 +409,6 @@ Adds C<value> to C<SELF> inplace.
         if ((c^a) >= 0 || (c^b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
         else {
-            maybe_throw_overflow_error(interp);
             upgrade_self_to_bignum(INTERP, SELF);
             VTABLE_i_add_int(INTERP, SELF, b);
         }
@@ -469,17 +478,11 @@ Subtracts C<value> from C<SELF> inplace.
 
 
     MULTI void i_subtract(Complex value) {
-        const INTVAL a = SELF.get_integer();
-
-        pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
-        VTABLE_set_number_native(INTERP, SELF,
-                (FLOATVAL)a - VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, SELF, 1,
-                -VTABLE_get_number_keyed_int(INTERP, value, 1));
+        upgrade_self_to_complex(INTERP, SELF);
+        VTABLE_i_subtract(INTERP, SELF, value);
     }
 
     MULTI void i_subtract(BigInt value) {
-        maybe_throw_overflow_error(interp);
         upgrade_self_to_bignum(INTERP, SELF);
         VTABLE_i_subtract(INTERP, SELF, value);
     }
@@ -496,7 +499,6 @@ Subtracts C<value> from C<SELF> inplace.
         if ((c^a) >= 0 || (c^~b) >= 0)
             VTABLE_set_integer_native(INTERP, SELF, c);
         else {
-            maybe_throw_overflow_error(INTERP);
             SELF = upgrade_self_to_bignum(INTERP, SELF);
             VTABLE_i_subtract_int(INTERP, SELF, b);
         }
@@ -605,18 +607,19 @@ Multiply C<value> with C<SELF> inplace.
 
 
     MULTI void i_multiply(BigInt value) {
-        interp->vtables[enum_class_BigInt]->multiply_int(INTERP, value, SELF.get_integer(), SELF);
+        upgrade_self_to_bignum(INTERP, SELF);
+        VTABLE_i_multiply(INTERP, SELF, value);
     }
 
 
     MULTI void i_multiply(Complex value) {
+        upgrade_self_to_complex(INTERP, SELF);
         VTABLE_multiply(INTERP, value, SELF, SELF);
     }
 
 
     MULTI void i_multiply(DEFAULT value) {
-        VTABLE_set_number_native(INTERP, SELF,
-                SELF.get_integer() * VTABLE_get_number(INTERP, value));
+        STATICSELF.i_multiply_float(VTABLE_get_number(INTERP, value));
     }
 
 
@@ -628,7 +631,6 @@ Multiply C<value> with C<SELF> inplace.
         if ((double) c == cf)
             SELF.set_integer_native(c);
         else {
-            maybe_throw_overflow_error(INTERP);
             upgrade_self_to_bignum(INTERP, SELF);
             VTABLE_i_multiply_int(INTERP, SELF, b);
         }
@@ -684,8 +686,7 @@ Divides C<SELF> by C<value> inplace.
 
 
     MULTI void i_divide(BigInt value) {
-        maybe_throw_overflow_error(INTERP);
-        SELF = upgrade_self_to_bignum(INTERP, SELF);
+        upgrade_self_to_bignum(INTERP, SELF);
         VTABLE_i_divide(INTERP, SELF, value);
     }
 
@@ -778,8 +779,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     MULTI void i_floor_divide(BigInt value) {
-        maybe_throw_overflow_error(INTERP);
-        SELF = upgrade_self_to_bignum(INTERP, SELF);
+        upgrade_self_to_bignum(INTERP, SELF);
         VTABLE_i_floor_divide(INTERP, SELF, value);
     }
 
@@ -895,8 +895,7 @@ Calculates modulus in place.
 
 
     MULTI void i_modulus(BigInt value) {
-        maybe_throw_overflow_error(INTERP);
-        SELF = upgrade_self_to_bignum(INTERP, SELF);
+        upgrade_self_to_bignum(INTERP, SELF);
         VTABLE_i_modulus(INTERP, SELF, value);
     }
 
