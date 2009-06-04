@@ -30,6 +30,10 @@ PMC class by it self. Contains C<@traits>, C<@parents>, C<@vtable> methods and C
 
 Vasily "bacek" Chekalkin is creator of initial version.
 
+Christoph "cotto" Otto.
+
+chromatic as author of initial idea.
+
 =head1 COPYRIGHT
 
 Copyright (C) 2009, Parrot Foundation.
