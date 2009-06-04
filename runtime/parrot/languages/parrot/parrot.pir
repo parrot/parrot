@@ -30,7 +30,8 @@
     library['name'] = name
     library['filename'] = file
     # If this fails, we should build a hash of DEFAULT and ALL => the normal ns
-    $P0 = get_hll_global name, 'EXPORT'
+    $P0 = get_hll_namespace name
+    $P0 = $P0['EXPORT']
     library['symbols'] = $P0
     $P0 = get_hll_namespace name
     library['namespace'] = $P0
