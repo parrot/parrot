@@ -162,7 +162,7 @@ method c_arguments($/) {
 method c_argument($/) {
     #say("c_argument");
     my $past := PAST::Var.new(
-        :name(~$<identifier>[0]),
+        :name(~$<identifier>),
         :returns(~$<c_type>)
     );
     make $past;

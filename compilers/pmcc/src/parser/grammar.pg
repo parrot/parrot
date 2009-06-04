@@ -171,11 +171,7 @@ rule c_signature {
 
 # Very-very simplified C type. E.g. "void", "PMC *", etc
 rule c_type {
-    [
-        | 'struct'   <identifier>
-        | 'unsigned' <identifier>
-        | <identifier>
-    ]
+    <identifier>+
     '*'*
     {*}
 }
