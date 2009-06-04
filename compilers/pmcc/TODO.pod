@@ -1,8 +1,44 @@
 ## $Id$
 
+=head1 TODO
+
 Simple todo list for PMC compiler.
 
-1. Implement parsing PMC.
-2. Implement emiting C code.
-3. ...
-4. Profit!
+=over 4
+
+=item 1.
+
+Implement parsing PMC.
+
+=item 2.
+
+Implement emiting C code.
+
+=item 3.
+
+...
+
+=item 4.
+
+Profit!
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item bacek
+
+=item cotto
+
+=item Put your name here!
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2009, Parrot Foundation.
+
+=cut
+
