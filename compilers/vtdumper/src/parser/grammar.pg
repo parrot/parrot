@@ -27,7 +27,6 @@ rule attribute {
     ':' <identifier>
 }
 
-
 rule vtable_func {
     <type> <identifier> '(' <argument>* ')' <attribute>*  {*}
 }
