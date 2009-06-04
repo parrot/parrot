@@ -1,0 +1,9 @@
+pmclass Integer {
+    MULTI PMC *add(Integer value, PMC *dest) {
+        SELF.decrement();
+    }
+    
+    MULTI PMC *add(DEFAULT value, PMC *dest) {
+        SELF.increment();
+    }
+}
