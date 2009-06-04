@@ -6,10 +6,47 @@
     .include 'test_more.pir'
     load_bytecode 'vtdumper.pbc'
 
-    plan(19)
+    plan(45)
+    comments()
     valid_functions()
     invalid_functions()
+    function_parsing()
 .end
+
+.sub comments
+    .local pmc parse_tests
+
+    parse_tests = new ['Hash']
+
+    parse_tests['comments: before function'] =<<"VTABLE"
+#HAVE A NICE DAY
+void do_foo()
+VTABLE
+
+    parse_tests['comments: after function'] =<<"VTABLE"
+void do_foo()
+#I've got a lovely bunch of coconuts.
+VTABLE
+
+    parse_tests['comments: with function'] =<<"VTABLE"
+void do_foo() #This is an important function that does important things.
+VTABLE
+
+    .local pmc it, key
+    .local string vtable, test_result
+
+    it = iter parse_tests
+  iter_loop:
+    unless it goto iter_done
+    key = shift it
+    vtable = parse_tests[key]
+    test_result = 'test_parse_one'(vtable)
+    is(test_result, '', key)
+    goto iter_loop
+  iter_done:
+
+.end
+
 
 .sub valid_functions
     .local pmc parse_tests
@@ -127,6 +164,109 @@ VTABLE
 
 .end
 
+.sub function_parsing
+    .local pmc parse_test
+
+    parse_test = new ['String']
+
+    parse_test = <<"VTABLE"
+PMC0* do_foo(INTVAL i, FLOATVAL j, SPECIALVAL k)
+INTVAL0 do_bar(PMC1* p1, PMC2* p2)
+INTVAL1 quuxle(PMC3* p3, PMC4* p4)
+VTABLE
+
+    .local pmc emitter, past
+    (emitter, past) = get_emitter_and_capture(parse_test, "past")
+
+    .local pmc do_foo, do_bar, quuxle, args
+    do_foo = past[0]
+    do_bar = past[1]
+    quuxle = past[2]
+
+
+    #test do_foo
+    #PMC0* do_foo(INTVAL i, FLOATVAL j, SPECIALVAL k)
+
+    $S0 = do_foo['name']
+    is($S0, 'do_foo', "do_foo name")
+
+    $S0 = do_foo['returns']
+    is($S0, "PMC0* ", "do_foo return type")
+
+    $I0 = do_foo['arguments']
+    is($I0, 3, "do_foo arg count")
+
+    $S0 = do_foo['arguments';0;'type';'identifier']
+    is($S0, "INTVAL", "do_foo first arg type")
+
+    $S0 = do_foo['arguments';0;'identifier']
+    is($S0, "i", "do_foo first arg name")
+
+    $S0 = do_foo['arguments';1;'type';'identifier']
+    is($S0, "FLOATVAL", "do_foo second arg type")
+
+    $S0 = do_foo['arguments';1;'identifier']
+    is($S0, "j", "do_foo second arg name")
+
+    $S0 = do_foo['arguments';2;'type';'identifier']
+    is($S0, "SPECIALVAL", "do_foo third arg type")
+
+    $S0 = do_foo['arguments';2;'identifier']
+    is($S0, "k", "do_foo third arg name")
+
+
+    #test do_bar
+    #INTVAL0 do_bar(PMC1* p1, PMC2* p2)
+
+    $S0 = do_bar['name']
+    is($S0, 'do_bar', "do_bar name")
+
+    $S0 = do_bar['returns']
+    is($S0, "INTVAL0 ", "do_bar return type")
+
+    $I0 = do_bar['arguments']
+    is($I0, 2, "do_bar arg count")
+
+    $S0 = do_bar['arguments';0;'type']
+    is($S0, "PMC1* ", "do_bar first arg type")
+
+    $S0 = do_bar['arguments';0;'identifier']
+    is($S0, "p1", "do_bar first arg name")
+
+    $S0 = do_bar['arguments';1;'type']
+    is($S0, "PMC2* ", "do_bar second arg type")
+
+    $S0 = do_bar['arguments';1;'identifier']
+    is($S0, "p2", "do_bar second arg name")
+
+    
+    #test quuxle
+    #INTVAL1 quuxle(PMC3* p3, PMC4* p4)
+
+    $S0 = quuxle['name']
+    is($S0, 'quuxle', "quuxle name")
+
+    $S0 = quuxle['returns']
+    is($S0, "INTVAL1 ", "quuxle return type")
+
+    $I0 = quuxle['arguments']
+    is($I0, 2, "quuxle arg count")
+
+    $S0 = quuxle['arguments';0;'type']
+    is($S0, "PMC3* ", "quuxle first arg type")
+
+    $S0 = quuxle['arguments';0;'identifier']
+    is($S0, "p3", "quuxle first arg name")
+
+    $S0 = quuxle['arguments';1;'type']
+    is($S0, "PMC4* ", "quuxle second arg type")
+
+    $S0 = quuxle['arguments';1;'identifier']
+    is($S0, "p4", "quuxle second arg name")
+
+
+
+.end
 # Don't forget to update plan!
 
 # Local Variables:

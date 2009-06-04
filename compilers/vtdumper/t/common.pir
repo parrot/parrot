@@ -2,7 +2,7 @@
 
 =cut
 
-.sub 'test_parse_one'
+.sub test_parse_one
     .param string vtable
     .local pmc compiler
     compiler = compreg 'VTable'
@@ -25,7 +25,6 @@
 
 
 .sub get_emitter_and_capture
-    .param string name
     .param string source
     .param string target
 
@@ -33,13 +32,11 @@
     compiler = compreg 'VTable'
     capture = compiler.'compile'(source, 'target'=> target)
 
-    emitter = new ['PMC'; 'Emitter']
-    emitter.'set_filename'(name)
     .return (emitter, capture)
 .end
 
 
-.sub '_slurp'
+.sub _slurp
     .param string file
     .local pmc pio
     pio  = open file
