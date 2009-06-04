@@ -24,15 +24,72 @@ Profit!
 
 =back
 
+=head2 Tests
+
+We need more tests:
+1. For expected parse failures.
+2. For internal methods like C<add_vtable> and C<add_method>
+
+
+=head2 Parsing
+
+Parsing is in very early stages of development. Currently we do a lot of
+cheating for parsing C. There is 2 obvious options:
+
+=over 4
+
+=item *
+
+Steal code from C<languages/c99> to be almost 100% conmpatible with C.
+
+=item *
+
+Continue cheating because iventually we are going to replace C-based PMCs with
+L1-based.
+
+=back
+
+=head2 Emitting
+
+List of NYI items for PASTing/emitting
+
+=over 4
+
+=item METHODs
+
+They are parsed, but code for support emitting just absent. There is no point
+to implement it yet, becase of C<pcc_rewiring> branch which will change it.
+
+=item MULTIs.
+
+Parsed. No emitting.
+
+=item VTABLEs
+
+Parsed. Many macro-substitution like STATICSELF not implemented yet.
+
+=back
+
+=head2 Documentation!
+
+Wrote a lot of documents how it works (fsvo) now. How it should work for
+current PMCs. How it will work for L1.
+
+And (of cause) update this TODO file with more items.
+
 =head1 AUTHORS
+
+We need your name here!
 
 =over 4
 
 =item bacek
 
+Vasily Chekalkin
+
 =item cotto
 
-=item Put your name here!
+Christoph Otto
 
 =back
 
