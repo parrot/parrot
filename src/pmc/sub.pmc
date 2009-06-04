@@ -444,8 +444,8 @@ Set SELF to the data in other.
             PMC_get_sub(INTERP, other, other_sub);
 
             /* Increase reference count of destination before
-	     * freeing the one in self, to avoid problems in
-	     * case of self assignment */
+             * freeing the one in self, to avoid problems in
+             * case of self assignment */
             if (other_sub->ctx)
                 Parrot_context_ref(interp, other_sub->ctx);
             /* get rid of this context, if attached */
