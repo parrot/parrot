@@ -318,8 +318,7 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT     := @inst_libparrot_ldflags@
-#ELSE:LIBPARROT     :=
+LIBPARROT     := @inst_libparrot_ldflags@
 
 OPS2C           := $(PERL) $(LIB_DIR)/tools/build/ops2c.pl
 
@@ -411,8 +410,7 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT     := @inst_libparrot_ldflags@
-#ELSE:LIBPARROT     :=
+LIBPARROT     := @inst_libparrot_ldflags@
 
 PMC2C_INCLUDES  := --include $(SRC_DIR) --include $(SRC_DIR)/pmc
 PMC2C           := $(PERL) $(LIB_DIR)/tools/build/pmc2c.pl
@@ -494,7 +492,7 @@ PARROT_ARGS   :=
 VERSION       := @versiondir@
 BIN_DIR       := @bindir@
 LIB_DIR       := @libdir@$(VERSION)
-DOC_DIR       := @doc_dir@$(VERSION)
+DOC_DIR       := @docdir@$(VERSION)
 MANDIR        := @mandir@$(VERSION)
 
 # Set up extensions

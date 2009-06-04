@@ -218,9 +218,6 @@ sub process_code_start_token {
     }
     else {
 
-        # Tidy up the C reference *s.
-        $text =~ s|\b\s*\*\s+\b| \*|gs;
-
         esc($text);
     }
 

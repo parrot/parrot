@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2008, Parrot Foundation.
+ * Copyright (C) 2002-2009, Parrot Foundation.
  */
 
 /*
@@ -1897,6 +1897,8 @@ extern const char i_map_sub[];
 
 extern const jit_arch_info arch_info;
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const jit_arch_info * Parrot_jit_init(PARROT_INTERP);
 
 #undef INT_REGISTERS_TO_MAP

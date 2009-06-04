@@ -182,10 +182,15 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
                                         "Can't unpack packfile.");
         }
 
+        /* Disable GC during copy data into internal structures. */
+        Parrot_block_GC_mark(interp);
+
         /* Copy values from PackFile header to own attributes */
         copy_packfile_header(interp, SELF, pf);
 
         VTABLE_set_pointer(interp, attrs->directory, &pf->directory);
+
+        Parrot_unblock_GC_mark(interp);
 
         PackFile_destroy(interp, pf);
     }

@@ -68,14 +68,18 @@ of individual subroutines.
 This also means that you currently can't use the same global symbol (e.g.
 subroutine name) in different namespaces. The following creates invalid code:
 
+=begin PIR
+
   .sub main
-     ...
+     #...
   .end
 
    .namespace ["main"]
   .sub main
-     ...
+     #...
   .end
+
+=end PIR
 
 Local labels in different I<compilation units> with the same name are
 allowed, though assembling the generated PASM doesn't work. However,
@@ -94,13 +98,21 @@ variables. If the life range of one variable doesn't overlap the range
 of another variable, they might get the same parrot register. For
 instance:
 
+=begin PIR_FRAGMENT
+
    $I0 = 10
    $I1 = 20
 
+=end PIR_FRAGMENT
+
 will translate to
+
+=begin PASM
 
    set I0, 10
    set I0, 20
+
+=end PASM
 
 provided that $I0 is not used after these lines. In this case, the
 assignment to $I0 is redundant and will be optimized away if IMCC is
@@ -143,32 +155,38 @@ an appropriate message.
 
 Consider these two code snippets (block numbers are attached):
 
+=begin PIR
+
   .sub main :main
- 0      $I0 = 0     # initialized
- 0      if $I0 goto l1
- 1      $I1 = 1     # init in block 1
- 1      goto l2
- 2  l1:
- 2      $I1 = 2     # init in block 2
- 3  l2:
- 3      print $I0
- 3      print $I1   # all paths leading here do init
- 3      print "\n"
- 3      end
+      $I0 = 0        # 0 initialized
+      if $I0 goto l1 # 0
+      $I1 = 1        # 1 init
+      goto l2        # 1
+  l1:                # 2
+      $I1 = 2        # 2 init
+  l2:                # 3
+      print $I0      # 3
+      print $I1      # 3 all paths leading here do init
+      print "\n"     # 3
   .end
+
+=end PIR
 
 and:
 
+=begin PIR
+
   .sub main :main
- 0      $I0 = 0     # initialized
- 0      if $I0 goto l1  # branch to bb 1 or 2
- 1      $I1 = 1     # init only in block 1
- 2  l1:
- 2      print $I0
- 2      print $I1   # no init in code path from block 0
- 2      print "\n"
- 2      end
+      $I0 = 0         # 0 initialized
+      if $I0 goto l1  # 0 branch to bb 1 or 2
+      $I1 = 1         # 1 init only in block 1
+  l1:                 # 2
+      print $I0       # 2
+      print $I1       # 2 no init in code path from block 0
+      print "\n"      # 2
   .end
+
+=end PIR
 
 The latter of these emits the warning:
 
@@ -208,17 +226,29 @@ Integer arguments to float operations are converted to float operands.
 
 A sequence of code:
 
+=begin PIR_FRAGMENT
+
+    .local pmc cond
+    # ...
     if cond, L1
     branch L2
  L1:
- ...
+    # ...
  L2:
+
+=end PIR_FRAGMENT
 
 will be converted to
 
+=begin PIR_FRAGMENT
+    
+    .local pmc cond
+    # ...
     unless cond, L2
-    ...
+    # ...
  L2:
+
+=end PIR_FRAGMENT
 
 The same is done for other conditional branches B<gt>, B<ge>, B<eq>
 and their reverse meanings.
@@ -245,13 +275,21 @@ Thing.
 
 For a sequence of code
 
+=begin PIR_FRAGMENT
+
    $I0 = 10
    $I1 = 20
+
+=end PIR_FRAGMENT
 
 where B<$I0> is not used again, the first assignment will be tossed,
 resulting in code like:
 
+=begin PASM
+
    set I0, 20
+
+=end PASM
 
 =head2 Loop optimization
 

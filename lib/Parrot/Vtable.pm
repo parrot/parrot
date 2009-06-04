@@ -201,7 +201,7 @@ vtable array.
 sub vtbl_macros {
     my $vtable = shift;
 
-    my $macros = <<"EOM";
+    my $macros = <<'EOM';
 
 /*
  * vtable accessor macros
@@ -220,7 +220,7 @@ EOM
     (pmc)->vtable->$entry->[1]($args)
 EOM
     }
-    $macros .= <<"EOM";
+    $macros .= <<'EOM';
 
 /*
  * vtable method name defines for delegate
@@ -234,12 +234,12 @@ EOM
 EOM
 
     }
-    $macros .= <<"EOM";
+    $macros .= <<'EOM';
 
 EOM
 
     # finally the name mapping
-    $macros .= <<"EOM";
+    $macros .= <<'EOM';
 /*
  * vtable slot names
  */
@@ -247,7 +247,7 @@ EOM
 
 #define PARROT_VTABLE_LOW 9
 
-static const char * const Parrot_vtable_slot_names[] = {
+static PARROT_OBSERVER const char * const Parrot_vtable_slot_names[] = {
     "",   /* Pointer to namespace for this class */
     "",   /* 'type' value for MMD */
     "",   /* Name of class this vtable is for */
@@ -293,14 +293,14 @@ EOM
         $entry->[4],
 EOM
     }
-    $macros .= <<"EOM";
+    $macros .= <<'EOM';
         MMD_USER_FIRST
 } parrot_mmd_func_enum;
 
 /* &end_gen */
 
 #ifdef PARROT_IN_OBJECTS_C
-static const char * const Parrot_mmd_func_names[] = {
+static PARROT_OBSERVER const char * const Parrot_mmd_func_names[] = {
 EOM
 
     for my $entry ( @{$vtable} ) {

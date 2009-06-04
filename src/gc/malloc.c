@@ -1747,8 +1747,8 @@ int public_mALLOPt(int p, int v) {
   so the (usually slower) memmove is not needed.
 */
 
-#  define MALLOC_COPY(dest, src, nbytes)  memcpy(dest, src, nbytes)
-#  define MALLOC_ZERO(dest, nbytes)       memset(dest, 0,   nbytes)
+#  define MALLOC_COPY(dest, src, nbytes)  memcpy((dest), (src), (nbytes))
+#  define MALLOC_ZERO(dest, nbytes)       memset((dest), 0,     (nbytes))
 
 #else /* !USE_MEMCPY */
 
@@ -1774,13 +1774,13 @@ do {                                                                          \
 
 #  define MALLOC_COPY(dest,src,nbytes)                                          \
 do {                                                                          \
-  INTERNAL_SIZE_T* mcsrc = (INTERNAL_SIZE_T*) src;                            \
-  INTERNAL_SIZE_T* mcdst = (INTERNAL_SIZE_T*) dest;                           \
-  CHUNK_SIZE_T  mctmp = (nbytes)/sizeof (INTERNAL_SIZE_T);                     \
+  INTERNAL_SIZE_T* mcsrc = (INTERNAL_SIZE_T*) (src);                          \
+  INTERNAL_SIZE_T* mcdst = (INTERNAL_SIZE_T*) (dest);                         \
+  CHUNK_SIZE_T  mctmp = (nbytes)/sizeof (INTERNAL_SIZE_T);                    \
   long mcn;                                                                   \
   if (mctmp < 8) mcn = 0; else { mcn = (mctmp-1)/8; mctmp %= 8; }             \
   switch (mctmp) {                                                            \
-    case 0: for (;;) { *mcdst++ = *mcsrc++;                                    \
+    case 0: for (;;) { *mcdst++ = *mcsrc++;                                   \
     case 7:           *mcdst++ = *mcsrc++;                                    \
     case 6:           *mcdst++ = *mcsrc++;                                    \
     case 5:           *mcdst++ = *mcsrc++;                                    \
@@ -2132,11 +2132,11 @@ typedef struct malloc_chunk* mbinptr;
 #define last(b)      ((b)->bk)
 
 /* Take a chunk off a bin list */
-#define unlink(P, BK, FD) {                                            \
-  FD = P->fd;                                                          \
-  BK = P->bk;                                                          \
-  FD->bk = BK;                                                         \
-  BK->fd = FD;                                                         \
+#define unlink(P, BK, FD) { \
+  (FD) = (P)->fd;           \
+  (BK) = (P)->bk;           \
+  (FD)->bk = (BK);          \
+  (BK)->fd = (FD);          \
 }
 
 /*
@@ -2244,7 +2244,7 @@ static int largebin_index(unsigned int sz) {
 */
 
 /* The otherwise unindexable 1-bin is used to hold unsorted chunks. */
-#define unsorted_chunks(M)          (bin_at(M, 1))
+#define unsorted_chunks(M)          (bin_at((M), 1))
 
 /*
   Top
@@ -2539,11 +2539,11 @@ static Void_t** iALLOc();
 #  define check_malloc_state()
 
 #else
-#  define check_chunk(P)              do_check_chunk(P)
-#  define check_free_chunk(P)         do_check_free_chunk(P)
-#  define check_inuse_chunk(P)        do_check_inuse_chunk(P)
-#  define check_remalloced_chunk(P,N) do_check_remalloced_chunk(P,N)
-#  define check_malloced_chunk(P,N)   do_check_malloced_chunk(P,N)
+#  define check_chunk(P)              do_check_chunk((P))
+#  define check_free_chunk(P)         do_check_free_chunk((P))
+#  define check_inuse_chunk(P)        do_check_inuse_chunk((P))
+#  define check_remalloced_chunk(P,N) do_check_remalloced_chunk((P),(N))
+#  define check_malloced_chunk(P,N)   do_check_malloced_chunk((P),(N))
 #  define check_malloc_state()        do_check_malloc_state()
 
 /*

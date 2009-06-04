@@ -1,3 +1,7 @@
+=head1 TITLE
+
+Documenting PMCs
+
 =head1 Overview
 
 This document describes guidelines for writing documentation for PMCs.

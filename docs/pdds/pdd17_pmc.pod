@@ -310,8 +310,12 @@ requires the same steps as accessing a class from another HLL, first
 retrieving the namespace object, and then instantiating from that
 namespace.
 
+=begin PIR_FRAGMENT
+
   $P0 = get_root_namespace ['parrot'; 'Integer']
   $P1 = new $P0
+
+=end PIR_FRAGMENT
 
 HLLs can choose to provide direct access to Parrot's core PMC types by
 aliasing them within the HLL namespace.
@@ -380,13 +384,21 @@ so they are only created once.
 Therefore, subclassing a PMC looks, at a PIR level, like subclassing a high
 level class.
 
+=begin PIR_FRAGMENT
+
   $P0 = get_class 'Hash'
   $P1 = newclass 'MyClass'
   addparent $P1, $P0     # The new class inherits from the Hash PMC
 
+=end PIR_FRAGMENT
+
 Or, more briefly:
 
+=begin PIR_FRAGMENT
+
   $P1 = subclass 'Hash', 'MyClass'
+
+=end PIR_FRAGMENT
 
 PMCs store state in a very different way to PDD15 objects. When a method
 inherited from a PMC is called on a PDD15 object, that method needs to

@@ -32,7 +32,7 @@ BIN_DIR         := @bindir@
 LIB_DIR         := @libdir@
 INCLUDE_DIR     := @includedir@
 DATA_DIR        := @datadir@
-DOC_DIR         := @doc_dir@
+DOC_DIR         := @docdir@
 VERSION_DIR     = @versiondir@
 
 
@@ -407,12 +407,12 @@ INTERP_O_FILES := \
     $(SRC_DIR)/exit$(O) \
     $(SRC_DIR)/extend$(O) \
     $(SRC_DIR)/extend_vtable$(O) \
+    $(SRC_DIR)/gc/alloc_memory$(O) \
+    $(SRC_DIR)/gc/alloc_register$(O) \
     $(SRC_DIR)/gc/api$(O) \
     $(SRC_DIR)/gc/generational_ms$(O) \
     $(SRC_DIR)/gc/incremental_ms$(O) \
-    $(SRC_DIR)/gc/memory$(O) \
-    $(SRC_DIR)/gc/pools$(O) \
-    $(SRC_DIR)/gc/register$(O) \
+    $(SRC_DIR)/gc/gc_ms$(O) \
     $(SRC_DIR)/gc/mark_sweep$(O) \
     $(SRC_DIR)/gc/system$(O) \
     $(SRC_DIR)/global$(O) \
@@ -512,7 +512,7 @@ LIBPARROT_STATIC    := @blib_dir@/@libparrot_static@
 LIBPARROT           := @libparrot@
 
 #IF(has_icu):ICU_SHARED  := @icu_shared@
-ALL_PARROT_LIBS     := @libparrot_ldflags@ $(ICU_SHARED) $(C_LIBS)
+ALL_PARROT_LIBS     := @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR          := runtime/parrot/dynext
@@ -742,6 +742,7 @@ help :
 	@echo "  bsdlint:           Code checking with bsdlint."
 	@echo "  sunlint:           Code checking with Sun Studio's sunlint."
 	@echo "  splint:            Code checking with splint."
+	@echo "  splint-all:        Splint all of Parrot, for the masochist only."
 	@echo "  headerizer:        Recreate header files for C-source files"
 	@echo "  apilist:           Show list of PARROT_EXPORT functions"
 	@echo "  malloclist:        Show list of PARROT_MALLOC functions"
@@ -752,7 +753,6 @@ help :
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
-	@echo "  rpms:              Create RPMs."
 	@echo "  win32-inno-installer:  Create MSWin32 setup."
 	@echo ""
 	@echo "Examples:"
@@ -868,9 +868,6 @@ lib_deps_source : $(GENERAL_H_FILES)
 	$(PERL) tools/dev/lib_deps.pl source all_source
 
 lib_deps : lib_deps_object lib_deps_source
-
-check_source : $(GENERAL_H_FILES)
-	$(PERL) tools/dev/check_source_standards.pl all_source
 
 # XXX changes don't always propagate into libparrot
 # e.g. when I change debug:fataly to xfataly, nm still shows the old symbol
@@ -1093,15 +1090,15 @@ $(SRC_DIR)/key$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/key.str $(SRC_DIR)/pmc/pmc_ke
 
 $(SRC_DIR)/gc/mark_sweep$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 
+$(SRC_DIR)/gc/gc_ms$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_ms.c
+
 $(SRC_DIR)/gc/api$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/gc/gc_private.h
 
 $(SRC_DIR)/gc/generational_ms$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/incremental_ms$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/pools$(O) : $(GENERAL_H_FILES)
-
-$(SRC_DIR)/gc/resources$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/alloc_resources$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/gc/res_lea$(O) : $(GENERAL_H_FILES)
 
@@ -1172,7 +1169,7 @@ $(IO_DIR)/utf8$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
 $(IO_DIR)/win32$(O) : $(GENERAL_H_FILES) $(IO_DIR)/io_private.h
 
-$(SRC_DIR)/gc/memory$(O) : $(GENERAL_H_FILES)
+$(SRC_DIR)/gc/alloc_memory$(O) : $(GENERAL_H_FILES)
 
 $(SRC_DIR)/main$(O) : $(SRC_DIR)/main.c $(GENERAL_H_FILES)
 
@@ -1193,7 +1190,7 @@ $(SRC_DIR)/packout$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_key.h
 
 $(SRC_DIR)/parrot$(O) : $(GENERAL_H_FILES)
 
-$(SRC_DIR)/gc/register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
+$(SRC_DIR)/gc/alloc_register$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/pmc/pmc_sub.h
 
 $(SRC_DIR)/runcore/cores$(O) : $(GENERAL_H_FILES)
 
@@ -1231,7 +1228,8 @@ $(SRC_DIR)/spf_render$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_render.str
 
 $(SRC_DIR)/spf_vtable$(O) : $(GENERAL_H_FILES) $(SRC_DIR)/spf_vtable.str
 
-$(SRC_DIR)/string/encoding$(O) : $(SRC_DIR)/string/encoding.c $(GENERAL_H_FILES)
+$(SRC_DIR)/string/encoding$(O) : $(SRC_DIR)/string/encoding.c \
+	$(INC_DIR)/config.h $(GENERAL_H_FILES)
 
 $(SRC_DIR)/string/charset$(O) : $(SRC_DIR)/string/charset.c $(GENERAL_H_FILES)
 
@@ -1369,7 +1367,7 @@ htmlhelp-clean :
 dynpmc : dynpmc.dummy
 
 # XXX this dependancy is too broad, and should be narrowed down
-dynpmc.dummy : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
+dynpmc.dummy : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h $(PMC2C_FILES)
 	$(MAKE) src/dynpmc
 
 dynpmc-test : $(PARROT) $(INC_DIR)/parrot.h $(INC_DIR)/extend.h $(INC_DIR)/dynext.h
@@ -1469,12 +1467,10 @@ BUILDTOOLS_TEST_FILES := \
     $(REVISIONUTILS_DIR)/*.t \
     $(HARNESS_DIR)/*.t
 MANIFEST_DIR := t/manifest
+INSTALL_TOOLS_DIR := t/tools/install
 MANIFEST_TEST_FILES := \
-    $(MANIFEST_DIR)/01-basic.t \
-    $(MANIFEST_DIR)/02-regenerate_file.t \
-    $(MANIFEST_DIR)/03-regenerate_skip.t \
-    $(MANIFEST_DIR)/04-alt_file.t \
-    $(MANIFEST_DIR)/05-alt_skip.t
+    $(MANIFEST_DIR)/*.t \
+    $(INSTALL_TOOLS_DIR)/*.t
 EXAMPLES_TEST_FILES := \
     t/examples/*.t
 CONFIGURE_TEST_FILES := \
@@ -1495,7 +1491,10 @@ test_pbc_annotation_persistence : test_prep
 # integrating them in a single run is difficult.
 
 # Normal test package
-test : test_prep test_pbc_annotation_persistence nqp_test
+test : test_core nqp_test
+
+# Test Parrot core.
+test_core: test_prep test_pbc_annotation_persistence
 	$(PERL) t/harness $(EXTRA_TEST_ARGS)
 
 # Test the NQP compiler
@@ -1629,7 +1628,7 @@ examples_tests :
 
 # benchmark tests
 benchmark_tests : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) $(BENCHMARK_TEST_FILES)
+	$(PERL) t/harness $(BENCHMARK_TEST_FILES)
 
 # Running a benchmark
 mopsbench : test_prep
@@ -1963,7 +1962,7 @@ SPLINTFLAGS = \
     -showfunc \
     -tmpdir $(SPLINT_TMP) \
     \
-    +posix-strict-lib \
+    +posix-lib \
     -skip-posix-headers \
     \
     +ansi89-limits \
@@ -2016,12 +2015,21 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
 SPLINTFLAGS := $(SPLINTFLAGS) \
     +relax-quals
 
-# Pointer arithmetic is OK, but watch for null pointers
+# Memory checking
 SPLINTFLAGS := $(SPLINTFLAGS) \
-    -ptr-arith \
+    -must-free \
+    -mustfreefresh \
+    -mustfreeonly \
+    +null \
     +nullptrarith \
+    +nullret \
+    -ptr-arith \
     +ptr-negate \
-    -zero-ptr
+    -zero-ptr \
+
+# Transfer errors are too tough for us right now
+SPLINTFLAGS := $(SPLINTFLAGS) \
+    -mem-trans
 
 # Symbol definitions
 SPLINTFLAGS := $(SPLINTFLAGS) \
@@ -2054,24 +2062,10 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
     +long-integral \
     +match-any-integral \
 
-# TODO: Miscellaneous other flags
-SPLINTFLAGS := $(SPLINTFLAGS) \
-    +aliasunique \
-    +assignexpose \
-    +continuecomment \
-    +fielduse \
-    +match-fields \
-    +nestedextern \
-    +null \
-    +nullret \
-    +paramuse \
-    +shadow \
-
 # Other options we'd like to add back
 # +initallelements : Right now, the *.ops files don't initialize all
 #  values of the arrays
 # +casebreak: Auto-generated ops have way too case fallthrus right now
-# +noeffect: Right now the UNUSED(macro) trips +noeffect
 # +fcnuse: We have many functions that are defined but not used, but they
 #  should get hidden or ifdeffed
 # +redef, +redecl: Ops currently have tons of redefinitions
@@ -2079,18 +2073,25 @@ SPLINTFLAGS := $(SPLINTFLAGS) \
 # added to splint target to simplify experimentation,
 # ex: make SPLINTFLAGS_TEST='-posixstrictlib +posixlib' splint
 
-splint : $(PARROT)
+SPLINT_SOURCE := `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
+
+splint-all : $(PARROT)
 	$(MKPATH) $(SPLINT_TMP)
-	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) `echo $(O_FILES) | $(PERL) -pe @PQ@s/\.o/\.c/g@PQ@`
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	$(SPLINT_SOURCE) \
 	$(SPLINT) $(CC_INC) $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) $(IMCC_DIR)/main.c
 
-# Test a single file with limited splint options to ease cleanup -petdance
-splint-andy :
+# "splint" is the less-thorough splint target.  For cage cleaning work,
+# you'll probably want to specify SPLINT_SOURCE rather than work on the
+# entire tree, like so:
+#     make splint SPLINT_SOURCE='src/call/*.c'
+
+splint : all
 	$(MKPATH) $(SPLINT_TMP)
-	splint $(CC_INC) @cc_hasjit@ -DNDEBUG "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
-	+partial -memchecks \
-	src/packfile.c \
-    | grep -v 'Source code error generation point'
+	$(SPLINT) $(CC_INC) @cc_hasjit@ "-Isrc/pmc" "-Icompilers/ast" $(SPLINTFLAGS) $(SPLINTFLAGS_TEST) \
+	+partial -DNDEBUG \
+	$(SPLINT_SOURCE) \
+		| grep -v 'Source code error generation point'
 
 COVER_FLAGS := -fprofile-arcs -ftest-coverage
 COVER_DIRS := \

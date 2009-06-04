@@ -954,7 +954,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 {
     ASSERT_ARGS(parrot_create_hash)
     HashBucket  *bp;
-    Hash * const hash = mem_allocate_zeroed_typed(Hash);
+    Hash * const hash = mem_allocate_typed(Hash);
     size_t       i;
 
     PARROT_ASSERT(INITIAL_BUCKETS % 4 == 0);
@@ -966,6 +966,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
     hash->seed       = interp->hash_seed;
     hash->mask       = INITIAL_BUCKETS - 1;
     hash->entries    = 0;
+    hash->container  = PMCNULL;
 
     /*
      * TODO if we have a significant amount of small hashes:

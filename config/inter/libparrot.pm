@@ -118,8 +118,28 @@ sub runstep {
         : ''
     );
 
+    # When building shared libraries and dynamically loadable
+    # modules with 'ld', do we need to include -lparrot?  If so
+    # this variable contains the necessary flags.  (This is normally
+    # empty, but may be overridden by various hints files for
+    # specific platforms.)
+
+    # This version works in the build directory.
     unless ( defined( $conf->data->get('libparrot_ldflags') ) ) {
-        $conf->data->set(libparrot_ldflags =>
+        $conf->data->set(libparrot_ldflags => '');
+    }
+
+    # This version refers to the installed library.
+    unless ( defined( $conf->data->get('inst_libparrot_ldflags') ) ) {
+        $conf->data->set(inst_libparrot_ldflags => '');
+    }
+
+    # When linking an executable to -lparrot, this variable
+    # contains the necessary flags to find and use -lparrot.
+
+    # This version uses the -lparrot in the build directory.
+    unless ( defined( $conf->data->get('libparrot_linkflags') ) ) {
+        $conf->data->set(libparrot_linkflags =>
         '-L'
         . $conf->data->get('build_dir')
         . $conf->data->get('slash')
@@ -128,8 +148,9 @@ sub runstep {
         );
     }
 
-    unless ( defined( $conf->data->get('inst_libparrot_ldflags') ) ) {
-        $conf->data->set(inst_libparrot_ldflags =>
+    # This version uses the installed -lparrot.
+    unless ( defined( $conf->data->get('inst_libparrot_linkflags') ) ) {
+        $conf->data->set(inst_libparrot_linkflags =>
         '-L'
         . $conf->data->get('libdir')
         . ' -lparrot'

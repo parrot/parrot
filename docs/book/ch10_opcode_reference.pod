@@ -442,6 +442,17 @@ Like C<cmp>, but forces string comparison.
 
 I<Arguments: IR, P, P>
 
+=head3 cmp_pmc
+
+X<cmp_pmc opcode (PASM)>
+
+  cmp_pmc R<DEST>, R<VAL1>, R<VAL2>
+
+Like C<cmp>, but places a PMC in R<DEST>.  This opcode is useful for avoiding
+semipredicate problems in HLLs where two PMCs are not always comparable.
+
+I<Arguments: P, P, P>
+
 =head3 collect
 
 X<collect opcode (PASM)>
@@ -846,7 +857,7 @@ X<fdopen opcode (PASM)>
 
   fdopen R<DEST>, R<INT>, R<MODE>
 
-Get a ParrotIO object for handle R<INT> with open mode R<MODE>.
+Get a FileHandle object for handle R<INT> with open mode R<MODE>.
 
 I<Arguments: P, I, S>
 
@@ -1124,7 +1135,7 @@ X<getstdout opcode (PASM)>
   getstdin R<DEST>
   getstdout R<DEST>
 
-Get a ParrotIO object for the given standard handle.
+Get a FileHandle object for the given standard handle.
 
 I<Arguments: P>
 
@@ -1787,7 +1798,7 @@ X<peek opcode (PASM)>
   peek R<DEST>
   peek R<DEST>, R<PIO>
 
-Read the next byte from the given ParrotIO object or from C<stdin> but
+Read the next byte from the given FileHandle object or from C<stdin> but
 don't remove it.
 
 I<Arguments: SR or SR, P>
@@ -2234,12 +2245,14 @@ See also: C<getprop> and C<delprop>.
 =head3 setstd*
 
 X<setstderr opcode (PASM)>
+X<setstdin  opcode (PASM)>
 X<setstdout opcode (PASM)>
 
   setstderr R<DEST>
+  setstdin  R<DEST>
   setstdout R<DEST>
 
-Set a ParrotIO object for the given standard handle.
+Set a FileHandle object for the given standard handle.
 
 I<Arguments: P>
 
@@ -2714,7 +2727,7 @@ X<tell opcode (PASM)>
   tell R<DEST>, R<PIO>
   tell R<UPPER32>, R<LOWER32>, R<PIO>
 
-Return the file position of the given ParrotIO object.
+Return the file position of the given FileHandle object.
 
 I<Arguments: IR, P or IR, I, P>
 

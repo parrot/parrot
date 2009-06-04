@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -76,7 +76,7 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
             dest = pmc_new(interp, enum_class_BigInt);
 
         VTABLE_set_integer_native(interp, dest, base);
-        interp->vtables[enum_class_BigInt]->bitwise_shl_int(interp, dest, shift_amount, dest);
+        VTABLE_i_bitwise_shl_int(interp, dest, shift_amount);
     }
 
     return dest;
@@ -257,10 +257,7 @@ Subtracts C<value> from C<SELF> inplace.
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
         const FLOATVAL a = SELF.get_number();
-        if (dest)
-            pmc_reuse(INTERP, dest, value->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
         VTABLE_set_number_native(INTERP, dest,
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -403,7 +400,7 @@ Divides C<SELF> by C<value> inplace.
 */
 
     MULTI PMC *divide(PMC *value, PMC *dest) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -438,7 +435,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     VTABLE void i_divide(PMC *value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -524,7 +521,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     VTABLE void i_floor_divide(PMC *value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -576,7 +573,7 @@ Calculates modulus inplace
 */
 
     MULTI PMC *modulus(PMC *value, PMC *dest) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -614,7 +611,7 @@ Calculates modulus inplace
     }
 
     VTABLE void i_modulus(PMC *value) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
+        const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
@@ -866,7 +863,7 @@ Inplace bitwise and.
         return dest;
     }
 
-    MULTI PMC *bitwise_xor_int(INTVAL value, PMC *dest) {
+    VTABLE PMC *bitwise_xor_int(INTVAL value, PMC *dest) {
         const INTVAL result = SELF.get_integer() ^ value;
 
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));

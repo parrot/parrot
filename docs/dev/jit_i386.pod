@@ -28,21 +28,24 @@ opcode gets executed:
 
         PASM                 JIT ops   Normal     CGP ops
 
-	                     (call cgp_core)      (jmp back)
+=begin PASM
+	                     # (call cgp_core)      (jmp back)
 
-	set I0, 10           set_i_ic
-	print I0             (call)               print_i
-	print "\n"                                print_sc
-	bsr inc              (call)     bsr_ic    cpu_ret
-	end                  (jmp) HALT           end (ret)
-	                     end (ret)
+	set I0, 10           # set_i_ic
+	print I0             # (call)               print_i
+	print "\n"           #                      print_sc
+	bsr inc              # (call)     bsr_ic    cpu_ret
+	end                  # (jmp) HALT           end (ret)
+	                     # end (ret)
   inc:
-	inc I0               inc_i
-	new P0, 'String'     new_p_sc
-	set P0, I0           set_p_i
-	print P0             (call)               print_p
-	print "\n"                                print_sc
-	ret                  (call)     ret       cpu_ret
+	inc I0               # inc_i
+	new P0, 'String'     # new_p_sc
+	set P0, I0           # set_p_i
+	print P0             # (call)               print_p
+	print "\n"           #                      print_sc
+	ret                  # (call)     ret       cpu_ret
+
+=end PASM
 
 =head2 Startup sequence
 

@@ -1165,10 +1165,12 @@ location_directive:
      TK_LINE INTC COMMA STRINGC '\n'
          {
            IMCC_INFO(interp)->line = atoi($2);
+           /* set_filename() frees the STRINGC */
            set_filename(interp, $4);
          }
    | TK_FILE STRINGC '\n'
          {
+           /* set_filename() frees the STRINGC */
            set_filename(interp, $2);
          }
    ;
@@ -1193,6 +1195,7 @@ hll_def:
                 Parrot_register_HLL(interp, hll_name);
 
             IMCC_INFO(interp)->cur_namespace = NULL;
+            mem_sys_free($2);
             $$ = 0;
          }
    ;
@@ -1210,12 +1213,15 @@ pmc_const:
      CONST { pesky_global__is_def=1; } INTC var_or_i '=' any_string
          {
            $$ = mk_pmc_const(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6);
+           mem_sys_free($6);
            pesky_global__is_def = 0;
          }
 
      | CONST { pesky_global__is_def=1; } STRINGC var_or_i '=' any_string
          {
            $$ = mk_pmc_const_named(interp, IMCC_INFO(interp)->cur_unit, $3, $4, $6);
+           mem_sys_free($3);
+           mem_sys_free($6);
            pesky_global__is_def = 0;
          }
    ;

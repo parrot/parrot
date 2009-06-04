@@ -41,7 +41,7 @@
 #define mem_realloc_n_typed(p, n, type)     (p) = (type *)mem_sys_realloc((p), (n)*sizeof(type))
 #define mem_copy_n_typed(dest, src, n, type) memcpy((dest), (src), (n)*sizeof(type))
 
-/* HEADERIZER BEGIN: src/gc/memory.c */
+/* HEADERIZER BEGIN: src/gc/alloc_memory.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
@@ -127,7 +127,7 @@ void * mem__internal_realloc_zeroed(
 #define ASSERT_ARGS_mem__internal_realloc_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(file)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-/* HEADERIZER END: src/gc/memory.c */
+/* HEADERIZER END: src/gc/alloc_memory.c */
 
 #endif /* PARROT_MEMORY_H_GUARD */
 

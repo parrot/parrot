@@ -6,26 +6,47 @@ X<Parrot Grammar Engine>
 X<PGE (Parrot Grammar Engine)>
 The Parrot Grammar Engine (PGE) is a parser generator, one of the key
 components of the Parrot Compiler Toolkit. It reads grammar files written in
-the PGE rules format and generates parser modules.  PGE rules provide the full
-power of recursive descent parsing and operator precedence parsing, but are
-usable even if you don't know exactly what that means.  All you'll need to know
-to start is that rules are patterns for matching text.
+the PGE rules format and generates parser modules written in PIR code. PGE
+rules provide the full power of I<recursive descent parsing> and I<operator
+precedence parsing>. Fortunately, you don't need to know what those terms
+mean in order to make good use of PGE. We'll introduce the necessary
+concepts as we talk about various features in this chapter.
 
 =head2 Grammars
 
-A grammar is a collection of rules, in much the same way that a class is a
-collection of methods.N<A grammar is a special kind of class and a rule is a
-special kind of method.> Each rule defines a pattern for matching one unit of
-text. The basic matching syntax for rules is familiar to anyone who has worked
-with regular expressions:
+The ultimate goal of a parser is to match patterns in a source language and
+convert them to an internal data structure for later manipulations. As a
+programmer, you're probably already familiar with some of these types of
+patterns: function declarations, function calls, statements, and assignments.
+Each of these different concepts have a particular form called a I<syntax>.
+In C for example, the syntax to define a function looks something like this:
+
+  <return_type> <function_name> ( <arguments> ) { <function_body> }
+
+Things that fit this pattern, so long as all the sub-patterns use the proper
+syntax also, are valid subroutines in C. Similarly, we can use a slightly
+different pattern to create a subroutine:
+
+  sub <function_name> { <function_body> }
+
+A grammar is a collection of rules like the ones above that specify all the
+acceptable patterns in a language. Grammars group together these rules in
+much the same way that a groups together related data fields and methods
+N<In languages like Perl 6 for instance, a grammar is just a special kind
+of class and a rule is just a special kind of method.>. Each rule defines
+a pattern for matching one unit of text, and can be made up of various other
+rules which are called recursively to make a complete match.
+
+A rule can contain regular expressions to match patterns of characters:
 
   rule id { \d+ }
 
-Smaller rules can combine into larger rules:
+A rule can also contain patterns of references to other rules:
 
   rule record { <id> <name> <phone> }
 
-A grammar contains a group of rules that work together:
+A grammar contains a group of rules that work together to match the entire
+language:
 
   grammar Contacts;
 
@@ -41,10 +62,10 @@ A grammar contains a group of rules that work together:
 
 X<rule>
 X<token>
-There are two different kinds of rules: C<rule> or C<token>. A C<rule> performs
-smart whitespace matching between the various pieces of the pattern. The
-C<record> rule given previously would match "6355 John" or "6355      John" but
-not "6355John".
+There are two different kinds of rules: C<rule>, which we saw above, and
+C<token>. A C<rule> performs smart whitespace matching between the various
+pieces of the pattern. The C<record> rule given previously would match
+"6355 John" or "6355      John" but not "6355John".
 
 A C<token> matches whitespace only if you specifically request it. To get the
 same effect with a token, add the C<\s> (match a space character) and C<+>
@@ -57,20 +78,25 @@ times) pattern to the rule:
 
 X<top>
 X<top-down parser>
-A recursive descent parser is a top-down parser. It starts at the highest-level
-rule and works its way down through individual rules to match an entire string
-or file. PGE convention calls this top-level rule C<TOP>N<Perl 6 allows any
-name for the top-level rule, but PCT expects a rule called C<TOP>.>.
+A recursive descent parser is what's called a I<top-down parser>. It starts
+at the highest-level rule, called C<TOP>, and works its way down through
+individual rules to match an entire string or file. Real Perl 6 allows any
+name for the top-level rule, but PCT expects a rule called C<TOP>. If PCT
+was as fully-featured as Perl 6, people would use it instead! Here's an
+example of a TOP rule:
 
   rule TOP { <record> }
 
-This rule matches a single record in a string or file. Once the parser has
-succeeded in matching the entire string or file passed to the start rule, it
-returns a parse tree.
+This rule matches a single C<record> pattern in a string or file. Once the
+parser has succeeded in matching the entire string or file passed to the
+start rule, it returns a parse tree. If it cannot match the entire input
+with the rules provided, it can either return a partial match, or it can
+throw a parse error.
 
 =head3 Testing a Grammar
 
-Save this example to a file called F<Contacts.pg>:
+Let's do a small example grammar. Save this example to a file called
+F<Contacts.pg>:
 
   grammar Contacts is PGE::Grammar;
 

@@ -266,6 +266,11 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     clear_locals(unit);
 
+    if (unit->vtable_name)
+        mem_sys_free(unit->vtable_name);
+    if (unit->instance_of)
+        mem_sys_free(unit->instance_of);
+
     free(unit->hash.data);
     free(unit);
 }

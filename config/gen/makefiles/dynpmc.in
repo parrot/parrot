@@ -17,15 +17,13 @@ LD_LOAD_FLAGS := @ld_load_flags@
 CFLAGS        := @ccflags@ @cc_shared@ @cc_debug@ @ccwarn@ @cc_hasjit@ @cg_flag@ @gc_flag@
 CC_OUT        := @cc_o_out@
 LD_OUT        := @ld_out@
-#IF(parrot_is_shared):LIBPARROT     := @libparrot_ldflags@
-#ELSE:LIBPARROT     :=
+LIBPARROT     := @libparrot_ldflags@
 
 BUILD_TOOLS_DIR := $(BUILD_DIR)@slash@tools@slash@build
 BUILD_LIB_DIR   := $(BUILD_DIR)@slash@blib@slash@lib
 PMC2C           := $(PERL) $(BUILD_TOOLS_DIR)@slash@pmc2c.pl
 INCLUDES        := -I$(BUILD_DIR)@slash@include -I@build_dir@@slash@src@slash@pmc
-#IF(!cygwin and cc==gcc):LINKARGS       := -Wl,-L $(BUILD_LIB_DIR) $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
-#ELSE:LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
+LINKARGS        := $(LDFLAGS) $(LD_LOAD_FLAGS) $(LIBPARROT) @icu_shared@ @libs@
 
 PMC2CD := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump
 PMC2CC := $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c

@@ -210,17 +210,17 @@ tree as a PIR code object that can be compiled.
     .local string expstr
     expstr = expcode
     code.'emit'("          .local pmc cstack :unique_reg")
-    code.'emit'("          cstack = new 'ResizableIntegerArray'")
+    code.'emit'("          cstack = root_new ['parrot';'ResizableIntegerArray']")
     $I0 = index expstr, 'ustack'
     if $I0 < 0 goto code_body_1
     code.'emit'("          .local pmc ustack :unique_reg")
-    code.'emit'("          ustack = new 'ResizablePMCArray'")
+    code.'emit'("          ustack = root_new ['parrot';'ResizablePMCArray']")
   code_body_1:
     ##   generate the gpad only if we need it
     $I0 = index expstr, 'gpad'
     if $I0 < 0 goto code_body_2
     code.'emit'("          .local pmc gpad :unique_reg")
-    code.'emit'("          gpad = new 'ResizablePMCArray'")
+    code.'emit'("          gpad = root_new ['parrot';'ResizablePMCArray']")
   code_body_2:
     ##   set the captscope if we need it
     $I0 = index expstr, 'captscope'
@@ -328,7 +328,7 @@ tree as a PIR code object that can be compiled.
     captgen.'emit'(<<"        CODE", cname, label)
           $I0 = defined captscope[%0]
           if $I0 goto %1_cgen
-          $P0 = new 'ResizablePMCArray'
+          $P0 = root_new ['parrot';'ResizablePMCArray']
           captscope[%0] = $P0
           local_branch cstack, %1_cgen
           delete captscope[%0]

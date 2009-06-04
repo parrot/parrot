@@ -396,12 +396,10 @@ init_regusage(PARROT_INTERP, Parrot_jit_optimizer_section_ptr cur_section)
 {
     int typ;
 
-    cur_section->ru[0].registers_used =
-        CONTEXT(interp)->n_regs_used[REGNO_INT];
-    cur_section->ru[3].registers_used =
-        CONTEXT(interp)->n_regs_used[REGNO_NUM];
-    cur_section->ru[1].registers_used =
-        cur_section->ru[2].registers_used = 0;
+    cur_section->ru[0].registers_used = CONTEXT(interp)->n_regs_used[REGNO_INT];
+    cur_section->ru[3].registers_used = CONTEXT(interp)->n_regs_used[REGNO_NUM];
+    cur_section->ru[1].registers_used = cur_section->ru[2].registers_used = 0;
+
     for (typ = 0; typ < 4; typ++) {
         int j;
         for (j = 0; j < cur_section->ru[typ].registers_used; j++)
@@ -1299,12 +1297,15 @@ set_reg_usage(PARROT_INTERP, const opcode_t *pc)
             PMC        * const sub_pmc = ct->constants[ci]->u.key;
             Parrot_sub        *sub;
             size_t             offs;
+            int                i;
 
             PMC_get_sub(interp, sub_pmc, sub);
             offs = pc - sub->seg->base.data;
 
             if (offs >= sub->start_offs && offs < sub->end_offs) {
-                CONTEXT(interp)->n_regs_used = sub->n_regs_used;
+                for (i = 0; i < 4; i++)
+                    CONTEXT(interp)->n_regs_used[i] = sub->n_regs_used[i];
+
                 return;
             }
         }
@@ -1353,7 +1354,7 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
     PackFile_Segment     *jit_seg;
     char                 *map;
     Parrot_jit_fn_info_t *op_func;
-    INTVAL               *n_regs_used;        /* INSP in PBC */
+    INTVAL                n_regs_used[4];        /* INSP in PBC */
     op_info_t            *op_info;
     const jit_arch_info  *arch_info;
     int                   needs_fs;       /* fetch/store */
@@ -1423,7 +1424,9 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
 #endif
 
     /* remember register usage */
-    n_regs_used = CONTEXT(interp)->n_regs_used;
+    for (i = 0; i < 4; i++)
+        n_regs_used[i] = CONTEXT(interp)->n_regs_used[i];
+
     set_reg_usage(interp, code_start);
 
 #if JIT_SEGS
@@ -1674,10 +1677,9 @@ parrot_build_asm(PARROT_INTERP, ARGIN(opcode_t *code_start), ARGIN(opcode_t *cod
             cur_section->next;
     }
 
-    /*
-     * restore register usage
-     */
-    CONTEXT(interp)->n_regs_used = n_regs_used;
+    /* restore register usage */
+    for (i = 0; i < 4; i++)
+        CONTEXT(interp)->n_regs_used[i] = n_regs_used[i];
 
     /* Do fixups before converting offsets */
     (arch_info->jit_dofixup)(jit_info, interp);
@@ -1766,7 +1768,7 @@ the ManagedStruct PMC as it is garbage collected.
 void
 Parrot_jit_free_buffer(PARROT_INTERP, void *ptr, void *priv)
 {
-    struct jit_buffer_private_data *jit = (struct jit_buffer_private_data*)priv;
+    const struct jit_buffer_private_data * const jit = (struct jit_buffer_private_data*)priv;
     mem_free_executable(ptr, jit->size);
     free(priv);
 }
@@ -1785,7 +1787,7 @@ It is called by the ManagedStruct PMC's clone() function.
 PMC *
 Parrot_jit_clone_buffer(PARROT_INTERP, PMC *pmc, void *priv)
 {
-    PMC *rv = pmc_new(interp, pmc->vtable->base_type);
+    PMC * const rv = pmc_new(interp, pmc->vtable->base_type);
 
     VTABLE_init(interp, rv);
     /* copy the attributes */

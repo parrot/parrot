@@ -272,7 +272,12 @@ ok 1
 ok 2
 OUTPUT
 
-pasm_output_is( <<"CODE", <<OUTPUT, 'atan2' );
+my @jittodo = (
+    $runcore =~ /--runcore=jit/
+        ? ( todo => 'broken under JIT TT #530' )
+        : ()
+);
+pasm_output_is( <<"CODE", <<OUTPUT, 'atan2', @jittodo );
         .include 'fp_equality.pasm'
         set N0, 0.0
         set I0, 0

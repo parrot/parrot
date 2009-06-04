@@ -39,6 +39,17 @@ static UINTVAL codepoints(PARROT_INTERP, ARGMOD(STRING *src))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*src);
 
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL find_cclass(PARROT_INTERP,
+    ARGIN(STRING *s),
+    ARGIN(const INTVAL *typetable),
+    INTVAL flags,
+    UINTVAL pos,
+    UINTVAL end)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static UINTVAL get_byte(SHIM_INTERP,
     ARGIN(const STRING *src),
     UINTVAL offset)
@@ -181,6 +192,10 @@ static const void * utf8_skip_forward(ARGIN(const void *ptr), UINTVAL n)
 #define ASSERT_ARGS_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(src)
+#define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s) \
+    || PARROT_ASSERT_ARG(typetable)
 #define ASSERT_ARGS_get_byte __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_get_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -683,6 +698,27 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *src), UINTVAL offset, UINTVAL codepoi
 
 /*
 
+=item C<static UINTVAL find_cclass(PARROT_INTERP, STRING *s, const INTVAL
+*typetable, INTVAL flags, UINTVAL pos, UINTVAL end)>
+
+Stub, the charset level handles this for unicode strings.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL
+find_cclass(PARROT_INTERP, ARGIN(STRING *s), ARGIN(const INTVAL *typetable),
+INTVAL flags, UINTVAL pos, UINTVAL end)
+{
+    Parrot_ex_throw_from_c_args(interp, NULL,
+        EXCEPTION_UNIMPLEMENTED,
+        "No find_cclass support in unicode encoding plugins");
+}
+
+/*
+
 =item C<static UINTVAL get_byte(PARROT_INTERP, const STRING *src, UINTVAL
 offset)>
 
@@ -1018,7 +1054,8 @@ Parrot_encoding_utf8_init(PARROT_INTERP)
         become_encoding,
         codepoints,
         bytes,
-        iter_init
+        iter_init,
+        find_cclass
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);
     Parrot_register_encoding(interp, "utf8", return_encoding);

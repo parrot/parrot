@@ -116,24 +116,36 @@ If I want to add two integer registers using PASM I would use the
 Parrot C<set> opcode to put values into registers, and the C<add>
 opcode to add them, like this:
 
+=begin PIR_FRAGMENT
+
    set $I1, 5
    set $I2, 3
    add $I0, $I1, $I2   # $I0 yields 5+3
 
+=end PIR_FRAGMENT
+
 PIR includes infix operators for these common opcodes. I could write
 this same code as
+
+=begin PIR_FRAGMENT
 
    $I1 = 5
    $I2 = 3
    $I0 = $I1 + $I2
 
+=end PIR_FRAGMENT
+
 There are the four arithmetic operators as you should be expecting, as
 well as the six different comparison operators, which return a boolean
 value:
 
+=begin PIR_FRAGMENT
+
    $I1 = 5
    $I2 = 3
    $I0 = $I1 <= $I2   # $I0 yields 0 (false)
+
+=end PIR_FRAGMENT
 
 I can also use the short accumulation-like operators, like C<+=>.
 
@@ -142,8 +154,12 @@ instead of register names. For that I just need to declare the
 variable using the C<.local> keyword with any of the four data
 types available on PIR: C<int>, C<string>, C<num> and C<pmc>:
 
+=begin PIR_FRAGMENT
+
    .local int size
    size = 5
+
+=end PIR_FRAGMENT
 
 Note that all registers, both numbered and named, are consolidated by
 the Parrot register allocator, assigning these "virtual registers" to
@@ -166,12 +182,24 @@ Another simplification of PASM are branches. Basically, when I want to
 test a condition and jump to another place in the code, I would write
 the following PASM code:
 
-   le $I1, $I2, LESS_EQ
+=begin PASM
+
+   le I1, I2, LESS_EQ
+   # ...
+ LESS_EQ:
+
+=end PASM
 
 Meaning, if C<$I1> is less or equal than C<$I2>, jump to label
 C<LESS_EQ>. In PIR I would write it in a more legible way:
 
+=begin PIR_FRAGMENT
+
    if $I1 <= $I2 goto LESS_EQ
+   # ...
+ LESS_EQ:
+
+=end PIR_FRAGMENT
 
 PIR includes the C<unless> keyword as well.
 
@@ -219,18 +247,32 @@ If I need more parameters I just need to add more C<.param> lines.
 To return values from PIR subroutines I use the C<.return> keyword,
 followed by one or more arguments, just like this:
 
-  .return (10, 20, 30)
+=begin PIR
+
+  .sub _
+    .return (10, 20, 30)
+  .end
+
+=end PIR
 
 The calling subroutine can accept these values. If you want to retrieve
 only one value (or only the first value, in case multiple values are
 returned), write this:
 
+=begin PIR_FRAGMENT
+
   $I0 = compute_it($I8, $I9)
+
+=end PIR_FRAGMENT
 
 To accept multiple values from such a function, use a parenthesized
 results list:
 
+=begin PIR_FRAGMENT
+
   ($I1, $I2, $I3) = compute_it($I8, $I9)
+
+=end PIR_FRAGMENT
 
 =head2 Factorial Example
 
@@ -269,8 +311,13 @@ PIR supports them as well.
 As before, I need to use C<.param> for each named argument, but you need to
 specify a flag indicating the parameter is named:
 
+=begin PIR
+
   .sub func
     .param int a :named("foo")
+  .end
+
+=end PIR
 
 The subroutine will receive an integer named "foo", and inside of the
 subroutine that integer will be known as "a".
@@ -278,8 +325,12 @@ subroutine that integer will be known as "a".
 When calling the function, I need to pass the names of the
 arguments. For that there are two syntaxes:
 
+=begin PIR_FRAGMENT
+
   func( 10 :named("foo") )    # or
   func( "foo" => 10 )
+
+=end PIR_FRAGMENT
 
 Note that with named arguments, you may rearrange the order of your
 parameters at will.
@@ -297,10 +348,14 @@ parameters at will.
 
 This subroutine may be called in any of the following ways:
 
+=begin PIR_FRAGMENT
+
   foo( "Fred", 35, "m" )
   foo( "gender" => "m", "name" => "Fred", "age" => 35 )
   foo( "age" => 35, "gender" => "m", "name" => "Fred" )
   foo( "m" :named("gender"), 35 :named("age"), "name" => "Fred" )
+
+=end PIR_FRAGMENT
 
 and any other permutation you can think of as long as you use the named
 argument syntax. Note that any positional parameters must be passed
@@ -318,20 +373,32 @@ before the named parameters. So, the following is allowed:
 
 Whereas the following is not:
 
+=begin PIR_INVALID
+
   .sub main
     .param int a :named("name")
     .param int b # cannot declare positional parameter after a named parameter
     # ...
   .end
 
+=begin PIR_INVALID
+
 It's also possible to use named syntax when returning values from
 subroutines. Into the C<.return> command I'll use:
 
+=begin PIR
+
   .return ( "bar" => 20, "foo" => 10)
+
+=end PIR
 
 and when calling the function, I will do:
 
+=begin PIR
+
   ("foo" => $I0, "bar" => $I1) = func()
+
+=end PIR
 
 And C<$I0> will yield 10, and C<$I1> will yield 20, as expected.
 
@@ -343,14 +410,22 @@ PIR). There is a C<read> opcode to read from standard input.  Just
 pass it a string register or variable where you wish the characters
 read to be placed and the number of characters you wish to read:
 
+=begin PIR
+
   read $S1, 100
+
+=end PIR
 
 This line will read 100 characters (or until the end of the line) and
 put the read string into C<$S1>. In case you need a number, just
 assign the string to the correct register type:
 
+=begin PIR
+
   read $S1, 100
   $I1 = $S1
+
+=end PIR
 
 With the PIR syntax shown in this article you should be able to start
 writing simple programs. Next article we will look into available

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 my $i   = 0;
-my $max = 5000;
+my $max = 500;
 my $i6  = 0;
 my $i7;
 

@@ -49,7 +49,7 @@ have the same number of elements because there is a one-to-one mapping.
 #include "../pmc/pmc_parrotlibrary.h"
 
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: include/parrot/runcore_api.h */
 /* XXX Needs to get done at the same time as the other interpreter files */
 
 /* HEADERIZER BEGIN: static */
@@ -300,6 +300,7 @@ C<pc_prederef> is the current opcode, and C<type> is the run core type.
 void
 do_prederef(void **pc_prederef, PARROT_INTERP, int type)
 {
+    ASSERT_ARGS(do_prederef)
     const size_t     offset = pc_prederef - interp->code->prederef.code;
     opcode_t * const pc     = ((opcode_t *)interp->code->base.data) + offset;
     const op_info_t *opinfo;
@@ -620,6 +621,7 @@ C<op_info_table>
 void
 exec_init_prederef(PARROT_INTERP, void *prederef_arena)
 {
+    ASSERT_ARGS(exec_init_prederef)
     load_prederef(interp, PARROT_CGP_CORE);
 
     if (!interp->code->prederef.code) {
@@ -648,6 +650,7 @@ PARROT_CAN_RETURN_NULL
 void *
 init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
 {
+    ASSERT_ARGS(init_jit)
 #if JIT_CAPABLE
     opcode_t          *code_start;
     UINTVAL            code_size;          /* in opcodes */
@@ -695,7 +698,9 @@ Prepares to run the interpreter's run core.
 void
 prepare_for_run(PARROT_INTERP)
 {
+    ASSERT_ARGS(prepare_for_run)
     void *ignored;
+
     switch (interp->run_core) {
         case PARROT_JIT_CORE:
             ignored = init_jit(interp, interp->code->base.data);
@@ -892,6 +897,7 @@ evaluation of opcode continues.
 void
 runops_int(PARROT_INTERP, size_t offset)
 {
+    ASSERT_ARGS(runops_int)
     opcode_t *(*core) (PARROT_INTERP, opcode_t *) = NULL;
 
     /* setup event function ptrs */
@@ -1009,6 +1015,7 @@ TODO: Free it at destroy. Handle run-core changes.
 void
 Parrot_setup_event_func_ptrs(PARROT_INTERP)
 {
+    ASSERT_ARGS(Parrot_setup_event_func_ptrs)
     const size_t       n         = interp->op_count;
     const oplib_init_f init_func = get_core_op_lib_init(interp, interp->run_core);
     op_lib_t * const   lib       = init_func(1);
@@ -1034,6 +1041,36 @@ Parrot_setup_event_func_ptrs(PARROT_INTERP)
 
 /*
 
+=item C<void Parrot_runcore_destroy(PARROT_INTERP)>
+
+Shuts down the runcores and deallocates any dynops memory.
+
+=cut
+
+*/
+
+void
+Parrot_runcore_destroy(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_runcore_destroy)
+    op_lib_t    *cg_lib;
+
+#ifdef HAVE_COMPUTED_GOTO
+    cg_lib = PARROT_CORE_CGP_OPLIB_INIT(1);
+    if (cg_lib->op_func_table)
+        mem_sys_free(cg_lib->op_func_table);
+    cg_lib->op_func_table = NULL;
+
+    cg_lib = PARROT_CORE_CG_OPLIB_INIT(1);
+    if (cg_lib->op_func_table)
+        mem_sys_free(cg_lib->op_func_table);
+    cg_lib->op_func_table = NULL;
+#endif
+}
+
+
+/*
+
 =back
 
 =head2 Dynamic Loading Functions
@@ -1051,6 +1088,7 @@ Register a dynamic oplib.
 void
 dynop_register(PARROT_INTERP, PMC *lib_pmc)
 {
+    ASSERT_ARGS(dynop_register)
     op_lib_t *lib, *core;
     oplib_init_f init_func;
     op_func_t *new_func_table, *new_evc_func_table;
@@ -1341,6 +1379,7 @@ PARROT_EXPORT
 void
 disable_event_checking(PARROT_INTERP)
 {
+    ASSERT_ARGS(disable_event_checking)
     /* restore func table */
     PARROT_ASSERT(interp->save_func_table);
     notify_func_table(interp, interp->save_func_table, 0);
@@ -1366,6 +1405,7 @@ PARROT_EXPORT
 void
 enable_event_checking(PARROT_INTERP)
 {
+    ASSERT_ARGS(enable_event_checking)
     /* put table in place */
     notify_func_table(interp, interp->evc_func_table, 1);
 }

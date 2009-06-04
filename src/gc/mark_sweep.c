@@ -8,8 +8,12 @@ src/gc/mark_sweep.c - Small Object Pools and general mark/sweep GC behavior
 
 =head1 DESCRIPTION
 
-Handles the accessing of small object pools (header pools).  All of the
-mark/sweep garbage collectors use this code.
+This file implements a number of routines related to the mark and sweep phases
+of the garbage collector system. The functions in this file attempt to perform
+various useful utilities without interfering with the operations of the
+particular GC core. Individual GC cores may choose to use these functions or
+to reimplement their functionality, hopefully without causing any problems
+throughout the rest of Parrot.
 
 =head2 Functions
 
@@ -27,239 +31,124 @@ mark/sweep garbage collectors use this code.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void clear_live_bits(ARGIN(const Small_Object_Pool *pool))
-        __attribute__nonnull__(1);
-
-static void gc_ms_add_free_object(SHIM_INTERP,
+static void free_buffer(SHIM_INTERP,
     ARGMOD(Small_Object_Pool *pool),
-    ARGIN(void *to_add))
+    ARGMOD(PObj *b))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool);
-
-static void gc_ms_add_free_pmc_ext(SHIM_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    ARGIN(void *to_add))
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*pool);
-
-static void gc_ms_alloc_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void * gc_ms_get_free_object(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void * gc_ms_get_free_pmc_ext(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
-static void gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
-static void more_traceable_objects(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pool);
-
-static int sweep_cb(PARROT_INTERP,
-    ARGMOD(Small_Object_Pool *pool),
-    int flag,
-    ARGMOD(void *arg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*pool)
-        FUNC_MODIFIES(*arg);
+        FUNC_MODIFIES(*b);
 
-static int trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
+static void free_buffer_malloc(SHIM_INTERP,
+    SHIM(Small_Object_Pool *pool),
+    ARGMOD(PObj *b))
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*b);
+
+static void free_pmc_in_pool(PARROT_INTERP,
+    SHIM(Small_Object_Pool *pool),
+    ARGMOD(PObj *p))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*p);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool * new_buffer_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_gc_ms_add_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP,
+    size_t actual_buffer_size)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool * new_pmc_pool(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool * new_small_object_pool(
+    size_t object_size,
+    size_t objects_per_alloc);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL constant)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_free_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(to_add)
-#define ASSERT_ARGS_gc_ms_add_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(to_add)
-#define ASSERT_ARGS_gc_ms_alloc_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    || PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_free_buffer_malloc __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(b)
+#define ASSERT_ARGS_free_pmc_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_gc_ms_get_free_object __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_gc_ms_get_free_pmc_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_gc_ms_pool_init __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool)
-#define ASSERT_ARGS_sweep_cb __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(pool) \
-    || PARROT_ASSERT_ARG(arg)
-#define ASSERT_ARGS_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+    || PARROT_ASSERT_ARG(p)
+#define ASSERT_ARGS_new_buffer_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_bufferlike_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_pmc_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_new_small_object_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_new_string_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-
-#define GC_DEBUG_REPLENISH_LEVEL_FACTOR        0.0
-#define GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR 1
-#define REPLENISH_LEVEL_FACTOR                 0.3
-
-/* this factor is totally arbitrary, but gives good timings for stress.pasm */
-#define UNITS_PER_ALLOC_GROWTH_FACTOR          1.75
-
-#define POOL_MAX_BYTES                         65536 * 128
 
 /* Set when walking the system stack */
 int CONSERVATIVE_POINTER_CHASING = 0;
 
 /*
 
-=item C<void Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)>
+=item C<void Parrot_gc_run_init(PARROT_INTERP)>
 
-Runs the stop-the-world mark & sweep (MS) collector.
+Prepares the collector for a mark & sweep GC run. Initializes the various
+fields in the Arenas structure that need to be zeroed out prior to the
+mark phase.
 
 =cut
 
 */
 
 void
-Parrot_gc_ms_run(PARROT_INTERP, UINTVAL flags)
+Parrot_gc_run_init(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_gc_ms_run)
-    Arenas * const arena_base = interp->arena_base;
+    ASSERT_ARGS(Parrot_gc_run_init)
+    Arenas * const arena_base       = interp->arena_base;
 
-    /* XXX these should go into the interpreter */
-    int total_free     = 0;
-
-    if (arena_base->gc_mark_block_level)
-        return;
-
-    if (interp->pdb && interp->pdb->debugger) {
-        /*
-         * if the other interpreter did a GC mark run, it can set
-         * live bits of shared objects, but these aren't reset, because
-         * they are in a different arena. When now such a PMC points to
-         * other non-shared object, these wouldn't be marked and hence
-         * collected.
-         */
-        Parrot_gc_clear_live_bits(interp);
-    }
-
-    /*
-     * the sync sweep is always at the end, so that
-     * the live bits are cleared
-     */
-    if (flags & GC_finish_FLAG) {
-        clear_live_bits(interp->arena_base->pmc_pool);
-        clear_live_bits(interp->arena_base->constant_pmc_pool);
-
-        /* keep the scheduler and its kids alive for Task-like PMCs to destroy
-         * themselves; run a sweep to collect them */
-        if (interp->scheduler) {
-            Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->scheduler);
-            VTABLE_mark(interp, interp->scheduler);
-            Parrot_gc_sweep(interp, interp->arena_base->pmc_pool);
-        }
-
-        /* now sweep everything that's left */
-        Parrot_gc_sweep(interp, interp->arena_base->pmc_pool);
-        Parrot_gc_sweep(interp, interp->arena_base->constant_pmc_pool);
-
-        return;
-    }
-
-    ++arena_base->gc_mark_block_level;
-    arena_base->lazy_gc = flags & GC_lazy_FLAG;
-
-    /* tell the threading system that we're doing GC mark */
-    pt_gc_start_mark(interp);
-    Parrot_gc_ms_run_init(interp);
-
-    /* compact STRING pools to collect free headers and allocated buffers */
-    Parrot_gc_compact_memory_pool(interp);
-
-    /* Now go trace the PMCs */
-    if (trace_active_PMCs(interp, (flags & GC_trace_stack_FLAG)
-        ? GC_TRACE_FULL
-        : GC_TRACE_ROOT_ONLY)) {
-        int ignored;
-
-        arena_base->gc_trace_ptr = NULL;
-        arena_base->gc_mark_ptr  = NULL;
-
-        /* mark is now finished */
-        pt_gc_stop_mark(interp);
-
-        /* Now put unused PMCs and Buffers on the free list */
-        ignored = Parrot_forall_header_pools(interp, POOL_BUFFER | POOL_PMC,
-            (void*)&total_free, sweep_cb);
-        UNUSED(ignored);
-
-        if (interp->profile)
-            Parrot_gc_profile_end(interp, PARROT_PROF_GC_cb);
-    }
-    else {
-        pt_gc_stop_mark(interp); /* XXX */
-
-        /* successful lazy mark run count */
-        ++arena_base->gc_lazy_mark_runs;
-
-        Parrot_gc_clear_live_bits(interp);
-        if (interp->profile)
-            Parrot_gc_profile_end(interp, PARROT_PROF_GC_p2);
-    }
-
-    /* Note it */
-    arena_base->gc_mark_runs++;
-    --arena_base->gc_mark_block_level;
-
-    return;
+    arena_base->gc_trace_ptr        = NULL;
+    arena_base->gc_mark_start       = NULL;
+    arena_base->num_early_PMCs_seen = 0;
+    arena_base->num_extended_PMCs   = 0;
 }
-
 
 /*
 
 =item C<int Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)>
 
-Traces the root set. Returns 0 if it's a lazy GC run and all objects
-that need timely destruction were found.
+Traces the root set with behavior that's dependent on the flags passed.
+Returns 0 if it's a lazy GC run and all objects that need timely destruction
+were found. Returns 1 otherwise.
 
-C<trace_stack> can have these values:
+The flag C<trace> can have these values:
 
 =over 4
 
-=item * GC_TRACE_FULL
-
-trace whole root set, including system areas
-
 =item * GC_TRACE_ROOT_ONLY
 
-trace normal roots, no system areas
+trace normal roots
 
 =item * GC_TRACE_SYSTEM_ONLY
 
 trace system areas only
+
+=item * GC_TRACE_FULL
+
+trace whole root set, including system areas.
 
 =back
 
@@ -293,7 +182,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
             = interp->iglobals;
     }
 
-    /* mark it as used  */
+    /* mark the list of iglobals */
     Parrot_gc_mark_PObj_alive(interp, (PObj *)interp->iglobals);
 
     /* mark the current continuation */
@@ -308,15 +197,7 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     /* mark the dynamic environment. */
     mark_stack(interp, interp->dynamic_env);
 
-    /*
-     * mark vtable->data
-     *
-     * XXX these PMCs are constant and shouldn't get collected
-     * but t/library/dumper* fails w/o this marking.
-     *
-     * It seems that the Class PMC gets GCed - these should
-     * get created as constant PMCs.
-     */
+    /* mark the vtables: the data, Class PMCs, etc. */
     mark_vtables(interp);
 
     /* mark the root_namespace */
@@ -346,14 +227,15 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     /* Walk the iodata */
     Parrot_IOData_mark(interp, interp->piodata);
 
-    /* quick check if we can already bail out */
+    if (trace == GC_TRACE_FULL)
+        trace_system_areas(interp);
+
+    /* quick check to see if we have already marked all impatient PMCs. If we
+       have, return 0 and exit here. This will alert other parts of the GC
+       that if we are in a lazy run we can just stop it. */
     if (arena_base->lazy_gc
     &&  arena_base->num_early_PMCs_seen >= arena_base->num_early_gc_PMCs)
         return 0;
-
-    /* Find important stuff on the system stack */
-    if (trace == GC_TRACE_FULL)
-        trace_system_areas(interp);
 
     if (interp->profile)
         Parrot_gc_profile_end(interp, PARROT_PROF_GC_p1);
@@ -361,86 +243,23 @@ Parrot_gc_trace_root(PARROT_INTERP, Parrot_gc_trace_type trace)
     return 1;
 }
 
+
 /*
 
-=item C<void Parrot_gc_ms_run_init(PARROT_INTERP)>
+=item C<void Parrot_gc_sweep_pool(PARROT_INTERP, Small_Object_Pool *pool)>
 
-Prepares the collector for a mark & sweep GC run. This is the
-initializer function for the MS garbage collector.
+Puts any buffers/PMCs that are marked as "dead" or "black" onto the pool
+free list. If C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoids
+buffers that are immune from collection (i.e. constant).
 
 =cut
 
 */
 
 void
-Parrot_gc_ms_run_init(PARROT_INTERP)
+Parrot_gc_sweep_pool(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
 {
-    ASSERT_ARGS(Parrot_gc_ms_run_init)
-    Arenas * const arena_base       = interp->arena_base;
-
-    arena_base->gc_trace_ptr        = NULL;
-    arena_base->gc_mark_start       = NULL;
-    arena_base->num_early_PMCs_seen = 0;
-    arena_base->num_extended_PMCs   = 0;
-}
-
-
-/*
-
-=item C<void Parrot_gc_ms_free_pmc(PARROT_INTERP, Small_Object_Pool *pool, PObj
-*p)>
-
-Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
-method if one is available. If the PMC uses a PMC_EXT structure, that is freed
-as well.
-
-=cut
-
-*/
-
-void
-Parrot_gc_ms_free_pmc(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
-        ARGMOD(PObj *p))
-{
-    ASSERT_ARGS(Parrot_gc_ms_free_pmc)
-    PMC    * const pmc        = (PMC *)p;
-    Arenas * const arena_base = interp->arena_base;
-
-    /* TODO collect objects with finalizers */
-    if (PObj_needs_early_gc_TEST(p))
-        --arena_base->num_early_gc_PMCs;
-
-    if (PObj_active_destroy_TEST(p))
-        VTABLE_destroy(interp, pmc);
-
-    if (PObj_is_PMC_EXT_TEST(p))
-         Parrot_gc_free_pmc_ext(interp, pmc);
-
-#ifndef NDEBUG
-
-    pmc->pmc_ext     = (PMC_EXT *)0xdeadbeef;
-    pmc->vtable      = (VTABLE  *)0xdeadbeef;
-
-#endif
-
-}
-
-/*
-
-=item C<void Parrot_gc_sweep(PARROT_INTERP, Small_Object_Pool *pool)>
-
-Puts any buffers/PMCs that are now unused onto the pool's free list. If
-C<GC_IS_MALLOC>, bufstart gets freed too, if possible. Avoids buffers that
-are immune from collection (i.e. constant).
-
-=cut
-
-*/
-
-void
-Parrot_gc_sweep(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(Parrot_gc_sweep)
+    ASSERT_ARGS(Parrot_gc_sweep_pool)
     UINTVAL total_used        = 0;
     const UINTVAL object_size = pool->object_size;
 
@@ -517,8 +336,6 @@ next:
 }
 
 
-
-
 /*
 
 =item C<INTVAL contained_in_pool(const Small_Object_Pool *pool, const void
@@ -544,39 +361,12 @@ contained_in_pool(ARGIN(const Small_Object_Pool *pool), ARGIN(const void *ptr))
             (ptrdiff_t)ptr - (ptrdiff_t)arena->start_objects;
 
         if (0 <= ptr_diff
-                && ptr_diff < (ptrdiff_t)(arena->used * pool->object_size)
-                && ptr_diff % pool->object_size == 0)
+              && ptr_diff < (ptrdiff_t)(arena->used * pool->object_size)
+              && ptr_diff % pool->object_size == 0)
             return 1;
     }
 
     return 0;
-}
-
-/*
-
-=item C<int Parrot_is_const_pmc(PARROT_INTERP, const PMC *pmc)>
-
-Returns whether C<*pmc> is a constant PMC. The given pointer is a constant
-PMC if it points into the constant PMC pool.
-
-=cut
-
-*/
-
-int
-Parrot_is_const_pmc(PARROT_INTERP, ARGIN(const PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_is_const_pmc)
-    Small_Object_Pool * const pool = interp->arena_base->constant_pmc_pool;
-    const               int   c    = contained_in_pool(pool, pmc);
-
-    /* some paranoia first. */
-    /* I wonder if it would save any machine cycles to write
-       !(PObj_constant_TEST(pmc) ^ c)
-       instead. */
-    PARROT_ASSERT(!!PObj_constant_TEST(pmc) == !!c);
-
-    return c;
 }
 
 
@@ -614,7 +404,7 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
     if (PObj_is_PMC_shared_TEST(obj)) {
         interp = PMC_sync(obj)->owner;
         PARROT_ASSERT(interp);
-        /* XXX FIXME hack */
+
         if (!interp->arena_base->gc_mark_ptr)
             interp->arena_base->gc_mark_ptr = obj;
     }
@@ -647,13 +437,11 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
          *     processed first.
          */
         if (hi_prio && tptr) {
-            if (PMC_next_for_GC(tptr) == tptr) {
+            if (PMC_next_for_GC(tptr) == tptr)
                 PMC_next_for_GC(obj) = obj;
-            }
-            else {
+            else
                 /* put it at the head of the list */
                 PMC_next_for_GC(obj) = PMC_next_for_GC(tptr);
-            }
 
             PMC_next_for_GC(tptr)    = (PMC*)obj;
         }
@@ -668,7 +456,6 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
     }
     if (PObj_custom_mark_TEST(obj)) {
         PObj_get_FLAGS(obj) |= PObj_custom_GC_FLAG;
-
         if (!PObj_constant_TEST(obj))
             VTABLE_mark(interp, obj);
     }
@@ -677,235 +464,21 @@ mark_special(PARROT_INTERP, ARGIN(PMC *obj))
 
 /*
 
-=item C<static void more_traceable_objects(PARROT_INTERP, Small_Object_Pool
+=item C<void Parrot_gc_clear_live_bits(PARROT_INTERP, const Small_Object_Pool
 *pool)>
 
-We're out of traceable objects. First we try a GC run to free some up. If
-that doesn't work, allocate a new arena.
+Resets the PMC pool, so all objects are marked as "White". This
+is done after a GC run to reset the system and prepare for the
+next mark phase.
 
 =cut
 
 */
 
-static void
-more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+void
+Parrot_gc_clear_live_bits(PARROT_INTERP, ARGIN(const Small_Object_Pool *pool))
 {
-    ASSERT_ARGS(more_traceable_objects)
-    if (pool->skip)
-        pool->skip = 0;
-    else {
-        Small_Object_Arena * const arena = pool->last_Arena;
-        if (arena) {
-            if (arena->used == arena->total_objects)
-                Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
-
-            if (pool->num_free_objects <= pool->replenish_level)
-                pool->skip = 1;
-        }
-    }
-
-    /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep. If gc
-     * is disabled, then we must check the free list directly. */
-    if (!pool->free_list)
-        (*pool->alloc_objects) (interp, pool);
-}
-
-/*
-
-=item C<static void gc_ms_add_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
-*pool, void *to_add)>
-
-Add a freed PMC_EXT structure to the free list in the PMC_EXT pool. Objects
-on the free list can be reused later.
-
-=cut
-
-*/
-
-static void
-gc_ms_add_free_pmc_ext(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
-{
-    ASSERT_ARGS(gc_ms_add_free_pmc_ext)
-    PMC_EXT * const object = (PMC_EXT *)to_add;
-    object->_metadata      = NULL;
-
-    /* yes, this cast is a hack for now, but a pointer is a pointer */
-    object->_next_for_GC   = (PMC *)pool->free_list;
-    pool->free_list        = object;
-}
-
-/*
-
-=item C<static void gc_ms_add_free_object(PARROT_INTERP, Small_Object_Pool
-*pool, void *to_add)>
-
-Add an unused object back to the pool's free list for later reuse. Set
-the PObj flags to indicate that the item is free.
-
-=cut
-
-*/
-
-static void
-gc_ms_add_free_object(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGIN(void *to_add))
-{
-    ASSERT_ARGS(gc_ms_add_free_object)
-    PObj *object           = (PObj *)to_add;
-
-    PObj_flags_SETTO(object, PObj_on_free_list_FLAG);
-
-    ((GC_MS_PObj_Wrapper*)object)->next_ptr = (PObj *)pool->free_list;
-    pool->free_list        = object;
-}
-
-
-/*
-
-=item C<static void * gc_ms_get_free_object(PARROT_INTERP, Small_Object_Pool
-*pool)>
-
-Free object allocator for the MS garbage collector system. If there are no
-free objects, call C<gc_ms_add_free_object> to either free them up with a
-GC run, or allocate new objects. If there are objects available on the
-free list, pop it off and return it.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void *
-gc_ms_get_free_object(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(gc_ms_get_free_object)
-    PObj *ptr;
-    PObj *free_list = (PObj *)pool->free_list;
-
-    /* if we don't have any objects */
-    if (!free_list) {
-        (*pool->more_objects)(interp, pool);
-        free_list = (PObj *)pool->free_list;
-    }
-
-    ptr             = free_list;
-    pool->free_list = ((GC_MS_PObj_Wrapper*)ptr)->next_ptr;
-
-    PObj_flags_SETTO(ptr, 0);
-
-    --pool->num_free_objects;
-
-    return ptr;
-}
-
-
-/*
-
-=item C<static void * gc_ms_get_free_pmc_ext(PARROT_INTERP, Small_Object_Pool
-*pool)>
-
-Get a new PMC_EXT structure from the free pool and return it.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static void *
-gc_ms_get_free_pmc_ext(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(gc_ms_get_free_pmc_ext)
-    PMC_EXT *ptr;
-    PMC_EXT *free_list = (PMC_EXT *)pool->free_list;
-
-    /* if we don't have any objects */
-    if (!free_list) {
-        (*pool->more_objects)(interp, pool);
-        free_list = (PMC_EXT *)pool->free_list;
-    }
-
-    ptr               = free_list;
-    pool->free_list   = ptr->_next_for_GC;
-    ptr->_next_for_GC = NULL;
-
-    --pool->num_free_objects;
-
-    return ptr;
-}
-
-
-/*
-
-=item C<static int sweep_cb(PARROT_INTERP, Small_Object_Pool *pool, int flag,
-void *arg)>
-
-Sweeps the given pool for the MS collector. This function also ends
-the profiling timer, if profiling is enabled. Returns the total number
-of objects freed.
-
-=cut
-
-*/
-
-static int
-sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
-    ARGMOD(void *arg))
-{
-    ASSERT_ARGS(sweep_cb)
-    int * const total_free = (int *) arg;
-
-    Parrot_gc_sweep(interp, pool);
-
-    if (interp->profile && (flag & POOL_PMC))
-        Parrot_gc_profile_end(interp, PARROT_PROF_GC_cp);
-
-    *total_free += pool->num_free_objects;
-
-    return 0;
-}
-
-
-/*
-
-=item C<static int trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)>
-
-Performs a full trace run and marks all the PMCs as active if they
-are. Returns whether the run completed, that is, whether it's safe
-to proceed with GC.
-
-=cut
-
-*/
-
-static int
-trace_active_PMCs(PARROT_INTERP, Parrot_gc_trace_type trace)
-{
-    ASSERT_ARGS(trace_active_PMCs)
-    if (!Parrot_gc_trace_root(interp, trace))
-        return 0;
-
-    /* Okay, we've marked the whole root set, and should have a good-sized
-     * list of things to look at. Run through it */
-    return Parrot_gc_trace_children(interp, (size_t) -1);
-}
-
-
-/*
-
-=item C<static void clear_live_bits(const Small_Object_Pool *pool)>
-
-Runs through all PMC arenas and clear live bits. This is used to reset
-the GC system after a full system sweep.
-
-=cut
-
-*/
-
-static void
-clear_live_bits(ARGIN(const Small_Object_Pool *pool))
-{
-    ASSERT_ARGS(clear_live_bits)
+    ASSERT_ARGS(Parrot_gc_clear_live_bits)
     Small_Object_Arena *arena;
     const UINTVAL object_size = pool->object_size;
 
@@ -918,28 +491,6 @@ clear_live_bits(ARGIN(const Small_Object_Pool *pool))
             b = (Buffer *)((char *)b + object_size);
         }
     }
-
-}
-
-
-/*
-
-=item C<void Parrot_gc_clear_live_bits(PARROT_INTERP)>
-
-Resets the PMC pool, so all objects are marked as "White". This
-is done after a GC run to reset the system and prepare for the
-next mark phase.
-
-=cut
-
-*/
-
-void
-Parrot_gc_clear_live_bits(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_clear_live_bits)
-    Small_Object_Pool * const pool = interp->arena_base->pmc_pool;
-    clear_live_bits(pool);
 }
 
 
@@ -947,7 +498,9 @@ Parrot_gc_clear_live_bits(PARROT_INTERP)
 
 =item C<int Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)>
 
-Returns whether the tracing process has completed.
+Traces through the linked list formed by the C<next_for_GC> pointer.
+Returns 0 if this is a lazy GC run and we've found all impatient PMCs.
+Returns 1 if we've traced the entire list.
 
 =cut
 
@@ -1023,7 +576,7 @@ Parrot_gc_trace_children(PARROT_INTERP, size_t how_many)
 =item C<void Parrot_add_to_free_list(PARROT_INTERP, Small_Object_Pool *pool,
 Small_Object_Arena *arena)>
 
-Adds the objects in the newly allocated C<arena> to the free list.
+Adds the objects in the newly allocated C<arena> to the free list of the pool.
 
 =cut
 
@@ -1066,6 +619,7 @@ arenas structure, such as the number of objects allocated in it.
 =cut
 
 */
+
 void
 Parrot_append_arena_in_pool(PARROT_INTERP,
     ARGMOD(Small_Object_Pool *pool),
@@ -1094,63 +648,182 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
     interp->arena_base->header_allocs_since_last_collect++;
 }
 
+/*
+
+=item C<void Parrot_gc_profile_start(PARROT_INTERP)>
+
+Records the start time of a GC mark run when profiling is enabled.
+
+=cut
+
+*/
+
+void
+Parrot_gc_profile_start(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_profile_start)
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG))
+        interp->profile->gc_time = Parrot_floatval_time();
+}
 
 /*
 
-=item C<static void gc_ms_alloc_objects(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<void Parrot_gc_profile_end(PARROT_INTERP, int what)>
 
-New arena allocator function for the MS garbage collector system. Allocates
-and initializes a new memory arena in the given pool. Adds all the new
-objects to the pool's free list for later allocation.
+Records the end time of the GC mark run part C<what> run when profiling is
+enabled. Also record start time of next part.
+
+=cut
+
+*/
+
+void
+Parrot_gc_profile_end(PARROT_INTERP, int what)
+{
+    ASSERT_ARGS(Parrot_gc_profile_end)
+    if (Interp_flags_TEST(interp, PARROT_PROFILE_FLAG)) {
+        RunProfile * const profile = interp->profile;
+        const FLOATVAL     now     = Parrot_floatval_time();
+
+        profile->data[what].numcalls++;
+        profile->data[what].time += now - profile->gc_time;
+
+        /*
+         * we've recorded the time of a GC piece from
+         * gc_time until now, so add this to the start of the
+         * currently executing opcode, which hasn't run this
+         * interval.
+         */
+        profile->starttime += now - profile->gc_time;
+
+        /* prepare start for next step */
+        profile->gc_time    = now;
+    }
+}
+
+#ifndef GC_IS_MALLOC
+#  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
+#  define BUFFER_HEADERS_PER_ALLOC  5120 / sizeof (Buffer)
+#  define STRING_HEADERS_PER_ALLOC  5120 / sizeof (STRING)
+#else /* GC_IS_MALLOC */
+#  define PMC_HEADERS_PER_ALLOC    10240 / sizeof (PMC)
+#  define BUFFER_HEADERS_PER_ALLOC 10240 / sizeof (Buffer)
+#  define STRING_HEADERS_PER_ALLOC 10240 / sizeof (STRING)
+#endif /* GC_IS_MALLOC */
+
+#define CONSTANT_PMC_HEADERS_PER_ALLOC 64
+#define GET_SIZED_POOL_IDX(x) ((x) / sizeof (void *))
+
+
+
+/*
+
+=back
+
+=head2 Header Pool Creation Functions
+
+=over 4
+
+=item C<static Small_Object_Pool * new_pmc_pool(PARROT_INTERP)>
+
+Creates and initializes a new pool for PMCs and returns it.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool *
+new_pmc_pool(PARROT_INTERP)
+{
+    ASSERT_ARGS(new_pmc_pool)
+    const int num_headers = PMC_HEADERS_PER_ALLOC;
+    Small_Object_Pool * const pmc_pool =
+        new_small_object_pool(sizeof (PMC), num_headers);
+
+    pmc_pool->mem_pool   = NULL;
+    pmc_pool->gc_object  = free_pmc_in_pool;
+
+    (interp->arena_base->init_pool)(interp, pmc_pool);
+    return pmc_pool;
+}
+
+/*
+
+=item C<static void free_pmc_in_pool(PARROT_INTERP, Small_Object_Pool *pool,
+PObj *p)>
+
+Frees a PMC that is no longer being used. Calls a custom C<destroy> VTABLE
+method if one is available. If the PMC uses a PMC_EXT structure, that is freed
+as well.
 
 =cut
 
 */
 
 static void
-gc_ms_alloc_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
+free_pmc_in_pool(PARROT_INTERP, SHIM(Small_Object_Pool *pool),
+        ARGMOD(PObj *p))
 {
-    ASSERT_ARGS(gc_ms_alloc_objects)
-    /* Setup memory for the new objects */
-    Small_Object_Arena * const new_arena =
-        mem_internal_allocate_typed(Small_Object_Arena);
+    ASSERT_ARGS(free_pmc_in_pool)
+    PMC    * const pmc        = (PMC *)p;
+    Arenas * const arena_base = interp->arena_base;
 
-    const size_t size = pool->object_size * pool->objects_per_alloc;
-    size_t alloc_size;
+    /* TODO collect objects with finalizers */
+    if (PObj_needs_early_gc_TEST(p))
+        --arena_base->num_early_gc_PMCs;
 
-    /* could be mem_internal_allocate too, but calloc is fast */
-    new_arena->start_objects = mem_internal_allocate_zeroed(size);
+    if (PObj_active_destroy_TEST(p))
+        VTABLE_destroy(interp, pmc);
 
-    Parrot_append_arena_in_pool(interp, pool, new_arena, size);
+    if (PObj_is_PMC_EXT_TEST(p))
+         Parrot_gc_free_pmc_ext(interp, pmc);
 
-    Parrot_add_to_free_list(interp, pool, new_arena);
+#ifndef NDEBUG
 
-    /* Allocate more next time */
-    if (GC_DEBUG(interp)) {
-        pool->objects_per_alloc *= GC_DEBUG_UNITS_PER_ALLOC_GROWTH_FACTOR;
-        pool->replenish_level =
-                (size_t)(pool->total_objects *
-                GC_DEBUG_REPLENISH_LEVEL_FACTOR);
-    }
-    else {
-        pool->objects_per_alloc = (size_t)(pool->objects_per_alloc *
-            UNITS_PER_ALLOC_GROWTH_FACTOR);
-        pool->replenish_level   =
-                (size_t)(pool->total_objects * REPLENISH_LEVEL_FACTOR);
-    }
+    pmc->pmc_ext     = (PMC_EXT *)0xdeadbeef;
+    pmc->vtable      = (VTABLE  *)0xdeadbeef;
 
-    /* check alloc size against maximum */
-    alloc_size = pool->object_size * pool->objects_per_alloc;
+#endif
 
-    if (alloc_size > POOL_MAX_BYTES)
-        pool->objects_per_alloc = POOL_MAX_BYTES / pool->object_size;
 }
 
 
 /*
 
-=item C<Small_Object_Pool * new_small_object_pool(size_t object_size, size_t
-objects_per_alloc)>
+=item C<static Small_Object_Pool * new_bufferlike_pool(PARROT_INTERP, size_t
+actual_buffer_size)>
+
+Creates a new pool for buffer-like structures. This is called from
+C<get_bufferlike_pool()>, and should probably not be called directly.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool *
+new_bufferlike_pool(PARROT_INTERP, size_t actual_buffer_size)
+{
+    ASSERT_ARGS(new_bufferlike_pool)
+    const int num_headers          = BUFFER_HEADERS_PER_ALLOC;
+    const size_t buffer_size       =
+            (actual_buffer_size + sizeof (void *) - 1) & ~(sizeof (void *) - 1);
+    Small_Object_Pool * const pool =
+            new_small_object_pool(buffer_size, num_headers);
+
+    pool->gc_object = NULL;
+    pool->mem_pool  = interp->arena_base->memory_pool;
+    (interp->arena_base->init_pool)(interp, pool);
+    return pool;
+}
+
+/*
+
+=item C<static Small_Object_Pool * new_small_object_pool(size_t object_size,
+size_t objects_per_alloc)>
 
 Creates a new C<Small_Object_Pool> and returns a pointer to it.
 Initializes the pool structure based on the size of objects in the
@@ -1162,7 +835,7 @@ pool and the number of items to allocate in each arena.
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Small_Object_Pool *
+static Small_Object_Pool *
 new_small_object_pool(size_t object_size, size_t objects_per_alloc)
 {
     ASSERT_ARGS(new_small_object_pool)
@@ -1179,149 +852,330 @@ new_small_object_pool(size_t object_size, size_t objects_per_alloc)
 }
 
 
+
 /*
 
-=item C<void gc_pmc_ext_pool_init(Small_Object_Pool *pool)>
+=item C<static Small_Object_Pool * new_buffer_pool(PARROT_INTERP)>
 
-Initialize the PMC_EXT pool functions. This is done separately from other
-pools.
+Creates a new C<Small_Object_Pool> structure for managing buffer objects.
+
+Non-constant strings and plain Buffers are stored in the sized header pools.
 
 =cut
 
 */
 
-void
-gc_pmc_ext_pool_init(ARGMOD(Small_Object_Pool *pool))
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool *
+new_buffer_pool(PARROT_INTERP)
 {
-    ASSERT_ARGS(gc_pmc_ext_pool_init)
-    pool->add_free_object = gc_ms_add_free_pmc_ext;
-    pool->get_free_object = gc_ms_get_free_pmc_ext;
-    pool->alloc_objects   = gc_ms_alloc_objects;
-    pool->more_objects    = gc_ms_alloc_objects;
-}
+    ASSERT_ARGS(new_buffer_pool)
+    Small_Object_Pool * const pool = get_bufferlike_pool(interp, sizeof (Buffer));
 
+#ifdef GC_IS_MALLOC
+    pool->gc_object = free_buffer_malloc;
+#else
+    pool->gc_object = free_buffer;
+#endif
+
+    return pool;
+}
 
 /*
 
-=item C<static void gc_ms_pool_init(PARROT_INTERP, Small_Object_Pool *pool)>
+=item C<static void free_buffer_malloc(PARROT_INTERP, Small_Object_Pool *pool,
+PObj *b)>
 
-Initialize a memory pool for the MS garbage collector system. Sets the
-function pointers necessary to perform basic operations on a pool, such
-as object allocation.
+Frees the given buffer, returning the storage space to the operating system
+and removing it from Parrot's memory management system. If the buffer is COW,
+The buffer is not freed if the reference count is greater then 1.
 
 =cut
 
 */
 
 static void
-gc_ms_pool_init(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool))
+free_buffer_malloc(SHIM_INTERP, SHIM(Small_Object_Pool *pool),
+        ARGMOD(PObj *b))
 {
-    ASSERT_ARGS(gc_ms_pool_init)
-    pool->add_free_object = gc_ms_add_free_object;
-    pool->get_free_object = gc_ms_get_free_object;
-    pool->alloc_objects   = gc_ms_alloc_objects;
-    pool->more_objects    = more_traceable_objects;
-}
+    ASSERT_ARGS(free_buffer_malloc)
+    /* free allocated space at (int *)bufstart - 1, but not if it used COW or is
+     * external */
+    PObj_buflen(b) = 0;
 
-
-/*
-
-=item C<void Parrot_gc_ms_init(PARROT_INTERP)>
-
-Initialize the state structures of the gc system. Called immediately before
-creation of memory pools. This function must set the function pointers
-for C<add_free_object_fn>, C<get_free_object_fn>, C<alloc_object_fn>, and
-C<more_object_fn>.
-
-=cut
-
-*/
-
-void
-Parrot_gc_ms_init(PARROT_INTERP)
-{
-    ASSERT_ARGS(Parrot_gc_ms_init)
-    Arenas * const arena_base     = interp->arena_base;
-
-    arena_base->do_gc_mark         = Parrot_gc_ms_run;
-    arena_base->finalize_gc_system = NULL;
-    arena_base->init_pool          = gc_ms_pool_init;
-}
-
-
-/*
-
-=item C<void Parrot_small_object_pool_merge(PARROT_INTERP, Small_Object_Pool
-*dest, Small_Object_Pool *source)>
-
-Merge pool C<source> into pool C<dest>. Combines the free lists directly,
-moves all arenas to the new pool, and remove the old pool. To merge, the
-two pools must have the same object size, and the same name (if they have
-names).
-
-=cut
-
-*/
-
-void
-Parrot_small_object_pool_merge(PARROT_INTERP,
-        ARGMOD(Small_Object_Pool *dest), ARGMOD(Small_Object_Pool *source))
-{
-    ASSERT_ARGS(Parrot_small_object_pool_merge)
-    Small_Object_Arena  *cur_arena;
-    void               **free_list_end;
-
-    /* XXX num_free_objects doesn't seem to be accounted correctly in, e.g.,
-     * the PMC_EXT pool.
-     */
-#if 0
-    if (source->num_free_objects == source->total_objects) {
+    if (!PObj_bufstart(b) || PObj_is_external_or_free_TESTALL(b))
         return;
+
+    if (PObj_COW_TEST(b)) {
+        INTVAL * const refcount = PObj_bufrefcountptr(b);
+
+        if (--(*refcount) == 0) {
+            mem_sys_free(refcount); /* the actual bufstart */
+        }
     }
+    else
+        mem_sys_free(PObj_bufrefcountptr(b));
+}
+
+/*
+
+=item C<static void free_buffer(PARROT_INTERP, Small_Object_Pool *pool, PObj
+*b)>
+
+Frees a buffer, returning it to the memory pool for Parrot to possibly
+reuse later.
+
+=cut
+
+*/
+
+static void
+free_buffer(SHIM_INTERP, ARGMOD(Small_Object_Pool *pool), ARGMOD(PObj *b))
+{
+    ASSERT_ARGS(free_buffer)
+    Memory_Pool * const mem_pool = (Memory_Pool *)pool->mem_pool;
+
+    /* XXX Jarkko reported that on irix pool->mem_pool was NULL, which really
+     * shouldn't happen */
+    if (mem_pool) {
+        if (!PObj_COW_TEST(b))
+            mem_pool->guaranteed_reclaimable += PObj_buflen(b);
+
+         mem_pool->possibly_reclaimable += PObj_buflen(b);
+    }
+
+    PObj_buflen(b)        = 0;
+}
+
+
+/*
+
+=item C<static Small_Object_Pool * new_string_pool(PARROT_INTERP, INTVAL
+constant)>
+
+Creates a new pool for C<STRING>s and returns it. This calls
+C<get_bufferlike_pool> internally, which in turn calls C<new_bufferlike_pool>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static Small_Object_Pool *
+new_string_pool(PARROT_INTERP, INTVAL constant)
+{
+    ASSERT_ARGS(new_string_pool)
+    Small_Object_Pool *pool;
+    if (constant) {
+        pool           = new_bufferlike_pool(interp, sizeof (STRING));
+        pool->mem_pool = interp->arena_base->constant_string_pool;
+    }
+    else
+        pool = get_bufferlike_pool(interp, sizeof (STRING));
+
+    pool->objects_per_alloc = STRING_HEADERS_PER_ALLOC;
+
+    return pool;
+}
+
+
+/*
+
+=item C<Small_Object_Pool * get_bufferlike_pool(PARROT_INTERP, size_t
+buffer_size)>
+
+Makes and return a bufferlike header pool for objects of a given size. If a
+pool for objects of that size already exists, no new pool will be created and
+the pointer to the existing pool is returned.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+Small_Object_Pool *
+get_bufferlike_pool(PARROT_INTERP, size_t buffer_size)
+{
+    ASSERT_ARGS(get_bufferlike_pool)
+    Small_Object_Pool **sized_pools = interp->arena_base->sized_header_pools;
+    const UINTVAL       num_old     = interp->arena_base->num_sized;
+    const UINTVAL       idx         = GET_SIZED_POOL_IDX(buffer_size);
+
+    /* Expands the array of sized resource pools, if necessary */
+    if (num_old <= idx) {
+        const UINTVAL num_new = idx + 1;
+        /* XXX: use mem_sys_realloc_zeroed to do this easier? If we want the
+                same debugging behavior as mem_internal_realloc, we would
+                need to add a new function/macro for
+                mem_internal_realloc_zeroed, to mirror mem_sys_realloc_zeroed. */
+        sized_pools = (Small_Object_Pool **)mem_internal_realloc(sized_pools,
+                                           num_new * sizeof (void *));
+        memset(sized_pools + num_old, 0, sizeof (void *) * (num_new - num_old));
+
+        interp->arena_base->sized_header_pools = sized_pools;
+        interp->arena_base->num_sized = num_new;
+    }
+
+    if (sized_pools[idx] == NULL)
+        sized_pools[idx] = new_bufferlike_pool(interp, buffer_size);
+
+    return sized_pools[idx];
+}
+
+/*
+
+=item C<void initialize_header_pools(PARROT_INTERP)>
+
+The initialization routine for the interpreter's header pools. Initializes
+pools for string headers, constant string headers, buffers, PMCs, PMC_EXTs, and
+constant PMCs.
+
+The C<string_header_pool> and C<buffer_header_pool> are actually both in the
+sized pools, although no other sized pools are created here.
+
+=cut
+
+*/
+
+void
+initialize_header_pools(PARROT_INTERP)
+{
+    ASSERT_ARGS(initialize_header_pools)
+    Arenas * const arena_base                     = interp->arena_base;
+
+    /* Init the constant string header pool */
+    arena_base->constant_string_header_pool       = new_string_pool(interp, 1);
+    arena_base->constant_string_header_pool->name = "constant_string_header";
+
+    /* Init the buffer header pool
+     *
+     * The buffer_header_pool and the string_header_pool actually live in the
+     * sized_header_pools. These pool pointers only provide faster access in
+     * new_*_header */
+    arena_base->buffer_header_pool       = new_buffer_pool(interp);
+    arena_base->buffer_header_pool->name = "buffer_header";
+
+    /* Init the string header pool */
+    arena_base->string_header_pool       = new_string_pool(interp, 0);
+    arena_base->string_header_pool->name = "string_header";
+
+    /* Init the PMC header pool */
+    arena_base->pmc_pool                 = new_pmc_pool(interp);
+    arena_base->pmc_pool->name           = "pmc";
+
+    /* pmc extension buffer */
+    arena_base->pmc_ext_pool             =
+        new_small_object_pool(sizeof (PMC_EXT), 1024);
+
+#if PARROT_GC_MS
+    /*
+     * pmc_ext isn't a managed item. If a PMC has a pmc_ext structure
+     * it is returned to the pool instantly - the structure is never
+     * marked.
+     * Use GS MS pool functions
+     */
+    gc_ms_pmc_ext_pool_init(arena_base->pmc_ext_pool);
+#else
+    /* rational, consistant behavior (as yet unwritten) */
 #endif
 
-    /* PARROT_ASSERT(source->total_objects); */
-    PARROT_ASSERT(dest->object_size == source->object_size);
-    PARROT_ASSERT((dest->name == NULL && source->name == NULL)
-                || STREQ(dest->name, source->name));
+    arena_base->pmc_ext_pool->name = "pmc_ext";
 
-    dest->total_objects += source->total_objects;
+    /* constant PMCs */
+    arena_base->constant_pmc_pool                    = new_pmc_pool(interp);
+    arena_base->constant_pmc_pool->name              = "constant_pmc";
+    arena_base->constant_pmc_pool->objects_per_alloc =
+        CONSTANT_PMC_HEADERS_PER_ALLOC;
+}
 
-    /* append new free_list to old */
-    /* XXX this won't work with, e.g., gc_gms */
-    free_list_end  = &dest->free_list;
 
-    while (*free_list_end)
-        free_list_end = (void **)*free_list_end;
+/*
 
-    *free_list_end = source->free_list;
+=item C<int header_pools_iterate_callback(PARROT_INTERP, int flag, void *arg,
+pool_iter_fn func)>
 
-    /* now append source arenas */
-    cur_arena = source->last_Arena;
+Iterates through header pools, invoking the given callback function on each
+pool in the list matching the given criteria. Determines which pools to iterate
+over depending on flags passed to the function.  Returns the callback's return
+value, if non-zero. A non-zero return value from the callback function will
+terminate the iteration prematurely.
 
-    while (cur_arena) {
-        size_t                     total_objects;
-        Small_Object_Arena * const next_arena = cur_arena->prev;
+=over 4
 
-        cur_arena->next = cur_arena->prev = NULL;
+=item flag is one of
 
-        total_objects   = cur_arena->total_objects;
+  POOL_PMC
+  POOL_BUFFER
+  POOL_CONST
+  POOL_ALL
 
-        Parrot_append_arena_in_pool(interp, dest, cur_arena,
-            cur_arena->total_objects);
+Only matching pools will be used. Notice that it is not possible to iterate
+over certain sets of pools using the provided flags in the single pass. For
+instance, both the PMC pool and the constant PMC pool cannot be iterated over
+in a single pass.
 
-        /* XXX needed? */
-        cur_arena->total_objects = total_objects;
+=item arg
 
-        cur_arena = next_arena;
+This argument is passed on to the iteration function.
+
+=item pool_iter_fn
+
+Called with C<(Parrot_Interp, Small_Object_Pool *, int flag, void *arg)>.  If
+the function returns a non-zero value, iteration will stop.
+
+=back
+
+=cut
+
+*/
+
+PARROT_IGNORABLE_RESULT
+int
+header_pools_iterate_callback(PARROT_INTERP, int flag, ARGIN_NULLOK(void *arg),
+        NOTNULL(pool_iter_fn func))
+{
+    ASSERT_ARGS(header_pools_iterate_callback)
+    Arenas * const arena_base = interp->arena_base;
+
+    if (flag & POOL_PMC) {
+        Small_Object_Pool *pool = flag & POOL_CONST
+            ? arena_base->constant_pmc_pool
+            : arena_base->pmc_pool;
+
+        const int ret_val = (func)(interp, pool,
+            flag & (POOL_PMC | POOL_CONST) , arg);
+
+        if (ret_val)
+            return ret_val;
     }
 
-    /* remove things from source */
-    /* XXX is this enough? */
-    source->last_Arena       = NULL;
-    source->free_list        = NULL;
-    source->total_objects    = 0;
-    source->num_free_objects = 0;
+    if (flag & POOL_BUFFER) {
+        INTVAL i;
+
+        if (flag & POOL_CONST) {
+            const int ret_val = (func)(interp,
+                arena_base->constant_string_header_pool,
+                POOL_BUFFER | POOL_CONST, arg);
+
+            if (ret_val)
+                return ret_val;
+        }
+
+        for (i = interp->arena_base->num_sized - 1; i >= 0; --i) {
+            Small_Object_Pool * const pool = arena_base->sized_header_pools[i];
+
+            if (pool) {
+                const int ret_val = (func)(interp, pool, POOL_BUFFER, arg);
+                if (ret_val)
+                    return ret_val;
+            }
+        }
+    }
+
+    return 0;
 }
 
 

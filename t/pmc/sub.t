@@ -9,7 +9,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 68;
+use Parrot::Test tests => 69;
 use Parrot::Config;
 
 =head1 NAME
@@ -1588,6 +1588,39 @@ compiled
 MAIN
 lived
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', '.get_subid' );
+.sub 'main'
+    .const 'Sub' foo = 'foo'
+    $S0 = foo.'get_subid'()
+    say $S0
+
+    $P0 = get_global 'bar'
+    $S0 = $P0.'get_subid'()
+    say $S0
+
+    $P0 = get_global 'baz'
+    $S0 = $P0.'get_subid'()
+    say $S0
+.end
+
+.sub '' :subid('foo')
+    say 'foo'
+.end
+
+.sub 'bar'
+    say 'bar'
+.end
+
+.sub 'baz' :subid('bazsubid')
+    say 'baz'
+.end
+CODE
+foo
+bar
+bazsubid
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

@@ -497,6 +497,16 @@ STRING * string_make(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * string_make_from_charset(PARROT_INTERP,
+    ARGIN_NULLOK(const char *buffer),
+    UINTVAL len,
+    INTVAL charset_nr,
+    UINTVAL flags)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL string_max_bytes(SHIM_INTERP, ARGIN(const STRING *s), UINTVAL nchars)
         __attribute__nonnull__(2);
 
@@ -507,6 +517,7 @@ INTVAL string_ord(PARROT_INTERP, ARGIN_NULLOK(const STRING *s), INTVAL idx)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 const char* string_primary_encoding_for_representation(PARROT_INTERP,
     parrot_string_representation_t representation)
         __attribute__nonnull__(1);
@@ -708,6 +719,8 @@ STRING* Parrot_str_from_uint(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(s)
 #define ASSERT_ARGS_string_make __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_string_make_from_charset __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_string_max_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(s)

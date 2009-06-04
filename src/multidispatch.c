@@ -1356,10 +1356,6 @@ Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
         /* Create an NCI sub for the C function */
         PMC    *sub_obj       = constant_pmc_new(interp, enum_class_NCI);
 
-#ifdef PARROT_HAS_ALIGNED_FUNCPTR
-        PARROT_ASSERT((PTR2UINTVAL(func_ptr) & 3) == 0);
-#endif
-
         VTABLE_set_pointer_keyed_str(interp, sub_obj, short_sig,
                                      F2DPTR(func_ptr));
 

@@ -1269,7 +1269,7 @@ gc_gms_set_gen(PARROT_INTERP)
         plan.merge_gen = 1;
     else
         gmsp->current_gen_no = 1;
-    Parrot_forall_header_pools(interp, POOL_ALL, &plan, set_gen_cb);
+    header_pools_iterate_callback(interp, POOL_ALL, &plan, set_gen_cb);
 }
 
 /*
@@ -1543,7 +1543,7 @@ gc_gms_init_mark(PARROT_INTERP)
     arena_base->num_early_PMCs_seen = 0;
     arena_base->num_extended_PMCs   = 0;
 
-    Parrot_forall_header_pools(interp, POOL_ALL, 0, init_mark_cb);
+    header_pools_iterate_callback(interp, POOL_ALL, 0, init_mark_cb);
 }
 
 /*
@@ -1594,7 +1594,7 @@ gc_gms_trace_root(PARROT_INTERP, int trace_stack)
 
     if (ret == 0)
         return 0;
-    Parrot_forall_header_pools(interp, POOL_ALL, 0, trace_igp_cb);
+    header_pools_iterate_callback(interp, POOL_ALL, 0, trace_igp_cb);
     return ret;
 }
 
@@ -1661,7 +1661,7 @@ static int
 gc_gms_trace_children(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_trace_children)
-    return !Parrot_forall_header_pools(interp, POOL_PMC, 0,
+    return !header_pools_iterate_callback(interp, POOL_PMC, 0,
             trace_children_cb);
 }
 
@@ -1789,8 +1789,8 @@ static void
 gc_gms_sweep(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_sweep)
-    Parrot_forall_header_pools(interp, POOL_PMC, 0, sweep_cb_pmc);
-    Parrot_forall_header_pools(interp, POOL_BUFFER, 0, sweep_cb_buf);
+    header_pools_iterate_callback(interp, POOL_PMC, 0, sweep_cb_pmc);
+    header_pools_iterate_callback(interp, POOL_BUFFER, 0, sweep_cb_buf);
 }
 
 /*
@@ -1835,7 +1835,7 @@ static void
 gc_gms_end_cycle(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_end_cycle)
-    Parrot_forall_header_pools(interp, POOL_ALL, 0, end_cycle_cb);
+    header_pools_iterate_callback(interp, POOL_ALL, 0, end_cycle_cb);
 }
 
 /*
@@ -1875,7 +1875,7 @@ parrot_gc_gms_run(PARROT_INTERP, UINTVAL flags)
 
         pool->white = pool->marker.next;
         /* XXX need to sweep over objects that have finalizers only */
-        Parrot_forall_header_pools(interp, POOL_PMC, 0, sweep_cb_pmc);
+        header_pools_iterate_callback(interp, POOL_PMC, 0, sweep_cb_pmc);
         gc_gms_end_cycle(interp);
         --arena_base->gc_mark_block_level;
         return;

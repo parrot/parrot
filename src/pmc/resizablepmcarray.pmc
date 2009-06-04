@@ -69,10 +69,12 @@ Resizes the array to C<size> elements.
 
             }
             else {
-
                 SUPER(size);
                 PMC_threshold(SELF) = size;
             }
+        }
+        else if (size == PMC_size(SELF)) {
+            return;
         }
         else if (size <= PMC_threshold(SELF)) {
 
@@ -81,7 +83,6 @@ Resizes the array to C<size> elements.
             return;
         }
         else {
-
             INTVAL i, cur, needed;
             i = cur = PMC_threshold(SELF);
             if (cur < 8192)
@@ -92,8 +93,10 @@ Resizes the array to C<size> elements.
                 cur   &= ~0xfff;
             }
 
-            PMC_array(SELF) = (PMC **)mem_sys_realloc(PMC_array(SELF),
-                    cur * sizeof (PMC *));
+            if (cur < 8)
+                cur = 8;
+
+            PMC_array(SELF) = mem_realloc_n_typed(PMC_array(SELF), cur, PMC *);
 
             for (; i < cur; i++) {
                 (PMC_array(SELF))[i] = PMCNULL;

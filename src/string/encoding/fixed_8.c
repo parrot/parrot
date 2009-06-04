@@ -34,6 +34,17 @@ static UINTVAL codepoints(PARROT_INTERP, ARGIN(STRING *source_string))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL find_cclass(PARROT_INTERP,
+    ARGIN(STRING *s),
+    ARGIN(const INTVAL *typetable),
+    INTVAL flags,
+    UINTVAL pos,
+    UINTVAL end)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 static UINTVAL fixed8_get_next(PARROT_INTERP, ARGMOD(String_iter *iter))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -163,6 +174,10 @@ static STRING * to_encoding(PARROT_INTERP,
 #define ASSERT_ARGS_codepoints __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(source_string)
+#define ASSERT_ARGS_find_cclass __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(s) \
+    || PARROT_ASSERT_ARG(typetable)
 #define ASSERT_ARGS_fixed8_get_next __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(iter)
@@ -276,6 +291,33 @@ set_codepoint(PARROT_INTERP, ARGIN(STRING *source_string),
 {
     ASSERT_ARGS(set_codepoint)
     set_byte(interp, source_string, offset, codepoint);
+}
+
+
+/*
+
+=item C<static UINTVAL find_cclass(PARROT_INTERP, STRING *s, const INTVAL
+*typetable, INTVAL flags, UINTVAL pos, UINTVAL end)>
+
+codepoints are bytes, so delegate
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static UINTVAL
+find_cclass(PARROT_INTERP, ARGIN(STRING *s), ARGIN(const INTVAL *typetable),
+INTVAL flags, UINTVAL pos, UINTVAL end)
+{
+    ASSERT_ARGS(find_cclass)
+    unsigned char *contents = (unsigned char *)s->strstart;
+    for (; pos < end; ++pos) {
+        if ((typetable[contents[pos]] & flags) != 0) {
+            return pos;
+        }
+    }
+    return end;
 }
 
 /*
@@ -652,7 +694,8 @@ Parrot_encoding_fixed_8_init(PARROT_INTERP)
         become_encoding,
         codepoints,
         bytes,
-        iter_init
+        iter_init,
+        find_cclass
 
     };
     STRUCT_COPY_FROM_STRUCT(return_encoding, base_encoding);

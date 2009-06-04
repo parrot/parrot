@@ -19,7 +19,7 @@ Tests mainly morphing undef to other types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(19)
+    plan(21)
 
     morph_to_string()
     undef_pmc_is_false()
@@ -33,6 +33,7 @@ Tests mainly morphing undef to other types.
     check_whether_interface_is_done()
     verify_clone_works()
     undef_equals_undef()
+    set_undef_to_object()
 .end
 
 .sub morph_to_string
@@ -166,6 +167,21 @@ Tests mainly morphing undef to other types.
     ok( 1, 'Undef == Undef (RT #33603)' )
 .end
 
+.sub set_undef_to_object
+    $P0 = new "Undef"
+    $P2 = new 'Integer'
+    assign $P0, $P2
+    ok( 1, 'Assign Integer to Undef' )
+
+    $P0 = new "Undef"
+    $P1 = newclass "HI"
+    $P2 = new $P1
+    assign $P0, $P2
+    ok( 1, 'Assign Object to Undef' )
+
+    # TODO: Needs tests to verify that the values and metadata are preserved
+    #       across the assignment
+.end
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

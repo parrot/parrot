@@ -9,7 +9,7 @@ JSON.pir - PIR implementation of JSON data interchange format.
 
 Use the C<_json> method to generate a JSON representation of a PMC.
 
- .include 'library/JSON.pir'
+ load_bytecode 'JSON.pir'
  $S0 = _json( $P0 )
 
 To generate a PMC from a JSON string, see L<compilers/json/JSON.pir>.

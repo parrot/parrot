@@ -54,6 +54,9 @@ our %file_types_info = (
     perl => {
         comment_type    => '#',
     },
+    pir => {
+        comment_type    => '#',
+    },
 );
 
 =item C<cc_gen()>
@@ -358,6 +361,9 @@ sub genfile {
         }
         elsif ($target =~ m/\.pmc$/ ) {
             $options{file_type} = 'pmc';
+        }
+        elsif ($target =~ m/\.pir$/ ) {
+            $options{file_type} = 'pir';
         }
     } elsif ( $options{file_type} eq 'none' ) {
         delete $options{file_type};

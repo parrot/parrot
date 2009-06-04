@@ -71,16 +71,17 @@ the rendered JSON will not be formatted. The default is false.
     expanded = not compact
 
     # render the object as a string.
+    load_bytecode 'JSON.pir'
     .local string output
     output = _json( config, expanded )
 
     # write out the file..
     $P1 = open filename, 'w'
     print $P1, output
+    print $P1, "\n"
     close $P1
 
 .end
-.include 'library/JSON.pir'
 
 # Local Variables:
 #   mode: pir

@@ -31,6 +31,17 @@ extern "C" {
 #endif
 #endif
 
+#ifdef PIO_OS_WIN32
+#  define PIO_INVALID_HANDLE INVALID_HANDLE_VALUE
+#endif
+
+#ifdef PIO_OS_UNIX
+#  define PIO_INVALID_HANDLE -1
+#endif
+
+#ifdef PIO_OS_STDIO
+#  define PIO_INVALID_HANDLE NULL
+#endif
 
 pmclass FileHandle need_ext {
     ATTR INTVAL flags;                /* Filehandle flags             */
@@ -38,6 +49,7 @@ pmclass FileHandle need_ext {
     ATTR STRING *mode;                /* The mode string used in open */
     ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
+    ATTR INTVAL process_id;           /* Child process on pipes       */
     ATTR PIOOFF_T file_size;          /* Current file size            */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
     ATTR PIOOFF_T last_pos;           /* Last file position           */
@@ -46,6 +58,12 @@ pmclass FileHandle need_ext {
     ATTR unsigned char *buffer_start; /* Start of buffer              */
     ATTR unsigned char *buffer_end;   /* End of buffer                */
     ATTR unsigned char *buffer_next;  /* Current read/write pointer   */
+
+/*
+ * Using INTVAL for process_id is a temporary solution.
+ * We may need to define a custom type to store it in a platform
+ * dependant way.
+ */
 
 /*
 
@@ -61,30 +79,23 @@ Initializes a newly created FileHandle object.
         Parrot_FileHandle_attributes *data_struct =
                 mem_allocate_typed(Parrot_FileHandle_attributes);
 
-        PMC_data(SELF)            = data_struct;
-        data_struct->flags        = 0;
-        data_struct->mode         = NULL;
-        data_struct->encoding     = NULL;
-        data_struct->filename     = NULL;
-        data_struct->file_size    = 0;
-        data_struct->file_pos     = piooffsetzero;
-        data_struct->last_pos     = piooffsetzero;
-        data_struct->buffer_flags = 0;
-        data_struct->buffer_size  = 0;
-        data_struct->buffer_start = NULL;
-        data_struct->buffer_end   = NULL;
-        data_struct->buffer_next  = NULL;
+        PMC_data(SELF)             = data_struct;
+        data_struct->flags         = 0;
+        data_struct->filename      = NULL;
+        data_struct->mode          = NULL;
+        data_struct->encoding      = NULL;
+        data_struct->process_id    = 0;
+        data_struct->file_size     = 0;
+        data_struct->file_pos      = piooffsetzero;
+        data_struct->last_pos      = piooffsetzero;
+        data_struct->buffer_size   = 0;
+        data_struct->buffer_flags  = 0;
+        data_struct->buffer_start  = NULL;
+        data_struct->buffer_end    = NULL;
+        data_struct->buffer_next   = NULL;
 
         /* Initialize the os_handle to the platform-specific value for closed. */
-#ifdef PIO_OS_WIN32
-    data_struct->os_handle    = (PIOHANDLE)INVALID_HANDLE_VALUE;
-#endif
-#ifdef PIO_OS_UNIX
-    data_struct->os_handle    = (PIOHANDLE)-1;
-#endif
-#ifdef PIO_OS_STDIO
-    data_struct->os_handle    = (PIOHANDLE)NULL;
-#endif
+        data_struct->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
 
         PObj_custom_mark_SET(SELF);
         PObj_active_destroy_SET(SELF);
@@ -155,6 +166,50 @@ Free structures.
 
             mem_sys_free(PARROT_FILEHANDLE(SELF));
             PMC_data(SELF) = NULL;
+        }
+    }
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Shortcut to get the value of some attributes.
+For internal usage only, subject to change without notice.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+        INTVAL result;
+        switch (key) {
+            case 0:
+                GET_ATTR_process_id(INTERP, SELF, result);
+                break;
+            default:
+                result = 0;
+        }
+        return result;
+    }
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Shortcut to set the value of some attributes
+For internal usage only, subject to change without notice.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        switch (key) {
+            case 0:
+                SET_ATTR_process_id(INTERP, SELF, value);
+                break;
+            default:
+                break;
         }
     }
 
@@ -341,9 +396,9 @@ Read a line from the filehandle and return it in a string.
 */
 
     METHOD readline_interactive(STRING *prompt :optional, INTVAL got_prompt :opt_flag) {
-        STRING *string_result;
+        STRING *string_result = NULL;
 #ifdef PARROT_HAS_READLINE
-        char * const r = readline(got_prompt ? prompt->strstart : NULL);
+    char * const r = readline(got_prompt ? prompt->strstart : NULL);
 
         if (r) {
             if (*r)
@@ -351,13 +406,8 @@ Read a line from the filehandle and return it in a string.
 
             string_result = Parrot_str_new(INTERP, r, 0);
             mem_sys_free(r);
-            RETURN(STRING *string_result);
         }
-
-        RETURN(PMC *PMCNULL);
 #else
-        UINTVAL len;
-
         if (got_prompt)
             fprintf(stderr, "%s", prompt->strstart);
 
@@ -365,21 +415,22 @@ Read a line from the filehandle and return it in a string.
             Parrot_io_setlinebuf(INTERP, SELF);
 
         string_result = Parrot_io_reads(INTERP, SELF, 0);
-        if (!string_result)
-            RETURN(PMC *PMCNULL);
-        len = Parrot_str_byte_length(INTERP, string_result);
-        if (len < 1)
-            RETURN(PMC *PMCNULL);
-        while (len > 0 &&
-                (((char*)string_result->strstart)[len - 1] == '\n' ||
-                 ((char*)string_result->strstart)[len - 1] == '\r')) {
-            --len;
-            --string_result->strlen;
-            --string_result->bufused;
+        if (string_result) {
+            UINTVAL len = Parrot_str_byte_length(INTERP, string_result);
+            if (len < 1)
+                string_result = NULL;
+            else {
+                while (len > 0 &&
+                        (((char*)string_result->strstart)[len - 1] == '\n' ||
+                         ((char*)string_result->strstart)[len - 1] == '\r')) {
+                    --len;
+                    --string_result->strlen;
+                    --string_result->bufused;
+                }
+            }
         }
-
-        RETURN(STRING *string_result);
 #endif
+        RETURN(STRING *string_result);
     }
 
 /*

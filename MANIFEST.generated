@@ -2,10 +2,10 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.1.1.0.dylib                    [main]lib
+blib/lib/libparrot.1.2.0.dylib                    [main]lib
 blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
-blib/lib/libparrot.so.1.1.0                       [main]lib
+blib/lib/libparrot.so.1.2.0                       [main]lib
 blib/lib/libparrot.so                             [main]lib
 compilers/json/JSON/grammar.pbc                   [json]
 compilers/json/JSON.pbc                           [json]
@@ -131,15 +131,21 @@ runtime/parrot/include/tm.pasm                    [main]
 runtime/parrot/include/vtable_methods.pasm        [main]
 runtime/parrot/include/warnings.pasm              [main]
 runtime/parrot/library/CGI/QueryHash.pbc          [main]
+runtime/parrot/library/Config/JSON.pbc            [main]
 runtime/parrot/library/config.pbc                 [main]
 runtime/parrot/library/config.pir                 [main]
+runtime/parrot/library/Crow.pbc                   [main]
 runtime/parrot/library/Data/Dumper/Base.pbc       [main]
 runtime/parrot/library/Data/Dumper/Default.pbc    [main]
 runtime/parrot/library/Data/Dumper.pbc            [main]
+runtime/parrot/library/Data/Replace.pbc           [main]
+runtime/parrot/library/Digest/MD5.pbc             [main]
 runtime/parrot/library/dumper.pbc                 [main]
 runtime/parrot/library/Getopt/Obj.pbc             [main]
+runtime/parrot/library/HTTP/Daemon.pbc            [main]
 runtime/parrot/library/Iter.pbc                   [main]
 runtime/parrot/library/JSON.pbc                   [main]
+runtime/parrot/library/libpcre.pbc                [main]
 runtime/parrot/library/Math/Random/mt19937ar.pbc  [main]
 runtime/parrot/library/Math/Rand.pbc              [main]
 runtime/parrot/library/MIME/Base64.pbc            [main]
@@ -178,7 +184,15 @@ runtime/parrot/library/Stream/ParrotIO.pbc        [main]
 runtime/parrot/library/Stream/Replay.pbc          [main]
 runtime/parrot/library/Stream/Sub.pbc             [main]
 runtime/parrot/library/Stream/Writer.pbc          [main]
+runtime/parrot/library/Tcl/Glob.pbc               [main]
 runtime/parrot/library/TclLibrary.pbc             [main]
+runtime/parrot/library/Test/Builder/Test.pbc      [main]
+runtime/parrot/library/Test/Builder/Tester.pbc    [main]
+runtime/parrot/library/Test/Builder/TestPlan.pbc  [main]
+runtime/parrot/library/Test/Builder/Output.pbc    [main]
+runtime/parrot/library/Test/Builder.pbc           [main]
+runtime/parrot/library/Test/Class.pbc             [main]
+runtime/parrot/library/Test/More.pbc              [main]
 runtime/parrot/library/TGE.pbc                    [tge]
 runtime/parrot/library/YAML/Dumper/Base.pmc       [main]
 runtime/parrot/library/YAML/Dumper/Default.pmc    [main]

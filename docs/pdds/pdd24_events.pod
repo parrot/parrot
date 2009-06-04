@@ -82,8 +82,8 @@ to process is as cheap as possible, so it may be queried at regular intervals.
 
 =head3 Event API
 
-An event is a PMC object that contains a type, data for the event, and a
-priority.
+An event is a Task PMC object that contains a type, data for the event,
+and a priority.
 
 The type of an event is only used to match the event with an event handler,
 but is notionally similar to the class of an object.
@@ -99,19 +99,24 @@ events below a certain threshold of priority. When the central scheduler
 ignores an event because of its priority level, the event remains in the task
 list until the priority threshold changes.
 
-An instance of the Event PMC has 3 internal attributes, which are:
+An instance of the Task PMC acting as an event uses 4 internal
+attributes, which are:
 
 =over 4
 
 =item 1
 
-The type of the event
+The type of the task, which is "event"
 
 =item 2
 
-The priority of the event
+The subtype of this particular event
 
 =item 3
+
+The priority of the event
+
+=item 4
 
 A PMC containing any additional data associated with the event, which may be
 used by the event handler.
@@ -243,17 +248,26 @@ The following opcodes are used with the event system:
 
 =item new
 
+=begin PIR_FRAGMENT
+
   $P1 = new 'Event'
   $P1 = new 'EventHandler'
   $P1 = new 'EventHandler', $P2
+
+=end PIR_FRAGMENT
+
 
 Creates a new event or event handler.
 
 =item schedule
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'Event'
   # set attributes
   schedule $P0
+
+=end PIR_FRAGMENT
 
 Register an event with the concurrency scheduler. If the concurrency scheduler
 for this interpreter (thread/clustered instance) is linked to another
@@ -265,9 +279,13 @@ non-fatal, whether it's a timer, etc) are stored within the event PMC.
 
 =item addhandler
 
+=begin PIR_FRAGMENT
+
   $P0 = new 'EventHandler'
   # set attributes
   addhandler $P0
+
+=end PIR_FRAGMENT
 
 Register an event handler with the concurrency scheduler. If the concurrency
 scheduler for this interpreter (thread/clustered instance) is linked to

@@ -29,6 +29,7 @@ typedef void (*encoding_set_bytes_t)(PARROT_INTERP, STRING *src, UINTVAL offset,
 typedef void (*encoding_become_encoding_t)(PARROT_INTERP, STRING *src);
 typedef UINTVAL (*encoding_codepoints_t)(PARROT_INTERP, STRING *src);
 typedef UINTVAL (*encoding_bytes_t)(PARROT_INTERP, STRING *src);
+typedef UINTVAL (*encoding_find_cclass_t)(PARROT_INTERP, STRING *s, const INTVAL *typetable, INTVAL flags, UINTVAL offset, UINTVAL count);
 
 /* iterator support */
 
@@ -55,6 +56,7 @@ struct _encoding {
     encoding_codepoints_t               codepoints;
     encoding_bytes_t                    bytes;
     encoding_iter_init_t                iter_init;
+    encoding_find_cclass_t              find_cclass;
 };
 
 typedef struct _encoding ENCODING;
@@ -218,6 +220,8 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     ((src)->encoding)->bytes((i), (src))
 #define ENCODING_ITER_INIT(i, src, iter) \
     ((src)->encoding)->iter_init((i), (src), (iter))
+#define ENCODING_FIND_CCLASS(i, src, typetable, flags, pos, end) \
+    ((src)->encoding)->find_cclass((i), (src), (typetable), (flags), (pos), (end))
 
 #endif /* PARROT_ENCODING_H_GUARD */
 

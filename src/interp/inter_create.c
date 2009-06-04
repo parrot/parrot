@@ -20,6 +20,7 @@ Create or destroy a Parrot interpreter
 
 
 #include "parrot/parrot.h"
+#include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
 #include "../compilers/imcc/imc.h"
 #include "inter_create.str"
@@ -374,10 +375,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
   */
 
     /* we destroy all child interpreters and the last one too,
-     * if the --leak-test commandline was given
-     */
-    if (! (interp->parent_interpreter ||
-                Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
+     * if the --leak-test commandline was given */
+    if (! (interp->parent_interpreter
+    ||    Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
         return;
 
     if (interp->parent_interpreter
@@ -419,9 +419,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         interp->profile = NULL;
     }
 
-    /* deinit op_lib */
-    (void) PARROT_CORE_OPLIB_INIT(0);
-
     destroy_context(interp);
     destroy_runloop_jump_points(interp);
 
@@ -432,6 +429,8 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     /* strings, charsets, encodings - only once */
     Parrot_str_finish(interp);
+
+    PARROT_CORE_OPLIB_INIT(0);
 
     if (!interp->parent_interpreter) {
         if (interp->thread_data)
@@ -444,6 +443,9 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
         if (interp->n_libs > 0) {
             mem_sys_free(interp->op_info_table);
             mem_sys_free(interp->op_func_table);
+
+            /* deinit op_lib */
+            Parrot_runcore_destroy(interp);
         }
 
         MUTEX_DESTROY(interpreter_array_mutex);

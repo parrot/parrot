@@ -85,19 +85,20 @@ pointer.
     VTABLE void mark() {
         Parrot_CPointer_attributes * const data = PARROT_CPOINTER(SELF);
 
-        if (data->sig)
+        if (data->sig) {
             Parrot_gc_mark_PObj_alive(interp, (PObj *)data->sig);
 
-        if (data->pointer) {
-            if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
-                PMC ** const pmc_pointer = (PMC **) data->pointer;
-                PARROT_ASSERT(*pmc_pointer);
-                Parrot_gc_mark_PObj_alive(interp, (PObj *) *pmc_pointer);
-            }
-            else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "S"))) {
-                STRING ** const str_pointer = (STRING **) data->pointer;
-                PARROT_ASSERT(*str_pointer);
-                Parrot_gc_mark_PObj_alive(interp, (PObj *) *str_pointer);
+            if (data->pointer) {
+                if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "P"))) {
+                    PMC ** const pmc_pointer = (PMC **) data->pointer;
+                    PARROT_ASSERT(*pmc_pointer);
+                    Parrot_gc_mark_PObj_alive(interp, (PObj *) *pmc_pointer);
+                }
+                else if (Parrot_str_equal(interp, data->sig, CONST_STRING(interp, "S"))) {
+                    STRING ** const str_pointer = (STRING **) data->pointer;
+                    PARROT_ASSERT(*str_pointer);
+                    Parrot_gc_mark_PObj_alive(interp, (PObj *) *str_pointer);
+                }
             }
         }
     }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -46,7 +46,7 @@ Initializes the library with a C<NULL> oplib init function.
 */
 
     VTABLE void init() {
-        Parrot_ParrotLibrary_attributes *attrs =
+        Parrot_ParrotLibrary_attributes * const attrs =
             mem_allocate_zeroed_typed(Parrot_ParrotLibrary_attributes);
         PMC_data(SELF) = attrs;
         PObj_active_destroy_SET(SELF);
@@ -81,7 +81,7 @@ Creates and returns a clone of the library.
 */
 
     VTABLE PMC *clone() {
-        PMC *dest            = pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const dest     = pmc_new(INTERP, SELF->vtable->base_type);
         PMC_oplib_init(dest) = PMC_oplib_init(SELF);
         PMC_dlhandle(dest)   = PMC_dlhandle(SELF);
 
@@ -116,8 +116,8 @@ Returns the name of the loaded library.
 */
 
     VTABLE STRING *get_string() {
-        STRING *key  = CONST_STRING(INTERP, "_filename");
-        PMC    *prop = VTABLE_getprop(INTERP, SELF, key);
+        STRING * const key  = CONST_STRING(INTERP, "_filename");
+        PMC    * const prop = VTABLE_getprop(INTERP, SELF, key);
 
         return VTABLE_get_string(INTERP, prop);
     }

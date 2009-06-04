@@ -1166,8 +1166,6 @@ Creates a new PMC object of the type of the class and calls init().
 
     VTABLE PMC *instantiate(PMC *init) {
         Parrot_Class_attributes  * const _class = PARROT_CLASS(SELF);
-
-        Parrot_Object_attributes *obj_guts;
         PMC                      *object;
 
         /* If we've not been instantiated before... */
@@ -1236,10 +1234,8 @@ Creates a new PMC object of the type of the class and calls init().
 
         /* Initialize the object's underlying structure, pointing it to this
          * class. */
-        obj_guts               = mem_allocate_zeroed_typed(Parrot_Object_attributes);
-        obj_guts->_class       = SELF;
-        PMC_data(object)       = obj_guts;
-        obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
+        PMC_data(object) =
+            (Parrot_Object_attributes *)Parrot_oo_new_object_attrs(interp, SELF);
 
         if (!PMC_IS_NULL(init)) {
             /* Initialize attributes with the supplied values. */
@@ -1783,19 +1779,9 @@ C<add_method> vtable method.
 =cut
 
 */
-    METHOD add_method(STRING *name, PMC *sub,
-                              int vtable     :optional :named("vtable"),
-                              int has_vtable :opt_flag,
-                              int anon       :optional :named("anon"),
-                              int has_anon   :opt_flag)
+    METHOD add_method(STRING *name, PMC *sub)
     {
-        /* If it's a vtable method... */
-        if (has_vtable && vtable)
-            VTABLE_add_vtable_override(interp, SELF, name, sub);
-
-        /* Provided it's not anonymous, add it to the methods list. */
-        if (!has_anon || !anon)
-            SELF.add_method(name, sub);
+        SELF.add_method(name, sub);
     }
 
 /*

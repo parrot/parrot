@@ -352,6 +352,14 @@ get_path(PARROT_INTERP, ARGMOD_NULLOK(STRING *lib), ARGOUT(void **handle),
             return path;
     }
 #endif
+
+    /* And after-finally,  let the OS use his own search */
+    if (!STRING_IS_EMPTY(lib)) {
+        *handle = dlopen_string(interp, lib);
+        if (*handle)
+            return lib;
+    }
+
     err = Parrot_dlerror();
     Parrot_warn(interp, PARROT_WARNINGS_DYNEXT_FLAG,
                 "Couldn't load '%Ss': %s\n",

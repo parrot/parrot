@@ -353,6 +353,8 @@ static const jit_arch_info arch_info = {
  * and finally you need an interface function to return above structure
  */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const jit_arch_info *
 Parrot_jit_init(PARROT_INTERP)
 {

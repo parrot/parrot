@@ -94,10 +94,10 @@ header file.
 
 PARROT_EXPORT
 FLOATVAL
-floatval_divide_by_zero(PARROT_INTERP, FLOATVAL num)
+floatval_divide_by_zero(SHIM_INTERP, FLOATVAL num)
 {
     ASSERT_ARGS(floatval_divide_by_zero)
-    FLOATVAL zero = 0.0;
+    const FLOATVAL zero = 0.0;
     return num / zero;
 }
 

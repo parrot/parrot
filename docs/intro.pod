@@ -277,27 +277,61 @@ with a C<#> are comments.
 PIR provides a bit of syntactic sugar that makes it look more high level than
 assembly. For example:
 
+=begin PIR_FRAGMENT
+
+  .local pmc temp, i
   temp = i * i
+
+=end PIR_FRAGMENT
 
 Is just another way of writing the more assembly-ish:
 
+=begin PIR_FRAGMENT
+
+  .local pmc temp, i
   mul temp, i, i
 
+=end PIR_FRAGMENT
+
 And:
 
+=begin PIR_FRAGMENT
+
+  .local pmc i, maxnum
   if i <= maxnum goto loop
+  # ...
+  loop:
+
+=end PIR_FRAGMENT
 
 Is the same as:
 
+=begin PIR_FRAGMENT
+
+  .local pmc i, maxnum
   le i, maxnum, loop
+  # ...
+  loop:
+
+=end PIR_FRAGMENT
 
 And:
 
+=begin PIR_FRAGMENT
+
+  .local pmc temp, total
   total += temp
 
+=end PIR_FRAGMENT
+
 Is the same as:
 
+=begin PIR_FRAGMENT
+
+  .local pmc  temp, total
   add total, temp
+
+=end PIR_FRAGMENT
 
 As a rule, whenever a Parrot instruction modifies the contents of a register,
 that will be the first register when writing the instruction in assembly form.
@@ -361,9 +395,14 @@ by the name C<n> for the rest of the sub.
 Much of what follows has been seen in previous examples, apart from the line
 reading:
 
+=begin PIR_FRAGMENT
+
+  .local pmc result, factorial
   result = factorial($I0)
 
-This single line of PIR actually represents a few lines of PASM. The assembler
+=end PIR_FRAGMENT
+
+The last line of PIR actually represents a few lines of PASM. The assembler
 builds a PMC that describes the signature, including which register the
 arguments are held in. A similar process happens for providing the registers
 that the return values should be placed in. Finally, the C<factorial> sub is 

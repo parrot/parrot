@@ -31,6 +31,7 @@ my %platforms = map { $_ => 1 } qw/
     hpux
     irix
     linux
+    netbsd
     openbsd
     solaris
     MSWin32

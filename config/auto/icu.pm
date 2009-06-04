@@ -299,6 +299,7 @@ sub _try_icuconfig {
         print "Trying $arg->{icuconfig} with '--prefix'\n"
             if $arg->{verbose};
         $icuheaders = capture_output("$arg->{icuconfig} --prefix");
+        chomp($icuheaders);
         print "icuheaders:  captured $icuheaders\n"
             if $arg->{verbose};
         ($icuheaders, $arg->{without}) =

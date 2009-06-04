@@ -62,6 +62,7 @@ my %valid_macros = map { ( $_, 1 ) } qw(
     PARROT_CONST_FUNCTION
     PARROT_DOES_NOT_RETURN
     PARROT_MALLOC
+    PARROT_OBSERVER
 );
 
 =item C<extract_function_declarations($text)>

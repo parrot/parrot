@@ -179,7 +179,7 @@ parrot_free_vtables(PARROT_INTERP)
     ASSERT_ARGS(parrot_free_vtables)
     int i;
 
-    for (i = 1; i < interp->n_vtable_max; i++)
+    for (i = 0; i < interp->n_vtable_max; i++)
         Parrot_destroy_vtable(interp, interp->vtables[i]);
 
     mem_sys_free(interp->vtables);

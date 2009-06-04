@@ -1,31 +1,55 @@
 Name:           parrot
-Version:        1.1.0
-Release:        1%{dist}
-Summary:        Parrot Virtual Machine
+Version:        1.0.0
+Release:        6%{?dist}
+Summary:        Parrot is a virtual machine
 License:        Artistic 2.0
 Group:          Development/Libraries
 URL:            http://www.parrot.org/
+
 Source0:        ftp://ftp.parrot.org/pub/parrot/releases/stable/%{version}/parrot-%{version}.tar.gz
+# Without Patch0 %{_libdir}/libparrot.so would not be a symbolic link to
+# %{_libdir}/libparrot.so.%{version}  
+# Symlink:  libparrot.so ->  libparrot.so.%{version}
+# See for upstream: https://trac.parrot.org/parrot/ticket/509
+# Extended for the package to have no subdirectory under pkgconfig
+Patch0:         parrot-install_files.patch
+Patch1:         parrot-1.0.0-rpath-removal.patch
+
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  readline-devel
 BuildRequires:  ncurses-devel
 BuildRequires:  gmp-devel
 BuildRequires:  gdbm-devel
 BuildRequires:  libicu-devel
-BuildRequires:  perl-Test-Harness
+BuildRequires:  perl(Test::Harness)
+BuildRequires:  perl(Test::Simple)
+BuildRequires:  ctags
+BuildRequires:  openssl-devel
+ 
 
 %package docs
 Summary:        Parrot Virtual Machine documentation
-License:        Artistic 2.0
-Group:          Development/Libraries
-BuildRequires:  /usr/bin/perldoc
+Group:          Documentation
+Requires:       perl(strict)
+Requires:       perl(warnings)
 
 %package devel
 Summary:        Parrot Virtual Machine development headers and libraries
-License:        Artistic 2.0
 Group:          Development/Libraries
 Requires:       %{name} = %{version}-%{release}
-Requires:       %{_libdir}/pkgconfig
+Requires:       pkgconfig
+
+%package tools
+Summary:        Parrot Virtual Machine development for languages
+Group:          Development/Libraries
+Requires:       %{name} = %{version}-%{release}
+Requires:       perl(Pod::Simple)
+Requires:       perl(File::Which) = 0.05
+# It is necessary to have installed the package "perl-Perl-Critic" to install
+# the parrot-tools
+Provides:       perl(Parrot::Pmc2c::MethodEmitter) = %{version}
+Provides:       perl(Parrot::Pmc2c::PCCMETHOD_BITS) = %{version}
+Provides:       perl(Parrot::Pmc2c::PMCEmitter) = %{version}
 
 %description
 Parrot is a virtual machine designed to efficiently compile and execute
@@ -34,22 +58,36 @@ as well as variety of other languages.
 
 %description docs
 Documentation in text-, POD- and HTML-format (docs/html-subdirectory) and also
-examples about the Parrot Virtual Machine
+examples about the Parrot Virtual Machine.
 
 %description devel
 Parrot Virtual Machine development headers and libraries.
 
+%description tools
+Parrot Virtual Machine development files for building languages.
+
 %prep
 %setup -q
+%patch0 -p0
+%patch1 -b .rpatch
 
 %{__perl} -pi -e 's,"lib/,"%{_lib}/, if (/CONST_STRING\(interp,/)' \
     src/library.c
 %{__perl} -pi -e "s,'/usr/lib','%{_libdir}',;s,runtime/lib/,runtime/%{_lib}/," \
     tools/dev/install_files.pl
 
-%build
 
-%ifarch i386 x86_64
+cat << \EOF > %{name}-prov
+#!/bin/sh
+%{__perl_provides} $* | %{__sed} -e '/perl(A)/d' -e '/perl(B)/d' -e '/perl(DB)/d'
+EOF
+
+%global __perl_provides %{_builddir}/%{name}-%{version}/%{name}-prov
+chmod +x %{__perl_provides}
+
+
+%build
+%ifarch %{ix86} x86_64
 %{__perl} Configure.pl \
     --prefix=%{_usr} \
     --libdir=%{_libdir} \
@@ -60,52 +98,113 @@ Parrot Virtual Machine development headers and libraries.
     --cxx=%{__cxx} \
     --optimize="$RPM_OPT_FLAGS -maccumulate-outgoing-args" \
     --parrot_is_shared \
-    --lex=/usr/bin/flex \
-    --yacc=/usr/bin/yacc \
-    --libs="-lcurses -lm"
+    --lex=%{_bindir}/flex \
+    --yacc=%{_bindir}/yacc \
+    --libs='-lcurses -lm'
 %else
-# PowerPC
+# PowerPC, not all options work with the PowerPC-architecture, I do not test
+# which is not working   (Gerd)
 %{__perl} Configure.pl \
     --prefix=%{_usr} \
     --libdir=%{_libdir}
 %endif
 
+# The LDD_LIBRARY_PATH hack is needed for "miniparrot"
+# to find his parrot-library in "blib/lib" 
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
+
+# pbc_to_exe would not build if %{_smp_mflags} would used
 make
 make parrot_utils
 make installable
 make html
 
+
 %install
 rm -rf $RPM_BUILD_ROOT
 
+# This hack is needed for "miniparrot" to find his parrot-library in "blib/lib" 
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
-make install DESTDIR=$RPM_BUILD_ROOT
+
+# install-dev: Same as 'install' taget but also install support for development.
+make install-dev DESTDIR=$RPM_BUILD_ROOT
+
+%define RPM_PAR_LIB_DIR $RPM_BUILD_ROOT%{_libdir}/%{name}/%{version}/
+
 
 # Drop the docs so rpm can pick them up itself.
-rm -rf $RPM_BUILD_ROOT%{_usr}/share/doc/parrot    # necessary for SuSE
-#rm -rf $RPM_BUILD_ROOT/%{_docdir}/parrot         # for Solaris?
+rm -rf $RPM_BUILD_ROOT%{_defaultdocdir}/%{name}
 
 # Force permissions on doc directories.
 find docs examples -type d -exec chmod 755 {} \;
 find docs examples -type f -exec chmod 644 {} \;
 
-# Force permissions on shared libs so they get stripped.
-find $RPM_BUILD_ROOT%{_libdir} -type f \( -name '*.so' -o -name '*.so.*' \) \
+# Force permissions on shared versioned libs so they get stripped.
+# The parrot-install-script don't set the permissions right
+# With changed permissions the dependencies will be found
+find %{RPM_PAR_LIB_DIR}dynext -type f -name '*.so' -exec chmod 755 {} \;
+
+# Remove module that should be install instead (perl(File::Which))
+rm -rf %{RPM_PAR_LIB_DIR}tools/lib/File
+
+
+# Added to reduce output errors when using rpmlint
+
+# Force permission on perl-scripts in the "tools" subdirctory
+find %{RPM_PAR_LIB_DIR}tools -type f -name "*.pl" -exec chmod 755 {} \; \
+    -exec %{__sed} -i -e '1 s&#! perl&#!/usr/bin/perl&' {} \;
+# Set path to parrot binary and Force permission
+find %{RPM_PAR_LIB_DIR}tools/dev -type f -name "pbc_to_exe.pir" \
+    -exec %{__sed} -i -e '1 s&#! parrot&#!/usr/bin/parrot&' {} \; \
     -exec chmod 755 {} \;
+# This module is only needed for building and should not be installed (I think)
+# module "Parrot::OpLib::core"
+rm -rf %{RPM_PAR_LIB_DIR}tools/lib/Parrot/OpLib
+
+# Remove doc-files with zero-length
+find docs/html -type f -size 0 -exec rm -f {} \;
+
+# Set path for installed programs in docs package
+find examples -type f -name "*.pl" \
+    -exec %{__sed} -i -e '1 s&#! perl&#!/usr/bin/perl&' {} \;
+find examples -wholename 'examples/pir/befunge/t/basic.t' \
+    -exec %{__sed} -i -e '1 s&#! perl&#!/usr/bin/perl&' {} \;
+find examples -type f -name "*.py" \
+    -exec %{__sed} -i -e '1 s&#! python&#!/usr/bin/python&' {} \;
+find examples -type f -name "*.rb" \
+    -exec %{__sed} -i -e '1 s&#! ruby&#!/usr/bin/ruby&' {} \;
+
+find examples -type f -name "*.pir" \
+    -exec %{__sed} -i -e '1 s&#!./parrot&#!/usr/bin/parrot&' {} \;
+find examples/shootout -type f -name "random.pasm" \
+    -exec %{__sed} -i -e '1 s&#!./parrot&#!/usr/bin/parrot&' {} \;
+
+find examples -wholename 'examples/languages/abc/t/01-tests.t' \
+    -exec %{__sed} -i -e '1 s&#!perl&#!/usr/bin/perl&' {} \;
+find examples -wholename 'examples/shootout/revcomp.pir' \
+    -exec %{__sed} -i -e '1 s&#!parrot&#!/usr/bin/parrot&' {} \;
+
+find examples -wholename 'examples/languages/abc/t/harness' \
+    -exec %{__perl} -pi -e 's/\r$//' {} \;
+
+find examples/languages -type f -name harness \
+    -exec %{__sed} -i -e '1 s&#! perl&#!/usr/bin/perl&' {} \;
+for file in docs/book/ch09_pct.pod docs/memory_internals.pod; do
+        %{__mv} $file timestamp
+        iconv -f ISO-8859-1 -t UTF-8 -o $file timestamp
+        touch -r timestamp $file
+done
+%{__rm} -f timestamp
 
 # These files *probably* aren't needed.
 rm -rf $RPM_BUILD_ROOT%{_usr}/config \
     $RPM_BUILD_ROOT%{_includedir}/src \
-    $RPM_BUILD_ROOT%{_usr}/src \
-    $RPM_BUILD_ROOT%{_usr}/tools
+    $RPM_BUILD_ROOT%{_usr}/src 
 
 %check
 export LD_LIBRARY_PATH=$( pwd )/blib/lib
-# make test < /dev/null
-# %{?_with_fulltest:make fulltest < /dev/null}
-# make test || :
-# %{?_with_fulltest:make fulltest || :}
+make test
+%{?_with_fulltest: make fulltest}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -116,17 +215,19 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
+%doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
+%doc RESPONSIBLE_PARTIES TODO LICENSE
 %exclude %{_bindir}/parrot_config
 %exclude %{_bindir}/parrot_debugger
 %exclude %{_bindir}/pbc_*
 %{_bindir}/*
-%{_libdir}/parrot
+%{_libdir}/parrot/
+%exclude %{_libdir}/parrot/%{version}/tools
+%exclude %{_libdir}/parrot/%{version}/VERSION
 %{_libdir}/libparrot.so.*
 
 %files docs
 %defattr(-,root,root,-)
-%doc ChangeLog CREDITS NEWS PBC_COMPAT PLATFORMS README
-%doc RESPONSIBLE_PARTIES TODO
 %doc docs examples
 
 %files devel
@@ -143,9 +244,44 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/libparrot.a
 %{_libdir}/pkgconfig/*
 
+%files tools
+%defattr(-,root,root,-)
+# Files for building languages
+%{_libdir}/parrot/%{version}/tools/*
+%{_libdir}/parrot/%{version}/VERSION
+
+
+
 %changelog
-* Tue Apr 21 2009 Francois Perrad <francois.perrad@gadz.org> 1.1.0
-- updated to 1.1.0
+* Thu Apr 23 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 1.0.0-6
+- add a list of changes from Lubomir Rintel
+- add patch to remove rpath
+- add filtering Provides
+- change requires for docs-subpackage
+- enable test suite
+
+* Wed Mar 25 2009 Gerd Pokorra <gp@zimt.uni-siegen.de> 1.0.0-5
+- change the group of the subpackage "-docs" to Documentation
+- put the main-documentation from the docs-package to the main package
+- LICENSE file added
+- change 'make install' to 'make install-dev' to also install support for development (tools)
+- add Provides-lines
+- add patch for the file "tools/dev/install_files.pl"
+- add commands to reduce output of errors when using rpmlint
+- define RPM_PAR_LIB_DIR added
+- add subpackage "tools"
+- exclude tools directory from main-package
+
+* Sun Mar 22 2009 Fabien Georget <fabien.georget@gmail.com> 1.0.0-4
+- add tools
+
+* Sun Mar 22 2009 David Fetter <david@fetter.org> 1.0.0-3
+- Removed wrong prefix from pkgconfig per Christoph Wickert
+- Changed i386 to ix86 per Christoph Wickert
+
+* Sun Mar 22 2009 David Fetter <david@fetter.org> 1.0.0-2
+- Changed hard-coded path requirement to perl.
+
 
 * Tue Mar 17 2009 Allison Randal <allison@parrot.org> 1.0.0
 - updated to 1.0.0

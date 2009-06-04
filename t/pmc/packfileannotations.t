@@ -21,10 +21,10 @@ Tests the PackfileAnnotations PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-    plan(14)
+    plan(17)
     test_sanity()
-    test_handling_directory()
     test_unpack()
+    test_pack_unpack()
 .end
 
 
@@ -36,36 +36,68 @@ Tests the PackfileAnnotations PMC.
     ok($I0, "PackfileAnnotations created")
 .end
 
-# Annotations should propogate ConstantTable to Keys.
-.sub 'test_handling_directory'
-    .local pmc keys, anns, pfdir
-
-    anns = new 'PackfileAnnotations'
-    keys = anns.'get_key_list'()
-    $I0 = defined keys
-    ok($I0, "Keys created")
-    $P0 = keys.'get_constant_table'()
-    $I0 = defined $P0
-    is($I0, 0, "    without ConstantTable")
-
-    pfdir = new 'PackfileDirectory'
-    $P0 = new 'PackfileConstantTable'
-    # Order does matter
-    pfdir['CONSTANTS'] = $P0
-    pfdir['ANNOTATIONS'] = anns
-    $P0 = keys.'get_constant_table'()
-    $I0 = defined $P0
-    ok($I0, 'PackfileConstantTable found and propogated to Keys')
-.end
-
 # PackfileAnnotations unpack from PBC
 .sub 'test_unpack'
-    .local pmc pf, pfdir, pfanns, it
+    .local pmc pf
 
     $P0 = open 't/native_pbc/annotations.pbc'
     $S0 = $P0.'readall'()
     pf = new 'Packfile'
     pf = $S0
+    .tailcall '!test_unpack'(pf)
+.end
+
+# Programatically create PBC same as t/native_pbc/annotations.pbc and check unpack of it.
+.sub 'test_pack_unpack'
+    .local pmc pf, pfdir
+    pf = new 'Packfile'
+    pfdir = pf.'get_directory'()
+    #$P0 = new 'PackfileConstantTable'
+    #$P0[0] = 42.0
+    $P0 = new 'PackfileFixupTable'
+    pfdir["FIXUP_t/pmc/packfileannotations.t"] = $P0
+
+    $P1 = new 'PackfileRawSegment'
+    pfdir["BYTECODE_t/pmc/packfileannotations.t"] = $P1
+
+    $P2 = new 'PackfileConstantTable'
+    pfdir["CONSTANTS_t/pmc/packfileannotations.t"] = $P2
+
+    .local pmc anns
+    anns = new 'PackfileAnnotations'
+    # We have to add it to Directory before doing anything to handle Constants properly
+    pfdir["BYTECODE_t/pmc/packfileannotations.t_ANN"] = anns
+
+    $P3 = new 'PackfileAnnotation'
+    $P3.'set_name'('file')
+    $P3 = 'annotations.pir'
+    anns[0] = $P3
+
+    $P4 = new 'PackfileAnnotation'
+    $P4.'set_name'('creator')
+    $P4 = 'Parrot Foundation'
+    anns[1] = $P4
+
+    $P5 = new 'PackfileAnnotation'
+    $P5.'set_name'('line')
+    $P5 = 1
+    anns[2] = $P5
+
+    $P6 = new 'PackfileAnnotation'
+    $P6.'set_name'('line')
+    $P6 = 2
+    anns[3] = $P6
+
+    # Pack
+    $S0 = pf
+    pf = new 'Packfile'
+    pf = $S0
+    .tailcall '!test_unpack'(pf)
+.end
+
+.sub '!test_unpack'
+    .param pmc pf
+    .local pmc pfdir, pfanns, it
 
     # Find annotations
     pfdir = pf.'get_directory'()
@@ -79,19 +111,6 @@ Tests the PackfileAnnotations PMC.
     ok(1, "PackfileAnnotations unpacked")
     pfanns = $P0
 
-    # Check keys
-    .local pmc keys
-    keys = pfanns.'get_key_list'()
-    $I0 = elements keys
-    is($I0, 3, 'Keys were successfully unpacked')
-
-    $S0 = keys[0]
-    is($S0, "file", "First key is correct")
-    $S0 = keys[1]
-    is($S0, "creator", "Second key is correct")
-    $S0 = keys[2]
-    is($S0, "line", "Third key is correct")
-
     # Test entities
     $I0 = elements pfanns
     is($I0, 4, "Annotations were unpack correctly")
@@ -101,15 +120,17 @@ Tests the PackfileAnnotations PMC.
     constants = _find_segment_by_type(pf, "PackfileConstantTable")
     # "file"
     a = pfanns[0]
-    $I0 = a
-    $S0 = constants[$I0]
-    is($S0, "annotations.pir", "First annotation is correct")
+    $S0 = a.'get_name'()
+    is($S0, "file", "First annotation's name unpacked")
+    $S0 = a
+    is($S0, "annotations.pir", "First annotation's value is correct")
 
     # "creator"
     a = pfanns[1]
-    $I0 = a
-    $S0 = constants[$I0]
-    is($S0, "Parrot Foundation", "Second annotation is correct")
+    $S0 = a.'get_name'()
+    is($S0, "creator", "Second annotation's name unpacked")
+    $S0 = a
+    is($S0, "Parrot Foundation", "Second annotation's value is correct")
 
     # Two "line"
     a = pfanns[2]

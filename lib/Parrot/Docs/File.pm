@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, Parrot Foundation.
+# Copyright (C) 2004-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -380,45 +380,20 @@ sub short_description {
     return '' unless $self->contains_pod;
 
     my @lines = $self->read;
+    my $firstline = shift @lines;
+    return $self->title unless $firstline =~ /^=head1\s+ABSTRACT/;
 
-    while (@lines) {
-        my $line = shift @lines;
-
-        if ( $line =~ /^=head1\s+ABSTRACT/o ) {
-            while (@lines) {
-                $line = shift @lines;
-
-                last if $line =~ /\S/o;
-            }
-
-            my @abstract_text = $line;
-
-            while (@lines) {
-                $line = shift @lines;
-
-                last if $line !~ /\S/o;
-
-                push @abstract_text, $line;
-            }
-
-            my $desc = join ' ', @abstract_text;
-
-            # Joining lines may have created a bit of extra whitespace.
-            $desc =~ s/\s+/ /osg;
-            $desc =~ s/^\s+//os;
-            $desc =~ s/\s+$//os;
-
-            # Remove any POD.
-            $desc =~ s/[CFL]<([^>]+)>/$1/osg;
-
-            return $desc;
-        }
-    }
-
-    # RT#43687 - The abstract section above was added later. The two searches
-    # could be combined.
-
-    return $self->title;
+    my $all_text = join "\n" => @lines;
+    $all_text =~ s/^\s+//;
+    my @paragraphs = split /\n{2,}/, $all_text;
+    my $desc;
+    # For a short description, we take only the first paragraph of any
+    # ABSTRACT.
+    ($desc = $paragraphs[0]) =~ s/\n/ /g;
+    $desc =~ s/\s+/ /sg;
+    # We eliminate certain POD formatting characters.
+    $desc =~ s/[CFL]<([^>]+)>/$1/sg;
+    return $desc;
 }
 
 =back

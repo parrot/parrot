@@ -21,21 +21,30 @@ Tests the PackfileAnnotation PMC.
 .include 'test_more.pir'
     .local pmc pa
 
-    plan(4)
+    plan(5)
 
     pa = new ['PackfileAnnotation']
     $I0 = defined pa
     ok($I0, 'PackfileAnnotation created')
 
-    pa = 42
-    pa.'set_key_id'(1)
+    pa.'set_name'('line')
     pa.'set_offset'(115200)
+    pa = 42
 
-    $I0 = pa
-    is($I0, 42, 'Value stored and fetched')
-    $I0 = pa.'get_key_id'()
-    is($I0, 1,  'KeyId stored and fetched')
+    $S0 = pa.'get_name'()
+    is($S0, 'line',  'Name stored and fetched')
     $I0 = pa.'get_offset'()
     is($I0, 115200, 'Offset stored and fetched')
+    $I0 = pa
+    is($I0, 42, 'Value stored and fetched')
+
+    # We can't fetch string from integer annotation
+    push_eh check
+    $I1 = 1
+    $S0 = pa
+    $I0 = 0
+  check:
+    pop_eh
+    ok($I0, "Can't fetch wrong value from Annotation")
 
 .end

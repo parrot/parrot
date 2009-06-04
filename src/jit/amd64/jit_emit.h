@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007-2008, Parrot Foundation.
+ * Copyright (C) 2007-2009, Parrot Foundation.
  */
 
 /*
@@ -902,6 +902,9 @@ void jit_mov_x_mx(Interp *interp, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs);
 void jit_mov_r_mr(Interp *interp, Parrot_jit_info_t *jit_info,
         int dst_reg, int base_reg, INTVAL offs);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 const jit_arch_info * Parrot_jit_init(Interp *interp);
 
 

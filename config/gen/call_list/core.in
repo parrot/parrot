@@ -86,6 +86,10 @@ P    JPNP
 
 I    JPP      # MMD compare
 
+# These are needed for packfileconstanttable.pmc
+I    JPS
+I    JPN
+
 # These are needed for parrotio.pmc
 i    JP
 v    JP

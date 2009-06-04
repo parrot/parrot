@@ -11,15 +11,40 @@ src/pmc/stringhandle.pmc - StringHandle PMC
 The StringHandle PMC performs I/O operations, but on an internal string rather
 than an external file. Commonly used as a mock FileHandle for testing.
 
-=head2 Vtable Functions
-
-=over 4
-
 =cut
 
 */
 
 #include "../src/io/io_private.h"
+
+PARROT_INLINE
+static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s));
+
+/*
+
+=head2 Internal Functions
+
+=over 4
+
+=item C<static int encoding_is_utf8()>
+
+Helper function for internal usage. Return 1 if the string argument is
+not null and has utf8 encoding, 0 otherwise.
+
+=back
+
+=cut
+
+*/
+
+PARROT_INLINE
+static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
+{
+    if (STRING_IS_NULL(s))
+        return 0;
+    else
+        return Parrot_str_equal(interp, s, CONST_STRING(interp, "utf8"));
+}
 
 pmclass StringHandle need_ext {
     ATTR INTVAL  flags;               /* Filehandle flags             */
@@ -30,6 +55,10 @@ pmclass StringHandle need_ext {
     ATTR INTVAL  read_offset;         /* Position, for reading bytes  */
 
 /*
+
+=head2 Vtable Functions
+
+=over 4
 
 =item C<void init()>
 
@@ -176,8 +205,7 @@ stored for mocking.
             STRING *encoding;
 
             GET_ATTR_encoding(INTERP, SELF, encoding);
-            if (!STRING_IS_NULL(encoding)
-            &&  Parrot_str_equal(INTERP, encoding, CONST_STRING(INTERP, "utf8")))
+            if (encoding_is_utf8(INTERP, encoding))
                 new_string = string_make(INTERP, "", 0, "unicode", 0);
             else
                 new_string = Parrot_str_new(INTERP, "", 0);
@@ -343,9 +371,7 @@ StringHandle object that isn't opened yet, returns an empty string.
         if (STRING_IS_NULL(string_result)) {
             STRING *encoding;
             GET_ATTR_encoding(INTERP, SELF, encoding);
-            if (!STRING_IS_NULL(encoding) &&
-                    Parrot_str_equal(INTERP, encoding,
-                        Parrot_str_new_constant(INTERP, "utf8")))
+            if (encoding_is_utf8(INTERP, encoding))
                 string_result = string_make(INTERP, "", 0, "unicode", 0);
             else
                 string_result = Parrot_str_new_constant(INTERP, "");
@@ -432,9 +458,9 @@ ignored, but stored for mocking.
 
     METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
         INTVAL flags;
-        STRING * const nobuffer_string   = Parrot_str_new_constant(INTERP, "unbuffered");
-        STRING * const linebuffer_string = Parrot_str_new_constant(INTERP, "line-buffered");
-        STRING * const fullbuffer_string = Parrot_str_new_constant(INTERP, "full-buffered");
+        STRING * const nobuffer_string   = CONST_STRING(INTERP, "unbuffered");
+        STRING * const linebuffer_string = CONST_STRING(INTERP, "line-buffered");
+        STRING * const fullbuffer_string = CONST_STRING(INTERP, "full-buffered");
 
         GET_ATTR_flags(INTERP, SELF, flags);
 

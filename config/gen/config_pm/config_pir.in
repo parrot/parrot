@@ -8,6 +8,7 @@ config.pir - Access Parrot configuration data
 
   .sub _some
   ...
+  load_bytecode 'config.pbc'
   # store the config data into $P0
   $P0 = _config()
   # Retrieve and print a key
@@ -18,7 +19,6 @@ config.pir - Access Parrot configuration data
   ...
 
  .end
- .include "library/config.pir"
 
 =head1 DESCRIPTION
 

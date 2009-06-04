@@ -146,7 +146,7 @@ Tests the PMCProxy PMC.
 
     #We will override the add_role vtable method.
     $P2 = get_global 'no_add_role'
-    $P0.'add_method'('add_role', $P2, 'vtable' => 1)
+    $P0.'add_vtable_override'('add_role', $P2)
     ok(1, 'overrode a vtable method')
 
     $P2 = $P0.'new'()
@@ -180,7 +180,7 @@ Tests the PMCProxy PMC.
 
     #We will override the inspect_str vtable method.
     $P2 = get_global 'always42'
-    $P0.'add_method'('inspect_str', $P2, 'vtable' => 1)
+    $P0.'add_vtable_override'('inspect_str', $P2)
     ok(1, 'overrode inspect_str method')
 
     $P2 = $P0.'new'()

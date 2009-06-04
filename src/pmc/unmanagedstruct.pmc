@@ -653,8 +653,8 @@ calc_offsets(PARROT_INTERP, PMC *pmc, PMC *value, size_t toff)
 
 pmclass UnManagedStruct need_ext no_ro {
     ATTR void   *ptr;   /* the struct that this UnManagedStruct isn't managing */
-    ATTR INTVAL  size;  /* the size of the struct */
     ATTR PMC    *init;  /* the initializer used with this UnManagedStruct */
+    ATTR INTVAL  size;  /* the size of the struct */
 
 /*
 
@@ -676,7 +676,23 @@ Initializes the C<struct> with a default value of C<NULL>.
         Parrot_UnManagedStruct_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_UnManagedStruct_attributes);
         PMC_data(SELF) = attrs;
+        PObj_active_destroy_SET(SELF);
     }
+
+/*
+
+=item C<void destroy()>
+
+Destroys the subroutine.
+
+=cut
+
+*/
+
+    VTABLE void destroy() {
+        mem_sys_free(PMC_data(SELF));
+    }
+
 
 /*
 
@@ -707,7 +723,9 @@ The offset.
 */
 
     VTABLE void init_pmc(PMC *value) {
-        SELF.init();
+        Parrot_UnManagedStruct_attributes *attrs =
+            mem_allocate_zeroed_typed(Parrot_UnManagedStruct_attributes);
+        PMC_data(SELF) = attrs;
         SELF.set_pmc(value);
     }
 

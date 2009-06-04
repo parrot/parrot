@@ -51,7 +51,7 @@ my (
 my $copyright_simple =
     qr/Copyright \(C\) \d{4}/i;
 my $copyright_parrot =
-    qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.$/;
+    qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.\n/;
 
 foreach my $file (@files) {
 
@@ -69,7 +69,7 @@ foreach my $file (@files) {
 
     # is the copyright text correct?
     # If so, remove it...
-    if ( ! ($buf =~ s/$copyright_parrot//m) ) {
+    if ( ! ($buf =~ s/$copyright_parrot//) ) {
         push @bad_format_copyright_files, $path;
     }
     # ... and then see if any other copyright notices exist.
@@ -96,9 +96,6 @@ ok( !scalar(@no_copyright_files), 'Copyright statement exists' )
     $suggested_version
     );
 
-TODO:
-{
-    local $TODO = "Waiting for full transition to Parrot Foundation";
     ok( !scalar(@bad_format_copyright_files), 'Copyright statement in the right format' )
         or diag(
         join
@@ -109,7 +106,6 @@ TODO:
         "Please update to read something like:",
         $suggested_version
         );
-}
 
 # Certain files contain the string 'Copyright (c)' more than once
 # because they contain heredocs for generated files, correctly cite the
@@ -162,18 +158,18 @@ my @non_permitted_duplicate_copyright_files =
 TODO: {
     local $TODO = 'duplicate copyrights exist.';
 
-ok( !scalar(@non_permitted_duplicate_copyright_files),
-    'Duplicate Copyright statements' )
-    or diag(
-    join
-        $/ => "Duplicate copyright statement found in "
-        . scalar @non_permitted_duplicate_copyright_files
-        . " files:",
-    @non_permitted_duplicate_copyright_files,
-    "Please get copyright assigned to Parrot Foundation",
-    "and remove alternate notice; or remove duplicated",
-    "notice for Parrot Foundation."
-    );
+    ok( !scalar(@non_permitted_duplicate_copyright_files),
+        'Duplicate Copyright statements' )
+        or diag(
+        join
+            $/ => "Duplicate copyright statement found in "
+            . scalar @non_permitted_duplicate_copyright_files
+            . " files:",
+        @non_permitted_duplicate_copyright_files,
+        "Please get copyright assigned to Parrot Foundation",
+        "and remove alternate notice; or remove duplicated",
+        "notice for Parrot Foundation."
+        );
 }
 
 # Local Variables:

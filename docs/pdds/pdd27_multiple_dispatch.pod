@@ -157,14 +157,26 @@ The following attributes are used when declaring a MultiSub in PIR.
 
 =item :multi
 
+=begin PIR
+
   .sub mymultisub :multi(Integer, Integer)
+    # ...
+  .end
+
+=end PIR
 
 The C<:multi> attribute marks a subroutine or method as participating in
 multiple dispatch.
 
 =item :invocant
 
+=begin PIR_INVALID
+
+  .sub mymultisub
   .param pmc first :invocant
+  .end
+
+=end PIR_INVALID
 
 Not all elements of a multi-sub's signature are relevant for the purposes of
 multiple dispatch. The subroutine parameters that participate in dispatch are

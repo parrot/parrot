@@ -21,7 +21,7 @@ of primes, the last one found, and the time taken.
 	set     P1, 1
 	# I2 holds the highest number we want to check for primality
 	new P2, 'Integer'
-	set     P2, 10000
+	set     P2, 1000
 	new P6, 'Integer'
 	set	P6, 0
 	print   "N primes up to "

@@ -199,9 +199,9 @@ sub create_c_include {
 #ifndef PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
 #define PARROT_SRC_STRING_PRIVATE_CSTRING_H_GUARD
 
-static const struct _cstrings {
+static PARROT_OBSERVER const struct _cstrings {
     UINTVAL len;
-    const char *string;
+    PARROT_OBSERVER const char *string;
 } parrot_cstrings[] = {
     { 0, "" },
 HEADER

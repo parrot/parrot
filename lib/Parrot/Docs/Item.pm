@@ -68,8 +68,6 @@ sub new {
     my $text     = shift;
     my @contents = @_;
 
-    # RT#43713 - Items should only contain paths.
-
     die "No contents ($text).\n" unless @contents;
 
     $self = bless {

@@ -212,19 +212,35 @@ Next it selects the appropriate op. Register keys have the signature C<k> and
 constant keys have the signature C<kc>. Integer register and constant keys are
 encoded as C<ki> and C<kic> respectively.
 
-    set P1["hi"], 1234
+=begin PIR_FRAGMENT
+
+    set $P1["hi"], 1234
+
+=end PIR_FRAGMENT
 
 finds an op named C<set_p_kc_i>. On the other hand,
 
-    set P1[P1], 1234
+=begin PIR_FRAGMENT
+
+    set $P1[$P1], 1234
+
+=end PIR_FRAGMENT
 
 produces an op named C<set_p_k_i>. Likewise, this:
 
-    set P1[1], 1234
+=begin PIR_FRAGMENT
+
+    set $P1[1], 1234
+
+=end PIR_FRAGMENT
 
 produces an op named C<set_p_kic>, and this:
 
-    set P1[I1], 1234
+=begin PIR_FRAGMENT
+
+    set $P1[$I1], 1234
+
+=end PIR_FRAGMENT
 
 produces an op named C<set_p_ki>.
 

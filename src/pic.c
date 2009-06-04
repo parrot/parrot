@@ -124,11 +124,6 @@ static int is_pic_param(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*mic);
 
-static void parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*mic);
-
 static int pass_int(PARROT_INTERP,
     ARGIN(PMC *sig),
     ARGIN(const char *src_base),
@@ -206,9 +201,6 @@ static int pass_str(PARROT_INTERP,
 #define ASSERT_ARGS_is_pic_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(pc) \
-    || PARROT_ASSERT_ARG(mic)
-#define ASSERT_ARGS_parrot_pic_move __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(mic)
 #define ASSERT_ARGS_pass_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -909,40 +901,6 @@ parrot_PIC_prederef(PARROT_INTERP, opcode_t op, ARGOUT(void **pc_pred), int core
         *pc_pred = (void **)op;
     else
         *pc_pred = ((void **)prederef_op_func)[op];
-}
-
-/*
-
-=item C<static void parrot_pic_move(PARROT_INTERP, Parrot_MIC *mic)>
-
-=cut
-
-*/
-
-static void
-parrot_pic_move(PARROT_INTERP, ARGMOD(Parrot_MIC *mic))
-{
-    ASSERT_ARGS(parrot_pic_move)
-    /* MIC slot is empty - use it */
-    if (!mic->lru.u.type)
-        return;
-
-    /* need more cache slots - allocate one PIC */
-    if (!mic->pic) {
-        mic->pic = parrot_PIC_alloc_pic(interp);
-    }
-    else {
-        /* PIC was already used - shift slots up */
-        Parrot_PIC * const pic = mic->pic;
-
-        pic->lru[2].u.type = pic->lru[1].u.type;
-        pic->lru[2].f.sub  = pic->lru[1].f.sub;
-        pic->lru[1].u.type = pic->lru[0].u.type;
-        pic->lru[1].f.sub  = pic->lru[0].f.sub;
-        pic->lru[0].u.type = mic->lru.u.type;
-        pic->lru[0].f.sub  = mic->lru.f.sub;
-        mic->lru.u.type    = 0;
-    }
 }
 
 /*

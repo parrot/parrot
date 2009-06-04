@@ -31,21 +31,38 @@ Use C<.line 42 "file.pir"> for this.
 
 This looks like a function call in many HLLs:
 
+=begin PIR_FRAGMENT
+
    $P0( $P1, $P2, $P3 )
+
+=end PIR_FRAGMENT
 
 where $P0 is the function object, and $P1, $P2, and $P3 are its
 parameters. You can also use a function's name in place of the
 object, as long as it's in the same namespace.
 
+=begin PIR_FRAGMENT
+
    somefunctionlabel( $P1, $P2, $P3 )
+
+=end PIR_FRAGMENT
 
 You can also get return value(s):
 
+=begin PIR_FRAGMENT
+
   ($P1,$P2) = $P0( $P1, $P2, $P3 )
+
+=end PIR_FRAGMENT
 
 If the function name might collide with a Parrot opcode, quote it:
 
+=begin PIR_FRAGMENT
+
+   .local int i
    i = 'new'(42)
+
+=end PIR_FRAGMENT
 
 You can also use the full PCC for these calls. See
 L<docs/pdd19_pir.pod/Parameter Passing and Getting Flags> and other
@@ -56,13 +73,23 @@ questions below for more information.
 Similar to function calls, just append C<.> and the method name to the object.
 You should quote a literal method name to avoid confusion.
 
+=begin PIR_FRAGMENT
+
+  .local pmc ret_val, some_obj, arg
   ret_val = some_obj.'some_meth'(arg)
+
+=end PIR_FRAGMENT
 
 The method name may also be a string variable representing a method name:
 
+=begin PIR_FRAGMENT
+
   .local string m
+  .local pmc curses_obj
   m = 'bold'
   curses_obj.m()
+
+=end PIR_FRAGMENT
 
 =head2 How do I locate or create a subroutine object?
 
@@ -71,14 +98,22 @@ the subroutine.
 
 If the sub is in the same compilation unit use a Sub constant:
 
+=begin PIR_FRAGMENT
+
   .const 'Sub' foo = 'foo'
-  ...
+  # ...
   foo()
+
+=end PIR_FRAGMENT
 
 A more dynamic way is:
 
+=begin PIR_FRAGMENT
+
   .local pmc foo
   foo = find_name 'foo'
+
+=end PIR_FRAGMENT
 
 This searches for a subroutine 'foo' in the current lexical pad, in
 the current namespace, in the global, and in the builtin namespace in
@@ -88,7 +123,12 @@ compiler can't figure out, where the function is.
 If the subroutine is in a different namespace, use the
 C<get_hll_global> or C<get_root_global> opcodes:
 
+=begin PIR_FRAGMENT
+
+  .local pmc foo
   foo = get_root_global ['Foo'], 'foo'
+
+=end PIR_FRAGMENT
 
 This fetches the sub C<foo> in the C<Foo> namespace.
 
@@ -99,9 +139,13 @@ Therefore you need to perform two steps.
 First use one of the above ways to locate the Sub object.
 Then use the op C<newclosure> to capture the environment.
 
+=begin PIR_FRAGMENT
+
   .local pmc coro
   coro = find_name 'my_coro'
   coro = newclosure coro
+
+=end PIR_FRAGMENT
 
 Any subroutine that contains a C<.yield> directive is automatically
 created as a Coroutine PMC:
@@ -143,26 +187,38 @@ list in PIR?
 If you have a variable amounts of arguments in an array, you can
 pass all items of that array with the C<:flat> directive.
 
+=begin PIR_FRAGMENT
+
+  .local pmc ar, foo
   ar = new 'ResizablePMCArray'
   push ar, "arg 1\n"
   push ar, "arg 2\n"
-  ...
+  #...
   foo(ar :flat)
-  ...
+  #...
+
+=end PIR_FRAGMENT
 
 =head2 How to I retrieve the contents of a variable-length parameter
 list being passed to me?
 
 Use a slurpy array:
 
+=begin PIR
+
   .sub mysub
     .param pmc argv      :slurpy
     .local int argc
     argc = argv
-    ...
+    #...
+  .end
+
+=end PIR
 
 If you have a few fixed parameters too, you can use a slurpy array
 to get the rest of the arguments
+
+=begin PIR
 
   .sub mysub
     .param pmc arg0
@@ -170,11 +226,16 @@ to get the rest of the arguments
     .param pmc varargs   :slurpy
     .local int num_varargs
     num_varargs = varargs
-    ...
+    # ...
+  .end
+
+=end PIR
 
 =head2 How do I pass optional arguments?
 
 Use the C<:optional> and C<:opt_flag> pragmas:
+
+=begin PIR
 
   .sub foo
      .param pmc arg1       :optional
@@ -183,7 +244,10 @@ Use the C<:optional> and C<:opt_flag> pragmas:
      .param int has_arg2   :opt_flag
 
      if has_arg1 goto got_arg1
-     ...
+     #...
+  .end
+
+=end PIR
 
 =head2 How do I create nested subroutines?
 
@@ -197,12 +261,18 @@ for details.
 
 Use the C<get_root_global> or C<get_hll_global> op:
 
+=begin PIR_FRAGMENT
+
     get_hll_global $P0, ['name'; 'space'], 'name_of_the_global'
     get_hll_global $P1, 'name_of_the_global'
+
+=end PIR_FRAGMENT
 
 =head2 How can I delete a global?
 
 You can retrieve the namespace hash and use the C<delete> opcode.
+
+=begin PIR
 
     .sub main :main
     $P0 = new 'Integer'
@@ -228,6 +298,7 @@ You can retrieve the namespace hash and use the C<delete> opcode.
     print "null.\n"
     .end
 
+=end PIR
 
 =head2 How do I use lexical pads to have both a function scope and a
 global scope?
@@ -244,15 +315,23 @@ a PMCNULL with the C<null> opcode.)
 
 Use C<find_name>:
 
+=begin PIR_FRAGMENT
+
     $P0 = find_name '$x'
     find_name $P0, 'foo'    # same thing
+
+=end PIR_FRAGMENT
 
 This will find the name C<foo> in the lexical, global, or builtin namespace, in
 that order, and store it in C<$P0>.
 
 =head2 How do I fetch a variable from the current lexical pad?
 
+=begin PIR_FRAGMENT
+
     find_lex $P0, 'foo'
+
+=end PIR_FRAGMENT
 
 or much better, if possible just use the variable defined along with
 the C<.lex> definition of C<foo>.
@@ -261,7 +340,11 @@ the C<.lex> definition of C<foo>.
 
 That is still the same:
 
+=begin PIR_FRAGMENT
+
     find_lex $P0, 'foo'
+
+=end PIR_FRAGMENT
 
 This finds a C<foo> variable at any B<outer> depth starting from the top.
 
@@ -285,19 +368,29 @@ XXX
 
 With the C<newclass> op:
 
+=begin PIR_FRAGMENT
+
     newclass $P0, 'Animal'
+
+=end PIR_FRAGMENT
 
 =head2 How do I add instance variables/attributes?
 
 Each class knows which attributes its objects can have. You can add attributes
 to a class (not to individual objects) like so:
 
+=begin PIR_FRAGMENT
+
     addattribute $P0, 'legs'
+
+=end PIR_FRAGMENT
 
 =head2 How do I add instance methods to a class?
 
 Methods are declared as functions in the class namespace with the C<:method>
 keyword appended to the function declaration:
+
+=begin PIR
 
   .namespace [ 'Animal' ]
 
@@ -305,10 +398,14 @@ keyword appended to the function declaration:
      print "slow and steady\n"
   .end
 
+=end PIR
+
 =head2 How do I override a vtable on a class?
 
 As with methods, but note the new keyword. The vtable name specified B<must>
 be an existing vtable slot.
+
+=begin PIR
 
   .namespace [ 'NearlyPi' ]
 
@@ -316,22 +413,27 @@ be an existing vtable slot.
      .return ('three and a half')
   .end
 
+=end PIR
+
 Now, given an instance of NearlyPi in $P0
+
+=begin PIR_FRAGMENT
 
   $S0 = $P0
   say $S0  # prints 'three and a half'
+
+=end PIR_FRAGMENT
 
 =head2 How do I access attributes?
 
 You can access attributes by a short name:
 
+=begin PIR_FRAGMENT_INVALID
+
   $P0 = getattribute self, 'legs'
   assign $P0, 4                   # set attribute's value
 
-or by a fully qualified name: XXX This is long dead.
-
-  $P0 = getattribute self, "Animal\0legs"
-  assign $P0, 4                   # set attribute's value
+=end PIR_FRAGMENT_INVALID
 
 =head2 When should I use properties vs. attributes?
 
@@ -344,12 +446,20 @@ You first have to get the class PMC of the class you want to subclass.
 Either you use the PMC returned by the C<newclass> op if you created
 the class, or use the C<get_class> op:
 
+=begin PIR_FRAGMENT
+
     get_class $P0, 'Animal'
+
+=end PIR_FRAGMENT
 
 Then you can use the C<subclass> op to create a new class that is a
 subclass of this class:
 
+=begin PIR_FRAGMENT
+
     subclass $P1, $P0, 'Dog'
+
+=end PIR_FRAGMENT
 
 This stores the newly created class PMC in $P1.
 
@@ -365,38 +475,58 @@ example.
 If you have a class PMC (created with C<newclass> or by C<subclass>),
 you can add more parent classes to it with the C<addparent> op:
 
+=begin PIR_FRAGMENT
+
     get_class $P1, 'Dog'
     subclass $P2, $P1, 'SmallDog'
     get_class $P3, 'Pet'
     addparent $P2, $P3  # make "SmallDog" also a "Pet"
 
+=end PIR_FRAGMENT
+
 =head2 How can I specify the constructor of a class?
 
 Just override the init vtable for that class.
 
-    newclass $P0, 'Dog'         # create a class named Dog
-    # ...
+=begin PIR
+
+    .sub _ :main
+      newclass $P0, 'Dog'         # create a class named Dog
+    .end
 
     .namespace ['Dog']
 
     .sub init :vtable
       # ...
+    .end
+
+=end PIR
 
 Or you can specify the constructor method by setting the BUILD
 property of the class PMC:
+
+=begin PIR_FRAGMENT
 
     newclass $P0, 'Dog'         # create a class named Dog
     new $P1, 'String'           # create a string
     set $P1, 'initialise'       # set it to the name of the constructor method
     setprop $P0, 'BUILD', $P1   # set the BUILD property
 
+=end PIR_FRAGMENT
+
 =head2 How do I instantiate a class?
 
 You can do so either with the class name:
 
+=begin PIR_FRAGMENT
+
     new $P0, 'Dog'
 
+=end PIR_FRAGMENT
+
 or with the class object:
+
+=begin PIR_FRAGMENT
 
     $P1 = get_class 'Dog'   # find the 'Dog' class
     unless null $P1 goto have_dog_class
@@ -404,6 +534,8 @@ or with the class object:
     .return ()
   have_dog_class:
     new $P0, $P1    # creates a Dog object and stores it in register $P0
+
+=end PIR_FRAGMENT
 
 The chief difference is that using a string constant will produce the
 specific error "Class 'Dog' not found" if that happens to be the case;
@@ -417,13 +549,16 @@ You can pass only a single argument to a constructor.  By convention,
 a hash PMC is passed to the constructor that contains the arguments as
 key/value pairs:
 
+=begin PIR_FRAGMENT
+
     new $P0, 'Hash'
     set $P0['greeting'], 'hello'
     set $P0['size'], 1.23
 
-    find_type $I0, 'Alien'
-    new $P1, $I0, $P0           # create an Alien object and pass
+    new $P1, 'Alien', $P0       # create an Alien object and pass
                                 # the hash to the constructor
+
+=end PIR_FRAGMENT
 
 =head2 How do I add module/class methods?
 
@@ -439,13 +574,21 @@ XXX
 
 The easiest way is the perl-like
 
+=begin PIR_FRAGMENT
+
     die 'Eeeek!'
 
+=end PIR_FRAGMENT
+
 You can also explicitly create an exception object and throw it:
+
+=begin PIR_FRAGMENT
 
     $P0 = new 'Exception'
     $P0 = 'something happened'
     throw $P0
+
+=end PIR_FRAGMENT
 
 =head2 How do I catch an exception in PIR?
 
@@ -453,38 +596,51 @@ Use C<push_eh> to push an exception handler onto the stack. End the set of
 instructions that might throw the exception you're interested in with
 C<pop_eh>.
 
+=begin PIR_FRAGMENT
+
     push_eh handler
       die 'whoops'  # or any other code that might throw an exception...
     pop_eh
-    ... # ok
+    # ok
+
+=end PIR_FRAGMENT
 
 An exception handler is called with one argument, which is the exception object.
 The message of the exception can be easily extracted, as follows:
+
+=begin PIR_FRAGMENT
 
   handler: # exception
     .get_results ($P0)
     print 'Exception caught:'
     $S0 = $P0['message']
     say $S0
-    ...
+
+=end PIR_FRAGMENT
 
 =head2 How do I let exceptions from C<exit> pass through my handler?
 
 Rethrow the exception if it has a severity of C<EXCEPT_EXIT>.
 
+=begin PIR_FRAGMENT
+
   .include 'except_severity.pasm'
-  ...
+  # ...
   handler:
     .get_results ($P0)
     $I0 = $P0['severity']
     if $I0 == .EXCEPT_EXIT goto handle_exit
     say 'Exception caught!'
-    ...
+    # ...
 
   handle_exit:
     rethrow $P0 # let the next handler deal with it.
 
+=end PIR_FRAGMENT
+
 Exception example:
+
+=begin PIR_FRAGMENT
 
     push_eh handler
     $P0 = new 'Exception'
@@ -502,6 +658,8 @@ Exception example:
     print message
     print "\n"
     exit 1
+
+=end PIR_FRAGMENT
 
 =head1 C Extensions
 
@@ -578,6 +736,8 @@ to do a DLL export specification of the NCI function:
 Then, after having compiled the file as a shared library, the PIR code looks
 like this:
 
+=begin PIR
+
   .sub main :main
      .local pmc lib, func
 
@@ -593,14 +753,20 @@ like this:
 
   .end
 
+=end PIR
+
 If you embedded a Parrot in your C file and you want to invoke another function
 in that same C file, you should pass a null string to loadlib. Do that as follows:
+
+=begin PIR_FRAGMENT
 
  .local pmc lib
  .local string libname
  null libname
 
  lib = loadlib libname
+
+=end PIR_FRAGMENT
 
 Under Linux, the .c file must then be linked with the -export-dynamic option.
 
@@ -610,17 +776,25 @@ Under Linux, the .c file must then be linked with the -export-dynamic option.
 
 Create a new C<Env> PMC and access it like a hash.
 
+=begin PIR_FRAGMENT
+
     .local pmc e
     e = new 'Env'
     $P0 = e['USER']      # lt
 
+=end PIR_FRAGMENT
+
 =head2 How can I access Parrot's configuration?
+
+=begin PIR_FRAGMENT
 
     .include 'iglobals.pasm'
     .local pmc interp, cfg
     interp = getinterp
     cfg = interp[.IGLOBALS_CONFIG_HASH]
     $S0 = cfg['VERSION']    # "0.3.0"
+
+=end PIR_FRAGMENT
 
 See F<config_lib.pasm> for all the keys in the config hash - or iterate over
 the config hash.

@@ -5,42 +5,37 @@
 Z<CHP-3>
 
 X<Parrot Intermediate Representation;;(see PIR)>
-X<PIR>
+X<PIR (Parrot intermediate representation)>
 
 Parrot Intermediate Representation (PIR) is Parrot's native low-level
-language.N<Parrot also has a pure native assembly language called PASM,
-described in Chapter 9.> PIR is fundamentally an assembly language, but
-it has some higher-level features such as operator syntax, syntactic
-sugar for subroutine and method calls, automatic register allocation,
-and more friendly conditional syntax.  PIR is commonly used to write
-Parrot libraries -- including some of Parrot's compilers -- and is the
-target form when compiling high-level languages to Parrot.  Even so, PIR
-is more rigid and "close to the machine" then some higher-level
-languages like C. X<.pir files> Files containing PIR code use the
-F<.pir> extension.
+language.N<Parrot has a pure native assembly language called PASM, described in
+Chapter 9.> PIR is fundamentally an assembly language, but it has some
+higher-level features such as operator syntax, syntactic sugar for subroutine
+and method calls, automatic register allocation, and more friendly conditional
+syntax.  PIR is commonly used to write Parrot libraries -- including some of
+PCT's compilers -- and is the target form when compiling high-level languages
+to Parrot.
 
-=head2 Basic Syntax
+Even so, PIR is more rigid and "close to the machine" then some higher-level
+languages like C. X<.pir files> Files containing PIR code use the F<.pir>
+extension.
+
+=head2 Basics
 
 PIR has a relatively simple syntax. Every line is a comment, a label, a
-statement, or a directive. There is no end-of-line symbol (such as a
-semicolon in C), the end of the line is the end of the statement or
-directive.
+statement, or a directive. Each statement or directive stands on its own line.
+There is no end-of-line symbol (such as a semicolon in other languages).
 
 =head3 Comments
 
-X<PIR (Parrot intermediate representation); comments>
-X<comments (PIR)>
+X<PIR comments>
 A comment begins with the C<#> symbol, and continues until the end of the line.
 Comments can stand alone on a line or follow a statement or directive.
-
-=begin PIR
 
     # This is a regular comment. The PIR
     # interpreter ignores this.
 
-=end PIR
-
-X<Pod documentation>
+X<PIR POD>
 PIR also treats inline documentation in Pod format as a comment. An
 equals sign as the first character of a line marks the start of a Pod
 block.  A C<=cut> marker signals the end of a Pod block.
@@ -52,32 +47,21 @@ block.  A C<=cut> marker signals the end of a Pod block.
 
   =cut
 
-=head3 Labels
+=head2 Labels
 
 Z<CHP-3-SECT-4>
 
 X<PIR (Parrot intermediate representation);labels> X<labels (PIR)> A label
-attaches a name to a line of code so other statements can refer to it.
-Labels can contain letters, numbers, and underscores. By convention,
-labels use all capital letters to stand out from the rest of the source
-code. It's fine to put a label on the same line as a statement or
-directive:
-
-=begin PIR_FRAGMENT
-
-    GREET: print "'Allo, 'allo, 'allo."
-
-=end PIR_FRAGMENT
-
-Readability is improved by putting labels on separate lines, outdented
-to stand apart from the ordiary code flow:
-
-=begin PIR_FRAGMENT
+attaches to a line of code so other statements can refer to it.  Labels can
+contain letters, numbers, and underscores. By convention, labels use all
+capital letters to stand out from the rest of the source code. A label can be
+precede a line of code, though outdenting labels on separate lines improves
+readability:
 
   GREET:
-    print "'Allo, 'allo, 'allo."
+      say "'Allo, 'allo, 'allo."
 
-=end PIR_FRAGMENT
+Labels are vital to control flow.
 
 =head3 Statements
 
@@ -89,397 +73,102 @@ A statement is either an opcode or syntactic sugar for one or more opcodes. An
 opcode is a native instruction for the virtual machine; it consists of the name
 of the instruction followed by zero or more arguments.
 
-=begin PIR_FRAGMENT
-
-  print "Norwegian Blue"
-
-=end PIR_FRAGMENT
+  say "Norwegian Blue"
 
 PIR also provides higher-level constructs, including symbol operators:
 
-=begin PIR_FRAGMENT
-
   $I1 = 2 + 5
-
-=end PIR_FRAGMENT
 
 Under the hood, these special statement forms are just syntactic sugar for
 regular opcodes. The C<+> symbol corresponds to the C<add> opcode, the C<->
-symbol to the C<sub> opcode, and so on. The previous example is equivalent to:
-
-=begin PIR_FRAGMENT
+symbol to the C<sub> opcode, and so on.  The previous example is equivalent to:
 
   add $I1, 2, 5
 
-=end PIR_FRAGMENT
-
 =head3 Directives
 
-Directives look similar to opcodes, but they begin with a period (C<.>).
-Parrot's parser handles them specially. Some directives specify actions
-that occur at compile time. Other directives represent complex
-operations that require the generation of multiple instructions.  The
-C<.local> directive, for example, declares a named variable.
-
-=begin PIR_FRAGMENT
+Directives begin with a period (C<.>); Parrot's parser handles them specially.
+Some directives specify actions that occur at compile time. Other directives
+represent complex operations that require the generation of multiple
+instructions.  The C<.local> directive declares a typed register.
 
   .local string hello
 
-=end PIR_FRAGMENT
+PIR also has a macro facility to create user-defined directives.
 
 =head3 Literals
 
 Integers and floating point numbers are numeric literals. They can be positive
 or negative.
 
-=begin PIR_FRAGMENT
-
   $I0 = 42       # positive
   $I1 = -1       # negative
 
-=end PIR_FRAGMENT
-
-Integer literals can also be binary or hexadecimal:
-
-=begin PIR_FRAGMENT
+Integer literals can also be binary, octal, or hexadecimal:
 
   $I3 = 0b01010  # binary
+  $I3 = 0o78     # octal
   $I2 = 0xA5     # hexadecimal
-
-=end PIR_FRAGMENT
 
 Floating point number literals have a decimal point, and can use scientific
 notation:
 
-=begin PIR_FRAGMENT
-
   $N0 = 3.14
   $N2 = -1.2e+4
-
-=end PIR_FRAGMENT
 
 X<strings;in PIR>
 String literals are enclosed in single or double-quotes.N<L<Strings>
 explains the differences between the quoting types.>
 
-=begin PIR_FRAGMENT
-
   $S0 = "This is a valid literal string"
   $S1 = 'This is also a valid literal string'
 
-=end PIR_FRAGMENT
-
 =head3 Variables
 
-PIR variables can store four different kinds of valuesE<mdash>integers,
-numbers (floating point), strings, and objects. Parrot's objects are
-called PMCs, for "I<P>olyI<M>orphic I<C>ontainer".
-
-The simplest kind of variable is a register variable. The name of a
-register variable always starts with a dollar sign (C<$>), followed by a
-single character which specifies the type of the variableE<mdash>integer
-(C<I>), number (C<N>), string (C<S>), or PMC (C<P>)E<mdash>, and end
-with a unique number. Register variables don't need to be predeclared:
-
-=begin PIR_FRAGMENT
+PIR variables can store four different kinds of valuesE<mdash>integers, numbers
+(floating point), strings, and objects. The simplest way to work with these
+values is through register variables. Register variables always start with a
+dollar sign (C<$>) and a single character which specifies the type of the
+register: integer (C<I>), number (C<N>), string (C<S>), or PMC (C<P>).
+Registers have numbers as well; the "first" string register is
+C<$S0>.N<Register numbers may or may not correspond to the register used
+internally; Parrot's compiler remaps registers as appropriate.>
 
   $S0 = "Who's a pretty boy, then?"
-  print $S0
+  say $S0
 
-=end PIR_FRAGMENT
-
-PIR also has named variables, which are declared with the C<.local>
-directive. As with register variables, there are four valid types:
-C<int>, C<num>, C<string>, and C<pmc>. Named variables have to be
-declared, but otherwise behave exactly the same as register variables.
-
-=begin PIR_FRAGMENT
+PIR also has named variables, which are declared with the C<.local> directive.
+As with registers, there are four valid types for named variables: C<int>,
+C<num>, C<string>, and C<pmc>.N<Again, for "I<P>olyI<M>orphic I<C>ontainer".>
+After declaring a named variable, you can use the name anywhere you would use a
+register:
 
   .local string hello
-  hello = "'Allo, 'allo, 'allo."
-  print hello
-
-=end PIR_FRAGMENT
-
-=head3 Constants
-
-X<PIR (Parrot intermediate representation);constants>
-X<constants (PIR)>
-
-The C<.const> directive declares a named constant. Named constants are
-similar to named variables, but their values are set in the declaration
-and can never be changed. Like C<.local>, C<.const> takes a type and a
-name. It also requires a literal argument to set the value of the
-constant.
-
-=begin PIR_FRAGMENT
-
-  .const int    frog = 4                       # integer constant
-  .const string name = "Superintendent Parrot" # string constant
-  .const num    pi   = 3.14159                 # floating point constant
-
-=end PIR_FRAGMENT
-
-Named constants may be used in all the same places as literals, but have
-to be declared beforehand. The following example declares a named string
-constant C<hello> and prints the value:
-
-=begin PIR_FRAGMENT
-
-  .const string hello = "Hello, Polly."
-  print hello
-
-=end PIR_FRAGMENT
-
-=head3 Control Structures
-
-Rather than providing a pre-packaged set of control structures like
-C<if> and C<while>, PIR gives you the building blocks to construct your
-own.N<PIR has many advanced features, but at heart it B<is> an assembly
-language.> The most basic of these building blocks is C<goto>, which
-jumps to a named label.N<This is not your father's C<goto>. It can only
-jump inside a subroutine, and only to a named label.> In the following
-code example, the C<print> statement will run immediately after the
-C<goto> statement:
-
-=begin PIR_FRAGMENT
-
-    goto GREET
-    # ... some skipped code ...
-
-  GREET:
-    print "'Allo, 'allo, 'allo."
-
-=end PIR_FRAGMENT
-
-Variations on the basic C<goto> check whether a particular condition is
-true or false before jumping:
-
-=begin PIR_FRAGMENT
-
-  if $I0 > 5 goto GREET
-
-=end PIR_FRAGMENT
-
-All of the traditional control structures can be constructed from PIR's
-control building blocks.
-
-=head3 Subroutines
-
-A PIR subroutine starts with the C<.sub> directive and ends with the
-C<.end> directive. Parameter declarations use the C<.param> directive,
-and look a lot like named variable declarations. The following example
-declares a subroutined named C<greeting>, that takes a single string
-parameter named C<hello>:
-
-=begin PIR
-
-  .sub greeting
-      .param string hello
-      print hello
-  .end
-
-=end PIR
-
-=head3 That's All Folks
-
-You now know everything you need to know about PIR. Everything else you
-read or learn about PIR will use one of these fundamental language
-structures. The rest is vocabulary.
-
-=head2 Working with Variables
-
-We call the simple C<$I0>-style variables "register variables" for a
-specific reason: Parrot is a register-based virtual machine. It has 4
-typed register sets: integers, floating-point numbers, strings, and
-objects. When you're working with register variables or named variables,
-you're actually working directly with register storage locations in the
-virtual machine.
-
-If you've ever worked with an assembly language before, you may
-immediately jump to the conclusion that C<$I0> is the zeroth integer
-register, but Parrot is a bit smarter than that. The number of a
-register variable usually does not correspond to the register used
-internally; Parrot's compiler maps registers as appropriate for speed
-and memory considerations. The only guarantee Parrot gives you is that
-you'll always get the same storage location when you use C<$I0> in the
-same subroutine.
-
-The most basic operation on a variable is assignment using the C<=>
-operator:
-
-=begin PIR_FRAGMENT
-
-  $I0 = 42        # set integer variable to the value 42
-  $N3 = 3.14159   # set number variable to an approximation of pi
-  $I1 = $I0       # set $I1 to the value of $I0
-
-=end PIR_FRAGMENT
-
-The C<exchange> opcode swaps the contents of two variables of the same
-type. The following example sets C<$I0> to the value of C<$I1>, and sets
-C<$I1> to the value of C<$I0>. 
-
-=begin PIR_FRAGMENT
-
-  exchange $I0, $I1
-
-=end PIR_FRAGMENT
-
-The C<null> opcode sets an integer or number variable to a zero value,
-and undefines a string or object.
-
-=begin PIR_FRAGMENT
-
-  null $I0  # 0
-  null $N0  # 0.0
-  null $S0  # NULL
-  null $P0  # PMCNULL
-
-=end PIR_FRAGMENT
-
-=head2 Working with Numbers
-
-X<PIR (Parrot assembly language);math operations>
-PIR has an extensive set of math instructions that work with integers,
-floating-point numbers, and numeric PMCs. Many of the math instructions
-have two- and three-argument forms:
-
-=begin PIR_FRAGMENT
-
-  $I10 = $I11 + $I2
-  $I0 += $I1
-
-=end PIR_FRAGMENT
-
-The three-argument form of C<+> stores the sum
-of the two arguments in the result variable. The two-argument form
-adds the first variable to the second and stores the result back in
-the first variable.
-
-The arguments can be Parrot variables or constants, but they
-must be compatible with the type of the result.
-Generally, "compatible" means that the result and arguments have to
-be the same type, but there are a few exceptions:
-
-=begin PIR_FRAGMENT
-
-  $P0 = $P1 - 2
-  $P0 = $P1 - 1.5
-
-=end PIR_FRAGMENT
-
-If the result is an integer type, like C<$I0>, the arguments must be
-integer variables or constants. A
-floating-point result, like C<$N0>, usually requires
-floating-point arguments, but many math instructions also allow the final
-argument to be an integer. Instructions with a PMC result may
-accept an integer, floating-point, or PMC final argument:
-
-=begin PIR_FRAGMENT
-
-  mul $P0, $P1             # $P0 *= $P1
-  mul $P0, $I1
-  mul $P0, $N1
-  mul $P0, $P1, $P2        # $P0 = $P1 * $P2
-  mul $P0, $P1, $I2
-  mul $P0, $P1, $N2
-
-=end PIR_FRAGMENT
-
-
-
-We won't list every math opcode here, but we'll list some of the most common
-ones. You can get a complete list in "PIR Opcodes" in Chapter 11.
-
-=head4 Unary math opcodes
-
-Z<CHP-9-SECT-2.3.1>
-
-The unary opcodes have either a destination argument and a source
-argument, or a single argument as destination and source. Some of the
-most common unary math opcodes are C<inc> (increment), C<dec>
-(decrement), C<abs> (absolute value), C<neg> (negate), and C<fact>
-(factorial):
-
-=begin PIR_FRAGMENT
-
-  abs $N0, -5.0  # the absolute value of -5.0 is 5.0
-  fact $I1, 5    # the factorial of 5 is 120
-  inc $I1        # 120 incremented by 1 is 121
-
-=end PIR_FRAGMENT
-
-=head4 Binary math opcodes
-
-Z<CHP-9-SECT-2.3.2>
-
-X<PIR (Parrot assembly language);math operations;binary>
-Binary opcodes have two source arguments and a destination argument, and we
-saw examples of these types above. As we mentioned before, most binary math
-opcodes have a two-argument form in which the first argument is both a source
-and the destination. Parrot provides C<add>X<add opcode (PIR)> (addition),
-C<sub>X<sub opcode (PIR)> (subtraction), C<mul>X<mul opcode (PIR)>
-(multiplication), C<div>X<div opcode (PIR)> (division), and C<pow>X<pow
-opcode (PIR)> (exponent) opcodes, as well as two different modulus
-operations. C<mod>X<mod opcode (PIR)> is Parrot's implementation of modulus,
-and C<cmod>X<cmod opcode (PIR)> performs an operation equivalent the C<%>
-operator from the C programming language. It also provides C<gcd>X<gcd opcode
-(PIR)> (greatest common divisor) and C<lcm>X<lcm opcode (PIR)> (least common
-multiple).
-
-=begin PIR_FRAGMENT
-
-  div $I0, 12, 5   # $I0 = 12 / 5
-  mod $I0, 12, 5   # $I0 = 12 % 5
-
-=end PIR_FRAGMENT
-
-=head4 Floating-point operations
-
-Z<CHP-9-SECT-2.3.3>
-
-X<PIR (Parrot assembly language);math operations;floating-point>
-Although most of the math operations work with both floating-point numbers
-and integers, a few require floating-point destination registers. Among these
-are C<ln> (natural log), C<log2> (log base 2), C<log10> (log base 10), and
-C<exp> (I<e>G<x>), as well as a full set of trigonometric opcodes such as
-C<sin> (sine), C<cos> (cosine), C<tan> (tangent), C<sec> (secant), C<cosh>
-(hyperbolic cosine), C<tanh> (hyperbolic tangent), C<sech> (hyperbolic secant),
-C<asin> (arc sine), C<acos> (arc cosine), C<atan> (arc tangent), C<asec> (arc
-secant), C<exsec> (exsecant), C<hav> (haversine), and C<vers> (versine). All
-angle arguments for the X<trigonometric functions (PIR)> trigonometric
-functions are in radians:
-
-=begin PIR_FRAGMENT
-
-  sin $N1, $N0
-  exp $N1, 2
-
-=end PIR_FRAGMENT
-
-The majority of the floating-point operations have a single source argument
-and a single destination argument. Even though the destination must be a
-floating-point register, the source can be either an integer or floating-point
-number.
-
-The C<atan>X<atan opcode (PIR)> opcode also has a three-argument variant that
-implements C's C<atan2()>:
-
-=begin PIR_FRAGMENT
-
-  atan $N0, 1, 1
-
-=end PIR_FRAGMENT
-
-
-
-
-=head2 Working with Strings
+  set hello, "'Allo, 'allo, 'allo."
+  say hello
+
+Integer (C<I>) and Number (C<N>) registers use platform-dependent sizes and
+limitations.N<There are a few exceptions to this; Parrot smooths out some of the
+bumps and inconsistencies so that PIR code behaves the same way on all
+supported platforms.> Internally, Parrot treats both I and N registers as
+signed quantities internally for the purposes of arithmetic. Parrot's floating
+point values and operations all comply with the IEEE 754 standard.
+
+Strings (S) are buffers of variable-sized data. The most common use of S
+registers and variables is to store textual data. S registers I<may> also be
+buffers for binary or other non-textual data, though this is rare.N<In general,
+a custom PMC is mroe useful.>  Parrot strings are flexible and powerful, to
+account for all the complexity of human-readable (and computer-representable)
+textual data.
+
+The final data type is the PMC. PMC resemble classes and objects are in
+object-oriented languages. They are the basis for complex data structures and
+object-oriented behavior in Parrot.
+
+=head2 Strings
 
 Strings in double-quotes accept all sorts of escape sequences using
-backslashes. Strings in single-quotes only allow escapes for nested
-quotes:
+backslashes. Strings in single-quotes only allow escapes for nested quotes:
 
   $S0 = "This string is \n on two lines"
   $S0 = 'This is a \n one-line string with a slash in it'
@@ -516,806 +205,17 @@ line, and may not have any trailing whitespace.
 
   End_Token
 
-=head3 Assignment
-
-Strings in Parrot are also stored as references to internal data structures
-like PMCs. However, strings use Copy-On-Write (COW) optimizations. When we
-call C<set S1, S0> we copy the pointer only, so both registers point to the
-same string memory. We don't actually make a copy of the string until one of
-two registers is modified. Here's the same example using string registers
-instead of PMC registers, which demonstrate how strings use COW:
-
-=begin PASM
-
-  set S0, "Ford"
-  set S1, S0
-  set S1, "Zaphod"
-  print S0                # prints "Ford"
-  print S1                # prints "Zaphod"
-  end
-
-=end PASM
-
-Here, we can clearly see the opposite result from how PMCs were handled in
-the previous example. Modifying one of the two registers causes a new string
-to be created, preserving the old value in C<S0> and assigning the new value
-to the new string in C<S1>. The benefits here are that we don't have to worry
-about stray references causing side effects in our code, and we don't waste
-time copying a string until it's actually time to make a copy.
-
-
-Strings are buffers of variable-sized data. The most common use of string
-registers and variables is to store textual data. String registers I<may> also be
-buffers for binary or other non-textual data, though this is rareN<In general,
-a custom PMC is more useful>.  Parrot strings are flexible and powerful, to
-account for all the complexity of human-readable (and computer-representable)
-textual data.
-
-X<PIR (Parrot assembly language);string operations>
-String operations work with string registers and string-like PMCs.
-String operations on PMC registers require all their string
-arguments to be String PMCs.
-
-=head4 Concatenating strings
-
-Z<CHP-9-SECT-2.4.1>
-
-X<PIR (Parrot assembly language);string operations;concatenation>
-Use the C<concat>X<concat opcode (PIR)> opcode to concatenate
-strings. With string register or string constant arguments, C<concat>
-has both a two-argument and a three-argument form. The first argument
-is a source and a destination in the two-argument form:
-
-=begin PIR_FRAGMENT
-
-  set $S0, "ab"
-  concat $S0, "cd"     # S0 has "cd" appended
-  print $S0            # prints "abcd"
-  print "\n"
-
-  concat $S1, $S0, "xy" # S1 is the string S0 with "xy" appended
-  print $S1            # prints "abcdxy"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-The first C<concat> concatenates the string "cd" onto the string "ab" in
-C<S0>. It generates a new string "abcd" and changes C<S0> to point to the
-new string. The second C<concat> concatenates "xy" onto the string "abcd"
-in C<S0> and stores the new string in C<S1>.
-
-X<PMCs (Polymorphic Containers);concatenation>
-For PMC registers, C<concat> has only a three-argument form with
-separate registers for source and destination:
-
-=begin PIR_FRAGMENT
-
-  new $P0, "String"
-  new $P1, "String"
-  new $P2, "String"
-  set $P0, "ab"
-  set $P1, "cd"
-  concat $P2, $P0, $P1
-  print $P2            # prints abcd
-  print "\n"
-
-=end PIR_FRAGMENT
-
-Here, C<concat> concatenates the strings in C<$P0> and C<$P1> and stores
-the result in C<$P2>.
-
-=head4 Repeating strings
-
-Z<CHP-9-SECT-2.4.2>
-
-X<PIR (Parrot assembly language);string operations;repeating strings>
-The C<repeat>X<repeat opcode (PIR)> opcode repeats a string a certain
-number of times:
-
-=begin PIR_FRAGMENT
-
-  set $S0, "x"
-  repeat $S1, $S0, 5  # $S1 = $S0 x 5
-  print $S1          # prints "xxxxx"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-In this example, C<repeat> generates a new string with "x" repeated
-five times and stores a pointer to it in C<S1>.
-
-=head4 Length of a string
-
-Z<CHP-9-SECT-2.4.3>
-
-X<PIR (Parrot assembly language);string operations;length>
-The C<length>X<length opcode (PIR)> opcode returns the length of a
-string in characters. This won't be the same as the length in bytes
-for multibyte encoded strings:
-
-=begin PIR_FRAGMENT
-
-  set $S0, "abcd"
-  length $I0, $S0                # the length is 4
-  print $I0
-  print "\n"
-
-=end PIR_FRAGMENT
-
-C<length> doesn't have an equivalent for PMC strings.
-
-=head4 Substrings
-
-Z<CHP-9-SECT-2.4.4>
-
-X<PIR (Parrot assembly language);string operations;substrings>
-The simplest version of the C<substr>X<substr opcode (PIR)> opcode
-takes four arguments: a destination register, a string, an offset
-position, and a length. It returns a substring of the original string,
-starting from the offset position (0 is the first character) and
-spanning the length:
-
-=begin PIR_FRAGMENT
-
-  substr $S0, "abcde", 1, 2        # $S0 is "bc"
-
-=end PIR_FRAGMENT
-
-This example extracts a two-character string from "abcde" at a
-one-character offset from the beginning of the string (starting with
-the second character). It generates a new string, "bc", in the
-destination register C<S0>.
-
-When the offset position is negative, it counts backward from the end
-of the string. So an offset of -1 starts at the last character of the
-string.
-
-C<substr> also has a five-argument form, where the fifth argument is a
-string to replace the substring. This modifies the second argument and
-returns the removed substring in the destination register.
-
-=begin PIR_FRAGMENT
-
-  set $S1, "abcde"
-  substr $S0, $S1, 1, 2, "XYZ"
-  print $S0                        # prints "bc"
-  print "\n"
-  print $S1                        # prints "aXYZde"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This replaces the substring "bc" in C<S1> with the string "XYZ", and
-returns "bc" in C<S0>.
-
-When the offset position in a replacing C<substr> is one character
-beyond the original string length, C<substr> appends the replacement
-string just like the C<concat> opcode. If the replacement string is an
-empty string, the characters are just removed from the original
-string.
-
-When you don't need to capture the replaced string, there's an
-optimized version of C<substr> that just does a replace without
-returning the removed substring.
-
-=begin PIR_FRAGMENT
-
-  set $S1, "abcde"
-  substr $S1, 1, 2, "XYZ"
-  print $S1                        # prints "aXYZde"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-The PMC versions of C<substr> are not yet implemented.
-
-=head4 Chopping strings
-
-Z<CHP-9-SECT-2.4.5>
-
-X<PIR (Parrot assembly language);string operations;chopping strings>
-The C<chopn>X<chopn opcode (PIR)> opcode removes characters from the
-end of a string. It takes two arguments: the string to modify and the
-count of characters to remove.
-
-=begin PIR_FRAGMENT
-
-  set $S0, "abcde"
-  chopn $S0, 2
-  print $S0         # prints "abc"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This example removes two characters from the end of C<S0>. If the
-count is negative, that many characters are kept in the string:
-
-=begin PIR_FRAGMENT
-
-  set $S0, "abcde"
-  chopn $S0, -2
-  print $S0         # prints "ab"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This keeps the first two characters in C<S0> and removes the rest.
-C<chopn> also has a three-argument version that stores the chopped
-string in a separate destination register, leaving the original string
-untouched:
-
-=begin PIR_FRAGMENT
-
-  set $S0, "abcde"
-  chopn $S1, $S0, 1
-  print $S1         # prints "abcd"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-=head4 Copying and Cloning
-
-Z<CHP-9-SECT-2.4.6>
-
-X<PIR (Parrot assembly language);string operations;copying> The C<clone>
-X<clone opcode (PIR)> opcode makes a deep copy of a string or PMC. Earlier
-in this chapter we saw that PMC and String values used with the C<set> opcode
-didn't create a copy of the underlying data structure, it only created
-a copy of the reference to that structure. With strings, this doesn't cause
-a problem because strings use Copy On Write (COW) semantics to automatically
-create a copy of the string when one reference is modified. However, as we
-saw, PMCs don't have this same behavior and so making a change to one PMC
-reference would modify the data that all the other references to that same
-PMC pointed to.
-
-Instead of just copying the pointer like C<set> would do, we can use the
-C<clone> opcode to create a I<deep copy> of the PMC, not just a I<shallow
-copy> of the reference.
-
-=begin PIR_FRAGMENT
-
-  new $P0, "String"
-  set $P0, "Ford"
-  clone $P1, $P0
-  set $P0, "Zaphod"
-  print $P0        # prints "Zaphod"
-  print $P1        # prints "Ford"
-
-=end PIR_FRAGMENT
-
-This example creates an identical, independent clone of the PMC in
-C<P0> and puts a pointer to it in C<P1>. Later changes to C<P0> have
-no effect on the PMC referenced in C<P1>.
-
-With simple strings, the copes created by C<clone> are COW exactly the same
-as the copy created by C<set>, so there is no difference between these two
-opcodes for strings. By convention, C<set> is used with strings more often
-then C<clone>, but there is no rule about this.
-
-=head4 Converting characters
-
-Z<CHP-9-SECT-2.4.7>
-
-X<PIR (Parrot assembly language);string operations;converting strings>
-The C<chr>X<chr opcode (PIR)> opcode takes an integer value and returns the
-corresponding character in the ASCII character set as a one-character string,
-while the C<ord>X<ord opcode (PIR)> opcode takes a single character string
-and returns the integer value of the character at the first position in the
-string. Notice that the integer value of the character will differ depending
-on the current encoding of the string:
-
-=begin PIR_FRAGMENT
-
-  chr $S0, 65                # $S0 is "A"
-  ord $I0, $S0               # $I0 is 65, if $S0 is ASCII or UTF-8
-
-=end PIR_FRAGMENT
-
-C<ord> has a three-argument variant that takes a character offset to select
-a single character from a multicharacter string. The offset must be within
-the length of the string:
-
-=begin PIR_FRAGMENT
-
-  ord $I0, "ABC", 2        # $I0 is 67
-
-=end PIR_FRAGMENT
-
-A negative offset counts backward from the end of the string, so -1 is
-the last character.
-
-=begin PIR_FRAGMENT
-
-  ord $I0, "ABC", -1        # $I0 is 67
-
-=end PIR_FRAGMENT
-
-=head4 Formatting strings
-
-Z<CHP-9-SECT-2.4.8>
-
-X<PIR (Parrot assembly language);string operations;formatting strings>
-The C<sprintf>X<sprintf opcode (PIR)> opcode generates a formatted string
-from a series of values. It takes three arguments: the destination register,
-a string specifying the format, and an ordered aggregate PMC (like an
-C<Array> PMC) containing the values to be formatted. The format string and
-the destination register can be either strings or PMCs:
-
-=begin PIR_FRAGMENT
-
-  sprintf $S0, $S1, $P2
-  sprintf $P0, $P1, $P2
-
-=end PIR_FRAGMENT
-
-The format string is similar to the one for C's C<sprintf> function,
-but with some extensions for Parrot data types. Each format field in
-the string starts with a C<%>
-X<% (percent sign);% format strings for sprintf opcode (PIR)> and
-ends with a character specifying the output format. The output format
-characters are listed in Table 9-1.
-
-=begin table picture Format characters
-
-Z<CHP-9-TABLE-1>
-
-=headrow
-
-=row
-
-=cell Format
-
-=cell Meaning
-
-=bodyrows
-
-=row
-
-=cell C<%c>
-
-=cell A single character.
-
-=row
-
-=cell C<%d>
-
-=cell A decimal integer.
-
-=row
-
-=cell C<%i>
-
-=cell A decimal integer.
-
-=row
-
-=cell C<%u>
-
-=cell An unsigned integer.
-
-=row
-
-=cell C<%o>
-
-=cell An octal integer.
-
-=row
-
-=cell C<%x>
-
-=cell A hex integer, preceded by 0x when # is specified.
-
-=row
-
-=cell C<%X>
-
-=cell A hex integer with a capital X (when # is specified).
-
-=row
-
-=cell C<%b>
-
-=cell A binary integer, preceded by 0b when # is specified.
-
-=row
-
-=cell C<%B>
-
-=cell A binary integer with a capital B (when # is specified).
-
-=row
-
-=cell C<%p>
-
-=cell A pointer address in hex.
-
-=row
-
-=cell C<%f>
-
-=cell A floating-point number.
-
-=row
-
-=cell C<%e>
-
-=cell A floating-point number in scientific notation (displayed with a
-lowercase "e").
-
-=row
-
-=cell C<%E>
-
-=cell The same as C<%e>, but displayed with an uppercase E.
-
-=row
-
-=cell C<%g>
-
-=cell The same as either C<%e> or C<%f>, whichever fits best.
-
-=row
-
-=cell C<%G>
-
-=cell The same as C<%g>, but displayed with an uppercase E.
-
-=row
-
-=cell C<%s>
-
-=cell A string.
-
-=end table
-
-Each format field can be specified with several options: R<flags>,
-R<width>, R<precision>, and R<size>. The format flags are listed in
-Table 9-2.
-
-=begin table picture Format flags
-
-Z<CHP-9-TABLE-2>
-
-=headrow
-
-=row
-
-=cell Flag
-
-=cell Meaning
-
-=bodyrows
-
-=row
-
-=cell 0
-
-=cell Pad with zeros.
-
-=row
-
-=cell E<lt>spaceE<gt>
-
-=cell Pad with spaces.
-
-=row
-
-=cell C<+>
-
-=cell Prefix numbers with a sign.
-
-=row
-
-=cell C<->
-
-=cell Align left.
-
-=row
-
-=cell C<#>
-
-=cell Prefix a leading 0 for octal, 0x for hex, or force a decimal point.
-
-=end table
-
-The R<width> is a number defining the minimum width of the output from
-a field. The R<precision> is the maximum width for strings or
-integers, and the number of decimal places for floating-point fields.
-If either R<width> or R<precision> is an asterisk (C<*>), it takes its
-value from the next argument in the PMC.
-
-The R<size> modifier defines the type of the argument the field takes.
-The flags are listed in Table 9-3.
-
-=begin table picture Size flags
-
-Z<CHP-9-TABLE-3>
-
-=headrow
-
-=row
-
-=cell Character
-
-=cell Meaning
-
-=bodyrows
-
-=row
-
-=cell C<h>
-
-=cell short integer or single-precision float
-
-=row
-
-=cell C<l>
-
-=cell long
-
-=row
-
-=cell C<H>
-
-=cell huge value (long long or long double)
-
-=row
-
-=cell C<v>
-
-=cell Parrot INTVAL or FLOATVAL
-
-=row
-
-=cell C<O>
-
-=cell opcode_t pointer
-
-=row
-
-=cell C<P>
-
-=cell C<PMC>
-
-=row
-
-=cell C<S>
-
-=cell String
-
-=end table
-
-The values in the aggregate PMC must have a type compatible with the
-specified R<size>.
-
-Here's a short illustration of string formats:
-
-=begin PIR_FRAGMENT
-
-  new $P2, "Array"
-  new $P0, "Int"
-  set $P0, 42
-  push $P2, $P0
-  new $P1, "Num"
-  set $P1, 10
-  push $P2, $P1
-  sprintf $S0, "int %#Px num %+2.3Pf\n", $P2
-  print $S0     # prints "int 0x2a num +10.000"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-The first eight lines create a C<Array> with two elements: a
-C<Int> and a C<Num>. The format string of the C<sprintf> has
-two format fields. The first, C<%#Px>, takes a PMC argument from the
-aggregate (C<P>) and formats it as a hexadecimal integer (C<x>), with
-a leading 0x (C<#>). The second format field, C<%+2.3Pf>, takes a PMC
-argument (C<P>) and formats it as a floating-point number (C<f>), with
-a minimum of two whole digits and a maximum of three decimal places
-(C<2.3>) and a leading sign (C<+>).
-
-The test files F<t/op/string.t> and F<t/src/sprintf.t> have many more
-examples of format strings.
-
-=head4 Testing for substrings
-
-Z<CHP-9-SECT-2.4.9>
-
-X<PIR (Parrot assembly language);string operations;testing for substrings>
-The C<index>X<index opcode (PIR)> opcode searches for a substring
-within a string. If it finds the substring, it returns the position
-where the substring was found as a character offset from the beginning
-of the string. If it fails to find the substring, it returns -1:
-
-=begin PIR_FRAGMENT
-
-  index $I0, "Beeblebrox", "eb"
-  print $I0                       # prints 2
-  print "\n"
-  index $I0, "Beeblebrox", "Ford"
-  print $I0                       # prints -1
-  print "\n"
-
-=end PIR_FRAGMENT
-
-C<index> also has a four-argument version, where the fourth argument
-defines an offset position for starting the search:
-
-=begin PIR_FRAGMENT
-
-  index $I0, "Beeblebrox", "eb", 3
-  print $I0                         # prints 5
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This finds the second "eb" in "Beeblebrox" instead of the first,
-because the search skips the first three characters in the
-string.
-
-=head4 Joining strings
-
-The C<join> opcode joins the elements of an array PMC into a single
-string. The second argument separates the individual elements of the
-PMC in the final string result.
-
-=begin PIR_FRAGMENT
-
-  new $P0, "Array"
-  push $P0, "hi"
-  push $P0, 0
-  push $P0, 1
-  push $P0, 0
-  push $P0, "parrot"
-  join $S0, "__", $P0
-  print $S0              # prints "hi__0__1__0__parrot"
-
-=end PIR_FRAGMENT
-
-This example builds a C<Array> in C<P0> with the values C<"hi">,
-C<0>, C<1>, C<0>, and C<"parrot">. It then joins those values (separated
-by the string C<"__">) into a single string, and stores it in C<S0>.
-
-=head4 Splitting strings
-
-Splitting a string yields a new array containing the resulting
-substrings of the original string.
-
-=begin PIR_FRAGMENT
-
-  split $P0, "", "abc"
-  set $P1, $P0[0]
-  print $P1              # 'a'
-  set $P1, $P0[2]
-  print $P1              # 'c'
-
-=end PIR_FRAGMENT
-
-This example splits the string "abc" into individual characters and
-stores them in an array in C<P0>. It then prints out the first and
-third elements of the array. For now, the split pattern (the second
-argument to the opcode) is ignored except for a test to make sure that
-its length is zero.
-
-=head3 Logical and Bitwise Operations
-
-Z<CHP-9-SECT-2.6>
-
-X<PIR (Parrot assembly language);bitwise operations>
-X<PIR (Parrot assembly language);logical operations>
-The X<logical opcodes> logical opcodes evaluate the truth of their
-arguments. They're often used to make decisions on control flow.
-Logical operations are implemented for integers and PMCs. Numeric
-values are false if they're 0, and true otherwise. Strings are false
-if they're the empty string or a single character "0", and true
-otherwise. PMCs are true when their
-C<get_bool>X<get_bool vtable method (PIR)> vtable method returns a
-nonzero value.
-
-The C<and>X<and opcode (PIR)> opcode returns the second argument if
-it's false and the third argument otherwise:
-
-=begin PIR_FRAGMENT
-
-  and $I0, 0, 1  # returns 0
-  and $I0, 1, 2  # returns 2
-
-=end PIR_FRAGMENT
-
-The C<or>X<or opcode (PIR)> opcode returns the second argument if
-it's true and the third argument otherwise:
-
-=begin PIR_FRAGMENT
-
-  or $I0, 1, 0  # returns 1
-  or $I0, 0, 2  # returns 2
-
-  or $P0, $P1, $P2
-
-=end PIR_FRAGMENT
-
-Both C<and> and C<or> are short-circuiting. If they can determine what
-value to return from the second argument, they'll never evaluate the
-third.  This is significant only for PMCs, as they might have side
-effects on evaluation.
-
-The C<xor>X<xor opcode (PIR)> opcode returns the second argument if
-it is the only true value, returns the third argument if it is the
-only true value, and returns false if both values are true or both are
-false:
-
-=begin PIR_FRAGMENT
-
-  xor $I0, 1, 0  # returns 1
-  xor $I0, 0, 1  # returns 1
-  xor $I0, 1, 1  # returns 0
-  xor $I0, 0, 0  # returns 0
-
-=end PIR_FRAGMENT
-
-The C<not>X<not opcode (PIR)> opcode returns a true value when the
-second argument is false, and a false value if the second argument is
-true:
-
-=begin PIR_FRAGMENT
-
-  not $I0, $I1
-  not $P0, $P1
-
-=end PIR_FRAGMENT
-
-The X<bitwise;opcodes (PIR)> bitwise opcodes operate on their values
-a single bit at a time. C<band>X<band opcode (PIR)>,
-C<bor>X<bor opcode (PIR)>, and C<bxor>X<bxor opcode (PIR)> return a
-value that is the logical AND, OR, or XOR of each bit in the source
-arguments. They each take a destination register and two source
-registers. They also have two-argument forms where the destination is
-also a source.  C<bnot>X<bnot opcode (PIR)> is the logical NOT of
-each bit in a single source argument.
-
-=begin PIR_FRAGMENT
-
-  bnot $I0, $I1
-  band $P0, $P1
-  bor $I0, $I1, $I2
-  bxor $P0, $P1, $I2
-
-=end PIR_FRAGMENT
-
-X<bitwise;string opcodes>
-The bitwise opcodes also have string variants for AND, OR, and XOR:
-C<bors>X<bors opcode (PIR)>, C<bands>X<bands opcode (PIR)>, and
-C<bxors>X<bxors opcode (PIR)>. These take string register or PMC
-string source arguments and perform the logical operation on each byte
-of the strings to produce the final string.
-
-=begin PIR_FRAGMENT
-
-  bors $S0, $S1
-  bands $P0, $P1
-  bors $S0, $S1, $S2
-  bxors $P0, $P1, $S2
-
-=end PIR_FRAGMENT
-
-The bitwise string opcodes only have meaningful results when they're
-used with simple ASCII strings because the bitwise operation is done
-per byte.
-
-The logical and arithmetic shift operations shift their values by a
-specified number of bits:
-
-=begin PIR_FRAGMENT
-
-  shl  $I0, $I1, $I2        # shift I1 left by count I2 giving I0
-  shr  $I0, $I1, $I2        # arithmetic shift right
-  lsr  $P0, $P1, $P2        # logical shift right
-
-=end PIR_FRAGMENT
-
-=head3 Encodings and Charsets
+=head3 Strings: Encodings and Charsets
 
 X<charset>
+Strings are complicated; string declarations aren't the whole story.  In olden
+times, strings only needed to support the ASCII character set (or charset), a
+mapping of 128 bit patterns to symbols and English-language characters. This
+worked as long as everyone using a computer read and wrote English and used a
+small handful of punctuation symbols.
+
+In other words, it was woefully insufficient for international uses, polyglots, and more.
+
 A modern string system must manage several character encodings and charsets in
 order to make sense out of all the string data in the world.  Parrot does this.
 Every string has an associated encoding and an associated character set.  The
@@ -1323,20 +223,16 @@ default charset is 8-bit ASCII, which is simple to use and is almost
 universally supported.
 
 Double-quoted string constants can have an optional prefix specifying the the
-string's encoding and charsetN<As you might suspect, single-quoted strings do
-not support this.>. Parrot will maintain these values internally, and will
+string's encoding and charset.N<As you might suspect, single-quoted strings do
+not support this.> Parrot will maintain these values internally, and will
 automatically convert strings when necessary to preserve the information.
 String prefixes are specified as C<encoding:charset:> at the front of the
 string. Here are some examples:
-
-=begin PIR_FRAGMENT
 
   $S0 = utf8:unicode:"Hello UTF8 Unicode World!"
   $S1 = utf16:unicode:"Hello UTF16 Unicode World!"
   $S2 = ascii:"This is 8-bit ASCII"
   $S3 = binary:"This is raw, unformatted binary data"
-
-=end PIR_FRAGMENT
 
 The C<binary:> charset treats the string as a buffer of raw unformatted binary
 data. It isn't really a string per se, because binary data contains no readable
@@ -1351,105 +247,83 @@ necessary. ASCII strings will automatically upgrade to UTF-8 strings if needed,
 and UTF-8 will upgrade to UTF-16. All of these conversions happen inside
 Parrot; you the programmer don't need to worry about the details.
 
-=head2 Working with PMCs
+=head2 Named Variables
 
-Polymorphic Containers (PMCs) are the basis for complex data types and
-object-oriented behavior in Parrot. In PIR, any variable that isn't a
-low-level integer, number, or string is a PMC
+Z<CHP-3-SECT-2.3>
 
-Operations on a PMC are implemented by vtable functions. The result of
-an operation is entirely determined by the behavior of
-the PMCs vtable. Since PMCs define their own behavior for these vtable
-functions, it's important to familiarize yourself with the behavior
-of the particular PMC before you start performing a lot of operations on it.
+X<named variables (PIR)>
+X<PIR (Parrot intermediate representation);named variables>
 
-=head3 Assignment
+=for author
 
-PMC registers contain references to PMC structures internally. So, the set
-opcode doesn't copy the entire PMC, it only copies the reference to the
-PMC data. Here's an example that shows a side effect of this operation:
+The declaration section earlier alludes to this.
 
-=begin PASM
+=end for
 
-  new P0, "String"
-  set P0, "Ford"
-  set P1, P0
-  set P1, "Zaphod"
-  print P0                # prints "Zaphod"
-  print P1                # prints "Zaphod"
-  end
+Calling a value "$S0" isn't very descriptive, and usually it's a lot
+nicer to be able to refer to values using a helpful name. For this
+reason Parrot allows registers to be given temporary variable names to
+use instead. These named variables can be used anywhere a register
+would be used normally.N<...because they actually are registers, but
+with fancier names.> They're declared with the C<.local> statement
+which requires a variable type and a name:
 
-=end PASM
+  .local string hello
+  set hello, "Hello, Polly."
+  say hello
 
-In this example, both C<P0> and C<P1> are both references to the same
-internal data structure, so when we set C<P1> to the string literal
-C<"Zaphod">, it overwrites the previous value C<"Ford">. Now, both C<P0>
-and C<P1> point to the String PMC C<"Zaphod">, even though it appears that
-we only set one of those two registers to that value.
+This snippet defines a string variable named C<hello>, assigns it the value
+"Hello, Polly.", and then prints the value. Under the hood these named
+variables are just normal registers of course, so any operation that a register
+can be used for a named variable can be used for as well.
 
-=head4 PMC object types
+X<types;variable (PIR)>
+X<variables;types (PIR)>
+The valid types are C<int>, C<num>, C<string>, and C<pmc>
+It should come as no surprise that these are the same as Parrot's four
+built-in register types. Named variables are valid from the point of
+their definition to the end of the current subroutine.
 
-Z<CHP-9-SECT-2.2.2>
+The name of a variable must be a valid PIR identifier. It can contain letters,
+digits and underscores but the first character has to be a letter or an
+underscore. There is no limit to the length of an identifier, other than good
+taste.
 
-X<PMCs (Polymorphic Containers);object types>
-Every PMC has a distinct type that determines its behavior through the
-vtable interface. In the chapter on PIR, we've seen a number of these vtable
-functions already, and seen how they implement the behaviors found inside
-the various opcodes. The vtable interface is standard, and all PMCs implement
-the exact same set of vtables. We've seen some of the vtables and their uses,
-and more of them will be discussed in this chapter and later in the various
-reference chapters.
+As mentioned earlier, Parrot's internal compiler may remap named registers and
+symbolic registers to actual registers as necessary.  This happens
+transparently, and for the most part you never need to know about it.  There's
+one exception: when you know something outside of Parrot must refer to a
+specific register exactly.N<For example, when an NCI call takes a pointer to a
+register and returns a value through the pointer.>  Use the C<:unique_reg>
+modifier on a variable declaration to prevent potential register allocation
+changes:
 
-The C<typeof> opcode can be used to determine the type of a PMC. When
-the source argument is a PMC and the destination is a string register,
-C<typeof> returns the name of the type:
+  .local pmc MyUniquePMC :unique_reg
 
-=begin PIR_FRAGMENT
+This attribute C<:unique_reg> will not affect the behavior of Parrot otherwise.
 
-  new $P0, "String"
-  typeof $S0, $P0               # $S0 is "String"
-  print $S0
-  print "\n"
+=head2 PMC variables
 
-=end PIR_FRAGMENT
+Z<CHP-3-SECT-2.4>
 
-Using C<typeof> with a PMC output parameter instead, it returns the Class
-PMC for that type.
-
-
-
-=head3 Scalars
-
-Parrot provides a set of
-
-In most of the examples we've shown so far, X<PMCs (Polymorphic
-Containers);working with> PMCs just duplicate the functionality of integers,
-numbers, and strings.
-
-PMCs act much like any integer, floating-point
+PMC registers and variables act much like any integer, floating-point
 number, or string register or variable, but you have to instantiate a
 new PMC object into a type before you use it. The C<new> instruction creates
 a new PMC of the specified type:
 
-=begin PIR_FRAGMENT
-
   $P0 = new 'String'
-  $P0 = "That's a bollard and not a parrot."
-  print $P0
+  $P0 = "Hello, Polly."
+  say $P0
 
-=end PIR_FRAGMENT
+This example creates a C<String> object, stores it in the PMC register C<$P0>,
+assigns it the value "Hello, Polly.", and prints it.  The type provided to the
+C<.local> directive is either the generic C<pmc> or a type compatible with the
+type passed to C<new>:
 
-This example creates a C<String> object, stores it in the PMC register variable C<$P0>,
-assigns it the value "Hello, Polly.", and prints it:
-
-=end PIR_FRAGMENT
-
-  .local pmc hello    # or .local pmc hello
+  .local String hello    # or .local pmc hello
   hello = new 'String'
   hello = "Hello, Polly."
-  print hello
-
-=end PIR_FRAGMENT
+  say hello
 
 PIR is a dynamic language; that dynamicism is evident in how Parrot handles PMC
 values. Primitive registers like strings, numbers, and integers perform a
@@ -1459,16 +333,12 @@ String, Number, and Integer; notice that the primitive types are in lower-case,
 while the PMC classes are capitalized. If you want to box a value explicitly,
 use the C<box> opcode:
 
-=begin PIR_FRAGMENT
-
   $P0 = new 'Integer'       # The boxed form of int
   $P0 = box 42
   $P1 = new 'Number'        # The boxed form of num
   $P1 = box 3.14
   $P2 = new 'String'        # The boxed form of string
   $P2 = "This is a string!"
-
-=end PIR_FRAGMENT
 
 The PMC classes C<Integer>, C<Number>, and C<String> are thin overlays on the
 primitive types they represent. These PMC types have the benefit of the
@@ -1477,411 +347,80 @@ PMCs conform to for performing standard operations. These PMC types support
 custom methods to perform various operations, may be passed to subroutines that
 expect PMC arguments, and can be subclassed by a user-defined type.
 
+=head2 Named Constants
 
-PMCs are are polymorphic data items that
-can be one of a large variety of predefined types. As we have seen briefly,
-and as we will see in more depth later, PMCs have a standard interface called
-the VTABLE interface. VTABLEs are a standard list of functions that all PMCs
-implement N<or, PMCs can choose not to implement each interface explicitly and
-instead let Parrot call the default implementations>.
+Z<CHP-3-SECT-2.5>
 
-VTABLEs are very strict: There are a fixed number with fixed names and
-fixed argument lists. You can't just create any random VTABLE interface that
-you want to create, you can only make use of the ones that Parrot supplies
-and expects. To circumvent this limitation, PMCs may have METHODS in
-addition to VTABLEs. METHODs are arbitrary code functions that can be
-written in C, may have any name, and may implement any behavior.
-
-=head4 Boxing and Unboxing
-
-Z<CHP-9-SECT-2.2.3>
-
-As we've seen in the previous chapters about PIR, we can convert between
-primitive string, integer, and number types and PMCs. PIR used the C<=>
-operator to make these conversions. PIR uses the C<set> opcode to do the
-same thing. C<set> will perform the type conversions for us automatically,
-in a process called I<autoboxing>.
-
-Assigning a primitive data type to a PMC of a String, Integer, or Float type
-converts that PMC to the new type. So, assigning a string to a Number PMC
-converts it into a String PMC. Assigning an integer value converts it to a
-C<Integer>, and assigning C<undef> converts it to an C<Undef> PMC:
-
-=begin PIR_FRAGMENT
-
-  new $P0, "String"
-  set $P0, "Ford\n"
-  print $P0           # prints "Ford\n"
-  set $P0, 42
-  print $P0           # prints 42
-  print "\n"
-  typeof $S0, $P0
-  print $S0           # prints "Integer"
-  print "\n"
-
-=end PIR_FRAGMENT
-
-C<P0> starts as a C<String>, but when C<set> assigns it an integer
-value 42 (replacing the old string value C<"Ford">), it changes type
-to C<Integer>. This behavior only works for the wrapper PMC types for the
-primitive values string, int, and num. Other PMC classes will have different
-behaviors when you try to assign a primitive value to them.
-
-We can also use the C<box> opcode to explicitly convert an integer, a float,
-or a string into an appropriate PMC type.
-
-=begin PIR_FRAGMENT
-
-  box $P0, 3
-  typeof $S0, $P0         # $P0 is an "Integer"
-  box $P1, "hello"
-  typeof $S0, $P1         # $P1 is a "String"
-  box $P2, 3.14
-  typeof $S0, $P2         # $P2 is a "Number"
-
-=end PIR_FRAGMENT
-
-
-=head3 Aggregates
-
-Z<CHP-9-SECT-3.1>
-
-PMCs can define complex types that hold multiple values. These are
-commonly called "X<PMCs (Polymorphic Containers);aggregate>
-X<aggregate PMCs> aggregates." The most important feature added for
-aggregates is keyed access. Elements within an aggregate PMC can be
-stored and retrieved by a numeric or string key. PIR also offers a
-full set of operations for manipulating aggregate data types.
-
-Two of the most basic aggregate types are arrays and hashes. The primary
-difference between these two is that arrays are indexed using integer keys,
-and hashes are indexed with string keys. The term "hash" in this context is
-derived from the data type in Perl 5 of the same name. Other programming
-languages might refer to the same concept using different terms such as
-"dictionary" or "hash table" or "associative array".
-
-Arrays and hashes are not the only types of aggregates available, although
-they are the most simple demonstrations of using integer and strings as
-keys in an aggregate, respectively.
+X<PIR (Parrot intermediate representation);named constants>
+X<named constants (PIR)>
 
-=head4 Arrays
+The C<.const> directive declares a named constant. It resembles C<.local>; it
+requires a type and a name. It also requires the assignment of a constant
+value.  As with named variables, named constants are visibl only within the
+compilation unit where they're declared. This example declares a named string
+constant C<hello> and prints the value:
 
-Z<CHP-9-SECT-3.1.1>
+  .const string hello = "Hello, Polly."
+  say hello
 
-X<arrays>
-The C<Array>X<Array PMC> PMC is an ordered aggregate with zero-based integer
-keys. The syntax for X<keyed access to PMCs> keyed access to a PMC puts the
-key in square brackets after the register name:
+Named constants may be used in all the same places as literal constants,
+but have to be declared beforehand:
 
-=begin PIR_FRAGMENT
+  .const int    the_answer = 42        # integer constant
+  .const string mouse      = "Mouse"   # string constant
+  .const num    pi         = 3.14159   # floating point constant
 
-  new $P0, "Array"     # obtain a new array object
-  set $P0, 2           # set its length
-  set $P0[0], 10       # set first element to 10
-  set $P0[1], $I31     # set second element to $I31
-  set $I0, $P0[0]      # get the first element
-  set $I1, $P0         # get array length
+In addition to normal local constants, you can also specify a global constant
+which is accessible from everywhere in the current code file:
 
-=end PIR_FRAGMENT
+  .globalconst int days = 365
 
-A key on the destination register of a C<set> operation sets a value
-for that key in the aggregate. A key on the source register of a
-C<set> returns the value for that key. If you set C<P0> without a key,
-you set the length of the array, not one of its values.N<C<Array>
-is an autoextending array, so you never need to set its length. Other
-array types may require the length to be set explicitly.> And if you
-assign the C<Array> to an integer, you get the length of the
-array.
+Currently there is no way to specify a PMC constant in PIR source code.
 
-We mention "other array types" above, not as a vague suggestion that there may
-be other types of arrays eventually, but as an indication that we actually
-have several types of array PMCs in Parrot's core. Parrot comes with
-C<FixedPMCArray>, C<ResizablePMCArray>, C<FixedIntegerArray>,
-C<ResizableIntegerArray>, C<FixedFloatArray>, C<ResizableFloatArray>,
-C<FixedStringArray>, C<ResizableStringArray>, C<FixedBooleanArray>,
-and C<ResizableBooleanArray> types. These various types of arrays use
-various packing methods to create higher memory efficiency for their contents
-then using a single generic array type would be able to. The trade-off for
-higher memory efficiency is that these array PMCs can only hold a single type
-of data.
+=for author
 
-The array PMC types that start with "Fixed" have a fixed size and do not
-automatically extend themselves if you attempt to add data to a higher index
-then the array contains. The "Resizable" variants will automatically extend
-themselves as more data are added, but the cost is in algorithmic complexity
-of checking array bounds and reallocating array memory.
+Why declare constants?
 
-To retrieve the number of items currently in an array, you can use the
-C<elements> opcode.
+=end for
 
-=begin PIR_FRAGMENT
+=head2 Symbol Operators
 
-  set $P0, 100         # allocate store for 100 elements
-  set $I0, $P0          # obtain current allocation size
-  elements $I0, $P0     # get element count
+Z<CHP-3-SECT-3>
 
-=end PIR_FRAGMENT
+X<symbol operators in PIR>
 
-Some other useful instructions for working with arrays are C<push>,
-C<pop>, C<shift>, and C<unshift> (you'll find them in
-"PIR Opcodes" in Chapter 11).
+=for author
 
-=head4 Hashes
+An earlier section described this already too.
 
-Z<CHP-9-SECT-3.1.2>
+=end for
 
-X<PMCs (Polymorphic Containers);hashes>
-The C<Hash>X<Hash PMC> PMC is an unordered aggregate which uses string keys
-to identify elements within it.
+PIR has many other symbolic operators: arithmetic, concatenation, comparison,
+bitwise, and logical. All PIR operators are translated into one or more Parrot
+opcodes internally, but the details of this translation stay safely hidden from
+the programmer. Consider this example snippet:
 
-=begin PIR_FRAGMENT
+  .local int sum
+  sum = $I42 + 5
+  say sum
 
-  new $P1, "Hash"      # generate a new hash object
-  set $P1["key"], 10   # set key and value
-  set $I0, $P1["key"]   # obtain value for key
-  set $I1, $P1          # number of entries in hash
+The statement C<sum = $I42 + 5> translates to the equivalent statement C<add
+sum, $I42, 5>.  PIR symbolic operations are:
 
-=end PIR_FRAGMENT
+  $I0 = $I1 + 5      # Addition
+  $N0 = $N1 - 7      # Subtraction
+  $I3 = 4 * 6        # Multiplication
+  $N7 = 3.14 / $N2   # Division
+  $S0 = $S1 . $S2    # String concatenation
 
-The C<exists>X<exists opcode (PIR)> opcode tests whether a keyed
-value exists in an aggregate. It returns 1 if it finds the key in the
-aggregate, and returns 0 if it doesn't. It doesn't care if the value
-itself is true or false, only that the key has been set:
+PIR also provides automatic assignment operators such as C<+=>, C<-=>,
+and C<<< >>= >>>. These operators help programmers to perform common
+manipulations on a data value in place, and save a few keystrokes while
+doing them.
 
-=begin PIR_FRAGMENT
+A complete list of PIR operators is available in Chapter 13.
 
-  new $P0, "Hash"
-  set $P0["key"], 0
-  exists $I0, $P0["key"] # does a value exist at "key"
-  print $I0             # prints 1
-  print "\n"
-
-=end PIR_FRAGMENT
-
-The C<delete>X<delete opcode (PIR)> opcode is also useful for working
-with hashes: it removes a key/value pair.
-
-=head4 Iterators
-
-Z<CHP-9-SECT-3.1.3>
-
-Iterators extract values from an aggregate PMC one at a time and without
-extracting duplicates. Iterators are most useful in loops where an action
-needs to be performed on every element in an aggregate. You create an
-iterator by creating a new C<Iterator> PMC, and passing the aggregate PMC
-to C<new> as an additional parameter:
-
-=begin PIR_FRAGMENT
-
-  new $P1, "Iterator", $P2
-
-=end PIR_FRAGMENT
-
-Alternatively, you can use the C<iter> opcode to do the same thing:
-
-=begin PIR_FRAGMENT
-
-  iter $P1, $P2     # Same!
-
-=end PIR_FRAGMENT
-
-The include file F<iterator.pasm> defines some constants for working
-with iterators. The C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END>
-constants are used to select whether an array iterator starts from the
-beginning or end of the array. Since Hash PMCs are unordered, these two
-constants do not have any affect on Hash iterators.
-
-A value can be extracted from the iterator using the C<shift> opcode.
-Evaluating the iterator PMC as a boolean returns whether the iterator has
-reached the end of the aggregate or not.
-
-=begin PIR_FRAGMENT
-
-  .include "iterator.pasm"
-      new $P2, "Array"
-      push $P2, "a"
-      push $P2, "b"
-      push $P2, "c"
-      new $P1, "Iterator", $P2
-      set $P1, .ITERATE_FROM_START
-
-  iter_loop:
-      unless $P1, iter_end
-      shift $P5, $P1
-      print $P5                        # prints "a", "b", "c"
-      branch iter_loop
-  iter_end:
-      # ...
-
-=end PIR_FRAGMENT
-
-Hash iterators work similarly to array iterators, but they extract keys
-only. With the key, you can find it's value from the original hash PMC.
-With hashes it's only meaningful to iterate in one direction since they
-don't define any order for their keys.
-
-=begin PIR_FRAGMENT
-
-  .include "iterator.pasm"
-      new $P2, "Hash"
-      set $P2["a"], 10
-      set $P2["b"], 20
-      set $P2["c"], 30
-      new $P1, "Iterator", $P2
-      set $P1, .ITERATE_FROM_START_KEYS
-
-  iter_loop:
-      unless $P1, iter_end
-      shift $S5, $P1                    # one of the keys "a", "b", "c"
-      set $I9, $P2[$S5]
-      print $I9                        # prints e.g. 20, 10, 30
-      branch iter_loop
-  iter_end:
-      # ...
-
-=end PIR_FRAGMENT
-
-=head4 Data structures
-
-Z<CHP-9-SECT-3.1.4>
-
-X<PMCs (Polymorphic Containers);data structures>
-Arrays and hashes can hold any data type, including other aggregates.
-Accessing elements deep within nested data structures is a common
-operation, so PIR provides a way to do it in a single instruction.
-Complex keys specify a series of nested data structures, with each
-individual key separated by a semicolon:
-
-=begin PIR_FRAGMENT
-
-  new $P0, "Hash"
-  new $P1, "Array"
-  set $P1[2], 42
-  set $P0["answer"], $P1
-  set $I1, 2
-  set $I0, $P0["answer";$I1]        # $i = %hash{"answer"}[2]
-  print $I0
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This example builds up a data structure of a hash containing an array.
-The complex key C<P0["answer";I1]> retrieves an element of the array
-within the hash. You can also set a value using a complex key:
-
-=begin PIR_FRAGMENT
-
-  set $P0["answer";0], 5   # %hash{"answer"}[0] = 5
-
-=end PIR_FRAGMENT
-
-The individual keys are integers or strings, or registers with integer
-or string values.
-
-=head3 PMC Assignment
-
-Z<CHP-9-SECT-3.2>
-
-We mentioned before that C<set> on two X<PMCs (Polymorphic
-Containers);assignment> PMCs simply aliases them both to the same object,
-and that C<clone> creates a complete duplicate object. But if you just
-want to assign the value of one PMC to another PMC, you need the
-C<assign>X<assign opcode (PIR)> opcode:
-
-=begin PIR_FRAGMENT
-
-  new $P0, "Int"
-  new $P1, "Int"
-  set $P0, 42
-  set $P2, $P0
-  assign $P1, $P0     # note: $P1 has to exist already
-  inc $P0
-  print $P0          # prints 43
-  print "\n"
-  print $P1          # prints 42
-  print "\n"
-  print $P2          # prints 43
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This example creates two C<Int> PMCs: C<P0> and C<P1>. It gives
-C<P0> a value of 42. It then uses C<set> to give the same value to
-C<P2>, but uses C<assign> to give the value to C<P1>. When C<P0> is
-incremented, C<P2> also changes, but C<P1> doesn't. The destination
-register for C<assign> must have an existing object of the right type
-in it, since C<assign> doesn't create a new object (as with C<clone>)
-or reuse the source object (as with C<set>).
-
-=head3 Properties
-
-Z<CHP-9-SECT-3.3>
-
-X<PMCs (Polymorphic Containers);properties>
-PMCs can have additional values attached to them as "properties" of
-the PMC. What these properties do is entirely up to the language being
-implemented. Most usually properties are used to hold extra metadata about
-the PMC that is used by the high-level language (HLL).
-
-The C<setprop>X<setprop opcode (PIR)> opcode sets the value of a
-named property on a PMC. It takes three arguments: the PMC to be set
-with a property, the name of the property, and a PMC containing the
-value of the property. The C<getprop>X<getprop opcode (PIR)> opcode
-returns the value of a property. It also takes three arguments: the
-PMC to store the property's value, the name of the property, and the
-PMC from which the property value is to be retrieved. Internally a PMCs
-properties are stored in a Hash structure, where the name of the property
-is stored in a special properties Hash.
-
-=begin PIR_FRAGMENT
-
-  new $P0, "String"
-  set $P0, "Zaphod"
-  new $P1, "Int"
-  set $P1, 1
-  setprop $P0, "constant", $P1       # set a property on $P0
-  getprop $P3, "constant", $P0       # retrieve a property on $P0
-  print $P3                          # prints 1
-  print "\n"
-
-=end PIR_FRAGMENT
-
-This example creates a C<String> object in C<P0>, and a C<Int>
-object with the value 1 in C<P1>. C<setprop> sets a property named
-"constant" on the object in C<P0> and gives the property the value in
-C<P1>.N<The "constant" property is ignored by PIR, but may be significant
-to the HLL that set it.> C<getprop> retrieves the value of the property
-"constant" on C<P0> and stores it in C<P3>.
-
-Properties are kept in a separate hash for each PMC. Property values
-are always PMCs, but only references to the actual PMCs. Trying to
-fetch the value of a property that doesn't exist returns a
-C<Undef>.
-
-C<delprop>X<delprop opcode (PIR)> deletes a property from a PMC.
-
-=begin PIR_FRAGMENT
-
-  delprop $P1, "constant"  # delete property
-
-=end PIR_FRAGMENT
-
-You can also return a complete hash of all properties on a PMC with
-C<prophash>X<prophash opcode (PIR)>.
-
-=begin PIR_FRAGMENT
-
-  prophash $P0, $P1         # set $P0 to the property hash of $P1
-
-=end PIR_FRAGMENT
-
-
-=head2 VTABLE Interfaces
-
-Internally, all operations on PMCs are performed by calling various VTABLE
-interfaces.
-
-=head3 Type Conversion
+=head2 C<=> and Type Conversion
 
 The C<=> operator is very powerful.  Its simplest form stores a value into one
 of the Parrot registers. It can assign a string value to a C<string> register,
@@ -1890,30 +429,20 @@ register, etc. However, the C<=> operator can assign I<any> type of value into
 I<any> type of register; Parrot will handle the conversion for you
 automatically:
 
-=begin PIR_FRAGMENT
-
   $I0 = 5     # Integer. 5
   $S0 = $I0   # Stringify. "5"
   $N0 = $S0   # Numify. 5.0
   $I0 = $N0   # Intify. 5
 
-=end PIR_FRAGMENT
-
 Notice that conversions between the numeric formats and strings only makes
 sense when the value to convert is a number.
-
-=begin PIR_FRAGMENT
 
   $S0 = "parrot"
   $I0 = $S0        # 0
 
-=end PIR_FRAGMENT
-
 An earlier example showed a string literal assigned to a PMC register of type
 C<String>. This works for all the primitive types and their autoboxed PMC
 equivalents:
-
-=begin PIR_FRAGMENT
 
   $P0 = new 'Integer'
   $P0 = 5
@@ -1933,372 +462,15 @@ equivalents:
   $I2 = $P2      # Intify. 3
   $N2 = $P2      # Unbox. $N2 = 3.14
 
-=end PIR_FRAGMENT
+=head2 Compilation Units
 
-=head2 Control Structures
-
-Z<CHP-3-SECT-5>
-
-X<PIR (Parrot intermediate representation);control flow>
-X<control flow;in PIR>
-
-Control flow in PIR occurs entirely with conditional and unconditional branches
-to labels. This may seem simplistic and primitive, but here PIR shows its roots
-as a thin overlay on the assembly language of a virtual processor.  PIR does
-not support high-level looping structures such as C<while> or C<for> loops. PIR
-has some support for basic C<if> branching constructs, but does not support
-more complicated C<if>/C<then>/C<else> branch structures.  
-
-The control structures of high-level languages hew tightly to the semantics of
-those languages; Parrot provides the minimal feature set necessary to implement
-any semantic of an HLL without dictating how that HLL may implement its
-features.  Language agnosticism is an important design goal in Parrot, and
-creates a very flexible and powerful development environment for language
-developers.
-
-X<goto instruction (PIR)>
-The most basic branching instruction is the unconditional branch, C<goto>:
-
-=begin PIR
-
-  .sub 'main'
-      goto L1
-      print "never printed"
-
-  L1:
-      print "after branch"
-  .end
-
-=end PIR
-
-The first C<print> statement never runs because the C<goto> always skips over it
-to the label C<L1>.
-
-The conditional branches combine C<if> or C<unless> with C<goto>.
-
-=begin PIR
-
-  .sub 'main'
-      $I0 = 42
-      if $I0 goto L1
-      say "never printed"
-  L1:
-      say "after branch"
-  .end
-
-=end PIR
-
-X<if (conditional);instruction (PIR)> X<unless (conditional);instruction (PIR)>
-In this example, the C<goto> branches to the label C<L1> only if the value
-stored in C<$I0> is true. The C<unless> statement is similar, but it branches
-when the tested value is false.  You can use PMC and STRING registers with
-C<if> and C<unless>.  The op will call the C<get_bool> vtable entry on any PMC
-so used and will convert the STRING to a boolean value.  An undefined value, 0,
-or an empty string are all false values. All other values are true.
-
-The comparison operators (C<E<lt>>, C<E<lt>=>, C<==>, C<!=>, C<E<gt>>,
-C<E<gt>=>) can combine with C<if ...  goto>. These branch when the
-comparison is true:
-
-=begin PIR
-
-  .sub 'main'
-      $I0 = 42
-      $I1 = 43
-      if $I0 < $I1 goto L1
-      say "never printed"
-  L1:
-      say "after branch"
-  .end
-
-=end PIR
-
-This example compares C<$I0> to C<$I1> and branches to the label C<L1> if
-C<$I0> is less than C<$I1>. The C<if $I0 E<lt> $I1 goto L1> statement
-translates directly to the C<lt> branch operation.
-
-Chapter 11's "PIR Instructions" section summarizes the other comparison
-operators.
-
-X<loops;PIR>
-X<PIR (Parrot intermediate representation);loop constructs>
-PIR has no special loop constructs. A combination of conditional and
-unconditional branches handle iteration:
-
-=begin PIR
-
-  .sub 'main'
-      $I0 = 1               # product
-      $I1 = 5               # counter
-
-  REDO:                     # start of loop
-      $I0 = $I0 * $I1
-      dec $I1
-      if $I1 > 0 goto REDO  # end of loop
-
-      say $I0
-  .end
-
-=end PIR
-
-X<do-while style loop;(PIR)>
-This example calculates the factorial C<5!>. Each time through the loop it
-multiplies C<$I0> by the current value of the counter C<$I1>, decrements the
-counter, and branches to the start of the loop.  The loop ends when C<$I1>
-counts down to 0. This is a I<do while>-style loop with the condition test at
-the end, so the code always runs the first time through.
-
-X<while-style loop (PIR)>
-For a I<while>-style loop with the condition test at the start, use a
-conditional branch with an unconditional branch:
-
-=begin PIR
-
-  .sub 'main'
-      $I0 = 1               # product
-      $I1 = 5               # counter
-
-  REDO:                     # start of loop
-      if $I1 <= 0 goto LAST
-      $I0 = $I0 * $I1
-      dec $I1
-      goto REDO
-  LAST:                     # end of loop
-
-      say $I0
-  .end
-
-=end PIR
-
-This example tests the counter C<$I1> at the start of the loop. At the
-end of the loop, it unconditionally branches back to the start of the
-loop and tests the condition again. The loop ends when the counter
-C<$I1> reaches 0 and the C<if> branches to the C<LAST> label. If the
-counter isn't a positive number before the loop, the loop never
-executes.
-
-You can build any high-level flow control construct from conditional and
-unconditional branches; the lowest level of computer hardware works this way.
-All modern programming languages use branching constructs to implement their
-most complex flow control devices.
-
-
-Branch instructions transfer control to a relative offset from the
-current instruction. The rightmost argument to every branch opcode is
-a label, which the assembler converts to the integer value of the
-offset. You can also branch on a literal integer value, but there's
-rarely any need to do so. The simplest branch instruction is
-C<branch>:
-
-=begin PIR_FRAGMENT
-
-    branch L1                # branch 4
-    print "skipped\n"
-  L1:
-    print "after branch\n"
-
-=end PIR_FRAGMENT
-
-This example unconditionally branches to the location of the label
-C<L1>, skipping over the first C<print> statement.
-
-Jump instructions transfer control to an absolute address. The C<jump>
-opcode doesn't calculate an address from a label, so it's used
-together with C<set_addr>:
-
-=begin PIR_FRAGMENT
-
-    set_addr $I0, L1
-    jump $I0
-    print "skipped\n"
-    end
-  L1:
-    print "after jump\n"
-
-=end PIR_FRAGMENT
-
-The C<set_addr>X<set_addr opcode (PIR)> opcode takes a label or an
-integer offset and returns an absolute address.
-
-You've probably noticed the C<end>X<end opcode (PIR)> opcode as the
-last statement in many examples above. This terminates the execution
-of the current run loop. Terminating the main bytecode segment (the
-first run loop) stops the interpreter. Without the C<end> statement,
-execution just falls off the end of the bytecode segment, with a good
-chance of crashing the interpreter.
-
-=head3 Conditional Branches
-
-Z<CHP-9-SECT-4.1>
-
-X<PIR (Parrot assembly language);conditional branches>
-X<conditional branches in PIR>
-Unconditional jumps and branches aren't really enough for flow
-control. What you need to implement the control structures of
-high-level languages is the ability to select different actions based
-on a set of conditions. PIR has opcodes that conditionally branch
-based on the truth of a single value or the comparison of two values.
-The following example has C<if>X<if (conditional);opcode (PIR)> and
-C<unless>X<unless (conditional);opcode (PIR)> conditional branches:
-
-=begin PIR_FRAGMENT
-
-    set $I0, 0
-    if $I0, TRUE
-    unless $I0, FALSE
-    print "skipped\n"
-    end
-  TRUE:
-    print "shouldn't happen\n"
-    end
-  FALSE:
-    print "the value was false\n"
-
-=end PIR_FRAGMENT
-
-C<if> branches if its first argument is a true value, and C<unless>
-branches if its first argument is a false value. In this case, the
-C<if> doesn't branch because C<I0> is false, but the C<unless> does
-branch.
-The comparison branching opcodes compare two values and branch if the
-stated relation holds true. These are
-C<eq>X<eq (equal);opcode (PIR)> (branch when equal),
-C<ne>X<ne (not equal);opcode (PIR)> (when not equal),
-C<lt>X<lt (less than);opcode (PIR)> (when less than),
-C<gt>X<gt (greater than);opcode (PIR)> (when greater than),
-C<le>X<le (less than or equal);opcode (PIR)> (when less than or
-equal), and C<ge>X<ge (greater than or equal);opcode (PIR)> (when
-greater than or equal). The two compared arguments must be the same
-register type:
-
-=begin PIR_FRAGMENT
-
-    set $I0, 4
-    set $I1, 4
-    eq $I0, $I1, EQUAL
-    print "skipped\n"
-    end
-  EQUAL:
-    print "the two values are equal\n"
-
-=end PIR_FRAGMENT
-
-This compares two integers, C<I0> and C<I1>, and branches if they're
-equal. Strings of different character sets or encodings are converted
-to Unicode before they're compared. PMCs have a C<cmp> vtable method.
-This gets called on the left argument to perform the comparison of the
-two objects.
-
-The comparison opcodes don't specify if a numeric or string comparison
-is intended. The type of the register selects for integers, floats,
-and strings. With PMCs, the vtable method C<cmp> or C<is_equal> of the
-first argument is responsible for comparing the PMC meaningfully with
-the other operand. If you need to force a numeric or string comparison
-on two PMCs, use the alternate comparison opcodes that end in the
-C<_num> and C<_str> suffixes.
-
-=begin PIR_FRAGMENT
-
-  eq_str $P0, $P1, label     # always a string compare
-  gt_num $P0, $P1, label     # always numerically
-
-=end PIR_FRAGMENT
-
-Finally, the C<eq_addr> opcode branches if two PMCs or strings are
-actually the same object (have the same address):
-
-=begin PIR_FRAGMENT
-
-  eq_addr $P0, $P1, same_pmcs_found
-
-=end PIR_FRAGMENT
-
-=head3 Iteration
-
-Z<CHP-9-SECT-4.2>
-
-X<iteration;in PIR>
-X<PIR (Parrot assembly language);iteration>
-PIR doesn't define high-level loop constructs. These are built up
-from a combination of conditional and unconditional branches. A
-I<do-while>X<do-while style loop;(PIR)> style loop can be constructed
-with a single conditional branch:
-
-=begin PIR_FRAGMENT
-
-    set $I0, 0
-    set $I1, 10
-  REDO:
-    inc $I0
-    print $I0
-    print "\n"
-    lt $I0, $I1, REDO
-
-=end PIR_FRAGMENT
-
-This example prints out the numbers 1 to 10. The first time through,
-it executes all statements up to the C<lt> statement.  If the
-condition evaluates as true (C<I0> is less than C<I1>) it branches to
-the C<REDO> label and runs the three statements in the loop body
-again. The loop ends when the condition evaluates as false.
-
-Conditional and unconditional branches can build up quite complex
-looping constructs, as follows:
-
-=begin PIR_FRAGMENT
-
-    # loop ($i=1; $i<=10; $i++) {
-    #    print "$i\n";
-    # }
-  loop_init:
-    set $I0, 1
-    branch loop_test
-  loop_body:
-    print $I0
-    print "\n"
-    branch loop_continue
-  loop_test:
-    le $I0, 10, loop_body
-    branch out
-  loop_continue:
-    inc $I0
-    branch loop_test
-  out:
-    # ... 
-
-=end PIR_FRAGMENT
-
-X<loops;PIR>
-X<PIR (Parrot assembly language);loops>
-This example emulates a X<counter-controlled loop> counter-controlled
-loop like Perl 6's C<loop> keyword or C's C<for>. The first time
-through the loop it sets the initial value of the counter in
-C<loop_init>, tests that the loop condition is met in C<loop_test>,
-and then executes the body of the loop in C<loop_body>. If the test
-fails on the first iteration, the loop body will never execute. The
-end of C<loop_body> branches to C<loop_continue>, which increments the
-counter and then goes to C<loop_test> again. The loop ends when the
-condition fails, and it branches to C<out>. The example is more
-complex than it needs to be just to count to 10, but it nicely shows
-the major components of a
-loop.
-
-=head2 Macros
-
-=for author
-
-Needs supplementing; needs moving.
-
-=end for
-
-=head2 Subroutines
+Z<CHP-3-SECT-4.1>
 
 X<PIR (Parrot intermediate representation);subroutine> X<subroutine (PIR)>
 Subroutines in PIR are roughly equivalent to the subroutines or methods of a
-high-level language.  All code in a PIR source file must occur within a
+high-level language.  All code in a PIR source file must appear within a
 subroutine.  The simplest syntax for a PIR subroutine starts with the C<.sub>
-directive and ends with the C<.end> directiveN<The name C<main> is only a
-convention.>:
+directive and ends with the C<.end> directive:
 
 =begin PIR
 
@@ -2347,6 +519,171 @@ C<:main> function and continues until that function ends.  To perform other
 operations, you must call other functions explicitly.  Chapter 4 describes
 subroutines and their uses.
 
+=head2 Flow Control
+
+Z<CHP-3-SECT-5>
+
+X<PIR (Parrot intermediate representation);flow control>
+X<flow control;in PIR>
+
+Flow control in PIR occurs entirely with conditional and unconditional branches
+to labels. This may seem simplistic and primitive, but here PIR shows its roots
+as a thin overlay on the assembly language of a virtual processor.  PIR does
+not support high-level looping structures such as C<while> or C<for> loops. PIR
+has some support for basic C<if> branching constructs, but does not support
+more complicated C<if>/C<then>/C<else> branch structures.
+
+The control structures of high-level languages hew tightly to the semantics of
+those languages; Parrot provides the minimal feature set necessary to implement
+any semantic of an HLL without dictating how that HLL may implement its
+features.  Language agnosticism is an important design goal in Parrot, and
+creates a very flexible and powerful development environment for language
+developers.
+
+X<goto instruction (PIR)>
+The most basic branching instruction is the unconditional branch, C<goto>:
+
+=begin PIR
+
+  .sub 'main'
+      goto L1
+      say "never printed"
+
+  L1:
+      say "after branch"
+      end
+  .end
+
+=end PIR
+
+The first C<say> statement never runs because the C<goto> always skips over it
+to the label C<L1>.
+
+The conditional branches combine C<if> or C<unless> with C<goto>.
+
+=begin PIR
+
+  .sub 'main'
+      $I0 = 42
+      if $I0 goto L1
+      say "never printed"
+  L1:
+      say "after branch"
+      end
+  .end
+
+=end PIR
+
+X<if (conditional);instruction (PIR)> X<unless (conditional);instruction (PIR)>
+In this example, the C<goto> branches to the label C<L1> only if the value
+stored in C<$I0> is true. The C<unless> statement is similar, but it branches
+when the tested value is false.  You can use PMC and STRING registers with
+C<if> and C<unless>.  The op will call the C<get_bool> vtable entry on any PMC
+so used and will convert the STRING to a boolean value.  An undefined value, 0,
+or an empty string are all false values. All other values are true.
+
+The comparison operators (C<E<lt>>, C<E<lt>=>, C<==>, C<!=>, C<E<gt>>,
+C<E<gt>=>) can combine with C<if ...  goto>. These branch when the
+comparison is true:
+
+=begin PIR
+
+  .sub 'main'
+      $I0 = 42
+      $I1 = 43
+      if $I0 < $I1 goto L1
+      say "never printed"
+  L1:
+      say "after branch"
+      end
+  .end
+
+=end PIR
+
+This example compares C<$I0> to C<$I1> and branches to the label C<L1> if
+C<$I0> is less than C<$I1>. The C<if $I0 E<lt> $I1 goto L1> statement
+translates directly to the C<lt> branch operation.
+
+Chapter 11's "PIR Instructions" section summarizes the other comparison
+operators.
+
+X<loops;PIR>
+X<PIR (Parrot intermediate representation);loop constructs>
+PIR has no special loop constructs. A combination of conditional and
+unconditional branches handle iteration:
+
+=begin PIR
+
+  .sub 'main'
+      $I0 = 1               # product
+      $I1 = 5               # counter
+
+  REDO:                     # start of loop
+      $I0 = $I0 * $I1
+      dec $I1
+      if $I1 > 0 goto REDO  # end of loop
+
+      say $I0
+      end
+  .end
+
+=end PIR
+
+X<do-while style loop;(PIR)>
+This example calculates the factorial C<5!>. Each time through the loop it
+multiplies C<$I0> by the current value of the counter C<$I1>, decrements the
+counter, and branches to the start of the loop.  The loop ends when C<$I1>
+counts down to 0. This is a I<do while>-style loop with the condition test at
+the end so that the code always runs at least once through the loop.
+
+X<while-style loop (PIR)>
+For a I<while>-style loop with the condition test at the start, use a
+conditional branch with an unconditional branch:
+
+=begin PIR
+
+  .sub 'main'
+      $I0 = 1               # product
+      $I1 = 5               # counter
+
+  REDO:                     # start of loop
+      if $I1 <= 0 goto LAST
+      $I0 = $I0 * $I1
+      dec $I1
+      goto REDO
+  LAST:                     # end of loop
+
+      say $I0
+      end
+  .end
+
+=end PIR
+
+This example tests the counter C<$I1> at the start of the loop. At the end of
+the loop, it unconditionally branches back to the start of the loop and tests
+the condition again. The loop ends when the counter C<$I1> reaches 0 and the
+C<if> branches to the C<LAST> label. If the counter isn't a positive number
+before the loop, the loop will never execute.
+
+You can build any high-level flow control construct from conditional and
+unconditional branches; the lowest level of computer hardware works this way.
+All modern programming languages use branching constructs to implement their
+most complex flow control devices.
+
+That doesn't make complex code easier to write in PIR.  Fortunately, a series
+of macros exist to simplify flow control.
+
+=head2 Macros
+
+=for author
+
+Needs supplementing; needs moving.
+
+=end for
+
+=head2 Subroutines
+
+Z<CHP-4>
 
 X<PIR (Parrot intermediate representation);subroutines>
 X<subroutines;in PIR>
@@ -2364,27 +701,12 @@ high-level language in itself, but to provide the basic tools that other
 languages can use to implement them. PIR's subroutine syntax may seem very
 primitive for this reason.
 
-=head3 Parrot Calling Conventions
+=head2 Parrot Calling Conventions
 
 Z<CHP-4-SECT-1>
 
 X<PIR (Parrot intermediate representation);subroutines;Parrot calling conventions>
 X<subroutines;Parrot calling conventions;in PIR>
-
-The C<.sub> directive defines globally accessible subroutine
-objects.
-
-Subroutine objects of all kinds can be called with the
-C<invoke>X<invoke opcode (PIR)> opcode. There is also an C<invoke>
-C<PR<x>> instruction for calling objects held in a different register.
-
-The C<invokecc>X<invokecc opcode (PIR)> opcode is like C<invoke>, but it
-also creates and stores a new return continuation. When the
-called subroutine invokes this return continuation, it returns control
-to the instruction after the function call. This kind of call is known
-as Continuation Passing Style (CPS).
-X<CPS (Continuation Passing Style)>
-X<Continuation Passing Style (CPS)>
 
 The way that Parrot calls a subroutine -- passing arguments, altering control
 flow, and returning results -- is the "Parrot Calling Conventions" (PCC).
@@ -2411,6 +733,8 @@ this point, passes the arguments, looks up the subroutine by name (and by
 signature, if necessary)), calls the subroutine, and assigns the results of the
 call to the appropriate integer register. This is all in addition to the
 computation the subroutine itself performs.
+
+=head3 Expanded Subroutine Syntax
 
 The single line subroutine call is incredibly convenient, but it isn't always
 flexible enough. PIR also has a more verbose call syntax that is still more
@@ -2464,6 +788,7 @@ between different units.
      $I0 = 'fact'(count, product)
 
      say $I0
+     end
   .end
 
   .sub 'fact'
@@ -2489,14 +814,12 @@ is 120.
 
 As usual, execution of the program starts at the C<:main> subroutine.
 
-=head3 Parameters and Arguments
-
-=head4 Named Parameters
+=head3 Named Arguments
 
 =for author
 
 We have to get our terms straight here.  Which are "arguments" (passed in) and
-which are "parameters" (processed from within).
+which are "parameters" (processed from within)?
 
 =end for
 
@@ -2514,9 +837,9 @@ name and can be in any order.  Here's an example:
  .sub 'MySub'
     .param string yrs :named("age")
     .param string call :named("name")
-    $S0 = "Hello " . call
-    $S1 = "You are " . yrs
-    $S1 = $S1 . " years old"
+    $S0  = "Hello " . call
+    $S1  = "You are " . yrs
+    $S1 .= " years old"
     say $S0
     say $S1
  .end
@@ -2527,6 +850,7 @@ name and can be in any order.  Here's an example:
 
 =end PIR
 
+Named arguments are convenient because the order of the pairs does not matter.
 You can also pass these pairs in the opposite order:
 
 =begin PIR
@@ -2537,19 +861,16 @@ You can also pass these pairs in the opposite order:
 
 =end PIR
 
-Named arguments can be a big help because you don't have to worry about the
-exact order of variables, especially as argument lists get very long.
-
-=head4 Optional Parameters
+=head3 Optional Arguments
 
 X<optional arguments>
-Some functions have arguments with appropriate default values, so that callers
+Some functions have arguments with appropriate default values so that callers
 don't always have to pass them.  Parrot provides a mechanism to identify
-optional argument.  Parrot also provides a flag value to determine if the
-caller has passed in an optional argument.
+optional arguments as well as flag values to determine if the
+caller has passed optional arguments.
 
 Optional parameters appear in PIR as if they're actually I<two> parameters:
-the value and its flag:
+the value and a flag:
 
   .param string name     :optional
   .param int    has_name :opt_flag
@@ -2566,10 +887,10 @@ value for an optional parameter, you can write:
     name = "Default value"
   we_have_a_name:
 
-Optional parameters can be positional or named parameters. When using them with
-positional parameters, they must appear at the end of the list of positional
-parameters. Also, the C<:opt_flag> parameter must always appear directly after
-the C<:optional> parameter.
+Optional parameters can be positional or named parameters. Optional positional
+parameters must appear at the end of the list of positional parameters. Also,
+the C<:opt_flag> parameter must always appear directly after the C<:optional>
+parameter.
 
   .sub 'Foo'
     .param int optvalue :optional
@@ -2600,641 +921,6 @@ You can call this function in two ways:
   'MySub'("answer" => 42)  # with a value
   'MySub'()                # without
 
-=head4 Commandline Arguments
-
-Programs written in Parrot have access to arguments passed on the command
-line:
-
-=begin PIR
-
-  .sub 'MyMain' :main
-    .param pmc all_args :slurpy
-    # ...
-  .end
-
-=end PIR
-
-=for author
-
-Please verify and expand.
-
-=end for
-
-The C<all_args> PMC is a ResizableStringArray PMC, which means you can loop
-over the results, access them individually, or even modify them.
-
-=head3 Continuations
-
-X<continuations>
-
-A continuation is a subroutine that captures a complete copy of the
-caller's context. Invoking a
-continuation starts or restarts it at the entry point:
-
-=begin PIR_FRAGMENT_INVALID
-
-    new $P1, "Integer"
-    set $P1, 5
-
-    newsub $P0, 'Continuation', _con
-  _con:
-    print "in cont "
-    print $P1
-    print "\n"
-    dec $P1
-    unless $P1, done
-    invoke                        # $P0
-  done:
-    print "done\n"
-
-=end PIR_FRAGMENT_INVALID
-
-This prints:
-
-  in cont 5
-  in cont 4
-  in cont 3
-  in cont 2
-  in cont 1
-  done
-
-Continuations are a kind of subroutine that take a snapshots of control
-flow. They are frozen images of the current
-execution state of the VM. Once you have a continuation, you can invoke it to
-return to the point where the continuation was first created. It's like a
-magical timewarp that allows the developer to arbitrarily move control flow
-back to any previous point in the program.
-
-Continuations are like any other PMC; you can create one with the C<new> opcode:
-
-=begin PIR_FRAGMENT
-
-  $P0 = new 'Continuation'
-
-=end PIR_FRAGMENT
-
-The new continuation starts off in an undefined state. If you attempt to invoke
-a new continuation without initializing it, Parrot will throw an exception.  To
-prepare the continuation for use, assign it a destination label with the
-C<set_addr> opcode:
-
-=begin PIR_FRAGMENT
-
-    $P0 = new 'Continuation'
-    set_addr $P0, my_label
-
-  my_label:
-    # ...
-
-=end PIR_FRAGMENT
-
-To jump to the continuation's stored label and return the context to the state
-it was in I<at the point of its creation>, invoke the continuation:
-
-=begin PIR_FRAGMENT_INVALID
-
-  invoke $P0  # Explicit using "invoke" opcode
-  $P0()       # Same, but nicer syntax
-
-=end PIR_FRAGMENT_INVALID
-
-Even though you can use the subroutine notation C<$P0()> to invoke the
-continuation, it doesn't make any sense to pass arguments or obtain return
-values:
-
-=begin PIR_FRAGMENT
-
-  $P0 = new 'Continuation'
-  set_addr $P0, my_label
-
-  $P0(1, 2)      # WRONG!
-
-  $P1 = $P0()    # WRONG!
-
-=end PIR_FRAGMENT
-
-
-=head4 Continuation Passing Style
-
-X<continuation passing style>
-X<CPS>
-
-Parrot uses continuations internally for control flow. When Parrot
-invokes a function, it creates a continuation representing the
-current point in the program.  It passes this continuation as an invisible
-parameter to the function call.  When that function returns, it invokes the
-continuation -- in effect, it performs a goto to the point of creation of that
-continuation.  If you have a continuation, you can invoke it to return to its
-point of creation any time you want.
-
-This type of flow control -- invoking continuations instead of performing bare
-jumps -- is X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
-
-
-
-=head4 Tailcalls
-
-In many cases, a subroutine will set up and call another subroutine, and then
-return the result of the second call directly. This is a X<tailcall> tailcall,
-and is an important opportunity for optimization.  Here's a contrived example
-in pseudocode:
-
-  call add_two(5)
-
-  subroutine add_two(value)
-    value = add_one(value)
-    return add_one(value)
-
-In this example, the subroutine C<add_two> makes two calls to c<add_one>. The
-second call to C<add_one> is the return value. C<add_one> gets called; its
-result gets returned to the caller of C<add_two>.  Nothing in C<add_two> uses
-that return value directly.
-
-A simple optimization is available for this type of code.  The second call to
-C<add_one> can return to the same place that C<add_two> returns; therefore,
-it's perfectly safe and correct to use the same return continuation that
-C<add_two> uses. The two subroutine calls can share a return continuation,
-instead of having to create a new continuation for each call.
-
-X<.tailcall directive>
-
-PIR provides the C<.tailcall> directive to identify similar situations.  Use it
-in place of the C<.return> directive. C<.tailcall> performs this optimization
-by reusing the return continuation of the parent function to make the tailcall:
-
-=begin PIR
-
-  .sub 'main' :main
-      .local int value
-      value = add_two(5)
-      say value
-  .end
-
-  .sub 'add_two'
-      .param int value
-      .local int val2
-      val2 = add_one(value)
-      .tailcall add_one(val2)
-  .end
-
-  .sub 'add_one'
-      .param int a
-      .local int b
-      b = a + 1
-      .return (b)
-  .end
-
-=end PIR
-
-This example above will print out the correct value "7".
-
-=head3 Native Call Interface
-
-Z<CHP-9-SECT-7.2>
-
-X<subroutines;calling conventions;NCI>
-A special version of the Parrot calling conventions are used by the
-X<NCI (Native Call Interface)> Native Call Interface (NCI) for calling
-subroutines with a known prototype in shared libraries. This is not
-really portable across all libraries, but it's worth a short example.
-This is a simplified version of the first test in F<t/pmc/nci.t>:
-
-=begin PIR_FRAGMENT
-
-    loadlib $P1, "libnci_test"      # get library object for a shared lib
-    print "loaded\n"
-    dlfunc $P0, $P1, "nci_dd", "dd" # obtain the function object
-    print "dlfunced\n"
-    set $I0, 1                      # prototype used - unchecked
-    set_args "0", 4.0               # set the argument
-    get_results "0", $N5            # prepare to store the return value
-    invokecc $P0                    # call nci_dd
-    ne $N5, 8.0, nok_1              # the test functions returns 2*arg
-    print "ok 1\n"
-    end
-    nok_1:
-    #...
-
-=end PIR_FRAGMENT
-
-This example shows two new instructions: C<loadlib> and C<dlfunc>. The
-C<loadlib>X<loadlib opcode (PIR)> opcode obtains a handle for a shared
-library. It searches for the shared library in the current directory,
-in F<runtime/parrot/dynext>, and in a few other configured
-directories. It also tries to load the provided filename unaltered and
-with appended extensions like C<.so> or C<.dll>. Which extensions it
-tries depends on the OS Parrot is running on.
-
-The C<dlfunc>X<dlfunc opcode (PIR)> opcode gets a function object from a
-previously loaded library (second argument) of a specified name (third
-argument) with a known function signature (fourth argument). The
-function signature is a string where the first character is the return
-value and the rest of the parameters are the function parameters. The
-characters used in X<NCI (Native Call Interface);function signatures>
-NCI function signatures are listed in Table 9-5.
-
-=begin table picture Function signature letters
-
-Z<CHP-9-TABLE-5>
-
-=headrow
-
-=row
-
-=cell Character
-
-=cell Register set
-
-=cell C type
-
-=bodyrows
-
-=row
-
-=cell C<v>
-
-=cell -
-
-=cell void (no return value)
-
-=row
-
-=cell C<c>
-
-=cell C<I>
-
-=cell char
-
-=row
-
-=cell C<s>
-
-=cell C<I>
-
-=cell short
-
-=row
-
-=cell C<i>
-
-=cell C<I>
-
-=cell int
-
-=row
-
-=cell C<l>
-
-=cell C<I>
-
-=cell long
-
-=row
-
-=cell C<f>
-
-=cell C<N>
-
-=cell float
-
-=row
-
-=cell C<d>
-
-=cell C<N>
-
-=cell double
-
-=row
-
-=cell C<t>
-
-=cell C<S>
-
-=cell char *
-
-=row
-
-=cell C<p>
-
-=cell C<P>
-
-=cell void * (or other pointer)
-
-=row
-
-=cell C<I>
-
-=cell -
-
-=cell Parrot_Interp *interpreter
-
-=row
-
-=cell C<C>
-
-=cell -
-
-=cell a callback function pointer
-
-=row
-
-=cell C<D>
-
-=cell -
-
-=cell a callback function pointer
-
-=row
-
-=cell C<Y>
-
-=cell C<P>
-
-=cell the subroutine C<C> or C<D> calls into
-
-=row
-
-=cell C<Z>
-
-=cell C<P>
-
-=cell the argument for C<Y>
-
-=end table
-
-For more information on callback functions, read the documentation in
-F<docs/pdds/pdd16_native_call.pod> and F<docs/pmc/struct.pod>.
-
-
-
-=head3 Coroutines
-
-X<PIR;Coroutines>
-X<Coroutines>
-
-As we mentioned in the previous chapter, coroutines are
-X<subroutines;coroutines> subroutines that
-can suspend themselves and return control to the caller--and then pick
-up where they left off the next time they're called, as if they never
-left.
-
-X<coroutines>
-In PIR, coroutines are subroutine-like objects:
-
-=begin PIR_FRAGMENT_INVALID
-
-  newsub P0, .Coroutine, _co_entry
-
-=end PIR_FRAGMENT_INVALID
-
-The C<Coroutine> object has its own user stack, register frame stacks,
-control stack, and pad stack. The pad stack is inherited from the
-caller. The coroutine's control stack has the caller's control stack
-prepended, but is still distinct. When the coroutine invokes itself,
-it returns to the caller and restores the caller's context (basically
-swapping all stacks). The next time the coroutine is invoked, it
-continues to execute from the point at which it previously returned:
-
-=begin PIR_FRAGMENT_INVALID
-
-    new_pad 0                # push a new lexical pad on stack
-    new P0, "Int"            # save one variable in it
-    set P0, 10
-    store_lex -1, "var", P0
-
-    newsub P0, .Coroutine, _cor
-                             # make a new coroutine object
-    saveall                  # preserve environment
-    invoke                   # invoke the coroutine
-    restoreall
-    print "back\n"
-    saveall
-    invoke                   # invoke coroutine again
-    restoreall
-    print "done\n"
-    pop_pad
-    end
-
-  _cor:
-    find_lex P1, "var"       # inherited pad from caller
-    print "in cor "
-    print P1
-    print "\n"
-    inc P1                   # var++
-    saveall
-    invoke                   # yield(  )
-    restoreall
-    print "again "
-    branch _cor              # next invocation of the coroutine
-
-=end PIR_FRAGMENT_INVALID
-
-This prints out the result:
-
-  in cor 10
-  back
-  again in cor 11
-  done
-
-X<invoke opcode (PIR);coroutines and>
-The C<invoke> inside the coroutine is commonly referred to as
-I<yield>. The coroutine never ends. When it reaches the bottom, it
-branches back up to C<_cor> and executes until it hits C<invoke>
-again.
-
-The interesting part about this example is that the coroutine yields
-in the same way that a subroutine is called. This means that the
-coroutine has to preserve its own register values. This example uses
-C<saveall> but it could have only stored the registers the coroutine
-actually used. Saving off the registers like this works because
-coroutines have their own register frame stacks.
-
-We've mentioned coroutines several times before, and we're finally going
-to explain what they are. Coroutines are similar to subroutines except
-that they have an internal notion of I<state> N<And the cool new name!>.
-Coroutines, in addition to performing a normal C<.return> to return
-control flow back to the caller and destroy the lexical environment of
-the subroutine, may also perform a C<.yield> operation. C<.yield> returns
-a value to the caller like C<.return> can, but it does not destroy the
-lexical state of the coroutine. The next time the coroutine is called, it
-continues execution from the point of the last C<.yield>, not at the
-beginning of the coroutine.
-
-In a Coroutine, when we continue from a C<.yield>, the entire lexical
-environment is the same as it was when C<.yield> was called. This
-means that the parameter values don't change, even if we call the
-coroutine with different arguments later.
-
-Coroutines are defined like any ordinary subroutine. They do not require
-any special flag or any special syntax to mark them as being a
-coroutine. However, what sets them apart is the use of the C<.yield>
-directive. C<.yield> plays several roles:
-
-=over 4
-
-=item * Identifies coroutines
-
-When Parrot sees a yield, it knows to create a Coroutine PMC object
-instead of a Sub PMC.
-
-=item * Creates a continuation
-
-Continuations, as we have already seen, allow us to continue
-execution at the point of the continuation later. It's like a snapshot of
-the current execution environment. C<.yield> creates a continuation in
-the coroutine and stores the continuation object in the coroutine object
-or later resuming from the point of the C<.yield>.
-
-=item * Returns a value
-
-C<.yield> can return a value N<or many values, or no values> to the caller.
-It is basically the same as a C<.return> in this regard.
-
-=back
-
-Here is a quick example of a simple coroutine:
-
-  .sub 'MyCoro'
-    .yield(1)
-    .yield(2)
-    .yield(3)
-    .return(4)
-  .end
-
-  .sub 'main' :main
-    $I0 = MyCoro()    # 1
-    $I0 = MyCoro()    # 2
-    $I0 = MyCoro()    # 3
-    $I0 = MyCoro()    # 4
-    $I0 = MyCoro()    # 1
-    $I0 = MyCoro()    # 2
-    $I0 = MyCoro()    # 3
-    $I0 = MyCoro()    # 4
-    $I0 = MyCoro()    # 1
-    $I0 = MyCoro()    # 2
-    $I0 = MyCoro()    # 3
-    $I0 = MyCoro()    # 4
-  .end
-
-This is obviously a contrived example, but it demonstrates how the coroutine
-stores it's state. The coroutine stores it's state when we reach a C<.yield>
-directive, and when the coroutine is called again it picks up where it last
-left off. Coroutines also handle parameters in a way that might not be
-intuitive. Here's an example of this:
-
-  .sub 'StoredConstant'
-    .param int x
-    .yield(x)
-    .yield(x)
-    .yield(x)
-  .end
-
-  .sub 'main' :main
-    $I0 = StoredConstant(5)       # $I0 = 5
-    $I0 = StoredConstant(6)       # $I0 = 5
-    $I0 = StoredConstant(7)       # $I0 = 5
-    $I0 = StoredConstant(8)       # $I0 = 8
-  .end
-
-Notice how even though we are calling the C<StoredConstant> coroutine with
-different arguments each time, the value of parameter C<x> doesn't change
-until the coroutine's state resets after the last C<.yield>. Remember that
-a continuation takes a snapshot of the current state, and the C<.yield>
-directive takes a continuation. The next time we call the coroutine, it
-invokes the continuation internally, and returns us to the exact same place in
-the exact same condition as we were when we called the C<.yield>. In order
-to reset the coroutine and enable it to take a new parameter, we must either
-execute a C<.return> directive or reach the end of the coroutine.
-
-=head3 Multiple Dispatch
-
-Multiple dispatch is when there are multiple subroutines in a single
-namespace with the same name. These functions must differ, however, in
-their parameter list, or "signature". All subs with the same name get
-put into a single PMC called a MultiSub. The MultiSub is like a list
-of subroutines. When the multisub is invoked, the MultiSub PMC object
-searches through the list of subroutines and searches for the one with
-the closest matching signature. The best match is the sub that gets
-invoked.
-
-MultiSubs are subroutines with the C<:multi> flag applied to them.
-MultiSubs (also called "Multis") must all differ from one another in
-the number and/or type of arguments passed to the function. Having
-two multisubs with the same function signature could result in a
-parsing error, or the later function could overwrite the former one
-in the multi.
-
-Multisubs are defined like this:
-
-  .sub 'MyMulti' :multi
-      # does whatever a MyMulti does
-  .end
-
-Multis belong to a specific namespace. Functions in different namespaces
-with the same name do not conflict with each other N<this is one of the
-reasons for having multisubs in the first place!>. It's only when
-multiple functions in a single namespace need to have the same name that
-a multi is used.
-
-Multisubs take a special designator called a I<multi signature>. The multi
-signature tells Parrot what particular combination of input parameters the
-multi accepts. Each multi will have a different signature, and Parrot will
-be able to dispatch to each one depending on the arguments passed. The
-multi signature is specified in the C<:multi> directive:
-
-  .sub 'Add' :multi(I, I)
-    .param int x
-    .param int y
-    .return(x + y)
-  .end
-
-  .sub 'Add' :multi(N, N)
-    .param num x
-    .param num y
-    .return(x + y)
-  .end
-
-  .sub 'Start' :main
-    $I0 = Add(1, 2)      # 3
-    $N0 = Add(3.14, 2.0) # 5.14
-    $S0 = Add("a", "b")  # ERROR! No (S, S) variant!
-  .end
-
-Multis can take I, N, S, and P types, but they can also use C<_> (underscore)
-to denote a wildcard, and a string that can be the name of a particular PMC
-type:
-
-  .sub 'Add' :multi(I, I)  # Two integers
-    ...
-
-  .sub 'Add' :multi(I, 'Float')  # An integer and Float PMC
-    ...
-
-                           # Two Integer PMCs
-  .sub 'Add' :multi('Integer', _)
-    ...
-
-When we call a multi PMC, Parrot will try to take the most specific
-best-match variant, and will fall back to more general variants if a perfect
-best-match cannot be found. So if we call C<'Add'(1, 2)>, Parrot will dispatch
-to the C<(I, I)> variant. If we call C<'Add'(1, "hi")>, Parrot will match the
-C<(I, _)> variant, since the string in the second argument doesn't match C<I>
-or C<'Float'>. Parrot can also choose to automatically promote one of the I,
-N, or S values to an Integer, Float, or String PMC.
-
-To make the decision about which multi variant to call, Parrot takes a
-I<Manhattan Distance> between the two. Parrot calculates the I<distance>
-between the multi signatures and the argument signature. Every difference
-counts as one step. A difference can be an autobox from a primitive type
-to a PMC, or the conversion from one primitive type to another, or the
-matching of an argument to a C<_> wildcard. After Parrot calculates the
-distance to each variant, it calls the function with the lowest distance.
-Notice that it's possible to define a variant that is impossible to call:
-for every potential combination of arguments there is a better match. This
-isn't necessarily a common occurrence, but it's something to watch out for
-in systems with a lot of multis and a limited number of data types in use.
-
 =head3 Sub PMCs
 
 Subroutines are a PMC type in Parrot. You can store them in PMC registers and
@@ -3246,7 +932,7 @@ the current namespace with the C<get_global> opcode:
 To find a subroutine in a different namespace, first look up the appropriate
 the namespace PMC, then use that with C<get_global>:
 
-  $P0 = get_namespace "MyNamespace"
+  $P0 = get_namespace "MyNameSpace"
   $P1 = get_global $P0, "MySubName"
 
 You can obviously invoke a Sub PMC:
@@ -3307,234 +993,147 @@ C<get_namespace> method:
 
   $P1 = $P0.'get_namespace'()
 
-=head3 Evaluating a Code String
+=head2 The Commandline
 
-Z<CHP-9-SECT-7.6>
+Programs written in Parrot have access to arguments passed on the command
+line like any other program would:
 
-X<code strings, evaluating>
-This isn't really a subroutine operation, but it does produce a code
-object that can be invoked. In this case, it's a X<bytecode segment
-object> bytecode segment object.
+  .sub 'MyMain' :main
+    .param pmc all_args :slurpy
+    ...
+  .end
 
-The first step is to get an assembler or compiler for the target
-language:
+=for author
 
-=begin PIR_FRAGMENT
+Please verify and expand.
 
-  compreg $P1, "PIR"
+=end for
 
-=end PIR_FRAGMENT
+The C<all_args> PMC is a ResizableStringArray PMC, which means you can loop
+over the results, access them individually, or even modify them.
 
-Within the Parrot interpreter there are currently three registered
-languages: C<PASM>, C<PIR>, and C<PASM1>. The first two are for parrot
-assembly language and parrot intermediate representation code. The third
-is for evaluating single statements in PASM. Parrot automatically adds
-an C<end> opcode at the end of C<PASM1> strings before they're
-compiled.
+=head2 Continuation Passing Style
 
-This example places a bytecode segment object into the destination
-register C<P0> and then invokes it with C<invoke>:
+X<continuations>
+X<continuation passing style>
+X<CPS>
+Continuations are snapshots of control flow: frozen images of the current
+execution state of the VM. Once you have a continuation, you can invoke it to
+return to the point where the continuation was first created. It's like a
+magical timewarp that allows the developer to arbitrarily move control flow
+back to any previous point in the program.
 
-=begin PIR_FRAGMENT_INVALID
+Continuations are not a new concept; they've boggled the minds of new Lisp and
+Scheme programmers for many years.  Despite their power and heritage, they're
+not visible to most other modern programming languages or their runtimes.
+Parrot aims to change that: it performs almost all control flow through the use
+of continuations.  PIR and PCT hide most of this complexity from developers,
+but the full power of continuations is available.
 
-  compreg P1, "PASM1"                # get compiler
-  set S1, "in eval\n"
-  compile P0, P1, "print S1"
-  invoke                             # eval code P0
-  print "back again\n"
+When Parrot invokes a function, it creates a continuation representing the
+current point in the program.  It passes this continuation as an invisible
+parameter to the function call.  When that function returns, it invokes the
+continuation -- in effect, it performs a goto to the point of creation of that
+continuation.  If you have a continuation, you can invoke it to return to its
+point of creation any time you want.
 
-=end PIR_FRAGMENT_INVALID
+This type of flow control -- invoking continuations instead of performing bare
+jumps -- is X<Continuation Passing Style;CPS> Continuation Passing Style (CPS).
+CPS allows parrot to offer all sorts of neat features, such as tail-call
+optimizations and lexical subroutines.
 
-You can register a compiler or assembler for any language inside the
-Parrot core and use it to compile and invoke code from that language.
-These compilers may be written in PIR or reside in shared libraries.
+=head3 Tailcalls
 
-=begin PIR_FRAGMENT
+A subroutine may set up and call another subroutine, then return the result of
+the second call directly. This is a X<tailcall> tailcall, and is an important
+opportunity for optimization.  Here's a contrived example in pseudocode:
 
-  compreg "MyLanguage", $P10
+  call add_two(5)
 
-=end PIR_FRAGMENT
+  subroutine add_two(value)
+    value = add_one(value)
+    return add_one(value)
 
-In this example the C<compreg> opcode registers the subroutine-like
-object C<P10> as a compiler for the language "MyLanguage". See
-F<examples/compilers> and F<examples/japh/japh16.pasm> for an external
-compiler in a shared library.
+In this example, the subroutine C<add_two> makes two calls to c<add_one>. The
+second call to C<add_one> is the return value. C<add_one> gets called; its
+result gets returned to the caller of C<add_two>.  Nothing in C<add_two> uses
+that return value directly.
 
+A simple optimization is available for this type of code.  The second call to
+C<add_one> will return to the same place that C<add_two> returns; it's
+perfectly safe and correct to use the same return continuation that C<add_two>
+uses. The two subroutine calls can share a return continuation, instead of
+having to create a new continuation for each call.
 
+X<.tailcall directive>
 
-=head2 Lexicals and Globals
+PIR provides the C<.tailcall> directive to identify similar situations.  Use it
+in place of the C<.return> directive. C<.tailcall> performs this optimization
+by reusing the return continuation of the parent function to make the tailcall:
 
-So far, we've been treating Parrot registers like the variables of a
-high-level language. This is fine, as far as it goes, but it isn't the
-full picture. The dynamic nature and introspective features of
-languages like Perl make it desirable to manipulate variables by name,
-instead of just by register or stack location. These languages also
-have global variables, which are visible throughout the entire
-program. Storing a global variable in a register would either tie up
-that register for the lifetime of the program or require some unwieldy way
-to shuffle the data into and out of registers.
+=begin PIR
 
-Parrot provides structures for storing both global and lexically
-scoped named variables. Lexical and global variables must be PMC
-values. PIR provides instructions for storing and retrieving
-variables from these structures so the PIR opcodes can operate on
-their values.
+  .sub 'main' :main
+      .local int value
+      value = add_two(5)
+      say value
+  .end
 
-=head3 Globals
+  .sub 'add_two'
+      .param int value
+      .local int val2
+      val2 = add_one(value)
+      .tailcall add_one(val2)
+  .end
 
-Z<CHP-9-SECT-6.1>
+  .sub 'add_one'
+      .param int a
+      .local int b
+      b = a + 1
+      .return (b)
+  .end
 
-X<PIR (Parrot assembly language);global variables>
-Global variables are stored in a C<Hash>, so every variable name
-must be unique.  PIR has two opcodes for globals, C<set_global> and
-C<get_global>:
+=end PIR
 
-=begin PIR_FRAGMENT_INVALID
+This example above print the correct value "7".
 
-  new P10, "Int"
-  set P10, 42
-  set_global "$foo", P10
-  # ...
-  get_global P0, "$foo"
-  print P0                        # prints 42
+=head3 Creating and Using Continuations
 
-=end PIR_FRAGMENT_INVALID
+While Parrot's use of continuations and CPS is invisible to most code, you can
+create and use them explicitly if you like.  Continuations are like any other
+PMC. Create one with the C<new> opcode:
 
-The first two statements create a C<Int> in the PMC register
-C<P10> and give it the value 42. In the third statement,
-C<set_global> stores that PMC as the named global variable C<$foo>.
-At some later point in the program, C<get_global> retrieves the PMC
-from the global variable by name, and stores it in C<P0> so it can be
-printed.
+  $P0 = new 'Continuation'
 
-The C<set_global> opcode only stores a reference to the object. If
-we add an increment statement:
+The new continuation starts off in an undefined state. If you attempt to invoke
+a new continuation without initializing it, Parrot will raise an exception.  To
+prepare the continuation for use, assign it a destination label with the
+C<set_addr> opcode:
 
-=begin PIR_FRAGMENT
+    $P0 = new 'Continuation'
+    set_addr $P0, my_label
 
-  inc $P10
+  my_label:
+    ...
 
-=end PIR_FRAGMENT
+To jump to the continuation's stored label and return the context to the state
+it was in I<at the point of its creation>, invoke the continuation:
 
-after the C<set_global> it increments the stored global, printing 43.
-If that's not what you want, you can C<clone> the PMC before you store
-it. Leaving the global variable as an alias does have advantages,
-though. If you retrieve a stored global into a register and modify it
-as follows:
+  invoke $P0  # Explicit using "invoke" opcode
+  $P0()       # Same, but nicer syntax
 
-=begin PIR_FRAGMENT_INVALID
+Even though you can use the subroutine notation C<$P0()> to invoke the
+continuation, it doesn't make any sense to pass arguments or obtain return
+values:
 
-  get_global P0, "varname"
-  inc P0
+  $P0 = new 'Continuation'
+  set_addr $P0, my_label
 
-=end PIR_FRAGMENT_INVALID
+  $P0(1, 2)      # WRONG!
 
-the value of the stored global is directly modified, so you don't need
-to call C<set_global> again.
+  $P1 = $P0()    # WRONG!
 
-The two-argument forms of C<set_global> and C<get_global> store or
-retrieve globals from the outermost namespace (what Perl users will
-know as the "main" namespace). A simple flat global namespace isn't
-enough for most languages, so Parrot also needs to support
-hierarchical namespaces for separating packages (classes and modules
-in Perl 6). Use C<set_rootglobal> and
-C<get_root_global> add an argument to select a nested namespace:
-
-=begin PIR_FRAGMENT_INVALID
-
-  set_root_global ["Foo"], "var", P0 # store P0 as var in the Foo namespace
-  get_root_global P1, ["Foo"], "var"  # get Foo::var
-
-=end PIR_FRAGMENT_INVALID
-
-Eventually the global opcodes will have variants that take a PMC to
-specify the namespace, but the design and implementation of these
-aren't finished yet.
-
-=head3 Lexicals
-
-X<PIR (Parrot assembly language);lexical variables>
-Lexical variables are stored in a lexical scratchpad. There's one pad
-for each lexical scope. Every pad has both a hash and an array, so
-elements can be stored either by name or by numeric index.
-
-=head4 Basic instructions
-
-Z<CHP-9-SECT-6.2.1>
-
-To store a lexical variable in the current scope pad, use C<store_lex>.
-Likewise, use C<find_lex> to retrieve a variable from the current pad.
-
-=begin PIR_FRAGMENT
-
-  new $P0, "Int"            # create a variable
-  set $P0, 10               # assign value to it
-  store_lex "foo", $P0      # store the var with the variable name "foo"
-  # ...
-  find_lex $P1, "foo"       # get the var "foo" into P1
-  print $P1
-  print "\n"                # prints 10
-
-=end PIR_FRAGMENT
-
-As we have seen above, we can declare a new subroutine to be a nested inner
-subroutine of an existing outer subroutine using the C<:outer> flag. The
-outer flag is used to specify the name of the outer subroutine. Where there
-may be multiple subroutines with the same name N<such is the case with
-multisubs, which we will discuss soon>, we can use the C<:subid> flag on the
-outer subroutine to give it a different--and unique--name that the lexical
-subroutines can reference in their C<:outer> declarations. Within lexical
-subroutines, the C<.lex> command defines a local variable that follows these
-scoping rules.
-
-=head3 LexPad and LexInfo PMCs
-
-Information about lexical variables in a subroutine is stored in two different
-types of PMCs: The LexPad PMC that we already mentioned briefly, and the
-LexInfo PMCs which we haven't. Neither of these PMC types are really usable
-from PIR code, but are instead used by Parrot internally to store information
-about lexical variables.
-
-C<LexInfo> PMCs are used to store information about lexical variables at
-compile time. This is read-only information that is generated during
-compilation to represent what is known about lexical variables. Not all
-subroutines get a LexInfo PMC by default, you need to indicate to Parrot
-somehow that you require a LexInfo PMC to be created. One way to do this is
-with the C<.lex> directive that we looked at above. Of course, the C<.lex>
-directive only works for languages where the names of lexical variables are
-all known at compile time. For languages where this information isn't known,
-the subroutine can be flagged with C<:lex> instead.
-
-C<LexPad> PMCs are used to store run-time information about lexical variables.
-This includes their current values and their type information. LexPad PMCs are
-created at runtime for subs that have a C<LexInfo> PMC already. These are
-created each time the subroutine is invoked, which allows for recursive
-subroutine calls without overwriting variable names.
-
-With a Subroutine PMC, you can get access to the associated LexInfo PMC by
-calling the C<'get_lexinfo'> method:
-
-  $P0 = find_global "MySubroutine"
-  $P1 = $P0.'get_lexinfo'()
-
-Once you have the LexInfo PMC, there are a limited number of operations that
-you can call with it:
-
-  $I0 = elements $P1    # Get the number of lexical variables from it
-  $P0 = $P1["name"]     # Get the entry for lexical variable "name"
-
-There really isn't much else useful to do with LexInfo PMCs, they're mostly
-used by Parrot internally and aren't helpful to the PIR programmer.
-
-There is no easy way to get a reference to the current LexPad PMC in a given
-subroutine, but like LexInfo PMCs that doesn't matter because they aren't
-useful from PIR anyway. Remember that subroutines themselves can be lexical
-and that therefore the lexical environment of a given variable can extend to
-multiple subroutines and therefore multiple LexPads. The opcodes C<find_lex>
-and C<store_lex> automatically search through nested LexPads recursively to
-find the proper environment information about the given variables.
-
-=head3 Lexical Subroutines
+=head2 Lexical Subroutines
 
 X<Lexical Subroutines>
 
@@ -3545,8 +1144,8 @@ variables from the outer subroutine, but can itself define its own lexical
 variables that the outer subroutine cannot access.   PIR lacks the concept of
 blocks or nested lexical scopes; this is how it performs the same function.
 
-If the subroutine is lexical, you can get its C<:outer> with the C<get_outer>
-method on the Sub PMC:
+If a subroutine is lexical, find its C<:outer> Sub with the C<get_outer>
+method:
 
   $P1 = $P0.'get_outer'()
 
@@ -3592,9 +1191,9 @@ supplies lexical subroutines to create nested lexical scopes.
 
 =head3 PIR Scoping
 
-Only one PIR structure supports scoping like this: the subroutineN<... and
+Only one PIR structure supports scoping like this: the subroutine.N<... and
 objects that inherit from subroutines, such as methods, coroutines, and
-multisubs>. There are no blocks in PIR that have their own scope besides
+multisubs> There are no blocks in PIR that have their own scope besides
 subroutines. Fortunately, we can use these lexical subroutines to simulate this
 behavior that HLLs require:
 
@@ -3611,12 +1210,18 @@ behavior that HLLs require:
   .sub 'MyInner' :outer('MyOuter')
       .local int z
       .lex 'z', z
-      #x, y, and z are all "visible" here
+      # x, y, and z are all "visible" here
   .end
 
 =end PIR
 
-In the example above we put the word C<"visible"> in quotes. This is because
+=for author
+
+This paragraph is unclear.
+
+=end for
+
+This example calls the variables in C<MyInner> "visible". This is because
 lexically-defined variables need to be accessed with the C<get_lex> and
 C<set_lex> opcodes. These two opcodes don't just access the value of a
 register, where the value is stored while it's being used, but they also make
@@ -3624,728 +1229,386 @@ sure to interact with the C<LexPad> PMC that's storing the data. If the value
 isn't properly stored in the LexPad, then they won't be available in nested
 inner subroutines, or available from C<:outer> subroutines either.
 
-=head2 Namespaces
+=head3 Lexical Variables
 
-X<Namespaces>
+=for author
+
+What's the point of this paragraph?
+
+=end for
+
+As we have seen above, we can declare a new subroutine to be a nested inner
+subroutine of an existing outer subroutine using the C<:outer> flag. The outer
+flag is used to specify the name of the outer subroutine. Where there may be
+multiple subroutines with the same name, we can use the C<:subid> flag on the
+outer subroutine to give it a different--and unique--name that the lexical
+subroutines can reference in their C<:outer> declarations. Within lexical
+subroutines, the C<.lex> command defines a local variable that follows these
+scoping rules.
+
+=head3 LexPad and LexInfo PMCs
+
+X<LexPad PMC>
+X<LexInfo PMC>
+Subs store information about lexical variables in two different PMCs: the
+LexPad PMC and the LexInfo PMC. They're not visible to PIR code; Parrot uses
+them internally to store information about lexical variables.
+
+I<LexInfo> PMCs store read-only information about the lexical variables used in
+a Sub.  Parrot creates them when it compiles a Sub.  Not all subroutines get a
+LexInfo PMC by default; only those that need it.  One way to identify such a
+Sub is its use of the C<.lex> directive, but this only works for languages
+which know the names of lexical variables at compile time. If that's not true
+of your language, declare the Sub with the C<:lex> attribute.
+
+I<LexPad> PMCs store run-time information about lexical variables.  This
+includes their current values and their type information. Parrot creates LexPad
+PMCs for Subs that already have a LexInfo PMC. As you can imagine, Parrot must
+create a new LexPad for each I<invocation> of a Sub, lest a recursive call
+overwrite previous lexical values.
+
+Call the C<get_lexinfo> method on a Subroutine PMC to access its associated
+LexInfo PMC:
+
+  $P0 = find_global "MySubroutine"
+  $P1 = $P0.'get_lexinfo'()
+
+Once you have the LexInfo PMC, you can inspect the lexicals it represents:
+
+  $I0 = elements $P1    # the number of lexical variables it holds
+  $P0 = $P1["name"]     # the entry for lexical variable "name"
+
+There's not much else you can do (though the PMC behaves like a Hash PMC, so
+you can iterate over its keys and values).
+
+There is no easy way to get a reference to the current LexPad PMC in a given
+subroutine, but they're not useful from PIR anyway.  Remember that subroutines
+themselves can be lexical; the lexical environment of a given variable can
+extend to multiple subroutines with their own LexPads. The opcodes C<find_lex>
+and C<store_lex> search through nested LexPads recursively to find the proper
+environment for the given variables.
+
+=head2 Compilation Units Revisited
+
+Z<CHP-4-SECT-1.1>
+
+X<Subroutine>
+A subroutine is a section of code that forms a single unit. The factorial
+calculation example had two separate subroutines: the C<main> subroutine and
+the C<fact> subroutine. Here is that algorithm in a single subroutine:
+
+=begin PIR
+
+  .sub 'main'
+      $I1 = 5           # counter
+      bsr fact
+      say $I0
+      $I1 = 6           # counter
+      bsr fact
+      say $I0
+      end
+
+  fact:
+      $I0 = 1           # product
+  L1:
+      $I0 = $I0 * $I1
+      dec $I1
+      if $I1 > 0 goto L1
+      ret
+  .end
+
+=end PIR
+
+The unit of code from the C<fact> label definition to C<ret> is a reusable
+routine, but is only usable from within the C<main> subroutine. There are
+several problems with this simple approach. In terms of the interface, the
+caller has to know to pass the argument to C<fact> in C<$I1> and to get the
+result from C<$I0>. This differs from Parrot's well-understood calling
+conventions.
+
+Another disadvantage of this approach is that C<main> and C<fact> share the
+same subroutine. Parrot processes them as one piece of code.  They share
+registers, and they'd share any LexInfo and LexPad PMCs, if any were needed by
+C<main>. The C<fact> routine is also not easily usable from outside the C<main>
+subroutine, so other parts of your code won't have access to it.
+
+=head2 NameSpaces, Methods, and VTABLES
+
+Z<CHP-4-SECT-2>
+
+X<PIR (Parrot intermediate representation);methods>
+X<methods;in PIR>
+X<classes;methods>
+X<. (dot);. (method call);instruction (PIR)>
+PIR provides syntax to simplify writing methods and method calls for
+object-oriented programming.  PIR allows you to define your own classes, and
+with those classes you can define method interfaces to them. Method calls
+follow the Parrot's calling conventions, including the various parameter
+configurations, lexical scoping, and other aspects already shown.
+
+Parrot supports several built-in classes, such as C<ResizablePMCArray> and
+C<Integer>, written in C and compiled with the rest of Parrot. You may also
+declare your own classes in PIR. Like other object oriented systems, Parrot
+classes provide their own I<namespaces> and support I<methods> and
+I<attributes>.
+
+=head3 NameSpaces
+
+Z<CHP-4-SECT-2.1>
+
+X<NameSpaces>
 X<.namespace>
-Namespaces provide a mechanism where names can be reused. This may not
-sound like much, but in large complicated systems, or systems with
-many included libraries, it can be very handy. Each namespace gets its
-own area for function names and global variables. This way you can have
-multiple functions named C<create> or C<new> or C<convert>, for
-instance, without having to use I<Multi-Method Dispatch> (MMD) which we
-will describe later. Namespaces are also vital for defining classes and their
-methods, which we already mentioned. We'll talk about all those uses here.
+NameSpaces provide a categorization mechanism to avoid name collisions. This is
+most useful when producing encapsulated libraries or when building large
+systems.  Each namespace provides a separate location for function names and
+global variables.
 
-Namespaces are specified with the C<.namespace []> directive. The brackets
-are not optional, but the keys inside them are. Here are some examples:
+X<namespace collisions>
+X<namespace pollution>
+
+Without a namespace (or in a program that eschews namespaces), all subroutines
+and global variables would live in one big bag, running the risk of
+I<namespace collisions> thanks to I<namespace pollution>. You couldn't tell
+which subroutine performed which operation when two task contexts use the same
+word to mean two different things.
+
+NameSpaces are very effective at hiding private information as well as
+gathering similar things together.
+
+For example, the C<Math> namespace could store subroutines that manipulate
+numbers. The C<Images> namespace could store subroutines create and manipulate
+images. If your program must add two numbers together I<and> perform additive
+image composition, you can use the appropriate namespaced C<add> functions
+without conflict or confusion.  Within the C<Image> namespace you could have
+also have sub namespaces for C<jpeg> and C<MRI> and C<schematics>; each of
+these could have its own C<add> subroutine without getting into each other's
+way.
+
+Declare a namespace in PIR with the C<.namespace []> directive. The brackets
+are not optional, but the keys inside them are. For example:
 
   .namespace [ ]               # The root namespace
   .namespace [ "Foo" ]         # The namespace "Foo"
-  .namespace [ "Foo" ; "Bar" ] # Namespace Foo::Bar
+  .namespace [ "Foo" ; "Bar" ] # NameSpace Foo::Bar
   .namespace                   # WRONG! The [] are needed
 
-Using semicolons, namespaces can be nested to any arbitrary depth.
-Namespaces are special types of PMC, so we can access them and manipulate
-them just like other data objects. We can get the PMC for the root
-namespace using the C<get_root_namespace> opcode:
+You may nest namespaces to arbitrary depth by separating name components with
+semicolons.  NameSpaces are PMC, so you can access them and manipulate them
+just like other data objects. Get the PMC for the root namespace using the
+C<get_root_namespace> opcode:
 
   $P0 = get_root_namespace
 
-The current namespace, which might be different from the root namespace
-can be retrieved with the C<get_namespace> opcode:
+The current namespace may be different from the root namespace; retrieved it
+with the C<get_namespace> opcode:
 
   $P0 = get_namespace             # get current namespace PMC
   $P0 = get_namespace ["Foo"]     # get PMC for namespace "Foo"
 
-Namespaces are arranged into a large n-ary tree. There is the root namespace
-at the top of the tree, and in the root namespace are various special HLL
-namespaces. Each HLL compiler gets its own HLL namespace where it can store
-its data during compilation and runtime. Each HLL namespace may have a large
-hierarchy of other namespaces. We'll talk more about HLL namespaces and their
-significance in chapter 10.
+X<HLL namespaces>
+X<namespaces; HLL>
+Parrot arranges its namespaces in a hiarachy.  The root namespace is the root
+of the tree.  Beneath the root are HLL namespaces; hLL compiler gets its own
+HLL namespace where it can store its data during compilation and runtime. Each
+HLL namespace may itself be the root of a tree of namespaces.
 
-The root namespace is a busy place. Everybody could be lazy and use it to store
-all their subroutines and global variables, and then we would run into all
-sorts of collisions. One library would define a function "Foo", and then
-another library could try to create another subroutine with the same name.
-This is called I<namespace pollution>, because everybody is trying to put
-things into the root namespace, and those things are all unrelated to each
-other. Best practices requires that namespaces be used to hold private
-information away from public information, and to keep like things together.
+=head3 NameSpace PMC
 
-As an example, the namespace C<Integers> could be used to store subroutines
-that deal with integers. The namespace C<images> could be used to store
-subroutines that deal with creating and manipulating images. That way, when
-we have a subroutine that adds two numbers together, and a subroutine that
-performs additive image composition, we can name them both C<add> without any
-conflict or confusion. And within the C<image> namespace we could have sub
-namespaces for C<jpeg> and C<MRI> and C<schematics>, and each of these could
-have a C<add> method without getting into each other's way.
-
-The short version is this: use namespaces. There aren't any penalties to them,
-and they do a lot of work to keep things organized and separated.
-
-=head3 Namespace PMC
-
-The C<.namespace> directive that we've seen sets the current namespace. In
-PIR code, we have multiple ways to address a namespace:
+There are multiple ways to address a namespace in PIR, depending on the
+starting point of the lookup.  They may start at the root namespace:
 
   # Get namespace "a/b/c" starting at the root namespace
   $P0 = get_root_namespace ["a" ; "b" ; "c"]
 
+... or from the current HLL's namespace as a root:
+
   # Get namespace "a/b/c" starting in the current HLL namespace.
   $P0 = get_hll_namespace ["a" ; "b" ; "c"]
-  # Same
+
+... but this is identical to a root namespace lookup with the HLL as the first
+branch:
+
   $P0 = get_root_namespace ["hll" ; "a" ; "b" ; "c"]
+
+... and, of course, relative to the current namespace without a root:
 
   # Get namespace "a/b/c" starting in the current namespace
   $P0 = get_namespace ["a" ; "b" ; "c"]
 
-Once we have a namespace PMC we can retrieve global variables and
-subroutine PMCs from it using the following functions:
+Given a namespace PMC, retrieve global variables and subroutine PMCs with the
+C<get_global> opcode:
 
   $P1 = get_global $S0            # Get global in current namespace
   $P1 = get_global ["Foo"], $S0   # Get global in namespace "Foo"
   $P1 = get_global $P0, $S0       # Get global in $P0 namespace PMC
 
-=head3 Operations on the Namespace PMC
+=head3 Operations on the NameSpace PMC
 
-We've seen above how to find a Namespace PMC. Once you have it, there are a
-few things you can do with it. You can find methods and variables that are
-stored in the namespace, or you can add new ones:
+You can perform other operations on the NameSpace PMC.  You can find methods
+and variables that are stored in the namespace or add new ones.
+
+For example, to add one namespace to another current namespace, use the
+C<add_namespace> method:
 
   $P0 = get_namespace
-  $P0.'add_namespace'($P1)      # Add Namespace $P1 to $P0
-  $P1 = $P0.'find_namespace'("MyOtherNamespace")
+  $P0.'add_namespace'($P1)
 
-  # Find namespace "MyNamespace" in $P0, create it if it
-  #    doesn't exist
-  $P1 = $P0.'make_namespace'("MyNamespace")
+You can also find a namespace nested in a namespace with the C<find_namespace>
+method.  Note that this finds I<only> a namespace, where the C<find_global>
+opcode will find I<any> PMC stored in that namespace under the given name:
 
-  $P0.'add_sub'("MySub", $P2)   # Add Sub PMC $P2 to the namespace
-  $P1 = $P0.'find_sub'("MySub") # Find it
+  $P0 = get_namespace
+  $P1 = $P0.'find_namespace'("MyOtherNameSpace")
+
+You may also wish to create a namespace if it doesn't exist and find it
+otherwise.  That's the purpose of the C<make_namespace> method:
+
+  $P1 = $P0.'make_namespace'("MyNameSpace")
+
+To manipulate Sub PMCs in a namespace, use the C<add_sub> and C<find_sub>
+methods.  As with C<find_namespace>, C<find_sub> returns I<only> a Sub PMC and
+never any other kind of global symbol:
+
+  $P0.'add_sub'("MySub", $P2)
+  $P1 = $P0.'find_sub'("MySub")
+
+Similarly, the C<add_var> and C<find_var> methods work on PMCs of I<any> type:
 
   $P0.'add_var'("MyVar", $P3)   # Add variable "MyVar" in $P3
   $P1 = $P0.'find_var'("MyVar") # Find it
 
-  # Return the name of Namespace $P0 as a ResizableStringArray
+You can get the name of a namespace with the C<get_name> method; this returns a
+ResizableStringArray of STRINGs:
+
   $P3 = $P0.'get_name'()
 
-  # Find the parent namespace that contains this one:
+Request a namespace's parent namespace with the C<get_parent> method:
+
   $P5 = $P0.'get_parent'()
 
-  # Get the Class PMC associated with this namespace:
+Find a class associated with a namespace with the C<get_class> method:
+
   $P6 = $P0.'get_class'()
 
-There are a few other operations that can be done on Namespaces, but none
-as interesting as these. We'll talk about Namespaces throughout the rest
-of this chapter.
-
-
-=head2 Classes and Objects
-
-This section revolves around one complete example that defines a
-class, instantiates objects, and uses them. The whole example is
-included at the end of the section.
-
-=head3 Class declaration
-
-Z<CHP-9-SECT-12.1>
-
-X<classes;in PIR>
-The C<newclass>X<newclass opcode (PIR)> opcode defines a new class.
-It takes two arguments, the name of the class and the destination
-register for the class PMC. All classes (and objects) inherit from the
-C<ParrotClass> PMCX<ParrotClass PMC>, which is the core of the Parrot
-object system.
-
-=begin PIR_FRAGMENT
-
-    newclass $P1, "Foo"
-
-=end PIR_FRAGMENT
-
-To instantiate a new object of a particular class, you first look up
-the integer value for the class type with the C<find_type> opcode,
-then create an object of that type with the C<new> opcode:
-
-=begin PIR_FRAGMENT_INVALID
-
-    find_type I1, "Foo"
-    new P3I I1
-
-=end PIR_FRAGMENT_INVALID
-
-The C<new> opcode also checks to see if the class defines a
-method named "__init" and calls it if it exists.
-
-=head3 Attributes
-
-Z<CHP-9-SECT-12.2>
-
-X<attributes;in PIR>
-X<classes;attributes>
-The C<addattribute> opcode creates a slot in the class for an
-attribute (sometimes known as an I<instance variable>) and associates
-it with a name:
-
-=begin PIR_FRAGMENT
-
-    addattribute $P1, ".i"                # Foo.i
-
-=end PIR_FRAGMENT
-
-This chunk of code
-from the C<__init> method looks up the position of the first
-attribute, creates a C<Int> PMC, and stores it as the first
-attribute:
-
-=begin PIR_FRAGMENT_INVALID
-
-    classoffset $I0, $P2, "Foo"    # first "Foo" attribute of object P2
-    new $P6, "Int"                 # create storage for the attribute
-    setattribute $P2, $I0, $P6     # store the first attribute
-
-=end PIR_FRAGMENT_INVALID
-
-The C<classoffset> opcodeX<classoffset opcode (PIR)> takes a PMC
-containing an object and the name of its class, and returns an integer
-index for the position of the first attribute. The C<setattribute>
-opcode uses the integer index to store a PMC value in one of the
-object's attribute slots. This example initializes the first
-attribute. The second attribute would be at C<I0 + 1>, the third
-attribute at C<I0 + 2>, etc:
-
-=begin PIR_FRAGMENT_INVALID
-
-    inc $I0
-    setattribute $P2, $I0, $P7       # store next attribute
-    #...
-
-=end PIR_FRAGMENT_INVALID
-
-There is also support for named parameters with fully qualified
-parameter names (although this is a little bit slower than getting
-the class offset once and accessing several attributes by index):
-
-=begin PIR_FRAGMENT
-
-    new $P6, "Int"
-    setattribute $P2, "Foo\x0.i", $P6   # store the attribute
-
-=end PIR_FRAGMENT
-
-You use the same integer index to retrieve the value of an attribute.
-The C<getattribute>X<getattribute opcode (PIR)> opcode takes an object and
-an index as arguments and returns the attribute PMC at that position:
-
-=begin PIR_FRAGMENT_INVALID
-
-    classoffset $I0, $P2, "Foo"         # first "Foo" attribute of object P2
-    getattribute $P10, $P2, $I0         # indexed get of attribute
-
-=end PIR_FRAGMENT_INVALID
-
-or
-
-=begin PIR_FRAGMENT
-
-    getattribute $P10, $P2, "Foo\x0.i"  # named get
-
-=end PIR_FRAGMENT
-
-To set the value of an attribute PMC, first retrieve it with
-C<getattribute> and then assign to the returned PMC. Because PMC
-registers are only pointers to values, you don't need to store the PMC
-again after you modify its value:
-
-=begin PIR_FRAGMENT_INVALID
-
-    getattribute $P10, $P2, $I0
-    set $P10, $I5
-
-=end PIR_FRAGMENT_INVALID
-
-=head3 Methods
-
-Z<CHP-9-SECT-12.3>
-
-X<methods;in PIR>
-X<classes;methods>
-X<classes;namespaces>
-Methods in PIR are just subroutines installed in the namespace of the
-class. You define a method with the C<.pcc_sub> directive before the
-label:
-
-=begin PIR_INVALID_FRAGMENT
-
-  .pcc_sub _half:                 # I5 = self."_half"()
-    classoffset I0, P2, "Foo"
-    getattribute P10, P2, I0
-    set I5, P10                   # get value
-    div I5, 2
-    invoke P1
-
-=end PIR_INVALID_FRAGMENT
-
-This routine returns half of the value of the first attribute of the
-object. Method calls use the Parrot calling conventions so they always
-pass the I<invocant> object (often called I<self>) in C<P2>. Invoking
-the return continuation in C<P1> returns control to the caller.
-
-The C<.pcc_sub> directive automatically stores the subroutine as a
-global in the current namespace. The C<.namespace> directive sets the
-current namespace:
-
-=begin PIR
-
-  .namespace [ "Foo" ]
-
-=end PIR
-
-If the namespace is explicitly set to an empty string or key, then the
-subroutine is stored in the outermost namespace.
-
-The C<callmethodcc>X<callmethodcc opcode (PIR)> opcode makes a method
-call. It follows the Parrot calling conventions, so it expects to
-find the invocant object in C<P2>, the method object in C<P0>, etc. It
-adds one bit of magic, though. If you pass the name of the method in
-C<S0>, C<callmethodcc> looks up that method name in the invocant
-object and stores the method object in C<P0> for you:
-
-=begin PIR_FRAGMENT_INVALID
-
-    set $S0, "_half"            # set method name
-    set $P2, $P3                # the object
-    callmethodcc                # create return continuation, call
-    print $I5                   # result of method call
-    print "\n"
-
-=end PIR_FRAGMENT_INVALID
-
-The C<callmethodcc> opcode also generates a return continuation and
-stores it in C<P1>. The C<callmethod> opcode doesn't generate a return
-continuation, but is otherwise identical to C<callmethodcc>. Just like
-ordinary subroutine calls, you have to preserve and restore any
-registers you want to keep after a method call. Whether you store
-individual registers, register frames, or half register frames is up
-to you.
-
-=head4 Overriding vtable functions
-
-Z<CHP-9-SECT-12.3.1>
-
-Every object inherits a default set of I<vtable> functions from the
-C<ParrotObject> PMC, but you can also override them with your own
-methods. The vtable functions have predefined names that start with a
-double underscore "__". The following code defines a method named
-C<__init> in the C<Foo> class that initializes the first attribute of
-the object with an integer:
-
-=begin PIR_FRAGMENT_INVALID
-
-  .sub __init:
-    classoffset I0, P2, "Foo"     # lookup first attribute position
-    new P6, "Int"                 # create storage for the attribute
-    setattribute P2, I0, P6       # store the first attribute
-    invoke P1                     # return
-
-=end PIR_FRAGMENT_INVALID
-
-Ordinary methods have to be called explicitly, but the vtable
-functions are called implicitly in many different contexts. Parrot
-saves and restores registers for you in these calls. The C<__init>
-method is called whenever a new object is constructed:
-
-=begin PIR_FRAGMENT_INVALID
-
-    find_type I1, "Foo"
-    new P3, I1          # call __init if it exists
-
-=end PIR_FRAGMENT_INVALID
-
-A few other vtable functions in the complete code example for this
-section are C<__set_integer_native>, C<__add>, C<__get_integer>,
-C<__get_string>, and C<__increment>. The C<set> opcode calls Foo's
-C<__set_integer_native> vtable function when its destination register
-is a C<Foo> object and the source register is a native integer:
-
-=begin PIR_FRAGMENT
-
-    set $P3, 30          # call __set_integer_native method
-
-=end PIR_FRAGMENT
-
-The C<add> opcode calls Foo's C<__add> vtable function when it adds
-two C<Foo> objects:
-
-=begin PIR_FRAGMENT_INVALID
-
-    new $P4, $I1          # same with P4
-    set $P4, $12
-    new $P5, $I1          # create a new store for add
-
-    add $P5, $P3, $P4     # __add method
-
-=end PIR_FRAGMENT_INVALID
-
-The C<inc> opcode calls Foo's C<__increment> vtable function when it
-increments a C<Foo> object:
-
-=begin PIR_FRAGMENT
-
-    inc $P3              # __increment
-
-=end PIR_FRAGMENT
-
-Foo's C<__get_integer> and C<__get_string> vtable functions are called
-whenever an integer or string value is retrieved from a C<Foo> object:
-
-=begin PIR_FRAGMENT
-
-    set $I10, $P5         # __get_integer
-    #...
-    print $P5            # calls __get_string, prints 'fortytwo'
-
-=end PIR_FRAGMENT
-
-
-=head3 Inheritance
-
-Z<CHP-9-SECT-12.4>
-
-X<inheritance;in PIR>
-X<classes;inheritance>
-The C<subclass>X<subclass opcode (PIR)> opcode creates a new class that
-inherits methods and attributes from another class. It takes 3
-arguments: the destination register for the new class, a register
-containing the parent class, and the name of the new class:
-
-=begin PIR_FRAGMENT
-
-    subclass $P3, $P1, "Bar"
-
-=end PIR_FRAGMENT
-
-X<multiple inheritance; in PIR>
-For multiple inheritance, the C<addparent>X<addparent opcode (PIR)>
-opcode adds additional parents to a subclass.
-
-=begin PIR_FRAGMENT
-
-  newclass $P4, "Baz"
-  addparent $P3, $P4
-
-=end PIR_FRAGMENT
-
-To override an inherited method, define a method with the same name in
-the namespace of the subclass. The following code overrides Bar's
-C<__increment> method so it decrements the value instead of
-incrementing it:
-
-=begin PIR_FRAGMENT_INVALID
-
-  .namespace [ "Bar" ]
-
-  .sub __increment:
-    classoffset I0, P2, "Foo"     # get Foo's attribute slot offset
-    getattribute P10, P2, I0      # get the first Foo attribute
-    dec P10                       # the evil line
-    invoke P1
-
-=end PIR_FRAGMENT_INVALID
-
-Notice that the attribute inherited from C<Foo> can only be looked up
-with the C<Foo> class name, not the C<Bar> class name. This preserves
-the distinction between attributes that belong to the class and
-inherited attributes.
-
-Object creation for subclasses is the same as for ordinary classes:
-
-=begin PIR_FRAGMENT_INVALID
-
-    find_type $I1, "Bar"
-    new $P5, $I1
-
-=end PIR_FRAGMENT_INVALID
-
-Calls to inherited methods are just like calls to methods defined in
-the class:
-
-=begin PIR_FRAGMENT_INVALID
-
-    set $P5, 42                  # inherited __set_integer_native
-    inc $P5                      # overridden __increment
-    print $P5                    # prints 41 as Bar's __increment decrements
-    print "\n"
-
-    set $S0, "_half"             # set method name
-    set $P2, $P5                 # the object
-    callmethodcc                 # create return continuation, call
-    print $I5
-    print "\n"
-
-=end PIR_FRAGMENT_INVALID
-
-=head3 Additional Object Opcodes
-
-Z<CHP-9-SECT-12.5>
-
-The C<isa> and C<can> instructuions are also useful when working with
-objects. C<isa> checks whether an object belongs to or
-inherits from a particular class. C<can> checks whether
-an object has a particular method. Both return a true or false value.
-
-=begin PIR_FRAGMENT
-
-    $I0 = isa $P3, "Foo"         # 1
-    $I0 = isa $P3, "Bar"         # 1
-    $I0 = can $P3, "add"         # 1
-
-=end PIR_FRAGMENT
-
-
-It may seem more appropriate for a discussion of PIR's support for classes
-and objects to reside in its own chapter, instead of appearing in a generic
-chapter about PIR programming "basics". However, part of PIR's core
-functionality is its support for object-oriented programming. PIR doesn't
-use all the fancy syntax as other OO languages, and it doesn't even support
-all the features that most modern OO languages have. What PIR does have is
-support for some of the basic structures and abilities, the necessary subset
-to construct richer and higher-level object systems.
-
-
-=head3 Attributes
-
-Classes and subclasses can be given attributes N<in addition to methods,
-which we will talk about in the next chapter> which are named data fields.
-Attributes are created with the C<addattribute> opcode, and can be set
-and retrieved with the C<setattribute> and C<getattribute> opcodes
-respectively:
-
-  # Create the new class with two attributes
-  $P0 = newclass 'MyClass'
-  addattribute $P0, 'First'
-  addattribute $P0, 'Second'
-
-  # Create a new item of type MyClass
-  $P1 = new 'MyClass'
-
-  # Set values to the attributes
-  setattribute $P1, 'First', 'First Value'
-  setattribute $P1, 'Second', 'Second Value'
-
-  # Get the attribute values
-  $S0 = getattribute $P1, 'First'
-  $S1 = getattribute $P1, 'Second'
-
-Those values added as attributes don't need to be strings, even though
-both of the ones in the example are. They can be integers, numbers
-or PMCs too.
-
-=head3 Methods
-
-PIR provides syntax to simplify writing methods and method calls for
-object-oriented programming. We've seen some method calls in the examples
-above, especially when we were talking about the interfaces to certain PMC
-types. We've also seen a little bit of information about classes and objects
-in the previous chapter. PIR allows you to define your own classes, and with
-those classes you can define method interfaces to them. Method calls follow
-the same Parrot calling conventions that we have seen above, including all the
-various parameter configurations, lexical scoping, and other aspects we have
-already talked about.
-
-The second type of class can be defined in PIR at runtime. We saw some
-examples of this in the last chapter using the C<newclass> and C<subclass>
-opcodes. We also talked about class attribute values. Now, we're going to talk
-about associating subroutines with these classes, and they're called
-I<methods>. Methods are just like other normal subroutines with two major
-changes: they are marked with the C<:method> flag, and they exist in a
-I<namespace>. Before we can talk about methods, we need to discuss
-namespaces first.
+=head3 Calling Methods
 
 Z<CHP-4-SECT-2.2>
 
-Methods are just like subroutines, except
-they are invoked on a object PMC, and that PMC is passed as the c<self>
-parameter.
+X<methods>
+Namespaces enable plenty of interesting behaviors, such as object oriented
+programming and method calls.  Methods resemble subroutines with one big
+change: they require an invocant (an object PMC passed as the C<self>
+parameter).
 
-The basic syntax for a method call is similar to the single line
-subroutine call above. It takes a variable for the invocant PMC and a
-string with the name of the method:
+The basic syntax for a method call resembles a subroutine call.  Previous
+examples have demonstrated it already.  A PIR method call takes a variable for
+the invocant PMC and a string with the name of the method:
 
   object."methodname"(arguments)
 
-Notice that the name of the method must be contained in quotes. If the
-name of the method is not contained in quotes, it's treated as a named
-variable that does. Here's an example:
+If you forget the quotes around the method's name, PIR will treat the method
+name as a named variable which contains the method's name:
 
   .local string methname = "Foo"
   object.methname()               # Same as object."Foo"()
   object."Foo"()                  # Same
 
-The invocant can be a variable or register, and the method name can be
-a literal string, string variable, or method object PMC.
+The invocant can be a variable or register, and the method name can be a
+literal string, string variable, or method object PMC.
 
 =head3 Defining Methods
 
-Methods are defined like any other subroutine except with two major
-differences: They must be inside a namespace named after the class
-they are a part of, and they must use the C<:method> flag.
+Define a method like any other subroutine, respecting two changes. First, a
+method must be a member of a namespace (the namespace representing the class to
+which the method belongs). Second, they require the C<:method> flag.
 
-  .namespace [ "MyClass"]
+  .namespace [ "MyClass" ]
 
-  .sub "MyMethod" :method
+  .sub 'MyMethod' :method
     ...
+  .end
 
-Inside the method, the invocant object can be accessed using the C<self>
-keyword. C<self> isn't the only name you can call this value, however.
-You can also use the C<:invocant> flag to define a new name for the invocant
-object:
+Inside the method, access the invocant object through the C<self> parameter.
+C<self> isn't the only name you can call this value, however.  You can also use
+the C<:invocant> flag to define a new name for the invocant object:
 
 (See TT #483)
 
-=begin PIR_INVALID
+=begin PIR
 
-  .sub "MyMethod" :method
+  .sub 'MyMethod' :method
     $S0 = self                    # Already defined as "self"
     say $S0
   .end
 
-  .sub "MyMethod2" :method
-    .param pmc item :invocant     # "self" is now called "item"
+  .sub 'MyMethod2' :method
+    .param pmc item :invocant     # "self" is now "item"
     $S0 = item
     say $S0
   .end
 
-=end PIR_INVALID
+=end PIR
 
-This example defines two methods in the C<Foo> class. It calls one
-from the main body of the subroutine and the other from within the
-first method:
+This example defines two methods in the C<Foo> class. It calls one from the
+main body of the subroutine and the other from within the first method:
 
 =begin PIR
 
-  .sub main
+  .sub 'main'
     .local pmc class
     .local pmc obj
     newclass class, "Foo"       # create a new Foo class
     new obj, "Foo"              # instantiate a Foo object
     obj."meth"()                # call obj."meth" which is actually
-    print "done\n"              # in the "Foo" namespace
+    say "done"                  # in the "Foo" namespace
+    end
   .end
 
   .namespace [ "Foo" ]          # start namespace "Foo"
 
-  .sub meth :method             # define Foo::meth global
-     print "in meth\n"
+  .sub 'meth' :method           # define Foo::meth global
+     say "in meth"
      $S0 = "other_meth"         # method names can be in a register too
      self.$S0()                 # self is the invocant
   .end
 
-  .sub other_meth :method       # define another method
-     print "in other_meth\n"    # as above Parrot provides a return
+  .sub 'other_meth' :method     # define another method
+     say "in other_meth"        # as earlier, Parrot provides a return
   .end                          # statement
 
 =end PIR
 
-Each method call looks up the method name in the object's class namespace.
-The C<.sub> directive automatically makes a symbol table entry for the
-subroutine in the current namespace.
+Each method call looks up the method name in the object's class namespace.  The
+C<.sub> directive automatically makes a symbol table entry for the subroutine
+in the current namespace.
 
-When a C<.sub> is declared as a C<:method>, it automatically creates a
-local variable named C<self> and assigns it the object passed in
-C<P2>. You don't need to write C<.param pmc self> to get it, it comes
-free with the method.
-
-You can pass multiple arguments to a method and retrieve multiple
-return values just like a single line subroutine call:
+You can pass multiple arguments to a method and retrieve multiple return values
+just like a single line subroutine call:
 
   (res1, res2) = obj."method"(arg1, arg2)
 
+=head3 VTABLEs
 
-=head3 Introspection
-
-The details about various PMC classes are managed by the Class PMC. Class PMCs
-contain information about the class, available methods, the inheritance
-hierarchy of the class, and various other details. Classes can be created
-with the C<newclass> opcode:
-
-  $P0 = newclass "MyClass"
-
-Once we have created the class PMC, we can instantiate objects of that class
-using the C<new> opcode. The C<new> opcode takes either the class name or the
-Class PMC as an argument:
-
-  $P1 = new $P0        # $P0 is the Class PMC
-  $P2 = new "MyClass"  # Same
-
-The C<new> opcode can create two different types of PMC. The first type are
-the built-in core PMC classes. The built-in PMCs are written in C and cannot
-be extended from PIR without subclassing. However, you can also create
-user-defined PMC types in PIR. User-defined PMCs use the Object PMC type for
-instantiation. Object PMCs are used for all user-defined type and keep track
-of the methods and VTABLE override definitions. We're going to talk about
-methods and VTABLE overrides in the next chapter.
-
-=head2 Subclassing PMCs
-
-Existing built-in PMC types can be subclassed to associate additional data
-and methods with that PMC type. Subclassed PMC types act like their PMC
-base types, by sharing the same VTABLE methods and underlying data types.
-However, the subclass can define additional methods and attribute data
-storage. If necessary new VTABLE interfaces can be defined in PIR and old
-VTABLE methods can be overridden using PIR. We'll talk about defining
-methods and VTABLE interface overrides in the next chapter.
-
-Creating a new subclass of an existing PMC class is done using the
-C<subclass> keyword:
-
-  # create an anonymous subclass
-  $P0 = subclass 'ResizablePMCArray'
-
-  # create a subclass named "MyArray"
-  $P0 = subclass 'ResizablePMCArray', 'MyArray'
-
-This returns a C<Class> PMC which can be used to create and modify the
-class by adding attributes or creating objects of that class. You can also
-use the new class PMC to create additional subclasses:
-
-  $P0 = subclass 'ResizablePMCArray', 'MyArray'
-  $P1 = subclass $P0, 'MyOtherArray'
-
-Once you have created these classes, you can create them like normal with
-the C<new> keyword:
-
-  $P0 = new 'MyArray'
-  $P1 = new 'MyOtherArray'
-
-
-
-=head3 Vtable Overrides
-
-PMCs all subscribe to a common interface of functions called X<VTABLE>
-VTABLEs. Every PMC implements the same set of these interfaces, which
-perform very specific low-level tasks on the PMC. The term VTABLE was
-originally a shortened form of the name "virtual function table",
-although that name isn't used any more by the developers, or in any of
-the documentation. The virtual functions in the VTABLE, called X<VTABLE
-interfaces> VTABLE interfaces, are similar to ordinary functions and
-methods in many respects. VTABLE interfaces are occasionally called
-"VTABLE functions", or "VTABLE methods" or even "VTABLE entries" in
-casual conversation. A quick comparison shows that VTABLE interfaces
-are not really subroutines or methods in the way that those terms have
-been used throughout the rest of Parrot. Like methods on an object,
-VTABLE interfaces are defined for a specific class of PMC, and can be
-invoked on any member of that class. Likewise, in a VTABLE interface
-declaration, the C<self> keyword is used to describe the object that
-it is invoked upon. That's where the similarities end, however. Unlike
-ordinary subroutines or methods, VTABLE methods cannot be invoked
-directly, they are also not inherited through class hierarchies like
-how methods are. With all this terminology discussion out of the way,
-we can start talking about what VTABLES are and how they are used in
-Parrot.
+PMCs all implement a common interface of functions called X<VTABLE> VTABLEs.
+Every PMC implements the same set of these interfaces, which perform very
+specific low-level tasks on the PMC. The term VTABLE was originally a shortened
+form of the name "virtual function table", although that name isn't used any
+more by the developers, or in any of the documentation.N<In fact, if you say
+"virtual function table" to one of the developers, they probably won't know
+what you are talking about.> The virtual functions in the VTABLE, called
+X<VTABLE interfaces> VTABLE interfaces, are similar to ordinary functions and
+methods in many respects. VTABLE interfaces are occasionally called "VTABLE
+functions", or "VTABLE methods" or even "VTABLE entries" in casual
+conversation. A quick comparison shows that VTABLE interfaces are not really
+subroutines or methods in the way that those terms have been used throughout
+the rest of Parrot. Like methods on an object, VTABLE interfaces are defined
+for a specific class of PMC, and can be invoked on any member of that class.
+Likewise, in a VTABLE interface declaration, the C<self> keyword is used to
+describe the object that it is invoked upon. That's where the similarities end,
+however. Unlike ordinary subroutines or methods, VTABLE methods cannot be
+invoked directly, they are also not inherited through class hierarchies like
+how methods are. With all this terminology discussion out of the way, we can
+start talking about what VTABLES are and how they are used in Parrot.
 
 VTABLE interfaces are the primary way that data in the PMC is accessed
 and modified. VTABLES also provide a way to invoke the PMC if it's a
@@ -4407,8 +1670,7 @@ Inside a VTABLE interface definition, the C<self> local variable contains
 the PMC on which the VTABLE interface is invoked, just like in a method
 declaration.
 
-
-=head3 Roles
+=head2 Roles
 
 As we've seen above and in the previous chapter, Class PMCs and NameSpace
 PMCs work to keep classes and methods together in a logical way. There is
@@ -4419,7 +1681,7 @@ collections of methods and VTABLES that can be added into an existing class.
 Adding a role to a class is called I<composing> that role, and any class
 that has been composed with a role C<does> that role.
 
-Roles are created as PMC and can be manipulated through opcodes and methods
+Roles are created as PMCs and can be manipulated through opcodes and methods
 like other PMCs:
 
   $P0 = new 'Role'
@@ -4446,12 +1708,326 @@ We can get a list of roles from our Class PMC:
 Roles are very useful for ensuring that related classes all implement a common
 interface.  
 
+=head2 Coroutines
 
-=head2 Filehandles
+X<PIR;Coroutines>
+X<Coroutines>
+We've mentioned coroutines several times before, and we're finally going
+to explain what they are. Coroutines are similar to subroutines except
+that they have an internal notion of I<state>.N<And the cool new name!>.
+Coroutines, in addition to performing a normal C<.return> to return
+control flow back to the caller and destroy the lexical environment of
+the subroutine, may also perform a C<.yield> operation. C<.yield> returns
+a value to the caller like C<.return> can, but it does not destroy the
+lexical state of the coroutine. The next time the coroutine is called, it
+continues execution from the point of the last C<.yield>, not at the
+beginning of the coroutine.
+
+In a Coroutine, when we continue from a C<.yield>, the entire lexical
+environment is the same as it was when C<.yield> was called. This
+means that the parameter values don't change, even if we call the
+coroutine with different arguments later.
+
+=head3 Defining Coroutines
+
+Coroutines are defined like any ordinary subroutine. They do not require
+any special flag or any special syntax to mark them as being a
+coroutine. However, what sets them apart is the use of the C<.yield>
+directive. C<.yield> plays several roles:
+
+=over 4
+
+=item * Identifies coroutines
+
+When Parrot sees a yield, it knows to create a Coroutine PMC object
+instead of a Sub PMC.
+
+=item * Creates a continuation
+
+Continuations, as we have already seen, allow us to continue
+execution at the point of the continuation later. It's like a snapshot of
+the current execution environment. C<.yield> creates a continuation in
+the coroutine and stores the continuation object in the coroutine object
+or later resuming from the point of the C<.yield>.
+
+=item * Returns a value
+
+C<.yield> can return a valueN<or many values, or no values> to the caller.
+It is basically the same as a C<.return> in this regard.
+
+=back
+
+Here is a quick example of a simple coroutine:
+
+  .sub 'MyCoro'
+    .yield(1)
+    .yield(2)
+    .yield(3)
+    .return(4)
+  .end
+
+  .sub 'main' :main
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+    $I0 = MyCoro()    # 1
+    $I0 = MyCoro()    # 2
+    $I0 = MyCoro()    # 3
+    $I0 = MyCoro()    # 4
+  .end
+
+This is obviously a contrived example, but it demonstrates how the coroutine
+stores it's state. The coroutine stores it's state when we reach a C<.yield>
+directive, and when the coroutine is called again it picks up where it last
+left off. Coroutines also handle parameters in a way that might not be
+intuitive. Here's an example of this:
+
+  .sub 'StoredConstant'
+    .param int x
+    .yield(x)
+    .yield(x)
+    .yield(x)
+  .end
+
+  .sub 'main' :main
+    $I0 = StoredConstant(5)       # $I0 = 5
+    $I0 = StoredConstant(6)       # $I0 = 5
+    $I0 = StoredConstant(7)       # $I0 = 5
+    $I0 = StoredConstant(8)       # $I0 = 8
+  .end
+
+Notice how even though we are calling the C<StoredConstant> coroutine with
+different arguments each time, the value of parameter C<x> doesn't change
+until the coroutine's state resets after the last C<.yield>. Remember that
+a continuation takes a snapshot of the current state, and the C<.yield>
+directive takes a continuation. The next time we call the coroutine, it
+invokes the continuation internally, and returns us to the exact same place in
+the exact same condition as we were when we called the C<.yield>. In order
+to reset the coroutine and enable it to take a new parameter, we must either
+execute a C<.return> directive or reach the end of the coroutine.
+
+=head2 Multiple Dispatch
+
+Multiple dispatch is when there are multiple subroutines in a single
+namespace with the same name. These functions must differ, however, in
+their parameter list, or "signature". All subs with the same name get
+put into a single PMC called a MultiSub. The MultiSub is like a list
+of subroutines. When the multisub is invoked, the MultiSub PMC object
+searches through the list of subroutines and searches for the one with
+the closest matching signature. The best match is the sub that gets
+invoked.
+
+=head3 Defining MultiSubs
+
+MultiSubs are subroutines with the C<:multi> flag applied to them.
+MultiSubs (also called "Multis") must all differ from one another in
+the number and/or type of arguments passed to the function. Having
+two multisubs with the same function signature could result in a
+parsing error, or the later function could overwrite the former one
+in the multi.
+
+Multisubs are defined like this:
+
+  .sub 'MyMulti' :multi
+      # does whatever a MyMulti does
+  .end
+
+Multis belong to a specific namespace. Functions in different namespaces with
+the same name do not conflict with each other.  It's only when multiple
+functions in a single namespace need to have the same name that a multi is
+used.
+
+Multisubs take a special designator called a I<multi signature>. The multi
+signature tells Parrot what particular combination of input parameters the
+multi accepts. Each multi will have a different signature, and Parrot will
+be able to dispatch to each one depending on the arguments passed. The
+multi signature is specified in the C<:multi> directive:
+
+  .sub 'Add' :multi(I, I)
+    .param int x
+    .param int y
+    .return(x + y)
+  .end
+
+  .sub 'Add' :multi(N, N)
+    .param num x
+    .param num y
+    .return(x + y)
+  .end
+
+  .sub 'Start' :main
+    $I0 = Add(1, 2)      # 3
+    $N0 = Add(3.14, 2.0) # 5.14
+    $S0 = Add("a", "b")  # ERROR! No (S, S) variant!
+  .end
+
+Multis can take I, N, S, and P types, but they can also use C<_> (underscore)
+to denote a wildcard, and a string that can be the name of a particular PMC
+type:
+
+  .sub 'Add' :multi(I, I)  # Two integers
+    ...
+
+  .sub 'Add' :multi(I, 'Float')  # An integer and Float PMC
+    ...
+
+                           # Two Integer PMCs
+  .sub 'Add' :multi('Integer', _)
+    ...
+
+When we call a multi PMC, Parrot will try to take the most specific
+best-match variant, and will fall back to more general variants if a perfect
+best-match cannot be found. So if we call C<'Add'(1, 2)>, Parrot will dispatch
+to the C<(I, I)> variant. If we call C<'Add'(1, "hi")>, Parrot will match the
+C<(I, _)> variant, since the string in the second argument doesn't match C<I>
+or C<'Float'>. Parrot can also choose to automatically promote one of the I,
+N, or S values to an Integer, Float, or String PMC.
+
+To make the decision about which multi variant to call, Parrot takes a
+I<Manhattan Distance> between the two. Parrot calculates the I<distance>
+between the multi signatures and the argument signature. Every difference
+counts as one step. A difference can be an autobox from a primitive type
+to a PMC, or the conversion from one primitive type to another, or the
+matching of an argument to a C<_> wildcard. After Parrot calculates the
+distance to each variant, it calls the function with the lowest distance.
+Notice that it's possible to define a variant that is impossible to call:
+for every potential combination of arguments there is a better match. This
+isn't necessarily a common occurrence, but it's something to watch out for
+in systems with a lot of multis and a limited number of data types in use.
+
+
+=head2 Classes and Objects
+
+It may seem more appropriate for a discussion of PIR's support for classes
+and objects to reside in its own chapter, instead of appearing in a generic
+chapter about PIR programming "basics". However, part of PIR's core
+functionality is its support for object-oriented programming. PIR doesn't
+use all the fancy syntax as other OO languages, and it doesn't even support
+all the features that most modern OO languages have. What PIR does have is
+support for some of the basic structures and abilities, the necessary subset
+to construct richer and higher-level object systems.
+
+=head2 PMCs as Classes
+
+PMCs aren't exactly "classes" in the way that this term is normally used in
+object-oriented programming languages. They are polymorphic data items that can
+be one of a large variety of predefined types. As we have seen briefly, and as
+we will see in more depth later, PMCs have a standard interface called the
+VTABLE interface. VTABLEs are a standard list of functions that all PMCs
+implement.N<Alternately, PMCs can choose not to implement each interface
+explicitly and instead let Parrot call the default implementations.>
+
+VTABLEs are very strict: There are a fixed number with fixed names and
+fixed argument lists. You can't just create any random VTABLE interface that
+you want to create, you can only make use of the ones that Parrot supplies
+and expects. To circumvent this limitation, PMCs may have METHODS in
+addition to VTABLEs. METHODs are arbitrary code functions that can be
+written in C, may have any name, and may implement any behavior.
+
+=head2 VTABLE Interfaces
+
+Internally, all operations on PMCs are performed by calling various VTABLE
+interfaces.
+
+=head2 Class and Object PMCs
+
+The details about various PMC classes are managed by the Class PMC. Class PMCs
+contain information about the class, available methods, the inheritance
+hierarchy of the class, and various other details. Classes can be created
+with the C<newclass> opcode:
+
+  $P0 = newclass "MyClass"
+
+Once we have created the class PMC, we can instantiate objects of that class
+using the C<new> opcode. The C<new> opcode takes either the class name or the
+Class PMC as an argument:
+
+  $P1 = new $P0        # $P0 is the Class PMC
+  $P2 = new "MyClass"  # Same
+
+The C<new> opcode can create two different types of PMC. The first type are
+the built-in core PMC classes. The built-in PMCs are written in C and cannot
+be extended from PIR without subclassing. However, you can also create
+user-defined PMC types in PIR. User-defined PMCs use the Object PMC type for
+instantiation. Object PMCs are used for all user-defined type and keep track
+of the methods and VTABLE override definitions. We're going to talk about
+methods and VTABLE overrides in the next chapter.
+
+=head2 Subclassing PMCs
+
+Existing built-in PMC types can be subclassed to associate additional data
+and methods with that PMC type. Subclassed PMC types act like their PMC
+base types, by sharing the same VTABLE methods and underlying data types.
+However, the subclass can define additional methods and attribute data
+storage. If necessary new VTABLE interfaces can be defined in PIR and old
+VTABLE methods can be overridden using PIR. We'll talk about defining
+methods and VTABLE interface overrides in the next chapter.
+
+Creating a new subclass of an existing PMC class is done using the
+C<subclass> keyword:
+
+  # create an anonymous subclass
+  $P0 = subclass 'ResizablePMCArray'
+
+  # create a subclass named "MyArray"
+  $P0 = subclass 'ResizablePMCArray', 'MyArray'
+
+This returns a C<Class> PMC which can be used to create and modify the
+class by adding attributes or creating objects of that class. You can also
+use the new class PMC to create additional subclasses:
+
+  $P0 = subclass 'ResizablePMCArray', 'MyArray'
+  $P1 = subclass $P0, 'MyOtherArray'
+
+Once you have created these classes, you can create them like normal with
+the C<new> keyword:
+
+  $P0 = new 'MyArray'
+  $P1 = new 'MyOtherArray'
+
+=head2 Attributes
+
+Classes and subclasses can be given attributes which are named data fields.
+Attributes are created with the C<addattribute> opcode, and can be set and
+retrieved with the C<setattribute> and C<getattribute> opcodes respectively:
+
+  # Create the new class with two attributes
+  $P0 = newclass 'MyClass'
+  addattribute $P0, 'First'
+  addattribute $P0, 'Second'
+
+  # Create a new item of type MyClass
+  $P1 = new 'MyClass'
+
+  # Set values to the attributes
+  setattribute $P1, 'First', 'First Value'
+  setattribute $P1, 'Second', 'Second Value'
+
+  # Get the attribute values
+  $S0 = getattribute $P1, 'First'
+  $S1 = getattribute $P1, 'Second'
+
+Those values added as attributes don't need to be strings, even though
+both of the ones in the example are. They can be integers, numbers
+or PMCs too.
+
+=head2 Input and Output
 
 Like almost everything else in Parrot, input and output are handled by PMCs.
+Using the C<print> opcode or the C<say> opcode like we've already seen in
+some examples does this internally without your knowledge. However, we can
+do it explicitly too. First we'll talk about basic I/O, and then we will talk
+about using PMC-based filehandles for more advanced operations.
 
-We've seen C<print> and C<say>. C<print> prints
+=head2 Basic I/O Opcodes
+
+We've seen C<print> and C<say>. These are carry-over artifacts from Perl, when
+Parrot was simply the VM backend to the Perl 6 language. C<print> prints
 the given string argument, or the stringified form of the argument, if it's
 not a string, to standard output. C<say> does the same thing but also appends
 a trailing newline to it. Another opcode worth mentioning is the C<printerr>
@@ -4474,6 +2050,8 @@ standard output:
   .end
 
 =end PIR
+
+=head2 Filehandles
 
 The ops we have seen so far are useful if all your I/O operations are limited
 to the standard streams. However, there are plenty of other places where
@@ -4677,101 +2255,6 @@ support this.
 
 =head2 Exceptions
 
-=head2 Exceptions and Exception Handlers
-
-Z<CHP-9-SECT-8>
-
-X<exceptions>
-X<exception handlers>
-Exceptions provide a way of calling a piece of code outside the normal
-flow of control. They are mainly used for error reporting or cleanup
-tasks, but sometimes exceptions are just a funny way to branch from
-one code location to another one. The design and implementation of
-exceptions in Parrot isn't complete yet, but this section will give
-you an idea where we're headed.
-
-Exceptions are objects that hold all the information needed to handle
-the exception: the error message, the severity and type of the error,
-etc. The class of an exception object indicates the kind of exception
-it is.
-
-Exception handlers are derived from continuations. They are ordinary
-subroutines that follow the Parrot calling conventions, but are never
-explicitly called from within user code. User code pushes an exception
-handler onto the control stack with the C<set_eh>X<set_eh opcode (PIR)>
-opcode. The system calls the installed exception handler only when an
-exception is thrown (perhaps because of code that does division by
-zero or attempts to retrieve a global that wasn't stored.)
-
-=begin PIR_FRAGMENT_INVALID
-
-    newsub P20, .ExceptionHandler, _handler
-    set_eh P20                  # push handler on control stack
-    null P10                    # set register to null
-    get_global P10, "none"     # may throw exception
-    clear_eh                    # pop the handler off the stack
-    #...
-
-  _handler:                     # if not, execution continues here
-    is_null P10, not_found      # test P10
-    #...
-
-=end PIR_FRAGMENT_INVALID
-
-This example creates a new exception handler subroutine with the
-C<newsub> opcode and installs it on the control stack with the
-C<set_eh> opcode. It sets the C<P10> register to a null value (so it
-can be checked later) and attempts to retrieve the global variable
-named C<none>. If the global variable is found, the next statement
-(C<clear_eh>) pops the exception handler off the control stack and
-normal execution continues. If the C<get_global> call doesn't find
-C<none> it throws an exception by pushing an exception object onto the
-control stack. When Parrot sees that it has an exception, it pops it
-off the control stack and calls the exception handler C<_handler>.
-
-The first exception handler in the control stack sees every exception
-thrown. The handler has to examine the exception object and decide
-whether it can handle it (or discard it) or whether it should
-C<rethrow> the exception to pass it along to an exception handler
-deeper in the stack. The C<rethrow>X<rethrow opcode (PIR)> opcode is only
-valid in exception handlers. It pushes the exception object back onto
-the control stack so Parrot knows to search for the next exception
-handler in the stack. The process continues until some exception
-handler deals with the exception and returns normally, or until there
-are no more exception handlers on the control stack. When the system
-finds no installed exception handlers it defaults to a final action,
-which normally means it prints an appropriate message and terminates
-the program.
-
-When the system installs an exception handler, it creates a return
-continuation with a snapshot of the current interpreter context. If
-the exception handler just returns (that is, if the exception is
-cleanly caught) the return continuation restores the control stack
-back to its state when the exception handler was called, cleaning up
-the exception handler and any other changes that were made in the
-process of handling the exception.
-
-Exceptions thrown by standard Parrot opcodes (like the one thrown by
-C<get_global> above or by the C<throw> opcode) are always resumable,
-so when the exception handler function returns normally it continues
-execution at the opcode immediately after the one that threw the
-exception. Other exceptions at the run-loop level are also generally
-resumable.
-
-=begin PIR_FRAGMENT
-
-  new $P10, 'Exception'    # create new Exception object
-  set $P10, 'I die'        # set message attribute
-  throw $P10               # throw it
-
-=end PIR_FRAGMENT
-
-Exceptions are designed to work with the Parrot calling conventions.
-Since the return addresses of C<bsr> subroutine calls and exception
-handlers are both pushed onto the control stack, it's generally a bad
-idea to combine the two.
-
-
 Parrot includes a robust exception mechanism that is not only used internally
 to implement a variety of control flow constructs, but is also available for
 use directly from PIR code. Exceptions, in as few words as possible, are
@@ -4785,7 +2268,7 @@ and provide access to a number of different bits of data about the error,
 such as the location where the error was thrown (including complete
 backtraces), any annotation information from the file, and other data.
 
-=head3 Throwing Exceptions
+=head2 Throwing Exceptions
 
 Many exceptions are used internally in Parrot to indicate error conditions.
 Opcodes such as C<die> and C<warn> throw exceptions internally to do what they
@@ -4803,7 +2286,7 @@ handlers in scope, the interpreter will pass the exception object to the
 handler and continue execution there. If there are no handlers available,
 Parrot will exit.
 
-=head3 Exception Attributes
+=head2 Exception Attributes
 
 Since Exceptions are PMC objects, they can contain a number of useful data
 items. One such data item is the message:
@@ -4822,7 +2305,7 @@ Finally, there is a spot for additional data to be included:
 
   $P0["payload"] = $P2  # Any arbitrary PMC
 
-=head3 Exception Handlers
+=head2 Exception Handlers
 
 Exception handlers are labels in PIR code that can be jumped to when an
 exception is thrown. To list a label as an exception handler, the C<push_eh>
@@ -4864,13 +2347,13 @@ if you want:
   my_handler:
     ...
 
-=head3 Rethrowing Exceptions
+=head2 Rethrowing and Exception Propagation
 
 Exception handlers are nested and are stored in a stack. This is because not
 all handlers are intended to handle all exceptions. If a handler cannot deal
-with a particular exception, it can C<rethrow> the exception to the next outer handler
-handler. If none of the set handlers can handle the exception, the
-exception is a fatal error and Parrot will exit.
+with a particular exception, it can C<rethrow> the exception to the next
+handler in the stack. Exceptions propagate through the handler stack until it
+reaches the default handler which causes Parrot to exit.
 
 =head2 Annotations
 
@@ -4879,7 +2362,7 @@ give some information about what the original source code looked like. This
 is especially important when dealing with high-level languages. We'll go into
 detail about annotations and their use in Chapter 10.
 
-Annotations are created using the c<.annotation> keyword. Annotations consist
+Annotations are created using the C<.annotation> keyword. Annotations consist
 of a key/value pair, where the key is a string and the value is an integer,
 a number, or a string. Since annotations are stored compactly as constants in
 the compiled bytecode, PMCs cannot be used.
@@ -4920,331 +2403,6 @@ The backtrace PMC is an array of hashes. Each element in the array corresponds
 to a function in the current call stack. Each hash has two elements:
 C<'annotation'> which is the hash of annotations that were in effect at that
 point, and C<'sub'> which is the Sub PMC of that function.
-
-=head2 Events
-
-Z<CHP-9-SECT-9>
-
-An event is a notification that something has happened: a timer
-expired, an IO operation finished, a thread sent a message to
-another thread, or the user pressed C<Ctrl-C> to interrupt program
-execution.
-
-What all of these events have in common is that they arrive
-asynchronously. It's generally not safe to interrupt program flow at an
-arbitrary point and continue at a different position, so the event is
-placed in the
-interpreter's task queue. The run loops code regularly checks whether
-an event needs to be handled. Event handlers may be an internal piece
-of code or a user-defined event handler subroutine.
-
-Events are still experimental in Parrot, so the implementation and
-design is subject to change.
-
-=head3 Timers
-
-Z<CHP-9-SECT-9.1>
-
-C<Timer> objects are the replacement for Perl 5's C<alarm> handlers.
-They are also a significant improvement. Timers can fire once or
-repeatedly, and multiple timers can run independently. The precision
-of a timer is limited by the OS Parrot runs on, but it is always more
-fine-grained then a whole second. The final syntax isn't yet fixed, so
-please consult the documentation for examples.
-
-=head3 Signals
-
-Z<CHP-9-SECT-9.2>
-
-Signal handling is related to events. When Parrot gets a signal it
-needs to handle from the OS, it converts that signal into an event and
-broadcasts it to all running threads. Each thread independently
-decides if it's interested in this signal and, if so, how to respond to it.
-
-=begin PIR_FRAGMENT_INVALID
-
-    newsub P20, .ExceptionHandler, _handler
-    set_eh P20                  # establish signal handler
-    print "send SIGINT:\n"
-    sleep 2                     # press ^C after you saw start
-    print "no SIGINT\n"
-    end
-  _handler:
-    .include "signal.pasm"      # get signal definitions
-    print "caught "
-    set I0, P5["type"]         # if _type is negative, the ...
-    neg I0, I0                  # ... negated type is the signal
-    ne I0, .SIGINT, nok
-    print "SIGINT\n"
-  nok:
-    end
-
-=end PIR_FRAGMENT_INVALID
-
-This example creates a signal handler and pushes it on to the control
-stack. It then prompts the user to send a C<SIGINT> from the shell
-(this is usually C<Ctrl-C>, but it varies in different shells), and
-waits for 2 seconds. If the user doesn't send a SIGINT in 2 seconds
-the example just prints "no SIGINT" and ends. If the user does send a
-SIGINT, the signal handler catches it, prints out "caught SIGINT" and
-ends.N<Currently, only Linux installs a C<SIGINT> C<sigaction>
-handler, so this example won't work on other platforms.>
-
-=head2 Threads
-
-Z<CHP-9-SECT-10>
-
-Threads allow multiple pieces of code to run in parallel. This is
-useful when you have multiple physical CPUs to share the load of
-running individual threads. With a single processor, threads still
-provide the feeling of parallelism, but without any improvement in
-execution time. Even worse, sometimes using threads on a single
-processor will actually slow down your program.
-
-Still, many algorithms can be expressed more easily in terms of
-parallel running pieces of code and many applications profit from
-taking advantage of multiple CPUs. Threads can vastly simplify
-asynchronous programs like internet servers: a thread splits off,
-waits for some IO to happen, handles it, and relinquishes the
-processor again when it's done.
-
-Parrot compiles in thread support by default (at least, if the
-platform provides some kind of support for it). Unlike Perl 5,
-compiling with threading support doesn't impose any execution time
-penalty for a non-threaded program. Like exceptions and events,
-threads are still under development, so you can expect significant
-changes in the near future.
-
-As outlined in the previous chapter, Parrot implements three different
-threading models. (B<Note>:  As of version 1.0, the C<TQueue> PMC will be
-deprecated, rendering the following discussion obsolete.) The following
-example uses the third model, which takes advantage of shared data. It uses a
-C<TQueue> (thread-safe queue) object to synchronize the two parallel running
-threads. This is only a simple example to illustrate threads, not a typical
-usage of threads (no-one really wants to spawn two threads just to print out a
-simple string).
-
-=begin PIR_FRAGMENT_INVALID
-
-    get_global P5, "_th1"              # locate thread function
-    new P2, "ParrotThread"              # create a new thread
-    find_method P0, P2, "thread3"       # a shared thread's entry
-    new P7, "TQueue"                    # create a Queue object
-    new P8, "Int"                       # and a Int
-    push P7, P8                         # push the Int onto queue
-    new P6, "String"                    # create new string
-    set P6, "Js nte artHce\n"
-    set I3, 3                           # thread function gets 3 args
-    invoke                              # _th1.run(P5,P6,P7)
-    new P2, "ParrotThread"              # same for a second thread
-    get_global P5, "_th2"
-    set P6, "utaohrPro akr"             # set string to 2nd thread's
-    invoke                              # ... data, run 2nd thread too
-    end                                 # Parrot joins both
-
-  .pcc_sub _th1:                        # 1st thread function
-  w1: sleep 0.001                       # wait a bit and schedule
-    defined I1, P7                      # check if queue entry is ...
-    unless I1, w1                       # ... defined, yes: it's ours
-    set S5, P6                          # get string param
-    substr S0, S5, I0, 1                # extract next char
-    print S0                            # and print it
-    inc I0                              # increment char pointer
-    shift P8, P7                        # pull item off from queue
-    if S0, w1                           # then wait again, if todo
-    invoke P1                           # done with string
-
-  .pcc_sub _th2:                        # 2nd thread function
-  w2: sleep 0.001
-    defined I1, P7                      # if queue entry is defined
-    if I1, w2                           # then wait
-    set S5, P6
-    substr S0, S5, I0, 1                # if not print next char
-    print S0
-    inc I0
-    new P8, "Int"                       # and put a defined entry
-    push P7, P8                         # onto the queue so that
-    if S0, w2                           # the other thread will run
-    invoke P1                           # done with string
-
-=end PIR_FRAGMENT_INVALID
-
-This example creates a C<ParrotThread> object and calls its C<thread3>
-method, passing three arguments: a PMC for the C<_th1> subroutine in
-C<P5>, a string argument in C<P6>, and a C<TQueue> object in C<P7>
-containing a single integer. Remember from the earlier section
-"Parrot calling conventions" that registers 5-15
-hold the arguments for a subroutine or method call and C<I3> stores
-the number of arguments. The thread object is passed in C<P2>.
-
-This call to the C<thread3> method spawns a new thread to run the
-C<_th1> subroutine. The main body of the code then creates a second
-C<ParrotThread> object in C<P2>, stores a different subroutine in
-C<P5>, sets C<P6> to a new string value, and then calls the C<thread3>
-method again, passing it the same C<TQueue> object as the first
-thread. This method call spawns a second thread. The main body of code
-then ends, leaving the two threads to do the work.
-
-At this point the two threads have already started running. The first
-thread (C<_th1>) starts off by sleeping for a 1000th of a second. It
-then checks if the C<TQueue> object contains a value. Since it
-contains a value when the thread is first called, it goes ahead and
-runs the body of the subroutine. The first thing this does is shift
-the element off the C<TQueue>. It then pulls one character off a copy
-of the string parameter using C<substr>, prints the character,
-increments the current position (C<I0>) in the string, and loops back
-to the C<w1> label and sleeps. Since the queue doesn't have any
-elements now, the subroutine keeps sleeping.
-
-Meanwhile, the second thread (C<_th2>) also starts off by sleeping for
-a 1000th of a second. It checks if the shared C<TQueue> object
-contains a defined value but unlike the first thread it only continues
-sleeping if the queue does contain a value. Since the queue contains a
-value when the second thread is first called, the subroutine loops
-back to the C<w2> label and continues sleeping. It keeps sleeping
-until the first thread shifts the integer off the queue, then runs the
-body of the subroutine. The body pulls one character off a copy of the
-string parameter using C<substr>, prints the character, and increments
-the current position in the string. It then creates a new
-C<Int>, pushes it onto the shared queue, and loops back to the
-C<w2> label again to sleep. The queue has an element now, so the
-second thread keeps sleeping, but the first thread runs through its
-loop again.
-
-The two threads alternate like this, printing a character and marking
-the queue so the next thread can run, until there are no more
-characters in either string. At the end, each subroutine invokes the
-return continuation in C<P1> which terminates the thread. The
-interpreter waits for all threads to terminate in the cleanup phase
-after the C<end> in the main body of code.
-
-The final printed result (as you might have guessed) is:
-
-  Just another Parrot Hacker
-
-The syntax for threads isn't carved in stone and the implementation
-still isn't finished but as this example shows, threads are working
-now and already useful.
-
-Several methods are useful when working with threads. The C<join>
-method belongs to the C<ParrotThread> class. When it's called on a
-C<ParrotThread> object, the calling code waits until the thread
-terminates.
-
-=begin PIR_FRAGMENT_INVALID
-
-    new $P2, "ParrotThread"       # create a new thread
-    set $I5, $P2                  # get thread ID
-
-    find_method $P0, $P2, "join"  # get the join method...
-    invoke                        # ...and join (wait for) the thread
-    set $P16, $P5                 # the return result of the thread
-
-=end PIR_FRAGMENT_INVALID
-
-C<kill> and C<detach> are interpreter methods, so you have to grab the
-current interpreter object before you can look up the method object.
-
-=begin PIR_FRAGMENT_INVALID
-
-    set $I5, $P2                  # get thread ID of thread P2
-    getinterp $P3                 # get this interpreter object
-    find_method $P0, $P3, "kill"  # get kill method
-    invoke                        # kill thread with ID I5
-
-    find_method $P0, $P3, "detach"
-    invoke                      # detach thread with ID I5
-
-=end PIR_FRAGMENT_INVALID
-
-By the time you read this, some of these combinations of statements
-and much of the threading syntax above may be reduced to a simpler set
-of opcodes.
-
-=head2 Loading Bytecode
-
-Z<CHP-9-SECT-11>
-
-In addition to running Parrot bytecode on the command-line, you can
-also load pre-compiled bytecode directly into your PIR source file.
-The C<load_bytecode>X<load_bytecode opcode (PIR)> opcode takes a single
-argument: the name of the bytecode file to load. So, if you create a
-file named F<file.pasm> containing a single subroutine:
-
-=begin PIR_FRAGMENT_INVALID
-
-  # file.pasm
-  .sub _sub2:               # .sub stores a global sub
-     print "in sub2\n"
-     invoke P1
-
-=end PIR_FRAGMENT_INVALID
-
-and compile it to bytecode using the C<-o> command-line switch:
-
-  $ parrot -o file.pbc file.pasm
-
-You can then load the compiled bytecode into F<main.pasm> and directly
-call the subroutine defined in F<file.pasm>:
-
-=begin PIR_FRAGMENT_INVALID
-
-  # main.pir
-  main:
-    load_bytecode "file.pbc"    # compiled file.pasm
-    get_global $P0, "_sub2"
-    invokecc
-
-=end PIR_FRAGMENT_INVALID
-
-The C<load_bytecode> opcode also works with source files, as long as
-Parrot has a compiler registered for that type of file:
-
-=begin PIR_FRAGMENT_INVALID
-
-  # main2.pir
-  main:
-    load_bytecode "file.pasm"  # PIR source code
-    set_global $P0, "_sub2"
-    invokecc
-
-=end PIR_FRAGMENT_INVALID
-
-Subroutines marked with C<:load> run as soon as they're loaded (before
-C<load_bytecode> returns), rather than waiting to be called. A
-subroutine marked with C<:main> will always run first, no matter what
-name you give it or where you define it in the file.
-
-=begin PIR_FRAGMENT_INVALID
-
-  # file3.pir
-  .sub :load                    # mark the sub as to be run
-    print "file3\n"
-    invoke $P1                   # return
-
-  # main3.pasm
-  first:                        # first is never invoked
-    print "never\n"
-    invoke $P1
-
-  .sub :main                    # because _main is marked as the
-    print "main\n"              # MAIN entry of program execution
-    load_bytecode "file3.pasm"
-    print "back\n"
-
-=end PIR_FRAGMENT_INVALID
-
-This example uses both C<:load> and C<:main>. Because the C<main>
-subroutine is defined with C<:main> it will execute first even though
-another subroutine comes before it in the file. C<main> prints a
-line, loads the PIR source file, and then prints another line.
-Because C<_entry> in F<file3.pasm> is marked with C<:load> it runs
-before C<load_bytecode> returns, so the final output is:
-
-  main
-  file3
-  back
-
 
 =cut
 

@@ -80,6 +80,7 @@ loop:
     print spac
     $P0 = multi[i]
     $P1 = $P0."get_multisig"()
+    if null $P1 goto next_loop
     m = elements $P1
     j = 0
 lp2:
@@ -90,6 +91,7 @@ lp2:
     if j < m goto lp2
 
     print "\n"
+next_loop:
     inc i
     if i < n goto loop
 .end

@@ -77,7 +77,7 @@ sweep_cb(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool), int flag,
     if (flag & POOL_BUFFER)
         used_cow(interp, pool, 0);
 
-    Parrot_gc_sweep(interp, pool);
+    Parrot_gc_sweep_pool(interp, pool);
 
     if (flag & POOL_BUFFER)
         clear_cow(interp, pool, 0);

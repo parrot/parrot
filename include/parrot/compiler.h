@@ -111,7 +111,7 @@
 /* UNUSED() is the old way we handled shim arguments Should still be
    used in cases where the argument should, at some point be used.
  */
-#define UNUSED(a) if (0) (void)(a);
+#define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
 
 #if PARROT_HAS_SAL
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull
@@ -131,6 +131,11 @@
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/
 #define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ __attribute__warn_unused_result__
+
+/* Macros for exposure tracking for splint. */
+/* See http://www.splint.org/manual/html/all.html section 6.2 */
+#define PARROT_OBSERVER                     /*@observer@*/
+#define PARROT_EXPOSED                      /*@exposed@*/
 
 /* Function argument instrumentation */
 /* For explanations of the annotations, see http://www.splint.org/manual/manual.html */

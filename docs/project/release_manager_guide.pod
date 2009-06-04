@@ -18,7 +18,9 @@ A couple of weeks in advance: Ask people to run C<make fulltest> and
 report (and hopefully fix!) any problems they find. Check in with
 language project leads for release blockers, to allow time to fix them.
 Also ask people to review the tickets targeted for the upcoming release
-L<https://trac.parrot.org/parrot/roadmap>.
+L<https://trac.parrot.org/parrot/roadmap>. Make sure your ssh keys have
+been added to the FTP server, so you'll be able to ship the release (any
+previous release manager can help).
 
 A couple of days in advance: announce the new release to
 parrot-dev@lists.parrot.org and to the IRC channel #parrot. Ask whether
@@ -52,8 +54,7 @@ Update files with version-specific information:
 =item a
 
 Increment the version number in the following files:
-F<VERSION>, F<parrot.spec>, F<MANIFEST.generated>, F<META.yml>,
-F<README>.
+F<VERSION>, F<MANIFEST.generated>, F<META.yml>, F<README>.
 
 Also update the version number, date, and your name in the
 the file: F<docs/parrothist.pod>.
@@ -88,6 +89,10 @@ Enter the date of the Saturday before the next release.
 =item C<wiki.bugday>
 
 Update the date part of the link to the wiki page for the next bugday.
+
+=item C<ftp.path>
+
+The URL of the FTP directory where the Parrot tarball can be found.
 
 =back
 
@@ -242,7 +247,7 @@ front page.
 
 =item b
 
-Set the "News" category to "Releases".
+For the "News" category, select both "Releases" and "News".
 
 Add tags to the page for significant changes in this release (e.g. "rakudo" for
 significant Rakudo language updates, or "gc" for significant garbage collection
@@ -359,7 +364,6 @@ the 3rd Tuesday of each month.
 The starred releases are Parrot's twice-yearly supported releases, see
 F<docs/project/support_policy.pod>.
 
- - May 19, 2009      - 1.2  - tewk
  - June 16, 2009     - 1.3  - whiteknight
  - July 21, 2009     - 1.4* - cotto
  - August 18, 2009   - 1.5  - rgrjr

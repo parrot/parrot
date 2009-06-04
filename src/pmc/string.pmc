@@ -34,9 +34,8 @@ Initializes the string.
 */
 
     VTABLE void init() {
-
         Parrot_String_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_String_attributes);
+            mem_allocate_typed(Parrot_String_attributes);
 
         attrs->str_val = Parrot_str_new_noinit(INTERP, enum_stringrep_one, 0);
         PMC_data(SELF) = attrs;
@@ -242,8 +241,10 @@ Sets the value of the string to that of the specified C<string>.
     VTABLE void set_string_native(STRING *value) {
         /* Only allow constant PMCs to embed constant strings */
         if (PObj_constant_TEST(SELF) && !PObj_constant_TEST(value)) {
-             const char *copy = Parrot_str_to_cstring(INTERP, value);
-             value            = Parrot_str_new_constant(INTERP, copy);
+            char *copy = Parrot_str_to_cstring(INTERP, value);
+            value      = Parrot_str_new_init(INTERP, copy, strlen(copy),
+                    PARROT_DEFAULT_ENCODING, PARROT_DEFAULT_CHARSET, PObj_constant_FLAG);
+            Parrot_str_free_cstring(copy);
         }
 
         SET_ATTR_str_val(INTERP, SELF, value);
@@ -260,8 +261,11 @@ Sets the value of the string to a copy of the specified C<string>.
 */
 
     VTABLE void assign_string_native(STRING *value) {
-        SET_ATTR_str_val(INTERP, SELF,
-                Parrot_str_set(INTERP, SELF.get_string(), value));
+        if (!STRING_IS_NULL(value))
+            SET_ATTR_str_val(INTERP, SELF,
+                    Parrot_str_set(INTERP, SELF.get_string(), value));
+        else
+            SET_ATTR_str_val(INTERP, SELF, NULL);
     }
 
 /*
@@ -841,7 +845,7 @@ Used to unarchive the string.
         IMAGE_IO * const io = info->image_io;
         SUPER(info);
         if (info->extra_flags == EXTRA_IS_NULL)
-            SELF.set_string_native(VTABLE_shift_string(INTERP, io));
+            SET_ATTR_str_val(INTERP, SELF, VTABLE_shift_string(INTERP, io));
     }
 /*
 

@@ -11,16 +11,25 @@ This is an initial version, be careful and not expect too much.
 
 Compile Xlib.pir to Xlib.pbc before usage:
 
-../../parrot -o Xlib.pbc Xlib.pir
+../../parrot -o Xlib.pbc Xlib.pir [ filename ]
 
 Press Escape key to exit.
 
-=cut
+Press S to save to filename
 
+=cut
 
 .include 'Xlibconstants.pir'
 
+# Key for JSON line data
+.const string JKEY_LINES = 'lines'
+
 .sub main :main
+    .param pmc args
+
+    .local string filename
+    filename = args [1]
+    say filename
 
     load_bytecode 'Xlib.pbc'
 
@@ -82,8 +91,18 @@ Press Escape key to exit.
     codeEscape = display.'KeysymToKeycode'($I0)
 #    say codeEscape
 
+    $I0 = StringToKeysym('S')
+#    print $I0
+#    print '-'
+    .local int codeS
+    codeS = display.'KeysymToKeycode'($I0)
+#    say codeS
+
     .local pmc listline
-    listline = new 'ResizablePMCArray'
+    listline = load(filename)
+
+mainloop:
+
     .local pmc line
 
 # Event loop
@@ -131,16 +150,24 @@ keypress:
 #    say $S0
 #    eq $S0, 'Escape', finish
 
-    ne $I0, codeEscape, loop
+    if $I0 == codeEscape goto handleescape
+    if $I0 == codeS goto handleS
+    goto loop
+handleescape:
     w.'Unmap'()
     w.'Destroy'()
     goto loop
+handleS:
+    say 'S'
+    save(filename, listline)
+    goto loop
+
 
 press:
     lastpx = event.'x'()
     lastpy = event.'y'()
     w.'DrawPoint'(lastpx, lastpy)
-    line = new 'ResizableIntegerArray'
+    line = new [ 'ResizableIntegerArray' ]
     push listline, line
     push line, lastpx
     push line, lastpy
@@ -240,6 +267,72 @@ finish:
     dname = DisplayName()
     print dname
     say '"'
+.end
+
+#-----------------------------------------------------------------------
+.sub load
+    .param string filename
+    .local pmc listline
+    if null filename goto newfile
+
+    push_eh newfile
+    .local pmc handle
+    handle = open filename, 'r'
+    pop_eh
+
+    push_eh failed
+    .local string jsonfile
+    jsonfile = handle.'readall'()
+    close handle
+
+    load_bytecode 'compilers/json/JSON.pbc'
+    .local pmc json
+    json = compreg 'JSON'
+    .local pmc jsonobject
+    jsonobject = json(jsonfile)
+    listline = jsonobject [JKEY_LINES]
+    goto finish
+
+failed:
+    .local pmc exception
+    .get_results(exception)
+    pop_eh
+    print "\nERROR LOADING FILE: "
+    print exception
+    print "\n\n"
+
+newfile:
+    listline = new [ 'ResizablePMCArray' ]
+finish:
+    .return(listline)
+.end
+
+#-----------------------------------------------------------------------
+.sub save
+    .param string filename
+    .param pmc listline
+
+    push_eh failed
+    load_bytecode 'JSON.pbc'
+
+    .local pmc jsondata
+    jsondata = new [ 'Hash' ]
+    jsondata [JKEY_LINES] = listline
+    .local string jsonfile
+    jsonfile = _json(jsondata)
+    .local pmc handle
+    handle = open filename, 'w'
+    print handle, jsonfile
+    print handle, "\n"
+    close handle
+    .return()
+failed:
+    .local pmc exception
+    .get_results(exception)
+    pop_eh
+    print "\nERROR SAVING FILE: "
+    print exception
+    print "\n\n"
 .end
 
 #-----------------------------------------------------------------------

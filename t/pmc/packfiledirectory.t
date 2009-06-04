@@ -21,7 +21,7 @@ Tests the PackfileDirectory PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-    plan(21)
+    plan(23)
 
     'test_create'()
     'test_typeof'()
@@ -122,7 +122,6 @@ Tests the PackfileDirectory PMC.
     pfdir[$S0] = seg
     $I1   = elements pfdir
     is($I0, $I1, "Segment with old name was added")
-    goto done
 
     # Add segment with new name
   add_new:
@@ -132,6 +131,13 @@ Tests the PackfileDirectory PMC.
     $I1   = elements pfdir
     inc $I0
     is($I0, $I1, "New segment added")
+
+    # Remove that segment again
+  delete_seg:
+    delete pfdir[$S0]
+    dec $I0
+    $I1   = elements pfdir
+    is($I0, $I1, "segment deleted")
 
   done:
     .return()

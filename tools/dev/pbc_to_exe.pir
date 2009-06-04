@@ -18,8 +18,6 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 
 =cut
 
-.include 'library/config.pir'
-
 .sub 'main' :main
     .param pmc    argv
     .local string infile
@@ -29,11 +27,25 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     .local string out
     .local int    closeresult
 
+    .local string gcc
+    .local int    is_gcc
+    load_bytecode 'config.pbc'
+    $P0 = '_config'()
+    gcc    = $P0['gccversion']
+    $I0    = length gcc
+    is_gcc = $I0 > 0
+
     (infile, cfile, objfile, exefile) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
     .local string codestring
+    unless is_gcc goto code_for_non_gcc
+  code_for_gcc:
+    codestring = 'generate_code_gcc'(infile)
+    goto code_end
+  code_for_non_gcc:
     codestring = 'generate_code'(infile)
+  code_end:
 
   open_outfile:
     .local pmc outfh
@@ -221,6 +233,91 @@ MAIN
     die "cannot open infile"
 .end
 
+# The PBC will be represented as a C string, so this sub builds a table
+# of the C representation of each ASCII character, for lookup by ordinal value.
+.sub 'generate_encoding_table'
+    # Use '\%o' for speed, or '\x%02x' for readability
+    .const string encoding_format = '\%o'
+
+    # The 'sprintf' op requires the arglist to be in an array, even when
+    # there is only one arg.
+    .local pmc one_number
+    one_number    = new 'FixedIntegerArray'
+    set one_number, 1
+
+    .local pmc coded_strings
+    coded_strings = new 'FixedStringArray'
+    set coded_strings, 256
+
+    .local int index
+    index = 0
+
+  next_index:
+    one_number[0] = index
+    $S0 = sprintf encoding_format, one_number
+    coded_strings[index] = $S0
+    inc index
+    if index < 256 goto next_index
+
+    .return (coded_strings)
+.end
+
+.sub 'generate_code_gcc'
+    .param string infile
+    .local pmc ifh
+    ifh = open infile, 'r'
+    unless ifh goto err_infile
+
+    .local pmc encoding_table
+    encoding_table = 'generate_encoding_table'()
+
+    .local string codestring
+    .local int size
+    codestring = "const char * program_code =\n"
+    codestring .= '"'
+    size = 0
+
+  read_loop:
+    .local string pbcstring
+    .local int pbclength
+
+    pbcstring = read ifh, 16384
+    pbclength = length pbcstring
+    unless pbclength > 0 goto read_done
+
+    .local int pos
+    pos = 0
+  code_loop:
+    unless pos < pbclength goto code_done
+    $I0 = ord pbcstring, pos
+    $S0 = encoding_table[$I0]
+    codestring .= $S0
+    inc pos
+    inc size
+    $I0 = size % 32
+    unless $I0 == 0 goto code_loop
+    codestring .= '"'
+    codestring .= "\n"
+    codestring .= '"'
+    goto code_loop
+  code_done:
+    goto read_loop
+
+  read_done:
+    close ifh
+
+    codestring .= '"'
+    codestring .= "\n;\n\n"
+    codestring .= "const int bytecode_size = "
+    $S0 = size
+    codestring .= $S0
+    codestring .= ";\n"
+    .return (codestring)
+
+  err_infile:
+    die "cannot open infile"
+.end
+
 # util functions
 .sub 'compile_file'
     .param string cfile
@@ -284,7 +381,7 @@ MAIN
     link_dynamic = $P0['link_dynamic']
     linkflags    = $P0['linkflags']
     ld_out       = $P0['ld_out']
-    libparrot    = $P0['libparrot_ldflags']
+    libparrot    = $P0['libparrot_linkflags']
     libs         = $P0['libs']
     o            = $P0['o']
     rpath        = $P0['rpath_blib']

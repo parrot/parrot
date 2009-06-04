@@ -161,13 +161,23 @@ method names are quoted. Why is that? If you would have left out
 the quotes, then the identifier is assumed to be a declared
 C<.local> symbol. So, instead of writing:
 
+=begin PIR_FRAGMENT
+
+    .local pmc elsie
     elsie.'speak'()
+
+=end PIR_FRAGMENT
 
 you could also have written:
 
+=begin PIR_FRAGMENT
+
+    .local pmc elsie
     .local string speak
     speak = 'speak'
     elsie.speak()
+
+=end PIR_FRAGMENT
 
 Another example of this is shown below.
 
@@ -305,17 +315,21 @@ the Animal base class like so:
 
 =head3 Example 6: inheriting
 
-    ...
+=begin PIR_FRAGMENT
+
     $P0 = newclass "Animal"
     addattribute $P0, "name"
     $P0 = subclass "Animal", "Cow"
     $P0 = subclass "Animal", "Dog"
     $P0 = subclass "Animal", "Pig"
-    ...
+    # ...
+    .local pmc cow
     cow = new 'Cow'
     cow.'setname'("Elsie")
-    ...
+    # ...
     cow.'getname'()
+
+=end PIR_FRAGMENT
 
 Each subclass will contain an attribute called "name" that can be
 used to store the name of the animal.  The C<setname> method

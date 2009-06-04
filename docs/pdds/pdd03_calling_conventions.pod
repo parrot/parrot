@@ -342,6 +342,10 @@ Specific exceptions to throw for specific errors.
 
 =head3 Function Calls
 
+=begin PIR_FRAGMENT_INVALID
+
+  .local pmc foo, i, ar, y, p, value, kw, a, b, c, z
+  # ...
   foo(1, i)                       # 2 positional arguments
   foo(x, ar :flat, y)             # flattening array
   foo(p, 'key' => value)          # named argument
@@ -351,23 +355,44 @@ Specific exceptions to throw for specific errors.
   # all together now: three positional (one flat) with two named (one flat)
   foo(a, b, c :flat, 'x' => 3, 'y' => 4, z :flat :named('z'))
 
+=end PIR_FRAGMENT_INVALID
+
 =head3 Parameters
 
-  .param int i                    # positional parameter
-  .param pmc argv :slurpy         # slurpy array
-  .param pmc value :named('key')  # named parameter
-  .param int x :optional          # optional parameter
-  .param int has_x :opt_flag      # flag 0/1 x was passed
-  .param pmc kw :slurpy :named    # slurpy hash
+=begin PIR
+
+  .sub foo 
+    .param int i                    # positional parameter
+    .param pmc argv :slurpy         # slurpy array
+    .param pmc value :named('key')  # named parameter
+    .param int x :optional          # optional parameter
+    .param int has_x :opt_flag      # flag 0/1 x was passed
+    .param pmc kw :slurpy :named    # slurpy hash
+    # ...
+  .end
+
+=end PIR
 
 =head3 Return Values
 
-  .return (i, ar: flat, value :named('key') )
+=begin PIR_INVALID
+
+  .sub foo
+    .local pmc i, ar, value
+    .return (i, ar: flat, value :named('key') )
+  .end
+
+=end PIR_INVALID
 
 =head3 Call Results
 
+=begin PIR_FRAGMENT
+
+  .local pmc x, foo, i, j, ar, value
   x = foo()                       # single result
   (i, j :optional, ar :slurpy, value :named('key') ) = foo()
+
+=end PIR_FRAGMENT
 
 =head2 Attachments
 

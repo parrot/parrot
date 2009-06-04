@@ -38,10 +38,57 @@ PARROT_CONST_FUNCTION
 static size_t find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+static size_t get_max_buffer_address(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+static size_t get_max_pmc_address(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+static size_t get_min_buffer_address(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+static size_t get_min_pmc_address(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+static int is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+static int is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+static void trace_mem_block(PARROT_INTERP,
+    size_t lo_var_ptr,
+    size_t hi_var_ptr)
+        __attribute__nonnull__(1);
+
 static void trace_system_stack(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_find_common_mask __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_max_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_max_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_min_buffer_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_get_min_pmc_address __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_is_buffer_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ptr)
+#define ASSERT_ARGS_is_pmc_ptr __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(ptr)
+#define ASSERT_ARGS_trace_mem_block __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_trace_system_stack __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -196,6 +243,116 @@ trace_system_stack(PARROT_INTERP)
             (size_t)&lo_var_ptr);
 }
 
+/*
+
+=item C<static size_t get_max_buffer_address(PARROT_INTERP)>
+
+Calculates the maximum buffer address and returns it. This is done by looping
+through all the sized pools, and finding the pool whose C<end_arena_memory>
+field is the highest. Notice that arenas in each pool are not necessarily
+located directly next to each other in memory, and the last arena in the pool's
+list may not be located at the highest memory address.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static size_t
+get_max_buffer_address(PARROT_INTERP)
+{
+    ASSERT_ARGS(get_max_buffer_address)
+    Arenas * const arena_base = interp->arena_base;
+    size_t         max        = 0;
+    UINTVAL        i;
+
+    for (i = 0; i < arena_base->num_sized; i++) {
+        if (arena_base->sized_header_pools[i]) {
+            if (arena_base->sized_header_pools[i]->end_arena_memory > max)
+                max = arena_base->sized_header_pools[i]->end_arena_memory;
+        }
+    }
+
+    return max;
+}
+
+
+/*
+
+=item C<static size_t get_min_buffer_address(PARROT_INTERP)>
+
+Calculates the minimum buffer address and returns it. Loops through all sized
+pools, and finds the one with the smallest C<start_arena_memory> field. Notice
+that the memory region between C<get_min_buffer_address> and
+C<get_max_buffer_address> may be fragmented, and parts of it may not be
+available for Parrot to use directly (such as bookkeeping data for the OS
+memory manager).
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static size_t
+get_min_buffer_address(PARROT_INTERP)
+{
+    ASSERT_ARGS(get_min_buffer_address)
+    Arenas * const arena_base = interp->arena_base;
+    size_t         min        = (size_t) -1;
+    UINTVAL        i;
+
+    for (i = 0; i < arena_base->num_sized; i++) {
+        if (arena_base->sized_header_pools[i]
+        &&  arena_base->sized_header_pools[i]->start_arena_memory) {
+            if (arena_base->sized_header_pools[i]->start_arena_memory < min)
+                min = arena_base->sized_header_pools[i]->start_arena_memory;
+        }
+    }
+
+    return min;
+}
+
+
+/*
+
+=item C<static size_t get_max_pmc_address(PARROT_INTERP)>
+
+Returns the maximum memory address used by the C<pmc_pool>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static size_t
+get_max_pmc_address(PARROT_INTERP)
+{
+    ASSERT_ARGS(get_max_pmc_address)
+    return interp->arena_base->pmc_pool->end_arena_memory;
+}
+
+
+/*
+
+=item C<static size_t get_min_pmc_address(PARROT_INTERP)>
+
+Returns the minimum memory address used by the C<pmc_pool>. Notice that the
+memory region between C<get_min_pmc_address> and C<get_max_pmc_address> may be
+fragmented, and not all of it may be used directly by Parrot for storing PMCs.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static size_t
+get_min_pmc_address(PARROT_INTERP)
+{
+    ASSERT_ARGS(get_min_pmc_address)
+    return interp->arena_base->pmc_pool->start_arena_memory;
+}
+
+
 #ifndef PLATFORM_STACK_WALK
 
 /*
@@ -239,7 +396,7 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
 
 /*
 
-=item C<void trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t
+=item C<static void trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t
 hi_var_ptr)>
 
 Traces the memory block between C<lo_var_ptr> and C<hi_var_ptr>.
@@ -251,7 +408,7 @@ areas.
 
 */
 
-void
+static void
 trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
 {
     ASSERT_ARGS(trace_mem_block)
@@ -309,6 +466,55 @@ trace_mem_block(PARROT_INTERP, size_t lo_var_ptr, size_t hi_var_ptr)
 
     return;
 }
+
+/*
+
+=item C<static int is_buffer_ptr(PARROT_INTERP, const void *ptr)>
+
+Checks whether the given C<ptr> is located within one of the sized
+header pools. Returns C<1> if it is, and C<0> if not.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static int
+is_buffer_ptr(PARROT_INTERP, ARGIN(const void *ptr))
+{
+    ASSERT_ARGS(is_buffer_ptr)
+    Arenas * const arena_base = interp->arena_base;
+    UINTVAL        i;
+
+    for (i = 0; i < arena_base->num_sized; i++) {
+        if (arena_base->sized_header_pools[i]
+        &&  contained_in_pool(arena_base->sized_header_pools[i], ptr))
+            return 1;
+    }
+
+    return 0;
+}
+
+/*
+
+=item C<static int is_pmc_ptr(PARROT_INTERP, const void *ptr)>
+
+Checks that C<ptr> is actually a PMC pointer. Returns C<1> if it is, C<0>
+otherwise.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static int
+is_pmc_ptr(PARROT_INTERP, ARGIN(const void *ptr))
+{
+    ASSERT_ARGS(is_pmc_ptr)
+    return contained_in_pool(interp->arena_base->pmc_pool, ptr);
+}
+
+
 #endif
 
 /*

@@ -89,7 +89,7 @@ Francois Perrad.
  kjs         0.9.1          2009-Feb-17     "Final Countdown"
 
  Allison     1.0.0          2009-Mar-17     "Haru Tatsu"
-
  Francois    1.1.0          2009-Apr-21     "Half-moon Conure"
+ Infinoid    1.2.0          2009-May-19     "Bird Brain"
 
 =cut

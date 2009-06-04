@@ -2,184 +2,268 @@
 
 =head1 Parrot Compiler Tools
 
-Z<CHP-9>
+Z<CHP-4>
 
-So far we've talked a lot about low-level Parrot programming with
-PIR and PASM. However, the true power of Parrot is its ability to
-host programs written in high level languages such as Perl 6,
-Python, Ruby, Tcl, and PHP. In order to write code in these languages
-developers need there to be compilers that convert from the language
-into PIR or PASM (or even directly convert to Parrot Bytecode).
-People who have worked on compilers before may be anticipating us
-to use terms like "Lex and Yacc" here, but we promise that we won't.
+The previous chapters demonstrated low-level Parrot programming in PIR.  That's
+fun, but Parrot's true power is to host programs written in high level
+languages such as Perl 6, Python, Ruby, Tcl, and PHP.
 
-Instead of traditional lexical analyzers and parser-generators that
-have been the mainstay of compiler designers for decades, Parrot
-uses an advanced set of parsing tools called the Parrot Compiler
-Tools (PCT)X<Parrot Compiler Tools>. PCT uses a subset of the Perl 6
-programming language called I<Not Quite Perl>X<Not Quite Perl> (NQP)
-and an implementation of the Perl 6 Grammar Engine X<Perl 6 Grammar
-Engine> (PGE) to build compilers for Parrot. Instead of using
-traditional low-level languages to write compilers, we can use a
-modern dynamic language like Perl 6 to write it instead. On a more
-interesting note, this means that the Perl 6 compiler is itself
-being written in Perl 6, a mind-boggling process known as
-C<bootstrapping>.
+Parrot's language neutrality was a conscious design decision.  Parrot and Perl
+6 hewed closely in the early days; it would have been easy for the two to
+overlap and intermingle.
 
-The language-neutrality of the interpreter is partially a design
-decision for modularity. Keeping the implementation independent of the
-syntax makes the codebase cleaner and easier to maintain.
-Modular design also benefits future language designers, not just
-designers of current languages. Instead of targeting I<lex>/I<yacc> and
-reimplementing low-level features such as garbage collection and dynamic
-data types, designers can leave the details to Parrot and focus on the
-high-level features of their language: syntax, libraries, capabilities.
-Parrot does all the necessary bookkeeping, exposing a rich interface with
-capabilities that few languages can make full use of.
+By keeping the two projects separate and encapsulated, the possibility arose to
+support many other dynamic languages equally well. This modular design also
+benefits designers of future languages.  Instead of having to reimplement
+low-level features such as garbage collection and dynamic data types, language
+designers and compiler implementers can leave these details of infrastructure
+to Parrot and focus on the syntax, capabilities, and libraries of their
+high-level languages instead.
 
-A robust exceptions system, a capability to compile into
-platform-independent bytecode, and a clean extension and embedding
-mechanism would be just some of the necessary and standard features.
+Parrot exposes a rich interface for these languages to use, offering several
+important features: a robust exceptions system, compilation into
+platform-independent bytecode, a clean extension and embedding interface,
+just-in-time compilation to machine code, native library interface mechanisms,
+garbage collection, support for objects and classes, and a robust concurrency
+model.  Designing a new language or implementing a new compiler for an old
+language is easier with all of these features designed, implemented, tested,
+and supported in a VM already.
 
-Since Parrot would support the features of the major dynamic languages
-and wasn't biased to a particular syntax, it could run all these
-languages with little additional effort.  
+Language interoperability is a core goal for Parrot. Different languages are
+suited to different tasks; heated debates explode across the Internet about
+which language is right for which project.  There's rarely a perfect fit.
+Developers often settle for one particular language if only because it offers
+the fewest I<disadvantages>.  Parrot changes this game by allowing developers
+to combine multiple languages seamlessly within a single project.  Well-tested
+libraries written in one languages can interoperate with clean problem-domain
+expression in a second language, glued together by a third language which
+elegantly describes the entire system's architecture.  You can use the
+strengths of multiple language and mitigate their weaknesses.
 
-Language interoperability is another core goal. Different languages are
-suited to different tasks, and picking which language to use in a large
-software project is a common planning problem.  There's never a perfect
-fit, at least not for all jobs. Developers find themselves settling for
-the language with the most advantages and the least noticeable
-disadvantages. The ability to easily combine multiple languages within a
-single project opens up the potential of using well-tested libraries
-from one language, taking advantage of clean problem-domain expression
-in a second, while binding it together in a third that elegantly
-captures the overall architecture. It's about using languages according
-to their inherent strengths, and mitigating the cost of their
-weaknesses.
+For language hosting and interoperability to work, languages developers need to
+write compilers that convert source code written in high level languages to
+bytecode.  This process is analogous to how a compiler such as GCC converts C
+or C++ into machine code -- though instead of targeting machine code for a
+specific hardware platform, compilers written in Parrot produce Parrot code
+which can run on any hardware platform that can run Parrot.
+
+Parrot includes a suite of compiler tools for every step of this conversion:
+lexical analysis, parsing, optimization, resource allocation, and code
+generation.  Instead of using traditional low-level languages -- such as the C
+produced by C<lex> and C<yacc> -- to write compilers, Parrot can use any
+language hosted on Parrot in its compiler process.  As a practical matter, the
+prevalent tool uses a subset of the Perl 6 programming language called I<Not
+Quite Perl>X<Not Quite Perl> (NQP) and an implementation of the Perl 6 Grammar
+Engine X<Perl 6 Grammar Engine> (PGE) to build compilers for Parrot.
+
+=begin notetip
+
+Yes, the Perl 6 compiler on Parrot is itself written in Perl 6.  This
+X<bootstrapping> I<bootstrapping> process is mind-boggling at first.
+
+=end notetip
+
+PGE and NQP are part of the Parrot Compiler Tools.  A<CHP-5> Chapter 5
+discusses PGE and A<CHP-6> Chapter 6 explains NQP.
 
 =head2 PCT Overview
 
-PCT is a collection of classes which handle the creation of a
-compiler and driver program for a high-level language. The
-C<PCT::HLLCompiler> class handles building the compiler front end
-while the C<PCT::Grammar>  and C<PCT::Grammar::Actions> classes handle
-building the parser and lexical analyzer. Creating a new HLL compiler
-is as easy as subclassing these three entities with methods specific
-to that high-level language.
+The X<Parrot Compiler Tools;PCT> Parrot Compiler Tools (PCT) enable the
+creation of high-level language compilers and runtimes.  Though the Perl 6
+development team originally created these tools to produce Rakudo (Perl 6 on
+Parrot), several other Parrot-hosted compilers use them to great effect.
+Writing a compiler using Perl 6 syntax and dynamic language tools is much
+easier than writing a compiler in C, C<lex>, and C<yacc>.
+
+PCT contains several classes that implement various parts of a compiler. HLL
+developers write language-specific subclasses to fill in the details their
+languages require.  The X<HLLCompiler> C<PCT::HLLCompiler> class specifies the
+compiler's interface and represents the object used to parse and execute code.
+The X<Parrot Compiler Tools;PCT::Grammar> C<PCT::Grammar> and X<Parrot Compiler
+Tools;PCT::Grammar::Actions> C<PCT::Grammar::Actions> classes represent the
+parser and syntax tree generators, respectively. Creating a new HLL compiler is
+as easy as subclassing these three entities with methods specific to your
+language.
 
 =head3 Grammars and Action Files
 
-Creating a compiler using PCT requires three basic files, plus any
-additional files needed to implement the languages logic and library:
+A PCT-based compiler requires three basic files: the main entry point file, the
+grammar specification file, and the grammar actions file. In addition,
+compilers and the languages they implement often use large libaries of built-in
+routines to provide language-specific behaviors.
 
 =over 4
 
-=item * A main file
+=item * The main file
 
-The main file should contain the C<:main> function that is the driver
-program for the compiler. Here, a new C<PCT::HLLCompiler> object is
-instantiated, libraries are loaded, and necessary special global
-variables are created. The driver program is typically written in PIR,
-although thankfully they tend to be very short. Most of the action
-happens elsewhere.
+The main file is (often) a PIR program which contains the C<:main> function
+that creates and executes the compiler object. This program instantiates a
+C<PCT::HLLCompiler> subclass, loads any necessary support libraries, and
+initializes any compiler- or languages-specific data.
 
-=item * A parser file
+The main file tends to be short.  The guts of the compiler logic is in the
+grammar and actions files.  Runtime support and auxiliary functions often
+appear in other files, by convention.  This separation of concerns tends to
+make compilers easier to maintain.
 
-The grammar for the high level language is specified using the Perl 6
-grammar engine (PGE) and is stored in a C<.pg> file. This file should
-subclass the C<PCT::Grammar> class and implement all the necessary
-rules to successfully parse the language.
+=item * A grammar file
+
+The high-level language's grammar appears in a F<.pg> file.  This file
+subclasses C<PCT::Grammar> class and implements all of the necessary rules --
+written using PGE -- to parse the languages.
 
 =item * An actions file
 
-Actions files are written in NQP. They take match objects generated by
-the grammar file and convert them into an Abstract Syntax Tree (AST)
-X<Abstract Syntax Tree;Parrot Abstract Syntax Tree;AST;PAST>
-which is converted by PCT into PIR for compiling and execution.
-The PIR implementation of these AST trees and nodes is called the
-Parrot Abstract Syntax Tree (PAST).
+Actions contains methods -- written in NQP -- on the C<PCT::Grammar:Actions>
+object which receive parse data from the grammar rules and construct an
+X<Abstract Syntax Tree;Parrot Abstract Syntax Tree;AST;PAST> Abstract Syntax
+Tree (AST).N<The Parrot version of an AST is, of course, the Parrot Abstract
+Syntax Tree, or PAST.>
 
 =back
 
-=head3 C<make_language_shell.pl>
+PCT's workflow is customizable, but simple.  The compiler passes the source
+code of the HLL into the grammar engine.  The grammer engine parses this code
+and returns a X<PGE;Match Object> special Match object which represents a
+parsed version of the code.  The compiler then passes this match object to the
+action methods, which convert it in stages into PAST.  The compiler finally
+converts this PAST into PIR code, which it can save to a file, convert to
+bytecode, or execute directly.
 
-The Parrot repository contains a number of helpful utilities for doing
-some common development and building tasks with Parrot. Many of these
-utilities are currently written in Perl 5, though some run on Parrot
-directly, and in future releases more will be migrated to Parrot.
+=head3 C<mk_language_shell.pl>
 
-One of the tools of use to new compiler designers and language implementers
-is C<make_language_shell.pl>. C<make_language_shell.pl> is a tool for
-automatically creating all the necessary stub files for creating a new
-compiler for Parrot. It generates the driver file, parser grammar and
-actions files, builtin functions stub file, makefile, and test harness.
-All of these are demonstrative stubs and will obviously need to be
-edited furiously or even completely overwritten, but they give a good idea
-of what is needed to start on development of the compiler.
+The only way creating a new language compiler could be easier is if these files
+created themselves. PCT includes a tool to do just that:
+C<mk_language_shell.pl>.  This program automatically creates a new directory in
+F<languages/> for your new language, the necessary three files, starter files
+for libraries, a F<Makefile> to automate the build process, and a basic test
+harness to demonstrate that your language works as expects.
 
-C<make_language_shell.pl> is designed to be run from within the Parrot
-repository file structure. It creates a subfolder in C</languages/>
-with the name of your new language implementation. Typically a new
-implementation of an existing language is not simply named after the
-language, but is given some other descriptive name to let users know it
-is only one implementation available. Consider the way Perl 5 distributions
-are named things like "Active Perl" or "Strawberry Perl", or how Python
-distributions might be "IronPython" or "VPython". If, on the other hand,
-you are implementing an entirely new language, you don't need to give it
-a fancy distribution name.
+These generated files are all stubs which will require extensive editing to
+implement a full language, but they are a well-understood and working starting
+point.  With this single command you can create a working compiler.  It's up to
+you to fill the details.
+
+C<mk_language_shell.pl> prefers to run from within a working Parrot repository.
+It requires a single argument, the name of the new project to create.  There
+are no hard-and-fast rules about names, but the Parrot developers reccomend
+that Parrot-based implementations of existing languages use unique names.
+
+Consider the names of Perl 5 distributions: Active Perl and Strawberry Perl.
+Python implementations are IronPython (running on the CLR) and Jython (running
+on the JVM).  The Ruby-on-Parrot compiler isn't just "Ruby": it's Cardinal.
+The Tcl compiler on Parrot is Partcl.
+
+An entirely new language has no such constraints.
+
+From the Parrot directory, invoke C<mk_language_shell.pl> like:
+
+  $ B<cd languages/>
+  $ B<perl ../tools/build/mk_language_shell.pl <project name>>
 
 =head3 Parsing Fundamentals
 
-Compilers typically consist of three components: The lexical analyzer,
-the parser, and the code generator C<This is an oversimplification, 
-compilers also may have semantic analyzers, symbol tables, optimizers,
-preprocessors, data flow analyzers, dependency analyzers, and resource
-allocators, among other components. All these things are internal to
-Parrot and aren't the concern of the compiler implementer. Plus, these
-are all well beyond the scope of this book>. The lexical analyzer converts
-the HLL input file into individual tokens. A token may consist of an
-individual punctuation mark("+"), an identifier ("myVar"), or a keyword
-("while"), or any other artifact that cannot be sensibly broken down. The
-parser takes a stream of these input tokens, and attempts to match them
-against a given pattern, or grammar. The matching process orders the input
-tokens into an abstract syntax tree (AST), which is a form that
-the computer can easily work with. This AST is passed to the code
-generator which converts it into code of the target language. For
-something like the GCC C compiler, the target language is machine code.
-For PCT and Parrot, the target language is PIR and PBC.
+An important part of a compiler is the parser and lexical analyzer.  The
+lexical analyzer converts the HLL input file into individual tokens. A token
+may consist of an individual punctuation ("+"), an identifier ("myVar"), a
+keyword ("while"), or any other artifact that stands on its own as a single
+unit.  The parser attempts to match a stream of these input tokens against a
+given pattern, or grammar. The matching process orders the input tokens into an
+abstract syntax tree which the other portions of the compiler can process.
 
-Parsers come in two general varieties: Top-down and bottom-up. Top-down
-parsers start with a top-level rule, a rule which is supposed to
-represent the entire input. It attempts to match various combination of
-subrules until the entire input is matched. Bottom-down parsers, on the
-other hand, start with individual tokens from the lexical analyzer and
-attempt to combine them together into larger and larger patterns until
-they produce a top-level token.
+X<top-down parser>
+X<bottom-up parser>
+X<parsers; top-down>
+X<parsers; bottom-up>
+Parsers come in top-down and bottom-up varieties. Top-down parsers start with a
+top-level rule which represents the entire input. It attempts to match various
+combination of subrules until it has consumed the entire input.  Bottom-down
+parsers start with individual tokens from the lexical analyzer and attempt to
+combine them together into larger and larger patterns until they produce a
+top-level token.
 
-PGE itself is a top-down parser, although it also contains a bottom-up
-I<operator precedence> parser, for things like mathematical expressions
-where bottom-up methods are more efficient. We'll discuss both, and the
-methods for switching between the two, throughout this chapter.
+PGE is a top-down parser, although it also contains a bottom-up I<operator
+precedence> parser to make processing token clusters such as mathematical
+expressions more efficient.
 
 =head2 Driver Programs
 
-The driver program for the new compiler must create instances of the
-various necessary classes that run the parser. It must also include
-the standard function libraries, create global variables, and handle
-commandline options. Most commandline options are handled by PCT, but
-there are some behaviors that the driver program will want to
-override.
+The driver program for the new compiler must create instances of the various
+necessary classes that run the parser. It must also include the standard
+function libraries, create global variables, and handle commandline options.
+PCT provides several useful command-line options, but driver programs may need
+to override several behaviors.
 
-PCT programs can, by default, be run in two ways: Interactive mode,
-which is run one statement at a time in the console, and file mode which
-loads and runs an entire file. For interactive mode, it is necessary
-to specify information about the prompt that's used and the environment
-that's expected. Help and error messages need to be written for the user
-too. 
+PCT programs can run in two ways.  An interactive mode runs one statement at a
+time in the console.  A file mode loads and runs an entire file at once.  A
+driver program may specificy information about the interactive prompt and
+environment, as well as help and error messages.
 
 =head3 C<HLLCompiler> class
 
+The C<HLLCompiler> class implements a compiler object. This object contains
+references to language-specific parser grammar and actions files, as well as
+the steps involved in the compilation process.  The stub compiler created by
+C<mk_language_shell.pl> might resemble:
+
+  .sub 'onload' :anon :load :init
+      load_bytecode 'PCT.pbc'
+      $P0 = get_hll_global ['PCT'], 'HLLCompiler'
+      $P1 = $P0.'new'()
+      $P1.'language'('MyCompiler')
+      $P1.'parsegrammar'('MyCompiler::Grammar')
+      $P1.'parseactions'('MyCompiler::Grammar::Actions')
+  .end
+
+  .sub 'main' :main
+      .param pmc args
+      $P0 = compreg 'MyCompiler'
+      $P1 = $P0.'command_line'(args)
+  .end
+
+The C<:onload> function creates the driver object as an instance of
+C<HLLCompiler>, sets the necessary options, and registers the compiler with
+Parrot. The C<:main> function drives parsing and execution begin. It calls the
+C<compreg> opcode to retrieve the registered compiler object for the language
+"MyCompiler" and invokes that compiler object using the options received from
+the commandline.
+
+The C<compreg> opcode hides some of Parrot's magic; you can use it multiple
+times in a program to compile and run different languages. You can create
+multiple instances of a compiler object for a single language (such as for
+runtime C<eval>) or you can create compiler objects for multiple languages for
+easy interoperability. The Rakudo Perl 6 C<eval> function uses this mechanism
+to allow runtime eval of code snippets in other languages:
+
+  eval("puts 'Konnichiwa'", :lang<Ruby>);
+
+=head3 C<HLLCompiler> methods
+
+The previous example showed the use of several HLLCompiler methods:
+C<language>, C<parsegrammar>, and C<parseactions>.  These three methods are the
+bare minimum interface any PCT-based compiler should provide.  The C<language>
+method takes a string argument that is the name of the compiler. The
+HLLCompiler object uses this name to register the compiler object with Parrot.
+The C<parsegrammar> method creates a reference to the grammar file that you
+write with PGE. The C<parseactions> method takes the class name of the NQP file
+used to create the AST-generator for the compiler.
+
+If your compiler needs additional features, there are several other available
+methods:
+
+=over 4
+
+=item * C<commandline_prompt>
+
+The C<commandline_prompt> method allows you to specify a custom prompt to
+display to users in interactive mode.
+
+=item * C<commandline_banner>
+
+The C<commandline_banner> method allows you to specify a banner message that
+displays at the beginning of interactive mode.
+
+=back
 
 =cut
 

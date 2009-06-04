@@ -29,13 +29,17 @@ get_attrib_index(PARROT_INTERP, PMC *self, STRING *name)
     Parrot_Class_attributes * const _class  = PARROT_CLASS(self);
     const INTVAL                    cur_hll = CONTEXT(interp)->current_HLL;
     int                             num_classes, i;
+    INTVAL                          retval;
 
     CONTEXT(interp)->current_HLL = 0;
 
     /* First see if we can find it in the cache. */
-    if (VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
-        const INTVAL retval =
-            VTABLE_get_integer_keyed_str(interp, _class->attrib_cache, name);
+    retval                       = VTABLE_get_integer_keyed_str(interp,
+                                         _class->attrib_cache, name);
+
+    /* there's a semi-predicate problem with a retval of 0 */
+    if (retval
+    || VTABLE_exists_keyed_str(interp, _class->attrib_cache, name)) {
         CONTEXT(interp)->current_HLL = cur_hll;
         return retval;
     }
@@ -639,15 +643,14 @@ Creates a clone of the object.
 */
 
     VTABLE PMC * clone() {
-        Parrot_Object_attributes * const obj       = PARROT_OBJECT(pmc);
+    Parrot_Object_attributes * const obj = PARROT_OBJECT(pmc);
         Parrot_Class_attributes  * const _class    = PARROT_CLASS(obj->_class);
         STRING        * const meth_name = CONST_STRING(interp, "clone");
         PMC           * cloned;
-        Parrot_Object_attributes * cloned_guts;
 
         /* See if we have a custom override of the method first. */
         const int num_classes = VTABLE_elements(interp, _class->all_parents);
-        int i, num_attrs;
+        int i;
         for (i = 0; i < num_classes; i++) {
             /* Get the class. */
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
@@ -660,47 +663,7 @@ Creates a clone of the object.
         }
 
         /* If we get here, no custom clone. Create a new object PMC. */
-        cloned = pmc_new_noinit(interp, enum_class_Object);
-
-        /* Set custom GC mark and destroy on the object. */
-        PObj_custom_mark_SET(cloned);
-        PObj_active_destroy_SET(cloned);
-
-        /* Flag that it is an object */
-        PObj_is_object_SET(cloned);
-
-        /* Now create the underlying structure, and clone attributes list.class. */
-        cloned_guts               = mem_allocate_zeroed_typed(Parrot_Object_attributes);
-        cloned_guts->_class       = obj->_class;
-        cloned_guts->attrib_store = VTABLE_clone(INTERP, obj->attrib_store);
-        PMC_data(cloned)          = cloned_guts;
-        num_attrs                 = VTABLE_elements(INTERP, cloned_guts->attrib_store);
-        for (i = 0; i < num_attrs; i++) {
-            PMC * const to_clone = VTABLE_get_pmc_keyed_int(INTERP, cloned_guts->attrib_store, i);
-            if (!PMC_IS_NULL(to_clone)) {
-                VTABLE_set_pmc_keyed_int(INTERP, cloned_guts->attrib_store, i,
-                        VTABLE_clone(INTERP, to_clone));
-            }
-        }
-
-        /* Some of the attributes may have been the PMCs providing storage for any
-         * PMCs we inherited from; also need to clone those. */
-        if (CLASS_has_alien_parents_TEST(obj->_class)) {
-            /* Locate any PMC parents. */
-            for (i = 0; i < num_classes; i++) {
-                PMC * const cur_class = VTABLE_get_pmc_keyed_int(interp, _class->all_parents, i);
-                if (cur_class->vtable->base_type == enum_class_PMCProxy) {
-                    /* Clone this PMC too. */
-                    STRING * const proxy = CONST_STRING(interp, "proxy");
-                    VTABLE_set_attr_keyed(interp, cloned, cur_class, proxy,
-                        VTABLE_clone(interp,
-                            VTABLE_get_attr_keyed(interp, cloned, cur_class, proxy)));
-                }
-            }
-        }
-
-        /* And we have ourselves a clone. */
-        return cloned;
+        return Parrot_oo_clone_object(interp, SELF, obj->_class, NULL);
     }
 
 /*

@@ -380,12 +380,16 @@ without the full complexity of manually defining exception handlers
 (though it would still be implemented as an exception handler
 internally). Something like:
 
+=begin PIR_FRAGMENT_TODO
+
   .local pmc error_code
   .capture_start error_code
   $P1 = find_lex 'foo'
   .capture_end
 
   # error_code contains what would have been the "error" return value
+
+=end PIR_FRAGMENT_TODO
 
 This could eliminate the need for "defanging" because it would be almost
 as easy to use as error codes. It could be implemented once for all
@@ -399,13 +403,17 @@ error in with normal return values. }}
 
 The exception message is stored in the 'message' attribute:
 
-  ...
+=begin PIR_FRAGMENT
+
+  # ...
  handler:
   .local pmc exception
   .local string message
   .get_results (exception)
   message = exception['message']
   say message
+
+=end PIR_FRAGMENT
 
 
 =head4 Resuming after Exceptions
@@ -423,6 +431,8 @@ die, exit.}}
 You resume from an exception by invoking the return continuation stored
 in the 'resume' attribute of the exception.
 
+=begin PIR_FRAGMENT
+
   push_eh handler
   $P0 = new 'Exception'          # create new exception object
   throw $P0                      # throw it
@@ -434,6 +444,8 @@ in the 'resume' attribute of the exception.
   .get_results (exception)
   continuation = exception['resume']
   continuation()
+
+=end PIR_FRAGMENT
 
 =head2 Attachments
 

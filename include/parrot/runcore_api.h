@@ -14,6 +14,66 @@
 
 #  define DO_OP(PC, INTERP) ((PC) = (((INTERP)->op_func_table)[*(PC)])((PC), (INTERP)))
 
+/* HEADERIZER BEGIN: src/runcore/main.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+void disable_event_checking(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void enable_event_checking(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void do_prederef(void **pc_prederef, PARROT_INTERP, int type)
+        __attribute__nonnull__(2);
+
+void dynop_register(PARROT_INTERP, PMC *lib_pmc)
+        __attribute__nonnull__(1);
+
+void exec_init_prederef(PARROT_INTERP, void *prederef_arena)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+void * init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
+        __attribute__nonnull__(1);
+
+void Parrot_runcore_destroy(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_setup_event_func_ptrs(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void prepare_for_run(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void runops_int(PARROT_INTERP, size_t offset)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_disable_event_checking __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_enable_event_checking __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_do_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_dynop_register __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_exec_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_init_jit __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_runcore_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_setup_event_func_ptrs __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_prepare_for_run __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_runops_int __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/runcore/main.c */
+
 /* HEADERIZER BEGIN: src/runcore/cores.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

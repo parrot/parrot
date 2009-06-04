@@ -214,6 +214,9 @@ Parrot_io_open_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
         fprintf(stderr, "Parrot_io_open_win32: %s\n", spath);
     }
 #  endif
+    if (flags & PIO_F_PIPE)
+        return Parrot_io_open_pipe_win32(interp, filehandle, path, flags);
+
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         return NULL;
 
@@ -307,11 +310,18 @@ Parrot_io_close_win32(PARROT_INTERP, ARGMOD(PMC *filehandle))
     UINTVAL result = 0;
     PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
     if (os_handle != INVALID_HANDLE_VALUE) {
+        int flags = Parrot_io_get_flags(interp, filehandle);
         if (CloseHandle(os_handle) == 0)
             result = GetLastError();
         Parrot_io_set_os_handle(interp, filehandle, INVALID_HANDLE_VALUE);
+        if (flags & PIO_F_PIPE) {
+            INTVAL procid =  VTABLE_get_integer_keyed_int(interp, filehandle, 0);
+            HANDLE process = (HANDLE) procid;
+            WaitForSingleObject(process, INFINITE);
+            CloseHandle(process);
+        }
     }
-    return 0;
+    return (result != 0);
 }
 
 /*
@@ -422,6 +432,8 @@ Parrot_io_read_win32(PARROT_INTERP,
     }
     else {
         /* FIXME : An error occured */
+            Parrot_io_set_flags(interp, filehandle,
+                    (Parrot_io_get_flags(interp, filehandle) | PIO_F_EOF));
     }
 
     s->bufused = s->strlen = 0;
@@ -447,8 +459,9 @@ Parrot_io_write_win32(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_io_write_win32)
     DWORD countwrote = 0;
+    DWORD err;
     void * const buffer = s->strstart;
-    size_t len = s->bufused;
+    DWORD len = (DWORD) s->bufused;
     PIOHANDLE os_handle = Parrot_io_get_os_handle(interp, filehandle);
 
     /* do it by hand, Win32 hasn't any specific flag */
@@ -456,7 +469,6 @@ Parrot_io_write_win32(PARROT_INTERP,
         LARGE_INTEGER p;
         p.LowPart = 0;
         p.HighPart = 0;
-
         p.LowPart = SetFilePointer(os_handle, p.LowPart,
                                    &p.HighPart, FILE_END);
         if (p.LowPart == 0xFFFFFFFF && (GetLastError() != NO_ERROR)) {
@@ -465,8 +477,27 @@ Parrot_io_write_win32(PARROT_INTERP,
         }
     }
 
-    if (WriteFile(os_handle, (LPCSTR) buffer, (DWORD) len, &countwrote, NULL))
+    if (WriteFile(os_handle, (LPCSTR) buffer, len, &countwrote, NULL))
         return countwrote;
+
+    /* Write may have failed because of small buffers,
+     * see TT #710 for example.
+     * Let's try writing in small chunks */
+    if ((err = GetLastError()) == ERROR_NOT_ENOUGH_MEMORY || err == ERROR_INVALID_USER_BUFFER) {
+        DWORD chunk = 4096; /* Arbitrarily choosen value */
+        if (len < chunk)
+            goto fail;
+        while (len > 0) {
+            if (chunk > len)
+                chunk = len;
+            if (WriteFile(os_handle, (LPCSTR) buffer, chunk, &countwrote, NULL) == 0 ||
+                    countwrote != chunk)
+                goto fail;
+            len -= chunk;
+        }
+        return len;
+    }
+fail:
     /* FIXME: Set error flag */
     return (size_t)-1;
 }
@@ -566,13 +597,111 @@ Open a pipe. Not implemented for this platform.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PMC *
-Parrot_io_open_pipe_win32(PARROT_INTERP, SHIM(PMC *filehandle),
-        SHIM(STRING *command), int flags)
+Parrot_io_open_pipe_win32(PARROT_INTERP, ARGMOD(PMC *filehandle),
+        ARGIN(STRING *command), int flags)
 {
     ASSERT_ARGS(Parrot_io_open_pipe_win32)
-    UNUSED(flags);
+
+    HANDLE current = GetCurrentProcess();
+    HANDLE hnull = INVALID_HANDLE_VALUE;
+    HANDLE hread = INVALID_HANDLE_VALUE;
+    HANDLE hwrite = INVALID_HANDLE_VALUE;
+    HANDLE hchild = INVALID_HANDLE_VALUE;
+    STARTUPINFO start;
+    SECURITY_ATTRIBUTES sec;
+    PROCESS_INFORMATION procinfo;
+    char *cmd = NULL;
+    const char *comspec;
+    PMC *io = PMC_IS_NULL(filehandle) ? Parrot_io_new_pmc(interp, flags) : filehandle;
+    STRING *auxcomm;
+    int f_read = (flags & PIO_F_READ) != 0;
+    int f_write = (flags & PIO_F_WRITE) != 0;
+    if (f_read == f_write)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Invalid pipe mode: %X", flags);
+
+    procinfo.hThread = INVALID_HANDLE_VALUE;
+    procinfo.hProcess = INVALID_HANDLE_VALUE;
+    sec.nLength = sizeof sec;
+    sec.lpSecurityDescriptor = NULL;
+    sec.bInheritHandle = TRUE;
+
+    comspec = getenv("COMSPEC");
+    if (comspec == NULL)
+        comspec = "cmd";
+    auxcomm = Parrot_str_new(interp, comspec, 0);
+    auxcomm = Parrot_str_append(interp, auxcomm, Parrot_str_new(interp, " /c ", 0));
+    auxcomm = Parrot_str_append(interp, auxcomm, command);
+    cmd = Parrot_str_to_cstring(interp, auxcomm);
+    start.cb = sizeof start;
+    GetStartupInfo(&start);
+    start.dwFlags = STARTF_USESTDHANDLES;
+    if (CreatePipe(&hread, &hwrite, NULL, 0) == 0)
+        goto fail;
+    if (DuplicateHandle(current, f_read ? hwrite : hread,
+            current, &hchild,
+            0, TRUE,
+            DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS)
+            == 0)
+        goto fail;
+    if (hchild == INVALID_HANDLE_VALUE)
+        goto fail;
+
+    if (f_read) {
+        /* Redirect input to NULL. This is to avoid
+         * interferences in case both the child and
+         * the parent tries to read from stdin.
+         * May be unneccessary or even interfere
+         * with valid usages, need more feedback. */
+        hnull = CreateFile("NUL", GENERIC_READ|GENERIC_WRITE,
+                0, &sec, OPEN_EXISTING,
+                FILE_ATTRIBUTE_NORMAL, NULL);
+        if (hnull == INVALID_HANDLE_VALUE)
+            goto fail;
+        start.hStdInput  = hnull;
+        start.hStdOutput = hchild;
+        start.hStdError  = hchild;
+    }
+    else {
+        start.hStdInput = hchild;
+    }
+
+    if (CreateProcess(NULL,
+            cmd,
+            NULL, NULL, TRUE, 0,
+            NULL, NULL, &start, &procinfo) == 0)
+        goto fail;
+    Parrot_str_free_cstring(cmd);
+    cmd = NULL;
+    if (f_read) {
+        Parrot_io_set_os_handle(interp, io, hread);
+        CloseHandle(hwrite);
+    }
+    else {
+        Parrot_io_set_os_handle(interp, io, hwrite);
+        CloseHandle(hread);
+    }
+    CloseHandle(procinfo.hThread);
+    VTABLE_set_integer_keyed_int(interp, io, 0, (INTVAL)procinfo.hProcess);
+    return io;
+
+fail:
+    if (cmd != NULL)
+        Parrot_str_free_cstring(cmd);
+    if (hnull != INVALID_HANDLE_VALUE)
+        CloseHandle(hnull);
+    if (hread != INVALID_HANDLE_VALUE)
+        CloseHandle(hread);
+    if (hwrite != INVALID_HANDLE_VALUE)
+        CloseHandle(hwrite);
+    if (hchild != INVALID_HANDLE_VALUE)
+        CloseHandle(hchild);
+    if (procinfo.hThread != INVALID_HANDLE_VALUE)
+        CloseHandle(procinfo.hThread);
+    if (procinfo.hProcess != INVALID_HANDLE_VALUE)
+        CloseHandle(procinfo.hProcess);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "pipe() not implemented");
+        "pipe open error");
 }
 
 #endif /* PIO_OS_WIN32 */

@@ -57,6 +57,12 @@ L<https://trac.parrot.org/parrot/ticket/448>
 
 L<https://trac.parrot.org/parrot/ticket/452>
 
+=item Hash changes to AssociativePMCArray [eligible in 1.5]
+
+Also OrderedHash to OrderedAssociativePMCArray.
+
+L<https://trac.parrot.org/parrot/ticket/679>
+
 =back
 
 =head1 Opcodes
@@ -87,6 +93,14 @@ address of the PMC. Uses of get_addr and set_addr that would set label values
 for Sub, Exception, and related PMC types will instead be handled by
 get_label and set_label.
 
+=item C<bsr>, C<jsr>, and C<ret> [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/702>
+
+=item C<branch_cs> [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/470>
+
 =back
 
 =head1 Bytecode
@@ -110,14 +124,6 @@ L<https://trac.parrot.org/parrot/ticket/451>
 =head1 Class Features
 
 =over 4
-
-=item :anon and :vtable named parameters to add_method [eligible in 1.1]
-
-If you want to override a vtable method/function when building a Class, then
-use the method C<add_vtable_override> instead of calling C<add_method> with
-one or both of these flags.
-
-L<https://trac.parrot.org/parrot/ticket/158>
 
 =back
 
@@ -234,6 +240,30 @@ L<https://trac.parrot.org/parrot/ticket/625>
 
 L<https://trac.parrot.org/parrot/ticket/664>
 
+=item functions in src/stack.c [eligible in 1.5]
+
+L<https://trac.parrot.org/parrot/ticket/702>
+Here is a list of functions in this file which are currently being exported:
+
+  stack_system_init
+  cst_new_stack_chunk
+  new_stack
+  mark_stack
+  stack_height
+  stack_entry
+  stack_prepare_push
+  stack_push
+  stack_prepare_pop
+  stack_pop
+  pop_dest
+  stack_peep
+  Parrot_dump_dynamic_environment
+  Parrot_push_action*
+  Parrot_push_mark*
+  Parrot_pop_mark*
+
+* = item may be kept but reimplemented.
+
 =back
 
 =head1 Compiler tools
@@ -315,6 +345,21 @@ L<https://trac.parrot.org/parrot/ticket/459>
 Replaced with makefiles.
 
 L<https://trac.parrot.org/parrot/ticket/338>
+
+=back
+
+=head1 pmc2c syntax
+
+=over 4
+
+=item "pmclass" with name not matching file's basename [eligible in 1.5]
+
+When foo.pmc contains a the line "pmclass bar", pmc2c generates a pmc_foo.h
+but tries to include pmc_bar.h.  This is a bug, but it's possible someone out
+there is using it.  This usage will result in a warning for now; after
+the 1.4 release, this warning will be upgraded to an error.
+
+L<https://trac.parrot.org/parrot/ticket/665>
 
 =back
 

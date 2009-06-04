@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -43,7 +43,7 @@ Initializes a newly created CallSignature object.
 */
 
     VTABLE void init() {
-        Parrot_CallSignature_attributes *sig_struct =
+        Parrot_CallSignature_attributes * const sig_struct =
             mem_allocate_typed(Parrot_CallSignature_attributes);
         PMC_data(SELF)         = sig_struct;
         sig_struct->short_sig  = NULL;
@@ -183,7 +183,6 @@ Mark any referenced strings and PMCs.
 */
     VTABLE void mark() {
         PMC ** const data = PMC_data_typed(SELF, PMC **);
-        INTVAL i;
         Parrot_CallSignature_attributes * const attrs = PARROT_CALLSIGNATURE(SELF);
 
         if (attrs) {
@@ -200,12 +199,12 @@ Mark any referenced strings and PMCs.
                 Parrot_gc_mark_PObj_alive(interp, (PObj*)attrs->short_sig);
         }
 
-        if (!data)
-            return;
-
-        for (i = attrs->data_size - 1; i >= 0; --i)
-            if (data[i])
-                Parrot_gc_mark_PObj_alive(interp, (PObj *)data[i]);
+        if (data) {
+            INTVAL i;
+            for (i = attrs->data_size - 1; i >= 0; --i)
+                if (data[i])
+                    Parrot_gc_mark_PObj_alive(interp, (PObj *)data[i]);
+        }
     }
 
 

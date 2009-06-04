@@ -2,9 +2,8 @@
 # $Id$
 # demonstrate Tcl/Tk GUI using NCI
 
-.include 'runtime/parrot/library/TclLibrary.pir'
-
 .sub try :main
+    load_bytecode 'TclLibrary.pbc'
     .local pmc tcl
     tcl = new 'TclLibrary'
     .local string res

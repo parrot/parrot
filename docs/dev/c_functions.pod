@@ -97,6 +97,11 @@ uninitialized pointer as an ARGOUT parameter.
 Modifiable, or "in-out" parameters are parameters that have both behaviors.
 Some fields in it are read, some fields in it are changed.
 
+Please note that these are only to be used on pointer types.  If you're
+not absolutely sure that the argument is a pointer, don't use them.
+(The "va_list" builtin type is sometimes a pointer, sometimes a struct,
+depending on platform and compiler.)
+
 Here's a simple example of a function that uses these modifiers:
 
   void MyFunction(PARROT_INTERP, ARGIN(char *Foo),

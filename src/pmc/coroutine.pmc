@@ -8,7 +8,7 @@ src/pmc/coroutine.pmc - Co-Routine PMC
 
 =head1 DESCRIPTION
 
-C<Coroutine> extends C<Continuation> to provide a subroutine that can
+C<Coroutine> extends C<Sub> to provide a subroutine that can
 stop in the middle, and start back up later at the point at which it
 stopped. See the L<Glossary|docs/glossary.pod> for more information.
 
@@ -76,41 +76,33 @@ Clone the coroutine.
 
     VTABLE void init() {
         Parrot_Coroutine_attributes *attrs =
-            mem_allocate_zeroed_typed(Parrot_Coroutine_attributes);
-        attrs->sub = (Parrot_sub*)new_coroutine(INTERP);
+            mem_allocate_typed(Parrot_Coroutine_attributes);
+
+        attrs->sub     = (Parrot_sub *)new_coroutine(INTERP);
         PMC_data(SELF) = attrs;
+
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
+
 /*
 
-=item C<void destroy()>
+=item C<PMC * clone()>
 
-Destroys the coroutine.
+Clones the coroutine.
 
 =cut
 
 */
 
-    VTABLE void destroy() {
-        Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
-        Parrot_sub                  *sub   = attrs->sub;
-
-        if (sub->ctx)
-            Parrot_free_context(interp, sub->ctx, 1);
-
-        SUPER();
-    }
-
     VTABLE PMC *clone() {
-        Parrot_coro * const coro_sub = mem_allocate_typed(Parrot_coro);
         PMC         * const ret      = pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_sub         *sub;
+        Parrot_sub         *coro_sub;
 
         PObj_custom_mark_destroy_SETALL(ret);
 
-        SET_ATTR_sub(INTERP, ret, (Parrot_sub *)coro_sub);
-
+        PMC_get_sub(INTERP, ret,  coro_sub);
         PMC_get_sub(INTERP, SELF, sub);
         memcpy(coro_sub, sub, sizeof (Parrot_coro));
 
@@ -132,7 +124,7 @@ Swaps the "context".
     VTABLE opcode_t *invoke(void *next) {
         PackFile_ByteCode  *wanted_seg;
         Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
-        Parrot_coro * const co = (Parrot_coro*)attrs->sub;
+        Parrot_coro * const co = (Parrot_coro *)attrs->sub;
         opcode_t    * dest     = co->address;
 
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
@@ -262,17 +254,15 @@ Marks the coroutine as live.
 
     VTABLE void mark() {
         Parrot_Coroutine_attributes *attrs = PARROT_COROUTINE(SELF);
-        Parrot_coro * const co = (Parrot_coro *)attrs->sub;
+        Parrot_coro * const          co    = (Parrot_coro *)attrs->sub;
 
+        /* co->ctx marked in SUPER(), so do not mark here */
         if (co) {
-            if (co->ctx)
-                mark_context(INTERP, co->ctx);
             if (co->dynamic_state)
                 mark_stack(INTERP, co->dynamic_state);
 
+            SUPER();
         }
-
-        SUPER();
     }
 }
 

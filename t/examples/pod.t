@@ -161,7 +161,7 @@ to be updated:
 
  =end PIR_FRAGMENT_INVALID
 
-As show, you can "stack" the modifiers. Take care to make the begin and
+As shown, you can "stack" the modifiers. Take care to make the begin and
 and end POD targets identical. Always begin with the target language.
 
 =cut

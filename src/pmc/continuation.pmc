@@ -134,11 +134,17 @@ Creates and returns a clone of the continuation.
 */
 
     VTABLE PMC *clone() {
-        Parrot_cont * const cc_self = PMC_cont(SELF);
-        Parrot_cont * const cc      = new_continuation(INTERP, cc_self);
-        PMC         * const ret     = pmc_new(INTERP, enum_class_Continuation);
+        Parrot_cont * const cc_self  = PMC_cont(SELF);
+        Parrot_cont * const cc       = new_continuation(INTERP, cc_self);
+        PMC         * const ret      = pmc_new(INTERP, enum_class_Continuation);
+        Parrot_cont * const ret_cont = PMC_cont(ret);
 
         PObj_custom_mark_destroy_SETALL(ret);
+
+        /* free ret's PMC_cont */
+        Parrot_free_context(interp, ret_cont->from_ctx, 1);
+        mem_sys_free(ret_cont);
+
         cc->runloop_id = cc_self->runloop_id;
         PMC_cont(ret)  = cc;
 

@@ -33,6 +33,9 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 
 #ifdef PIO_OS_UNIX
 
+#  include <sys/types.h>
+#  include <sys/wait.h>
+
 /* HEADERIZER HFILE: include/parrot/io_unix.h */
 
 /* HEADERIZER BEGIN: static */
@@ -335,11 +338,20 @@ Parrot_io_close_unix(PARROT_INTERP, ARGMOD(PMC *filehandle))
     ASSERT_ARGS(Parrot_io_close_unix)
     INTVAL result = 0;
     PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+    int flags = Parrot_io_get_flags(interp, filehandle);
+
     /* BSD and Solaris need explicit fsync() */
     if (file_descriptor >= 0) {
         fsync(file_descriptor);
         if (close(file_descriptor) != 0)
             result = errno;
+
+        /* Wait for the child after closing the
+         * handle, to let it notice the closing and finish */
+        if (flags & PIO_F_PIPE) {
+            int status;
+            waitpid(VTABLE_get_integer_keyed_int(interp, filehandle, 0), &status, 0);
+        }
     }
     Parrot_io_set_os_handle(interp, filehandle, -1);
     return result;
@@ -639,25 +651,38 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
      *        if that's not true, we need a test
      */
 #  ifdef PARROT_HAS_HEADER_UNISTD
-    int pid, err, fds[2];
+    int pid;
+    int fds[2];
+    const int f_read  = (flags & PIO_F_READ) != 0;
+    const int f_write = (flags & PIO_F_WRITE) != 0;
+    if (f_read == f_write)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Invalid pipe mode: %X", flags);
 
-    err = pipe(fds);
-    if (err < 0) {
-        return NULL;
+    if (pipe(fds) < 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Error opening pipe: %s", strerror(errno));
+
+    pid = fork();
+    if (pid < 0) {
+        /* fork failed, cleaning up */
+        close(fds[0]);
+        close(fds[1]);
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "fork failed: %s", strerror(errno));
     }
-
-    /* Parent - return IO stream */
-    if ((pid = fork()) > 0) {
+    else if (pid > 0) {
+        /* Parent - return IO stream */
         PMC *io;
         if (PMC_IS_NULL(filehandle))
             io = Parrot_io_new_pmc(interp, flags & (PIO_F_READ|PIO_F_WRITE));
         else
             io = filehandle;
 
-        Parrot_io_set_flags(interp, io,
-                (Parrot_io_get_flags(interp, io) & (~PIO_F_PIPE)));
+        /* Save the pid of the child, we'll wait for it when closing */
+        VTABLE_set_integer_keyed_int(interp, io, 0, pid);
 
-        if (flags & PIO_F_READ) {
+        if (f_read) {
             /* close this writer's end of pipe */
             close(fds[1]);
             Parrot_io_set_os_handle(interp, io, fds[0]);
@@ -669,83 +694,47 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
         }
         return io;
     }
-
-    /* Child - exec process */
-    if (pid == 0) {
-        /* See above comments */
-#    if 0
-        char *argv[10], *p, *c, *cmd, *orig_cmd;
-        int   n;
-#    else
-        char * argv[10], *orig_cmd;
-
+    else /* (pid == 0) */ {
+        /* Child - exec process */
+        char * argv[4];
         /* C strings for the execv call defined that way to avoid
          * const problems without copying them.
          */
         static char auxarg0 [] = "/bin/sh";
         static char auxarg1 [] = "-c";
-#    endif
 
-        if (flags & PIO_F_WRITE) {
+        if (f_write) {
             /* the other end is writing - we read from the pipe */
             close(STDIN_FILENO);
-            /*close(fds[1]);*/
+            close(fds[1]);
 
             if (Parrot_dup(fds[0]) != STDIN_FILENO)
-                exit(EXIT_SUCCESS);
+                exit(EXIT_FAILURE);
         }
         else {
             /* XXX redirect stdout, stderr to pipe */
-            close(STDIN_FILENO);
             close(STDOUT_FILENO);
             close(STDERR_FILENO);
+            close(fds[0]);
 
-            if (Parrot_dup(fds[0]) != STDIN_FILENO
-            ||  Parrot_dup(fds[1]) != STDOUT_FILENO
-            ||  Parrot_dup(fds[1]) != STDERR_FILENO)
-                exit(EXIT_SUCCESS);
+            if (Parrot_dup(fds[1]) != STDOUT_FILENO)
+                exit(EXIT_FAILURE);
+            if (Parrot_dup(fds[1]) != STDERR_FILENO)
+                exit(EXIT_FAILURE);
         }
 
-        /*******************************************************
-         *     THIS IS A QUICK TEST IMPLEMENTATION
-         * Thus the if'ed out code is not deleted yet
-         * TT #661
-         *******************************************************
-         */
-#    if 0
-        /* XXX ugly hack to be able to pass some arguments
-         *     split cmd at blanks */
-        orig_cmd = cmd = Parrot_str_to_cstring(interp, command);
-        c        = strdup(cmd);
-
-        for (n = 0, p = strtok(c, " "); n < 9 && p; p = strtok(NULL, " ")) {
-            if (n == 0)
-                cmd = p;
-            argv[n++] = p;
-        }
-
-        argv[n] = NULL;
-
-        Parrot_str_free_cstring(c); /* done with C string */
-        execv(cmd, argv);       /* XXX use execvp ? */
-#    else
-
-        orig_cmd = Parrot_str_to_cstring(interp, command);
         argv [0] = auxarg0;
         argv [1] = auxarg1;
-        argv [2] = orig_cmd;
+        argv [2] = Parrot_str_to_cstring(interp, command);
         argv [3] = NULL;
         execv(argv [0], argv);
 
-#    endif
-
-        /* Will never reach this unless exec fails. */
-        Parrot_str_free_cstring(orig_cmd);
+        /* Will never reach this unless exec fails.
+         * No need to clean up, we're just going to exit */
         perror("execvp");
         exit(EXIT_FAILURE);
     }
 
-    perror("fork");
 #  else
     UNUSED(l);
     UNUSED(command);
@@ -753,7 +742,6 @@ Parrot_io_open_pipe_unix(PARROT_INTERP, ARGMOD(PMC *filehandle),
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "pipe() unimplemented");
 #  endif
-    return NULL;
 }
 
 /*

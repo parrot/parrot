@@ -7,7 +7,7 @@
     argc = argv
     .local pmc N
     N = new 'Integer'
-    N = 28
+    N = 24
     if argc <= 1 goto noarg
     $S0 = argv[1]
     N = $S0

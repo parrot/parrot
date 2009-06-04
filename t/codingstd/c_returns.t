@@ -29,7 +29,8 @@ than C<return (foo);>
 =head1 NOTES
 
 This test was hacked from the C<check_returns> sub in
-C<tools/dev/check_source_standards.pl>
+C<tools/dev/check_source_standards.pl>, which is no longer part of the Parrot
+distribution.
 
 =head1 SEE ALSO
 

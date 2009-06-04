@@ -431,7 +431,7 @@ This is to exclude automatically generated C-language files Parrot might have.
             compilers/pirc/macro/macrolexer.h
             compilers/pirc/macro/macroparser.c
             compilers/pirc/macro/macroparser.h
-            src/malloc.c
+            src/gc/malloc.c
             } unless @exemptions;
 
         my $path = -f $file ? $file : $file->path;

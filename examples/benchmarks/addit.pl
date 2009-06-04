@@ -36,7 +36,7 @@ $args[2] = 87;
 $args[3] = "3.87";
 $args[4] = "21000000";
 
-for ( my $x = 500000 ; $x >= 0 ; --$x ) {
+for ( my $x = 50000 ; $x >= 0 ; --$x ) {
     $result = varargs_adder(@args);
 }
 print "$result\n";

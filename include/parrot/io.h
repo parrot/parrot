@@ -101,8 +101,6 @@ typedef long PIOOFF_T;
 
 extern PIOOFF_T piooffsetzero;
 
-typedef struct _ParrotIOFilter ParrotIOFilter;
-typedef struct _ParrotIO ParrotIO;
 typedef struct _ParrotIOData ParrotIOData;
 
 #ifdef _MSC_VER

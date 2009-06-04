@@ -430,6 +430,7 @@ SP              [ ]
                 "stringliteral or register", IMCC_INFO(interp)->cur_macro_name);
 
         define_macro(interp, IMCC_INFO(interp)->cur_macro_name, NULL, valp->s, start_line);
+        mem_sys_free(valp->s);
 
         IMCC_INFO(interp)->cur_macro_name = NULL;
 
@@ -443,9 +444,12 @@ SP              [ ]
 
 <emit,INITIAL>".include" {
         const int c = yylex(valp, yyscanner, interp);
+
         if (c != STRINGC)
             return c;
 
+        /* STRINGCs have a str_dup()ed valp->s */
+        mem_sys_free(valp->s);
         YYCHOP();
         include_file(interp, yytext + 1, yyscanner);
     }

@@ -1,7 +1,9 @@
-parrot (1.0.0-1ubuntu1~ppa9~karmic1) karmic; urgency=low
+parrot (1.0.0-1ubuntu1) karmic; urgency=low
   * Resynchronize with Debian unstable.
+  * Add a patch to detect the lpia architecture, to correctly configure for
+    unaligned function pointers.
 
- -- Allison Randal <allison@parrot.org>  Sun, 10 May 2009 20:39:20 -0700
+ -- Allison Randal <allison@parrot.org>  Thu, 28 May 2009 13:13:12 -0700
 
 parrot (1.0.0-1) unstable; urgency=low
   * New upstream release

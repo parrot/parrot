@@ -46,9 +46,9 @@ The header directory. Defaults to '/usr/include'.
 
 =back
 
-=head2 See Also
+=head1 SEE ALSO
 
-See F<tools/dev/install_files.pl> for a detailed description of the MANIFEST
+See F<lib/Parrot/Manifest.pm> for a detailed description of the MANIFEST
 format.
 
 =cut
@@ -57,9 +57,13 @@ format.
 
 use strict;
 use warnings;
-use File::Basename qw(dirname basename);
-use File::Copy;
-use File::Spec;
+use File::Basename qw(basename);
+use lib qw( lib );
+use Parrot::Install qw(
+    install_files
+    create_directories
+    lines_to_files
+);
 
 # When run from the makefile, which is probably the only time this
 # script will ever be used, all of these defaults will get overridden.
@@ -74,7 +78,9 @@ my %options = (
     docdir      => '/usr/share/doc', # parrot/ subdir added below
     datadir     => '/usr/share/',    # parrot/ subdir added below
     srcdir      => '/usr/src/',      # parrot/ subdir added below
+    versiondir  => '',
     'dry-run'   => 0,
+    packages    => 'devel|pct|tge|nqp',
 );
 
 my @manifests;
@@ -89,118 +95,88 @@ foreach (@ARGV) {
 
 my $parrotdir = $options{versiondir};
 
-# We'll report multiple occurrences of the same file
-my %seen;
+# Set up transforms on filenames
+my(@transformorder) = (qw(lib share include src doc), '^(tools|VERSION)', '^compilers');
+my(%metatransforms) = (
+    lib => {
+        ismeta => 1,
+        optiondir => 'lib',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{DestDirs} = [$parrotdir, "tools"];
+            return($filehash);
+        },
+    },
+    share => {
+        ismeta => 1,
+        optiondir => 'data',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} = basename($filehash->{Dest});
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    include => {
+        ismeta => 1,
+        optiondir => 'include',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s/^src//; # strip off leading src/ dir
+            $filehash->{Dest} =~ s/^include//;
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    src => {
+        ismeta => 1,
+        optiondir => 'src',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s/^src//; # strip off leading src/ dir
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    doc => {
+        ismeta => 1,
+        optiondir => 'doc',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s/^docs/pod/; # other docs are actually raw Pod
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    '^(tools|VERSION)' => {
+        optiondir => 'lib',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    '^compilers' => {
+        optiondir => 'lib',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s/^compilers/languages/;
+            $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+);
 
-my @files;
-my @installable_exe;
-my %directories;
-@ARGV = @manifests;
-while (<>) {
-    chomp;
-
-    s/\#.*//;    # Ignore comments
-    next if /^\s*$/;    # Skip blank lines
-
-    my ( $src, $meta, $dest ) = split( /\s+/, $_ );
-    $dest ||= $src;
-
-    if ( $seen{$src}++ ) {
-        print STDERR "$ARGV:$.: Duplicate entry $src\n";
-    }
-
-    # Parse out metadata
-    die "Malformed line in MANIFEST: $_" if not defined $meta;
-    my $generated = $meta =~ s/^\*//;
-    my ($package) = $meta =~ /^\[(.*?)\]/;
-    $meta =~ s/^\[(.*?)\]//;
-    next unless $package;    # Skip if this file belongs to no package
-
-    next unless $package =~ /devel|pct|tge|nqp/;
-
-    my %meta;
-    @meta{ split( /,/, $meta ) } = ();
-    $meta{$_} = 1 for ( keys %meta );          # Laziness
-
-    if ( $meta{lib} ) {
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, "tools", $dest );
-    }
-    elsif ( $meta{share} ) {
-        $dest = File::Spec->catdir( $options{datadir}, $parrotdir, basename($dest) );
-    }
-    elsif ( $meta{include} ) {
-        $dest =~ s/^src//; # strip off leading src/ dir
-        $dest =~ s/^include//;
-        $dest = File::Spec->catdir( $options{includedir}, $parrotdir, $dest );
-    }
-    elsif ( $meta{src} ) {
-        $dest =~ s/^src//; # strip off leading src/ dir
-        $dest = File::Spec->catdir( $options{srcdir}, $parrotdir, $dest );
-    }
-    elsif ( $meta{doc} ) {
-        $dest =~ s/^docs/pod/; # docs dir are actually raw Pod
-        $dest = File::Spec->catdir( $options{docdir}, $parrotdir, $dest );
-    }
-    elsif ( /^runtime/ ) {
-        $dest =~ s/^runtime\/parrot\///;
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
-    }
-    elsif ( /^tools/ ) {
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
-    }
-    elsif ( /^VERSION/ ) {
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
-    }
-    elsif ( /^compilers/ ) {
-        $dest =~ s/^compilers/languages/;
-        $dest = File::Spec->catdir( $options{libdir}, $parrotdir, $dest );
-    }
-    else {
-        die "Unknown file type in MANIFEST: $_";
-    }
-
-    $dest = File::Spec->catdir( $options{buildprefix}, $dest )
-        if $options{buildprefix};
-
-    $directories{ dirname($dest) } = 1;
-    push( @files, [ $src => $dest ] );
-}
-continue {
-    close ARGV if eof;    # Reset line numbering for each input file
-}
+my($filehashes, $directories) = lines_to_files(
+    \%metatransforms, \@transformorder, \@manifests, \%options, $parrotdir
+);
 
 unless ( $options{'dry-run'} ) {
-    for my $dir ( map { $options{destdir} . $_ } keys %directories ) {
-        unless ( -d $dir ) {
+    create_directories($options{destdir}, $directories);
+}
+install_files($options{destdir}, $options{'dry-run'}, $filehashes);
 
-            # Make full path to the directory $dir
-            my @dirs;
-            while ( !-d $dir ) {    # Scan up to nearest existing ancestor
-                unshift @dirs, $dir;
-                $dir = dirname($dir);
-            }
-            foreach (@dirs) {
-                mkdir( $_, 0777 ) or die "mkdir $_: $!\n";
-            }
-        }
-    }
-}
-print("Installing ...\n");
-foreach ( @files, @installable_exe ) {
-    my ( $src, $dest ) = @$_;
-    $dest = $options{destdir} . $dest;
-    if ( $options{'dry-run'} ) {
-        print "$src -> $dest\n";
-        next;
-    }
-    else {
-        next unless -e $src;
-        copy( $src, $dest ) or die "copy $src to $dest: $!\n";
-        print "$dest\n";
-    }
-    my $mode = ( stat($src) )[2];
-    chmod $mode, $dest;
-}
+print "Finished install_dev_files.pl\n";
 
 # Local Variables:
 #   mode: cperl

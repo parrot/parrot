@@ -24,7 +24,8 @@ use Parrot::Pmc2c::PMC::Object ();
 # Parrot::Pmc2c::Emitter.
 our $OPTIONS;
 
-$SIG{'__WARN__'} = sub { use Carp; warn $_[0]; Carp::confess; };
+# This is useful for debugging, but upgrades deprecation warnings to errors.
+#$SIG{'__WARN__'} = sub { use Carp; warn $_[0]; Carp::confess; };
 
 =head1 NAME
 

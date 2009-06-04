@@ -39,7 +39,10 @@ is used in Parrot ops.
 
 =item C<PMC * Parrot_io_stdhandle(PARROT_INTERP, INTVAL fileno, PMC *newhandle)>
 
-Get the current standard IO object and optionally set a new one.
+Get the current standard IO object with the specified filenumber. If the
+C<newhandle> parameter is non-null, set that to be the new standard IO object
+of that number. Returns the old IO object before the new one is set, so it
+can be cached for later.
 
 =cut
 
@@ -172,7 +175,8 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), PIOHANDLE fd,
 
 =item C<INTVAL Parrot_io_close(PARROT_INTERP, PMC *pmc)>
 
-Closes the filehandle object.
+Closes the filehandle object. Calls the C<close> method on the filehandle
+PMC object.
 
 =cut
 
@@ -197,7 +201,8 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<INTVAL Parrot_io_is_closed(PARROT_INTERP, PMC *pmc)>
 
-Test whether a filehandle is closed.
+Test whether a filehandle is closed. Calls the C<is_closed> method of the
+filehandle PMC.
 
 =cut
 
@@ -222,7 +227,8 @@ Parrot_io_is_closed(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<void Parrot_io_flush(PARROT_INTERP, PMC *pmc)>
 
-Flushes the C<ParrotIO> PMC C<*pmc>.
+Flushes the C<ParrotIO> PMC C<*pmc>. Calls the C<flush> method on the
+filehandle PMC.
 
 =cut
 
@@ -243,7 +249,8 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 =item C<STRING * Parrot_io_reads(PARROT_INTERP, PMC *pmc, size_t length)>
 
-Return a new C<STRING*> holding up to C<len> bytes.
+Return a new C<STRING*> holding up to C<len> bytes read from the filehandle
+PMC. Calls the C<read> method on the filehandle PMC.
 
 =cut
 
@@ -267,7 +274,8 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 
 =item C<STRING * Parrot_io_readline(PARROT_INTERP, PMC *pmc)>
 
-Return a new C<STRING*> holding the next line read from the file.
+Return a new C<STRING*> holding the next line read from the file. Calls
+the C<readline> method of the filehandle PMC.
 
 =cut
 
@@ -445,7 +453,8 @@ Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
 
 =item C<INTVAL Parrot_io_putps(PARROT_INTERP, PMC *pmc, STRING *s)>
 
-Writes C<*s> to C<*pmc>. Parrot string version.
+Writes C<*s> to C<*pmc>. Parrot string version. Calls the C<puts> method
+on the filehandle PMC.
 
 =cut
 

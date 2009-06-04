@@ -295,9 +295,16 @@ Returns whether the class is or inherits from C<*classname>.
             return 1;
 
         /* Look in the isa hash. */
-        if (interp->vtables[_proxy->id] != NULL &&
-            parrot_hash_exists(interp, interp->vtables[_proxy->id]->isa_hash, classname))
-            return 1;
+        if (interp->vtables[_proxy->id]) {
+            Hash *isa_hash = interp->vtables[_proxy->id]->isa_hash;
+
+            if (!isa_hash && Parrot_str_equal(interp,
+                     interp->vtables[_proxy->id]->whoami, classname))
+                return 1;
+
+            if (isa_hash && parrot_hash_exists(interp, isa_hash, classname))
+                return 1;
+        }
 
         /* Iterate over all the parents and check if they respond true
          * for 'isa' on the original comparison. */
@@ -334,9 +341,17 @@ Returns whether the class is or inherits from C<*classname>.
             return 1;
 
         /* Look in the isa hash. */
-        if (interp->vtables[_proxy->id] != NULL &&
-            parrot_hash_exists(interp, interp->vtables[_proxy->id]->isa_hash, classname))
-            return 1;
+        if (interp->vtables[_proxy->id]) {
+            Hash *isa_hash = interp->vtables[_proxy->id]->isa_hash;
+
+            if (!isa_hash && Parrot_str_equal(interp,
+                     interp->vtables[_proxy->id]->whoami, classname)) {
+                return 1;
+            }
+
+            if (isa_hash && parrot_hash_exists(interp, isa_hash, classname))
+                return 1;
+        }
 
         return 0;
     }

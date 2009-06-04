@@ -633,6 +633,7 @@ This is needed for packfile unpacking, unless we just always use UTF-8 or BOCU.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 const char*
 string_primary_encoding_for_representation(PARROT_INTERP,
     parrot_string_representation_t representation)
@@ -682,6 +683,7 @@ Parrot_str_new_constant(PARROT_INTERP, ARGIN(const char *buffer))
 
     return s;
 }
+
 
 /*
 
@@ -735,6 +737,52 @@ string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
         charset->preferred_encoding, charset, flags);
 
 }
+
+
+/*
+
+=item C<STRING * string_make_from_charset(PARROT_INTERP, const char *buffer,
+UINTVAL len, INTVAL charset_nr, UINTVAL flags)>
+
+Creates and returns a new Parrot string using C<len> bytes of string data read
+from C<buffer>.
+
+The value of C<charset_name> specifies the string's representation.  It must be
+a valid charset identifier.
+
+    'iso-8859-1'
+    'ascii'
+    'binary'
+    'unicode'
+
+The encoding is implicitly guessed; C<unicode> implies the C<utf-8> encoding,
+and the other three assume C<fixed-8> encoding.
+
+The value of C<flags> is optionally one or more C<PObj_*> flags C<OR>-ed
+together.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING *
+string_make_from_charset(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
+    UINTVAL len, INTVAL charset_nr, UINTVAL flags)
+{
+    ASSERT_ARGS(string_make_from_charset)
+    const CHARSET *charset = Parrot_get_charset(interp, charset_nr);
+
+    if (!charset)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+            "Invalid charset number '%d' specified", charset_nr);
+
+    return Parrot_str_new_init(interp, buffer, len,
+        charset->preferred_encoding, charset, flags);
+}
+
 
 /*
 
@@ -2357,19 +2405,27 @@ size_t
 Parrot_str_to_hashval(PARROT_INTERP, ARGMOD_NULLOK(STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_hashval)
-    register size_t h;
-    const UINTVAL seed = interp->hash_seed;
+    String_iter iter;
+    UINTVAL     offs;
+    size_t      hashval = interp->hash_seed;
 
     if (!s)
-        return seed;
+        return hashval;
 
     /* ZZZZZ workaround for something not setting up encodings right */
     saneify_string(s);
 
-    h          = CHARSET_COMPUTE_HASH(interp, s, seed);
-    s->hashval = h;
+    ENCODING_ITER_INIT(interp, s, &iter);
 
-    return h;
+    for (offs = 0; offs < s->strlen; ++offs) {
+        const UINTVAL c = iter.get_and_advance(interp, &iter);
+        hashval += hashval << 5;
+        hashval += c;
+    }
+
+    s->hashval = hashval;
+
+    return hashval;
 }
 
 

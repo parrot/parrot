@@ -73,7 +73,7 @@ mem_free_executable(void *p, size_t size)
 #  ifdef WIN32
     free(p);
 #  else /* !WIN32 */
-    size_t pagesize = sysconf(_SC_PAGESIZE);
+    const size_t pagesize = sysconf(_SC_PAGESIZE);
     size = (size + pagesize - 1) & ~(pagesize-1);
     munmap(p, size);
 #  endif /* WIN32 */

@@ -340,7 +340,7 @@ open $FH, '>', $filename
         or die "Can't open $filename ($!).\n";
 print $FH q{"Hello, world!\n"};
 close $FH;
-$out = `$parrot $langdir/primitivearc/arc.pbc $filename`;
+$out = `$parrot $langdir/primitivearc/primitivearc.pbc $filename`;
 ok($out eq "Hello, world!\n\n", "check primitivearc");
 unlink($filename);
 }

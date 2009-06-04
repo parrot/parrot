@@ -66,6 +66,7 @@ pmclass Exception {
     ATTR INTVAL          handled;      /* Whether the exception has been handled. */
     ATTR PMC            *handler_iter; /* An iterator of handlers (for rethrow). */
     ATTR Parrot_Context *handler_ctx;  /* A stored context for handler iterator. */
+    ATTR Parrot_Context *thrower;      /* The position we were at when thrown. */
 
 /*
 
@@ -174,7 +175,8 @@ Destroys the exception.
 
     VTABLE void destroy() {
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
-
+        if (core_struct->thrower)
+            Parrot_free_context(interp, core_struct->thrower, 1);
         if (core_struct)
             mem_sys_free(core_struct);
     }
@@ -655,6 +657,17 @@ Set an attribute value for the exception object.
         else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "handler_iter"))) {
             SET_ATTR_handler_iter(interp, SELF, value);
         }
+        else if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "thrower"))) {
+            /* Ensure it's a ret cont, and extract the from_ctx.
+             * XXX TT#596 - when we have Context PMCs, just take and set that. */
+            if (VTABLE_isa(interp, value, CONST_STRING(interp, "Continuation"))) {
+                Parrot_Context *ctx = PMC_cont(value)->from_ctx;
+                if (ctx) {
+                    Parrot_context_ref(interp, ctx);
+                    SET_ATTR_thrower(interp, SELF, ctx);
+                }
+            }
+        }
         else {
             /* If unknown attribute name, throw an exception. */
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ATTRIB_NOT_FOUND,
@@ -748,13 +761,24 @@ sub, or for the point of the call a level deeper for the rest.
     METHOD backtrace() {
         PMC *result = pmc_new(interp, enum_class_ResizablePMCArray);
         PMC *resume;
+        Parrot_Context *cur_ctx;
+        Parrot_cont    *cont;
 
         /* Get starting context, then loop over them. */
         GET_ATTR_resume(interp, SELF, resume);
         if (!PMC_IS_NULL(resume)) {
-            Parrot_cont    *cont    = PMC_cont(resume);
-            Parrot_Context *cur_ctx = cont->to_ctx;
+            /* We have a resume continuation, so we can get the address from
+             * that. */
+            cont    = PMC_cont(resume);
+            cur_ctx = cont->to_ctx;
+        }
+        else {
+            /* No return continuation. Assuming we're being called  */
+            cont = NULL;
+            GET_ATTR_thrower(interp, SELF, cur_ctx);
+        }
 
+        {
             while (cur_ctx) {
                 PMC        *frame       = pmc_new(interp, enum_class_Hash);
                 PMC        *annotations = NULL;
@@ -774,7 +798,7 @@ sub, or for the point of the call a level deeper for the rest.
 
                     if (sub->seg->annotations) {
                         PackFile_ByteCode *seg = sub->seg;
-                        opcode_t          *pc  = cur_ctx == cont->to_ctx
+                        opcode_t          *pc  = cont && cur_ctx == cont->to_ctx
                                                ? cont->address
                                                : cur_ctx->current_pc;
 

@@ -24,16 +24,14 @@ These are parrot's generic encoding handling functions
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static INTVAL register_encoding(PARROT_INTERP,
+static INTVAL register_encoding(SHIM_INTERP,
     ARGIN(const char *encodingname),
     ARGIN(ENCODING *encoding))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_register_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(encodingname) \
+       PARROT_ASSERT_ARG(encodingname) \
     || PARROT_ASSERT_ARG(encoding)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
@@ -300,7 +298,7 @@ C<encodingname>. Returns 1 if successful, returns 0 otherwise.
 */
 
 static INTVAL
-register_encoding(PARROT_INTERP, ARGIN(const char *encodingname),
+register_encoding(SHIM_INTERP, ARGIN(const char *encodingname),
         ARGIN(ENCODING *encoding))
 {
     ASSERT_ARGS(register_encoding)

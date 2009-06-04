@@ -728,7 +728,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "method cache invalidation" );
     o = new ['Bar']
     print o
     $P0 = get_global "ok2"
-    cl.'add_method'('get_string', $P0, 'vtable' => 1)
+    cl.'add_vtable_override'('get_string', $P0)
     print o
 .end
 .sub ok2

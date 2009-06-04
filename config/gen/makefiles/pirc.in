@@ -68,7 +68,7 @@ all: pirc$(EXE)
 pirc$(EXE): $(OBJS)
 	$(LINK) @ld_out@$@ \
 	    $(OBJS) \
-	    @rpath_blib@ @libparrot_ldflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+	    @rpath_blib@ @libparrot_linkflags@ $(C_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 
 src/pirparser$(O): src/pirparser.c src/pirparser.h
 src/pirlexer$(O): src/pirlexer.c src/pirlexer.h

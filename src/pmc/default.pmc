@@ -171,7 +171,7 @@ propagate_std_props(PARROT_INTERP, PMC *self, PMC *prop_hash) {
 /*
 
 =item C<static INTVAL
-has_pending_std_props(PMC *self)>
+has_pending_std_props(ARGIN(const PMC *self))>
 
 Returns true if propagate_std_props() would create a non-empty prophash.
 
@@ -180,7 +180,7 @@ Returns true if propagate_std_props() would create a non-empty prophash.
 */
 
 static INTVAL
-has_pending_std_props(PMC *self) {
+has_pending_std_props(ARGIN(const PMC *self)) {
     if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
         return 1;
     else
@@ -233,7 +233,6 @@ make_prop_hash(PARROT_INTERP, PMC *self) {
 
     PMC_metadata(self) = prop = pmc_new(interp, enum_class_Hash);
     GC_WRITE_BARRIER(interp, self, NULL, prop);
-    VTABLE_init(interp, prop);
     propagate_std_props(interp, self, prop);
     return prop;
 }
@@ -896,12 +895,19 @@ true (1) is returned; otherwise, false (0) is returned.
 */
 
     VTABLE INTVAL isa_pmc(PMC *lookup) {
+       Hash   * const isa_hash = SELF->vtable->isa_hash;
+       STRING *pmc_name;
+
         if (PMC_IS_NULL(lookup))
             return 0;
 
+        pmc_name = VTABLE_get_string(interp, lookup);
+
+        if (!isa_hash)
+            return Parrot_str_equal(interp, SELF->vtable->whoami, pmc_name);
+
         /* RT #46665 - walk mro */
-        return parrot_hash_exists(INTERP, SELF->vtable->isa_hash,
-                (void *)VTABLE_get_string(interp, lookup));
+        return parrot_hash_exists(INTERP, isa_hash, (void *)pmc_name);
     }
 
 /*
@@ -918,8 +924,11 @@ true (1) is returned; otherwise, false (0) is returned.
 
     VTABLE INTVAL isa(STRING *_class) {
         /* RT #46665 - walk mro */
-        return parrot_hash_exists(INTERP, SELF->vtable->isa_hash,
-                    (void *)_class);
+        Hash * const isa_hash = SELF->vtable->isa_hash;
+        if (!isa_hash)
+            return Parrot_str_equal(interp, SELF->vtable->whoami, _class);
+
+        return parrot_hash_exists(INTERP, isa_hash, (void *)_class);
     }
 
 /*
