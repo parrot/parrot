@@ -2,6 +2,29 @@
 
 =cut
 
+.sub test_parse_loop
+    .param pmc hash
+    .param int expect_fail
+
+    .local pmc it, key
+    .local string vtable, test_result
+
+    it = iter hash
+  iter_loop:
+    unless it goto iter_done
+    key = shift it
+    vtable = hash[key]
+    test_result = 'test_parse_one'(vtable)
+    if expect_fail == 1 goto test_isnt
+    is(test_result, '', key)
+    goto iter_loop
+  test_isnt:
+    isnt(test_result, '', key)
+    goto iter_loop
+  iter_done:
+.end
+
+
 .sub test_parse_one
     .param string vtable
     .local pmc compiler
