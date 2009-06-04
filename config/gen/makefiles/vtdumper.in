@@ -18,6 +18,7 @@ SOURCES := \
   vtdumper.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
+  src/function.pir
 
 # the default target
 vtdumper.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
@@ -61,7 +62,7 @@ test: all
 testclean:
 
 CLEANUPS := \
-  pmc.pbc \
+  vtdumper.pbc \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
 

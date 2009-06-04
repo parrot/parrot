@@ -4,7 +4,7 @@
 grammar VTable::Grammar is PCT::Grammar;
 
 token TOP {
-    <vtable_or_section>*
+    <sections>
     [ $ || <panic: 'Syntax error'> ]
     {*}
 }
@@ -29,21 +29,15 @@ rule attribute {
 
 
 rule vtable_func {
-    <type> <identifier> '(' <args> ')' <attribute>*  {*}
+    <type> <identifier> '(' <argument>* ')' <attribute>*  {*}
 }
 
 rule type {
     [ 'struct' | 'union' ]? <identifier> '*'?
 }
 
-rule args {
-    [ <arg> [ ',' <args> ]?
-    |
-    ]
-}
-
-rule arg {
-    <type> <identifier>
+rule argument {
+    <type> <identifier> ','?
 }
 
 token identifier {

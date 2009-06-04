@@ -71,6 +71,8 @@
     .tailcall $P0.'command_line'(args, 'encoding'=>'utf8', 'transcode'=>'ascii')
 .end
 
+
+.include 'src/function.pir'
 .include 'src/parser/gen_grammar.pir'
 .include 'src/parser/gen_actions.pir'
 
