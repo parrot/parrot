@@ -143,8 +143,8 @@ INTVAL0 do_bar(PMC1* p1, PMC2* p2)
 INTVAL1 quuxle(PMC3* p3, PMC4* p4)
 VTABLE
 
-    .local pmc emitter, past
-    (emitter, past) = get_emitter_and_capture(parse_test, "past")
+    .local pmc past
+    past = get_past(parse_test)
 
     .local pmc do_foo, do_bar, quuxle, args
     do_foo = past[0]

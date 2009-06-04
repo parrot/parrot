@@ -77,9 +77,9 @@ INTVAL pants(PMC* p)
 INTVAL attraction()
 VTABLE
 
-    .local pmc emitter, past, node
+    .local pmc past, node
     .local string section, name
-    (emitter, past) = get_emitter_and_capture(parse_test, "past")
+    past = get_past(parse_test)
 
     node    = past[0]
     name    = node['name']

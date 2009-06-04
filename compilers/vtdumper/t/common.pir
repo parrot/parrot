@@ -47,15 +47,14 @@
 .end
 
 
-.sub get_emitter_and_capture
+.sub get_past
     .param string source
-    .param string target
 
-    .local pmc compiler, emitter, capture
+    .local pmc compiler, past
     compiler = compreg 'VTable'
-    capture = compiler.'compile'(source, 'target'=> target)
+    past = compiler.'compile'(source, 'target'=> 'past')
 
-    .return (emitter, capture)
+    .return (past)
 .end
 
 
