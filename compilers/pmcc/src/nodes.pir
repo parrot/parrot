@@ -244,7 +244,7 @@ Add VTABLE method to PMC.
     $P0 = self.'attr'('vtables', 0, 0)
     $I0 = exists $P0[name]
     unless $I0 goto add_method
-    $S0 = concat "Duplicate VTABLE method: ", name
+    $S0 = concat "Duplicate VTABLE function: ", name
     die $S0
   add_method:
     $P0[name] = method
