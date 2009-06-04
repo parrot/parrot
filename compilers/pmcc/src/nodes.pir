@@ -50,6 +50,10 @@ PMC class by it self.
     $P1 = new 'Hash'
     res.'attr'('methods', $P1, 1)
 
+    # Multis are Hash of Arrays. name -> implementation*
+    $P1 = new 'Hash'
+    res.'attr'('multis', $P1, 1)
+
     $P1 = new 'ResizablePMCArray'
     res.'attr'('attrs', $P1, 1)
 
@@ -97,6 +101,16 @@ Get PMC methods.
 
 .sub 'methods' :method
     .tailcall self.'attr'('methods',0,0)
+.end
+
+=item C<multis>
+
+Get PMC MULTIs.
+
+=cut
+
+.sub 'multis' :method
+    .tailcall self.'attr'('multis',0,0)
 .end
 
 =item C<provides>
@@ -268,6 +282,28 @@ Add METHOD to PMC.
     die $S0
   add_method:
     $P0[name] = method
+    .return ()
+.end
+
+=item C<add_multi>
+
+Add MULTI to PMC.
+
+=cut
+
+.sub 'add_multi' :method
+    .param string name
+    .param pmc    multi
+
+    .local pmc    list
+
+    $P0 = self.'attr'('multis', 0, 0)
+    list = $P0[name]
+    unless null list goto vivify
+    list = new ['ResizablePMCArray']
+    $P0[name] = list
+  vivify:
+    push list, multi
     .return ()
 .end
 
