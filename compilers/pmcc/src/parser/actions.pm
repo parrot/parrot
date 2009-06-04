@@ -92,6 +92,12 @@ method body_part($/, $key) {
     elsif $key eq 'method' {
         $?PMC.add_method($m.name, $m);
     }
+    elsif $key eq 'multi' {
+        $?PMC.add_multi($m.name, $m);
+    }
+    else {
+        $/.panic("Unsupported body part " ~ $m);
+    }
 }
 
 method class_init($/) {
@@ -135,7 +141,16 @@ method method($/) {
 
 method multi($/) {
     #say('MULTI ' ~$<identifier>);
-    my $past := PAST::Block.new( :blocktype('declaration'), :node($/) );
+    my $past := PAST::Block.new(
+        :name(~$<c_signature><identifier>),
+        :blocktype('method'),
+        :returns(~$<c_signature><c_type>),
+        :node($/),
+
+        $<c_body>.ast
+    );
+    $past<parameters> := $<c_signature><c_arguments>.ast;
+    make $past;
     make $past;
 }
 

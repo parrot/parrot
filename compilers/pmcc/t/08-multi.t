@@ -17,7 +17,6 @@
     (emitter, capture) = get_emitter_and_capture(filename, content, 'past')
     ok("MULTI functions parsed")
 
-    
 .end
 
 # Don't forget to update plan!
