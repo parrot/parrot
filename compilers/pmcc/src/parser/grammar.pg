@@ -181,8 +181,9 @@ rule c_type {
 }
 
 # Very-very simplified named? function param.
+# No nameless arguments. At least not now.
 rule c_argument {
-    <c_type> <identifier>?
+    <c_type> <identifier>
     {*}
 }
 
@@ -230,4 +231,4 @@ token ws {
   ]*
 }
 
-
+# vim: expandtab shiftwidth=4 ft=perl6:
