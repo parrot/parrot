@@ -18,7 +18,7 @@ You need a C compiler, a linker, and a make program of course. If you will be
 linking with the ICU library you have to download and install it before
 configuring Parrot.
 
-Get it from http://www-306.ibm.com/software/globalization/icu/downloads.jsp
+Get it from http://site.icu-project.org/download
 
 You also need Perl 5.8.4 or newer, Storable 2.12 or newer, and Bundle::Parrot
 to run various configure and build scripts.

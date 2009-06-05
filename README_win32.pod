@@ -60,7 +60,7 @@ build Parrot without it, by not installing it or asking Parrot to
 ignore it (C<--without-icu>).
 
 If you want to use ICU, download it from
-L<http://www.icu-project.org/download/>.
+L<http://site.icu-project.org/download>.
 
 If you want to use precompiled binaries, do the following.
 Download the package matching your compiler, unpack it (say, into
