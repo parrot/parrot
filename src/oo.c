@@ -1015,8 +1015,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
                 sizeof (Meth_cache_entry ***) * mc->mc_size);
         }
         else {
-            mc->idx = (Meth_cache_entry ***)mem_sys_allocate_zeroed(
-                sizeof (Meth_cache_entry ***) * (type + 1));
+            mc->idx = mem_allocate_n_zeroed_typed(type + 1, Meth_cache_entry**);
         }
         mc->mc_size = type + 1;
     }

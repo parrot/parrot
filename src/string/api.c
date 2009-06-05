@@ -721,7 +721,7 @@ string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
         UINTVAL len, ARGIN_NULLOK(const char *charset_name), UINTVAL flags)
 {
     ASSERT_ARGS(string_make)
-    const CHARSET  *charset;
+    const CHARSET *charset;
 
     if (!charset_name)
         charset_name = "ascii";
@@ -731,7 +731,6 @@ string_make(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
     if (!charset)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
             "Can't make '%s' charset strings", charset_name);
-
 
     return Parrot_str_new_init(interp, buffer, len,
         charset->preferred_encoding, charset, flags);
