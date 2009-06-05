@@ -33,7 +33,7 @@ don't apply.
 /* the number of entries above which it's faster to hash the hashval instead of
  * looping over the used HashBuckets directly */
 #define SMALL_HASH_SIZE  4
-#define INITIAL_BUCKETS 16
+#define INITIAL_BUCKETS  4
 
 /* HEADERIZER HFILE: include/parrot/hash.h */
 
