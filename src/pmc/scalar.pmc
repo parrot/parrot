@@ -171,23 +171,9 @@ Adds C<value> to C<SELF> inplace.
 
 */
 
-    MULTI PMC *add(Complex value, PMC *dest) {
-        const FLOATVAL a = SELF.get_number();
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                a + VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                VTABLE_get_number_keyed_int(INTERP, value, 1));
-        return dest;
-    }
-
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_number_native(INTERP, dest,
-                SELF.get_number() + VTABLE_get_number(INTERP, value));
+        dest = SELF.clone();
+        VTABLE_i_add(INTERP, dest, value);
         return dest;
     }
 
@@ -255,21 +241,9 @@ Subtracts C<value> from C<SELF> inplace.
 
 */
 
-    MULTI PMC *subtract(Complex value, PMC *dest) {
-        const FLOATVAL a = SELF.get_number();
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                a - VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                -VTABLE_get_number_keyed_int(INTERP, value, 1));
-        return dest;
-    }
-
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        VTABLE_set_number_native(INTERP, dest,
-                SELF.get_number() - VTABLE_get_number(INTERP, value));
+        dest = SELF.clone();
+        VTABLE_i_subtract(INTERP, dest, value);
         return dest;
     }
 
@@ -328,16 +302,9 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
 
 */
 
-    MULTI PMC *multiply(Complex value, PMC *dest) {
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "TODO mul<Float, Complex>");
-    }
-
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_number_native(INTERP, dest,
-            SELF.get_number() * VTABLE_get_number(INTERP, value));
+        dest = SELF.clone();
+        VTABLE_i_multiply(INTERP, dest, value);
         return dest;
     }
 
@@ -399,16 +366,9 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *divide(PMC *value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
-
-        if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                "float division by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_number_native(INTERP, dest, SELF.get_number() / d);
+    MULTI PMC *divide(DEFAULT value, PMC *dest) {
+        dest = SELF.clone();
+        VTABLE_i_divide(INTERP, dest, value);
         return dest;
     }
 
@@ -482,17 +442,9 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *floor_divide(PMC *value, PMC *dest) {
-        FLOATVAL d = VTABLE_get_number(INTERP, value);
-
-        if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                "float division by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-        d    = floor(SELF.get_number() / d);
-
-        VTABLE_set_integer_native(INTERP, dest, (INTVAL)d);
+    MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
+        dest = SELF.clone();
+        VTABLE_i_floor_divide(INTERP, dest, value);
         return dest;
     }
 
@@ -572,17 +524,9 @@ Calculates modulus inplace
 
 */
 
-    MULTI PMC *modulus(PMC *value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
-
-        if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
-                "float modulus by zero");
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_number_native(INTERP, dest,
-                floatval_mod(SELF.get_number(), d));
+    MULTI PMC *modulus(DEFAULT value, PMC *dest) {
+        dest = SELF.clone();
+        VTABLE_i_modulus(INTERP, dest, value);
         return dest;
     }
 
@@ -662,12 +606,9 @@ Calculates pow inplace
 
 */
 
-    MULTI PMC *pow(PMC *value, PMC *dest) {
-        const FLOATVAL d = VTABLE_get_number(INTERP, value);
-
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        VTABLE_set_number_native(INTERP, dest, pow(SELF.get_number(), d));
+    MULTI PMC *pow(DEFAULT value, PMC *dest) {
+        dest = SELF.clone();
+        VTABLE_i_pow(INTERP, dest, value);
         return dest;
     }
 
