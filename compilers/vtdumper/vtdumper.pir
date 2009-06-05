@@ -5,6 +5,7 @@
 
 .sub '__onload' :load :init
     load_bytecode 'PCT.pbc'
+    load_bytecode 'JSON.pbc'
     load_bytecode 'compilers/nqp/nqp.pbc'
 
     .local pmc p6meta
@@ -25,20 +26,78 @@
     $P0.'removestage'('evalpmc')
 
     #add an extra stage to generate the c, h and dump files
-    $P0.'addstage'('generate_dump', 'after'=>'past')
+    $P0.'addstage'('generate_json', 'after'=>'past')
 
 .end
 
 
-.sub 'generate_dump' :method
+.sub 'generate_json' :method
     .param pmc past
     .param pmc adverbs :slurpy :named
 
-    .local string frozen
+    .local pmc node, spast, snode, sattrs, sargs, sarg
+    .local pmc it, key
+    .local int i, j, elems
 
-    frozen = freeze past
-    'write_file'("vtable.frozen", frozen)
+    spast = new ['ResizablePMCArray']
 
+    #PAST::Block doesn't support iteration or even get_integer, so this is the
+    #easiest way to get all elements
+    i = 0
+  loop_start:
+    node = past[i]
+    i += 1
+    if_null node, loop_end
+
+    snode = new ['Hash']
+
+    $S0 = node['name']
+    snode['name'] = $S0
+
+    $S0 = node['returns']
+    snode['returns'] = $S0
+
+    $S0 = node['section']
+    snode['section'] = $S0
+
+    $P0 = node['arguments']
+    sargs = new ['ResizablePMCArray']
+    j = 0
+    elems = elements $P0
+
+  args_loop_start:
+    if j == elems goto args_loop_end
+
+    $P1 = new ['Hash']
+
+    $S0 = node['arguments';j;'type']
+    $P1['type'] = $S0
+
+    $S0 = node['arguments';j;'identifier']
+    $P1['identifier'] = $S0
+
+    push sargs, $P1
+
+    j += 1
+    goto args_loop_start
+
+  args_loop_end:
+
+    snode['arguments'] = sargs
+
+    sattrs = node['attributes']
+    snode['attributes'] = sattrs
+    push spast, snode
+
+    goto loop_start
+
+  loop_end:
+
+    .local string json
+    json = _json(spast, 1)
+    'write_file'("vtable.json", json)
+
+    #exit to avoid confusing HLLCompiler
     exit 0
 .end
 
