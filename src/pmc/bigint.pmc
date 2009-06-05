@@ -1166,29 +1166,12 @@ Inplace shift left.
 
 */
 
-    MULTI PMC *bitwise_shl(BigInt value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shl_bigint_int(INTERP, SELF,
-                                      VTABLE_get_integer(INTERP, value),
-                                      dest);
-        return dest;
-    }
-
-    MULTI PMC *bitwise_shl(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shl_bigint_int(INTERP, SELF,
-                VTABLE_get_integer(interp, value), dest);
-        return dest;
-    }
     MULTI PMC *bitwise_shl(DEFAULT value, PMC *dest) {
-        UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigInt: no multiple dispatch variant 'bitwise_shl' for %Ss",
-            VTABLE_name(interp, value));
+        dest = SELF.clone();
+        VTABLE_i_bitwise_shl(INTERP, dest, value);
+        return dest;
     }
+
 
     VTABLE PMC *bitwise_shl_int(INTVAL value, PMC *dest) {
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1238,29 +1221,10 @@ Inplace shift left.
 
 */
 
-    MULTI PMC *bitwise_shr(BigInt value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shr_bigint_int(INTERP, SELF,
-                                      VTABLE_get_integer(INTERP, value),
-                                      dest);
-        return dest;
-    }
-
-    MULTI PMC *bitwise_shr(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
-
-        bigint_bitwise_shr_bigint_int(INTERP, SELF,
-                VTABLE_get_integer(interp, value), dest);
-        return dest;
-    }
-
     MULTI PMC *bitwise_shr(DEFAULT value, PMC *dest) {
-        UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigInt: no multiple dispatch variant 'bitwise_shr' for %Ss",
-            VTABLE_name(interp, value));
+        dest = SELF.clone();
+        VTABLE_i_bitwise_shr(INTERP, dest, value);
+        return dest;
     }
 
     VTABLE PMC *bitwise_shr_int(INTVAL value, PMC *dest) {
