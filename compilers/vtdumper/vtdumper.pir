@@ -37,7 +37,7 @@
     .local string frozen
 
     frozen = freeze past
-    'write_file'("vtable.dump", frozen)
+    'write_file'("vtable.frozen", frozen)
 
     exit 0
 .end
