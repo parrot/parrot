@@ -4696,6 +4696,12 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
         if (!pf)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Unable to append PBC to the current directory");
+
+        mem_sys_free(pf->header);
+        pf->header = NULL;
+        mem_sys_free(pf->dirp);
+        pf->dirp   = NULL;
+
     }
     else {
         STRING *err;
