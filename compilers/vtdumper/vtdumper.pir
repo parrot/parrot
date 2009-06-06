@@ -26,8 +26,21 @@
     $P0.'removestage'('evalpmc')
 
     #add an extra stage to generate the c, h and dump files
-    $P0.'addstage'('generate_json', 'after'=>'past')
+    $P0.'addstage'('generate_dump', 'after'=>'past')
 
+.end
+
+
+.sub 'generate_dump'
+    .param pmc past
+    .param pmc adverbs :slurpy :named
+
+    .local string frozen
+
+    frozen = freeze past
+    'write_file'("vtable.frozen", frozen)
+
+    exit 0
 .end
 
 
