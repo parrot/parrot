@@ -95,7 +95,7 @@ my $cwd = cwd();
     ok( chdir $tdir, 'changed to temp directory for testing' );
 
     my $pmcdir = qq{$tdir/src/pmc};
-    ok(mkpath($pmcdir, 0, 0755), "Able to make directory for testing");
+    ok(mkpath($pmcdir, { mode => 0755 }), "Able to make directory for testing");
     my $num = qq{$pmcdir/pmc.num};
     open my $IN3, ">", $num or croak "Unable to open file for writing: $!";
     print $IN3 "# comment line\n";
@@ -132,7 +132,7 @@ my $cwd = cwd();
     ok( chdir $tdir, 'changed to temp directory for testing' );
 
     my $pmcdir = qq{$tdir/src/pmc};
-    ok(mkpath($pmcdir, 0, 0755), "Able to make directory for testing");
+    ok(mkpath($pmcdir, { mode => 0755 }), "Able to make directory for testing");
     eval { my $order_ref = auto::pmc::get_pmc_order(); };
     like($@,
         qr/Can't read src\/pmc\/pmc\.num/, "Got expected 'die' message");

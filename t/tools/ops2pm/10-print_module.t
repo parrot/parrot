@@ -188,7 +188,7 @@ are as yet uncovered:
 Directory failure:  can it be provoked?
 
   if ( !-d $fulldir ) {
-    File::Path::mkpath( $fulldir, 0, 0755 )
+    File::Path::mkpath( $fulldir, { mode => 0755 } )
       or die "$self->{script}: Could not mkdir $fulldir: $!!\n";
   }
 
