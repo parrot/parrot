@@ -205,12 +205,6 @@ check in 1.4 or 2.0 for the new names.
 
 L<https://trac.parrot.org/parrot/ticket/443>
 
-=item Parrot_add_library_path [eligible in 1.1]
-
-Will be renamed to C<Parrot_lib_add_path_from_cstring>.
-
-L<https://trac.parrot.org/parrot/ticket/455>
-
 =item parrot_new_pmc_hash [eligible in 1.5]
 
 This function will be removed.  parrot_new_hash should be used in its place.

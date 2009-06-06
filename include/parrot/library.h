@@ -39,20 +39,6 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_add_library_path(PARROT_INTERP,
-    ARGIN(STRING *path),
-    enum_lib_paths which)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
-void Parrot_add_library_path_from_cstring(PARROT_INTERP,
-    ARGIN(const char *path),
-    enum_lib_paths which)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_get_runtime_path(PARROT_INTERP)
         __attribute__nonnull__(1);
@@ -62,6 +48,20 @@ PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 char* Parrot_get_runtime_prefix(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_lib_add_path(PARROT_INTERP,
+    ARGIN(STRING *path_str),
+    enum_lib_paths which)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_lib_add_path_from_cstring(PARROT_INTERP,
+    ARGIN(const char *path),
+    enum_lib_paths which)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -100,17 +100,17 @@ STRING * parrot_split_path_ext(PARROT_INTERP,
         FUNC_MODIFIES(*wo_ext)
         FUNC_MODIFIES(*ext);
 
-#define ASSERT_ARGS_Parrot_add_library_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(path)
-#define ASSERT_ARGS_Parrot_add_library_path_from_cstring \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_Parrot_get_runtime_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_Parrot_get_runtime_prefix __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_Parrot_lib_add_path __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(path_str)
+#define ASSERT_ARGS_Parrot_lib_add_path_from_cstring \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(path)
 #define ASSERT_ARGS_Parrot_locate_runtime_file __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(file_name)

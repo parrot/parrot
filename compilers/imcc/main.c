@@ -529,15 +529,15 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 SET_FLAG(PARROT_DESTROY_FLAG);
                 break;
             case 'I':
-                Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
+                Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_INCLUDE);
                 break;
             case 'L':
-                Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
+                Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_LIBRARY);
                 break;
             case 'X':
-                Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
+                Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_DYNEXT);
                 break;
             default:
