@@ -9,7 +9,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 31;
+use Test::More tests => 32;
 
 =head1 NAME
 
@@ -484,6 +484,19 @@ CODE
 close $FH;
 $out = `$parrot $langdir/shakespeare/shakespeare.pbc $filename`;
 ok($out eq "Hello World!\n", "check shakespeare");
+unlink($filename);
+}
+
+SKIP:
+{
+skip("steme", 1) unless (-d "$langdir/steme");
+$filename = 'test.scm';
+open $FH, '>', $filename
+        or die "Can't open $filename ($!).\n";
+print $FH "( say \"Hello, World!\" )\n";
+close $FH;
+$out = `$parrot $langdir/steme/steme.pbc $filename`;
+ok($out eq "Hello, World!\n", "check steme");
 unlink($filename);
 }
 

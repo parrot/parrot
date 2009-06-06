@@ -266,6 +266,12 @@ my @hlls = (
     },
 
     {
+        name       => 'steme',
+        scm        => 'GIT',
+        repository => 'git://github.com/tene/steme.git'
+    },
+
+    {
         name       => 'tcl',
         scm        => 'SVN',
         repository => 'http://partcl.googlecode.com/svn/trunk'
