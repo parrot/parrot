@@ -360,10 +360,15 @@ HARNESS_JOBS = $(HARNESS) --jobs
 # the default target
 all: @lclang@$(EXE)
 
+installable: installable_@lclang@$(EXE)
+
 ##  targets for building a standalone executable
 @lclang@$(EXE): @lclang@.pbc
 	$(PBC_TO_EXE) @lclang@.pbc
 	@win32_libparrot_copy@
+
+installable_@lclang@$(EXE): @lclang@.pbc
+	$(PBC_TO_EXE) @lclang@.pbc --install
 
 # the compiler .pbc
 @lclang@.pbc: Makefile $(PARROT) $(SOURCES) $(BUILTINS_PIR)
