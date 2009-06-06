@@ -330,7 +330,9 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     /* in constant */
     int dirs       = 1;
 
-    if (r[0] == NULL)
+    /* XXX: Maybe the check for n == 0 is the only one required
+     * and the other must be assertions? */
+    if (n == 0 || r[0] == NULL || r[0]->name == NULL)
         IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                     "The opcode '%s' needs arguments", name);
 
