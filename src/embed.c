@@ -459,8 +459,7 @@ again:
                 break;
 
             chunk_size   = 1024;
-            program_code = mem_realloc_n_typed(program_code,
-                 program_size + chunk_size, char);
+            mem_realloc_n_typed(program_code, program_size + chunk_size, char);
 
             if (!program_code) {
                 Parrot_io_eprintf(interp,
