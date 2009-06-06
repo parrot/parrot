@@ -196,13 +196,6 @@ to happen.
 
 L<http://rt.perl.org/rt3/Ticket/Display.html?id=53302>
 
-=item Parrot_readbc, Parrot_loadbc. [eligible in 1.1]
-
-They have been renamed to C<Parrot_pbc_read>, C<Parrot_pbc_load>.
-C<Parrot_pbc_read> has one third int argument.
-
-L<https://trac.parrot.org/parrot/ticket/266>
-
 =item C API coding standards cleanup [eligible in 1.1]
 
 All C API functions that aren't currently named according to the
