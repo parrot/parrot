@@ -816,7 +816,12 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
             if (!(arg->type == VTIDENTIFIER
             ||    arg->type == VTPASM
             ||    arg->type == VTREG))
-                meth = mk_const(interp, arg->name, 'S');
+                if (arg->type & VT_ENCODED) {
+                    meth = mk_const(interp, arg->name, 'U');
+                }
+                else {
+                    meth = mk_const(interp, arg->name, 'S');
+                }
         }
     }
 
