@@ -86,6 +86,11 @@
     delete $P1[$I0]
     pmc_dir = join '/', $P1
 
+    $I0 = pmc_dir
+    unless $I0 == 0 goto emit_files
+    pmc_dir = '.'
+
+  emit_files:  
     .local string dump_filename, c_filename, header_filename
     .local string dump_contents, c_contents, header_contents
 
