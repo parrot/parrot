@@ -31,7 +31,7 @@
 .end
 
 
-.sub 'generate_dump'
+.sub 'generate_dump' :method
     .param pmc past
     .param pmc adverbs :slurpy :named
 
