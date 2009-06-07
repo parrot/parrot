@@ -93,10 +93,7 @@ sub _evaluate_gcc {
     $conf->data->set(
         ccwarn              => "$ccwarn",
         gccversion          => $gccversion,
-        HAS_aligned_funcptr => 1
     );
-    $conf->data->set( HAS_aligned_funcptr => 0 )
-        if $conf->data->get_p5('OSNAME') eq 'hpux';
     return 1;
 }
 

@@ -228,7 +228,7 @@ my $cwd = cwd();
     my $expected_include_dir =
         $expected_dir . $conf->data->get('slash') .  q{include};
     mkdir $expected_dir or croak "Unable to make testing directory";
-    mkpath($expected_include_dir, 0, 0755)
+    mkpath($expected_include_dir, { mode => 0755 })
         or croak "Unable to make second-level testing directory";
     ($icuheaders, $without) =
         $step->_handle_icuheaders($conf, qq{$expected_dir\n}, 0);

@@ -206,9 +206,6 @@ sub runstep {
         make_set_make => $Config{make_set_make},
         make_and      => '&&',
 
-        # for cygwin
-        cygchkdll => '',
-
         # make_c: Command to emulate GNU make's C<-C directory> option:  chdir
         # to C<directory> before executing $(MAKE)
         make_c => '$(PERL) -e \'chdir shift @ARGV; system q{$(MAKE)}, @ARGV; exit $$? >> 8;\'',

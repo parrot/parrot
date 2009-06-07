@@ -245,7 +245,7 @@ Postcircumfix brackets are useful for subroutine invocation or indexing. Of
 course, this fully depends on the specification of your language. Sometimes,
 you need a different rule to define subroutine invocation syntax. This is the
 case when arguments can be other objects than operands of normal operators
-(which, again, are defined by the c<term:> rule).
+(which, again, are defined by the C<term:> rule).
 
 An example to handle indexing (assuming the index is an operand as any other
 operator's operand) is this:

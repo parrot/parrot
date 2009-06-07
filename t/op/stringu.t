@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 27;
+use Parrot::Test tests => 28;
 use Parrot::Config;
 
 =head1 NAME
@@ -435,22 +435,74 @@ AB
 OUTPUT
 }
 
-pasm_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode literals", todo => 'TT #24' );
-    set S0, unicode:"\u00ab"
-    length I0, S0
-    say I0
-    say S0
-    set S0, iso-8859-1:"\xab"
-    length I0, S0
-    say I0
-    say S0
-    end
+pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys");
+.sub 'main'
+    .local string str0, str1
+    str0 = unicode:"\u00ab"
+    str1 = iso-8859-1:"\xab"
+
+    .local pmc hash
+    hash = new 'Hash'
+    hash[str0] = 'hello'
+
+    $I0 = iseq str0, str1
+    say $I0
+
+    $S0 = hash[str0]
+    $S1 = hash[str1]
+    $I0 = iseq $S0, $S1
+    say $I0
+    say $S0
+    say $S1
+.end
 CODE
 1
-\xc2\xab
 1
-\xc2\xab
+hello
+hello
 OUTPUT
+
+pir_output_is( <<'CODE', <<OUTPUT, "UTF-8 and Unicode hash keys, full bucket" );
+.sub 'main'
+    .local string str0, str1
+    str0 = unicode:"infix:\u00b1"
+    str1 = iso-8859-1:"infix:\xb1"
+
+    .local pmc hash
+    hash = new 'Hash'
+    hash[str0] = 'hello'
+
+    $I0 = 0
+  fill_loop:
+    unless $I0 < 200 goto fill_done
+    inc $I0
+    $S0 = $I0
+    $S0 = concat 'infix:', $S0
+    hash[$S0] = 'foo'
+    goto fill_loop
+  fill_done:
+
+    $I0 = iseq str0, str1
+    #print "iseq str0, str1               => "
+    say $I0
+
+    $S0 = hash[str0]
+    $S1 = hash[str1]
+    $I0 = iseq $S0, $S1
+    #print "iseq hash[str0], hash[str1]   => "
+    say $I0
+    say $S0
+    say $S1
+.end
+CODE
+1
+1
+hello
+hello
+OUTPUT
+
+
+
 
 # Local Variables:
 #   mode: cperl

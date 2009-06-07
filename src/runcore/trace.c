@@ -45,7 +45,7 @@ static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 /* HEADERIZER END: static */
 
 /*
- 
+
 =item C<Interp * debugger_or_interp(PARROT_INTERP)>
 
 Get debugger if available
@@ -55,6 +55,8 @@ Get debugger if available
 PARROT_CANNOT_RETURN_NULL
 Interp *
 debugger_or_interp(PARROT_INTERP) {
+    ASSERT_ARGS(debugger_or_interp)
+
     return interp->pdb && interp->pdb->debugger
             ? interp->pdb->debugger
             : interp;

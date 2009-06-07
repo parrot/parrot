@@ -59,6 +59,12 @@ static PMC * find_method_direct_1(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)
+        __attribute__nonnull__(1);
+
 static void invalidate_all_caches(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -79,6 +85,8 @@ static void invalidate_type_caches(PARROT_INTERP, UINTVAL type)
        PARROT_ASSERT_ARG(interp) \
     || PARROT_ASSERT_ARG(_class) \
     || PARROT_ASSERT_ARG(method_name)
+#define ASSERT_ARGS_get_pmc_proxy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_invalidate_all_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_invalidate_type_caches __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -236,14 +244,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
         else
             type = pmc_type(interp, VTABLE_get_string(interp, key));
 
-        /* Reject invalid type numbers */
-        if (type > interp->n_vtable_max || type <= 0)
-            classobj = PMCNULL;
-        else {
-            PMC * const type_num = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, type_num, type);
-            classobj = pmc_new_init(interp, enum_class_PMCProxy, type_num);
-        }
+        classobj = get_pmc_proxy(interp, type);
     }
 
     return classobj;
@@ -299,9 +300,9 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
 
     /* Now create the underlying structure, and clone attributes list.class. */
     cloned_guts               = mem_allocate_zeroed_typed(Parrot_Object_attributes);
+    PMC_data(cloned)          = cloned_guts;
     cloned_guts->_class       = obj->_class;
     cloned_guts->attrib_store = VTABLE_clone(interp, obj->attrib_store);
-    PMC_data(cloned)          = cloned_guts;
     num_attrs                 = VTABLE_elements(interp, cloned_guts->attrib_store);
     for (i = 0; i < num_attrs; i++) {
         PMC * const to_clone = VTABLE_get_pmc_keyed_int(interp, cloned_guts->attrib_store, i);
@@ -358,6 +359,51 @@ Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
 
 /*
 
+=item C<static PMC * get_pmc_proxy(PARROT_INTERP, INTVAL type)>
+
+Get the PMC proxy for a PMC with the given type, creating it if does not exist.
+If type is not a valid type, return PMCNULL.  This code assumes that
+all PMCProxy objects live in the 'parrot' HLL namespace -- if/when
+we allow PMC types to exist in other HLL namespaces, this code will
+need to be updated.
+
+For internal use only.
+
+=cut
+
+*/
+
+PARROT_INLINE
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+static PMC *
+get_pmc_proxy(PARROT_INTERP, INTVAL type)
+{
+    ASSERT_ARGS(get_pmc_proxy)
+
+    /* Check if not a PMC or invalid type number */
+    if (type > interp->n_vtable_max || type <= 0)
+        return PMCNULL;
+    else {
+        PMC * const parrot_hll = Parrot_get_namespace_keyed_str(interp, interp->root_namespace, CONST_STRING(interp, "parrot"));
+        PMC * const pmc_ns =
+            Parrot_make_namespace_keyed_str(interp, parrot_hll,
+                interp->vtables[type]->whoami);
+        PMC * proxy = VTABLE_get_class(interp, pmc_ns);
+
+        /* Create proxy if not found */
+        if (PMC_IS_NULL(proxy)) {
+            PMC * const type_num = pmc_new(interp, enum_class_Integer);
+            VTABLE_set_integer_native(interp, type_num, type);
+            proxy = pmc_new_init(interp, enum_class_PMCProxy, type_num);
+            Parrot_PCCINVOKE(interp, pmc_ns, CONST_STRING(interp, "set_class"), "P->", proxy);
+        }
+        return proxy;
+    }
+}
+
+/*
+
 =item C<PMC * Parrot_oo_get_class_str(PARROT_INTERP, STRING *name)>
 
 Lookup a class object from a builtin string.
@@ -373,35 +419,19 @@ PMC *
 Parrot_oo_get_class_str(PARROT_INTERP, ARGIN(STRING *name))
 {
     ASSERT_ARGS(Parrot_oo_get_class_str)
+
+    /* First check in current HLL namespace */
     PMC * const hll_ns = VTABLE_get_pmc_keyed_int(interp, interp->HLL_namespace,
                            CONTEXT(interp)->current_HLL);
     PMC * const ns     = Parrot_get_namespace_keyed_str(interp, hll_ns, name);
     PMC * const _class = PMC_IS_NULL(ns)
                        ? PMCNULL : VTABLE_get_class(interp, ns);
 
-    /* Look up a low-level class and create a proxy */
-    if (PMC_IS_NULL(_class)) {
-        const INTVAL type = pmc_type(interp, name);
-
-        /* Reject invalid type numbers */
-        if (type > interp->n_vtable_max || type <= 0)
-            return PMCNULL;
-        else {
-            PMC * new_class;
-            PMC * new_ns;
-            PMC * const type_num = pmc_new(interp, enum_class_Integer);
-            VTABLE_set_integer_native(interp, type_num, type);
-            new_ns = ns;
-            new_class = pmc_new_init(interp, enum_class_PMCProxy, type_num);
-            if (ns->vtable->base_type != enum_class_NameSpace) {
-                new_ns = Parrot_make_namespace_keyed_str(interp, hll_ns, name);
-            }
-            Parrot_PCCINVOKE(interp, new_ns, CONST_STRING(interp, "set_class"), "P->", new_class);
-            return new_class;
-        }
-    }
-
-    return _class;
+    /* If not found, check for a PMC */
+    if (PMC_IS_NULL(_class))
+        return get_pmc_proxy(interp, pmc_type(interp, name));
+    else
+        return _class;
 }
 
 
@@ -985,8 +1015,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
                 sizeof (Meth_cache_entry ***) * mc->mc_size);
         }
         else {
-            mc->idx = (Meth_cache_entry ***)mem_sys_allocate_zeroed(
-                sizeof (Meth_cache_entry ***) * (type + 1));
+            mc->idx = mem_allocate_n_zeroed_typed(type + 1, Meth_cache_entry**);
         }
         mc->mc_size = type + 1;
     }

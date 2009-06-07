@@ -50,7 +50,7 @@ my $cwd = cwd();
     my $cpuarch = 'bar';
     my $osname = 'baz';
     my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
-    mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $corejitdir, { mode => 0755 } ) or croak "Unable to make testing directory";
     my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
     is( $step->_check_jitcapability($corejit, $cpuarch, $osname, 8), 0,
         "Got expected value for _check_jitcapability(): no core.jit case");
@@ -65,7 +65,7 @@ my $cwd = cwd();
     my $cpuarch = 'bar';
     my $osname = 'baz';
     my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
-    mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $corejitdir, { mode => 0755 } ) or croak "Unable to make testing directory";
     my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
     open my $FH, '>', $corejit
         or croak "Unable to open handle to file for testing";
@@ -84,7 +84,7 @@ my $cwd = cwd();
     my $cpuarch = 'bar';
     my $osname = 'baz';
     my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
-    mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $corejitdir, { mode => 0755 } ) or croak "Unable to make testing directory";
     my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
     open my $FH, '>', $corejit
         or croak "Unable to open handle to file for testing";
@@ -106,7 +106,7 @@ my $cwd = cwd();
     my $cpuarch = 'i386';
     my $osname = 'darwin';
     my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
-    mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $corejitdir, { mode => 0755 } ) or croak "Unable to make testing directory";
     my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
     open my $FH, '>', $corejit
         or croak "Unable to open handle to file for testing";
@@ -128,7 +128,7 @@ my $cwd = cwd();
     my $cpuarch = 'i386';
     my $osname = 'MSWin32';
     my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
-    mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $corejitdir, { mode => 0755 } ) or croak "Unable to make testing directory";
     my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
     open my $FH, '>', $corejit
         or croak "Unable to open handle to file for testing";
@@ -152,8 +152,8 @@ my $cwd = cwd();
     my $cpuarch = 'bar';
     my $jitarchname = "${cpuarch}-baz";
     my $asmdir = File::Spec->catdir( $jitbase, $cpuarch );
-    mkpath( $asmdir, 0, 755 ) or croak "Unable to make testing directory";
-    mkpath( q{src}, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $asmdir, { mode => 0755 } ) or croak "Unable to make testing directory";
+    mkpath( q{src}, { mode => 0755 } ) or croak "Unable to make testing directory";
 
     ok(auto::jit::_handle_asm( {
         conf        => $conf,
@@ -175,8 +175,8 @@ my $cwd = cwd();
     my $cpuarch = 'bar';
     my $jitarchname = "${cpuarch}-baz";
     my $asmdir = File::Spec->catdir( $jitbase, $cpuarch );
-    mkpath( $asmdir, 0, 755 ) or croak "Unable to make testing directory";
-    mkpath( q{src}, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $asmdir, { mode => 0755 } ) or croak "Unable to make testing directory";
+    mkpath( q{src}, { mode => 0755 } ) or croak "Unable to make testing directory";
 
     my $sjit =
         File::Spec->catfile( $jitbase, $cpuarch, qq{${jitarchname}.s} );
@@ -205,8 +205,8 @@ my $cwd = cwd();
     my $cpuarch = 'bar';
     my $jitarchname = "${cpuarch}-baz";
     my $asmdir = File::Spec->catdir( $jitbase, $cpuarch );
-    mkpath( $asmdir, 0, 755 ) or croak "Unable to make testing directory";
-    mkpath( q{src}, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $asmdir, { mode => 0755 } ) or croak "Unable to make testing directory";
+    mkpath( q{src}, { mode => 0755 } ) or croak "Unable to make testing directory";
     my $asm = File::Spec->catfile( $jitbase, $cpuarch, q{asm.s} );
     open my $FH, '>', $asm
         or croak "Unable to open handle to file for testing";
@@ -314,7 +314,7 @@ $cwd = cwd();
     my $cpuarch = 'i386';
     my $osname = 'darwin';
     my $corejitdir = File::Spec->catdir ( $jitbase, $cpuarch );
-    mkpath( $corejitdir, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $corejitdir, { mode => 0755 } ) or croak "Unable to make testing directory";
     my $corejit = File::Spec->catfile( $jitbase, $cpuarch, q{core.jit} );
     open my $FH, '>', $corejit
         or croak "Unable to open handle to file for testing";

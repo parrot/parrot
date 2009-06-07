@@ -1681,7 +1681,7 @@ collections of methods and VTABLES that can be added into an existing class.
 Adding a role to a class is called I<composing> that role, and any class
 that has been composed with a role C<does> that role.
 
-Roles are created as PMC and can be manipulated through opcodes and methods
+Roles are created as PMCs and can be manipulated through opcodes and methods
 like other PMCs:
 
   $P0 = new 'Role'
@@ -2362,7 +2362,7 @@ give some information about what the original source code looked like. This
 is especially important when dealing with high-level languages. We'll go into
 detail about annotations and their use in Chapter 10.
 
-Annotations are created using the c<.annotation> keyword. Annotations consist
+Annotations are created using the C<.annotation> keyword. Annotations consist
 of a key/value pair, where the key is a string and the value is an integer,
 a number, or a string. Since annotations are stored compactly as constants in
 the compiled bytecode, PMCs cannot be used.

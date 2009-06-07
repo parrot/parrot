@@ -36,6 +36,7 @@ pir_output_is( <<"CODE", <<OUT, "spawnw, _config" );
      print O, "\tsay \\"Hello, World!\\"\\n"
      print O, ".end\\n"
      close O
+     load_bytecode 'config.pbc'
     .local pmc conf_hash
     conf_hash = _config()
     .local string slash
@@ -51,7 +52,6 @@ pir_output_is( <<"CODE", <<OUT, "spawnw, _config" );
     say \$I0
 .end
 
-.include "library/config.pir"
 CODE
 Hello, World!
 0
@@ -59,6 +59,7 @@ OUT
 
 pir_output_is( <<'CODE', <<'OUT', "conf_hash is read-only")
 .sub _test :main
+     load_bytecode 'config.pbc'
     .local pmc conf_hash
     conf_hash = _config()
     push_eh is_ro
@@ -70,7 +71,6 @@ is_ro:
 end:
 .end
 
-.include 'library/config.pir'
 CODE
 hash is read-only
 OUT

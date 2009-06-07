@@ -1306,41 +1306,42 @@ STRING *
 PF_fetch_string(PARROT_INTERP, ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **cursor))
 {
     ASSERT_ARGS(PF_fetch_string)
-    UINTVAL flags;
-    opcode_t charset_nr;
-    size_t size;
-    STRING *s;
+    STRING   *s;
+    UINTVAL   flags    = PF_fetch_opcode(pf, cursor);
     const int wordsize = pf ? pf->header->wordsize : sizeof (opcode_t);
-    const char *charset_name;
+    size_t    size;
+    opcode_t  charset_nr;
 
-    flags = PF_fetch_opcode(pf, cursor);
     /* don't let PBC mess our internals - only constant or not */
-    flags &= (PObj_constant_FLAG | PObj_private7_FLAG);
-    charset_nr = PF_fetch_opcode(pf, cursor);
+    flags      &= (PObj_constant_FLAG | PObj_private7_FLAG);
+    charset_nr  = PF_fetch_opcode(pf, cursor);
 
     /* These may need to be separate */
-    size = (size_t)PF_fetch_opcode(pf, cursor);
+    size        = (size_t)PF_fetch_opcode(pf, cursor);
+
     TRACE_PRINTF(("PF_fetch_string(): flags=0x%04x, ", flags));
     TRACE_PRINTF(("charset_nr=%ld, ", charset_nr));
     TRACE_PRINTF(("size=%ld.\n", size));
-    charset_name = Parrot_charset_c_name(interp, charset_nr);
-    s = string_make(interp, (const char *)*cursor, size, charset_name, flags);
+
+    s            = string_make_from_charset(interp, (const char *)*cursor,
+                        size, charset_nr, flags);
 
     /* print only printable characters */
     TRACE_PRINTF_VAL(("PF_fetch_string(): string is '%s' at 0x%x\n",
                       s->strstart, OFFS(pf, *cursor)));
 
-/*    s = string_make(interp, *cursor, size,
-            encoding_lookup_index(encoding),
-                               flags); */
     TRACE_PRINTF_ALIGN(("-s ROUND_UP_B: cursor=0x%x, size=%d, wordsize=%d\n",
                         (const char *)*cursor + size, size, wordsize));
+
     size = ROUND_UP_B(size, wordsize);
+
     TRACE_PRINTF(("PF_fetch_string(): round size up to %ld.\n", size));
     *((const unsigned char **) (cursor)) += size;
+
     TRACE_PRINTF_ALIGN(("+s ROUND_UP_B: cursor=0x%x, size=%d\n", *cursor, size));
     return s;
 }
+
 
 /*
 

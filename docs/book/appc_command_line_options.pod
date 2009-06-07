@@ -252,36 +252,58 @@ goto core> if it's available. Otherwise the I<fast core> is used.
 
 =over 4
 
-=item --bounds-checks
+=item -R slow
+
+Run with the I<slow core>
+
+=item -R bounds
 
 Activate bounds checking. This also runs with the I<slow core> as a
 side effect.
 
-=item --fast-core
+=item -R fast
 
 Run with the I<fast core>.
 
-=item --computed-goto-core
+=item -R cgoto
 
 Run the I<computed goto core> (CGoto).
 
-=item --jit-core
+=item -R jit
 
 Run with the I<JIT core> if available.
+
+=item -R cgp
+
+Run with the I<CGoto-Prederefed> core.
+
+=item -R cgp-jit
+
+Run with the I<CGoto-Prederefed with jit> core.
+
+=item -R switch
+
+Run with the I<Switched core>.
+
+=item -R switch-jit
+
+Run with the I<Switched core with jit>.
+
+=item -R exec
+
+Run with the I<exec core>
+(uses JIT at compile time to generate native code)
+
+=item -R gcdebug
+
+Performs a full GC run before every op dispatch
+(good for debugging GC problems)
 
 =item -p,--profile
 
 Activate profiling. This prints a summary of opcode usage and
 execution times after the program stops. It also runs within the
 I<slow core>.
-
-=item --CGP-core
-
-Run with the I<CGoto-Prederefed> core.
-
-=item --switched-core
-
-Run with the I<Switched core>.
 
 =item -t,--trace
 

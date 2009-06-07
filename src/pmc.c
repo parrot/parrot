@@ -225,6 +225,7 @@ pmc_reuse_by_class(PARROT_INTERP, ARGMOD(PMC * pmc), ARGIN(PMC * class_),
     return pmc;
 }
 
+
 /*
 
 =item C<static void check_pmc_reuse_flags(PARROT_INTERP, UINTVAL srcflags,

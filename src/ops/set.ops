@@ -490,33 +490,40 @@ Morphs the PMC in $1 to the type of the PMC in $2, then assigns $2 to $1.
 =cut
 
 inline op copy(inout PMC, invar PMC) :base_mem {
-  PMC   * const clone = VTABLE_clone(interp, $2);
+    if (PMC_IS_NULL($1)) {
+        opcode_t *dest = expr NEXT();
+        opcode_t *handler = Parrot_ex_throw_from_op_args(interp, dest,
+                EXCEPTION_NULL_REG_ACCESS, "Null PMC in copy");
+        goto ADDRESS(handler);
+    }
+    else {
+        PMC   * const clone = VTABLE_clone(interp, $2);
+        /* Preserve the metadata on the destination. */
+        PMC   * const meta  = VTABLE_getprops(interp, $1);
 
-  /* Preserve the metadata on the destination. */
-  PMC   * const meta  = VTABLE_getprops(interp, $1);
+        /* avoid leaks and unreachable memory by destroying the destination PMC */
+        if (PObj_active_destroy_TEST($1))
+            VTABLE_destroy(interp, $1);
 
-  /* avoid leaks and unreachable memory by destroying the destination PMC */
-  if (PObj_active_destroy_TEST($1))
-      VTABLE_destroy(interp, $1);
+        /* the source PMC knows how to clone itself, but we must reuse the
+         * destination header */
+        memmove($1, clone, sizeof (PMC));
 
-  /* the source PMC knows how to clone itself, but we must reuse the
-   destination header */
-  memmove($1, clone, sizeof (PMC));
+        /* don't let the clone's destruction destroy the destination's data */
+        PObj_active_destroy_CLEAR(clone);
+        if (PObj_is_PMC_EXT_TEST(clone))
+            clone->pmc_ext = NULL;
 
-  /* don't let the clone's destruction destroy the destination's data */
-  PObj_active_destroy_CLEAR(clone);
-  if (PObj_is_PMC_EXT_TEST(clone))
-    clone->pmc_ext = NULL;
-
-  /* Restore metadata. */
-  if (!PMC_IS_NULL(meta)) {
-      PMC * const iter = VTABLE_get_iter(interp, meta);
-      while (VTABLE_get_bool(interp, iter)) {
-          STRING * const key = VTABLE_shift_string(interp, iter);
-          PMC * const value  = VTABLE_get_pmc_keyed_str(interp, meta, key);
-          VTABLE_setprop(interp, $1, key, value);
-      }
-  }
+        /* Restore metadata. */
+        if (!PMC_IS_NULL(meta)) {
+            PMC * const iter = VTABLE_get_iter(interp, meta);
+            while (VTABLE_get_bool(interp, iter)) {
+                STRING * const key = VTABLE_shift_string(interp, iter);
+                PMC * const value  = VTABLE_get_pmc_keyed_str(interp, meta, key);
+                VTABLE_setprop(interp, $1, key, value);
+            }
+        }
+    }
 }
 
 =back

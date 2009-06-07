@@ -377,6 +377,8 @@
 ##        my $params := $past[0];
 ##        if $<declarator> eq 'method' {
 ##            $past.blocktype('method');
+##            $past.push(PAST::Op.new('inline'=>'.lex 'self', self);
+##            $past.symbol('self', :scope('lexical'));
 ##        }
 ##        for $<signature>[0] {
 ##            my $parameter := $($_<parameter>);
@@ -400,6 +402,10 @@
     $S0 = match['declarator']
     if $S0 != 'method' goto add_signature
     past.'blocktype'('method')
+    $P3 = get_hll_global ['PAST'], 'Op'
+    $P4 = $P3.'new'('inline'=>'    .lex "self", self', 'pasttype'=>'inline')
+    unshift past, $P4
+    past.'symbol'('self', 'scope'=>'lexical')
   add_signature:
     $P0 = match['signature']
     $P0 = $P0[0]
@@ -738,13 +744,25 @@
 
 
 ##    method noun($/, $key) {
-##        make $($/{$key});
+##        if $key eq 'self' {
+##            make PAST::Var.new(:name('self'), :scope('lexical'), :node($/));
+##        }
+##        else {
+##            make $($/{$key});
+##        }
 ##    }
 .sub 'noun' :method
     .param pmc match
     .param pmc key
+
     $P0 = match[key]
+    if key == 'self' goto make_self
     $P1 = $P0.'ast'()
+    match.'!make'($P1)
+    .return()
+  make_self:
+    $P9 = get_hll_global ['PAST'], 'Var'
+    $P1 = $P9.'new'('scope'=>'lexical', 'name'=>'self', 'node'=>$P0)
     match.'!make'($P1)
 .end
 

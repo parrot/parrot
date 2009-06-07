@@ -178,7 +178,7 @@ typedef struct Parrot_sub {
         else { \
             (sub) = Parrot_get_sub_pmc_from_subclass((interp), (pmc)); \
         } \
-    } while (0);
+    } while (0)
 
 /* the first entries must match Parrot_sub, so we can cast
  * these two to the other type

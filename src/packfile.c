@@ -38,7 +38,8 @@ about the structure of the frozen bytecode.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void byte_code_destroy(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
+static void byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
+        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
@@ -335,7 +336,8 @@ static int sub_pragma(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_byte_code_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(self)
+       PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(self)
 #define ASSERT_ARGS_byte_code_new __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_clone_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
@@ -2518,7 +2520,7 @@ Destroys the C<PackFile_ByteCode> segment C<self>.
 */
 
 static void
-byte_code_destroy(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
+byte_code_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
 {
     ASSERT_ARGS(byte_code_destroy)
     PackFile_ByteCode * const byte_code = (PackFile_ByteCode *)self;
@@ -4694,6 +4696,12 @@ compile_or_load_file(PARROT_INTERP, ARGIN(STRING *path),
         if (!pf)
             Parrot_ex_throw_from_c_args(interp, NULL, 1,
                 "Unable to append PBC to the current directory");
+
+        mem_sys_free(pf->header);
+        pf->header = NULL;
+        mem_sys_free(pf->dirp);
+        pf->dirp   = NULL;
+
     }
     else {
         STRING *err;
@@ -4764,9 +4772,9 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     parrot_split_path_ext(interp, path, &found_path, &found_ext);
     name_length = Parrot_str_length(interp, lang_name);
     found_path = Parrot_str_substr(interp, found_path, -name_length, name_length, NULL, 0);
-    Parrot_add_library_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "include/")),
+    Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "include/")),
             PARROT_LIB_PATH_INCLUDE);
-    Parrot_add_library_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "dynext/")),
+    Parrot_lib_add_path(interp, Parrot_str_append(interp, found_path, CONST_STRING(interp, "dynext/")),
             PARROT_LIB_PATH_DYNEXT);
 
 

@@ -76,7 +76,7 @@ bitwise_left_shift_internal(PARROT_INTERP, PMC *self,
             dest = pmc_new(interp, enum_class_BigInt);
 
         VTABLE_set_integer_native(interp, dest, base);
-        interp->vtables[enum_class_BigInt]->bitwise_shl_int(interp, dest, shift_amount, dest);
+        VTABLE_i_bitwise_shl_int(interp, dest, shift_amount);
     }
 
     return dest;
@@ -257,10 +257,7 @@ Subtracts C<value> from C<SELF> inplace.
 
     MULTI PMC *subtract(Complex value, PMC *dest) {
         const FLOATVAL a = SELF.get_number();
-        if (dest)
-            pmc_reuse(INTERP, dest, value->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, value));
 
         VTABLE_set_number_native(INTERP, dest,
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
@@ -866,7 +863,7 @@ Inplace bitwise and.
         return dest;
     }
 
-    MULTI PMC *bitwise_xor_int(INTVAL value, PMC *dest) {
+    VTABLE PMC *bitwise_xor_int(INTVAL value, PMC *dest) {
         const INTVAL result = SELF.get_integer() ^ value;
 
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));

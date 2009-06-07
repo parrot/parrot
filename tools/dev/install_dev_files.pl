@@ -46,9 +46,9 @@ The header directory. Defaults to '/usr/include'.
 
 =back
 
-=head2 See Also
+=head1 SEE ALSO
 
-See F<tools/dev/install_files.pl> for a detailed description of the MANIFEST
+See F<lib/Parrot/Manifest.pm> for a detailed description of the MANIFEST
 format.
 
 =cut

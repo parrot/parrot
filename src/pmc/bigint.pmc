@@ -311,7 +311,6 @@ bigint_cmp_int(PARROT_INTERP, PMC *self, INTVAL value) {
 static void
 bigint_abs(PARROT_INTERP, PMC *self, PMC *dest) {
     BIGINT *bi_self, *bi_dest;
-    pmc_reuse(interp, dest, enum_class_BigInt, 0);
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_abs(bi_dest->b, bi_self->b);
@@ -320,7 +319,6 @@ bigint_abs(PARROT_INTERP, PMC *self, PMC *dest) {
 static void
 bigint_neg(PARROT_INTERP, PMC *self, PMC *dest) {
     BIGINT *bi_self, *bi_dest;
-    pmc_reuse(interp, dest, enum_class_BigInt, 0);
     GETATTR_BigInt_bi(interp, self, bi_self);
     GETATTR_BigInt_bi(interp, dest, bi_dest);
     mpz_neg(bi_dest->b, bi_self->b);
@@ -837,14 +835,14 @@ Decrements the integer.
     }
 
     MULTI PMC *add(BigInt value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_add_bigint(INTERP, SELF, value, dest);
         return dest;
     }
 
     MULTI PMC *add(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_add_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -859,7 +857,7 @@ Decrements the integer.
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_add_bigint_int(INTERP, SELF, value, dest);
         return dest;
@@ -893,20 +891,14 @@ Decrements the integer.
 
 
     MULTI PMC *subtract(BigInt value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_sub_bigint(INTERP, SELF, value, dest);
         return dest;
     }
 
     MULTI PMC *subtract(Integer value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_sub_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -921,10 +913,7 @@ Decrements the integer.
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_sub_bigint_int(INTERP, SELF, value, dest);
         return dest;
@@ -958,14 +947,14 @@ Decrements the integer.
 
 
     MULTI PMC *multiply(BigInt value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_mul_bigint(INTERP, SELF, value, dest);
         return dest;
     }
 
     MULTI PMC *multiply(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_mul_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -980,7 +969,7 @@ Decrements the integer.
     }
 
     VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_mul_bigint_int(INTERP, SELF, value, dest);
         return dest;
@@ -1011,10 +1000,7 @@ Decrements the integer.
     }
 
     VTABLE PMC *pow_int(INTVAL value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_pow_bigint_int(INTERP, SELF, value, dest);
         return dest;
@@ -1023,7 +1009,7 @@ Decrements the integer.
     MULTI PMC *pow(PMC *value, PMC *dest) {
         /* XXX only Integer RHS currently */
         const INTVAL r = VTABLE_get_integer(INTERP, value);
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_pow_bigint_int(INTERP, SELF, r, dest);
         return dest;
@@ -1031,10 +1017,7 @@ Decrements the integer.
 
     MULTI PMC *divide(BigInt value, PMC *dest) {
         BIGINT *bi;
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_div_bigint(INTERP, SELF, value, dest);
 #if 0
@@ -1050,10 +1033,7 @@ Decrements the integer.
     }
 
     MULTI PMC *divide(Integer value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_div_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -1068,10 +1048,7 @@ Decrements the integer.
     }
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_div_bigint_int(INTERP, SELF, value, dest);
         return dest;
@@ -1095,14 +1072,14 @@ Decrements the integer.
     }
 
     MULTI PMC *floor_divide(BigInt value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_fdiv_bigint(INTERP, SELF, value, dest);
         return dest;
     }
 
     MULTI PMC *floor_divide(Integer value, PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_fdiv_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -1117,10 +1094,7 @@ Decrements the integer.
     }
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_fdiv_bigint_int(INTERP, SELF, value, dest);
         return dest;
@@ -1146,20 +1120,14 @@ Decrements the integer.
     }
 
     MULTI PMC *modulus(BigInt value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_mod_bigint(INTERP, SELF, value, dest);
         return dest;
     }
 
     MULTI PMC *modulus(Integer value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_mod_bigint_int(INTERP, SELF, VTABLE_get_integer(interp, value), dest);
         return dest;
@@ -1229,7 +1197,7 @@ Sets C<dest> to the absolute value of SELF.
 */
 
     VTABLE PMC *absolute(PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_abs(INTERP, SELF, dest);
         return dest;
@@ -1253,7 +1221,7 @@ Set C<dest> to the negated value of C<SELF>.
 */
 
     VTABLE PMC *neg(PMC *dest) {
-        dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_neg(INTERP, SELF, dest);
         return dest;
@@ -1282,10 +1250,7 @@ Inplace shift left.
 */
 
     MULTI PMC *bitwise_shl(BigInt value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_bitwise_shl_bigint_int(INTERP, SELF,
                                       VTABLE_get_integer(INTERP, value),
@@ -1294,10 +1259,7 @@ Inplace shift left.
     }
 
     MULTI PMC *bitwise_shl(Integer value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_bitwise_shl_bigint_int(INTERP, SELF,
                 VTABLE_get_integer(interp, value), dest);
@@ -1312,10 +1274,7 @@ Inplace shift left.
     }
 
     VTABLE PMC *bitwise_shl_int(INTVAL value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_bitwise_shl_bigint_int(INTERP, SELF, value, dest);
         return dest;
@@ -1363,10 +1322,7 @@ Inplace shift left.
 */
 
     MULTI PMC *bitwise_shr(BigInt value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_bitwise_shr_bigint_int(INTERP, SELF,
                                       VTABLE_get_integer(INTERP, value),
@@ -1375,10 +1331,7 @@ Inplace shift left.
     }
 
     MULTI PMC *bitwise_shr(Integer value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_bitwise_shr_bigint_int(INTERP, SELF,
                 VTABLE_get_integer(interp, value), dest);
@@ -1394,10 +1347,7 @@ Inplace shift left.
     }
 
     VTABLE PMC *bitwise_shr_int(INTVAL value, PMC *dest) {
-        if (dest)
-            pmc_reuse(interp, dest, SELF->vtable->base_type, 0);
-        else
-            dest = pmc_new(INTERP, SELF->vtable->base_type);
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_bitwise_shr_bigint_int(INTERP, SELF, value, dest);
         return dest;

@@ -81,8 +81,6 @@ Writing tests in B<PIR> is more convenient. This is done with
 C<pir_output_is> and friends.
 
     pir_output_is(<<'CODE',<<'OUT','nothing useful');
-        .include 'library/config.pir'
-
         .sub main :main
             print "hi\n"
         .end

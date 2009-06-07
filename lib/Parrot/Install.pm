@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use File::Basename qw(dirname);
 use File::Copy;
-use File::Path; # mkpath
+use File::Path qw( mkpath );
 use File::Spec;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
@@ -175,9 +175,11 @@ B<Comment:>
 sub create_directories {
     my($destdir, $directories) = @_;
 
-    mkpath([
-        grep { ! -d } map { $destdir . $_ } keys %$directories
-    ],0,0777);
+    my @dirs_created = mkpath(
+        ( grep { ! -d } map { $destdir . $_ } keys %$directories ),
+        { mode => 0777 },
+    );
+    return 1;
 }
 
 =head2 C<install_files()>

@@ -20,7 +20,7 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(164)
+    plan(165)
 
     set_or_get_strings()
     setting_integers()
@@ -70,6 +70,7 @@ Tests the C<String> PMC.
     out_of_bounds_substr_negative_offset()
     exception_to_int_2()
     exception_to_int_3()
+    assign_null_string()
 
     # END_OF_TESTS
 
@@ -1017,6 +1018,20 @@ handler:
     .exception_is( 'invalid conversion to int - bad base 37' )
 .end
 
+.sub assign_null_string
+    .local pmc s
+    .local string m
+    s = new ['String']
+    null m
+    assign s, m
+    m = 'Any other thing'
+    m = s
+    $I0 = 0
+    if null m goto check
+    inc $I0
+check:
+    is( $I0, 0, 'assign null string, TT #729' )
+.end
 
 # Local Variables:
 #   mode: cperl
