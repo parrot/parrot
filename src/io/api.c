@@ -334,15 +334,18 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 {
     ASSERT_ARGS(Parrot_io_reads)
     STRING *result = NULL;
-    if (PMC_IS_NULL(pmc) || !VTABLE_does(interp, pmc, CONST_STRING(interp, "read")))
+    if (PMC_IS_NULL(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
     if (pmc->vtable->base_type == enum_class_FileHandle) {
-        INTVAL  ignored;
+        INTVAL ignored;
+        INTVAL flags;
+        GETATTR_FileHandle_flags(interp, pmc, flags);
 
-        if (Parrot_io_is_closed_filehandle(interp, pmc))
+        if (Parrot_io_is_closed_filehandle(interp, pmc)
+        || !(flags & PIO_F_READ))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
+                "Cannot read from a closed or non-readable filehandle");
 
         result = Parrot_io_make_string(interp, &result, length);
         result->bufused = length;
@@ -355,7 +358,7 @@ Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
     else if (pmc->vtable->base_type == enum_class_StringHandle) {
         STRING *string_orig;
         INTVAL offset;
-
+        /* TODO: Check that we are open for reading */
         GETATTR_StringHandle_stringhandle(interp, pmc, string_orig);
         if (STRING_IS_NULL(string_orig))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -494,8 +497,7 @@ PIOOFF_T
 Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *pmc), PIOOFF_T offset, INTVAL w)
 {
     ASSERT_ARGS(Parrot_io_seek)
-    if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "file")) 
-     || Parrot_io_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         return -1;
 
     return Parrot_io_seek_buffer(interp, pmc, offset, w);
@@ -517,12 +519,10 @@ PIOOFF_T
 Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_tell)
-    /* TODO: In the case where we don't have a FileHandle, call the "tell"
-       method */
-    if (pmc->vtable->base_type == enum_class_FileHandle
-     && !Parrot_io_is_closed(interp, pmc))
-        return Parrot_io_get_file_position(interp, pmc);
-    return -1;
+    if (Parrot_io_is_closed(interp, pmc))
+        return -1;
+
+    return Parrot_io_get_file_position(interp, pmc);
     /* return PIO_TELL(interp, pmc); */
 }
 
@@ -543,8 +543,7 @@ INTVAL
 Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *pmc), ARGOUT(STRING **buffer))
 {
     ASSERT_ARGS(Parrot_io_peek)
-    if (pmc->vtable->base_type != enum_class_FileHandle
-     || Parrot_io_is_closed(interp, pmc))
+    if (Parrot_io_is_closed(interp, pmc))
         return -1;
 
     return Parrot_io_peek_buffer(interp, pmc, buffer);
@@ -567,23 +566,24 @@ INTVAL
 Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_eof)
-    INTVAL flags;
+    INTVAL flags, result;
 
     /* io could be null here, but rather than return a negative error
      * we just fake EOF since eof test is usually in a boolean context.
      */
-    if (PMC_IS_NULL(pmc)
-     || pmc->vtable->base_type != enum_class_FileHandle
-     || Parrot_io_is_closed(interp, pmc))
+    if (PMC_IS_NULL(pmc))
         return 1;
-    if (Parrot_io_is_closed_filehandle(interp, pmc))
-        return 1;
+    if (pmc->vtable->base_type == enum_class_FileHandle) {
+        if (Parrot_io_is_closed_filehandle(interp, pmc))
+            return 1;
 
-    GETATTR_FileHandle_flags(interp, pmc, flags);
-    if (flags & PIO_F_EOF)
-        return 1;
-
-    return 0;
+        GETATTR_FileHandle_flags(interp, pmc, flags);
+        if (flags & PIO_F_EOF)
+            return 1;
+        return 0;
+    }
+    Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "eof"), "->I", &result);
+    return result;
 }
 
 /*
@@ -625,21 +625,22 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD_NULLOK(STRING *s))
     if (PMC_IS_NULL(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Cannot write to null PMC");
-    if (STRING_IS_NULL(s))
-        return 0;
-    /* TODO: No more pseudoroles. Fix this. */
-    if (!VTABLE_does(interp, pmc, CONST_STRING(interp, "write")))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Target PMC is not writable");
-    if (VTABLE_does(interp, pmc, CONST_STRING(interp, "file"))) {
+    if (pmc->vtable->base_type == enum_class_FileHandle) {
         INTVAL flags;
         GETATTR_FileHandle_flags(interp, pmc, flags);
 
+        if (!(flags & PIO_F_WRITE))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "FileHandle is not opened for writing");
+        if (STRING_IS_NULL(s))
+            return 0;
         if (Parrot_io_is_encoding(interp, pmc, CONST_STRING(interp, "utf8")))
             result = Parrot_io_write_utf8(interp, pmc, s);
         else
             result = Parrot_io_write_buffer(interp, pmc, s);
     }
+    else
+        Parrot_PCCINVOKE(interp, pmc, CONST_STRING(interp, "puts"), "S->I", s, &result);
 
     return result;
 
