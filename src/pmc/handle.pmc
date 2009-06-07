@@ -34,12 +34,6 @@ pmclass Handle provides Handle {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
-
-    VTABLE INTVAL does(STRING * role) {
-        if (Parrot_str_equal(interp, role, Parrot_str_new(INTERP, "IO", 2)))
-            return 1;
-        return 0;
-    }
 }
 
 /*

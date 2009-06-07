@@ -83,29 +83,6 @@ Create a copy of the stringhandle.
 
 /*
 
-=item <INTVAL does(STRING * role)>
-
-=cut
-
-*/
-
-    VTABLE INTVAL does(STRING * role) {
-        Parrot_StringHandle_attributes * const attrs = PMC_data(SELF);
-        if (Parrot_str_equal(INTERP, role, CONST_STRING(INTERP, "string")))
-            return 1;
-        if (attrs->flags != 0 && !STRING_IS_NULL(attrs->stringhandle)) {
-            if((attrs->flags & PIO_F_READ) && Parrot_str_equal(interp, role, CONST_STRING(INTERP, "read")))
-                return 1;
-            if((attrs->flags & PIO_F_WRITE) && Parrot_str_equal(interp, role, CONST_STRING(INTERP, "write")))
-                return 1;
-            if((attrs->flags & PIO_F_APPEND) && Parrot_str_equal(interp, role, CONST_STRING(INTERP, "append")))
-                return 1;
-        }
-        return SUPER(role);
-    }
-
-/*
-
 =item C<void mark()>
 
 Mark active stringhandle data as live.

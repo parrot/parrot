@@ -117,7 +117,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
-        ARGIN(STRING *path), ARGIN_NULLOK(STRING *mode))
+        ARGIN_NULLOK(STRING *path), ARGIN_NULLOK(STRING *mode))
 {
     ASSERT_ARGS(Parrot_io_open)
     PMC *new_filehandle, *filehandle;
@@ -133,6 +133,8 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
 
     flags = Parrot_io_parse_open_flags(interp, mode);
     if (new_filehandle->vtable->base_type == enum_class_FileHandle) {
+        /* TODO: StringHandle may have a null path, but a filehandle really
+           shouldn't allow that. */
         PARROT_ASSERT(new_filehandle->vtable->base_type == enum_class_FileHandle);
         filehandle = PIO_OPEN(interp, new_filehandle, path, flags);
         if (PMC_IS_NULL(filehandle))
