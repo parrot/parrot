@@ -1,12 +1,6 @@
-#! perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+#! parrot
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Test tests => 16;
 
 =head1 NAME
 
@@ -23,447 +17,395 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting array size" );
-    new P0, ['Array']
+.namespace []
 
-    set I0,P0
-    eq I0,0,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+.include "except_types.pasm"
+.include 'fp_equality.pasm'
 
-    set P0,1
-    set I0,P0
-    eq I0,1,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+.sub main :main
+    .include 'test_more.pir'
 
-    set P0,2
-    set I0,P0
-    eq I0,2,OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+    plan(64)
 
-    new P1, ['Integer']
-    set P1, 3
-    set P0,P1
-    set I0,P0
-    eq I0,3,OK_4
-    print "not "
-OK_4:    print "ok 4\n"
+    setting_array_size() # 4 tests
+    setting_first_element() # 3 tests
+    setting_second_element() # 3 tests
+    setting_out_of_bounds_element() # 2 tests
+    defined_sub() # 8 tests
+    exists_sub() # 6 tests
+    set_via_pmc_keys_access_via_ints() # 4 tests
+    set_via_ints_access_via_pmc_keys() # 4 tests
+    multikeyed_access_i_arg() # 5 tests
+    multikeyed_access_p_arg() # 5 tests
+    delete_sub() # 3 tests
+    check_whether_interface_is_done() # 3 tests
+    get_bool() # 4 tests
+    freeze_thaw() # 5 tests
+    array_comparison() # 5 tests
+.end
 
 
-        end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
+.sub setting_array_size
+    .local pmc foo, ifoo
+    .local int size
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting first element" );
-    new P0, ['Array']
-    set P0, 1
+    foo = new ['Array']
+    size = foo
+    is(size, 0, 'array size initialised to 0 correctly')
 
-    set P0[0],-7
-    set I0,P0[0]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    foo = 1
+    size = foo
+    is(size, 1, 'array size set to 1 correctly')
 
-    set P0[0],3.7
-    set N0,P0[0]
-    eq N0,3.7,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+    foo = 2
+    size = foo
+    is(size, 2, 'array size set to 2 correctly')
 
-    set P0[0],"Buckaroo"
-    set S0,P0[0]
-    eq S0,"Buckaroo",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+    ifoo = new ['Integer']
+    ifoo = 3
+    foo = ifoo
+    size = foo
+    is(size, 3, 'array size set to 3 correctly')
+.end
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub setting_first_element
+    .local pmc foo
+    .local int ival
+    .local num nval
+    .local string sval
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Setting second element" );
-    new P0, ['Array']
-    set P0, 2
+    foo = new ['Array']
+    foo = 1
 
-    set P0[1], -7
-    set I0, P0[1]
-    eq I0,-7,OK_1
-    print "not "
-OK_1:    print "ok 1\n"
+    foo[0] = -7
+    ival = foo[0]
+    is(ival, -7, 'array first element set to integer correctly')
 
-    set P0[1], 3.7
-    set N0, P0[1]
-    eq N0,3.7,OK_2
-    print "not "
-OK_2:    print "ok 2\n"
+    foo[0] = 3.7
+    nval = foo[0]
+    is(nval, 3.7, 'array first element set to number correctly')
 
-    set P0[1],"Buckaroo"
-    set S0, P0[1]
-    eq S0,"Buckaroo",OK_3
-    print "not "
-OK_3:    print "ok 3\n"
+    foo[0] = "Buckaroo"
+    sval = foo[0]
+    is(sval, "Buckaroo", 'array first element set to string correctly')
+.end
 
-    end
-CODE
-ok 1
-ok 2
-ok 3
-OUTPUT
+.sub setting_second_element
+    .local pmc foo
+    .local int ival
+    .local num nval
+    .local string sval
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Setting out-of-bounds elements" );
-    new P0, ['Array']
-    set P0, 1
+    foo = new ['Array']
+    foo = 2
 
-    set P0[1], -7
+    foo[1] = -7
+    ival = foo[1]
+    is(ival, -7, 'array second element set to integer correctly')
 
-    end
-CODE
-/^Array index out of bounds!
-current instr/
-OUTPUT
+    foo[1] = 3.7
+    nval = foo[1]
+    is(nval, 3.7, 'array second element set to number correctly')
 
-pasm_error_output_like( <<'CODE', <<'OUTPUT', "Getting out-of-bounds elements" );
-    new P0, ['Array']
-    set P0, 1
+    foo[1] = "Buckaroo"
+    sval = foo[1]
+    is(sval, "Buckaroo", 'array second element set to string correctly')
+.end
 
-    set I0, P0[1]
-    end
-CODE
-/^Array index out of bounds!
-current instr/
-OUTPUT
+.sub setting_out_of_bounds_element
+    .local pmc foo, eh
+    .local int ifoo
 
-pasm_output_is( <<'CODE', <<OUTPUT, "defined" );
-    new P0, ['Array']
-    defined I0, P0
-    print I0
-    print "\n"
-    defined I0, P1
-    print I0
-    print "\n"
-    set P0, 5
-    set P0[0], 1
-    defined I0, P0[0]
-    print I0
-    print "\n"
-    defined I0, P0[1]
-    print I0
-    print "\n"
-    defined I0, P0[100]
-    print I0
-    print "\n"
-    new P1, ['Undef']
-    set P0[2], P1
-    defined I0, P0[2]
-    print I0
-    print "\n"
-    new P2, ['Key']
-    set P2, 3
-    set P0[3], 4
-    defined I0, P0[P2]
-    print I0
-    print "\n"
-    set P2, 4
-    defined I0, P0[P2]
-    print I0
-    print "\n"
-    end
-CODE
-1
-0
-1
-0
-0
-0
-1
-0
-OUTPUT
+    foo = new ['Array']
+    foo = 1
 
-pasm_output_is( <<'CODE', <<OUTPUT, "exists" );
-    new P0, ['Array']
-    set P0, 5
-    set P0[0], 1
-    exists I0, P0[0]
-    print I0
-    print "\n"
-    exists I0, P0[1]
-    print I0
-    print "\n"
-    exists I0, P0[100]
-    print I0
-    print "\n"
-    new P1, ['Undef']
-    set P0[2], P1
-    exists I0, P0[2]
-    print I0
-    print "\n"
-    new P2, ['Key']
-    set P2, 3
-    set P0[3], 4
-    exists I0, P0[P2]
-    print I0
-    print "\n"
-    set P2, 4
-    exists I0, P0[P2]
-    print I0
-    print "\n"
-    end
-CODE
-1
-0
-0
-1
-1
-0
-OUTPUT
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_OUT_OF_BOUNDS)
+    set_addr eh, eh_label
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via PMC keys, access via INTs" );
-     .include 'fp_equality.pasm'
-     new P0, ['Array']
-     set P0, 4
-     new P1, ['Key']
+    foo[0] = 42
+    ifoo = foo[0]
+    is(ifoo, 42, 'array in-bounds element set correctly')
 
-     set P1, 0
-     set P0[P1], 25
+    push_eh eh
+      foo[1] = -7
+    pop_eh
 
-     set P1, 1
-     set P0[P1], 2.5
+    ok(0, 'setting_out_of_bounds_element')
+    goto end
 
-     set P1, 2
-     set P0[P1], "Squeek"
+eh_label:
+    .local string message
+    .get_results($P0)
+    message = $P0['message']
+    is(message, "Array index out of bounds!", 'setting_out_of_bounds_element')
 
-     set P1, 3
-     new P2, ['Hash']
-     set P2["a"], "apple"
-     set P0[P1], P2
+end:
+.end
 
-     set I0, P0[0]
-     eq I0, 25, OK1
-     print "not "
-OK1: print "ok 1\\n"
+.sub defined_sub
+    .local pmc foo, bar, baz
+    .local int ival
+    
+    foo = new ['Array']
+    defined ival, foo
+    is(ival, 1, 'newed array is defined')
 
-     set N0, P0[1]
-     .fp_eq_pasm(N0, 2.5, OK2)
-     print "not "
-OK2: print "ok 2\\n"
+    defined ival, bar
+    is(ival, 0, 'unreferenced pmc is undefined')
 
-     set S0, P0[2]
-     eq S0, "Squeek", OK3
-     print "not "
-OK3: print "ok 3\\n"
+    foo = 5
+    foo[0] = 1
+    defined ival, foo[0]
+    is(ival, 1, 'assigned array element is defined')
 
-     set P3, P0[3]
-     set S1, P3["a"]
-     eq S1, "apple", OK4
-     print "not "
-OK4: print "ok 4\\n"
+    defined ival, foo[1]
+    is(ival, 0, 'unassigned in-bounds array element is undefined')
 
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
+    defined ival, foo[100]
+    is(ival, 0, 'unassigned out-of-bounds array element is undefined')
 
-pasm_output_is( <<"CODE", <<'OUTPUT', "Set via INTs, access via PMC Keys" );
-     .include 'fp_equality.pasm'
-     new P0, ['Array']
-     set P0, 1024
+    bar = new ['Undef']
+    foo[2] = bar
+    defined ival, foo[2]
+    is(ival, 0, 'assigned undef pmc is undefined')
 
-     set P0[25], 125
-     set P0[128], -9.9
-     set P0[513], "qwertyuiopasdfghjklzxcvbnm"
-     new P1, ['Integer']
-     set P1, 123456
-     set P0[1023], P1
+    baz = new ['Key']
+    baz = 3
+    foo[3] = 4
+    defined ival, foo[baz]
+    is(ival, 1, 'defined keyed array element is defined')
 
-     new P2, ['Key']
-     set P2, 25
-     set I0, P0[P2]
-     eq I0, 125, OK1
-     print "not "
-OK1: print "ok 1\\n"
+    baz = 4
+    defined ival, foo[baz]
+    is(ival, 0, 'undefined keyed array element is defined')
+.end
 
-     set P2, 128
-     set N0, P0[P2]
-     .fp_eq_pasm(N0, -9.9, OK2)
-     print "not "
-OK2: print "ok 2\\n"
+.sub exists_sub
+    .local pmc foo, bar, baz
+    .local int ival
 
-     set P2, 513
-     set S0, P0[P2]
-     eq S0, "qwertyuiopasdfghjklzxcvbnm", OK3
-     print "not "
-OK3: print "ok 3\\n"
+    foo = new ['Array']
+    foo = 5
+    foo[0] = 1
+    exists ival, foo[0]
+    is(ival, 1, 'assigned array element exists')
 
-     set P2, 1023
-     set P3, P0[P2]
-     set I1, P3
-     eq I1, 123456, OK4
-     print "not "
-OK4: print "ok 4\\n"
+    exists ival, foo[1]
+    is(ival, 0, 'unassigned in-bounds array element does not exist')
 
-     end
-CODE
-ok 1
-ok 2
-ok 3
-ok 4
-OUTPUT
+    exists ival, foo[100]
+    is(ival, 0, 'unassigned out-of-bounds array element does not exist')
 
-pasm_output_is( <<'CODE', <<OUT, "multikeyed access I arg" );
-    new P0, ['Array']
-    set P0, 1
-    new P1, ['Array']
-    set P1, 1
-    set P0[0], P1
-    set P0[0;0], 20
-    set P2, P0[0]
-    typeof S0, P2
-    print S0
-    print "\n"
-    set I2, P0[0;0]
-    print I2
-    set I3, 0
-    set I2, P0[I3;0]
-    print I2
-    set I2, P0[0;I3]
-    print I2
-    set I2, P0[I3;I3]
-    print I2
-    print "\n"
-    end
-CODE
-Array
-20202020
-OUT
+    bar = new ['Undef']
+    foo[2] = bar
+    exists ival, foo[2]
+    is(ival, 1, 'assigned undef array element exists')
 
-pasm_output_is( <<'CODE', <<OUT, "multikeyed access P arg" );
-    new P0, ['Array']
-    set P0, 1
-    new P1, ['Array']
-    set P1, 1
-    new P3, ['Integer']
-    set P3, 20
-    set P0[0], P1
-    set P0[0;0], P3
-    set P2, P0[0]
-    typeof S0, P2
-    print S0
-    print "\n"
-    set I2, P0[0;0]
-    print I2
-    set I3, 0
-    set I2, P0[I3;0]
-    print I2
-    set I2, P0[0;I3]
-    print I2
-    set I2, P0[I3;I3]
-    print I2
-    print "\n"
-    end
-CODE
-Array
-20202020
-OUT
+    baz = new ['Key']
+    baz = 3
+    foo[3] = 4
+    exists ival, foo[baz]
+    is(ival, 1, 'defined keyed array element exists')
 
-pasm_output_is( <<'CODE', <<OUT, "delete" );
-    new P0, ['Array']
-    set P0, 3
-    set P0[0], 10
-    set P0[1], 20
-    set P0[2], 30
+    baz = 4
+    exists ival, foo[baz]
+    is(ival, 0, 'undefined keyed array element does not exist')
+.end
 
-    delete P0[1]
-    set I0, P0
-    print I0
+.sub set_via_pmc_keys_access_via_ints
+    .local pmc foo, bar, baz, faz
+    .local int ival
+    .local num nval
+    .local string sval, inner
+   
+    foo = new ['Array']
+    foo = 4
+    bar = new ['Key']
 
-    set I0, P0[0]
-    print I0
-    set I0, P0[1]
-    print I0
-    print "\n"
-    end
-CODE
-21030
-OUT
+    bar = 0
+    foo[bar] = 25
+    ival = foo[0]
+    is(ival, 25, 'integer element can be retrieved from array')
 
-pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
+    bar = 1
+    foo[bar] = 2.5
+    nval = foo[1]
+    is(nval, 2.5, 'number element can be retrieved from array')
 
-.sub _main
+    bar = 2
+    foo[bar] = "Squeek"
+    sval = foo[2]
+    is(sval, "Squeek", 'string element can be retrieved from array')
+
+    bar = 3
+    baz = new ['Hash']
+    baz["a"] = "apple"
+    foo[bar] = baz
+
+    faz = foo[3]
+    inner = faz["a"]
+    is(inner, "apple", 'inner string element can be retrieved from array')
+.end
+
+.sub set_via_ints_access_via_pmc_keys
+    .local pmc foo, bar, baz, faz
+    .local int ival, inner
+    .local num nval
+    .local string sval
+
+    foo = new ['Array']
+    foo = 1024
+
+    foo[25] = 125
+    foo[128] = -9.9
+    foo[513] = "qwertyuiopasdfghjklzxcvbnm"
+    bar = new ['Integer']
+    bar = 123456
+    foo[1023] = bar
+
+    baz = new ['Key']
+    baz = 25
+
+    ival = foo[baz]
+    is(ival, 125, 'integer element can be retrieved from array')
+
+    baz = 128
+    nval = foo[baz]
+    is(nval, -9.9, 'number element can be retrieved from array')
+
+    baz = 513
+    sval = foo[baz]
+    is(sval, "qwertyuiopasdfghjklzxcvbnm", 'string element can be retrieved from array')
+
+    baz = 1023
+    faz = foo[baz]
+    inner = faz
+    is(inner, 123456, 'indirect integer element can be retrieved from array')
+.end
+
+.sub multikeyed_access_i_arg
+    .local pmc foo, bar, baz
+    .local int ival, inum
+    .local string pmctype
+
+    foo = new ['Array']
+    foo = 1
+    bar = new ['Array']
+    bar = 1
+
+    foo[0] = bar
+    foo[0;0] = 20
+    baz = foo[0]
+    typeof pmctype, baz
+    is(pmctype, 'Array', 'pmc is an array')
+
+    ival = foo[0;0]
+    is(ival, 20, 'access to array via [int;int] works correctly')
+
+    inum = 0
+    ival = foo[inum;0]
+    is(ival, 20, 'access to array via [var;int] works correctly')
+
+    ival = foo[0;inum]
+    is(ival, 20, 'access to array via [int;var] works correctly')
+
+    ival = foo[inum;inum]
+    is(ival, 20, 'access to array via [var;var] works correctly')
+.end
+
+.sub multikeyed_access_p_arg
+    .local pmc foo, bar, baz, faz
+    .local int ival, inum
+    .local string pmctype
+
+    foo = new ['Array']
+    foo = 1
+    bar = new ['Array']
+    bar = 1
+
+    faz = new ['Integer']
+    faz = 20
+    foo[0] = bar
+    foo[0;0] = faz
+    baz = foo[0]
+    typeof pmctype, baz
+    is(pmctype, 'Array', 'pmc is an array')
+
+    ival = foo[0;0]
+    is(ival, 20, 'access to array via [int;int] works correctly')
+
+    inum = 0
+    ival = foo[inum;0]
+    is(ival, 20, 'access to array via [var;int] works correctly')
+
+    ival = foo[0;inum]
+    is(ival, 20, 'access to array via [int;var] works correctly')
+
+    ival = foo[inum;inum]
+    is(ival, 20, 'access to array via [var;var] works correctly')
+.end
+
+.sub delete_sub
+    .local pmc foo
+    .local int ival
+
+    foo = new ['Array']
+    foo = 3
+    foo[0] = 10
+    foo[1] = 20
+    foo[2] = 30
+
+    delete foo[1]
+    ival = foo
+    is(ival, 2, 'array with deleted element correctly sized')
+
+    ival = foo[0]
+    is(ival, 10, 'array with deleted element has correct first element')
+
+    ival = foo[1]
+    is(ival, 30, 'array with deleted element has correct first element')
+.end
+
+.sub check_whether_interface_is_done
     .local pmc pmc1
     pmc1 = new ['Array']
     .local int bool1
     does bool1, pmc1, "scalar"
-    print bool1
-    print "\n"
+    is(bool1, 0, 'pmc array does not do scalar correctly')
+
     does bool1, pmc1, "array"
-    print bool1
-    print "\n"
+    is(bool1, 1, 'pmc array does array correctly')
+
     does bool1, pmc1, "no_interface"
-    print bool1
-    print "\n"
-    end
+    is(bool1, 0, 'pmc array does not do no_interface correctly')
 .end
-CODE
-0
-1
-0
-OUTPUT
 
-
-pir_output_is( << 'CODE', << 'OUTPUT', "get_bool" );
-
-.sub _main
+.sub get_bool
     .local pmc p
     .local int i
+
     p = new ['Array']
-
-    if p goto L1
-    print "not "
-L1: say "true"
-
+    is(p, 0, 'newed array is not true correctly')
+    
     p = 4
-
-    if p goto L2
-    print "is not "
-L2: say "true"
-
+    is(p, 4, 'resized array is true correctly')
 
     p[0] = 2
-    if p goto L3
-    print "not "
-L3: say "true"
+    is(p, 4, 'assigned array is true correctly')
 
     p = new ['Array']
     p = 0
-    if p goto L4
-    print "not "
-L4: say "true"
-
+    is(p, 0, 'newed array set to zero length is not true correctly')
 .end
-CODE
-not true
-true
-true
-not true
-OUTPUT
 
-TODO: {
-    local $TODO = "freeze/thaw known to be broken";
-pir_output_is( << 'CODE', << 'OUTPUT', "freeze/thaw" );
-.sub main
+
+.sub freeze_thaw
     .local pmc p, it, val
     .local string s
+
+    .local string reason
+    reason = "freeze/thaw known to be broken"
 
     p = new ['Array']
 
@@ -478,70 +420,77 @@ pir_output_is( << 'CODE', << 'OUTPUT', "freeze/thaw" );
 
     it = iter p
 
-iter_loop:
-    unless it goto iter_end
     val = shift it
-    print val
-    print "\n"
-    goto iter_loop
+    #is(val, '"p"', 'first thawed array element accessed correctly')
+    unless null val goto NOT_NULL_1
+        val = new 'String'
+  NOT_NULL_1:
+    $I0 = cmp val, '"p"'
+    $I0 = not $I0
+    todo($I0, 'first thawed array element accessed correctly', reason)
 
-iter_end:
+    val = shift it
+    #is(val, '-3', 'second thawed array element accessed correctly')
+    unless null val goto NOT_NULL_2
+        val = new 'String'
+  NOT_NULL_2:
+    $I0 = cmp val, -3
+    $I0 = not $I0
+    todo($I0, 'second thawed array element accessed correctly', reason)
 
+    val = shift it
+    #is(val, '9999', 'third thawed array element accessed correctly')
+    unless null val goto NOT_NULL_3
+        val = new 'String'
+  NOT_NULL_3:
+    $I0 = cmp val, '9999'
+    $I0 = not $I0
+    todo($I0, 'third thawed array element accessed correctly', reason)
+
+    val = shift it
+    #is(val, 'foo', 'fourth thawed array element accessed correctly')
+    unless null val goto NOT_NULL_4
+        val = new 'String'
+  NOT_NULL_4:
+    $I0 = cmp val, 'foo'
+    $I0 = not $I0
+    todo($I0, 'fourth thawed array element accessed correctly', reason)
+
+    val = shift it
+    #is(val, '2', 'fifth thawed array element accessed correctly')
+    unless null val goto NOT_NULL_5
+        val = new 'String'
+  NOT_NULL_5:
+    $I0 = cmp val, '2'
+    $I0 = not $I0
+    todo($I0, 'fifth thawed array element accessed correctly', reason)
 .end
-CODE
-p
--3
-9999
-foo
-2
-OUTPUT
-}
 
-pir_output_is( << 'CODE', << 'OUTPUT', "array comparison" );
-.sub main
+.sub array_comparison
     .local pmc a1, a2
     .local int i
 
     a1 = new ['Array']
     a2 = new ['Array']
 
-    if a1 == a2 goto L1
-    print "not "
-L1: say "equal"
+    is(a1, a2, 'two newed arrays are equal correctly')
 
     a1 = 4
-
-    if a1 == a2 goto L2
-    print "not "
-L2: say "equal"
+    isnt(a1, a2, 'a sized array is not the same as a newed array correctly')
 
     a2 = 4
+    is(a1, a2, 'two identically sized arrays are equal correctly')
 
     a1[0] = "foo"
     a2[0] = "foo"
-
-    if a1 == a2 goto L3
-    print "not "
-L3: say "equal"
+    is(a1, a2, 'two identically assigned arrays are equal correctly')
 
     a1[1] = 234
     a2[1] = 234
     a1[3] = "bar"
     a2[3] = "bar"
-
-    if a1 == a2 goto L4
-    print "not "
-L4: say "equal"
-
+    is(a1, a2, 'two identically assigned arrays are equal correctly')
 .end
-CODE
-equal
-not equal
-equal
-equal
-OUTPUT
-
-1;
 
 # Local Variables:
 #   mode: cperl
