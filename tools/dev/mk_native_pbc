@@ -139,6 +139,18 @@ perl t/harness t/native_pbc/integer.t && \
     perl t/harness t/native_pbc/number.t && \
     perl t/harness t/native_pbc/string.t
 
+./parrot -o t/native_pbc/annotations.pbc - <<EOF
+.sub 'main'
+.annotate "file", "annotations.pir"
+.annotate "creator", "Parrot Foundation"
+.annotate "line", 1
+    say "Hi"
+    say "line"
+.annotate "line", 2
+    .return ()
+.end
+EOF
+
 if [ "$enable_long_double" = "1" ]; then
     if [ "$1" = "--noconf" ]; then
       echo "Hmm. You have no long double, and we want to try --floatval=long double"
