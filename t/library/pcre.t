@@ -57,7 +57,7 @@ SKIP: {
     .local pmc lib_paths
     lib_paths = interp[.IGLOBALS_LIB_PATHS]
 
-    # XXX - hard-coded magic constant (should be PARROT_LIB_PATH_DYNEXT)
+    # TT #747 - hard-coded magic constant (should be PARROT_LIB_PATH_DYNEXT)
     .local pmc dynext_path
     dynext_path = lib_paths[2]
     unshift dynext_path, '$pcre_libpath'
