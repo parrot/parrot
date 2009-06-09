@@ -31,24 +31,11 @@ extern "C" {
 #endif
 #endif
 
-#ifdef PIO_OS_WIN32
-#  define PIO_INVALID_HANDLE INVALID_HANDLE_VALUE
-#endif
-
-#ifdef PIO_OS_UNIX
-#  define PIO_INVALID_HANDLE -1
-#endif
-
-#ifdef PIO_OS_STDIO
-#  define PIO_INVALID_HANDLE NULL
-#endif
-
-pmclass FileHandle need_ext {
+pmclass FileHandle extends Handle {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */
     ATTR STRING *mode;                /* The mode string used in open */
     ATTR STRING *encoding;            /* The encoding for read/write  */
-    ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
     ATTR INTVAL process_id;           /* Child process on pipes       */
     ATTR PIOOFF_T file_size;          /* Current file size            */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
@@ -248,10 +235,9 @@ filehandle, rather than modifying the invocant).
 */
 
     METHOD open(STRING *filename :optional, INTVAL got_filename :opt_flag,
-                STRING *mode :optional, INTVAL got_mode :opt_flag) {
+        STRING *mode :optional, INTVAL got_mode :opt_flag) {
         PMC *filehandle;
         STRING *open_filename, *open_mode;
-        INTVAL flags;
 
         if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -278,16 +264,7 @@ filehandle, rather than modifying the invocant).
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
-        flags = Parrot_io_parse_open_flags(interp, open_mode);
-        SET_ATTR_flags(INTERP, SELF, flags);
-        filehandle = PIO_OPEN(INTERP, SELF, open_filename, flags);
-
-        if (PMC_IS_NULL(filehandle))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Unable to open filehandle from path '%S'",
-                open_filename);
-
-        Parrot_io_setbuf(interp, filehandle, PIO_UNBOUND);
+        filehandle = Parrot_io_open(INTERP, SELF, open_filename, open_mode);
 
         RETURN(PMC *filehandle);
     }
@@ -316,7 +293,7 @@ Close the filehandle.
 
     METHOD close() {
         INTVAL status;
-        status = Parrot_io_close_filehandle(interp, SELF);
+        status = Parrot_io_close(INTERP, SELF);
         RETURN(INTVAL status);
     }
 
@@ -332,7 +309,7 @@ Test if the filehandle is closed.
 
     METHOD is_closed() {
         INTVAL status;
-        status = Parrot_io_is_closed_filehandle(interp, SELF);
+        status = Parrot_io_is_closed(interp, SELF);
         RETURN(INTVAL status);
     }
 
@@ -348,19 +325,7 @@ Read the given number of bytes from the filehandle and return them in a string.
 
     METHOD read(INTVAL length) {
         STRING *string_result = NULL;
-        INTVAL  ignored;
-
-        if (Parrot_io_is_closed_filehandle(interp, SELF))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-
-        string_result = Parrot_io_make_string(interp, &string_result, length);
-        string_result->bufused = length;
-
-        if (Parrot_io_is_encoding(interp, SELF, CONST_STRING(interp, "utf8")))
-            ignored = Parrot_io_read_utf8(interp, SELF, &string_result);
-        else
-            ignored = Parrot_io_read_buffer(interp, SELF, &string_result);
+        string_result = Parrot_io_reads(INTERP, SELF, length);
 
         RETURN(STRING *string_result);
     }
@@ -377,11 +342,7 @@ Read a line from the filehandle and return it in a string.
 
     METHOD readline() {
         STRING *string_result;
-        if (!(PARROT_FILEHANDLE(SELF)->flags & PIO_F_LINEBUF))
-            Parrot_io_setlinebuf(INTERP, SELF);
-
-        string_result = Parrot_io_reads(INTERP, SELF, 0);
-
+        string_result = Parrot_io_readline(INTERP, SELF);
         RETURN(STRING *string_result);
     }
 
@@ -471,6 +432,7 @@ filehandle when finished.
                                 "Cannot readall on a new file from an already open filehandle");
             }
             filehandle  = Parrot_io_open(INTERP, PMCNULL, name, NULL);
+            PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
             SET_ATTR_encoding(INTERP, filehandle, encoding);
             size = (size_t)(Parrot_stat_info_intval(INTERP, name, STAT_FILESIZE));
 
@@ -513,7 +475,7 @@ Flushes the filehandle.
 */
 
     METHOD flush() {
-        Parrot_io_flush_filehandle(interp, SELF);
+        Parrot_io_flush(INTERP, SELF);
     }
 
 /*
@@ -544,30 +506,8 @@ Print the string to the filehandle.
 */
 
     METHOD puts(STRING *to_print) {
-        INTVAL flags, status;
-        if (Parrot_io_is_closed_filehandle(interp, SELF))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot write to a closed filehandle");
-
-        GET_ATTR_flags(INTERP, SELF, flags);
-        if (!(flags & PIO_F_WRITE))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot write to a filehandle not opened for write");
-
-        if (STRING_IS_NULL(to_print))
-            RETURN(INTVAL 0);
-
-#if ! DISABLE_GC_DEBUG
-        /* trigger GC for debug - but not during tests */
-        if (0 && GC_DEBUG(interp))
-            Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
-#endif
-
-        if (Parrot_io_is_encoding(interp, SELF, CONST_STRING(interp, "utf8")))
-            status = Parrot_io_write_utf8(interp, SELF, to_print);
-        else
-            status = Parrot_io_write_buffer(interp, SELF, to_print);
-
+        INTVAL status;
+        status = Parrot_io_putps(INTERP, SELF, to_print);
         RETURN(INTVAL status);
     }
 
@@ -707,14 +647,8 @@ Returns true if the filehandle is at end-of-file, returns false otherwise.
 
     METHOD eof() {
         INTVAL flags;
-        if (Parrot_io_is_closed_filehandle(interp, SELF))
-            RETURN(INTVAL 1);
-
-        GET_ATTR_flags(INTERP, SELF, flags);
-        if (flags & PIO_F_EOF)
-            RETURN(INTVAL 1);
-
-        RETURN(INTVAL 0);
+        flags = Parrot_io_eof(INTERP, SELF);
+        RETURN(INTVAL flags);
     }
 
 

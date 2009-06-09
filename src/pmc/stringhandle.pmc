@@ -46,7 +46,7 @@ static int encoding_is_utf8(PARROT_INTERP, ARGIN_NULLOK(STRING *s))
         return Parrot_str_equal(interp, s, CONST_STRING(interp, "utf8"));
 }
 
-pmclass StringHandle need_ext {
+pmclass StringHandle extends Handle need_ext {
     ATTR INTVAL  flags;               /* Filehandle flags             */
     ATTR STRING *stringhandle;        /* The string data              */
     ATTR STRING *mode;                /* The mode string used in open */
@@ -220,8 +220,7 @@ stored for mocking.
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
-        flags = Parrot_io_parse_open_flags(interp, open_mode);
-        SET_ATTR_flags(INTERP, SELF, flags);
+        Parrot_io_open(INTERP, SELF, filename, open_mode);
 
         RETURN(PMC *SELF);
     }
@@ -266,13 +265,9 @@ Check if the StringHandle is open.
 */
 
     METHOD is_closed() {
-        STRING *stringhandle;
-        GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
-
-        if (STRING_IS_NULL(stringhandle))
-            RETURN(INTVAL 1);
-
-        RETURN(INTVAL 0);
+        INTVAL status;
+        status = Parrot_io_is_closed(INTERP, SELF);
+        RETURN(INTVAL status);
     }
 
 /*
@@ -287,32 +282,8 @@ C<bytes> argument is currently ignored.
 */
 
     METHOD read(INTVAL length) {
-        STRING *string_result, *string_orig;
-        INTVAL offset;
-
-        GET_ATTR_stringhandle(INTERP, SELF, string_orig);
-        if (STRING_IS_NULL(string_orig))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-
-        if (length == 0)
-            string_result = Parrot_str_copy(INTERP, string_orig);
-        else {
-            INTVAL orig_length, read_length;
-            read_length = length;
-            orig_length = Parrot_str_byte_length(INTERP, string_orig);
-
-            GET_ATTR_read_offset(INTERP, SELF, offset);
-
-            /* Only read to the end of the string data. */
-            if (offset + read_length > orig_length)
-                read_length = orig_length - offset;
-
-            string_result = Parrot_str_substr(INTERP, string_orig, offset,
-                    read_length, NULL, 0);
-            SET_ATTR_read_offset(INTERP, SELF, offset + read_length);
-        }
-
+        STRING *string_result;
+        string_result = Parrot_io_reads(INTERP, SELF, length);
         RETURN(STRING *string_result);
     }
 
@@ -329,27 +300,7 @@ responds to "\n" newlines.)
 
     METHOD readline() {
         STRING *string_result;
-        INTVAL offset, newline_pos, read_length, orig_length;
-
-        GET_ATTR_stringhandle(INTERP, SELF, string_result);
-        if (STRING_IS_NULL(string_result))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Cannot read from a closed filehandle");
-
-        orig_length = Parrot_str_byte_length(INTERP, string_result);
-        GET_ATTR_read_offset(INTERP, SELF, offset);
-        newline_pos = Parrot_str_find_index(INTERP, string_result, CONST_STRING(INTERP, "\n"), offset);
-
-        /* No newline found, read the rest of the string. */
-        if (newline_pos == -1)
-            read_length = orig_length - offset;
-        else
-            read_length = newline_pos - offset + 1; /* +1 to include the newline */
-
-        string_result = Parrot_str_substr(INTERP, string_result, offset,
-                read_length, NULL, 0);
-        SET_ATTR_read_offset(INTERP, SELF, newline_pos + 1);
-
+        string_result = Parrot_io_readline(INTERP, SELF);
         RETURN(STRING *string_result);
     }
 
@@ -393,7 +344,7 @@ Clear the StringHandle by resetting it to a null value.
 */
 
     METHOD flush() {
-        SET_ATTR_stringhandle(INTERP, SELF, NULL);
+        Parrot_io_flush(INTERP, SELF);
     }
 
 /*
