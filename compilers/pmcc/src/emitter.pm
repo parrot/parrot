@@ -69,6 +69,15 @@ method set_filename($name) {
     our $?filename := $name;
 }
 
+method vtable_info() {
+    our $?vtable_info;
+    $?vtable_info;
+}
+
+method set_vtable_info($info) {
+    our $?vtable_info := $info;
+}
+
 
 # Get (specific) PMC emitter
 # Try to create specific emitter. In case of failure create generic one.

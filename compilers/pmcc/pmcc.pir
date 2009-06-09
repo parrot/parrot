@@ -80,8 +80,10 @@
 
     vtdump_filename = adverbs['vtdump']
     if vtdump_filename != '' goto read_dump
-    $P0 = getstderr
-    print $P0, "Error: no vtable.freeze specified."
+    #temporary code to make manually running pmcc simpler
+    vtdump_filename = '../../vtable.frozen'
+    #$P0 = getstderr
+    #print $P0, "Error: no vtable.freeze specified."
   read_dump:
     $P0 = new ['FileHandle']
     vtdump_str = $P0.'readall'(vtdump_filename)
@@ -91,14 +93,14 @@
     $P0          = get_hll_global ['PMC';'Emitter'], '$?pmc_name'
     pmc_name = $P0
 
+    #XXX: Splitting paths based on '/' is too simplistic.
     pmc_dir = pmc_filename
     $P1 = split '/', pmc_dir
     $I0 = $P1
     delete $P1[$I0]
     pmc_dir = join '/', $P1
 
-    $I0 = pmc_dir
-    unless $I0 == 0 goto emit_files
+    unless pmc_dir == '' goto emit_files
     pmc_dir = '.'
 
   emit_files:  
@@ -106,6 +108,7 @@
     .local string dump_contents, c_contents, header_contents
 
     emitter = new ['PMC';'Emitter']
+    emitter.'set_vtable_info'(vtdump)
 
     c_filename = concat pmc_dir, '/'
     c_filename = concat c_filename, pmc_name

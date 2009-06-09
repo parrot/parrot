@@ -18,7 +18,7 @@
 
     say generated
 
-    like($S0, "'Parrot_default_get_vtable'", "Parrot_default_get_vtable generated") 
+    like(generated, "'Parrot_default_get_vtable'", "Parrot_default_get_vtable generated") 
 .end
 
 # Don't forget to update plan!

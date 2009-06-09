@@ -23,7 +23,7 @@ method generate_header() {
         '#ifndef ' ~ $guard ~ "\n",
         '#define ' ~ $guard ~ "\n\n",
 
-        self.generate_header_functions(), "\n",
+        self.generate_vtable_function_prototypes(), "\n",
 
         self.generate_attr_struct(), "\n",
 
@@ -467,7 +467,7 @@ method vtables() {
 method generate_signature($entry, $prefix) {
     my @res;
 
-    @res.push('PARROT_EXPORT ' ~ $entry.returns() ~ ' Parrot_' ~ self.name ~ '_' ~ $entry.name);
+    @res.push('static ' ~ $entry.returns() ~ ' Parrot_' ~ self.name ~ '_' ~ $entry.name);
 
     @res.push('(PARROT_INTERP');
     for @($entry<parameters>) {
@@ -476,6 +476,17 @@ method generate_signature($entry, $prefix) {
     @res.push(')');
 
     join('', @res);
+}
+
+method generate_vtable_function_prototypes() {
+    my @res;
+
+    @res.push('PARROT_EXPORT VTABLE* Parrot_'~ self.name ~ '_update_vtable(ARGMOD(VTABLE*));');
+    @res.push('PARROT_EXPORT VTABLE* Parrot_'~ self.name ~ '_ro_update_vtable(ARGMOD(VTABLE*));');
+    @res.push('PARROT_EXPORT VTABLE* Parrot_'~ self.name ~ '_get_vtable(ARGMOD(VTABLE*));');
+    @res.push('PARROT_EXPORT VTABLE* Parrot_'~ self.name ~ '_ro_get_vtable(ARGMOD(VTABLE*));');
+
+    join("\n", @res);
 }
 
 =item C<pre_method_gen>
