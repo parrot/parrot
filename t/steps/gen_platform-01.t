@@ -120,7 +120,7 @@ my $cwd = cwd();
     chdir $tdir or croak "Unable to change to temporary directory";
     $conf->data->set( platform_asm => 1 );
     my $platform = 'aix';
-    mkpath( 'src', 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( 'src', { mode => 0755 } ) or croak "Unable to make testing directory";
     my $asmfile = File::Spec->catfile( 'src', 'platform_asm.s' );
     open my $FH, '>', $asmfile or croak "Unable to open handle for writing";
     print $FH "Hello asm\n";
@@ -140,7 +140,7 @@ $conf->data->set( platform_asm => $platform_asm_orig );
     $conf->data->set( platform_asm => 1 );
     my $platform = 'aix';
 
-    mkpath( 'src', 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( 'src', { mode => 0755 } ) or croak "Unable to make testing directory";
 
     my $asmfile = File::Spec->catfile( 'src', 'platform_asm.s' );
     open my $FH, '>', $asmfile or croak "Unable to open handle for writing";
@@ -148,7 +148,7 @@ $conf->data->set( platform_asm => $platform_asm_orig );
     close $FH or croak "Unable to close handle after writing";
 
     my $path = File::Spec->catdir( 'config', 'gen', 'platform', $platform );
-    mkpath( $path, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $path, { mode => 0755 } ) or croak "Unable to make testing directory";
 
     my $configfile = File::Spec->catfile( $path, 'asm.s' );
     open my $FH2, '>', $configfile or croak "Unable to open handle for writing";
@@ -172,12 +172,12 @@ $conf->data->set( platform_asm => $platform_asm_orig );
     my $platform = 'darwin';
 
     my $path = File::Spec->catdir( 'config', 'gen', 'platform', $platform );
-    mkpath( $path, 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( $path, { mode => 0755 } ) or croak "Unable to make testing directory";
     copy qq{$cwd/config/gen/platform/$platform/begin.c},
         qq{$path/begin.c}
             or croak "Unable to copy file for testing";
 
-    mkpath( 'src', 0, 755 ) or croak "Unable to make testing directory";
+    mkpath( 'src', { mode => 0755 } ) or croak "Unable to make testing directory";
     my $plat_c = q{src/platform.c};
     open my $PLATFORM_C, '>', $plat_c
         or croak "Unable to open handle for writing";

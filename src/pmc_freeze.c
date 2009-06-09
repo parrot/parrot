@@ -742,8 +742,11 @@ static void
 op_append(PARROT_INTERP, ARGIN(STRING *s), opcode_t b, size_t len)
 {
     ASSERT_ARGS(op_append)
+    char *str_pos;
+
     op_check_size(interp, s, len);
-    *((opcode_t *)((ptrcast_t)s->strstart + s->bufused)) = b;
+    str_pos = s->strstart + s->bufused;
+    *((opcode_t *)(str_pos)) = b;
     s->bufused += len;
     s->strlen += len;
 }

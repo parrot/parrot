@@ -16,6 +16,8 @@
 typedef FILE* PIOHANDLE;
 typedef long PIOOFF_T;
 
+#define PIO_INVALID_HANDLE NULL
+
 /* HEADERIZER BEGIN: src/io/portable.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 

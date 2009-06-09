@@ -39,7 +39,7 @@ given character set. So in ASCII, the character C<A> has codepoint 0x41.
 An encoding determines how a codepoint is represented inside a computer.
 Simple encodings like ASCII define that the codepoints 0-127 simply
 live as their numeric equivalents inside an eight-bit bytes. Other
-fixed-width encodings like UTF-16 use more bytes to encode more
+fixed-width encodings like UCS-2 use more bytes to encode more
 codepoints. Variable-width encodings like UTF-8 use one byte for
 codepoints 0-127, two bytes for codepoints 127-2047, and so on.
 

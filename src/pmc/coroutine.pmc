@@ -149,7 +149,7 @@ Swaps the "context".
             caller_ctx = CONTEXT(interp);
             ctx        = Parrot_set_new_context(INTERP, co->n_regs_used);
 
-            co->ctx                   = ctx;
+            co->ctx                   = Parrot_context_ref(interp, ctx);
             co->dynamic_state         = interp->dynamic_env;
 
             ctx->caller_ctx           = caller_ctx;

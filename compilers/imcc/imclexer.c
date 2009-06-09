@@ -3601,7 +3601,7 @@ YY_RULE_SETUP
         YYCHOP();
 
         if (valp)
-            valp->s = yytext;
+            valp->s = str_dup(yytext);
 
         return LABEL;
     }

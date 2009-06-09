@@ -84,12 +84,6 @@ void Parrot_set_config_hash(void);
 
 int Parrot_revision(void);
 
-/* Deprecated */
-
-/* with 0.9.1 TT #266 */
-#define Parrot_readbc(i, c)  Parrot_pbc_read((i), (c), 0)
-#define Parrot_loadbc(i, pf) Parrot_pbc_load((i), (pf))
-
 #endif /* PARROT_EMBED_H_GUARD */
 
 /*

@@ -128,7 +128,8 @@ A newline is automatically added to the end of the fmt.
     if ('\n' != Parrot_str_indexed(INTERP, fmt, Parrot_str_byte_length(interp, fmt) - 1))
         fmt = Parrot_str_concat(INTERP, fmt, newline, 0);
 
-    S1 = Parrot_str_concat(INTERP, SELF.get_string(), fmt, 0);
+    GET_ATTR_str_val(INTERP, SELF, S1);
+    S1 = Parrot_str_concat(INTERP, S1, fmt, 0);
     VTABLE_set_string_native(INTERP, SELF, S1);
 
     RETURN(PMC *SELF);
@@ -168,17 +169,22 @@ the first line is line number zero.
         ipos = last_pos;
     }
 
-    str  = SELF.get_string();
+    GET_ATTR_str_val(INTERP, SELF, str);
     jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline, str, ipos, pos);
 
     while (jpos < pos) {
-        line++;
+
+        if (ipos
+        &&  jpos == ipos
+        &&  string_ord(INTERP, str, jpos)     == 10
+        &&  string_ord(INTERP, str, ipos - 1) == 13) {
+            /* do not increment line; \r\n is a single line separator */
+        }
+        else
+            line++;
 
         ipos = jpos + 1;
 
-        /* treat \r\n as a single line separator */
-        ipos += (string_ord(INTERP, str, jpos)     == 13
-             &&  string_ord(INTERP, str, jpos + 1) == 10);
         jpos = Parrot_str_find_cclass(INTERP, enum_cclass_newline, str, ipos, pos);
     }
 

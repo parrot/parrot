@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 42;
+use Parrot::Test tests => 41;
 use Parrot::Test::Util 'create_tempfile';
 use Parrot::Test::Util 'create_tempfile';
 
@@ -37,58 +37,6 @@ sub file_content_is {
     is( <$FOO>, $content, $name );
 
     close $FOO;
-}
-
-TODO: {
-    local $TODO = "IO on some invalid types";
-
-    pir_output_is( <<'CODE', <<'OUTPUT', "IO on some invalid types" );
-.sub main
-    $P0 = null
-    test($P0, "Undef")
-    new $P0, ['Integer']
-    test($P0, "null")
-    new $P0, ['Undef']
-    test($P0, "Integer")
-    new $P0, ['String']
-    test($P0, "String")
-.end
-.sub test
-    .param pmc io
-    .param string name
-
-    print name
-    read $S0, io, 1
-    length $I0, $S0
-    if $I0 == 0 goto ok1
-    print " not"
-ok1:
-    print " ok 1\n"
-
-    print name
-    # what should happen here?
-    close io
-    print " ok 2\n"
-
-    print name
-    # what should happen here?
-    print io, "not"
-    print " ok 3\n"
-.end
-CODE
-Undef ok 1
-Undef ok 2
-Undef ok 3
-null ok 1
-null ok 2
-null ok 3
-Integer ok 1
-Integer ok 2
-Integer ok 3
-String ok 1
-String ok 2
-String ok 3
-OUTPUT
 }
 
 my (undef, $temp_file) = create_tempfile( UNLINK => 1 );
