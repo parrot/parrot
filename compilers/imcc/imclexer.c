@@ -5308,8 +5308,11 @@ read_braced(YYSTYPE *valp, PARROT_INTERP, const char *macro_name,
         c = yylex(&val,yyscanner,interp);
     }
 
-    if (valp)
+    if (valp) {
+        if (valp->s)
+            mem_sys_free(valp->s);
         *valp = val;
+    }
     else
         mem_sys_free(val.s);
 
@@ -5358,6 +5361,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
         }
         else if (c == '{') {
             current = read_braced(&val, interp, macro_name, current, yyscanner);
+            mem_sys_free(val.s);
             c       = yylex_skip(&val, interp, " \n", yyscanner);
             len     = strlen(current);
         }
