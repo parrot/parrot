@@ -357,13 +357,15 @@ Adds C<value> to the integer. C<*dest> is unused.
 
 */
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_add(INTERP, dest, value);
         return dest;
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         Integer.dest.i_add_int(value);
         return dest;
     }
@@ -435,7 +437,8 @@ C<get_integer> and C<set_integer_native> always.
 */
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_subtract(INTERP, dest, value);
         return dest;
     }
@@ -451,7 +454,8 @@ Subtracts C<value> from the integer. C<*dest> is unused.
 */
 
     VTABLE PMC *subtract_int(INTVAL b, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         Integer.dest.i_subtract_int(b);
         return dest;
     }
@@ -523,14 +527,16 @@ Multiplies the integer by C<*value>. C<*dest> is unused.
 */
 
     MULTI PMC *multiply(PMC *value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_multiply(INTERP, dest, value);
         return dest;
     }
 
 
     VTABLE PMC *multiply_int(INTVAL b, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         Integer.dest.i_multiply_int(b);
         return dest;
     }
@@ -614,7 +620,8 @@ Divides C<SELF> by C<value> inplace.
 */
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_divide(INTERP, dest, value);
         return dest;
     }
@@ -659,19 +666,22 @@ Divides C<SELF> by C<value> inplace.
 */
 
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_floor_divide(INTERP, dest, value);
         return dest;
     }
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_floor_divide_int(INTERP, dest, value);
         return dest;
     }
 
     VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_floor_divide_float(INTERP, dest, value);
         return dest;
     }
@@ -744,21 +754,24 @@ Calculates modulus in place.
 
 
     MULTI PMC *modulus(DEFAULT value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         VTABLE_i_modulus(INTERP, dest, value);
         return dest;
     }
 
 
     VTABLE PMC *modulus_int(INTVAL value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         STATICSELF.i_modulus_int(value);
         return dest;
     }
 
 
     VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) {
-        dest = VTABLE_clone(INTERP, SELF);
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_integer_native(INTERP, dest, SELF.get_integer());
         STATICSELF.i_modulus_float(value);
         return dest;
     }

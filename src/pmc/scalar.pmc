@@ -172,7 +172,8 @@ Adds C<value> to C<SELF> inplace.
 */
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_number_native(INTERP, dest, SELF.get_number());
         VTABLE_i_add(INTERP, dest, value);
         return dest;
     }
@@ -242,7 +243,8 @@ Subtracts C<value> from C<SELF> inplace.
 */
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_number_native(INTERP, dest, SELF.get_number());
         VTABLE_i_subtract(INTERP, dest, value);
         return dest;
     }
@@ -303,7 +305,8 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
 */
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_number_native(INTERP, dest, SELF.get_number());
         VTABLE_i_multiply(INTERP, dest, value);
         return dest;
     }
@@ -367,7 +370,8 @@ Divides C<SELF> by C<value> inplace.
 */
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_number_native(INTERP, dest, SELF.get_number());
         VTABLE_i_divide(INTERP, dest, value);
         return dest;
     }
@@ -443,7 +447,8 @@ Divides C<SELF> by C<value> inplace.
 */
 
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_number_native(INTERP, dest, SELF.get_number());
         VTABLE_i_floor_divide(INTERP, dest, value);
         return dest;
     }
@@ -525,7 +530,8 @@ Calculates modulus inplace
 */
 
     MULTI PMC *modulus(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_number_native(INTERP, dest, SELF.get_number());
         VTABLE_i_modulus(INTERP, dest, value);
         return dest;
     }
@@ -607,7 +613,8 @@ Calculates pow inplace
 */
 
     MULTI PMC *pow(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        VTABLE_set_number_native(INTERP, dest, SELF.get_number());
         VTABLE_i_pow(INTERP, dest, value);
         return dest;
     }

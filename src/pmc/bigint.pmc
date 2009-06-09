@@ -835,7 +835,8 @@ Decrements the integer.
     }
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_add(INTERP, dest, value);
         return dest;
     }
@@ -875,7 +876,8 @@ Decrements the integer.
 
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_subtract(INTERP, dest, value);
         return dest;
     }
@@ -915,7 +917,8 @@ Decrements the integer.
 
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_multiply(INTERP, dest, value);
         return dest;
     }
@@ -987,7 +990,8 @@ Decrements the integer.
     }
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_divide(INTERP, dest, value);
         return dest;
     }
@@ -1019,7 +1023,8 @@ Decrements the integer.
     }
 
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_floor_divide(INTERP, dest, value);
         return dest;
     }
@@ -1051,7 +1056,8 @@ Decrements the integer.
     }
 
     MULTI PMC *modulus(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_modulus(INTERP, dest, value);
         return dest;
     }
@@ -1167,7 +1173,8 @@ Inplace shift left.
 */
 
     MULTI PMC *bitwise_shl(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_bitwise_shl(INTERP, dest, value);
         return dest;
     }
@@ -1222,7 +1229,8 @@ Inplace shift left.
 */
 
     MULTI PMC *bitwise_shr(DEFAULT value, PMC *dest) {
-        dest = SELF.clone();
+        dest = pmc_new(INTERP, SELF.type());
+        bigint_set(INTERP, dest, SELF);
         VTABLE_i_bitwise_shr(INTERP, dest, value);
         return dest;
     }
