@@ -1904,11 +1904,13 @@ labeled_inst:
          {
            SymReg *n = mk_const(interp, $2, 'S');
            set_lexical(interp, $4, n); $$ = 0;
+           mem_sys_free($2);
          }
    | LEXICAL USTRINGC COMMA target
          {
            SymReg *n = mk_const(interp, $2, 'U');
            set_lexical(interp, $4, n); $$ = 0;
+           mem_sys_free($2);
          }
    | CONST { pesky_global__is_def=1; } type IDENTIFIER '=' const
          {
