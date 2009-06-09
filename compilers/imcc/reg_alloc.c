@@ -1189,8 +1189,9 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
             && (r->usage & usage)
             && r->use_count) {
                 Set *avail    = sets[j];
-                int first_reg = first_avail(unit, (int)r->set, &avail);
-
+                int first_reg = avail
+                              ? set_first_zero(avail)
+                              : first_avail(unit, (int)r->set, &avail);
                 set_add(avail, first_reg);
                 r->color = first_reg++;
 
@@ -1200,6 +1201,10 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
                         (int)r->set, r->name, r->color);
 
                 unit->first_avail[j] = first_reg;
+
+                /* don't lose this set; we must free it */
+                if (!sets[j])
+                    sets[j] = avail;
             }
         }
     }
