@@ -46,8 +46,19 @@ appropriate type.
         }
         else {
             PMC * const class_ = PARROT_OBJECT(other)->_class;
+            PMC        *clone  = VTABLE_clone(interp, other);
+            void       *attrs;
             pmc_reuse_by_class(INTERP, SELF, class_, PObj_is_object_FLAG);
-            Parrot_oo_clone_object(interp, other, class_, SELF);
+
+            /* now swap memory without leaking it */
+            attrs              - PMC_data(SELF);
+            PMC_data(SELF)     = PMC_data(clone);
+            PMC_data(clone)    = attrs;
+            VTABLE_destroy(interp, clone);
+
+            PObj_is_object_SET(SELF);
+            PObj_active_destroy_SET(SELF);
+
         }
     }
 
