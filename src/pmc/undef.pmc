@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2009, Parrot Foundation.
 $Id$
 
 =head1 NAME
@@ -51,7 +51,7 @@ appropriate type.
             pmc_reuse_by_class(INTERP, SELF, class_, PObj_is_object_FLAG);
 
             /* now swap memory without leaking it */
-            attrs              - PMC_data(SELF);
+            attrs              = PMC_data(SELF);
             PMC_data(SELF)     = PMC_data(clone);
             PMC_data(clone)    = attrs;
             VTABLE_destroy(interp, clone);
