@@ -10,7 +10,6 @@ method TOP($/) {
 
 method pmc($/, $key) {
     our $?PMC;
-    our $?VTABLE;
 
     if $key eq 'begin' {
         $?PMC := PMC::Class.new(
@@ -20,13 +19,6 @@ method pmc($/, $key) {
 
         # Save c_header.
         $?PMC<c_header> := substr($/.orig, 0, $/.from);
-
-        Q:PIR {
-            $P0 = new ['FileHandle']
-            $S0 = $P0.'readall'('../../vtable.frozen')
-            $P0 = thaw $S0
-            set_global '$?VTABLE', $P0 
-        };
 
     }
     else {

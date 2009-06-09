@@ -27,7 +27,7 @@
     #add an extra stage to generate the c, h and dump files
     $P0.'addstage'('generate_files', 'after'=>'past')
 
-    $P1 = split ' ', 'e=s pmc_path|p=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v'
+    $P1 = split ' ', 'e=s vtdump|d=s pmc_path|p=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v'
     setattribute $P0, '@cmdoptions', $P1
 
 .end
@@ -43,6 +43,7 @@
 
     pmc_name = new ['String']
     #TODO: DTRT if files is an array of filenames, although this isn't an expected use case
+    #TRT probably means complain and exit
     files_clone = clone files
     set_hll_global ['PMC';'Emitter'], '$?filename', files_clone
 
@@ -74,8 +75,18 @@
     .param pmc past
     .param pmc adverbs :slurpy :named
 
-    .local string pmc_dir, pmc_name
-    .local pmc pmc_filename, emitter
+    .local string pmc_dir, pmc_name, vtdump_str, vtdump_filename
+    .local pmc pmc_filename, emitter, vtdump
+
+    vtdump_filename = adverbs['vtdump']
+    if vtdump_filename != '' goto read_dump
+    $P0 = getstderr
+    print $P0, "Error: no vtable.freeze specified."
+  read_dump:
+    $P0 = new ['FileHandle']
+    vtdump_str = $P0.'readall'(vtdump_filename)
+    vtdump = thaw vtdump_str
+
     pmc_filename = get_hll_global ['PMC';'Emitter'], '$?filename'
     $P0          = get_hll_global ['PMC';'Emitter'], '$?pmc_name'
     pmc_name = $P0
@@ -154,6 +165,7 @@
 
 .include 'src/nodes.pir'
 .include 'src/vtable_info.pir'
+.include '../vtdumper/src/function.pir'
 .include 'src/emitter/pmc.pir'
 .include 'src/emitter/c.pir'
 
