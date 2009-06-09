@@ -115,7 +115,7 @@ Free structures.
         if (PARROT_SOCKET(SELF)) {
             Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
 
-            if(data_struct->os_handle != PIO_INVALID_HANDLE)
+            if (data_struct->os_handle != PIO_INVALID_HANDLE)
                 Parrot_io_close_piohandle(interp, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
@@ -209,11 +209,11 @@ Close a socket.
         if (PARROT_SOCKET(SELF)) {
             Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
 
-            if(data_struct->os_handle != PIO_INVALID_HANDLE)
+            if (data_struct->os_handle != PIO_INVALID_HANDLE)
                 result = Parrot_io_close_piohandle(interp, data_struct->os_handle);
             data_struct->os_handle = PIO_INVALID_HANDLE;
         }
-	RETURN(INTVAL result);
+        RETURN(INTVAL result);
     }
 
 /*
