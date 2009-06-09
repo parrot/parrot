@@ -196,6 +196,28 @@ connected socket object.]
 
 /*
 
+=item C<close>
+
+Close a socket.
+
+=cut
+
+*/
+
+    METHOD close() {
+        INTVAL result = -1;
+        if (PARROT_SOCKET(SELF)) {
+            Parrot_Socket_attributes *data_struct = PARROT_SOCKET(SELF);
+
+            if(data_struct->os_handle != PIO_INVALID_HANDLE)
+                result = Parrot_io_close_piohandle(interp, data_struct->os_handle);
+            data_struct->os_handle = PIO_INVALID_HANDLE;
+        }
+	RETURN(INTVAL result);
+    }
+
+/*
+
 =item C<recv>
 
 Receives a message from a connected socket object. It returns
