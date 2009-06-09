@@ -30,10 +30,11 @@ use Pod::Usage;
 use Cwd;
 
 my ( $update_flag, $checkout_flag ) = ( 0, 1 );
-GetOptions( "update" => \$update_flag ) or pod2usage();
+GetOptions( 'update' => \$update_flag ) or pod2usage();
 
-mkdir 'languages';
-chdir 'languages';
+my $languages_dir = 'languages';
+mkdir $languages_dir;
+chdir $languages_dir;
 
 # some commands
 my %checkout_cmd = (
