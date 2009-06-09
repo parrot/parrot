@@ -702,7 +702,8 @@ SP              [ ]
             snprintf(label, len, "local__%s__%s__$:",
                 IMCC_INFO(interp)->cur_macro_name, yytext+1);
 
-            /* XXX: free valp->s if it exists? */
+            if (valp->s)
+                mem_sys_free(valp->s);
             valp->s = label;
         }
 
@@ -717,6 +718,8 @@ SP              [ ]
             snprintf(label, len, "local__%s__%s__$",
                 IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
+            if (valp->s)
+                mem_sys_free(valp->s);
             valp->s = label;
         }
 
@@ -931,6 +934,8 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
             current                           = str_dup("");
             len                               = 0;
 
+            if (val.s)
+                mem_sys_free(val.s);
             c = yylex_skip(&val, interp, " \n", yyscanner);
         }
         else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
