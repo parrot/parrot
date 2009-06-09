@@ -773,10 +773,12 @@ new_frame(PARROT_INTERP) {
 
     if (IMCC_INFO(interp)->frames) {
         tmp->s.pasm_file = IMCC_INFO(interp)->frames->s.pasm_file;
+
         if (IMCC_INFO(interp)->frames->s.file_needs_free)
-            tmp->s.file = str_dup(IMCC_INFO(interp)->frames->s.file);
+            tmp->s.file            = str_dup(IMCC_INFO(interp)->frames->s.file);
         else
-            tmp->s.file = IMCC_INFO(interp)->frames->s.file;
+            tmp->s.file            = IMCC_INFO(interp)->frames->s.file;
+
         tmp->s.file_needs_free = IMCC_INFO(interp)->frames->s.file_needs_free;
     }
 
@@ -1138,8 +1140,12 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
         frame->is_macro = 1;
 
         /* remember macro name for error reporting
-        RT #42384 check that all the .file text is malloced / freed */
-        frame->s.file = str_dup(name);
+         * first free any filename allocated in new_frame() */
+        if (frame->s.file && frame->s.file_needs_free)
+            mem_sys_free(frame->s.file);
+
+        /* RT #42384 check that all the .file text is malloced / freed */
+        frame->s.file            = str_dup(name);
         frame->s.file_needs_free = 1;
 
         /* whitespace can be safely ignored */
@@ -1231,10 +1237,10 @@ include_file(PARROT_INTERP, char *file_name, void *yyscanner)
         IMCC_fataly(interp, EXCEPTION_EXTERNAL_ERROR, strerror(errno));
 
     mem_sys_free(s);
-    frame->s.file   = file_name;
+    frame->s.file            = file_name;
     frame->s.file_needs_free = 0;
-    frame->s.handle = file;
-    ext             = strrchr(file_name, '.');
+    frame->s.handle          = file;
+    ext                      = strrchr(file_name, '.');
 
     if (ext) {
         if (STREQ(ext, ".pasm")) {
