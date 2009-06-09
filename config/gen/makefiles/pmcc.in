@@ -94,12 +94,13 @@ testclean:
 
 CLEANUPS := \
   pmc.pbc \
+  src/gen_emitter.pir \
+  src/gen_vtable_info.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
-  src/gen_emitter.pir \
   src/emitter/gen_pmc.pir \
   src/emitter/gen_c.pir \
-  src/gen_vtable_info.pir
+  src/emitter/pmc/gen_default.pir
 
 
 clean:
