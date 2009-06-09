@@ -505,7 +505,7 @@ SP              [ ]
         YYCHOP();
 
         if (valp)
-            valp->s = yytext;
+            valp->s = str_dup(yytext);
 
         return LABEL;
     }

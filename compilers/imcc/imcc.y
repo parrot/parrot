@@ -1831,7 +1831,9 @@ _labels:
 label:
      LABEL
          {
-           $$ = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, $1));
+             Instruction *i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, $1));
+             mem_sys_free($1);
+             $$ = i;
          }
    ;
 
