@@ -1679,8 +1679,8 @@ paramtype:
    | ADV_OPTIONAL               { $$ = VT_OPTIONAL; }
    | ADV_OPT_FLAG               { $$ = VT_OPT_FLAG; }
    | ADV_NAMED                  { $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; }
-   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; }
+   | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; mem_sys_free($3); }
+   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; mem_sys_free($3); }
    | UNIQUE_REG                 { $$ = VT_UNIQUE_REG; }
    ;
 
