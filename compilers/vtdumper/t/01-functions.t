@@ -6,7 +6,7 @@
     .include 'test_more.pir'
     load_bytecode 'vtdumper.pbc'
 
-    plan(45)
+    plan(48)
     comments()
     valid_functions()
     invalid_functions()
@@ -161,25 +161,28 @@ VTABLE
     $S0 = do_foo['returns']
     is($S0, "PMC0* ", "do_foo return type")
 
-    $I0 = do_foo['arguments']
+    $I0 = do_foo['parameters']
     is($I0, 3, "do_foo arg count")
 
-    $S0 = do_foo['arguments';0;'type';'identifier']
+    $S0 = do_foo['parameter_list']
+    is($S0, "INTVAL i, FLOATVAL j, SPECIALVAL k", "do_foo arg list")
+
+    $S0 = do_foo['parameters';0;'type';'identifier']
     is($S0, "INTVAL", "do_foo first arg type")
 
-    $S0 = do_foo['arguments';0;'identifier']
+    $S0 = do_foo['parameters';0;'identifier']
     is($S0, "i", "do_foo first arg name")
 
-    $S0 = do_foo['arguments';1;'type';'identifier']
+    $S0 = do_foo['parameters';1;'type';'identifier']
     is($S0, "FLOATVAL", "do_foo second arg type")
 
-    $S0 = do_foo['arguments';1;'identifier']
+    $S0 = do_foo['parameters';1;'identifier']
     is($S0, "j", "do_foo second arg name")
 
-    $S0 = do_foo['arguments';2;'type';'identifier']
+    $S0 = do_foo['parameters';2;'type';'identifier']
     is($S0, "SPECIALVAL", "do_foo third arg type")
 
-    $S0 = do_foo['arguments';2;'identifier']
+    $S0 = do_foo['parameters';2;'identifier']
     is($S0, "k", "do_foo third arg name")
 
 
@@ -192,19 +195,22 @@ VTABLE
     $S0 = do_bar['returns']
     is($S0, "INTVAL0 ", "do_bar return type")
 
-    $I0 = do_bar['arguments']
+    $I0 = do_bar['parameters']
     is($I0, 2, "do_bar arg count")
 
-    $S0 = do_bar['arguments';0;'type']
+    $S0 = do_bar['parameter_list']
+    is($S0, "PMC1* p1, PMC2* p2", "do_bar arg list")
+
+    $S0 = do_bar['parameters';0;'type']
     is($S0, "PMC1* ", "do_bar first arg type")
 
-    $S0 = do_bar['arguments';0;'identifier']
+    $S0 = do_bar['parameters';0;'identifier']
     is($S0, "p1", "do_bar first arg name")
 
-    $S0 = do_bar['arguments';1;'type']
+    $S0 = do_bar['parameters';1;'type']
     is($S0, "PMC2* ", "do_bar second arg type")
 
-    $S0 = do_bar['arguments';1;'identifier']
+    $S0 = do_bar['parameters';1;'identifier']
     is($S0, "p2", "do_bar second arg name")
 
 
@@ -217,19 +223,22 @@ VTABLE
     $S0 = quuxle['returns']
     is($S0, "INTVAL1 ", "quuxle return type")
 
-    $I0 = quuxle['arguments']
+    $I0 = quuxle['parameters']
     is($I0, 2, "quuxle arg count")
 
-    $S0 = quuxle['arguments';0;'type']
+    $S0 = quuxle['parameter_list']
+    is($S0, "PMC3* p3, PMC4* p4", "quuxle arg list")
+
+    $S0 = quuxle['parameters';0;'type']
     is($S0, "PMC3* ", "quuxle first arg type")
 
-    $S0 = quuxle['arguments';0;'identifier']
+    $S0 = quuxle['parameters';0;'identifier']
     is($S0, "p3", "quuxle first arg name")
 
-    $S0 = quuxle['arguments';1;'type']
+    $S0 = quuxle['parameters';1;'type']
     is($S0, "PMC4* ", "quuxle second arg type")
 
-    $S0 = quuxle['arguments';1;'identifier']
+    $S0 = quuxle['parameters';1;'identifier']
     is($S0, "p4", "quuxle second arg name")
 
 .end

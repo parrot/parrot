@@ -46,9 +46,13 @@ method vtable_func($/) {
         $function.add_attribute(~$_<identifier>);
     }
 
-    for $/<argument> {
-        $function.add_argument($_);
+    my $parameter_list := '';
+    for $/<parameter> {
+        $function.add_parameter($_);
+        $parameter_list := $parameter_list ~ ~$_;
     }
+
+    $function.set_parameter_list($parameter_list);
 
     $function.set_section($?SECTION_NAME);
 

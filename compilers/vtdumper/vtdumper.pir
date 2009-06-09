@@ -73,7 +73,7 @@
     $S0 = node['section']
     snode['section'] = $S0
 
-    $P0 = node['arguments']
+    $P0 = node['parameters']
     sargs = new ['ResizablePMCArray']
     j = 0
     elems = elements $P0
@@ -83,10 +83,10 @@
 
     $P1 = new ['Hash']
 
-    $S0 = node['arguments';j;'type']
+    $S0 = node['parameters';j;'type']
     $P1['type'] = $S0
 
-    $S0 = node['arguments';j;'identifier']
+    $S0 = node['parameters';j;'identifier']
     $P1['identifier'] = $S0
 
     push sargs, $P1
@@ -96,7 +96,7 @@
 
   args_loop_end:
 
-    snode['arguments'] = sargs
+    snode['parameters'] = sargs
 
     sattrs = node['attributes']
     snode['attributes'] = sattrs

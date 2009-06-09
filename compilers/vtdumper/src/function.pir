@@ -42,7 +42,10 @@ PAST node representing one VTABLE function
 
     # Initialize various attributes
     $P1 = new 'ResizablePMCArray'
-    res.'attr'('arguments', $P1, 1)
+    res.'attr'('parameters', $P1, 1)
+
+    $P1 = new 'String'
+    res.'attr'('parameter_list', $P1, 1)
 
     $P1 = new 'ResizableStringArray'
     res.'attr'('attributes', $P1, 1)
@@ -53,17 +56,17 @@ PAST node representing one VTABLE function
     .return (res)
 .end
 
-=item C<add_argument>
+=item C<add_parameter>
 
-Add a function argument to PMC.
+Add a function parameter to PMC.
 
 =cut
 
-.sub 'add_argument' :method
-    .param pmc argument
+.sub 'add_parameter' :method
+    .param pmc parameter
 
-    $P0 = self.'attr'('arguments', 0, 0)
-    push $P0, argument
+    $P0 = self.'attr'('parameters', 0, 0)
+    push $P0, parameter
   done:
     .return ()
 .end
@@ -108,6 +111,47 @@ Set the section where this VTABLE function lives.
     $P0 = name
   done:
     .return ()
+.end
+
+=item C<set_parameter_list>
+
+Set the string representing all of this function's parameters.
+
+=cut
+
+.sub 'set_parameter_list' :method
+    .param string list
+
+    $P0 = self.'attr'('parameter_list', 0, 0)
+    $P0 = list
+  done:
+    .return ()
+.end
+
+=item C<has_attribute>
+
+Return 1 if this function has the speficied attribute.
+
+=cut
+
+.sub 'has_attribute' :method
+    .param string name
+
+    .local int elems, i
+
+    $P0 = self.'attr'('attributes', 0, 0)
+    elems = elements $P0
+    i = 0
+  loop_start:
+    if i == elems goto not_found
+    $S0 = $P0[i]
+    if $S0 == name goto found
+    i += 1
+    goto loop_start
+  not_found:
+    .return (0) 
+  found:
+    .return (1)
 .end
 
 =head1 COPYRIGHT

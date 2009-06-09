@@ -28,14 +28,14 @@ rule attribute {
 }
 
 rule vtable_func {
-    <type> <identifier> '(' <argument>* ')' <attribute>*  {*}
+    <type> <identifier> '(' <parameter>* ')' <attribute>*  {*}
 }
 
 rule type {
     [ 'struct' | 'union' ]? <identifier> '*'?
 }
 
-rule argument {
+rule parameter {
     <type> <identifier> ','?
 }
 
