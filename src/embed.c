@@ -1076,6 +1076,7 @@ Prints the contents of the constants table.
 static void
 print_constant_table(PARROT_INTERP)
 {
+    ASSERT_ARGS(print_constant_table)
     const INTVAL numconstants = interp->code->const_table->const_count;
     INTVAL i;
 
