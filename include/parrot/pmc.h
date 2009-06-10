@@ -88,13 +88,13 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_IGNORABLE_RESULT
 PMC * pmc_reuse_by_class(PARROT_INTERP,
-    ARGMOD(PMC * pmc),
-    ARGIN(PMC * class_),
+    ARGMOD(PMC *pmc),
+    ARGIN(PMC *class_),
     UINTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(* pmc);
+        FUNC_MODIFIES(*pmc);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
