@@ -34,7 +34,11 @@ static FLOATVAL calibrate(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char * op_name(PARROT_INTERP, int k)
+        __attribute__nonnull__(1);
+
+static void print_constant_table(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
@@ -59,6 +63,8 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 #define ASSERT_ARGS_calibrate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_op_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -689,6 +695,7 @@ Returns the name of the opcode.
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char *
 op_name(PARROT_INTERP, int k)
 {
@@ -730,10 +737,10 @@ calibrate(PARROT_INTERP)
 {
     ASSERT_ARGS(calibrate)
     opcode_t code[] = { 1 };      /* noop */
-    opcode_t *pc    = code;
-    size_t   count  = 1000000;
+    const opcode_t *pc    = code;
+    const size_t   count  = 1000000;
     size_t   n      = count;
-    FLOATVAL start  = Parrot_floatval_time();
+    const FLOATVAL start  = Parrot_floatval_time();
     FLOATVAL now    = start;
 
     /* op timing isn't free; it requires at least one time fetch per op */
@@ -1067,15 +1074,16 @@ Prints the contents of the constants table.
 
 */
 static void
-print_constant_table(PARROT_INTERP) {
-    INTVAL numconstants = interp->code->const_table->const_count;
+print_constant_table(PARROT_INTERP)
+{
+    const INTVAL numconstants = interp->code->const_table->const_count;
     INTVAL i;
 
     /* TODO: would be nice to print the name of the file as well */
     Parrot_io_printf(interp, "=head1 Constant-table\n\n");
 
     for (i = 0; i < numconstants; ++i) {
-        PackFile_Constant *c = interp->code->const_table->constants[i];
+        const PackFile_Constant * const c = interp->code->const_table->constants[i];
 
         switch (c->type) {
             case PFC_NUMBER:
@@ -1167,11 +1175,11 @@ void
 Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_options options)
 {
     PDB_line_t *line;
-    PDB_t      *pdb             = mem_allocate_zeroed_typed(PDB_t);
-    int         num_mappings    = 0;
-    int         curr_mapping    = 0;
-    int         op_code_seq_num = 0;
-    int         debugs;
+    PDB_t * const pdb   = mem_allocate_zeroed_typed(PDB_t);
+    int num_mappings    = 0;
+    int curr_mapping    = 0;
+    int op_code_seq_num = 0;
+    int debugs;
 
     interp->pdb     = pdb;
     pdb->cur_opcode = interp->code->base.data;
@@ -1260,7 +1268,7 @@ PARROT_EXPORT
 void
 Parrot_run_native(PARROT_INTERP, native_func_t func)
 {
-    PackFile       *pf = PackFile_new(interp, 0);
+    PackFile * const pf = PackFile_new(interp, 0);
     static opcode_t program_code[2];
 
     program_code[0] = interp->op_lib->op_code("enternative", 0);
@@ -1302,7 +1310,7 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
      * before compiling a string */
 
     if (!interp->initial_pf) {
-        PackFile *pf = PackFile_new_dummy(interp, "compile_string");
+        PackFile * const pf = PackFile_new_dummy(interp, "compile_string");
         /* Assumption: there is no valid reason to fail to create it.
          * If the assumption changes, replace the assertion with a
          * runtime check */
