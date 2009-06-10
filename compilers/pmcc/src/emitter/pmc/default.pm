@@ -82,11 +82,11 @@ PARROT_EXPORT VTABLE* Parrot_default_get_vtable(PARROT_INTERP) {
     );
 
     # For default we have all vtable functions. So, just iterate over all @vtables
-    my @vtables := PMC::VTableInfo::vtable_list();
+    my @vtables := self.vtable_info;
     my @tmp;
     for @vtables {
 #        say("vtable " ~ $_.name ~ ' ' ~ $past<vtables>{$_.name});
-        @tmp.push('Parrot_default_' ~ $_.name); 
+        @tmp.push('Parrot_default_' ~ $_<name>); 
     }
     @res.push(join(",\n        ", @tmp));
 

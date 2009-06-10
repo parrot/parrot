@@ -46,7 +46,6 @@ method generate_header() {
 
 method generate_header_functions() {
     my $past := self.past;
-    my %vtables := PMC::VTableInfo::vtable_hash();
 
     my @res_builder;
 
@@ -507,6 +506,16 @@ method name() {
 
 method ucname() {
     self<ucname>;
+}
+
+method set_vtable_info($vtable_info) {
+    our $?vtable_info;
+    $?vtable_info := $vtable_info;
+}
+
+method vtable_info() {
+    our $?vtable_info;
+    $?vtable_info;
 }
 
 # Local Variables:

@@ -13,7 +13,7 @@ method generate_header($past) {
     my $filename := self.filename();
 
     # Get emitter for (specific) PMC.
-    my $pmc_emitter := get_pmc_emitter($name, $past);
+    my $pmc_emitter := get_pmc_emitter($name, $past, self.vtable_info);
 
     $res :=
             # Generate header.
@@ -34,7 +34,7 @@ method generate_c_code($past) {
     my $filename := self.filename();
 
     # Get emitter for (specific) PMC.
-    my $pmc_emitter := get_pmc_emitter($name, $past);
+    my $pmc_emitter := get_pmc_emitter($name, $past, self.vtable_info);
 
     $res :=
             # Generate header.
@@ -55,7 +55,7 @@ method generate_dump($past) {
     my $filename := self.filename();
 
     # Get emitter for (specific) PMC.
-    my $pmc_emitter := get_pmc_emitter($name, $past);
+    my $pmc_emitter := get_pmc_emitter($name, $past, self.vtable_info);
 
     $pmc_emitter.generate_dump();
 }
@@ -81,22 +81,25 @@ method set_vtable_info($info) {
 
 # Get (specific) PMC emitter
 # Try to create specific emitter. In case of failure create generic one.
-sub get_pmc_emitter($name, $past) {
+sub get_pmc_emitter($name, $past, $vtable_info) {
 PIR q<
     find_lex $P0, '$name'
     find_lex $P1, '$past'
+    find_lex $P2, '$vtable_info'
     $S0 = $P0
 
     .local pmc ctor
     ctor = get_hll_global ['PMC';'Emitter';'PMC'], $S0
     push_eh not_found
     %r = ctor.'new'($P1)
+    %r.'set_vtable_info'($P2)
     goto done
 
   not_found:
     pop_eh
     ctor = get_hll_global ['PMC';'Emitter'], 'PMC'
     %r = ctor.'new'($P1)
+    %r.'set_vtable_info'($P2)
   done:
 >;
 }
