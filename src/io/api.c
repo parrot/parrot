@@ -151,7 +151,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc),
         filehandle = pmc;
     }
     else
-        Parrot_PCCINVOKE(interp, new_filehandle, CONST_STRING(interp, "read"), "SS->P", path, mode, &open);
+        Parrot_PCCINVOKE(interp, new_filehandle, CONST_STRING(interp, "open"), "SS->P", path, mode, &filehandle);
     return filehandle;
 }
 
