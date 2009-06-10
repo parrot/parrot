@@ -7,7 +7,7 @@
     .include 'test_more.pir'
     load_bytecode 'pmcc.pbc'
 
-    plan(1)
+    plan(2)
 
     # Parse "default" pmc.
     .local pmc emitter, capture
@@ -19,6 +19,9 @@
     say generated
 
     like(generated, "'Parrot_default_get_vtable'", "Parrot_default_get_vtable generated") 
+
+    #this should be generated, even though it's not explicitly defined in default.pmc
+    like(generated, "'Parrot_default_set_number_keyed_int'", "Parrot_default_get_vtable generated") 
 .end
 
 # Don't forget to update plan!
