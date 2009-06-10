@@ -408,9 +408,11 @@ SP              [ ]
 ".="                   return CONCAT_ASSIGN;
 
 <emit,INITIAL>".macro_const" {
-        int c;
-        int start_line;
-        int start_cond  = YY_START;
+        char *macro_name   = NULL;
+        int   start_cond   = YY_START;
+        int   macro_exists = 0;
+        int   c;
+        int   start_line;
 
         BEGIN(macro);
         c = yylex_skip(valp, interp, " ", yyscanner);
@@ -419,7 +421,7 @@ SP              [ ]
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                "Constant names must be identifiers");
 
-        IMCC_INFO(interp)->cur_macro_name = valp->s;
+        IMCC_INFO(interp)->cur_macro_name = macro_name = valp->s;
         start_line                        = IMCC_INFO(interp)->line;
 
         c = yylex_skip(valp, interp, " ", yyscanner);
@@ -427,10 +429,20 @@ SP              [ ]
         if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                 "Constant '%s' value must be a number, "
-                "stringliteral or register", IMCC_INFO(interp)->cur_macro_name);
+                "stringliteral or register", macro_name);
 
-        define_macro(interp, IMCC_INFO(interp)->cur_macro_name, NULL, valp->s, start_line);
+        /* macro_name becomes a hash key
+         * the first one needs to remain; destroying the hash frees it
+         * subsequent macro_names need destruction here to avoid leaks */
+        if (find_macro(interp, macro_name))
+            macro_exists = 1;
+
+        define_macro(interp, macro_name, NULL, valp->s, start_line);
         mem_sys_free(valp->s);
+
+        /* don't leak these */
+        if (macro_exists)
+            mem_sys_free(macro_name);
 
         IMCC_INFO(interp)->cur_macro_name = NULL;
 
