@@ -737,7 +737,7 @@ calibrate(PARROT_INTERP)
 {
     ASSERT_ARGS(calibrate)
     opcode_t code[] = { 1 };      /* noop */
-    const opcode_t *pc    = code;
+    opcode_t *pc    = code;
     const size_t   count  = 1000000;
     size_t   n      = count;
     const FLOATVAL start  = Parrot_floatval_time();

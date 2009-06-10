@@ -601,7 +601,7 @@ STRING* interpinfo_s(PARROT_INTERP, INTVAL what)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void * Parrot_compile_file(PARROT_INTERP,
-    ARGIN(const char *fullname),
+    ARGIN(char *fullname),
     ARGOUT(STRING **error))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

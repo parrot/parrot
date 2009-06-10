@@ -1154,8 +1154,8 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
     if (m) {
         int i,c,start_cond;
 
-        macro_frame_t * const frame = new_frame(interp);
-        frame->params               = &m->params;
+        macro_frame_t * frame = new_frame(interp);
+        frame->params         = &m->params;
 
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;

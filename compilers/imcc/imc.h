@@ -236,13 +236,13 @@ PMC * imcc_compile(PARROT_INTERP,
         FUNC_MODIFIES(*error_message);
 
 PARROT_CANNOT_RETURN_NULL
-void * IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
+void * IMCC_compile_file(PARROT_INTERP, ARGIN(char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 void * IMCC_compile_file_s(PARROT_INTERP,
-    ARGIN(const char *s),
+    ARGIN(char *s),
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -525,7 +525,7 @@ struct nodeType_t;
 struct parser_state_t {
     struct parser_state_t *next;
     Interp                *interp;
-    const char            *file;
+    char                  *file;
     FILE                  *handle;
     int                    file_needs_free; /* is *file malloced? */
     int                    line;

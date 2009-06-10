@@ -38,7 +38,7 @@ The entry point from the command line into Parrot.
 int
 main(int argc, char * argv[])
 {
-    const char *sourcefile;
+    char    *sourcefile;
     Interp  *interp;
     int      status;
 
@@ -57,7 +57,7 @@ main(int argc, char * argv[])
        available. */
     Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
 
-    sourcefile = parseflags(interp, &argc, &argv);
+    sourcefile = strdup(parseflags(interp, &argc, &argv));
     status     = imcc_run(interp, sourcefile, argc, argv);
     UNUSED(status);
 

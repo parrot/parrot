@@ -59,7 +59,7 @@ static int change_op(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static void * imcc_compile_file(PARROT_INTERP,
-    ARGIN(const char *fullname),
+    ARGIN(char *fullname),
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -885,8 +885,8 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<static void * imcc_compile_file(PARROT_INTERP, const char *fullname,
-STRING **error_message)>
+=item C<static void * imcc_compile_file(PARROT_INTERP, char *fullname, STRING
+**error_message)>
 
 Compile a file by filename (can be either PASM or IMCC code)
 
@@ -896,7 +896,7 @@ Compile a file by filename (can be either PASM or IMCC code)
 
 PARROT_CANNOT_RETURN_NULL
 static void *
-imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
+imcc_compile_file(PARROT_INTERP, ARGIN(char *fullname),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(imcc_compile_file)
@@ -998,7 +998,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
 
 /*
 
-=item C<void * IMCC_compile_file(PARROT_INTERP, const char *s)>
+=item C<void * IMCC_compile_file(PARROT_INTERP, char *s)>
 
 Note: This function is provided for backward compatibility. This
 function can go away in future.
@@ -1009,7 +1009,7 @@ function can go away in future.
 
 PARROT_CANNOT_RETURN_NULL
 void *
-IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
+IMCC_compile_file(PARROT_INTERP, ARGIN(char *s))
 {
     ASSERT_ARGS(IMCC_compile_file)
     STRING *error_message;
@@ -1018,7 +1018,7 @@ IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<void * IMCC_compile_file_s(PARROT_INTERP, const char *s, STRING
+=item C<void * IMCC_compile_file_s(PARROT_INTERP, char *s, STRING
 **error_message)>
 
 =cut
@@ -1027,7 +1027,7 @@ IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 
 PARROT_CANNOT_RETURN_NULL
 void *
-IMCC_compile_file_s(PARROT_INTERP, ARGIN(const char *s),
+IMCC_compile_file_s(PARROT_INTERP, ARGIN(char *s),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(IMCC_compile_file_s)
