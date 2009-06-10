@@ -136,7 +136,7 @@ typedef struct Small_Object_Pool {
     struct Memory_Pool *mem_pool;
     size_t start_arena_memory;
     size_t end_arena_memory;
-    const char *name;
+    PARROT_OBSERVER const char *name;
 #if PARROT_GC_GMS
     struct _gc_gms_hdr marker;          /* limit of list */
     struct _gc_gms_hdr *black;          /* alive */

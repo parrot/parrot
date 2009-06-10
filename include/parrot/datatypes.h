@@ -69,7 +69,7 @@ typedef enum {
 
 /* &end_gen */
 struct _data_types {
-    const char *name;
+    PARROT_OBSERVER const char *name;
     int size;
 };
 
