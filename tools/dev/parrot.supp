@@ -78,7 +78,6 @@
    fun:trace_children
    fun:trace_active_PMCs
 }
-
 {
    trace_children
    Memcheck:Cond
@@ -86,3 +85,262 @@
    fun:trace_active_PMCs
 }
 
+# strip out the system library nonsense
+{
+   gnuld-index-cond
+   Memcheck:Cond
+   fun:index
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-strlen-cond
+   Memcheck:Cond
+   fun:strlen
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-libc-memalign-cond
+   Memcheck:Cond
+   fun:__libc_memalign
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-memcpy-cond
+   Memcheck:Cond
+   fun:memcpy
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-calloc-cond
+   Memcheck:Cond
+   fun:calloc
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-new-object-cond
+   Memcheck:Cond
+   fun:_dl_new_object
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-new-object-value8
+   Memcheck:Value8
+   fun:_dl_new_object
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-memcpy-value8
+   Memcheck:Value8
+   fun:memcpy
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-mempcpy-value8
+   Memcheck:Value8
+   fun:mempcpy
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-map-object-from-fd-cond
+   Memcheck:Cond
+   fun:_dl_map_object_from_fd
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-map-object-from-fd-value8
+   Memcheck:Value8
+   fun:_dl_map_object_from_fd
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-setup-hash-value8
+   Memcheck:Value8
+   fun:_dl_setup_hash
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-main-cond
+   Memcheck:Cond
+   fun:dl_main
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-main-value8
+   Memcheck:Value8
+   fun:dl_main
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-map-object-deps-value8
+   Memcheck:Value8
+   fun:_dl_map_object_deps
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-map-object-cond
+   Memcheck:Cond
+   fun:_dl_map_object
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-map-object-value8
+   Memcheck:Value8
+   fun:_dl_map_object
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-name-match-p-value8
+   Memcheck:Value8
+   fun:_dl_name_match_p
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-name-match-p-cond
+   Memcheck:Cond
+   fun:_dl_name_match_p
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-open-path-cond
+   Memcheck:Cond
+   fun:open_path
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-local-strdup-cond
+   Memcheck:Cond
+   fun:local_strdup
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-map-object-deps-cond
+   Memcheck:Cond
+   fun:_dl_map_object_deps
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-openaux-value8
+   Memcheck:Value8
+   fun:openaux
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-check-map-versions-cond
+   Memcheck:Cond
+   fun:_dl_check_map_versions
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-check-map-versions-value8
+   Memcheck:Value8
+   fun:_dl_check_map_versions
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-check-all-versions-cond
+   Memcheck:Cond
+   fun:_dl_check_all_versions
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-check-all-versions-value8
+   Memcheck:Value8
+   fun:_dl_check_all_versions
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-init-tls-cond
+   Memcheck:Cond
+   fun:init_tls
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-init-tls-value8
+   Memcheck:Value8
+   fun:init_tls
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-do-lookup-x-value8
+   Memcheck:Value8
+   fun:do_lookup_x
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-do-lookup-x-cond
+   Memcheck:Cond
+   fun:do_lookup_x
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-relocate-object-cond
+   Memcheck:Cond
+   fun:_dl_relocate_object
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-relocate-object-value8
+   Memcheck:Value8
+   fun:_dl_relocate_object
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-lookup-symbol-x-value8
+   Memcheck:Value8
+   fun:_dl_lookup_symbol_x
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-check-match.8513-value8
+   Memcheck:Value8
+   fun:check_match.8513
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-protect-relro-value8
+   Memcheck:Value8
+   fun:_dl_protect_relro
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-call-init-value8
+   Memcheck:Value8
+   fun:call_init
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-fixup-cond
+   Memcheck:Cond
+   fun:_dl_fixup
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-fixup-value8
+   Memcheck:Value8
+   fun:_dl_fixup
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-fini-cond
+   Memcheck:Cond
+   fun:_dl_fini
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-fini-value8
+   Memcheck:Value8
+   fun:_dl_fini
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-sort-fini-value8
+   Memcheck:Value8
+   fun:_dl_sort_fini
+   obj:/lib*/ld-*.so
+}
+{
+   gnuld-dl-sort-fini-cond
+   Memcheck:Cond
+   fun:_dl_sort_fini
+   obj:/lib*/ld-*.so
+}
