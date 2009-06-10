@@ -154,7 +154,7 @@ Parrot_compreg(PARROT_INTERP, ARGIN(STRING *type),
 
 /*
 
-=item C<void * Parrot_compile_file(PARROT_INTERP, char *fullname, STRING
+=item C<void * Parrot_compile_file(PARROT_INTERP, const char *fullname, STRING
 **error)>
 
 Compile code file.
@@ -166,7 +166,7 @@ Compile code file.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void *
-Parrot_compile_file(PARROT_INTERP, ARGIN(char *fullname), ARGOUT(STRING **error))
+Parrot_compile_file(PARROT_INTERP, ARGIN(const char *fullname), ARGOUT(STRING **error))
 {
     ASSERT_ARGS(Parrot_compile_file)
     return IMCC_compile_file_s(interp, fullname, error);

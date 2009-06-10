@@ -8,7 +8,7 @@
 
 PARROT_EXPORT void imcc_initialize(PARROT_INTERP);
 PARROT_EXPORT const char * parseflags(PARROT_INTERP, int *argc, char **argv[]);
-PARROT_EXPORT int imcc_run(PARROT_INTERP, char *sourcefile, int argc, char **argv);
+PARROT_EXPORT int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char **argv);
 
 #endif /* PARROT_IMCC_H_GUARD */
 

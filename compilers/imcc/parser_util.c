@@ -59,7 +59,7 @@ static int change_op(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static void * imcc_compile_file(PARROT_INTERP,
-    ARGIN(char *fullname),
+    ARGIN(const char *fullname),
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -885,8 +885,8 @@ imcc_compile_pir_ex(PARROT_INTERP, ARGIN(const char *s))
 
 /*
 
-=item C<static void * imcc_compile_file(PARROT_INTERP, char *fullname, STRING
-**error_message)>
+=item C<static void * imcc_compile_file(PARROT_INTERP, const char *fullname,
+STRING **error_message)>
 
 Compile a file by filename (can be either PASM or IMCC code)
 
@@ -896,7 +896,7 @@ Compile a file by filename (can be either PASM or IMCC code)
 
 PARROT_CANNOT_RETURN_NULL
 static void *
-imcc_compile_file(PARROT_INTERP, ARGIN(char *fullname),
+imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(imcc_compile_file)
@@ -939,8 +939,12 @@ imcc_compile_file(PARROT_INTERP, ARGIN(char *fullname),
     interp->code                     = NULL;
 
     IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = fullname;
-    ext                            = strrchr(fullname, '.');
+    {
+        /* Store a copy, in order to know how to free it later */
+        char *copyname = strdup(fullname);
+        IMCC_INFO(interp)->state->file = copyname;
+        ext                            = strrchr(copyname, '.');
+    }
     IMCC_INFO(interp)->line        = 1;
 
     /*
@@ -998,7 +1002,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(char *fullname),
 
 /*
 
-=item C<void * IMCC_compile_file(PARROT_INTERP, char *s)>
+=item C<void * IMCC_compile_file(PARROT_INTERP, const char *s)>
 
 Note: This function is provided for backward compatibility. This
 function can go away in future.
@@ -1009,7 +1013,7 @@ function can go away in future.
 
 PARROT_CANNOT_RETURN_NULL
 void *
-IMCC_compile_file(PARROT_INTERP, ARGIN(char *s))
+IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
 {
     ASSERT_ARGS(IMCC_compile_file)
     STRING *error_message;
@@ -1018,7 +1022,7 @@ IMCC_compile_file(PARROT_INTERP, ARGIN(char *s))
 
 /*
 
-=item C<void * IMCC_compile_file_s(PARROT_INTERP, char *s, STRING
+=item C<void * IMCC_compile_file_s(PARROT_INTERP, const char *s, STRING
 **error_message)>
 
 =cut
@@ -1027,7 +1031,7 @@ IMCC_compile_file(PARROT_INTERP, ARGIN(char *s))
 
 PARROT_CANNOT_RETURN_NULL
 void *
-IMCC_compile_file_s(PARROT_INTERP, ARGIN(char *s),
+IMCC_compile_file_s(PARROT_INTERP, ARGIN(const char *s),
         ARGOUT(STRING **error_message))
 {
     ASSERT_ARGS(IMCC_compile_file_s)

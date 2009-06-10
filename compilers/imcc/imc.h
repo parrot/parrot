@@ -236,13 +236,13 @@ PMC * imcc_compile(PARROT_INTERP,
         FUNC_MODIFIES(*error_message);
 
 PARROT_CANNOT_RETURN_NULL
-void * IMCC_compile_file(PARROT_INTERP, ARGIN(char *s))
+void * IMCC_compile_file(PARROT_INTERP, ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 void * IMCC_compile_file_s(PARROT_INTERP,
-    ARGIN(char *s),
+    ARGIN(const char *s),
     ARGOUT(STRING **error_message))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

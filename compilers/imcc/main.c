@@ -44,7 +44,7 @@ extern int yydebug;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void compile_to_bytecode(PARROT_INTERP,
-    ARGIN(char * const sourcefile),
+    ARGIN(const char * const sourcefile),
     ARGIN_NULLOK(const char * const output_file))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -923,8 +923,8 @@ determine_output_file_type(PARROT_INTERP,
 
 /*
 
-=item C<static void compile_to_bytecode(PARROT_INTERP, char * const sourcefile,
-const char * const output_file)>
+=item C<static void compile_to_bytecode(PARROT_INTERP, const char * const
+sourcefile, const char * const output_file)>
 
 Compile source code into bytecode (or die trying).
 
@@ -934,7 +934,7 @@ Compile source code into bytecode (or die trying).
 
 static void
 compile_to_bytecode(PARROT_INTERP,
-                    ARGIN(char * const sourcefile),
+                    ARGIN(const char * const sourcefile),
                     ARGIN_NULLOK(const char * const output_file))
 {
     ASSERT_ARGS(compile_to_bytecode)
@@ -955,7 +955,7 @@ compile_to_bytecode(PARROT_INTERP,
     Parrot_pbc_load(interp, pf);
 
     IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = sourcefile;
+    IMCC_INFO(interp)->state->file = strdup(sourcefile);
 
     emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output_file);
 
@@ -1003,7 +1003,8 @@ compile_to_bytecode(PARROT_INTERP,
 
 /*
 
-=item C<int imcc_run(PARROT_INTERP, char *sourcefile, int argc, char **argv)>
+=item C<int imcc_run(PARROT_INTERP, const char *sourcefile, int argc, char
+**argv)>
 
 Entry point of IMCC, as invoked by Parrot's main function.
 Compile source code (if required), write bytecode file (if required)
@@ -1014,7 +1015,7 @@ and run. This function always returns 0.
 */
 
 int
-imcc_run(PARROT_INTERP, ARGIN(char *sourcefile), int argc,
+imcc_run(PARROT_INTERP, ARGIN(const char *sourcefile), int argc,
         ARGIN(char **argv))
 {
     int                obj_file;

@@ -38,9 +38,9 @@ The entry point from the command line into Parrot.
 int
 main(int argc, char * argv[])
 {
-    char    *sourcefile;
-    Interp  *interp;
-    int      status;
+    const char *sourcefile;
+    Interp     *interp;
+    int         status;
 
     /* internationalization setup */
     /* setlocale(LC_ALL, ""); */
