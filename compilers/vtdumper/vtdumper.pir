@@ -35,19 +35,7 @@
     .param pmc past
     .param pmc adverbs :slurpy :named
 
-    .local string frozen
-
-    frozen = freeze past
-    'write_file'("vtable.frozen", frozen)
-
-    exit 0
-.end
-
-
-.sub 'generate_json' :method
-    .param pmc past
-    .param pmc adverbs :slurpy :named
-
+    #spast = simplified past, i.e. converted from a Capture
     .local pmc node, spast, snode, sattrs, sargs, sarg
     .local pmc it, key
     .local int i, j, elems
@@ -55,9 +43,9 @@
     spast = new ['ResizablePMCArray']
 
     #PAST::Block doesn't support iteration or even get_integer, so this is the
-    #easiest way to get all elements
+    #easiest way to get all elements.  Also, freeze/thaw on Captures is broken.
     i = 0
-  loop_start:
+  spast_loop_start:
     node = past[i]
     i += 1
     if_null node, loop_end
@@ -78,8 +66,8 @@
     j = 0
     elems = elements $P0
 
-  args_loop_start:
-    if j == elems goto args_loop_end
+  params_loop_start:
+    if j == elems goto params_loop_end
 
     $P1 = new ['Hash']
 
@@ -92,23 +80,28 @@
     push sargs, $P1
 
     j += 1
-    goto args_loop_start
+    goto params_loop_start
 
-  args_loop_end:
+  params_loop_end:
 
     snode['parameters'] = sargs
+    $P0 = node['parameter_list']
+    snode['parameter_list'] = $P0
 
     sattrs = node['attributes']
     snode['attributes'] = sattrs
     push spast, snode
 
-    goto loop_start
+    goto spast_loop_start
 
   loop_end:
 
-    .local string json
-    json = _json(spast, 1)
-    'write_file'("vtable.json", json)
+    .local string frozen
+    frozen = freeze spast
+    'write_file'("vtable.frozen", frozen)
+
+    #$S0 = _json(spast, 1)
+    #say $S0
 
     #exit to avoid confusing HLLCompiler
     exit 0
