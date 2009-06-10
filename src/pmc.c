@@ -180,7 +180,7 @@ pmc_reuse(PARROT_INTERP, ARGIN(PMC *pmc), INTVAL new_type,
 
 /*
 
-=item C<PMC * pmc_reuse_by_class(PARROT_INTERP, PMC * pmc, PMC * class_, UINTVAL
+=item C<PMC * pmc_reuse_by_class(PARROT_INTERP, PMC *pmc, PMC *class_, UINTVAL
 flags)>
 
 Reuse an existing PMC. Convert it to the type specified by the given Class

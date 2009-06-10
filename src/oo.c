@@ -252,8 +252,8 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC * pmc, PMC * class_, PMC
-* dest)>
+=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC *pmc, PMC *class_, PMC
+*dest)>
 
 Clone an Object PMC. If an existing PMC C<dest> is provided, reuse that
 PMC to store copies of the data. Otherwise, create a new PMC and populate
