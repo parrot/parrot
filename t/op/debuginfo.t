@@ -27,8 +27,10 @@ $ENV{TEST_PROG_ARGS} ||= '';
 my $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/
     ? "\\(unknown file\\)\n-1" : "debuginfo_\\d+\\.pasm\n\\d";
 
-SKIP: {
-skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/;
+#SKIP: {
+#skip "disabled on fast-core",1 if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto)/;
+TODO: {
+    local $TODO = q|Not yet passing on 'fast' or 'cgoto' runcores|;
 
 pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 .pcc_sub main:
@@ -40,7 +42,8 @@ pasm_output_like( <<'CODE', <<"OUTPUT", "getline, getfile" );
 CODE
 /$nolineno/
 OUTPUT
-}
+
+} # END TODO
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "debug backtrace - Null PMC access" );
 .sub main
@@ -167,8 +170,10 @@ OUTPUT
 $nolineno = $ENV{TEST_PROG_ARGS} =~ /--runcore=fast/
     ? '\(\(unknown file\):-1\)' : '\(xyz.pir:126\)';
 
-SKIP: {
-skip "disabled on this core",2 if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto|jit|switch)/;
+#SKIP: {
+#skip "disabled on this core",2 if $ENV{TEST_PROG_ARGS} =~ /--runcore=(fast|cgoto|jit|switch)/;
+TODO: {
+    local $TODO = q|Not yet passing on 'fast', 'cgoto', 'jit' or 'switch' runcores|;
 
 # See "RT #43269 and .annotate
 pir_error_output_like( <<'CODE', <<"OUTPUT", "setfile and setline" );
@@ -204,7 +209,7 @@ CODE
 /$nolineno/
 OUTPUT
 
-}
+} # END TODO
 
 # Local Variables:
 #   mode: cperl
