@@ -181,6 +181,7 @@ destroy_context(PARROT_INTERP)
             mem_sys_free(ptr);
             ptr = next;
         }
+        interp->ctx_mem.free_list[slot] = NULL;
     }
     mem_sys_free(interp->ctx_mem.free_list);
 }

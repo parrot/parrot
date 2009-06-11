@@ -61,7 +61,7 @@ my %methods = qw{
     logical_xor     xor
 };
 
-# XXX Put BigInt and BigNum here 
+# XXX Put BigInt and BigNum here
 my @pmcs = qw{
     Integer Float
 };

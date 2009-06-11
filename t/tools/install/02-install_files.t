@@ -10,7 +10,6 @@ use Test::More tests => 18;
 use Carp;
 use Cwd;
 use File::Copy;
-use File::Path qw( mkpath );
 use File::Temp qw( tempdir );
 use lib qw( lib );
 use Parrot::Install qw(

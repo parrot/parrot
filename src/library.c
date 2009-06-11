@@ -594,10 +594,10 @@ try_bytecode_extensions(PARROT_INTERP, ARGMOD(STRING* path))
 
 /*
 
-=item C<void Parrot_add_library_path(PARROT_INTERP, STRING *path, enum_lib_paths
+=item C<void Parrot_lib_add_path(PARROT_INTERP, STRING *path_str, enum_lib_paths
 which)>
 
-Add a path to the library searchpath of the given type.
+Add a path to the library searchpath of the given type (passing in a STRING).
 
 =cut
 
@@ -605,27 +605,24 @@ Add a path to the library searchpath of the given type.
 
 PARROT_EXPORT
 void
-Parrot_add_library_path(PARROT_INTERP,
-        ARGIN(STRING *path),
+Parrot_lib_add_path(PARROT_INTERP,
+        ARGIN(STRING *path_str),
         enum_lib_paths which)
 {
-    ASSERT_ARGS(Parrot_add_library_path)
+    ASSERT_ARGS(Parrot_lib_add_path)
     PMC * const iglobals = interp->iglobals;
     PMC * const lib_paths = VTABLE_get_pmc_keyed_int(interp, iglobals,
         IGLOBALS_LIB_PATHS);
     PMC * const paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, which);
-    VTABLE_push_string(interp, paths, path);
+    VTABLE_push_string(interp, paths, path_str);
 }
 
 /*
 
-=item C<void Parrot_add_library_path_from_cstring(PARROT_INTERP, const char
-*path, enum_lib_paths which)>
+=item C<void Parrot_lib_add_path_from_cstring(PARROT_INTERP, const char *path,
+enum_lib_paths which)>
 
 Add a path to the library searchpath of the given type (passing in a C string).
-
-This function is just an interface to C<Parrot_add_library_path> for low-level
-code.
 
 =cut
 
@@ -633,13 +630,13 @@ code.
 
 PARROT_EXPORT
 void
-Parrot_add_library_path_from_cstring(PARROT_INTERP,
+Parrot_lib_add_path_from_cstring(PARROT_INTERP,
         ARGIN(const char *path),
         enum_lib_paths which)
 {
-    ASSERT_ARGS(Parrot_add_library_path_from_cstring)
+    ASSERT_ARGS(Parrot_lib_add_path_from_cstring)
     STRING * const path_str = Parrot_str_new(interp, path, 0);
-    Parrot_add_library_path(interp, path_str, which);
+    Parrot_lib_add_path(interp, path_str, which);
 }
 
 /*

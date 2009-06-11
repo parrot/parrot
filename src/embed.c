@@ -34,7 +34,11 @@ static FLOATVAL calibrate(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char * op_name(PARROT_INTERP, int k)
+        __attribute__nonnull__(1);
+
+static void print_constant_table(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void print_debug(PARROT_INTERP, SHIM(int status), SHIM(void *p))
@@ -59,6 +63,8 @@ static PMC* setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 #define ASSERT_ARGS_calibrate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_op_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(interp)
+#define ASSERT_ARGS_print_constant_table __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
 #define ASSERT_ARGS_print_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp)
@@ -105,6 +111,7 @@ Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
     /* inter_create.c:make_interpreter builds a new Parrot_Interp. */
     return make_interpreter(parent, PARROT_NO_FLAGS);
 }
+
 
 /*
 
@@ -388,17 +395,17 @@ PARROT_CAN_RETURN_NULL
 PackFile *
 Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int debug)
 {
+    PackFile *pf;
+    char     *program_code;
     FILE     *io        = NULL;
     INTVAL    is_mapped = 0;
-    char     *program_code;
-    PackFile *pf;
     INTVAL    program_size;
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     int       fd        = -1;
 #endif
 
-    if (fullname == NULL || STREQ(fullname, "-")) {
+    if (!fullname || STREQ(fullname, "-")) {
         /* read from STDIN */
         io = stdin;
 
@@ -418,8 +425,9 @@ Parrot_pbc_read(PARROT_INTERP, ARGIN_NULLOK(const char *fullname), const int deb
 
         /* we may need to relax this if we want to read bytecode from pipes */
         if (!Parrot_stat_info_intval(interp, fs, STAT_ISREG)) {
-            Parrot_io_eprintf(interp, "Parrot VM: '%s', is not a regular file %i.\n",
-                    fullname, errno);
+            Parrot_io_eprintf(interp,
+                "Parrot VM: '%s', is not a regular file %i.\n",
+                fullname, errno);
             return NULL;
         }
 
@@ -446,17 +454,18 @@ again:
         INTVAL wanted     = program_size;
         size_t read_result;
 
-        program_code = (char *)mem_sys_allocate(chunk_size);
+        program_code = mem_allocate_n_typed(chunk_size, char);
+        cursor       = program_code;
         program_size = 0;
-        cursor       = (char *)program_code;
 
         while ((read_result = fread(cursor, 1, chunk_size, io)) > 0) {
             program_size += read_result;
+
             if (program_size == wanted)
                 break;
+
             chunk_size   = 1024;
-            program_code =
-                (char *)mem_sys_realloc(program_code, program_size + chunk_size);
+            mem_realloc_n_typed(program_code, program_size + chunk_size, char);
 
             if (!program_code) {
                 Parrot_io_eprintf(interp,
@@ -466,15 +475,17 @@ again:
                 return NULL;
             }
 
-            cursor = (char *)program_code + program_size;
+            cursor = (char *)(program_code + program_size);
         }
 
         if (ferror(io)) {
-            Parrot_io_eprintf(interp, "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
+            Parrot_io_eprintf(interp,
+             "Parrot VM: Problem reading packfile from PIO:  code %d.\n",
                         ferror(io));
             mem_sys_free(program_code);
             return NULL;
         }
+
         fclose(io);
     }
     else {
@@ -507,12 +518,13 @@ again:
             /* try again, now with IO reading the file */
             io = fopen(fullname, "rb");
             if (!io) {
-                Parrot_io_eprintf(interp, "Parrot VM: Can't open %s, code %i.\n",
-                        fullname, errno);
+                Parrot_io_eprintf(interp,
+                    "Parrot VM: Can't open %s, code %i.\n", fullname, errno);
                 return NULL;
             }
             goto again;
         }
+
         is_mapped = 1;
 
 #else   /* PARROT_HAS_HEADER_SYSMMAN */
@@ -539,8 +551,8 @@ again:
         return NULL;
     }
 
+    /* Set :main routine */
     if (!(pf->options & PFOPT_HEADERONLY))
-        /* Set :main routine */
         do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
 
     /* JITting and/or prederefing the sub/the bytecode is done
@@ -573,7 +585,7 @@ PARROT_EXPORT
 void
 Parrot_pbc_load(PARROT_INTERP, NOTNULL(PackFile *pf))
 {
-    if (pf == NULL) {
+    if (!pf) {
         Parrot_io_eprintf(interp, "Invalid packfile\n");
         return;
     }
@@ -581,6 +593,7 @@ Parrot_pbc_load(PARROT_INTERP, NOTNULL(PackFile *pf))
     interp->initial_pf = pf;
     interp->code       = pf->cur_cs;
 }
+
 
 /*
 
@@ -599,6 +612,7 @@ Parrot_pbc_fixup_loaded(PARROT_INTERP)
     PackFile_fixup_subs(interp, PBC_LOADED, NULL);
 }
 
+
 /*
 
 =item C<static PMC* setup_argv(PARROT_INTERP, int argc, char **argv)>
@@ -614,9 +628,8 @@ static PMC*
 setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
 {
     ASSERT_ARGS(setup_argv)
+    PMC   *userargv = pmc_new(interp, enum_class_ResizableStringArray);
     INTVAL i;
-    PMC   *userargv;
-
 
     if (Interp_debug_TEST(interp, PARROT_START_DEBUG_FLAG)) {
         Parrot_io_eprintf(interp,
@@ -624,13 +637,9 @@ setup_argv(PARROT_INTERP, int argc, ARGIN(char **argv))
             argc);
     }
 
-    userargv = pmc_new_noinit(interp, enum_class_ResizableStringArray);
-
     /* immediately anchor pmc to root set */
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals,
             (INTVAL)IGLOBALS_ARGV_LIST, userargv);
-
-    VTABLE_init(interp, userargv);
 
     for (i = 0; i < argc; i++) {
         /* Run through argv, adding everything to @ARGS. */
@@ -686,6 +695,7 @@ Returns the name of the opcode.
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char *
 op_name(PARROT_INTERP, int k)
 {
@@ -726,11 +736,11 @@ static FLOATVAL
 calibrate(PARROT_INTERP)
 {
     ASSERT_ARGS(calibrate)
-    size_t   count  = 1000000;
-    size_t   n      = count;
     opcode_t code[] = { 1 };      /* noop */
     opcode_t *pc    = code;
-    FLOATVAL start  = Parrot_floatval_time();
+    const size_t   count  = 1000000;
+    size_t   n      = count;
+    const FLOATVAL start  = Parrot_floatval_time();
     FLOATVAL now    = start;
 
     /* op timing isn't free; it requires at least one time fetch per op */
@@ -869,13 +879,14 @@ static PMC*
 set_current_sub(PARROT_INTERP)
 {
     ASSERT_ARGS(set_current_sub)
-    opcode_t    i;
     Parrot_sub *sub_pmc_sub;
     PMC        *sub_pmc;
 
     PackFile_ByteCode   * const cur_cs = interp->code;
     PackFile_FixupTable * const ft     = cur_cs->fixups;
     PackFile_ConstTable * const ct     = cur_cs->const_table;
+
+    opcode_t    i;
 
     /*
      * Walk the fixup table.  The first Sub-like entry should be our
@@ -903,7 +914,7 @@ set_current_sub(PARROT_INTERP)
         }
     }
 
-    /* if we didn't find anything put a dummy PMC into current_sub */
+    /* if we didn't find anything, put a dummy PMC into current_sub */
 
     sub_pmc                      = pmc_new(interp, enum_class_Sub);
     PMC_get_sub(interp, sub_pmc, sub_pmc_sub);
@@ -971,7 +982,8 @@ Parrot_runcode(PARROT_INTERP, int argc, ARGIN(char **argv))
                 Parrot_io_eprintf(interp, "EXEC core");
                 break;
             default:
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown run core");
+                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                     "Unknown run core");
         }
 
         Parrot_io_eprintf(interp, " ***\n");
@@ -1051,25 +1063,28 @@ Parrot_debug(PARROT_INTERP, NOTNULL(Parrot_Interp debugger), opcode_t * pc)
     return NULL;
 }
 
+
 /*
 
 =item C<static void print_constant_table(PARROT_INTERP)>
 
-Print the contents of the constants table.
+Prints the contents of the constants table.
 
 =cut
 
 */
 static void
-print_constant_table(PARROT_INTERP) {
-    INTVAL numconstants = interp->code->const_table->const_count;
+print_constant_table(PARROT_INTERP)
+{
+    ASSERT_ARGS(print_constant_table)
+    const INTVAL numconstants = interp->code->const_table->const_count;
     INTVAL i;
 
     /* TODO: would be nice to print the name of the file as well */
     Parrot_io_printf(interp, "=head1 Constant-table\n\n");
 
     for (i = 0; i < numconstants; ++i) {
-        PackFile_Constant *c = interp->code->const_table->constants[i];
+        const PackFile_Constant * const c = interp->code->const_table->constants[i];
 
         switch (c->type) {
             case PFC_NUMBER:
@@ -1087,17 +1102,20 @@ print_constant_table(PARROT_INTERP) {
                 break;
             case PFC_PMC: {
                 Parrot_io_printf(interp, "PMC_CONST(%d): ", i);
+
                 switch (c->u.key->vtable->base_type) {
-                    /* each PBC file has a ParrotInterpreter, but it can't stringify by itself */
+                    /* each PBC file has a ParrotInterpreter, but it can't
+                     * stringify by itself */
                     case enum_class_ParrotInterpreter:
                         Parrot_io_printf(interp, "'ParrotInterpreter'");
                         break;
 
-                    /* FixedIntegerArrays are used for signatures, handy to print */
+                    /* FixedIntegerArrays used for signatures, handy to print */
                     case enum_class_FixedIntegerArray: {
                         INTVAL n = VTABLE_elements(interp, c->u.key);
                         INTVAL i;
                         Parrot_io_printf(interp, "[");
+
                         for (i = 0; i < n; ++i) {
                             INTVAL val = VTABLE_get_integer_keyed_int(interp, c->u.key, i);
                             Parrot_io_printf(interp, "%d", val);
@@ -1158,11 +1176,11 @@ void
 Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_options options)
 {
     PDB_line_t *line;
-    PDB_t      *pdb             = mem_allocate_zeroed_typed(PDB_t);
-    int         num_mappings    = 0;
-    int         curr_mapping    = 0;
-    int         op_code_seq_num = 0;
-    int         debugs;
+    PDB_t * const pdb   = mem_allocate_zeroed_typed(PDB_t);
+    int num_mappings    = 0;
+    int curr_mapping    = 0;
+    int op_code_seq_num = 0;
+    int debugs;
 
     interp->pdb     = pdb;
     pdb->cur_opcode = interp->code->base.data;
@@ -1237,9 +1255,8 @@ Parrot_disassemble(PARROT_INTERP, SHIM(const char *outfile), Parrot_disassemble_
 
 =item C<void Parrot_run_native(PARROT_INTERP, native_func_t func)>
 
-Run the C function C<func> through the program C<[enternative, end]>.
-This ensures that the function is run with the same setup as in other
-run loops.
+Runs the C function C<func> through the program C<[enternative, end]>.  This
+ensures that the function runs with the same setup as in other run loops.
 
 This function is used in some of the source tests in F<t/src> which use
 the interpreter outside a runloop.
@@ -1252,7 +1269,7 @@ PARROT_EXPORT
 void
 Parrot_run_native(PARROT_INTERP, native_func_t func)
 {
-    PackFile       *pf = PackFile_new(interp, 0);
+    PackFile * const pf = PackFile_new(interp, 0);
     static opcode_t program_code[2];
 
     program_code[0] = interp->op_lib->op_code("enternative", 0);
@@ -1273,12 +1290,13 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
     runops(interp, interp->resume_offset);
 }
 
+
 /*
 
 =item C<Parrot_PMC Parrot_compile_string(PARROT_INTERP, Parrot_String type,
 const char *code, Parrot_String *error)>
 
-Compile code string.
+Compiles a code string.
 
 =cut
 
@@ -1289,16 +1307,14 @@ Parrot_PMC
 Parrot_compile_string(PARROT_INTERP, Parrot_String type,
         const char *code, Parrot_String *error)
 {
+    /* For the benefit of embedders that do not load any pbc
+     * before compiling a string */
 
-    /* For the benefit of embedders that does not load any pbc
-     * before compiling a string
-     */
-    if (! interp->initial_pf) {
-        PackFile *pf = PackFile_new_dummy(interp, "compile_string");
+    if (!interp->initial_pf) {
+        PackFile * const pf = PackFile_new_dummy(interp, "compile_string");
         /* Assumption: there is no valid reason to fail to create it.
-         * If the assumption changes, replace the assertio with a
-         * runtime check
-         */
+         * If the assumption changes, replace the assertion with a
+         * runtime check */
         PARROT_ASSERT(interp->initial_pf);
     }
 
@@ -1311,6 +1327,7 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type,
     *error = Parrot_str_new(interp, "Invalid interpreter type", 0);
     return NULL;
 }
+
 
 /*
 

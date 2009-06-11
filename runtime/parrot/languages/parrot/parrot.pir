@@ -30,7 +30,8 @@
     library['name'] = name
     library['filename'] = file
     # If this fails, we should build a hash of DEFAULT and ALL => the normal ns
-    $P0 = get_hll_global name, 'EXPORT'
+    $P0 = get_hll_namespace name
+    $P0 = $P0['EXPORT']
     library['symbols'] = $P0
     $P0 = get_hll_namespace name
     library['namespace'] = $P0
@@ -58,6 +59,46 @@
     relns.'push'('DEFAULT')
     exportns = ns.'make_namespace'(relns)
     ns.'export_to'(exportns, syms)
+.end
+
+.sub 'import' :method :multi(_,_)
+    .param pmc library
+    .local pmc i, targetns
+    i = getinterp
+    targetns = i['namespace';1]
+    .tailcall self.'import'('parrot',library,'targetns'=>targetns)
+.end
+
+.sub 'import' :method :multi(_,_,_)
+    .param string lang
+    .param pmc library
+    .param pmc targetns :named('targetns') :optional
+    .local pmc name, compiler, library, imports
+    $S0 = library
+    name = split '::', $S0
+    compiler = compreg lang
+    unless null targetns goto has_targetns
+    $P0 = getinterp
+    targetns = $P0['namespace';1]
+  has_targetns:
+    library = compiler.'load_library'(name)
+    imports = library['symbols']
+    imports = imports['DEFAULT']
+    .local pmc ns_iter, item
+    ns_iter = iter imports
+  import_loop:
+    unless ns_iter goto import_loop_end
+    $S0 = shift ns_iter
+    $P0 = imports[$S0]
+    targetns[$S0] = $P0
+    goto import_loop
+  import_loop_end:
+    #foreignlibns = library['namespace']
+    #if null foreignlibns goto no_foreign_ns
+    #$S0 = pop name
+    #set_hll_global name, $S0, foreignlibns
+    #no_foreign_ns:
+    .return (library)
 .end
 
 # TODO Should this provide support for loading HLL libraries?

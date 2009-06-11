@@ -323,7 +323,7 @@ sub print_module {
     my $cwd     = cwd();
     my $fulldir = File::Spec->catdir( $cwd, $self->{moddir} );
     if ( !-d $fulldir ) {
-        if ( !File::Path::mkpath( $fulldir, 0, 0755 ) ) {
+        if ( !File::Path::mkpath( $fulldir, { mode => 0755 } ) ) {
             -d $fulldir
                 or die "$self->{script}: Could not mkdir $fulldir: $!!\n";
         }
@@ -412,7 +412,7 @@ sub print_h {
     my $cwd     = cwd();
     my $fulldir = File::Spec->catdir( $cwd, $self->{inc_dir} );
     if ( !-d $fulldir ) {
-        if ( !File::Path::mkpath( $fulldir, 0, 0755 ) ) {
+        if ( !File::Path::mkpath( $fulldir, { mode => 0755 } ) ) {
             -d $fulldir
                 or die "$self->{script}: Could not mkdir $fulldir: $!!\n";
         }

@@ -88,7 +88,7 @@ static void notify_func_table(PARROT_INTERP,
 static void prederef_args(
     ARGMOD(void **pc_prederef),
     PARROT_INTERP,
-    ARGIN(opcode_t *pc),
+    ARGIN(const opcode_t *pc),
     ARGIN(const op_info_t *opinfo))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -170,8 +170,8 @@ static void turn_ev_check(PARROT_INTERP, int on)
 
 /*
 
-=item C<static void prederef_args(void **pc_prederef, PARROT_INTERP, opcode_t
-*pc, const op_info_t *opinfo)>
+=item C<static void prederef_args(void **pc_prederef, PARROT_INTERP, const
+opcode_t *pc, const op_info_t *opinfo)>
 
 Called from C<do_prederef()> to deal with any arguments.
 
@@ -183,7 +183,7 @@ C<pc_prederef> is the current opcode.
 
 static void
 prederef_args(ARGMOD(void **pc_prederef), PARROT_INTERP,
-        ARGIN(opcode_t *pc), ARGIN(const op_info_t *opinfo))
+        ARGIN(const opcode_t *pc), ARGIN(const op_info_t *opinfo))
 {
     ASSERT_ARGS(prederef_args)
     const PackFile_ConstTable * const const_table = interp->code->const_table;
@@ -298,7 +298,7 @@ C<pc_prederef> is the current opcode, and C<type> is the run core type.
 */
 
 void
-do_prederef(void **pc_prederef, PARROT_INTERP, int type)
+do_prederef(ARGIN(void **pc_prederef), PARROT_INTERP, int type)
 {
     ASSERT_ARGS(do_prederef)
     const size_t     offset = pc_prederef - interp->code->prederef.code;
@@ -619,13 +619,13 @@ C<op_info_table>
 */
 
 void
-exec_init_prederef(PARROT_INTERP, void *prederef_arena)
+exec_init_prederef(PARROT_INTERP, ARGIN(void *prederef_arena))
 {
     ASSERT_ARGS(exec_init_prederef)
     load_prederef(interp, PARROT_CGP_CORE);
 
     if (!interp->code->prederef.code) {
-        void **temp = (void **)prederef_arena;
+        void ** const temp = (void **)prederef_arena;
 
         interp->code->prederef.code = temp;
         /* TODO */
@@ -1086,7 +1086,7 @@ Register a dynamic oplib.
 */
 
 void
-dynop_register(PARROT_INTERP, PMC *lib_pmc)
+dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 {
     ASSERT_ARGS(dynop_register)
     op_lib_t *lib, *core;

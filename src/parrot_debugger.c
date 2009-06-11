@@ -108,6 +108,7 @@ and C<debug_break> ops in F<ops/debug.ops>.
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <ctype.h>
 #include "../compilers/imcc/imc.h"
 #include "../compilers/imcc/parser.h"
@@ -183,7 +184,7 @@ main(int argc, char *argv[])
             Parrot_pbc_load(interp, pf);
 
             IMCC_push_parser_state(interp);
-            IMCC_INFO(interp)->state->file = filename;
+            IMCC_INFO(interp)->state->file = strdup(filename);
 
             if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
                 IMCC_fatal_standalone(interp, EXCEPTION_PIO_ERROR,

@@ -252,8 +252,8 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
 
 /*
 
-=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC * pmc, PMC * class_, PMC
-* dest)>
+=item C<PMC * Parrot_oo_clone_object(PARROT_INTERP, PMC *pmc, PMC *class_, PMC
+*dest)>
 
 Clone an Object PMC. If an existing PMC C<dest> is provided, reuse that
 PMC to store copies of the data. Otherwise, create a new PMC and populate
@@ -265,16 +265,16 @@ that with the data.
 
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
-    ARGMOD_NULLOK(PMC * class_), ARGMOD_NULLOK(PMC * dest))
+Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC *pmc),
+    ARGMOD_NULLOK(PMC *class_), ARGMOD_NULLOK(PMC *dest))
 {
     ASSERT_ARGS(Parrot_oo_clone_object)
-    Parrot_Object_attributes * obj;
-    Parrot_Class_attributes  * _class;
-    INTVAL num_classes;
-    PMC * cloned;
-    Parrot_Object_attributes * cloned_guts;
-    INTVAL i, num_attrs;
+    Parrot_Object_attributes *obj;
+    Parrot_Object_attributes *cloned_guts;
+    Parrot_Class_attributes  *_class;
+    PMC                      *cloned;
+    INTVAL                    num_classes;
+    INTVAL                    i, num_attrs;
 
     if (!PMC_IS_NULL(dest)) {
         PARROT_ASSERT(!PMC_IS_NULL(class_));
@@ -284,9 +284,10 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
         cloned = dest;
     }
     else {
-        obj = PARROT_OBJECT(pmc);
+        obj    = PARROT_OBJECT(pmc);
         cloned = pmc_new_noinit(interp, enum_class_Object);
     }
+
     _class = PARROT_CLASS(obj->_class);
     PARROT_ASSERT(_class);
     num_classes = VTABLE_elements(interp, _class->all_parents);
@@ -299,7 +300,7 @@ Parrot_oo_clone_object(PARROT_INTERP, ARGIN(PMC * pmc),
     PObj_is_object_SET(cloned);
 
     /* Now create the underlying structure, and clone attributes list.class. */
-    cloned_guts               = mem_allocate_zeroed_typed(Parrot_Object_attributes);
+    cloned_guts               = mem_allocate_typed(Parrot_Object_attributes);
     PMC_data(cloned)          = cloned_guts;
     cloned_guts->_class       = obj->_class;
     cloned_guts->attrib_store = VTABLE_clone(interp, obj->attrib_store);
@@ -351,7 +352,7 @@ Parrot_oo_new_object_attrs(PARROT_INTERP, ARGIN(PMC * class_))
 {
     ASSERT_ARGS(Parrot_oo_new_object_attrs)
     Parrot_Object_attributes * const obj_guts =
-        mem_allocate_zeroed_typed(Parrot_Object_attributes);
+        mem_allocate_typed(Parrot_Object_attributes);
     obj_guts->_class       = class_;
     obj_guts->attrib_store = pmc_new(interp, enum_class_ResizablePMCArray);
     return (void *)obj_guts;
@@ -1015,8 +1016,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
                 sizeof (Meth_cache_entry ***) * mc->mc_size);
         }
         else {
-            mc->idx = (Meth_cache_entry ***)mem_sys_allocate_zeroed(
-                sizeof (Meth_cache_entry ***) * (type + 1));
+            mc->idx = mem_allocate_n_zeroed_typed(type + 1, Meth_cache_entry**);
         }
         mc->mc_size = type + 1;
     }

@@ -525,7 +525,7 @@ struct nodeType_t;
 struct parser_state_t {
     struct parser_state_t *next;
     Interp                *interp;
-    const char            *file;
+    char                  *file;
     FILE                  *handle;
     int                    file_needs_free; /* is *file malloced? */
     int                    line;

@@ -408,9 +408,11 @@ SP              [ ]
 ".="                   return CONCAT_ASSIGN;
 
 <emit,INITIAL>".macro_const" {
-        int c;
-        int start_line;
-        int start_cond  = YY_START;
+        char *macro_name   = NULL;
+        int   start_cond   = YY_START;
+        int   macro_exists = 0;
+        int   c;
+        int   start_line;
 
         BEGIN(macro);
         c = yylex_skip(valp, interp, " ", yyscanner);
@@ -419,7 +421,7 @@ SP              [ ]
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                "Constant names must be identifiers");
 
-        IMCC_INFO(interp)->cur_macro_name = valp->s;
+        IMCC_INFO(interp)->cur_macro_name = macro_name = valp->s;
         start_line                        = IMCC_INFO(interp)->line;
 
         c = yylex_skip(valp, interp, " ", yyscanner);
@@ -427,10 +429,20 @@ SP              [ ]
         if (c != INTC && c != FLOATC && c != STRINGC && c != REG)
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
                 "Constant '%s' value must be a number, "
-                "stringliteral or register", IMCC_INFO(interp)->cur_macro_name);
+                "stringliteral or register", macro_name);
 
-        define_macro(interp, IMCC_INFO(interp)->cur_macro_name, NULL, valp->s, start_line);
+        /* macro_name becomes a hash key
+         * the first one needs to remain; destroying the hash frees it
+         * subsequent macro_names need destruction here to avoid leaks */
+        if (find_macro(interp, macro_name))
+            macro_exists = 1;
+
+        define_macro(interp, macro_name, NULL, valp->s, start_line);
         mem_sys_free(valp->s);
+
+        /* don't leak these */
+        if (macro_exists)
+            mem_sys_free(macro_name);
 
         IMCC_INFO(interp)->cur_macro_name = NULL;
 
@@ -505,7 +517,7 @@ SP              [ ]
         YYCHOP();
 
         if (valp)
-            valp->s = yytext;
+            valp->s = str_dup(yytext);
 
         return LABEL;
     }
@@ -702,7 +714,8 @@ SP              [ ]
             snprintf(label, len, "local__%s__%s__$:",
                 IMCC_INFO(interp)->cur_macro_name, yytext+1);
 
-            /* XXX: free valp->s if it exists? */
+            if (valp->s)
+                mem_sys_free(valp->s);
             valp->s = label;
         }
 
@@ -717,6 +730,8 @@ SP              [ ]
             snprintf(label, len, "local__%s__%s__$",
                 IMCC_INFO(interp)->cur_macro_name, yytext+2);
 
+            if (valp->s)
+                mem_sys_free(valp->s);
             valp->s = label;
         }
 
@@ -773,10 +788,12 @@ new_frame(PARROT_INTERP) {
 
     if (IMCC_INFO(interp)->frames) {
         tmp->s.pasm_file = IMCC_INFO(interp)->frames->s.pasm_file;
+
         if (IMCC_INFO(interp)->frames->s.file_needs_free)
-            tmp->s.file = str_dup(IMCC_INFO(interp)->frames->s.file);
+            tmp->s.file            = str_dup(IMCC_INFO(interp)->frames->s.file);
         else
-            tmp->s.file = IMCC_INFO(interp)->frames->s.file;
+            tmp->s.file            = IMCC_INFO(interp)->frames->s.file;
+
         tmp->s.file_needs_free = IMCC_INFO(interp)->frames->s.file_needs_free;
     }
 
@@ -890,8 +907,11 @@ read_braced(YYSTYPE *valp, PARROT_INTERP, const char *macro_name,
         c = yylex(&val, yyscanner, interp);
     }
 
-    if (valp)
+    if (valp) {
+        if (valp->s)
+            mem_sys_free(valp->s);
         *valp = val;
+    }
     else
         mem_sys_free(val.s);
 
@@ -929,6 +949,8 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
             current                           = str_dup("");
             len                               = 0;
 
+            if (val.s)
+                mem_sys_free(val.s);
             c = yylex_skip(&val, interp, " \n", yyscanner);
         }
         else if (need_id && (*current || c != IDENTIFIER) && c != ' ') {
@@ -938,6 +960,7 @@ read_params(YYSTYPE *valp, PARROT_INTERP, params_t *params,
         }
         else if (c == '{') {
             current = read_braced(&val, interp, macro_name, current, yyscanner);
+            mem_sys_free(val.s);
             c       = yylex_skip(&val, interp, " \n", yyscanner);
             len     = strlen(current);
         }
@@ -1131,15 +1154,19 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
     if (m) {
         int i,c,start_cond;
 
-        macro_frame_t * const frame = new_frame(interp);
-        frame->params               = &m->params;
+        macro_frame_t * frame = new_frame(interp);
+        frame->params         = &m->params;
 
         /* When an error occurs, then report it as being in a macro */
         frame->is_macro = 1;
 
         /* remember macro name for error reporting
-        RT #42384 check that all the .file text is malloced / freed */
-        frame->s.file = str_dup(name);
+         * first free any filename allocated in new_frame() */
+        if (frame->s.file && frame->s.file_needs_free)
+            mem_sys_free(frame->s.file);
+
+        /* RT #42384 check that all the .file text is malloced / freed */
+        frame->s.file            = str_dup(name);
         frame->s.file_needs_free = 1;
 
         /* whitespace can be safely ignored */
@@ -1231,10 +1258,10 @@ include_file(PARROT_INTERP, char *file_name, void *yyscanner)
         IMCC_fataly(interp, EXCEPTION_EXTERNAL_ERROR, strerror(errno));
 
     mem_sys_free(s);
-    frame->s.file   = file_name;
+    frame->s.file            = file_name;
     frame->s.file_needs_free = 0;
-    frame->s.handle = file;
-    ext             = strrchr(file_name, '.');
+    frame->s.handle          = file;
+    ext                      = strrchr(file_name, '.');
 
     if (ext) {
         if (STREQ(ext, ".pasm")) {

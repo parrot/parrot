@@ -219,14 +219,9 @@ help(void)
     "    -L --library add path to library search\n"
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
-    "    -R --runcore CORE\n"
-    "    --bounds-checks|--slow-core\n"
-    "    --CGP-core\n"
-    "    --fast-core\n"
-    "    --computed-goto-core\n"
-    "    --jit-core\n"
+    "    -R --runcore slow|bounds|fast|jit|cgoto|cgp|cgp-jit\n"
+    "    -R --runcore switch|switch-jit|trace|exec|gcdebug\n"
     "    -p --profile\n"
-    "    --switched-core\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
@@ -534,15 +529,15 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
                 SET_FLAG(PARROT_DESTROY_FLAG);
                 break;
             case 'I':
-                Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
+                Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_INCLUDE);
                 break;
             case 'L':
-                Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
+                Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_LIBRARY);
                 break;
             case 'X':
-                Parrot_add_library_path_from_cstring(interp, opt.opt_arg,
+                Parrot_lib_add_path_from_cstring(interp, opt.opt_arg,
                     PARROT_LIB_PATH_DYNEXT);
                 break;
             default:
@@ -960,7 +955,7 @@ compile_to_bytecode(PARROT_INTERP,
     Parrot_pbc_load(interp, pf);
 
     IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = sourcefile;
+    IMCC_INFO(interp)->state->file = strdup(sourcefile);
 
     emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output_file);
 

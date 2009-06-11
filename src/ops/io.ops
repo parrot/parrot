@@ -317,7 +317,7 @@ Print $2 on the IO stream object $1.
 
 op print(invar PMC, in INT) :base_io {
   if ($1) {
-    STRING * const s = Parrot_sprintf_c(interp, INTVAL_FMT, $2);
+    STRING * const s = Parrot_str_from_int(interp, $2);
     Parrot_io_putps(interp, $1, s);
   }
 }

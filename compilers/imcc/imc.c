@@ -266,6 +266,8 @@ imc_free_unit(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
 
     clear_locals(unit);
 
+    if (unit->_namespace && unit->owns_namespace)
+        free_sym(unit->_namespace);
     if (unit->vtable_name)
         mem_sys_free(unit->vtable_name);
     if (unit->instance_of)

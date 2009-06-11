@@ -56,13 +56,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'runinterp - works with printing' );
     print "uno\n"
     runinterp test_interp, pasm
     print "dos\n"
-
-  get_stdout:
-    $S0 = readline stdout
-    actual .= $S0
-    if $S0 goto get_stdout
-
-    print actual
     goto pasm_end
 
   pasm:

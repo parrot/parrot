@@ -80,12 +80,14 @@ static void dump_string(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char* GDB_P(PARROT_INTERP, ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char* GDB_print_reg(PARROT_INTERP, int t, int n)
         __attribute__nonnull__(1);
 
@@ -388,8 +390,8 @@ static void dbg_watch(PDB_t * pdb, const char * cmd) /* HEADERIZER SKIP */
 
 struct DebuggerCmd {
     debugger_func_t func;
-    const char * const shorthelp;
-    const char * const help;
+    PARROT_OBSERVER const char * const shorthelp;
+    PARROT_OBSERVER const char * const help;
 };
 
 static const DebuggerCmd
@@ -541,9 +543,9 @@ the -t option.\n"
     };
 
 struct DebuggerCmdList {
-    const char * const name;
+    PARROT_OBSERVER const char * const name;
     char shortname;
-    const DebuggerCmd * const cmd;
+    PARROT_OBSERVER const DebuggerCmd * const cmd;
 };
 
 DebuggerCmdList DebCmdList [] = {
@@ -2730,14 +2732,14 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
     if (specialop > 0) {
         char buf[1000];
         PMC * const sig = interp->code->const_table->constants[op[1]]->u.key;
-        int n_values = VTABLE_elements(interp, sig);
+        const int n_values = VTABLE_elements(interp, sig);
         /* The flag_names strings come from Call_bits_enum_t (with which it
            should probably be colocated); they name the bits from LSB to MSB.
            The two least significant bits are not flags; they are the register
            type, which is decoded elsewhere.  We also want to show unused bits,
            which could indicate problems.
         */
-        const char * const flag_names[] = {
+        PARROT_OBSERVER const char * const flag_names[] = {
                                      "",
                                      "",
                                      " :unused004",
@@ -2753,7 +2755,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
 
 
         /* Register decoding.  It would be good to abstract this, too. */
-        static const char regs[] = "ISPN";
+        PARROT_OBSERVER static const char regs[] = "ISPN";
 
         for (j = 0; j < n_values; j++) {
             size_t idx = 0;
@@ -3548,6 +3550,7 @@ print directly and return "").
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char*
 GDB_print_reg(PARROT_INTERP, int t, int n)
 {
@@ -3587,6 +3590,7 @@ Returns "" or error message.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_OBSERVER
 static const char*
 GDB_P(PARROT_INTERP, ARGIN(const char *s))
 {

@@ -33,7 +33,8 @@ my $PERL5  = $PConfig{perl};
 
 my $ended_ok = 0;
 
-my ($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', DIR => cwd(), UNLINK => 1 );
+#my ($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', DIR => cwd(), UNLINK => 1 );
+my ($FOO, $temp_pasm) = create_tempfile( SUFFIX => '.pasm', UNLINK => 1 );
 
 print $FOO <<'ENDF';
   .macro_const BAR 42

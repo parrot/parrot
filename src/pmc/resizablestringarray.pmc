@@ -36,7 +36,6 @@ Initializes the array.
 */
 
     VTABLE void init() {
-
         Parrot_ResizableStringArray_attributes *attrs =
             mem_allocate_zeroed_typed(Parrot_ResizableStringArray_attributes);
 

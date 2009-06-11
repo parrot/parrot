@@ -800,14 +800,19 @@ IMCC_itcall_sub(PARROT_INTERP, ARGIN(SymReg *sub))
 {
     ASSERT_ARGS(IMCC_itcall_sub)
     IMCC_INFO(interp)->cur_call->pcc_sub->sub = sub;
+
     if (IMCC_INFO(interp)->cur_obj) {
         if (IMCC_INFO(interp)->cur_obj->set != 'P')
             IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR, "object isn't a PMC");
-        IMCC_INFO(interp)->cur_call->pcc_sub->object = IMCC_INFO(interp)->cur_obj;
+
+        IMCC_INFO(interp)->cur_call->pcc_sub->object =
+            IMCC_INFO(interp)->cur_obj;
         IMCC_INFO(interp)->cur_obj = NULL;
     }
+
     if (IMCC_INFO(interp)->cur_call->pcc_sub->sub->pmc_type == enum_class_NCI)
         IMCC_INFO(interp)->cur_call->pcc_sub->flags |= isNCI;
+
     if (IMCC_INFO(interp)->cur_unit->type == IMC_PCCSUB)
         IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->pcc_sub->calls_a_sub |= 1;
 }
@@ -1407,13 +1412,13 @@ vtable:
      VTABLE_METHOD
          {
            $$ = P_VTABLE;
-           IMCC_INFO(interp)->cur_unit->vtable_name = NULL;
+           IMCC_INFO(interp)->cur_unit->vtable_name      = NULL;
            IMCC_INFO(interp)->cur_unit->is_vtable_method = 1;
          }
    | VTABLE_METHOD '(' STRINGC ')'
          {
            $$ = P_VTABLE;
-           IMCC_INFO(interp)->cur_unit->vtable_name = $3;
+           IMCC_INFO(interp)->cur_unit->vtable_name      = $3;
            IMCC_INFO(interp)->cur_unit->is_vtable_method = 1;
          }
    ;
@@ -1423,13 +1428,13 @@ method:
          {
            $$ = P_METHOD;
            IMCC_INFO(interp)->cur_unit->method_name = NULL;
-           IMCC_INFO(interp)->cur_unit->is_method = 1;
+           IMCC_INFO(interp)->cur_unit->is_method   = 1;
          }
    | METHOD '(' any_string ')'
          {
            $$ = P_METHOD;
            IMCC_INFO(interp)->cur_unit->method_name = $3;
-           IMCC_INFO(interp)->cur_unit->is_method = 1;
+           IMCC_INFO(interp)->cur_unit->is_method   = 1;
          }
    ;
 
@@ -1437,7 +1442,7 @@ ns_entry_name:
     NS_ENTRY
          {
            $$ = 0;
-           IMCC_INFO(interp)->cur_unit->ns_entry_name = NULL;
+           IMCC_INFO(interp)->cur_unit->ns_entry_name     = NULL;
            IMCC_INFO(interp)->cur_unit->has_ns_entry_name = 1;
          }
    | NS_ENTRY '(' any_string ')'
@@ -1674,8 +1679,8 @@ paramtype:
    | ADV_OPTIONAL               { $$ = VT_OPTIONAL; }
    | ADV_OPT_FLAG               { $$ = VT_OPT_FLAG; }
    | ADV_NAMED                  { $$ = VT_NAMED; }
-   | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; }
-   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; }
+   | ADV_NAMED '(' STRINGC ')'  { adv_named_set(interp, $3);   $$ = 0; mem_sys_free($3); }
+   | ADV_NAMED '(' USTRINGC ')' { adv_named_set_u(interp, $3); $$ = 0; mem_sys_free($3); }
    | UNIQUE_REG                 { $$ = VT_UNIQUE_REG; }
    ;
 
@@ -1826,7 +1831,9 @@ _labels:
 label:
      LABEL
          {
-           $$ = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, $1));
+             Instruction *i = iLABEL(interp, IMCC_INFO(interp)->cur_unit, mk_local_label(interp, $1));
+             mem_sys_free($1);
+             $$ = i;
          }
    ;
 
@@ -1899,11 +1906,13 @@ labeled_inst:
          {
            SymReg *n = mk_const(interp, $2, 'S');
            set_lexical(interp, $4, n); $$ = 0;
+           mem_sys_free($2);
          }
    | LEXICAL USTRINGC COMMA target
          {
            SymReg *n = mk_const(interp, $2, 'U');
            set_lexical(interp, $4, n); $$ = 0;
+           mem_sys_free($2);
          }
    | CONST { pesky_global__is_def=1; } type IDENTIFIER '=' const
          {
@@ -2092,9 +2101,9 @@ func_assign:
    ;
 
 the_sub:
-     IDENTIFIER                { $$ = mk_sub_address(interp, $1);  mem_sys_free($1); }
-   | STRINGC                   { $$ = mk_sub_address_fromc(interp, $1); mem_sys_free($1); }
-   | USTRINGC                  { $$ = mk_sub_address_u(interp, $1); mem_sys_free($1); }
+     IDENTIFIER     { $$ = mk_sub_address(interp, $1);       mem_sys_free($1); }
+     | STRINGC      { $$ = mk_sub_address_fromc(interp, $1); mem_sys_free($1); }
+     | USTRINGC     { $$ = mk_sub_address_u(interp, $1);     mem_sys_free($1); }
    | target
          {
            $$ = $1;
@@ -2115,6 +2124,12 @@ the_sub:
             IMCC_INFO(interp)->cur_obj = $1;
             $$                         = $3;
         }
+   | target DOT USTRINGC
+         {
+            IMCC_INFO(interp)->cur_obj = $1;
+            $$                         = mk_const(interp, $3, 'U');
+            mem_sys_free($3);
+         }
    | target DOT STRINGC
          {
             IMCC_INFO(interp)->cur_obj = $1;

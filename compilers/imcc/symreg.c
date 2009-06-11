@@ -385,12 +385,18 @@ add_namespace(PARROT_INTERP, ARGMOD(IMC_Unit *unit))
         SymReg * const g = dup_sym(ns);
         SymReg * const r = _get_sym(&IMCC_INFO(interp)->ghash, g->name);
 
-        unit->_namespace = g;
-        g->reg           = ns;
-        g->type          = VT_CONSTP;
+        unit->_namespace     = g;
+        g->reg               = ns;
+        g->type              = VT_CONSTP;
 
-        if (!r || r->type != VT_CONSTP)
+        /* this unit should free its namespace only if it's the only thing
+         * holding onto it */
+        if (!r || r->type != VT_CONSTP) {
             _store_symreg(&IMCC_INFO(interp)->ghash, g);
+            unit->owns_namespace = 0;
+        }
+        else
+            unit->owns_namespace = 1;
     }
 }
 
@@ -923,7 +929,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
         char *aux_name = NULL;
         const char * const sub_name = (uniq == U_add_uniq_sub)
                        /* remember to free this name; add_ns malloc()s it */
-                       ? (aux_name= add_ns(interp, name))
+                       ? (aux_name = add_ns(interp, name))
                        : (char *)name;
 
         r = _get_sym(hsh, sub_name);

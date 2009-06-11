@@ -846,7 +846,7 @@ becomes:
 Note that this only works for opcodes that have have a leading C<OUT>
 parameter. [this restriction unimplemented: RT #36283]
 
-=item ([<var1> [:<modifier1> ...], ...]) = <var2>([<arg1> [:<modifier2> ...], ...])
+=item ([<var1> [:<mod1> ...], ...]) = <var2>([<arg1> [:<mod2> ...], ...])
 
 This is short for:
 

@@ -330,6 +330,12 @@ var_arg_ins(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
     /* in constant */
     int dirs       = 1;
 
+    /* XXX: Maybe the check for n == 0 is the only one required
+     * and the other must be assertions? */
+    if (n == 0 || r[0] == NULL || r[0]->name == NULL)
+        IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
+                    "The opcode '%s' needs arguments", name);
+
     r[0]           = mk_const(interp, r[0]->name, 'P');
     r[0]->pmc_type = enum_class_FixedIntegerArray;
 
@@ -933,8 +939,12 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     interp->code                     = NULL;
 
     IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = fullname;
-    ext                            = strrchr(fullname, '.');
+    {
+        /* Store a copy, in order to know how to free it later */
+        char *copyname = strdup(fullname);
+        IMCC_INFO(interp)->state->file = copyname;
+        ext                            = strrchr(copyname, '.');
+    }
     IMCC_INFO(interp)->line        = 1;
 
     /*
