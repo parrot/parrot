@@ -323,7 +323,7 @@ PIR q<
 #
 #=cut
 
-method generate_c_code() {
+method generate_c_code($past) {
     self.pre_method_gen();
     my $res :=
           self.past<c_header> ~ "\n\n"

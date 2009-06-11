@@ -167,7 +167,6 @@
 .end
 
 .include 'src/nodes.pir'
-.include 'src/vtable_info.pir'
 .include '../vtdumper/src/function.pir'
 .include 'src/emitter/pmc.pir'
 .include 'src/emitter/c.pir'
@@ -177,7 +176,6 @@
 .include 'src/emitter/gen_c.pir'
 .include 'src/emitter/pmc/default.pir'
 .include 'src/emitter/pmc/gen_default.pir'
-.include 'src/gen_vtable_info.pir'
 .include 'src/parser/gen_grammar.pir'
 .include 'src/parser/gen_actions.pir'
 .include 'src/builtins.pir'

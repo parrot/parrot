@@ -21,7 +21,7 @@
     like(generated, "'Parrot_default_get_vtable'", "Parrot_default_get_vtable generated") 
 
     #this should be generated, even though it's not explicitly defined in default.pmc
-    like(generated, "'Parrot_default_set_number_keyed_int'", "Parrot_default_get_vtable generated") 
+    like(generated, "'Parrot_default_set_number_keyed'", "Parrot_default_set_number_keyed_int generated") 
 .end
 
 # Don't forget to update plan!

@@ -17,7 +17,6 @@ all: pmcc.pbc
 SOURCES := \
   pmcc.pir \
   src/nodes.pir \
-  src/vtable_info.pir \
   src/emitter/pmc.pir \
   src/emitter/gen_pmc.pir \
   src/emitter/c.pir \
@@ -27,7 +26,6 @@ SOURCES := \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
   src/gen_emitter.pir \
-  src/gen_vtable_info.pir \
   src/builtins.pir
 
 # the default target
@@ -61,10 +59,6 @@ src/gen_emitter.pir: $(NQP) $(PCT) src/emitter.pm
 	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_emitter.pir \
 	    --target=pir src/emitter.pm
 
-src/gen_vtable_info.pir: $(NQP) $(PCT) src/vtable_info.pm
-	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_vtable_info.pir \
-	    --target=pir src/vtable_info.pm
-
 
 # This is a listing of all targets, that are meant to be called by users
 help:
@@ -95,7 +89,6 @@ testclean:
 CLEANUPS := \
   pmc.pbc \
   src/gen_emitter.pir \
-  src/gen_vtable_info.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
   src/emitter/gen_pmc.pir \

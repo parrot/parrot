@@ -30,12 +30,21 @@
     .param string source
     .param string target
 
-    .local pmc compiler, emitter, capture
+    .local pmc compiler, emitter, capture, vtdump
+    .local string vtdump_str, vtdump_filename
+
+    vtdump_filename = '../../vtable.frozen'
+    $P0 = new ['FileHandle']
+    vtdump_str = $P0.'readall'(vtdump_filename)
+    vtdump = thaw vtdump_str
+
     compiler = compreg 'PMC'
     capture = compiler.'compile'(source, 'target'=> target)
 
     emitter = new ['PMC'; 'Emitter']
     emitter.'set_filename'(name)
+    emitter.'set_vtable_info'(vtdump)
+
     .return (emitter, capture)
 .end
 

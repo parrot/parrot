@@ -17,19 +17,19 @@ Generate bunch of "not_implemented_yet" VTABLE functions.
 
 =cut
 method pre_method_gen() {
-    my @vtables := PMC::VTableInfo::vtable_list();
+    my @vtables := self.vtable_info;
     my %vtables := self.vtables;
 
     for @vtables {
-        if !exists(%vtables, $_.name) {
+        if !exists(%vtables, $_<name>) {
             my $entry := PAST::Block.new(
-                :name($_.name),
-                :returns($_.returns),
+                :name($_<name>),
+                :returns($_<returns>),
             );
             # FIXME Ugly hack
             $entry<parameters> := PAST::Op.new(
                 PAST::Val.new(
-                    :name($_<parameters>)
+                    :name($_<parameter_list>)
                 )
             );
 
@@ -38,7 +38,7 @@ method pre_method_gen() {
                     :pasttype('inline'),
                     :inline(
 ' {
-    cant_do_method(interp, pmc, "' ~ $_.name ~ '");
+    cant_do_method(interp, pmc, "' ~ $_<name> ~ '");
 }
 '),
                 )
@@ -85,7 +85,6 @@ PARROT_EXPORT VTABLE* Parrot_default_get_vtable(PARROT_INTERP) {
     my @vtables := self.vtable_info;
     my @tmp;
     for @vtables {
-#        say("vtable " ~ $_.name ~ ' ' ~ $past<vtables>{$_.name});
         @tmp.push('Parrot_default_' ~ $_<name>); 
     }
     @res.push(join(",\n        ", @tmp));
