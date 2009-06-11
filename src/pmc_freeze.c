@@ -1040,6 +1040,15 @@ ft_init(PARROT_INTERP, ARGIN(visit_info *info))
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "bad string to thaw");
         }
+
+        /*TT 474: use the validation logic from Packfile_unpack */
+        if (pf->header->bc_major != PARROT_PBC_MAJOR
+        ||  pf->header->bc_minor != PARROT_PBC_MINOR )
+            Parrot_ex_throw_from_c_args(interp, NULL,
+                    EXCEPTION_INVALID_STRING_REPRESENTATION,
+                    "can't thaw a PMC from Parrot %d.%d", pf->header->bc_major,
+                    pf->header->bc_minor);
+
         mem_sys_memcopy(pf->header, s->strstart, PACKFILE_HEADER_BYTES);
         PackFile_assign_transforms(pf);
         s->bufused -= header_length;
