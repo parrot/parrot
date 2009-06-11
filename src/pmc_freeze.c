@@ -1043,7 +1043,7 @@ ft_init(PARROT_INTERP, ARGIN(visit_info *info))
 
         /*TT 479: use the validation logic from Packfile_unpack */
         if (pf->header->bc_major != PARROT_PBC_MAJOR
-        ||  pf->header->bc_minor != PARROT_PBC_MINOR )
+        ||  pf->header->bc_minor != PARROT_PBC_MINOR)
             Parrot_ex_throw_from_c_args(interp, NULL,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "can't thaw a PMC from Parrot %d.%d", pf->header->bc_major,
