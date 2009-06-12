@@ -2102,10 +2102,13 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
         for (offs = 0; (state != parse_end) && (offs < s->strlen); ++offs) {
             const UINTVAL c = iter.get_and_advance(interp, &iter);
+            /* Check for overflow */
+            if (c > 255)
+                break;
 
             switch (state) {
                 case parse_start:
-                    if (isdigit(c)) {
+                    if (isdigit((unsigned char)c)) {
                         const INTVAL nextval = c - '0';
                         if (i < max_safe || (i == max_safe && nextval <= last_dig))
                             i = i * 10 + nextval;
@@ -2128,7 +2131,7 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
                     break;
 
                 case parse_before_dot:
-                    if (isdigit(c)) {
+                    if (isdigit((unsigned char)c)) {
                         const INTVAL nextval = c - '0';
                         if (i < max_safe || (i == max_safe && nextval <= last_dig))
                             i = i * 10 + nextval;
@@ -2194,9 +2197,13 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
     /* Handcrafter FSM to read float value */
     for (offs = 0; (state != parse_end) && (offs < s->strlen); ++offs) {
         const UINTVAL c = iter.get_and_advance(interp, &iter);
+        /* Check for overflow */
+        if (c > 255)
+            break;
+
         switch (state) {
             case parse_start:
-                if (isdigit(c)) {
+                if (isdigit((unsigned char)c)) {
                     f = c - '0';
                     m = c - '0';
                     state = parse_before_dot;
@@ -2209,7 +2216,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
                     state = parse_before_dot;
                 else if (c == '.')
                     state = parse_after_dot;
-                else if (isspace(c))
+                else if (isspace((unsigned char)c))
                     ; /* Do nothing */
                 else {
                     check_nan = 1;
@@ -2218,7 +2225,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
                 break;
 
             case parse_before_dot:
-                if (isdigit(c)) {
+                if (isdigit((unsigned char)c)) {
                     f = f*10.0 + (c-'0');
                     m = m*10 + (c-'0');
                     /* Integer overflow for mantissa */
@@ -2249,7 +2256,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
                 break;
 
             case parse_after_dot:
-                if (isdigit(c)) {
+                if (isdigit((unsigned char)c)) {
                     f += (c-'0') * divider;
                     divider /= 10.0;
                     d = d*10 + (c-'0');
@@ -2264,7 +2271,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
                 break;
 
             case parse_after_e:
-                if (isdigit(c)) {
+                if (isdigit((unsigned char)c)) {
                     e = e*10 + (c-'0');
                     state = parse_after_e_sign;
                 }
@@ -2279,7 +2286,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
                 break;
 
             case parse_after_e_sign:
-                if (isdigit(c))
+                if (isdigit((unsigned char)c))
                     e = e*10 + (c-'0');
                 else
                     state = parse_end;
