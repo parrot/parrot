@@ -160,7 +160,7 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
     fh = new ['FileHandle']
     it = iter pmc_path
 
-  path_loop:  
+  path_loop:
     unless it goto dump_not_found
     filename = shift it
     concat filename, "/"

@@ -55,7 +55,7 @@ TODO: Parse c_body properly and implement all other functions.
 .sub '!generate_children_body_part' :method
     .param pmc pmclass
     .param pmc entry
-    
+
     .local pmc res
     res = new 'ResizableStringArray'
     $P0 = entry.'iterator'()

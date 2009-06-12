@@ -103,7 +103,7 @@
     unless pmc_dir == '' goto emit_files
     pmc_dir = '.'
 
-  emit_files:  
+  emit_files:
     .local string dump_filename, c_filename, header_filename
     .local string dump_contents, c_contents, header_contents
 

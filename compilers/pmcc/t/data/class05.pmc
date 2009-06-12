@@ -1,5 +1,5 @@
 pmclass Foo extends scalar provides scalar {
-    METHOD foo () {
+    METHOD foo() {
         if  {
         }
     }

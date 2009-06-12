@@ -19,7 +19,7 @@ c_footer. Inherited from C<PAST::Block>
 
 =item PMC::AST::VTableMethod
 
-Single vtable method. Inherited from C<PAST::Block>. 
+Single vtable method. Inherited from C<PAST::Block>.
 
 =item PMC::AST::Method
 
@@ -38,7 +38,7 @@ Classes:
 
 =item C<PMC::Emitter>
 
-Main emitter Facade. 
+Main emitter Facade.
 
 =item C<PMC::Emitter::PMC>
 

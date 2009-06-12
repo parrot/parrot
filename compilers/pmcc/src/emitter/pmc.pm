@@ -378,6 +378,7 @@ method class_init_func() {
         ~ self.name
         ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
     @res.push( self.generate_attr_defs() );
+    @res.push( self.generate_passes() );
 
     my $past := self.past;
     if ($past<class_init>) {
@@ -398,7 +399,7 @@ Generate a string representing the definition of this PMC's ATTRs.
 method generate_attr_defs() {
 
     my @attrs := self.attrs;
-    
+
     my $attr_defs := "";
     for @attrs {
 
@@ -430,11 +431,25 @@ method generate_attr_defs() {
 }
 
 
+=item C<generate_passes>
+
+Generate C code pass-sepcific PMC initialization code
+
+=cut
+
+method generate_passes() {
+    my @res;
+
+    "";
+}
+
+
 =item C<get_vtable_func>
 
 Generate C-code for get_vtable_func
 
 =cut
+
 method get_vtable_func() {
     "";
 }

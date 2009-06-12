@@ -5,7 +5,7 @@ pmclass Foo extends scalar provides scalar {
 =cut
 
 */
-    METHOD foo () {
+    METHOD foo() {
         if {
         }
     }

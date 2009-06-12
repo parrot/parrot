@@ -149,7 +149,7 @@ Return 1 if this function has the speficied attribute.
     i += 1
     goto loop_start
   not_found:
-    .return (0) 
+    .return (0)
   found:
     .return (1)
 .end

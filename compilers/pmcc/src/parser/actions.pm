@@ -203,7 +203,7 @@ method c_body_statement($/, $key) {
     else {
         $/.panic("Unknown key " ~ $key);
     }
-    
+
     make $past;
 }
 

@@ -85,7 +85,7 @@ PARROT_EXPORT VTABLE* Parrot_default_get_vtable(PARROT_INTERP) {
     my @vtables := self.vtable_info;
     my @tmp;
     for @vtables {
-        @tmp.push('Parrot_default_' ~ $_<name>); 
+        @tmp.push('Parrot_default_' ~ $_<name>);
     }
     @res.push(join(",\n        ", @tmp));
 
