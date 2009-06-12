@@ -1,13 +1,6 @@
-#!perl
+#! parrot
 # Copyright (C) 2001-2008, Parrot Foundation.
 # $Id$
-
-use strict;
-use warnings;
-use lib qw( . lib ../lib ../../lib );
-
-use Test::More;
-use Parrot::Test tests =>  1;
 
 =head1 NAME
 
@@ -19,14 +12,21 @@ t/pmc/handle.t - Handle basic type
 
 =head1 DESCRIPTION
 
-Tests the Handle PMC.
-
-(As yet there are no real tests here.   This is a placeholder file to pacify a
-coding standards test.)
+Tests the Handle PMC. Handle is abstract, so no real tests of functionality
+here.
 
 =cut
 
-pass("No real tests as yet in $0");
+.sub main :main
+    .include 'test_more.pir'
+
+    plan(1)
+    push_eh cant_instantiate
+    $P0 = new 'Handle'
+    print "not "
+  cant_instantiate:
+    say "ok 1"
+.end
 
 # Local Variables:
 #   mode: cperl
