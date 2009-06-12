@@ -42,23 +42,64 @@
 .end
 
 .sub 'export' :method
-    .param string list
-    # This should accept a tag...
-    .local pmc syms, i, ns, relns, exportns
-    # We should default to all symbols when none are specified
-    syms = split ' ', list
-    i = getinterp
-    ns = i['namespace';1]
-    relns = new 'ResizablePMCArray'
-    relns.'push'('EXPORT')
-    # This could be a loop, I guess...
-    relns.'push'('ALL')
-    exportns = ns.'make_namespace'(relns)
-    ns.'export_to'(exportns, syms)
-    relns.'pop'()
-    relns.'push'('DEFAULT')
-    exportns = ns.'make_namespace'(relns)
-    ns.'export_to'(exportns, syms)
+    .param pmc symbols
+    .param pmc tags    :optional
+    .param pmc from_ns :optional
+
+    # 1. Canonify / default params
+
+    # If space-delimited symbol string, canonify to array;
+    # may also pass a hash to allow symbol rename during export
+    $I0 = does symbols, 'array'
+    $I1 = does symbols, 'hash'
+    $I2 = $I0 | $I1
+    if $I2 goto symbols_ready
+    $S0 = symbols
+    symbols = split ' ', $S0
+  symbols_ready:
+
+    # If space-delimited tag string, canonify to array;
+    # if no tags, use ALL and DEFAULT
+    unless null tags goto have_tags
+    tags = new 'ResizableStringArray'
+    tags.'push'('ALL')
+    tags.'push'('DEFAULT')
+    goto tags_is_array
+  have_tags:
+    $I0 = does tags, 'array'
+    if $I0 goto tags_is_array
+    $S0 = tags
+    tags = split ' ', $S0
+  tags_is_array:
+
+    # If no from_ns, export from caller's namespace
+    unless null from_ns goto has_from_ns
+    $P0 = getinterp
+    from_ns = $P0['namespace'; 1]
+  has_from_ns:
+
+    # 2. Export symbols to each tag namespace
+    # (e.g. ['parrot';'Module';'Name';'EXPORT';'tagname'])
+
+    # rel_ns_key will hold ['EXPORT';'tagname'] for each tagname
+    .local pmc rel_ns_key
+    rel_ns_key = new 'ResizableStringArray'
+    rel_ns_key.'push'('EXPORT')
+
+    # For each tagname, use rel_ns_key to make a new EXPORT namespace
+    # and export all symbols to it, using native NameSpace .export_to()
+    .local pmc tag_iter, export_ns
+    tag_iter = iter tags
+  tag_loop:
+    unless tag_iter goto tag_loop_end
+    $S0 = shift tag_iter
+    rel_ns_key.'push'($S0)
+    export_ns = from_ns.'make_namespace'(rel_ns_key)
+    from_ns.'export_to'(export_ns, symbols)
+    rel_ns_key.'pop'()
+    goto tag_loop
+  tag_loop_end:
+
 .end
 
 .sub 'import' :method :multi(_,_)
