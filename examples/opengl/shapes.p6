@@ -8,10 +8,9 @@ shapes.p6 - Exercise basic OpenGL 1.1/GLUT 3 APIs by drawing animated shapes
 
 =head1 SYNOPSIS
 
-    $ cd parrot-home
-    $ make perl6
-    $ cd parrot-home/runtime/parrot/library
-    $ ../../../perl6 ../../../examples/opengl/shapes.p6
+    $ cd rakudo-home
+    $ export PERL6LIB=rakudo-home:parrot-home/runtime/parrot/library
+    $ ./perl6 parrot-home/examples/opengl/shapes.p6
 
 =head1 DESCRIPTION
 
@@ -21,7 +20,7 @@ working yet.
 This example is slightly more complex than F<triangle.p6>, and exercises more
 of the OpenGL 1.1 and GLUT 3 APIs.  It is also a better behaved application,
 correctly responding to reshape events, pausing on minimize, and so on.  It is
-a fairly direct translation of f<shapes.pir> to Perl 6.
+a fairly direct translation of F<shapes.pir> to Perl 6.
 
 To quit the example, press C<Q> or the C<ESCAPE> key, or close the window using
 your window manager (using the X in the corner of the window title bar, for
@@ -29,43 +28,43 @@ example).  To pause or restart the animation, press any other ASCII key.
 
 =end pod
 
+use OpenGL:from<parrot>;
+use NCI::Utils:from<parrot>;
 
-use OpenGL;
-use NCI::call_toolkit_init;
+# None of these currently work; they all create an inescapable new lexical pad
+# require 'glutconst.p6';
+# 'glutconst.p6'.evalfile;
+# eval open('glutconst.p6').slurp;
 
-# .include 'datatypes.pasm'
+constant GLUT_RGBA              = 0x0000;
+constant GLUT_DOUBLE            = 0x0002;
+constant GLUT_DEPTH             = 0x0010;
+constant GLUT_STENCIL           = 0x0020;
 
-# .include 'opengl_defines.pasm'
-our $GLUT_RGBA              = 0x0000;
-our $GLUT_DOUBLE            = 0x0002;
-our $GLUT_DEPTH             = 0x0010;
-our $GLUT_STENCIL           = 0x0020;
+constant GL_DEPTH_BUFFER_BIT    = 0x0100;
+constant GL_STENCIL_BUFFER_BIT  = 0x0400;
+constant GL_COLOR_BUFFER_BIT    = 0x4000;
 
-our $GL_DEPTH_BUFFER_BIT    = 0x0100;
-our $GL_STENCIL_BUFFER_BIT  = 0x0400;
-our $GL_COLOR_BUFFER_BIT    = 0x4000;
-
-our $GL_FALSE               = 0x0000;
-our $GL_TRUE                = 0x0001;
-our $GL_TRIANGLES           = 0x0004;
-our $GL_EQUAL               = 0x0202;
-our $GL_ALWAYS              = 0x0207;
-our $GL_SRC_ALPHA           = 0x0302;
-our $GL_ONE_MINUS_SRC_ALPHA = 0x0303;
-our $GL_FRONT               = 0x0404;
-our $GL_BACK                = 0x0405;
-our $GL_DEPTH_TEST          = 0x0B71;
-our $GL_STENCIL_TEST        = 0x0B90;
-our $GL_NORMALIZE           = 0x0BA1;
-our $GL_BLEND               = 0x0BE2;
-our $GL_MODELVIEW           = 0x1700;
-our $GL_PROJECTION          = 0x1701;
-our $GL_KEEP                = 0x1E00;
-our $GL_REPLACE             = 0x1E01;
+constant GL_FALSE               = 0x0000;
+constant GL_TRUE                = 0x0001;
+constant GL_TRIANGLES           = 0x0004;
+constant GL_EQUAL               = 0x0202;
+constant GL_ALWAYS              = 0x0207;
+constant GL_SRC_ALPHA           = 0x0302;
+constant GL_ONE_MINUS_SRC_ALPHA = 0x0303;
+constant GL_FRONT               = 0x0404;
+constant GL_BACK                = 0x0405;
+constant GL_DEPTH_TEST          = 0x0B71;
+constant GL_STENCIL_TEST        = 0x0B90;
+constant GL_NORMALIZE           = 0x0BA1;
+constant GL_BLEND               = 0x0BE2;
+constant GL_MODELVIEW           = 0x1700;
+constant GL_PROJECTION          = 0x1701;
+constant GL_KEEP                = 0x1E00;
+constant GL_REPLACE             = 0x1E01;
 
 
-our $mode        = $GLUT_DOUBLE +| $GLUT_RGBA +| $GLUT_DEPTH +| $GLUT_STENCIL;
-our $glut_window = init_glut($mode, 'Test', @*ARGS);
+our $glut_window;
 
 our $aspect      = 1.0;
 our $frames      = 0;
@@ -76,26 +75,36 @@ our $time_curr   = $time_prev;
 our $time_sim    = 0.0;
 our $time_sim_dt = 0.0;
 
-glutIdleFunc(     &idle     );
-glutDisplayFunc(  &draw     );
-# glutReshapeFunc(  &reshape  );
-glutKeyboardFunc( &keyboard );
 
-glutMainLoop();
+sub MAIN(*@ARGS is rw) {
+    # Initialize GLUT and create GLUT window
+    $glut_window = init_glut(@ARGS, 'Shapes: OpenGL 1.x NCI Test');
 
+    # Set up GLUT callbacks
+    glutIdleFunc(     &idle     );
+    glutDisplayFunc(  &draw     );
+    glutReshapeFunc(  &reshape  );
+    glutKeyboardFunc( &keyboard );
 
-sub init_glut($display_mode, $window_title, @args is rw) {
-    # Import OpenGL and GLUT functions
-    OpenGL::_export_all_functions();
+    # Enter the GLUT main loop
+    glutMainLoop();
+
+    # Rakudo bug -- glutMainLoop() never returns, but Rakudo dies without this
+    return;
+}
+
+sub init_glut(@args is rw, $window_title) {
+    # We need a full-featured GL environment
+    my $display_mode = [+|] GLUT_DOUBLE, GLUT_RGBA, GLUT_DEPTH, GLUT_STENCIL;
 
     # Set larger default window size
     glutInitWindowSize(500, 500);
 
     # Initialize GLUT, fixup command line args
-    @args = NCI::call_toolkit_init(&glutInit, @args);
+    @args = call_toolkit_init(&glutInit, @args, $*PROGRAM_NAME);
 
     # Set display mode, create GLUT window, return window handle
-    glutInitDisplayMode($GLUT_DOUBLE +| $GLUT_RGBA +| $GLUT_DEPTH +| $GLUT_STENCIL);
+    glutInitDisplayMode($display_mode);
 
     return glutCreateWindow($window_title);
 }
@@ -106,10 +115,8 @@ sub idle {
 
     my $dt = $paused ?? 0 !! $time_curr - $time_prev;
 
-    $time_sim_dt = $dt;
-    # XXXX: Broken because of Parrot RT #60036
-    # $time_sim   += $dt;
-    $time_sim    = $dt + $time_sim;
+    $time_sim_dt  = $dt;
+    $time_sim    += $dt;
 
     glutPostRedisplay() unless $paused;
 }
@@ -118,9 +125,10 @@ sub reshape($width, $height is copy) {
     $height = $height || 1;
     $aspect = $width / $height;
 
-    # say "HELLO1";
     glViewport(0, 0, $width, $height);
-    say "HELLO2";
+
+    # Rakudo bug -- Rakudo dies without this
+    return;
 }
 
 sub keyboard($key, $x, $y) {
@@ -137,7 +145,7 @@ sub keyboard($key, $x, $y) {
 }
 
 sub draw {
-    glClear($GL_COLOR_BUFFER_BIT +| $GL_DEPTH_BUFFER_BIT +| $GL_STENCIL_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT +| GL_DEPTH_BUFFER_BIT +| GL_STENCIL_BUFFER_BIT);
 
     set_3d_view();
     update_particle_effect();
@@ -151,12 +159,12 @@ sub draw {
 
 sub set_3d_view {
     # Simple 60 degree FOV perspective view
-    glMatrixMode($GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(60, $aspect, 1, 100);
 
     # Look at origin from (0,2,4), with +Y up
-    glMatrixMode($GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(0, 2, 4, 0, 0, 0, 0, 1, 0);
 
@@ -170,32 +178,34 @@ sub draw_reflected_scene {
     # doesn't "leak out" of the reflective area
 
     # Turn off everything we don't need
-    glDisable($GL_DEPTH_TEST);
-    glColorMask($GL_FALSE, $GL_FALSE, $GL_FALSE, $GL_FALSE);
+    glDisable(GL_DEPTH_TEST);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
 
     # Set stencil for just the reflecting area
-    glEnable($GL_STENCIL_TEST);
-    glStencilOp($GL_REPLACE, $GL_REPLACE, $GL_REPLACE);
-    glStencilFunc($GL_ALWAYS, 1, 0xffffffff);
+    glEnable(GL_STENCIL_TEST);
+    glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    # glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
+    glStencilFunc(GL_ALWAYS, 1, +^0);
 
     # Draw the floor as the reflector
     draw_floor();
 
     # Now only draw where stencil is set
-    glStencilOp($GL_KEEP, $GL_KEEP, $GL_KEEP);
-    glStencilFunc($GL_EQUAL, 1, 0xffffffff);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    # glStencilFunc(GL_EQUAL, 1, 0xffffffff);
+    glStencilFunc(GL_EQUAL, 1, +^0);
 
     # Turn back on the stuff we turned off
-    glEnable($GL_DEPTH_TEST);
-    glColorMask($GL_TRUE, $GL_TRUE, $GL_TRUE, $GL_TRUE);
+    glEnable(GL_DEPTH_TEST);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
 
     # Flip reflection through the reflector
     glPushMatrix();
     glScalef(1, -1, 1);
 
     # Account for the reversed normals
-    glEnable($GL_NORMALIZE);
-    glCullFace($GL_FRONT);
+    glEnable(GL_NORMALIZE);
+    glCullFace(GL_FRONT);
 
     # Lights need to be reassigned after reflection
     set_lights();
@@ -204,23 +214,23 @@ sub draw_reflected_scene {
     draw_objects();
 
     # Switch back to normal facing
-    glDisable($GL_NORMALIZE);
-    glCullFace($GL_BACK);
+    glDisable(GL_NORMALIZE);
+    glCullFace(GL_BACK);
     glPopMatrix();
 
     # Done with stencil
-    glDisable($GL_STENCIL_TEST);
+    glDisable(GL_STENCIL_TEST);
 }
 
 sub draw_main_scene {
     #Draw floor blended over reflected scene
-    glEnable($GL_BLEND);
-    glBlendFunc($GL_SRC_ALPHA, $GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     draw_floor();
 
     # Done with blending
-    glDisable($GL_BLEND);
+    glDisable(GL_BLEND);
 
     # Set lights for upright view
     set_lights();
@@ -263,7 +273,7 @@ sub draw_rgb_triangle {
     glTranslatef(0, 0.04, -1.5);
     glRotatef($angle, 0, 1, 0);
 
-    glBegin($GL_TRIANGLES);
+    glBegin(GL_TRIANGLES);
     glColor3f(1, 0, 0); glVertex3f(-.5, 0, 0);
     glColor3f(0, 1, 0); glVertex3f( .5, 0, 0);
     glColor3f(0, 0, 1); glVertex3f(0  , 1, 0);
@@ -282,10 +292,10 @@ sub draw_particle_effect {
 }
 
 sub set_2d_view {
-    glMatrixMode($GL_PROJECTION);
+    glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    glMatrixMode($GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
 
