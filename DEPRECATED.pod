@@ -1,14 +1,26 @@
 # $Id$
 
-=head1 Deprecation in Parrot
+=head1 Purpose
+
+Provide a list of deprecated and experimental items in parrot.
+All items in this list should have a corresponding Trac ticket[1].
+
+=head1 Experimental Status
+
+These features are not considered stable, even though they may
+have shipped in a stable release of parrot[2]. Use them at your own
+risk, as they can be removed or changed in any release. These
+items are marked below with C<[experimental]>.
+
+=head1 Deprecated Status
 
 Please see F<docs/project/support_policy.pod> for the parrot
 project's policy regarding deprecated features.
 
-This is a list of currently deprecated features of Parrot.  Every deprecation
-has an associated Trac ticket [1].  Each item indicates the first release
-in which it is eligible for removal. If the release listed is one that
-has already occurred, this feature may be removed in any upcoming release.
+Each item shows the first release in which it is eligible for removal, e.g.
+C<[eligible in 1.5]>.  If the release listed is one that has already
+shipped, this feature may be removed in B<any> upcoming release, and
+you should no longer rely on it.
 
 Whenever deprecated items are removed, information
 regarding how to cope with the removal will be added to
@@ -368,11 +380,6 @@ L<https://trac.parrot.org/parrot/ticket/753>
 
 =item Cross-HLL library loading [experimental]
 
-The cross-HLL library loading design and implementation are experimental,
-and may change at any time.  Thus they were marked "pre-deprecated"
-immediately upon creation; no release has been made without this
-deprecation in place.
-
 L<https://trac.parrot.org/parrot/ticket/754>
 
 =back
@@ -386,6 +393,12 @@ L<https://trac.parrot.org/parrot/ticket/754>
 L<Trac|http://trac.parrot.org/> is parrot's primary issue tracking system.
 
 Older tickets may be listed at L<RT|https://rt.perl.org/rt3>.
+
+=item 2
+
+For an item to be considered experimental, it can C<never> have shipped in
+a stable release without the C<experimental> tag; those items must be
+treated as deprecations before they are removed.
 
 =back
 
