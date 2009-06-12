@@ -397,8 +397,8 @@ Older tickets may be listed at L<RT|https://rt.perl.org/rt3>.
 =item 2
 
 For an item to be considered experimental, it can B<never> have shipped in
-a stable release without the C<[experimental]> tag; those items must be
-treated as deprecations before they are removed.
+a stable release without the C<[experimental]> tag; otherwise, it must be
+deprecated normally before removal or incompatible change.
 
 =back
 
