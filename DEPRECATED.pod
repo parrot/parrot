@@ -366,6 +366,15 @@ L<https://trac.parrot.org/parrot/ticket/508>
 
 L<https://trac.parrot.org/parrot/ticket/753>
 
+=item Cross-HLL library loading [experimental]
+
+The cross-HLL library loading design and implementation are experimental,
+and may change at any time.  Thus they were marked "pre-deprecated"
+immediately upon creation; no release has been made without this
+deprecation in place.
+
+L<https://trac.parrot.org/parrot/ticket/754>
+
 =back
 
 =head1 Footnotes
