@@ -62,8 +62,7 @@ PMC: {
         or diag "files in $dynpmc_dir but not in test dir:\n\t@$test_dynpmc_miss";
 
     # Tests in src/dynoplibs
-    ok( !@$test_dynoplibs_miss, "there are test files in $test_dynoplibs_dir
-        for all OPS files" )
+    ok( !@$test_dynoplibs_miss, "there are test files in $test_dynoplibs_dir for all OPS files" )
         or diag "files in $dynoplibs_dir but not in test dir:\n\t@$test_dynoplibs_miss";
 }    # PMC
 
