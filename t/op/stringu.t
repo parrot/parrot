@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 31;
 use Parrot::Config;
 
 =head1 NAME
@@ -501,6 +501,51 @@ hello
 hello
 OUTPUT
 
+
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings' );
+.sub main :main
+     $S0 = "140"
+     $I0 = $S0
+     say $I0
+     $I0 = find_encoding 'ucs2'
+     $S0 = trans_encoding $S0, $I0
+     $I0 = $S0
+     say $I0
+.end
+CODE
+140
+140
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings' );
+.sub main :main
+     $S0 = "140"
+     $N0 = $S0
+     say $N0
+     $I0 = find_encoding 'ucs2'
+     $S0 = trans_encoding $S0, $I0
+     $N0 = $S0
+     say $N0
+.end
+CODE
+140
+140
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings' );
+.sub main :main
+    $S0 = unicode:"140 r\x{e9}sum\x{e9}s"
+    $N0 = $S0
+    say $N0
+    $I0 = find_encoding 'ucs2'
+    $S0 = trans_encoding $S0, $I0
+    $N0 = $S0
+    say $N0
+.end
+CODE
+140
+140
+OUT
 
 
 

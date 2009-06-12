@@ -618,6 +618,7 @@ STR_FILES := \
     $(SRC_DIR)/scheduler.str \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \
+    $(SRC_DIR)/string/api.str \
     $(SRC_DIR)/sub.str \
     $(SRC_DIR)/stacks.str \
     \

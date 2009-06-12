@@ -27,6 +27,7 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 #include "parrot/compiler.h"
 #include "parrot/string_funcs.h"
 #include "private_cstring.h"
+#include "api.str"
 
 #define nonnull_encoding_name(s) (s) ? (s)->encoding->name : "null string"
 #define saneify_string(s) \
@@ -2041,6 +2042,21 @@ Parrot_str_format_data(PARROT_INTERP, ARGIN(const char *format), ...)
     return output;
 }
 
+/*
+State of FSM during number value parsing.
+
+Integer uses only parse_start, parse_before_dot and parse_end.
+
+*/
+typedef enum number_parse_state {
+    parse_start,
+    parse_before_dot,
+    parse_after_dot,
+    parse_after_e,
+    parse_after_e_sign,
+    parse_end
+} number_parse_state;
+
 
 /*
 
@@ -2074,45 +2090,60 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     if (s == NULL)
         return 0;
     {
-        const char         *start     = s->strstart;
-        const char * const  end       = start + s->bufused;
         const INTVAL        max_safe  = PARROT_INTVAL_MAX / 10;
         const INTVAL        last_dig  = PARROT_INTVAL_MAX % 10;
         int                 sign      = 1;
-        INTVAL              in_number = 0;
         INTVAL              i         = 0;
+        String_iter         iter;
+        UINTVAL             offs;
+        number_parse_state  state = parse_start;
 
-        PARROT_ASSERT(s);
+        ENCODING_ITER_INIT(interp, s, &iter);
 
-        while (start < end) {
-            const unsigned char c = *start;
+        for (offs = 0; (state != parse_end) && (offs < s->strlen); ++offs) {
+            const UINTVAL c = iter.get_and_advance(interp, &iter);
 
-            if (isdigit((unsigned char)c)) {
-                const INTVAL nextval = c - '0';
-                in_number = 1;
-                if (i < max_safe || (i == max_safe && nextval <= last_dig))
-                    i = i * 10 + nextval;
-                else
-                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
-                        "Integer value of String '%S' too big", s);
-            }
-            else if (!in_number) {
-                /* we've not yet seen any digits */
-                if (c == '-') {
-                    sign      = -1;
-                    in_number = 1;
-                }
-                else if (c == '+')
-                    in_number = 1;
-                else if (isspace((unsigned char)c))
-                    ;
-                else
+            switch (state) {
+                case parse_start:
+                    if (isdigit(c)) {
+                        const INTVAL nextval = c - '0';
+                        if (i < max_safe || (i == max_safe && nextval <= last_dig))
+                            i = i * 10 + nextval;
+                        else
+                            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
+                                "Integer value of String '%S' too big", s);
+                        state = parse_before_dot;
+                    }
+                    else if (c == '-') {
+                        sign      = -1;
+                        state = parse_before_dot;
+                    }
+                    else if (c == '+')
+                        state = parse_before_dot;
+                    else if (isspace((unsigned char)c))
+                        ; /* Do nothing */
+                    else
+                        state = parse_end;
+
+                    break;
+
+                case parse_before_dot:
+                    if (isdigit(c)) {
+                        const INTVAL nextval = c - '0';
+                        if (i < max_safe || (i == max_safe && nextval <= last_dig))
+                            i = i * 10 + nextval;
+                        else
+                            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ERR_OVERFLOW,
+                                "Integer value of String '%S' too big", s);
+                    }
+                    else
+                        state = parse_end;
+                    break;
+
+                default:
+                    /* Pacify compiler */
                     break;
             }
-            else {
-                break;
-            }
-            ++start;
         }
 
         i *= sign;
@@ -2120,7 +2151,6 @@ Parrot_str_to_int(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
         return i;
     }
 }
-
 
 /*
 
@@ -2138,39 +2168,158 @@ FLOATVAL
 Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_num)
-    FLOATVAL    f;
-    char       *cstr;
-    const char *p;
+    FLOATVAL      f         = 0.0;
+    FLOATVAL      mantissa  = 0.0;
+    FLOATVAL      sign      = 1.0; /* -1 for '-' */
+    FLOATVAL      divider   = 0.1;
+    INTVAL        e         = 0;
+    INTVAL        e_sign    = 1; /* -1 for '-' */
+    /* How many digits it's safe to parse */
+    const INTVAL  max_safe  = PARROT_INTVAL_MAX / 10;
+    INTVAL        m         = 0;    /* Integer mantissa */
+    int           m_is_safe = 1;    /* We can use integer mantissa */
+    INTVAL        d         = 0;    /* Integer descriminator */
+    int           d_is_safe = 1;    /* We can use integer mantissa */
+    int           d_length  = 0;
+    int           check_nan = 0;    /* Check for NaN and Inf after main loop */
+    String_iter iter;
+    UINTVAL     offs;
+    number_parse_state state = parse_start;
 
-    /*
-     * XXX C99 atof interprets 0x prefix
-     * XXX would strtod() be better for detecting malformed input?
-     */
-    cstr = Parrot_str_to_cstring(interp, s);
-    p    = cstr;
+    if (!s)
+        return 0.0;
 
-    while (isspace((unsigned char)*p))
-        p++;
+    ENCODING_ITER_INIT(interp, s, &iter);
 
-    if (STREQ(p, PARROT_CSTRING_INF_POSITIVE))
-        f = PARROT_FLOATVAL_INF_POSITIVE;
-    else if (STREQ(p, PARROT_CSTRING_INF_NEGATIVE))
-        f = PARROT_FLOATVAL_INF_NEGATIVE;
-    else if (STREQ(p, PARROT_CSTRING_NAN_QUIET))
-        f = PARROT_FLOATVAL_NAN_QUIET;
-    else
-        f = atof(p);
+    /* Handcrafter FSM to read float value */
+    for (offs = 0; (state != parse_end) && (offs < s->strlen); ++offs) {
+        const UINTVAL c = iter.get_and_advance(interp, &iter);
+        switch (state) {
+            case parse_start:
+                if (isdigit(c)) {
+                    f = c - '0';
+                    m = c - '0';
+                    state = parse_before_dot;
+                }
+                else if (c == '-') {
+                    sign = -1.0;
+                    state = parse_before_dot;
+                }
+                else if (c == '+')
+                    state = parse_before_dot;
+                else if (c == '.')
+                    state = parse_after_dot;
+                else if (isspace(c))
+                    ; /* Do nothing */
+                else {
+                    check_nan = 1;
+                    state     = parse_end;
+                }
+                break;
 
-    /* Not all atof()s return -0 from "-0" */
-    if (*p == '-' && FLOAT_IS_ZERO(f))
-#if defined(_MSC_VER)
-        /* Visual C++ compiles -0.0 to 0.0, so we need to trick
-            the compiler. */
-        f = 0.0 * -1;
-#else
-        f = -0.0;
-#endif
-    Parrot_str_free_cstring(cstr);
+            case parse_before_dot:
+                if (isdigit(c)) {
+                    f = f*10.0 + (c-'0');
+                    m = m*10 + (c-'0');
+                    /* Integer overflow for mantissa */
+                    if (m >= max_safe)
+                        m_is_safe = 0;
+                }
+                else if (c == '.') {
+                    state = parse_after_dot;
+                    /*
+                     * Throw gathered result. Recalulate from integer mantissa
+                     * to preserve precision.
+                     */
+                    if (m_is_safe)
+                        f = m;
+                    mantissa = f;
+                }
+                else if (c == 'e' || c == 'E') {
+                    state = parse_after_e;
+                    /* See comment above */
+                    if (m_is_safe)
+                        f = m;
+                    mantissa = f;
+                }
+                else {
+                    check_nan = 1;
+                    state     = parse_end;
+                }
+                break;
+
+            case parse_after_dot:
+                if (isdigit(c)) {
+                    f += (c-'0') * divider;
+                    divider /= 10.0;
+                    d = d*10 + (c-'0');
+                    if (d >= max_safe)
+                        d_is_safe = 0;
+                    d_length++;
+                }
+                else if (c == 'e' || c == 'E')
+                    state = parse_after_e;
+                else
+                    state = parse_end;
+                break;
+
+            case parse_after_e:
+                if (isdigit(c)) {
+                    e = e*10 + (c-'0');
+                    state = parse_after_e_sign;
+                }
+                else if (c == '-') {
+                    e_sign = -1;
+                    state = parse_after_e_sign;
+                }
+                else if (c == '+')
+                    state = parse_after_e_sign;
+                else
+                    state = parse_end;
+                break;
+
+            case parse_after_e_sign:
+                if (isdigit(c))
+                    e = e*10 + (c-'0');
+                else
+                    state = parse_end;
+                break;
+
+            case parse_end:
+            default:
+                /* Pacify compiler */
+                break;
+        }
+    }
+
+    /* Support for non-canonical NaN and Inf */
+    /* charpos <=2 because for "-i" iter will be advanced to next char already */
+    if (check_nan && (iter.charpos <= 2)) {
+        STRING *t = Parrot_str_upcase(interp, s);
+        if (Parrot_str_equal(interp, t, CONST_STRING(interp, "NAN")))
+            return PARROT_FLOATVAL_NAN_QUIET;
+        else if (Parrot_str_equal(interp, t, CONST_STRING(interp, "INF"))
+                || Parrot_str_equal(interp, t, CONST_STRING(interp, "INFINITY")))
+            return PARROT_FLOATVAL_INF_POSITIVE;
+        else if (Parrot_str_equal(interp, t, CONST_STRING(interp, "-INF"))
+                || Parrot_str_equal(interp, t, CONST_STRING(interp, "-INFINITY")))
+            return PARROT_FLOATVAL_INF_NEGATIVE;
+        else
+            return 0.0;
+    }
+
+    if (d && d_is_safe) {
+        f = mantissa + (1.0 * d / powl(10, d_length));
+    }
+
+    f = f * sign;
+
+    if (e) {
+        if (e_sign == 1)
+            f *= powl(10, e);
+        else
+            f /= powl(10, e);
+    }
 
     return f;
 }
