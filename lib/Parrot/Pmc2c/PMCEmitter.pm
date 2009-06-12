@@ -207,45 +207,11 @@ Initializes the instance.
 sub init {
     my ($self) = @_;
 
-    $self->fixup_singleton if $self->singleton;
-
     #!( singleton or abstract ) everything else gets readonly version of
     # methods too.
 
     $self->ro( Parrot::Pmc2c::PMC::RO->new($self) )
         unless $self->abstract or $self->singleton;
-}
-
-sub fixup_singleton {
-    my ($self) = @_;
-
-    # Because singletons are shared between interpreters, we need to make
-    # special effort to use the right namespace for method lookups.
-    #
-    # Note that this trick won't work if the singleton inherits from something
-    # else (because the MRO will still be shared).
-
-    unless ( $self->implements_vtable('get_namespace')
-        or $self->super_method('get_namespace') ne 'default' )
-    {
-        my $body =
-            Parrot::Pmc2c::Emitter->text(
-            "  return INTERP->vtables[SELF->vtable->base_type]->_namespace;\n");
-        $self->add_method(
-            Parrot::Pmc2c::Method->new(
-                {
-                    name        => 'get_namespace',
-                    parent_name => $self->name,
-                    parameters  => '',
-                    body        => $body,
-                    type        => Parrot::Pmc2c::Method::VTABLE,
-                    mmds        => [],
-                    return_type => 'PMC*',
-                    attrs       => {},
-                }
-            )
-        );
-    }
 }
 
 =item C<gen_includes()>
