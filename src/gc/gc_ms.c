@@ -373,7 +373,7 @@ gc_ms_more_traceable_objects(PARROT_INTERP, ARGMOD(Small_Object_Pool *pool))
             if (arena->used == arena->total_objects)
                 Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
-            if (pool->num_free_objects > pool->replenish_level)
+            if (pool->num_free_objects <= pool->replenish_level)
                 pool->skip = 1;
         }
     }
