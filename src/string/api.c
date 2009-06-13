@@ -2319,7 +2319,8 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
         f = mantissa + (1.0 * d / powl(10, d_length));
     }
 
-    f = f * sign;
+    if (sign < 0)
+        f = -f;
 
     if (e) {
         if (e_sign == 1)
