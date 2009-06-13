@@ -1081,7 +1081,8 @@ CODE
 0.5
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "sqrt_n_n" );
+# Don't check exact string representation. Last digit part can be different */
+pasm_output_like( <<'CODE', <<OUTPUT, "sqrt_n_n" );
         set N1, 2
         sqrt N2, N1
         say N2
@@ -1089,8 +1090,7 @@ pasm_output_is( <<'CODE', <<OUTPUT, "sqrt_n_n" );
         say N2
         end
 CODE
-1.4142135623731
-1.4142135623731
+/^1.414213562373.*\n1.414213562373.*/
 OUTPUT
 
 pasm_error_output_like( <<'CODE', <<OUTPUT, "div_n_n by zero" );
