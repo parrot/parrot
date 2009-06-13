@@ -502,7 +502,9 @@ hello
 OUTPUT
 
 
-pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings' );
+SKIP: {
+    skip( 'no ICU lib', 3 ) unless $PConfig{has_icu};
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings to int' );
 .sub main :main
      $S0 = "140"
      $I0 = $S0
@@ -517,7 +519,7 @@ CODE
 140
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings' );
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings to float' );
 .sub main :main
      $S0 = "140"
      $N0 = $S0
@@ -532,7 +534,7 @@ CODE
 140
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings' );
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings float mixed' );
 .sub main :main
     $S0 = unicode:"140 r\x{e9}sum\x{e9}s"
     $N0 = $S0
@@ -546,7 +548,7 @@ CODE
 140
 140
 OUT
-
+}
 
 
 # Local Variables:
