@@ -16,7 +16,7 @@
 .sub 'load_library' :method
     .param pmc name
     .param pmc extra :named :slurpy
-    .local pmc name, library, inc_hash
+    .local pmc name, library, ns, inc_hash
     .local string file
     $I0 = does name, 'array'
     if $I0 goto have_namelist
@@ -29,12 +29,18 @@
     library = new 'Hash'
     library['name'] = name
     library['filename'] = file
-    # If this fails, we should build a hash of DEFAULT and ALL => the normal ns
-    $P0 = get_hll_namespace name
-    $P0 = $P0['EXPORT']
+    ns = get_hll_namespace name
+    library['namespace'] = ns
+    $P0 = ns['EXPORT']
+    if null $P0 goto no_exports
     library['symbols'] = $P0
-    $P0 = get_hll_namespace name
-    library['namespace'] = $P0
+    goto symbols_done
+  no_exports:
+    $P0 = new 'Hash'
+    $P0['ALL'] = ns
+    $P0['DEFAULT'] = ns
+    library['symbols'] = $P0
+  symbols_done:
     .return (library)
   fail:
     # TODO: better fail?
