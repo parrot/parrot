@@ -166,7 +166,6 @@ method multi($/) {
         my $type := cleanup_type($_<returns>);
         my $name := $_<name>;
 
-        say($type);
         @long_sig.push(~$type);
 
         my $sig_char;
@@ -204,7 +203,6 @@ sub cleanup_type($type) {
         $I0 = find_not_cclass .CCLASS_ALPHABETIC, $S0, 0, $I1
 
         $S0 = substr $S0, 0, $I0
-        say $S0
         $P0 = new 'String'
         $P0 = $S0
         %r = $P0
