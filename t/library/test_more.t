@@ -22,7 +22,7 @@
     exports = split " ", "plan test_out test_diag test_fail test_pass test_test"
     test_namespace.'export_to'(curr_namespace, exports)
 
-    plan( 74 )
+    plan( 75 )
 
     test_skip()
     test_todo()
@@ -346,24 +346,29 @@
     test_test( 'failing is_deeply() for hashes with different numbers of keys' )
 
     left['bar']  = 1
-    right['foo'] = 1
+    right['bar'] = 1
 
     test_fail( 'more diag' )
     is_deeply( left, right, 'more diag' )
     test_diag( 'Mismatch: expected 2 elements, received 1' )
     test_test( '... with description and proper pluralization' )
 
-    right['bar'] = 2
+    right['foo'] = 2
 
     test_fail()
     is_deeply( left, right )
-    test_diag( 'Mismatch at [bar]: expected 1, received 2' )
+    test_diag( 'Mismatch at [foo]: expected 1, received 2' )
     test_test( 'failing is_deeply() for hash with value mismatch' )
 
     test_fail( '2 is not 1' )
     is_deeply( left, right, '2 is not 1' )
-    test_diag( 'Mismatch at [bar]: expected 1, received 2' )
+    test_diag( 'Mismatch at [foo]: expected 1, received 2' )
     test_test( '... with description' )
+
+    right['foo'] = 1
+    test_pass()
+    is_deeply( left, right )
+    test_test( 'passing test is_deeply() for hashes created in different orders' )
 .end
 
 .sub test_is_deeply_mismatch
