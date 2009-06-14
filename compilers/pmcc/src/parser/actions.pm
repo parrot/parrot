@@ -160,10 +160,14 @@ method multi($/) {
     
     # Largely stolen from Pmc2c::MULTIs::rewrite_multi_sub
     my $short_sig := "JP";  # prepend the short signature interpreter and invocant
+    my @long_sig;
     for @( $past<parameters> ) {
         # Clean any '*' out of the name or type.
         my $type := cleanup_type($_<returns>);
         my $name := $_<name>;
+
+        say($type);
+        @long_sig.push(~$type);
 
         my $sig_char;
         # Pass standard parameter types unmodified.
@@ -185,6 +189,7 @@ method multi($/) {
     }
 
     $past<short_signature> := $short_sig;
+    $past<long_signature>  := join(',', @long_sig);
 
     make $past;
 }
@@ -195,7 +200,8 @@ sub cleanup_type($type) {
         type = find_lex '$type'
         
         $S0 = type
-        $I0 = find_not_cclass .CCLASS_ALPHABETIC, $S0, 0, 0
+        $I1 = length $S0
+        $I0 = find_not_cclass .CCLASS_ALPHABETIC, $S0, 0, $I1
 
         $S0 = substr $S0, 0, $I0
         say $S0
