@@ -7,15 +7,20 @@
     .include 'test_more.pir'
     load_bytecode 'pmcc.pbc'
 
-    plan(1)
+    plan(2)
 
     .local string filename, content
     filename = 't/data/class27.pmc'
     content = _slurp(filename)
 
     .local pmc emitter, capture
+    .local string generated
     (emitter, capture) = get_emitter_and_capture(filename, content, 'past')
-    ok("MULTI functions parsed")
+    
+    generated = emitter.'generate_c_code'(capture)
+
+    like(generated, "'Parrot_Integer_multi_add_Integer_PMC'", "Integer,PMC method generated") 
+    like(generated, "'Parrot_Integer_multi_add_DEFAULT_PMC'", "DEFAULT,PMC method generated") 
 
 .end
 
