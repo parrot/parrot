@@ -55,7 +55,7 @@ method generate_header_functions() {
 
     for %vtables {
         my $entry := %vtables{$_};
-        @res_builder.push(self.generate_signature($entry, "") ~ ";\n");
+        @res_builder.push(self.generate_signature($entry, $entry.name, "") ~ ";\n");
     };
 
     join('', @res_builder);
@@ -343,11 +343,25 @@ method generate_c_functions() {
     my %vtables := self.vtables;
     my $emitter := PMC::Emitter::C.new;
     my @res;
+
+    # Generate VTABLEs.
     for %vtables {
         my $entry := %vtables{$_};
-        @res.push(self.generate_signature($entry, ""));
+        @res.push(self.generate_signature($entry, $entry.name, ""));
         @res.push($emitter.emit($past, $entry));
         @res.push("\n");
+    }
+
+    # Generate MULTIs
+    my %multis := self.past.multis;
+    for %multis.keys {
+        my $multi_name  := $_;
+        my $m           := %multis{ $_ };
+        for $m {
+            @res.push(self.generate_signature($_, $_<full_name>, ""));
+            @res.push($emitter.emit($past, $_));
+            @res.push("\n");
+        }
     }
 
     join('', @res);
@@ -480,10 +494,10 @@ method vtables() {
     self.past.vtables;
 }
 
-method generate_signature($entry, $prefix) {
+method generate_signature($entry, $name, $prefix) {
     my @res;
 
-    @res.push('static ' ~ $entry.returns() ~ ' Parrot_' ~ self.name ~ '_' ~ $entry.name);
+    @res.push('static ' ~ $entry.returns() ~ ' Parrot_' ~ self.name ~ '_' ~ $name);
 
     @res.push('(PARROT_INTERP');
     for @($entry<parameters>) {
@@ -548,6 +562,8 @@ method generate_multis() {
     for %constant_strings.keys {
         say("\t" ~ $_ ~ " -> " ~ %constant_strings{$_} );
     }
+
+    "";
 }
 
 method past() {
