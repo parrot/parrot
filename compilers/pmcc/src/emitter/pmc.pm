@@ -533,8 +533,15 @@ Generate code for register MULTIs.
 
 =cut
 method generate_multis() {
+    # Result holder.
+    my @res;
+
     # First - gather all required constant strings in hash.
     my %constant_strings;
+
+    # There is "ns" in MMD info. But looks like for PMCs it always name of PMC.
+    # So, store it in constant strings.
+    %constant_strings{ self.name } := 0;
 
     # Generate bunch of constant strings for registering multi.
     my %multis := self.past.multis;
@@ -558,12 +565,41 @@ method generate_multis() {
         }
     }
 
-    say("constants:");
+    # Generate CONST_STRING_GENs.
+    # Don't bother with readability of generated code.
     for %constant_strings.keys {
-        say("\t" ~ $_ ~ " -> " ~ %constant_strings{$_} );
+        my $idx := %constant_strings{ $_ };
+        @res.push(
+            "\n    STRING * const mfl_" ~ $idx ~ ' = CONST_STRING_GEN(interp, "' ~ $_ ~ '");'
+        );
+    }
+    @res.push("\n\n");
+
+    # Generate mmd_info array for registering.
+    my @mmd_info;
+    for %multis.keys {
+        # $m is list of implementations.
+        my $m := %multis{ $_ };
+        for $m {
+            my $mmd_info :=
+                  "{\n"
+                ~ 'mfl_' ~ %constant_strings{ $_.name } ~ ",\n"
+                ~ 'mfl_' ~ %constant_strings{ $_<short_signature> } ~ ",\n"
+                ~ 'mfl_' ~ %constant_strings{ $_<long_signature> } ~ ",\n"
+                ~ 'mfl_' ~ %constant_strings{ self.name } ~ ",\n" # see comment above about ns
+                ~ '(funcptr_t) Parrot_' ~ self.name ~ '_' ~ $_<full_name>
+                ~ "}\n";
+
+            @mmd_info.push($mmd_info);
+        }
     }
 
-    "";
+    @res.push("const  multi_func_list _temp_multi_func_list[] = {\n"
+        ~ join(",\n", @mmd_info)
+        ~ "};\n"
+    );
+    
+    join('', @res);
 }
 
 method past() {
