@@ -189,6 +189,7 @@ method multi($/) {
 
     $past<short_signature> := $short_sig;
     $past<long_signature>  := join(',', @long_sig);
+    $past<full_name>       := "multi_" ~ $past.name ~ "_" ~ join('_', @long_sig);
 
     make $past;
 }
