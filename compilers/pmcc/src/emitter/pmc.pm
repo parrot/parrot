@@ -522,9 +522,25 @@ method generate_multis() {
     # First - gather all required constant strings in hash.
     my %constant_strings;
 
-    for self.past.multis.keys {
+    # Generate bunch of constant strings for registering multi.
+    my %multis := self.past.multis;
+    for %multis.keys {
         if !%constant_strings{ $_ } {
             %constant_strings{ $_ } := +%constant_strings;
+        }
+        
+        # $m is list of implementations.
+        my $m := %multis{ $_ };
+        for $m {
+            my $short_sig := $_<short_signature>;
+            if !%constant_strings{ $short_sig } {
+                %constant_strings{ $short_sig } := +%constant_strings;
+            }
+
+            my $long_sig := $_<long_signature>;
+            if !%constant_strings{ $long_sig } {
+                %constant_strings{ $long_sig } := +%constant_strings;
+            }
         }
     }
 
