@@ -22,6 +22,8 @@
     like(generated, "'Parrot_Integer_multi_add_Integer_PMC'", "Integer,PMC method generated") 
     like(generated, "'Parrot_Integer_multi_add_DEFAULT_PMC'", "DEFAULT,PMC method generated") 
 
+    # Part of class_init
+    like(generated, "'CONST_STRING_GEN(interp, \"Integer,PMC\")'", "We have generated CONST_STRINGS");
 .end
 
 # Don't forget to update plan!
