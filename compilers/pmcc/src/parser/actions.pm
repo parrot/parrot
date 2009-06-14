@@ -1,6 +1,10 @@
 # Copyright (C) 2009, Parrot Foundation.
 # $Id$
 
+PIR q<
+.include 'cclass.pasm'
+>;
+
 class PMC::Grammar::Actions;
 
 method TOP($/) {
@@ -151,8 +155,54 @@ method multi($/) {
         $<c_body>.ast
     );
     $past<parameters> := $<c_signature><c_arguments>.ast;
+
+    # Handle parameters to create short and long signaures
+    
+    # Largely stolen from Pmc2c::MULTIs::rewrite_multi_sub
+    my $short_sig := "JP";  # prepend the short signature interpreter and invocant
+    for @( $past<parameters> ) {
+        # Clean any '*' out of the name or type.
+        my $type := cleanup_type($_<returns>);
+        my $name := $_<name>;
+
+        my $sig_char;
+        # Pass standard parameter types unmodified.
+        # All other param types are rewritten as PMCs.
+        if ($type eq 'STRING' or $type eq 'PMC' or $type eq 'INTVAL') {
+            $sig_char := substr($type, 0, 1); # short signature takes first character of name
+        }
+        elsif ($type eq 'FLOATVAL') {
+            $sig_char := 'N';
+        }
+        else {
+            $sig_char := 'P';
+            # Replace "returns". Keep old
+            $_<old_returns> := $_<returns>;
+            $_<returns>     := "PMC *";
+        }
+
+        $short_sig := $short_sig ~ $sig_char;
+    }
+
+    $past<short_signature> := $short_sig;
+
     make $past;
-    make $past;
+}
+
+sub cleanup_type($type) {
+    PIR q<
+        .local pmc type
+        type = find_lex '$type'
+        
+        $S0 = type
+        $I0 = find_not_cclass .CCLASS_ALPHABETIC, $S0, 0, 0
+
+        $S0 = substr $S0, 0, $I0
+        say $S0
+        $P0 = new 'String'
+        $P0 = $S0
+        %r = $P0
+    >
 }
 
 method c_body($/) {
