@@ -63,7 +63,6 @@ Variour helper builtins.
     unless it goto done
     $P0 = shift it
     $S0 = $P0
-    say $S0
     push res, $S0
     goto loop
   done:
