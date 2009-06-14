@@ -393,8 +393,8 @@ method class_init_func() {
         ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
 
     @res.push( self.generate_attr_defs() );
-    @res.push( self.generate_passes() );
     @res.push( self.generate_multis() );
+    @res.push( self.generate_passes() );
 
     my $past := self.past;
     if ($past<class_init>) {
@@ -455,6 +455,13 @@ Generate C code pass-sepcific PMC initialization code
 
 method generate_passes() {
     my @res;
+
+## Cotto, this is last bit of second pass.
+##        {
+## #define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))
+##            Parrot_mmd_add_multi_list_from_c_args(interp,
+##                _temp_multi_func_list, N_MULTI_LIST);
+##        }
 
     "";
 }
