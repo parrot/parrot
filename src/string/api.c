@@ -2315,19 +2315,28 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN(const STRING *s))
             return 0.0;
     }
 
-    if (d && d_is_safe) {
-        f = mantissa + (1.0 * d / powl(10, d_length));
-    }
+/* local macro to call proper pow version depending on FLOATVAL */
+#if NUMVAL_SIZE == DOUBLE_SIZE
+#  define POW pow
+#else
+#  define POW powl
+#endif
+
+     if (d && d_is_safe) {
+        f = mantissa + (1.0 * d / POW(10.0, d_length));
+     }
 
     if (sign < 0)
         f = -f;
 
     if (e) {
         if (e_sign == 1)
-            f *= powl(10, e);
+            f *= POW(10.0, e);
         else
-            f /= powl(10, e);
+            f /= POW(10.0, e);
     }
+
+#undef POW
 
     return f;
 }
