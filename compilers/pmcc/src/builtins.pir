@@ -51,6 +51,27 @@ Variour helper builtins.
     .return ($S0)
 .end
 
+
+# Extend various Parrot's PMCs to play nicely with NQP.
+.namespace ['Hash']
+
+.sub 'keys' :method
+    .local pmc res, it
+    res = new 'ResizableStringArray'
+    it = iter self
+  loop:
+    unless it goto done
+    $P0 = shift it
+    $S0 = $P0
+    say $S0
+    push res, $S0
+    goto loop
+  done:
+
+    .return(res)
+
+.end
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
