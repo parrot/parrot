@@ -377,8 +377,10 @@ method class_init_func() {
           "PARROT_EXPORT void Parrot_"
         ~ self.name
         ~ "_class_init(PARROT_INTERP, int entry, int pass) {\n");
+
     @res.push( self.generate_attr_defs() );
     @res.push( self.generate_passes() );
+    @res.push( self.generate_multis() );
 
     my $past := self.past;
     if ($past<class_init>) {
@@ -509,6 +511,27 @@ Method for generating PMC-specific VTABLE functions. E.g. C<default> and C<null>
 
 =cut
 method pre_method_gen() {
+}
+
+=item C<generate_multis>
+
+Generate code for register MULTIs.
+
+=cut
+method generate_multis() {
+    # First - gather all required constant strings in hash.
+    my %constant_strings;
+
+    for self.past.multis.keys {
+        if !%constant_strings{ $_ } {
+            %constant_strings{ $_ } := +%constant_strings;
+        }
+    }
+
+    say("constants:");
+    for %constant_strings.keys {
+        say("\t" ~ $_ ~ " -> " ~ %constant_strings{$_} );
+    }
 }
 
 method past() {
