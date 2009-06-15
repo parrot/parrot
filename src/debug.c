@@ -3344,8 +3344,12 @@ void
 PDB_info(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_info)
-    Parrot_Interp itdeb = interp->pdb->debugger;
-    Parrot_Interp itp = interp->pdb->debugee;
+
+    /* If a debugger is created, use it for printing and use the
+     * data in his debugee. Otherwise, use current interpreter
+     * for both */
+    Parrot_Interp itdeb = interp->pdb ? interp->pdb->debugger : interp;
+    Parrot_Interp itp = interp->pdb ? interp->pdb->debugee : interp;
 
     Parrot_io_eprintf(itdeb, "Total memory allocated = %ld\n",
             interpinfo(itp, TOTAL_MEM_ALLOC));
