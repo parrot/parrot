@@ -1171,7 +1171,7 @@ Obviously, the value of C<b> should be a string.
 The automatic name munging on C<.macro_local> variables allows for using
 multiple macros, like so:
 
-=begin PIR
+=begin PIR_TODO
 
   .macro foo(a)
   .macro_local int $a
@@ -1186,7 +1186,7 @@ multiple macros, like so:
     .bar("x")
   .end
 
-=end PIR
+=end PIR_TODO
 
 This will result in code for the parser as follows:
 
@@ -1221,20 +1221,24 @@ When invoking the macro C<foo> as follows:
 
 =begin PIR_FRAGMENT
 
+  .macro foo(b)
+    #...
+  .endm
+
   .foo("x")
 
 =end PIR_FRAGMENT
 
 there will be two variables: C<b> and C<x>. When the macro is invoked twice:
 
-=begin PIR
+=begin PIR_TODO
 
   .sub main
     .foo("x")
     .foo("y")
   .end
 
-=end PIR
+=end PIR_TODO
 
 the resulting code that is given to the parser will read as follows:
 
@@ -1267,13 +1271,12 @@ in the file. Other sub modifiers include C<:load>, C<:init>, etc.
       .param int b
       .param int c
 
-      .begin_return
-        .set_return xy
-      .end_return
-
+      # ...
+      .local pmc xy
+      .return(xy) 
     .end
 
-=end PIR
+=end PIR_INVALID
 
 =head3 Subroutine Call
 
@@ -1375,7 +1378,7 @@ subroutine declaration contains "method".
 The syntax is very similar to subroutine calls. The call is done with
 C<.meth_call> which must immediately be preceded by the C<.invocant>:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_TODO
 
    .local int x, y, z
    .local pmc class, obj
@@ -1392,7 +1395,7 @@ C<.meth_call> which must immediately be preceded by the C<.invocant>:
    .end_call
    ...
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_TODO
 
 
 The return continuation is optional. The method can be a string

@@ -1534,7 +1534,7 @@ the C<:invocant> flag to define a new name for the invocant object:
 
 (See TT #483)
 
-=begin PIR
+=begin PIR_TODO
 
   .sub 'MyMethod' :method
     $S0 = self                    # Already defined as "self"
@@ -1547,7 +1547,7 @@ the C<:invocant> flag to define a new name for the invocant object:
     say $S0
   .end
 
-=end PIR
+=end PIR_TODO
 
 This example defines two methods in the C<Foo> class. It calls one from the
 main body of the subroutine and the other from within the first method:
