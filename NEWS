@@ -15,9 +15,11 @@ New in 1.3.0
   + Added preliminary Pipe support
   + Fixed cloning of Object PMCs
   + Added root_new opcode
+  + Added initial versions of Packfile PMCs with read/write capabilities
 - Compilers
   + Fixed several memory leaks in IMCC
   + Updated PCT to use root_new opcode
+  + Added support for keyword "self" in NQP
 - Documentation
   + Improvment and expansion of /docs/book
   + Updated documentation, including release managers guide
