@@ -426,23 +426,21 @@ string_rep_compatible(SHIM_INTERP,
 
     /* a table could possibly simplify the logic */
     if (a->encoding == Parrot_utf8_encoding_ptr &&
-            (b->charset == Parrot_ascii_charset_ptr ||
-             b->charset == Parrot_iso_8859_1_charset_ptr)) {
+            b->charset == Parrot_ascii_charset_ptr ) {
         if (a->strlen == a->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
-            return Parrot_ascii_charset_ptr;
+            return b->charset;
         }
         *e = a->encoding;
         return a->charset;
     }
     if (b->encoding == Parrot_utf8_encoding_ptr &&
-            (a->charset == Parrot_ascii_charset_ptr ||
-             a->charset == Parrot_iso_8859_1_charset_ptr)) {
+            a->charset == Parrot_ascii_charset_ptr) {
         if (b->strlen == b->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return a->charset;
         }
-        *e = Parrot_utf8_encoding_ptr;
+        *e = b->encoding;
         return b->charset;
     }
     if (a->encoding != b->encoding)
@@ -562,14 +560,22 @@ Parrot_str_append(PARROT_INTERP, ARGMOD_NULLOK(STRING *a), ARGIN_NULLOK(STRING *
         a->encoding = enc;
     }
     else {
-        /* upgrade to utf16 */
-        Parrot_utf16_encoding_ptr->to_encoding(interp, a, NULL);
-        b = Parrot_utf16_encoding_ptr->to_encoding(interp, b,
+        /* upgrade strings for concatenation */
+        enc = (a->encoding == Parrot_utf16_encoding_ptr ||
+                  b->encoding == Parrot_utf16_encoding_ptr ||
+                  a->encoding == Parrot_ucs2_encoding_ptr ||
+                  b->encoding == Parrot_ucs2_encoding_ptr)
+              ? Parrot_utf16_encoding_ptr
+              : Parrot_utf8_encoding_ptr;
+
+        Parrot_unicode_charset_ptr->to_charset(interp, a, NULL);
+        b = Parrot_unicode_charset_ptr->to_charset(interp, b,
                 Parrot_gc_new_string_header(interp, 0));
 
-        /* result could be mixed ucs2 / utf16 */
-        if (b->encoding == Parrot_utf16_encoding_ptr)
-            a->encoding = Parrot_utf16_encoding_ptr;
+        if (a->encoding != enc)
+            enc->to_encoding(interp, a, NULL);
+        if (b->encoding != enc)
+            enc->to_encoding(interp, b, NULL);
     }
 
     /* calc usable and total bytes */
