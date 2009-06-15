@@ -1276,7 +1276,7 @@ in the file. Other sub modifiers include C<:load>, C<:init>, etc.
       .return(xy) 
     .end
 
-=end PIR_INVALID
+=end PIR
 
 =head3 Subroutine Call
 
@@ -1306,7 +1306,7 @@ created.
 
 =head3 NCI Call
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_TODO
 
     load_lib $P0, "libname"
     dlfunc $P1, $P0, "funcname", "signature"
@@ -1320,7 +1320,7 @@ created.
       .get_result r
     .end_call
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_TODO
 
 =head3 Subroutine Call Syntactic Sugar
 
@@ -1342,16 +1342,16 @@ a NCI sub, and on invocation will do the Right Thing.
 
 Instead of the label a subroutine object can be used too:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_TODO
 
    get_global $P0, "sub_label"
    $P0(args)
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_TODO
 
 =head3 Methods
 
-=begin PIR
+=begin PIR_TODO
 
   .namespace [ "Foo" ]
 
@@ -1368,7 +1368,7 @@ Instead of the label a subroutine object can be used too:
     ...
   .end
 
-=end PIR
+=end PIR_TODO
 
 The variable "self" automatically refers to the invocating object, if the
 subroutine declaration contains "method".
