@@ -426,7 +426,7 @@ string_rep_compatible(SHIM_INTERP,
 
     /* a table could possibly simplify the logic */
     if (a->encoding == Parrot_utf8_encoding_ptr &&
-            b->charset == Parrot_ascii_charset_ptr ) {
+            b->charset == Parrot_ascii_charset_ptr) {
         if (a->strlen == a->bufused) {
             *e = Parrot_fixed_8_encoding_ptr;
             return b->charset;
