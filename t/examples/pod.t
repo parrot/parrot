@@ -39,7 +39,7 @@ sub compile_ok {
             $snippet->{code} .  "\n.end";
     }
 
-    # Generate a temp file we can compile.
+    # Generate a temp file for the source.
     my ($fh,$tempfile) = tempfile(
         SUFFIX => '.' . lc $snippet->{type},
         UNLINK => 1
@@ -47,21 +47,38 @@ sub compile_ok {
     print {$fh} $snippet->{code};
     close $fh;
 
+    # Generate a temp file for stderr
+    my ($err_fh,$err_tempfile) = tempfile(
+        SUFFIX => '.err',
+        UNLINK => 1
+    );
+    close $err_fh;
+
     # Send the output to /dev/null; similar to perl5's -c
     my $cmd = File::Spec->curdir() . $PConfig{slash} .
               $PConfig{test_prog} . " -o " . File::Spec->devnull() . " " .
-              $tempfile;
-
+              $tempfile . ' 2> ' . $err_tempfile;
+ 
     my $description = join (':', map {$snippet->{$_}}
         qw(file line type modifier));
 
+    my $rc = system($cmd);
+    open my $errout_fh, '<', $err_tempfile;
+
+    my $error_output; 
+    {
+        undef local $/;
+        $error_output = <$errout_fh>;
+    }
+ 
+    my $todo = 0;
+    $todo = 1 if ($snippet->{modifier} =~ /TODO|INVALID/);
     TODO: {
         # conditionally TODO the file.
-        local $TODO = "invalid code" if $snippet->{modifier} =~
-            /TODO|INVALID/;
-        is(system($cmd), 0 , $description);
-    }
+        local $TODO = 'invalid code' if $todo;
 
+        is ($error_output,'',$description);
+    } 
 }
 
 sub get_samples {
