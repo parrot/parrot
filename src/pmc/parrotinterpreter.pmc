@@ -806,7 +806,7 @@ The valid values for fileno are listed in include/stdio.pasm
 Optionally sets the parrot handler passed as second argument
 as the specified standard handler.
 
-This method is experimental.
+This method is experimental. See TT #264.
 
 =cut
 

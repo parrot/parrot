@@ -75,6 +75,10 @@ Also OrderedHash to OrderedAssociativePMCArray.
 
 L<https://trac.parrot.org/parrot/ticket/679>
 
+=item Method stdhandle in ParrotInterpreter [experimental]
+
+L<https://trac.parrot.org/parrot/ticket/264>
+
 =back
 
 =head1 Opcodes
