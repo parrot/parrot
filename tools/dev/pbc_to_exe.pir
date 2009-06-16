@@ -57,7 +57,7 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     print outfh, <<'HEADER'
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
-void * get_program_code(void);
+const void * get_program_code(void);
 HEADER
 
     print outfh, codestring
@@ -67,9 +67,9 @@ HEADER
         {
             PackFile     *pf;
             Parrot_Interp interp;
-            unsigned char *program_code_addr;
+            const unsigned char *program_code_addr;
 
-            program_code_addr = get_program_code();
+            program_code_addr = (const unsigned char *)get_program_code();
             if (!program_code_addr)
                 return 1;
 
@@ -253,7 +253,7 @@ MAIN
     codestring .= $S0
     codestring .= ";\n"
     codestring .= <<'END_OF_FUNCTION'
-        void * get_program_code(void)
+        const void * get_program_code(void)
         {
             return program_code;
         }
@@ -347,7 +347,7 @@ END_OF_FUNCTION
     codestring .= ";\n"
 
     codestring .= <<'END_OF_FUNCTION'
-        void * get_program_code(void)
+        const void * get_program_code(void)
         {
             return program_code;
         }
@@ -445,7 +445,7 @@ END_OF_DEFINES
     codestring .= ";\n"
 
     codestring .= <<'END_OF_FUNCTION'
-        void * get_program_code(void)
+        const void * get_program_code(void)
         {
             HRSRC   hResource;
             DWORD   size;
