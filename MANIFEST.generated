@@ -2,10 +2,10 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.1.2.0.dylib                    [main]lib
+blib/lib/libparrot.1.3.0.dylib                    [main]lib
 blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
-blib/lib/libparrot.so.1.2.0                       [main]lib
+blib/lib/libparrot.so.1.3.0                       [main]lib
 blib/lib/libparrot.so                             [main]lib
 compilers/json/JSON/grammar.pbc                   [json]
 compilers/json/JSON.pbc                           [json]
