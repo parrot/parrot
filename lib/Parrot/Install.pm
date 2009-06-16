@@ -173,12 +173,16 @@ B<Comment:>
 =cut
 
 sub create_directories {
-    my($destdir, $directories) = @_;
+    my ( $destdir, $directories ) = @_;
 
-    my @dirs_created = mkpath(
-        ( grep { ! -d } map { $destdir . $_ } keys %$directories ),
-        { mode => 0777 },
-    );
+    my @dirs_to_create = grep { ! -d } map { $destdir . $_ } sort keys %{$directories};
+
+    my $print_the_dirs = 0;
+    my $mode = oct('0777');
+
+    # We must use the legacy interface to support File::Path versions before 2.01.
+    my @dirs_created = mkpath( \@dirs_to_create, $print_the_dirs, $mode );
+
     return 1;
 }
 
