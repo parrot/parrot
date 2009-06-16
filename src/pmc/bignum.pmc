@@ -474,18 +474,22 @@ bignum_div_bignum_int(PARROT_INTERP, PMC *self, INTVAL value, PMC *dest) {
 
 static void
 bignum_div_bignum_float(PARROT_INTERP, PMC *self, FLOATVAL value, PMC *dest) {
-    BIGNUM *bn, *bn_self, *bn_dest;
+    BIGNUM bn, *bn_self, *bn_dest;
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
     int_check_divide_zero(interp, value);
+    mpf_init(bn.b);
 
     if (value < 0) {
-        mpf_set_d(bn->b, -value);
-        mpf_div(bn_dest->b, bn_self->b, bn->b);
+        mpf_set_d(bn.b, -value);
+        mpf_div(bn_dest->b, bn_self->b, bn.b);
         mpf_neg(bn_dest->b, bn_dest->b);
     }
-    else
-        mpf_div(bn_dest->b, bn_self->b, bn->b);
+    else {
+        mpf_set_d(bn.b, value);
+        mpf_div(bn_dest->b, bn_self->b, bn.b);
+    }
+    mpf_clear(bn.b);
 }
 
 /* There's no such mpf_fdiv, only mpz_fdiv and mpf_div */
@@ -1347,6 +1351,13 @@ Decrement the BigNum by 1.0.
         dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bignum_div_bignum_int(INTERP, SELF, value, dest);
+        return dest;
+    }
+
+    VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) {
+        dest = pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+
+        bignum_div_bignum_float(INTERP, SELF, value, dest);
         return dest;
     }
 

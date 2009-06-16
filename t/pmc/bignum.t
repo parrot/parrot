@@ -25,7 +25,7 @@ Tests the BigNum PMC.
 =cut
 
 if ( $PConfig{gmp} ) {
-    plan tests => 32;
+    plan tests => 33;
 }
 else {
     plan skip_all => "No BigNum PMC enabled";
@@ -376,6 +376,29 @@ OK1: say "ok 1"
      set P4, 10000000
      div P1, P0, P4
      set P2, 10000000
+     eq  P1, P2, OK2
+     print "not "
+OK2: say "ok 2"
+     end
+CODE
+ok 1
+ok 2
+OUT
+
+pasm_output_is( <<'CODE', <<'OUT', "div float" );
+     new P0, ['BigNum']
+     set P0, "100000000000000000000"
+     new P1, ['BigNum']
+     div P1, P0, 10.0
+     new P2, ['BigNum']
+     set P2, "10000000000000000000"
+     eq P1, P2, OK1
+     print "not "
+OK1: say "ok 1"
+
+     set P0, "100000000000000"
+     div P1, P0, -10.0
+     set P2, "-10000000000000"
      eq  P1, P2, OK2
      print "not "
 OK2: say "ok 2"
