@@ -91,5 +91,6 @@ Francois Perrad.
  Allison     1.0.0          2009-Mar-17     "Haru Tatsu"
  Francois    1.1.0          2009-Apr-21     "Half-moon Conure"
  Infinoid    1.2.0          2009-May-19     "Bird Brain"
+ Whiteknight 1.3.0          2009-Jun-16     "Andean Swift"
 
 =cut
