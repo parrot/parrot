@@ -63,6 +63,7 @@ main(int argc, char * argv[])
 
     /* Clean-up after ourselves */
     Parrot_destroy(interp);
+    free(sourcefile);
     Parrot_exit(interp, 0);
 }
 
