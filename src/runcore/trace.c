@@ -471,20 +471,20 @@ trace_op_dump(PARROT_INTERP,
 done:
 
     if (interp->code->annotations) {
-        PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
+        PMC * const annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
                 pc - code_start + 1, NULL);
         if (!PMC_IS_NULL(annot)) {
-            PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
+            PMC * const pfile = VTABLE_get_pmc_keyed_str(interp, annot,
                     Parrot_str_new_constant(interp, "file"));
-            PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
+            PMC * const pline = VTABLE_get_pmc_keyed_str(interp, annot,
                     Parrot_str_new_constant(interp, "line"));
             if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
                 /* The debugger interpreter may not be the same as
                  * the main interpreter, extract values from the
                  * PMC instad of passing them directly
                  */
-                STRING *file = VTABLE_get_string(interp, pfile);
-                INTVAL line = VTABLE_get_integer(interp, pline);
+                STRING * const file = VTABLE_get_string(interp, pfile);
+                const INTVAL line   = VTABLE_get_integer(interp, pline);
                 Parrot_io_eprintf(debugger, " (%Ss:%li)", file, (long)line);
             }
         }
