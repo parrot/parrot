@@ -720,6 +720,7 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     HashBucket   *bs, *b;
 
     void * const  old_mem  = hash->bs;
+    HashBucket *old_offset = (HashBucket*)((char*)hash + sizeof (Hash));
     const UINTVAL old_size = hash->mask + 1;
     const UINTVAL new_size = old_size << 1;
     const UINTVAL old_nb   = N_BUCKETS(old_size);
@@ -737,8 +738,16 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     */
 
     /* resize mem */
-    HashBucket * const new_mem =
-        (HashBucket *)mem_sys_realloc(old_mem, HASH_ALLOC_SIZE(new_size));
+    HashBucket *new_mem;
+    if (old_offset != old_mem) {
+        /* This buffer has been reallocated at least once before. */
+        new_mem = (HashBucket *)mem_sys_realloc(old_mem, HASH_ALLOC_SIZE(new_size));
+    }
+    else {
+        /* Allocate a new buffer. */
+        new_mem = (HashBucket *)mem_sys_allocate(HASH_ALLOC_SIZE(new_size));
+        memcpy(new_mem, old_mem, HASH_ALLOC_SIZE(old_size));
+    }
 
     /*
          +---+---+---+---+---+---+-+-+-+-+-+-+-+-+
@@ -954,7 +963,8 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
 {
     ASSERT_ARGS(parrot_create_hash)
     HashBucket  *bp;
-    Hash * const hash = mem_allocate_typed(Hash);
+    void        *alloc = mem_sys_allocate(sizeof (Hash) + HASH_ALLOC_SIZE(INITIAL_BUCKETS));
+    Hash * const hash  = (Hash*)alloc;
     size_t       i;
 
     PARROT_ASSERT(INITIAL_BUCKETS % 4 == 0);
@@ -974,7 +984,7 @@ parrot_create_hash(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_
      * - use the bucket store and bi inside this structure
      * - when reallocate copy this part
      */
-    bp = (HashBucket *)mem_sys_allocate(HASH_ALLOC_SIZE(INITIAL_BUCKETS));
+    bp = (HashBucket *)((char*)alloc + sizeof (Hash));
     hash->free_list = NULL;
 
     /* fill free_list from hi addresses so that we can use
@@ -1015,7 +1025,9 @@ void
 parrot_hash_destroy(SHIM_INTERP, ARGMOD(Hash *hash))
 {
     ASSERT_ARGS(parrot_hash_destroy)
-    mem_sys_free(hash->bs);
+    HashBucket *bp = (HashBucket*)((char*)hash + sizeof (Hash));
+    if (bp != hash->bs)
+        mem_sys_free(hash->bs);
     mem_sys_free(hash);
 }
 
