@@ -45,13 +45,13 @@ sub check_indent {
 
     foreach my $path (@_) {
         my @source;
-        open my $fh, '<', $path
+        open my $IN, '<', $path
             or die "Can not open '$path' for reading!\n";
-        @source = <$fh>;
+        @source = <$IN>;
 
         my @stack;    # for tracking indention level
         my $line_cnt       = 0;
-        my $f              = undef;
+        my $block_indent   = undef;
         my $prev_last_char = '';
         my $last_char      = '';
         my $in_comment     = 0;
@@ -158,21 +158,21 @@ sub check_indent {
             if (/^(\s*).*\{\s*$/) {
 
                 # note the beginning of a block, and its indent depth.
-                $f = length($1);
+                $block_indent = length($1);
                 next;
             }
 
             if (/^\s*([\#\}])/) {
 
                 # skip the last line of the func or cpp directives.
-                $f = undef if ( $1 eq "}" );
+                $block_indent = undef if ( $1 eq "}" );
                 next;
             }
 
-            if ( defined($f) ) {
+            if ( defined($block_indent) ) {
 
                 # first line of a block
-                if ( $f == 0 ) {
+                if ( $block_indent == 0 ) {
 
                     # first line of a top-level block (first line of a function,
                     # in other words)
@@ -185,7 +185,7 @@ sub check_indent {
                         $c_failed{"$path\n"} = 1;
                     }
                 }
-                $f = undef;
+                $block_indent = undef;
             }
 
             my ($indent) = /^(\s+)/ or next;
