@@ -77,13 +77,13 @@ the subroutine in the namespace. The C<:nsentry> modifier stores the subroutine
 in the currenly active namespace with a different name. For example, Parrot
 will store this subroutine in the current namespace as C<bar>, not C<foo>:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'foo' :nsentry('bar')
     #...
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 Chapter 7 on I<"Classes and Objects"> explains other subroutine modifiers.
 
@@ -154,7 +154,7 @@ The default way of matching the arguments passed in a subroutine call to
 the parameters defined in the subroutine's declaration is by position.
 If you declare three parameters -- an integer, a number, and a string:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'foo'
     .param int a
@@ -163,7 +163,7 @@ If you declare three parameters -- an integer, a number, and a string:
     # ...
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 ... then calls to this subroutine must also pass three arguments -- an integer,
 a number, and a string:
@@ -281,14 +281,15 @@ must appear at the end of the list of positional parameters after all the
 required parameters.  An optional I<and> named parameter must immediately
 precede its C<:opt_flag> parameter:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'question'
     .param int value     :named("answer") :optional
     .param int has_value :opt_flag
-    ...
+    #...
+  .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 You can call this subroutine with a named argument or with no argument:
 
@@ -411,14 +412,14 @@ C<load_bytecode>X<load_bytecode opcode> opcode takes a single argument: the
 name of the bytecode file to load. If you create a file named F<foo_file.pir>
 containing a single subroutine:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   # foo_file.pir
   .sub 'foo_sub'              # .sub stores a global sub
      say "in foo_sub"
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 ... and compile it to bytecode using the C<-o> command-line switch:
 
@@ -427,7 +428,7 @@ containing a single subroutine:
 ... you can then load the compiled bytecode into F<main.pir> and directly
 call the subroutine defined in F<foo_file.pir>:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   # main.pir
   .sub 'main' :main
@@ -435,12 +436,12 @@ call the subroutine defined in F<foo_file.pir>:
     foo_sub()
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 The C<load_bytecode> opcode also works with source files, as long as Parrot has
 a compiler registered for that type of file:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   # main2.pir
   .sub 'main' :main
@@ -448,7 +449,7 @@ a compiler registered for that type of file:
     foo_sub()
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 =head2 Sub PMC
 
@@ -534,7 +535,7 @@ individual pieces of metadata:
 
 =begin PIR_FRAGMENT
 
-  $I0 = inspect $P0, "pos_required"
+  $P0 = inspect $P0, "pos_required"
 
 =end PIR_FRAGMENT
 
@@ -666,7 +667,7 @@ PMC:
 
 =begin PIR_FRAGMENT
 
-  $P0 = find_global "MySubroutine"
+  $P0 = get_global "MySubroutine"
   $P1 = $P0.'get_lexinfo'()
 
 =end PIR_FRAGMENT
@@ -693,7 +694,7 @@ declares a subroutine as a nested inner lexical scope of another
 existing subroutine. The modifier takes one argument, the name of the
 outer subroutine:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'foo'
     # defines lexical variables
@@ -703,13 +704,13 @@ outer subroutine:
     # can access foo's lexical variables
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 Sometimes a name alone isn't sufficient to uniquely identify the outer
 subroutine. The C<:subid> modifier allows the outer subroutine to declare a
 truly unique name usable with C<:outer>:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'foo' :subid('barsouter')
     # defines lexical variables
@@ -719,7 +720,7 @@ truly unique name usable with C<:outer>:
     # can access foo's lexical variables
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 The C<get_outer> method on a C<Sub> PMC retrieves its C<:outer> sub.
 
@@ -767,7 +768,7 @@ C<z>.  A naE<iuml>ve translation of this code to PIR might be:
   x = 0
   y = 1
   z = 2
-  ...
+  #...
 
 =end PIR_FRAGMENT
 
@@ -793,7 +794,7 @@ uses C<:outer> PIR subroutines instead:
       .local pmc x, new_y, z
       .lex 'z', z
       find_lex x, 'x'
-      say $x                            # prints 10
+      say x                            # prints 10
       new_y = new 'Integer'
       new_y = 20
       store_lex 'y', new_y
@@ -828,13 +829,13 @@ searches its list of variants for the best matching candidate.
 
 The C<:multi> modifier on a C<.sub> declares a C<MultiSub>:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
-  .sub 'MyMulti' :multi
+  .sub 'MyMulti' :multi()
       # does whatever a MyMulti does
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 Each variant in a C<MultiSub> must have a unique type or number of parameters
 declared, so the dispatcher can calculate a best match. If you had two variants
@@ -842,22 +843,24 @@ that both took four integer parameters, the dispatcher would never be able to
 decide which one to call when it received four integer arguments.
 
 X<multi signature>
-The C<:multi> modifier takes an optional special designator called a
-I<multi signature>. The multi signature tells Parrot what particular
-combination of input parameters the multi accepts:
+The C<:multi> modifier takes one or more arguments defining the I<multi
+signature>. The multi signature tells Parrot what particular combination
+of input parameters the multi accepts:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'Add' :multi(I, I)
     .param int x
     .param int y
-    .return(x + y)
+     $I0 = x + y
+    .return($I0)
   .end
 
   .sub 'Add' :multi(N, N)
     .param num x
     .param num y
-    .return(x + y)
+    $N0 = x + y
+    .return($N0)
   .end
 
   .sub 'Start' :main
@@ -866,23 +869,26 @@ combination of input parameters the multi accepts:
     $S0 = Add("a", "b")  # ERROR! No (S, S) variant!
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 Multis can take I, N, S, and P types, but they can also use C<_> (underscore)
 to denote a wildcard, and a string which names a PMC type:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'Add' :multi(I, I)          # Two integers
-    ...
+    #...
+  .end
 
   .sub 'Add' :multi(I, 'Float')    # An integer and Float PMC
-    ...
+    #...
+  .end
 
   .sub 'Add' :multi('Integer', _)  # An Integer PMC and a wildcard
-    ...
+    #...
+  .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 When you call a C<MultiSub>, Parrot will try to take the most specific
 best-match variant, but will fall back to more general variants if it
@@ -1069,7 +1075,7 @@ It is basically the same as a C<.return> in this regard.
 
 Here is a simple coroutine example:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'MyCoro'
     .yield(1)
@@ -1093,7 +1099,7 @@ Here is a simple coroutine example:
     $I0 = MyCoro()    # 4
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 This contrived example demonstrates how the coroutine stores its state. When
 Parrot encounters the C<.yield>, the coroutine stores its current execution
