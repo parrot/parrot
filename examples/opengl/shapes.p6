@@ -36,11 +36,16 @@ use NCI::Utils:from<parrot>;
 # 'glutconst.p6'.evalfile;
 # eval open('glutconst.p6').slurp;
 
+# Parrot
+constant DATATYPE_FLOAT         = -84;
+
+# GLUT
 constant GLUT_RGBA              = 0x0000;
 constant GLUT_DOUBLE            = 0x0002;
 constant GLUT_DEPTH             = 0x0010;
 constant GLUT_STENCIL           = 0x0020;
 
+# OpenGL
 constant GL_DEPTH_BUFFER_BIT    = 0x0100;
 constant GL_STENCIL_BUFFER_BIT  = 0x0400;
 constant GL_COLOR_BUFFER_BIT    = 0x4000;
@@ -54,15 +59,20 @@ constant GL_SRC_ALPHA           = 0x0302;
 constant GL_ONE_MINUS_SRC_ALPHA = 0x0303;
 constant GL_FRONT               = 0x0404;
 constant GL_BACK                = 0x0405;
+constant GL_LIGHTING            = 0x0B50;
 constant GL_DEPTH_TEST          = 0x0B71;
 constant GL_STENCIL_TEST        = 0x0B90;
 constant GL_NORMALIZE           = 0x0BA1;
 constant GL_BLEND               = 0x0BE2;
+constant GL_SPECULAR            = 0x1202;
+constant GL_POSITION            = 0x1203;
+constant GL_SHININESS           = 0x1601;
+constant GL_AMBIENT_AND_DIFFUSE = 0x1602;
 constant GL_MODELVIEW           = 0x1700;
 constant GL_PROJECTION          = 0x1701;
 constant GL_KEEP                = 0x1E00;
 constant GL_REPLACE             = 0x1E01;
-
+constant GL_LIGHT0              = 0x4000;
 
 our $glut_window;
 
@@ -257,7 +267,34 @@ sub draw_floor {
     glPopMatrix();
 }
 
+sub make_float4($a = 0.0, $b = 0.0, $c = 0.0, $d = 1.0) {
+    my @float4_layout = (DATATYPE_FLOAT, 0, 0) xx 4;
+
+    # XXX: How do I do this in pure Perl 6 in Rakudo?
+    return Q:PIR{
+        $P0 = find_lex '@float4_layout'
+        $P1 = new 'ManagedStruct', $P0
+        $P2 = find_lex '$a'
+        $N0 = $P2
+        $P1[0] = $N0
+        $P2 = find_lex '$b'
+        $N0 = $P2
+        $P1[1] = $N0
+        $P2 = find_lex '$c'
+        $N0 = $P2
+        $P1[2] = $N0
+        $P2 = find_lex '$d'
+        $N0 = $P2
+        $P1[3] = $N0
+        %r  = $P1
+    };
+}
+
 sub set_lights {
+    my $position := make_float4(0.0, 2.0, 0.0, 1.0);
+
+    glEnable(GL_LIGHT0);
+    glLightfv(GL_LIGHT0, GL_POSITION, $position);
 }
 
 sub draw_objects {
@@ -285,6 +322,26 @@ sub draw_rgb_triangle {
 }
 
 sub draw_lit_teapot {
+    # Lit cyan teapot at +X
+
+    glPushMatrix();
+    glTranslatef(1.5, .4, 0);
+    glRotatef(90, 0, 1, 0);
+
+    glEnable(GL_LIGHTING);
+
+    my $color := make_float4(0.0, 0.8, 0.8, 1.0);
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, $color);
+
+    $color := make_float4(1.0, 1.0, 1.0, 1.0);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,  $color);
+    glMaterialf( GL_FRONT, GL_SHININESS, 64);
+
+    glutSolidTeapot(.5);
+
+    glDisable(GL_LIGHTING);
+
+    glPopMatrix();
 }
 
 sub update_particle_effect {
@@ -305,30 +362,8 @@ sub set_2d_view {
 =begin pod
 
 .sub main :main
-    # Init miscellaneous globals
-    init_globals()
-
     # Create particle effect
     init_particle_effect()
-.end
-
-.sub init_globals
-    # Create structure definition for float4 structure
-    .local pmc float4
-    float4 = new 'ResizablePMCArray'
-    push float4, .DATATYPE_FLOAT
-    push float4, 0
-    push float4, 0
-    push float4, .DATATYPE_FLOAT
-    push float4, 0
-    push float4, 0
-    push float4, .DATATYPE_FLOAT
-    push float4, 0
-    push float4, 0
-    push float4, .DATATYPE_FLOAT
-    push float4, 0
-    push float4, 0
-    set_global 'float4', float4
 .end
 
 .sub init_particle_effect
@@ -340,53 +375,6 @@ sub set_2d_view {
 
     set_global 'pfx_pos', pfx_pos
     set_global 'pfx_vel', pfx_vel
-.end
-
-.sub set_lights
-    glEnable(.GL_LIGHT0)
-
-    # Light above origin
-    .local pmc float4, position
-    float4   = get_global 'float4'
-    position = new 'ManagedStruct', float4
-    position[0] = 0.0
-    position[1] = 2.0
-    position[2] = 0.0
-    position[3] = 1.0
-
-    glLightfv(.GL_LIGHT0, .GL_POSITION, position)
-.end
-
-.sub draw_lit_teapot
-    # Lit cyan teapot at +X
-
-    glPushMatrix()
-    glTranslatef(1.5, .4, 0)
-    glRotatef(90, 0, 1, 0)
-
-    glEnable(.GL_LIGHTING)
-
-    .local pmc float4, color
-    float4 = get_global 'float4'
-    color  = new 'ManagedStruct', float4
-    color[0] = 0.0
-    color[1] = 0.8
-    color[2] = 0.8
-    color[3] = 1.0
-    glMaterialfv(.GL_FRONT, .GL_AMBIENT_AND_DIFFUSE, color)
-
-    color[0] = 1.0
-    color[1] = 1.0
-    color[2] = 1.0
-    color[3] = 1.0
-    glMaterialfv(.GL_FRONT, .GL_SPECULAR,  color)
-    glMaterialf (.GL_FRONT, .GL_SHININESS, 64)
-
-    glutSolidTeapot(.5)
-
-    glDisable(.GL_LIGHTING)
-
-    glPopMatrix()
 .end
 
 .sub new_particle
