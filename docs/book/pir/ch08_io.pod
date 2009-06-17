@@ -120,7 +120,7 @@ just like any other filehandle object:
 =begin PIR_FRAGMENT
 
   $P0 = getstdout
-  say $P0, 'hello'
+  print $P0, 'hello'
 
 =end PIR_FRAGMENT
 
@@ -136,7 +136,7 @@ filehandle has reached the end of the file:
     $P1 = open 'myfile.txt', 'r'
     loop_top:
       $S0 = readline $P1
-      say $P0, $S0
+      print $P0, $S0
       if $P1 goto loop_top
     close $P1
   .end
@@ -224,10 +224,10 @@ object and returns them in a string.
 
   $S0 = $P0.'read'(10)
 
+=end PIR_FRAGMENT
+
 If the remaining bytes in the filehandle are fewer than the requested
 number of bytes, returns a string containing the remaining bytes.
-
-=end PIR_FRAGMENT
 
 =head3 readline
 
