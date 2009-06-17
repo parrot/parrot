@@ -314,16 +314,16 @@ especially important when dealing with high-level languages, where annotations
 contain information about the HLL's source code such as the current line number
 and file name.
 
-Create an annotation with the C<.annotation> keyword. Annotations consist of a
+Create an annotation with the C<.annotate> keyword. Annotations consist of a
 key/value pair, where the key is a string and the value is an integer, a
 number, or a string.  Bytecode stores annotations as constants in the compiled
 bytecode.  Consequently, you may not store PMCs.
 
 =begin PIR_FRAGMENT
 
-  .annotation 'file', 'mysource.lang'
-  .annotation 'line', 42
-  .annotation 'compiletime', 0.3456
+  .annotate 'file', 'mysource.lang'
+  .annotate 'line', 42
+  .annotate 'compiletime', 0.3456
 
 =end PIR_FRAGMENT
 
@@ -334,10 +334,10 @@ current hash of annotations:
 
 =begin PIR_FRAGMENT
 
-  .annotation 'line', 1
+  .annotate 'line', 1
   $P0 = annotations # {'line' => 1}
 
-  .annotation 'line', 2
+  .annotate 'line', 2
   $P0 = annotations # {'line' => 2}
 
 =end PIR_FRAGMENT
@@ -346,7 +346,7 @@ To retrieve a single annotation by name, use the name with C<annotations>:
 
 =begin PIR_FRAGMENT
 
-  $I0 = annotations 'line'
+  $P0 = annotations 'line'
 
 =end PIR_FRAGMENT
 
