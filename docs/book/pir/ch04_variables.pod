@@ -818,7 +818,7 @@ of three decimal places (C<2.3>) and a leading sign (C<+>):
 
 =end PIR_FRAGMENT
 
-The test files F<t/op/string.t> and F<t/src/sprintf.t> have many more
+The test files F<t/op/string.t> and F<t/op/sprintf.t> have many more
 examples of format strings.
 
 =head3 Joining strings
