@@ -589,9 +589,6 @@ EOC
     $cout .= <<"EOC";
     if (pass == 0) {
 EOC
-    for my $k ( keys %extra_vt ) {
-        $cout .= "        VTABLE *vt_$k;\n";
-    }
 
     my $flags = $self->vtable_flags;
     $cout .= <<"EOC";
@@ -600,18 +597,9 @@ EOC
         vt->base_type      = $enum_name;
         vt->flags          = $flags;
         vt->attribute_defs = attr_defs;
+        interp->vtables[entry] = vt;
 
 EOC
-    for my $k ( keys %extra_vt ) {
-        my $k_flags = $self->$k->vtable_flags;
-        $cout .= <<"EOC";
-        vt_${k}                 = Parrot_${classname}_${k}_get_vtable(interp);
-        vt_${k}->base_type      = $enum_name;
-        vt_${k}->flags          = $k_flags;
-        vt_${k}->attribute_defs = attr_defs;
-
-EOC
-    }
 
     # init vtable slot
     if ( $self->is_dynamic ) {
@@ -639,6 +627,11 @@ EOC
         isa_hash         = parrot_new_hash(interp);
         vt->isa_hash     = isa_hash;
 EOC
+        for my $isa (@isa) {
+            $cout .= <<"EOC";
+        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING_GEN(interp, "$isa")), PMCNULL);
+EOC
+        }
     }
     else {
         $cout .= <<"EOC";
@@ -646,29 +639,25 @@ EOC
 EOC
     }
 
-    for my $k ( keys %extra_vt ) {
-        $cout .= <<"EOC";
-        vt_${k}->base_type    = entry;
-        vt_${k}->whoami       = vt->whoami;
-        vt_${k}->provides_str = vt->provides_str;
-EOC
-    }
 
     for my $k ( keys %extra_vt ) {
+        my $k_flags = $self->$k->vtable_flags;
         $cout .= <<"EOC";
-        vt->${k}_variant_vtable    = vt_${k};
-        vt_${k}->${k}_variant_vtable = vt;
-        vt_${k}->isa_hash          = isa_hash;
-EOC
-    }
+        {
+            VTABLE                   *vt_$k;
+            vt_${k}                 = Parrot_${classname}_${k}_get_vtable(interp);
+            vt_${k}->base_type      = $enum_name;
+            vt_${k}->flags          = $k_flags;
+            vt_${k}->attribute_defs = attr_defs;
 
-    $cout .= <<"EOC";
-        interp->vtables[entry] = vt;
-EOC
+            vt_${k}->base_type           = entry;
+            vt_${k}->whoami              = vt->whoami;
+            vt_${k}->provides_str        = vt->provides_str;
+            vt->${k}_variant_vtable      = vt_${k};
+            vt_${k}->${k}_variant_vtable = vt;
+            vt_${k}->isa_hash            = isa_hash;
+        }
 
-    for my $isa (@isa) {
-        $cout .= <<"EOC";
-        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING_GEN(interp, "$isa")), PMCNULL);
 EOC
     }
 
