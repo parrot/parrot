@@ -89,7 +89,7 @@ sub MAIN(*@ARGS is rw) {
     # Enter the GLUT main loop
     glutMainLoop();
 
-    # Rakudo bug -- glutMainLoop() never returns, but Rakudo dies without this
+    # XXX: Rakudo bug -- glutMainLoop() never returns, but Rakudo dies without this
     return;
 }
 
@@ -127,7 +127,7 @@ sub reshape($width, $height is copy) {
 
     glViewport(0, 0, $width, $height);
 
-    # Rakudo bug -- Rakudo dies without this
+    # XXX: Rakudo bug -- Rakudo dies without this
     return;
 }
 
@@ -184,6 +184,7 @@ sub draw_reflected_scene {
     # Set stencil for just the reflecting area
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+    # XXX: Rakudo bug - decimalized constant in PIR code does wrong thing
     # glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
     glStencilFunc(GL_ALWAYS, 1, +^0);
 
@@ -192,6 +193,7 @@ sub draw_reflected_scene {
 
     # Now only draw where stencil is set
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    # XXX: Same Rakudo bug (wrong constant)
     # glStencilFunc(GL_EQUAL, 1, 0xffffffff);
     glStencilFunc(GL_EQUAL, 1, +^0);
 
@@ -248,9 +250,9 @@ sub draw_floor {
     glRotatef(90, 1, 0, 0);
 
     # Annulus floor (shapes sit in various spots above it)
-#     my $glu_quadric = gluNewQuadric();
-#     gluDisk($glu_quadric, 1, 2, 128, 1);
-#     gluDeleteQuadric($glu_quadric);
+    my $glu_quadric = gluNewQuadric();
+    gluDisk($glu_quadric, 1, 2, 128, 1);
+    gluDeleteQuadric($glu_quadric);
 
     glPopMatrix();
 }
