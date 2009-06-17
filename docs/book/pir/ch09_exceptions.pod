@@ -1,0 +1,383 @@
+=pod
+
+=head1 Exceptions
+
+X<exceptions>
+Exceptions provide a way of subverting the normal flow of control. Their main
+use is error reporting and cleanup tasks, but sometimes exceptions are just a
+funny way to jump from one code location to another one. Parrot uses a robust
+exception mechanism and makes it available to PIR.
+
+Exceptions are objects that hold essential information about an exceptional
+situation: the error message, the severity and type of the error, the location
+of the error, and backtrace information about the chain of calls that led to
+the error. Exception handlers are ordinary subroutines, but user code never
+calls them directly from within user code. Instead, Parrot invokes an
+appropriate exception handler to catch a thrown exception.
+
+=head2 Throwing Exceptions
+
+The C<throw> opcode throws an exception object. This example creates a new
+C<Exception> object in C<$P0> and throws it:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new 'Exception'
+  throw $P0
+
+=end PIR_FRAGMENT
+
+Setting the string value of an exception object sets its error message:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new 'Exception'
+  $P0 = "I really had my heart set on halibut."
+  throw $P0
+
+=end PIR_FRAGMENT
+
+Other parts of Parrot throw their own exceptions.  The C<die> opcode throws a
+fatal (that is, uncatchable) exception. Many opcodes throw exceptions to
+indicate error conditions. The C</> operator (the C<div> opcode), for example,
+throws an exception on attempted division by zero.
+
+When no appropriate handlers are available to catch an exception, Parrot treats
+it as a fatal error and exits, printing the exception message followed by a
+backtrace showing the location of the thrown exception:
+
+  I really had my heart set on halibut.
+  current instr.: 'main' pc 6 (pet_store.pir:4)
+
+=head2 Catching Exceptions
+
+X<exception handlers>
+X<exceptions;handling>
+Exception handlers catch exceptions, making it possible to recover from
+errors in a controlled way, instead of terminating the process entirely.
+
+The C<push_eh> opcode creates an exception handler and stores it in the list of
+currently active exception handlers. The body of the exception handler is a
+labeled section of code inside the same subroutine as the call to C<push_eh>.
+The opcode takes one argument, the name of the label:
+
+=begin PIR_FRAGMENT
+
+  push_eh my_handler
+    $P0 = new 'Exception'
+    throw $P0
+
+    say 'never printed'
+
+  my_handler:
+    say 'caught an exception'
+
+=end PIR_FRAGMENT
+
+This example creates an exception handler from the C<my_handler> label, then
+creates a new exception and throws it. At this point, Parrot checks to see if
+there are any appropriate exception handlers in the currently active list. It
+finds C<my_handler> and runs it, printing "caught an exception". The "never
+printed" line never runs, because the exceptional control flow skips right over
+it.
+
+Because Parrot scans the list of active handlers from newest to oldest, you
+don't want to leave exception handlers lying around when you're done with them.
+The C<pop_eh> opcode removes an exception handler from the list of currently
+active handlers:
+
+=begin PIR_FRAGMENT
+
+  push_eh my_handler
+    $I0 = $I1 / $I2
+    pop_eh
+
+    say 'maybe printed'
+
+    goto skip_handler
+
+  my_handler:
+    say 'caught an exception'
+    pop_eh
+
+  skip_handler:
+
+=end PIR_FRAGMENT
+
+This example creates an exception handler C<my_handler> and then runs a a
+division operation that will throw a "division by zero" exception if C<$I2> is
+0. When C<$I2> is 0, C<div> throws an exceptoin.  The exception handler catches
+it, prints "caught an exception", and then clears itself with C<pop_eh>. When
+C<$I2> is a non-zero value, there is no exception.  The code clears the
+exception handler with C<pop_eh>, then prints "maybe printed".  The C<goto>
+skips over the code of the exception handler, as it's just a labeled unit of
+code within the subruotine.
+
+The exception object provides access to various attributes of the exception for
+additional information about what kind of error it was, and what might have
+caused it. The C<.get_results()> directive retrieves the C<Exception> object
+from inside the handler:
+
+=begin PIR_FRAGMENT
+
+  my_handler:
+    .get_results($P0)
+
+=end PIR_FRAGMENT
+
+Not all handlers are able to handle all kinds of exceptions. If a handler
+determines that it's caught an exception it can't handle, it can C<rethrow> the
+exception to the next handler in the list of active handlers:
+
+=begin PIR_FRAGMENT
+
+  my_handler:
+    .get_results($P0)
+    rethrow $P0
+
+=end PIR_FRAGMENT
+
+If none of the active handlers can handle the exception, the exception becomes
+a fatal error.  Parrot will exit, just as if it could find no handlers.
+
+X<exceptions;resuming>
+X<resumable exceptions>
+
+An exception handler creates a return continuation with a snapshot of the
+current interpreter context. If the handler is successful, it can resume
+running at the instruction immediately after the one that threw the exception.
+This resume continuation is available from the C<resume> attribute of the
+exception object. To resume after the exception handler is complete, call the
+resume handler like an ordinary subroutine:
+
+=begin PIR_FRAGMENT
+
+  my_handler:
+    .get_results($P0)
+    $P1 = $P0['resume']
+    $P1()
+
+=end PIR_FRAGMENT
+
+=head2 Exception PMC
+
+X<exceptions;message>
+C<Exception> objects contain several useful pieces of information about the
+exception. To set and retrieve the exception message, use the C<message> key on
+the exception object:
+
+=begin PIR_FRAGMENT
+
+  $P0            = new 'Exception'
+  $P0['message'] = "this is an error message for the exception"
+
+=end PIR_FRAGMENT
+
+... or set and retrieve the string value of the exception object directly:
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P0
+
+=end PIR_FRAGMENT
+
+X<exceptions;severity>
+X<exceptions;type>
+The severity and type of the exception are both integer values:
+
+=begin PIR_FRAGMENT
+
+  $P0['severity'] = 1
+  $P0['type']     = 2
+
+=end PIR_FRAGMENT
+
+X<exceptions;payload>
+The payload holds any user-defined data attached to the exception object:
+
+=begin PIR_FRAGMENT
+
+  $P0['payload'] = $P2
+
+=end PIR_FRAGMENT
+
+The attributes of the exception are useful in the handler for making decisions
+about how and whether to handle an exception and report its results:
+
+=begin PIR_FRAGMENT
+
+  my_handler:
+    .get_results($P2)
+    $S0 = $P2['message']
+    print 'caught exception: "'
+    print $S0
+    $I0 = $P2['type']
+    print '", of type '
+    say $I0
+
+=end PIR_FRAGMENT
+
+=head2 Exception Handler PMC
+
+Exception handlers are subroutine-like PMC objects, derived from Parrot's
+C<Continuation> type. When you use C<push_eh> with a label to create an
+exception handler, Parrot creates the handler PMC for you. You can also create
+it directly by creating a new C<ExceptionHandler> object, and setting
+its destination address to the label of the handler using the
+C<set_addr> opcode:
+
+=begin PIR_FRAGMENT
+
+    $P0 = new 'ExceptionHandler'
+    set_addr $P0, my_handler
+    push_eh $P0
+    # ...
+
+  my_handler:
+    # ...
+
+=end PIR_FRAGMENT
+
+X<can_handle>
+C<ExceptionHandler> PMCs have several methods for setting or checking handler
+attributes. The C<can_handle> method reports whether the handler is willing or
+able to handle a particular exception. It takes one argument, the exception
+object to test:
+
+=begin PIR_FRAGMENT
+
+  $I0 = $P0.'can_handle'($P1)
+
+=end PIR_FRAGMENT
+
+X<min_severity>
+X<max_severity>
+The C<min_severity> and C<max_severity> methods set and retrieve the severity
+attributes of the handler, allowing it to refuse to handle any exceptions whose
+severity is too high or too low. Both take a single optional integer argument
+to set the severity; both return the current value of the attribute as a
+result:
+
+=begin PIR_FRAGMENT
+
+  $P0.'min_severity'(5)
+  $I0 = $P0.'max_severity'()
+
+=end PIR_FRAGMENT
+
+The C<handle_types> and C<handle_types_except> methods tell the
+exception handler what types of exceptions it should or shouldn't
+handle. Both take a list of integer types, which correspond to the
+C<type> attribute set on an exception object:
+
+=begin PIR_FRAGMENT
+
+  $P0.'handle_types'(5, 78, 42)
+
+=end PIR_FRAGMENT
+
+The following example creates an exception handler that only handles
+exception types 1 and 2. Instead of having C<push_eh> create the
+exception handler object, it creates a new C<ExceptionHandler> object
+manually. It then calls C<handle_types> to identify the exception types
+it will handle:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new 'ExceptionHandler'
+  set_addr $P0, my_handler
+  $P0.'handle_types'(1, 2)
+  push_eh $P0
+
+=end PIR_FRAGMENT
+
+This handler can only handle exception objects with a type of 1 or 2.  Parrot
+will skip over this handler for all other exception types.
+
+=begin PIR_FRAGMENT
+
+  $P1         = new 'Exception'
+  $P1['type'] = 2
+  throw $P1                     # caught
+
+  $P1         = new 'Exception'
+  $P1['type'] = 3
+  throw $P1                     # uncaught
+
+=end PIR_FRAGMENT
+
+=head2 Annotations
+
+X<annotations>
+Annotations are pieces of metadata code stored in a bytecode file.  This is
+especially important when dealing with high-level languages, where annotations
+contain information about the HLL's source code such as the current line number
+and file name.
+
+Create an annotation with the C<.annotation> keyword. Annotations consist of a
+key/value pair, where the key is a string and the value is an integer, a
+number, or a string.  Bytecode stores annotations as constants in the compiled
+bytecode.  Consequently, you may not store PMCs.
+
+=begin PIR_FRAGMENT
+
+  .annotation 'file', 'mysource.lang'
+  .annotation 'line', 42
+  .annotation 'compiletime', 0.3456
+
+=end PIR_FRAGMENT
+
+Annotations exist, or are "in force" throughout the entire subroutine or until
+their redefinition.  Creating a new annotation with the same name as an old one
+overwrites it with the new value. The C<annotations> opcode retrieves the
+current hash of annotations:
+
+=begin PIR_FRAGMENT
+
+  .annotation 'line', 1
+  $P0 = annotations # {'line' => 1}
+
+  .annotation 'line', 2
+  $P0 = annotations # {'line' => 2}
+
+=end PIR_FRAGMENT
+
+To retrieve a single annotation by name, use the name with C<annotations>:
+
+=begin PIR_FRAGMENT
+
+  $I0 = annotations 'line'
+
+=end PIR_FRAGMENT
+
+Exception objects contain information about the annotations that were in force
+when the exception was thrown. Retrieve them with the C<annotations> method on
+the exception PMC object:
+
+=begin PIR_FRAGMENT
+
+  $I0 = $P0.'annotations'('line')  # only the 'line' annotation
+  $P1 = $P0.'annotations'()        # hash of all annotations
+
+=end PIR_FRAGMENT
+
+Exceptions can also include a backtrace to display the program flow to the
+point of the throw:
+
+=begin PIR_FRAGMENT
+
+  $P1 = $P0.'backtrace'()
+
+=end PIR_FRAGMENT
+
+The backtrace PMC is an array of hashes. Each element in the array corresponds
+to a function in the current call chain. Each hash has two elements:
+C<annotation> (the hash of annotations in effect at that point) and C<sub> (the
+Sub PMC of that function).
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

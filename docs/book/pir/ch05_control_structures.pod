@@ -1,0 +1,344 @@
+=pod
+
+=head1 Control Structures
+
+The semantics of control structures in high-level languages vary broadly.
+Rather than dictating one particular set of semantics for control structures,
+or attempting to provide multiple implementations of common control structures
+to fit the semantics of all major target languages, PIR provides a simple set
+of conditional and unconditional branch instructions.N<In fact, all control
+structures in all languages ultimately compile down to conditional and
+unconditional branches, so you're just getting a peek into the inner workings
+of your software.>
+
+=head2 Conditionals and Unconditionals
+
+X<goto instruction> An unconditional branch always jumps to a specified label.
+PIR has only one unconditional branch instruction, C<goto>. In this example,
+the first C<print> statement never runs because the C<goto> always skips over
+it to the label C<skip_all_that>:
+
+=begin PIR_FRAGMENT
+
+      goto skip_all_that
+      say "never printed"
+
+  skip_all_that:
+      say "after branch"
+
+=end PIR_FRAGMENT
+
+A conditional branch jumps to a specified label only when a particular
+condition is true. The condition may be as simple as checking the truth of a
+particular variable or as complex as a comparison operation.
+
+In this example, the C<goto> skips to the label C<maybe_skip> only if the value
+stored in C<$I0> is true. If C<$I0> is false, it will print "might be printed"
+and then print "after branch":
+
+=begin PIR_FRAGMENT
+
+      if $I0 goto maybe_skip
+      say "might be printed"
+  maybe_skip:
+      say "after branch"
+
+=end PIR_FRAGMENT
+
+=head3 Boolean Truth
+
+X<boolean truth>
+X<PIR values; boolean>
+
+Parrot's C<if> and C<unless> instructions evaluate a variable as a boolean to
+decide whether to jump. In PIR, an integer is false if it's 0 and true if it's
+any non-zero value. A number is false if it's 0.0 and true otherwise. A string
+is false if it's the empty string (C<"">) or a string containing only a zero
+(C<"0">), and true otherwise. Evaluating a PMC as a boolean calls the vtable
+function C<get_bool> to check if it's true or false, so each PMC is free to
+determine what its boolean value should be.
+
+=head3 Comparisons
+
+X<PIR; comparison operators>
+
+In addition to a simple check for the truth of a variable, PIR provides a
+collection of comparison operations for conditional branches.  These jump when
+the comparison is true.
+
+This example compares C<$I0> to C<$I1> and jumps to the label C<success>
+if C<$I0> is less than C<$I1>:
+
+=begin PIR_FRAGMENT
+
+      if $I0 < $I1 goto success
+      say "comparison false"
+  success:
+      say "comparison true"
+
+=end PIR_FRAGMENT
+
+The full set of comparison operators in PIR are C<==> (equal), C<!=>
+(not equal), C<E<lt>> (less than), C<E<lt>=> (less than or equal),
+C<E<gt>> (greater than), and C<E<gt>=> (greater than or equal).
+
+=head3 Complex Conditions
+
+PIR disallows nested expressions.  You cannot embed a statement within another
+statement.  If you have a more complex condition than a simple truth test or
+comparison, you must build up your condition with a series of instructions that
+produce a final, single truth value.
+
+This example performs two operations, addition and multiplication, then uses
+C<and> to check if the results of both operations were true.  The C<and> opcode
+stores a boolean value (0 or 1) in the integer variable C<$I2>; the code uses
+this value in an ordinary truth test:
+
+=begin PIR_FRAGMENT
+
+    $I0 = 4 + 5
+    $I1 = 63 * 0
+    $I2 = and $I0, $I1
+
+    if $I2 goto true
+    say "maybe printed"
+  true:
+
+=end PIR_FRAGMENT
+
+=head2 If/Else Construct
+
+C<PIR; if>
+C<PIR; else>
+
+High-level languages often use the keywords I<if> and I<else> for simple
+conditional control structures. These control structures perform an action when
+a condition is true and skip the action when the condition is false. PIR's
+C<if> instruction can build up simple conditionals.
+
+This example checks the truth of the condition C<$I0>. If C<$I0> is true, it
+jumps to the C<do_it> label, and runs the body of the conditional construct. If
+C<$I0> is false, it continues on to the next statement, a C<goto> instruction
+that skips over the body of the conditional to the label C<dont_do_it>:
+
+=begin PIR_FRAGMENT
+
+    if $I0 goto do_it
+    goto dont_do_it
+  do_it:
+    say "in the body of the if"
+  dont_do_it:
+
+=end PIR_FRAGMENT
+
+The control flow of this example may seem backwards.  In a high-level language,
+I<if> often means I<"if the condition is true, run the next few lines of
+code">.  In an assembly language, it's often more straightforward to write
+I<"if the condition is true, B<skip> the next few lines of code">. Because of
+the reversed logic, you may find it easier to build a simple conditional
+construct using the C<unless> instruction instead of C<if>.
+
+=begin PIR_FRAGMENT
+
+    unless $I0 goto dont_do_it
+    say "in the body of the if"
+  dont_do_it:
+
+=end PIR_FRAGMENT
+
+This example produces the same output as the previous example, but the logic is
+simpler.  When C<$I0> is true, C<unless> does nothing and the body of the
+conditional runs. When C<$I0> is false, C<unless> skips over the body of the
+conditional by jumping to C<dont_do_it>.
+
+An I<if/else> control structure is easier to build using the C<if> instruction
+than C<unless>.  To build an I<if/else>, insert the body of the else right
+after the first C<if> instruction.
+
+This example checks if C<$I0> is true.  If so, it jumps to the label C<true>
+and runs the body of the I<if> construct. If C<$I0> is false, the C<if>
+instruction does nothing, and the code continues to the body of the I<else>
+construct. When the body of the else has finished, the C<goto> jumps to the end
+of the I<if/else> control structure by skipping over the body of the I<if>
+construct:
+
+    if $I0 goto true
+    say "in the body of the else"
+    goto done
+  true:
+    say "in the body of the if"
+  done:
+
+=head2 Switch Construct
+
+X<switch>
+X<PIR; switch>
+
+A I<switch> control structure selects one action from a list of possible
+actions by comparing a single variable to a series of values until it finds one
+that matches. The simplest way to achieve this in PIR is with a series of
+C<unless> instructions:
+
+=begin PIR_FRAGMENT
+
+    $S0 = 'a'
+
+  option1:
+    unless $S0 == 'a' goto option2
+    say "matched: a"
+    goto end_of_switch
+
+  option2:
+    unless $S0 == 'b' goto default
+    say "matched: b"
+    goto end_of_switch
+
+  default:
+    say "I don't understand"
+
+  end_of_switch:
+
+=end PIR_FRAGMENT
+
+This example uses C<$S0> as the I<case> of the switch construct. It
+compares that case against the first value C<a>.  If they match, it prints
+the string "matched: a", then jumps to the end of the switch at the
+label C<end_of_switch>. If the first case doesn't match C<a>, the
+C<goto> jumps to the label C<option2> to check the second option.
+The second option compares the case against the value C<b>.  If they
+match, it prints the string "matched: b", then jumps to the end of the
+switch. If the case doesn't match the second option, the C<goto>
+goes on to the default case, prints "I don't understand", and continues
+to the end of the switch.
+
+=head2 Do-While Loop
+
+A I<do-while>X<do-while loop> loop runs the body of the loop once, then
+checks a condition at the end to decide whether to repeat it.  A single
+conditional branch can build this style of loop:
+
+=begin PIR_FRAGMENT
+
+    $I0 = 0                 # counter
+
+  redo:                     # start of loop
+    inc $I0
+    say $I0
+    if $I0 < 10 goto redo   # end of loop
+
+=end PIR_FRAGMENT
+
+This example prints the numbers 1 to 10. The first time through, it executes
+all statements up to the C<if> instruction.  If the condition evaluates as true
+(C<$I0> is less than 10), it jumps to the C<redo> label and runs the loop body
+again. The loop ends when the condition evaluates as false.
+
+Here's a slightly more complex example that calculates the factorial C<5!>:
+
+=begin PIR_FRAGMENT
+
+      .local int product, counter
+
+      product = 1
+      counter = 5
+
+  redo:                         # start of loop
+      product *= counter
+      dec counter
+      if counter > 0 goto redo  # end of loop
+
+      say product
+
+=end PIR_FRAGMENT
+
+Each time through the loop it multiplies C<product> by the current value of the
+C<counter >, decrements the counter, and jumps to the start of the loop. The
+loop ends when C<counter> has counted down to 0.
+
+=head2 While Loop
+
+X<while-style loop> A I<while> loop tests the condition at the start of the
+loop instead of at the end. This style of loop needs a conditional branch
+combined with an unconditional branch.  This example also calculates a
+factorial, but with a I<while> loop:
+
+=begin PIR_FRAGMENT
+
+      .local int product, counter
+      product = 1
+      counter = 5
+
+  redo:                         # start of loop
+      if counter <= 0 goto end_loop
+      product *= counter
+      dec counter
+      goto redo
+  end_loop:                     # end of loop
+
+      say product
+
+=end PIR_FRAGMENT
+
+This code tests the counter C<counter> at the start of the loop to see if it's
+less than or equal to 0, then multiplies the current product by the counter and
+decrements the counter. At the end of the loop, it unconditionally jumps back
+to the start of the loop and tests the condition again.  The loop ends when the
+counter C<counter> reaches 0 and the C<if> jumps to the C<end_loop> label. If
+the counter is a negative number or zero before the loop starts the first time,
+the body of the loop will never execute.
+
+=head2 For Loop
+
+X<for loop>
+
+A I<for> loop is a counter-controlled loop with three declared components: a
+starting value, a condition to determine when to stop, and an operation to step
+the counter to the next iteration. A I<for> loop in C looks something like:
+
+  for (i = 1; i <= 10; i++) {
+    ...
+  }
+
+where C<i> is the counter, C<i = 1> sets the start value, C<<i <= 10>> checks
+the stop condition, and C<i++> steps to the next iteration.  A I<for> loop in
+PIR requires one conditional branch and two unconditional branches.
+
+=begin PIR_FRAGMENT
+
+  loop_init:
+    .local int counter
+    counter = 1
+
+  loop_test:
+    if counter <= 10 goto loop_body
+    goto loop_end
+
+  loop_body:
+    say counter
+
+  loop_continue:
+    inc counter
+    goto loop_test
+
+  loop_end:
+
+=end PIR_FRAGMENT
+
+The first time through the loop, this example sets the initial value of the
+counter in C<loop_init>. It then goes on to test that the loop condition is met
+in C<loop_test>. If the condition is true (C<counter> is less than or equal to
+10) it jumps to C<loop_body> and executes the body of the loop. If the the
+condition is false, it will jump straight to C<loop_end> and the loop will end.
+The body of the loop prints the current counter then goes on to
+C<loop_continue>, which increments the counter and jumps back up to
+C<loop_test> to continue on to the next iteration. Each iteration through the
+loop tests the condition and increments the counter, ending the loop when the
+condition is false. If the condition is false on the very first iteration, the
+body of the loop will never run.
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

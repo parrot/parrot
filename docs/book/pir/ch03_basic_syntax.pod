@@ -1,0 +1,326 @@
+=pod
+
+=head1 Basic Syntax
+
+Z<CHP-3>
+
+X<PIR syntax>
+
+PIR has a relatively simple syntax. Every line is a comment, a label, a
+statement, or a directive. Each statement or directive stands on its own
+line. There is no end-of-line symbol (such as a semicolon in C).
+
+=head2 Comments
+
+X<comments>
+A comment begins with the C<#> symbol, and continues until the end of the line.
+Comments can stand alone on a line or follow a statement or directive.
+
+=begin PIR
+
+    # This is a regular comment. The PIR
+    # interpreter ignores this.
+
+=end PIR
+
+X<Pod documentation>
+PIR also treats inline documentation in Pod format as a comment. An
+equals sign as the first character of a line marks the start of a Pod
+block.  A C<=cut> marker signals the end of a Pod block.
+
+  =head2
+
+  This is Pod documentation, and is treated like a
+  comment. The PIR interpreter ignores this.
+
+  =cut
+
+=head2 Labels
+
+X<PIR (Parrot intermediate representation);labels> X<labels (PIR)>
+A label attaches a name to a line of code so other statements can refer to it.
+Labels can contain letters, numbers, and underscores. By convention, labels use
+all capital letters to stand out from the rest of the source code. It's fine to
+put a label on the same line as a statement or directive:
+
+=begin PIR_FRAGMENT
+
+    GREET: say "'Allo, 'allo, 'allo."
+
+=end PIR_FRAGMENT
+
+Labels on separate lines improve readability, especially when outdented:
+
+=begin PIR_FRAGMENT
+
+  GREET:
+    say "'Allo, 'allo, 'allo."
+
+=end PIR_FRAGMENT
+
+=head2 Statements
+
+Z<CHP-3-SECT-1>
+
+X<statements (PIR)>
+X<PIR (Parrot intermediate representation);statements>
+A statement is either an opcode or syntactic sugar for one or more opcodes. An
+opcode is a native instruction for the virtual machine; it consists of the name
+of the instruction followed by zero or more arguments.
+
+=begin PIR_FRAGMENT
+
+  say "Norwegian Blue"
+
+=end PIR_FRAGMENT
+
+PIR also provides higher-level constructs, including symbolic operators:
+
+=begin PIR_FRAGMENT
+
+  $I1 = 2 + 5
+
+=end PIR_FRAGMENT
+
+These special statement forms are just syntactic sugar for regular opcodes. The
+C<+> symbol corresponds to the C<add> opcode, the C<-> symbol to the C<sub>
+opcode, and so on. The previous example is equivalent to:
+
+=begin PIR_FRAGMENT
+
+  add $I1, 2, 5
+
+=end PIR_FRAGMENT
+
+=head2 Directives
+
+X<directives (PIR)>
+X<PIR (Parrot intermediate representation);directives>
+
+Directives resemble opcodes, but they begin with a period (C<.>).  Some
+directives specify actions that occur at compile time. Other directives
+represent complex operations that require the generation of multiple
+instructions.  The C<.local> directive, for example, declares a named variable.
+
+=begin PIR_FRAGMENT
+
+  .local string hello
+
+=end PIR_FRAGMENT
+
+=head2 Literals
+
+X<literals (PIR)>
+X<PIR (Parrot intermediate representation);literals>
+
+Integers and floating point numbers are numeric literals. They can be positive
+or negative.
+
+=begin PIR_FRAGMENT
+
+  $I0 = 42       # positive
+  $I1 = -1       # negative
+
+=end PIR_FRAGMENT
+
+Integer literals can also be binary, octal, or hexadecimal:
+
+=begin PIR_FRAGMENT
+
+  $I1 = 0b01010  # binary
+  $I2 = 0o78     # octal
+  $I3 = 0xA5     # hexadecimal
+
+=end PIR_FRAGMENT
+
+Floating point number literals have a decimal point, and can use scientific
+notation:
+
+=begin PIR_FRAGMENT
+
+  $N0 = 3.14
+  $N2 = -1.2e+4
+
+=end PIR_FRAGMENT
+
+X<strings;in PIR>
+String literals are enclosed in single or double-quotes.N<See the
+section on L<Strings> in Chapter 4 for an explanation of the differences
+between the quoting types.>
+
+=begin PIR_FRAGMENT
+
+  $S0 = "This is a valid literal string"
+  $S1 = 'This is also a valid literal string'
+
+=end PIR_FRAGMENT
+
+=head2 Variables
+
+X<variables (PIR)>
+X<PIR (Parrot intermediate representation);variables>
+X<PMC; definition>
+
+PIR variables can store four different kinds of valuesE<mdash>integers,
+numbers (floating point), strings, and objects. Parrot's objects are
+called PMCs, for "I<P>olyI<M>orphic I<C>ontainer".
+
+The simplest kind of variable is a register variable. The name of a register
+variable always starts with a dollar sign (C<$>), followed by a single
+character which specifies the type of the variable -- integer (C<I>), number
+(C<N>), string (C<S>), or PMC (C<P>) -- and ends with a unique number. You need
+not predeclare register variables:
+
+=begin PIR_FRAGMENT
+
+  $S0 = "Who's a pretty boy, then?"
+  say $S0
+
+=end PIR_FRAGMENT
+
+PIR also has named variables; the C<.local>
+directive declares them. As with register variables, there are four valid types:
+C<int>, C<num>, C<string>, and C<pmc>. You I<must> declare named variables; 
+otherwise they behave exactly the same as register variables.
+
+=begin PIR_FRAGMENT
+
+  .local string hello
+  hello = "'Allo, 'allo, 'allo."
+  say hello
+
+=end PIR_FRAGMENT
+
+=head2 Constants
+
+X<PIR (Parrot intermediate representation);constants>
+X<constants (PIR)>
+
+The C<.const> directive declares a named constant. Named constants are similar
+to named variables, but the values set in the declaration may never change.
+Like C<.local>, C<.const> takes a type and a name. It also requires a literal
+argument to set the value of the constant.
+
+=begin PIR_FRAGMENT
+
+  .const int    frog = 4                       # integer constant
+  .const string name = "Superintendent Parrot" # string constant
+  .const num    pi   = 3.14159                 # floating point constant
+
+=end PIR_FRAGMENT
+
+You may use a named constant anywhere you may use a literal, but you must
+declare the named constant beforehand.  This example declares a named string
+constant C<hello> and prints the value:
+
+=begin PIR_FRAGMENT
+
+  .const string hello = "Hello, Polly."
+  say hello
+
+=end PIR_FRAGMENT
+
+=head2 Keys
+
+X<PIR (Parrot intermediate representation);keys>
+X<keys (PIR)>
+
+A key is a special kind of constant used for accessing elements in complex
+variables (such as an array). A key is either an integer or a string; and it's
+always enclosed in square brackets (C<[> and C<]>).  You do not have to declare
+literal keys.  This code example stores the string "foo" in $P0 as element 5,
+and then retreives it.
+
+=begin PIR_FRAGMENT
+
+  $P0[5] = "foo"
+  $S1    = $P0[5]
+
+=end PIR_FRAGMENT
+
+PIR supports multi-part keys.  Use a semicolon to separate each part.
+
+=begin PIR_FRAGMENT
+
+  $P0['my';'key'] = 472
+  $I1             = $P0['my';'key']
+
+=end PIR_FRAGMENT
+
+=head2 Control Structures
+
+X<PIR (Parrot intermediate representation);control structures>
+X<control structures (PIR)>
+
+Rather than providing a pre-packaged set of control structures like C<if> and
+C<while>, PIR gives you the building blocks to construct your own.N<PIR has
+many advanced features, but at heart it B<is> an assembly language.> The most
+basic of these building blocks is C<goto>, which jumps to a named label.N<This
+is not your father's C<goto>. It can only jump inside a subroutine, and only to
+a named label.> In this code example, the C<say> statement will run immediately
+after the C<goto> statement:
+
+=begin PIR_FRAGMENT
+
+    goto GREET
+      # ... some skipped code ...
+  GREET:
+    say "'Allo, 'allo, 'allo."
+
+=end PIR_FRAGMENT
+
+Variations on the basic C<goto> check whether a particular condition is
+true or false before jumping:
+
+=begin PIR_FRAGMENT
+
+  if $I0 > 5 goto GREET
+
+=end PIR_FRAGMENT
+
+You can construct any traditional control structure from PIR's built-in control structures.
+
+=head2 Subroutines
+
+X<PIR (Parrot intermediate representation);subroutines>
+X<subroutines (PIR)>
+
+A PIR subroutine starts with the C<.sub> directive and ends with the C<.end>
+directive. Parameter declarations use the C<.param> directive; they resemble
+named variable declarations. This example declares a subroutine named
+C<greeting>, that takes a single string parameter named C<hello>:
+
+=begin PIR
+
+  .sub 'greeting'
+      .param string hello
+      say hello
+  .end
+
+=end PIR
+
+=head2 That's All Folks
+
+You now know everything you need to know about PIR. Everything else you
+read or learn about PIR will use one of these fundamental language
+structures. The rest is vocabulary.
+
+=begin sidebar Parrot Assembly Language
+
+Parrot Assembly Language (PASM) is another low-level language native to the
+virtual machine. PASM is a pure assembly language, with none of the syntactic
+sugar that makes PIR friendly for library development.  PASM's primary purpose
+is to act as a plain English reprepresention of the bytecode format. Its
+typical use is for debugging, rather than for writing libraries. Use PIR or a
+higher-level language for development tasks.
+
+PASM files use the F<.pasm> file extension.
+
+=end sidebar
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:
