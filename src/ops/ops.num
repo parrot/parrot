@@ -1278,3 +1278,5 @@ find_name_p_s                  1253
 find_name_p_sc                 1254
 find_sub_not_null_p_s          1255
 find_sub_not_null_p_sc         1256
+isnull_i_s                     1257
+isnull_i_sc                    1258

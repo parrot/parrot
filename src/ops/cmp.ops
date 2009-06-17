@@ -704,6 +704,10 @@ Sets $1 to 1 or 0, depending on whether $2 is false or not.
 
 Sets $1 to 1 if the object is null, 0 otherwise.
 
+=item B<isnull>(out INT, in STR)
+
+Sets $1 to 1 if the string is null, 0 otherwise.
+
 =cut
 
 inline op issame(out INT, invar PMC, invar PMC) {
@@ -738,6 +742,10 @@ inline op isfalse(out INT, invar PMC) {
 
 inline op isnull(out INT, in PMC) {
     $1 = PMC_IS_NULL($2);
+}
+
+inline op isnull(out INT, in STR) {
+    $1 = STRING_IS_NULL($2);
 }
 
 =item B<isgt>(out INT, in INT, in INT)

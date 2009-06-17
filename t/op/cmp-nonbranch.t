@@ -17,7 +17,7 @@ Tests all non-branching conditional operators.
 =cut
 
 
-.const int TESTS = 90
+.const int TESTS = 93
 
 .macro EXP()
   exp_nok:
@@ -53,7 +53,8 @@ Tests all non-branching conditional operators.
     'isntsame'()
     'istrue'()
     'isfalse'()
-    'isnull'()
+    'isnull_pmc'()
+    'isnull_string'()
     'isgt'()
     'isge'()
     'isle'()
@@ -159,9 +160,9 @@ Tests all non-branching conditional operators.
 .end
 
 
-.sub 'isnull'
+.sub 'isnull_pmc'
     .local int exp, res
-    .SET_DESC('isnull')
+    .SET_DESC('isnull pmc')
 
   init:
     $S0 = 'FUBAR'
@@ -188,6 +189,18 @@ Tests all non-branching conditional operators.
     .TEST()
 .end
 
+
+.sub 'isnull_string'
+    .local int res
+    null $S0
+    res = isnull $S0
+    is(res, 1, 'isnull string null')
+    $S0 = 'something'
+    res = isnull $S0
+    is(res, 0, 'isnull string non null')
+    res = isnull 'H'
+    is(res, 0, 'isnull string constant')
+.end
 
 .sub 'isgt'
     .local string exp, res
