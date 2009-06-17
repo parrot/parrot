@@ -1309,19 +1309,15 @@ ordered array iterator starts from the beginning or end of the array.  These
 two constants have no effect on associative array iterators, as their elements
 are unordered.
 
-Load the iterator constants with the C<.include> directive to include the file
-F<iterator.pasm>.
+Load the iterator constants with the C<.include> directive to include
+the file F<iterator.pasm>. To use them, set the iterator PMC to the
+value of the constant:
 
 =begin PIR_FRAGMENT
 
       .include "iterator.pasm"
 
-=end PIR_FRAGMENT
-
-To use the iterator constants, set the iterator PMC to the value of the
-constant:
-
-=begin PIR_FRAGMENT
+      # ...
 
       $P1 = .ITERATE_FROM_START
 
@@ -1710,14 +1706,10 @@ and C<get_root_global>, except they always operate on the virtual root for the
 currently selected HLL. This example stores and retrieves a C<bill> variable in
 the Euro namespace, under the Dutch HLL namespace root:
 
-=begin PIR_FRAGMENT_INVALID
-
   .HLL 'Dutch'
   #...
   set_hll_global ["Euro"], "bill", $P0
   $P1 = get_hll_global ["Euro"], "bill"
-
-=end PIR_FRAGMENT_INVALID
 
 =head3 NameSpace PMC
 
