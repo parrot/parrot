@@ -406,7 +406,6 @@ third and subsequent children can be any value they wish.
 
     .local pmc iter
     .local string rtype
-    .local int sigidx
     iter = node.'iterator'()
     sigidx = 1
     rtype = substr signature, sigidx, 1
@@ -1423,7 +1422,7 @@ by C<node>.
     collpast = node[0]
     bodypast = node[1]
 
-    .local pmc collpost, testpost
+    .local pmc collpost
     collpost = self.'as_post'(collpast, 'rtype'=>'P')
     ops.'push'(collpost)
 

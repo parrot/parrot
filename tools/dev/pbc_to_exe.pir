@@ -168,7 +168,6 @@ MAIN
     .return(infile, cfile, objfile, exefile)
 
   proper_args:
-    .local string infile, cfile, objfile, exefile
 
     $P0    = shift args
     infile = shift args

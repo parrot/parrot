@@ -107,7 +107,7 @@ or the resulting PIR code (target='PIR').
     .return ($P0)
 
   analyze:
-    .local pmc exp, pad
+    .local pmc pad
     exp = match['expr']
     pad = clone adverbs
     $P0 = new 'Hash'
