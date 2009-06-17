@@ -13,7 +13,7 @@ use Parrot::Test;
 plan skip_all => 'No reason to compile invalid PBC here'
     if $ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} =~ m/--run-pbc/;
 
-plan tests => 5;
+plan tests => 6;
 
 ## tests for imcc error messages
 
@@ -77,6 +77,20 @@ pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'Array is on type, RT #427
 END_PIR
 /^error:imcc:syntax error, unexpected IDENTIFIER, expecting/
 END_EXPECTED
+
+TODO: {
+  local $TODO = 'TT #767';
+
+pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'no multiple .local, TT #767' );
+.sub main :main
+  .local pmc p
+  .local pmc p
+.end
+END_PIR
+/^error:imcc:syntax error, duplicated IDENTIFIER/
+END_EXPECTED
+
+}
 
 # Local Variables:
 #   mode: cperl
