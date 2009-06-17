@@ -99,7 +99,7 @@ X<classes;methods>
 Methods in PIR are subroutines stored in the class object. Define a method with
 the C<.sub> directive and the C<:method> modifier:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub half :method
     $P0 = getattribute self, 'bar'
@@ -107,7 +107,7 @@ the C<.sub> directive and the C<:method> modifier:
     .return($P1)
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 This method returns the integer value of the C<bar> attribute of the object
 divided by two. Notice that the code never declares the named variable C<self>.
@@ -157,11 +157,11 @@ you can't pass a C<String> PMC as the method name.
 Methods can have multiple arguments and multiple return values just like
 subroutine:
 
-=begin PIR_FRAGMENT
+=begin PIR_FRAGMENT_INVALID
 
-  ($P0, $S1) = obj.'method'($I3, $P4)
+  ($P0, $S1) = $P2.'method'($I3, $P4)
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 The C<can> opcode checks whether an object has a particular method. It
 returns 0 (false) or 1 (true):
@@ -212,7 +212,7 @@ To override an inherited method in the child class, define a method with the
 same name in the subclass. This example code overrides C<Bar>'s C<who_am_i>
 method to return a more meaningful name:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .namespace [ 'Bar' ]
 
@@ -220,7 +220,7 @@ method to return a more meaningful name:
     .return( 'I am proud to be a Bar' )
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 Object creation for subclasses is the same as for ordinary classes:
 
@@ -260,7 +260,7 @@ The C<:vtable> modifier marks a subroutine as a vtable override. As it does
 with methods, Parrot stores vtable overrides in the class associated with the
 currently selected namespace:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub 'init' :vtable
     $P6 = new 'Integer'
@@ -268,18 +268,18 @@ currently selected namespace:
     .return()
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 Subroutines acting as vtable overrides must either have the name of an actual
 vtable function or include the vtable function name in the C<:vtable> modifier:
 
-=begin PIR_FRAGMENT
+=begin PIR
 
   .sub foozle :vtable('init')
     # ...
   .end
 
-=end PIR_FRAGMENT
+=end PIR
 
 You must call methods on objects explicitly, but Parrot calls vtable functions
 implicitly in multiple contexts.  For example, creating a new object with C<$P3
@@ -341,8 +341,8 @@ of the class that it chooses to reveal:
 
 =begin PIR_FRAGMENT
 
-  $P0 = inspect
-  $P1 = $P0['attributes']
+  $P1 = inspect $P0
+  $P2 = $P1['attributes']
 
 =end PIR_FRAGMENT
 
@@ -351,7 +351,7 @@ a specific characteristic of the class:
 
 =begin PIR_FRAGMENT
 
-  $P0 = inspect 'parents'
+  $P0 = inspect $P1, 'parents'
 
 =end PIR_FRAGMENT
 
