@@ -128,12 +128,12 @@ Integer literals can also be binary, octal, or hexadecimal:
 =begin PIR_FRAGMENT
 
   $I1 = 0b01010  # binary
-  $I2 = 0o78     # octal
+  $I2 = 0o72     # octal
   $I3 = 0xA5     # hexadecimal
 
 =end PIR_FRAGMENT
 
-Floating point number literals have a decimal point, and can use scientific
+Floating point number literals have a decimal point and can use scientific
 notation:
 
 =begin PIR_FRAGMENT
