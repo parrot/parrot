@@ -173,7 +173,8 @@ the mode.
 
 =head3 close
 
-The C<close> method closes the filehandle. This does not destroy the filehandle object; uou can reopen it with the C<open> method later.
+The C<close> method closes the filehandle. This does not destroy the filehandle
+object; you can reopen it with the C<open> method later.
 
 =begin PIR_FRAGMENT
 
