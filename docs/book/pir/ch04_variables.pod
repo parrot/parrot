@@ -1687,12 +1687,12 @@ and C<get_root_global> opcodes instead of C<set_global> and C<get_global>. This
 example sets and retrieves the variable C<bill> in the Dollar namespace, which
 is directly under the root namespace:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
   set_root_global ["Dollar"], "bill", $P0
   $P1 = get_root_global ["Dollar"], "bill"
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
 To prevent further collisions, each high-level language running on Parrot
 operates within its own virtual namespace root. The default virtual root is

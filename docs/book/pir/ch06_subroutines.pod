@@ -948,11 +948,11 @@ C<set_addr> opcode:
 To jump to the continuation's stored label and return the context to the state
 it was in I<at the point of its creation>, invoke the continuation:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
   $P0()
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
 Even though you can use the subroutine call notation C<$P0()> to invoke
 the continuation, you cannot pass arguments or obtain return values.

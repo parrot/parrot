@@ -157,11 +157,11 @@ you can't pass a C<String> PMC as the method name.
 Methods can have multiple arguments and multiple return values just like
 subroutine:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
   ($P0, $S1) = $P2.'method'($I3, $P4)
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
 The C<can> opcode checks whether an object has a particular method. It
 returns 0 (false) or 1 (true):
@@ -233,11 +233,11 @@ Object creation for subclasses is the same as for ordinary classes:
 Calls to inherited methods are just like calls to methods defined in
 the class:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
     $P1.'increment'()
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
 The C<isa> opcode checks whether an object is an instance of or inherits
 from a particular class. It returns 0 (false) or 1 (true):
@@ -299,16 +299,18 @@ integer variable:
 The C<+> operator (or C<add> opcode) calls C<Foo>'s C<add> vtable function
 when it adds two C<Foo> objects:
 
-=begin PIR_FRAGMENT_INVALID
+=begin PIR_FRAGMENT
 
     $P3 = new 'Foo'
     $P3 = 3
     $P4 = new 'Foo'
     $P4 = 1774
 
-    $P5 = $P3 + $P4  # or: add $P5, $P3, $P4
+    $P5 = $P3 + $P4
+    # or:
+    add $P5, $P3, $P4
 
-=end PIR_FRAGMENT_INVALID
+=end PIR_FRAGMENT
 
 The C<inc> opcode calls C<Foo>'s C<increment> vtable function when it
 increments a C<Foo> object:
