@@ -100,11 +100,9 @@ is not intended to be a general-use sub.
     .return ($P0)
 
   idk:
-    $P0 = new ['Exception']
     $S0 = typeof what
-    $S0 = concat "don't know how to clone ", $S0
-    $P0['message'] = $S0
-    throw $P0
+    $S0 = "don't know how to clone" . $S0
+    die $S0
 .end
 
 .sub 'substr'
