@@ -551,7 +551,7 @@ Parrot_io_write_unix(PARROT_INTERP, ARGIN(PMC *filehandle), ARGMOD(STRING *s))
     size_t to_write = s->bufused;
     size_t written  = 0;
 
-  write_through:
+    write_through:
     while (to_write > 0) {
         const int err = write(file_descriptor, ptr, to_write);
         if (err >= 0) {

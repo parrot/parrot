@@ -49,102 +49,93 @@ sub check_indent {
             or die "Can not open '$path' for reading!\n";
         @source = <$IN>;
 
-        my @stack;    # for tracking indention level
-        my $line_cnt       = 0;
-        my $block_indent   = undef;
-        my $prev_last_char = '';
-        my $last_char      = '';
-        my $in_comment     = 0;
+        my %state = (
+            stack           => [],
+            line_cnt        => 0,
+            bif             => undef,
+            prev_last_char  => '',
+            last_char       => '',
+            in_comment      => 0,
+        );
 
-        foreach (@source) {
-            $line_cnt++;
-            next unless defined $_;
-            chomp;
+        foreach my $line (@source) {
+            $state{line_cnt}++;
+            chomp $line;
+#            dump_state(\%state, $line);
+            next unless $line;
 
-            $prev_last_char = $last_char;
-            $last_char = substr( $_, -1, 1 );
+            $state{prev_last_char} = $state{last_char};
+            $state{last_char} = substr( $line, -1, 1 );
 
             # ignore multi-line comments (except the first line)
-            $in_comment = 0, next if $in_comment && m{\*/} && $' !~ m{/\*};
-            next if $in_comment;
-            $in_comment = 1 if m{/\*} && $' !~ m{\*/};
+            $state{in_comment} = 0, next if $state{in_comment} &&
+                $line =~ m{\*/} &&
+                $' !~ m{/\*};
+            next if $state{in_comment};
+            $state{in_comment} = 1
+                if $line =~ m{/\*} &&
+                $' !~ m{\*/};
 
             ## preprocessor scan
-            if (
-                m/ ^ \s* \#
-                    (\s*)
-                    ( ifndef | ifdef | if )
-                    \s+(.*)
-                  /x
-                )
+            if ( $line =~ m/^\s*\#(\s*)(ifndef|ifdef|if)\s+(.*)/ )
             {
-                next if (m/PARROT_IN_CORE|_GUARD/);
-                next if (m/__cplusplus/);
+                my ($prespace, $condition, $postspace) = ($1,$2,$3);
+                next if ($line =~ m/PARROT_IN_CORE|_GUARD/);
+                next if ($line =~ m/__cplusplus/);
 
-                my $indent = q{  } x @stack;
-                if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line_cnt\n"
-                        . "     got: $_"
-                        . "expected: #$indent$2 $3'\n";
+                my $indent = q{  } x @{ $state{stack} };
+                if ( $prespace ne $indent ) {
+                    push @pp_indent => "$path:$state{line_cnt}\n"
+                        . "     got: $line"
+                        . "expected: #$indent$condition $postspace'\n";
                     $pp_failed{"$path\n"} = 1;
                 }
-                push @stack, "#$2 $3";
+                push @{ $state{stack} }, "#$condition $postspace";
+                $state{bif} = undef;
                 next;
             }
-            if (
-                m/ ^ \s* \#
-                    (\s*)
-                    ( else | elif )
-                  /x
-                )
+            if ( $line =~ m/^\s*\#(\s*)(else|elif)/)
             {
 
+                my ($prespace, $condition) = ($1,$2);
                 # stay where we are, but indenting should be
                 # back even with the opening brace.
-                my $indent = q{  } x ( @stack - 1 );
-                if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line_cnt\n"
-                        . "     got: $_"
-                        . "expected: #$indent$2 -- it's inside of "
-                        . ( join ' > ', @stack ) . "\n";
+                my $indent = q{  } x ( @{ $state{stack} } - 1 );
+                if ( $prespace ne $indent ) {
+                    push @pp_indent => "$path:$state{line_cnt}\n"
+                        . "     got: $line"
+                        . "expected: #$indent$condition -- it's inside of "
+                        . ( join ' > ', @{ $state{stack} } ) . "\n";
                     $pp_failed{"$path\n"} = 1;
                 }
                 next;
             }
-            if (
-                m/ ^ \s* \#
-                    (\s*)
-                    (endif)
-                  /x
-                )
+            if ( $line =~ m/^\s*\#(\s*)(endif)/)
             {
-                my $indent = q{  } x ( @stack - 1 );
-                if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line_cnt\n"
-                        . "     got: $_"
-                        . "expected: #$indent$2 --  it's inside of "
-                        . ( join ' > ', @stack ) . "\n";
+                my ($prespace, $condition) = ($1,$2);
+                my $indent = q{  } x ( @{ $state{stack} } - 1 );
+                if ( $prespace ne $indent ) {
+                    push @pp_indent => "$path:$state{line_cnt}\n"
+                        . "     got: $line"
+                        . "expected: #$indent$condition --  it's inside of "
+                        . ( join ' > ', @{ $state{stack} } ) . "\n";
                     $pp_failed{"$path\n"} = 1;
                 }
-                pop @stack;
+                pop @{ $state{stack} };
                 next;
             }
-            next unless @stack;
+            next unless @{ $state{stack} };
 
-            if (
-                m/ ^ \s* \#
-                    (\s*)
-                    (.*)
-                  /x
-                )
+            if ( $line =~ m/^\s*\#(\s*)(.*)/)
             {
-                next if (m/ASSERT_ARGS_/); # autogenerated by headerizer
-                my $indent = q{  } x (@stack);
-                if ( $1 ne $indent ) {
-                    push @pp_indent => "$path:$line_cnt\n"
-                        . "     got: $_"
-                        . "expected: #$indent$2 -- it's inside of "
-                        . ( join ' > ', @stack ) . "\n";
+                my ($prespace, $condition) = ($1,$2);
+                next if ($line =~ m/ASSERT_ARGS_/); # autogenerated by headerizer
+                my $indent = q{  } x (@{ $state{stack} });
+                if ( $prespace ne $indent ) {
+                    push @pp_indent => "$path:$state{line_cnt}\n"
+                        . "     got: $line"
+                        . "expected: #$indent$condition -- it's inside of "
+                        . ( join ' > ', @{ $state{stack} } ) . "\n";
                     $pp_failed{"$path\n"} = 1;
                 }
                 next;
@@ -155,40 +146,42 @@ sub check_indent {
             # probably overkill for this task.  For now we just check the
             # first line of a function, and assume that more likely than not
             # indenting is consistent within a func body.
-            if (/^(\s*).*\{\s*$/) {
+            if ($line =~ /^(\s*).*\{\s*$/) {
 
+                my $prespace = $1;
                 # note the beginning of a block, and its indent depth.
-                $block_indent = length($1);
+                $state{bif} = length($prespace);
                 next;
             }
 
-            if (/^\s*([\#\}])/) {
+            if ($line =~ /^\s*([\#\}])/) {
 
+                my $closing_punc = $1;
                 # skip the last line of the func or cpp directives.
-                $block_indent = undef if ( $1 eq "}" );
+                $state{bif} = undef if ( $closing_punc eq "}" );
                 next;
             }
 
-            if ( defined($block_indent) ) {
+            if ( defined($state{bif}) ) {
 
                 # first line of a block
-                if ( $block_indent == 0 ) {
+                if ( $state{bif} == 0 ) {
 
                     # first line of a top-level block (first line of a function,
                     # in other words)
-                    my ($indent) = /^(\s*)/;
+                    my ($indent) = $line =~ /^(\s*)/;
                     if ( length($indent) != 4 ) {
-                        push @c_indent => "$path:$line_cnt\n"
+                        push @c_indent => "$path:$state{line_cnt}\n"
                             . "    apparent non-4 space indenting ("
                             . length($indent)
                             . " spaces)\n";
                         $c_failed{"$path\n"} = 1;
                     }
                 }
-                $block_indent = undef;
+                $state{bif} = undef;
             }
 
-            my ($indent) = /^(\s+)/ or next;
+            my ($indent) = $line =~ /^(\s+)/ or next;
             $indent = length($indent);
 
             # Ignore the indentation of the current line if that
@@ -197,8 +190,11 @@ sub check_indent {
             # The indentation of the previous line is not considered.
             # Check sanity by verifying that the indentation of the current line
             # is divisible by four.
-            if ( $indent % 4 && !$in_comment && $prev_last_char eq ';' ) {
-                push @c_indent => "$path:$line_cnt\n"
+            if ( $indent % 4 &&
+                !$state{in_comment} &&
+                $state{prev_last_char} eq ';'
+            ) {
+                push @c_indent => "$path:$state{line_cnt}\n"
                     . "    apparent non-4 space indenting ($indent space"
                     . ( $indent == 1 ? '' : 's' ) . ")\n";
                 $c_failed{"$path\n"} = 1;
@@ -224,6 +220,17 @@ sub check_indent {
             . " occurrences in "
             . scalar @c_failed_files
             . " files:\n@c_indent" );
+}
+
+sub dump_state {
+    my ($state, $line) = @_;
+    print STDERR (join q{|} => (
+        $state->{line_cnt},
+        (defined($state->{bif}) ? $state->{bif} : q{u}),
+        $state->{in_comment},
+        (join q{*} => @{ $state->{stack} }),
+        $line,
+    ) ), "\n";
 }
 
 # Local Variables:
