@@ -363,6 +363,8 @@ Generate functions related to class_init
 method generate_class_init() {
       self.update_vtable_func()
     ~ self.get_vtable_func()
+    ~ self.get_mro_func()
+    ~ self.get_isa_func()
     ~ self.class_init_func()
 }
 
@@ -517,7 +519,18 @@ method get_vtable_func() {
 Generate C-code for update_vtable_func
 
 =cut
+
 method update_vtable_func() {
+    "";
+}
+
+
+method get_mro_func() {
+
+    "";
+}
+
+method get_isa_func() {
     "";
 }
 
