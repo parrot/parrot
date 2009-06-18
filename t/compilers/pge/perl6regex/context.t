@@ -32,7 +32,7 @@ my $PRE = <<PRE;
     load_bytecode "PGE/Glob.pbc"
     load_bytecode "PGE/Text.pbc"
     .local string target, pattern
-    .local pmc perl6regex, rulesub, pir, exp, match
+    .local pmc perl6regex, rulesub, pir, match
     perl6regex = compreg 'PGE::Perl6Regex'
     null match
     null rulesub
