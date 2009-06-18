@@ -44,7 +44,7 @@ method traits($/, $key) {
     #say("traits " ~$/);
     if $key eq 'extends' {
         $?PMC.parents().push(~$<identifier>);
-        $?PMC.unfreeze_pmc_attrs(~$<identifier>);
+        $?PMC.thaw_pmc_attrs(~$<identifier>);
     }
     elsif $key eq 'provides' {
         $?PMC.provides().push(~$<identifier>);

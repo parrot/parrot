@@ -147,13 +147,13 @@ Get PMC traits.
 .end
 
 
-=item C<unfreeze_attrs>
+=item C<thaw_pmc_attrs>
 
 unserialize a PMC's frozen ATTRs and add them to this PMC.
 
 =cut
 
-.sub 'unfreeze_pmc_attrs' :method
+.sub 'thaw_pmc_attrs' :method
 
     .param string pmcname
 
