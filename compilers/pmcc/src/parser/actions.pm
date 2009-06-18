@@ -47,13 +47,14 @@ method traits($/, $key) {
         $?PMC.unfreeze_pmc_attrs(~$<identifier>);
     }
     elsif $key eq 'provides' {
+        $?PMC.provides().push(~$<identifier>);
     }
     elsif $key eq 'group' {
     }
     elsif $key eq 'lib' {
     }
     else {
-        $?PMC.trait(~$/, 1);
+        $?PMC.traits{$key} := 1;
     }
 }
 

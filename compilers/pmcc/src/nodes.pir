@@ -60,6 +60,9 @@ PMC class by it self.
     $P1 = new 'ResizableStringArray'
     res.'attr'('provides', $P1, 1)
 
+    $P1 = new 'Hash'
+    res.'attr'('traits', $P1, 1)
+
     .return (res)
 .end
 
@@ -131,6 +134,16 @@ Get PMC ATTRs.
 
 .sub 'attrs' :method
     .tailcall self.'attr'('attrs',0,0)
+.end
+
+=item C<traits>
+
+Get PMC traits.
+
+=cut
+
+.sub 'traits' :method
+    .tailcall self.'attr'('traits',0,0)
 .end
 
 
@@ -210,19 +223,6 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
     .return ()
 .end
 
-
-=item C<set_trait>
-
-Set boolean trait
-
-=cut
-
-.sub 'trait' :method
-    .param string name
-    .param int value        :optional
-    .param int has_value    :opt_flag
-    .tailcall self.'attr'(name, value, has_value)
-.end
 
 =item C<add_class_init>
 

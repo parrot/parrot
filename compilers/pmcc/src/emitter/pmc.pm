@@ -455,7 +455,53 @@ Generate C code pass-sepcific PMC initialization code
 
 method generate_passes() {
     my @res;
+    my $enum_name;
+    my $name := self.name;
+    my $provides := join(' ', self.past.provides);
 
+    #not sure if this is the best place for such code
+    if elements(self.past.provides) == 0 {
+        self.past.provides.push('scalar');
+    }
+
+    if self.past.traits{'dynpmc'} {
+        $enum_name := '-1';
+    }
+    else {
+        $enum_name := 'enum_class_'~ self.name;
+    }
+
+
+    #first pass
+
+    @res.push('    if (pass == 0) {');
+    @res.push('        Hash    *isa_hash  = NULL;');
+    @res.push('        VTABLE * const vt  = Parrot_'~ self.name ~'_get_vtable(interp);');
+    @res.push('        vt->base_type      = '~ $enum_name ~';');
+    @res.push('        vt->flags          = '~ self.vtable_flags ~';');
+    @res.push('        vt->attribute_defs = attr_defs;');
+    @res.push('        interp->vtables[entry] = vt;');
+
+    if self.past.traits{'dynpmc'} {
+        my $name_length := chars(self.name);
+        my $provides_length := chars($provides);
+
+        @res.push('        vt->base_type    = entry;');
+        @res.push('        vt->whoami       = string_make(interp, "'~ self.name ~'", '~ $name_length ~',');
+        @res.push('            "ascii", PObj_constant_FLAG|PObj_external_FLAG);');
+        @res.push('        vt->provides_str = Parrot_str_append(interp, vt->provides_str,');
+        @res.push('            string_make(interp, "'~ $provides ~'", '~ $provides_length  ~', "ascii",');
+        @res.push('            PObj_constant_FLAG|PObj_external_FLAG));');
+
+    }
+    else {
+        @res.push('         vt->whoami       = CONST_STRING_GEN(interp, "'~ self.name ~'");');
+        @res.push('         vt->provides_str = CONST_STRING_GEN(interp, "' ~$provides ~'");');
+    }
+
+
+
+    #second pass
 ## Cotto, this is last bit of second pass.
 ##        {
 ## #define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))
@@ -463,8 +509,10 @@ method generate_passes() {
 ##                _temp_multi_func_list, N_MULTI_LIST);
 ##        }
 
-    "";
+    join("\n", @res);
 }
+
+
 
 
 =item C<get_vtable_func>
@@ -501,6 +549,10 @@ method vtables() {
     self.past.vtables;
 }
 
+method attr() {
+    self.past.attr;
+}
+
 method generate_signature($entry, $name, $prefix) {
     my @res;
 
@@ -531,6 +583,7 @@ method generate_vtable_function_prototypes() {
 Method for generating PMC-specific VTABLE functions. E.g. C<default> and C<null> implementations.
 
 =cut
+
 method pre_method_gen() {
 }
 
@@ -539,6 +592,7 @@ method pre_method_gen() {
 Generate code for register MULTIs.
 
 =cut
+
 method generate_multis() {
     # Result holder.
     my @res;
@@ -608,6 +662,40 @@ method generate_multis() {
     
     join('', @res);
 }
+
+
+=item C<get_vtable_flags()>
+
+Returns C code to produce a PMC's flags.
+
+=cut
+
+method vtable_flags() {
+
+    my @flags;
+
+    if self.past.traits{'need_ext'} {
+        @flags.push('VTABLE_PMC_NEEDS_EXT');
+    }
+    if self.past.traits{'singleton'} {
+        @flags.push('VTABLE_PMC_IS_SINGLETON');
+    }
+    if self.past.traits{'is_shared'} {
+        @flags.push('VTABLE_IS_SHARED_FLAG');
+    }
+    if self.past.traits{'is_ro'} {
+        @flags.push('VTABLE_IS_READONLY_FLAG');
+    }
+    if self.past.traits{'has_ro'} {
+        @flags.push('VTABLE_HAS_READONLY_FLAG');
+    }
+    if !@flags {
+        @flags.push('0');
+    }
+
+    join('|',@flags);
+}
+
 
 method past() {
     self<past>;
