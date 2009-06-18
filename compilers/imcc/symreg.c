@@ -74,6 +74,14 @@ static char * add_ns(PARROT_INTERP, ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static SymReg * get_sym_by_name(
+    ARGIN(const SymHash *hsh),
+    ARGIN(const char *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static int int_overflows(ARGIN(const SymReg *r))
         __attribute__nonnull__(1);
 
@@ -104,6 +112,9 @@ static void resize_symhash(ARGMOD(SymHash *hsh))
     || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_add_ns __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(interp) \
+    || PARROT_ASSERT_ARG(name)
+#define ASSERT_ARGS_get_sym_by_name __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(hsh) \
     || PARROT_ASSERT_ARG(name)
 #define ASSERT_ARGS_int_overflows __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(r)
@@ -196,6 +207,35 @@ _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
 
     for (p = hsh->data[i]; p; p = p->next) {
         if ((t == p->set) && STREQ(name, p->name))
+            return p;
+    }
+
+    return NULL;
+}
+
+
+/*
+
+=item C<static SymReg * get_sym_by_name(const SymHash *hsh, const char *name)>
+
+Gets a symbol from the hash, with the given C<name>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+static SymReg *
+get_sym_by_name(ARGIN(const SymHash *hsh), ARGIN(const char *name))
+{
+    ASSERT_ARGS(get_sym_by_name)
+
+    SymReg            *p;
+    const unsigned int i = hash_str(name) % hsh->size;
+
+    for (p = hsh->data[i]; p; p = p->next) {
+        if (STREQ(name, p->name))
             return p;
     }
 
@@ -600,9 +640,13 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_ident)
     char   * const fullname = _mk_fullname(pesky_global__namespace, name);
-    SymReg        *r        = mk_symreg(interp, fullname, t);
+    SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->last_unit->hash), name);
+    if (r && r->set != t)
+        IMCC_warning(interp, "Duplicated IDENTIFIER '%s'\n", fullname);
 
+    r = mk_symreg(interp, fullname, t);
     r->type = VTIDENTIFIER;
+
 
     if (pesky_global__namespace) {
         Identifier * const ident = mem_allocate_zeroed_typed(Identifier);
