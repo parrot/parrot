@@ -137,8 +137,8 @@ EOH
     }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
-    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP);\n");
-    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP);\n");
+    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, PMC* mro);\n");
+    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, Hash* isa);\n");
 
 
     $self->gen_attributes;
@@ -623,7 +623,7 @@ EOC
     if (@isa) {
         unshift @isa, $classname;
         $cout .= <<"EOC";
-        vt->isa_hash     = Parrot_${classname}_get_isa(interp);
+        vt->isa_hash     = Parrot_${classname}_get_isa(interp, NULL);
 EOC
     }
     else {
@@ -684,7 +684,7 @@ EOC
         {
             VTABLE * const vt  = interp->vtables[entry];
 
-            vt->mro = Parrot_${classname}_get_mro(interp);
+            vt->mro = Parrot_${classname}_get_mro(interp, PMCNULL);
 
             if (vt->ro_variant_vtable)
                 vt->ro_variant_vtable->mro = vt->mro;
@@ -825,33 +825,35 @@ sub get_mro_func {
 
     my $cout      = "";
     my $classname = $self->name;
-    my $get_mro;
+    my $get_mro = '';
     my $parent_name = @{ $self->parents }[0];
+    my @parent_names;
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
-    if ($parent_name eq 'default') {
-        $get_mro = "pmc_new(interp, enum_class_ResizableStringArray);";
-    }
-    else {
-        $get_mro = "Parrot_${parent_name}_get_mro(interp);";
+    #pmc has no direct parents other than default
+    for my $dp (@{ $self->direct_parents}) {
+        $get_mro .= "    mro = Parrot_${dp}_get_mro(interp, mro);\n"
+            unless $dp eq 'default';
     }
 
     $cout .= <<"EOC";
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PMC* Parrot_${classname}_get_mro(PARROT_INTERP) {
-    PMC *parents = $get_mro;
-    VTABLE_unshift_string(interp, parents,
+PMC* Parrot_${classname}_get_mro(PARROT_INTERP, PMC* mro) {
+    if (PMC_IS_NULL(mro)) {
+        mro = pmc_new(interp, enum_class_ResizableStringArray);
+    }
+$get_mro
+    VTABLE_unshift_string(interp, mro,
         string_make(interp, "$classname", @{[length($classname)]}, NULL, 0));
-    return parents;
+    return mro;
 }
 
 EOC
 
     $cout;
 }
-
 
 =item C<get_isa_func()>
 
@@ -864,23 +866,26 @@ sub get_isa_func {
 
     my $cout      = "";
     my $classname = $self->name;
-    my $get_isa;
+    my $get_isa = '';
     my $parent_name = @{ $self->parents }[0];
+    my @parent_names;
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
-    if ($parent_name eq 'default') {
-        $get_isa = "parrot_new_hash(interp);"
-    }
-    else {
-        $get_isa = "Parrot_${parent_name}_get_isa(interp);";
+    #pmc has no direct parents other than default
+    for my $dp (@{ $self->direct_parents}) {
+        $get_isa .= "    isa = Parrot_${dp}_get_isa(interp, isa);\n"
+            unless $dp eq 'default';
     }
 
     $cout .= <<"EOC";
 $export
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Hash* Parrot_${classname}_get_isa(PARROT_INTERP) {
-    Hash *isa = $get_isa;
+Hash* Parrot_${classname}_get_isa(PARROT_INTERP, Hash* isa) {
+    if (isa == NULL) {
+        isa = parrot_new_hash(interp);
+    }
+$get_isa
     parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
     return isa;
 }
@@ -889,6 +894,7 @@ EOC
 
     $cout;
 }
+
 
 =item C<get_vtable_func()>
 
