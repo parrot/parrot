@@ -94,6 +94,8 @@ sub generate_c_file {
 
     $c->emit( $self->update_vtable_func );
     $c->emit( $self->get_vtable_func );
+    $c->emit( $self->get_mro_func );
+    $c->emit( $self->get_isa_func );
     $c->emit( $self->init_func );
     $c->emit( $self->postamble );
 
@@ -135,6 +137,8 @@ EOH
     }
     $h->emit("${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n");
     $h->emit("${export}VTABLE* Parrot_${name}_ro_get_vtable(PARROT_INTERP);\n");
+    $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP);\n");
+    $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP);\n");
 
 
     $self->gen_attributes;
@@ -589,7 +593,6 @@ EOC
     my $flags = $self->vtable_flags;
     $cout .= <<"EOC";
     if (pass == 0) {
-        Hash    *isa_hash  = NULL;
         VTABLE * const vt  = Parrot_${classname}_get_vtable(interp);
         vt->base_type      = $enum_name;
         vt->flags          = $flags;
@@ -620,15 +623,8 @@ EOC
     if (@isa) {
         unshift @isa, $classname;
         $cout .= <<"EOC";
-
-        isa_hash         = parrot_new_hash(interp);
-        vt->isa_hash     = isa_hash;
+        vt->isa_hash     = Parrot_${classname}_get_isa(interp);
 EOC
-        for my $isa (@isa) {
-            $cout .= <<"EOC";
-        parrot_hash_put(interp, isa_hash, (void *)(CONST_STRING_GEN(interp, "$isa")), PMCNULL);
-EOC
-        }
     }
     else {
         $cout .= <<"EOC";
@@ -651,7 +647,7 @@ EOC
             vt_${k}->provides_str        = vt->provides_str;
             vt->${k}_variant_vtable      = vt_${k};
             vt_${k}->${k}_variant_vtable = vt;
-            vt_${k}->isa_hash            = isa_hash;
+            vt_${k}->isa_hash            = vt->isa_hash;
         }
 
 EOC
@@ -686,23 +682,14 @@ EOC
 
         $cout .= <<"EOC";
         {
-            PMC    * const mro = pmc_new(interp, enum_class_ResizableStringArray);
             VTABLE * const vt  = interp->vtables[entry];
 
-            vt->mro = mro;
+            vt->mro = Parrot_${classname}_get_mro(interp);
 
             if (vt->ro_variant_vtable)
-                vt->ro_variant_vtable->mro = mro;
+                vt->ro_variant_vtable->mro = vt->mro;
 
 EOC
-
-    @isa = $classname unless @isa;
-
-    for my $isa (@isa) {
-        $cout .= <<"EOC";
-            VTABLE_push_string(interp, mro, CONST_STRING_GEN(interp, "$isa"));
-EOC
-    }
 
     $cout .= <<"EOC";
         }
@@ -820,6 +807,82 @@ EOC
 PARROT_EXPORT VTABLE *Parrot_${classname}_ro_update_vtable(ARGMOD(VTABLE *vt)) {
 $vtable_updates
     return vt;
+}
+
+EOC
+
+    $cout;
+}
+
+=item C<get_mro_func()>
+
+Returns the C code for the PMC's get_mro function.
+
+=cut
+
+sub get_mro_func {
+    my ($self) = @_;
+
+    my $cout      = "";
+    my $classname = $self->name;
+    my $get_mro;
+    my $parent_name = @{ $self->parents }[0];
+    my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
+
+    if ($parent_name eq 'default') {
+        $get_mro = "pmc_new(interp, enum_class_ResizableStringArray);";
+    }
+    else {
+        $get_mro = "Parrot_${parent_name}_get_mro(interp);";
+    }
+
+    $cout .= <<"EOC";
+$export
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC* Parrot_${classname}_get_mro(PARROT_INTERP) {
+    PMC *parents = $get_mro;
+    VTABLE_unshift_string(interp, parents,
+        string_make(interp, "$classname", @{[length($classname)]}, NULL, 0));
+    return parents;
+}
+
+EOC
+
+    $cout;
+}
+
+
+=item C<get_isa_func()>
+
+Returns the C code for the PMC's get_isa function.
+
+=cut
+
+sub get_isa_func {
+    my ($self) = @_;
+
+    my $cout      = "";
+    my $classname = $self->name;
+    my $get_isa;
+    my $parent_name = @{ $self->parents }[0];
+    my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
+
+    if ($parent_name eq 'default') {
+        $get_isa = "parrot_new_hash(interp);"
+    }
+    else {
+        $get_isa = "Parrot_${parent_name}_get_isa(interp);";
+    }
+
+    $cout .= <<"EOC";
+$export
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+Hash* Parrot_${classname}_get_isa(PARROT_INTERP) {
+    Hash *isa = $get_isa;
+    parrot_hash_put(interp, isa, (void *)(CONST_STRING_GEN(interp, "$classname")), PMCNULL);
+    return isa;
 }
 
 EOC
