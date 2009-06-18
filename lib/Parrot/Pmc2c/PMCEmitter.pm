@@ -586,12 +586,9 @@ EOC
 EOC
     }
 
-    $cout .= <<"EOC";
-    if (pass == 0) {
-EOC
-
     my $flags = $self->vtable_flags;
     $cout .= <<"EOC";
+    if (pass == 0) {
         Hash    *isa_hash  = NULL;
         VTABLE * const vt  = Parrot_${classname}_get_vtable(interp);
         vt->base_type      = $enum_name;
@@ -608,7 +605,7 @@ EOC
         vt->whoami       = string_make(interp, "$classname", @{[length($classname)]},
                                        "ascii", PObj_constant_FLAG|PObj_external_FLAG);
         vt->provides_str = Parrot_str_append(interp, vt->provides_str,
-            string_make(interp, " $provides", @{[length($provides) + 1]}, "ascii",
+            string_make(interp, "$provides", @{[length($provides)]}, "ascii",
             PObj_constant_FLAG|PObj_external_FLAG));
 
 EOC
@@ -638,7 +635,6 @@ EOC
         vt->isa_hash     = NULL;
 EOC
     }
-
 
     for my $k ( keys %extra_vt ) {
         my $k_flags = $self->$k->vtable_flags;
