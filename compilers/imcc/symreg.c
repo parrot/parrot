@@ -641,8 +641,10 @@ mk_ident(PARROT_INTERP, ARGIN(const char *name), int t)
     ASSERT_ARGS(mk_ident)
     char   * const fullname = _mk_fullname(pesky_global__namespace, name);
     SymReg *r = get_sym_by_name(&(IMCC_INFO(interp)->last_unit->hash), name);
-    if (r && r->set != t)
+    if (r && r->set != t) {
+        IMCC_print_inc(interp);
         IMCC_warning(interp, "Duplicated IDENTIFIER '%s'\n", fullname);
+    }
 
     r = mk_symreg(interp, fullname, t);
     r->type = VTIDENTIFIER;
