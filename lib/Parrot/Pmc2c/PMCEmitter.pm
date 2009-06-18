@@ -826,14 +826,14 @@ sub get_mro_func {
     my $cout      = "";
     my $classname = $self->name;
     my $get_mro = '';
-    my $parent_name = @{ $self->parents }[0];
     my @parent_names;
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
-    #pmc has no direct parents other than default
-    for my $dp (@{ $self->direct_parents}) {
-        $get_mro .= "    mro = Parrot_${dp}_get_mro(interp, mro);\n"
+    if ($classname ne 'default') {
+        for my $dp (@{ $self->direct_parents}) {
+            $get_mro .= "    mro = Parrot_${dp}_get_mro(interp, mro);\n"
             unless $dp eq 'default';
+        }
     }
 
     $cout .= <<"EOC";
@@ -867,14 +867,14 @@ sub get_isa_func {
     my $cout      = "";
     my $classname = $self->name;
     my $get_isa = '';
-    my $parent_name = @{ $self->parents }[0];
     my @parent_names;
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
-    #pmc has no direct parents other than default
-    for my $dp (@{ $self->direct_parents}) {
-        $get_isa .= "    isa = Parrot_${dp}_get_isa(interp, isa);\n"
+    if ($classname ne 'default') {
+        for my $dp (@{ $self->direct_parents}) {
+            $get_isa .= "    isa = Parrot_${dp}_get_isa(interp, isa);\n"
             unless $dp eq 'default';
+        }
     }
 
     $cout .= <<"EOC";
