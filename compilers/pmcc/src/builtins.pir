@@ -127,6 +127,12 @@ is not intended to be a general-use sub.
     .return ($I0)
 .end
 
+.sub 'freeze'
+    .param pmc p
+    $S0 = freeze p
+    .return ($S0)
+.end
+
 # Extend various Parrot's PMCs to play nicely with NQP.
 .namespace ['Hash']
 

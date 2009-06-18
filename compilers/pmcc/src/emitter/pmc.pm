@@ -3,11 +3,11 @@
 
 class PMC::Emitter::PMC;
 
-# =item C<generate_header>
-#
-# Generate part of header file.
-#
-# =cut
+=item C<generate_header>
+
+Generate part of header file.
+
+=cut
 
 # "Template Method". Just override generate_header_functions in derived
 # classes.
@@ -38,11 +38,11 @@ method generate_header() {
     $res
 }
 
-# =item C<generate_header_functions>
-#
-# Generate C declarations for vtable functions
-#
-# =cut
+=item C<generate_header_functions>
+
+Generate C declarations for vtable functions
+
+=cut
 
 method generate_header_functions() {
     my $past := self.past;
@@ -61,11 +61,11 @@ method generate_header_functions() {
     join('', @res_builder);
 }
 
-#=item C<generate_attr_struct>
-#
-#Generate a C declaration for the ATTR wrapper struct
-#
-#=cut
+=item C<generate_attr_struct>
+
+Generate a C declaration for the ATTR wrapper struct
+
+=cut
 
 method generate_attr_struct() {
 
@@ -98,11 +98,11 @@ method generate_attr_struct() {
     return $struct_start ~ join('', @struct_members) ~ $struct_end;
 }
 
-#=item C<generate_casting_macro>
-#
-#Generate a #define to simplify ATTR access
-#
-#=cut
+=item C<generate_casting_macro>
+
+Generate a #define to simplify ATTR access
+
+=cut
 
 method generate_casting_macro() {
 
@@ -117,11 +117,11 @@ method generate_casting_macro() {
 }
 
 
-#=item C<generate_attr_accessors>
-#
-#Generate a macros to manipulate ATTRs
-#
-#=cut
+=item C<generate_attr_accessors>
+
+Generate a macros to manipulate ATTRs
+
+=cut
 
 method generate_attr_accessors() {
 
@@ -292,36 +292,23 @@ method default_setter_body($type) {
               \"subclassed from a high-level PMC.\"); \\";
 }
 
-#=item C<generate_dump_file>
-#
-#Generate the contents of a dump file for this PMC, which will contain any
-#information that's needed for determining inheritance.
-#
-#=cut
+=item C<generate_dump_file>
+
+Generate the contents of a dump file for this PMC, which will contain any
+information that's needed for determining inheritance.
+
+=cut
 
 method generate_dump() {
-    my $res := self.freeze_attrs();
-}
-
-method freeze_attrs() {
-    my $frozen;
-
-    #IWBNI nqp exposed freeze directly, but this is works too
-PIR q<
-    $P0 = self.'attrs'()
-    $S0 = freeze $P0
-    $P0 = find_lex '$frozen'
-    $P0 = $S0
->;
-    return $frozen;
+    my $res := freeze(self.attrs);
 }
 
 
-#=item C<generate_c_code>
-#
-#Generate C file's contents for this PMC.
-#
-#=cut
+=item C<generate_c_code>
+
+Generate C file's contents for this PMC.
+
+=cut
 
 method generate_c_code($past) {
     self.pre_method_gen();
@@ -332,11 +319,11 @@ method generate_c_code($past) {
 }
 
 
-#=item C<generate_c_functions>
-#
-#Generate C declarations for vtable functions
-#
-#=cut
+=item C<generate_c_functions>
+
+Generate C declarations for vtable functions
+
+=cut
 
 method generate_c_functions() {
     my $past    := self.past;
