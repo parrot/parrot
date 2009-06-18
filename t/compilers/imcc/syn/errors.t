@@ -84,7 +84,7 @@ TODO: {
 pir_error_output_like( <<'END_PIR', <<'END_EXPECTED', 'no multiple .local, TT #767' );
 .sub main :main
   .local pmc p
-  .local pmc p
+  .local string p
 .end
 END_PIR
 /^error:imcc:syntax error, duplicated IDENTIFIER/
