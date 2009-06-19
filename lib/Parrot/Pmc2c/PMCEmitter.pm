@@ -907,9 +907,19 @@ sub get_vtable_func {
 
     my $cout      = "";
     my $classname = $self->name;
+    my @other_parents = @{ $self->direct_parents };
+    my $first_parent = shift @other_parents;
 
     my $get_vtable = '';
-    foreach my $parent_name ( reverse ($self->name, @{ $self->parents }) ) {
+
+    if ($first_parent eq 'default') {
+        $get_vtable .= "    vt = Parrot_default_get_vtable(interp);\n";
+    }
+    else {
+        $get_vtable .= "    vt = Parrot_${first_parent}_get_vtable(interp);\n";
+    }
+
+    foreach my $parent_name ( @other_parents) {
         if ($parent_name eq 'default') {
             $get_vtable .= "    vt = Parrot_default_get_vtable(interp);\n";
         }
@@ -917,6 +927,7 @@ sub get_vtable_func {
             $get_vtable .= "    Parrot_${parent_name}_update_vtable(vt);\n";
         }
     }
+    $get_vtable .= "    Parrot_${classname}_update_vtable(vt);\n";
 
     $cout .= <<"EOC";
 PARROT_EXPORT
@@ -931,7 +942,15 @@ $get_vtable
 EOC
 
     my $get_extra_vtable = '';
-    foreach my $parent_name ( reverse ($self->name, @{ $self->parents }) ) {
+
+    if ($first_parent eq 'default') {
+        $get_extra_vtable .= "    vt = Parrot_default_ro_get_vtable(interp);\n";
+    }
+    else {
+        $get_extra_vtable .= "    vt = Parrot_${first_parent}_ro_get_vtable(interp);\n";
+    }
+
+    foreach my $parent_name ( @other_parents ) {
         if ($parent_name eq 'default') {
             $get_extra_vtable .= "    vt = Parrot_default_ro_get_vtable(interp);\n";
         }
@@ -939,6 +958,7 @@ EOC
             $get_extra_vtable .= "    Parrot_${parent_name}_ro_update_vtable(vt);\n";
         }
     }
+    $get_extra_vtable .= "    Parrot_${classname}_ro_update_vtable(vt);\n";
 
     $cout .= <<"EOC";
 PARROT_EXPORT
