@@ -361,20 +361,20 @@ Generate functions related to class_init
 
 =cut
 method generate_class_init() {
-      self.update_vtable_func()
-    ~ self.get_vtable_func()
-    ~ self.get_mro_func()
-    ~ self.get_isa_func()
-    ~ self.class_init_func()
+      self.generate_update_vtable_func() ~ "\n\n"
+    ~ self.generate_get_vtable_func()    ~ "\n\n"
+    ~ self.generate_get_mro_func()       ~ "\n\n"
+    ~ self.generate_get_isa_func()       ~ "\n\n"
+    ~ self.generate_class_init_func()    ~ "\n\n"
 }
 
-=item C<class_init_func>
+=item C<generate_class_init_func>
 
 Generating class_init function
 
 =cut
 
-method class_init_func() {
+method generate_class_init_func() {
     my @res;
     @res.push(
           "PARROT_EXPORT void Parrot_"
@@ -488,6 +488,15 @@ method generate_passes() {
         @res.push('         vt->provides_str = CONST_STRING_GEN(interp, "' ~$provides ~'");');
     }
 
+    if self.past.parents[0] ne 'default' {
+        @res.push('        vt->isa_hash     = Parrot_'~self.name~'_get_isa(interp, NULL);');
+    }
+    else {
+        @res.push'(        vt->isa_hash     = NULL;');
+    }
+
+
+
 
 
     #second pass
@@ -504,34 +513,133 @@ method generate_passes() {
 
 
 
-=item C<get_vtable_func>
+=item C<generate_get_vtable_func>
 
-Generate C-code for get_vtable_func
-
-=cut
-
-method get_vtable_func() {
-    "";
-}
-
-=item C<update_vtable_func>
-
-Generate C-code for update_vtable_func
+Generate C-code for generate_get_vtable_func
 
 =cut
 
-method update_vtable_func() {
-    "";
+method generate_get_vtable_func() {
+    my @res;
+    my @other_parents := self.past.parents;
+    my $first_parent := @other_parents.shift;
+
+    @res.push('PARROT_EXPORT');
+    @res.push('PARROT_CANNOT_RETURN_NULL');
+    @res.push('PARROT_WARN_UNUSED_RESULT');
+    @res.push('VTABLE* Parrot_'~ self.name ~'_get_vtable(PARROT_INTERP) {');
+    @res.push('    VTABLE *vt;');
+
+    if $first_parent eq 'default' {
+        @res.push('    vt = Parrot_default_get_vtable(interp);');
+    }
+    else {
+        @res.push('    vt = Parrot_'~ $first_parent ~'_get_vtable(interp);');
+    }
+
+    for (@other_parents) {
+        @res.push('    vt = Parrot_'~ $_ ~'_update_vtable(vt);');
+    }
+    @other_parents.unshift($first_parent);
+
+    @res.push('    vt = Parrot_'~ self.name ~'_update_vtable(vt);');
+    @res.push('    return vt;');
+
+    @res.push("}");
+
+    #XXX: needs implemetation for variant vtables
+
+    join("\n",@res);
+}
+
+=item C<generate_update_vtable_func>
+
+Generate C-code for generate_update_vtable_func
+
+=cut
+
+method generate_update_vtable_func() {
+    my @res ;
+
+    @res.push('PARROT_EXPORT');
+    @res.push('VTABLE *Parrot_'~ self.name ~"_update_vtable(VTABLE *vt) {");
+
+    for (self.past.vtables) {
+        @res.push('    vt->'~$_~' = Parrot_'~self.name~'_'~$_~';');
+    }
+    @res.push('');
+    @res.push('    return vt;');
+    @res.push("}");
+
+    #XXX: needs implementation for variant vtable functions
+    join("\n",@res);
 }
 
 
-method get_mro_func() {
+method generate_get_mro_func() {
+    my @res;
 
-    "";
+    if self.past.traits{'dynpmc'} {
+        @res.push('PARROT_DYNEXT_EXPORT');
+    }
+    else {
+        @res.push('PARROT_EXPORT');
+    }
+    @res.push('PARROT_CANNOT_RETURN_NULL');
+    @res.push('PARROT_WARN_UNUSED_RESULT');
+    @res.push('PMC* Parrot_'~self.name~'_get_mro(PARROT_INTERP, PMC* mro) {');
+    @res.push('    if (PMC_IS_NULL(mro)) {');
+    @res.push('        mro = pmc_new(interp, enum_class_ResizableStringArray);');
+    @res.push('    }');
+    @res.push('');
+
+    if self.name ne 'default' {
+        for (self.past.parents) {
+            if $_ ne 'default' {
+                @res.push('    mro = Parrot_'~$_~'_get_mro(interp, mro);');
+            }
+        }
+    }
+
+    my $name_length := chars(self.name);
+
+    @res.push('    VTABLE_unshift_string(interp, mro,');
+    @res.push('        string_make(interp, "'~self.name~'", '~$name_length~', NULL, 0));');
+    @res.push('    return mro;');
+    @res.push('}');
+    join("\n",@res);
 }
 
-method get_isa_func() {
-    "";
+method generate_get_isa_func() {
+    my @res;
+
+    if self.past.traits{'dynpmc'} {
+        @res.push('PARROT_DYNEXT_EXPORT');
+    }
+    else {
+        @res.push('PARROT_EXPORT');
+    }
+    @res.push('PARROT_CANNOT_RETURN_NULL');
+    @res.push('PARROT_WARN_UNUSED_RESULT');
+    @res.push('Hash* Parrot_'~self.name~'_get_isa(PARROT_INTERP, Hash* isa) {');
+
+    @res.push('    if (isa == NULL) {');
+    @res.push('        isa = parrot_new_hash(interp);');
+    @res.push('    }');
+    @res.push('');
+
+    if self.name ne 'default' {
+        for (self.past.parents) {
+            if $_ ne 'default' {
+                @res.push('    isa = Parrot_'~$_~'_get_isa(interp, isa);');
+            }
+        }
+    }
+
+    @res.push('    return isa;');
+    @res.push('}');
+
+    join("\n",@res);
 }
 
 method dumper($x) {
@@ -610,7 +718,7 @@ method generate_multis() {
         if !%constant_strings{ $_ } {
             %constant_strings{ $_ } := +%constant_strings;
         }
-        
+
         # $m is list of implementations.
         my $m := %multis{ $_ };
         for $m {
@@ -659,7 +767,7 @@ method generate_multis() {
         ~ join(",\n", @mmd_info)
         ~ "};\n"
     );
-    
+
     join('', @res);
 }
 
