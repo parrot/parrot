@@ -440,18 +440,17 @@ a key.  Returns a string value corresponding to the key.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING *
 key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_string)
-    INTVAL   int_key;
-    FLOATVAL num_key;
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         /* remember to COW strings instead of returning them directly */
         case KEY_string_FLAG:
         {
+            INTVAL int_key;
             STRING *s;
             GETATTR_Key_str_key(interp, key, s);
             if (s)
@@ -460,6 +459,7 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
         }
         case KEY_string_FLAG | KEY_register_FLAG:
         {
+            INTVAL int_key;
             STRING *s;
             GETATTR_Key_int_key(interp, key, int_key);
             s = REG_STR(interp, int_key);
@@ -469,25 +469,36 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
         }
         case KEY_pmc_FLAG | KEY_register_FLAG:
         {
+            INTVAL int_key;
             PMC *reg;
             GETATTR_Key_int_key(interp, key, int_key);
             reg = REG_PMC(interp, int_key);
             return VTABLE_get_string(interp, reg);
         }
         case KEY_integer_FLAG:
+        {
+            INTVAL int_key;
             GETATTR_Key_int_key(interp, key, int_key);
             return Parrot_str_from_int(interp, int_key);
+        }
         case KEY_integer_FLAG | KEY_register_FLAG:
+        {
+            INTVAL int_key;
             GETATTR_Key_int_key(interp, key, int_key);
             return Parrot_str_from_int(interp, REG_INT(interp, int_key));
-
+        }
         case KEY_number_FLAG:
+        {
+            FLOATVAL num_key;
             GETATTR_Key_num_key(interp, key, num_key);
             return Parrot_str_from_num(interp, num_key);
+        }
         case KEY_number_FLAG | KEY_register_FLAG:
+        {
+            INTVAL int_key;
             GETATTR_Key_int_key(interp, key, int_key);
             return Parrot_str_from_num(interp, REG_NUM(interp, int_key));
-
+        }
         default:
         case KEY_pmc_FLAG:
             return VTABLE_get_string(interp, key);
