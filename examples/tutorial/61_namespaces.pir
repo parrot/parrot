@@ -20,7 +20,7 @@ and access variables in a different namespace.
 
 .sub main :main
 
-   $P0 = new 'String'
+   $P0 = new ['String']
    $P0 = "Hello"
    set_global ["Different"; "Namespace"], "foo", $P0
 

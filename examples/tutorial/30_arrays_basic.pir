@@ -18,7 +18,7 @@ C<push>, C<pop>, C<shift>, and C<unshift>.
 .sub main :main
 
     .local pmc myarray
-    myarray = new 'ResizableStringArray'
+    myarray = new ['ResizableStringArray']
 
     myarray[0] = "Foo"
     push myarray, "Bar"

@@ -23,7 +23,7 @@ The C<=> symbol can be used to assign a value to one of these registers.
 
     $S5 = "Hello"    # set temp string var to "Hello"
 
-    $P0 = new 'String'
+    $P0 = new ['String']
     $P0 = "Ford"     # set temp PMC var to "Ford"
 
     say $I0
