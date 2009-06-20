@@ -920,13 +920,9 @@ sub get_vtable_func {
     }
 
     foreach my $parent_name ( @other_parents) {
-        if ($parent_name eq 'default') {
-            $get_vtable .= "    vt = Parrot_default_get_vtable(interp);\n";
-        }
-        else {
-            $get_vtable .= "    Parrot_${parent_name}_update_vtable(vt);\n";
-        }
+        $get_vtable .= "    Parrot_${parent_name}_update_vtable(vt);\n";
     }
+
     $get_vtable .= "    Parrot_${classname}_update_vtable(vt);\n";
 
     $cout .= <<"EOC";
@@ -951,13 +947,9 @@ EOC
     }
 
     foreach my $parent_name ( @other_parents ) {
-        if ($parent_name eq 'default') {
-            $get_extra_vtable .= "    vt = Parrot_default_ro_get_vtable(interp);\n";
-        }
-        else {
-            $get_extra_vtable .= "    Parrot_${parent_name}_ro_update_vtable(vt);\n";
-        }
+        $get_extra_vtable .= "    Parrot_${parent_name}_ro_update_vtable(vt);\n";
     }
+
     $get_extra_vtable .= "    Parrot_${classname}_ro_update_vtable(vt);\n";
 
     $cout .= <<"EOC";
