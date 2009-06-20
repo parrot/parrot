@@ -325,7 +325,7 @@ Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_add_pmc_ext)
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
-    if(!pmc->pmc_ext)
+    if (!pmc->pmc_ext)
         pmc->pmc_ext = (PMC_EXT *)pool->get_free_object(interp, pool);
     if (!pmc->pmc_ext)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
