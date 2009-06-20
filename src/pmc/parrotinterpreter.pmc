@@ -242,8 +242,8 @@ Initializes the interpreter.
             PMC_data(SELF) = attrs;
             create_interp(SELF, INTERP);
             PARROT_ASSERT(attrs->interp);
-            PObj_active_destroy_SET(SELF);
         }
+        PObj_active_destroy_SET(SELF);
     }
 
 /*

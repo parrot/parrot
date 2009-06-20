@@ -394,6 +394,9 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_gc_add_pmc_sync)
     if (!PObj_is_PMC_EXT_TEST(pmc))
         Parrot_gc_add_pmc_ext(interp, pmc);
+    if (PMC_sync(pmc))
+        /* This mutex already exists, leave it alone. */
+        return;
     PMC_sync(pmc) = mem_allocate_typed(Sync);
     if (!PMC_sync(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
