@@ -51,7 +51,7 @@ method generate_header_functions() {
 
     @res_builder.push("void Parrot_" ~ self.name ~ "_class_init(PARROT_INTERP, int, int);\n");
 
-    my %vtables := self.vtables;
+    my %vtables := self.vtables{'default'};
 
     for %vtables {
         my $entry := %vtables{$_};
@@ -327,7 +327,7 @@ Generate C declarations for vtable functions
 
 method generate_c_functions() {
     my $past    := self.past;
-    my %vtables := self.vtables;
+    my %vtables := self.vtables{'default'};
     my $emitter := PMC::Emitter::C.new;
     my @res;
 
@@ -492,7 +492,7 @@ method generate_passes() {
         @res.push('        vt->isa_hash     = Parrot_'~self.name~'_get_isa(interp, NULL);');
     }
     else {
-        @res.push'(        vt->isa_hash     = NULL;');
+        @res.push('(        vt->isa_hash     = NULL;');
     }
 
 
@@ -564,7 +564,7 @@ method generate_update_vtable_func() {
     @res.push('PARROT_EXPORT');
     @res.push('VTABLE *Parrot_'~ self.name ~"_update_vtable(VTABLE *vt) {");
 
-    for (self.past.vtables) {
+    for (self.past.vtables{'default'}) {
         @res.push('    vt->'~$_~' = Parrot_'~self.name~'_'~$_~';');
     }
     @res.push('');
@@ -654,7 +654,7 @@ method attrs() {
 }
 
 method vtables() {
-    self.past.vtables;
+    self.past.vtables{'default'};
 }
 
 method attr() {

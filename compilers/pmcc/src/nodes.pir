@@ -247,7 +247,7 @@ Add a class_init function to PMC.
 
 =item C<add_vtable>
 
-Add VTABLE method to PMC.
+Add a VTABLE function to this PMC's default vtable.
 
 =cut
 
@@ -256,12 +256,17 @@ Add VTABLE method to PMC.
     .param pmc method
 
     $P0 = self.'attr'('vtables', 0, 0)
+    $I0 = exists $P0['default']
+    if $I0 goto check_name
+    $P1 = new ['Hash']
+    $P0['default'] = $P1
+  check_name:
     $I0 = exists $P0[name]
     unless $I0 goto add_method
     $S0 = concat "Duplicate VTABLE function: ", name
     die $S0
   add_method:
-    $P0[name] = method
+    $P0['default';name] = method
     .return ()
 .end
 
