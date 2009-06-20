@@ -363,17 +363,16 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
     Arenas            * const arena_base = interp->arena_base;
     Small_Object_Pool * const ext_pool   = arena_base->pmc_ext_pool;
 
+    if (!p->pmc_ext)
+        return;
+
     if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
         MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
         mem_internal_free(PMC_sync(p));
         PMC_sync(p) = NULL;
     }
-
-    if (p->pmc_ext) {
-        ext_pool->add_free_object(interp, ext_pool, p->pmc_ext);
-        ext_pool->num_free_objects++;
-    }
-
+    ext_pool->add_free_object(interp, ext_pool, p->pmc_ext);
+    ext_pool->num_free_objects++;
     p->pmc_ext = NULL;
 }
 
