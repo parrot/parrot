@@ -300,7 +300,6 @@ pmc_reuse_check_pmc_ext(PARROT_INTERP, ARGMOD(PMC * pmc),
         /* If we need an ext area, go allocate one */
         Parrot_gc_add_pmc_ext(interp, pmc);
         newflags |= PObj_is_PMC_EXT_FLAG;
-        PARROT_ASSERT(pmc->pmc_ext != NULL);
         PARROT_ASSERT((newflags & PObj_is_PMC_EXT_FLAG) != 0);
     }
     else {
@@ -749,13 +748,9 @@ create_class_pmc(PARROT_INTERP, INTVAL type)
         interp->vtables[type]->pmc_class = _class;
     }
     else {
-        if (PObj_is_PMC_EXT_TEST(_class))
-            Parrot_gc_free_pmc_ext(interp, _class);
-
+        Parrot_gc_free_pmc_ext(interp, _class);
         gc_flag_CLEAR(is_special_PMC, _class);
-
         PObj_is_PMC_shared_CLEAR(_class);
-
         interp->vtables[type]->pmc_class = _class;
     }
 
