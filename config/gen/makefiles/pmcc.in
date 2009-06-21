@@ -17,6 +17,7 @@ all: pmcc.pbc
 SOURCES := \
   pmcc.pir \
   src/nodes.pir \
+  src/gen_nodes.pir \
   src/emitter/pmc.pir \
   src/emitter/gen_pmc.pir \
   src/emitter/c.pir \
@@ -33,6 +34,10 @@ pmcc.pbc: $(PARROT) $(PGE_LIBRARY)/Perl6Grammar.pir $(SOURCES)
 	$(PARROT) $(PARROT_ARGS) $(PGE_LIBRARY)/Perl6Grammar.pir \
 	    --output=src/parser/gen_grammar.pir src/parser/grammar.pg
 	$(PARROT) -o pmcc.pbc pmcc.pir
+
+src/gen_nodes.pir: $(NQP) $(PCT) src/nodes.pm
+	$(PARROT) $(PARROT_ARGS) $(NQP) --output=src/gen_nodes.pir \
+	    --target=pir src/nodes.pm
 
 src/parser/gen_grammar.pir: $(PERL6GRAMMAR) src/parser/grammar.pg
 	$(PARROT) $(PARROT_ARGS) $(PERL6GRAMMAR) \
@@ -89,6 +94,7 @@ testclean:
 CLEANUPS := \
   pmc.pbc \
   src/gen_emitter.pir \
+  src/gen_nodes.pir \
   src/parser/gen_grammar.pir \
   src/parser/gen_actions.pir \
   src/emitter/gen_pmc.pir \

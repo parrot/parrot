@@ -26,12 +26,13 @@
 
     #add an extra stage to generate the c, h and dump files
     $P0.'addstage'('generate_files', 'after'=>'past')
+    $P0.'addstage'('read_dump', 'before'=>'past')
 
     $P1 = split ' ', 'e=s vtdump|d=s pmc_path|p=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v'
     setattribute $P0, '@cmdoptions', $P1
 
 .end
-
+ 
 
 # override HLLCompiler's default evalfiles in order to store the name of the file being compiled
 .sub 'evalfiles' :method
@@ -68,6 +69,14 @@
     .local pmc super_evalfiles
     super_evalfiles = get_hll_global ['PCT';'HLLCompiler'], 'evalfiles'
     .tailcall self.super_evalfiles(files, args :flat, adverbs :flat :named)
+.end
+
+
+.sub 'read_dump' :method
+    .param pmc past
+    .param pmc adverbs :slurpy :named
+
+    .return (past, adverbs :flat :named)
 .end
 
 
@@ -167,6 +176,7 @@
 .end
 
 .include 'src/nodes.pir'
+.include 'src/gen_nodes.pir'
 .include '../vtdumper/src/function.pir'
 .include 'src/emitter/pmc.pir'
 .include 'src/emitter/c.pir'

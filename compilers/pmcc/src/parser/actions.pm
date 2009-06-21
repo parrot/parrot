@@ -27,6 +27,8 @@ method pmc($/, $key) {
     }
     else {
         # TODO Set c_header and c_coda
+        #XXX: is this the best place to set up variant vtables?
+        #$?PMC.create_variant_vtables();
         make $?PMC;
     }
 }
