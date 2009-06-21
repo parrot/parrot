@@ -1032,7 +1032,7 @@ BODY
     1;
 }
 
-# Generate signle case for switch VTABLE
+# Generate single case for switch VTABLE
 sub generate_single_case {
     my ($self, $vt_method_name, $multi) = @_;
 
