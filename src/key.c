@@ -450,7 +450,6 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
         /* remember to COW strings instead of returning them directly */
         case KEY_string_FLAG:
         {
-            INTVAL int_key;
             STRING *s;
             GETATTR_Key_str_key(interp, key, s);
             if (s)
@@ -619,9 +618,9 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(key_mark)
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
     PMC          *next_key;
-    STRING       *str_key;
 
     if (flags == KEY_string_FLAG) {
+        STRING *str_key;
         GETATTR_Key_str_key(interp, key, str_key);
         Parrot_gc_mark_PObj_alive(interp, (PObj *)str_key);
     }
@@ -668,7 +667,7 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     INTVAL         int_key;
     STRING        *str_key;
 
-    for (;key;) {
+    while (key != NULL) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 GETATTR_Key_int_key(interp, key, int_key);
