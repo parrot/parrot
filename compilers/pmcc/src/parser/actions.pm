@@ -160,7 +160,7 @@ method multi($/) {
     $past<parameters> := $<c_signature><c_arguments>.ast;
 
     # Handle parameters to create short and long signaures
-    
+
     # Largely stolen from Pmc2c::MULTIs::rewrite_multi_sub
     my $short_sig := "JP";  # prepend the short signature interpreter and invocant
     my @long_sig;
@@ -201,7 +201,7 @@ sub cleanup_type($type) {
     PIR q<
         .local pmc type
         type = find_lex '$type'
-        
+
         $S0 = type
         $I1 = length $S0
         $I0 = find_not_cclass .CCLASS_ALPHABETIC, $S0, 0, $I1

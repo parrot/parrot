@@ -32,7 +32,7 @@
     setattribute $P0, '@cmdoptions', $P1
 
 .end
- 
+
 
 # override HLLCompiler's default evalfiles in order to store the name of the file being compiled
 .sub 'evalfiles' :method

@@ -37,10 +37,11 @@
 
     #spast = simplified past, i.e. converted from a Capture
     .local pmc node, spast, snode, sattrs, sargs, sarg
-    .local pmc it, key
+    .local pmc it, key, attr_it, attr_key
+    .local string name
     .local int i, j, elems
 
-    spast = new ['ResizablePMCArray']
+    spast = new ['Hash']
 
     #PAST::Block doesn't support iteration or even get_integer, so this is the
     #easiest way to get all elements.  Also, freeze/thaw on Captures is broken.
@@ -52,8 +53,7 @@
 
     snode = new ['Hash']
 
-    $S0 = node['name']
-    snode['name'] = $S0
+    name = node['name']
 
     $S0 = node['returns']
     snode['returns'] = $S0
@@ -89,8 +89,18 @@
     snode['parameter_list'] = $P0
 
     sattrs = node['attributes']
-    snode['attributes'] = sattrs
-    push spast, snode
+    $P0 = new ['Hash']
+
+    attr_it = iter sattrs
+  attr_iter_start:
+    unless attr_it goto attr_iter_end
+    attr_key = shift attr_it
+    $P0[attr_key] = 1
+    goto attr_iter_start
+  attr_iter_end:
+
+    snode['attributes'] = $P0
+    spast[name] = snode
 
     goto spast_loop_start
 

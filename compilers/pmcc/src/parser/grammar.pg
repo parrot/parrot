@@ -67,7 +67,7 @@ rule attribute_type {
 }
 
 rule simple_attr {
-    <simple_attr_type> <identifier> 
+    <simple_attr_type> <identifier>
 }
 
 rule simple_attr_type {
@@ -80,7 +80,7 @@ rule simple_attr_type {
 }
 
 rule pointer_attr {
-    <pointer_attr_type> <identifier> 
+    <pointer_attr_type> <identifier>
 }
 
 rule pointer_attr_type {
@@ -156,7 +156,7 @@ rule c_parameters {
 }
 
 rule c_parameter {
-    <-[()]>+ <c_parameters_parens>? 
+    <-[()]>+ <c_parameters_parens>?
     {*}
 }
 

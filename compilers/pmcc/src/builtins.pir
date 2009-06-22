@@ -63,7 +63,7 @@ is not intended to be a general-use sub.
     does_hash   = does what, 'hash'
     does_array  = does what, 'array'
     if does_scalar == 1 goto clone_scalar
-  
+
   clone_aggregate:
     .local pmc it, key, val, cloned, cloned_val
     .local int i
