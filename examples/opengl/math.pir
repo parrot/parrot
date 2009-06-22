@@ -25,35 +25,65 @@ Parrot module.
     load_bytecode 'OpenGL/Math.pbc'
     load_bytecode 'dumper.pbc'
 
+    # Create some sample data
+    .local pmc vec1, vec2
+    (vec1, vec2) = make_test_vectors()
+
+    # Run a few simple tests
+    sanity(vec1, vec2)
+    normalize(vec1)
+.end
+
+.sub make_test_vectors
     # Test some basics
+    $P0 = new 'FixedFloatArray'
+    $P0 = 4
+    $P0[0] = 0.5
+    $P0[1] = 1.0
+    $P0[2] = 2.0
+    $P0[3] = 4.0
+
     $P1 = new 'FixedFloatArray'
     $P1 = 4
-    $P1[0] = 0.5
-    $P1[1] = 1.0
-    $P1[2] = 2.0
+    $P1[0] = 1.0
+    $P1[1] = 2.0
+    $P1[2] = 3.0
     $P1[3] = 4.0
-
-    $P2 = new 'FixedFloatArray'
-    $P2 = 4
-    $P2[0] = 1.0
-    $P2[1] = 2.0
-    $P2[2] = 3.0
-    $P2[3] = 4.0
 
     .local pmc Vec4
     Vec4 = get_class ['OpenGL';'Math';'Vec4']
 
+    $P2 = new Vec4
+    $P2.'set_vals'($P0)
+
     $P3 = new Vec4
     $P3.'set_vals'($P1)
 
-    $P4 = new Vec4
-    $P4.'set_vals'($P2)
+    .return ($P2, $P3)
+.end
 
-    $P5 = $P3.'mult'($P4)
+.sub sanity
+    .param pmc vec1
+    .param pmc vec2
 
-    _dumper($P3, 'Vec4')
-    _dumper($P4, 'Vec4')
-    _dumper($P5, 'Vec4')
+    .local pmc vec3
+    vec3 = vec1.'mult'(vec2)
+
+    say "vec1 * vec2 = vec3"
+    _dumper(vec1, 'vec1')
+    _dumper(vec2, 'vec2')
+    _dumper(vec3, 'vec3')
+.end
+
+.sub normalize
+    .param pmc vector
+
+    .local pmc normalized
+    normalized = vector.'normalize'()
+
+    say "normalize(vector) = normalized"
+    _dumper(vector,     'vector')
+    _dumper(normalized, 'normalized')
 .end
 
 # Local Variables:

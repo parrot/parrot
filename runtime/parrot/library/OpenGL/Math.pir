@@ -143,8 +143,8 @@ Set the current vector value to a four element array.
 
 =cut
 
-# Standard header for binop methods
-.macro vec4_extract_self_plus_arg
+# Standard header for vec4-vec4 binop methods
+.macro vec4_extract_self_plus_vec_arg
    .param pmc vec2
 
    .local pmc v1, v2
@@ -160,6 +160,48 @@ Set the current vector value to a four element array.
    $N21 = v2[1]
    $N22 = v2[2]
    $N23 = v2[3]
+.endm
+
+# Standard header for vec3-vec3 binop methods
+.macro vec3_extract_self_plus_vec_arg
+   .param pmc vec2
+
+   .local pmc v1, v2
+   v1 = getattribute self, 'vals'
+   v2 = getattribute vec2, 'vals'
+
+   $N10 = v1[0]
+   $N11 = v1[1]
+   $N12 = v1[2]
+
+   $N20 = v2[0]
+   $N21 = v2[1]
+   $N22 = v2[2]
+.endm
+
+# Standard header for vec4-num binop methods
+.macro vec4_extract_self_plus_num_arg
+   .param num N
+
+   .local pmc v1
+   v1 = getattribute self, 'vals'
+
+   $N10 = v1[0]
+   $N11 = v1[1]
+   $N12 = v1[2]
+   $N13 = v1[3]
+.endm
+
+# Standard header for vec3-num binop methods
+.macro vec3_extract_self_plus_num_arg
+   .param num N
+
+   .local pmc v1
+   v1 = getattribute self, 'vals'
+
+   $N10 = v1[0]
+   $N11 = v1[1]
+   $N12 = v1[2]
 .endm
 
 # Standard footer for binop methods returning a vec4
@@ -210,7 +252,7 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub add :method
-   .vec4_extract_self_plus_arg
+   .vec4_extract_self_plus_vec_arg
 
    $N30 = $N10 + $N20
    $N31 = $N11 + $N21
@@ -229,7 +271,7 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub sub :method
-   .vec4_extract_self_plus_arg
+   .vec4_extract_self_plus_vec_arg
 
    $N30 = $N10 - $N20
    $N31 = $N11 - $N21
@@ -248,7 +290,7 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub mult :method
-   .vec4_extract_self_plus_arg
+   .vec4_extract_self_plus_vec_arg
 
    $N30 = $N10 * $N20
    $N31 = $N11 * $N21
@@ -268,7 +310,7 @@ XXX - SO WHAT HAPPENS?
 =cut
 
 .sub div :method
-   .vec4_extract_self_plus_arg
+   .vec4_extract_self_plus_vec_arg
 
    $N30 = $N10 / $N20
    $N31 = $N11 / $N21
@@ -287,7 +329,7 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub mod :method
-   .vec4_extract_self_plus_arg
+   .vec4_extract_self_plus_vec_arg
 
    $N30 = $N10 % $N20
    $N31 = $N11 % $N21
@@ -295,6 +337,26 @@ a new C<Vec4> vector C<result>.
    $N33 = $N13 % $N23
 
    .vec4_return_new_result
+.end
+
+
+=item Vec4 result = vector.div_num(num N)
+
+Calculate the elementwise division C<vector / N> and return a new C<Vec4>
+vector C<result>.  No attempt is made to prevent division by zero,
+XXX - SO WHAT HAPPENS?
+
+=cut
+
+.sub div_num :method
+    .vec4_extract_self_plus_num_arg
+
+    $N30 = $N10 / N
+    $N31 = $N11 / N
+    $N32 = $N12 / N
+    $N33 = $N13 / N
+
+    .vec4_return_new_result
 .end
 
 
@@ -314,7 +376,7 @@ first three elements are the cross product and whose last element is 1.0.
 =cut
 
 .sub cross :method
-   .vec4_extract_self_plus_arg
+   .vec3_extract_self_plus_vec_arg
 
    $N0  = $N11 * $N22
    $N1  = $N21 * $N12
@@ -339,7 +401,7 @@ Calculate the dot product C<vec1 dot vec2> and return the result as a num.
 =cut
 
 .sub dot :method
-   .vec4_extract_self_plus_arg
+   .vec4_extract_self_plus_vec_arg
 
    $N30 = $N10 * $N20
    $N31 = $N11 * $N21
@@ -363,7 +425,7 @@ three elements of each vector, and return the result as a num.
 =cut
 
 .sub dot3 :method
-   .vec4_extract_self_plus_arg
+   .vec3_extract_self_plus_vec_arg
 
    $N30 = $N10 * $N20
    $N31 = $N11 * $N21
@@ -399,13 +461,27 @@ considering only the first three elements), and return the result as a num.
 
 =cut
 
-.sub length :method
+.sub length3 :method
      $N0 = self.'dot3'(self)
      $N1 = sqrt $N0
 
      .return($N1)
 .end
 
+
+=item Vec4 result = vector.normalize()
+
+Calculate a normalized version of C<vector> as C<vector / length(vector)>,
+returning the result as a new C<Vec4>.
+
+=cut
+
+.sub normalize :method
+     $N0 = self.'length'()
+     $P0 = self.'div_num'($N0)
+
+     .return($P0)
+.end
 
 =item num dist = vec1.distance(vec2)
 
