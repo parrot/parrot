@@ -141,25 +141,15 @@ Set the current vector value to a four element array.
 
 =head3 Elementwise Operations
 
-=over 4
-
-=item Vec4 result = vec1.add(Vec4 vec2)
-
-Calculate the elementwise addition C<vec1 + vec2> and return
-a new C<Vec4> vector C<result>.
-
 =cut
 
-.sub add :method
+# Standard header for binop methods
+.macro vec4_extract_self_plus_arg
    .param pmc vec2
 
    .local pmc v1, v2
    v1 = getattribute self, 'vals'
    v2 = getattribute vec2, 'vals'
-
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
 
    $N10 = v1[0]
    $N11 = v1[1]
@@ -170,11 +160,13 @@ a new C<Vec4> vector C<result>.
    $N21 = v2[1]
    $N22 = v2[2]
    $N23 = v2[3]
+.endm
 
-   $N30 = $N10 + $N20
-   $N31 = $N11 + $N21
-   $N32 = $N12 + $N22
-   $N33 = $N13 + $N23
+# Standard footer for binop methods returning a vec4
+.macro vec4_return_new_result
+   .local pmc v3
+   v3 = new 'FixedFloatArray'
+   v3 = 4
 
    v3[0] = $N30
    v3[1] = $N31
@@ -187,6 +179,45 @@ a new C<Vec4> vector C<result>.
    setattribute result, 'vals', v3
 
    .return(result)
+.endm
+
+# Standard footer for binop methods returning a vec4 = (vec3, w)
+.macro vec4_return_new_result_with_w(w)
+   .local pmc v3
+   v3 = new 'FixedFloatArray'
+   v3 = 4
+
+   v3[0] = $N30
+   v3[1] = $N31
+   v3[2] = $N32
+   v3[3] = .w
+
+   .local pmc result
+   $P0 = typeof self
+   result = new $P0
+   setattribute result, 'vals', v3
+
+   .return(result)
+.endm
+
+=over 4
+
+=item Vec4 result = vec1.add(Vec4 vec2)
+
+Calculate the elementwise addition C<vec1 + vec2> and return
+a new C<Vec4> vector C<result>.
+
+=cut
+
+.sub add :method
+   .vec4_extract_self_plus_arg
+
+   $N30 = $N10 + $N20
+   $N31 = $N11 + $N21
+   $N32 = $N12 + $N22
+   $N33 = $N13 + $N23
+
+   .vec4_return_new_result
 .end
 
 
@@ -198,42 +229,14 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub sub :method
-   .param pmc vec2
-
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
-
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
-
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-   $N13 = v1[3]
-
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
-   $N23 = v2[3]
+   .vec4_extract_self_plus_arg
 
    $N30 = $N10 - $N20
    $N31 = $N11 - $N21
    $N32 = $N12 - $N22
    $N33 = $N13 - $N23
 
-   v3[0] = $N30
-   v3[1] = $N31
-   v3[2] = $N32
-   v3[3] = $N33
-
-   .local pmc result
-   $P0 = typeof self
-   result = new $P0
-   setattribute result, 'vals', v3
-
-   .return(result)
+   .vec4_return_new_result
 .end
 
 
@@ -245,42 +248,14 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub mult :method
-   .param pmc vec2
-
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
-
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
-
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-   $N13 = v1[3]
-
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
-   $N23 = v2[3]
+   .vec4_extract_self_plus_arg
 
    $N30 = $N10 * $N20
    $N31 = $N11 * $N21
    $N32 = $N12 * $N22
    $N33 = $N13 * $N23
 
-   v3[0] = $N30
-   v3[1] = $N31
-   v3[2] = $N32
-   v3[3] = $N33
-
-   .local pmc result
-   $P0 = typeof self
-   result = new $P0
-   setattribute result, 'vals', v3
-
-   .return(result)
+   .vec4_return_new_result
 .end
 
 
@@ -293,42 +268,14 @@ XXX - SO WHAT HAPPENS?
 =cut
 
 .sub div :method
-   .param pmc vec2
-
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
-
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
-
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-   $N13 = v1[3]
-
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
-   $N23 = v2[3]
+   .vec4_extract_self_plus_arg
 
    $N30 = $N10 / $N20
    $N31 = $N11 / $N21
    $N32 = $N12 / $N22
    $N33 = $N13 / $N23
 
-   v3[0] = $N30
-   v3[1] = $N31
-   v3[2] = $N32
-   v3[3] = $N33
-
-   .local pmc result
-   $P0 = typeof self
-   result = new $P0
-   setattribute result, 'vals', v3
-
-   .return(result)
+   .vec4_return_new_result
 .end
 
 
@@ -340,42 +287,14 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub mod :method
-   .param pmc vec2
-
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
-
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
-
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-   $N13 = v1[3]
-
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
-   $N23 = v2[3]
+   .vec4_extract_self_plus_arg
 
    $N30 = $N10 % $N20
    $N31 = $N11 % $N21
    $N32 = $N12 % $N22
    $N33 = $N13 % $N23
 
-   v3[0] = $N30
-   v3[1] = $N31
-   v3[2] = $N32
-   v3[3] = $N33
-
-   .local pmc result
-   $P0 = typeof self
-   result = new $P0
-   setattribute result, 'vals', v3
-
-   .return(result)
+   .vec4_return_new_result
 .end
 
 
@@ -395,23 +314,7 @@ first three elements are the cross product and whose last element is 1.0.
 =cut
 
 .sub cross :method
-   .param pmc vec2
-
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
-
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
-
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
+   .vec4_extract_self_plus_arg
 
    $N0  = $N11 * $N22
    $N1  = $N21 * $N12
@@ -425,17 +328,7 @@ first three elements are the cross product and whose last element is 1.0.
    $N5  = $N20 * $N11
    $N32 = $N4 - $N5
 
-   v3[0] = $N30
-   v3[1] = $N31
-   v3[2] = $N32
-   v3[3] = 1.0
-
-   .local pmc result
-   $P0 = typeof self
-   result = new $P0
-   setattribute result, 'vals', v3
-
-   .return(result)
+   .vec4_return_new_result_with_w(1.0)
 .end
 
 
@@ -446,21 +339,7 @@ Calculate the dot product C<vec1 dot vec2> and return the result as a num.
 =cut
 
 .sub dot :method
-   .param pmc vec2
-
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
-
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-   $N13 = v1[3]
-
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
-   $N23 = v2[3]
+   .vec4_extract_self_plus_arg
 
    $N30 = $N10 * $N20
    $N31 = $N11 * $N21
@@ -468,7 +347,6 @@ Calculate the dot product C<vec1 dot vec2> and return the result as a num.
    $N33 = $N13 * $N23
 
    .local num result
-
    result  = $N30 + $N31
    result += $N32
    result += $N33
@@ -485,26 +363,13 @@ three elements of each vector, and return the result as a num.
 =cut
 
 .sub dot3 :method
-   .param pmc vec2
-
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
-
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
+   .vec4_extract_self_plus_arg
 
    $N30 = $N10 * $N20
    $N31 = $N11 * $N21
    $N32 = $N12 * $N22
 
    .local num result
-
    result  = $N30 + $N31
    result += $N32
 
