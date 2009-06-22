@@ -366,45 +366,49 @@
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void add_pcc_named_arg(PARROT_INTERP,
+static void add_pcc_named_arg(
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg *name),
-    ARGIN(SymReg *value))
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*cur_call);
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
 
-static void add_pcc_named_arg_var(PARROT_INTERP,
+static void add_pcc_named_arg_var(
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg *name),
-    ARGIN(SymReg *value))
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*cur_call);
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
 
-static void add_pcc_named_param(PARROT_INTERP,
+static void add_pcc_named_param(
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg *name),
-    ARGIN(SymReg *value))
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*cur_call);
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
 
-static void add_pcc_named_result(PARROT_INTERP,
+static void add_pcc_named_result(
     ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg *name),
-    ARGIN(SymReg *value))
+    ARGMOD(SymReg *name),
+    ARGMOD(SymReg *value))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*cur_call);
+        FUNC_MODIFIES(*cur_call)
+        FUNC_MODIFIES(*name)
+        FUNC_MODIFIES(*value);
 
 static void add_pcc_named_return(PARROT_INTERP,
     ARGMOD(SymReg *cur_call),
@@ -563,23 +567,19 @@ static void set_lexical(PARROT_INTERP,
         FUNC_MODIFIES(*name);
 
 #define ASSERT_ARGS_add_pcc_named_arg __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_add_pcc_named_arg_var __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_add_pcc_named_param __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_add_pcc_named_result __attribute__unused__ int _ASSERT_ARGS_CHECK = \
-       PARROT_ASSERT_ARG(interp) \
-    || PARROT_ASSERT_ARG(cur_call) \
+       PARROT_ASSERT_ARG(cur_call) \
     || PARROT_ASSERT_ARG(name) \
     || PARROT_ASSERT_ARG(value)
 #define ASSERT_ARGS_add_pcc_named_return __attribute__unused__ int _ASSERT_ARGS_CHECK = \
@@ -1199,17 +1199,17 @@ set_lexical(PARROT_INTERP, ARGMOD(SymReg *r), ARGMOD(SymReg *name))
 
 /*
 
-=item C<static void add_pcc_named_arg(PARROT_INTERP, SymReg *cur_call, SymReg
-*name, SymReg *value)>
+=item C<static void add_pcc_named_arg(SymReg *cur_call, SymReg *name, SymReg
+*value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call),
-        ARGIN(SymReg *name),
-        ARGIN(SymReg *value))
+add_pcc_named_arg(ARGMOD(SymReg *cur_call),
+        ARGMOD(SymReg *name),
+        ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_arg)
     name->type  |= VT_NAMED;
@@ -1220,16 +1220,16 @@ add_pcc_named_arg(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_arg_var(PARROT_INTERP, SymReg *cur_call,
-SymReg *name, SymReg *value)>
+=item C<static void add_pcc_named_arg_var(SymReg *cur_call, SymReg *name, SymReg
+*value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_arg_var(PARROT_INTERP, ARGMOD(SymReg *cur_call),
-    ARGIN(SymReg *name), ARGIN(SymReg *value))
+add_pcc_named_arg_var(ARGMOD(SymReg *cur_call),
+    ARGMOD(SymReg *name), ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_arg_var)
     name->type |= VT_NAMED;
@@ -1239,17 +1239,17 @@ add_pcc_named_arg_var(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_result(PARROT_INTERP, SymReg *cur_call, SymReg
-*name, SymReg *value)>
+=item C<static void add_pcc_named_result(SymReg *cur_call, SymReg *name, SymReg
+*value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call),
-        ARGIN(SymReg *name),
-        ARGIN(SymReg *value))
+add_pcc_named_result(ARGMOD(SymReg *cur_call),
+        ARGMOD(SymReg *name),
+        ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_result)
     name->type         |= VT_NAMED;
@@ -1260,17 +1260,17 @@ add_pcc_named_result(PARROT_INTERP, ARGMOD(SymReg *cur_call),
 
 /*
 
-=item C<static void add_pcc_named_param(PARROT_INTERP, SymReg *cur_call, SymReg
-*name, SymReg *value)>
+=item C<static void add_pcc_named_param(SymReg *cur_call, SymReg *name, SymReg
+*value)>
 
 =cut
 
 */
 
 static void
-add_pcc_named_param(PARROT_INTERP, ARGMOD(SymReg *cur_call),
-        ARGIN(SymReg *name),
-        ARGIN(SymReg *value))
+add_pcc_named_param(ARGMOD(SymReg *cur_call),
+        ARGMOD(SymReg *name),
+        ARGMOD(SymReg *value))
 {
     ASSERT_ARGS(add_pcc_named_param)
     name->type         |= VT_NAMED;
@@ -1384,7 +1384,7 @@ typedef union YYSTYPE
     SymReg * sr;
     Instruction *i;
 }
-/* Line 187 of yacc.c.  */
+/* Line 193 of yacc.c.  */
 #line 1378 "compilers/imcc/imcparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -3529,7 +3529,7 @@ yyreduce:
 #line 1363 "compilers/imcc/imcc.y"
     {
            if (IMCC_INFO(interp)->adv_named_id) {
-                 add_pcc_named_param(interp, IMCC_INFO(interp)->cur_call,
+                 add_pcc_named_param(IMCC_INFO(interp)->cur_call,
                                      IMCC_INFO(interp)->adv_named_id, (yyvsp[(2) - (3)].sr));
                  IMCC_INFO(interp)->adv_named_id = NULL;
            }
@@ -3935,7 +3935,7 @@ yyreduce:
   case 123:
 #line 1659 "compilers/imcc/imcc.y"
     {
-           IdList *l = (yyvsp[(4) - (4)].idlist);
+           IdList * const l = (yyvsp[(4) - (4)].idlist);
            SymReg *ignored;
            if (l->unique_reg)
                ignored = mk_ident_ur(interp, l->id, (yyvsp[(3) - (4)].t));
@@ -4718,7 +4718,7 @@ yyreduce:
 #line 2114 "compilers/imcc/imcc.y"
     {
             /* disallow bareword method names; SREG name constants are fine */
-            char *name = (yyvsp[(3) - (3)].sr)->name;
+            const char * const name = (yyvsp[(3) - (3)].sr)->name;
             if (!((yyvsp[(3) - (3)].sr)->type & VTREG)) {
                 if (*name != '\'' || *name != '\"')
                     IMCC_fataly(interp, EXCEPTION_SYNTAX_ERROR,
@@ -4777,7 +4777,7 @@ yyreduce:
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(3) - (3)].sr));
+               add_pcc_named_arg(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(3) - (3)].sr));
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
@@ -4790,7 +4790,7 @@ yyreduce:
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(1) - (1)].sr));
+               add_pcc_named_arg(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(1) - (1)].sr));
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
@@ -4802,7 +4802,7 @@ yyreduce:
 #line 2175 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
-           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,
+           add_pcc_named_arg(IMCC_INFO(interp)->cur_call,
                 mk_const(interp, (yyvsp[(3) - (5)].s), 'S'), (yyvsp[(5) - (5)].sr));
            mem_sys_free((yyvsp[(3) - (5)].s));
          }
@@ -4812,7 +4812,7 @@ yyreduce:
 #line 2182 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
-           add_pcc_named_arg_var(interp, IMCC_INFO(interp)->cur_call, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr));
+           add_pcc_named_arg_var(IMCC_INFO(interp)->cur_call, (yyvsp[(1) - (3)].sr), (yyvsp[(3) - (3)].sr));
          }
     break;
 
@@ -4820,7 +4820,7 @@ yyreduce:
 #line 2187 "compilers/imcc/imcc.y"
     {
            (yyval.sr) = 0;
-           add_pcc_named_arg(interp, IMCC_INFO(interp)->cur_call,
+           add_pcc_named_arg(IMCC_INFO(interp)->cur_call,
                 mk_const(interp, (yyvsp[(1) - (3)].s), 'S'), (yyvsp[(3) - (3)].sr));
            mem_sys_free((yyvsp[(1) - (3)].s));
          }
@@ -4871,7 +4871,7 @@ yyreduce:
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(3) - (3)].sr));
+               add_pcc_named_result(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(3) - (3)].sr));
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
@@ -4882,7 +4882,7 @@ yyreduce:
   case 282:
 #line 2229 "compilers/imcc/imcc.y"
     {
-            add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call,
+            add_pcc_named_result(IMCC_INFO(interp)->cur_call,
             mk_const(interp, (yyvsp[(3) - (5)].s), 'S'), (yyvsp[(5) - (5)].sr));
             mem_sys_free((yyvsp[(3) - (5)].s));
          }
@@ -4893,7 +4893,7 @@ yyreduce:
     {
            (yyval.sr) = 0;
            if (IMCC_INFO(interp)->adv_named_id) {
-               add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(1) - (1)].sr));
+               add_pcc_named_result(IMCC_INFO(interp)->cur_call, IMCC_INFO(interp)->adv_named_id, (yyvsp[(1) - (1)].sr));
                IMCC_INFO(interp)->adv_named_id = NULL;
            }
            else
@@ -4904,7 +4904,7 @@ yyreduce:
   case 284:
 #line 2245 "compilers/imcc/imcc.y"
     {
-           add_pcc_named_result(interp, IMCC_INFO(interp)->cur_call, mk_const(interp, (yyvsp[(1) - (3)].s), 'S'), (yyvsp[(3) - (3)].sr));
+           add_pcc_named_result(IMCC_INFO(interp)->cur_call, mk_const(interp, (yyvsp[(1) - (3)].s), 'S'), (yyvsp[(3) - (3)].sr));
            mem_sys_free((yyvsp[(1) - (3)].s));
          }
     break;
