@@ -105,7 +105,7 @@ Return an array of matching candidates, sorted from best matching to worst
 matching, for a passed in signature. The signature passed in is an array of
 PMCs, and the types are extracted from the types of the array elements.
 
-=item get_pmc_keyed_string
+=item get_pmc_keyed_str
 
 Return an array of matching candidates, sorted from best matching to worst
 matching, for a passed in signature. The signature passed in is a simple type
