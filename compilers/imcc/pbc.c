@@ -1809,6 +1809,9 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     STRING *s;
     PMC    *p;
 
+    if(PMC_IS_NULL(_class))
+        IMCC_fatal(interp, 1, "make_pmc_const: no such pmc");
+
     if (*r->name == '"')
         s = Parrot_str_unescape(interp, r->name + 1, '"', NULL);
 
