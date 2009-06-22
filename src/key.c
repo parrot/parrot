@@ -617,11 +617,13 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_mark)
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
-    PMC          *next_key;
 
     if (flags == KEY_string_FLAG) {
         STRING *str_key;
         GETATTR_Key_str_key(interp, key, str_key);
+
+        /* XXX str_key can be NULL from GETATTR_Key_str_key, */
+        /* so shouldn't be marked. */
         Parrot_gc_mark_PObj_alive(interp, (PObj *)str_key);
     }
 
@@ -630,13 +632,13 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
      * the bucket_index and not the next key component
      * Note to self: shoot whoever thought this was a good idea.
      */
-    if (flags == KEY_hash_iterator_FLAGS)
-        return;
-
-    /* if iteration hasn't started, above flag isn't set yet */
-    GETATTR_Key_next_key(interp, key, next_key);
-    if (next_key && (void *)next_key != (void *)INITBucketIndex)
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
+    if (flags != KEY_hash_iterator_FLAGS) {
+        PMC *next_key;
+        /* if iteration hasn't started, above flag isn't set yet */
+        GETATTR_Key_next_key(interp, key, next_key);
+        if (next_key && (void *)next_key != (void *)INITBucketIndex)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
+    }
 
 }
 
