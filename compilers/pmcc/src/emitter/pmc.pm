@@ -522,7 +522,16 @@ Generate C-code for generate_get_vtable_func
 method generate_get_vtable_func() {
     my @res;
     my @other_parents := self.past.parents;
-    my $first_parent := @other_parents.shift;
+    my $parent_count := elements(@other_parents);
+    my $first_parent;
+
+    if ($parent_count == 0) {
+        $first_parent := 'default';
+    }
+    else {
+        $first_parent := @other_parents.shift;
+    }
+    say("first parent is "~$first_parent);
 
     @res.push('PARROT_EXPORT');
     @res.push('PARROT_CANNOT_RETURN_NULL');
@@ -570,8 +579,21 @@ method generate_update_vtable_func() {
     @res.push('');
     @res.push('    return vt;');
     @res.push("}");
+    @res.push('');
+    @res.push('');
 
     #XXX: needs implementation for variant vtable functions
+    @res.push('PARROT_EXPORT');
+    @res.push('VTABLE *Parrot_'~ self.name ~"_ro_update_vtable(VTABLE *vt) {");
+
+    for (self.past.vtables{'ro'}) {
+        @res.push('    vt->'~$_~' = Parrot_'~self.name~'_'~$_~';');
+    }
+    @res.push('');
+    @res.push('    return vt;');
+    @res.push("}");
+    @res.push('');
+
     join("\n",@res);
 }
 

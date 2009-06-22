@@ -26,7 +26,7 @@
 
     #add an extra stage to generate the c, h and dump files
     $P0.'addstage'('generate_files', 'after'=>'past')
-    $P0.'addstage'('read_dump', 'before'=>'past')
+    #$P0.'addstage'('read_dump', 'before'=>'parse')
 
     $P1 = split ' ', 'e=s vtdump|d=s pmc_path|p=s help|h target=s dumper=s trace|t=s encoding=s output|o=s combine version|v'
     setattribute $P0, '@cmdoptions', $P1
@@ -75,6 +75,22 @@
 .sub 'read_dump' :method
     .param pmc past
     .param pmc adverbs :slurpy :named
+
+    .local string vtdump_filename, vtdump_str
+    .local pmc vtdump
+
+    vtdump_filename = '../../vtable.frozen'
+    #$P0 = getstderr
+    #print $P0, "Error: no vtable.freeze specified."
+    $P0 = new ['FileHandle']
+    vtdump_str = $P0.'readall'(vtdump_filename)
+    vtdump = thaw vtdump_str
+
+    set_global ['PMC';'Class'], '%vtdump', vtdump
+
+    load_bytecode 'JSON.pbc'
+    #$S0 = _json(vtdump,1)
+    #say $S0
 
     .return (past, adverbs :flat :named)
 .end

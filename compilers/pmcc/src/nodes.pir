@@ -48,6 +48,9 @@ PMC class by it self.
     res.'attr'('vtables', $P1, 1)
 
     $P1 = new 'Hash'
+    res.'attr'('vtdump', $P1, 1)
+
+    $P1 = new 'Hash'
     res.'attr'('methods', $P1, 1)
 
     # Multis are Hash of Arrays. name -> implementation*
@@ -94,6 +97,16 @@ Get PMC vtable methods.
 
 .sub 'vtables' :method
     .tailcall self.'attr'('vtables',0,0)
+.end
+
+=item C<vtudmp>
+
+Get PMC vtable dump hash.
+
+=cut
+
+.sub 'vtdump' :method
+    .tailcall self.'attr'('vtdump',0,0)
 .end
 
 =item C<methods>
@@ -244,6 +257,19 @@ Add a class_init function to PMC.
     self['class_init'] = method
     .return ()
 .end
+
+
+=item C<set_vtdump>
+
+Store the thawed vtable.tbl dump in this PMC.
+
+=cut
+
+.sub 'set_vtdump' :method
+    .param pmc vtdump
+    .tailcall self.'attrs'('vtdump', vtdump, 1)
+.end
+
 
 =item C<add_vtable>
 

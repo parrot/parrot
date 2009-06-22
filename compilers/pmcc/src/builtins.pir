@@ -131,6 +131,25 @@ is not intended to be a general-use sub.
     .return ($S0)
 .end
 
+.sub 'json'
+    .param pmc p
+    load_bytecode 'JSON.pbc'
+    $S0 = _json(p, 1)
+    .return ($S0)
+.end
+
+.sub 'thaw'
+    .param string filename
+
+    .local string frozen
+    .local pmc pio
+    pio = new ['FileHandle']
+    frozen = pio.'readall'(filename)
+    $P0 = thaw frozen
+    .return ($P0)
+
+.end
+
 # Extend various Parrot's PMCs to play nicely with NQP.
 .namespace ['Hash']
 
