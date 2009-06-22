@@ -145,101 +145,101 @@ Set the current vector value to a four element array.
 
 # Standard header for vec4-vec4 binop methods
 .macro vec4_extract_self_plus_vec_arg
-   .param pmc vec2
+    .param pmc vec2
 
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
+    .local pmc v1, v2
+    v1 = getattribute self, 'vals'
+    v2 = getattribute vec2, 'vals'
 
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-   $N13 = v1[3]
+    $N10 = v1[0]
+    $N11 = v1[1]
+    $N12 = v1[2]
+    $N13 = v1[3]
 
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
-   $N23 = v2[3]
+    $N20 = v2[0]
+    $N21 = v2[1]
+    $N22 = v2[2]
+    $N23 = v2[3]
 .endm
 
 # Standard header for vec3-vec3 binop methods
 .macro vec3_extract_self_plus_vec_arg
-   .param pmc vec2
+    .param pmc vec2
 
-   .local pmc v1, v2
-   v1 = getattribute self, 'vals'
-   v2 = getattribute vec2, 'vals'
+    .local pmc v1, v2
+    v1 = getattribute self, 'vals'
+    v2 = getattribute vec2, 'vals'
 
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
+    $N10 = v1[0]
+    $N11 = v1[1]
+    $N12 = v1[2]
 
-   $N20 = v2[0]
-   $N21 = v2[1]
-   $N22 = v2[2]
+    $N20 = v2[0]
+    $N21 = v2[1]
+    $N22 = v2[2]
 .endm
 
 # Standard header for vec4-num binop methods
 .macro vec4_extract_self_plus_num_arg
-   .param num N
+    .param num N
 
-   .local pmc v1
-   v1 = getattribute self, 'vals'
+    .local pmc v1
+    v1 = getattribute self, 'vals'
 
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
-   $N13 = v1[3]
+    $N10 = v1[0]
+    $N11 = v1[1]
+    $N12 = v1[2]
+    $N13 = v1[3]
 .endm
 
 # Standard header for vec3-num binop methods
 .macro vec3_extract_self_plus_num_arg
-   .param num N
+    .param num N
 
-   .local pmc v1
-   v1 = getattribute self, 'vals'
+    .local pmc v1
+    v1 = getattribute self, 'vals'
 
-   $N10 = v1[0]
-   $N11 = v1[1]
-   $N12 = v1[2]
+    $N10 = v1[0]
+    $N11 = v1[1]
+    $N12 = v1[2]
 .endm
 
 # Standard footer for binop methods returning a vec4
 .macro vec4_return_new_result
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
+    .local pmc v3
+    v3 = new 'FixedFloatArray'
+    v3 = 4
 
-   v3[0] = $N30
-   v3[1] = $N31
-   v3[2] = $N32
-   v3[3] = $N33
+    v3[0] = $N30
+    v3[1] = $N31
+    v3[2] = $N32
+    v3[3] = $N33
 
-   .local pmc result
-   $P0 = typeof self
-   result = new $P0
-   setattribute result, 'vals', v3
+    .local pmc result
+    $P0 = typeof self
+    result = new $P0
+    setattribute result, 'vals', v3
 
-   .return(result)
+    .return(result)
 .endm
 
 # Standard footer for binop methods returning a vec4 = (vec3, w)
 .macro vec4_return_new_result_with_w(w)
-   .local pmc v3
-   v3 = new 'FixedFloatArray'
-   v3 = 4
+    .local pmc v3
+    v3 = new 'FixedFloatArray'
+    v3 = 4
 
-   v3[0] = $N30
-   v3[1] = $N31
-   v3[2] = $N32
-   v3[3] = .w
+    v3[0] = $N30
+    v3[1] = $N31
+    v3[2] = $N32
+    v3[3] = .w
 
-   .local pmc result
-   $P0 = typeof self
-   result = new $P0
-   setattribute result, 'vals', v3
+    .local pmc result
+    $P0 = typeof self
+    result = new $P0
+    setattribute result, 'vals', v3
 
-   .return(result)
+    .return(result)
 .endm
 
 =over 4
@@ -252,14 +252,14 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub add :method
-   .vec4_extract_self_plus_vec_arg
+    .vec4_extract_self_plus_vec_arg
 
-   $N30 = $N10 + $N20
-   $N31 = $N11 + $N21
-   $N32 = $N12 + $N22
-   $N33 = $N13 + $N23
+    $N30 = $N10 + $N20
+    $N31 = $N11 + $N21
+    $N32 = $N12 + $N22
+    $N33 = $N13 + $N23
 
-   .vec4_return_new_result
+    .vec4_return_new_result
 .end
 
 
@@ -271,14 +271,14 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub sub :method
-   .vec4_extract_self_plus_vec_arg
+    .vec4_extract_self_plus_vec_arg
 
-   $N30 = $N10 - $N20
-   $N31 = $N11 - $N21
-   $N32 = $N12 - $N22
-   $N33 = $N13 - $N23
+    $N30 = $N10 - $N20
+    $N31 = $N11 - $N21
+    $N32 = $N12 - $N22
+    $N33 = $N13 - $N23
 
-   .vec4_return_new_result
+    .vec4_return_new_result
 .end
 
 
@@ -290,14 +290,14 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub mult :method
-   .vec4_extract_self_plus_vec_arg
+    .vec4_extract_self_plus_vec_arg
 
-   $N30 = $N10 * $N20
-   $N31 = $N11 * $N21
-   $N32 = $N12 * $N22
-   $N33 = $N13 * $N23
+    $N30 = $N10 * $N20
+    $N31 = $N11 * $N21
+    $N32 = $N12 * $N22
+    $N33 = $N13 * $N23
 
-   .vec4_return_new_result
+    .vec4_return_new_result
 .end
 
 
@@ -310,14 +310,14 @@ XXX - SO WHAT HAPPENS?
 =cut
 
 .sub div :method
-   .vec4_extract_self_plus_vec_arg
+    .vec4_extract_self_plus_vec_arg
 
-   $N30 = $N10 / $N20
-   $N31 = $N11 / $N21
-   $N32 = $N12 / $N22
-   $N33 = $N13 / $N23
+    $N30 = $N10 / $N20
+    $N31 = $N11 / $N21
+    $N32 = $N12 / $N22
+    $N33 = $N13 / $N23
 
-   .vec4_return_new_result
+    .vec4_return_new_result
 .end
 
 
@@ -329,14 +329,14 @@ a new C<Vec4> vector C<result>.
 =cut
 
 .sub mod :method
-   .vec4_extract_self_plus_vec_arg
+    .vec4_extract_self_plus_vec_arg
 
-   $N30 = $N10 % $N20
-   $N31 = $N11 % $N21
-   $N32 = $N12 % $N22
-   $N33 = $N13 % $N23
+    $N30 = $N10 % $N20
+    $N31 = $N11 % $N21
+    $N32 = $N12 % $N22
+    $N33 = $N13 % $N23
 
-   .vec4_return_new_result
+    .vec4_return_new_result
 .end
 
 
@@ -376,21 +376,21 @@ first three elements are the cross product and whose last element is 1.0.
 =cut
 
 .sub cross :method
-   .vec3_extract_self_plus_vec_arg
+    .vec3_extract_self_plus_vec_arg
 
-   $N0  = $N11 * $N22
-   $N1  = $N21 * $N12
-   $N30 = $N0 - $N1
+    $N0  = $N11 * $N22
+    $N1  = $N21 * $N12
+    $N30 = $N0 - $N1
 
-   $N2  = $N20 * $N12
-   $N3  = $N10 * $N22
-   $N31 = $N2 - $N3
+    $N2  = $N20 * $N12
+    $N3  = $N10 * $N22
+    $N31 = $N2 - $N3
 
-   $N4  = $N10 * $N21
-   $N5  = $N20 * $N11
-   $N32 = $N4 - $N5
+    $N4  = $N10 * $N21
+    $N5  = $N20 * $N11
+    $N32 = $N4 - $N5
 
-   .vec4_return_new_result_with_w(1.0)
+    .vec4_return_new_result_with_w(1.0)
 .end
 
 
@@ -401,19 +401,19 @@ Calculate the dot product C<vec1 dot vec2> and return the result as a num.
 =cut
 
 .sub dot :method
-   .vec4_extract_self_plus_vec_arg
+    .vec4_extract_self_plus_vec_arg
 
-   $N30 = $N10 * $N20
-   $N31 = $N11 * $N21
-   $N32 = $N12 * $N22
-   $N33 = $N13 * $N23
+    $N30 = $N10 * $N20
+    $N31 = $N11 * $N21
+    $N32 = $N12 * $N22
+    $N33 = $N13 * $N23
 
-   .local num result
-   result  = $N30 + $N31
-   result += $N32
-   result += $N33
+    .local num result
+    result  = $N30 + $N31
+    result += $N32
+    result += $N33
 
-   .return(result)
+    .return(result)
 .end
 
 
@@ -425,17 +425,17 @@ three elements of each vector, and return the result as a num.
 =cut
 
 .sub dot3 :method
-   .vec3_extract_self_plus_vec_arg
+    .vec3_extract_self_plus_vec_arg
 
-   $N30 = $N10 * $N20
-   $N31 = $N11 * $N21
-   $N32 = $N12 * $N22
+    $N30 = $N10 * $N20
+    $N31 = $N11 * $N21
+    $N32 = $N12 * $N22
 
-   .local num result
-   result  = $N30 + $N31
-   result += $N32
+    .local num result
+    result  = $N30 + $N31
+    result += $N32
 
-   .return(result)
+    .return(result)
 .end
 
 
@@ -447,10 +447,10 @@ the result as a num.
 =cut
 
 .sub length :method
-     $N0 = self.'dot'(self)
-     $N1 = sqrt $N0
+    $N0 = self.'dot'(self)
+    $N1 = sqrt $N0
 
-     .return($N1)
+    .return($N1)
 .end
 
 
@@ -462,10 +462,10 @@ considering only the first three elements), and return the result as a num.
 =cut
 
 .sub length3 :method
-     $N0 = self.'dot3'(self)
-     $N1 = sqrt $N0
+    $N0 = self.'dot3'(self)
+    $N1 = sqrt $N0
 
-     .return($N1)
+    .return($N1)
 .end
 
 
@@ -477,10 +477,10 @@ returning the result as a new C<Vec4>.
 =cut
 
 .sub normalize :method
-     $N0 = self.'length'()
-     $P0 = self.'div_num'($N0)
+    $N0 = self.'length'()
+    $P0 = self.'div_num'($N0)
 
-     .return($P0)
+    .return($P0)
 .end
 
 =item num dist = vec1.distance(vec2)
@@ -491,12 +491,12 @@ between them as C<length(vec1 - vec2)>, returning the result as a num.
 =cut
 
 .sub distance :method
-     .param pmc vec2
+    .param pmc vec2
 
-     $P0 = self.'sub'(vec2)
-     $N0 = $P0.'length'()
+    $P0 = self.'sub'(vec2)
+    $N0 = $P0.'length'()
 
-     .return($N0)
+    .return($N0)
 .end
 
 
@@ -509,12 +509,12 @@ three elements), and returning the result as a num.
 =cut
 
 .sub distance3 :method
-     .param pmc vec2
+    .param pmc vec2
 
-     $P0 = self.'sub'(vec2)
-     $N0 = $P0.'length3'()
+    $P0 = self.'sub'(vec2)
+    $N0 = $P0.'length3'()
 
-     .return($N0)
+    .return($N0)
 .end
 
 =back
@@ -532,18 +532,18 @@ Callback function for Parrot's C<Data::Dumper> clone.
 =cut
 
 .sub __dump :method
-   .param pmc    dumper
-   .param string label
+    .param pmc    dumper
+    .param string label
 
-   ($S1, $S0) = dumper.'newIndent'()
-   say '['
-   print $S1
-   print 'vals = '
-   $P0 = getattribute self, 'vals'
-   dumper.'genericArray'('vals', $P0)
-   say ''
-   print $S0
-   say ']'
+    ($S1, $S0) = dumper.'newIndent'()
+    say '['
+    print $S1
+    print 'vals = '
+    $P0 = getattribute self, 'vals'
+    dumper.'genericArray'('vals', $P0)
+    say ''
+    print $S0
+    say ']'
 .end
 
 =back
