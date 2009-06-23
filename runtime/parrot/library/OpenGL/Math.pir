@@ -242,102 +242,48 @@ Set the current vector value to a four element array.
     .return(result)
 .endm
 
+# A standard elementwise vec4 binop (vec4 op vec4 --> vec4)
+.macro vec4_vec4_vec4_binop(name, op)
+.sub .name :method
+    .vec4_extract_self_plus_vec_arg
+
+    $N30 = $N10 .op $N20
+    $N31 = $N11 .op $N21
+    $N32 = $N12 .op $N22
+    $N33 = $N13 .op $N23
+
+    .vec4_return_new_result
+.end
+.endm
+
 =over 4
 
 =item Vec4 result = vec1.add(Vec4 vec2)
 
-Calculate the elementwise addition C<vec1 + vec2> and return
-a new C<Vec4> vector C<result>.
-
-=cut
-
-.sub add :method
-    .vec4_extract_self_plus_vec_arg
-
-    $N30 = $N10 + $N20
-    $N31 = $N11 + $N21
-    $N32 = $N12 + $N22
-    $N33 = $N13 + $N23
-
-    .vec4_return_new_result
-.end
-
-
 =item Vec4 result = vec1.sub(Vec4 vec2)
-
-Calculate the elementwise subtraction C<vec1 - vec2> and return
-a new C<Vec4> vector C<result>.
-
-=cut
-
-.sub sub :method
-    .vec4_extract_self_plus_vec_arg
-
-    $N30 = $N10 - $N20
-    $N31 = $N11 - $N21
-    $N32 = $N12 - $N22
-    $N33 = $N13 - $N23
-
-    .vec4_return_new_result
-.end
-
 
 =item Vec4 result = vec1.mult(Vec4 vec2)
 
-Calculate the elementwise multiplication C<vec1 * vec2> and return
-a new C<Vec4> vector C<result>.
-
-=cut
-
-.sub mult :method
-    .vec4_extract_self_plus_vec_arg
-
-    $N30 = $N10 * $N20
-    $N31 = $N11 * $N21
-    $N32 = $N12 * $N22
-    $N33 = $N13 * $N23
-
-    .vec4_return_new_result
-.end
-
-
 =item Vec4 result = vec1.div(Vec4 vec2)
 
-Calculate the elementwise division C<vec1 / vec2> and return a new C<Vec4>
-vector C<result>.  No attempt is made to prevent division by zero,
+=item Vec4 result = vec1.mod(Vec4 vec2)
+
+Calculate the elementwise addition, subtraction, multiplication, division,
+or modulus C<vec1 [+-*/%] vec2> and return a new C<Vec4> vector C<result>.
+No attempt is made in C<div> and C<mod> to prevent division by zero,
 XXX - SO WHAT HAPPENS?
 
 =cut
 
-.sub div :method
-    .vec4_extract_self_plus_vec_arg
+.vec4_vec4_vec4_binop(add, +)
 
-    $N30 = $N10 / $N20
-    $N31 = $N11 / $N21
-    $N32 = $N12 / $N22
-    $N33 = $N13 / $N23
+.vec4_vec4_vec4_binop(sub, -)
 
-    .vec4_return_new_result
-.end
+.vec4_vec4_vec4_binop(mult, *)
 
+.vec4_vec4_vec4_binop(div, /)
 
-=item Vec4 result = vec1.mod(Vec4 vec2)
-
-Calculate the elementwise modulus C<vec1 % vec2> and return
-a new C<Vec4> vector C<result>.
-
-=cut
-
-.sub mod :method
-    .vec4_extract_self_plus_vec_arg
-
-    $N30 = $N10 % $N20
-    $N31 = $N11 % $N21
-    $N32 = $N12 % $N22
-    $N33 = $N13 % $N23
-
-    .vec4_return_new_result
-.end
+.vec4_vec4_vec4_binop(mod, %)
 
 
 =item Vec4 result = vector.div_num(num N)
