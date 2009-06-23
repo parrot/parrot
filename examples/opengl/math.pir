@@ -67,7 +67,7 @@ Parrot module.
     .param pmc vec2
 
     .local pmc vec3
-    vec3 = vec1.'mult'(vec2)
+    vec3 = vec1.'mul'(vec2)
 
     say "vec1 * vec2 = vec3"
     _dumper(vec1, 'vec1')

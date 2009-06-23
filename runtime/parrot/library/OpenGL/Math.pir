@@ -262,7 +262,7 @@ Set the current vector value to a four element array.
 
 =item Vec4 result = vec1.sub(Vec4 vec2)
 
-=item Vec4 result = vec1.mult(Vec4 vec2)
+=item Vec4 result = vec1.mul(Vec4 vec2)
 
 =item Vec4 result = vec1.div(Vec4 vec2)
 
@@ -279,7 +279,7 @@ XXX - SO WHAT HAPPENS?
 
 .vec4_vec4_vec4_binop(sub, -)
 
-.vec4_vec4_vec4_binop(mult, *)
+.vec4_vec4_vec4_binop(mul, *)
 
 .vec4_vec4_vec4_binop(div, /)
 
