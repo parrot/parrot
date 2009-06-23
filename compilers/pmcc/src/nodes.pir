@@ -41,30 +41,36 @@ PMC class by it self.
     res.'init'(children :flat, adverbs :flat :named)
 
     # Initialize various attributes
-    $P1 = new 'ResizableStringArray'
+    $P1 = new ['ResizableStringArray']
     res.'attr'('parents', $P1, 1)
 
-    $P1 = new 'Hash'
+    $P1 = new ['Hash']
     res.'attr'('vtables', $P1, 1)
 
-    $P1 = new 'Hash'
+    $P1 = new ['Hash']
     res.'attr'('vtdump', $P1, 1)
 
-    $P1 = new 'Hash'
+    $P1 = new ['Hash']
     res.'attr'('methods', $P1, 1)
 
     # Multis are Hash of Arrays. name -> implementation*
-    $P1 = new 'Hash'
+    $P1 = new ['Hash']
     res.'attr'('multis', $P1, 1)
 
-    $P1 = new 'ResizablePMCArray'
+    $P1 = new ['ResizablePMCArray']
     res.'attr'('attrs', $P1, 1)
 
-    $P1 = new 'ResizableStringArray'
+    $P1 = new ['ResizableStringArray']
     res.'attr'('provides', $P1, 1)
 
-    $P1 = new 'Hash'
+    $P1 = new ['Hash']
     res.'attr'('traits', $P1, 1)
+    
+    $P1 = new ['String']
+    res.'attr'('hll', $P1, 1)
+    
+    $P1 = new ['ResizableStringArray']
+    res.'attr'('maps', $P1, 1)
 
     .return (res)
 .end
@@ -159,6 +165,24 @@ Get PMC traits.
     .tailcall self.'attr'('traits',0,0)
 .end
 
+=item hll
+
+Get PMC hll name.
+
+=cut
+
+.sub 'hll' :method
+    .tailcall self.'attr'('hll',0,0)
+.end
+
+.sub 'set_hll' :method
+    .param pmc name
+    .tailcall self.'attr'('hll',name,1)
+.end
+
+.sub 'maps' :method
+    .tailcall self.'attr'('maps',0,0)
+.end
 
 =item C<thaw_pmc_attrs>
 
@@ -364,7 +388,7 @@ Add an ATTR to PMC.
     die $S0
 
   add_method:
-    attr = new 'Hash'
+    attr = new ['Hash']
     attr['type'] = type
     attr['name'] = name
     attr['is_fp'] = is_fp

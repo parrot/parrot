@@ -43,12 +43,12 @@ method c_header($/) {
 method traits($/, $key) {
     our $?PMC;
 
-    #say("traits " ~$/);
     if $key eq 'does' {
     }
     elsif $key eq 'group' {
     }
     elsif $key eq 'hll' {
+        $?PMC.set_hll(~$<identifier>);
     }
     elsif $key eq 'provides' {
         $?PMC.provides().push(~$<identifier>);
@@ -58,6 +58,7 @@ method traits($/, $key) {
         $?PMC.thaw_pmc_attrs(~$<identifier>);
     }
     elsif $key eq 'maps' {
+        $?PMC.maps().push(~$<identifier>);
     }
     elsif $key eq 'lib' {
     }

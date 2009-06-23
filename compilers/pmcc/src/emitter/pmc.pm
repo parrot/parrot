@@ -520,18 +520,34 @@ method generate_passes() {
 
     @res.push('    } /* pass 2 */');
     @res.push('    else {');
+    
+    my $hll := self.past.hll();
 
-    #XXX: take care of HLL stuff here
+    if $hll ne '' && elements(self.past.maps()) {
+        
+        @res.push('    {');
+        @res.push('        /* Register this PMC as a HLL mapping */');
+        @res.push('        const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "'~$hll~'"));');
+        @res.push('        if (pmc_id > 0) {');
 
-    @res.push('        {');
-    @res.push('            VTABLE * const vt  = interp->vtables[entry];');
-    @res.push('            vt->mro = Parrot_'~self.name~'_get_mro(interp, PMCNULL);');
-    @res.push('            if (vt->ro_variant_vtable)');
-    @res.push('                vt->ro_variant_vtable->mro = vt->mro;');
-    @res.push('        }');
+        for self.past.maps() {
+            @res.push('            Parrot_register_HLL_type( interp, pmc_id, enum_class_'~$_~', entry);');
+        }
+
+        @res.push('        }');
+        @res.push('    }');
+        @res.push('');
+    }
+
+    @res.push('    /* set up MRO and _namespace */');
+    @res.push('    {');
+    @res.push('        VTABLE * const vt  = interp->vtables[entry];');
+    @res.push('        vt->mro = Parrot_'~self.name~'_get_mro(interp, PMCNULL);');
+    @res.push('        if (vt->ro_variant_vtable)');
+    @res.push('            vt->ro_variant_vtable->mro = vt->mro;');
+    @res.push('    }');
     @res.push('');
-    @res.push('        /* set up MRO and _namespace */');
-    @res.push('        Parrot_create_mro(interp, entry);');
+    @res.push('    Parrot_create_mro(interp, entry);');
 
 
     @res.push('}');
