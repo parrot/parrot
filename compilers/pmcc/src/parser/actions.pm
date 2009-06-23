@@ -44,14 +44,20 @@ method traits($/, $key) {
     our $?PMC;
 
     #say("traits " ~$/);
-    if $key eq 'extends' {
-        $?PMC.parents().push(~$<identifier>);
-        $?PMC.thaw_pmc_attrs(~$<identifier>);
+    if $key eq 'does' {
+    }
+    elsif $key eq 'group' {
+    }
+    elsif $key eq 'hll' {
     }
     elsif $key eq 'provides' {
         $?PMC.provides().push(~$<identifier>);
     }
-    elsif $key eq 'group' {
+    elsif $key eq 'extends' {
+        $?PMC.parents().push(~$<identifier>);
+        $?PMC.thaw_pmc_attrs(~$<identifier>);
+    }
+    elsif $key eq 'maps' {
     }
     elsif $key eq 'lib' {
     }

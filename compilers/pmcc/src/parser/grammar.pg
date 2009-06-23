@@ -42,9 +42,12 @@ rule pmc {
 
 rule traits {
     [
-    | 'extends'     <identifier>            {*} #= extends
-    | 'provides'    <identifier>            {*} #= provides
+    | 'does'        <identifier>            {*} #= does
     | 'group'       <identifier>            {*} #= group
+    | 'hll'         <identifier>            {*} #= hll
+    | 'provides'    <identifier>            {*} #= provides
+    | 'extends'     <identifier>            {*} #= extends
+    | 'maps'        <identifier>            {*} #= maps
     | 'lib'         <identifier>            {*} #= lib
     | 'need_ext'                            {*} #= need_ext
     | 'abstract'                            {*} #= abstract
