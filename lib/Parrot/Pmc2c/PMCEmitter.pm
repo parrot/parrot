@@ -722,12 +722,14 @@ EOC
     }
 
     # include any class specific init code from the .pmc file
-    $cout .= <<"EOC" if $class_init_code;
+    if ($class_init_code) {
+        $cout .= <<"EOC";
         /* class_init */
         {
 $class_init_code
         }
 EOC
+    }
 
     $cout .= <<"EOC";
         {
