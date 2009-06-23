@@ -688,10 +688,6 @@ EOC
 
             if (vt->ro_variant_vtable)
                 vt->ro_variant_vtable->mro = vt->mro;
-
-EOC
-
-    $cout .= <<"EOC";
         }
 
         /* set up MRO and _namespace */
