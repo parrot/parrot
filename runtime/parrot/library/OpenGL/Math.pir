@@ -505,15 +505,19 @@ Callback function for Parrot's C<Data::Dumper> clone.
     .param pmc    dumper
     .param string label
 
-    ($S1, $S0) = dumper.'newIndent'()
-    say '['
-    print $S1
-    print 'vals = '
     $P0 = getattribute self, 'vals'
-    dumper.'genericArray'('vals', $P0)
-    say ''
+
+    print '[ '
+    $I0 = 0
+  dump_loop:
+    $S0 = $P0[$I0]
     print $S0
-    say ']'
+    inc $I0
+    if $I0 >= 4 goto dump_loop_end
+    print ', '
+    goto dump_loop
+  dump_loop_end:
+    print ' ]'
 .end
 
 =back

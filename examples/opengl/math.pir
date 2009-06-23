@@ -69,7 +69,7 @@ Parrot module.
     .local pmc vec3
     vec3 = vec1.'mul'(vec2)
 
-    say "vec1 * vec2 => vec3"
+    say "\nvec1 * vec2 => vec3"
     _dumper(vec1, 'vec1')
     _dumper(vec2, 'vec2')
     _dumper(vec3, 'vec3')
@@ -77,7 +77,7 @@ Parrot module.
     .local pmc scaled
     scaled = vec1.'mul_num'(3)
 
-    say "vector * 3 => scaled"
+    say "\nvector * 3 => scaled"
     _dumper(vec1,   'vector')
     _dumper(scaled, 'scaled')
 .end
@@ -88,7 +88,7 @@ Parrot module.
     .local pmc normalized
     normalized = vector.'normalize'()
 
-    say "normalize(vector) => normalized"
+    say "\nnormalize(vector) => normalized"
     _dumper(vector,     'vector')
     _dumper(normalized, 'normalized')
 .end
