@@ -9,7 +9,7 @@ method rewrite_op($pmclass, $past) {
     #say("OH HI " ~ $pasttype);
     my $res;
     if $pasttype eq 'inline' {
-        $res := $past<inline>;
+        $res := '        '~$past<inline>;
     }
     elsif $pasttype eq 'call' {
         # Technicaly we can have different "calls". But for now only macros supported.

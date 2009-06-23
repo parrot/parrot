@@ -327,7 +327,7 @@ Generate C declarations for vtable functions
 
 method generate_c_functions() {
     my $past    := self.past;
-    my %vtables := self.vtables{'default'};
+    my %vtables := self.past.vtables{'default'};
     my $emitter := PMC::Emitter::C.new;
     my @res;
 
@@ -484,29 +484,57 @@ method generate_passes() {
 
     }
     else {
-        @res.push('         vt->whoami       = CONST_STRING_GEN(interp, "'~ self.name ~'");');
-        @res.push('         vt->provides_str = CONST_STRING_GEN(interp, "' ~$provides ~'");');
+        @res.push('        vt->whoami       = CONST_STRING_GEN(interp, "'~ self.name ~'");');
+        @res.push('        vt->provides_str = CONST_STRING_GEN(interp, "' ~$provides ~'");');
     }
 
     if self.past.parents[0] ne 'default' {
         @res.push('        vt->isa_hash     = Parrot_'~self.name~'_get_isa(interp, NULL);');
     }
     else {
-        @res.push('(        vt->isa_hash     = NULL;');
+        @res.push('        vt->isa_hash     = NULL;');
+    }
+
+    unless self.past.traits{'singleton'} || self.past.traits{'abstract'} {
+
+       @res.push('        {');
+       @res.push('            VTABLE                    *vt_ro;');
+       @res.push('            vt_ro                    = Parrot_'~self.name~'_ro_get_vtable(interp);');
+       @res.push('            vt_ro->base_type         = '~$enum_name~';');
+       @res.push('            vt_ro->flags             = '~ self.vtable_flags ~';');
+       @res.push('            vt_ro->attribute_defs    = attr_defs;');
+       @res.push('');
+       @res.push('            vt_ro->base_type         = entry;');
+       @res.push('            vt_ro->whoami            = vt->whoami;');
+       @res.push('            vt_ro->provides_str      = vt->provides_str;');
+       @res.push('            vt->ro_variant_vtable    = vt_ro;');
+       @res.push('            vt_ro->ro_variant_vtable = vt;');
+       @res.push('            vt_ro->isa_hash          = vt->isa_hash;');
+       @res.push('        }');
+       @res.push('');
     }
 
 
-
-
-
     #second pass
-## Cotto, this is last bit of second pass.
-##        {
-## #define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))
-##            Parrot_mmd_add_multi_list_from_c_args(interp,
-##                _temp_multi_func_list, N_MULTI_LIST);
-##        }
 
+
+    @res.push('    } /* pass 2 */');
+    @res.push('    else {');
+
+    #XXX: take care of HLL stuff here
+
+    @res.push('        {');
+    @res.push('            VTABLE * const vt  = interp->vtables[entry];');
+    @res.push('            vt->mro = Parrot_'~self.name~'_get_mro(interp, PMCNULL);');
+    @res.push('            if (vt->ro_variant_vtable)');
+    @res.push('                vt->ro_variant_vtable->mro = vt->mro;');
+    @res.push('        }');
+    @res.push('');
+    @res.push('        /* set up MRO and _namespace */');
+    @res.push('        Parrot_create_mro(interp, entry);');
+
+
+    @res.push('}');
     join("\n", @res);
 }
 
@@ -794,7 +822,7 @@ method generate_multis() {
 }
 
 
-=item C<get_vtable_flags()>
+=item C<vtable_flags()>
 
 Returns C code to produce a PMC's flags.
 
