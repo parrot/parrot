@@ -52,6 +52,7 @@ rule traits {
     | 'singleton'                           {*} #= singleton
     | 'dynpmc'                              {*} #= dynpmc
     | 'no_ro'                               {*} #= no_ro
+    | 'default'                             {*} #= default
     ]
 }
 
@@ -137,8 +138,8 @@ rule c_body {
 
 rule c_body_statement {
     | <c_body_macro> {*}        #= macro
-    | <-[{}]>  {*}              #= characters
-    | <c_body> {*}              #= body
+    | <-[{}]>+       {*}        #= characters
+    | <c_body>       {*}        #= body
 }
 
 # Various macros for VTABLE body
