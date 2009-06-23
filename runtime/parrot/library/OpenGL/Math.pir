@@ -256,6 +256,22 @@ Set the current vector value to a four element array.
 .end
 .endm
 
+
+# A standard elementwise vec4-num binop (vec4 op num --> vec4)
+.macro vec4_num_vec4_binop(name, op)
+.sub .name :method
+    .vec4_extract_self_plus_num_arg
+
+    $N30 = $N10 .op N
+    $N31 = $N11 .op N
+    $N32 = $N12 .op N
+    $N33 = $N13 .op N
+
+    .vec4_return_new_result
+.end
+.endm
+
+
 =over 4
 
 =item Vec4 result = vec1.add(Vec4 vec2)
@@ -269,9 +285,9 @@ Set the current vector value to a four element array.
 =item Vec4 result = vec1.mod(Vec4 vec2)
 
 Calculate the elementwise addition, subtraction, multiplication, division,
-or modulus C<vec1 [+-*/%] vec2> and return a new C<Vec4> vector C<result>.
-No attempt is made in C<div> and C<mod> to prevent division by zero,
-XXX - SO WHAT HAPPENS?
+or modulus (C<vec1 [ + - * / % ] vec2>) and return a new C<Vec4> vector
+C<result>. No attempt is made in C<div> and C<mod> to prevent division by
+zero, XXX - SO WHAT HAPPENS?
 
 =cut
 
@@ -286,24 +302,32 @@ XXX - SO WHAT HAPPENS?
 .vec4_vec4_vec4_binop(mod, %)
 
 
+=item Vec4 result = vector.add_num(num N)
+
+=item Vec4 result = vector.sub_num(num N)
+
+=item Vec4 result = vector.mul_num(num N)
+
 =item Vec4 result = vector.div_num(num N)
 
-Calculate the elementwise division C<vector / N> and return a new C<Vec4>
-vector C<result>.  No attempt is made to prevent division by zero,
-XXX - SO WHAT HAPPENS?
+=item Vec4 result = vector.mod_num(num N)
+
+Calculate the elementwise addition, subtraction, multiplication, division,
+or modulus (C<vector [ + - * / % ] N>) and return a new C<Vec4> vector
+C<result>.  No attempt is made in C<div_num> and C<mod_num> to prevent
+division by zero, XXX - SO WHAT HAPPENS?
 
 =cut
 
-.sub div_num :method
-    .vec4_extract_self_plus_num_arg
+.vec4_num_vec4_binop(add_num, +)
 
-    $N30 = $N10 / N
-    $N31 = $N11 / N
-    $N32 = $N12 / N
-    $N33 = $N13 / N
+.vec4_num_vec4_binop(sub_num, -)
 
-    .vec4_return_new_result
-.end
+.vec4_num_vec4_binop(mul_num, *)
+
+.vec4_num_vec4_binop(div_num, /)
+
+.vec4_num_vec4_binop(mod_num, %)
 
 
 =back
