@@ -56,8 +56,7 @@ Parrot module.
     $P2 = new Vec4
     $P2.'set_vals'($P0)
 
-    $P3 = new Vec4
-    $P3.'set_vals'($P1)
+    $P3 = Vec4.'new'('vals' => $P1)
 
     .return ($P2, $P3)
 .end

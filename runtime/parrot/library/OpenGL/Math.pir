@@ -96,6 +96,11 @@ sets up their attributes.
 Create a new object representing a four-element vector.  You will need
 to set the initial values using the C<set_vals()> method.
 
+=item Vec4 vec4 = Vec4.'new'('vals' => vals)
+
+Create a new object representing a four-element vector, setting the
+initial values to the array PMC C<vals>.
+
 =back
 
 
