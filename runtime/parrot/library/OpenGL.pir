@@ -108,6 +108,9 @@ the known different filenames for each library in turn before giving up.
     .local pmc libnames
 
     libnames = new 'ResizableStringArray'
+    # The following line brought to you by proprietary driver packages
+    # that don't update the libGL.so symlink properly, causing FAIL
+    push libnames, 'libGL.so.1'
     push libnames, 'libGL'
     push libnames, 'opengl32'
     push libnames, '/System/Library/Frameworks/OpenGL.framework/OpenGL'

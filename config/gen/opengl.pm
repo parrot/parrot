@@ -325,6 +325,9 @@ my @IGNORE = (
     'SetPixelFormat',
 
     # Can't handle longlong until RT 53406 is done
+    'glBufferAddressRangeNV',
+    'glUniformui64NV',
+    'glProgramUniformui64NV',
     'glPresentFrameKeyedNV',
     'glPresentFrameDualFillNV',
     'glXSwapBuffersMscOML',
