@@ -145,7 +145,7 @@ push_namespace(SHIM_INTERP, ARGIN(const char *name))
     Namespace * const ns = mem_allocate_zeroed_typed(Namespace);
 
     ns->parent = pesky_global__namespace;
-    ns->name   = str_dup(name);
+    ns->name   = mem_sys_strdup(name);
     pesky_global__namespace = ns;
 }
 
@@ -267,7 +267,7 @@ _mk_symreg(ARGMOD(SymHash *hsh), ARGIN(const char *name), int t)
         r             = mem_allocate_zeroed_typed(SymReg);
         r->set        = t;
         r->type       = VTREG;
-        r->name       = str_dup(name);
+        r->name       = mem_sys_strdup(name);
         r->color      = -1;
         r->want_regno = -1;
 
@@ -619,7 +619,7 @@ _mk_fullname(ARGIN_NULLOK(const Namespace *ns), ARGIN(const char *name))
         return result;
     }
 
-    return str_dup(name);
+    return mem_sys_strdup(name);
 }
 
 
@@ -722,7 +722,7 @@ mk_pmc_const_2(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(SymReg *left),
     r[0] = left;
 
     /* strip delimiters */
-    name          = str_dup(rhs->name + 1);
+    name          = mem_sys_strdup(rhs->name + 1);
     len           = strlen(name);
     name[len - 1] = '\0';
 
@@ -920,7 +920,7 @@ add_ns(PARROT_INTERP, ARGIN(const char *name))
 
     if (!IMCC_INFO(interp)->cur_namespace
     || (l = strlen(IMCC_INFO(interp)->cur_namespace->name)) <= 2)
-        return str_dup(name);
+        return mem_sys_strdup(name);
 
     /* TODO keyed syntax */
     len     = strlen(name) + l  + 4;
@@ -967,7 +967,7 @@ _mk_address(PARROT_INTERP, ARGMOD(SymHash *hsh), ARGIN(const char *name), int un
     if (uniq == U_add_all) {
         r       = mem_allocate_zeroed_typed(SymReg);
         r->type = VTADDRESS;
-        r->name = str_dup(name);
+        r->name = mem_sys_strdup(name);
         _store_symreg(hsh, r);
     }
     else {
@@ -1150,7 +1150,7 @@ dup_sym(ARGIN(const SymReg *r))
     ASSERT_ARGS(dup_sym)
     SymReg * const new_sym = mem_allocate_zeroed_typed(SymReg);
     STRUCT_COPY(new_sym, r);
-    new_sym->name = str_dup(r->name);
+    new_sym->name = mem_sys_strdup(r->name);
 
     if (r->nextkey)
         new_sym->nextkey = dup_sym(r->nextkey);

@@ -70,6 +70,12 @@ void * mem_sys_realloc_zeroed(
     size_t size,
     size_t old_size);
 
+PARROT_EXPORT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char * mem_sys_strdup(ARGIN(const char *src))
+        __attribute__nonnull__(1);
+
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 void * mem__internal_allocate(
@@ -116,6 +122,8 @@ void * mem__internal_realloc_zeroed(
 #define ASSERT_ARGS_mem_sys_free __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_mem_sys_realloc __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
 #define ASSERT_ARGS_mem_sys_realloc_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = 0
+#define ASSERT_ARGS_mem_sys_strdup __attribute__unused__ int _ASSERT_ARGS_CHECK = \
+       PARROT_ASSERT_ARG(src)
 #define ASSERT_ARGS_mem__internal_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = \
        PARROT_ASSERT_ARG(file)
 #define ASSERT_ARGS_mem__internal_allocate_zeroed __attribute__unused__ int _ASSERT_ARGS_CHECK = \

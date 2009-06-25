@@ -343,6 +343,32 @@ mem__internal_free(ARGFREE(void *from), ARGIN(const char *file), int line)
 
 /*
 
+=item C<char * mem_sys_strdup(const char *src)>
+
+Copy a C string to a new block of memory allocated with mem_sys_allocate,
+that can be later deallocated with mem_sys_free.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_MALLOC
+PARROT_CANNOT_RETURN_NULL
+char *
+mem_sys_strdup(ARGIN(const char *src))
+{
+    ASSERT_ARGS(mem_sys_strdup)
+
+    size_t l = strlen(src);
+    char *result = (char *)mem_sys_allocate(l + 1);
+    memcpy(result, src, l);
+    result[l] = '\0';
+    return result;
+}
+
+/*
+
 =back
 
 =cut

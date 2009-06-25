@@ -2388,7 +2388,7 @@ segment_init(ARGOUT(PackFile_Segment *self), ARGIN(PackFile *pf),
     self->size        = 0;
     self->data        = NULL;
     self->id          = 0;
-    self->name        = str_dup(name);
+    self->name        = mem_sys_strdup(name);
 }
 
 
@@ -2733,7 +2733,7 @@ pf_debug_unpack(PARROT_INTERP, ARGOUT(PackFile_Segment *self), ARGIN(const opcod
     }
 
     /* find seg e.g. CODE_DB => CODE and attach it */
-    code_name              = str_dup(debug->base.name);
+    code_name              = mem_sys_strdup(debug->base.name);
     str_len                = strlen(code_name);
     code_name[str_len - 3] = '\0';
     code                   = (PackFile_ByteCode *)PackFile_find_segment(interp,
@@ -3509,7 +3509,7 @@ PackFile_FixupTable_new_entry(PARROT_INTERP,
 
     self->fixups[i]         = mem_allocate_typed(PackFile_FixupEntry);
     self->fixups[i]->type   = type;
-    self->fixups[i]->name   = str_dup(label);
+    self->fixups[i]->name   = mem_sys_strdup(label);
     self->fixups[i]->offset = offs;
     self->fixups[i]->seg    = self->code;
 }
@@ -4310,7 +4310,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     }
 
     /* Need to associate this segment with the applicable code segment. */
-    code_name              = str_dup(self->base.name);
+    code_name              = mem_sys_strdup(self->base.name);
     str_len                = strlen(code_name);
     code_name[str_len - 4] = '\0';
     code                   = (PackFile_ByteCode *)PackFile_find_segment(interp,

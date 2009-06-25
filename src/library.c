@@ -788,7 +788,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
     char * const env = Parrot_getenv("PARROT_RUNTIME", &free_it);
 
     if (env)
-        return free_it ? env : str_dup(env);
+        return free_it ? env : mem_sys_strdup(env);
     else {
         PMC    * const config_hash =
             VTABLE_get_pmc_keyed_int(interp, interp->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH);
@@ -799,7 +799,7 @@ Parrot_get_runtime_prefix(PARROT_INTERP)
             return Parrot_str_to_cstring(interp, s);
         }
         else
-            return str_dup(".");
+            return mem_sys_strdup(".");
     }
 }
 
