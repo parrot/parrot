@@ -335,8 +335,8 @@ stack_pop(PARROT_INTERP, ARGMOD(Stack_Chunk_t **stack_p),
           ARGOUT_NULLOK(void *where), Stack_entry_type type)
 {
     ASSERT_ARGS(stack_pop)
-    Stack_Chunk_t     *cur_chunk   = *stack_p;
-    Stack_Entry_t * const entry    =
+    Stack_Chunk_t * const cur_chunk = *stack_p;
+    Stack_Entry_t * const entry =
         (Stack_Entry_t *)stack_prepare_pop(interp, stack_p);
 
     /* Types of 0 mean we don't care */
