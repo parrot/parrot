@@ -701,10 +701,6 @@ EOC
         my $method_name = $method->name;
         my $symbol_name = $method->symbol;
 
-        if (!defined $method->symbol) {
-            print "\n\nUSING method->name: ".$method->name."\n\n\n";
-        }
-
         $cout .= <<"EOC";
         register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_${classname}_${method_name}), CONST_STRING_GEN(interp, "$symbol_name"));
 EOC
