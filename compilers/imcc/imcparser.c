@@ -761,11 +761,11 @@ mk_pmc_const(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGIN(const char *type),
     r[0] = left;
     if (ascii) {
         /* strip delimiters */
-        name                   = str_dup(constant + 1);
+        name                   = mem_sys_strdup(constant + 1);
         name[strlen(name) - 1] = 0;
     }
     else {
-        name = str_dup(constant);
+        name = mem_sys_strdup(constant);
     }
 
     switch (type_enum) {
@@ -811,7 +811,7 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     SymReg *r[3];
     char   *const_name;
     const int ascii       = (*constant == '\'' || *constant == '"');
-    char   *unquoted_name = str_dup(name + 1);
+    char   *unquoted_name = mem_sys_strdup(name + 1);
     size_t  name_length   = strlen(unquoted_name) - 1;
 
     unquoted_name[name_length] = 0;
@@ -828,11 +828,11 @@ mk_pmc_const_named(PARROT_INTERP, ARGMOD(IMC_Unit *unit),
     r[0] = left;
     if (ascii) {
         /* strip delimiters */
-        const_name                         = str_dup(constant + 1);
+        const_name                         = mem_sys_strdup(constant + 1);
         const_name[strlen(const_name) - 1] = 0;
     }
     else {
-        const_name = str_dup(constant);
+        const_name = mem_sys_strdup(constant);
     }
 
     if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
@@ -1083,7 +1083,7 @@ mk_sub_address_fromc(PARROT_INTERP, ARGIN(const char *name))
     ASSERT_ARGS(mk_sub_address_fromc)
     /* name is a quoted sub name */
     SymReg *r;
-    char *name_copy                  = str_dup(name + 1);
+    char *name_copy                  = mem_sys_strdup(name + 1);
     name_copy[strlen(name_copy) - 1] = 0;
 
     r = mk_sub_address(interp, name_copy);
@@ -1384,7 +1384,7 @@ typedef union YYSTYPE
     SymReg * sr;
     Instruction *i;
 }
-/* Line 193 of yacc.c.  */
+/* Line 187 of yacc.c.  */
 #line 1378 "compilers/imcc/imcparser.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
@@ -3504,7 +3504,7 @@ yyreduce:
     {
           IMCC_INFO(interp)->cur_call->pcc_sub->pragma = (yyvsp[(5) - (6)].t);
           if (!IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid) {
-            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = str_dup(
+            IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->subid = mem_sys_strdup(
             IMCC_INFO(interp)->cur_unit->instructions->symregs[0]->name);
           }
         }
@@ -4392,7 +4392,7 @@ yyreduce:
   case 200:
 #line 1970 "compilers/imcc/imcc.y"
     {
-           /* there'd normally be a str_dup() here, but the lexer already
+           /* there'd normally be a mem_sys_strdup() here, but the lexer already
             * copied the string, so it's safe to use directly */
            if ((IMCC_INFO(interp)->cur_pmc_type = pmc_type(interp,
                Parrot_str_new(interp, (yyvsp[(1) - (1)].s), 0))) <= 0) {
