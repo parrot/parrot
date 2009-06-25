@@ -118,20 +118,24 @@ rule class_init {
 
 rule method {
     'METHOD' :: [
-        [ <identifier> '(' <parrot_c_arguments> ')' <c_body> ]
+        [ <identifier> '(' <parrot_c_arguments> ')' <method_attr>* <c_body> ]
         | <.panic: "Unexpected METHOD content">
     ]
     {*}
 }
 
 rule vtable {
-    'VTABLE' :: <c_signature> <c_body>
+    'VTABLE' :: <c_signature> <method_attr>* <c_body>
     {*}
 }
 
 rule multi {
-    'MULTI' :: <c_signature> <c_body>
+    'MULTI' :: <c_signature> <method_attr>* <c_body>
     {*}
+}
+
+rule method_attr {
+    ':' <identifier>
 }
 
 # Nested list of something

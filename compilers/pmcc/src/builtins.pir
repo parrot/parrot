@@ -147,7 +147,11 @@ is not intended to be a general-use sub.
     frozen = pio.'readall'(filename)
     $P0 = thaw frozen
     .return ($P0)
+.end
 
+.sub 'die'
+    .param string msg
+    die msg
 .end
 
 # Extend various Parrot's PMCs to play nicely with NQP.

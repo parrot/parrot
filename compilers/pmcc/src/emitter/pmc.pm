@@ -311,6 +311,18 @@ Generate C file's contents for this PMC.
 =cut
 
 method generate_c_code($past) {
+
+    my %vtables := thaw('../../vtable.frozen');
+    #make sure there aren't any misnamed VTABLE functions
+    for self.past.vtables{'default'} {
+        if !%vtables{$_} {
+            #XXX: check that the return type and parameter types are good too
+            #XXX: show a nicer message that points to the failure
+            die("Found an invalid vtable function '"~$_~"'.  Perhaps you misnamed it?");
+        }
+    }
+
+
     self.pre_method_gen();
     my $res :=
           self.past<c_header> ~ "\n\n"
@@ -384,12 +396,6 @@ method generate_class_init_func() {
     @res.push( self.generate_attr_defs() );
     @res.push( self.generate_multis() );
     @res.push( self.generate_passes() );
-
-    my $past := self.past;
-    if ($past<class_init>) {
-        @res.push("/* class_init */\n");
-        @res.push(PMC::Emitter::C.new().emit($past, $past<class_init>));
-    }
 
     @res.push("\n}\n");
     join('', @res);
@@ -521,16 +527,16 @@ method generate_passes() {
     @res.push('    } /* pass 2 */');
     @res.push('    else {');
     
-    my $hll := self.past.hll();
+    my $hll := self.past.traits{'hll'};
 
-    if $hll ne '' && elements(self.past.maps()) {
+    if $hll ne '' && elements(self.past.maps) {
         
         @res.push('    {');
         @res.push('        /* Register this PMC as a HLL mapping */');
         @res.push('        const INTVAL pmc_id = Parrot_get_HLL_id( interp, CONST_STRING_GEN(interp, "'~$hll~'"));');
         @res.push('        if (pmc_id > 0) {');
 
-        for self.past.maps() {
+        for self.past.maps {
             @res.push('            Parrot_register_HLL_type( interp, pmc_id, enum_class_'~$_~', entry);');
         }
 
@@ -539,18 +545,33 @@ method generate_passes() {
         @res.push('');
     }
 
-    @res.push('    /* set up MRO and _namespace */');
-    @res.push('    {');
-    @res.push('        VTABLE * const vt  = interp->vtables[entry];');
-    @res.push('        vt->mro = Parrot_'~self.name~'_get_mro(interp, PMCNULL);');
-    @res.push('        if (vt->ro_variant_vtable)');
-    @res.push('            vt->ro_variant_vtable->mro = vt->mro;');
-    @res.push('    }');
+    @res.push('        /* set up MRO and _namespace */');
+    @res.push('        {');
+    @res.push('            VTABLE * const vt  = interp->vtables[entry];');
+    @res.push('            vt->mro = Parrot_'~self.name~'_get_mro(interp, PMCNULL);');
+    @res.push('            if (vt->ro_variant_vtable)');
+    @res.push('                vt->ro_variant_vtable->mro = vt->mro;');
+    @res.push('        }');
     @res.push('');
-    @res.push('    Parrot_create_mro(interp, entry);');
+    @res.push('        Parrot_create_mro(interp, entry);');
 
+    for self.past.methods { 
+        @res.push('    register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_'~self.name~'_nci_'~$_~'), CONST_STRING_GEN(interp, "'~$_~'"));');
+        if self.past.methods{$_}{'attrs'}{'write'} {
+            @res.push('    Parrot_mark_method_writes(interp, entry, "nci_'~$_~'");');
+        }
+    }
+    @res.push('');
 
-    @res.push('}');
+    if self.past.class_init {
+        @res.push('        /* class_init */');
+        @res.push('        {');
+        @res.push(PMC::Emitter::C.new().emit(self.past, self.past.class_init));
+        #@res.push(self.past.class_init);
+        @res.push('        }');
+    }
+
+    @res.push('    }');
     join("\n", @res);
 }
 
@@ -575,7 +596,6 @@ method generate_get_vtable_func() {
     else {
         $first_parent := @other_parents.shift;
     }
-    say("first parent is "~$first_parent);
 
     @res.push('PARROT_EXPORT');
     @res.push('PARROT_CANNOT_RETURN_NULL');

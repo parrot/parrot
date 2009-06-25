@@ -44,23 +44,30 @@ method traits($/, $key) {
     our $?PMC;
 
     if $key eq 'does' {
+        $?PMC.does.push(~$<identifier>);
     }
     elsif $key eq 'group' {
+        #XXX: only one group is possible
+        #XXX: only valid for dynpmcs
+        $?PMC.traits{'group'} := ~$<identifier>;
     }
     elsif $key eq 'hll' {
-        $?PMC.set_hll(~$<identifier>);
+        #XXX: only one HLL is possible
+        $?PMC.traits{'hll'} := ~$<identifier>;
     }
     elsif $key eq 'provides' {
-        $?PMC.provides().push(~$<identifier>);
+        $?PMC.provides.push(~$<identifier>);
     }
     elsif $key eq 'extends' {
-        $?PMC.parents().push(~$<identifier>);
+        #XXX: some sanity checking here would probably be advisable
+        $?PMC.parents.push(~$<identifier>);
         $?PMC.thaw_pmc_attrs(~$<identifier>);
     }
     elsif $key eq 'maps' {
-        $?PMC.maps().push(~$<identifier>);
+        $?PMC.maps.push(~$<identifier>);
     }
     elsif $key eq 'lib' {
+        $?PMC.traits{'lib'} := ~$<identifier>;
     }
     else {
         $?PMC.traits{$key} := 1;
@@ -137,25 +144,42 @@ method vtable($/) {
         $<c_body>.ast
     );
     $past<parameters> := $<c_signature><c_arguments>.ast;
+
+    my %attrs;
+    for $<method_attr> {
+        %attrs{~$_<identifier>} := 1;
+    }
+    $past<attrs> := %attrs;
+
     make $past;
 }
 
 method method($/) {
     #say('METHOD ' ~$<identifier>);
+    my $method_body := $<c_body>.ast;
+
     my $past := PAST::Block.new(
         :name(~$<identifier>),
         :blocktype('declaration'),
         :returns('void'),           # PCC METHODS returns void
         :node($/),
 
-        $<c_body>.ast
+        $method_body
     );
     #$past<parameters> := $<c_signature><c_arguments>.ast;
+
+    my %attrs;
+    for $<method_attr> {
+        %attrs{~$_<identifier>} := 1;
+    }
+    $past<attrs> := %attrs;
+
     make $past;
 }
 
 method multi($/) {
     #say('MULTI ' ~$<identifier>);
+
     my $past := PAST::Block.new(
         :name(~$<c_signature><identifier>),
         :blocktype('method'),
@@ -200,6 +224,12 @@ method multi($/) {
     $past<short_signature> := $short_sig;
     $past<long_signature>  := join(',', @long_sig);
     $past<full_name>       := "multi_" ~ $past.name ~ "_" ~ join('_', @long_sig);
+
+    my %attrs;
+    for $<method_attr> {
+        %attrs{~$_<identifier>} := 1;
+    }
+    $past<attrs> := %attrs;
 
     make $past;
 }

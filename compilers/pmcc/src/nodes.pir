@@ -42,6 +42,9 @@ PMC class by it self.
 
     # Initialize various attributes
     $P1 = new ['ResizableStringArray']
+    res.'attr'('does', $P1, 1)
+
+    $P1 = new ['ResizableStringArray']
     res.'attr'('parents', $P1, 1)
 
     $P1 = new ['Hash']
@@ -66,13 +69,20 @@ PMC class by it self.
     $P1 = new ['Hash']
     res.'attr'('traits', $P1, 1)
     
-    $P1 = new ['String']
-    res.'attr'('hll', $P1, 1)
-    
     $P1 = new ['ResizableStringArray']
     res.'attr'('maps', $P1, 1)
 
     .return (res)
+.end
+
+=item C<does>
+
+How does this PMC act?.
+
+=cut
+
+.sub 'does' :method
+    .tailcall self.'attr'('does',0,0)
 .end
 
 =item C<parents>
@@ -165,20 +175,6 @@ Get PMC traits.
     .tailcall self.'attr'('traits',0,0)
 .end
 
-=item hll
-
-Get PMC hll name.
-
-=cut
-
-.sub 'hll' :method
-    .tailcall self.'attr'('hll',0,0)
-.end
-
-.sub 'set_hll' :method
-    .param pmc name
-    .tailcall self.'attr'('hll',name,1)
-.end
 
 .sub 'maps' :method
     .tailcall self.'attr'('maps',0,0)

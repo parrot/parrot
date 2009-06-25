@@ -45,10 +45,8 @@ TODO: Parse c_body properly and implement all other functions.
     .param pmc pmclass
     .param pmc past
     .local string res
-    res = "{\n"
     $S0 = self.'!generate_children_body_part'(pmclass, past)
     concat res, $S0
-    concat res, "}\n"
     .return (res)
 .end
 
