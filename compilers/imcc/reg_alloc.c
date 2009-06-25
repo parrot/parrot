@@ -72,7 +72,7 @@ static void compute_one_du_chain(ARGMOD(SymReg *r), ARGIN(IMC_Unit *unit))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*r);
 
-static int first_avail(
+static unsigned int first_avail(
     ARGIN(const IMC_Unit *unit),
     int reg_set,
     ARGOUT_NULLOK(Set **avail))
@@ -1110,7 +1110,7 @@ map_colors(ARGIN(const IMC_Unit* unit), int x, ARGIN(unsigned int *graph),
 
 /*
 
-=item C<static int first_avail(const IMC_Unit *unit, int reg_set, Set **avail)>
+=item C<static unsigned int first_avail(const IMC_Unit *unit, int reg_set, Set **avail)>
 
 find first available register of the given reg_set
 
@@ -1118,7 +1118,7 @@ find first available register of the given reg_set
 
 */
 
-static int
+static unsigned int
 first_avail(ARGIN(const IMC_Unit *unit), int reg_set, ARGOUT_NULLOK(Set **avail))
 {
     ASSERT_ARGS(first_avail)
@@ -1188,10 +1188,10 @@ allocate_uniq(PARROT_INTERP, ARGMOD(IMC_Unit *unit), int usage)
             &&  r->color == -1
             && (r->usage & usage)
             && r->use_count) {
-                Set *avail    = sets[j];
-                int first_reg = avail
-                              ? set_first_zero(avail)
-                              : first_avail(unit, (int)r->set, &avail);
+                Set         *avail     = sets[j];
+                unsigned int first_reg = avail
+                                       ? set_first_zero(avail)
+                                       : first_avail(unit, (int)r->set, &avail);
                 set_add(avail, first_reg);
                 r->color = first_reg++;
 
