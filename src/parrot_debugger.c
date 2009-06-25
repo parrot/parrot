@@ -184,7 +184,7 @@ main(int argc, char *argv[])
             Parrot_pbc_load(interp, pf);
 
             IMCC_push_parser_state(interp);
-            IMCC_INFO(interp)->state->file = strdup(filename);
+            IMCC_INFO(interp)->state->file = str_dup(filename);
 
             if (!(imc_yyin_set(fopen(filename, "r"), yyscanner)))    {
                 IMCC_fatal_standalone(interp, EXCEPTION_PIO_ERROR,

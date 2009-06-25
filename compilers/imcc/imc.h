@@ -527,7 +527,6 @@ struct parser_state_t {
     Interp                *interp;
     char                  *file;
     FILE                  *handle;
-    int                    file_needs_free; /* is *file malloced? */
     int                    line;
     int                    pasm_file;       /* pasm_file mode of this frame */
 };

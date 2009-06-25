@@ -955,7 +955,7 @@ compile_to_bytecode(PARROT_INTERP,
     Parrot_pbc_load(interp, pf);
 
     IMCC_push_parser_state(interp);
-    IMCC_INFO(interp)->state->file = strdup(sourcefile);
+    IMCC_INFO(interp)->state->file = str_dup(sourcefile);
 
     emit_open(interp, per_pbc, per_pbc ? NULL : (void*)output_file);
 
