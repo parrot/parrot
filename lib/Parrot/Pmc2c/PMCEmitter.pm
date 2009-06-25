@@ -698,22 +698,16 @@ EOC
     foreach my $method ( @{ $self->{methods} } ) {
         next unless $method->type eq Parrot::Pmc2c::Method::NON_VTABLE;
 
-        my $proto       = proto( $method->return_type, $method->parameters );
         my $method_name = $method->name;
-        my $symbol_name =
-            defined $method->symbol ? $method->symbol : $method->name;
+        my $symbol_name = $method->symbol;
 
-        if ( exists $method->{PCCMETHOD} ) {
-            $cout .= <<"EOC";
+        if (!defined $method->symbol) {
+            print "\n\nUSING method->name: ".$method->name."\n\n\n";
+        }
+
+        $cout .= <<"EOC";
         register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_${classname}_${method_name}), CONST_STRING_GEN(interp, "$symbol_name"));
 EOC
-        }
-        else {
-            $cout .= <<"EOC";
-        register_nci_method(interp, entry,
-                F2DPTR(Parrot_${classname}_${method_name}), "$symbol_name", "$proto");
-EOC
-        }
         if ( $method->{attrs}{write} ) {
             $cout .= <<"EOC";
         Parrot_mark_method_writes(interp, entry, "$symbol_name");
