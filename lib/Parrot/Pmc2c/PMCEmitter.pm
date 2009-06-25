@@ -828,7 +828,7 @@ sub get_mro_func {
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
     if ($classname ne 'default') {
-        for my $dp (@{ $self->direct_parents}) {
+        for my $dp (reverse @{ $self->direct_parents}) {
             $get_mro .= "    mro = Parrot_${dp}_get_mro(interp, mro);\n"
             unless $dp eq 'default';
         }
@@ -869,7 +869,7 @@ sub get_isa_func {
     my $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT';
 
     if ($classname ne 'default') {
-        for my $dp (@{ $self->direct_parents}) {
+        for my $dp (reverse @{ $self->direct_parents}) {
             $get_isa .= "    isa = Parrot_${dp}_get_isa(interp, isa);\n"
             unless $dp eq 'default';
         }
@@ -905,7 +905,7 @@ sub get_vtable_func {
 
     my $cout      = "";
     my $classname = $self->name;
-    my @other_parents = @{ $self->direct_parents };
+    my @other_parents = reverse @{ $self->direct_parents };
     my $first_parent = shift @other_parents;
 
     my $get_vtable = '';
