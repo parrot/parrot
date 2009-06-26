@@ -2,10 +2,10 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.1.2.0.dylib                    [main]lib
+blib/lib/libparrot.1.3.0.dylib                    [main]lib
 blib/lib/libparrot.a                              [main]lib
 blib/lib/libparrot.dylib                          [main]lib
-blib/lib/libparrot.so.1.2.0                       [main]lib
+blib/lib/libparrot.so.1.3.0                       [main]lib
 blib/lib/libparrot.so                             [main]lib
 compilers/json/JSON/grammar.pbc                   [json]
 compilers/json/JSON.pbc                           [json]
@@ -122,6 +122,7 @@ runtime/parrot/include/opengl_defines.pasm        [main]
 runtime/parrot/include/parrotlib.pbc              [main]
 runtime/parrot/include/pmctypes.pasm              [main]
 runtime/parrot/include/signal.pasm                [main]
+runtime/parrot/include/socket.pasm                [main]
 runtime/parrot/include/stat.pasm                  [main]
 runtime/parrot/include/stdio.pasm                 [main]
 runtime/parrot/include/stringinfo.pasm            [main]
@@ -213,7 +214,9 @@ src/pmc/float.dump                                [devel]src
 src/pmc/hash.dump                                 [devel]src
 src/pmc/integer.dump                              [devel]src
 src/pmc/multisub.dump                             [devel]src
+src/pmc/object.dump                               [devel]src
 src/pmc/pmc_boolean.h                             [devel]include
+src/pmc/pmc_class.h                               [devel]include
 src/pmc/pmc_continuation.h                        [devel]include
 src/pmc/pmc_default.h                             [devel]include
 src/pmc/pmc_fixedintegerarray.h                   [devel]include
@@ -225,11 +228,13 @@ src/pmc/pmc_multisub.h                            [devel]include
 src/pmc/pmc_object.h                              [devel]include
 src/pmc/pmc_parrotlibrary.h                       [devel]include
 src/pmc/pmc_resizablepmcarray.h                   [devel]include
+src/pmc/pmc_role.h                                [devel]include
 src/pmc/pmc_scalar.h                              [devel]include
 src/pmc/pmc_string.h                              [devel]include
 src/pmc/pmc_sub.h                                 [devel]include
 src/pmc/pmc_undef.h                               [devel]include
 src/pmc/resizablepmcarray.dump                    [devel]src
+src/pmc/role.dump                                 [devel]src
 src/pmc/scalar.dump                               [devel]src
 src/pmc/string.dump                               [devel]src
 src/pmc/sub.dump                                  [devel]src

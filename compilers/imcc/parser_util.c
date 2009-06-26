@@ -677,7 +677,7 @@ imcc_compile(PARROT_INTERP, ARGIN(const char *s), int pasm_file,
         IMCC_INFO(interp)->state->next = NULL;
 
     IMCC_INFO(interp)->state->pasm_file = pasm_file;
-    IMCC_INFO(interp)->state->file      = name;
+    IMCC_INFO(interp)->state->file      = mem_sys_strdup(name);
     IMCC_INFO(interp)->expect_pasm      = 0;
 
     compile_string(interp, s, yyscanner);
@@ -941,7 +941,7 @@ imcc_compile_file(PARROT_INTERP, ARGIN(const char *fullname),
     IMCC_push_parser_state(interp);
     {
         /* Store a copy, in order to know how to free it later */
-        char *copyname = strdup(fullname);
+        char *copyname = mem_sys_strdup(fullname);
         IMCC_INFO(interp)->state->file = copyname;
         ext                            = strrchr(copyname, '.');
     }

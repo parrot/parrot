@@ -2,8 +2,32 @@
 
 New in 1.3.0
 - Core
-  + Optimization for parts of the IO system
-  + Fix inheritance heirarchy of FileHandle and Socket PMC types
+  + Optimized parts of the IO system
+  + Fixed inheritance hierarchy of FileHandle and Socket PMC types
+  + Fixed leaks involving subroutines and Parrot_Context
+  + Cleaned up and refactored GC internals, including fixes and optimizations
+  + Optimized PMC class manipulations to use type numbers instead of string names
+  + Fixed problems involving hashval calculations in strings
+  + Removed unnecessary MULTI dispatches in built-in PMCs
+  + Fixed memory leaks involving PMCs that were not properly destroyed
+  + Fixed creation of PMCProxy PMCs in correct namespaces
+  + Added preliminary Pipe support
+  + Fixed cloning of Object PMCs
+  + Added root_new opcode
+  + Added initial versions of Packfile PMCs with read/write capabilities
+- Compilers
+  + Fixed several memory leaks in IMCC
+  + Updated PCT to use root_new opcode
+  + Added support for keyword "self" in NQP
+- Documentation
+  + Improved and expanded /docs/book
+  + Updated project documentation
+  + Defined 'experimental' status and procedures in DEPRECATED.pod
+- Miscellaneous
+  + Cleaned code and improved code-level documentation
+  + Various bugfixes, code cleanups, and coding standard fixes
+  + Added an experimental compiler library to help use PIR libraries from HLLs
+  + Updated OpenGL library and examples to support experimental HLL import
 
 New in 1.2.0
 - Core

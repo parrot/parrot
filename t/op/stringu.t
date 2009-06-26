@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 28;
+use Parrot::Test tests => 32;
 use Parrot::Config;
 
 =head1 NAME
@@ -502,6 +502,78 @@ hello
 OUTPUT
 
 
+SKIP: {
+    skip( 'no ICU lib', 3 ) unless $PConfig{has_icu};
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings to int' );
+.sub main :main
+     $S0 = "140"
+     $I0 = $S0
+     say $I0
+     $I0 = find_encoding 'ucs2'
+     $S0 = trans_encoding $S0, $I0
+     $I0 = $S0
+     say $I0
+.end
+CODE
+140
+140
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings to float' );
+.sub main :main
+     $S0 = "140"
+     $N0 = $S0
+     say $N0
+     $I0 = find_encoding 'ucs2'
+     $S0 = trans_encoding $S0, $I0
+     $N0 = $S0
+     say $N0
+.end
+CODE
+140
+140
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'numification of unicode strings float mixed' );
+.sub main :main
+    $S0 = unicode:"140 r\x{e9}sum\x{e9}s"
+    $N0 = $S0
+    say $N0
+    $I0 = find_encoding 'ucs2'
+    $S0 = trans_encoding $S0, $I0
+    $N0 = $S0
+    say $N0
+.end
+CODE
+140
+140
+OUT
+}
+
+pir_output_is( <<'CODE', <<'OUT', 'concatenation of utf8 and iso-8859-1 (TT#752)' );
+.sub 'main'
+
+    $S1 = chr 0xe5
+    $S2 = chr 0x263b
+
+    $S0 = unicode:"\u00e5\u263b"
+    $S3 = concat $S1, $S2
+    if $S0 == $S3 goto equal_1
+    print "not "
+  equal_1:
+    say "equal"
+
+    $S0 = unicode:"\u263b\u00e5"
+    $S3 = concat $S2, $S1
+    if $S0 == $S3 goto equal_2
+    print "not "
+  equal_2:
+    say "equal"
+.end
+CODE
+equal
+equal
+OUT
 
 
 # Local Variables:

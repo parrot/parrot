@@ -383,7 +383,7 @@ Jonathan Scott Duff
 
     .sub getname :method
         $P0 = getattribute self, "name"
-        print $P0
+        .return($P0)
     .end
 
     .sub speak :method

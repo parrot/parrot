@@ -103,8 +103,8 @@ _mk_instruction(ARGIN(const char *op), ARGIN(const char *fmt), int n,
         (Instruction*)mem_sys_allocate_zeroed(sizeof (Instruction) + reg_space);
     int i;
 
-    ins->opname       = str_dup(op);
-    ins->format       = str_dup(fmt);
+    ins->opname       = mem_sys_strdup(op);
+    ins->format       = mem_sys_strdup(fmt);
     ins->symreg_count = n;
 
     for (i = 0; i < n; i++)

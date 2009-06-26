@@ -33,8 +33,8 @@ You might also select a name (and optionally a quote) for your release.
 For example, you could select a name from
 L<http://en.wikipedia.org/wiki/List_of_parrots>.
 
-Set up your account on L<http://www.parrot.org/> and ask one of Allison, Jerry,
-Jeff, Will, or chromatic to bestow you story-creating powers.
+Set up your account on L<http://www.parrot.org/> and ask an existing release
+manager to provide you with admin privileges if you don't already have them.
 
 =item 1.
 
@@ -230,13 +230,12 @@ features, just be sure to say the same thing in both text and HTML versions.
 
 =item 10.
 
-Update the website. You will need an account on L<http://www.parrot.org>.
+Update the website. You will need an account with administrative rights
+on L<http://www.parrot.org>.
 
 =over 4
 
 =item a
-
-At this step, the "editor" privilege is needed, "poster" is not enough.
 
 Add a new page for the release announcement with "Create content" -> "Story".
 There's some additional stuff needed at the top of the page; use one of the
@@ -264,8 +263,6 @@ Under "Publishing options" make sure "Published" and "Promoted to front page"
 are checked.
 
 =item e
-
-At this step, the "admin" privilege is needed.
 
 Under "Administer" -> "Site building" -> "URL Redirects", change the URL for
 "release/current" to the FTP directory for the new release (for example,
@@ -364,14 +361,13 @@ the 3rd Tuesday of each month.
 The starred releases are Parrot's twice-yearly supported releases, see
 F<docs/project/support_policy.pod>.
 
- - June 16, 2009     - 1.3  - whiteknight
  - July 21, 2009     - 1.4* - cotto
  - August 18, 2009   - 1.5  - rgrjr
- - Sept 21, 2009     - 1.6  -
+ - Sept 15, 2009     - 1.6  - particle
  - Oct 20, 2009      - 1.7  -
- - Nov 24, 2009      - 1.8  -
- - Dec 22, 2009      - 1.9  -
- - Jan 18, 2010      - 2.0* -
+ - Nov 17, 2009      - 1.8  -
+ - Dec 15, 2009      - 1.9  -
+ - Jan 19, 2010      - 2.0* -
 
 =cut
 

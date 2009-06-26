@@ -325,7 +325,8 @@ Parrot_gc_add_pmc_ext(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_gc_add_pmc_ext)
     Small_Object_Pool * const pool = interp->arena_base->pmc_ext_pool;
-    pmc->pmc_ext = (PMC_EXT *)pool->get_free_object(interp, pool);
+    if (!pmc->pmc_ext)
+        pmc->pmc_ext = (PMC_EXT *)pool->get_free_object(interp, pool);
     if (!pmc->pmc_ext)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: PMC_EXT allocation failed!\n");
@@ -362,17 +363,16 @@ Parrot_gc_free_pmc_ext(PARROT_INTERP, ARGMOD(PMC *p))
     Arenas            * const arena_base = interp->arena_base;
     Small_Object_Pool * const ext_pool   = arena_base->pmc_ext_pool;
 
+    if (!p->pmc_ext)
+        return;
+
     if (PObj_is_PMC_shared_TEST(p) && PMC_sync(p)) {
         MUTEX_DESTROY(PMC_sync(p)->pmc_lock);
         mem_internal_free(PMC_sync(p));
         PMC_sync(p) = NULL;
     }
-
-    if (p->pmc_ext) {
-        ext_pool->add_free_object(interp, ext_pool, p->pmc_ext);
-        ext_pool->num_free_objects++;
-    }
-
+    ext_pool->add_free_object(interp, ext_pool, p->pmc_ext);
+    ext_pool->num_free_objects++;
     p->pmc_ext = NULL;
 }
 
@@ -394,6 +394,9 @@ Parrot_gc_add_pmc_sync(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(Parrot_gc_add_pmc_sync)
     if (!PObj_is_PMC_EXT_TEST(pmc))
         Parrot_gc_add_pmc_ext(interp, pmc);
+    if (PMC_sync(pmc))
+        /* This mutex already exists, leave it alone. */
+        return;
     PMC_sync(pmc) = mem_allocate_typed(Sync);
     if (!PMC_sync(pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,

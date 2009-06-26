@@ -39,6 +39,7 @@ cygwin1.7.0-x86-gcc4.3.2      4   Y    Y    -     -   -   Y    Y     Y  20090315
 dragonfly2.2.0-i386-gcc-4.1.2 4   Y    Y    -     Y   Y   Y    Y     ?  20090427
 freebsd-x86-gcc-4.2.1         4   Y    Y    Y     ?   ?   Y    Y     Y  20090415
 freebsd-amd64-gcc-4.2.1       8   Y    -    -     ?   ?   Y    Y     Y  20090419
+linux-amd64-clang-r73854      8   ?    ?    =     Y   Y   Y/4  Y/1   ?  20090622
 linux-ppc-gcc3.4.5                Y    Y    Y     ?   ?   Y    Y     ?  20080519
 linux-s390x-gcc4.1.2         B4   ?    -    -     Y   Y   Y    Y/2   ?  20080908
 linux-x86_64-gcc4.1.2         8   Y    -    -     Y   Y   Y    Y     ?  20080220
@@ -93,6 +94,8 @@ Remarks:
    --ccflags='-m64' --ldflags='-m64' --linkflags='-m64'
 *2 http://rt.perl.org/rt3/Ticket/Display.html?id=60926
 *3 failures in 'make examples_tests' (part of 'make fulltest')
+*4 compiles with --ccflags=-U__APPLE_CC__ --without-gmp
+   See http://lists.parrot.org/pipermail/parrot-dev/2009-June/002407.html
 
 The following configurations are also working on x86/linux (and possibly
 other platforms):

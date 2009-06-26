@@ -715,7 +715,6 @@
     $S0 = expr.'name'()
     if $S0 != 'infix:,' goto one_arg
   comma_arg:
-    .local pmc iter
     iter = expr.'iterator'()
   iter_loop:
     unless iter goto end

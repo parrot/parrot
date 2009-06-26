@@ -242,8 +242,8 @@ Initializes the interpreter.
             PMC_data(SELF) = attrs;
             create_interp(SELF, INTERP);
             PARROT_ASSERT(attrs->interp);
-            PObj_active_destroy_SET(SELF);
         }
+        PObj_active_destroy_SET(SELF);
     }
 
 /*
@@ -806,7 +806,7 @@ The valid values for fileno are listed in include/stdio.pasm
 Optionally sets the parrot handler passed as second argument
 as the specified standard handler.
 
-This method is experimental.
+This method is experimental. See TT #264.
 
 =cut
 

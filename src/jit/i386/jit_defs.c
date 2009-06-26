@@ -2277,13 +2277,13 @@ Parrot_jit_build_call_func(PARROT_INTERP, PMC *pmc_nci, STRING *signature, int *
             case 'b':   /* buffer (void*) pass PObj_bufstart(SReg) */
                 emitm_call_cfunc(pc, get_nci_S);
                 emitm_movl_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
-                               (size_t) &PObj_bufstart((STRING *) 0));
+                               (size_t) &PObj_bufstart((STRING *) NULL));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'B':   /* buffer (void**) pass &PObj_bufstart(SReg) */
                 emitm_call_cfunc(pc, get_nci_S);
                 emitm_lea_m_r(interp, pc, emit_EAX, emit_EAX, 0, 1,
-                              (size_t) &PObj_bufstart((STRING *) 0));
+                              (size_t) &PObj_bufstart((STRING *) NULL));
                 emitm_movl_r_m(interp, pc, emit_EAX, emit_EBP, 0, 1, args_offset);
                 break;
             case 'S':

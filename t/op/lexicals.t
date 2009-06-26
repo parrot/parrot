@@ -226,7 +226,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'get_lexpad - set two vars via pad (2 lex -
     .local pmc pad, interp
     interp = getinterp
     pad = interp["lexpad"]
-    .local pmc pad
     unless null pad goto ok
     print "pad is NULL\n"
     end

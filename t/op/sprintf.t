@@ -198,6 +198,9 @@ tag C<all> is allowed for todo tests that should fail on any system.
     description .= ' actual: >'
     description .= actual
     description .= '<'
+    description .= ' expected: >'
+    description .= expected
+    description .= '<'
     goto is_nok
 
     # remove /'s

@@ -8,10 +8,9 @@ triangle.p6 - Initialize GLUT and render a simple OpenGL animation
 
 =head1 SYNOPSIS
 
-    $ cd parrot-home
-    $ make perl6
-    $ cd parrot-home/runtime/parrot/library
-    $ ../../../perl6 ../../../examples/opengl/triangle.p6
+    $ cd rakudo-home
+    $ export PERL6LIB=rakudo-home:parrot-home/runtime/parrot/library
+    $ ./perl6 parrot-home/examples/opengl/triangle.p6
 
 =head1 DESCRIPTION
 
@@ -30,38 +29,50 @@ For a more complex and well-behaved example, try F<shapes.p6>.
 =end pod
 
 
-use OpenGL;
-use NCI::call_toolkit_init;
+# None of these currently work; they all create an inescapable new lexical pad
+# require 'glutconst.p6';
+# 'glutconst.p6'.evalfile;
+# eval open('glutconst.p6').slurp;
 
-# .include 'opengl_defines.pasm'
-my $GL_COLOR_BUFFER_BIT = 0x4000;
-my $GL_DEPTH_BUFFER_BIT = 0x0100;
-my $GL_TRIANGLES        = 4;
-my $GLUT_DOUBLE         = 2;
-my $GLUT_RGBA           = 0;
+constant GLUT_RGBA           = 0x0000;
+constant GLUT_DOUBLE         = 0x0002;
+constant GL_TRIANGLES        = 0x0004;
+constant GL_DEPTH_BUFFER_BIT = 0x0100;
+constant GL_COLOR_BUFFER_BIT = 0x4000;
 
+use OpenGL:from<parrot>;
+use NCI::Utils:from<parrot>;
 
-OpenGL::_export_all_functions();
+our $rotating  = 1;
+our $prev_time = time();
+our $window; 
 
-@*ARGS = NCI::call_toolkit_init(&glutInit, @*ARGS);
+sub MAIN(*@ARGS is rw) {
+    # Initialize GLUT
+    @ARGS = call_toolkit_init(&glutInit, @ARGS, $*PROGRAM_NAME);
 
-glutInitDisplayMode($GLUT_DOUBLE +| $GLUT_RGBA);
+    # Set display mode
+    glutInitDisplayMode(GLUT_DOUBLE +| GLUT_RGBA);
 
-my $window = glutCreateWindow('Test');
+    # Create GLUT window
+    $window = glutCreateWindow('Rotating Triangle NCI Test');
 
-glutDisplayFunc(  &draw     );
-glutIdleFunc(     &idle     );
-glutKeyboardFunc( &keyboard );
+    # Set up GLUT callbacks
+    glutDisplayFunc(  &draw     );
+    glutIdleFunc(     &idle     );
+    glutKeyboardFunc( &keyboard );
 
-my $rotating  = 1;
-my $prev_time = time();
+    # Enter the GLUT main loop
+    glutMainLoop();
 
-glutMainLoop();
+    # Rakudo bug -- glutMainLoop() never returns, but Rakudo dies without this
+    return;
+}
 
 sub draw {
-    glClear($GL_COLOR_BUFFER_BIT +| $GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT +| GL_DEPTH_BUFFER_BIT);
 
-    glBegin($GL_TRIANGLES);
+    glBegin(GL_TRIANGLES);
     glColor3f(1, 0, 0); glVertex3f(-.5, -.5, 0);
     glColor3f(0, 1, 0); glVertex3f( .5, -.5, 0);
     glColor3f(0, 0, 1); glVertex3f(0  ,  .5, 0);

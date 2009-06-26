@@ -17,7 +17,7 @@ Tests all non-branching conditional operators.
 =cut
 
 
-.const int TESTS = 90
+.const int TESTS = 93
 
 .macro EXP()
   exp_nok:
@@ -38,6 +38,10 @@ Tests all non-branching conditional operators.
     desc = .op
 .endm
 
+.macro RESET_DESC(op)
+    desc = .op
+.endm
+
 .macro CONCAT_RES()
     $S98 = $I1
     concat res, $S98
@@ -53,7 +57,8 @@ Tests all non-branching conditional operators.
     'isntsame'()
     'istrue'()
     'isfalse'()
-    'isnull'()
+    'isnull_pmc'()
+    'isnull_string'()
     'isgt'()
     'isge'()
     'isle'()
@@ -159,9 +164,9 @@ Tests all non-branching conditional operators.
 .end
 
 
-.sub 'isnull'
+.sub 'isnull_pmc'
     .local int exp, res
-    .SET_DESC('isnull')
+    .SET_DESC('isnull pmc')
 
   init:
     $S0 = 'FUBAR'
@@ -189,6 +194,18 @@ Tests all non-branching conditional operators.
 .end
 
 
+.sub 'isnull_string'
+    .local int res
+    null $S0
+    res = isnull $S0
+    is(res, 1, 'isnull string null')
+    $S0 = 'something'
+    res = isnull $S0
+    is(res, 0, 'isnull string non null')
+    res = isnull 'H'
+    is(res, 0, 'isnull string constant')
+.end
+
 .sub 'isgt'
     .local string exp, res
 
@@ -209,7 +226,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_ic_i')
+    .RESET_DESC('isgt_i_ic_i')
     set $I1, 111
     set $I3, 333
     isgt $I1, 222, $I3
@@ -221,7 +238,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_i_ic')
+    .RESET_DESC('isgt_i_i_ic')
     set $I1, 111
     set $I2, 222
     isgt $I1, $I2, 223
@@ -233,7 +250,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_ic_ic')
+    .RESET_DESC('isgt_i_ic_ic')
     set $I1, 111
     isgt $I1, 222, 223
     .CONCAT_RES()
@@ -244,7 +261,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_n_n')
+    .RESET_DESC('isgt_i_n_n')
     set $I1, 111
     set $N2, 2.22
     set $N3, 3.33
@@ -259,7 +276,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_nc_n')
+    .RESET_DESC('isgt_i_nc_n')
     set $I1, 111
     set $N3, 3.33
     isgt $I1, 2.22, $N3
@@ -271,7 +288,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_n_nc')
+    .RESET_DESC('isgt_i_n_nc')
     set $I1, 111
     set $N2, 2.22
     isgt $I1, $N2, 2.23
@@ -283,7 +300,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_nc_nc')
+    .RESET_DESC('isgt_i_nc_nc')
     set $I1, 111
     isgt $I1, 2.22, 2.23
     .CONCAT_RES()
@@ -294,7 +311,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_s_s')
+    .RESET_DESC('isgt_i_s_s')
     set $I1, 111
     set $S2, "Aaa"
     set $S3, "Bbb"
@@ -309,7 +326,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_sc_s')
+    .RESET_DESC('isgt_i_sc_s')
     set $I1, 111
     set $S3, "Bbb"
     isgt $I1, "Aaa", $S3
@@ -321,7 +338,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_s_sc')
+    .RESET_DESC('isgt_i_s_sc')
     set $I1, 111
     set $S2, "Bbb"
     isgt $I1, $S2, "Ccc"
@@ -333,7 +350,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isgt_i_sc_sc')
+    .RESET_DESC('isgt_i_sc_sc')
     set $I1, 111
     isgt $I1, "Bbb", "Ccc"
     .CONCAT_RES()
@@ -365,7 +382,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_ic_i')
+    .RESET_DESC('isge_i_ic_i')
     set $I1, 111
     set $I3, 333
     isge $I1, 222, $I3
@@ -377,7 +394,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_i_ic')
+    .RESET_DESC('isge_i_i_ic')
     set $I1, 111
     set $I2, 222
     isge $I1, $I2, 223
@@ -389,7 +406,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_ic_ic')
+    .RESET_DESC('isge_i_ic_ic')
     set $I1, 111
     isge $I1, 222, 223
     .CONCAT_RES()
@@ -400,7 +417,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_n_n')
+    .RESET_DESC('isge_i_n_n')
     set $I1, 111
     set $N2, 2.22
     set $N3, 3.33
@@ -415,7 +432,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_nc_n')
+    .RESET_DESC('isge_i_nc_n')
     set $I1, 111
     set $N3, 3.33
     isge $I1, 2.22, $N3
@@ -427,7 +444,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_n_nc')
+    .RESET_DESC('isge_i_n_nc')
     set $I1, 111
     set $N2, 2.22
     isge $I1, $N2, 2.23
@@ -439,7 +456,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_nc_nc')
+    .RESET_DESC('isge_i_nc_nc')
     set $I1, 111
     isge $I1, 2.22, 2.23
     .CONCAT_RES()
@@ -450,7 +467,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_s_s')
+    .RESET_DESC('isge_i_s_s')
     set $I1, 111
     set $S2, "Aaa"
     set $S3, "Bbb"
@@ -465,7 +482,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_sc_s')
+    .RESET_DESC('isge_i_sc_s')
     set $I1, 111
     set $S3, "Bbb"
     isge $I1, "Aaa", $S3
@@ -477,7 +494,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_s_sc')
+    .RESET_DESC('isge_i_s_sc')
     set $I1, 111
     set $S2, "Bbb"
     isge $I1, $S2, "Ccc"
@@ -489,7 +506,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isge_i_sc_sc')
+    .RESET_DESC('isge_i_sc_sc')
     set $I1, 111
     isge $I1, "Bbb", "Ccc"
     .CONCAT_RES()
@@ -521,7 +538,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_ic_i')
+    .RESET_DESC('isle_i_ic_i')
     set $I1, 111
     set $I3, 333
     isle $I1, 222, $I3
@@ -533,7 +550,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_i_ic')
+    .RESET_DESC('isle_i_i_ic')
     set $I1, 111
     set $I2, 222
     isle $I1, $I2, 223
@@ -545,7 +562,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_ic_ic')
+    .RESET_DESC('isle_i_ic_ic')
     set $I1, 111
     isle $I1, 222, 223
     .CONCAT_RES()
@@ -556,7 +573,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_n_n')
+    .RESET_DESC('isle_i_n_n')
     set $I1, 111
     set $N2, 2.22
     set $N3, 3.33
@@ -571,7 +588,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_nc_n')
+    .RESET_DESC('isle_i_nc_n')
     set $I1, 111
     set $N3, 3.33
     isle $I1, 2.22, $N3
@@ -583,7 +600,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_n_nc')
+    .RESET_DESC('isle_i_n_nc')
     set $I1, 111
     set $N2, 2.22
     isle $I1, $N2, 2.23
@@ -595,7 +612,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_nc_nc')
+    .RESET_DESC('isle_i_nc_nc')
     set $I1, 111
     isle $I1, 2.22, 2.23
     .CONCAT_RES()
@@ -606,7 +623,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_s_s')
+    .RESET_DESC('isle_i_s_s')
     set $I1, 111
     set $S2, "Aaa"
     set $S3, "Bbb"
@@ -621,7 +638,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_sc_s')
+    .RESET_DESC('isle_i_sc_s')
     set $I1, 111
     set $S3, "Bbb"
     isle $I1, "Aaa", $S3
@@ -633,7 +650,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_s_sc')
+    .RESET_DESC('isle_i_s_sc')
     set $I1, 111
     set $S2, "Bbb"
     isle $I1, $S2, "Ccc"
@@ -645,7 +662,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isle_i_sc_sc')
+    .RESET_DESC('isle_i_sc_sc')
     set $I1, 111
     isle $I1, "Bbb", "Ccc"
     .CONCAT_RES()
@@ -677,7 +694,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_ic_i')
+    .RESET_DESC('islt_i_ic_i')
     set $I1, 111
     set $I3, 333
     islt $I1, 222, $I3
@@ -689,7 +706,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_i_ic')
+    .RESET_DESC('islt_i_i_ic')
     set $I1, 111
     set $I2, 222
     islt $I1, $I2, 223
@@ -701,7 +718,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_ic_ic')
+    .RESET_DESC('islt_i_ic_ic')
     set $I1, 111
     islt $I1, 222, 223
     .CONCAT_RES()
@@ -712,7 +729,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_n_n')
+    .RESET_DESC('islt_i_n_n')
     set $I1, 111
     set $N2, 2.22
     set $N3, 3.33
@@ -727,7 +744,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_nc_n')
+    .RESET_DESC('islt_i_nc_n')
     set $I1, 111
     set $N3, 3.33
     islt $I1, 2.22, $N3
@@ -739,7 +756,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_n_nc')
+    .RESET_DESC('islt_i_n_nc')
     set $I1, 111
     set $N2, 2.22
     islt $I1, $N2, 2.23
@@ -751,7 +768,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_nc_nc')
+    .RESET_DESC('islt_i_nc_nc')
     set $I1, 111
     islt $I1, 2.22, 2.23
     .CONCAT_RES()
@@ -762,7 +779,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_s_s')
+    .RESET_DESC('islt_i_s_s')
     set $I1, 111
     set $S2, "Aaa"
     set $S3, "Bbb"
@@ -777,7 +794,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_sc_s')
+    .RESET_DESC('islt_i_sc_s')
     set $I1, 111
     set $S3, "Bbb"
     islt $I1, "Aaa", $S3
@@ -789,7 +806,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_s_sc')
+    .RESET_DESC('islt_i_s_sc')
     set $I1, 111
     set $S2, "Bbb"
     islt $I1, $S2, "Ccc"
@@ -801,7 +818,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('islt_i_sc_sc')
+    .RESET_DESC('islt_i_sc_sc')
     set $I1, 111
     islt $I1, "Bbb", "Ccc"
     .CONCAT_RES()
@@ -833,7 +850,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_ic_i')
+    .RESET_DESC('iseq_i_ic_i')
     set $I1, 111
     set $I3, 333
     iseq $I1, 222, $I3
@@ -845,7 +862,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_i_ic')
+    .RESET_DESC('iseq_i_i_ic')
     set $I1, 111
     set $I2, 222
     iseq $I1, $I2, 223
@@ -857,7 +874,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_ic_ic')
+    .RESET_DESC('iseq_i_ic_ic')
     set $I1, 111
     iseq $I1, 222, 223
     .CONCAT_RES()
@@ -868,7 +885,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_n_n')
+    .RESET_DESC('iseq_i_n_n')
     set $I1, 111
     set $N2, 2.22
     set $N3, 3.33
@@ -883,7 +900,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_nc_n')
+    .RESET_DESC('iseq_i_nc_n')
     set $I1, 111
     set $N3, 3.33
     iseq $I1, 2.22, $N3
@@ -895,7 +912,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_n_nc')
+    .RESET_DESC('iseq_i_n_nc')
     set $I1, 111
     set $N2, 2.22
     iseq $I1, $N2, 2.23
@@ -907,7 +924,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_nc_nc')
+    .RESET_DESC('iseq_i_nc_nc')
     set $I1, 111
     iseq $I1, 2.22, 2.23
     .CONCAT_RES()
@@ -918,7 +935,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_s_s')
+    .RESET_DESC('iseq_i_s_s')
     set $I1, 111
     set $S2, "Aaa"
     set $S3, "Bbb"
@@ -933,7 +950,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_sc_s')
+    .RESET_DESC('iseq_i_sc_s')
     set $I1, 111
     set $S3, "Bbb"
     iseq $I1, "Aaa", $S3
@@ -945,7 +962,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_s_sc')
+    .RESET_DESC('iseq_i_s_sc')
     set $I1, 111
     set $S2, "Bbb"
     iseq $I1, $S2, "Ccc"
@@ -957,7 +974,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('iseq_i_sc_sc')
+    .RESET_DESC('iseq_i_sc_sc')
     set $I1, 111
     iseq $I1, "Bbb", "Ccc"
     .CONCAT_RES()
@@ -989,7 +1006,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_ic_i')
+    .RESET_DESC('isne_i_ic_i')
     set $I1, 111
     set $I3, 333
     isne $I1, 222, $I3
@@ -1001,7 +1018,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_i_ic')
+    .RESET_DESC('isne_i_i_ic')
     set $I1, 111
     set $I2, 222
     isne $I1, $I2, 223
@@ -1013,7 +1030,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_ic_ic')
+    .RESET_DESC('isne_i_ic_ic')
     set $I1, 111
     isne $I1, 222, 223
     .CONCAT_RES()
@@ -1024,7 +1041,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_n_n')
+    .RESET_DESC('isne_i_n_n')
     set $I1, 111
     set $N2, 2.22
     set $N3, 3.33
@@ -1039,7 +1056,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_nc_n')
+    .RESET_DESC('isne_i_nc_n')
     set $I1, 111
     set $N3, 3.33
     isne $I1, 2.22, $N3
@@ -1051,7 +1068,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_n_nc')
+    .RESET_DESC('isne_i_n_nc')
     set $I1, 111
     set $N2, 2.22
     isne $I1, $N2, 2.23
@@ -1063,7 +1080,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_nc_nc')
+    .RESET_DESC('isne_i_nc_nc')
     set $I1, 111
     isne $I1, 2.22, 2.23
     .CONCAT_RES()
@@ -1074,7 +1091,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_s_s')
+    .RESET_DESC('isne_i_s_s')
     set $I1, 111
     set $S2, "Aaa"
     set $S3, "Bbb"
@@ -1089,7 +1106,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_sc_s')
+    .RESET_DESC('isne_i_sc_s')
     set $I1, 111
     set $S3, "Bbb"
     isne $I1, "Aaa", $S3
@@ -1101,7 +1118,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_s_sc')
+    .RESET_DESC('isne_i_s_sc')
     set $I1, 111
     set $S2, "Bbb"
     isne $I1, $S2, "Ccc"
@@ -1113,7 +1130,7 @@ Tests all non-branching conditional operators.
     is( res, exp, desc)
 
     res = ''
-    .SET_DESC('isne_i_sc_sc')
+    .RESET_DESC('isne_i_sc_sc')
     set $I1, 111
     isne $I1, "Bbb", "Ccc"
     .CONCAT_RES()

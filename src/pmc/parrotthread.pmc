@@ -70,7 +70,6 @@ static INTVAL do_thread_run(PARROT_INTERP, PMC *thread,
 
     pmc_reuse(interp, thread, enum_class_ParrotRunningThread, 0);
 
-    PObj_active_destroy_CLEAR(thread);
     PObj_custom_mark_CLEAR(thread);
     VTABLE_set_integer_native(interp, thread, tid);
 

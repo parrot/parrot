@@ -68,7 +68,7 @@ Initializes the subroutine.
      */
     VTABLE void init() {
         Parrot_Sub_attributes * const attrs =
-            mem_allocate_zeroed_typed(Parrot_Sub_attributes);
+            mem_allocate_typed(Parrot_Sub_attributes);
 
         attrs->sub     = new_sub(INTERP);
         PMC_data(SELF) = attrs;
@@ -89,16 +89,17 @@ Destroys the subroutine.
         Parrot_sub *sub;
         GET_ATTR_sub(INTERP, SELF, sub);
 
-        if (!sub)
-            return;
-        if (sub->arg_info)
-            mem_sys_free(sub->arg_info);
-        if (sub->ctx)
-            Parrot_free_context(INTERP, sub->ctx, 1);
-        if (sub->outer_ctx)
-            Parrot_free_context(INTERP, sub->outer_ctx, 1);
+        if (sub) {
+            if (sub->arg_info)
+                mem_sys_free(sub->arg_info);
+            if (sub->ctx)
+                Parrot_free_context(INTERP, sub->ctx, 1);
+            if (sub->outer_ctx)
+                Parrot_free_context(INTERP, sub->outer_ctx, 1);
 
-        mem_sys_free(sub);
+            mem_sys_free(sub);
+        }
+
         mem_sys_free(PMC_data(SELF));
         PMC_data(SELF) = NULL;
     }

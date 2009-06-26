@@ -143,6 +143,11 @@ imc_cleanup(PARROT_INTERP, ARGIN_NULLOK(void *yyscanner))
     clear_globals(interp);
     mem_sys_free(IMCC_INFO(interp)->ghash.data);
     IMCC_INFO(interp)->ghash.data = NULL;
+
+    if (IMCC_INFO(interp)->state) {
+        free(IMCC_INFO(interp)->state->file);
+        IMCC_INFO(interp)->state->file = NULL;
+    }
 }
 
 

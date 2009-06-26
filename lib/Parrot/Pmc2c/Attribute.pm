@@ -145,7 +145,7 @@ EOA
         $decl .= <<"EOA";
             PMC * const attr_value = VTABLE_get_attr_str(interp, \\
                               pmc, Parrot_str_new_constant(interp, "$attrname")); \\
-            (dest) =  (PMC_IS_NULL(attr_value) ? (STRING *) 0: VTABLE_get_string(interp, attr_value)); \\
+            (dest) =  (PMC_IS_NULL(attr_value) ? (STRING *)NULL : VTABLE_get_string(interp, attr_value)); \\
 EOA
     }
     elsif ($attrtype =~ $isptrtopmc) {

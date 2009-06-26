@@ -50,6 +50,7 @@ Create a new, invalid handle to a running thread.
             mem_allocate_zeroed_typed(Parrot_ParrotRunningThread_attributes);
         attrs->tid = -1;
         PMC_data(SELF) = attrs;
+        PObj_active_destroy_SET(SELF);
     }
 
 /*

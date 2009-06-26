@@ -1,0 +1,1807 @@
+=pod
+
+=head1 Variables
+
+Parrot is a register-based virtual machine. It has four typed register sets --
+integers, floating-point numbers, strings, and objects.  All variables in PIR
+are one of these four types. Whether you work with register variables or named
+variables, you're actually working directly with register storage locations in
+the virtual machine.
+
+If you've ever worked with an assembly language before, you may immediately
+jump to the conclusion that C<$I0> is the zeroth integer register in the
+register set, but Parrot is a bit smarter than that. The number of a register
+variable does not necessarily correspond to the register used internally;
+Parrot's compiler maps registers as appropriate for speed and memory
+considerations. The only guarantee Parrot gives you is that you'll always get
+the same storage location when you use C<$I0> in the same subroutine.
+
+=head2 Assignment
+
+X<variable assignment>
+X<PIR operators; =>
+
+The most basic operation on a variable is assignment using the C<=>
+operator:
+
+=begin PIR_FRAGMENT
+
+  $I0 = 42        # set integer variable to the value 42
+  $N3 = 3.14159   # set number variable to an approximation of pi
+  $I1 = $I0       # set $I1 to the value of $I0
+
+=end PIR_FRAGMENT
+
+X<exchange>
+X<opcodes; exchange>
+
+The C<exchange> opcode swaps the contents of two variables of the same type.
+This example sets C<$I0> to the value of C<$I1> and sets C<$I1> to the value
+of C<$I0>.
+
+=begin PIR_FRAGMENT
+
+  exchange $I0, $I1
+
+=end PIR_FRAGMENT
+
+X<null>
+X<opcodes; null>
+
+The C<null> opcode sets an integer or number variable to a zero value,
+and undefines a string or object.
+
+=begin PIR_FRAGMENT
+
+  null $I0  # 0
+  null $N0  # 0.0
+  null $S0  # NULL
+  null $P0  # PMCNULL
+
+=end PIR_FRAGMENT
+
+=head2 Working with Numbers
+
+PIR has an extensive set of instructions that work with integers,
+floating-point numbers, and numeric PMCs. Many of these instructions
+have a variant that modifies the result in place:
+
+=begin PIR_FRAGMENT
+
+  $I0 = $I1 + $I2
+  $I0 += $I1
+
+=end PIR_FRAGMENT
+
+The first form of C<+> stores the sum of the two arguments in the result
+variable, C<$I0>. The second variant, C<+=>, adds the single argument to
+C<$I0> and stores the sum back in C<$I0>.
+
+The arguments can be Parrot literals, variables, or constants.  If the
+result is an integer type, like C<$I0>, the arguments must also be
+integers. A number result, like C<$N0>, usually requires number
+arguments, but many numeric instructions also allow the final argument to
+be an integer. Instructions with a PMC result may accept an integer,
+floating-point, or PMC final argument:
+
+=begin PIR_FRAGMENT
+
+  $P0 = $P1 * $P2
+  $P0 = $P1 * $I2
+  $P0 = $P1 * $N2
+  $P0 *= $P1
+  $P0 *= $I1
+  $P0 *= $N1
+
+=end PIR_FRAGMENT
+
+There are many numeric opcodes; a complete list is available in "PIR Opcodes"
+in Chapter 11.
+
+=head3 Unary numeric opcodes
+
+X<unary numeric opcodes>
+
+Unary opcodes have a single argument.  They either return a result or modify
+the argument in place. Some of the most common unary numeric opcodes are C<inc>
+(increment), C<dec> (decrement), C<abs> (absolute value), C<neg> (negate), and
+C<fact> (factorial):
+
+=begin PIR_FRAGMENT
+
+  $N0 = abs -5.0  # the absolute value of -5.0 is 5.0
+  $I1 = fact  5   # the factorial of 5 is 120
+  inc $I1         # 120 incremented by 1 is 121
+
+=end PIR_FRAGMENT
+
+=head3 Binary numeric opcodes
+
+X<binary numeric opcodes>
+
+Binary opcodes have two arguments and a result.  Parrot provides
+addition (C<+> or C<add>), subtraction (C<-> or C<sub>), multiplication
+(C<*> or C<mul>), division (C</> or C<div>), modulus (C<%> or C<mod>),
+and exponent (C<pow>) opcodes, as well as C<gcd>X<gcd opcode>
+(greatest common divisor) and C<lcm>X<lcm opcode> (least common
+multiple).
+
+=begin PIR_FRAGMENT
+
+  $I0 = 12 / 5
+  $I0 = 12 % 5
+
+=end PIR_FRAGMENT
+
+=head3 Floating-point operations
+
+X<float opcodes>
+
+The most common floating-point operations are C<ln> (natural log), C<log2> (log
+base 2), C<log10> (log base 10), and C<exp> (I<e>G<x>), as well as a full set
+of trigonometric opcodes such as C<sin> (sine), C<cos> (cosine), C<tan>
+(tangent), C<sec> (secant), C<cosh> (hyperbolic cosine), C<tanh> (hyperbolic
+tangent), C<sech> (hyperbolic secant), C<asin> (arc sine), C<acos> (arc
+cosine), C<atan> (arc tangent), C<asec> (arc secant), C<exsec> (exsecant),
+C<hav> (haversine), and C<vers> (versine). All angle arguments for the
+X<trigonometric functions> trigonometric functions are in radians:
+
+=begin PIR_FRAGMENT
+
+  $N0 = sin $N1
+  $N0 = exp 2
+
+=end PIR_FRAGMENT
+
+The majority of the floating-point operations have a single argument and a
+single result. The arguments can generally be either an integer or number, but
+many of these opcodes require the result to be a number.
+
+=head3 Logical and Bitwise Operations
+
+X<logical opcodes>
+
+The logical opcodes evaluate the truth of their arguments.  They're most useful
+to make decisions for control flow.  Integers and numeric PMCs support logical
+are false if they're 0 and true otherwise. Strings are false if they're the
+empty string or a single character "0", and true otherwise. PMCs are true when
+their C<get_bool>X<get_bool vtable method> vtable method returns a nonzero
+value.
+
+The C<and>X<and opcode> opcode returns the first argument if
+it's false and the second argument otherwise:
+
+=begin PIR_FRAGMENT
+
+  $I0 = and 0, 1  # returns 0
+  $I0 = and 1, 2  # returns 2
+
+=end PIR_FRAGMENT
+
+The C<or>X<or opcode> opcode returns the first argument if
+it's true and the second argument otherwise:
+
+=begin PIR_FRAGMENT
+
+  $I0 = or 1, 0  # returns 1
+  $I0 = or 0, 2  # returns 2
+
+  $P0 = or $P1, $P2
+
+=end PIR_FRAGMENT
+
+Both C<and> and C<or> are short-circuiting ops. If they can determine what
+value to return from the first argument, they'll never evaluate the third.
+This is significant only for PMCs, as they might have side effects on
+evaluation.
+
+The C<xor>X<xor opcode> opcode returns the first argument if it is the only
+true value, returns the second argument if it is the only true value, and
+returns false if both values are true or both are false:
+
+=begin PIR_FRAGMENT
+
+  $I0 = xor 1, 0  # returns 1
+  $I0 = xor 0, 1  # returns 1
+  $I0 = xor 1, 1  # returns 0
+  $I0 = xor 0, 0  # returns 0
+
+=end PIR_FRAGMENT
+
+The C<not>X<not opcode> opcode returns a true value when the argument is false
+and a false value if the argument is true:
+
+=begin PIR_FRAGMENT
+
+  $I0 = not $I1
+  $P0 = not $P1
+
+=end PIR_FRAGMENT
+
+X<bitwise;opcodes>
+
+The bitwise opcodes operate on their values a single bit at a time.
+C<band>X<band opcode>, C<bor>X<bor opcode>, and C<bxor>X<bxor opcode> return a
+value that is the logical AND, OR, or XOR of each bit in the source arguments.
+They each take two arguments.
+
+=begin PIR_FRAGMENT
+
+  $I0 = bor $I1, $I2
+  $P0 = bxor $P1, $I2
+
+=end PIR_FRAGMENT
+
+C<band>, C<bor>, and C<bxor> also have variants that modify the result
+in place.
+
+=begin PIR_FRAGMENT
+
+  $I0 = band $I1
+  $P0 = bor $P1
+
+=end PIR_FRAGMENT
+
+C<bnot>X<bnot opcode> is the logical NOT of each bit in the source argument.
+
+=begin PIR_FRAGMENT
+
+  $I0 = bnot $I1
+
+=end PIR_FRAGMENT
+
+X<shift opcodes>
+
+The logical and arithmetic shift operations shift their values by a specified
+number of bits:
+
+=begin PIR_FRAGMENT
+
+  $I0 = shl $I1, $I2        # shift $I1 left by count $I2
+  $I0 = shr $I1, $I2        # arithmetic shift right
+  $P0 = lsr $P1, $P2        # logical shift right
+
+=end PIR_FRAGMENT
+
+=head2 Working with Strings
+
+Parrot strings are buffers of variable-sized data. The most common use of
+strings is to store text data. Strings can also hold binary or other
+non-textual data, though this is rare.N<In general, a custom PMC is more
+useful.> Parrot strings are flexible and powerful, to handle the complexity of
+human-readable (and computer-representable) text data.  String operations work
+with string literals, variables, and constants, and with string-like PMCs.
+
+=head3 Escape Sequences
+
+X<string escapes>
+X<escape sequences>
+
+Strings in double-quotes allow escape sequences using backslashes. Strings in
+single-quotes only allow escapes for nested quotes:
+
+  $S0 = "This string is \n on two lines"
+  $S0 = 'This is a \n one-line string with a slash in it'
+
+Parrot supports several escape sequences in double-quoted strings:
+
+=begin table String Escapes
+
+=headrow
+
+=row
+
+=cell Escape
+
+=cell Meaning
+
+=bodyrows
+
+=row
+
+=cell C<\a>
+
+=cell An ASCII alarm character
+
+=row
+
+=cell C<\b>
+
+=cell An ASCII backspace character
+
+=row
+
+=cell C<\t>
+
+=cell A tab
+
+=row
+
+=cell C<\n>
+
+=cell A newline
+
+=row
+
+=cell C<\v>
+
+=cell A vertical tab
+
+=row
+
+=cell C<\f>
+
+=cell A form feed
+
+=row
+
+=cell C<\r>
+
+=cell A carriage return
+
+=row
+
+=cell C<\e>
+
+=cell An escape
+
+=row
+
+=cell C<\\>
+
+=cell A backslash
+
+=row
+
+=cell C<\">
+
+=cell A quote
+
+=row
+
+=cell C<\x>R<NN>
+
+=cell A character represented by 1-2 hexadecimal digits
+
+=row
+
+=cell C<\x{>R<NNNNNNNN>C<}>
+
+=cell A character represented by 1-8 hexadecimal digits
+
+=row
+
+=cell C<\o>R<NNN>
+
+=cell A character represented by 1-3 octal digits
+
+=row
+
+=cell C<\u>R<NNNN>
+
+=cell A character represented by 4 hexadecimal digits
+
+=row
+
+=cell C<\U>R<NNNNNNNN>
+
+=cell A character represented by 8 hexadecimal digits
+
+=row
+
+=cell C<\c>R<X>
+
+=cell A control character R<X>
+
+=end table
+
+=head3 Heredocs
+
+X<heredocs>
+
+If you need more flexibility in defining a string, use a heredoc string
+literal. The C<E<lt>E<lt>> operator starts a heredoc.  The string terminator
+immediately follows. All text until the terminator is part of the string. The
+terminator must appear on its own line, must appear at the beginning of the
+line, and may not have any trailing whitespace.
+
+  $S2 = << "End_Token"
+
+  This is a multi-line string literal. Notice that
+  it doesn't use quotation marks.
+
+  End_Token
+
+=head3 Concatenating strings
+
+X<concat opcode>
+X<string concatenation>
+
+Use the C<.> operator to concatenate strings. The following example
+concatenates the string "cd" onto the string "ab" and stores the result in
+C<$S1>.
+
+=begin PIR_FRAGMENT
+
+  $S0 = "ab"
+  $S1 = $S0 . "cd"  # concatenates $S0 with "cd"
+  say $S1           # prints "abcd"
+
+=end PIR_FRAGMENT
+
+Concatenation has a C<.=> variant to modify the result in place. In the
+next example, the C<.=> operation appends "xy" onto the string "abcd" in
+C<$S1>.
+
+=begin PIR_FRAGMENT
+
+  $S1 .= "xy"       # appends "xy" to $S1
+  say $S1           # prints "abcdxy"
+
+=end PIR_FRAGMENT
+
+=head3 Repeating strings
+
+The C<repeat> opcode repeats a string a specified number of times:
+
+=begin PIR_FRAGMENT
+
+  $S0 = "a"
+  $S1 = repeat $S0, 5
+  say $S1              # prints "aaaaa"
+
+=end PIR_FRAGMENT
+
+In this example, C<repeat> generates a new string with "a" repeated five
+times and stores it in C<$S1>.
+
+=head3 Length of a string
+
+The C<length> opcode returns the length of a string in characters. This won't
+be the same as the length in I<bytes> for multibyte encoded strings:
+
+=begin PIR_FRAGMENT
+
+  $S0 = "abcd"
+  $I0 = length $S0                # the length is 4
+  say $I0
+
+=end PIR_FRAGMENT
+
+C<length> has no equivalent for PMC strings.
+
+=head3 Substrings
+
+The simplest version of the C<substr>X<substr opcode> opcode takes three
+arguments: a source string, an offset position, and a length. It returns a
+substring of the original string, starting from the offset position (0 is the
+first character) and spanning the length:
+
+=begin PIR_FRAGMENT
+
+  $S0 = substr "abcde", 1, 2        # $S0 is "bc"
+
+=end PIR_FRAGMENT
+
+This example extracts a two-character string from "abcde" at a one-character
+offset from the beginning of the string (starting with the second character).
+It generates a new string, "bc", in the destination register C<$S0>.
+
+When the offset position is negative, it counts backward from the end of the
+string. Thus an offset of -1 starts at the last character of the string.
+
+C<substr> also has a four-argument form, where the fourth argument is a string
+used to replace the substring. This variant modifies the source string and
+returns the removed substring.
+
+This example above replaces the substring "bc" in C<$S1> with the string "XYZ",
+and returns "bc" in C<$S0>:
+
+=begin PIR_FRAGMENT
+
+  $S1 = "abcde"
+  $S0 = substr $S1, 1, 2, "XYZ"
+  say $S0                        # prints "bc"
+  say $S1                        # prints "aXYZde"
+
+=end PIR_FRAGMENT
+
+When the offset position in a replacing C<substr> is one character beyond the
+original string length, C<substr> appends the replacement string just like the
+concatenation operator. If the replacement string is an empty string, the
+opcode removes the characters from the original string.
+
+If you don't need to capture the replaced string, an optimized version of
+C<substr> performs a replace without returning the removed substring:
+
+=begin PIR_FRAGMENT
+
+  $S1 = "abcde"
+  $S1 = substr 1, 2, "XYZ"
+  say $S1                        # prints "aXYZde"
+
+=end PIR_FRAGMENT
+
+=head3 Converting characters
+
+The C<chr>X<chr opcode> opcode takes an integer value and returns the
+corresponding character in the ASCII character set as a one-character string.
+The C<ord>X<ord opcode> opcode takes a single character string and returns the
+integer value of the character at the first position in the string. The integer
+value of the character will differ depending on the current encoding of the
+string:
+
+=begin PIR_FRAGMENT
+
+  $S0 = chr 65              # $S0 is "A"
+  $I0 = ord $S0             # $I0 is 65, if $S0 is ASCII or UTF-8
+
+=end PIR_FRAGMENT
+
+C<ord> has a two-argument variant that takes a character offset to select
+a single character from a multicharacter string. The offset must be within
+the length of the string:
+
+=begin PIR_FRAGMENT
+
+  $I0 = ord "ABC", 2        # $I0 is 67
+
+=end PIR_FRAGMENT
+
+A negative offset counts backward from the end of the string, so -1 is
+the last character.
+
+=begin PIR_FRAGMENT
+
+  $I0 = ord "ABC", -1       # $I0 is 67
+
+=end PIR_FRAGMENT
+
+=head3 Formatting strings
+
+X<string formatting>
+
+The C<sprintf>X<sprintf opcode> opcode generates a formatted string from a
+series of values. It takes two arguments: a string specifying the format, and
+an array PMC containing the values to be formatted. The format string and the
+result can be either strings or PMCs:
+
+=begin PIR_FRAGMENT
+
+  $S0 = sprintf $S1, $P2
+  $P0 = sprintf $P1, $P2
+
+=end PIR_FRAGMENT
+
+The format string is similar to C's C<sprintf> function with extensions for
+Parrot data types. Each format field in the string starts with a C<%> and ends
+with a character specifying the output format. Table 4-2 lists the available
+output format characters.
+
+=begin table Format characters
+
+=headrow
+
+=row
+
+=cell Format
+
+=cell Meaning
+
+=bodyrows
+
+=row
+
+=cell C<%c>
+
+=cell A single character.
+
+=row
+
+=cell C<%d>
+
+=cell A decimal integer.
+
+=row
+
+=cell C<%i>
+
+=cell A decimal integer.
+
+=row
+
+=cell C<%u>
+
+=cell An unsigned integer.
+
+=row
+
+=cell C<%o>
+
+=cell An octal integer.
+
+=row
+
+=cell C<%x>
+
+=cell A hex integer, preceded by 0x (when # is specified).
+
+=row
+
+=cell C<%X>
+
+=cell A hex integer with a capital X (when # is specified).
+
+=row
+
+=cell C<%b>
+
+=cell A binary integer, preceded by 0b (when # is specified).
+
+=row
+
+=cell C<%B>
+
+=cell A binary integer with a capital B (when # is specified).
+
+=row
+
+=cell C<%p>
+
+=cell A pointer address in hex.
+
+=row
+
+=cell C<%f>
+
+=cell A floating-point number.
+
+=row
+
+=cell C<%e>
+
+=cell A floating-point number in scientific notation (displayed with a
+lowercase "e").
+
+=row
+
+=cell C<%E>
+
+=cell The same as C<%e>, but displayed with an uppercase E.
+
+=row
+
+=cell C<%g>
+
+=cell The same as C<%e> or C<%f>, whichever fits best.
+
+=row
+
+=cell C<%G>
+
+=cell The same as C<%g>, but displayed with an uppercase E.
+
+=row
+
+=cell C<%s>
+
+=cell A string.
+
+=end table
+
+Each format field supports several specifier options: R<flags>, R<width>,
+R<precision>, and R<size>.  Table 4-3 lists the format flags.
+
+=begin table Format flags
+
+=headrow
+
+=row
+
+=cell Flag
+
+=cell Meaning
+
+=bodyrows
+
+=row
+
+=cell 0
+
+=cell Pad with zeros.
+
+=row
+
+=cell E<lt>spaceE<gt>
+
+=cell Pad with spaces.
+
+=row
+
+=cell C<+>
+
+=cell Prefix numbers with a sign.
+
+=row
+
+=cell C<->
+
+=cell Align left.
+
+=row
+
+=cell C<#>
+
+=cell Prefix a leading 0 for octal, 0x for hex, or force a decimal point.
+
+=end table
+
+The R<width> is a number defining the minimum width of the output from
+a field. The R<precision> is the maximum width for strings or
+integers, and the number of decimal places for floating-point fields.
+If either R<width> or R<precision> is an asterisk (C<*>), it takes its
+value from the next argument in the PMC.
+
+The R<size> modifier defines the type of the argument the field takes.  Table
+4-4 lists the size flags.
+
+=begin table Size flags
+
+=headrow
+
+=row
+
+=cell Character
+
+=cell Meaning
+
+=bodyrows
+
+=row
+
+=cell C<h>
+
+=cell short integer or single-precision float
+
+=row
+
+=cell C<l>
+
+=cell long
+
+=row
+
+=cell C<H>
+
+=cell huge value (long long or long double)
+
+=row
+
+=cell C<v>
+
+=cell Parrot INTVAL or FLOATVAL
+
+=row
+
+=cell C<O>
+
+=cell opcode_t pointer
+
+=row
+
+=cell C<P>
+
+=cell C<PMC>
+
+=row
+
+=cell C<S>
+
+=cell String
+
+=end table
+
+The values in the aggregate PMC must have a type compatible with the specified
+R<size>.
+
+The format string of this C<sprintf> example has two format fields. The first,
+C<%#Px>, extracts a PMC argument (C<P>) from the aggregate C<$P2> and formats
+it as a hexadecimal integer (C<x>) with a leading 0x (C<#>). The second format
+field, C<%+2.3Pf>, takes a PMC argument (C<P>) and formats it as a
+floating-point number (C<f>) with a minimum of two whole digits and a maximum
+of three decimal places (C<2.3>) and a leading sign (C<+>):
+
+=begin PIR_FRAGMENT
+
+  $S0 = sprintf "int %#Px num %+2.3Pf\n", $P2
+  say $S0       # prints "int 0x2a num +10.000"
+
+=end PIR_FRAGMENT
+
+The test files F<t/op/string.t> and F<t/op/sprintf.t> have many more
+examples of format strings.
+
+=head3 Joining strings
+
+The C<join> opcode joins the elements of an array PMC into a single
+string. The first argument separates the individual elements of the
+PMC in the final string result.
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "Array"
+  push $P0, "hi"
+  push $P0, 0
+  push $P0, 1
+  push $P0, 0
+  push $P0, "parrot"
+  $S0 = join "__", $P0
+  say $S0                # prints "hi__0__1__0__parrot"
+
+=end PIR_FRAGMENT
+
+This example builds a C<Array> in C<$P0> with the values C<"hi">, C<0>, C<1>,
+C<0>, and C<"parrot">. It then joins those values (separated by the string
+C<"__">) into a single string stored in C<$S0>.
+
+=head3 Splitting strings
+
+Splitting a string yields a new array containing the resulting substrings of
+the original string.
+
+This example splits the string "abc" into individual characters and stores them
+in an array in C<$P0>. It then prints out the first and third elements of the
+array.
+
+=begin PIR_FRAGMENT
+
+  $P0 = split "", "abc"
+  $P1 = $P0[0]
+  say $P1                # 'a'
+  $P1 = $P0[2]
+  say $P1                # 'c'
+
+=end PIR_FRAGMENT
+
+=head3 Testing for substrings
+
+The C<index>X<index opcode> opcode searches for a substring
+within a string. If it finds the substring, it returns the position
+where the substring was found as a character offset from the beginning
+of the string. If it fails to find the substring, it returns -1:
+
+=begin PIR_FRAGMENT
+
+  $I0 = index "Beeblebrox", "eb"
+  say $I0                           # prints 2
+  $I0 = index "Beeblebrox", "Ford"
+  say $I0                           # prints -1
+
+=end PIR_FRAGMENT
+
+C<index> also has a three-argument version, where the final argument
+defines an offset position for starting the search.
+
+This example finds the second "eb" in "Beeblebrox" instead of the first,
+because the search skips the first three characters in the string:
+
+=begin PIR_FRAGMENT
+
+  $I0 = index "Beeblebrox", "eb", 3
+  say $I0                           # prints 5
+
+=end PIR_FRAGMENT
+
+=head3 Bitwise Operations
+
+The numeric bitwise opcodes also have string variants for AND, OR, and XOR:
+C<bors>X<bors opcode>, C<bands>X<bands opcode>, and C<bxors>X<bxors opcode>.
+These take string or string-like PMC arguments and perform the logical
+operation on each byte of the strings to produce the result string.
+
+=begin PIR_FRAGMENT
+
+  $S0 = bors $S1
+  $P0 = bands $P1
+  $S0 = bors $S1, $S2
+  $P0 = bxors $P1, $S2
+
+=end PIR_FRAGMENT
+
+The bitwise string opcodes produce meaningful results only when used with
+simple ASCII strings, because Parrot performs bitwise operations per byte.
+
+=head3 Copy-On-Write
+
+Strings use copy-on-write (COW) optimizations. A call to C<$S1 = $S0>
+doesn't immediately make a copy of C<$S0>, it only makes both variables
+point to the same string. Parrot doesn't make a copy of the string until
+one of two strings is modified.
+
+=begin PIR_FRAGMENT
+
+  $S0 = "Ford"
+  $S1 = $S0
+  $S1 = "Zaphod"
+  say $S0                # prints "Ford"
+  say $S1                # prints "Zaphod"
+
+=end PIR_FRAGMENT
+
+Modifying one of the two variables causes Parrot to create a new string.  This
+example preserves the existing value in C<$S0> and assigns the new value to the
+new string in C<$S1>. The benefit of copy-on-write is avoiding the cost of
+copying strings until the copies are necessary.
+
+=head3 Encodings and Charsets
+
+X<charset>
+X<ASCII>
+
+Years ago, strings only needed to support the ASCII character set (or charset),
+a mapping of 128 bit patterns to symbols and English-language characters. This
+worked as long as everyone using a computer read and wrote English and only
+used a small handful of punctuation symbols. In other words, it was woefully
+insufficient. A modern string system must manage charsets in order to make
+sense out of all the string data in the world.
+
+X<encoding>
+
+A modern string system must also handle different encodings -- ways to
+represent various charsets in memory and on disk.
+
+Every string in Parrot has an associated encoding and charset. The default
+charset is 8-bit ASCII, which is almost universally supported.  Double-quoted
+string constants can have an optional prefix specifying the string's encoding
+and charset.N<As you might suspect, single-quoted strings do not support this.>
+Parrot tracks information about encoding and character set internally, and
+automatically converts strings when necessary to preserve these
+characteristics. Strings may have prefixes of the form C<encoding:charset:>.
+
+=begin PIR_FRAGMENT
+
+  $S0 = utf8:unicode:"Hello UTF-8 Unicode World!"
+  $S1 = utf16:unicode:"Hello UTF-16 Unicode World!"
+  $S2 = ascii:"This is 8-bit ASCII"
+  $S3 = binary:"This is raw, unformatted binary data"
+
+=end PIR_FRAGMENT
+
+Parrot supports the character sets C<ascii>, C<binary>, C<iso-8859-1>
+(Latin 1), and C<unicode> and the encodings C<fixed_8>, C<ucs2>,
+C<utf8>, and C<utf18>.
+
+The C<binary:> charset treats the string as a buffer of raw unformatted
+binary data. It isn't really a string per se, because binary data
+contains no readable characters. This exists to support libraries which
+manipulate binary data that doesn't easily fit into any other primitive
+data type.
+
+When Parrot operates on two strings (as in concatenation or comparison), they
+must both use the same character set and encoding. Parrot will automatically
+upgrade one or both of the strings to the next highest compatible format as
+necessary. ASCII strings will automatically upgrade to UTF-8 strings if needed,
+and UTF-8 will upgrade to UTF-16.  All of these conversions happen inside
+Parrot, so the programmer doesn't need to worry about the details.
+
+=head2 Working with PMCs
+
+Polymorphic Containers (PMCs) are the basis for complex data types and
+object-oriented behavior in Parrot. In PIR, any variable that isn't a
+low-level integer, number, or string is a PMC. PMC variables act much
+like the low-level variables, but you have to instantiate a new PMC
+object before you use it. The C<new> opcode creates a new PMC object of
+the specified type.
+
+=begin PIR_FRAGMENT
+
+  $P0 = new 'String'
+  $P0 = "That's a bollard and not a parrot"
+  say $P0
+
+=end PIR_FRAGMENT
+
+This example creates a C<String> object, stores it in the PMC register
+variable C<$P0>, assigns it the value "That's a bollard and not a
+parrot", and prints it.
+
+Every PMC has a type that indicates what data it can store and what
+behavior it supports. The C<typeof> opcode reports the type of a PMC.
+When the result is a string variable, C<typeof> returns the name of the
+type:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $S0 = typeof $P0               # $S0 is "String"
+  say $S0                        # prints "String"
+
+=end PIR_FRAGMENT
+
+When the result is a PMC variable, C<typeof> returns the C<Class> PMC
+for that object type.
+
+=head3 Scalars
+
+X<scalars>
+X<scalar PMCs>
+
+In most of the examples shown so far, PMCs duplicate the behavior of integers,
+numbers, and strings. Parrot provides a set of PMCs for this exact purpose.
+C<Integer>, C<Number>, and C<String> are thin overlays on Parrot's low-level
+integers, numbers, and strings.
+
+A previous example showed a string literal assigned to a PMC variable of type
+C<String>. Direct assignment of a literal to a PMC works for all the low-level
+types and their PMC equivalents:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new 'Integer'
+  $P0 = 5
+
+  $P1 = new 'String'
+  $P1 = "5 birds"
+
+  $P2 = new 'Number'
+  $P2 = 3.14
+
+=end PIR_FRAGMENT
+
+X<boxing>
+
+You may also assign non-constant low-level integer, number, or string registers
+directly to a PMC. The PMC handles the conversion from the low-level type to
+its own internal storage.N<This conversion of a simpler type to a more complex
+type is "boxing".>
+
+=begin PIR_FRAGMENT
+
+  $I0 = 5
+  $P0 = new 'Integer'
+  $P0 = $I0
+
+  $S1 = "5 birds"
+  $P1 = new 'String'
+  $P1 = $S1
+
+  $N2 = 3.14
+  $P2 = new 'Number'
+  $P2 = $N2
+
+=end PIR_FRAGMENT
+
+The C<box> opcode is a handy shortcut to create the appropriate PMC
+object from an integer, number, or string literal or variable.
+
+=begin PIR_FRAGMENT
+
+  $P0 = box 3    # $P0 is an "Integer"
+
+  $P1 = box $S1  # $P1 is a "String"
+
+  $P2 = box 3.14 # $P2 is a "Number"
+
+=end PIR_FRAGMENT
+
+X<unboxing>
+
+In the reverse situation, when assigning a PMC to an integer, number, or
+string variable, the PMC also has the ability to convert its value to
+the low-level type.N<The reverse of "boxing" is "unboxing".>
+
+=begin PIR_FRAGMENT
+
+  $P0 = box 5
+  $S0 = $P0           # the string "5"
+  $N0 = $P0           # the number 5.0
+  $I0 = $P0           # the integer 5
+
+  $P1 = box "5 birds"
+  $S1 = $P1           # the string "5 birds"
+  $I1 = $P1           # the integer 5
+  $N1 = $P1           # the number 5.0
+
+  $P2 = box 3.14
+  $S2 = $P2           # the string "3.14"
+  $I2 = $P2           # the integer 3
+  $N2 = $P2           # the number 3.14
+
+=end PIR_FRAGMENT
+
+This example creates C<Integer>, C<Number>, and C<String> PMCs, and
+shows the effect of assigning each one back to a low-level type.
+
+Converting a string to an integer or number only makes sense when the contents
+of the string are a number. The C<String> PMC will attempt to extract a number
+from the beginning of the string, but otherwise will return a false value.
+
+=begin sidebar Type Conversions
+
+Parrot also handles conversions between the low-level types where
+possible, converting integers to strings (C<$S0 = $I1>),
+numbers to strings (C<$S0 = $N1>), numbers to integers (C<$I0 = $N1>),
+integers to numbers (C<$N0 = $I1>), and even strings to integers or
+numbers (C<$I0 = $S1> and C<$N0 = $S1>).
+
+=end sidebar
+
+=head3 Aggregates
+
+X<aggregates>
+X<aggregate PMCs>
+
+PMCs can define complex types that hold multiple values, commonly called
+aggregates. Two basic aggregate types are ordered arrays and associative
+arrays. The primary difference between these is that ordered arrays use integer
+keys for indexes and associative arrays use string keys.
+
+Aggregate PMCs support the use of numeric or string keys.  PIR also offers a
+extensive set of operations for manipulating aggregate data types.
+
+=head4 Ordered Arrays
+
+Parrot provides several ordered array PMCs, differentiated by what the array
+should store -- booleans, integers, numbers, strings, or other PMCs -- and
+whether the array should maintain a fixed size or dynamically resize for the
+number of elements it stores.
+
+The core array types are C<FixedPMCArray>, C<ResizablePMCArray>,
+C<FixedIntegerArray>, C<ResizableIntegerArray>, C<FixedFloatArray>,
+C<ResizableFloatArray>, C<FixedStringArray>, C<ResizableStringArray>,
+C<FixedBooleanArray>, and C<ResizableBooleanArray>. The array
+types that start with "Fixed" have a fixed size and do not allow
+elements to be added outside their allocated size. The "Resizable"
+variants automatically extend themselves as more elements are
+added.N<With some additional overhead for checking array bounds and
+reallocating array memory.> The array types that include "String",
+"Integer", or "Boolean" in the name use alternate packing methods for
+greater memory efficiency.
+
+Parrot's core ordered array PMCs all have zero-based integer keys. Extracting
+or inserting an element into the array uses PIR's standard key syntax, with the
+key in square brackets after the variable name. An lvalue key sets the value
+for that key.  An rvalue key extracts the value for that key in the aggregate
+to use as the argument value:
+
+=begin PIR_FRAGMENT
+
+  $P0    = new "ResizablePMCArray" # create a new array object
+  $P0[0] = 10                      # set first element to 10
+  $P0[1] = $I31                    # set second element to $I31
+  $I0    = $P0[0]                  # get the first element
+
+=end PIR_FRAGMENT
+
+Setting the array to an integer value directly (without a key) sets the number
+of elements of the array.  Assigning an array directly to an integer retrieves
+the number of elements of the array.
+
+=begin PIR_FRAGMENT
+
+  $P0 = 2    # set array size
+  $I1 = $P0  # get array size
+
+=end PIR_FRAGMENT
+
+This is equivalent to using the C<elements> opcode to retrieve the number of
+items currently in an array:
+
+=begin PIR_FRAGMENT
+
+  elements $I0, $P0 # get element count
+
+=end PIR_FRAGMENT
+
+Some other useful instructions for working with ordered arrays are
+C<push>, C<pop>, C<shift>, and C<unshift>, to add or remove elements.
+C<push> and C<pop> work on the end of the array, the highest numbered
+index. C<shift> and C<unshift> work on the start of the array, adding or
+removing the zeroth element, and renumbering all the following elements.
+
+=begin PIR_FRAGMENT
+
+  push $P0, 'banana' # add to end
+  $S0 = pop $P0      # fetch from end
+
+  unshift $P0, 74    # add to start
+  $I0 = shift $P0    # fetch from start
+
+=end PIR_FRAGMENT
+
+=head4 Associative Arrays
+
+X<associative arrays>
+
+An associative array is an unordered aggregate that uses string keys to
+identify elements.  You may know them as "hash tables", "hashes", "maps", or
+"dictionaries". Parrot provides one core associative array PMC, called C<Hash>.
+String keys work very much like integer keys.  An lvalue key sets the value of
+an element, and an rvalue key extracts the value of an element. The string in
+the key must always be in single or double quotes.
+
+=begin PIR_FRAGMENT
+
+  new $P1, "Hash"          # create a new associative array
+  $P1["key"] = 10          # set key and value
+  $I0        = $P1["key"]  # get value for key
+
+=end PIR_FRAGMENT
+
+Assigning a C<Hash> PMC (without a key) to an integer result fetches the number
+of elements in the hash.N<You may not set a C<Hash> PMC directly to an integer
+value.>
+
+=begin PIR_FRAGMENT
+
+  $I1 = $P1         # number of entries
+
+=end PIR_FRAGMENT
+
+The C<exists>X<exists opcode> opcode tests whether a keyed value exists in an
+aggregate. It returns 1 if it finds the key in the aggregate and 0 otherwise.
+It doesn't care if the value itself is true or false, only that an entry exists
+for that key:
+
+=begin PIR_FRAGMENT
+
+  new $P0, "Hash"
+  $P0["key"] = 0
+  exists $I0, $P0["key"] # does a value exist at "key"?
+  say $I0                # prints 1
+
+=end PIR_FRAGMENT
+
+The C<delete>X<delete opcode> opcode removes an element from an associative
+array:
+
+=begin PIR_FRAGMENT
+
+  delete $P0["key"]
+
+=end PIR_FRAGMENT
+
+=head4 Iterators
+
+X<iterators>
+X<PMC iterators>
+
+An iterator extracts values from an aggregate PMC one at a time.  Iterators are
+most useful in loops which perform an action on every element in an aggregate.
+The C<iter> opcode creates a new iterator from an aggregate PMC. It takes one
+argument, the PMC over which to iterate:
+
+=begin PIR_FRAGMENT
+
+  $P1 = iter $P2
+
+=end PIR_FRAGMENT
+
+Alternatively, you can also create an iterator by creating a new C<Iterator>
+PMC, passing the aggregate PMC as an initialization parameter to C<new>:
+
+=begin PIR_FRAGMENT
+
+  $P1 = new "Iterator", $P2
+
+=end PIR_FRAGMENT
+
+The C<shift> opcode extracts the next value from the iterator.
+
+=begin PIR_FRAGMENT
+
+      $P5 = shift $P1
+
+=end PIR_FRAGMENT
+
+Evaluating the iterator PMC as a boolean returns whether the iterator has
+reached the end of the aggregate:
+
+=begin PIR_FRAGMENT
+
+      if $P1 goto iter_repeat
+
+=end PIR_FRAGMENT
+
+Parrot provides predefined constants for working with iterators.
+C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END> constants select whether an
+ordered array iterator starts from the beginning or end of the array.  These
+two constants have no effect on associative array iterators, as their elements
+are unordered.
+
+Load the iterator constants with the C<.include> directive to include
+the file F<iterator.pasm>. To use them, set the iterator PMC to the
+value of the constant:
+
+=begin PIR_FRAGMENT
+
+      .include "iterator.pasm"
+
+      # ...
+
+      $P1 = .ITERATE_FROM_START
+
+=end PIR_FRAGMENT
+
+With all of those separate pieces in one place, this example loads the iterator
+constants, creates an ordered array of "a", "b", "c", creates an iterator from
+that array, and then loops over the iterator using a conditional C<goto> to
+checks the boolean value of the iterator and another unconditional C<goto>:
+
+=begin PIR_FRAGMENT
+
+      .include "iterator.pasm"
+      $P2 = new "ResizablePMCArray"
+      push $P2, "a"
+      push $P2, "b"
+      push $P2, "c"
+
+      $P1 = iter $P2
+      $P1 = .ITERATE_FROM_START
+
+  iter_loop:
+      unless $P1 goto iter_end
+      $P5 = shift $P1
+      say $P5                        # prints "a", "b", "c"
+      goto iter_loop
+  iter_end:
+
+=end PIR_FRAGMENT
+
+Associative array iterators work similarly to ordered array iterators.  When
+iterating over associative arrays, the C<shift> opcode extracts keys instead of
+values. The key looks up the value in the original hash PMC.
+
+=begin PIR_FRAGMENT
+
+      $P2      = new "Hash"
+      $P2["a"] = 10
+      $P2["b"] = 20
+      $P2["c"] = 30
+
+      $P1      = iter $P2
+
+  iter_loop:
+      unless $P1 goto iter_end
+      $S5 = shift $P1          # the key "a", "b", or "c"
+      $I9 = $P2[$S5]           # the value 10, 20, or 30
+      say $I9
+      goto iter_loop
+  iter_end:
+
+=end PIR_FRAGMENT
+
+This example creates an associative array C<$P2> that contains three
+keys "a", "b", and "c", assigning them the values 10, 20, and 30. It
+creates an iterator (C<$P1>) from the associative array using the
+C<iter> opcode, and then starts a loop over the iterator. At the start
+of each loop, the C<unless> instruction checks whether the iterator has
+any more elements. If there are no more elements, C<goto> jumps to the
+end of the loop, marked by the label C<iter_end>. If there are more
+elements, the C<shift> opcode extracts the next key. Keyed assignment
+stores the integer value of the element indexed by the key in C<$I9>.
+After printing the integer value, C<goto> jumps back to the start of the
+loop, marked by C<iter_loop>.
+
+=head4 Multi-level Keys
+
+Aggregates can hold any data type, including other aggregates.
+Accessing elements deep within nested data structures is a common
+operation, so PIR provides a way to do it in a single instruction.
+Complex keys specify a series of nested data structures, with each
+individual key separated by a semicolon.
+
+=begin PIR_FRAGMENT
+
+  $P0           = new "Hash"
+  $P1           = new "ResizablePMCArray"
+  $P1[2]        = 42
+  $P0["answer"] = $P1
+
+  $I1 = 2
+  $I0 = $P0["answer";$I1]
+  say $I0
+
+=end PIR_FRAGMENT
+
+This example builds up a data structure of an associative array
+containing an ordered array. The complex key C<$P0["answer";$I1]>
+retrieves an element of the array within the hash. You can also set a
+value using a complex key:
+
+=begin PIR_FRAGMENT
+
+  $P0["answer";0] = 5
+
+=end PIR_FRAGMENT
+
+The individual keys are integer or string literals, or variables with
+integer or string values.
+
+=head3 Copying and Cloning
+
+X<PMCs; copy>
+X<PMCs; clone>
+
+PMC registers don't directly store the data for a PMC, they only store a
+pointer to the structure that stores the data. As a result, the C<=>
+operator doesn't copy the entire PMC, it only copies the pointer to the
+PMC data. If you later modify the copy of the variable, it will also
+modify the original.
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $P0 = "Ford"
+  $P1 = $P0
+  $P1 = "Zaphod"
+  say $P0                # prints "Zaphod"
+  say $P1                # prints "Zaphod"
+
+=end PIR_FRAGMENT
+
+In this example, C<$P0> and C<$P1> are both pointers to the same
+internal data structure.  Setting C<$P1> to the string literal
+"Zaphod", it overwrites the previous value "Ford". Both C<$P0> and
+C<$P1> refer to the C<String> PMC "Zaphod".
+
+The C<clone> X<clone opcode> opcode makes a deep copy of a PMC, instead
+of copying the pointer like C<=> does.
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $P0 = "Ford"
+  $P1 = clone $P0
+  $P0 = "Zaphod"
+  say $P0        # prints "Zaphod"
+  say $P1        # prints "Ford"
+
+=end PIR_FRAGMENT
+
+This example creates an identical, independent clone of the PMC in
+C<$P0> and puts it in C<$P1>. Later changes to C<$P0> have no effect on
+the PMC in C<$P1>.N<With low-level strings, the copies created by
+C<clone> are copy-on-write exactly the same as the copy created by
+C<=>.>
+
+To assign the I<value> of one PMC to another PMC that already exists, use the
+C<assign>X<assign opcode> opcode:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "Integer"
+  $P1 = new "Integer"
+  $P0 = 42
+  assign $P1, $P0    # note: $P1 must exist already
+  inc $P0
+  say $P0            # prints 43
+  say $P1            # prints 42
+
+=end PIR_FRAGMENT
+
+This example creates two C<Integer> PMCs, C<$P1> and C<$P2>, and gives the
+first one the value 42. It then uses C<assign> to pass the same integer value
+on to C<$P1>. Though C<$P0> increments, C<$P1> doesn't change. The result for
+C<assign> must have an existing object of the right type in it, because
+C<assign> neither creates a new duplicate object (as does C<clone>) or reuses
+the source object (as does C<=>).
+
+=head3 Properties
+
+X<properties>
+X<PMCs; properties>
+
+PMCs can have additional values attached to them as "properties" of the
+PMC. Most properties hold extra metadata about the PMC.
+
+The C<setprop>X<setprop opcode> opcode sets the value of a named property on a
+PMC. It takes three arguments: the PMC on which to set a property, the name of
+the property, and a PMC containing the value of the property.
+
+=begin PIR_FRAGMENT
+
+  setprop $P0, "name", $P1
+
+=end PIR_FRAGMENT
+
+The C<getprop>X<getprop opcode> opcode returns the value of a property.  It
+takes two arguments: the name of the property and the PMC from which to
+retrieve the property value.
+
+=begin PIR_FRAGMENT
+
+  $P2 = getprop "name", $P0
+
+=end PIR_FRAGMENT
+
+This example creates a C<String> object in C<$P0> and an C<Integer> object with
+the value 1 in C<$P1>. C<setprop> sets a property named "eric" on the object in
+C<$P0> and gives the property the value of C<$P1>. C<getprop> retrieves the
+value of the property "eric" on C<$P0> and stores it in C<$P2>.
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $P0 = "Half-a-Bee"
+  $P1 = new "Integer"
+  $P1 = 1
+
+  setprop $P0, "eric", $P1  # set a property on $P0
+  $P2 = getprop "eric", $P0 # retrieve a property from $P0
+
+  say $P2                   # prints 1
+
+=end PIR_FRAGMENT
+
+Parrot stores PMC properties in an associative array where the name of the
+property is the key.
+
+C<delprop>X<delprop opcode> deletes a property from a PMC.
+
+=begin PIR_FRAGMENT
+
+  delprop $P1, "constant" # delete property
+
+=end PIR_FRAGMENT
+
+You can fetch a complete hash of all properties on a PMC with
+C<prophash>X<prophash opcode>:
+
+=begin PIR_FRAGMENT
+
+  $P0 = prophash $P1 # set $P0 to the property hash of $P1
+
+=end PIR_FRAGMENT
+
+Fetching the value of a non-existent property returns an C<Undef> PMC.
+
+=head3 Vtable Functions
+
+X<vtables>
+X<vtable functions>
+
+You may have noticed that a simple operation sometimes has a different effect
+on different PMCs. Assigning a low-level integer value to a C<Integer> PMC sets
+its integer value of the PMC, but assigning that same integer to an ordered
+array sets the size of the array.
+
+Every PMC defines a standard set of low-level operations called vtable
+functions. When you perform an assignment like:
+
+   $P0 = 5
+
+... Parrot calls the C<set_integer_native> vtable function on the PMC referred
+to by register C<$P0>.
+
+Parrot has a fixed set of vtable functions, so that any PMC can stand in for
+any other PMC; they're polymorphic.N<Hence the name "Polymorphic Container".>
+Every PMC defines some behavior for every vtable function. The default behavior
+is to throw an exception reporting that the PMC doesn't implement that vtable
+function. The full set of vtable functions for a PMC defines the PMC's basic
+interface, but PMCs may also define methods to extend their behavior beyond the
+vtable set.
+
+=head2 Namespaces
+
+X<namespaces>
+
+Parrot performs operations on variables stored in small register sets local to
+each subroutine. For more complex tasks,N<...and for most high-level languages
+that Parrot supports.> it's also useful to have variables that live beyond the
+scope of a single subroutine. These variables may be global to the entire
+program or restricted to a particular library. Parrot stores long-lived
+variables in a hierarchy of namespaces.
+
+The opcodes C<set_global> and C<get_global> store and fetch a variable in a
+namespace:
+
+=begin PIR_FRAGMENT
+
+  $P0 = new "String"
+  $P0 = "buzz, buzz"
+  set_global "bee", $P0
+  # ...
+  $P1 = get_global "bee"
+  say $P1                        # prints "buzz, buzz"
+
+=end PIR_FRAGMENT
+
+The first two statements in this example create a C<String> PMC in
+C<$P0> and assign it a value. In the third statement, C<set_global>
+stores that PMC as the named global variable C<bee>.  At some later
+point in the program, C<get_global> retrieves the global variable by
+name, and stores it in C<$P1> to print.
+
+Namespaces can only store PMC variables.  Parrot boxes all primitive integer,
+number, or string values into the corresponding PMCs before storing them in a
+namespace.
+
+The name of every variable stored in a particular namespace must be
+unique. You can't have store both an C<Integer> PMC and an array PMC
+both named "bee", stored in the same namespace.N<You may wonder why
+anyone would want to do this. We wonder the same thing, but Perl 5 does
+it all the time. The Perl 6 implementation on Parrot includes type
+sigils in the names of the variables it stores in namespaces so each
+name is unique, e.g. C<$bee>, C<@bee>....>
+
+=head3 Namespace Hierarchy
+
+X<hierarchical namespaces>
+X<namespaces; hierarchy>
+
+A single global namespace would be far too limiting for most languages or
+applications. The risk of accidental collisions -- where two libraries try to
+use the same name for some variable -- would be quite high for larger code
+bases. Parrot maintains a collection of namespaces arranged as a tree, with the
+C<parrot> namespace as the root.  Every namespace you declare is a child of the
+C<parrot> namespace (or a child of a child....).
+
+The C<set_global> and C<get_global> opcodes both have alternate forms that take
+a key name to access a variable in a particular namespace within the tree. This
+code example stores a variable as C<bill> in the Duck namespace and retrieves
+it again:
+
+=begin PIR_FRAGMENT
+
+  set_global ["Duck"], "bill", $P0
+  $P1 = get_global ["Duck"], "bill"
+
+=end PIR_FRAGMENT
+
+The key name for the namespace can have multiple levels, which correspond to
+levels in the namespace hierarchy. This example stores a variable as C<bill> in
+the Electric namespace under the General namespace in the hierarchy.
+
+=begin PIR_FRAGMENT
+
+  set_global ["General";"Electric"], "bill", $P0
+  $P1 = get_global ["General";"Electric"], "bill"
+
+=end PIR_FRAGMENT
+
+X<root namespace>
+X<namespaces; root>
+
+The C<set_global> and C<get_global> opcode operate on the currently selected
+namespace. The default top-level namespace is the "root" namespace. The
+C<.namespace> directive allows you to declare any namespace for subsequent
+code.  If you select the General Electric namespace, then store or retrieve the
+C<bill> variable without specifying a namespace, you will work with the General
+Electric bill, not the Duck bill.
+
+  .namespace ["General";"Electric"]
+  #...
+  set_global "bill", $P0
+  $P1 = get_global "bill"
+
+Passing an empty key to the C<.namespace> directive resets the selected
+namespace to the root namespace. The brackets are required even when the
+key is empty.
+
+  .namespace [ ]
+
+When you need to be absolutely sure you're working with the root namespace
+regardless of what namespace is currently active, use the C<set_root_global>
+and C<get_root_global> opcodes instead of C<set_global> and C<get_global>. This
+example sets and retrieves the variable C<bill> in the Dollar namespace, which
+is directly under the root namespace:
+
+=begin PIR_FRAGMENT
+
+  set_root_global ["Dollar"], "bill", $P0
+  $P1 = get_root_global ["Dollar"], "bill"
+
+=end PIR_FRAGMENT
+
+To prevent further collisions, each high-level language running on Parrot
+operates within its own virtual namespace root. The default virtual root is
+C<parrot>, and the C<.HLL> directive (for I<H>igh-I<L>evel I<L>anguage) selects
+an alternate virtual root for a particular high-level language:
+
+  .HLL 'ruby'
+
+The C<set_hll_global> and C<get_hll_global> opcodes are like C<set_root_global>
+and C<get_root_global>, except they always operate on the virtual root for the
+currently selected HLL. This example stores and retrieves a C<bill> variable in
+the Euro namespace, under the Dutch HLL namespace root:
+
+  .HLL 'Dutch'
+  #...
+  set_hll_global ["Euro"], "bill", $P0
+  $P1 = get_hll_global ["Euro"], "bill"
+
+=head3 NameSpace PMC
+
+Namespaces are just PMCs. They implement the standard vtable functions
+and a few extra methods. The C<get_namespace> opcode retrieves the
+currently selected namespace as a PMC object:
+
+  $P0 = get_namespace
+
+The C<get_root_namespace> opcode retrieves the namespace object for the root
+namespace.  The C<get_hll_namespace> opcode retrieves the virtual root for the
+currently selected HLL.
+
+  $P0 = get_root_namespace
+  $P0 = get_hll_namespace
+
+Each of these three opcodes can take a key argument to retrieve a namespace
+under the currenly selected namespace, root namespace, or HLL root namespace:
+
+  $P0 = get_namespace ["Duck"]
+  $P0 = get_root_namespace ["General";"Electric"]
+  $P0 = get_hll_namespace ["Euro"]
+
+Once you have a namespace object you can use it to retrieve variables from the
+namespace instead of using a keyed lookup. This example first looks up the Euro
+namespace in the currently selected HLL, then retrieves the C<bill> variable
+from that namespace:
+
+  $P0 = get_hll_namespace ["Euro"]
+  $P1 = get_global $P0, "bill"
+
+Namespaces also provide a set of methods to provide more complex behavior than
+the standard vtable functions allow. The C<get_name> method returns the name of
+the namespace as a C<ResizableStringArray>:
+
+  $P3 = $P0.'get_name'()
+
+The C<get_parent> method retrieves a namespace object for the parent
+namespace that contains this one:
+
+  $P5 = $P0.'get_parent'()
+
+The C<get_class> method retrieves any Class PMC associated with the
+namespace:
+
+  $P6 = $P0.'get_class'()
+
+The C<add_var> and C<find_var> methods store and retrieve variables in a
+namespace in a language-neutral way:
+
+  $P0.'add_var'("bee", $P3)
+  $P1 = $P0.'find_var'("bee")
+
+The C<find_namespace> method looks up a namespace, just like the
+C<get_namespace> opcode:
+
+  $P1 = $P0.'find_namespace'("Duck")
+
+The C<add_namespace> method adds a new namespace as a child of the
+namespace object:
+
+  $P0.'add_namespace'($P1)
+
+The C<make_namespace> method looks up a namespace as a child of the
+namespace object and returns it. If the requested namespace doesn't
+exist, C<make_namespace> creates a new one and adds it under that name:
+
+  $P1 = $P0.'make_namespace'("Duck")
+
+=head3 Aliasing
+
+Just like regular assignment, the various operations to store a variable in a
+namespace only store a pointer to the PMC. If you modify the local PMC after
+storing in a namespace, those changes will also appear in the stored global. To
+store a true copy of the PMC, C<clone> it before you store it.
+
+Leaving the global variable as an alias for a local variable has its advantages.
+If you retrieve a stored global into a register and modify it:
+
+=begin PIR_FRAGMENT
+
+  $P1 = get_global "feather"
+  inc $P1
+
+=end PIR_FRAGMENT
+
+... you modify the value of the stored global, so you don't need to call
+C<set_global> again.
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

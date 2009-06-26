@@ -160,7 +160,7 @@ string is treated as '0'.
   have_pos:
 
     # count newlines to the current position of the parse
-    .local int pos, npos, lines
+    .local int npos, lines
     .local string target
     $P99 = getattribute match, '$.target'
     target = $P99

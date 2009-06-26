@@ -416,8 +416,13 @@ static void
 upcase(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(upcase)
-#if PARROT_HAS_ICU
+    if (src->bufused  == src->strlen
+            && src->encoding == Parrot_utf8_encoding_ptr) {
+        Parrot_ascii_charset_ptr->downcase(interp, src);
+        return;
+    }
 
+#if PARROT_HAS_ICU
     UErrorCode err;
     int dest_len, src_len, needed;
 
@@ -511,13 +516,12 @@ downcase(PARROT_INTERP, ARGIN(STRING *src))
 {
     ASSERT_ARGS(downcase)
     if (src->bufused  == src->strlen
-    &&  src->encoding == Parrot_utf8_encoding_ptr) {
+            && src->encoding == Parrot_utf8_encoding_ptr) {
         Parrot_ascii_charset_ptr->downcase(interp, src);
         return;
     }
-    else {
-#if PARROT_HAS_ICU
 
+#if PARROT_HAS_ICU
     UErrorCode err;
     int dest_len, src_len;
 
@@ -554,7 +558,6 @@ u_strToLower(UChar *dest, int32_t destCapacity,
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
-    }
 }
 
 

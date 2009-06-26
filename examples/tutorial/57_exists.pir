@@ -23,10 +23,10 @@ that PMC implements the related vtable functions.
 
     # set up an array with two elements
     .local pmc my_array
-    my_array = new 'ResizablePMCArray'
-    $P0      = new 'String'
+    my_array = new ['ResizablePMCArray']
+    $P0      = new ['String']
     $P0      = "Hello"
-    $P1      = new 'Undef'
+    $P1      = new ['Undef']
     push my_array, $P0
     push my_array, $P1
 

@@ -1,0 +1,109 @@
+=pod
+
+=head1 Introduction
+
+Parrot is a language-neutral virtual machine for dynamic languages such as
+Ruby, Python, PHP, and Perl. It hosts a powerful suite of compiler tools
+tailored to dynamic languages and a next generation regular expression engine.
+Its architecture differs from virtual machines such as the JVM or CLR, with
+optimizations for dynamic languages, the use of registers instead of stacks,
+and pervasive continuations used for all flow control.
+
+The name "Parrot" was inspired by Monty Python's Parrot sketch. As an April
+Fools' Day joke in 2001, Simon Cozens published "Programming Parrot", a
+fictional interview between Guido van Rossum and Larry Wall detailing their
+plans to merge Python and Perl into a new language called Parrot
+(U<http://www.perl.com/pub/a/2001/04/01/parrot.htm>).
+
+Parrot Intermediate Representation (PIR) is Parrot's native low-level language.
+PIR is fundamentally an assembly language, but it has some higher-level
+features such as operator syntax, syntactic sugar for subroutine and method
+calls, automatic register allocation, and more friendly conditional syntax.
+Parrot libraries -- including most of Parrot's compiler tools -- are often
+written in PIR.  Even so, PIR is more rigid and "close to the machine" than
+some higher-level languages like C, which makes it a good window into the inner
+workings of the virtual machine.
+
+=head2 Parrot Resources
+
+The starting point for all things related to Parrot is the main website
+U<http://www.parrot.org/>. The site lists additional resources, well as recent
+news and information about the project.
+
+The Parrot Foundation holds the copyright over Parrot and helps support its
+development and community.
+
+=head3 Documentation
+
+Parrot includes extensive documentation in the distribution. The full
+documentation for the latest release is available online at
+U<http://docs.parrot.org/>.
+
+=head3 Mailing Lists
+
+X<parrot-dev (Parrot mailing list)>
+X<mailing lists>
+
+The primary mailing list for Parrot is I<parrot-dev@lists.parrot.org>.  If
+you're interested in developing Parrot, the I<parrot-commits> and
+I<parrot-tickets> lists are useful.  More information on the Parrot mailing
+lists, as well as subscription options, is available at
+U<http://lists.parrot.org/mailman/listinfo>.
+
+The archives for I<parrot-dev> are also available on Google Groups at
+U<http://groups.google.com/group/parrot-dev> and via NNTP at
+U<nntp://news.gmane.org/gmane.comp.compilers.parrot.devel>.
+
+=head3 IRC
+
+X<#parrot (Parrot IRC channel)>
+X<IRC channel (#parrot)>
+
+Parrot developers and users congregate on IRC at C<#parrot> on the
+U<irc://irc.parrot.org> server. It's a good place to ask questions or discuss
+Parrot in real time.
+
+=head3 Issue Tracking & Wiki
+
+X<trac.parrot.org website>
+X<issue tracking (trac.parrot.org)>
+
+Parrot developers track issues with a Trac site at U<https://trac.parrot.org/>.
+Users can submit new tickets and track the status of existing tickets.  The
+site also includes a wiki used in project development, a source code browser,
+and the project roadmap.
+
+=head2 Parrot Development
+
+X<development cycles>
+
+Parrot's first release occurred in September 2001.  The 1.0 release took place
+on March 17, 2009.  2009. The Parrot project makes releases on the third
+Tuesday of each month. Two releases a year E<mdash> occuring every January and
+July E<mdash> are "supported" releases intended for production use.  The other
+ten releases are development releases intended for language implementers and
+testers.
+
+Development proceeds in cycles around releases. Activity just before a release
+focuses on closing tickets, fixing bugs, reviewing documentation, and preparing
+for the release. Immediately after the release, larger changes occur: merging
+branches, adding large features, or removing deprecated features. This allows
+developers to ensure that changes have sufficient testing time before the next
+release.  These regular releases also encourage feedback from casual users and
+testers.
+
+=head2 Licensing
+
+X<license>
+
+The Parrot foundation supports the Parrot development community and holds
+trademarks and copyrights to Parrot.  The project is available under the
+Artistic License 2.0, allowing free use in commercial and open source/free
+software contexts.
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

@@ -1451,7 +1451,6 @@ $create_nested_key
 
     key      = create_nested_key( 'Child' )
 
-    .local pmc grandchild_ns
     grandchild_ns = child_ns.'find_namespace'( key )
     if_null grandchild_ns, CHECK_SIBLING
     print "Grandchild still exists\\n"
@@ -1561,7 +1560,6 @@ pir_output_is( <<"CODE", <<'OUTPUT', 'del_sub()' );
     child_ns = parent_ns.'find_namespace'( 'Child' )
     child_ns.'del_sub'( 'dummy' )
 
-    .local pmc my_sub
     my_sub = get_global [ 'Parent'; 'Child' ], 'dummy'
     if_null my_sub, CHILD_NO_DUMMY
     print "Child did not delete dummy\\n"

@@ -18,15 +18,15 @@ code. We'l talk about some of these other types later.
 =cut
 
 .sub main :main
-    $P0 = new 'Integer'
+    $P0 = new ['Integer']
     $P0 = 42
     say $P0
 
-    $P1 = new 'Float'
+    $P1 = new ['Float']
     $P1 = 6.35
     say $P1
 
-    $P2 = new 'ResizableStringArray'
+    $P2 = new ['ResizableStringArray']
     $P2[0] = "Foo"
     $P2[1] = "Bar"
     $P2[2] = "Baz"

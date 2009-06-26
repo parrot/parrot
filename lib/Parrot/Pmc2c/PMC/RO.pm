@@ -44,7 +44,7 @@ sub new {
     my $self = bless Parrot::Pmc2c::PMC->new(
         {
             parents => [ $parent->name, @{ $parent->parents } ],    # prepend self to parrent
-            flags => { ( %{ $parent->get_flags } ), 'is_ro' => 1 }, # copy flags, set is_const
+            flags => { ( %{ $parent->get_flags } ), 'is_ro' => 1 }, # copy flags, set is_ro
             name       => $parent->name . "_ro",                    # set pmcname
             vtable     => $parent->vtable,                          # and alias vtable
             parentname => $parent->name,                            # set parentname

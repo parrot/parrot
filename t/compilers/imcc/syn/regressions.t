@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 14;
+use Parrot::Test tests => 15;
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -191,6 +191,15 @@ CODE
 OUT
 
 }
+
+pir_error_output_like( <<'CODE', <<'OUT', 'No segfault from syntax error, RT #60172');
+.sub 'main'
+    ($S0) = 'blah'(:pir_only=>1)
+.end
+CODE
+/syntax error.+unexpected/
+OUT
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

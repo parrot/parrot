@@ -107,6 +107,7 @@ my @FREEGLUT_CALLBACKS = (
 # alter the typemaps to fit this bug.
 
 my %C_TYPE = (
+    VOID                    => 'void',
     GLvoid                  => 'void',
     GLUnurbs                => 'void',
     GLUquadric              => 'void',
@@ -147,11 +148,20 @@ my %C_TYPE = (
     WindowRef               => 'void*',
     HIViewRef               => 'void*',
     Style                   => 'void*',
+    HANDLE                  => 'void*',
+    HPBUFFERARB             => 'void*',
+    HPBUFFEREXT             => 'void*',
+    HVIDEOOUTPUTDEVICENV    => 'void*',
+    HPVIDEODEV              => 'void*',
+    HPGPUNV                 => 'void*',
+    HGPUNV                  => 'void*',
     HDC                     => 'void*',
     HGLRC                   => 'void*',
     LPGLYPHMETRICSFLOAT     => 'void*',
     LPLAYERPLANEDESCRIPTOR  => 'void*',
     LPPIXELFORMATDESCRIPTOR => 'void*',
+    LPVOID                  => 'void*',
+    PGPU_DEVICE             => 'void*',
 
     GLchar                  => 'char',
     GLcharARB               => 'char',
@@ -160,10 +170,12 @@ my %C_TYPE = (
     GLboolean               => 'unsigned char',
 
     GLshort                 => 'short',
+    USHORT                  => 'unsigned short',
     GLushort                => 'unsigned short',
     GLhalfARB               => 'unsigned short',
     GLhalfNV                => 'unsigned short',
 
+    BOOL                    => 'int',
     Bool                    => 'int',
     Status                  => 'int',
     GLint                   => 'int',
@@ -171,6 +183,8 @@ my %C_TYPE = (
     GLfixed                 => 'int',
     GLclampx                => 'int',
     int32_t                 => 'int',
+    INT32                   => 'int',
+    INT                     => 'int',
 
     GLenum                  => 'unsigned int',
     GLCenum                 => 'unsigned int',
@@ -182,11 +196,13 @@ my %C_TYPE = (
     CGLError                => 'unsigned int',
     SphereMapFlags          => 'unsigned int',
 
+    UINT                    => 'unsigned int',
     GLuint                  => 'unsigned int',
     GLbitfield              => 'unsigned int',
     GLhandleARB             => 'unsigned int',
     GLXVideoDeviceNV        => 'unsigned int',
 
+    DWORD                   => 'unsigned long',
     GLulong                 => 'unsigned long',
     XID                     => 'unsigned long',
     Window                  => 'unsigned long',
@@ -208,9 +224,11 @@ my %C_TYPE = (
     GLXVideoSourceSGIX      => 'unsigned long',
 
     int64_t                 => 'long long',
+    INT64                   => 'long long',
     GLint64EXT              => 'signed long long',
     GLuint64EXT             => 'unsigned long long',
 
+    FLOAT                   => 'float',
     GLfloat                 => 'float',
     GLclampf                => 'float',
     GLdouble                => 'double',
@@ -307,11 +325,19 @@ my @IGNORE = (
     'SetPixelFormat',
 
     # Can't handle longlong until RT 53406 is done
+    'glBufferAddressRangeNV',
+    'glUniformui64NV',
+    'glProgramUniformui64NV',
     'glPresentFrameKeyedNV',
     'glPresentFrameDualFillNV',
     'glXSwapBuffersMscOML',
     'glXWaitForMscOML',
     'glXWaitForSbcOML',
+    'wglGetSyncValuesOML',
+    'wglSwapBuffersMscOML',
+    'wglSwapLayerBuffersMscOML',
+    'wglWaitForMscOML',
+    'wglWaitForSbcOML',
 
     # Can't handle weird data types specified only in proprietary headers
     'glXCreateGLXVideoSourceSGIX',
@@ -431,6 +457,7 @@ sub runstep {
         (map "$_/gl/*.h" => @include_paths_win32),
 
 #         # Portability testing headers
+#         "$ENV{HOME}/src/gentoo3/*.h",
 #         "$ENV{HOME}/src/osx/headers/GLUT/*.h",
 #         "$ENV{HOME}/src/osx/headers/OpenGL/*.h",
 #         "$ENV{HOME}/src/osx-10.4/GLUT/*.h",

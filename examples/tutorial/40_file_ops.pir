@@ -20,7 +20,7 @@ This example demonstrates basic file operations. Note the readmode.
     close filein
 
     # Be nice and remove the temporary file we created.
-    $P1 = new 'OS'
+    $P1 = new ['OS']
     $P1.'rm'('40_file_ops_data.txt')
 .end
 

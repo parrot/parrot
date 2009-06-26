@@ -8,7 +8,8 @@ PCT::Dumper - various dumper formats for PCT
 =head1 DESCRIPTION
 
 This file implements a dumper that attempts to output PAST,
-Match, and Capture objects in a YAML-compatible format.
+Match, and Capture objects in a format that can be easily
+consumed by syntax highlighters (such as Padre).
 Yes, the code is probably much uglier and convoluted than
 it should be.  No, I'm not proud of it, but it works for now.
 

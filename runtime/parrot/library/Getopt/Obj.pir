@@ -202,7 +202,6 @@ shortarg:
 
     key = name
 
-    .local string type
     type = spec."type"()
     $I2 = length val
 
@@ -220,7 +219,6 @@ beginfor_0:
 
     (name, spec) = self."getNameForKey"(key)
     if null name goto redofor
-    .local string type
     type = spec."type"()
     unless type == 'Boolean' goto error_2
 
@@ -263,7 +261,6 @@ beginstore:
 
 beginstore_1:
     # Store the value...
-    .local string type
     type = spec."type"()
     if_null val, undef
     if type == 'String' goto str
@@ -286,7 +283,6 @@ optelse:
 array:
     $P0 = return[name]
     if null $P0 goto not_set
-    .local string type
     type = typeof $P0
     unless type != 'ResizableStringArray' goto endif_5
 not_set:
@@ -297,7 +293,6 @@ endif_5:
 hash:
     $P0 = return[name]
     if null $P0 goto not_set_hash
-    .local string type
     type = typeof $P0
     unless type != 'Hash' goto endif_7
 not_set_hash:

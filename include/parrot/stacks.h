@@ -37,7 +37,7 @@ typedef struct Stack_Chunk {
 /* #define STACK_ITEMSIZE(chunk) PObj_buflen(chunk) */
 
 
-typedef void (*Stack_cleanup_method)(Interp*, Stack_Entry_t *);
+typedef void (*Stack_cleanup_method)(PARROT_INTERP, ARGIN(struct Stack_Entry *));
 
 #define STACK_CLEANUP_NULL ((Stack_cleanup_method)NULLfunc)
 

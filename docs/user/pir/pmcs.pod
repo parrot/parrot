@@ -21,17 +21,18 @@ the register type followed by the register number (C<$S15> is
 String register number 15). Parrot programs consist of lines of
 text where each line contains one opcode and its arguments.
 
-Each subroutine will have as many registers
-available as necessary; a simple subroutine will only need
-a few whereas complex subroutines with many calculations will
-need a larger number of registers. This is a fundamental
-difference from the original design of Parrot, in which there
-were 32 registers for each of the built-in types (int, num,
-pmc, string).
-PIR also provides for a more "natural" syntax for opcodes.
-Rather than saying C<set $I1, 0> to assign a zero to the $I1
-register, you may say instead C<$I1 = 0>.
-PIR also provides syntax for easily creating named variables
+Each subroutine will have as many registers available of each basic type
+(int, num, string, and pmc) as necessary; a simple subroutine will only
+need a few whereas complex subroutines with many calculations will need
+a larger number of registers.  This is a fundamental difference from
+hardware CPUs (and the original design of Parrot), in which there are a
+fixed number of registers.
+
+PIR also provides for a more "natural" syntax for opcodes than
+the standard assembly language C<op arg, arg> format.
+Rather than writing C<set $I1, 0> to assign a zero to the $I1
+register, you may instead write C<$I1 = 0>.
+PIR also provides easy syntax for creating named variables
 and constants, subroutines, passing parameters to subroutines,
 accessing parameters by name, etc.
 
@@ -39,14 +40,12 @@ Now, on to business ...
 
 =head2 What's a PMC?
 
-Integers, strings, and arbitrary floating point numbers are
-common data types in most programming languages, but what's
-a PMC? PMC stands for "Polymorphic Container". PMCs are how
-Parrot handles more complicated structures and behaviors
-(hence the magic :) Some examples of PMC usage would be for
-arrays, hashes, data structures, objects, etc. Anything that
-can't be expressed using just integers, floating point
-numbers and strings can be expressed with a PMC.
+Integers, strings, and floating point numbers are common data types in
+most programming languages, but what's a PMC?  PMC stands for
+"I<P>olyI<M>orphic I<C>ontainer".  PMCs are how Parrot handles more
+complicated structures and behaviors, such as arrays, hashes, and
+objects. anything that can't be expressed using just integers,
+floating point numbers and strings can be expressed with a PMC.
 
 Parrot comes with many types of PMC that encapsulate common,
 useful behavior.
@@ -63,8 +62,8 @@ several interesting and useful PMC types:
     Hash            A generic, resizable hash
     Random          Obtain a random number
     String          Similar to a string register but in PMC form
-    Integer         Similar to an integer register but in PMC form
-    Float           Similar to a number register but in PMC form
+    Integer         Similar to an int register but in PMC form
+    Float           Similar to a num register but in PMC form
     Exception       The standard exception mechanism
     Timer           A timer of course :)
 

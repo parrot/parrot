@@ -53,11 +53,8 @@ foreach my $branch (@branches) {
         $newest->atts->{revision};
     my $created_date = $oldest->first_child('date')->xml_text;
     my $updated_date = $newest->first_child('date')->xml_text;
-    my $author_txt;
-    if (scalar keys %authors == 1) {
-         $author_txt = $creator;
-    }
-    else {
+    my $author_txt = '';
+    if (scalar keys %authors != 1) {
         my @counts;
         foreach my $author (sort {$authors{$b} <=> $authors{$a}} keys %authors) {
             push @counts, "$author [$authors{$author}]";
@@ -81,8 +78,11 @@ foreach my $branch (@branches) {
                   $revisions,
 '|       creator: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
                   $creator,
+($author_txt ne '') ?
+(
 '|       authors: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
                   $author_txt,
+): (),
 '|    created on: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',
                   $created_date,
 '|    updated on: {<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<} |',

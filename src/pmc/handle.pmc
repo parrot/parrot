@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2008, Parrot Foundation.
-$Id: socket.pmc 38794 2009-05-15 16:12:33Z coke $
+$Id$
 
 =head1 NAME
 
@@ -13,6 +13,10 @@ This is the base-class for all IO-related PMCs.
 =head2 Vtable Functions
 
 =over 4
+
+=item * [to come]
+
+=back
 
 =cut
 

@@ -20,32 +20,35 @@ Warning! With --install there must be no directory prefix in the first arg yet.
 
 .sub 'main' :main
     .param pmc    argv
+
+    load_bytecode 'config.pbc'
+
     .local string infile
     .local string cfile
     .local string objfile
     .local string exefile
-    .local string out
-    .local int    closeresult
-
-    .local string gcc
-    .local int    is_gcc
-    load_bytecode 'config.pbc'
-    $P0 = '_config'()
-    gcc    = $P0['gccversion']
-    $I0    = length gcc
-    is_gcc = $I0 > 0
 
     (infile, cfile, objfile, exefile) = 'handle_args'(argv)
     unless infile > '' goto err_infile
 
+
+    .local string code_type
+    code_type = 'determine_code_type'()
+
     .local string codestring
-    unless is_gcc goto code_for_non_gcc
+    if code_type == 'gcc'  goto code_for_gcc
+    if code_type == 'msvc' goto code_for_msvc
+    goto code_for_default
   code_for_gcc:
     codestring = 'generate_code_gcc'(infile)
     goto code_end
-  code_for_non_gcc:
+  code_for_msvc:
+    codestring = 'generate_code_msvc'(infile)
+    goto code_end
+  code_for_default:
     codestring = 'generate_code'(infile)
   code_end:
+
 
   open_outfile:
     .local pmc outfh
@@ -54,6 +57,7 @@ Warning! With --install there must be no directory prefix in the first arg yet.
     print outfh, <<'HEADER'
 #include "parrot/parrot.h"
 #include "parrot/embed.h"
+const void * get_program_code(void);
 HEADER
 
     print outfh, codestring
@@ -63,11 +67,15 @@ HEADER
         {
             PackFile     *pf;
             Parrot_Interp interp;
+            const unsigned char *program_code_addr;
+
+            program_code_addr = (const unsigned char *)get_program_code();
+            if (!program_code_addr)
+                return 1;
 
             Parrot_set_config_hash();
 
             interp = Parrot_new( NULL );
-
             if (!interp)
                 return 1;
 
@@ -76,9 +84,11 @@ HEADER
             Parrot_set_flag(interp, PARROT_DESTROY_FLAG);
 
             pf = PackFile_new(interp, 0);
+            if (!pf)
+                return 1;
 
             if (!PackFile_unpack(interp, pf,
-                    (const opcode_t *)program_code, bytecode_size))
+                    (const opcode_t *)program_code_addr, bytecode_size))
                 return 1;
 
             do_sub_pragmas(interp, pf->cur_cs, PBC_PBC, NULL);
@@ -92,13 +102,23 @@ HEADER
         }
 MAIN
 
+
     # The close opcode does not return a result code,
     # use the method instead.
+    .local int    closeresult
     closeresult = outfh.'close'()
     unless closeresult == 0 goto err_close
 
+
+    .local string extra_obj
+    extra_obj = ''
+    if code_type != 'msvc' goto no_extra
+    extra_obj  = 'replace_pbc_extension'(infile, '.RES')
+  no_extra:
+
+
     'compile_file'(cfile, objfile)
-    'link_file'(objfile, exefile)
+    'link_file'(objfile, exefile, extra_obj)
     .return ()
 
   err_infile:
@@ -112,6 +132,11 @@ MAIN
 
 .sub 'handle_args'
     .param pmc argv
+
+    .local string obj, exe
+    $P0    = '_config'()
+    obj    = $P0['o']
+    exe    = $P0['exe']
 
     .local pmc args
     args   = argv
@@ -133,49 +158,23 @@ MAIN
     .return ()
 
   proper_install:
-    .local string cfile, objfile, obj, exefile, exe
+    .local string cfile, objfile, exefile
 
-    $P0    = '_config'()
-    obj    = $P0['o']
-    exe    = $P0['exe']
+    cfile   = 'replace_pbc_extension'(infile, '.c')
+    objfile = 'replace_pbc_extension'(infile, obj)
+    $S0     = 'replace_pbc_extension'(infile, exe)
+    exefile = concat 'installable_', $S0
 
-    .local int infile_len
-    infile_len  = length infile
-    infile_len -= 3
-
-    cfile       = substr infile, 0, infile_len
-    cfile      .= 'c'
-
-    dec infile_len
-    objfile     = substr infile, 0, infile_len
-    exefile     = 'installable_'
-    exefile    .= objfile
-    exefile    .= exe
-    objfile    .= obj
     .return(infile, cfile, objfile, exefile)
 
   proper_args:
-    .local string infile, cfile, objfile, obj, exefile, exe
-
-    $P0    = '_config'()
-    obj    = $P0['o']
-    exe    = $P0['exe']
 
     $P0    = shift args
     infile = shift args
 
-    .local int infile_len
-    infile_len  = length infile
-    infile_len -= 3
-
-    cfile       = substr infile, 0, infile_len
-    cfile      .= 'c'
-
-    dec infile_len
-    objfile     = substr infile, 0, infile_len
-    objfile    .= obj
-    exefile     = substr infile, 0, infile_len
-    exefile    .= exe
+    cfile   = 'replace_pbc_extension'(infile, '.c')
+    objfile = 'replace_pbc_extension'(infile, obj)
+    exefile = 'replace_pbc_extension'(infile, exe)
 
     # substitute .c for .pbc
     # remove .c for executable
@@ -183,6 +182,31 @@ MAIN
     # TODO this should complain about results/returns mismatch
     .return(infile, cfile, objfile, exefile)
 .end
+
+.sub 'determine_code_type'
+    .local pmc    config
+    .local string gcc_ver
+    .local string cc
+    .local string os_name
+
+    config = '_config'()
+
+    gcc_ver = config['gccversion']
+    unless gcc_ver > '' goto not_gcc
+    .return ('gcc')
+  not_gcc:
+
+    cc      = config['cc']
+    os_name = config['osname']
+
+    if os_name != 'MSWin32' goto not_msvc
+    if cc      != 'cl'      goto not_msvc
+    .return ('msvc')
+  not_msvc:
+
+    .return ('default')
+.end
+
 
 .sub 'generate_code'
     .param string infile
@@ -227,11 +251,19 @@ MAIN
     $S0 = size
     codestring .= $S0
     codestring .= ";\n"
+    codestring .= <<'END_OF_FUNCTION'
+        const void * get_program_code(void)
+        {
+            return program_code;
+        }
+END_OF_FUNCTION
+
     .return (codestring)
 
   err_infile:
     die "cannot open infile"
 .end
+
 
 # The PBC will be represented as a C string, so this sub builds a table
 # of the C representation of each ASCII character, for lookup by ordinal value.
@@ -312,10 +344,159 @@ MAIN
     $S0 = size
     codestring .= $S0
     codestring .= ";\n"
+
+    codestring .= <<'END_OF_FUNCTION'
+        const void * get_program_code(void)
+        {
+            return program_code;
+        }
+END_OF_FUNCTION
+
     .return (codestring)
 
   err_infile:
     die "cannot open infile"
+.end
+
+
+# Transforms the .pbc path into one with a different extension.
+# Passing '' means no extension.
+# Extensions without leading dots will have a dot pre-pended.
+.sub 'replace_pbc_extension'
+    .param string pbc_path
+    .param string new_extension
+
+    $S0 = substr pbc_path, -4
+    downcase $S0
+    if $S0 != '.pbc' goto err_pbc_path_not_pbc
+    .local string base_path
+     base_path = substr pbc_path, 0
+     substr base_path, -4, 4, ''
+
+    .local string new_path
+    new_path = substr base_path, 0
+
+    unless new_extension > '' goto ext_null
+
+    $S1 = substr new_extension, 0, 1
+    if $S1 == '.' goto has_dot
+    new_path .= '.'
+
+  has_dot:
+    new_path .= new_extension
+
+  ext_null:
+    .return (new_path)
+
+  err_pbc_path_not_pbc:
+    die "input pbc file name does not end in '.pbc'"
+.end
+
+
+# In addition to generating the code for inclusion in the C file,
+# this sub creates supplemental .rc and .RES files.
+.sub 'generate_code_msvc'
+    .param string pbc_path
+
+    .local string rc_path
+    .local string res_path
+    rc_path  = 'replace_pbc_extension'(pbc_path, '.rc' )
+    res_path = 'replace_pbc_extension'(pbc_path, '.res')
+
+    # The exact numbers are not relevant;
+    # they are used to identify the resource within the final executable.
+    .local string rc_constant_defines
+    rc_constant_defines = <<'END_OF_DEFINES'
+#define RESOURCE_NAME_ID_WHOLE_PBC 333
+#define RESOURCE_TYPE_ID_WHOLE_PBC 444
+END_OF_DEFINES
+
+
+    .local string rc_contents
+    rc_contents  = ''
+    rc_contents .= rc_constant_defines
+    rc_contents .= 'RESOURCE_NAME_ID_WHOLE_PBC RESOURCE_TYPE_ID_WHOLE_PBC '
+    rc_contents .= pbc_path
+    rc_contents .= "\n"
+
+    .local pmc rc_fh
+    rc_fh = open rc_path, 'w'
+    unless rc_fh goto err_rc_open
+    print rc_fh, rc_contents
+    $I0 = rc_fh.'close'()
+    unless $I0 == 0 goto err_rc_close
+
+
+    .local int pbc_size
+    $P1 = new ['OS']
+    $P2 = $P1.'stat'(pbc_path)
+    pbc_size = $P2[7]
+
+
+    .local string codestring
+    codestring  = ''
+    codestring .= '#include <windows.h>'
+    codestring .= "\n"
+    codestring .= rc_constant_defines
+    codestring .= "const unsigned int bytecode_size = "
+    $S0 = pbc_size
+    codestring .= $S0
+    codestring .= ";\n"
+
+    codestring .= <<'END_OF_FUNCTION'
+        const void * get_program_code(void)
+        {
+            HRSRC   hResource;
+            DWORD   size;
+            HGLOBAL hPBC;
+            LPVOID  actual_pointer_to_pbc_in_memory;
+
+            hResource = FindResource(
+                NULL,
+                MAKEINTRESOURCE(RESOURCE_NAME_ID_WHOLE_PBC),
+                MAKEINTRESOURCE(RESOURCE_TYPE_ID_WHOLE_PBC)
+            );
+            if (!hResource)
+                return NULL;
+
+            size = SizeofResource( NULL, hResource );
+            if (size != bytecode_size)
+                return NULL;
+
+            hPBC = LoadResource( NULL, hResource );
+            if (!hPBC)
+                return NULL;
+
+            actual_pointer_to_pbc_in_memory = LockResource( hPBC );
+            if (!actual_pointer_to_pbc_in_memory)
+                return NULL;
+
+            return actual_pointer_to_pbc_in_memory;
+        }
+END_OF_FUNCTION
+
+    .local string rc_cmd
+    rc_cmd  = 'rc '
+    rc_cmd .= rc_path
+
+    say rc_cmd
+    .local int status
+    status = spawnw rc_cmd
+    unless status goto rc_ok
+
+    die "RC command failed"
+  rc_ok:
+
+    .return (codestring)
+
+  err_h_open:
+    die "cannot open .h file"
+  err_rc_open:
+    die "cannot open .rc file"
+  err_h_close:
+    die "cannot close .h file"
+  err_rc_close:
+    die "cannot close .rc file"
 .end
 
 # util functions
@@ -371,6 +552,7 @@ MAIN
 .sub 'link_file'
     .param string objfile
     .param string exefile
+    .param string extra_obj
     .param int install :optional
 
     $P0 = '_config'()
@@ -415,6 +597,12 @@ MAIN
     link .= pathquote
     link .= objfile
     link .= pathquote
+    unless extra_obj > '' goto skip_extra_obj
+    link .= ' '
+    link .= pathquote
+    link .= extra_obj
+    link .= pathquote
+  skip_extra_obj:
     link .= ' '
     link .= config
     link .= ' '

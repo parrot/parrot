@@ -15,11 +15,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/distro/test_file_coverage.t - make sure source files have matching tests
+t/codingstd/test_file_coverage.t - make sure source files have matching tests
 
 =head1 SYNOPSIS
 
-    % prove t/distro/test_file_coverage.t
+    % prove t/codingstd/test_file_coverage.t
 
 =head1 DESCRIPTION
 
@@ -54,15 +54,15 @@ PMC: {
     local $" = "\n\t";
 
     # Tests in src/pmc
-    ok( !@$test_pmc_miss, "there are PMC files for all test files in $test_pmc_dir" )
+    ok( !@$test_pmc_miss, "there are test files in $test_pmc_dir for all PMC files" )
         or diag "files in $pmc_dir but not in test dir:\n\t@$test_pmc_miss";
 
     # Tests in src/dynpmc
-    ok( !@$test_dynpmc_miss, "there are PMC files for all test files in $test_dynpmc_dir" )
+    ok( !@$test_dynpmc_miss, "there are test files in $test_dynpmc_dir for all PMC files" )
         or diag "files in $dynpmc_dir but not in test dir:\n\t@$test_dynpmc_miss";
 
     # Tests in src/dynoplibs
-    ok( !@$test_dynoplibs_miss, "there are OPS files for all test files in $test_dynoplibs_dir" )
+    ok( !@$test_dynoplibs_miss, "there are test files in $test_dynoplibs_dir for all OPS files" )
         or diag "files in $dynoplibs_dir but not in test dir:\n\t@$test_dynoplibs_miss";
 }    # PMC
 

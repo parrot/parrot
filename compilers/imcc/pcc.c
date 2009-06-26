@@ -743,6 +743,9 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
 
     SymReg * const sub = ins->symregs[0];
 
+    PARROT_ASSERT(sub);
+    PARROT_ASSERT(sub->pcc_sub);
+
     if (ins->type & ITRESULT) {
         const int n = sub->pcc_sub->nret;
         ins         = pcc_get_args(interp, unit, ins, "get_results", n,
@@ -767,6 +770,11 @@ expand_pcc_sub_call(PARROT_INTERP, ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *i
 
     if (ins->type & ITCALL) {
         SymReg * const the_sub = sub->pcc_sub->sub;
+        /* If this condition is true the generator must haven't be called,
+         * but check it as a last resort.
+         * See also TT #737 */
+        if (the_sub == NULL)
+            IMCC_fatal(interp, 1, "expand_pcc_sub_call: no such sub");
 
         if (!meth_call && (the_sub->type & VTADDRESS)) {
             /* sub->pcc_sub->sub is an actual subroutine name, not a variable */

@@ -453,7 +453,7 @@ or 'Object').
     setattribute how, 'parrotclass', parrotclass
 
     ##  create an anonymous class for the protoobject
-    .local pmc protoclass, protoobject, iter
+    .local pmc protoclass, protoobject
     protoclass = new 'Class'
     $P0 = get_class 'P6protoobject'
     ##  P6protoobject methods override parrotclass methods...

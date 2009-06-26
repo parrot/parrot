@@ -21,7 +21,7 @@ opcode on it.
 
     myarray = split " ", "foo bar baz boz"
 
-    iter = new 'Iterator', myarray
+    iter = new ['Iterator'], myarray
   iter_loop:
     unless iter goto iter_end
 

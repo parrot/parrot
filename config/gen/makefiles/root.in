@@ -259,10 +259,12 @@ GEN_LIBRARY := \
     $(LIBRARY_DIR)/Math/Random/mt19937ar.pbc \
     $(LIBRARY_DIR)/Math/Rand.pbc \
     $(LIBRARY_DIR)/MIME/Base64.pbc \
+    $(LIBRARY_DIR)/NCI/Utils.pbc \
     $(LIBRARY_DIR)/NCI/call_toolkit_init.pbc \
     $(LIBRARY_DIR)/ncurses.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
+#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL/Math.pbc \
     $(LIBRARY_DIR)/P6object.pbc \
     $(LIBRARY_DIR)/parrotlib.pbc \
     $(LIBRARY_DIR)/pcore.pbc \
@@ -619,6 +621,7 @@ STR_FILES := \
     $(SRC_DIR)/scheduler.str \
     $(SRC_DIR)/spf_render.str \
     $(SRC_DIR)/spf_vtable.str \
+    $(SRC_DIR)/string/api.str \
     $(SRC_DIR)/sub.str \
     $(SRC_DIR)/stacks.str \
     \

@@ -204,6 +204,11 @@ sub parents {
     return $self->{parents};
 }
 
+sub direct_parents {
+    my ($self) = @_;
+    return $self->{direct_parents};
+}
+
 sub mixins {
     my ($self) = @_;
     return $self->{mixins};
@@ -235,7 +240,10 @@ sub get_flags {
 sub set_parents {
     my ( $self, $value ) = @_;
     $value             ||= [];
-    $self->{parents}     = $value;
+    $self->{parents}        = $value;
+    for my $dp (@{ $value }) {
+        push @{$self->{direct_parents}}, $dp;
+    }
     return 1;
 }
 

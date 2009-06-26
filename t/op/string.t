@@ -7,7 +7,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 163;
+use Parrot::Test tests => 165;
 use Parrot::Config;
 
 =head1 NAME
@@ -2925,6 +2925,38 @@ Foo::Bar
 Foo/Bar
 Foo/Bar
 OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'Corner cases of numification' );
+.sub main :main
+    say 2147483647.0
+    say -2147483648.0
+.end
+CODE
+2147483647
+-2147483648
+OUT
+pir_output_is( <<'CODE', <<'OUT', 'Non canonical nan and inf' );
+.sub main :main
+    $N0 = 'nan'
+    say $N0
+    $N0 = 'iNf'
+    say $N0
+    $N0 = 'INFINITY'
+    say $N0
+    $N0 = '-INF'
+    say $N0
+    $N0 = '-Infinity'
+    say $N0
+.end
+CODE
+NaN
+Inf
+Inf
+-Inf
+-Inf
+OUT
+
+
 
 # Local Variables:
 #   mode: cperl

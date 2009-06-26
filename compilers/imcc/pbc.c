@@ -1348,7 +1348,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         ns_const  = ns->color;
 
         if (real_name) {
-            char * const p = str_dup(real_name + 1);
+            char * const p = mem_sys_strdup(real_name + 1);
             free(r->name);
             r->name = p;
         }
@@ -1394,7 +1394,7 @@ add_const_pmc_sub(PARROT_INTERP, ARGMOD(SymReg *r), size_t offs, size_t end)
         unit->subid = r;
     else {
         /* trim the quotes  */
-        unit->subid->name = str_dup(unit->subid->name + 1);
+        unit->subid->name = mem_sys_strdup(unit->subid->name + 1);
         unit->subid->name[strlen(unit->subid->name) - 1] = 0;
 
         /* create string constant for it. */
@@ -1808,6 +1808,9 @@ make_pmc_const(PARROT_INTERP, ARGMOD(SymReg *r))
     PMC    * const _class = interp->vtables[r->pmc_type]->pmc_class;
     STRING *s;
     PMC    *p;
+
+    if (PMC_IS_NULL(_class))
+        IMCC_fatal(interp, 1, "make_pmc_const: no such pmc");
 
     if (*r->name == '"')
         s = Parrot_str_unescape(interp, r->name + 1, '"', NULL);

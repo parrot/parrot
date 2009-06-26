@@ -200,7 +200,7 @@ then a warning is generated if perl is running under -w.
     goto START_5
     END_5:
 
-    .local int len, len_mod_4
+    .local int len_mod_4
     len = length base64_cleaned
     len_mod_4 = len % 4
 

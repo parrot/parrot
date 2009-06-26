@@ -60,7 +60,6 @@ Tests the ExceptionHandler PMC.
     eh = 0
     c()
   error_handler_one:
-    .local pmc e, c
     .get_results (e)
     ok(1, 'Min and Max severity for exception handlers')
     c = e['resume']
@@ -93,14 +92,12 @@ Tests the ExceptionHandler PMC.
     goto subclass_handler
 
   typed_handler_one:
-    .local pmc e, c
     .get_results (e)
     ok(1, 'Exception Handler type checks work')
     c = e['resume']
     eh = 0
     c()
   typed_handler_two:
-    .local pmc e, c
     .get_results (e)
     ok(0, 'Exception Handler type checks work')
     c = e['resume']

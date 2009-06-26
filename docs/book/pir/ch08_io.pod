@@ -1,0 +1,386 @@
+=pod
+
+=head1 I/O
+
+X<FileHandle>
+X<PMCs; FileHandle>
+X<Socket>
+X<PMCs; Socket>
+Parrot handles all I/O in Parrot with a set of PMCs. The C<FileHandle> PMC
+takes care of reading from and writing to files and file-like streams.  The
+C<Socket> PMC takes care of network I/O.
+
+=head2 FileHandle Opcodes
+
+The C<open> opcode opens a new filehandle. It takes a string argument,
+which is the path to the file:
+
+=begin PIR_FRAGMENT
+
+  $P0 = open 'my/file/name.txt'
+
+=end PIR_FRAGMENT
+
+By default, it opens the filehandle as read-only, but an optional second string
+argument can specify the mode for the file. The modes are C<r> for read, C<w>
+for write, C<a> for append, and C<p> for pipe:N<These are the same as the C
+language read-modes, so may be familiar.>
+
+=begin PIR_FRAGMENT
+
+  $P0 = open 'my/file/name.txt', 'a'
+
+  $P0 = open 'myfile.txt', 'r'
+
+=end PIR_FRAGMENT
+
+You can combine modes; a handle that can read and write uses the mode string
+C<rw>. A handle that can read and write but will not overwrite the existing
+contents uses C<ra> instead.
+
+The C<close> opcode closes a filehandle when it's no longer needed.
+Closing a filehandle doesn't destroy the object, it only makes that
+filehandle object available for opening a different file.N<It's
+generally not a good idea to manually close the standard input, standard
+output, or standard error filehandles, though you can recreate them.>
+
+=begin PIR_FRAGMENT
+
+  close $P0
+
+=end PIR_FRAGMENT
+
+The C<print> opcode prints a string argument or the string form of an
+integer, number, or PMC to a filehandle:
+
+=begin PIR_FRAGMENT
+
+  print $P0, 'Nobody expects'
+
+=end PIR_FRAGMENT
+
+It also has a one-argument variant that always prints to standard
+output:
+
+=begin PIR_FRAGMENT
+
+  print 'the Spanish Inquisition'
+
+=end PIR_FRAGMENT
+
+The C<say> opcode also prints to standard output, but it appends a
+trailing newline to whatever it prints. Another opcode worth mentioning
+is the C<printerr> opcode, which prints an argument to the standard
+error instead of standard output:
+
+=begin PIR_FRAGMENT
+
+  say 'Turnip'
+
+  printerr 'Blancmange'
+
+=end PIR_FRAGMENT
+
+The C<read> and C<readline> opcodes read values from a filehandle.  C<read>
+takes an integer value and returns a string with that many characters (if
+possible). C<readline> reads a line of input from a filehandle and returns the
+string without the trailing newline:
+
+=begin PIR_FRAGMENT
+
+  $S0 = read $P0, 10
+
+  $S0 = readline $P0
+
+=end PIR_FRAGMENT
+
+The C<read> opcode has a one-argument variant that reads from standard input:
+
+=begin PIR_FRAGMENT
+
+      $S0 = read 10
+
+=end PIR_FRAGMENT
+
+The C<getstdin>, C<getstdout>, and C<getstderr> opcodes fetch the
+filehandle objects for the standard streams: standard input, standard
+output, and standard error:
+
+=begin PIR_FRAGMENT
+
+  $P0 = getstdin    # Standard input handle
+  $P1 = getstdout   # Standard output handle
+  $P2 = getstderr   # Standard error handle
+
+=end PIR_FRAGMENT
+
+Once you have the filehandle for one of the standard streams, you can use it
+just like any other filehandle object:
+
+=begin PIR_FRAGMENT
+
+  $P0 = getstdout
+  print $P0, 'hello'
+
+=end PIR_FRAGMENT
+
+This following example reads data from the file F<myfile.txt> one line at a
+time using the C<readline> opcode. As it loops over the lines of the file, it
+checks the boolean value of the read-only filehandle C<$P0> to test whether the
+filehandle has reached the end of the file:
+
+=begin PIR
+
+  .sub 'main'
+    $P0 = getstdout
+    $P1 = open 'myfile.txt', 'r'
+    loop_top:
+      $S0 = readline $P1
+      print $P0, $S0
+      if $P1 goto loop_top
+    close $P1
+  .end
+
+=end PIR
+
+=head2 FileHandle Methods
+
+The methods available on a filehandle object are mostly duplicates of the
+opcodes, though sometimes they provide more options. Behind the scenes many of
+the opcodes call the filehandle's methods anyway, so the choice between the two
+is more a matter of style preference than anything else.
+
+=head3 open
+
+The C<open> method opens a stream in an existing filehandle object. It takes
+two optional string arguments: the name of the file to open and the open mode.
+
+=begin PIR_FRAGMENT
+
+  $P0 = new 'FileHandle'
+  $P0.'open'('myfile.txt', 'r')
+
+=end PIR_FRAGMENT
+
+The C<open> opcode internally creates a new filehandle PMC and calls its
+C<open> method on it. The opcode version is shorter to write, but it also
+creates a new PMC for every call, while the method can reopen an existing
+filehandle PMC with a new file.
+
+When reopening a filehandle, Parrot will reuse the previous filename associated
+with the filehandle unless you provide a different filename.  The same goes for
+the mode.
+
+=head3 close
+
+The C<close> method closes the filehandle. This does not destroy the filehandle
+object; you can reopen it with the C<open> method later.
+
+=begin PIR_FRAGMENT
+
+  $P0.'close'()
+
+=end PIR_FRAGMENT
+
+=head3 is_closed
+
+The C<is_closed> method checks if the filehandle is closed. It returns
+true if the filehandle has been closed or was never opened, and false if
+it is currently open:
+
+=begin PIR_FRAGMENT
+
+  $I0 = $P0.'is_closed'()
+
+=end PIR_FRAGMENT
+
+=head3 print
+
+The C<print> method prints a given value to the filehandle. The argument
+can be an integer, number, string, or PMC.
+
+=begin PIR_FRAGMENT
+
+  $P0.'print'('Hello!')
+
+=end PIR_FRAGMENT
+
+=head3 puts
+
+The C<puts> method is similar to C<print>, but it only takes a string
+argument.
+
+=begin PIR_FRAGMENT
+
+  $P0.'puts'('Hello!')
+
+=end PIR_FRAGMENT
+
+=head3 read
+
+The C<read> method reads a specified number of bytes from the filehandle
+object and returns them in a string.
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P0.'read'(10)
+
+=end PIR_FRAGMENT
+
+If the remaining bytes in the filehandle are fewer than the requested
+number of bytes, returns a string containing the remaining bytes.
+
+=head3 readline
+
+The C<readline> method reads an entire line up to a newline character or
+the end-of-file mark from the filehandle object and returns it in a
+string.
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P0.'readline'()
+
+=end PIR_FRAGMENT
+
+=head3 readline_interactive
+
+The C<readline_interactive> method is useful for command-line scripts.
+It writes the single argument to the method as a prompt to the screen,
+then reads back a line of input.
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P0.'readline_interactive'('Please enter your name:')
+
+=end PIR_FRAGMENT
+
+=head3 readall
+
+The C<readall> method reads an entire file. If the filehandle is closed,
+it will open the file given by the passed in string argument, read the
+entire file, and then close the filehandle.
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P0.'readall'('myfile.txt')
+
+=end PIR_FRAGMENT
+
+If the filehandle is already open, C<readall> will read the contents of the
+file, and won't close the filehandle when it's finished. Don't pass the name
+argument when working with a file you've already opened.
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P0.'readall'()
+
+=end PIR_FRAGMENT
+
+=head3 mode
+
+The C<mode> method returns the current file access mode for the
+filehandle object.
+
+=begin PIR_FRAGMENT
+
+  $S0 = $P0.'mode'()
+
+=end PIR_FRAGMENT
+
+=head3 encoding
+
+The C<encoding> method sets or retrieves the string encoding behavior of the
+filehandle.
+
+=begin PIR_FRAGMENT
+
+ $P0.'encoding'('utf8')
+ $S0 = $P0.'encoding'()
+
+=end PIR_FRAGMENT
+
+See L<Encodings and Charsets> in Chapter 4 for more details on the
+encodings supported in Parrot.
+
+=head3 buffer_type
+
+The C<buffer_type> method sets or retrieves the buffering behavior of the
+filehandle object. The argument or return value is one of: C<unbuffered> to
+disable buffering, C<line-buffered> to read or write when the filehandle
+encounters a line ending, or C<full-buffered> to read or write bytes when the
+buffer is full.
+
+=begin PIR_FRAGMENT
+
+  $P0.'buffer_type'('full-buffered')
+  $S0 = $P0.'buffer_type'()
+
+=end PIR_FRAGMENT
+
+=head3 buffer_size
+
+The C<buffer_size> method sets or retrieves the buffer size of the
+filehandle object.
+
+=begin PIR_FRAGMENT
+
+  $P0.'buffer_size'(1024)
+  $I0 = $P0.'buffer_size'()
+
+=end PIR_FRAGMENT
+
+The buffer size set on the filehandle is only a suggestion.  Parrot may
+allocate a larger buffer, but it will never allocate a smaller buffer.
+
+=head3 flush
+
+The C<flush> method flushes the buffer if the filehandle object is
+working in a buffered mode.
+
+=begin PIR_FRAGMENT
+
+  $P0.'flush'()
+
+=end PIR_FRAGMENT
+
+=head3 eof
+
+The C<eof> method checks whether a filehandle object has reached the end of the
+current file. It returns true if the filehandle is at the end of the current
+file and false otherwise.
+
+=begin PIR_FRAGMENT
+
+  $I0 = $P0.'eof'()
+
+=end PIR_FRAGMENT
+
+=head3 isatty
+
+The C<isatty> method returns a boolean value whether the filehandle is a
+TTY terminal.
+
+=begin PIR_FRAGMENT
+
+  $P0.'isatty'()
+
+=end PIR_FRAGMENT
+
+=head3 get_fd
+
+The C<get_fd> method returns the integer file descriptor of the current
+filehandle object. Not all operating systems use integer file
+descriptors. Those that don't simply return C<-1>.
+
+=begin PIR_FRAGMENT
+
+  $I0 = $P0.'get_fd'()
+
+=end PIR_FRAGMENT
+
+=cut
+
+# Local variables:
+#   c-file-style: "parrot"
+# End:
+# vim: expandtab shiftwidth=4:

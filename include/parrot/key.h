@@ -167,7 +167,7 @@ INTVAL key_type(SHIM_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING * key_string(PARROT_INTERP, ARGIN(PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

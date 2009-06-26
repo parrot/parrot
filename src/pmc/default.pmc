@@ -494,7 +494,16 @@ Store the method as a global in the namespace of this class.
 */
 
     VTABLE PMC *get_namespace() {
-        return SELF->vtable->_namespace;
+
+        /* Because singletons are shared between interpreters, we need to make
+         * special effort to use the right namespace for method lookups.
+         * Note that this trick won't work if the singleton inherits from
+         * something else (because the MRO will still be shared).
+         * Having this code here avoids creating a special case for singletons
+         * elsewhere.
+         */
+
+        return INTERP->vtables[SELF->vtable->base_type]->_namespace;
     }
 
 

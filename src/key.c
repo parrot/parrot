@@ -440,13 +440,11 @@ a key.  Returns a string value corresponding to the key.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 STRING *
 key_string(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_string)
-    INTVAL   int_key;
-    FLOATVAL num_key;
 
     switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
         /* remember to COW strings instead of returning them directly */
@@ -460,6 +458,7 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
         }
         case KEY_string_FLAG | KEY_register_FLAG:
         {
+            INTVAL int_key;
             STRING *s;
             GETATTR_Key_int_key(interp, key, int_key);
             s = REG_STR(interp, int_key);
@@ -469,25 +468,36 @@ key_string(PARROT_INTERP, ARGIN(PMC *key))
         }
         case KEY_pmc_FLAG | KEY_register_FLAG:
         {
+            INTVAL int_key;
             PMC *reg;
             GETATTR_Key_int_key(interp, key, int_key);
             reg = REG_PMC(interp, int_key);
             return VTABLE_get_string(interp, reg);
         }
         case KEY_integer_FLAG:
+        {
+            INTVAL int_key;
             GETATTR_Key_int_key(interp, key, int_key);
             return Parrot_str_from_int(interp, int_key);
+        }
         case KEY_integer_FLAG | KEY_register_FLAG:
+        {
+            INTVAL int_key;
             GETATTR_Key_int_key(interp, key, int_key);
             return Parrot_str_from_int(interp, REG_INT(interp, int_key));
-
+        }
         case KEY_number_FLAG:
+        {
+            FLOATVAL num_key;
             GETATTR_Key_num_key(interp, key, num_key);
             return Parrot_str_from_num(interp, num_key);
+        }
         case KEY_number_FLAG | KEY_register_FLAG:
+        {
+            INTVAL int_key;
             GETATTR_Key_int_key(interp, key, int_key);
             return Parrot_str_from_num(interp, REG_NUM(interp, int_key));
-
+        }
         default:
         case KEY_pmc_FLAG:
             return VTABLE_get_string(interp, key);
@@ -607,11 +617,13 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
 {
     ASSERT_ARGS(key_mark)
     const UINTVAL flags = PObj_get_FLAGS(key) & KEY_type_FLAGS;
-    PMC          *next_key;
-    STRING       *str_key;
 
     if (flags == KEY_string_FLAG) {
+        STRING *str_key;
         GETATTR_Key_str_key(interp, key, str_key);
+
+        /* XXX str_key can be NULL from GETATTR_Key_str_key, */
+        /* so shouldn't be marked. */
         Parrot_gc_mark_PObj_alive(interp, (PObj *)str_key);
     }
 
@@ -620,13 +632,13 @@ key_mark(PARROT_INTERP, ARGIN(PMC *key))
      * the bucket_index and not the next key component
      * Note to self: shoot whoever thought this was a good idea.
      */
-    if (flags == KEY_hash_iterator_FLAGS)
-        return;
-
-    /* if iteration hasn't started, above flag isn't set yet */
-    GETATTR_Key_next_key(interp, key, next_key);
-    if (next_key && (void *)next_key != (void *)INITBucketIndex)
-        Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
+    if (flags != KEY_hash_iterator_FLAGS) {
+        PMC *next_key;
+        /* if iteration hasn't started, above flag isn't set yet */
+        GETATTR_Key_next_key(interp, key, next_key);
+        if (next_key && (void *)next_key != (void *)INITBucketIndex)
+            Parrot_gc_mark_PObj_alive(interp, (PObj *)next_key);
+    }
 
 }
 
@@ -657,7 +669,7 @@ key_set_to_string(PARROT_INTERP, ARGIN_NULLOK(PMC *key))
     INTVAL         int_key;
     STRING        *str_key;
 
-    for (;key;) {
+    while (key != NULL) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
             case KEY_integer_FLAG:
                 GETATTR_Key_int_key(interp, key, int_key);

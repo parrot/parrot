@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2009, Parrot Foundation.
 # $Id$
 
 =head1 NAME
@@ -26,7 +26,7 @@ Testing Perl 6 objects.
     test_namespace.'export_to'(curr_namespace, exports)
 
     ##  set our plan
-    plan(234)
+    plan(252)
 
     ##  make sure we can load the P6object library
     push_eh load_fail
@@ -460,6 +460,15 @@ diagnostic message).
     $I0 = isnull $P0
     ok($I0, ".new_class didn't store ['parrot'], 'WXY'")
     p6obj_tests(wxyproto, 'WXY', 'isa'=>'WXY P6object', 'can'=>'foo')
+
+    ## build a Parrotclass
+    .local pmc vwx_nsarray, vwx_ns, vwx_parrotclass, vwx_proto 
+    vwx_nsarray = new 'ResizablePMCArray'
+    push vwx_nsarray, 'VWX'
+    vwx_ns = get_hll_namespace vwx_nsarray
+    vwx_parrotclass = newclass vwx_ns
+    vwx_proto = p6meta.'register'(vwx_parrotclass)
+    p6obj_tests(vwx_proto, 'VWX', 'can'=>'foo')
 .end
 
 .namespace ['XYZ']
@@ -468,6 +477,11 @@ diagnostic message).
 .end
 
 .namespace ['WXY']
+.sub 'foo' :method
+    .return ('WXY::foo')
+.end
+
+.namespace ['VWX']
 .sub 'foo' :method
     .return ('WXY::foo')
 .end

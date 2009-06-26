@@ -220,7 +220,7 @@ stored for mocking.
             SET_ATTR_mode(INTERP, SELF, open_mode);
         }
 
-        Parrot_io_open(INTERP, SELF, filename, open_mode);
+        SELF = Parrot_io_open(INTERP, SELF, filename, open_mode);
 
         RETURN(PMC *SELF);
     }
