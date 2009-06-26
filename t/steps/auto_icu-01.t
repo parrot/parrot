@@ -403,13 +403,27 @@ $conf->data->set( ccflags => $status ); # re-set for next test
        \$stderr,
    );
 
-   like($stdout, qr/Adding -I $icuheaders to ccflags for icu headers/,
-       "Got expected verbose output");
+   if ($icuheaders =~ /\s/) {
+       like($stdout, qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
+           "Got expected verbose output");
+   }
+   else {
+       like($stdout, qr/Adding -I \Q$icuheaders\E to ccflags for icu headers/,
+           "Got expected verbose output");
+   }
 }
-like($conf->data->get( 'ccflags'),
-    qr/-I $icuheaders/,
-    "ccflags augmented as expected"
-);
+if ($icuheaders =~ /\s/) {
+    like($conf->data->get( 'ccflags' ),
+        qr/-I \"\Q$icuheaders\E\"/,
+        "ccflags augmented as expected"
+    );
+}
+else {
+    like($conf->data->get( 'ccflags' ),
+        qr/-I \Q$icuheaders\E/,
+        "ccflags augmented as expected"
+    );
+}
 $conf->data->set( ccflags => $status ); # re-set for next test
 
 {
@@ -430,10 +444,19 @@ $conf->data->set( ccflags => $status ); # re-set for next test
 
    ok(! $stdout, "No verbose output, as expected");
 }
-like($conf->data->get( 'ccflags'),
-    qr/-I $icuheaders/,
-    "ccflags augmented as expected"
-);
+
+if ($icuheaders =~ /\s/) {
+    like($conf->data->get( 'ccflags'),
+        qr/-I \"\Q$icuheaders\E\"/,
+        "ccflags augmented as expected"
+    );
+}
+else {
+    like($conf->data->get( 'ccflags'),
+        qr/-I \Q$icuheaders\E/,
+        "ccflags augmented as expected"
+    );
+}
 $conf->data->set( ccflags => $status ); # re-set for next test
 
 ########## _set_no_configure_with_icu() ##########
@@ -652,7 +675,7 @@ $conf->replenish($serialized);
                 "Got expected verbose output re --ldflags");
             like($stdout, qr/icushared:  captured/s,
                 "Got expected verbose output re icushared");
-            like($stdout, qr/For icushared, found $icushared and $without/s,
+            like($stdout, qr/For icushared, found \Q$icushared\E and $without/s,
                 "Got expected verbose output re icushared");
             like($stdout, qr/Trying $icuconfig with '--prefix'/s,
                 "Got expected verbose output re --prefix");
