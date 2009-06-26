@@ -555,9 +555,9 @@ method generate_passes() {
     @res.push('        Parrot_create_mro(interp, entry);');
 
     for self.past.methods { 
-        @res.push('    register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_'~self.name~'_nci_'~$_~'), CONST_STRING_GEN(interp, "'~$_~'"));');
+        @res.push('        register_raw_nci_method_in_ns(interp, entry, F2DPTR(Parrot_'~self.name~'_nci_'~$_~'), CONST_STRING_GEN(interp, "'~$_~'"));');
         if self.past.methods{$_}{'attrs'}{'write'} {
-            @res.push('    Parrot_mark_method_writes(interp, entry, "nci_'~$_~'");');
+            @res.push('        Parrot_mark_method_writes(interp, entry, "nci_'~$_~'");');
         }
     }
     @res.push('');
@@ -569,6 +569,13 @@ method generate_passes() {
         #@res.push(self.past.class_init);
         @res.push('        }');
     }
+
+    if elements(self.past.multis) {
+        @res.push('#define N_MULTI_LIST (sizeof(_temp_multi_func_list)/sizeof(_temp_multi_func_list[0]))');
+        @res.push('        Parrot_mmd_add_multi_list_from_c_args(interp,');
+        @res.push('            _temp_multi_func_list, N_MULTI_LIST);');
+    }
+        
 
     @res.push('    }');
     join("\n", @res);
