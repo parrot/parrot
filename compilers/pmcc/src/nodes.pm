@@ -7,7 +7,7 @@ method create_variant_vtable() {
 
     my %vtdump;
 
-    %vtdump := self.past.vtdump;
+    %vtdump := self<vtdump>;
 
     for (self.vtables{'default'}) {
        if (!%vtdump{$_}{'attributes'}{'write'}) {

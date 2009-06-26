@@ -60,8 +60,6 @@ TODO: Parse c_body properly and implement all other functions.
   loop:
     unless $P0 goto done
     $P1 = shift $P0
-    #print 'P1 '
-    #say $P1
     $S0 = self.'!generate_body_part'(pmclass, $P1)
     push res, $S0
     goto loop
