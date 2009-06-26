@@ -192,9 +192,13 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
 
     .local pmc pmc_path, attrs, fh, it, filename
     .local string dumpname
+    .local int already_have_attrs
 
     #search through all dirs in @pmc_path, looking for a file
     #named lc(pmcname) ~".dump"
+
+    $P0 = self.'attrs'()
+    already_have_attrs = elements $P0
 
     pmc_path = get_hll_global ['PMC';'Emitter'], '@?pmc_path'
     dumpname = pmcname
@@ -239,6 +243,7 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
 
   iter_loop:
     unless it goto iter_done
+    if already_have_attrs goto cant_add_attrs
     attr = shift it
     name  = attr['name']
     type  = attr['type']
@@ -254,6 +259,9 @@ unserialize a PMC's frozen ATTRs and add them to this PMC.
     printerr pmcname
     printerr ".pmc\n"
     .return ()
+
+  cant_add_attrs:
+    die "attempt to multiply inherit from two parents which both have ATTRs"
 .end
 
 
