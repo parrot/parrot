@@ -92,7 +92,7 @@ test: all
 testclean:
 
 CLEANUPS := \
-  pmc.pbc \
+  pmcc.pbc \
   src/gen_emitter.pir \
   src/gen_nodes.pir \
   src/parser/gen_grammar.pir \
