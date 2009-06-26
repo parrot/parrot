@@ -95,6 +95,7 @@ sub runstep {
         $conf->genfile( $self->{digest_pmc_template} => "src/dynpmc/${file}.pmc" );
         $conf->genfile( $self->{digest_t_template} => "t/dynpmc/${file}.t" );
     }
+    $conf->cc_clean();
 
     return 1;
 }
