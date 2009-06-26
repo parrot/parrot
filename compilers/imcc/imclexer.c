@@ -5637,6 +5637,7 @@ expand_macro(PARROT_INTERP, ARGIN(const char *name), void *yyscanner)
 
         IMCC_INFO(interp)->line = m->line;
         scan_string(frame, m->expansion, yyscanner);
+
         return 1;
     }
 
@@ -5653,9 +5654,14 @@ include_file(PARROT_INTERP, char *file_name, void *yyscanner)
     char *ext;
     FILE *file;
 
-    if (!s || !(file = fopen(s, "r")))
+    if (!s || !(file = fopen(s, "r"))) {
+        if (frame->s.file)
+            mem_sys_free(frame->s.file);
         IMCC_fataly(interp, EXCEPTION_EXTERNAL_ERROR, strerror(errno));
+    }
 
+    if (frame->s.file)
+        mem_sys_free(frame->s.file);
     mem_sys_free(s);
     frame->s.file            = mem_sys_strdup(file_name);
     frame->s.handle          = file;
