@@ -312,7 +312,7 @@ Generate C file's contents for this PMC.
 
 method generate_c_code($past) {
 
-    my %vtables := thaw('../../vtable.frozen');
+    my %vtables := self.past.vtdump;
     #make sure there aren't any misnamed VTABLE functions
     for self.past.vtables{'default'} {
         if !%vtables{$_} {

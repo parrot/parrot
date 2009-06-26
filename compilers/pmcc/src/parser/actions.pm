@@ -24,6 +24,7 @@ method pmc($/, $key) {
         # Save c_header.
         $?PMC<c_header> := substr($/.orig, 0, $/.from);
 
+        $?PMC<vtdump> := thaw('../../vtable.frozen');
     }
     else {
         # TODO Set c_header and c_coda
@@ -190,6 +191,12 @@ method multi($/) {
     );
     $past<parameters> := $<c_signature><c_arguments>.ast;
 
+    my %attrs;
+    for $<method_attr> {
+        %attrs{~$_<identifier>} := 1;
+    }
+    $past<attrs> := %attrs;
+
     # Handle parameters to create short and long signaures
 
     # Largely stolen from Pmc2c::MULTIs::rewrite_multi_sub
@@ -224,12 +231,6 @@ method multi($/) {
     $past<short_signature> := $short_sig;
     $past<long_signature>  := join(',', @long_sig);
     $past<full_name>       := "multi_" ~ $past.name ~ "_" ~ join('_', @long_sig);
-
-    my %attrs;
-    for $<method_attr> {
-        %attrs{~$_<identifier>} := 1;
-    }
-    $past<attrs> := %attrs;
 
     make $past;
 }
