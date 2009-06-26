@@ -1269,6 +1269,7 @@ pasm_inst:                     { clear_state(interp); }
                     IMCC_INFO(interp)->cur_unit,
                     mk_sub_label(interp, $4));
            IMCC_INFO(interp)->cur_call->pcc_sub->pragma = $3;
+           mem_sys_free($4);
          }
    | PNULL var
          {
